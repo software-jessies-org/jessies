@@ -9,28 +9,54 @@ import javax.swing.Timer;
 public class GreenwichMapView extends JComponent {
     private BufferedImage dayMap;
     private BufferedImage nightMap;
+    private boolean showMeridian = false;
+    private JLabel label;
     
     public GreenwichMapView() {
-        dayMap = getBufferedImage("/Users/elliotth/Desktop/land_ocean_ice_2048.jpg");
-        nightMap = getBufferedImage("/Users/elliotth/Desktop/land_ocean_ice_lights_2048.jpg");
+        dayMap = getBufferedImage("land_ocean_ice_2048.jpg");
+        nightMap = getBufferedImage("land_ocean_ice_lights_2048.jpg");
         Dimension size = new Dimension(dayMap.getWidth(), dayMap.getHeight());
         setPreferredSize(size);
         new Timer(5 * 60 * 1000, new Updater()).start();
-        addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+        addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseMoved(MouseEvent e) {
                 int x = e.getX();
                 double y = (double) e.getY();
                 double latitude = 90.0 - 180.0 * (y / (double) dayMap.getHeight());
                 double longitude = 360.0 * ((double) x / (double) dayMap.getWidth()) - 180.0;
-                System.err.println("lat="+latitude + " lon="+longitude);
+                if (label != null) {
+                    label.setText("lat=" + fromDegrees(latitude, 'S', 'N') + " lon=" + fromDegrees(longitude, 'W', 'E'));
+                }
             }
         });
         setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
     }
     
+    public String fromDegrees(double angle, char negative, char positive) {
+        String result = "";
+        boolean usePositive = (angle >= 0);
+        angle = Math.abs(angle);
+        int degrees = (int) angle;
+        result += degrees + "'";
+        angle -= degrees;
+        int minutes = (int) (60 * angle);
+        result += minutes + "\"";
+        result += usePositive ? positive : negative;
+        return result;
+    }
+    
+    public void setShowMeridian(boolean b) {
+        this.showMeridian = b;
+        repaint();
+    }
+    
+    public void setLocationLabel(JLabel label) {
+        this.label = label;
+    }
+    
     private BufferedImage getBufferedImage(String filename) {
         // Load the original image.
-        ImageIcon icon = new ImageIcon(filename);
+        ImageIcon icon = new ImageIcon(System.getProperty("user.home") + "/Desktop/" + filename);
         final int width = icon.getIconWidth();
         final int height = icon.getIconHeight();
         
@@ -51,7 +77,14 @@ public class GreenwichMapView extends JComponent {
         }
     }
     
-    public void paintComponent(Graphics g) {
-        new SolarProjector().paintIlluminatedArea((Graphics2D) g, dayMap, nightMap);
+    public void paintComponent(Graphics oldGraphics) {
+        Graphics2D g = (Graphics2D) oldGraphics;
+        new SolarProjector().paintIlluminatedArea(g, dayMap, nightMap);
+        if (showMeridian) {
+            final int greenwich = getWidth() / 2;
+            g.setColor(new Color(0, 0, 0, 128));
+            g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 2.0f, 3.0f }, 0.0f));
+            g.drawLine(greenwich, 0, greenwich, getHeight());
+        }
     }
 }

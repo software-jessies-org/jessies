@@ -1,10 +1,12 @@
 package e.toys.world;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.net.*;
 import java.util.*;
 import java.text.*;
 import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * Shows a world map.
@@ -31,6 +33,7 @@ public class WorldClock extends JFrame {
     private JLabel right;
 
     public WorldClock() {
+        super("World Clock");
         setContentPane(makeContentPane());
         pack();
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -75,19 +78,31 @@ public class WorldClock extends JFrame {
         right.setText(GB.format(now));
         */
     }
+    
+    private JComponent makeControls() {
+        JPanel controls = new JPanel(new BorderLayout());
+        
+        JCheckBox showMeridian = new JCheckBox("Show Greenwich Meridian");
+        showMeridian.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                mapView.setShowMeridian(e.getStateChange() == ItemEvent.SELECTED);
+            }
+        });
+        controls.add(showMeridian, BorderLayout.WEST);
+        
+        JLabel location = new JLabel(" ");
+        mapView.setLocationLabel(location);
+        controls.add(location, BorderLayout.EAST);
+        
+        return controls;
+    }
 
     private JComponent makeContentPane() {
         JComponent content = new JPanel(new BorderLayout());
         mapView = new GreenwichMapView();
+        content.setBorder(new EmptyBorder(0, 0, 10, 0));
         content.add(mapView, BorderLayout.CENTER);
-        /*
-        initLabelsAndIcons();
-        JComponent content = new JPanel(new BorderLayout());
-        content.setBorder(new javax.swing.border.EmptyBorder(2, 2, 2, 2));
-        content.add(left, BorderLayout.WEST);
-        content.add(new JLabel("  "), BorderLayout.CENTER);
-        content.add(right, BorderLayout.EAST);
-        */
+        content.add(makeControls(), BorderLayout.SOUTH);
         return content;
     }
 
