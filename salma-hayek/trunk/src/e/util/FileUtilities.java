@@ -222,7 +222,7 @@ public class FileUtilities {
      * and I don't actually Edit any non-ASCII files with Edit, so it
      * can wait.
      */
-    public static boolean isAsciiFile(File file) {
+    public static boolean isTextFile(File file) {
         boolean isAsciiFile = false;
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
