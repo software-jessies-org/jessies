@@ -2,9 +2,7 @@ package e.edit;
 
 import java.awt.event.*;
 import javax.swing.*;
-
 import e.forms.*;
-import e.util.*;
 
 public class SetBuildTargetAction extends ETextAction {
     public static final String ACTION_NAME = "Set Build Target...";
@@ -16,16 +14,18 @@ public class SetBuildTargetAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        buildTargetField.setText(Parameters.getParameter("make.target"));
+        Workspace workspace = Edit.getCurrentWorkspace();
+
+        buildTargetField.setText(workspace.getBuildTarget());
         
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Build Target:", buildTargetField);
-        boolean okay = FormDialog.show(Edit.getFrame(), "Build Properties", formPanel, "Apply");
+        boolean okay = FormDialog.show(Edit.getFrame(), workspace.getTitle() + " Build Target", formPanel, "Apply");
         
         if (okay == false) {
             return;
         }
         
-        System.setProperty("make.target", buildTargetField.getText());
+        workspace.setBuildTarget(buildTargetField.getText());
     }
 }

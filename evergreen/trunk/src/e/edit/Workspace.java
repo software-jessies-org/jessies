@@ -28,6 +28,7 @@ public class Workspace extends JPanel {
         super(new BorderLayout());
         this.title = title;
         this.rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
+        this.buildTarget = "";
         add(makeUI(), BorderLayout.CENTER);
     }
     
