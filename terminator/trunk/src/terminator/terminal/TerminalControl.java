@@ -65,7 +65,6 @@ public class TerminalControl implements Runnable {
 
 	private StringBuffer lineBuffer = new StringBuffer();
 
-	public static final int ESC = 0x1b;
 	private EscapeParser escapeParser;
 	
 	public static void doStep() {
@@ -175,9 +174,14 @@ public class TerminalControl implements Runnable {
 	
 	private boolean terminalActionsProcessed = true;
 	
+	private static final char ASCII_BEL = 0x07;
+	private static final char ASCII_SO = 0x0e;
+	private static final char ASCII_SI = 0x0f;
+	private static final char ASCII_ESC = 0x1b;
+	
 	public void processChar(final char ch) throws IOException {
 		logWriter.append(ch);
-		if (ch == ESC) {
+		if (ch == ASCII_ESC) {
 			flushLineBuffer();
 			// If the old escape sequence is interrupted; we start a new one.
 			if (escapeParser != null) {
@@ -196,7 +200,11 @@ public class TerminalControl implements Runnable {
 			flushLineBuffer();
 			doStep();
 			processSpecialCharacter(ch);
-		} else if (ch > 0x7) {
+		} else if (ch == ASCII_SO || ch == ASCII_SI) {
+			// The xwsh man page says that these make G0 and G1 the current
+			// character set, respectively. In practice, they make whiptail(1) look
+			// strange. Until we support graphical character sets, ignore them.
+		} else if (ch > ASCII_BEL) {
 			// Most telnetd(1) implementations seem to have a bug whereby
 			// they send the NUL byte at the end of the C strings they want to
 			// output when you first connect. Since all Unixes are pretty much
@@ -271,7 +279,7 @@ public class TerminalControl implements Runnable {
 	
 	public void sendEscapeString(String str) {
 		try {
-			out.write((byte) ESC);
+			out.write((byte) ASCII_ESC);
 			out.write(str.getBytes());
 			out.flush();
 		} catch (IOException ex) {
