@@ -20,7 +20,7 @@ public class PTextWindow {
     private static void open(final String filename) {
         final StopWatch stopWatch = new StopWatch(filename + ": ");
         final PTextBuffer text = new PTextBuffer();
-        text.setText(e.util.StringUtilities.readFile(filename).toCharArray());
+        text.readFromFile(new java.io.File(filename));
         stopWatch.print("read file");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

@@ -1,6 +1,8 @@
 package e.ptextarea;
 
-
+import java.io.*;
+import java.nio.*;
+import java.nio.charset.*;
 import java.util.*;
 
 /**
@@ -49,8 +51,43 @@ public class PTextBuffer implements CharSequence {
         }
     }
     
-    /** Sets the text, replacing anything that was here before. */
-    public void setText(char[] text) {
+    /**
+     * Replaces the contents of this buffer with the entire contents of 'file'.
+     */
+    public void readFromFile(File file) {
+        DataInputStream dataInputStream = null;
+        try {
+            // Read all the bytes in.
+            long byteCount = file.length();
+            FileInputStream fileInputStream = new FileInputStream(file);
+            ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[(int) byteCount]);
+            dataInputStream = new DataInputStream(fileInputStream);
+            dataInputStream.readFully(byteBuffer.array());
+            
+            // Convert the bytes to characters.
+            CharBuffer charBuffer = Charset.forName("UTF-8").decode(byteBuffer);
+            
+            // And use the characters as our content.
+            char[] chars = charBuffer.array();
+            setText(chars);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            if (dataInputStream != null) {
+                try {
+                    dataInputStream.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Sets the text, replacing anything that was here before.
+     * Note that this method does not copy the given char[].
+     */
+    private void setText(char[] text) {
         this.text = text;
         gapPosition = 0;
         gapLength = 0;
