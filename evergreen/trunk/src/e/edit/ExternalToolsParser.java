@@ -1,6 +1,5 @@
 package e.edit;
 
-import javax.swing.*;
 import e.util.*;
 
 /**

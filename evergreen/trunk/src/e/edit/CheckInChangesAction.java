@@ -1,7 +1,5 @@
 package e.edit;
 
-import java.awt.event.*;
-
 /**
  * Runs CheckInTool.
  */
