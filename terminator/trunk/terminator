@@ -1,4 +1,4 @@
 #!/bin/bash
 TERMINATOR_HOME=`dirname $0`
 CLASSES_DIR=$TERMINATOR_HOME/classes
-exec java -cp $CLASSES_DIR terminatorn.JTelnetPane $*
+exec java -cp $CLASSES_DIR terminatorn.JTelnetPane "$@"
