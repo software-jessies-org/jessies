@@ -98,6 +98,7 @@ public class TagsUpdater {
         tree.setCellRenderer(new TagsPanel.TagsTreeRenderer());
         
         final SearchField searchField = new SearchField("Search Symbols");
+        searchField.setSendsNotificationForEachKeystroke(true);
         searchField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 tree.clearSelection();
