@@ -11,6 +11,12 @@ public interface MinibufferUser {
     public String getPrompt();
 
     /**
+     * Returns the history of past accepted values.
+     * May return null to signify that no history is kept.
+     */
+    public StringHistory getHistory();
+    
+    /**
      * Returns the proposed initial value of the minibuffer's text.
      */
     public String getInitialValue();

@@ -28,6 +28,10 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     // MinibufferUser interface.
     //
     
+    public StringHistory getHistory() {
+        return null;
+    }
+    
     public String getInitialValue() {
         String result = "";
         try {
