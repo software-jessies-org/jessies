@@ -48,9 +48,10 @@ public class HyperlinkHighlighter implements Highlighter {
 	
 	/**
 	 * A filename can end at the end of a line, before a quote, or before
-	 * whitespace.
+	 * whitespace. It can also reasonably end with any character, after
+	 * the address part of a grep match. So there's not much to say here.
 	 */
-	private static final String END = "(?: $ | \" | \\s )";
+	private static final String END = "";
 	
 	/**
 	 * The (optional) directory part of a filename must end in a slash,
