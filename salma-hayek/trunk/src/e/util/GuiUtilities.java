@@ -41,8 +41,19 @@ public class GuiUtilities {
         return (System.getProperty("os.name").indexOf("Windows") != -1);
     }
     
-    public static KeyStroke makeKeyStroke(String key, boolean shifted) {
-        int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    /**
+     * Returns a KeyStroke suitable for passing to putValue(Action.ACCELERATOR_KEY) to
+     * set up a keyboard equivalent for an Action.
+     */
+    public static KeyStroke makeKeyStroke(final String key, final boolean shifted) {
+        return makeKeyStrokeForModifier(Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), key, shifted);
+    }
+    
+    /**
+     * A more general form of makeKeyStroke needed by Terminator on Linux to use Alt instead of Ctrl.
+     */
+    public static KeyStroke makeKeyStrokeForModifier(final int modifier, final String key, final boolean shifted) {
+        int modifiers = modifier;
         if (shifted) modifiers |= InputEvent.SHIFT_MASK;
         String keycodeName = "VK_" + key;
         int keycode;
