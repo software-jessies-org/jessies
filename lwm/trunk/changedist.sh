@@ -1,3 +1,4 @@
 #!/bin/sh
 
-cp ChangeLog /usr/james/www/jfc/software/lwm-stable-ChangeLog.txt
+scp ChangeLog jessies:www.jfc.org.uk/html/software/lwm-stable-ChangeLog.txt
+
