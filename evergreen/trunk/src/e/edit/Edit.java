@@ -272,7 +272,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     /** Returns the workspace whose root directory shares the longest common prefix with the given filename. */
     public static Workspace getBestWorkspaceForFilename(String filename) {
         Workspace[] workspaces = getWorkspaces();
-        int bestIndex = 0;
+        int bestIndex = (tabbedPane == null) ? 0 : tabbedPane.getSelectedIndex();
         int bestLength = 0;
         for (int i = 0; i < workspaces.length; i++) {
             Workspace workspace = workspaces[i];
