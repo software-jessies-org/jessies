@@ -13,12 +13,17 @@ import terminator.view.highlight.*;
  * the pop-up menu on all platforms.
  */
 public class TerminatorMenuBar extends JMenuBar {
+	private Action[] customWindowMenuItems = new Action[] {
+		new NextTerminalAction(),
+		new PreviousTerminalAction()
+	};
+	
 	public TerminatorMenuBar() {
 		add(makeFileMenu());
 		add(makeEditMenu());
 		add(makeScrollbackMenu());
 		//add(makeFontMenu());
-		add(WindowMenu.getSharedInstance().makeJMenu());
+		add(WindowMenu.getSharedInstance().makeJMenu(customWindowMenuItems));
 		//addHelpMenu();
 	}
 	
@@ -120,6 +125,11 @@ public class TerminatorMenuBar extends JMenuBar {
 	public static JTerminalPane getFocusedTerminalPane() {
 		Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
 		return (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, focusOwner);
+	}
+	
+	public static TerminatorFrame getFocusedTerminatorFrame() {
+		Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+		return (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, focusOwner);
 	}
 	
 	public static class NewShellAction extends AbstractAction {
@@ -362,6 +372,34 @@ public class TerminatorMenuBar extends JMenuBar {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
 				terminal.doClearScrollbackAction();
+			}
+		}
+	}
+	
+	public static class NextTerminalAction extends AbstractAction {
+		public NextTerminalAction() {
+			super("Next Terminal");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("RIGHT"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			TerminatorFrame frame = getFocusedTerminatorFrame();
+			if (frame != null) {
+				frame.switchToNextTab();
+			}
+		}
+	}
+	
+	public static class PreviousTerminalAction extends AbstractAction {
+		public PreviousTerminalAction() {
+			super("Previous Terminal");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("LEFT"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			TerminatorFrame frame = getFocusedTerminatorFrame();
+			if (frame != null) {
+				frame.switchToPreviousTab();
 			}
 		}
 	}
