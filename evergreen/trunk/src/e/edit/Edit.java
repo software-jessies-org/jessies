@@ -225,16 +225,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         try {
             /*
              * Open the file a symbolic link points to, and not the link itself.
-             */
-            if (FileUtilities.isSymbolicLink(filename)) {
-                String canonicalFilename = FileUtilities.fileFromString(filename).getCanonicalPath();
-                if (address != null) {
-                    canonicalFilename += address;
-                }
-                return Edit.openFileNonInteractively(canonicalFilename);
-            }
-            
-            /*
              * Clean paths like a/b/../c/d. Let the Java API do this.
              */
             filename = FileUtilities.fileFromString(filename).getCanonicalPath();
