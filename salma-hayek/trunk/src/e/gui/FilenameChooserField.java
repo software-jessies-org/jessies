@@ -1,6 +1,5 @@
 package e.gui;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
@@ -24,7 +23,6 @@ public class FilenameChooserField extends JPanel implements ActionListener {
     
     /** fileChooserMode is one of the JFileChooser file selection mode constants. Which will hopefully become enums in Java 1.5. */
     public FilenameChooserField(int fileChooserMode) {
-        super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         this.fileChooserMode = fileChooserMode;
         initUI();
     }
@@ -42,7 +40,10 @@ public class FilenameChooserField extends JPanel implements ActionListener {
     }
     
     private void initUI() {
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        pathnameField.setMaximumSize(pathnameField.getPreferredSize());
         add(pathnameField);
+        add(Box.createHorizontalStrut(10));
         add(makeButton());
     }
     
