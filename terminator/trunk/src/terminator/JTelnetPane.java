@@ -72,6 +72,9 @@ public class JTelnetPane extends JPanel {
 	public static JTelnetPane newShell() {
 		String user = System.getProperty("user.name");
 		String command = getUserShell(user);
+		if (Options.getSharedInstance().isLoginShell()) {
+			command += " -l";
+		}
 		return new JTelnetPane(user + "@localhost", command);
 	}
 	

@@ -32,15 +32,19 @@ public class Options {
 	}
 	
 	/**
+	 * Whether or not the shells we start should be login shells. The
+	 * default is false.
+	 */
+	public boolean isLoginShell() {
+		return defaultedBooleanResource("loginShell", false);
+	}
+	
+	/**
 	 * Whether or not pressing a key should cause the the scrollbar to go
 	 * to the bottom of the scrolling region. The default is true.
 	 */
 	public boolean isScrollKey() {
-		String scrollKey = (String) options.get("scrollKey");
-		if (scrollKey != null) {
-			return parseBoolean(scrollKey);
-		}
-		return true;
+		return defaultedBooleanResource("scrollKey", true);
 	}
 	
 	/**
@@ -48,11 +52,15 @@ public class Options {
 	 * go to the bottom of the scrolling region. The default is false.
 	 */
 	public boolean isScrollTtyOutput() {
-		String scrollTtyOutput = (String) options.get("scrollTtyOutput");
-		if (scrollTtyOutput != null) {
-			return parseBoolean(scrollTtyOutput);
+		return defaultedBooleanResource("scrollTtyOutput", false);
+	}
+	
+	private boolean defaultedBooleanResource(String name, boolean defaultValue) {
+		String value = (String) options.get(name);
+		if (value != null) {
+			return parseBoolean(value);
 		}
-		return false;
+		return defaultValue;
 	}
 	
 	private boolean parseBoolean(String s) {
