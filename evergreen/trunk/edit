@@ -24,7 +24,7 @@ Darwin)
     # Darwin is what Mac OS X calls itself.
     EDIT_PREFERENCES_DIRECTORY=$HOME/Library/Preferences/$EDIT_CLASS_NAME
     PATH=/System/Library/Frameworks/JavaVM.framework/Commands:$PATH
-    OS_SPECIFIC_OPTIONS=-Xdock:name=Edit:icon=$EDIT_HOME/edit.icns
+    OS_SPECIFIC_OPTIONS=-Xdock:name=Edit:icon=/Developer/Examples/Carbon/SimpleText/SimpleText.icns
     ;;
 *)
     ;;
