@@ -9,15 +9,8 @@ import javax.swing.*;
 import e.gui.*;
 import e.util.*;
 import terminator.*;
-import terminator.model.*;
 import terminator.terminal.*;
 import terminator.view.highlight.*;
-
-/**
-
-@author Phil Norman
-@author Elliott Hughes
-*/
 
 public class JTerminalPane extends JPanel {
 	private TerminalPaneMaster controller;
@@ -28,18 +21,18 @@ public class JTerminalPane extends JPanel {
 	private Dimension currentSizeInChars;
 	private Action[] menuAndKeyActions = new Action[] {
 		new TerminatorMenuBar.CopyAction(),
-		new PasteAction(),
+		new TerminatorMenuBar.PasteAction(),
 		null,
 		new TerminatorMenuBar.NewShellAction(),
 //		new NewTabAction(),
 //		new RunCommandAction(),
-		new CloseAction(),
+		new TerminatorMenuBar.CloseAction(),
 		null,
-		new FindAction(),
-		new FindNextAction(),
-		new FindPreviousAction(),
+		new TerminatorMenuBar.FindAction(),
+		new TerminatorMenuBar.FindNextAction(),
+		new TerminatorMenuBar.FindPreviousAction(),
 		null,
-		new ClearScrollbackAction(),
+		new TerminatorMenuBar.ClearScrollbackAction(),
 	};
 	
 	/**
@@ -245,7 +238,7 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		public void keyPressed(KeyEvent event) {
-			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
+			if (GuiUtilities.isMacOs() == false && TerminatorMenuBar.isKeyboardEquivalent(event)) {
 				handleKeyboardEquivalent(event);
 				return;
 			}
@@ -461,15 +454,8 @@ public class JTerminalPane extends JPanel {
 		return new InfoAction(text);
 	}
 	
-	public class PasteAction extends AbstractAction {
-		public PasteAction() {
-			super("Paste");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("V"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			textPane.paste();
-		}
+	public void doPasteAction() {
+		textPane.paste();
 	}
 	
 /*	public class RunCommandAction implements MenuKeyAction {
@@ -496,49 +482,21 @@ public class JTerminalPane extends JPanel {
 		}
 	}*/
 	
-	public class FindAction extends AbstractAction {
-		public FindAction() {
-			super("Find...");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("F"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			controller.showFindDialogFor(textPane);
-		}
+	public void doFindAction() {
+		controller.showFindDialogFor(textPane);
 	}
 	
-	public class FindNextAction extends AbstractAction {
-		public FindNextAction() {
-			super("Find Next");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("G"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			textPane.findNext();
-		}
+	public void doFindNextAction() {
+		textPane.findNext();
 	}
 	
-	public class FindPreviousAction extends AbstractAction {
-		public FindPreviousAction() {
-			super("Find Previous");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("D"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			textPane.findPrevious();
-		}
+	public void doFindPreviousAction() {
+		textPane.findPrevious();
 	}
 	
-	public class ClearScrollbackAction extends AbstractAction {
-		public ClearScrollbackAction() {
-			super("Clear Scrollback");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("K"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			textPane.clearScrollBuffer();
-			control.sendRedrawScreen();
-		}
+	public void doClearScrollbackAction() {
+		textPane.clearScrollBuffer();
+		control.sendRedrawScreen();
 	}
 	
 /*	public class NewTabAction implements MenuKeyAction {
@@ -555,15 +513,8 @@ public class JTerminalPane extends JPanel {
 		}
 	}*/
 	
-	public class CloseAction extends AbstractAction {
-		public CloseAction() {
-			super("Close");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("W"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			control.destroyProcess();
-			controller.closeTerminalPane(JTerminalPane.this);
-		}
+	public void doCloseAction() {
+		control.destroyProcess();
+		controller.closeTerminalPane(JTerminalPane.this);
 	}
 }
