@@ -21,7 +21,6 @@ cd /tmp/$$
 echo "Creating directories..."
 mkdir -p $name
 mkdir -p $name/src
-mkdir -p $name/classes
 
 echo "Creating Makefile..."
 cat > $name/Makefile <<EOF
