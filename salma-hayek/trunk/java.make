@@ -4,23 +4,38 @@
 #   make dist
 #   make bindist
 
+# You can set:
+#   JAVA_COMPILER to "jikes", "javac", or a binary of your choice.
+
 # Your calling Makefile:
 #   must define PROJECT_NAME
 #   may append to BINDIST_FILES
 #   may append to SUBDIRS
 #   must include ../salma-hayek/java.make
 
+# ----------------------------------------------------------------------------
+# Ensure we're running a suitable version of make(1).
+# ----------------------------------------------------------------------------
+
+REQUIRED_MAKE_VERSION = 3.80
+REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
+ifneq "$(REQUIRED_MAKE_VERSION)" \
+      "$(word 1,$(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))"
+    $(error This makefile requires at least version $(REQUIRED_MAKE_VERSION) of GNU make, but you're using $(REAL_MAKE_VERSION))
+endif
+
+# ----------------------------------------------------------------------------
+# Define useful stuff not provided by GNU make.
+# ----------------------------------------------------------------------------
+
+pathsearch = $(firstword $(wildcard $(addsuffix /$(1),$(subst :, ,$(PATH)))))
+makepath = $(subst $(SPACE),:,$(strip $(1)))
+
 SPACE := $(subst :, ,:)
 
-# Where are we?
-ifeq ($(MAKE_VERSION), 3.79)
-    # Old versions of make (like the one Apple ships) don't
-    # have $(MAKEFILE_LIST), so we need to have a fall-back
-    # for that case.
-    SALMA_HAYEK=~/Projects/salma-hayek/
-else
-    SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
-endif
+# ----------------------------------------------------------------------------
+
+SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
 # By default, distributions end up under http://www.jessies.org/~enh/
 DIST_SCP_USER_AND_HOST=enh@jessies.org
@@ -88,8 +103,9 @@ FILE_LIST_WITH_DIRECTORIES += classes
 FILE_LIST_WITH_DIRECTORIES += ChangeLog # The ChangeLog should never be checked in, but should be in distributions.
 FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE_LIST_WITH_DIRECTORIES)),$(FILE_LIST_WITH_DIRECTORIES))))
 
-pathsearch = $(firstword $(wildcard $(addsuffix /$(1),$(subst :, ,$(PATH)))))
-makepath = $(subst $(SPACE),:,$(strip $(1)))
+# ----------------------------------------------------------------------------
+# Choose a Java compiler, and set up the flags appropriately.
+# ----------------------------------------------------------------------------
 
 JAVA_FLAGS += $(JAVA_FLAGS.$(JAVA_COMPILER))
 JAVA_FLAGS += $(addprefix -bootclasspath ,$(call makepath,$(BOOT_CLASS_PATH)))
@@ -105,8 +121,10 @@ ifeq "$(JAVA_COMPILER_LOCATION)" ""
   JAVA_COMPILER = javac
 endif
 
-# variables above
-# rules below
+# ----------------------------------------------------------------------------
+# Variables above this point,
+# rules below...
+# ----------------------------------------------------------------------------
 
 .PHONY: build
 build: $(SOURCE_FILES) build.subdirs
