@@ -122,7 +122,7 @@ public class TagReader {
     }
     
     public static class Tag {
-        public String typeSortOrder = "cdeEfgimnpst";
+        public String typeSortOrder = "cdeECDfgimnpst";
         public String classSeparator = ".";
         
         public String identifier;
@@ -138,6 +138,12 @@ public class TagReader {
             this.type = type;
             this.context = context;
             this.containingClass = containingClass;
+            
+            // Recognize constructors. Using the same name as the containing
+            // class is a pattern common to most languages.
+            if (containingClass.equals(identifier) || containingClass.endsWith("." + identifier)) {
+                this.type = 'C';
+            }
         }
         
         public String describeVisibility() {
@@ -190,14 +196,11 @@ public class TagReader {
     }
     
     public static class JavaTag extends Tag {
-        
         public JavaTag(String identifier, int lineNumber, char type, String context, String containingClass) {
             super(identifier, lineNumber, type, context, containingClass);
             typeSortOrder = "pfCmci";
-            if (containingClass.equals(identifier) || containingClass.endsWith("." + identifier)) {
-                this.type = 'C';    // Constructor
-            }
         }
+        
         public String describe() {
             switch (type) {
                 case 'c': return "class " + identifier;
@@ -209,14 +212,13 @@ public class TagReader {
                 default: return identifier;
             }
         }
-        
-        
     }
     
     public static class RubyTag extends Tag {
         public RubyTag(String identifier, int lineNumber, char type, String context, String containingClass) {
             super(identifier, lineNumber, type, context, containingClass);
         }
+        
         public String describe() {
             switch (type) {
                 case 'c': return "class " + identifier;
@@ -231,11 +233,16 @@ public class TagReader {
     }
     
     public static class CTag extends Tag {
-
         public CTag(String identifier, int lineNumber, char type, String context, String containingClass) {
             super(identifier, lineNumber, type, context, containingClass);
             classSeparator = "::";
+            
+            // Recognize a C++ destructor.
+            if (identifier.equals("~" + containingClass)) {
+                this.type = 'D';
+            }
         }
+        
         public String describe() {
             switch (type) {
                 case 'c': return "class " + identifier;
