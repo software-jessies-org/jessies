@@ -8,12 +8,17 @@
 
 # You *will* need to change these.
 
-address="software@jessies.org"
+mail_domain="jessies.org" # Assumes all authors (and the list) share a domain.
+
+to_address="software@#{mail_domain}"
+reply_to_address=to_address # Use "nil" to reply to author.
+
 sendmail="/usr/sbin/sendmail"
 svnlook="/opt/subversion-1.1.0-rc2/bin/svnlook"
 
-if `whoami` =~ %r{^(martind)$}
-  address=$1
+if `whoami` =~ /^(elliotth|martind)$/
+  to_address=$1
+  reply_to_address=nil
   svnlook="svnlook"
 end
 
@@ -43,6 +48,8 @@ date=info_lines.shift
 info_lines.shift
 comment=info_lines
 
+from_address="#{author}@#{mail_domain}"
+
 subject="#{repo} revision #{rev}"
 
 body = "<html><head><title>#{subject}</title></head><body>"
@@ -58,13 +65,16 @@ body << "</p>"
 
 # Get and output the patch.
 changes=`#{svnlook} diff #{repo} -r #{rev}`
+changes.gsub!(/\r/, "") # In case we're running on MS Windows.
 body << "<pre>"
 changes.split("\n").each() {
     |line|
     color = "black"
     if line =~ /^Modified: /
+        next
     elsif line =~ /^=+$/
         body << "<hr noshade=\"yes\" />"
+        next
     elsif line =~ /^@@ /
         color = "gray"
     elsif line =~ /^-/
@@ -79,10 +89,10 @@ body << "</body></html>"
 
 # Write the header.
 header = ""
-header << "To: #{address}\n"
-header << "From: #{address}\n"
+header << "To: #{to_address}\n"
+header << "From: #{from_address}\n"
 header << "Subject: #{subject}\n"
-header << "Reply-to: #{address}\n"
+header << "Reply-to: #{reply_to_address}\n" if reply_to_address != nil
 header << "MIME-Version: 1.0\n"
 header << "Content-Type: text/html; charset=UTF-8\n"
 header << "Content-Transfer-Encoding: 8bit\n"
@@ -90,7 +100,7 @@ header << "\n"
 
 # Send the mail.
 begin
-    fd = open("|#{sendmail} #{address}", "w")
+    fd = open("|#{sendmail} #{to_address}", "w")
     fd.print(header)
     fd.print(body)
 rescue
