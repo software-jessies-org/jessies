@@ -231,25 +231,24 @@ public class FileUtilities {
      * can wait.
      */
     public static boolean isTextFile(File file) {
-        boolean isAsciiFile = false;
+        boolean isTextFile = false;
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
             byte[] bytes = new byte[512];
             int byteCount = fileInputStream.read(bytes);
             fileInputStream.close();
             
-            int asciiByteCount = 0;
+            int zeroByteCount = 0;
             for (int i = 0; i < byteCount; ++i) {
-                byte b = bytes[i];
-                if ((b >= ' ' && b <= '~') || b == '\t' || b == '\n' || b == '\f') {
-                    ++asciiByteCount;
+                if (bytes[i] == 0) {
+                    ++zeroByteCount;
                 }
             }
-            isAsciiFile = (byteCount == -1 || asciiByteCount == byteCount);
+            isTextFile = (byteCount == -1 || zeroByteCount == 0);
         } catch (Exception ex) {
             ex = ex;
         }
-        return isAsciiFile;
+        return isTextFile;
     }
     
     public static String findFileByNameSearchingUpFrom(String leafName, String startPath) {
