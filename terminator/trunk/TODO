@@ -7,7 +7,6 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
-[5]	Bug - if you try to select text with the H-scrollbar some way to the right, the scrollbar jumps back to the left-hand edge.
 [5]	Make an about box.
 [5]	Stop inserting blank lines at the bottom when we're resized.
 [5]	Implement "New Window" to go with "New Tab".
