@@ -3,8 +3,8 @@ package e.gui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
+
+import e.util.*;
 
 /**
  * A text field for search/filter interfaces. The extra functionality includes
@@ -21,11 +21,9 @@ import javax.swing.border.*;
 //
 
 public class SearchField extends JTextField {
-    private static final Border CANCEL_BORDER = new CancelBorder();
-    
     private boolean sendsNotificationForEachKeystroke = false;
     private boolean showingPlaceholderText = false;
-    private boolean armed = false;
+    private StringHistory history = new StringHistory();
     
     public SearchField(String placeholderText) {
         super(15);
@@ -39,11 +37,8 @@ public class SearchField extends JTextField {
     }
     
     private void initBorder() {
-        setBorder(new CompoundBorder(getBorder(), CANCEL_BORDER));
-        
-        MouseInputListener mouseInputListener = new CancelListener();
-        addMouseListener(mouseInputListener);
-        addMouseMotionListener(mouseInputListener);
+        new CancelBorder().attachTo(this);
+        new MenuBorder().attachTo(this);
     }
     
     private void initKeyListener() {
@@ -51,6 +46,8 @@ public class SearchField extends JTextField {
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     cancel();
+                } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    history.add(getText());
                 } else if (sendsNotificationForEachKeystroke) {
                     maybeNotify();
                 }
@@ -74,14 +71,69 @@ public class SearchField extends JTextField {
         this.sendsNotificationForEachKeystroke = eachKeystroke;
     }
     
+    class SearchHistoryAction extends AbstractAction {
+        SearchHistoryAction(String item) {
+            super(item);
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            showingPlaceholderText = false;
+            setText((String) getValue(NAME));
+            postActionEvent();
+        }
+    }
+    
+    class ClearHistoryAction extends AbstractAction {
+        ClearHistoryAction() {
+            super("Clear Entries");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            history.clear();
+        }
+    }
+    
+    public void showMenu(int x, int y) {
+        EPopupMenu menu = new EPopupMenu();
+        for (int i = 0; i < history.size(); ++i) {
+            menu.add(new SearchHistoryAction(history.get(i)));
+        }
+        menu.addSeparator();
+        menu.add(new ClearHistoryAction());
+        menu.show(this, x, y);
+    }
+    
+    private static final Color GRAY = new Color(0.7f, 0.7f, 0.7f);
+    
+    class MenuBorder extends InteractiveBorder {
+        MenuBorder() {
+            super(15, true);
+            setActivateOnPress(true);
+        }
+        
+        public void paintBorder(Component c, Graphics oldGraphics, int x, int y, int width, int height) {
+            Graphics2D g = (Graphics2D) oldGraphics;
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            g.setColor(Color.DARK_GRAY);
+            int[] xs = { x + 2, x + 10, x + 6 };
+            int[] ys = { y + 6, y + 6, y + 10 };
+            g.fillPolygon(xs, ys, 3);
+        }
+        
+        public void buttonActivated(MouseEvent e) {
+            selectAll();
+            showMenu(e.getX(), e.getY());
+        }
+    }
+    
     /**
      * Draws the cancel button as a gray circle with a white cross inside.
      */
-    static class CancelBorder extends EmptyBorder {
-        private static final Color GRAY = new Color(0.7f, 0.7f, 0.7f);
-        
+    class CancelBorder extends InteractiveBorder {
         CancelBorder() {
-            super(0, 0, 0, 15);
+            super(15, false);
+            setActivateOnPress(false);
         }
         
         public void paintBorder(Component c, Graphics oldGraphics, int x, int y, int width, int height) {
@@ -96,7 +148,7 @@ public class SearchField extends JTextField {
             final int circleL = 14;
             final int circleX = x + width - circleL;
             final int circleY = y + (height - 1 - circleL)/2;
-            g.setColor(field.armed ? Color.GRAY : GRAY);
+            g.setColor(isArmed() ? Color.GRAY : GRAY);
             g.fillOval(circleX, circleY, circleL, circleL);
             
             final int lineL = circleL - 8;
@@ -106,57 +158,13 @@ public class SearchField extends JTextField {
             g.drawLine(lineX, lineY, lineX + lineL, lineY + lineL);
             g.drawLine(lineX, lineY + lineL, lineX + lineL, lineY);
         }
-    }
-    
-    /**
-     * Handles a click on the cancel button by clearing the text and notifying
-     * any ActionListeners.
-     */
-    class CancelListener extends MouseInputAdapter {
-        private boolean isOverButton(MouseEvent e) {
-            // If the button is down, we might be outside the component
-            // without having had mouseExited invoked.
-            if (contains(e.getPoint()) == false) {
-                return false;
-            }
-            
-            // In lieu of proper hit-testing for the circle, check that
-            // the mouse is somewhere in the border.
-            Rectangle innerArea = SwingUtilities.calculateInnerArea(SearchField.this, null);
-            return (innerArea.contains(e.getPoint()) == false);
-        }
         
-        public void mouseDragged(MouseEvent e) {
-            arm(e);
-        }
-        
-        public void mouseEntered(MouseEvent e) {
-            arm(e);
-        }
-        
-        public void mouseExited(MouseEvent e) {
-            disarm();
-        }
-        
-        public void mousePressed(MouseEvent e) {
-            arm(e);
-        }
-        
-        public void mouseReleased(MouseEvent e) {
-            if (armed) {
-                cancel();
-            }
-            disarm();
-        }
-        
-        private void arm(MouseEvent e) {
-            armed = (isOverButton(e) && SwingUtilities.isLeftMouseButton(e));
-            repaint();
-        }
-        
-        private void disarm() {
-            armed = false;
-            repaint();
+        /**
+         * Handles a click on the cancel button by clearing the text and
+         * notifying any ActionListeners.
+         */
+        public void buttonActivated(MouseEvent e) {
+            cancel();
         }
     }
     
@@ -177,8 +185,10 @@ public class SearchField extends JTextField {
 
         public void focusGained(FocusEvent e) {
             setForeground(previousColor);
-            setText(previousText);
-            showingPlaceholderText = false;
+            if (showingPlaceholderText) {
+                setText(previousText);
+                showingPlaceholderText = false;
+            }
         }
 
         public void focusLost(FocusEvent e) {
