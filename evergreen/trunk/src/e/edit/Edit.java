@@ -802,13 +802,22 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         splitPane.setResizeWeight(0.8);
         
         frame.setVisible(true);
-        
         openRememberedFiles();
         
         initializing = false;
+        Log.warn("Ready to use!");
+        
+        startScanningWorkspaces();
     }
 
+    private void startScanningWorkspaces() {
+        Workspace[] workspaces = getWorkspaces();
+        for (int i = 0; i < workspaces.length; ++i) {
+            workspaces[i].updateFileList(null);
+        }
+    }
+    
     public static void main(String[] args) {
-	instance = new Edit();
+        instance = new Edit();
     }
 }
