@@ -17,7 +17,16 @@ public class EErrorsWindow extends EWindow implements LinkListener {
     
     public EErrorsWindow(String filename) {
         super(filename);
-        this.text = new JTextPane();
+        this.text = new JTextPane() {
+            /**
+             * Returns "" instead of null for the empty selection, for
+             * compatibility with ETextArea.
+             */
+            public String getSelectedText() {
+                String selection = super.getSelectedText();
+                return (selection != null) ? selection : "";
+            }
+        };
         this.linkRecognizer = new LinkRecognizer(text, this);
         this.linkFormatter = new LinkFormatter(text);
         initTextStyles();
