@@ -270,8 +270,8 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             getTitleBar().checkForCounterpart(); // If we don't do this, we don't get the icon until we get focus.
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
-            Edit.showAlert("Open", "Couldn't open file '" + th.getMessage() + "'.");
-            throw new RuntimeException("don't open this window");
+            Edit.showAlert("Open", "Couldn't open file '" + FileUtilities.getUserFriendlyName(file) + "' (" + th.getMessage() + ")");
+            throw new RuntimeException("can't open " + FileUtilities.getUserFriendlyName(file));
         }
     }
     
