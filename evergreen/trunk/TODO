@@ -23,19 +23,6 @@ symbolic links: given that we don't really (see FIXME in FileUtilities) recogniz
 [ ] Find/Replace is broken for matches that span lines. (Try a find pattern
     that contains "\n", for example.) [there's also a file "find-test.txt".]
     
-    Find/Replace's preview is hard to understand for cases where there
-    are multiple matches on the same line. You get a list item for each
-    match, not one for each line containing matches.
-    
-    I think what we need to do is explicitly break the text into lines, find
-    the lines with a match, and then find all the matches in those lines.
-    When we know where they are, we make two colored HTML copies:
-    one with all the matches marked, the other with the same areas marked,
-    but the matching text replaced with the appropriate replacement.
-
-    The preview lists should contain one item for each line containing
-    matches, rather than one item per match.
-
 [ ] parse the javadoc in the background as soon as Edit starts, and hope
     that it's ready by the time you want to use it. the delays from parsing
     only on demand suck a little.
