@@ -3,8 +3,6 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 
-import e.edit.*;
-
 public class ESwitchButton extends EButton implements ActionListener {
     private ETextWindow window;
     

@@ -1,7 +1,6 @@
 package e.edit;
 
 import javax.swing.undo.*;
-import e.gui.*;
 
 public abstract class ETextComponent extends EWindow {
     public ETextComponent(String filename) {

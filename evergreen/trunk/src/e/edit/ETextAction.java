@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.*;
-import e.gui.*;
 
 public abstract class ETextAction extends TextAction {
     public ETextAction(String name) {

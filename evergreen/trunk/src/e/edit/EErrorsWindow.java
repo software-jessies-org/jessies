@@ -5,7 +5,6 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.text.*;
-import e.gui.*;
 
 public class EErrorsWindow extends EWindow implements LinkListener {
     private JTextPane text;
@@ -90,6 +89,7 @@ public class EErrorsWindow extends EWindow implements LinkListener {
         ArrayList items = new ArrayList();
         items.add(new OpenSelectionAction());
         items.add(new FindFilesContainingSelectionAction());
+        items.add(new FindDeclarationAction());
         items.add(null);
         items.add(new ClearErrorsAction());
         return items;

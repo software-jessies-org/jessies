@@ -3,6 +3,7 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import e.gui.*;
 
 public abstract class EDialog extends JDialog {
     private ActionListener listener;

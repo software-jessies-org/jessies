@@ -3,6 +3,7 @@ package e.edit;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import e.gui.*;
 
 /**
 A simple labelled button. 

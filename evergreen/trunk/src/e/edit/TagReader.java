@@ -1,9 +1,7 @@
-package e.util;
+package e.edit;
 
 import java.io.*;
 import java.util.regex.*;
-
-import e.edit.ETextWindow; // for the pseudo-Mode hack.
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");

@@ -2,7 +2,6 @@ package e.edit;
 
 import java.awt.event.*;
 import javax.swing.*;
-import e.gui.*;
 
 /**
 The ETextArea close window action.
