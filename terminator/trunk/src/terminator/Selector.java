@@ -23,28 +23,38 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		view.setAutoscrolls(true);
 	}
 	
-	// Mouse (motion) listener methods.
-
-	public void mouseClicked(MouseEvent event) {
-		if (event.getButton() == MouseEvent.BUTTON1) {
-			Location loc = view.viewToModel(event.getPoint());
-			TextBuffer model = view.getModel();
-			if (loc.getLineIndex() >= model.getLineCount()) {
+	public void mousePressed(MouseEvent event) {
+		if (event.getButton() != MouseEvent.BUTTON1) {
+			return;
+		}
+		
+		Location loc = view.viewToModel(event.getPoint());
+		view.removeHighlightsFrom(this, 0);
+		startLocation = loc;
+		
+		TextBuffer model = view.getModel();
+		if (loc.getLineIndex() >= model.getLineCount()) {
+			return;
+		}
+		
+		if (event.getClickCount() == 2) {
+			// Select word.
+			String line = model.getLine(loc.getLineIndex());
+			if (loc.getCharOffset() >= line.length()) {
 				return;
 			}
-			if (event.getClickCount() == 2) {  // Select word.
-				String line = model.getLine(loc.getLineIndex());
-				if (loc.getCharOffset() >= line.length()) {
-					return;
-				}
-				selectWord(model, loc);
-			} else if (event.getClickCount() == 3) {  // Select line.
-				Location start = new Location(loc.getLineIndex(), 0);
-				Location end = new Location(loc.getLineIndex() + 1, 0);
-				setHighlight(start, end);
-			}
-			copy();
-		} else if (event.getButton() == MouseEvent.BUTTON2) {
+			selectWord(model, loc);
+		} else if (event.getClickCount() == 3) {
+			// Select line.
+			Location start = new Location(loc.getLineIndex(), 0);
+			Location end = new Location(loc.getLineIndex() + 1, 0);
+			setHighlight(start, end);
+		}
+		copy();
+	}
+	
+	public void mouseClicked(MouseEvent event) {
+		if (event.getButton() == MouseEvent.BUTTON2) {
 			paste();
 		}
 	}
@@ -87,13 +97,6 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 			++end;
 		}
 		setHighlight(new Location(lineNumber, start), new Location(lineNumber, end));
-	}
-	
-	public void mousePressed(MouseEvent event) {
-		if (event.getButton() == MouseEvent.BUTTON1) {
-			view.removeHighlightsFrom(this, 0);
-			startLocation = view.viewToModel(event.getPoint());
-		}
 	}
 	
 	public void mouseReleased(MouseEvent event) {
