@@ -7,10 +7,10 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
+[5]	Make a menu and an about box.
 [5]	Particularly since we can't chmod from Java, make logging optional.
 [5]	Stop inserting blank lines at the bottom when we're resized.
 [5]	Implement "New Window" to go with "New Tab".
-[5]	Sort out some decent way of building distributions, including the library superstar.
 [5]	Find some profiling tool to see if we can find simple ways of speeding up.
 [5]	Fix ^C. It works fine if you've started Terminator from another terminal emulator (xterm, say), but if you start it from the GNOME panel, it doesn't. stty -a can't see any difference.
 [3]	Review the current properties reading, and see if it's really going to work well enough.  Possibly add "?MacOS:" stuff to it.
