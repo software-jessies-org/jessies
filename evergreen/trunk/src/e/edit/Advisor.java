@@ -34,7 +34,7 @@ public class Advisor extends JPanel {
         registerTextComponent(textField);
         add(textField, BorderLayout.SOUTH);
         setDelay(500);
-        addResearcher(new JavaResearcher());
+        addResearcher(JavaResearcher.getSharedInstance());
         addResearcher(new ManPageResearcher());
         addResearcher(new NumberResearcher());
         addResearcher(new RubyDocumentationResearcher());
