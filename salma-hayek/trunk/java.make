@@ -149,14 +149,8 @@ BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(COMPILER_TYPE))
 # Set up the classpath.
 # ----------------------------------------------------------------------------
 CLASS_PATH += $(SALMA_HAYEK)/classes
+CLASS_PATH += $(SALMA_HAYEK)/MRJ141Stubs.jar
 CLASS_PATH += $(CLASS_PATH.$(COMPILER_TYPE))
-
-# ----------------------------------------------------------------------------
-# Use Apple's MRJ141Stubs, if they're there.
-# ----------------------------------------------------------------------------
-ifneq ($(wildcard MRJ141Stubs.jar),)
-    CLASS_PATH += MRJ141Stubs.jar
-endif
 
 # ----------------------------------------------------------------------------
 # Sort out the flags our chosen compiler needs.
