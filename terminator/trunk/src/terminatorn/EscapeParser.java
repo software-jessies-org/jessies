@@ -1,8 +1,8 @@
-package terminatorn;
+package terminator;
 
 import java.util.*;
 import e.util.*;
-import terminatorn.escape.*;
+import terminator.escape.*;
 
 /**
 

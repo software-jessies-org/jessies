@@ -1,4 +1,4 @@
-package terminatorn;
+package terminator;
 
 /**
 A TerminalAction does something to affect a TerminalListener.

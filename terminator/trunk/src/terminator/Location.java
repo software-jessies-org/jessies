@@ -1,4 +1,4 @@
-package terminatorn;
+package terminator;
 
 /**
 A Location holds the line index, and character offset within the line of a particular character.

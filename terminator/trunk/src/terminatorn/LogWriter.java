@@ -1,4 +1,4 @@
-package terminatorn;
+package terminator;
 
 import java.io.*;
 import java.text.*;

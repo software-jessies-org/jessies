@@ -1,7 +1,7 @@
-package terminatorn.escape;
+package terminator.escape;
 
 import e.util.*;
-import terminatorn.*;
+import terminator.*;
 
 /**
 Parses 'CSI' escape sequences.  Such sequences always have '[' as their first character,

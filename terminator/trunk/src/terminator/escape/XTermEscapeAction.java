@@ -1,7 +1,7 @@
-package terminatorn.escape;
+package terminator.escape;
 
 import e.util.*;
-import terminatorn.*;
+import terminator.*;
 
 /**
 An XTermEscapeAction performs the action associated with an XTerm-style escape sequence.

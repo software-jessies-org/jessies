@@ -1,4 +1,4 @@
-package terminatorn;
+package terminator;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
