@@ -8,7 +8,7 @@ import java.util.regex.*;
 import e.util.*;
 
 /**
- * Reads in settings from the file system and makes the conveniently
+ * Reads in settings from the file system and makes them conveniently
  * available.
  * 
  * There's a grand tradition amongst Unix terminal emulators of pretending
@@ -22,17 +22,29 @@ import e.util.*;
  * needed different settings on each. We do understand X11's idiosyncratic
  * comment style, and that should be enough for most resource files seen in
  * the real world.
+ * 
+ * All settings should have a default, so that users can use "--help" to see
+ * every available option.
  */
 public class Options {
 	private static final Options INSTANCE = new Options();
+	
+	private static final String ANTI_ALIAS = "antiAlias";
+	private static final String FONT_NAME = "fontName";
+	private static final String FONT_SIZE = "fontSize";
+	private static final String INITIAL_COLUMN_COUNT = "initialColumnCount";
+	private static final String INITIAL_ROW_COUNT = "initialRowCount";
+	private static final String INTERNAL_BORDER = "internalBorder";
+	private static final String LOGIN_SHELL = "loginShell";
+	private static final String SCROLL_KEY = "scrollKey";
+	private static final String SCROLL_TTY_OUTPUT = "scrollTtyOutput";
+	private static final String TITLE = "title";
+	private static final String USE_MENU_BAR = "useMenuBar";
 	
 	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt|Terminator)(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
 	private HashMap options = new HashMap();
 	private HashMap rgbColors = null;
-	
-	private File terminatorOptionsFile;
-	private HashMap propertySets = new HashMap();
 	
 	public static Options getSharedInstance() {
 		return INSTANCE;
@@ -48,88 +60,82 @@ public class Options {
 	}
 	
 	/**
-	 * Whether or not the shells we start should be login shells. The
-	 * default is true.
+	 * Whether or not the shells we start should be login shells.
 	 */
 	public boolean isLoginShell() {
-		return defaultedBooleanResource("loginShell", true);
+		return booleanResource(LOGIN_SHELL);
 	}
 	
 	/**
 	 * Whether or not pressing a key should cause the the scrollbar to go
-	 * to the bottom of the scrolling region. The default is true.
+	 * to the bottom of the scrolling region.
 	 */
 	public boolean isScrollKey() {
-		return defaultedBooleanResource("scrollKey", true);
+		return booleanResource(SCROLL_KEY);
 	}
 	
 	/**
 	 * Whether or not output to the terminal should cause the scrollbar to
-	 * go to the bottom of the scrolling region. The default is false.
+	 * go to the bottom of the scrolling region.
 	 */
 	public boolean isScrollTtyOutput() {
-		return defaultedBooleanResource("scrollTtyOutput", false);
+		return booleanResource(SCROLL_TTY_OUTPUT);
 	}
 	
 	/**
 	 * Whether or not to anti-alias text.
 	 */
 	public boolean isAntiAliased() {
-		return defaultedBooleanResource("antiAlias", false);
+		return booleanResource(ANTI_ALIAS);
 	}
 	
 	/**
 	 * Whether or not to use a menu bar.
 	 */
 	public boolean shouldUseMenuBar() {
-		return defaultedBooleanResource("useMenuBar", GuiUtilities.isMacOs());
-	}
-	
-	private boolean defaultedBooleanResource(String name, boolean defaultValue) {
-		String value = (String) options.get(name);
-		if (value != null) {
-			return parseBoolean(value);
-		}
-		return defaultValue;
-	}
-	
-	private boolean parseBoolean(String s) {
-		return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on");
+		return booleanResource(USE_MENU_BAR);
 	}
 	
 	/**
 	 * Returns a string suitable for the window manager to use as a window
-	 * title. The default is "Terminator".
+	 * title.
 	 */
 	public String getTitle() {
-		String title = (String) options.get("title");
-		return (title != null) ? title : "Terminator";
+		return stringResource(TITLE);
 	}
 	
 	public int getInternalBorder() {
-		return defaultedIntegerResource("internalBorder", 2);
+		return integerResource(INTERNAL_BORDER);
 	}
 	
 	/**
 	 * How many rows a new window should have.
 	 */
 	public int getInitialRowCount() {
-		return defaultedIntegerResource("initialRowCount", 24);
+		return integerResource(INITIAL_ROW_COUNT);
 	}
 	
 	/**
 	 * How many columns a new window should have.
 	 */
 	public int getInitialColumnCount() {
-		return defaultedIntegerResource("initialColumnCount", 80);
+		return integerResource(INITIAL_COLUMN_COUNT);
 	}
 	
-	private int defaultedIntegerResource(String name, int defaultValue) {
-		String value = (String) options.get(name);
-		if (value != null) {
-			return Integer.parseInt(value);
-		}
-		return defaultValue;
+	private int integerResource(String name) {
+		return Integer.parseInt(stringResource(name));
+	}
+	
+	private String stringResource(String name) {
+		return (String) options.get(name);
+	}
+	
+	private boolean booleanResource(String name) {
+		return parseBoolean(stringResource(name));
+	}
+	
+	private boolean parseBoolean(String s) {
+		return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on");
 	}
 	
 	/**
@@ -149,32 +155,13 @@ public class Options {
 	 * xterm also offers complete control over all the ECMA colors.
 	 */
 	public Color getColor(String name) {
-		Properties props = getPropertySet("Colors", "Colors");
-		if (props != null) {
-			String description = props.getProperty(name);
-			if (description != null) {
-				return Color.decode(description);
-			}
-		}
-		String description = (String) options.get(name);
+		String description = stringResource(name);
 		if (description == null) {
 			return null;
 		} else if (description.startsWith("#")) {
 			return Color.decode("0x" + description.substring(1));
 		} else {
 			return getRgbColor(description);
-		}
-	}
-	
-	/** Sets the color for the given name, writing it into the properties file. */
-	public void setColor(String name, Color color) {
-		String encodedColor = "0x" + Integer.toHexString(color.getRGB()).substring(2);
-		HashMap writeSet = getWritablePropertySet("Colors", "Colors");
-		writeSet.put(name, encodedColor);
-		try {
-			writeTerminatorOptions(terminatorOptionsFile);
-		} catch (IOException ex) {
-			Log.warn("Failed to write options file.", ex);
 		}
 	}
 	
@@ -186,24 +173,15 @@ public class Options {
 	 * "fontName" and "fontSize".
 	 */
 	public Font getFont() {
-		String fontName = (String) options.get("fontName");
-		if (fontName == null) {
-			fontName = GuiUtilities.isMacOs() ? "Monaco" : "Monospaced";
-		}
-		return new Font(fontName, Font.PLAIN, defaultedIntegerResource("fontSize", 12));
+		return new Font(stringResource(FONT_NAME), Font.PLAIN, integerResource(FONT_SIZE));
 	}
 	
 	private Options() {
+		initDefaults();
 		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
-		terminatorOptionsFile = new File(System.getProperty("user.home"), ".terminator");
 		aliasColorBD();
-		try {
-			readTerminatorOptions(terminatorOptionsFile);
-		} catch (Exception ex) {
-			Log.warn("Problem reading options from " + terminatorOptionsFile.getPath(), ex);
-		}
 	}
 	
 	/**
@@ -222,6 +200,23 @@ public class Options {
 			}
 		}
 		return otherArguments;
+	}
+	
+	/**
+	 * Sets the defaults for non-color options.
+	 */
+	private void initDefaults() {
+		options.put(ANTI_ALIAS, "false");
+		options.put(FONT_NAME, GuiUtilities.isMacOs() ? "Monaco" : "Monospaced");
+		options.put(FONT_SIZE, "12");
+		options.put(INITIAL_COLUMN_COUNT, "80");
+		options.put(INITIAL_ROW_COUNT, "24");
+		options.put(INTERNAL_BORDER, "2");
+		options.put(LOGIN_SHELL, "true");
+		options.put(SCROLL_KEY, "true");
+		options.put(SCROLL_TTY_OUTPUT, "false");
+		options.put(TITLE, "Terminator");
+		options.put(USE_MENU_BAR, Boolean.toString(GuiUtilities.isMacOs()));
 	}
 	
 	/**
@@ -340,158 +335,6 @@ public class Options {
 			String key = matcher.group(1);
 			String value = matcher.group(2);
 			options.put(key, value);
-		}
-	}
-	
-	public String[] getPropertySetNames(String type) {
-		HashMap typeSets = (HashMap) propertySets.get(type);
-		if (typeSets == null) {
-			return new String[0];
-		} else {
-			return (String[]) typeSets.keySet().toArray(new String[0]);
-		}
-	}
-	
-	public HashMap getWritablePropertySet(String type, String name) {
-		HashMap typeSets = ensureHashMap(propertySets, type);
-		return ensureHashMap(typeSets, name);
-	}
-	
-	private HashMap ensureHashMap(HashMap container, String key) {
-		if (container.containsKey(key)) {
-			return (HashMap) container.get(key);
-		} else {
-			HashMap result = new HashMap();
-			container.put(key, result);
-			return result;
-		}
-	}
-	
-	public Properties getPropertySet(String type, String name) {
-		HashMap typeSets = (HashMap) propertySets.get(type);
-		if (typeSets == null) {
-			return null;
-		} else {
-			HashMap map = (HashMap) typeSets.get(name);
-			if (map == null) {
-				return null;
-			} else {
-				Properties result = new Properties();
-				result.putAll(map);
-				return result;
-			}
-		}
-	}
-	
-	private void writeTerminatorOptions(File file) throws IOException {
-		ArrayList oldContents = new ArrayList();
-		int colorInsertPos = -1;
-		if (file.exists()) {
-			LineNumberReader in = null;
-			try {
-				in = new LineNumberReader(new FileReader(file));
-				Pattern colorOpener = Pattern.compile("^Colors\\s+Colors\\s+\\{");
-				boolean readingColors = false;
-				String line;
-				while ((line = in.readLine()) != null) {
-					if (readingColors) {
-						if (line.trim().equals("}")) {
-							readingColors = false;
-						}
-					} else if (colorOpener.matcher(line).matches()) {
-						readingColors = true;
-						colorInsertPos = oldContents.size();
-					} else {
-						oldContents.add(line);
-					}
-				}
-			} finally {
-				if (in != null) {
-					try {
-						in.close();
-					} catch (IOException ex) {
-						Log.warn("Failed to close " + file.getPath(), ex);
-					}
-				}
-			}
-		}
-		if (colorInsertPos == -1) {
-			oldContents.add("");
-			colorInsertPos = oldContents.size();
-		}
-		Properties props = getPropertySet("Colors", "Colors");
-		if (props != null) {
-			oldContents.add(colorInsertPos++, "Colors Colors {");
-			String[] keys = (String[]) props.keySet().toArray(new String[0]);
-			for (int i = 0; i < keys.length; i++) {
-				oldContents.add(colorInsertPos++, "\t" + keys[i] + " = " + props.getProperty(keys[i]));
-			}
-			oldContents.add(colorInsertPos++, "}");
-		}
-		PrintWriter out = null;
-		try {
-			out = new PrintWriter(new FileWriter(file));
-			for (int i = 0; i < oldContents.size(); i++) {
-				out.println((String) oldContents.get(i));
-			}
-		} finally {
-			if (out != null) {
-				out.close();
-			}
-		}
-	}
-	
-	private void readTerminatorOptions(File file) throws IOException {
-		if (file.exists() == false) {
-			Log.warn("Create a file called " + file.getPath() + " with your Terminator setup.");
-			return;
-		}
-		LineNumberReader in = null;
-		try {
-			in = new LineNumberReader(new FileReader(file));
-			Pattern propertySetOpener = Pattern.compile("^(\\w+)\\s+(\\w+)\\s+\\{");
-			String line;
-			HashMap propertySet = null;
-			while ((line = in.readLine()) != null) {
-				line = line.trim();
-				if (line.length() == 0 || line.startsWith("#")) {
-					continue;
-				}
-				if (propertySet == null) {
-					Matcher matcher = propertySetOpener.matcher(line);
-					if (matcher.matches()) {
-						String type = matcher.group(1);
-						String name = matcher.group(2);
-						propertySet = new HashMap();
-						HashMap typeMap = (HashMap) propertySets.get(type);
-						if (typeMap == null) {
-							typeMap = new HashMap();
-							propertySets.put(type, typeMap);
-						}
-						typeMap.put(name, propertySet);
-					}
-				} else {
-					int equalsIndex = line.indexOf('=');
-					if (line.equals("}")) {
-						propertySet = null;
-					} else if (equalsIndex != -1) {
-						String key = line.substring(0, equalsIndex).trim();
-						String value = line.substring(equalsIndex + 1).trim();
-						if (value.startsWith("\"") && value.endsWith("\"")) {
-							value = value.substring(1, value.length() - 1);
-						}
-						propertySet.put(key, value);
-					}
-				}
-			}
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException ex) {
-					Log.warn("Couldn't close stream.", ex);
-				}
-			}
 		}
 	}
 }
