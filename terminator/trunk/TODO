@@ -7,6 +7,8 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
+[5]	Don't break nastily when ~/.terminal-logs and its subdirectories are missing.
+[5]	Particularly since we can't chmod from Java, make logging optional.
 [5]	Stop inserting blank lines at the bottom when we're resized.
 [5]	Implement "New Window" to go with "New Tab".
 [5]	Sort out some decent way of building distributions, including the library superstar.
