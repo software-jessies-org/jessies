@@ -41,31 +41,8 @@ SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 DIST_SCP_USER_AND_HOST=enh@jessies.org
 DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 
-# A list of likely JDK rt.jar locations.
-# Traditional Java setup:
-KNOWN_RT_JAR_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
-# Apple:
-KNOWN_RT_JAR_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
-# install-everything.sh:
-KNOWN_RT_JAR_LOCATIONS+=/usr/local/jdk1.5.0/jre/lib/rt.jar
-# Fall back to searching:
-KNOWN_RT_JAR_LOCATIONS:=$(KNOWN_RT_JAR_LOCATIONS) $(shell locate /rt.jar)
-
 SOURCE_FILES=$(shell find `pwd`/src -type f -name "*.java")
 TAR_FILE_OF_THE_DAY=`date +$(PROJECT_NAME)-%Y-%m-%d.tar`
-
-# Pick a JDK and append the MRJ141Stubs, in case they're there.
-RT_JAR=$(firstword $(wildcard $(KNOWN_RT_JAR_LOCATIONS)))
-
-BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(JAVA_COMPILER))
-CLASS_PATH += $(CLASS_PATH.$(JAVA_COMPILER))
-
-BOOT_CLASS_PATH.jikes += $(RT_JAR)
-
-ifneq ($(wildcard MRJ141Stubs.jar),)
-    CLASS_PATH += MRJ141Stubs.jar
-endif
-CLASS_PATH += $(SALMA_HAYEK)/classes
 
 REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
 
@@ -106,10 +83,56 @@ FILE_LIST_WITH_DIRECTORIES += ChangeLog # The ChangeLog should never be checked 
 FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE_LIST_WITH_DIRECTORIES)),$(FILE_LIST_WITH_DIRECTORIES))))
 
 # ----------------------------------------------------------------------------
-# Choose a Java compiler, and set up the flags appropriately.
+# Choose a Java compiler.
 # ----------------------------------------------------------------------------
 
-JAVA_FLAGS += $(JAVA_FLAGS.$(JAVA_COMPILER))
+JAVA_COMPILER ?= jikes
+# Did we get an absolute path?
+JAVA_COMPILER_LOCATION := $(wildcard $(JAVA_COMPILER))
+# Can we find what we were given on the user's PATH?
+ifeq "$(JAVA_COMPILER_LOCATION)" ""
+  JAVA_COMPILER_LOCATION := $(call pathsearch,$(JAVA_COMPILER))
+endif
+# Can we find javac?
+ifeq "$(JAVA_COMPILER_LOCATION)" ""
+  JAVA_COMPILER = javac
+endif
+
+# Make the compiler's leafname available for simple javac/jikes tests.
+COMPILER_TYPE = $(notdir $(JAVA_COMPILER))
+
+# ----------------------------------------------------------------------------
+# Find any necessary JAR files.
+# ----------------------------------------------------------------------------
+
+# A list of likely JDK rt.jar locations.
+# Traditional Java setup:
+KNOWN_RT_JAR_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
+# Apple:
+KNOWN_RT_JAR_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
+# install-everything.sh:
+KNOWN_RT_JAR_LOCATIONS+=/usr/local/jdk1.5.0/jre/lib/rt.jar
+# Fall back to searching:
+KNOWN_RT_JAR_LOCATIONS:=$(KNOWN_RT_JAR_LOCATIONS) $(shell locate /rt.jar)
+
+# Pick a JDK and append the MRJ141Stubs, in case they're there.
+RT_JAR=$(firstword $(wildcard $(KNOWN_RT_JAR_LOCATIONS)))
+
+BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(COMPILER_TYPE))
+CLASS_PATH += $(CLASS_PATH.$(COMPILER_TYPE))
+
+BOOT_CLASS_PATH.jikes += $(RT_JAR)
+
+ifneq ($(wildcard MRJ141Stubs.jar),)
+    CLASS_PATH += MRJ141Stubs.jar
+endif
+CLASS_PATH += $(SALMA_HAYEK)/classes
+
+# ----------------------------------------------------------------------------
+# Sort out the flags our chosen compiler needs.
+# ----------------------------------------------------------------------------
+
+JAVA_FLAGS += $(JAVA_FLAGS.$(COMPILER_TYPE))
 JAVA_FLAGS += $(addprefix -bootclasspath ,$(call makepath,$(BOOT_CLASS_PATH)))
 JAVA_FLAGS += $(addprefix -classpath ,$(call makepath,$(CLASS_PATH)))
 JAVA_FLAGS += -d classes/
@@ -119,12 +142,6 @@ JAVA_FLAGS += -deprecation
 JAVA_FLAGS.jikes += +D +P +Pall +Pno-serial +Pno-redundant-modifiers
 JAVA_FLAGS.javac += -Xlint -Xlint:-serial
 JAVA_FLAGS.javac += -Xlint:-unchecked # until Jikes supports generics
-
-JAVA_COMPILER ?= jikes
-JAVA_COMPILER_LOCATION := $(call pathsearch,$(JAVA_COMPILER))
-ifeq "$(JAVA_COMPILER_LOCATION)" ""
-  JAVA_COMPILER = javac
-endif
 
 # ----------------------------------------------------------------------------
 # Variables above this point,
