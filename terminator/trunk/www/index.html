@@ -161,6 +161,14 @@ export TERMINFO=~/.terminfo
 export TERM=$TERM
 </pre>
 
+<h3>Pasting in VNC</h3>
+
+<p>If you're using VNC, you may experience problems pasting into Terminator, accompanied by the following exception:
+<pre>
+java.awt.datatransfer.UnsupportedFlavorException: Unicode String
+</pre>
+<p>This is a bug in old versions of the X11 VNC server. On Debian, you should remove the <tt>vncserver</tt> package and install the <tt>vnc4server</tt> package, and run <tt>vnc4server</tt> (it takes the same arguments as <tt>vncserver</tt>)&nbsp;&mdash; just upgrading your existing <tt>vncserver</tt> package will not help. Switching package will also a fix a bunch of other problems you may or may not have noticed with VNC.
+
 <h3>X11-style resources</h3>
 
 <p>Terminator will look in <tt>~/.Xdefaults</tt> and <tt>~/.Xresources</tt> (in
