@@ -29,9 +29,6 @@ Should allow the user to specify a log filename per tab, on the command line.
 * "Connect to Server" CS-K; don't implement Rendevouz (unless you're bored!)
   but take (user@)?host and port-scan for ssh, and fall back to telnet.
 
-* Don't do defaults in code; if we have something in the options HashMap, it's
-  self-documenting.
-
 * Try to make sure we never cache options. Then we can think about adding stuff
   to e.forms to automatically generate a dialog. And -- scarier still --
   writing stuff back to .Xdefaults or whatever. This is probably a longer-term
