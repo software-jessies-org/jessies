@@ -8,8 +8,7 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
 [5] Implement ESC[4h - insert mode (ESC[4l resets back to the usual replace mode).
-[5]	Implement 'mode 1' - client-side manipulation of the cursor position when the
-	cursor keys are used.
+[5]	Implement 'mode 1'.
 [3]	Implement 'mode 47' - alternate buffer support.
 [3]	Cope with '\t'. Remember tab stops are settable.
 [3]	Add ssh support.
