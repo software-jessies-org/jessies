@@ -615,10 +615,16 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             }
         }
         
+        // Try to save a backup copy first. Ideally, we should do this from
+        // a timer and always have a recent backup around.
         File backupFile = FileUtilities.fileFromString(this.filename + ".bak");
-        if (file.exists() && file.renameTo(backupFile) == false) {
-            Edit.showAlert("Save", "File '" + this.filename + "' wasn't saved! Couldn't create backup file.");
-            return false;
+        if (file.exists()) {
+            try {
+                writeCopyTo(backupFile);
+            } catch (Exception ex) {
+                Edit.showAlert("Save", "File '" + this.filename + "' wasn't saved! Couldn't create backup file.");
+                return false;
+            }
         }
         
         try {
