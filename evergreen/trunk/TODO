@@ -22,7 +22,12 @@ symbolic links: given that we don't really (see FIXME in FileUtilities) recogniz
 
 [ ] Find/Replace is broken for matches that span lines. (Try a find pattern
     that contains "\n", for example.) [there's also a file "find-test.txt".]
-    
+
+    [ ] Some way of marking submatch groups: the whole match is marked in
+        red or blue, but it would be good to also see the submatches within
+        that. At least some way of showing $1="hello", $2="world" as we used
+        to in the tool tip.
+
 [ ] parse the javadoc in the background as soon as Edit starts, and hope
     that it's ready by the time you want to use it. the delays from parsing
     only on demand suck a little.
@@ -109,11 +114,6 @@ let us always show the user-friendly forms.
     [ ] should have an environment variable editor (like the Windows Control
         Panel one).
     
-[ ] Find/Replace dialog:
-
-    [ ] Some way of marking submatch groups: the whole match is marked in
-        green, but it would be good to also see the submatches within that.
-
 [ ] upon performing 'new file', and including a non-existent directory as
     part of the new filename, the directory should be created too, i think.
     perhaps with a 'you've either mistyped that, or you want a new

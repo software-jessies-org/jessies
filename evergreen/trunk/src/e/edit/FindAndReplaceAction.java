@@ -202,8 +202,8 @@ public class FindAndReplaceAction extends ETextAction {
         private String html;
         private String tooltip;
 
-        public DisplayableMatch(String line, String regex) {
-            this.html = colorize(line, regex);
+        public DisplayableMatch(String line, String regex, String replacement) {
+            this.html = colorize(line, regex, replacement);
             this.tooltip = "unimplemented";
         }
 
@@ -233,27 +233,39 @@ public class FindAndReplaceAction extends ETextAction {
             return html;
         }
 
-        public String colorize(String line, String regex) {
-            Pattern pattern = Pattern.compile("(" + regex + ")");
-            html = pattern.matcher(line).replaceAll("\u0000$1\u0001");
+        private static final String RED_ON = "<font color=red>";
+        private static final String BLUE_ON = "<font color=blue>";
+
+        public String colorize(String line, String regex, String replacement) {
+            String colorOn = BLUE_ON;
+            if (replacement == null) {
+                regex = "(" + regex + ")";
+                replacement = "$1";
+                colorOn = RED_ON;
+            }
+            replacement = "\u0000" + replacement + "\u0001";
+            Pattern pattern = Pattern.compile(regex);
+            html = pattern.matcher(line).replaceAll(replacement);
             StringBuffer buffer = new StringBuffer(html);
             for (int i = 0; i < buffer.length(); ++i) {
-                String replacement = null;
+                String insert = null;
                 if (buffer.charAt(i) == ' ') {
-                    replacement = "&nbsp;";
+                    insert = "&nbsp;";
                 } else if (buffer.charAt(i) == '<') {
-                    replacement = "&lt;";
+                    insert = "&lt;";
                 } else if (buffer.charAt(i) == '\u0000') {
-                    replacement = "<font color=red>";
+                    insert = colorOn;
                 } else if (buffer.charAt(i) == '\u0001') {
-                    replacement = "</font>";
+                    insert = "</font>";
                 }
-                if (replacement != null) {
-                    buffer.replace(i, i + 1, replacement);
-                    i += replacement.length() - 1;
+                if (insert != null) {
+                    buffer.replace(i, i + 1, insert);
+                    i += insert.length() - 1;
                 }
             }
-            return "<html>" + buffer.toString();
+            String result = "<html>" + buffer.toString();
+            System.err.println(result);
+            return result;
         }
     }
     
@@ -306,10 +318,10 @@ public class FindAndReplaceAction extends ETextAction {
                         ++matchCount;
                         
                         // Record the match.
-                        matchModel.addElement(new DisplayableMatch(line, regex));
+                        matchModel.addElement(new DisplayableMatch(line, regex, null));
                         
                         // Record the rewritten line.
-                        replacementsModel.addElement(line.replaceAll(regex, replacement));
+                        replacementsModel.addElement(new DisplayableMatch(line, regex, replacement));
                     }
                 }
             } catch (PatternSyntaxException ex) {
