@@ -141,7 +141,10 @@ public class TagReader {
             
             // Recognize constructors. Using the same name as the containing
             // class is a pattern common to most languages.
-            if (containingClass.equals(identifier) || containingClass.endsWith("." + identifier)) {
+            if (containingClass.equals(identifier)) {
+                this.type = 'C';
+            } else if (containingClass.endsWith("." + identifier)) {
+                // An inner class constructor.
                 this.type = 'C';
             }
         }
