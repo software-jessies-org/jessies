@@ -1,6 +1,7 @@
 package e.util;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.*;
 
 public class ProcessUtilities {
@@ -76,6 +77,82 @@ public class ProcessUtilities {
                     result.add(ex.getMessage());
                 }
             }
+        }
+    }
+    
+    /**
+     * Returns the process id of the given process, or -1 if we couldn't
+     * work it out.
+     */
+    public static int getProcessId(Process process) {
+        try {
+            Field pidField = process.getClass().getDeclaredField("pid");
+            pidField.setAccessible(true);
+            return pidField.getInt(process);
+        } catch (Exception ex) {
+            return -1;
+        }
+    }
+    
+    /** The HUP (hang up) signal. */
+    public static final int SIGHUP = 1;
+    
+    /** The INT (interrupt) signal. */
+    public static final int SIGINT = 2;
+    
+    /** The QUIT (quit) signal. */
+    public static final int SIGQUIT = 3;
+    
+    /** The KILL (non-catchable, non-ignorable kill) signal. */
+    public static final int SIGKILL = 9;
+    
+    /** The TERM (soft termination) signal. */
+    public static final int SIGTERM = 15;
+    
+    /**
+     * Sends the given signal to the given process. Returns false if
+     * the signal could not be sent.
+     */
+    public static boolean signalProcess(Process process, int signal) {
+        int pid = getProcessId(process);
+        if (pid == -1) {
+            return false;
+        }
+        try {
+            Runtime.getRuntime().exec("kill -" + signal + " " + pid);
+            return true;
+        } catch (IOException ex) {
+            return false;
+        }
+    }
+    
+    /**
+     * Returns the integer file descriptor corresponding to one of
+     * FileDescriptor.in, FileDescriptor.out or FileDescriptor.err
+     * for the given process. Returns -1 on error.
+     */
+    public static int getFd(Process process, FileDescriptor which) {
+        if (which == FileDescriptor.in) {
+            return getFd(process, "stdin_fd");
+        } else if (which == FileDescriptor.out) {
+            return getFd(process, "stdout_fd");
+        } else if (which == FileDescriptor.err) {
+            return getFd(process, "stderr_fd");
+        } else {
+            return -1;
+        }
+    }
+    
+    private static int getFd(Process process, String which) {
+        try {
+            Field fileDescriptorField = process.getClass().getDeclaredField(which);
+            fileDescriptorField.setAccessible(true);
+            FileDescriptor fileDescriptor = (FileDescriptor) fileDescriptorField.get(process);
+            Field fdField = FileDescriptor.class.getDeclaredField("fd");
+            fdField.setAccessible(true);
+            return fdField.getInt(fileDescriptor);
+        } catch (Exception ex) {
+            return -1;
         }
     }
     
