@@ -12,15 +12,15 @@ import e.util.*;
  */
 
 public class StringHistory {
-    private File file;
+    private String filename;
     private ArrayList history = new ArrayList();
     
     public StringHistory(String leafName) {
-        this.file = new File(Edit.getPreferenceFilename(leafName));
+        this.filename = Edit.getPreferenceFilename(leafName);
         try {
             readHistoryFile();
         } catch (IOException ex) {
-            Log.warn("Failed to read history file from " + file.getPath());
+            Log.warn("Failed to read history file from '" + filename + "'.");
         }
     }
     
@@ -44,38 +44,18 @@ public class StringHistory {
     
     public void readHistoryFile() throws IOException {
         history = new ArrayList();
-        if (file.exists() == false) {
-            return;
-        }
-        BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                history.add(line);
-            }
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ex) {
-                    Log.warn("Error closing history file " + file.getPath(), ex);
-                }
-            }
+            String[] lines = StringUtilities.readLinesFromFile(filename);
+            history.addAll(Arrays.asList(lines));
+        } catch (Exception ex) {
+            Log.warn("Error reading history '" + filename + "'.", ex);
         }
     }
     
     public void writeToHistoryFile(String string) {
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(new FileWriter(file, true));
-            writer.println(string);
-            writer.close();
-        } catch (IOException ex) {
-            Log.warn("Failed to append string \"" + string + "\" to history file " + file.getPath(), ex);
-            if (writer != null) {
-                writer.close();
-            }
+        String error = StringUtilities.appendToFile(FileUtilities.fileFromString(filename), string);
+        if (error != null) {
+            Log.warn("Failed to append string \"" + string + "\" to history file '" + filename + "' (" + error + ").");
         }
     }
 }
