@@ -39,10 +39,13 @@ public class WindowMenu {
      * Returns a new JMenu to be added to a window's JMenuBar. This menu will
      * automatically be updated whenever a window is created or destroyed, or
      * if a window's title changes.
+     * 
+     * You can supply custom items for the menu by providing a non-null, non-empty
+     * array of Action instances as customItems.
      */
-    public JMenu makeJMenu() {
-        UpdatableJMenu menu = new UpdatableJMenu();
-        updateMenu(menu);
+    public JMenu makeJMenu(Action[] customItems) {
+        UpdatableJMenu menu = new UpdatableJMenu(customItems);
+        menu.updateMenu(getFrames());
         return menu;
     }
     
@@ -97,19 +100,60 @@ public class WindowMenu {
         }
     }
     
-    private static class UpdatableJMenu extends JMenu {
-        public UpdatableJMenu() {
+    private class UpdatableJMenu extends JMenu {
+        private Action[] customItems;
+        
+        public UpdatableJMenu(Action[] customItems) {
             super("Window");
+            this.customItems = customItems;
             InstanceTracker.addInstance(this);
         }
         
-        public void addWindowItem(final Frame f) {
+        public void updateMenu(Frame[] windows) {
+            removeAll();
+            addStandardItems();
+            if (windows.length == 0) {
+                disableAll();
+            } else {
+                addWindowItems(windows);
+            }
+        }
+        
+        private void addStandardItems() {
+            add(new JMenuItem(new MinimizeAction()));
+            add(new JMenuItem(new ZoomAction()));
+            
+            addCustomItems();
+            
+            add(new JSeparator());
+            add(new JMenuItem(new BringAllToFrontAction()));
+        }
+        
+        private void addCustomItems() {
+            if (customItems == null || customItems.length == 0) {
+                return;
+            }
+            
+            add(new JSeparator());
+            for (int i = 0; i < customItems.length; ++i) {
+                add(new JMenuItem(customItems[i]));
+            }
+        }
+        
+        private void addWindowItems(Frame[] windows) {
+            add(new JSeparator());
+            for (int i = 0; i < windows.length; ++i) {
+                addWindowItem(windows[i]);
+            }
+        }
+        
+        private void addWindowItem(final Frame f) {
             JCheckBoxMenuItem item = new JCheckBoxMenuItem(new ShowSpecificWindowAction(f));
             item.setSelected(f.isFocused());
             add(item);
         }
         
-        public void disableAll() {
+        private void disableAll() {
             for (int i = 0; i < getMenuComponentCount(); ++i) {
                 JMenuItem item = getItem(i);
                 if (item != null) {
@@ -121,41 +165,24 @@ public class WindowMenu {
     
     private void updateMenus() {
         Object[] menus = InstanceTracker.getInstancesOfClass(UpdatableJMenu.class);
+        Frame[] frames = null;
         for (int i = 0; i < menus.length; ++i) {
-            updateMenu((UpdatableJMenu) menus[i]);
+            if (frames == null) {
+                frames = getFrames();
+            }
+            ((UpdatableJMenu) menus[i]).updateMenu(frames);
         }
     }
     
-    private void updateMenu(UpdatableJMenu menu) {
-        menu.removeAll();
-        addStandardItemsTo(menu);
-        
-        if (windows.size() == 0) {
-            menu.disableAll();
-            return;
-        }
-        
-        addWindowItemsTo(menu);
+    private Frame[] getFrames() {
+        return (Frame[]) windows.toArray(new Frame[windows.size()]);
     }
     
-    private void addWindowItemsTo(UpdatableJMenu menu) {
-        menu.add(new JSeparator());
-        for (int i = 0; i < windows.size(); ++i) {
-            Frame f = (Frame) windows.get(i);
-            menu.addWindowItem(f);
+    private void bringAllToFront() {
+        Frame[] frames = getFrames();
+        for (int i = 0; i < frames.length; ++i) {
+            frames[i].toFront();
         }
-    }
-    
-    private void addStandardItemsTo(JMenu menu) {
-        menu.add(new JMenuItem(new MinimizeAction()));
-        menu.add(new JMenuItem(new ZoomAction()));
-        
-        // FIXME: need some way for Terminator to add this:
-        //menu.add(new JSeparator());
-        //menu.add(new JMenuItem(new ReturnToDefaultSizeAction()));
-        
-        menu.add(new JSeparator());
-        menu.add(new JMenuItem(new BringAllToFrontAction()));
     }
     
     private static class MinimizeAction extends AbstractAction {
@@ -191,10 +218,7 @@ public class WindowMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            for (int i = 0; i < windows.size(); ++i) {
-                Frame f = (Frame) windows.get(i);
-                f.toFront();
-            }
+            bringAllToFront();
         }
     }
 }
