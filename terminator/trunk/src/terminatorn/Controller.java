@@ -19,4 +19,6 @@ public interface Controller {
 	public void showFindDialogFor(JTextBuffer textToFindIn);
 	
 	public void setTerminalSize(Dimension size);
+	
+	public void terminalNameChanged(JTelnetPane terminal);
 }

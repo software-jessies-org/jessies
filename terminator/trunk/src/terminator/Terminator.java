@@ -38,9 +38,16 @@ public class Terminator implements Controller {
 		if (terminalSize != null) {
 			title.append(" [").append(terminalSize.width).append(" x ").append(terminalSize.height).append("]");
 		}
-		if (terminals.size() == 1) {
-			JTelnetPane pane = (JTelnetPane) terminals.get(0);
-			title.append(" - ").append(pane.getName());
+		if (terminals.size() >= 1) {
+			JTelnetPane pane;
+			if (tabbedPane == null) {
+				pane = (JTelnetPane) terminals.get(0);
+			} else {
+				pane = (JTelnetPane) tabbedPane.getSelectedComponent();
+			}
+			if (pane != null) {
+				title.append(" - ").append(pane.getName());
+			}
 		}
 		frame.setTitle(title.toString());
 	}
@@ -144,6 +151,7 @@ public class Terminator implements Controller {
 						}
 					});
 				}
+				updateFrameTitle();
 			}
 		});
 		
@@ -278,6 +286,15 @@ public class Terminator implements Controller {
 		terminalSizeTimer.setRepeats(false);
 		terminalSizeTimer.start();
 	}
+	
+	public void terminalNameChanged(JTelnetPane terminal) {
+		if (tabbedPane != null) {
+			int index = tabbedPane.indexOfComponent(terminal);
+			tabbedPane.setTitleAt(index, terminal.getName());
+		}
+		updateFrameTitle();
+	}
+
 	
 	private JWindow findWindow;
 	private JTextField findField;

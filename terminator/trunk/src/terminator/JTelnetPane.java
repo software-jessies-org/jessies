@@ -206,6 +206,11 @@ public class JTelnetPane extends JPanel {
 		return name;
 	}
 	
+	public void setName(String name) {
+		this.name = name;
+		controller.terminalNameChanged(this);
+	}
+	
 	public Dimension getOptimalViewSize() {
 		return textPane.getOptimalViewSize();
 	}
