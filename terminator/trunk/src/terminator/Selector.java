@@ -20,6 +20,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		view.addMouseListener(this);
 		view.addMouseMotionListener(this);
 		view.addHighlighter(this);
+		view.setAutoscrolls(true);
 	}
 	
 	// Mouse (motion) listener methods.
