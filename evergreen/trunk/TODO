@@ -92,10 +92,6 @@ let us always show the user-friendly forms.
     This only applies the first time the dialog is opened. Thereafter, it should
     re-appear where it was when it was closed.
 
-[ ] when we warn that a file's changed, we should try harder to see if
-    it really has. BitKeeper has a habit of touching files without modifying
-    them.
-
 [ ] find out (using jdb?) where the OutOfMemoryException is thrown if
     you load a huge file, and plug the leak. then we could optimistically
     try to load huge files and fail gracefully. (catching the exception in
