@@ -1,0 +1,77 @@
+#!/usr/bin/ruby -w
+
+# A Subversion post-commit hook. Edit the configurable stuff below, and
+# copy into your repository's hooks/ directory as "post-commit". Don't
+# forget to "chmod a+x post-commit".
+
+# ------------------------------------------------------------------------
+
+# You *will* need to change these.
+
+address="software@jessies.org"
+sendmail="/usr/sbin/sendmail"
+svnlook="/opt/subversion-1.1.0-rc2/bin/svnlook"
+
+# ------------------------------------------------------------------------
+
+# Subversion's commit-email.pl suggests that svnlook might create files.
+Dir.chdir("/tmp")
+
+# What revision in what repository?
+repo = ARGV.shift()
+rev = ARGV.shift()
+
+# Get the overview information.
+info=`#{svnlook} info #{repo} -r #{rev}`
+info_lines=info.split("\n")
+author=info_lines.shift
+date=info_lines.shift
+info_lines.shift
+comment=info_lines
+
+body = ""
+
+# Output the overview.
+body << "<p><b>#{author}</b> #{date}</p>"
+body << "<p>#{comment.join("<br>\n")}</p>"
+body << "<hr noshade>"
+
+# Get and output the patch.
+changes=`#{svnlook} diff #{repo} -r #{rev}`
+body << "<pre>"
+changes.split('\n').each() {
+    |line|
+    color = "black"
+    if line =~ /^Modified: / || line =~ /^=+$/ || line =~ /^@@ /
+        color = "gray"
+    elsif line =~ /^-/
+        color = "red"
+    elsif line =~ /^\+/
+        color = "blue"
+    end
+    body << "<font color=\"#{color}\">#{line}</font>\n"
+}
+body << "</pre>"
+
+# Write the header.
+header = ""
+header << "To: #{address}\n"
+header << "From: #{address}\n"
+header << "Subject: #{repo} revision #{rev}\n"
+header << "Reply-to: #{address}\n"
+header << "Content-Type: text/html; charset=UTF-8\n"
+header << "Content-Transfer-Encoding: 8bit\n"
+header << "\n"
+
+# Send the mail.
+begin
+    fd = open("|#{sendmail} #{address}", "w")
+    fd.print(header)
+    fd.print(body)
+rescue
+    exit(1)
+end
+fd.close
+
+# We're done.
+exit(0)
