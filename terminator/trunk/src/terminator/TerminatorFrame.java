@@ -10,15 +10,15 @@ import javax.swing.Timer;
 import javax.swing.event.*;
 import terminator.view.*;
 
-public class TerminatorFrame implements TerminalPaneMaster {
+public class TerminatorFrame extends JFrame implements TerminalPaneMaster {
 	private Terminator terminator;
 	private Dimension terminalSize;
-	private JFrame frame;
 	private JTabbedPane tabbedPane;
 	
 	private ArrayList terminals = new ArrayList();
 
 	public TerminatorFrame(Terminator terminator, JTerminalPaneFactory[] paneFactories) {
+		super(Options.getSharedInstance().getTitle());
 		this.terminator = terminator;
 		JTerminalPane[] panes = new JTerminalPane[paneFactories.length];
 		for (int i = 0; i < paneFactories.length; i++) {
@@ -48,7 +48,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 				title.append(pane.getName());
 			}
 		}
-		frame.setTitle(title.toString());
+		setTitle(title.toString());
 	}
 	
 	/**
@@ -64,34 +64,33 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		FRAME_ICON = (iconFile != null) ? new ImageIcon(iconFile).getImage() : null;
 	}
 	
-	private void initIcon(JFrame frame) {
+	private void initIcon() {
 		if (FRAME_ICON != null) {
-			frame.setIconImage(FRAME_ICON);
+			setIconImage(FRAME_ICON);
 		}
 	}
 	
 	private void initFrame() {
-		frame = new JFrame(Options.getSharedInstance().getTitle());
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		if (GuiUtilities.isMacOs() == false) {
-			frame.setBackground(Options.getSharedInstance().getColor("background"));
+			setBackground(Options.getSharedInstance().getColor("background"));
 		}
-		initIcon(frame);
+		initIcon();
 		
 		if (Options.getSharedInstance().shouldUseMenuBar()) {
-			frame.setJMenuBar(new TerminatorMenuBar());
+			setJMenuBar(new TerminatorMenuBar());
 		}
-		frame.addWindowListener(new WindowAdapter() {
+		addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent event) {
 				terminator.frameClosed(TerminatorFrame.this);
 			}
 		});
 		initTerminals();
-		frame.pack();
+		pack();
 		// FIXME: until Mac OS has Java 1.5, we'll have to set the java.awt.Window.locationByPlatform property instead.
-		//frame.setLocationByPlatform(true);
-		frame.setVisible(true);
-		WindowMenu.getSharedInstance().addWindow(frame);
+		//setLocationByPlatform(true);
+		setVisible(true);
+		WindowMenu.getSharedInstance().addWindow(this);
 	}
 	
 	private void initTerminals() {
@@ -111,8 +110,8 @@ public class TerminatorFrame implements TerminalPaneMaster {
 	
 	private void initSingleTerminal() {
 		JTerminalPane terminalPane = (JTerminalPane) terminals.get(0);
-		frame.setContentPane(terminalPane);
-		frame.setTitle(terminalPane.getName());
+		setContentPane(terminalPane);
+		setTitle(terminalPane.getName());
 	}
 	
 	private void initTabbedPane() {
@@ -120,7 +119,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 			return;
 		}
 		
-		JComponent oldContentPane = (JComponent) frame.getContentPane();
+		JComponent oldContentPane = (JComponent) getContentPane();
 		
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addChangeListener(new ChangeListener() {
@@ -146,7 +145,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 			addPaneToUI((JTerminalPane) oldContentPane);
 		}
 		
-		frame.setContentPane(tabbedPane);
+		setContentPane(tabbedPane);
 	}
 	
 	public static void disableFocusTraversal(Component c) {
@@ -216,9 +215,9 @@ public class TerminatorFrame implements TerminalPaneMaster {
 			JTerminalPane soleSurvivor = (JTerminalPane) terminals.get(0);
 			soleSurvivor.invalidate();
 			tabbedPane.remove(soleSurvivor);
-			frame.setContentPane(soleSurvivor);
+			setContentPane(soleSurvivor);
 			soleSurvivor.revalidate();
-			frame.repaint();
+			repaint();
 			tabbedPane = null;
 			updateFrameTitle();
 		}
@@ -228,8 +227,8 @@ public class TerminatorFrame implements TerminalPaneMaster {
 	 * Implements closeTerminalPane.
 	 */
 	private void closeWindow() {
-		frame.setVisible(false);
-		frame.dispose();
+		setVisible(false);
+		dispose();
 	}
 	
 	public void openShellPane(boolean focusOnNewTab) {
