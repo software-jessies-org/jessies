@@ -34,6 +34,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private PTextAreaSpellingChecker spellingChecker;
     
     public PTextArea(PTextBuffer text) {
+        setBackground(Color.WHITE);
         setText(text);
         addMouseListener(new PMouseHandler(this));
         addKeyListener(new PKeyHandler(this));
