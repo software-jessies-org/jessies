@@ -101,7 +101,7 @@ public class TagsUpdater {
         searchField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 tree.clearSelection();
-                tree.selectNodesMatching(searchField.getText());
+                tree.selectNodesMatching(searchField.getText(), true);
             }
         });
         
