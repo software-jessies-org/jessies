@@ -14,18 +14,22 @@ DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 
 # A list of likely JDK rt.jar locations.
 # Traditional Java setup:
-KNOWN_JRE_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
+KNOWN_RT_JAR_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
 # Apple:
-KNOWN_JRE_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
+KNOWN_RT_JAR_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
 # Fall back to searching:
-KNOWN_JRE_LOCATIONS:=$(KNOWN_JRE_LOCATION) $(shell locate /rt.jar)
+KNOWN_RT_JAR_LOCATIONS:=$(KNOWN_RT_JAR_LOCATIONS) $(shell locate /rt.jar)
 
 SOURCE_FILES=$(shell find `pwd`/src -type f -name "*.java")
 TAR_FILE_OF_THE_DAY=`date +$(PROJECT_NAME)-%Y-%m-%d.tar`
 
 # Pick a JDK and append the MRJ141Stubs, in case they're there.
-BOOT_CLASS_PATH=$(firstword $(wildcard $(KNOWN_JRE_LOCATIONS)))
-BOOT_CLASS_PATH:=$(BOOT_CLASS_PATH):MRJ141Stubs.jar
+RT_JAR=$(firstword $(wildcard $(KNOWN_RT_JAR_LOCATIONS)))
+
+BOOT_CLASS_PATH=$(RT_JAR)
+ifneq ($(wildcard MRJ141Stubs.jar),)
+    BOOT_CLASS_PATH:=$(BOOT_CLASS_PATH):MRJ141Stubs.jar
+endif
 
 REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
 
