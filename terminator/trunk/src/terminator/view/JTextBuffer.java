@@ -189,7 +189,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public void scrollToBottom() {
-		scrollRectToVisible(new Rectangle(0, getHeight() - 10, 10, 10));
+		JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
+		BoundedRangeModel barModel = pane.getVerticalScrollBar().getModel();
+		barModel.setValue(barModel.getMaximum() - barModel.getExtent());
+		barModel = pane.getHorizontalScrollBar().getModel();
+		barModel.setValue(barModel.getMinimum());
+//		scrollRectToVisible(new Rectangle(0, getHeight() - 10, 10, 11));
 	}
 	
 	public void scrollToLine(final int lineNumber) {
