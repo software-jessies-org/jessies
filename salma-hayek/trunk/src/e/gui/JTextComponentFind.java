@@ -53,17 +53,19 @@ public class JTextComponentFind {
     private Action findPreviousAction = new FindPreviousAction();
     
     public static void addFindFunctionalityTo(final JTextComponent textComponent) {
-        JTextComponentFind find = new JTextComponentFind(textComponent);
+        new JTextComponentFind(textComponent);
     }
     
-    private void initKeyStrokes() {
-        addKeyBinding(KeyEvent.VK_F, findAction);
-        addKeyBinding(KeyEvent.VK_D, findPreviousAction);
-        addKeyBinding(KeyEvent.VK_G, findNextAction);
+    private void initKeyStrokes(final JTextComponent component, boolean includeFind) {
+        if (includeFind) {
+            addKeyBinding(component, KeyEvent.VK_F, findAction);
+        }
+        addKeyBinding(component, KeyEvent.VK_D, findPreviousAction);
+        addKeyBinding(component, KeyEvent.VK_G, findNextAction);
     }
     
-    private void addKeyBinding(int keyEventVk, Action action) {
-        InputMap inputMap = textComponent.getInputMap();
+    private static void addKeyBinding(final JTextComponent component, int keyEventVk, Action action) {
+        InputMap inputMap = component.getInputMap();
         int eventMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         KeyStroke key = KeyStroke.getKeyStroke(keyEventVk, eventMask);
         inputMap.put(key, action);
@@ -132,7 +134,8 @@ public class JTextComponentFind {
     
     private JTextComponentFind(final JTextComponent textComponent) {
         this.textComponent = textComponent;
-        initKeyStrokes();
+        initKeyStrokes(textComponent, true);
+        initKeyStrokes(findField, false);
     }
     
     private class FindAction extends AbstractAction {
