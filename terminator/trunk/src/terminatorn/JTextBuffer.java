@@ -21,6 +21,19 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	private boolean displayCaret = true;
 	private HashMap highlighters = new HashMap();
 	
+	/**
+	* The highlights present in each line.  The highlights for a line are stored at the index in
+	* lineHighlights corresponding to the line index.  The object at that index is another ArrayList
+	* containing all Highlight objects which appear on that line.  Note that a highlight object which
+	* appears on several lines will appear several times within this structure (once within the
+	* ArrayList for each line upon which the highlight appears).  This ArrayList is not guaranteed to
+	* be the same size as the number of lines in the model, and likewise there is no guarantee that
+	* the reference at a certain index will be a real ArrayList - it could be null.  Use the already
+	* implemented methods for accessing this structure whenever possible in order to hide all the
+	* necessary checks.
+	*/
+	private ArrayList lineHighlights = new ArrayList();
+	
 	public JTextBuffer() {
 		model = new TextBuffer(this, 80, 24);
 		setFont(Options.getSharedInstance().getFont());
@@ -100,10 +113,48 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		return (Highlighter) highlighters.get(name);
 	}
 	
+	public void removeHighlightsFrom(int firstLineIndex) {
+		while (lineHighlights.size() > firstLineIndex) {
+			lineHighlights.remove(firstLineIndex);
+		}
+	}
+	
+	public void removeHighlightsFrom(Highlighter highlighter, int firstLineIndex) {
+		for (int i = firstLineIndex; i < lineHighlights.size(); i++) {
+			ArrayList list = (ArrayList) lineHighlights.get(i);
+			if (list != null) {
+				Highlight[] highlights = (Highlight[]) list.toArray(new Highlight[list.size()]);
+				for (int j = 0; j < highlights.length; j++) {
+					if (highlights[j].getHighlighter() == highlighter) {
+						list.remove(highlights[j]);
+					}
+				}
+			}
+		}
+	}
+	
+	public void addHighlight(Highlight highlight) {
+		for (int i = highlight.getStart().getLineIndex(); i <= highlight.getEnd().getLineIndex(); i++) {
+			addHighlightAtLine(highlight, i);
+		}
+	}
+	
+	public void addHighlightAtLine(Highlight highlight, int lineIndex) {
+		if (lineIndex >= lineHighlights.size() || lineHighlights.get(lineIndex) == null) {
+			lineHighlights.ensureCapacity(lineIndex + 1);
+			lineHighlights.set(lineIndex, new ArrayList());
+		}
+		((ArrayList) lineHighlights.get(lineIndex)).add(highlight);
+	}
+	
+	/** Returns an array containing all highlights in the indexed line.  This method never returns null. */
 	public Highlight[] getHighlightsForLine(int lineIndex) {
-		return new Highlight[] {
-			new Highlight(null, new Location(lineIndex, 5), new Location(lineIndex, 10), new Style(null, Color.blue, null, null))
-		};
+		if (lineIndex >= lineHighlights.size() || lineHighlights.get(lineIndex) == null) {
+			return new Highlight[0];
+		} else {
+			ArrayList highlights = (ArrayList) lineHighlights.get(lineIndex);
+			return (Highlight[]) highlights.toArray(new Highlight[highlights.size()]);
+		}
 	}
 	
 	// Redraw code.
@@ -155,10 +206,8 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		FontMetrics metrics = getFontMetrics(getFont());
 		Style style = text.getStyle();
 		int textWidth = metrics.stringWidth(text.getText());
-//		if (text.getBackground() != StyledText.WHITE) {
-			graphics.setColor(style.getBackground());
-			graphics.fillRect(x, y - metrics.getMaxAscent(), textWidth, metrics.getHeight());
-//		}
+		graphics.setColor(style.getBackground());
+		graphics.fillRect(x, y - metrics.getMaxAscent(), textWidth, metrics.getHeight());
 		graphics.setColor(style.getForeground());
 		if (style.isUnderlined()) {
 			graphics.drawLine(x, y + 1, x + textWidth, y + 1);
