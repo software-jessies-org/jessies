@@ -145,7 +145,7 @@ public class FileUtilities {
     private static Pattern uninterestingDirectoryNames;
     
     public static boolean isIgnored(File file) {
-        if (file.isHidden() || file.getName().startsWith(".")) {
+        if (file.isHidden() || file.getName().startsWith(".") || file.getName().endsWith("~")) {
             return true;
         }
         if (file.isDirectory()) {
