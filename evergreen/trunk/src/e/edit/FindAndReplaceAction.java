@@ -35,6 +35,17 @@ public class FindAndReplaceAction extends ETextAction {
     private ETextWindow textWindow;
     private ETextArea text;
 
+    private boolean isSelectionMeantAsScope() {
+        return (text.getSelectedText().indexOf("\n") != -1);
+    }
+    
+    private void initPatternField() {
+        String selection = text.getSelectedText();
+        if (selection.length() > 0 && isSelectionMeantAsScope() == false) {
+            patternField.setText(StringUtilities.regularExpressionFromLiteral(selection));
+        }
+    }
+    
     public void actionPerformed(ActionEvent e) {
         textWindow = getFocusedTextWindow();
         if (textWindow == null) {
@@ -42,6 +53,8 @@ public class FindAndReplaceAction extends ETextAction {
         }
         text = textWindow.getText();
 
+        initPatternField();
+        
         matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -100,7 +113,7 @@ public class FindAndReplaceAction extends ETextAction {
         UndoManager undoManager = text.getUndoManager();
         undoManager.addEdit(entireEdit);
         try {
-            if (text.getSelectionStart() != text.getSelectionEnd()) {
+            if (isSelectionMeantAsScope()) {
                 // There's a selection, so only replace in that.
                 int selectionStart = text.getSelectionStart();
                 String newText = makeReplacedText(text.getSelectedText());
