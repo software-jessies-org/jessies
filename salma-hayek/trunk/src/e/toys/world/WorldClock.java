@@ -36,11 +36,16 @@ public class WorldClock extends JFrame {
         super("World Clock");
         setContentPane(makeContentPane());
         pack();
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-//        final int x = screen.width - getWidth();
-//        final int y = screen.height - getHeight();
-//        setLocation(new Point(x, y));
+        centerFrameOnScreen();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+    }
+    
+    private void centerFrameOnScreen() {
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        final int x = (screen.width - getWidth()) / 2;
+        final int y = (screen.height - getHeight()) / 2;
+        setLocation(new Point(x, y));
     }
 
     private ImageIcon makeIcon(String filename, String url) {
