@@ -6,7 +6,7 @@ import javax.swing.*;
 
 import e.util.*;
 
-public class EditServer extends Thread {
+public final class EditServer extends Thread {
     private ServerSocket socket;
     
     public EditServer() throws IOException {
