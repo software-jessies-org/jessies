@@ -43,5 +43,9 @@ do
     link_in_usr_local_bin `pwd`/$script
 done
 
+if test -f /etc/debian_version ; then
+    apt-get install exuberant-ctags ri
+fi
+
 echo "All done!"
 exit 0
