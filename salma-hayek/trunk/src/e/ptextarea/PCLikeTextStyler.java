@@ -23,11 +23,11 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
     private boolean[] commentCache;
     private Pattern keywordPattern = Pattern.compile("\\b\\w+\\b");
     
-    private static final int TYPE_NORMAL = 0;
-    private static final int TYPE_STRING = 1;
-    private static final int TYPE_COMMENT = 2;
-    private static final int TYPE_KEYWORD = 3;
-    private static final int TYPE_ERROR = 4;
+    protected static final int TYPE_NORMAL = 0;
+    protected static final int TYPE_STRING = 1;
+    protected static final int TYPE_COMMENT = 2;
+    protected static final int TYPE_KEYWORD = 3;
+    protected static final int TYPE_ERROR = 4;
     
     private static final Color[] DEFAULT_COLORS = new Color[5];
     static {
@@ -55,6 +55,15 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
      * Returns true if the styler should comment to end of line on seeing '#'.
      */
     public abstract boolean supportShellComments();
+    
+    /**
+     * Adds a text segment of type String to the given segment list.  Override
+     * this method if you wish to perform some validation on the string and introduce
+     * error-style sections into it.
+     */
+    public void addStringSegment(ArrayList segmentList, String string) {
+        segmentList.add(new PTextSegment(TYPE_STRING, string));
+    }
     
     public Color getDefaultColor(int index) {
         return DEFAULT_COLORS[index];
@@ -207,7 +216,7 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
                         result.add(new PTextSegment(TYPE_ERROR, line.substring(i)));
                         i = line.length();
                     } else {
-                        result.add(new PTextSegment(TYPE_STRING, line.substring(i, stringEnd)));
+                        addStringSegment(result, line.substring(i, stringEnd));
                         i = stringEnd;
                     }
                     lastStart = i;
