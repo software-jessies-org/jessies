@@ -263,9 +263,10 @@ public class Edit implements com.apple.eawt.ApplicationListener {
              */
             filename = FileUtilities.fileFromString(filename).getAbsolutePath();
         } catch (IOException ex) {
-            /* harmless. */
+            /* Harmless. */
             ex = ex;
         }
+        filename = normalizeWorkspacePrefix(filename);
         filename = FileUtilities.getUserFriendlyName(filename);
         
         /* Find which workspace this file is on/should be on, and make it visible. */
@@ -298,6 +299,38 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             result[i] = (Workspace) tabbedPane.getComponentAt(i);
         }
         return result;
+    }
+
+    /**
+     * Substituting ~/ for /home/userName isn't the only friendly transformation
+     * that we can usefully and easily make.  If the user has configured us
+     * with workspace paths which include symbolic links, then it's a reasonable
+     * presumption that the user would like us to consistently use the form of
+     * the path which they supplied rather than the OS-canonical form (supplied
+     * by File.getCanonicalPath).
+     * A symbolic link within such a workspace would have both symbolic links
+     * canonicalized in openFile and so would end up with a path prefixed by
+     * the desired Workspace's canonical name rather than its friendly name.
+     * This would send it to the wrong Workspace.
+     * FIXME: Consistency probably demands that this be called from
+     * FileUtilities.getUserFriendlyName rather than Edit.openFile.
+     */
+    public static String normalizeWorkspacePrefix(String filename) {
+        Workspace[] workspaces = getWorkspaces();
+        for (int i = 0; i < workspaces.length; i++) {
+            try {
+                Workspace workspace = workspaces[i];
+                String friendlyPrefix = workspace.getRootDirectory();
+                String canonicalPrefix = workspace.getCanonicalRootDirectory();
+                if (filename.startsWith(canonicalPrefix)) {
+                    return friendlyPrefix + filename.substring(canonicalPrefix.length());
+                }
+            } catch (IOException ex) {
+                /* Harmless. */
+                ex = ex;
+            }
+        }
+        return filename;
     }
     
     /** Returns the workspace whose root directory shares the longest common prefix with the given filename. */

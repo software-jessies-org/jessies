@@ -24,13 +24,14 @@ public class Workspace extends JPanel {
     public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
         this.title = title;
-        this.rootDirectory = canonicalizeRootDirectory(rootDirectory);
+        this.rootDirectory = normalizeRootDirectory(rootDirectory);
         
         add(makeUI(), BorderLayout.CENTER);
         updateFileList();
     }
     
-    public static String canonicalizeRootDirectory(String rootDirectory) {
+    /** Substitutes friendly names for canonical ones. */
+    public static String normalizeRootDirectory(String rootDirectory) {
         rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
         if (rootDirectory.endsWith(File.separator) == false) {
             rootDirectory += File.separator;
@@ -56,8 +57,20 @@ public class Workspace extends JPanel {
         return title;
     }
     
+    /**
+     * Returns the normal, friendly form rather than the OS-canonical one.
+     * See also getCanonicalRootDirectory.
+     */
     public String getRootDirectory() {
         return rootDirectory;
+    }
+    
+    /**
+     * Returns the OS-canonical form rather than the normal, friendly one.
+     * See also getRootDirectory.
+     */
+    public String getCanonicalRootDirectory() throws IOException {
+        return FileUtilities.fileFromString(getRootDirectory()).getCanonicalPath() + File.separator;
     }
     
     /**
