@@ -79,6 +79,7 @@ public class JTelnetPane extends JPanel {
 
 		private String getSequenceForKeyCode(int keyCode) {
 			switch (keyCode) {
+				case KeyEvent.VK_ESCAPE: return "";
 				case KeyEvent.VK_UP: return "[A";
 				case KeyEvent.VK_DOWN: return "[B";
 				case KeyEvent.VK_RIGHT: return "[C";
