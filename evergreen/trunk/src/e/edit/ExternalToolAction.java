@@ -87,7 +87,7 @@ public class ExternalToolAction extends ETextAction {
 
     public void safeRunCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
         try {
-            new ShellCommand(filename, lineNumber, workspace, context, command);
+            new ShellCommand(filename, lineNumber, workspace, false, context, command);
         } catch (IOException ex) {
             Edit.showAlert(context, "Can't start task (" + ex.getMessage() + ").");
         }

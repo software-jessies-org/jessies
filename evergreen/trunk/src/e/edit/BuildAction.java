@@ -46,7 +46,7 @@ public class BuildAction extends ETextAction {
     public void invokeBuildTool(ETextWindow text, String makefileName, String command) {
         String makefileDirectoryName = makefileName.substring(0, makefileName.lastIndexOf(File.separatorChar));
         command = addTarget(command);
-        text.invokeShellCommand(makefileDirectoryName, command);
+        text.invokeShellCommand(makefileDirectoryName, command, true);
     }
     
     public String addTarget(String command) {

@@ -9,6 +9,8 @@ public class ShellCommand {
     private String context;
     private String name;
     
+    private boolean shouldShowProgress;
+    
     private String[] envp;
 // the ProcessBuilder stuff is the right way to do things when we can
 // ditch 1.4.2 compatibility (probably not before "H1 2005", for Mac OS).
@@ -20,16 +22,17 @@ public class ShellCommand {
     private int openStreamCount = 0;
     
     public ShellCommand(String command) throws IOException {
-        this("", 0, Edit.getCurrentWorkspace(), "/", command);
+        this("", 0, Edit.getCurrentWorkspace(), false, "/", command);
     }
     
     /** Starts a new task. */
-    public ShellCommand(String filename, int lineNumber, Workspace workspace, String context, String command) throws IOException {
+    public ShellCommand(String filename, int lineNumber, Workspace workspace, boolean shouldShowProgress, String context, String command) throws IOException {
         this.command = command.trim();
 
         /* FIXME: we also need to mangle UTF-8. for each byte, we need to have the 'character' corresponding to the byte. the JVM 'translates' non-ASCII characters by just sending the first byte, it seems. */
         
         this.workspace = workspace;
+        this.shouldShowProgress = shouldShowProgress;
         this.context = context;
         this.name = command;
 
@@ -102,7 +105,9 @@ public class ShellCommand {
     
     /** Invoked by StreamMonitor when one of this task's streams is opened. */
     public synchronized void streamOpened() {
-        Edit.showProgressBar();
+        if (shouldShowProgress) {
+            Edit.showProgressBar();
+        }
         openStreamCount++;
     }
     
@@ -111,7 +116,9 @@ public class ShellCommand {
     * streams left open, this task has finished and Edit is notified.
     */
     public synchronized void streamClosed() {
-        Edit.hideProgressBar();
+        if (shouldShowProgress) {
+            Edit.hideProgressBar();
+        }
         openStreamCount--;
         if (openStreamCount == 0) {
             try {
