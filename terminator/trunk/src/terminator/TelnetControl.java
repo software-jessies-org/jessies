@@ -27,10 +27,17 @@ public class TelnetControl implements Runnable {
 	private InputStream in;
 	private OutputStream out;
 	
+	// Current style.
+	private int foregroundColour;
+	private int backgroundColour;
+	private boolean isBold;
+	private boolean isUnderlined;
+	
 	public TelnetControl(TelnetListener listener, InputStream in, OutputStream out) throws IOException {
 		this.listener = listener;
 		this.in = in;
 		this.out = out;
+		resetStyle();
 		(new Thread(this, "Telnet connection listener")).start();
 	}
 	
@@ -238,38 +245,41 @@ public class TelnetControl implements Runnable {
 	}
 	
 	public boolean processFontEscape(String sequence) {
-		int style = (sequence.length() == 0) ? StyledText.getDefaultStyle() : processStyle(sequence);
-		listener.setStyle(style);
+		listener.setStyle(processStyle(sequence));
 		return true;
 	}
 	
-	public int processStyle(String sequence) {	
-		int foreground = StyledText.BLACK;
-		int background = StyledText.WHITE;
-		boolean isBold = false;
-		boolean isUnderlined = false;
-		boolean isReverse = false;
+	private void resetStyle() {
+		foregroundColour = StyledText.BLACK;
+		backgroundColour = StyledText.WHITE;
+		isBold = false;
+		isUnderlined = false;
+	}
+	
+	private void reverseColours() {
+		int temp = foregroundColour;
+		foregroundColour = backgroundColour;
+		backgroundColour = temp;
+	}
+	
+	public int processStyle(String sequence) {
 		String[] bits = sequence.split(";");
 		for (int i = 0; i < bits.length; i++) {
-			int value = Integer.parseInt(bits[i]);
+			int value = (bits[i].length() == 0) ? 0 : Integer.parseInt(bits[i]);
 			if (valueInRange(value, 0, 8)) {
 				switch (value) {
+					case 0: resetStyle(); break;
 					case 1: isBold = true; break;
 					case 4: isUnderlined = true; break;
-					case 7: isReverse = true; break;
+					case 7: reverseColours(); break;
 				}
 			} else if (valueInRange(value, 30, 37)) {
-				foreground = value - 30;
+				foregroundColour = value - 30;
 			} else if (valueInRange(value, 40, 47)) {
-				background = value - 40;
+				backgroundColour = value - 40;
 			}
 		}
-		if (isReverse) {
-			int temp = foreground;
-			foreground = background;
-			background = temp;
-		}
-		return StyledText.getStyle(foreground, background, isBold, isUnderlined);
+		return StyledText.getStyle(foregroundColour, backgroundColour, isBold, isUnderlined);
 	}
 	
 	public boolean valueInRange(int value, int min, int max) {

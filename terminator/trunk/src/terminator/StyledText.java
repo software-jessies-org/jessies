@@ -63,4 +63,8 @@ public class StyledText {
 		return foreground | (background << BACKGROUND_SHIFT) |
 				(isBold ? IS_BOLD : 0) | (isUnderlined ? IS_UNDERLINED : 0);
 	}
+	
+	public String getDescription() {
+		return "FG " + getForeground() + ", BG " + getBackground() + ", B=" + isBold() + ", U=" + isUnderlined();
+	}
 }
