@@ -92,28 +92,16 @@ public class JTerminalPane extends JPanel {
 	* On any kind of failure, 'bash' is returned as default.
 	*/
 	private static String getUserShell(String user) {
-		File passwdFile = new File("/etc/passwd");
-		if (passwdFile.exists()) {
-			BufferedReader in = null;
-			try {
-				in = new BufferedReader(new FileReader(passwdFile));
-				String line;
-				while ((line = in.readLine()) != null) {
-					if (line.startsWith(user + ":")) {
-						return line.substring(line.lastIndexOf(':') + 1);
-					}
-				}
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			} finally {
-				if (in != null) {
-					try {
-						in.close();
-					} catch (IOException ex) {
-						Log.warn("Couldn't close file.", ex);
-					}
+		try {
+			String[] lines = StringUtilities.readLinesFromFile("/etc/passwd");
+			for (int i = 0; i < lines.length; ++i) {
+				String line = lines[i];
+				if (line.startsWith(user + ":")) {
+					return line.substring(line.lastIndexOf(':') + 1);
 				}
 			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 		return "bash";
 	}
