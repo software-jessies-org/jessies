@@ -344,6 +344,14 @@ public class JTerminalPane extends JPanel {
 		scrollVertically(0.5);
 	}
 	
+	public void lineUp() {
+		scrollVertically(-1.0/currentSizeInChars.height);
+	}
+	
+	public void lineDown() {
+		scrollVertically(1.0/currentSizeInChars.height);
+	}
+	
 	private void scrollVertically(double yMul) {
 		JViewport viewport = scrollPane.getViewport();
 		

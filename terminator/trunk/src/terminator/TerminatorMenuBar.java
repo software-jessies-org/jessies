@@ -77,9 +77,9 @@ public class TerminatorMenuBar extends JMenuBar {
 		menu.add(new JMenuItem(new PageUpAction()));
 		menu.add(new JMenuItem(new PageDownAction()));
 		
-		//menu.add(new JSeparator());
-		//menu.add(new JMenuItem(LineUpAction());
-		//menu.add(new JMenuItem(LineDownAction());
+		menu.add(new JSeparator());
+		menu.add(new JMenuItem(new LineUpAction()));
+		menu.add(new JMenuItem(new LineDownAction()));
 		
 		menu.add(new JSeparator());
 		menu.add(new JMenuItem(new ClearScrollbackAction()));
@@ -373,6 +373,34 @@ public class TerminatorMenuBar extends JMenuBar {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
 				terminal.pageDown();
+			}
+		}
+	}
+	
+	public static class LineUpAction extends AbstractAction {
+		public LineUpAction() {
+			super("Line Up");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("UP"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.lineUp();
+			}
+		}
+	}
+	
+	public static class LineDownAction extends AbstractAction {
+		public LineDownAction() {
+			super("Line Down");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("DOWN"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.lineDown();
 			}
 		}
 	}
