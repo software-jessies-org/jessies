@@ -1,5 +1,6 @@
 package e.gui;
 
+import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -58,6 +59,23 @@ public class ETree extends JTree {
         }
         if (node.toString().toLowerCase().indexOf(string) != -1) {
             addSelectionPath(parent);
+        }
+    }
+    
+    /** Scrolls the path to the middle of the scroll pane. */
+    public void scrollPathToVisible(TreePath path) {
+        if (path == null) {
+            return;
+        }
+        makeVisible(path);
+        Rectangle pathBounds = getPathBounds(path);
+        if (pathBounds != null) {
+            Rectangle visibleRect = getVisibleRect();
+            if (getHeight() > visibleRect.height) {
+                int y = pathBounds.y - visibleRect.height / 2;
+                visibleRect.y = Math.min(Math.max(0, y), getHeight() - visibleRect.height);
+                scrollRectToVisible(visibleRect);
+            }
         }
     }
 }
