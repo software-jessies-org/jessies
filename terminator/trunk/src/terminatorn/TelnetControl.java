@@ -435,6 +435,7 @@ public class TelnetControl implements Runnable {
 		try {
 			out.write((byte) ESC);
 			out.write(str.getBytes());
+			out.flush();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
