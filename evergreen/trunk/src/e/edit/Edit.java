@@ -26,6 +26,9 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     /** The global find history for all FindDialog instances. */
     private static EHistoryComboBoxModel findHistory = new ChronologicalComboBoxModel();
     
+    /** Tests false once we're fully started. */
+    private static boolean initializing = true;
+    
     public static Edit getInstance() {
         return instance;
     }
@@ -116,6 +119,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     public static void moveToComponent(Component c) {
+        // Don't do this while we're starting up, because it's distracting and
+        // annoying if the user's trying to do something else while we start.
+        if (initializing) {
+            return;
+        }
         c.requestFocus();
     }
     
@@ -728,6 +736,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         frame.setVisible(true);
         
         openRememberedFiles();
+        
+        initializing = false;
     }
 
     public static void main(String[] args) {
