@@ -455,7 +455,7 @@ public class Workspace extends JPanel {
             saveAsDialog = new FileDialog(Edit.getFrame(), "Save As", FileDialog.SAVE);
             saveAsDialog.setDirectory(getRootDirectory());
         }
-        saveAsDialog.show();
+        saveAsDialog.setVisible(true);
         String leafname = saveAsDialog.getFile();
         if (leafname == null) {
             return null;
