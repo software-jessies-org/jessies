@@ -11,6 +11,9 @@ public class GuiUtilities {
             if (lafClassName == null) {
                 lafClassName = UIManager.getSystemLookAndFeelClassName();
             }
+            if (lafClassName.indexOf("GTK") != -1) {
+                lafClassName = UIManager.getCrossPlatformLookAndFeelClassName();
+            }
             UIManager.setLookAndFeel(lafClassName);
             if (lafClassName.indexOf("Metal") != -1) {
                 Object font = UIManager.get("Table.font");
