@@ -132,33 +132,20 @@ public class Workspace extends JPanel {
     }
     
     public JComponent makeUI() {
-        leftColumn.addComponent(errors);
+        leftColumn.setErrorsWindow(errors);
         registerTextComponent(errors.getText());
         return leftColumn;
     }
     
-    /** Returns an array of this workspace's text windows. */
-    public ETextWindow[] getTextWindows() {
-        ArrayList textWindows = new ArrayList();
-        Component[] components = leftColumn.getComponents();
-        for (int i = 0; i < components.length; i++) {
-            if (components[i] instanceof ETextWindow) {
-                ETextWindow textWindow = (ETextWindow) components[i];
-                textWindows.add(textWindow);
-            }
-        }
-        return (ETextWindow[]) textWindows.toArray(new ETextWindow[textWindows.size()]);
-    }
-    
     /** Tests whether this workspace is empty. A workspace is still considered empty if all it contains is an errors window. */
     public boolean isEmpty() {
-        return getTextWindows().length == 0;
+        return leftColumn.getTextWindows().length == 0;
     }
     
     /** Returns an array of this workspace's dirty text windows. */
     public ETextWindow[] getDirtyTextWindows() {
         ArrayList dirtyTextWindows = new ArrayList();
-        ETextWindow[] textWindows = getTextWindows();
+        ETextWindow[] textWindows = leftColumn.getTextWindows();
         for (int i = 0; i < textWindows.length; i++) {
             ETextWindow textWindow = textWindows[i];
             if (textWindow.isDirty()) {
@@ -170,7 +157,7 @@ public class Workspace extends JPanel {
     
     /** Write the names of the currently open files to the given PrintWriter, one per line. */
     public void writeFilenamesTo(PrintWriter out) {
-        ETextWindow[] textWindows = getTextWindows();
+        ETextWindow[] textWindows = leftColumn.getTextWindows();
         for (int i = 0; i < textWindows.length; i++) {
             ETextWindow textWindow = textWindows[i];
             out.println(textWindow.getFilename() + textWindow.getAddress());
@@ -452,7 +439,7 @@ public class Workspace extends JPanel {
     }
     
     public void moveFilesToBestWorkspaces() {
-        ETextWindow[] textWindows = getTextWindows();
+        ETextWindow[] textWindows = leftColumn.getTextWindows();
         for (int i = 0; i < textWindows.length; i++) {
             ETextWindow textWindow = textWindows[i];
             Workspace bestWorkspace = Edit.getBestWorkspaceForFilename(textWindow.getFilename());
@@ -476,5 +463,13 @@ public class Workspace extends JPanel {
                 }
             });
         }
+    }
+    
+    public void switchToNextFile() {
+        leftColumn.switchToNextFile();
+    }
+    
+    public void switchToPreviousFile() {
+        leftColumn.switchToPreviousFile();
     }
 }

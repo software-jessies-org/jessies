@@ -30,15 +30,15 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     
     public JMenu makeFileMenu() {
         JMenu menu = new JMenu("File");
-        menu.add(makeAcceleratedItem(new NewFileAction(), 'N'));
-        menu.add(makeAcceleratedItem(new OpenAction(), 'O'));
-        menu.add(makeAcceleratedItemEx(new OpenSelectionAction(), 'D', true));
+        menu.add(makeAcceleratedItem(new NewFileAction(), "N"));
+        menu.add(makeAcceleratedItem(new OpenAction(), "O"));
+        menu.add(makeAcceleratedItemEx(new OpenSelectionAction(), "D", true));
         // FIXME: Should be "Open Recent >" here.
 
         menu.add(new JSeparator());
-        menu.add(makeAcceleratedItem(new CloseWindowAction(), 'W'));
-        menu.add(makeAcceleratedItem(new SaveAction(), 'S'));
-        menu.add(makeAcceleratedItemEx(new SaveAsAction(), 'S', true));
+        menu.add(makeAcceleratedItem(new CloseWindowAction(), "W"));
+        menu.add(makeAcceleratedItem(new SaveAction(), "S"));
+        menu.add(makeAcceleratedItemEx(new SaveAsAction(), "S", true));
         menu.add(new SaveAllAction());
         menu.add(new RevertToSavedAction()); // FIXME: Should be on C-U, but I'm not convinced we should make this so easy.
 
@@ -49,22 +49,22 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         return menu;
     }
 
-    public JMenuItem makeAcceleratedItem(Action action, char character) {
-        return makeAcceleratedItemEx(action, character, false);
+    public JMenuItem makeAcceleratedItem(Action action, String key) {
+        return makeAcceleratedItemEx(action, key, false);
     }
 
-    public JMenuItem makeAcceleratedItemEx(Action action, char character, boolean shifted) {
+    public JMenuItem makeAcceleratedItemEx(Action action, String key, boolean shifted) {
         JMenuItem item = new JMenuItem(action);
         int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         if (shifted) modifiers |= InputEvent.SHIFT_MASK;
-        String keycodeName = "VK_" + character;
+        String keycodeName = "VK_" + key;
         int keycode;
         try {
             keycode = KeyEvent.class.getField(keycodeName).getInt(KeyEvent.class);
             KeyStroke keyStroke = KeyStroke.getKeyStroke(keycode, modifiers);
             item.setAccelerator(keyStroke);
-        } catch (Exception e) {
-            Log.warn("Couldn't find virtual keycode for '" + character);
+        } catch (Exception ex) {
+            Log.warn("Couldn't find virtual keycode for '" + key + "'.", ex);
         }
         return item;
     }
@@ -78,17 +78,17 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     
     public JMenu makeEditMenu() {
         JMenu menu = new JMenu("Edit");
-        menu.add(makeAcceleratedItem(new UndoAction(), 'Z'));
-        menu.add(makeAcceleratedItemEx(new RedoAction(), 'Z', true));
+        menu.add(makeAcceleratedItem(new UndoAction(), "Z"));
+        menu.add(makeAcceleratedItemEx(new RedoAction(), "Z", true));
 
         menu.add(new JSeparator());
-        menu.add(makeAcceleratedItem(new CutAction(), 'X'));
-        menu.add(makeAcceleratedItem(new CopyAction(), 'C'));
-        menu.add(makeAcceleratedItem(new PasteAction(), 'V'));
+        menu.add(makeAcceleratedItem(new CutAction(), "X"));
+        menu.add(makeAcceleratedItem(new CopyAction(), "C"));
+        menu.add(makeAcceleratedItem(new PasteAction(), "V"));
         menu.add(makeCompletionItem(new AutoCompleteAction()));
 
         menu.add(new JSeparator());
-        menu.add(makeAcceleratedItem(new CorrectIndentationAction(), 'I'));
+        menu.add(makeAcceleratedItem(new CorrectIndentationAction(), "I"));
 
         menu.add(new JSeparator());
         menu.add(new ShowMisspellingsAction());
@@ -98,20 +98,20 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
 
     public JMenu makeFindMenu() {
         JMenu menu = new JMenu("Find");
-        menu.add(makeAcceleratedItem(FindAction.INSTANCE, 'F'));
-        menu.add(makeAcceleratedItem(new FindNextAction(), 'G'));
-        menu.add(makeAcceleratedItem(new FindPreviousAction(), 'D'));
+        menu.add(makeAcceleratedItem(FindAction.INSTANCE, "F"));
+        menu.add(makeAcceleratedItem(new FindNextAction(), "G"));
+        menu.add(makeAcceleratedItem(new FindPreviousAction(), "D"));
         //   Use Selection for Find C-E
-        menu.add(makeAcceleratedItem(new ScrollToSelectionAction(), 'J'));
+        menu.add(makeAcceleratedItem(new ScrollToSelectionAction(), "J"));
 
         menu.add(new JSeparator());
-        menu.add(makeAcceleratedItem(new FindAndReplaceAction(), 'R'));
+        menu.add(makeAcceleratedItem(new FindAndReplaceAction(), "R"));
 
         menu.add(new JSeparator());
-        menu.add(makeAcceleratedItem(new GotoAction(), 'L'));
+        menu.add(makeAcceleratedItem(new GotoAction(), "L"));
         
         menu.add(new JSeparator());
-        menu.add(makeAcceleratedItemEx(new FindFilesContainingSelectionAction(), 'G', true));
+        menu.add(makeAcceleratedItemEx(new FindFilesContainingSelectionAction(), "G", true));
         
         return menu;
     }
@@ -128,12 +128,12 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     
     public JMenu makeToolsMenu() {
         final JMenu menu = new JMenu("Tools");
-        menu.add(makeAcceleratedItem(new BuildAction(), 'B'));
+        menu.add(makeAcceleratedItem(new BuildAction(), "B"));
         menu.add(new SetBuildTargetAction());
         menu.add(new OpenMakefileAction());
         
         menu.add(new JSeparator());
-        menu.add(makeAcceleratedItem(new KillErrorsAction(), 'K'));
+        menu.add(makeAcceleratedItem(new KillErrorsAction(), "K"));
 
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
             public void addItem(Action action) {
@@ -141,7 +141,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
             }
 
             public void addItem(Action action, char keyboardEquivalent) {
-                menu.add(makeAcceleratedItemEx(action, keyboardEquivalent, true));
+                menu.add(makeAcceleratedItemEx(action, "" + keyboardEquivalent, true));
             }
 
             public void addSeparator() {
@@ -156,6 +156,9 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         JMenu menu = new JMenu("Workspace");
         menu.add(new AddWorkspaceAction());
         menu.add(new RemoveWorkspaceAction());
+        menu.add(new JSeparator());
+        menu.add(makeAcceleratedItem(new NextFileAction(), "BACK_QUOTE"));
+        menu.add(makeAcceleratedItemEx(new PreviousFileAction(), "BACK_QUOTE", true));
         return menu;
     }
     
