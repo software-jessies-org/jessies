@@ -26,7 +26,11 @@ public class JTerminalPane extends JPanel {
 		new NewTabAction(),
 		new RunCommandAction(),
 		new CloseTabAction(),
+		
 		new FindAction(),
+		new FindNextAction(),
+		new FindPreviousAction(),
+		
 		new ClearScrollbackAction(),
 		new ChangeColourAction(),
 //		new NewWindowAction(),
@@ -463,6 +467,34 @@ public class JTerminalPane extends JPanel {
 		
 		public char getHotkeyChar() {
 			return 'F';
+		}
+	}
+	
+	public class FindNextAction implements MenuKeyAction {
+		public String getName() {
+			return "Find Next";
+		}
+		
+		public void performAction() {
+			textPane.findNext();
+		}
+		
+		public char getHotkeyChar() {
+			return 'G';
+		}
+	}
+	
+	public class FindPreviousAction implements MenuKeyAction {
+		public String getName() {
+			return "Find Previous";
+		}
+		
+		public void performAction() {
+			textPane.findPrevious();
+		}
+		
+		public char getHotkeyChar() {
+			return 'D';
 		}
 	}
 	

@@ -179,6 +179,11 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		scrollRectToVisible(new Rectangle(0, getHeight() - 10, 10, 10));
 	}
 	
+	public void scrollToLine(final int lineNumber) {
+		FontMetrics metrics = getFontMetrics(getFont());
+		scrollRectToVisible(new Rectangle(0, lineNumber * metrics.getHeight() - 10, 10, metrics.getHeight() + 20));
+	}
+	
 	/**
 	 * Scrolls to the bottom of the output if doing so fits the user's
 	 * configuration, or is over-ridden by the fact that we're trying to
@@ -367,6 +372,63 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		((ArrayList) lineHighlights.get(lineIndex)).add(highlight);
 	}
 	
+	/**
+	 * Tests whether any of the Highlight objects in the array is a FindHighlighter.
+	 */
+	private static boolean containsFindHighlight(Highlight[] highlights) {
+		for (int i = 0; i < highlights.length; ++i) {
+			if (highlights[i].getHighlighter() instanceof FindHighlighter) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Searches from startLine to endLine inclusive, incrementing the
+	 * current line by 'direction', looking for a line with a find highlight.
+	 * When one is found, the cursor is moved there.
+	 */
+	private void findAgain(int startLine, int endLine, int direction) {
+		for (int i = startLine; i != endLine; i += direction) {
+			Highlight[] highlights = getHighlightsForLine(i);
+			if (containsFindHighlight(highlights)) {
+				scrollToLine(i);
+				return;
+			}
+		}
+	}
+	
+	/**
+	 * Scrolls the display to the first find highlight not currently on the display.
+	 */
+	public void findPrevious() {
+		findAgain(getFirstVisibleLine() - 1, -1, -1);
+	}
+	
+	/**
+	 * Scrolls the display to the next find highlight not currently on the display.
+	 */
+	public void findNext() {
+		findAgain(getLastVisibleLine() + 1, getModel().getLineCount() + 1, 1);
+	}
+	
+	public JViewport getViewport() {
+		return (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, this);
+	}
+	
+	public int getFirstVisibleLine() {
+		FontMetrics metrics = getFontMetrics(getFont());
+		Rectangle visibleBounds = getViewport().getViewRect();
+		return visibleBounds.y / metrics.getHeight();
+	}
+	
+	public int getLastVisibleLine() {
+		FontMetrics metrics = getFontMetrics(getFont());
+		Rectangle visibleBounds = getViewport().getViewRect();
+		return (visibleBounds.y + visibleBounds.height) / metrics.getHeight();
+	}
+
 	public Highlight[] getHighlightsForLocation(Location location) {
 		Highlight[] lineLights = getHighlightsForLine(location.getLineIndex());
 		ArrayList result = new ArrayList();
