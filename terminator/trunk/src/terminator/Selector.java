@@ -45,10 +45,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 			}
 			selectWord(model, loc);
 		} else if (event.getClickCount() == 3) {
-			// Select line.
-			Location start = new Location(loc.getLineIndex(), 0);
-			Location end = new Location(loc.getLineIndex() + 1, 0);
-			setHighlight(start, end);
+			selectLine(loc);
 		}
 		copy();
 	}
@@ -96,7 +93,15 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		while (end < line.length() && isWordChar(line.charAt(end))) {
 			++end;
 		}
-		setHighlight(new Location(lineNumber, start), new Location(lineNumber, end));
+		startLocation = new Location(lineNumber, start);
+		setHighlight(startLocation, new Location(lineNumber, end));
+	}
+	
+	public void selectLine(Location location) {
+		Location start = new Location(location.getLineIndex(), 0);
+		Location end = new Location(location.getLineIndex() + 1, 0);
+		startLocation = start;
+		setHighlight(start, end);
 	}
 	
 	public void mouseReleased(MouseEvent event) {
