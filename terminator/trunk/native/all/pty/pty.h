@@ -25,7 +25,7 @@
 #define SIZE_ESCAPE 0    /* Magic character used to escape size change notifications */
 
 int ptym_open(std::string&);
-int ptys_open(const char *);
+int ptys_open(const std::string&);
 pid_t pty_fork(int*);
 
 inline void panic(const char* reason, const char* parameter = 0) {

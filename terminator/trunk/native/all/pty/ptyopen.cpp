@@ -1,8 +1,6 @@
 #include "pty.h"
 
-#ifdef __APPLE__
-
-int ptym_open(std::string& pts_name) {
+static int search_for_pty(std::string& pts_name) {
     for (char* ptr1 = "pqrstuvwxyzPQRST"; *ptr1 != 0; ++ptr1) {
         for (char* ptr2 = "0123456789abcdef"; *ptr2 != 0; ++ptr2) {
             pts_name = "/dev/pty";
@@ -12,10 +10,12 @@ int ptym_open(std::string& pts_name) {
             /* try to open master */
             int fdm = open(pts_name.c_str(), O_RDWR);
             if (fdm < 0) {
-                if (errno == ENOENT) {  /* different from EIO */
-                    return -1;          /* out of pty devices */
+                if (errno == ENOENT) {
+                    /* Different from EIO. */
+                    panic("out of pseudo-terminal devices");
                 } else {
-                    continue;           /* try next pty device */
+                    /* Try next pty device. */
+                    continue;
                 }
             }
 
@@ -28,15 +28,13 @@ int ptym_open(std::string& pts_name) {
             return fdm;
         }
     }
-    return -1;        /* out of pty devices */
+    panic("out of pseudo-terminal devices");
 }
-
-#else
 
 int ptym_open(std::string& pts_name) {
     int ptmx_fd = open("/dev/ptmx", O_RDWR);
     if (ptmx_fd < 0) {
-        panic("failed to open /dev/ptmx");
+        return search_for_pty(pts_name);
     }
 
     const char* name = ptsname(ptmx_fd);
@@ -57,18 +55,17 @@ int ptym_open(std::string& pts_name) {
     return ptmx_fd;
 }
 
-#endif
-
-int ptys_open(const char* pts_name) {
+int ptys_open(const std::string& pts_name) {
     struct group* grptr = getgrnam("tty");
     gid_t gid = (grptr != NULL) ? grptr->gr_gid : gid_t(-1);
     
-    chown(pts_name, getuid(), gid);
-    chmod(pts_name, S_IRUSR | S_IWUSR | S_IWGRP);
+    const char* name = pts_name.c_str();
+    chown(name, getuid(), gid);
+    chmod(name, S_IRUSR | S_IWUSR | S_IWGRP);
     
-    int fds = open(pts_name, O_RDWR);
+    int fds = open(name, O_RDWR);
     if (fds < 0) {
-        panic("failed to open", pts_name);
+        panic("failed to open", name);
     }
     return fds;
 }

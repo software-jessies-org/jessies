@@ -1,12 +1,8 @@
 #include "pty.h"
 
 pid_t pty_fork(int* ptrfdm) {
-    std::string name;
-    int fdm = ptym_open(name);
-    const char* pts_name = name.c_str();
-    if (fdm < 0) {
-        panic("can't open master pty", pts_name);
-    }
+    std::string pty_name;
+    int fdm = ptym_open(pty_name);
 
     pid_t pid = fork();
     if (pid < 0) {
@@ -17,7 +13,7 @@ pid_t pty_fork(int* ptrfdm) {
             panic("setsid error");
 
         /* SVR4 acquires controlling terminal on open() */
-        int fds = ptys_open(pts_name);
+        int fds = ptys_open(pty_name);
         if (fds < 0)
             panic("can't open slave pty");
         close(fdm);        /* all done with master in child */
