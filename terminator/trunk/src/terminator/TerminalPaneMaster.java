@@ -14,8 +14,6 @@ to do stuff, like opening new tabs, closing itself, or whatever.
 public interface TerminalPaneMaster {
 	public void closeTerminalPane(JTerminalPane victim);
 	
-	public void openNewWindow();
-	
 	public void openShellPane(boolean focusOnNewTab);
 	
 	public void openCommandPane(String command, boolean focusOnNewTab);

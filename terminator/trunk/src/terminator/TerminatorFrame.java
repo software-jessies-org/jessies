@@ -13,11 +13,6 @@ import terminator.view.highlight.*;
 
 import javax.swing.Timer;
 
-/**
-
-@author Phil Norman
-*/
-
 public class TerminatorFrame implements TerminalPaneMaster {
 	private Terminator terminator;
 	private Dimension terminalSize;
@@ -95,7 +90,8 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		});
 		initTerminals();
 		frame.pack();
-		frame.setLocationByPlatform(true);
+		// FIXME: until Mac OS has Java 1.5, we'll have to set the java.awt.Window.locationByPlatform property instead.
+		//frame.setLocationByPlatform(true);
 		frame.setVisible(true);
 	}
 	
@@ -210,10 +206,6 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		}
 	}
 	
-	public void openNewWindow() {
-		terminator.openFrame();
-	}
-
 	/**
 	 * Implements closeTerminalPane.
 	 */
@@ -299,7 +291,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 					}
 				}
 				public void keyReleased(KeyEvent e) {
-					if (JTerminalPane.isKeyboardEquivalent(e)) {
+					if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
 						if (e.getKeyCode() == KeyEvent.VK_D) {
 							textToFindIn.findPrevious();
 						} else if (e.getKeyCode() == KeyEvent.VK_G) {

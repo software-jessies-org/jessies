@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.List;
 import javax.swing.*;
-import e.forms.*;
 import e.gui.*;
 import e.util.*;
 import terminator.*;
@@ -31,7 +30,7 @@ public class JTerminalPane extends JPanel {
 		new CopyAction(),
 		new PasteAction(),
 		null,
-		new NewWindowAction(),
+		new TerminatorMenuBar.NewShellAction(),
 //		new NewTabAction(),
 //		new RunCommandAction(),
 		new CloseAction(),
@@ -230,27 +229,6 @@ public class JTerminalPane extends JPanel {
 		return textPane.getOptimalViewSize();
 	}
 	
-	/**
-	 * On the Mac, the Command key (called 'meta' by Java) is always
-	 * used for keyboard equivalents. On other systems, Control tends to
-	 * be used, but in the special case of terminal emulators this
-	 * conflicts with the ability to type control characters. The
-	 * traditional work-around has always been to use Alt, which --
-	 * conveniently for Mac users -- is in the same place on a PC
-	 * keyboard as Command on a Mac keyboard.
-	 */
-	private static final int KEYBOARD_EQUIVALENT_MODIFIER = GuiUtilities.isMacOs() ? KeyEvent.META_MASK : KeyEvent.ALT_MASK;
-	
-	/**
-	 * Tests whether the given event corresponds to a keyboard
-	 * equivalent. In the long run, this code should all disappear
-	 * and be replaced by a Swing menu, but in the meantime, this
-	 * abstracts away cross-platform differences.
-	 */
-	public static boolean isKeyboardEquivalent(KeyEvent event) {
-		return ((event.getModifiers() & KEYBOARD_EQUIVALENT_MODIFIER) == KEYBOARD_EQUIVALENT_MODIFIER);
-	}
-	
 	private class KeyHandler implements KeyListener {
 		private void handleKeyboardEquivalent(KeyEvent event) {
 			for (int i = 0; i < menuAndKeyActions.length; i++) {
@@ -267,7 +245,7 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		public void keyPressed(KeyEvent event) {
-			if (isKeyboardEquivalent(event)) {
+			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
 				handleKeyboardEquivalent(event);
 				return;
 			}
@@ -314,7 +292,7 @@ public class JTerminalPane extends JPanel {
 		}
 
 		public void keyTyped(KeyEvent event) {
-			if (isKeyboardEquivalent(event) == false) {
+			if (TerminatorMenuBar.isKeyboardEquivalent(event) == false) {
 				char ch = event.getKeyChar();
 				if (ch != KeyEvent.CHAR_UNDEFINED) {
 					control.sendChar(ch);
@@ -483,14 +461,10 @@ public class JTerminalPane extends JPanel {
 		return new InfoAction(text);
 	}
 	
-	public static KeyStroke makeKeyStroke(String key) {
-		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, false);
-	}
-	
 	public class CopyAction extends AbstractAction {
 		public CopyAction() {
 			super("Copy");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("C"));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("C"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -501,7 +475,7 @@ public class JTerminalPane extends JPanel {
 	public class PasteAction extends AbstractAction {
 		public PasteAction() {
 			super("Paste");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("V"));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("V"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -536,7 +510,7 @@ public class JTerminalPane extends JPanel {
 	public class FindAction extends AbstractAction {
 		public FindAction() {
 			super("Find...");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("F"));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("F"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -547,7 +521,7 @@ public class JTerminalPane extends JPanel {
 	public class FindNextAction extends AbstractAction {
 		public FindNextAction() {
 			super("Find Next");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("G"));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("G"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -558,7 +532,7 @@ public class JTerminalPane extends JPanel {
 	public class FindPreviousAction extends AbstractAction {
 		public FindPreviousAction() {
 			super("Find Previous");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("D"));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("D"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -569,23 +543,12 @@ public class JTerminalPane extends JPanel {
 	public class ClearScrollbackAction extends AbstractAction {
 		public ClearScrollbackAction() {
 			super("Clear Scrollback");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("K"));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("K"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
 			textPane.clearScrollBuffer();
 			control.sendRedrawScreen();
-		}
-	}
-	
-	public class NewWindowAction extends AbstractAction {
-		public NewWindowAction() {
-			super("New Window");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("N"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			controller.openNewWindow();
 		}
 	}
 	
@@ -606,7 +569,7 @@ public class JTerminalPane extends JPanel {
 	public class CloseAction extends AbstractAction {
 		public CloseAction() {
 			super("Close");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("W"));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("W"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {

@@ -47,12 +47,37 @@ public class TerminatorMenuBar extends JMenuBar {
 		return menu;
 	}
 	
-	class NewShellAction extends AbstractAction {
+	/**
+	 * On the Mac, the Command key (called 'meta' by Java) is always
+	 * used for keyboard equivalents. On other systems, Control tends to
+	 * be used, but in the special case of terminal emulators this
+	 * conflicts with the ability to type control characters. The
+	 * traditional work-around has always been to use Alt, which --
+	 * conveniently for Mac users -- is in the same place on a PC
+	 * keyboard as Command on a Mac keyboard.
+	 */
+	private static final int KEYBOARD_EQUIVALENT_MODIFIER = GuiUtilities.isMacOs() ? KeyEvent.META_MASK : KeyEvent.ALT_MASK;
+	
+	/**
+	 * Tests whether the given event corresponds to a keyboard
+	 * equivalent.
+	 */
+	public static boolean isKeyboardEquivalent(KeyEvent event) {
+		return ((event.getModifiers() & KEYBOARD_EQUIVALENT_MODIFIER) == KEYBOARD_EQUIVALENT_MODIFIER);
+	}
+	
+	public static KeyStroke makeKeyStroke(String key) {
+		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, false);
+	}
+	
+	public static class NewShellAction extends AbstractAction {
 		public NewShellAction() {
 			super("New Shell");
+			putValue(ACCELERATOR_KEY, makeKeyStroke("N"));
 		}
+		
 		public void actionPerformed(ActionEvent e) {
-			//paste();
+			Terminator.getSharedInstance().openFrame();
 		}
 	}
 
