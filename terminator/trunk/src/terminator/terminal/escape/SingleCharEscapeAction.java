@@ -61,7 +61,7 @@ public class SingleCharEscapeAction implements TerminalAction {
 				unsupported("scr_charset_choose(3)");
 				break;
 			default:
-				Log.warn("Unrecognised single-character escape \"" + escChar + "\".");
+				Log.warn("Unrecognized single-character escape \"" + escChar + "\".");
 		}
 	}
 	
