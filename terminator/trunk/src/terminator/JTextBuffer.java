@@ -169,7 +169,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public void scrollToBottom() {
-		scrollRectToVisible(new Rectangle(0, getHeight() - 10, getWidth(), 10));
+		scrollRectToVisible(new Rectangle(0, getHeight() - 10, 10, 10));
 	}
 	
 	/**
