@@ -200,8 +200,8 @@ public class JTelnetPane extends JPanel {
 		 * conveniently for Mac users -- is in the same place on a PC
 		 * keyboard as Command on a Mac keyboard.
 		 */
-		private static int keyboardEquivalentModifier;
-		static {
+		private int keyboardEquivalentModifier;
+		{
 			if (System.getProperty("os.name").indexOf("Mac OS") != -1) {
 				keyboardEquivalentModifier = KeyEvent.META_MASK;
 			} else {
@@ -272,6 +272,9 @@ public class JTelnetPane extends JPanel {
 						if (commandToRun != null && commandToRun.length() > 0) {
 							controller.openCommandPane(commandToRun, true);
 						}
+						break;
+					case 'f': case 'F':
+						controller.showFindDialogFor(textPane);
 						break;
 				}
 			} else {

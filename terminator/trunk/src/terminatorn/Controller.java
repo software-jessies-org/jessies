@@ -13,4 +13,6 @@ public interface Controller {
 	public void openShellPane(boolean focusOnNewTab);
 	
 	public void openCommandPane(String command, boolean focusOnNewTab);
+	
+	public void showFindDialogFor(JTextBuffer textToFindIn);
 }
