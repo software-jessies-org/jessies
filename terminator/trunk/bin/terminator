@@ -20,7 +20,6 @@ if [ "`uname`" == "Darwin" ]
 then
   case "`uname -r`" in
   7.*)
-    echo "Mac OS X 10.3"
     # Mac OS X 10.3 only looks in /74/, but tic puts stuff in /t/.
     TERMINFO_DST=$TERMINFO/74/terminator
     TIC=""
