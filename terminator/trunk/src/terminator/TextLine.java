@@ -112,6 +112,10 @@ public class TextLine {
 	}
 	
 	public void killText(int startIndex, int endIndex) {
+		if (startIndex >= endIndex) {
+			return;
+		}
+		endIndex = Math.min(endIndex, text.length());
 		text = text.substring(0, startIndex) + text.substring(endIndex);
 		styles = trim(styles, startIndex, endIndex);
 	}

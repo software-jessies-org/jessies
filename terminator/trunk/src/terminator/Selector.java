@@ -142,8 +142,11 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	private void setHighlight(Location start, Location end) {
 		TextLine startLine = view.getModel().get(start.getLineIndex());
 		start = new Location(start.getLineIndex(), startLine.getEffectiveCharStartOffset(start.getCharOffset()));
-		TextLine endLine = view.getModel().get(end.getLineIndex());
-		end = new Location(end.getLineIndex(), endLine.getEffectiveCharEndOffset(end.getCharOffset()));
+		// Cope with selections off the bottom of the screen.
+		if (end.getCharOffset() != 0) {
+			TextLine endLine = view.getModel().get(end.getLineIndex());
+			end = new Location(end.getLineIndex(), endLine.getEffectiveCharEndOffset(end.getCharOffset()));
+		}
 		highlight = new Highlight(this, start, end, new SelectedStyleMutator());
 		view.addHighlight(highlight);
 	}
