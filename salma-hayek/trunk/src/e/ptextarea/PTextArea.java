@@ -601,7 +601,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public boolean getScrollableTracksViewportHeight() {
-        return false;
+        // If our parent is larger than we are, expand to fill the space.
+        return getParent().getHeight() > getPreferredSize().height;
     }
     
     public boolean getScrollableTracksViewportWidth() {
