@@ -19,7 +19,7 @@ DEFINES =
 #DEFINES = -D_POSIX_C_SOURCE=2
 
 # Add any strange libraries your system needs here.
-LDFLAGS = -lXext -lX11 -lICE
+LDFLAGS = -lXext -lX11 -lICE -SM
 
 # -----------------------------------------------------------------------------
 
