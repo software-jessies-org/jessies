@@ -212,13 +212,36 @@ public class FileUtilities {
         return false;
     }
     
-    /** Extensions that correspond to binary file types. */
-    private static final String[] DEFAULT_BINARY_EXTENSIONS = new String[] {
-        ".gif", ".gz", ".icns", ".jpg", ".mov", ".mp3", ".mpeg", ".mpg", ".pdf", ".tiff"
-    };
-    
-    public static boolean isBinaryFile(File file) {
-        return nameEndsWithOneOf(file, DEFAULT_BINARY_EXTENSIONS);
+    /**
+     * Tests whether the given file contains ASCII text. This is done by
+     * reading the first 512 bytes and ensuring that they are all
+     * ASCII characters of the kind you'd expect to find in source files.
+     * 
+     * Really, the best way to make this kind of test is to see how many
+     * bad runes we get if we interpret it as UTF-8. But that's harder,
+     * and I don't actually Edit any non-ASCII files with Edit, so it
+     * can wait.
+     */
+    public static boolean isAsciiFile(File file) {
+        boolean isAsciiFile = false;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            byte[] bytes = new byte[512];
+            int byteCount = fileInputStream.read(bytes);
+            fileInputStream.close();
+            
+            int asciiByteCount = 0;
+            for (int i = 0; i < byteCount; ++i) {
+                byte b = bytes[i];
+                if ((b >= ' ' && b <= '~') || b == '\t' || b == '\n' || b == '\f') {
+                    ++asciiByteCount;
+                }
+            }
+            isAsciiFile = (asciiByteCount == byteCount);
+        } catch (Exception ex) {
+            ex = ex;
+        }
+        return isAsciiFile;
     }
     
     public static String findFileByNameSearchingUpFrom(String leafName, String startPath) {
