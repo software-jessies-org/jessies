@@ -195,7 +195,7 @@ public class TagReader {
             DESCRIPTION_FORMATS.put(MODULE, new MessageFormat(MODULE + " {0}"));
             DESCRIPTION_FORMATS.put(ENUM, new MessageFormat(ENUM + " {0}"));
             DESCRIPTION_FORMATS.put(NAMESPACE, new MessageFormat(NAMESPACE + " {0}"));
-            DESCRIPTION_FORMATS.put(PROTOTYPE, new MessageFormat("{0} " + PROTOTYPE));
+            DESCRIPTION_FORMATS.put(PROTOTYPE, new MessageFormat("{0}() " + PROTOTYPE));
             DESCRIPTION_FORMATS.put(STRUCT, new MessageFormat(STRUCT + " {0}"));
             DESCRIPTION_FORMATS.put(TYPEDEF, new MessageFormat(TYPEDEF + " {0}"));
             DESCRIPTION_FORMATS.put(UNION, new MessageFormat(UNION + " {0}"));
