@@ -29,11 +29,11 @@ public class SingleCharEscapeAction implements TerminalAction {
 			case '9':  // rxvt: scr_forwardindex
 				unsupported("scr_forwardindex");
 				break;
-			case '=':  // rxvt: set private mode PrivMode_aplKP (keypad madness).
-				unsupported("set private mode PrivMode_aplKP (keypad madness).");
+			case '=':  // rxvt: set private mode PrivMode_aplKP (application keypad).
+				unsupported("set private mode PrivMode_aplKP (application keypad).");
 				break;
-			case '>':  // rxvt: unset private mode PrivMode_aplKP (keypad madness).
-				unsupported("unset private mode PrivMode_aplKP (keypad madness).");
+			case '>':  // rxvt: unset private mode PrivMode_aplKP (application keypad).
+				unsupported("unset private mode PrivMode_aplKP (application keypad).");
 				break;
 			case 'D':  // Move the cursor down one line, scrolling if it reaches the bottom of scroll region.  Effectively NL.
 				listener.processSpecialCharacter('\n');
