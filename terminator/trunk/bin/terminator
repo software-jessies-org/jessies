@@ -1,11 +1,6 @@
 #!/bin/bash
 
 UNAME=`uname`
-PORT=1949
-if [[ "$DISPLAY" =~ ":([[:digit:]]+)" ]]
-then
-  let PORT=$PORT+${BASH_REMATCH[1]}
-fi
 
 if [ "$UNAME" != "Darwin" ] && [ "$DEBUGGING_TERMINATOR" == "" ]
 then
@@ -14,7 +9,8 @@ then
   # on Linux (from gnome-panel or whatever). In particular, using this trick
   # we can open a new window quicker than xterm(1), from the user's point of
   # view.
-  socket_output=`echo new | socket localhost $PORT 2> /dev/null`
+  port=`cat ~/.terminal-logs/.terminator-server-port`
+  socket_output=`echo new | socket localhost $port 2> /dev/null`
   if [ $? == 0 ]
   then
     exit 0
@@ -91,4 +87,4 @@ then
   make -C `dirname $PTY_BINARY`
 fi
 
-java -Xmx1g -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Djava.awt.Window.locationByPlatform=true -Dpty.binary=$PTY_BINARY -Dterminator.port=$PORT terminator.Terminator "$@" || ( echo You need at least Java 1.5.0 - perhaps /usr/local/bin/java should be higher up your path than `type -p java`, which reports its version as: && java -version )
+java -Xmx1g -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Djava.awt.Window.locationByPlatform=true -Dpty.binary=$PTY_BINARY terminator.Terminator "$@" || ( echo You need at least Java 1.5.0 - perhaps /usr/local/bin/java should be higher up your path than `type -p java`, which reports its version as: && java -version )
