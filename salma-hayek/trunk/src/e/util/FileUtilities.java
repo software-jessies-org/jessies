@@ -75,6 +75,14 @@ public class FileUtilities {
     }
     
     /**
+     * Checks solely whether a file of the given name exists.
+     * This method is equivalent to fileFromString().exists().
+     */
+    public static boolean exists(String filename) {
+        return fileFromString(filename).exists();
+    }
+    
+    /**
      * Checks that a name exists and is a directory. Returns null if it does, an error suitable for a UI
      * if not.
      */
