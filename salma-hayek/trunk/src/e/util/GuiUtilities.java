@@ -15,6 +15,13 @@ public class GuiUtilities {
         return (System.getProperty("os.name").indexOf("Mac") != -1);
     }
     
+    /**
+     * Tests whether we're running on Windows.
+     */
+    public static boolean isWindows() {
+        return (System.getProperty("os.name").indexOf("Windows") != -1);
+    }
+    
     public static void initLookAndFeel() {
         try {
             String lafClassName = Parameters.getParameter("laf.className");
