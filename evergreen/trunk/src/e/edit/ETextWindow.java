@@ -629,6 +629,8 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         
         try {
             Edit.showStatus("Saving " + filename + "...");
+            // The file may be a symlink on a cifs server.
+            // In this case, it's important that we write into the original file rather than creating a new one.
             writeCopyTo(file);
             Edit.showStatus("Saved " + filename);
             markAsClean();
