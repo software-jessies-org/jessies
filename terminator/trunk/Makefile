@@ -1,9 +1,7 @@
 PROJECT_NAME=terminator
 
-.PHONY: default
-default: build build.pty
-
 BINDIST_FILES += doc pty terminator
+SUBDIRS += pty
 
 # Variables should come before the include but rules (apart from the default
 # one) should come afterwards.
@@ -12,9 +10,3 @@ BINDIST_FILES += doc pty terminator
 # to override them.
 # ?= assigns default values if the variable hasn't already been set.
 include ../salma-hayek/java.make
-
-.PHONY: build.pty
-build.pty:
-	@$(MAKE) -C pty
-
-bindist: build.pty
