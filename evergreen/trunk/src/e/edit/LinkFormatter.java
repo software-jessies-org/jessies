@@ -14,6 +14,7 @@ public class LinkFormatter {
     private JTextPane text;
     
     private boolean autoScroll = true;
+    private int maxYDisplayStart = -1;
     
     private StyleContext styles = new StyleContext();
     
@@ -27,6 +28,7 @@ public class LinkFormatter {
     
     public void setAutoScroll(boolean shouldAutoScroll) {
         this.autoScroll = shouldAutoScroll;
+        maxYDisplayStart = -1;
     }
     
     public void setCurrentStyle(Style baseStyle) {
@@ -89,7 +91,13 @@ public class LinkFormatter {
     
     /** Inserts an address using the link style. Text leading up to the address gets the current style. */
     private final String processAddress(StyledDocument document, String line, Matcher address) throws BadLocationException {
-        autoScroll = false; // Don't auto-scroll past a link.
+//        autoScroll = false; // Don't auto-scroll past a link.
+        // Instead of just switching off auto-scrolling, take note that the window shouldn't auto-scroll such
+        // that this address disappears off the top of the visible area.
+        if (maxYDisplayStart == -1) {
+            maxYDisplayStart = text.modelToView(document.getLength()).y;
+        }
+
         document.insertString(document.getLength(), line.substring(0, address.start(1)), currentStyle);
         document.insertString(document.getLength(), FileUtilities.getUserFriendlyName(address.group(1)), linkStyle);
         return line.substring(address.end(1));
@@ -138,12 +146,23 @@ public class LinkFormatter {
                     int lastDocumentOffset = text.getDocument().getLength();
                     Rectangle viewRect = text.modelToView(lastDocumentOffset);
                     if (viewRect != null) {
-                        text.scrollRectToVisible(viewRect);
+                        text.scrollRectToVisible(getViewRectangleIncludingMaxY(viewRect));
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
         });
+    }
+    
+    public Rectangle getViewRectangleIncludingMaxY(Rectangle rect) {
+        if (maxYDisplayStart == -1) {
+            return rect;
+        }
+        Dimension displaySize = ((JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, text)).getExtentSize();
+        Rectangle result = new Rectangle(0, rect.y + rect.height - displaySize.height, displaySize.width, displaySize.height);
+        result.y = Math.max(0, result.y);
+        result.y = Math.min(maxYDisplayStart, result.y);
+        return result;
     }
 }
