@@ -44,13 +44,13 @@ public class Terminator implements Controller {
 	private void initFrame() {
 		frame = new JFrame(Options.getSharedInstance().getTitle());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(makeContentPane());
+		initTerminals();
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 	
-	private JComponent makeContentPane() {
+	private void initTerminals() {
 		String name = null;
 		for (int i = 0; i < arguments.size(); ++i) {
 			String word = (String) arguments.get(i);
@@ -68,17 +68,27 @@ public class Terminator implements Controller {
 			terminals.add(JTelnetPane.newShell(this));
 		}
 		
-//		return (terminals.size() == 1) ? makeSingleTerminal() : makeTabbedTerminals();
-		return makeTabbedTerminals();
+		if (terminals.size() == 1) {
+			initSingleTerminal();
+		} else {
+			initTabbedTerminals();
+		}
 	}
 	
-	private JComponent makeSingleTerminal() {
+	private void initSingleTerminal() {
 		JTelnetPane telnetPane = (JTelnetPane) terminals.get(0);
+		frame.setContentPane(telnetPane);
 		frame.setTitle(telnetPane.getName());
-		return telnetPane;
 	}
 	
-	private JComponent makeTabbedTerminals() {
+	private void initTabbedPane() {
+		if (tabbedPane != null) {
+			return;
+		}
+		
+		JComponent oldContentPane = (JComponent) frame.getContentPane();
+		System.err.println(oldContentPane);
+		
 		tabbedPane = new JTabbedPane() {
 			/**
 			 * Prevents the tabs (ass opposed to their components)
@@ -104,11 +114,20 @@ public class Terminator implements Controller {
 				}
 			}
 		});
+		
+		if (oldContentPane instanceof JTelnetPane) {
+			addPaneToUI((JTelnetPane) oldContentPane);
+		}
+		
+		frame.setContentPane(tabbedPane);
+	}
+	
+	private void initTabbedTerminals() {
+		initTabbedPane();
 		for (int i = 0; i < terminals.size(); ++i) {
 			JTelnetPane telnetPane = (JTelnetPane) terminals.get(i);
 			addPaneToUI(telnetPane);
 		}
-		return tabbedPane;
 	}
 	
 	private class KeyHandler implements KeyListener {
@@ -126,11 +145,11 @@ public class Terminator implements Controller {
 		}
 		public void keyReleased(KeyEvent event) { }
 		public void keyTyped(KeyEvent event) { }
-	}
-	
-	private void setSelectedTab(int index) {
-		int tabCount = tabbedPane.getTabCount();
-		tabbedPane.setSelectedIndex((index + tabCount) % tabCount);
+		
+		private void setSelectedTab(int index) {
+			int tabCount = tabbedPane.getTabCount();
+			tabbedPane.setSelectedIndex((index + tabCount) % tabCount);
+		}
 	}
 	
 	/**
@@ -180,6 +199,7 @@ public class Terminator implements Controller {
 	}
 	
 	private void addPaneToUI(JTelnetPane newPane) {
+		initTabbedPane();
 		tabbedPane.add(newPane.getName(), newPane);
 		newPane.getTextPane().addKeyListener(new KeyHandler());
 	}
