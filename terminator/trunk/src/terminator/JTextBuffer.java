@@ -121,12 +121,13 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	// Methods used by TextBuffer in order to update the display.
 	
-	public void lineSectionChanged(int lineIndex, int charStartIndex, int charEndIndex) {
+	public void linesChangedFrom(int lineIndex) {
 		FontMetrics metrics = getFontMetrics(getFont());
-		Point baseline = getBaseline(new Location(lineIndex, charStartIndex));
+		Point redrawTop = getLineTop(new Location(lineIndex, 0));
 		int charHeight = metrics.getHeight();
 		redoHighlightsFrom(lineIndex);
-		repaint(baseline.x, baseline.y - charHeight, (charEndIndex - charStartIndex) * metrics.charWidth('W'), charHeight);
+		Dimension size = getSize();
+		repaint(redrawTop.x, redrawTop.y, size.width, size.height - redrawTop.y);
 	}
 	
 	public void sizeChanged() {
@@ -366,7 +367,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			int lineStart = (i == start.getLineIndex()) ? start.getCharOffset() : 0;
 			int lineEnd = (i == end.getLineIndex()) ? end.getCharOffset() : textLine.length();
 			buf.append(textLine.getTabbedText(lineStart, lineEnd));
-			if (i != end.getLineIndex()) {
+			if ((i != end.getLineIndex()) && textLine.hasNewline()) {
 				buf.append('\n');
 			}
 		}
