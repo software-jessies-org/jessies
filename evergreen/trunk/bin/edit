@@ -37,7 +37,7 @@ if ARGV[0] =~ /^\+(\d+)$/
 end
 
 case `uname`
-when "Darwin"
+when /Darwin/
     # Darwin is what Mac OS X calls itself.
     edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
     os_specific_options = "-Xdock:name=Edit:icon=/Developer/Examples/Carbon/SimpleText/SimpleText.icns"
