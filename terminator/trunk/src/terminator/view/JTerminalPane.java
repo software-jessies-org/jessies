@@ -138,6 +138,7 @@ public class JTerminalPane extends JPanel {
 		fixScrollBarForMacOs(scrollPane);
 		
 		add(scrollPane, BorderLayout.CENTER);
+		new StickyBottomScrollBarListener(scrollPane.getVerticalScrollBar());
 		
 		initSizeMonitoring(scrollPane);
 		textPane.sizeChanged();
