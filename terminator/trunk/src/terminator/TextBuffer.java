@@ -353,7 +353,7 @@ public class TextBuffer implements TelnetListener {
 
 	public void setSize(int width, int height) {
 		this.width = width;
-		if (this.height > height) {
+		if (this.height > height && textLines.size() >= this.height) {
 			for (int i = 0; i < (this.height - height); i++) {
 				textLines.remove(textLines.size() - 1);
 			}
