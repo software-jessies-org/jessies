@@ -22,6 +22,7 @@ public class TextBuffer implements TelnetListener {
 	private Location caretPosition;
 	private int lastValidStartIndex = 0;
 	private boolean insertMode = false;
+	private ArrayList tabPositions = new ArrayList();
 	
 	// Fields used for saving and restoring state.
 	private Location savedPosition;
@@ -76,7 +77,40 @@ public class TextBuffer implements TelnetListener {
 	private boolean usingAlternativeBuffer() {
 		return (savedScreen != null);
 	}
+
+	public void setTabAtCursor() {
+		int newPos = caretPosition.getCharOffset();
+		for (int i = 0; i < tabPositions.size(); i++) {
+			int pos = ((Integer) tabPositions.get(i)).intValue();
+			if (pos == newPos) {
+				return;
+			} else if (pos > newPos) {
+				tabPositions.add(i, new Integer(newPos));
+				return;
+			}
+		}
+		tabPositions.add(new Integer(newPos));
+	}
 	
+	public void removeTabAtCursor() {
+		tabPositions.remove(new Integer(caretPosition.getCharOffset()));
+	}
+	
+	public void removeAllTabs() {
+		tabPositions.clear();
+	}
+	
+	private int getNextTabPosition(int charOffset) {
+		for (int i = 0; i < tabPositions.size(); i++) {
+			int pos = ((Integer) tabPositions.get(i)).intValue();
+			if (pos > charOffset) {
+				return pos;
+			}
+		}
+		// No special tab to our right; return the default 8-separated tab stop.
+		return (charOffset + 8) & ~7;
+	}
+
 	/** Returns the contents of the indexed line excluding the terminating NL. */
 	public String getLine(int lineIndex) {
 		return get(lineIndex).getText();
@@ -253,10 +287,15 @@ public class TextBuffer implements TelnetListener {
 		} else {
 			textLine.writeTextAt(caretPosition.getCharOffset(), line, currentStyle);
 		}
+		textAdded(line.length());
+	}
+	
+	private void textAdded(int length) {
+		TextLine textLine = get(caretPosition.getLineIndex());
 		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition's line still has a valid *start* index.
-		int lastCharChanged = insertMode ? textLine.length() : caretPosition.getCharOffset() + line.length();
+		int lastCharChanged = insertMode ? textLine.length() : caretPosition.getCharOffset() + length;
 		view.lineSectionChanged(caretPosition.getLineIndex(), caretPosition.getCharOffset(), lastCharChanged);
-		moveCursorHorizontally(line.length());
+		moveCursorHorizontally(length);
 	}
 
 	public void processSpecialCharacter(char ch) {
@@ -270,12 +309,16 @@ public class TextBuffer implements TelnetListener {
 	}
 	
 	private void insertTab() {
-		// FIXME: Need to cope with modification of tab positions.
-		// For now we just assume one tab every 8 spaces.
-		int nextTabLocation = (caretPosition.getCharOffset() + 8) & ~7;
-		char[] spaces = new char[nextTabLocation - caretPosition.getCharOffset()];
-		Arrays.fill(spaces, ' ');
-		processLine(new String(spaces));
+		int nextTabLocation = getNextTabPosition(caretPosition.getCharOffset());
+		TextLine textLine = get(caretPosition.getLineIndex());
+		int startOffset = caretPosition.getCharOffset();
+		int tabLength = nextTabLocation - startOffset;
+		if (insertMode) {
+			textLine.insertTabAt(startOffset, tabLength, currentStyle);
+		} else {
+			textLine.writeTabAt(startOffset, tabLength, currentStyle);
+		}
+		textAdded(tabLength);
 	}
 	
 	/** Sets whether the caret should be displayed. */

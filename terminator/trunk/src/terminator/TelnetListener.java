@@ -39,6 +39,14 @@ public interface TelnetListener {
 	/** Sets or unsets the use of the alternative buffer. */
 	public void useAlternativeBuffer(boolean useAlternativeBuffer);
 	
+	// Tab control.
+	
+	public void setTabAtCursor();
+	
+	public void removeTabAtCursor();
+	
+	public void removeAllTabs();
+	
 	// VT100 command support.
 	
 	/** Sets whether the caret should be displayed. */

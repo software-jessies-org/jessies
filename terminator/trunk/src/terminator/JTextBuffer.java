@@ -294,6 +294,22 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return model.getCharSequence(highlight.getStart(), highlight.getEnd()).toString();
 	}
 	
+	public String getTabbedText(Highlight highlight) {
+		Location start = highlight.getStart();
+		Location end = highlight.getEnd();
+		StringBuffer buf = new StringBuffer();
+		for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
+			TextLine textLine = model.get(i);
+			int lineStart = (i == start.getLineIndex()) ? start.getCharOffset() : 0;
+			int lineEnd = (i == end.getLineIndex()) ? end.getCharOffset() : textLine.length();
+			buf.append(textLine.getTabbedText(lineStart, lineEnd));
+			if (i != end.getLineIndex()) {
+				buf.append('\n');
+			}
+		}
+		return buf.toString();
+	}
+	
 	// Redraw code.
 	
 	private void redrawCaretPosition() {
