@@ -9,6 +9,7 @@ import e.util.*;
 import terminator.*;
 import terminator.model.*;
 import terminator.terminal.*;
+import terminator.view.highlight.*;
 
 /**
 
@@ -222,6 +223,8 @@ public class JTerminalPane extends JPanel {
 	public void setName(String name) {
 		this.name = name;
 		controller.terminalNameChanged(this);
+		HyperlinkHighlighter linker = (HyperlinkHighlighter) textPane.getHighlighterOfClass(HyperlinkHighlighter.class);
+		linker.setDirectory(name);
 	}
 	
 	public Dimension getOptimalViewSize() {

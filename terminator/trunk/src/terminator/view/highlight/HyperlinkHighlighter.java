@@ -2,7 +2,7 @@ package terminator.view.highlight;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
+import java.io.*;
 import java.util.regex.*;
 import e.util.*;
 
@@ -11,76 +11,34 @@ import terminator.model.*;
 import terminator.view.*;
 
 /**
-
-@author Phil Norman
-*/
-
+ * Tries to create links to files.
+ */
 public class HyperlinkHighlighter implements Highlighter {
 	/** The underlined blue standard hyperlink style. */
 	private final Style style = new Style(Options.getSharedInstance().getColor("linkColor"), null, null, Boolean.TRUE);
-
-	private static class HyperLinker {
-		Pattern pattern;
-		int relevantGroup;
-		String command;
-		boolean runInTab;
-		
-		/**
-		 * We need a regular expression to match with, the index of the
-		 * group within the expression that should be highlighted (0 if
-		 * you want the whole expression highlighted, and the command
-		 * to be run when the link is followed.
-		 */
-		HyperLinker(String regularExpression, int relevantGroup, String command, boolean runInTab) {
-			this.pattern = Pattern.compile(regularExpression);
-			this.relevantGroup = relevantGroup;
-			this.command = command;
-			this.runInTab = runInTab;
-		}
-		
-		Matcher matcher(String line) {
-			return pattern.matcher(line);
-		}
-		
-		String command(Matcher matcher) {
-			return matcher.replaceFirst(command);
-		}
-		
-		boolean runInTab() {
-			return runInTab;
-		}
-	}
 	
-	private ArrayList linkers = new ArrayList();
-	{
-		String[] linkerNames = Options.getSharedInstance().getPropertySetNames("Highlighter");
-		for (int i = 0; i < linkerNames.length; i++) {
-			Properties info = Options.getSharedInstance().getPropertySet("Highlighter", linkerNames[i]);
-			String regexp = info.getProperty("regexp");
-			if (regexp == null) {
-				Log.warn("Missing regexp in highlighter definition " + linkerNames[i] + ".");
-				continue;
-			}
-			String openInTabString = info.getProperty("openInTab", "false");
-			boolean openInTab = openInTabString.equalsIgnoreCase("yes") || openInTabString.equalsIgnoreCase("true");
-			int highlightGroup;
-			try {
-				highlightGroup = Integer.parseInt(info.getProperty("highlightGroup", "1"));
-			} catch (NumberFormatException ex) {
-				Log.warn("Invalid highlightGroup in highlighter definition " + linkerNames[i] + " (number expected).");
-				continue;
-			}
-			String command = info.getProperty("command");
-			if (command == null) {
-				Log.warn("Missing command in highlighter definition " + linkerNames[i] + ".");
-				continue;
-			}
-			linkers.add(new HyperLinker(regexp, highlightGroup, command, openInTab));
-		}
-	}
-
+	private String directory = "~/";
+	
+	/**
+	 * This regular expression deliberately matches too much. We narrow it down a bit later.
+	 */
+	private Pattern pattern = Pattern.compile("(?:^| |\")([^ :\"]+\\.\\w+([\\d:]+)?)");
+	
+	/**
+	 * This is the group within 'pattern' that should be taken as a filename.
+	 */
+	private int relevantGroup = 1;
+	
 	public String getName() {
 		return "Hyperlink Highlighter";
+	}
+	
+	/**
+	 * Lets us be notified of title changes; we assume that the title is the name of the current directory.
+	 */
+	public void setDirectory(String name) {
+		this.directory = name;
+		System.err.println(directory);
 	}
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
@@ -96,38 +54,50 @@ public class HyperlinkHighlighter implements Highlighter {
 	
 	private int addHighlightsOnLine(JTextBuffer view, int lineIndex, String text) {
 		int count = 0;
-		for (int i = 0; i < linkers.size(); ++i) {
-			HyperLinker linker = (HyperLinker) linkers.get(i);
-			Matcher matcher = linker.matcher(text);
-			while (matcher.find()) {
-				Location start = new Location(lineIndex, matcher.start(linker.relevantGroup));
-				Location end = new Location(lineIndex, matcher.end(linker.relevantGroup));
-				Highlight highlight = new Highlight(HyperlinkHighlighter.this, start, end, style);
-				highlight.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				view.addHighlight(highlight);
-				++count;
+		Matcher matcher = pattern.matcher(text);
+		while (matcher.find()) {
+			/*
+			 * We're most useful in providing links to grep matches, so we
+			 * need to avoid being confused by stuff like File.java:123.
+			 */
+			String name = matcher.group(relevantGroup);
+			int colonIndex = name.indexOf(':');
+			if (colonIndex != -1) {
+				name = name.substring(0, colonIndex);
 			}
+			
+			/*
+			 * If the file doesn't exist, this wasn't a useful match.
+			 */
+			File file = FileUtilities.fileFromParentAndString(directory, name);
+			if (file.exists() == false) {
+				continue;
+			}
+			
+			Location start = new Location(lineIndex, matcher.start(relevantGroup));
+			Location end = new Location(lineIndex, matcher.end(relevantGroup));
+			Highlight highlight = new Highlight(HyperlinkHighlighter.this, start, end, style);
+			highlight.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			view.addHighlight(highlight);
+			++count;
 		}
 		return count;
 	}
 
 	/** Request to do something when the user clicks on a Highlight generated by this Highlighter. */
 	public void highlightClicked(JTextBuffer view, Highlight highlight, String text, MouseEvent event) {
-		for (int i = 0; i < linkers.size(); ++i) {
-			HyperLinker linker = (HyperLinker) linkers.get(i);
-			Matcher matcher = linker.matcher(text);
-			while (matcher.find()) {
-				String command = linker.command(matcher);
-				if (linker.runInTab()) {
-					view.getTerminalPaneMaster().openCommandPane(command, true);
-				} else {
-					try {
-						Runtime.getRuntime().exec(command);
-					} catch (Exception ex) {
-						Log.warn("Couldn't show '" + text + "' (with '" + linker.command(matcher) + "')", ex);
-					}
-				}
-			}
+		Matcher matcher = pattern.matcher(text);
+		while (matcher.find()) {
+			String command = getEditor() + " " + matcher.group(relevantGroup);
+			ProcessUtilities.spawn(FileUtilities.fileFromString(directory), new String[] { "bash", "-c", command });
 		}
+	}
+	
+	private static String getEditor() {
+		String result = System.getenv("EDITOR");
+		if (result == null) {
+			result = "vi";
+		}
+		return result;
 	}
 }
