@@ -30,6 +30,12 @@ public interface TelnetListener {
 	
 	// VT100 command support.
 	
+	/** Sets whether the caret should be displayed. */
+	public void setCaretDisplay(boolean isDisplayed);
+	
+	/** Inserts lines at the current caret position. */
+	public void insertLines(int count);
+	
 	/** Erases from either the start of line or the cursor, to either the end of the line or the cursor. */
 	public void killHorizontally(boolean fromStart, boolean toEnd);
 

@@ -15,8 +15,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	private static final boolean ANTIALIAS = false;
 
 	private TextBuffer model;
-	private Point caretPosition = new Point(0, 0);
+	private Location caretPosition = new Location(0, 0);
 	private boolean hasFocus = false;
+	private boolean displayCaret = true;
 	
 	public JTextBuffer() {
 		model = new TextBuffer(this, 80, 24);
@@ -45,7 +46,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	
 	public void lineSectionChanged(int lineIndex, int charStartIndex, int charEndIndex) {
 		FontMetrics metrics = getFontMetrics(getFont());
-		Point baseline = getBaseline(new Point(charStartIndex, lineIndex));
+		Point baseline = getBaseline(new Location(lineIndex, charStartIndex));
 		int charHeight = metrics.getHeight();
 		repaint(baseline.x, baseline.y - charHeight, (charEndIndex - charStartIndex) * metrics.charWidth('W'), charHeight);
 	}
@@ -58,20 +59,28 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		scrollRectToVisible(new Rectangle(0, size.height - 10, size.width, 10));
 	}
 	
-	public Point getCaretPosition() {
-		return new Point(caretPosition);  // We don't want anyone else messing with our Point.
+	public Location getCaretPosition() {
+		return caretPosition;
 	}
 	
-	public void setCaretPosition(Point caretPosition) {
+	public void setCaretPosition(Location caretPosition) {
 		redrawCaretPosition();
-		this.caretPosition.x = caretPosition.x;
-		this.caretPosition.y = caretPosition.y;
+		this.caretPosition = caretPosition;
 		redrawCaretPosition();
 	}
 	
-	private Point getBaseline(Point charCoords) {
+	/** Sets whether the caret should be displayed. */
+	public void setCaretDisplay(boolean displayCaret) {
+		if (this.displayCaret != displayCaret) {
+			this.displayCaret = displayCaret;
+			redrawCaretPosition();
+		}
+	}
+	
+	private Point getBaseline(Location charCoords) {
 		FontMetrics metrics = getFontMetrics(getFont());
-		return new Point(charCoords.x * metrics.charWidth('W'), (charCoords.y + 1) * metrics.getHeight());
+		return new Point(charCoords.getCharOffset() * metrics.charWidth('W'),
+				(charCoords.getLineIndex() + 1) * metrics.getHeight());
 	}
 	
 	public Dimension getOptimalViewSize() {
@@ -104,9 +113,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 				paintStyledText(graphics, lineText[j], x, baseline);
 				x += metrics.stringWidth(lineText[j].getText());
 			}
-			if (i == caretPosition.y) {
+			if (displayCaret && i == caretPosition.getLineIndex()) {
 				graphics.setColor(hasFocus ? Color.RED : Color.BLACK);
-				int caretX = caretPosition.x * metrics.charWidth('W');
+				int caretX = caretPosition.getCharOffset() * metrics.charWidth('W');
 				graphics.drawLine(caretX, baseline - metrics.getMaxAscent(), caretX, baseline);
 			}
 		}

@@ -1,6 +1,5 @@
 package terminatorn;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
@@ -20,12 +19,57 @@ public class TextBuffer implements TelnetListener {
 	private int currentStyle = StyledText.getDefaultStyle();
 	private int firstScrollLineIndex;
 	private int lastScrollLineIndex;
-	private Point caretPosition;
+	private Location caretPosition;
+	private int lastValidStartIndex = 0;
 	
 	public TextBuffer(JTextBuffer view, int width, int height) {
 		this.view = view;
 		setSize(width, height);
 		caretPosition = view.getCaretPosition();
+	}
+	
+	/** Returns the contents of the indexed line excluding the terminating NL. */
+	public String getLine(int lineIndex) {
+		return get(lineIndex).getText();
+	}
+	
+	/** Returns the length of the indexed line including the terminating NL. */
+	public int getLineLength(int lineIndex) {
+		return get(lineIndex).length() + 1;
+	}
+	
+	/** Returns the start character index of the indexed line. */
+	public int getStartIndex(int lineIndex) {
+		ensureValidStartIndex(lineIndex);
+		return get(lineIndex).getLineStartIndex();
+	}
+	
+	/** Returns the count of all characters in the buffer, including NLs. */
+	public int length() {
+		int lastIndex = textLines.size() - 1;
+		return getStartIndex(lastIndex) + getLineLength(lastIndex);
+	}
+	
+	public CharSequence getCharSequence() {
+		return getCharSequence(0, length());
+	}
+	
+	public CharSequence getCharSequence(int startIndex, int endIndex) {
+		return new Sequence(startIndex, endIndex);
+	}
+	
+	private void lineIsDirty(int dirtyLineIndex) {
+		lastValidStartIndex = Math.min(lastValidStartIndex, dirtyLineIndex - 1);
+	}
+	
+	private void ensureValidStartIndex(int lineIndex) {
+		if (lineIndex > lastValidStartIndex) {
+			for (int i = lastValidStartIndex; i < lineIndex; i++) {
+				TextLine line = get(i);
+				get(i + 1).setLineStartIndex(line.getLineStartIndex() + line.length() + 1);
+			}
+			lastValidStartIndex = lineIndex;
+		}
 	}
 	
 	public int getLineCount() {
@@ -63,10 +107,11 @@ public class TextBuffer implements TelnetListener {
 		// Use a private copy of the first display line throughout this method to avoid mutation
 		// caused by textLines.add()/textLines.remove().
 		final int firstDisplayLine = getFirstDisplayLine();
+		lineIsDirty(firstDisplayLine);
 		if (index > firstDisplayLine + lastScrollLineIndex) {
 			textLines.add(index, new TextLine());
 			if (firstScrollLineIndex == 0) {
-				caretPosition.y = index;
+				caretPosition = new Location(index, caretPosition.getCharOffset());
 			} else {
 				// If the program's defined scroll bounds, newline-adding actually chucks away
 				// the first scroll line, rather than just scrolling everything upwards like we normally
@@ -75,7 +120,7 @@ public class TextBuffer implements TelnetListener {
 				view.repaint();
 			}
 		} else {
-			caretPosition.y = index;
+			caretPosition = new Location(index, caretPosition.getCharOffset());
 		}
 	}
 	
@@ -106,39 +151,54 @@ public class TextBuffer implements TelnetListener {
 	}
 
 	public void processLine(String line) {
-		get(caretPosition.y).writeTextAt(caretPosition.x, line, currentStyle);
-		view.lineSectionChanged(caretPosition.y, caretPosition.x, caretPosition.x + line.length());
+		get(caretPosition.getLineIndex()).writeTextAt(caretPosition.getCharOffset(), line, currentStyle);
+		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition's line still has a valid *start* index.
+		view.lineSectionChanged(caretPosition.getLineIndex(), caretPosition.getCharOffset(), caretPosition.getCharOffset() + line.length());
 		moveCursorHorizontally(line.length());
 	}
 
 	public void processSpecialCharacter(char ch) {
 		switch (ch) {
-			case '\r': caretPosition.x = 0; return;
-			case '\n': insertLine(caretPosition.y + 1); return;
+			case '\r': caretPosition = new Location(caretPosition.getLineIndex(), 0); return;
+			case '\n': insertLine(caretPosition.getLineIndex() + 1); return;
 			case KeyEvent.VK_BACK_SPACE: moveCursorHorizontally(-1); return;
 			default: Log.warn("Unsupported special character: " + ((int) ch));
 		}
 	}
 	
+	/** Sets whether the caret should be displayed. */
+	public void setCaretDisplay(boolean isDisplayed) {
+		view.setCaretDisplay(isDisplayed);
+	}
+	
+	/** Inserts lines at the current caret position. */
+	public void insertLines(int count) {
+		for (int i = 0; i < count; i++) {
+			insertLine(caretPosition.getLineIndex());
+		}
+	}
+	
 	public void killHorizontally(boolean fromStart, boolean toEnd) {
-		TextLine line = get(caretPosition.y);
+		TextLine line = get(caretPosition.getLineIndex());
 		int oldLineLength = line.length();
-		int start = fromStart ? 0 : caretPosition.x;
-		int end = toEnd ? oldLineLength : caretPosition.x;
+		int start = fromStart ? 0 : caretPosition.getCharOffset();
+		int end = toEnd ? oldLineLength : caretPosition.getCharOffset();
 		line.killText(start, end);
-		view.lineSectionChanged(caretPosition.y, 0, oldLineLength);
+		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition.y's line still has a valid *start* index.
+		view.lineSectionChanged(caretPosition.getLineIndex(), 0, oldLineLength);
 	}
 
 	/** Erases from either the top or the cursor line, to either the bottom or the cursor line. */
 	public void killVertically(boolean fromTop, boolean toBottom) {
-		int start = fromTop ? getFirstDisplayLine() : caretPosition.y;
-		int end = toBottom ? getLineCount() : caretPosition.y;
+		int start = fromTop ? getFirstDisplayLine() : caretPosition.getLineIndex();
+		int end = toBottom ? getLineCount() : caretPosition.getLineIndex();
 		for (int i = start; i < end; i++) {
 			get(i).clear();
 		}
 		if (fromTop && toBottom) {
 			setCursorPosition(1, 1);  // Clear screen also implies moving the cursor to 'home'.
 		}
+		lineIsDirty(start + 1);
 		view.repaint();
 	}
 	
@@ -150,18 +210,17 @@ public class TextBuffer implements TelnetListener {
 		x = Math.max(1, x);
 		y = Math.max(1, y);
 
-		caretPosition.x = x - 1;
-		caretPosition.y = y - 1 + getFirstDisplayLine();
+		caretPosition = new Location(y - 1 + getFirstDisplayLine(), x - 1);
 	}
 	
 	/** Moves the cursor horizontally by the number of characters in xDiff, negative for left, positive for right. */
 	public void moveCursorHorizontally(int xDiff) {
-		caretPosition.x += xDiff;
+		caretPosition = new Location(caretPosition.getLineIndex(), caretPosition.getCharOffset() + xDiff);
 	}
 	
 	/** Moves the cursor vertically by the number of characters in yDiff, negative for up, positive for down. */
 	public void moveCursorVertically(int yDiff) {
-		caretPosition.y += yDiff;
+		caretPosition = new Location(caretPosition.getLineIndex() + yDiff, caretPosition.getCharOffset());
 	}
 
 	/** Sets the first and last lines to scroll.  If both are -1, make the entire screen scroll. */
@@ -176,6 +235,7 @@ public class TextBuffer implements TelnetListener {
 		int removeIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
 		textLines.add(addIndex, new TextLine());
 		textLines.remove(removeIndex);
+		lineIsDirty(addIndex);
 		view.repaint();
 	}
 
@@ -185,6 +245,7 @@ public class TextBuffer implements TelnetListener {
 		int addIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
 		textLines.remove(removeIndex);
 		textLines.add(addIndex, new TextLine());
+		lineIsDirty(removeIndex);
 		view.repaint();
 	}
 	
@@ -201,6 +262,33 @@ public class TextBuffer implements TelnetListener {
 			// Find the frame we're in, and change its title.
 			JFrame frame= (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, view);
 			frame.setTitle(newWindowTitle);
+		}
+	}
+	
+	public class Sequence implements CharSequence {
+		private int start;
+		private int end;
+		
+		public Sequence(int start, int end) {
+			this.start = start;
+			this.end = end;
+		}
+		
+		public char charAt(int index) {
+			return 0;
+		}
+		
+		public int length() {
+			return -1;
+		}
+		
+		public CharSequence subSequence(int start, int end) {
+			return null;
+		}
+		
+		public String toString() {
+			StringBuffer buf = new StringBuffer(end - start);
+			return buf.toString();
 		}
 	}
 }

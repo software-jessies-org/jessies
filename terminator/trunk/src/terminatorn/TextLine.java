@@ -11,8 +11,17 @@ use in a virtual terminal.
 */
 
 public class TextLine {
+	private int lineStartIndex;
 	private String text = "";
 	private byte[] styles = new byte[0];
+	
+	public int getLineStartIndex() {
+		return lineStartIndex;
+	}
+	
+	public void setLineStartIndex(int lineStartIndex) {
+		this.lineStartIndex = lineStartIndex;
+	}
 	
 	public StyledText[] getStyledTextSegments() {
 		if (styles.length == 0) {
@@ -30,6 +39,10 @@ public class TextLine {
 		}
 		result.add(new StyledText(text.substring(startIndex, styles.length), startStyle));
 		return (StyledText[]) result.toArray(new StyledText[result.size()]);
+	}
+	
+	public String getText() {
+		return text;
 	}
 	
 	public int length() {
