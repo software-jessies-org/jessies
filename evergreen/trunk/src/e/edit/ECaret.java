@@ -238,7 +238,7 @@ public class ECaret extends DefaultCaret {
     
     /**
      * Handles X11 middle-button pastes from XA_SELECTION (known
-     * to Java as the 'system selection'.
+     * to Java as the 'system selection').
      */
     public void mouseClicked(MouseEvent e) {
         if (SwingUtilities.isMiddleMouseButton(e) && e.getClickCount() == 1) {
