@@ -16,6 +16,11 @@ public class EPopupMenu {
         for (int i = 0; i < items.length; i++) {
             menuItems.add(items[i]);
         }
+        // Remove any trailing null.
+        int lastIndex = menuItems.size() - 1;
+        if (menuItems.get(lastIndex) == null) {
+            menuItems.remove(lastIndex);
+        }
     }
     
     /** Ensures that the menu is on the display & ready for action. */
