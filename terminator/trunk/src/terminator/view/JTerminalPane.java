@@ -223,6 +223,12 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	private class KeyHandler implements KeyListener {
+		/**
+		 * On Mac OS, we have the screen menu bar to take care of
+		 * all the keyboard equivalents. Elsewhere, we have to detect
+		 * the events, and invoke actionPerformed on the relevant
+		 * Action ourselves.
+		 */
 		private void handleKeyboardEquivalent(KeyEvent event) {
 			for (int i = 0; i < menuAndKeyActions.length; i++) {
 				if (menuAndKeyActions[i] == null) {
