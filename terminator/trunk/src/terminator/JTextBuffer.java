@@ -3,6 +3,7 @@ package terminator;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
 import e.util.*;
@@ -91,6 +92,14 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		becomeDropTarget();
 		cursorBlinker = new CursorBlinker(this);
 		new Selector(this);
+	}
+	
+	public static final Cursor INVISIBLE_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR), new Point(0, 0), "invisible");
+	
+	public void userIsTyping() {
+		blinkOn = true;
+		redrawCaretPosition();
+		setCursor(INVISIBLE_CURSOR);
 	}
 	
 	public Controller getController() {

@@ -258,6 +258,7 @@ public class JTerminalPane extends JPanel {
 			String sequence = getSequenceForKeyCode(event);
 			if (sequence != null) {
 				control.sendEscapeString(sequence);
+				textPane.userIsTyping();
 				scroll();
 				event.consume();
 			}
@@ -308,6 +309,7 @@ public class JTerminalPane extends JPanel {
 			} else {
 				if (ch != KeyEvent.CHAR_UNDEFINED) {
 					control.sendChar(ch);
+					textPane.userIsTyping();
 					scroll();
 				}
 			}
