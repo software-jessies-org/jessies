@@ -214,7 +214,6 @@ public class TerminatorFrame extends JFrame {
 		} else if (tabbedPane.getTabCount() == 1) {
 			JTerminalPane soleSurvivor = (JTerminalPane) terminals.get(0);
 			soleSurvivor.invalidate();
-			tabbedPane.remove(soleSurvivor);
 			setContentPane(soleSurvivor);
 			soleSurvivor.revalidate();
 			repaint();
