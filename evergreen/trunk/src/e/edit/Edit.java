@@ -779,7 +779,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         tabbedPane = new JTabbedPane(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                ETextWindow.rememberFocus();
                 Edit.getTagsPanel().ensureTagsAreHidden();
                 getCurrentWorkspace().restoreFocusToRememberedTextWindow();
             }
