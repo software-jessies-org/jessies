@@ -66,8 +66,14 @@ public class FindAction extends ETextAction implements MinibufferUser {
         return "Find";
     }
     
+    /** Checks that we can compile the pattern okay. */
     public boolean isValid(String value) {
-        return true;
+        try {
+            Pattern.compile(value);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
     
     public void valueChangedTo(String value) {
