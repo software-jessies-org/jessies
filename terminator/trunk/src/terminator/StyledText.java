@@ -27,6 +27,7 @@ public class StyledText {
 
 	private String text;
 	private Style style;
+	private boolean continueToEnd = false;
 	
 	public StyledText(String text, byte style) {
 		this(text, getForegroundColour(style), getBackgroundColour(style), isBold(style), isUnderlined(style));
@@ -39,6 +40,14 @@ public class StyledText {
 	public StyledText(String text, Style style) {
 		this.text = text;
 		this.style = style;
+	}
+	
+	public void setContinueToEnd(boolean continueToEnd) {
+		this.continueToEnd = continueToEnd;
+	}
+	
+	public boolean continueToEnd() {
+		return continueToEnd;
 	}
 	
 	public String getText() {

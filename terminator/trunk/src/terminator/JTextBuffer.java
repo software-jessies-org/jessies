@@ -173,7 +173,13 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	public Location viewToModel(Point point) {
 		FontMetrics metrics = getFontMetrics(getFont());
 		int lineIndex = Math.max(0, point.y / metrics.getHeight());
-		int charOffset = Math.max(0, point.x / metrics.charWidth('W'));
+		int charOffset = 0;
+		if (lineIndex >= model.getLineCount()) {
+			lineIndex = model.getLineCount();
+		} else {
+			charOffset = Math.max(0, point.x / metrics.charWidth('W'));
+			charOffset = Math.min(charOffset, model.get(lineIndex).length());
+		}
 		return new Location(lineIndex, charOffset);
 	}
 	
@@ -312,6 +318,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		Location end = highlight.getEnd();
 		StringBuffer buf = new StringBuffer();
 		for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
+			// Necessary to cope with selections extending to the bottom of the buffer.
+			if (i == end.getLineIndex() && end.getCharOffset() == 0) {
+				break;
+			}
 			TextLine textLine = model.get(i);
 			int lineStart = (i == start.getLineIndex()) ? start.getCharOffset() : 0;
 			int lineEnd = (i == end.getLineIndex()) ? end.getCharOffset() : textLine.length();
@@ -407,7 +417,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		
 		int textWidth = metrics.stringWidth(text.getText());
 		graphics.setColor(style.getBackground());
-		graphics.fillRect(x, y - metrics.getMaxAscent(), textWidth, metrics.getHeight());
+		// Special continueToEnd flag used for drawing the backgrounds of Highlights which extend
+		// over the end of lines.  Used for multi-line selection.
+		int backgroundWidth = text.continueToEnd() ? (getSize().width - x) : textWidth;
+		graphics.fillRect(x, y - metrics.getMaxAscent(), backgroundWidth, metrics.getHeight());
 		if (drawCaret) {
 			paintCaret(graphics, metrics);
 		}
