@@ -129,11 +129,28 @@ public class StringUtilities {
         }
         return i;
     }
-        
+    
+    /**
+     * Joins the strings in 'strings' with 'separator' after each (including
+     * the last).
+     */
     public static String join(String[] strings, String separator) {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < strings.length; ++i) {
             result.append(strings[i]);
+            result.append(separator);
+        }
+        return result.toString();
+    }
+    
+    /**
+     * Joins the strings in 'strings' with 'separator' after each (including
+     * the last).
+     */
+    public static String join(List strings, String separator) {
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < strings.size(); ++i) {
+            result.append(strings.get(i));
             result.append(separator);
         }
         return result.toString();
