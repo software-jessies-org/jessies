@@ -43,9 +43,6 @@ Java 1.5:
     wouldn't help with kind of problem that exhibits itself as a random
     pause, but it would help with more general slowness.
 
-advisor:
- 1. call researchers in a different thread.
-
 find in files:
  1. don't search twice for the same thing. we're not that fast!
  3. show the matching line(s).
