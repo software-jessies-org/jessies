@@ -14,6 +14,7 @@ A JTextBuffer provides the visible display of the virtual terminal.
 
 public class JTextBuffer extends JComponent implements FocusListener, Scrollable {
 	private static final boolean ANTIALIAS = false;
+	private static final boolean MAC_OS = (System.getProperty("os.name").indexOf("Mac") != -1);
 
 	private TextBuffer model;
 	private Location caretPosition = new Location(0, 0);
@@ -354,6 +355,18 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		}
 		graphics.drawString(text.getText(), x, y);
 		if (style.isBold()) {
+			if (MAC_OS) {
+				// A font doesn't necessarily have a bold.
+				// Mac OS X's "Monaco" font is an example.
+				// The trouble is, you can't tell from the
+				// Font you get back from deriveFont. isBold
+				// will return true, and getting the WEIGHT
+				// attribute will give you WEIGHT_BOLD.
+				// So the test above shouldn't be for Mac OS,
+				// it should be for a font without a bold,
+				// but I know no way of doing that.
+				graphics.drawString(text.getText(), x + 1, y);
+			}
 			graphics.setFont(oldFont);
 		}
 	}
