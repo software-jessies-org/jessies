@@ -106,7 +106,20 @@ public class Advisor extends JPanel {
             }
         }
         newText.append("</body></html>");
-        advicePane.setText(newText.toString());
+        String result = newText.toString();
+
+        // Deliberately ignore the advisors if they're just babbling.
+        int lineCount = 0;
+        for (int i = 0; i < result.length(); ++i) {
+            if (result.charAt(i) == '\n') {
+                ++lineCount;
+            }
+        }
+        if (lineCount > 100) {
+            result = "(Too much output.)";
+        }
+
+        advicePane.setText(result);
     }
     
     public void addResearcher(WorkspaceResearcher researcher) {
