@@ -5,7 +5,7 @@ import java.util.regex.*;
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
-    private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface):([^\t]+).*");
+    private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface|namespace):([^\t]+).*");
     
     private TagListener listener;
     private String fileType;
@@ -106,6 +106,9 @@ public class TagReader {
     }
     
     public static class Tag {
+        public String typeSortOrder = "cdeEfgimnpst";
+        public String classSeparator = ".";
+        
         public String identifier;
         public char type;
         public String context;
@@ -139,11 +142,29 @@ public class TagReader {
         public String toString() {
             return describe();
         }
+        
+        public boolean isContainerType() {
+            return "cgins".indexOf(type) != -1; 
+        }
+        
+        public int getTypeSortIndex() {
+            return typeSortOrder.indexOf(type);
+        }
+        
+        public String getClassQualifiedName() {
+            if (containingClass.length() > 0) {
+               return containingClass + classSeparator + identifier;
+            } else {
+                return identifier;
+            }
+        }
     }
     
     public static class JavaTag extends Tag {
+        
         public JavaTag(String identifier, int lineNumber, char type, String context, String containingClass) {
             super(identifier, lineNumber, type, context, containingClass);
+            typeSortOrder = "pfmcsi";
         }
         public String describe() {
             switch (type) {
@@ -155,6 +176,8 @@ public class TagReader {
                 default: return identifier;
             }
         }
+        
+        
     }
     
     public static class RubyTag extends Tag {
@@ -168,11 +191,17 @@ public class TagReader {
                 default: return identifier;
             }
         }
+        
+        public boolean isContainerType() {
+            return super.isContainerType() || type == 'm';
+        }
     }
     
     public static class CTag extends Tag {
+
         public CTag(String identifier, int lineNumber, char type, String context, String containingClass) {
             super(identifier, lineNumber, type, context, containingClass);
+            classSeparator = "::";
         }
         public String describe() {
             switch (type) {

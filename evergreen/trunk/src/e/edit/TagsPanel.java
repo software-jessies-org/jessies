@@ -147,11 +147,9 @@ public class TagsPanel extends JPanel {
         public void tagFound(TagReader.Tag tag) {
             DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
             
-            boolean isBranch = tag.type == 'c' || tag.type == 'g' /*enum*/ || tag.type == 'i' /* interface */ || tag.type == 's' /*struct*/ || (textWindow.isRuby() && tag.type == 'm' /* module */);
-            if (isBranch) {
-                String tagClass = tag.containingClass.length() > 0 ? (tag.containingClass + "." + tag.identifier) : tag.identifier;
+            if (tag.isContainerType()) {
                 leaf = new BranchNode(tag);
-                branches.put(tagClass, leaf);
+                branches.put(tag.getClassQualifiedName(), leaf);
             }
             
             DefaultMutableTreeNode branch = (DefaultMutableTreeNode) branches.get(tag.containingClass);
@@ -175,11 +173,10 @@ public class TagsPanel extends JPanel {
                 insert(node, getInsertIndex(tag));
             }
             
-            private static final String TAG_GROUP_ORDER="pfmcsi";
-            private SortedSet kidsNames = new TreeSet();            
+            private SortedSet kidsNames = new TreeSet();
             
             public int getInsertIndex(TagReader.Tag tag) {
-                String insertString = TAG_GROUP_ORDER.indexOf(tag.type) + tag.identifier + kidsNames.size();
+                String insertString = tag.getTypeSortIndex() + tag.identifier + kidsNames.size();
                 kidsNames.add(insertString);
                 return new ArrayList(kidsNames).indexOf(insertString);
             }
