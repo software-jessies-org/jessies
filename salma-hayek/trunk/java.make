@@ -81,6 +81,20 @@ FILE_LIST_WITH_DIRECTORIES += classes
 FILE_LIST_WITH_DIRECTORIES += ChangeLog # The ChangeLog should never be checked in, but should be in distributions.
 FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE_LIST_WITH_DIRECTORIES)),$(FILE_LIST_WITH_DIRECTORIES))))
 
+pathsearch = $(firstword $(wildcard $(addsuffix /$(1),$(subst :, ,$(PATH)))))
+
+COMMON_JAVA_FLAGS += -classpath $(SALMA_HAYEK)/classes
+COMMON_JAVA_FLAGS += -d classes/
+COMMON_JAVA_FLAGS += -sourcepath src/
+JAVA_FLAGS.jikes += -bootclasspath $(BOOT_CLASS_PATH)
+JAVA_FLAGS.jikes += +D +P +Pall +Pno-serial +Pno-redundant-modifiers
+
+JAVA_COMPILER ?= jikes
+JAVA_COMPILER_LOCATION := $(call pathsearch,$(JAVA_COMPILER))
+ifeq "$(JAVA_COMPILER_LOCATION)" ""
+  JAVA_COMPILER = javac
+endif
+
 # variables above
 # rules below
 
@@ -89,8 +103,7 @@ build: $(SOURCE_FILES) build.subdirs
 	@echo Recompiling the world... && \
 	 make clean && \
 	 mkdir -p classes && \
-	 jikes -bootclasspath $(BOOT_CLASS_PATH) -classpath $(SALMA_HAYEK)/classes -d classes/ -sourcepath src/ +D +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
-	 @#javac -d classes/ -sourcepath src/ $(SOURCE_FILES)
+	 $(JAVA_COMPILER) $(JAVA_FLAGS.$(JAVA_COMPILER)) $(COMMON_JAVA_FLAGS) $(SOURCE_FILES)
 
 .PHONY: clean
 clean:

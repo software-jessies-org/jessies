@@ -30,6 +30,7 @@ for PROJECT in $PROJECTS; do
     wget -C off -N http://www.jessies.org/~enh/software/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar zxf $PROJECT.tgz || die "extracting $PROJECT"
+    make -C $PROJECT || die "building $PROJECT"
 done
 
 # Put links to each of our shell scripts in /usr/local/bin.
