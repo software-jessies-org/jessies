@@ -689,6 +689,13 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         statusArea.setBorder(new javax.swing.border.EmptyBorder(2, 2, 2, 2));
         statusArea.add(statusLineAndProgressContainer, BorderLayout.NORTH);
         statusArea.add(minibuffer, BorderLayout.SOUTH);
+        
+        // Add some padding so that the tall Mac OS progress bar doesn't cause
+        // the status line to jiggle when it appears...
+        statusLine.setBorder(new javax.swing.border.EmptyBorder(2, 0, 2, 0));
+        // ...and so that it doesn't intrude on the area reserved for the
+        // grow box (and flicker as they fight about who gets drawn on top).
+        statusLineAndProgressContainer.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 20));
     }
     
     private static int progressNesting = 0;
