@@ -310,6 +310,13 @@ public class Terminator implements Controller {
 				}
 			}
 		});
+		// Make sure the find dialog is closed if the user drags the window.
+		// Strangely, on Linux this doesn't seem to cause the find dialog to lose the focus.
+		frame.addComponentListener(new ComponentAdapter() {
+			public void componentMoved(ComponentEvent e) {
+				hideFindDialog();
+			}
+		});
 	}
 	
 	private FindHighlighter getFindHighlighter() {
