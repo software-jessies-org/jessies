@@ -4,10 +4,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
-
-import java.util.List;
+import e.util.*;
 
 public class Terminator implements Controller {
 	private List arguments;

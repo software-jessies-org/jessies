@@ -1,5 +1,6 @@
 package terminatorn.escape;
 
+import e.util.*;
 import terminatorn.*;
 
 /**
