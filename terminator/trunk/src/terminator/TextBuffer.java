@@ -271,18 +271,22 @@ public class TextBuffer implements TerminalListener {
 	public void processActions(TerminalAction[] actions) {
 		firstLineChanged = Integer.MAX_VALUE;
 		boolean wereAtBottom = view.isAtBottom();
+		boolean needsScroll = false;
 		Dimension initialSize = getCurrentSizeInChars();
 		for (int i = 0; i < actions.length; i++) {
 			actions[i].perform(this);
 		}
 		if (firstLineChanged != Integer.MAX_VALUE) {
+			needsScroll = true;
 			view.linesChangedFrom(firstLineChanged);
 		}
 		Dimension finalSize = getCurrentSizeInChars();
 		if (initialSize.equals(finalSize) == false) {
 			view.sizeChanged(initialSize, finalSize);
 		}
-		view.scrollOnTtyOutput(wereAtBottom);
+		if (needsScroll) {
+			view.scrollOnTtyOutput(wereAtBottom);
+		}
 		view.setCaretPosition(caretPosition);
 	}
 	

@@ -328,15 +328,26 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public void removeHighlightsFrom(int firstLineIndex) {
-		while (lineHighlights.size() > firstLineIndex) {
-			ArrayList list = (ArrayList) lineHighlights.remove(firstLineIndex);
-			if (list != null) {
-				Highlight[] highlights = (Highlight[]) list.toArray(new Highlight[list.size()]);
-				for (int j = 0; j < highlights.length; j++) {
-					repaintHighlight(highlights[j]);
-				}
+		if (firstLineIndex == 0) {
+			lineHighlights.clear();
+			repaint();
+		} else {
+			// We use a backwards loop because going forwards results in N array copies if
+			// we're removing N lines.
+			for (int i = (lineHighlights.size() - 1); i >= firstLineIndex; i--) {
+				lineHighlights.remove(i);
 			}
+			repaintFromLine(firstLineIndex);
 		}
+//		while (lineHighlights.size() > firstLineIndex) {
+//			ArrayList list = (ArrayList) lineHighlights.remove(firstLineIndex);
+//			if (list != null) {
+//				Highlight[] highlights = (Highlight[]) list.toArray(new Highlight[list.size()]);
+//				for (int j = 0; j < highlights.length; j++) {
+//					repaintHighlight(highlights[j]);
+//				}
+//			}
+//		}
 	}
 	
 	public void removeHighlightsFrom(Highlighter highlighter, int firstLineIndex) {
@@ -359,6 +370,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			addHighlightAtLine(highlight, i);
 		}
 		repaintHighlight(highlight);
+	}
+	
+	private void repaintFromLine(int firstLineToRepaint) {
+		int top = getLineTop(new Location(firstLineToRepaint, 0)).y;
+		Dimension size = getSize();
+		repaint(0, top, size.width, size.height - top);
 	}
 	
 	private void repaintHighlight(Highlight highlight) {
