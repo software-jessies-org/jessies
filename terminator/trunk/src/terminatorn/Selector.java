@@ -71,10 +71,22 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		}
 	}
 	
+	public boolean isWordChar(char ch) {
+		return ch != ' ';
+	}
+	
 	public void selectWord(TextBuffer model, Location location) {
-		Location start = new Location(location.getLineIndex(), location.getCharOffset());
-		Location end = new Location(location.getLineIndex(), location.getCharOffset() + 1);
-		setHighlight(start, end);
+		final int lineNumber= location.getLineIndex();
+		String line = view.getModel().getLine(lineNumber);
+		int start = location.getCharOffset();
+		int end = start;
+		while (start > 0 && isWordChar(line.charAt(start - 1))) {
+			--start;
+		}
+		while (end < line.length() && isWordChar(line.charAt(end))) {
+			++end;
+		}
+		setHighlight(new Location(lineNumber, start), new Location(lineNumber, end));
 	}
 	
 	public void mousePressed(MouseEvent event) {
