@@ -188,8 +188,9 @@ public class Workspace extends JPanel {
     public EWindow findIfAlreadyOpen(String filename, String address) {
         /* Check we don't already have this open as a file or directory. */
         EWindow window = findWindowByName(filename);
-        if (window!= null) {
+        if (window != null) {
             leftColumn.setSelectedWindow(window);
+            window.ensureSufficientlyVisible();
             if (address != null) {
                 ETextWindow textWindow = (ETextWindow) window;
                 textWindow.jumpToAddress(address);
