@@ -3,9 +3,11 @@ package terminatorn;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import e.util.*;
 
 /**
- * Logs terminal output to a file.
+ * Logs terminal output to a file in ~/.terminal-logs. If that directory
+ * doesn't exist, logs to /dev/null.
  */
 public class LogWriter {
 	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ssZ");
@@ -14,15 +16,14 @@ public class LogWriter {
 	
 	public LogWriter(String prefix) throws IOException {
 		String timestamp = dateFormatter.format(new Date());
-		String directory = makeDirectory();
-		int lastSepIndex = prefix.lastIndexOf(File.separator);
-		if (lastSepIndex != -1) {
-			directory += prefix.substring(0, lastSepIndex + 1);
-			(new File(directory)).mkdirs();
-			prefix = prefix.substring(lastSepIndex + 1);
+		String logsDirectoryName = System.getProperty("user.home") + File.separator + ".terminal-logs" + File.separator;
+		File logsDirectory = new File(logsDirectoryName);
+		if (logsDirectory.exists() == false) {
+			stream = new FileWriter("/dev/null");
+		} else {
+			String filename =  prefix + '-' + timestamp + ".txt";
+			stream = new FileWriter(logsDirectoryName + filename);
 		}
-		String filename =  prefix + '-' + timestamp + ".txt";
-		stream = new FileWriter(directory + filename);
 	}
 	
 	public void append(char ch) throws IOException {
@@ -30,14 +31,5 @@ public class LogWriter {
 		if (ch == '\n') {
 			stream.flush();
 		}
-	}
-	
-	private String makeDirectory() {
-		String directoryName = System.getProperty("user.home") + File.separator + ".terminal-logs" + File.separator;
-		File directory = new File(directoryName);
-		if (directory.exists() == false) {
-			directory.mkdir();
-		}
-		return directoryName;
 	}
 }

@@ -2,6 +2,8 @@
 TERMINATOR_HOME=`dirname $0`
 CLASSPATH=$TERMINATOR_HOME/classes:$TERMINATOR_HOME/../salma-hayek/classes
 
+mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
+
 case "`uname`" in
 Darwin)
     OS_SPECIFIC_OPTIONS=-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns

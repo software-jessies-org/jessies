@@ -9,7 +9,6 @@ Unassigned TODOs:
 ~~~~~~~~~~~~~~
 [5]	Bug - if you try to select text with the H-scrollbar some way to the right, the scrollbar jumps back to the left-hand edge.
 [5]	Make an about box.
-[5]	Particularly since we can't chmod from Java, make logging optional.
 [5]	Stop inserting blank lines at the bottom when we're resized.
 [5]	Implement "New Window" to go with "New Tab".
 [5]	Find some profiling tool to see if we can find simple ways of speeding up.
@@ -32,3 +31,4 @@ Phil's TODOs:
 Elliott's TODOs:
 ~~~~~~~~~~~
 [1] Add resources or other configuration file for hyperlink recognizers. Maybe allow arbitrary classes to be instantiated?
+[1] "Connect to Server" CS-K; don't implement Rendevouz (unless you're bored!) but take (user@)?host and port-scan for ssh, and fall back to telnet.
