@@ -58,14 +58,6 @@ public class PTextBuffer implements CharSequence {
     }
     
     /**
-     * Returns the entire text we hold.  This involves making a complete copy of the text, and so is
-     * best avoided.  Use the CharSequence interface instead.
-     */
-    public char[] getText() {
-        return getText(0, length());
-    }
-    
-    /**
      * Returns a copy of the specified region of text.  This involves making a complete copy of the
      * specified region of text, and so is best avoided.  Use the CharSequence interface instead.
      */
