@@ -47,7 +47,7 @@ fi
 
 if [ "`uname`" == "Linux" ]
 then
-    OS_SPECIFIC_OPTIONS=-Dterminator.frame.icon=/usr/share/icons/crystalsvg/32x32/apps/terminal.png
+    OS_SPECIFIC_OPTIONS=-Dterminator.frame.icon=`locate gnome-terminal.png | grep 32x32 | head -1`
 fi
 
 if [ "$TIC" != "" ]
