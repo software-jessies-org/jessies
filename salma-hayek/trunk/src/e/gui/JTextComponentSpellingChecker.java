@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
-import e.util.SpellingChecker;
+import e.util.*;
 
 public class JTextComponentSpellingChecker implements DocumentListener {
     private JTextComponent component;
@@ -256,8 +256,15 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         return keywords.contains(word) || keywords.contains(word.toLowerCase());
     }
     
+    private LayeredHighlighter.LayerPainter makeMisspelledWordHighlightPainter() {
+        if (GuiUtilities.isMacOs()) {
+            return new UnderlineHighlightPainter();
+        }
+        return new WavyLineHighlightPainter(new Color(255, 0, 0, 72));
+    }
+    
     /** Paints the misspelled word highlights. */
-    private LayeredHighlighter.LayerPainter misspelledWordHighlightPainter = new UnderlineHighlightPainter();
+    private LayeredHighlighter.LayerPainter misspelledWordHighlightPainter = makeMisspelledWordHighlightPainter();
     
     /**
      * A red underline for spelling mistake highlights.
