@@ -106,7 +106,9 @@ def annotate_patch()
  
  file.each_line() {
   |line|
-  if plus_tags == nil && minus_tags == nil && line =~ /^\=\=\=\=\= (\S+) /
+  if line =~ /^=+$/ || line =~ /^Index: /
+   next
+  elsif plus_tags == nil && minus_tags == nil && line =~ /^\=\=\=\=\= (\S+) /
    plus_tags = tags_for_file($1)
    minus_tags = tags_for_file($1)
   elsif plus_tags == nil && line =~ /^\+\+\+ (\S+)\s/
