@@ -20,7 +20,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private static final int NO_MARGIN = -1;
     
     private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.6f, 0.6f, 0.6f);
-    private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.9f, 0.9f, 0.9f);
+    private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.96f, 0.96f, 0.96f);
     
     private PLineList lines;
     private List splitLines;  // TODO - Write a split buffer-style List implementation.
@@ -294,10 +294,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         generateLineWrappings();
         Graphics2D graphics = (Graphics2D) oldGraphics;
         Rectangle bounds = graphics.getClipBounds();
-        graphics.setColor(getBackground());
-        graphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
         FontMetrics metrics = graphics.getFontMetrics();
-        paintRightHandMargin(graphics, metrics);
+        int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds, metrics);
+        graphics.setColor(getBackground());
+        graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
         graphics.setColor(Color.black);
         int minLine = Math.min(splitLines.size() - 1, bounds.y / metrics.getHeight());
         int maxLine = Math.min(splitLines.size() - 1, (bounds.y + bounds.height) / metrics.getHeight());
@@ -313,15 +313,23 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         watch.print("Repaint");
     }
     
-    private void paintRightHandMargin(Graphics2D graphics, FontMetrics metrics) {
+    /**
+     * Draws the right-hand margin, and returns the width of the rectangle
+     * from bounds.x that should be filled with the non-margin background color.
+     * Using this in paintComponent lets us avoid unnecessary flicker caused
+     * by filling the area twice.
+     */
+    private int paintRightHandMargin(Graphics2D graphics, Rectangle bounds, FontMetrics metrics) {
+        int whiteBackgroundWidth = bounds.width;
         if (rightHandMarginColumn != NO_MARGIN) {
             int offset = metrics.stringWidth("n") * rightHandMarginColumn;
-            Rectangle bounds = graphics.getClipBounds();
             graphics.setColor(MARGIN_BOUNDARY_COLOR);
             graphics.drawLine(offset, bounds.y, offset, bounds.y + bounds.height);
             graphics.setColor(MARGIN_OUTSIDE_COLOR);
             graphics.fillRect(offset + 1, bounds.y, bounds.x + bounds.width - offset - 1, bounds.height);
+            whiteBackgroundWidth = (offset - bounds.x);
         }
+        return whiteBackgroundWidth;
     }
     
     private void paintHighlights(Graphics2D graphics, int minLine, int maxLine) {
