@@ -64,7 +64,7 @@ changes.split("\n").each() {
     color = "black"
     if line =~ /^Modified: /
     elsif line =~ /^=+$/
-        body << "<hr noshade>
+        body << "<hr noshade=\"yes\" />"
     elsif line =~ /^@@ /
         color = "gray"
     elsif line =~ /^-/
