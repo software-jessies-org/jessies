@@ -69,10 +69,21 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	public void mouseReleased(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON1) {
 			if (highlight != null) {
-				String selection = view.getText(highlight);
-				view.getToolkit().getSystemClipboard().setContents(new StringSelection(selection), null);
+				setClipboard(view.getText(highlight));
 			}
 			startLocation = null;
+		}
+	}
+	
+	/**
+	 * Sets the clipboard (and X11's nasty hacky semi-duplicate).
+	 */
+	public static void setClipboard(String newContents) {
+		StringSelection selection = new StringSelection(newContents);
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		toolkit.getSystemClipboard().setContents(selection, selection);
+		if (toolkit.getSystemSelection() != null) {
+			toolkit.getSystemSelection().setContents(selection, selection);
 		}
 	}
 	
