@@ -14,6 +14,10 @@ public class Minibuffer extends JPanel implements FocusListener {
     private JLabel prompt;
     private JTextField textField;
     
+    private StringHistory history;
+    private int historyIndex;
+    private String itemAfterHistory;
+    
     public Minibuffer() {
         super(new BorderLayout());
         
@@ -111,9 +115,29 @@ public class Minibuffer extends JPanel implements FocusListener {
         } else if (keyCode == KeyEvent.VK_ENTER) {
             e.consume();
             notifyMinibufferUserOfTyping();
-            shouldHide = minibufferUser.wasAccepted(textField.getText());
+            String text = textField.getText();
+            shouldHide = minibufferUser.wasAccepted(text);
+            if (shouldHide && history != null && text.length() != 0) {
+                history.add(text);
+            }
+        } else if (keyCode == KeyEvent.VK_UP) {
+            traverseHistory(-1);
+        } else if (keyCode == KeyEvent.VK_DOWN) {
+            traverseHistory(1);
         }
         return shouldHide;
+    }
+    
+    private void traverseHistory(int direction) {
+        if (history == null) {
+            return;
+        }
+        int newHistoryIndex = historyIndex + direction;
+        if (newHistoryIndex < 0 || newHistoryIndex > history.size()) {
+            return;
+        }
+        historyIndex = newHistoryIndex;
+        textField.setText((historyIndex == history.size()) ? itemAfterHistory : history.get(historyIndex));
     }
         
     public void activate(MinibufferUser newUser) {
@@ -130,6 +154,19 @@ public class Minibuffer extends JPanel implements FocusListener {
         textField.setText(minibufferUser.getInitialValue());
         textField.selectAll();
         textField.requestFocusInWindow();
+        
+        history = minibufferUser.getHistory();
+        if (history == null) {
+            historyIndex = 0;
+        } else {
+            if (history.get(history.getLatestHistoryIndex()).equals(textField.getText())) {
+                itemAfterHistory = "";
+                historyIndex = history.getLatestHistoryIndex();
+            } else {
+                itemAfterHistory = textField.getText();
+                historyIndex = history.getLatestHistoryIndex() + 1;
+            }
+        }
         
         // Rather than force the MinibufferUser to have a special case,
         // we notify them that the value has 'changed' to the value they

@@ -28,8 +28,11 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     public String currentRegularExpression;
     
+    private StringHistory regularExpressionHistory;
+    
     private FindAction() {
         super(ACTION_NAME);
+        regularExpressionHistory = new StringHistory("e.edit.FindAction-history");
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -50,6 +53,10 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     /** Stores the initial end of the selection so we can restore it if the user cancels the search. */
     private int initialSelectionEnd;
+    
+    public StringHistory getHistory() {
+        return regularExpressionHistory;
+    }
     
     public String getInitialValue() {
         ETextArea textArea = currentTextWindow.getText();
