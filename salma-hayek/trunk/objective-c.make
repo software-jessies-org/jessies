@@ -1,6 +1,15 @@
-# FIXME: ...default to guessing an executable name?
-#CURRENT_DIRECTORY := $(shell pwd)
-#EXECUTABLE_NAME ?= $(shell basename $(CURRENT_DIRECTORY))
+# You can set:
+# 
+#  EXECUTABLE_NAME - the path to write the resulting executable to; defaults
+#                    to the name of the current directory, in the current
+#                    directory.
+
+# ----------------------------------------------------------------------------
+# 
+# ----------------------------------------------------------------------------
+
+CURRENT_DIRECTORY := $(shell pwd)
+EXECUTABLE_NAME ?= $(shell basename $(CURRENT_DIRECTORY))
 
 # ----------------------------------------------------------------------------
 # Rules for compiling Objective C and Objective C++ source.
