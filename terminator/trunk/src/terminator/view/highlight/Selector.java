@@ -3,6 +3,7 @@ package terminator.view.highlight;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 import terminator.*;
 import terminator.model.*;
@@ -45,7 +46,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	}
 	
 	public void mousePressed(MouseEvent event) {
-		if (event.getButton() != MouseEvent.BUTTON1) {
+		if (SwingUtilities.isLeftMouseButton(event) == false) {
 			return;
 		}
 		
@@ -75,6 +76,27 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		if (event.getButton() == MouseEvent.BUTTON2) {
 			view.paste();
 		}
+	}
+	
+	public void mouseReleased(MouseEvent event) {
+		if (SwingUtilities.isLeftMouseButton(event)) {
+			copy();
+		}
+	}
+	
+	public void mouseDragged(MouseEvent event) {
+		if (SwingUtilities.isLeftMouseButton(event) && startLocation != null) {
+			selectToPointOf(event);
+		}
+	}
+	
+	public void mouseMoved(MouseEvent event) {
+	}
+	
+	public void mouseEntered(MouseEvent event) {
+	}
+	
+	public void mouseExited(MouseEvent event) {
 	}
 	
 	/**
@@ -119,12 +141,6 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		setHighlight(start, end);
 	}
 	
-	public void mouseReleased(MouseEvent event) {
-		if (event.getButton() == MouseEvent.BUTTON1) {
-			copy();
-		}
-	}
-	
 	/**
 	 * Sets the clipboard (and X11's nasty hacky semi-duplicate).
 	 */
@@ -134,12 +150,6 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		toolkit.getSystemClipboard().setContents(selection, selection);
 		if (toolkit.getSystemSelection() != null) {
 			toolkit.getSystemSelection().setContents(selection, selection);
-		}
-	}
-	
-	public void mouseDragged(MouseEvent event) {
-		if (startLocation != null) {
-			selectToPointOf(event);
 		}
 	}
 	
@@ -156,12 +166,6 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		setHighlight(min(startLocation, endLocation), max(startLocation, endLocation));
 		view.scrollRectToVisible(new Rectangle(event.getX(), event.getY(), 10, 10));
 	}
-	
-	public void mouseMoved(MouseEvent event) { }
-	
-	public void mouseEntered(MouseEvent event) { }
-	
-	public void mouseExited(MouseEvent event) { }
 	
 	private void setHighlight(Location start, Location end) {
 		TextLine startLine = view.getModel().get(start.getLineIndex());
