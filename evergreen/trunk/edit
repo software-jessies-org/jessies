@@ -43,16 +43,21 @@ EDIT_LOG=/tmp/edit.log.$$
 # Symbolically linking to a file which doesn't exist is perfectly legal.
 ln -s -f $EDIT_LOG /tmp/edit.log
 
+JAVA_ENV=""
+for VARIABLE in CVS_RSH DISPLAY EDIT_HOME HOME JAVA_HOME PATH
+do
+    eval VALUE="\${${VARIABLE}}"
+    if [ "${VALUE}" != "" ]
+    then
+        JAVA_ENV="$JAVA_ENV -Denv.${VARIABLE}=${VALUE}"
+    fi
+done
+
 $JAVA $OS_SPECIFIC_OPTIONS \
     $EXTRA_JAVA_OPTIONS \
     $HEAP_SIZE \
     -classpath $EDIT_HOME/classes:$EDIT_HOME/../salma-hayek/classes:$EXTRA_CLASSPATH_ENTRIES \
-    -Denv.CVS_RSH=$CVS_RSH \
-    -Denv.DISPLAY=$DISPLAY \
-    -Denv.EDIT_HOME=$EDIT_HOME \
-    -Denv.HOME=$HOME \
-    -Denv.JAVA_HOME=$JAVA_HOME \
-    -Denv.PATH=$PATH \
+    $JAVA_ENV \
     -DpreferencesDirectory=$EDIT_PREFERENCES_DIRECTORY \
     $EDIT_CLASS_NAME \
 >> $EDIT_LOG 2>&1 || cat $EDIT_LOG 1>&2 &
