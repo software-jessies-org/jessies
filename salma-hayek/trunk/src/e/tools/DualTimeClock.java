@@ -13,8 +13,8 @@ import javax.swing.Timer;
  * (in effect) Bracknell and San Jose.
  */
 public class DualTimeClock extends JWindow implements ActionListener {
-    private static final DateFormat local = makeDateFormat();
-    private static final DateFormat uk = makeDateFormat();
+    private static final DateFormat LOCAL = makeDateFormat();
+    private static final DateFormat GB = makeDateFormat();
     static {
         /*
         String[] ids = TimeZone.getAvailableIDs();
@@ -22,7 +22,7 @@ public class DualTimeClock extends JWindow implements ActionListener {
             System.err.println(id);
         }
         */
-        uk.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+        GB.setTimeZone(TimeZone.getTimeZone("Europe/London"));
     }
 
     private ImageIcon usIcon;
@@ -76,8 +76,8 @@ public class DualTimeClock extends JWindow implements ActionListener {
 
     private void updateTimes() {
         Date now = new Date();
-        left.setText(local.format(now));
-        right.setText(uk.format(now));
+        left.setText(LOCAL.format(now));
+        right.setText(GB.format(now));
     }
 
     private JComponent makeContentPane() {
