@@ -49,7 +49,13 @@ public class EWindow extends JComponent {
     
     /** Closes this window by removing it from its column. */
     public void closeWindow() {
-        getColumn().removeComponent(this);
+        windowClosing();
+        removeFromColumn();
+    }
+    
+    public void removeFromColumn() {
+        boolean mustReassignFocus = getTitleBar().isActive();
+        getColumn().removeComponent(this, mustReassignFocus);
     }
     
     /** Invoked when the window is about to be closed. */

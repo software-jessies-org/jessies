@@ -218,7 +218,7 @@ public class ETitleBar extends JComponent implements MouseListener, MouseMotionL
     /** Causes the title bar to track the mouse's movements. */
     public void mouseDragged(MouseEvent e) {
         EColumn column = (EColumn) SwingUtilities.getAncestorOfClass(EColumn.class, this);
-        column.moveBy(getParent(), SwingUtilities.convertMouseEvent(this, e, column).getY() - pointerOffset);
+        column.moveTo(getParent(), SwingUtilities.convertMouseEvent(this, e, column).getY() - pointerOffset);
     }
     
     public void mouseMoved(MouseEvent e) { }

@@ -12,7 +12,7 @@ A column containing views.
 <font color="red">Note that you have you call addComponent and not add. I don't know why I
 didn't override add and invoke super.add at the critical point; this seems like a serious design
 error that someone should check out and fix. As things stand, accidentally invoking add will
-cause a whole can of Whup Ass to be spilt in Edit's lap.</font>
+cause a whole can of Whoop Ass to be spilt in Edit's lap.</font>
 
 @author Elliott Hughes <enh@acm.org>
 */
@@ -40,13 +40,7 @@ public class EColumn extends JPanel implements ComponentListener {
         }
     }
     
-    public void removeComponent(Component c) {
-        boolean mustReassignFocus = false;
-        if (c instanceof EWindow) {
-            EWindow window = (EWindow) c;
-            mustReassignFocus = window.getTitleBar().isActive();
-            window.windowClosing();
-        }
+    public void removeComponent(Component c, boolean mustReassignFocus) {
         int which = getComponentIndex(c);
         remove(which);
         Log.warn("which="+which+";getComponentCount()="+getComponentCount());
@@ -85,17 +79,6 @@ public class EColumn extends JPanel implements ComponentListener {
         updateTabForWorkspace();
     }
     
-    /** Returns the number of windows that aren't errors windows. */
-    public int getNonErrorsWindowCount() {
-        int result = 0;
-        for (int i = 0; i < getComponentCount(); i++) {
-            if (getComponent(i) instanceof EErrorsWindow == false) {
-                result++;
-            }
-        }
-        return result;
-    }
-    
     /**
      * Updates the title of the tab in the JTabbedPane that corresponds to the Workspace that this
      * EColumn represents (if you can follow that). Invoked when the column has a component added
@@ -106,7 +89,7 @@ public class EColumn extends JPanel implements ComponentListener {
         JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
         if (workspace != null && tabbedPane != null) {
             String title = workspace.getTitle();
-            int windowCount = getNonErrorsWindowCount();
+            int windowCount = workspace.getTextWindows().length;
             if (windowCount > 0) {
                 title += " (" + windowCount + ")";
             }
@@ -150,7 +133,7 @@ public class EColumn extends JPanel implements ComponentListener {
             int y = largest.getY() + largest.getHeight() / 2;
             add(c, index + 1);
             placeComponent(index + 1, c);
-            moveBy(c, y);
+            moveTo(c, y);
         }
         updateTabForWorkspace();
     }
@@ -194,11 +177,6 @@ public class EColumn extends JPanel implements ComponentListener {
         return -1;
     }
     
-    public void moveBy(Component c, int y) {
-        int which = getComponentIndex(c);
-        moveBy(which, y);
-    }
-    
     private boolean isThereAnySpaceAboveComponent(int which) {
         for (int i = 0; i < which; i++) {
             if (getComponent(i).getHeight() > MIN_HEIGHT) {
@@ -208,8 +186,13 @@ public class EColumn extends JPanel implements ComponentListener {
         return false;
     }
     
-    /** FIXME: should be called moveTo. the 'y' coordinate is an absolute position in the column. */
-    public void moveBy(int which, int y) {
+    public boolean isValidComponentIndex(int which) {
+        return which < getComponentCount();
+    }
+    
+    /** Moves the given component to the given absolute Y position in the column. */
+    public void moveTo(Component c, int y) {
+        int which = getComponentIndex(c);
         if (which < 1) {
             return;
         }
@@ -220,7 +203,7 @@ public class EColumn extends JPanel implements ComponentListener {
         /* Dramatis personae. */
         Component previous = getComponent(which - 1);
         Component current = getComponent(which);
-        Component next = (getComponentCount() > which + 1) ? getComponent(which + 1) : null;
+        Component next = isValidComponentIndex(which + 1) ? getComponent(which + 1) : null;
         
         /* What happens to the window above us? */
         int bottomOfPrevious = previous.getY() + previous.getHeight();
@@ -231,7 +214,7 @@ public class EColumn extends JPanel implements ComponentListener {
             /* FIXME: wrong test. we're really interested in knowing whether there's room. */
             if (isThereAnySpaceAboveComponent(which)) {
                 /* ... budge it up a bit ... */
-                moveBy(which - 1, newY - MIN_HEIGHT);
+                moveTo(previous, newY - MIN_HEIGHT);
                 newPreviousHeight = newY - previous.getY();
             } else {
                 /* ... or refuse to squish it. */
@@ -245,9 +228,9 @@ public class EColumn extends JPanel implements ComponentListener {
         
         /* If we would get squished... */
         if (newHeight < MIN_HEIGHT) {
-            if (which < getComponentCount()) {
+            if (next != null) {
                 /* ... budge the window below us down a bit ... */
-                moveBy(which + 1, newY + MIN_HEIGHT);
+                moveTo(next, newY + MIN_HEIGHT);
                 newHeight = next.getY() - newY;
             } else {
                 /** ... or refuse to be squished. */
