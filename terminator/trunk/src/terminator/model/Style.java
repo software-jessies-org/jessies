@@ -3,10 +3,12 @@ package terminator.model;
 import java.awt.*;
 
 /**
-
-@author Phil Norman
-*/
-
+ * Phil talks about this class as being immutable, yet it's not final.
+ * I'm also not sure what would break if we could mutate Style
+ * instances.
+ *
+ * For now, I've subclassed this and overridden getBackground.
+ */
 public class Style implements StyleMutator {
 	// If any of these is null, it should be ignored.  We use Boolean references because they
 	// can be used to represent 3 states - null, TRUE and FALSE.

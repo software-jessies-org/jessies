@@ -44,10 +44,6 @@ public class Highlight {
 		return end;
 	}
 	
-	public StyleMutator getStyleMutator() {
-		return style;
-	}
-
 	public Cursor getCursor() {
 		return cursor;
 	}
