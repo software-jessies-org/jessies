@@ -77,7 +77,7 @@ void loop(int ptym, int ignoreeof)
                         err_sys("writen error to master pty");
                     }
                     bytesInBuffer -= 2;
-                    memcpy(buff, buff + 2, bytesInBuffer);
+                    memmove(buff, buff + 2, bytesInBuffer);
                     bytesRequired = 1;
                 } else {
                     if (bytesInBuffer >= SIZE_STRUCT_SIZE) {  /* escapeLength + sizeof(short) * 4 */
@@ -90,7 +90,7 @@ void loop(int ptym, int ignoreeof)
                             err_sys("TIOCSWINSZ error");
                         }
                         bytesInBuffer -= SIZE_STRUCT_SIZE;
-                        memcpy(buff, buff + SIZE_STRUCT_SIZE, bytesInBuffer);
+                        memmove(buff, buff + SIZE_STRUCT_SIZE, bytesInBuffer);
                         bytesRequired = 1;
                     } else {
                         bytesRequired = SIZE_STRUCT_SIZE;
@@ -103,7 +103,7 @@ void loop(int ptym, int ignoreeof)
                             err_sys("writen error to master pty");
                         }
                         bytesInBuffer = bytesInBuffer - index;  /* If there was no escape char, bytesInBuffer = 0, and 0 bytes copied. */
-                        memcpy(buff, buff + index, bytesInBuffer);
+                        memmove(buff, buff + index, bytesInBuffer);
                         bytesRequired = 1;
                         break;
                     }
