@@ -154,4 +154,5 @@ ptrdiff
 # Standard headers
 iomanip
 iostream
-
+sstream
+typeinfo
