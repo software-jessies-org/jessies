@@ -286,19 +286,74 @@ public class TerminalControl implements Runnable {
 	
 	/**
 	 * Translate ASCII to the Unicode box-drawing characters.
+	 * 
+	 * Run this in xterm(1) for reference:
+	 * 
+	 *   ruby -e 'cs="abcdefghijklmnopqrstuvwxyz"; puts(cs); \
+	 *            print("\x1b(0\x1b)B\x0f");puts(cs);print("\x0e")'
+	 * 
+	 * We use the Unicode box-drawing characters, but the
+	 * glyphs don't fill the font's bounding box, so the effect is
+	 * not much better than the traditional ASCII-art rendition.
+	 * 
+	 * Also, the glyphs are bottom-heavy, making the effect even worse.
+	 * The strange thing is that the characters seem to extend out of
+	 * the bottom of the bounding box. Bug parade #4896465.
 	 */
 	private char translateToGraphicalCharacterSet(char ch) {
 		switch (ch) {
-			case 'q': return '\u2500';
-			case 'x': return '\u2502';
-			case 'm': return '\u2514';
-			case 'j': return '\u2518';
-			case 'l': return '\u250c';
-			case 'k': return '\u2510';
-			case 't': return '\u251c';
-			case 'u': return '\u2524';
-			default:
-				return ch;
+		case 'a':
+			return '\u2591'; // LIGHT SHADE
+		case 'b':
+			return '\u2409'; // SYMBOL FOR HORIZONTAL TABULATION
+		case 'c':
+			return '\u240c'; // SYMBOL FOR FORM FEED
+		case 'd':
+			return '\u240d'; // SYMBOL FOR CARRIAGE RETURN
+		case 'e':
+			return '\u240a'; // SYMBOL FOR LINE FEED
+		case 'f':
+			return '\u00b0'; // DEGREE SIGN
+		case 'g':
+			return '\u00b1'; // PLUS-MINUS SIGN
+		case 'h':
+			return '\u2424'; // SYMBOL FOR NEW LINE
+		case 'i':
+			return '\u240b'; // SYMBOL FOR VERTICAL TABULATION
+		case 'j':
+			return '\u2518'; // BOX DRAWINGS LIGHT UP AND LEFT
+		case 'k':
+			return '\u2510'; // BOX DRAWINGS LIGHT DOWN AND LEFT
+		case 'l':
+			return '\u250c'; // BOX DRAWINGS LIGHT DOWN AND RIGHT
+		case 'm':
+			return '\u2514'; // BOX DRAWINGS LIGHT UP AND RIGHT
+		case 'n':
+			return '\u253c'; // BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
+		case 'v':
+			return '\u2534'; // BOX DRAWINGS LIGHT UP AND HORIZONTAL
+		case 'w':
+			return '\u252c'; // BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
+		case 'o':
+		case 'p':
+		case 'q':
+		case 'r':
+		case 's':
+			// These should all be different characters,
+			// but Unicode only offers one of them.
+			return '\u2500'; // BOX DRAWINGS LIGHT HORIZONTAL
+		case 't':
+			return '\u251c'; // BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+		case 'u':
+			return '\u2524'; // BOX DRAWINGS LIGHT VERTICAL AND LEFT
+		case 'x':
+			return '\u2502'; // BOX DRAWINGS LIGHT VERTICAL
+		case 'y':
+			return '\u2264'; // LESS-THAN OR EQUAL TO
+		case 'z':
+			return '\u2265'; // GREATER-THAN OR EQUAL TO
+		default:
+			return ch;
 		}
 	}
 	
