@@ -65,10 +65,9 @@ public class OpenQuicklyDialog {
         }
         matchList.setModel(model);
         
-        // This means the user can just hit Return if there's only one match.
-        if (model.getSize() == 1) {
-            matchList.setSelectedIndex(0);
-        }
+        // If we don't set the selected index, the user won't be able to cycle the focus into the list with the Tab key.
+        // This also means the user can just hit Return if there's only one match.
+        matchList.setSelectedIndex(0);
     }
     
     public void initMatchList() {
