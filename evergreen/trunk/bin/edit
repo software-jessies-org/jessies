@@ -1,66 +1,84 @@
-#!/bin/sh
+#!/usr/bin/ruby -w
 
-real_script=`readlink $0 || echo $0` # Deals with symbolic links to this script.
+require 'fileutils.rb'
+require 'pathname.rb'
 
-EDIT_CLASS_NAME=e.edit.Edit
-EDIT_HOME=`dirname $real_script`/..
-EDIT_HOME=`cd $EDIT_HOME ; pwd`  # Ensures we have an absolute path.
-export EDIT_HOME
-PATH=$PATH:$EDIT_HOME            # Make Edit's support tools available.
-JAVA=java
+# Cope with symbolic links to this script.
+edit_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
+ENV["EDIT_HOME"] = edit_home
+salma_hayek = Pathname.new("#{edit_home}/../salma-hayek").realpath()
 
-# Enable Profiling.
-#EXTRA_JAVA_OPTIONS+=-Xprof
-# Enable Debugging.
-#EXTRA_JAVA_OPTIONS+=-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n
+edit_class_name = "e.edit.Edit"
+edit_preferences_directory = "#{ENV["HOME"]}/.#{edit_class_name}"
 
-EDIT_PREFERENCES_DIRECTORY=$HOME/.$EDIT_CLASS_NAME
+edit_server_port = `cat #{edit_preferences_directory}/edit-server-port`
 
-case "`uname`" in
-Darwin)
+def openFileOnLocalhost(port, filename)
+  host = 'localhost'
+  begin
+    require 'net/telnet'
+    telnet = Net::Telnet.new('Host' => host, 'Port' => port.to_i(), 'Telnetmode' => false)
+    telnet.puts("open #{filename}\r")
+    print(telnet.readlines().join("\n"))
+    telnet.close()
+    return true
+  rescue
+    return false
+  end
+end
+
+# Translate vi/gvim line number specifications.
+if ARGV[0] =~ /^\+(\d+)$/
+  ARGV.shift
+  ARGV[0] = "#{ARGV[0]}:#$1"
+end
+
+filename = ARGV[0]
+if filename != nil && openFileOnLocalhost(edit_server_port, File.expand_path(filename))
+  exit(0)
+end
+
+case `uname`
+when "Darwin"
     # Darwin is what Mac OS X calls itself.
-    EDIT_PREFERENCES_DIRECTORY=$HOME/Library/Preferences/$EDIT_CLASS_NAME
-    PATH=/System/Library/Frameworks/JavaVM.framework/Commands:$PATH
-    OS_SPECIFIC_OPTIONS=-Xdock:name=Edit:icon=/Developer/Examples/Carbon/SimpleText/SimpleText.icns
-    ;;
-*)
-    EXTRA_CLASSPATH_ENTRIES=$EDIT_HOME/../salma-hayek/MRJ141Stubs.jar
-    ;;
-esac
+    edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
+    os_specific_options = "-Xdock:name=Edit:icon=/Developer/Examples/Carbon/SimpleText/SimpleText.icns"
+else
+    extra_classpath_entries = "#{salma_hayek}/MRJ141Stubs.jar"
+end
 
-if [ ! -d $EDIT_PREFERENCES_DIRECTORY ]; then
-    echo "Edit: Couldn't find preferences directory '$EDIT_PREFERENCES_DIRECTORY'."
-    echo "Edit: Creating preferences directory '$EDIT_PREFERENCES_DIRECTORY'."
-    mkdir $EDIT_PREFERENCES_DIRECTORY
-    echo "Edit: Copying default preferences."
-    cp $EDIT_HOME/edit.properties-sample $EDIT_PREFERENCES_DIRECTORY/edit.properties
-    echo "Edit: Away you go!"
-fi
-
-HEAP_SIZE=-Xmx1g
+if File.stat(edit_preferences_directory).directory? == false
+    puts("Edit: Couldn't find preferences directory '#{edit_preferences_directory}.")
+    puts("Edit: Creating preferences directory '#{edit_preferences_directory}'.")
+    Dir.mkdir(edit_preferences_directory)
+    puts("Edit: Copying default preferences.")
+    FileUtils.cp("#{edit_home}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
+    puts("Edit: Away you go!")
+end
 
 # Create a log file, and link to it as the newest.
-EDIT_LOG=/tmp/edit.log.$$
-# Symbolically linking to a file which doesn't exist is perfectly legal.
-ln -s -f $EDIT_LOG /tmp/edit.log
+# Symbolically linking to a file which doesn't exist yet is perfectly legal.
+edit_log = "/tmp/edit.log.#$$"
+FileUtils.ln_sf(edit_log, "/tmp/edit.log")
 
-JAVA_ENV=""
-for VARIABLE in CVS_RSH DISPLAY EDIT_HOME HOME JAVA_HOME PATH SHELL
-do
-    eval VALUE="\${${VARIABLE}}"
-    if [ "${VALUE}" != "" ]
-    then
-        JAVA_ENV="$JAVA_ENV -Denv.${VARIABLE}=${VALUE}"
-    fi
-done
+fake_environment = ""
+["CVS_RSH", "DISPLAY", "EDIT_HOME", "HOME", "JAVA_HOME", "PATH", "SHELL"].each() {
+  |variable|
+  value = ENV[variable]
+  if value != nil
+    fake_environment << " -Denv.#{variable}=#{value}"
+  end
+}
 
-options="$OS_SPECIFIC_OPTIONS $EXTRA_JAVA_OPTIONS $HEAP_SIZE $JAVA_ENV \
-    -DpreferencesDirectory=$EDIT_PREFERENCES_DIRECTORY \
-    -classpath $EDIT_HOME/classes:$EDIT_HOME/../salma-hayek/classes:$EXTRA_CLASSPATH_ENTRIES"
+classpath = "-classpath #{edit_home}/classes:#{salma_hayek}/classes:#{extra_classpath_entries}"
+heap_size = "-Xmx1g"
 
-if [ "${DEBUGGING_EDIT}" != "" ]
-then
-    $JAVA $options $EDIT_CLASS_NAME
+options = "#{os_specific_options} #{heap_size} #{fake_environment} #{classpath} -DpreferencesDirectory=#{edit_preferences_directory}"
+
+puts(options)
+
+if ENV["DEBUGGING_EDIT"] != nil
+  system("java #{options} #{edit_class_name}")
 else
-    $JAVA $options $EDIT_CLASS_NAME > $EDIT_LOG 2>&1 || cat $EDIT_LOG 1>&2 &
-fi
+  system("java #{options} #{edit_class_name} > #{edit_log} 2>&1 || cat #{edit_log} 1>&2 &")
+end
