@@ -1,6 +1,7 @@
 package e.util;
 
 import java.io.*;
+import java.security.*;
 import java.util.regex.*;
 
 /**
@@ -234,9 +235,43 @@ public class FileUtilities {
         return null;
     }
     
+    /**
+     * Returns the md5 digest of the given file, or null if there's a problem.
+     * The string is in the same form as the digest produced by the md5sum(1)
+     * command.
+     */
+    public static String md5(File file) {
+        byte[] digest = null;
+        try {
+            MessageDigest digester = MessageDigest.getInstance("MD5");
+            FileInputStream fileInputStream = new FileInputStream(file);
+            byte[] bytes = new byte[fileInputStream.available()];
+            int byteCount = fileInputStream.read(bytes);
+            fileInputStream.close();
+            digester.update(bytes);
+            digest = digester.digest();
+        } catch (Exception ex) {
+            Log.warn("Unable to compute MD5 digest of '" + file + "'.", ex);
+        }
+        
+        if (digest == null) {
+            return null;
+        }
+        
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < digest.length; ++i) {
+            byte b = digest[i];
+            result.append(Integer.toHexString((b >> 4) & 0xf));
+            result.append(Integer.toHexString(b & 0xf));
+        }
+        return result.toString();
+    }
+    
     public static void main(String[] args) {
         for (int i = 0; i < args.length; ++i) {
-            System.err.println(parseUserFriendlyName(args[i]));
+            String filename = args[i];
+            System.err.println(parseUserFriendlyName(filename));
+            System.err.println(md5(fileFromString(filename)) + "\t" + filename);
         }
     }
     
