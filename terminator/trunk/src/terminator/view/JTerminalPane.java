@@ -156,7 +156,6 @@ public class JTerminalPane extends JPanel {
 	
 	private void initSizeMonitoring(final JScrollPane scrollPane) {
 		class SizeMonitor extends ComponentAdapter {
-			private Dimension currentSize;
 			private boolean isAtEnd = true;
 
 			public void componentShown(ComponentEvent event) {
