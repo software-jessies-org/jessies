@@ -144,9 +144,22 @@ public class TelnetControl implements Runnable {
 		telnetActions.clear();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				listener.processActions(actions);
+				try {
+					listener.processActions(actions);
+				} finally {
+					synchronized (TelnetControl.this) {
+						TelnetControl.this.notifyAll();
+					}
+				}
 			}
 		});
+		synchronized (this) {
+			try {
+				wait();
+			} catch (InterruptedException ex) {
+				Log.warn("Go away.", ex);
+			}
+		}
 		return size - i;
 	}
 	
