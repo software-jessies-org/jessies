@@ -284,6 +284,9 @@ public class TerminalControl implements Runnable {
 	}
 	
 	public void sendEscapeString(String str) {
+		if (processIsRunning == false) {
+			return;
+		}
 		try {
 			out.write((byte) ASCII_ESC);
 			out.write(str.getBytes());
@@ -295,8 +298,10 @@ public class TerminalControl implements Runnable {
 	
 	public void sendChar(char ch) {
 		try {
-			out.write((byte) ch);
-			out.flush();
+			if (processIsRunning) {
+				out.write((byte) ch);
+				out.flush();
+			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -304,8 +309,10 @@ public class TerminalControl implements Runnable {
 	
 	public void sendString(String s) {
 		try {
-			out.write(s.getBytes());
-			out.flush();
+			if (processIsRunning) {
+				out.write(s.getBytes());
+				out.flush();
+			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -313,10 +320,12 @@ public class TerminalControl implements Runnable {
 	
 	public void sendLine(String line) {
 		try {
-			out.write(line.getBytes());
-			out.write('\r');
-			out.write('\n');
-			out.flush();
+			if (processIsRunning) {
+				out.write(line.getBytes());
+				out.write('\r');
+				out.write('\n');
+				out.flush();
+			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
