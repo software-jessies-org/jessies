@@ -38,7 +38,7 @@ public class JTelnetPane extends JPanel {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		JScrollPane scrollPane = new JScrollPane(textPane);
-		scrollPane.getViewport().setBackground(Color.WHITE);
+		scrollPane.getViewport().setBackground(textPane.getBackground());
 		add(scrollPane, BorderLayout.CENTER);
 		textPane.sizeChanged();
 		try {
