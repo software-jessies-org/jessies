@@ -1,7 +1,6 @@
 package terminator.model;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -454,20 +453,24 @@ public class TextBuffer implements TerminalListener {
 
 	public void processSpecialCharacter(char ch) {
 		switch (ch) {
-			case '\r':
-				caretPosition = new Location(caretPosition.getLineIndex(), 0);
-//				Log.warn("Got <CR>; new location " + caretPosition + ".");
-				return;
-			case '\n':
-				int lineIndex = caretPosition.getLineIndex();
-				moveToLine(caretPosition.getLineIndex() + 1);
-//				Log.warn("Got <LF>; moved from line " + lineIndex + " to " + caretPosition.getLineIndex() + ".");
-				return;
-			case '\t':
-				insertTab();
-				return;
-			case KeyEvent.VK_BACK_SPACE: moveCursorHorizontally(-1); return;
-			default: Log.warn("Unsupported special character: " + ((int) ch));
+		case Ascii.CR:
+			caretPosition = new Location(caretPosition.getLineIndex(), 0);
+			return;
+		case Ascii.LF:
+			int lineIndex = caretPosition.getLineIndex();
+			moveToLine(caretPosition.getLineIndex() + 1);
+			return;
+		case Ascii.VT:
+			moveCursorVertically(1);
+			return;
+		case Ascii.HT:
+			insertTab();
+			return;
+		case Ascii.BS:
+			moveCursorHorizontally(-1);
+			return;
+		default:
+			Log.warn("Unsupported special character: " + ((int) ch));
 		}
 	}
 	
