@@ -1,6 +1,7 @@
 package e.edit;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.lang.reflect.*;
 import java.util.*;
 import javax.swing.*;
@@ -14,15 +15,15 @@ import e.util.*;
  * to the matches' locations.
  */
 public class BirdView extends JComponent {
-    private ETextArea textArea;
+    private ETextWindow textWindow;
     private JScrollBar scrollBar;
 
     private Method method;
 
     private BitSet matchingLines = new BitSet();
 
-    public BirdView(ETextArea textArea, JScrollBar scrollBar) {
-        this.textArea = textArea;
+    public BirdView(ETextWindow textWindow, JScrollBar scrollBar) {
+        this.textWindow = textWindow;
         this.scrollBar = scrollBar;
         try {
             method = BasicScrollBarUI.class.getDeclaredMethod("getTrackBounds", new Class[] {});
@@ -30,6 +31,7 @@ public class BirdView extends JComponent {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        addMouseListener(new LineHopper());
     }
 
     public Dimension getPreferredSize() {
@@ -69,11 +71,8 @@ public class BirdView extends JComponent {
             g.drawRect(usableArea.x, usableArea.y, usableArea.width, usableArea.height);
         }
 
-        int linesInDocument = textArea.getLineCount();
-        // The '-1' in the following line is to force the last line of the file to be right at the bottom of
-        // the bird view.  Otherwise the marker for the final line seems to be too high in short files.
-        double scaleFactor = (double) usableArea.height / (double) (linesInDocument - 1);
-
+        double scaleFactor = getLineScaleFactor(usableArea);
+        
         g.setColor(Color.BLACK);
         for (int i = 0; i < matchingLines.length(); i++) {
             if (matchingLines.get(i)) {
@@ -81,6 +80,12 @@ public class BirdView extends JComponent {
                 g.drawLine(usableArea.x, y, usableArea.width, y);
             }
         }
+    }
+    
+    public double getLineScaleFactor(Rectangle usableArea) {
+        // The '-1' in the following line is to force the last line of the file to be right at the bottom of
+        // the bird view.  Otherwise the marker for the final line seems to be too high in short files.
+        return ((double) usableArea.height) / (textWindow.getText().getLineCount() - 1);
     }
 
     public synchronized void addMatchingLine(int lineNumber) {
@@ -91,5 +96,18 @@ public class BirdView extends JComponent {
     public synchronized void clearMatchingLines() {
         matchingLines = new BitSet();
         repaint();
+    }
+    
+    class LineHopper extends MouseAdapter {
+        public void mouseClicked(MouseEvent event) {
+            if (SwingUtilities.isLeftMouseButton(event)) {
+                Rectangle usableArea = getUsableArea();
+                double scaleFactor = getLineScaleFactor(usableArea);
+                int y = event.getY() - usableArea.y;
+                int lineIndex = (int) (y / scaleFactor);
+                lineIndex = Math.max(0, Math.min(lineIndex, textWindow.getText().getLineCount() - 1));
+                textWindow.goToLine(lineIndex + 1);  // Humans and textWindow.goToLine() number lines from 1.
+            }
+        }
     }
 }
