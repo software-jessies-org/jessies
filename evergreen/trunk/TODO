@@ -80,16 +80,6 @@ in favor of FileUtilities.fileFromString, but should probably have something
 similar in the other direction, where special JFilenameField components would
 let us always show the user-friendly forms.
 
-[ ] auto-scroll in the errors window shouldn't stop immediately we output
-    a link: it should ensure that the first link we output doesn't scroll
-    off the top --- that's the behavior we're trying to ensure. we can
-    hack this by recording the link's rectangle and doing a scrollRectToVisible
-    for it each time we've done a scrollRectToVisible for a new line (which
-    strikes me as likely to be rather annoying jumpy behavior), or we can
-    work out how to compare these rectangles and currently-visible rectangle
-    (which i assume we can get hold of) and decide on that basis whether to
-    scrollRectToVisible.
-
 [ ] fix the fact that you can slide windows off the bottom of the column,
     or behind the others at the bottom of a column.
 
