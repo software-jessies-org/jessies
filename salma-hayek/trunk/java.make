@@ -166,7 +166,7 @@ JAVA_FLAGS += -deprecation
 JAVA_FLAGS.jikes += +D +P +Pall +Pno-serial +Pno-redundant-modifiers
 JAVA_FLAGS.javac += -Xlint -Xlint:-serial
 JAVA_FLAGS.javac += -Xlint:-unchecked # until Jikes supports generics
-JAVA_FLAGS.gcjx += -pedantic -error -verbose
+JAVA_FLAGS.gcjx += -pedantic -verbose -fverify # -error -- reinstate later!
 
 # ----------------------------------------------------------------------------
 # Variables above this point,
@@ -218,3 +218,20 @@ build.subdirs:
 .PHONY: echo.%
 echo.%:
 	@echo '$($*)'
+
+# ----------------------------------------------------------------------------
+# How to build a .app directory for Mac OS
+# ----------------------------------------------------------------------------
+
+.PHONY: app
+app: build
+	APP_DIR=../$(PROJECT_NAME).app/Contents && \
+	rm -rf $$APP_DIR && \
+	mkdir -p $$APP_DIR/MacOS && \
+	mkdir -p $$APP_DIR/Resources && \
+	cp -r . $$APP_DIR/Resources/$(PROJECT_NAME) && \
+	cp -r $(SALMA_HAYEK) $$APP_DIR/Resources/salma-hayek && \
+	cd $$APP_DIR/MacOS && \
+	echo -e '#!/bin/bash\nexec `dirname $$0`/../Resources/$(PROJECT_NAME)/bin/$(PROJECT_NAME)\n' > $(PROJECT_NAME) && \
+	chmod a+x $(PROJECT_NAME)
+
