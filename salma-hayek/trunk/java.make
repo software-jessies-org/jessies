@@ -2,7 +2,8 @@ SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 #SALMA_HAYEK=~/Projects/salma-hayek/
 
 # By default, distributions end up under http://www.jessies.org/~enh/
-DIST_SCP_DESTINATION=enh@jessies.org:public_html/software/$(PROJECT_NAME)
+DIST_SCP_USER_AND_HOST=enh@jessies.org
+DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 
 KNOWN_JRE_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
 KNOWN_JRE_LOCATIONS+=/home/elliotth/download/j2sdk1.4.2/jre/lib/rt.jar
@@ -43,11 +44,13 @@ clean:
 dist: build
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM)); \
 	find . -name "*.bak" | xargs --no-run-if-empty rm; \
-	scp -r www/* $(DIST_SCP_DESTINATION) && \
+	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
+	scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
 	cd $(if $(wildcard ../trunk),../..,..) && \
 	tar --exclude=CVS --exclude=.svn -cvf $(TAR_FILE_OF_THE_DAY) $(PROJECT_NAME)/ && \
 	gzip $(TAR_FILE_OF_THE_DAY) && \
-	scp $(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_DESTINATION)/$(PROJECT_NAME).tgz
+	scp $(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
+	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME).tgz
 
 JAR=$(if $(JAVA_HOME),$(JAVA_HOME)/bin/)jar
 CREATE_OR_UPDATE_JAR=cd $(2) && $(JAR) $(1)f $(CURDIR)/$@ -C classes $(notdir $(wildcard $(2)/classes/*))
