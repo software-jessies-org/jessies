@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import e.util.*;
 
@@ -61,9 +62,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			}
 
 			public void highlightClicked(MouseEvent event) {
-				Highlight[] lights = getHighlightsForLocation(viewToModel(event.getPoint()));
-				for (int i = 0; i < lights.length; i++) {
-					lights[i].getHighlighter().highlightClicked(JTextBuffer.this, lights[i], getTextFromHighlight(lights[i]), event);
+				List highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
+				for (int i = 0; i < highlights.size(); i++) {
+					Highlight highlight = (Highlight) highlights.get(i);
+					highlight.getHighlighter().highlightClicked(JTextBuffer.this, highlight, getTextFromHighlight(highlight), event);
 				}
 			}
 			
@@ -81,10 +83,11 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				}
 				lastLocation = location;
 				Cursor cursor = null;
-				Highlight[] lights = getHighlightsForLocation(viewToModel(event.getPoint()));
-				for (int i = 0; i < lights.length; i++) {
-					if (lights[i].getCursor() != null) {
-						cursor = lights[i].getCursor();
+				List highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
+				for (int i = 0; i < highlights.size(); i++) {
+					Highlight highlight = (Highlight) highlights.get(i);
+					if (highlight.getCursor() != null) {
+						cursor = highlight.getCursor();
 						break;
 					}
 				}
@@ -370,15 +373,16 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return (Highlighter) highlighters.get(kind);
 	}
 	
-	public Highlighter[] getHighlighters() {
-		return (Highlighter[]) highlighters.values().toArray(new Highlighter[0]);
+	public Collection/*<Highlighter>*/ getHighlighters() {
+		return Collections.unmodifiableCollection(highlighters.values());
 	}
 	
 	private void redoHighlightsFrom(int firstLineIndex) {
 		removeHighlightsFrom(firstLineIndex);
-		Highlighter[] lighters = getHighlighters();
-		for (int i = 0; i < lighters.length; i++) {
-			lighters[i].addHighlights(this, firstLineIndex);
+		Iterator it = getHighlighters().iterator();
+		while (it.hasNext()) {
+			Highlighter highlighter = (Highlighter) it.next();
+			highlighter.addHighlights(this, firstLineIndex);
 		}
 	}
 	
@@ -394,26 +398,18 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			}
 			repaintFromLine(firstLineIndex);
 		}
-//		while (lineHighlights.size() > firstLineIndex) {
-//			ArrayList list = (ArrayList) lineHighlights.remove(firstLineIndex);
-//			if (list != null) {
-//				Highlight[] highlights = (Highlight[]) list.toArray(new Highlight[list.size()]);
-//				for (int j = 0; j < highlights.length; j++) {
-//					repaintHighlight(highlights[j]);
-//				}
-//			}
-//		}
 	}
 	
 	public void removeHighlightsFrom(Highlighter highlighter, int firstLineIndex) {
 		for (int i = firstLineIndex; i < lineHighlights.size(); i++) {
 			ArrayList list = (ArrayList) lineHighlights.get(i);
 			if (list != null) {
-				Highlight[] highlights = (Highlight[]) list.toArray(new Highlight[list.size()]);
-				for (int j = 0; j < highlights.length; j++) {
-					if (highlights[j].getHighlighter() == highlighter) {
-						list.remove(highlights[j]);
-						repaintHighlight(highlights[j]);
+				Iterator it = list.iterator();
+				while (it.hasNext()) {
+					Highlight highlight = (Highlight) it.next();
+					if (highlight.getHighlighter() == highlighter) {
+						it.remove();
+						repaintHighlight(highlight);
 					}
 				}
 			}
@@ -463,7 +459,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	 */
 	private void findAgain(Class highlighterClass, int startLine, int endLine, int direction) {
 		for (int i = startLine; i != endLine; i += direction) {
-			Highlight[] highlights = getHighlightsForLine(i);
+			List highlights = getHighlightsForLine(i);
 			Highlight match = firstHighlightOfClass(highlights, highlighterClass);
 			if (match != null) {
 				scrollTo(i, match.getStart().getCharOffset(), match.getEnd().getCharOffset());
@@ -473,11 +469,11 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	/**
-	 * Tests whether any of the Highlight objects in the array is a FindHighlighter.
+	 * Tests whether any of the Highlight objects in the list is a FindHighlighter.
 	 */
-	private static Highlight firstHighlightOfClass(Highlight[] highlights, Class highlighterClass) {
-		for (int i = 0; i < highlights.length; ++i) {
-			Highlight highlight = highlights[i];
+	private static Highlight firstHighlightOfClass(List highlights, Class highlighterClass) {
+		for (int i = 0; i < highlights.size(); ++i) {
+			Highlight highlight = (Highlight) highlights.get(i);
 			if (highlight.getHighlighter().getClass() == highlighterClass) {
 				return highlight;
 			}
@@ -515,30 +511,30 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return (visibleBounds.y + visibleBounds.height) / character.height;
 	}
 
-	public Highlight[] getHighlightsForLocation(Location location) {
-		Highlight[] lineLights = getHighlightsForLine(location.getLineIndex());
+	public List getHighlightsForLocation(Location location) {
+		List highlights = getHighlightsForLine(location.getLineIndex());
 		ArrayList result = new ArrayList();
-		for (int i = 0; i < lineLights.length; i++) {
-			Location start = lineLights[i].getStart();
-			Location end = lineLights[i].getEnd();
+		for (int i = 0; i < lineHighlights.size(); i++) {
+			Highlight highlight = (Highlight) highlights.get(i);
+			Location start = highlight.getStart();
+			Location end = highlight.getEnd();
 			boolean startOK = (location.getLineIndex() > start.getLineIndex()) ||
 					(location.getCharOffset() >= start.getCharOffset());
 			boolean endOK = (location.getLineIndex() < end.getLineIndex()) ||
 					(location.getCharOffset() < end.getCharOffset());
 			if (startOK && endOK) {
-				result.add(lineLights[i]);
+				result.add(highlight);
 			}
 		}
-		return (Highlight[]) result.toArray(new Highlight[result.size()]);
+		return result;
 	}
 	
-	/** Returns an array containing all highlights in the indexed line.  This method never returns null. */
-	public Highlight[] getHighlightsForLine(int lineIndex) {
+	/** Returns a (possibly empty) list containing all highlights in the indexed line. */
+	private List/*<Highlight>*/ getHighlightsForLine(int lineIndex) {
 		if (lineIndex >= lineHighlights.size() || lineHighlights.get(lineIndex) == null) {
-			return new Highlight[0];
+			return Collections.EMPTY_LIST;
 		} else {
-			ArrayList highlights = (ArrayList) lineHighlights.get(lineIndex);
-			return (Highlight[]) highlights.toArray(new Highlight[highlights.size()]);
+			return Collections.unmodifiableList((ArrayList) lineHighlights.get(lineIndex));
 		}
 	}
 	
@@ -613,9 +609,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public StyledText[] getLineText(int line) {
 		StyledText[] result = model.getLineText(line);
-		Highlight[] highlights = getHighlightsForLine(line);
-		for (int i = 0; i < highlights.length; i++) {
-			result = highlights[i].applyHighlight(result, new Location(line, 0));
+		List highlights = getHighlightsForLine(line);
+		for (int i = 0; i < highlights.size(); i++) {
+			Highlight highlight = (Highlight) highlights.get(i);
+			result = highlight.applyHighlight(result, new Location(line, 0));
 		}
 		return result;
 	}
