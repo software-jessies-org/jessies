@@ -27,7 +27,7 @@ public class InsertNewlineAction extends TextAction {
             
             // Should we try to insert matching brace pairs?
             String line = target.getLineTextAtOffset(position);
-            if (target.getIndenter().isElectric('}') && line.endsWith("{") && hasUnbalancedBraces(target.getText())) {
+            if (target.getIndenter().isElectric('}') && position > 0 && target.getCharAt(position - 1) == '{' && hasUnbalancedBraces(target.getText())) {
                 insertMatchingBrace(target);
             } else if (line.endsWith("/*") || line.endsWith("/**")) {
                 insertMatchingCloseComment(target);
