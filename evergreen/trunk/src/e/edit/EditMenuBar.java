@@ -77,6 +77,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
 
         menu.add(new JSeparator());
         menu.add(new ShowMisspellingsAction());
+        menu.add(new CompareSelectionAndClipboardAction());
 
         return menu;
     }
