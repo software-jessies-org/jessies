@@ -124,4 +124,18 @@ public class NumberDecoder {
         }
         return result;
     }
+    
+    public String toHtml() {
+        if (valid == false) {
+            return "";
+        }
+        List strings = toStrings();
+        StringBuffer result = new StringBuffer("<html>");
+        for (int i = 0; i < strings.size(); ++i) {
+            String string = (String) strings.get(i);
+            result.append(string);
+            result.append("<br>\n");
+        }
+        return result.toString().replaceAll(" ", "&nbsp;");
+    }
 }
