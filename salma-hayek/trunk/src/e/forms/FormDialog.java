@@ -131,8 +131,9 @@ public class FormDialog extends JDialog {
     
     private void initKeyboardCloseBehavior() {
         KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKeyStroke, "ESCAPE");
-        getRootPane().getActionMap().put("ESCAPE", closeAction);
+        final String CLOSE_ACTION = "e.forms.FormDialog.CloseDialogIfEscapePressed";
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKeyStroke, CLOSE_ACTION);
+        getRootPane().getActionMap().put(CLOSE_ACTION, closeAction);
     }
     
     /**
