@@ -37,16 +37,14 @@ public class Style {
 	private Color background;
 	private Boolean isBold;
 	private Boolean isUnderlined;
+	private boolean isReverseVideo;
 	
-	public Style(Color foreground, Color background, boolean isBold, boolean isUnderlined) {
-		this(foreground, background, Boolean.valueOf(isBold), Boolean.valueOf(isUnderlined));
-	}
-	
-	public Style(Color foreground, Color background, Boolean isBold, Boolean isUnderlined) {
+	public Style(Color foreground, Color background, Boolean isBold, Boolean isUnderlined, boolean isReverseVideo) {
 		this.foreground = foreground;
 		this.background = background;
 		this.isBold = isBold;
 		this.isUnderlined = isUnderlined;
+		this.isReverseVideo = isReverseVideo;
 	}
 	
 	/**
@@ -63,9 +61,10 @@ public class Style {
 	public Style appliedTo(Style originalStyle) {
 		Color mutatedForeground = hasForeground() ? getForeground() : originalStyle.getForeground();
 		Color mutatedBackground = hasBackground() ? getBackground() : originalStyle.getBackground();
-		boolean mutatedBold = hasBold() ? isBold() : originalStyle.isBold();
-		boolean mutatedUnderlined = hasUnderlined() ? isUnderlined() : originalStyle.isUnderlined();
-		return new Style(mutatedForeground, mutatedBackground, mutatedBold, mutatedUnderlined);
+		Boolean mutatedBold = Boolean.valueOf(hasBold() ? isBold() : originalStyle.isBold());
+		Boolean mutatedUnderlined = Boolean.valueOf(hasUnderlined() ? isUnderlined() : originalStyle.isUnderlined());
+		boolean mutatedReverseVideo = isReverseVideo() || originalStyle.isReverseVideo();
+		return new Style(mutatedForeground, mutatedBackground, mutatedBold, mutatedUnderlined, mutatedReverseVideo);
 	}
 
 	public boolean hasForeground() {
@@ -98,5 +97,9 @@ public class Style {
 	
 	public boolean isUnderlined() {
 		return hasUnderlined() && isUnderlined.booleanValue();
+	}
+	
+	public boolean isReverseVideo() {
+		return isReverseVideo;
 	}
 }

@@ -14,9 +14,10 @@ public class StyledText {
 	private static final int BACKGROUND_SHIFT = 3;
 	private static final int FOREGROUND_MASK = 7;
 	private static final int BACKGROUND_MASK = 7 << BACKGROUND_SHIFT;
-
+	
 	private static final int IS_BOLD = 1 << 6;
 	private static final int IS_UNDERLINED = 1 << 7;
+	private static final int IS_REVERSE_VIDEO = 1 << 8;
 	
 	private static final int HAS_FOREGROUND = 1 << 14;
 	private static final int HAS_BACKGROUND = 1 << 15;
@@ -26,7 +27,7 @@ public class StyledText {
 	private boolean continueToEnd = false;
 	
 	public StyledText(String text, short style) {
-		this(text, new Style(getForegroundColor(style), getBackgroundColor(style), isBold(style), isUnderlined(style)));
+		this(text, new Style(getForegroundColor(style), getBackgroundColor(style), Boolean.valueOf(isBold(style)), Boolean.valueOf(isUnderlined(style)), isReverseVideo(style)));
 	}
 	
 	public StyledText(String text, Style style) {
@@ -105,15 +106,19 @@ public class StyledText {
 		return (style & IS_UNDERLINED) != 0;
 	}
 	
-	public static short getDefaultStyle() {
-		return getStyle(-1, false, -1, false, false, false);
+	public static boolean isReverseVideo(int style) {
+		return (style & IS_REVERSE_VIDEO) != 0;
 	}
 	
-	public static short getStyle(int foreground, boolean hasForeground, int background, boolean hasBackground, boolean isBold, boolean isUnderlined) {
-		return (short) ((foreground & FOREGROUND_MASK) | ((background << BACKGROUND_SHIFT) & BACKGROUND_MASK) | (isBold ? IS_BOLD : 0) | (isUnderlined ? IS_UNDERLINED : 0) | (hasForeground ? HAS_FOREGROUND : 0) | (hasBackground ? HAS_BACKGROUND : 0));
+	public static short getDefaultStyle() {
+		return getStyle(-1, false, -1, false, false, false, false);
+	}
+	
+	public static short getStyle(int foreground, boolean hasForeground, int background, boolean hasBackground, boolean isBold, boolean isUnderlined, boolean isReverseVideo) {
+		return (short) ((foreground & FOREGROUND_MASK) | ((background << BACKGROUND_SHIFT) & BACKGROUND_MASK) | (isBold ? IS_BOLD : 0) | (isUnderlined ? IS_UNDERLINED : 0) | (hasForeground ? HAS_FOREGROUND : 0) | (hasBackground ? HAS_BACKGROUND : 0) | (isReverseVideo ? IS_REVERSE_VIDEO : 0));
 	}
 	
 	public String getDescription() {
-		return "StyledText[foreground=" + style.getForeground() + ",background=" + style.getBackground() + ",bold=" + style.isBold() + ",underlined=" + style.isUnderlined();
+		return "StyledText[foreground=" + style.getForeground() + ",background=" + style.getBackground() + ",bold=" + style.isBold() + ",underlined=" + style.isUnderlined() + ",reverse=" + style.isReverseVideo() + "]";
 	}
 }

@@ -16,7 +16,7 @@ import terminator.view.*;
  */
 public class HyperlinkHighlighter implements Highlighter {
 	/** The underlined blue standard hyperlink style. */
-	private final Style style = new Style(Options.getSharedInstance().getColor("linkColor"), null, null, Boolean.TRUE);
+	private final Style style = new Style(Options.getSharedInstance().getColor("linkColor"), null, null, Boolean.TRUE, false);
 	
 	private String directory = "~/";
 	

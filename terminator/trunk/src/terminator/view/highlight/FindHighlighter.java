@@ -12,7 +12,7 @@ import terminator.view.*;
  */
 public class FindHighlighter implements Highlighter {
 	/** The highlighter pen style. */
-	private final Style style = new Style(Color.black, Color.yellow, null, null);
+	private final Style style = new Style(Color.black, Color.yellow, null, null, false);
 
 	private Pattern pattern;
 	
