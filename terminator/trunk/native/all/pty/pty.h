@@ -3,6 +3,7 @@
 
 #include <fcntl.h>
 #include <grp.h>
+#include <iostream>
 #include <string>
 #include <termios.h>
 #include <sys/ioctl.h>
@@ -12,7 +13,6 @@
 #include <sys/wait.h>
 
 #include <errno.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,8 +20,6 @@
 
 #define SIZE_STRUCT_SIZE 10  /* 2 (escapeSequenceLength) + 4 * sizeof(unsigned short). */
 #define SIZE_ESCAPE 0    /* Magic character used to escape size change notifications */
-
-#define MAXLINE 4096   /* max line length */
 
 typedef void Sigfunc(int); /* for signal handlers */
 
@@ -46,7 +44,13 @@ int ptys_open(int, const char *);
 pid_t pty_fork(int *, char *, const struct termios *, const struct winsize *);
 #endif
 
-void err_quit(const char *, ...);
-void err_sys(const char *, ...);
+inline void panic(const char* reason, const char* parameter = 0) {
+    std::cerr << reason;
+    if (parameter != 0) {
+        std::cerr << " '" << parameter << "'";
+    }
+    std::cerr << ": " << strerror(errno) << std::endl;;
+    exit(1);
+}
 
 #endif

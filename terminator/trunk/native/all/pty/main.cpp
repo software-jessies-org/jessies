@@ -23,16 +23,16 @@ main(int argc, char *argv[])
 
     if (interactive) {    /* fetch current termios and window size */
         if (tcgetattr(STDIN_FILENO, &orig_termios) < 0)
-            err_sys("tcgetattr error on stdin");
+            panic("tcgetattr error on stdin");
         if (ioctl(STDIN_FILENO, TIOCGWINSZ, (char *) &size) < 0)
-            err_sys("TIOCGWINSZ error");
+            panic("TIOCGWINSZ error");
         pid = pty_fork(&fdm, slave_name, &orig_termios, &size);
 
     } else
         pid = pty_fork(&fdm, slave_name, NULL, NULL);
 
     if (pid < 0)
-        err_sys("fork error");
+        panic("fork error");
 
     else if (pid == 0) {        /* child */
         if (noecho)
@@ -51,7 +51,7 @@ main(int argc, char *argv[])
         signal(SIGCHLD, SIG_DFL);
 
         if (execvp(argv[1], &argv[1]) < 0)
-            err_sys("can't execute: %s", argv[1]);
+            panic("can't execute", argv[1]);
     }
 
     if (verbose) {
@@ -62,9 +62,9 @@ main(int argc, char *argv[])
 
     if (interactive && driver == NULL) {
         if (tty_raw(STDIN_FILENO) < 0)    /* user's tty to raw mode */
-            err_sys("tty_raw error");
+            panic("tty_raw error");
         if (atexit(tty_atexit) < 0)        /* reset user's tty on exit */
-            err_sys("atexit error");
+            panic("atexit error");
     }
 
     if (driver)
@@ -89,12 +89,12 @@ set_noecho(int fd)        /* turn off echo (for slave pty) */
     struct termios    stermios;
 
     if (tcgetattr(fd, &stermios) < 0)
-        err_sys("tcgetattr error");
+        panic("tcgetattr error");
 
     stermios.c_lflag &= ~(ECHO | ECHOE | ECHOK | ECHONL);
     stermios.c_oflag &= ~(ONLCR);
             /* also turn off NL to CR/NL mapping on output */
 
     if (tcsetattr(fd, TCSANOW, &stermios) < 0)
-        err_sys("tcsetattr error");
+        panic("tcsetattr error");
 }
