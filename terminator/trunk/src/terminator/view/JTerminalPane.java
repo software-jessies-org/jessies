@@ -468,6 +468,9 @@ public class JTerminalPane extends JPanel {
 		String result = "";
 		try {
 			Clipboard selection = getToolkit().getSystemSelection();
+			if (selection == null) {
+				selection = getToolkit().getSystemClipboard();
+			}
 			Transferable transferable = selection.getContents(null);
 			result = (String) transferable.getTransferData(DataFlavor.stringFlavor);
 		} catch (Exception ex) {

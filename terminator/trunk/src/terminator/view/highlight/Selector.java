@@ -46,7 +46,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	}
 	
 	public void mousePressed(MouseEvent event) {
-		if (SwingUtilities.isLeftMouseButton(event) == false) {
+		if (SwingUtilities.isLeftMouseButton(event) == false || event.isPopupTrigger()) {
 			return;
 		}
 		
