@@ -47,7 +47,7 @@ public class FileUtilities {
      * Also adds a trailing separator to the name of a directory.
      */
     public static String getUserFriendlyName(String filename) {
-        boolean isDirectory = new File(filename).isDirectory();
+        boolean isDirectory = fileFromString(filename).isDirectory();
         if (isDirectory && filename.endsWith(File.separator) == false) {
             filename += File.separatorChar;
         }
