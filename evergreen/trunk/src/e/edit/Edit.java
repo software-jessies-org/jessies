@@ -304,13 +304,15 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     public static Workspace getBestWorkspaceForFilename(String filename) {
         Workspace[] workspaces = getWorkspaces();
         int bestIndex = 0;
-        int bestLength = StringUtilities.lengthOfCommonDirectoryPrefix(filename, workspaces[0].getRootDirectory());
-        for (int i = 1; i < workspaces.length; i++) {
+        int bestLength = 0;
+        for (int i = 0; i < workspaces.length; i++) {
             String workspaceRoot = workspaces[i].getRootDirectory();
-            int length = StringUtilities.lengthOfCommonDirectoryPrefix(filename, workspaceRoot);
-            if (length > bestLength) {
-                bestIndex = i;
-                bestLength = length;
+            if (filename.startsWith(workspaceRoot)) {
+                int length = workspaceRoot.length();
+                if (length > bestLength) {
+                    bestIndex = i;
+                    bestLength = length;
+                }
             }
         }
         return workspaces[bestIndex];
