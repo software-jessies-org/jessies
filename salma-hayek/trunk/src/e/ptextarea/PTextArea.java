@@ -15,6 +15,7 @@ import java.util.List;
  */
 
 public class PTextArea extends JComponent implements PLineListener, Scrollable {
+    private static final Color SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
     private static final int MIN_WIDTH = 50;
     private static final int MAX_CACHED_CHAR = 128;
     private static final int NO_MARGIN = -1;
@@ -23,6 +24,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.96f, 0.96f, 0.96f);
     
     private PLineList lines;
+    private PHighlight selection;
     private List splitLines;  // TODO - Write a split buffer-style List implementation.
     private int[] widthCache;
     private int caretLocation;
@@ -36,7 +38,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public PTextArea(PTextBuffer text) {
         setBackground(Color.WHITE);
         setText(text);
-        addMouseListener(new PMouseHandler(this));
+        PMouseHandler mouseHandler = new PMouseHandler(this);
+        addMouseListener(mouseHandler);
+        addMouseMotionListener(mouseHandler);
         addKeyListener(new PKeyHandler(this));
         addComponentListener(new ComponentAdapter() {
             private int lastWidth;
@@ -53,6 +57,53 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         requestFocus();
         showRightHandMarginAt(80);
         initSpellingChecking();
+    }
+    
+    // Selection methods.
+    public String getSelectedText() {
+        if (selection == null) {
+            return "";
+        } else {
+            return getPTextBuffer().subSequence(selection.getStartIndex(), selection.getEndIndex()).toString();
+        }
+    }
+    
+    public int getSelectionStart() {
+        return (selection == null) ? getCaretLocation() : selection.getStartIndex();
+    }
+    
+    public int getSelectionEnd() {
+        return (selection == null) ? getCaretLocation() : selection.getEndIndex();
+    }
+    
+    public void replaceSelection(String newContent) {
+        throw new UnsupportedOperationException("Can't do this yet.");
+    }
+    
+    public void clearSelection() {
+        select(0, 0);
+    }
+    
+    public void select(int start, int end) {
+        if (selection != null) {
+            repaintHighlight(selection);
+        }
+        if (start == end) {
+            selection = null;
+        } else {
+            selection = new PColoredHighlight(this, start, end, SELECTION_COLOR);
+        }
+        if (selection != null) {
+            repaintHighlight(selection);
+        }
+    }
+    
+    public boolean hasSelection() {
+        return (selection != null);
+    }
+    
+    public void selectAll() {
+        select(0, getPTextBuffer().length());
     }
     
     private void initSpellingChecking() {
@@ -334,6 +385,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         int minChar = getSplitLine(minLine).getTextIndex();
         SplitLine max = getSplitLine(maxLine);
         int maxChar = max.getTextIndex() + max.getLength();
+        if (selection != null) {
+            selection.paint(graphics);
+        }
         for (int i = 0; i < highlights.size(); i++) {
             PHighlight highlight = (PHighlight) highlights.get(i);
             if (highlight.getStart().getIndex() <= maxChar && highlight.getEnd().getIndex() > minChar) {

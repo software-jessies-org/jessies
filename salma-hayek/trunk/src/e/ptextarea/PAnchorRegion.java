@@ -32,6 +32,14 @@ public class PAnchorRegion {
         return end;
     }
     
+    public int getStartIndex() {
+        return start.getIndex();
+    }
+    
+    public int getEndIndex() {
+        return end.getIndex();
+    }
+    
     /** Notification that either of the start and end anchors has been deleted. */
     public void delete() { }
     
