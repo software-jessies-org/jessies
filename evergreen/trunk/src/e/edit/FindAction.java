@@ -31,7 +31,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     private FindAction() {
         super(ACTION_NAME);
-        regularExpressionHistory = new StringHistory("e.edit.FindAction-history");
+        regularExpressionHistory = new StringHistory(Edit.getPreferenceFilename("e.edit.FindAction-history"));
     }
     
     public void actionPerformed(ActionEvent e) {
