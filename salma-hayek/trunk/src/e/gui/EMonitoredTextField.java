@@ -34,10 +34,4 @@ public class EMonitoredTextField extends JTextField {
     public void textChanged() {
         timer.restart();
     }
-
-    /** Selects the text on gaining the focus. */
-    public void requestFocus() {
-        super.requestFocus();
-        selectAll();
-    }
 }
