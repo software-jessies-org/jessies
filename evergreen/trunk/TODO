@@ -164,22 +164,10 @@ auto-saving
     spaces to fix the indentation, and then, if you backspace again, delete
     back up to the opening brace.
 
-[ ] How about an imitation of Chimera/Safari's download manager windows
-    to show what tasks we've got running? Although Ant makes it quite
-    clear when it's finished, it's not nearly as obvious with grep or
-    even plain old make. Sometimes I carry on with other work too early,
-    other times I wait too long.
-
-    [ ] Change the stream monitoring code to distinguish stdout from stderr;
-        get the errors windows to automatically close after a build if there
-        wasn't anything on stderr? Is it possible to recognize that a task's
-        finished?
-
-    [ ] Is "Build Project" a special case that deserves a dialog with some
-        kind of progress feedback? Or do we want a 'Task Manager' dialog that
-        deals with everything? Is ant a special case of "Build Project" (since
-        it gives us clear feedback as to what phase of a build it's in, unlike
-        make).
+[ ] Change the stream monitoring code to distinguish stdout from stderr;
+    get the errors windows to automatically close after a build if there
+    wasn't anything on stderr? Is it possible to recognize that a task's
+    finished?
 
 [ ] Open Quickly:
 
