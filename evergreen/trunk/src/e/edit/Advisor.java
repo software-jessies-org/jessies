@@ -45,7 +45,12 @@ public class Advisor extends JPanel {
         timer = new Timer(ms, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (currentComponent != null) {
-                    doResearch();
+                    Thread worker = new Thread() {
+                        public void run() {
+                            doResearch();
+                        }
+                    };
+                    worker.start();
                 }
             }
         });
