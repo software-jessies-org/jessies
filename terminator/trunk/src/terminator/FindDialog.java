@@ -40,47 +40,6 @@ public class FindDialog {
         findField.find();
     }
     
-    /**
-     * Tests whether any of the Highlight objects in the array is a FindHighlighter.
-     */
-    private static boolean containsFindHighlight(Highlight[] highlights) {
-        for (int i = 0; i < highlights.length; ++i) {
-            if (highlights[i].getHighlighter() instanceof FindHighlighter) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Searches from startLine to endLine inclusive, incrementing the
-     * current line by 'direction', looking for a line with a find highlight.
-     * When one is found, the cursor is moved there.
-     */
-    private void findAgainIn(JTextBuffer text, int startLine, int endLine, int direction) {
-        for (int i = startLine; i != endLine; i += direction) {
-            Highlight[] highlights = text.getHighlightsForLine(i);
-            if (containsFindHighlight(highlights)) {
-                text.scrollToLine(i);
-                return;
-            }
-        }
-    }
-    
-    /**
-     * Scrolls the display to the first find highlight not currently on the display.
-     */
-    public void findPreviousIn(JTextBuffer text) {
-        findAgainIn(text, text.getFirstVisibleLine() - 1, -1, -1);
-    }
-    
-    /**
-     * Scrolls the display to the next find highlight not currently on the display.
-     */
-    public void findNextIn(JTextBuffer text) {
-        findAgainIn(text, text.getLastVisibleLine() + 1, text.getModel().getLineCount() + 1, 1);
-    }
-    
     private FindHighlighter getFindHighlighter() {
         return (FindHighlighter) textToFindIn.getHighlighterOfClass(FindHighlighter.class);
     }
@@ -107,9 +66,9 @@ public class FindDialog {
                 public void keyReleased(KeyEvent e) {
                     if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
                         if (e.getKeyCode() == KeyEvent.VK_D) {
-                            findPreviousIn(textToFindIn);
+                            textToFindIn.findPrevious(FindHighlighter.class);
                         } else if (e.getKeyCode() == KeyEvent.VK_G) {
-                            findNextIn(textToFindIn);
+                            textToFindIn.findNext(FindHighlighter.class);
                         }
                     }
                 }
