@@ -123,8 +123,14 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
                 } else if (ch == ')') {
                     --parenthesisNesting;
                 } else if (ch == '{') {
+                    if (parenthesisNesting != 0) {
+                        addHighlight = true;
+                    }
                     indentationStack.push(indentation);
                 } else if (ch == '}') {
+                    if (parenthesisNesting != 0) {
+                        addHighlight = true;
+                    }
                     if (indentationStack.empty()) {
                         addHighlight = true;
                     } else {
