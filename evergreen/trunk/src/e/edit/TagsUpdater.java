@@ -231,7 +231,6 @@ public class TagsUpdater {
             
             DefaultMutableTreeNode branch = (DefaultMutableTreeNode) branches.get(tag.containingClass);
             if (branch == null) {
-                System.err.println(tag.containingClass);
                 branch = new BranchNode(tag.containingClass);
                 branches.put(tag.containingClass, branch);
                 root.add(branch);
