@@ -32,9 +32,13 @@ public class PColoredHighlight extends PHighlight {
         for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
             int xStart = (i == start.getLineIndex()) ? startPt.x : 0;
             int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getSize().width;
-            graphics.fillRect(xStart, y, xEnd - xStart, lineHeight);
+            paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
             y += lineHeight;
         }
         graphics.setColor(oldColor);
+    }
+    
+    public void paintRectangleContents(Graphics2D graphics, Rectangle rectangle) {
+        graphics.fill(rectangle);
     }
 }
