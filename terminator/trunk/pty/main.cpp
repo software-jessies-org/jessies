@@ -20,39 +20,6 @@ main(int argc, char *argv[])
     noecho = 0;
     verbose = 0;
     driver = NULL;
-    
-#if 0
-    opterr = 0;        /* don't want getopt() writing to stderr */
-    while ( (c = getopt(argc, argv, "d:einv")) != EOF) {
-        switch (c) {
-        case 'd':        /* driver for stdin/stdout */
-            driver = optarg;
-            break;
-
-        case 'e':        /* noecho for slave pty's line discipline */
-            noecho = 1;
-            break;
-
-        case 'i':        /* ignore EOF on standard input */
-            ignoreeof = 1;
-            break;
-        case 'n':        /* not interactive */
-            interactive = 0;
-            break;
-
-        case 'v':        /* verbose */
-            verbose = 1;
-            break;
-
-        case '?':
-            err_quit("%s: unrecognized option: -%c", argv[0], optopt);
-        }
-    }
-    if (optind >= argc)
-        err_quit("usage: pty [-d driver] [-e] [-i] [-n] [-v] program [ arg ... ]");
-#endif
-
-        optind = 1;//FIXME
 
     if (interactive) {    /* fetch current termios and window size */
         if (tcgetattr(STDIN_FILENO, &orig_termios) < 0)
@@ -83,8 +50,8 @@ main(int argc, char *argv[])
         signal(SIGQUIT, SIG_DFL);
         signal(SIGCHLD, SIG_DFL);
 
-        if (execvp(argv[optind], &argv[optind]) < 0)
-            err_sys("can't execute: %s", argv[optind]);
+        if (execvp(argv[1], &argv[1]) < 0)
+            err_sys("can't execute: %s", argv[1]);
     }
 
     if (verbose) {

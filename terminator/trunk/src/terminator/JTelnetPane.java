@@ -29,7 +29,7 @@ public class JTelnetPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	private JTelnetPane(Controller controller, String name, String command) {
+	private JTelnetPane(Controller controller, String name, String command, boolean ignoreExitStatus) {
 		super(new BorderLayout());
 		this.controller = controller;
 		this.name = name;
@@ -37,7 +37,7 @@ public class JTelnetPane extends JPanel {
 		try {
 			Log.warn("Starting process '" + command + "'");
 			final Process proc = Runtime.getRuntime().exec(System.getProperty("pty.binary") + " " + command);
-			init(command, proc);
+			init(command, proc, ignoreExitStatus);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -55,7 +55,7 @@ public class JTelnetPane extends JPanel {
 				title = title.substring(0, title.indexOf(' '));
 			}
 		}
-		return new JTelnetPane(controller, title, command);
+		return new JTelnetPane(controller, title, command, false);
 	}
 	
 	/**
@@ -67,7 +67,7 @@ public class JTelnetPane extends JPanel {
 		if (Options.getSharedInstance().isLoginShell()) {
 			command += " -l";
 		}
-		return new JTelnetPane(controller, user + "@localhost", command);
+		return new JTelnetPane(controller, user + "@localhost", command, true);
 	}
 	
 	/**
@@ -101,7 +101,7 @@ public class JTelnetPane extends JPanel {
 		return "bash";
 	}
 
-	private void init(String command, Process process) throws IOException {
+	private void init(String command, Process process, boolean ignoreExitStatus) throws IOException {
 		textPane = new JTextBuffer(controller);
 		textPane.addKeyListener(new KeyHandler());
 		textPane.addMouseListener(new ContextMenuOpener());
@@ -119,7 +119,7 @@ public class JTelnetPane extends JPanel {
 		initSizeMonitoring(scrollPane);
 		textPane.sizeChanged();
 		try {
-			control = new TelnetControl(this, textPane.getModel(), command, process);
+			control = new TelnetControl(this, textPane.getModel(), command, process, ignoreExitStatus);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}

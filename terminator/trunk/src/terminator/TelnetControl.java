@@ -25,6 +25,7 @@ public class TelnetControl implements Runnable {
 	private JTelnetPane pane;
 	private TelnetListener listener;
 	private Process process;
+	private boolean ignoreExitStatus;
 	private boolean processIsRunning = true;
 	private InputStream in;
 	private PtyOutputStream out;
@@ -34,10 +35,11 @@ public class TelnetControl implements Runnable {
 	// Buffer of TelnetActions to perform.
 	private ArrayList telnetActions = new ArrayList();
 	
-	public TelnetControl(JTelnetPane pane, TelnetListener listener, String command, Process process) throws IOException {
+	public TelnetControl(JTelnetPane pane, TelnetListener listener, String command, Process process, boolean ignoreExitStatus) throws IOException {
 		this.pane = pane;
 		this.listener = listener;
 		this.process = process;
+		this.ignoreExitStatus = ignoreExitStatus;
 		this.in = process.getInputStream();
 		this.out = new PtyOutputStream(process.getOutputStream());
 		this.logWriter = new LogWriter(command);
@@ -95,7 +97,7 @@ public class TelnetControl implements Runnable {
 			processIsRunning = false;
 			try {
 				int status = process.waitFor();
-				if (status == 0) {
+				if (status == 0 || ignoreExitStatus) {
 					pane.getController().closeTelnetPane(pane);
 				} else {
 					announceConnectionLost("[Process exited with status " + status + ".]");
