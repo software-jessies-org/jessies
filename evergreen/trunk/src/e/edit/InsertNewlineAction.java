@@ -77,7 +77,11 @@ public class InsertNewlineAction extends TextAction {
         }
     }
     
-    public boolean hasUnbalancedBraces(String text) {
+    public boolean hasUnbalancedBraces(String initialText) {
+        String text = initialText.replaceAll("\\\\.", "_"); // Remove escaped characters.
+        text = text.replaceAll("'.'", "_"); // Remove character literals.
+        text = text.replaceAll("\"([^\\n]*?)\"", "_"); // Remove string literals.
+        text = text.replaceAll("//[^\\n]*", "_"); // Remove C++ comments.
         int braceNesting = 0;
         for (int i = 0; i < text.length(); ++i) {
             char ch = text.charAt(i);
