@@ -48,8 +48,8 @@ public class FindAction extends ETextAction implements MinibufferUser {
         initialSelectionStart = textArea.getSelectionStart();
         initialSelectionEnd = textArea.getSelectionEnd();
         String selectedText = textArea.getSelectedText();
-        if (selectedText == null || selectedText.length() == 0) {
-            return "";
+        if (selectedText.length() == 0) {
+            return currentRegularExpression;
         }
         return StringUtilities.regularExpressionFromLiteral(selectedText);
     }
