@@ -3,7 +3,6 @@ package e.gui;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.text.*;
 
 public class EMonitoredTextField extends JTextField {
     private Timer timer;

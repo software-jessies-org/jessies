@@ -1,14 +1,7 @@
 package e.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
 import java.util.*;
-import javax.swing.*;
 import javax.swing.table.*;
-
-import e.gui.*;
-import e.util.*;
 
 /**
  * Allows an ArrayList to be used as a single-column TableModel.

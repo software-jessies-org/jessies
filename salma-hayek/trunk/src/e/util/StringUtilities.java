@@ -48,7 +48,7 @@ public class StringUtilities {
     }
     
     /** Used by the escape method to pad Unicode escapes to four digits. */
-    private final static char[] ZEROES = { '0', '0', '0' };
+    private static final char[] ZEROES = { '0', '0', '0' };
     
     /** Turns a string into a printable Java string literal (minus the quotes). So a tab is converted to "\t", et cetera. */
     public static String escapeForJava(String s) {

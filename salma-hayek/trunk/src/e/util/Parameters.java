@@ -45,7 +45,12 @@ public class Parameters extends Properties {
                 processPropertiesLine(props, line);
             }
         } finally {
-            try { inStream.close(); } catch (IOException ex) { /* Ignore. */ }
+            try {
+                inStream.close();
+            } catch (IOException ex) {
+                /* Ignore. */
+                ex = ex;
+            }
         }
     }
     

@@ -6,8 +6,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
-import e.edit.*;
-
 public class ETextField extends JTextField implements DocumentListener {
     public ETextField() {
         this(null, null, 0);

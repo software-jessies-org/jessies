@@ -2,8 +2,6 @@ package e.util;
 
 import java.io.*;
 import java.nio.*;
-import java.nio.channels.*;
-import java.nio.charset.*;
 import java.util.regex.*;
 
 public class FileSearcher {

@@ -3,7 +3,6 @@ package e.util;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
-import e.util.*;
 
 /**
  * Uses aspell(1) or ispell(1) to check spelling.
@@ -20,7 +19,7 @@ public class SpellingChecker {
     private static SpellingChecker instance;
     
     /** Returns the single instance of SpellingChecker. */
-    public synchronized static SpellingChecker getSharedSpellingCheckerInstance() {
+    public static synchronized SpellingChecker getSharedSpellingCheckerInstance() {
         if (instance == null) {
             instance = new SpellingChecker();
         }
@@ -118,7 +117,7 @@ public class SpellingChecker {
         return (String[]) suggestions.toArray(new String[suggestions.size()]);
     }
     
-    public synchronized static void dumpKnownBadWordsTo(PrintStream out) {
+    public static synchronized void dumpKnownBadWordsTo(PrintStream out) {
         // Get a sorted list of the known bad words.
         Iterator it = knownBad.iterator();
         ArrayList words = new ArrayList();

@@ -1,7 +1,6 @@
 package e.util;
 
 import java.io.*;
-import java.util.*;
 import java.util.regex.*;
 
 /**
@@ -77,6 +76,7 @@ public class FileUtilities {
             in.close();
         } catch (IOException ex) {
             // This method's purpose is to ignore this exception!
+            ex = ex;
         }
     }
     

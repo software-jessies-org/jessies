@@ -2,7 +2,6 @@ package e.gui;
 
 import java.awt.*;
 import javax.swing.*;
-import java.awt.event.*;
 
 /**
 A simple label. 
@@ -46,14 +45,14 @@ public class ELabel extends JComponent {
     }
     
     public static final int MINIMUM_WIDTH = 80;
-    public static final int HEIGHT = 25;
+    public static final int PREFERRED_HEIGHT = 25;
     public Dimension getMinimumSize() {
         return getPreferredSize();
     }
     
     public Dimension getPreferredSize() {
         int width = Math.max(getWidthRequest(), MINIMUM_WIDTH);
-        return new Dimension(width, HEIGHT);
+        return new Dimension(width, PREFERRED_HEIGHT);
     }
     
     public Dimension getMaximumSize() {

@@ -1,13 +1,6 @@
 package e.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-
-import e.edit.*;
 
 public class EHistoryTextField extends JComboBox {
     private EHistoryComboBoxModel history;
