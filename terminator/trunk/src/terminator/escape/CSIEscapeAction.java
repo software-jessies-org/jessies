@@ -54,10 +54,12 @@ public class CSIEscapeAction implements TelnetAction {
 		int clearType = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		if (clearType == 0) {
 			// Clear horizontal tab at current cursor position.
-			return false;  // Change to 'true' when implemented.
+			listener.removeTabAtCursor();
+			return true;
 		} else if (clearType == 3) {
 			// Clear all horizontal tabs.
-			return false;  // Change to 'true' when implemented.
+			listener.removeAllTabs();
+			return true;
 		} else {
 			Log.warn("Unknown clear tabs type: " + clearType);
 			return false;
@@ -79,26 +81,24 @@ public class CSIEscapeAction implements TelnetAction {
 	}
 	
 	public boolean setMode(TelnetListener listener, String seq, boolean value) {
-		if (seq.startsWith("?")) {
-			String[] modes = seq.substring(1).split(";");
-			for (int i = 0; i < modes.length; i++) {
+		boolean isQuestionMode = seq.startsWith("?");
+		String[] modes = (isQuestionMode ? seq.substring(1) : seq).split(";");
+		for (int i = 0; i < modes.length; i++) {
+			int mode = Integer.parseInt(modes[i]);
+			if (isQuestionMode) {
 				switch (Integer.parseInt(modes[i])) {
 					case 25: listener.setCaretDisplay(value); break;
 					case 47: listener.useAlternativeBuffer(value); break;
 					default: Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
 				}
-			}
-			return true;
-		} else {
-			String[] modes = seq.split(";");
-			for (int i = 0; i < modes.length; i++) {
+			} else {
 				switch (Integer.parseInt(modes[i])) {
 					case 4: listener.setInsertMode(value); break;
 					default: Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
 				}
 			}
-			return true;
 		}
+		return true;
 	}
 	
 	public boolean setScrollScreen(TelnetListener listener, String seq) {

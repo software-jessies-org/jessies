@@ -22,7 +22,7 @@ Unassigned TODOs:
 
 Phil's TODOs:
 ~~~~~~~~~~
-[3]	Cope with '\t'. Remember tab stops are settable. How do we copy tabs to the clipboard, rather than spaces? (xwsh -- alone among terminals I've known -- did the right thing.)
+[3]	Change text selection so it selects only whole tabs together, not parts of tabs.
 
 
 

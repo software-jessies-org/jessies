@@ -42,7 +42,7 @@ public class SingleCharEscapeAction implements TelnetAction {
 				listener.processSpecialCharacter('\n');
 				break;
 			case 'H':  // rxvt: scr_set_tab(1)  Set a horizontal tab marker at the current cursor position.
-				unsupported("scr_set_tab(1)");
+				listener.setTabAtCursor();
 				break;
 			case 'M':  // Move cursor up one line, scrolling if it reaches the top of scroll region.  Opposite of NL.
 				listener.scrollDisplayUp();

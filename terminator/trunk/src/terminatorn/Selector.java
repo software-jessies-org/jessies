@@ -55,7 +55,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	 */
 	public void copy() {
 		if (highlight != null) {
-			setClipboard(view.getText(highlight));
+			setClipboard(view.getTabbedText(highlight));
 		}
 	}
 	
