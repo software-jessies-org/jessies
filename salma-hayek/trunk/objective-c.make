@@ -56,11 +56,22 @@ SOURCE_FILES = $(shell find `pwd`/src -type f '(' $(FIND_EXPRESSION) ')')
 OBJECT_FILES = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst %.$(EXTENSION),%.o,$(filter %.$(EXTENSION),$(SOURCE_FILES))))
 
 # ----------------------------------------------------------------------------
+# Find the header files for our conservative dependency later.
+# ----------------------------------------------------------------------------
+
+HEADER_FILES = $(shell find `pwd`/src -type f -name "*.h")
+
+# ----------------------------------------------------------------------------
 # Our targets; the executable (the default target), and "clean".
 # ----------------------------------------------------------------------------
 
 $(EXECUTABLE_NAME): $(OBJECT_FILES)
 	$(CXX) -o $(EXECUTABLE_NAME) $(LDFLAGS) $^
+
+# Rather than track dependencies properly, or have the compiler do it, we
+# conservatively assume that if a header files changes, we have to recompile
+# everything.
+$(OBJECT_FILES): $(HEADER_FILES)
 
 .PHONY: clean
 clean:
