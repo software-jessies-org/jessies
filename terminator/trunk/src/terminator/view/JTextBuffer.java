@@ -256,12 +256,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return displayCaret;
 	}
 	
-	public Color getCursorColour() {
-		if (blinkOn) {
-			return Options.getSharedInstance().getColor("cursorColor");
-		} else {
-			return Options.getSharedInstance().getColor("background");
-		}
+	public Color getCursorColor() {
+		return Options.getSharedInstance().getColor(blinkOn ? "cursorColor" : "background");
 	}
 	
 	public void blinkCursor() {
@@ -579,7 +575,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	 * character's foreground color (and having some way of doing so).
 	 */
 	private void paintCaret(Graphics graphics, FontMetrics metrics) {
-		graphics.setColor(getCursorColour());
+		graphics.setColor(getCursorColor());
 		Point top = getLineTop(caretPosition);
 		final int bottomY = top.y + metrics.getHeight() - 1;
 		if (hasFocus) {
@@ -608,7 +604,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		
 		// Sanity check for top weirdness.
 		if (style.getForeground().equals(style.getBackground())) {
-			Log.warn("Foreground and background colours are identical (text \"" + text.getText() + "\").");
+			Log.warn("Foreground and background colors are identical (text \"" + text.getText() + "\").");
 		}
 		
 		int textWidth = metrics.stringWidth(text.getText());

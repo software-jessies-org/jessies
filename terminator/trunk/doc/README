@@ -7,7 +7,7 @@ section.
 If you have problems with certain programs not working as
 expected, see the 'TermInfo Files' section.
 
-If you want to know how to customise colours, read the 'Colours'
+If you want to know how to customise colors, read the 'Colors'
 section.
 
 
@@ -54,10 +54,10 @@ directory exists in your home directory.  For more details see the
 man page for tic (execute 'man tic').
 
 
-Colours
+Colors
 ~~~~~~~
 Terminator will automatically read your ~/.Xresources and
-~/.Xdefaults files and parse them for colour definitions of the
+~/.Xdefaults files and parse them for color definitions of the
 form:
 
 XTerm*color1: red
@@ -65,26 +65,10 @@ Rxvt*color2: green
 Terminator*color3: #f0f000
 
 In this way, just running Terminator you should get the same
-colours as you've already configured for xterm or rxvt.  Colours
-are understood in all forms, including colour names.  In order to
-resolve colour names to RGB values, Terminator will also read the
+colors as you've already configured for xterm or rxvt.  Colors
+are understood in all forms, including color names.  In order to
+resolve color names to RGB values, Terminator will also read the
 file '/usr/X11R6/lib/X11/rgb.txt' if it's present.
 
-If you don't have any colours set up in your .Xresources or
+If you don't have any colors set up in your .Xresources or
 .Xdefaults file, Terminator will use some built-in defaults.
-
-If you later decide you wish to modify the colours, you can do so
-very easily within Terminator.  Simply find some text whose colour
-is not right, bring up a menu with the mouse pointer over some
-text of that colour, and one of the menu items will be called
-'Change Colour <something>...', where <something> is the name of
-the colour you've selected.  Clicking on this opens a dialog for
-you to choose the new colour.  The new colour will be saved into
-the ~/.terminator file, which overrides the colours parsed from
-the .Xresources/.Xdefaults file.
-
-If you bring up the menu over a space character, it will allow you
-to change the background colour at that point.  If you bring up
-the menu over a place where there's no text at all, you can change
-the background colour.
-
