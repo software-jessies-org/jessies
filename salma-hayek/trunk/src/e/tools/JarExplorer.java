@@ -82,10 +82,18 @@ public class JarExplorer extends JFrame {
     }
 
     private JComponent makeUi() {
+        ItemListener itemListener = new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                updateInformation();
+            }
+        };
+        
         JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         showLineNumberAndLocalVariableTables = new JCheckBox("Show Line Number Tables");
+        showLineNumberAndLocalVariableTables.addItemListener(itemListener);
         checkBoxPanel.add(showLineNumberAndLocalVariableTables);
         showVerboseDetail = new JCheckBox("Show Verbose Information");
+        showVerboseDetail.addItemListener(itemListener);
         checkBoxPanel.add(showVerboseDetail);
 
         list = new JList(model);
@@ -100,7 +108,7 @@ public class JarExplorer extends JFrame {
         list.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    handleDoubleClick((String) list.getSelectedValue());
+                    updateInformation();
                 }
             }
         });
@@ -123,7 +131,11 @@ public class JarExplorer extends JFrame {
         return textArea;
     }
 
-    private void handleDoubleClick(String entry) {
+    private void updateInformation() {
+        updateInformation((String) list.getSelectedValue());
+    }
+    
+    private void updateInformation(String entry) {
         if (entry.endsWith(".class")) {
             String className = entry.replace('/', '.');
             className = className.replaceAll("\\.class$", "");
