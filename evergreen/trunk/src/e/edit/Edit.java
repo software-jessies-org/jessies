@@ -49,52 +49,21 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     public static Advisor getAdvisor() {
         return advisor;
     }
-    
-    private static final int MAX_LINE_LENGTH = 72;
-
-    public static String breakLongMessageLines(String message) {
-        if (message.length() < MAX_LINE_LENGTH) {
-            return message;
-        }
-        StringBuffer result = new StringBuffer(message);
-        int chunkLength = 0;
-        for (int i = 0; i < result.length(); i++) {
-            if (result.charAt(i) == '\n') {
-                chunkLength = 0;
-            } else {
-                chunkLength++;
-                if (chunkLength > MAX_LINE_LENGTH && result.charAt(i) == ' ') {
-                    result.insert(i + 1, '\n');
-                }
-            }
-        }
-        return result.toString();
-    }
 
     public static void showStatus(String status) {
         statusLine.setText(status);
     }
 
     public static void showAlert(String title, String message) {
-        JOptionPane.showMessageDialog(Edit.getFrame(), breakLongMessageLines(message), title, JOptionPane.WARNING_MESSAGE);
+        SimpleDialog.showAlert(Edit.getFrame(), title, message);
     }
 
     public static boolean askQuestion(String title, String message, String continueText) {
-        Object[] options = { continueText, "Cancel" };
-        int option = JOptionPane.showOptionDialog(Edit.getFrame(), breakLongMessageLines(message), title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-        return (option == JOptionPane.YES_OPTION);
+        return SimpleDialog.askQuestion(Edit.getFrame(), title, message, continueText);
     }
 
     public static String askQuestion(String title, String message, String continueTextYes, String continueTextNo) {
-        Object[] options = { continueTextYes, continueTextNo, "Cancel" };
-        int option = JOptionPane.showOptionDialog(Edit.getFrame(), breakLongMessageLines(message), title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-        if (option == JOptionPane.YES_OPTION) {
-            return continueTextYes;
-        } else if (option == JOptionPane.NO_OPTION) {
-            return continueTextNo;
-        } else {
-            return "Cancel";
-        }
+        return SimpleDialog.askQuestion(Edit.getFrame(), title, message, continueTextYes, continueTextNo);
     }
 
     public static void showDocument(String uri) {
