@@ -22,11 +22,7 @@ public class FileUtilities {
     /**
      * Converts paths of the form ~/src to /Users/elliotth/src (or
      * whatever the user's home directory is). Also copes with the
-     * special case of ~ on its own, but not with ~someone-else/tmp
-     * because Java gives us no way to find another user's home
-     * directory. We could, I suppose, compare user.home and user.name
-     * and try to guess, but I'll wait until I really need the functionality
-     * before I add the hack.
+     * special case of ~ on its own, and with ~someone-else/tmp.
      */
     public static String parseUserFriendlyName(String filename) {
         String result = filename;
