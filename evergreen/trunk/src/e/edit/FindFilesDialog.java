@@ -155,11 +155,15 @@ public class FindFilesDialog {
                     }
                     try {
                         String candidate = (String) fileList.get(doneFileCount);
+                        File file = FileUtilities.fileFromParentAndString(root, candidate);
+                        if (FileUtilities.isTextFile(file) == false) {
+                            // FIXME: should we do the grep(1) thing of "binary file <x> matches"?
+                            continue;
+                        }
                         if (regex.length() != 0) {
                             ArrayList matches = new ArrayList();
                             int matchCount = fileSearcher.searchFile(root, candidate, matches);
                             if (matchCount > 0) {
-                                File file = FileUtilities.fileFromParentAndString(root, candidate);
                                 DefinitionFinder definitionFinder = new DefinitionFinder(file, regex);
                                 MatchingFile matchingFile = new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition);
                                 DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
