@@ -31,13 +31,16 @@ public class TelnetControl implements Runnable {
 	private InputStream in;
 	private OutputStream out;
 	
+	private LogWriter logWriter;
+	
 	// Buffer of TelnetActions to perform.
 	private ArrayList telnetActions = new ArrayList();
 	
-	public TelnetControl(TelnetListener listener, InputStream in, OutputStream out) throws IOException {
+	public TelnetControl(TelnetListener listener, String command, InputStream in, OutputStream out) throws IOException {
 		this.listener = listener;
 		this.in = in;
 		this.out = out;
+		this.logWriter = new LogWriter(command);
 	}
 	
 	/** Starts the process listening once all the user interface stuff is set up. */
@@ -136,7 +139,8 @@ public class TelnetControl implements Runnable {
 		return size - i;
 	}
 	
-	public void processChar(final char ch) {
+	public void processChar(final char ch) throws IOException {
+		logWriter.append(ch);
 		if (readingOSC) {
 			if (ch == '\\' || ch == 0x7) {
 				readingOSC = false;
