@@ -3,7 +3,7 @@ PROJECT_NAME=TerminatorN
 .PHONY: default
 default: build build.pty
 
-BINDIST_FILES += pty terminator
+BINDIST_FILES += doc pty terminator
 
 # Variables should come before the include but rules (apart from the default one)
 # should come afterwards.
