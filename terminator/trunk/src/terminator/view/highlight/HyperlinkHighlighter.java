@@ -103,7 +103,7 @@ public class HyperlinkHighlighter implements Highlighter {
 					}
 				}
 			};
-			ProcessUtilities.spawn(FileUtilities.fileFromString(directory), new String[] { "bash", "-c", command }, listener);
+			ProcessUtilities.spawn(FileUtilities.fileFromString(directory), new String[] { "bash", "--login", "-c", command }, listener);
 		}
 	}
 	
