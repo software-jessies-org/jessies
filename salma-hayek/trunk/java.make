@@ -119,32 +119,45 @@ endif
 COMPILER_TYPE = $(notdir $(JAVA_COMPILER))
 
 # ----------------------------------------------------------------------------
-# Find any necessary JAR files.
+# Find the boot classes.
+# Note: we only look for rt.jar; someday we might need to find the other jars.
 # ----------------------------------------------------------------------------
 
-# A list of likely JDK rt.jar locations.
-# Traditional Java setup:
-KNOWN_RT_JAR_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
-# Apple:
-KNOWN_RT_JAR_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
-# install-everything.sh:
-KNOWN_RT_JAR_LOCATIONS+=/usr/local/jdk1.5.0/jre/lib/rt.jar
-# Fall back to searching:
-KNOWN_RT_JAR_LOCATIONS:=$(KNOWN_RT_JAR_LOCATIONS) $(shell locate /rt.jar)
+# Traditional Java location:
+RT_JAR=$(JAVA_HOME)/jre/lib/rt.jar
+ifeq "$(wildcard $(RT_JAR))" ""
+  # Apple:
+  RT_JAR=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
+  ifeq "$(wildcard $(RT_JAR))" ""
+    # Where install-everything.sh leaves stuff:
+    RT_JAR=/usr/local/jdk1.5.0/jre/lib/rt.jar
+    ifeq "$(wildcard $(RT_JAR))" ""
+      # Fall back to searching:
+      RT_JAR=$(firstword $(shell locate /rt.jar))
+    endif
+  endif
+endif
 
-# Pick a JDK and append the MRJ141Stubs, in case they're there.
-RT_JAR=$(firstword $(wildcard $(KNOWN_RT_JAR_LOCATIONS)))
-
+# ----------------------------------------------------------------------------
+# Set up the bootclasspath.
+# ----------------------------------------------------------------------------
+BOOT_CLASS_PATH.javac = "" # Not needed
+BOOT_CLASS_PATH.jikes += $(RT_JAR)
+BOOT_CLASS_PATH.gcjx += $(RT_JAR)
 BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(COMPILER_TYPE))
+
+# ----------------------------------------------------------------------------
+# Set up the classpath.
+# ----------------------------------------------------------------------------
+CLASS_PATH += $(SALMA_HAYEK)/classes
 CLASS_PATH += $(CLASS_PATH.$(COMPILER_TYPE))
 
-BOOT_CLASS_PATH.jikes += $(RT_JAR)
-BOOT_CLASS_PATH.gcjx +=  /usr/local/j2re1.4.2_06/lib/rt.jar 
-
+# ----------------------------------------------------------------------------
+# Use Apple's MRJ141Stubs, if they're there.
+# ----------------------------------------------------------------------------
 ifneq ($(wildcard MRJ141Stubs.jar),)
     CLASS_PATH += MRJ141Stubs.jar
 endif
-CLASS_PATH += $(SALMA_HAYEK)/classes
 
 # ----------------------------------------------------------------------------
 # Sort out the flags our chosen compiler needs.
