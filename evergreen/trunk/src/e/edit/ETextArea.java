@@ -409,6 +409,29 @@ public class ETextArea extends JTextArea {
     }
     
     /**
+     * Returns the word up to but not past the caret. The intended use is
+     * working out what to offer as completions in AutoCompleteAction.
+     */
+    public String getWordUpToCaret() {
+        String word = "";
+        try {
+            int end = getCaretPosition();
+            int start = end;
+            while (start > 0) {
+                char ch = getCharAt(start - 1);
+                if (ch != '_' && Character.isLetterOrDigit(ch) == false) {
+                    break;
+                }
+                --start;
+            }
+            word = getText(start, end - start);
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+        }
+        return word;
+    }
+
+    /**
      * Overrides getSelectedText to return the empty string instead of null
      * when the selection is empty. Knowing you'll never see null is useful,
      * and the empty string is every bit as good a representation of the

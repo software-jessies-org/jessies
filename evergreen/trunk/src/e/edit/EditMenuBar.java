@@ -69,6 +69,13 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         return item;
     }
     
+    public JMenuItem makeCompletionItem(Action action) {
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_MASK);
+        JMenuItem item = new JMenuItem(action);
+        item.setAccelerator(keyStroke);
+        return item;
+    }
+    
     public JMenu makeEditMenu() {
         JMenu menu = new JMenu("Edit");
         menu.add(makeAcceleratedItem(new UndoAction(), 'Z'));
@@ -78,6 +85,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(makeAcceleratedItem(new CutAction(), 'X'));
         menu.add(makeAcceleratedItem(new CopyAction(), 'C'));
         menu.add(makeAcceleratedItem(new PasteAction(), 'V'));
+        menu.add(makeCompletionItem(new AutoCompleteAction()));
 
         menu.add(new JSeparator());
         menu.add(makeAcceleratedItem(new CorrectIndentationAction(), 'I'));

@@ -14,6 +14,16 @@ public class JavaResearcher implements WorkspaceResearcher {
     public static final Pattern NEW_PATTERN = Pattern.compile("(?x) .* \\b new \\s+ (\\S+) \\s* \\($");
     
     private static String[] javaDocSummary;
+    private static TreeSet uniqueIdentifiers;
+    
+    private static final JavaResearcher INSTANCE = new JavaResearcher();
+    
+    private JavaResearcher() {
+    }
+    
+    public static JavaResearcher getSharedInstance() {
+        return INSTANCE;
+    }
     
     private static void readJavaDocSummary() {
         long start = System.currentTimeMillis();
@@ -21,15 +31,38 @@ public class JavaResearcher implements WorkspaceResearcher {
         
         javaDocSummary = StringUtilities.readLinesFromFile(System.getProperty("env.EDIT_HOME") + java.io.File.separatorChar + "javadoc-summary.txt");
         
+        Pattern identifierPattern = Pattern.compile("^[MCF]:(\\S+?)(\\(|\t).*$");
+        uniqueIdentifiers = new TreeSet();
+        
         int classCount = 0;
         for (int i = 0; i < javaDocSummary.length; i++) {
-            if (javaDocSummary[i].startsWith("Class:")) {
+            String line = javaDocSummary[i];
+            if (line.startsWith("Class:")) {
                 classCount++;
+            } else {
+                // Is it a constructor, method or field definition?
+                Matcher matcher = identifierPattern.matcher(line);
+                if (matcher.find()) {
+                    uniqueIdentifiers.add(matcher.group(1));
+                }
             }
         }
         
         long timeTaken = System.currentTimeMillis() - start;
-        Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines) in " + timeTaken + "ms.");
+        Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + timeTaken + "ms.");
+    }
+    
+    public List listIdentifiersStartingWith(String prefix) {
+        ArrayList result = new ArrayList();
+        final int prefixLength = prefix.length();
+        Iterator it = uniqueIdentifiers.iterator();
+        while (it.hasNext()) {
+            String identifier = (String) it.next();
+            if (identifier.startsWith(prefix)) {
+                result.add(identifier);
+            }
+        }
+        return result;
     }
     
     static {
