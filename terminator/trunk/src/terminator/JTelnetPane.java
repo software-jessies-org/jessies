@@ -34,8 +34,11 @@ public class JTelnetPane extends JPanel {
 				public void run() {
 					try {
 						int status = proc.waitFor();
-						// FIXME: whether or not we invoke this should depend on 'status'.
-						closeContainingTabOrWindow();
+						if (status == 0) {
+							closeContainingTabOrWindow();
+						} else {
+							control.announceConnectionLost("[Process exited with status " + status + ".]");
+						}
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

@@ -82,14 +82,11 @@ public class TelnetControl implements Runnable {
 			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
-		} finally {
-			announceConnectionLost();
 		}
 	}
 	
-	public void announceConnectionLost() {
+	public void announceConnectionLost(String goodbye) {
 		try {
-			final String goodbye = "Connection closed by foreign host.";
 			final byte[] bytes = goodbye.getBytes();
 			processBuffer(bytes, bytes.length);
 		} catch (IOException ex) {
