@@ -29,13 +29,14 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
     private static final int TYPE_KEYWORD = 3;
     private static final int TYPE_ERROR = 4;
     
-    private static final Color[] DEFAULT_COLORS = new Color[] {
-        Color.BLACK,
-        new Color(0, 0, 1f),
-        new Color(0, 0.5f, 0),
-        new Color(0.4f, 0.2f, 0.2f),
-        new Color(0.7f, 0, 0),
-    };
+    private static final Color[] DEFAULT_COLORS = new Color[5];
+    static {
+        DEFAULT_COLORS[TYPE_NORMAL] = Color.BLACK;
+        DEFAULT_COLORS[TYPE_STRING] = Color.decode("#0000ff");
+        DEFAULT_COLORS[TYPE_COMMENT] = Color.decode("#227722");
+        DEFAULT_COLORS[TYPE_KEYWORD] = Color.decode("#770022");
+        DEFAULT_COLORS[TYPE_ERROR] = Color.decode("#ff0000");
+    }
     
     public PCLikeTextStyler(PTextArea textArea) {
         this.textArea = textArea;
