@@ -39,10 +39,6 @@ public class EWindow extends JComponent {
         titleBar.setTitle(title);
     }
     
-    public void repaintTitle() {
-        titleBar.repaint();
-    }
-    
     public boolean isDirty() {
         return false;
     }

@@ -14,7 +14,7 @@ import e.util.*;
 /**
 A text-editing component.
 */
-public class ETextWindow extends ETextComponent implements ChangeListener, DocumentListener {
+public class ETextWindow extends ETextComponent implements DocumentListener {
     protected String filename;
     protected File file;
     private long lastModifiedTime;
@@ -649,9 +649,5 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
         } catch (IOException ex) {
             Edit.showAlert("Run", "Can't start task (" + ex.getMessage() + ").");
         }
-    }
-    
-    public void stateChanged(ChangeEvent e) {
-        repaintTitle();
     }
 }
