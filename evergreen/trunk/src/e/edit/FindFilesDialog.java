@@ -29,11 +29,13 @@ public class FindFilesDialog {
         private String name;
         private int matchCount;
         private String regularExpression;
+        private boolean containsDefinition;
         
-        public MatchingFile(String name, int matchCount, String regularExpression) {
+        public MatchingFile(String name, int matchCount, String regularExpression, boolean containsDefinition) {
             this.name = name;
             this.matchCount = matchCount;
             this.regularExpression = regularExpression;
+            this.containsDefinition = containsDefinition;
         }
         
         public void open() {
@@ -49,7 +51,11 @@ public class FindFilesDialog {
             StringBuffer result = new StringBuffer(name);
             result.append(" (");
             result.append(matchCount);
-            result.append(matchCount == 1 ? " match)" : " matches)");
+            result.append(matchCount == 1 ? " match" : " matches");
+            if (containsDefinition) {
+                result.append(" including definition");
+            }
+            result.append(")");
             return result.toString();
         }
     }
@@ -94,7 +100,8 @@ public class FindFilesDialog {
                         String candidate = (String) fileList.get(i);
                         int matchCount = fileSearcher.searchFile(root, candidate);
                         if (matchCount > 0) {
-                            matchModel.addElement(new MatchingFile(candidate, matchCount, regex));
+                            DefinitionFinder definitionFinder = new DefinitionFinder(FileUtilities.fileFromParentAndString(root, candidate), regex);
+                            matchModel.addElement(new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition));
                         }
                     } catch (FileNotFoundException ex) {
                         ex = ex; // Not our problem.
@@ -122,6 +129,23 @@ public class FindFilesDialog {
                 matchList.setSelectedIndex(0);
             }
             status.setText(" ");
+        }
+    }
+    
+    public static class DefinitionFinder implements TagReader.TagListener {
+        public boolean foundDefinition = false;
+        private Pattern pattern;
+        public DefinitionFinder(File file, String regularExpression) {
+            this.pattern = Pattern.compile(regularExpression);
+            new TagReader(file, null, this);
+        }
+        public void tagFound(TagReader.Tag tag) {
+            if (pattern.matcher(tag.identifier).find()) {
+                foundDefinition = true;
+            }
+        }
+        public void taggingFailed(Exception ex) {
+            Log.warn("Failed to use tags to check for a definition.", ex);
         }
     }
     

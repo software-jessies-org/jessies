@@ -3,7 +3,6 @@ package e.edit;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
-import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
@@ -66,7 +65,7 @@ public class TagsPanel extends JPanel {
                 if (node == null) {
                     return;
                 }
-                Tag tag = (Tag) node.getUserObject();
+                TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
                 textWindow.goToLine(tag.lineNumber);
             }
         });
@@ -99,184 +98,9 @@ public class TagsPanel extends JPanel {
         setVisibleComponent(emptyPanel);
     }
     
-    public class Tag {
-        public String identifier;
-        public char type;
-        public String context;
-        public int lineNumber;
-        
-        public Tag(String identifier, int lineNumber, char type, String context) {
-            this.identifier = identifier;
-            this.lineNumber = lineNumber;
-            this.type = type;
-            this.context = context;
-        }
-        
-        public String describeVisibility() {
-            if (context.indexOf("access:public") != -1) {
-                return "+";
-            } else if (context.indexOf("access:private") != -1) {
-                return "-";
-            } else if (context.indexOf("access:protected") != -1) {
-                return "#";
-            } else {
-                return "?";
-            }
-        }
-        
-        public String describe() {
-            if (textWindow != null) {
-                if (textWindow.isJava()) {
-                    return describeJavaTag();
-                } else if (textWindow.isCPlusPlus()) {
-                    return describeCPlusPlusTag();
-                } else if (textWindow.isRuby()) {
-                    return describeRubyTag();
-                }
-            }
-            return identifier;
-        }
-        
-        public String describeRubyTag() {
-            switch (type) {
-                case 'c': return "class " + identifier;
-                case 'm': return "module " + identifier;
-                default: return identifier;
-            }
-        }
-        
-        public String describeJavaTag() {
-            switch (type) {
-                case 'c': return "class " + identifier;
-                case 'f': return identifier;
-                case 'i': return "interface " + identifier;
-                case 'm': return identifier + "()";
-                case 'p': return "package " + identifier;
-                default: return identifier;
-            }
-        }
-            
-        public String describeCPlusPlusTag() {
-            switch (type) {
-                case 'c': return "class " + identifier;
-                case 'd': return identifier + " macro";
-                case 'e': return identifier;
-                case 'f': return identifier + "()";
-                case 'g': return "enum " + identifier;
-                case 'm': return identifier;
-                case 'n': return "namespace " + identifier;
-                case 'p': return identifier + " prototype";
-                case 's': return "struct " + identifier;
-                case 't': return "typedef " + identifier;
-                case 'u': return "union " + identifier;
-                case 'v': return identifier;
-                case 'x': return "extern " + identifier;
-                default: return identifier;
-            }
-        }
-        
-        public String toString() {
-            return describe();
-        }
-    }
-    
-    private Pattern tagLinePattern = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
-    private Pattern classPattern = Pattern.compile("(?:struct|class|enum):([^\t]+).*");
     public void processTagLine(DefaultMutableTreeNode root, String line) {
-        // The format is: <identifier>\t<filename>\t<line>;"\t<tag type>[\t<context>]
-        // For example:
-        // A   headers/openssl/bn.h    257;"   m   struct:bn_blinding_st
-        // Here the tag is called "A", is in "headers/openssl/bn.h" on line 257, and
-        // is a 'm'ember of the struct called "bn_blinding_st".
-        Matcher matcher = tagLinePattern.matcher(line);
-        if (matcher.matches() == false) {
-            return;
-        }
-
-        String identifier = matcher.group(1);
-        String filename = matcher.group(2);
-        int lineNumber = Integer.parseInt(matcher.group(3));
-        char type = matcher.group(4).charAt(0);
-        String context = matcher.group(5);
-        if (context == null) {
-            context = "";
-        }
-
-        Matcher classMatcher = classPattern.matcher(context);
-        String containingClass = (classMatcher.matches() ? classMatcher.group(1) : "");
-        //Log.warn(context + " => " + containingClass);
-
-        Tag tag = new Tag(identifier, lineNumber, type, context);
-        DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
-
-        boolean isBranch = type == 'c' || type == 'g' /*enum*/ || type == 's' /*struct*/ || (textWindow.isRuby() && type == 'm' /* module */);
-        if (isBranch) {
-            branches.put(tag.toString(), leaf);
-        }
-
-        DefaultMutableTreeNode branch = (DefaultMutableTreeNode) branches.get(containingClass);
-        if (branch == null) {
-            branch = new DefaultMutableTreeNode(containingClass);
-            branches.put(containingClass, branch);
-            root.add(branch);
-        }
-
-        if (isBranch == false) {
-            branch.add(leaf);
-        }
     }
     
-    public DefaultTreeModel makeTagsFor(File file) throws InterruptedException, IOException {
-        File tagsFile = File.createTempFile("edit-tags-", ".tags");
-        tagsFile.deleteOnExit();
-        Process p = Runtime.getRuntime().exec(new String[] { "ctags", "--c++-types=+p", "-n", "--fields=+a", "-f", tagsFile.getAbsolutePath(), file.getAbsolutePath() });
-        p.waitFor();
-        DefaultTreeModel result = readTagsFile(tagsFile);
-        tagsFile.delete();
-        return result;
-    }
-    
-    public DefaultTreeModel readTagsFile(File tagsFile) {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-        DefaultTreeModel newModel = new DefaultTreeModel(root);
-        branches = new Hashtable();
-        branches.put("", root);
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(tagsFile)));
-            String line;
-            boolean foundValidHeader = false;
-            while ((line = reader.readLine()) != null && line.startsWith("!_TAG_")) {
-                foundValidHeader = true;
-                //TODO: check the tags file is sorted? of a suitable version?
-            }
-            if (foundValidHeader == false) {
-                Edit.getCurrentWorkspace().reportError("", "The tags file didn't have a valid header.");
-                return null;
-            }
-            if (line != null) {
-                do {
-                    processTagLine(root, line);
-                } while ((line = reader.readLine()) != null);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            //FIXME: this is too dangerous, but it would be nice to give some feedback!
-            Edit.getCurrentWorkspace().reportError("", "There was an error reading the tags file ("+ ex.getMessage() + ")");
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException ex) {
-                // What can we do? Nothing.
-                ex = ex;
-            }
-        }
-
-        return newModel;
-    }
-
     public void setVisibleComponent(Component c) {
         removeAll();
         add(c, BorderLayout.CENTER);
@@ -295,8 +119,14 @@ public class TagsPanel extends JPanel {
         progressBar.setIndeterminate(false);
     }
 
-    public class TagsScanner extends SwingWorker {
+    public class TagsScanner extends SwingWorker implements TagReader.TagListener {
         private long startTime;
+        private DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        private DefaultTreeModel model = new DefaultTreeModel(root);
+        private HashMap branches = new HashMap();
+        {
+            branches.put("", root);
+        }
 
         public void doScan() {
             showProgressBar();
@@ -314,8 +144,31 @@ public class TagsPanel extends JPanel {
             return suffix;
         }
 
+        public void tagFound(TagReader.Tag tag) {
+            DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
+            
+            boolean isBranch = tag.type == 'c' || tag.type == 'g' /*enum*/ || tag.type == 's' /*struct*/ || (textWindow.isRuby() && tag.type == 'm' /* module */);
+            if (isBranch) {
+                branches.put(tag.toString(), leaf);
+            }
+            
+            DefaultMutableTreeNode branch = (DefaultMutableTreeNode) branches.get(tag.containingClass);
+            if (branch == null) {
+                branch = new DefaultMutableTreeNode(tag.containingClass);
+                branches.put(tag.containingClass, branch);
+                root.add(branch);
+            }
+            
+            if (isBranch == false) {
+                branch.add(leaf);
+            }
+        }
+        
+        public void taggingFailed(Exception ex) {
+            Edit.getCurrentWorkspace().reportError("", "There was an error reading the tags (" + ex.getMessage() + ")");
+        }
+        
         public Object construct() {
-            DefaultTreeModel model = null;
             try {
                 /*
                  * It's important to use the same suffix as the original
@@ -325,7 +178,7 @@ public class TagsPanel extends JPanel {
                 File temporaryFile = File.createTempFile("edit-", getFilenameSuffix());
                 temporaryFile.deleteOnExit();
                 textWindow.writeCopyTo(temporaryFile);
-                model = makeTagsFor(temporaryFile);
+                TagReader tagReader = new TagReader(temporaryFile, textWindow.getFileType(), this);
                 temporaryFile.delete();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -334,7 +187,7 @@ public class TagsPanel extends JPanel {
         }
 
         public void finished() {
-            DefaultTreeModel model = (DefaultTreeModel) get();
+            get();
             if (model == null) {
                 Edit.getCurrentWorkspace().reportError("", "Couldn't make tags.");
             } else {

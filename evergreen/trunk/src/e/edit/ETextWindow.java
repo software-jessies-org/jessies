@@ -22,11 +22,11 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     private boolean isDirty;
     private BirdView birdView;
     
-    private static final String UNKNOWN = "Unknown";
-    private static final String C_PLUS_PLUS = "C++";
-    private static final String JAVA = "Java";
-    private static final String RUBY = "Ruby";
-    private static final String PERL = "Perl";
+    public static final String UNKNOWN = "Unknown";
+    public static final String C_PLUS_PLUS = "C++";
+    public static final String JAVA = "Java";
+    public static final String RUBY = "Ruby";
+    public static final String PERL = "Perl";
     
     private String fileType = UNKNOWN;
     
@@ -309,6 +309,15 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     
     public boolean isRuby() {
         return (fileType == RUBY);
+    }
+    
+    /**
+     * FIXME: this should be replaced with a proper system of Mode,
+     * incorporating Indenter and all the other stuff currently done
+     * by asking isRuby and isJava et cetera.
+     */
+    public String getFileType() {
+        return fileType;
     }
     
     public void addContextSpecificMenuItems(Collection items) {
