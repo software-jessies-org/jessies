@@ -201,8 +201,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             throw new RuntimeException("Edit can't edit directories, which is what '" + filename + "' is.");
         }
         
-        /* Refuse to open non-ASCII files. */
-        if (FileUtilities.isAsciiFile(FileUtilities.fileFromString(filename)) == false) {
+        /* Refuse to open non-text files. */
+        if (FileUtilities.isTextFile(FileUtilities.fileFromString(filename)) == false) {
             throw new RuntimeException("Edit is a text editor, and can't handle binary files such as '" + filename + "'. This file will not be opened.");
         }
         
