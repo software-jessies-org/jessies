@@ -167,7 +167,7 @@ public class TelnetControl implements Runnable {
 		if (inEscape) {
 			escapeBuffer.append(ch);
 			//FIXME: does anything else terminate an ANSI escape sequence?
-			if (Character.isLetter(ch) || ch == '>') {
+			if (Character.isLetter(ch) || ch == '>' || ch == '@') {
 				processEscape();
 			}
 		} else if (ch == '\n' || ch == '\r' || ch == KeyEvent.VK_BACK_SPACE) {
