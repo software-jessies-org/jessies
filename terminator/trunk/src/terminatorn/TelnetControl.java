@@ -38,9 +38,13 @@ public class TelnetControl implements Runnable {
 		this.listener = listener;
 		this.in = in;
 		this.out = out;
-		(new Thread(this, "Telnet connection listener")).start();
 	}
 	
+	/** Starts the process listening once all the user interface stuff is set up. */
+	public void start() {
+		(new Thread(this, "Telnet connection listener")).start();
+	}
+
 	private boolean localEcho = false;
 	private StringBuffer lineBuffer = new StringBuffer();
 	
