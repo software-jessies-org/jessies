@@ -232,14 +232,14 @@ public class Terminator implements Controller {
 		});
 		findField.addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent e) {
-				if (e.getKeyChar() == '\n') {
+				if (textToFindIn != null && e.getKeyChar() == '\n') {
 					find(findField.getText());
 					hideFindDialog();
 					e.consume();
 				}
 			}
 			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+				if (textToFindIn != null && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					getFindHighlighter().forgetRegularExpression(textToFindIn);
 					hideFindDialog();
 					e.consume();
@@ -257,8 +257,9 @@ public class Terminator implements Controller {
 	}
 	
 	public void showFindDialogFor(JTextBuffer text) {
-		this.textToFindIn = text;
 		hideFindDialog();
+		
+		this.textToFindIn = text;
 		
 		Point location = frame.getLocationOnScreen();
 		location.y += frame.getHeight();
@@ -275,6 +276,7 @@ public class Terminator implements Controller {
 		findField.selectAll();
 		
 		findWindow.setVisible(true);
+		findField.requestFocus();
 	}
 	
 	private void hideFindDialog() {
@@ -282,6 +284,10 @@ public class Terminator implements Controller {
 			findWindow.setVisible(false);
 			findWindow.dispose();
 			findWindow = null;
+		}
+		if (textToFindIn != null) {
+			textToFindIn.requestFocus();
+			textToFindIn = null;
 		}
 	}
 	
