@@ -90,7 +90,7 @@ public class Terminator implements Controller {
 		
 		tabbedPane = new JTabbedPane() {
 			/**
-			 * Prevents the tabs (ass opposed to their components)
+			 * Prevents the tabs (as opposed to their components)
 			 * from getting the focus.
 			 */
 			public boolean isFocusTraversable() {
