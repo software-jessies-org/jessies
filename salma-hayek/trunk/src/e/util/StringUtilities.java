@@ -129,21 +129,7 @@ public class StringUtilities {
         }
         return i;
     }
-    
-    /**
-     * Returns the length in characters of the directory prefix common
-     * to both s1 and s2. This differs from the normal prefix in that
-     * characters past a directory separator don't count. So the result
-     * for "/s/apple" and "/s/apricot" does not include the "ap" they
-     * have in common. This is intended to be used for finding out the
-     * common ancestor of files in the directory hierarchy.
-     */
-    public static int lengthOfCommonDirectoryPrefix(String s1, String s2) {
-        int result = lengthOfCommonPrefix(s1, s2);
-        result = s1.lastIndexOf(File.separator, result);
-        return result;
-    }
-    
+        
     public static String join(String[] strings, String separator) {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < strings.length; ++i) {
