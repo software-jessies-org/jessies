@@ -43,7 +43,7 @@ public class XTermEscapeAction implements TelnetAction {
 	 */
 	public void perform(TelnetListener listener) {
 		if (sequence.startsWith("2;") || sequence.startsWith("0;")) {
-			String newWindowTitle = sequence.substring(3);
+			String newWindowTitle = sequence.substring(2);
 			listener.setWindowTitle(newWindowTitle);
 		} else {
 			Log.warn("Unsupported XTerm escape sequence \"" + sequence + "\".");
