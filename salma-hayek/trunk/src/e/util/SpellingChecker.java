@@ -208,9 +208,15 @@ public class SpellingChecker {
         if (matcher.find() == false) {
             return false; // We don't understand what ispell's said, so let's not assume anything.
         }
-        String firstSuggestion = matcher.group(1).trim();
-        boolean result = firstSuggestion.equalsIgnoreCase(word);
-        return result;
+        List suggestions = new ArrayList();
+        fillCollectionWithSuggestions(response, suggestions);
+        for (Iterator i = suggestions.iterator(); i.hasNext(); ) {
+            String suggestion = (String) i.next();
+            if (suggestion.equalsIgnoreCase(word)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private String[] extractSuggestions(String response) {
