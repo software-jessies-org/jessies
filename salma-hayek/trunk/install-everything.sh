@@ -16,26 +16,24 @@ cd /usr/local/ && \
 link_in_usr_local_bin /usr/local/jdk1.5.0/bin/java
 link_in_usr_local_bin /usr/local/jdk1.5.0/bin/javac
 
+# Create a directory in /usr/local for all our stuff.
 mkdir -p /usr/local/www.jessies.org/ && \
 cd /usr/local/www.jessies.org/ || die "making install directory"
 
-# if i could remember how to write a list literal, i'd have a list of projects here...
-
-wget -N http://www.jessies.org/~enh/software/edit/edit.tgz && \
-wget -N http://www.jessies.org/~enh/software/salma-hayek/salma-hayek.tgz && \
-wget -N http://www.jessies.org/~enh/software/scm/scm.tgz && \
-wget -N http://www.jessies.org/~enh/software/terminator/terminator.tgz || die "downloading"
-
-tar zxf edit.tgz && \
-tar zxf salma-hayek.tgz && \
-tar zxf scm.tgz && \
-tar zxf terminator.tgz || die "extracting"
-
-scripts=`find * -type f -maxdepth 1 -perm +1`
-for script in $scripts
-do
-    link_in_usr_local_bin `pwd`/$script
+# Download and extract the latest nightly builds.
+PROJECTS="salma-hayek edit scm terminator"
+for PROJECT in $PROJECTS; do
+    wget -N http://www.jessies.org/~enh/software/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
+    tar zxf $PROJECT.tgz || die "extracting $PROJECT"
 done
+
+# This doesn't leave us with anything that works. Generate a
+# chunk of PATH-fiddling bash to be used with 'source'?
+#scripts=`find * -type f -maxdepth 1 -perm +1`
+#for script in $scripts
+#do
+#    link_in_usr_local_bin `pwd`/$script
+#done
 
 echo "All done!"
 exit 0
