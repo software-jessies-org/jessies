@@ -10,6 +10,7 @@ import e.util.*;
 
 import terminator.*;
 import terminator.model.*;
+import terminator.terminal.*;
 import terminator.view.highlight.*;
 
 /**
@@ -49,6 +50,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		this.controller = controller;
 		Options options = Options.getSharedInstance();
 		model = new TextBuffer(this, options.getInitialColumnCount(), options.getInitialRowCount());
+		TerminatorFrame.disableFocusTraversal(this);
 		setFont(options.getFont());
 		setForeground(options.getColor("foreground"));
 		setBackground(options.getColor("background"));
@@ -136,13 +138,20 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		}
 	}
 	
-	public void insertText(String text) {
-		for (int i = 0; i < text.length(); i++) {
-			char ch = text.charAt(i);
-			int keyCode = KeyEvent.VK_UNDEFINED;
-			KeyEvent event = new KeyEvent(this, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, keyCode, ch);
-			processKeyEvent(event);
-		}
+	private TerminalControl terminalControl;
+	
+	public void setTerminalControl(TerminalControl terminalControl) {
+		this.terminalControl = terminalControl;
+	}
+	
+	public void insertText(final String text) {
+		new Thread() {
+			public void run() {
+				for (int i = 0; i < text.length(); i++) {
+					terminalControl.sendChar(text.charAt(i));
+				}
+			}
+		}.start();
 	}
 	
 	/** Returns our visible size. */
@@ -640,16 +649,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			graphics.setFont(oldFont);
 		}
 		return textWidth;
-	}
-
-	/** Overridden so we can get real tabs, and they're not stolen by some cycling thing. */
-	public boolean isManagingFocus() {
-		return true;
-	}
-	
-	/** Overridden so we can get real tabs, and they're not stolen by some cycling thing. */
-	public boolean isFocusCycleRoot() {
-		return true;
 	}
 	
 	public void focusGained(FocusEvent event) {

@@ -127,15 +127,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		
 		JComponent oldContentPane = (JComponent) frame.getContentPane();
 		
-		tabbedPane = new JTabbedPane() {
-			/**
-			 * Prevents the tabs (as opposed to their components)
-			 * from getting the focus.
-			 */
-			public boolean isFocusTraversable() {
-				return false;
-			}
-		};
+		tabbedPane = new JTabbedPane();
 		tabbedPane.addChangeListener(new ChangeListener() {
 			/**
 			 * Ensures that when we change tab, we give focus to that terminal.
@@ -153,12 +145,18 @@ public class TerminatorFrame implements TerminalPaneMaster {
 				updateFrameTitle();
 			}
 		});
+		disableFocusTraversal(tabbedPane);
 		
 		if (oldContentPane instanceof JTerminalPane) {
 			addPaneToUI((JTerminalPane) oldContentPane);
 		}
 		
 		frame.setContentPane(tabbedPane);
+	}
+	
+	public static void disableFocusTraversal(Component c) {
+		c.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
+		c.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
 	}
 	
 	private void initTabbedTerminals() {
