@@ -218,7 +218,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
         
         /* Give up if the file doesn't exist. */
-        if (FileUtilities.fileFromString(filename).exists() == false) {
+        if (FileUtilities.exists(filename) == false) {
             throw new RuntimeException("File '" + filename + "' does not exist.");
         }
         
@@ -576,7 +576,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         int y = 0;
         int width = 800;
         int height = 730;
-        if (FileUtilities.fileFromString(filename).exists()) {
+        if (FileUtilities.exists(filename)) {
             String[] lines = StringUtilities.readLinesFromFile(filename);
             if (lines.length == 4) {
                 x = Integer.parseInt(lines[0]);
@@ -617,7 +617,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     public void openRememberedFiles() {
         Edit.showStatus("Opening remembered files...");
         final String filename = getOpenFileListPreferenceFilename();
-        if (FileUtilities.fileFromString(filename).exists() == false) {
+        if (FileUtilities.exists(filename) == false) {
             Edit.showStatus("No list of files to open");
             return; // It's not an error to not have any stored state.
         }
@@ -656,7 +656,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     public void openRememberedWorkspaces() {
         Log.warn("Opening remembered workspaces...");
         final String filename = getOpenWorkspaceListPreferenceFilename();
-        if (FileUtilities.fileFromString(filename).exists() == false) {
+        if (FileUtilities.exists(filename) == false) {
             return; // It's not an error to not have any stored state.
         }
         

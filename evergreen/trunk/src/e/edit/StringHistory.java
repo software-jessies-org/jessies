@@ -48,8 +48,10 @@ public class StringHistory {
     public void readHistoryFile() throws IOException {
         history = new ArrayList();
         try {
-            String[] lines = StringUtilities.readLinesFromFile(filename);
-            history.addAll(Arrays.asList(lines));
+            if (FileUtilities.exists(filename)) {
+                String[] lines = StringUtilities.readLinesFromFile(filename);
+                history.addAll(Arrays.asList(lines));
+            }
         } catch (Exception ex) {
             Log.warn("Error reading history '" + filename + "'.", ex);
         }
