@@ -26,6 +26,9 @@ public class TextBuffer implements TelnetListener {
 	private Location savedPosition;
 	private int savedStyle;
 	
+	// Fields used for saving and restoring the 'real' screen while the alternative buffer is in use.
+	private TextLine[] savedScreen;
+	
 	public TextBuffer(JTextBuffer view, int width, int height) {
 		this.view = view;
 		setSize(width, height);
@@ -44,6 +47,33 @@ public class TextBuffer implements TelnetListener {
 			caretPosition = savedPosition;
 			setStyle(savedStyle);
 		}
+	}
+	
+	/** Sets or unsets the use of the alternative buffer. */
+	public void useAlternativeBuffer(boolean useAlternativeBuffer) {
+		if (useAlternativeBuffer == usingAlternativeBuffer()) {
+			return;
+		}
+		if (useAlternativeBuffer) {
+			savedScreen = new TextLine[height];
+			for (int i = 0; i < height; i++) {
+				int lineIndex = getFirstDisplayLine() + i;
+				savedScreen[i] = get(lineIndex);
+				textLines.set(lineIndex, new TextLine());
+			}
+		} else {
+			for (int i = 0; i < height; i++) {
+				int lineIndex = getFirstDisplayLine() + i;
+				textLines.set(lineIndex, savedScreen[i]);
+			}
+			savedScreen = null;
+		}
+		lineIsDirty(getFirstDisplayLine());
+	}
+	
+	/** Returns true when the alternative buffer is in use. */
+	private boolean usingAlternativeBuffer() {
+		return (savedScreen != null);
 	}
 	
 	/** Returns the contents of the indexed line excluding the terminating NL. */
@@ -160,14 +190,15 @@ public class TextBuffer implements TelnetListener {
 		lineIsDirty(firstDisplayLine);
 		if (index > firstDisplayLine + lastScrollLineIndex) {
 			textLines.add(index, new TextLine());
-			if (firstScrollLineIndex == 0) {
-				caretPosition = new Location(index, caretPosition.getCharOffset());
-			} else {
-				// If the program's defined scroll bounds, newline-adding actually chucks away
+			if (usingAlternativeBuffer() || (firstScrollLineIndex > 0)) {
+				// If the program has defined scroll bounds, newline-adding actually chucks away
 				// the first scroll line, rather than just scrolling everything upwards like we normally
-				// do.  This makes vim work better.
+				// do.  This makes vim work better.  Also, if we're using the alternative buffer, we
+				// don't add anything going off the top into the history.
 				textLines.remove(firstDisplayLine + firstScrollLineIndex);
 				view.repaint();
+			} else {
+				caretPosition = new Location(index, caretPosition.getCharOffset());
 			}
 		} else {
 			caretPosition = new Location(index, caretPosition.getCharOffset());
