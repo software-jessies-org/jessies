@@ -173,15 +173,15 @@ public class TelnetControl implements Runnable {
 		}
 		if (ch == ESC) {
 			flushLineBuffer();
-			inEscape = true;
-			escapeBuffer.setLength(0);  // Old escape sequence is interrupted; we start a new one.
+			// If the old escape sequence is interrupted; we start a new one.
+			escapeParser = new EscapeParser();
 			return;
 		}
-		if (inEscape) {
-			escapeBuffer.append(ch);
-			//FIXME: does anything else terminate an ANSI escape sequence?
-			if (Character.isLetter(ch) || ch == '>' || ch == '@') {
+		if (escapeParser != null) {
+			escapeParser.addChar(ch);
+			if (escapeParser.isComplete()) {
 				processEscape();
+				escapeParser = null;
 			}
 		} else if (ch == '\n' || ch == '\r' || ch == KeyEvent.VK_BACK_SPACE) {
 			flushLineBuffer();
@@ -229,13 +229,10 @@ public class TelnetControl implements Runnable {
 
 	public static final int ESC = 0x1b;
 	
-	public boolean inEscape = false;
-	private StringBuffer escapeBuffer = new StringBuffer();
+	private EscapeParser escapeParser;
 	
 	public void processEscape() {
-		inEscape = false;
-		final String sequence = escapeBuffer.toString();
-		escapeBuffer.setLength(0);
+		final String sequence = escapeParser.toString();
 		if (sequence.startsWith("]")) {  // This one affects the stream, so we must deal with it now.
 			readingOSC = true;
 			oscBuffer = new StringBuffer(sequence);
@@ -247,22 +244,26 @@ public class TelnetControl implements Runnable {
 		doStep();
 		telnetActions.add(new TelnetAction() {
 			public void perform(TelnetListener listener) {
-				if (DEBUG) {
-					Log.warn("Escape sequence \"" + sequence + "\"");
-				}
-				if (sequence.startsWith("[")) {
-					if (processVT100BracketSequence(sequence) == false) {
+				try {
+					if (DEBUG) {
+						Log.warn("Escape sequence \"" + sequence + "\"");
+					}
+					if (sequence.startsWith("[")) {
+						if (processVT100BracketSequence(sequence) == false) {
+							Log.warn("Unknown escape sequence: \"" + sequence + "\"");
+						}
+					} else if (sequence.equals("c")) {
+						// Full reset (RIS).
+						listener.fullReset();
+					} else if (sequence.equals("D")) {
+						listener.scrollDisplayDown();
+					} else if (sequence.equals("M")) {
+						listener.scrollDisplayUp();
+					} else {
 						Log.warn("Unknown escape sequence: \"" + sequence + "\"");
 					}
-				} else if (sequence.equals("c")) {
-					// Full reset (RIS).
-					listener.fullReset();
-				} else if (sequence.equals("D")) {
-					listener.scrollDisplayDown();
-				} else if (sequence.equals("M")) {
-					listener.scrollDisplayUp();
-				} else {
-					Log.warn("Unknown escape sequence: \"" + sequence + "\"");
+				} catch (Exception ex) {
+					Log.warn("Could not process escape sequence \"" + sequence + "\"", ex);
 				}
 			}
 		});
@@ -307,6 +308,7 @@ public class TelnetControl implements Runnable {
 			case 'K': return killLineContents(midSequence);
 			case 'J': return killLines(midSequence);
 			case 'L': return insertLines(midSequence);
+			case 'M': return scrollDisplayUp(midSequence);
 			case 'P': return deleteCharacters(midSequence);
 			case 'h': return setMode(midSequence, true);
 			case 'l': return setMode(midSequence, false);
@@ -314,6 +316,14 @@ public class TelnetControl implements Runnable {
 			case 'r': return setScrollScreen(midSequence);
 			default: return false;
 		}
+	}
+	
+	public boolean scrollDisplayUp(String seq) {
+		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
+		for (int i = 0; i < count; i++) {
+			listener.scrollDisplayDown();
+		}
+		return true;
 	}
 	
 	public boolean insertLines(String seq) {
