@@ -213,9 +213,6 @@ auto-saving
     the root of a workspace: TODO and TODONE, say. Complete a task and
     (when you quit? after a fixed interval?) it moves to TODONE.
 
-    [ ] emacs has a ChangeLog command to add a ChangeLog entry. We might
-        want to offer something similar.
-
 [ ] The code for correcting indentation could be smarter. It doesn't do
     well with any of the things mentioned below.
     
