@@ -65,10 +65,6 @@ Find/Replace:
  2. Some way of marking submatch groups: the whole match is marked in red or blue, but it would be good to also see the submatches within that.
  4. Should be able to select matches/replacements, and only apply the selected ones.
 
-[ ] parse the javadoc in the background as soon as Edit starts, and hope
-    that it's ready by the time you want to use it. the delays from parsing
-    only on demand suck a little.
-
 [ ] if you want the documentation for startsWith, you have to know it's
     in String and either find "String" and double-click it or find the advisor
     text field and type "String", and then you have to navigate the
@@ -305,10 +301,6 @@ auto-saving
         x = (some & (initial << expression)) | (this() * that() +
                                                 the_other() - 1);
 
-[ ] I sometimes find myself wanting to look at a list of the files in a
-    given directory. Perhaps an "Open Directory" that opens another
-    column in the current workspace, containing an EDirectoryWindow?
-
 [ ] SCM: (BitKeeper for me, CVS for Ed)
 
     1. diff current file against repository
@@ -343,9 +335,6 @@ auto-saving
     shouldn't flush. we should get (say) 16KiB or timeout. only in these
     cases should we flush.
 
-[ ] The TELNET window should understand that people use \r to rewrite the
-    current line.
-
 [ ] Update the manual!
 
 [ ] Fix double-clicking next to a " character to be as it was before.
@@ -361,9 +350,6 @@ auto-saving
     or some-such. This is basically what Project Builder does (it has a
     directory for each type).
     
-[ ] Should Edit poll the files it's got open to see if they've been modified
-    behind our backs?
-
 [ ] Need to be able to go quickly from a #include to a header file.
 
 [ ] wily-style access to |, > and < commands?
