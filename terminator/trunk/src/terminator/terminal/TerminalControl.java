@@ -43,6 +43,8 @@ public class TerminalControl implements Runnable {
 	private int characterSet;
 	private char[] g = new char[4];
 	
+	private boolean automaticNewline;
+	
 	private LogWriter logWriter;
 	
 	// Buffer of TerminalActions to perform.
@@ -77,7 +79,16 @@ public class TerminalControl implements Runnable {
 		this.characterSet = index;
 	}
 	
+	public void setAutomaticNewline(boolean automatic) {
+		this.automaticNewline = automatic;
+	}
+	
+	public boolean isAutomaticNewline() {
+		return automaticNewline;
+	}
+	
 	public void reset() {
+		setAutomaticNewline(false);
 		invokeCharacterSet(0);
 		designateCharacterSet(0, 'B');
 		designateCharacterSet(1, '0');
