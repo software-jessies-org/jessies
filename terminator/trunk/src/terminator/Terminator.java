@@ -41,7 +41,7 @@ public class Terminator {
 	private void parseCommandLine(final String[] argumentArray) throws IOException {
 		arguments = Options.getSharedInstance().parseCommandLine(argumentArray);
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
-			showUsage(System.err);
+			showUsage(System.out);
 		}
 		if (arguments.contains("-v") || arguments.contains("-version") || arguments.contains("--version")) {
 			showVersion();
