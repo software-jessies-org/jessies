@@ -48,8 +48,7 @@ public class FilenameChooserField extends JPanel implements ActionListener {
     }
     
     private JButton makeButton() {
-        boolean onMacOs = (System.getProperty("os.name").indexOf("Mac") == -1);
-        String label = onMacOs ? "Choose..." : "Browse...";
+        String label = GuiUtilities.isMacOs() ? "Choose..." : "Browse...";
         JButton result = new JButton(label);
         result.addActionListener(this);
         return result;
