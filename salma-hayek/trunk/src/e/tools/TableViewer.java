@@ -28,8 +28,11 @@ public class TableViewer extends JFrame {
         table = new JTable();
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         DefaultTableModel model = (DefaultTableModel) table.getModel();
-        File file = FileUtilities.fileFromString(filename);
-        LineNumberReader in = new LineNumberReader(new InputStreamReader(new FileInputStream(file)));
+        InputStream inputStream = System.in;
+        if (filename.equals("-") == false) {
+            inputStream = new FileInputStream(FileUtilities.fileFromString(filename));
+        }
+        LineNumberReader in = new LineNumberReader(new InputStreamReader(inputStream));
         String line;
         while ((line = in.readLine()) != null) {
             String[] fields = line.split("\t");
