@@ -203,8 +203,9 @@ public class ECaret extends DefaultCaret {
         }
         
         // Select from the start to the end of the current word...
-        setDot(WordAction.getWordStart((ETextArea) text, offset));
-        moveDot(WordAction.getWordEnd((ETextArea) text, offset));
+        ETextArea textArea = (ETextArea) text;
+        setDot(WordAction.getWordStart(textArea.charSequence(), offset, textArea.getWordSelectionStopChars()));
+        moveDot(WordAction.getWordEnd(textArea.charSequence(), offset, textArea.getWordSelectionStopChars()));
     }
     
     /** Invokes appropriate selection methods for multiple presses. */

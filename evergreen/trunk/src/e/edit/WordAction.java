@@ -14,7 +14,7 @@ public abstract class WordAction extends TextAction {
     }
     
     /** Returns the offset the subclass wants the caret (or selection) to be moved to. */
-    public abstract int getNewOffset(ETextArea text, int offset);
+    public abstract int getNewOffset(CharSequence text, int offset, String stopChars);
     
     /** The operation to perform when this action is triggered. */
     public void actionPerformed(ActionEvent e) {
@@ -23,9 +23,10 @@ public abstract class WordAction extends TextAction {
             return;
         }
         
-        ETextArea text = (ETextArea) target;
+        CharSequence text = ((ETextArea) target).charSequence();
+        String stopChars = ((ETextArea) target).getWordSelectionStopChars();
         int offset = target.getCaretPosition();
-        int newOffset = getNewOffset(text, offset);
+        int newOffset = getNewOffset(text, offset, stopChars);
         if (select) {
             target.moveCaretPosition(newOffset);
         } else {
@@ -36,28 +37,28 @@ public abstract class WordAction extends TextAction {
     private static final String WHITESPACE = " \t";
     
     /** Returns the start of the word at 'offset'. */
-    public static final int getWordStart(ETextArea text, int offset) {
-        return scanBackwards(text, offset, text.getWordSelectionStopChars(), false);
+    public static final int getWordStart(CharSequence text, int offset, String stopChars) {
+        return scanBackwards(text, offset, stopChars, false);
     }
     
     /** Returns the end of the word at 'offset'. */
-    public static final int getWordEnd(ETextArea text, int offset) {
-        return scanForwards(text, offset, text.getWordSelectionStopChars(), false);
+    public static final int getWordEnd(CharSequence text, int offset, String stopChars) {
+        return scanForwards(text, offset, stopChars, false);
     }
     
     /** Returns the start of the whitespace at 'offset'. */
-    public static final int getWhitespaceStart(ETextArea text, int offset) {
+    public static final int getWhitespaceStart(CharSequence text, int offset) {
         return scanBackwards(text, offset, WHITESPACE, true);
     }
     
     /** Returns the start of the non-word at 'offset'. */
-    public static final int getNonWordStart(ETextArea text, int offset) {
-        return scanBackwards(text, offset, text.getWordSelectionStopChars(), true);
+    public static final int getNonWordStart(CharSequence text, int offset, String stopChars) {
+        return scanBackwards(text, offset, stopChars, true);
     }
     
     /** Returns the end of the non-word at 'offset'. */
-    public static final int getNonWordEnd(ETextArea text, int offset) {
-        return scanForwards(text, offset, text.getWordSelectionStopChars(), true);
+    public static final int getNonWordEnd(CharSequence text, int offset, String stopChars) {
+        return scanForwards(text, offset, stopChars, true);
     }
     
     private static final boolean charIsFoundIn(char c, String s) {
@@ -65,43 +66,30 @@ public abstract class WordAction extends TextAction {
     }
     
     /** Tests whether the given offset is in a word in 'text'. */
-    public static final boolean isInWord(ETextArea text, int offset) {
-        return (isIn(text, offset, text.getWordSelectionStopChars()) == false);
+    public static final boolean isInWord(CharSequence text, int offset, String stopChars) {
+        return (isIn(text, offset, stopChars) == false);
     }
     
     /** Tests whether the given offset is in whitespace in 'text'. */
-    public static final boolean isInWhitespace(ETextArea text, int offset) {
+    public static final boolean isInWhitespace(CharSequence text, int offset) {
         return isIn(text, offset, WHITESPACE);
     }
     
-    private static final boolean isIn(ETextArea text, int offset, String characters) {
-        try {
-            return charIsFoundIn(text.getCharAt(offset), characters);
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
-            return false;
-        }
+    private static final boolean isIn(CharSequence text, int offset, String characters) {
+        return charIsFoundIn(text.charAt(offset), characters);
     }
     
-    private static final int scanBackwards(ETextArea text, int offset, String set, boolean shouldBeInSet) {
-        try {
-            while (offset > 0 && charIsFoundIn(text.getCharAt(offset - 1), set) == shouldBeInSet) {
-                offset--;
-            }
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
+    private static final int scanBackwards(CharSequence text, int offset, String set, boolean shouldBeInSet) {
+        while (offset > 0 && charIsFoundIn(text.charAt(offset - 1), set) == shouldBeInSet) {
+            offset--;
         }
         return offset;
     }
     
-    private static final int scanForwards(ETextArea text, int offset, String set, boolean shouldBeInSet) {
-        try {
-            int lastOffset = text.getDocument().getLength();
-            while (offset < lastOffset && charIsFoundIn(text.getCharAt(offset), set) == shouldBeInSet) {
-                offset++;
-            }
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
+    private static final int scanForwards(CharSequence text, int offset, String set, boolean shouldBeInSet) {
+        int lastOffset = text.length();
+        while (offset < lastOffset && charIsFoundIn(text.charAt(offset), set) == shouldBeInSet) {
+            offset++;
         }
         return offset;
     }
