@@ -127,6 +127,13 @@ public class Workspace extends JPanel {
         return result;
     }
     
+    /**
+     * Returns the number of indexed files for this workspace.
+     */
+    public int getIndexedFileCount() {
+        return fileList.size();
+    }
+    
     public JComponent makeUI() {
         leftColumn.addComponent(errors);
         registerTextComponent(errors.getText());
