@@ -19,12 +19,13 @@ public class FilteredListModel extends AbstractListModel {
      * Sets a new filter substring. Items in the underlying model that
      * don't contain the given substring will disappear. Set to "" if you
      * want to cancel the filtering (since every string contains the empty
-     * string).
+     * string). String comparison is done case-insensitively.
      */
-    public void setFilter(String filter) {
+    public void setFilter(final String filter) {
+        String substring = filter.toLowerCase();
         validIndexes = new ArrayList();
         for (int i = 0; i < model.getSize(); ++i) {
-            String entry = model.getElementAt(i).toString();
+            String entry = model.getElementAt(i).toString().toLowerCase();
             if (entry.indexOf(filter) != -1) {
                 validIndexes.add(new Integer(i));
             }
