@@ -36,4 +36,28 @@ public class ETree extends JTree {
             collapsePath(parent);
         }
     }
+    
+    /**
+     * Selects the nodes matching the given string. The matching is
+     * a case-insensitive substring match. The selection is not cleared
+     * first; you must do this yourself.
+     */
+    public void selectNodesMatching(String string) {
+        TreePath path = new TreePath(getModel().getRoot());
+        selectNodesMatching(path, string.toLowerCase());
+    }
+    
+    private void selectNodesMatching(TreePath parent, String string) {
+        TreeNode node = (TreeNode) parent.getLastPathComponent();
+        if (node.getChildCount() >= 0) {
+            for (Enumeration e = node.children(); e.hasMoreElements(); ) {
+                TreeNode n = (TreeNode) e.nextElement();
+                TreePath path = parent.pathByAddingChild(n);
+                selectNodesMatching(path, string);
+            }
+        }
+        if (node.toString().toLowerCase().indexOf(string) != -1) {
+            addSelectionPath(parent);
+        }
+    }
 }
