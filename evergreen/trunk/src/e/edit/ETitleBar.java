@@ -126,7 +126,29 @@ public class ETitleBar extends JComponent implements MouseListener, MouseMotionL
         repaint();
     }
     
+    /**
+     * Paints a reasonable title bar background for Mac OS. Although you might
+     * expect that this gives exactly the result you see with JInternalFrame,
+     * it doesn't. As of 1.4.2, Apple invoke apple.laf.AquaImageFactory's
+     * drawFrameTitleBackground method rather than using these colors. We
+     * could use reflection to do the same, but that seems unnecessarily
+     * fragile.
+     */
+    private void paintMacOsBackground(Graphics2D g) {
+        if (isActive) {
+            g.setColor(UIManager.getColor("InternalFrame.activeTitleBackground"));
+        } else {
+            g.setColor(UIManager.getColor("InternalFrame.inactiveTitleBackground"));
+        }
+        g.fillRect(0, 0, getWidth(), getHeight());
+    }
+    
     public void paintBackground(Graphics2D g) {
+        if (GuiUtilities.isMacOs()) {
+            paintMacOsBackground(g);
+            return;
+        }
+        
         Color leftColor;
         Color rightColor;
         if (isActive) {
@@ -147,7 +169,7 @@ public class ETitleBar extends JComponent implements MouseListener, MouseMotionL
         }
         
         if (isActive == false) {
-            if (UIManager.getLookAndFeel().getName().indexOf("GTK") != -1 || GuiUtilities.isMacOs()) {
+            if (UIManager.getLookAndFeel().getName().indexOf("GTK") != -1) {
                 rightColor = rightColor.brighter();
                 leftColor = leftColor.brighter();
             }
