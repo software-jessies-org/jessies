@@ -245,7 +245,7 @@ public class Options {
 		addDefault(BLOCK_CURSOR, "false", "Use a block cursor instead of an underline?");
 		addDefault(CURSOR_BLINK, "true", "Blink the cursor?");
 		addDefault(ERROR_EXIT_HOLDING, "true", "Keep the window open if the child exits with an error status?");
-		addDefault(FONT_NAME, GuiUtilities.isMacOs() ? "Monaco" : "Monospaced", "The name of the font to use (not an X11 font)");
+		addDefault(FONT_NAME, GuiUtilities.getMonospacedFontName(), "The name of the font to use (not an X11 font)");
 		addDefault(FONT_SIZE, "12", "The size of text, in points");
 		addDefault(INITIAL_COLUMN_COUNT, "80", "The number of columns in a new terminal");
 		addDefault(INITIAL_ROW_COUNT, "24", "The number of rows in a new terminal");
