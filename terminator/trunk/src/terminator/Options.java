@@ -237,26 +237,31 @@ public class Options {
 	 * blue, magenta, cyan, and white).
 	 */
 	private void initDefaultColors() {
-		options.put("color0", "black");
-		options.put("color1", "red3");
-		options.put("color2", "green3");
-		options.put("color3", "yellow3");
-		options.put("color4", "blue3");
-		options.put("color5", "magenta3");
-		options.put("color6", "cyan3");
-		options.put("color7", "gray90");
+		options.put("color0", "#000000"); // black
+		options.put("color1", "#cd0000"); // red3
+		options.put("color2", "#00cd00"); // green3
+		options.put("color3", "#cdcd00"); // yellow3
+		options.put("color4", "#0000cd"); // blue3
+		options.put("color5", "#cd00cd"); // magenta3
+		options.put("color6", "#00cdcd"); // cyan3
+		options.put("color7", "#e5e5e5"); // grey90
 		
-		options.put("color8", "gray30");
-		options.put("color9", "red");
-		options.put("color10", "green");
-		options.put("color11", "yellow");
-		options.put("color12", "blue");
-		options.put("color13", "magenta");
-		options.put("color14", "cyan");
-		options.put("color15", "white");
+		options.put("color8", "#4d4d4d"); // gray30
+		options.put("color9", "#ff0000"); // red
+		options.put("color10", "#00ff00"); // green
+		options.put("color11", "#ffff00"); // yellow
+		options.put("color12", "#0000ff"); // blue
+		options.put("color13", "#ff00ff"); // magenta
+		options.put("color14", "#00ffff"); // cyan
+		options.put("color15", "#ffffff"); // white
 		
-		options.put("cursorColor", "green");
-		options.put("linkColor", "blue");
+		// Defaults reminiscent of SGI's xwsh(1).
+		options.put("background", "#000045"); // dark blue
+		options.put("colorBD", "#ffffff"); // white
+		options.put("cursorColor", "#00ff00"); // green
+		options.put("foreground", "#e7e7e7"); // off-white
+		options.put("linkColor", "#00ffff"); // cyan
+		options.put("selectionColor", "#1c2bff"); // light blue
 	}
 	
 	/**
