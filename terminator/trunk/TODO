@@ -69,3 +69,9 @@ Should allow the user to specify a log filename per tab, on the command line.
   and rxvt aren't, but it doesn't work as well in situations they're good at:
   numbers in situations such as "offset=1234,length=5678". No-one does IP
   addresses well, that I've seen.
+
+* "whiptail --yesno food 5 18" still isn't right in Terminator. We've got the
+  foreground and background colors the wrong way round relative to xterm (and
+  if you look at the two, it's obvious xterm is right), we have a pixel's gap
+  between lines (which may not be our fault so much as the font's), and we've
+  cleared the non-default background color to the right of the box.
