@@ -70,7 +70,9 @@ main(int argc, char *argv[])
     else if (pid == 0) {        /* child */
         if (noecho)
             set_noecho(STDIN_FILENO);    /* stdin is slave pty */
-            putenv("TERM=xterm-color");
+/*            putenv("TERM=xterm-color");*/
+            putenv("TERM=xterm-nam");
+
         if (execvp(argv[optind], &argv[optind]) < 0)
             err_sys("can't execute: %s", argv[optind]);
     }

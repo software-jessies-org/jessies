@@ -414,8 +414,10 @@ public class TextBuffer implements TelnetListener {
 	public void processLine(String line) {
 		TextLine textLine = get(caretPosition.getLineIndex());
 		if (insertMode) {
+//			Log.warn("Inserting text \"" + line + "\" at " + caretPosition + ".");
 			textLine.insertTextAt(caretPosition.getCharOffset(), line, currentStyle);
 		} else {
+//			Log.warn("Writing text \"" + line + "\" at " + caretPosition + ".");
 			textLine.writeTextAt(caretPosition.getCharOffset(), line, currentStyle);
 		}
 		textAdded(line.length());
@@ -438,9 +440,17 @@ public class TextBuffer implements TelnetListener {
 
 	public void processSpecialCharacter(char ch) {
 		switch (ch) {
-			case '\r': caretPosition = new Location(caretPosition.getLineIndex(), 0); return;
-			case '\n': moveToLine(caretPosition.getLineIndex() + 1); return;
-			case '\t': insertTab(); return;
+			case '\r':
+//				Log.warn("Got <CR>.");
+				caretPosition = new Location(caretPosition.getLineIndex(), 0);
+				return;
+			case '\n':
+//				Log.warn("Got <LF>.");
+				moveToLine(caretPosition.getLineIndex() + 1);
+				return;
+			case '\t':
+				insertTab();
+				return;
 			case KeyEvent.VK_BACK_SPACE: moveCursorHorizontally(-1); return;
 			default: Log.warn("Unsupported special character: " + ((int) ch));
 		}
@@ -529,6 +539,7 @@ public class TextBuffer implements TelnetListener {
 	
 	/** Moves the cursor vertically by the number of characters in yDiff, negative for up, positive for down. */
 	public void moveCursorVertically(int yDiff) {
+//		Log.warn("Moving cursor vertically by " + yDiff + " from " + caretPosition + ".");
 		caretPosition = new Location(caretPosition.getLineIndex() + yDiff, caretPosition.getCharOffset());
 	}
 

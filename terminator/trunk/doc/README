@@ -1,5 +1,15 @@
 README file for Terminator.
 
+
+If you don't see any hyperlinks, read the 'Properties Files'
+section.
+
+If you have problems with certain programs not working as
+expected, see the 'TermInfo Files' section.
+
+
+Properties Files
+~~~~~~~~~~~~~~~~
 In the sub-directory 'props-examples' there are some examples of
 '.terminator' properties files.  The names should give you some
 clues as to which one might be right for you.  Simply copy one of
@@ -15,4 +25,28 @@ modifying it as you see fit.  You'll need to know some regexp to
 do this.  The regexp used is that built into the Java runtime
 libraries (as of version 1.4), and is almost identical to the
 syntax used in Perl regexp.
+
+
+TermInfo Files
+~~~~~~~~~~~~~~
+In the sub-directory 'terminfo' live two files, named xterm-nam
+and xterm-nam.tic.  The first of these is a compiled terminfo
+file, and the second is an uncompiled terminfo description file.
+
+In order for Terminator to function properly on a system, that
+system needs to have a proper terminfo description for
+'xterm-nam'.  This is basically like that for 'xterm-color',
+except that automatic line wrapping is disabled.  In order to use
+this, either ask your sysadmin to add the 'xterm-nam' terminfo
+file to the host system, or place it in your home directory.  In
+the latter case, the file must be placed in
+'~/.terminfo/x/xterm-nam'.
+
+You may also play around with the 'xterm-nam.tic' file provided if
+you wish, in which case you must run the command 'tic
+xterm-nam.tic'.  This will create a compiled terminfo file which
+will either be placed in /usr/share/terminfo, or in ~/.terminfo/,
+depending upon whether your root, and whether a .terminfo
+directory exists in your home directory.  For more details see the
+man page for tic (execute 'man tic').
 
