@@ -58,21 +58,16 @@ int ptym_open(std::string& pts_name) {
 #endif
 
 int ptys_open(int fdm, const char* pts_name) {
-    struct group* grptr;
-    int gid, fds;
-
-    if ( (grptr = getgrnam("tty")) != NULL)
-        gid = grptr->gr_gid;
-    else
-        gid = -1;        /* group tty is not in the group file */
-
-            /* following two functions don't work unless we're root */
+    struct group* grptr = getgrnam("tty");
+    gid_t gid = (grptr != NULL) ? grptr->gr_gid : gid_t(-1);
+    
     chown(pts_name, getuid(), gid);
     chmod(pts_name, S_IRUSR | S_IWUSR | S_IWGRP);
-
-    if ( (fds = open(pts_name, O_RDWR)) < 0) {
+    
+    int fds = open(pts_name, O_RDWR);
+    if (fds < 0) {
         close(fdm);
-        return(-1);
+        return -1;
     }
-    return(fds);
+    return fds;
 }

@@ -21,35 +21,20 @@
 #define SIZE_STRUCT_SIZE 10  /* 2 (escapeSequenceLength) + 4 * sizeof(unsigned short). */
 #define SIZE_ESCAPE 0    /* Magic character used to escape size change notifications */
 
-typedef void Sigfunc(int); /* for signal handlers */
-
-     /* 4.3BSD Reno <signal.h> doesn't define SIG_ERR */
-#if defined(SIG_IGN) && !defined(SIG_ERR)
-#define SIG_ERR ((Sigfunc *)-1)
-#endif
-
-Sigfunc *signal_intr(int, Sigfunc *);/* {Prog signal_intr_function} */
-
-int tty_cbreak(int);
-int tty_raw(int);
-int tty_reset(int);
-void tty_atexit(void);
-#ifdef ECHO
-struct termios *tty_termios(void);
-#endif
-
 int ptym_open(std::string&);
 int ptys_open(int, const char *);
-#ifdef TIOCGWINSZ
-pid_t pty_fork(int *, char *, const struct termios *, const struct winsize *);
-#endif
+pid_t pty_fork(int*);
 
 inline void panic(const char* reason, const char* parameter = 0) {
-    std::cerr << reason;
+    std::ostream& os(std::cerr);
+    os << reason;
     if (parameter != 0) {
-        std::cerr << " '" << parameter << "'";
+        os << " '" << parameter << "'";
     }
-    std::cerr << ": " << strerror(errno) << std::endl;;
+    if (errno != 0) {
+        os << ": " << strerror(errno);
+    }
+    os << std::endl;
     exit(1);
 }
 

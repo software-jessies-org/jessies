@@ -1,6 +1,8 @@
-#include    "pty.h"
+#include "pty.h"
 
-Sigfunc * signal_intr(int signo, Sigfunc *func) {
+typedef void SignalHandler(int);
+
+SignalHandler* signal_intr(int signo, SignalHandler* func) {
     struct sigaction act, oact;
     act.sa_handler = func;
     sigemptyset(&act.sa_mask);
@@ -48,7 +50,7 @@ unsigned short readUnsignedShort(char *buf) {
     return result;
 }
 
-void loop(int ptym, int ignoreeof)
+void loop(int ptym)
 {
     static const size_t BUFFER_SIZE = 32 * 1024;
     char buff[BUFFER_SIZE];
@@ -110,10 +112,7 @@ void loop(int ptym, int ignoreeof)
             }
         }
 
-            /* We always terminate when we encounter an EOF on stdin,
-               but we only notify the parent if ignoreeof is 0. */
-        if (ignoreeof == 0)
-            kill(getppid(), SIGTERM);    /* notify parent */
+        kill(getppid(), SIGTERM);    /* notify parent */
         exit(4);    /* and terminate; child can't return */
     }
 
