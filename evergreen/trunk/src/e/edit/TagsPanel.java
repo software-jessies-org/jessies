@@ -1,13 +1,11 @@
 package e.edit;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.table.*;
 import javax.swing.tree.*;
 
 import e.gui.*;
@@ -259,7 +257,8 @@ public class TagsPanel extends JPanel {
                     reader.close();
                 }
             } catch (IOException ex) {
-                // Fuck it dude, let's go bowlin'...
+                // What can we do? Nothing.
+                ex = ex;
             }
         }
 

@@ -2,10 +2,7 @@ package e.gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.font.*;
 import javax.swing.*;
-
-import e.util.*;
 
 public abstract class EDialog extends JDialog {
     private ActionListener listener;

@@ -1,11 +1,6 @@
 package e.edit;
 
-import java.awt.*;
 import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
 
 /**
 An action that ensures that the selection is visible.

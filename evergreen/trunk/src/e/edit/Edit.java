@@ -1,14 +1,8 @@
 package e.edit;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.dnd.*;
 import java.awt.event.*;
 import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
-import java.util.*;
-import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -264,6 +258,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             filename = FileUtilities.fileFromString(filename).getAbsolutePath();
         } catch (IOException ex) {
             /* harmless. */
+            ex = ex;
         }
         
         /* Find which workspace this file is on/should be on, and make it visible. */

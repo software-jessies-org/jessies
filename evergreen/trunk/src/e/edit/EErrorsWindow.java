@@ -4,10 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.text.*;
 import e.gui.*;
-import e.util.*;
 
 public class EErrorsWindow extends EWindow implements LinkListener {
     private JTextPane text;
@@ -68,6 +66,7 @@ public class EErrorsWindow extends EWindow implements LinkListener {
             linkFormatter.autoScroll();
         } catch (BadLocationException ex) {
             // Can't happen.
+            ex.printStackTrace();
         }
     }
     

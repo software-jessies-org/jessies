@@ -1,8 +1,6 @@
 package e.edit;
 
-import java.awt.event.*;
 import java.util.*;
-import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
@@ -271,7 +269,7 @@ public class DocumentUndoFilter {
         /**
          * Undo the edit that was made.
          */
-        public void undo() throws CannotUndoException {
+        public void undo() /*throws CannotUndoException*/ {
             boolean wasUndoing = isUndoing;
 
             super.undo();
@@ -294,7 +292,7 @@ public class DocumentUndoFilter {
         /**
          * Re-apply the edit, assuming that it has been undone.
          */
-        public void redo() throws CannotRedoException {
+        public void redo() /*throws CannotRedoException*/ {
             boolean wasUndoing = isUndoing;
 
             super.redo();

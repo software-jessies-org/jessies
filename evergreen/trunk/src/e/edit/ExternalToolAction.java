@@ -1,16 +1,10 @@
 package e.edit;
 
-
-import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
 
 import e.forms.*;
-import e.gui.*;
-import e.util.*;
 
 public class ExternalToolAction extends ETextAction {
     private String commandPattern;

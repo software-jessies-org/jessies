@@ -1,9 +1,7 @@
 package e.edit;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
-import javax.swing.text.html.*;
 import e.util.*;
 
 /**

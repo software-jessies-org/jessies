@@ -6,7 +6,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.text.*;
 import e.gui.*;
 import e.util.*;

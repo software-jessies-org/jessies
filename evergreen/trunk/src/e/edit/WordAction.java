@@ -1,7 +1,6 @@
 package e.edit;
 
 import java.awt.event.*;
-import javax.swing.*;
 import javax.swing.text.*;
 
 public abstract class WordAction extends TextAction {
