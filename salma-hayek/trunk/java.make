@@ -7,6 +7,7 @@
 # Your calling Makefile:
 #   must define PROJECT_NAME
 #   may append to BINDIST_FILES
+#   may append to SUBDIRS
 #   must include ../salma-hayek/java.make
 
 # Where are we?
@@ -82,7 +83,7 @@ FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE
 # rules below
 
 .PHONY: build
-build: $(SOURCE_FILES)
+build: $(SOURCE_FILES) build.subdirs
 	@echo Recompiling the world... && \
 	 make clean && \
 	 mkdir -p classes && \
@@ -115,6 +116,10 @@ bindist: $(PROJECT_NAME)-bindist.tgz
 
 $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
 	@cd .. && tar -zcf $(addprefix $(DIRECTORY_NAME)/,$@ $(FILTERED_BINDIST_FILES))
+
+.PHONY: build.subdirs
+build.subdirs:
+	@$(foreach SUBDIR,$(SUBDIRS),$(MAKE) -C $(SUBDIR);)
 
 .PHONY: echo.%
 echo.%:
