@@ -7,8 +7,6 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
-[5]	Override TERM environment variable to help ensure that our children have an accurate idea of our capabilities (and so we only have one major target to support)?
-[5]     Make sure we can get the exit status of our child (and that pty's exit status corresponds to *its* child), so we can behave like Mac OS X and automatically close the window if the child exits successfully but hold it (and say why) if not.
 [5] Implement ESC[4h - insert mode (ESC[4l resets back to the usual replace mode).
 [5]	Implement 'mode 1'.
 [3]	Implement 'mode 47' - alternate buffer support.
@@ -16,7 +14,6 @@ Unassigned TODOs:
 [3]	Add ssh support.
 [1]	Fix double-click selection so it selects a word (maybe bracket-matching aswell).
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
-[1]	Pass '-i' to shell. bash doesn't seem to correctly recognize that it should be interactive otherwise. [I think I was confused when I wrote this, and don't think this is relevant.]
 [1]	Fix scrolling with the scroll bar arrows and mouse wheel. elliotth fixed it once (implementing Scrollable in JTelnetPane), but we've broken it again somewhere along the line.
 
 
