@@ -37,7 +37,8 @@ public class CSIEscapeAction implements TerminalAction {
 			case 'C': return moveCursor(listener, midSequence, 1, 0);
 			case 'c': return deviceAttributesRequest(listener, midSequence);
 			case 'D': return moveCursor(listener, midSequence, -1, 0);
-			case 'G': return moveCursorColumnTo(listener, midSequence);
+			case 'd': return moveCursorRowTo(listener, midSequence);
+			case 'G': case '`': return moveCursorColumnTo(listener, midSequence);
 			case 'f': case 'H': return moveCursorTo(listener, midSequence);
 			case 'K': return killLineContents(listener, midSequence);
 			case 'J': return killLines(listener, midSequence);
@@ -142,6 +143,11 @@ public class CSIEscapeAction implements TerminalAction {
 		boolean fromTop = (type >= 1);
 		boolean toBottom = (type != 1);
 		listener.killVertically(fromTop, toBottom);
+		return true;
+	}
+	
+	public boolean moveCursorRowTo(TerminalListener listener, String seq) {
+		listener.setCursorPosition(-1, Integer.parseInt(seq));
 		return true;
 	}
 	
