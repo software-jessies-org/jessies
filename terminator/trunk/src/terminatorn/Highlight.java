@@ -45,11 +45,11 @@ public class Highlight {
 	public StyleMutator getStyleMutator() {
 		return style;
 	}
-	
+
 	public Cursor getCursor() {
 		return cursor;
 	}
-	
+
 	/**
 	* Returns a modified set of styled text regions based upon the set passed in, which are
 	* at the given location.  The returned array will be at least as long as the given array.
@@ -79,6 +79,32 @@ public class Highlight {
 			}
 			offset += unlitText.length();
 		}
+		
+		// If the highlight extends past the end of this line, we highlight up to the RHS
+		// of the screen.  Used for multi-line selections.
+		if (end.getLineIndex() > unlitStart.getLineIndex()) {
+			// If we're on an empty line, we need to add a zero-length entry to hold the
+			// style to be propagated to the RHS.  Also, if the highlight starts after the end
+			// of the visible text, we need to do the same.
+			if ((result.size() == 0) || highlightStartsAtEndOfLine(unlit, unlitStart)) {
+				StyledText empty = new StyledText("", (byte) StyledText.getDefaultStyle());
+				result.add(new StyledText("", style.mutate(empty.getStyle())));
+			}
+			((StyledText) result.get(result.size() - 1)).setContinueToEnd(true);
+		}
+		
 		return (StyledText[]) result.toArray(new StyledText[result.size()]);
+	}
+	
+	/** Returns true if the highlight's first character is just after the end of the line. */
+	private boolean highlightStartsAtEndOfLine(StyledText[] unlit, Location unlitStart) {
+		if (start.getLineIndex() < unlitStart.getLineIndex()) {
+			return false;
+		}
+		int totalLength = 0;
+		for (int i = 0; i < unlit.length; i++) {
+			totalLength += unlit[i].getText().length();
+		}
+		return (start.getCharOffset() == totalLength);
 	}
 }
