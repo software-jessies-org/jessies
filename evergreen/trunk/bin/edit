@@ -29,7 +29,7 @@ def openFileOnEditServer(edit_preferences_directory, filename)
     host = 'localhost'
   end
   begin
-    port = IO.read("#{edit_preferences_directory}/edit-server-port")
+    port = File.new("#{edit_preferences_directory}/edit-server-port").read()
     require 'net/telnet'
     telnet = Net::Telnet.new('Host' => host, 'Port' => port.to_i(), 'Telnetmode' => false)
     telnet.puts("open #{filename}\r")
