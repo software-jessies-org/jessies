@@ -699,6 +699,24 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         getPTextBuffer().insert(0, newText.toCharArray());
     }
     
+    /**
+     * Appends the given string to the end of the text.
+     */
+    public void append(String newText) {
+        PTextBuffer buffer = getPTextBuffer();
+        synchronized (buffer) {
+            buffer.insert(buffer.length(), newText.toCharArray());
+            setCaretPosition(buffer.length());
+        }
+    }
+    
+    /**
+     * Returns a copy of the text in this text area.
+     */
+    public String getText() {
+        return getPTextBuffer().toString();
+    }
+    
     public Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
     }
