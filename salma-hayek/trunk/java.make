@@ -34,8 +34,14 @@ makepath = $(subst $(SPACE),:,$(strip $(1)))
 SPACE := $(subst :, ,:)
 
 # ----------------------------------------------------------------------------
+# Work out what native code, if any, we need to build. 
+# ----------------------------------------------------------------------------
 
-SUBDIRS += $(wildcard native/all/*) $(wildcard native/Darwin/*)
+TARGET_OS = $(shell uname)
+SUBDIRS += $(wildcard native/all/*)
+SUBDIRS += $(wildcard native/$(TARGET_OS)/*)
+
+# ----------------------------------------------------------------------------
 
 SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
@@ -133,6 +139,7 @@ BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(COMPILER_TYPE))
 CLASS_PATH += $(CLASS_PATH.$(COMPILER_TYPE))
 
 BOOT_CLASS_PATH.jikes += $(RT_JAR)
+BOOT_CLASS_PATH.gcjx +=  /usr/local/j2re1.4.2_06/lib/rt.jar 
 
 ifneq ($(wildcard MRJ141Stubs.jar),)
     CLASS_PATH += MRJ141Stubs.jar
@@ -153,6 +160,7 @@ JAVA_FLAGS += -deprecation
 JAVA_FLAGS.jikes += +D +P +Pall +Pno-serial +Pno-redundant-modifiers
 JAVA_FLAGS.javac += -Xlint -Xlint:-serial
 JAVA_FLAGS.javac += -Xlint:-unchecked # until Jikes supports generics
+JAVA_FLAGS.gcjx += -pedantic -error -verbose
 
 # ----------------------------------------------------------------------------
 # Variables above this point,
