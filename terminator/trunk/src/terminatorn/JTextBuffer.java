@@ -21,6 +21,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private Location caretPosition = new Location(0, 0);
 	private boolean hasFocus = false;
 	private boolean displayCaret = true;
+	private boolean blinkOn = true;
+	private CursorBlinker cursorBlinker;
 	private HashMap highlighters = new HashMap();
 	
 	/**
@@ -77,6 +79,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		});
 		addHighlighter(new HyperlinkHighlighter());
 		becomeDropTarget();
+		cursorBlinker = new CursorBlinker(this);
 		new Selector(this);
 	}
 	
@@ -174,6 +177,15 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			this.displayCaret = displayCaret;
 			redrawCaretPosition();
 		}
+	}
+	
+	public boolean shouldShowCursor() {
+		return displayCaret && blinkOn;
+	}
+	
+	public void blinkCursor() {
+		blinkOn = !blinkOn;
+		redrawCaretPosition();
 	}
 	
 	public Location viewToModel(Point point) {
@@ -361,7 +373,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		int lastTextLine = (rect.y + rect.height + metrics.getHeight() - 1) / metrics.getHeight();
 		lastTextLine = Math.min(lastTextLine, model.getLineCount() - 1);
 		for (int i = firstTextLine; i <= lastTextLine; i++) {
-			boolean drawCaret = (displayCaret && i == caretPosition.getLineIndex());
+			boolean drawCaret = (shouldShowCursor() && i == caretPosition.getLineIndex());
 			StyledText[] lineText = getLineText(i);
 			int x = 0;
 			int baseline = metrics.getHeight() * (i + 1) - metrics.getMaxDescent();
@@ -473,11 +485,14 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public void focusGained(FocusEvent event) {
 		hasFocus = true;
+		blinkOn = true;
+		cursorBlinker.start();
 		redrawCaretPosition();
 	}
 	
 	public void focusLost(FocusEvent event) {
 		hasFocus = false;
+		cursorBlinker.stop();
 		redrawCaretPosition();
 	}
 	
