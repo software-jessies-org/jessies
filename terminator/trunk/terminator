@@ -29,13 +29,26 @@ then
 else
   export TERMINFO=/usr/share/terminfo
 fi
-mkdir -p $TERMINFO/t
 
+TIC=`type -p tic`
 TERMINFO_SRC=$TERMINATOR_HOME/doc/terminfo/terminator.tic
 TERMINFO_DST=$TERMINFO/t/terminator
-if [ "`type -p tic`" != "" ]
+if [ "`uname`" == "Darwin" ]
 then
-  tic $TERMINFO_SRC
+    # Mac OS X 10.3 only looks in /74/, but tic puts stuff in /t/.
+    TERMINFO_DST=$TERMINFO/74/terminator
+    TIC=""
+    # While we're here, make ourselves look a little better...
+    OS_SPECIFIC_OPTIONS=-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns
+fi
+if [ ! -e $TERMINFO_DST ]
+then
+    mkdir -p $TERMINFO_DST && rmdir $TERMINFO_DST
+fi
+
+if [ "$TIC" != "" ]
+then
+    tic -o$TERMINFO_DST $TERMINFO_SRC
 else
   if [ ! -e $TERMINFO_DST ]
   then
@@ -48,13 +61,5 @@ mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
 # If we don't have a pre-compiled 'pty' program for this
 # architecture, try to build it.
 test -e $PTY_BINARY || make -C pty/
-
-case "`uname`" in
-Darwin)
-    OS_SPECIFIC_OPTIONS=-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns
-    ;;
-*)
-    ;;
-esac
 
 exec java -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Dpty.binary=$PTY_BINARY terminatorn.Terminator "$@"
