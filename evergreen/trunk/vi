@@ -2,18 +2,21 @@
 # Opens files in Edit.
 # @author Elliott Hughes <enh@acm.org>
 
-require 'pathname'
-require 'net/telnet'
-
 def previousViOnPath()
-    directories = ENV["PATH"].split(':')
-    executables = directories.map() {
-        |directory|
-        pathname = Pathname.new("#{directory}/vi")
-        pathname.exist?() ? pathname.realpath().to_s() : nil
-    }.compact().uniq()
-    executables.delete($0)
-    return executables[0]
+    begin
+        require 'pathname'
+        directories = ENV["PATH"].split(':')
+        executables = directories.map() {
+            |directory|
+            pathname = Pathname.new("#{directory}/vi")
+            pathname.exist?() ? pathname.realpath().to_s() : nil
+        }.compact().uniq()
+        executables.delete($0)
+        return executables[0]
+    rescue LoadError
+        print("Unable to search for a vi to fall back on; guessing 'vim'.")
+        return "vim"
+    end
 end
 
 def openFileOnLocalhost(filename)
@@ -23,11 +26,13 @@ def openFileOnLocalhost(filename)
     end
     
     begin
+        require 'net/telnet'
         telnet = Net::Telnet.new('Host' => host, 'Port' => 1948, 'Telnetmode' => false)
         telnet.puts("open #{filename}\r")
         print(telnet.readlines().join("\n"))
         telnet.close()
     rescue
+        print("Unable to talk to Edit; trying the next vi on the path.")
         system("#{previousViOnPath()} #{filename}")
     end
 end
