@@ -327,6 +327,7 @@ public class TextBuffer implements TelnetListener {
 		} else {
 			textLines.remove(firstDisplayLine + lastScrollLineIndex);
 			textLines.add(index, lineToInsert);
+			linesChangedFrom(index);
 			caretPosition = new Location(index, caretPosition.getCharOffset());
 		}
 	}
@@ -513,6 +514,7 @@ public class TextBuffer implements TelnetListener {
 		textLines.add(addIndex, new TextLine());
 		textLines.remove(removeIndex);
 		lineIsDirty(addIndex);
+		linesChangedFrom(addIndex);
 		view.repaint();
 	}
 
@@ -523,23 +525,13 @@ public class TextBuffer implements TelnetListener {
 		textLines.add(addIndex, new TextLine());
 		textLines.remove(removeIndex);
 		lineIsDirty(removeIndex);
+		linesChangedFrom(removeIndex);
 		view.repaint();
 	}
 	
 	public void setWindowTitle(String newWindowTitle) {
-		// What we do here depends on whether there are multiple tabs.
-		// I'm unconvinced this is the right place/way to handle this, but nothing else springs to mind at the moment.
-		JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, view);
-		if (tabbedPane != null) {
-			// Find the tab we're in, and change its title.
-			JTelnetPane telnetPane = (JTelnetPane) SwingUtilities.getAncestorOfClass(JTelnetPane.class, view);
-			int index = tabbedPane.indexOfComponent(telnetPane);
-			tabbedPane.setTitleAt(index, newWindowTitle);
-		} else {
-			// Find the frame we're in, and change its title.
-			JFrame frame= (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, view);
-			frame.setTitle(newWindowTitle);
-		}
+		JTelnetPane telnetPane = (JTelnetPane) SwingUtilities.getAncestorOfClass(JTelnetPane.class, view);
+		telnetPane.setName(newWindowTitle);
 	}
 	
 	public class Sequence implements CharSequence {
