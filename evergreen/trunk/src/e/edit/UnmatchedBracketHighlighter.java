@@ -82,16 +82,16 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
             Highlighter highlighter = textComponent.getHighlighter();
             int parenthesisNesting = 0;
             Stack indentationStack = new Stack();
-            String indentation = new String();
+            String indentation = "";
             boolean withinIndent = true;
             for (int i = 0; i < text.length(); ++i) {
                 char ch = text.charAt(i);
                 if (ch == '\n') {
-                    indentation = new String();
+                    indentation = "";
                     withinIndent = true;
                 } else if (withinIndent) {
                     if (ch == ' ' || ch == '\t') {
-                        indentation = indentation + ch;
+                        indentation += ch;
                     } else {
                         withinIndent = false;
                     }
