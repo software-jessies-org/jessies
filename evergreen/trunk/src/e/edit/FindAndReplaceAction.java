@@ -215,8 +215,13 @@ public class FindAndReplaceAction extends ETextAction {
             }
             replacement = "\u0000" + replacement + "\u0001";
             Pattern pattern = Pattern.compile(regularExpression);
-            html = pattern.matcher(line).replaceAll(replacement);
-            StringBuffer buffer = new StringBuffer(html);
+            String replacedLine;
+            try {
+                replacedLine = pattern.matcher(line).replaceAll(replacement);
+            } catch (IllegalArgumentException ex) {
+                return ex.getMessage();
+            }
+            StringBuffer buffer = new StringBuffer(replacedLine);
             for (int i = 0; i < buffer.length(); ++i) {
                 String insert = null;
                 if (buffer.charAt(i) == ' ') {
