@@ -60,7 +60,7 @@ os_specific_options = []
 if test(?w, "/usr/share/terminfo")
   terminfo="/usr/share/terminfo"
 else
-  terminfo="~/.terminfo"
+  terminfo="#{HOME}/.terminfo"
 end
 ENV["TERMINFO"]=terminfo
 
