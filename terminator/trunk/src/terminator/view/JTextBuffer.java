@@ -241,12 +241,22 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public void scrollToTop() {
-		scrollToLine(0);
+		scrollTo(0, 0, 0);
 	}
 	
-	public void scrollToLine(final int lineNumber) {
+	private void scrollTo(final int lineNumber, final int charStart, final int charEnd) {
 		Dimension character = getCharUnitSize();
-		scrollRectToVisible(new Rectangle(0, lineNumber * character.height - 10, 10, character.height + 20));
+		final int x0 = charStart * character.width;
+		final int y0 = lineNumber * character.height - 10;
+		final int width = (charEnd - charStart) * character.width;
+		final int height = character.height + 20;
+		// Showing the beginning of the line first lets us scroll
+		// horizontally as far as necessary but no further. We'd rather
+		// show more of the beginning of the line in case we've jumped
+		// here from a long way away; the beginning is where the
+		// context is.
+		scrollRectToVisible(new Rectangle(0, y0, 0, height));
+		scrollRectToVisible(new Rectangle(x0, y0, width, height));
 	}
 	
 	/**
@@ -453,8 +463,9 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private void findAgain(Class highlighterClass, int startLine, int endLine, int direction) {
 		for (int i = startLine; i != endLine; i += direction) {
 			Highlight[] highlights = getHighlightsForLine(i);
-			if (containsHighlightOfClass(highlights, highlighterClass)) {
-				scrollToLine(i);
+			Highlight match = firstHighlightOfClass(highlights, highlighterClass);
+			if (match != null) {
+				scrollTo(i, match.getStart().getCharOffset(), match.getEnd().getCharOffset());
 				return;
 			}
 		}
@@ -463,13 +474,14 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	/**
 	 * Tests whether any of the Highlight objects in the array is a FindHighlighter.
 	 */
-	private static boolean containsHighlightOfClass(Highlight[] highlights, Class highlighterClass) {
+	private static Highlight firstHighlightOfClass(Highlight[] highlights, Class highlighterClass) {
 		for (int i = 0; i < highlights.length; ++i) {
-			if (highlights[i].getHighlighter().getClass() == highlighterClass) {
-				return true;
+			Highlight highlight = highlights[i];
+			if (highlight.getHighlighter().getClass() == highlighterClass) {
+				return highlight;
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	/**
