@@ -578,10 +578,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		if (drawCaret) {
 			paintCaret(graphics, metrics);
 		}
-		graphics.setColor(style.getForeground());
+		Color foreground = style.getForeground();
 		if (style.isUnderlined()) {
+			graphics.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 128));
 			graphics.drawLine(x, y + 1, x + textWidth, y + 1);
 		}
+		graphics.setColor(foreground);
 		Font oldFont = graphics.getFont();
 		if (style.isBold()) {
 			graphics.setFont(oldFont.deriveFont(Font.BOLD));
