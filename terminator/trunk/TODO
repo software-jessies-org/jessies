@@ -7,6 +7,8 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
+[5]	Sort out some decent way of building distributions, including the library superstar.
+[5]	Find some profiling tool to see if we can find simple ways of speeding up.
 [5]	If backspace in vim really fixed?  I think this is a terminfo problem, so should be resolved now.  Test this.
 [5]	Fix ^C. It works fine if you've started Terminator from another terminal emulator (xterm, say), but if you start it from the GNOME panel, it doesn't. stty -a can't see any difference.
 [3]	Review the current properties reading, and see if it's really going to work well enough.  Possibly add "?MacOS:" stuff to it.
