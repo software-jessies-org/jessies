@@ -236,6 +236,10 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             text.getIndenter().setIndentationPropertyBasedOnContent(text, content);
             text.getUndoManager().discardAllEdits();
             text.getDocument().addDocumentListener(this);
+            if (fileType != UNKNOWN) {
+                text.enableAutoIndent();
+                text.getDocument().addDocumentListener(new UnmatchedBracketHighlighter(text));
+            }
             markAsClean();
             getTitleBar().checkForCounterpart(); // If we don't do this, we don't get the icon until we get focus.
         } catch (Throwable th) {
