@@ -133,10 +133,10 @@ public class JTelnetPane extends JPanel {
 		textPane.addComponentListener(new ComponentAdapter() {
 			private Dimension currentSize;
 			public void componentShown(ComponentEvent e) {
-				this.currentSize = textPane.getSizeInCharacters();
+				this.currentSize = textPane.getVisibleSizeInCharacters();
 			}
 			public void componentResized(ComponentEvent e) {
-				Dimension size = textPane.getSizeInCharacters();
+				Dimension size = textPane.getVisibleSizeInCharacters();
 				if (size.equals(currentSize) == false) {
 					// FIXME: need to tell pty about the size change.
 					currentSize = size;
@@ -275,6 +275,9 @@ public class JTelnetPane extends JPanel {
 						break;
 					case 'f': case 'F':
 						controller.showFindDialogFor(textPane);
+						break;
+					case 'k': case 'K':
+						textPane.clearScrollBuffer();
 						break;
 				}
 			} else {

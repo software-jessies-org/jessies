@@ -51,6 +51,29 @@ public class TextBuffer implements TelnetListener {
 		}
 	}
 	
+	public void reset() {
+		// Revert to just the right number of empty lines to fill the
+		// current window size.
+		textLines = new ArrayList();
+		setSize(width, view.getVisibleSizeInCharacters().height);
+		
+		// Make sure all the lines will be redrawn.
+		view.sizeChanged();
+		lineIsDirty(0);
+		
+		// Home the cursor.
+		// FIXME: it's a bit crazy that these aren't tied!
+		// FIXME: it's even crazier that they use different origins!
+		setCursorPosition(1, 1);
+		view.setCaretPosition(new Location(0, 0));
+		
+		// Redraw ourselves.
+		view.repaint();
+		
+		// FIXME: what we really want to do now is send SIGWINCH so the
+		// running application redraws itself.
+	}
+	
 	/** Sets or unsets the use of the alternative buffer. */
 	public void useAlternativeBuffer(boolean useAlternativeBuffer) {
 		if (useAlternativeBuffer == usingAlternativeBuffer()) {
