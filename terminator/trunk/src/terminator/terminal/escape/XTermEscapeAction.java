@@ -1,6 +1,7 @@
 package terminator.terminal.escape;
 
 import e.util.*;
+import terminator.model.*;
 import terminator.terminal.*;
 
 /**
@@ -42,7 +43,7 @@ public class XTermEscapeAction implements TerminalAction {
 	 *      39 = change default fg color
 	 *      49 = change default bg color
 	 */
-	public void perform(TerminalListener listener) {
+	public void perform(TextBuffer listener) {
 		if (sequence.startsWith("2;") || sequence.startsWith("0;")) {
 			String newWindowTitle = sequence.substring(2);
 			listener.setWindowTitle(newWindowTitle);

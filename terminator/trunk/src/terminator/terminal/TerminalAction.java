@@ -1,11 +1,13 @@
 package terminator.terminal;
 
+import terminator.model.*;
+
 /**
-A TerminalAction does something to affect a TerminalListener.
+A TerminalAction does something to affect a TextBuffer.
 
 @author Phil Norman
 */
 
 public interface TerminalAction {
-	public void perform(TerminalListener listener);
+	public void perform(TextBuffer listener);
 }

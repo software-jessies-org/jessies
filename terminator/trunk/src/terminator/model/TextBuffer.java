@@ -15,7 +15,7 @@ TextLine objects, one for each line.
 @author Phil Norman
 */
 
-public class TextBuffer implements TerminalListener {
+public class TextBuffer {
 	private JTextBuffer view;
 	private int width;
 	private int height;
@@ -306,6 +306,10 @@ public class TextBuffer implements TerminalListener {
 	
 	public Dimension getCurrentSizeInChars() {
 		return new Dimension(getMaxLineWidth(), getLineCount());
+	}
+	
+	public Location getCursorPosition() {
+		return caretPosition;
 	}
 	
 	public void processActions(TerminalAction[] actions) {

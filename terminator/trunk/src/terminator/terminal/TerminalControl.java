@@ -6,6 +6,7 @@ import java.util.*;
 import javax.swing.*;
 import e.util.*;
 import terminator.*;
+import terminator.model.*;
 import terminator.view.*;
 import terminator.terminal.escape.*;
 
@@ -33,7 +34,7 @@ public class TerminalControl implements Runnable {
 	private static final int INPUT_BUFFER_SIZE = 8 * 1024;
 
 	private JTerminalPane pane;
-	private TerminalListener listener;
+	private TextBuffer listener;
 	private Process process;
 	private boolean processIsRunning = true;
 	private InputStream in;
@@ -46,7 +47,7 @@ public class TerminalControl implements Runnable {
 	// Buffer of TerminalActions to perform.
 	private ArrayList terminalActions = new ArrayList();
 	
-	public TerminalControl(JTerminalPane pane, TerminalListener listener, String command, Process process) throws IOException {
+	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command, Process process) throws IOException {
 		this.pane = pane;
 		this.listener = listener;
 		this.process = process;
@@ -128,7 +129,7 @@ public class TerminalControl implements Runnable {
 	/** Must be called in the AWT dispatcher thread. */
 	public void sizeChanged(final Dimension sizeInChars, final Dimension sizeInPixels) throws IOException {
 		TerminalAction sizeChangeAction = new TerminalAction() {
-			public void perform(TerminalListener listener) {
+			public void perform(TextBuffer listener) {
 				listener.sizeChanged(sizeInChars);
 			}
 			
@@ -231,7 +232,7 @@ public class TerminalControl implements Runnable {
 		if (line.length() > 0) {
 			doStep();
 			terminalActions.add(new TerminalAction() {
-				public void perform(TerminalListener listener) {
+				public void perform(TextBuffer listener) {
 					if (DEBUG) {
 						Log.warn("Processing line \"" + line + "\"");
 					}
@@ -247,7 +248,7 @@ public class TerminalControl implements Runnable {
 	
 	public synchronized void processSpecialCharacter(final char ch) {
 		terminalActions.add(new TerminalAction() {
-			public void perform(TerminalListener listener) {
+			public void perform(TextBuffer listener) {
 				if (DEBUG) {
 					Log.warn("Processing special char \"" + getCharDesc(ch) + "\"");
 				}

@@ -1,12 +1,8 @@
 package terminator.terminal.escape;
 
 import e.util.*;
+import terminator.model.*;
 import terminator.terminal.*;
-
-/**
-
-@author Phil Norman
-*/
 
 public class SingleCharEscapeAction implements TerminalAction {
 	private char escChar;
@@ -15,7 +11,7 @@ public class SingleCharEscapeAction implements TerminalAction {
 		this.escChar = escChar;
 	}
 
-	public void perform(TerminalListener listener) {
+	public void perform(TextBuffer listener) {
 		switch (escChar) {
 			case '6':  // rxvt: scr_backindex
 				unsupported("scr_backindex");
