@@ -12,12 +12,11 @@ public class ScrollToSelectionAction extends ETextAction {
         super(ACTION_NAME);
     }
     
-    public boolean isEnabled() {
-        return super.isEnabled() && (getFocusedTextWindow() != null);
-    }
-    
     public void actionPerformed(ActionEvent e) {
         ETextWindow window = getFocusedTextWindow();
+        if (window == null) {
+            return;
+        }
         window.getText().ensureVisibilityOfOffset(window.getText().getCaretPosition());
     }
 }

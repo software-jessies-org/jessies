@@ -15,12 +15,12 @@ public class GotoAction extends ETextAction implements MinibufferUser {
         super(ACTION_NAME);
     }
     
-    public boolean isEnabled() {
-        return super.isEnabled() && (getFocusedTextWindow() != null);
-    }
-    
     public void actionPerformed(ActionEvent e) {
         currentTextWindow = getFocusedTextWindow();
+        if (currentTextWindow == null) {
+            return;
+        }
+        
         Edit.showMinibuffer(this);
     }
     

@@ -33,10 +33,4 @@ public abstract class ETextAction extends TextAction {
         }
         return (ETextArea) (SwingUtilities.getAncestorOfClass(ETextArea.class, component));
     }
-    
-    public boolean isEnabled() {
-        JTextComponent target = (JTextComponent) getFocusedComponent();
-        //System.err.println("isEnabled; target=" + target);
-        return (target != null); //targetSwingUtilities.getAncestorOfClass(ETextComponent.class, target) != null;
-    }
 }

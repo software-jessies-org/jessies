@@ -11,11 +11,14 @@ public class KillErrorsAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Edit.getCurrentWorkspace().getErrorsWindow().clear();
-    }
-
-    public boolean isEnabled() {
         Workspace workspace = Edit.getCurrentWorkspace();
-        return super.isEnabled() && workspace != null;
+        if (workspace == null) {
+            return;
+        }
+        EErrorsWindow errorsWindow = workspace.getErrorsWindow();
+        if (errorsWindow == null) {
+            return;
+        }
+        errorsWindow.clear();
     }
 }

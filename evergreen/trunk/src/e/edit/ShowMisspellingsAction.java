@@ -13,12 +13,11 @@ public class ShowMisspellingsAction extends ETextAction {
         super(ACTION_NAME);
     }
     
-    public boolean isEnabled() {
-        return super.isEnabled() && (getFocusedTextWindow() != null);
-    }
-    
     public void actionPerformed(ActionEvent e) {
         final ETextWindow window = getFocusedTextWindow();
+        if (window == null) {
+            return;
+        }
         final ETextArea text = window.getText();
         final JList list = new JList(text.getSpellingChecker().listMisspellings().toArray());
         list.addMouseListener(new MouseAdapter() {

@@ -151,9 +151,4 @@ public class OpenQuicklyDialog {
             Edit.openFile(workspace.getRootDirectory() + File.separator + filename);
         }
     }
-    
-    /** Always returns true because there's no reason not to open a file. */
-    public boolean isEnabled() {
-        return true;
-    }
 }

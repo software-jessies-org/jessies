@@ -12,10 +12,6 @@ public class FindNextAction extends ETextAction {
         super(ACTION_NAME);
     }
     
-    public boolean isEnabled() {
-        return super.isEnabled() && (getFocusedTextWindow() != null);
-    }
-    
     public void actionPerformed(ActionEvent e) {
         ETextWindow textWindow = getFocusedTextWindow();
         if (textWindow != null) {

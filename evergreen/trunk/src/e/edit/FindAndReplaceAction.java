@@ -32,15 +32,14 @@ public class FindAndReplaceAction extends ETextAction {
         super(ACTION_NAME);
     }
     
-    public boolean isEnabled() {
-        return super.isEnabled() && (getFocusedTextWindow() != null);
-    }
-    
     private ETextWindow textWindow;
     private ETextArea text;
 
     public void actionPerformed(ActionEvent e) {
         textWindow = getFocusedTextWindow();
+        if (textWindow == null) {
+            return;
+        }
         text = textWindow.getText();
 
         matchList = new JList();

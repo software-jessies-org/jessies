@@ -191,8 +191,6 @@ public class Workspace extends JPanel {
         EWindow window = null;
         if (filename.endsWith(".gif") || filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
             window = addViewer(new EImageWindow(filename));
-        } else if (FileUtilities.fileFromString(filename).isDirectory()) {
-            window = addViewer(new EDirectoryWindow(filename));
         } else {
             try {
                 ETextWindow newWindow = new ETextWindow(filename);

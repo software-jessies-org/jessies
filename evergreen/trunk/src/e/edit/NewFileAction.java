@@ -37,11 +37,6 @@ public class NewFileAction extends ETextAction {
         createNewFile(filenameField.getPathname());
     }
 
-    /** Always returns true because there's no reason not to open a file. */
-    public boolean isEnabled() {
-        return true;
-    }
-
     public void createNewFile(String filename) {
         try {
             File newFile = FileUtilities.fileFromString(filename);
