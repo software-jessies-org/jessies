@@ -7,6 +7,14 @@ A TextLine maintains the characters to be printed on a particular line, and the 
 to each.  It also provides mutator methods for removing and writing text, specifically designed for
 use in a virtual terminal.
 
+<p>The text we store internally contains information about tabs.  When text is passed back out to the
+outside world, we either convert the tab information to spaces, or to tab characters.  Internally, a tab
+is marked as beginning at a '\t' character, and each following character (assuming *all* characters are
+the same width) which forms part of the area covered by that tab is denoted by a '\r' character.
+We have to internally store all this tab position and length information because tab positions can change
+in the outside world at any time, but each TextLine must retain its integrity once the tabs have been
+inserted into it.
+
 @author Phil Norman
 */
 
@@ -14,11 +22,9 @@ public class TextLine {
 	private int lineStartIndex;
 	private String text = "";
 	private byte[] styles = new byte[0];
-	private byte[] tabRecords = null;
 	
-	private static final byte TAB_NONE = (byte) 0;
-	private static final byte TAB_START = (byte) 1;
-	private static final byte TAB_CONTINUE = (byte) 2;
+	private static final char TAB_START = '\t';
+	private static final char TAB_CONTINUE = '\r';
 	
 	public int getLineStartIndex() {
 		return lineStartIndex;
@@ -37,30 +43,26 @@ public class TextLine {
 		byte startStyle = styles[0];
 		for (int i = 1; i < styles.length; i++) {
 			if (styles[i] != startStyle) {
-				result.add(new StyledText(text.substring(startIndex, i), startStyle));
+				result.add(new StyledText(getText().substring(startIndex, i), startStyle));
 				startIndex = i;
 				startStyle = styles[i];
 			}
 		}
-		result.add(new StyledText(text.substring(startIndex, styles.length), startStyle));
+		result.add(new StyledText(getText().substring(startIndex, styles.length), startStyle));
 		return (StyledText[]) result.toArray(new StyledText[result.size()]);
 	}
 	
 	public String getText() {
-		return text;
+		return text.replace(TAB_START, ' ').replace(TAB_CONTINUE, ' ');
 	}
 	
 	/** Returns the text, with all the tabs put back in for use with clipboard stuff. */
 	public String getTabbedText(int start, int end) {
-		if (tabRecords == null) {
-			return getText().substring(start, end);
-		}
 		StringBuffer buf = new StringBuffer();
 		for (int i = start; i < end; i++) {
-			switch (tabRecords[i]) {
-				case TAB_NONE: buf.append(text.charAt(i)); break;
-				case TAB_START: buf.append('\t'); break;
-				case TAB_CONTINUE: break; // Ignore.
+			switch (text.charAt(i)) {
+				case TAB_CONTINUE: break;
+				default: buf.append(text.charAt(i));
 			}
 		}
 		return buf.toString();
@@ -78,42 +80,27 @@ public class TextLine {
 	public void killText(int startIndex, int endIndex) {
 		text = text.substring(0, startIndex) + text.substring(endIndex);
 		styles = trim(styles, startIndex, endIndex);
-		if (tabRecords != null) {
-			tabRecords = trim(styles, startIndex, endIndex);
-			if (tabRecords.length == 0) {
-				tabRecords = null;
-			}
-		}
 	}
 	
 	public void insertTabAt(int offset, int tabLength, int style) {
 		insertTextAt(offset, getTabString(tabLength), style);
-		recordTabPosition(offset, tabLength);
 	}
 	
 	public void writeTabAt(int offset, int tabLength, int style) {
 		writeTextAt(offset, getTabString(tabLength), style);
-		recordTabPosition(offset, tabLength);
-	}
-	
-	private void recordTabPosition(int offset, int tabLength) {
-		if (tabRecords == null) {
-			tabRecords = new byte[styles.length];
-		}
-		tabRecords[offset] = TAB_START;
-		for (int i = 1; i < tabLength; i++) {
-			tabRecords[offset + i] = TAB_CONTINUE;
-		}
-		// If we've overlapped an existing tab, move the old tab's start marker to just after the
-		// end of the new tab.
-		if (tabRecords.length > offset + tabLength && tabRecords[offset + tabLength] == TAB_CONTINUE) {
-			tabRecords[offset + tabLength] = TAB_START;
+		// If we've partially overwritten an existing tab, replace the first TAB_CONTINUE
+		// character of the existing tab with a TAB_START, so we end up with two tabs,
+		// the second slightly shorter than it was, rather than one long tab.
+		int indexAfterTab = offset + tabLength;
+		if (text.length() > indexAfterTab && text.charAt(indexAfterTab) == TAB_CONTINUE) {
+			text = text.substring(0, indexAfterTab) + TAB_START + text.substring(indexAfterTab + 1);
 		}
 	}
 
 	private String getTabString(int tabLength) {
 		char[] spaces = new char[tabLength];
-		Arrays.fill(spaces, ' ');
+		spaces[0] = TAB_START;
+		Arrays.fill(spaces, 1, spaces.length, TAB_CONTINUE);
 		return new String(spaces);
 	}
 	
@@ -121,9 +108,6 @@ public class TextLine {
 	public void insertTextAt(int offset, String newText, int style) {
 		ensureOffsetIsOK(offset);
 		styles = insertBytesInto(styles, offset, newText.length(), (byte) style);
-		if (tabRecords != null) {
-			tabRecords = insertBytesInto(tabRecords, offset, newText.length(), TAB_NONE);
-		}
 		text = text.substring(0, offset) + newText + text.substring(offset);
 	}
 	
@@ -133,15 +117,9 @@ public class TextLine {
 		if (offset + newText.length() < styles.length) {
 			text = text.substring(0, offset) + newText + text.substring(offset + newText.length());
 			Arrays.fill(styles, offset, offset + newText.length(), (byte) style);
-			if (tabRecords != null) {
-				Arrays.fill(tabRecords, offset, offset + newText.length(), TAB_NONE);
-			}
 		} else {
 			text = text.substring(0, offset) + newText;
 			styles = extendWithBytes(styles, offset, newText.length(), (byte) style);
-			if (tabRecords != null) {
-				tabRecords = extendWithBytes(tabRecords, offset, offset + newText.length(), TAB_NONE);
-			}
 		}
 	}
 
@@ -159,9 +137,6 @@ public class TextLine {
 		Arrays.fill(pad, ' ');
 		text += new String(pad);
 		styles = insertBytesInto(styles, styles.length, count, (byte) StyledText.getDefaultStyle());
-		if (tabRecords != null) {
-			tabRecords = insertBytesInto(tabRecords, tabRecords.length, count, TAB_NONE);
-		}
 	}
 	
 	private byte[] extendWithBytes(byte[] bytes, int offset, int count, byte value) {
