@@ -3,9 +3,11 @@ package e.edit;
 import java.io.*;
 import java.awt.event.*;
 
+import e.util.*;
+
 /**
- * Opens the "Find Files" dialog with the current selection entered in the dialog's
- * pattern field.
+ * Opens the "Find Files" dialog with a regular expression to match the current
+ * selection entered in the dialog's pattern field.
  */
 public class FindFilesContainingSelectionAction extends ETextAction {
     public FindFilesContainingSelectionAction() {
@@ -13,8 +15,9 @@ public class FindFilesContainingSelectionAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
+        String pattern = StringUtilities.regularExpressionFromLiteral(getSelectedText());
         String directory = guessDirectoryToSearchIn();
-        Edit.getCurrentWorkspace().showFindFilesDialog(getSelectedText(), directory);
+        Edit.getCurrentWorkspace().showFindFilesDialog(pattern, directory);
     }
     
     public String guessDirectoryToSearchIn() {

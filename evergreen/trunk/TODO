@@ -1,5 +1,8 @@
 TODO list for Edit
 
+Did you know that vim keeps a ~/.vim/backup/ directory, containing the
+equivalent of our .bak files?
+
 I want to start implementing some of this "code completion" stuff. On the
 Mac, any text field brings up a list of choices when you hit option-Escape,
 suggested completions of the word you've typed so far. It would be good to
