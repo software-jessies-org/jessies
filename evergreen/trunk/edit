@@ -41,7 +41,7 @@ HEAP_SIZE=-Xmx302m
 
 # Create a log file, and link to it as the newest.
 EDIT_LOG=/tmp/edit.log.$$
-touch $EDIT_LOG
+# Symbolically linking to a file which doesn't exist is perfectly legal.
 ln -s -f $EDIT_LOG /tmp/edit.log
 
 exec $JAVA $OS_SPECIFIC_OPTIONS \
