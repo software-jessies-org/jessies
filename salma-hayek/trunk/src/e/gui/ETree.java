@@ -84,4 +84,19 @@ public class ETree extends JTree {
             }
         }
     }
+    
+    /**
+     * Makes JTree's implementation less width-greedy. Left to JTree, we'll
+     * grow to be wide enough to show our widest node without using a scroll
+     * bar. While this is seemingly widely acceptable (ho ho), it's no good
+     * in Edit's "Find in Files" dialog. If long lines match, next time you
+     * open the dialog, it can be so wide it doesn't fit on the screen. Here,
+     * we go for the minimum width, and assume that an ETree is never packed
+     * on its own (in which case, it might end up rather narrow by default).
+     */
+    public Dimension getPreferredScrollableViewportSize() {
+        Dimension size = super.getPreferredScrollableViewportSize();
+        size.width = getMinimumSize().width;
+        return size;
+    }
 }
