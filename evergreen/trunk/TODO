@@ -37,8 +37,6 @@ Java 1.5:
     wouldn't help with kind of problem that exhibits itself as a random
     pause, but it would help with more general slowness.
 
-shouldn't include vim's "filename.cpp~" files in open quickly et cetera.
-
 advisor:
  1. call researchers in a different thread.
 
