@@ -172,15 +172,24 @@ public class HyperlinkHighlighter implements Highlighter {
 			
 			/*
 			 * If the file doesn't exist, this wasn't a useful match.
+			 * This implementation is problematic, though, because
+			 * we risk hanging the AWT event thread. Maybe a better
+			 * trade-off is to have a list of acceptable extensions
+			 * and only accept those, but always accept them?
 			 */
 			File file = null;
 			if (name.startsWith("/") || name.startsWith("~")) {
 				file = FileUtilities.fileFromString(name);
+				// We can't be certain that an NFS server will
+				// ever respond, so using File.exists is a bit
+				// dangerous. For now, use a closed world
+				// assumption.
+				continue;
 			} else {
 				file = FileUtilities.fileFromParentAndString(directory, name);
-			}
-			if (file.exists() == false) {
-				continue;
+				if (file.exists() == false) {
+					continue;
+				}
 			}
 			
 			Location start = new Location(lineIndex, matcher.start(relevantGroup));
