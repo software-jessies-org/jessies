@@ -160,7 +160,11 @@ public class TagsPanel extends JPanel {
             }
             
             if (isBranch == false) {
-                branch.add(leaf);
+                if (textWindow.isJava() && tag.type == 'p') {
+                    branch.insert(leaf, 0); // Put packages at the top, where they belong.
+                } else {
+                    branch.add(leaf);
+                }
             }
         }
         
