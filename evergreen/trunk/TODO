@@ -1,5 +1,11 @@
 TODO list for Edit
 
+Subversion ignores the following by default; maybe we should hard-code
+something similar in Edit? I'd like to remove more of edit.properties,
+and at least only have it contain differences from some sensible default
+state, rather than be strictly necessary for a working Edit.
+# global-ignores = *.o *.lo *.la #*# .*.rej *.rej .*~ *~ .#* .DS_Store
+
 We should keep track of 'recent files' on a per-workspace basis. We
 should also use scm's ability to find what's modified in a repository (once
 it gains this ability) to be able to offer a list of modified files too.
