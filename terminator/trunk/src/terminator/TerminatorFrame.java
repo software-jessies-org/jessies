@@ -120,25 +120,10 @@ public class TerminatorFrame extends JFrame {
 		}
 		
 		JComponent oldContentPane = (JComponent) getContentPane();
+		Dimension initialSize = oldContentPane.getSize();
 		
 		tabbedPane = new JTabbedPane();
-		tabbedPane.addChangeListener(new ChangeListener() {
-			/**
-			 * Ensures that when we change tab, we give focus to that terminal.
-			 */
-			public void stateChanged(ChangeEvent e) {
-				final Component selected = tabbedPane.getSelectedComponent();
-				if (selected != null) {
-					// I dislike the invokeLater, but it's sadly necessary.
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							selected.requestFocus();
-						}
-					});
-				}
-				updateFrameTitle();
-			}
-		});
+		tabbedPane.addChangeListener(new TerminalFocuser());
 		disableFocusTraversal(tabbedPane);
 		
 		if (oldContentPane instanceof JTerminalPane) {
@@ -146,6 +131,41 @@ public class TerminatorFrame extends JFrame {
 		}
 		
 		setContentPane(tabbedPane);
+		validate();
+		
+		Dimension finalSize = oldContentPane.getSize();
+		fixTerminalSizesAfterAddingTabbedPane(initialSize, finalSize);
+	}
+	
+	/**
+	 * Ensures that when we change tab, we give focus to that terminal.
+	 */
+	private class TerminalFocuser implements ChangeListener {
+		public void stateChanged(ChangeEvent e) {
+			final Component selected = tabbedPane.getSelectedComponent();
+			if (selected != null) {
+				// I dislike the invokeLater, but it's sadly necessary.
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						selected.requestFocus();
+					}
+				});
+			}
+			updateFrameTitle();
+		}
+	}
+
+	/**
+	 * Increases the size of the frame based on the amount of space taken
+	 * away from the terminal to insert the tabbed pane. The end result
+	 * should be that the terminal size remains constant but the window
+	 * grows.
+	 */
+	private void fixTerminalSizesAfterAddingTabbedPane(Dimension initialSize, Dimension finalSize) {
+		Dimension size = getSize();
+		size.height += (initialSize.height - finalSize.height);
+		size.width += (initialSize.width - finalSize.width);
+		setSize(size);
 	}
 	
 	public static void disableFocusTraversal(Component c) {
