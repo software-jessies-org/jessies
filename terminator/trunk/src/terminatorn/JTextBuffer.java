@@ -51,6 +51,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent event) {
 				requestFocus();
+				if (SwingUtilities.isLeftMouseButton(event)) {
+					highlightClicked(event);
+				}
+			}
+
+			public void highlightClicked(MouseEvent event) {
 				Highlight[] lights = getHighlightsForLocation(viewToModel(event.getPoint()));
 				for (int i = 0; i < lights.length; i++) {
 					lights[i].getHighlighter().highlightClicked(JTextBuffer.this, lights[i], getText(lights[i]), event);
