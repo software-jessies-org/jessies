@@ -93,7 +93,7 @@ public class CSIEscapeAction implements TerminalAction {
 			if (isQuestionMode) {
 				switch (Integer.parseInt(modes[i])) {
 					case 25: listener.setCursorVisible(value); break;
-					case 47: listener.useAlternativeBuffer(value); break;
+					case 47: listener.useAlternateBuffer(value); break;
 					default: Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
 				}
 			} else {

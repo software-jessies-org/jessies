@@ -590,7 +590,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		int firstTextLine = rect.y / metrics.getHeight();
 		int lastTextLine = (rect.y + rect.height + metrics.getHeight() - 1) / metrics.getHeight();
 		lastTextLine = Math.min(lastTextLine, model.getLineCount() - 1);
-		int lineNotToDraw = model.usingAlternativeBuffer() ? model.getFirstDisplayLine() - 1 : -1;
+		int lineNotToDraw = model.usingAlternateBuffer() ? model.getFirstDisplayLine() - 1 : -1;
 		for (int i = firstTextLine; i <= lastTextLine; i++) {
 			if (i == lineNotToDraw) {
 				continue;
