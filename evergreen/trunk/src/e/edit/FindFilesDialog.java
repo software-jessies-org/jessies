@@ -81,9 +81,8 @@ public class FindFilesDialog {
             Thread.currentThread().setName("Search for '" + regex + "' in " + directory);
             try {
                 Pattern pattern = Pattern.compile(regex);
-                Pattern fileNamePattern = Pattern.compile(directory, Pattern.CASE_INSENSITIVE);
+                List fileList = workspace.getListOfFilesMatching(directory);
                 FileSearcher fileSearcher = new FileSearcher(pattern);
-                List fileList = workspace.getFileList();
                 String root = workspace.getRootDirectory();
                 long startTime = System.currentTimeMillis();
                 for (int i = 0; i < fileList.size(); i++) {
@@ -93,11 +92,9 @@ public class FindFilesDialog {
                     }
                     try {
                         String candidate = (String) fileList.get(i);
-                        if (fileNamePattern.matcher(candidate).find()) {
-                            int matchCount = fileSearcher.searchFile(root, candidate);
-                            if (matchCount > 0) {
-                                matchModel.addElement(new MatchingFile(candidate, matchCount, regex));
-                            }
+                        int matchCount = fileSearcher.searchFile(root, candidate);
+                        if (matchCount > 0) {
+                            matchModel.addElement(new MatchingFile(candidate, matchCount, regex));
                         }
                     } catch (FileNotFoundException ex) {
                         ex = ex; // Not our problem.
@@ -197,12 +194,7 @@ public class FindFilesDialog {
     }
     
     public void showDialog() {
-        if (workspace.getFileList() == null) {
-            Edit.showAlert("Find Files", "The list of files for " + workspace.getTitle() + " is not yet available.");
-            return;
-        }
-        if (workspace.getFileList().isEmpty()) {
-            Edit.showAlert("Find Files", "The list of files for " + workspace.getTitle() + " is empty.");
+        if (workspace.isFileListUnsuitableFor("Find Files")) {
             return;
         }
 //        if (directoryField.getText().length() == 0) {

@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.regex.*;
 import javax.swing.*;
 import e.gui.*;
 import e.util.*;
@@ -65,13 +66,48 @@ public class Workspace extends JPanel {
     }
     
     /**
-     * Returns the current file list. Note that this can be updated, so you should never
-     * cache this result across operations, but must cache it for the duration of any
-     * single operation.
-     * This method can return null, if the workspace hasn't been scanned yet.
+     * Checks whether the file list is available, and if so, if it's non-empty.
+     * It's usually unavailable if the workspace hasn't been scanned yet.
+     * The user will be shown an appropriate warning in case of unsuitability.
      */
-    public List getFileList() {
-        return fileList;
+    public boolean isFileListUnsuitableFor(String purpose) {
+        if (fileList == null) {
+            Edit.showAlert(purpose, "The list of files for " + getTitle() + " is not yet available.");
+            return true;
+        }
+        if (fileList.isEmpty()) {
+            Edit.showAlert(purpose, "The list of files for " + getTitle() + " is empty.");
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Returns a list of the files matching the given regular expression.
+     */
+    public List/*<String>*/ getListOfFilesMatching(String regularExpression) {
+        // If the user typed a capital, assume that means something, and we
+        // should do a case-sensitive search. If everything's lower-case,
+        // assume they don't care.
+        boolean caseInsensitive = true;
+        for (int i = 0; i < regularExpression.length(); ++i) {
+            if (Character.isUpperCase(regularExpression.charAt(i))) {
+                caseInsensitive = false;
+            }
+        }
+        Pattern pattern = Pattern.compile(regularExpression, caseInsensitive ? Pattern.CASE_INSENSITIVE : 0);
+        
+        // Collect the matches.
+        ArrayList result = new ArrayList();
+        List allFiles = fileList;
+        for (int i = 0; i < allFiles.size(); ++i) {
+            String candidate = (String) allFiles.get(i);
+            Matcher matcher = pattern.matcher(candidate);
+            if (matcher.find()) {
+                result.add(candidate);
+            }
+        }
+        return result;
     }
     
     public JComponent makeUI() {

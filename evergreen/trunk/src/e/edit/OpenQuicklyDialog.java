@@ -48,14 +48,9 @@ public class OpenQuicklyDialog {
     
         this.model = new DefaultListModel();
         try {
-            Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-            List fileList = workspace.getFileList();
+            List fileList = workspace.getListOfFilesMatching(regex);
             for (int i = 0; i < fileList.size(); i++) {
-                String candidate = (String) fileList.get(i);
-                Matcher matcher = pattern.matcher(candidate);
-                if (matcher.find()) {
-                    model.addElement(candidate);
-                }
+                model.addElement(fileList.get(i));
             }
         } catch (PatternSyntaxException ex) {
             patternSyntaxException = ex;
@@ -115,8 +110,7 @@ public class OpenQuicklyDialog {
     }
     
     public void showDialog() {
-        if (workspace.getFileList() == null) {
-            Edit.showAlert("Open Quickly", "The list of files for " + workspace.getTitle() + " is not yet available.");
+        if (workspace.isFileListUnsuitableFor("Open Quickly")) {
             return;
         }
         
