@@ -156,7 +156,7 @@ public class TagsPanel extends JPanel {
             
             DefaultMutableTreeNode branch = (DefaultMutableTreeNode) branches.get(tag.containingClass);
             if (branch == null) {
-                branch = new DefaultMutableTreeNode(tag.containingClass);
+                branch = new BranchNode(tag.containingClass);
                 branches.put(tag.containingClass, branch);
                 root.add(branch);
             }
@@ -179,7 +179,7 @@ public class TagsPanel extends JPanel {
             private SortedSet kidsNames = new TreeSet();            
             
             public int getInsertIndex(TagReader.Tag tag) {
-                String insertString = TAG_GROUP_ORDER.indexOf(tag.type) + tag.identifier;
+                String insertString = TAG_GROUP_ORDER.indexOf(tag.type) + tag.identifier + kidsNames.size();
                 kidsNames.add(insertString);
                 return new ArrayList(kidsNames).indexOf(insertString);
             }
