@@ -29,7 +29,7 @@ public class Options {
 	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt|Terminator)(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
 	private HashMap options = new HashMap();
-	private HashMap rgbColours = new HashMap();
+	private HashMap rgbColors = null;
 	
 	private File terminatorOptionsFile;
 	private HashMap propertySets = new HashMap();
@@ -162,15 +162,15 @@ public class Options {
 		} else if (description.startsWith("#")) {
 			return Color.decode("0x" + description.substring(1));
 		} else {
-			return (Color) rgbColours.get(description.toLowerCase());
+			return getRgbColor(description);
 		}
 	}
 	
-	/** Sets the colour for the given name, writing it into the properties file. */
-	public void setColor(String name, Color colour) {
-		String encodedColour = "0x" + Integer.toHexString(colour.getRGB()).substring(2);
+	/** Sets the color for the given name, writing it into the properties file. */
+	public void setColor(String name, Color color) {
+		String encodedColor = "0x" + Integer.toHexString(color.getRGB()).substring(2);
 		HashMap writeSet = getWritablePropertySet("Colors", "Colors");
-		writeSet.put(name, encodedColour);
+		writeSet.put(name, encodedColor);
 		try {
 			writeTerminatorOptions(terminatorOptionsFile);
 		} catch (IOException ex) {
@@ -194,11 +194,6 @@ public class Options {
 	}
 	
 	private Options() {
-		try {
-			readRGBFile();
-		} catch (Exception ex) {
-			Log.warn("Problem reading X11 colors", ex);
-		}
 		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
@@ -296,8 +291,19 @@ public class Options {
 			int g = channelAt(line, 4);
 			int b = channelAt(line, 8);
 			line = line.substring(12).trim();
-			rgbColours.put(line.toLowerCase(), new Color(r, g, b));
+			rgbColors.put(line.toLowerCase(), new Color(r, g, b));
 		}
+	}
+	
+	private Color getRgbColor(String description) {
+		if (rgbColors == null) {
+			try {
+				readRGBFile();
+			} catch (Exception ex) {
+				Log.warn("Problem reading X11 colors", ex);
+			}
+		}
+		return (Color) rgbColors.get(description.toLowerCase());
 	}
 	
 	private int channelAt(String line, int offset) {
@@ -378,22 +384,22 @@ public class Options {
 	
 	private void writeTerminatorOptions(File file) throws IOException {
 		ArrayList oldContents = new ArrayList();
-		int colourInsertPos = -1;
+		int colorInsertPos = -1;
 		if (file.exists()) {
 			LineNumberReader in = null;
 			try {
 				in = new LineNumberReader(new FileReader(file));
-				Pattern colourOpener = Pattern.compile("^Colours\\s+Colours\\s+\\{");
-				boolean readingColours = false;
+				Pattern colorOpener = Pattern.compile("^Colors\\s+Colors\\s+\\{");
+				boolean readingColors = false;
 				String line;
 				while ((line = in.readLine()) != null) {
-					if (readingColours) {
+					if (readingColors) {
 						if (line.trim().equals("}")) {
-							readingColours = false;
+							readingColors = false;
 						}
-					} else if (colourOpener.matcher(line).matches()) {
-						readingColours = true;
-						colourInsertPos = oldContents.size();
+					} else if (colorOpener.matcher(line).matches()) {
+						readingColors = true;
+						colorInsertPos = oldContents.size();
 					} else {
 						oldContents.add(line);
 					}
@@ -408,18 +414,18 @@ public class Options {
 				}
 			}
 		}
-		if (colourInsertPos == -1) {
+		if (colorInsertPos == -1) {
 			oldContents.add("");
-			colourInsertPos = oldContents.size();
+			colorInsertPos = oldContents.size();
 		}
 		Properties props = getPropertySet("Colors", "Colors");
 		if (props != null) {
-			oldContents.add(colourInsertPos++, "Colours Colours {");
+			oldContents.add(colorInsertPos++, "Colors Colors {");
 			String[] keys = (String[]) props.keySet().toArray(new String[0]);
 			for (int i = 0; i < keys.length; i++) {
-				oldContents.add(colourInsertPos++, "\t" + keys[i] + " = " + props.getProperty(keys[i]));
+				oldContents.add(colorInsertPos++, "\t" + keys[i] + " = " + props.getProperty(keys[i]));
 			}
-			oldContents.add(colourInsertPos++, "}");
+			oldContents.add(colorInsertPos++, "}");
 		}
 		PrintWriter out = null;
 		try {
