@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.font.*;
 import java.text.*;
+import java.util.regex.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -161,9 +162,16 @@ public class ETextArea extends JTextArea {
     public Font getAppropriateFontForContent() {
         boolean fixed = Boolean.getBoolean("fixedFont.default");
         String content = getText();
-        if (content.indexOf("\t ") != -1) {
+
+        // If we've got a file with GNU-style lines where you have a mixture
+        // of tabs and spaces for indentation, we need to use a fixed font.
+        // But we need to exclude the case where we're looking at a JavaDoc
+        // comment where there's a space just to make the stars line up.
+        Pattern pattern = Pattern.compile("\\t [^*]", Pattern.MULTILINE);
+        if (pattern.matcher(content).find()) {
             fixed = true;
         }
+
         return fixed ? getConfiguredFixedFont() : getConfiguredFont();
     }
     
