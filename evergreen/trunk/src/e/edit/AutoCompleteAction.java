@@ -55,7 +55,7 @@ public class AutoCompleteAction extends ETextAction {
                     e.consume();
                 }
             }
-            public void keyReleased(KeyEvent e) {
+            public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     hideCompletionsWindow();
                     target.requestFocus();
@@ -77,6 +77,7 @@ public class AutoCompleteAction extends ETextAction {
             
             Frame owner = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, target);
             showCompletionsWindow(owner, windowLocation, new JScrollPane(completionsUi));
+            completionsUi.requestFocus();
         } catch (BadLocationException ex) {
             Log.warn("Couldn't show the completions.", ex);
         }
