@@ -6,6 +6,10 @@
 # Here's what has been done:
 # 1: Removed 'am' (automatic line wrap), because Terminator doesn't do it.
 # 2: Removed a strange \017 on the end of the 'clear attributes' escape sequence (sgr0).
+#
+# If you want to experiment with named sequences, try something like this:
+# 
+#   $ echo normal $(tput rev) reversed $(tput rmso) normal
 
 terminator|Terminator no line wrap, 
         eo, km, mir, msgr, xenl, xon, 
