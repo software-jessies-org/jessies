@@ -208,18 +208,8 @@ public class FindFilesDialog {
         formPanel.addRow("Whose Names Match:", directoryField);
         formPanel.addRow("Matches:", new JScrollPane(matchList));
         formPanel.addRow("", status);
-        boolean okay = FormDialog.show(Edit.getFrame(), "Find Files", formPanel);
-        
-        if (okay == false) {
-            return;
-        }
-        
-        // Ensure that, if the user was too fast in hitting return, we've definitely searched.
-        if (haveSearched == false) {
-            showMatches();
-        }
-        
-        openSelectedFilesFromList();
+
+        FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel);
     }
     
     public void openSelectedFilesFromList() {
