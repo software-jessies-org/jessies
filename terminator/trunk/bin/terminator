@@ -1,100 +1,119 @@
-#!/bin/bash
+#!/usr/bin/ruby -w
 
-UNAME=`uname`
+begin
+  require 'fileutils.rb'
+  have_fileutils = true
+rescue LoadError
+  have_fileutils = false
+end
+begin
+  require 'pathname.rb'
+  have_pathname = true
+  # Cope with symbolic links to this script.
+  terminator_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
+  salma_hayek = Pathname.new("#{terminator_home}/../salma-hayek").realpath()
+rescue LoadError
+  terminator_bin = `dirname #{__FILE__}`.chomp()
+  terminator_home = "#{terminator_bin}/.."
+  salma_hayek = "#{terminator_home}/../salma-hayek"
+end
+ENV["TERMINATOR_HOME"] = terminator_home
+
+class_name = "terminator.Terminator"
+HOME = ENV["HOME"]
+
+UNAME=`uname`.chomp()
 
 # Make sure we have a directory for the terminal logs.
-log_directory=~/.terminal-logs
-if [ ! -d $log_directory ]
-then
-  mkdir -p $log_directory && chmod og-rx $log_directory
-fi
+log_directory="#{HOME}/.terminal-logs"
+if test(?d, log_directory) == false
+  Dir.mkdir(log_directory)
+  system("chmod og-rx #{log_directory}")
+end
 
-server_port_file=$log_directory/.terminator-server-port
-if [ "$UNAME" != "Darwin" ] && [ "$DEBUGGING_TERMINATOR" == "" ] && [ $# == 0 ] && [ -f $server_port_file ]
-then
+server_port_file="#{log_directory}/.terminator-server-port"
+
+if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
+  command = ARGV.join("\0")
   # See if there's already a Terminator running that can open us a new window.
   # This lets us emulate the Mac OS behavior when clicking on the Dock icon
   # on Linux (from gnome-panel or whatever). In particular, using this trick
   # we can open a new window quicker than xterm(1), from the user's point of
   # view.
-  port=`cat $server_port_file`
-  socket_output=`echo new | socket localhost $port 2> /dev/null`
-  if [ $? == 0 ]
-  then
-    exit 0
-  fi
-fi
+  begin
+    port = IO.read(server_port_file)
+    require 'net/telnet'
+    telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port.to_i(), 'Telnetmode' => false)
+    telnet.puts("new #{command}")
+    print(telnet.readlines().join("\n"))
+    telnet.close()
+    exit(0)
+  rescue
+    # fall through...
+  end
+end
 
-real_script=`readlink $0 || echo $0` # Deals with symbolic links to this script.
+classpath="#{terminator_home}/classes:#{terminator_home}/../salma-hayek/classes:#{terminator_home}/terminator.jar"
+pty_binary="#{terminator_home}/native/all/pty/pty-#{UNAME}-#{`arch`}"
 
-TERMINATOR_HOME=`dirname $real_script`/..
-CLASSPATH=$TERMINATOR_HOME/classes:$TERMINATOR_HOME/../salma-hayek/classes:$TERMINATOR_HOME/terminator.jar
-PTY_BINARY=$TERMINATOR_HOME/native/all/pty/pty-$UNAME-`arch`
-
-if [ ! -w /usr/share/terminfo ]
-then
-  export TERMINFO=~/.terminfo
+if test(?w, "/usr/share/terminfo")
+  terminfo="/usr/share/terminfo"
 else
-  export TERMINFO=/usr/share/terminfo
-fi
+  terminfo="~/.terminfo"
+end
+ENV["TERMINFO"]=terminfo
 
-TIC=`type -p tic`
-TERMINFO_SRC=$TERMINATOR_HOME/doc/terminfo/terminator.tic
-TERMINFO_DST=$TERMINFO/t/terminator
-if [ "$UNAME" == "Darwin" ]
-then
-  case "`uname -r`" in
-  7.*)
+tic_binary=`bash -c "type -p tic"`.chomp()
+terminfo_SRC="#{terminator_home}/doc/terminfo/terminator.tic"
+terminfo_DST="#{terminfo}/t/terminator"
+if UNAME == "Darwin"
+  if `uname -r` =~ /^7\./
     # Mac OS X 10.3 only looks in /74/, but tic puts stuff in /t/.
-    TERMINFO_DST=$TERMINFO/74/terminator
-    TIC=""
-    ;;
-  esac
+    terminfo_DST="#{terminfo}/74/terminator"
+    tic_binary=""
+  end
   # While we're here, make ourselves look a little better...
-  OS_SPECIFIC_OPTIONS=-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns
-fi
-if [ ! -e $TERMINFO_DST ]
-then
-    mkdir -p $TERMINFO_DST && rmdir $TERMINFO_DST
-fi
+  os_specific_options = [ "-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns" ]
+end
+if test(?e, terminfo_DST) == false
+  system("mkdir -p #{terminfo_DST} && rmdir #{terminfo_DST}")
+end
 
-if [ "$UNAME" == "Linux" ]
-then
+if UNAME == "Linux"
   # Use locate(1) to find the gnome-terminal icon.
   # Cache the result, because this is the single most expensive part of
   # the script.
-  icon_filename_file=$log_directory/.cached-icon
-  if [ ! -f $icon_filename_file ] || [ ! -f `cat $icon_filename_file` ]
-  then
-    locate gnome-terminal.png | grep 32x32 | head -1 > $icon_filename_file
-  fi
-  icon_file=`cat $icon_filename_file`
-  OS_SPECIFIC_OPTIONS=-Dterminator.frame.icon=$icon_file
-fi
+#  icon_filename_file=$log_directory/.cached-icon
+#  if [ ! -f $icon_filename_file ] || [ ! -f `cat $icon_filename_file` ]
+#  then
+#    locate gnome-terminal.png | grep 32x32 | head -1 > $icon_filename_file
+#  fi
+#  icon_file=`cat $icon_filename_file`
+#  os_specific_options=-Dterminator.frame.icon=$icon_file
+end
 
-if [ "$TIC" != "" ]
-then
-  tic -o$TERMINFO $TERMINFO_SRC
-else
-  if [ ! -e $TERMINFO_DST ]
-  then
-    cp $TERMINATOR_HOME/doc/terminfo/terminator $TERMINFO_DST
-  fi
-fi
+if tic_binary != ""
+  system("#{tic_binary} -o#{terminfo} #{terminfo_SRC}")
+elsif test(?f, terminfo_DST) == false
+  system("cp #{terminator_home}/doc/terminfo/terminator #{terminfo_DST}")
+end
 
 # If we don't have a pre-compiled 'pty' program for this
 # architecture, try to build it.
-if [ ! -x $PTY_BINARY ]
-then
-  make -C `dirname $PTY_BINARY`
-fi
+if test(?x, pty_binary)
+  system("make -C `dirname #{pty_binary}`")
+end
 
-options="-Xmx1g -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Djava.awt.Window.locationByPlatform=true -Dpty.binary=$PTY_BINARY"
-class_name=terminator.Terminator
-log_filename=$log_directory/terminator.log.$$
-if [ "$DEBUGGING_TERMINATOR" != "" ]
-then
-  java $options $class_name "$@"
-else
-  java $options $class_name "$@" > $log_filename 2>&1 || cat $log_filename 1>&2 &
-fi
+options = [ "-Xmx1g", "-cp", classpath, "-Djava.awt.Window.locationByPlatform=true", "-Dpty.binary=#{pty_binary}" ]
+options.concat(os_specific_options)
+log_filename="#{log_directory}/terminator.log.#{$$}"
+
+args = [ "java" ]
+args.concat(options)
+args.push(class_name)
+args.concat(ARGV)
+#if ENV["DEBUGGING_TERMINATOR"] != nil
+  system(*args)
+#else
+#  system(... "> #{log_filename} 2>&1 || cat #{log_filename} 1>&2 &")
+#end

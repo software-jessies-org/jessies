@@ -27,9 +27,15 @@ public class Terminator {
 	private void startTerminatorServer() {
 		new InAppServer("Terminator", "~/.terminal-logs/.terminator-server-port") {
 			public boolean handleCommand(String line, PrintWriter out) {
-				if (line.equals("new")) {
-					Terminator.getSharedInstance().openFrame();
-					return true;
+				if (line.startsWith("new ")) {
+					try {
+						String tail = line.substring(4);
+						String[] arguments = (tail.length() > 0) ? tail.split("\u0000") : new String[0];
+						Terminator.getSharedInstance().parseCommandLine(arguments);
+						return true;
+					} catch (Exception ex) {
+						ex.printStackTrace(out);
+					}
 				}
 				return false;
 			}
@@ -123,8 +129,8 @@ public class Terminator {
 	}
 	
 	public void showVersion() {
-		System.err.println("Terminator (see ChangeLog for version information)");
-		System.err.println("Copyright (C) 2004 Free Software Foundation, Inc.");
+		System.err.println("Terminator (see ChangeLog for author and version information)");
+		System.err.println("Copyright (C) 2004-2005 Free Software Foundation, Inc.");
 		System.err.println("This is free software; see the source for copying conditions.  There is NO");
 		System.err.println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
 		System.exit(0);
