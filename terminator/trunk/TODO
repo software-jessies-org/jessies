@@ -51,7 +51,8 @@
 
 * Rewrite the hyper-link code to be less eager. [It's already rewritten to be
   less eager in the sense that I meant when I wrote this, but I wonder if the
-  user shouldn't have to explicitly ask us to look for possible links?]
+  user shouldn't have to explicitly ask us to look for possible links? That
+  might also give us scope for offering various selection-related actions.]
 
 * Fix the speed of pasting large amounts of text (without breaking the
   correctness). [Have checked in code to fix this, but want a reproducible
@@ -86,3 +87,11 @@
 * We should be able to "Copy With Styles" so we can paste color output into
   a mailer or whatever, and preserve the formatting. Presumably we can put
   HTML data on the clipboard? [See elliotth's blog for details.]
+
+* The menu bar doesn't work on Linux.
+
+* The actions available on Mac OS should all be available on Linux, even if
+  they aren't on the pop-up menu. menuAndKeyActions might want a keyActions
+  sibling. If we fixed the menu bar to work on Linux, is there a way to have
+  it present (for key handling) but invisible? That would be the nicest
+  solution to this problem.
