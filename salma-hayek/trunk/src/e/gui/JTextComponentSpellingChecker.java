@@ -95,6 +95,27 @@ public class JTextComponentSpellingChecker implements DocumentListener {
             }
         }
     }
+
+    public Collection listMisspellings() {
+        Highlighter highlighter = component.getHighlighter();
+        Highlighter.Highlight[] highlights = highlighter.getHighlights();
+        
+        TreeSet result = new TreeSet();
+        for (int i = 0; i < highlights.length; i++) {
+            Highlighter.Highlight highlight = highlights[i];
+            if (highlight.getPainter() == misspelledWordHighlightPainter) {
+                final int start = highlight.getStartOffset();
+                final int end = highlight.getEndOffset();
+                try {
+                    String misspelling = document.getText(start, (end - start));
+                    result.add(misspelling);
+                } catch (BadLocationException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        return result;
+    }
     
     public static final class Range {
         public int start;
