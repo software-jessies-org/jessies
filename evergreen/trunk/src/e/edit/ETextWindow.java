@@ -379,19 +379,26 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     public String getCounterpartFilename() {
         // Work out what the counterpart would be called.
         String basename = file.getName().replaceAll("\\..*$", "");
-        String counterpartFilename = null;
         
-        if (filename.endsWith(".cpp")) {
-            counterpartFilename = basename + ".h";
-        } else if (filename.endsWith(".h")) {
-            counterpartFilename = basename + ".cpp";
-        } else {
-            return null;
+        String parent = file.getParent();
+        if (filename.endsWith(".cpp") || filename.endsWith(".cc") || filename.endsWith(".c")) {
+            if (FileUtilities.exists(parent, basename + ".hpp")) {
+                return basename + ".hpp";
+            } else if (FileUtilities.exists(parent, basename + ".hh")) {
+                return basename + ".hh";
+            } else if (FileUtilities.exists(parent, basename + ".h")) {
+                return basename + ".h";
+            }
+        } else if (filename.endsWith(".hpp") || filename.endsWith(".hh") || filename.endsWith(".h")) {
+            if (FileUtilities.exists(parent, basename + ".cpp")) {
+                return basename + ".cpp";
+            } else if (FileUtilities.exists(parent, basename + ".cc")) {
+                    return basename + ".cc";
+            } else if (FileUtilities.exists(parent, basename + ".c")) {
+                return basename + ".c";
+            }
         }
-
-        // See if the counterpart exists.
-        File counterpartFile = FileUtilities.fileFromParentAndString(file.getParent(), counterpartFilename);
-        return (counterpartFile.exists() ? counterpartFilename : null);
+        return null;
     }
 
     public void switchToCounterpart() {
