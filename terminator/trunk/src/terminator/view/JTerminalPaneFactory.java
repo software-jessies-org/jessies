@@ -1,13 +1,6 @@
 package terminator.view;
 
-import java.io.*;
-import e.util.*;
 import terminator.*;
-
-/**
-
-@author Phil Norman
-*/
 
 public interface JTerminalPaneFactory {
 	public JTerminalPane create(TerminalPaneMaster controller);
@@ -32,43 +25,7 @@ public interface JTerminalPaneFactory {
 	
 	public class Shell implements JTerminalPaneFactory {
 		public JTerminalPane create(TerminalPaneMaster controller) {
-			String user = System.getProperty("user.name");
-			String command = getUserShell(user);
-			if (Options.getSharedInstance().isLoginShell()) {
-				command += " -l";
-			}
-			return new JTerminalPane(controller, user + "@localhost", command, true);
-		}
-	
-		/**
-		* Returns the command to execute as the user's shell, parsed from the /etc/passwd file.
-		* On any kind of failure, 'bash' is returned as default.
-		*/
-		private static String getUserShell(String user) {
-			File passwdFile = new File("/etc/passwd");
-			if (passwdFile.exists()) {
-				BufferedReader in = null;
-				try {
-					in = new BufferedReader(new FileReader(passwdFile));
-					String line;
-					while ((line = in.readLine()) != null) {
-						if (line.startsWith(user + ":")) {
-							return line.substring(line.lastIndexOf(':') + 1);
-						}
-					}
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				} finally {
-					if (in != null) {
-						try {
-							in.close();
-						} catch (IOException ex) {
-							Log.warn("Couldn't close file.", ex);
-						}
-					}
-				}
-			}
-			return "bash";
+			return JTerminalPane.newShell(controller);
 		}
 	}
 }
