@@ -147,20 +147,35 @@ public class JTelnetPane extends JPanel {
 	
 	private class KeyHandler implements KeyListener {
 		public void keyPressed(KeyEvent event) {
-			String sequence = getSequenceForKeyCode(event.getKeyCode());
+			String sequence = getSequenceForKeyCode(event);
 			if (sequence != null) {
 				control.sendEscapeString(sequence);
 				event.consume();
 			}
 		}
 
-		private String getSequenceForKeyCode(int keyCode) {
+		private String getSequenceForKeyCode(KeyEvent event) {
+			int keyCode = event.getKeyCode();
 			switch (keyCode) {
 				case KeyEvent.VK_ESCAPE: return "";
-				case KeyEvent.VK_UP: return "[A";
-				case KeyEvent.VK_DOWN: return "[B";
-				case KeyEvent.VK_RIGHT: return "[C";
-				case KeyEvent.VK_LEFT: return "[D";
+				
+				case KeyEvent.VK_HOME: return "[H";
+				case KeyEvent.VK_END: return "[F";
+				
+				case KeyEvent.VK_UP:
+				case KeyEvent.VK_DOWN:
+				case KeyEvent.VK_RIGHT:
+				case KeyEvent.VK_LEFT:
+				{
+					/* Send xterm sequences. */
+					char letter = "DACB".charAt(keyCode - KeyEvent.VK_LEFT);
+					if (event.isControlDown()) {
+						return "[5" + letter;
+					} else {
+						return "[" + letter;
+					}
+				}
+
 				default: return null;
 			}
 		}
