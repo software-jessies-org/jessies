@@ -27,7 +27,7 @@ public class InsertNewlineAction extends TextAction {
             
             // Should we try to insert matching brace pairs?
             String line = target.getLineTextAtOffset(position);
-            if (target.getIndenter().isElectric('}') && line.endsWith("{")) {
+            if (target.getIndenter().isElectric('}') && line.endsWith("{") && hasUnbalancedBraces(target.getText())) {
                 insertMatchingBrace(target);
             } else if (line.endsWith("/*") || line.endsWith("/**")) {
                 insertMatchingCloseComment(target);
@@ -75,5 +75,18 @@ public class InsertNewlineAction extends TextAction {
         } catch (BadLocationException ex) {
             Log.warn("Problem inserting close comment.", ex);
         }
+    }
+    
+    public boolean hasUnbalancedBraces(String text) {
+        int braceNesting = 0;
+        for (int i = 0; i < text.length(); ++i) {
+            char ch = text.charAt(i);
+            if (ch == '{') {
+                ++braceNesting;
+            } else if (ch == '}') {
+                --braceNesting;
+            }
+        }
+        return (braceNesting != 0);
     }
 }
