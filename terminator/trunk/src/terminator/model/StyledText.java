@@ -11,15 +11,6 @@ its namespace the set of allowed styles, and provides static methods for accessi
 */
 
 public class StyledText {
-	public static final int BLACK = 0;
-	public static final int RED = 1;
-	public static final int GREEN = 2;
-	public static final int YELLOW = 3;
-	public static final int BLUE = 4;
-	public static final int MAGENTA = 5;
-	public static final int CYAN = 6;
-	public static final int WHITE = 7;
-	
 	private static final int BACKGROUND_SHIFT = 3;
 	private static final int FOREGROUND_MASK = 7;
 	private static final int BACKGROUND_MASK = 7 << BACKGROUND_SHIFT;
@@ -115,7 +106,7 @@ public class StyledText {
 	}
 	
 	public static short getDefaultStyle() {
-		return getStyle(BLACK, false, WHITE, false, false, false);
+		return getStyle(-1, false, -1, false, false, false);
 	}
 	
 	public static short getStyle(int foreground, boolean hasForeground, int background, boolean hasBackground, boolean isBold, boolean isUnderlined) {
