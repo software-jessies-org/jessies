@@ -130,25 +130,28 @@ public class JTelnetPane extends JPanel {
 	 * Mac OS' grow box intrudes in the lower right corner of every window.
 	 * In our case, with a scroll bar hard against the right edge of the
 	 * window, that means our down scroll arrow gets covered.
-	 * 
-	 * The proper fix is probably to insert some kind of spacer, but I
-	 * want to go to bed, so for now let's just rip the scroll bar out
-	 * of the scroll pane and stick it in the WEST slot of our BorderLayout.
 	 */
 	private void fixScrollBarForMacOs(JScrollPane scrollPane) {
 		if (System.getProperty("os.name").indexOf("Mac OS") == -1) {
 			return;
 		}
 		
-		add(scrollPane.getVerticalScrollBar(), BorderLayout.WEST);
-		
-		/*
+		// Make a JPanel the same size as the grow box.
 		final int size = (int) scrollPane.getVerticalScrollBar().getMinimumSize().getWidth();
-		JPanel panel = new JPanel();
-		panel.setBackground(Color.RED);
-		panel.setSize(new Dimension(size, size));
-		scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, panel);
-		*/
+		JPanel growBoxPanel = new JPanel();
+		Dimension growBoxSize = new Dimension(size, size);
+		growBoxPanel.setPreferredSize(growBoxSize);
+		
+		// Stick the scroll pane's scroll bar in a new panel with
+		// our fake grow box at the bottom, so the real grow box
+		// can sit on top of it.
+		JPanel sidePanel = new JPanel(new BorderLayout());
+		sidePanel.add(scrollPane.getVerticalScrollBar(), BorderLayout.CENTER);
+		sidePanel.add(growBoxPanel, BorderLayout.SOUTH);
+		
+		// Put our scroll bar plus spacer panel against the edge of
+		// the window.
+		add(sidePanel, BorderLayout.EAST);
 	}
 	
 	/** Starts the process listening once all the user interface stuff is set up. */
