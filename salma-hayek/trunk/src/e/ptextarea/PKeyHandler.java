@@ -194,7 +194,7 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private int caretRight() {
-        if (textArea.getCaretLocation() < textArea.getPTextBuffer().length() - 1) {
+        if (textArea.getCaretLocation() < textArea.getPTextBuffer().length()) {
             return textArea.getCaretLocation() + 1;
         } else {
             return textArea.getCaretLocation();
