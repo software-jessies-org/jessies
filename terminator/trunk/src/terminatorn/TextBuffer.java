@@ -357,11 +357,15 @@ public class TextBuffer implements TerminalListener {
 		this.width = width;
 		if (this.height > height && textLines.size() >= this.height) {
 			for (int i = 0; i < (this.height - height); i++) {
-				textLines.remove(textLines.size() - 1);
+				if (usingAlternativeBuffer() || get(textLines.size() - 1).length() == 0) {
+					textLines.remove(textLines.size() - 1);
+				}
 			}
 		} else if (this.height < height) {
 			for (int i = 0; i < (height - this.height); i++) {
-				textLines.add(new TextLine());
+				if (usingAlternativeBuffer() || getFirstDisplayLine() <= 0) {
+					textLines.add(new TextLine());
+				}
 			}
 		}
 		this.height = height;
