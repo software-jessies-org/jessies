@@ -73,6 +73,12 @@ public class Terminator implements Controller {
 		frame = new JFrame(Options.getSharedInstance().getTitle());
 		frame.setBackground(Options.getSharedInstance().getColor("background"));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		if (Options.getSharedInstance().shouldUseMenuBar()) {
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			frame.setJMenuBar(new TerminatorMenuBar());
+		}
+		
 		initTerminals();
 		frame.pack();
 		frame.setLocationRelativeTo(null);
