@@ -80,7 +80,7 @@ public class FindFilesDialog {
             System.err.println("---Starting search for " + regex + " in files matching " + directory + "...");
             Thread.currentThread().setName("Search for '" + regex + "' in " + directory);
             try {
-                Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+                Pattern pattern = Pattern.compile(regex);
                 Pattern fileNamePattern = Pattern.compile(directory, Pattern.CASE_INSENSITIVE);
                 FileSearcher fileSearcher = new FileSearcher(pattern);
                 List fileList = workspace.getFileList();

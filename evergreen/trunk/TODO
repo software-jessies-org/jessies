@@ -1,5 +1,11 @@
 TODO list for Edit
 
+* Need to remove the noHighlightsSet optimization from FindAction; it's
+  no longer valid now we're sharing a FindAction.
+
+* Try basing case-sensitivity for "Open Quickly" on whether or not there's
+  any capitalization in the search string. Similarly for all searches?
+
 Java 1.5:
  1. use Thread.getAllStackTraces to let us type C-\ at the UI to see what
     it's doing. can this work? or is it most likely to be useful when the
