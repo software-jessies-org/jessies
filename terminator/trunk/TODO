@@ -10,7 +10,6 @@ Unassigned TODOs:
 [5]	Hitting alt-k a number of times results in no redraw of the prompt.  I think bash tries to be clever.
 [5]	Change the naming of 'Control' and 'Controller'.  It's confusing.
 [5]	Refactor to make Terminator the main application, responsible for a number of TerminatorFrame objects.
-[5]	Change the 'terminatorn' package to be 'terminator'.
 [5]	Fix ^W in less.
 [5]	Resizing the terminal window causes an automatic scroll to the bottom.  This shouldn't happen.
 [5]	Make an about box.
