@@ -210,6 +210,16 @@ public class TextBuffer implements TelnetListener {
 		}
 	}
 	
+	public void deleteCharacters(int count) {
+		TextLine line = get(caretPosition.getLineIndex());
+		int oldLineLength = line.length();
+		int start = caretPosition.getCharOffset();
+		int end = start + count;
+		line.killText(start, end);
+		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition.y's line still has a valid *start* index.
+		view.lineSectionChanged(caretPosition.getLineIndex(), 0, oldLineLength);
+	}
+	
 	public void killHorizontally(boolean fromStart, boolean toEnd) {
 		TextLine line = get(caretPosition.getLineIndex());
 		int oldLineLength = line.length();
