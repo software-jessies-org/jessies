@@ -33,6 +33,8 @@ public class TerminalControl implements Runnable {
 	private InputStream in;
 	private PtyOutputStream out;
 	
+	private boolean graphicalCharacterSet = false;
+	
 	private LogWriter logWriter;
 	
 	// Buffer of TerminalActions to perform.
@@ -200,10 +202,10 @@ public class TerminalControl implements Runnable {
 			flushLineBuffer();
 			doStep();
 			processSpecialCharacter(ch);
-		} else if (ch == ASCII_SO || ch == ASCII_SI) {
-			// The xwsh man page says that these make G0 and G1 the current
-			// character set, respectively. In practice, they make whiptail(1) look
-			// strange. Until we support graphical character sets, ignore them.
+		} else if (ch == ASCII_SO) {
+			graphicalCharacterSet = true;
+		} else if (ch == ASCII_SI) {
+			graphicalCharacterSet = false;
 		} else if (ch > ASCII_BEL) {
 			// Most telnetd(1) implementations seem to have a bug whereby
 			// they send the NUL byte at the end of the C strings they want to
@@ -214,7 +216,12 @@ public class TerminalControl implements Runnable {
 			// Nothing below BEL is printable anyway.
 			
 			// And neither is BEL, really.
-			lineBuffer.append(ch);
+			
+			if (graphicalCharacterSet) {
+				lineBuffer.append(translateToGraphicalCharacterSet(ch));
+			} else {
+				lineBuffer.append(ch);
+			}
 		}
 	}
 
@@ -274,6 +281,22 @@ public class TerminalControl implements Runnable {
 		TerminalAction action = escapeParser.getAction(this);
 		if (action != null) {
 			terminalActions.add(action);
+		}
+	}
+	
+	/**
+	 * Translate ASCII to the Unicode box-drawing characters.
+	 */
+	private char translateToGraphicalCharacterSet(char ch) {
+		switch (ch) {
+			case 'q': return '\u2500';
+			case 'x': return '\u2502';
+			case 'm': return '\u2514';
+			case 'j': return '\u2518';
+			case 'l': return '\u250c';
+			case 'k': return '\u2510';
+			default:
+				return ch;
 		}
 	}
 	
