@@ -30,6 +30,8 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         };
     }
     
+    private static ETextWindow mostRecentlyFocusedTextWindow;
+    
     protected String filename;
     protected File file;
     private long lastModifiedTime;
@@ -107,9 +109,17 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         findResultsUpdater.setRepeats(false);
     }
 
+    public static void rememberFocus() {
+        if (mostRecentlyFocusedTextWindow != null) {
+            Workspace workspace = (Workspace) SwingUtilities.getAncestorOfClass(Workspace.class, mostRecentlyFocusedTextWindow);
+            workspace.rememberFocusedTextWindow(mostRecentlyFocusedTextWindow);
+        }
+    }
+    
     private void initFocusListener() {
         text.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
+                mostRecentlyFocusedTextWindow = ETextWindow.this;
                 text.setSelectionColor(FOCUSED_SELECTION_COLOR);
                 updateWatermark();
             }
