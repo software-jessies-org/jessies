@@ -33,7 +33,9 @@ public class JTelnetPane extends JPanel {
 			Thread reaper = new Thread(new Runnable() {
 				public void run() {
 					try {
-						proc.waitFor();
+						int status = proc.waitFor();
+						// FIXME: whether or not we invoke this should depend on 'status'.
+						closeContainingTabOrWindow();
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
@@ -133,6 +135,27 @@ public class JTelnetPane extends JPanel {
 	/** Starts the process listening once all the user interface stuff is set up. */
 	public void start() {
 		control.start();
+	}
+	
+	/**
+	 * Closes the tab or window containing this terminal.
+	 */
+	public void closeContainingTabOrWindow() {
+		// Look for a tabbed pane to remove ourselves from first,
+		// but only one with other tabs; if we're the last tab, we
+		// should fall through and close the window instead.
+		JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
+		if (tabbedPane != null && tabbedPane.getTabCount() > 1) {
+			tabbedPane.remove(this);
+			return;
+		}
+		
+		// Look for a window to close.
+		JFrame window = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, this);
+		if (window != null) {
+			window.setVisible(false);
+			window.dispose();
+		}
 	}
 	
 	public String getName() {
