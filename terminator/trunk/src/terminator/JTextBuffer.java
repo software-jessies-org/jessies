@@ -304,7 +304,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private void redrawCaretPosition() {
 		Point top = getLineTop(caretPosition);
 		FontMetrics metrics = getFontMetrics(getFont());
-		repaint(top.x, top.y, 1, metrics.getHeight());
+		repaint(top.x, top.y, metrics.charWidth(' '), metrics.getHeight());
 	}
 	
 	public void paintComponent(Graphics graphics) {
@@ -321,13 +321,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			int x = 0;
 			int baseline = metrics.getHeight() * (i + 1) - metrics.getMaxDescent();
 			for (int j = 0; j < lineText.length; j++) {
-				paintStyledText(graphics, lineText[j], x, baseline);
-				x += metrics.stringWidth(lineText[j].getText());
-			}
-			if (displayCaret && i == caretPosition.getLineIndex()) {
-				graphics.setColor(hasFocus ? Options.getSharedInstance().getColor("cursorColor") : Color.BLACK);
-				Point top = getLineTop(caretPosition);
-				graphics.drawLine(top.x, top.y, top.x, top.y + metrics.getHeight() - 1);
+				boolean drawCaret = (displayCaret && i == caretPosition.getLineIndex());
+				x += paintStyledText(graphics, lineText[j], x, baseline, drawCaret);
 			}
 		}
 		if (ANTIALIAS) {
@@ -344,12 +339,45 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return result;
 	}
 	
-	private void paintStyledText(Graphics graphics, StyledText text, int x, int y) {
+	/**
+	 * Paints the caret. Three caret styles are supported, though there's
+	 * no interface yet to choose between them, and the block caret has
+	 * the problem of needing to know whether to influence the next
+	 * character's foreground color (and having some way of doing so).
+	 */
+	private void paintCaret(Graphics graphics, FontMetrics metrics) {
+		graphics.setColor(Options.getSharedInstance().getColor("cursorColor"));
+		Point top = getLineTop(caretPosition);
+		final int bottomY = top.y + metrics.getHeight() - 1;
+		if (hasFocus) {
+			// Block.
+			//graphics.fillRect(top.x, top.y, metrics.charWidth(' '), metrics.getHeight());
+			// Vertical Bar.
+			//graphics.drawLine(top.x, top.y, top.x, bottomY);
+			// Underline.
+			graphics.drawLine(top.x, bottomY, top.x + metrics.charWidth(' ') - 1, bottomY);
+		} else {
+			// For some reason, terminals always seem to use an
+			// empty block for the unfocused cursor, regardless
+			// of what shape they're using for the focused cursor.
+			// It's not obvious what else they could do that would
+			// look better.
+			graphics.drawRect(top.x, top.y, metrics.charWidth(' ') - 1, metrics.getHeight() - 1);
+		}
+	}
+	
+	/**
+	 * Paints the text. Returns how many pixels wide the text was.
+	 */
+	private int paintStyledText(Graphics graphics, StyledText text, int x, int y, boolean drawCaret) {
 		FontMetrics metrics = getFontMetrics(getFont());
 		Style style = text.getStyle();
 		int textWidth = metrics.stringWidth(text.getText());
 		graphics.setColor(style.getBackground());
 		graphics.fillRect(x, y - metrics.getMaxAscent(), textWidth, metrics.getHeight());
+		if (drawCaret) {
+			paintCaret(graphics, metrics);
+		}
 		graphics.setColor(style.getForeground());
 		if (style.isUnderlined()) {
 			graphics.drawLine(x, y + 1, x + textWidth, y + 1);
@@ -374,6 +402,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			}
 			graphics.setFont(oldFont);
 		}
+		return textWidth;
 	}
 
 	/** Overridden so we can get real tabs, and they're not stolen by some cycling thing. */
