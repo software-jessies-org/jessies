@@ -217,10 +217,17 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public PCoordinates getNearestCoordinates(Point point) {
+        if (point.y < 0) {
+            return new PCoordinates(0, 0);
+        }
         generateLineWrappings();
+        final int maxLineIndex = splitLines.size() - 1;
         FontMetrics metrics = getFontMetrics(getFont());
         int lineIndex = point.y / metrics.getHeight();
-        lineIndex = Math.max(0, Math.min(splitLines.size() - 1, lineIndex));
+        if (lineIndex > maxLineIndex) {
+            point.x = Integer.MAX_VALUE;
+        }
+        lineIndex = Math.max(0, Math.min(maxLineIndex, lineIndex));
         PLineSegment[] segments = getLineSegments(lineIndex);
         int charOffset = 0;
         int x = 0;
