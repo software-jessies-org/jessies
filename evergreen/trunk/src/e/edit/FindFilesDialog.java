@@ -78,6 +78,10 @@ public class FindFilesDialog {
             this.containsDefinition = containsDefinition;
         }
         
+        public boolean containsDefinition() {
+            return containsDefinition;
+        }
+        
         public void open() {
             EWindow window = Edit.openFile(workspace.getRootDirectory() + File.separator + name);
             if (window instanceof ETextWindow && regularExpression != null) {
@@ -287,6 +291,8 @@ public class FindFilesDialog {
     }
     
     public class MatchTreeCellRenderer extends DefaultTreeCellRenderer {
+        Font defaultFont = null;
+        
         public MatchTreeCellRenderer() {
             setClosedIcon(null);
             setOpenIcon(null);
@@ -295,7 +301,21 @@ public class FindFilesDialog {
         
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean isExpanded, boolean isLeaf,  int row,  boolean hasFocus) {
             Component c = super.getTreeCellRendererComponent(tree, value, isSelected, isExpanded, isLeaf, row, hasFocus);
-            if (isLeaf) {
+            
+            // Unlike the foreground Color, the Font gets remembered, so we
+            // need to manually revert it each time.
+            if (defaultFont == null) {
+                defaultFont = c.getFont();
+            }
+            c.setFont(defaultFont);
+            
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            if (node.getUserObject() instanceof MatchingFile) {
+                MatchingFile file = (MatchingFile) node.getUserObject();
+                if (file.containsDefinition()) {
+                    c.setFont(c.getFont().deriveFont(Font.BOLD));
+                }
+            } else {
                 c.setForeground(Color.GRAY);
             }
             return c;
