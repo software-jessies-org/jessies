@@ -36,6 +36,7 @@ public class JarExplorer extends JFrame {
         setContentPane(makeUi());
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -85,7 +86,7 @@ public class JarExplorer extends JFrame {
     }
 
     private JTextArea makeTextArea() {
-        JTextArea textArea = new JTextArea(80, 20);
+        JTextArea textArea = new JTextArea(30, 80);
         textArea.setEditable(false);
         textArea.setDragEnabled(false);
         return textArea;
