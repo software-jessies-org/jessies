@@ -61,6 +61,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 	
 	private void initFrame() {
 		frame = new JFrame(Options.getSharedInstance().getTitle());
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setBackground(Options.getSharedInstance().getColor("background"));
 		
 		if (Options.getSharedInstance().shouldUseMenuBar()) {
