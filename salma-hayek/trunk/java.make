@@ -35,6 +35,8 @@ SPACE := $(subst :, ,:)
 
 # ----------------------------------------------------------------------------
 
+SUBDIRS += $(wildcard native/all/*) $(wildcard native/Darwin/*)
+
 SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
 # By default, distributions end up under http://www.jessies.org/~enh/
