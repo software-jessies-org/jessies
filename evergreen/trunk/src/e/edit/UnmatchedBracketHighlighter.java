@@ -98,10 +98,12 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
                 if (parenthesisNesting < 0 && (ch == '{' || ch == '}' || ch == ')')) {
                     // Can't have a block within parentheses.
                     addHighlight = true;
+                    parenthesisNesting = 0;
                 }
                 if (braceNesting < 0 && (ch == '{' || ch == '}')) {
                     // Can't have unbalanced braces.
                     addHighlight = true;
+                    braceNesting = 0;
                 }
 
                 if (addHighlight) {
