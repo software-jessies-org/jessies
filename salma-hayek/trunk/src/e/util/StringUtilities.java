@@ -10,7 +10,7 @@ public class StringUtilities {
         LineNumberReader in = null;
         try {
             File file = FileUtilities.fileFromString(filename);
-            in = new LineNumberReader(new InputStreamReader(new FileInputStream(file)));
+            in = new LineNumberReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
             String line;
             while ((line = in.readLine()) != null) {
                 result.add(line);
