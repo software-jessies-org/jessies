@@ -124,7 +124,7 @@ public class Options {
 	 * 
 	 *  background (white)
 	 *  foreground (black)
-	 *  cursorColor (black)
+	 *  cursorColor (black; we use green)
 	 *  highlightColor (reverse video)
 	 *  pointerColor
 	 *  pointerBackgroundColor
@@ -215,7 +215,7 @@ public class Options {
 		options.put("color14", "cyan");
 		options.put("color15", "white");
 		
-		options.put("cursorColor", "black");
+		options.put("cursorColor", "green");
 		options.put("linkColor", "blue");
 	}
 	
