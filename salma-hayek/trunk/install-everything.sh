@@ -10,11 +10,15 @@ link_in_usr_local_bin() {
     ln -fs $* /usr/local/bin || die "couldn't link $*"
 }
 
+cd /usr/local/ || die "couldn't cd to /usr/local"
+
 # Install Java in /usr/local, and put links to java and javac in /usr/local/bin.
-cd /usr/local/ && \
-/home/elliotth/download/jdk-1_5_0-beta2-linux-i586.bin || die "installing Java"
-link_in_usr_local_bin /usr/local/jdk1.5.0/bin/java
-link_in_usr_local_bin /usr/local/jdk1.5.0/bin/javac
+java_installer=/home/elliotth/download/jdk-1_5_0-beta2-linux-i586.bin
+if test -f $java_installer && ! test -d /usr/local/jdk1.5.0 ; then
+    $java_installer || die "installing Java"
+    link_in_usr_local_bin /usr/local/jdk1.5.0/bin/java
+    link_in_usr_local_bin /usr/local/jdk1.5.0/bin/javac
+fi
 
 # Create a directory in /usr/local for all our stuff.
 mkdir -p /usr/local/www.jessies.org/ && \
