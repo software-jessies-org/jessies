@@ -11,18 +11,23 @@ import javax.swing.text.*;
 /**
 
 @author Phil Norman
+@author Elliott Hughes
 */
 
-public class JTelnetPane extends JScrollPane {
+public class JTelnetPane extends JPanel {
 	private TelnetControl control;
 	private JTextBuffer textPane;
 	private int viewWidth = 80;
 	private int viewHeight = 24;
 	
 	public JTelnetPane(String host, int port) {
+		super(new BorderLayout());
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
-		getViewport().setView(textPane);
+		JScrollPane scrollPane = new JScrollPane(textPane);
+		scrollPane.getViewport().setBackground(Color.WHITE);
+		add(scrollPane, BorderLayout.CENTER);
+		textPane.sizeChanged();
 		try {
 			Socket sock = new Socket(host, port);
 			control = new TelnetControl(textPane.getModel(), sock.getInputStream(), sock.getOutputStream());
