@@ -240,7 +240,7 @@ public class JTerminalPane extends JPanel {
 		
 		public void keyPressed(KeyEvent event) {
 			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
-				if (GuiUtilities.isMacOs() == false) {
+				if (Options.getSharedInstance().shouldUseMenuBar() == false) {
 					handleKeyboardEquivalent(event);
 				}
 				return;
