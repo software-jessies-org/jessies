@@ -183,6 +183,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             initKeywordsForDocument();
             
             text.setText(content);
+            text.setAppropriateFont();
             text.getUndoManager().discardAllEdits();
             text.getDocument().addDocumentListener(this);
             markAsClean();

@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.undo.*;
 import e.forms.*;
 import e.gui.*;
 import e.util.*;
@@ -140,6 +141,10 @@ public class FindAndReplaceAction extends ETextAction {
             } else {
                 String regex = patternField.getText();
                 String replacementPattern = replacementField.getText();
+                // Introduce a CompoundEdit to the UndoManager so that all our replacements are treated as a single UndoableEdit.
+                CompoundEdit entireEdit = new CompoundEdit();
+                UndoManager undoManager = text.getUndoManager();
+                undoManager.addEdit(entireEdit);
                 try {
                     String newText = Pattern.compile(regex, Pattern.MULTILINE).matcher(text.getText()).replaceAll(replacementPattern);
                     int caretPosition = text.getCaretPosition(); // Assume the text doesn't change too much.
@@ -148,17 +153,16 @@ public class FindAndReplaceAction extends ETextAction {
                     finished = true;
                 } catch (Exception ex) {
                     Edit.showAlert("Find And Replace", "Couldn't perform the replacements (" + ex.getMessage() + ").");
+                } finally {
+                    // Ensure that, no matter what happens, we finish the CompoundEdit so life can go back to normal.
+                    // FIXME: We should probably undo the CompoundEdit if an exception was thrown, but as it is we're likely to want to fix what went wrong.
+                    entireEdit.end();
                 }
                 
                 /*
                 ----------------------------------------------------------------------------------------------------
                 This is retired because it doesn't cope properly with the case where the regex is "$".
                 ----------------------------------------------------------------------------------------------------
-                // Introduce a CompoundEdit to the UndoManager so that all our replacements are treated as a single UndoableEdit.
-                CompoundEdit entireEdit = new CompoundEdit();
-                UndoManager undoManager = text.getUndoManager();
-                undoManager.addEdit(entireEdit);
-                try {
                     Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
                     int offset = 0;
                     do {
@@ -177,13 +181,6 @@ public class FindAndReplaceAction extends ETextAction {
                         // Work out where we need to start looking for the next match.
                         offset = start + replacement.length();
                     } while (true);
-                } catch (Exception ex) {
-                    Edit.showAlert("Find And Replace", "Couldn't perform the replacements (" + ex.getMessage() + ").");
-                } finally {
-                    // Ensure that, no matter what happens, we finish the CompoundEdit so life can go back to normal.
-                    // FIXME: We should probably undo the CompoundEdit, but as it is we're likely to want to fix what went wrong.
-                    entireEdit.end();
-                }
                 ----------------------------------------------------------------------------------------------------
                 */
             }
