@@ -7,7 +7,7 @@ import java.awt.*;
 @author Phil Norman
 */
 
-public class Style {
+public class Style implements StyleMutator {
 	// If any of these is null, it should be ignored.  We use Boolean references because they
 	// can be used to represent 3 states - null, TRUE and FALSE.
 	private Color foreground;
@@ -26,6 +26,14 @@ public class Style {
 		this.isUnderlined = isUnderlined;
 	}
 	
+	public Style mutate(Style originalStyle) {
+		Color mutatedForeground = hasForeground() ? getForeground() : originalStyle.getForeground();
+		Color mutatedBackground = hasBackground() ? getBackground() : originalStyle.getBackground();
+		boolean mutatedBold = hasBold() ? isBold() : originalStyle.isBold();
+		boolean mutatedUnderlined = hasUnderlined() ? isUnderlined() : originalStyle.isUnderlined();
+		return new Style(mutatedForeground, mutatedBackground, mutatedBold, mutatedUnderlined);
+	}
+
 	public boolean hasForeground() {
 		return foreground != null;
 	}
