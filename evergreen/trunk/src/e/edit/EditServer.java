@@ -49,6 +49,8 @@ public final class EditServer extends Thread {
         if (line.startsWith("open ")) {
             String filename = line.substring("open ".length());
             open(out, filename);
+        } else if (line.equals("save-all")) {
+            SaveAllAction.saveAll(false);
         } else {
             out.println("EditServer: didn't understand request \"" + line + "\".");
         }
