@@ -376,6 +376,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private int paintStyledText(Graphics graphics, StyledText text, int x, int y, boolean drawCaret) {
 		FontMetrics metrics = getFontMetrics(getFont());
 		Style style = text.getStyle();
+		
+		// Sanity check for top weirdness.
+		if (style.getForeground().equals(style.getBackground())) {
+			Log.warn("Foreground and background colours are identical (text \"" + text.getText() + "\").");
+		}
+		
 		int textWidth = metrics.stringWidth(text.getText());
 		graphics.setColor(style.getBackground());
 		graphics.fillRect(x, y - metrics.getMaxAscent(), textWidth, metrics.getHeight());
