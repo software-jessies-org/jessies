@@ -46,7 +46,6 @@ Java 1.5:
 find in files:
  1. don't search twice for the same thing. we're not that fast!
  3. show the matching line(s).
- 7. if the 'files containing' field is blank at the start of the search, there's no need to do a full search; the result should be the same as a search for files matching 'whose names match'.
  8. sometimes (not always) i see the list of matches get populated, and then everything vanishes at the last moment. i seem to remember the open quickly dialog used to do that too, but stopped doing it some time ago. it seems particularly prone to it if the list of matches is long.
 
 spelling checking:

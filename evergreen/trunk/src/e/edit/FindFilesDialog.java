@@ -31,6 +31,16 @@ public class FindFilesDialog {
         private String regularExpression;
         private boolean containsDefinition;
         
+        /**
+         * For matches based just on filename.
+         */
+        public MatchingFile(String name) {
+            this(name, 0, null, false);
+        }
+        
+        /**
+         * For matches based on filename and a regular expression.
+         */
         public MatchingFile(String name, int matchCount, String regularExpression, boolean containsDefinition) {
             this.name = name;
             this.matchCount = matchCount;
@@ -40,7 +50,7 @@ public class FindFilesDialog {
         
         public void open() {
             EWindow window = Edit.openFile(workspace.getRootDirectory() + File.separator + name);
-            if (window instanceof ETextWindow) {
+            if (window instanceof ETextWindow && regularExpression != null) {
                 ETextWindow textWindow = (ETextWindow) window;
                 FindAction.INSTANCE.findInText(textWindow, regularExpression);
                 textWindow.findNext();
@@ -49,13 +59,15 @@ public class FindFilesDialog {
         
         public String toString() {
             StringBuffer result = new StringBuffer(name);
-            result.append(" (");
-            result.append(matchCount);
-            result.append(matchCount == 1 ? " match" : " matches");
-            if (containsDefinition) {
-                result.append(" including definition");
+            if (matchCount != 0) {
+                result.append(" (");
+                result.append(matchCount);
+                result.append(matchCount == 1 ? " match" : " matches");
+                if (containsDefinition) {
+                    result.append(" including definition");
+                }
+                result.append(")");
             }
-            result.append(")");
             return result.toString();
         }
     }
@@ -98,10 +110,14 @@ public class FindFilesDialog {
                     }
                     try {
                         String candidate = (String) fileList.get(i);
-                        int matchCount = fileSearcher.searchFile(root, candidate);
-                        if (matchCount > 0) {
-                            DefinitionFinder definitionFinder = new DefinitionFinder(FileUtilities.fileFromParentAndString(root, candidate), regex);
-                            matchModel.addElement(new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition));
+                        if (regex.length() != 0) {
+                            int matchCount = fileSearcher.searchFile(root, candidate);
+                            if (matchCount > 0) {
+                                DefinitionFinder definitionFinder = new DefinitionFinder(FileUtilities.fileFromParentAndString(root, candidate), regex);
+                                matchModel.addElement(new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition));
+                            }
+                        } else {
+                            matchModel.addElement(new MatchingFile(candidate));
                         }
                     } catch (FileNotFoundException ex) {
                         ex = ex; // Not our problem.
