@@ -18,20 +18,23 @@ public class PTextWindow {
     }
     
     private static void open(final String filename) {
-        final StopWatch stopWatch = new StopWatch(filename + ": ");
-        final PTextBuffer text = new PTextBuffer();
-        text.readFromFile(new java.io.File(filename));
-        stopWatch.print("read file");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                PTextArea area = new PTextArea(text);
-                stopWatch.print("created text area");
+                final StopWatch stopWatch = new StopWatch(filename + ": ");
+                
+                final PTextArea area = new PTextArea();
                 area.setFont(new Font(e.util.GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12));
+                stopWatch.print("created text area");
+                
+                area.getPTextBuffer().readFromFile(new java.io.File(filename));
+                stopWatch.print("read file");
+
                 PTextStyler styler = getTextStyler(filename, area);
                 if (styler != null) {
                     area.setTextStyler(styler);
                 }
                 stopWatch.print("added styler");
+                
                 JFrame frame = new JFrame("PTextArea Test: " + filename);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 JScrollPane scroller = new JScrollPane(area);
@@ -41,7 +44,7 @@ public class PTextWindow {
                 frame.setVisible(true);
                 frame.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
-                        text.writeToFile(new java.io.File(filename + ".bak"));
+                        area.getPTextBuffer().writeToFile(new java.io.File(filename + ".bak"));
                     }
                 });
             }
