@@ -15,7 +15,7 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     
     public GotoAction() {
         super(ACTION_NAME);
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("L", false));
+        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("L", false));
     }
     
     public void actionPerformed(ActionEvent e) {

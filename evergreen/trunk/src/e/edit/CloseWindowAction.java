@@ -11,7 +11,7 @@ public class CloseWindowAction extends ETextAction {
 
     public CloseWindowAction() {
         super(ACTION_NAME);
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("W", false));
+        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("W", false));
     }
 
     public void actionPerformed(ActionEvent e) {

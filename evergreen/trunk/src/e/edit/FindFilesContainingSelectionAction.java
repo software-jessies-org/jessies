@@ -12,7 +12,7 @@ import e.util.*;
 public class FindFilesContainingSelectionAction extends ETextAction {
     public FindFilesContainingSelectionAction() {
         super("Find in Files...");
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("G", true));
+        putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("G", true));
     }
     
     public void actionPerformed(ActionEvent e) {

@@ -30,7 +30,7 @@ public class FindAndReplaceAction extends ETextAction {
     
     public FindAndReplaceAction() {
         super(ACTION_NAME);
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("R", false));
+        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("R", false));
     }
     
     private ETextWindow textWindow;
