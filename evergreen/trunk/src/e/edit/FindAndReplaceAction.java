@@ -10,8 +10,8 @@ import e.gui.*;
 import e.util.*;
 
 /**
-The ETextArea action to open a find and replace dialog.
-*/
+ * The ETextArea action to open a find and replace dialog.
+ */
 public class FindAndReplaceAction extends ETextAction {
     public static final String ACTION_NAME = "Find/Replace...";
     
@@ -44,6 +44,7 @@ public class FindAndReplaceAction extends ETextAction {
         String selection = text.getSelectedText();
         if (selection.length() > 0 && isSelectionMeantAsScope() == false) {
             patternField.setText(StringUtilities.regularExpressionFromLiteral(selection));
+            replacementField.setText(StringUtilities.regularExpressionFromLiteral(selection));
         }
     }
     
