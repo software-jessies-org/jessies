@@ -191,62 +191,77 @@ public class CSIEscapeAction implements TerminalAction {
 		String[] chunks = sequence.split(";");
 		for (int i = 0; i < chunks.length; i++) {
 			int value = (chunks[i].length() == 0) ? 0 : Integer.parseInt(chunks[i]);
-			if (valueInRange(value, 0, 29)) {
-				switch (value) {
-					case 0:
-						hasForeground = false;
-						hasBackground = false;
-						isBold = false;
-						isReverseVideo = false;
-						isUnderlined = false;
-						break;
-					case 1:
-						isBold = true;
-						break;
-					case 4:
-						isUnderlined = true;
-						break;
-					case 5:
-						// Blink on. Unsupported.
-						break;
-					case 7:
-						isReverseVideo = true;
-						break;
-					case 22:
-						isBold = false;
-						break;
-					case 24:
-						isUnderlined = false;
-						break;
-					case 25:
-						// Blink off. Unsupported.
-						break;
-					case 27:
-						isReverseVideo = false;
-						break;
-					default:
-						Log.warn("Unknown attribute " + value + " in [" + sequence);
-						break;
-				}
-			} else if (valueInRange(value, 30, 37)) {
+			switch (value) {
+			case 0:
+				// Clear all attributes.
+				hasForeground = false;
+				hasBackground = false;
+				isBold = false;
+				isReverseVideo = false;
+				isUnderlined = false;
+				break;
+			case 1:
+				isBold = true;
+				break;
+			case 4:
+				isUnderlined = true;
+				break;
+			case 5:
+				// Blink on. Unsupported.
+				break;
+			case 7:
+				isReverseVideo = true;
+				break;
+			case 22:
+				isBold = false;
+				break;
+			case 24:
+				isUnderlined = false;
+				break;
+			case 25:
+				// Blink off. Unsupported.
+				break;
+			case 27:
+				isReverseVideo = false;
+				break;
+			case 30:
+			case 31:
+			case 32:
+			case 33:
+			case 34:
+			case 35:
+			case 36:
+			case 37:
+				// Set foreground color.
 				foreground = value - 30;
 				hasForeground = true;
-			} else if (valueInRange(value, 40, 47)) {
+				break;
+			case 39:
+				// Use default foreground color.
+				hasForeground = false;
+				break;
+			case 40:
+			case 41:
+			case 42:
+			case 43:
+			case 44:
+			case 45:
+			case 46:
+			case 47:
+				// Set background color.
 				background = value - 40;
 				hasBackground = true;
-			} else if (value == 39) {
-				hasForeground = false;
-			} else if (value == 49) {
+				break;
+			case 49:
+				// Use default background color.
 				hasBackground = false;
-			} else {
+				break;
+			default:
 				Log.warn("Unknown attribute " + value + " in [" + sequence);
+				break;
 			}
 		}
 		listener.setStyle(StyledText.getStyle(foreground, hasForeground, background, hasBackground, isBold, isUnderlined, isReverseVideo));
 		return true;
-	}
-	
-	public boolean valueInRange(int value, int min, int max) {
-		return (value >= min) && (value <= max);
 	}
 }
