@@ -13,7 +13,11 @@ import e.util.*;
  * and we'll provide the buttons and basic functionality. A non-modal dialog
  * gets just a Close button; a modal dialog gets OK and Cancel, and you can
  * also provide an extra button with any label.
- *
+ * 
+ * Obviously you wouldn't dream of having an "OK" button, would you? Because
+ * of this, you actually have to supply the label for the positive action
+ * button; something like "Add", "Print", "Save" or whatever.
+ * 
  * These dialogs automatically remember the location and size they had last time they were
  * shown, though this isn't automatically stored anywhere, so restart your program, and you'll
  * be back to defaults. If your program invokes writeGeometriesTo and readGeometriesFrom
@@ -40,34 +44,41 @@ public class FormDialog extends JDialog {
     
     /** Shows a non-modal dialog with just a Close button. */
     public static void showNonModal(Frame parent, String title, Container contentPane) {
-        FormDialog formDialog = new FormDialog(parent, title, contentPane, null, false);
+        FormDialog formDialog = new FormDialog(parent, title, contentPane, "Close", null, false);
         formDialog.show();
     }
     
-    /** Shows a dialog with the usual OK and Cancel buttons. */
-    public static boolean show(Frame parent, String title, Container contentPane) {
-        return show(parent, title, contentPane, null);
+    /**
+     * Shows a dialog with the usual OK and Cancel buttons.
+     * See the note in the class documentation about "OK" buttons.
+     */
+    public static boolean show(Frame parent, String title, Container contentPane, String actionLabel) {
+        return show(parent, title, contentPane, actionLabel, null);
     }
     
-    /** Shows a dialog with the usual OK and Cancel buttons plus an extra button you provide. */
-    public static boolean show(Frame parent, String title, Container contentPane, JButton extraButton) {
-        FormDialog formDialog = new FormDialog(parent, title, contentPane, extraButton, true);
+    /**
+     * Shows a dialog with the usual OK and Cancel buttons plus an extra button
+     * you provide.
+     * See the note in the class documentation about "OK" buttons.
+     */
+    public static boolean show(Frame parent, String title, Container contentPane, String actionLabel, JButton extraButton) {
+        FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, extraButton, true);
         formDialog.show();
         return formDialog.wasAccepted();
     }
 
-    private FormDialog(Frame parent, String title, Container contentPane, JButton extraButton, boolean modal) {
+    private FormDialog(Frame parent, String title, Container contentPane, String actionLabel, JButton extraButton, boolean modal) {
         super(parent, title, modal);
-        init(parent, contentPane, extraButton);
+        init(parent, contentPane, actionLabel, extraButton);
     }
     
-    private void init(Frame parent, Container contentPane, JButton extraButton) {
+    private void init(Frame parent, Container contentPane, String actionLabel, JButton extraButton) {
         setResizable(true);
         
         JPanel internalContentPane = new JPanel(new BorderLayout(componentSpacing, componentSpacing));
         internalContentPane.setBorder(BorderFactory.createEmptyBorder(componentSpacing, componentSpacing, componentSpacing, componentSpacing));
         internalContentPane.add(contentPane, BorderLayout.CENTER);
-        internalContentPane.add(makeButtonPanel(getRootPane(), extraButton), BorderLayout.SOUTH);
+        internalContentPane.add(makeButtonPanel(getRootPane(), actionLabel, extraButton), BorderLayout.SOUTH);
         
         setContentPane(internalContentPane);
         
@@ -150,9 +161,9 @@ public class FormDialog extends JDialog {
         return wasAccepted;
     }
 
-    private JPanel makeButtonPanel(JRootPane rootPane, JButton extraButton) {
+    private JPanel makeButtonPanel(JRootPane rootPane, String actionLabel, JButton extraButton) {
         if (isModal() == false) {
-            JButton closeButton = new JButton("Close");
+            JButton closeButton = new JButton(actionLabel);
             closeButton.addActionListener(closeAction);
             rootPane.setDefaultButton(closeButton);
             return makeButtonPanel(closeButton, null, null);
@@ -161,19 +172,27 @@ public class FormDialog extends JDialog {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(closeAction);
 
-        JButton okButton = new JButton("OK");
-        okButton.addActionListener(new ActionListener() {
+        JButton actionButton = new JButton(actionLabel);
+        actionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 acceptDialog();
             }
         });
-        okButton.setPreferredSize(cancelButton.getPreferredSize());
-        rootPane.setDefaultButton(okButton);
+        
+        Dimension cancelSize = cancelButton.getPreferredSize();
+        Dimension actionSize = actionButton.getPreferredSize();
+        final int width = (int) Math.max(actionSize.getWidth(), cancelSize.getWidth());
+        final int height = (int) Math.max(actionSize.getHeight(), cancelSize.getHeight());
+        Dimension buttonSize = new Dimension(width, height);
+        actionButton.setPreferredSize(buttonSize);
+        cancelButton.setPreferredSize(buttonSize);
+        
+        rootPane.setDefaultButton(actionButton);
 
-        return makeButtonPanel(okButton, cancelButton, extraButton);
+        return makeButtonPanel(actionButton, cancelButton, extraButton);
     }
     
-    private JPanel makeButtonPanel(JButton okButton, JButton cancelButton, JButton extraButton) {
+    private JPanel makeButtonPanel(JButton actionButton, JButton cancelButton, JButton extraButton) {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(0, componentSpacing, componentSpacing, componentSpacing));
         //panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -182,7 +201,7 @@ public class FormDialog extends JDialog {
         if (isWindows()) {
             // Use the traditional Windows layout.
             panel.add(Box.createGlue());
-            panel.add(okButton);
+            panel.add(actionButton);
             if (cancelButton != null) {
                 panel.add(Box.createHorizontalStrut(componentSpacing));
                 panel.add(cancelButton);
@@ -201,7 +220,7 @@ public class FormDialog extends JDialog {
                 panel.add(cancelButton);
                 panel.add(Box.createHorizontalStrut(componentSpacing));
             }
-            panel.add(okButton);
+            panel.add(actionButton);
         }
         
         return panel;
