@@ -5,11 +5,15 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class SearchField extends JTextField {
-    public SearchField() {
+    public SearchField(String placeholderText) {
         super(15);
-        addFocusListener(new PlaceholderText("Search"));
+        addFocusListener(new PlaceholderText(placeholderText));
     }
 
+    public SearchField() {
+        this("Search");
+    }
+    
     class PlaceholderText implements FocusListener {
         private String placeholderText;
         private String previousText = "";
