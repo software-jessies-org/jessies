@@ -9,9 +9,10 @@ import e.gui.*;
 import e.util.*;
 
 /**
- * Implements simple modal dialogs. You provide the content (probably with a FormPanel),
- * and we'll provide the buttons and basic functionality. You can also provide an extra button
- * to go with the default OK and Cancel.
+ * Implements simple dialogs. You provide the content (probably with a FormPanel),
+ * and we'll provide the buttons and basic functionality. A non-modal dialog
+ * gets just a Close button; a modal dialog gets OK and Cancel, and you can
+ * also provide an extra button with any label.
  *
  * These dialogs automatically remember the location and size they had last time they were
  * shown, though this isn't automatically stored anywhere, so restart your program, and you'll
@@ -37,6 +38,12 @@ public class FormDialog extends JDialog {
         return 10;
     }
     
+    /** Shows a non-modal dialog with just a Close button. */
+    public static void showNonModal(Frame parent, String title, Container contentPane) {
+        FormDialog formDialog = new FormDialog(parent, title, contentPane, null, false);
+        formDialog.show();
+    }
+    
     /** Shows a dialog with the usual OK and Cancel buttons. */
     public static boolean show(Frame parent, String title, Container contentPane) {
         return show(parent, title, contentPane, null);
@@ -44,19 +51,17 @@ public class FormDialog extends JDialog {
     
     /** Shows a dialog with the usual OK and Cancel buttons plus an extra button you provide. */
     public static boolean show(Frame parent, String title, Container contentPane, JButton extraButton) {
-        FormDialog formDialog = new FormDialog(parent, title, contentPane, extraButton);
+        FormDialog formDialog = new FormDialog(parent, title, contentPane, extraButton, true);
         formDialog.show();
-        dialogGeometries.put(title, formDialog.getBounds());
         return formDialog.wasAccepted();
     }
 
-    private FormDialog(Frame parent, String title, Container contentPane, JButton extraButton) {
-        super(parent, title);
+    private FormDialog(Frame parent, String title, Container contentPane, JButton extraButton, boolean modal) {
+        super(parent, title, modal);
         init(parent, contentPane, extraButton);
     }
     
     private void init(Frame parent, Container contentPane, JButton extraButton) {
-        setModal(true);
         setResizable(true);
         
         JPanel internalContentPane = new JPanel(new BorderLayout(componentSpacing, componentSpacing));
@@ -96,15 +101,16 @@ public class FormDialog extends JDialog {
         });
     }
     
+    private Action closeAction = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            cancelDialog();
+        }
+    };
+    
     private void initKeyboardCloseBehavior() {
         KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-        Action escapeAction = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                cancelDialog();
-            }
-        };
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKeyStroke, "ESCAPE");
-        getRootPane().getActionMap().put("ESCAPE", escapeAction);
+        getRootPane().getActionMap().put("ESCAPE", closeAction);
     }
     
     /**
@@ -135,6 +141,7 @@ public class FormDialog extends JDialog {
     }
 
     public void processUserChoice(boolean isAcceptance) {
+        dialogGeometries.put(getTitle(), getBounds());
         wasAccepted = isAcceptance;
         dispose();
     }
@@ -144,12 +151,15 @@ public class FormDialog extends JDialog {
     }
 
     private JPanel makeButtonPanel(JRootPane rootPane, JButton extraButton) {
+        if (isModal() == false) {
+            JButton closeButton = new JButton("Close");
+            closeButton.addActionListener(closeAction);
+            rootPane.setDefaultButton(closeButton);
+            return makeButtonPanel(closeButton, null, null);
+        }
+        
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                cancelDialog();
-            }
-        });
+        cancelButton.addActionListener(closeAction);
 
         JButton okButton = new JButton("OK");
         okButton.addActionListener(new ActionListener() {
@@ -160,6 +170,10 @@ public class FormDialog extends JDialog {
         okButton.setPreferredSize(cancelButton.getPreferredSize());
         rootPane.setDefaultButton(okButton);
 
+        return makeButtonPanel(okButton, cancelButton, extraButton);
+    }
+    
+    private JPanel makeButtonPanel(JButton okButton, JButton cancelButton, JButton extraButton) {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(0, componentSpacing, componentSpacing, componentSpacing));
         //panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -169,8 +183,10 @@ public class FormDialog extends JDialog {
             // Use the traditional Windows layout.
             panel.add(Box.createGlue());
             panel.add(okButton);
-            panel.add(Box.createHorizontalStrut(componentSpacing));
-            panel.add(cancelButton);
+            if (cancelButton != null) {
+                panel.add(Box.createHorizontalStrut(componentSpacing));
+                panel.add(cancelButton);
+            }
             if (extraButton != null) {
                 panel.add(Box.createHorizontalStrut(componentSpacing));
                 panel.add(extraButton);
@@ -181,8 +197,10 @@ public class FormDialog extends JDialog {
                 panel.add(extraButton);
             }
             panel.add(Box.createGlue());
-            panel.add(cancelButton);
-            panel.add(Box.createHorizontalStrut(componentSpacing));
+            if (cancelButton != null) {
+                panel.add(cancelButton);
+                panel.add(Box.createHorizontalStrut(componentSpacing));
+            }
             panel.add(okButton);
         }
         
