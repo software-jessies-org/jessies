@@ -55,6 +55,7 @@ end
 
 classpath="#{terminator_home}/classes:#{terminator_home}/../salma-hayek/classes:#{terminator_home}/terminator.jar"
 pty_binary="#{terminator_home}/native/all/pty/pty-#{UNAME}-#{`arch`}"
+os_specific_options = []
 
 if test(?w, "/usr/share/terminfo")
   terminfo="/usr/share/terminfo"
