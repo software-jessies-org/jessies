@@ -114,6 +114,8 @@ JAVA_FLAGS += -d classes/
 JAVA_FLAGS += -sourcepath src/
 
 JAVA_FLAGS.jikes += +D +P +Pall +Pno-serial +Pno-redundant-modifiers
+JAVA_FLAGS.javac += -Xlint -Xlint:-serial
+JAVA_FLAGS.javac += -Xlint:-unchecked # until Jikes supports generics
 
 JAVA_COMPILER ?= jikes
 JAVA_COMPILER_LOCATION := $(call pathsearch,$(JAVA_COMPILER))
