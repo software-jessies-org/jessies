@@ -252,19 +252,23 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	private class KeyHandler implements KeyListener {
+		private void handleKeyboardEquivalent(KeyEvent event) {
+			for (int i = 0; i < menuAndKeyActions.length; i++) {
+				if (menuAndKeyActions[i] == null) {
+					continue;
+				}
+				KeyStroke accelerator = (KeyStroke) menuAndKeyActions[i].getValue(Action.ACCELERATOR_KEY);
+				KeyStroke thisStroke = KeyStroke.getKeyStrokeForEvent(event);
+				if (thisStroke.equals(accelerator)) {
+					menuAndKeyActions[i].actionPerformed(null);
+					break;
+				}
+			}
+		}
+		
 		public void keyPressed(KeyEvent event) {
 			if (isKeyboardEquivalent(event)) {
-				for (int i = 0; i < menuAndKeyActions.length; i++) {
-					if (menuAndKeyActions[i] == null) {
-						continue;
-					}
-					KeyStroke accelerator = (KeyStroke) menuAndKeyActions[i].getValue(Action.ACCELERATOR_KEY);
-					KeyStroke thisStroke = KeyStroke.getKeyStrokeForEvent(event);
-					if (thisStroke.equals(accelerator)) {
-						menuAndKeyActions[i].actionPerformed(null);
-						break;
-					}
-				}
+				handleKeyboardEquivalent(event);
 				return;
 			}
 			if (doKeyboardScroll(event)) {
@@ -479,10 +483,14 @@ public class JTerminalPane extends JPanel {
 		return new InfoAction(text);
 	}
 	
+	public static KeyStroke makeKeyStroke(String key) {
+		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, false);
+	}
+	
 	public class CopyAction extends AbstractAction {
 		public CopyAction() {
 			super("Copy");
-			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("C", false));
+			putValue(ACCELERATOR_KEY, makeKeyStroke("C"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -493,7 +501,7 @@ public class JTerminalPane extends JPanel {
 	public class PasteAction extends AbstractAction {
 		public PasteAction() {
 			super("Paste");
-			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("V", false));
+			putValue(ACCELERATOR_KEY, makeKeyStroke("V"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -528,7 +536,7 @@ public class JTerminalPane extends JPanel {
 	public class FindAction extends AbstractAction {
 		public FindAction() {
 			super("Find...");
-			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("F", false));
+			putValue(ACCELERATOR_KEY, makeKeyStroke("F"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -539,7 +547,7 @@ public class JTerminalPane extends JPanel {
 	public class FindNextAction extends AbstractAction {
 		public FindNextAction() {
 			super("Find Next");
-			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("G", false));
+			putValue(ACCELERATOR_KEY, makeKeyStroke("G"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -550,7 +558,7 @@ public class JTerminalPane extends JPanel {
 	public class FindPreviousAction extends AbstractAction {
 		public FindPreviousAction() {
 			super("Find Previous");
-			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("D", false));
+			putValue(ACCELERATOR_KEY, makeKeyStroke("D"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -561,7 +569,7 @@ public class JTerminalPane extends JPanel {
 	public class ClearScrollbackAction extends AbstractAction {
 		public ClearScrollbackAction() {
 			super("Clear Scrollback");
-			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("K", false));
+			putValue(ACCELERATOR_KEY, makeKeyStroke("K"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -573,7 +581,7 @@ public class JTerminalPane extends JPanel {
 	public class NewWindowAction extends AbstractAction {
 		public NewWindowAction() {
 			super("New Window");
-			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("N", false));
+			putValue(ACCELERATOR_KEY, makeKeyStroke("N"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -598,7 +606,7 @@ public class JTerminalPane extends JPanel {
 	public class CloseAction extends AbstractAction {
 		public CloseAction() {
 			super("Close");
-			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("W", false));
+			putValue(ACCELERATOR_KEY, makeKeyStroke("W"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
