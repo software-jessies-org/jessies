@@ -24,6 +24,9 @@ public class TextBuffer implements TelnetListener {
 	private boolean insertMode = false;
 	private ArrayList tabPositions = new ArrayList();
 	
+	// Used for reducing the number of lines changed events sent up to the view.
+	private int firstLineChanged;
+	
 	// Fields used for saving and restoring state.
 	private Location savedPosition;
 	private int savedStyle;
@@ -96,7 +99,7 @@ public class TextBuffer implements TelnetListener {
 		lineIsDirty(getFirstDisplayLine());
 		for (int i = 0; i < height; i++) {
 			int index = getFirstDisplayLine() + i;
-			view.lineSectionChanged(index, 0, get(index).length());
+			linesChangedFrom(index);
 		}
 	}
 	
@@ -206,7 +209,7 @@ public class TextBuffer implements TelnetListener {
 		if (lineIndex > lastValidStartIndex) {
 			for (int i = lastValidStartIndex; i < lineIndex; i++) {
 				TextLine line = get(i);
-				get(i + 1).setLineStartIndex(line.getLineStartIndex() + line.length() + 1);
+				get(i + 1).setLineStartIndex(line.getLineStartIndex() + line.lengthIncludingNewline());
 			}
 			lastValidStartIndex = lineIndex;
 		}
@@ -224,11 +227,19 @@ public class TextBuffer implements TelnetListener {
 		view.repaint();
 	}
 	
+	public void linesChangedFrom(int firstLineChanged) {
+		this.firstLineChanged = Math.min(this.firstLineChanged, firstLineChanged);
+	}
+	
 	public void processActions(TelnetAction[] actions) {
+		firstLineChanged = Integer.MAX_VALUE;
 		boolean wereAtBottom = view.isAtBottom();
 		int initialLineCount = getLineCount();
 		for (int i = 0; i < actions.length; i++) {
 			actions[i].perform(this);
+		}
+		if (firstLineChanged != Integer.MAX_VALUE) {
+			view.linesChangedFrom(firstLineChanged);
 		}
 		if (getLineCount() != initialLineCount) {
 			view.sizeChanged();
@@ -254,12 +265,16 @@ public class TextBuffer implements TelnetListener {
 	}
 
 	public void insertLine(int index) {
+		insertLine(index, new TextLine());
+	}
+
+	public void insertLine(int index, TextLine lineToInsert) {
 		// Use a private copy of the first display line throughout this method to avoid mutation
 		// caused by textLines.add()/textLines.remove().
 		final int firstDisplayLine = getFirstDisplayLine();
 		lineIsDirty(firstDisplayLine);
 		if (index > firstDisplayLine + lastScrollLineIndex) {
-			textLines.add(index, new TextLine());
+			textLines.add(index, lineToInsert);
 			if (usingAlternativeBuffer() || (firstScrollLineIndex > 0)) {
 				// If the program has defined scroll bounds, newline-adding actually chucks away
 				// the first scroll line, rather than just scrolling everything upwards like we normally
@@ -267,14 +282,14 @@ public class TextBuffer implements TelnetListener {
 				// don't add anything going off the top into the history.
 				int removeIndex = firstDisplayLine + firstScrollLineIndex;
 				textLines.remove(removeIndex);
-				view.lineSectionChanged(removeIndex, 0, get(removeIndex).length());
+				linesChangedFrom(removeIndex);
 				view.repaint();
 			} else {
 				caretPosition = new Location(index, caretPosition.getCharOffset());
 			}
 		} else {
 			textLines.remove(firstDisplayLine + lastScrollLineIndex);
-			textLines.add(index, new TextLine());
+			textLines.add(index, lineToInsert);
 			caretPosition = new Location(index, caretPosition.getCharOffset());
 		}
 	}
@@ -321,9 +336,12 @@ public class TextBuffer implements TelnetListener {
 	
 	private void textAdded(int length) {
 		TextLine textLine = get(caretPosition.getLineIndex());
+		int currentLine = caretPosition.getLineIndex();
+		while (textLine.length() > width) {
+			insertLine(currentLine + 1, textLine.splitAt(width));
+		}
 		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition's line still has a valid *start* index.
-		int lastCharChanged = insertMode ? textLine.length() : caretPosition.getCharOffset() + length;
-		view.lineSectionChanged(caretPosition.getLineIndex(), caretPosition.getCharOffset(), lastCharChanged);
+		linesChangedFrom(caretPosition.getLineIndex());
 		moveCursorHorizontally(length);
 	}
 
@@ -369,7 +387,7 @@ public class TextBuffer implements TelnetListener {
 		int end = start + count;
 		line.killText(start, end);
 		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition.y's line still has a valid *start* index.
-		view.lineSectionChanged(caretPosition.getLineIndex(), 0, oldLineLength);
+		linesChangedFrom(caretPosition.getLineIndex());
 	}
 	
 	public void killHorizontally(boolean fromStart, boolean toEnd) {
@@ -379,7 +397,7 @@ public class TextBuffer implements TelnetListener {
 		int end = toEnd ? oldLineLength : caretPosition.getCharOffset();
 		line.killText(start, end);
 		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition.y's line still has a valid *start* index.
-		view.lineSectionChanged(caretPosition.getLineIndex(), 0, oldLineLength);
+		linesChangedFrom(caretPosition.getLineIndex());
 	}
 
 	/** Erases from either the top or the cursor line, to either the bottom or the cursor line. */
@@ -409,7 +427,13 @@ public class TextBuffer implements TelnetListener {
 	
 	/** Moves the cursor horizontally by the number of characters in xDiff, negative for left, positive for right. */
 	public void moveCursorHorizontally(int xDiff) {
-		caretPosition = new Location(caretPosition.getLineIndex(), caretPosition.getCharOffset() + xDiff);
+		int charOffset = caretPosition.getCharOffset() + xDiff;
+		int lineIndex = caretPosition.getLineIndex();
+		while (charOffset < 0) {
+			TextLine lineAbove = get(--lineIndex);
+			charOffset += lineAbove.length();
+		}
+		caretPosition = new Location(lineIndex, charOffset);
 	}
 	
 	/** Moves the cursor vertically by the number of characters in yDiff, negative for up, positive for down. */
@@ -470,7 +494,7 @@ public class TextBuffer implements TelnetListener {
 		
 		public char charAt(int index) {
 			Location loc = getLocationFromCharIndex(start + index);
-			String line = getLine(loc.getLineIndex());
+			String line = get(loc.getLineIndex()).getText();
 			if (line.length() > loc.getCharOffset()) {
 				return line.charAt(loc.getCharOffset());
 			} else {
@@ -491,11 +515,11 @@ public class TextBuffer implements TelnetListener {
 			Location loc = getLocationFromCharIndex(start);
 			int charsLeft = end - start;
 			while (charsLeft > 0) {
-				String str = getLine(loc.getLineIndex()).substring(loc.getCharOffset());
+				TextLine line = get(loc.getLineIndex());
+				String str = line.hasNewline() ? line.getText() + '\n' : line.getText();
+				str = str.substring(loc.getCharOffset());
 				if (charsLeft < str.length()) {
 					str = str.substring(0, charsLeft);
-				} else if (charsLeft > str.length()) {
-					str += '\n';
 				}
 				buf.append(str);
 				charsLeft -= str.length();
