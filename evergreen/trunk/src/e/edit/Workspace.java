@@ -21,16 +21,21 @@ public class Workspace extends JPanel {
     
     private ArrayList fileList;
     
-    public Workspace(String title, String rootDirectory) {
+    public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
         this.title = title;
-        this.rootDirectory = rootDirectory;
-        if (rootDirectory.endsWith(File.separator) == false) {
-            rootDirectory += File.separator;
-        }
+        this.rootDirectory = canonicalizeRootDirectory(rootDirectory);
         
         add(makeUI(), BorderLayout.CENTER);
         updateFileList();
+    }
+    
+    public static String canonicalizeRootDirectory(String rootDirectory) {
+        rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
+        if (rootDirectory.endsWith(File.separator) == false) {
+            rootDirectory += File.separator;
+        }
+        return rootDirectory;
     }
     
     /**
@@ -184,7 +189,7 @@ public class Workspace extends JPanel {
                 ex.printStackTrace();
             }
         }
-        Edit.showStatus("Opened " + FileUtilities.getUserFriendlyName(filename));
+        Edit.showStatus("Opened " + filename);
         return window;
     }
     
@@ -243,7 +248,7 @@ public class Workspace extends JPanel {
         return true;
     }
     
-    public void scanDirectory(int prefixCharsToSkip, String directory, String[] ignoredExtensions, ArrayList result) {
+    public void scanDirectory(String directory, String[] ignoredExtensions, ArrayList result) {
         File dir = FileUtilities.fileFromString(directory);
         File[] files = dir.listFiles();
         if (files == null) {
@@ -251,13 +256,16 @@ public class Workspace extends JPanel {
         }
         for (int i = 0; i < files.length; i++) {
             File file = files[i];
+            String filename = FileUtilities.getUserFriendlyName(file);
             if (file.isDirectory()) {
                if (FileUtilities.isIgnoredDirectory(file) == false) {
-                   scanDirectory(prefixCharsToSkip, file.toString(), ignoredExtensions, result);
+                   scanDirectory(filename, ignoredExtensions, result);
                }
             } else {
-                if (FileUtilities.nameEndsWithOneOf(file.toString(), ignoredExtensions) == false && FileUtilities.isSymbolicLink(file) == false) {
-                    result.add(file.toString().substring(prefixCharsToSkip));
+                if (FileUtilities.nameEndsWithOneOf(filename, ignoredExtensions) == false && FileUtilities.isSymbolicLink(file) == false) {
+                    // getRootDirectory() includes a trailing directory separator.
+                    int prefixCharsToSkip = getRootDirectory().length();
+                    result.add(filename.substring(prefixCharsToSkip));
                 }
             }
         }
@@ -290,8 +298,7 @@ public class Workspace extends JPanel {
         File[] rootFiles = workspaceRoot.listFiles();
         if (isUnderUserHome || (rootFiles != null && isSensibleToScan(rootFiles))) {
             Log.warn("Scanning " + getRootDirectory() + " for interesting files.");
-            int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(getRootDirectory()).length() + (getRootDirectory().endsWith(File.separator) ? 0 : 1);
-            scanDirectory(prefixCharsToSkip, getRootDirectory(), ignoredExtensions, result);
+            scanDirectory(getRootDirectory(), ignoredExtensions, result);
             Log.warn("Scan of " + getRootDirectory() + " took " + (System.currentTimeMillis() - start) + "ms; found " + result.size() + " files.");
             Edit.showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
         } else {

@@ -225,25 +225,20 @@ let us always show the user-friendly forms.
 
 [ ] Only check for symbolic links on non-Windows OSes.
 
-    [ ] martind says we should canonicalize names when comparing. that
-        way, we wouldn't open two windows on two names for the same
-        file (forget hard links).
-
-    [ ] he also says we shouldn't write to a copy then copy that over the
-        original, because that buggers symbolic links. he says to write a safe
-        copy and then try writing into the original. the advantage? well, you'd
-        get to see files in windows with the name you got to them via. i'm not
-        sure that's enough to make me bother, though maybe we'd be better off
-        canonicalizing. would the hairy stuff for recognizing duplicates get
-        simpler? sounds plausible. if only i'd understood how to choose between
-        getAbsolutePath and getCanonicalPath when i first wrote this!
-
-        more convincingly, ACLs and Windows security descriptors would be
-        preserved. the trick, as martind points out -- though this applies
-        to the current scheme too -- is in being able to recognize that
-        you've successfully written a copy of the file. how do you know it's
-        actually made it? even if you read it back, how do you know that's
-        not coming from some local cache?
+[ ] Martin says we shouldn't write to a copy then copy that over the
+    original. He says to write a safe copy and then try writing into
+    the original. The advantage? ACLs and Windows security descriptors
+    would be preserved.
+    
+    One trick, is in being able to recognize that you've successfully
+    written a copy of the file. How do you know it's actually made it?
+    Even if you read it back, how do you know that's not coming from
+    some local cache?
+    
+    The original reason for this TODO entry was to prevent symlinks
+    from being replaced by the new copy of the file they refer to.
+    Canonicalization of filenames has provided a certainly adequate
+    and probably superior solution to that part of the problem.
 
 [ ] Finish the tags support.
 

@@ -202,7 +202,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             int originalCaretPosition = text.getCaretPosition();
             fillWithContent();
             text.setCaretPosition(originalCaretPosition);
-            Edit.showStatus("Reverted to saved version of " + FileUtilities.getUserFriendlyName(filename));
+            Edit.showStatus("Reverted to saved version of " + filename);
         }
     }
     
@@ -211,7 +211,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
     }
     
     public void windowClosing() {
-        Edit.showStatus("Closed " + FileUtilities.getUserFriendlyName(filename));
+        Edit.showStatus("Closed " + filename);
         this.file = null;
         getWorkspace().unregisterTextComponent(getText());
         // FIXME: what else needs doing to ensure that we give back memory?
@@ -296,7 +296,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
         }
 
         // See if the counterpart exists.
-        File counterpartFile = new File(file.getParentFile(), counterpartFilename);
+        File counterpartFile = FileUtilities.fileFromParentAndString(file.getParent(), counterpartFilename);
         return (counterpartFile.exists() ? counterpartFilename : null);
     }
 
@@ -585,7 +585,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
     * Returns the name of the context for this window. In this case, the directory the file's in.
     */
     public String getContext() {
-        return file.getParent();
+        return FileUtilities.getUserFriendlyName(file.getParent());
     }
     
     public void reportError(String error) {
@@ -612,16 +612,16 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
         }
         
         try {
-            Edit.showStatus("Saving " + FileUtilities.getUserFriendlyName(filename) + "...");
+            Edit.showStatus("Saving " + filename + "...");
             writeCopyTo(file);
-            Edit.showStatus("Saved " + FileUtilities.getUserFriendlyName(filename));
+            Edit.showStatus("Saved " + filename);
             markAsClean();
             this.lastModifiedTime = file.lastModified();
             Edit.getTagsPanel().ensureTagsCorrespondTo(this);
             return true;
         } catch (IOException ex) {
             Edit.showStatus("");
-            Edit.showAlert("Save", "Couldn't save file '" + FileUtilities.getUserFriendlyName(filename) + "' (" + ex.getMessage() + ").");
+            Edit.showAlert("Save", "Couldn't save file '" + filename + "' (" + ex.getMessage() + ").");
             ex.printStackTrace();
         }
         return false;
@@ -655,8 +655,10 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
     /** FIXME: replace with use of File.renameTo */
     public boolean copyFile(String fromName, String toName) {
         try {
-            FileInputStream from = new FileInputStream(fromName);
-            FileOutputStream to = new FileOutputStream(toName);
+            File fromFile = FileUtilities.fileFromString(fromName);
+            File toFile = FileUtilities.fileFromString(toName);
+            FileInputStream from = new FileInputStream(fromFile);
+            FileOutputStream to = new FileOutputStream(toFile);
             byte[] buffer = new byte[4096];
             int bytesRead;
             while ((bytesRead = from.read(buffer)) != -1) {
