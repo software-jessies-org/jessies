@@ -15,7 +15,7 @@ A JTextBuffer provides the visible display of the virtual terminal.
 */
 
 public class JTextBuffer extends JComponent implements FocusListener {
-	private static final boolean ANTIALIAS = false;
+	private static final boolean ANTIALIAS = Options.getSharedInstance().isAntiAliased();
 	private static final boolean MAC_OS = GuiUtilities.isMacOs();
 
 	private Controller controller;

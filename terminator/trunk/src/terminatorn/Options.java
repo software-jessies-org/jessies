@@ -61,6 +61,13 @@ public class Options {
 		return defaultedBooleanResource("scrollTtyOutput", false);
 	}
 	
+	/**
+	 * Whether or not to anti-alias text.
+	 */
+	public boolean isAntiAliased() {
+		return defaultedBooleanResource("antiAlias", true);
+	}
+	
 	private boolean defaultedBooleanResource(String name, boolean defaultValue) {
 		String value = (String) options.get(name);
 		if (value != null) {
