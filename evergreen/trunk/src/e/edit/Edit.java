@@ -499,7 +499,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * Writes out all our various bits of state to disk, so that next
      * time we start, we start more or less where we left off.
      */
-    private void rememberState() {
+    public void rememberState() {
         if (initializing) {
             // If we haven't finished initializing, we may not have
             // read all the state in, so writing it back out could
@@ -701,7 +701,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     
     public void startEditServer() {
         try {
-            new EditServer();
+            new EditServer(this);
         } catch (Throwable th) {
             Log.warn("Couldn't start EditServer", th);
         }
