@@ -34,7 +34,6 @@ public class ETextArea extends JTextArea {
         setDragEnabled(false);
         setLineWrap(true);
         setMargin(new Insets(4, 4, 4, 1));
-        getDocument().addDocumentListener(new UnmatchedBracketHighlighter(this));
         getCaret().addChangeListener(new MatchingBracketHighlighter(this));
         getKeymap().setDefaultAction(new DefaultKeyAction());
     }
@@ -231,8 +230,8 @@ public class ETextArea extends JTextArea {
         
         // Overrides a few DefaultEditorKit editing actions.
         getActionMap().put(DefaultEditorKit.deletePrevCharAction, new BackspaceAction());
-        getActionMap().put(DefaultEditorKit.insertBreakAction, new InsertNewlineAction());
         getActionMap().put(DefaultEditorKit.insertTabAction, new InsertTabAction());
+        // See also ETextArea.setIndenter.
         
         // Overrides the DefaultEditorKit Home/End actions.
         getActionMap().put(DefaultEditorKit.beginLineAction, new StartOfLineAction(false));
@@ -335,6 +334,10 @@ public class ETextArea extends JTextArea {
     
     public void setIndenter(Indenter newIndenter) {
         this.indenter = newIndenter;
+    }
+    
+    public void enableAutoIndent() {
+        getActionMap().put(DefaultEditorKit.insertBreakAction, new InsertNewlineAction());
     }
     
     public void autoIndent() {
