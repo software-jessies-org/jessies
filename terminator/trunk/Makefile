@@ -1,4 +1,4 @@
-PROJECT_NAME=TerminatorN
+PROJECT_NAME=terminator
 
 .PHONY: default
 default: build build.pty
