@@ -127,11 +127,11 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	private void paintStyledText(Graphics graphics, StyledText text, int x, int y) {
 		FontMetrics metrics = getFontMetrics(getFont());
 		int textWidth = metrics.stringWidth(text.getText());
-		if (text.getBackground() != StyledText.WHITE) {
-			graphics.setColor(getStyleColour(text.getBackground()));
+//		if (text.getBackground() != StyledText.WHITE) {
+			graphics.setColor(text.getBackground());
 			graphics.fillRect(x, y - metrics.getMaxAscent(), textWidth, metrics.getHeight());
-		}
-		graphics.setColor(getStyleColour(text.getForeground()));
+//		}
+		graphics.setColor(text.getForeground());
 		if (text.isUnderlined()) {
 			graphics.drawLine(x, y + 1, x + textWidth, y + 1);
 		}
@@ -142,20 +142,6 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		graphics.drawString(text.getText(), x, y);
 		if (text.isBold()) {
 			graphics.setFont(oldFont);
-		}
-	}
-	
-	private Color getStyleColour(int colour) {
-		switch (colour) {
-			case StyledText.BLACK: return getForeground();
-			case StyledText.RED: return Color.RED;
-			case StyledText.GREEN: return Color.GREEN;
-			case StyledText.YELLOW: return Color.YELLOW;
-			case StyledText.BLUE: return Color.BLUE;
-			case StyledText.MAGENTA: return Color.MAGENTA;
-			case StyledText.CYAN: return Color.CYAN;
-			case StyledText.WHITE: return getBackground();
-			default: return Color.BLACK;
 		}
 	}
 
