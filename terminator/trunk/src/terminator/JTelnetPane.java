@@ -252,27 +252,27 @@ public class JTelnetPane extends JPanel {
 			char ch = event.getKeyChar();
 			if (isKeyboardEquivalent(event)) {
 				switch (ch) {
-					case 'n': case 'N':
-						// TODO: Open a new window.
-						break;
-					case 't': case 'T':
-						controller.openShellPane(true);
-						break;
 					case 'e': case 'E':
 						String commandToRun = StringEntryDialog.getString(JTelnetPane.this, "Enter Command to Run");
 						if (commandToRun != null && commandToRun.length() > 0) {
 							controller.openCommandPane(commandToRun, true);
 						}
 						break;
-					case 'd': case 'D':
-						control.destroyProcess();
-						controller.closeTelnetPane(JTelnetPane.this);
-						break;
 					case 'f': case 'F':
 						controller.showFindDialogFor(textPane);
 						break;
 					case 'k': case 'K':
 						textPane.clearScrollBuffer();
+						break;
+					case 'n': case 'N':
+						// TODO: Open a new window.
+						break;
+					case 't': case 'T':
+						controller.openShellPane(true);
+						break;
+					case 'w': case 'W':
+						control.destroyProcess();
+						controller.closeTelnetPane(JTelnetPane.this);
 						break;
 				}
 			} else {
