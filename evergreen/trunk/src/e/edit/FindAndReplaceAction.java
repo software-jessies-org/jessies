@@ -131,15 +131,10 @@ public class FindAndReplaceAction extends ETextAction {
         return pattern.matcher(oldText).replaceAll(replacementPattern);
     }
 
-    public static class DisplayableMatchRenderer extends DefaultListCellRenderer {
-        private static final Color ALTERNATE_ROW_COLOR = new Color(0.92f, 0.95f, 0.99f);
+    public static class DisplayableMatchRenderer extends EListCellRenderer {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             
-            if (!isSelected && index % 2 == 0) {
-                setBackground(ALTERNATE_ROW_COLOR);
-            }
-
             // If there were captured groups, set the tooltip. (If not, avoid setting an empty
             // tooltip, because that's not the same as no tooltip, and looks rather silly.)
             DisplayableMatch match = (DisplayableMatch) value;

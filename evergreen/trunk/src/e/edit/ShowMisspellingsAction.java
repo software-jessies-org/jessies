@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.forms.*;
+import e.gui.*;
 import e.util.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -33,6 +34,7 @@ public class ShowMisspellingsAction extends ETextAction {
                 window.findNext();
             }
         });
+        list.setCellRenderer(new EListCellRenderer());
 
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Misspellings:", new JScrollPane(list));
