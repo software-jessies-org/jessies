@@ -16,11 +16,11 @@ public class TagsUpdater {
     private JPanel uiPanel;
     private ETextWindow textWindow;
     private boolean followCaretChanges;
-    private TagsScanner tagsScanner;
+    private TreeModelBuilder treeModelBuilder;
     
     public TagsUpdater(ETextWindow textWindow) {
         this.textWindow = textWindow;
-        this.tagsScanner = new TagsScanner();
+        this.treeModelBuilder = new TreeModelBuilder();
         createUI();
         installListeners();
     }
@@ -112,7 +112,7 @@ public class TagsUpdater {
     }
     
     public void updateTags() {
-        new Thread(tagsScanner).start();
+        new Thread(treeModelBuilder).start();
     }
     
     public void setTreeModel(TreeModel treeModel) {
@@ -167,7 +167,7 @@ public class TagsUpdater {
         }
     }
     
-    public class TagsScanner implements Runnable, TagReader.TagListener {
+    public class TreeModelBuilder implements Runnable, TagReader.TagListener {
         private boolean tagsHaveNotChanged;
         private String digest;
         private long startTime;
@@ -178,7 +178,7 @@ public class TagsUpdater {
         private DefaultTreeModel treeModel;
         private HashMap branches;
         
-        public TagsScanner() {
+        public TreeModelBuilder() {
             progressTimer = new Timer(500, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Edit.getTagsPanel().showProgressBar();
