@@ -37,8 +37,18 @@ public class TextBuffer implements TelnetListener {
 		view.repaint();
 	}
 	
+	public void processActions(TelnetAction[] actions) {
+		for (int i = 0; i < actions.length; i++) {
+			actions[i].perform(this);
+		}
+	}
+	
 	public void setStyle(int style) {
 		this.currentStyle = style;
+	}
+	
+	public int getStyle() {
+		return currentStyle;
 	}
 
 	public void insertLine(int index) {

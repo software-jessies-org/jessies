@@ -3,6 +3,7 @@ package terminatorn;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.*;
 import javax.swing.*;
 
 /**
@@ -21,35 +22,28 @@ low-level telnet protocol (RFC 854).
 // once all the work in that parcel is done.  This should help make us fast like we should be.
 
 public class TelnetControl implements Runnable {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final boolean DEBUG_STEP_MODE = false;
 	private static BufferedReader stepModeReader;
+
+	private static final int INPUT_BUFFER_SIZE = 4096;
 
 	private TelnetListener listener;
 	private InputStream in;
 	private OutputStream out;
 	
-	// Current style.
-	private int foregroundColour;
-	private int backgroundColour;
-	private boolean isBold;
-	private boolean isUnderlined;
+	// Buffer of TelnetActions to perform.
+	private ArrayList telnetActions = new ArrayList();
 	
 	public TelnetControl(TelnetListener listener, InputStream in, OutputStream out) throws IOException {
 		this.listener = listener;
 		this.in = in;
 		this.out = out;
-		resetStyle();
 		(new Thread(this, "Telnet connection listener")).start();
 	}
 	
 	private boolean localEcho = false;
 	private StringBuffer lineBuffer = new StringBuffer();
-	private javax.swing.Timer receiveTimeout = new javax.swing.Timer(30, new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			flushLineBuffer();
-		}
-	});
 	private boolean readingOSC = false;
 	
 	public static void doStep() {
@@ -63,6 +57,68 @@ public class TelnetControl implements Runnable {
 				ex.printStackTrace();
 			}
 		}
+	}
+	
+	public void run() {
+		try {
+			byte[] buffer = new byte[INPUT_BUFFER_SIZE];
+			int readCount;
+			int remainCount = 0;
+			while ((readCount = in.read(buffer, remainCount, buffer.length - remainCount)) != -1) {
+				// Process all unprocessed bytes in buffer, and then move any which remain
+				// processed to the front of the buffer, noting how many there are.
+				readCount += remainCount;
+//				System.err.println("Processing buffer of " + readCount + " bytes.");
+				remainCount = processBuffer(buffer, readCount);
+				System.arraycopy(buffer, readCount - remainCount, buffer, 0, remainCount);
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			Log.warn("Returning from TelnetSocket.run()");
+		}
+	}
+	
+	private boolean nextByteIsCommand = false;
+	
+	/** Returns the number of bytes in buffer which remain unprocessed. */
+	private int processBuffer(byte[] buffer, int size) throws IOException {
+		int i;
+		for (i = 0; i < size; i++) {
+			int value = (buffer[i]) & 0xff;  // We don't handle negative bytes well.
+			if (nextByteIsCommand) {
+				if (value == IAC) {
+					processChar((char) value);
+				} else {
+					int extraIACByteCount = getExtraIACByteCount(value);
+					if (size - i > extraIACByteCount) {
+						int[] extraBytes = new int[extraIACByteCount];
+						for (int j = 0; j < extraBytes.length; j++) {
+							extraBytes[j] = ((int) buffer[++i]) & 0xff;
+						}
+						interpretAsCommand(value, extraBytes);
+					} else {
+						break;
+					}
+				}
+				nextByteIsCommand = false;
+			} else {
+				if (value == IAC) {
+					nextByteIsCommand = true;
+				} else {
+					processChar((char) value);
+				}
+			}
+		}
+		flushLineBuffer();
+		final TelnetAction[] actions = (TelnetAction[]) telnetActions.toArray(new TelnetAction[telnetActions.size()]);
+		telnetActions.clear();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				listener.processActions(actions);
+			}
+		});
+		return size - i;
 	}
 	
 	public void processChar(final char ch) {
@@ -99,23 +155,9 @@ public class TelnetControl implements Runnable {
 		} else if (ch == '\n' || ch == '\r' || ch == KeyEvent.VK_BACK_SPACE) {
 			flushLineBuffer();
 			doStep();
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					if (DEBUG) {
-						String charDesc = "UK";
-						switch (ch) {
-							case '\n': charDesc = "LF"; break;
-							case '\r': charDesc = "CR"; break;
-							case KeyEvent.VK_BACK_SPACE: charDesc = "BS"; break;
-						}
-						System.err.println("Processing special char \"" + charDesc + "\"");
-					}
-					listener.processSpecialCharacter(ch);
-				}
-			});
+			processSpecialCharacter(ch);
 		} else {
 			lineBuffer.append(ch);
-			receiveTimeout.restart();
 		}
 	}
 
@@ -126,8 +168,8 @@ public class TelnetControl implements Runnable {
 		// Conform to the stated claim that the listener's always called in the AWT dispatch thread.
 		if (line.length() > 0) {
 			doStep();
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
+			telnetActions.add(new TelnetAction() {
+				public void perform(TelnetListener listener) {
 					if (DEBUG) {
 						System.err.println("Processing line \"" + line + "\"");
 					}
@@ -135,7 +177,23 @@ public class TelnetControl implements Runnable {
 				}
 			});
 		}
-		receiveTimeout.stop();
+	}
+	
+	public void processSpecialCharacter(final char ch) {
+		telnetActions.add(new TelnetAction() {
+			public void perform(TelnetListener listener) {
+				if (DEBUG) {
+					String charDesc = "UK";
+					switch (ch) {
+						case '\n': charDesc = "LF"; break;
+						case '\r': charDesc = "CR"; break;
+						case KeyEvent.VK_BACK_SPACE: charDesc = "BS"; break;
+					}
+					System.err.println("Processing special char \"" + charDesc + "\"");
+				}
+				listener.processSpecialCharacter(ch);
+			}
+		});
 	}
 
 	public static final int ESC = 0x1b;
@@ -154,8 +212,8 @@ public class TelnetControl implements Runnable {
 		// Invoke all escape sequence handling in the AWT dispatch thread - otherwise we'd have
 		// to create billions upon billions of tiny little invokeLater(Runnable) things all over the place.
 		doStep();
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+		telnetActions.add(new TelnetAction() {
+			public void perform(TelnetListener listener) {
 				if (DEBUG) {
 					Log.warn("Escape sequence \"" + sequence + "\"");
 				}
@@ -254,41 +312,38 @@ public class TelnetControl implements Runnable {
 	}
 	
 	public boolean processFontEscape(String sequence) {
-		listener.setStyle(processStyle(sequence));
-		return true;
-	}
-	
-	private void resetStyle() {
-		foregroundColour = StyledText.BLACK;
-		backgroundColour = StyledText.WHITE;
-		isBold = false;
-		isUnderlined = false;
-	}
-	
-	private void reverseColours() {
-		int temp = foregroundColour;
-		foregroundColour = backgroundColour;
-		backgroundColour = temp;
-	}
-	
-	public int processStyle(String sequence) {
+		int oldStyle = listener.getStyle();
+		int foreground = StyledText.getForeground(oldStyle);
+		int background = StyledText.getBackground(oldStyle);
+		boolean isBold = StyledText.isBold(oldStyle);
+		boolean isUnderlined = StyledText.isUnderlined(oldStyle);
 		String[] bits = sequence.split(";");
 		for (int i = 0; i < bits.length; i++) {
 			int value = (bits[i].length() == 0) ? 0 : Integer.parseInt(bits[i]);
 			if (valueInRange(value, 0, 8)) {
 				switch (value) {
-					case 0: resetStyle(); break;
+					case 0:
+						foreground = StyledText.BLACK;
+						background = StyledText.WHITE;
+						isBold = false;
+						isUnderlined = false;
+						break;
 					case 1: isBold = true; break;
 					case 4: isUnderlined = true; break;
-					case 7: reverseColours(); break;
+					case 7:
+						int temp = foreground;
+						foreground = background;
+						background = temp;
+						break;
 				}
 			} else if (valueInRange(value, 30, 37)) {
-				foregroundColour = value - 30;
+				foreground = value - 30;
 			} else if (valueInRange(value, 40, 47)) {
-				backgroundColour = value - 40;
+				background = value - 40;
 			}
 		}
-		return StyledText.getStyle(foregroundColour, backgroundColour, isBold, isUnderlined);
+		listener.setStyle(StyledText.getStyle(foreground, background, isBold, isUnderlined));
+		return true;
 	}
 	
 	public boolean valueInRange(int value, int min, int max) {
@@ -332,29 +387,6 @@ public class TelnetControl implements Runnable {
 		}
 	}
 	
-	public void run() {
-		try {
-			int i;
-			while ((i = in.read()) != -1) {
-				if (i != IAC) {
-					processChar((char) i);
-				} else {
-					i = in.read();
-					if (i == -1) { return; }
-					if (i != IAC) {
-						interpretAsCommand(i);
-					} else {
-						processChar((char) i);
-					}
-				}
-			}
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			Log.warn("Returning from TelnetSocket.run()");
-		}
-	}
-	
 	public void sendCommand(int type) throws IOException {
 		out.write(new byte[] { (byte) IAC, (byte) type });
 	}
@@ -379,9 +411,24 @@ public class TelnetControl implements Runnable {
 		sendCommand(WILL_NOT, what);
 	}
 	
-	public void interpretAsCommand(int b) throws IOException {
+	public int getExtraIACByteCount(int command) {
+		switch (command) {
+			case WILL:
+			case WILL_NOT:
+			case DO:
+			case DO_NOT:
+			case SB:
+				return 1;
+			
+			case SE:
+			default:
+				return 0;
+		}
+	}
+	
+	public void interpretAsCommand(int b, int[] extraBytes) throws IOException {
 		if (b == WILL) {
-			int what = in.read();
+			int what = extraBytes[0];
 			if (what == TelnetOption.ECHO || what == TelnetOption.SUPPRESS_GO_AHEAD) {
 				sendDo(what);
 			} else if (what == TelnetOption.STATUS) {
@@ -390,10 +437,10 @@ public class TelnetControl implements Runnable {
 				Log.warn("Got WILL  " + what);
 			}
 		} else if (b == WILL_NOT) {
-			int what = in.read();
+			int what = extraBytes[0];
 			Log.warn("Got WON'T " + what);
 		} else if (b == DO) {
-			int what = in.read();
+			int what = extraBytes[0];
 			if (what == TelnetOption.ECHO) {
 				sendWill(TelnetOption.ECHO);
 				localEcho = true;
@@ -407,7 +454,7 @@ public class TelnetControl implements Runnable {
 				sendWillNot(what);
 			}
 		} else if (b == DO_NOT) {
-			int what = in.read();
+			int what = extraBytes[0];
 			if (what == TelnetOption.ECHO) {
 				Log.warn("Disabling local echo...");
 				localEcho = false;
@@ -416,7 +463,7 @@ public class TelnetControl implements Runnable {
 				Log.warn("Got DON'T " + what + "; don't understand!");
 			}
 		} else if (b == SB) {
-			int what = in.read();
+			int what = extraBytes[0];
 			Log.warn("Start sub-option negotiation for " + what);
 			if (what == TelnetOption.TERMINAL_TYPE) {
 				out.write(new byte[] { (byte) IAC, (byte) SB, (byte) TelnetOption.TERMINAL_TYPE, (byte) IS });
