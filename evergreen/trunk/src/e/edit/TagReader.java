@@ -30,6 +30,7 @@ public class TagReader {
         Process p = Runtime.getRuntime().exec(new String[] {
             "ctags",
             "--c++-types=+p", "-n", "--fields=+a", "-u",
+            "--regex-java=/( static )/\1/S/",
             "-f", tagsFile.getAbsolutePath(),
             file.getAbsolutePath()
         });
@@ -68,6 +69,12 @@ public class TagReader {
         }
     }
     
+    /**
+     * Set to the number of the last line containing the pattern " static ".
+     * If the next tag seen has the same line number, it will be marked as static.
+     */
+    private int staticTagLineNumber = 0;
+    
     private void processTagLine(String line) {
         // The format is: <identifier>\t<filename>\t<line>;"\t<tag type>[\t<context>]
         // For example:
@@ -88,6 +95,11 @@ public class TagReader {
             context = "";
         }
         
+        if (type == 'S') {
+            staticTagLineNumber = lineNumber;
+            return;
+        }
+        
         Matcher classMatcher = CLASS_PATTERN.matcher(context);
         String containingClass = (classMatcher.matches() ? classMatcher.group(1) : "");
         //Log.warn(context + " => " + containingClass);
@@ -103,6 +115,9 @@ public class TagReader {
             tag = new TagReader.Tag(identifier, lineNumber, type, context, containingClass);
         }
         
+        tag.isStatic = (lineNumber == staticTagLineNumber);
+        staticTagLineNumber = 0;
+        
         listener.tagFound(tag);
     }
     
@@ -115,6 +130,7 @@ public class TagReader {
         public String context;
         public String containingClass;
         public int lineNumber;
+        public boolean isStatic;
         
         public Tag(String identifier, int lineNumber, char type, String context, String containingClass) {
             this.identifier = identifier;
@@ -144,7 +160,7 @@ public class TagReader {
             } else if (context.indexOf("access:protected") != -1) {
                 return Color.ORANGE;
             } else {
-                return null;
+                return Color.GRAY;
             }
         }
         
@@ -177,11 +193,15 @@ public class TagReader {
         
         public JavaTag(String identifier, int lineNumber, char type, String context, String containingClass) {
             super(identifier, lineNumber, type, context, containingClass);
-            typeSortOrder = "pfmcsi";
+            typeSortOrder = "pfCmci";
+            if (containingClass.equals(identifier) || containingClass.endsWith("." + identifier)) {
+                this.type = 'C';    // Constructor
+            }
         }
         public String describe() {
             switch (type) {
                 case 'c': return "class " + identifier;
+                case 'C': return identifier;
                 case 'f': return identifier;
                 case 'i': return "interface " + identifier;
                 case 'm': return identifier + "()";
