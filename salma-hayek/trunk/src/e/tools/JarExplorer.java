@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.zip.*;
 import javax.swing.*;
 
+import e.gui.*;
 import e.util.*;
 
 /**
@@ -81,19 +82,20 @@ public class JarExplorer extends JFrame {
     }
 
     private JComponent makeUi() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 10, 10));
-
         JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         showLineNumberAndLocalVariableTables = new JCheckBox("Show Line Number Tables");
         checkBoxPanel.add(showLineNumberAndLocalVariableTables);
         showVerboseDetail = new JCheckBox("Show Verbose Information");
         checkBoxPanel.add(showVerboseDetail);
-        panel.add(checkBoxPanel, BorderLayout.NORTH);
 
         list = new JList(model);
+        list.setCellRenderer(new EListCellRenderer(true));
         list.setVisibleRowCount(10);
         JScrollPane entriesScroller = new JScrollPane(list);
+        JPanel entriesPanel = new JPanel(new BorderLayout());
+        entriesPanel.add(entriesScroller, BorderLayout.CENTER);
+        entriesPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
+        entriesPanel.add(checkBoxPanel, BorderLayout.NORTH);
 
         list.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -110,10 +112,8 @@ public class JarExplorer extends JFrame {
         tabbedPane.add("Summary", new JScrollPane(summaryTextArea));
         tabbedPane.add("Detail", new JScrollPane(detailTextArea));
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                              entriesScroller, tabbedPane);
-        panel.add(splitPane, BorderLayout.CENTER);
-        return panel;
+        return new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                              entriesPanel, tabbedPane);
     }
 
     private JTextArea makeTextArea() {
