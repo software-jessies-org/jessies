@@ -19,10 +19,12 @@ public class TextBuffer implements TelnetListener {
 	private int currentStyle = StyledText.getDefaultStyle();
 	private int firstScrollLineIndex;
 	private int lastScrollLineIndex;
+	private Point caretPosition;
 	
 	public TextBuffer(JTextBuffer view, int width, int height) {
 		this.view = view;
 		setSize(width, height);
+		caretPosition = view.getCaretPosition();
 	}
 	
 	public int getLineCount() {
@@ -38,9 +40,14 @@ public class TextBuffer implements TelnetListener {
 	}
 	
 	public void processActions(TelnetAction[] actions) {
+		int initialLineCount = getLineCount();
 		for (int i = 0; i < actions.length; i++) {
 			actions[i].perform(this);
 		}
+		if (getLineCount() != initialLineCount) {
+			view.sizeChanged();
+		}
+		view.setCaretPosition(caretPosition);
 	}
 	
 	public void setStyle(int style) {
@@ -58,8 +65,7 @@ public class TextBuffer implements TelnetListener {
 		if (index > firstDisplayLine + lastScrollLineIndex) {
 			textLines.add(index, new TextLine());
 			if (firstScrollLineIndex == 0) {
-				view.setCaretPosition(new Point(0, index));
-				view.sizeChanged();
+				caretPosition.y = index;
 			} else {
 				// If the program's defined scroll bounds, newline-adding actually chucks away
 				// the first scroll line, rather than just scrolling everything upwards like we normally
@@ -68,7 +74,7 @@ public class TextBuffer implements TelnetListener {
 				view.repaint();
 			}
 		} else {
-			view.setCaretPosition(new Point(0, index));
+			caretPosition.y = index;
 		}
 	}
 	
@@ -99,42 +105,33 @@ public class TextBuffer implements TelnetListener {
 	}
 
 	public void processLine(String line) {
-		Point pos = view.getCaretPosition();
-		get(pos.y).writeTextAt(pos.x, line, currentStyle);
-		view.lineSectionChanged(pos.y, pos.x, pos.x + line.length());
+		get(caretPosition.y).writeTextAt(caretPosition.x, line, currentStyle);
+		view.lineSectionChanged(caretPosition.y, caretPosition.x, caretPosition.x + line.length());
 		moveCursorHorizontally(line.length());
 	}
 
 	public void processSpecialCharacter(char ch) {
 		switch (ch) {
-			case '\r':
-				view.setCaretPosition(new Point(0, view.getCaretPosition().y));
-				return;
-			case '\n':
-				int x = view.getCaretPosition().x;
-				insertLine(view.getCaretPosition().y + 1);
-				moveCursorHorizontally(x);
-				return;
+			case '\r': caretPosition.x = 0; return;
+			case '\n': insertLine(caretPosition.y + 1); return;
 			case KeyEvent.VK_BACK_SPACE: moveCursorHorizontally(-1); return;
 			default: Log.warn("Unsupported special character: " + ((int) ch));
 		}
 	}
 	
 	public void killHorizontally(boolean fromStart, boolean toEnd) {
-		Point caretPos = view.getCaretPosition();
-		TextLine line = get(caretPos.y);
+		TextLine line = get(caretPosition.y);
 		int oldLineLength = line.length();
-		int start = fromStart ? 0 : caretPos.x;
-		int end = toEnd ? oldLineLength : caretPos.x;
+		int start = fromStart ? 0 : caretPosition.x;
+		int end = toEnd ? oldLineLength : caretPosition.x;
 		line.killText(start, end);
-		view.lineSectionChanged(caretPos.y, 0, oldLineLength);
+		view.lineSectionChanged(caretPosition.y, 0, oldLineLength);
 	}
 
 	/** Erases from either the top or the cursor line, to either the bottom or the cursor line. */
 	public void killVertically(boolean fromTop, boolean toBottom) {
-		Point caretPos = view.getCaretPosition();
-		int start = fromTop ? getFirstDisplayLine() : caretPos.y;
-		int end = toBottom ? getLineCount() : caretPos.y;
+		int start = fromTop ? getFirstDisplayLine() : caretPosition.y;
+		int end = toBottom ? getLineCount() : caretPosition.y;
 		for (int i = start; i < end; i++) {
 			get(i).clear();
 		}
@@ -146,22 +143,18 @@ public class TextBuffer implements TelnetListener {
 	
 	/** Sets the position of the cursor to the given x and y coordinates, counted from 1,1 at the top-left corner. */
 	public void setCursorPosition(int x, int y) {
-		view.setCaretPosition(new Point(x - 1, y - 1 + getFirstDisplayLine()));
+		caretPosition.x = x - 1;
+		caretPosition.y = y - 1 + getFirstDisplayLine();
 	}
 	
 	/** Moves the cursor horizontally by the number of characters in xDiff, negative for left, positive for right. */
 	public void moveCursorHorizontally(int xDiff) {
-		moveCursor(xDiff, 0);
+		caretPosition.x += xDiff;
 	}
 	
 	/** Moves the cursor vertically by the number of characters in yDiff, negative for up, positive for down. */
 	public void moveCursorVertically(int yDiff) {
-		moveCursor(0, yDiff);
-	}
-	
-	public void moveCursor(int xDiff, int yDiff) {
-		Point oldPos = view.getCaretPosition();
-		view.setCaretPosition(new Point(oldPos.x + xDiff, oldPos.y + yDiff));
+		caretPosition.y += yDiff;
 	}
 
 	/** Sets the first and last lines to scroll.  If both are -1, make the entire screen scroll. */

@@ -57,12 +57,13 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public Point getCaretPosition() {
-		return caretPosition;
+		return new Point(caretPosition);  // We don't want anyone else messing with our Point.
 	}
 	
 	public void setCaretPosition(Point caretPosition) {
 		redrawCaretPosition();
-		this.caretPosition = caretPosition;
+		this.caretPosition.x = caretPosition.x;
+		this.caretPosition.y = caretPosition.y;
 		redrawCaretPosition();
 	}
 	
