@@ -20,6 +20,11 @@ fi
 if test -d /usr/local/jdk1.5.0 ; then
     link_in_usr_local_bin /usr/local/jdk1.5.0/bin/java
     link_in_usr_local_bin /usr/local/jdk1.5.0/bin/javac
+    for BROWSER in mozilla mozilla-firefox; do
+        if test -d /usr/lib/$BROWSER/plugins; then
+            ln -s /usr/local/jdk1.5.0/jre/plugin/i386/ns7/libjavaplugin_oji.so /usr/lib/$BROWSER/plugins
+        fi
+    done
 fi
 
 # Create a directory in /usr/local for all our stuff.
