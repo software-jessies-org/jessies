@@ -51,7 +51,7 @@ public class JarExplorer extends JFrame {
         final int totalEntryCount = zipFile.size();
         int entryCount = 0;
 
-        model = new DefaultListModel();
+        ArrayList entries = new ArrayList();
         Enumeration e = zipFile.entries();
         while (e.hasMoreElements()) {
             ++entryCount;
@@ -60,9 +60,15 @@ public class JarExplorer extends JFrame {
                 continue;
             }
 
-            model.addElement(entry.getName());
+            entries.add(entry.getName());
         }
         zipFile.close();
+
+        Collections.sort(entries);
+        model = new DefaultListModel();
+        for (int i = 0; i < entries.size(); ++i) {
+            model.addElement(entries.get(i));
+        }
     }
 
     private JComponent makeUi() {
