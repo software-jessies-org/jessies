@@ -67,9 +67,6 @@ let us always show the user-friendly forms.
     (which i assume we can get hold of) and decide on that basis whether to
     scrollRectToVisible.
 
-[ ] shouldn't use our own text selection colors. should show when we're
-    not focused.
-
 [ ] fix the fact that you can slide windows off the bottom of the column,
     or behind the others at the bottom of a column.
 

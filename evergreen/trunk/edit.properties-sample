@@ -9,13 +9,6 @@ fixedFont.default=false
 
 ?Windows 2000:fixedFont.name=lucida sans typewriter
 
-titlebar.leftColor=#4040a0
-titlebar.rightColor=#c0c0f0
-
-# WindowMaker-style; aka "Buffy"-style
-#titlebar.leftColor=#4b0000
-#titlebar.rightColor=#b25869
-
 hungryDelete=true
 indent.string=    
 
