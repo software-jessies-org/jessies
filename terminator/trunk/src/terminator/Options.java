@@ -145,15 +145,16 @@ public class Options {
 	/**
 	 * Returns a suitable fixed font (ignoring all X11 configuration,
 	 * because we're unlikely to understand those font specifications).
-	 * So we don't get into trouble with Xterm's font resource, we
-	 * call ours "javaFont".
+	 * So we don't get into trouble with Xterm's font resource, and
+	 * to work around Font.decode's weaknesses, we use two resources:
+	 * "fontName" and "fontSize".
 	 */
 	public Font getFont() {
-		String fontDescription = (String) options.get("javaFont");
-		if (fontDescription == null) {
-			fontDescription = GuiUtilities.isMacOs() ? "Monaco" : "Monospaced";
+		String fontName = (String) options.get("fontName");
+		if (fontName == null) {
+			fontName = GuiUtilities.isMacOs() ? "Monaco" : "Monospaced";
 		}
-		return Font.decode(fontDescription);
+		return new Font(fontName, Font.PLAIN, defaultedIntegerResource("fontSize", 12));
 	}
 	
 	private Options() {
