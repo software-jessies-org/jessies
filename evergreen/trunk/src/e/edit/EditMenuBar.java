@@ -192,9 +192,10 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
                 Action action = menuItem.getAction();
                 if (action == null) {
                     Log.warn("Actionless menu item found: " + menuItem);
+                } else {
+                    Log.warn(menuItem.toString() + ": " + action.isEnabled());
+                    menuItem.setEnabled(action.isEnabled());
                 }
-                Log.warn(menuItem.toString() + ": " + action.isEnabled());
-                menuItem.setEnabled(action.isEnabled());
             }
         }
     }
@@ -206,8 +207,9 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
             Action action = menuItem.getAction();
             if (action == null) {
                 Log.warn("Actionless popup menu item found: " + menuItem);
+            } else {
+                menuItem.setEnabled(action.isEnabled());
             }
-            menuItem.setEnabled(action.isEnabled());
         }
     }
     
