@@ -20,8 +20,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	
 	public JTextBuffer() {
 		model = new TextBuffer(this, 80, 24);
-		setFont(Font.decode("Monospaced"));
-		setBackground(Color.WHITE);
+		setFont(Options.getSharedInstance().getFont());
+		setForeground(Options.getSharedInstance().getColor("foreground"));
+		setBackground(Options.getSharedInstance().getColor("background"));
 		addFocusListener(this);
 		requestFocus();
 		SwingUtilities.invokeLater(new Runnable() {
@@ -87,12 +88,10 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	}
 	
 	public void paintComponent(Graphics graphics) {
-		if (ANTIALIAS) {
-			((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		}
+		((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, ANTIALIAS ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
 		FontMetrics metrics = getFontMetrics(getFont());
 		Rectangle rect = graphics.getClipBounds();
-		graphics.setColor(Color.WHITE);
+		graphics.setColor(getBackground());
 		graphics.fillRect(rect.x, rect.y, rect.width, rect.height);
 		int firstTextLine = rect.y / metrics.getHeight();
 		int lastTextLine = (rect.y + rect.height + metrics.getHeight() - 1) / metrics.getHeight();
@@ -139,14 +138,14 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	
 	private Color getStyleColour(int colour) {
 		switch (colour) {
-			case StyledText.BLACK: return Color.BLACK;
+			case StyledText.BLACK: return getForeground();
 			case StyledText.RED: return Color.RED;
 			case StyledText.GREEN: return Color.GREEN;
 			case StyledText.ORANGE: return Color.ORANGE;
 			case StyledText.BLUE: return Color.BLUE;
 			case StyledText.MAGENTA: return Color.MAGENTA;
 			case StyledText.CYAN: return Color.CYAN;
-			case StyledText.WHITE: return Color.WHITE;
+			case StyledText.WHITE: return getBackground();
 			default: return Color.BLACK;
 		}
 	}
