@@ -95,7 +95,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		addHighlighter(new FindHighlighter());
 		becomeDropTarget();
 		cursorBlinker = new CursorBlinker(this);
-		new Selector(this);
+		new SelectionHighlighter(this);
 	}
 	
 	public static final Cursor INVISIBLE_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR), new Point(0, 0), "invisible");

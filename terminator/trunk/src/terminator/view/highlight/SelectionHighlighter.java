@@ -16,7 +16,7 @@ import terminator.view.*;
  * towards shell-like applications), triple-click for line selection, and
  * shift-click to extend a selection.
  */
-public class Selector implements ClipboardOwner, MouseListener, MouseMotionListener, Highlighter {
+public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseListener, MouseMotionListener {
 	/**
 	 * Subverts the immutability of Style so we can track focus changes
 	 * and effectively update the selection highlight's background color
@@ -54,8 +54,8 @@ public class Selector implements ClipboardOwner, MouseListener, MouseMotionListe
 	private Highlight highlight;
 	private Location startLocation;
 	
-	/** Creates a Selector for selecting text in the given view, and adds us as mouse listeners to that view. */
-	public Selector(JTextBuffer view) {
+	/** Creates a SelectionHighlighter for selecting text in the given view, and adds us as mouse listeners to that view. */
+	public SelectionHighlighter(JTextBuffer view) {
 		this.view = view;
 		view.addFocusListener(style);
 		view.addMouseListener(this);
