@@ -16,7 +16,8 @@ public class FindFilesContainingSelectionAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        String pattern = StringUtilities.regularExpressionFromLiteral(getSelectedText());
+        String selection = getSelectedText();
+        String pattern = (selection != null ? StringUtilities.regularExpressionFromLiteral(selection) : null);
         String directory = guessDirectoryToSearchIn();
         Edit.getCurrentWorkspace().showFindFilesDialog(pattern, directory);
     }
