@@ -677,14 +677,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         advisor = new Advisor();
     }
     
-    public void startEditServer() {
-        try {
-            new EditServer(this);
-        } catch (Throwable th) {
-            Log.warn("Couldn't start EditServer", th);
-        }
-    }
-    
     public void initPreferences() {
         Parameters.readPropertiesFile(getPreferenceFilename("edit.properties"));
     }
@@ -761,7 +753,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         initAdvisor();
         initStatusArea();
         
-        startEditServer();
+        new EditServer();
         
         UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
         tabbedPane = new JTabbedPane(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);
