@@ -5,7 +5,7 @@
 #                    directory.
 
 # ----------------------------------------------------------------------------
-# 
+# Choose a default executable name if the user didn't supply one.
 # ----------------------------------------------------------------------------
 
 CURRENT_DIRECTORY := $(shell pwd)
