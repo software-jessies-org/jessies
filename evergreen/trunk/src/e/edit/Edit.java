@@ -15,7 +15,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     private static com.apple.eawt.Application application;
     private static Edit instance;
     
-    public static JFrame frame;
+    private static JFrame frame;
     private static JTabbedPane tabbedPane;
     private static TagsPanel tagsPanel;
     private static Advisor advisor;
