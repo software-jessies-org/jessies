@@ -17,7 +17,6 @@ Unassigned TODOs:
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 [1]	Implement 'mode 1'.
 [1]	Feedback on other tabs when there's been output you haven't seen yet?
-[1]	The cursor doesn't get drawn on empty lines, presumably a problem with getTop or whatever when the line's empty causing us to repaint the wrong area?
 
 
 
