@@ -1,6 +1,7 @@
 package terminatorn;
 
 import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
@@ -95,6 +96,19 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public TextBuffer getModel() {
 		return model;
+	}
+	
+	/**
+	 * Pastes the text on the clipboard into the terminal.
+	 */
+	public void paste() {
+		try {
+			Transferable contents = getToolkit().getSystemClipboard().getContents(this);
+			String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
+			insertText(string);
+		} catch (Exception ex) {
+			Log.warn("Couldn't paste.", ex);
+		}
 	}
 	
 	public void insertText(String text) {
