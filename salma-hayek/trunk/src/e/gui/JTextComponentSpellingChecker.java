@@ -18,6 +18,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
     public JTextComponentSpellingChecker(JTextComponent component) {
         this.component = component;
         initPopUpMenu();
+        InstanceTracker.addInstance(this);
     }
     
     private void initPopUpMenu() {
@@ -88,8 +89,10 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         
         public void actionPerformed(ActionEvent e) {
             SpellingChecker.getSharedSpellingCheckerInstance().acceptSpelling(word);
-            checkSpelling();
-            // FIXME: need to notify *all* the ispells.
+            Object[] spellingCheckers = InstanceTracker.getInstancesOfClass(JTextComponentSpellingChecker.class);
+            for (int i = 0; i < spellingCheckers.length; ++i) {
+                ((JTextComponentSpellingChecker) spellingCheckers[i]).checkSpelling();
+            }
         }
     }
     
