@@ -99,7 +99,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         //System.err.println(fromIndex + ".." + toIndex + " (document length " + document.getLength() + ")");
         for (int i = 0; i < highlights.length; ++i) {
             Highlighter.Highlight highlight = highlights[i];
-            if (highlight.getPainter() == misspelledWordHighlightPainter && highlight.getStartOffset() >= fromIndex && highlight.getEndOffset() <= toIndex) {
+            if (highlight.getPainter() == PAINTER && highlight.getStartOffset() >= fromIndex && highlight.getEndOffset() <= toIndex) {
                 highlighter.removeHighlight(highlight);
             }
         }
@@ -112,7 +112,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         TreeSet result = new TreeSet();
         for (int i = 0; i < highlights.length; i++) {
             Highlighter.Highlight highlight = highlights[i];
-            if (highlight.getPainter() == misspelledWordHighlightPainter) {
+            if (highlight.getPainter() == PAINTER) {
                 final int start = highlight.getStartOffset();
                 final int end = highlight.getEndOffset();
                 try {
@@ -141,7 +141,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         
         for (int i = 0; i < highlights.length; i++) {
             Highlighter.Highlight highlight = highlights[i];
-            if (highlight.getPainter() == misspelledWordHighlightPainter && highlight.getStartOffset() <= fromIndex && highlight.getEndOffset() >= toIndex) {
+            if (highlight.getPainter() == PAINTER && highlight.getStartOffset() <= fromIndex && highlight.getEndOffset() >= toIndex) {
                 actualRange.start = Math.min(highlight.getStartOffset(), highlight.getEndOffset());
                 actualRange.end = Math.max(highlight.getStartOffset(), highlight.getEndOffset());
                 return true;
@@ -235,7 +235,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
                 misspellingCount++;
                 //System.err.println("Misspelled word '" + word + "'");
                 try {
-                    highlighter.addHighlight(start, finish, misspelledWordHighlightPainter);
+                    highlighter.addHighlight(start, finish, PAINTER);
                 } catch (BadLocationException ex) {
                     ex.printStackTrace();
                 }
@@ -256,54 +256,59 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         return keywords.contains(word) || keywords.contains(word.toLowerCase());
     }
     
-    private LayeredHighlighter.LayerPainter makeMisspelledWordHighlightPainter() {
-        if (GuiUtilities.isMacOs()) {
-            return new UnderlineHighlightPainter();
-        }
-        return new WavyLineHighlightPainter(new Color(255, 0, 0, 72));
-    }
-    
     /** Paints the misspelled word highlights. */
-    private LayeredHighlighter.LayerPainter misspelledWordHighlightPainter = makeMisspelledWordHighlightPainter();
+    private static final LayeredHighlighter.LayerPainter PAINTER = new UnderlineHighlightPainter();
     
     /**
-     * A red underline for spelling mistake highlights.
+     * A red underline for spelling mistake highlights. On Mac OS, this is a dashed
+     * line. Elsewhere, it's a wavy line.
      */
     public static class UnderlineHighlightPainter extends LayeredHighlighter.LayerPainter {
-        private static final Color COLOR = new Color(255, 0, 0, 128);
+        private static final boolean DASHED = GuiUtilities.isMacOs();
+        private static final Color COLOR = new Color(255, 0, 0, DASHED ? 128 : 72);
         private static final Stroke DASHED_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 2.0f, 3.0f }, 0.0f);
         
         public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
             // Do nothing: this method will never be called
         }
         
-        public Shape paintLayer(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c, View view) {
-            Rectangle r = null;
-            if (offs0 == view.getStartOffset() && offs1 == view.getEndOffset()) {
-                if (bounds instanceof Rectangle) {
-                    r = (Rectangle) bounds;
-                } else {
-                    r = bounds.getBounds();
-                }
-            } else {
+        public Shape paintLayer(Graphics g, int offs0, int offs1, Shape shape, JTextComponent c, View view) {
+            if ((offs0 == view.getStartOffset() && offs1 == view.getEndOffset()) == false) {
                 try {
-                    Shape shape = view.modelToView(offs0, Position.Bias.Forward, offs1, Position.Bias.Backward, bounds);
-                    r = (shape instanceof Rectangle) ?  (Rectangle) shape : shape.getBounds();
-                } catch (BadLocationException e) {
+                    shape = view.modelToView(offs0, Position.Bias.Forward, offs1, Position.Bias.Backward, shape);
+                } catch (BadLocationException ex) {
                     return null;
                 }
             }
-            
+            g.setColor(COLOR);
+            Rectangle r = shape.getBounds();
+            if (DASHED) {
+                paintDashedLine((Graphics2D) g, r);
+            } else {
+                paintWavyHorizontalLine(g, r.x, r.x + r.width, r.y + r.height - 1);
+            }
+            return r;
+        }
+        
+        private void paintDashedLine(Graphics2D g, Rectangle r) {
             int baseline = r.y + r.height - 1;
             r.y += 2; r.height -= 3;
             
-            Graphics2D g2 = (Graphics2D) g;
-            Stroke originalStroke = g2.getStroke();
-            g2.setColor(COLOR);
-            g2.setStroke(DASHED_STROKE);
-            g2.drawLine(r.x, baseline, r.x + r.width, baseline);
-            g2.setStroke(originalStroke);
-            return r;
+            Stroke originalStroke = g.getStroke();
+            g.setStroke(DASHED_STROKE);
+            g.drawLine(r.x, baseline, r.x + r.width, baseline);
+            g.setStroke(originalStroke);
+        }
+        
+        private void paintWavyHorizontalLine(Graphics g, int x1, int x2, int y) {
+            int x = Math.min(x1, x2);
+            int end = Math.max(x1, x2);
+            int yOff = 1;
+            while (x < end) {
+                g.drawLine(x, y + yOff, Math.min(end, x + 2), y - yOff);
+                x += 2;
+                yOff = -yOff;
+            }
         }
     }
 }
