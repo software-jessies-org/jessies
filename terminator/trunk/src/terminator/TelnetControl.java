@@ -38,7 +38,8 @@ public class TelnetControl implements Runnable {
 		this.listener = listener;
 		this.process = process;
 		this.in = process.getInputStream();
-		this.out = process.getOutputStream();
+//		this.out = process.getOutputStream();
+		this.out = new PtyOutputStream(process.getOutputStream());
 		this.logWriter = new LogWriter(command);
 	}
 	
@@ -118,7 +119,7 @@ public class TelnetControl implements Runnable {
 	private boolean nextByteIsCommand = false;
 	
 	/** Must be called in the AWT dispatcher thread. */
-	public void sizeChanged(final Dimension sizeInChars) {
+	public void sizeChanged(final Dimension sizeInChars, final Dimension sizeInPixels) throws IOException {
 		TelnetAction sizeChangeAction = new TelnetAction() {
 			public void perform(TelnetListener listener) {
 				listener.sizeChanged(sizeInChars);
@@ -126,6 +127,7 @@ public class TelnetControl implements Runnable {
 		};
 		listener.processActions(new TelnetAction[] { sizeChangeAction });
 		// Notify the pty that the size has changed.
+	//	out.sendResizeNotification(sizeInChars, sizeInPixels);
 	}
 	
 	/** Returns the number of bytes in buffer which remain unprocessed. */

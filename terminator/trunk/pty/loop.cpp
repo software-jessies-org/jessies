@@ -45,23 +45,70 @@ ssize_t writen(int fd, const void *vptr, size_t n) {
     return n;
 }
 
+unsigned short readUnsignedShort(char *buf) {
+    unsigned short result = ((buf[0] << 8) & 0xff00) | (buf[1] & 0xff);
+    return result;
+}
+
 void loop(int ptym, int ignoreeof)
 {
     int        nread;
     char    buff[BUFFSIZE];
     pid_t    child;
+    int index;
+    int bytesInBuffer = 0;
+    int bytesRequired = 1;
     if ( (child = fork()) < 0) {
         err_sys("fork error");
 
     } else if (child == 0) {    /* child copies stdin to ptym */
         for ( ; ; ) {
-            if ( (nread = read(STDIN_FILENO, buff, BUFFSIZE)) < 0)
-                err_sys("read error from stdin");
-            else if (nread == 0)
-                break;        /* EOF on stdin means we're done */
+            if (bytesInBuffer < bytesRequired) {
+                if ( (nread = read(STDIN_FILENO, buff + bytesInBuffer, BUFFSIZE - bytesInBuffer)) < 0)
+                    err_sys("read error from stdin");
+                else if (nread == 0)
+                    break;        /* EOF on stdin means we're done */
+                bytesInBuffer += nread;
+            }
 
-            if (writen(ptym, buff, nread) != nread)
-                err_sys("writen error to master pty");
+            if (buff[0] == SIZE_ESCAPE) {
+                if (bytesInBuffer >= 2 && buff[1] == SIZE_ESCAPE) {
+                    if (writen(ptym, buff, 1) != 1) {
+                        err_sys("writen error to master pty");
+                    }
+                    bytesInBuffer -= 2;
+                    memcpy(buff, buff + 2, bytesInBuffer);
+                    bytesRequired = 1;
+                } else {
+                    if (bytesInBuffer >= SIZE_STRUCT_SIZE) {  /* escapeLength + sizeof(short) * 4 */
+                        struct winsize size;
+                        size.ws_row = readUnsignedShort(buff + 2);
+                        size.ws_col = readUnsignedShort(buff + 4);
+                        size.ws_xpixel = readUnsignedShort(buff + 6);
+                        size.ws_ypixel = readUnsignedShort(buff + 8);
+                        if (ioctl(ptym, TIOCGWINSZ, (char *) &size) < 0) {
+                            err_sys("TIOCGWINSZ error");
+                        }
+                        bytesInBuffer -= SIZE_STRUCT_SIZE;
+                        memcpy(buff, buff + SIZE_STRUCT_SIZE, bytesInBuffer);
+                        bytesRequired = 1;
+                    } else {
+                        bytesRequired = SIZE_STRUCT_SIZE;
+                    }
+                }
+            } else {
+                for (index = 0; index <= bytesInBuffer; index++) {
+                    if ((index == bytesInBuffer) || (buff[index] == SIZE_ESCAPE)) {
+                        if (writen(ptym, buff, index) != index) {
+                            err_sys("writen error to master pty");
+                        }
+                        bytesInBuffer = bytesInBuffer - index;  /* If there was no escape char, bytesInBuffer = 0, and 0 bytes copied. */
+                        memcpy(buff, buff + index, bytesInBuffer);
+                        bytesRequired = 1;
+                        break;
+                    }
+                }
+            }
         }
 
             /* We always terminate when we encounter an EOF on stdin,
