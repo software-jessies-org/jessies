@@ -287,8 +287,6 @@ public class ETextArea extends JTextArea {
      */
     public Font getAppropriateFontForContent() {
         boolean fixed = Boolean.getBoolean("fixedFont.default");
-        // FIXME: we should really hand this work out to an IndentationAnalyzer
-        // that also works out a suitable default indent string.
         String content = getText();
         if (content.indexOf("\t ") != -1) {
             fixed = true;
@@ -403,6 +401,14 @@ public class ETextArea extends JTextArea {
         return indenter;
     }
     
+    public String getIndentationString() {
+        String indentationString = (String) getDocument().getProperty(Indenter.INDENTATION_PROPERTY);
+        if (indentationString == null) {
+            indentationString = Parameters.getParameter("indent.string");
+        }
+        return indentationString;
+    }
+    
     /**
      * Returns a string corresponding to the spaces and tabs found at the
      * start of the line containing the given offset.
@@ -456,7 +462,6 @@ public class ETextArea extends JTextArea {
     /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
     public boolean correctIndentation(boolean shouldMoveCaret) {
         try {
-            String indentString = Parameters.getParameter("indent.string", "\t");
             int position = getCaretPosition();
             int lineNumber = getLineOfOffset(position);
 
@@ -489,50 +494,6 @@ public class ETextArea extends JTextArea {
             return false;
         }
     }
-    
-// FIXME: incorporate JavaDoc comment formatting in 'correctIndentation'.
-//        [this code came from InsertNewlineAction.]
-//        try {
-//            int position = target.getCaretPosition();
-//            //target.getIndentationOfLineAtOffset(position));
-//            String line = target.getLineTextAtOffset(position);
-//            StringBuffer whitespace = getIndentation(line);
-//            Log.warn(">>" + line + "<<");
-//            if (line.endsWith("{\n")) {
-//                //FIXME: it would be nice to insert the closing brace too, don't you think?
-//                whitespace.append(Parameters.getParameter("indent.string", "\t"));
-//            } else if (line.endsWith("/**\n")) {
-//                whitespace.append(" *");
-//            } else if ((line.length() == whitespace.length() + 3) && line.endsWith("*/\n")) {
-//                whitespace.setLength(whitespace.length() - 1); // Remove " ".
-//            }
-//            target.replaceSelection("\n" + whitespace);
-//        } catch (BadLocationException ex) {
-//            ex.printStackTrace();
-//        }
-//    public boolean isWhitespace(String line, int offset) {
-//        if (offset >= line.length()) {
-//            return false;
-//        }
-//        char ch = line.charAt(offset);
-//        return ch == ' ' || ch == '\t';
-//    }
-//    public StringBuffer getIndentation(String line) {
-//        StringBuffer result = new StringBuffer();
-//        boolean worthContinuing = true;
-//        for (int i = 0; worthContinuing && i < line.length(); i++) {
-//            char ch = line.charAt(i);
-//            if (isWhitespace(line, i)) {
-//                result.append(ch);
-//            } else {
-//                worthContinuing = false;
-//                if (ch == '*' && isWhitespace(line, i + 1)) {
-//                    result.append(ch);
-//                }
-//            }
-//        }
-//        return result;
-//    }
     
     private String wordSelectionStopChars = " \t\n!\"#%&'()*+,-./:;<=>?@`[\\]^{|}~";
     

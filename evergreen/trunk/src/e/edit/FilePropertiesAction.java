@@ -9,7 +9,7 @@ import e.util.*;
 
 /**
 The ETextArea action to open file properties dialog where you can view
-or alter the end of line string, indent string, and other stuff as we
+or alter the end of line string, indentation string, and other stuff as we
 think of it. (File encoding would be one possibility.)
 */
 public class FilePropertiesAction extends ETextAction {
@@ -37,7 +37,10 @@ public class FilePropertiesAction extends ETextAction {
         }
         String initialEndOfLine = StringUtilities.escapeForJava(endOfLineString);
         endOfLineStringField.setText(initialEndOfLine);
-        indentStringField.setText(StringUtilities.escapeForJava(Parameters.getParameter("indent.string")));
+        
+        String indentationString = text.getIndentationString();
+        String initialIndentationString = StringUtilities.escapeForJava(indentationString);
+        indentStringField.setText(initialIndentationString);
 
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
@@ -50,6 +53,7 @@ public class FilePropertiesAction extends ETextAction {
         
         String newEndOfLine = StringUtilities.unescapeJava(endOfLineStringField.getText());
         doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, newEndOfLine);
-        System.setProperty("indent.string", StringUtilities.unescapeJava(indentStringField.getText()));
+        String newIndentationString = StringUtilities.unescapeJava(indentStringField.getText());
+        doc.putProperty(Indenter.INDENTATION_PROPERTY, newIndentationString);
     }
 }

@@ -3,8 +3,6 @@ package e.edit;
 import java.awt.event.*;
 import javax.swing.text.*;
 
-import e.util.*;
-
 /**
 The ETextArea action that inserts a tab.
 */
@@ -17,7 +15,6 @@ public class InsertTabAction extends TextAction {
 
     public void actionPerformed(ActionEvent e) {
         ETextArea target = (ETextArea) getFocusedComponent();
-        String tab = Parameters.getParameter("indent.string", "\t");
-        target.replaceSelection(tab);
+        target.replaceSelection(target.getIndentationString());
     }
 }

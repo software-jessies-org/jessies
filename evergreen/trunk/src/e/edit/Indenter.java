@@ -1,21 +1,16 @@
 package e.edit;
 
-import e.util.*;
 import java.util.*;
 import java.util.regex.*;
 import javax.swing.text.*;
 
 public class Indenter {
-    public String getIndentString() {
-        return Parameters.getParameter("indent.string", "\t");
+    public String increaseIndentation(ETextArea text, String original) {
+        return original + text.getIndentationString();
     }
     
-    public String increaseIndentation(String original) {
-        return original + getIndentString();
-    }
-    
-    public String decreaseIndentation(String original) {
-        String delta = getIndentString();
+    public String decreaseIndentation(ETextArea text, String original) {
+        String delta = text.getIndentationString();
         if (original.endsWith(delta)) {
             return original.substring(0, original.length() - delta.length());
         }
@@ -34,6 +29,14 @@ public class Indenter {
     /** Returns the whitespace that should be used for the given line number. */
     public String getIndentation(ETextArea text, int lineNumber) throws BadLocationException {
         return text.getIndentationOfLine(text.getPreviousNonBlankLineNumber(lineNumber));
+    }
+    
+    public static final String INDENTATION_PROPERTY = "IndentationStringProperty";
+    
+    public void setIndentationPropertyBasedOnContent(ETextArea text, String content) {
+        String indentation = text.getIndenter().guessIndentationFromFile(content);
+        //System.err.println(filename + ": '" + indentation + "'");
+        text.getDocument().putProperty(Indenter.INDENTATION_PROPERTY, indentation);
     }
     
     public String guessIndentationFromFile(String fileContents) {
