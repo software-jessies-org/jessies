@@ -85,3 +85,7 @@
   sibling. If we fixed the menu bar to work on Linux, is there a way to have
   it present (for key handling) but invisible? That would be the nicest
   solution to this problem.
+
+* Find Next and Find Previous should scroll horizontally as well as vertically, if
+  necessary, so that at least part of the highlight is visible (the center would be
+  a plausible choice).
