@@ -80,7 +80,6 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		initIcon(frame);
 		
 		if (Options.getSharedInstance().shouldUseMenuBar()) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			frame.setJMenuBar(new TerminatorMenuBar());
 		}
 		frame.addWindowListener(new WindowAdapter() {
