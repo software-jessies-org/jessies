@@ -17,7 +17,15 @@ public class FindFilesContainingSelectionAction extends ETextAction {
     
     public void actionPerformed(ActionEvent e) {
         String selection = getSelectedText();
-        String pattern = (selection != null ? StringUtilities.regularExpressionFromLiteral(selection) : null);
+        String pattern = null;
+        if (selection != null) {
+            // Remove trailing newlines.
+            selection = selection.replaceAll("\n$", "");
+            // Only use the selection as a pattern if there are no embedded newlines.
+            if (selection.indexOf("\n") == -1) {
+                pattern = StringUtilities.regularExpressionFromLiteral(selection);
+            }
+        }
         String directory = guessDirectoryToSearchIn();
         Edit.getCurrentWorkspace().showFindFilesDialog(pattern, directory);
     }
