@@ -13,7 +13,7 @@ build: $(SOURCE_FILES)
 	@echo Recompiling the world... && \
 	 make clean && \
 	 mkdir -p classes && \
-	 jikes -bootclasspath $(BOOT_CLASS_PATH) -d classes/ -sourcepath src/ +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
+	 jikes -bootclasspath $(BOOT_CLASS_PATH) -d classes/ -sourcepath src/ +D +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
 
 .PHONY: clean
 clean:
