@@ -15,11 +15,13 @@ public class TerminatorMenuBar extends JMenuBar {
 	public TerminatorMenuBar() {
 		add(makeFileMenu());
 		add(makeEditMenu());
+		add(makeScrollbackMenu());
+		//add(makeFontMenu());
 		add(WindowMenu.getSharedInstance().makeJMenu());
 		//addHelpMenu();
 	}
 	
-	public JMenu makeFileMenu() {
+	private JMenu makeFileMenu() {
 		JMenu menu = new JMenu("File");
 		menu.add(new JMenuItem(new NewShellAction()));
 		//menu.add(makeAcceleratedItemEx(new NewCommandAction(), 'N', true));
@@ -38,7 +40,7 @@ public class TerminatorMenuBar extends JMenuBar {
 		return menu;
 	}
 	
-	public JMenu makeEditMenu() {
+	private JMenu makeEditMenu() {
 		JMenu menu = new JMenu("Edit");
 		menu.add(new JMenuItem(new CopyAction()));
 		menu.add(new JMenuItem(new PasteAction()));
@@ -49,9 +51,35 @@ public class TerminatorMenuBar extends JMenuBar {
 		menu.add(new JMenuItem(new FindNextAction()));
 		menu.add(new JMenuItem(new FindPreviousAction()));
 		
+		return menu;
+	}
+	
+	private JMenu makeScrollbackMenu() {
+		JMenu menu = new JMenu("Scrollback");
+		
+		menu.add(new JMenuItem(new ScrollToTopAction()));
+		menu.add(new JMenuItem(new ScrollToBottomAction()));
+		
+		menu.add(new JSeparator());
+		menu.add(new JMenuItem(new PageUpAction()));
+		menu.add(new JMenuItem(new PageDownAction()));
+		
+		//menu.add(new JSeparator());
+		//menu.add(new JMenuItem(LineUpAction());
+		//menu.add(new JMenuItem(LineDownAction());
+		
 		menu.add(new JSeparator());
 		menu.add(new JMenuItem(new ClearScrollbackAction()));
-
+		
+		return menu;
+	}
+	
+	private JMenu makeFontMenu() {
+		JMenu menu = new JMenu("Font");
+		
+		//menu.add(new JMenuItem(new BiggerFontAction()));
+		//menu.add(new JMenuItem(new SmallerFontAction()));
+		
 		return menu;
 	}
 	
@@ -211,6 +239,62 @@ public class TerminatorMenuBar extends JMenuBar {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
 				FindDialog.getSharedInstance().findPreviousIn(terminal.getTextPane());
+			}
+		}
+	}
+	
+	public static class ScrollToTopAction extends AbstractAction {
+		public ScrollToTopAction() {
+			super("Scroll To Top");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("HOME"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.getTextPane().scrollToTop();
+			}
+		}
+	}
+	
+	public static class ScrollToBottomAction extends AbstractAction {
+		public ScrollToBottomAction() {
+			super("Scroll To Bottom");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("END"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.getTextPane().scrollToBottom();
+			}
+		}
+	}
+	
+	public static class PageUpAction extends AbstractAction {
+		public PageUpAction() {
+			super("Page Up");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("PAGE_UP"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.pageUp();
+			}
+		}
+	}
+	
+	public static class PageDownAction extends AbstractAction {
+		public PageDownAction() {
+			super("Page Down");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("PAGE_DOWN"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.pageDown();
 			}
 		}
 	}
