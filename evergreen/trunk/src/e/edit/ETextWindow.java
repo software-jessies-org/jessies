@@ -179,12 +179,14 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     }
     
     public void updateWatermark() {
+        watermarkViewPort.setSerious(false);
         ArrayList items = new ArrayList();
         if (file.canWrite() == false) {
             items.add("(read-only)");
         }
         if (isOutOfDateWithRespectToDisk()) {
             items.add("(out-of-date)");
+            watermarkViewPort.setSerious(true);
         }
         watermarkViewPort.setWatermark(items.size() > 0 ? StringUtilities.join(items, " ") : null);
     }

@@ -20,9 +20,21 @@ public class WatermarkViewPort extends JViewport {
      */
     private static final Color WATERMARK_COLOR = new Color(220, 220, 220);
     
+    /**
+     * A very light red. Okay, so it's pink. It doesn't mean anything.
+     */
+    private static final Color SERIOUS_COLOR = new Color(250, 201, 201);
+    
     public WatermarkViewPort() {
         setBackground(Color.WHITE);
-        setForeground(WATERMARK_COLOR);
+        setSerious(false);
+    }
+    
+    /**
+     * Reverts to the default foreground color for the watermark text.
+     */
+    public void setSerious(boolean isSerious) {
+        setForeground(isSerious ? SERIOUS_COLOR : WATERMARK_COLOR);
     }
     
     /**
