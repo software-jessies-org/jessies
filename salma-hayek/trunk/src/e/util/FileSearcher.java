@@ -2,6 +2,7 @@ package e.util;
 
 import java.io.*;
 import java.nio.*;
+import java.util.*;
 import java.util.regex.*;
 
 public class FileSearcher {
@@ -13,7 +14,7 @@ public class FileSearcher {
     }
     
     /** Finds the index of the next newline character in 'charSequence' after 'start'. */
-    public int findEndOfLine(CharSequence charSequence, int start) {
+    private int findEndOfLine(CharSequence charSequence, int start) {
         final int max = charSequence.length();
         for (int i = start; i < max; i++) {
             if (charSequence.charAt(i) == '\n') {
@@ -27,7 +28,7 @@ public class FileSearcher {
      * Use the linePattern to break the given CharBuffer into lines, applying
      * the input pattern to each line to see if we have a match.
      */
-    public int searchCharBuffer(String fileName, CharSequence charSequence) {
+    private int searchCharBuffer(String fileName, CharSequence charSequence, Collection matches) {
         // Early exit on non-matching files.
         Matcher firstMatch = pattern.matcher(charSequence);
         if (firstMatch.find() == false) {
@@ -46,8 +47,8 @@ public class FileSearcher {
                 patternMatcher.reset(currentLine);
             }
             if (patternMatcher.find()) {
-                System.err.println(fileName + ":" + lineNumber + ":" + currentLine);
-                matchCount++;
+                matches.add(":" + lineNumber + ":" + currentLine);
+                ++matchCount;
             }
             
             start = end + 1;
@@ -59,7 +60,7 @@ public class FileSearcher {
      * Search for occurrences of the input pattern in the given file.
      * Returns the number of matches.
      */
-    public int searchFile(String path, String fileName) throws IOException {
+    public int searchFile(String path, String fileName, Collection matches) throws IOException {
         File file = FileUtilities.fileFromParentAndString(path, fileName);
         FileInputStream fileInputStream = new FileInputStream(file);
         DataInputStream dataInputStream = new DataInputStream(fileInputStream);
@@ -83,7 +84,7 @@ public class FileSearcher {
             }
             
             CharSequence charSequence = new AsciiCharSequence(byteBuffer, 0, byteCount);
-            return searchCharBuffer(fileName, charSequence);
+            return searchCharBuffer(fileName, charSequence, matches);
         } finally {
             //fileChannel.close();
             dataInputStream.close();
