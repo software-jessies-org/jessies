@@ -78,8 +78,7 @@
 
 * "whiptail --yesno food 8 40" still isn't right in Terminator.
   We have a pixel's gap between lines (which may not be our fault so much as
-  the font's), and we've cleared the non-default background color to the right
-  of the box.
+  the font's).
 
 * We should be able to "Copy With Styles" so we can paste color output into
   a mailer or whatever, and preserve the formatting. Presumably we can put
