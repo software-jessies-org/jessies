@@ -1,6 +1,5 @@
 package e.edit;
 
-import java.io.*;
 import java.util.*;
 import e.util.*;
 
@@ -30,7 +29,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
          * This has the advantage that you can remove any entries that annoy you.
          */
         
-        String[] manPages = StringUtilities.readLinesFromFile(System.getProperty("env.EDIT_HOME") + File.separatorChar + "manpages");
+        String[] manPages = StringUtilities.readLinesFromFile(Edit.getResourceFilename("manpages"));
         for (int i = 0; i < manPages.length; i++) {
             knownManPages.add(manPages[i]);
         }
