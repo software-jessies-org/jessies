@@ -67,3 +67,7 @@ Should allow the user to specify a log filename per tab, on the command line.
   if you look at the two, it's obvious xterm is right), we have a pixel's gap
   between lines (which may not be our fault so much as the font's), and we've
   cleared the non-default background color to the right of the box.
+
+* we should be able to "Copy With Styles" so we can paste color output into
+  a mailer or whatever, and preserve the formatting. Presumably we can put
+  HTML data on the clipboard?
