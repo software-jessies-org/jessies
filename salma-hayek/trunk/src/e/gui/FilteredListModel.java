@@ -1,5 +1,6 @@
 package e.gui;
 
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -36,6 +37,22 @@ public class FilteredListModel extends AbstractListModel {
         // it could be altered to report all the additions and removals.
         fireIntervalRemoved(this, 0, model.getSize());
         fireIntervalAdded(this, 0, validIndexes.size());
+    }
+    
+    /**
+     * Creates a new SearchField tied to this FilteredListModel such that
+     * typing in the field will change the filter. Each invocation creates
+     * a new instance.
+     */
+    public SearchField makeSearchField() {
+        final SearchField searchField = new SearchField();
+        searchField.setSendsNotificationForEachKeystroke(true);
+        searchField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setFilter(searchField.getText());
+            }
+        });
+        return searchField;
     }
     
     public Object getElementAt(int index) {

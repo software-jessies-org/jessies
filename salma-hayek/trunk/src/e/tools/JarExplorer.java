@@ -107,14 +107,7 @@ public class JarExplorer extends JFrame {
         showVerboseDetail = new JCheckBox("Show Verbose Information");
         showVerboseDetail.addItemListener(itemListener);
         checkBoxPanel.add(showVerboseDetail);
-        final SearchField searchField = new SearchField();
-        searchField.setSendsNotificationForEachKeystroke(true);
-        searchField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                filteredListModel.setFilter(searchField.getText());
-            }
-        });
-        checkBoxPanel.add(searchField);
+        checkBoxPanel.add(filteredListModel.makeSearchField());
         
         JScrollPane entriesScroller = new JScrollPane(list);
         JPanel entriesPanel = new JPanel(new BorderLayout());
