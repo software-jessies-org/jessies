@@ -15,6 +15,7 @@ Unassigned TODOs:
 [1]	Fix double-click selection so it selects a word (maybe bracket-matching aswell).
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 [1]	Fix scrolling with the scroll bar arrows and mouse wheel. elliotth fixed it once (implementing Scrollable in JTelnetPane), but we've broken it again somewhere along the line.
+[1]     We should start a timer on mouseExited and stop it on mouseEntered that jogs the auto-scrolling. Having to wiggle the mouse to produce mouseDragged events is stupid, even if it's what you have to do with PuTTY and gnome-terminal. Apple's Terminal does it right, so we should too.
 
 
 
