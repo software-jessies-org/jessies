@@ -1,0 +1,13 @@
+ChangeLog for Terminator
+~~~~~~~~~~~~~~~~~~~
+
+File started on 13th May 2004.  This is several weeks after development first started, so
+there's a lot missing from here.
+
+
+
+13th May 2004, Phil Norman
+	* Made memory efficiency improvements to the way tabs are stored within TextLine,
+		as suggested by Elliott.
+	* Fixed up the selection highlighter so it highlights only entire tabs, not bits of tabs.
+
