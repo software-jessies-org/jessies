@@ -221,7 +221,7 @@ public class FindFilesDialog {
         private Pattern pattern;
         public DefinitionFinder(File file, String regularExpression) {
             this.pattern = Pattern.compile(regularExpression);
-            new TagReader(file, null, null, this);
+            new TagReader(file, null, this);
         }
         public void tagFound(TagReader.Tag tag) {
             // Function prototypes and Java packages probably aren't interesting.

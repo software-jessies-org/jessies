@@ -13,12 +13,10 @@ public class TagReader {
     private TagListener listener;
     private String fileType;
     private String digest;
-    private ETextArea textArea;
 
-    public TagReader(File file, String fileType, ETextArea textArea, TagListener tagListener) {
+    public TagReader(File file, String fileType, TagListener tagListener) {
         this.listener = tagListener;
         this.fileType = fileType;
-        this.textArea = textArea;
         
         try {
             File tagsFile = createTagsFileFor(file);
@@ -138,14 +136,6 @@ public class TagReader {
         tag.isAbstract = (lineNumber == abstractTagLineNumber | tag.isAbstract);
         abstractTagLineNumber = 0;
         
-        try {
-            if (textArea != null) {
-                tag.lineText = textArea.getLineText(lineNumber - 1);
-            }
-        } catch (javax.swing.text.BadLocationException ex) {
-            ex.printStackTrace();
-        }
-        
         listener.tagFound(tag);
     }
     
@@ -224,7 +214,7 @@ public class TagReader {
         public String context;
         public String containingClass;
         public int lineNumber;
-        public String lineText;
+        public String toolTip;
         public boolean isStatic;
         public boolean isAbstract;
         
