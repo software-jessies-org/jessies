@@ -22,10 +22,15 @@ public class WatermarkViewPort extends JViewport {
     
     public WatermarkViewPort() {
         setBackground(Color.WHITE);
+        setForeground(WATERMARK_COLOR);
     }
     
-    public void setWatermark(final String watermark) {
-        this.watermark = watermark;
+    /**
+     * Sets the watermark string; ensures the view has the appropriate opacity.
+     */
+    public void setWatermark(final String newWatermark) {
+        watermark = newWatermark;
+        ((JComponent) getView()).setOpaque(watermark == null);
     }
     
     public void paintComponent(final Graphics g) {
@@ -40,7 +45,7 @@ public class WatermarkViewPort extends JViewport {
         final int watermarkHeight = (int) (1.2 * fm.getHeight());
         final int watermarkWidth = (int) (1.1 * fm.stringWidth(watermark));
         Rectangle clip = g.getClipBounds();
-        g.setColor(WATERMARK_COLOR);
+        g.setColor(getForeground());
         for (int x = clip.x - (clip.x % watermarkWidth); x < clip.x + clip.width; x += watermarkWidth) {
             for (int y = clip.y - (clip.y % watermarkHeight); y < clip.y + clip.height + watermarkHeight; y += watermarkHeight) {
                 g.drawString(watermark, x, y);

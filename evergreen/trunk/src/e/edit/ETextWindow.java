@@ -167,13 +167,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         if (isOutOfDateWithRespectToDisk()) {
             items.add("(out-of-date)");
         }
-        if (items.size() > 0) {
-            String watermarkString = StringUtilities.join(items, " ");
-            watermarkViewPort.setWatermark(watermarkString);
-            text.setOpaque(false);
-        } else {
-            text.setOpaque(true);            
-        }
+        watermarkViewPort.setWatermark(items.size() > 0 ? StringUtilities.join(items, " ") : null);
     }
     
     /**
