@@ -1,6 +1,6 @@
 package e.edit;
 
-import e.util.Bag;
+import e.util.*;
 import java.util.regex.*;
 import javax.swing.text.*;
 
@@ -42,7 +42,7 @@ public class Indenter {
     public String guessIndentationFromFile(String fileContents) {
         String previousIndent = "";
         Bag indentations = new Bag();
-        String emergencyAlternative = "    ";
+        String emergencyAlternative = Parameters.getParameter("indent.string", "    ");
         String[] lines = fileContents.split("\n");
         for (int i = 0; i < lines.length; ++i) {
             String line = lines[i];
