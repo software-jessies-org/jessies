@@ -3,7 +3,6 @@ package terminator.view;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
-import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
 import e.util.*;
@@ -64,8 +63,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			public void highlightClicked(MouseEvent event) {
 				Highlight[] lights = getHighlightsForLocation(viewToModel(event.getPoint()));
 				for (int i = 0; i < lights.length; i++) {
-					lights[i].getHighlighter().highlightClicked(JTextBuffer.this, lights[i], getText(lights[i]), event);
+					lights[i].getHighlighter().highlightClicked(JTextBuffer.this, lights[i], getTextFromHighlight(lights[i]), event);
 				}
+			}
+			
+			private String getTextFromHighlight(Highlight highlight) {
+				return model.getCharSequence(highlight.getStart(), highlight.getEnd()).toString();
 			}
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
@@ -98,12 +101,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		new SelectionHighlighter(this);
 	}
 	
-	public static final Cursor INVISIBLE_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR), new Point(0, 0), "invisible");
-	
 	public void userIsTyping() {
 		blinkOn = true;
 		redrawCaretPosition();
-		setCursor(INVISIBLE_CURSOR);
+		setCursor(GuiUtilities.INVISIBLE_CURSOR);
 	}
 	
 	private void becomeDropTarget() {
@@ -539,10 +540,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			ArrayList highlights = (ArrayList) lineHighlights.get(lineIndex);
 			return (Highlight[]) highlights.toArray(new Highlight[highlights.size()]);
 		}
-	}
-	
-	public String getText(Highlight highlight) {
-		return model.getCharSequence(highlight.getStart(), highlight.getEnd()).toString();
 	}
 	
 	public String getTabbedText(Highlight highlight) {
