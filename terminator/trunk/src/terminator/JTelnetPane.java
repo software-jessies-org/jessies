@@ -108,19 +108,7 @@ public class JTelnetPane extends JPanel {
 
 	private void init(String command, InputStream in, OutputStream out) throws IOException {
 		textPane = new JTextBuffer(controller);
-		textPane.addComponentListener(new ComponentAdapter() {
-			private Dimension currentSize;
-			public void componentShown(ComponentEvent e) {
-				this.currentSize = textPane.getSizeInCharacters();
-			}
-			public void componentResized(ComponentEvent e) {
-				Dimension size = textPane.getSizeInCharacters();
-				if (size.equals(currentSize) == false) {
-					// FIXME: need to tell pty about the size change.
-					currentSize = size;
-				}
-			}
-		});
+		initSizeMonitoring();
 		textPane.addKeyListener(new KeyHandler());
 		
 		JScrollPane scrollPane = new JScrollPane(new BorderPanel(textPane));
@@ -139,6 +127,22 @@ public class JTelnetPane extends JPanel {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	private void initSizeMonitoring() {
+		textPane.addComponentListener(new ComponentAdapter() {
+			private Dimension currentSize;
+			public void componentShown(ComponentEvent e) {
+				this.currentSize = textPane.getSizeInCharacters();
+			}
+			public void componentResized(ComponentEvent e) {
+				Dimension size = textPane.getSizeInCharacters();
+				if (size.equals(currentSize) == false) {
+					// FIXME: need to tell pty about the size change.
+					currentSize = size;
+				}
+			}
+		});
 	}
 	
 	public JTextBuffer getTextPane() {
