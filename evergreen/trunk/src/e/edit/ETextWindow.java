@@ -62,6 +62,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         initKeywordsFor(C_PLUS_PLUS);
         initKeywordsFor(JAVA);
         initKeywordsFor(RUBY);
+        JavaResearcher.addJavaWords((Set) KEYWORDS_MAP.get(JAVA));
     }
     
     private static void initKeywordsFor(String language) {
@@ -209,11 +210,6 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         if (keywords == null) {
             keywords = new HashSet();
         }
-        
-        if (isJava()) {
-            JavaResearcher.addJavaWords(keywords);
-        }
-        
         text.getDocument().putProperty(JTextComponentSpellingChecker.KEYWORDS_DOCUMENT_PROPERTY, keywords);
     }
     

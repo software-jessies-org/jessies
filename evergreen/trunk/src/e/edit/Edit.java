@@ -726,6 +726,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     private Edit() {
+        long start = System.currentTimeMillis();
+        
         application = new com.apple.eawt.Application();
         application.addApplicationListener(this);
 
@@ -779,7 +781,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         splitPane.setDividerLocation(0.8);
         splitPane.setResizeWeight(0.8);
         
-        Log.warn("Ready to use!");
+        long end = System.currentTimeMillis();
+        Log.warn("Ready to use after " + (end - start) + " ms!");
         
         startScanningWorkspaces();
     }
