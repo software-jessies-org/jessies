@@ -46,8 +46,8 @@ public class CSIEscapeAction implements TerminalAction {
 			case 'M': return scrollDisplayUp(listener, midSequence);
 			case 'P': return deleteCharacters(listener, midSequence);
 			case 'g': return clearTabs(listener, midSequence);
-			case 'h': return setPrivateMode(listener, midSequence, true);
-			case 'l': return setPrivateMode(listener, midSequence, false);
+			case 'h': return setMode(listener, midSequence, true);
+			case 'l': return setMode(listener, midSequence, false);
 			case 'm': return processFontEscape(listener, midSequence);
 			case 'n': return processDeviceStatusReport(listener, midSequence);
 			case 'r': return setScrollScreen(listener, midSequence);
@@ -85,12 +85,12 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	private boolean setPrivateMode(TextBuffer listener, String seq, boolean value) {
-		boolean isQuestionMode = seq.startsWith("?");
-		String[] modes = (isQuestionMode ? seq.substring(1) : seq).split(";");
+	private boolean setMode(TextBuffer listener, String seq, boolean value) {
+		boolean isPrivateMode = seq.startsWith("?");
+		String[] modes = (isPrivateMode ? seq.substring(1) : seq).split(";");
 		for (int i = 0; i < modes.length; i++) {
 			int mode = Integer.parseInt(modes[i]);
-			if (isQuestionMode) {
+			if (isPrivateMode) {
 				switch (Integer.parseInt(modes[i])) {
 					case 25: listener.setCursorVisible(value); break;
 					case 47: listener.useAlternateBuffer(value); break;
@@ -98,8 +98,14 @@ public class CSIEscapeAction implements TerminalAction {
 				}
 			} else {
 				switch (Integer.parseInt(modes[i])) {
-					case 4: listener.setInsertMode(value); break;
-					default: Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
+				case 4:
+					listener.setInsertMode(value);
+					break;
+				case 20:
+					control.setAutomaticNewline(value);
+					break;
+				default:
+					Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
 				}
 			}
 		}

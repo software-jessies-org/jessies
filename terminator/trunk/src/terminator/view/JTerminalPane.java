@@ -309,6 +309,9 @@ public class JTerminalPane extends JPanel {
 				}
 				if (ch != KeyEvent.CHAR_UNDEFINED) {
 					control.sendChar(ch);
+					if (ch == Ascii.CR && control.isAutomaticNewline()) {
+						control.sendChar(Ascii.LF);
+					}
 					textPane.userIsTyping();
 					scroll();
 				}
