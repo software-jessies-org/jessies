@@ -167,46 +167,8 @@ resources of class <tt>XTerm</tt>, <tt>Rxvt</tt>, or <tt>Terminator</tt>. This
 means that by default it will pick up the other programs' settings, but you can
 have different settings for Terminator if you wish.
 
-<p>Use <tt>terminator --help</tt> to see all the options, and their values.
-
-<p>Common resources:
-<dl>
-
-<dt>loginShell
-<dd>Whether or not the shell will be started with a <tt>-l</tt> argument.
-
-<dt>scrollKey
-<dd>Whether or not pressing a key should move the scrollbar to the bottom.
-
-<dt>scrollTtyOutput
-<dd>Whether or not output to the terminal should move the scrollbar to the
-bottom.
-
-<dt>title
-<dd>The default title string for new terminals.
-
-<dt>internalBorder
-<dd>The number of pixels spacing between the text and the edge of the window.
-
-</dl>
-
-<p>Terminator-only resources:
-<dl>
-
-<dt>antiAlias
-<dd>Whether or not to use anti-aliased text.
-
-<dt>useMenuBar
-<dd>Whether or not to use a menu bar. This defaults to false normally, but to
-true on Mac OS.
-
-<dt>initialRowCount
-<dd>The number of lines in a newly-opened terminal.
-
-<dt>initialColumnCount
-<dd>The number of columns in a newly-opened terminal.
-
-</dl>
+<p>Use <tt>terminator --help</tt> to see all the options, their explanations,
+and their values.
 
 <p>Terminator should use the same colors you usually see in <tt>xterm(1)</tt>
 or <tt>rxvt(1)</tt>. In order to resolve color names to RGB values, Terminator
@@ -215,6 +177,10 @@ this file, Terminator only understands colors in the form #rrggbb.
 
 <p>If you don't have any colors configured, Terminator will use built-in
 defaults similar to SGI's <tt>xwsh(1)</tt>.
+
+<p>Terminator uses the same names for fonts as Java. (This is why we use
+different resources to specify a font, and won't even try to translate X11
+logical font descriptions.)
 
 <h2>Authors</h2>
 

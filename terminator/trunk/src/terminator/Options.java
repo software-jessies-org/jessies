@@ -44,6 +44,7 @@ public class Options {
 	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt|Terminator)(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
 	private HashMap options = new HashMap();
+	private HashMap descriptions = new HashMap();
 	private HashMap rgbColors = null;
 	
 	public static Options getSharedInstance() {
@@ -55,6 +56,10 @@ public class Options {
 		Arrays.sort(keys);
 		for (int i = 0; i < keys.length; ++i) {
 			String key = (String) keys[i];
+			String description = (String) descriptions.get(key);
+			if (description != null) {
+				out.println("\n# " + description);
+			}
 			out.println("Terminator*" + key + ": " + options.get(key));
 		}
 	}
@@ -202,21 +207,26 @@ public class Options {
 		return otherArguments;
 	}
 	
+	private void addDefault(String name, String value, String description) {
+		options.put(name, value);
+		descriptions.put(name, description);
+	}
+	
 	/**
 	 * Sets the defaults for non-color options.
 	 */
 	private void initDefaults() {
-		options.put(ANTI_ALIAS, "false");
-		options.put(FONT_NAME, GuiUtilities.isMacOs() ? "Monaco" : "Monospaced");
-		options.put(FONT_SIZE, "12");
-		options.put(INITIAL_COLUMN_COUNT, "80");
-		options.put(INITIAL_ROW_COUNT, "24");
-		options.put(INTERNAL_BORDER, "2");
-		options.put(LOGIN_SHELL, "true");
-		options.put(SCROLL_KEY, "true");
-		options.put(SCROLL_TTY_OUTPUT, "false");
-		options.put(TITLE, "Terminator");
-		options.put(USE_MENU_BAR, Boolean.toString(GuiUtilities.isMacOs()));
+		addDefault(ANTI_ALIAS, "false", "Whether or not to use anti-aliased text");
+		addDefault(FONT_NAME, GuiUtilities.isMacOs() ? "Monaco" : "Monospaced", "The name of the font to use (not an X11 font)");
+		addDefault(FONT_SIZE, "12", "The size of text, in points");
+		addDefault(INITIAL_COLUMN_COUNT, "80", "The number of columns in a new terminal");
+		addDefault(INITIAL_ROW_COUNT, "24", "The number of rows in a new terminal");
+		addDefault(INTERNAL_BORDER, "2", "The number of pixels spacing between the text and the edge of the window");
+		addDefault(LOGIN_SHELL, "true", "Whether or not the shell will be started with the '-l' argument");
+		addDefault(SCROLL_KEY, "true", "Whether or not pressing a key should move the scrollbar to the bottom");
+		addDefault(SCROLL_TTY_OUTPUT, "false", "Whether or not output to the terminal should move the scrollbar to the bottom");
+		addDefault(TITLE, "Terminator", "The default title string for new terminals");
+		addDefault(USE_MENU_BAR, Boolean.toString(GuiUtilities.isMacOs()), "Whether or not to use a menu bar");
 	}
 	
 	/**
