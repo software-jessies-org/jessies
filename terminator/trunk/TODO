@@ -7,6 +7,12 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
+[5]	Change the naming of 'Control' and 'Controller'.  It's confusing.
+[5]	Refactor to make Terminator the main application, responsible for a number of TerminatorFrame objects.
+[5]	Change the 'terminatorn' package to be 'terminator'.
+[5]	Fix ^W in less.
+[5]	Sometimes the last line of a catted file isn't displayed.
+[5]	Resizing the terminal window causes an automatic scroll to the bottom.  This shouldn't happen.
 [5]	Make an about box.
 [5]	Implement "New Window" to go with "New Tab".
 [3]	Review the current properties reading, and see if it's really going to work well enough.  Possibly add "?MacOS:" stuff to it.
