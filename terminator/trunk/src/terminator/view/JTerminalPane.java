@@ -43,14 +43,14 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	public JTerminalPane(String name, String command, boolean ignoreExitStatus) {
+	public JTerminalPane(String name, String command) {
 		super(new BorderLayout());
 		this.name = name;
 		
 		try {
 //			Log.warn("Starting process '" + command + "'");
 			final Process proc = Runtime.getRuntime().exec(System.getProperty("pty.binary") + " " + command);
-			init(command, proc, ignoreExitStatus);
+			init(command, proc);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -68,7 +68,7 @@ public class JTerminalPane extends JPanel {
 				title = title.substring(0, title.indexOf(' '));
 			}
 		}
-		return new JTerminalPane(title, command, false);
+		return new JTerminalPane(title, command);
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class JTerminalPane extends JPanel {
 		if (Options.getSharedInstance().isLoginShell()) {
 			command += " -l";
 		}
-		return new JTerminalPane(user + "@localhost", command, true);
+		return new JTerminalPane(user + "@localhost", command);
 	}
 	
 	public Dimension getPaneSize() {
@@ -110,7 +110,7 @@ public class JTerminalPane extends JPanel {
 		return "bash";
 	}
 
-	private void init(String command, Process process, boolean ignoreExitStatus) throws IOException {
+	private void init(String command, Process process) throws IOException {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		textPane.addMouseListener(new ContextMenuOpener());
@@ -126,11 +126,11 @@ public class JTerminalPane extends JPanel {
 		add(scrollPane, BorderLayout.CENTER);
 		new StickyBottomScrollBarListener(scrollPane.getVerticalScrollBar());
 		
-		initSizeMonitoring();
 		textPane.sizeChanged();
 		try {
-			control = new TerminalControl(this, textPane.getModel(), command, process, ignoreExitStatus);
+			control = new TerminalControl(this, textPane.getModel(), command, process);
 			textPane.setTerminalControl(control);
+			initSizeMonitoring();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}

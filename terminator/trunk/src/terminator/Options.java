@@ -32,6 +32,7 @@ public class Options {
 	private static final String ANTI_ALIAS = "antiAlias";
 	private static final String BLOCK_CURSOR = "blockCursor";
 	private static final String CURSOR_BLINK = "cursorBlink";
+	private static final String ERROR_EXIT_HOLDING = "errorExitHolding";
 	private static final String FONT_NAME = "fontName";
 	private static final String FONT_SIZE = "fontSize";
 	private static final String INITIAL_COLUMN_COUNT = "initialColumnCount";
@@ -101,6 +102,14 @@ public class Options {
 	 */
 	public boolean isBlockCursor() {
 		return booleanResource(BLOCK_CURSOR);
+	}
+	
+	/**
+	 * Whether or not to keep the window up if the child exits with an
+	 * error status code.
+	 */
+	public boolean isErrorExitHolding() {
+		return booleanResource(ERROR_EXIT_HOLDING);
 	}
 	
 	/**
@@ -232,19 +241,20 @@ public class Options {
 	 * Sets the defaults for non-color options.
 	 */
 	private void initDefaults() {
-		addDefault(ANTI_ALIAS, "false", "Whether or not to use anti-aliased text");
-		addDefault(BLOCK_CURSOR, "false", "Whether to a block cursor instead of an underline");
-		addDefault(CURSOR_BLINK, "true", "Whether or not the cursor should blink");
+		addDefault(ANTI_ALIAS, "false", "Use anti-aliased text?");
+		addDefault(BLOCK_CURSOR, "false", "Use a block cursor instead of an underline?");
+		addDefault(CURSOR_BLINK, "true", "Blink the cursor?");
+		addDefault(ERROR_EXIT_HOLDING, "true", "Keep the window open if the child exits with an error status?");
 		addDefault(FONT_NAME, GuiUtilities.isMacOs() ? "Monaco" : "Monospaced", "The name of the font to use (not an X11 font)");
 		addDefault(FONT_SIZE, "12", "The size of text, in points");
 		addDefault(INITIAL_COLUMN_COUNT, "80", "The number of columns in a new terminal");
 		addDefault(INITIAL_ROW_COUNT, "24", "The number of rows in a new terminal");
 		addDefault(INTERNAL_BORDER, "2", "The number of pixels spacing between the text and the edge of the window");
-		addDefault(LOGIN_SHELL, "true", "Whether or not the shell will be started with the '-l' argument");
-		addDefault(SCROLL_KEY, "true", "Whether or not pressing a key should move the scrollbar to the bottom");
-		addDefault(SCROLL_TTY_OUTPUT, "false", "Whether or not output to the terminal should move the scrollbar to the bottom");
+		addDefault(LOGIN_SHELL, "true", "Start the child with a '-l' argument?");
+		addDefault(SCROLL_KEY, "true", "Move the scrollbar to the bottom when a key is pressed?");
+		addDefault(SCROLL_TTY_OUTPUT, "false", "Move the scrollbar to the bottom when something is output?");
 		addDefault(TITLE, "Terminator", "The default title string for new terminals");
-		addDefault(USE_MENU_BAR, Boolean.toString(GuiUtilities.isMacOs()), "Whether or not to use a menu bar");
+		addDefault(USE_MENU_BAR, Boolean.toString(GuiUtilities.isMacOs()), "Use a menu bar?");
 	}
 	
 	/**

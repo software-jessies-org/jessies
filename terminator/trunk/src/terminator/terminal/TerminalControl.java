@@ -34,7 +34,6 @@ public class TerminalControl implements Runnable {
 	private JTerminalPane pane;
 	private TerminalListener listener;
 	private Process process;
-	private boolean ignoreExitStatus;
 	private boolean processIsRunning = true;
 	private InputStream in;
 	private PtyOutputStream out;
@@ -46,11 +45,10 @@ public class TerminalControl implements Runnable {
 	// Buffer of TerminalActions to perform.
 	private ArrayList terminalActions = new ArrayList();
 	
-	public TerminalControl(JTerminalPane pane, TerminalListener listener, String command, Process process, boolean ignoreExitStatus) throws IOException {
+	public TerminalControl(JTerminalPane pane, TerminalListener listener, String command, Process process) throws IOException {
 		this.pane = pane;
 		this.listener = listener;
 		this.process = process;
-		this.ignoreExitStatus = ignoreExitStatus;
 		this.in = process.getInputStream();
 		this.out = new PtyOutputStream(process.getOutputStream());
 		this.logWriter = new LogWriter(command);
@@ -101,10 +99,10 @@ public class TerminalControl implements Runnable {
 			processIsRunning = false;
 			try {
 				int status = process.waitFor();
-				if (status == 0 || ignoreExitStatus) {
-					pane.doCloseAction();
-				} else {
+				if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
 					announceConnectionLost("[Process exited with status " + status + ".]");
+				} else {
+					pane.doCloseAction();
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
