@@ -77,11 +77,22 @@ public class InsertNewlineAction extends TextAction {
         }
     }
     
-    public boolean hasUnbalancedBraces(String initialText) {
+    public boolean hasUnbalancedBraces(final String text) {
+        return (calculateBraceNesting(text) != 0);
+    }
+
+    /**
+     * Returns how many more opening braces there are than closing
+     * braces in the given String. Returns 0 if there are equal
+     * numbers of opening and closing braces; a negative number if
+     * there are more closing braces than opening braces.
+     */
+    public int calculateBraceNesting(final String initialText) {
         String text = initialText.replaceAll("\\\\.", "_"); // Remove escaped characters.
         text = text.replaceAll("'.'", "_"); // Remove character literals.
         text = text.replaceAll("\"([^\\n]*?)\"", "_"); // Remove string literals.
         text = text.replaceAll("//[^\\n]*", "_"); // Remove C++ comments.
+        text = text.replaceAll("/\\*(?s).*?\\*/", "_"); // Remove C comments.
         int braceNesting = 0;
         for (int i = 0; i < text.length(); ++i) {
             char ch = text.charAt(i);
@@ -91,14 +102,16 @@ public class InsertNewlineAction extends TextAction {
                 --braceNesting;
             }
         }
-        return (braceNesting != 0);
+        return braceNesting;
     }
 
     public static void main(String[] filenames) {
         InsertNewlineAction action = new InsertNewlineAction();
         for (int i = 0; i < filenames.length; ++i) {
             String filename = filenames[i];
-            System.err.println(filename + " " + action.hasUnbalancedBraces(StringUtilities.readFile(filename)));
+            String text = StringUtilities.readFile(filename);
+            int nesting = action.calculateBraceNesting(text);
+            System.err.println(filename + " nesting = " + nesting);
         }
     }
 }
