@@ -141,7 +141,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			case StyledText.BLACK: return getForeground();
 			case StyledText.RED: return Color.RED;
 			case StyledText.GREEN: return Color.GREEN;
-			case StyledText.ORANGE: return Color.ORANGE;
+			case StyledText.YELLOW: return Color.YELLOW;
 			case StyledText.BLUE: return Color.BLUE;
 			case StyledText.MAGENTA: return Color.MAGENTA;
 			case StyledText.CYAN: return Color.CYAN;
