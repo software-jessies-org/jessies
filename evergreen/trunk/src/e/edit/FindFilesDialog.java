@@ -273,7 +273,7 @@ public class FindFilesDialog {
         formPanel.addRow("Files Containing:", patternField);
         formPanel.addRow("Whose Names Match:", directoryField);
         formPanel.addRow("Matches:", new JScrollPane(matchList));
-        formPanel.addRow("", status);
+        formPanel.setStatusBar(status);
         
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
