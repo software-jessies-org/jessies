@@ -347,7 +347,7 @@ public class JTelnetPane extends JPanel {
 		}
 		
 		public char getHotkeyChar() {
-			return 'e';
+			return 'E';
 		}
 	}
 	
@@ -361,7 +361,7 @@ public class JTelnetPane extends JPanel {
 		}
 		
 		public char getHotkeyChar() {
-			return 'f';
+			return 'F';
 		}
 	}
 	
@@ -376,7 +376,7 @@ public class JTelnetPane extends JPanel {
 		}
 		
 		public char getHotkeyChar() {
-			return 'k';
+			return 'K';
 		}
 	}
 	
@@ -390,7 +390,7 @@ public class JTelnetPane extends JPanel {
 		}
 		
 		public char getHotkeyChar() {
-			return 'n';
+			return 'N';
 		}
 	}
 	
@@ -404,7 +404,7 @@ public class JTelnetPane extends JPanel {
 		}
 		
 		public char getHotkeyChar() {
-			return 't';
+			return 'T';
 		}
 	}
 	
@@ -419,7 +419,7 @@ public class JTelnetPane extends JPanel {
 		}
 		
 		public char getHotkeyChar() {
-			return 'w';
+			return 'W';
 		}
 	}
 }
