@@ -20,7 +20,7 @@ public class SpellingChecker {
     private static SpellingChecker instance;
     
     /** Returns the single instance of SpellingChecker. */
-    public static SpellingChecker getSharedSpellingCheckerInstance() {
+    public synchronized static SpellingChecker getSharedSpellingCheckerInstance() {
         if (instance == null) {
             instance = new SpellingChecker();
         }
@@ -84,7 +84,7 @@ public class SpellingChecker {
      * knownGood and knownBad HashSets are used to save on
      * expensive inter-process communication.
      */
-    public boolean isMisspelledWord(String word) {
+    public synchronized boolean isMisspelledWord(String word) {
         if (ispell == null) {
             return false;
         }
@@ -109,7 +109,7 @@ public class SpellingChecker {
         return misspelled;
     }
     
-    public String[] getSuggestionsFor(String misspelledWord) {
+    public synchronized String[] getSuggestionsFor(String misspelledWord) {
         ArrayList suggestions = new ArrayList();
         boolean isMisspelled = isMisspelledWordAccordingToIspell(misspelledWord, suggestions);
         if (isMisspelled == false) {
@@ -118,7 +118,7 @@ public class SpellingChecker {
         return (String[]) suggestions.toArray(new String[suggestions.size()]);
     }
     
-    public static void dumpKnownBadWordsTo(PrintStream out) {
+    public synchronized static void dumpKnownBadWordsTo(PrintStream out) {
         // Get a sorted list of the known bad words.
         Iterator it = knownBad.iterator();
         ArrayList words = new ArrayList();
