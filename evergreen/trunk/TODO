@@ -29,8 +29,13 @@ spelling checking:
 
 symbolic links: given that we don't really (see FIXME in FileUtilities) recognize symbolic links properly, how about having "Add Workspace" automatically use the canonical path of whatever path you give it? though that might look ugly, and it is kind of doing exactly what someone's presumably trying to avoid by using a symbolic link: remembering a specific path that may change.
 
-[ ] Find/Replace is broken for matches that span lines. (Try a find pattern
-    that contains "\n", for example.) [there's also a file "find-test.txt".]
+Find/Replace
+
+    [ ] Find/Replace is broken for matches that span lines. (Try a find pattern
+        that contains "\n", for example.) [there's also a file "find-test.txt".]
+        
+        Martin just successfully deleted whole lines matching " *MONK\n",
+        although the Matches and Replacements boxes were empty.
 
     [ ] Some way of marking submatch groups: the whole match is marked in
         red or blue, but it would be good to also see the submatches within
