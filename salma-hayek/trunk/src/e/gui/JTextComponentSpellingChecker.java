@@ -384,7 +384,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         
         private void paintDashedLine(Graphics2D g, Rectangle r) {
             int baseline = r.y + r.height - 1;
-            r.y += 2; r.height -= 3;
+            r.y += 2; r.height -= 2;
             
             Stroke originalStroke = g.getStroke();
             g.setStroke(DASHED_STROKE);
