@@ -118,15 +118,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
     }
     
-    public static void moveToComponent(Component c) {
-        // Don't do this while we're starting up, because it's distracting and
-        // annoying if the user's trying to do something else while we start.
-        if (initializing) {
-            return;
-        }
-        c.requestFocus();
-    }
-    
     /** Extensions that shouldn't be opened by Edit. */
     private static String[] externalApplicationExtensions;
     

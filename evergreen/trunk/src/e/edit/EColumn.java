@@ -60,6 +60,10 @@ public class EColumn extends JSplitPane {
         setTopComponent(errorsWindow);
     }
 
+    public void setSelectedWindow(EWindow window) {
+        comboBox.setSelectedItem(window);
+    }
+    
     public void switchToNextFile() {
         comboBox.setSelectedIndex((comboBox.getSelectedIndex() + 1) % comboBox.getItemCount());
     }

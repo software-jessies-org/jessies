@@ -189,15 +189,11 @@ public class Workspace extends JPanel {
         /* Check we don't already have this open as a file or directory. */
         EWindow window = findWindowByName(filename);
         if (window!= null) {
-            if (window.getHeight() < 2 * window.getTitleBar().getHeight()) {
-                /* FIXME: we don't necessarily want this window to grab *all* the space. */
-                window.expand();
-            }
+            leftColumn.setSelectedWindow(window);
             if (address != null) {
                 ETextWindow textWindow = (ETextWindow) window;
                 textWindow.jumpToAddress(address);
             }
-            Edit.moveToComponent(window);
             return window;
         }
         return null;
@@ -244,7 +240,6 @@ public class Workspace extends JPanel {
                 }
             });
         }
-        Edit.moveToComponent(viewer);
         return viewer;
     }
     
