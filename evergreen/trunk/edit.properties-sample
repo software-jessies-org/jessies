@@ -23,71 +23,6 @@ files.externalApplicationExtensions=.icns;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 #Not yet implemented. See e.util.FileUtilities.
 #files.binaryExtensions=.gif;.gz;.icns;.jpg;.jpeg;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 
-?Linux:cpp.includePath=/home/elliotth/Projects/wahoo/headers/;/home/elliotth/Projects/wahoo/headers/stdheaders/;/home/elliotth/Projects/wahoo/headers/stdheaders/stl-3.2/;/home/elliotth/Projects/wahoo/include/
-?Mac OS X:cpp.includePath=/usr/include;/usr/include/gcc/darwin/2.95.2/g++/
-
-# If you use telnet to connect to a Unix machine from a Windows machine, though
-# you may have drive mappings available that give you access to the same files,
-# they probably start with a different root. Path rewritings let you let Edit
-# take care of that.
-?Windows 2000:path.rewrite.from.0=/home/elliotth/
-?Windows 2000:path.rewrite.to.0=v:\
-
-#?Windows 2000:workspace.0.name=home
-#?Windows 2000:workspace.0.root=u:\ed
-#?Windows 2000:workspace.1.name=temp
-#?Windows 2000:workspace.1.root=c:\temp
-#?Windows 2000:workspace.2.name=src
-#?Windows 2000:workspace.2.root=u:\ed\src
-#?Windows 2000:workspace.3.name=expressionist
-#?Windows 2000:workspace.3.root=c:\genedata
-
-#FIXME: if path rewriting were universal, i wouldn't need two copies of
-#effectively the same information, one in Unix form and the other in
-#Windows form...
-
-?Windows 2000:workspace.0.name=wahoo
-?Windows 2000:workspace.0.root=V:\projects\wahoo
-?Windows 2000:workspace.2.name=docs
-?Windows 2000:workspace.2.root=V:\projects\docs
-?Windows 2000:workspace.3.name=misc
-?Windows 2000:workspace.3.root=V:\projects\misc
-?Windows 2000:workspace.4.name=playground
-?Windows 2000:workspace.4.root=V:\playground
-?Windows 2000:workspace.5.name=random
-?Windows 2000:workspace.5.root=V:\
-
-?Linux:workspace.0.name=fsm-wahoo
-?Linux:workspace.0.root=~/Projects/fsm-wahoo
-?Linux:workspace.1.name=pure-bfsb-wahoo
-?Linux:workspace.1.root=~/Projects/pure-bfsb-wahoo
-?Linux:workspace.2.name=docs
-?Linux:workspace.2.root=~/Projects/docs
-?Linux:workspace.3.name=misc
-?Linux:workspace.3.root=~/Projects/misc
-?Linux:workspace.4.name=playground
-?Linux:workspace.4.root=~/playground
-?Linux:workspace.5.name=random
-?Linux:workspace.5.root=~
-
-?Mac OS X:workspace.0.name=src
-?Mac OS X:workspace.0.root=/Users/elliotth/src
-?Mac OS X:workspace.1.name=doc
-?Mac OS X:workspace.1.root=/Users/elliotth/doc
-?Mac OS X:workspace.2.name=random
-?Mac OS X:workspace.2.root=/does-not-exist
-
-mode.java=e.edit.modes.Java
-mode.c=e.edit.modes.CPlusPlus
-mode.cpp=e.edit.modes.CPlusPlus
-mode.h=e.edit.modes.CPlusPlus
-
-telnet.retroLook=false
-?Linux:telnet.defaultHost=bradshaw
-?Mac OS X:telnet.defaultHost=localhost
-
-keyboardFile=keyboard
-
 ?Mac OS X:browser=/usr/bin/open
 ?Windows 2000:browser=c:\Program Files\Internet Explorer\IEXPLORE.EXE
 ?Linux:browser=mozilla
@@ -104,25 +39,15 @@ url.prefixes=file://;ftp://;http://;https://
 ?Windows 2000:make.command=nmake
 
 tools.0.name=Check in Changes...
-tools.0.command=bk citool
+tools.0.command=checkintool
 tools.0.checkEverythingSaved=true
 tools.1.name=Show History...
 tools.1.command=revisiontool $EDIT_CURRENT_FILENAME:$EDIT_CURRENT_LINE_NUMBER
 tools.1.keyboardEquivalent=H
 tools.1.needsFile=true
-tools.2.name=Show Differences...
-tools.2.command=bk diffs -u $EDIT_CURRENT_FILENAME | code2html -lpatch > /tmp/patch$$.html ; java -cp ~/edit/classes e.tools.HtmlViewer /tmp/patch$$.html ; rm -f /tmp/patch$$.html
-tools.2.needsFile=true
-tools.3.name=<separator>
-tools.4.name=Grep...
-tools.4.command=esgrep 
-tools.4.keyboardEquivalent=G
-tools.4.requestConfirmation=true
-tools.5.name=<separator>
-?Linux:tools.6.name=VHDL Directory...
-?Linux:tools.6.command=cd `awk -- '/^VLSI_DIRECTORY *=/ { print $3; }' $SOFTWARE/libs/vlsi/bfsb/Makefile`/vhdl_files ; rxvt&
-tools.7.name=Shell Window
-?Linux:tools.7.command=cd $EDIT_CURRENT_DIRECTORY ; rxvt&
-?Mac OS X:tools.7.command=open -a Terminal $EDIT_CURRENT_DIRECTORY
-?Windows:tools.7.command=start /D%EDIT_CURRENT_DIRECTORY% cmd
-tools.7.keyboardEquivalent=S
+tools.2.name=<separator>
+tools.3.name=Shell Window
+?Linux:tools.3.command=cd $EDIT_CURRENT_DIRECTORY ; terminator&
+?Mac OS X:tools.3.command=open -a Terminal $EDIT_CURRENT_DIRECTORY
+?Windows:tools.3.command=start /D%EDIT_CURRENT_DIRECTORY% cmd
+tools.3.keyboardEquivalent=S
