@@ -15,9 +15,8 @@ then
   then
     PROPS_VARIANT=gnome
   else
-    echo Failed to recognize your windowing environment - choosing a random set of defaults.
-    echo Heh - the thought of randomness should get you reading that README file.
-    # Well, at least the vi FileHighlighter is likely to work.
+    echo Failed to recognize your windowing environment - choosing GNOME defaults.
+    echo Read $TERMINATOR_HOME/README for more information.
     PROPS_VARIANT=gnome
   fi
   cp $TERMINATOR_HOME/doc/props-examples/$PROPS_VARIANT.terminator ~/.terminator
