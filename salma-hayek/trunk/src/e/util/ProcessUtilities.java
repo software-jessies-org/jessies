@@ -25,9 +25,6 @@ public class ProcessUtilities {
      * Lines written to standard output are passed to 'outputLineListener'.
      * Lines written to standard error are passed to 'errorLineListener'.
      *
-     * FIXME: should errors *we* detect go in 'lines', or in 'errors'? Currently
-     * they go in 'lines'.
-     *
      * If directory is null, the subprocess inherits our working directory.
      *
      * You can use the same ArrayList for 'lines' and 'errors'. All the error
@@ -43,7 +40,7 @@ public class ProcessUtilities {
             return p.waitFor();
         } catch (Exception ex) {
             ex.printStackTrace();
-            outputLineListener.processLine(ex.getMessage());
+            errorLineListener.processLine(ex.getMessage());
             return 1;
         }
     }
