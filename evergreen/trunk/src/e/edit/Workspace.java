@@ -27,16 +27,12 @@ public class Workspace extends JPanel {
         super(new BorderLayout());
         this.title = title;
         this.rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
-        
         add(makeUI(), BorderLayout.CENTER);
-        updateFileList(null);
     }
     
     /**
      * Fills the file list. It can take some time to scan for files, so we do
-     * the job in the background. The constructor slaps in an empty placeholder
-     * list until the real one comes along. This means that clients should
-     * never cache the result from getFileList.
+     * the job in the background.
      */
     public void updateFileList(ChangeListener listener) {
         FileListUpdater fileListUpdater = new FileListUpdater(listener);
@@ -47,6 +43,7 @@ public class Workspace extends JPanel {
         ChangeListener listener;
         FileListUpdater(ChangeListener listener) {
             this.listener = listener;
+            fileList = null;
         }
         public void doScan() {
             start();
