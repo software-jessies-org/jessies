@@ -402,11 +402,7 @@ public class ETextArea extends JTextArea {
     }
     
     public String getIndentationString() {
-        String indentationString = (String) getDocument().getProperty(Indenter.INDENTATION_PROPERTY);
-        if (indentationString == null) {
-            indentationString = Parameters.getParameter("indent.string");
-        }
-        return indentationString;
+        return (String) getDocument().getProperty(Indenter.INDENTATION_PROPERTY);
     }
     
     /**
