@@ -5,13 +5,14 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.*;
+import e.util.*;
 
 /**
-A caret implementation that strives to stay visible, and selects more
-sensibly.
-
-@author Elliott Hughes <enh@acm.org>
-*/
+ * A caret implementation that strives to stay visible, and selects more
+ * sensibly.
+ * 
+ * @author Elliott Hughes <enh@acm.org>
+ */
 public class ECaret extends DefaultCaret {
     /** Constructs a new caret. */
     public ECaret() {
@@ -33,29 +34,36 @@ public class ECaret extends DefaultCaret {
         super.setSelectionVisible(true);
     }
     
+    /**
+     * Draws little twiddles on the top and bottom of a vertical bar; this
+     * makes our caret more visible when next to red highlighting.
+     */
     public void paint(Graphics g) {
-        if(isVisible()) {
-            try {
-                JTextComponent component = (JTextComponent) getComponent();
-                javax.swing.plaf.TextUI mapper = component.getUI();
-                Rectangle r = mapper.modelToView(component, getDot());
-                
-                if ((r == null) || ((r.width == 0) && (r.height == 0))) {
-                    return;
-                }
-                g.setColor(component.getCaretColor());
-                g.drawLine(r.x, r.y, r.x, r.y + r.height - 1);
-                g.drawLine(r.x -1, r.y -1, r.x, r.y);
-                g.drawLine(r.x +1, r.y -1, r.x, r.y);
-                g.drawLine(r.x -1, r.y + r.height, r.x, r.y + r.height - 1);
-                g.drawLine(r.x +1, r.y + r.height, r.x, r.y + r.height - 1);
-           } catch (BadLocationException e) {
-                // can't render I guess
-                System.err.println("Can't render cursor");
+        if (isVisible() == false) {
+            return;
+        }
+        try {
+            JTextComponent component = (JTextComponent) getComponent();
+            javax.swing.plaf.TextUI mapper = component.getUI();
+            Rectangle r = mapper.modelToView(component, getDot());
+            
+            if (r == null || (r.width == 0 && r.height == 0)) {
+                return;
             }
+            g.setColor(component.getCaretColor());
+            g.drawLine(r.x, r.y, r.x, r.y + r.height - 1);
+            g.drawLine(r.x -1, r.y -1, r.x, r.y);
+            g.drawLine(r.x +1, r.y -1, r.x, r.y);
+            g.drawLine(r.x -1, r.y + r.height, r.x, r.y + r.height - 1);
+            g.drawLine(r.x +1, r.y + r.height, r.x, r.y + r.height - 1);
+        } catch (BadLocationException ex) {
+            Log.warn("Can't render cursor.", ex);
         }
     }
     
+    /**
+     * Includes the area of the twiddle in the damaged rectangle. See paint.
+     */
     protected synchronized void damage(Rectangle r) {
         if (r != null) {
             x = r.x - 4;
