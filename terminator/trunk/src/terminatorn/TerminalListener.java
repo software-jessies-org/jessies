@@ -68,7 +68,10 @@ public interface TerminalListener {
 	/** Erases from either the top or the cursor line, to either the bottom or the cursor line. */
 	public void killVertically(boolean fromTop, boolean toBottom);
 	
-	/** Sets the position of the cursor to the given x and y coordinates, counted from 1,1 at the top-left corner. */
+	/**
+	* Sets the position of the cursor to the given x and y coordinates, counted from 1,1 at the top-left corner.
+	* If either x or y is -1, that coordinate is left unchanged.
+	*/
 	public void setCursorPosition(int x, int y);
 	
 	/** Moves the cursor horizontally by the number of characters in xDiff, negative for left, positive for right. */
