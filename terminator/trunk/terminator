@@ -45,6 +45,11 @@ then
     mkdir -p $TERMINFO_DST && rmdir $TERMINFO_DST
 fi
 
+if [ "`uname`" == "Linux" ]
+then
+    OS_SPECIFIC_OPTIONS=-Dterminator.frame.icon=/usr/share/icons/crystalsvg/32x32/apps/terminal.png
+fi
+
 if [ "$TIC" != "" ]
 then
     tic -o$TERMINFO $TERMINFO_SRC
