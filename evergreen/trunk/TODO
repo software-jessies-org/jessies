@@ -1,5 +1,13 @@
 TODO list for Edit
 
+Thinking about the literal string/regular expression problem I just
+fixed with FindFilesContainingSelectionAction, we should have a text
+field capable of automatically coloring invalid regular expressions
+red, and offering an explanation for any status line that happens to
+be available. Or we should fix all the existing dialogs using normal
+text fields to be like the Find/Replace dialog, which is the one
+place we do this properly at the moment.
+
 Did you know that vim keeps a ~/.vim/backup/ directory, containing the
 equivalent of our .bak files?
 
