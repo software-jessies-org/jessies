@@ -13,7 +13,7 @@ link_in_usr_local_bin() {
 cd /usr/local/ || die "couldn't cd to /usr/local"
 
 # Install Java in /usr/local, and put links to java and javac in /usr/local/bin.
-java_installer=/net/mirror/mirror-link/java/jdk-1_5_0-beta2-linux-i586.bin
+java_installer=/net/mirror/mirror-link/java/jdk-1_5_0-linux-i586.bin
 if test -f $java_installer && ! test -d /usr/local/jdk1.5.0 ; then
     $java_installer || die "installing Java"
 fi
