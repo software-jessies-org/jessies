@@ -11,15 +11,11 @@ public interface JTerminalPaneFactory {
 		
 		public Command(String command, String title) {
 			this.command = command;
-			if (title == null) {
-				int spaceIndex = command.indexOf(' ');
-				title = ((spaceIndex == -1) ? command : command.substring(0, spaceIndex)).trim();
-			}
 			this.title = title;
 		}
 		
 		public JTerminalPane create(TerminalPaneMaster controller) {
-			return new JTerminalPane(controller, title, command, false);
+			return JTerminalPane.newCommandWithTitle(controller, command, title);
 		}
 	}
 	
