@@ -109,7 +109,8 @@ menuhit(XButtonEvent *e) {
 	getMenuDimensions(&width, &height, &length);
 	
 	/*
-	 * Arrange for centre of first menu item to be under pointer.
+	 * Arrange for centre of first menu item to be under pointer,
+	 * unless that would put the menu offscreen.
 	 */
 	start_x = e->x - width / 2;
 	start_y = e->y - height / 2;
@@ -120,6 +121,9 @@ menuhit(XButtonEvent *e) {
 		start_x = current_screen->display_width - width;
 	if (start_y < 0)
 		start_y = 0;
+	if (start_y + (height * length) > current_screen->display_height)
+		start_y = current_screen->display_height - (height * length);
+
 	
 	current_item = menu_whichitem(e->x_root, e->y_root);
 	

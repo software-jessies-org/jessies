@@ -1,11 +1,18 @@
 Change Log for "lwm"
 
+20045-01-28	jfc	York
+
+	Applied a patch from Chris Reece that ensures that the popup
+	menu does not disappear off the bottom of the screen.
+
 2004-09-30	jfc	York
 
 	Fixed an issue with IRIX 6.5 and lwm, where the root menu could
 	not be used because motion events had coordinates with respect to
 	the popup, not the root. Fixed by explicitly using the root window
 	coordinates.
+
+	Released lwm-1.2.1.
 
 2004-09-28	jfc	York
 

@@ -23,5 +23,11 @@ better than it was. apparently the window is now placed correctly,
 but gets larger between successive runs. i can't reproduce this,
 unfortunately.
 
-gtk applications window titles are empty with gtk+ 2.4.x (reported by peter hartlitch).
+chris reports that positioning a window on the bottom or right edge of a screen
+and then resizing the edge opposite to that touching the edge of the screen
+causes the window to jump in 1 unit (pixel or character depending on the
+application). also, and possibly related, holding button 1 to resize any edge
+apart from the right, and then moving the mouse along that edge (ie.
+perpendicular to the normal movement for resizing) causes the window to shrink
+one unit.
 
