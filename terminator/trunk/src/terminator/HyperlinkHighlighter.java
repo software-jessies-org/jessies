@@ -16,10 +16,18 @@ public class HyperlinkHighlighter implements Highlighter {
 
 	private static class HyperLinker {
 		Pattern pattern;
+		int relevantGroup;
 		String command;
 		
-		HyperLinker(String regularExpression, String command) {
+		/**
+		 * We need a regular expression to match with, the index of the
+		 * group within the expression that should be highlighted (0 if
+		 * you want the whole expression highlighted, and the command
+		 * to be run when the link is followed.
+		 */
+		HyperLinker(String regularExpression, int relevantGroup, String command) {
 			this.pattern = Pattern.compile(regularExpression);
+			this.relevantGroup = relevantGroup;
 			this.command = command;
 		}
 		
@@ -34,9 +42,9 @@ public class HyperlinkHighlighter implements Highlighter {
 	
 	private ArrayList linkers = new ArrayList();
 	{
-		linkers.add(new HyperLinker("(\\b(http|https|ftp):/*[\\w\\.]+(:\\d+)?[/\\w\\.\\?&=\\+]*)", "open $1"));
-		linkers.add(new HyperLinker("(?:^| |\")(/[^ :\"]+\\.\\w+([\\d:]+)?)", "vi $1"));
-		linkers.add(new HyperLinker("^mercury:([^$]+)\\$", "echo $1"));
+		linkers.add(new HyperLinker("(\\b(http|https|ftp):/*[\\w\\.]+(:\\d+)?[/\\w\\.\\?&=\\+]*)", 1, "open $1"));
+		linkers.add(new HyperLinker("(?:^| |\")(/[^ :\"]+\\.\\w+([\\d:]+)?)", 1, "vi $1"));
+		linkers.add(new HyperLinker("mercury:([^$]+)\\$", 1, "echo $1"));
 	}
 
 	public String getName() {
@@ -57,8 +65,8 @@ public class HyperlinkHighlighter implements Highlighter {
 			HyperLinker linker = (HyperLinker) linkers.get(i);
 			Matcher matcher = linker.matcher(text);
 			while (matcher.find()) {
-				Location start = new Location(lineIndex, matcher.start());
-				Location end = new Location(lineIndex, matcher.end());
+				Location start = new Location(lineIndex, matcher.start(linker.relevantGroup));
+				Location end = new Location(lineIndex, matcher.end(linker.relevantGroup));
 				Highlight highlight = new Highlight(HyperlinkHighlighter.this, start, end, style);
 				highlight.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				view.addHighlight(highlight);
