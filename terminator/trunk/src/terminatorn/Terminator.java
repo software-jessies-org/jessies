@@ -13,8 +13,8 @@ public class Terminator {
 	private ArrayList terminals = new ArrayList();
 
 	public Terminator(final String[] argumentArray) throws IOException {
-		arguments = Arrays.asList(argumentArray);
 		Log.setApplicationName("Terminator");
+		arguments = Options.getSharedInstance().parseCommandLine(argumentArray);
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
 			showUsage();
 		}
