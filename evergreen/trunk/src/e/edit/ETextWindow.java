@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
@@ -40,6 +41,8 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     private String fileType = UNKNOWN;
     
     private static final Hashtable KEYWORDS_MAP = new Hashtable();
+
+    private Timer findResultsUpdater;
     
     static {
         initKeywordsFor(C_PLUS_PLUS);
@@ -78,8 +81,18 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
         fillWithContent();
+        initFindResultsUpdater();
     }
     
+    private void initFindResultsUpdater() {
+        findResultsUpdater = new Timer(150, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateFindResults();
+            }
+        });
+        findResultsUpdater.setRepeats(false);
+    }
+
     private void initFocusListener() {
         text.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
@@ -247,6 +260,10 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     }
     
     public void windowClosing() {
+        if (findResultsUpdater != null) {
+            findResultsUpdater.stop();
+            findResultsUpdater = null;
+        }
         Edit.showStatus("Closed " + filename);
         this.file = null;
         getWorkspace().unregisterTextComponent(getText());
@@ -448,7 +465,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     }
     
     public void markAsDirty() {
-        //findDialog.removeCurrentHighlights();
+        findResultsUpdater.restart();
         isDirty = true;
         repaint();
     }
@@ -463,16 +480,19 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     }
     
     public void findNext() {
-        FindAction.INSTANCE.repeatLastFind(this);
         findHighlight(true);
     }
     
     public void findPrevious() {
-        FindAction.INSTANCE.repeatLastFind(this);
         findHighlight(false);
+    }
+
+    public void updateFindResults() {
+        FindAction.INSTANCE.repeatLastFind(this);
     }
     
     private void findHighlight(boolean forwards) {
+        updateFindResults();
         Highlighter highlighter = getText().getHighlighter();
         Highlighter.Highlight[] highlights = highlighter.getHighlights();
         int start = forwards ? 0 : highlights.length - 1;
