@@ -2,18 +2,24 @@
 elsif
 # Library identifiers.
 ARGV
+basename
 chmod
 chown
 dirname
+grep
 gsub
+ljust
 makedirs
 mkdir
 mkpath
+Mutex
 popen
 Regexp
+rjust
 rmdir
 rmtree
 symlink
 umask
+uniq
 upcase
 upto
