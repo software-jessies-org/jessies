@@ -174,6 +174,8 @@ public class Options {
 		options.put("color13", "magenta");
 		options.put("color14", "cyan");
 		options.put("color15", "white");
+		
+		options.put("cursorColor", "black");
 	}
 	
 	/**

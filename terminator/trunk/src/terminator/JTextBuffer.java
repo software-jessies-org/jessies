@@ -325,7 +325,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				x += metrics.stringWidth(lineText[j].getText());
 			}
 			if (displayCaret && i == caretPosition.getLineIndex()) {
-				graphics.setColor(hasFocus ? Color.RED : Color.BLACK);
+				graphics.setColor(hasFocus ? Options.getSharedInstance().getColor("cursorColor") : Color.BLACK);
 				Point top = getLineTop(caretPosition);
 				graphics.drawLine(top.x, top.y, top.x, top.y + metrics.getHeight() - 1);
 			}
