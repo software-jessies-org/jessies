@@ -1,5 +1,6 @@
 package terminatorn;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -115,6 +116,17 @@ public class TelnetControl implements Runnable {
 	}
 	
 	private boolean nextByteIsCommand = false;
+	
+	/** Must be called in the AWT dispatcher thread. */
+	public void sizeChanged(final Dimension sizeInChars) {
+		TelnetAction sizeChangeAction = new TelnetAction() {
+			public void perform(TelnetListener listener) {
+				listener.sizeChanged(sizeInChars);
+			}
+		};
+		listener.processActions(new TelnetAction[] { sizeChangeAction });
+		// Notify the pty that the size has changed.
+	}
 	
 	/** Returns the number of bytes in buffer which remain unprocessed. */
 	private int processBuffer(byte[] buffer, int size) throws IOException {

@@ -1,5 +1,7 @@
 package terminatorn;
 
+import java.awt.*;
+
 /**
 A TelnetListener listens to escape sequences and text input coming from the TelnetControl
 object.
@@ -20,6 +22,8 @@ public interface TelnetListener {
 	public int getStyle();
 	
 	public void setInsertMode(boolean insertOn);
+	
+	public void sizeChanged(Dimension sizeInChars);
 	
 	/**
 	* Process the characters in the given line.  The string is composed of normally printable
