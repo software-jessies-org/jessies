@@ -78,6 +78,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			}
 		});
 		addHighlighter(new HyperlinkHighlighter());
+		new Selector(this);
 	}
 	
 	public TextBuffer getModel() {
@@ -121,31 +122,29 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		}
 	}
 	
-	private Location viewToModel(Point point) {
+	public Location viewToModel(Point point) {
 		FontMetrics metrics = getFontMetrics(getFont());
-		int lineIndex = point.y / metrics.getHeight();
-		int charOffset = point.x / metrics.charWidth('W');
+		int lineIndex = Math.max(0, point.y / metrics.getHeight());
+		int charOffset = Math.max(0, point.x / metrics.charWidth('W'));
 		return new Location(lineIndex, charOffset);
 	}
 	
 	private Point getLineTop(Location charCoords) {
 		FontMetrics metrics = getFontMetrics(getFont());
-		Point result = getBaseline(charCoords);
-		result.y -= metrics.getMaxAscent();
-		return result;
+		return new Point(charCoords.getCharOffset() * metrics.charWidth('W'),
+				charCoords.getLineIndex() * metrics.getHeight());
 	}
 	
 	private Point getLineBottom(Location charCoords) {
 		FontMetrics metrics = getFontMetrics(getFont());
-		Point result = getBaseline(charCoords);
-		result.y += metrics.getMaxDescent();
-		return result;
+		return new Point(charCoords.getCharOffset() * metrics.charWidth('W'),
+				(charCoords.getLineIndex() + 1) * metrics.getHeight());
 	}
 	
 	private Point getBaseline(Location charCoords) {
 		FontMetrics metrics = getFontMetrics(getFont());
 		return new Point(charCoords.getCharOffset() * metrics.charWidth('W'),
-				(charCoords.getLineIndex() + 1) * metrics.getHeight());
+				(charCoords.getLineIndex() + 1) * metrics.getHeight() - metrics.getMaxDescent());
 	}
 	
 	public Dimension getOptimalViewSize() {
@@ -263,9 +262,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	// Redraw code.
 	
 	private void redrawCaretPosition() {
-		Point baseline = getBaseline(caretPosition);
+		Point top = getLineTop(caretPosition);
 		FontMetrics metrics = getFontMetrics(getFont());
-		repaint(baseline.x, baseline.y - metrics.getHeight(), 1, metrics.getHeight());
+		repaint(top.x, top.y, 1, metrics.getHeight());
 	}
 	
 	public void paintComponent(Graphics graphics) {
@@ -287,8 +286,8 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			}
 			if (displayCaret && i == caretPosition.getLineIndex()) {
 				graphics.setColor(hasFocus ? Color.RED : Color.BLACK);
-				int caretX = caretPosition.getCharOffset() * metrics.charWidth('W');
-				graphics.drawLine(caretX, baseline - metrics.getMaxAscent(), caretX, baseline);
+				Point top = getLineTop(caretPosition);
+				graphics.drawLine(top.x, top.y, top.x, top.y + metrics.getHeight() - 1);
 			}
 		}
 		if (ANTIALIAS) {
