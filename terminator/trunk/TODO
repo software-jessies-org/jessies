@@ -16,7 +16,7 @@ Unassigned TODOs:
 [1]	Fix double-click selection so it selects a word (maybe bracket-matching aswell).
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 [1]	Override TERM environment variable to help ensure that our children have an accurate idea of our capabilities (and so we only have one major target to support)?
-[1]	Pass '-i' to shell. bash doesn't seem to correctly recognize that it should be interactive otherwise.
+[1]	Pass '-i' to shell. bash doesn't seem to correctly recognize that it should be interactive otherwise. [I think I was confused when I wrote this, and don't think this is relevant.]
 [1]	Fix scrolling with the scroll bar arrows and mouse wheel. elliotth fixed it once (implementing Scrollable in JTelnetPane), but we've broken it again somewhere along the line.
 
 
@@ -30,3 +30,5 @@ Elliott's TODOs:
 ~~~~~~~~~~~
 [3]	Implement searching.
 [3]	Add hyperlink following support for stuff like http: mailto: and telnet:
+[1] Implement something like gnome-terminal's ability to name each tab on the command-line.
+[1] Implement X11-style "-xrm resource-string" options, rather than the whole mess of xterm options.
