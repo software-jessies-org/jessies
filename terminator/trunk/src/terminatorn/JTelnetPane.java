@@ -18,6 +18,8 @@ public class JTelnetPane extends JPanel {
 	private JTextBuffer textPane;
 	private String name;
 	private MenuKeyAction[] menuAndKeyActions = new MenuKeyAction[] {
+		new CopyAction(),
+		new PasteAction(),
 		new NewTabAction(),
 		new RunCommandAction(),
 		new CloseTabAction(),
@@ -332,6 +334,34 @@ public class JTelnetPane extends JPanel {
 		public void performAction();
 		
 		public char getHotkeyChar();
+	}
+	
+	public class CopyAction implements MenuKeyAction {
+		public String getName() {
+			return "Copy";
+		}
+		
+		public void performAction() {
+			// FIXME: we should probably have an "explicit copy" mode.
+		}
+		
+		public char getHotkeyChar() {
+			return 'C';
+		}
+	}
+	
+	public class PasteAction implements MenuKeyAction {
+		public String getName() {
+			return "Paste";
+		}
+		
+		public void performAction() {
+			textPane.paste();
+		}
+		
+		public char getHotkeyChar() {
+			return 'V';
+		}
 	}
 	
 	public class RunCommandAction implements MenuKeyAction {

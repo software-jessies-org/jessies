@@ -3,7 +3,6 @@ package terminatorn;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
-import e.util.*;
 
 /**
 
@@ -58,7 +57,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	
 	public void mouseClicked(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON2) {
-			paste();
+			view.paste();
 		}
 	}
 	
@@ -68,19 +67,6 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	public void copy() {
 		if (highlight != null) {
 			setClipboard(view.getTabbedText(highlight));
-		}
-	}
-	
-	/**
-	 * Pastes the text on the clipboard into the terminal.
-	 */
-	public void paste() {
-		try {
-			Transferable contents = view.getToolkit().getSystemClipboard().getContents(view);
-			String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
-			view.insertText(string);
-		} catch (Exception ex) {
-			Log.warn("Couldn't paste.", ex);
 		}
 	}
 	
