@@ -18,8 +18,6 @@ public interface TerminalPaneMaster {
 	
 	public void openCommandPane(String command, boolean focusOnNewTab);
 	
-	public void showFindDialogFor(JTextBuffer textToFindIn);
-	
 	public void setTerminalSize(Dimension size);
 	
 	public void terminalNameChanged(JTerminalPane terminal);

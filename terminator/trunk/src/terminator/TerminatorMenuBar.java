@@ -182,7 +182,7 @@ public class TerminatorMenuBar extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
-				terminal.doFindAction();
+				FindDialog.getSharedInstance().showFindDialogFor(terminal.getTextPane());
 			}
 		}
 	}
@@ -196,7 +196,7 @@ public class TerminatorMenuBar extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
-				terminal.doFindNextAction();
+				FindDialog.getSharedInstance().findNextIn(terminal.getTextPane());
 			}
 		}
 	}
@@ -210,7 +210,7 @@ public class TerminatorMenuBar extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
-				terminal.doFindPreviousAction();
+				FindDialog.getSharedInstance().findPreviousIn(terminal.getTextPane());
 			}
 		}
 	}

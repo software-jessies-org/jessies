@@ -1,18 +1,14 @@
 package terminator;
 
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.regex.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import e.forms.*;
-import e.gui.*;
-import e.util.*;
-import terminator.view.*;
-import terminator.view.highlight.*;
-
 import javax.swing.Timer;
+import javax.swing.event.*;
+import terminator.view.*;
 
 public class TerminatorFrame implements TerminalPaneMaster {
 	private Terminator terminator;
@@ -269,76 +265,6 @@ public class TerminatorFrame implements TerminalPaneMaster {
 			tabbedPane.setTitleAt(index, terminal.getName());
 		}
 		updateFrameTitle();
-	}
-
-	
-	private FindField findField = new FindField();
-	private JLabel findStatus = new JLabel(" ");
-	private JTextBuffer textToFindIn;
-	
-	private class FindField extends EMonitoredTextField {
-		public FindField() {
-			super(40);
-			addKeyListener(new KeyAdapter() {
-				public void keyTyped(KeyEvent e) {
-					if (textToFindIn != null && e.getKeyChar() == '\n') {
-						find();
-						e.consume();
-						textToFindIn.requestFocus();
-					}
-				}
-				public void keyPressed(KeyEvent e) {
-					if (textToFindIn != null && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-						getFindHighlighter().forgetRegularExpression(textToFindIn);
-						textToFindIn.requestFocus();
-					}
-				}
-				public void keyReleased(KeyEvent e) {
-					if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
-						if (e.getKeyCode() == KeyEvent.VK_D) {
-							textToFindIn.findPrevious();
-						} else if (e.getKeyCode() == KeyEvent.VK_G) {
-							textToFindIn.findNext();
-						}
-					}
-				}
-			});
-		}
-		
-		public void timerExpired() {
-			find();
-		}
-		
-		public void find() {
-			String regularExpression = getText();
-			try {
-				int matchCount = getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
-				findStatus.setText("Matches: " + matchCount);
-				setForeground(UIManager.getColor("TextField.foreground"));
-			} catch (PatternSyntaxException ex) {
-				setForeground(Color.RED);
-				findStatus.setText(ex.getDescription());
-			}
-		}
-	}
-	
-	private FindHighlighter getFindHighlighter() {
-		return (FindHighlighter) textToFindIn.getHighlighterOfClass(FindHighlighter.class);
-	}
-	
-	public void showFindDialogFor(JTextBuffer text) {
-		this.textToFindIn = text;
-		
-		FormPanel formPanel = new FormPanel();
-		formPanel.addRow("Find:", findField);
-		formPanel.setStatusBar(findStatus);
-		FormDialog.showNonModal(frame, "Find", formPanel);
-		
-		findField.selectAll();
-		findField.requestFocus();
-		findStatus.setText(" ");
-		
-		findField.find();
 	}
 	
 	private void addPane(JTerminalPane newPane, boolean focusOnNewTab) {
