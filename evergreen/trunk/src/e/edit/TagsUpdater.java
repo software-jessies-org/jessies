@@ -46,28 +46,30 @@ public class TagsUpdater {
                 updateTags();
             }
         });
-        text.addFocusListener(new FocusListener() {
+        // Select the corresponding tag in the tree when the focus is gained or the caret moves.
+        text.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 followCaretChanges = true;
                 showTags();
-            }
-            public void focusLost(FocusEvent e) {
-                followCaretChanges = false;
+                selectTagAtCaret(text);
             }
         });
-        // Select the corresponding tag in the tree when the caret moves.
         text.getCaret().addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (followCaretChanges) {
-                    try {
-                        int lineNumber = text.getLineOfOffset(text.getCaretPosition());
-                        selectTreeNode(getTagForLine(lineNumber));
-                    } catch (BadLocationException ex) {
-                        ex = ex;
-                    }
+                    selectTagAtCaret(text);
                 }
             }
         });
+    }
+    
+    private void selectTagAtCaret(ETextArea text) {
+        try {
+            int lineNumber = text.getLineOfOffset(text.getCaretPosition());
+            selectTreeNode(getTagForLine(lineNumber));
+        } catch (BadLocationException ex) {
+            ex = ex;
+        }
     }
     
     private void createUI() {
@@ -81,6 +83,7 @@ public class TagsUpdater {
                 if (node == null) {
                     return;
                 }
+                followCaretChanges = false;
                 TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
                 textWindow.goToLine(tag.lineNumber);
             }
@@ -153,7 +156,9 @@ public class TagsUpdater {
             DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel();
             TreePath path = new TreePath(treeModel.getPathToRoot(node));
             tree.setSelectionPath(path);
-            tree.scrollPathToVisible(path);
+            if (followCaretChanges) {
+                tree.scrollPathToVisible(path);
+            }
         }
     }
 }
