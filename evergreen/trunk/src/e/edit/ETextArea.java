@@ -254,6 +254,11 @@ public class ETextArea extends JTextArea {
         getUndoManager().addEdit(entireEdit);
         try {
             String replacementText = (String) content.getTransferData(DataFlavor.stringFlavor);
+            
+            // You don't want to paste non-breakable spaces from HTML
+            // documentation into your code.
+            replacementText = replacementText.replace('\u00a0', ' ');
+            
             if (Parameters.getParameter("reformatPastedText", true) && replacementText.indexOf('\n') != -1) {
                 int firstLine = getLineOfOffset(getCaretPosition());
                 replaceSelection(replacementText);
