@@ -54,7 +54,8 @@ Should allow the user to specify a log filename per tab, on the command line.
 * Our double-click selection may be pretty clever in situations where xterm
   and rxvt aren't, but it doesn't work as well in situations they're good at:
   numbers in situations such as "offset=1234,length=5678". No-one does IP
-  addresses well, that I've seen.
+  addresses well, that I've seen. [I take that back; Apple's Terminal does a
+  pretty much perfect job. It has bracket matching, too.]
 
 * "whiptail --yesno food 5 18" still isn't right in Terminator. We've got the
   foreground and background colors the wrong way round relative to xterm (and
