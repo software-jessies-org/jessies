@@ -38,6 +38,7 @@ public class AddWorkspaceAction extends AbstractAction {
             return;
         }
         
-        Edit.createWorkspace(nameField.getText(), filenameChooserField.getPathname());
+        Workspace workspace = Edit.createWorkspace(nameField.getText(), filenameChooserField.getPathname());
+        workspace.updateFileList(null);
     }
 }
