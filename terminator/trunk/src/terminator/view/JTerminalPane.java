@@ -1,8 +1,10 @@
 package terminator.view;
 
 import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.List;
 import javax.swing.*;
 import e.forms.*;
 import e.util.*;
@@ -391,6 +393,7 @@ public class JTerminalPane extends JPanel {
 						menu.add(getMenuItem(menuAndKeyActions[i], event.getPoint()));
 					}
 				}
+				addInfoItems(menu);
 				menu.show((Component) event.getSource(), event.getX() + 1, event.getY());
 			}
 		}
@@ -408,6 +411,41 @@ public class JTerminalPane extends JPanel {
 			}
 			return result;
 		}
+	}
+	
+	private void addInfoItems(JPopupMenu menu) {
+		String selectedText = getSelectedText();
+		if (selectedText.indexOf("\n") != -1) {
+			return;
+		}
+		
+		NumberDecoder numberDecoder = new NumberDecoder(selectedText);
+		if (numberDecoder.isValid()) {
+			menu.addSeparator();
+			List items = numberDecoder.toStrings();
+			for (int i = 0; i < items.size(); ++i) {
+				String item = (String) items.get(i);
+				menu.add(makeInfoItem(item));
+			}
+		}
+	}
+	
+	private String getSelectedText() {
+		String result = "";
+		try {
+			Clipboard selection = getToolkit().getSystemSelection();
+			Transferable transferable = selection.getContents(null);
+			result = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+		} catch (Exception ex) {
+			Log.warn("Couldn't get system selection.", ex);
+		}
+		return result;
+	}
+	
+	private JMenuItem makeInfoItem(String text) {
+		JMenuItem result = new JMenuItem(text);
+		result.setEnabled(false);
+		return result;
 	}
 	
 	public interface MenuKeyAction {
