@@ -48,16 +48,16 @@ public class JavaIndenter extends Indenter {
     }
     
     public String getIndentation(ETextArea text, int lineNumber) throws javax.swing.text.BadLocationException {
+        String indentation = "";
+
         int previousDefinitive = getPreviousDefinitiveLineNumber(text, lineNumber);
-        if (previousDefinitive == 0) {
-            return "";
-        }
-        
-        String indentation = text.getIndentationOfLine(previousDefinitive);
-        
-        String activePartOfPrevious = getActivePartOfLine(text, previousDefinitive);
-        if (isBlockBegin(activePartOfPrevious) || isLabel(activePartOfPrevious)) {
-            indentation = increaseIndentation(text, indentation);
+        if (previousDefinitive != 0) {
+            indentation = text.getIndentationOfLine(previousDefinitive);
+            
+            String activePartOfPrevious = getActivePartOfLine(text, previousDefinitive);
+            if (isBlockBegin(activePartOfPrevious) || isLabel(activePartOfPrevious)) {
+                indentation = increaseIndentation(text, indentation);
+            }
         }
         
         String activePartOfLine = getActivePartOfLine(text, lineNumber);
