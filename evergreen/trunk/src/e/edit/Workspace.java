@@ -330,13 +330,12 @@ public class Workspace extends JPanel {
             if (FileUtilities.isIgnored(file)) {
                 continue;
             }
-            String filename = FileUtilities.getUserFriendlyName(file);
+            String filename = file.toString();
             if (file.isDirectory()) {
                 scanDirectory(filename, ignoredExtensions, result);
             } else {
                 if (FileUtilities.nameEndsWithOneOf(filename, ignoredExtensions) == false && FileUtilities.isSymbolicLink(file) == false) {
-                    // getRootDirectory() includes a trailing directory separator.
-                    int prefixCharsToSkip = getRootDirectory().length();
+                    int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(getRootDirectory()).length();
                     result.add(filename.substring(prefixCharsToSkip));
                 }
             }
