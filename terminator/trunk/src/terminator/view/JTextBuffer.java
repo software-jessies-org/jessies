@@ -525,8 +525,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private void redrawCaretPosition() {
 		Point top = getLineTop(caretPosition);
 		Dimension character = getCharUnitSize();
-		repaint(top.x, 0, character.width, getSize().height);
-		repaint(0, top.y, getSize().width, character.height);
+		repaint(top.x, top.y, character.width, character.height);
 	}
 	
 	public void paintComponent(Graphics graphics) {
@@ -565,7 +564,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				paintCaret(graphics, metrics, "", baseline);
 			}
 		}
-		//paintCaretCross(graphics, metrics);
 		if (ANTIALIAS) {
 			((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
 		}
@@ -612,17 +610,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			// look better.
 			graphics.drawRect(top.x, top.y, metrics.charWidth(' ') - 1, metrics.getHeight() - 1);
 		}
-	}
-	
-	private void paintCaretCross(Graphics graphics, FontMetrics metrics) {
-		Color oldColor = graphics.getColor();
-		Color curs = getCursorColor();
-		Color crossColor = new Color(curs.getRed(), curs.getGreen(), curs.getBlue(), 30);
-		graphics.setColor(crossColor);
-		Point top = getLineTop(caretPosition);
-		graphics.fillRect(0, top.y, getSize().width, metrics.getHeight());
-		graphics.fillRect(top.x, 0, metrics.charWidth(' '), getSize().height);
-		graphics.setColor(oldColor);
 	}
 	
 	/**
