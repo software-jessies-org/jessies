@@ -78,13 +78,31 @@ public class TagsPanel extends JPanel {
     }
     
     private static class TagsTreeRenderer extends DefaultTreeCellRenderer {
-        private final Icon squareIcon = new DrawnIcon(new Dimension(10, 10)) {
-            public void paintIcon(Component c, Graphics g, int x, int y) {
+        
+        private static final Shape CIRCLE = new java.awt.geom.Ellipse2D.Float(0, 0, 8, 8);
+        private static final Shape SQUARE = new Rectangle(0, 0, 7, 7);
+        private static final Shape TRIANGLE = new Polygon(new int[] { 0, 4, 8 }, new int[] { 8, 0, 8 }, 3);
+        
+        private static final Map TYPE_SHAPES = new HashMap();
+        {
+            TYPE_SHAPES.put("c", CIRCLE);
+            TYPE_SHAPES.put("f", TRIANGLE);
+            TYPE_SHAPES.put("m", SQUARE);
+        }
+        
+        private final Icon icon = new DrawnIcon(new Dimension(8, 8)) {
+            public void paintIcon(Component c, Graphics og, int x, int y) {
+                Graphics2D g = (Graphics2D) og;
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setColor(visibilityColor);
-                g.fillRect(x, y, 10, 10);
+                g.translate(x, y);
+                g.fill(typeMarker);
+                g.translate(-x, -y);
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
             }
         };
         
+        private Shape typeMarker;
         private Color visibilityColor;
         
         public TagsTreeRenderer() {
@@ -100,11 +118,12 @@ public class TagsPanel extends JPanel {
             if (node.getUserObject() instanceof TagReader.Tag) {
                 TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
                 visibilityColor = tag.visibilityColor();
+                typeMarker = (Shape) TYPE_SHAPES.get(String.valueOf(tag.type));
             } else {
                 System.err.println(node.getUserObject().getClass() + " : " + node.getUserObject());
             }
-            if (visibilityColor != null) {
-                setIcon(squareIcon);
+            if (visibilityColor != null && typeMarker != null) {
+                setIcon(icon);
             }
             return this;
         }

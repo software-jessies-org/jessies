@@ -140,7 +140,7 @@ public class TagReader {
             if (context.indexOf("access:public") != -1) {
                 return Color.GREEN.darker();
             } else if (context.indexOf("access:private") != -1) {
-                return Color.RED;
+                return Color.RED.darker();
             } else if (context.indexOf("access:protected") != -1) {
                 return Color.ORANGE;
             } else {
@@ -157,7 +157,7 @@ public class TagReader {
         }
         
         public boolean isContainerType() {
-            return "cgins".indexOf(type) != -1; 
+            return "cgins".indexOf(type) != -1;
         }
         
         public int getTypeSortIndex() {
