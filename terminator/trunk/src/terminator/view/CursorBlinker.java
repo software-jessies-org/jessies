@@ -2,6 +2,7 @@ package terminator.view;
 
 import java.awt.event.*;
 import javax.swing.*;
+import terminator.*;
 
 public class CursorBlinker implements ActionListener {
 	private Timer timer;
@@ -9,15 +10,21 @@ public class CursorBlinker implements ActionListener {
 	
 	public CursorBlinker(JTextBuffer text) {
 		this.text = text;
-		this.timer = new Timer(500, this);
+		if (Options.getSharedInstance().shouldCursorBlink()) {
+			this.timer = new Timer(500, this);
+		}
 	}
 	
 	public void start() {
-		timer.start();
+		if (timer != null) {
+			timer.start();
+		}
 	}
 	
 	public void stop() {
-		timer.stop();
+		if (timer != null) {
+			timer.stop();
+		}
 	}
 	
 	public void actionPerformed(ActionEvent e) {
