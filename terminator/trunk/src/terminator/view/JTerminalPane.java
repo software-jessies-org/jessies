@@ -452,30 +452,6 @@ public class JTerminalPane extends JPanel {
 		textPane.paste();
 	}
 	
-/*	public class RunCommandAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "Run In Tab...";
-		}
-		
-		public void performAction() {
-			JTextField commandField = new JTextField(40);
-			FormPanel formPanel = new FormPanel();
-			formPanel.addRow("Command:", commandField);
-			boolean okay = FormDialog.show(null, "Run Command", formPanel, "Run");
-			if (okay == false) {
-				return;
-			}
-			String command = commandField.getText();
-			if (command.length() > 0) {
-				controller.openCommandPane(command, true);
-			}
-		}
-		
-		public char getHotkeyChar() {
-			return 'E';
-		}
-	}*/
-	
 	public void doClearScrollbackAction() {
 		textPane.clearScrollBuffer();
 		control.sendRedrawScreen();
