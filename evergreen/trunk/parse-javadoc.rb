@@ -1,10 +1,5 @@
 #!/usr/local/bin/ruby -w
 
-# Usage:
-# parse-javadoc.rb `locate "/doc/api" | grep "api$"` > /tmp/summary-javadoc.txt
-
-#####################
-
 # Represents a class, field or method.
 class Item
     def initialize(name)
@@ -123,7 +118,7 @@ end
 #####################
 
 if ARGV.length() == 0
-    puts("Usage: parse-javadoc.rb <java-doc-directories>...")
+    puts("Usage: parse-javadoc.rb <java-doc-directories>... > javadoc-summary.txt")
     puts("")
     puts("Probable JavaDoc locations on this machine:")
     locations = `locate allclasses-noframe.html`
