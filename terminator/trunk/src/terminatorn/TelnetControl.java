@@ -262,10 +262,13 @@ public class TelnetControl implements Runnable {
 		}
 	}
 	
-	/** Sends a ^L (form feed, aka redraw screen request) to the process. */
+	/**
+	 * Send a fake resize notification so the application gets a SIGWINCH
+	 * and redraws itself.
+	 */
 	public void sendRedrawScreen() {
 		try {
-			out.write((byte) 12);
+			out.sendResizeNotification(pane.getTextPane().getModel().getCurrentSizeInChars(), new Dimension());
 			out.flush();
 		} catch (IOException ex) {
 			ex.printStackTrace();
