@@ -27,7 +27,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		private boolean focused = true;
 		
 		private SelectionStyle() {
-			super(Options.getSharedInstance().getColor("foreground"), Options.getSharedInstance().getColor("selectionColor"), null, null);
+			super(Options.getSharedInstance().getColor("foreground"), Options.getSharedInstance().getColor("selectionColor"), null, null, false);
 		}
 		
 		public Color getBackground() {

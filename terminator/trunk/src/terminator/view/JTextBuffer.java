@@ -656,6 +656,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		Color foreground = style.getForeground();
 		Color background = style.getBackground();
 		
+		if (style.isReverseVideo()) {
+			Color oldForeground = foreground;
+			foreground = background;
+			background = oldForeground;
+		}
+		
 		int textWidth = metrics.stringWidth(text.getText());
 		graphics.setColor(background);
 		// Special continueToEnd flag used for drawing the backgrounds of Highlights which extend

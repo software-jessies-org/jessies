@@ -184,6 +184,7 @@ public class CSIEscapeAction implements TerminalAction {
 		int foreground = StyledText.getForeground(oldStyle);
 		int background = StyledText.getBackground(oldStyle);
 		boolean isBold = StyledText.isBold(oldStyle);
+		boolean isReverseVideo = StyledText.isReverseVideo(oldStyle);
 		boolean isUnderlined = StyledText.isUnderlined(oldStyle);
 		boolean hasForeground = StyledText.hasForeground(oldStyle);
 		boolean hasBackground = StyledText.hasBackground(oldStyle);
@@ -196,6 +197,7 @@ public class CSIEscapeAction implements TerminalAction {
 						hasForeground = false;
 						hasBackground = false;
 						isBold = false;
+						isReverseVideo = false;
 						isUnderlined = false;
 						break;
 					case 1:
@@ -204,15 +206,26 @@ public class CSIEscapeAction implements TerminalAction {
 					case 4:
 						isUnderlined = true;
 						break;
+					case 5:
+						// Blink on. Unsupported.
+						break;
 					case 7:
-						int temp = foreground;
-						foreground = background;
-						background = temp;
-						hasForeground = true;
-						hasBackground = true;
+						isReverseVideo = true;
+						break;
+					case 22:
+						isBold = false;
 						break;
 					case 24:
 						isUnderlined = false;
+						break;
+					case 25:
+						// Blink off. Unsupported.
+						break;
+					case 27:
+						isReverseVideo = false;
+						break;
+					default:
+						Log.warn("Unknown attribute " + value + " in [" + sequence);
 						break;
 				}
 			} else if (valueInRange(value, 30, 37)) {
@@ -221,9 +234,15 @@ public class CSIEscapeAction implements TerminalAction {
 			} else if (valueInRange(value, 40, 47)) {
 				background = value - 40;
 				hasBackground = true;
+			} else if (value == 39) {
+				hasForeground = false;
+			} else if (value == 49) {
+				hasBackground = false;
+			} else {
+				Log.warn("Unknown attribute " + value + " in [" + sequence);
 			}
 		}
-		listener.setStyle(StyledText.getStyle(foreground, hasForeground, background, hasBackground, isBold, isUnderlined));
+		listener.setStyle(StyledText.getStyle(foreground, hasForeground, background, hasBackground, isBold, isUnderlined, isReverseVideo));
 		return true;
 	}
 	
