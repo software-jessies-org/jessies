@@ -1,4 +1,4 @@
-# Terminator options file for linux.
+# Terminator options file for Mac OS X.
 
 Highlighter WebHighlighter {
 	openInTab = no
@@ -7,39 +7,9 @@ Highlighter WebHighlighter {
 	command = "open $1"
 }
 
-Highlighter MailToHighlighter {
-    openInTab = no
-    regexp = "(\bmailto:([a-zA-Z0-9-_\.]+@[a-zA-Z0-9-_\.]+))"
-    highlightGroup = 1
-    command = "open $1"
-}
-
 Highlighter FileHighlighter {
 	openInTab = no
 	regexp = "(?:^| |")(/[^ :"]+\.\w+([\d:]+)?)"
 	highlightGroup = 1
 	command = "vi $1"
 }
-
-Highlighter TelnetHighlighter {
-	openInTab = yes
-	regexp = "(\btelnet:([a-zA-Z0-9-_\.]+))"
-	highlightGroup = 1
-	command = "telnet $2"
-}
-
-Highlighter RshHighlighter {
-	openInTab = yes
-	regexp = "(\brsh:([a-zA-Z0-9-_\.]+))"
-	highlightGroup = 1
-	command = "rsh $2"
-}
-
-Highlighter SshHighlighter {
-	openInTab = yes
-	regexp = "(\bssh:([a-zA-Z0-9-_\.@]+))"
-	highlightGroup = 1
-	command = "ssh $2"
-}
-
-
