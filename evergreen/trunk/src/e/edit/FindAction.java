@@ -108,7 +108,8 @@ public class FindAction extends ETextAction implements MinibufferUser {
         findAllMatches(regularExpression);
     }
     
-    public void repeatLastFind() {
+    public void repeatLastFind(ETextWindow textWindow) {
+        currentTextWindow = textWindow;
         findAllMatches(currentRegularExpression);
     }
     
@@ -116,13 +117,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     // Find stuff.
     //
     
-    /** Used to optimize clearing of highlights for the simple & not uncommon case of there being none. */
-    private boolean noHighlightsSet;
-    
     public void removeAllMatches() {
-        if (noHighlightsSet) {
-            return;
-        }
         Highlighter highlighter = currentTextWindow.getText().getHighlighter();
         Highlighter.Highlight[] highlights = highlighter.getHighlights();
         for (int i = 0; i < highlights.length; i++) {
@@ -131,7 +126,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
             }
         }
         currentTextWindow.getBirdView().clearMatchingLines();
-        noHighlightsSet = true;
     }
     
     public void findAllMatches(String regularExpression) {
@@ -169,7 +163,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
             try {
                 currentTextWindow.getBirdView().addMatchingLine(textArea.getLineOfOffset(matcher.end()));
                 highlighter.addHighlight(matcher.start(), matcher.end(), PAINTER);
-                noHighlightsSet = false;
             } catch (BadLocationException ex) {
                 ex.printStackTrace();
             }
