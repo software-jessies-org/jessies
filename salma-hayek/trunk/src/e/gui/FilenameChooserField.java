@@ -70,12 +70,7 @@ public class FilenameChooserField extends JPanel implements ActionListener {
     }
     
     private void updateFilenameField(File file) {
-        String pathname = FileUtilities.getUserFriendlyName(file);
-        // FIXME: should this be part of getUserFriendlyName, at least the form that's given a File rather than a String?
-        if (file.isDirectory() && pathname.endsWith(File.separator) == false) {
-            pathname += File.separator;
-        }
-        pathnameField.setText(pathname);
+        pathnameField.setText(FileUtilities.getUserFriendlyName(file));
     }
     
     private void updateCompanionNameField(File file) {

@@ -44,8 +44,13 @@ public class FileUtilities {
      * if it's there, replacing it with ~. It would be nice to do other users'
      * home directories too, but I can't think of a pure Java way to do
      * that.
+     * Also adds a trailing separator to the name of a directory.
      */
     public static String getUserFriendlyName(String filename) {
+        boolean isDirectory = new File(filename).isDirectory();
+        if (isDirectory && filename.endsWith(File.separator) == false) {
+            filename += File.separatorChar;
+        }
         String home = System.getProperty("user.home");
         if (filename.startsWith(home)) {
             return "~" + filename.substring(home.length());
