@@ -288,12 +288,15 @@ public class TerminalControl implements Runnable {
 	}
 	
 	/**
-	 * Translate ASCII to the Unicode box-drawing characters.
+	 * Translate ASCII to the nearest Unicode characters to the special
+	 * graphics and line drawing characters.
 	 * 
 	 * Run this in xterm(1) for reference:
 	 * 
 	 *   ruby -e 'cs="abcdefghijklmnopqrstuvwxyz"; puts(cs); \
 	 *            print("\x1b(0\x1b)B\x0f");puts(cs);print("\x0e")'
+	 * 
+	 * Or try test 3 of vttest.
 	 * 
 	 * We use the Unicode box-drawing characters, but the
 	 * glyphs don't fill the font's bounding box, so the effect is
@@ -305,6 +308,8 @@ public class TerminalControl implements Runnable {
 	 */
 	private char translateToGraphicalCharacterSet(char ch) {
 		switch (ch) {
+		case '`':
+			return '\u2666'; // BLACK DIAMOND SUIT
 		case 'a':
 			return '\u2591'; // LIGHT SHADE
 		case 'b':
@@ -355,6 +360,14 @@ public class TerminalControl implements Runnable {
 			return '\u2264'; // LESS-THAN OR EQUAL TO
 		case 'z':
 			return '\u2265'; // GREATER-THAN OR EQUAL TO
+		case '{':
+			return '\u03c0'; // GREEK SMALL LETTER PI
+		case '|':
+			return '\u2260'; // NOT EQUAL TO
+		case '}':
+			return '\u00a3'; // POUND SIGN
+		case '~':
+			return '\u00b7'; // MIDDLE DOT
 		default:
 			return ch;
 		}
