@@ -36,9 +36,18 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private PTextStyler textStyler = PPlainTextStyler.INSTANCE;
     private int rightHandMarginColumn = NO_MARGIN;
     
+    private int rowCount;
+    private int columnCount;
+    
     private PTextAreaSpellingChecker spellingChecker;
     
     public PTextArea() {
+        this(0, 0);
+    }
+    
+    public PTextArea(int rowCount, int columnCount) {
+        this.rowCount = rowCount;
+        this.columnCount = columnCount;
         setAutoscrolls(true);
         setBackground(Color.WHITE);
         setText(new PTextBuffer());
@@ -695,6 +704,18 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public int getScrollableUnitIncrement(Rectangle visible, int orientation, int direction) {
         return getFontMetrics(getFont()).getHeight();
+    }
+    
+    public Dimension getPreferredSize() {
+        Dimension result = super.getPreferredSize();
+        Insets insets = getInsets();
+        if (columnCount != 0) {
+            result.width = Math.max(result.width, columnCount * getFontMetrics(getFont()).charWidth('m') + insets.left + insets.right);
+        }
+        if (rowCount != 0) {
+            result.height = Math.max(result.height, rowCount * getLineHeight() + insets.top + insets.bottom);
+        }
+        return result;
     }
     
     public class SplitLine {
