@@ -1,5 +1,14 @@
 TODO list for Edit
 
+Java 1.5:
+ 1. use Thread.getAllStackTraces to let us type C-\ at the UI to see what
+    it's doing. can this work? or is it most likely to be useful when the
+    event handling thread's too busy? maybe what we want is to implement
+    some kind of Pure Java sampling profiler. you could turn that on
+    before the expensive operation, and check its findings afterwards.
+    wouldn't help with kind of problem that exhibits itself as a random
+    pause, but it would help with more general slowness.
+
 shouldn't include vim's "filename.cpp~" files in open quickly et cetera.
 
 advisor:
