@@ -10,10 +10,15 @@ def openFileOnLocalhost(filename)
         host = 'localhost'
     end
     
-    telnet = Net::Telnet.new('Host' => host, 'Port' => 1948, 'Telnetmode' => false)
-    telnet.puts("open #{filename}\r")
-    print(telnet.readlines().join("\n"))
-    telnet.close()
+    begin
+        telnet = Net::Telnet.new('Host' => host, 'Port' => 1948, 'Telnetmode' => false)
+        telnet.puts("open #{filename}\r")
+        print(telnet.readlines().join("\n"))
+        telnet.close()
+    rescue
+        # Defer to the next 'vi' on the path if we failed.
+        system("`type -Pa vi | uniq | tail +2 | head -1` #{filename}")
+    end
 end
 
 ARGV.each {
