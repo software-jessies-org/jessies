@@ -443,10 +443,12 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
     }
     
     public void findNext() {
+        FindAction.INSTANCE.repeatLastFind();
         findHighlight(true);
     }
     
     public void findPrevious() {
+        FindAction.INSTANCE.repeatLastFind();
         findHighlight(false);
     }
     

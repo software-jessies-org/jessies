@@ -18,6 +18,8 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     public ETextWindow currentTextWindow;
     
+    public String currentRegularExpression;
+    
     private FindAction() {
         super(ACTION_NAME);
     }
@@ -98,6 +100,10 @@ public class FindAction extends ETextAction implements MinibufferUser {
         findAllMatches(regularExpression);
     }
     
+    public void repeatLastFind() {
+        findAllMatches(currentRegularExpression);
+    }
+    
     //
     // Find stuff.
     //
@@ -120,11 +126,11 @@ public class FindAction extends ETextAction implements MinibufferUser {
         noHighlightsSet = true;
     }
     
-    public void findAllMatches(String searchString) {
+    public void findAllMatches(String regularExpression) {
         removeAllMatches();
         
         // Do we have something to search for?
-        if (searchString == null || searchString.length() == 0) {
+        if (regularExpression == null || regularExpression.length() == 0) {
             return;
         }
         
@@ -135,10 +141,12 @@ public class FindAction extends ETextAction implements MinibufferUser {
             return;
         }
         
+        currentRegularExpression = regularExpression;
+        
         // Compile the regular expression.
         Pattern pattern;
         try {
-            pattern = Pattern.compile(searchString);
+            pattern = Pattern.compile(regularExpression);
         } catch (PatternSyntaxException patternSyntaxException) {
             Edit.showStatus(patternSyntaxException.getDescription());
             patternSyntaxException.printStackTrace();
