@@ -117,10 +117,12 @@ public class TerminatorMenuBar extends JMenuBar {
 		}
 	}
 	
-	class CopyAction extends AbstractAction {
+	public static class CopyAction extends AbstractAction {
 		public CopyAction() {
 			super("Copy");
+			putValue(ACCELERATOR_KEY, makeKeyStroke("C"));
 		}
+		
 		public void actionPerformed(ActionEvent e) {
 			// FIXME: we should probably have an "explicit copy" mode.
 		}

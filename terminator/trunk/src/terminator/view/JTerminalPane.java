@@ -27,7 +27,7 @@ public class JTerminalPane extends JPanel {
 	private String name;
 	private Dimension currentSizeInChars;
 	private Action[] menuAndKeyActions = new Action[] {
-		new CopyAction(),
+		new TerminatorMenuBar.CopyAction(),
 		new PasteAction(),
 		null,
 		new TerminatorMenuBar.NewShellAction(),
@@ -459,17 +459,6 @@ public class JTerminalPane extends JPanel {
 	
 	private Action makeInfoItem(String text) {
 		return new InfoAction(text);
-	}
-	
-	public class CopyAction extends AbstractAction {
-		public CopyAction() {
-			super("Copy");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("C"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			// FIXME: we should probably have an "explicit copy" mode.
-		}
 	}
 	
 	public class PasteAction extends AbstractAction {
