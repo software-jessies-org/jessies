@@ -29,7 +29,7 @@ public class FormPanel extends JPanel {
         labelConstraints.gridx = 0;
         labelConstraints.gridy = nextRow;
         labelConstraints.insets = new Insets(componentSpacing, componentSpacing, 0, 0);
-        labelConstraints.anchor = GridBagConstraints.EAST;
+        labelConstraints.anchor = (component instanceof JScrollPane) ? GridBagConstraints.NORTHEAST : GridBagConstraints.EAST;
         labelConstraints.fill = GridBagConstraints.NONE;
         add(label, labelConstraints);
 
