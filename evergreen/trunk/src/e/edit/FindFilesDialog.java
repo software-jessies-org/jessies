@@ -198,9 +198,6 @@ public class FindFilesDialog {
         if (workspace.isFileListUnsuitableFor("Find Files")) {
             return;
         }
-//        if (directoryField.getText().length() == 0) {
-//            directoryField.setText(workspace.getRootDirectory());
-//        }
         
         initMatchList();
         
@@ -209,8 +206,13 @@ public class FindFilesDialog {
         formPanel.addRow("Whose Names Match:", directoryField);
         formPanel.addRow("Matches:", new JScrollPane(matchList));
         formPanel.addRow("", status);
-
-        FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel);
+        
+        ActionListener listener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openSelectedFilesFromList();
+            }
+        };
+        FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel, "Open", listener);
     }
     
     public void openSelectedFilesFromList() {
