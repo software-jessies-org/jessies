@@ -265,6 +265,7 @@ public class JTelnetPane extends JPanel {
 						}
 						break;
 					case 'd': case 'D':
+						control.destroyProcess();
 						controller.closeTelnetPane(JTelnetPane.this);
 						break;
 					case 'f': case 'F':
