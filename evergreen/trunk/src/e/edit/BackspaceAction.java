@@ -40,7 +40,7 @@ public class BackspaceAction extends TextAction {
                 }
             }
         } else if (lineOffset > 1 && lineOffset <= whitespace.length()) {
-            String tab = Parameters.getParameter("indent.string", "\t");
+            String tab = target.getIndentationString();
             whitespace = whitespace.substring(0, lineOffset);
             while (whitespace.startsWith(tab)) {
                 whitespace = whitespace.substring(tab.length());

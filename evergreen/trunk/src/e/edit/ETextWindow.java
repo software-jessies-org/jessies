@@ -184,6 +184,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             
             text.setText(content);
             text.setAppropriateFont();
+            text.getIndenter().setIndentationPropertyBasedOnContent(text, content);
             text.getUndoManager().discardAllEdits();
             text.getDocument().addDocumentListener(this);
             markAsClean();

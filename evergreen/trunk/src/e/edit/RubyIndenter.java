@@ -26,7 +26,7 @@ public class RubyIndenter extends Indenter {
         if (increasersMatcher.find()) {
 //            System.err.println("found an increaser");
             // || trimmedPrevious =~ '\({\|\<do\>\).*|.*|\s*$' || trimmedPrevious =~ '\<do\>\(\s*#.*\)\=$') {
-            indentation = increaseIndentation(indentation);
+            indentation = increaseIndentation(text, indentation);
             haveIncreasedIndentation = true;
         }
         
@@ -34,14 +34,14 @@ public class RubyIndenter extends Indenter {
         // they begin with something that would otherwise cause us to increase the indentation.
         if (haveIncreasedIndentation && trimmedPrevious.matches(".*\\<end\\>\\s*(#.*)?$")) {
 //            System.err.println("found a nullifier");
-            indentation = decreaseIndentation(indentation);
+            indentation = decreaseIndentation(text, indentation);
         }
         
         // Subtract a 'shiftwidth' on end, else and, elsif, when and '}'.
         String trimmedLine = text.getLineText(lineNumber).trim();
         if (trimmedLine.matches("end\\b|else\\b|elsif\\b.*|when\\b.*|ensure\\b|rescue\\b.*|}")) {
 //            System.err.println("found a decreaser");
-            indentation = decreaseIndentation(indentation);
+            indentation = decreaseIndentation(text, indentation);
         }
         
         return indentation;

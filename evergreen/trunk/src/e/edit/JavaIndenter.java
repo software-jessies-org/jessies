@@ -57,12 +57,12 @@ public class JavaIndenter extends Indenter {
         
         String activePartOfPrevious = getActivePartOfLine(text, previousDefinitive);
         if (isBlockBegin(activePartOfPrevious) || isLabel(activePartOfPrevious)) {
-            indentation = increaseIndentation(indentation);
+            indentation = increaseIndentation(text, indentation);
         }
         
         String activePartOfLine = getActivePartOfLine(text, lineNumber);
         if (isBlockEnd(activePartOfLine) || isLabel(activePartOfLine)) {
-            indentation = decreaseIndentation(indentation);
+            indentation = decreaseIndentation(text, indentation);
         }
         if (activePartOfLine.startsWith("#")) {
             indentation = "";
