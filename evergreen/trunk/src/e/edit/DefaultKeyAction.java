@@ -1,7 +1,10 @@
 package e.edit;
 
 import java.awt.event.*;
+import javax.swing.text.*;
 import javax.swing.undo.*;
+
+import e.util.*;
 
 public class DefaultKeyAction extends ETextAction {
     public DefaultKeyAction() {
@@ -39,10 +42,41 @@ public class DefaultKeyAction extends ETextAction {
             } finally {
                 entireEdit.end();
             }
+        } else if (c == '{' && target.getIndenter().isElectric('}')) {
+            insertBracePair(target);
         } else if (content != null) {
             target.replaceSelection(content);
         } else {
             javax.swing.UIManager.getLookAndFeel().provideErrorFeedback(target);
+        }
+    }
+    
+    public void insertBracePair(ETextArea target) {
+        CompoundEdit entireEdit = null;
+        try {
+            Document document = target.getDocument();
+            int position = target.getCaretPosition();
+            
+            // An obvious special case we're not interested in.
+            // String literals are harder to spot, though.
+            if (position > 0 && document.getText(position - 1, 1).equals("'")) {
+                target.replaceSelection("{");
+                return;
+            }
+            
+            entireEdit = new CompoundEdit();
+            target.getUndoManager().addEdit(entireEdit);
+            String whitespace = target.getIndentationOfLineAtOffset(position);
+            String prefix = "{\n" + whitespace + target.getIndentationString();
+            String suffix = "\n" + whitespace + "}";
+            document.insertString(position, prefix + suffix, null);
+            target.setCaretPosition(position + prefix.length());
+        } catch (BadLocationException ex) {
+            Log.warn("Problem inserting brace pair.", ex);
+        } finally {
+            if (entireEdit != null) {
+                entireEdit.end();
+            }
         }
     }
 }
