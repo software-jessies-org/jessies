@@ -114,7 +114,7 @@ public class HyperlinkHighlighter implements Highlighter {
 			while (matcher.find()) {
 				String command = linker.command(matcher);
 				if (linker.runInTab()) {
-					view.getController().openCommandPane(command, true);
+					view.getTerminalPaneMaster().openCommandPane(command, true);
 				} else {
 					try {
 						Runtime.getRuntime().exec(command);

@@ -17,7 +17,7 @@ import javax.swing.Timer;
 @author Phil Norman
 */
 
-public class TerminatorFrame implements Controller {
+public class TerminatorFrame implements TerminalPaneMaster {
 	private Terminator terminator;
 	private Dimension terminalSize;
 	private JFrame frame;

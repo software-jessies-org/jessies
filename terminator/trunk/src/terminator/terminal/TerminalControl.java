@@ -101,7 +101,7 @@ public class TerminalControl implements Runnable {
 			try {
 				int status = process.waitFor();
 				if (status == 0 || ignoreExitStatus) {
-					pane.getController().closeTerminalPane(pane);
+					pane.getTerminalPaneMaster().closeTerminalPane(pane);
 				} else {
 					announceConnectionLost("[Process exited with status " + status + ".]");
 				}
