@@ -1,13 +1,4 @@
-TODO file for the Terminator project.
-This file contains all the stuff which still needs to be decided, considered or done.
-If you want to take over an item, please assign it to yourself in your own section.
-
-
-Unassigned TODOs:
-~~~~~~~~~~~~~~
 Hitting alt-k a number of times results in no redraw of the prompt.  I think bash tries to be clever.
-
-Auto-scrolling is completely broken.  Fix it.  I haven't noticed any problems with this for some time.  Hasn't it been fixed?
 
 Make an about box.
 
@@ -30,17 +21,6 @@ The flashing green underline of a cursor is often difficult to find.  Fine by me
 
 Should allow the user to specify a log filename per tab, on the command line.
 
-
-Phil's TODOs:
-~~~~~~~~~~
-
-
-
-Elliott's TODOs:
-~~~~~~~~~~~
-* Add resources or other configuration file for hyperlink recognizers. Maybe
-  allow arbitrary classes to be instantiated?
-
 * "Connect to Server" CS-K; don't implement Rendevouz (unless you're bored!)
   but take (user@)?host and port-scan for ssh, and fall back to telnet.
 
@@ -53,3 +33,39 @@ Elliott's TODOs:
   idea, though. There's a long way between our options stuff and something as
   good as Apple's. And I guess the right direction to go in is one that moves
   us away from .Xdefaults and .Xresources except as an initial land grab.
+
+* Remove the color-editing cruft, which doesn't really work properly anyway.
+
+* Fix Mac OS integration; primarily, this means supporting a single menu bar.
+
+* Rewrite the hyper-link code to be less eager.
+
+* Get the web page and images under version control; update them.
+
+* Fix the fall-back defaults so that they're either like xterm's or xwsh's.
+  The current situation where none of the maintainers (and presumably none of
+  the users) live with the fall-back defaults has led to a fresh install
+  on a machine without previous X11 configuration being hard to use. (Should
+  perhaps get James "Computer Museum" Carter to get us the actual xwsh colors.)
+
+* Some way to easily get the log filename for a given tab onto the clipboard.
+
+* Some way to turn off logging for a given connection.
+
+* Fix the speed of pasting large amounts of text (without breaking the
+  correctness).
+
+* Fix the problem where sometimes the selection as pasted into another program
+  doesn't match what appears to be selected. (I think this only happens when
+  you've selected to the end of a line, and you get some amount of the text
+  that follows on later lines.)
+
+* Now we support the graphical character set, we can get a terminal into the
+  traditional unusable state. We should probably have a way to reset from
+  Terminator (because you're not necessarily talking to Unix, and even if you
+  are, you don't necessarily know what to do).
+
+* Our double-click selection may be pretty clever in situations where xterm
+  and rxvt aren't, but it doesn't work as well in situations they're good at:
+  numbers in situations such as "offset=1234,length=5678". No-one does IP
+  addresses well, that I've seen.
