@@ -31,6 +31,7 @@ public class TagReader {
             "ctags",
             "--c++-types=+p", "-n", "--fields=+a", "-u",
             "--regex-java=/( static )/\1/S/",
+            "--regex-c++=/( static )/\1/S/",
             "-f", tagsFile.getAbsolutePath(),
             file.getAbsolutePath()
         });
