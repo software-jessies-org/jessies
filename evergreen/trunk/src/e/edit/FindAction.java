@@ -107,6 +107,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     public void wasCanceled() {
         removeAllMatches();
+        currentRegularExpression = null;
         currentTextWindow.goToSelection(initialSelectionStart, initialSelectionEnd);
     }
     
