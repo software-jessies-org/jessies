@@ -47,7 +47,7 @@ EDIT_LOG=/tmp/edit.log.$$
 ln -s -f $EDIT_LOG /tmp/edit.log
 
 JAVA_ENV=""
-for VARIABLE in CVS_RSH DISPLAY EDIT_HOME HOME JAVA_HOME PATH
+for VARIABLE in CVS_RSH DISPLAY EDIT_HOME HOME JAVA_HOME PATH SHELL
 do
     eval VALUE="\${${VARIABLE}}"
     if [ "${VALUE}" != "" ]
