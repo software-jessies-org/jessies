@@ -1,9 +1,5 @@
 package e.edit;
 
-import java.awt.*;
-import java.io.*;
-import javax.swing.text.html.*;
-
 import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {

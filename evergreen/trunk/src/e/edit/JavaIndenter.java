@@ -42,6 +42,7 @@ public class JavaIndenter extends Indenter {
                 }
             }
         } catch (javax.swing.text.BadLocationException ex) {
+            ex.printStackTrace();
         }
         return 0;
     }

@@ -6,7 +6,6 @@ import java.awt.font.*;
 import java.awt.event.*;
 import java.text.*;
 import java.util.*;
-import java.util.regex.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -451,6 +450,7 @@ public class ETextArea extends JTextArea {
                 }
             }
         } catch (BadLocationException ex) {
+            ex.printStackTrace();
         }
         return 0;
     }

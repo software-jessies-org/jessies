@@ -1,11 +1,9 @@
 package e.gui;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.text.*;
 import e.edit.*;
 
 public class EWindow extends JComponent implements FocusListener {

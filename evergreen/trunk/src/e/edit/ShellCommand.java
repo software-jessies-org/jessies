@@ -1,9 +1,6 @@
 package e.edit;
 
 import java.io.*;
-import java.awt.event.*;
-
-import e.gui.*;
 import e.util.*;
 
 public class ShellCommand {
@@ -15,8 +12,6 @@ public class ShellCommand {
     
     /** The count of open streams. */
     private int openStreamCount = 0;
-    
-    private Process proc;
     
     public ShellCommand(String command) throws IOException {
         this("", 0, Edit.getCurrentWorkspace(), "/", command);

@@ -1,10 +1,8 @@
 package e.edit;
 
 import java.awt.*;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.text.*;
 import javax.swing.text.html.*;
 
 public class EHtmlPane extends JComponent implements HyperlinkListener {

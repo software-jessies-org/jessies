@@ -4,9 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.undo.*;
 import e.forms.*;
 import e.gui.*;
 import e.util.*;
@@ -239,14 +236,14 @@ public class FindAndReplaceAction extends ETextAction {
                 return "";
             }
             
-            StringBuffer tooltip = new StringBuffer();
+            StringBuffer buffer = new StringBuffer();
             for (int i = 1; i <= matcher.groupCount(); i++) {
-                if (i > 1) tooltip.append(", ");
-                tooltip.append("$" + i + "=\"");
-                tooltip.append(matcher.group(i));
-                tooltip.append("\"");
+                if (i > 1) buffer.append(", ");
+                buffer.append("$" + i + "=\"");
+                buffer.append(matcher.group(i));
+                buffer.append("\"");
             }
-            return tooltip.toString();
+            return buffer.toString();
         }
 
         public String toString() {

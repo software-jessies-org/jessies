@@ -4,9 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.text.*;
-import javax.swing.undo.*;
 
 /**
 The ETextArea go to/select to start of line action.

@@ -7,9 +7,6 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.*;
 import javax.swing.text.*;
-import javax.swing.text.html.*;
-
-import e.gui.*;
 
 public class Advisor extends JPanel {
     private ArrayList researchers = new ArrayList();

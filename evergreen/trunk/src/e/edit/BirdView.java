@@ -13,14 +13,12 @@ to their locations.
 public class BirdView extends JComponent {
     private ETextArea textArea;
 
-    private javax.swing.plaf.ScrollBarUI ui;
     private Method method;
 
     private BitSet matchingLines = new BitSet();
 
     public BirdView(ETextArea textArea, JScrollBar scrollBar) {
         this.textArea = textArea;
-        this.ui = (javax.swing.plaf.ScrollBarUI) scrollBar.getUI();
         try {
             method = javax.swing.plaf.basic.BasicScrollBarUI.class.getDeclaredMethod("getTrackBounds", new Class[] {});
             method.setAccessible(true);

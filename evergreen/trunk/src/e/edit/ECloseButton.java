@@ -3,8 +3,6 @@ package e.gui;
 import java.awt.*;
 import java.awt.event.*;
 
-import e.edit.*;
-
 public class ECloseButton extends EButton implements ActionListener {
     private EWindow window;
     

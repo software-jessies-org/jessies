@@ -1,14 +1,10 @@
 package e.edit;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
-import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 import java.util.jar.*;
 import java.util.zip.*;
-import javax.swing.*;
 
 import e.util.*;
 
@@ -375,6 +371,7 @@ public class JavaDoc {
                  * we're looking for. We are just guessing its location,
                  * after all.
                  */
+                ex = ex;
             }
         }
         return (Class[]) classes.toArray(new Class[classes.size()]);

@@ -1,18 +1,12 @@
 package e.edit;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.undo.*;
 import e.forms.*;
 import e.gui.*;
-import e.util.*;
 
 /**
  * Improves on Apple Project Builder's "Open Quickly",

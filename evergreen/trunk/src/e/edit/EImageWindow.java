@@ -1,7 +1,6 @@
 package e.edit;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
@@ -71,9 +70,9 @@ public class EImageWindow extends EWindow {
     }
     
     public Image loadImage(String filename) {
-        Image image = Toolkit.getDefaultToolkit().createImage(filename);
-        waitForImageToLoad(image);
-        return image;
+        Image newImage = Toolkit.getDefaultToolkit().createImage(filename);
+        waitForImageToLoad(newImage);
+        return newImage;
     }
     
     public void waitForImageToLoad(Image image) {

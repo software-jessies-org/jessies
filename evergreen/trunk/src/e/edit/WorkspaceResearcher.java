@@ -1,8 +1,5 @@
 package e.edit;
 
-import java.awt.*;
-import javax.swing.text.html.*;
-
 public interface WorkspaceResearcher {
     /**
     * Look for something in a JTextComponent. Returns an HTML string

@@ -1,7 +1,6 @@
 package e.edit;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -24,11 +23,11 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
     private boolean isDirty;
     private BirdView birdView;
     
-    private final static String UNKNOWN = "Unknown";
-    private final static String C_PLUS_PLUS = "C++";
-    private final static String JAVA = "Java";
-    private final static String RUBY = "Ruby";
-    private final static String PERL = "Perl";
+    private static final String UNKNOWN = "Unknown";
+    private static final String C_PLUS_PLUS = "C++";
+    private static final String JAVA = "Java";
+    private static final String RUBY = "Ruby";
+    private static final String PERL = "Perl";
     
     private String fileType = UNKNOWN;
     
@@ -530,7 +529,9 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             if (st.hasMoreTokens()) {
                 try {
                     offset = emacsWalk(offset, Integer.parseInt(st.nextToken()));
-                } catch (NumberFormatException ex) {}
+                } catch (NumberFormatException ex) {
+                    ex = ex;
+                }
             }
             
             // We interpret address ending with a ":" (from grep and compilers) as requiring
@@ -541,13 +542,17 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             if (st.hasMoreTokens()) {
                 try {
                     endOffset = text.getLineStartOffset(Integer.parseInt(st.nextToken()) - 1);
-                } catch (NumberFormatException ex) {}
+                } catch (NumberFormatException ex) {
+                    ex = ex;
+                }
             }
             if (st.hasMoreTokens()) {
                 try {
                     // emacs end offsets seem to include the character following.
                     endOffset = emacsWalk(endOffset, Integer.parseInt(st.nextToken())) + 1;
-                } catch (NumberFormatException ex) {}
+                } catch (NumberFormatException ex) {
+                    ex = ex;
+                }
             }
             offset = Math.min(offset, maxOffset);
             endOffset = Math.min(endOffset, maxOffset);

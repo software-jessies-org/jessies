@@ -1,10 +1,6 @@
 package e.edit;
 
-import java.awt.*;
 import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.text.*;
 
 /**
@@ -40,6 +36,7 @@ public class GotoAction extends ETextAction implements MinibufferUser {
             result = Integer.toString(lineNumber);
         } catch (BadLocationException ex) {
             // Ignore.
+            ex = ex;
         }
         return result;
     }

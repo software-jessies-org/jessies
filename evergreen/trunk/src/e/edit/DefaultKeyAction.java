@@ -1,7 +1,6 @@
 package e.edit;
 
 import java.awt.event.*;
-import javax.swing.text.*;
 import javax.swing.undo.*;
 
 public class DefaultKeyAction extends ETextAction {
