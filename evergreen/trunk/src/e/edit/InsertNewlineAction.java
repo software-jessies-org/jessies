@@ -29,6 +29,8 @@ public class InsertNewlineAction extends TextAction {
             String line = target.getLineTextAtOffset(position);
             if (target.getIndenter().isElectric('}') && line.endsWith("{")) {
                 insertMatchingBrace(target);
+            } else if (line.endsWith("/**")) {
+                insertMatchingCloseComment(target);
             } else {
                 target.replaceSelection("\n");
                 target.autoIndent();
@@ -58,6 +60,20 @@ public class InsertNewlineAction extends TextAction {
             target.setCaretPosition(position + prefix.length());
         } catch (BadLocationException ex) {
             Log.warn("Problem inserting brace pair.", ex);
+        }
+    }
+    
+    public void insertMatchingCloseComment(ETextArea target) {
+        try {
+            final int position = target.getCaretPosition();
+            String line = target.getLineTextAtOffset(position);
+            String whitespace = target.getIndentationOfLineAtOffset(position);
+            String prefix = "\n" + whitespace + " * ";
+            String suffix = "\n" + whitespace + " */";
+            target.getDocument().insertString(position, prefix + suffix, null);
+            target.setCaretPosition(position + prefix.length());
+        } catch (BadLocationException ex) {
+            Log.warn("Problem inserting close comment.", ex);
         }
     }
 }

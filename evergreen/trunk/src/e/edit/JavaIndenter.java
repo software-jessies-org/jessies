@@ -76,7 +76,7 @@ public class JavaIndenter extends Indenter {
                 // a close of comment, we're not in a comment, and should
                 // do nothing.
             } else if (previousLine.startsWith("/**") || previousLine.startsWith("* ")) {
-                indentation += " *";
+                indentation += " * ";
             }
         }
         
