@@ -31,9 +31,11 @@ build: $(SOURCE_FILES)
 	 jikes -bootclasspath $(BOOT_CLASS_PATH) -classpath $(SALMA_HAYEK)/classes -d classes/ -sourcepath src/ +D +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
 	 @#javac -d classes/ -sourcepath src/ $(SOURCE_FILES)
 
+GENERATED_FILES += classes
+
 .PHONY: clean
 clean:
-	@$(RM) -rf classes
+	@$(RM) -rf $(GENERATED_FILES)
 
 .PHONY: dist
 dist: build
@@ -43,3 +45,26 @@ dist: build
 	tar cvf $(TAR_FILE_OF_THE_DAY) $(PROJECT_NAME)/ && \
 	gzip $(TAR_FILE_OF_THE_DAY) && \
 	scp $(TAR_FILE_OF_THE_DAY).gz $(ARCHIVE_HOST):~/$(PROJECT_NAME)/
+
+JAR=$(if $(JAVA_HOME),$(JAVA_HOME)/bin/)jar
+CREATE_OR_UPDATE_JAR=cd $(2) && $(JAR) $(1)f $(CURDIR)/$@ -C classes $(notdir $(wildcard $(2)/classes/*))
+
+$(PROJECT_NAME).jar: build
+	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
+	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
+
+GENERATED_FILES += $(PROJECT_NAME).jar
+
+grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
+DIRECTORY_NAME := $(notdir $(CURDIR))
+
+BINDIST_FILES += README COPYING doc $(PROJECT_NAME).jar
+FILTERED_BINDIST_FILES = $(shell find $(BINDIST_FILES) -type f | grep -v CVS)
+
+.PHONY: bindist
+bindist: $(PROJECT_NAME)-bindist.tgz
+
+$(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
+	@cd .. && tar -zcf $(addprefix $(DIRECTORY_NAME)/,$@ $(FILTERED_BINDIST_FILES))
+
+GENERATED_FILES += $(PROJECT_NAME)-bindist.tgz
