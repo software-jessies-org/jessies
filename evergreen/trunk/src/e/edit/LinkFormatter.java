@@ -1,6 +1,7 @@
 package e.edit;
 
 import java.awt.*;
+import java.io.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.text.*;
@@ -21,6 +22,8 @@ public class LinkFormatter {
     private Style currentStyle;
     
     private Style linkStyle;
+    
+    private File currentDirectory;
     
     public LinkFormatter(JTextPane text) {
         this.text = text;
@@ -75,7 +78,7 @@ public class LinkFormatter {
      * and that an address can't end in a /. But this seems to work
      * pretty nicely.
      */
-    private Pattern addressPattern = Pattern.compile("(?:^| |\")(/[^ :\"]+\\.\\w+([\\d:]+)?)");
+    private Pattern addressPattern = Pattern.compile("(?:^| |\")([^ :\"]+(?:Makefile|\\w+\\.\\w+)([\\d:]+)?)");
     
     private Pattern colorPattern = Pattern.compile("\\e\\[(\\d+)m");
     
@@ -90,24 +93,57 @@ public class LinkFormatter {
     }
     
     /** Inserts an address using the link style. Text leading up to the address gets the current style. */
-    private final String processAddress(StyledDocument document, String line, Matcher address) throws BadLocationException {
+    private final String processAddress(StyledDocument document, String line, Matcher address, String linkText) throws BadLocationException {
         // Instead of just switching off auto-scrolling, take note that the window shouldn't auto-scroll such
         // that this address disappears off the top of the visible area.
         if (maxYDisplayStart == -1) {
             maxYDisplayStart = text.modelToView(document.getLength()).y;
         }
-
+        
         document.insertString(document.getLength(), line.substring(0, address.start(1)), currentStyle);
-        document.insertString(document.getLength(), FileUtilities.getUserFriendlyName(address.group(1)), linkStyle);
+        document.insertString(document.getLength(), linkText, linkStyle);
         return line.substring(address.end(1));
     }
+    
+    private static final Pattern MAKE_DIRECTORY_CHANGE = Pattern.compile("^make(?:\\[\\d+\\])?: (Entering|Leaving) directory `(.*)'$");
     
     public void appendLine(String line) {
         StyledDocument document = text.getStyledDocument();
         try {
+            Matcher directoryChangeMatcher = MAKE_DIRECTORY_CHANGE.matcher(line);
+            if (directoryChangeMatcher.find()) {
+                if (directoryChangeMatcher.group(1).equals("Entering")) {
+                    currentDirectory(directoryChangeMatcher.group(2));
+                }
+            }
+            
             while (true) {
                 Matcher address = addressPattern.matcher(line);
+                File file = null;
+                String tail = "";
                 boolean foundAddress = address.find();
+                if (foundAddress) {
+                    /*
+                     * We're most useful in providing links to grep matches, so we
+                     * need to avoid being confused by stuff like File.java:123.
+                     */
+                    String name = address.group(1);
+                    int colonIndex = name.indexOf(':');
+                    if (colonIndex != -1) {
+                        tail = name.substring(colonIndex);
+                        name = name.substring(0, colonIndex);
+                    }
+                    
+                    /*
+                     * If the file doesn't exist, this wasn't a useful match.
+                     */
+                    if (name.startsWith("/") || name.startsWith("~")) {
+                        file = FileUtilities.fileFromString(name);
+                    } else {
+                        file = new File(currentDirectory(), name);
+                    }
+                    foundAddress = file.exists();
+                }
                 
                 Matcher color = colorPattern.matcher(line);
                 boolean foundColor = color.find();
@@ -122,7 +158,8 @@ public class LinkFormatter {
                 // Only do whichever comes first (because it will invalidate the other's group start and end).
                 // An alternative implementation might keep offsets into the line rather than substringing it.
                 if (addressStart < colorStart) {
-                    line = processAddress(document, line, address);
+                    String linkText = FileUtilities.getUserFriendlyName(file) + tail;
+                    line = processAddress(document, line, address, linkText);
                 } else {
                     line = processColor(document, line, color);
                 }
@@ -163,5 +200,13 @@ public class LinkFormatter {
         result.y = Math.max(0, result.y);
         result.y = Math.min(maxYDisplayStart, result.y);
         return result;
+    }
+    
+    private void currentDirectory(String directory) {
+        currentDirectory = new File(directory);
+    }
+    
+    private File currentDirectory() {
+        return currentDirectory;
     }
 }

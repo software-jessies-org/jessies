@@ -45,7 +45,7 @@ public class BuildAction extends ETextAction {
         } else if (makefileName.endsWith("build.xml")) {
             invokeBuildTool(workspace, makefileName, "ant -emacs -quiet");
         } else if (makefileName.endsWith("Makefile")) {
-            String makeCommand = Parameters.getParameter("make.command", "make");
+            String makeCommand = Parameters.getParameter("make.command", "make") + " --print-directory";
             invokeBuildTool(workspace, makefileName, makeCommand);
         }
     }
