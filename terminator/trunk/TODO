@@ -1,7 +1,9 @@
 * Doing "Clear Scrollback" a number of times results in no redraw of the prompt.
   I think bash tries to be clever, and recognizes that nothing's changed, and
   assumes we haven't already cleared the display. Somehow Terminal doesn't have
-  this problem, so it is fixable.
+  this problem, so it is fixable. What we need to do is (a) nothing if we're in
+  alternate buffer mode, and (b) not involve the application otherwise; we
+  need to do all the redrawing.
 
 * Our sideways-scrolling performance is weak when we have long lines. We don't
   take the clip rectangle into account to try to avoid work, and ask
