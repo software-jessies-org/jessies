@@ -41,11 +41,17 @@ public class ETree extends JTree {
     /**
      * Selects the nodes matching the given string. The matching is
      * a case-insensitive substring match. The selection is not cleared
-     * first; you must do this yourself.
+     * first; you must do this yourself if it's the behavior you want.
+     * 
+     * If ensureVisible is true, the first selected node in the model
+     * will be made visible via scrollPathToVisible.
      */
-    public void selectNodesMatching(String string) {
+    public void selectNodesMatching(String string, boolean ensureVisible) {
         TreePath path = new TreePath(getModel().getRoot());
         selectNodesMatching(path, string.toLowerCase());
+        if (ensureVisible) {
+            scrollPathToVisible(getSelectionPath());
+        }
     }
     
     private void selectNodesMatching(TreePath parent, String string) {
