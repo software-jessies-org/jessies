@@ -1,4 +1,4 @@
 #!/bin/bash
-tool_dir=`dirname $0`/classes
+tool_dir=`dirname $0`/../classes
 salma_hayek_dir=$tool_dir/../../salma-hayek/classes
 exec java -cp $tool_dir:$salma_hayek_dir KnowAll "$@"
