@@ -7,4 +7,4 @@ default: build build.pty
 build.pty:
 	@$(MAKE) -C pty
 
-include java.make
+include ../salma-hayek/java.make
