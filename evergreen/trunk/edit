@@ -43,7 +43,6 @@ exec $JAVA $OS_SPECIFIC_OPTIONS \
     $EXTRA_JAVA_OPTIONS \
     $HEAP_SIZE \
     -classpath $EDIT_HOME/classes:$EXTRA_CLASSPATH_ENTRIES \
-    -Denv.ANT_HOME=$ANT_HOME \
     -Denv.DISPLAY=$DISPLAY \
     -Denv.EDIT_HOME=$EDIT_HOME \
     -Denv.HOME=$HOME \
