@@ -1,0 +1,28 @@
+TODO file for the Terminator project.
+This file contains all the stuff which still needs to be decided, considered or done.
+If you want to take over an item, please assign it to yourself in your own section.
+When adding stuff, please put a priority to its left.  Priorities range from 1-5, with
+5 most important and 1 least.
+
+
+Unassigned TODOs:
+~~~~~~~~~~~~~~
+[5]	Implement 'mode 1' - client-side manipulation of the cursor position when the
+	cursor keys are used.
+[3]	Add hyperlink following support for stuff like http: mailto: and telnet:
+[3]	Add ssh support.
+[1]	Fix double-click selection so it selects a word (maybe bracket-matching aswell).
+
+
+
+Phil's TODOs:
+~~~~~~~~~~
+[5]	Copy selected text to the clipboard when a selection drag has finished.
+[5]	Implement auto-scrolling when someone's dragging a selection outside the
+	visible area.
+
+
+
+Elliott's TODOs:
+~~~~~~~~~~~
+[3]	Implement searching.

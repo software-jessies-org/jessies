@@ -58,7 +58,7 @@ public class TextBuffer implements TelnetListener {
 		while (highLine - lowLine > 1) {
 			int averageCharsPerLine = (high - low) / (highLine - lowLine);
 			int projectedLineOffset = (charIndex - low) / averageCharsPerLine;
-			int midLine = lowLine + Math.max(1, Math.min(high - low - 1, projectedLineOffset));
+			int midLine = lowLine + Math.max(1, Math.min(high - low - 2, projectedLineOffset));
 			int mid = getStartIndex(midLine);
 			if (mid <= charIndex) {
 				lowLine = midLine;
