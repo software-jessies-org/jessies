@@ -19,8 +19,8 @@
 
 REQUIRED_MAKE_VERSION = 3.80
 REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
-ifneq "$(REQUIRED_MAKE_VERSION)" \
-      "$(word 1,$(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))"
+EARLIER_MAKE_VERSION = $(firstword $(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))
+ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     $(error This makefile requires at least version $(REQUIRED_MAKE_VERSION) of GNU make, but you're using $(REAL_MAKE_VERSION))
 endif
 
