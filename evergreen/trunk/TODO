@@ -11,7 +11,7 @@ find in files:
  9. shouldn't be modal; there's no reason not to want to keep search results around arbitrarily long (see Xcode for an example of this taken to its extreme).
 
 spelling checking:
- 1. improve ispell's suggestions by not suggesting spaces or hyphens; can we guess whether to use _ or camelCase?
+ 1. add a way to show a short list of the misspelled words in the current file. and a way to add them to an exclusion list? or find/replace them?
  2. should we be less eager? have a timer so we don't literally check as you type each character? i think what i'd really like is two alpha values: one for misspelling-in-progress that's significantly lighter than finished-misspelling (which can be the same as what we're using at the moment), or some kind of scheme where alpha increases with age?
  3. is there a bug with misspellings at end-of-file?
  4. instead of dumping everything in the known-bad hash, we should only pay attention to 'misspellings' left in files when they're written. the known-bad hash contains too many spellings-in-progress.
