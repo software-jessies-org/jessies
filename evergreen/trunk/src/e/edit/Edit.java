@@ -727,9 +727,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         
         startEditServer();
         
-        boolean atSide = (Parameters.getParameter("os.name").indexOf("Mac OS") != -1);
         UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
-        tabbedPane = new JTabbedPane(atSide ? JTabbedPane.LEFT : JTabbedPane.TOP);
+        tabbedPane = new JTabbedPane(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 Edit.getTagsPanel().ensureTagsAreHidden();
