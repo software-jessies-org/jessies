@@ -40,6 +40,7 @@ public class TagsPanel extends JPanel {
     
     public TagsPanel() {
         setLayout(new BorderLayout());
+        add(createSearchField(), BorderLayout.NORTH);
         add(createUI(), BorderLayout.CENTER);
         startFollowingFocusChanges();
     }
@@ -53,6 +54,17 @@ public class TagsPanel extends JPanel {
                 }
             }
         };
+    }
+    
+    public JComponent createSearchField() {
+        final SearchField searchField = new SearchField();
+        searchField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                tree.clearSelection();
+                tree.selectNodesMatching(searchField.getText());
+            }
+        });
+        return searchField;
     }
     
     public JComponent createUI() {
@@ -73,7 +85,7 @@ public class TagsPanel extends JPanel {
         tree = new ETree(new DefaultTreeModel(new DefaultMutableTreeNode("")));
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         tree.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getPathForLocation(e.getX(), e.getY()).getLastPathComponent();
@@ -93,7 +105,6 @@ public class TagsPanel extends JPanel {
     }
     
     private static class BranchNode extends DefaultMutableTreeNode {
-        
         public BranchNode(Object userObject) {
             super(userObject);
         }
@@ -207,7 +218,7 @@ public class TagsPanel extends JPanel {
     }
     
     public void setVisibleComponent(Component c) {
-        removeAll();
+        remove(emptyPanel);
         add(c, BorderLayout.CENTER);
         c.invalidate();
         revalidate();
