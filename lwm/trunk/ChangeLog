@@ -1,6 +1,6 @@
 Change Log for "lwm"
 
-20045-01-28	jfc	York
+2005-01-28	jfc	York
 
 	Applied a patch from Chris Reece that ensures that the popup
 	menu does not disappear off the bottom of the screen.
@@ -19,7 +19,7 @@ Change Log for "lwm"
 	Added missing -lSM to no_xmkmf_makefile.
 
 2003-12-09	jfc	York
- 
+
 	Fixed bug (reported by Matthew Wilcox) where windows with extremely
 	long names could cause the pop menu to be unusable. Fixed by
 	maintaining a separate, shortened name for the menu, if

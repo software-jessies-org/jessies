@@ -115,14 +115,14 @@ menuhit(XButtonEvent *e) {
 	start_x = e->x - width / 2;
 	start_y = e->y - height / 2;
 	
-	if (start_x < 0)
-		start_x = 0;
 	if (start_x + width > current_screen->display_width)
 		start_x = current_screen->display_width - width;
-	if (start_y < 0)
-		start_y = 0;
+	if (start_x < 0)
+		start_x = 0;
 	if (start_y + (height * length) > current_screen->display_height)
 		start_y = current_screen->display_height - (height * length);
+	if (start_y < 0)
+		start_y = 0;
 
 	
 	current_item = menu_whichitem(e->x_root, e->y_root);
