@@ -1,0 +1,108 @@
+<html>
+ <head>
+  <title>KnowAll</title>
+ </head>
+<body>
+
+<h1>KnowAll</h1>
+
+<blockquote>
+
+<h2>Introduction</h2> <blockquote>
+
+<p>I've been writing this program for years. Or rather, I've been trying out
+various implementations of this idea for years. And so have other people; it's
+a popular idea.
+
+<p>As computers get faster, more searching is done automatically. Mac OS X
+hardly ever requires you to ask for a search to be performed: searches happen
+as you type. Although Adobe can't manage any kind of usable searching of PDF
+documents, Apple made sure that their
+<a href="http://www.apple.com/macosx/features/preview/">Preview</a>
+is fast enough to work as you type. If
+you haven't tried it, you should: it's an eye-opener. Likewise, iTunes filters
+the list of tracks as you type in its search field.
+So does <a href="http://www.apple.com/ical/">iCal</a>. Why wait?
+
+<p>My editor, Edit, even does regular expression searching as you type,
+highlighting all the matches in the document. And it works fine on even
+the most tasteless of multi-thousand line source files. (In an even more
+concerted attempt to make some use of the large amounts of spare
+processing power we have available while not compiling, Edit alpha-blends
+the match highlights in. Welcome to the future, where everything is free.)
+
+<p>Everybody's favorite way of searching (<a href="http://www.google.com/">Google</a>, silly!) remains kind of old-fashioned.
+You open a new web browser window, type or paste a search
+string, and hit Return. And yet it's still my search method of choice, and
+probably yours too, despite various kinds of competition. I believe the reason
+for this is because it doesn't require you to think about what you want, or
+what you're doing. KnowAll is an attempt to take these ideas &ndash; automatic
+search and "do everything I could have meant" &ndash; a step further.
+
+</blockquote> <h2>Kinds of Search</h2> <blockquote>
+
+<p>My first implementation of this kind of idea was in Edit. Edit supports
+plug-ins called Researchers that have the currently-selected or just-typed
+text sent to them whenever the user pauses. Relatively few Researchers were
+written, varying in usefulness from the JavaDocResearcher which we use all
+the time to go from a class or method name to its documentation or source,
+through the equivalent RubyResearcher (less useful only because we write
+less Ruby) to the ManPageResearcher and NumberResearcher (which shows numbers
+in alternative bases, and interpreted as ASCII bytes), which are rarely
+useful. The main problem with this system is that it's specific to Edit. It's
+not easy to offer the same functionality in other Java programs (though some
+refactoring work could fix this), and it's impossible to offer it in non-Java
+programs, or programs we don't have the source to. It's not easy to see, for
+example, how we'd extend this functionality to the web browser.
+
+<p>My next implementation, Assist, was quite different. It was a stand-alone
+program, brought up via hotkey, with a single text field and a couple of
+buttons. In its simplest form, it would just pass what you'd typed on to
+Google via your default web browser. If it recognized what you'd typed as
+being in a special form, though, it would do a more directed search. So a
+UK post code would open a <a href="http://www.multimap.com/">Multimap</a> map
+of the area, for example. Somehow, though, I kept finding myself just using
+Google. 
+
+<p>Most recently, I wrote a plug-in for Apple's
+<a href="http://www.apple.com/macosx/features/addressbook/">Address Book</a>
+to show maps for UK addresses. For some reason, the built-in "Map Of"
+functionality only works for US addresses. You may have noticed this
+functionality keeps cropping up: I think that's because an address is never
+the information I want (I haven't written a single letter this century).
+What I want is to know where somewhere is, and a picture &ndash; we call them
+maps &ndash; is usually the best way to do that. I was struck by the fact
+that there's no obvious reason why the only addresses in our address books
+are interesting. If anything, you'd expect to be more likely to know how to
+get to where the people in your address book live than to some random address
+in a web page. How annoying, then, that there's no easy way to go from an
+address in a web page to a map. I could write a
+<a href="http://www.macdevcenter.com/pub/a/mac/2004/06/04/cm_pt2.html">contextual menu plug-in for Mac OS</a>, but that would be Mac OS-specific, and mean
+writing another C program; something I've sworn never to do again. It's also
+solving a very specific problem. Why aren't I as interested in ISBN numbers,
+or Jikes bug numbers, say? Or getting a dictionary definition of a word?
+
+<p>...
+
+<dl>
+<dt><a href="http://ranchero.com/huevos/">Huevos</a>
+<dd>Manual invocation, no attempt to recognize kinds of input, extensible, no application support required.
+
+<dt><a href="http://www.google.com/">Google</a>
+<dd>Manual invocation, some attempts to recognize kinds of input, closed, no application support required.
+
+<dt><a href="http://www.nat.org/dashboard/">Dashboard</a>
+<dd>Automatically invoked, many attempts to recognize kinds of input, extensible, application support required.
+
+<dt>KnowAll
+<dd>Semi-automatic invocation (you have to copy to the clipboard), many attempts to recognize kinds of input, extensible, no application support required.
+</dl>
+
+</blockquote> <hr noshade>
+
+<p>Copyright (C) 2004, Elliott Hughes.
+
+</blockquote>
+
+</body>
+</html>

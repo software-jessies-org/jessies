@@ -1,0 +1,35 @@
+Recognizers:
+
+For developers:
+
+* defect number -> defect tracking system's web page for that defect
+
+* man pages
+  how do we show a man page? should we just choose a good web site?
+  nroff into a temporary file and alert Edit?
+
+* JavaDoc (class names, method names, field names)
+
+* Objective-C documentation
+
+For general users:
+
+* country names -> CIA world fact book; Ed's map program
+  http://www.iso.ch/iso/en/prods-services/iso3166ma/02iso-3166-code-lists/list-en1.html -- list of ISO country names/codes
+  http://www.cia.gov/cia/publications/factbook/ -- downloadable, also has list of names (and flags for use as link icons)
+
+* placenames -> weather reports
+  ("http://www.bbc.co.uk/cgi-bin/weather/world_location/location.cgi?wlocation=" + s.replace(' ', '+');)
+  need a list of city names? international?
+
+* dictionary definitions ("http://dictionary.reference.com/search?q=$1")
+
+* translations of non-English text
+  how to recognize?
+
+* areas/populations -> local comparisons
+* film titles -> imdb
+* actor/actress/director names -> imdb
+* friends' names -> address book entries
+* matching tracks in iTunes
+* matching web browser bookmarks
