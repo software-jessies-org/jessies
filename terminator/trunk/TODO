@@ -26,7 +26,7 @@ The flashing green underline of a cursor is often difficult to find.  Fine by me
 
 Should allow the user to specify a log filename per tab, on the command line.
 
-* "Connect to Server" CS-K; don't implement Rendevouz (unless you're bored!)
+* "Connect to Server" CS-K; don't implement Rendezvous (unless you're bored!)
   but take (user@)?host and port-scan for ssh, and fall back to telnet.
 
 * Try to make sure we never cache options. Then we can think about adding stuff
