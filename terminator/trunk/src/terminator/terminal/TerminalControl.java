@@ -276,6 +276,8 @@ public class TerminalControl implements Runnable {
 			case 'j': return '\u2518';
 			case 'l': return '\u250c';
 			case 'k': return '\u2510';
+			case 't': return '\u251c';
+			case 'u': return '\u2524';
 			default:
 				return ch;
 		}
