@@ -1,5 +1,6 @@
 package terminatorn;
 
+import java.awt.*;
 import java.util.*;
 
 /**
@@ -16,12 +17,17 @@ public class Highlight {
 	private Location start;
 	private Location end;
 	private StyleMutator style;
+	private Cursor cursor = null;
 	
 	public Highlight(Highlighter highlighter, Location start, Location end, StyleMutator style) {
 		this.highlighter = highlighter;
 		this.start = start;
 		this.end = end;
 		this.style = style;
+	}
+	
+	public void setCursor(Cursor cursor) {
+		this.cursor = cursor;
 	}
 	
 	public Highlighter getHighlighter() {
@@ -38,6 +44,10 @@ public class Highlight {
 	
 	public StyleMutator getStyleMutator() {
 		return style;
+	}
+	
+	public Cursor getCursor() {
+		return cursor;
 	}
 	
 	/**
