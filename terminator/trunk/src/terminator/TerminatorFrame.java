@@ -95,6 +95,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		// FIXME: until Mac OS has Java 1.5, we'll have to set the java.awt.Window.locationByPlatform property instead.
 		//frame.setLocationByPlatform(true);
 		frame.setVisible(true);
+		WindowMenu.getSharedInstance().addWindow(frame);
 	}
 	
 	private void initTerminals() {
