@@ -69,7 +69,7 @@ public class JavaDoc {
         classLoader = new URLClassLoader((URL []) urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
         
         // Note the locations of documents and source files.
-        docs = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.doc", ""));
+        docs = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.doc", "http://java.sun.com/j2se/1.5.0/docs/api/"));
         sources = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.source", ""));
         
         int totalPkgs = packageNames.size();
@@ -186,6 +186,10 @@ public class JavaDoc {
             return cached;
         }
         for (int i = 0; i < roots.length; i++) {
+            if (roots[i].length() == 0) {
+                continue;
+            }
+            
             // The separator is always '/' for a URL, but it might not be for source.
             // FIXME: should we insist on "file://" for specifying source locations?
             char separator = (type == DOC) ? '/' : File.separatorChar;
