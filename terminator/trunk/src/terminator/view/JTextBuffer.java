@@ -215,8 +215,19 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		scrollHorizontallyToShowCursor();
 	}
 	
+	private boolean isLineVisible(int lineIndex) {
+		return (lineIndex >= getFirstVisibleLine() && lineIndex <= getLastVisibleLine());
+	}
+	
 	private void scrollHorizontallyToShowCursor() {
 		JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
+		
+		if (isLineVisible(getCaretPosition().getLineIndex()) == false) {
+			// We shouldn't be jumping the horizontal scroll bar
+			// about because of new output if the user's trying to
+			// review the history.
+			return;
+		}
 		
 		// FIXME: we don't necessarily have a horizontal position that
 		// corresponds to where the cursor is. This is probably a
