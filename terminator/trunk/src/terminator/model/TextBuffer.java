@@ -392,10 +392,10 @@ public class TextBuffer implements TerminalListener {
 	public void processLine(String line) {
 		TextLine textLine = get(caretPosition.getLineIndex());
 		if (insertMode) {
-			Log.warn("Inserting text \"" + line + "\" at " + caretPosition + ".");
+//			Log.warn("Inserting text \"" + line + "\" at " + caretPosition + ".");
 			textLine.insertTextAt(caretPosition.getCharOffset(), line, currentStyle);
 		} else {
-			Log.warn("Writing text \"" + line + "\" at " + caretPosition + ".");
+//			Log.warn("Writing text \"" + line + "\" at " + caretPosition + ".");
 			textLine.writeTextAt(caretPosition.getCharOffset(), line, currentStyle);
 		}
 		textAdded(line.length());
