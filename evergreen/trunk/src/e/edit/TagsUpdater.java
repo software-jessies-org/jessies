@@ -249,6 +249,7 @@ public class TagsUpdater {
                 String newDigest = tagReader.getTagsDigest();
                 tagsHaveNotChanged = newDigest.equals(digest);
                 digest = newDigest;
+                temporaryFile.delete();
             } catch (Exception ex) {
                 Edit.getCurrentWorkspace().reportError("Tags", "Couldn't make tags.");
                 ex.printStackTrace();
