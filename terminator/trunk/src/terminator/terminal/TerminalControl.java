@@ -293,19 +293,6 @@ public class TerminalControl implements Runnable {
 		}
 	}
 	
-	/**
-	 * Send a fake resize notification so the application gets a SIGWINCH
-	 * and redraws itself.
-	 */
-	public void sendRedrawScreen() {
-		try {
-			out.sendResizeNotification(pane.getTextPane().getModel().getCurrentSizeInChars(), new Dimension());
-			out.flush();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
-	
 	public void sendChar(char ch) {
 		try {
 			out.write((byte) ch);

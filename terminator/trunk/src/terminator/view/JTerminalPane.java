@@ -469,16 +469,6 @@ public class JTerminalPane extends JPanel {
 		textPane.paste();
 	}
 	
-	public void doClearScrollbackAction() {
-		// FIXME: really, we should still clear everything off-screen.
-		if (textPane.getModel().usingAlternativeBuffer()) {
-			return;
-		}
-		
-		textPane.clearScrollBuffer();
-		control.sendRedrawScreen();
-	}
-	
 	public void doCloseAction() {
 		control.destroyProcess();
 		getTerminatorFrame().closeTerminalPane(this);

@@ -77,23 +77,45 @@ public class TextBuffer implements TerminalListener {
 		}
 	}
 	
-	public void reset() {
+	public void clearScrollBuffer() {
+		// FIXME: really, we should still clear everything off-screen.
+		if (usingAlternativeBuffer()) {
+			return;
+		}
+
+		// We want to keep any lines after the caret, so remember them.
+		// FIXME: if the user's editing a really long logical line at
+		// the bash prompt, it may have manually wrapped it onto
+		// multiple physical lines, and the caret may not be on the
+		// first of those lines. Ideally we should keep all pertinent
+		// lines. Unfortunately, I can't see how we'd know.
+		ArrayList retainedLines = new ArrayList(textLines.subList(caretPosition.getLineIndex(), textLines.size()));
+
 		// Revert to just the right number of empty lines to fill the
 		// current window size.
+		// Using a new ArrayList ensures we free space without risking
+		// expensive nulling-out of now-unused elements. The assumption
+		// being that we're most likely to be asked to clear the
+		// scrollback when it's insanely large.
 		Dimension oldSize = getCurrentSizeInChars();
 		textLines = new ArrayList();
 		setSize(width, view.getVisibleSizeInCharacters().height);
 		maxLineWidth = width;
 		
+		// Re-insert the lines after the caret.
+		for (int i = 0; i < retainedLines.size(); ++i) {
+			insertLine(i, (TextLine) retainedLines.get(i));
+		}
+		
 		// Make sure all the lines will be redrawn.
 		view.sizeChanged(oldSize, getCurrentSizeInChars());
 		lineIsDirty(0);
 		
-		// Home the cursor.
+		// Re-position the cursor.
 		// FIXME: it's a bit crazy that these aren't tied!
 		// FIXME: it's even crazier that they use different origins!
-		setCursorPosition(1, 1);
-		view.setCaretPosition(new Location(0, 0));
+		setCursorPosition(-1, 1);
+		view.setCaretPosition(caretPosition);
 		
 		// Redraw ourselves.
 		view.repaint();

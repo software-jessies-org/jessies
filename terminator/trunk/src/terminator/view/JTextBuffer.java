@@ -305,10 +305,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return new Dimension(model.getMaxLineWidth() * character.width, model.getLineCount() * character.height);
 	}
 	
-	public void clearScrollBuffer() {
-		model.reset();
-	}
-	
 	// Highlighting support.
 	
 	/**
