@@ -492,6 +492,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public void focusLost(FocusEvent event) {
 		hasFocus = false;
+		blinkOn = true;
 		cursorBlinker.stop();
 		redrawCaretPosition();
 	}
