@@ -297,6 +297,18 @@ public class FileUtilities {
         return result.toString();
     }
     
+    /**
+     * Returns a file found relative to the root of the salma-hayek
+     * installation. This will break if FileUtilities moves package, if the
+     * classes directory moves from the root of salma-hayek, or if the
+     * salma-hayek classes for an application aren't actually in a copy of
+     * the salma-hayek directory structure.
+     */
+    public static File getSalmaHayekFile(String pathFromSalmaHayekRoot) {
+        String salmaHayekRoot = new File(FileUtilities.class.getResource("../..").getPath()).getParent();
+        return fileFromParentAndString(salmaHayekRoot, pathFromSalmaHayekRoot);
+    }
+    
     public static void main(String[] args) {
         for (int i = 0; i < args.length; ++i) {
             String filename = args[i];
