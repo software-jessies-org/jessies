@@ -61,6 +61,12 @@ public class EWindow extends JComponent {
     /** Invoked when the window is about to be closed. */
     public void windowClosing() { }
     
+    public void ensureSufficientlyVisible() {
+        if (getHeight() < 2 * titleBar.getHeight()) {
+            expand();
+        }
+    }
+    
     public void expand() {
         getColumn().expandComponent(this);
     }
