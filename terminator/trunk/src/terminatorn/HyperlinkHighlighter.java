@@ -50,7 +50,6 @@ public class HyperlinkHighlighter implements Highlighter {
 	{
 		linkers.add(new HyperLinker("(\\b(http|https|ftp):/*[^\\s:\"]+(:\\d+)?[/\\w\\.\\?&=\\+]*)", 1, "open $1", false));
 		linkers.add(new HyperLinker("(?:^| |\")(/[^ :\"]+\\.\\w+([\\d:]+)?)", 1, "vi $1", false));
-		linkers.add(new HyperLinker("mercury:([^$]+)\\$", 1, "echo $1", false));
 		linkers.add(new HyperLinker("(\\btelnet:([a-zA-Z0-9-_\\.]+))", 1, "telnet $2", true));
 		linkers.add(new HyperLinker("(\\brsh:([a-zA-Z0-9-_\\.]+))", 1, "rsh $2", true));
 		linkers.add(new HyperLinker("(\\bssh:([a-zA-Z0-9-_\\.@]+))", 1, "ssh $2", true));
