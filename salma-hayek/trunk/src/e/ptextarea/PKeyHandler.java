@@ -77,19 +77,18 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     public void keyTyped(KeyEvent event) {
-        long startTime = System.currentTimeMillis();
-        if (event.isControlDown()) {
-            // Do nothing.
-        } else {
-            if (isInsertableCharacter(event.getKeyChar())) {
-                insertCharacter(event.getKeyChar());
-            }
+        if (isInsertableCharacter(event)) {
+            insertCharacter(event.getKeyChar());
+            event.consume();
         }
-        System.err.println("keyTyped took " + (System.currentTimeMillis() - startTime) + "ms.");
     }
     
-    private boolean isInsertableCharacter(char ch) {
-        switch (ch) {
+    private boolean isInsertableCharacter(KeyEvent e) {
+        if (e.isAltDown() || e.isAltGraphDown() || e.isControlDown() || e.isMetaDown()) {
+            return false;
+        }
+        
+        switch (e.getKeyChar()) {
         case KeyEvent.CHAR_UNDEFINED:
         case '\010':  // backspace
         case '\177':  // delete
