@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import e.util.*;
 
 /**
 A JTextBuffer provides the visible display of the virtual terminal.

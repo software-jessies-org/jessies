@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import e.util.*;
 
 /**
 Telnet stream control object - manages the interface between the rest of the Java code and the
