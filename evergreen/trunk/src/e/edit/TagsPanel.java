@@ -162,6 +162,7 @@ public class TagsPanel extends JPanel {
             if (node.getUserObject() instanceof TagReader.Tag) {
                 TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
                 visibilityColor = tag.visibilityColor();
+                setForeground(visibilityColor == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
                 typeMarker = (Shape) TYPE_SHAPES.get(String.valueOf(tag.type));
                 tagIsStatic = tag.isStatic;
             }
