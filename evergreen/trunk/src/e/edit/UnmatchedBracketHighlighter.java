@@ -95,6 +95,40 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
     private static final Rewriter STRING_LITERALS = new SameLengthRewriter("(\"([^\\n]*?)\")");
     private static final Rewriter C_PLUS_PLUS_COMMENTS = new SameLengthRewriter("(//[^\\n]*)");
     private static final Rewriter C_COMMENTS = new SameLengthRewriter("(/\\*(?s).*?\\*/)");
+    
+    public class BracketSite {
+        private final String indentation;
+        private final char bracketCharacter;
+        
+        public BracketSite(final String indentation, final char bracketCharacter) {
+            this.indentation = indentation;
+            this.bracketCharacter = bracketCharacter;
+        }
+        
+        public char getClosingCharacter() {
+            if (bracketCharacter == '(') {
+                return ')';
+            }
+            if (bracketCharacter == '{') {
+                return '}';
+            }
+            throw new RuntimeException("invalid opening bracket character " + bracketCharacter);
+        }
+        
+        public boolean equals(Object object) {
+            BracketSite rhs = (BracketSite) object;
+            return indentation.equals(rhs.indentation) && bracketCharacter == rhs.bracketCharacter;
+        }
+        
+        public int hashCode() {
+            return indentation.length() + bracketCharacter;
+        }
+        
+        public boolean isClosedBy(BracketSite closingSite) {
+            BracketSite expectedClosingSite = new BracketSite(indentation, getClosingCharacter());
+            return closingSite.equals(expectedClosingSite);
+        }
+    }
 
     private void updateHighlights() {
         removeHighlights();
@@ -108,7 +142,6 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
 
         try {
             Highlighter highlighter = textComponent.getHighlighter();
-            int parenthesisNesting = 0;
             Stack indentationStack = new Stack();
             String indentation = "";
             boolean withinIndent = true;
@@ -125,32 +158,19 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
                     }
                 }
                 boolean addHighlight = false;
-                if (ch == '(') {
-                    ++parenthesisNesting;
-                } else if (ch == ')') {
-                    --parenthesisNesting;
-                } else if (ch == '{') {
-                    if (parenthesisNesting != 0) {
-                        addHighlight = true;
-                    }
-                    indentationStack.push(indentation);
-                } else if (ch == '}') {
-                    if (parenthesisNesting != 0) {
-                        addHighlight = true;
-                    }
+                if (ch == '(' || ch == '{') {
+                    indentationStack.push(new BracketSite(indentation, ch));
+                } else if (ch == ')' || ch == '}') {
                     if (indentationStack.empty()) {
                         addHighlight = true;
                     } else {
-                        String openingIndentation = (String) indentationStack.pop();
-                        if (openingIndentation.equals(indentation) == false) {
+                        BracketSite openingBracketSite = (BracketSite) indentationStack.peek();
+                        if (openingBracketSite.isClosedBy(new BracketSite(indentation, ch)) == false) {
                             addHighlight = true;
+                        } else {
+                            indentationStack.pop();
                         }
                     }
-                }
-                
-                if (parenthesisNesting < 0) {
-                    addHighlight = true;
-                    parenthesisNesting = 0;
                 }
 
                 if (addHighlight) {
