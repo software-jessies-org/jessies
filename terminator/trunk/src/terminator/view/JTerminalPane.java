@@ -147,6 +147,7 @@ public class JTerminalPane extends JPanel {
 		textPane.sizeChanged();
 		try {
 			control = new TerminalControl(this, textPane.getModel(), command, process, ignoreExitStatus);
+			textPane.setTerminalControl(control);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}

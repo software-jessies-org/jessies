@@ -62,11 +62,11 @@ public class PtyOutputStream extends OutputStream {
 		}
 	}
 	
-	public void close() throws IOException {
+	public synchronized void close() throws IOException {
 		out.close();
 	}
 	
-	public void flush() throws IOException {
+	public synchronized void flush() throws IOException {
 		out.flush();
 	}
 }
