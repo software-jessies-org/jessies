@@ -1,8 +1,13 @@
 #!/bin/bash
 TERMINATOR_HOME=`dirname $0`
 CLASSPATH=$TERMINATOR_HOME/classes:$TERMINATOR_HOME/../salma-hayek/classes
+PTY_BINARY=$TERMINATOR_HOME/pty/pty-`uname`-`arch`
 
 mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
+
+# If we don't have a pre-compiled 'pty' program for this
+# architecture, try to build it.
+test -e $PTY_BINARY || make -C pty/
 
 case "`uname`" in
 Darwin)
@@ -12,4 +17,4 @@ Darwin)
     ;;
 esac
 
-exec java -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Dpty.binary=$TERMINATOR_HOME/pty/pty-`uname`-`arch` terminatorn.Terminator "$@"
+exec java -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Dpty.binary=$PTY_BINARY terminatorn.Terminator "$@"
