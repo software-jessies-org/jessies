@@ -1,4 +1,4 @@
-README file for Terminator, v1.1.
+README file for Terminator
 
 Please do read this file first - it's short, but important.
 
@@ -10,32 +10,9 @@ switch to another user (although sudo works fine).  Similarly, if you're
 using Terminator to run ssh, then you will want to follow the instructions
 in doc/README to install the terminfo file on the target system.
 
-In order to get the best out of Terminator, you're also recommended to
-customize the ~/.terminator configuration file to enable hyperlinks.
 Terminator will attempt to guess appropriate defaults when it's first run.
 If you run Terminator on multiple windowing environments with the same
 home directory then, er, we apologize.
 
-Terminator is a joint project between Phil Norman and Elliott Hughes.
-Started on 21st April 2004 after Elliott moaned about the lack of a really
-good terminal emulator.
-
-
-Feature List:
-
-1: Hyperlink recognition (configurable), allowing arbitrary programs to
-be run when a recognised hyperlink is clicked on.
-
-2: Multiple tabs, so you can have several terminals hidden under tabs
-within the same window.
-
-3: No line wrap, so reading a catted file is made a lot easier.
-
-4: Proper handling of tabs, so copy/pasting them into other applications
-doesn't turn them into strings of spaces.
-
-5: Fully-functioning terminal emulation.
-
-
-If you find any bugs, please report them to cuvy.abezna@virgin.net
-(Phil Norman).
+Send bug reports to software@jessies.org, being sure to include the
+word "Terminator" in your Subject: line.
