@@ -1,3 +1,9 @@
 Items to be done for PTextArea:
 
+* Move to next/previous word.
+
+* Check that unclaimed keystrokes are passed on to a JMenuBar.
+
+* Remember user-set horizontal caret position so we can move over short lines and come back to the right column. (Should it work on column, or pixels?)
+
 * Create a language-specific API to work out double-click selections, and use this in the mouse handler.
