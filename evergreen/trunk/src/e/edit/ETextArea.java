@@ -253,6 +253,8 @@ public class ETextArea extends JTextArea {
         CompoundEdit entireEdit = new CompoundEdit();
         getUndoManager().addEdit(entireEdit);
         try {
+            Position position = getDocument().createPosition(getSelectionEnd());
+            
             String replacementText = (String) content.getTransferData(DataFlavor.stringFlavor);
             
             // You don't want to paste non-breakable spaces from HTML
@@ -270,6 +272,8 @@ public class ETextArea extends JTextArea {
             } else {
                 replaceSelection(replacementText);
             }
+            
+            setCaretPosition(position.getOffset());
         } catch (Exception e) {
             getToolkit().beep();
             Log.warn("Exception in paste:" + e.toString());
