@@ -95,7 +95,7 @@ public class FindAndReplaceAction extends ETextAction {
         // (b) we make it all through the text performing replacements.
         boolean finished = false;
         while (!finished) {
-            boolean shouldReplace = FormDialog.show(Edit.getFrame(), "Find/Replace", formPanel);
+            boolean shouldReplace = FormDialog.show(Edit.getFrame(), "Find/Replace", formPanel, "Replace");
             if (shouldReplace == false) {
                 finished = true;
             } else {

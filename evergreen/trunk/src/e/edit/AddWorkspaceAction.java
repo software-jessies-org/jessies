@@ -26,7 +26,7 @@ public class AddWorkspaceAction extends AbstractAction {
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Name:", nameField);
         formPanel.addRow("Root Directory:", filenameChooserField);
-        boolean okay = FormDialog.show(Edit.getFrame(), "Add Workspace", formPanel);
+        boolean okay = FormDialog.show(Edit.getFrame(), "Add Workspace", formPanel, "Add");
         
         if (okay == false) {
             return;

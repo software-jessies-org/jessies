@@ -20,7 +20,7 @@ public class SetBuildTargetAction extends ETextAction {
         
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Build Target:", buildTargetField);
-        boolean okay = FormDialog.show(Edit.getFrame(), "Build Properties", formPanel);
+        boolean okay = FormDialog.show(Edit.getFrame(), "Build Properties", formPanel, "Apply");
         
         if (okay == false) {
             return;

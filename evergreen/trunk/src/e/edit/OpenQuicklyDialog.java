@@ -154,7 +154,7 @@ public class OpenQuicklyDialog {
         formPanel.addRow("Names Containing:", filenameField);
         formPanel.addRow("Matches:", new JScrollPane(matchList));
         formPanel.addRow("", status);
-        boolean okay = FormDialog.show(Edit.getFrame(), "Open Quickly", formPanel, makeRescanButton());
+        boolean okay = FormDialog.show(Edit.getFrame(), "Open Quickly", formPanel, "Open", makeRescanButton());
         
         if (okay == false) {
             return;
