@@ -70,7 +70,7 @@ public class PJavaTextStyler extends PCLikeTextStyler {
                         }
                         if (isError == false) {
                             // Cope with certain unicode escapes which are considered erroneous.
-                            isError = isInvalidUnicodeEscapeHex(string.substring(i + 2, i + 6));
+                            isError = isInvalidUnicodeEscape(string.substring(i, i + increment));
                         }
                     } else {
                         // Invalid escape sequence - we presume the user meant to use a two-character
@@ -106,13 +106,13 @@ public class PJavaTextStyler extends PCLikeTextStyler {
         segmentList.add(new PTextSegment(TYPE_STRING, string.substring(segmentStart)));
     }
     
-    private boolean isInvalidUnicodeEscapeHex(String escapeHex) {
+    private boolean isInvalidUnicodeEscape(String escapeHex) {
         // From section 3.10.4 (Character Literals) of the JLS:
         // Because unicode escapes are processed very early in the compilation, it is
         // not valid to use them to represent newlines or carriage returns, since they would
         // be transformed into their line-terminating character equivalents before the string
         // is parsed.
-        return escapeHex.equalsIgnoreCase("000a") || escapeHex.equalsIgnoreCase("000d");
+        return escapeHex.matches("[\\\\]u000[AaDd]");
     }
     
     private boolean isBasicEscapeCharacter(char ch) {
