@@ -73,6 +73,13 @@ public class GuiUtilities {
         return null;
     }
     
+    /**
+     * Returns the name of the system's best monospaced font.
+     */
+    public static String getMonospacedFontName() {
+        return isMacOs() ? "Monaco" : "Monospaced";
+    }
+    
     public static void initLookAndFeel() {
         try {
             String lafClassName = Parameters.getParameter("laf.className");
