@@ -197,7 +197,7 @@ endif
 .PHONY: build
 build: $(SOURCE_FILES) build.subdirs
 	@echo Recompiling the world... && \
-	 make clean && \
+	 $(MAKE) clean && \
 	 mkdir -p classes && \
 	 $(JAVA_COMPILER) $(JAVA_FLAGS) $(SOURCE_FILES)
 
