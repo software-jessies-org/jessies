@@ -1,0 +1,443 @@
+Change Log for "lwm"
+
+2003-12-09	jfc	York
+ 
+	Fixed bug (reported by Matthew Wilcox) where windows with extremely
+	long names could cause the pop menu to be unusable. Fixed by
+	maintaining a separate, shortened name for the menu, if
+	necessary ("this is a very very [...] ry long window name"). This
+	takes no account of UTF-8 names as yet.
+
+2003-12-08	jfc	York
+
+	Fixed bug (reported by Eugene Wong) where resizing the top of
+	a window would cause it to jump up several pixels. The height of
+	the titlebar was not being considered when calculating mouse
+	motion in reshaping_motionnotify().
+
+	Modified manage() to avoid autoplacing windows during
+	initialisation.
+
+	Released lwm-1.2.0.
+
+2003-12-03	jfc	York
+
+	Applied patch from Elliott that gives focus to new windows in
+	click-to-focus mode.
+
+	Changed the buttonpress code in disp.c to ignore scroll wheel
+	"clicks".
+
+	Modified Client_Remove so that, in click-to-focus mode, it
+	refocuses on the most sensible window (either the top window,
+	or the window that the closing window was a transient for).
+
+	Attempted to fix the edit placement bug by adding titleHeight()
+	to the supplied X coordinate during a ConfigureRequest event,
+	and not attempting to fix clients that don't supply a border
+	width during a configure request.
+
+	Fixed fullscreen-mode bug where galeon windows appeared to jump
+	up and to the left after the first click.
+
+	Released lwm-1.1.7.
+
+2003-11-28	jfc	York
+
+	Changed the behaviour when unhiding a window in click-to-focus mode.
+	An unhidden window now automatically gets focus in this mode.
+
+	Fixed a small bug in the session management code that could
+	cause a crash when lwm quit.
+
+	Moved a call to ewmh_set_client_list make before ewmh was
+	initialised.
+
+	Changed lwm's behaviour when minimising windows. Button three must
+	now be pressed and released before the window is hidden (or
+	moved to the bottom of the stack). This ensures that lwm swallows
+	all the events generated during the operation, and allows the user
+	to back out of the operation by moving the mouse out of the window
+	before releasing the button.
+
+	Removed include of Xm/MwmUtil.h in manage.c, and the HAVE_MOTIF
+	kludge from the Imakefile, in favour of copying the few lines
+	that are required from Xm/MwmUtil.h (LessTif, so hopefully no
+	licensing issues).
+
+	Fixed bug that caused the last cursor displayed in a frame
+	to be incorrectly used when moving into the frame when the
+	root menu was on screen. This is done by brute force -
+	see Client_ResetAllCursors().
+
+	Released lwm-1.1.6.
+
+2003-11-26	jfc	York
+
+	Fixed bug in Client_MakeSane that caused occasional crashes
+	during window moves/resizing. Should investigate why it occasionally
+	gets called with a NULL client.
+
+2003-11-03	jfc	York
+
+	Added an entry for LeaveNotify in the dispatch table (disp.c).
+
+2003-08-13	jfc	York
+
+	Removed "error" message when lwm fails to connect to a session
+	manager. This isn't actually an error and the message is confusing.
+
+2003-08-01	jfc	York
+
+	Fixed bug that allowed clients to grab the focus and confuse lwm.
+
+	Cleaned up the code for raising and lowering clients, and added
+	code to prevent a client from being raised above its transients.
+
+	Retired disp.old, and CLOSE_PATCH.txt.
+
+	Added an edge resistance to the workarea, so that window may
+	be moved to the edge of the workarea without precise mousing,
+	as requested by MAD. EDGE_RESIST in lwm.h defines the number of
+	pixels of resistance and may be safely set to zero.
+
+	Released lwm-1.1.5.
+
+2003-07-31	jfc	York
+
+	In click-to-focus mode, always draw the box in the frame.
+
+2003-07-29	jfc	York
+
+	Added a click-to-focus mode. The default remains (sloppy)
+	enter-to-focus.
+
+	Released lwm-1.1.4.
+
+
+2003-07-28	jfc	York
+
+	Updated no_xmkmf_makefile to reflect the changes made since 1.01.
+
+2003-07-10	jfc	York
+
+	Fixed a bug in manage.c than prevented lwm compiling on systems
+	with no variety of Motif installed. If this means you, remove
+	_DHAVE_MOTIF from Imakefile.
+
+	Released lwm-1.1.3.
+
+2003-07-08	jfc	York
+
+	Added support for NET_MOVERESIZE, but I cannot find any
+	applications the want to use it, apart from the keyboard
+	variants. I don't know what to do about the keyboard move/resize.
+
+2003-07-03	jfc	York
+
+	Fixed a few buglets thrown up by running lwm through the compiler
+	with all warnings on.
+
+2003-07-02	jfc	York
+
+	In Client_MakeSane(), added a check to prevent windows being
+	moved into a position where they might be completely obscured
+	by panels/docks.
+
+	Changed ewmh_set_strut() to run Client_MakeSane() across all
+	clients when the work area changes. This avoids clients getting
+	lost behind panels/docks.
+
+	Added support for _NET_WM_STATE_ABOVE and
+	_NET_WM_STATE_BELOW. Added fix_stack() to maintain the window
+	stack as dictated by the EWMH spec.
+
+2003-07-01	jfc	York
+
+	Added support for _NET_WM_STRUT. lwm now maintains _NET_WORKAREA
+	correctly, and takes the reserved space into account in its
+	window placing algorithm.
+
+	Released lwm-1.1.2.
+
+2003-06-30	jfc	York
+
+	Fixed bug that caused tk menus to be badly placed placed by
+	sending a configure notify where appropriate in setactive().
+
+	Removed compile time option of prepending window title's with
+	the client machines's name (PREPEND_CLIENT_MACHINE).
+
+	Added i18n support for window titles, using UTF8 names from
+	_NET_WM_NAME where available and supported (ie XFree86).
+
+	Added code in disp.c to change the pointer in some areas of the
+	frame to indicate the action taken by button1. I didn't allow the
+	"move" pointer in the titlebar because it looked nasty. Added
+	the xkill pointer for the the box. This was a TODO item.
+
+2003-06-28	jfc	York
+
+	Added GPL headers to all the source files.
+
+	Released lwm-1.1.1.
+
+2003-06-27	jfc	York
+
+	Fixed the bug where each GTK window generated an extra
+	window when lwm shut down by unmapping all the clients in
+	Client_FreeAll(). Elliott thinks this is bad magic, and that
+	the X server should lose the windows, but this doesn't happen
+	with XFree86.
+
+	Fixed bug, reported by Ed Porter, that caused moving the mouse
+	wheel to generate xterms. Wheel mice generate button press events
+	on buttons 4 and 5 and shell() wasn't taking this into account.
+
+	Fixed silly bug in motifWouldDecorate(): windows should have a
+	frame is MWM_DECOR_ALL is set.
+
+2003-06-26	jfc	York
+
+	Shaped windows now work again. I'm not sure what I changed
+	to break it, but the fix was to process shaped windows in
+	scanWindowTree (they were previously ignored). They had to be
+	clients anyway, if they were to appear in _NET_CLIENT_LIST.
+
+2003-06-25	jfc	York
+
+	Fixed bug that caused frameless windows to be immoveable.
+
+	In manage.c, allowed lwm to fall back on Motif hints when
+	deciding if a window should have a frame, if _NET_WM_WINDOW_TYPE
+	is not set. This breaks the EWMH spec, in that a window
+	without _NET_WM_WINDOW_TYPE should be assumed to have
+	_NET_WM_WINDOW_TYPE_NORMAL, but it's the only way for older
+	apps to indicate that they don't want decorating, and in the
+	absence of Motif hints the default state is
+	_NET_WM_WINDOW_TYPE_NORMAL.
+
+2003-06-24	jfc	York
+
+	Fixed the following TODO item:
+		allow users to back out of closing a window if
+		they leave the box before letting go of the button.
+	Implemented by adding an extra wm_closing_window mode rather
+	than adding to the Client structure, as per AMidthune's
+	patch. Not sure which is the better solution, though.
+
+	Added initial support for _NET_WM_STATE, but only for
+	_NET_WM_STATE_SKIP_TASKBAR, _NET_WM_STATE_SKIP_PAGER and
+	_NET_WM_HIDDEN.
+
+	Added simple hardwired _NET_WM_ALLOWED_ACTIONS support, and
+	support for the _NET_CLOSE_WINDOW client message.
+
+	First attempt an _WM_STATE_FULLSCREEN and a full-screen mode.
+	It's not quite right yet, but useable.
+
+
+2003-06-23	jfc	York
+
+	Fixed some silly bugs in the session management code.
+
+	Added initial EWMH code using the 1.2 spec:
+	http://www.freedesktop.org/standards/wm-spec/1.2/html/
+	Initial support covers the mechanisms for announcing support
+	for EWMH (_NET_SUPPORTED, _NET_SUPPORTING_WM_CHECK), the
+	client list and active client (_NET_CLIENT_LIST and
+	_NET_ACTIVE_WINDOW), and the window type (_NET_WM_WINDOW_TYPE).
+	Windows may now be frameless if their window type indicates.
+
+2003-06-21	jfc	York
+
+	Added session management so that GNOME2's gnome-session does
+	not wait a long timeout when starting the window manager.
+
+2000-02-08	enh	Basel
+	
+	Tried out a patch from Robert Bauer so that it's possible to move
+	windows with button 1, if you're in the ``titlebar'' (i.e. not touching
+	the top border). This makes it easier for Windows users to cope
+	with lwm, and easier for those with two-button mice (or laptops)
+	too. At the moment, "mv disp.old disp.c" will give back the old
+	behaviour.
+
+1999-11-11	enh	Basel
+
+	Fixed a cut-and-paste bug in client.c that made the check for
+	a window being too large or too small wrong. This bug was found
+	by Mike Meyer.
+
+1999-09-22	enh	Basel
+
+	Altered the button-press code so that it's now easier for unhappy
+	users to alter which button performs which function. Simply edit
+	lwm.h and modify the three relevant #define statements.
+
+1999-07-19	enh	Basel
+
+	Added a handler for circulation events so that other programs
+	can offer "Alt-Tab" functionality.
+
+1999-07-08	enh	Basel
+
+	Fixed the cosmetic problem with titlebars of dialogue boxes. If
+	this looks to be OK, I can think about another lwm release.
+
+1999-06-10	enh	Basel
+
+	Incorporated bug fix by Adrian Colley regarding the attempt in
+	manage.c to call XSetWindowBorderWidth on an InputOnly window,
+	and moved the #include of <signal.h> after <sys/types.h> so that
+	lwm can compile on Solaris 2.6. Cosmetic change to move the close
+	box to line up with the client window. The effect is spoilt if the
+	child insists on drawing a black border around itself, though.
+
+1999-02-07	enh	Basel
+	
+	Title-bars no longer pop up and down. An inactive window has a
+	grey title instead. This means less load on the server, no annoying
+	"I want to type the information from one window's title-bar into
+	the current window but can't" syndrome, and a final solution to
+	the race condition that's been with us since the very beginning.
+	
+	The size feedback no longer pops up as soon as you grab a window,
+	because that made it almost impossible to grab a window without
+	resizing it.
+
+1998-11-03	enh	Basel
+
+	The size feedback now pops up as soon as you grab a window,
+	rather than waiting for you to actually move.
+
+1998-10-06	enh	Basel
+
+	Al pointed out that my Sun actually has two framebuffers. One
+	monitor-lugging later, and I suddenly have a need for a window
+	manager that can cope with multiple screens. And here it is!
+
+1998-05-29	enh	Basel
+
+	Fixed window minimum/maximum height code so that it no longer
+	includes the title decoration. Menu now pops down if a window
+	disappears while the menu is up.
+
+1998-03-23	enh	Basel
+
+	Removed unused constant. A little tidying up, renaming.  Some
+	debugging code removed. The width of the size-feedback window
+	is now calculated at run-time depending on the size of the screen.
+
+1998-02-05	enh	Basel
+
+	Fixed bug found by Marty Olevitch: lwm's automatic window
+	placement heuristics broke down when either the right or bottom
+	of the display were reached.
+	Changed menu placement to ensure that the menu is fully
+	on-screen.
+
+1998-01-06	enh	Basel
+
+	Fixed bug found by J. Han whereby lwm dumped core if a window
+	disappeared while being reshaped.
+
+1997-09-01	enh	Basel
+
+	"Push to back" functionality moved from button 3 click in box
+	to button 3 click anywhere in frame with Shift held down.
+
+1997-08-29	enh	Basel
+
+	Simple version numbering introduced.
+
+1997-08-25	enh	Basel
+
+	Fixed stupid mistake introduced with the last change, with regard
+	to setting the input focus.
+
+1997-08-22	enh	Basel
+
+	Xt applications (strictly, applications whose window title is
+	the same as their class hint resource name) no longer have a
+	title bar. This means it's more awkward to kill them, but that
+	they don't have pointless decoration.
+
+1997-08-07	enh	Basel
+
+	Bug related to hiding windows fixed.
+
+1997-08-06	enh	Basel
+
+	The size indictor now has the correct GC settings. Whoops!
+	Improved handling of WM_NORMAL_HINTS. Amongst other things,
+	this means that size reporting of xterm et al is more reliable.
+
+1997-07-31	enh	Basel
+
+	Reshaping now uses the popup to display the current width and
+	height of the window being reshaped (in whatever units it uses).
+
+1997-07-04	enh	Swanwick
+
+	Clicking button 3 on the "box" pushes the window to the bottom.
+	Changing image in xv no longer causes the window to gravitate to
+	the southeast. There's an ICCCM convention that clients should
+	set the border width with each ConfigureWindow request. As usual,
+	many clients fail to follow this convention. I get the distinct
+	impression that the very reason for the existance of the Xt
+	library is because the X11 protocol and ICCCM are so messy and
+	involved that the only way to make X11 bearable was to write
+	this code once and for all. The menu code has been rewritten,
+	changing as a side-effect the order in which hidden windows
+	appear on the menu. The rewrite now means that the order is very
+	easy to change for experiments like alphabetical ordering etc. I
+	like it as it is: a stack.
+
+1997-06-24	enh	York
+
+	Now handles NoExpose events. Better protocol error reporting.
+	Default minimum size calculation improved.
+
+1997-06-23	enh	York
+
+	Both button 1 and 2 can now have commands associated with them.
+	See the documentation for details. Windows whose minimum and
+	maximum sizes are identical can no longer be resized. The
+	oscillation race condition is now less likely to occur. Some
+	dead code removed.
+
+1997-05-25	enh	York
+
+	lwm now does the right thing with respect to hidden windows on
+	exit and startup. a hidden window is now re-hidden if lwm exits
+	and is then restarted.
+
+1997-05-21	enh	York
+
+	Fixed a bug that meant a client could confuse lwm by remapping
+	a hidden window: the menu of hidden windows wasn't being updated.
+
+1997-05-16	enh	York
+
+	A bug relating to ConfigureRequests on the current window caused
+	the title-bar to be redrawn incorrectly. Once again, this came
+	to light with xv.
+
+	The "New Shell" command has gone from the button 3 menu, and
+	button 2 now performs this function.
+
+1997-05-09	enh	York
+
+	This version fixes a bug relating to ConfigureRequests. Client
+	windows that were resized under program control were resized,
+	but the client was misinformed as to what change had actually
+	taken place. xv's optimised redraw, for example, missed out on
+	part of the window because of this.
+	The behaviour with regard to hidden windows on exit has also
+	changed. They're now remapped, but lowered in the window stack.
+	This means that you don't lose them, but that they don't
+	obliterate the more important windows on your screen if you kill
+	the window manager.
+
+- Initial announcement on comp.windows.x.announce -

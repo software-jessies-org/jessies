@@ -1,0 +1,24 @@
+we're possibly being a bit overzealous about maintaining the window stack,
+with lots of flickering windows as a result. it's particularly noticeable
+when you're running a desktop - but then that's a stupid thing to do anyway.
+not sure how to fix it without maintaining a lot more data about the window
+stack.
+
+reported by corey holcomb-hockin: lwm producues messages like this when popups appear:
+lwm: protocol request X_ConfigureWindow on resource 0xa0000e failed: 
+BadWindow (invalid Window parameter)
+lwm: protocol request X_SendEvent on resource 0xa0000e failed: BadWindow 
+(invalid Window parameter)
+lwm: protocol request X_ConfigureWindow on resource 0xa0000e failed: 
+BadWindow (invalid Window parameter)
+lwm: protocol request X_SendEvent on resource 0xa0000e failed: BadWindow 
+(invalid Window parameter)
+lwm: protocol request X_SetInputFocus on resource 0xa0000e failed: 
+BadWindow (invalid Window parameter)
+lwm: protocol request X_SetInputFocus on resource 0x8000de failed: 
+BadMatch (invalid parameter attributes)
+
+martin and elliott still have window problems with edit, although it's
+better than it was. apparently the window is now placed correctly,
+but gets larger between successive runs. i can't reproduce this,
+unfortunately.

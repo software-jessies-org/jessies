@@ -1,0 +1,96 @@
+.\" lwm, a window manager for X11
+.\" Copyright (C) 1997-2003 Elliott Hughes, James Carter
+.\" 
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version 2
+.\" of the License, or (at your option) any later version.
+.\" 
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\" 
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+.\" 
+.TH LWM 1
+.SH NAME
+lwm \- Lightweight Window Manager for the X Window System
+.SH SYNTAX
+\fBlwm \fP[ \fB\-s\fP \fIsession-id\fP ] 
+.SH DESCRIPTION
+\fILwm\fP is a window manager for the X Window System. It provides enough
+features to allow the user to manage their windows, and no more.
+.PP
+Windows are surrounded by a frame with a 
+titlebar at the top next to a small box. The frame is a grey colour for
+all windows except that which has the input focus, where it is black.
+.PP
+In the default configuration, \fIlwm\fP uses the enter-to-focus scheme, where
+moving the pointer into a window gives that window the input focus.
+\fILwm\fP may also be configured to use the click-to-focus scheme, where a
+window must be clicked on (with any button) to receive the input focus. Clicking
+on a window in this mode causes the window to be raised. Note that a click
+used to focus a window is always swallowed by \fIlwm\fP, so clicking a
+button in a new window requires two clicks.
+.PP
+A button 1 click on a window frame brings that window to the top. Dragging
+button 1 on the frame of a resizable window repositions that edge of
+the window. If a corner rather than an edge is dragged, then both edges
+forming the corner are repositioned. While you're reshaping a window,
+a little window pops up to show you the window's current size.
+.PP
+In the default configuration, button 1 on the root window does nothing.
+.PP
+Button 2 is used to drag a window by its frame, repositioning the window
+but maintaining its position in the window stack.
+.PP
+In the default configuration, button 2 on the root window brings up a
+new shell.
+.PP
+A button 3 click on a window frame hides that window.  Pressing
+button 3 on the root window brings up a menu. The various items unhide
+the named hidden window.
+.PP
+A button 3 click in the frame while Shift is held down pushes the window
+to the back, under any other windows. (Users with 4-button mice are
+encouraged to use their fourth button for this function.)
+.PP
+A click with any button inside the little white box in a window's frame
+can be used to close the window.
+.SH OPTIONS
+\fILwm\fP accepts the following command line options:
+.PP
+.TP 8
+.B \-s
+specifies a client ID for the X Session Management system, and is used
+exclusively by session managers.
+.SH RESOURCES
+\fILwm\fP understands the following X resources:
+.TP 12
+.B titlefont
+font used in window titles
+.TP 12
+.B popupFont
+font used in popup window (menu/size indicator)
+.TP 12
+.B border
+width in pixels of window borders
+.TP 12
+.B button1
+program spawned when button 1 is clicked on the root window
+.TP 12
+.B button2
+program spawned when button 2 is clicked on the root window
+.TP 12
+.B focus
+focus mode, one of "enter" for enter-to-focus (or sloppy focus), or
+"click" for click-to-focus
+.SH "SEE ALSO"
+.PP
+X(7)
+.SH AUTHORS
+Elliott Hughes <ehughes@bluearc.com>,
+James Carter <james@jfc.org.uk>
