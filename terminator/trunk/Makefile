@@ -1,7 +1,6 @@
 PROJECT_NAME=terminator
 
 BINDIST_FILES += doc pty terminator
-SUBDIRS += pty
 
 # Variables should come before the include but rules (apart from the default
 # one) should come afterwards.
