@@ -317,23 +317,23 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
     
     private void dirtyFromOffset(PTextEvent event) {
         CharSequence seq = textArea.getPTextBuffer();
-        String checkString = event.getString();
-        if (event.getOffset() > 0) {
-            checkString = seq.charAt(event.getOffset() - 1) + checkString;
-        }
+        StringBuffer buf = new StringBuffer();
+        String prefix = seq.subSequence(Math.max(0, event.getOffset() - 2), event.getOffset()).toString();
+        int endIndex = event.getOffset();
         if (event.isInsert()) {
-            if (event.getOffset() + event.getLength() + 1 < seq.length()) {
-                checkString += seq.charAt(event.getOffset() + event.getLength());
-            }
-        } else {
-            if (event.getOffset() + 1 < seq.length()) {
-                checkString += seq.charAt(event.getOffset());
-            }
+            endIndex += event.getLength();
         }
-        if (checkString.indexOf("/*") != -1 || checkString.indexOf("*/") != -1) {
+        String suffix = seq.subSequence(endIndex, Math.min(endIndex + 1, seq.length())).toString();
+        String withMiddleText = prefix + event.getString() + suffix;
+        String withoutMiddleText = prefix + suffix;
+        if (hasCommentMarker(withMiddleText) || hasCommentMarker(withoutMiddleText)) {
             lastGoodLine = Math.min(lastGoodLine, textArea.getLineList().getLineIndex(event.getOffset()));
             textArea.repaintFromLine(textArea.getSplitLineIndex(lastGoodLine));
         }
+    }
+    
+    private boolean hasCommentMarker(String text) {
+        return (text.indexOf("/*") != -1) || (text.indexOf("*/") != -1);
     }
     
     public void textCompletelyReplaced(PTextEvent event) {
