@@ -17,12 +17,26 @@ import e.util.*;
 A text-editing component.
 */
 public class ETextWindow extends ETextComponent implements DocumentListener {
+    /**
+     * Ensures that the TagsPanel is empty if the focused window isn't an ETextWindow.
+     */
+    static {
+        new KeyboardFocusMonitor() {
+            public void focusChanged(Component oldOwner, Component newOwner) {
+                if (newOwner instanceof EWindow && newOwner instanceof ETextWindow == false) {
+                    Edit.getTagsPanel().ensureTagsAreHidden();
+                }
+            }
+        };
+    }
+    
     protected String filename;
     protected File file;
     private long lastModifiedTime;
     protected ETextArea text;
     private boolean isDirty;
     private BirdView birdView;
+    private TagsUpdater tagsUpdater;
     
     /**
      * Used to display a watermark to indicate such things as a read-only file.
@@ -76,7 +90,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         scrollPane.setViewport(watermarkViewPort);
         
         initFocusListener();
-        
+        tagsUpdater = new TagsUpdater(this);
         this.birdView = new BirdView(this, scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
@@ -616,7 +630,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             Edit.showStatus("Saved " + filename);
             markAsClean();
             this.lastModifiedTime = file.lastModified();
-            Edit.getTagsPanel().ensureTagsCorrespondTo(this);
+            tagsUpdater.updateTags();
             return true;
         } catch (IOException ex) {
             Edit.showStatus("");
