@@ -1,12 +1,8 @@
 package terminator.terminal.escape;
 
 import e.util.*;
+import terminator.model.*;
 import terminator.terminal.*;
-
-/**
-
-@author Phil Norman
-*/
 
 public class TwoCharEscapeAction implements TerminalAction {
 	private String sequence;
@@ -15,7 +11,7 @@ public class TwoCharEscapeAction implements TerminalAction {
 		this.sequence = sequence;
 	}
 
-	public void perform(TerminalListener listener) {
+	public void perform(TextBuffer listener) {
 		switch (sequence.charAt(0)) {
 			case '#':  // rxvt: if second char == '8', scr_E().
 				unsupported();

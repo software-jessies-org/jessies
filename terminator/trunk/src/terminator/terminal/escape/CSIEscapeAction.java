@@ -22,13 +22,13 @@ public class CSIEscapeAction implements TerminalAction {
 		this.sequence = sequence;
 	}
 
-	public void perform(TerminalListener listener) {
+	public void perform(TextBuffer listener) {
 		if (processSequence(listener) == false) {
 			Log.warn("Unimplemented escape sequence: \"" + sequence + "\"");
 		}
 	}
 	
-	private boolean processSequence(TerminalListener listener) {
+	private boolean processSequence(TextBuffer listener) {
 		char lastChar = sequence.charAt(sequence.length() - 1);
 		String midSequence = sequence.substring(1, sequence.length() - 1);
 		switch (lastChar) {
@@ -49,12 +49,13 @@ public class CSIEscapeAction implements TerminalAction {
 			case 'h': return setMode(listener, midSequence, true);
 			case 'l': return setMode(listener, midSequence, false);
 			case 'm': return processFontEscape(listener, midSequence);
+			case 'n': return processDeviceStatusReport(listener, midSequence);
 			case 'r': return setScrollScreen(listener, midSequence);
 			default: return false;
 		}
 	}
 	
-	public boolean clearTabs(TerminalListener listener, String seq) {
+	public boolean clearTabs(TextBuffer listener, String seq) {
 		int clearType = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		if (clearType == 0) {
 			// Clear horizontal tab at current cursor position.
@@ -70,7 +71,7 @@ public class CSIEscapeAction implements TerminalAction {
 		}
 	}
 	
-	public boolean scrollDisplayUp(TerminalListener listener, String seq) {
+	public boolean scrollDisplayUp(TextBuffer listener, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
 		for (int i = 0; i < count; i++) {
 			listener.scrollDisplayDown();
@@ -78,13 +79,13 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean insertLines(TerminalListener listener, String seq) {
+	public boolean insertLines(TextBuffer listener, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
 		listener.insertLines(count);
 		return true;
 	}
 	
-	public boolean setMode(TerminalListener listener, String seq, boolean value) {
+	public boolean setMode(TextBuffer listener, String seq, boolean value) {
 		boolean isQuestionMode = seq.startsWith("?");
 		String[] modes = (isQuestionMode ? seq.substring(1) : seq).split(";");
 		for (int i = 0; i < modes.length; i++) {
@@ -105,7 +106,7 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean setScrollScreen(TerminalListener listener, String seq) {
+	public boolean setScrollScreen(TextBuffer listener, String seq) {
 		int index = seq.indexOf(';');
 		if (index == -1) {
 			listener.setScrollScreen(-1, -1);
@@ -115,7 +116,7 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean deviceAttributesRequest(TerminalListener listener, String seq) {
+	public boolean deviceAttributesRequest(TextBuffer listener, String seq) {
 		if (seq.equals("") || seq.equals("0")) {
 			control.sendEscapeString("[?1;0c");
 			return true;
@@ -124,13 +125,13 @@ public class CSIEscapeAction implements TerminalAction {
 		}
 	}
 	
-	public boolean deleteCharacters(TerminalListener listener, String seq) {
+	public boolean deleteCharacters(TextBuffer listener, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
 		listener.deleteCharacters(count);
 		return true;
 	}
 	
-	public boolean killLineContents(TerminalListener listener, String seq) {
+	public boolean killLineContents(TextBuffer listener, String seq) {
 		int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		boolean fromStart = (type >= 1);
 		boolean toEnd = (type != 1);
@@ -138,7 +139,7 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean killLines(TerminalListener listener, String seq) {
+	public boolean killLines(TextBuffer listener, String seq) {
 		int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		boolean fromTop = (type >= 1);
 		boolean toBottom = (type != 1);
@@ -146,17 +147,17 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean moveCursorRowTo(TerminalListener listener, String seq) {
+	public boolean moveCursorRowTo(TextBuffer listener, String seq) {
 		listener.setCursorPosition(-1, Integer.parseInt(seq));
 		return true;
 	}
 	
-	public boolean moveCursorColumnTo(TerminalListener listener, String seq) {
+	public boolean moveCursorColumnTo(TextBuffer listener, String seq) {
 		listener.setCursorPosition(Integer.parseInt(seq), -1);
 		return true;
 	}
 	
-	public boolean moveCursorTo(TerminalListener listener, String seq) {
+	public boolean moveCursorTo(TextBuffer listener, String seq) {
 		int x = 1;
 		int y = 1;
 		int splitIndex = seq.indexOf(';');
@@ -168,7 +169,7 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean moveCursor(TerminalListener listener, String countString, int xDirection, int yDirection) {
+	public boolean moveCursor(TextBuffer listener, String countString, int xDirection, int yDirection) {
 		int count = (countString.length() == 0) ? 1 : Integer.parseInt(countString);
 		if (xDirection != 0) {
 			listener.moveCursorHorizontally(xDirection * count);
@@ -179,7 +180,23 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean processFontEscape(TerminalListener listener, String sequence) {
+	private boolean processDeviceStatusReport(TextBuffer listener, String sequence) {
+		switch (Integer.parseInt(sequence)) {
+		case 5:
+			control.sendEscapeString("[0n");
+			return true;
+		case 6:
+			Location location = listener.getCursorPosition();
+			int row = location.getLineIndex() - listener.getFirstDisplayLine() + 1;
+			int column = location.getCharOffset() + 1;
+			control.sendEscapeString("[" + row + ";" + column + "R");
+			return true;
+		default:
+			return false;
+		}
+	}
+	
+	public boolean processFontEscape(TextBuffer listener, String sequence) {
 		int oldStyle = listener.getStyle();
 		int foreground = StyledText.getForeground(oldStyle);
 		int background = StyledText.getBackground(oldStyle);
