@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.List;
 import javax.swing.*;
 import e.forms.*;
+import e.gui.*;
 import e.util.*;
 import terminator.*;
 import terminator.model.*;
@@ -26,13 +27,13 @@ public class JTerminalPane extends JPanel {
 	private JScrollPane scrollPane;
 	private String name;
 	private Dimension currentSizeInChars;
-	private MenuKeyAction[] menuAndKeyActions = new MenuKeyAction[] {
+	private Action[] menuAndKeyActions = new Action[] {
 		new CopyAction(),
 		new PasteAction(),
 		null,
 		new NewWindowAction(),
-		new NewTabAction(),
-		new RunCommandAction(),
+//		new NewTabAction(),
+//		new RunCommandAction(),
 		new CloseAction(),
 		null,
 		new FindAction(),
@@ -40,8 +41,6 @@ public class JTerminalPane extends JPanel {
 		new FindPreviousAction(),
 		null,
 		new ClearScrollbackAction(),
-		null,
-		new ChangeColourAction(),
 	};
 	
 	/**
@@ -255,6 +254,17 @@ public class JTerminalPane extends JPanel {
 	private class KeyHandler implements KeyListener {
 		public void keyPressed(KeyEvent event) {
 			if (isKeyboardEquivalent(event)) {
+				for (int i = 0; i < menuAndKeyActions.length; i++) {
+					if (menuAndKeyActions[i] == null) {
+						continue;
+					}
+					KeyStroke accelerator = (KeyStroke) menuAndKeyActions[i].getValue(Action.ACCELERATOR_KEY);
+					KeyStroke thisStroke = KeyStroke.getKeyStrokeForEvent(event);
+					if (thisStroke.equals(accelerator)) {
+						menuAndKeyActions[i].actionPerformed(null);
+						break;
+					}
+				}
 				return;
 			}
 			if (doKeyboardScroll(event)) {
@@ -300,19 +310,8 @@ public class JTerminalPane extends JPanel {
 		}
 
 		public void keyTyped(KeyEvent event) {
-			char ch = event.getKeyChar();
-			if (isKeyboardEquivalent(event)) {
-				for (int i = 0; i < menuAndKeyActions.length; i++) {
-					if (menuAndKeyActions[i] == null) {
-						continue;
-					}
-					char actionChar = Character.toLowerCase(menuAndKeyActions[i].getHotkeyChar());
-					if (Character.toLowerCase(ch) == actionChar) {
-						menuAndKeyActions[i].performAction();
-						break;
-					}
-				}
-			} else {
+			if (isKeyboardEquivalent(event) == false) {
+				char ch = event.getKeyChar();
 				if (ch != KeyEvent.CHAR_UNDEFINED) {
 					control.sendChar(ch);
 					textPane.userIsTyping();
@@ -395,35 +394,32 @@ public class JTerminalPane extends JPanel {
 
 		private void maybeShowPopup(MouseEvent event) {
 			if (event.isPopupTrigger()) {
-				JPopupMenu menu = new JPopupMenu();
+				EPopupMenu menu = new EPopupMenu();
 				for (int i = 0; i < menuAndKeyActions.length; i++) {
 					if (menuAndKeyActions[i] == null) {
 						menu.addSeparator();
 					} else {
-						menu.add(getMenuItem(menuAndKeyActions[i], event.getPoint()));
+						menu.add(menuAndKeyActions[i]);
 					}
 				}
 				addInfoItems(menu);
 				menu.show((Component) event.getSource(), event.getX() + 1, event.getY());
 			}
 		}
+	}
+	
+	public class InfoAction extends AbstractAction {
+		public InfoAction(String text) {
+			super(text);
+			setEnabled(false);
+		}
 		
-		private JMenuItem getMenuItem(final MenuKeyAction action, Point mousePosition) {
-			JMenuItem result = new JMenuItem(action.getName(mousePosition));
-			result.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent event) {
-					action.performAction();
-				}
-			});
-			char hotkey = action.getHotkeyChar();
-			if (hotkey != (char) 0) {
-				result.setAccelerator(KeyStroke.getKeyStroke(new Character(hotkey), KEYBOARD_EQUIVALENT_MODIFIER));
-			}
-			return result;
+		public void actionPerformed(ActionEvent e) {
+			// Do nothing.
 		}
 	}
 	
-	private void addSelectionInfoItems(JPopupMenu menu, String selectedText) {
+	private void addSelectionInfoItems(EPopupMenu menu, String selectedText) {
 		if (selectedText.length() == 0) {
 			return;
 		}
@@ -442,7 +438,7 @@ public class JTerminalPane extends JPanel {
 		}
 	}
 	
-	private void addNumberInfoItems(JPopupMenu menu, String selectedText) {
+	private void addNumberInfoItems(EPopupMenu menu, String selectedText) {
 		if (selectedText.indexOf("\n") != -1) {
 			return;
 		}
@@ -458,7 +454,7 @@ public class JTerminalPane extends JPanel {
 		}
 	}
 	
-	private void addInfoItems(JPopupMenu menu) {
+	private void addInfoItems(EPopupMenu menu) {
 		String selectedText = getSelectedText();
 		addSelectionInfoItems(menu, selectedText);
 		addNumberInfoItems(menu, selectedText);
@@ -479,49 +475,33 @@ public class JTerminalPane extends JPanel {
 		return result;
 	}
 	
-	private JMenuItem makeInfoItem(String text) {
-		JMenuItem result = new JMenuItem(text);
-		result.setEnabled(false);
-		return result;
+	private Action makeInfoItem(String text) {
+		return new InfoAction(text);
 	}
 	
-	public interface MenuKeyAction {
-		public String getName(Point mousePosition);
-		
-		public void performAction();
-		
-		public char getHotkeyChar();
-	}
-	
-	public class CopyAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "Copy";
+	public class CopyAction extends AbstractAction {
+		public CopyAction() {
+			super("Copy");
+			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("C", false));
 		}
 		
-		public void performAction() {
+		public void actionPerformed(ActionEvent e) {
 			// FIXME: we should probably have an "explicit copy" mode.
 		}
-		
-		public char getHotkeyChar() {
-			return 'C';
-		}
 	}
 	
-	public class PasteAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "Paste";
+	public class PasteAction extends AbstractAction {
+		public PasteAction() {
+			super("Paste");
+			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("V", false));
 		}
 		
-		public void performAction() {
+		public void actionPerformed(ActionEvent e) {
 			textPane.paste();
 		}
-		
-		public char getHotkeyChar() {
-			return 'V';
-		}
 	}
 	
-	public class RunCommandAction implements MenuKeyAction {
+/*	public class RunCommandAction implements MenuKeyAction {
 		public String getName(Point mousePosition) {
 			return "Run In Tab...";
 		}
@@ -543,80 +523,65 @@ public class JTerminalPane extends JPanel {
 		public char getHotkeyChar() {
 			return 'E';
 		}
-	}
+	}*/
 	
-	public class FindAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "Find...";
+	public class FindAction extends AbstractAction {
+		public FindAction() {
+			super("Find...");
+			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("F", false));
 		}
 		
-		public void performAction() {
+		public void actionPerformed(ActionEvent e) {
 			controller.showFindDialogFor(textPane);
 		}
-		
-		public char getHotkeyChar() {
-			return 'F';
-		}
 	}
 	
-	public class FindNextAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "Find Next";
+	public class FindNextAction extends AbstractAction {
+		public FindNextAction() {
+			super("Find Next");
+			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("G", false));
 		}
 		
-		public void performAction() {
+		public void actionPerformed(ActionEvent e) {
 			textPane.findNext();
 		}
-		
-		public char getHotkeyChar() {
-			return 'G';
-		}
 	}
 	
-	public class FindPreviousAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "Find Previous";
+	public class FindPreviousAction extends AbstractAction {
+		public FindPreviousAction() {
+			super("Find Previous");
+			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("D", false));
 		}
 		
-		public void performAction() {
+		public void actionPerformed(ActionEvent e) {
 			textPane.findPrevious();
 		}
-		
-		public char getHotkeyChar() {
-			return 'D';
-		}
 	}
 	
-	public class ClearScrollbackAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "Clear Scrollback";
+	public class ClearScrollbackAction extends AbstractAction {
+		public ClearScrollbackAction() {
+			super("Clear Scrollback");
+			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("K", false));
 		}
 		
-		public void performAction() {
+		public void actionPerformed(ActionEvent e) {
 			textPane.clearScrollBuffer();
 			control.sendRedrawScreen();
 		}
-		
-		public char getHotkeyChar() {
-			return 'K';
-		}
 	}
 	
-	public class NewWindowAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "New Window";
+	public class NewWindowAction extends AbstractAction {
+		public NewWindowAction() {
+			super("New Window");
+			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("N", false));
 		}
 		
-		public void performAction() {
+		public void actionPerformed(ActionEvent e) {
 			controller.openNewWindow();
 		}
-		
-		public char getHotkeyChar() {
-			return 'N';
-		}
 	}
 	
-	public class NewTabAction implements MenuKeyAction {
+/*	public class NewTabAction implements MenuKeyAction {
 		public String getName(Point mousePosition) {
 			return "New Tab";
 		}
@@ -628,62 +593,17 @@ public class JTerminalPane extends JPanel {
 		public char getHotkeyChar() {
 			return 'T';
 		}
-	}
+	}*/
 	
-	public class CloseAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "Close";
+	public class CloseAction extends AbstractAction {
+		public CloseAction() {
+			super("Close");
+			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("W", false));
 		}
 		
-		public void performAction() {
+		public void actionPerformed(ActionEvent e) {
 			control.destroyProcess();
 			controller.closeTerminalPane(JTerminalPane.this);
-		}
-		
-		public char getHotkeyChar() {
-			return 'W';
-		}
-	}
-	
-	public class ChangeColourAction implements MenuKeyAction {
-		private String colourName;
-		private String colourDescription;
-
-		public String getName(Point mousePosition) {
-			colourDescription = "Background";
-			Location location = textPane.viewToModel(mousePosition);
-			TextBuffer model = textPane.getModel();
-			if (location.getLineIndex() >= model.getLineCount()) {
-				colourName = "background";
-			} else {
-				TextLine line = model.get(location.getLineIndex());
-				if (location.getCharOffset() >= line.length()) {
-					colourName = "background";
-				} else {
-					byte style = line.getStyleAt(location.getCharOffset());
-					if (line.getText().charAt(location.getCharOffset()) == ' ') {
-						colourName = StyledText.getBackgroundColourName(style);
-						colourDescription = StyledText.getBackgroundColourDescription(style);
-					} else {
-						colourName = StyledText.getForegroundColourName(style);
-						colourDescription = StyledText.getForegroundColourDescription(style);
-					}
-				}
-			}
-			return "Change Colour " + colourDescription + "...";
-		}
-		
-		public void performAction() {
-			Color colour = Options.getSharedInstance().getColor(colourName);
-			colour = JColorChooser.showDialog(JTerminalPane.this, "Change Colour " + colourDescription, colour);
-			if (colour != null) {
-				Options.getSharedInstance().setColor(colourName, colour);
-				textPane.repaint();
-			}
-		}
-		
-		public char getHotkeyChar() {
-			return (char) 0;  // No hot key for this.
 		}
 	}
 }
