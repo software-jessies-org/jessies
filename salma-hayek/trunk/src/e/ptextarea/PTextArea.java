@@ -420,15 +420,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
-    private Color getColor(int index) {
-        return textStyler.getDefaultColor(index);
-    }
-    
     private void paintSegments(Graphics2D graphics, FontMetrics metrics, PLineSegment[] segments, int baseline, PCoordinates caretCoords, boolean drawCaret, boolean showWrap) {
         int x = 0;
         int charOffset = 0;
         for (int i = 0; i < segments.length; i++) {
-            graphics.setColor(getColor(segments[i].getStyleIndex()));
+            graphics.setColor(textStyler.getColorForStyle(segments[i].getStyleIndex()));
             String text = segments[i].getText();
             if (segments[i].isVisible()) {
                 graphics.drawString(text, x, baseline);

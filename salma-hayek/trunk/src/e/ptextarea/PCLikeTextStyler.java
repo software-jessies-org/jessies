@@ -65,7 +65,7 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
         segmentList.add(new PTextSegment(TYPE_STRING, string));
     }
     
-    public Color getDefaultColor(int index) {
+    public Color getColorForStyle(int index) {
         return DEFAULT_COLORS[index];
     }
     

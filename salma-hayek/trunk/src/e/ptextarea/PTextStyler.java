@@ -18,5 +18,5 @@ public interface PTextStyler {
     public PTextSegment[] getLineSegments(PTextArea.SplitLine splitLine);
     
     /** Returns the color associated with an indexed style. */
-    public Color getDefaultColor(int style);
+    public Color getColorForStyle(int style);
 }

@@ -23,7 +23,7 @@ public class PPlainTextStyler implements PTextStyler {
         };
     }
 
-    public Color getDefaultColor(int style) {
+    public Color getColorForStyle(int style) {
         return Color.BLACK;
     }
 }
