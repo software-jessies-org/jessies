@@ -1,5 +1,7 @@
 package terminatorn;
 
+import java.awt.*;
+
 /**
 A StyledText represents a string of text with one particular style applied.  It also defines in
 its namespace the set of allowed styles, and provides static methods for accessing them.
@@ -24,31 +26,81 @@ public class StyledText {
 	static final int IS_UNDERLINED = 1 << 7;
 
 	private String text;
-	private int style;
+	private Color foreground;
+	private Color background;
+	private boolean isBold;
+	private boolean isUnderlined;
 	
 	public StyledText(String text, byte style) {
+		this(text, getForegroundColour(style), getBackgroundColour(style), isBold(style), isUnderlined(style));
+	}
+	
+	public StyledText(String text, Color foreground, Color background, boolean isBold, boolean isUnderlined) {
 		this.text = text;
-		this.style = (int) style;
+		this.foreground = foreground;
+		this.background = background;
+		this.isBold = isBold;
+		this.isUnderlined = isUnderlined;
 	}
 	
 	public String getText() {
 		return text;
 	}
 	
-	public int getForeground() {
-		return getForeground(style);
+	public Color getForeground() {
+		return foreground;
 	}
 	
-	public int getBackground() {
-		return getBackground(style);
+	public Color getBackground() {
+		return background;
 	}
 	
 	public boolean isBold() {
-		return isBold(style);
+		return isBold;
 	}
 	
 	public boolean isUnderlined() {
-		return isUnderlined(style);
+		return isUnderlined;
+	}
+	
+	public static Color getForegroundColour(int style) {
+		return getColour(getForeground(style), isBold(style));
+	}
+	
+	public static Color getBackgroundColour(int style) {
+		return getColour(getBackground(style), false);  // Background is never considered to be bold.
+	}
+	
+	public static Color getColour(int colourIndex, boolean isBold) {
+		Color result = null;
+		Options opts = Options.getSharedInstance();
+		if (isBold) {
+			result = opts.getColor("color" + (colourIndex + 8));
+		}
+		if (result == null) {
+			if (colourIndex == BLACK) {
+				result = opts.getColor("foreground");
+			} else if (colourIndex == WHITE) {
+				result = opts.getColor("background");
+			}
+		}
+		if (result == null) {
+			result = opts.getColor("color" + colourIndex);
+		}
+		if (result == null) {
+			switch (colourIndex) {
+				case BLACK: return Color.BLACK;
+				case RED: return Color.RED;
+				case GREEN: return Color.GREEN;
+				case YELLOW: return Color.YELLOW;
+				case BLUE: return Color.BLUE;
+				case MAGENTA: return Color.MAGENTA;
+				case CYAN: return Color.CYAN;
+				case WHITE: return Color.WHITE;
+				default: return Color.BLACK;
+			}
+		}
+		return result;
 	}
 	
 	public static int getForeground(int style) {

@@ -25,6 +25,7 @@ public class Options {
 	private static final Options INSTANCE = new Options();
 	
 	private HashMap options = new HashMap();
+	private HashMap rgbColours = new HashMap();
 	
 	public static Options getSharedInstance() {
 		return INSTANCE;
@@ -40,9 +41,8 @@ public class Options {
 	
 	/**
 	 * Returns a color, if explicitly configured by the user.
-	 * We only understand colors specified in the #rrggbb form,
-	 * and make no effort to find and parse rgb.txt (though we
-	 * could).
+	 * We understand colors specified in the #rrggbb form,
+	 * or those parsed from rgb.txt.
 	 * 
 	 * Color names supported by xterm (defaults in parentheses) include:
 	 * 
@@ -63,10 +63,13 @@ public class Options {
 	 */
 	public Color getColor(String name) {
 		String description = (String) options.get(name);
-		if (description == null || description.startsWith("#") == false) {
+		if (description == null) {
 			return null;
+		} else if (description.startsWith("#")) {
+			return Color.decode("0x" + description.substring(1));
+		} else {
+			return (Color) rgbColours.get(description.toLowerCase());
 		}
-		return Color.decode("0x" + description.substring(1));
 	}
 	
 	/**
@@ -79,8 +82,42 @@ public class Options {
 	}
 	
 	private Options() {
+		readRGBFile();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
+	}
+	
+	private void readRGBFile() {
+		BufferedReader in = null;
+		try {
+			File rgbFile = new File("/usr/X11R6/lib/X11/rgb.txt");
+			if (rgbFile.exists()) {
+				in = new BufferedReader(new FileReader(rgbFile));
+				String line;
+				while ((line = in.readLine()) != null) {
+					if (line.startsWith("!")) {
+						continue;
+					}
+					int r = channelAt(line, 0);
+					int g = channelAt(line, 4);
+					int b = channelAt(line, 8);
+					line = line.substring(12).trim();
+					rgbColours.put(line.toLowerCase(), new Color(r, g, b));
+				}
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException ex) { }
+			}
+		}
+	}
+	
+	private int channelAt(String line, int offset) {
+		return Integer.parseInt(line.substring(offset, offset + 3).trim());
 	}
 	
 	private void readOptionsFrom(String filename) {
@@ -96,7 +133,9 @@ public class Options {
 	}
 	
 	private void readOptionsFrom(File file) throws IOException {
-		Pattern pattern = Pattern.compile("(?:XTerm|Rxvt)(?:\\*|\\.)(\\S+):\\s*(\\S+)");
+//		Pattern pattern = Pattern.compile("(?:XTerm|Rxvt)(?:\\*|\\.)(\\S+):\\s*(\\S+)");
+// The colour name should be any character, since some entries in rgb.txt contain spaces.
+		Pattern pattern = Pattern.compile("(?:XTerm|Rxvt)(?:\\*|\\.)(\\S+):\\s*(.+)");
 		LineNumberReader in = new LineNumberReader(new FileReader(file));
 		String line;
 		while ((line = in.readLine()) != null) {
