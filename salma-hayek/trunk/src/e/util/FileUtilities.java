@@ -15,6 +15,9 @@ public class FileUtilities {
     public static File fileFromString(String filename) {
         return new File(FileUtilities.parseUserFriendlyName(filename));
     }
+    public static File fileFromParentAndString(String parent, String filename) {
+        return fileFromString(parent + File.separator + filename);
+    }
 
     /**
      * Converts paths of the form ~/src to /Users/elliotth/src (or
@@ -89,12 +92,30 @@ public class FileUtilities {
     
     /*
      * Tests whether filename is a symbolic link.
-     * If the absolute path and the canonical path are not
-     * the same, this means we're looking at a symbolic
-     * link.
-     * FIXME: the trouble with this is that it only means there
-     * was a symbolic link somewhere on the path. It doesn't
-     * actually mean that the leaf is a symbolic link.
+     *
+     * First, consider the case where the file in question is a symbolic link.
+     * Say that the symbolic link:
+     *   "/u/u58/martind/kipper/include/PtrTraits.h"
+     * has as its link target:
+     *   "/u/u58/martind/kipper/libs/RCPtr/PtrTraits.h"
+     * In isSymbolicLink("/u/u58/martind/kipper/include/PtrTraits.h"):
+     *   up           := "/u/u58/martind/kipper/include"
+     *   upThenFollow := "/u/u58/martind/kipper/include"
+     *   follow       := "/u/u58/martind/kipper/libs/RCPtr/PtrTraits.h"
+     *   followThenUp := "/u/u58/martind/kipper/libs/RCPtr"
+     *
+     * Now consider the case where the file in question isn't a symbolic link
+     * but something on its path is - and let's pick the case that's most
+     * likely to cause us problems - the one where our immediate parent is a
+     * symbolic link.  The link in question is:
+     *   "/home/martind/kipper"
+     * which has as its link target:
+     *   "/u/u58/martind/kipper"
+     * In isSymbolicLink("/home/martind/kipper/include"):
+     *   up           := "/home/martind/kipper"
+     *   upThenFollow := "/u/u58/martind/kipper"
+     *   follow       := "/u/u58/martind/kipper/include"
+     *   followThenUp := "/u/u58/martind/kipper"
      */
     public static boolean isSymbolicLink(String filename) {
         File file = FileUtilities.fileFromString(filename);
@@ -102,9 +123,11 @@ public class FileUtilities {
     }
     public static boolean isSymbolicLink(File file) {
         try {
-            String canonicalFilename = file.getCanonicalPath();
-            String absoluteFilename = file.getAbsolutePath();
-            return !absoluteFilename.equals(canonicalFilename);
+            File up = new File(file.getAbsolutePath());
+            String upThenFollow = up.getParentFile().getCanonicalPath();
+            File follow = new File(file.getCanonicalPath());
+            String followThenUp = follow.getParent();
+            return !upThenFollow.equals(followThenUp);
         } catch (IOException ex) {
             return false;
         }

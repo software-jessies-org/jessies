@@ -60,7 +60,7 @@ public class FileSearcher {
      * Returns the number of matches.
      */
     public int searchFile(String path, String fileName) throws IOException {
-        File file = new File(path, fileName);
+        File file = FileUtilities.fileFromParentAndString(path, fileName);
         FileInputStream fileInputStream = new FileInputStream(file);
         DataInputStream dataInputStream = new DataInputStream(fileInputStream);
         //FileChannel fileChannel = fileInputStream.getChannel();

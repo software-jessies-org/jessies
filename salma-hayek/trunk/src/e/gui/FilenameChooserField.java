@@ -34,7 +34,7 @@ public class FilenameChooserField extends JPanel implements ActionListener {
     }
     
     public void setPathname(String pathname) {
-        pathnameField.setText(FileUtilities.getUserFriendlyName(pathname));
+        pathnameField.setText(pathname);
     }
     
     public void setCompanionNameField(JTextField field) {

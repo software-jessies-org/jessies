@@ -9,7 +9,8 @@ public class StringUtilities {
         ArrayList result = new ArrayList();
         LineNumberReader in = null;
         try {
-            in = new LineNumberReader(new InputStreamReader(new FileInputStream(filename)));
+            File file = FileUtilities.fileFromString(filename);
+            in = new LineNumberReader(new InputStreamReader(new FileInputStream(file)));
             String line;
             while ((line = in.readLine()) != null) {
                 result.add(line);

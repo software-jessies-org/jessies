@@ -28,7 +28,8 @@ public class TableViewer extends JFrame {
         table = new JTable();
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         DefaultTableModel model = (DefaultTableModel) table.getModel();
-        LineNumberReader in = new LineNumberReader(new InputStreamReader(new FileInputStream(filename)));
+        File file = FileUtilities.fileFromString(filename);
+        LineNumberReader in = new LineNumberReader(new InputStreamReader(new FileInputStream(file)));
         String line;
         while ((line = in.readLine()) != null) {
             String[] fields = line.split("\t");
