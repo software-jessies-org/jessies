@@ -245,6 +245,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         filename = normalizeWorkspacePrefix(filename);
         filename = FileUtilities.getUserFriendlyName(filename);
         
+        /* Refuse to open directories. */
+        if (FileUtilities.fileFromString(filename).isDirectory()) {
+            throw new RuntimeException("Edit can't edit directories, which is what '" + filename + "' is.");
+        }
+        
         /* Find which workspace this file is on/should be on, and make it visible. */
         Workspace workspace = getBestWorkspaceForFilename(filename);
         tabbedPane.setSelectedComponent(workspace);
