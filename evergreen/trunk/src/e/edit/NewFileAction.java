@@ -34,7 +34,7 @@ public class NewFileAction extends ETextAction {
             return;
         }
         
-        createNewFile(FileUtilities.parseUserFriendlyName(filenameField.getPathname()));
+        createNewFile(filenameField.getPathname());
     }
 
     /** Always returns true because there's no reason not to open a file. */

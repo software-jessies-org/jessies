@@ -37,7 +37,7 @@ if [ ! -d $EDIT_PREFERENCES_DIRECTORY ]; then
 fi
 
 # Java 1.5.0beta1 aborts if you use this option!
-#HEAP_SIZE=-Xmx1g
+HEAP_SIZE=-Xmx302m
 
 exec $JAVA $OS_SPECIFIC_OPTIONS \
     $EXTRA_JAVA_OPTIONS \

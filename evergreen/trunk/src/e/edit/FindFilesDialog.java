@@ -204,8 +204,12 @@ public class FindFilesDialog {
             Edit.showAlert("Find Files", "The list of files for " + workspace.getTitle() + " is not yet available.");
             return;
         }
+        if (workspace.getFileList().isEmpty()) {
+            Edit.showAlert("Find Files", "The list of files for " + workspace.getTitle() + " is empty.");
+            return;
+        }
 //        if (directoryField.getText().length() == 0) {
-//            directoryField.setText(FileUtilities.getUserFriendlyName(workspace.getRootDirectory()));
+//            directoryField.setText(workspace.getRootDirectory());
 //        }
         
         initMatchList();

@@ -64,7 +64,7 @@ public class ETitleBar extends JComponent implements MouseListener, MouseMotionL
     }
     
     public void updateDisplayTitle() {
-        this.displayTitle = FileUtilities.getUserFriendlyName(getTitle());
+        this.displayTitle = getTitle();
     }
     
     public String getTitle() {

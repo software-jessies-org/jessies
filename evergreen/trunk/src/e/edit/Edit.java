@@ -198,8 +198,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * no file was opened or the file was passed to an external program.
      */
     public static EWindow openFile(String filename) {
-        filename = FileUtilities.parseUserFriendlyName(filename);
-        
         /* Special case for a URI. */
         if (FileUtilities.nameStartsWithOneOf(filename, FileUtilities.getArrayOfPathElements(Parameters.getParameter("url.prefixes", "")))) {
             Edit.showDocument(filename);
@@ -268,6 +266,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             /* harmless. */
             ex = ex;
         }
+        filename = FileUtilities.getUserFriendlyName(filename);
         
         /* Find which workspace this file is on/should be on, and make it visible. */
         Workspace workspace = getBestWorkspaceForFilename(filename);
@@ -305,10 +304,10 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     public static Workspace getBestWorkspaceForFilename(String filename) {
         Workspace[] workspaces = getWorkspaces();
         int bestIndex = 0;
-        filename = FileUtilities.parseUserFriendlyName(filename);
-        int bestLength = StringUtilities.lengthOfCommonDirectoryPrefix(filename, FileUtilities.parseUserFriendlyName(workspaces[0].getRootDirectory()));
+        int bestLength = StringUtilities.lengthOfCommonDirectoryPrefix(filename, workspaces[0].getRootDirectory());
         for (int i = 1; i < workspaces.length; i++) {
-            int length = StringUtilities.lengthOfCommonDirectoryPrefix(filename, FileUtilities.parseUserFriendlyName(workspaces[i].getRootDirectory()));
+            String workspaceRoot = workspaces[i].getRootDirectory();
+            int length = StringUtilities.lengthOfCommonDirectoryPrefix(filename, workspaceRoot);
             if (length > bestLength) {
                 bestIndex = i;
                 bestLength = length;

@@ -33,10 +33,10 @@ public class ShellCommand {
 
     public void initEnvironmentVariables(String filename, int lineNumber) {
         envp = new String[] {
-            "EDIT_CURRENT_DIRECTORY=" + context,
-            "EDIT_CURRENT_FILENAME=" + filename,
+            "EDIT_CURRENT_DIRECTORY=" + FileUtilities.parseUserFriendlyName(context),
+            "EDIT_CURRENT_FILENAME=" + FileUtilities.parseUserFriendlyName(filename),
             "EDIT_CURRENT_LINE_NUMBER=" + lineNumber,
-            "EDIT_WORKSPACE_ROOT=" + getWorkspace().getRootDirectory(),
+            "EDIT_WORKSPACE_ROOT=" + FileUtilities.parseUserFriendlyName(getWorkspace().getRootDirectory()),
             /* FIXME: we can do better when Java 1.5 is out. */
             makePassThroughVariable("CVS_RSH"),
             makePassThroughVariable("DISPLAY"),
