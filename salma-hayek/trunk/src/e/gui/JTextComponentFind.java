@@ -10,6 +10,8 @@ import e.forms.*;
 
 //
 // TODO: automatically update results as the document changes
+// TODO: support for something like BirdView?
+// TODO: some way to add menu items to a menu?
 //
 
 public class JTextComponentFind {
