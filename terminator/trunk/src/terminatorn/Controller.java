@@ -1,5 +1,7 @@
 package terminatorn;
 
+import java.awt.*;
+
 /**
 A Controller is the master of a JTelnetPane, and allows the JTelnetPane to request its master
 to do stuff, like opening new tabs, closing itself, or whatever.
@@ -15,4 +17,6 @@ public interface Controller {
 	public void openCommandPane(String command, boolean focusOnNewTab);
 	
 	public void showFindDialogFor(JTextBuffer textToFindIn);
+	
+	public Dimension getLastNoticedFrameSize();
 }

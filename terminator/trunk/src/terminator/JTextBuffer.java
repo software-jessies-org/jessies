@@ -126,6 +126,11 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return scrollPane.getViewport().getExtentSize();
 	}
 	
+	public Dimension getCharUnitSize() {
+		FontMetrics metrics = getFontMetrics(getFont());
+		return new Dimension(metrics.charWidth('W'), metrics.getHeight());
+	}
+	
 	/**
 	 * Returns our size in character units, where 'width' is the number of
 	 * columns and 'height' the number of rows. (In case you were concerned

@@ -16,7 +16,9 @@ public class JTelnetPane extends JPanel {
 	private Controller controller;
 	private TelnetControl control;
 	private JTextBuffer textPane;
+	private JScrollPane scrollPane;
 	private String name;
+	private Dimension currentSizeInChars;
 	private MenuKeyAction[] menuAndKeyActions = new MenuKeyAction[] {
 		new CopyAction(),
 		new PasteAction(),
@@ -72,6 +74,14 @@ public class JTelnetPane extends JPanel {
 		return new JTelnetPane(controller, user + "@localhost", command, true);
 	}
 	
+	public Dimension getPaneSize() {
+		return scrollPane.getViewport().getSize();
+	}
+	
+	public Dimension getCharUnitSize() {
+		return textPane.getCharUnitSize();
+	}
+	
 	/**
 	* Returns the command to execute as the user's shell, parsed from the /etc/passwd file.
 	* On any kind of failure, 'bash' is returned as default.
@@ -108,7 +118,7 @@ public class JTelnetPane extends JPanel {
 		textPane.addKeyListener(new KeyHandler());
 		textPane.addMouseListener(new ContextMenuOpener());
 		
-		JScrollPane scrollPane = new JScrollPane(new BorderPanel(textPane));
+		scrollPane = new JScrollPane(new BorderPanel(textPane));
 		scrollPane.setBorder(null);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -131,24 +141,62 @@ public class JTelnetPane extends JPanel {
 		return controller;
 	}
 	
-	private void initSizeMonitoring(JScrollPane scrollPane) {
-		scrollPane.addComponentListener(new ComponentAdapter() {
+	private void initSizeMonitoring(final JScrollPane scrollPane) {
+		class SizeMonitor extends ComponentAdapter implements ActionListener {
 			private Dimension currentSize;
-			public void componentShown(ComponentEvent e) {
-				this.currentSize = textPane.getVisibleSizeInCharacters();
+			private Timer timer;
+			public void componentShown(ComponentEvent event) {
+				currentSizeInChars = textPane.getVisibleSizeInCharacters();
+				forceSensibleSize();
 			}
-			public void componentResized(ComponentEvent e) {
+			
+			public void componentResized(ComponentEvent event) {
+				if (timer != null) {
+					timer.stop();
+					timer = null;
+				}
+				timer = new Timer(500, this);
+				timer.setRepeats(false);
+				timer.start();
+			}
+			
+			public void actionPerformed(ActionEvent event) {
 				Dimension size = textPane.getVisibleSizeInCharacters();
-				if (size.equals(currentSize) == false) {
+				if (size.equals(currentSizeInChars) == false) {
 					try {
 						control.sizeChanged(size, textPane.getVisibleSize());
 					} catch (IOException ex) {
 						Log.warn("Failed to notify pty of size change.", ex);
 					}
-					currentSize = size;
+					currentSizeInChars = size;
+				}
+				forceSensibleSize();
+				timer = null;
+			}
+			
+			public void forceSensibleSize() {
+				Dimension sparePixels = getRemainder(scrollPane.getViewport().getSize(), textPane.getCharUnitSize());
+				if (sparePixels.width > 0 || sparePixels.height > 0) {
+					JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, textPane);
+					Dimension size = frame.getSize();
+					// Hack - we're going to lazily adjust our sizes if the user's in the middle of dragging.
+					if (size.equals(controller.getLastNoticedFrameSize())) {
+						size = subtract(size, sparePixels);
+						frame.setSize(size);
+					}
 				}
 			}
-		});
+		
+			private Dimension subtract(Dimension one, Dimension two) {
+				return new Dimension(one.width - two.width, one.height - two.height);
+			}
+			
+			private Dimension getRemainder(Dimension numerator, Dimension denominator) {
+				return new Dimension(numerator.width % denominator.width,
+						numerator.height % denominator.height);
+			}
+		};
+		scrollPane.getViewport().addComponentListener(new SizeMonitor());
 	}
 	
 	public JTextBuffer getTextPane() {

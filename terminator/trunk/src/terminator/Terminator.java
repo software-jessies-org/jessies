@@ -14,6 +14,7 @@ public class Terminator implements Controller {
 	
 	private JFrame frame;
 	private JTabbedPane tabbedPane;
+	private Dimension lastNoticedFrameSize;
 	
 	private ArrayList terminals = new ArrayList();
 
@@ -28,6 +29,10 @@ public class Terminator implements Controller {
 		}
 		ensureRunnablePty();
 		initUi();
+	}
+	
+	public Dimension getLastNoticedFrameSize() {
+		return lastNoticedFrameSize;
 	}
 	
 	private void ensureRunnablePty() {
@@ -60,6 +65,11 @@ public class Terminator implements Controller {
 	
 	private void initFrame() {
 		frame = new JFrame(Options.getSharedInstance().getTitle());
+		frame.addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent event) {
+				lastNoticedFrameSize = ((JFrame) event.getSource()).getSize();
+			}
+		});
 		frame.setBackground(Options.getSharedInstance().getColor("background"));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		initTerminals();
