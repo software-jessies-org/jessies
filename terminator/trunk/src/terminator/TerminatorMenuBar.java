@@ -3,6 +3,7 @@ package terminator;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import e.gui.*;
 import e.util.*;
 import terminator.view.*;
 
@@ -14,7 +15,7 @@ public class TerminatorMenuBar extends JMenuBar {
 	public TerminatorMenuBar() {
 		add(makeFileMenu());
 		add(makeEditMenu());
-		//addWindowMenu();
+		add(WindowMenu.getSharedInstance().makeJMenu());
 		//addHelpMenu();
 	}
 	
