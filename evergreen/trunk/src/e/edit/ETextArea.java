@@ -292,6 +292,7 @@ public class ETextArea extends JTextArea {
             }
         } catch (Exception e) {
             getToolkit().beep();
+            Log.warn("Exception in paste:" + e.toString());
         } finally {
             entireEdit.end();
         }
@@ -467,11 +468,17 @@ public class ETextArea extends JTextArea {
         super.setSelectionColor(newColor);
         repaint();
     }
+    
+    public void updateWatermark() {
+        ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, this);
+        textWindow.updateWatermark();
+    }
 
     private void initFocusListener() {
         addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
                 setSelectionColor(FOCUSED_SELECTION_COLOR);
+                updateWatermark();
             }
 
             public void focusLost(FocusEvent e) {
