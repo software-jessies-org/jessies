@@ -186,9 +186,15 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     /** Attaches a set of keywords to a Document, tipping the spelling checker off that some words are okay. */
     private void initKeywordsForDocument() {
         HashSet keywords = (HashSet) KEYWORDS_MAP.get(fileType);
-        if (keywords != null) {
-            text.getDocument().putProperty(JTextComponentSpellingChecker.KEYWORDS_DOCUMENT_PROPERTY, keywords);
+        if (keywords == null) {
+            keywords = new HashSet();
         }
+        
+        if (isJava()) {
+            JavaResearcher.addJavaWords(keywords);
+        }
+        
+        text.getDocument().putProperty(JTextComponentSpellingChecker.KEYWORDS_DOCUMENT_PROPERTY, keywords);
     }
     
     public void updateWatermark() {

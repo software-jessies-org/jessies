@@ -15,6 +15,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     private static String[] javaDocSummary;
     private static TreeSet uniqueIdentifiers;
+    private static TreeSet uniqueWords;
     
     private static final JavaResearcher INSTANCE = new JavaResearcher();
     
@@ -52,8 +53,33 @@ public class JavaResearcher implements WorkspaceResearcher {
             }
         }
         
+        initUniqueWords();
+        
         long timeTaken = System.currentTimeMillis() - start;
         Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + timeTaken + "ms.");
+    }
+    
+    /**
+     * Extracts all the unique words from the identifiers in the JDK.
+     */
+    private static void initUniqueWords() {
+        uniqueWords = new TreeSet();
+        Iterator it = uniqueIdentifiers.iterator();
+        while (it.hasNext()) {
+            String identifier = (String) it.next();
+            String[] words = identifier.replace('_', ' ').replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase().split(" ");
+            for (int i = 0; i < words.length; ++i) {
+                uniqueWords.add(words[i]);
+            }
+        }
+    }
+    
+    /**
+     * Adds all the unique words from the identifiers in the JDK to the given set.
+     * This might be useful for spelling checking or word completion purposes.
+     */
+    public static void addJavaWords(Set set) {
+        set.addAll(uniqueWords);
     }
     
     public List listIdentifiersStartingWith(String prefix) {
