@@ -79,7 +79,12 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			}
 		});
 		addHighlighter(new HyperlinkHighlighter());
+		becomeDropTarget();
 		new Selector(this);
+	}
+	
+	private void becomeDropTarget() {
+		new TerminalDropTarget(this);
 	}
 	
 	public TextBuffer getModel() {
