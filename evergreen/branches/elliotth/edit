@@ -1,0 +1,67 @@
+#!/bin/sh
+
+JAVA_1_5=""
+if [ "$1" == "1.5" ]; then
+    JAVA_1_5="yes"
+fi
+
+EDIT_CLASS_NAME=e.edit.Edit
+EDIT_HOME=`dirname $0`
+EDIT_HOME=`cd $EDIT_HOME ; pwd`  # Ensures we have an absolute path.
+PATH=$PATH:$EDIT_HOME            # Make Edit's support tools available.
+JAVA=java
+
+# Enable Profiling.
+#EXTRA_JAVA_OPTIONS+=-Xprof
+# Enable Debugging.
+#EXTRA_JAVA_OPTIONS+=-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n
+
+EDIT_PREFERENCES_DIRECTORY=$HOME/.$EDIT_CLASS_NAME
+
+case "`uname`" in
+Linux)
+    if [ -f /home/elliotth/download/j2sdk1.4.2/bin/java ]; then
+        JAVA=/home/elliotth/download/j2sdk1.4.2/bin/java
+    fi
+    if [ "$JAVA_1_5" ]; then
+        JAVA=/home/elliotth/download/j2sdk1.5.0/bin/java
+    fi
+    EXTRA_CLASSPATH_ENTRIES=$EDIT_HOME/MRJ141Stubs.jar
+    ;;
+Darwin)
+    # Darwin is what Mac OS X calls itself.
+    EDIT_PREFERENCES_DIRECTORY=$HOME/Library/Preferences/$EDIT_CLASS_NAME
+    PATH=/System/Library/Frameworks/JavaVM.framework/Versions/1.4.1/Commands:$PATH
+    OS_SPECIFIC_OPTIONS=-Xdock:name=Edit:icon=$EDIT_HOME/edit.icns
+    ;;
+*)
+    ;;
+esac
+
+if [ ! -d $EDIT_PREFERENCES_DIRECTORY ]; then
+    echo "Edit: Couldn't find preferences directory '$EDIT_PREFERENCES_DIRECTORY'."
+    echo "Edit: Creating preferences directory '$EDIT_PREFERENCES_DIRECTORY'."
+    mkdir $EDIT_PREFERENCES_DIRECTORY
+    echo "Edit: Copying default preferences."
+    cp $EDIT_HOME/edit.properties-sample $EDIT_PREFERENCES_DIRECTORY/edit.properties
+    echo "Edit: Away you go!"
+fi
+
+# Java 1.5.0beta1 aborts if you use this option!
+if [ -z "$JAVA_1_5" ]; then
+    HEAP_SIZE=-Xmx1g
+fi
+
+exec $JAVA $OS_SPECIFIC_OPTIONS \
+    $EXTRA_JAVA_OPTIONS \
+    $HEAP_SIZE \
+    -classpath $EDIT_HOME/classes:$EXTRA_CLASSPATH_ENTRIES \
+    -Denv.ANT_HOME=$ANT_HOME \
+    -Denv.DISPLAY=$DISPLAY \
+    -Denv.EDIT_HOME=$EDIT_HOME \
+    -Denv.HOME=$HOME \
+    -Denv.JAVA_HOME=$JAVA_HOME \
+    -Denv.PATH=$PATH \
+    -DpreferencesDirectory=$EDIT_PREFERENCES_DIRECTORY \
+    $EDIT_CLASS_NAME \
+>> $EDIT_HOME/edit.log 2>&1

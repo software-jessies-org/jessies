@@ -1,0 +1,19 @@
+# Ruby keywords.
+elsif
+# Library identifiers.
+ARGV
+chmod
+chown
+dirname
+gsub
+makedirs
+mkdir
+mkpath
+popen
+Regexp
+rmdir
+rmtree
+symlink
+umask
+upcase
+upto
