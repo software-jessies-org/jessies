@@ -85,16 +85,25 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void select(int start, int end) {
-        if (selection != null) {
-            repaintHighlight(selection);
-        }
+        PHighlight oldSelection = selection;
         if (start == end) {
             selection = null;
         } else {
             selection = new PColoredHighlight(this, start, end, SELECTION_COLOR);
         }
-        if (selection != null) {
-            repaintHighlight(selection);
+        if ((oldSelection == null) != (selection == null)) {
+            repaintAnchorRegion(selection == null ? oldSelection : selection);
+        } else if (oldSelection != null && selection != null) {
+            int minStart = Math.min(oldSelection.getStartIndex(), selection.getStartIndex());
+            int maxStart = Math.max(oldSelection.getStartIndex(), selection.getStartIndex());
+            if (minStart != maxStart) {
+                repaintIndexRange(minStart, maxStart);
+            }
+            int minEnd = Math.min(oldSelection.getEndIndex(), selection.getEndIndex());
+            int maxEnd = Math.max(oldSelection.getEndIndex(), selection.getEndIndex());
+            if (minEnd != maxEnd) {
+                repaintIndexRange(minEnd, maxEnd);
+            }
         }
     }
     
@@ -150,12 +159,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public void addHighlight(PHighlight highlight) {
         highlights.add(highlight);
-        repaintHighlight(highlight);
+        repaintAnchorRegion(highlight);
     }
     
     public void removeHighlight(PHighlight highlight) {
         highlights.remove(highlight);
-        repaintHighlight(highlight);
+        repaintAnchorRegion(highlight);
     }
     
     public List getHighlights() {
@@ -178,7 +187,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
         if (isOnlyOneMatch) {
             if (match != null) {
-                repaintHighlight(match);
+                repaintAnchorRegion(match);
             }
             // If isOnlyOneMatch is true, but match is null, nothing was removed and so we don't repaint at all.
         } else {
@@ -307,12 +316,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
-    private synchronized void repaintHighlight(PHighlight highlight) {
+    private synchronized void repaintAnchorRegion(PAnchorRegion anchorRegion) {
+        repaintIndexRange(anchorRegion.getStartIndex(), anchorRegion.getEndIndex());
+    }
+    
+    private void repaintIndexRange(int startIndex, int endIndex) {
         if (splitLines == null) {
             return;
         }
-        PCoordinates start = getCoordinates(highlight.getStart().getIndex());
-        PCoordinates end = getCoordinates(highlight.getEnd().getIndex());
+        PCoordinates start = getCoordinates(startIndex);
+        PCoordinates end = getCoordinates(endIndex);
         repaintLines(start.getLineIndex(), end.getLineIndex());
     }
     
