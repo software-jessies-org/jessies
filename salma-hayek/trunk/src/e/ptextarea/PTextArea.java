@@ -172,9 +172,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (textStyler == null) {
             CharSequence chars = splitLine.getContents();
             if (chars.length() == 0) {
-                text = new PTextSegment[] { new PTextSegment(0, "") };
+                text = new PTextSegment[0];
+            } else {
+                text = new PTextSegment[] { new PTextSegment(0, chars.toString()) };
             }
-            text = new PTextSegment[] { new PTextSegment(0, chars.toString()) };
         } else {
             text = textStyler.getLineSegments(splitLine);
         }
