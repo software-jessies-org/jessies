@@ -32,7 +32,7 @@ SOURCE_DIRECTORIES=$(shell find `pwd`/src '(' -type d -name '.svn' -prune ')' -o
 SOURCE_DIRECTORIES:=$(patsubst %/.svn,,$(SOURCE_DIRECTORIES))
 C_AND_CXX_FLAGS += $(patsubst %,-I%,$(SOURCE_DIRECTORIES))
 
-C_AND_CXX_FLAGS += -g -W -Wall #-Werror
+C_AND_CXX_FLAGS += -g -W -Wall -Werror
 CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
 
