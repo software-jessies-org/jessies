@@ -141,9 +141,17 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	public void insertText(final String text) {
 		new Thread() {
 			public void run() {
-				for (int i = 0; i < text.length(); i++) {
+				for (int i = 0; i < text.length(); ++i) {
 					terminalControl.sendChar(text.charAt(i));
 				}
+				/*
+				String remainder = text;
+				while (remainder.length() > 0) {
+					int chunkLength = Math.min(1024, remainder.length());
+					terminalControl.sendString(remainder.substring(0, chunkLength));
+					remainder = remainder.substring(chunkLength);
+				}
+				*/
 			}
 		}.start();
 	}
@@ -331,7 +339,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return (Highlighter[]) highlighters.values().toArray(new Highlighter[0]);
 	}
 	
-	public void redoHighlightsFrom(int firstLineIndex) {
+	private void redoHighlightsFrom(int firstLineIndex) {
 		removeHighlightsFrom(firstLineIndex);
 		Highlighter[] lighters = getHighlighters();
 		for (int i = 0; i < lighters.length; i++) {
