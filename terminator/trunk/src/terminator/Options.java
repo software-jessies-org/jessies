@@ -68,6 +68,13 @@ public class Options {
 		return defaultedBooleanResource("antiAlias", false);
 	}
 	
+	/**
+	 * Whether or not to use a menu bar.
+	 */
+	public boolean shouldUseMenuBar() {
+		return defaultedBooleanResource("useMenuBar", GuiUtilities.isMacOs());
+	}
+	
 	private boolean defaultedBooleanResource(String name, boolean defaultValue) {
 		String value = (String) options.get(name);
 		if (value != null) {
