@@ -3,7 +3,7 @@ package terminator.view;
 public interface JTerminalPaneFactory {
 	public JTerminalPane create();
 	
-	public class Command implements JTerminalPaneFactory {
+	public static class Command implements JTerminalPaneFactory {
 		private String command;
 		private String title;
 		
@@ -17,7 +17,7 @@ public interface JTerminalPaneFactory {
 		}
 	}
 	
-	public class Shell implements JTerminalPaneFactory {
+	public static class Shell implements JTerminalPaneFactory {
 		public JTerminalPane create() {
 			return JTerminalPane.newShell();
 		}
