@@ -204,11 +204,30 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public void scrollToBottom() {
 		JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
-		BoundedRangeModel barModel = pane.getVerticalScrollBar().getModel();
-		barModel.setValue(barModel.getMaximum() - barModel.getExtent());
-		barModel = pane.getHorizontalScrollBar().getModel();
-		barModel.setValue(barModel.getMinimum());
-//		scrollRectToVisible(new Rectangle(0, getHeight() - 10, 10, 11));
+		
+		// Vertically, we just want to go to the bottom.
+		BoundedRangeModel verticalModel = pane.getVerticalScrollBar().getModel();
+		verticalModel.setValue(verticalModel.getMaximum() - verticalModel.getExtent());
+		
+		// Horizontally, we want to show the cursor.
+		
+		// FIXME: it's not entirely clear what this means. For one
+		// thing, we don't necessarily have a horizontal position that
+		// corresponds to where the cursor is. This is probably a
+		// mistake that should be fixed.
+		
+		// Another problem is that we may not want to scroll back as
+		// the user moves the cursor back; we should definitely ensure
+		// that the cursor is visible, but if it *is* already visible,
+		// we perhaps shouldn't touch the horizontal scroll bar?
+		
+		// [To reproduce the problem underlying this code, simply
+		// "cat > /dev/null" and then type more characters than fit
+		// on a line.]
+		
+		int xOffset = (getCaretPosition().getCharOffset() + 1) * getCharUnitSize().width;
+		BoundedRangeModel horizontalModel = pane.getHorizontalScrollBar().getModel();
+		horizontalModel.setValue(xOffset - horizontalModel.getExtent());
 	}
 	
 	public void scrollToTop() {
