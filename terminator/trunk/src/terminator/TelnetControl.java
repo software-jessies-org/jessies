@@ -293,9 +293,33 @@ public class TelnetControl implements Runnable {
 			case 'f': case 'H': return moveCursorTo(midSequence);
 			case 'K': return killLineContents(midSequence);
 			case 'J': return killLines(midSequence);
+			case 'L': return insertLines(midSequence);
+			case 'h': return setMode(midSequence, true);
+			case 'l': return setMode(midSequence, false);
 			case 'm': return processFontEscape(midSequence);
 			case 'r': return setScrollScreen(midSequence);
 			default: return false;
+		}
+	}
+	
+	public boolean insertLines(String seq) {
+		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
+		listener.insertLines(count);
+		return true;
+	}
+	
+	public boolean setMode(String seq, boolean value) {
+		if (seq.startsWith("?")) {
+			String[] modes = seq.substring(1).split(";");
+			for (int i = 0; i < modes.length; i++) {
+				switch (Integer.parseInt(modes[i])) {
+					case 25: listener.setCaretDisplay(value); break;
+					default: Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
+				}
+			}
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
