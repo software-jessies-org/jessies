@@ -653,19 +653,15 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private int paintStyledText(Graphics graphics, StyledText text, int x, int y) {
 		FontMetrics metrics = getFontMetrics(getFont());
 		Style style = text.getStyle();
-		
-		// Sanity check for top weirdness.
-		if (style.getForeground().equals(style.getBackground())) {
-			Log.warn("Foreground and background colors are identical (text \"" + text.getText() + "\").");
-		}
+		Color foreground = style.getForeground();
+		Color background = style.getBackground();
 		
 		int textWidth = metrics.stringWidth(text.getText());
-		graphics.setColor(style.getBackground());
+		graphics.setColor(background);
 		// Special continueToEnd flag used for drawing the backgrounds of Highlights which extend
 		// over the end of lines.  Used for multi-line selection.
 		int backgroundWidth = text.continueToEnd() ? (getSize().width - x) : textWidth;
 		graphics.fillRect(x, y - metrics.getMaxAscent() - metrics.getLeading(), backgroundWidth, metrics.getHeight());
-		Color foreground = style.getForeground();
 		if (style.isUnderlined()) {
 			graphics.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 128));
 			graphics.drawLine(x, y + 1, x + textWidth, y + 1);
