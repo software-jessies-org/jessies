@@ -88,6 +88,10 @@ public class OpenQuicklyDialog {
                     int index = matchList.locationToIndex(e.getPoint());
                     String filename = (String) matchList.getModel().getElementAt(index);
                     Edit.openFile(workspace.getRootDirectory() + File.separator + filename);
+                    
+                    // Wrestle focus back from the file we've just opened.
+                    JDialog dialog = (JDialog) SwingUtilities.getAncestorOfClass(JDialog.class, matchList);
+                    dialog.toFront();
                 }
             }
         });
