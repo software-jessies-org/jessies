@@ -23,6 +23,9 @@ public class Terminator implements Controller {
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
 			showUsage();
 		}
+		if (arguments.contains("-v") || arguments.contains("-version") || arguments.contains("--version")) {
+			showVersion();
+		}
 		initUi();
 	}
 	
@@ -318,6 +321,11 @@ public class Terminator implements Controller {
 
 	public void showUsage() {
 		System.err.println("Usage: Terminator [--help] [-xrm <resource-string>]... [[-n <name>] command]...");
+		System.exit(0);
+	}
+	
+	public void showVersion() {
+		System.err.println("Terminator 0.9 (24th May 2004), copyright Phil Norman, Elliott Hughes.");
 		System.exit(0);
 	}
 

@@ -1,0 +1,42 @@
+README file for Terminator, v0.9.
+
+Please do read this file first - it's short, but important.
+
+Terminator has its own terminfo file.  You'll need to install this in order
+for Terminator to work correctly.  For information on how to do this, read
+the doc/README file.
+
+In order to get the best out of Terminator, you're also recommended to
+create a ~/.terminator configuration file in order to enable hyperlinks.
+You can copy a pre-written one from doc/pros-examples/, where
+there are several for various different operating systems.  If you don't
+see your system listed, copy the nearest match and have a quick look
+through to make sure it's going to be running the right commands.
+
+Terminator is a joint project between Phil Norman and Elliott Hughes.
+Started on 21st April 2004 after Elliott moaned about the lack of a really
+good terminal emulator, it's developed over the period of 1 month to
+a state where we can happily release version 0.9.
+
+Version 1.0 will follow shortly, after we've tidied up some stuff, and
+added a menu so people don't have to hunt too much for the hotkeys.
+
+
+Feature List:
+
+1: Hyperlink recognition (configurable), allowing arbitrary programs to
+be run when a recognised hyperlink is clicked on.
+
+2: Multiple tabs, so you can have several terminals hidden under tabs
+within the same window.
+
+3: No line wrap, so reading a catted file is made a lot easier.
+
+4: Proper handling of tabs, so copy/pasting them into other applications
+doesn't turn them into strings of spaces.
+
+5: Fully-functioning terminal emulation.
+
+
+If you find any bugs, please report them to cuvy.abezna@virgin.net
+(Phil Norman).
