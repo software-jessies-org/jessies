@@ -85,6 +85,15 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		return model;
 	}
 	
+	public void insertText(String text) {
+		for (int i = 0; i < text.length(); i++) {
+			char ch = text.charAt(i);
+			int keyCode = KeyEvent.VK_UNDEFINED;
+			KeyEvent event = new KeyEvent(this, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, keyCode, ch);
+			processKeyEvent(event);
+		}
+	}
+	
 	// Methods used by TextBuffer in order to update the display.
 	
 	public void lineSectionChanged(int lineIndex, int charStartIndex, int charEndIndex) {

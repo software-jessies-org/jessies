@@ -46,9 +46,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 			try {
 				Transferable contents = view.getToolkit().getSystemClipboard().getContents(view);
 				String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
-				// This don't work, since we don't have a TransferHandler.  Find a nice way of
-				// firing off a log of KeyEvents.
-//				view.getTransferHandler().importData(view, contents);
+				view.insertText(string);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -70,8 +68,10 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	
 	public void mouseReleased(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON1) {
-			String selection = view.getText(highlight);
-			view.getToolkit().getSystemClipboard().setContents(new StringSelection(selection), null);
+			if (highlight != null) {
+				String selection = view.getText(highlight);
+				view.getToolkit().getSystemClipboard().setContents(new StringSelection(selection), null);
+			}
 			startLocation = null;
 		}
 	}
