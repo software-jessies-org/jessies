@@ -77,8 +77,6 @@ let us always show the user-friendly forms.
 [ ] shouldn't use our own text selection colors. should show when we're
     not focused.
 
---
-
 [ ] fix the fact that you can slide windows off the bottom of the column,
     or behind the others at the bottom of a column.
 
@@ -111,26 +109,25 @@ let us always show the user-friendly forms.
     This only applies the first time the dialog is opened. Thereafter, it should
     re-appear where it was when it was closed.
 
-[ ] martin
-    
-    [ ] when we warn that a file's changed, we should try harder to see if
-        it really has. BitKeeper has a habit of touching files without modifying
-        them.
-        
-    [ ] auto-indent should only apply to source files, not text files.
-    
-    [ ] find out (using jdb?) where the OutOfMemoryException is thrown if
-        you load a huge file, and plug the leak. then we could optimistically
-        try to load huge files and fail gracefully. (catching the exception in
-        the right place, we could also present an appropriate error to the
-        user.)
-    
-    [ ] we start up with the same files that were open when we quit, but
-        we don't remember how much space each had, which detracts somewhat.
-    
-    [ ] should have an environment variable editor (like the Windows Control
-        Panel one).
-    
+[ ] when we warn that a file's changed, we should try harder to see if
+    it really has. BitKeeper has a habit of touching files without modifying
+    them.
+
+[ ] auto-indent should only apply to source files, not text files.
+
+[ ] find out (using jdb?) where the OutOfMemoryException is thrown if
+    you load a huge file, and plug the leak. then we could optimistically
+    try to load huge files and fail gracefully. (catching the exception in
+    the right place, we could also present an appropriate error to the
+    user.)
+
+[ ] we start up with the same files that were open when we quit, but we
+    don't remember how much space each had (or what order they were in),
+    which detracts somewhat.
+
+[ ] should have an environment variable editor (like the Windows Control
+    Panel one).
+
 [ ] upon performing 'new file', and including a non-existent directory as
     part of the new filename, the directory should be created too, i think.
     perhaps with a 'you've either mistyped that, or you want a new
