@@ -1,6 +1,6 @@
 package e.edit;
 
-import java.util.*;
+import e.util.Bag;
 import java.util.regex.*;
 import javax.swing.text.*;
 
@@ -41,7 +41,7 @@ public class Indenter {
     
     public String guessIndentationFromFile(String fileContents) {
         String previousIndent = "";
-        Set indentations = new HashSet();
+        Bag indentations = new Bag();
         String emergencyAlternative = "    ";
         String[] lines = fileContents.split("\n");
         for (int i = 0; i < lines.length; ++i) {
@@ -50,8 +50,10 @@ public class Indenter {
             if (matcher.matches()) {
                 String indent = matcher.group(1);
                 if (indent.length() < emergencyAlternative.length()) {
+                    //indentations.add(indent);
                     emergencyAlternative = indent;
                 }
+                previousIndent = indent;
             }
             matcher = INDENTATION_PATTERN_2.matcher(line);
             if (matcher.matches()) {
@@ -59,24 +61,20 @@ public class Indenter {
                 if (indent.length() > previousIndent.length()) {
                     String difference = indent.substring(previousIndent.length());
                     indentations.add(difference);
+                } else if (indent.length() < previousIndent.length()) {
+                    String difference = previousIndent.substring(indent.length());
+                    indentations.add(difference);
                 }
                 previousIndent = indent;
             }
         }
-        if (indentations.size() == 0) {
+        System.err.println("indentations=" + indentations);
+        if (indentations.isEmpty()) {
             return emergencyAlternative;
         } else {
-            String[] array = (String[]) indentations.toArray(new String[indentations.size()]);
-            String shortest = array[0];
-            for (int i = 1; i < array.length; ++i) {
-                String indentation = (String) array[i];
-                if (indentation.length() < shortest.length()) {
-                    shortest = indentation;
-                }
-            }
-            return shortest;
+            return (String) indentations.commonestItem();
         }
     }
-    private static final Pattern INDENTATION_PATTERN_1 = Pattern.compile("^( +)[A-Za-z].*$");
-    private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^( +)[{}]$");
+    private static final Pattern INDENTATION_PATTERN_1 = Pattern.compile("^(\\s+)[A-Za-z].*$");
+    private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^(\\s+)[{}]$");
 }
