@@ -131,7 +131,7 @@ public class TagsUpdater {
      * closest tag with an enclosing scope and returns that. If that fails, returns null.
      */
     public TreeNode getTagForLine(int lineNumber) throws BadLocationException {
-        lineNumber++;    // JTextComponent numbers lines from 0, ectags from 1.
+        lineNumber++; // JTextComponent numbers lines from 0, ectags from 1.
         
         TagReader.Tag nearestTag = null;
         TreeNode nearestNode = null;
