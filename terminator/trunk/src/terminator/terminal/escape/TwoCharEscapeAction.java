@@ -39,7 +39,7 @@ public class TwoCharEscapeAction implements TerminalAction {
 				unsupported();
 				break;
 			default:
-				Log.warn("Unrecognised two-character escape \"" + sequence + "\".");
+				Log.warn("Unrecognized two-character escape \"" + sequence + "\".");
 		}
 	}
 	

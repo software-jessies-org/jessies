@@ -16,30 +16,30 @@ public class EscapeParser {
 	private boolean isComplete = false;
 	private String sequence = "";
 
-	private SequenceRecogniser seqRecogniser;
+	private SequenceRecognizer seqRecognizer;
 	
-	private static final HashMap SEQ_RECOGNISERS = new HashMap();
+	private static final HashMap SEQ_RECOGNIZERS = new HashMap();
 	static {
-		addSequenceRecognisers("6789=>DEHMZcno", new SingleCharSequenceRecogniser());
-		addSequenceRecognisers("#()*+$@", new TwoCharSequenceRecogniser());
-		addSequenceRecognisers("[", new CSISequenceRecogniser());
-		addSequenceRecognisers("]", new XTermSequenceRecogniser());
+		addSequenceRecognizers("6789=>DEHMZcno", new SingleCharSequenceRecognizer());
+		addSequenceRecognizers("#()*+$@", new TwoCharSequenceRecognizer());
+		addSequenceRecognizers("[", new CSISequenceRecognizer());
+		addSequenceRecognizers("]", new XTermSequenceRecognizer());
 	}
-	private static void addSequenceRecognisers(String chars, SequenceRecogniser recogniser) {
+	private static void addSequenceRecognizers(String chars, SequenceRecognizer recognizer) {
 		for (int i = 0; i < chars.length(); i++) {
-			SEQ_RECOGNISERS.put(new Character(chars.charAt(i)), recogniser);
+			SEQ_RECOGNIZERS.put(new Character(chars.charAt(i)), recognizer);
 		}
 	}
 	
 	public void addChar(char ch) {
 		sequence += ch;
 		if (sequence.length() == 1) {
-			seqRecogniser = (SequenceRecogniser) SEQ_RECOGNISERS.get(new Character(ch));
-			if (seqRecogniser == null) {
-				Log.warn("Unable to find escape sequence end recogniser for start char \"" + ch + "\"");
+			seqRecognizer = (SequenceRecognizer) SEQ_RECOGNIZERS.get(new Character(ch));
+			if (seqRecognizer == null) {
+				Log.warn("Unable to find escape sequence end recognizer for start char \"" + ch + "\"");
 			}
 		}
-		isComplete = (seqRecogniser == null) ? true : seqRecogniser.isAtEnd(sequence);
+		isComplete = (seqRecognizer == null) ? true : seqRecognizer.isAtEnd(sequence);
 	}
 	
 	public boolean isComplete() {
@@ -48,19 +48,19 @@ public class EscapeParser {
 	
 	public TerminalAction getAction(TerminalControl terminalControl) {
 //		Log.warn("Getting action for ESC sequence \"" + sequence + "\"");
-		return (seqRecogniser == null) ? null : seqRecogniser.getTerminalAction(terminalControl, sequence);
+		return (seqRecognizer == null) ? null : seqRecognizer.getTerminalAction(terminalControl, sequence);
 	}
 	
 	public String toString() {
 		return sequence;
 	}
 	
-	private interface SequenceRecogniser {
+	private interface SequenceRecognizer {
 		public boolean isAtEnd(String sequence);
 		public TerminalAction getTerminalAction(TerminalControl terminalControl, String sequence);
 	}
 	
-	private static class SingleCharSequenceRecogniser implements SequenceRecogniser {
+	private static class SingleCharSequenceRecognizer implements SequenceRecognizer {
 		public boolean isAtEnd(String sequence) {
 			return (sequence.length() == 1);
 		}
@@ -70,7 +70,7 @@ public class EscapeParser {
 		}
 	}
 	
-	private static class TwoCharSequenceRecogniser implements SequenceRecogniser {
+	private static class TwoCharSequenceRecognizer implements SequenceRecognizer {
 		public boolean isAtEnd(String sequence) {
 			return (sequence.length() == 2);
 		}
@@ -80,9 +80,9 @@ public class EscapeParser {
 		}
 	}
 	
-	private static class CSISequenceRecogniser implements SequenceRecogniser {
+	private static class CSISequenceRecognizer implements SequenceRecognizer {
 		public boolean isAtEnd(String sequence) {
-			// We don't need to check for sequence.length() == 0, since SequenceRecognisers are always
+			// We don't need to check for sequence.length() == 0, since SequenceRecognizers are always
 			// created after the first char has been read.
 			if (sequence.length() == 1) {
 				return false;
@@ -96,11 +96,11 @@ public class EscapeParser {
 		}
 	}
 	
-	private static class XTermSequenceRecogniser implements SequenceRecogniser {
+	private static class XTermSequenceRecognizer implements SequenceRecognizer {
 		private boolean isInInitialNumber = true;
 
 		public boolean isAtEnd(String sequence) {
-			// We don't need to check for sequence.length() == 0, since SequenceRecognisers are always
+			// We don't need to check for sequence.length() == 0, since SequenceRecognizers are always
 			// created after the first char has been read.
 			if (sequence.length() == 1) {
 				return false;
