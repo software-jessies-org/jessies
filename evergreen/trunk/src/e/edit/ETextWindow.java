@@ -295,7 +295,6 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         items.add(new RevertToSavedAction());
         addContextSpecificMenuItems(items);
         addExternalToolMenuItems(items);
-        addSpellingSuggestions(items);
         return items;
     }
 
@@ -388,38 +387,6 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     
     public void addContextSpecificMenuItems(Collection items) {
         boolean needSeparator = true;
-    }
-    
-    public void addSpellingSuggestions(Collection items) {
-        try {
-            final JTextComponentSpellingChecker.Range actualRange = new JTextComponentSpellingChecker.Range();
-            if (text.getSpellingChecker().isMisspelledWordBetween(text.getSelectionStart(), text.getSelectionEnd(), actualRange)) {
-                String misspelling = text.getText(actualRange.start, actualRange.end - actualRange.start);
-                String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
-                for (int i = 0; i < suggestions.length; i++) {
-                    String suggestion = suggestions[i];
-                    // Since we're mainly used for editing source, camelCase
-                    // and underscored_identifiers are more likely than
-                    // hyphenated words or multiple words.
-                    suggestion = suggestion.replace('-', '_');
-                    suggestion = convertMultipleWordsToCamelCase(suggestion);
-                    items.add(new CorrectSpellingAction(this, suggestion, actualRange.start, actualRange.end));
-                }
-            }
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    private String convertMultipleWordsToCamelCase(String original) {
-        StringBuffer result = new StringBuffer(original);
-        for (int i = 0; i < result.length(); ++i) {
-            if (result.charAt(i) == ' ' && i < result.length() - 1) {
-                result.deleteCharAt(i);
-                result.setCharAt(i, Character.toUpperCase(result.charAt(i)));
-            }
-        }
-        return result.toString();
     }
     
     private void doGoToSelection(int startOffset, int endOffset) {
