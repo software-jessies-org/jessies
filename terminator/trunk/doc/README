@@ -29,22 +29,22 @@ syntax used in Perl regexp.
 
 TermInfo Files
 ~~~~~~~~~~~~~~
-In the sub-directory 'terminfo' live two files, named xterm-nam
-and xterm-nam.tic.  The first of these is a compiled terminfo
+In the sub-directory 'terminfo' live two files, named terminator
+and terminator.tic.  The first of these is a compiled terminfo
 file, and the second is an uncompiled terminfo description file.
 
 In order for Terminator to function properly on a system, that
 system needs to have a proper terminfo description for
-'xterm-nam'.  This is basically like that for 'xterm-color',
-except that automatic line wrapping is disabled.  In order to use
-this, either ask your sysadmin to add the 'xterm-nam' terminfo
-file to the host system, or place it in your home directory.  In
-the latter case, the file must be placed in
-'~/.terminfo/x/xterm-nam'.
+'terminator'.  This is basically like that for 'rxvt', with a few
+tweaks, including turning off automatic line wrapping.  In order
+to use this, either ask your sysadmin to add the 'terminator'
+terminfo file to the host system, or place it in your home
+directory.  In the latter case, the file must be placed in
+'~/.terminfo/t/terminator'.
 
-You may also play around with the 'xterm-nam.tic' file provided if
+You may also play around with the 'terminator.tic' file provided if
 you wish, in which case you must run the command 'tic
-xterm-nam.tic'.  This will create a compiled terminfo file which
+terminator.tic'.  This will create a compiled terminfo file which
 will either be placed in /usr/share/terminfo, or in ~/.terminfo/,
 depending upon whether your root, and whether a .terminfo
 directory exists in your home directory.  For more details see the
