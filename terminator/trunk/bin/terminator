@@ -60,7 +60,7 @@ then
   # Cache the result, because this is the single most expensive part of
   # the script.
   icon_filename_file=~/.terminal-logs/.cached-icon
-  if [ ! -f $icon_filename_file ] || [ ! -f `cat $icon_filename_file`]
+  if [ ! -f $icon_filename_file ] || [ ! -f `cat $icon_filename_file` ]
   then
     locate gnome-terminal.png | grep 32x32 | head -1 > $icon_filename_file
   fi
