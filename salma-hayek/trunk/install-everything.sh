@@ -37,7 +37,7 @@ done
 
 # Put links to each of our shell scripts in /usr/local/bin.
 # This avoids the need to mess with anyone's $PATH.
-scripts=`find * -type f -maxdepth 1 -perm +1`
+scripts=`find */bin -type f -perm +1`
 for script in $scripts
 do
     link_in_usr_local_bin `pwd`/$script
