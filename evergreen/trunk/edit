@@ -47,7 +47,7 @@ ln -s -f $EDIT_LOG /tmp/edit.log
 $JAVA $OS_SPECIFIC_OPTIONS \
     $EXTRA_JAVA_OPTIONS \
     $HEAP_SIZE \
-    -classpath $EDIT_HOME/classes:$EXTRA_CLASSPATH_ENTRIES \
+    -classpath $EDIT_HOME/classes:$EDIT_HOME/../salma-hayek/classes:$EXTRA_CLASSPATH_ENTRIES \
     -Denv.CVS_RSH=$CVS_RSH \
     -Denv.DISPLAY=$DISPLAY \
     -Denv.EDIT_HOME=$EDIT_HOME \
