@@ -69,6 +69,7 @@ public class Indenter {
         }
         System.err.println("indentations=" + indentations);
         if (indentations.isEmpty()) {
+            System.err.println(" - no line just containing an indented brace?");
             return emergencyAlternative;
         } else {
             return (String) indentations.commonestItem();
