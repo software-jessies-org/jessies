@@ -73,7 +73,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public int getLineOfOffset(int offset) {
-        return getCoordinates(offset).getLineIndex();
+        return getSplitLine(getCoordinates(offset).getLineIndex()).getLineIndex();
     }
     
     public void showRightHandMarginAt(int rightHandMarginColumn) {

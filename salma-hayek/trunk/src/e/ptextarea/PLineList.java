@@ -292,9 +292,13 @@ public class PLineList implements PTextListener {
             setWidthInvalid();
         }
         
+        public int getLengthBeforeTerminator() {
+            return isLineTerminated() ? length - 1 : length;
+        }
+        
         /** Returns the offset of the end of this line, not including any newline character. */
         public int getEndOffsetBeforeTerminator() {
-            return isLineTerminated() ? start + length - 1 : start + length;
+            return start + getLengthBeforeTerminator();
         }
         
         /**

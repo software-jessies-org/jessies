@@ -12,7 +12,6 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     public void keyPressed(KeyEvent event) {
-        long startTime = System.currentTimeMillis();
         if (event.isControlDown()) {
             switch (event.getKeyCode()) {
             case KeyEvent.VK_T: textArea.printLineInfo(); break;
@@ -54,8 +53,11 @@ public class PKeyHandler extends KeyAdapter {
                     }
                 }
             }
+        } else {
+            if (handleInvisibleKeyPressed(event)) {
+                event.consume();
+            }
         }
-//        System.err.println("keyPressed took " + (System.currentTimeMillis() - startTime) + "ms.");
     }
     
     public class PColoredHighlightMatcher implements PHighlightMatcher {
@@ -76,20 +78,75 @@ public class PKeyHandler extends KeyAdapter {
     
     public void keyTyped(KeyEvent event) {
         long startTime = System.currentTimeMillis();
-        char key = event.getKeyChar();
-        int caretLocation = textArea.getCaretLocation();
         if (event.isControlDown()) {
             // Do nothing.
-        } else if (key == KeyEvent.VK_BACK_SPACE) {
-            if (caretLocation > 0) {
-                caretLocation -= 1;
-                textArea.getPTextBuffer().delete(caretLocation, 1);
-                textArea.setCaretLocation(caretLocation);
+        } else {
+            if (event.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+                textArea.getPTextBuffer().insert(textArea.getCaretLocation(), new char[] { event.getKeyChar() });
+                textArea.setCaretLocation(textArea.getCaretLocation() + 1);
             }
-        } else if (key != KeyEvent.CHAR_UNDEFINED && event.isControlDown() == false) {
-            textArea.getPTextBuffer().insert(textArea.getCaretLocation(), new char[] { key });
-            textArea.setCaretLocation(caretLocation + 1);
         }
         System.err.println("keyTyped took " + (System.currentTimeMillis() - startTime) + "ms.");
+    }
+    
+    private boolean handleInvisibleKeyPressed(KeyEvent event) {
+        switch (event.getKeyCode()) {
+            case KeyEvent.VK_LEFT: moveCaretLeft(); break;
+            case KeyEvent.VK_RIGHT: moveCaretRight(); break;
+            case KeyEvent.VK_UP: moveCaretUp(); break;
+            case KeyEvent.VK_DOWN: moveCaretDown(); break;
+            case KeyEvent.VK_HOME: moveCaretToStartOfLine(); break;
+            case KeyEvent.VK_END: moveCaretToEndOfLine(); break;
+
+        default:
+            return false;
+        }
+        return true;
+    }
+    
+    private void moveCaretToStartOfLine() {
+        int lineIndex = textArea.getLineOfOffset(textArea.getCaretLocation());
+        textArea.setCaretLocation(textArea.getLineStartOffset(lineIndex));
+    }
+    
+    private void moveCaretToEndOfLine() {
+        int lineIndex = textArea.getLineOfOffset(textArea.getCaretLocation());
+        textArea.setCaretLocation(textArea.getLineEndOffset(lineIndex));
+    }
+    
+    private void moveCaretLeft() {
+        if (textArea.getCaretLocation() > 0) {
+            textArea.setCaretLocation(textArea.getCaretLocation() - 1);
+        }
+    }
+    
+    private void moveCaretRight() {
+        if (textArea.getCaretLocation() < textArea.getPTextBuffer().length() - 1) {
+            textArea.setCaretLocation(textArea.getCaretLocation() + 1);
+        }
+    }
+    
+    private void moveCaretUp() {
+        int lineIndex = textArea.getLineOfOffset(textArea.getCaretLocation());
+        if (lineIndex == 0) {
+            textArea.setCaretLocation(0);
+        } else {
+            int charOffset = textArea.getCaretLocation() - textArea.getLineStartOffset(lineIndex);
+            lineIndex--;
+            charOffset = Math.min(charOffset, textArea.getLineList().getLine(lineIndex).getLengthBeforeTerminator());
+            textArea.setCaretLocation(textArea.getLineStartOffset(lineIndex) + charOffset);
+        }
+    }
+    
+    private void moveCaretDown() {
+        int lineIndex = textArea.getLineOfOffset(textArea.getCaretLocation());
+        if (lineIndex == textArea.getLineCount() - 1) {
+            textArea.setCaretLocation(textArea.getPTextBuffer().length());
+        } else {
+            int charOffset = textArea.getCaretLocation() - textArea.getLineStartOffset(lineIndex);
+            lineIndex++;
+            charOffset = Math.min(charOffset, textArea.getLineList().getLine(lineIndex).getLengthBeforeTerminator());
+            textArea.setCaretLocation(textArea.getLineStartOffset(lineIndex) + charOffset);
+        }
     }
 }
