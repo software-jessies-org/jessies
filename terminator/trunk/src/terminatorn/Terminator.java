@@ -37,7 +37,7 @@ public class Terminator {
 	}
 	
 	private void initFrame() {
-		frame = new JFrame("Terminator");
+		frame = new JFrame(Options.getSharedInstance().getTitle());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(makeContentPane());
 		frame.pack();
