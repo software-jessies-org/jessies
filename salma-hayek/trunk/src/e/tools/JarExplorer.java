@@ -87,23 +87,11 @@ public class JarExplorer extends JFrame {
             }
         };
         
-        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        showLineNumberAndLocalVariableTables = new JCheckBox("Show Line Number Tables");
-        showLineNumberAndLocalVariableTables.addItemListener(itemListener);
-        checkBoxPanel.add(showLineNumberAndLocalVariableTables);
-        showVerboseDetail = new JCheckBox("Show Verbose Information");
-        showVerboseDetail.addItemListener(itemListener);
-        checkBoxPanel.add(showVerboseDetail);
-
-        list = new JList(model);
+        final FilteredListModel filteredListModel = new FilteredListModel(model);
+        
+        list = new JList(filteredListModel);
         list.setCellRenderer(new EListCellRenderer(true));
         list.setVisibleRowCount(10);
-        JScrollPane entriesScroller = new JScrollPane(list);
-        JPanel entriesPanel = new JPanel(new BorderLayout());
-        entriesPanel.add(entriesScroller, BorderLayout.CENTER);
-        entriesPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
-        entriesPanel.add(checkBoxPanel, BorderLayout.NORTH);
-
         list.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -111,7 +99,29 @@ public class JarExplorer extends JFrame {
                 }
             }
         });
-
+        
+        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        showLineNumberAndLocalVariableTables = new JCheckBox("Show Line Number Tables");
+        showLineNumberAndLocalVariableTables.addItemListener(itemListener);
+        checkBoxPanel.add(showLineNumberAndLocalVariableTables);
+        showVerboseDetail = new JCheckBox("Show Verbose Information");
+        showVerboseDetail.addItemListener(itemListener);
+        checkBoxPanel.add(showVerboseDetail);
+        final SearchField searchField = new SearchField();
+        searchField.setSendsNotificationForEachKeystroke(true);
+        searchField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                filteredListModel.setFilter(searchField.getText());
+            }
+        });
+        checkBoxPanel.add(searchField);
+        
+        JScrollPane entriesScroller = new JScrollPane(list);
+        JPanel entriesPanel = new JPanel(new BorderLayout());
+        entriesPanel.add(entriesScroller, BorderLayout.CENTER);
+        entriesPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
+        entriesPanel.add(checkBoxPanel, BorderLayout.NORTH);
+        
         summaryTextArea = makeTextArea();
         detailTextArea = makeTextArea();
 
