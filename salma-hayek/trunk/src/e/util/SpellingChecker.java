@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.regex.*;
 
 /**
- * Uses aspell(1) or ispell(1) to check spelling.
+ * Uses ispell(1) to check spelling.
  */
 public class SpellingChecker {
     private Process ispell;
@@ -25,11 +25,14 @@ public class SpellingChecker {
         return instance;
     }
     
-    /** Establishes the connection to aspell or ispell, if possible. We favor ispell because it's faster. */
+    /** Establishes the connection to ispell, if possible. */
     private SpellingChecker() {
-        boolean found = connectTo(new String[] { "ispell", "-a" });
+        // On Mac OS, we want to use the system's spelling checker, so try our
+        // NSSpell utility (which gives Apple's code an ispell-like interface)
+        // first.
+        boolean found = connectTo(new String[] { "NSSpell" });
         if (found == false) {
-            connectTo(new String[] { "aspell", "-a" });
+            connectTo(new String[] { "ispell", "-a" });
         }
     }
     
