@@ -600,7 +600,9 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				}
 			} else {
 				// Underline.
-				graphics.drawLine(top.x, bottomY, top.x + metrics.charWidth(' ') - 1, bottomY);
+				if (blinkOn) {
+					graphics.drawLine(top.x, bottomY, top.x + metrics.charWidth(' ') - 1, bottomY);
+				}
 			}
 		} else {
 			// For some reason, terminals always seem to use an
