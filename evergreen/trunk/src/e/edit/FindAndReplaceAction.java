@@ -133,61 +133,53 @@ public class FindAndReplaceAction extends ETextAction {
         // (a) the user cancels the dialog.
         // (b) we make it all through the text performing replacements.
         boolean finished = false;
-        do {
+        while (!finished) {
             boolean shouldReplace = FormDialog.show(Edit.getFrame(), "Find/Replace", formPanel);
-            
             if (shouldReplace == false) {
                 finished = true;
             } else {
-                String regex = patternField.getText();
-                String replacementPattern = replacementField.getText();
-                // Introduce a CompoundEdit to the UndoManager so that all our replacements are treated as a single UndoableEdit.
-                CompoundEdit entireEdit = new CompoundEdit();
-                UndoManager undoManager = text.getUndoManager();
-                undoManager.addEdit(entireEdit);
-                try {
-                    String newText = Pattern.compile(regex, Pattern.MULTILINE).matcher(text.getText()).replaceAll(replacementPattern);
-                    int caretPosition = text.getCaretPosition(); // Assume the text doesn't change too much.
-                    text.setText(newText);
-                    text.setCaretPosition(caretPosition);
-                    finished = true;
-                } catch (Exception ex) {
-                    Edit.showAlert("Find And Replace", "Couldn't perform the replacements (" + ex.getMessage() + ").");
-                } finally {
-                    // Ensure that, no matter what happens, we finish the CompoundEdit so life can go back to normal.
-                    // FIXME: We should probably undo the CompoundEdit if an exception was thrown, but as it is we're likely to want to fix what went wrong.
-                    entireEdit.end();
-                }
-                
-                /*
-                ----------------------------------------------------------------------------------------------------
-                This is retired because it doesn't cope properly with the case where the regex is "$".
-                ----------------------------------------------------------------------------------------------------
-                    Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-                    int offset = 0;
-                    do {
-                        // We need a new Matcher each time because we're going forwards and modifying the text at the same time.
-                        Matcher matcher = pattern.matcher(text.getText());
-                        if (matcher.find(offset) == false) {
-                            finished = true;
-                            break;
-                        }
-                        // Do the replacement.
-                        final int start = matcher.start();
-                        final int end = matcher.end();
-                        System.err.println(""+start+".."+end);
-                        final String replacement = makeReplacement(matcher, replacementPattern);
-                        text.replaceRange(replacement, start, end);
-                        // Work out where we need to start looking for the next match.
-                        offset = start + replacement.length();
-                    } while (true);
-                ----------------------------------------------------------------------------------------------------
-                */
+                finished = doReplacementsInText();
             }
-        } while (!finished);
+        }
         
         textWindow = null;
         text = null;
+    }
+
+    public boolean doReplacementsInText() {
+        // Introduce a CompoundEdit to the UndoManager so that all our replacements are treated as a single UndoableEdit.
+        CompoundEdit entireEdit = new CompoundEdit();
+        UndoManager undoManager = text.getUndoManager();
+        undoManager.addEdit(entireEdit);
+        try {
+            if (text.getSelectionStart() != text.getSelectionEnd()) {
+                // There's a selection, so only replace in that.
+                int selectionStart = text.getSelectionStart();
+                String newText = makeReplacedText(text.getSelectedText());
+                text.replaceSelection(newText);
+                text.select(selectionStart, selectionStart + newText.length());
+            } else {
+                // There's no selection, so do the whole text.
+                int caretPosition = text.getCaretPosition();
+                text.setText(makeReplacedText(text.getText()));
+                text.setCaretPosition(caretPosition);
+            }
+            return true;
+        } catch (Exception ex) {
+            Edit.showAlert("Find And Replace", "Couldn't perform the replacements (" + ex.getMessage() + ").");
+            return false;
+        } finally {
+            // Ensure that, no matter what happens, we finish the CompoundEdit so life can go back to normal.
+            // FIXME: We should probably undo the CompoundEdit if an exception was thrown, but as it is we're likely to want to fix what went wrong.
+            entireEdit.end();
+        }
+    }
+
+    public String makeReplacedText(String oldText) {
+        String regularExpression = patternField.getText();
+        String replacementPattern = replacementField.getText();
+        Pattern pattern = Pattern.compile(regularExpression, Pattern.MULTILINE);
+        return pattern.matcher(oldText).replaceAll(replacementPattern);
     }
 
     public class DisplayableMatchRenderer extends DefaultListCellRenderer {

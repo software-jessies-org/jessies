@@ -127,10 +127,6 @@ let us always show the user-friendly forms.
     [ ] Some way of marking submatch groups: the whole match is marked in
         green, but it would be good to also see the submatches within that.
 
-    [ ] An option to only work on the selection. ("If there's a selection, use that,
-        otherwise use the whole file"?) Java 1.5's regular expression code has
-        support for this, so I'm planning on waiting until then.
-
 [ ] upon performing 'new file', and including a non-existent directory as
     part of the new filename, the directory should be created too, i think.
     perhaps with a 'you've either mistyped that, or you want a new
