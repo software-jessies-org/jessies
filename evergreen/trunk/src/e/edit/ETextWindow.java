@@ -316,7 +316,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     
     public Collection getPopupMenuItems() {
         ArrayList items = new ArrayList();
-        items.add(new OpenSelectionAction());
+        items.add(new OpenQuicklyAction());
         items.add(new FindFilesContainingSelectionAction());
         items.add(new RevertToSavedAction());
         addContextSpecificMenuItems(items);

@@ -87,7 +87,7 @@ public class EErrorsWindow extends EWindow implements LinkListener {
     
     public Collection getPopupMenuItems() {
         ArrayList items = new ArrayList();
-        items.add(new OpenSelectionAction());
+        items.add(new OpenQuicklyAction());
         items.add(new FindFilesContainingSelectionAction());
         items.add(null);
         items.add(new ClearErrorsAction());
