@@ -1,6 +1,7 @@
 package e.util;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 public class GuiUtilities {
@@ -38,6 +39,20 @@ public class GuiUtilities {
      */
     public static boolean isWindows() {
         return (System.getProperty("os.name").indexOf("Windows") != -1);
+    }
+    
+    public static KeyStroke makeKeyStroke(String key, boolean shifted) {
+        int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        if (shifted) modifiers |= InputEvent.SHIFT_MASK;
+        String keycodeName = "VK_" + key;
+        int keycode;
+        try {
+            keycode = KeyEvent.class.getField(keycodeName).getInt(KeyEvent.class);
+            return KeyStroke.getKeyStroke(keycode, modifiers);
+        } catch (Exception ex) {
+            Log.warn("Couldn't find virtual keycode for '" + key + "'.", ex);
+        }
+        return null;
     }
     
     public static void initLookAndFeel() {
