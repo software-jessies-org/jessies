@@ -30,6 +30,8 @@ public class Options {
 	private HashMap options = new HashMap();
 	private HashMap rgbColours = new HashMap();
 	
+	private HashMap propertySets = new HashMap();
+	
 	public static Options getSharedInstance() {
 		return INSTANCE;
 	}
@@ -128,7 +130,13 @@ public class Options {
 		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
+		File terminatorOptionsFile = new File(System.getProperty("user.home"), ".terminator");
 		aliasColorBD();
+		try {
+			readTerminatorOptions(terminatorOptionsFile);
+		} catch (IOException ex) {
+			Log.warn("Problem reading options from " + terminatorOptionsFile.getPath(), ex);
+		}
 	}
 	
 	/**
@@ -223,7 +231,9 @@ public class Options {
 			if (in != null) {
 				try {
 					in.close();
-				} catch (IOException ex) { }
+				} catch (IOException ex) {
+					Log.warn("Couldn't close file.", ex);
+				}
 			}
 		}
 	}
@@ -245,14 +255,25 @@ public class Options {
 	}
 	
 	private void readOptionsFrom(File file) throws IOException {
-		LineNumberReader in = new LineNumberReader(new FileReader(file));
-		String line;
-		while ((line = in.readLine()) != null) {
-			line = line.trim();
-			if (line.length() == 0 || line.startsWith("!")) {
-				continue;
+		LineNumberReader in = null;
+		try {
+			in = new LineNumberReader(new FileReader(file));
+			String line;
+			while ((line = in.readLine()) != null) {
+				line = line.trim();
+				if (line.length() == 0 || line.startsWith("!")) {
+					continue;
+				}
+				processResourceString(line);
 			}
-			processResourceString(line);
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException ex) {
+					Log.warn("Couldn't close stream.", ex);
+				}
+			}
 		}
 	}
 	
@@ -262,6 +283,85 @@ public class Options {
 			String key = matcher.group(1);
 			String value = matcher.group(2);
 			options.put(key, value);
+		}
+	}
+	
+	public String[] getPropertySetNames(String type) {
+		HashMap typeSets = (HashMap) propertySets.get(type);
+		if (typeSets == null) {
+			return new String[0];
+		} else {
+			return (String[]) typeSets.keySet().toArray(new String[0]);
+		}
+	}
+	
+	public Properties getPropertySet(String type, String name) {
+		HashMap typeSets = (HashMap) propertySets.get(type);
+		if (typeSets == null) {
+			return null;
+		} else {
+			HashMap map = (HashMap) typeSets.get(name);
+			if (map == null) {
+				return null;
+			} else {
+				Properties result = new Properties();
+				result.putAll(map);
+				return result;
+			}
+		}
+	}
+	
+	private void readTerminatorOptions(File file) throws IOException {
+		if (file.exists() == false) {
+			Log.warn("Create a file called " + file.getPath() + " with your Terminator setup.");
+			return;
+		}
+		LineNumberReader in = null;
+		try {
+			in = new LineNumberReader(new FileReader(file));
+			Pattern propertySetOpener = Pattern.compile("^(\\w+)\\s+(\\w+)\\s+\\{");
+			String line;
+			HashMap propertySet = null;
+			while ((line = in.readLine()) != null) {
+				line = line.trim();
+				if (line.length() == 0 || line.startsWith("#")) {
+					continue;
+				}
+				if (propertySet == null) {
+					Matcher matcher = propertySetOpener.matcher(line);
+					if (matcher.matches()) {
+						String type = matcher.group(1);
+						String name = matcher.group(2);
+						propertySet = new HashMap();
+						HashMap typeMap = (HashMap) propertySets.get(type);
+						if (typeMap == null) {
+							typeMap = new HashMap();
+							propertySets.put(type, typeMap);
+						}
+						typeMap.put(name, propertySet);
+					}
+				} else {
+					int equalsIndex = line.indexOf('=');
+					if (line.equals("}")) {
+						propertySet = null;
+					} else if (equalsIndex != -1) {
+						String key = line.substring(0, equalsIndex).trim();
+						String value = line.substring(equalsIndex + 1).trim();
+						if (value.startsWith("\"") && value.endsWith("\"")) {
+							value = value.substring(1, value.length() - 1);
+						}
+						propertySet.put(key, value);
+					}
+				}
+			}
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException ex) {
+					Log.warn("Couldn't close stream.", ex);
+				}
+			}
 		}
 	}
 }

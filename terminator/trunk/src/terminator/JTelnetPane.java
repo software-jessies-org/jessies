@@ -83,7 +83,9 @@ public class JTelnetPane extends JPanel {
 				if (in != null) {
 					try {
 						in.close();
-					} catch (IOException ex) { }
+					} catch (IOException ex) {
+						Log.warn("Couldn't close file.", ex);
+					}
 				}
 			}
 		}
