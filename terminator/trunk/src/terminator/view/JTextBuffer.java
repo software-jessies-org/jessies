@@ -565,7 +565,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				paintCaret(graphics, metrics, "", baseline);
 			}
 		}
-		paintCaretCross(graphics, metrics);
+		//paintCaretCross(graphics, metrics);
 		if (ANTIALIAS) {
 			((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
 		}
