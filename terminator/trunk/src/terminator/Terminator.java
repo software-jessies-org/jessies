@@ -378,7 +378,7 @@ public class Terminator implements Controller {
 	}
 	
 	public void showVersion() {
-		System.err.println("Terminator 0.9 (24th May 2004), copyright Phil Norman, Elliott Hughes.");
+		System.err.println("Terminator 1.0 (28th May 2004), copyright Phil Norman, Elliott Hughes.");
 		System.exit(0);
 	}
 
