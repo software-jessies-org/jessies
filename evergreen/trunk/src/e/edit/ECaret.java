@@ -33,6 +33,39 @@ public class ECaret extends DefaultCaret {
         super.setSelectionVisible(true);
     }
     
+    public void paint(Graphics g) {
+        if(isVisible()) {
+            try {
+                JTextComponent component = (JTextComponent) getComponent();
+                javax.swing.plaf.TextUI mapper = component.getUI();
+                Rectangle r = mapper.modelToView(component, getDot());
+                
+                if ((r == null) || ((r.width == 0) && (r.height == 0))) {
+                    return;
+                }
+                g.setColor(component.getCaretColor());
+                g.drawLine(r.x, r.y, r.x, r.y + r.height - 1);
+                g.drawLine(r.x -1, r.y -1, r.x, r.y);
+                g.drawLine(r.x +1, r.y -1, r.x, r.y);
+                g.drawLine(r.x -1, r.y + r.height, r.x, r.y + r.height - 1);
+                g.drawLine(r.x +1, r.y + r.height, r.x, r.y + r.height - 1);
+           } catch (BadLocationException e) {
+                // can't render I guess
+                System.err.println("Can't render cursor");
+            }
+        }
+    }
+    
+    protected synchronized void damage(Rectangle r) {
+        if (r != null) {
+            x = r.x - 4;
+            y = r.y - 1;
+            width = 10;
+            height = r.height + 2;
+            repaint();
+        }
+    }
+    
     /** Selects the line at the cursor. */
     public void selectLineAtCursor(JTextComponent text) {
         Element line = javax.swing.text.Utilities.getParagraphElement(text, text.getSelectionStart());
