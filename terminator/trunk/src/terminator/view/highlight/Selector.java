@@ -16,7 +16,7 @@ import terminator.view.*;
  * towards shell-like applications), triple-click for line selection, and
  * shift-click to extend a selection.
  */
-public class Selector implements MouseListener, MouseMotionListener, Highlighter {
+public class Selector implements ClipboardOwner, MouseListener, MouseMotionListener, Highlighter {
 	/**
 	 * If the user configured a selection color, we use that as the
 	 * background for selected text. If not, we use the old reverse
@@ -102,7 +102,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	/**
 	 * Copies the selected text to the clipboard.
 	 */
-	public void copy() {
+	private void copy() {
 		if (highlight != null) {
 			setClipboard(view.getTabbedText(highlight));
 		}
@@ -132,6 +132,13 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		}
 		startLocation = new Location(lineNumber, start);
 		setHighlight(startLocation, new Location(lineNumber, end));
+		copy();
+	}
+	
+	private void clearSelection() {
+		view.removeHighlightsFrom(this, 0);
+		startLocation = null;
+		highlight = null;
 	}
 	
 	public void selectAll() {
@@ -147,18 +154,28 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		Location end = new Location(location.getLineIndex() + 1, 0);
 		startLocation = start;
 		setHighlight(start, end);
+		copy();
 	}
 	
 	/**
 	 * Sets the clipboard (and X11's nasty hacky semi-duplicate).
 	 */
-	public static void setClipboard(String newContents) {
+	private void setClipboard(String newContents) {
 		StringSelection selection = new StringSelection(newContents);
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		toolkit.getSystemClipboard().setContents(selection, selection);
+		toolkit.getSystemClipboard().setContents(selection, this);
 		if (toolkit.getSystemSelection() != null) {
-			toolkit.getSystemSelection().setContents(selection, selection);
+			toolkit.getSystemSelection().setContents(selection, this);
 		}
+	}
+	
+	/**
+	 * Invoked to notify us that we no longer own the clipboard; we use
+	 * this to clear the selection, so we're not misrepresenting the
+	 * situation.
+	 */
+	public void lostOwnership(Clipboard clipboard, Transferable contents) {
+		clearSelection();
 	}
 	
 	/**
