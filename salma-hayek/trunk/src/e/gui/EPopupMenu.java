@@ -12,6 +12,16 @@ public class EPopupMenu {
     /** Creates a new popup menu. */
     public EPopupMenu() { }
     
+    /** Adds a single item. */
+    public void add(Action item) {
+        menuItems.add(item);
+    }
+    
+    /** Adds a separator. */
+    public void addSeparator() {
+        menuItems.add(null);
+    }
+    
     /** Adds a group of Action items to the end of the current list of items. */
     public void add(Action[] items) {
         for (int i = 0; i < items.length; i++) {
