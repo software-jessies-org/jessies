@@ -150,7 +150,7 @@ public class JTelnetPane extends JPanel {
 	 * window, that means our down scroll arrow gets covered.
 	 */
 	private void fixScrollBarForMacOs(JScrollPane scrollPane) {
-		if (System.getProperty("os.name").indexOf("Mac OS") == -1) {
+		if (GuiUtilities.isMacOs() == false) {
 			return;
 		}
 		
@@ -195,14 +195,7 @@ public class JTelnetPane extends JPanel {
 		 * conveniently for Mac users -- is in the same place on a PC
 		 * keyboard as Command on a Mac keyboard.
 		 */
-		private int keyboardEquivalentModifier;
-		{
-			if (System.getProperty("os.name").indexOf("Mac OS") != -1) {
-				keyboardEquivalentModifier = KeyEvent.META_MASK;
-			} else {
-				keyboardEquivalentModifier = KeyEvent.ALT_MASK;
-			}
-		}
+		private int keyboardEquivalentModifier = GuiUtilities.isMacOs() ? KeyEvent.META_MASK : KeyEvent.ALT_MASK;
 		
 		/**
 		 * Tests whether the given event corresponds to a keyboard

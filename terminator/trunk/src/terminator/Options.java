@@ -122,8 +122,7 @@ public class Options {
 	 * because we're unlikely to understand those font specifications).
 	 */
 	public Font getFont() {
-		boolean isMacOS = (System.getProperty("os.name").indexOf("Mac") != -1);
-		return Font.decode(isMacOS ? "Monaco" : "Monospaced");
+		return Font.decode(GuiUtilities.isMacOs() ? "Monaco" : "Monospaced");
 	}
 	
 	private Options() {
