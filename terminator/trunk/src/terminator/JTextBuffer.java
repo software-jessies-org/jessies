@@ -78,6 +78,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			}
 		});
 		addHighlighter(new HyperlinkHighlighter());
+		addHighlighter(new FindHighlighter());
 		becomeDropTarget();
 		cursorBlinker = new CursorBlinker(this);
 		new Selector(this);
@@ -230,12 +231,23 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	// Highlighting support.
 	
+	/**
+	 * Adds a highlighter. Highlighters are referred to by class, so it's
+	 * a bad idea to have more than one of the same class.
+	 */
 	public void addHighlighter(Highlighter highlighter) {
-		highlighters.put(highlighter.getName(), highlighter);
+		Class kind = highlighter.getClass();
+		if (highlighters.get(kind) != null) {
+			throw new IllegalArgumentException("duplicate " + kind);
+		}
+		highlighters.put(kind, highlighter);
 	}
 	
-	public Highlighter getHighlighter(String name) {
-		return (Highlighter) highlighters.get(name);
+	/**
+	 * Returns the highlighter of the given class.
+	 */
+	public Highlighter getHighlighterOfClass(Class kind) {
+		return (Highlighter) highlighters.get(kind);
 	}
 	
 	public Highlighter[] getHighlighters() {

@@ -35,6 +35,7 @@ public class Terminator implements Controller {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				initFrame();
+				initFindField();
 				initFocus();
 				startThreads();
 			}
@@ -216,6 +217,68 @@ public class Terminator implements Controller {
 	
 	public void openCommandPane(String command, boolean focusOnNewTab) {
 		addPane(JTelnetPane.newCommandWithTitle(this, command, command), focusOnNewTab);
+	}
+	
+	private JWindow findWindow;
+	private JTextField findField;
+	private JTextBuffer textToFindIn;
+	
+	private void initFindField() {
+		findField = new JTextField("", 40);
+		findField.addFocusListener(new FocusAdapter() {
+			public void focusLost(FocusEvent e) {
+				hideFindDialog();
+			}
+		});
+		findField.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				if (e.getKeyChar() == '\n') {
+					find(findField.getText());
+					hideFindDialog();
+					e.consume();
+				}
+			}
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					hideFindDialog();
+					e.consume();
+				}
+			}
+		});
+	}
+	
+	private void find(String regularExpression) {
+		FindHighlighter finder = (FindHighlighter) textToFindIn.getHighlighterOfClass(FindHighlighter.class);
+		finder.setRegularExpression(textToFindIn, regularExpression);
+	}
+	
+	public void showFindDialogFor(JTextBuffer text) {
+		this.textToFindIn = text;
+		hideFindDialog();
+		
+		Point location = frame.getLocationOnScreen();
+		location.y += frame.getHeight();
+		
+		findWindow = new JWindow(frame);
+		findWindow.setContentPane(findField);
+		findWindow.setLocation(location);
+		findWindow.pack();
+		
+		Dimension findWindowSize = findWindow.getSize();
+		findWindowSize.width = frame.getWidth();
+		findWindow.setSize(findWindowSize);
+		
+		findField.selectAll();
+		
+		findWindow.setVisible(true);
+	}
+	
+	private void hideFindDialog() {
+		if (findWindow != null) {
+			findWindow.setVisible(false);
+			findWindow.dispose();
+			findWindow = null;
+		}
 	}
 	
 	private void addPane(JTelnetPane newPane, boolean focusOnNewTab) {

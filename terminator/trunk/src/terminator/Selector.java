@@ -30,7 +30,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		if (selectionColor == null) {
 			styler = new SelectedStyleMutator();
 		} else {
-			styler = new Style(Options.getSharedInstance().getColor("foreground"), selectionColor, false, false);
+			styler = new Style(Options.getSharedInstance().getColor("foreground"), selectionColor, null, null);
 		}
 	}
 
