@@ -107,6 +107,8 @@ public class StringUtilities {
                     char actualChar = (char) Integer.parseInt(s.substring(++i, i + 4), 16);
                     i += 3;
                     result.append(actualChar);
+                } else {
+                    result.append(next);
                 }
             } else {
                 result.append(c);
