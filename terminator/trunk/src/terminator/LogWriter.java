@@ -11,6 +11,7 @@ import java.util.*;
 public class LogWriter {
 	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ssZ");
 	
+	private String filename;
 	private FileWriter stream;
 	
 	public LogWriter(String prefix) throws IOException {
@@ -18,12 +19,8 @@ public class LogWriter {
 		String timestamp = dateFormatter.format(new Date());
 		String logsDirectoryName = System.getProperty("user.home") + File.separator + ".terminal-logs" + File.separator;
 		File logsDirectory = new File(logsDirectoryName);
-		if (logsDirectory.exists() == false) {
-			stream = new FileWriter("/dev/null");
-		} else {
-			String filename =  prefix + '-' + timestamp + ".txt";
-			stream = new FileWriter(logsDirectoryName + filename);
-		}
+		this.filename = (logsDirectory.exists() ? (logsDirectoryName + prefix + '-' + timestamp + ".txt") : "/dev/null");
+		this.stream = new FileWriter(filename);
 	}
 	
 	public void append(char ch) throws IOException {
@@ -31,5 +28,9 @@ public class LogWriter {
 		if (ch == '\n') {
 			stream.flush();
 		}
+	}
+	
+	public String getFilename() {
+		return filename;
 	}
 }

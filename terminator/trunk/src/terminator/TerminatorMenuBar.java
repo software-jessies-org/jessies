@@ -31,6 +31,9 @@ public class TerminatorMenuBar extends JMenuBar {
 		menu.add(new JMenuItem(new CloseAction()));
 		//menu.add(new JMenuItem(new SaveAsAction()));
 		
+		menu.add(new JSeparator());
+		menu.add(new JMenuItem(new ShowInfoAction()));
+		
 		/*
 		if (GuiUtilities.isMacOs() == false) {
 			menu.add(new JSeparator());
@@ -153,7 +156,21 @@ public class TerminatorMenuBar extends JMenuBar {
 			}
 		}
 	}
-
+	
+	public static class ShowInfoAction extends AbstractAction {
+		public ShowInfoAction() {
+			super("Show Info");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("I"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				InfoDialog.getSharedInstance().showInfoDialogFor(terminal);
+			}
+		}
+	}
+	
 	class SaveAsAction extends AbstractAction {
 		public SaveAsAction() {
 			super("Save As...");
