@@ -272,7 +272,6 @@ public class FindAndReplaceAction extends ETextAction {
             this.replacementsModel = new DefaultListModel();
             this.regex = pattern;
             this.replacement = StringUtilities.unescapeJava(replacement);
-            setStatusToGood();
             start();
         }
         
@@ -335,6 +334,7 @@ public class FindAndReplaceAction extends ETextAction {
             } else if (replacementSyntaxError != null) {
                 setStatusToBad(replacementSyntaxError.getMessage(), replacementField);
             } else {
+                setStatusToGood();
                 matchList.setModel(matchModel);
                 replacementsList.setModel(replacementsModel);
             }
