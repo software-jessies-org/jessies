@@ -80,30 +80,43 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
 
         try {
             Highlighter highlighter = textComponent.getHighlighter();
-            int braceNesting = 0;
             int parenthesisNesting = 0;
+            Stack indentationStack = new Stack();
+            String indentation = new String();
+            boolean withinIndent = true;
             for (int i = 0; i < text.length(); ++i) {
                 char ch = text.charAt(i);
+                if (ch == '\n') {
+                    indentation = new String();
+                    withinIndent = true;
+                } else if (withinIndent) {
+                    if (ch == ' ' || ch == '\t') {
+                        indentation = indentation + ch;
+                    } else {
+                        withinIndent = false;
+                    }
+                }
+                boolean addHighlight = false;
                 if (ch == '(') {
                     ++parenthesisNesting;
                 } else if (ch == ')') {
                     --parenthesisNesting;
                 } else if (ch == '{') {
-                    ++braceNesting;
+                    indentationStack.push(indentation);
                 } else if (ch == '}') {
-                    --braceNesting;
+                    if (indentationStack.empty()) {
+                        addHighlight = true;
+                    } else {
+                        String openingIndentation = (String) indentationStack.pop();
+                        if (openingIndentation.equals(indentation) == false) {
+                            addHighlight = true;
+                        }
+                    }
                 }
-
-                boolean addHighlight = false;
-                if (parenthesisNesting < 0 && (ch == '{' || ch == '}' || ch == ')')) {
-                    // Can't have a block within parentheses.
+                
+                if (parenthesisNesting < 0) {
                     addHighlight = true;
                     parenthesisNesting = 0;
-                }
-                if (braceNesting < 0 && (ch == '{' || ch == '}')) {
-                    // Can't have unbalanced braces.
-                    addHighlight = true;
-                    braceNesting = 0;
                 }
 
                 if (addHighlight) {
