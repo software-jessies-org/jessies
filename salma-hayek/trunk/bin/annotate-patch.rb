@@ -4,7 +4,9 @@
 #   annotate-patch.rb - add scope names to patch hunks
 #
 # SYNOPSIS
-#   annotate-patch.rb patch-file
+#   annotate-patch.rb <patch-filename>
+#   svn diff | annotate-patch.rb -
+#   svn diff | annotate-patch.rb
 #
 # DESCRIPTION
 #   Appends scope names to the end of lines in a patch that introduce hunks,
@@ -59,11 +61,6 @@ EOF
 
 # -----------------------------------------------------------------------------
 
-if ARGV.length() != 1
-  print("usage: #{$0} patch-file\n")
-  exit(1)
-end
-
 def tags_for_file(filename)
   tag_lines = `ctags -n -f - #{filename}`.split('\n')
   namespace_separator=(filename =~ /\.java$/) ? "." : "::"
@@ -95,25 +92,40 @@ def find_tag_for_line(tags, line)
  return name
 end
 
-minus_file = "(unknown)"
-minus_tags = []
-plus_file = "(unknown)"
-plus_tags = []
-
-file = File.new(ARGV[0])
-lines = file.readlines()
-lines.each() {
- |line|
- if line =~ /^\+\+\+ (\S+)\s/
-  plus_file = $1
-  plus_tags = tags_for_file(plus_file)
- elsif line =~ /^--- (\S+)\s/
-  minus_file = $1
-  minus_tags = tags_for_file(minus_file)
- elsif line =~ /^@@ -(\d+),\d+ \+(\d+),\d+ @@/
-  plus_tag = find_tag_for_line(plus_tags, $2)
-  minus_tag = find_tag_for_line(minus_tags, $1)
-  line = "#{line.chomp()} #{minus_tag} #{plus_tag}\n"
+def annotate_patch()
+ file = $stdin
+ if ARGV.length() > 1
+  print("usage: #{$0} patch-file\n(or use as a filter)\n")
+  exit(1)
+ elsif ARGV.length() == 1 && ARGV[0] != "-"
+  file = File.new(ARGV[0])
  end
- print(line)
-}
+ 
+ minus_file = "(unknown)"
+ minus_tags = []
+ plus_file = "(unknown)"
+ plus_tags = []
+ 
+ file.each_line() {
+  |line|
+  if line =~ /^\+\+\+ (\S+)\s/
+   plus_file = $1
+   plus_tags = tags_for_file(plus_file)
+  elsif line =~ /^--- (\S+)\s/
+   minus_file = $1
+   minus_tags = tags_for_file(minus_file)
+  elsif line =~ /^@@ -(\d+),\d+ \+(\d+),\d+ @@/
+   plus_tag = find_tag_for_line(plus_tags, $2)
+   minus_tag = find_tag_for_line(minus_tags, $1)
+   tag = "#{minus_tag}"
+   if plus_tag != minus_tag
+    tag << " #{plus_tag}"
+   end
+   line = "#{line.chomp()} #{tag}\n"
+  end
+  print(line)
+ }
+end
+
+annotate_patch()
+exit(0)
