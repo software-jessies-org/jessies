@@ -11,7 +11,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
-import e.gui.JTextComponentSpellingChecker;
+import e.gui.*;
 import e.util.*;
 
 /**
@@ -83,32 +83,12 @@ public class ETextArea extends JTextArea {
         return spellingChecker;
     }
     
-    public void ensureVisibilityOfOffset(int offset) {
-        JViewport viewport = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, this);
-        if (viewport == null) {
-            return;
-        }
-        int height = viewport.getExtentSize().height;
-        try {
-            Rectangle viewRectangle = modelToView(offset);
-            if (viewRectangle == null) {
-                return;
-            }
-            int y = viewRectangle.y - height/2;
-            y = Math.max(0, y);
-            y = Math.min(y, getHeight() - height);
-            viewport.setViewPosition(new Point(0, y));
-        } catch (javax.swing.text.BadLocationException ex) {
-            ex.printStackTrace();
-        }
-    }
-    
     public void setFont(Font font) {
         // Changing font can cause the area around the caret to have moved off-screen.
         // We also have to bear in mind that setFont is called early on during construction, so there may not be a caret!
         int originalCaretPosition = (getCaret() != null) ? getCaretPosition() : 0;
         super.setFont(font);
-        ensureVisibilityOfOffset(originalCaretPosition);
+        JTextComponentUtilities.ensureVisibilityOfOffset(this, originalCaretPosition);
         
         boolean fixedWidth = isFontFixedWidth(font);
         setTabSize(fixedWidth ? 8 : 2);

@@ -1,6 +1,7 @@
 package e.edit;
 
 import java.awt.event.*;
+import e.gui.*;
 
 /**
 An action that ensures that the selection is visible.
@@ -17,6 +18,6 @@ public class ScrollToSelectionAction extends ETextAction {
         if (window == null) {
             return;
         }
-        window.getText().ensureVisibilityOfOffset(window.getText().getCaretPosition());
+        JTextComponentUtilities.ensureVisibilityOfOffset(window.getText(), window.getText().getCaretPosition());
     }
 }

@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.text.*;
+import e.gui.*;
 import e.util.*;
 
 /**
@@ -108,7 +109,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     public void wasCanceled() {
         removeAllMatches();
         currentRegularExpression = null;
-        currentTextWindow.goToSelection(initialSelectionStart, initialSelectionEnd);
+        JTextComponentUtilities.goToSelection(currentTextWindow.getText(), initialSelectionStart, initialSelectionEnd);
     }
     
     //
@@ -130,13 +131,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     //
     
     public void removeAllMatches() {
-        Highlighter highlighter = currentTextWindow.getText().getHighlighter();
-        Highlighter.Highlight[] highlights = highlighter.getHighlights();
-        for (int i = 0; i < highlights.length; i++) {
-            if (highlights[i].getPainter() == PAINTER) {
-                highlighter.removeHighlight(highlights[i]);
-            }
-        }
+        JTextComponentUtilities.removeAllHighlightsUsingPainter(currentTextWindow.getText(), PAINTER);
         currentTextWindow.getBirdView().clearMatchingLines();
     }
     
