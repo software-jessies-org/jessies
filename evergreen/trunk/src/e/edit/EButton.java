@@ -18,7 +18,7 @@ public class EButton extends ELabel implements MouseListener {
     private boolean wasPressed = false;
 
     public EButton(AbstractAction action) {
-        this((String) action.getValue(action.NAME), action);
+        this((String) action.getValue(Action.NAME), action);
     }
 
     public EButton(String label) {
