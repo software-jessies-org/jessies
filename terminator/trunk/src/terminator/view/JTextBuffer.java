@@ -581,12 +581,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				continue;
 			}
 			boolean drawCaret = (shouldShowCursor() && i == caretPosition.getLineIndex());
-			StyledText[] lineText = getLineText(i);
 			int x = 0;
 			int baseline = metrics.getHeight() * (i + 1) - metrics.getMaxDescent();
 			int startOffset = 0;
-			for (int j = 0; j < lineText.length; j++) {
-				StyledText chunk = lineText[j];
+			Iterator it = getLineText(i).iterator();
+			while (it.hasNext()) {
+				StyledText chunk = (StyledText) it.next();
 				x += paintStyledText(graphics, chunk, x, baseline);
 				String chunkText = chunk.getText();
 				if (drawCaret && caretPosition.charOffsetInRange(startOffset, startOffset + chunkText.length())) {
@@ -607,8 +607,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		}
 	}
 	
-	public StyledText[] getLineText(int line) {
-		StyledText[] result = model.getLineText(line);
+	public List/*<StyledText>*/ getLineText(int line) {
+		List result = model.getLineText(line);
 		List highlights = getHighlightsForLine(line);
 		for (int i = 0; i < highlights.size(); i++) {
 			Highlight highlight = (Highlight) highlights.get(i);

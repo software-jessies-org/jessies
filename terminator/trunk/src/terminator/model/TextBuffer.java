@@ -3,6 +3,7 @@ package terminator.model;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import e.util.*;
 import terminator.terminal.*;
@@ -388,7 +389,7 @@ public class TextBuffer implements TerminalListener {
 		return width;
 	}
 	
-	public StyledText[] getLineText(int lineIndex) {
+	public List/*<StyledText>*/ getLineText(int lineIndex) {
 		return get(lineIndex).getStyledTextSegments();
 	}
 	

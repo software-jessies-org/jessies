@@ -2,6 +2,7 @@ package terminator.view.highlight;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import terminator.model.*;
 
@@ -56,27 +57,28 @@ public class Highlight {
 	* Returns a modified set of styled text regions based upon the set passed in, which are
 	* at the given location.  The returned array will be at least as long as the given array.
 	*/
-	public StyledText[] applyHighlight(StyledText[] unlit, Location unlitStart) {
+	public List/*<StyledText>*/ applyHighlight(List/*<StyledText>*/ unlit, Location unlitStart) {
 		ArrayList result = new ArrayList();
 		int startOffset = (unlitStart.getLineIndex() == start.getLineIndex()) ? start.getCharOffset() : 0;
 		int endOffset = (unlitStart.getLineIndex() == end.getLineIndex()) ? end.getCharOffset() : Integer.MAX_VALUE;
 		int offset = 0;
-		for (int i = 0; i < unlit.length; i++) {
-			String unlitText = unlit[i].getText();
+		for (int i = 0; i < unlit.size(); i++) {
+			StyledText styledText = (StyledText) unlit.get(i);
+			String unlitText = styledText.getText();
 			int unlitEnd = offset + unlitText.length();
-			if (startOffset <= offset && endOffset >= offset + unlitEnd) {  // unlit[i] completely within highlight.
-				result.add(new StyledText(unlitText, style.appliedTo(unlit[i].getStyle())));
-			} else if (startOffset >= unlitEnd || endOffset <= offset) {  // unlit[i] completely outside highlight.
-				result.add(unlit[i]);
-			} else {  // unlit[i] is partially inside highlight.
-				if (startOffset > offset) {  // highlight starts part-way through unlit[i].
-					result.add(new StyledText(unlitText.substring(0, startOffset - offset), unlit[i].getStyle()));
+			if (startOffset <= offset && endOffset >= offset + unlitEnd) {  // styledText completely within highlight.
+				result.add(new StyledText(unlitText, style.appliedTo(styledText.getStyle())));
+			} else if (startOffset >= unlitEnd || endOffset <= offset) {  // styledText completely outside highlight.
+				result.add(styledText);
+			} else {  // styledText is partially inside highlight.
+				if (startOffset > offset) {  // highlight starts part-way through styledText.
+					result.add(new StyledText(unlitText.substring(0, startOffset - offset), styledText.getStyle()));
 				}
 				String midText = unlitText.substring(Math.max(0, startOffset - offset),
 						Math.min(unlitEnd - offset, endOffset - offset));
-				result.add(new StyledText(midText, style.appliedTo(unlit[i].getStyle())));
-				if (endOffset < unlitEnd) {  // highlight ends part-way through unlit[i].
-					result.add(new StyledText(unlitText.substring(endOffset - offset), unlit[i].getStyle()));
+				result.add(new StyledText(midText, style.appliedTo(styledText.getStyle())));
+				if (endOffset < unlitEnd) {  // highlight ends part-way through styledText.
+					result.add(new StyledText(unlitText.substring(endOffset - offset), styledText.getStyle()));
 				}
 			}
 			offset += unlitText.length();
@@ -95,17 +97,18 @@ public class Highlight {
 			((StyledText) result.get(result.size() - 1)).setContinueToEnd(true);
 		}
 		
-		return (StyledText[]) result.toArray(new StyledText[result.size()]);
+		return result;
 	}
 	
 	/** Returns true if the highlight's first character is just after the end of the line. */
-	private boolean highlightStartsAtEndOfLine(StyledText[] unlit, Location unlitStart) {
+	private boolean highlightStartsAtEndOfLine(List/*<StyledText>*/ unlit, Location unlitStart) {
 		if (start.getLineIndex() < unlitStart.getLineIndex()) {
 			return false;
 		}
 		int totalLength = 0;
-		for (int i = 0; i < unlit.length; i++) {
-			totalLength += unlit[i].getText().length();
+		for (int i = 0; i < unlit.size(); i++) {
+			StyledText styledText = (StyledText) unlit.get(i);
+			totalLength += styledText.getText().length();
 		}
 		return (start.getCharOffset() == totalLength);
 	}

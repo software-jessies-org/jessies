@@ -44,9 +44,9 @@ public class TextLine {
 		return styles[index];
 	}
 	
-	public StyledText[] getStyledTextSegments() {
+	public List/*<StyledText>*/ getStyledTextSegments() {
 		if (styles.length == 0) {
-			return new StyledText[0];
+			return Collections.EMPTY_LIST;
 		}
 		ArrayList result = new ArrayList();
 		int startIndex = 0;
@@ -59,7 +59,7 @@ public class TextLine {
 			}
 		}
 		result.add(new StyledText(getText().substring(startIndex, styles.length), startStyle));
-		return (StyledText[]) result.toArray(new StyledText[result.size()]);
+		return result;
 	}
 	
 	public String getText() {
