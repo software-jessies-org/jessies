@@ -30,6 +30,10 @@ public class FilteredListModel extends AbstractListModel {
                 validIndexes.add(new Integer(i));
             }
         }
+        // We can't use fireContentsChanged here because it doesn't imply
+        // that the structure has changed, so the selection model won't be
+        // updated. This implementation means you'll use the selection, but
+        // it could be altered to report all the additions and removals.
         fireIntervalRemoved(this, 0, model.getSize());
         fireIntervalAdded(this, 0, validIndexes.size());
     }
