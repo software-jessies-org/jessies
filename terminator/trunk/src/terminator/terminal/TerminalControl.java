@@ -1,4 +1,4 @@
-package terminator;
+package terminator.terminal;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -6,6 +6,9 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import e.util.*;
+import terminator.*;
+import terminator.view.*;
+import terminator.terminal.escape.*;
 
 /**
 Terminal stream control object - manages the interface between the rest of the Java code and the

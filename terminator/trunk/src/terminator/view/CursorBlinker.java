@@ -1,4 +1,4 @@
-package terminator;
+package terminator.view;
 
 import java.awt.event.*;
 import javax.swing.*;

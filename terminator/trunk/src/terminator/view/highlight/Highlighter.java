@@ -1,6 +1,8 @@
-package terminator;
+package terminator.view.highlight;
 
 import java.awt.event.*;
+
+import terminator.view.*;
 
 /**
 

@@ -1,7 +1,9 @@
-package terminator;
+package terminator.view.highlight;
 
 import java.awt.*;
 import java.util.*;
+
+import terminator.model.*;
 
 /**
 A Highlight represents a region of text spanning between two Locations in which the text

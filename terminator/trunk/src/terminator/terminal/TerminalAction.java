@@ -1,4 +1,4 @@
-package terminator;
+package terminator.terminal;
 
 /**
 A TerminalAction does something to affect a TerminalListener.

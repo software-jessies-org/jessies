@@ -1,4 +1,4 @@
-package terminator;
+package terminator.model;
 
 /**
 A StyleMutator is an object capable of changing certain aspects of a style and leaving others
