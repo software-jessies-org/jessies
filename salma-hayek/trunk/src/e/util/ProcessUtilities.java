@@ -61,6 +61,10 @@ public class ProcessUtilities {
         }
     }
 
+    public static void spawn(final File directory, final String[] command) {
+        spawn(directory, command, null);
+    }
+    
     /**
      * Runs a command and ignores the output. The child is waited for on a
      * separate thread, so there's no indication of whether the spawning was
@@ -69,14 +73,19 @@ public class ProcessUtilities {
      * get the return code (but losing that is part of the deal), but you
      * would at least know that Java had no trouble in exec. Is that worth
      * anything?
+     * 
+     * listener may be null.
      */
-    public static void spawn(final File directory, final String[] command) {
+    public static void spawn(final File directory, final String[] command, final ProcessListener listener) {
         new Thread() {
             public void run() {
                 try {
                     Process p = Runtime.getRuntime().exec(command, null, directory);
                     p.getOutputStream().close();
-                    p.waitFor();
+                    int status = p.waitFor();
+                    if (listener != null) {
+                        listener.processExited(status);
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -84,6 +93,10 @@ public class ProcessUtilities {
         }.start();
     }
 
+    public interface ProcessListener {
+        public void processExited(int status);
+    }
+    
     private static void readLinesFromStream(LineListener listener, InputStream stream) {
         BufferedReader in = null;
         try {
