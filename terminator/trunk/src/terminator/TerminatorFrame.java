@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import e.forms.*;
 import e.gui.*;
+import e.util.*;
 import terminator.view.*;
 import terminator.view.highlight.*;
 
@@ -76,7 +77,9 @@ public class TerminatorFrame implements TerminalPaneMaster {
 	private void initFrame() {
 		frame = new JFrame(Options.getSharedInstance().getTitle());
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setBackground(Options.getSharedInstance().getColor("background"));
+		if (GuiUtilities.isMacOs() == false) {
+			frame.setBackground(Options.getSharedInstance().getColor("background"));
+		}
 		initIcon(frame);
 		
 		if (Options.getSharedInstance().shouldUseMenuBar()) {
