@@ -279,7 +279,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 	}
 
 	
-	private JTextField findField = new FindField();
+	private FindField findField = new FindField();
 	private JLabel findStatus = new JLabel(" ");
 	private JTextBuffer textToFindIn;
 	
@@ -305,7 +305,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 			find();
 		}
 		
-		private void find() {
+		public void find() {
 			String regularExpression = getText();
 			try {
 				int matchCount = getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
@@ -333,6 +333,8 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		findField.selectAll();
 		findField.requestFocus();
 		findStatus.setText(" ");
+		
+		findField.find();
 	}
 	
 	private void addPane(JTerminalPane newPane, boolean focusOnNewTab) {
