@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export CLASSPATH=/usr/lib/java/jre/lib/rt.jar:classes
+export CLASSPATH=`locate /rt.jar | head -1`:classes
 
 find classes -name '*.class'|xargs rm -f
 find src -name '*.java'|xargs jikes -cp $CLASSPATH -d classes
