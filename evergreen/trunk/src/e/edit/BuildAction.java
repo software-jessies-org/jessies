@@ -60,7 +60,7 @@ public class BuildAction extends ETextAction {
     
     public void invokeBuildTool(Workspace workspace, String makefileName, String command) {
         String makefileDirectoryName = makefileName.substring(0, makefileName.lastIndexOf(File.separatorChar));
-        command = addTarget(command);
+        command = addTarget(workspace, command);
         try {
             new ShellCommand("", 0, workspace, true, makefileDirectoryName, command);
         } catch (IOException ex) {
@@ -69,8 +69,8 @@ public class BuildAction extends ETextAction {
         }
     }
     
-    public String addTarget(String command) {
-        String target = Parameters.getParameter("make.target", "");
+    private String addTarget(Workspace workspace, String command) {
+        String target = workspace.getBuildTarget();
         if (target.length() == 0) {
             return command;
         }
