@@ -33,9 +33,9 @@ public class Terminator implements Controller {
 	}
 	
 	public void updateFrameTitle() {
-		StringBuffer title = new StringBuffer("Terminator");
+		StringBuffer title = new StringBuffer();
 		if (terminalSize != null) {
-			title.append(" [").append(terminalSize.width).append(" x ").append(terminalSize.height).append("]");
+			title.append("[").append(terminalSize.width).append(" x ").append(terminalSize.height).append("] ");
 		}
 		if (terminals.size() >= 1) {
 			JTerminalPane pane;
@@ -45,7 +45,7 @@ public class Terminator implements Controller {
 				pane = (JTerminalPane) tabbedPane.getSelectedComponent();
 			}
 			if (pane != null) {
-				title.append(" - ").append(pane.getName());
+				title.append(pane.getName());
 			}
 		}
 		frame.setTitle(title.toString());
