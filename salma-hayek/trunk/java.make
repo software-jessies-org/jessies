@@ -58,7 +58,7 @@ GENERATED_FILES += $(PROJECT_NAME).jar
 grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
 DIRECTORY_NAME := $(notdir $(CURDIR))
 
-BINDIST_FILES += README COPYING doc $(PROJECT_NAME).jar
+BINDIST_FILES += README COPYING $(PROJECT_NAME).jar
 FILTERED_BINDIST_FILES = $(shell find $(BINDIST_FILES) -type f | grep -v CVS)
 
 .PHONY: bindist
