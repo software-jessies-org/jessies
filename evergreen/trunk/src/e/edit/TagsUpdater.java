@@ -223,6 +223,12 @@ public class TagsUpdater {
         }
         
         public void tagFound(TagReader.Tag tag) {
+            try {
+                tag.toolTip = textWindow.getText().getLineText(tag.lineNumber - 1);
+            } catch (javax.swing.text.BadLocationException ex) {
+                ex.printStackTrace();
+            }
+            
             DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
             
             if (tag.isContainerType()) {
@@ -259,7 +265,7 @@ public class TagsUpdater {
                     temporaryFile.deleteOnExit();
                 }
                 getTextWindow().writeCopyTo(temporaryFile);
-                TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), getTextWindow().getText(), this);
+                TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), this);
                 String newDigest = tagReader.getTagsDigest();
                 tagsHaveNotChanged = newDigest.equals(digest);
                 digest = newDigest;
