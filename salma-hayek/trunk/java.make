@@ -13,6 +13,15 @@
 #   may append to SUBDIRS
 #   must include ../salma-hayek/java.make
 
+#   must have any extra rules after the include
+#   must set any variables before the include
+#     (Variables used on either side of the colon in rules are evaluated on
+#      the first pass. By the time you get to the other side of the include,
+#      you're too late to override them.)
+
+# Use "VARIABLE ?= default" to assign a values iff the variable hasn't already
+# been set.
+
 # ----------------------------------------------------------------------------
 # Ensure we're running a suitable version of make(1).
 # ----------------------------------------------------------------------------
