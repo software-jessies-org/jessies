@@ -28,7 +28,7 @@ int ptys_open(const char *);
 pid_t pty_fork(int*);
 
 inline void panic(const char* reason, const char* parameter = 0) {
-    std::ostream& os(std::cerr);
+    std::ostream& os(std::cout);
     os << reason;
     if (parameter != 0) {
         os << " '" << parameter << "'";

@@ -100,7 +100,7 @@ public class TerminalControl implements Runnable {
 			try {
 				int status = process.waitFor();
 				if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
-					announceConnectionLost("[Process exited with status " + status + ".]");
+					announceConnectionLost("\n\r[Process exited with status " + status + ".]");
 				} else {
 					pane.doCloseAction();
 				}
