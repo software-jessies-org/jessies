@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import e.gui.*;
 import e.util.*;
 
 public class Workspace extends JPanel {

@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import e.edit.*;
+import e.gui.*;
 
 public class EWindow extends JComponent {
     private ETitleBar titleBar;

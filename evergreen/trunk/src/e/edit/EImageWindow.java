@@ -7,8 +7,6 @@ import java.util.*;
 
 import javax.swing.*;
 
-import e.gui.*;
-
 public class EImageWindow extends EWindow {
     private String filename;
     private Image image = null;
