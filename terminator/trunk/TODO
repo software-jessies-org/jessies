@@ -66,11 +66,6 @@
   you've selected to the end of a line, and you get some amount of the text
   that follows on later lines.) [Haven't seen this in a while.]
 
-* Now we support the graphical character set, we can get a terminal into the
-  traditional unusable state. We should probably have a way to reset from
-  Terminator (because you're not necessarily talking to Unix, and even if you
-  are, you don't necessarily know what to do).
-
 * Our double-click selection may be pretty clever in situations where xterm
   and rxvt aren't, but it doesn't work as well in situations they're good at:
   numbers in situations such as "offset=1234,length=5678". No-one does IP
