@@ -86,6 +86,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	public void mouseReleased(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON1) {
 			startLocation = null;
+			copy();
 		}
 	}
 	
