@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.lang.reflect.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.plaf.*;
 import javax.swing.plaf.basic.*;
 import e.util.*;
@@ -13,6 +14,9 @@ import e.util.*;
  * A bird's-eye view of the document. Intended to sit alongside the vertical scrollbar.
  * The find code informs us of matches, and we display little marks corresponding
  * to the matches' locations.
+ * 
+ * If you hover over the view, the nearest mark (if it's close enough) will be highlighted.
+ * Clicking will take you to that match.
  */
 public class BirdView extends JComponent {
     private ETextWindow textWindow;
@@ -21,6 +25,8 @@ public class BirdView extends JComponent {
     private Method method;
 
     private BitSet matchingLines = new BitSet();
+    
+    int nearestMatchingLine = -1;
 
     public BirdView(ETextWindow textWindow, JScrollBar scrollBar) {
         this.textWindow = textWindow;
@@ -31,7 +37,52 @@ public class BirdView extends JComponent {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        addMouseListener(new LineHopper());
+        initMouseListener();
+    }
+    
+    private void initMouseListener() {
+        MouseInputListener listener = new MouseInputAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e) && nearestMatchingLine != -1) {
+                    // Humans and goToLine() number lines from 1.
+                    textWindow.goToLine(nearestMatchingLine + 1);
+                }
+            }
+            
+            public void mouseExited(MouseEvent e) {
+                nearestMatchingLine = -1;
+                repaint();
+            }
+            
+            public void mouseMoved(MouseEvent e) {
+                findNearestMatchingLineTo(viewToModel(e.getY()));
+                repaint();
+            }
+        };
+        addMouseListener(listener);
+        addMouseMotionListener(listener);
+    }
+
+    public int viewToModel(int y) {
+        Rectangle usableArea = getUsableArea();
+        double scaleFactor = getLineScaleFactor(usableArea);
+        int lineIndex = (int) ((y - usableArea.y) / scaleFactor);
+        lineIndex = Math.max(0, Math.min(lineIndex, textWindow.getText().getLineCount() - 1));
+        return lineIndex;
+    }
+    
+    private void findNearestMatchingLineTo(int exactLine) {
+        nearestMatchingLine = -1;
+        for (int distance = 0; nearestMatchingLine == -1 && distance < 10; ++distance) {
+            setNearestLineIfMatching(exactLine - distance);
+            setNearestLineIfMatching(exactLine + distance);
+        }
+    }
+    
+    private void setNearestLineIfMatching(final int line) {
+        if (line >= 0 && line < matchingLines.length() && matchingLines.get(line)) {
+            nearestMatchingLine = line;
+        }
     }
 
     public Dimension getPreferredSize() {
@@ -72,10 +123,9 @@ public class BirdView extends JComponent {
         }
 
         double scaleFactor = getLineScaleFactor(usableArea);
-        
-        g.setColor(Color.BLACK);
         for (int i = 0; i < matchingLines.length(); i++) {
             if (matchingLines.get(i)) {
+                g.setColor(i == nearestMatchingLine ? Color.CYAN : Color.BLACK);
                 int y = usableArea.y + (int) ((double) i * scaleFactor);
                 g.drawLine(usableArea.x, y, usableArea.width, y);
             }
@@ -96,18 +146,5 @@ public class BirdView extends JComponent {
     public synchronized void clearMatchingLines() {
         matchingLines = new BitSet();
         repaint();
-    }
-    
-    class LineHopper extends MouseAdapter {
-        public void mouseClicked(MouseEvent event) {
-            if (SwingUtilities.isLeftMouseButton(event)) {
-                Rectangle usableArea = getUsableArea();
-                double scaleFactor = getLineScaleFactor(usableArea);
-                int y = event.getY() - usableArea.y;
-                int lineIndex = (int) (y / scaleFactor);
-                lineIndex = Math.max(0, Math.min(lineIndex, textWindow.getText().getLineCount() - 1));
-                textWindow.goToLine(lineIndex + 1);  // Humans and textWindow.goToLine() number lines from 1.
-            }
-        }
     }
 }
