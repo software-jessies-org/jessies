@@ -32,6 +32,8 @@ public class JTerminalPane extends JPanel {
 		new TerminatorMenuBar.FindPreviousAction(),
 		null,
 		new TerminatorMenuBar.ClearScrollbackAction(),
+		null,
+		new TerminatorMenuBar.ShowInfoAction()
 	};
 	
 	/**
