@@ -9,15 +9,16 @@ import e.util.*;
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
-    private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface|namespace):([^\t]+).*");
-    
+    private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface|namespace):([^\t]+).*");    
     private TagListener listener;
     private String fileType;
     private String digest;
+    private ETextArea textArea;
 
-    public TagReader(File file, String fileType, TagListener tagListener) {
+    public TagReader(File file, String fileType, ETextArea textArea, TagListener tagListener) {
         this.listener = tagListener;
         this.fileType = fileType;
+        this.textArea = textArea;
         
         try {
             File tagsFile = createTagsFileFor(file);
@@ -137,6 +138,14 @@ public class TagReader {
         tag.isAbstract = (lineNumber == abstractTagLineNumber | tag.isAbstract);
         abstractTagLineNumber = 0;
         
+        try {
+            if (textArea != null) {
+                tag.lineText = textArea.getLineText(lineNumber - 1);
+            }
+        } catch (javax.swing.text.BadLocationException ex) {
+            ex.printStackTrace();
+        }
+        
         listener.tagFound(tag);
     }
     
@@ -215,6 +224,7 @@ public class TagReader {
         public String context;
         public String containingClass;
         public int lineNumber;
+        public String lineText;
         public boolean isStatic;
         public boolean isAbstract;
         
