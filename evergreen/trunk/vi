@@ -6,7 +6,9 @@ require 'net/telnet'
 
 def openFileOnLocalhost(filename)
     host = ENV["EDIT_HOME_SERVER"]
-    if host == nil; then host = 'localhost'; end
+    if host == nil then
+        host = 'localhost'
+    end
     
     telnet = Net::Telnet.new('Host' => host, 'Port' => 1948, 'Telnetmode' => false)
     telnet.puts("open #{filename}\r")
