@@ -3,6 +3,7 @@
 EDIT_CLASS_NAME=e.edit.Edit
 EDIT_HOME=`dirname $0`
 EDIT_HOME=`cd $EDIT_HOME ; pwd`  # Ensures we have an absolute path.
+export EDIT_HOME
 PATH=$PATH:$EDIT_HOME            # Make Edit's support tools available.
 JAVA=java
 
