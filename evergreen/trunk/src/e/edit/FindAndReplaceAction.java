@@ -139,7 +139,7 @@ public class FindAndReplaceAction extends ETextAction {
 
     public String makeReplacedText(String oldText) {
         String regularExpression = patternField.getText();
-        String replacementPattern = replacementField.getText();
+        String replacementPattern = StringUtilities.unescapeJava(replacementField.getText());
         Pattern pattern = Pattern.compile(regularExpression, Pattern.MULTILINE);
         return pattern.matcher(oldText).replaceAll(replacementPattern);
     }
@@ -265,7 +265,7 @@ public class FindAndReplaceAction extends ETextAction {
             this.matchModel = new DefaultListModel();
             this.replacementsModel = new DefaultListModel();
             this.regex = pattern;
-            this.replacement = replacement;
+            this.replacement = StringUtilities.unescapeJava(replacement);
             setStatusToGood();
             start();
         }
