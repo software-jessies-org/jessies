@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
+import e.forms.*;
 import e.util.*;
 
 /**
@@ -389,9 +390,16 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		public void performAction() {
-			String commandToRun = StringEntryDialog.getString(JTerminalPane.this, "Enter Command to Run");
-			if (commandToRun != null && commandToRun.length() > 0) {
-				controller.openCommandPane(commandToRun, true);
+			JTextField commandField = new JTextField(40);
+			FormPanel formPanel = new FormPanel();
+			formPanel.addRow("Command:", commandField);
+			boolean okay = FormDialog.show(null, "Run Command", formPanel, "Run");
+			if (okay == false) {
+				return;
+			}
+			String command = commandField.getText();
+			if (command.length() > 0) {
+				controller.openCommandPane(command, true);
 			}
 		}
 		
