@@ -25,10 +25,9 @@ public class Terminator {
 	
 	private void initMenuBar() {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		System.setProperty("apple.awt.window.position.forceSafeProgrammaticPositioning", "false");
 		JFrame hiddenFrame = new JFrame("Mac OS implementation detail");
 		hiddenFrame.setJMenuBar(new TerminatorMenuBar());
-		hiddenFrame.setLocation(30000, 30000);
+		hiddenFrame.setUndecorated(true);
 		hiddenFrame.setVisible(true);
 	}
 	
