@@ -23,11 +23,9 @@ public class TelnetControl implements Runnable {
 	private JTelnetPane pane;
 	private TelnetListener listener;
 	private Process process;
+	private boolean processIsRunning = true;
 	private InputStream in;
 	private OutputStream out;
-	
-	/** The reason why our connection closed. */
-	private String goodbye;
 	
 	private LogWriter logWriter;
 	
@@ -44,11 +42,12 @@ public class TelnetControl implements Runnable {
 	}
 	
 	public void destroyProcess() {
-		try {
-			out.close();
-			process.destroy();
-		} catch (Exception ex) {
-			Log.warn("Failed to destroy process.", ex);
+		if (processIsRunning) {
+			try {
+				process.destroy();
+			} catch (Exception ex) {
+				Log.warn("Failed to destroy process.", ex);
+			}
 		}
 	}
 	
@@ -91,6 +90,7 @@ public class TelnetControl implements Runnable {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
+			processIsRunning = false;
 			try {
 				int status = process.waitFor();
 				if (status == 0) {
@@ -104,20 +104,14 @@ public class TelnetControl implements Runnable {
 		}
 	}
 	
-	private void announceConnectionLost() {
-		if (goodbye == null) {
-			return;
-		}
+	public void announceConnectionLost(String message) {
 		try {
-			final byte[] bytes = goodbye.getBytes();
+			String fullMessage = message + "\n\rPress alt-d to close this tab.\n\r";
+			final byte[] bytes = fullMessage.getBytes();
 			processBuffer(bytes, bytes.length);
 		} catch (Exception ex) {
-			Log.warn("Couldn't say '" + goodbye + "'.", ex);
+			Log.warn("Couldn't say '" + message + "'.", ex);
 		}
-	}
-	
-	public void announceConnectionLost(String message) {
-		this.goodbye = message;
 	}
 	
 	private boolean nextByteIsCommand = false;
