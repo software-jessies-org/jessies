@@ -14,6 +14,7 @@ build: $(SOURCE_FILES)
 	 make clean && \
 	 mkdir -p classes && \
 	 jikes -bootclasspath $(BOOT_CLASS_PATH) -d classes/ -sourcepath src/ +D +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
+	 @#javac -d classes/ -sourcepath src/ $(SOURCE_FILES)
 
 .PHONY: clean
 clean:
