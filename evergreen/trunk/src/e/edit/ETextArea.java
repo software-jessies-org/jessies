@@ -39,6 +39,7 @@ public class ETextArea extends JTextArea {
         setLineWrap(true);
         setMargin(new Insets(4, 4, 4, 1));
         initFocusListener();
+        getKeymap().setDefaultAction(new DefaultKeyAction());
     }
     
     /** Returns a fake 'preferred size' if our parent's not tall enough for us to make it as far as the display. */
@@ -214,8 +215,6 @@ public class ETextArea extends JTextArea {
         getActionMap().put(DefaultEditorKit.previousWordAction, new PreviousWordAction(false));
         getActionMap().put(DefaultEditorKit.selectionNextWordAction, new NextWordAction(true));
         getActionMap().put(DefaultEditorKit.nextWordAction, new NextWordAction(false));
-        
-        getKeymap().setDefaultAction(new DefaultKeyAction());
     }
     
     /**
