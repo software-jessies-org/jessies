@@ -3,5 +3,5 @@
 export CLASSPATH=`locate /rt.jar | head -1`:classes
 
 find classes -name '*.class'|xargs rm -f
-find src -name '*.java'|xargs jikes -cp $CLASSPATH -d classes
+find src -name '*.java'|xargs jikes -cp $CLASSPATH -d classes +D +P +Pall +Pno-serial +Pno-redundant-modifiers
 
