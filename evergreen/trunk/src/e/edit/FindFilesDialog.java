@@ -1,5 +1,6 @@
 package e.edit;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.List;
@@ -19,7 +20,6 @@ public class FindFilesDialog {
     private JList matchList;
     
     private boolean haveSearched;
-    private PatternSyntaxException patternSyntaxException;
     
     private Workspace workspace;
     
@@ -104,7 +104,7 @@ public class FindFilesDialog {
             int newPercentage = (doneFileCount * 100) / totalFileCount;
             if (newPercentage != percentage) {
                 percentage = newPercentage;
-                status.setText("Searching... " + percentage + "%");
+                setStatus("Searching... " + percentage + "%", false);
             }
         }
         
@@ -140,8 +140,9 @@ public class FindFilesDialog {
                 }
                 long endTime = System.currentTimeMillis();
                 System.err.println("----------took: " + (endTime - startTime) + " ms.");
+                setStatus(matchModel.getSize() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.", false);
             } catch (PatternSyntaxException ex) {
-                patternSyntaxException = ex;
+                setStatus(ex.getDescription(), true);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -159,7 +160,6 @@ public class FindFilesDialog {
             if (matchModel.getSize() == 1) {
                 matchList.setSelectedIndex(0);
             }
-            status.setText(matchModel.getSize() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.");
         }
     }
     
@@ -228,6 +228,11 @@ public class FindFilesDialog {
                 }
             }
         });
+    }
+    
+    private void setStatus(String message, boolean isError) {
+        status.setForeground(isError ? Color.RED : Color.BLACK);
+        status.setText(message);
     }
     
     public FindFilesDialog(Workspace workspace) {
