@@ -92,7 +92,6 @@ public class JTelnetPane extends JPanel {
 
 	private void init(String command, Process process) throws IOException {
 		textPane = new JTextBuffer(controller);
-		initSizeMonitoring();
 		textPane.addKeyListener(new KeyHandler());
 		
 		JScrollPane scrollPane = new JScrollPane(new BorderPanel(textPane));
@@ -105,6 +104,7 @@ public class JTelnetPane extends JPanel {
 		
 		add(scrollPane, BorderLayout.CENTER);
 		
+		initSizeMonitoring(scrollPane);
 		textPane.sizeChanged();
 		try {
 			control = new TelnetControl(this, textPane.getModel(), command, process);
@@ -117,8 +117,8 @@ public class JTelnetPane extends JPanel {
 		return controller;
 	}
 	
-	private void initSizeMonitoring() {
-		textPane.addComponentListener(new ComponentAdapter() {
+	private void initSizeMonitoring(JScrollPane scrollPane) {
+		scrollPane.addComponentListener(new ComponentAdapter() {
 			private Dimension currentSize;
 			public void componentShown(ComponentEvent e) {
 				this.currentSize = textPane.getVisibleSizeInCharacters();
