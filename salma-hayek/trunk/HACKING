@@ -1,0 +1,10 @@
+* Use international English spelling.
+
+* Use 4-space 'tabs' and K&R (Sun Java) indentation. (That is, follow
+  the rest of the code.)
+
+* Use the Log class instead of System.err/System.out; those should be
+  used only while debugging.
+
+* Never use "new File"; use FileUtilities.fileFromString instead; this
+  also understands ~/HACKING and ~elliotth/HACKING.

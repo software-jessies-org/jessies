@@ -41,9 +41,18 @@ public class StringUtilities {
     
     /** Writes the given String to the given File. Returns the text of the exception message on failure, null on success. */
     public static String writeFile(File file, String content) {
+        return writeFile(file, content, false);
+    }
+    
+    /** Appends the given String to the given File. Returns the text of the exception message on failure, null on success. */
+    public static String appendToFile(File file, String content) {
+        return writeFile(file, content, true);
+    }
+    
+    private static String writeFile(File file, String content, boolean append) {
         PrintWriter out = null;
         try {
-            out = new PrintWriter(new FileOutputStream(file));
+            out = new PrintWriter(new FileOutputStream(file, append));
             out.print(content);
             return null;
         } catch (IOException ex) {
