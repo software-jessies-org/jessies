@@ -25,9 +25,9 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private static final boolean MAC_OS = GuiUtilities.isMacOs();
 
 	private TextBuffer model;
-	private Location caretPosition = new Location(0, 0);
+	private Location cursorPosition = new Location(0, 0);
 	private boolean hasFocus = false;
-	private boolean displayCaret = true;
+	private boolean displayCursor = true;
 	private boolean blinkOn = true;
 	private CursorBlinker cursorBlinker;
 	private HashMap highlighters = new HashMap();
@@ -106,7 +106,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public void userIsTyping() {
 		blinkOn = true;
-		redrawCaretPosition();
+		redrawCursorPosition();
 		setCursor(GuiUtilities.INVISIBLE_CURSOR);
 	}
 	
@@ -226,7 +226,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private void scrollHorizontallyToShowCursor() {
 		JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
 		
-		if (isLineVisible(getCaretPosition().getLineIndex()) == false) {
+		if (isLineVisible(getCursorPosition().getLineIndex()) == false) {
 			// We shouldn't be jumping the horizontal scroll bar
 			// about because of new output if the user's trying to
 			// review the history.
@@ -241,7 +241,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		// "cat > /dev/null" and then type more characters than fit
 		// on a line.]
 		
-		int leftCursorEdge = getCaretPosition().getCharOffset() * getCharUnitSize().width;
+		int leftCursorEdge = getCursorPosition().getCharOffset() * getCharUnitSize().width;
 		int rightCursorEdge = leftCursorEdge + getCharUnitSize().width;
 		
 		BoundedRangeModel horizontalModel = pane.getHorizontalScrollBar().getModel();
@@ -300,30 +300,30 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return atBottom;
 	}
 	
-	public Location getCaretPosition() {
-		return caretPosition;
+	public Location getCursorPosition() {
+		return cursorPosition;
 	}
 	
-	public void setCaretPosition(Location newCaretPosition) {
-		if (caretPosition.equals(newCaretPosition)) {
+	public void setCursorPosition(Location newCursorPosition) {
+		if (cursorPosition.equals(newCursorPosition)) {
 			return;
 		}
-		redrawCaretPosition();
-		caretPosition = newCaretPosition;
-		redrawCaretPosition();
+		redrawCursorPosition();
+		cursorPosition = newCursorPosition;
+		redrawCursorPosition();
 		scrollHorizontallyToShowCursor();
 	}
 	
-	/** Sets whether the caret should be displayed. */
-	public void setCaretDisplay(boolean displayCaret) {
-		if (this.displayCaret != displayCaret) {
-			this.displayCaret = displayCaret;
-			redrawCaretPosition();
+	/** Sets whether the cursor should be displayed. */
+	public void setCursorVisible(boolean displayCursor) {
+		if (this.displayCursor != displayCursor) {
+			this.displayCursor = displayCursor;
+			redrawCursorPosition();
 		}
 	}
 	
 	public boolean shouldShowCursor() {
-		return displayCaret;
+		return displayCursor;
 	}
 	
 	public Color getCursorColor() {
@@ -332,7 +332,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public void blinkCursor() {
 		blinkOn = !blinkOn;
-		redrawCaretPosition();
+		redrawCursorPosition();
 	}
 	
 	public Location viewToModel(Point point) {
@@ -575,8 +575,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	// Redraw code.
 	
-	private void redrawCaretPosition() {
-		Point top = getLineTop(caretPosition);
+	private void redrawCursorPosition() {
+		Point top = getLineTop(cursorPosition);
 		Dimension character = getCharUnitSize();
 		repaint(top.x, top.y, character.width, character.height);
 	}
@@ -595,7 +595,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			if (i == lineNotToDraw) {
 				continue;
 			}
-			boolean drawCaret = (shouldShowCursor() && i == caretPosition.getLineIndex());
+			boolean drawCursor = (shouldShowCursor() && i == cursorPosition.getLineIndex());
 			int x = 0;
 			int baseline = metrics.getHeight() * (i + 1) - metrics.getMaxDescent();
 			int startOffset = 0;
@@ -604,17 +604,17 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				StyledText chunk = (StyledText) it.next();
 				x += paintStyledText(graphics, chunk, x, baseline);
 				String chunkText = chunk.getText();
-				if (drawCaret && caretPosition.charOffsetInRange(startOffset, startOffset + chunkText.length())) {
-					final int charOffsetUnderCaret = caretPosition.getCharOffset() - startOffset;
-					paintCaret(graphics, metrics, chunkText.substring(charOffsetUnderCaret, charOffsetUnderCaret + 1), baseline);
-					drawCaret = false;
+				if (drawCursor && cursorPosition.charOffsetInRange(startOffset, startOffset + chunkText.length())) {
+					final int charOffsetUnderCursor = cursorPosition.getCharOffset() - startOffset;
+					paintCursor(graphics, metrics, chunkText.substring(charOffsetUnderCursor, charOffsetUnderCursor + 1), baseline);
+					drawCursor = false;
 				}
 				startOffset += chunkText.length();
 			}
-			if (drawCaret) {
-				// A caret at the end of the line is in a
+			if (drawCursor) {
+				// A cursor at the end of the line is in a
 				// position past the end of the text.
-				paintCaret(graphics, metrics, "", baseline);
+				paintCursor(graphics, metrics, "", baseline);
 			}
 		}
 		if (ANTIALIAS) {
@@ -633,13 +633,13 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	/**
-	 * Paints the caret, which is either a solid block or an underline.
-	 * The caret may actually be invisible because it's blinking and in
+	 * Paints the cursor, which is either a solid block or an underline.
+	 * The cursor may actually be invisible because it's blinking and in
 	 * the 'off' state.
 	 */
-	private void paintCaret(Graphics graphics, FontMetrics metrics, String characterUnderCaret, int baseline) {
+	private void paintCursor(Graphics graphics, FontMetrics metrics, String characterUnderCursor, int baseline) {
 		graphics.setColor(getCursorColor());
-		Point top = getLineTop(caretPosition);
+		Point top = getLineTop(cursorPosition);
 		final int bottomY = top.y + metrics.getHeight() - 1;
 		if (hasFocus) {
 			if (Options.getSharedInstance().isBlockCursor()) {
@@ -650,7 +650,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 					// Redraw the character in the
 					// background color.
 					graphics.setColor(Options.getSharedInstance().getColor("background"));
-					graphics.drawString(characterUnderCaret, top.x, baseline);
+					graphics.drawString(characterUnderCursor, top.x, baseline);
 				}
 			} else {
 				// Underline.
@@ -721,14 +721,14 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		hasFocus = true;
 		blinkOn = true;
 		cursorBlinker.start();
-		redrawCaretPosition();
+		redrawCursorPosition();
 	}
 	
 	public void focusLost(FocusEvent event) {
 		hasFocus = false;
 		blinkOn = true;
 		cursorBlinker.stop();
-		redrawCaretPosition();
+		redrawCursorPosition();
 	}
 	
 	public boolean hasFocus() {

@@ -23,7 +23,7 @@ public class TextBuffer {
 	private short currentStyle = StyledText.getDefaultStyle();
 	private int firstScrollLineIndex;
 	private int lastScrollLineIndex;
-	private Location caretPosition;
+	private Location cursorPosition;
 	private int lastValidStartIndex = 0;
 	private boolean insertMode = false;
 	private ArrayList tabPositions = new ArrayList();
@@ -42,7 +42,7 @@ public class TextBuffer {
 	public TextBuffer(JTextBuffer view, int width, int height) {
 		this.view = view;
 		setSize(width, height);
-		caretPosition = view.getCaretPosition();
+		cursorPosition = view.getCursorPosition();
 	}
 	
 	public void updateMaxLineWidth(int aLineWidth) {
@@ -55,14 +55,14 @@ public class TextBuffer {
 	
 	/** Saves the current style and location for retrieving later. */
 	public void saveCursor() {
-		savedPosition = caretPosition;
+		savedPosition = cursorPosition;
 		savedStyle = currentStyle;
 	}
 	
 	/** Restores the saved style and location if it was saved earlier. */
 	public void restoreCursor() {
 		if (savedPosition != null) {
-			caretPosition = savedPosition;
+			cursorPosition = savedPosition;
 			setStyle(savedStyle);
 		}
 	}
@@ -87,13 +87,13 @@ public class TextBuffer {
 		// cursor change when we move over where they were.
 		view.removeHighlightsFrom(0);
 		
-		// We want to keep any lines after the caret, so remember them.
+		// We want to keep any lines after the cursor, so remember them.
 		// FIXME: if the user's editing a really long logical line at
 		// the bash prompt, it may have manually wrapped it onto
-		// multiple physical lines, and the caret may not be on the
+		// multiple physical lines, and the cursor may not be on the
 		// first of those lines. Ideally we should keep all pertinent
 		// lines. Unfortunately, I can't see how we'd know.
-		ArrayList retainedLines = new ArrayList(textLines.subList(caretPosition.getLineIndex(), textLines.size()));
+		ArrayList retainedLines = new ArrayList(textLines.subList(cursorPosition.getLineIndex(), textLines.size()));
 
 		// Revert to just the right number of empty lines to fill the
 		// current window size.
@@ -106,7 +106,7 @@ public class TextBuffer {
 		setSize(width, view.getVisibleSizeInCharacters().height);
 		maxLineWidth = width;
 		
-		// Re-insert the lines after the caret.
+		// Re-insert the lines after the cursor.
 		for (int i = 0; i < retainedLines.size(); ++i) {
 			insertLine(i, (TextLine) retainedLines.get(i));
 		}
@@ -119,7 +119,7 @@ public class TextBuffer {
 		// FIXME: it's a bit crazy that these aren't tied!
 		// FIXME: it's even crazier that they use different origins!
 		setCursorPosition(-1, 1);
-		view.setCaretPosition(caretPosition);
+		view.setCursorPosition(cursorPosition);
 		
 		// Redraw ourselves.
 		view.repaint();
@@ -128,7 +128,7 @@ public class TextBuffer {
 
 	public void sizeChanged(Dimension sizeInChars) {
 		setSize(sizeInChars.width, sizeInChars.height);
-		caretPosition = getLocationWithinBounds(caretPosition);
+		cursorPosition = getLocationWithinBounds(cursorPosition);
 		savedPosition = getLocationWithinBounds(savedPosition);
 	}
 	
@@ -178,7 +178,7 @@ public class TextBuffer {
 	}
 
 	public void setTabAtCursor() {
-		int newPos = caretPosition.getCharOffset();
+		int newPos = cursorPosition.getCharOffset();
 		for (int i = 0; i < tabPositions.size(); i++) {
 			int pos = ((Integer) tabPositions.get(i)).intValue();
 			if (pos == newPos) {
@@ -192,7 +192,7 @@ public class TextBuffer {
 	}
 	
 	public void removeTabAtCursor() {
-		tabPositions.remove(new Integer(caretPosition.getCharOffset()));
+		tabPositions.remove(new Integer(cursorPosition.getCharOffset()));
 	}
 	
 	public void removeAllTabs() {
@@ -309,7 +309,7 @@ public class TextBuffer {
 	}
 	
 	public Location getCursorPosition() {
-		return caretPosition;
+		return cursorPosition;
 	}
 	
 	public void processActions(TerminalAction[] actions) {
@@ -331,7 +331,7 @@ public class TextBuffer {
 		if (needsScroll) {
 			view.scrollOnTtyOutput(wereAtBottom);
 		}
-		view.setCaretPosition(caretPosition);
+		view.setCursorPosition(cursorPosition);
 	}
 	
 	public void setStyle(short style) {
@@ -346,7 +346,7 @@ public class TextBuffer {
 		if (index >= (getFirstDisplayLine() + lastScrollLineIndex)) {
 			insertLine(index);
 		} else {
-			caretPosition = new Location(index, caretPosition.getCharOffset());
+			cursorPosition = new Location(index, cursorPosition.getCharOffset());
 		}
 	}
 
@@ -373,13 +373,13 @@ public class TextBuffer {
 				linesChangedFrom(removeIndex);
 				view.repaint();
 			} else {
-				caretPosition = new Location(index, caretPosition.getCharOffset());
+				cursorPosition = new Location(index, cursorPosition.getCharOffset());
 			}
 		} else {
 			textLines.remove(firstDisplayLine + lastScrollLineIndex);
 			textLines.add(index, lineToInsert);
 			linesChangedFrom(index);
-			caretPosition = new Location(index, caretPosition.getCharOffset());
+			cursorPosition = new Location(index, cursorPosition.getCharOffset());
 		}
 		checkInvariant();
 	}
@@ -410,7 +410,7 @@ public class TextBuffer {
 		if (this.height > height && textLines.size() >= this.height) {
 			for (int i = 0; i < (this.height - height); i++) {
 				int lineToRemove = textLines.size() - 1;
-				if (usingAlternativeBuffer() || (get(lineToRemove).length() == 0 && caretPosition.getLineIndex() != lineToRemove)) {
+				if (usingAlternativeBuffer() || (get(lineToRemove).length() == 0 && cursorPosition.getLineIndex() != lineToRemove)) {
 					textLines.remove(lineToRemove);
 				}
 			}
@@ -441,34 +441,34 @@ public class TextBuffer {
 	 */
 	public void processLine(String untranslatedLine) {
 		String line = view.getTerminalControl().translate(untranslatedLine);
-		TextLine textLine = get(caretPosition.getLineIndex());
+		TextLine textLine = get(cursorPosition.getLineIndex());
 		if (insertMode) {
-//			Log.warn("Inserting text \"" + line + "\" at " + caretPosition + ".");
-			textLine.insertTextAt(caretPosition.getCharOffset(), line, currentStyle);
+//			Log.warn("Inserting text \"" + line + "\" at " + cursorPosition + ".");
+			textLine.insertTextAt(cursorPosition.getCharOffset(), line, currentStyle);
 		} else {
-//			Log.warn("Writing text \"" + line + "\" at " + caretPosition + ".");
-			textLine.writeTextAt(caretPosition.getCharOffset(), line, currentStyle);
+//			Log.warn("Writing text \"" + line + "\" at " + cursorPosition + ".");
+			textLine.writeTextAt(cursorPosition.getCharOffset(), line, currentStyle);
 		}
 		textAdded(line.length());
 	}
 	
 	private void textAdded(int length) {
-		TextLine textLine = get(caretPosition.getLineIndex());
-		int currentLine = caretPosition.getLineIndex();
+		TextLine textLine = get(cursorPosition.getLineIndex());
+		int currentLine = cursorPosition.getLineIndex();
 		updateMaxLineWidth(textLine.length());
-		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition's line still has a valid *start* index.
-		linesChangedFrom(caretPosition.getLineIndex());
+		lineIsDirty(cursorPosition.getLineIndex() + 1);  // cursorPosition's line still has a valid *start* index.
+		linesChangedFrom(cursorPosition.getLineIndex());
 		moveCursorHorizontally(length);
 	}
 
 	public void processSpecialCharacter(char ch) {
 		switch (ch) {
 		case Ascii.CR:
-			caretPosition = new Location(caretPosition.getLineIndex(), 0);
+			cursorPosition = new Location(cursorPosition.getLineIndex(), 0);
 			return;
 		case Ascii.LF:
-			int lineIndex = caretPosition.getLineIndex();
-			moveToLine(caretPosition.getLineIndex() + 1);
+			int lineIndex = cursorPosition.getLineIndex();
+			moveToLine(cursorPosition.getLineIndex() + 1);
 			return;
 		case Ascii.VT:
 			moveCursorVertically(1);
@@ -485,9 +485,9 @@ public class TextBuffer {
 	}
 	
 	private void insertTab() {
-		int nextTabLocation = getNextTabPosition(caretPosition.getCharOffset());
-		TextLine textLine = get(caretPosition.getLineIndex());
-		int startOffset = caretPosition.getCharOffset();
+		int nextTabLocation = getNextTabPosition(cursorPosition.getCharOffset());
+		TextLine textLine = get(cursorPosition.getLineIndex());
+		int startOffset = cursorPosition.getCharOffset();
 		int tabLength = nextTabLocation - startOffset;
 		if (insertMode) {
 			textLine.insertTabAt(startOffset, tabLength, currentStyle);
@@ -497,42 +497,42 @@ public class TextBuffer {
 		textAdded(tabLength);
 	}
 	
-	/** Sets whether the caret should be displayed. */
-	public void setCaretDisplay(boolean isDisplayed) {
-		view.setCaretDisplay(isDisplayed);
+	/** Sets whether the cursor should be visible. */
+	public void setCursorVisible(boolean isDisplayed) {
+		view.setCursorVisible(isDisplayed);
 	}
 	
-	/** Inserts lines at the current caret position. */
+	/** Inserts lines at the current cursor position. */
 	public void insertLines(int count) {
 		for (int i = 0; i < count; i++) {
-			insertLine(caretPosition.getLineIndex());
+			insertLine(cursorPosition.getLineIndex());
 		}
 	}
 	
 	public void deleteCharacters(int count) {
-		TextLine line = get(caretPosition.getLineIndex());
+		TextLine line = get(cursorPosition.getLineIndex());
 		int oldLineLength = line.length();
-		int start = caretPosition.getCharOffset();
+		int start = cursorPosition.getCharOffset();
 		int end = start + count;
 		line.killText(start, end);
-		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition.y's line still has a valid *start* index.
-		linesChangedFrom(caretPosition.getLineIndex());
+		lineIsDirty(cursorPosition.getLineIndex() + 1);  // cursorPosition.y's line still has a valid *start* index.
+		linesChangedFrom(cursorPosition.getLineIndex());
 	}
 	
 	public void killHorizontally(boolean fromStart, boolean toEnd) {
-		TextLine line = get(caretPosition.getLineIndex());
+		TextLine line = get(cursorPosition.getLineIndex());
 		int oldLineLength = line.length();
-		int start = fromStart ? 0 : caretPosition.getCharOffset();
-		int end = toEnd ? oldLineLength : caretPosition.getCharOffset();
+		int start = fromStart ? 0 : cursorPosition.getCharOffset();
+		int end = toEnd ? oldLineLength : cursorPosition.getCharOffset();
 		line.killText(start, end);
-		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition.y's line still has a valid *start* index.
-		linesChangedFrom(caretPosition.getLineIndex());
+		lineIsDirty(cursorPosition.getLineIndex() + 1);  // cursorPosition.y's line still has a valid *start* index.
+		linesChangedFrom(cursorPosition.getLineIndex());
 	}
 
 	/** Erases from either the top or the cursor line, to either the bottom or the cursor line. */
 	public void killVertically(boolean fromTop, boolean toBottom) {
-		int start = fromTop ? getFirstDisplayLine() : caretPosition.getLineIndex();
-		int end = toBottom ? getLineCount() : caretPosition.getLineIndex();
+		int start = fromTop ? getFirstDisplayLine() : cursorPosition.getLineIndex();
+		int end = toBottom ? getLineCount() : cursorPosition.getLineIndex();
 		for (int i = start; i < end; i++) {
 			get(i).clear();
 		}
@@ -552,28 +552,28 @@ public class TextBuffer {
 		// from (1,1), there's nothing to stop a badly-behaved program
 		// from sending (0,0). ASUS routers do this (they're rubbish).
 		// Note that here we also transform from 1-based coordinates to 0-based.
-		x = (x == -1) ? caretPosition.getCharOffset() : Math.max(0, x - 1);
-		y = (y == -1) ? caretPosition.getLineIndex() : Math.max(0, y - 1);
+		x = (x == -1) ? cursorPosition.getCharOffset() : Math.max(0, x - 1);
+		y = (y == -1) ? cursorPosition.getLineIndex() : Math.max(0, y - 1);
 		x = Math.min(x, width - 1);
 		y = Math.min(y, height - 1);
 
-		caretPosition = new Location(y + getFirstDisplayLine(), x);
+		cursorPosition = new Location(y + getFirstDisplayLine(), x);
 	}
 	
 	/** Moves the cursor horizontally by the number of characters in xDiff, negative for left, positive for right. */
 	public void moveCursorHorizontally(int xDiff) {
-		int charOffset = caretPosition.getCharOffset() + xDiff;
-		int lineIndex = caretPosition.getLineIndex();
+		int charOffset = cursorPosition.getCharOffset() + xDiff;
+		int lineIndex = cursorPosition.getLineIndex();
 		while (charOffset < 0) {
 			TextLine lineAbove = get(--lineIndex);
 			charOffset += lineAbove.length();
 		}
-		caretPosition = new Location(lineIndex, charOffset);
+		cursorPosition = new Location(lineIndex, charOffset);
 	}
 	
 	/** Moves the cursor vertically by the number of characters in yDiff, negative for up, positive for down. */
 	public void moveCursorVertically(int yDiff) {
-		caretPosition = new Location(caretPosition.getLineIndex() + yDiff, caretPosition.getCharOffset());
+		cursorPosition = new Location(cursorPosition.getLineIndex() + yDiff, cursorPosition.getCharOffset());
 	}
 
 	/** Sets the first and last lines to scroll.  If both are -1, make the entire screen scroll. */

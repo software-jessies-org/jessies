@@ -134,7 +134,7 @@ public class TerminalControl implements Runnable {
 		try {
 			final byte[] bytes = message.getBytes();
 			processBuffer(bytes, bytes.length);
-			pane.getTextPane().setCaretDisplay(false);
+			pane.getTextPane().setCursorVisible(false);
 		} catch (Exception ex) {
 			Log.warn("Couldn't say '" + message + "'.", ex);
 		}
