@@ -5,10 +5,6 @@
 
 Make an about box.
 
-Review the current properties reading, and see if it's really going to work well enough.  Possibly add "?MacOS:" stuff to it.
-
-Find some profiling tool to see if we can find simple ways of speeding up.
-
 Add bracket-matching double-click selection?
 
 Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
