@@ -2,11 +2,18 @@ package e.util;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import javax.swing.*;
 
 public class GuiUtilities {
     private GuiUtilities() { /* Not instantiable. */ }
-
+    
+    /**
+     * An invisible cursor, useful if you want to hide the cursor when the
+     * user is typing.
+     */
+    public static final Cursor INVISIBLE_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR), new Point(0, 0), "invisible");
+    
     /**
      * The background color for alternate rows in lists and tables.
      */
