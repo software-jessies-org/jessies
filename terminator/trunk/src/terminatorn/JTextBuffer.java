@@ -61,21 +61,22 @@ public class JTextBuffer extends JComponent implements FocusListener {
 
 			public void mouseMoved(MouseEvent event) {
 				Location location = viewToModel(event.getPoint());
-				if (location != lastLocation) {
-					lastLocation = location;
-					Cursor cursor = null;
-					Highlight[] lights = getHighlightsForLocation(viewToModel(event.getPoint()));
-					for (int i = 0; i < lights.length; i++) {
-						if (lights[i].getCursor() != null) {
-							cursor = lights[i].getCursor();
-							break;
-						}
-					}
-					if (cursor == null) {
-						cursor = Cursor.getDefaultCursor();
-					}
-					setCursor(cursor);
+				if (location.equals(lastLocation)) {
+					return;
 				}
+				lastLocation = location;
+				Cursor cursor = null;
+				Highlight[] lights = getHighlightsForLocation(viewToModel(event.getPoint()));
+				for (int i = 0; i < lights.length; i++) {
+					if (lights[i].getCursor() != null) {
+						cursor = lights[i].getCursor();
+						break;
+					}
+				}
+				if (cursor == null) {
+					cursor = Cursor.getDefaultCursor();
+				}
+				setCursor(cursor);
 			}
 		});
 		addHighlighter(new HyperlinkHighlighter());
