@@ -127,8 +127,9 @@ public class TagsUpdater {
     }
     
     /**
-     * Returns the tree node containing the tag for the line. If there's no tag for the line, finds the
-     * closest tag with an enclosing scope and returns that. If that fails, returns null.
+     * Returns the tree node containing the tag for the line. If there's no
+     * tag for the line, finds the nearest tag before the caret. If that
+     * fails, returns null.
      */
     public TreeNode getTagForLine(int lineNumber) throws BadLocationException {
         lineNumber++; // JTextComponent numbers lines from 0, ectags from 1.
@@ -143,7 +144,7 @@ public class TagsUpdater {
                 TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
                 if (tag.lineNumber == lineNumber) {
                     return node;
-                } else if (tag.isContainerType() && tag.lineNumber < lineNumber) {
+                } else if (tag.lineNumber < lineNumber) {
                     if (nearestTag == null || tag.lineNumber > nearestTag.lineNumber) {
                         nearestTag = tag;
                         nearestNode = node;
