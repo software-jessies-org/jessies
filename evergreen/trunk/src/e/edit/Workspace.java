@@ -478,4 +478,20 @@ public class Workspace extends JPanel {
             }
         }        
     }
+    
+    private ETextWindow rememberedTextWindow;
+    
+    public void rememberFocusedTextWindow(ETextWindow textWindow) {
+        rememberedTextWindow = textWindow;
+    }
+    
+    public void restoreFocusToRememberedTextWindow() {
+        if (rememberedTextWindow != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    rememberedTextWindow.requestFocus();
+                }
+            });
+        }
+    }
 }
