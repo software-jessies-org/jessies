@@ -68,7 +68,12 @@ public class HyperlinkHighlighter implements Highlighter {
 			/*
 			 * If the file doesn't exist, this wasn't a useful match.
 			 */
-			File file = FileUtilities.fileFromParentAndString(directory, name);
+			File file = null;
+			if (name.startsWith("/") || name.startsWith("~")) {
+				file = FileUtilities.fileFromString(name);
+			} else {
+				file = FileUtilities.fileFromParentAndString(directory, name);
+			}
 			if (file.exists() == false) {
 				continue;
 			}
