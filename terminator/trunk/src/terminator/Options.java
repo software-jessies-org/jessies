@@ -127,9 +127,15 @@ public class Options {
 	/**
 	 * Returns a suitable fixed font (ignoring all X11 configuration,
 	 * because we're unlikely to understand those font specifications).
+	 * So we don't get into trouble with Xterm's font resource, we
+	 * call ours "javaFont".
 	 */
 	public Font getFont() {
-		return Font.decode(GuiUtilities.isMacOs() ? "Monaco" : "Monospaced");
+		String fontDescription = (String) options.get("javaFont");
+		if (fontDescription == null) {
+			fontDescription = GuiUtilities.isMacOs() ? "Monaco" : "Monospaced";
+		}
+		return Font.decode(fontDescription);
 	}
 	
 	private Options() {
