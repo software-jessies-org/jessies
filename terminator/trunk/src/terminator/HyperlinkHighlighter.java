@@ -42,7 +42,7 @@ public class HyperlinkHighlighter implements Highlighter {
 	
 	private ArrayList linkers = new ArrayList();
 	{
-		linkers.add(new HyperLinker("(\\b(http|https|ftp):/*[\\w\\.]+(:\\d+)?[/\\w\\.\\?&=\\+]*)", 1, "open $1"));
+		linkers.add(new HyperLinker("(\\b(http|https|ftp):/*[^\\s:\"]+(:\\d+)?[/\\w\\.\\?&=\\+]*)", 1, "open $1"));
 		linkers.add(new HyperLinker("(?:^| |\")(/[^ :\"]+\\.\\w+([\\d:]+)?)", 1, "vi $1"));
 		linkers.add(new HyperLinker("mercury:([^$]+)\\$", 1, "echo $1"));
 	}
