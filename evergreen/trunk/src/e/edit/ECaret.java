@@ -79,25 +79,26 @@ public class ECaret extends DefaultCaret {
     */
     
     /** Returns the offset of the matching bracket, or -1. */
-    public int findMatchingBracket(JTextComponent text, int offset) throws BadLocationException {
+    public int findMatchingBracket(int offset) throws BadLocationException {
         //Log.warn("findMatchingBracket(offset="+offset+")");
         char bracket = getCharAt(offset);
         if (isCloseBracket(bracket)) {
-            return findMatchingBracket(text, offset, false);
+            return findMatchingBracket(offset, false);
         }
         if (offset > 0 && isOpenBracket(getCharAt(offset - 1))) {
-            return findMatchingBracket(text, offset - 1, true);
+            return findMatchingBracket(offset - 1, true);
         }
         return -1;
     }
     
     /** Returns the offset of the matching bracket, scanning in the given direction, or -1. */
-    public int findMatchingBracket(JTextComponent text, int offset, boolean scanForwards) throws BadLocationException {
+    public int findMatchingBracket(int offset, boolean scanForwards) throws BadLocationException {
         //Log.warn("findMatchingBracket(offset="+offset+",scanForwards="+scanForwards+")");
         char bracket = getCharAt(offset);
         if (isBracket(bracket) == false) {
             return -1;
         }
+        JTextComponent text = getTextComponent();
         char partner = getPartnerForBracket(bracket);
         int nesting = 1;
         int step = scanForwards ? +1 : -1;
@@ -118,14 +119,15 @@ public class ECaret extends DefaultCaret {
     }
     
     /** Selects the word scanning out from the dot. */
-    public void selectWordAtCursor(JTextComponent text) throws BadLocationException {
+    public void selectWordAtCursor() throws BadLocationException {
+        JTextComponent text = getTextComponent();
         int offset = getDot();
         Element line = javax.swing.text.Utilities.getParagraphElement(text, offset);
         int lineStart = line.getStartOffset();
         int lineEnd = Math.min(line.getEndOffset(), text.getDocument().getLength());
         
         //FIXME: first try to match with a bracket.
-        int bracketOffset = findMatchingBracket(text, offset);
+        int bracketOffset = findMatchingBracket(offset);
         if (bracketOffset != -1) {
             moveDot(bracketOffset);
             return;
@@ -175,7 +177,7 @@ public class ECaret extends DefaultCaret {
         }
         if (e.getClickCount() == 2) {
             try {
-                selectWordAtCursor(getComponent());
+                selectWordAtCursor();
             } catch (BadLocationException ex) { ex.printStackTrace(); }
         } else if (e.getClickCount() == 3) {
             selectLineAtCursor(getComponent());
