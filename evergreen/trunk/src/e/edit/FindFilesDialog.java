@@ -91,12 +91,16 @@ public class FindFilesDialog {
                         System.err.println("---Aborting search!");
                         return null;
                     }
-                    String candidate = (String) fileList.get(i);
-                    if (fileNamePattern.matcher(candidate).find()) {
-                        int matchCount = fileSearcher.searchFile(root, candidate);
-                        if (matchCount > 0) {
-                            matchModel.addElement(new MatchingFile(candidate, matchCount, regex));
+                    try {
+                        String candidate = (String) fileList.get(i);
+                        if (fileNamePattern.matcher(candidate).find()) {
+                            int matchCount = fileSearcher.searchFile(root, candidate);
+                            if (matchCount > 0) {
+                                matchModel.addElement(new MatchingFile(candidate, matchCount, regex));
+                            }
                         }
+                    } catch (FileNotFoundException ex) {
+                        ex = ex; // Not our problem.
                     }
                 }
                 long endTime = System.currentTimeMillis();
