@@ -1,5 +1,6 @@
 package e.edit;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.text.*;
@@ -15,6 +16,13 @@ public class FindAction extends ETextAction implements MinibufferUser {
     public static final String ACTION_NAME = "Find...";
     
     public static final FindAction INSTANCE = new FindAction();
+    
+    /**
+     * Used to mark the matches in the text as if they'd been gone over with a highlighter pen. We use
+     * full yellow with half-alpha so you can see the selection through, as a dirty smudge, just like a real
+     * highlighter pen might do.
+     */
+    public static final Highlighter.HighlightPainter PAINTER = new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 0, 128));
     
     public ETextWindow currentTextWindow;
     
@@ -118,7 +126,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
         Highlighter highlighter = currentTextWindow.getText().getHighlighter();
         Highlighter.Highlight[] highlights = highlighter.getHighlights();
         for (int i = 0; i < highlights.length; i++) {
-            if (highlights[i].getPainter() == currentTextWindow.getMatchHighlightPainter()) {
+            if (highlights[i].getPainter() == PAINTER) {
                 highlighter.removeHighlight(highlights[i]);
             }
         }
@@ -160,7 +168,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
         while (matcher.find()) {
             try {
                 currentTextWindow.getBirdView().addMatchingLine(textArea.getLineOfOffset(matcher.end()));
-                highlighter.addHighlight(matcher.start(), matcher.end(), currentTextWindow.getMatchHighlightPainter());
+                highlighter.addHighlight(matcher.start(), matcher.end(), PAINTER);
                 noHighlightsSet = false;
             } catch (BadLocationException ex) {
                 ex.printStackTrace();
