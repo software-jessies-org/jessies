@@ -14,6 +14,7 @@ import e.util.*;
 public class TagsPanel extends JPanel {
     private ETextWindow textWindow;
     private int lastLineCount;
+    private String digest;
 
     private JProgressBar progressBar = new JProgressBar();
     private JPanel progressPanel;
@@ -163,8 +164,6 @@ public class TagsPanel extends JPanel {
                 visibilityColor = tag.visibilityColor();
                 typeMarker = (Shape) TYPE_SHAPES.get(String.valueOf(tag.type));
                 tagIsStatic = tag.isStatic;
-            } else {
-                System.err.println(node.getUserObject().getClass() + " : " + node.getUserObject());
             }
             if (visibilityColor != null && typeMarker != null) {
                 setIcon(icon);
@@ -218,14 +217,14 @@ public class TagsPanel extends JPanel {
         setVisibleComponent(progressPanel);
         progressBar.setIndeterminate(true);
     }
-
-    public void hideProgressBar() {
+    
+    public void showTagsTree() {
         setVisibleComponent(detailView);
         progressBar.setIndeterminate(false);
     }
 
     public class TagsScanner extends SwingWorker implements TagReader.TagListener {
-        private long startTime;
+        private boolean tagsHaveNotChanged;
         private DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
         private DefaultTreeModel model = new DefaultTreeModel(root);
         private HashMap branches = new HashMap();
@@ -234,9 +233,8 @@ public class TagsPanel extends JPanel {
         }
 
         public void doScan() {
-            showProgressBar();
+            //showProgressBar();
             start();
-            startTime = System.currentTimeMillis();
         }
 
         public String getFilenameSuffix() {
@@ -282,6 +280,9 @@ public class TagsPanel extends JPanel {
                 temporaryFile.deleteOnExit();
                 textWindow.writeCopyTo(temporaryFile);
                 TagReader tagReader = new TagReader(temporaryFile, textWindow.getFileType(), this);
+                String newDigest = tagReader.getTagsDigest();
+                tagsHaveNotChanged = newDigest.equals(digest);
+                digest = newDigest;
                 temporaryFile.delete();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -291,18 +292,18 @@ public class TagsPanel extends JPanel {
 
         public void finished() {
             get();
+            if (tagsHaveNotChanged) {
+                return;
+            }
+            
             if (model == null) {
                 Edit.getCurrentWorkspace().reportError("", "Couldn't make tags.");
             } else {
                 tree.setModel(model);
                 tree.expandAll();
             }
-
-            hideProgressBar();
-
-            long endTime = System.currentTimeMillis();
-            double duration = ((double) (endTime - startTime)) / 1000.0;
-            //Log.warn("Time taken reading tags: " + duration + "s");
+            
+            showTagsTree();
         }
     }
 }
