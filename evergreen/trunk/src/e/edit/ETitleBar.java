@@ -22,6 +22,17 @@ public class ETitleBar extends JComponent implements MouseListener, MouseMotionL
             }
             
             public void setActive(Component c, boolean active) {
+                // Under some circumstances, we can end up taking the focus
+                // away from components that are no longer on-screen. There's
+                // never any reason to make them redraw themselves, and it
+                // could be -- if they're being destroyed -- that they really
+                // don't want to be asked to redraw. So let's leave them in
+                // peace.
+                if (c == null || c.isShowing() == false) {
+                    return;
+                }
+                
+                // Otherwise, find the EWindow and poke its title bar...
                 EWindow window = (EWindow) SwingUtilities.getAncestorOfClass(EWindow.class, c);
                 if (window == null) {
                     return;
