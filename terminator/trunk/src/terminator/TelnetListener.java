@@ -25,7 +25,7 @@ public interface TelnetListener {
 	*/
 	public void processLine(String line);
 	
-	/** Process a special character, one of CR, LF or BS. */
+	/** Process a special character, one of CR, LF, TAB or BS. */
 	public void processSpecialCharacter(char ch);
 	
 	/** Saves the current style and location for retrieving later. */

@@ -182,6 +182,14 @@ public class TextBuffer implements TelnetListener {
 	public int getStyle() {
 		return currentStyle;
 	}
+	
+	public void moveToLine(int index) {
+		if (index >= (getFirstDisplayLine() + lastScrollLineIndex)) {
+			insertLine(index);
+		} else {
+			caretPosition = new Location(index, caretPosition.getCharOffset());
+		}
+	}
 
 	public void insertLine(int index) {
 		// Use a private copy of the first display line throughout this method to avoid mutation
@@ -201,6 +209,8 @@ public class TextBuffer implements TelnetListener {
 				caretPosition = new Location(index, caretPosition.getCharOffset());
 			}
 		} else {
+			textLines.remove(firstDisplayLine + lastScrollLineIndex);
+			textLines.add(index, new TextLine());
 			caretPosition = new Location(index, caretPosition.getCharOffset());
 		}
 	}
@@ -241,10 +251,20 @@ public class TextBuffer implements TelnetListener {
 	public void processSpecialCharacter(char ch) {
 		switch (ch) {
 			case '\r': caretPosition = new Location(caretPosition.getLineIndex(), 0); return;
-			case '\n': insertLine(caretPosition.getLineIndex() + 1); return;
+			case '\n': moveToLine(caretPosition.getLineIndex() + 1); return;
+			case '\t': insertTab(); return;
 			case KeyEvent.VK_BACK_SPACE: moveCursorHorizontally(-1); return;
 			default: Log.warn("Unsupported special character: " + ((int) ch));
 		}
+	}
+	
+	private void insertTab() {
+		// FIXME: Need to cope with modification of tab positions.
+		// For now we just assume one tab every 8 spaces.
+		int nextTabLocation = (caretPosition.getCharOffset() + 8) & ~7;
+		char[] spaces = new char[nextTabLocation - caretPosition.getCharOffset()];
+		Arrays.fill(spaces, ' ');
+		processLine(new String(spaces));
 	}
 	
 	/** Sets whether the caret should be displayed. */
@@ -334,8 +354,8 @@ public class TextBuffer implements TelnetListener {
 	public void scrollDisplayDown() {
 		int removeIndex = getFirstDisplayLine() + firstScrollLineIndex;
 		int addIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
-		textLines.remove(removeIndex);
 		textLines.add(addIndex, new TextLine());
+		textLines.remove(removeIndex);
 		lineIsDirty(removeIndex);
 		view.repaint();
 	}

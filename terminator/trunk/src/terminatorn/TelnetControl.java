@@ -72,7 +72,6 @@ public class TelnetControl implements Runnable {
 				// Process all unprocessed bytes in buffer, and then move any which remain
 				// processed to the front of the buffer, noting how many there are.
 				readCount += remainCount;
-//				System.err.println("Processing buffer of " + readCount + " bytes.");
 				remainCount = processBuffer(buffer, readCount);
 				System.arraycopy(buffer, readCount - remainCount, buffer, 0, remainCount);
 			}
@@ -101,34 +100,44 @@ public class TelnetControl implements Runnable {
 	
 	private boolean nextByteIsCommand = false;
 	
+//	static FileOutputStream foobar;
+//	static {
+//		try {
+//			foobar = new FileOutputStream(new File("/home/phil/blox"));
+//		} catch (Exception ex) { ex.printStackTrace(); }
+//	}
+	
 	/** Returns the number of bytes in buffer which remain unprocessed. */
 	private int processBuffer(byte[] buffer, int size) throws IOException {
 		int i;
 		for (i = 0; i < size; i++) {
 			int value = (buffer[i]) & 0xff;  // We don't handle negative bytes well.
-			if (nextByteIsCommand) {
-				if (value == IAC) {
-					processChar((char) value);
-				} else {
-					int extraIACByteCount = getExtraIACByteCount(value);
-					if (size - i > extraIACByteCount) {
-						int[] extraBytes = new int[extraIACByteCount];
-						for (int j = 0; j < extraBytes.length; j++) {
-							extraBytes[j] = ((int) buffer[++i]) & 0xff;
-						}
-						interpretAsCommand(value, extraBytes);
-					} else {
-						break;
-					}
-				}
-				nextByteIsCommand = false;
-			} else {
-				if (value == IAC) {
-					nextByteIsCommand = true;
-				} else {
-					processChar((char) value);
-				}
-			}
+//			foobar.write(value);
+//			foobar.flush();
+			processChar((char) value);
+//			if (nextByteIsCommand) {
+//				if (value == IAC) {
+//					processChar((char) value);
+//				} else {
+//					int extraIACByteCount = getExtraIACByteCount(value);
+//					if (size - i > extraIACByteCount) {
+//						int[] extraBytes = new int[extraIACByteCount];
+//						for (int j = 0; j < extraBytes.length; j++) {
+//							extraBytes[j] = ((int) buffer[++i]) & 0xff;
+//						}
+//						interpretAsCommand(value, extraBytes);
+//					} else {
+//						break;
+//					}
+//				}
+//				nextByteIsCommand = false;
+//			} else {
+//				if (value == IAC) {
+//					nextByteIsCommand = true;
+//				} else {
+//					processChar((char) value);
+//				}
+//			}
 		}
 		flushLineBuffer();
 		final TelnetAction[] actions = (TelnetAction[]) telnetActions.toArray(new TelnetAction[telnetActions.size()]);
@@ -146,6 +155,9 @@ public class TelnetControl implements Runnable {
 		if (ch == ESC) {
 			flushLineBuffer();
 			// If the old escape sequence is interrupted; we start a new one.
+			if (escapeParser != null) {
+				Log.warn("Escape parser discarded with string \"" + escapeParser + "\".");
+			}
 			escapeParser = new EscapeParser();
 			return;
 		}
@@ -155,7 +167,7 @@ public class TelnetControl implements Runnable {
 				processEscape();
 				escapeParser = null;
 			}
-		} else if (ch == '\n' || ch == '\r' || ch == KeyEvent.VK_BACK_SPACE) {
+		} else if (ch == '\n' || ch == '\r' || ch == KeyEvent.VK_BACK_SPACE || ch == '\t') {
 			flushLineBuffer();
 			doStep();
 			processSpecialCharacter(ch);
@@ -169,7 +181,7 @@ public class TelnetControl implements Runnable {
 			// Nothing below BEL is printable anyway.
 			
 			// And neither is BEL, really.
-			lineBuffer.append(ch != '\t' ? ch : ' '); // FIXME: remove this tab-mangling hack!
+			lineBuffer.append(ch);
 		}
 	}
 
@@ -183,7 +195,7 @@ public class TelnetControl implements Runnable {
 			telnetActions.add(new TelnetAction() {
 				public void perform(TelnetListener listener) {
 					if (DEBUG) {
-						System.err.println("Processing line \"" + line + "\"");
+						Log.warn("Processing line \"" + line + "\"");
 					}
 					listener.processLine(line);
 				}
@@ -199,9 +211,10 @@ public class TelnetControl implements Runnable {
 					switch (ch) {
 						case '\n': charDesc = "LF"; break;
 						case '\r': charDesc = "CR"; break;
+						case '\t': charDesc = "TAB"; break;
 						case KeyEvent.VK_BACK_SPACE: charDesc = "BS"; break;
 					}
-					System.err.println("Processing special char \"" + charDesc + "\"");
+					Log.warn("Processing special char \"" + charDesc + "\"");
 				}
 				listener.processSpecialCharacter(ch);
 			}
