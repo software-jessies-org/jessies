@@ -8,6 +8,13 @@ import javax.swing.text.*;
 
 import e.forms.*;
 
+//
+// TODO: find previous/find next
+// TODO: automatically update results as the document changes
+// TODO: try to remove some of the duplication between this class and similar
+//       classes in Edit and Terminator.
+//
+
 public class JTextComponentFind {
     /**
      * Used to mark the matches in the text as if they'd been gone over with a highlighter pen. We use
@@ -42,6 +49,8 @@ public class JTextComponentFind {
     private JLabel findStatus = new JLabel(" ");
     
     private Action findAction = new FindAction();
+    private Action findNextAction = new FindNextAction();
+    private Action findPreviousAction = new FindPreviousAction();
     
     public static void addFindFunctionalityTo(final JTextComponent textComponent) {
         JTextComponentFind find = new JTextComponentFind(textComponent);
@@ -49,8 +58,8 @@ public class JTextComponentFind {
     
     private void initKeyStrokes() {
         addKeyBinding(KeyEvent.VK_F, findAction);
-        //addKeyBinding(KeyEvent.VK_D, FindPreviousAction);
-        //addKeyBinding(KeyEvent.VK_G, FindNextAction);
+        addKeyBinding(KeyEvent.VK_D, findPreviousAction);
+        addKeyBinding(KeyEvent.VK_G, findNextAction);
     }
     
     private void addKeyBinding(int keyEventVk, Action action) {
@@ -80,14 +89,12 @@ public class JTextComponentFind {
     }
     
     private void removeAllMatches() {
-        Highlighter highlighter = textComponent.getHighlighter();
-        Highlighter.Highlight[] highlights = highlighter.getHighlights();
-        for (int i = 0; i < highlights.length; i++) {
-            if (highlights[i].getPainter() == PAINTER) {
-                highlighter.removeHighlight(highlights[i]);
-            }
-        }
+        JTextComponentUtilities.removeAllHighlightsUsingPainter(textComponent, PAINTER);
         //currentTextWindow.getBirdView().clearMatchingLines();
+    }
+    
+    private void updateFindResults() {
+        findAllMatches(findField.getText());
     }
     
     private void findAllMatches(String regularExpression) {
@@ -138,6 +145,28 @@ public class JTextComponentFind {
         }
     }
     
+    private class FindNextAction extends AbstractAction {
+        public FindNextAction() {
+            super("Find Next");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            updateFindResults();
+            JTextComponentUtilities.findNextHighlight(textComponent, Position.Bias.Forward, PAINTER);
+        }
+    }
+    
+    private class FindPreviousAction extends AbstractAction {
+        public FindPreviousAction() {
+            super("Find Previous");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            updateFindResults();
+            JTextComponentUtilities.findNextHighlight(textComponent, Position.Bias.Backward, PAINTER);
+        }
+    }
+    
     private class FindField extends EMonitoredTextField {
         public FindField() {
             super(40);
@@ -173,10 +202,9 @@ public class JTextComponentFind {
         }
         
         public void find() {
-            String regularExpression = getText();
             try {
                 setForeground(UIManager.getColor("TextField.foreground"));
-                findAllMatches(regularExpression);
+                updateFindResults();
             } catch (PatternSyntaxException ex) {
                 setForeground(Color.RED);
                 findStatus.setText(ex.getDescription());
