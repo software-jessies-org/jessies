@@ -58,7 +58,7 @@ public class StringHistory {
     }
     
     public void writeToHistoryFile(String string) {
-        String error = StringUtilities.appendToFile(FileUtilities.fileFromString(filename), string);
+        String error = StringUtilities.appendToFile(FileUtilities.fileFromString(filename), string + "\n");
         if (error != null) {
             Log.warn("Failed to append string \"" + string + "\" to history file '" + filename + "' (" + error + ").");
         }
