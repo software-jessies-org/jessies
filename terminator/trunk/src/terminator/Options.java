@@ -116,6 +116,7 @@ public class Options {
 		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
+		aliasColorBD();
 	}
 	
 	/**
@@ -143,6 +144,27 @@ public class Options {
 		options.put("color13", "magenta");
 		options.put("color14", "cyan");
 		options.put("color15", "white");
+	}
+	
+	/**
+	 * Tries to get a good bold foreground color. If the user has set their
+	 * own, or they haven't set their own foreground, we don't need to do
+	 * anything. Otherwise, we look through the normal (low intensity)
+	 * colors to see if we can find a match. If we do, take the appropriate
+	 * bold (high intensity) color for the bold foreground color.
+	 */
+	private void aliasColorBD() {
+		if (getColor("colorBD") != null || getColor("foreground") == null) {
+			return;
+		}
+		Color foreground = getColor("foreground");
+		for (int i = 0; i < 8; ++i) {
+			Color color = getColor("color" + i);
+			if (foreground.equals(color)) {
+				options.put("colorBD", options.get("color" + (i + 8)));
+				return;
+			}
+		}
 	}
 	
 	private void readRGBFile() {
