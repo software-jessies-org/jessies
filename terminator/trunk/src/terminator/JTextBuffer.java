@@ -51,6 +51,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 				requestFocus();
 			}
 		});
+		addHighlighter(new TheHighlighter());
 	}
 	
 	public TextBuffer getModel() {
@@ -63,6 +64,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		FontMetrics metrics = getFontMetrics(getFont());
 		Point baseline = getBaseline(new Location(lineIndex, charStartIndex));
 		int charHeight = metrics.getHeight();
+		redoHighlightsFrom(lineIndex);
 		repaint(baseline.x, baseline.y - charHeight, (charEndIndex - charStartIndex) * metrics.charWidth('W'), charHeight);
 	}
 	
@@ -72,6 +74,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		setPreferredSize(size);
 		setSize(size);
 		scrollRectToVisible(new Rectangle(0, size.height - 10, size.width, 10));
+		redoHighlightsFrom(lineHighlights.size());
 	}
 	
 	public Location getCaretPosition() {
@@ -92,6 +95,20 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		}
 	}
 	
+	private Point getLineTop(Location charCoords) {
+		FontMetrics metrics = getFontMetrics(getFont());
+		Point result = getBaseline(charCoords);
+		result.y -= metrics.getMaxAscent();
+		return result;
+	}
+	
+	private Point getLineBottom(Location charCoords) {
+		FontMetrics metrics = getFontMetrics(getFont());
+		Point result = getBaseline(charCoords);
+		result.y += metrics.getMaxDescent();
+		return result;
+	}
+	
 	private Point getBaseline(Location charCoords) {
 		FontMetrics metrics = getFontMetrics(getFont());
 		return new Point(charCoords.getCharOffset() * metrics.charWidth('W'),
@@ -105,12 +122,24 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	
 	// Highlighting support.
 	
-	public void setHighlighter(String name, Highlighter highlighter) {
-		highlighters.put(name, highlighter);
+	public void addHighlighter(Highlighter highlighter) {
+		highlighters.put(highlighter.getName(), highlighter);
 	}
 	
 	public Highlighter getHighlighter(String name) {
 		return (Highlighter) highlighters.get(name);
+	}
+	
+	public Highlighter[] getHighlighters() {
+		return (Highlighter[]) highlighters.values().toArray(new Highlighter[0]);
+	}
+	
+	public void redoHighlightsFrom(int firstLineIndex) {
+		removeHighlightsFrom(firstLineIndex);
+		Highlighter[] lighters = getHighlighters();
+		for (int i = 0; i < lighters.length; i++) {
+			lighters[i].addHighlights(this, firstLineIndex);
+		}
 	}
 	
 	public void removeHighlightsFrom(int firstLineIndex) {
@@ -127,6 +156,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 				for (int j = 0; j < highlights.length; j++) {
 					if (highlights[j].getHighlighter() == highlighter) {
 						list.remove(highlights[j]);
+						repaintHighlight(highlights[j]);
 					}
 				}
 			}
@@ -137,11 +167,24 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		for (int i = highlight.getStart().getLineIndex(); i <= highlight.getEnd().getLineIndex(); i++) {
 			addHighlightAtLine(highlight, i);
 		}
+		repaintHighlight(highlight);
+	}
+	
+	private void repaintHighlight(Highlight highlight) {
+		Point redrawStart = getLineTop(highlight.getStart());
+		Point redrawEnd = getLineBottom(highlight.getEnd());
+		if (highlight.getStart().getLineIndex() == highlight.getEnd().getLineIndex()) {
+			repaint(redrawStart.x, redrawStart.y, redrawEnd.x - redrawStart.x, redrawEnd.y - redrawStart.y);
+		} else {
+			repaint(0, redrawStart.y, getSize().width,redrawEnd.y - redrawStart.y);
+		}
 	}
 	
 	public void addHighlightAtLine(Highlight highlight, int lineIndex) {
 		if (lineIndex >= lineHighlights.size() || lineHighlights.get(lineIndex) == null) {
-			lineHighlights.ensureCapacity(lineIndex + 1);
+			for (int i = lineHighlights.size(); i <= lineIndex; i++) {
+				lineHighlights.add(i, null);
+			}
 			lineHighlights.set(lineIndex, new ArrayList());
 		}
 		((ArrayList) lineHighlights.get(lineIndex)).add(highlight);
