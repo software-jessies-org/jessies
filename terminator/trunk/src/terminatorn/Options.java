@@ -89,13 +89,7 @@ public class Options {
 	 *  pointerColor
 	 *  pointerBackgroundColor
 	 * 
-	 * xterm also offers complete control over all the ECMA colors:
-	 * 
-	 *  color0 to color7 are the normal colors (black, red3, green3,
-	 *  yellow3, blue3, magenta3, cyan3, and gray90).
-	 * 
-	 *  color8 to color15 are the bold colors (gray30, red, green, yellow,
-	 *  blue, magenta, cyan, and white).
+	 * xterm also offers complete control over all the ECMA colors.
 	 */
 	public Color getColor(String name) {
 		String description = (String) options.get(name);
@@ -119,8 +113,36 @@ public class Options {
 	
 	private Options() {
 		readRGBFile();
+		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
+	}
+	
+	/**
+	 * color0 to color7 are the normal colors (black, red3, green3,
+	 * yellow3, blue3, magenta3, cyan3, and gray90).
+	 *
+	 * color8 to color15 are the bold colors (gray30, red, green, yellow,
+	 * blue, magenta, cyan, and white).
+	 */
+	private void initDefaultColors() {
+		options.put("color0", "black");
+		options.put("color1", "red3");
+		options.put("color2", "green3");
+		options.put("color3", "yellow3");
+		options.put("color4", "blue3");
+		options.put("color5", "magenta3");
+		options.put("color6", "cyan3");
+		options.put("color7", "gray90");
+		
+		options.put("color8", "gray30");
+		options.put("color9", "red");
+		options.put("color10", "green");
+		options.put("color11", "yellow");
+		options.put("color12", "blue");
+		options.put("color13", "magenta");
+		options.put("color14", "cyan");
+		options.put("color15", "white");
 	}
 	
 	private void readRGBFile() {
@@ -169,8 +191,6 @@ public class Options {
 	}
 	
 	private void readOptionsFrom(File file) throws IOException {
-//		Pattern pattern = Pattern.compile("(?:XTerm|Rxvt)(?:\\*|\\.)(\\S+):\\s*(\\S+)");
-// The colour name should be any character, since some entries in rgb.txt contain spaces.
 		Pattern pattern = Pattern.compile("(?:XTerm|Rxvt)(?:\\*|\\.)(\\S+):\\s*(.+)");
 		LineNumberReader in = new LineNumberReader(new FileReader(file));
 		String line;
