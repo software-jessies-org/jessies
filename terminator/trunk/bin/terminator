@@ -7,7 +7,7 @@ then
   let PORT=$PORT+${BASH_REMATCH[1]}
 fi
 
-if [ "$UNAME" != "Darwin" -a "$DEBUGGING_TERMINATOR" == "" ]
+if [ "$UNAME" != "Darwin" ] && [ "$DEBUGGING_TERMINATOR" == "" ]
 then
   # See if there's already a Terminator running that can open us a new window.
   # This lets us emulate the Mac OS behavior when clicking on the Dock icon
