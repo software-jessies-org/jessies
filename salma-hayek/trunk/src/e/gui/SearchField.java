@@ -3,17 +3,172 @@ package e.gui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.border.*;
+
+/**
+ * A text field for search/filter interfaces. The extra functionality includes
+ * a placeholder string (when the user hasn't yet typed anything), and a button
+ * to clear the currently-entered text.
+ * 
+ * @author Elliott Hughes
+ */
+
+//
+// TODO: add a menu of recent searches.
+// TODO: make recent searches persistent.
+// TODO: use rounded corners, at least on Mac OS X.
+//
 
 public class SearchField extends JTextField {
+    private static final Border CANCEL_BORDER = new CancelBorder();
+    
+    private boolean showingPlaceholderText = false;
+    private boolean armed = false;
+    
     public SearchField(String placeholderText) {
         super(15);
         addFocusListener(new PlaceholderText(placeholderText));
+        initBorder();
     }
-
+    
     public SearchField() {
         this("Search");
     }
     
+    private void initBorder() {
+        setBorder(new CompoundBorder(getBorder(), CANCEL_BORDER));
+        
+        MouseInputListener mouseInputListener = new CancelListener();
+        addMouseListener(mouseInputListener);
+        addMouseMotionListener(mouseInputListener);
+    }
+    
+    private DocumentListener documentListener;
+    
+    public void setSendsNotificationForEachKeystroke(boolean eachKeystroke) {
+        if (eachKeystroke) {
+            if (documentListener == null) {
+                documentListener = new DocumentListener() {
+                    public void changedUpdate(DocumentEvent e) {
+                        // Style changes aren't relevant.
+                    }
+                    
+                    public void insertUpdate(DocumentEvent e) {
+                        maybeNotify();
+                    }
+                    
+                    public void removeUpdate(DocumentEvent e) {
+                        maybeNotify();
+                    }
+                    
+                    public void maybeNotify() {
+                        if (showingPlaceholderText) {
+                            return;
+                        }
+                        postActionEvent();
+                    }
+                };
+                getDocument().addDocumentListener(documentListener);
+            }
+        } else {
+            getDocument().removeDocumentListener(documentListener);
+            documentListener = null;
+        }
+    }
+    
+    /**
+     * Draws the cancel button as a gray circle with a white cross inside.
+     */
+    static class CancelBorder extends EmptyBorder {
+        private static final Color GRAY = new Color(0.7f, 0.7f, 0.7f);
+        
+        CancelBorder() {
+            super(0, 0, 0, 15);
+        }
+        
+        public void paintBorder(Component c, Graphics oldGraphics, int x, int y, int width, int height) {
+            SearchField field = (SearchField) c;
+            if (field.showingPlaceholderText || field.getText().length() == 0) {
+                return;
+            }
+            
+            Graphics2D g = (Graphics2D) oldGraphics;
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            final int circleL = 14;
+            final int circleX = x + width - circleL;
+            final int circleY = y + (height - 1 - circleL)/2;
+            g.setColor(field.armed ? Color.GRAY : GRAY);
+            g.fillOval(circleX, circleY, circleL, circleL);
+            
+            final int lineL = circleL - 8;
+            final int lineX = circleX + 4;
+            final int lineY = circleY + 4;
+            g.setColor(Color.WHITE);
+            g.drawLine(lineX, lineY, lineX + lineL, lineY + lineL);
+            g.drawLine(lineX, lineY + lineL, lineX + lineL, lineY);
+        }
+    }
+    
+    /**
+     * Handles a click on the cancel button by clearing the text and notifying
+     * any ActionListeners.
+     */
+    class CancelListener extends MouseInputAdapter {
+        private boolean isOverButton(MouseEvent e) {
+            // If the button is down, we might be outside the component
+            // without having had mouseExited invoked.
+            if (contains(e.getPoint()) == false) {
+                return false;
+            }
+            
+            // In lieu of proper hit-testing for the circle, check that
+            // the mouse is somewhere in the border.
+            Rectangle innerArea = SwingUtilities.calculateInnerArea(SearchField.this, null);
+            return (innerArea.contains(e.getPoint()) == false);
+        }
+        
+        public void mouseDragged(MouseEvent e) {
+            arm(e);
+        }
+        
+        public void mouseEntered(MouseEvent e) {
+            arm(e);
+        }
+        
+        public void mouseExited(MouseEvent e) {
+            disarm();
+        }
+        
+        public void mousePressed(MouseEvent e) {
+            arm(e);
+        }
+        
+        public void mouseReleased(MouseEvent e) {
+            if (armed) {
+                setText("");
+                postActionEvent();
+            }
+            disarm();
+        }
+        
+        private void arm(MouseEvent e) {
+            armed = (isOverButton(e) && SwingUtilities.isLeftMouseButton(e));
+            repaint();
+        }
+        
+        private void disarm() {
+            armed = false;
+            repaint();
+        }
+    }
+    
+    /**
+     * Replaces the entered text with a gray placeholder string when the
+     * search field doesn't have the focus. The entered text returns when
+     * we get the focus back.
+     */
     class PlaceholderText implements FocusListener {
         private String placeholderText;
         private String previousText = "";
@@ -27,13 +182,17 @@ public class SearchField extends JTextField {
         public void focusGained(FocusEvent e) {
             setForeground(previousColor);
             setText(previousText);
+            showingPlaceholderText = false;
         }
 
         public void focusLost(FocusEvent e) {
             previousText = getText();
             previousColor = getForeground();
-            setForeground(Color.GRAY);
-            setText(placeholderText);
+            if (previousText.length() == 0) {
+                showingPlaceholderText = true;
+                setForeground(Color.GRAY);
+                setText(placeholderText);
+            }
         }
     }
 }
