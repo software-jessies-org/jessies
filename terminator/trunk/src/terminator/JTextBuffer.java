@@ -12,7 +12,7 @@ A JTextBuffer provides the visible display of the virtual terminal.
 @author Elliott Hughes
 */
 
-public class JTextBuffer extends JComponent implements FocusListener, Scrollable {
+public class JTextBuffer extends JComponent implements FocusListener {
 	private static final boolean ANTIALIAS = false;
 	private static final boolean MAC_OS = (System.getProperty("os.name").indexOf("Mac") != -1);
 
@@ -398,37 +398,5 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	
 	public boolean hasFocus() {
 		return hasFocus;
-	}
-	
-	//
-	// Scrollable interface.
-	//
-	
-	public Dimension getPreferredScrollableViewportSize() {
-		return getPreferredSize();
-	}
-	
-	public int getScrollableUnitIncrement(Rectangle visibleRectangle, int orientation, int direction) {
-		if (orientation == SwingConstants.VERTICAL) {
-			return visibleRectangle.height / 10;
-		} else {
-			return visibleRectangle.width / 10;
-		}
-	}
-	
-	public int getScrollableBlockIncrement(Rectangle visibleRectangle, int orientation, int direction) {
-		if (orientation == SwingConstants.VERTICAL) {
-			return visibleRectangle.height;
-		} else {
-			return visibleRectangle.width;
-		}
-	}
-	
-	public boolean getScrollableTracksViewportWidth() {
-		return true;
-	}
-	
-	public boolean getScrollableTracksViewportHeight() {
-		return false; // We want a vertical scroll-bar.
 	}
 }
