@@ -85,7 +85,9 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	}
 	
 	public boolean isWordChar(char ch) {
-		return ch != ' ';
+		// Space marks the end of a word by any reasonable definition.
+		// Bracket characters usually mark the end of what you're interested in.
+		return " <>(){}[]".indexOf(ch) == -1;
 	}
 	
 	public void selectWord(Location location) {
