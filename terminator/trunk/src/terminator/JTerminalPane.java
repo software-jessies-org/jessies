@@ -35,13 +35,13 @@ public class JTerminalPane extends JPanel {
 		new ClearScrollbackAction(),
 		null,
 		new ChangeColourAction(),
-//		new NewWindowAction(),
+		new NewWindowAction(),
 	};
 	
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	private JTerminalPane(Controller controller, String name, String command, boolean ignoreExitStatus) {
+	public JTerminalPane(Controller controller, String name, String command, boolean ignoreExitStatus) {
 		super(new BorderLayout());
 		this.controller = controller;
 		this.name = name;
@@ -529,7 +529,7 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		public void performAction() {
-			// TODO: Open a new window.
+			controller.openNewWindow();
 		}
 		
 		public char getHotkeyChar() {
