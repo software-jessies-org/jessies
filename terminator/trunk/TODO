@@ -23,8 +23,6 @@ Why not?  When catting the log files, I've found this useful.  It lets me see wh
   while working at the bottom (one presumes). I've no idea what this is for,
   but felt I should mention it.
 
-The flashing green underline of a cursor is often difficult to find.  Fine by me if people really want the option but I don't think it should be the default.
-
 Should allow the user to specify a log filename per tab, on the command line.
 
 * "Connect to Server" CS-K; don't implement Rendezvous (unless you're bored!)

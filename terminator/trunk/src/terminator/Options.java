@@ -30,6 +30,7 @@ public class Options {
 	private static final Options INSTANCE = new Options();
 	
 	private static final String ANTI_ALIAS = "antiAlias";
+	private static final String BLOCK_CURSOR = "blockCursor";
 	private static final String FONT_NAME = "fontName";
 	private static final String FONT_SIZE = "fontSize";
 	private static final String INITIAL_COLUMN_COUNT = "initialColumnCount";
@@ -92,6 +93,13 @@ public class Options {
 	 */
 	public boolean isAntiAliased() {
 		return booleanResource(ANTI_ALIAS);
+	}
+	
+	/**
+	 * Whether to use a block cursor instead of an underline cursor.
+	 */
+	public boolean isBlockCursor() {
+		return booleanResource(BLOCK_CURSOR);
 	}
 	
 	/**
@@ -217,6 +225,7 @@ public class Options {
 	 */
 	private void initDefaults() {
 		addDefault(ANTI_ALIAS, "false", "Whether or not to use anti-aliased text");
+		addDefault(BLOCK_CURSOR, "false", "Whether to a block cursor instead of an underline");
 		addDefault(FONT_NAME, GuiUtilities.isMacOs() ? "Monaco" : "Monospaced", "The name of the font to use (not an X11 font)");
 		addDefault(FONT_SIZE, "12", "The size of text, in points");
 		addDefault(INITIAL_COLUMN_COUNT, "80", "The number of columns in a new terminal");

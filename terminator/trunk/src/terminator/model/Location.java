@@ -6,7 +6,7 @@ A Location holds the line index, and character offset within the line of a parti
 @author Phil Norman
 */
 
-public class Location implements Comparable {
+public final class Location implements Comparable {
 	private int lineIndex;
 	private int charOffset;
 	
@@ -38,6 +38,10 @@ public class Location implements Comparable {
 		} else {
 			return false;
 		}
+	}
+	
+	public boolean charOffsetInRange(int begin, int end) {
+		return (getCharOffset() >= begin && getCharOffset() < end);
 	}
 	
 	public int compareTo(Object obj) {
