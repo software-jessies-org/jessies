@@ -1,6 +1,6 @@
 #!/bin/bash
 TERMINATOR_HOME=`dirname $0`
-CLASSPATH=$TERMINATOR_HOME/classes:$TERMINATOR_HOME/../salma-hayek/classes
+CLASSPATH=$TERMINATOR_HOME/classes:$TERMINATOR_HOME/../salma-hayek/classes:$TERMINATOR_HOME/TerminatorN.jar
 PTY_BINARY=$TERMINATOR_HOME/pty/pty-`uname`-`arch`
 
 if [ ! -f ~/.terminator ]
