@@ -91,7 +91,6 @@ public class LinkFormatter {
     
     /** Inserts an address using the link style. Text leading up to the address gets the current style. */
     private final String processAddress(StyledDocument document, String line, Matcher address) throws BadLocationException {
-//        autoScroll = false; // Don't auto-scroll past a link.
         // Instead of just switching off auto-scrolling, take note that the window shouldn't auto-scroll such
         // that this address disappears off the top of the visible area.
         if (maxYDisplayStart == -1) {
