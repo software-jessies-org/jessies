@@ -2,6 +2,7 @@ package e.edit;
 
 import java.awt.event.*;
 import javax.swing.undo.*;
+import e.util.*;
 
 public class DefaultKeyAction extends ETextAction {
     public DefaultKeyAction() {
@@ -26,7 +27,7 @@ public class DefaultKeyAction extends ETextAction {
         }
         
         char c = content.charAt(0);
-        if ((c < 0x20) || (c == 0x7F)) {
+        if (c < ' ' || c == Ascii.DEL) {
             return;
         }
         
