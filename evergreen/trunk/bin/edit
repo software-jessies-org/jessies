@@ -9,13 +9,16 @@ ENV["EDIT_HOME"] = edit_home
 salma_hayek = Pathname.new("#{edit_home}/../salma-hayek").realpath()
 
 edit_class_name = "e.edit.Edit"
-edit_preferences_directory = "#{ENV["HOME"]}/.#{edit_class_name}"
+HOME = ENV["HOME"]
+edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
 
-edit_server_port = `cat #{edit_preferences_directory}/edit-server-port`
-
-def openFileOnLocalhost(port, filename)
-  host = 'localhost'
+def openFileOnEditServer(edit_preferences_directory, filename)
+  host = ENV["EDIT_HOME_SERVER"]
+  if host == nil then
+    host = 'localhost'
+  end
   begin
+    port = IO.read("#{edit_preferences_directory}/edit-server-port")
     require 'net/telnet'
     telnet = Net::Telnet.new('Host' => host, 'Port' => port.to_i(), 'Telnetmode' => false)
     telnet.puts("open #{filename}\r")
@@ -33,11 +36,6 @@ if ARGV[0] =~ /^\+(\d+)$/
   ARGV[0] = "#{ARGV[0]}:#$1"
 end
 
-filename = ARGV[0]
-if filename != nil && openFileOnLocalhost(edit_server_port, File.expand_path(filename))
-  exit(0)
-end
-
 case `uname`
 when "Darwin"
     # Darwin is what Mac OS X calls itself.
@@ -45,6 +43,11 @@ when "Darwin"
     os_specific_options = "-Xdock:name=Edit:icon=/Developer/Examples/Carbon/SimpleText/SimpleText.icns"
 else
     extra_classpath_entries = "#{salma_hayek}/MRJ141Stubs.jar"
+end
+
+filename = ARGV[0]
+if filename != nil && openFileOnEditServer(edit_preferences_directory, File.expand_path(filename))
+  exit(0)
 end
 
 if File.stat(edit_preferences_directory).directory? == false
@@ -74,8 +77,6 @@ classpath = "-classpath #{edit_home}/classes:#{salma_hayek}/classes:#{extra_clas
 heap_size = "-Xmx1g"
 
 options = "#{os_specific_options} #{heap_size} #{fake_environment} #{classpath} -DpreferencesDirectory=#{edit_preferences_directory}"
-
-puts(options)
 
 if ENV["DEBUGGING_EDIT"] != nil
   system("java #{options} #{edit_class_name}")
