@@ -226,9 +226,6 @@ public class TagReader {
             // class is a pattern common to most languages.
             if (containingClass.equals(identifier)) {
                 tagType = 'C';
-            } else if (containingClass.endsWith("." + identifier)) {
-                // An inner class constructor.
-                tagType = 'C';
             }
             this.type = (String) TYPES.get(String.valueOf(tagType));
         }
@@ -306,6 +303,11 @@ public class TagReader {
                 { METHOD }, { CLASS }, { INTERFACE }
             };
             this.isAbstract = (type.equals(INTERFACE));
+            
+            if (containingClass.endsWith("." + identifier)) {
+                // An inner class constructor.
+                this.type = CONSTRUCTOR;
+            }
         }
     }
     
@@ -327,9 +329,11 @@ public class TagReader {
             super(identifier, lineNumber, fixType(tagType), context, containingClass);
             classSeparator = "::";
             
-            // Recognize a C++ destructor.
-            if (identifier.equals("~" + containingClass)) {
+            if (identifier.charAt(0) == '~') {
                 this.type = DESTRUCTOR;
+            } else if (containingClass.endsWith("::" + identifier)) {
+                // A constructor in a namespace.
+                this.type = CONSTRUCTOR;
             }
         }
         
