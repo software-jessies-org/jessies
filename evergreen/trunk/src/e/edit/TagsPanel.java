@@ -78,19 +78,33 @@ public class TagsPanel extends JPanel {
     }
     
     private static class TagsTreeRenderer extends DefaultTreeCellRenderer {
+        private final Icon squareIcon = new DrawnIcon(new Dimension(10, 10)) {
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                g.setColor(visibilityColor);
+                g.fillRect(x, y, 10, 10);
+            }
+        };
+        
+        private Color visibilityColor;
+        
         public TagsTreeRenderer() {
             setClosedIcon(null);
             setLeafIcon(null);
             setOpenIcon(null);
         }
+        
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            visibilityColor = null;
             if (node.getUserObject() instanceof TagReader.Tag) {
                 TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
-                setForeground(tag.visibilityColor());
+                visibilityColor = tag.visibilityColor();
             } else {
                 System.err.println(node.getUserObject().getClass() + " : " + node.getUserObject());
+            }
+            if (visibilityColor != null) {
+                setIcon(squareIcon);
             }
             return this;
         }

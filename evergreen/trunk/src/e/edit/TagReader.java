@@ -144,7 +144,7 @@ public class TagReader {
             } else if (context.indexOf("access:protected") != -1) {
                 return Color.ORANGE;
             } else {
-                return Color.BLACK;
+                return null;
             }
         }
         
