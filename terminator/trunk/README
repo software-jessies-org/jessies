@@ -1,18 +1,9 @@
-README file for Terminator
+This directory contains the Terminator terminal emulator.
 
-Please do read this file first - it's short, but important.
-
-Terminator has its own terminfo file.  This will be installed in your home
-directory unless you run terminator with privileges on the system-wide
-terminfo directory.  If it's only installed in your home directory then you
-will see "terminal is not fully functional" problems when using su to
-switch to another user (although sudo works fine).  Similarly, if you're
-using Terminator to run ssh, then you will want to follow the instructions
-in doc/README to install the terminfo file on the target system.
-
-Terminator will attempt to guess appropriate defaults when it's first run.
-If you run Terminator on multiple windowing environments with the same
-home directory then hopefully you want the same settings on all of them.
+Terminator is free software. See the file COPYING for copying permission.
+All source files are copyright the authors where not otherwise attributed.
 
 Send bug reports to software@jessies.org, being sure to include the
 word "Terminator" in your Subject: line.
+
+Enjoy!
