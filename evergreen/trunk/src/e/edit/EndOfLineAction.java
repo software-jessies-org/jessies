@@ -7,8 +7,8 @@ import javax.swing.*;
 import javax.swing.text.*;
 
 /**
-The ETextArea go to/select to end of line action.
-*/
+ * The ETextArea go to/select to end of line action.
+ */
 public class EndOfLineAction extends TextAction {
     public static final String ACTION_NAME = "EndOfLine";
     public static final String SHIFT_ACTION_NAME = "SelectToEndOfLine";
@@ -31,8 +31,8 @@ public class EndOfLineAction extends TextAction {
             try {
                 int offset = target.getCaretPosition();
                 int lineEndOffset = target.getLineEndOffset(target.getLineOfOffset(offset));
-                if (lineEndOffset != target.getDocument().getLength()) {
-                    lineEndOffset--; // Back up past the newline.
+                if (offset != target.getDocument().getLength() && lineEndOffset > 0 && target.getCharAt(lineEndOffset - 1) == '\n') {
+                    --lineEndOffset; // Back up past the newline.
                 }
                 if (select) {
                     target.moveCaretPosition(lineEndOffset);
