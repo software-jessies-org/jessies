@@ -31,6 +31,33 @@ public class GuiUtilities {
         UIManager.put("Table.selectionForeground", Color.WHITE);
     }
     
+    // Used by isFontFixedWidth.
+    private static final java.awt.font.FontRenderContext DEFAULT_FONT_RENDER_CONTEXT = new java.awt.font.FontRenderContext(null, false, false);
+    
+    /**
+     * Guesses whether a font is fixed-width by comparing the widths of
+     * various characters known for having wildly different sizes in
+     * proportional fonts. As far as I know, there's no proper way to
+     * query this font property in Java, despite how fundamental it
+     * appears.
+     */
+    public static boolean isFontFixedWidth(Font font) {
+        int maxWidth = 0;
+        char[] testChars = "ILMWilmw01".toCharArray();
+        for (int i = 0; i < testChars.length; i++) {
+            java.awt.geom.Rectangle2D stringBounds = font.getStringBounds(testChars, i, i + 1, DEFAULT_FONT_RENDER_CONTEXT);
+            int width = (int) Math.ceil(stringBounds.getWidth());
+            if (maxWidth == 0) {
+                maxWidth = width;
+            } else {
+                if (width != maxWidth) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
     /**
      * Tests whether we're running on Mac OS. The Mac is quite
      * different from Linux and Windows, and it's sometimes
