@@ -139,10 +139,38 @@ public class StringUtilities {
         return result.toString();
     }
 
+    /**
+     * Returns a copy of the string, with leading whitespace
+     * omitted. See String.trim.
+     */
+    public static String trimLeadingWhitespace(String s) {
+        final int length = s.length();
+        int i = 0;
+        while (i < length && s.charAt(i) <= ' ') {
+            ++i;
+        }
+        return s.substring(i);
+    }
+    
+    /**
+     * Returns a copy of the string, with trailing whitespace
+     * omitted. See String.trim.
+     */
+    public static String trimTrailingWhitespace(String s) {
+        final int length = s.length();
+        int i = length - 1;
+        while (i > 0 && s.charAt(i - 1) <= ' ') {
+            --i;
+        }
+        return s.substring(0, i);
+    }
+
     private StringUtilities() {
     }
 
     public static void main(String[] args) {
+        System.out.println("'" + trimLeadingWhitespace("  hello world  ") + "'");
+        System.out.println("'" + trimTrailingWhitespace("  hello world  ") + "'");
         System.out.println("blah="+escapeForJava("hello\tworld\u01f8\n"));
         System.out.println("blah2="+escapeForJava(unescapeJava(escapeForJava("hello\tworld\u01f8\n"))));
         for (int i = 0; i < args.length; i++) {
