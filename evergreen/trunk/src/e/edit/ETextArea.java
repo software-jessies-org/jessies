@@ -392,6 +392,10 @@ public class ETextArea extends JTextArea {
         wordSelectionStopChars = newWordSelectionStopChars;
     }
     
+    public CharSequence charSequence() {
+        return new DocumentCharSequence(getDocument());
+    }
+    
     /** Returns the character at the given offset in the document, . */
     public char getCharAt(int offset) throws BadLocationException {
         return getDocument().getText(offset, 1).charAt(0);
