@@ -8,6 +8,4 @@ to do stuff, like opening new tabs, or whatever.
 */
 public interface TerminalPaneMaster {
 	public void openShellPane(boolean focusOnNewTab);
-	
-	public void openCommandPane(String command, boolean focusOnNewTab);
 }

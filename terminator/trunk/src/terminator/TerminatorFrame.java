@@ -235,10 +235,6 @@ public class TerminatorFrame extends JFrame implements TerminalPaneMaster {
 		addPane(JTerminalPane.newShell(this), focusOnNewTab);
 	}
 	
-	public void openCommandPane(String command, boolean focusOnNewTab) {
-		addPane(JTerminalPane.newCommandWithTitle(this, command, command), focusOnNewTab);
-	}
-
 	private Timer terminalSizeTimer = null;
 
 	public void setTerminalSize(Dimension size) {
