@@ -48,6 +48,8 @@ class JavaDocParser
         @fields = []
         @methods = []
         @constructors = []
+        @annotationTypes = []
+        @enumConstants = []
     end
 
     def parse_file(filename)
@@ -63,6 +65,8 @@ class JavaDocParser
         show_items("C", @constructors)
         show_items("M", @methods)
         show_items("F", @fields)
+        show_items("A", @annotationTypes)
+        show_items("E", @enumConstants)
         puts("")
     end
 
@@ -74,11 +78,11 @@ class JavaDocParser
             |line|
             #puts(">>>>> #{line}")
             
-            if line =~ /^<META NAME="keywords" CONTENT="(.+),.+">$/
+            if line =~ /^<META NAME="keywords" CONTENT="(.+) .+">$/
                 @class = Item.new($1)
             elsif line =~ /^<!-- =+ START OF CLASS DATA =+ -->$/
                 item = @class
-            elsif line =~ /^<!-- =+ NESTED CLASS SUMMARY =+ -->$/
+            elsif line =~ /^<!-- =+ .+ SUMMARY =+ -->$/
                 item = nil
             elsif line =~ /^<A NAME=\"(.*)\">.*<\/A><H3>$/
                 if item != nil
@@ -101,6 +105,10 @@ class JavaDocParser
                 items = @methods
             elsif line =~ /^<!-- =+ CONSTRUCTOR DETAIL =+ -->$/
                 items = @constructors
+            elsif line =~ /^<!-- =+ ANNOTATION TYPE MEMBER DETAIL =+ -->$/
+                items = @annotationTypes
+            elsif line =~ /^<!-- =+ ENUM CONSTANT DETAIL =+ -->$/
+                items = @enumConstants
             end
         }
     end
