@@ -37,8 +37,9 @@ public class FindFilesContainingSelectionAction extends ETextAction {
             }
         }
         
-        // Ensure we have a trailing separator.
-        if (directory.endsWith(File.separator) == false) {
+        // Ensure we have a trailing separator, unless that would mean that
+        // we have a leading separator.
+        if (directory.length() > 0 && directory.endsWith(File.separator) == false) {
             directory += File.separator;
         }
         
