@@ -10,7 +10,7 @@ import terminator.*;
 */
 
 public interface JTerminalPaneFactory {
-	public JTerminalPane create(Controller controller);
+	public JTerminalPane create(TerminalPaneMaster controller);
 	
 	public class Command implements JTerminalPaneFactory {
 		private String command;
@@ -25,13 +25,13 @@ public interface JTerminalPaneFactory {
 			this.title = title;
 		}
 		
-		public JTerminalPane create(Controller controller) {
+		public JTerminalPane create(TerminalPaneMaster controller) {
 			return new JTerminalPane(controller, title, command, false);
 		}
 	}
 	
 	public class Shell implements JTerminalPaneFactory {
-		public JTerminalPane create(Controller controller) {
+		public JTerminalPane create(TerminalPaneMaster controller) {
 			String user = System.getProperty("user.name");
 			String command = getUserShell(user);
 			if (Options.getSharedInstance().isLoginShell()) {

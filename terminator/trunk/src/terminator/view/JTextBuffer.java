@@ -23,7 +23,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private static final boolean ANTIALIAS = Options.getSharedInstance().isAntiAliased();
 	private static final boolean MAC_OS = GuiUtilities.isMacOs();
 
-	private Controller controller;
+	private TerminalPaneMaster controller;
 	private TextBuffer model;
 	private Location caretPosition = new Location(0, 0);
 	private boolean hasFocus = false;
@@ -45,7 +45,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	*/
 	private ArrayList lineHighlights = new ArrayList();
 	
-	public JTextBuffer(Controller controller) {
+	public JTextBuffer(TerminalPaneMaster controller) {
 		this.controller = controller;
 		Options options = Options.getSharedInstance();
 		model = new TextBuffer(this, options.getInitialColumnCount(), options.getInitialRowCount());
@@ -106,7 +106,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		setCursor(INVISIBLE_CURSOR);
 	}
 	
-	public Controller getController() {
+	public TerminalPaneMaster getTerminalPaneMaster() {
 		return controller;
 	}
 	

@@ -17,7 +17,7 @@ import terminator.terminal.*;
 */
 
 public class JTerminalPane extends JPanel {
-	private Controller controller;
+	private TerminalPaneMaster controller;
 	private TerminalControl control;
 	private JTextBuffer textPane;
 	private JScrollPane scrollPane;
@@ -44,7 +44,7 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	public JTerminalPane(Controller controller, String name, String command, boolean ignoreExitStatus) {
+	public JTerminalPane(TerminalPaneMaster controller, String name, String command, boolean ignoreExitStatus) {
 		super(new BorderLayout());
 		this.controller = controller;
 		this.name = name;
@@ -63,7 +63,7 @@ public class JTerminalPane extends JPanel {
 	 * title. If 'title' is null, we use the first word of the command
 	 * as the the title.
 	 */
-	public static JTerminalPane newCommandWithTitle(Controller controller, String command, String title) {
+	public static JTerminalPane newCommandWithTitle(TerminalPaneMaster controller, String command, String title) {
 		if (title == null) {
 			title = command.trim();
 			if (title.indexOf(' ') != -1) {
@@ -76,7 +76,7 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Creates a new terminal running the user's shell.
 	 */
-	public static JTerminalPane newShell(Controller controller) {
+	public static JTerminalPane newShell(TerminalPaneMaster controller) {
 		String user = System.getProperty("user.name");
 		String command = getUserShell(user);
 		if (Options.getSharedInstance().isLoginShell()) {
@@ -148,7 +148,7 @@ public class JTerminalPane extends JPanel {
 		}
 	}
 	
-	public Controller getController() {
+	public TerminalPaneMaster getTerminalPaneMaster() {
 		return controller;
 	}
 	

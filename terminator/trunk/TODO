@@ -7,9 +7,7 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
-[5]	Do some repackaging - the number of source files in the base package is getting annoying.
 [5]	Hitting alt-k a number of times results in no redraw of the prompt.  I think bash tries to be clever.
-[5]	Change the naming of 'Control' and 'Controller'.  It's confusing.
 [5]	Resizing the terminal window causes an automatic scroll to the bottom.  This shouldn't happen.
 [5]	Make an about box.
 [3]	Review the current properties reading, and see if it's really going to work well enough.  Possibly add "?MacOS:" stuff to it.
