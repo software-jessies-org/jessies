@@ -65,20 +65,6 @@ public class EColumn extends JSplitPane {
                 title += " (" + windowCount + ")";
             }
             tabbedPane.setTitleAt(tabbedPane.indexOfComponent(workspace), title);
-            ensureNonEmptyColumnVisible(tabbedPane);
-        }
-    }
-    
-    public void ensureNonEmptyColumnVisible(JTabbedPane tabbedPane) {
-        Workspace currentWorkspace = getWorkspace();
-        if (currentWorkspace.isEmpty() == false) {
-            return;
-        }
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            Workspace workspace = (Workspace) tabbedPane.getComponentAt(i);
-            if (workspace.isEmpty() == false) {
-                tabbedPane.setSelectedIndex(i);
-            }
         }
     }
     
