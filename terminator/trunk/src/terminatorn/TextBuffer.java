@@ -357,8 +357,9 @@ public class TextBuffer implements TerminalListener {
 		this.width = width;
 		if (this.height > height && textLines.size() >= this.height) {
 			for (int i = 0; i < (this.height - height); i++) {
-				if (usingAlternativeBuffer() || get(textLines.size() - 1).length() == 0) {
-					textLines.remove(textLines.size() - 1);
+				int lineToRemove = textLines.size() - 1;
+				if (usingAlternativeBuffer() || (get(lineToRemove).length() == 0 && caretPosition.getLineIndex() != lineToRemove)) {
+					textLines.remove(lineToRemove);
 				}
 			}
 		} else if (this.height < height) {
@@ -404,12 +405,13 @@ public class TextBuffer implements TerminalListener {
 	public void processSpecialCharacter(char ch) {
 		switch (ch) {
 			case '\r':
-//				Log.warn("Got <CR>.");
 				caretPosition = new Location(caretPosition.getLineIndex(), 0);
+//				Log.warn("Got <CR>; new location " + caretPosition + ".");
 				return;
 			case '\n':
-//				Log.warn("Got <LF>.");
+				int lineIndex = caretPosition.getLineIndex();
 				moveToLine(caretPosition.getLineIndex() + 1);
+//				Log.warn("Got <LF>; moved from line " + lineIndex + " to " + caretPosition.getLineIndex() + ".");
 				return;
 			case '\t':
 				insertTab();
@@ -506,7 +508,6 @@ public class TextBuffer implements TerminalListener {
 	
 	/** Moves the cursor vertically by the number of characters in yDiff, negative for up, positive for down. */
 	public void moveCursorVertically(int yDiff) {
-//		Log.warn("Moving cursor vertically by " + yDiff + " from " + caretPosition + ".");
 		caretPosition = new Location(caretPosition.getLineIndex() + yDiff, caretPosition.getCharOffset());
 	}
 
