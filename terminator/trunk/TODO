@@ -13,7 +13,15 @@ Feedback on other tabs when there's been output you haven't seen yet?
 Shouldn't log while in alternate buffer mode.
 Why not?  When catting the log files, I've found this useful.  It lets me see when johnh has been into vim.
 
-Add ability to view more than one terminal at a time, in a split pane, or in a 2d-tiled layout.
+* Phil suggested "add ability to view more than one terminal at a time, in a
+  split pane, or in a 2d-tiled layout". I'm not entirely convinced, but can
+  see an argument that the tab/window distinction shouldn't be so fixed. Why
+  can't I make a tab into a window, or vice versa? What would the UI be,
+  especially for turning a window into a tab? Apple's Terminal has a weird (to
+  my mind) feature that lets you split a single terminal so you have two views
+  into the same terminal. So you can be looking at one part of the scrollback
+  while working at the bottom (one presumes). I've no idea what this is for,
+  but felt I should mention it.
 
 The flashing green underline of a cursor is often difficult to find.  Fine by me if people really want the option but I don't think it should be the default.
 
