@@ -237,7 +237,7 @@ public class FileUtilities {
                     ++asciiByteCount;
                 }
             }
-            isAsciiFile = (asciiByteCount == byteCount);
+            isAsciiFile = (byteCount == -1 || asciiByteCount == byteCount);
         } catch (Exception ex) {
             ex = ex;
         }
