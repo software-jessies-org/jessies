@@ -76,5 +76,5 @@ public class Indenter {
         }
     }
     private static final Pattern INDENTATION_PATTERN_1 = Pattern.compile("^(\\s+)[A-Za-z].*$");
-    private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^(\\s+)[{}]$");
+    private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^(\\s*)[{}]$");
 }
