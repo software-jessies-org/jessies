@@ -123,7 +123,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	 */
 	public void paste() {
 		try {
-			Transferable contents = getToolkit().getSystemClipboard().getContents(this);
+			Toolkit toolkit = getToolkit();
+			Transferable contents = toolkit.getSystemClipboard().getContents(this);
+			if (toolkit.getSystemSelection() != null) {
+				contents = toolkit.getSystemSelection().getContents(this);
+			}
+			DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
 			String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
 			insertText(string);
 		} catch (Exception ex) {
