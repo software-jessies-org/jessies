@@ -161,7 +161,6 @@ public class HyperlinkHighlighter implements Highlighter {
 			 * need to avoid being confused by stuff like File.java:123.
 			 */
 			String name = matcher.group(relevantGroup);
-			System.err.println(name);
 			int colonIndex = name.indexOf(':');
 			if (colonIndex != -1) {
 				name = name.substring(0, colonIndex);
