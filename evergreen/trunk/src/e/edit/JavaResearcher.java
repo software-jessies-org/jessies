@@ -31,7 +31,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         
         javaDocSummary = StringUtilities.readLinesFromFile(System.getProperty("env.EDIT_HOME") + java.io.File.separatorChar + "javadoc-summary.txt");
         
-        Pattern identifierPattern = Pattern.compile("^[MCF]:(\\S+?)(\\(|\t).*$");
+        Pattern identifierPattern = Pattern.compile("^[MCFEA]:(\\S+?)(\\(|\t).*$");
         uniqueIdentifiers = new TreeSet();
         
         int classCount = 0;
