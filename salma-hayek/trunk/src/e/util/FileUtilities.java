@@ -309,6 +309,25 @@ public class FileUtilities {
         return fileFromParentAndString(salmaHayekRoot, pathFromSalmaHayekRoot);
     }
     
+    /**
+     * Creates a temporary file containing 'content' where the temporary file's
+     * name begins with 'prefix'. Returns the name of the temporary file.
+     * On error, a RuntimeException is thrown which will refer to the file
+     * using 'humanReadableName'. The file will be deleted on exit. 
+     */
+    public static String createTemporaryFile(String prefix, String humanReadableName, String content) {
+        try {
+            File file = File.createTempFile(prefix, null);
+            file.deleteOnExit();
+            PrintWriter out = new PrintWriter(new FileOutputStream(file));
+            out.print(content);
+            out.close();
+            return file.toString();
+        } catch (IOException ex) {
+            throw new RuntimeException("Couldn't create " + humanReadableName + ": " + ex.getMessage());
+        }
+    }
+    
     public static void main(String[] args) {
         for (int i = 0; i < args.length; ++i) {
             String filename = args[i];
