@@ -195,7 +195,7 @@ public class FindFilesDialog {
         }
 
         matchList = new JList();
-        matchList.setCellRenderer(new EListCellRenderer());
+        matchList.setCellRenderer(new EListCellRenderer(true));
         matchList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
