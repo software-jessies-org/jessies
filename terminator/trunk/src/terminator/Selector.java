@@ -5,10 +5,12 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 
 /**
-
-@author Phil Norman
-*/
-
+ * Implements the feel (rather than the look) of the selection. The look is
+ * deferred to the Highlighter. The feel is the usual sweep-selection, plus
+ * double-click to highlight a word (the exact definition of which is biased
+ * towards shell-like applications), triple-click for line selection, and
+ * shift-click to extend a selection.
+ */
 public class Selector implements MouseListener, MouseMotionListener, Highlighter {
 	private JTextBuffer view;
 	private Highlight highlight;
@@ -36,6 +38,12 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 
 	public void mousePressed(MouseEvent event) {
 		if (event.getButton() != MouseEvent.BUTTON1) {
+			return;
+		}
+		
+		// Shift-click should move one end of the selection.
+		if (event.isShiftDown() && startLocation != null) {
+			selectToPointOf(event);
 			return;
 		}
 		
@@ -104,7 +112,6 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	
 	public void mouseReleased(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON1) {
-			startLocation = null;
 			copy();
 		}
 	}
@@ -123,14 +130,22 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	
 	public void mouseDragged(MouseEvent event) {
 		if (startLocation != null) {
-			view.removeHighlightsFrom(this, 0);
-			Location endLocation = view.viewToModel(event.getPoint());
-			if (endLocation.equals(startLocation)) {
-				return;
-			}
-			setHighlight(min(startLocation, endLocation), max(startLocation, endLocation));
-			view.scrollRectToVisible(new Rectangle(event.getX(), event.getY(), 10, 10));
+			selectToPointOf(event);
 		}
+	}
+	
+	/**
+	 * Changes the end of the selection to be the point pointed to by the
+	 * given MouseEvent.
+	 */
+	private void selectToPointOf(MouseEvent event) {
+		view.removeHighlightsFrom(this, 0);
+		Location endLocation = view.viewToModel(event.getPoint());
+		if (endLocation.equals(startLocation)) {
+			return;
+		}
+		setHighlight(min(startLocation, endLocation), max(startLocation, endLocation));
+		view.scrollRectToVisible(new Rectangle(event.getX(), event.getY(), 10, 10));
 	}
 	
 	public void mouseMoved(MouseEvent event) { }
