@@ -77,7 +77,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         
         initFocusListener();
         
-        this.birdView = new BirdView(text, scrollPane.getVerticalScrollBar());
+        this.birdView = new BirdView(this, scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
         fillWithContent();
