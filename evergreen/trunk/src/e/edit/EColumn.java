@@ -85,7 +85,7 @@ public class EColumn extends JPanel implements ComponentListener {
      * or removed.
      */
     public void updateTabForWorkspace() {
-        Workspace workspace = (Workspace) SwingUtilities.getAncestorOfClass(Workspace.class, this);
+        Workspace workspace = getWorkspace();
         JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
         if (workspace != null && tabbedPane != null) {
             String title = workspace.getTitle();
@@ -99,7 +99,8 @@ public class EColumn extends JPanel implements ComponentListener {
     }
     
     public void ensureNonEmptyColumnVisible(JTabbedPane tabbedPane) {
-        if (getComponentCount() > 0) {
+        Workspace currentWorkspace = getWorkspace();
+        if (currentWorkspace.isEmpty() == false) {
             return;
         }
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
@@ -108,6 +109,10 @@ public class EColumn extends JPanel implements ComponentListener {
                 tabbedPane.setSelectedIndex(i);
             }
         }
+    }
+    
+    private Workspace getWorkspace() {
+        return (Workspace) SwingUtilities.getAncestorOfClass(Workspace.class, this);
     }
     
     public void expandComponent(Component luckyBoy) {
