@@ -319,6 +319,16 @@ public class TagReader {
             }
         }
         
+        /**
+         * The tag type needs to be converted to one of our canonical types,
+         * to work around ectags' liberal re-use of type tags. In C++ mode,
+         * for example, 'p' means function prototype, in Java it means package.
+         * It also means "paragraph", "port", "procedure", "program" and
+         * "property". Pascal, Sql and Tcl programmers beware!
+         * The likely best work-around for this would be to submit a
+         * patch to ectags so that it at least records in its tags
+         * file which mode it was in.
+         */
         private static char fixType(char type) {
             switch (type) {
                 case 'f': return 'm'; // Function -> Method.
