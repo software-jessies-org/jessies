@@ -8,22 +8,22 @@ import javax.swing.*;
 import e.util.*;
 
 /**
-Telnet stream control object - manages the interface between the rest of the Java code and the
-low-level telnet protocol (RFC 854).
+Terminal stream control object - manages the interface between the rest of the Java code and the
+low-level terminal protocol.
 
 @author Phil Norman
 @author Elliott Hughes
 */
 
-public class TelnetControl implements Runnable {
+public class TerminalControl implements Runnable {
 	private static final boolean DEBUG = false;
 	private static final boolean DEBUG_STEP_MODE = false;
 	private static BufferedReader stepModeReader;
 
 	private static final int INPUT_BUFFER_SIZE = 4096;
 
-	private JTelnetPane pane;
-	private TelnetListener listener;
+	private JTerminalPane pane;
+	private TerminalListener listener;
 	private Process process;
 	private boolean ignoreExitStatus;
 	private boolean processIsRunning = true;
@@ -32,10 +32,10 @@ public class TelnetControl implements Runnable {
 	
 	private LogWriter logWriter;
 	
-	// Buffer of TelnetActions to perform.
-	private ArrayList telnetActions = new ArrayList();
+	// Buffer of TerminalActions to perform.
+	private ArrayList terminalActions = new ArrayList();
 	
-	public TelnetControl(JTelnetPane pane, TelnetListener listener, String command, Process process, boolean ignoreExitStatus) throws IOException {
+	public TerminalControl(JTerminalPane pane, TerminalListener listener, String command, Process process, boolean ignoreExitStatus) throws IOException {
 		this.pane = pane;
 		this.listener = listener;
 		this.process = process;
@@ -57,7 +57,7 @@ public class TelnetControl implements Runnable {
 	
 	/** Starts the process listening once all the user interface stuff is set up. */
 	public void start() {
-		(new Thread(this, "Telnet connection listener")).start();
+		(new Thread(this, "Terminal connection listener")).start();
 	}
 
 	private boolean localEcho = false;
@@ -98,7 +98,7 @@ public class TelnetControl implements Runnable {
 			try {
 				int status = process.waitFor();
 				if (status == 0 || ignoreExitStatus) {
-					pane.getController().closeTelnetPane(pane);
+					pane.getController().closeTerminalPane(pane);
 				} else {
 					announceConnectionLost("[Process exited with status " + status + ".]");
 				}
@@ -122,12 +122,12 @@ public class TelnetControl implements Runnable {
 	
 	/** Must be called in the AWT dispatcher thread. */
 	public void sizeChanged(final Dimension sizeInChars, final Dimension sizeInPixels) throws IOException {
-		TelnetAction sizeChangeAction = new TelnetAction() {
-			public void perform(TelnetListener listener) {
+		TerminalAction sizeChangeAction = new TerminalAction() {
+			public void perform(TerminalListener listener) {
 				listener.sizeChanged(sizeInChars);
 			}
 		};
-		listener.processActions(new TelnetAction[] { sizeChangeAction });
+		listener.processActions(new TerminalAction[] { sizeChangeAction });
 		// Notify the pty that the size has changed.
 		out.sendResizeNotification(sizeInChars, sizeInPixels);
 	}
@@ -140,25 +140,25 @@ public class TelnetControl implements Runnable {
 			processChar((char) value);
 		}
 		flushLineBuffer();
-		final TelnetAction[] actions = (TelnetAction[]) telnetActions.toArray(new TelnetAction[telnetActions.size()]);
-		telnetActions.clear();
+		final TerminalAction[] actions = (TerminalAction[]) terminalActions.toArray(new TerminalAction[terminalActions.size()]);
+		terminalActions.clear();
 		synchronized (this) {
-			telnetActionsProcessed = false;
+			terminalActionsProcessed = false;
 		}
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					listener.processActions(actions);
 				} finally {
-					synchronized (TelnetControl.this) {
-						telnetActionsProcessed = true;
-						TelnetControl.this.notifyAll();
+					synchronized (TerminalControl.this) {
+						terminalActionsProcessed = true;
+						TerminalControl.this.notifyAll();
 					}
 				}
 			}
 		});
 		synchronized (this) {
-			if (telnetActionsProcessed == false) {
+			if (terminalActionsProcessed == false) {
 				try {
 					wait();
 				} catch (InterruptedException ex) {
@@ -169,7 +169,7 @@ public class TelnetControl implements Runnable {
 		return size - i;
 	}
 	
-	private boolean telnetActionsProcessed = true;
+	private boolean terminalActionsProcessed = true;
 	
 	public void processChar(final char ch) throws IOException {
 		logWriter.append(ch);
@@ -213,8 +213,8 @@ public class TelnetControl implements Runnable {
 		// Conform to the stated claim that the listener's always called in the AWT dispatch thread.
 		if (line.length() > 0) {
 			doStep();
-			telnetActions.add(new TelnetAction() {
-				public void perform(TelnetListener listener) {
+			terminalActions.add(new TerminalAction() {
+				public void perform(TerminalListener listener) {
 					if (DEBUG) {
 						Log.warn("Processing line \"" + line + "\"");
 					}
@@ -225,8 +225,8 @@ public class TelnetControl implements Runnable {
 	}
 	
 	public void processSpecialCharacter(final char ch) {
-		telnetActions.add(new TelnetAction() {
-			public void perform(TelnetListener listener) {
+		terminalActions.add(new TerminalAction() {
+			public void perform(TerminalListener listener) {
 				if (DEBUG) {
 					String charDesc = "UK";
 					switch (ch) {
@@ -248,9 +248,9 @@ public class TelnetControl implements Runnable {
 		// Invoke all escape sequence handling in the AWT dispatch thread - otherwise we'd have
 		// to create billions upon billions of tiny little invokeLater(Runnable) things all over the place.
 		doStep();
-		TelnetAction action = escapeParser.getAction(this);
+		TerminalAction action = escapeParser.getAction(this);
 		if (action != null) {
-			telnetActions.add(action);
+			terminalActions.add(action);
 		}
 	}
 	

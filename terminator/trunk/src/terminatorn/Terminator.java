@@ -38,11 +38,11 @@ public class Terminator implements Controller {
 			title.append(" [").append(terminalSize.width).append(" x ").append(terminalSize.height).append("]");
 		}
 		if (terminals.size() >= 1) {
-			JTelnetPane pane;
+			JTerminalPane pane;
 			if (tabbedPane == null) {
-				pane = (JTelnetPane) terminals.get(0);
+				pane = (JTerminalPane) terminals.get(0);
 			} else {
-				pane = (JTelnetPane) tabbedPane.getSelectedComponent();
+				pane = (JTerminalPane) tabbedPane.getSelectedComponent();
 			}
 			if (pane != null) {
 				title.append(" - ").append(pane.getName());
@@ -87,12 +87,12 @@ public class Terminator implements Controller {
 			}
 			
 			String command = word;
-			terminals.add(JTelnetPane.newCommandWithTitle(this, command, name));
+			terminals.add(JTerminalPane.newCommandWithTitle(this, command, name));
 			name = null;
 		}
 		
 		if (arguments.isEmpty()) {
-			terminals.add(JTelnetPane.newShell(this));
+			terminals.add(JTerminalPane.newShell(this));
 		}
 		
 		if (terminals.size() == 1) {
@@ -103,9 +103,9 @@ public class Terminator implements Controller {
 	}
 	
 	private void initSingleTerminal() {
-		JTelnetPane telnetPane = (JTelnetPane) terminals.get(0);
-		frame.setContentPane(telnetPane);
-		frame.setTitle(telnetPane.getName());
+		JTerminalPane terminalPane = (JTerminalPane) terminals.get(0);
+		frame.setContentPane(terminalPane);
+		frame.setTitle(terminalPane.getName());
 	}
 	
 	private void initTabbedPane() {
@@ -142,8 +142,8 @@ public class Terminator implements Controller {
 			}
 		});
 		
-		if (oldContentPane instanceof JTelnetPane) {
-			addPaneToUI((JTelnetPane) oldContentPane);
+		if (oldContentPane instanceof JTerminalPane) {
+			addPaneToUI((JTerminalPane) oldContentPane);
 		}
 		
 		frame.setContentPane(tabbedPane);
@@ -152,8 +152,8 @@ public class Terminator implements Controller {
 	private void initTabbedTerminals() {
 		initTabbedPane();
 		for (int i = 0; i < terminals.size(); ++i) {
-			JTelnetPane telnetPane = (JTelnetPane) terminals.get(i);
-			addPaneToUI(telnetPane);
+			JTerminalPane terminalPane = (JTerminalPane) terminals.get(i);
+			addPaneToUI(terminalPane);
 		}
 	}
 	
@@ -191,7 +191,7 @@ public class Terminator implements Controller {
 	 * Give focus to the first terminal.
 	 */
 	private void initFocus() {
-		((JTelnetPane) terminals.get(0)).requestFocus();
+		((JTerminalPane) terminals.get(0)).requestFocus();
 	}
 	
 	/**
@@ -203,7 +203,7 @@ public class Terminator implements Controller {
 	 */
 	private void startThreads() {
 		for (int i = 0; i < terminals.size(); i++) {
-			((JTelnetPane) terminals.get(i)).start();
+			((JTerminalPane) terminals.get(i)).start();
 		}
 	}
 
@@ -211,7 +211,7 @@ public class Terminator implements Controller {
 	 * Removes the given terminal. If this is the last terminal, close
 	 * the window.
 	 */
-	public void closeTelnetPane(JTelnetPane victim) {
+	public void closeTerminalPane(JTerminalPane victim) {
 		terminals.remove(victim);
 		if (tabbedPane != null) {
 			closeTab(victim);
@@ -221,14 +221,14 @@ public class Terminator implements Controller {
 	}
 	
 	/**
-	 * Implements closeTelnetPane.
+	 * Implements closeTerminalPane.
 	 */
-	private void closeTab(JTelnetPane victim) {
+	private void closeTab(JTerminalPane victim) {
 		tabbedPane.remove(victim);
 		if (tabbedPane.getTabCount() == 0) {
 			closeWindow();
 		} else if (tabbedPane.getTabCount() == 1) {
-			JTelnetPane soleSurvivor = (JTelnetPane) terminals.get(0);
+			JTerminalPane soleSurvivor = (JTerminalPane) terminals.get(0);
 			soleSurvivor.invalidate();
 			tabbedPane.remove(soleSurvivor);
 			frame.setContentPane(soleSurvivor);
@@ -240,7 +240,7 @@ public class Terminator implements Controller {
 	}
 	
 	/**
-	 * Implements closeTelnetPane.
+	 * Implements closeTerminalPane.
 	 */
 	private void closeWindow() {
 		frame.setVisible(false);
@@ -248,11 +248,11 @@ public class Terminator implements Controller {
 	}
 	
 	public void openShellPane(boolean focusOnNewTab) {
-		addPane(JTelnetPane.newShell(this), focusOnNewTab);
+		addPane(JTerminalPane.newShell(this), focusOnNewTab);
 	}
 	
 	public void openCommandPane(String command, boolean focusOnNewTab) {
-		addPane(JTelnetPane.newCommandWithTitle(this, command, command), focusOnNewTab);
+		addPane(JTerminalPane.newCommandWithTitle(this, command, command), focusOnNewTab);
 	}
 
 	private Timer terminalSizeTimer = null;
@@ -274,7 +274,7 @@ public class Terminator implements Controller {
 		terminalSizeTimer.start();
 	}
 	
-	public void terminalNameChanged(JTelnetPane terminal) {
+	public void terminalNameChanged(JTerminalPane terminal) {
 		if (tabbedPane != null) {
 			int index = tabbedPane.indexOfComponent(terminal);
 			tabbedPane.setTitleAt(index, terminal.getName());
@@ -355,7 +355,7 @@ public class Terminator implements Controller {
 		}
 	}
 	
-	private void addPane(JTelnetPane newPane, boolean focusOnNewTab) {
+	private void addPane(JTerminalPane newPane, boolean focusOnNewTab) {
 		terminals.add(newPane);
 		addPaneToUI(newPane);
 		newPane.start();
@@ -365,7 +365,7 @@ public class Terminator implements Controller {
 		updateFrameTitle();
 	}
 	
-	private void addPaneToUI(JTelnetPane newPane) {
+	private void addPaneToUI(JTerminalPane newPane) {
 		initTabbedPane();
 		tabbedPane.add(newPane.getName(), newPane);
 		newPane.getTextPane().removeKeyListener(keyHandler);

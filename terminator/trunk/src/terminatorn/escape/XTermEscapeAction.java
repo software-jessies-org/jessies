@@ -13,7 +13,7 @@ BEL terminator, if present, in the constructor, since it contains no information
 @author Phil Norman
 */
 
-public class XTermEscapeAction implements TelnetAction {
+public class XTermEscapeAction implements TerminalAction {
 	private String sequence;
 	
 	public XTermEscapeAction(String sequence) {
@@ -42,7 +42,7 @@ public class XTermEscapeAction implements TelnetAction {
 	 *      39 = change default fg color
 	 *      49 = change default bg color
 	 */
-	public void perform(TelnetListener listener) {
+	public void perform(TerminalListener listener) {
 		if (sequence.startsWith("2;") || sequence.startsWith("0;")) {
 			String newWindowTitle = sequence.substring(2);
 			listener.setWindowTitle(newWindowTitle);

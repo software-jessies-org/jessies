@@ -46,9 +46,9 @@ public class EscapeParser {
 		return isComplete;
 	}
 	
-	public TelnetAction getAction(TelnetControl telnetControl) {
+	public TerminalAction getAction(TerminalControl terminalControl) {
 //		Log.warn("Getting action for ESC sequence \"" + sequence + "\"");
-		return (seqRecogniser == null) ? null : seqRecogniser.getTelnetAction(telnetControl, sequence);
+		return (seqRecogniser == null) ? null : seqRecogniser.getTerminalAction(terminalControl, sequence);
 	}
 	
 	public String toString() {
@@ -57,7 +57,7 @@ public class EscapeParser {
 	
 	private interface SequenceRecogniser {
 		public boolean isAtEnd(String sequence);
-		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence);
+		public TerminalAction getTerminalAction(TerminalControl terminalControl, String sequence);
 	}
 	
 	private static class SingleCharSequenceRecogniser implements SequenceRecogniser {
@@ -65,7 +65,7 @@ public class EscapeParser {
 			return (sequence.length() == 1);
 		}
 		
-		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence) {
+		public TerminalAction getTerminalAction(TerminalControl terminalControl, String sequence) {
 			return new SingleCharEscapeAction(sequence.charAt(0));
 		}
 	}
@@ -75,7 +75,7 @@ public class EscapeParser {
 			return (sequence.length() == 2);
 		}
 		
-		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence) {
+		public TerminalAction getTerminalAction(TerminalControl terminalControl, String sequence) {
 			return new TwoCharEscapeAction(sequence);
 		}
 	}
@@ -91,8 +91,8 @@ public class EscapeParser {
 			return (endChar < ' ' || endChar >= '@');
 		}
 		
-		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence) {
-			return new CSIEscapeAction(telnetControl, sequence);
+		public TerminalAction getTerminalAction(TerminalControl terminalControl, String sequence) {
+			return new CSIEscapeAction(terminalControl, sequence);
 		}
 	}
 	
@@ -120,7 +120,7 @@ public class EscapeParser {
 			return (endChar < ' ');
 		}
 		
-		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence) {
+		public TerminalAction getTerminalAction(TerminalControl terminalControl, String sequence) {
 			return new XTermEscapeAction(sequence);
 		}
 	}
