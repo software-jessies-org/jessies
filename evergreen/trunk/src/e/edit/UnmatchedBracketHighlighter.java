@@ -75,8 +75,8 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
         text = ESCAPE_CHARACTERS.rewrite(text);
         text = CHARACTER_LITERALS.rewrite(text);
         text = STRING_LITERALS.rewrite(text);
-        text = C_PLUS_PLUS_COMMENTS.rewrite(text);
         text = C_COMMENTS.rewrite(text);
+        text = C_PLUS_PLUS_COMMENTS.rewrite(text);
 
         try {
             Highlighter highlighter = textComponent.getHighlighter();
