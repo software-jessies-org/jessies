@@ -127,8 +127,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         c.requestFocus();
     }
     
-    private static Workspace defaultWorkspace;
-    
     /** Extensions that shouldn't be opened by Edit. */
     private static String[] externalApplicationExtensions;
     
@@ -165,7 +163,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
         return filename;
     }
-    
+
     /**
      * Opens a file. If the file's already open, it receives the focus. The 'filename'
      * parameter is actually a grep-style filename:address string.
@@ -305,12 +303,16 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     /** Returns the workspace whose root directory shares the longest common prefix with the given filename. */
-    public static Workspace getBestWorkspaceForFilename(String filename) {
+    public static Workspace getBestWorkspaceForFilenameWithExclusion(String filename, Workspace excludingWorkspace) {
         Workspace[] workspaces = getWorkspaces();
         int bestIndex = 0;
         int bestLength = 0;
         for (int i = 0; i < workspaces.length; i++) {
-            String workspaceRoot = workspaces[i].getRootDirectory();
+            Workspace workspace = workspaces[i];
+            if (workspace == excludingWorkspace) {
+                continue;
+            }
+            String workspaceRoot = workspace.getRootDirectory();
             if (filename.startsWith(workspaceRoot)) {
                 int length = workspaceRoot.length();
                 if (length > bestLength) {
@@ -320,6 +322,10 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             }
         }
         return workspaces[bestIndex];
+    }
+    
+    public static Workspace getBestWorkspaceForFilename(String filename) {
+        return getBestWorkspaceForFilenameWithExclusion(filename, null);
     }
     
     public static Workspace getCurrentWorkspace() {
@@ -348,6 +354,21 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return index;
     }
     
+    private static void addWorkspace(final Workspace workspace) {
+        String name = workspace.getTitle();
+        tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), getWorkspaceIndexInTabbedPane(name));
+        tabbedPane.setSelectedComponent(workspace);
+        
+        // We need to ensure that the workspace has been validated so that it
+        // and its children have bounds, so that EColumn has a non-zero height
+        // so that when we come to add components to it using EColumn.moveTo,
+        // we don't stack them all on top of one another.
+        workspace.revalidate();
+        frame.validate();
+        
+        Edit.showStatus("Added workspace '" + name + "' (" + workspace.getRootDirectory() + ")");
+    }
+
     public static Workspace createWorkspace(String name, String root) {
         boolean noNonEmptyWorkspaceOfThisNameExists = removeWorkspaceByName(name);
         if (noNonEmptyWorkspaceOfThisNameExists == false) {
@@ -355,12 +376,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             return null;
         }
         Workspace workspace = new Workspace(name, root);
-        tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), getWorkspaceIndexInTabbedPane(name));
-        Edit.showStatus("Added workspace '" + name + "' (" + workspace.getRootDirectory() + ")");
-        if (defaultWorkspace == null) defaultWorkspace = workspace;
-        frame.invalidate();
-        frame.validate();
-        frame.repaint();
+        addWorkspace(workspace);
+        reassessFileToWorkspaceMapping();
         return workspace;
     }
     
@@ -382,11 +399,20 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return true;
     }
     
+    public static void reassessFileToWorkspaceMapping() {
+        Workspace[] workspaces = getWorkspaces();
+        for (int i = 0; i < workspaces.length; i++) {
+            Workspace workspace = workspaces[i];
+            workspace.reassessFileToWorkspaceMapping();
+        }
+    }
+    
     public static void removeCurrentWorkspace() {
         Workspace workspace = getCurrentWorkspace();
         if (workspace == null) {
             return;
         }
+        workspace.tryToMoveFilesToOtherWorkspaces();
         if (workspace.isEmpty()) {
             tabbedPane.remove(workspace);
         } else {
