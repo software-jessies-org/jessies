@@ -1,0 +1,4 @@
+#!/bin/sh
+
+time gzip -dc /usr/share/man/man1/perlfunc.1.gz | nroff -man
+

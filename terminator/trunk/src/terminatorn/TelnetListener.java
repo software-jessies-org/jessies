@@ -17,10 +17,12 @@ public interface TelnetListener {
 	
 	/**
 	* Process the characters in the given line.  The string is composed of normally printable
-	* characters, plus special characters backspace, CR, LF (and possibly others) which need
-	* to be handled cleverly.
+	* characters.
 	*/
 	public void processLine(String line);
+	
+	/** Process a special character, one of CR, LF or BS. */
+	public void processSpecialCharacter(char ch);
 	
 	// VT100 command support.
 	
