@@ -135,7 +135,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     public String listMethodsOrFields(String name) {
-        StringBuffer result = new StringBuffer(name + " could be:\n");
+        StringBuffer result = new StringBuffer();
         Pattern pattern = Pattern.compile("^[MF]:(" + name + "[^(\t]*)(\\([^\t]+)\t");
         Matcher matcher;
         String htmlFile = "";
@@ -150,6 +150,10 @@ public class JavaResearcher implements WorkspaceResearcher {
                 result.append("<br><a href=\"file://" + htmlFile + "#" + matcher.group(1) + matcher.group(2) + "\">" + matcher.group(1) + "</a> in <a href=\"file://" + htmlFile + "\">" + className + "</a>\n");
             }
         }
+        if (result.length() == 0) {
+            return "";
+        }
+        result.insert(0, name + " could be:\n");
         return result.toString();
     }
     
