@@ -9,6 +9,7 @@ import java.util.zip.*;
 import javax.swing.*;
 
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 
 /**
@@ -31,8 +32,8 @@ public class JarExplorer extends JFrame {
     private JList list;
     private DefaultListModel model;
 
-    private JTextArea summaryTextArea;
-    private JTextArea detailTextArea;
+    private PTextArea summaryTextArea;
+    private PTextArea detailTextArea;
 
     private String filename;
 
@@ -126,11 +127,10 @@ public class JarExplorer extends JFrame {
                               entriesPanel, tabbedPane);
     }
 
-    private JTextArea makeTextArea() {
-        JTextArea textArea = new JTextArea(30, 80);
-        textArea.setEditable(false);
-        textArea.setDragEnabled(false);
-        JTextComponentFind.addFindFunctionalityTo(textArea);
+    private PTextArea makeTextArea() {
+        PTextArea textArea = new PTextArea(30, 80);
+        //textArea.setEditable(false);
+        //JTextComponentFind.addFindFunctionalityTo(textArea);
         return textArea;
     }
 

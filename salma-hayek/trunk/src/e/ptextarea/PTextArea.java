@@ -484,6 +484,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
 
     public void linesAdded(PLineEvent event) {
+        if (splitLines == null) {
+            return;
+        }
         FontMetrics metrics = getFontMetrics(getFont());
         int lineIndex = event.getIndex();
         int splitIndex = getSplitLineIndex(lineIndex);
@@ -497,6 +500,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void linesRemoved(PLineEvent event) {
+        if (splitLines == null) {
+            return;
+        }
         int splitIndex = getSplitLineIndex(event.getIndex());
         for (int i = 0; i < event.getLength(); i++) {
             removeSplitLines(splitIndex);
@@ -514,6 +520,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void linesChanged(PLineEvent event) {
+        if (splitLines == null) {
+            return;
+        }
         FontMetrics metrics = getFontMetrics(getFont());
         int lineCountChange = 0;
         int minLine = Integer.MAX_VALUE;
@@ -675,7 +684,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         line.setWidth(metrics.stringWidth(line.getContents().toString()));
     }
     
-    public void setText(PTextBuffer text) {
+    private void setText(PTextBuffer text) {
         if (lines != null) {
             lines.removeLineListener(this);
         }
@@ -683,6 +692,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         lines.addLineListener(this);
         text.addTextListener(anchorSet);
         invalidateLineWrappings();
+    }
+    
+    /**
+     * Replaces the entire contents of this text area with the given string.
+     * FIXME: should use PTextBuffer.replace, when it's available.
+     */
+    public void setText(String newText) {
+        getPTextBuffer().delete(0, getPTextBuffer().length());
+        getPTextBuffer().insert(0, newText.toCharArray());
     }
     
     public Dimension getPreferredScrollableViewportSize() {
