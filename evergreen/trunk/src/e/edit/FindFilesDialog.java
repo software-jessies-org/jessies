@@ -272,6 +272,10 @@ public class FindFilesDialog {
         matchView.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) matchView.getLastSelectedPathComponent();
+                if (node == null) {
+                    return;
+                }
+                
                 ClickableTreeItem match = (ClickableTreeItem) node.getUserObject();
                 match.open();
             }
