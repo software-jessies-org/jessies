@@ -10,6 +10,8 @@
 #   may append to SUBDIRS
 #   must include ../salma-hayek/java.make
 
+SPACE := $(subst :, ,:)
+
 # Where are we?
 ifeq ($(MAKE_VERSION), 3.79)
     # Old versions of make (like the one Apple ships) don't
@@ -38,10 +40,15 @@ TAR_FILE_OF_THE_DAY=`date +$(PROJECT_NAME)-%Y-%m-%d.tar`
 # Pick a JDK and append the MRJ141Stubs, in case they're there.
 RT_JAR=$(firstword $(wildcard $(KNOWN_RT_JAR_LOCATIONS)))
 
-BOOT_CLASS_PATH=$(RT_JAR)
+BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(JAVA_COMPILER))
+CLASS_PATH += $(CLASS_PATH.$(JAVA_COMPILER))
+
+BOOT_CLASS_PATH.jikes += $(RT_JAR)
+
 ifneq ($(wildcard MRJ141Stubs.jar),)
-    BOOT_CLASS_PATH:=$(BOOT_CLASS_PATH):MRJ141Stubs.jar
+    CLASS_PATH += MRJ141Stubs.jar
 endif
+CLASS_PATH += $(SALMA_HAYEK)/classes
 
 REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
 
@@ -82,11 +89,14 @@ FILE_LIST_WITH_DIRECTORIES += ChangeLog # The ChangeLog should never be checked 
 FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE_LIST_WITH_DIRECTORIES)),$(FILE_LIST_WITH_DIRECTORIES))))
 
 pathsearch = $(firstword $(wildcard $(addsuffix /$(1),$(subst :, ,$(PATH)))))
+makepath = $(subst $(SPACE),:,$(strip $(1)))
 
-COMMON_JAVA_FLAGS += -classpath $(SALMA_HAYEK)/classes
-COMMON_JAVA_FLAGS += -d classes/
-COMMON_JAVA_FLAGS += -sourcepath src/
-JAVA_FLAGS.jikes += -bootclasspath $(BOOT_CLASS_PATH)
+JAVA_FLAGS += $(JAVA_FLAGS.$(JAVA_COMPILER))
+JAVA_FLAGS += $(addprefix -bootclasspath ,$(call makepath,$(BOOT_CLASS_PATH)))
+JAVA_FLAGS += $(addprefix -classpath ,$(call makepath,$(CLASS_PATH)))
+JAVA_FLAGS += -d classes/
+JAVA_FLAGS += -sourcepath src/
+
 JAVA_FLAGS.jikes += +D +P +Pall +Pno-serial +Pno-redundant-modifiers
 
 JAVA_COMPILER ?= jikes
@@ -103,7 +113,7 @@ build: $(SOURCE_FILES) build.subdirs
 	@echo Recompiling the world... && \
 	 make clean && \
 	 mkdir -p classes && \
-	 $(JAVA_COMPILER) $(JAVA_FLAGS.$(JAVA_COMPILER)) $(COMMON_JAVA_FLAGS) $(SOURCE_FILES)
+	 $(JAVA_COMPILER) $(JAVA_FLAGS) $(SOURCE_FILES)
 
 .PHONY: clean
 clean:
