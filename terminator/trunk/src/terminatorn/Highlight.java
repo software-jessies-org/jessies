@@ -57,7 +57,7 @@ public class Highlight {
 	public StyledText[] applyHighlight(StyledText[] unlit, Location unlitStart) {
 		ArrayList result = new ArrayList();
 		int startOffset = (unlitStart.getLineIndex() == start.getLineIndex()) ? start.getCharOffset() : 0;
-		int endOffset = (unlitStart.getLineIndex() == end.getLineIndex()) ? end.getCharOffset() : 0;
+		int endOffset = (unlitStart.getLineIndex() == end.getLineIndex()) ? end.getCharOffset() : Integer.MAX_VALUE;
 		int offset = 0;
 		for (int i = 0; i < unlit.length; i++) {
 			String unlitText = unlit[i].getText();
