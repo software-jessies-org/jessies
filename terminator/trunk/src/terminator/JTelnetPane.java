@@ -28,23 +28,7 @@ public class JTelnetPane extends JPanel {
 		try {
 			Log.warn("Starting process '" + command + "'");
 			final Process proc = Runtime.getRuntime().exec(System.getProperty("pty.binary") + " " + command);
-			init(command, proc.getInputStream(), proc.getOutputStream());
-			// Probably should do this somewhere else rather than setting up a whole Thread for it.
-			Thread reaper = new Thread(new Runnable() {
-				public void run() {
-					try {
-						int status = proc.waitFor();
-						if (status == 0) {
-							JTelnetPane.this.controller.closeTelnetPane(JTelnetPane.this);
-						} else {
-							control.announceConnectionLost("[Process exited with status " + status + ".]");
-						}
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-			});
-			reaper.start();
+			init(command, proc);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -106,7 +90,7 @@ public class JTelnetPane extends JPanel {
 		return "bash";
 	}
 
-	private void init(String command, InputStream in, OutputStream out) throws IOException {
+	private void init(String command, Process process) throws IOException {
 		textPane = new JTextBuffer(controller);
 		initSizeMonitoring();
 		textPane.addKeyListener(new KeyHandler());
@@ -123,10 +107,14 @@ public class JTelnetPane extends JPanel {
 		
 		textPane.sizeChanged();
 		try {
-			control = new TelnetControl(textPane.getModel(), command, in, out);
+			control = new TelnetControl(this, textPane.getModel(), command, process);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public Controller getController() {
+		return controller;
 	}
 	
 	private void initSizeMonitoring() {
@@ -265,6 +253,9 @@ public class JTelnetPane extends JPanel {
 			if (isKeyboardEquivalent(event)) {
 				switch (ch) {
 					case 'n': case 'N':
+						// TODO: Open a new window.
+						break;
+					case 't': case 'T':
 						controller.openShellPane(true);
 						break;
 					case 'e': case 'E':
@@ -272,6 +263,9 @@ public class JTelnetPane extends JPanel {
 						if (commandToRun != null && commandToRun.length() > 0) {
 							controller.openCommandPane(commandToRun, true);
 						}
+						break;
+					case 'd': case 'D':
+						controller.closeTelnetPane(JTelnetPane.this);
 						break;
 					case 'f': case 'F':
 						controller.showFindDialogFor(textPane);

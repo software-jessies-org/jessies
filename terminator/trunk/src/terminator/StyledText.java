@@ -54,6 +54,10 @@ public class StyledText {
 		return text;
 	}
 	
+	public int length() {
+		return text.length();
+	}
+	
 	public Style getStyle() {
 		return style;
 	}
