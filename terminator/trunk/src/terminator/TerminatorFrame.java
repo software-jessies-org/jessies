@@ -59,10 +59,30 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		frame.setTitle(title.toString());
 	}
 	
+	/**
+	 * An icon to use for each frame, if the terminator shell script suggested one.
+	 * We don't use this on Mac OS, because there windows don't have icons
+	 * unless the window's contents are themselves a graphic. On Linux, we use
+	 * one of the available GNOME icons so we look like a terminal rather than a
+	 * generic 'window'.
+	 */
+	private static final Image FRAME_ICON;
+	static {
+		String iconFile = System.getProperty("terminator.frame.icon");
+		FRAME_ICON = (iconFile != null) ? new ImageIcon(iconFile).getImage() : null;
+	}
+	
+	private void initIcon(JFrame frame) {
+		if (FRAME_ICON != null) {
+			frame.setIconImage(FRAME_ICON);
+		}
+	}
+	
 	private void initFrame() {
 		frame = new JFrame(Options.getSharedInstance().getTitle());
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setBackground(Options.getSharedInstance().getColor("background"));
+		initIcon(frame);
 		
 		if (Options.getSharedInstance().shouldUseMenuBar()) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
