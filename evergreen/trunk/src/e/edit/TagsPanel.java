@@ -73,23 +73,25 @@ public class TagsPanel extends JPanel {
         
         private static final Map TYPE_SHAPES = new HashMap();
         {
-            TYPE_SHAPES.put("c", CIRCLE);
-            TYPE_SHAPES.put("C", CIRCLE);
-            TYPE_SHAPES.put("D", CIRCLE);
-            TYPE_SHAPES.put("i", CIRCLE);
-            TYPE_SHAPES.put("f", TRIANGLE);
-            TYPE_SHAPES.put("m", SQUARE);
+            TYPE_SHAPES.put(TagReader.Tag.CLASS, CIRCLE);
+            TYPE_SHAPES.put(TagReader.Tag.CONSTRUCTOR, CIRCLE);
+            TYPE_SHAPES.put(TagReader.Tag.DESTRUCTOR, CIRCLE);
+            TYPE_SHAPES.put(TagReader.Tag.INTERFACE, CIRCLE);
+            TYPE_SHAPES.put(TagReader.Tag.FIELD, TRIANGLE);
+            TYPE_SHAPES.put(TagReader.Tag.METHOD, SQUARE);
+            TYPE_SHAPES.put(TagReader.Tag.PROTOTYPE, SQUARE);
         }
-        
+                
         private final Icon icon = new DrawnIcon(new Dimension(10, 10)) {
             public void paintIcon(Component c, Graphics og, int x, int y) {
                 Graphics2D g = (Graphics2D) og;
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                g.setColor(visibilityColor);
+                g.setColor(tag.visibilityColor());
                 g.translate(x, y);
+                Shape typeMarker = (Shape) TYPE_SHAPES.get(tag.type);
                 g.draw(typeMarker);
-                if (tagIsStatic == false) {
+                if (tag.isStatic == false) {
                     g.fill(typeMarker);
                 }
                 g.translate(-x, -y);
@@ -98,9 +100,7 @@ public class TagsPanel extends JPanel {
             }
         };
         
-        private Shape typeMarker;
-        private Color visibilityColor;
-        private boolean tagIsStatic = false;
+        private TagReader.Tag tag;
         
         public TagsTreeRenderer() {
             setClosedIcon(null);
@@ -111,16 +111,15 @@ public class TagsPanel extends JPanel {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            visibilityColor = null;
             if (node.getUserObject() instanceof TagReader.Tag) {
-                TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
-                visibilityColor = tag.visibilityColor();
-                setForeground(visibilityColor == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
-                typeMarker = (Shape) TYPE_SHAPES.get(String.valueOf(tag.type));
-                tagIsStatic = tag.isStatic;
-            }
-            if (visibilityColor != null && typeMarker != null) {
-                setIcon(icon);
+                tag = (TagReader.Tag) node.getUserObject();
+                setForeground(tag.visibilityColor() == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
+                Shape typeMarker = (Shape) TYPE_SHAPES.get(tag.type);
+                if (typeMarker != null) {
+                    setIcon(icon);
+                }
+            } else {
+                tag = null;
             }
             return this;
         }

@@ -2,6 +2,8 @@ package e.edit;
 
 import java.awt.Color;
 import java.io.*;
+import java.text.*;
+import java.util.*;
 import java.util.regex.*;
 import e.util.*;
 
@@ -130,31 +132,96 @@ public class TagReader {
     }
     
     public static class Tag {
-        public String typeSortOrder = "cdeECDmfginpst";
+        public static final String CLASS = "class";
+        public static final String CONSTRUCTOR = "constructor";
+        public static final String DESTRUCTOR = "destructor";
+        public static final String INTERFACE = "interface";
+        public static final String FIELD = "field";
+        public static final String METHOD = "method";
+        public static final String MACRO = "macro";
+        public static final String MODULE = "module";
+        public static final String ENUMERATOR = "enumerator";
+        public static final String ENUM = "enum";
+        public static final String NAMESPACE = "namespace";
+        public static final String PACKAGE = "package";
+        public static final String PROTOTYPE = "prototype";
+        public static final String STRUCT = "struct";
+        public static final String TYPEDEF = "typedef";
+        public static final String UNION = "union";
+        public static final String VARIABLE = "variable";
+        public static final String EXTERN = "extern";
+        
+        private static final Map TYPES = new HashMap();
+        static {
+            TYPES.put("c", CLASS);
+            TYPES.put("C", CONSTRUCTOR);
+            TYPES.put("D", DESTRUCTOR);
+            TYPES.put("i", INTERFACE);
+            TYPES.put("f", FIELD);
+            TYPES.put("m", METHOD);
+            TYPES.put("M", MODULE);
+            TYPES.put("d", MACRO);
+            TYPES.put("e", ENUMERATOR);
+            TYPES.put("g", ENUM);
+            TYPES.put("n", NAMESPACE);
+            TYPES.put("p", PACKAGE);
+            TYPES.put("P", PROTOTYPE);
+            TYPES.put("s", STRUCT);
+            TYPES.put("t", TYPEDEF);
+            TYPES.put("u", UNION);
+            TYPES.put("v", VARIABLE);
+            TYPES.put("x", EXTERN);
+        }
+        
+        public static final List CONTAINER_TYPES = Collections.unmodifiableList(Arrays.asList(new String[] {
+            CLASS, ENUM, INTERFACE, NAMESPACE, STRUCT
+        }));
+        
+        private static final Map DESCRIPTION_FORMATS = new HashMap();
+        static {
+            DESCRIPTION_FORMATS.put(PACKAGE, new MessageFormat(PACKAGE + " {0}"));
+            DESCRIPTION_FORMATS.put(CLASS, new MessageFormat(CLASS + " {0}"));
+            DESCRIPTION_FORMATS.put(METHOD, new MessageFormat("{0}()"));
+            DESCRIPTION_FORMATS.put(CONSTRUCTOR, new MessageFormat("{0}()"));
+            DESCRIPTION_FORMATS.put(DESTRUCTOR, new MessageFormat("{0}()"));
+            DESCRIPTION_FORMATS.put(MODULE, new MessageFormat(MODULE + " {0}"));
+            DESCRIPTION_FORMATS.put(ENUM, new MessageFormat(ENUM + " {0}"));
+            DESCRIPTION_FORMATS.put(NAMESPACE, new MessageFormat(NAMESPACE + " {0}"));
+            DESCRIPTION_FORMATS.put(PROTOTYPE, new MessageFormat("{0} " + PROTOTYPE));
+            DESCRIPTION_FORMATS.put(STRUCT, new MessageFormat(STRUCT + " {0}"));
+            DESCRIPTION_FORMATS.put(TYPEDEF, new MessageFormat(TYPEDEF + " {0}"));
+            DESCRIPTION_FORMATS.put(UNION, new MessageFormat(UNION + " {0}"));
+            DESCRIPTION_FORMATS.put(EXTERN, new MessageFormat(EXTERN + " {0}"));
+        }
+        
+        public List typeSortOrder = Collections.unmodifiableList(Arrays.asList(new String[] {
+            NAMESPACE, CLASS, MACRO, CONSTRUCTOR, DESTRUCTOR,
+            PROTOTYPE, METHOD, FIELD, ENUM, STRUCT, TYPEDEF
+        }));
         public String classSeparator = ".";
         
         public String identifier;
-        public char type;
+        public String type;
         public String context;
         public String containingClass;
         public int lineNumber;
         public boolean isStatic;
         
-        public Tag(String identifier, int lineNumber, char type, String context, String containingClass) {
+        public Tag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
             this.identifier = identifier;
             this.lineNumber = lineNumber;
-            this.type = type;
             this.context = context;
             this.containingClass = containingClass;
             
             // Recognize constructors. Using the same name as the containing
             // class is a pattern common to most languages.
             if (containingClass.equals(identifier)) {
-                this.type = 'C';
+                tagType = 'C';
             } else if (containingClass.endsWith("." + identifier)) {
                 // An inner class constructor.
-                this.type = 'C';
+                tagType = 'C';
             }
+            this.type = (String) TYPES.get(String.valueOf(tagType));
         }
         
         public String describeVisibility() {
@@ -186,7 +253,12 @@ public class TagReader {
         }
         
         public String describe() {
-            return identifier;
+            MessageFormat formatter = (MessageFormat) DESCRIPTION_FORMATS.get(type);
+            if (formatter != null) {
+                return formatter.format(new String[] { identifier });
+            } else {
+                return identifier;
+            }
         }
         
         public String toString() {
@@ -194,7 +266,7 @@ public class TagReader {
         }
         
         public boolean isContainerType() {
-            return "cgins".indexOf(type) != -1;
+            return CONTAINER_TYPES.contains(type);
         }
         
         public int getTypeSortIndex() {
@@ -211,76 +283,48 @@ public class TagReader {
     }
     
     public static class JavaTag extends Tag {
-        public JavaTag(String identifier, int lineNumber, char type, String context, String containingClass) {
-            super(identifier, lineNumber, type, context, containingClass);
-            typeSortOrder = "pfCmci";
-        }
-        
-        public String describe() {
-            switch (type) {
-                case 'c': return "class " + identifier;
-                case 'C': case 'm': return identifier + "()";
-                case 'f': return identifier;
-                case 'i': return "interface " + identifier;
-                case 'p': return "package " + identifier;
-                default: return identifier;
-            }
+        public JavaTag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
+            super(identifier, lineNumber, tagType, context, containingClass);
+            typeSortOrder = Collections.unmodifiableList(Arrays.asList(new String[] {
+                PACKAGE, FIELD, CONSTRUCTOR, METHOD, CLASS, INTERFACE
+            }));
         }
     }
     
     public static class RubyTag extends Tag {
-        public RubyTag(String identifier, int lineNumber, char type, String context, String containingClass) {
-            super(identifier, lineNumber, type, context, containingClass);
+        public RubyTag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
+            super(identifier, lineNumber, fixType(tagType), context, containingClass);
         }
         
-        public String describe() {
+        private static char fixType(char type) {
             switch (type) {
-                case 'c': return "class " + identifier;
-                case 'm': return "module " + identifier;
-                default: return identifier;
+                case 'm': return 'M'; // Module, not method.
+                default: return type;
             }
         }
         
         public boolean isContainerType() {
-            return super.isContainerType() || type == 'm';
+            return super.isContainerType() || type.equals(MODULE);
         }
     }
     
     public static class CTag extends Tag {
-        public CTag(final String identifier, final int lineNumber, final char type, final String context, final String containingClass) {
-            super(identifier, lineNumber, fixType(type), context, containingClass);
+        public CTag(final String identifier, final int lineNumber, final char tagType, final String context, final String containingClass) {
+            super(identifier, lineNumber, fixType(tagType), context, containingClass);
             classSeparator = "::";
             
             // Recognize a C++ destructor.
             if (identifier.equals("~" + containingClass)) {
-                this.type = 'D';
+                this.type = DESTRUCTOR;
             }
         }
         
         private static char fixType(char type) {
             switch (type) {
-            case 'f': return 'm'; // Function -> Method.
-            case 'm': return 'f'; // Member (data) -> Field.
-            case 'p': return 'm'; // Prototype -> Method.
-            default: return type;
-            }
-        }
-        
-        public String describe() {
-            switch (type) {
-                case 'C': case 'D': case 'm': return identifier + "()";
-                case 'c': return "class " + identifier;
-                case 'd': return identifier + " macro";
-                case 'e': return identifier;
-                case 'f': return identifier;
-                case 'g': return "enum " + identifier;
-                case 'n': return "namespace " + identifier;
-                case 's': return "struct " + identifier;
-                case 't': return "typedef " + identifier;
-                case 'u': return "union " + identifier;
-                case 'v': return identifier;
-                case 'x': return "extern " + identifier;
-                default: return identifier;
+                case 'f': return 'm'; // Function -> Method.
+                case 'm': return 'f'; // Member (data) -> Field.
+                case 'p': return 'P'; // Prototype, not package.
+                default: return type;
             }
         }
     }
