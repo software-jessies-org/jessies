@@ -81,7 +81,32 @@ public class TextBuffer implements TelnetListener {
 	public void sizeChanged(Dimension sizeInChars) {
 		width = sizeInChars.width;
 		height = sizeInChars.height;
-		// Loop through lines and rewrap them, remember to update caret position.
+		int caretCharIndex = getCharIndexFromLocation(caretPosition);
+		ArrayList newLines = new ArrayList();
+		TextLine currentLine = null;
+		for (int i = 0; i < textLines.size(); i++) {
+			if (currentLine == null) {
+				currentLine = (TextLine) textLines.get(i);
+			} else {
+				currentLine.append((TextLine) textLines.get(i));
+			}
+			while (currentLine.length() > width) {
+				TextLine after = currentLine.splitAt(width);
+				newLines.add(currentLine);
+				currentLine = after;
+			}
+			if (currentLine.hasNewline() || (i == textLines.size() - 1)) {
+				newLines.add(currentLine);
+				currentLine = null;
+			}
+		}
+		textLines = newLines;
+		caretPosition = getLocationFromCharIndex(caretCharIndex);
+		
+		// Send a size change even if it hasn't, because it also causes a complete redraw
+		// and higlight recalculation.
+		view.setCaretPosition(caretPosition);
+		view.sizeChanged();
 	}
 	
 	/** Sets or unsets the use of the alternative buffer. */
