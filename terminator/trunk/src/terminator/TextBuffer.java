@@ -44,6 +44,38 @@ public class TextBuffer implements TelnetListener {
 		return get(lineIndex).getLineStartIndex();
 	}
 	
+	/** Returns a Location describing the line and offset at which the given char index exists. */
+	public Location getLocationFromCharIndex(int charIndex) {
+		int lowLine = 0;
+		int low = 0;
+		int highLine = textLines.size();
+		int high = getStartIndex(highLine - 1) + getLineLength(highLine - 1);
+		
+		// We use almost a binary chop, except the chop position is not directly in the middle, but is
+		// weighted using the assumption that on average, all lines will be of equal length.
+		// Of course, this could get very slow if the assumption doesn't hold; we'll see how it
+		// goes.
+		while (highLine - lowLine > 1) {
+			int averageCharsPerLine = (high - low) / (highLine - lowLine);
+			int projectedLineOffset = (charIndex - low) / averageCharsPerLine;
+			int midLine = lowLine + Math.max(1, Math.min(high - low - 1, projectedLineOffset));
+			int mid = getStartIndex(midLine);
+			if (mid <= charIndex) {
+				lowLine = midLine;
+				low = mid;
+			} else {
+				highLine = midLine;
+				high = mid;
+			}
+		}
+		return new Location(lowLine, charIndex - getStartIndex(lowLine));
+	}
+	
+	/** Returns the char index equivalent to the given Location. */
+	public int getCharIndexFromLocation(Location location) {
+		return getStartIndex(location.getLineIndex()) + location.getCharOffset();
+	}
+	
 	/** Returns the count of all characters in the buffer, including NLs. */
 	public int length() {
 		int lastIndex = textLines.size() - 1;
@@ -275,19 +307,38 @@ public class TextBuffer implements TelnetListener {
 		}
 		
 		public char charAt(int index) {
-			return 0;
+			Location loc = getLocationFromCharIndex(start + index);
+			String line = getLine(loc.getLineIndex());
+			if (line.length() > loc.getCharOffset()) {
+				return line.charAt(loc.getCharOffset());
+			} else {
+				return '\n';  // The only case of a character indexable but not appearing in the string.
+			}
 		}
 		
 		public int length() {
-			return -1;
+			return end - start;
 		}
 		
-		public CharSequence subSequence(int start, int end) {
-			return null;
+		public CharSequence subSequence(int subStart, int subEnd) {
+			return new Sequence(start + subStart, start + subEnd);
 		}
 		
 		public String toString() {
-			StringBuffer buf = new StringBuffer(end - start);
+			StringBuffer buf = new StringBuffer(length());
+			Location loc = getLocationFromCharIndex(start);
+			int charsLeft = end - start;
+			while (charsLeft > 0) {
+				String str = getLine(loc.getLineIndex()).substring(loc.getCharOffset());
+				if (charsLeft < str.length()) {
+					str = str.substring(0, charsLeft);
+				} else if (charsLeft > str.length()) {
+					str += '\n';
+				}
+				buf.append(str);
+				charsLeft -= str.length();
+				loc = new Location(loc.getLineIndex() + 1, 0);
+			}
 			return buf.toString();
 		}
 	}
