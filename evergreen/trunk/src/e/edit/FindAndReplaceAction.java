@@ -245,10 +245,10 @@ public class FindAndReplaceAction extends ETextAction {
         }
     }
     
-    public void setStatusToGood() {
+    public void setStatusToGood(int matchCount) {
         patternField.setForeground(UIManager.getColor("TextField.foreground"));
         replacementField.setForeground(UIManager.getColor("TextField.foreground"));
-        statusLabel.setText(" ");
+        statusLabel.setText("Matches: " + matchCount);
     }
     
     public void setStatusToBad(String explanation, LiveTextField badField) {
@@ -334,7 +334,7 @@ public class FindAndReplaceAction extends ETextAction {
             } else if (replacementSyntaxError != null) {
                 setStatusToBad(replacementSyntaxError.getMessage(), replacementField);
             } else {
-                setStatusToGood();
+                setStatusToGood(matchModel.size());
                 matchList.setModel(matchModel);
                 replacementsList.setModel(replacementsModel);
             }
