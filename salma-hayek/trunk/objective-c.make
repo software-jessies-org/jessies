@@ -50,7 +50,11 @@ SOURCE_EXTENSIONS += cpp
 SOURCE_EXTENSIONS += m
 SOURCE_EXTENSIONS += mm
 
-SOURCE_FILES = $(shell find `pwd`/src -type f '(' -name "*.c" -or -name "*.cpp" -or -name "*.m" -or -name "*.mm" ')')
+# FIXME: this belongs in "boilerplate.make".
+tail = $(wordlist 2,$(words $(1)),$(1))
+
+FIND_EXPRESSION := $(call tail,$(foreach EXTENSION,$(SOURCE_EXTENSIONS),-or -name "*.$(EXTENSION)"))
+SOURCE_FILES = $(shell find `pwd`/src -type f '(' $(FIND_EXPRESSION) ')')
 OBJECT_FILES = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst %.$(EXTENSION),%.o,$(filter %.$(EXTENSION),$(SOURCE_FILES))))
 
 # ----------------------------------------------------------------------------
