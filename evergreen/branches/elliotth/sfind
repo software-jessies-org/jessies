@@ -1,0 +1,14 @@
+#!/bin/bash
+startDirectory=${1:-"."}
+exec find $startDirectory \
+    '(' -type d -name SCCS -prune ')' -or \
+    '(' -type d -name BitKeeper -prune ')' -or \
+    '(' -type d -name ppc_BOS-eabi_* -prune ')' -or \
+    '(' -type d -name ppc_BOS_* -prune ')' -or \
+    '(' -type d -name ix86_mingw32msvc* -prune ')' -or \
+    '(' -type d -name ix86_linux* -prune ')' -or \
+    '(' -type d -name ix86_solaris* -prune ')' -or \
+    '(' -type d -name billbox_BOS* -prune ')' -or \
+    '(' -type d -name sun4_solaris_* -prune ')' -or \
+    -type f -print \
+| grep -v -e "\.gen\." -e "\.bak$" -e "\.i$" -e "\.class$" -e "/err$" -e "~$" -e ".swp$" -e "\.o$" -e "\.p$"
