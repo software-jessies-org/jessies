@@ -23,7 +23,7 @@ public class HyperlinkHighlighter implements Highlighter {
 	/**
 	 * This regular expression deliberately matches too much. We narrow it down a bit later.
 	 */
-	private Pattern pattern = Pattern.compile("(?:^| |\")([^ :\"]+\\.\\w+([\\d:]+)?)");
+	private Pattern pattern = Pattern.compile("(?:^| |\")([^ :\"]+(?:Makefile|\\w+\\.\\w+)([\\d:]+)?)");
 	
 	/**
 	 * This is the group within 'pattern' that should be taken as a filename.
