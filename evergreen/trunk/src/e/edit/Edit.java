@@ -493,16 +493,31 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             return;
         }
         
-        SpellingChecker.dumpKnownBadWordsTo(System.out);
-        FormDialog.writeGeometriesTo(getDialogGeometriesPreferenceFilename());
-        
         // We're definitely going to quit now...
-        rememberOpenFiles();
-        rememberOpenWorkspaces();
-        rememberWindowSizeAndPosition();
+        rememberState();
         if (onMacOS == false) {
             System.exit(0);
         }
+    }
+
+    /**
+     * Writes out all our various bits of state to disk, so that next
+     * time we start, we start more or less where we left off.
+     */
+    private void rememberState() {
+        if (initializing) {
+            // If we haven't finished initializing, we may not have
+            // read all the state in, so writing it back out could
+            // actually throw state away. We don't want to do that.
+            return;
+        }
+
+        SpellingChecker.dumpKnownBadWordsTo(System.out);
+        FormDialog.writeGeometriesTo(getDialogGeometriesPreferenceFilename());
+        
+        rememberOpenFiles();
+        rememberOpenWorkspaces();
+        rememberWindowSizeAndPosition();
     }
     
     /** Returns the full pathname for the given preference file. */
