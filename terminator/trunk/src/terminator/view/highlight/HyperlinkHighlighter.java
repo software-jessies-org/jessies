@@ -224,7 +224,7 @@ public class HyperlinkHighlighter implements Highlighter {
 	private static String getEditor() {
 		String result = System.getenv("EDITOR");
 		if (result == null) {
-			result = "e";
+			result = "edit";
 		}
 		return result;
 	}
