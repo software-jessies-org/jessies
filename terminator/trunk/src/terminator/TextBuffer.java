@@ -3,6 +3,7 @@ package terminatorn;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
 A TextBuffer represents all the text associated with a single connection.  It maintains a list of
@@ -185,5 +186,10 @@ public class TextBuffer implements TelnetListener {
 		textLines.remove(removeIndex);
 		textLines.add(addIndex, new TextLine());
 		view.repaint();
+	}
+	
+	public void setWindowTitle(String newWindowTitle) {
+		JFrame frame= (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, view);
+		frame.setTitle(newWindowTitle);
 	}
 }

@@ -53,4 +53,7 @@ public interface TelnetListener {
 
 	/** Scrolls the display down by one line. */
 	public void scrollDisplayDown();
+	
+	/** Changes the window title. */
+	public void setWindowTitle(String newWindowTitle);
 }

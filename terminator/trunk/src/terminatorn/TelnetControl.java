@@ -43,7 +43,9 @@ public class TelnetControl implements Runnable {
 	
 	private boolean localEcho = false;
 	private StringBuffer lineBuffer = new StringBuffer();
+	
 	private boolean readingOSC = false;
+	private StringBuffer oscBuffer;
 	
 	public static void doStep() {
 		if (DEBUG_STEP_MODE) {
@@ -124,6 +126,9 @@ public class TelnetControl implements Runnable {
 		if (readingOSC) {
 			if (ch == '\\' || ch == 0x7) {
 				readingOSC = false;
+				processOSC();
+			} else {
+				oscBuffer.append(ch);
 			}
 			return;
 		}
@@ -206,6 +211,8 @@ public class TelnetControl implements Runnable {
 		escapeBuffer.setLength(0);
 		if (sequence.startsWith("]")) {  // This one affects the stream, so we must deal with it now.
 			readingOSC = true;
+			oscBuffer = new StringBuffer(sequence);
+			return;
 		}
 		
 		// Invoke all escape sequence handling in the AWT dispatch thread - otherwise we'd have
@@ -232,6 +239,15 @@ public class TelnetControl implements Runnable {
 				}
 			}
 		});
+	}
+	
+	public void processOSC() {
+		String osc = oscBuffer.toString();
+		oscBuffer = null;
+		if (osc.startsWith("]2;")) {
+			String newWindowTitle = osc.substring(3);
+			listener.setWindowTitle(newWindowTitle);
+		}
 	}
 	
 	public boolean processVT100BracketSequence(String sequence) {
