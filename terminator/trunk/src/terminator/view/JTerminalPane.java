@@ -201,7 +201,7 @@ public class JTerminalPane extends JPanel {
 	
 	public void setName(String name) {
 		this.name = name;
-		controller.terminalNameChanged(this);
+		getTerminatorFrame().terminalNameChanged(this);
 		HyperlinkHighlighter linker = (HyperlinkHighlighter) textPane.getHighlighterOfClass(HyperlinkHighlighter.class);
 		linker.setDirectory(name);
 	}
