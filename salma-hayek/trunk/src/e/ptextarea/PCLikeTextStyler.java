@@ -30,7 +30,7 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
     private static final int TYPE_ERROR = 4;
     
     private static final Color[] DEFAULT_COLORS = new Color[] {
-        Color.black,
+        Color.BLACK,
         new Color(0, 0, 1f),
         new Color(0, 0.5f, 0),
         new Color(0.4f, 0.2f, 0.2f),
@@ -73,18 +73,19 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
         List segments = getLineSegments(lineIndex, fullLine);
         int index = 0;
         ArrayList result = new ArrayList();
-        int offset = splitLine.getOffset();
-        int end = offset + splitLine.getLength();
-        for (int i = 0; i < segments.size(); i++) {
+        int start = splitLine.getOffset();
+        int end = start + splitLine.getLength();
+        
+        for (int i = 0; index < end && i < segments.size(); ++i) {
             PTextSegment segment = (PTextSegment) segments.get(i);
-            if (offset >= index + segment.getLength()) {
+            if (start >= index + segment.getLength()) {
                 index += segment.getLength();
                 continue;
-            } else if (end < index) {
-                break;
             }
-            if (offset > index) {
-                segment = segment.subSegment(offset - index);
+            if (start > index) {
+                int skip = start - index;
+                segment = segment.subSegment(skip);
+                index += skip;
             }
             if (end < index + segment.getLength()) {
                 segment = segment.subSegment(0, end - index);
@@ -150,6 +151,18 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
                 comment = false;
             } else {
                 switch (line.charAt(i)) {
+                    /*
+                case '#':
+                    comment = true;
+                    if (lastStart < i) {
+                        result.add(new PTextSegment(TYPE_NORMAL, line.substring(lastStart, i)));
+                    }
+                    result.add(new PTextSegment(TYPE_COMMENT, line.substring(i)));
+                    i = line.length();
+                    lastStart = i;
+                    break;
+                    */
+                    
                 case '/':
                     if (i < line.length() - 1) {
                         if (line.charAt(i + 1) == '*') {

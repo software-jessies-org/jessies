@@ -298,7 +298,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds, metrics);
         graphics.setColor(getBackground());
         graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
-        graphics.setColor(Color.black);
+        graphics.setColor(Color.BLACK);
         int minLine = Math.min(splitLines.size() - 1, bounds.y / metrics.getHeight());
         int maxLine = Math.min(splitLines.size() - 1, (bounds.y + bounds.height) / metrics.getHeight());
         int baseline = getBaseline(metrics, minLine);
@@ -307,10 +307,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         for (int i = minLine; i <= maxLine; i++) {
             PLineSegment[] segments = getLineSegments(i);
             boolean drawCaret = (caretCoords.getLineIndex() == i);
-            paintSegments(graphics, metrics, segments, baseline, caretCoords, drawCaret);
+            boolean showWrap = isNextLineAContinuationOf(i);
+            paintSegments(graphics, metrics, segments, baseline, caretCoords, drawCaret, showWrap);
             baseline += metrics.getHeight();
         }
         watch.print("Repaint");
+    }
+    
+    private boolean isNextLineAContinuationOf(int index) {
+        final int nextIndex = index + 1;
+        return (nextIndex < splitLines.size()) && (getSplitLine(index).getLineIndex() == getSplitLine(nextIndex).getLineIndex());
     }
     
     /**
@@ -345,10 +351,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private Color getColor(int index) {
-        return (textStyler == null) ? Color.black : textStyler.getDefaultColor(index);
+        return (textStyler == null) ? Color.BLACK : textStyler.getDefaultColor(index);
     }
     
-    private void paintSegments(Graphics2D graphics, FontMetrics metrics, PLineSegment[] segments, int baseline, PCoordinates caretCoords, boolean drawCaret) {
+    private void paintSegments(Graphics2D graphics, FontMetrics metrics, PLineSegment[] segments, int baseline, PCoordinates caretCoords, boolean drawCaret, boolean showWrap) {
         int x = 0;
         int charOffset = 0;
         for (int i = 0; i < segments.length; i++) {
@@ -365,14 +371,24 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             charOffset += text.length();
             x += segments[i].getDisplayWidth(metrics, x);
         }
+        if (showWrap) {
+            paintWrapMark(graphics, metrics, x, baseline);
+        }
         // If drawCaret is still set, the caret must be at the end of the line.
         if (drawCaret) {
             paintCaret(graphics, metrics, x, baseline);
         }
     }
     
+    private void paintWrapMark(Graphics2D graphics, FontMetrics metrics, int x, int y) {
+        graphics.setColor(Color.GRAY);
+        int yTop = y - metrics.getMaxAscent();
+        int yBottom = y + metrics.getMaxDescent() - 1;
+        graphics.fillRect(x, yTop, getWidth() - x, yBottom - yTop);
+    }
+    
     private void paintCaret(Graphics2D graphics, FontMetrics metrics, int x, int y) {
-        graphics.setColor(Color.red);
+        graphics.setColor(Color.RED);
         int yTop = y - metrics.getMaxAscent();
         int yBottom = y + metrics.getMaxDescent() - 1;
         graphics.drawLine(x, yTop + 1, x, yBottom - 1);
@@ -551,7 +567,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             for (int i = 0; i < chars.length(); i++) {
                 char ch = chars.charAt(i);
                 x = addCharWidth(x, ch);
-                if (x > width) {
+                if (x >= width) {
                     splitLines.add(index++, new SplitLine(lineIndex, offset, i - offset));
                     addedCount++;
                     offset = i;

@@ -39,17 +39,17 @@ public class PKeyHandler extends KeyAdapter {
                 {
                     int caret = textArea.getCaretLocation();
                     int end = Math.min(caret + 20, textArea.getPTextBuffer().length());
-                    textArea.addHighlight(new PColoredHighlight(textArea, caret, end, Color.yellow));
+                    textArea.addHighlight(new PColoredHighlight(textArea, caret, end, Color.YELLOW));
                 }
                 break;
                 
             case KeyEvent.VK_A:
                 {
                     if (event.isShiftDown()) {
-                        textArea.removeHighlights(new PColoredHighlightMatcher(Color.cyan));
+                        textArea.removeHighlights(new PColoredHighlightMatcher(Color.CYAN));
                     } else {
                         for (int i = 0; i < textArea.getPTextBuffer().length() - 4; i += 4) {
-                            textArea.addHighlight(new PColoredHighlight(textArea, i, i + 2, Color.cyan));
+                            textArea.addHighlight(new PColoredHighlight(textArea, i, i + 2, Color.CYAN));
                         }
                     }
                 }
