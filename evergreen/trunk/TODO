@@ -19,7 +19,6 @@ find in files:
  3. show the matching line(s).
  7. if the 'files containing' field is blank at the start of the search, there's no need to do a full search; the result should be the same as a search for files matching 'whose names match'.
  8. sometimes (not always) i see the list of matches get populated, and then everything vanishes at the last moment. i seem to remember the open quickly dialog used to do that too, but stopped doing it some time ago. it seems particularly prone to it if the list of matches is long.
- 9. shouldn't be modal; there's no reason not to want to keep search results around arbitrarily long (see Xcode for an example of this taken to its extreme).
 
 spelling checking:
  1. add a way to show a short list of the misspelled words in the current file. and a way to add them to an exclusion list? or find/replace them?
