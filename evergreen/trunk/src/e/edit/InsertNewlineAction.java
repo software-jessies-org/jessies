@@ -93,4 +93,12 @@ public class InsertNewlineAction extends TextAction {
         }
         return (braceNesting != 0);
     }
+
+    public static void main(String[] filenames) {
+        InsertNewlineAction action = new InsertNewlineAction();
+        for (int i = 0; i < filenames.length; ++i) {
+            String filename = filenames[i];
+            System.err.println(filename + " " + action.hasUnbalancedBraces(StringUtilities.readFile(filename)));
+        }
+    }
 }
