@@ -36,65 +36,6 @@ public class FindAndReplaceAction extends ETextAction {
         return super.isEnabled() && (getFocusedTextWindow() != null);
     }
     
-    /**
-     * Rewrites the given replacement string using the given matcher so that
-     * back-references are replaced with the text of the appropriate group.
-     * The returned string is suitable for use as the specific replacement for
-     * the match described by matcher.
-     * 
-     * This code is a lightly modified version of the main chunk of code in
-     * Matcher.appendReplacement (which sadly wasn't factored out for public
-     * use). It would perhaps make sense to revert most of the changes for
-     * ease of diffing when new Java releases come out.
-     * 
-     * FIXME: submit an RFE to Sun asking for this code to be factored out.
-     */
-    public String makeReplacement(Matcher matcher, String replacement) {
-        StringBuffer result = new StringBuffer();
-        for (int cursor = 0; cursor < replacement.length(); ) {
-            char nextChar = replacement.charAt(cursor++);
-            if (nextChar == '\\') {
-                nextChar = replacement.charAt(cursor);
-                result.append(nextChar);
-                cursor++;
-            } else if (nextChar == '$') {
-                // The first number is always a group
-                int refNum = (int)replacement.charAt(cursor++) - '0';
-                if ((refNum < 0)||(refNum > 9)) {
-                    throw new IllegalArgumentException("Illegal group reference");
-                }
-                
-                // Capture the largest legal group string
-                boolean done = false;
-                while (!done) {
-                    if (cursor >= replacement.length()) {
-                        break;
-                    }
-                    int nextDigit = replacement.charAt(cursor) - '0';
-                    if ((nextDigit < 0)||(nextDigit > 9)) {
-                        // not a number
-                        break;
-                    }
-                    int newRefNum = (refNum * 10) + nextDigit;
-                    if (matcher.groupCount() < newRefNum) {
-                        done = true;
-                    } else {
-                        refNum = newRefNum;
-                        cursor++;
-                    }
-                }
-                
-                // Append group
-                if (matcher.group(refNum) != null) {
-                    result.append(matcher.group(refNum));
-                }
-            } else {
-                result.append(nextChar);
-            }
-        }
-        return result.toString();
-    }
-    
     private ETextWindow textWindow;
     private ETextArea text;
 
