@@ -617,6 +617,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             Edit.showStatus("Saved " + FileUtilities.getUserFriendlyName(filename));
             markAsClean();
             this.lastModifiedTime = file.lastModified();
+            Edit.getTagsPanel().ensureTagsCorrespondTo(this);
             return true;
         } catch (IOException ex) {
             Edit.showStatus("");
