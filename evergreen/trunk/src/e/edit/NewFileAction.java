@@ -23,7 +23,7 @@ public class NewFileAction extends ETextAction {
     public void actionPerformed(ActionEvent e) {
         ETextWindow window = getFocusedTextWindow();
         if (window != null) {
-            filenameField.setPathname(window.getContext() + File.separator);
+            filenameField.setPathname(window.getContext());
         }
 
         FormPanel formPanel = new FormPanel();
