@@ -174,13 +174,14 @@ public class TagReader {
         }
         
         public static final List CONTAINER_TYPES = Collections.unmodifiableList(Arrays.asList(new String[] {
-            CLASS, ENUM, INTERFACE, NAMESPACE, STRUCT
+            CLASS, ENUM, INTERFACE, NAMESPACE, STRUCT, MODULE
         }));
         
         private static final Map DESCRIPTION_FORMATS = new HashMap();
         static {
             DESCRIPTION_FORMATS.put(PACKAGE, new MessageFormat(PACKAGE + " {0}"));
             DESCRIPTION_FORMATS.put(CLASS, new MessageFormat(CLASS + " {0}"));
+            DESCRIPTION_FORMATS.put(INTERFACE, new MessageFormat(INTERFACE + " {0}"));
             DESCRIPTION_FORMATS.put(METHOD, new MessageFormat("{0}()"));
             DESCRIPTION_FORMATS.put(CONSTRUCTOR, new MessageFormat("{0}()"));
             DESCRIPTION_FORMATS.put(DESTRUCTOR, new MessageFormat("{0}()"));
@@ -301,10 +302,6 @@ public class TagReader {
                 case 'm': return 'M'; // Module, not method.
                 default: return type;
             }
-        }
-        
-        public boolean isContainerType() {
-            return super.isContainerType() || type.equals(MODULE);
         }
     }
     
