@@ -8,14 +8,14 @@ import terminatorn.*;
 @author Phil Norman
 */
 
-public class SingleCharEscapeAction implements TelnetAction {
+public class SingleCharEscapeAction implements TerminalAction {
 	private char escChar;
 	
 	public SingleCharEscapeAction(char escChar) {
 		this.escChar = escChar;
 	}
 
-	public void perform(TelnetListener listener) {
+	public void perform(TerminalListener listener) {
 		switch (escChar) {
 			case '6':  // rxvt: scr_backindex
 				unsupported("scr_backindex");

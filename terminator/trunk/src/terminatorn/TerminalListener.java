@@ -3,7 +3,7 @@ package terminatorn;
 import java.awt.*;
 
 /**
-A TelnetListener listens to escape sequences and text input coming from the TelnetControl
+A TerminalListener listens to escape sequences and text input coming from the TerminalControl
 object.
 
 <p>All methods will be called in the AWT event dispatcher thread.  This is to cut down on
@@ -12,8 +12,8 @@ the number of SwingUtilities.invokeLater calls and tiny Runnable objects.
 @author Phil Norman
 */
 
-public interface TelnetListener {
-	public void processActions(TelnetAction[] actions);
+public interface TerminalListener {
+	public void processActions(TerminalAction[] actions);
 
 	public void fullReset();
 	

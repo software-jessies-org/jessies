@@ -3,14 +3,14 @@ package terminatorn;
 import java.awt.*;
 
 /**
-A Controller is the master of a JTelnetPane, and allows the JTelnetPane to request its master
+A Controller is the master of a JTerminalPane, and allows the JTerminalPane to request its master
 to do stuff, like opening new tabs, closing itself, or whatever.
 
 @author Phil Norman
 */
 
 public interface Controller {
-	public void closeTelnetPane(JTelnetPane victim);
+	public void closeTerminalPane(JTerminalPane victim);
 	
 	public void openShellPane(boolean focusOnNewTab);
 	
@@ -20,5 +20,5 @@ public interface Controller {
 	
 	public void setTerminalSize(Dimension size);
 	
-	public void terminalNameChanged(JTelnetPane terminal);
+	public void terminalNameChanged(JTerminalPane terminal);
 }

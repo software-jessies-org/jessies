@@ -12,22 +12,22 @@ all that stuff.
 @author Phil Norman
 */
 
-public class CSIEscapeAction implements TelnetAction {
-	private TelnetControl control;
+public class CSIEscapeAction implements TerminalAction {
+	private TerminalControl control;
 	private String sequence;
 	
-	public CSIEscapeAction(TelnetControl control, String sequence) {
+	public CSIEscapeAction(TerminalControl control, String sequence) {
 		this.control = control;
 		this.sequence = sequence;
 	}
 
-	public void perform(TelnetListener listener) {
+	public void perform(TerminalListener listener) {
 		if (processSequence(listener) == false) {
 			Log.warn("Unimplemented escape sequence: \"" + sequence + "\"");
 		}
 	}
 	
-	private boolean processSequence(TelnetListener listener) {
+	private boolean processSequence(TerminalListener listener) {
 		char lastChar = sequence.charAt(sequence.length() - 1);
 		String midSequence = sequence.substring(1, sequence.length() - 1);
 		switch (lastChar) {
@@ -51,7 +51,7 @@ public class CSIEscapeAction implements TelnetAction {
 		}
 	}
 	
-	public boolean clearTabs(TelnetListener listener, String seq) {
+	public boolean clearTabs(TerminalListener listener, String seq) {
 		int clearType = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		if (clearType == 0) {
 			// Clear horizontal tab at current cursor position.
@@ -67,7 +67,7 @@ public class CSIEscapeAction implements TelnetAction {
 		}
 	}
 	
-	public boolean scrollDisplayUp(TelnetListener listener, String seq) {
+	public boolean scrollDisplayUp(TerminalListener listener, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
 		for (int i = 0; i < count; i++) {
 			listener.scrollDisplayDown();
@@ -75,13 +75,13 @@ public class CSIEscapeAction implements TelnetAction {
 		return true;
 	}
 	
-	public boolean insertLines(TelnetListener listener, String seq) {
+	public boolean insertLines(TerminalListener listener, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
 		listener.insertLines(count);
 		return true;
 	}
 	
-	public boolean setMode(TelnetListener listener, String seq, boolean value) {
+	public boolean setMode(TerminalListener listener, String seq, boolean value) {
 		boolean isQuestionMode = seq.startsWith("?");
 		String[] modes = (isQuestionMode ? seq.substring(1) : seq).split(";");
 		for (int i = 0; i < modes.length; i++) {
@@ -102,7 +102,7 @@ public class CSIEscapeAction implements TelnetAction {
 		return true;
 	}
 	
-	public boolean setScrollScreen(TelnetListener listener, String seq) {
+	public boolean setScrollScreen(TerminalListener listener, String seq) {
 		int index = seq.indexOf(';');
 		if (index == -1) {
 			listener.setScrollScreen(-1, -1);
@@ -112,7 +112,7 @@ public class CSIEscapeAction implements TelnetAction {
 		return true;
 	}
 	
-	public boolean deviceAttributesRequest(TelnetListener listener, String seq) {
+	public boolean deviceAttributesRequest(TerminalListener listener, String seq) {
 		if (seq.equals("") || seq.equals("0")) {
 			control.sendEscapeString("[?1;0c");
 			return true;
@@ -121,13 +121,13 @@ public class CSIEscapeAction implements TelnetAction {
 		}
 	}
 	
-	public boolean deleteCharacters(TelnetListener listener, String seq) {
+	public boolean deleteCharacters(TerminalListener listener, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
 		listener.deleteCharacters(count);
 		return true;
 	}
 	
-	public boolean killLineContents(TelnetListener listener, String seq) {
+	public boolean killLineContents(TerminalListener listener, String seq) {
 		int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		boolean fromStart = (type >= 1);
 		boolean toEnd = (type != 1);
@@ -135,7 +135,7 @@ public class CSIEscapeAction implements TelnetAction {
 		return true;
 	}
 	
-	public boolean killLines(TelnetListener listener, String seq) {
+	public boolean killLines(TerminalListener listener, String seq) {
 		int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		boolean fromTop = (type >= 1);
 		boolean toBottom = (type != 1);
@@ -143,7 +143,7 @@ public class CSIEscapeAction implements TelnetAction {
 		return true;
 	}
 	
-	public boolean moveCursorTo(TelnetListener listener, String seq) {
+	public boolean moveCursorTo(TerminalListener listener, String seq) {
 		int x = 1;
 		int y = 1;
 		int splitIndex = seq.indexOf(';');
@@ -155,7 +155,7 @@ public class CSIEscapeAction implements TelnetAction {
 		return true;
 	}
 	
-	public boolean moveCursor(TelnetListener listener, String countString, int xDirection, int yDirection) {
+	public boolean moveCursor(TerminalListener listener, String countString, int xDirection, int yDirection) {
 		int count = (countString.length() == 0) ? 1 : Integer.parseInt(countString);
 		if (xDirection != 0) {
 			listener.moveCursorHorizontally(xDirection * count);
@@ -166,7 +166,7 @@ public class CSIEscapeAction implements TelnetAction {
 		return true;
 	}
 	
-	public boolean processFontEscape(TelnetListener listener, String sequence) {
+	public boolean processFontEscape(TerminalListener listener, String sequence) {
 		int oldStyle = listener.getStyle();
 		int foreground = StyledText.getForeground(oldStyle);
 		int background = StyledText.getBackground(oldStyle);

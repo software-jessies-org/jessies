@@ -12,9 +12,9 @@ import e.util.*;
 @author Elliott Hughes
 */
 
-public class JTelnetPane extends JPanel {
+public class JTerminalPane extends JPanel {
 	private Controller controller;
-	private TelnetControl control;
+	private TerminalControl control;
 	private JTextBuffer textPane;
 	private JScrollPane scrollPane;
 	private String name;
@@ -33,7 +33,7 @@ public class JTelnetPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	private JTelnetPane(Controller controller, String name, String command, boolean ignoreExitStatus) {
+	private JTerminalPane(Controller controller, String name, String command, boolean ignoreExitStatus) {
 		super(new BorderLayout());
 		this.controller = controller;
 		this.name = name;
@@ -52,26 +52,26 @@ public class JTelnetPane extends JPanel {
 	 * title. If 'title' is null, we use the first word of the command
 	 * as the the title.
 	 */
-	public static JTelnetPane newCommandWithTitle(Controller controller, String command, String title) {
+	public static JTerminalPane newCommandWithTitle(Controller controller, String command, String title) {
 		if (title == null) {
 			title = command.trim();
 			if (title.indexOf(' ') != -1) {
 				title = title.substring(0, title.indexOf(' '));
 			}
 		}
-		return new JTelnetPane(controller, title, command, false);
+		return new JTerminalPane(controller, title, command, false);
 	}
 	
 	/**
 	 * Creates a new terminal running the user's shell.
 	 */
-	public static JTelnetPane newShell(Controller controller) {
+	public static JTerminalPane newShell(Controller controller) {
 		String user = System.getProperty("user.name");
 		String command = getUserShell(user);
 		if (Options.getSharedInstance().isLoginShell()) {
 			command += " -l";
 		}
-		return new JTelnetPane(controller, user + "@localhost", command, true);
+		return new JTerminalPane(controller, user + "@localhost", command, true);
 	}
 	
 	public Dimension getPaneSize() {
@@ -131,7 +131,7 @@ public class JTelnetPane extends JPanel {
 		initSizeMonitoring(scrollPane);
 		textPane.sizeChanged();
 		try {
-			control = new TelnetControl(this, textPane.getModel(), command, process, ignoreExitStatus);
+			control = new TerminalControl(this, textPane.getModel(), command, process, ignoreExitStatus);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -389,7 +389,7 @@ public class JTelnetPane extends JPanel {
 		}
 		
 		public void performAction() {
-			String commandToRun = StringEntryDialog.getString(JTelnetPane.this, "Enter Command to Run");
+			String commandToRun = StringEntryDialog.getString(JTerminalPane.this, "Enter Command to Run");
 			if (commandToRun != null && commandToRun.length() > 0) {
 				controller.openCommandPane(commandToRun, true);
 			}
@@ -464,7 +464,7 @@ public class JTelnetPane extends JPanel {
 		
 		public void performAction() {
 			control.destroyProcess();
-			controller.closeTelnetPane(JTelnetPane.this);
+			controller.closeTerminalPane(JTerminalPane.this);
 		}
 		
 		public char getHotkeyChar() {

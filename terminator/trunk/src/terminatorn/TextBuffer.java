@@ -13,7 +13,7 @@ TextLine objects, one for each line.
 @author Phil Norman
 */
 
-public class TextBuffer implements TelnetListener {
+public class TextBuffer implements TerminalListener {
 	private JTextBuffer view;
 	private int width;
 	private int height;
@@ -268,7 +268,7 @@ public class TextBuffer implements TelnetListener {
 		return new Dimension(getMaxLineWidth(), getLineCount());
 	}
 	
-	public void processActions(TelnetAction[] actions) {
+	public void processActions(TerminalAction[] actions) {
 		firstLineChanged = Integer.MAX_VALUE;
 		boolean wereAtBottom = view.isAtBottom();
 		Dimension initialSize = getCurrentSizeInChars();
@@ -531,8 +531,8 @@ public class TextBuffer implements TelnetListener {
 	}
 	
 	public void setWindowTitle(String newWindowTitle) {
-		JTelnetPane telnetPane = (JTelnetPane) SwingUtilities.getAncestorOfClass(JTelnetPane.class, view);
-		telnetPane.setName(newWindowTitle);
+		JTerminalPane terminalPane = (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, view);
+		terminalPane.setName(newWindowTitle);
 	}
 	
 	public class Sequence implements CharSequence {

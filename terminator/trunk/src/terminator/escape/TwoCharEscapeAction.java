@@ -8,14 +8,14 @@ import terminatorn.*;
 @author Phil Norman
 */
 
-public class TwoCharEscapeAction implements TelnetAction {
+public class TwoCharEscapeAction implements TerminalAction {
 	private String sequence;
 	
 	public TwoCharEscapeAction(String sequence) {
 		this.sequence = sequence;
 	}
 
-	public void perform(TelnetListener listener) {
+	public void perform(TerminalListener listener) {
 		switch (sequence.charAt(0)) {
 			case '#':  // rxvt: if second char == '8', scr_E().
 				unsupported();
