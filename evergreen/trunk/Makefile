@@ -1,6 +1,7 @@
 PROJECT_NAME=edit
 ARCHIVE_HOST=locke
 
+KNOWN_JRE_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
 KNOWN_JRE_LOCATIONS+=/home/elliotth/download/j2sdk1.4.2/jre/lib/rt.jar
 KNOWN_JRE_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
 KNOWN_JRE_LOCATIONS+=MRJ141Stubs.jar
