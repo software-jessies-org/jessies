@@ -191,8 +191,36 @@ public class JTelnetPane extends JPanel {
 	}
 	
 	private class KeyHandler implements KeyListener {
+		/**
+		 * On the Mac, the Command key (called 'meta' by Java) is always
+		 * used for keyboard equivalents. On other systems, Control tends to
+		 * be used, but in the special case of terminal emulators this
+		 * conflicts with the ability to type control characters. The
+		 * traditional work-around has always been to use Alt, which --
+		 * conveniently for Mac users -- is in the same place on a PC
+		 * keyboard as Command on a Mac keyboard.
+		 */
+		private static int keyboardEquivalentModifier;
+		static {
+			if (System.getProperty("os.name").indexOf("Mac OS") != -1) {
+				keyboardEquivalentModifier = KeyEvent.META_MASK;
+			} else {
+				keyboardEquivalentModifier = KeyEvent.ALT_MASK;
+			}
+		}
+		
+		/**
+		 * Tests whether the given event corresponds to a keyboard
+		 * equivalent. In the long run, this code should all disappear
+		 * and be replaced by a Swing menu, but in the meantime, this
+		 * abstracts away cross-platform differences.
+		 */
+		public boolean isKeyboardEquivalent(KeyEvent event) {
+			return ((event.getModifiers() & keyboardEquivalentModifier) == keyboardEquivalentModifier);
+		}
+		
 		public void keyPressed(KeyEvent event) {
-			if (event.isAltDown()) {
+			if (isKeyboardEquivalent(event)) {
 				return;
 			}
 			String sequence = getSequenceForKeyCode(event);
@@ -234,7 +262,7 @@ public class JTelnetPane extends JPanel {
 
 		public void keyTyped(KeyEvent event) {
 			char ch = event.getKeyChar();
-			if (event.isAltDown()) {
+			if (isKeyboardEquivalent(event)) {
 				switch (ch) {
 					case 'n': case 'N':
 						controller.openShellPane(true);
