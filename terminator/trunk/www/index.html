@@ -128,13 +128,15 @@ export TERMINFO=~/.terminfo
 export TERM=$TERM
 </pre>
 
-<h3>Supported xterm resources</h3>
+<h3>X11-style resources</h3>
 
 <p>Terminator will look in <tt>~/.Xdefaults</tt> and <tt>~/.Xresources</tt> (in
 that order, with the last-read setting overriding any earlier settings) for X11
 resources of class <tt>XTerm</tt>, <tt>Rxvt</tt>, or <tt>Terminator</tt>. This
 means that by default it will pick up the other programs' settings, but you can
 have different settings for Terminator if you wish.
+
+<p>Use <tt>terminator --help</tt> to see all the options, and their values.
 
 <p>Common resources:
 <dl>
