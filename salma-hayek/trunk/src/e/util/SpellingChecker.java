@@ -27,10 +27,26 @@ public class SpellingChecker {
     
     /** Establishes the connection to ispell, if possible. */
     private SpellingChecker() {
-        // On Mac OS, we want to use the system's spelling checker, so try our
-        // NSSpell utility (which gives Apple's code an ispell-like interface)
-        // first.
-        boolean found = connectTo(new String[] { "NSSpell" });
+        boolean found = false;
+        
+        if (GuiUtilities.isMacOs()) {
+            // On Mac OS, we want to use the system's spelling checker, so try
+            // our NSSpell utility (which gives Apple's code an ispell-like
+            // interface) first. We try to find it relative to this class'
+            // location. This will break if the "classes" directory is moved
+            // away from the "native" directory, or if the "native" directory's
+            // contents are re-arranged.
+            
+            // Why commit such a potentially fragile hack? Well, the breakage
+            // will be easy to spot, and unlikely, and in the meantime it
+            // means we can offer system spelling checking on Mac OS with
+            // no installation necessary.
+            
+            String classesDirectory = new File(SpellingChecker.class.getResource("../..").getPath()).getParent();
+            String nsspellPath = classesDirectory + "/native/Darwin/NSSpell/NSSpell";
+            found = connectTo(new String[] { nsspellPath });
+        }
+        
         if (found == false) {
             connectTo(new String[] { "ispell", "-a" });
         }
