@@ -219,6 +219,8 @@ public class FindAndReplaceAction extends ETextAction {
                 String insert = null;
                 if (buffer.charAt(i) == ' ') {
                     insert = "&nbsp;";
+                } else if (buffer.charAt(i) == '\t') {
+                    insert = "&nbsp;&nbsp;&nbsp;&nbsp;";
                 } else if (buffer.charAt(i) == '<') {
                     insert = "&lt;";
                 } else if (buffer.charAt(i) == '\u0000') {
