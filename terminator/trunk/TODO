@@ -7,13 +7,13 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
+[5]	Logging to file: we hang so often this is a very high priority.
 [5]	Implement 'mode 1' - client-side manipulation of the cursor position when the
 	cursor keys are used.
 [3]	Implement 'mode 47' - alternate buffer support.
 [3]	Cope with '\t'. Remember tab stops are settable.
 [3]	Add ssh support.
 [1]	Fix double-click selection so it selects a word (maybe bracket-matching aswell).
-[1]	Logging to file.
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 [1]	Override TERM environment variable to help ensure that our children have an accurate idea of our capabilities (and so we only have one major target to support)?
 [1]	Pass '-i' to shell. bash doesn't seem to correctly recognize that it should be interactive otherwise.
@@ -31,3 +31,4 @@ Elliott's TODOs:
 [3]	Implement searching.
 [3]	Add hyperlink following support for stuff like http: mailto: and telnet:
 [3]	Support XTerm*loginShell resource.
+[1]	Support XTerm*scrollKey and XTerm*scrollTtyOutput resources.
