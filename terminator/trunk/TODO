@@ -11,7 +11,6 @@ Unassigned TODOs:
 [5]	Stop inserting blank lines at the bottom when we're resized.
 [5]	Implement "New Window" to go with "New Tab".
 [5]	Find some profiling tool to see if we can find simple ways of speeding up.
-[5]	Fix ^C. It works fine if you've started Terminator from another terminal emulator (xterm, say), but if you start it from the GNOME panel, it doesn't. stty -a can't see any difference.
 [3]	Review the current properties reading, and see if it's really going to work well enough.  Possibly add "?MacOS:" stuff to it.
 [1]	Add bracket-matching double-click selection?
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
