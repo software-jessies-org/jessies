@@ -214,6 +214,7 @@ dist: build
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM)); \
 	find . -name "*.bak" | xargs --no-run-if-empty rm; \
 	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
+	scp ChangeLog $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
 	scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
 	cd $(if $(wildcard ../trunk),../..,..) && \
 	tar -cf $(TAR_FILE_OF_THE_DAY) $(FILE_LIST) && \
