@@ -66,17 +66,17 @@ BINDIST_FILES += README COPYING $(PROJECT_NAME).jar
 FILTERED_BINDIST_FILES = $(shell find $(BINDIST_FILES) -type f | grep -v CVS)
 
 define GENERATE_FILE_LIST.bk
-  cd .. && bk sfiles -g $(PROJECT_NAME)
+  bk sfiles -g
 endef
 define GENERATE_FILE_LIST.cvs
-  cvs ls -R -P -e | perl -ne 'm/(.*):$$/ && ($$dir = "$$1/") && ($$dir =~ s@\./@@); m@^/([^/]*)/@ && print ("$(PROJECT_NAME)/$$dir$$1\n")'
+  cvs ls -R -P -e | perl -ne 'm/(.*):$$/ && ($$dir = "$$1"); m@^/([^/]*)/@ && print ("$$dir/$$1\n")'
 endef
 define GENERATE_FILE_LIST.svn
-  svn list -R | perl -pe 's@@$(PROJECT_NAME)/@'
+  svn list -R
 endef
 
 FILE_LIST_WITH_DIRECTORIES = $(shell $(GENERATE_FILE_LIST.$(REVISION_CONTROL_SYSTEM)))
-FILE_LIST = $(filter-out $(dir $(FILE_LIST_WITH_DIRECTORIES)),$(FILE_LIST_WITH_DIRECTORIES))
+FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE_LIST_WITH_DIRECTORIES)),$(FILE_LIST_WITH_DIRECTORIES))))
 
 # variables above
 # rules below
