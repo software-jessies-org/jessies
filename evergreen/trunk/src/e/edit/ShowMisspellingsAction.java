@@ -34,7 +34,7 @@ public class ShowMisspellingsAction extends ETextAction {
                 window.findNext();
             }
         });
-        list.setCellRenderer(new EListCellRenderer());
+        list.setCellRenderer(new EListCellRenderer(true));
 
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Misspellings:", new JScrollPane(list));

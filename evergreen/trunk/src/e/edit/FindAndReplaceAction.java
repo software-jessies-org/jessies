@@ -144,6 +144,10 @@ public class FindAndReplaceAction extends ETextAction {
     }
 
     public static class DisplayableMatchRenderer extends EListCellRenderer {
+        public DisplayableMatchRenderer() {
+            super(true);
+        }
+
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             
