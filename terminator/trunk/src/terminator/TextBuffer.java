@@ -143,6 +143,12 @@ public class TextBuffer implements TelnetListener {
 	
 	/** Sets the position of the cursor to the given x and y coordinates, counted from 1,1 at the top-left corner. */
 	public void setCursorPosition(int x, int y) {
+		// Although the cursor positions are supposed to be measured
+		// from (1,1), there's nothing to stop a badly-behaved program
+		// from sending (0,0). ASUS routers do this (they're rubbish).
+		x = Math.max(1, x);
+		y = Math.max(1, y);
+
 		caretPosition.x = x - 1;
 		caretPosition.y = y - 1 + getFirstDisplayLine();
 	}
