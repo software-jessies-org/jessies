@@ -13,6 +13,7 @@ import terminator.terminal.*;
 import terminator.view.highlight.*;
 
 public class JTerminalPane extends JPanel {
+	private Process process;
 	private TerminalControl control;
 	private JTextBuffer textPane;
 	private JScrollPane scrollPane;
@@ -50,8 +51,8 @@ public class JTerminalPane extends JPanel {
 		
 		try {
 //			Log.warn("Starting process '" + command + "'");
-			final Process proc = Runtime.getRuntime().exec(System.getProperty("pty.binary") + " " + command);
-			init(command, proc);
+			process = Runtime.getRuntime().exec(System.getProperty("pty.binary") + " " + command);
+			init(command);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -111,7 +112,7 @@ public class JTerminalPane extends JPanel {
 		return "bash";
 	}
 
-	private void init(String command, Process process) throws IOException {
+	private void init(String command) throws IOException {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		textPane.addMouseListener(new ContextMenuOpener());
@@ -500,8 +501,12 @@ public class JTerminalPane extends JPanel {
 		textPane.paste();
 	}
 	
-	public void doCloseAction() {
+	public void destroyProcess() {
 		control.destroyProcess();
+	}
+	
+	public void doCloseAction() {
+		destroyProcess();
 		getTerminatorFrame().closeTerminalPane(this);
 	}
 	
