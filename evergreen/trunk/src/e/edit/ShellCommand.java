@@ -37,7 +37,8 @@ public class ShellCommand {
             "EDIT_CURRENT_FILENAME=" + filename,
             "EDIT_CURRENT_LINE_NUMBER=" + lineNumber,
             "EDIT_WORKSPACE_ROOT=" + getWorkspace().getRootDirectory(),
-            /* Thanks, Sun. */
+            /* FIXME: we can do better when Java 1.5 is out. */
+            makePassThroughVariable("CVS_RSH"),
             makePassThroughVariable("DISPLAY"),
             makePassThroughVariable("HOME"),
             makePassThroughVariable("JAVA_HOME"),
