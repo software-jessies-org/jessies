@@ -1,5 +1,5 @@
 #Rotide Project File
-#Mon May 17 14:54:08 BST 2004
+#Tue May 18 15:48:43 BST 2004
 Diff\ Command=cvs diff ${FILE}
 Top-Level\ Source\ Directory=/home/phil/Development/TerminatorN/src
 Javadoc\ Paths=
@@ -8,5 +8,5 @@ Project\ Name=TerminatorN
 Ignorable\ Paths=
 Build\ Classpath=
 Core\ JDK\ Directory=
-Searchable\ Extensions=java,config,properties
+Searchable\ Extensions=java,config,properties,c,h
 Project\ Type=Java
