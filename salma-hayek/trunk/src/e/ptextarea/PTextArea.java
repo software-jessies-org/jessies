@@ -24,6 +24,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private static final Color SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f, 0.5f);
     private static final Color SELECTION_BOUNDARY_COLOR = new Color(0.5f, 0.55f, 0.7f, 0.75f);
     
+    private static final Stroke WRAP_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 1.0f, 2.0f }, 0.0f);
+    
     private PLineList lines;
     private PHighlight selection;
     private List splitLines;  // TODO - Write a split buffer-style List implementation.
@@ -445,10 +447,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void paintWrapMark(Graphics2D graphics, FontMetrics metrics, int x, int y) {
-        graphics.setColor(Color.GRAY);
-        int yTop = y - metrics.getMaxAscent();
-        int yBottom = y + metrics.getMaxDescent() - 1;
-        graphics.fillRect(x, yTop, getWidth() - x, yBottom - yTop);
+        graphics.setColor(Color.BLACK);
+        graphics.setStroke(WRAP_STROKE);
+        int yMiddle = y - metrics.getMaxAscent() / 2;
+        graphics.drawLine(x, yMiddle, getWidth(), yMiddle);
     }
     
     private void paintCaret(Graphics2D graphics, FontMetrics metrics, int x, int y) {
