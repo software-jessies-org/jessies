@@ -26,7 +26,7 @@ public class Terminator implements Controller {
 		Log.setApplicationName("Terminator");
 		arguments = Options.getSharedInstance().parseCommandLine(argumentArray);
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
-			showUsage();
+			showUsage(System.err);
 		}
 		if (arguments.contains("-v") || arguments.contains("-version") || arguments.contains("--version")) {
 			showVersion();
@@ -403,8 +403,14 @@ public class Terminator implements Controller {
 		newPane.getTextPane().addKeyListener(keyHandler);
 	}
 
-	public void showUsage() {
-		System.err.println("Usage: Terminator [--help] [-xrm <resource-string>]... [[-n <name>] command]...");
+	public void showUsage(PrintStream out) {
+		out.println("Usage: Terminator [--help] [-xrm <resource-string>]... [[-n <name>] command]...");
+		out.println();
+		out.println("Current resource settings:");
+		Options.getSharedInstance().showOptions(out);
+		out.println();
+		out.println("Terminator will read your .Xdefaults and .Xresources files, and use");
+		out.println("resources of class Rxvt, Terminator or XTerm.");
 		System.exit(0);
 	}
 	

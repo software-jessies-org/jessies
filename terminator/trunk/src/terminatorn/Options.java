@@ -26,7 +26,7 @@ import e.util.*;
 public class Options {
 	private static final Options INSTANCE = new Options();
 	
-	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt)(?:\\*|\\.))?(\\S+):\\s*(.+)");
+	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt|Terminator)(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
 	private HashMap options = new HashMap();
 	private HashMap rgbColours = new HashMap();
@@ -35,6 +35,15 @@ public class Options {
 	
 	public static Options getSharedInstance() {
 		return INSTANCE;
+	}
+	
+	public void showOptions(PrintStream out) {
+		Object[] keys = options.keySet().toArray();
+		Arrays.sort(keys);
+		for (int i = 0; i < keys.length; ++i) {
+			String key = (String) keys[i];
+			out.println("Terminator*" + key + ": " + options.get(key));
+		}
 	}
 	
 	/**
