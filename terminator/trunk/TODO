@@ -7,9 +7,9 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
-[5] Implement window size change notification. Grep for TIOCSWINSZ in the rxvt source. Basically, we have to do an ioctl on the relevant fd. And only pty knows that. Martin suggests TELNET IAC-like signaling in the byte stream to pty.
 [5]     Fix backspace in vim on Linux; it deletes forwards, and is driving me mad whenever I write a checkin comment. Must start work on CheckInTool.
 [5]     Fix ^C. It works fine if you've started Terminator from another terminal emulator (xterm, say), but if you start it from the GNOME panel, it doesn't. stty -a can't see any difference.
+[5]	Cursor should always be visible - at the moment the cursor can disappear in inverse video.
 [1]	Add bracket-matching double-click selection?
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 [1]	Implement 'mode 1'.
@@ -21,8 +21,8 @@ Unassigned TODOs:
 
 Phil's TODOs:
 ~~~~~~~~~~
-[5]	Implement wrapping.
-[5]	Fix redraw bug - strange redraw effects happen when editing a CVS commit comment in vim.
+[5]	Fix the line wrapping so it's useable when needed.
+[5]	Get the wrapping toggle on/off to wrap/unwrap the text when triggered.
 
 
 

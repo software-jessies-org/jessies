@@ -98,7 +98,7 @@ public class JTelnetPane extends JPanel {
 		
 		JScrollPane scrollPane = new JScrollPane(new BorderPanel(textPane));
 		scrollPane.setBorder(null);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.getViewport().setBackground(textPane.getBackground());
 		
@@ -272,6 +272,9 @@ public class JTelnetPane extends JPanel {
 						break;
 					case 'n': case 'N':
 						// TODO: Open a new window.
+						break;
+					case 'r': case 'R':
+						textPane.getModel().setIsWrapping(! textPane.getModel().isWrapping());
 						break;
 					case 't': case 'T':
 						controller.openShellPane(true);

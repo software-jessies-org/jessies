@@ -234,7 +234,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public Dimension getOptimalViewSize() {
 		FontMetrics metrics = getFontMetrics(getFont());
-		return new Dimension(model.getWidth() * metrics.charWidth('W'), model.getLineCount() * metrics.getHeight());
+		return new Dimension(model.getMaxLineWidth() * metrics.charWidth('W'), model.getLineCount() * metrics.getHeight());
 	}
 	
 	public void clearScrollBuffer() {
