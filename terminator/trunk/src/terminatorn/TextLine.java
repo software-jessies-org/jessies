@@ -72,6 +72,40 @@ public class TextLine {
 		return text.length();
 	}
 	
+	/**
+	* Returns the offset of the character specified by charOffset.
+	* The returned value will be charOffset for most characters, but may
+	* be smaller if the character at charOffset is part of a tab.
+	*/
+	public int getEffectiveCharStartOffset(int charOffset) {
+		if (charOffset >= text.length()) {
+			return charOffset;
+		}
+		for (int i = charOffset; i >= 0; i--) {
+			if (text.charAt(i) != TAB_CONTINUE) {
+				return i;
+			}
+		}
+		return 0;
+	}
+	
+	/**
+	* Returns the offset of the character after that specified by charOffset.
+	* The returned value will be charOffset + 1 for most characters, but may
+	* be larger if the character at charOffset is part of a tab (after the start).
+	*/
+	public int getEffectiveCharEndOffset(int charOffset) {
+		if (charOffset >= text.length()) {
+			return charOffset;
+		}
+		for (int i = charOffset; i < text.length(); i++) {
+			if (text.charAt(i) != TAB_CONTINUE) {
+				return i;
+			}
+		}
+		return text.length();
+	}
+	
 	public void clear() {
 		text = "";
 		styles = new byte[0];
