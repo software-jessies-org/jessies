@@ -19,8 +19,10 @@ public class FindHighlighter implements Highlighter {
 	
 	public void setRegularExpression(JTextBuffer view, String regularExpression) {
 		view.removeHighlightsFrom(this, 0);
-		this.pattern = Pattern.compile(regularExpression);
-		addHighlights(view, 0);
+		if (regularExpression.length() > 0) {
+			this.pattern = Pattern.compile(regularExpression);
+			addHighlights(view, 0);
+		}
 	}
 	
 	public void forgetRegularExpression(JTextBuffer view) {
