@@ -23,18 +23,22 @@ search for text and regular expressions within your terminal (including the scro
 highlighting them all, in the style of <tt>less(1)</tt>, and offering quick movement to the
 next or previous match.  As far as we know, the only other terminal emulator with a find
 function is Apple's Terminal, and ours is better.
-<p><img src="mac-os-man-bash-find.png">
-<p>Terminator running on Mac OS X, after running 'man bash', and doing a find for
-'(?i)shell'.
 <p>Searches stay active until you cancel them, so if you're waiting for some particular
 output in a great stream of output, this is a really great way to make it blindingly obvious
 when it appears.
+<p>A screenshot of Terminator on Mac OS X, after running 'man bash', and doing a find for
+'(?i)shell'. Despite the evidence that a pager is running, this is Terminator doing the
+highlighting&nbsp;&mdash; one of the authors uses cat(1) as his pager:
+<p align="center" ><img src="mac-os-man-bash-find.png">
 
 <li><p><strong>Hyperlinks</strong> - Terminator will recognize the names of files, or
 grep-like addresses consisting of a filename and line number, and automatically
 turn the text into a link that will open the file in your configured editor. So <tt>grep -n</tt> output,
 or <tt>svn update</tt> output, for example, becomes clickable.
-<p><img src="mac-os-grep.png">
+<p>Terminator can also jump to the next/previous link, which is great for quickly scanning
+voluminous build output.
+<p>A screenshot of Terminator automatically providing links to grep(1) matches:
+<p align="center"><img src="mac-os-grep.png">
 
 <li><p><strong>Number reinterpretation</strong> - Terminator will recognize numbers
 in a variety of bases as the current selection, and add informational menu items to the
@@ -125,7 +129,9 @@ systems look for this directory automatically).
 <p>The 'pty' program is based on code from one of the examples in the
 book "Advanced Programming in the Unix Environment", by W Richard Stevens.
 
-<p>Phil wrote the code that took us from nothing to a more-or-less usable replacement for <tt>rxvt</tt> on his own between 2004-04-21 and 2004-05-28. Given that he was on holiday for a week during this time, that makes roughly a month of development time. Since then, Terminator has been on the long slog towards Joel's <a href="http://www.joelonsoftware.com/articles/fog0000000017.html">ten years</a> of quality.
+<p>Phil wrote the code that took us from nothing to a more-or-less usable replacement for <tt>rxvt</tt> on his own between 2004-04-21 and 2004-05-28. Given that he was on holiday for a week during this time, that makes roughly a month of development time.
+
+<p>Since then, Terminator has been on the long slog towards Joel's <a href="http://www.joelonsoftware.com/articles/fog0000000017.html">ten years</a> of quality.
 
 </body>
 </html>
