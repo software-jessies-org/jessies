@@ -7,10 +7,12 @@ import javax.swing.*;
 import e.util.*;
 
 public final class EditServer extends Thread {
+    private Edit edit;
     private ServerSocket socket;
     
-    public EditServer() throws IOException {
-        socket = new ServerSocket(1948);
+    public EditServer(Edit edit) throws IOException {
+        this.edit = edit;
+        this.socket = new ServerSocket(1948);
         setName("EditServer");
         start();
     }
@@ -49,6 +51,8 @@ public final class EditServer extends Thread {
         if (line.startsWith("open ")) {
             String filename = line.substring("open ".length());
             open(out, filename);
+        } else if (line.equals("remember-state")) {
+            edit.rememberState();
         } else if (line.equals("save-all")) {
             SaveAllAction.saveAll(false);
         } else {
