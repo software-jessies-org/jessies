@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import javax.swing.*;
 
 /**
@@ -17,9 +18,23 @@ public class JTelnetPane extends JPanel {
 	private JTextBuffer textPane;
 	private int viewWidth = 80;
 	private int viewHeight = 24;
+	private String name;
 	
-	public JTelnetPane(String host, int port) {
+	public JTelnetPane(String hostAndPort) {
 		super(new BorderLayout());
+		
+		this.name = hostAndPort;
+		
+		String host = hostAndPort;
+		int port = 23;
+		if (name.indexOf(':') != -1) {
+			port = Integer.parseInt(name.substring(name.indexOf(':') + 1));
+			host = name.substring(0, name.indexOf(':'));
+			if (name.endsWith("/")) {
+				name = name.substring(0, name.length() - 1);
+			}
+		}
+
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		JScrollPane scrollPane = new JScrollPane(textPane);
@@ -32,6 +47,10 @@ public class JTelnetPane extends JPanel {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public Dimension getOptimalViewSize() {
@@ -71,19 +90,37 @@ public class JTelnetPane extends JPanel {
 		}
 	}
 
-	public static void main(String[] argv) throws IOException {
-		if (argv.length < 1 || argv.length > 2) {
-			System.err.println("Usage: JTelnetPane <host> [<port>]");
+	public static void main(final String[] arguments) throws IOException {
+		if (arguments.length < 1) {
+			System.err.println("Usage: JTelnetPane <host>[:<port>]...");
 			System.exit(1);
 		}
-		final String host = argv[0];
-		final int port = (argv.length == 2) ? Integer.parseInt(argv[1]) : 23;
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				JFrame frame = new JFrame("telnet://" + host + ":" + port);
+				JFrame frame = new JFrame("Terminator");
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				JTelnetPane telPane = new JTelnetPane(host, port);
-				frame.getContentPane().add(telPane);
+				
+				ArrayList telnetPanes = new ArrayList();
+				for (int i = 0; i < arguments.length; ++i) {
+					String hostAndPort = arguments[i];
+					telnetPanes.add(new JTelnetPane(hostAndPort));
+				}
+
+				JComponent content = null;
+				if (telnetPanes.size() == 1) {
+					JTelnetPane telnetPane = (JTelnetPane) telnetPanes.get(0);
+					frame.setTitle(telnetPane.getName());
+					content = telnetPane;
+				} else {
+					JTabbedPane tabbedPane = new JTabbedPane();
+					for (int i = 0; i < telnetPanes.size(); ++i) {
+						JTelnetPane telnetPane = (JTelnetPane) telnetPanes.get(i);
+						tabbedPane.add(telnetPane.getName(), telnetPane);
+					}
+					content = tabbedPane;
+				}
+				
+				frame.getContentPane().add(content);
 				frame.setSize(new Dimension(600, 400));
 				frame.setLocationRelativeTo(null);
 				frame.setVisible(true);
