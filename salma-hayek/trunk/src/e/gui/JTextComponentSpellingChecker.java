@@ -1,7 +1,9 @@
 package e.gui;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import e.util.*;
@@ -15,6 +17,96 @@ public class JTextComponentSpellingChecker implements DocumentListener {
     
     public JTextComponentSpellingChecker(JTextComponent component) {
         this.component = component;
+        addPopUpMenu();
+    }
+    
+    private void addPopUpMenu() {
+        component.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                processMouseEvent(e);
+            }
+            
+            public void mouseReleased(MouseEvent e) {
+                processMouseEvent(e);
+            }
+            
+            private void processMouseEvent(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    showMenu(e);
+                    e.consume();
+                }
+            }
+        });
+    }
+    
+    /**
+     * Returns a collection of menu items if there's a misspelled word in the text selection, or
+     * an empty collection otherwise.
+     */
+    private void showMenu(MouseEvent e) {
+        try {
+            final Range actualRange = new Range();
+            final int offset = component.viewToModel(e.getPoint());
+            if (isMisspelledWordBetween(offset, offset, actualRange)) {
+                EPopupMenu menu = new EPopupMenu();
+                String misspelling = document.getText(actualRange.start, actualRange.end - actualRange.start);
+                //menuItems.add(new AcceptSpellingAction(misspelling));
+                String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
+                for (int i = 0; i < suggestions.length; i++) {
+                    String suggestion = suggestions[i];
+                    // Since we're mainly used for editing source, camelCase
+                    // and underscored_identifiers are more likely than
+                    // hyphenated words or multiple words.
+                    suggestion = suggestion.replace('-', '_');
+                    suggestion = convertMultipleWordsToCamelCase(suggestion);
+                    menu.add(new CorrectSpellingAction(document, suggestion, actualRange.start, actualRange.end));
+                }
+                menu.show(component, e.getX(), e.getY());
+            }
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private String convertMultipleWordsToCamelCase(String original) {
+        StringBuffer result = new StringBuffer(original);
+        for (int i = 0; i < result.length(); ++i) {
+            if (result.charAt(i) == ' ' && i < result.length() - 1) {
+                result.deleteCharAt(i);
+                result.setCharAt(i, Character.toUpperCase(result.charAt(i)));
+            }
+        }
+        return result.toString();
+    }
+    
+    private static class CorrectSpellingAction extends AbstractAction {
+        private Document document;
+        private String replacement;
+        private int startIndex;
+        private int endIndex;
+        
+        public CorrectSpellingAction(Document document, String replacement, int startIndex, int endIndex) {
+            super("Correct to '" + replacement + "'");
+            this.document = document;
+            this.replacement = replacement;
+            this.startIndex = startIndex;
+            this.endIndex = endIndex;
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            if (document != null) {
+                try {
+                    if (document instanceof AbstractDocument) {
+                        ((AbstractDocument) document).replace(startIndex, endIndex - startIndex, replacement, null);
+                    } else {
+                        document.remove(startIndex, endIndex - startIndex);
+                        document.insertString(startIndex, replacement, null);
+                    }
+                } catch (BadLocationException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
     
     public void setDocument(Document newDocument) {
