@@ -14,6 +14,8 @@ svnlook="/opt/subversion-1.1.0-rc2/bin/svnlook"
 
 # ------------------------------------------------------------------------
 
+require 'cgi'
+
 # Subversion's commit-email.pl suggests that svnlook might create files.
 Dir.chdir("/tmp")
 
@@ -49,7 +51,8 @@ changes.split('\n').each() {
     elsif line =~ /^\+/
         color = "blue"
     end
-    body << "<font color=\"#{color}\">#{line}</font>\n"
+
+    body << "<font color=\"#{color}\">#{CGI.escapeHTML(line)}</font>\n"
 }
 body << "</pre>"
 
