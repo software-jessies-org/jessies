@@ -154,7 +154,7 @@ public class ShellCommand {
             if (shell == null) {
                 shell = "/bin/sh";
             }
-            return new String[] { shell, /*"--login",*/ "-c", command };
+            return new String[] { shell, "--login", "-c", command };
         }
     }
     
