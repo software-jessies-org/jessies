@@ -8,16 +8,19 @@ KNOWN_JRE_LOCATIONS+=MRJ141Stubs.jar
 space=$(subst a,,a a)
 BOOT_CLASS_PATH=$(subst $(space),:,$(wildcard $(KNOWN_JRE_LOCATIONS)))
 
-edit: $(SOURCE_FILES)
-	@echo Recompiling the world...
-	@make clean; \
-	 mkdir classes; \
+.PHONY: build
+build: $(SOURCE_FILES)
+	@echo Recompiling the world... && \
+	 make clean && \
+	 mkdir -p classes && \
 	 jikes -bootclasspath $(BOOT_CLASS_PATH) -d classes/ -sourcepath src/ +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
 
+.PHONY: clean
 clean:
 	@$(RM) -rf classes
 
-dist: edit
+.PHONY: dist
+dist: build
 	rm edit.log; cd ..; \
 	tar cvf $(TAR_FILE_OF_THE_DAY) edit/; \
 	gzip $(TAR_FILE_OF_THE_DAY); \

@@ -9,6 +9,7 @@ public class ShellCommand {
     private String context;
     private String name;
     private String[] envp;
+    private Process process;
     
     /** The count of open streams. */
     private int openStreamCount = 0;
@@ -54,16 +55,17 @@ public class ShellCommand {
 
     public void runCommand() throws IOException {
         File directory = FileUtilities.fileFromString(context);
-        Process proc = Runtime.getRuntime().exec(makeCommandLine(command), envp, directory);
+        process = Runtime.getRuntime().exec(makeCommandLine(command), envp, directory);
 
-        startMonitoringStream(proc.getInputStream());
-        startMonitoringStream(proc.getErrorStream());
+        Edit.showStatus("Started task '" + command + "'");
+
+        startMonitoringStream(process.getInputStream());
+        startMonitoringStream(process.getErrorStream());
         
         workspace.getErrorsWindow().resetAutoScroll();
-        Edit.showStatus("Started task '" + command + "'");
         
 // this implements wily-style |cmd
-//        InputStream inStream = proc.getInputStream();
+//        InputStream inStream = process.getInputStream();
 //        BufferedReader in = new BufferedReader(new InputStreamReader(inStream));
 //        int count;
 //        char[] chars = new char[8192];
@@ -92,6 +94,15 @@ public class ShellCommand {
     public synchronized void streamClosed() {
         openStreamCount--;
         if (openStreamCount == 0) {
+            try {
+                int exitStatus = process.waitFor();
+                if (exitStatus != 0) {
+                    workspace.reportError(context, "Task '" + command + "' failed with exit status " + exitStatus);
+                }
+            } catch (InterruptedException ex) {
+                /* Ignore what we don't understand. */
+                ex = ex;
+            }
             workspace.getErrorsWindow().drawHorizontalRule();
             Edit.showStatus("Task '" + command + "' finished");
         }
