@@ -112,6 +112,7 @@ JAVA_FLAGS += $(addprefix -bootclasspath ,$(call makepath,$(BOOT_CLASS_PATH)))
 JAVA_FLAGS += $(addprefix -classpath ,$(call makepath,$(CLASS_PATH)))
 JAVA_FLAGS += -d classes/
 JAVA_FLAGS += -sourcepath src/
+JAVA_FLAGS += -deprecation
 
 JAVA_FLAGS.jikes += +D +P +Pall +Pno-serial +Pno-redundant-modifiers
 JAVA_FLAGS.javac += -Xlint -Xlint:-serial
