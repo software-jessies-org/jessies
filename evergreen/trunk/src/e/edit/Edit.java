@@ -127,30 +127,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         c.requestFocus();
     }
     
-    private static EDialog lastShownDialog;
-    
-    public static void hideDialog() {
-        if (lastShownDialog != null && lastShownDialog.isVisible()) {
-            lastShownDialog.setVisible(false);
-        }
-    }
-    
-    public static void showDialog(EDialog dialog) {
-        hideDialog();
-        
-        Point location = frame.getLocationOnScreen();
-        location.x += (frame.getWidth() - dialog.getWidth()) / 2;
-        location.y += (frame.getHeight() - dialog.getHeight()) / 2;
-        location.x = Math.max(0, location.x);
-        location.y = Math.max(0, location.y);
-        dialog.setLocation(location);
-        
-        dialog.setVisible(true);
-        lastShownDialog = dialog;
-        
-        dialog.toFront();
-    }
-    
     private static Workspace defaultWorkspace;
     
     /** Extensions that shouldn't be opened by Edit. */
@@ -201,11 +177,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         /* Special case for a URI. */
         if (FileUtilities.nameStartsWithOneOf(filename, FileUtilities.getArrayOfPathElements(Parameters.getParameter("url.prefixes", "")))) {
             Edit.showDocument(filename);
-            return null;
-        }
-        
-        if (filename.startsWith("telnet://")) {
-            getCurrentWorkspace().addViewer(new ETelnetWindow(filename.substring(9)));
             return null;
         }
         
@@ -761,7 +732,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         tabbedPane = new JTabbedPane(atSide ? JTabbedPane.LEFT : JTabbedPane.TOP);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                Edit.hideDialog();
                 Edit.getTagsPanel().ensureTagsAreHidden();
             }
         });
