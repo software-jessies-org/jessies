@@ -22,7 +22,6 @@ Unassigned TODOs:
 
 Phil's TODOs:
 ~~~~~~~~~~
-[5] Implement ESC[4h - insert mode (ESC[4l resets back to the usual replace mode).
 [3]	Cope with '\t'. Remember tab stops are settable. How do we copy tabs to the clipboard, rather than spaces? (xwsh -- alone among terminals I've known -- did the right thing.)
 
 

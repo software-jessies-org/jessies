@@ -34,16 +34,17 @@ public class SingleCharEscapeAction implements TelnetAction {
 			case '>':  // rxvt: unset private mode PrivMode_aplKP (keypad madness).
 				unsupported("unset private mode PrivMode_aplKP (keypad madness).");
 				break;
-			case 'D':  // Scroll display down.
-				listener.scrollDisplayDown();
+			case 'D':  // Move the cursor down one line, scrolling if it reaches the bottom of scroll region.  Effectively NL.
+				listener.processSpecialCharacter('\n');
 				break;
-			case 'E':  // rxvt: scr_add_lines containing '\n\r', 1, 2
-				unsupported("scr_add_lines containing '\\n\\r', 1, 2");
+			case 'E':  // Move cursor to start of next line, scrolling if required.  Effectively CR,NL
+				listener.processSpecialCharacter('\r');
+				listener.processSpecialCharacter('\n');
 				break;
-			case 'H':  // rxvt: scr_set_tab(1)
+			case 'H':  // rxvt: scr_set_tab(1)  Set a horizontal tab marker at the current cursor position.
 				unsupported("scr_set_tab(1)");
 				break;
-			case 'M':  // Scroll display up.
+			case 'M':  // Move cursor up one line, scrolling if it reaches the top of scroll region.  Opposite of NL.
 				listener.scrollDisplayUp();
 				break;
 			case 'Z':  // rxvt: Print ESCZ_ANSWER

@@ -19,6 +19,8 @@ public interface TelnetListener {
 	
 	public int getStyle();
 	
+	public void setInsertMode(boolean insertOn);
+	
 	/**
 	* Process the characters in the given line.  The string is composed of normally printable
 	* characters.
