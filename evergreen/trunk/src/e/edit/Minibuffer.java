@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.util.*;
 
 public class Minibuffer extends JPanel implements FocusListener {
     private MinibufferUser minibufferUser;

@@ -2,6 +2,7 @@ package e.edit;
 
 import java.awt.event.*;
 import javax.swing.text.*;
+import e.util.*;
 
 /**
 The ETextArea action to open a 'goto' dialog.
