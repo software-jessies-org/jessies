@@ -386,7 +386,7 @@ public class TerminatorMenuBar extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
-				terminal.doClearScrollbackAction();
+				terminal.getTextPane().getModel().clearScrollBuffer();
 			}
 		}
 	}
