@@ -1,0 +1,77 @@
+<html>
+<head>
+<title>Edit</title>
+</head>
+<body>
+
+<div align="center"><h1>Edit</h1></div>
+
+<h2>Why another editor?</h2>
+
+<p>You can be forgiven for wondering why anyone would write another editor.
+There are plenty out there. Surely one fits?
+
+<p>Edit started as a project to reimplement Rob Pike's
+<a href="http://plan9.bell-labs.com/sys/doc/acme/acme.html">acme</a>
+editor in Java, so I could use it on Unix and Windows. (I'd got used
+to it at university, using Plan 9.) Eventually, my editor diverged and
+today probably represents my personality quite closely; in particular,
+if the computer <i>can</i> do something, it <i>must</i>. I certainly
+shouldn't have to.
+
+<h2>What's so great about Edit?</h2>
+
+<h3>Ubiquitous regular expressions</h3>
+
+<p>Programmers know regular expressions. And yet their graphical tools
+don't use make much use of them. Edit does. Anywhere it's asking you to
+type something, it's probably expecting a regular expression: full Perl/Java
+regular expressions in find, in find/replace, in find in files (as you'd
+expect), but also in the open dialog.
+
+<h3>The best open dialog</h3>
+
+<p>Edit indexes your project, so you don't have to remember where files
+are. Or what case your co-worker used ("Hyperlink" or "HyperLink"?). Just
+a substring or regular expression that matches what you want. Edit updates
+a list of the matching files as you type (like iTunes):
+
+<div align="center"><img src="open-quickly.jpg"></div>
+
+<h3>The best find</h3>
+
+<p>You have a fast computer, yet the 'find' function in other editors is
+grindingly slow. Edit, like <tt>less(1)</tt>, highlights all the matches.
+Only Edit does it as you type, lets you move backwards as easily as
+forwards through the matches, and shows you next to the scroll bar just
+where the matches are:
+
+<div align="center"><img src="find.jpg"></div>
+
+<h3>The best find/replace</h3>
+
+<p>Find/replace functionality in other editors
+has a habit of being awkward in use. How much
+better to be able to see all the changes at once, with the results of the
+substitutions?
+
+<div align="center"><img src="find-replace.jpg"></div>
+
+<p>(An open question is whether we wouldn't be even more comfortable with
+something more like the output from <tt>diff&nbsp-u</tt>.)
+
+<h3>The best spelling checking</h3>
+
+<p>Not only does Edit check your spelling as you type, it understands
+CamelCase words aren't single-word spelling mistakes but compounds of
+correctly spelled words:
+
+<div align="center"><img src="spelling.jpg"></div>
+
+<h2>How do I install it?</h2>
+
+<p>Good question. The distribution is here (<a href="edit.tgz">edit.tgz</a>),
+but you'll also need a copy of the library to go with it (<a href="../salma-hayek/salma-hayek.tgz">salma-hayek.tgz</a>).
+
+</body>
+</html>
