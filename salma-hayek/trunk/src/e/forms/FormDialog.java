@@ -45,7 +45,6 @@ public class FormDialog extends JDialog {
     /** Shows a dialog with the usual OK and Cancel buttons plus an extra button you provide. */
     public static boolean show(Frame parent, String title, Container contentPane, JButton extraButton) {
         FormDialog formDialog = new FormDialog(parent, title, contentPane, extraButton);
-        new DialogFocusRedirector(contentPane).redirectFocus();
         formDialog.show();
         dialogGeometries.put(title, formDialog.getBounds());
         return formDialog.wasAccepted();
@@ -75,11 +74,17 @@ public class FormDialog extends JDialog {
         restorePreviousSize();
         
         initCloseBehavior();
+        initFocus(contentPane);
     }
     
     private void initCloseBehavior() {
         initWindowManagerCloseBehavior();
         initKeyboardCloseBehavior();
+    }
+
+    private void initFocus(Container contentPane) {
+        DialogFocusRedirector dialogFocusRedirector = new DialogFocusRedirector(contentPane);
+        dialogFocusRedirector.redirectFocus();
     }
     
     private void initWindowManagerCloseBehavior() {
