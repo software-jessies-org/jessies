@@ -68,6 +68,10 @@ public class TerminalControl implements Runnable {
 	public void start() {
 		(new Thread(this, "Terminal connection listener")).start();
 	}
+	
+	public void reset() {
+		graphicalCharacterSet = false;
+	}
 
 	private StringBuffer lineBuffer = new StringBuffer();
 

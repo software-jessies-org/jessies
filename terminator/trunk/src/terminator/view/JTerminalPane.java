@@ -37,7 +37,8 @@ public class JTerminalPane extends JPanel {
 		new TerminatorMenuBar.NextTerminalAction(),
 		new TerminatorMenuBar.PreviousTerminalAction(),
 		null,
-		new TerminatorMenuBar.ShowInfoAction()
+		new TerminatorMenuBar.ShowInfoAction(),
+		new TerminatorMenuBar.ResetAction()
 	};
 	
 	/**
@@ -198,6 +199,10 @@ public class JTerminalPane extends JPanel {
 	/** Starts the process listening once all the user interface stuff is set up. */
 	public void start() {
 		control.start();
+	}
+	
+	public void reset() {
+		control.reset();
 	}
 	
 	public LogWriter getLogWriter() {
