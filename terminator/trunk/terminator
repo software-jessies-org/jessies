@@ -1,4 +1,4 @@
 #!/bin/bash
 TERMINATOR_HOME=`dirname $0`
-CLASSES_DIR=$TERMINATOR_HOME/classes
-exec java -cp $CLASSES_DIR -Dpty.binary=$TERMINATOR_HOME/pty/pty-`uname`-`arch` terminatorn.Terminator "$@"
+CLASSPATH=$TERMINATOR_HOME/classes:$TERMINATOR_DIR/../salma-hayek/classes
+exec java -cp $CLASSPATH -Dpty.binary=$TERMINATOR_HOME/pty/pty-`uname`-`arch` terminatorn.Terminator "$@"
