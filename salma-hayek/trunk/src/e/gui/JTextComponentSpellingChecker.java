@@ -63,8 +63,6 @@ public class JTextComponentSpellingChecker implements DocumentListener {
             if (isMisspelledWordBetween(offset, offset, actualRange)) {
                 EPopupMenu menu = new EPopupMenu();
                 String misspelling = document.getText(actualRange.start, actualRange.end - actualRange.start);
-                menu.add(new AcceptSpellingAction(misspelling));
-                boolean firstSuggestion = true;
                 String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
                 for (int i = 0; i < suggestions.length; i++) {
                     String suggestion = suggestions[i];
@@ -73,17 +71,28 @@ public class JTextComponentSpellingChecker implements DocumentListener {
                     // hyphenated words or multiple words.
                     suggestion = suggestion.replace('-', '_');
                     suggestion = convertMultipleWordsToCamelCase(suggestion);
-                    if (firstSuggestion) {
-                        menu.addSeparator();
-                        firstSuggestion = false;
-                    }
                     menu.add(new CorrectSpellingAction(document, suggestion, actualRange.start, actualRange.end));
                 }
+                if (suggestions.length == 0) {
+                    menu.add(new NoSuggestionsAction());
+                }
+                menu.addSeparator();
+                menu.add(new AcceptSpellingAction(misspelling));
                 menu.show(component, e.getX(), e.getY());
                 e.consume();
             }
         } catch (BadLocationException ex) {
             ex.printStackTrace();
+        }
+    }
+    
+    public class NoSuggestionsAction extends AbstractAction {
+        public NoSuggestionsAction() {
+            super("(No suggestions)");
+            setEnabled(false);
+        }
+        
+        public void actionPerformed(ActionEvent e) {
         }
     }
     
