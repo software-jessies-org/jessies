@@ -3,7 +3,7 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-
+import e.gui.*;
 import e.util.*;
 
 /**
@@ -19,7 +19,7 @@ cause a whole can of Whoop Ass to be spilt in Edit's lap.</font>
 public class EColumn extends JSplitPane {
     private static final JPanel EMPTY_PANEL = new JPanel();
 
-    private DefaultComboBoxModel windows = new DefaultComboBoxModel();
+    private SortedComboBoxModel windows = new SortedComboBoxModel();
     private JPanel bottomPanel = new JPanel(new BorderLayout());
     private JComboBox comboBox = new JComboBox(windows);
     private JComponent lastWindow = null;
