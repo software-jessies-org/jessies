@@ -66,8 +66,6 @@ let us always show the user-friendly forms.
 [ ] fix the fact that you can slide windows off the bottom of the column,
     or behind the others at the bottom of a column.
 
-[ ] Metronome thread to output regular timestamps to the log.
-
 [ ] Store divider position on quit. Restore on start.
 
 [ ] make use of the 'help' key on Apple desktop keyboards.
