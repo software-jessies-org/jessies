@@ -178,6 +178,10 @@ build: $(SOURCE_FILES) build.subdirs
 clean:
 	@$(RM) -rf $(GENERATED_FILES)
 
+.PHONY: clobber
+clobber: clean
+	@$(foreach SUBDIR,$(SUBDIRS),$(MAKE) -C $(SUBDIR) clean;)
+
 .PHONY: dist
 dist: build
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM)); \
