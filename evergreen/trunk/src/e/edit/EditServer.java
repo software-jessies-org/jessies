@@ -7,7 +7,7 @@ import e.util.*;
 
 public final class EditServer extends InAppServer {
     public EditServer() {
-        super("Edit", 1948);
+        super("Edit", Edit.getPreferenceFilename("edit-server-port"));
     }
     
     public boolean handleCommand(String line, PrintWriter out) {
