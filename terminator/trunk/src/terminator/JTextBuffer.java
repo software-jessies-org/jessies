@@ -318,12 +318,15 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		int lastTextLine = (rect.y + rect.height + metrics.getHeight() - 1) / metrics.getHeight();
 		lastTextLine = Math.min(lastTextLine, model.getLineCount() - 1);
 		for (int i = firstTextLine; i <= lastTextLine; i++) {
+			boolean drawCaret = (displayCaret && i == caretPosition.getLineIndex());
 			StyledText[] lineText = getLineText(i);
 			int x = 0;
 			int baseline = metrics.getHeight() * (i + 1) - metrics.getMaxDescent();
 			for (int j = 0; j < lineText.length; j++) {
-				boolean drawCaret = (displayCaret && i == caretPosition.getLineIndex());
 				x += paintStyledText(graphics, lineText[j], x, baseline, drawCaret);
+			}
+			if (lineText.length == 0 && drawCaret) {
+				paintCaret(graphics, metrics);
 			}
 		}
 		if (ANTIALIAS) {
