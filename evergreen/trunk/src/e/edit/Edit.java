@@ -3,8 +3,16 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
+
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+import org.w3c.dom.*;
 
 import e.forms.*;
 import e.gui.*;
@@ -476,9 +484,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         SpellingChecker.dumpKnownBadWordsTo(System.out);
         FormDialog.writeGeometriesTo(getDialogGeometriesPreferenceFilename());
         
-        rememberOpenFiles();
-        rememberOpenWorkspaces();
-        rememberWindowSizeAndPosition();
+        writeSavedState();
     }
     
     /** Returns the full pathname for the given preference file. */
@@ -490,10 +496,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return getPreferenceFilename("dialog-geometries");
     }
     
-    public static String getWindowSizeAndPositionPreferenceFilename() {
-        return getPreferenceFilename("window-size-and-position");
-    }
-    
     public static String getOpenFileListPreferenceFilename() {
         return getPreferenceFilename("open-file-list");
     }
@@ -502,115 +504,51 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return getPreferenceFilename("open-workspace-list");
     }
     
-    public void rememberWindowSizeAndPosition() {
-        final String filename = getWindowSizeAndPositionPreferenceFilename();
-        Point position = frame.getLocation();
-        Dimension size = frame.getSize();
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(new FileWriter(filename));
-            out.println(position.x);
-            out.println(position.y);
-            out.println(size.width);
-            out.println(size.height);
-        } catch (IOException ex) {
-            Edit.showAlert("Edit", "Couldn't write window size and position " + filename);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
+    private int initialX = 0;
+    private int initialY = 0;
+    private int initialWidth = 800;
+    private int initialHeight = 730;
     
     public void initWindowPosition() {
-        final String filename = getWindowSizeAndPositionPreferenceFilename();
-        int x = 0;
-        int y = 0;
-        int width = 800;
-        int height = 730;
-        if (FileUtilities.exists(filename)) {
-            String[] lines = StringUtilities.readLinesFromFile(filename);
-            if (lines.length == 4) {
-                x = Integer.parseInt(lines[0]);
-                y = Integer.parseInt(lines[1]);
-                width = Integer.parseInt(lines[2]);
-                height = Integer.parseInt(lines[3]);
-            }
-        }
-        frame.setLocation(x, y);
-        frame.setSize(width, height);
+        frame.setLocation(initialX, initialY);
+        frame.setSize(initialWidth, initialHeight);
     }
     
-    /** Writes a file containing a list of the currently-open files to Edit's preferences directory. */
-    public void rememberOpenFiles() {
-        Log.warn("Remembering open files in preparation for quit.");
-        final String filename = getOpenFileListPreferenceFilename();
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(new FileWriter(filename));
-            Workspace[] workspaces = getWorkspaces();
-            for (int i = 0; i < workspaces.length; i++) {
-                workspaces[i].writeFilenamesTo(out);
-            }
-        } catch (IOException ex) {
-            Edit.showAlert("Edit", "Couldn't write list of open files to " + filename);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
+    private List initialFilenames;
     
     /** Opens all the files listed in the file we remembered them to last time we quit. */
     public void openRememberedFiles() {
         Edit.showStatus("Opening remembered files...");
-        final String filename = getOpenFileListPreferenceFilename();
-        if (FileUtilities.exists(filename) == false) {
-            Edit.showStatus("No list of files to open");
-            return; // It's not an error to not have any stored state.
-        }
-        String[] filenames = StringUtilities.readLinesFromFile(filename);
-        for (int i = 0; i < filenames.length; i++) {
-            Edit.openFile(filenames[i]);
-        }
-        Edit.showStatus((filenames.length == 0) ? "No files to open" : "Finished opening files");
-    }
-    
-    /** Writes a file containing a list of the currently-open workspaces to Edit's preferences directory. */
-    public void rememberOpenWorkspaces() {
-        Log.warn("Remembering open workspaces in preparation for quit.");
-        final String filename = getOpenWorkspaceListPreferenceFilename();
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(new FileWriter(filename));
-            Workspace[] workspaces = getWorkspaces();
-            for (int i = 0; i < workspaces.length; i++) {
-                workspaces[i].writeDetailsTo(out);
+        
+        // FIXME: remove this when everyone's upgraded.
+        if (initialFilenames == null) {
+            final String filename = getOpenFileListPreferenceFilename();
+            if (FileUtilities.exists(filename) == false) {
+                Edit.showStatus("No list of files to open");
+                return; // It's not an error to not have any stored state.
             }
-        } catch (IOException ex) {
-            Edit.showAlert("Edit", "Couldn't write list of open workspaces to " + filename);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            initialFilenames = Arrays.asList(StringUtilities.readLinesFromFile(filename));
         }
+        
+        for (int i = 0; i < initialFilenames.size(); i++) {
+            Edit.openFile((String) initialFilenames.get(i));
+        }
+        Edit.showStatus((initialFilenames.size() == 0) ? "No files to open" : "Finished opening files");
     }
     
     /** Opens all the workspaces listed in the file we remembered them to last time we quit. */
     public void openRememberedWorkspaces() {
         Log.warn("Opening remembered workspaces...");
+        if (initialWorkspaces != null) {
+            for (int i = 0; i < initialWorkspaces.size(); ++i) {
+                Element info = (Element) initialWorkspaces.get(i);
+                addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"));
+            }
+            return;
+        }
+        
+        // FIXME: remove this code when everyone's upgraded.
+        
         final String filename = getOpenWorkspaceListPreferenceFilename();
         if (FileUtilities.exists(filename) == false) {
             return; // It's not an error to not have any stored state.
@@ -624,21 +562,86 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         for (int i = 0; i < lines.length - 1; i += 2) {
             String name = lines[i];
             String root = lines[i + 1];
-            Log.warn("Opening workspace '" + name + "' with root '" + root + "'");
-            Workspace workspace = createWorkspace(name, root);
-            if (workspace == null) {
-                continue;
-            }
+            String buildTarget = "";
+            addWorkspace(name, root, buildTarget);
+        }
+    }
+    
+    private ArrayList initialWorkspaces;
 
-            File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
-            int which = tabbedPane.indexOfComponent(workspace);
-            if (rootDirectory.exists() == false) {
-                tabbedPane.setForegroundAt(which, Color.RED);
-                tabbedPane.setToolTipTextAt(which, root + " doesn't exist.");
-            } else if (rootDirectory.isDirectory() == false) {
-                tabbedPane.setForegroundAt(which, Color.RED);
-                tabbedPane.setToolTipTextAt(which, root + " isn't a directory.");
+    private void readSavedState() {
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = builder.parse(FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml")));
+            
+            Element root = document.getDocumentElement();
+            initialX = Integer.parseInt(root.getAttribute("x"));
+            initialY = Integer.parseInt(root.getAttribute("y"));
+            initialWidth = Integer.parseInt(root.getAttribute("width"));
+            initialHeight = Integer.parseInt(root.getAttribute("height"));
+            
+            initialWorkspaces = new ArrayList();
+            initialFilenames = new ArrayList();
+            for (Node workspace = root.getFirstChild(); workspace != null; workspace = workspace.getNextSibling()) {
+                if (workspace instanceof Element) {
+                    initialWorkspaces.add(workspace);
+                    for (Node file = workspace.getFirstChild(); file != null; file = file.getNextSibling()) {
+                        if (file instanceof Element) {
+                            initialFilenames.add(((Element) file).getAttribute("name"));
+                        }
+                    }
+                }
             }
+        } catch (Exception ex) {
+            Log.warn("Problem reading saved state", ex);
+        }
+    }
+    
+    private void writeSavedState() {
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = builder.newDocument();
+            
+            Element root = document.createElement("edit");
+            document.appendChild(root);
+            
+            Point position = frame.getLocation();
+            root.setAttribute("x", Integer.toString((int) position.getX()));
+            root.setAttribute("y", Integer.toString((int) position.getY()));
+            Dimension size = frame.getSize();
+            root.setAttribute("width", Integer.toString((int) size.getWidth()));
+            root.setAttribute("height", Integer.toString((int) size.getHeight()));
+            
+            Workspace[] workspaceList = getWorkspaces();
+            for (int i = 0; i < workspaceList.length; ++i) {
+                workspaceList[i].serializeAsXml(document, root);
+            }
+            
+            String filename = getPreferenceFilename("saved-state.xml");
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(new DOMSource(document), new StreamResult(new FileOutputStream(filename)));
+        } catch (Exception ex) {
+            Log.warn("Problem writing saved state", ex);
+        }
+    }
+    
+    public void addWorkspace(String name, String root, String buildTarget) {
+        Log.warn("Opening workspace '" + name + "' with root '" + root + "'");
+        Workspace workspace = createWorkspace(name, root);
+        if (workspace == null) {
+            return;
+        }
+        
+        workspace.setBuildTarget(buildTarget);
+        File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
+        int which = tabbedPane.indexOfComponent(workspace);
+        if (rootDirectory.exists() == false) {
+            tabbedPane.setForegroundAt(which, Color.RED);
+            tabbedPane.setToolTipTextAt(which, root + " doesn't exist.");
+        } else if (rootDirectory.isDirectory() == false) {
+            tabbedPane.setForegroundAt(which, Color.RED);
+            tabbedPane.setToolTipTextAt(which, root + " isn't a directory.");
         }
     }
     
@@ -743,6 +746,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         frame.setJMenuBar(menuBar);
         menuBar.populate();
         
+        readSavedState();
         initWindow();
         initTagsPanel();
         initAdvisor();
@@ -776,7 +780,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         openRememberedFiles();
         
         initializing = false;
-
+        
         frame.setVisible(true);
         splitPane.setDividerLocation(0.8);
         splitPane.setResizeWeight(0.8);

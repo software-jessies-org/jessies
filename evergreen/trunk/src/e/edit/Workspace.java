@@ -16,6 +16,8 @@ public class Workspace extends JPanel {
 
     private String title;
     private String rootDirectory;
+    private String buildTarget;
+    
     private OpenQuicklyDialog openQuicklyDialog;
     private EFileOpenDialog openDialog;
     private FileDialog saveAsDialog;
@@ -152,20 +154,6 @@ public class Workspace extends JPanel {
             }
         }
         return (ETextWindow[]) dirtyTextWindows.toArray(new ETextWindow[dirtyTextWindows.size()]);
-    }
-    
-    /** Write the names of the currently open files to the given PrintWriter, one per line. */
-    public void writeFilenamesTo(PrintWriter out) {
-        ETextWindow[] textWindows = leftColumn.getTextWindows();
-        for (int i = 0; i < textWindows.length; i++) {
-            ETextWindow textWindow = textWindows[i];
-            out.println(textWindow.getFilename() + textWindow.getAddress());
-        }
-    }
-    
-    public void writeDetailsTo(PrintWriter out) {
-        out.println(getTitle());
-        out.println(getRootDirectory());
     }
     
     public EWindow findWindowByName(String name) {
@@ -377,10 +365,10 @@ public class Workspace extends JPanel {
      */
     public void showFindFilesDialog(String pattern, String filenamePattern) {
         FindFilesDialog findFilesDialog = new FindFilesDialog(this);
-        if (pattern.length() > 0) {
+        if (pattern != null && pattern.length() > 0) {
             findFilesDialog.setPattern(pattern);
         }
-        if (filenamePattern.length() > 0) {
+        if (filenamePattern != null && filenamePattern.length() > 0) {
             findFilesDialog.setFilenamePattern(filenamePattern);
         }
         findFilesDialog.showDialog();
@@ -457,6 +445,29 @@ public class Workspace extends JPanel {
                     rememberedTextWindow.requestFocus();
                 }
             });
+        }
+    }
+    
+    public String getBuildTarget() {
+        return buildTarget;
+    }
+    
+    public void setBuildTarget(String buildTarget) {
+        this.buildTarget = buildTarget;
+    }
+    
+    public void serializeAsXml(org.w3c.dom.Document document, org.w3c.dom.Element workspaces) {
+        org.w3c.dom.Element workspace = document.createElement("workspace");
+        workspaces.appendChild(workspace);
+        workspace.setAttribute("name", getTitle());
+        workspace.setAttribute("root", getRootDirectory());
+        workspace.setAttribute("buildTarget", getBuildTarget());
+        ETextWindow[] textWindows = leftColumn.getTextWindows();
+        for (int i = 0; i < textWindows.length; ++i) {
+            ETextWindow textWindow = textWindows[i];
+            org.w3c.dom.Element file = document.createElement("file");
+            workspace.appendChild(file);
+            file.setAttribute("name", textWindow.getFilename() + textWindow.getAddress());
         }
     }
 }
