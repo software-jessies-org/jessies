@@ -22,7 +22,9 @@ end
 require 'cgi'
 require 'pathname'
 
-$: << "#{Pathname.new(__FILE__).realpath.dirname}"
+# __FILE__ may be relative to the current directory which we're about to change.
+script_path=Pathname.new(__FILE__).realpath.dirname
+$: << script_path
 
 require 'escaping.rb'
 
@@ -93,7 +95,7 @@ end
 fd.close
 
 # Keep the post-commit trigger up-to-date.
-Dir.chdir("#{Pathname.new(__FILE__).realpath.dirname}")
+Dir.chdir(script_path)
 system("svn update")
 
 # We're done.
