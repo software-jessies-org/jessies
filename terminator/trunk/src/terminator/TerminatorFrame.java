@@ -161,34 +161,21 @@ public class TerminatorFrame extends JFrame {
 		}
 	}
 	
-	private final KeyHandler keyHandler = new KeyHandler();
+	public void switchToNextTab() {
+		if (tabbedPane != null) {
+			setSelectedTab(tabbedPane.getSelectedIndex() + 1);
+		}
+	}
 	
-	private class KeyHandler implements KeyListener {
-		public void keyPressed(KeyEvent event) {
-			if (event.isAltDown()) {
-				switch (event.getKeyCode()) {
-					case KeyEvent.VK_RIGHT:
-						if (tabbedPane != null) {
-							setSelectedTab(tabbedPane.getSelectedIndex() + 1);
-							event.consume();
-						}
-						break;
-					case KeyEvent.VK_LEFT:
-						if (tabbedPane != null) {
-							setSelectedTab(tabbedPane.getSelectedIndex() - 1);
-							event.consume();
-						}
-						break;
-				}
-			}
+	public void switchToPreviousTab() {
+		if (tabbedPane != null) {
+			setSelectedTab(tabbedPane.getSelectedIndex() - 1);
 		}
-		public void keyReleased(KeyEvent event) { }
-		public void keyTyped(KeyEvent event) { }
-		
-		private void setSelectedTab(int index) {
-			int tabCount = tabbedPane.getTabCount();
-			tabbedPane.setSelectedIndex((index + tabCount) % tabCount);
-		}
+	}
+	
+	private void setSelectedTab(int index) {
+		int tabCount = tabbedPane.getTabCount();
+		tabbedPane.setSelectedIndex((index + tabCount) % tabCount);
 	}
 
 	/**
@@ -272,7 +259,5 @@ public class TerminatorFrame extends JFrame {
 	private void addPaneToUI(JTerminalPane newPane) {
 		initTabbedPane();
 		tabbedPane.add(newPane.getName(), newPane);
-		newPane.getTextPane().removeKeyListener(keyHandler);
-		newPane.getTextPane().addKeyListener(keyHandler);
 	}
 }
