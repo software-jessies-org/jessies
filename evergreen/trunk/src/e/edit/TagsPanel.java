@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import e.gui.*;
@@ -12,6 +13,7 @@ import e.util.*;
 
 public class TagsPanel extends JPanel {
     private ETextWindow textWindow;
+    private int lastLineCount;
 
     private JProgressBar progressBar = new JProgressBar();
     private JPanel progressPanel;
@@ -22,6 +24,18 @@ public class TagsPanel extends JPanel {
 
     private ETree tree;
     private Hashtable branches;
+    
+    private final DocumentListener documentListener = new DocumentListener() {
+        public void changedUpdate(DocumentEvent e) {
+            // We don't care about style changes.
+        }
+        public void insertUpdate(DocumentEvent e) {
+            updateTags();
+        }
+        public void removeUpdate(DocumentEvent e) {
+            updateTags();
+        }
+    };
     
     public TagsPanel() {
         setLayout(new BorderLayout());
@@ -168,7 +182,22 @@ public class TagsPanel extends JPanel {
             return;
         }
         
+        if (textWindow != null) {
+            textWindow.getText().getDocument().removeDocumentListener(documentListener);
+        }
+        
         this.textWindow = newTextWindow;
+        this.lastLineCount = -1;
+        textWindow.getText().getDocument().addDocumentListener(documentListener);
+        updateTags();
+    }
+    
+    private void updateTags() {
+        final int newLineCount = textWindow.getText().getLineCount();
+        if (lastLineCount == newLineCount) {
+            return;
+        }
+        lastLineCount = newLineCount;
         new TagsScanner().doScan();
     }
     
