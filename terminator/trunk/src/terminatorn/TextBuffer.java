@@ -27,8 +27,6 @@ public class TextBuffer implements TelnetListener {
 	private ArrayList tabPositions = new ArrayList();
 	private int maxLineWidth = width;
 	
-	private boolean wrapping = false;
-	
 	// Used for reducing the number of lines changed events sent up to the view.
 	private int firstLineChanged;
 	
@@ -43,14 +41,6 @@ public class TextBuffer implements TelnetListener {
 		this.view = view;
 		setSize(width, height);
 		caretPosition = view.getCaretPosition();
-	}
-	
-	public boolean isWrapping() {
-		return wrapping;
-	}
-	
-	public void setIsWrapping(boolean wrapping) {
-		this.wrapping = wrapping;
 	}
 	
 	public void updateMaxLineWidth(int aLineWidth) {
@@ -100,38 +90,6 @@ public class TextBuffer implements TelnetListener {
 		setSize(sizeInChars.width, sizeInChars.height);
 		caretPosition = getLocationWithinBounds(caretPosition);
 		savedPosition = getLocationWithinBounds(savedPosition);
-		if (isWrapping()) {
-			doWrappingUpdate();
-		}
-	}
-	
-	private void doWrappingUpdate() {
-		int caretCharIndex = getCharIndexFromLocation(caretPosition);
-		ArrayList newLines = new ArrayList();
-		TextLine currentLine = null;
-		for (int i = 0; i < textLines.size(); i++) {
-			if (currentLine == null) {
-				currentLine = (TextLine) textLines.get(i);
-			} else {
-				currentLine.append((TextLine) textLines.get(i));
-			}
-			while (currentLine.length() > width) {
-				TextLine after = currentLine.splitAt(width);
-				newLines.add(currentLine);
-				currentLine = after;
-			}
-			if (currentLine.hasNewline() || (i == textLines.size() - 1)) {
-				newLines.add(currentLine);
-				currentLine = null;
-			}
-		}
-		textLines = newLines;
-		caretPosition = getLocationFromCharIndex(caretCharIndex);
-		
-		// Send a size change even if it hasn't, because it also causes a complete redraw
-		// and higlight recalculation.
-		view.setCaretPosition(caretPosition);
-		view.sizeChanged();
 	}
 	
 	private Location getLocationWithinBounds(Location location) {
@@ -426,13 +384,7 @@ public class TextBuffer implements TelnetListener {
 	private void textAdded(int length) {
 		TextLine textLine = get(caretPosition.getLineIndex());
 		int currentLine = caretPosition.getLineIndex();
-		if (isWrapping()) {
-			while (textLine.length() > width) {
-				insertLine(currentLine + 1, textLine.splitAt(width));
-			}
-		} else {
-			updateMaxLineWidth(textLine.length());
-		}
+		updateMaxLineWidth(textLine.length());
 		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition's line still has a valid *start* index.
 		linesChangedFrom(caretPosition.getLineIndex());
 		moveCursorHorizontally(length);
@@ -618,7 +570,7 @@ public class TextBuffer implements TelnetListener {
 			int charsLeft = end - start;
 			while (charsLeft > 0) {
 				TextLine line = get(loc.getLineIndex());
-				String str = line.hasNewline() ? line.getText() + '\n' : line.getText();
+				String str = line.getText() + '\n';
 				str = str.substring(loc.getCharOffset());
 				if (charsLeft < str.length()) {
 					str = str.substring(0, charsLeft);

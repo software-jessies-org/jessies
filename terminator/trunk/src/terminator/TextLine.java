@@ -22,7 +22,6 @@ public class TextLine {
 	private int lineStartIndex;
 	private String text;
 	private byte[] styles;
-	private boolean hasNewline = true;
 	
 	private static final char TAB_START = '\t';
 	private static final char TAB_CONTINUE = '\r';
@@ -36,48 +35,12 @@ public class TextLine {
 		this.styles = styles;
 	}
 	
-	public boolean hasNewline() {
-		return hasNewline;
-	}
-	
 	public int getLineStartIndex() {
 		return lineStartIndex;
 	}
 	
 	public void setLineStartIndex(int lineStartIndex) {
 		this.lineStartIndex = lineStartIndex;
-	}
-	
-	public void prepend(TextLine other) {
-		text = other.text + text;
-		byte[] newStyles = new byte[other.styles.length + styles.length];
-		System.arraycopy(other.styles, 0, newStyles, 0, other.styles.length);
-		System.arraycopy(styles, 0, newStyles, other.styles.length, styles.length);
-		this.styles = newStyles;
-	}
-	
-	public void append(TextLine other) {
-		text += other.text;
-		byte[] newStyles = new byte[styles.length + other.styles.length];
-		System.arraycopy(styles, 0, newStyles, 0, styles.length);
-		System.arraycopy(other.styles, 0, newStyles, styles.length, other.styles.length);
-		this.styles = newStyles;
-		hasNewline = other.hasNewline;
-	}
-	
-	public TextLine splitAt(int index) {
-		String otherText = text.substring(index);
-		text = text.substring(0, index);
-		byte[] otherStyles = new byte[styles.length - index];
-		System.arraycopy(styles, index, otherStyles, 0, otherStyles.length);
-		byte[] thisStyles = new byte[index];
-		System.arraycopy(styles, 0, thisStyles, 0, index);
-		this.styles = thisStyles;
-		TextLine result = new TextLine(otherText, otherStyles);
-		result.setLineStartIndex(getLineStartIndex() + index);
-		result.hasNewline = hasNewline;
-		hasNewline = false;
-		return result;
 	}
 	
 	public StyledText[] getStyledTextSegments() {
@@ -119,7 +82,7 @@ public class TextLine {
 	}
 	
 	public int lengthIncludingNewline() {
-		return hasNewline ? text.length() + 1 : text.length();
+		return length() + 1;
 	}
 	
 	/**
