@@ -123,6 +123,14 @@ public class StringUtilities {
         final String REGEXP_META_CHARACTERS = "|[().\\^$?+*{";
         for (int i = 0; i < literal.length(); i++) {
             char c = literal.charAt(i);
+            if (c == '\n') {
+                result.append("\\n");
+                continue;
+            }
+            if (c == '\t') {
+                result.append("\\t");
+                continue;
+            }
             if (REGEXP_META_CHARACTERS.indexOf(c) != -1) {
                 result.append('\\');
             }
