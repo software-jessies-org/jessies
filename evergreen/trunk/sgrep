@@ -1,29 +1,39 @@
 #!/bin/bash
 
-my_dir=`dirname $0`
+variant=`basename $0 | cut -c1`
 
-usageText="Usage: `basename $0` [--help] [<grep options>] [--] [start-dir] <search-term>"
+usageText="Usage: ${variant}grep [--help] [<grep options>] [--] <search-term> <start-dir>*"
 showHelp() {
     echo $usageText
     exit 0
 }
 
-grepOptions="-n -H"
+grepOptions=""
+nonOptions=()
+
 while [ $# -gt 0 ]; do
     case "$1" in
     --help) shift ; showHelp ;;
     --)     shift ; break ;;
     -*)     grepOptions=$grepOptions" "$1 ; shift ;;
-    *)      break ;;
+    *)      nonOptions[${#nonOptions[@]}]="$1" ; shift ;;
     esac
 done
+for i in "$@"
+do
+    nonOptions[${#nonOptions[@]}]="$i"
+done
 
-if [ $# -eq 2 ]; then 
-    startDirectory=${1:-"."}
-    shift
-fi
-if [ $# -ne 1 ]; then
+if [ ${#nonOptions[@]} -lt 1 ]; then
     showHelp
 fi
-searchTerm=$1
-$my_dir/sfind $startDirectory | sed -e 's/\(.*\)/"\1"/' | xargs grep $grepOptions -e "$searchTerm"
+
+searchTermSubscript=0
+searchTerm=${nonOptions[$searchTermSubscript]}
+unset nonOptions[$searchTermSubscript]
+
+# If we have LANG set, grep takes a lot longer to start. And we're about to run it a lot of times.
+unset LANG
+
+grep=`type -p grep`
+${variant}find "${nonOptions[@]}" | xargs $grep -nH $grepOptions "$searchTerm"
