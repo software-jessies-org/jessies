@@ -34,6 +34,7 @@ public class ETextArea extends JTextArea {
         setDragEnabled(false);
         setLineWrap(true);
         setMargin(new Insets(4, 4, 4, 1));
+        getDocument().addDocumentListener(new UnmatchedBracketHighlighter(this));
         getCaret().addChangeListener(new MatchingBracketHighlighter(this));
         getKeymap().setDefaultAction(new DefaultKeyAction());
     }
