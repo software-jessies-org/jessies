@@ -124,6 +124,8 @@ public class TagReader {
             tag = new JavaTag(identifier, lineNumber, type, context, containingClass);
         } else if (fileType == ETextWindow.C_PLUS_PLUS) {
             tag = new CTag(identifier, lineNumber, type, context, containingClass);
+        } else if (fileType == ETextWindow.PERL) {
+            tag = new PerlTag(identifier, lineNumber, type, context, containingClass);
         } else if (fileType == ETextWindow.RUBY) {
             tag = new RubyTag(identifier, lineNumber, type, context, containingClass);
         } else {
@@ -142,13 +144,14 @@ public class TagReader {
         public static final String CLASS = "class";
         public static final String CONSTRUCTOR = "constructor";
         public static final String DESTRUCTOR = "destructor";
-        public static final String INTERFACE = "interface";
-        public static final String FIELD = "field";
-        public static final String METHOD = "method";
-        public static final String MACRO = "macro";
-        public static final String MODULE = "module";
-        public static final String ENUMERATOR = "enumerator";
         public static final String ENUM = "enum";
+        public static final String ENUMERATOR = "enumerator";
+        public static final String EXTERN = "extern";
+        public static final String FIELD = "field";
+        public static final String INTERFACE = "interface";
+        public static final String MACRO = "macro";
+        public static final String METHOD = "method";
+        public static final String MODULE = "module";
         public static final String NAMESPACE = "namespace";
         public static final String PACKAGE = "package";
         public static final String PROTOTYPE = "prototype";
@@ -156,20 +159,19 @@ public class TagReader {
         public static final String TYPEDEF = "typedef";
         public static final String UNION = "union";
         public static final String VARIABLE = "variable";
-        public static final String EXTERN = "extern";
         
         private static final Map TYPES = new HashMap();
         static {
             TYPES.put("c", CLASS);
             TYPES.put("C", CONSTRUCTOR);
+            TYPES.put("d", MACRO);
             TYPES.put("D", DESTRUCTOR);
-            TYPES.put("i", INTERFACE);
+            TYPES.put("e", ENUMERATOR);
             TYPES.put("f", FIELD);
+            TYPES.put("g", ENUM);
+            TYPES.put("i", INTERFACE);
             TYPES.put("m", METHOD);
             TYPES.put("M", MODULE);
-            TYPES.put("d", MACRO);
-            TYPES.put("e", ENUMERATOR);
-            TYPES.put("g", ENUM);
             TYPES.put("n", NAMESPACE);
             TYPES.put("p", PACKAGE);
             TYPES.put("P", PROTOTYPE);
@@ -319,6 +321,19 @@ public class TagReader {
         private static char fixType(char type) {
             switch (type) {
                 case 'm': return 'M'; // Module, not method.
+                default: return type;
+            }
+        }
+    }
+    
+    public static class PerlTag extends Tag {
+        public PerlTag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
+            super(identifier, lineNumber, fixType(tagType), context, containingClass);
+        }
+        
+        private static char fixType(char type) {
+            switch (type) {
+                case 's': return 'm'; // Method (subroutine), not struct.
                 default: return type;
             }
         }
