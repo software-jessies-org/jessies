@@ -39,7 +39,7 @@ public class FileUtilities {
             if (matcher.find()) {
                 String user = matcher.group(1);
                 File home = fileFromString(System.getProperty("user.home"));
-                File otherHome = fileFromParentAndString(home.getParent().toString(), user);
+                File otherHome = fileFromParentAndString(home.getParent(), user);
                 if (otherHome.exists() && otherHome.isDirectory()) {
                     result = otherHome.toString() + matcher.group(2);
                 }
