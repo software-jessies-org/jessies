@@ -2,10 +2,9 @@ package e.gui;
 
 import java.awt.*;
 import javax.swing.*;
+import e.util.*;
 
 public class EListCellRenderer extends DefaultListCellRenderer {
-    private static final Color ALTERNATE_ROW_COLOR = new Color(0.92f, 0.95f, 0.99f);
-
     private boolean alternateLineColor;
 
     public EListCellRenderer(boolean alternateLineColor) {
@@ -27,7 +26,7 @@ public class EListCellRenderer extends DefaultListCellRenderer {
         
         // Optionally use the line-printer paper trick of alternating row color.
         if (alternateLineColor && !isSelected && index % 2 == 0) {
-            setBackground(ALTERNATE_ROW_COLOR);
+            setBackground(GuiUtilities.ALTERNATE_ROW_COLOR);
         }
 
         return this;

@@ -1,9 +1,15 @@
 package e.util;
 
+import java.awt.*;
 import javax.swing.*;
 
 public class GuiUtilities {
     private GuiUtilities() { /* Not instantiable. */ }
+
+    /**
+     * The background color for alternate rows in lists and tables.
+     */
+    public static final Color ALTERNATE_ROW_COLOR = new Color(0.92f, 0.95f, 0.99f);
     
     /**
      * Tests whether we're running on Mac OS. The Mac is quite
