@@ -159,6 +159,23 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         }
     }
     
+    public void updateWatermark() {
+        ArrayList items = new ArrayList();
+        if (file.canWrite() == false) {
+            items.add("(read-only)");
+        }
+        if (isOutOfDateWithRespectToDisk()) {
+            items.add("(out-of-date)");
+        }
+        if (items.size() > 0) {
+            String watermarkString = StringUtilities.join(items, " ");
+            watermarkViewPort.setWatermark(watermarkString);
+            text.setOpaque(false);
+        } else {
+            text.setOpaque(true);            
+        }
+    }
+    
     /**
      * Invoked during construction. Override this if you don't want to read from a file with
      * the same name as the window's title.
@@ -182,12 +199,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
                 text.setIndenter(new JavaIndenter());
             }
             initKeywordsForDocument();
-            
-            if (file.canWrite() == false) {
-                watermarkViewPort.setWatermark("(read-only)");
-                text.setOpaque(false);
-            }
-            
+            updateWatermark();
             text.setText(content);
             text.setAppropriateFont();
             text.getIndenter().setIndentationPropertyBasedOnContent(text, content);
