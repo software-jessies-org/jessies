@@ -79,7 +79,7 @@ public class FindAndReplaceAction extends ETextAction {
         // ...and tie the lists' selections together.
         ListSelectionModel selectionModel = matchList.getSelectionModel();
         replacementsList.setSelectionModel(selectionModel);
-        
+
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Find:", patternField);
         formPanel.addRow("Replace With:", replacementField);
@@ -106,14 +106,6 @@ public class FindAndReplaceAction extends ETextAction {
         textWindow = null;
         text = null;
     }
-    
-    private String getReplacementScope() {
-        if (isSelectionMeantAsScope()) {
-            return text.getSelectedText();
-        } else {
-            return text.getText();
-        }
-    }
 
     public boolean doReplacementsInText() {
         // Introduce a CompoundEdit to the UndoManager so that all our replacements are treated as a single UndoableEdit.
@@ -121,15 +113,16 @@ public class FindAndReplaceAction extends ETextAction {
         UndoManager undoManager = text.getUndoManager();
         undoManager.addEdit(entireEdit);
         try {
-            String newText = makeReplacedText(getReplacementScope());
             if (isSelectionMeantAsScope()) {
                 // There's a selection, so only replace in that.
                 int selectionStart = text.getSelectionStart();
+                String newText = makeReplacedText(text.getSelectedText());
                 text.replaceSelection(newText);
                 text.select(selectionStart, selectionStart + newText.length());
             } else {
+                // There's no selection, so do the whole text.
                 int caretPosition = text.getCaretPosition();
-                text.setText(newText);
+                text.setText(makeReplacedText(text.getText()));
                 text.setCaretPosition(caretPosition);
             }
             return true;
@@ -276,7 +269,7 @@ public class FindAndReplaceAction extends ETextAction {
 
             try {
                 Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-                String[] lines = getReplacementScope().split("\n");
+                String[] lines = text.getText().split("\n");
                 int matchCount = 0;
                 for (int i = 0; i < lines.length; ++i) {
                     String line = lines[i];
