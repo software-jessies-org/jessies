@@ -23,7 +23,7 @@ public class StringUtilities {
         }
     }
     
-    /** Reads the entire contents of the named file into a string. Throws a RuntimeException on failure. */
+    /** Reads the entire contents of the named file into a String. Throws a RuntimeException on failure. */
     public static String readFile(String filename) {
         StringBuffer result = new StringBuffer();
         String[] lines = readLinesFromFile(filename);
@@ -32,6 +32,11 @@ public class StringUtilities {
             result.append('\n');
         }
         return result.toString();
+    }
+    
+    /** Reads the entire contents of the given File into a String. Throws a RuntimeException on failure. */
+    public static String readFile(File file) {
+        return readFile(file.toString());
     }
     
     /** Writes the given String to the given File. Returns the text of the exception message on failure, null on success. */
