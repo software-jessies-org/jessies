@@ -25,6 +25,7 @@ endl
 npos
 ostream
 ostringstream
+setfill
 setw
 sstream
 substr
@@ -150,3 +151,7 @@ stdin
 stdout
 # Standard types from table 97 of ISO+IEC+14882-1998.
 ptrdiff
+# Standard headers
+iomanip
+iostream
+
