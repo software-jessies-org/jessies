@@ -29,7 +29,7 @@ public class InsertNewlineAction extends TextAction {
             String line = target.getLineTextAtOffset(position);
             if (target.getIndenter().isElectric('}') && line.endsWith("{")) {
                 insertMatchingBrace(target);
-            } else if (line.endsWith("/**")) {
+            } else if (line.endsWith("/*") || line.endsWith("/**")) {
                 insertMatchingCloseComment(target);
             } else {
                 target.replaceSelection("\n");
