@@ -216,17 +216,20 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		// corresponds to where the cursor is. This is probably a
 		// mistake that should be fixed.
 		
-		// Another problem is that we may not want to scroll back as
-		// the user moves the cursor back; we should definitely ensure
-		// that the cursor is visible, but if it *is* already visible,
-		// we perhaps shouldn't touch the horizontal scroll bar?
-		
 		// [To reproduce the problem underlying this code, simply
 		// "cat > /dev/null" and then type more characters than fit
 		// on a line.]
 		
 		int xOffset = (getCaretPosition().getCharOffset() + 1) * getCharUnitSize().width;
 		BoundedRangeModel horizontalModel = pane.getHorizontalScrollBar().getModel();
+		
+		if (xOffset >= horizontalModel.getValue() && xOffset <= (horizontalModel.getValue() + horizontalModel.getExtent())) {
+			// We don't want to scroll back as the user moves the
+			// cursor back; we should just ensure that the cursor
+			// is visible, and do nothing if it is already visible.
+			return;
+		}
+		
 		horizontalModel.setValue(xOffset - horizontalModel.getExtent());
 	}
 	
