@@ -69,7 +69,6 @@ public class FormDialog extends JDialog {
         
         // Set sensible defaults for size and location.
         pack();
-        limitSize();
         setLocationRelativeTo(parent);
         
         // But if we've shown this dialog before, put it back where it last was.
@@ -104,27 +103,21 @@ public class FormDialog extends JDialog {
     }
     
     /**
-     * Arbitrarily limits the initial size of the dialog to be no
-     * more than three quarters of the height of the screen and
-     * two thirds of the width.
-     *
-     * No attempt is made to achieve a pleasing aspect ratio.
+     * Restores the size and location stored in the dialog geometries
+     * configuration. This is invoked just after we've invoked pack, so we
+     * refuse to allow the configuration to make us any smaller. (When JButton
+     * grew vertically between 1.4.2 and 1.5.0, I spent some time wondering why
+     * the LayoutManager was allowing my JButton to be clipped. It wasn't; this
+     * code was forcing the clipping to occur. Hence the restriction now.)
      */
-    public void limitSize() {
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Dimension screenSize = toolkit.getScreenSize();
-        Dimension size = getSize();
-        // FIXME: aim for a golden rectangle.
-        size.height = Math.min(size.height, (3 * screenSize.height) / 4);
-        size.width = Math.min(size.width, (2 * screenSize.width) / 3);
-        //setSize(size);
-    }
-    
     public void restorePreviousSize() {
         Rectangle previousBounds = (Rectangle) dialogGeometries.get(getTitle());
         if (previousBounds != null) {
             setLocation(previousBounds.getLocation());
-            setSize(previousBounds.getSize());
+            Dimension newSize = previousBounds.getSize();
+            newSize.height = Math.max(newSize.height, getHeight());
+            newSize.width = Math.max(newSize.width, getWidth());
+            setSize(newSize);
         }
     }
     
