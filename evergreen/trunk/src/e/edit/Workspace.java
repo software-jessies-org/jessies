@@ -324,11 +324,12 @@ public class Workspace extends JPanel {
         }
         for (int i = 0; i < files.length; i++) {
             File file = files[i];
+            if (FileUtilities.isIgnored(file)) {
+                continue;
+            }
             String filename = FileUtilities.getUserFriendlyName(file);
             if (file.isDirectory()) {
-               if (FileUtilities.isIgnoredDirectory(file) == false) {
-                   scanDirectory(filename, ignoredExtensions, result);
-               }
+                scanDirectory(filename, ignoredExtensions, result);
             } else {
                 if (FileUtilities.nameEndsWithOneOf(filename, ignoredExtensions) == false && FileUtilities.isSymbolicLink(file) == false) {
                     // getRootDirectory() includes a trailing directory separator.
