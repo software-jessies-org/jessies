@@ -21,7 +21,9 @@ low-level telnet protocol (RFC 854).
 // once all the work in that parcel is done.  This should help make us fast like we should be.
 
 public class TelnetControl implements Runnable {
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
+	private static final boolean DEBUG_STEP_MODE = false;
+	private static BufferedReader stepModeReader;
 
 	private TelnetListener listener;
 	private InputStream in;
@@ -49,6 +51,19 @@ public class TelnetControl implements Runnable {
 		}
 	});
 	private boolean readingOSC = false;
+	
+	public static void doStep() {
+		if (DEBUG_STEP_MODE) {
+			try {
+				if (stepModeReader == null) {
+					stepModeReader = new BufferedReader(new InputStreamReader(System.in));
+				}
+				stepModeReader.readLine();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
 	
 	public void processChar(final char ch) {
 		if (readingOSC) {
@@ -83,8 +98,18 @@ public class TelnetControl implements Runnable {
 			}
 		} else if (ch == '\n' || ch == '\r' || ch == KeyEvent.VK_BACK_SPACE) {
 			flushLineBuffer();
+			doStep();
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
+					if (DEBUG) {
+						String charDesc = "UK";
+						switch (ch) {
+							case '\n': charDesc = "LF"; break;
+							case '\r': charDesc = "CR"; break;
+							case KeyEvent.VK_BACK_SPACE: charDesc = "BS"; break;
+						}
+						System.err.println("Processing special char \"" + charDesc + "\"");
+					}
 					listener.processSpecialCharacter(ch);
 				}
 			});
@@ -100,34 +125,17 @@ public class TelnetControl implements Runnable {
 		
 		// Conform to the stated claim that the listener's always called in the AWT dispatch thread.
 		if (line.length() > 0) {
+			doStep();
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					if (DEBUG) {
-						System.err.println("Processing line \"" + describeLine(line) + "\"");
+						System.err.println("Processing line \"" + line + "\"");
 					}
 					listener.processLine(line);
 				}
 			});
 		}
 		receiveTimeout.stop();
-	}
-	
-	private String describeLine(String line) {
-		line = replaceInstances(line, "\n", "<NL>");
-		line = replaceInstances(line, "\r", "<CR>");
-		return line;
-	}
-	
-	private String replaceInstances(String line, String search, String replace) {
-		StringBuffer buf = new StringBuffer();
-		int startIndex = 0;
-		int matchIndex;
-		while ((matchIndex = line.indexOf(search, startIndex)) != -1) {
-			buf.append(line.substring(startIndex, matchIndex)).append(replace);
-			startIndex = matchIndex + search.length();
-		}
-		buf.append(line.substring(startIndex));
-		return buf.toString();
 	}
 
 	public static final int ESC = 0x1b;
@@ -145,6 +153,7 @@ public class TelnetControl implements Runnable {
 		
 		// Invoke all escape sequence handling in the AWT dispatch thread - otherwise we'd have
 		// to create billions upon billions of tiny little invokeLater(Runnable) things all over the place.
+		doStep();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				if (DEBUG) {
@@ -433,7 +442,7 @@ public class TelnetControl implements Runnable {
 	 * TELNET: The data stream portion of a Synch.
 	 * This should always be accompanied by a TCP Urgent notification.
 	 */
-	private static final int DATA_MARK = 242 ;
+	private static final int DATA_MARK = 242;
 	
 	private static final int BREAK = 243;
 	private static final int INTERRUPT_PROCESS = 244;

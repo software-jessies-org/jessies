@@ -45,7 +45,7 @@ public class TextBuffer implements TelnetListener {
 		// Use a private copy of the first display line throughout this method to avoid mutation
 		// caused by textLines.add()/textLines.remove().
 		final int firstDisplayLine = getFirstDisplayLine();
-		if (index >= firstDisplayLine + lastScrollLineIndex) {
+		if (index > firstDisplayLine + lastScrollLineIndex) {
 			textLines.add(index, new TextLine());
 			if (firstScrollLineIndex == 0) {
 				view.setCaretPosition(new Point(0, index));
@@ -97,8 +97,14 @@ public class TextBuffer implements TelnetListener {
 
 	public void processSpecialCharacter(char ch) {
 		switch (ch) {
-			case '\r': view.setCaretPosition(new Point(0, view.getCaretPosition().y)); return;
-			case '\n': insertLine(view.getCaretPosition().y + 1); return;
+			case '\r':
+				view.setCaretPosition(new Point(0, view.getCaretPosition().y));
+				return;
+			case '\n':
+				int x = view.getCaretPosition().x;
+				insertLine(view.getCaretPosition().y + 1);
+				moveCursorHorizontally(x);
+				return;
 			case KeyEvent.VK_BACK_SPACE: moveCursorHorizontally(-1); return;
 			default: Log.warn("Unsupported special character: " + ((int) ch));
 		}
