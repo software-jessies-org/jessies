@@ -14,8 +14,8 @@ import e.gui.*;
 import e.util.*;
 
 /**
-A text-editing component.
-*/
+ * A text-editing component.
+ */
 public class ETextWindow extends ETextComponent implements DocumentListener {
     /**
      * Ensures that the TagsPanel is empty if the focused window isn't an ETextWindow.
@@ -615,7 +615,8 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             }
         }
         
-        if (file.exists() && copyFile(this.filename, this.filename + ".bak") == false) {
+        File backupFile = FileUtilities.fileFromString(this.filename + ".bak");
+        if (file.exists() && file.renameTo(backupFile) == false) {
             Edit.showAlert("Save", "File '" + this.filename + "' wasn't saved! Couldn't create backup file.");
             return false;
         }
@@ -625,6 +626,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             writeCopyTo(file);
             Edit.showStatus("Saved " + filename);
             markAsClean();
+            backupFile.delete();
             this.lastModifiedTime = file.lastModified();
             tagsUpdater.updateTags();
             return true;
@@ -659,27 +661,6 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         Writer writer = new BufferedWriter(new FileWriter(file));
         text.write(writer);
         writer.close();
-    }
-    
-    /** FIXME: replace with use of File.renameTo */
-    public boolean copyFile(String fromName, String toName) {
-        try {
-            File fromFile = FileUtilities.fileFromString(fromName);
-            File toFile = FileUtilities.fileFromString(toName);
-            FileInputStream from = new FileInputStream(fromFile);
-            FileOutputStream to = new FileOutputStream(toFile);
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = from.read(buffer)) != -1) {
-                to.write(buffer, 0, bytesRead);
-            }
-            to.close();
-            from.close();
-            return true;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return false;
-        }
     }
     
     public void invokeShellCommand(String context, String command, boolean shouldShowProgress) {
