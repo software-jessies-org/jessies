@@ -9,6 +9,8 @@ def escapeTextLineToHtml(line)
     $_.gsub!(/^([^[:space:]\/]\S*): /, "<b>\\1</b>: ")
     # Preserve formatting:
     $_.gsub!(/^(\s+)/) {|spaces| "&nbsp;" * spaces.length()}
+    # Turn URLs into links:
+    $_.gsub!(/(http:\/\/\S+)/, "<a href=\"\\1\">\\1</a>")
     # Make slight typographical improvements:
     $_.gsub!(/ -- /, "&nbsp;&ndash; ")
     $_.gsub!(/ --- /, "&nbsp;&mdash; ")
