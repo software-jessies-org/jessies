@@ -5,66 +5,29 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.Timer;
 import javax.swing.tree.*;
 
 import e.gui.*;
 import e.util.*;
 
 public class TagsPanel extends JPanel {
-    private ETextWindow textWindow;
-    private int lastLineCount;
-    private String digest;
-
     private JProgressBar progressBar = new JProgressBar();
     private JPanel progressPanel;
     
     private JPanel emptyPanel;
-
-    private JPanel detailView;
-
-    private ETree tree;
-    private Hashtable branches;
-    
-    private final DocumentListener documentListener = new DocumentListener() {
-        public void changedUpdate(DocumentEvent e) {
-            // We don't care about style changes.
-        }
-        public void insertUpdate(DocumentEvent e) {
-            updateTags();
-        }
-        public void removeUpdate(DocumentEvent e) {
-            updateTags();
-        }
-    };
     
     public TagsPanel() {
         setLayout(new BorderLayout());
-        add(createSearchField(), BorderLayout.NORTH);
         add(createUI(), BorderLayout.CENTER);
-        startFollowingFocusChanges();
     }
     
-    private void startFollowingFocusChanges() {
-        new KeyboardFocusMonitor() {
-            public void focusChanged(Component oldOwner, Component newOwner) {
-                ETextWindow newTextWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, newOwner);
-                if (newTextWindow != null) {
-                    ensureTagsCorrespondTo(newTextWindow);
-                }
-            }
-        };
-    }
-    
-    public JComponent createSearchField() {
-        final SearchField searchField = new SearchField();
-        searchField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tree.clearSelection();
-                tree.selectNodesMatching(searchField.getText());
-            }
-        });
-        return searchField;
+    public void setTagsTree(Component c) {
+        if (c != null) {
+            setVisibleComponent(c);
+        } else {
+            ensureTagsAreHidden();
+        }
     }
     
     public JComponent createUI() {
@@ -76,35 +39,38 @@ public class TagsPanel extends JPanel {
          * the progress bar vertically.
          */
         progressPanel = new JPanel();
+        progressPanel.setBackground(UIManager.getColor("Tree.background"));
         progressPanel.add(progressBar);
         
         emptyPanel = new JPanel();
         emptyPanel.setBackground(UIManager.getColor("Tree.background"));
-        
-        detailView = new JPanel(new BorderLayout());
-        tree = new ETree(new DefaultTreeModel(new DefaultMutableTreeNode("")));
-        tree.setRootVisible(false);
-        tree.setShowsRootHandles(true);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        tree.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getPathForLocation(e.getX(), e.getY()).getLastPathComponent();
-                if (node == null) {
-                    return;
-                }
-                TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
-                textWindow.goToLine(tag.lineNumber);
-            }
-        });
-        tree.setCellRenderer(new TagsTreeRenderer());
-
-        JScrollPane scrollPane = new JScrollPane(tree);
-        detailView.add(scrollPane, BorderLayout.CENTER);
-
-        return detailView;
+        return emptyPanel;
+    }
+    
+    public void ensureTagsAreHidden() {
+        setVisibleComponent(emptyPanel);
+    }
+    
+    public void setVisibleComponent(Component c) {
+        removeAll();
+        add(c, BorderLayout.CENTER);
+        c.invalidate();
+        revalidate();
+        repaint();
+    }
+    
+    public void showProgressBar() {
+        setVisibleComponent(progressPanel);
+        progressBar.setIndeterminate(true);
+    }
+    
+    public void hideProgressBar() {
+        setVisibleComponent(emptyPanel);
+        progressBar.setIndeterminate(false);
     }
     
     private static class BranchNode extends DefaultMutableTreeNode {
+        
         public BranchNode(Object userObject) {
             super(userObject);
         }
@@ -123,7 +89,7 @@ public class TagsPanel extends JPanel {
         }
     }
     
-    private static class TagsTreeRenderer extends DefaultTreeCellRenderer {
+    public static class TagsTreeRenderer extends DefaultTreeCellRenderer {
         
         private static final Shape CIRCLE = new java.awt.geom.Ellipse2D.Float(1, 1, 8, 8);
         private static final Shape SQUARE = new Rectangle(1, 2, 7, 7);
@@ -184,81 +150,46 @@ public class TagsPanel extends JPanel {
         }
     }
     
-    public Workspace getWorkspace() {
-        return (Workspace) SwingUtilities.getAncestorOfClass(Workspace.class, textWindow);
-    }
-    
-    public void ensureTagsCorrespondTo(ETextWindow newTextWindow) {
-        if (isShowing() == false) {
-            return;
-        }
-        
-        if (textWindow != null) {
-            textWindow.getText().getDocument().removeDocumentListener(documentListener);
-        }
-        
-        this.textWindow = newTextWindow;
-        this.lastLineCount = -1;
-        textWindow.getText().getDocument().addDocumentListener(documentListener);
-        updateTags();
-    }
-    
-    private void updateTags() {
-        final int newLineCount = textWindow.getText().getLineCount();
-        if (lastLineCount == newLineCount) {
-            return;
-        }
-        lastLineCount = newLineCount;
-        new TagsScanner().doScan();
-    }
-    
-    public void ensureTagsAreHidden() {
-        this.textWindow = null;
-        setVisibleComponent(emptyPanel);
-    }
-    
-    public void setVisibleComponent(Component c) {
-        remove(emptyPanel);
-        add(c, BorderLayout.CENTER);
-        c.invalidate();
-        revalidate();
-        repaint();
-    }
-
-    public void showProgressBar() {
-        setVisibleComponent(progressPanel);
-        progressBar.setIndeterminate(true);
-    }
-    
-    public void showTagsTree() {
-        setVisibleComponent(detailView);
-        progressBar.setIndeterminate(false);
-    }
-
-    public class TagsScanner extends SwingWorker implements TagReader.TagListener {
+    public static class TagsScanner extends SwingWorker implements TagReader.TagListener {
         private boolean tagsHaveNotChanged;
+        private String digest;
+        private long startTime;
+        private Timer progressTimer;
+        private TagsUpdater model;
+        
         private DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-        private DefaultTreeModel model = new DefaultTreeModel(root);
+        private DefaultTreeModel treeModel = new DefaultTreeModel(root);
         private HashMap branches = new HashMap();
         {
             branches.put("", root);
         }
-
-        public void doScan() {
-            //showProgressBar();
-            start();
+        
+        public TagsScanner(TagsUpdater model) {
+            this.model = model;
+            progressTimer = new Timer(500, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    Edit.getTagsPanel().showProgressBar();
+                }
+            });
+            progressTimer.setRepeats(false);
         }
-
+        
+        public void doScan() {
+            start();
+            startTime = System.currentTimeMillis();
+            progressTimer.start();
+        }
+        
         public String getFilenameSuffix() {
             String suffix = ".txt";
-            String filename = textWindow.getFilename();
+            String filename = model.getTextWindow().getFilename();
             int lastDot = filename.lastIndexOf('.');
             if (lastDot != -1) {
                 suffix = filename.substring(lastDot);
             }
             return suffix;
         }
-
+        
         public void tagFound(TagReader.Tag tag) {
             DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
             
@@ -290,8 +221,8 @@ public class TagsPanel extends JPanel {
                  */
                 File temporaryFile = File.createTempFile("edit-", getFilenameSuffix());
                 temporaryFile.deleteOnExit();
-                textWindow.writeCopyTo(temporaryFile);
-                TagReader tagReader = new TagReader(temporaryFile, textWindow.getFileType(), this);
+                model.getTextWindow().writeCopyTo(temporaryFile);
+                TagReader tagReader = new TagReader(temporaryFile, model.getTextWindow().getFileType(), this);
                 String newDigest = tagReader.getTagsDigest();
                 tagsHaveNotChanged = newDigest.equals(digest);
                 digest = newDigest;
@@ -301,21 +232,24 @@ public class TagsPanel extends JPanel {
             }
             return model;
         }
-
+        
         public void finished() {
             get();
             if (tagsHaveNotChanged) {
                 return;
             }
             
+            progressTimer.stop();
+            Edit.getTagsPanel().hideProgressBar();
             if (model == null) {
                 Edit.getCurrentWorkspace().reportError("", "Couldn't make tags.");
             } else {
-                tree.setModel(model);
-                tree.expandAll();
+                model.setTreeModel(treeModel);
             }
             
-            showTagsTree();
+            long endTime = System.currentTimeMillis();
+            double duration = ((double) (endTime - startTime)) / 1000.0;
+            //Log.warn("Time taken reading tags: " + duration + "s");
         }
     }
 }
