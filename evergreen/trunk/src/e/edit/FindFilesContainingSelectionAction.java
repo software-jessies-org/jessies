@@ -26,6 +26,15 @@ public class FindFilesContainingSelectionAction extends ETextAction {
             return "";
         }
         
+        // If there aren't many files in the workspace, don't bother
+        // automatically restricting the search to a specific directory.
+        // Note that "" actually means "use whatever's already in the
+        // field" rather than "nothing".
+        Workspace workspace = Edit.getCurrentWorkspace();
+        if (workspace.getIndexedFileCount() < 1000) {
+            return "";
+        }
+        
         String directory = textWindow.getContext();
         System.err.println(directory);
         
