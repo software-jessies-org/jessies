@@ -248,7 +248,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             } else if (filename.endsWith(".rb") || isRubyContent(content)) {
                 fileType = RUBY;
                 text.setIndenter(new RubyIndenter());
-            } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || content.startsWith("#ifndef") || isCPlusPlusContent(content)) {
+            } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || content.startsWith("#ifndef") || isCPlusPlusContent(content)) {
                 fileType = C_PLUS_PLUS;
                 text.setIndenter(new JavaIndenter());
             } else if (filename.endsWith(".pl") || isPerlContent(content)) {
