@@ -141,7 +141,13 @@ public class FindFilesDialog {
                 }
                 long endTime = System.currentTimeMillis();
                 System.err.println("----------took: " + (endTime - startTime) + " ms.");
-                setStatus(matchModel.getSize() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.", false);
+                
+                String status = matchModel.getSize() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "");
+                if (workspace.getIndexedFileCount() != totalFileCount) {
+                    status += " (from " + workspace.getIndexedFileCount() + ")";
+                }
+                status += " match.";
+                setStatus(status, false);
             } catch (PatternSyntaxException ex) {
                 setStatus(ex.getDescription(), true);
             } catch (Exception ex) {
