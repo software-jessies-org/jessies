@@ -48,7 +48,9 @@ public class JTelnetPane extends JPanel {
 		
 		JScrollPane scrollPane = new JScrollPane(wrapper);
 		scrollPane.getViewport().setBackground(textPane.getBackground());
+		scrollPane.setBorder(null);
 		add(scrollPane, BorderLayout.CENTER);
+		
 		textPane.sizeChanged();
 		try {
 			Socket sock = new Socket(host, port);
