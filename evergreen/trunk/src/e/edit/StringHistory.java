@@ -37,6 +37,7 @@ public class StringHistory {
     }
     
     public void add(String string) {
+        history.remove(string);  // Avoid duplication.
         history.add(string);
         writeToHistoryFile(string);
     }
