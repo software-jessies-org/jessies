@@ -448,9 +448,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private void paintWrapMark(Graphics2D graphics, FontMetrics metrics, int x, int y) {
         graphics.setColor(Color.BLACK);
+        Stroke oldStroke = graphics.getStroke();
         graphics.setStroke(WRAP_STROKE);
         int yMiddle = y - metrics.getMaxAscent() / 2;
         graphics.drawLine(x, yMiddle, getWidth(), yMiddle);
+        graphics.setStroke(oldStroke);
     }
     
     private void paintCaret(Graphics2D graphics, FontMetrics metrics, int x, int y) {
