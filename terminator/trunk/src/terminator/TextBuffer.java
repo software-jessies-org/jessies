@@ -73,13 +73,12 @@ public class TextBuffer implements TelnetListener {
 		
 		// Redraw ourselves.
 		view.repaint();
-		
-		// FIXME: what we really want to do now is send SIGWINCH so the
-		// running application redraws itself.
 	}
 
 	public void sizeChanged(Dimension sizeInChars) {
 		setSize(sizeInChars.width, sizeInChars.height);
+		caretPosition = getLocationWithinBounds(caretPosition);
+		savedPosition = getLocationWithinBounds(savedPosition);
 		int caretCharIndex = getCharIndexFromLocation(caretPosition);
 		ArrayList newLines = new ArrayList();
 		TextLine currentLine = null;
@@ -106,6 +105,15 @@ public class TextBuffer implements TelnetListener {
 		// and higlight recalculation.
 		view.setCaretPosition(caretPosition);
 		view.sizeChanged();
+	}
+	
+	private Location getLocationWithinBounds(Location location) {
+		if (location == null) {
+			return location;
+		}
+		int lineIndex = Math.min(location.getLineIndex(), textLines.size() - 1);
+		int charOffset = Math.min(location.getCharOffset(), width - 1);
+		return new Location(lineIndex, charOffset);
 	}
 	
 	/** Sets or unsets the use of the alternative buffer. */
@@ -191,7 +199,11 @@ public class TextBuffer implements TelnetListener {
 		return get(lineIndex).getLineStartIndex();
 	}
 	
-	/** Returns a Location describing the line and offset at which the given char index exists. */
+	/**
+	* Returns a Location describing the line and offset at which the given char index exists.
+	* If the index is actually larger than the screen area, returns a 'fake' location to the right
+	* of the end of the last line.
+	*/
 	public Location getLocationFromCharIndex(int charIndex) {
 		int lowLine = 0;
 		int low = 0;
@@ -341,17 +353,16 @@ public class TextBuffer implements TelnetListener {
 	}
 	
 	public TextLine get(int index) {
+		if (index >= textLines.size()) {
+			Log.warn("TextLine requested for index " + index + ", size of buffer is " + textLines.size() + ".");
+			return new TextLine();
+		}
 		return (TextLine) textLines.get(index);
 	}
 
 	public void setSize(int width, int height) {
 		this.width = width;
 		if (this.height > height) {
-//			if (caretPosition.getLineIndex() >= getFirstDisplayLine() + height) {
-				Log.warn("Moving caret out of harm's way.");
-				int newLineIndex = Math.max(getFirstDisplayLine(), caretPosition.getLineIndex() + height - this.height);
-				caretPosition = new Location(newLineIndex, caretPosition.getCharOffset());
-//			}
 			for (int i = 0; i < (this.height - height); i++) {
 				textLines.remove(textLines.size() - 1);
 			}
