@@ -69,4 +69,14 @@ mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
 # architecture, try to build it.
 test -e $PTY_BINARY || make -C `dirname $PTY_BINARY`
 
-exec java -Xmx1g -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Dpty.binary=$PTY_BINARY terminator.Terminator "$@"
+# This belongs in salma-hayek:
+# java -version takes ages.
+# /usr/bin/java is usually some obsolete Free implementation.
+# We need an up-to-date Sun one.
+JAVA=`type -p java`
+if [ "$JAVA" == "/usr/bin/java" ]
+then
+  JAVA=/usr/local/jdk1.5.0/bin/java
+fi
+
+exec $JAVA -Xmx1g -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Dpty.binary=$PTY_BINARY terminator.Terminator "$@"
