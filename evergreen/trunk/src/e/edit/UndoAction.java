@@ -14,9 +14,11 @@ public class UndoAction extends ETextAction {
     }
 
     public void actionPerformed(ActionEvent e) {
+        ETextArea target = getTextArea();
+        if (target == null) {
+            return;
+        }
         try {
-            ETextArea target = getTextArea();
-
             // Workaround for Java Bug Parade #4688560.
             target.setCaretPosition(target.getCaretPosition());
 
@@ -32,9 +34,5 @@ public class UndoAction extends ETextAction {
         } catch (CannotUndoException ex) {
             ex.printStackTrace();
         }
-    }
-
-    public boolean isEnabled() {
-        return super.isEnabled() && getTextArea().getUndoManager().canUndo();
     }
 }

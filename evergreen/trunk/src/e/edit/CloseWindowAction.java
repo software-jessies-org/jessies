@@ -16,10 +16,8 @@ public class CloseWindowAction extends ETextAction {
 
     public void actionPerformed(ActionEvent e) {
         EWindow window = (EWindow) SwingUtilities.getAncestorOfClass(EWindow.class, getFocusedComponent());
-        window.closeWindow();
-    }
-
-    public boolean isEnabled() {
-        return (getFocusedComponent() != null);
+        if (window != null) {
+            window.closeWindow();
+        }
     }
 }

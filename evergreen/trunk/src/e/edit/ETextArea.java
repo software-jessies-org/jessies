@@ -28,52 +28,9 @@ public class ETextArea extends JTextArea {
     
     private Indenter indenter = new Indenter();
     
-    /** All ETextArea instances share the same keymap. */
-    protected static Keymap sharedKeymap;
-    
-    private static final String KEYMAP_NAME = "ETextWindowKeymap";
-    
     private static final FindAction FIND_ACTION = new FindAction();
     
-    private static final Action[] KEYMAP_ACTIONS = {
-        new BackspaceAction(),
-        
-        new BuildAction(),
-        new CloseWindowAction(),
-        new CorrectIndentationAction(),
-        
-        /*
-         * We need to offer these because the Motif LAF binds them to
-         * the COPY, CUT and PASTE keys on Sun keyboards, but we want
-         * them bound to C-C, C-X and C-V on all keyboards. This is,
-         * after all, the 21st century.
-         */
-        new CopyAction(),
-        new CutAction(),
-        new PasteAction(),
-        
-        new EndOfLineAction(true),
-        new EndOfLineAction(false),
-        FIND_ACTION,
-        new FindAndReplaceAction(),
-        new FindNextAction(),
-        new FindPreviousAction(),
-        new GotoAction(),
-        new InsertBracePairAction(),
-        new InsertInterfaceAction(),
-        new InsertNewlineAction(),
-        new InsertTabAction(),
-        new KillErrorsAction(),
-        new OpenAction(),
-        new RedoAction(),
-        new SaveAction(),
-        new StartOfLineAction(true),
-        new StartOfLineAction(false),
-        new UndoAction()
-    };
-    
-    private static JTextComponent.KeyBinding[] keyBindings;
-    
+    /*
     public static JTextComponent.KeyBinding makeShiftCommandKeyBinding(int virtualKey, String actionName) {
         JTextComponent.KeyBinding result = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(virtualKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK), actionName);
         if (result == null) {
@@ -105,50 +62,7 @@ public class ETextArea extends JTextArea {
         }
         return result;
     }
-    
-    static {
-        ArrayList list = new ArrayList();
-        list.add(makeCommandKeyBinding(KeyEvent.VK_B, BuildAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_C, CopyAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_D, FindPreviousAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_F, FindAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_G, FindNextAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_I, CorrectIndentationAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_J, InsertInterfaceAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_K, KillErrorsAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_L, GotoAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_O, OpenAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_R, FindAndReplaceAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_S, SaveAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_V, PasteAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_W, CloseWindowAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_X, CutAction.ACTION_NAME));
-        list.add(makeCommandKeyBinding(KeyEvent.VK_Z, UndoAction.ACTION_NAME));
-        list.add(makeShiftCommandKeyBinding(KeyEvent.VK_Z, RedoAction.ACTION_NAME));
-        //list.add(makeKeyBinding("ctrl BRACELEFT", InsertBracePairAction.ACTION_NAME));
-        list.add(makeKeyBinding("TAB", InsertTabAction.ACTION_NAME));
-        
-        // Unfortunately, Java 1.5.0 beta1 has changed back from \010.
-        // I wish they'd just make up their minds!
-        if (System.getProperty("java.version").indexOf("1.5") != -1) {
-            list.add(makeKeyBinding("BACK_SPACE", BackspaceAction.ACTION_NAME));
-        } else {
-            list.add(makeKeyBinding("typed \010", BackspaceAction.ACTION_NAME));
-        }
-        
-        list.add(makeKeyBinding("ENTER", InsertNewlineAction.ACTION_NAME));
-        list.add(makeKeyBinding("END", EndOfLineAction.ACTION_NAME));
-        list.add(makeKeyBinding("shift END", EndOfLineAction.SHIFT_ACTION_NAME));
-        list.add(makeKeyBinding("HOME", StartOfLineAction.ACTION_NAME));
-        list.add(makeKeyBinding("shift HOME", StartOfLineAction.SHIFT_ACTION_NAME));
-        
-        // Old-style DOS keyboard copy/cut/paste equivalents for martind.
-        list.add(makeKeyBinding("control INSERT", CopyAction.ACTION_NAME));
-        list.add(makeKeyBinding("shift INSERT", PasteAction.ACTION_NAME));
-        list.add(makeKeyBinding("shift DELETE", CutAction.ACTION_NAME));
-        
-        keyBindings = (JTextComponent.KeyBinding[]) list.toArray(new JTextComponent.KeyBinding[list.size()]);
-    }
+    */
     
     public ETextArea() {
         setBackground(Color.WHITE);
@@ -319,26 +233,22 @@ public class ETextArea extends JTextArea {
     }
 
     /**
-     * Sets the keymap, adding in our extra bindings.
+     * Sets the keymap, mixing in our slight modifications.
      */
     public void setKeymap(Keymap map) {
-        if (map == null) {
-            //Log.warn("Setting null keymap.");
-            super.setKeymap(null);
-            sharedKeymap = null;
-            return;
-        }
-        if (getKeymap() == null) {
-            if (sharedKeymap == null) {
-                // Switch keymaps & add extra bindings.
-                removeKeymap(KEYMAP_NAME);
-                sharedKeymap = addKeymap(KEYMAP_NAME, map);
-                loadKeymap(sharedKeymap, keyBindings, KEYMAP_ACTIONS);
-            }
-            map = sharedKeymap;
-        }
-        //Log.warn("Setting keymap " + map);
         super.setKeymap(map);
+        
+        // Overrides a few DefaultEditorKit editing actions.
+        getActionMap().put(DefaultEditorKit.deletePrevCharAction, new BackspaceAction());
+        getActionMap().put(DefaultEditorKit.insertBreakAction, new InsertNewlineAction());
+        getActionMap().put(DefaultEditorKit.insertTabAction, new InsertTabAction());
+        
+        // Overrides the DefaultEditorKit Home/End actions.
+        getActionMap().put(DefaultEditorKit.beginLineAction, new StartOfLineAction(false));
+        getActionMap().put(DefaultEditorKit.selectionBeginLineAction, new StartOfLineAction(true));
+        
+        getActionMap().put(DefaultEditorKit.endLineAction, new EndOfLineAction(false));
+        getActionMap().put(DefaultEditorKit.selectionEndLineAction, new EndOfLineAction(true));
         
         // Overrides the DefaultEditorKit actions for extending the selection or moving the caret to the beginning/end of the current word.
         getActionMap().put(DefaultEditorKit.selectionPreviousWordAction, new PreviousWordAction(true));

@@ -241,9 +241,4 @@ public class FindFilesDialog {
             file.open();
         }
     }
-    
-    /** Always returns true because there's no reason not to open a file. */
-    public boolean isEnabled() {
-        return true;
-    }
 }

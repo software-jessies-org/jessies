@@ -13,19 +13,12 @@ public class RevertToSavedAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        getFocusedTextWindow().revertToSaved();
-    }
-    
-    public boolean isEnabled() {
-        if (super.isEnabled() == false) {
-            return false;
+        ETextWindow window = getFocusedTextWindow();
+        if (window == null) {
+            return;
         }
-        
-        ETextWindow textWindow = getFocusedTextWindow();
-        if (textWindow == null) {
-            return false;
+        if (window.isDirty() && window.isOutOfDateWithRespectToDisk()) {
+            window.revertToSaved();
         }
-        
-        return textWindow.isDirty() || textWindow.isOutOfDateWithRespectToDisk();
     }
 }

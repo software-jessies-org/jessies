@@ -26,16 +26,4 @@ public abstract class SelectedTextAction extends TextAction {
             actOnSelection(component, selection);
         }
     }
-    
-    /** Ensures that we're not enabled if there's no suitable selection. */
-    public boolean isEnabled() {
-        if (super.isEnabled() == false) {
-            return false;
-        }
-        String selection = getFocusedComponent().getSelectedText();
-        if (selection == null || selection.length() == 0) {
-            return false;
-        }
-        return true;
-    }
 }

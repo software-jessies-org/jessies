@@ -22,14 +22,13 @@ public class FilePropertiesAction extends ETextAction {
         super(ACTION_NAME);
     }
     
-    public boolean isEnabled() {
-        return super.isEnabled() && (getFocusedTextWindow() != null);
-    }
-    
     public void actionPerformed(ActionEvent e) {
         ETextWindow window = getFocusedTextWindow();
+        if (window == null) {
+            return;
+        }
+        
         ETextArea text = window.getText();
-
         Document doc = text.getDocument();
         String endOfLineString = (String) doc.getProperty(DefaultEditorKit.EndOfLineStringProperty);
         if (endOfLineString == null) {

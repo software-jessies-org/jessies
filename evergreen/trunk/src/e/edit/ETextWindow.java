@@ -235,7 +235,6 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
         ArrayList items = new ArrayList();
         items.add(new OpenSelectionAction());
         items.add(new FindFilesContainingSelectionAction());
-        items.add(new ExecuteAction());
         addContextSpecificMenuItems(items);
         addWindowSpecificMenuItems(items);
         addExternalToolMenuItems(items);
@@ -368,25 +367,6 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             }
         }
         return result.toString();
-    }
-    
-    public class ExecuteAction extends AbstractAction {
-        public ExecuteAction() {
-            super("Execute");
-        }
-        public void actionPerformed(ActionEvent e) {
-            execute(text.getSelectedText());
-        }
-        public boolean isEnabled() {
-            if (super.isEnabled() == false) {
-                return false;
-            }
-            String selection = text.getSelectedText();
-            if (selection == null || selection.length() == 0) {
-                return false;
-            }
-            return true;
-        }
     }
     
     private void doGoToSelection(int startOffset, int endOffset) {

@@ -82,6 +82,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(makeAcceleratedItem(new PasteAction(), 'V'));
 
         menu.add(new JSeparator());
+        menu.add(makeAcceleratedItem(new CorrectIndentationAction(), 'I'));
         menu.add(new ShowMisspellingsAction());
 
         return menu;
@@ -154,6 +155,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     }
     
     public JMenu add(JMenu menu) {
+        traverseMenu(menu);
         menu.addMenuListener(this);
         return super.add(menu);
     }

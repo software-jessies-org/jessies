@@ -36,6 +36,9 @@ public class ExternalToolAction extends ETextAction {
     
     public void actionPerformed(ActionEvent e) {
         ETextWindow textWindow = getFocusedTextWindow();
+        if (needsFile && textWindow == null) {
+            return;
+        }
         
         if (checkEverythingSaved) {
             boolean shouldContinue = Edit.getCurrentWorkspace().prepareForAction(NAME, "Save unsaved files first?");
@@ -50,10 +53,6 @@ public class ExternalToolAction extends ETextAction {
             Workspace workspace = Edit.getCurrentWorkspace();
             runCommand("", 0, workspace, workspace.getRootDirectory());
         }
-    }
-
-    public boolean isEnabled() {
-        return (needsFile == false) || (getFocusedTextWindow() != null);
     }
 
     public boolean isContextSensitive() {
