@@ -1,4 +1,4 @@
-package e.gui;
+package e.edit;
 
 import java.awt.*;
 import java.awt.event.*;
