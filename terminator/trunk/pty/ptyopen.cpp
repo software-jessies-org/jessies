@@ -1,5 +1,28 @@
-#include    "pty.h"
+#include "pty.h"
 
+int ptym_open(std::string& pts_name) {
+    int ptmx_fd = open("/dev/ptmx", O_RDWR);
+    if (ptmx_fd < 0) {
+        return -1;
+    }
+    
+    const char* name = ptsname(ptmx_fd);
+    if (name == 0) {
+        return -1;
+    }
+    pts_name = name;
+    
+    if (grantpt(ptmx_fd) != 0) {
+        return -1;
+    }
+    if (unlockpt(ptmx_fd) != 0) {
+        return -1;
+    }
+    
+    return ptmx_fd;
+}
+
+#if 0
 int ptym_open(char *pts_name) {
     strcpy(pts_name, "/dev/ptyXY");
       /* array index: 0123456789 (for references in following code) */
@@ -23,8 +46,9 @@ int ptym_open(char *pts_name) {
     }
     return(-1);        /* out of pty devices */
 }
+#endif
 
-int ptys_open(int fdm, char *pts_name) {
+int ptys_open(int fdm, const char* pts_name) {
     struct group* grptr;
     int gid, fds;
 

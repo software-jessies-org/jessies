@@ -3,6 +3,7 @@
 
 #include <fcntl.h>
 #include <grp.h>
+#include <string>
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -39,8 +40,8 @@ void tty_atexit(void);
 struct termios *tty_termios(void);
 #endif
 
-int ptym_open(char *);
-int ptys_open(int, char *);
+int ptym_open(std::string&);
+int ptys_open(int, const char *);
 #ifdef TIOCGWINSZ
 pid_t pty_fork(int *, char *, const struct termios *, const struct winsize *);
 #endif
