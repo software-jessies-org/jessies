@@ -71,7 +71,11 @@ public class JavaIndenter extends Indenter {
         // Recognize doc comments, and help out with the ASCII art.
         if (lineNumber > 0) {
             String previousLine = text.getLineText(lineNumber - 1).trim();
-            if (previousLine.startsWith("/**") || previousLine.startsWith("* ")) {
+            if (previousLine.endsWith("*/")) {
+                // Whatever the previous line looks like, if it ends with
+                // a close of comment, we're not in a comment, and should
+                // do nothing.
+            } else if (previousLine.startsWith("/**") || previousLine.startsWith("* ")) {
                 indentation += " *";
             }
         }
