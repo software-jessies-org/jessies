@@ -36,6 +36,7 @@ public class TagReader {
             "--c++-types=+p", "-n", "--fields=+a", "-u",
             "--regex-java=/( static )/\1/S/",
             "--regex-c++=/( static )/\1/S/",
+            "--regex-java=/( abstract )/\1/A/",
             "-f", tagsFile.getAbsolutePath(),
             file.getAbsolutePath()
         });
@@ -84,6 +85,7 @@ public class TagReader {
      * If the next tag seen has the same line number, it will be marked as static.
      */
     private int staticTagLineNumber = 0;
+    private int abstractTagLineNumber = 0;
     
     private void processTagLine(String line) {
         // The format is: <identifier>\t<filename>\t<line>;"\t<tag type>[\t<context>]
@@ -108,6 +110,9 @@ public class TagReader {
         if (type == 'S') {
             staticTagLineNumber = lineNumber;
             return;
+        } else if (type == 'A') {
+            abstractTagLineNumber = lineNumber;
+            return;
         }
         
         Matcher classMatcher = CLASS_PATTERN.matcher(context);
@@ -125,8 +130,10 @@ public class TagReader {
             tag = new TagReader.Tag(identifier, lineNumber, type, context, containingClass);
         }
         
-        tag.isStatic = (lineNumber == staticTagLineNumber);
+        tag.isStatic = (lineNumber == staticTagLineNumber | tag.isStatic);
         staticTagLineNumber = 0;
+        tag.isAbstract = (lineNumber == abstractTagLineNumber | tag.isAbstract);
+        abstractTagLineNumber = 0;
         
         listener.tagFound(tag);
     }
@@ -207,6 +214,7 @@ public class TagReader {
         public String containingClass;
         public int lineNumber;
         public boolean isStatic;
+        public boolean isAbstract;
         
         public Tag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
             this.identifier = identifier;
@@ -289,6 +297,7 @@ public class TagReader {
             typeSortOrder = Collections.unmodifiableList(Arrays.asList(new String[] {
                 PACKAGE, FIELD, CONSTRUCTOR, METHOD, CLASS, INTERFACE
             }));
+            this.isAbstract = (type.equals(INTERFACE));
         }
     }
     
