@@ -9,14 +9,18 @@ Unassigned TODOs:
 ~~~~~~~~~~~~~~
 [5]	Hitting alt-k a number of times results in no redraw of the prompt.  I think bash tries to be clever.
 [5]	Auto-scrolling is completely broken.  Fix it.
+I haven't noticed any problems with this for some time.  Hasn't it been fixed?
 [5]	Make an about box.
+How can this be priority 5?
 [3]	Review the current properties reading, and see if it's really going to work well enough.  Possibly add "?MacOS:" stuff to it.
 [2]	Find some profiling tool to see if we can find simple ways of speeding up.
 [1]	Add bracket-matching double-click selection?
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 [1]	Feedback on other tabs when there's been output you haven't seen yet?
 [1]	Shouldn't log while in alternate buffer mode.
+Why not?  When catting the log files, I've found this useful.  It lets me see when johnh has been into vim.
 [1]	Add ability to view more than one terminal at a time, in a split pane, or in a 2d-tiled layout.
+[] The flashing green underline of a cursor is often difficult to find.  Fine by me if people really want the option but I don't think it should be the default.
 
 
 
