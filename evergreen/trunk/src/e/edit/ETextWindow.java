@@ -1,6 +1,7 @@
 package e.edit;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
@@ -26,6 +27,9 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
      * Used to display a watermark to indicate such things as a read-only file.
      */
     private WatermarkViewPort watermarkViewPort;
+    
+    private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
+    private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f);
     
     public static final String UNKNOWN = "Unknown";
     public static final String C_PLUS_PLUS = "C++";
@@ -68,10 +72,25 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewport(watermarkViewPort);
         
+        initFocusListener();
+        
         this.birdView = new BirdView(text, scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
         fillWithContent();
+    }
+    
+    private void initFocusListener() {
+        text.addFocusListener(new FocusListener() {
+            public void focusGained(FocusEvent e) {
+                text.setSelectionColor(FOCUSED_SELECTION_COLOR);
+                updateWatermark();
+            }
+            
+            public void focusLost(FocusEvent e) {
+                text.setSelectionColor(UNFOCUSED_SELECTION_COLOR);
+            }
+        });
     }
     
     public BirdView getBirdView() {
