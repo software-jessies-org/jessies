@@ -126,6 +126,10 @@ public class TerminalControl implements Runnable {
 			public void perform(TerminalListener listener) {
 				listener.sizeChanged(sizeInChars);
 			}
+			
+			public String toString() {
+				return "TerminalAction[Size change to " + sizeInChars + "]";
+			}
 		};
 		listener.processActions(new TerminalAction[] { sizeChangeAction });
 		// Notify the pty that the size has changed.
@@ -220,6 +224,10 @@ public class TerminalControl implements Runnable {
 					}
 					listener.processLine(line);
 				}
+				
+				public String toString() {
+					return "TerminalAction[Process line: " + line + "]";
+				}
 			});
 		}
 	}
@@ -228,16 +236,23 @@ public class TerminalControl implements Runnable {
 		terminalActions.add(new TerminalAction() {
 			public void perform(TerminalListener listener) {
 				if (DEBUG) {
-					String charDesc = "UK";
-					switch (ch) {
-						case '\n': charDesc = "LF"; break;
-						case '\r': charDesc = "CR"; break;
-						case '\t': charDesc = "TAB"; break;
-						case KeyEvent.VK_BACK_SPACE: charDesc = "BS"; break;
-					}
-					Log.warn("Processing special char \"" + charDesc + "\"");
+					Log.warn("Processing special char \"" + getCharDesc(ch) + "\"");
 				}
 				listener.processSpecialCharacter(ch);
+			}
+			
+			public String toString() {
+				return "TerminalAction[Special char " + getCharDesc(ch) + "]";
+			}
+			
+			private String getCharDesc(char ch) {
+				switch (ch) {
+					case '\n': return "LF";
+					case '\r': return "CR";
+					case '\t': return "TAB";
+					case KeyEvent.VK_BACK_SPACE: return "BS";
+					default: return "UK";
+				}
 			}
 		});
 	}
