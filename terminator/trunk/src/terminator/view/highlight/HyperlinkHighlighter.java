@@ -110,7 +110,7 @@ public class HyperlinkHighlighter implements Highlighter {
 	private static String getEditor() {
 		String result = System.getenv("EDITOR");
 		if (result == null) {
-			result = "vi";
+			result = "e";
 		}
 		return result;
 	}
