@@ -246,14 +246,28 @@ public class Workspace extends JPanel {
                 return false;
             }
             boolean saveAll = choice.equals("Save All");
-            if (saveAll) {
-                for (int i = 0; i < dirtyWindows.length; i++) {
-                    boolean savedOkay = dirtyWindows[i].save();
-                    if (savedOkay == false) {
-                        // Pretend the user canceled, because we shouldn't pretend that everything went okay.
-                        return false;
-                    }
-                }
+            if (saveAll == false) {
+                return true;
+            }
+            boolean okay = saveAll();
+            if (okay == false) {
+                // Pretend the user canceled, because we shouldn't pretend that everything went okay.
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Attempts to save all the dirty files on this workspace.
+     * Returns true if all saves were successful, false otherwise.
+     */
+    public boolean saveAll() {
+        ETextWindow[] dirtyWindows = getDirtyTextWindows();
+        for (int i = 0; i < dirtyWindows.length; i++) {
+            boolean savedOkay = dirtyWindows[i].save();
+            if (savedOkay == false) {
+                return false;
             }
         }
         return true;

@@ -36,11 +36,10 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         // FIXME: Should be "Open Recent >" here.
 
         menu.add(new JSeparator());
-
         menu.add(makeAcceleratedItem(new CloseWindowAction(), 'W'));
         menu.add(makeAcceleratedItem(new SaveAction(), 'S'));
         menu.add(makeAcceleratedItemEx(new SaveAsAction(), 'S', true));
-        // FIXME: Should be "Save All" here.
+        menu.add(new SaveAllAction());
         menu.add(new RevertToSavedAction()); // FIXME: Should be on C-U, but I'm not convinced we should make this so easy.
 
         if (System.getProperty("os.name").indexOf("Mac") == -1) {
@@ -76,7 +75,6 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(makeAcceleratedItemEx(new RedoAction(), 'Z', true));
 
         menu.add(new JSeparator());
-
         menu.add(makeAcceleratedItem(new CutAction(), 'X'));
         menu.add(makeAcceleratedItem(new CopyAction(), 'C'));
         menu.add(makeAcceleratedItem(new PasteAction(), 'V'));
@@ -114,10 +112,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(new ChangeFontAction(false));
 
         menu.add(new JSeparator());
-
         menu.add(new FilePropertiesAction());
-        //menu.add(new JMenuItem("Show 80 Columns"));
-
         return menu;
     }
     
