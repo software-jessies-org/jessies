@@ -133,6 +133,10 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         
         menu.add(new JSeparator());
         menu.add(new KillErrorsAction());
+        
+        menu.add(new JSeparator());
+        menu.add(new CheckInChangesAction());
+        menu.add(new ShowHistoryAction());
 
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
             public void addItem(ExternalToolAction action) {

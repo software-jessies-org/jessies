@@ -12,8 +12,6 @@ fixedFont.default=false
 hungryDelete=true
 indent.string=    
 
-#?Linux:laf.className=com.sun.java.swing.plaf.motif.MotifLookAndFeel
-
 ?Mac OS X:open.command=/usr/bin/open
 ?Windows 2000:open.command=start
 
@@ -38,16 +36,8 @@ url.prefixes=file://;ftp://;http://;https://
 
 ?Windows 2000:make.command=nmake
 
-tools.0.name=Check in Changes...
-tools.0.command=checkintool
-tools.0.checkEverythingSaved=true
-tools.1.name=Show History...
-tools.1.command=revisiontool $EDIT_CURRENT_FILENAME:$EDIT_CURRENT_LINE_NUMBER
-tools.1.keyboardEquivalent=H
-tools.1.needsFile=true
-tools.2.name=<separator>
-tools.3.name=Shell Window
-?Linux:tools.3.command=cd $EDIT_CURRENT_DIRECTORY ; terminator&
-?Mac OS X:tools.3.command=open -a Terminal $EDIT_CURRENT_DIRECTORY
-?Windows:tools.3.command=start /D%EDIT_CURRENT_DIRECTORY% cmd
-tools.3.keyboardEquivalent=S
+tools.0.name=Shell Window
+?Linux:tools.0.command=cd $EDIT_CURRENT_DIRECTORY ; terminator&
+?Mac OS X:tools.0.command=open -a Terminal $EDIT_CURRENT_DIRECTORY
+?Windows:tools.0.command=start /D%EDIT_CURRENT_DIRECTORY% cmd
+tools.0.keyboardEquivalent=S
