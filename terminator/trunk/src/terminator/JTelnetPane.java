@@ -91,6 +91,7 @@ public class JTelnetPane extends JPanel {
 	}
 
 	public static void main(final String[] arguments) throws IOException {
+		Log.setApplicationName("Terminator");
 		if (arguments.length < 1) {
 			System.err.println("Usage: JTelnetPane <host>[:<port>]...");
 			System.exit(1);
