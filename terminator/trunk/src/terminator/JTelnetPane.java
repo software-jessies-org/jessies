@@ -126,7 +126,7 @@ public class JTelnetPane extends JPanel {
 			public void componentResized(ComponentEvent e) {
 				Dimension size = textPane.getVisibleSizeInCharacters();
 				if (size.equals(currentSize) == false) {
-					// FIXME: need to tell pty about the size change.
+					control.sizeChanged(size);
 					currentSize = size;
 				}
 			}

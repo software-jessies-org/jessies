@@ -1,5 +1,6 @@
 package terminatorn;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
@@ -75,6 +76,12 @@ public class TextBuffer implements TelnetListener {
 		
 		// FIXME: what we really want to do now is send SIGWINCH so the
 		// running application redraws itself.
+	}
+
+	public void sizeChanged(Dimension sizeInChars) {
+		width = sizeInChars.width;
+		height = sizeInChars.height;
+		// Loop through lines and rewrap them, remember to update caret position.
 	}
 	
 	/** Sets or unsets the use of the alternative buffer. */
