@@ -205,14 +205,16 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	public void scrollToBottom() {
 		JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
 		
-		// Vertically, we just want to go to the bottom.
 		BoundedRangeModel verticalModel = pane.getVerticalScrollBar().getModel();
 		verticalModel.setValue(verticalModel.getMaximum() - verticalModel.getExtent());
 		
-		// Horizontally, we want to show the cursor.
+		scrollHorizontallyToShowCursor();
+	}
+	
+	private void scrollHorizontallyToShowCursor() {
+		JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
 		
-		// FIXME: it's not entirely clear what this means. For one
-		// thing, we don't necessarily have a horizontal position that
+		// FIXME: we don't necessarily have a horizontal position that
 		// corresponds to where the cursor is. This is probably a
 		// mistake that should be fixed.
 		
@@ -220,17 +222,22 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		// "cat > /dev/null" and then type more characters than fit
 		// on a line.]
 		
-		int xOffset = (getCaretPosition().getCharOffset() + 1) * getCharUnitSize().width;
+		int leftCursorEdge = getCaretPosition().getCharOffset() * getCharUnitSize().width;
+		int rightCursorEdge = leftCursorEdge + getCharUnitSize().width;
+		
 		BoundedRangeModel horizontalModel = pane.getHorizontalScrollBar().getModel();
 		
-		if (xOffset >= horizontalModel.getValue() && xOffset <= (horizontalModel.getValue() + horizontalModel.getExtent())) {
-			// We don't want to scroll back as the user moves the
-			// cursor back; we should just ensure that the cursor
-			// is visible, and do nothing if it is already visible.
-			return;
-		}
+		int leftWindowEdge = horizontalModel.getValue();
+		int rightWindowEdge = leftWindowEdge + horizontalModel.getExtent();
 		
-		horizontalModel.setValue(xOffset - horizontalModel.getExtent());
+		// We don't want to scroll back as the user moves the
+		// cursor back; we should just ensure that the cursor
+		// is visible, and do nothing if it is already visible.
+		if (leftCursorEdge < leftWindowEdge) {
+			horizontalModel.setValue(leftCursorEdge - horizontalModel.getExtent() / 2);
+		} else if (rightCursorEdge > rightWindowEdge) {
+			horizontalModel.setValue(rightCursorEdge - horizontalModel.getExtent() / 2);
+		}
 	}
 	
 	public void scrollToTop() {
@@ -268,10 +275,14 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return caretPosition;
 	}
 	
-	public void setCaretPosition(Location caretPosition) {
+	public void setCaretPosition(Location newCaretPosition) {
+		if (caretPosition.equals(newCaretPosition)) {
+			return;
+		}
 		redrawCaretPosition();
-		this.caretPosition = caretPosition;
+		caretPosition = newCaretPosition;
 		redrawCaretPosition();
+		scrollHorizontallyToShowCursor();
 	}
 	
 	/** Sets whether the caret should be displayed. */
