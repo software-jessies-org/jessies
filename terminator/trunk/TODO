@@ -8,15 +8,16 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
 [5] Implement ESC[4h - insert mode (ESC[4l resets back to the usual replace mode).
+[5] Implement window size change notification. Grep for TIOCSWINSZ in the rxvt source. Basically, we have to do an ioctl on the relevant fd. And only pty knows that. Martin suggests TELNET IAC-like signaling in the byte stream to pty.
 [5]     Fix ^C. It works fine if you've started Terminator from another terminal emulator (xterm, say), but if you start it from the GNOME panel, it doesn't. stty -a can't see any difference.
 [5]     Fix backspace in vim on Linux; it deletes forwards, and is driving me mad whenever I write a checkin comment. Must start work on CheckInTool.
-[5]	Implement 'mode 1'.
 [3]	Implement 'mode 47' - alternate buffer support.
 [3]	Cope with '\t'. Remember tab stops are settable.
 [3]	Add ssh support.
 [1]	Fix double-click selection so it selects a word (maybe bracket-matching aswell).
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 [1]	Fix scrolling with the scroll bar arrows and mouse wheel. elliotth fixed it once (implementing Scrollable in JTelnetPane), but we've broken it again somewhere along the line.
+[1]	Implement 'mode 1'.
 
 
 
