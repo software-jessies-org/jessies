@@ -6,25 +6,6 @@ TERMINATOR_HOME=`dirname $real_script`/..
 CLASSPATH=$TERMINATOR_HOME/classes:$TERMINATOR_HOME/../salma-hayek/classes:$TERMINATOR_HOME/terminator.jar
 PTY_BINARY=$TERMINATOR_HOME/native/all/pty/pty-`uname`-`arch`
 
-if [ ! -f ~/.terminator ]
-then
-  if [ "`uname`" == "Darwin" ]
-  then
-    PROPS_VARIANT=macosx
-  elif ps -e | grep --quiet kde
-  then
-    PROPS_VARIANT=kde
-  elif ps -e | grep --quiet gnome
-  then
-    PROPS_VARIANT=gnome
-  else
-    echo Failed to recognize your windowing environment - choosing GNOME defaults.
-    echo Read $TERMINATOR_HOME/README for more information.
-    PROPS_VARIANT=gnome
-  fi
-  cp $TERMINATOR_HOME/doc/props-examples/$PROPS_VARIANT.terminator ~/.terminator
-fi
-
 if [ ! -w /usr/share/terminfo ]
 then
   export TERMINFO=~/.terminfo
