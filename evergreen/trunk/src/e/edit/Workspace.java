@@ -183,21 +183,8 @@ public class Workspace extends JPanel {
     }
     
     public EWindow findWindowByName(String name) {
-        EWindow win = findWindowInColumnByName(leftColumn, name);
         //FIXME: if the file's not already open, we need to find it and open it.
-        return win;
-    }
-    
-    public EWindow findWindowInColumnByName(EColumn column, String name) {
-        name = name.toLowerCase();
-        Component[] cs = column.getComponents();
-        for (int i = 0; i < cs.length; i++) {
-            EWindow win = (EWindow) cs[i];
-            if (win.getTitle().toLowerCase().endsWith(name)) {
-                return win;
-            }
-        }
-        return null;
+        return leftColumn.findWindowByName(name);
     }
     
     public static boolean isAbsolute(String filename) {
@@ -261,8 +248,7 @@ public class Workspace extends JPanel {
     }
     
     public EWindow addViewer(EWindow viewer, final String address) {
-        EColumn column = leftColumn;
-        column.addComponent(viewer);
+        leftColumn.addComponent(viewer);
         if (address != null) {
             final ETextWindow textWindow = (ETextWindow) viewer;
             SwingUtilities.invokeLater(new Runnable() {

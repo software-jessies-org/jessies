@@ -296,4 +296,16 @@ public class EColumn extends JPanel implements ComponentListener {
         c.invalidate();
         c.validate();
     }
+
+    public EWindow findWindowByName(String name) {
+        name = name.toLowerCase();
+        Component[] cs = getComponents();
+        for (int i = 0; i < cs.length; i++) {
+            EWindow window = (EWindow) cs[i];
+            if (window.getTitle().toLowerCase().endsWith(name)) {
+                return window;
+            }
+        }
+        return null;
+    }
 }
