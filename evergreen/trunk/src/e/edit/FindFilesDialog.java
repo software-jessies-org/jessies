@@ -166,7 +166,12 @@ public class FindFilesDialog {
                         }
                         if (regex.length() != 0) {
                             ArrayList matches = new ArrayList();
+                            long t0 = System.currentTimeMillis();
                             int matchCount = fileSearcher.searchFile(root, candidate, matches);
+                            long t1 = System.currentTimeMillis();
+                            if (t1 - t0 > 500) {
+                                System.err.println(file + " " + (t1-t0) + "ms");
+                            }
                             if (matchCount > 0) {
                                 DefinitionFinder definitionFinder = new DefinitionFinder(file, regex);
                                 MatchingFile matchingFile = new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition);
@@ -308,6 +313,12 @@ public class FindFilesDialog {
                 defaultFont = c.getFont();
             }
             c.setFont(defaultFont);
+            
+            // Work around JLabel's tab-rendering stupidity.
+            String text = getText();
+            if (text.indexOf('\t') != -1) {
+                setText(text.replaceAll("\t", "    "));
+            }
             
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
             if (node.getUserObject() instanceof MatchingFile) {
