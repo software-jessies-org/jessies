@@ -9,12 +9,13 @@ KNOWN_JRE_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
 KNOWN_JRE_LOCATIONS+=/home/elliotth/download/j2sdk1.4.2/jre/lib/rt.jar
 KNOWN_JRE_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
 KNOWN_JRE_LOCATIONS+=MRJ141Stubs.jar
+KNOWN_JRE_LOCATIONS:=$(KNOWN_JRE_LOCATION) $(shell locate rt.jar)
 
 SOURCE_FILES=$(shell find `pwd`/src -type f -name "*.java")
 TAR_FILE_OF_THE_DAY=`date +$(PROJECT_NAME)-%Y-%m-%d.tar`
 
 space=$(subst a,,a a)
-BOOT_CLASS_PATH=$(subst $(space),:,$(wildcard $(KNOWN_JRE_LOCATIONS)))
+BOOT_CLASS_PATH=$(subst $(space),:,$(wildcard $(firstword $(KNOWN_JRE_LOCATIONS))))
 
 REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
 
