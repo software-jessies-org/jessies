@@ -31,6 +31,9 @@ public class TelnetControl implements Runnable {
 	private InputStream in;
 	private OutputStream out;
 	
+	/** The reason why our connection closed. */
+	private String goodbye;
+	
 	private LogWriter logWriter;
 	
 	// Buffer of TelnetActions to perform.
@@ -82,16 +85,25 @@ public class TelnetControl implements Runnable {
 			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
+		} finally {
+			announceConnectionLost();
 		}
 	}
 	
-	public void announceConnectionLost(String goodbye) {
+	private void announceConnectionLost() {
+		if (goodbye == null) {
+			return;
+		}
 		try {
 			final byte[] bytes = goodbye.getBytes();
 			processBuffer(bytes, bytes.length);
-		} catch (IOException ex) {
-			ex.printStackTrace();
+		} catch (Exception ex) {
+			Log.warn("Couldn't say '" + goodbye + "'.", ex);
 		}
+	}
+	
+	public void announceConnectionLost(String message) {
+		this.goodbye = message;
 	}
 	
 	private boolean nextByteIsCommand = false;

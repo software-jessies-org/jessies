@@ -49,21 +49,17 @@ public class JTelnetPane extends JPanel {
 	}
 	
 	/**
-	 * Creates a new terminal running telnet to the given host and port.
-	 * The hostAndPort parameter is of the form "host:port", as in a telnet:// URI.
+	 * Creates a new terminal running the given command, with the given
+	 * title. If 'title' is null, we use the first word of the command
+	 * as the the title.
 	 */
-	public static JTelnetPane newTelnetHostAndPort(String hostAndPort) {
-		String host = hostAndPort;
-		int port = 23;
-		String title = hostAndPort;
-		if (title.indexOf(':') != -1) {
-			port = Integer.parseInt(title.substring(title.indexOf(':') + 1));
-			host = title.substring(0, title.indexOf(':'));
-			if (title.endsWith("/")) {
-				title = title.substring(0, title.length() - 1);
+	public static JTelnetPane newCommandWithTitle(String command, String title) {
+		if (title == null) {
+			title = command.trim();
+			if (title.indexOf(' ') != -1) {
+				title = title.substring(0, title.indexOf(' '));
 			}
 		}
-		String command = "telnet " + host + " " + port;
 		return new JTelnetPane(title, command);
 	}
 	
