@@ -186,11 +186,13 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	}
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
-	public void addHighlights(JTextBuffer view, int firstLineIndex) {
+	public int addHighlights(JTextBuffer view, int firstLineIndex) {
 		if (highlight != null && isValidLocation(view, highlight.getStart()) && isValidLocation(view, highlight.getEnd())) {
 			view.addHighlight(highlight);
+			return 1;
 		} else {
 			highlight = null;
+			return 0;
 		}
 	}
 	
