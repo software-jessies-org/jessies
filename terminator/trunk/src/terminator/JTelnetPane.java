@@ -163,15 +163,17 @@ public class JTelnetPane extends JPanel {
 		}
 
 		public void keyReleased(KeyEvent event) {
-//			event.consume();
 		}
 
 		public void keyTyped(KeyEvent event) {
 			char ch = event.getKeyChar();
 //			System.err.println("Got key " + ((int) ch));
-//			if (ch != KeyEvent.CHAR_UNDEFINED) {
+			if (ch != KeyEvent.CHAR_UNDEFINED) {
 				control.sendChar(ch);
-//			}
+				if (Options.getSharedInstance().isScrollKey()) {
+					textPane.scrollToBottom();
+				}
+			}
 			event.consume();
 		}
 	}

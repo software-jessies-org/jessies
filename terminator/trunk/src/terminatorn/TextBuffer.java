@@ -121,6 +121,7 @@ public class TextBuffer implements TelnetListener {
 	}
 	
 	public void processActions(TelnetAction[] actions) {
+		boolean wereAtBottom = view.isAtBottom();
 		int initialLineCount = getLineCount();
 		for (int i = 0; i < actions.length; i++) {
 			actions[i].perform(this);
@@ -128,6 +129,7 @@ public class TextBuffer implements TelnetListener {
 		if (getLineCount() != initialLineCount) {
 			view.sizeChanged();
 		}
+		view.scrollOnTtyOutput(wereAtBottom);
 		view.setCaretPosition(caretPosition);
 	}
 	
