@@ -2,6 +2,6 @@
 
 real_script=`readlink $0 || echo $0` # Deals with symbolic links to this script.
 
-XV_HOME=`dirname $real_script`
+XV_HOME=`dirname $real_script`/..
 
 java -Xmx1g -cp $XV_HOME/classes:$XV_HOME/../salma-hayek/classes e.tools.Xv "$@"
