@@ -92,5 +92,9 @@ rescue
 end
 fd.close
 
+# Keep the post-commit trigger up-to-date.
+Dir.chdir("#{Pathname.new(__FILE__).realpath.dirname}")
+system("svn update")
+
 # We're done.
 exit(0)
