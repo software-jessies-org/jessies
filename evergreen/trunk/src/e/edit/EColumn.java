@@ -38,6 +38,7 @@ public class EColumn extends JSplitPane {
                 }
             }
         });
+        comboBox.setMaximumRowCount(20);
         updateComboBoxEnabledState();
     }
 
