@@ -44,7 +44,8 @@ do
 done
 
 if test -f /etc/debian_version ; then
-    apt-get install exuberant-ctags ri
+    apt-get update
+    apt-get -y install exuberant-ctags ri
 fi
 
 echo "All done!"
