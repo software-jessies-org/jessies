@@ -73,7 +73,15 @@ public class Terminator {
 	}
 	
 	private JComponent makeTabbedTerminals() {
-		final JTabbedPane tabbedPane = new JTabbedPane();
+		final JTabbedPane tabbedPane = new JTabbedPane() {
+			/**
+			 * Prevents the tabs (ass opposed to their components)
+			 * from getting the focus.
+			 */
+			public boolean isFocusTraversable() {
+				return false;
+			}
+		};
 		tabbedPane.addChangeListener(new ChangeListener() {
 			/**
 			 * Ensures that when we change tab, we give focus to that terminal.

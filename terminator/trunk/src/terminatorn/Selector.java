@@ -32,18 +32,12 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		view.removeHighlightsFrom(this, 0);
 		startLocation = loc;
 		
-		TextBuffer model = view.getModel();
-		if (loc.getLineIndex() >= model.getLineCount()) {
+		if (loc.getLineIndex() >= view.getModel().getLineCount()) {
 			return;
 		}
 		
 		if (event.getClickCount() == 2) {
-			// Select word.
-			String line = model.getLine(loc.getLineIndex());
-			if (loc.getCharOffset() >= line.length()) {
-				return;
-			}
-			selectWord(model, loc);
+			selectWord(loc);
 		} else if (event.getClickCount() == 3) {
 			selectLine(loc);
 		}
@@ -82,9 +76,13 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		return ch != ' ';
 	}
 	
-	public void selectWord(TextBuffer model, Location location) {
+	public void selectWord(Location location) {
 		final int lineNumber= location.getLineIndex();
 		String line = view.getModel().getLine(lineNumber);
+		if (location.getCharOffset() >= line.length()) {
+			return;
+		}
+		
 		int start = location.getCharOffset();
 		int end = start;
 		while (start > 0 && isWordChar(line.charAt(start - 1))) {
