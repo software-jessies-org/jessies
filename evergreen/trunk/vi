@@ -43,7 +43,11 @@ def openFileOnLocalhost(filename)
     end
 end
 
-ARGV.each {
-    | filename |
-    openFileOnLocalhost(File.expand_path(filename))
-}
+# Translate vi/gvim line number specifications.
+if ARGV[0] =~ /^\+(\d+)$/
+    ARGV.shift
+    ARGV[0] = "#{ARGV[0]}:#$1"
+end
+
+filename = ARGV[0]
+openFileOnLocalhost(File.expand_path(filename))
