@@ -8,11 +8,19 @@ import e.util.*;
 import terminator.view.*;
 
 public class Terminator {
+	private static final Terminator INSTANCE = new Terminator();
 	private List arguments;
 	private ArrayList frames = new ArrayList();
 	
-	public Terminator(final String[] argumentArray) throws IOException {
+	public static Terminator getSharedInstance() {
+		return INSTANCE;
+	}
+	
+	private Terminator() {
 		Log.setApplicationName("Terminator");
+	}
+	
+	private void parseCommandLine(final String[] argumentArray) throws IOException {
 		arguments = Options.getSharedInstance().parseCommandLine(argumentArray);
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
 			showUsage(System.err);
@@ -84,11 +92,14 @@ public class Terminator {
 	}
 	
 	public void showVersion() {
-		System.err.println("Terminator 1.1 (3rd June 2004), copyright Phil Norman, Elliott Hughes.");
+		System.err.println("Terminator (see ChangeLog for version information)");
+		System.err.println("Copyright (C) 2004 Free Software Foundation, Inc.");
+		System.err.println("This is free software; see the source for copying conditions.  There is NO");
+		System.err.println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
 		System.exit(0);
 	}
 
 	public static void main(final String[] arguments) throws IOException {
-		new Terminator(arguments);
+		Terminator.getSharedInstance().parseCommandLine(arguments);
 	}
 }

@@ -69,4 +69,4 @@ mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
 # architecture, try to build it.
 test -e $PTY_BINARY || make -C `dirname $PTY_BINARY`
 
-java -Xmx1g -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Dpty.binary=$PTY_BINARY terminator.Terminator "$@" || ( echo You need at least Java 1.5.0 - perhaps /usr/local/bin/java should be higher up your path than `type -p java`, which reports its version as: && java -version )
+java -Xmx1g -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Djava.awt.Window.locationByPlatform=true -Dpty.binary=$PTY_BINARY terminator.Terminator "$@" || ( echo You need at least Java 1.5.0 - perhaps /usr/local/bin/java should be higher up your path than `type -p java`, which reports its version as: && java -version )
