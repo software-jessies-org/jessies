@@ -78,6 +78,9 @@ public class TagsUpdater {
     
     private void createUI() {
         tree = new ETree(new DefaultTreeModel(new DefaultMutableTreeNode("")));
+        // We can't trust JTree's row height calculation. Make it use
+        // the preferred height of the cell renderer component instead.
+        tree.setRowHeight(-1);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
