@@ -44,7 +44,7 @@ public class FindAndReplaceAction extends ETextAction {
         String selection = text.getSelectedText();
         if (selection.length() > 0 && isSelectionMeantAsScope() == false) {
             patternField.setText(StringUtilities.regularExpressionFromLiteral(selection));
-            replacementField.setText(StringUtilities.regularExpressionFromLiteral(selection));
+            replacementField.setText(StringUtilities.escapeForJava(StringUtilities.regularExpressionFromLiteral(selection)));
         }
     }
     
