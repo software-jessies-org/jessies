@@ -555,7 +555,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                     splitLines.add(index++, new SplitLine(lineIndex, offset, i - offset));
                     addedCount++;
                     offset = i;
-                    x = 0;
+                    x = addCharWidth(0, ch);
                 }
             }
             if (x > 0) {
