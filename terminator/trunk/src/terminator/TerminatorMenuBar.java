@@ -6,6 +6,7 @@ import javax.swing.*;
 import e.gui.*;
 import e.util.*;
 import terminator.view.*;
+import terminator.view.highlight.*;
 
 /**
  * Provides a menu bar for Mac OS, and acts as a source of Action instances for
@@ -54,6 +55,9 @@ public class TerminatorMenuBar extends JMenuBar {
 		menu.add(new JMenuItem(new FindNextAction()));
 		menu.add(new JMenuItem(new FindPreviousAction()));
 		
+		menu.add(new JSeparator());
+		menu.add(new JMenuItem(new FindNextLinkAction()));
+		menu.add(new JMenuItem(new FindPreviousLinkAction()));
 		return menu;
 	}
 	
@@ -107,6 +111,10 @@ public class TerminatorMenuBar extends JMenuBar {
 	
 	public static KeyStroke makeKeyStroke(String key) {
 		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, false);
+	}
+	
+	public static KeyStroke makeShiftedKeyStroke(String key) {
+		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, true);
 	}
 	
 	public static JTerminalPane getFocusedTerminalPane() {
@@ -241,7 +249,21 @@ public class TerminatorMenuBar extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
-				FindDialog.getSharedInstance().findNextIn(terminal.getTextPane());
+				terminal.getTextPane().findNext(FindHighlighter.class);
+			}
+		}
+	}
+	
+	public static class FindNextLinkAction extends AbstractAction {
+		public FindNextLinkAction() {
+			super("Find Next Link");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedKeyStroke("G"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.getTextPane().findNext(HyperlinkHighlighter.class);
 			}
 		}
 	}
@@ -255,7 +277,21 @@ public class TerminatorMenuBar extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
-				FindDialog.getSharedInstance().findPreviousIn(terminal.getTextPane());
+				terminal.getTextPane().findPrevious(FindHighlighter.class);
+			}
+		}
+	}
+	
+	public static class FindPreviousLinkAction extends AbstractAction {
+		public FindPreviousLinkAction() {
+			super("Find Previous Link");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedKeyStroke("D"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.getTextPane().findPrevious(HyperlinkHighlighter.class);
 			}
 		}
 	}
