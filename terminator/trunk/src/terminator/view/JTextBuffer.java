@@ -514,7 +514,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	public List getHighlightsForLocation(Location location) {
 		List highlights = getHighlightsForLine(location.getLineIndex());
 		ArrayList result = new ArrayList();
-		for (int i = 0; i < lineHighlights.size(); i++) {
+		for (int i = 0; i < highlights.size(); i++) {
 			Highlight highlight = (Highlight) highlights.get(i);
 			Location start = highlight.getStart();
 			Location end = highlight.getEnd();
