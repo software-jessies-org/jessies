@@ -9,8 +9,6 @@ import e.util.*;
 /**
 The ETextArea action to open a 'find' dialog.
 
-TODO:
-    [ ] We ought to remember previous searches, but I'm not sure whether to do that here, or in the Minibuffer, for all its users.
 */
 public class FindAction extends ETextAction implements MinibufferUser {
     public static final String ACTION_NAME = "Find...";

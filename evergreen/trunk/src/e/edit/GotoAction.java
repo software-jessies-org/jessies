@@ -10,6 +10,7 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     public static final String ACTION_NAME = "Go to Line...";
     
     public ETextWindow currentTextWindow;
+    public int initialCaretPosition;
     
     public GotoAction() {
         super(ACTION_NAME);
@@ -20,6 +21,7 @@ public class GotoAction extends ETextAction implements MinibufferUser {
         if (currentTextWindow == null) {
             return;
         }
+        initialCaretPosition = currentTextWindow.getText().getCaretPosition();
         
         Edit.showMinibuffer(this);
     }
@@ -60,6 +62,14 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     }
     
     public void valueChangedTo(String value) {
+        try {
+            int line = Integer.parseInt(value);
+            if (line < currentTextWindow.getText().getLineCount()) {
+                currentTextWindow.goToLine(line);
+            }
+        } catch (NumberFormatException ex) {
+            ex = ex; // Do nothing.
+        }
     }
     
     /** Returns false because we offer no actions, so the minibuffer should remain active. */
@@ -82,5 +92,6 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     }
     
     public void wasCanceled() {
+        currentTextWindow.getText().setCaretPosition(initialCaretPosition);
     }
 }
