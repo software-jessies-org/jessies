@@ -5,7 +5,7 @@ package e.edit;
  */
 public class CheckInChangesAction extends ExternalToolAction {
     public CheckInChangesAction() {
-        super("Check in Changes...", "cd $EDIT_CURRENT_DIRECTORY ; checkintool");
+        super("Check in Changes...", "cd $EDIT_CURRENT_DIRECTORY ; SCM_EDITOR=e checkintool");
         setChecksEverythingSaved(true);
     }
 }
