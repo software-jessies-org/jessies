@@ -28,7 +28,11 @@ int ptym_open(std::string&);
 int ptys_open(const std::string&);
 pid_t pty_fork(int*);
 
-inline void panic(const char* reason, const char* parameter = 0) {
+// "gcc version 3.3 20030304 (Apple Computer, Inc. build 1671)" isn't clever
+// enough to work this out for itself.
+void panic(const char* reason, const char* parameter = 0) __attribute__((noreturn));
+
+inline void panic(const char* reason, const char* parameter /*= 0*/) {
     std::ostream& os(std::cout);
     os << reason;
     if (parameter != 0) {
