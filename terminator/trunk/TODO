@@ -3,7 +3,7 @@
   assumes we haven't already cleared the display. Somehow Terminal doesn't have
   this problem, so it is fixable.
 
-* Our sideways-scrolling performance is week when we have long lines. We don't
+* Our sideways-scrolling performance is weak when we have long lines. We don't
   take the clip rectangle into account to try to avoid work, and ask
   Graphics.drawString to render really long lines. On Mac OS, at least, this
   isn't a very good idea; even with a monospaced font, it seems to assume
