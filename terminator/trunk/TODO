@@ -9,6 +9,13 @@
   isn't a very good idea; even with a monospaced font, it seems to assume
   you've done the clipping yourself.
 
+* Although we've fixed the performance problem with running something like
+
+    perl -e 'print "x" x 100_000 . "\n"'
+
+  we still have a problem in that the first time you run it, too few characters
+  are passed to addHighlights; I don't know where the characters go missing.
+
 Make an about box.
 
 Add bracket-matching double-click selection?
