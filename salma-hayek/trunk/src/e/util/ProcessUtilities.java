@@ -6,30 +6,58 @@ import java.util.*;
 
 public class ProcessUtilities {
     /**
-     * Runs 'command'. Returns the command's status code.
+     * Runs 'command'. Returns the command's exit status.
      * Lines written to standard output are appended to 'lines'.
      * Lines written to standard error are appended to 'errors'.
-     * 
+     */
+    public static int backQuote(final File directory, final String[] command, final ArrayList lines, final ArrayList errors) {
+        return backQuote(directory, command, new ArrayListLineListener(lines), new ArrayListLineListener(errors));
+    }
+    
+    /**
+     * Runs 'command'. Returns the command's exit status.
+     * Lines written to standard output are passed to 'outputLineListener'.
+     * Lines written to standard error are passed to 'errorLineListener'.
+     *
      * FIXME: should errors *we* detect go in 'lines', or in 'errors'? Currently
      * they go in 'lines'.
-     * 
+     *
      * If directory is null, the subprocess inherits our working directory.
-     * 
+     *
      * You can use the same ArrayList for 'lines' and 'errors'. All the error
      * lines will appear after all the output lines.
      */
-    public static int backQuote(File directory, String[] command, ArrayList lines, ArrayList errors) {
+    public static int backQuote(final File directory, final String[] command, final LineListener outputLineListener, final LineListener errorLineListener) {
         ArrayList result = new ArrayList();
         try {
             Process p = Runtime.getRuntime().exec(command, null, directory);
             p.getOutputStream().close();
-            readLinesFromStream(lines, p.getInputStream());
-            readLinesFromStream(errors, p.getErrorStream());
+            readLinesFromStream(outputLineListener, p.getInputStream());
+            readLinesFromStream(errorLineListener, p.getErrorStream());
             return p.waitFor();
         } catch (Exception ex) {
             ex.printStackTrace();
-            lines.add(ex.getMessage());
+            outputLineListener.processLine(ex.getMessage());
             return 1;
+        }
+    }
+    
+    public interface LineListener {
+        public void processLine(String line);
+    }
+    
+    /**
+     * Collects lines into an ArrayList.
+     */
+    private static class ArrayListLineListener implements LineListener {
+        private ArrayList arrayList;
+        
+        public ArrayListLineListener(final ArrayList arrayList) {
+            this.arrayList = arrayList;
+        }
+        
+        public void processLine(String line) {
+            arrayList.add(line);
         }
     }
 
@@ -56,25 +84,25 @@ public class ProcessUtilities {
         }.start();
     }
 
-    private static void readLinesFromStream(ArrayList result, InputStream stream) {
+    private static void readLinesFromStream(LineListener listener, InputStream stream) {
         BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(stream));
             String line;
             while ((line = in.readLine()) != null) {
-                result.add(line);
+                listener.processLine(line);
             }
             in.close();
         } catch (Exception ex) {
             ex.printStackTrace();
-            result.add(ex.getMessage());
+            listener.processLine(ex.getMessage());
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    result.add(ex.getMessage());
+                    listener.processLine(ex.getMessage());
                 }
             }
         }
