@@ -16,6 +16,15 @@ import e.util.*;
  * 
  * @author Elliott Hughes
  */
+
+//
+// TODO: SearchField filtering in the list.
+// TODO: C-F/C-D/C-G searching in the text areas.
+// TODO: do the summary ourselves using reflection.
+// TODO: link the summary to the detail (i.e. "show me the disassembly of this method")
+// TODO: handle files other than .class files.
+//
+
 public class JarExplorer extends JFrame {
     private JCheckBox showLineNumberAndLocalVariableTables;
     private JCheckBox showVerboseDetail;
