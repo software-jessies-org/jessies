@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 /**
 
@@ -167,6 +168,13 @@ public class JTelnetPane extends JPanel {
 			event.consume();
 		}
 	}
+	
+	/**
+	 * Hands focus to our text pane.
+	 */
+	public void requestFocus() {
+		textPane.requestFocus();
+	}
 
 	public static void main(final String[] arguments) throws IOException {
 		Log.setApplicationName("Terminator");
@@ -194,7 +202,15 @@ public class JTelnetPane extends JPanel {
 					frame.setTitle(telnetPane.getName());
 					content = telnetPane;
 				} else {
-					JTabbedPane tabbedPane = new JTabbedPane();
+					final JTabbedPane tabbedPane = new JTabbedPane();
+					tabbedPane.addChangeListener(new ChangeListener() {
+						/**
+						 * Ensures that when we change tab, we give focus to that terminal.
+						 */
+						public void stateChanged(ChangeEvent e) {
+							tabbedPane.getSelectedComponent().requestFocus();
+						}
+					});
 					for (int i = 0; i < telnetPanes.size(); ++i) {
 						JTelnetPane telnetPane = (JTelnetPane) telnetPanes.get(i);
 						tabbedPane.add(telnetPane.getName(), telnetPane);
