@@ -131,15 +131,23 @@ public class Terminator implements Controller {
 		}
 	}
 	
+	private final KeyHandler keyHandler = new KeyHandler();
+	
 	private class KeyHandler implements KeyListener {
 		public void keyPressed(KeyEvent event) {
 			if (event.isAltDown()) {
 				switch (event.getKeyCode()) {
 					case KeyEvent.VK_RIGHT:
-						setSelectedTab(tabbedPane.getSelectedIndex() + 1);
+						if (tabbedPane != null) {
+							setSelectedTab(tabbedPane.getSelectedIndex() + 1);
+							event.consume();
+						}
 						break;
 					case KeyEvent.VK_LEFT:
-						setSelectedTab(tabbedPane.getSelectedIndex() - 1);
+						if (tabbedPane != null) {
+							setSelectedTab(tabbedPane.getSelectedIndex() - 1);
+							event.consume();
+						}
 						break;
 				}
 			}
@@ -304,7 +312,8 @@ public class Terminator implements Controller {
 	private void addPaneToUI(JTelnetPane newPane) {
 		initTabbedPane();
 		tabbedPane.add(newPane.getName(), newPane);
-		newPane.getTextPane().addKeyListener(new KeyHandler());
+		newPane.getTextPane().removeKeyListener(keyHandler);
+		newPane.getTextPane().addKeyListener(keyHandler);
 	}
 
 	public void showUsage() {

@@ -7,7 +7,7 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
-[5]	Fix backspace in vim on Linux; it deletes forwards, and is driving me mad whenever I write a checkin comment. Must start work on CheckInTool.
+[5]	If backspace in vim really fixed?  I think this is a terminfo problem, so should be resolved now.  Test this.
 [5]	Fix ^C. It works fine if you've started Terminator from another terminal emulator (xterm, say), but if you start it from the GNOME panel, it doesn't. stty -a can't see any difference.
 [3]	Review the current properties reading, and see if it's really going to work well enough.  Possibly add "?MacOS:" stuff to it.
 [1]	Add bracket-matching double-click selection?
