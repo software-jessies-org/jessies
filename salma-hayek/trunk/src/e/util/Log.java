@@ -5,6 +5,29 @@ import java.util.*;
 import java.lang.reflect.*;
 
 public class Log {
+    /**
+     * java.awt.EventDispatchThread checks this property before using its
+     * default exception-reporting code; if you set it to the name of a class,
+     * you can arrange for your code to be invoked instead.
+     */
+    private static final String HANDLER_PROPERTY = "sun.awt.exception.handler";
+    static {
+        System.setProperty(HANDLER_PROPERTY, "e.util.Log$AwtExceptionHandler");
+    }
+    
+    /**
+     * java.awt.EventDispatchThread needs a zero-argument constructor, so this
+     * has to be a static nested class.
+     */
+    public static class AwtExceptionHandler {
+        /**
+         * Forwards the caught exception to our usual logging code.
+         */
+        public void handle(Throwable th) {
+            Log.warn("Exception occurred during event dispatching.", th);
+        }
+    }
+    
     private static String applicationName = "unknown";
     private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S Z");
 
