@@ -35,7 +35,13 @@ body = ""
 
 # Output the overview.
 body << "<p><b>#{author}</b> #{date}</p>"
-body << "<p>#{comment.join("<br>\n")}</p>"
+body << "<p>"
+comment.each() {
+    |line|
+    body << CGI.escapeHTML(line)
+    body << "<br>\n"
+}
+body << "</p>"
 body << "<hr noshade>"
 
 # Get and output the patch.
