@@ -17,9 +17,6 @@ JAVA=java
 EDIT_PREFERENCES_DIRECTORY=$HOME/.$EDIT_CLASS_NAME
 
 case "`uname`" in
-Linux)
-    EXTRA_CLASSPATH_ENTRIES=$EDIT_HOME/../salma-hayek/MRJ141Stubs.jar
-    ;;
 Darwin)
     # Darwin is what Mac OS X calls itself.
     EDIT_PREFERENCES_DIRECTORY=$HOME/Library/Preferences/$EDIT_CLASS_NAME
@@ -27,6 +24,7 @@ Darwin)
     OS_SPECIFIC_OPTIONS=-Xdock:name=Edit:icon=/Developer/Examples/Carbon/SimpleText/SimpleText.icns
     ;;
 *)
+    EXTRA_CLASSPATH_ENTRIES=$EDIT_HOME/../salma-hayek/MRJ141Stubs.jar
     ;;
 esac
 
