@@ -22,10 +22,10 @@ void NSSpellChecker_showSuggestions(const char* word) {
 
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-    NSString* string = [[NSString stringWithUTF8String:word] autorelease];
+    NSString* string = [NSString stringWithUTF8String:word];
     NSArray* guesses = [checker guessesForWord:string];
     if ([guesses count] == 0) {
-        printf("#\n");
+        printf("# %s 0\n", word);
         [pool release];
         return;
     }

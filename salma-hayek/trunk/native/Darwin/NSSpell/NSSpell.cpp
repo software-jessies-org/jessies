@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
             std::string word(line.substr(1));
             // FIXME: insert word into dictionary.
         } else {
-            os << "eh? " << line << std::endl;
+            abort();
         }
     }
 }
