@@ -75,7 +75,7 @@ public class JTextComponentFind {
         
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Find:", findField);
-        formPanel.addRow("", findStatus);
+        formPanel.setStatusBar(findStatus);
         FormDialog.showNonModal(frame, "Find", formPanel);
         
         findField.selectAll();
