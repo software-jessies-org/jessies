@@ -95,7 +95,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		});
 		initTerminals();
 		frame.pack();
-		frame.setLocationRelativeTo(null);
+		frame.setLocationByPlatform(true);
 		frame.setVisible(true);
 	}
 	
