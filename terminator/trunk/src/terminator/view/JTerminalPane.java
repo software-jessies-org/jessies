@@ -27,9 +27,10 @@ public class JTerminalPane extends JPanel {
 		new CopyAction(),
 		new PasteAction(),
 		null,
+		new NewWindowAction(),
 		new NewTabAction(),
 		new RunCommandAction(),
-		new CloseTabAction(),
+		new CloseAction(),
 		null,
 		new FindAction(),
 		new FindNextAction(),
@@ -38,7 +39,6 @@ public class JTerminalPane extends JPanel {
 		new ClearScrollbackAction(),
 		null,
 		new ChangeColourAction(),
-		new NewWindowAction(),
 	};
 	
 	/**
@@ -555,9 +555,9 @@ public class JTerminalPane extends JPanel {
 		}
 	}
 	
-	public class CloseTabAction implements MenuKeyAction {
+	public class CloseAction implements MenuKeyAction {
 		public String getName(Point mousePosition) {
-			return "Close Tab";
+			return "Close";
 		}
 		
 		public void performAction() {
