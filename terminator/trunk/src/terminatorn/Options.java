@@ -25,7 +25,7 @@ import java.util.regex.*;
 public class Options {
 	private static final Options INSTANCE = new Options();
 	
-	private final Pattern resourcePattern = Pattern.compile("(?:XTerm|Rxvt)(?:\\*|\\.)(\\S+):\\s*(.+)");
+	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt)(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
 	private HashMap options = new HashMap();
 	private HashMap rgbColours = new HashMap();
@@ -68,6 +68,15 @@ public class Options {
 	
 	private boolean parseBoolean(String s) {
 		return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes");
+	}
+	
+	/**
+	 * Returns a string suitable for the window manager to use as a window
+	 * title. The default is "Terminator".
+	 */
+	public String getTitle() {
+		String title = (String) options.get("title");
+		return (title != null) ? title : "Terminator";
 	}
 	
 	public int getInternalBorder() {
