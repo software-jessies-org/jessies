@@ -3,6 +3,7 @@ package e.edit;
 import java.awt.Color;
 import java.io.*;
 import java.util.regex.*;
+import e.util.*;
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
@@ -10,6 +11,7 @@ public class TagReader {
     
     private TagListener listener;
     private String fileType;
+    private String digest;
 
     public TagReader(File file, String fileType, TagListener tagListener) {
         this.listener = tagListener;
@@ -36,7 +38,12 @@ public class TagReader {
             file.getAbsolutePath()
         });
         p.waitFor();
+        digest = FileUtilities.md5(tagsFile);
         return tagsFile;
+    }
+    
+    public String getTagsDigest() {
+        return digest;
     }
     
     private void readTagsFile(File tagsFile) throws IOException {
