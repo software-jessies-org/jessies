@@ -136,6 +136,10 @@ public class JTelnetPane extends JPanel {
 	 * of the scroll pane and stick it in the WEST slot of our BorderLayout.
 	 */
 	private void fixScrollBarForMacOs(JScrollPane scrollPane) {
+		if (System.getProperty("os.name").indexOf("Mac OS") == -1) {
+			return;
+		}
+		
 		add(scrollPane.getVerticalScrollBar(), BorderLayout.WEST);
 		
 		/*
