@@ -7,7 +7,6 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
-[5]	Fix Alt-K (clear scrollback).
 [5]	Stop inserting blank lines at the bottom when we're resized.
 [5]	Implement "New Window" to go with "New Tab".
 [5]	Sort out some decent way of building distributions, including the library superstar.
