@@ -117,6 +117,23 @@ public class SpellingChecker {
         return (String[]) suggestions.toArray(new String[suggestions.size()]);
     }
     
+    /**
+     * Moves the word from the known bad set to the known good set,
+     * and inserts it into the user's personal ispell dictionary.
+     */
+    public synchronized void acceptSpelling(String word) {
+        if (isMisspelledWord(word) == false) {
+            return;
+        }
+        
+        knownBad.remove(word);
+        knownGood.add(word);
+        
+        // Send the word to ispell to insert into the personal dictionary.
+        out.println("*" + word);
+        out.flush();
+    }
+    
     public static synchronized void dumpKnownBadWordsTo(PrintStream out) {
         // Get a sorted list of the known bad words.
         Iterator it = knownBad.iterator();

@@ -54,7 +54,8 @@ public class JTextComponentSpellingChecker implements DocumentListener {
             if (isMisspelledWordBetween(offset, offset, actualRange)) {
                 EPopupMenu menu = new EPopupMenu();
                 String misspelling = document.getText(actualRange.start, actualRange.end - actualRange.start);
-                //menuItems.add(new AcceptSpellingAction(misspelling));
+                menu.add(new AcceptSpellingAction(misspelling));
+                boolean firstSuggestion = true;
                 String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
                 for (int i = 0; i < suggestions.length; i++) {
                     String suggestion = suggestions[i];
@@ -63,6 +64,10 @@ public class JTextComponentSpellingChecker implements DocumentListener {
                     // hyphenated words or multiple words.
                     suggestion = suggestion.replace('-', '_');
                     suggestion = convertMultipleWordsToCamelCase(suggestion);
+                    if (firstSuggestion) {
+                        menu.addSeparator();
+                        firstSuggestion = false;
+                    }
                     menu.add(new CorrectSpellingAction(document, suggestion, actualRange.start, actualRange.end));
                 }
                 menu.show(component, e.getX(), e.getY());
@@ -70,6 +75,21 @@ public class JTextComponentSpellingChecker implements DocumentListener {
             }
         } catch (BadLocationException ex) {
             ex.printStackTrace();
+        }
+    }
+    
+    public class AcceptSpellingAction extends AbstractAction {
+        private final String word;
+        
+        public AcceptSpellingAction(final String word) {
+            super("Accept '" + word + "'");
+            this.word = word;
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            SpellingChecker.getSharedSpellingCheckerInstance().acceptSpelling(word);
+            checkSpelling();
+            // FIXME: need to notify *all* the ispells.
         }
     }
     
