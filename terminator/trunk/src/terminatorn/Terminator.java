@@ -240,6 +240,7 @@ public class Terminator implements Controller {
 			}
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					getFindHighlighter().forgetRegularExpression(textToFindIn);
 					hideFindDialog();
 					e.consume();
 				}
@@ -247,9 +248,12 @@ public class Terminator implements Controller {
 		});
 	}
 	
+	private FindHighlighter getFindHighlighter() {
+		return (FindHighlighter) textToFindIn.getHighlighterOfClass(FindHighlighter.class);
+	}
+	
 	private void find(String regularExpression) {
-		FindHighlighter finder = (FindHighlighter) textToFindIn.getHighlighterOfClass(FindHighlighter.class);
-		finder.setRegularExpression(textToFindIn, regularExpression);
+		getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
 	}
 	
 	public void showFindDialogFor(JTextBuffer text) {
