@@ -61,11 +61,6 @@
   correctness). [Have checked in code to fix this, but want a reproducible
   test case before switching over.]
 
-* Fix the problem where sometimes the selection as pasted into another program
-  doesn't match what appears to be selected. (I think this only happens when
-  you've selected to the end of a line, and you get some amount of the text
-  that follows on later lines.) [Haven't seen this in a while.]
-
 * Our double-click selection may be pretty clever in situations where xterm
   and rxvt aren't, but it doesn't work as well in situations they're good at:
   numbers in situations such as "offset=1234,length=5678". No-one does IP
