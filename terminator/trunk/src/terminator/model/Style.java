@@ -8,6 +8,27 @@ import java.awt.*;
  * instances.
  *
  * For now, I've subclassed this and overridden getBackground.
+ * 
+ * Here's Phil's commentary:
+ * 
+ * Oh, and to answer the original question, the Style associated with a
+ * piece of text which has been produced by the escape-sequence-filled
+ * stream of characters from the process we're running, should never be
+ * modified by anyone else.  IOW, no part of the program is allowed to
+ * corrupt our only copy of the data.
+ * 
+ * Of course, anyone's free to create Style subclasses which filter the
+ * colors, or act as an adapter to an 'original' Style object.  However,
+ * since the data model generator will only produce vanilla Style instances,
+ * such activity can't produce model corruption, which is what we wish to
+ * avoid.
+ * 
+ * So it's not quite as strictly immutable as String, but the particular
+ * aspect of immutability which is enforced is that which states that the
+ * creator knows that the Style's nature cannot be changed, but it does not
+ * enforce that the recipient of a Style may know that it cannot change its
+ * nature.  Of course, the latter is unlikely to happen, but it's not
+ * absolutely disallowed because there's no particular reason it should be.
  */
 public class Style {
 	// If any of these is null, it should be ignored.  We use Boolean references because they
