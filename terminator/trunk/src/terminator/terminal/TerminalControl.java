@@ -23,7 +23,13 @@ public class TerminalControl implements Runnable {
 	private static final boolean DEBUG_STEP_MODE = false;
 	private static BufferedReader stepModeReader;
 
-	private static final int INPUT_BUFFER_SIZE = 8192;
+	/**
+	 * On Mac OS, this seems to be an optimal size; any smaller and we end
+	 * up doing more reads from programs that produce a lot of output, but
+	 * going larger doesn't reduce the number. Maybe this corresponds to
+	 * the stdio buffer size or something?
+	 */
+	private static final int INPUT_BUFFER_SIZE = 8 * 1024;
 
 	private JTerminalPane pane;
 	private TerminalListener listener;
