@@ -66,7 +66,7 @@ public class EscapeParser {
 		}
 		
 		public TerminalAction getTerminalAction(TerminalControl terminalControl, String sequence) {
-			return new SingleCharEscapeAction(sequence.charAt(0));
+			return new SingleCharEscapeAction(terminalControl, sequence.charAt(0));
 		}
 	}
 	
@@ -76,7 +76,7 @@ public class EscapeParser {
 		}
 		
 		public TerminalAction getTerminalAction(TerminalControl terminalControl, String sequence) {
-			return new TwoCharEscapeAction(sequence);
+			return new TwoCharEscapeAction(terminalControl, sequence);
 		}
 	}
 	

@@ -40,7 +40,8 @@ public class TerminalControl implements Runnable {
 	private InputStream in;
 	private PtyOutputStream out;
 	
-	private boolean graphicalCharacterSet = false;
+	private int characterSet;
+	private char[] g = new char[4];
 	
 	private LogWriter logWriter;
 	
@@ -48,6 +49,7 @@ public class TerminalControl implements Runnable {
 	private ArrayList terminalActions = new ArrayList();
 	
 	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command, Process process) throws IOException {
+		reset();
 		this.pane = pane;
 		this.listener = listener;
 		this.process = process;
@@ -71,10 +73,22 @@ public class TerminalControl implements Runnable {
 		(new Thread(this, "Terminal connection listener")).start();
 	}
 	
-	public void reset() {
-		graphicalCharacterSet = false;
+	public void invokeCharacterSet(int index) {
+		this.characterSet = index;
 	}
-
+	
+	public void reset() {
+		invokeCharacterSet(0);
+		designateCharacterSet(0, 'B');
+		designateCharacterSet(1, '0');
+		designateCharacterSet(2, 'B');
+		designateCharacterSet(3, 'B');
+	}
+	
+	public void designateCharacterSet(int index, char set) {
+		g[index] = set;
+	}
+	
 	private StringBuffer lineBuffer = new StringBuffer();
 
 	private EscapeParser escapeParser;
@@ -149,6 +163,13 @@ public class TerminalControl implements Runnable {
 			processChar((char) value);
 		}
 		flushLineBuffer();
+		flushTerminalActions();
+	}
+	
+	private synchronized void flushTerminalActions() {
+		if (terminalActions.size() == 0) {
+			return;
+		}
 		
 		final TerminalAction[] actions = (TerminalAction[]) terminalActions.toArray(new TerminalAction[terminalActions.size()]);
 		terminalActions.clear();
@@ -202,9 +223,9 @@ public class TerminalControl implements Runnable {
 			doStep();
 			processSpecialCharacter(ch);
 		} else if (ch == Ascii.SO) {
-			graphicalCharacterSet = true;
+			invokeCharacterSet(1);
 		} else if (ch == Ascii.SI) {
-			graphicalCharacterSet = false;
+			invokeCharacterSet(0);
 		} else if (ch > Ascii.BEL) {
 			// Most telnetd(1) implementations seem to have a bug whereby
 			// they send the NUL byte at the end of the C strings they want to
@@ -216,14 +237,40 @@ public class TerminalControl implements Runnable {
 			
 			// And neither is BEL, really.
 			
-			if (graphicalCharacterSet) {
-				lineBuffer.append(translateToGraphicalCharacterSet(ch));
-			} else {
-				lineBuffer.append(ch);
-			}
+			lineBuffer.append(ch);
 		}
 	}
 
+	private class PlainTextAction implements TerminalAction {
+		private String line;
+		
+		private PlainTextAction(String line) {
+			this.line = line;
+		}
+		
+		public void perform(TextBuffer listener) {
+			if (DEBUG) {
+				Log.warn("Processing line \"" + line + "\"");
+			}
+			listener.processLine(line);
+		}
+		
+		public String toString() {
+			return "TerminalAction[Process line: " + line + "]";
+		}
+	}
+	
+	public String translate(String characters) {
+		if (g[characterSet] == 'B') {
+			return characters;
+		}
+		StringBuffer translation = new StringBuffer(characters.length());
+		for (int i = 0; i < characters.length(); ++i) {
+			translation.append(translateToCharacterSet(characters.charAt(i)));
+		}
+		return translation.toString();
+	}
+	
 	private synchronized void flushLineBuffer() {
 		final String line = lineBuffer.toString();
 		lineBuffer = new StringBuffer();
@@ -231,18 +278,7 @@ public class TerminalControl implements Runnable {
 		// Conform to the stated claim that the listener's always called in the AWT dispatch thread.
 		if (line.length() > 0) {
 			doStep();
-			terminalActions.add(new TerminalAction() {
-				public void perform(TextBuffer listener) {
-					if (DEBUG) {
-						Log.warn("Processing line \"" + line + "\"");
-					}
-					listener.processLine(line);
-				}
-				
-				public String toString() {
-					return "TerminalAction[Process line: " + line + "]";
-				}
-			});
+			terminalActions.add(new PlainTextAction(line));
 		}
 	}
 	
@@ -285,6 +321,17 @@ public class TerminalControl implements Runnable {
 		TerminalAction action = escapeParser.getAction(this);
 		if (action != null) {
 			terminalActions.add(action);
+		}
+	}
+	
+	private char translateToCharacterSet(char ch) {
+		switch (g[characterSet]) {
+		case '0':
+			return translateToGraphicalCharacterSet(ch);
+		case 'A':
+			return translateToUkCharacterSet(ch);
+		default:
+			return ch;
 		}
 	}
 	
@@ -368,6 +415,10 @@ public class TerminalControl implements Runnable {
 		default:
 			return ch;
 		}
+	}
+	
+	private char translateToUkCharacterSet(char ch) {
+		return (ch == '#') ? '\u00a3' : ch;
 	}
 	
 	public void sendEscapeString(String str) {
