@@ -257,5 +257,46 @@ public class JTextComponentSpellingChecker implements DocumentListener {
     }
     
     /** Paints the misspelled word highlights. */
-    private Highlighter.HighlightPainter misspelledWordHighlightPainter = new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 0, 0, 32));
+    private LayeredHighlighter.LayerPainter misspelledWordHighlightPainter = new UnderlineHighlightPainter();
+    
+    /**
+     * A red underline for spelling mistake highlights.
+     */
+    public static class UnderlineHighlightPainter extends LayeredHighlighter.LayerPainter {
+        private static final Color COLOR = new Color(255, 0, 0, 128);
+        private static final Stroke DASHED_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 2.0f, 3.0f }, 0.0f);
+        
+        public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
+            // Do nothing: this method will never be called
+        }
+        
+        public Shape paintLayer(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c, View view) {
+            Rectangle r = null;
+            if (offs0 == view.getStartOffset() && offs1 == view.getEndOffset()) {
+                if (bounds instanceof Rectangle) {
+                    r = (Rectangle) bounds;
+                } else {
+                    r = bounds.getBounds();
+                }
+            } else {
+                try {
+                    Shape shape = view.modelToView(offs0, Position.Bias.Forward, offs1, Position.Bias.Backward, bounds);
+                    r = (shape instanceof Rectangle) ?  (Rectangle) shape : shape.getBounds();
+                } catch (BadLocationException e) {
+                    return null;
+                }
+            }
+            
+            int baseline = r.y + r.height - 1;
+            r.y += 2; r.height -= 3;
+            
+            Graphics2D g2 = (Graphics2D) g;
+            Stroke originalStroke = g2.getStroke();
+            g2.setColor(COLOR);
+            g2.setStroke(DASHED_STROKE);
+            g2.drawLine(r.x, baseline, r.x + r.width, baseline);
+            g2.setStroke(originalStroke);
+            return r;
+        }
+    }
 }
