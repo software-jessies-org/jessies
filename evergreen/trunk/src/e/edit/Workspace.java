@@ -19,7 +19,6 @@ public class Workspace extends JPanel {
     private OpenQuicklyDialog openQuicklyDialog;
     private EFileOpenDialog openDialog;
     private FileDialog saveAsDialog;
-    private FindFilesDialog findFilesDialog;
     
     private ArrayList fileList;
     
@@ -377,9 +376,7 @@ public class Workspace extends JPanel {
      * user last typed, or you should leave things as they are.
      */
     public void showFindFilesDialog(String pattern, String filenamePattern) {
-        if (findFilesDialog == null) {
-            findFilesDialog = new FindFilesDialog(this);
-        }
+        FindFilesDialog findFilesDialog = new FindFilesDialog(this);
         if (pattern.length() > 0) {
             findFilesDialog.setPattern(pattern);
         }
