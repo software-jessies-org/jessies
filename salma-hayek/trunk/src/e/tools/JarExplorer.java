@@ -128,6 +128,7 @@ public class JarExplorer extends JFrame {
         JTextArea textArea = new JTextArea(30, 80);
         textArea.setEditable(false);
         textArea.setDragEnabled(false);
+        JTextComponentFind.addFindFunctionalityTo(textArea);
         return textArea;
     }
 
