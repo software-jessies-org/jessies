@@ -208,7 +208,7 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
             }
         }
         if (lastStart < line.length()) {
-            result.add(new PTextSegment(TYPE_NORMAL, line.substring(lastStart, line.length())));
+            result.add(new PTextSegment(comment ? TYPE_COMMENT : TYPE_NORMAL, line.substring(lastStart, line.length())));
         }
         return result;
     }
