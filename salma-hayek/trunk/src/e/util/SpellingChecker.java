@@ -11,7 +11,6 @@ public class SpellingChecker {
     private Process ispell;
     private PrintWriter out;
     private BufferedReader in;
-    private BufferedReader err;
     
     private static HashSet knownGood = new HashSet();
     private static HashSet knownBad = new HashSet();
@@ -40,23 +39,6 @@ public class SpellingChecker {
             ispell = Runtime.getRuntime().exec(execArguments);
             in = new BufferedReader(new InputStreamReader(ispell.getInputStream()));
             out = new PrintWriter(ispell.getOutputStream());
-            
-            /*
-            err = new BufferedReader(new InputStreamReader(ispell.getErrorStream()));
-            new Thread("ISpell Error Reporter") {
-                public void run() {
-                    try {
-                        String line;
-                        while ((line = err.readLine()) != null) {
-                            System.err.println("ispell: " + line);
-                        }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    } finally {
-                    }
-                }
-            }.start();
-            */
             
             String greeting = in.readLine();
             if (greeting.startsWith("@(#) International Ispell ")) {
