@@ -73,6 +73,7 @@ public class FindFilesDialog {
     }
     
     public class FileFinder extends SwingWorker {
+        private List fileList;
         private DefaultListModel matchModel;
         private String regex;
         private String directory;
@@ -89,7 +90,8 @@ public class FindFilesDialog {
             this.directory = directory;
             this.resultNoLongerWanted = false;
             this.doneFileCount = 0;
-            this.totalFileCount = workspace.getIndexedFileCount();
+            this.fileList = workspace.getListOfFilesMatching(directory);
+            this.totalFileCount = fileList.size();
             this.percentage = -1;
             
             matchList.setModel(matchModel);
@@ -113,7 +115,6 @@ public class FindFilesDialog {
             Thread.currentThread().setName("Search for '" + regex + "' in " + directory);
             try {
                 Pattern pattern = Pattern.compile(regex);
-                List fileList = workspace.getListOfFilesMatching(directory);
                 FileSearcher fileSearcher = new FileSearcher(pattern);
                 String root = workspace.getRootDirectory();
                 long startTime = System.currentTimeMillis();
