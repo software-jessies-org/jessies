@@ -413,8 +413,26 @@ public class JTerminalPane extends JPanel {
 		}
 	}
 	
-	private void addInfoItems(JPopupMenu menu) {
-		String selectedText = getSelectedText();
+	private void addSelectionInfoItems(JPopupMenu menu, String selectedText) {
+		if (selectedText.length() == 0) {
+			return;
+		}
+		
+		int selectedLineCount = 0;
+		for (int i = 0; i < selectedText.length(); ++i) {
+			if (selectedText.charAt(i) == '\n') {
+				++selectedLineCount;
+			}
+		}
+		menu.addSeparator();
+		menu.add(makeInfoItem("Selection"));
+		menu.add(makeInfoItem("  characters: " + selectedText.length()));
+		if (selectedLineCount != 0) {
+			menu.add(makeInfoItem("  lines: " + selectedLineCount));
+		}
+	}
+	
+	private void addNumberInfoItems(JPopupMenu menu, String selectedText) {
 		if (selectedText.indexOf("\n") != -1) {
 			return;
 		}
@@ -428,6 +446,12 @@ public class JTerminalPane extends JPanel {
 				menu.add(makeInfoItem(item));
 			}
 		}
+	}
+	
+	private void addInfoItems(JPopupMenu menu) {
+		String selectedText = getSelectedText();
+		addSelectionInfoItems(menu, selectedText);
+		addNumberInfoItems(menu, selectedText);
 	}
 	
 	private String getSelectedText() {
