@@ -226,14 +226,18 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		public void keyPressed(KeyEvent event) {
-			if (GuiUtilities.isMacOs() == false && TerminatorMenuBar.isKeyboardEquivalent(event)) {
-				handleKeyboardEquivalent(event);
+			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
+				if (GuiUtilities.isMacOs() == false) {
+					handleKeyboardEquivalent(event);
+				}
 				return;
 			}
+			
 			if (doKeyboardScroll(event)) {
 				event.consume();
 				return;
 			}
+			
 			String sequence = getSequenceForKeyCode(event);
 			if (sequence != null) {
 				control.sendEscapeString(sequence);
@@ -294,12 +298,10 @@ public class JTerminalPane extends JPanel {
 						textPane.scrollToBottom();
 						return true;
 					case KeyEvent.VK_PAGE_UP:
-					case KeyEvent.VK_UP:
-						scrollVertically(-0.5);
+						pageUp();
 						return true;
 					case KeyEvent.VK_PAGE_DOWN:
-					case KeyEvent.VK_DOWN:
-						scrollVertically(0.5);
+						pageDown();
 						return true;
 					default:
 						return false;
@@ -307,24 +309,6 @@ public class JTerminalPane extends JPanel {
 			} else {
 				return false;
 			}
-		}
-		
-		private void scrollVertically(double yMul) {
-			JViewport viewport = scrollPane.getViewport();
-			
-			// Translate JViewport's terrible confusing names into plain English.
-			final int totalHeight = viewport.getViewSize().height;
-			final int visibleHeight = viewport.getExtentSize().height;
-			
-			Point p = viewport.getViewPosition();
-			p.y += (int) (yMul * visibleHeight);
-			
-			// Don't go off the top...
-			p.y = Math.max(0, p.y);
-			// Or bottom...
-			p.y = Math.min(p.y, totalHeight - visibleHeight);
-			
-			viewport.setViewPosition(p);
 		}
 		
 		/**
@@ -337,6 +321,32 @@ public class JTerminalPane extends JPanel {
 				textPane.scrollToBottom();
 			}
 		}
+	}
+	
+	public void pageUp() {
+		scrollVertically(-0.5);
+	}
+	
+	public void pageDown() {
+		scrollVertically(0.5);
+	}
+	
+	private void scrollVertically(double yMul) {
+		JViewport viewport = scrollPane.getViewport();
+		
+		// Translate JViewport's terrible confusing names into plain English.
+		final int totalHeight = viewport.getViewSize().height;
+		final int visibleHeight = viewport.getExtentSize().height;
+		
+		Point p = viewport.getViewPosition();
+		p.y += (int) (yMul * visibleHeight);
+		
+		// Don't go off the top...
+		p.y = Math.max(0, p.y);
+		// Or bottom...
+		p.y = Math.min(p.y, totalHeight - visibleHeight);
+		
+		viewport.setViewPosition(p);
 	}
 	
 	/**
