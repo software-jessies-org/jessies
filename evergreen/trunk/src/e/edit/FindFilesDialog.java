@@ -13,8 +13,8 @@ import e.util.*;
  * 
  */
 public class FindFilesDialog {
-    private FileNamePatternField patternField = new FileNamePatternField();
-    private JTextField directoryField = new JTextField("", 40);
+    private CheapMonitoredField patternField = new CheapMonitoredField();
+    private CheapMonitoredField directoryField = new CheapMonitoredField();
     private JLabel status = new JLabel(" ");
     private JList matchList;
     
@@ -125,8 +125,8 @@ public class FindFilesDialog {
         }
     }
     
-    public class FileNamePatternField extends EMonitoredTextField {
-        public FileNamePatternField() {
+    public class CheapMonitoredField extends EMonitoredTextField {
+        public CheapMonitoredField() {
             super(40);
         }
         
