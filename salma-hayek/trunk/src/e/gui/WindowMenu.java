@@ -19,7 +19,7 @@ import javax.swing.*;
 public class WindowMenu {
     private static final WindowMenu INSTANCE = new WindowMenu();
     
-    private final WindowCloseListener windowCloseListener = new WindowCloseListener();
+    private final WindowEventListener windowEventListener = new WindowEventListener();
     private final WindowTitleListener windowTitleListener = new WindowTitleListener();
     
     private Vector windows;
@@ -52,14 +52,19 @@ public class WindowMenu {
      */
     public void addWindow(Frame f) {
         f.addPropertyChangeListener("title", windowTitleListener);
-        f.addWindowListener(windowCloseListener);
+        f.addWindowListener(windowEventListener);
+        f.addWindowFocusListener(windowEventListener);
         windows.add(f);
         updateMenus();
     }
     
-    private class WindowCloseListener extends WindowAdapter {
+    private class WindowEventListener extends WindowAdapter {
         public void windowClosed(WindowEvent e) {
             removeWindow((Frame) e.getWindow());
+        }
+        
+        public void windowGainedFocus(WindowEvent e) {
+            updateMenus();
         }
     }
     
@@ -99,7 +104,9 @@ public class WindowMenu {
         }
         
         public void addWindowItem(final Frame f) {
-            add(new ShowSpecificWindowAction(f));
+            JCheckBoxMenuItem item = new JCheckBoxMenuItem(new ShowSpecificWindowAction(f));
+            item.setSelected(f.isFocused());
+            add(item);
         }
         
         public void disableAll() {
