@@ -115,6 +115,7 @@ public class TagsUpdater {
         tree.setModel(treeModel);
         tree.expandAll();
         showTags();
+        selectTagAtCaret(textWindow.getText());
     }
     
     public void showTags() {
