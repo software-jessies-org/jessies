@@ -14,7 +14,7 @@ public class PTextWindow {
             System.exit(1);
         }
         final File file = new File(args[0]);
-        final PText text = new PText();
+        final PTextBuffer text = new PTextBuffer();
         text.setText(getFileText(file));
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

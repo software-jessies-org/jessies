@@ -6,19 +6,19 @@ public class PTextEvent {
     public static final int REMOVE = 2;
     public static final int COMPLETE_REPLACEMENT = 3;
     
-    private PText pText;
+    private PTextBuffer pText;
     private int eventType;
     private int offset;
     private char[] characters;
      
-    public PTextEvent(PText pText, int eventType, int offset, char[] characters) {
+    public PTextEvent(PTextBuffer pText, int eventType, int offset, char[] characters) {
         this.pText = pText;
         this.eventType = eventType;
         this.offset = offset;
         this.characters = characters;
     }
     
-    public PText getPText() {
+    public PTextBuffer getPTextBuffer() {
         return pText;
     }
     

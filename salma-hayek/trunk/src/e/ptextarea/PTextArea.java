@@ -31,7 +31,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private PTextStyler textStyler;
     private int rightHandMarginColumn = NO_MARGIN;
     
-    public PTextArea(PText text) {
+    public PTextArea(PTextBuffer text) {
         setText(text);
         addMouseListener(new PMouseHandler(this));
         addKeyListener(new PKeyHandler(this));
@@ -130,8 +130,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return lines;
     }
     
-    public PText getText() {
-        return lines.getText();
+    public PTextBuffer getPTextBuffer() {
+        return lines.getPTextBuffer();
     }
     
     public PCoordinates getNearestCoordinates(Point point) {
@@ -559,7 +559,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         line.setWidth(metrics.stringWidth(line.getContents().toString()));
     }
     
-    public void setText(PText text) {
+    public void setText(PTextBuffer text) {
         if (lines != null) {
             lines.removeLineListener(this);
         }

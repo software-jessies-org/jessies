@@ -4,7 +4,7 @@ package e.ptextarea;
 import java.util.*;
 
 /**
- * A PLineList is an abstraction on top of a PText.  This class handles the splitting up of lines,
+ * A PLineList is an abstraction on top of a PTextBuffer.  This class handles the splitting up of lines,
  * and allows the PTextArea to easily index the text in terms of lines.
  * Note that this class deals only with logical lines, that is lines separated by line terminators.
  * Line wrapping is not handled here.
@@ -13,13 +13,13 @@ import java.util.*;
  */
 
 public class PLineList implements PTextListener {
-    private PText text;
+    private PTextBuffer text;
     private ArrayList lines;
     private int lastValidLineIndex;
     private ArrayList listeners = new ArrayList();
     
-    public PLineList(PText text) {
-        setText(text);
+    public PLineList(PTextBuffer text) {
+        setPTextBuffer(text);
     }
     
     public void printLineInfo() {
@@ -39,13 +39,13 @@ public class PLineList implements PTextListener {
         listeners.remove(listener);
     }
     
-    /** Returns the underlying PText model. */
-    public PText getText() {
+    /** Returns the underlying PTextBuffer model. */
+    public PTextBuffer getPTextBuffer() {
         return text;
     }
     
-    /** Replaces the underlying PText model with a new one. */
-    public void setText(PText text) {
+    /** Replaces the underlying PTextBuffer model with a new one. */
+    public void setPTextBuffer(PTextBuffer text) {
         if (this.text != null) {
             this.text.removeTextListener(this);
         }
@@ -55,7 +55,7 @@ public class PLineList implements PTextListener {
     }
     
     /**
-     * Returns the character offset into the PText corresponding to the line index and char offset
+     * Returns the character offset into the PTextBuffer corresponding to the line index and char offset
      * contained in the coordinates argument.
      */
     public int getIndex(PCoordinates coords) {
@@ -66,7 +66,7 @@ public class PLineList implements PTextListener {
     
     /**
      * Returns the logical coordinates, in terms of line index and character offset, of the given
-     * character offset into the PText model.
+     * character offset into the PTextBuffer model.
      */
     public PCoordinates getCoordinates(int index) {
         if (index < 0 || index >= text.length()) {
@@ -80,7 +80,7 @@ public class PLineList implements PTextListener {
     
     /**
      * Returns the index of the line containing the character with the specified index
-     * within the underlying PText model.
+     * within the underlying PTextBuffer model.
      */
     public int getLineIndex(int charIndex) {
         int minLine = 0;
@@ -124,7 +124,7 @@ public class PLineList implements PTextListener {
         }
     }
 
-    /** Handles text insertion notifications from the underlying PText model. */
+    /** Handles text insertion notifications from the underlying PTextBuffer model. */
     public void textInserted(PTextEvent event) {
         int lineIndex = getLineIndex(event.getOffset());
         int startIndex = lineIndex;
@@ -152,7 +152,7 @@ public class PLineList implements PTextListener {
         }
     }
     
-    /** Handles text removal notifications from the underlying PText model. */
+    /** Handles text removal notifications from the underlying PTextBuffer model. */
     public void textRemoved(PTextEvent event) {
         int lineIndex = getLineIndex(event.getOffset());
         char[] chars = event.getCharacters();
@@ -199,9 +199,9 @@ public class PLineList implements PTextListener {
         return result;
     }
     
-    /** Handles complete text replacement notifications from the underlying PText model. */
+    /** Handles complete text replacement notifications from the underlying PTextBuffer model. */
     public void textCompletelyReplaced(PTextEvent event) {
-        setText(text);  // Forces all the relevant regeneration of internals.
+        setPTextBuffer(text);  // Forces all the relevant regeneration of internals.
     }
     
     private void linesAreInvalidAfter(int lineIndex) {
@@ -273,7 +273,7 @@ public class PLineList implements PTextListener {
             return width;
         }
         
-        /** Returns the character offset within the underlying PText model of the start of this line. */
+        /** Returns the character offset within the underlying PTextBuffer model of the start of this line. */
         public int getStart() {
             return start;
         }
@@ -298,7 +298,7 @@ public class PLineList implements PTextListener {
         }
         
         /**
-         * Returns true if the specified character offset from the start of the underlying PText model is
+         * Returns true if the specified character offset from the start of the underlying PTextBuffer model is
          * held within this line.
          */
         public boolean containsIndex(int charIndex) {

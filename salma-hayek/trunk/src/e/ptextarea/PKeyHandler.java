@@ -22,7 +22,7 @@ public class PKeyHandler extends KeyAdapter {
                 {
                     int caret = textArea.getCaretLocation();
                     String insertion = "Insertion\nof some\ntext";
-                    textArea.getText().insert(caret, insertion.toCharArray());
+                    textArea.getPTextBuffer().insert(caret, insertion.toCharArray());
                     textArea.setCaretLocation(caret + insertion.length());
                 }
                 break;
@@ -30,7 +30,7 @@ public class PKeyHandler extends KeyAdapter {
                 {
                     int caret = textArea.getCaretLocation();
                     int delCount = Math.min(caret, 20);
-                    textArea.getText().delete(caret - delCount, delCount);
+                    textArea.getPTextBuffer().delete(caret - delCount, delCount);
                     textArea.setCaretLocation(caret - delCount);
                 }
                 break;
@@ -38,7 +38,7 @@ public class PKeyHandler extends KeyAdapter {
             case KeyEvent.VK_H:
                 {
                     int caret = textArea.getCaretLocation();
-                    int end = Math.min(caret + 20, textArea.getText().length());
+                    int end = Math.min(caret + 20, textArea.getPTextBuffer().length());
                     textArea.addHighlight(new PColoredHighlight(textArea, caret, end, Color.yellow));
                 }
                 break;
@@ -48,7 +48,7 @@ public class PKeyHandler extends KeyAdapter {
                     if (event.isShiftDown()) {
                         textArea.removeHighlights(new PColoredHighlightMatcher(Color.cyan));
                     } else {
-                        for (int i = 0; i < textArea.getText().length() - 4; i += 4) {
+                        for (int i = 0; i < textArea.getPTextBuffer().length() - 4; i += 4) {
                             textArea.addHighlight(new PColoredHighlight(textArea, i, i + 2, Color.cyan));
                         }
                     }
@@ -83,11 +83,11 @@ public class PKeyHandler extends KeyAdapter {
         } else if (key == KeyEvent.VK_BACK_SPACE) {
             if (caretLocation > 0) {
                 caretLocation -= 1;
-                textArea.getText().delete(caretLocation, 1);
+                textArea.getPTextBuffer().delete(caretLocation, 1);
                 textArea.setCaretLocation(caretLocation);
             }
         } else if (key != KeyEvent.CHAR_UNDEFINED && event.isControlDown() == false) {
-            textArea.getText().insert(textArea.getCaretLocation(), new char[] { key });
+            textArea.getPTextBuffer().insert(textArea.getCaretLocation(), new char[] { key });
             textArea.setCaretLocation(caretLocation + 1);
         }
         System.err.println("keyTyped took " + (System.currentTimeMillis() - startTime) + "ms.");

@@ -40,7 +40,7 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
     public PCLikeTextStyler(PTextArea textArea) {
         this.textArea = textArea;
         initCommentCache();
-        textArea.getText().addTextListener(this);
+        textArea.getPTextBuffer().addTextListener(this);
         textArea.setTextStyler(this);
     }
     
@@ -303,7 +303,7 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
     }
     
     private void dirtyFromOffset(PTextEvent event) {
-        CharSequence seq = textArea.getText();
+        CharSequence seq = textArea.getPTextBuffer();
         String checkString = event.getString();
         if (event.getOffset() > 0) {
             checkString = seq.charAt(event.getOffset() - 1) + checkString;

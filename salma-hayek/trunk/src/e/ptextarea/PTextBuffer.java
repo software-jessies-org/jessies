@@ -4,13 +4,13 @@ package e.ptextarea;
 import java.util.*;
 
 /**
- * A PText is the Document of the PTextArea.  It implements the CharSequence interface, and is
+ * A PTextBuffer is the Document of the PTextArea.  It implements the CharSequence interface, and is
  * responsible for maintaining undo lists.
  * 
  * @author Phil Norman
  */
 
-public class PText implements CharSequence {
+public class PTextBuffer implements CharSequence {
     private char[] text = new char[0];
     private int gapPosition;
     private int gapLength;
@@ -157,7 +157,7 @@ public class PText implements CharSequence {
     }
     
     /**
-     * Returns a CharSequence which holds the specified section of the PText's text.  Part of the
+     * Returns a CharSequence which holds the specified section of the PTextBuffer's text.  Part of the
      * CharSequence interface.
      */
     public CharSequence subSequence(int start, int end) {
@@ -177,9 +177,9 @@ public class PText implements CharSequence {
     
     /**
      * A SubSequence is the implementation of a CharSequence which handles sub-sequences
-     * of the PText's text.
+     * of the PTextBuffer's text.
      * Note that calling 'subSequence' on a SubSequence returns another SubSequence instance
-     * which acts directly on the PText; they do not chain.
+     * which acts directly on the PTextBuffer; they do not chain.
      */
     public class SubSequence implements CharSequence {
         private int start;
@@ -191,7 +191,7 @@ public class PText implements CharSequence {
         }
         
         public char charAt(int index) {
-            return PText.this.charAt(start + index);
+            return PTextBuffer.this.charAt(start + index);
         }
         
         public int length() {
@@ -202,7 +202,7 @@ public class PText implements CharSequence {
             if (subEnd < subStart) {
                 throw new IndexOutOfBoundsException("Subsequence end " + subEnd + " less than start " + subStart);
             }
-            return PText.this.subSequence(start + subStart, start + subEnd);
+            return PTextBuffer.this.subSequence(start + subStart, start + subEnd);
         }
         
         public String toString() {
