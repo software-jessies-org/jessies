@@ -27,11 +27,12 @@ public class EndOfLineAction extends TextAction {
     
     public void actionPerformed(ActionEvent e) {
         ETextArea target = (ETextArea) getFocusedComponent();
+        CharSequence text = target.charSequence();
         if (target != null) {
             try {
                 int offset = target.getCaretPosition();
                 int lineEndOffset = target.getLineEndOffset(target.getLineOfOffset(offset));
-                if (offset != target.getDocument().getLength() && lineEndOffset > 0 && target.getCharAt(lineEndOffset - 1) == '\n') {
+                if (offset != text.length() && lineEndOffset > 0 && text.charAt(lineEndOffset - 1) == '\n') {
                     --lineEndOffset; // Back up past the newline.
                 }
                 if (select) {

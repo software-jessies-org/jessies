@@ -22,12 +22,11 @@ public class InsertNewlineAction extends TextAction {
         CompoundEdit entireEdit = new CompoundEdit();
         target.getUndoManager().addEdit(entireEdit);
         try {
-            Document document = target.getDocument();
             final int position = target.getCaretPosition();
             
             // Should we try to insert matching brace pairs?
             String line = target.getLineTextAtOffset(position);
-            if (target.getIndenter().isElectric('}') && position > 0 && target.getCharAt(position - 1) == '{' && hasUnbalancedBraces(target.getText())) {
+            if (target.getIndenter().isElectric('}') && position > 0 && target.charSequence().charAt(position - 1) == '{' && hasUnbalancedBraces(target.getText())) {
                 insertMatchingBrace(target);
             } else if (line.endsWith("/*") || line.endsWith("/**")) {
                 insertMatchingCloseComment(target);
