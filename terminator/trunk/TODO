@@ -28,6 +28,7 @@ Add ability to view more than one terminal at a time, in a split pane, or in a 2
 
 The flashing green underline of a cursor is often difficult to find.  Fine by me if people really want the option but I don't think it should be the default.
 
+Should allow the user to specify a log filename per tab, on the command line.
 
 
 Phil's TODOs:
