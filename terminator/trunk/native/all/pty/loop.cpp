@@ -1,7 +1,5 @@
 #include    "pty.h"
 
-#define    BUFFSIZE    512
-
 Sigfunc * signal_intr(int signo, Sigfunc *func) {
     struct sigaction act, oact;
     act.sa_handler = func;
@@ -52,18 +50,20 @@ unsigned short readUnsignedShort(char *buf) {
 
 void loop(int ptym, int ignoreeof)
 {
-    int        nread;
-    char    buff[BUFFSIZE];
-    pid_t    child;
-    int index;
+    static const size_t BUFFER_SIZE = 32 * 1024;
+    char buff[BUFFER_SIZE];
+    
+    int nread;
     int bytesInBuffer = 0;
     int bytesRequired = 1;
-    if ( (child = fork()) < 0) {
+    
+    pid_t child = fork();
+    if (child < 0) {
         panic("fork error");
     } else if (child == 0) {    /* child copies stdin to ptym */
         for ( ; ; ) {
             if (bytesInBuffer < bytesRequired) {
-                if ( (nread = read(STDIN_FILENO, buff + bytesInBuffer, BUFFSIZE - bytesInBuffer)) < 0)
+                if ( (nread = read(STDIN_FILENO, buff + bytesInBuffer, sizeof(buff) - bytesInBuffer)) < 0)
                     panic("read error from stdin");
                 else if (nread == 0)
                     break;        /* EOF on stdin means we're done */
@@ -96,7 +96,7 @@ void loop(int ptym, int ignoreeof)
                     }
                 }
             } else {
-                for (index = 0; index <= bytesInBuffer; index++) {
+                for (int index = 0; index <= bytesInBuffer; ++index) {
                     if ((index == bytesInBuffer) || (buff[index] == SIZE_ESCAPE)) {
                         if (writen(ptym, buff, index) != index) {
                             panic("writen error to master pty");
@@ -122,7 +122,7 @@ void loop(int ptym, int ignoreeof)
         panic("signal_intr error for SIGTERM");
 
     for ( ; ; ) {
-        if ( (nread = read(ptym, buff, BUFFSIZE)) <= 0)
+        if ( (nread = read(ptym, buff, sizeof(buff))) <= 0)
             break;        /* signal caught, error, or EOF */
 
         if (writen(STDOUT_FILENO, buff, nread) != nread)
