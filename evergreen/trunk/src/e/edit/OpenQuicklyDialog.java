@@ -89,6 +89,7 @@ public class OpenQuicklyDialog {
                 }
             }
         });
+        matchList.setCellRenderer(new EListCellRenderer());
     }
     
     public OpenQuicklyDialog(Workspace workspace) {
