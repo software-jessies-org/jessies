@@ -108,15 +108,9 @@ public class JTelnetPane extends JPanel {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		
-		// Add a border. (We could simplify this if JTextBuffer coped
-		// with having a border.)
-		JPanel wrapper = new JPanel(new BorderLayout());
-		wrapper.add(textPane, BorderLayout.CENTER);
-		wrapper.setBackground(textPane.getBackground());
-		final int internalBorder = Options.getSharedInstance().getInternalBorder();
-		wrapper.setBorder(new javax.swing.border.EmptyBorder(internalBorder, internalBorder, internalBorder, internalBorder));
-		
-		JScrollPane scrollPane = new JScrollPane(wrapper, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane scrollPane = new JScrollPane(new BorderPanel(textPane));
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.getViewport().setBackground(textPane.getBackground());
 		scrollPane.setBorder(null);
 		add(scrollPane, BorderLayout.CENTER);
