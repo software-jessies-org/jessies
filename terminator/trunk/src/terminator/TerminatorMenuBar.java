@@ -40,6 +40,7 @@ public class TerminatorMenuBar extends JMenuBar {
 		
 		menu.add(new JSeparator());
 		menu.add(new JMenuItem(new ShowInfoAction()));
+		menu.add(new JMenuItem(new ResetAction()));
 		
 		/*
 		if (GuiUtilities.isMacOs() == false) {
@@ -250,6 +251,19 @@ public class TerminatorMenuBar extends JMenuBar {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
 				terminal.selectAll();
+			}
+		}
+	}
+	
+	public static class ResetAction extends AbstractAction {
+		public ResetAction() {
+			super("Reset");
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.reset();
 			}
 		}
 	}
