@@ -55,7 +55,6 @@ comment.each() {
     body << escapeTextLineToHtml(line)
 }
 body << "</p>"
-body << "<hr noshade>"
 
 # Get and output the patch.
 changes=`#{svnlook} diff #{repo} -r #{rev}`
