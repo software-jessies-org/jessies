@@ -21,7 +21,7 @@ Unassigned TODOs:
 
 Phil's TODOs:
 ~~~~~~~~~~
-[3]	Fix hyperlink bug - hyperlinks need to be chucked away and recreated on alternative buffer switching.
+[5]	Implement wrapping.
 [5]	Fix redraw bug - strange redraw effects happen when editing a CVS commit comment in vim.
 
 

@@ -71,6 +71,10 @@ public class TextBuffer implements TelnetListener {
 			savedScreen = null;
 		}
 		lineIsDirty(getFirstDisplayLine());
+		for (int i = 0; i < height; i++) {
+			int index = getFirstDisplayLine() + i;
+			view.lineSectionChanged(index, 0, get(index).length());
+		}
 	}
 	
 	/** Returns true when the alternative buffer is in use. */
@@ -238,7 +242,9 @@ public class TextBuffer implements TelnetListener {
 				// the first scroll line, rather than just scrolling everything upwards like we normally
 				// do.  This makes vim work better.  Also, if we're using the alternative buffer, we
 				// don't add anything going off the top into the history.
-				textLines.remove(firstDisplayLine + firstScrollLineIndex);
+				int removeIndex = firstDisplayLine + firstScrollLineIndex;
+				textLines.remove(removeIndex);
+				view.lineSectionChanged(removeIndex, 0, get(removeIndex).length());
 				view.repaint();
 			} else {
 				caretPosition = new Location(index, caretPosition.getCharOffset());
