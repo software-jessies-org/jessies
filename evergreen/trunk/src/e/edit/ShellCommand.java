@@ -8,7 +8,12 @@ public class ShellCommand {
     private String command;
     private String context;
     private String name;
+    
     private String[] envp;
+// the ProcessBuilder stuff is the right way to do things when we can
+// ditch 1.4.2 compatibility (probably not before "H1 2005", for Mac OS).
+//    private ProcessBuilder processBuilder;
+
     private Process process;
     
     /** The count of open streams. */
@@ -28,11 +33,20 @@ public class ShellCommand {
         this.context = context;
         this.name = command;
 
-        initEnvironmentVariables(filename, lineNumber);
+        init(filename, lineNumber);
         runCommand();
     }
 
-    public void initEnvironmentVariables(String filename, int lineNumber) {
+//    public void init(String filename, int lineNumber) {
+//        processBuilder = new ProcessBuilder(makeCommandLine(command));
+//        processBuilder.directory(FileUtilities.fileFromString(context));
+//        processBuilder.environment().put("EDIT_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
+//        processBuilder.environment().put("EDIT_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(filename));
+//        processBuilder.environment().put("EDIT_CURRENT_LINE_NUMBER", Integer.toString(lineNumber));
+//        processBuilder.environment().put("EDIT_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(getWorkspace().getRootDirectory()));
+//    }
+
+    public void init(String filename, int lineNumber) {
         envp = new String[] {
             "EDIT_CURRENT_DIRECTORY=" + FileUtilities.parseUserFriendlyName(context),
             "EDIT_CURRENT_FILENAME=" + FileUtilities.parseUserFriendlyName(filename),
@@ -58,8 +72,8 @@ public class ShellCommand {
     }
 
     public void runCommand() throws IOException {
-        File directory = FileUtilities.fileFromString(context);
-        process = Runtime.getRuntime().exec(makeCommandLine(command), envp, directory);
+        process = Runtime.getRuntime().exec(makeCommandLine(command), envp, FileUtilities.fileFromString(context));
+//        process = processBuilder.start();
 
         Edit.showStatus("Started task '" + command + "'");
 
