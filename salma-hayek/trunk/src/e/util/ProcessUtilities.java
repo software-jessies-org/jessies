@@ -11,6 +11,12 @@ public class ProcessUtilities {
      * Lines written to standard error are appended to 'errors'.
      */
     public static int backQuote(final File directory, final String[] command, final ArrayList lines, final ArrayList errors) {
+        if (lines == null) {
+            throw new IllegalArgumentException("`lines' may not be null");
+        }
+        if (errors == null) {
+            throw new IllegalArgumentException("`errors' may not be null");
+        }
         return backQuote(directory, command, new ArrayListLineListener(lines), new ArrayListLineListener(errors));
     }
     
@@ -54,6 +60,9 @@ public class ProcessUtilities {
         
         public ArrayListLineListener(final ArrayList arrayList) {
             this.arrayList = arrayList;
+            if (arrayList == null) {
+                throw new IllegalArgumentException("`arrayList' may not be null");
+            }
         }
         
         public void processLine(String line) {
