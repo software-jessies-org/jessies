@@ -237,7 +237,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             /*
              * Clean paths like a/b/../c/d. Let the Java API do this.
              */
-            filename = FileUtilities.fileFromString(filename).getAbsolutePath();
+            filename = FileUtilities.fileFromString(filename).getCanonicalPath();
         } catch (IOException ex) {
             /* Harmless. */
             ex = ex;
