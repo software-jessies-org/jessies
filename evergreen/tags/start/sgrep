@@ -1,0 +1,29 @@
+#!/bin/bash
+
+my_dir=`dirname $0`
+
+usageText="Usage: `basename $0` [--help] [<grep options>] [--] [start-dir] <search-term>"
+showHelp() {
+    echo $usageText
+    exit 0
+}
+
+grepOptions="-n -H"
+while [ $# -gt 0 ]; do
+    case "$1" in
+    --help) shift ; showHelp ;;
+    --)     shift ; break ;;
+    -*)     grepOptions=$grepOptions" "$1 ; shift ;;
+    *)      break ;;
+    esac
+done
+
+if [ $# -eq 2 ]; then 
+    startDirectory=${1:-"."}
+    shift
+fi
+if [ $# -ne 1 ]; then
+    showHelp
+fi
+searchTerm=$1
+$my_dir/sfind $startDirectory | sed -e 's/\(.*\)/"\1"/' | xargs grep $grepOptions -e "$searchTerm"

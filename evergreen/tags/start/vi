@@ -1,0 +1,20 @@
+#!/usr/bin/ruby -w
+# Opens files in Edit.
+# @author Elliott Hughes <enh@acm.org>
+
+require 'net/telnet'
+
+def openFileOnLocalhost(filename)
+    host = ENV["EDIT_HOME_SERVER"]
+    if host == nil; then host = 'localhost'; end
+    
+    telnet = Net::Telnet.new('Host' => host, 'Port' => 1948, 'Telnetmode' => false)
+    puts "Opening #{filename} on #{host}"
+    telnet.puts "open #{filename}\r"
+    telnet.close
+end
+
+ARGV.each {
+    | filename |
+    openFileOnLocalhost(File.expand_path(filename))
+}
