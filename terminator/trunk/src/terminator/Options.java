@@ -49,10 +49,10 @@ public class Options {
 	
 	/**
 	 * Whether or not the shells we start should be login shells. The
-	 * default is false.
+	 * default is true.
 	 */
 	public boolean isLoginShell() {
-		return defaultedBooleanResource("loginShell", false);
+		return defaultedBooleanResource("loginShell", true);
 	}
 	
 	/**
