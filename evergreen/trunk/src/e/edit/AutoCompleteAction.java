@@ -98,6 +98,26 @@ public class AutoCompleteAction extends ETextAction {
         completionsWindow.setContentPane(content);
         completionsWindow.setLocation(location);
         completionsWindow.pack();
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final int maxHeight = screenSize.height - location.y;
+        Dimension windowSize = completionsWindow.getSize();
+        if (windowSize.height > maxHeight) {
+            windowSize.height= maxHeight;
+            if (content instanceof JScrollPane) {
+                // By making the window shorter, we will have introduced a
+                // vertical scroll bar, so we have to increase the width to
+                // prevent a horizontal scroll bar appearing too.
+                JScrollPane scrollPane = (JScrollPane) content;
+                JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
+                windowSize.width += scrollBar.getPreferredSize().width;
+            }
+        }
+        // The trailing margin on a JList is the same as the leading margin,
+        // but lists look better with a slightly wider trailing margin.
+        windowSize.width += 8;
+        completionsWindow.setSize(windowSize);
+        
         completionsWindow.setVisible(true);
     }
 }
