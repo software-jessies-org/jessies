@@ -22,3 +22,6 @@ martin and elliott still have window problems with edit, although it's
 better than it was. apparently the window is now placed correctly,
 but gets larger between successive runs. i can't reproduce this,
 unfortunately.
+
+gtk applications window titles are empty with gtk+ 2.4.x (reported by peter hartlitch).
+

@@ -1,5 +1,9 @@
 Change Log for "lwm"
 
+1004-09-28	jfc	York
+
+	Added missing -lSM to no_xmkmf_makefile.
+
 2003-12-09	jfc	York
  
 	Fixed bug (reported by Matthew Wilcox) where windows with extremely
