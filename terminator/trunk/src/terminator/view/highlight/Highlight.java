@@ -18,10 +18,10 @@ public class Highlight {
 	private Highlighter highlighter;
 	private Location start;
 	private Location end;
-	private StyleMutator style;
+	private Style style;
 	private Cursor cursor = null;
 	
-	public Highlight(Highlighter highlighter, Location start, Location end, StyleMutator style) {
+	public Highlight(Highlighter highlighter, Location start, Location end, Style style) {
 		this.highlighter = highlighter;
 		this.start = start;
 		this.end = end;
@@ -65,7 +65,7 @@ public class Highlight {
 			String unlitText = unlit[i].getText();
 			int unlitEnd = offset + unlitText.length();
 			if (startOffset <= offset && endOffset >= offset + unlitEnd) {  // unlit[i] completely within highlight.
-				result.add(new StyledText(unlitText, style.mutate(unlit[i].getStyle())));
+				result.add(new StyledText(unlitText, style.appliedTo(unlit[i].getStyle())));
 			} else if (startOffset >= unlitEnd || endOffset <= offset) {  // unlit[i] completely outside highlight.
 				result.add(unlit[i]);
 			} else {  // unlit[i] is partially inside highlight.
@@ -74,7 +74,7 @@ public class Highlight {
 				}
 				String midText = unlitText.substring(Math.max(0, startOffset - offset),
 						Math.min(unlitEnd - offset, endOffset - offset));
-				result.add(new StyledText(midText, style.mutate(unlit[i].getStyle())));
+				result.add(new StyledText(midText, style.appliedTo(unlit[i].getStyle())));
 				if (endOffset < unlitEnd) {  // highlight ends part-way through unlit[i].
 					result.add(new StyledText(unlitText.substring(endOffset - offset), unlit[i].getStyle()));
 				}
@@ -90,7 +90,7 @@ public class Highlight {
 			// of the visible text, we need to do the same.
 			if ((result.size() == 0) || highlightStartsAtEndOfLine(unlit, unlitStart)) {
 				StyledText empty = new StyledText("", (byte) StyledText.getDefaultStyle());
-				result.add(new StyledText("", style.mutate(empty.getStyle())));
+				result.add(new StyledText("", style.appliedTo(empty.getStyle())));
 			}
 			((StyledText) result.get(result.size() - 1)).setContinueToEnd(true);
 		}
