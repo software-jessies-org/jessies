@@ -51,14 +51,8 @@ public class TextBuffer implements TelnetListener {
 		int highLine = textLines.size();
 		int high = getStartIndex(highLine - 1) + getLineLength(highLine - 1);
 		
-		// We use almost a binary chop, except the chop position is not directly in the middle, but is
-		// weighted using the assumption that on average, all lines will be of equal length.
-		// Of course, this could get very slow if the assumption doesn't hold; we'll see how it
-		// goes.
 		while (highLine - lowLine > 1) {
-			int averageCharsPerLine = (high - low) / (highLine - lowLine);
-			int projectedLineOffset = (charIndex - low) / averageCharsPerLine;
-			int midLine = lowLine + Math.max(1, Math.min(high - low - 2, projectedLineOffset));
+			int midLine = (lowLine + highLine) / 2;
 			int mid = getStartIndex(midLine);
 			if (mid <= charIndex) {
 				lowLine = midLine;
