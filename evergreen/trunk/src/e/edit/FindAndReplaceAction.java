@@ -277,7 +277,6 @@ public class FindAndReplaceAction extends ETextAction {
                 }
             }
             String result = "<html>" + buffer.toString();
-            System.err.println(result);
             return result;
         }
     }
