@@ -34,12 +34,12 @@ echo "Adding GPL..."
 cp $projects_dir/edit/COPYING $name/COPYING
 
 echo "Creating a new Subversion repository..."
-ssh $svn_host svnadmin create /home/repositories/svnroot/$name
-ssh $svn_host chmod -R g+w /home/repositories/svnroot/$name/db
+ssh $svn_host svnadmin create /home/software/svnroot/$name
+ssh $svn_host chmod -R g+w /home/software/svnroot/$name/db
 echo "Making the initial import..."
-svn import $name svn+ssh://$svn_host/home/repositories/svnroot/$name -m 'New project, $name.'
+svn import $name svn+ssh://$svn_host/home/software/svnroot/$name -m 'New project, $name.'
 echo "Checking back out..."
-svn co svn+ssh://$svn_host/home/repositories/svnroot/$name $projects_dir/$name
+svn co svn+ssh://$svn_host/home/software/svnroot/$name $projects_dir/$name
 
 echo "Done!"
 exit 0
