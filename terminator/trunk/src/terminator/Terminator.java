@@ -18,9 +18,22 @@ public class Terminator {
 	
 	private Terminator() {
 		Log.setApplicationName("Terminator");
+		startTerminatorServer();
 		if (GuiUtilities.isMacOs()) {
 			initMenuBar();
 		}
+	}
+	
+	private void startTerminatorServer() {
+		new InAppServer("Terminator", 1949) {
+			public boolean handleCommand(String line, PrintWriter out) {
+				if (line.equals("new")) {
+					Terminator.getSharedInstance().openFrame();
+					return true;
+				}
+				return false;
+			}
+		};
 	}
 	
 	/**
