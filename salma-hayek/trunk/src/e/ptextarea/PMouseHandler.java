@@ -10,9 +10,12 @@ public class PMouseHandler extends MouseAdapter {
         this.textArea = textArea;
     }
     
-    public void mouseClicked(MouseEvent event) {
+    public void mousePressed(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            return;
+        }
         textArea.requestFocus();
-        PCoordinates nearestChar = textArea.getNearestCoordinates(event.getPoint());
+        PCoordinates nearestChar = textArea.getNearestCoordinates(e.getPoint());
         textArea.setCaretLocation(textArea.getTextIndex(nearestChar));
     }
 }
