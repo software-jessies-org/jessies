@@ -48,7 +48,7 @@ public class FormDialog extends JDialog {
     public static void showNonModal(Frame parent, String title, Container contentPane, String actionLabel, ActionListener listener) {
         FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, null, false);
         formDialog.listener = listener;
-        formDialog.show();
+        formDialog.setVisible(true);
     }
     
     /**
@@ -74,7 +74,7 @@ public class FormDialog extends JDialog {
      */
     public static boolean show(Frame parent, String title, Container contentPane, String actionLabel, JButton extraButton) {
         FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, extraButton, true);
-        formDialog.show();
+        formDialog.setVisible(true);
         return formDialog.wasAccepted();
     }
 

@@ -36,7 +36,7 @@ public class EFileOpenDialog {
      */
     public void show() {
         if (awtOpenDialog != null) {
-            awtOpenDialog.show();
+            awtOpenDialog.setVisible(true);
         } else {
             swingResult = swingOpenDialog.showDialog(null, "Open");
         }
