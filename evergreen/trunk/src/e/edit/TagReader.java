@@ -215,10 +215,9 @@ public class TagReader {
         public String describe() {
             switch (type) {
                 case 'c': return "class " + identifier;
-                case 'C': return identifier + "()";
+                case 'C': case 'm': return identifier + "()";
                 case 'f': return identifier;
                 case 'i': return "interface " + identifier;
-                case 'm': return identifier + "()";
                 case 'p': return "package " + identifier;
                 default: return identifier;
             }
