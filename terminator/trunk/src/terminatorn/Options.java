@@ -90,11 +90,29 @@ public class Options {
 	}
 	
 	public int getInternalBorder() {
-		String internalBorder = (String) options.get("internalBorder");
-		if (internalBorder != null) {
-			return Integer.parseInt(internalBorder);
+		return defaultedIntegerResource("internalBorder", 2);
+	}
+	
+	/**
+	 * How many rows a new window should have.
+	 */
+	public int getInitialRowCount() {
+		return defaultedIntegerResource("initialRowCount", 24);
+	}
+	
+	/**
+	 * How many columns a new window should have.
+	 */
+	public int getInitialColumnCount() {
+		return defaultedIntegerResource("initialColumnCount", 80);
+	}
+	
+	private int defaultedIntegerResource(String name, int defaultValue) {
+		String value = (String) options.get(name);
+		if (value != null) {
+			return Integer.parseInt(value);
 		}
-		return 2;
+		return defaultValue;
 	}
 	
 	/**
