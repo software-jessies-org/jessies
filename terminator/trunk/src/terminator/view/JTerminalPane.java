@@ -124,7 +124,7 @@ public class JTerminalPane extends JPanel {
 		add(scrollPane, BorderLayout.CENTER);
 		new StickyBottomScrollBarListener(scrollPane.getVerticalScrollBar());
 		
-		initSizeMonitoring(scrollPane);
+		initSizeMonitoring();
 		textPane.sizeChanged();
 		try {
 			control = new TerminalControl(this, textPane.getModel(), command, process, ignoreExitStatus);
@@ -134,7 +134,7 @@ public class JTerminalPane extends JPanel {
 		}
 	}
 	
-	private void initSizeMonitoring(final JScrollPane scrollPane) {
+	private void initSizeMonitoring() {
 		class SizeMonitor extends ComponentAdapter {
 			public void componentShown(ComponentEvent event) {
 				currentSizeInChars = textPane.getVisibleSizeInCharacters();
@@ -153,7 +153,12 @@ public class JTerminalPane extends JPanel {
 				}
 			}
 		};
-		scrollPane.getViewport().addComponentListener(new SizeMonitor());
+		// It's a mistake to listen to the JScrollPane's viewport, as
+		// we used to, because that changes size when the horizontal
+		// scrollbar appears. This caused us to lose data by moving
+		// the cursor back over already-output text if that chunk made
+		// the scrollbar appear.
+		addComponentListener(new SizeMonitor());
 	}
 	
 	public JTextBuffer getTextPane() {
