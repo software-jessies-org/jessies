@@ -172,10 +172,14 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public Location viewToModel(Point point) {
 		FontMetrics metrics = getFontMetrics(getFont());
-		int lineIndex = Math.max(0, point.y / metrics.getHeight());
+		int lineIndex = point.y / metrics.getHeight();
 		int charOffset = 0;
+		// If the line index is off the top or bottom, we leave charOffset = 0.  This gives us nicer
+		// selection functionality.
 		if (lineIndex >= model.getLineCount()) {
 			lineIndex = model.getLineCount();
+		} else if (lineIndex < 0) {
+			lineIndex = 0;
 		} else {
 			charOffset = Math.max(0, point.x / metrics.charWidth('W'));
 			charOffset = Math.min(charOffset, model.get(lineIndex).length());
