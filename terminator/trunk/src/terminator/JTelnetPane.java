@@ -194,18 +194,18 @@ public class JTelnetPane extends JPanel {
 		return textPane.getOptimalViewSize();
 	}
 	
+	/**
+	 * On the Mac, the Command key (called 'meta' by Java) is always
+	 * used for keyboard equivalents. On other systems, Control tends to
+	 * be used, but in the special case of terminal emulators this
+	 * conflicts with the ability to type control characters. The
+	 * traditional work-around has always been to use Alt, which --
+	 * conveniently for Mac users -- is in the same place on a PC
+	 * keyboard as Command on a Mac keyboard.
+	 */
+	private int keyboardEquivalentModifier = GuiUtilities.isMacOs() ? KeyEvent.META_MASK : KeyEvent.ALT_MASK;
+	
 	private class KeyHandler implements KeyListener {
-		/**
-		 * On the Mac, the Command key (called 'meta' by Java) is always
-		 * used for keyboard equivalents. On other systems, Control tends to
-		 * be used, but in the special case of terminal emulators this
-		 * conflicts with the ability to type control characters. The
-		 * traditional work-around has always been to use Alt, which --
-		 * conveniently for Mac users -- is in the same place on a PC
-		 * keyboard as Command on a Mac keyboard.
-		 */
-		private int keyboardEquivalentModifier = GuiUtilities.isMacOs() ? KeyEvent.META_MASK : KeyEvent.ALT_MASK;
-		
 		/**
 		 * Tests whether the given event corresponds to a keyboard
 		 * equivalent. In the long run, this code should all disappear
@@ -321,7 +321,7 @@ public class JTelnetPane extends JPanel {
 					action.performAction();
 				}
 			});
-			result.setAccelerator(KeyStroke.getKeyStroke(new Character(action.getHotkeyChar()), InputEvent.ALT_MASK));
+			result.setAccelerator(KeyStroke.getKeyStroke(new Character(action.getHotkeyChar()), keyboardEquivalentModifier));
 			return result;
 		}
 	}
