@@ -2,7 +2,7 @@
 
 UNAME=`uname`
 
-if [ "$UNAME" != "Darwin" ] && [ "$DEBUGGING_TERMINATOR" == "" ]
+if [ "$UNAME" != "Darwin" ] && [ "$DEBUGGING_TERMINATOR" == "" ] && [ $# == 0 ]
 then
   # See if there's already a Terminator running that can open us a new window.
   # This lets us emulate the Mac OS behavior when clicking on the Dock icon
