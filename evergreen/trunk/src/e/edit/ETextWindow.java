@@ -409,34 +409,13 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         boolean needSeparator = true;
     }
     
-    private void doGoToSelection(int startOffset, int endOffset) {
-        text.ensureVisibilityOfOffset(startOffset);
-        text.select(startOffset, endOffset);
-    }
-    
-    public void goToSelection(final int startOffset, final int endOffset) {
-        if (EventQueue.isDispatchThread()) {
-            doGoToSelection(startOffset, endOffset);
-        } else {
-            try {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        doGoToSelection(startOffset, endOffset);
-                    }
-                });
-            } catch (Throwable ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-    
     public void goToLine(int line) {
         try {
             // Humans number lines from 1, JTextComponent from 0.
             line--;
             final int start = text.getLineStartOffset(line);
             final int end = text.getLineEndOffset(line);
-            goToSelection(start, end);
+            JTextComponentUtilities.goToSelection(text, start, end);
         } catch (javax.swing.text.BadLocationException ex) {
             ex.printStackTrace();
         }
@@ -471,42 +450,17 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     }
     
     public void findNext() {
-        findHighlight(true);
+        updateFindResults();
+        JTextComponentUtilities.findNextHighlight(getText(), Position.Bias.Forward, FindAction.PAINTER);
     }
     
     public void findPrevious() {
-        findHighlight(false);
+        updateFindResults();
+        JTextComponentUtilities.findNextHighlight(getText(), Position.Bias.Backward, FindAction.PAINTER);
     }
-
+    
     public void updateFindResults() {
         FindAction.INSTANCE.repeatLastFind(this);
-    }
-    
-    private void findHighlight(boolean forwards) {
-        updateFindResults();
-        Highlighter highlighter = getText().getHighlighter();
-        Highlighter.Highlight[] highlights = highlighter.getHighlights();
-        int start = forwards ? 0 : highlights.length - 1;
-        int stop = forwards ? highlights.length : -1;
-        int step = forwards ? 1 : -1;
-        for (int i = start; i != stop; i += step) {
-            if (highlights[i].getPainter() == FindAction.PAINTER) {
-                if (highlighterIsNext(forwards, highlights[i])) {
-                    goToSelection(highlights[i].getStartOffset(), highlights[i].getEndOffset());
-                    return;
-                }
-            }
-        }
-    }
-    
-    private boolean highlighterIsNext(boolean forwards, Highlighter.Highlight highlight) {
-        final int minOffset = Math.min(highlight.getStartOffset(), highlight.getEndOffset());
-        final int maxOffset = Math.max(highlight.getStartOffset(), highlight.getEndOffset());
-        if (forwards) {
-            return minOffset > text.getSelectionEnd();
-        } else {
-            return maxOffset < text.getSelectionStart();
-        }
     }
     
     public boolean isFocusCycleRoot() {
@@ -588,7 +542,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             }
             offset = Math.min(offset, maxOffset);
             endOffset = Math.min(endOffset, maxOffset);
-            goToSelection(offset, endOffset);
+            JTextComponentUtilities.goToSelection(text, offset, endOffset);
         } catch (javax.swing.text.BadLocationException ex) {
             ex.printStackTrace();
         }
