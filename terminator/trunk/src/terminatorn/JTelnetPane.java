@@ -119,7 +119,7 @@ public class JTelnetPane extends JPanel {
 		final int internalBorder = Options.getSharedInstance().getInternalBorder();
 		wrapper.setBorder(new javax.swing.border.EmptyBorder(internalBorder, internalBorder, internalBorder, internalBorder));
 		
-		JScrollPane scrollPane = new JScrollPane(wrapper);
+		JScrollPane scrollPane = new JScrollPane(wrapper, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getViewport().setBackground(textPane.getBackground());
 		scrollPane.setBorder(null);
 		add(scrollPane, BorderLayout.CENTER);
@@ -256,7 +256,7 @@ public class JTelnetPane extends JPanel {
 				}
 				
 				frame.getContentPane().add(content);
-				frame.setSize(new Dimension(600, 400));
+				frame.pack();
 				frame.setLocationRelativeTo(null);
 				frame.setVisible(true);
 				
