@@ -10,6 +10,7 @@ public class PasteAction extends ETextAction {
 
     public PasteAction() {
         super(ACTION_NAME);
+        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("V", false));
     }
 
     public void actionPerformed(ActionEvent e) {

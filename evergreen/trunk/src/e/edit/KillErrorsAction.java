@@ -8,6 +8,7 @@ public class KillErrorsAction extends AbstractAction {
     
     public KillErrorsAction() {
         super(ACTION_NAME);
+        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("K", false));
     }
     
     public void actionPerformed(ActionEvent e) {

@@ -11,6 +11,7 @@ public class CorrectIndentationAction extends TextAction {
 
     public CorrectIndentationAction() {
         super(ACTION_NAME);
+        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("I", false));
     }
     
     public void actionPerformed(ActionEvent e) {
