@@ -13,8 +13,9 @@ for f in `echo $DISTFILES`; do
 	fi
 done
 
-(cd /tmp ; tar zcvf /usr/james/ftp/lwm-$VERSION.tar.gz lwm-$VERSION)
-cp ChangeLog /usr/james/www/jfc/software/lwm-stable-ChangeLog.txt
-cp lwm.1x.html /usr/james/www/jfc/software/lwm-stable.1x.html
+(cd /tmp ; tar zcvf lwm-$VERSION.tar.gz lwm-$VERSION)
+scp /tmp/lwm-$VERSION.tar.gz jessies:www.jfc.org.uk/html/files/lwm/
+scp ChangeLog jessies:www.jfc.org.uk/html/software/lwm-stable-ChangeLog.txt
+scp lwm.1x.html jessies:www.jfc.org.uk/html/software/lwm-stable.1x.html
 
-rm -rf /tmp/lwm-$VERSION
+rm -rf /tmp/lwm-$VERSION lwm-$VERSION.tar.gz
