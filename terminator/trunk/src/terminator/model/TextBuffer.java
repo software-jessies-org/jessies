@@ -66,6 +66,16 @@ public class TextBuffer implements TerminalListener {
 			setStyle(savedStyle);
 		}
 	}
+
+	public void checkInvariant() {
+		int highestStartLineIndex = -1;
+		for (int lineNumber = 0; lineNumber <= lastValidStartIndex; ++ lineNumber) {
+			int thisStartLineIndex = ((TextLine) textLines.get(lineNumber)).getLineStartIndex();
+			if (thisStartLineIndex <= highestStartLineIndex) {
+				throw new RuntimeException("the lineStartIndex must increase monotonically as the line number increases");
+			}
+		}
+	}
 	
 	public void reset() {
 		// Revert to just the right number of empty lines to fill the
@@ -87,6 +97,7 @@ public class TextBuffer implements TerminalListener {
 		
 		// Redraw ourselves.
 		view.repaint();
+		checkInvariant();
 	}
 
 	public void sizeChanged(Dimension sizeInChars) {
@@ -132,6 +143,7 @@ public class TextBuffer implements TerminalListener {
 			linesChangedFrom(index);
 		}
 		view.repaint();
+		checkInvariant();
 	}
 	
 	/** Returns true when the alternative buffer is in use. */
@@ -339,6 +351,7 @@ public class TextBuffer implements TerminalListener {
 			linesChangedFrom(index);
 			caretPosition = new Location(index, caretPosition.getCharOffset());
 		}
+		checkInvariant();
 	}
 	
 	public int getFirstDisplayLine() {
@@ -363,6 +376,7 @@ public class TextBuffer implements TerminalListener {
 
 	public void setSize(int width, int height) {
 		this.width = width;
+		lineIsDirty(0);
 		if (this.height > height && textLines.size() >= this.height) {
 			for (int i = 0; i < (this.height - height); i++) {
 				int lineToRemove = textLines.size() - 1;
@@ -383,6 +397,7 @@ public class TextBuffer implements TerminalListener {
 		while (getFirstDisplayLine() < 0) {
 			textLines.add(new TextLine());
 		}
+		checkInvariant();
 	}
 	
 	public void setInsertMode(boolean insertMode) {
@@ -536,6 +551,7 @@ public class TextBuffer implements TerminalListener {
 		lineIsDirty(addIndex);
 		linesChangedFrom(addIndex);
 		view.repaint();
+		checkInvariant();
 	}
 
 	/** Scrolls the display down by one line. */
@@ -547,6 +563,7 @@ public class TextBuffer implements TerminalListener {
 		lineIsDirty(removeIndex);
 		linesChangedFrom(removeIndex);
 		view.repaint();
+		checkInvariant();
 	}
 	
 	public void setWindowTitle(String newWindowTitle) {
