@@ -244,7 +244,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         if (keywords == null) {
             return false;
         }
-        return keywords.contains(word);
+        return keywords.contains(word) || keywords.contains(word.toLowerCase());
     }
     
     /** Paints the misspelled word highlights. */
