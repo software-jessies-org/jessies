@@ -140,7 +140,16 @@ public class FindFilesDialog {
             new TagReader(file, null, this);
         }
         public void tagFound(TagReader.Tag tag) {
-            if (pattern.matcher(tag.identifier).find()) {
+            // The tag type test is a hack. In C++ mode, 'p' means function
+            // prototype, which isn't interesting. In Java, it means package,
+            // which probably isn't interesting. It also means "paragraph",
+            // "port", "procedure", "program" and "property", thanks to ectags'
+            // liberal re-use of type tags. Pascal, Sql and Tcl programmers
+            // beware!
+            // The likely best work-around for this would be to submit a
+            // patch to ectags so that it at least records in its tags file
+            // which mode it was in.
+            if (tag.type != 'p' && pattern.matcher(tag.identifier).find()) {
                 foundDefinition = true;
             }
         }
