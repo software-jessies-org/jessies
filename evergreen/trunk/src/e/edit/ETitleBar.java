@@ -142,7 +142,7 @@ public class ETitleBar extends JComponent implements MouseListener, MouseMotionL
         }
         
         if (isActive == false) {
-            if (UIManager.getLookAndFeel().getName().indexOf("GTK") != -1 || System.getProperty("os.name").indexOf("Mac OS") != -1) {
+            if (UIManager.getLookAndFeel().getName().indexOf("GTK") != -1 || GuiUtilities.isMacOs()) {
                 rightColor = rightColor.brighter();
                 leftColor = leftColor.brighter();
             }
