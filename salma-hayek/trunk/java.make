@@ -1,3 +1,6 @@
+BADGER:=$(notdir $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))))
+SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+
 ARCHIVE_HOST=locke
 
 KNOWN_JRE_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
@@ -26,7 +29,7 @@ build: $(SOURCE_FILES)
 	@echo Recompiling the world... && \
 	 make clean && \
 	 mkdir -p classes && \
-	 jikes -bootclasspath $(BOOT_CLASS_PATH) -d classes/ -sourcepath src/ +D +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
+	 jikes -bootclasspath $(BOOT_CLASS_PATH) -classpath $(SALMA_HAYEK)/classes -d classes/ -sourcepath src/ +D +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
 	 @#javac -d classes/ -sourcepath src/ $(SOURCE_FILES)
 
 .PHONY: clean
