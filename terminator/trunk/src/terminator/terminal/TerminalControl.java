@@ -342,4 +342,8 @@ public class TerminalControl implements Runnable {
 			ex.printStackTrace();
 		}
 	}
+	
+	public LogWriter getLogWriter() {
+		return logWriter;
+	}
 }

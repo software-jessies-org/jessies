@@ -1,9 +1,3 @@
-Inspector showing:
- * dimensions
- * title (so you can copy it)
- * log filename
- * scrollback size?
-
 Hitting alt-k a number of times results in no redraw of the prompt.  I think bash tries to be clever.
 
 Make an about box.
