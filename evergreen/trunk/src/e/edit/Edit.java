@@ -801,5 +801,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     
     public static void main(String[] args) {
         instance = new Edit();
+        for (int i = 0; i < args.length; ++i) {
+            openFile(args[i]);
+        }
     }
 }
