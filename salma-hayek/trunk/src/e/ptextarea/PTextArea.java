@@ -22,6 +22,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.6f, 0.6f, 0.6f);
     private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.96f, 0.96f, 0.96f);
     private static final Color SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f, 0.5f);
+    private static final Color SELECTION_BOUNDARY_COLOR = new Color(0.5f, 0.55f, 0.7f, 0.75f);
     
     private PLineList lines;
     private PHighlight selection;
@@ -90,7 +91,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (start == end) {
             selection = null;
         } else {
-            selection = new PColoredHighlight(this, start, end, SELECTION_COLOR);
+            selection = new SelectionHighlight(this, start, end);
         }
         if ((oldSelection == null) != (selection == null)) {
             repaintAnchorRegion(selection == null ? oldSelection : selection);
@@ -98,12 +99,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             int minStart = Math.min(oldSelection.getStartIndex(), selection.getStartIndex());
             int maxStart = Math.max(oldSelection.getStartIndex(), selection.getStartIndex());
             if (minStart != maxStart) {
-                repaintIndexRange(minStart, maxStart);
+                repaintLines(getCoordinates(minStart).getLineIndex(), getCoordinates(maxStart).getLineIndex() + 1);
             }
             int minEnd = Math.min(oldSelection.getEndIndex(), selection.getEndIndex());
             int maxEnd = Math.max(oldSelection.getEndIndex(), selection.getEndIndex());
             if (minEnd != maxEnd) {
-                repaintIndexRange(minEnd, maxEnd);
+                repaintLines(getCoordinates(minEnd).getLineIndex() - 1, getCoordinates(maxEnd).getLineIndex());
             }
         }
     }
@@ -743,6 +744,50 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 end -= 1;
             }
             return parent.subSequence(offset, end);
+        }
+    }
+    
+    private class SelectionHighlight extends PHighlight {
+        public SelectionHighlight(PTextArea textArea, int startIndex, int endIndex) {
+            super(textArea, startIndex, endIndex);
+        }
+    
+        public void paint(Graphics2D graphics, PCoordinates start, PCoordinates end) {
+            Point startPt = textArea.getViewCoordinates(start);
+            Point endPt = textArea.getViewCoordinates(end);
+            Color oldColor = graphics.getColor();
+            int y = textArea.getLineTop(start.getLineIndex());
+            int lineHeight = textArea.getLineHeight();
+            for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
+                int xStart = (i == start.getLineIndex()) ? startPt.x : 0;
+                int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getSize().width;
+                graphics.setColor(SELECTION_COLOR);
+                paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
+                int yBottom = y + lineHeight - 1;
+                graphics.setColor(SELECTION_BOUNDARY_COLOR);
+                if (i == start.getLineIndex()) {
+                    if (xStart > 0) {
+                        graphics.drawLine(xStart, y, xStart, yBottom);
+                    }
+                    graphics.drawLine(xStart, y, xEnd, y);
+                } else if (i == start.getLineIndex() + 1) {
+                    graphics.drawLine(0, y, Math.min(xEnd, startPt.x), y);
+                }
+                if (i == end.getLineIndex()) {
+                    if (xEnd < textArea.getSize().width) {
+                        graphics.drawLine(xEnd, y, xEnd, yBottom);
+                    }
+                    graphics.drawLine(xStart, yBottom, xEnd, yBottom);
+                } else if (i == end.getLineIndex() - 1) {
+                    graphics.drawLine(Math.max(endPt.x, xStart), yBottom, xEnd, yBottom);
+                }
+                y += lineHeight;
+            }
+            graphics.setColor(oldColor);
+        }
+        
+        public void paintRectangleContents(Graphics2D graphics, Rectangle rectangle) {
+            graphics.fill(rectangle);
         }
     }
 }
