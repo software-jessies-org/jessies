@@ -33,8 +33,8 @@ public class Terminator {
 	
 	public void frameClosed(TerminatorFrame frame) {
 		frames.remove(frame);
-		if (frames.size() == 0) {
-			System.exit(0);  // Check if on Mac OS X, and exit conditionally.
+		if (frames.size() == 0 && GuiUtilities.isMacOs() == false) {
+			System.exit(0);
 		}
 	}
 	
