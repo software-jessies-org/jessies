@@ -2,7 +2,10 @@
 
 # Reads the output of "svn log" and produces a reasonable HTML rendition.
 
-require 'cgi'
+$: << "#{File.dirname(__FILE__)}/.."
+
+require 'escaping.rb'
+puts("<html>")
 while gets()
     if $_ =~ /^r(\d+) \| (\S+) \| (\d\d\d\d-\d\d-\d\d .*) \(.*\) \| (\d+) lines?$/
         revision = $1
@@ -13,18 +16,11 @@ while gets()
         puts("<blockquote>")
 	gets()
         (1..line_count).each() {
-	    $_ = CGI.escapeHTML(gets())
-            # Embolden filenames:
-            $_.gsub!(/^(\S+): /, "<b>\\1</b>: ")
-            # Preserve formatting:
-            $_.gsub!(/^(\s+)/) {|spaces| "&nbsp;" * spaces.length()}
-            # Make slight typographical improvements:
-            $_.gsub!(/ -- /, "&nbsp;&ndash; ")
-            $_.gsub!(/ --- /, "&nbsp;&mdash; ")
-            puts("#{$_}<br>\n")
-	}
+            puts(escapeTextLineToHtml(gets()))
+        }
         puts("</blockquote>")
         puts("<hr noshade>")
     end
 end
+puts("</html>")
 exit(0)

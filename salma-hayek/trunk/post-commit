@@ -12,9 +12,19 @@ address="software@jessies.org"
 sendmail="/usr/sbin/sendmail"
 svnlook="/opt/subversion-1.1.0-rc2/bin/svnlook"
 
+if `whoami` =~ %r{^(martind)$}
+  address=$1
+  svnlook="svnlook"
+end
+
 # ------------------------------------------------------------------------
 
 require 'cgi'
+require 'pathname'
+
+$: << "#{Pathname.new(__FILE__).realpath.dirname}"
+
+require 'escaping.rb'
 
 # Subversion's commit-email.pl suggests that svnlook might create files.
 Dir.chdir("/tmp")
@@ -38,8 +48,7 @@ body << "<p><b>#{author}</b> #{date}</p>"
 body << "<p>"
 comment.each() {
     |line|
-    body << CGI.escapeHTML(line)
-    body << "<br>\n"
+    body << escapeTextLineToHtml(line)
 }
 body << "</p>"
 body << "<hr noshade>"
