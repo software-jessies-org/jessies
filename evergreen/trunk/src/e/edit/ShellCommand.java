@@ -150,7 +150,7 @@ public class ShellCommand {
         if (windows) {
             return new String[] { "cmd", "/c", command };
         } else {
-            String shell = System.getProperty("SHELL");
+            String shell = System.getProperty("env.SHELL");
             if (shell == null) {
                 shell = "/bin/sh";
             }
