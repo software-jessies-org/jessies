@@ -31,6 +31,34 @@ public class Options {
 		return INSTANCE;
 	}
 	
+	/**
+	 * Whether or not pressing a key should cause the the scrollbar to go
+	 * to the bottom of the scrolling region. The default is true.
+	 */
+	public boolean isScrollKey() {
+		String scrollKey = (String) options.get("scrollKey");
+		if (scrollKey != null) {
+			return parseBoolean(scrollKey);
+		}
+		return true;
+	}
+	
+	/**
+	 * Whether or not output to the terminal should cause the scrollbar to
+	 * go to the bottom of the scrolling region. The default is false.
+	 */
+	public boolean isScrollTtyOutput() {
+		String scrollTtyOutput = (String) options.get("scrollTtyOutput");
+		if (scrollTtyOutput != null) {
+			return parseBoolean(scrollTtyOutput);
+		}
+		return false;
+	}
+	
+	private boolean parseBoolean(String s) {
+		return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes");
+	}
+	
 	public int getInternalBorder() {
 		String internalBorder = (String) options.get("internalBorder");
 		if (internalBorder != null) {

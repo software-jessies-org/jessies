@@ -109,8 +109,33 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		setMaximumSize(size);
 		setPreferredSize(size);
 		setSize(size);
-		scrollRectToVisible(new Rectangle(0, size.height - 10, size.width, 10));
 		redoHighlightsFrom(lineHighlights.size());
+	}
+	
+	public void scrollToBottom() {
+		scrollRectToVisible(new Rectangle(0, getHeight() - 10, getWidth(), 10));
+	}
+	
+	/**
+	 * Scrolls to the bottom of the output if doing so fits the user's
+	 * configuration, or is over-ridden by the fact that we're trying to
+	 * stay where we were but that *was* the bottom.
+	 */
+	public void scrollOnTtyOutput(boolean wereAtBottom) {
+		if (wereAtBottom || Options.getSharedInstance().isScrollTtyOutput()) {
+			scrollToBottom();
+		}
+	}
+	
+	/**
+	 * Tests whether we're currently at the bottom of the output. Code
+	 * that's causing output will need to keep the result of invoking this
+	 * method so it can invoke scrollOnTtyOutput correctly afterwards.
+	 */
+	public boolean isAtBottom() {
+		Rectangle visibleRectangle = getVisibleRect();
+		boolean atBottom = visibleRectangle.y + visibleRectangle.height >= getHeight();
+		return atBottom;
 	}
 	
 	public Location getCaretPosition() {
