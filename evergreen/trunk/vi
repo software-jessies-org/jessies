@@ -17,7 +17,7 @@ def openFileOnLocalhost(filename)
         telnet.close()
     rescue
         # Defer to the next 'vi' on the path if we failed.
-        system("`type -p -a vi | xargs -n1 readlink | uniq | tail +2 | head -1` #{filename}")
+        system("`type -p -a vi | xargs -n1 readlink --canonicalize | uniq | tail +2 | head -1` #{filename}")
     end
 end
 
