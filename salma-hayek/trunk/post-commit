@@ -31,6 +31,9 @@ require 'pathname'
 script_path=Pathname.new(__FILE__).realpath.dirname
 $: << script_path
 
+# We can work out the repository name because we're <path>/<name>/hooks/post-commit
+repository_name=Pathname.new(__FILE__).parent().parent().basename()
+
 require 'escaping.rb'
 
 # Subversion's commit-email.pl suggests that svnlook might create files.
@@ -50,7 +53,7 @@ comment=info_lines
 
 from_address="#{author}@#{mail_domain}"
 
-subject="#{repo} revision #{rev}"
+subject="#{repository_name} revision #{rev}"
 
 body = "<html><head><title>#{subject}</title></head><body>"
 
