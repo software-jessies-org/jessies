@@ -38,7 +38,6 @@ public class HyperlinkHighlighter implements Highlighter {
 	 */
 	public void setDirectory(String name) {
 		this.directory = name;
-		System.err.println(directory);
 	}
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
