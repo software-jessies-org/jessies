@@ -60,12 +60,12 @@ public class Terminator implements Controller {
 			}
 			
 			String command = word;
-			terminals.add(JTelnetPane.newCommandWithTitle(command, name));
+			terminals.add(JTelnetPane.newCommandWithTitle(this, command, name));
 			name = null;
 		}
 		
 		if (arguments.isEmpty()) {
-			terminals.add(JTelnetPane.newShell());
+			terminals.add(JTelnetPane.newShell(this));
 		}
 		
 //		return (terminals.size() == 1) ? makeSingleTerminal() : makeTabbedTerminals();
@@ -163,11 +163,11 @@ public class Terminator implements Controller {
 	}
 	
 	public void openShellPane(boolean focusOnNewTab) {
-		addPane(JTelnetPane.newShell(), focusOnNewTab);
+		addPane(JTelnetPane.newShell(this), focusOnNewTab);
 	}
 	
 	public void openCommandPane(String command, boolean focusOnNewTab) {
-		addPane(JTelnetPane.newCommandWithTitle(command, command), focusOnNewTab);
+		addPane(JTelnetPane.newCommandWithTitle(this, command, command), focusOnNewTab);
 	}
 	
 	private void addPane(JTelnetPane newPane, boolean focusOnNewTab) {
@@ -180,7 +180,6 @@ public class Terminator implements Controller {
 	}
 	
 	private void addPaneToUI(JTelnetPane newPane) {
-		newPane.setController(this);
 		tabbedPane.add(newPane.getName(), newPane);
 		newPane.getTextPane().addKeyListener(new KeyHandler());
 	}

@@ -16,6 +16,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private static final boolean ANTIALIAS = false;
 	private static final boolean MAC_OS = (System.getProperty("os.name").indexOf("Mac") != -1);
 
+	private Controller controller;
 	private TextBuffer model;
 	private Location caretPosition = new Location(0, 0);
 	private boolean hasFocus = false;
@@ -35,7 +36,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	*/
 	private ArrayList lineHighlights = new ArrayList();
 	
-	public JTextBuffer() {
+	public JTextBuffer(Controller controller) {
+		this.controller = controller;
 		model = new TextBuffer(this, 80, 24);
 		setFont(Options.getSharedInstance().getFont());
 		setForeground(Options.getSharedInstance().getColor("foreground"));
@@ -76,6 +78,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		addHighlighter(new HyperlinkHighlighter());
 		becomeDropTarget();
 		new Selector(this);
+	}
+	
+	public Controller getController() {
+		return controller;
 	}
 	
 	private void becomeDropTarget() {
