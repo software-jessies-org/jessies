@@ -1,0 +1,6 @@
+This directory contains the program 'pty', originally from W. Richard
+Stevens' "Advanced Programming in the UNIX Environment", Addison-Wesley,
+1992, ISBN 0-201-56317-7.
+
+You need this program, or something similar, to use Terminator. Compile
+it and ensure it's on your path so Terminator can find it.
