@@ -20,7 +20,7 @@ public class TextBuffer implements TerminalListener {
 	private int width;
 	private int height;
 	private ArrayList textLines = new ArrayList();
-	private int currentStyle = StyledText.getDefaultStyle();
+	private short currentStyle = StyledText.getDefaultStyle();
 	private int firstScrollLineIndex;
 	private int lastScrollLineIndex;
 	private Location caretPosition;
@@ -34,7 +34,7 @@ public class TextBuffer implements TerminalListener {
 	
 	// Fields used for saving and restoring state.
 	private Location savedPosition;
-	private int savedStyle;
+	private short savedStyle;
 	
 	// Fields used for saving and restoring the 'real' screen while the alternative buffer is in use.
 	private TextLine[] savedScreen;
@@ -330,11 +330,11 @@ public class TextBuffer implements TerminalListener {
 		view.setCaretPosition(caretPosition);
 	}
 	
-	public void setStyle(int style) {
+	public void setStyle(short style) {
 		this.currentStyle = style;
 	}
 	
-	public int getStyle() {
+	public short getStyle() {
 		return currentStyle;
 	}
 	

@@ -17,9 +17,9 @@ public interface TerminalListener {
 
 	public void fullReset();
 	
-	public void setStyle(int style);
+	public void setStyle(short style);
 	
-	public int getStyle();
+	public short getStyle();
 	
 	public void setInsertMode(boolean insertOn);
 	

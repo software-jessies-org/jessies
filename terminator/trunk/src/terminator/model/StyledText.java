@@ -20,33 +20,22 @@ public class StyledText {
 	public static final int CYAN = 6;
 	public static final int WHITE = 7;
 	
-	private static final String[] COLOR_DESCRIPTIONS = new String[] {
-		"Black",
-		"Red",
-		"Green",
-		"Yellow",
-		"Blue",
-		"Magenta",
-		"Cyan",
-		"White",
-	};
-	
 	private static final int BACKGROUND_SHIFT = 3;
 	private static final int FOREGROUND_MASK = 7;
 	private static final int BACKGROUND_MASK = 7 << BACKGROUND_SHIFT;
-	static final int IS_BOLD = 1 << 6;
-	static final int IS_UNDERLINED = 1 << 7;
 
+	private static final int IS_BOLD = 1 << 6;
+	private static final int IS_UNDERLINED = 1 << 7;
+	
+	private static final int HAS_FOREGROUND = 1 << 14;
+	private static final int HAS_BACKGROUND = 1 << 15;
+	
 	private String text;
 	private Style style;
 	private boolean continueToEnd = false;
 	
-	public StyledText(String text, byte style) {
-		this(text, getForegroundColor(style), getBackgroundColor(style), isBold(style), isUnderlined(style));
-	}
-	
-	public StyledText(String text, Color foreground, Color background, boolean isBold, boolean isUnderlined) {
-		this(text, new Style(foreground, background, isBold, isUnderlined));
+	public StyledText(String text, short style) {
+		this(text, new Style(getForegroundColor(style), getBackgroundColor(style), isBold(style), isUnderlined(style)));
 	}
 	
 	public StyledText(String text, Style style) {
@@ -75,58 +64,25 @@ public class StyledText {
 	}
 	
 	public static Color getForegroundColor(int style) {
-		return getColor(getForeground(style), isBold(style));
+		return getColor(getForeground(style), isBold(style), true);
 	}
 	
 	public static Color getBackgroundColor(int style) {
-		return getColor(getBackground(style), false);  // Background is never considered to be bold.
+		return getColor(getBackground(style), false, false);  // Background is never considered to be bold.
 	}
 	
-	public static String getForegroundColorName(int style) {
-		return getColorName(getForeground(style), isBold(style));
-	}
-	
-	public static String getBackgroundColorName(int style) {
-		return getColorName(getBackground(style), isBold(style));
-	}
-	
-	public static String getColorName(int colorIndex, boolean isBold) {
-		return "color" + (colorIndex + (isBold ? 8 : 0));
-	}
-	
-	public static String getForegroundColorDescription(int style) {
-		return getColorDescription(getForeground(style), isBold(style));
-	}
-	
-	public static String getBackgroundColorDescription(int style) {
-		return getColorDescription(getBackground(style), isBold(style));
-	}
-	
-	public static String getColorDescription(int colorIndex, boolean isBold) {
-		if (isBold) {
-			return COLOR_DESCRIPTIONS[colorIndex] + " (Bold)";
-		} else {
-			return COLOR_DESCRIPTIONS[colorIndex];
-		}
-	}
-	
-	public static Color getColor(int colorIndex, boolean isBold) {
+	private static Color getColor(int colorIndex, boolean isBold, boolean isForeground) {
 		Color result = null;
 		Options opts = Options.getSharedInstance();
-		boolean isForeground = (colorIndex == BLACK);
-		if (isBold) {
-			if (isForeground) {
+		if (isBold && isForeground) {
+			if (colorIndex == -1 && isForeground) {
 				result = opts.getColor("colorBD");
 			} else if (colorIndex < 8) {
 				result = opts.getColor("color" + (colorIndex + 8));
 			}
 		}
-		if (result == null) {
-			if (isForeground) {
-				result = opts.getColor("foreground");
-			} else if (colorIndex == WHITE) {
-				result = opts.getColor("background");
-			}
+		if (result == null && colorIndex == -1) {
+			result = opts.getColor(isForeground ? "foreground" : "background");
 		}
 		if (result == null) {
 			result = opts.getColor("color" + colorIndex);
@@ -134,12 +90,20 @@ public class StyledText {
 		return result;
 	}
 	
+	public static boolean hasBackground(int style) {
+		return ((style & HAS_BACKGROUND) != 0);
+	}
+	
+	public static boolean hasForeground(int style) {
+		return ((style & HAS_FOREGROUND) != 0);
+	}
+	
 	public static int getForeground(int style) {
-		return style & FOREGROUND_MASK;
+		return hasForeground(style) ? (style & FOREGROUND_MASK) : -1;
 	}
 	
 	public static int getBackground(int style) {
-		return (style & BACKGROUND_MASK) >> BACKGROUND_SHIFT;
+		return hasBackground(style) ? ((style & BACKGROUND_MASK) >> BACKGROUND_SHIFT) : -1;
 	}
 	
 	public static boolean isBold(int style) {
@@ -150,21 +114,15 @@ public class StyledText {
 		return (style & IS_UNDERLINED) != 0;
 	}
 	
-	public static int getNormalStyle(int color) {
-		return color;
+	public static short getDefaultStyle() {
+		return getStyle(BLACK, false, WHITE, false, false, false);
 	}
 	
-	public static int getDefaultStyle() {
-		return getStyle(BLACK, WHITE, false, false);
-	}
-	
-	public static int getStyle(int foreground, int background, boolean isBold, boolean isUnderlined) {
-		return foreground | (background << BACKGROUND_SHIFT) |
-				(isBold ? IS_BOLD : 0) | (isUnderlined ? IS_UNDERLINED : 0);
+	public static short getStyle(int foreground, boolean hasForeground, int background, boolean hasBackground, boolean isBold, boolean isUnderlined) {
+		return (short) ((foreground & FOREGROUND_MASK) | ((background << BACKGROUND_SHIFT) & BACKGROUND_MASK) | (isBold ? IS_BOLD : 0) | (isUnderlined ? IS_UNDERLINED : 0) | (hasForeground ? HAS_FOREGROUND : 0) | (hasBackground ? HAS_BACKGROUND : 0));
 	}
 	
 	public String getDescription() {
-		return "FG " + style.getForeground() + ", BG " + style.getBackground() +
-				", B=" + style.isBold() + ", U=" + style.isUnderlined();
+		return "StyledText[foreground=" + style.getForeground() + ",background=" + style.getBackground() + ",bold=" + style.isBold() + ",underlined=" + style.isUnderlined();
 	}
 }

@@ -185,33 +185,45 @@ public class CSIEscapeAction implements TerminalAction {
 		int background = StyledText.getBackground(oldStyle);
 		boolean isBold = StyledText.isBold(oldStyle);
 		boolean isUnderlined = StyledText.isUnderlined(oldStyle);
-		String[] bits = sequence.split(";");
-		for (int i = 0; i < bits.length; i++) {
-			int value = (bits[i].length() == 0) ? 0 : Integer.parseInt(bits[i]);
+		boolean hasForeground = StyledText.hasForeground(oldStyle);
+		boolean hasBackground = StyledText.hasBackground(oldStyle);
+		String[] chunks = sequence.split(";");
+		for (int i = 0; i < chunks.length; i++) {
+			int value = (chunks[i].length() == 0) ? 0 : Integer.parseInt(chunks[i]);
 			if (valueInRange(value, 0, 29)) {
 				switch (value) {
 					case 0:
-						foreground = StyledText.BLACK;
-						background = StyledText.WHITE;
+						hasForeground = false;
+						hasBackground = false;
 						isBold = false;
 						isUnderlined = false;
 						break;
-					case 1: isBold = true; break;
-					case 4: isUnderlined = true; break;
+					case 1:
+						isBold = true;
+						break;
+					case 4:
+						isUnderlined = true;
+						break;
 					case 7:
 						int temp = foreground;
 						foreground = background;
 						background = temp;
+						hasForeground = true;
+						hasBackground = true;
 						break;
-					case 24: isUnderlined = false; break;
+					case 24:
+						isUnderlined = false;
+						break;
 				}
 			} else if (valueInRange(value, 30, 37)) {
 				foreground = value - 30;
+				hasForeground = true;
 			} else if (valueInRange(value, 40, 47)) {
 				background = value - 40;
+				hasBackground = true;
 			}
 		}
-		listener.setStyle(StyledText.getStyle(foreground, background, isBold, isUnderlined));
+		listener.setStyle(StyledText.getStyle(foreground, hasForeground, background, hasBackground, isBold, isUnderlined));
 		return true;
 	}
 	
