@@ -144,7 +144,8 @@ public class FindFilesDialog {
             if (matchModel.getSize() == 1) {
                 matchList.setSelectedIndex(0);
             }
-            status.setText(" ");
+            final int totalFileCount = workspace.getIndexedFileCount();
+            status.setText(matchModel.getSize() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.");
         }
     }
     
