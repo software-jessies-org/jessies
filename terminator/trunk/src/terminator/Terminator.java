@@ -110,7 +110,7 @@ public class Terminator {
 	}
 
 	public void showUsage() {
-		System.err.println("Usage: Terminator [--help] [[-n <name>] command]...");
+		System.err.println("Usage: Terminator [--help] [-xrm <resource-string>]... [[-n <name>] command]...");
 		System.exit(0);
 	}
 
