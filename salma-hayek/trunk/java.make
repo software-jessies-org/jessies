@@ -141,7 +141,6 @@ endif
 # ----------------------------------------------------------------------------
 # Set up the bootclasspath.
 # ----------------------------------------------------------------------------
-BOOT_CLASS_PATH.javac = "" # Not needed
 BOOT_CLASS_PATH.jikes += $(RT_JAR)
 BOOT_CLASS_PATH.gcjx += $(RT_JAR)
 BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(COMPILER_TYPE))
