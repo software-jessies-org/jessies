@@ -526,6 +526,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             StringTokenizer st = new StringTokenizer(address, ":");
             int line = Integer.parseInt(st.nextToken()) - 1;
             int offset = text.getLineStartOffset(line);
+            int maxOffset = text.getLineEndOffset(line) - 1;
             if (st.hasMoreTokens()) {
                 try {
                     offset = emacsWalk(offset, Integer.parseInt(st.nextToken()));
@@ -535,7 +536,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             // We interpret address ending with a ":" (from grep and compilers) as requiring
             // the line to be selected. Other addresses (such as from our open-file-list) just
             // mean "position the caret".
-            int endOffset = (address.endsWith(":")) ? text.getLineEndOffset(line) : offset;
+            int endOffset = (address.endsWith(":")) ? (maxOffset + 1) : offset;
             
             if (st.hasMoreTokens()) {
                 try {
@@ -544,10 +545,12 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             }
             if (st.hasMoreTokens()) {
                 try {
-                    endOffset = emacsWalk(endOffset, Integer.parseInt(st.nextToken()));
-                    endOffset++; // emacs end offsets seem to include the character following. 
+                    // emacs end offsets seem to include the character following.
+                    endOffset = emacsWalk(endOffset, Integer.parseInt(st.nextToken())) + 1;
                 } catch (NumberFormatException ex) {}
             }
+            offset = Math.min(offset, maxOffset);
+            endOffset = Math.min(endOffset, maxOffset);
             goToSelection(offset, endOffset);
         } catch (javax.swing.text.BadLocationException ex) {
             ex.printStackTrace();
