@@ -11,6 +11,9 @@
  h2 {
   margin:0px -40px;
  }
+ pre {
+  margin:0px 40px;
+ }
 </style>
 </head>
 
@@ -52,12 +55,12 @@ voluminous build output.
 <p align="center"><img src="mac-os-grep.png">
 <p>This works by reading your current directory from the window title, so
 you'll need something like this in your <tt>bash(1)</tt> start-up scripts:
-<blockquote><pre>
+<pre>
 if [ "$TERM" == "terminator" ]
 then
   export PROMPT_COMMAND='echo -ne "\e2;`pwd`\a"'
 fi
-</pre></blockquote>
+</pre>
 
 <li><p><strong>Number reinterpretation</strong> - Terminator will recognize numbers
 in a variety of bases as the current selection, and add informational menu items to the
