@@ -28,3 +28,11 @@ Elliott's TODOs:
 ~~~~~~~~~~~
 [1] Add resources or other configuration file for hyperlink recognizers. Maybe allow arbitrary classes to be instantiated?
 [1] "Connect to Server" CS-K; don't implement Rendevouz (unless you're bored!) but take (user@)?host and port-scan for ssh, and fall back to telnet.
+* Don't do defaults in code; if we have something in the options HashMap, it's
+  self-documenting.
+* Try to make sure we never cache options. Then we can think about adding stuff
+  to e.forms to automatically generate a dialog. And -- scarier still --
+  writing stuff back to .Xdefaults or whatever. This is probably a longer-term
+  idea, though. There's a long way between our options stuff and something as
+  good as Apple's. And I guess the right direction to go in is one that moves
+  us away from .Xdefaults and .Xresources except as an initial land grab.
