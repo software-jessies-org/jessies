@@ -33,6 +33,9 @@ public class EColumn extends JSplitPane {
     }
     
     public void setErrorsWindow(EErrorsWindow errorsWindow) {
+        // This, sad to say, is the least difficult way to do what JSplitPane.setDividerLocation should do.
+        errorsWindow.setPreferredSize(new Dimension(10, 150));
+        
         setTopComponent(errorsWindow);
     }
     
