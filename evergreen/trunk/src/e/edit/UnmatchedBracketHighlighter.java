@@ -20,16 +20,37 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
     public UnmatchedBracketHighlighter(JTextComponent textComponent) {
         this.textComponent = textComponent;
     }
+
+    private boolean containsBrackets(String text) {
+        for (int i = 0; i < text.length(); ++i) {
+            char ch = text.charAt(i);
+            if (ch == '(' || ch == ')' || ch == '{' || ch == '}') {
+                return true;
+            }
+            if (ch == ' ' || ch == '\t') {
+                // We have to consider whitespace significant, too,
+                // because we don't just insist that braces match:
+                // we also insist that their indentation matches.
+                return true;
+            }
+        }
+        return false;
+    }
     
     /** Implements the DocumentListener interface so we can watch. */
     public void insertUpdate(DocumentEvent e) {
-        // FIXME: check to see if the inserted text contains any interesting characters; ignore if not.
-        updateHighlights();
+        try {
+            String insertedText = e.getDocument().getText(e.getOffset(), e.getLength());
+            if (containsBrackets(insertedText)) {
+                updateHighlights();
+            }
+        } catch (BadLocationException ex) {
+            Log.warn("Bad " + e + ".", ex);
+        }
     }
 
     /** Implements the DocumentListener interface so we can watch. */
     public void removeUpdate(DocumentEvent e) {
-        // FIXME: check to see if the removed text contains any interesting characters; ignore if not.
         updateHighlights();
     }
     
