@@ -367,7 +367,7 @@ public class Workspace extends JPanel {
      */
     public boolean isSensibleToScan(File[] contents) {
         for (int i = 0; i < contents.length; i++) {
-            if (contents[i].toString().matches(".*(CVS|SCCS|Makefile|makefile|build\\.xml)")) {
+            if (contents[i].toString().matches(".*(CVS|SCCS|\\.svn|Makefile|makefile|build\\.xml)")) {
                 return true;
             }
         }

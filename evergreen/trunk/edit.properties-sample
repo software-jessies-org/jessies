@@ -17,7 +17,7 @@ indent.string=
 ?Mac OS X:open.command=/usr/bin/open
 ?Windows 2000:open.command=start
 
-directories.uninterestingNames=(SCCS|CVS|BitKeeper|billbox_BOS_.*|ix86_mingw32msvc_.*|ppc_BOS_.*|ix86_linux_.*)
+directories.uninterestingNames=(SCCS|\.svn|CVS|BitKeeper|billbox_BOS_.*|ix86_mingw32msvc_.*|ppc_BOS_.*|ix86_linux_.*)
 files.uninterestingExtensions=.a;.aux;.bak;.bin;.class;.d;.elf;.exe;.jar;.lib;.log;.map;.o;.obj;.swp;.texshop;.toc
 files.externalApplicationExtensions=.icns;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 #Not yet implemented. See e.util.FileUtilities.
