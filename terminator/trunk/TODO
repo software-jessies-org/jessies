@@ -42,12 +42,6 @@ Should allow the user to specify a log filename per tab, on the command line.
 
 * Get the web page and images under version control; update them.
 
-* Fix the fall-back defaults so that they're either like xterm's or xwsh's.
-  The current situation where none of the maintainers (and presumably none of
-  the users) live with the fall-back defaults has led to a fresh install
-  on a machine without previous X11 configuration being hard to use. (Should
-  perhaps get James "Computer Museum" Carter to get us the actual xwsh colors.)
-
 * Some way to easily get the log filename for a given tab onto the clipboard.
 
 * Some way to turn off logging for a given connection.
