@@ -1,0 +1,186 @@
+package e.gui;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.regex.*;
+import javax.swing.*;
+import javax.swing.text.*;
+
+import e.forms.*;
+
+public class JTextComponentFind {
+    /**
+     * Used to mark the matches in the text as if they'd been gone over with a highlighter pen. We use
+     * full yellow with half-alpha so you can see the selection through, as a dirty smudge, just like a real
+     * highlighter pen might do.
+     */
+    public static final Highlighter.HighlightPainter PAINTER = new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 0, 128));
+    
+    /**
+     * The JTextComponent we're working on.
+     */
+    private JTextComponent textComponent;
+    
+    /**
+     * Stores the initial start of the selection so we can restore it if the
+     * user cancels the search.
+     */
+    private int initialSelectionStart;
+    
+    /**
+     * Stores the initial end of the selection so we can restore it if the
+     * user cancels the search.
+     */
+    private int initialSelectionEnd;
+    
+    private FindField findField = new FindField();
+    
+    /**
+     * Used to show the number of matches, or report errors in the user's
+     * regular expression.
+     */
+    private JLabel findStatus = new JLabel(" ");
+    
+    private Action findAction = new FindAction();
+    
+    public static void addFindFunctionalityTo(final JTextComponent textComponent) {
+        JTextComponentFind find = new JTextComponentFind(textComponent);
+    }
+    
+    private void initKeyStrokes() {
+        addKeyBinding(KeyEvent.VK_F, findAction);
+        //addKeyBinding(KeyEvent.VK_D, FindPreviousAction);
+        //addKeyBinding(KeyEvent.VK_G, FindNextAction);
+    }
+    
+    private void addKeyBinding(int keyEventVk, Action action) {
+        InputMap inputMap = textComponent.getInputMap();
+        int eventMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        KeyStroke key = KeyStroke.getKeyStroke(keyEventVk, eventMask);
+        inputMap.put(key, action);
+    }
+    
+    private void showFindDialog() {
+        Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, textComponent);
+        
+        FormPanel formPanel = new FormPanel();
+        formPanel.addRow("Find:", findField);
+        formPanel.addRow("", findStatus);
+        FormDialog.showNonModal(frame, "Find", formPanel);
+        
+        findField.selectAll();
+        findField.requestFocus();
+        findStatus.setText(" ");
+        
+        findField.find();
+    }
+    
+    private void cancelFind() {
+        removeAllMatches();
+    }
+    
+    private void removeAllMatches() {
+        Highlighter highlighter = textComponent.getHighlighter();
+        Highlighter.Highlight[] highlights = highlighter.getHighlights();
+        for (int i = 0; i < highlights.length; i++) {
+            if (highlights[i].getPainter() == PAINTER) {
+                highlighter.removeHighlight(highlights[i]);
+            }
+        }
+        //currentTextWindow.getBirdView().clearMatchingLines();
+    }
+    
+    private void findAllMatches(String regularExpression) {
+        removeAllMatches();
+        
+        // Do we have something to search for?
+        if (regularExpression == null || regularExpression.length() == 0) {
+            return;
+        }
+        
+        // Do we have something to search in?
+        String content = textComponent.getText();
+        if (content == null) {
+            return;
+        }
+        
+        // Compile the regular expression.
+        Pattern pattern = Pattern.compile(regularExpression);
+        
+        // Find all the matches.
+        int matchCount = 0;
+        Matcher matcher = pattern.matcher(content);
+        Highlighter highlighter = textComponent.getHighlighter();
+        while (matcher.find()) {
+            try {
+                //textComponent.getBirdView().addMatchingLine(textArea.getLineOfOffset(matcher.end()));
+                highlighter.addHighlight(matcher.start(), matcher.end(), PAINTER);
+            } catch (BadLocationException ex) {
+                ex.printStackTrace();
+            }
+            matchCount++;
+        }
+        findStatus.setText("Matches: " + matchCount);
+    }
+    
+    private JTextComponentFind(final JTextComponent textComponent) {
+        this.textComponent = textComponent;
+        initKeyStrokes();
+    }
+    
+    private class FindAction extends AbstractAction {
+        public FindAction() {
+            super("Find...");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            showFindDialog();
+        }
+    }
+    
+    private class FindField extends EMonitoredTextField {
+        public FindField() {
+            super(40);
+            addKeyListener(new KeyAdapter() {
+                public void keyTyped(KeyEvent e) {
+                    if (e.getKeyChar() == '\n') {
+                        find();
+                        e.consume();
+                    }
+                }
+                
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                        cancelFind();
+                    }
+                }
+                
+/*
+                public void keyReleased(KeyEvent e) {
+                    if (JTerminalPane.isKeyboardEquivalent(e)) {
+                        if (e.getKeyCode() == KeyEvent.VK_D) {
+                            textToFindIn.findPrevious();
+                        } else if (e.getKeyCode() == KeyEvent.VK_G) {
+                            textToFindIn.findNext();
+                        }
+                    }
+                }*/
+            });
+        }
+        
+        public void timerExpired() {
+            find();
+        }
+        
+        public void find() {
+            String regularExpression = getText();
+            try {
+                setForeground(UIManager.getColor("TextField.foreground"));
+                findAllMatches(regularExpression);
+            } catch (PatternSyntaxException ex) {
+                setForeground(Color.RED);
+                findStatus.setText(ex.getDescription());
+            }
+        }
+    }
+}
