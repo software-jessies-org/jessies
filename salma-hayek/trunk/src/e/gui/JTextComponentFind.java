@@ -9,10 +9,7 @@ import javax.swing.text.*;
 import e.forms.*;
 
 //
-// TODO: find previous/find next
 // TODO: automatically update results as the document changes
-// TODO: try to remove some of the duplication between this class and similar
-//       classes in Edit and Terminator.
 //
 
 public class JTextComponentFind {
