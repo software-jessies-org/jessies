@@ -42,7 +42,7 @@ public class WatermarkViewPort extends JViewport {
         Rectangle clip = g.getClipBounds();
         g.setColor(WATERMARK_COLOR);
         for (int x = clip.x - (clip.x % watermarkWidth); x < clip.x + clip.width; x += watermarkWidth) {
-            for (int y = clip.y - (clip.y % watermarkHeight); y < clip.y + clip.height; y += watermarkHeight) {
+            for (int y = clip.y - (clip.y % watermarkHeight); y < clip.y + clip.height + watermarkHeight; y += watermarkHeight) {
                 g.drawString(watermark, x, y);
             }
         }
