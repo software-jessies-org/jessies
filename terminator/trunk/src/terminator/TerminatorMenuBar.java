@@ -4,7 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import e.util.*;
+import terminator.view.*;
 
+/**
+ * Provides a menu bar for Mac OS, and acts as a source of Action instances for
+ * the pop-up menu on all platforms.
+ */
 public class TerminatorMenuBar extends JMenuBar {
 	public TerminatorMenuBar() {
 		add(makeFileMenu());
@@ -15,13 +20,13 @@ public class TerminatorMenuBar extends JMenuBar {
 	
 	public JMenu makeFileMenu() {
 		JMenu menu = new JMenu("File");
-		menu.add(makeAcceleratedItem(new NewShellAction(), 'N'));
-		menu.add(makeAcceleratedItemEx(new NewCommandAction(), 'N', true));
-		menu.add(makeAcceleratedItemEx(new ConnectToServerAction(), 'K', true));
+		menu.add(new JMenuItem(new NewShellAction()));
+		//menu.add(makeAcceleratedItemEx(new NewCommandAction(), 'N', true));
+		//menu.add(makeAcceleratedItemEx(new ConnectToServerAction(), 'K', true));
 		
 		menu.add(new JSeparator());
-		menu.add(makeAcceleratedItem(new CloseWindowAction(), 'W'));
-		menu.add(makeAcceleratedItemEx(new SaveAsAction(), 'S', true));
+		menu.add(new JMenuItem(new CloseAction()));
+		//menu.add(new JMenuItem(new SaveAsAction()));
 		
 		/*
 		if (GuiUtilities.isMacOs() == false) {
@@ -34,15 +39,17 @@ public class TerminatorMenuBar extends JMenuBar {
 	
 	public JMenu makeEditMenu() {
 		JMenu menu = new JMenu("Edit");
-		menu.add(makeAcceleratedItem(new CopyAction(), 'C'));
-		menu.add(makeAcceleratedItem(new PasteAction(), 'V'));
-		menu.add(makeAcceleratedItem(new SelectAllAction(), 'A'));
+		menu.add(new JMenuItem(new CopyAction()));
+		menu.add(new JMenuItem(new PasteAction()));
+		//menu.add(new JMenuItem(new SelectAllAction()));
 		
 		menu.add(new JSeparator());
-		menu.add(makeAcceleratedItem(new FindAction(), 'F'));
+		menu.add(new JMenuItem(new FindAction()));
+		menu.add(new JMenuItem(new FindNextAction()));
+		menu.add(new JMenuItem(new FindPreviousAction()));
 		
 		menu.add(new JSeparator());
-		menu.add(makeAcceleratedItem(new ClearScrollbackAction(), 'K'));
+		menu.add(new JMenuItem(new ClearScrollbackAction()));
 
 		return menu;
 	}
@@ -68,6 +75,11 @@ public class TerminatorMenuBar extends JMenuBar {
 	
 	public static KeyStroke makeKeyStroke(String key) {
 		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, false);
+	}
+	
+	public static JTerminalPane getFocusedTerminalPane() {
+		Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+		return (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, focusOwner);
 	}
 	
 	public static class NewShellAction extends AbstractAction {
@@ -99,12 +111,17 @@ public class TerminatorMenuBar extends JMenuBar {
 		}
 	}
 
-	class CloseWindowAction extends AbstractAction {
-		public CloseWindowAction() {
-			super("Close Window");
+	public static class CloseAction extends AbstractAction {
+		public CloseAction() {
+			super("Close");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("W"));
 		}
+		
 		public void actionPerformed(ActionEvent e) {
-			//paste();
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.doCloseAction();
+			}
 		}
 	}
 
@@ -128,60 +145,86 @@ public class TerminatorMenuBar extends JMenuBar {
 		}
 	}
 	
-	class PasteAction extends AbstractAction {
+	public static class PasteAction extends AbstractAction {
 		public PasteAction() {
 			super("Paste");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("V"));
 		}
+		
 		public void actionPerformed(ActionEvent e) {
-			//paste();
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.doPasteAction();
+			}
 		}
 	}
 	
-	class SelectAllAction extends AbstractAction {
+	/*
+	private static class SelectAllAction extends AbstractAction {
 		public SelectAllAction() {
 			super("Select All");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("A"));
 		}
+		
 		public void actionPerformed(ActionEvent e) {
-			//paste();
+			terminal.doSelectAllAction();
 		}
 	}
+	*/
 	
-	class FindAction extends AbstractAction {
+	public static class FindAction extends AbstractAction {
 		public FindAction() {
-			super("Find");
+			super("Find...");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("F"));
 		}
+		
 		public void actionPerformed(ActionEvent e) {
-			//paste();
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.doFindAction();
+			}
 		}
 	}
 	
-	class ClearScrollbackAction extends AbstractAction {
+	public static class FindNextAction extends AbstractAction {
+		public FindNextAction() {
+			super("Find Next");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("G"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.doFindNextAction();
+			}
+		}
+	}
+	
+	public static class FindPreviousAction extends AbstractAction {
+		public FindPreviousAction() {
+			super("Find Previous");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("D"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.doFindPreviousAction();
+			}
+		}
+	}
+	
+	public static class ClearScrollbackAction extends AbstractAction {
 		public ClearScrollbackAction() {
 			super("Clear Scrollback");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("K"));
 		}
+		
 		public void actionPerformed(ActionEvent e) {
-			//paste();
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.doClearScrollbackAction();
+			}
 		}
 	}
-	
-	public JMenuItem makeAcceleratedItem(Action action, char character) {
-		return makeAcceleratedItemEx(action, character, false);
-	}
-	
-	public JMenuItem makeAcceleratedItemEx(Action action, char character, boolean shifted) {
-		JMenuItem item = new JMenuItem(action);
-		int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		if (shifted) modifiers |= InputEvent.SHIFT_MASK;
-		String keycodeName = "VK_" + character;
-		int keycode;
-		try {
-			keycode = KeyEvent.class.getField(keycodeName).getInt(KeyEvent.class);
-			KeyStroke keyStroke = KeyStroke.getKeyStroke(keycode, modifiers);
-			item.setAccelerator(keyStroke);
-		} catch (Exception e) {
-			Log.warn("Couldn't find virtual keycode for '" + character);
-		}
-		return item;
-	}
-
 }
