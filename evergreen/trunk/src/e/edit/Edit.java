@@ -671,16 +671,10 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         });
     }
     
-    public void initWindowKeys() {
-        // FIXME: do we need this or not? i thought we did, but when i came to add it because C-O wasn't always working, i found C-O had started to work (as far as i can tell) all the time. weird...
-//        frame.getRootPane().registerKeyboardAction(this, "Close", KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, 0, true), JComponent.WHEN_IN_FOCUSED_WINDOW);
-    }
-    
     public void initWindow() {
         initWindowPosition();
         initWindowIcon();
         initWindowListener();
-        initWindowKeys();
     }
     
     public void initTagsPanel() {
