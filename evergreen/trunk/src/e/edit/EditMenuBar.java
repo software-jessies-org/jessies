@@ -135,11 +135,11 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(new KillErrorsAction());
 
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
-            public void addItem(Action action) {
+            public void addItem(ExternalToolAction action) {
                 menu.add(action);
             }
 
-            public void addItem(Action action, char keyboardEquivalent) {
+            public void addItem(ExternalToolAction action, char keyboardEquivalent) {
                 menu.add(makeAcceleratedItemEx(action, "" + keyboardEquivalent, true));
             }
 

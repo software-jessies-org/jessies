@@ -20,8 +20,8 @@ even if it does seem odd.)
 
  */
 public abstract class ExternalToolsParser {
-    public abstract void addItem(Action action);
-    public abstract void addItem(Action action, char keyEquivalent);
+    public abstract void addItem(ExternalToolAction action);
+    public abstract void addItem(ExternalToolAction action, char keyEquivalent);
     public abstract void addSeparator();
 
     public void parse() {
