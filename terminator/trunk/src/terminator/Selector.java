@@ -42,14 +42,31 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 				Location end = new Location(loc.getLineIndex() + 1, 0);
 				setHighlight(start, end);
 			}
+			copy();
 		} else if (event.getButton() == MouseEvent.BUTTON2) {
-			try {
-				Transferable contents = view.getToolkit().getSystemClipboard().getContents(view);
-				String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
-				view.insertText(string);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+			paste();
+		}
+	}
+	
+	/**
+	 * Copies the selected text to the clipboard.
+	 */
+	public void copy() {
+		if (highlight != null) {
+			setClipboard(view.getText(highlight));
+		}
+	}
+	
+	/**
+	 * Pastes the text on the clipboard into the terminal.
+	 */
+	public void paste() {
+		try {
+			Transferable contents = view.getToolkit().getSystemClipboard().getContents(view);
+			String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
+			view.insertText(string);
+		} catch (Exception ex) {
+			Log.warn("Couldn't paste.", ex);
 		}
 	}
 	
@@ -68,9 +85,6 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	
 	public void mouseReleased(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON1) {
-			if (highlight != null) {
-				setClipboard(view.getText(highlight));
-			}
 			startLocation = null;
 		}
 	}
