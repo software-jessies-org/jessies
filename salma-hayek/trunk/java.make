@@ -270,6 +270,6 @@ app: build
 	cp -r . $$APP_DIR/Resources/$(PROJECT_NAME) && \
 	cp -r $(SALMA_HAYEK) $$APP_DIR/Resources/salma-hayek && \
 	cd $$APP_DIR/MacOS && \
-	echo -e '#!/bin/bash\nexec `dirname $$0`/../Resources/$(PROJECT_NAME)/bin/$(PROJECT_NAME)\n' > $(PROJECT_NAME) && \
+	echo -e '#!/bin/bash\ncd\nexec `dirname $$0`/../Resources/$(PROJECT_NAME)/bin/$(PROJECT_NAME)\n' > $(PROJECT_NAME) && \
 	chmod a+x $(PROJECT_NAME)
 
