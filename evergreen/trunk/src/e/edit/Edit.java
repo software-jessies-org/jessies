@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -165,11 +166,13 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             filename = filename.replace('\\', '/');
         }
         
-        /* Extract any address. */
+        /* Extract any address; a trailing sequence of ":\d+" with an optional trailing ':'. */
+        Pattern addressPattern = Pattern.compile("^(.+?)((:\\d+)+):?$");
+        Matcher addressMatcher = addressPattern.matcher(filename);
         final String address;
-        if (filename.indexOf(':', 2) != -1) {
-            address = filename.substring(filename.indexOf(':', 2));
-            filename = filename.substring(0, filename.indexOf(':', 2));
+        if (addressMatcher.find()) {
+            address = addressMatcher.group(2);
+            filename = addressMatcher.group(1);
         } else {
             address = null;
         }
