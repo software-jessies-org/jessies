@@ -18,13 +18,8 @@ public class NextWordAction extends WordAction {
         if (isInWord(text, offset)) {
             return getWordEnd(text, offset);
         }
-
-        // If we're not in a word, go to the start of the next word.
-        if (isInWhitespace(text, offset) || isInWord(text, offset) == false) {
-            return getWordStart(text, getNonWordEnd(text, offset));
-        }
         
         // Otherwise go to the start of the next word.
-        return getWordStart(text, getNonWordEnd(text, getWordEnd(text, offset)));
+        return getWordEnd(text, getNonWordEnd(text, getWordEnd(text, offset)));
     }
 }
