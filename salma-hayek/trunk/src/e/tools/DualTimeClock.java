@@ -52,6 +52,11 @@ public class DualTimeClock extends JWindow implements ActionListener {
                 ex = ex;
             }
         }
+        final int preferredHeight = (int) new JLabel(" ").getPreferredSize().getHeight();
+        if (icon.getIconHeight() > preferredHeight) {
+            Image image = icon.getImage();
+            icon = new ImageIcon(image.getScaledInstance(-1, preferredHeight, Image.SCALE_AREA_AVERAGING));
+        }
         return icon;
     }
 
