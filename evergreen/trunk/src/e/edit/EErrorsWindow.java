@@ -20,7 +20,6 @@ public class EErrorsWindow extends EWindow implements LinkListener {
         this.text = new JTextPane();
         this.linkRecognizer = new LinkRecognizer(text, this);
         this.linkFormatter = new LinkFormatter(text);
-        text.addFocusListener(this);
         initTextStyles();
         add(new JScrollPane(text), BorderLayout.CENTER);
         attachPopupMenuTo(text);

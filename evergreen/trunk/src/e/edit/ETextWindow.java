@@ -1,7 +1,6 @@
 package e.edit;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
@@ -62,7 +61,6 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
         this.birdView = new BirdView(text, scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
-        text.addFocusListener(this);
         fillWithContent();
     }
     
@@ -84,13 +82,6 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
             return ":" + lineNumber + ":" + columnNumber;
         } catch (BadLocationException ex) {
             return "";
-        }
-    }
-    
-    public void focusGained(FocusEvent e) {
-        super.focusGained(e);
-        if (e.isTemporary() == false) {
-            Edit.getTagsPanel().ensureTagsCorrespondTo(this);
         }
     }
     

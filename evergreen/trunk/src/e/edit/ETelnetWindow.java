@@ -97,7 +97,6 @@ public class ETelnetWindow extends EWindow implements LinkListener {
         initTextStyles();
         this.inputLine = new ETextField();
         inputLine.addActionListener(new SendLineAction());
-        inputLine.addFocusListener(this);
         inputLine.getCaret().setBlinkRate(0);
         add(inputLine, BorderLayout.SOUTH);
         add(new JScrollPane(text), BorderLayout.CENTER);
