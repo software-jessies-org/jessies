@@ -1,0 +1,2 @@
+#!/bin/sh
+`dirname $0`/sgrep "$@" 2>&1 | cwd=`pwd` perl -p -e 's|^\./|$ENV{cwd}/|o;'

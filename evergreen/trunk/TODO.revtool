@@ -1,0 +1,91 @@
+Feature List
+------------
+
+> Here's my wish-list:
+> 
+> Works with both BK and CVS.
+> Lets you go straight to file:line.
+> Handles symlinks.
+> Displays text as (copyable) text.
+> Edit-like find.
+> Edit-like go to line.
+> More compact 'graph' of revisions.
+> Saving ('export') of patch files.
+> Shows checkin comment for other revisions when you hover, so 
+> you don't have to look at the revision.
+> Syntax coloring.
+> 
+>  -- elliott
+
+> Another one for the wish list:
+> 
+> Showing the revision when a selected line was deleted (bk 
+> sccscat is crude but surprisingly useful - it shows all the 
+> versions of every line at once)
+
+Annotation Formats
+------------------
+
+(we probably want to get the dates as single strings, and use SimpleDateFormat
+to parse them.)
+
+BitKeeper
+---------
+
+bk get -u -P -m -d -r<rev> <filename>
+
+stdout:
+^(\d\d)/(\d\d)/(\d\d)\t([^\t]+)\t([^\t]+)\t(.*)$
+$1 = year 03
+$2 = month 04
+$3 = day 11
+$4 = user
+$5 = revision
+$6 = line
+
+stderr:
+^([^ ]+) ([^ ]+): \d+ lines$
+$1 = filename
+$2 = revision
+
+
+CVS
+---
+
+cvs annotate -r<rev> <filename>
+
+stdout:
+^([^\t]+)\t\(([^\t]+)\t(\d\d)-(...)-(\d\d)\): (.*)$
+$1 = revision
+$2 = user
+$3 = day 11
+$4 = month Apr
+$5 = year 03
+
+stderr:
+^Annotations for (.*)$
+^\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*$
+$1 = filename
+
+
+About Row Headers
+-----------------
+
+the only row header i've ever looked at is the one from the tutorial:
+
+<http://java.sun.com/docs/books/tutorial/uiswing/components/scrollpane.html>
+
+whose source is here:
+
+<http://java.sun.com/docs/books/tutorial/uiswing/components/example-swing/Rule.java>
+
+as you see, it works using just the Y coordinates of the area it's being
+asked to paint. i reckon that JTextComponent.viewToModel is what we need,
+though i'm not sure how we make sure we're moving in line-sized increments.
+
+(for ed's benefit, if he's not clear about what i want to do, here's a link
+to something resembling what i'm looking for. check out the tooltips on the
+links in the second column.
+
+<http://bonsai.mozilla.org/cvsblame.cgi?file=mozilla/camino/src/browser/CocoaPromptService.mm&root=/cvsroot>
+)

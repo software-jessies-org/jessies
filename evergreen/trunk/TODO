@@ -1,0 +1,356 @@
+TODO list for Edit
+
+advisor:
+ 1. call researchers in a different thread.
+
+find in files:
+ 1. don't search twice for the same thing. we're not that fast!
+ 3. show the matching line(s).
+ 7. if the 'files containing' field is blank at the start of the search, there's no need to do a full search; the result should be the same as a search for files matching 'whose names match'.
+ 8. sometimes (not always) i see the list of matches get populated, and then everything vanishes at the last moment. i seem to remember the open quickly dialog used to do that too, but stopped doing it some time ago. it seems particularly prone to it if the list of matches is long.
+ 9. shouldn't be modal; there's no reason not to want to keep search results around arbitrarily long (see Xcode for an example of this taken to its extreme).
+
+spelling checking:
+ 1. improve ispell's suggestions by not suggesting spaces or hyphens; can we guess whether to use _ or camelCase?
+ 2. should we be less eager? have a timer so we don't literally check as you type each character? i think what i'd really like is two alpha values: one for misspelling-in-progress that's significantly lighter than finished-misspelling (which can be the same as what we're using at the moment), or some kind of scheme where alpha increases with age?
+ 3. is there a bug with misspellings at end-of-file?
+ 4. instead of dumping everything in the known-bad hash, we should only pay attention to 'misspellings' left in files when they're written. the known-bad hash contains too many spellings-in-progress.
+
+symbolic links: given that we don't really (see FIXME in FileUtilities) recognize symbolic links properly, how about having "Add Workspace" automatically use the canonical path of whatever path you give it? though that might look ugly, and it is kind of doing exactly what someone's presumably trying to avoid by using a symbolic link: remembering a specific path that may change.
+
+[ ] Find/Replace is broken for matches that span lines. (Try a find pattern
+    that contains "\n", for example.) [there's also a file "find-test.txt".]
+    
+    Find/Replace's preview is hard to understand for cases where there
+    are multiple matches on the same line. You get a list item for each
+    match, not one for each line containing matches.
+    
+    I think what we need to do is explicitly break the text into lines, find
+    the lines with a match, and then find all the matches in those lines.
+    When we know where they are, we make two colored HTML copies:
+    one with all the matches marked, the other with the same areas marked,
+    but the matching text replaced with the appropriate replacement.
+
+    The preview lists should contain one item for each line containing
+    matches, rather than one item per match.
+
+[ ] parse the javadoc in the background as soon as Edit starts, and hope
+    that it's ready by the time you want to use it. the delays from parsing
+    only on demand suck a little.
+
+[ ] if you want the documentation for startsWith, you have to know it's
+    in String and either find "String" and double-click it or find the advisor
+    text field and type "String", and then you have to navigate the
+    HTML documentation manually to find String.startsWith.
+    How big would a database of all JDK methods be?
+
+use Position instead of an int and arithmetic to re-position the caret
+after an editing operation. it's clearer, and we seem to keep getting
+the arithmetic wrong.
+
+we've removed most uses of "new File" and FileUtilities.parseUserFriendlyName
+in favor of FileUtilities.fileFromString, but should probably have something
+similar in the other direction, where special JFilenameField components would
+let us always show the user-friendly forms.
+
+[ ] auto-scroll in the errors window shouldn't stop immediately we output
+    a link: it should ensure that the first link we output doesn't scroll
+    off the top --- that's the behavior we're trying to ensure. we can
+    hack this by recording the link's rectangle and doing a scrollRectToVisible
+    for it each time we've done a scrollRectToVisible for a new line (which
+    strikes me as likely to be rather annoying jumpy behavior), or we can
+    work out how to compare these rectangles and currently-visible rectangle
+    (which i assume we can get hold of) and decide on that basis whether to
+    scrollRectToVisible.
+
+[ ] shouldn't use our own text selection colors. should show when we're
+    not focused.
+
+--
+
+[ ] fix the fact that you can slide windows off the bottom of the column,
+    or behind the others at the bottom of a column.
+
+[ ] Metronome thread to output regular timestamps to the log.
+
+[ ] Store divider position on quit. Restore on start.
+
+[ ] make use of the 'help' key on Apple desktop keyboards.
+
+[ ] opening files: say "if we don't find an exact match (i.e. a longest
+    common prefix that equals a workspace root), automatically create a new
+    workspace with [what? the longest common prefix?] as its root". the trouble,
+    as i've mentioned before, is that this doesn't do exactly what you want if
+    you open an unspecific file (~/edit.properties, say) and then go to a
+    more-specific file for which there's no better workspace
+    (~/Projects/rarely-used-project/, say).
+
+[ ] as a matter of interest, i accidentally opened 40 files on one workspace
+    yesterday. (i don't have a tall enough display for 40 titlebars.) Edit
+    didn't behave particularly gracefully, but it didn't spaz out in a
+    damaging way. i think we should refuse to open files on a workspace if
+    it's full.
+
+[ ] http://java.sun.com/products/jlf/at/book/Windows9.html says to position
+    dialogs "at the golden mean of the parent window". Centered horizontally,
+    and vertically n pixels below the top of the parent, where
+    
+        n = parentHeight - (parentHeight/1.618)
+
+    This only applies the first time the dialog is opened. Thereafter, it should
+    re-appear where it was when it was closed.
+
+[ ] martin
+    
+    [ ] when we warn that a file's changed, we should try harder to see if
+        it really has. BitKeeper has a habit of touching files without modifying
+        them.
+        
+    [ ] auto-indent should only apply to source files, not text files.
+    
+    [ ] find out (using jdb?) where the OutOfMemoryException is thrown if
+        you load a huge file, and plug the leak. then we could optimistically
+        try to load huge files and fail gracefully. (catching the exception in
+        the right place, we could also present an appropriate error to the
+        user.)
+    
+    [ ] we start up with the same files that were open when we quit, but
+        we don't remember how much space each had, which detracts somewhat.
+    
+    [ ] should have an environment variable editor (like the Windows Control
+        Panel one).
+    
+[ ] Find/Replace dialog:
+
+    [ ] Some way of marking submatch groups: the whole match is marked in
+        green, but it would be good to also see the submatches within that.
+
+    [ ] An option to only work on the selection. ("If there's a selection, use that,
+        otherwise use the whole file"?) Java 1.5's regular expression code has
+        support for this, so I'm planning on waiting until then.
+
+[ ] upon performing 'new file', and including a non-existent directory as
+    part of the new filename, the directory should be created too, i think.
+    perhaps with a 'you've either mistyped that, or you want a new
+    directory as well, don't you?' kind of message.  
+
+[ ] We could support automatic "bk edit"ing of files using this command:
+
+        bk sfiles -v ValidDeque.h
+
+    Which produces:
+
+        l    SCCS/s.ValidDeque.h
+
+    Or:
+
+        u    SCCS/s.ValidDeque.cpp
+
+    The letters mean:
+
+                    l???   the file is locked
+                    u???   the file is unlocked
+                    jjjj   the file is junk
+                    xxxx   the file is an extra
+                    ?c??   the file is modified (changed)
+                    ??p?   the file has pending deltas
+
+    So "u" means that "bk edit" is necessary to edit it.
+
+        bk sfiles -v badger
+
+    Produces no output even when not in a bk work area.
+
+[ ] hungry delete should probably delete to the correct indentation position
+    for the line first. so
+
+    if (blah) {
+            something();
+    }
+
+    with the caret before the 's' of 'something' would first delete four
+    spaces to fix the indentation, and then, if you backspace again, delete
+    back up to the opening brace.
+
+[ ] How about an imitation of Chimera/Safari's download manager windows
+    to show what tasks we've got running? Although Ant makes it quite
+    clear when it's finished, it's not nearly as obvious with grep or
+    even plain old make. Sometimes I carry on with other work too early,
+    other times I wait too long.
+
+    [ ] Change the stream monitoring code to distinguish stdout from stderr;
+        get the errors windows to automatically close after a build if there
+        wasn't anything on stderr? Is it possible to recognize that a task's
+        finished?
+
+    [ ] Is "Build Project" a special case that deserves a dialog with some
+        kind of progress feedback? Or do we want a 'Task Manager' dialog that
+        deals with everything? Is ant a special case of "Build Project" (since
+        it gives us clear feedback as to what phase of a build it's in, unlike
+        make).
+
+[ ] Open Quickly:
+
+    [ ] kfind works something like this (though they split the choices
+        between two tabs):
+        
+        Look in directory: [                       ][v]
+        For files named:   [                       ][v]
+        Containing text:   [                       ][v]
+        
+         [x] include subdirectories  [ ] case sensitive
+        
+        -----------------------------------------------
+        |                                             |
+        |                                             |
+        |                                             |
+        |                                             |
+        |                                             |
+        -----------------------------------------------
+        
+        [Open All]                  [Find/Stop] [Close]
+
+[ ] Cursor movement infelicities/bugs.
+
+    [ ] I'd be interested in making caseChangesLikeThis count
+        as word breaks.
+
+    [ ] Mac OS X and Windows: 'Up' should go to the start of the document
+        if on the first line, not stay still (worked in 1.3.1, but Sun
+        broke it for 1.4 and haven't fixed it yet).
+
+[ ] I'd really like to have Edit format javadoc-style comments for me,
+    making sure they're no more than 72 characters wide and have *s in
+    the right places and so forth.
+
+[ ] Only check for symbolic links on non-Windows OSes.
+
+    [ ] martind says we should canonicalize names when comparing. that
+        way, we wouldn't open two windows on two names for the same
+        file (forget hard links).
+
+    [ ] he also says we shouldn't write to a copy then copy that over the
+        original, because that buggers symbolic links. he says to write a safe
+        copy and then try writing into the original. the advantage? well, you'd
+        get to see files in windows with the name you got to them via. i'm not
+        sure that's enough to make me bother, though maybe we'd be better off
+        canonicalizing. would the hairy stuff for recognizing duplicates get
+        simpler? sounds plausible. if only i'd understood how to choose between
+        getAbsolutePath and getCanonicalPath when i first wrote this!
+
+        more convincingly, ACLs and Windows security descriptors would be
+        preserved. the trick, as martind points out -- though this applies
+        to the current scheme too -- is in being able to recognize that
+        you've successfully written a copy of the file. how do you know it's
+        actually made it? even if you read it back, how do you know that's
+        not coming from some local cache?
+
+[ ] Finish the tags support.
+
+    [ ] Like Ed says, we should probably have some kind of timer that
+        makes sure we keep the tags up-to-date as we edit (because the
+        focus won't be changing while we're making edits). My current
+        feeling is that what we probably want is a timer that's (re)started
+        each time a newline is entered (because only line changes are
+        significant?) and which causes a tags scan if it fires.
+
+[ ] Something like iCal's/Outlook's to-do list. Keep a pair of files at
+    the root of a workspace: TODO and TODONE, say. Complete a task and
+    (when you quit? after a fixed interval?) it moves to TODONE.
+
+    [ ] emacs has a ChangeLog command to add a ChangeLog entry. We might
+        want to offer something similar.
+
+[ ] The code for correcting indentation could be smarter. It doesn't do
+    well with any of the things mentioned below.
+    
+    [ ] C switch statements.
+
+        switch (x) {
+            case 1:
+                f();
+                break;
+            default:
+                g();
+                break;
+        }
+
+        (It does okay if you're prepared to use braces around the bodies
+        of the individual cases. This is a workaround I've taken to using,
+        when I find myself writing -- to my shame -- switch statements.)
+
+    [ ] C++ ostream output, where broken lines typically align at "<<".
+
+        std::cout << "hello, "
+                  << "world!" << std::endl;
+
+    [ ] Over-complicated expressions. If we have unbalanced parentheses,
+        we should probably indent as far as the last unclosed parenthesis.
+        This can lead to right-justified code, mind, but then what are
+        people doing writing stuff like this?
+
+        x = (some & (initial << expression)) | (this() * that() +
+                                                the_other() - 1);
+
+[ ] I sometimes find myself wanting to look at a list of the files in a
+    given directory. Perhaps an "Open Directory" that opens another
+    column in the current workspace, containing an EDirectoryWindow?
+
+[ ] SCM: (BitKeeper for me, CVS for Ed)
+
+    1. diff current file against repository
+        bk diffs -u $filename [display in some funky way]
+
+    2. revert changes in current file
+        bk unedit $filename
+        bk get $filename
+
+    3. remove current file
+        bk rm $filename
+
+    4. rename current file
+        bk mv $filename $new-filename
+
+    5. (bk-specific, or generalizable?) 'check in and commit, potentially
+       adding new files, removing uncommitted files, or reverting modified
+       files'
+        bk citool
+
+    http://bk-emacs.bkbits.net/
+
+[ ] grep " *" * in a directory with a reasonable amount of stuff in it.
+    Watch Edit have some kind of spazzy fit. how can we cure this? Pike's
+    sam (and acme?) would redirect a command's output to a file, then show
+    the first n lines of that file, giving you the option to see more.
+    maybe we shouldn't auto-scroll? maybe we should block until the user
+    hits a key, sort of permanent 'pager' mode? maybe we need a second
+    level of buffering over the current get-a-line-or-a-few-hundred-
+    milliseconds-worth scheme, so that if we don't get a natural break,
+    we wait until we do. what i think i mean is that getting a newline
+    shouldn't flush. we should get (say) 16KiB or timeout. only in these
+    cases should we flush.
+
+[ ] The TELNET window should understand that people use \r to rewrite the
+    current line.
+
+[ ] Update the manual!
+
+[ ] Fix double-clicking next to a " character to be as it was before.
+
+[ ] Have a way to copy a file or rename a file.
+
+[ ] Make the arrow keys move through 4-space tabs? If backspace knows
+    about indent.string, shouldn't delete?
+
+[ ] Add some kind of "template" facility to "New File" to automatically fill
+    in the boilerplate. A combo box or list in the 'new' dialog would do,
+    letting us choose a named sample from the files in $EDIT_HOME/templates
+    or some-such. This is basically what Project Builder does (it has a
+    directory for each type).
+    
+[ ] Should Edit poll the files it's got open to see if they've been modified
+    behind our backs?
+
+[ ] Need to be able to go quickly from a #include to a header file.
+
+[ ] wily-style access to |, > and < commands?
