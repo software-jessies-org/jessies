@@ -109,7 +109,6 @@ url.prefixes=file://;ftp://;http://;https://
 ?Mac OS X:apple.laf.useScreenMenuBar=true
 
 ?Windows 2000:make.command=nmake
-?Linux:make.command=/home/elliotth/bin/emake
 
 tools.0.name=Check in Changes...
 tools.0.command=bk citool
