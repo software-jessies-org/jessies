@@ -86,16 +86,25 @@ FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE
 # Choose a Java compiler.
 # ----------------------------------------------------------------------------
 
-JAVA_COMPILER ?= jikes
-# Did we get an absolute path?
-JAVA_COMPILER_LOCATION := $(wildcard $(JAVA_COMPILER))
-# Can we find what we were given on the user's PATH?
-ifeq "$(JAVA_COMPILER_LOCATION)" ""
-  JAVA_COMPILER_LOCATION := $(call pathsearch,$(JAVA_COMPILER))
-endif
-# Can we find javac?
-ifeq "$(JAVA_COMPILER_LOCATION)" ""
-  JAVA_COMPILER = javac
+ifneq "$(JAVA_COMPILER)" ""
+
+  # The user asked for a specific compiler, so check that we can find it.
+  ifeq "$(wildcard $(JAVA_COMPILER))$(call pathsearch,$(JAVA_COMPILER))" ""
+    $(error Unable to find $(JAVA_COMPILER))
+  endif
+
+else
+
+  # The user left the choice of compiler up to us.
+  # Favor Jikes, but fall back to javac.
+  JAVA_COMPILER = jikes
+  ifeq "$(wildcard $(JAVA_COMPILER))$(call pathsearch,$(JAVA_COMPILER))" ""
+    JAVA_COMPILER = javac
+    ifeq "$(wildcard $(JAVA_COMPILER))$(call pathsearch,$(JAVA_COMPILER))" ""
+      $(error Unable to find Jikes or javac)
+    endif
+  endif
+
 endif
 
 # Make the compiler's leafname available for simple javac/jikes tests.
