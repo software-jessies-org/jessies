@@ -2,9 +2,10 @@
 
 real_script=`readlink $0 || echo $0` # Deals with symbolic links to this script.
 
+UNAME=`uname`
 TERMINATOR_HOME=`dirname $real_script`/..
 CLASSPATH=$TERMINATOR_HOME/classes:$TERMINATOR_HOME/../salma-hayek/classes:$TERMINATOR_HOME/terminator.jar
-PTY_BINARY=$TERMINATOR_HOME/native/all/pty/pty-`uname`-`arch`
+PTY_BINARY=$TERMINATOR_HOME/native/all/pty/pty-$UNAME-`arch`
 
 if [ ! -w /usr/share/terminfo ]
 then
@@ -16,7 +17,7 @@ fi
 TIC=`type -p tic`
 TERMINFO_SRC=$TERMINATOR_HOME/doc/terminfo/terminator.tic
 TERMINFO_DST=$TERMINFO/t/terminator
-if [ "`uname`" == "Darwin" ]
+if [ "$UNAME" == "Darwin" ]
 then
   case "`uname -r`" in
   7.*)
@@ -33,14 +34,23 @@ then
     mkdir -p $TERMINFO_DST && rmdir $TERMINFO_DST
 fi
 
-if [ "`uname`" == "Linux" ]
+if [ "$UNAME" == "Linux" ]
 then
-    OS_SPECIFIC_OPTIONS=-Dterminator.frame.icon=`locate gnome-terminal.png | grep 32x32 | head -1`
+  # Use locate(1) to find the gnome-terminal icon.
+  # Cache the result, because this is the single most expensive part of
+  # the script.
+  icon_filename_file=~/.terminal-logs/.cached-icon
+  if [ ! -f $icon_filename_file -o ! -f `cat $icon_filename_file` ]
+  then
+    locate gnome-terminal.png | grep 32x32 | head -1 > $icon_filename_file
+  fi
+  icon_file=`cat $icon_filename_file`
+  OS_SPECIFIC_OPTIONS=-Dterminator.frame.icon=$icon_file
 fi
 
 if [ "$TIC" != "" ]
 then
-    tic -o$TERMINFO $TERMINFO_SRC
+  tic -o$TERMINFO $TERMINFO_SRC
 else
   if [ ! -e $TERMINFO_DST ]
   then
@@ -48,10 +58,17 @@ else
   fi
 fi
 
-mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
+# Make sure we have a directory for the terminal logs.
+if [ ! -d ~/.terminal-logs ]
+then
+  mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
+fi
 
 # If we don't have a pre-compiled 'pty' program for this
 # architecture, try to build it.
-test -e $PTY_BINARY || make -C `dirname $PTY_BINARY`
+if [ ! -x $PTY_BINARY ]
+then
+  make -C `dirname $PTY_BINARY`
+fi
 
 java -Xmx1g -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Djava.awt.Window.locationByPlatform=true -Dpty.binary=$PTY_BINARY terminator.Terminator "$@" || ( echo You need at least Java 1.5.0 - perhaps /usr/local/bin/java should be higher up your path than `type -p java`, which reports its version as: && java -version )
