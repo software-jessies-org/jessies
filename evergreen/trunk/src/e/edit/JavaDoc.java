@@ -128,12 +128,12 @@ public class JavaDoc {
                     System.err.println("Found package " + name);
                 } else {
                     // Some jar files seem to have only files in them, and no directory entries.
-                    int i = name.lastIndexOf("/");
+                    int i = entry.getName().lastIndexOf("/");
                     if (i != -1) {
                         String pkg = name.substring(0, i).replace('/', '.');
                         if (packageNames.contains(pkg) == false) {
                             packageNames.add(pkg);
-                            System.err.println("Found class " + pkg + ", using package from that.");
+                            System.err.println("Found package " + pkg);
                         }
                     }
                 }
