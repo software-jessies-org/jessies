@@ -70,9 +70,9 @@ public class TextLine {
 	public String getTabbedText(int start, int end) {
 		StringBuffer buf = new StringBuffer();
 		for (int i = start; i < end; i++) {
-			switch (text.charAt(i)) {
-				case TAB_CONTINUE: break;
-				default: buf.append(text.charAt(i));
+			char ch = text.charAt(i);
+			if (ch != TAB_CONTINUE) {
+				buf.append(ch);
 			}
 		}
 		return buf.toString();
