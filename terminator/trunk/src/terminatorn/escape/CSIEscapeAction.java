@@ -41,11 +41,26 @@ public class CSIEscapeAction implements TelnetAction {
 			case 'L': return insertLines(listener, midSequence);
 			case 'M': return scrollDisplayUp(listener, midSequence);
 			case 'P': return deleteCharacters(listener, midSequence);
+			case 'g': return clearTabs(listener, midSequence);
 			case 'h': return setMode(listener, midSequence, true);
 			case 'l': return setMode(listener, midSequence, false);
 			case 'm': return processFontEscape(listener, midSequence);
 			case 'r': return setScrollScreen(listener, midSequence);
 			default: return false;
+		}
+	}
+	
+	public boolean clearTabs(TelnetListener listener, String seq) {
+		int clearType = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
+		if (clearType == 0) {
+			// Clear horizontal tab at current cursor position.
+			return false;  // Change to 'true' when implemented.
+		} else if (clearType == 3) {
+			// Clear all horizontal tabs.
+			return false;  // Change to 'true' when implemented.
+		} else {
+			Log.warn("Unknown clear tabs type: " + clearType);
+			return false;
 		}
 	}
 	
@@ -75,7 +90,14 @@ public class CSIEscapeAction implements TelnetAction {
 			}
 			return true;
 		} else {
-			return false;
+			String[] modes = seq.split(";");
+			for (int i = 0; i < modes.length; i++) {
+				switch (Integer.parseInt(modes[i])) {
+					case 4: listener.setInsertMode(value); break;
+					default: Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
+				}
+			}
+			return true;
 		}
 	}
 	

@@ -21,6 +21,7 @@ public class TextBuffer implements TelnetListener {
 	private int lastScrollLineIndex;
 	private Location caretPosition;
 	private int lastValidStartIndex = 0;
+	private boolean insertMode = false;
 	
 	// Fields used for saving and restoring state.
 	private Location savedPosition;
@@ -240,11 +241,21 @@ public class TextBuffer implements TelnetListener {
 			textLines.add(new TextLine());
 		}
 	}
+	
+	public void setInsertMode(boolean insertMode) {
+		this.insertMode = insertMode;
+	}
 
 	public void processLine(String line) {
-		get(caretPosition.getLineIndex()).writeTextAt(caretPosition.getCharOffset(), line, currentStyle);
+		TextLine textLine = get(caretPosition.getLineIndex());
+		if (insertMode) {
+			textLine.insertTextAt(caretPosition.getCharOffset(), line, currentStyle);
+		} else {
+			textLine.writeTextAt(caretPosition.getCharOffset(), line, currentStyle);
+		}
 		lineIsDirty(caretPosition.getLineIndex() + 1);  // caretPosition's line still has a valid *start* index.
-		view.lineSectionChanged(caretPosition.getLineIndex(), caretPosition.getCharOffset(), caretPosition.getCharOffset() + line.length());
+		int lastCharChanged = insertMode ? textLine.length() : caretPosition.getCharOffset() + line.length();
+		view.lineSectionChanged(caretPosition.getLineIndex(), caretPosition.getCharOffset(), lastCharChanged);
 		moveCursorHorizontally(line.length());
 	}
 

@@ -47,7 +47,7 @@ public class EscapeParser {
 	}
 	
 	public TelnetAction getAction(TelnetControl telnetControl) {
-//		Log.warn("Getting telnet action for escape sequence \"" + sequence + "\"");
+//		Log.warn("Getting action for ESC sequence \"" + sequence + "\"");
 		return (seqRecogniser == null) ? null : seqRecogniser.getTelnetAction(telnetControl, sequence);
 	}
 	

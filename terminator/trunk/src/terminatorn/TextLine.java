@@ -62,14 +62,24 @@ public class TextLine {
 		styles = newStyles;
 	}
 	
+	/** Inserts text at the given position, moving anything already there further to the right. */
+	public void insertTextAt(int offset, String newText, int style) {
+		ensureOffsetIsOK(offset);
+		
+		// Extend the styles array and insert copies of the style into it.
+		byte[] newStyles = new byte[styles.length + newText.length()];
+		System.arraycopy(styles, 0, newStyles, 0, offset);
+		Arrays.fill(newStyles, offset, offset + newText.length(), (byte) style);
+		System.arraycopy(styles, offset, newStyles, offset + newText.length(), styles.length - offset);
+		styles = newStyles;
+		
+		// Insert the new text into the existing text.
+		text = text.substring(0, offset) + newText + text.substring(offset);
+	}
+	
 	/** Writes text at the given position, overwriting anything underneath. */
 	public void writeTextAt(int offset, String newText, int style) {
-		if (offset < 0) {
-			throw new IllegalArgumentException("Negative offset " + offset);
-		}
-		if (offset >= text.length()) {
-			appendPadding(offset - styles.length);
-		}
+		ensureOffsetIsOK(offset);
 		if (offset + newText.length() < styles.length) {
 			text = text.substring(0, offset) + newText + text.substring(offset + newText.length());
 			Arrays.fill(styles, offset, offset + newText.length(), (byte) style);
@@ -79,6 +89,15 @@ public class TextLine {
 			System.arraycopy(styles, 0, newStyles, 0, offset);
 			Arrays.fill(newStyles, offset, offset + newText.length(), (byte) style);
 			styles = newStyles;
+		}
+	}
+	
+	private void ensureOffsetIsOK(int offset) {
+		if (offset < 0) {
+			throw new IllegalArgumentException("Negative offset " + offset);
+		}
+		if (offset >= text.length()) {
+			appendPadding(offset - styles.length);
 		}
 	}
 	
