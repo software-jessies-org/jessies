@@ -3,12 +3,16 @@ package e.edit;
 import java.awt.event.*;
 import javax.swing.*;
 
+/**
+ * An Edit user is expected to use Open Quickly, so this is only
+ * here for emergencies. That's why, for example, there's no
+ * keyboard equivalent.
+ */
 public class OpenAction extends AbstractAction {
     public static final String ACTION_NAME = "Open...";
     
     public OpenAction() {
         super(ACTION_NAME);
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("O", false));
     }
     
     public void actionPerformed(ActionEvent e) {

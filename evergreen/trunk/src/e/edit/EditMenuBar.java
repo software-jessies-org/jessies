@@ -31,8 +31,8 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     public JMenu makeFileMenu() {
         JMenu menu = new JMenu("File");
         menu.add(new NewFileAction());
+        menu.add(new OpenQuicklyAction());
         menu.add(new OpenAction());
-        menu.add(new OpenSelectionAction());
         // FIXME: Should be "Open Recent >" here.
 
         menu.add(new JSeparator());
