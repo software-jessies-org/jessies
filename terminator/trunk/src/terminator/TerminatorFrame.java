@@ -209,6 +209,7 @@ public class TerminatorFrame extends JFrame {
 	 */
 	private void closeTab(JTerminalPane victim) {
 		tabbedPane.remove(victim);
+		tabbedPane.getSelectedComponent().requestFocus();
 		if (tabbedPane.getTabCount() == 0) {
 			closeWindow();
 		} else if (tabbedPane.getTabCount() == 1) {
@@ -216,6 +217,7 @@ public class TerminatorFrame extends JFrame {
 			soleSurvivor.invalidate();
 			setContentPane(soleSurvivor);
 			soleSurvivor.revalidate();
+			soleSurvivor.requestFocus();
 			repaint();
 			tabbedPane = null;
 			updateFrameTitle();
