@@ -275,13 +275,21 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         }
     }
     
+    private void uncheckedRevertToSaved() {
+        int originalCaretPosition = text.getCaretPosition();
+        fillWithContent();
+        text.setCaretPosition(originalCaretPosition);
+        Edit.showStatus("Reverted to saved version of " + filename);
+    }
+    
     public void revertToSaved() {
+        if (isDirty() == false && isOutOfDateWithRespectToDisk() == false) {
+            Edit.showAlert("Revert", "'" + getFilename() + "' is the same on disk as in the editor.");
+            return;
+        }
         boolean revert = Edit.askQuestion("Revert", "Revert to saved version of '" + file.getName() + "'?\nReverting will lose your current changes.", "Revert");
         if (revert) {
-            int originalCaretPosition = text.getCaretPosition();
-            fillWithContent();
-            text.setCaretPosition(originalCaretPosition);
-            Edit.showStatus("Reverted to saved version of " + filename);
+            uncheckedRevertToSaved();
         }
     }
     

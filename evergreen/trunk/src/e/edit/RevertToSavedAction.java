@@ -17,10 +17,6 @@ public class RevertToSavedAction extends ETextAction {
         if (window == null) {
             return;
         }
-        if (window.isDirty() || window.isOutOfDateWithRespectToDisk()) {
-            window.revertToSaved();
-        } else {
-            Edit.showAlert(ACTION_NAME, "'" + window.getFilename() + "' is the same on disk as in the editor.");
-        }
+        window.revertToSaved();
     }
 }
