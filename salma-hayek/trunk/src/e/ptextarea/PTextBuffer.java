@@ -14,6 +14,7 @@ import java.util.*;
  */
 
 public class PTextBuffer implements CharSequence {
+    private static final String CHARSET = "UTF-8";
     private char[] text = new char[0];
     private int gapPosition;
     private int gapLength;
@@ -66,15 +67,48 @@ public class PTextBuffer implements CharSequence {
             dataInputStream.readFully(byteBuffer.array());
             
             // Convert the bytes to characters.
-            CharBuffer charBuffer = Charset.forName("UTF-8").decode(byteBuffer);
+            CharBuffer charBuffer = Charset.forName(CHARSET).decode(byteBuffer);
             
             // And use the characters as our content.
             char[] chars = charBuffer.array();
             setText(chars);
+            
+            // FIXME: rewrite 'chars' replacing "\r" or "\r\n" with "\n", and
+            // storing the line ending the file had as a property on this
+            // document.
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
             FileUtilities.close(dataInputStream);
+        }
+    }
+    
+    /**
+     * Writes the contents of this buffer into the given file, replacing
+     * whatever's already there.
+     */
+    public void writeToFile(File file) {
+        Writer writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), CHARSET));
+            
+            // FIXME: if the property says the line ending isn't "\n", split
+            // the text into lines, and write them out with the appropriate
+            // line ending.
+            
+            // Otherwise, just write out the two halves as they are.
+            if (gapPosition != 0) {
+                writer.write(text, 0, gapPosition);
+            }
+            final int gapEnd = gapPosition + gapLength;
+            if (gapEnd < text.length) {
+                writer.write(text, gapEnd, text.length - gapEnd);
+            }
+            writer.flush();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            FileUtilities.close(writer);
         }
     }
     

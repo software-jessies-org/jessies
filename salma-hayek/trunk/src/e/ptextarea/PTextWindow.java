@@ -39,6 +39,11 @@ public class PTextWindow {
                 frame.setSize(new Dimension(600, 600));
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
+                frame.addWindowListener(new java.awt.event.WindowAdapter() {
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        text.writeToFile(new java.io.File(filename + ".bak"));
+                    }
+                });
             }
         });
     }

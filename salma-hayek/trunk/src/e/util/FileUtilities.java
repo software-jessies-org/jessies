@@ -128,11 +128,15 @@ public class FileUtilities {
         }
     }
     
-    public static void close(PrintWriter out) {
+    public static void close(Writer out) {
         if (out == null) {
             return;
         }
-        out.close();
+        try {
+            out.close();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
     /**
