@@ -1,0 +1,18 @@
+README file for Terminator.
+
+In the sub-directory 'props-examples' there are some examples of
+'.terminator' properties files.  The names should give you some
+clues as to which one might be right for you.  Simply copy one of
+these into your home directory, changing its name to
+'.terminator', and then glance through the file to see if there's
+anything which needs changing.  Typical examples of things you
+might want to modify include the commands executed when hyperlinks
+are clicked on.
+
+You can, of course, add more types of hyperlinks by copying an
+existing hyperlink entry, inventing a new name for it, and
+modifying it as you see fit.  You'll need to know some regexp to
+do this.  The regexp used is that built into the Java runtime
+libraries (as of version 1.4), and is almost identical to the
+syntax used in Perl regexp.
+
