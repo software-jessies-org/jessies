@@ -173,7 +173,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     public String listMethodsOrFields(String name) {
         StringBuffer result = new StringBuffer();
-        Pattern pattern = Pattern.compile("^[MF]:(" + name + "[^(\t]*)(\\([^\t]+)\t");
+        Pattern pattern = Pattern.compile("^[MF]:(" + StringUtilities.regularExpressionFromLiteral(name) + "[^(\t]*)(\\([^\t]+)\t");
         Matcher matcher;
         String htmlFile = "";
         String className = "";
