@@ -20,6 +20,30 @@ public class JTelnetPane extends JPanel {
 	private int viewHeight = 24;
 	private String name;
 	
+	public JTelnetPane() {
+		super(new BorderLayout());
+		String user = System.getProperty("user.name");
+		this.name = user + "@localhost";
+		String shell = getUserShell(user);
+		try {
+			Log.warn("Starting process " + shell);
+			final Process proc = Runtime.getRuntime().exec("pty " + shell);
+			init(proc.getInputStream(), proc.getOutputStream());
+			// Probably should do this somewhere else rather than setting up a whole Thread for it.
+			(new Thread(new Runnable() {
+				public void run() {
+					try {
+						proc.waitFor();
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			})).start();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
 	public JTelnetPane(String hostAndPort) {
 		super(new BorderLayout());
 		
@@ -35,6 +59,44 @@ public class JTelnetPane extends JPanel {
 			}
 		}
 
+		try {
+			Socket sock = new Socket(host, port);
+			init(sock.getInputStream(), sock.getOutputStream());
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	/**
+	* Returns the command to execute as the user's shell, parsed from the /etc/passwd file.
+	* On any kind of failure, 'bash' is returned as default.
+	*/
+	private String getUserShell(String user) {
+		File passwdFile = new File("/etc/passwd");
+		if (passwdFile.exists()) {
+			BufferedReader in = null;
+			try {
+				in = new BufferedReader(new FileReader(passwdFile));
+				String line;
+				while ((line = in.readLine()) != null) {
+					if (line.startsWith(user + ":")) {
+						return line.substring(line.lastIndexOf(':') + 1);
+					}
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (IOException ex) { }
+				}
+			}
+		}
+		return "bash";
+	}
+
+	private void init(InputStream in, OutputStream out) throws IOException {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		
@@ -53,11 +115,15 @@ public class JTelnetPane extends JPanel {
 		
 		textPane.sizeChanged();
 		try {
-			Socket sock = new Socket(host, port);
-			control = new TelnetControl(textPane.getModel(), sock.getInputStream(), sock.getOutputStream());
+			control = new TelnetControl(textPane.getModel(), in, out);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	/** Starts the process listening once all the user interface stuff is set up. */
+	public void start() {
+		control.start();
 	}
 	
 	public String getName() {
@@ -104,9 +170,9 @@ public class JTelnetPane extends JPanel {
 
 	public static void main(final String[] arguments) throws IOException {
 		Log.setApplicationName("Terminator");
-		if (arguments.length < 1) {
-			System.err.println("Usage: JTelnetPane <host>[:<port>]...");
-			System.exit(1);
+		if (arguments.length == 1 && arguments[0].endsWith("-help")) {
+			System.err.println("Usage: JTelnetPane [<host>[:<port>]]...");
+			System.exit(0);
 		}
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -117,6 +183,9 @@ public class JTelnetPane extends JPanel {
 				for (int i = 0; i < arguments.length; ++i) {
 					String hostAndPort = arguments[i];
 					telnetPanes.add(new JTelnetPane(hostAndPort));
+				}
+				if (arguments.length == 0) {
+					telnetPanes.add(new JTelnetPane());
 				}
 
 				JComponent content = null;
@@ -137,6 +206,14 @@ public class JTelnetPane extends JPanel {
 				frame.setSize(new Dimension(600, 400));
 				frame.setLocationRelativeTo(null);
 				frame.setVisible(true);
+				
+				// Start up the threads listening on the connections now that the UI is up.
+				// If we don't do this separately, we get a race condition whereby title
+				// setting (or other actions which need a JFrame) can be performed before
+				// the JFrame is available.
+				for (int i = 0; i < telnetPanes.size(); i++) {
+					((JTelnetPane) telnetPanes.get(i)).start();
+				}
 			}
 		});
 	}
