@@ -62,10 +62,10 @@ EOF
 # -----------------------------------------------------------------------------
 
 def tags_for_file(filename)
-  tag_lines = `ctags -n -f - #{filename}`.split('\n')
+  tag_lines = `ctags -n -f - #{filename}`
   namespace_separator=(filename =~ /\.java$/) ? "." : "::"
   tags = Hash.new()
-  tag_lines.each() {
+  tag_lines.each("\n") {
     |line|
     if line =~ /^(\S*)\t\S*\t(\d+);"\t\S+(?:\t(\S*))?/
       line_number = $2.to_i()
@@ -101,19 +101,18 @@ def annotate_patch()
   file = File.new(ARGV[0])
  end
  
- minus_file = "(unknown)"
- minus_tags = []
- plus_file = "(unknown)"
- plus_tags = []
+ minus_tags = nil
+ plus_tags = nil 
  
  file.each_line() {
   |line|
-  if line =~ /^\+\+\+ (\S+)\s/
-   plus_file = $1
-   plus_tags = tags_for_file(plus_file)
-  elsif line =~ /^--- (\S+)\s/
-   minus_file = $1
-   minus_tags = tags_for_file(minus_file)
+  if plus_tags == nil && minus_tags == nil && line =~ /^\=\=\=\=\= (\S+) /
+   plus_tags = tags_for_file($1)
+   minus_tags = tags_for_file($1)
+  elsif plus_tags == nil && line =~ /^\+\+\+ (\S+)\s/
+   plus_tags = tags_for_file($1)
+  elsif minus_tags == nil && line =~ /^--- (\S+)\s/
+   minus_tags = tags_for_file($1)
   elsif line =~ /^@@ -(\d+),\d+ \+(\d+),\d+ @@/
    plus_tag = find_tag_for_line(plus_tags, $2)
    minus_tag = find_tag_for_line(minus_tags, $1)
