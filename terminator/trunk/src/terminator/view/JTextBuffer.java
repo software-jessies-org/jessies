@@ -300,11 +300,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return new Point(charCoords.getCharOffset() * character.width, (charCoords.getLineIndex() + 1) * character.height);
 	}
 	
-	private Point getBaseline(Location charCoords) {
-		Dimension character = getCharUnitSize();
-		return new Point(charCoords.getCharOffset() * character.width, (charCoords.getLineIndex() + 1) * character.height - getFontMetrics(getFont()).getMaxDescent());
-	}
-	
 	public Dimension getOptimalViewSize() {
 		Dimension character = getCharUnitSize();
 		return new Dimension(model.getMaxLineWidth() * character.width, model.getLineCount() * character.height);
@@ -620,7 +615,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		// Special continueToEnd flag used for drawing the backgrounds of Highlights which extend
 		// over the end of lines.  Used for multi-line selection.
 		int backgroundWidth = text.continueToEnd() ? (getSize().width - x) : textWidth;
-		graphics.fillRect(x, y - metrics.getMaxAscent(), backgroundWidth, metrics.getHeight());
+		graphics.fillRect(x, y - metrics.getMaxAscent() - metrics.getLeading(), backgroundWidth, metrics.getHeight());
 		if (drawCaret) {
 			paintCaret(graphics, metrics);
 		}
