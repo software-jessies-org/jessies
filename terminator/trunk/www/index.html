@@ -28,7 +28,7 @@ output in a great stream of output, this is a really great way to make it blindi
 when it appears.
 <p>A screenshot of Terminator on Mac OS X, after running 'man bash', and doing a find for
 '(?i)shell'. Despite the evidence that a pager is running, this is Terminator doing the
-highlighting&nbsp;&mdash; one of the authors uses cat(1) as his pager:
+highlighting&nbsp;&mdash; one of the authors uses <tt>cat(1)</tt> as his pager:
 <p align="center" ><img src="mac-os-man-bash-find.png">
 
 <li><p><strong>Hyperlinks</strong> - Terminator will recognize the names of files, or
@@ -37,7 +37,7 @@ turn the text into a link that will open the file in your configured editor. So 
 or <tt>svn update</tt> output, for example, becomes clickable.
 <p>Terminator can also jump to the next/previous link, which is great for quickly scanning
 voluminous build output.
-<p>A screenshot of Terminator automatically providing links to grep(1) matches:
+<p>A screenshot of Terminator automatically providing links to <tt>grep(1)</tt> matches:
 <p align="center"><img src="mac-os-grep.png">
 
 <li><p><strong>Number reinterpretation</strong> - Terminator will recognize numbers
@@ -81,44 +81,107 @@ now surpassed Terminal in several areas.
 <p>The source distribution is here (<a href="terminator.tgz">terminator.tgz</a>),
 but you'll also need a copy of the library to go with it (<a href="http://www.jessies.org/~enh/software/salma-hayek/salma-hayek.tgz">salma-hayek.tgz</a>).
 
-<p>Terminator is written almost entirely in Java.  It has a small C++ back-end which runs
-a process, probably <tt>bash(1)</tt>, connected to a pseudo-terminal.
-For this reason, the native code is incredibly small and completely portable, and all we require
-on the Java side is a reasonably recent JRE. You should use at least 1.4, and go with 1.5
-if you can. The native code will automatically be recompiled assuming you
-have <tt>make(1)</tt> and <tt>g++(1)</tt> installed.
+<p>Terminator is written almost entirely in Java with a small C++ back-end
+which runs a process connected to a pseudo-terminal. You will need at least
+Java 1.4, and should use 1.5 if you can.
 
-<p>Terminator will run fine on KDE, Gnome, an old-style X11 window manager like lwm,
-Mac OS, or anything else Java supports.  Linux users can now change their desktop
-environment without recompiling their terminal emulator, or having to switch to a new one!
+<p>Terminator will run fine on Mac OS, KDE, Gnome, or even an old-style X11
+window manager like lwm. Now you can use the same terminal emulator everywhere!
 
 <h2>Running</h2>
 
-<p>We have made great efforts to ensure that Terminator is as easy to run as possible.
-The back-end C code will be compiled automatically the first time you run Terminator (assuming
-you have 'make', 'gcc' and 'g++' installed), and the start-up script tries to ensure that the
-relevant terminfo entry is installed in the user's home directory.
+<p>We have made great efforts to ensure that Terminator is as easy to run as
+possible. The native code will automatically be compiled the first time you run
+Terminator on a new architecture, assuming you have <tt>make(1)</tt> and
+<tt>g++(1)</tt> installed. A single Terminator installation may contain native
+binaries for a variety of different architectures; this is handled
+automatically.
 
 <h3>Terminfo/Curses</h3>
 
-<p>For best results, on computers where you'll be root some of the time, we recommend you
-install the terminfo file for Terminator in /usr/share/terminfo.  How this may be done is
-described in the doc/README file.
+<p>Terminator has its own terminfo file.  This will be installed in your home
+directory unless Terminator is able to write to the system-wide
+terminfo directory (which will only be the case if you run Terminator as root).
 
-<p>You will also need to ensure that any machines you'll be remotely logging into (through ssh,
-telnet or whatever) also have a copy of the terminfo file installed.  This can be done by copying
-the terminfo file to ~/.terminfo/t/terminator (creating the .terminfo and .terminfo/t directories)
-on the host machine.  This is enough on most GNU-based systems, such as Linux; if
-you still have problems (if 'vi' complains that the terminal is not fully functional), add the following
-lines to your ~/.profile file on the host machine:
+<h4>Logging in as root</h4>
+<p>If the terminfo file is only installed in your home directory then you
+will see "terminal is not fully functional" problems when using <tt>su(1)</tt>
+to switch to another user (although <tt>sudo(1)</tt> will work fine).
 
+<p>For best results, on computers where you'll be logged in as root at times,
+we recommend you install the terminfo file for Terminator in
+<tt>/usr/share/terminfo</tt>. The easiest way to do this is to simply run
+Terminator once as root. From then on, you can run Terminator as your normal
+user, and use <tt>su(1)</tt> to become root.
+
+<h4>Logging in to remote systems</h4>
+<p>You will also need to ensure that any machines you'll be remotely logging
+in to (through <tt>ssh(1)</tt>, <tt>telnet</tt> or whatever) also have a copy
+of the terminfo file installed.  This can be done by copying the terminfo file
+to <tt>~/.terminfo/t/terminator</tt> on the remote machine (you'll need
+to <tt>mkdir -p ~/.terminfo/t</tt> if the directories don't already exist).
+This is enough on most GNU-based systems, such as Linux; if you still have
+problems (if 'vi' complains that the terminal is not fully functional), add
+the following lines to <tt>~/.profile</tt> file on the remote machine:
 <pre>
 export TERMINFO=~/.terminfo
 export TERM=$TERM
 </pre>
 
-<p>This informs the host system of where your user terminfo files are to be found (GNU-based
-systems look for this directory automatically).
+<h3>Supported xterm resources</h3>
+
+<p>Terminator will look in <tt>~/.Xdefaults</tt> and <tt>~/.Xresources</tt> (in
+that order, with the last-read setting overriding any earlier settings) for X11
+resources of class <tt>XTerm</tt>, <tt>Rxvt</tt>, or <tt>Terminator</tt>. This
+means that by default it will pick up the other programs' settings, but you can
+have different settings for Terminator if you wish.
+
+<p>Common resources:
+<dl>
+
+<dt>loginShell
+<dd>Whether or not the shell will be started with a <tt>-l</tt> argument.
+
+<dt>scrollKey
+<dd>Whether or not pressing a key should move the scrollbar to the bottom.
+
+<dt>scrollTtyOutput
+<dd>Whether or not output to the terminal should move the scrollbar to the
+bottom.
+
+<dt>title
+<dd>The default title string for new terminals.
+
+<dt>internalBorder
+<dd>The number of pixels spacing between the text and the edge of the window.
+
+</dl>
+
+<p>Terminator-only resources:
+<dl>
+
+<dt>antiAlias
+<dd>Whether or not to use anti-aliased text.
+
+<dt>useMenuBar
+<dd>Whether or not to use a menu bar. This defaults to false normally, but to
+true on Mac OS.
+
+<dt>initialRowCount
+<dd>The number of lines in a newly-opened terminal.
+
+<dt>initialColumnCount
+<dd>The number of columns in a newly-opened terminal.
+
+</dl>
+
+<p>Terminator should use the same colors you usually see in <tt>xterm(1)</tt>
+or <tt>rxvt(1)</tt>. In order to resolve color names to RGB values, Terminator
+will read the file <tt>/usr/X11R6/lib/X11/rgb.txt</tt> if it exists. Without
+this file, Terminator only understands colors in the form #rrggbb.
+
+<p>If you don't have any colors configured, Terminator will use built-in
+defaults similar to SGI's <tt>xwsh(1)</tt>.
 
 <h2>Authors</h2>
 
