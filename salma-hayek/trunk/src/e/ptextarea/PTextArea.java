@@ -5,8 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-
 import java.util.List;
+import e.util.*;
 
 /**
  * A PTextArea is a replacement for JTextArea.
@@ -68,7 +68,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         setOpaque(true);
         setFocusTraversalKeysEnabled(false);
         requestFocus();
-        showRightHandMarginAt(80);
         initSpellingChecking();
     }
     
@@ -154,10 +153,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         this.rightHandMarginColumn = rightHandMarginColumn;
     }
     
-    public void dontShowRightHandMargin() {
-        rightHandMarginColumn = NO_MARGIN;
-    }
-    
     public void setTextStyler(PTextStyler textStyler) {
         this.textStyler = textStyler;
         repaint();
@@ -165,6 +160,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public void setFont(Font font) {
         super.setFont(font);
+        showRightHandMarginAt(GuiUtilities.isFontFixedWidth(font) ? 80 : NO_MARGIN);
         invalidateLineWrappings();
         generateLineWrappings();
         repaint();
