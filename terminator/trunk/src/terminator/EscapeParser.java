@@ -2,6 +2,8 @@ package terminatorn;
 
 import java.util.*;
 
+import terminatorn.escape.*;
+
 /**
 
 Stuff we're unsure about:
@@ -14,59 +16,72 @@ public class EscapeParser {
 	private boolean isComplete = false;
 	private String sequence = "";
 
-	private EndRecogniser endRecogniser;
+	private SequenceRecogniser seqRecogniser;
 	
-	private static final HashMap END_RECOGNISERS = new HashMap();
+	private static final HashMap SEQ_RECOGNISERS = new HashMap();
 	static {
-		addSequenceEndRecognisers("6789=>DEHMZcno", new LengthEndRecogniser(1));
-		addSequenceEndRecognisers("#()*+@", new LengthEndRecogniser(2));
-		addSequenceEndRecognisers("[", new CSIEndRecogniser());
-		addSequenceEndRecognisers("]", new XTermEndRecogniser());
+		addSequenceRecognisers("6789=>DEHMZcno", new SingleCharSequenceRecogniser());
+		addSequenceRecognisers("#()*+$@", new TwoCharSequenceRecogniser());
+		addSequenceRecognisers("[", new CSISequenceRecogniser());
+		addSequenceRecognisers("]", new XTermSequenceRecogniser());
 	}
-	private static void addSequenceEndRecognisers(String chars, EndRecogniser recogniser) {
+	private static void addSequenceRecognisers(String chars, SequenceRecogniser recogniser) {
 		for (int i = 0; i < chars.length(); i++) {
-			END_RECOGNISERS.put(new Character(chars.charAt(i)), recogniser);
+			SEQ_RECOGNISERS.put(new Character(chars.charAt(i)), recogniser);
 		}
 	}
 	
 	public void addChar(char ch) {
 		sequence += ch;
 		if (sequence.length() == 1) {
-			endRecogniser = (EndRecogniser) END_RECOGNISERS.get(new Character(ch));
-			if (endRecogniser == null) {
+			seqRecogniser = (SequenceRecogniser) SEQ_RECOGNISERS.get(new Character(ch));
+			if (seqRecogniser == null) {
 				Log.warn("Unable to find escape sequence end recogniser for start char \"" + ch + "\"");
 			}
 		}
-		isComplete = (endRecogniser == null) ? true : endRecogniser.isAtEnd(sequence);
+		isComplete = (seqRecogniser == null) ? true : seqRecogniser.isAtEnd(sequence);
 	}
 	
 	public boolean isComplete() {
 		return isComplete;
 	}
 	
+	public TelnetAction getAction(TelnetControl telnetControl) {
+		return (seqRecogniser == null) ? null : seqRecogniser.getTelnetAction(telnetControl, sequence);
+	}
+	
 	public String toString() {
 		return sequence;
 	}
 	
-	private interface EndRecogniser {
+	private interface SequenceRecogniser {
 		public boolean isAtEnd(String sequence);
+		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence);
 	}
 	
-	private static class LengthEndRecogniser implements EndRecogniser {
-		private int length;
-	
-		public LengthEndRecogniser(int length) {
-			this.length = length;
+	private static class SingleCharSequenceRecogniser implements SequenceRecogniser {
+		public boolean isAtEnd(String sequence) {
+			return (sequence.length() == 1);
 		}
 		
-		public boolean isAtEnd(String sequence) {
-			return (sequence.length() == length);
+		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence) {
+			return new SingleCharEscapeAction(sequence.charAt(0));
 		}
 	}
 	
-	private static class CSIEndRecogniser implements EndRecogniser {
+	private static class TwoCharSequenceRecogniser implements SequenceRecogniser {
 		public boolean isAtEnd(String sequence) {
-			// We don't need to check for sequence.length() == 0, since EndRecognisers are always
+			return (sequence.length() == 2);
+		}
+		
+		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence) {
+			return new TwoCharEscapeAction(sequence);
+		}
+	}
+	
+	private static class CSISequenceRecogniser implements SequenceRecogniser {
+		public boolean isAtEnd(String sequence) {
+			// We don't need to check for sequence.length() == 0, since SequenceRecognisers are always
 			// created after the first char has been read.
 			if (sequence.length() == 1) {
 				return false;
@@ -74,13 +89,17 @@ public class EscapeParser {
 			char endChar = sequence.charAt(sequence.length() - 1);
 			return (endChar < ' ' || endChar >= '@');
 		}
+		
+		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence) {
+			return new CSIEscapeAction(telnetControl, sequence);
+		}
 	}
 	
-	private static class XTermEndRecogniser implements EndRecogniser {
+	private static class XTermSequenceRecogniser implements SequenceRecogniser {
 		private boolean isInInitialNumber = true;
 
 		public boolean isAtEnd(String sequence) {
-			// We don't need to check for sequence.length() == 0, since EndRecognisers are always
+			// We don't need to check for sequence.length() == 0, since SequenceRecognisers are always
 			// created after the first char has been read.
 			if (sequence.length() == 1) {
 				return false;
@@ -98,6 +117,10 @@ public class EscapeParser {
 				}
 			}
 			return (endChar < ' ');
+		}
+		
+		public TelnetAction getTelnetAction(TelnetControl telnetControl, String sequence) {
+			return new XTermEscapeAction(sequence);
 		}
 	}
 }

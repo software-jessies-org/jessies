@@ -22,10 +22,28 @@ public class TextBuffer implements TelnetListener {
 	private Location caretPosition;
 	private int lastValidStartIndex = 0;
 	
+	// Fields used for saving and restoring state.
+	private Location savedPosition;
+	private int savedStyle;
+	
 	public TextBuffer(JTextBuffer view, int width, int height) {
 		this.view = view;
 		setSize(width, height);
 		caretPosition = view.getCaretPosition();
+	}
+	
+	/** Saves the current style and location for retrieving later. */
+	public void saveCursor() {
+		savedPosition = caretPosition;
+		savedStyle = currentStyle;
+	}
+	
+	/** Restores the saved style and location if it was saved earlier. */
+	public void restoreCursor() {
+		if (savedPosition != null) {
+			caretPosition = savedPosition;
+			setStyle(savedStyle);
+		}
 	}
 	
 	/** Returns the contents of the indexed line excluding the terminating NL. */
