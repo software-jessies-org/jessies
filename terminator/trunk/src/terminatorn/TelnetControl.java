@@ -241,10 +241,27 @@ public class TelnetControl implements Runnable {
 		});
 	}
 	
+	/**
+	 * Handles the special escape sequence from xterm, called OSC by ECMA.
+	 * From rxvt:
+	 *
+	 * XTerm escape sequences: ESC ] Ps;Pt BEL
+	 *       0 = change iconName/title
+	 *       1 = change iconName
+	 *       2 = change title
+	 *      46 = change log file (not implemented)
+	 *      50 = change font
+	 *
+	 * rxvt extensions:
+	 *      10 = menu
+	 *      20 = bg pixmap
+	 *      39 = change default fg color
+	 *      49 = change default bg color
+	 */
 	public void processOSC() {
 		String osc = oscBuffer.toString();
 		oscBuffer = null;
-		if (osc.startsWith("]2;")) {
+		if (osc.startsWith("]2;") || osc.startsWith("]0;")) {
 			String newWindowTitle = osc.substring(3);
 			listener.setWindowTitle(newWindowTitle);
 		}
