@@ -1,4 +1,4 @@
-README file for Terminator, v0.9.
+README file for Terminator, v1.1.
 
 Please do read this file first - it's short, but important.
 
@@ -18,11 +18,7 @@ home directory then, er, we apologize.
 
 Terminator is a joint project between Phil Norman and Elliott Hughes.
 Started on 21st April 2004 after Elliott moaned about the lack of a really
-good terminal emulator, it's developed over the period of 1 month to
-a state where we can happily release version 0.9.
-
-Version 1.0 will follow shortly, after we've tidied up some stuff, and
-added a menu so people don't have to hunt too much for the hotkeys.
+good terminal emulator.
 
 
 Feature List:
