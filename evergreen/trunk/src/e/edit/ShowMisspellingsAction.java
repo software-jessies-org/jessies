@@ -20,6 +20,7 @@ public class ShowMisspellingsAction extends ETextAction {
         }
         final ETextArea text = window.getText();
         final JList list = new JList(text.getSpellingChecker().listMisspellings().toArray());
+        list.setPrototypeCellValue("this would be quite a long misspelling");
         list.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() != 2) {
@@ -37,6 +38,6 @@ public class ShowMisspellingsAction extends ETextAction {
 
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Misspellings:", new JScrollPane(list));
-        FormDialog.show(Edit.getFrame(), "Misspellings", formPanel);
+        FormDialog.showNonModal(Edit.getFrame(), "Misspellings", formPanel);
     }
 }
