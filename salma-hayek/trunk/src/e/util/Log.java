@@ -1,7 +1,5 @@
 package e.util;
 
-import java.text.*;
-import java.util.*;
 import java.lang.reflect.*;
 
 public class Log {
@@ -29,7 +27,6 @@ public class Log {
     }
     
     private static String applicationName = "unknown";
-    private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S Z");
 
     public static void setApplicationName(String name) {
         applicationName = name;
@@ -41,8 +38,7 @@ public class Log {
     }
 
     public static void warn(String message, Throwable th) {
-        String time = dateFormatter.format(new Date());
-        System.err.println(time + " " + applicationName + ": "  + message);
+        System.err.println(TimeUtilities.currentIsoString() + " " + applicationName + ": "  + message);
         if (th != null) {
             System.err.println("Associated exception:");
             th.printStackTrace();
