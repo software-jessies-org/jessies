@@ -1,0 +1,11 @@
+#!/bin/cat
+
+Installing lwm
+
+1. Compile lwm:
+
+	xmkmf ; make ; strip lwm
+
+2. Copy the binary to where you want it.
+
+3. Edit your Xsession or whatever to call lwm.

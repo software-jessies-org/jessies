@@ -1,0 +1,30 @@
+XCOMM lwm, a window manager for X11
+XCOMM Copyright (C) 1997-2003 Elliott Hughes, James Carter
+XCOMM 
+XCOMM This program is free software; you can redistribute it and/or
+XCOMM modify it under the terms of the GNU General Public License
+XCOMM as published by the Free Software Foundation; either version 2
+XCOMM of the License, or (at your option) any later version.
+XCOMM 
+XCOMM This program is distributed in the hope that it will be useful,
+XCOMM but WITHOUT ANY WARRANTY; without even the implied warranty of
+XCOMM MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+XCOMM GNU General Public License for more details.
+XCOMM 
+XCOMM You should have received a copy of the GNU General Public License
+XCOMM along with this program; if not, write to the Free Software
+XCOMM Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+INCLUDES = -I$(TOP)
+DEPLIBS = $(DEPXLIB) $(DEPSMLIB)
+LOCAL_LIBRARIES = $(XLIB) $(SMLIB)
+XCOMM -L./ElectricFence-2.1 -lefence
+DEFINES = -g -DSHAPE -Wall
+
+HEADERS = lwm.h ewmh.h
+SRCS = lwm.c manage.c mouse.c client.c cursor.c error.c disp.c shape.c resource.c session.c ewmh.c
+OBJS = ${SRCS:.c=.o}
+
+ComplexProgramTarget(lwm)
+
+${OBJS}: ${HEADERS}
