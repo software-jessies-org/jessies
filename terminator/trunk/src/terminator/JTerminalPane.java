@@ -23,15 +23,17 @@ public class JTerminalPane extends JPanel {
 	private MenuKeyAction[] menuAndKeyActions = new MenuKeyAction[] {
 		new CopyAction(),
 		new PasteAction(),
+		null,
 		new NewTabAction(),
 		new RunCommandAction(),
 		new CloseTabAction(),
-		
+		null,
 		new FindAction(),
 		new FindNextAction(),
 		new FindPreviousAction(),
-		
+		null,
 		new ClearScrollbackAction(),
+		null,
 		new ChangeColourAction(),
 //		new NewWindowAction(),
 	};
@@ -294,6 +296,9 @@ public class JTerminalPane extends JPanel {
 			char ch = event.getKeyChar();
 			if (isKeyboardEquivalent(event)) {
 				for (int i = 0; i < menuAndKeyActions.length; i++) {
+					if (menuAndKeyActions[i] == null) {
+						continue;
+					}
 					char actionChar = Character.toLowerCase(menuAndKeyActions[i].getHotkeyChar());
 					if (Character.toLowerCase(ch) == actionChar) {
 						menuAndKeyActions[i].performAction();
@@ -375,7 +380,11 @@ public class JTerminalPane extends JPanel {
 			if (event.isPopupTrigger()) {
 				JPopupMenu menu = new JPopupMenu();
 				for (int i = 0; i < menuAndKeyActions.length; i++) {
-					menu.add(getMenuItem(menuAndKeyActions[i], event.getPoint()));
+					if (menuAndKeyActions[i] == null) {
+						menu.addSeparator();
+					} else {
+						menu.add(getMenuItem(menuAndKeyActions[i], event.getPoint()));
+					}
 				}
 				menu.show((Component) event.getSource(), event.getX() + 1, event.getY());
 			}
@@ -471,7 +480,7 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public class FindNextAction implements MenuKeyAction {
-		public String getName() {
+		public String getName(Point mousePosition) {
 			return "Find Next";
 		}
 		
@@ -485,7 +494,7 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public class FindPreviousAction implements MenuKeyAction {
-		public String getName() {
+		public String getName(Point mousePosition) {
 			return "Find Previous";
 		}
 		
