@@ -64,7 +64,7 @@ grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
 DIRECTORY_NAME := $(notdir $(CURDIR))
 
 BINDIST_FILES += README COPYING $(PROJECT_NAME).jar
-FILTERED_BINDIST_FILES = $(shell find $(BINDIST_FILES) -type f | grep -v CVS)
+FILTERED_BINDIST_FILES = $(shell find $(BINDIST_FILES) -type f | grep -v /CVS/)
 
 define GENERATE_FILE_LIST.bk
   bk sfiles -g
