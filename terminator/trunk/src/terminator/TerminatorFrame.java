@@ -291,11 +291,13 @@ public class TerminatorFrame implements TerminalPaneMaster {
 					if (textToFindIn != null && e.getKeyChar() == '\n') {
 						find();
 						e.consume();
+						textToFindIn.requestFocus();
 					}
 				}
 				public void keyPressed(KeyEvent e) {
 					if (textToFindIn != null && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						getFindHighlighter().forgetRegularExpression(textToFindIn);
+						textToFindIn.requestFocus();
 					}
 				}
 				public void keyReleased(KeyEvent e) {
