@@ -319,6 +319,9 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         items.add(new OpenQuicklyAction());
         items.add(new FindFilesContainingSelectionAction());
         items.add(new RevertToSavedAction());
+        items.add(null);
+        items.add(new CheckInChangesAction());
+        items.add(new ShowHistoryAction());
         addContextSpecificMenuItems(items);
         addExternalToolMenuItems(items);
         return items;
