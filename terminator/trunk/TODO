@@ -28,3 +28,4 @@ Elliott's TODOs:
 ~~~~~~~~~~~
 [3]	Implement searching.
 [3]	Add hyperlink following support for stuff like http: mailto: and telnet:
+* Fix the pty build (and terminator script) to work for multiple values of `arch` on the same file system.
