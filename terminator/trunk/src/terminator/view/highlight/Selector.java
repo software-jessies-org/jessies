@@ -57,6 +57,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		
 		Location loc = view.viewToModel(event.getPoint());
 		view.removeHighlightsFrom(this, 0);
+		highlight = null;
 		startLocation = loc;
 		
 		if (loc.getLineIndex() >= view.getModel().getLineCount()) {
