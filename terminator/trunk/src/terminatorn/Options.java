@@ -65,7 +65,7 @@ public class Options {
 	 * Whether or not to anti-alias text.
 	 */
 	public boolean isAntiAliased() {
-		return defaultedBooleanResource("antiAlias", true);
+		return defaultedBooleanResource("antiAlias", false);
 	}
 	
 	private boolean defaultedBooleanResource(String name, boolean defaultValue) {
