@@ -82,7 +82,11 @@ public class TextBuffer implements TerminalListener {
 		if (usingAlternativeBuffer()) {
 			return;
 		}
-
+		
+		// If we don't remove the highlights, we'll see the mouse
+		// cursor change when we move over where they were.
+		view.removeHighlightsFrom(0);
+		
 		// We want to keep any lines after the caret, so remember them.
 		// FIXME: if the user's editing a really long logical line at
 		// the bash prompt, it may have manually wrapped it onto
