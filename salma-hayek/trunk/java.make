@@ -1,21 +1,31 @@
-SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
-#SALMA_HAYEK=~/Projects/salma-hayek/
+# Where are we?
+ifeq ($(MAKE_VERSION), 3.79)
+    # Old versions of make (like the one Apple ships) don't
+    # have $(MAKEFILE_LIST), so we need to have a fall-back
+    # for that case.
+    SALMA_HAYEK=~/Projects/salma-hayek/
+else
+    SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+endif
 
 # By default, distributions end up under http://www.jessies.org/~enh/
 DIST_SCP_USER_AND_HOST=enh@jessies.org
 DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 
+# A list of likely JDK rt.jar locations.
+# Traditional Java setup:
 KNOWN_JRE_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
-KNOWN_JRE_LOCATIONS+=/home/elliotth/download/j2sdk1.4.2/jre/lib/rt.jar
+# Apple:
 KNOWN_JRE_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
-KNOWN_JRE_LOCATIONS+=MRJ141Stubs.jar
-KNOWN_JRE_LOCATIONS:=$(KNOWN_JRE_LOCATION) $(shell locate rt.jar)
+# Fall back to searching:
+KNOWN_JRE_LOCATIONS:=$(KNOWN_JRE_LOCATION) $(shell locate /rt.jar)
 
 SOURCE_FILES=$(shell find `pwd`/src -type f -name "*.java")
 TAR_FILE_OF_THE_DAY=`date +$(PROJECT_NAME)-%Y-%m-%d.tar`
 
-space=$(subst a,,a a)
-BOOT_CLASS_PATH=$(subst $(space),:,$(wildcard $(firstword $(KNOWN_JRE_LOCATIONS))))
+# Pick a JDK and append the MRJ141Stubs, in case they're there.
+BOOT_CLASS_PATH=$(firstword $(wildcard $(KNOWN_JRE_LOCATIONS)))
+BOOT_CLASS_PATH:=$(BOOT_CLASS_PATH):MRJ141Stubs.jar
 
 REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
 
