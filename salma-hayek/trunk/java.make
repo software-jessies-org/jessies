@@ -1,4 +1,5 @@
 SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+#SALMA_HAYEK=~/Projects/salma-hayek/
 
 ARCHIVE_HOST=locke
 
@@ -42,7 +43,7 @@ dist: build
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM)); \
 	find . -name "*.bak" | xargs --no-run-if-empty rm; \
 	cd $(if $(wildcard ../trunk),../..,..) && \
-	tar cvf $(TAR_FILE_OF_THE_DAY) $(PROJECT_NAME)/ && \
+	tar --exclude=CVS --exclude=.svn -cvf $(TAR_FILE_OF_THE_DAY) $(PROJECT_NAME)/ && \
 	gzip $(TAR_FILE_OF_THE_DAY) && \
 	scp $(TAR_FILE_OF_THE_DAY).gz $(ARCHIVE_HOST):~/$(PROJECT_NAME)/
 
