@@ -5,8 +5,10 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.gui.*;
 import e.util.*;
 
 import javax.swing.Timer;
@@ -287,29 +289,49 @@ public class Terminator implements Controller {
 	private JTextField findField;
 	private JTextBuffer textToFindIn;
 	
+	private class FindField extends EMonitoredTextField {
+		public FindField() {
+			super(40);
+			addFocusListener(new FocusAdapter() {
+				public void focusLost(FocusEvent e) {
+					hideFindDialog();
+				}
+			});
+			addKeyListener(new KeyAdapter() {
+				public void keyTyped(KeyEvent e) {
+					if (textToFindIn != null && e.getKeyChar() == '\n') {
+						find();
+						hideFindDialog();
+						e.consume();
+					}
+				}
+				public void keyPressed(KeyEvent e) {
+					if (textToFindIn != null && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+						getFindHighlighter().forgetRegularExpression(textToFindIn);
+						hideFindDialog();
+						e.consume();
+					}
+				}
+			});
+		}
+		
+		public void timerExpired() {
+			find();
+		}
+		
+		private void find() {
+			String regularExpression = getText();
+			try {
+				getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
+				setForeground(UIManager.getColor("TextField.foreground"));
+			} catch (PatternSyntaxException ex) {
+				setForeground(Color.RED);
+			}
+		}
+	}
+	
 	private void initFindField() {
-		findField = new JTextField("", 40);
-		findField.addFocusListener(new FocusAdapter() {
-			public void focusLost(FocusEvent e) {
-				hideFindDialog();
-			}
-		});
-		findField.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				if (textToFindIn != null && e.getKeyChar() == '\n') {
-					find(findField.getText());
-					hideFindDialog();
-					e.consume();
-				}
-			}
-			public void keyPressed(KeyEvent e) {
-				if (textToFindIn != null && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					getFindHighlighter().forgetRegularExpression(textToFindIn);
-					hideFindDialog();
-					e.consume();
-				}
-			}
-		});
+		findField = new FindField();
 		// Make sure the find dialog is closed if the user drags the window.
 		// Strangely, on Linux this doesn't seem to cause the find dialog to lose the focus.
 		frame.addComponentListener(new ComponentAdapter() {
@@ -321,10 +343,6 @@ public class Terminator implements Controller {
 	
 	private FindHighlighter getFindHighlighter() {
 		return (FindHighlighter) textToFindIn.getHighlighterOfClass(FindHighlighter.class);
-	}
-	
-	private void find(String regularExpression) {
-		getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
 	}
 	
 	public void showFindDialogFor(JTextBuffer text) {
