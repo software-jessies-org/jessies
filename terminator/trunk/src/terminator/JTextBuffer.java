@@ -41,12 +41,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		setForeground(Options.getSharedInstance().getColor("foreground"));
 		setBackground(Options.getSharedInstance().getColor("background"));
 		addFocusListener(this);
-		requestFocus();
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				requestFocus();
-			}
-		});
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent event) {
 				requestFocus();
