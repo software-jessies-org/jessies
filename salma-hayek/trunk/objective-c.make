@@ -1,8 +1,20 @@
+# This makefile compiles all the C/C++/Objective-C/Objective-C++ source found
+# in the ./src directory into a single executable. All subdirectories of src/
+# will be added to the compiler's main include path.
+
 # You can set:
 # 
 #  EXECUTABLE_NAME - the path to write the resulting executable to; defaults
 #                    to the name of the current directory, in the current
 #                    directory.
+
+# These traditional flags are used, but you should probably refrain from
+# modifying them outside this file, for portability's sake:
+#
+#  CFLAGS          - flags for the C/Objective-C compiler.
+#  CXXFLAGS        - flags for the C++/Objective-C++ compiler.
+#  C_AND_CXX_FLAGS - flags for both compilers.
+#  LDFLAGS         - flags for the linker.
 
 # ----------------------------------------------------------------------------
 # Choose a default executable name if the user didn't supply one.
@@ -24,7 +36,7 @@ COMPILE.mm = $(COMPILE.cpp)
 	$(COMPILE.mm) $(OUTPUT_OPTION) $<
 
 # ----------------------------------------------------------------------------
-# Sensible compiler/linker flags.
+# Sensible compiler flags.
 # ----------------------------------------------------------------------------
 
 # Hack around include paths by putting all directories on the path.
@@ -37,7 +49,6 @@ CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
 
 CFLAGS += -std=c99
-LDFLAGS += -framework Cocoa
 
 # ----------------------------------------------------------------------------
 # Find the source and work out what we need to build.
@@ -54,6 +65,14 @@ tail = $(wordlist 2,$(words $(1)),$(1))
 FIND_EXPRESSION := $(call tail,$(foreach EXTENSION,$(SOURCE_EXTENSIONS),-or -name "*.$(EXTENSION)"))
 SOURCE_FILES = $(shell find `pwd`/src -type f '(' $(FIND_EXPRESSION) ')')
 OBJECT_FILES = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst %.$(EXTENSION),%.o,$(filter %.$(EXTENSION),$(SOURCE_FILES))))
+
+# ----------------------------------------------------------------------------
+# Add the Cocoa framework if we're building Objective-C/C++.
+# ----------------------------------------------------------------------------
+
+ifneq "$(filter %.m %.mm,$(SOURCE_FILES))" ""
+  LDFLAGS += -framework Cocoa
+endif
 
 # ----------------------------------------------------------------------------
 # Find the header files for our conservative dependency later.
