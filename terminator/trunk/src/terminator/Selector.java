@@ -1,5 +1,7 @@
 package terminatorn;
 
+import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.*;
 
 /**
@@ -40,6 +42,16 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 				Location end = new Location(loc.getLineIndex() + 1, 0);
 				setHighlight(start, end);
 			}
+		} else if (event.getButton() == MouseEvent.BUTTON2) {
+			try {
+				Transferable contents = view.getToolkit().getSystemClipboard().getContents(view);
+				String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
+				// This don't work, since we don't have a TransferHandler.  Find a nice way of
+				// firing off a log of KeyEvents.
+//				view.getTransferHandler().importData(view, contents);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 	
@@ -58,7 +70,8 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	
 	public void mouseReleased(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON1) {
-			// Copy highlight text to clipboard.
+			String selection = view.getText(highlight);
+			view.getToolkit().getSystemClipboard().setContents(new StringSelection(selection), null);
 			startLocation = null;
 		}
 	}
@@ -71,6 +84,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 				return;
 			}
 			setHighlight(min(startLocation, endLocation), max(startLocation, endLocation));
+			view.scrollRectToVisible(new Rectangle(0, event.getY(), 10, 10));
 		}
 	}
 	
