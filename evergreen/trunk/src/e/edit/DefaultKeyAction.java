@@ -8,7 +8,7 @@ public class DefaultKeyAction extends ETextAction {
         super("default-key-action-with-electric-key-support");
     }
     
-    public void actionPerformed(java.awt.event.ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
         ETextArea target = getTextArea();
         if (target == null || e == null) {
             return;
@@ -35,13 +35,7 @@ public class DefaultKeyAction extends ETextAction {
             target.getUndoManager().addEdit(entireEdit);
             try {
                 target.replaceSelection(content);
-                
-                // If the electric character is the only thing on the line, correct the line's indentation.
-                //if (target.getLineText(target.getLineOfOffset(target.getCaretPosition())).trim().length() == 1) {
-                    target.correctIndentation(false);
-                //}
-            //} catch (BadLocationException ex) {
-                // Can't happen.
+                target.correctIndentation(false);
             } finally {
                 entireEdit.end();
             }
