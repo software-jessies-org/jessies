@@ -39,6 +39,7 @@ public class EColumn extends JSplitPane {
             }
         });
         comboBox.setMaximumRowCount(20);
+        comboBox.setMinimumSize(new Dimension(100, comboBox.getPreferredSize().height));
         updateComboBoxEnabledState();
     }
 
