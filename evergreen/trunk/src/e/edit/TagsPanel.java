@@ -69,15 +69,31 @@ public class TagsPanel extends JPanel {
                 textWindow.goToLine(tag.lineNumber);
             }
         });
-        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) tree.getCellRenderer();
-        renderer.setClosedIcon(null);
-        renderer.setLeafIcon(null);
-        renderer.setOpenIcon(null);
+        tree.setCellRenderer(new TagsTreeRenderer());
 
         JScrollPane scrollPane = new JScrollPane(tree);
         detailView.add(scrollPane, BorderLayout.CENTER);
 
         return detailView;
+    }
+    
+    private static class TagsTreeRenderer extends DefaultTreeCellRenderer {
+        public TagsTreeRenderer() {
+            setClosedIcon(null);
+            setLeafIcon(null);
+            setOpenIcon(null);
+        }
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            if (node.getUserObject() instanceof TagReader.Tag) {
+                TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
+                setForeground(tag.visibilityColor());
+            } else {
+                System.err.println(node.getUserObject().getClass() + " : " + node.getUserObject());
+            }
+            return this;
+        }
     }
     
     public Workspace getWorkspace() {

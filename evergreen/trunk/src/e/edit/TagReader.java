@@ -1,5 +1,6 @@
 package e.edit;
 
+import java.awt.Color;
 import java.io.*;
 import java.util.regex.*;
 
@@ -132,6 +133,18 @@ public class TagReader {
                 return "#";
             } else {
                 return "?";
+            }
+        }
+        
+        public Color visibilityColor() {
+            if (context.indexOf("access:public") != -1) {
+                return Color.GREEN.darker();
+            } else if (context.indexOf("access:private") != -1) {
+                return Color.RED;
+            } else if (context.indexOf("access:protected") != -1) {
+                return Color.ORANGE;
+            } else {
+                return Color.BLACK;
             }
         }
         
