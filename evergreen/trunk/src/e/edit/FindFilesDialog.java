@@ -1,12 +1,12 @@
 package e.edit;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.tree.*;
 import e.forms.*;
 import e.gui.*;
@@ -28,7 +28,34 @@ public class FindFilesDialog {
     
     private FileFinder workerThread;
     
-    public class MatchingFile {
+    public interface ClickableTreeItem {
+        public void open();
+    }
+    
+    public class MatchingLine implements ClickableTreeItem {
+        private String line;
+        private File file;
+        
+        public MatchingLine(String line, File file) {
+            this.line = line;
+            this.file = file;
+        }
+        
+        public void open() {
+            EWindow window = Edit.openFile(file.toString());
+            if (window instanceof ETextWindow) {
+                ETextWindow textWindow = (ETextWindow) window;
+                final int lineNumber = Integer.parseInt(line.substring(1, line.indexOf(':', 1)));
+                textWindow.goToLine(lineNumber);
+            }
+        }
+        
+        public String toString() {
+            return line;
+        }
+    }
+    
+    public class MatchingFile implements ClickableTreeItem {
         private String name;
         private int matchCount;
         private String regularExpression;
@@ -132,10 +159,13 @@ public class FindFilesDialog {
                             ArrayList matches = new ArrayList();
                             int matchCount = fileSearcher.searchFile(root, candidate, matches);
                             if (matchCount > 0) {
-                                DefinitionFinder definitionFinder = new DefinitionFinder(FileUtilities.fileFromParentAndString(root, candidate), regex);
-                                DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition));
+                                File file = FileUtilities.fileFromParentAndString(root, candidate);
+                                DefinitionFinder definitionFinder = new DefinitionFinder(file, regex);
+                                MatchingFile matchingFile = new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition);
+                                DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
                                 for (int i = 0; i < matches.size(); ++i) {
-                                    fileNode.add(new DefaultMutableTreeNode(matches.get(i)));
+                                    String line = (String) matches.get(i);
+                                    fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file)));
                                 }
                                 matchRoot.add(fileNode);
                             }
@@ -236,23 +266,14 @@ public class FindFilesDialog {
         matchView = new ETree(matchTreeModel);
         matchView.setRootVisible(false);
         matchView.setShowsRootHandles(true);
+        matchView.putClientProperty("JTree.lineStyle", "None");
         
         matchView.setCellRenderer(new MatchTreeCellRenderer());
-        matchView.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    TreePath path = matchView.getPathForLocation(e.getX(), e.getY());
-                    if (path != null) {
-                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-                        Object o = node.getUserObject();
-                        if (o instanceof MatchingFile) {
-                            MatchingFile match = (MatchingFile) o;
-                            match.open();
-                        } else {
-                            System.err.println(o);
-                        }
-                    }
-                }
+        matchView.addTreeSelectionListener(new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent e) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) matchView.getLastSelectedPathComponent();
+                ClickableTreeItem match = (ClickableTreeItem) node.getUserObject();
+                match.open();
             }
         });
     }
@@ -311,22 +332,6 @@ public class FindFilesDialog {
         formPanel.addRow("Matches:", new JScrollPane(matchView));
         formPanel.setStatusBar(status);
         
-        ActionListener listener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                openSelectedFilesFromList();
-            }
-        };
-        FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel, "Open", listener);
-    }
-    
-    public void openSelectedFilesFromList() {
-        /*
-        ListModel list = matchView.getModel();
-        int[] indices = matchView.getSelectedIndices();
-        for (int i = 0; i < indices.length; i++) {
-            MatchingFile file = (MatchingFile) list.getElementAt(indices[i]);
-            file.open();
-        }
-        */
+        FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel);
     }
 }
