@@ -1,5 +1,8 @@
 #!/bin/bash
-TERMINATOR_HOME=`dirname $0`
+
+real_script=`readlink $0 || echo $0` # Deals with symbolic links to this script.
+
+TERMINATOR_HOME=`dirname $real_script`
 CLASSPATH=$TERMINATOR_HOME/classes:$TERMINATOR_HOME/../salma-hayek/classes:$TERMINATOR_HOME/terminator.jar
 PTY_BINARY=$TERMINATOR_HOME/pty/pty-`uname`-`arch`
 
