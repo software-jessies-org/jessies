@@ -22,7 +22,7 @@ public class PKeyHandler extends KeyAdapter {
                     int caret = textArea.getCaretLocation();
                     String insertion = "Insertion\nof some\ntext";
                     textArea.getPTextBuffer().insert(caret, insertion.toCharArray());
-                    textArea.setCaretLocation(caret + insertion.length());
+                    textArea.setCaretPosition(caret + insertion.length());
                 }
                 break;
             case KeyEvent.VK_D:
@@ -30,7 +30,7 @@ public class PKeyHandler extends KeyAdapter {
                     int caret = textArea.getCaretLocation();
                     int delCount = Math.min(caret, 20);
                     textArea.getPTextBuffer().delete(caret - delCount, delCount);
-                    textArea.setCaretLocation(caret - delCount);
+                    textArea.setCaretPosition(caret - delCount);
                 }
                 break;
                 
@@ -122,7 +122,7 @@ public class PKeyHandler extends KeyAdapter {
             deleteSelection();
         }
         textArea.getPTextBuffer().insert(textArea.getCaretLocation(), new char[] { ch });
-        textArea.setCaretLocation(textArea.getCaretLocation() + 1);
+        textArea.setCaretPosition(textArea.getCaretLocation() + 1);
     }
     
     private void deleteSelection() {
@@ -130,7 +130,7 @@ public class PKeyHandler extends KeyAdapter {
         int selectionLength = textArea.getSelectionEnd() - selectionStart;
         textArea.clearSelection();
         textArea.getPTextBuffer().delete(selectionStart, selectionLength);
-        textArea.setCaretLocation(selectionStart);
+        textArea.setCaretPosition(selectionStart);
     }
     
     private void backspace() {
@@ -140,7 +140,7 @@ public class PKeyHandler extends KeyAdapter {
             int caret = textArea.getCaretLocation();
             if (caret > 0) {
                 caret--;
-                textArea.setCaretLocation(caret);
+                textArea.setCaretPosition(caret);
                 textArea.getPTextBuffer().delete(caret, 1);
             }
         }
@@ -171,7 +171,7 @@ public class PKeyHandler extends KeyAdapter {
             } else {
                 textArea.clearSelection();
             }
-            textArea.setCaretLocation(newCaretLocation);
+            textArea.setCaretPosition(newCaretLocation);
         }
     }
     

@@ -309,7 +309,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return caretLocation;
     }
     
-    public void setCaretLocation(int newLocation) {
+    public void setCaretPosition(int newLocation) {
         if (newLocation != caretLocation) {
             repaintCaret();
             caretLocation = newLocation;

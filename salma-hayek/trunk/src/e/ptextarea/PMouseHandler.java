@@ -65,13 +65,13 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void makeInitialSelection(int pressedLocation) {
             this.pressedLocation = pressedLocation;
             textArea.clearSelection();
-            textArea.setCaretLocation(pressedLocation);
+            textArea.setCaretPosition(pressedLocation);
         }
         
         public void mouseDragged(MouseEvent event) {
             int location = getLocationOfMouse(event);
             textArea.select(Math.min(location, pressedLocation), Math.max(location, pressedLocation));
-            textArea.setCaretLocation(location);
+            textArea.setCaretPosition(location);
             dragHandlerWasCalled = true;
         }
         
@@ -102,7 +102,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void makeInitialSelection(int pressedLocation) {
             this.pressedLine = textArea.getLineOfOffset(pressedLocation);
             textArea.select(textArea.getLineStartOffset(pressedLine), getLineEndOffset(pressedLine));
-            textArea.setCaretLocation(getLineEndOffset(pressedLine));
+            textArea.setCaretPosition(getLineEndOffset(pressedLine));
         }
         
         private int getLineEndOffset(int line) {
@@ -119,9 +119,9 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             int maxLine = Math.max(currentLine, pressedLine);
             textArea.select(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine));
             if (currentLine == maxLine) {
-                textArea.setCaretLocation(getLineEndOffset(currentLine));
+                textArea.setCaretPosition(getLineEndOffset(currentLine));
             } else {
-                textArea.setCaretLocation(textArea.getLineStartOffset(currentLine));
+                textArea.setCaretPosition(textArea.getLineStartOffset(currentLine));
             }
         }
         
