@@ -32,7 +32,7 @@ public class TableViewer extends JFrame {
         if (filename.equals("-") == false) {
             inputStream = new FileInputStream(FileUtilities.fileFromString(filename));
         }
-        LineNumberReader in = new LineNumberReader(new InputStreamReader(inputStream));
+        LineNumberReader in = new LineNumberReader(new InputStreamReader(inputStream, "UTF-8"));
         String line;
         while ((line = in.readLine()) != null) {
             String[] fields = line.split("\t");
