@@ -12,10 +12,11 @@ import java.awt.event.*;
  * shift-click to extend a selection.
  */
 public class Selector implements MouseListener, MouseMotionListener, Highlighter {
-	private JTextBuffer view;
-	private Highlight highlight;
-	private Location startLocation;
-	
+	/**
+	 * If the user configured a selection color, we use that as the
+	 * background for selected text. If not, we use the old reverse
+	 * video trick.
+	 */
 	private static final StyleMutator STYLER;
 	static {
 		Color selectionColor = Options.getSharedInstance().getColor("selectionColor");
@@ -25,6 +26,10 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 			STYLER = new Style(Options.getSharedInstance().getColor("foreground"), selectionColor, null, null);
 		}
 	}
+	
+	private JTextBuffer view;
+	private Highlight highlight;
+	private Location startLocation;
 	
 	/** Creates a Selector for selecting text in the given view, and adds us as mouse listeners to that view. */
 	public Selector(JTextBuffer view) {
