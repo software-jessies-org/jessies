@@ -1,14 +1,19 @@
 package terminatorn;
 
+import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-public class Terminator {
+import java.util.List;
+
+public class Terminator implements Controller {
 	private List arguments;
 	
 	private JFrame frame;
+	private JTabbedPane tabbedPane;
 	
 	private ArrayList terminals = new ArrayList();
 
@@ -63,7 +68,8 @@ public class Terminator {
 			terminals.add(JTelnetPane.newShell());
 		}
 		
-		return (terminals.size() == 1) ? makeSingleTerminal() : makeTabbedTerminals();
+//		return (terminals.size() == 1) ? makeSingleTerminal() : makeTabbedTerminals();
+		return makeTabbedTerminals();
 	}
 	
 	private JComponent makeSingleTerminal() {
@@ -73,7 +79,7 @@ public class Terminator {
 	}
 	
 	private JComponent makeTabbedTerminals() {
-		final JTabbedPane tabbedPane = new JTabbedPane() {
+		tabbedPane = new JTabbedPane() {
 			/**
 			 * Prevents the tabs (ass opposed to their components)
 			 * from getting the focus.
@@ -87,14 +93,44 @@ public class Terminator {
 			 * Ensures that when we change tab, we give focus to that terminal.
 			 */
 			public void stateChanged(ChangeEvent e) {
-				tabbedPane.getSelectedComponent().requestFocus();
+				final Component selected = tabbedPane.getSelectedComponent();
+				if (selected != null) {
+					// I dislike the invokeLater, but it's sadly necessary.
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							selected.requestFocus();
+						}
+					});
+				}
 			}
 		});
 		for (int i = 0; i < terminals.size(); ++i) {
 			JTelnetPane telnetPane = (JTelnetPane) terminals.get(i);
-			tabbedPane.add(telnetPane.getName(), telnetPane);
+			addPaneToUI(telnetPane);
 		}
 		return tabbedPane;
+	}
+	
+	private class KeyHandler implements KeyListener {
+		public void keyPressed(KeyEvent event) {
+			if (event.isAltDown()) {
+				switch (event.getKeyCode()) {
+					case KeyEvent.VK_RIGHT:
+						setSelectedTab(tabbedPane.getSelectedIndex() + 1);
+						break;
+					case KeyEvent.VK_LEFT:
+						setSelectedTab(tabbedPane.getSelectedIndex() - 1);
+						break;
+				}
+			}
+		}
+		public void keyReleased(KeyEvent event) { }
+		public void keyTyped(KeyEvent event) { }
+	}
+	
+	private void setSelectedTab(int index) {
+		int tabCount = tabbedPane.getTabCount();
+		tabbedPane.setSelectedIndex((index + tabCount) % tabCount);
 	}
 	
 	/**
@@ -115,6 +151,38 @@ public class Terminator {
 		for (int i = 0; i < terminals.size(); i++) {
 			((JTelnetPane) terminals.get(i)).start();
 		}
+	}
+
+	public void closeTelnetPane(JTelnetPane victim) {
+		terminals.remove(victim);
+		tabbedPane.remove(victim);
+		if (tabbedPane.getTabCount() == 0) {
+			frame.setVisible(false);
+			frame.dispose();
+		}
+	}
+	
+	public void openShellPane(boolean focusOnNewTab) {
+		addPane(JTelnetPane.newShell(), focusOnNewTab);
+	}
+	
+	public void openCommandPane(String command, boolean focusOnNewTab) {
+		addPane(JTelnetPane.newCommandWithTitle(command, command), focusOnNewTab);
+	}
+	
+	private void addPane(JTelnetPane newPane, boolean focusOnNewTab) {
+		terminals.add(newPane);
+		addPaneToUI(newPane);
+		newPane.start();
+		if (focusOnNewTab) {
+			tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+		}
+	}
+	
+	private void addPaneToUI(JTelnetPane newPane) {
+		newPane.setController(this);
+		tabbedPane.add(newPane.getName(), newPane);
+		newPane.getTextPane().addKeyListener(new KeyHandler());
 	}
 
 	public void showUsage() {
