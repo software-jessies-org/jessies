@@ -87,7 +87,6 @@ public class Terminator implements Controller {
 		}
 		
 		JComponent oldContentPane = (JComponent) frame.getContentPane();
-		System.err.println(oldContentPane);
 		
 		tabbedPane = new JTabbedPane() {
 			/**
@@ -172,13 +171,43 @@ public class Terminator implements Controller {
 		}
 	}
 
+	/**
+	 * Removes the given terminal. If this is the last terminal, close
+	 * the window.
+	 */
 	public void closeTelnetPane(JTelnetPane victim) {
 		terminals.remove(victim);
+		if (tabbedPane != null) {
+			closeTab(victim);
+		} else {
+			closeWindow();
+		}
+	}
+	
+	/**
+	 * Implements closeTelnetPane.
+	 */
+	private void closeTab(JTelnetPane victim) {
 		tabbedPane.remove(victim);
 		if (tabbedPane.getTabCount() == 0) {
-			frame.setVisible(false);
-			frame.dispose();
+			closeWindow();
+		} else if (tabbedPane.getTabCount() == 1) {
+			JTelnetPane soleSurvivor = (JTelnetPane) terminals.get(0);
+			soleSurvivor.invalidate();
+			tabbedPane.remove(soleSurvivor);
+			frame.setContentPane(soleSurvivor);
+			soleSurvivor.revalidate();
+			frame.repaint();
+			tabbedPane = null;
 		}
+	}
+	
+	/**
+	 * Implements closeTelnetPane.
+	 */
+	private void closeWindow() {
+		frame.setVisible(false);
+		frame.dispose();
 	}
 	
 	public void openShellPane(boolean focusOnNewTab) {
