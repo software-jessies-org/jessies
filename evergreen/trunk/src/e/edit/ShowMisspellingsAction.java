@@ -27,7 +27,7 @@ public class ShowMisspellingsAction extends ETextAction {
                 }
                 // Highlight all matches of this misspelling.
                 String literal = (String) list.getSelectedValue();
-                text.find(StringUtilities.regularExpressionFromLiteral(literal));
+                FindAction.INSTANCE.findInText(window, StringUtilities.regularExpressionFromLiteral(literal));
                 // Go to first match.
                 text.setCaretPosition(0);
                 window.findNext();
