@@ -67,7 +67,7 @@ public class NumberResearcher implements WorkspaceResearcher {
                 // If number is Long.MIN_VALUE, we'll end up here. The next line
                 // handles this case, and causes any genuine format error to be
                 // rethrown.
-                String constant = negative ? new String("-" + s.substring(index)) : s.substring(index);
+                String constant = negative ? ("-" + s.substring(index)) : s.substring(index);
                 result = Long.valueOf(constant, radix);
                 number = result.longValue();
                 valid = true;
