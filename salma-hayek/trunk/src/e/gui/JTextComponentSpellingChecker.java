@@ -49,9 +49,17 @@ public class JTextComponentSpellingChecker implements DocumentListener {
             return;
         }
         
+        final Point mousePosition = e.getPoint();
         try {
+            final int offset = component.viewToModel(mousePosition);
+            
+            // Ignore this click if the user actually clicked in the right-hand margin.
+            final Rectangle bounds = component.modelToView(offset);
+            if (bounds.x + bounds.width < mousePosition.x) {
+                return;
+            }
+            
             final Range actualRange = new Range();
-            final int offset = component.viewToModel(e.getPoint());
             if (isMisspelledWordBetween(offset, offset, actualRange)) {
                 EPopupMenu menu = new EPopupMenu();
                 String misspelling = document.getText(actualRange.start, actualRange.end - actualRange.start);
