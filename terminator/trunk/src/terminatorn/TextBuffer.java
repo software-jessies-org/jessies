@@ -88,22 +88,19 @@ public class TextBuffer implements TelnetListener {
 		}
 	}
 
-	public void processLine(final String line) {
-		for (int i = 0; i < line.length(); i++) {
-			Point pos = view.getCaretPosition();
-			char ch = line.charAt(i);
-			if (ch == KeyEvent.VK_BACK_SPACE) {
-				moveCursorHorizontally(-1);
-			} else if (ch == '\r') {
-				view.setCaretPosition(new Point(0, pos.y));
-			} else if (ch == '\n') {
-				insertLine(pos.y + 1);
-//				moveCursorVertically(1);
-			} else {
-				get(pos.y).writeTextAt(pos.x, new String(new char[] { ch }), currentStyle);
-				view.lineSectionChanged(pos.y, pos.x, pos.x + 1);
-				moveCursorHorizontally(1);
-			}
+	public void processLine(String line) {
+		Point pos = view.getCaretPosition();
+		get(pos.y).writeTextAt(pos.x, line, currentStyle);
+		view.lineSectionChanged(pos.y, pos.x, pos.x + line.length());
+		moveCursorHorizontally(line.length());
+	}
+
+	public void processSpecialCharacter(char ch) {
+		switch (ch) {
+			case '\r': view.setCaretPosition(new Point(0, view.getCaretPosition().y)); return;
+			case '\n': insertLine(view.getCaretPosition().y + 1); return;
+			case KeyEvent.VK_BACK_SPACE: moveCursorHorizontally(-1); return;
+			default: Log.warn("Unsupported special character: " + ((int) ch));
 		}
 	}
 	

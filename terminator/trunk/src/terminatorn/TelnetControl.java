@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
-import javax.swing.text.*;
 
 /**
 Telnet stream control object - manages the interface between the rest of the Java code and the
@@ -14,13 +13,19 @@ low-level telnet protocol (RFC 854).
 @author Elliott Hughes
 */
 
+// TODO: Our way of cutting the input into little chunks to be executed separately, each in their
+// own little Runnable on the AWT dispatch thread is leading to enormous performance problems.
+// We need to sort this out, using some kind of timer and event buffer so we can set one single
+// Runnable going which will execute each command which needs doing, keeping track of all
+// screen areas which have changed, and then finally cause a redraw/size update on the GUI
+// once all the work in that parcel is done.  This should help make us fast like we should be.
+
 public class TelnetControl implements Runnable {
 	private static final boolean DEBUG = false;
 
 	private TelnetListener listener;
 	private InputStream in;
 	private OutputStream out;
-	private StyleContext styles = new StyleContext();
 	
 	public TelnetControl(TelnetListener listener, InputStream in, OutputStream out) throws IOException {
 		this.listener = listener;
@@ -38,7 +43,7 @@ public class TelnetControl implements Runnable {
 	});
 	private boolean readingOSC = false;
 	
-	public void processChar(char ch) {
+	public void processChar(final char ch) {
 		if (readingOSC) {
 			if (ch == '\\' || ch == 0x7) {
 				readingOSC = false;
@@ -57,12 +62,6 @@ public class TelnetControl implements Runnable {
 			// And neither is BEL, really.
 			return;
 		}
-		if (false && ch < ' ') { Log.warn("received "+Integer.toHexString(ch)); }
-		if (ch == '\r') {
-			// FIXME: if the character following the CR isn't NL, should we erase
-			// to beginning of line instead of just pretend we never saw the CR?
-			return;
-		}
 		if (ch == ESC) {
 			flushLineBuffer();
 			inEscape = true;
@@ -75,13 +74,16 @@ public class TelnetControl implements Runnable {
 			if (Character.isLetter(ch) || ch == '>') {
 				processEscape();
 			}
+		} else if (ch == '\n' || ch == '\r' || ch == KeyEvent.VK_BACK_SPACE) {
+			flushLineBuffer();
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					listener.processSpecialCharacter(ch);
+				}
+			});
 		} else {
-			//Log.warn("appending char " + Integer.toString(ch) + " hex:" + Integer.toHexString(ch));
 			lineBuffer.append(ch);
 			receiveTimeout.restart();
-			if (ch == '\n') {
-				flushLineBuffer();
-			}
 		}
 	}
 
@@ -272,41 +274,6 @@ public class TelnetControl implements Runnable {
 	
 	public boolean valueInRange(int value, int min, int max) {
 		return (value >= min) && (value <= max);
-	}
-	
-	public void initTextStyles() {
-		Style plainStyle = styles.addStyle("plain", styles.getStyle(StyleContext.DEFAULT_STYLE));
-		StyleConstants.setFontFamily(plainStyle, Parameters.getParameter("font.name", "verdana"));
-		StyleConstants.setFontSize(plainStyle, Parameters.getParameter("font.size", 12));
-		
-		Style style = styles.addStyle("0", plainStyle);
-		// TODO - linkFormatter.setCurrentStyle(style);
-		
-		style = styles.addStyle("1", plainStyle);
-		StyleConstants.setBold(style, true);
-		style = styles.addStyle("4", plainStyle);
-		StyleConstants.setUnderline(style, true);
-		
-		addColorStyle("30", Color.BLACK);
-		addColorStyle("31", Color.RED);
-		addColorStyle("32", Color.GREEN);
-		addColorStyle("33", Color.ORANGE);
-		addColorStyle("34", Color.BLUE);
-		addColorStyle("35", Color.MAGENTA);
-		addColorStyle("36", Color.CYAN);
-		addColorStyle("37", Color.LIGHT_GRAY);
-		
-		Style linkStyle = styles.addStyle("link", plainStyle);
-		StyleConstants.setForeground(linkStyle, Color.BLUE);
-		StyleConstants.setUnderline(linkStyle, true);
-		// TODO - linkFormatter.setLinkStyle(linkStyle);
-	}
-	
-	public void addColorStyle(String number, Color color) {
-		Style defaultStyle = styles.getStyle("plain");
-		Style style = styles.addStyle(number, defaultStyle);
-		StyleConstants.setForeground(style, color);
-		StyleConstants.setBold(style, true); // Colors don't show up well otherwise.
 	}
 	
 	public void sendEscapeString(String str) {

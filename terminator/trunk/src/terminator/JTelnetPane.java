@@ -37,7 +37,21 @@ public class JTelnetPane extends JScrollPane {
 	
 	private class KeyHandler implements KeyListener {
 		public void keyPressed(KeyEvent event) {
-//			event.consume();
+			String sequence = getSequenceForKeyCode(event.getKeyCode());
+			if (sequence != null) {
+				control.sendEscapeString(sequence);
+				event.consume();
+			}
+		}
+
+		private String getSequenceForKeyCode(int keyCode) {
+			switch (keyCode) {
+				case KeyEvent.VK_UP: return "[A";
+				case KeyEvent.VK_DOWN: return "[B";
+				case KeyEvent.VK_RIGHT: return "[C";
+				case KeyEvent.VK_LEFT: return "[D";
+				default: return null;
+			}
 		}
 
 		public void keyReleased(KeyEvent event) {

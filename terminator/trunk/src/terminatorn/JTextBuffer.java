@@ -11,6 +11,8 @@ A JTextBuffer provides the visible display of the virtual terminal.
 */
 
 public class JTextBuffer extends JComponent implements FocusListener {
+	private static final boolean ANTIALIAS = false;
+
 	private TextBuffer model;
 	private Point caretPosition = new Point(0, 0);
 	private boolean hasFocus = false;
@@ -83,6 +85,9 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public void paintComponent(Graphics graphics) {
+		if (ANTIALIAS) {
+			((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		}
 		FontMetrics metrics = getFontMetrics(getFont());
 		Rectangle rect = graphics.getClipBounds();
 		graphics.setColor(Color.WHITE);
@@ -103,6 +108,9 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				int caretX = caretPosition.x * metrics.charWidth('W');
 				graphics.drawLine(caretX, baseline - metrics.getMaxAscent(), caretX, baseline);
 			}
+		}
+		if (ANTIALIAS) {
+			((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
 		}
 	}
 	
