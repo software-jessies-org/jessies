@@ -97,6 +97,9 @@ public class Minibuffer extends JPanel implements FocusListener {
                     typingTimer.stop();
                     notifyMinibufferUserOfTyping();
                     shouldHide = minibufferUser.interpretSpecialKeystroke(e);
+                    if (shouldHide) {
+                        addToHistory();
+                    }
                 }
                 if (shouldHide) {
                     deactivate();
@@ -117,8 +120,8 @@ public class Minibuffer extends JPanel implements FocusListener {
             notifyMinibufferUserOfTyping();
             String text = textField.getText();
             shouldHide = minibufferUser.wasAccepted(text);
-            if (shouldHide && history != null && text.length() != 0) {
-                history.add(text);
+            if (shouldHide) {
+                addToHistory();
             }
         } else if (keyCode == KeyEvent.VK_UP) {
             traverseHistory(-1);
@@ -128,6 +131,13 @@ public class Minibuffer extends JPanel implements FocusListener {
         return shouldHide;
     }
     
+    private void addToHistory() {
+        String text = textField.getText();
+        if (history != null) {
+            history.add(text);
+        }
+    }
+
     private void traverseHistory(int direction) {
         if (history == null) {
             return;
@@ -159,7 +169,7 @@ public class Minibuffer extends JPanel implements FocusListener {
         if (history == null) {
             historyIndex = 0;
         } else {
-            if (history.get(history.getLatestHistoryIndex()).equals(textField.getText())) {
+            if (history.size() > 0 && history.get(history.getLatestHistoryIndex()).equals(textField.getText())) {
                 itemAfterHistory = "";
                 historyIndex = history.getLatestHistoryIndex();
             } else {
