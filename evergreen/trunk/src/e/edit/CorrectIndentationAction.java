@@ -7,7 +7,7 @@ import javax.swing.text.*;
 The ETextArea action that automatically corrects the current line's indentation.
 */
 public class CorrectIndentationAction extends TextAction {
-    public static final String ACTION_NAME = "correct-indentation";
+    public static final String ACTION_NAME = "Correct Indentation";
 
     public CorrectIndentationAction() {
         super(ACTION_NAME);

@@ -35,7 +35,10 @@ Find/Replace
         that contains "\n", for example.) [there's also a file "find-test.txt".]
         
         Martin just successfully deleted whole lines matching " *MONK\n",
-        although the Matches and Replacements boxes were empty.
+        although the Matches and Replacements boxes were empty. The problem
+        being that we use the Pattern.MULTILINE flag; " *MONK$" would have
+        looked right and worked. But this isn't generally true: "a\nb" is
+        not the same as "a$b".
 
     [ ] Some way of marking submatch groups: the whole match is marked in
         red or blue, but it would be good to also see the submatches within
