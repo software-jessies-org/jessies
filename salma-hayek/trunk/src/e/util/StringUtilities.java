@@ -208,6 +208,18 @@ public class StringUtilities {
         return s.substring(0, i);
     }
 
+    /**
+     * A convenient wrapper around URLEncoder.encode.
+     */
+    public static String urlEncode(String s) {
+        try {
+            return java.net.URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            // Can't happen. We're guaranteed UTF-8.
+            throw new RuntimeException(ex);
+        }
+    }
+    
     private StringUtilities() {
     }
 
