@@ -21,12 +21,12 @@ inserted into it.
 public class TextLine {
 	private int lineStartIndex;
 	private String text;
-	private byte[] styles;
+	private short[] styles;
 	
 	private static final char TAB_START = '\t';
 	private static final char TAB_CONTINUE = '\r';
 	
-	private static final byte[] EMPTY_STYLES = new byte[0];
+	private static final short[] EMPTY_STYLES = new short[0];
 	
 	public TextLine() {
 		clear();
@@ -40,7 +40,7 @@ public class TextLine {
 		this.lineStartIndex = lineStartIndex;
 	}
 	
-	public byte getStyleAt(int index) {
+	public short getStyleAt(int index) {
 		return styles[index];
 	}
 	
@@ -50,7 +50,7 @@ public class TextLine {
 		}
 		ArrayList result = new ArrayList();
 		int startIndex = 0;
-		byte startStyle = styles[0];
+		short startStyle = styles[0];
 		for (int i = 1; i < styles.length; i++) {
 			if (styles[i] != startStyle) {
 				result.add(new StyledText(getText().substring(startIndex, i), startStyle));
@@ -134,11 +134,11 @@ public class TextLine {
 		styles = trim(styles, startIndex, endIndex);
 	}
 	
-	public void insertTabAt(int offset, int tabLength, int style) {
+	public void insertTabAt(int offset, int tabLength, short style) {
 		insertTextAt(offset, getTabString(tabLength), style);
 	}
 	
-	public void writeTabAt(int offset, int tabLength, int style) {
+	public void writeTabAt(int offset, int tabLength, short style) {
 		writeTextAt(offset, getTabString(tabLength), style);
 		// If we've partially overwritten an existing tab, replace the first TAB_CONTINUE
 		// character of the existing tab with a TAB_START, so we end up with two tabs,
@@ -157,21 +157,21 @@ public class TextLine {
 	}
 	
 	/** Inserts text at the given position, moving anything already there further to the right. */
-	public void insertTextAt(int offset, String newText, int style) {
+	public void insertTextAt(int offset, String newText, short style) {
 		ensureOffsetIsOK(offset);
-		styles = insertBytesInto(styles, offset, newText.length(), (byte) style);
+		styles = insertShortsInto(styles, offset, newText.length(), style);
 		text = text.substring(0, offset) + newText + text.substring(offset);
 	}
 	
 	/** Writes text at the given position, overwriting anything underneath. */
-	public void writeTextAt(int offset, String newText, int style) {
+	public void writeTextAt(int offset, String newText, short style) {
 		ensureOffsetIsOK(offset);
 		if (offset + newText.length() < styles.length) {
 			text = text.substring(0, offset) + newText + text.substring(offset + newText.length());
-			Arrays.fill(styles, offset, offset + newText.length(), (byte) style);
+			Arrays.fill(styles, offset, offset + newText.length(), style);
 		} else {
 			text = text.substring(0, offset) + newText;
-			styles = extendWithBytes(styles, offset, newText.length(), (byte) style);
+			styles = extendWithShorts(styles, offset, newText.length(), style);
 		}
 	}
 
@@ -188,28 +188,28 @@ public class TextLine {
 		char[] pad = new char[count];
 		Arrays.fill(pad, ' ');
 		text += new String(pad);
-		styles = insertBytesInto(styles, styles.length, count, (byte) StyledText.getDefaultStyle());
+		styles = insertShortsInto(styles, styles.length, count, StyledText.getDefaultStyle());
 	}
 	
-	private byte[] extendWithBytes(byte[] bytes, int offset, int count, byte value) {
-		byte[] result = new byte[offset + count];
-		System.arraycopy(bytes, 0, result, 0, offset);
-		Arrays.fill(result, offset, offset + count, (byte) value);
+	private short[] extendWithShorts(short[] shorts, int offset, int count, short value) {
+		short[] result = new short[offset + count];
+		System.arraycopy(shorts, 0, result, 0, offset);
+		Arrays.fill(result, offset, offset + count, value);
 		return result;
 	}
 
-	private byte[] insertBytesInto(byte[] bytes, int offset, int count, byte value) {
-		byte[] result = new byte[bytes.length + count];
-		System.arraycopy(bytes, 0, result, 0, offset);
-		Arrays.fill(result, offset, offset + count, (byte) value);
-		System.arraycopy(bytes, offset, result, offset + count, bytes.length - offset);
+	private short[] insertShortsInto(short[] shorts, int offset, int count, short value) {
+		short[] result = new short[shorts.length + count];
+		System.arraycopy(shorts, 0, result, 0, offset);
+		Arrays.fill(result, offset, offset + count, value);
+		System.arraycopy(shorts, offset, result, offset + count, shorts.length - offset);
 		return result;
 	}
 	
-	private byte[] trim(byte[] bytes, int startIndex, int endIndex) {
-		byte[] result = new byte[bytes.length - (endIndex - startIndex)];
-		System.arraycopy(bytes, 0, result, 0, startIndex);
-		System.arraycopy(bytes, endIndex, result, startIndex, bytes.length - endIndex);
+	private short[] trim(short[] shorts, int startIndex, int endIndex) {
+		short[] result = new short[shorts.length - (endIndex - startIndex)];
+		System.arraycopy(shorts, 0, result, 0, startIndex);
+		System.arraycopy(shorts, endIndex, result, startIndex, shorts.length - endIndex);
 		return result;
 	}
 }
