@@ -42,10 +42,11 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public JTextBuffer(Controller controller) {
 		this.controller = controller;
-		model = new TextBuffer(this, 80, 24);
-		setFont(Options.getSharedInstance().getFont());
-		setForeground(Options.getSharedInstance().getColor("foreground"));
-		setBackground(Options.getSharedInstance().getColor("background"));
+		Options options = Options.getSharedInstance();
+		model = new TextBuffer(this, options.getInitialColumnCount(), options.getInitialRowCount());
+		setFont(options.getFont());
+		setForeground(options.getColor("foreground"));
+		setBackground(options.getColor("background"));
 		addFocusListener(this);
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent event) {
