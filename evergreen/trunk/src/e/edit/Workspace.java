@@ -461,23 +461,15 @@ public class Workspace extends JPanel {
         window.removeFromColumn();
         leftColumn.addComponent(window);
     }
-
-    public void reassessFileToWorkspaceMappingWithExclusion(Workspace excludingWorkspace) {
+    
+    public void moveFilesToBestWorkspaces() {
         ETextWindow[] textWindows = getTextWindows();
         for (int i = 0; i < textWindows.length; i++) {
             ETextWindow textWindow = textWindows[i];
-            Workspace bestWorkspace = Edit.getBestWorkspaceForFilenameWithExclusion(textWindow.getFilename(), excludingWorkspace);
+            Workspace bestWorkspace = Edit.getBestWorkspaceForFilename(textWindow.getFilename());
             if (bestWorkspace != this) {
                 bestWorkspace.takeWindow(textWindow);
             }
-        }
-    }
-    
-    public void reassessFileToWorkspaceMapping() {
-        reassessFileToWorkspaceMappingWithExclusion(null);
-    }
-    
-    public void tryToMoveFilesToOtherWorkspaces() {
-        reassessFileToWorkspaceMappingWithExclusion(this);
+        }        
     }
 }
