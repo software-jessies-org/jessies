@@ -231,6 +231,7 @@ public class TagsUpdater {
             
             DefaultMutableTreeNode branch = (DefaultMutableTreeNode) branches.get(tag.containingClass);
             if (branch == null) {
+                System.err.println(tag.containingClass);
                 branch = new BranchNode(tag.containingClass);
                 branches.put(tag.containingClass, branch);
                 root.add(branch);
@@ -240,6 +241,7 @@ public class TagsUpdater {
         }
         
         public void taggingFailed(Exception ex) {
+            ex.printStackTrace();
             Edit.getCurrentWorkspace().reportError("", "There was an error reading the tags (" + ex.getMessage() + ")");
         }
         
@@ -297,8 +299,12 @@ public class TagsUpdater {
         }
         
         public void add(MutableTreeNode node) {
-            TagReader.Tag tag = (TagReader.Tag) ((DefaultMutableTreeNode) node).getUserObject();
-            insert(node, getInsertIndex(tag));
+            Object o = ((DefaultMutableTreeNode) node).getUserObject();
+            if (o instanceof TagReader.Tag) {
+                insert(node, getInsertIndex((TagReader.Tag) o));
+            } else {
+                super.add(node);
+            }
         }
         
         private SortedSet kidsNames = new TreeSet(String.CASE_INSENSITIVE_ORDER);
