@@ -1,9 +1,7 @@
 package terminator.view;
 
-import terminator.*;
-
 public interface JTerminalPaneFactory {
-	public JTerminalPane create(TerminalPaneMaster controller);
+	public JTerminalPane create();
 	
 	public class Command implements JTerminalPaneFactory {
 		private String command;
@@ -14,14 +12,14 @@ public interface JTerminalPaneFactory {
 			this.title = title;
 		}
 		
-		public JTerminalPane create(TerminalPaneMaster controller) {
-			return JTerminalPane.newCommandWithTitle(controller, command, title);
+		public JTerminalPane create() {
+			return JTerminalPane.newCommandWithTitle(command, title);
 		}
 	}
 	
 	public class Shell implements JTerminalPaneFactory {
-		public JTerminalPane create(TerminalPaneMaster controller) {
-			return JTerminalPane.newShell(controller);
+		public JTerminalPane create() {
+			return JTerminalPane.newShell();
 		}
 	}
 }

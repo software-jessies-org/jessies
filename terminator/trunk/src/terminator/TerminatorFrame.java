@@ -10,7 +10,7 @@ import javax.swing.Timer;
 import javax.swing.event.*;
 import terminator.view.*;
 
-public class TerminatorFrame extends JFrame implements TerminalPaneMaster {
+public class TerminatorFrame extends JFrame {
 	private Terminator terminator;
 	private Dimension terminalSize;
 	private JTabbedPane tabbedPane;
@@ -22,7 +22,7 @@ public class TerminatorFrame extends JFrame implements TerminalPaneMaster {
 		this.terminator = terminator;
 		JTerminalPane[] panes = new JTerminalPane[paneFactories.length];
 		for (int i = 0; i < paneFactories.length; i++) {
-			panes[i] = paneFactories[i].create(this);
+			panes[i] = paneFactories[i].create();
 			terminals.add(panes[i]);
 		}
 		initFrame();
@@ -229,10 +229,6 @@ public class TerminatorFrame extends JFrame implements TerminalPaneMaster {
 	private void closeWindow() {
 		setVisible(false);
 		dispose();
-	}
-	
-	public void openShellPane(boolean focusOnNewTab) {
-		addPane(JTerminalPane.newShell(this), focusOnNewTab);
 	}
 	
 	private Timer terminalSizeTimer = null;
