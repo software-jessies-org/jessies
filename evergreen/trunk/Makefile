@@ -1,4 +1,4 @@
-SOURCE_FILES=$(shell find src -type f -name "*.java")
+SOURCE_FILES=$(shell find `pwd`/src -type f -name "*.java")
 TAR_FILE_OF_THE_DAY=`date +edit-%Y-%m-%d.tar`
 
 KNOWN_JRE_LOCATIONS+=/home/elliotth/download/j2sdk1.4.2/jre/lib/rt.jar
