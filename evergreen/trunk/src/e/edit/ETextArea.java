@@ -2,7 +2,6 @@ package e.edit;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
-import java.awt.font.*;
 import java.text.*;
 import java.util.regex.*;
 
@@ -90,29 +89,10 @@ public class ETextArea extends JTextArea {
         super.setFont(font);
         JTextComponentUtilities.ensureVisibilityOfOffset(this, originalCaretPosition);
         
-        boolean fixedWidth = isFontFixedWidth(font);
+        boolean fixedWidth = GuiUtilities.isFontFixedWidth(font);
         setTabSize(fixedWidth ? 8 : 2);
         setShowEightyColumnMargin(fixedWidth);
     }
-    
-    public static boolean isFontFixedWidth(Font font) {
-        // Finds out whether a Font is fixed-width or not. I can't find a more direct way of doing this.
-        int maxWidth = 0;
-        char[] testChars = "ILMWilmw01".toCharArray();
-        for (int i = 0; i < testChars.length; i++) {
-            java.awt.geom.Rectangle2D stringBounds = font.getStringBounds(testChars, i, i + 1, DEFAULT_FONT_RENDER_CONTEXT);
-            int width = (int) Math.ceil(stringBounds.getWidth());
-            if (maxWidth == 0) {
-                maxWidth = width;
-            } else {
-                if (width != maxWidth) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    private static final FontRenderContext DEFAULT_FONT_RENDER_CONTEXT = new FontRenderContext(null, false, false);
     
     public void setShowEightyColumnMargin(boolean showEightyColumnMargin) {
         this.showEightyColumnMargin = showEightyColumnMargin;
