@@ -43,9 +43,9 @@ public class ShellCommand {
             "EDIT_CURRENT_LINE_NUMBER=" + lineNumber,
             "EDIT_WORKSPACE_ROOT=" + getWorkspace().getRootDirectory(),
             /* Thanks, Sun. */
-            makePassThroughVariable("ANT_HOME"),
             makePassThroughVariable("DISPLAY"),
             makePassThroughVariable("HOME"),
+            makePassThroughVariable("JAVA_HOME"),
             makePassThroughVariable("PATH")
         };
     }
