@@ -210,7 +210,10 @@ JAVA_FLAGS += -source 1.4
 # ----------------------------------------------------------------------------
 
 .PHONY: build
-build: $(SOURCE_FILES) build.subdirs
+build: build.java build.subdirs
+
+.PHONY: build.java
+build.java: $(SOURCE_FILES)
 	@echo Recompiling the world... && \
 	 $(MAKE) clean && \
 	 mkdir -p classes && \
