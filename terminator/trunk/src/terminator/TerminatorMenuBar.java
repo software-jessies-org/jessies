@@ -54,7 +54,7 @@ public class TerminatorMenuBar extends JMenuBar {
 		JMenu menu = new JMenu("Edit");
 		menu.add(new JMenuItem(new CopyAction()));
 		menu.add(new JMenuItem(new PasteAction()));
-		//menu.add(new JMenuItem(new SelectAllAction()));
+		menu.add(new JMenuItem(new SelectAllAction()));
 		
 		menu.add(new JSeparator());
 		menu.add(new JMenuItem(new FindAction()));
@@ -238,7 +238,6 @@ public class TerminatorMenuBar extends JMenuBar {
 		}
 	}
 	
-	/*
 	private static class SelectAllAction extends AbstractAction {
 		public SelectAllAction() {
 			super("Select All");
@@ -246,10 +245,12 @@ public class TerminatorMenuBar extends JMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			terminal.doSelectAllAction();
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.selectAll();
+			}
 		}
 	}
-	*/
 	
 	public static class FindAction extends AbstractAction {
 		public FindAction() {

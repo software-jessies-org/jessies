@@ -336,6 +336,11 @@ public class JTerminalPane extends JPanel {
 		}
 	}
 	
+	public void selectAll() {
+		Selector selector = (Selector) textPane.getHighlighterOfClass(Selector.class);
+		selector.selectAll();
+	}
+	
 	public void pageUp() {
 		scrollVertically(-0.5);
 	}

@@ -134,7 +134,15 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		setHighlight(startLocation, new Location(lineNumber, end));
 	}
 	
-	public void selectLine(Location location) {
+	public void selectAll() {
+		Location start = new Location(0, 0);
+		Location end = new Location(view.getModel().getLineCount(), 0);
+		startLocation = start;
+		setHighlight(start, end);
+		copy();
+	}
+	
+	private void selectLine(Location location) {
 		Location start = new Location(location.getLineIndex(), 0);
 		Location end = new Location(location.getLineIndex() + 1, 0);
 		startLocation = start;
