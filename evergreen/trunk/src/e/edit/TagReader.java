@@ -5,7 +5,7 @@ import java.util.regex.*;
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
-    private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum):([^\t]+).*");
+    private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface):([^\t]+).*");
     
     private TagListener listener;
     private String fileType;
@@ -28,7 +28,7 @@ public class TagReader {
         tagsFile.deleteOnExit();
         Process p = Runtime.getRuntime().exec(new String[] {
             "ctags",
-            "--c++-types=+p", "-n", "--fields=+a",
+            "--c++-types=+p", "-n", "--fields=+a", "-u",
             "-f", tagsFile.getAbsolutePath(),
             file.getAbsolutePath()
         });
