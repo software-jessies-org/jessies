@@ -617,10 +617,16 @@ public class Edit implements com.apple.eawt.ApplicationListener {
                 workspaceList[i].serializeAsXml(document, root);
             }
             
-            String filename = getPreferenceFilename("saved-state.xml");
+            // Write the XML to a new file...
+            String filename = getPreferenceFilename("saved-state.xml2");
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(new DOMSource(document), new StreamResult(new FileOutputStream(filename)));
+
+            // ...and then rename it to the file we want, to protect against
+            // losing all our state on failure.
+            File realFile = FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml"));
+            FileUtilities.fileFromString(filename).renameTo(realFile);
         } catch (Exception ex) {
             Log.warn("Problem writing saved state", ex);
         }
