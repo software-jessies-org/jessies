@@ -172,6 +172,15 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * no file was opened or the file was passed to an external program.
      */
     public static EWindow openFile(String filename) {
+        try {
+            return openFileNonInteractively(filename);
+        } catch (Exception ex) {
+            Edit.showAlert("Open", ex.getMessage());
+            return null;
+        }
+    }
+    
+    public static EWindow openFileNonInteractively(String filename) {
         /* Special case for a URI. */
         if (FileUtilities.nameStartsWithOneOf(filename, FileUtilities.getArrayOfPathElements(Parameters.getParameter("url.prefixes", "")))) {
             Edit.showDocument(filename);
@@ -210,8 +219,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         
         /* Give up if the file doesn't exist. */
         if (FileUtilities.fileFromString(filename).exists() == false) {
-            Edit.showAlert("Open", "File '" + filename + "' does not exist.");
-            return null;
+            throw new RuntimeException("File '" + filename + "' does not exist.");
         }
         
         try {
@@ -219,12 +227,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
              * Open the file a symbolic link points to, and not the link itself.
              */
             if (FileUtilities.isSymbolicLink(filename)) {
-                //Edit.showAlert("Open", "Edit won't open a symbolic link, which '" + filename + "' appears to be.\nThe link target '" + canonicalFilename + "' will be opened instead.");
                 String canonicalFilename = FileUtilities.fileFromString(filename).getCanonicalPath();
                 if (address != null) {
                     canonicalFilename += address;
                 }
-                return Edit.openFile(canonicalFilename);
+                return Edit.openFileNonInteractively(canonicalFilename);
             }
             
             /*
@@ -253,8 +260,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         final int MB = 1024 * KB;
         long fileLength = FileUtilities.fileFromString(filename).length();
         if (fileLength > 512 * MB) {
-            Edit.showAlert("Open", "Edit can't really handle files as large as '" + filename + "', which is " + fileLength + " bytes long. This file will not be opened.");
-            return null;
+            throw new RuntimeException("Edit can't really handle files as large as '" + filename + "', which is " + fileLength + " bytes long. This file will not be opened.");
         }
         
         /* Add an appropriate viewer for the filename to the chosen workspace. */

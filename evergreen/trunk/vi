@@ -9,9 +9,9 @@ def openFileOnLocalhost(filename)
     if host == nil; then host = 'localhost'; end
     
     telnet = Net::Telnet.new('Host' => host, 'Port' => 1948, 'Telnetmode' => false)
-    puts "Opening #{filename} on #{host}"
-    telnet.puts "open #{filename}\r"
-    telnet.close
+    telnet.puts("open #{filename}\r")
+    print(telnet.readlines().join("\n"))
+    telnet.close()
 end
 
 ARGV.each {
