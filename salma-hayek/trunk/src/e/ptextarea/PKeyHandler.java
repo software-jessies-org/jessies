@@ -81,12 +81,25 @@ public class PKeyHandler extends KeyAdapter {
         if (event.isControlDown()) {
             // Do nothing.
         } else {
-            if (event.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+            if (isInsertableCharacter(event.getKeyChar())) {
+                System.err.println("Inserting character from event: " + ((int) event.getKeyChar()));
                 textArea.getPTextBuffer().insert(textArea.getCaretLocation(), new char[] { event.getKeyChar() });
                 textArea.setCaretLocation(textArea.getCaretLocation() + 1);
             }
         }
         System.err.println("keyTyped took " + (System.currentTimeMillis() - startTime) + "ms.");
+    }
+    
+    private boolean isInsertableCharacter(char ch) {
+        switch (ch) {
+        case KeyEvent.CHAR_UNDEFINED:
+        case '\010':  // backspace
+        case '\177':  // delete
+            return false;
+            
+        default:
+            return true;
+        }
     }
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
@@ -97,11 +110,30 @@ public class PKeyHandler extends KeyAdapter {
             case KeyEvent.VK_DOWN: moveCaretDown(); break;
             case KeyEvent.VK_HOME: moveCaretToStartOfLine(); break;
             case KeyEvent.VK_END: moveCaretToEndOfLine(); break;
+            case KeyEvent.VK_BACK_SPACE: backspace(); break;
+            case KeyEvent.VK_DELETE: delete(); break;
 
         default:
             return false;
         }
         return true;
+    }
+    
+    private void backspace() {
+        int caret = textArea.getCaretLocation();
+        if (caret > 0) {
+            caret--;
+            textArea.setCaretLocation(caret);
+            textArea.getPTextBuffer().delete(caret, 1);
+        }
+    }
+    
+    private void delete() {
+        int caret = textArea.getCaretLocation();
+        PTextBuffer buffer = textArea.getPTextBuffer();
+        if (caret < buffer.length() - 1) {
+            buffer.delete(caret, 1);
+        }
     }
     
     private void moveCaretToStartOfLine() {

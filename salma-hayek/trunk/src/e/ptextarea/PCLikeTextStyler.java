@@ -326,10 +326,14 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
         String suffix = seq.subSequence(endIndex, Math.min(endIndex + 1, seq.length())).toString();
         String withMiddleText = prefix + event.getString() + suffix;
         String withoutMiddleText = prefix + suffix;
-        if (hasCommentMarker(withMiddleText) || hasCommentMarker(withoutMiddleText)) {
+        if (hasCommentMarker(withMiddleText) || hasCommentMarker(withoutMiddleText) || hasNewline(event.getString())) {
             lastGoodLine = Math.min(lastGoodLine, textArea.getLineList().getLineIndex(event.getOffset()));
             textArea.repaintFromLine(textArea.getSplitLineIndex(lastGoodLine));
         }
+    }
+    
+    private boolean hasNewline(String text) {
+        return (text.indexOf('\n') != -1);
     }
     
     private boolean hasCommentMarker(String text) {
