@@ -606,7 +606,29 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     }
     
     public boolean isOutOfDateWithRespectToDisk() {
-        return file.exists() && file.lastModified() != lastModifiedTime;
+        if (file.exists() == false) {
+            return false;
+        }
+        
+        // If the time stamp on disk is the same as it was when we last read
+        // or wrote the file, assume it hasn't changed.
+        if (file.lastModified() == lastModifiedTime) {
+            return false;
+        }
+        
+        // If the on-disk content is the same as what we have in memory, then
+        // the fact that the time stamp is different isn't significant.
+        try {
+            String currentContentInMemory = getText().getText();
+            String currentContentOnDisk = StringUtilities.readFile(file);
+            if (currentContentInMemory.equals(currentContentOnDisk)) {
+                return false;
+            }
+        } catch (Exception ex) {
+            Log.warn("Couldn't compare with on-disk copy.", ex);
+        }
+        
+        return true;
     }
     
     /** Saves the text. Returns true if the file was saved okay. */
