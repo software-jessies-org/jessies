@@ -2,6 +2,7 @@ package e.util;
 
 import java.io.*;
 import java.nio.*;
+import java.nio.channels.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -56,38 +57,56 @@ public class FileSearcher {
         return matchCount;
     }
     
+    private boolean isBinaryByteBuffer(ByteBuffer byteBuffer, final int byteCount) {
+        // Check we haven't accidentally come across a binary file.
+        final int end = Math.min(byteCount, 16);
+        for (int i = 0; i < end; i++) {
+            if (byteBuffer.get(i) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * Search for occurrences of the input pattern in the given file.
      * Returns the number of matches.
      */
     public int searchFile(String path, String fileName, Collection matches) throws IOException {
         File file = FileUtilities.fileFromParentAndString(path, fileName);
-        FileInputStream fileInputStream = new FileInputStream(file);
-        DataInputStream dataInputStream = new DataInputStream(fileInputStream);
-        //FileChannel fileChannel = fileInputStream.getChannel();
+        int byteCount = (int) file.length();
+        
+        DataInputStream dataInputStream = null;
+        FileChannel fileChannel = null;
+        ByteBuffer byteBuffer = null;
+        
         try {
-            int byteCount = (int) file.length();
-            ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[byteCount]);
-            dataInputStream.readFully(byteBuffer.array());
+            FileInputStream fileInputStream = new FileInputStream(file);
             
-            // Map the file into memory.
-            //int byteCount = (int) fileChannel.size();
-            //MappedByteBuffer byteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, byteCount);
-            
-            // Check we haven't accidentally come across a binary file.
-            final int end = Math.min(byteCount, 16);
-            for (int i = 0; i < end; i++) {
-                if (byteBuffer.get(i) == 0) {
-                    //System.err.println("--Rejecting binary " + fileName);
-                    return 0;
-                }
+            // FIXME: we should measure where the best cut-off point is.
+            if (byteCount <= 4096) {
+                // Read the whole file in.
+                dataInputStream = new DataInputStream(fileInputStream);
+                byteBuffer = ByteBuffer.wrap(new byte[byteCount]);
+                dataInputStream.readFully(byteBuffer.array());
+            } else {
+                // Map the file into memory.
+                fileChannel = fileInputStream.getChannel();
+                byteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, byteCount);
             }
             
+            if (isBinaryByteBuffer(byteBuffer, byteCount)) {
+                return 0;
+            }
             CharSequence charSequence = new AsciiCharSequence(byteBuffer, 0, byteCount);
             return searchCharBuffer(fileName, charSequence, matches);
         } finally {
-            //fileChannel.close();
-            dataInputStream.close();
+            if (fileChannel != null) {
+                fileChannel.close();
+            }
+            if (dataInputStream != null) {
+                dataInputStream.close();
+            }
         }
     }
 }
