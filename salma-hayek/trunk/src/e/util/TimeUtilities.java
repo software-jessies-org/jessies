@@ -43,7 +43,23 @@ public class TimeUtilities {
         long minutes = duration % 60;
         duration /= 60;
         long hours = duration;
-        return "P" + hours + "H" + minutes + "M" + seconds + "S";
+
+        StringBuffer result = new StringBuffer("P");
+        if (hours != 0) {
+            result.append(hours);
+            result.append('H');
+        }
+        if (result.length() > 1 || minutes != 0) {
+            result.append(minutes);
+            result.append('M');
+        }
+        result.append(seconds);
+        if (milliseconds != 0) {
+            result.append('.');
+            result.append(milliseconds);
+        }
+        result.append('S');
+        return result.toString();
     }
 
     /**
@@ -74,5 +90,8 @@ public class TimeUtilities {
         System.out.println(currentIsoString());
         System.out.println(durationToIsoString(end - start));
         System.out.println(durationToIsoString(millisecondsBetween(startDate, endDate)));
+        for (int i = 0; i < args.length; ++i) {
+            System.out.println(durationToIsoString(Long.parseLong(args[i])));
+        }
     }
 }
