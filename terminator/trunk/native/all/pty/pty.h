@@ -32,7 +32,7 @@ pid_t pty_fork(int*);
 // enough to work this out for itself.
 void panic(const char* reason, const char* parameter = 0) __attribute__((noreturn));
 
-inline void panic(const char* reason, const char* parameter /*= 0*/) {
+inline void panic(const char* reason, const char* parameter) {
     std::ostream& os(std::cout);
     os << reason;
     if (parameter != 0) {
