@@ -25,14 +25,14 @@ public class PText implements CharSequence {
      * Add a listener which will be informed when text is added or removed, or when the text is completely
      * replaced.
      */
-    public void addListener(PTextListener listener) {
+    public void addTextListener(PTextListener listener) {
         listeners.add(listener);
     }
     
     /**
      * Remove a previously added listener.
      */
-    public void removeListener(PTextListener listener) {
+    public void removeTextListener(PTextListener listener) {
         listeners.remove(listener);
     }
     

@@ -561,11 +561,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public void setText(PText text) {
         if (lines != null) {
-            lines.removeListener(this);
+            lines.removeLineListener(this);
         }
         lines = new PLineList(text);
-        lines.addListener(this);
-        text.addListener(anchorSet);
+        lines.addLineListener(this);
+        text.addTextListener(anchorSet);
         invalidateLineWrappings();
     }
     

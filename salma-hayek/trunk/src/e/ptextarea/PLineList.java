@@ -30,12 +30,12 @@ public class PLineList implements PTextListener {
     }
     
     /** Adds a listener which will be informed on line modification, addition and removal. */
-    public void addListener(PLineListener listener) {
+    public void addLineListener(PLineListener listener) {
         listeners.add(listener);
     }
     
     /** Removes a listener previously added with the addListener method. */
-    public void removeListener(PLineListener listener) {
+    public void removeLineListener(PLineListener listener) {
         listeners.remove(listener);
     }
     
@@ -47,10 +47,10 @@ public class PLineList implements PTextListener {
     /** Replaces the underlying PText model with a new one. */
     public void setText(PText text) {
         if (this.text != null) {
-            this.text.removeListener(this);
+            this.text.removeTextListener(this);
         }
         this.text = text;
-        text.addListener(this);
+        text.addTextListener(this);
         generateLines();
     }
     

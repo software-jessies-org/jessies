@@ -40,7 +40,7 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
     public PCLikeTextStyler(PTextArea textArea) {
         this.textArea = textArea;
         initCommentCache();
-        textArea.getText().addListener(this);
+        textArea.getText().addTextListener(this);
         textArea.setTextStyler(this);
     }
     
