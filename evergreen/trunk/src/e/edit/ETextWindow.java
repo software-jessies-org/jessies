@@ -226,8 +226,8 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         ArrayList items = new ArrayList();
         items.add(new OpenSelectionAction());
         items.add(new FindFilesContainingSelectionAction());
+        items.add(new RevertToSavedAction());
         addContextSpecificMenuItems(items);
-        addWindowSpecificMenuItems(items);
         addExternalToolMenuItems(items);
         addSpellingSuggestions(items);
         return items;
@@ -322,19 +322,6 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     
     public void addContextSpecificMenuItems(Collection items) {
         boolean needSeparator = true;
-    }
-    
-    public void addWindowSpecificMenuItems(Collection items) {
-        items.add(null);
-        items.add(new SaveAction());
-        items.add(null);
-        items.add(new UndoAction());
-        items.add(new RedoAction());
-        
-        if (isCPlusPlus()) {
-            //items.add(null);
-            //items.add(new OpenIncludeFileAction());
-        }
     }
     
     public void addSpellingSuggestions(Collection items) {
