@@ -17,33 +17,37 @@ public class JTextComponentSpellingChecker implements DocumentListener {
     
     public JTextComponentSpellingChecker(JTextComponent component) {
         this.component = component;
-        addPopUpMenu();
+        initPopUpMenu();
     }
     
-    private void addPopUpMenu() {
+    private void initPopUpMenu() {
         component.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                processMouseEvent(e);
+                maybeShowSpellingMenu(e);
             }
             
             public void mouseReleased(MouseEvent e) {
-                processMouseEvent(e);
-            }
-            
-            private void processMouseEvent(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    showMenu(e);
-                    e.consume();
-                }
+                maybeShowSpellingMenu(e);
             }
         });
     }
     
     /**
-     * Returns a collection of menu items if there's a misspelled word in the text selection, or
-     * an empty collection otherwise.
+     * Pops up a menu containing suggested corrections to
+     * the spelling mistake at the coordinates given by the
+     * MouseEvent.
+     * 
+     * If there is no mistake, no menu is shown.
+     * 
+     * The MouseEvent is consumed if a menu is shown, so
+     * other MouseListeners checking isPopupTrigger can
+     * also check isConsumed.
      */
-    private void showMenu(MouseEvent e) {
+    private void maybeShowSpellingMenu(MouseEvent e) {
+        if (e.isPopupTrigger() == false) {
+            return;
+        }
+        
         try {
             final Range actualRange = new Range();
             final int offset = component.viewToModel(e.getPoint());
@@ -62,6 +66,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
                     menu.add(new CorrectSpellingAction(document, suggestion, actualRange.start, actualRange.end));
                 }
                 menu.show(component, e.getX(), e.getY());
+                e.consume();
             }
         } catch (BadLocationException ex) {
             ex.printStackTrace();
