@@ -209,6 +209,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 //		scrollRectToVisible(new Rectangle(0, getHeight() - 10, 10, 11));
 	}
 	
+	public void scrollToTop() {
+		scrollToLine(0);
+	}
+	
 	public void scrollToLine(final int lineNumber) {
 		Dimension character = getCharUnitSize();
 		scrollRectToVisible(new Rectangle(0, lineNumber * character.height - 10, 10, character.height + 20));

@@ -326,10 +326,14 @@ public class JTerminalPane extends JPanel {
 			if (event.isShiftDown()) {
 				switch (event.getKeyCode()) {
 					case KeyEvent.VK_HOME:
+						textPane.scrollToTop();
+						return true;
+					case KeyEvent.VK_END:
+						textPane.scrollToBottom();
+						return true;
 					case KeyEvent.VK_LEFT:
 						scrollBy(-0.5, 0);
 						return true;
-					case KeyEvent.VK_END:
 					case KeyEvent.VK_RIGHT:
 						scrollBy(0.5, 0);
 						return true;
