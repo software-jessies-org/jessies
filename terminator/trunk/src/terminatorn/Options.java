@@ -30,6 +30,14 @@ public class Options {
 		return INSTANCE;
 	}
 	
+	public int getInternalBorder() {
+		String internalBorder = (String) options.get("internalBorder");
+		if (internalBorder != null) {
+			return Integer.parseInt(internalBorder);
+		}
+		return 2;
+	}
+	
 	/**
 	 * Returns a color, if explicitly configured by the user.
 	 * We only understand colors specified in the #rrggbb form,
