@@ -78,6 +78,7 @@ public class TagsUpdater {
     
     private void createUI() {
         tree = new ETree(new DefaultTreeModel(new DefaultMutableTreeNode("")));
+        ToolTipManager.sharedInstance().registerComponent(tree);
         // We can't trust JTree's row height calculation. Make it use
         // the preferred height of the cell renderer component instead.
         tree.setRowHeight(-1);
@@ -258,7 +259,7 @@ public class TagsUpdater {
                     temporaryFile.deleteOnExit();
                 }
                 getTextWindow().writeCopyTo(temporaryFile);
-                TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), this);
+                TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), getTextWindow().getText(), this);
                 String newDigest = tagReader.getTagsDigest();
                 tagsHaveNotChanged = newDigest.equals(digest);
                 digest = newDigest;

@@ -118,6 +118,7 @@ public class TagsPanel extends JPanel {
                 tag = (TagReader.Tag) node.getUserObject();
                 setForeground(tag.visibilityColor() == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
                 setFont((tag.isStatic && tag.visibilityColor() != TagReader.Tag.PRIVATE) ? boldFont : normalFont);
+                setToolTipText(tag.lineText);
                 Shape typeMarker = (Shape) TYPE_SHAPES.get(tag.type);
                 if (typeMarker != null) {
                     setIcon(icon);
