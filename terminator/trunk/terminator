@@ -23,7 +23,25 @@ then
   cp $TERMINATOR_HOME/doc/props-examples/$PROPS_VARIANT.terminator ~/.terminator
 fi
 
-tic $TERMINATOR_HOME/doc/terminfo/terminator.tic
+if [ ! -w /usr/share/terminfo ]
+then
+  export TERMINFO=~/.terminfo
+else
+  export TERMINFO=/usr/share/terminfo
+fi
+mkdir -p $TERMINFO/t
+
+TERMINFO_SRC=$TERMINATOR_HOME/doc/terminfo/terminator.tic
+TERMINFO_DST=$TERMINFO/t/terminator.tic
+if [ "`type -p tic`" != "" ]
+then
+  tic $TERMINFO_SRC
+else
+  if [ ! -e $TERMINFO_DST ]
+  then
+    cp $TERMINFO_SRC $TERMINFO_DST
+  fi
+fi
 
 mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
 
