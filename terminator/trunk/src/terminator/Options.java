@@ -194,7 +194,11 @@ public class Options {
 	}
 	
 	private Options() {
-		readRGBFile();
+		try {
+			readRGBFile();
+		} catch (Exception ex) {
+			Log.warn("Problem reading X11 colors", ex);
+		}
 		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
