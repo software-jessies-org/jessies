@@ -14,7 +14,6 @@ Unassigned TODOs:
 [1]	Add bracket-matching double-click selection?
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 [1]	Feedback on other tabs when there's been output you haven't seen yet?
-[1]	cursorColor should default to foreground rather than black.
 [1]	Shouldn't log while in alternate buffer mode.
 [1]	Add ability to view more than one terminal at a time, in a split pane, or in a 2d-tiled layout.
 
