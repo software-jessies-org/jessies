@@ -301,7 +301,7 @@ public class TagsUpdater {
             insert(node, getInsertIndex(tag));
         }
         
-        private SortedSet kidsNames = new TreeSet();
+        private SortedSet kidsNames = new TreeSet(String.CASE_INSENSITIVE_ORDER);
         
         public int getInsertIndex(TagReader.Tag tag) {
             String insertString = tag.getSortIdentifier() + kidsNames.size();
