@@ -2,28 +2,39 @@ package e.ptextarea;
 
 
 import java.awt.*;
-import java.io.*;
 import javax.swing.*;
 
 public class PTextWindow {
     private PTextWindow() { }
     
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Syntax: PTextWindow <filename>");
+    public static void main(String[] filenames) {
+        if (filenames.length == 0) {
+            System.err.println("Syntax: PTextWindow <filename>...");
             System.exit(1);
         }
-        final File file = new File(args[0]);
+        for (int i = 0; i < filenames.length; ++i) {
+            open(filenames[i]);
+        }
+    }
+    
+    private static void open(final String filename) {
+        final StopWatch stopWatch = new StopWatch(filename + ": ");
         final PTextBuffer text = new PTextBuffer();
-        text.setText(getFileText(file));
+        text.setText(e.util.StringUtilities.readFile(filename).toCharArray());
+        stopWatch.print("read file");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 PTextArea area = new PTextArea(text);
-                PTextStyler styler = getTextStyler(file, area);
+                stopWatch.print("created text area");
+                area.setFont(new Font(e.util.GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12));
+                PTextStyler styler = getTextStyler(filename, area);
                 if (styler != null) {
                     area.setTextStyler(styler);
                 }
-                JFrame frame = new JFrame("PTextArea Test: " + file.getPath());
+                stopWatch.print("added styler");
+                //new PTextAreaSpellingChecker(area).checkSpelling();
+                stopWatch.print("added spelling checker");
+                JFrame frame = new JFrame("PTextArea Test: " + filename);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 JScrollPane scroller = new JScrollPane(area);
                 frame.getContentPane().add(scroller);
@@ -34,10 +45,9 @@ public class PTextWindow {
         });
     }
     
-    private static PTextStyler getTextStyler(File file, PTextArea textArea) {
-        String name = file.getName();
-        if (name.indexOf('.') != -1) {
-            String extension = name.substring(name.lastIndexOf('.') + 1);
+    private static PTextStyler getTextStyler(String filename, PTextArea textArea) {
+        if (filename.indexOf('.') != -1) {
+            String extension = filename.substring(filename.lastIndexOf('.') + 1);
             if (extension.equals("cpp") || extension.equals("h")) {
                 return new PCPPTextStyler(textArea);
             } else if (extension.equals("c")) {
@@ -47,23 +57,5 @@ public class PTextWindow {
             }
         }
         return null;
-    }
-    
-    private static char[] getFileText(File file) {
-        try {
-            CharArrayWriter chars = new CharArrayWriter();
-            PrintWriter writer = new PrintWriter(chars);
-            BufferedReader in = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = in.readLine()) != null) {
-                writer.println(line);
-            }
-            in.close();
-            writer.close();
-            return chars.toCharArray();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return new char[0];
-        }
     }
 }
