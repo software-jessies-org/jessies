@@ -1,10 +1,15 @@
-* Use international English spelling.
+Use international English spelling.
 
-* Use 4-space 'tabs' and K&R (Sun Java) indentation. (That is, follow
-  the rest of the code.)
+Use 4-space 'tabs' and K&R (Sun Java) indentation. (That is, follow
+the rest of the code.)
 
-* Use the Log class instead of System.err/System.out; those should be
-  used only while debugging.
+Use the Log class instead of System.err/System.out; those should be
+used only while debugging.
 
-* Never use "new File"; use FileUtilities.fileFromString instead; this
-  also understands ~/HACKING and ~elliotth/HACKING.
+No new file formats. We can't keep just inventing random formats
+left, right and center. Any file we write (for our own purposes) should
+use an existing well-known format. It's not acceptable to use
+one of Edit's existing formats; they should be considered deprecated.
+
+Never use "new File"; use FileUtilities.fileFromString instead; this
+also understands ~/HACKING and ~elliotth/HACKING.
