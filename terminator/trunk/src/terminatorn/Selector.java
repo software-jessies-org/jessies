@@ -13,6 +13,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 	private JTextBuffer view;
 	private Highlight highlight;
 	private Location startLocation;
+	private static StyleMutator styler;
 	
 	/** Creates a Selector for selecting text in the given view, and adds us as mouse listeners to that view. */
 	public Selector(JTextBuffer view) {
@@ -21,8 +22,18 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 		view.addMouseMotionListener(this);
 		view.addHighlighter(this);
 		view.setAutoscrolls(true);
+		initStyler();
 	}
 	
+	private void initStyler() {
+		Color selectionColor = Options.getSharedInstance().getColor("selectionColor");
+		if (selectionColor == null) {
+			styler = new SelectedStyleMutator();
+		} else {
+			styler = new Style(Options.getSharedInstance().getColor("foreground"), selectionColor, false, false);
+		}
+	}
+
 	public void mousePressed(MouseEvent event) {
 		if (event.getButton() != MouseEvent.BUTTON1) {
 			return;
@@ -147,7 +158,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 			TextLine endLine = view.getModel().get(end.getLineIndex());
 			end = new Location(end.getLineIndex(), endLine.getEffectiveCharEndOffset(end.getCharOffset()));
 		}
-		highlight = new Highlight(this, start, end, new SelectedStyleMutator());
+		highlight = new Highlight(this, start, end, styler);
 		view.addHighlight(highlight);
 	}
 
