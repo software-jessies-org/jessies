@@ -166,7 +166,7 @@ dist: build
 	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
 	scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
 	cd $(if $(wildcard ../trunk),../..,..) && \
-	tar -cvf $(TAR_FILE_OF_THE_DAY) $(FILE_LIST) && \
+	tar -cf $(TAR_FILE_OF_THE_DAY) $(FILE_LIST) && \
 	rm -f $(TAR_FILE_OF_THE_DAY).gz && \
 	gzip $(TAR_FILE_OF_THE_DAY) && \
 	scp $(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
