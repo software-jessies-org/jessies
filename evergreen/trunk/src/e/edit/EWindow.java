@@ -6,7 +6,7 @@ import java.util.*;
 import javax.swing.*;
 import e.gui.*;
 
-public class EWindow extends JComponent implements Comparable {
+public class EWindow extends JComponent {
     private ETitleBar titleBar;
     
     private EPopupMenu popupMenu;
@@ -35,18 +35,6 @@ public class EWindow extends JComponent implements Comparable {
         return titleBar.getTitle();
     }
 
-    public String toString() {
-        return getTitle();
-    }
-    
-    /**
-     * Implements the Comparable interface so windows can be sorted
-     * into alphabetical order by title.
-     */
-    public int compareTo(Object other) {
-        return getTitle().compareTo(((EWindow) other).getTitle());
-    }
-    
     public void setTitle(String title) {
         titleBar.setTitle(title);
     }

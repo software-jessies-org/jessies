@@ -2,89 +2,52 @@ package e.edit;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
-import e.gui.*;
+import javax.swing.event.*;
 import e.util.*;
 
 /**
-A column containing views.
-
-<font color="red">Note that you have you call addComponent and not add. I don't know why I
-didn't override add and invoke super.add at the critical point; this seems like a serious design
-error that someone should check out and fix. As things stand, accidentally invoking add will
-cause a whole can of Whoop Ass to be spilt in Edit's lap.</font>
-
-@author Elliott Hughes <enh@acm.org>
-*/
+ * A column containing views.
+ * 
+ * <font color="red">Note that you have you call addComponent and not add. I don't know why I
+ * didn't override add and invoke super.add at the critical point; this seems like a serious design
+ * error that someone should check out and fix. As things stand, accidentally invoking add will
+ * cause a whole can of Whoop Ass to be spilt in Edit's lap.</font>
+ * 
+ * @author Elliott Hughes <enh@acm.org>
+ */
 public class EColumn extends JSplitPane {
-    private static final JPanel EMPTY_PANEL = new JPanel();
-
-    private SortedComboBoxModel windows = new SortedComboBoxModel();
-    private JPanel bottomPanel = new JPanel(new BorderLayout());
-    private JComboBox comboBox = new JComboBox(windows);
-    private JComponent lastWindow = null;
-
+    private static final int MIN_HEIGHT = ETitleBar.TITLE_HEIGHT + 5;
+    
+    private JSplitPane splitPane = new JSplitPane();
+    private TextsPanel bottomPanel = new TextsPanel();
+    
+    /**
+     * Creates a new empty column. We use a null LayoutManager, because
+     * we're going to do the layout ourselves.
+     */
     public EColumn() {
         super(JSplitPane.VERTICAL_SPLIT, true);
-        bottomPanel.add(comboBox, BorderLayout.NORTH);
-        setWindow(EMPTY_PANEL);
         setBottomComponent(bottomPanel);
-        comboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JComponent c = (JComponent) comboBox.getSelectedItem();
-                setWindow(c);
-                if (c != null) {
-                    c.requestFocus();
-                }
-            }
-        });
-        comboBox.setMaximumRowCount(20);
-        comboBox.setMinimumSize(new Dimension(100, comboBox.getPreferredSize().height));
-        updateComboBoxEnabledState();
-    }
-
-    private void setWindow(JComponent c) {
-        if (this.lastWindow != null) {
-            bottomPanel.remove(this.lastWindow);
-        }
-        if (c == null) {
-            c = EMPTY_PANEL;
-        }
-        bottomPanel.add(c, BorderLayout.CENTER);
-        bottomPanel.invalidate();
-        bottomPanel.validate();
-        bottomPanel.repaint();
-        this.lastWindow = c;
     }
     
     public void setErrorsWindow(EErrorsWindow errorsWindow) {
         setTopComponent(errorsWindow);
     }
-
+    
     public void setSelectedWindow(EWindow window) {
-        comboBox.setSelectedItem(window);
+        window.requestFocus();
     }
     
-    public void switchToNextFile() {
-        comboBox.setSelectedIndex((comboBox.getSelectedIndex() + 1) % comboBox.getItemCount());
-    }
-    
-    public void switchToPreviousFile() {
-        int index = comboBox.getSelectedIndex() - 1;
-        if (index < 0) {
-            index = comboBox.getItemCount() - 1;
-        }
-        comboBox.setSelectedIndex(index);
-    }
-    
-    public void removeComponent(Component c, boolean mustReassignFocus) {
-        windows.removeElement(c);
-        updateComboBoxEnabledState();
+    public void addComponent(EWindow c) {
+        bottomPanel.addComponent(c);
         updateTabForWorkspace();
     }
     
-    private void updateComboBoxEnabledState() {
-        comboBox.setEnabled(comboBox.getItemCount() > 0);
+    public void removeComponent(EWindow c, boolean mustReassignFocus) {
+        bottomPanel.removeComponent(c, mustReassignFocus);
+        updateTabForWorkspace();
     }
     
     /**
@@ -123,36 +86,299 @@ public class EColumn extends JSplitPane {
         return (Workspace) SwingUtilities.getAncestorOfClass(Workspace.class, this);
     }
     
-    public void addComponent(Component c) {
-        windows.addElement(c);
-        windows.setSelectedItem(c);
-        updateComboBoxEnabledState();
-        updateTabForWorkspace();
+    public void expandComponent(Component luckyBoy) {
+        bottomPanel.expandComponent(luckyBoy);
     }
     
-    /** Moves the given component to the given absolute Y position in the column. */
     public void moveTo(Component c, int y) {
+        bottomPanel.moveTo(c, y);
     }
 
-    public void expandComponent(EWindow window) {
+    public ETextWindow[] getTextWindows() {
+        ArrayList result = new ArrayList();
+        Component[] cs = bottomPanel.getComponents();
+        for (int i = 0; i < cs.length; i++) {
+            if (cs[i] instanceof ETextWindow) {
+                result.add(cs[i]);
+            }
+        }
+        return (ETextWindow[]) result.toArray(new ETextWindow[result.size()]);
     }
- 
+    
     public EWindow findWindowByName(String name) {
         name = name.toLowerCase();
-        for (int i = 0; i < windows.getSize(); ++i) {
-            EWindow window = (EWindow) windows.getElementAt(i);
-            if (window.getTitle().toLowerCase().endsWith(name)) {
-                return window;
+        ETextWindow[] texts = getTextWindows();
+        for (int i = 0; i < texts.length; i++) {
+            if (texts[i].getTitle().toLowerCase().endsWith(name)) {
+                return texts[i];
             }
         }
         return null;
     }
-
-    public ETextWindow[] getTextWindows() {
-        ETextWindow[] result = new ETextWindow[windows.getSize()];
-        for (int i = 0; i < result.length; ++i) {
-            result[i] = (ETextWindow) windows.getElementAt(i);
+    
+    private class TextsPanel extends JPanel {
+        private TextsPanel() {
+            setLayout(null);
+            addListeners();
         }
-        return result;
+        
+        private void addListeners() {
+            addComponentListener(new ComponentAdapter() {
+                public void componentResized(ComponentEvent e) {
+                    relayoutAfterResize();
+                }
+            });
+        }
+        
+        public void paint(Graphics g) {
+            if (getComponentCount() == 0) {
+                GraphicsUtilities.paintPaper(g, 240);
+            } else {
+                super.paintComponents(g);
+            }
+        }
+        
+        public void removeComponent(EWindow c, boolean mustReassignFocus) {
+            int which = getComponentIndex(c);
+            remove(which);
+            removeListenersFrom(c);
+            Log.warn("which="+which+";getComponentCount()="+getComponentCount());
+            if (which < getComponentCount()) {
+                Log.warn("free space to component below ("+which+")");
+                /* Give free space to component below the one removed. */
+                Component luckyBoy = getComponent(which);
+                luckyBoy.requestFocus();
+                luckyBoy.setSize(luckyBoy.getWidth(), luckyBoy.getHeight() + c.getHeight());
+                luckyBoy.setLocation(luckyBoy.getX(), c.getY());
+                luckyBoy.invalidate();
+                luckyBoy.validate();
+            } else if (which > 0) {
+                Log.warn("free space to component above ("+(which-1)+")");
+                /* Give free space to component above the one removed. */
+                Component luckyBoy = getComponent(which - 1);
+                luckyBoy.requestFocus();
+                luckyBoy.setSize(luckyBoy.getWidth(), c.getY() + c.getHeight() - luckyBoy.getY());
+                luckyBoy.invalidate();
+                luckyBoy.validate();
+            } else if (getComponentCount() > 0) {
+                Log.warn("free space to topmost component");
+                /* Give free space to the topmost component. */
+                Component luckyBoy = getComponent(0);
+                luckyBoy.requestFocus();
+                luckyBoy.setLocation(0, 0);
+                luckyBoy.setSize(luckyBoy.getWidth(), luckyBoy.getHeight() + c.getHeight());
+                luckyBoy.invalidate();
+                luckyBoy.validate();
+            } else {
+                Log.warn("empty column");
+                /* Redraw the now empty column. */
+                getParent().repaint();
+            }
+            getParent().repaint();
+        }
+        
+        private class TitleBarMouseInputListener extends MouseInputAdapter {
+            private int pointerOffset;
+            
+            /**
+             * Keeps track of how far down the title bar the mouse button is depressed. This allows
+             * us to position the title bar correctly when we move it in the mouseDragged method.
+             */
+            public void mousePressed(MouseEvent e) {
+                pointerOffset = e.getY();
+            }
+            
+            /** Causes the title bar to track the mouse's movements. */
+            public void mouseDragged(MouseEvent e) {
+                Component titleBar = (Component) e.getSource();
+                moveTo(titleBar.getParent(), SwingUtilities.convertMouseEvent(titleBar, e, bottomPanel).getY() - pointerOffset);
+            }
+        }
+        
+        private final TitleBarMouseInputListener titleBarMouseInputListener = new TitleBarMouseInputListener();
+        
+        public void addComponent(EWindow c) {
+            int index = getIndexOfLargestComponent();
+            if (index == -1) {
+                add(c);
+                placeComponent(0, c);
+            } else {
+                Component largest = getComponent(index);
+                int y = largest.getY() + largest.getHeight() / 2;
+                add(c, index + 1);
+                placeComponent(index + 1, c);
+                moveTo(c, y);
+            }
+            addListenersTo(c);
+        }
+        
+        private void addListenersTo(EWindow window) {
+            window.getTitleBar().addMouseListener(titleBarMouseInputListener);
+            window.getTitleBar().addMouseMotionListener(titleBarMouseInputListener);
+        }
+        
+        private void removeListenersFrom(EWindow window) {
+            window.getTitleBar().removeMouseListener(titleBarMouseInputListener);
+            window.getTitleBar().removeMouseMotionListener(titleBarMouseInputListener);
+        }
+        
+        private void placeComponent(int index, Component c) {
+            if (index == 0) {
+                c.setBounds(0, 0, getWidth(), getHeight());
+                c.invalidate();
+                c.validate();
+            } else {
+                Component last = getComponent(index - 1);
+                int y = last.getY() + last.getHeight()/2;
+                last.setBounds(0, last.getY(), getWidth(), last.getHeight()/2);
+                c.setBounds(0, y, getWidth(), getHeight() - y);
+                last.invalidate();
+                c.invalidate();
+                c.validate();
+                last.validate();
+            }
+        }
+        
+        private int getIndexOfLargestComponent() {
+            int largest = -1;
+            int currentLargestHeight = -1;
+            for (int i = 0; i < getComponentCount(); i++) {
+                Component c = getComponent(i);
+                if (c.getHeight() > currentLargestHeight) {
+                    currentLargestHeight = c.getHeight();
+                    largest = i;
+                }
+            }
+            return largest;
+        }
+        
+        private int getComponentIndex(Component c) {
+            for (int i = 0; i < getComponentCount(); i++) {
+                if (getComponent(i) == c) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        
+        private boolean isThereAnySpaceAboveComponent(int which) {
+            for (int i = 0; i < which; i++) {
+                if (getComponent(i).getHeight() > MIN_HEIGHT) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        private boolean isValidComponentIndex(int which) {
+            return which < getComponentCount();
+        }
+        
+        public void expandComponent(Component luckyBoy) {
+            int freeSpace = getHeight() - (MIN_HEIGHT * (getComponentCount() - 1));
+            int y = 0;
+            for (int i = 0; i < getComponentCount(); i++) {
+                Component c = getComponent(i);
+                int height = (c == luckyBoy) ? freeSpace : MIN_HEIGHT;
+                c.setBounds(0, y, c.getWidth(), height);
+                y += height;
+                c.invalidate();
+                c.validate();
+            }
+        }
+
+        /** Moves the given component to the given absolute Y position in the column. */
+        public void moveTo(Component c, int y) {
+            int which = getComponentIndex(c);
+            if (which < 1) {
+                return;
+            }
+            
+            /* Ensure a window can't be moved off the top or bottom. */
+            int newY = Math.min(Math.max(MIN_HEIGHT, y), getHeight() - MIN_HEIGHT);
+            
+            /* Dramatis personae. */
+            Component previous = getComponent(which - 1);
+            Component current = getComponent(which);
+            Component next = isValidComponentIndex(which + 1) ? getComponent(which + 1) : null;
+            
+            /* What happens to the window above us? */
+            int bottomOfPrevious = previous.getY() + previous.getHeight();
+            int newPreviousHeight = newY - previous.getY();
+            
+            /* If it would get squished... */
+            if (newPreviousHeight < MIN_HEIGHT) {
+                /* FIXME: wrong test. we're really interested in knowing whether there's room. */
+                if (isThereAnySpaceAboveComponent(which)) {
+                    /* ... budge it up a bit ... */
+                    moveTo(previous, newY - MIN_HEIGHT);
+                    newPreviousHeight = newY - previous.getY();
+                } else {
+                    /* ... or refuse to squish it. */
+                    newY = previous.getY() + MIN_HEIGHT;
+                    newPreviousHeight = MIN_HEIGHT;
+                }
+            }
+            
+            /* What happens to us? */
+            int newHeight = (next != null) ? next.getY() - newY : getHeight() - newY;
+            
+            /* If we would get squished... */
+            if (newHeight < MIN_HEIGHT) {
+                if (next != null) {
+                    /* ... budge the window below us down a bit ... */
+                    moveTo(next, newY + MIN_HEIGHT);
+                    newHeight = next.getY() - newY;
+                } else {
+                    /** ... or refuse to be squished. */
+                    //FIXME: implement this!
+                }
+            }
+            
+            /* Let things take their course... */
+            previous.setBounds(previous.getX(), previous.getY(), previous.getWidth(), newPreviousHeight);
+            previous.invalidate();
+            previous.validate();
+            
+            current.setBounds(current.getX(), newY, current.getWidth(), newHeight);
+            current.invalidate();
+            current.validate();
+        }
+        
+        private void relayoutAfterResize() {
+            final Component[] components = getComponents();
+            if (components.length == 0) {
+                return;
+            }
+            
+            setWidthsOfComponents(components, getWidth());
+            
+            /* FIXME: this assumes that the resize actually increased the column's height. */
+            Component last = components[components.length - 1];
+            int lastBottom = last.getY() + last.getHeight();
+            if (lastBottom != getHeight()) {
+                last.setSize(getWidth(), getHeight() - last.getY());
+                last.invalidate();
+                last.validate();
+            }
+        }
+        
+        /** Ensures all the components in the column have the given width. */
+        private void setWidthsOfComponents(Component[] components, int width) {
+            for (int i = 0; i < components.length; i++) {
+                setWidthOfComponent(components[i], width);
+            }
+        }
+        
+        /** Sets the width of the given component, if it isn't already that width, and ensures that the change is noticed. */
+        private void setWidthOfComponent(Component c, int width) {
+            if (c.getWidth() == width) {
+                return;
+            }
+            /* Resize and revalidate. */
+            c.setSize(width, c.getHeight());
+            c.invalidate();
+            c.validate();
+        }
     }
 }

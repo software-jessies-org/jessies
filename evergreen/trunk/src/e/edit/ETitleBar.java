@@ -9,7 +9,7 @@ import e.util.*;
 /**
  * A simple title-bar with a label and a right-aligned close button.
  */
-public class ETitleBar extends JComponent implements MouseListener, MouseMotionListener {
+public class ETitleBar extends JComponent {
     /**
      * Ensures that all title bars correctly reflect the focus ownership of
      * their associated windows.
@@ -53,8 +53,27 @@ public class ETitleBar extends JComponent implements MouseListener, MouseMotionL
         this.closeButton = new ECloseButton(window);
         add(closeButton);
         
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        initListener();
+    }
+    
+    private void initListener() {
+        addMouseListener(new MouseAdapter() {
+            /**
+             * Gives a window focus when its title-bar is selected.
+             */
+            public void mousePressed(MouseEvent e) {
+                window.requestFocus();
+            }
+            
+            /**
+             * Expands this window to maximum size on a double-click.
+             */
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    window.expand();
+                }
+            }
+        });
     }
     
     public void checkForCounterpart() {
@@ -211,42 +230,4 @@ public class ETitleBar extends JComponent implements MouseListener, MouseMotionL
     public Dimension getMaximumSize() {
         return new Dimension(Short.MAX_VALUE, TITLE_HEIGHT);
     }
-    
-    /** Expands this window to maximum size on a double-click. */
-    public void mouseClicked(MouseEvent e) {
-        if (e.getClickCount() == 2) {
-            window.expand();
-        }
-    }
-    
-    public void mouseEntered(MouseEvent e) {
-    }
-    
-    public void mouseExited(MouseEvent e) {
-    }
-    
-    public void mouseReleased(MouseEvent e) {
-    }
-    
-    /**
-    * Keeps track of how far down the title bar the mouse button is depressed. This allows
-    * us to position the title bar correctly when we move it in the mouseDragged method.
-    *
-    * Also requests focus for the associated window.
-    */
-    public void mousePressed(MouseEvent e) {
-        pointerOffset = e.getY();
-        window.requestFocus();
-    }
-    
-    /** How far down the title bar the pointer should remain. */
-    private int pointerOffset;
-    
-    /** Causes the title bar to track the mouse's movements. */
-    public void mouseDragged(MouseEvent e) {
-        EColumn column = (EColumn) SwingUtilities.getAncestorOfClass(EColumn.class, this);
-        column.moveTo(getParent(), SwingUtilities.convertMouseEvent(this, e, column).getY() - pointerOffset);
-    }
-    
-    public void mouseMoved(MouseEvent e) { }
 }

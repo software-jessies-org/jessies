@@ -675,4 +675,12 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             Edit.showAlert("Run", "Can't start task (" + ex.getMessage() + ").");
         }
     }
+    
+    /**
+     * Implements the Comparable interface so windows can be sorted
+     * into alphabetical order by title.
+     */
+    public int compareTo(Object other) {
+        return getTitle().compareTo(((EWindow) other).getTitle());
+    }
 }

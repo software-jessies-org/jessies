@@ -459,12 +459,4 @@ public class Workspace extends JPanel {
             });
         }
     }
-    
-    public void switchToNextFile() {
-        leftColumn.switchToNextFile();
-    }
-    
-    public void switchToPreviousFile() {
-        leftColumn.switchToPreviousFile();
-    }
 }
