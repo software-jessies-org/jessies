@@ -111,8 +111,10 @@ public class FileUtilities {
         out.close();
     }
     
-    /*
-     * Tests whether filename is a symbolic link.
+    /**
+     * Tests whether filename is a symbolic link. That is, test whether
+     * the leaf is a symbolic link, not whether we need to traverse a
+     * symbolic link to get to the leaf.
      *
      * First, consider the case where the file in question is a symbolic link.
      * Say that the symbolic link:
@@ -124,6 +126,7 @@ public class FileUtilities {
      *   upThenFollow := "/u/u58/martind/kipper/include"
      *   follow       := "/u/u58/martind/kipper/libs/RCPtr/PtrTraits.h"
      *   followThenUp := "/u/u58/martind/kipper/libs/RCPtr"
+     *        => true
      *
      * Now consider the case where the file in question isn't a symbolic link
      * but something on its path is - and let's pick the case that's most
@@ -137,6 +140,7 @@ public class FileUtilities {
      *   upThenFollow := "/u/u58/martind/kipper"
      *   follow       := "/u/u58/martind/kipper/include"
      *   followThenUp := "/u/u58/martind/kipper"
+     *        => false
      */
     public static boolean isSymbolicLink(String filename) {
         File file = FileUtilities.fileFromString(filename);
