@@ -1,3 +1,14 @@
+# You may use:
+#   make
+#   make clean
+#   make dist
+#   make bindist
+
+# Your calling Makefile:
+#   must define PROJECT_NAME
+#   may append to BINDIST_FILES
+#   must include ../salma-hayek/java.make
+
 # Where are we?
 ifeq ($(MAKE_VERSION), 3.79)
     # Old versions of make (like the one Apple ships) don't
@@ -41,6 +52,35 @@ define GENERATE_CHANGE_LOG.cvs
   $(if $(shell which cvs2cl),cvs2cl,cvs2cl.pl) --hide-filenames
 endef
 
+JAR=$(if $(JAVA_HOME),$(JAVA_HOME)/bin/)jar
+CREATE_OR_UPDATE_JAR=cd $(2) && $(JAR) $(1)f $(CURDIR)/$@ -C classes $(notdir $(wildcard $(2)/classes/*))
+
+GENERATED_FILES += classes
+GENERATED_FILES += $(PROJECT_NAME).jar
+GENERATED_FILES += $(PROJECT_NAME)-bindist.tgz
+
+grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
+DIRECTORY_NAME := $(notdir $(CURDIR))
+
+BINDIST_FILES += README COPYING $(PROJECT_NAME).jar
+FILTERED_BINDIST_FILES = $(shell find $(BINDIST_FILES) -type f | grep -v CVS)
+
+define GENERATE_FILE_LIST.bk
+  cd .. && bk sfiles -g $(PROJECT_NAME)
+endef
+define GENERATE_FILE_LIST.cvs
+  cvs ls -R -P -e | perl -ne 'm/(.*):$$/ && ($$dir = "$$1/") && ($$dir =~ s@\./@@); m@^/([^/]*)/@ && print ("$(PROJECT_NAME)/$$dir$$1\n")'
+endef
+define GENERATE_FILE_LIST.svn
+  svn list -R | perl -pe 's@@$(PROJECT_NAME)/@'
+endef
+
+FILE_LIST_WITH_DIRECTORIES = $(shell $(GENERATE_FILE_LIST.$(REVISION_CONTROL_SYSTEM)))
+FILE_LIST = $(filter-out $(dir $(FILE_LIST_WITH_DIRECTORIES)),$(FILE_LIST_WITH_DIRECTORIES))
+
+# variables above
+# rules below
+
 .PHONY: build
 build: $(SOURCE_FILES)
 	@echo Recompiling the world... && \
@@ -48,8 +88,6 @@ build: $(SOURCE_FILES)
 	 mkdir -p classes && \
 	 jikes -bootclasspath $(BOOT_CLASS_PATH) -classpath $(SALMA_HAYEK)/classes -d classes/ -sourcepath src/ +D +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
 	 @#javac -d classes/ -sourcepath src/ $(SOURCE_FILES)
-
-GENERATED_FILES += classes
 
 .PHONY: clean
 clean:
@@ -62,25 +100,15 @@ dist: build
 	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
 	scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
 	cd $(if $(wildcard ../trunk),../..,..) && \
-	tar --exclude=".#*" --exclude=CVS --exclude=.svn -cvf $(TAR_FILE_OF_THE_DAY) $(PROJECT_NAME)/ && \
+	tar -cvf $(TAR_FILE_OF_THE_DAY) $(FILE_LIST) && \
+	rm -f $(TAR_FILE_OF_THE_DAY).gz && \
 	gzip $(TAR_FILE_OF_THE_DAY) && \
 	scp $(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
 	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME).tgz
 
-JAR=$(if $(JAVA_HOME),$(JAVA_HOME)/bin/)jar
-CREATE_OR_UPDATE_JAR=cd $(2) && $(JAR) $(1)f $(CURDIR)/$@ -C classes $(notdir $(wildcard $(2)/classes/*))
-
 $(PROJECT_NAME).jar: build
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
-
-GENERATED_FILES += $(PROJECT_NAME).jar
-
-grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
-DIRECTORY_NAME := $(notdir $(CURDIR))
-
-BINDIST_FILES += README COPYING $(PROJECT_NAME).jar
-FILTERED_BINDIST_FILES = $(shell find $(BINDIST_FILES) -type f | grep -v CVS)
 
 .PHONY: bindist
 bindist: $(PROJECT_NAME)-bindist.tgz
@@ -88,4 +116,6 @@ bindist: $(PROJECT_NAME)-bindist.tgz
 $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
 	@cd .. && tar -zcf $(addprefix $(DIRECTORY_NAME)/,$@ $(FILTERED_BINDIST_FILES))
 
-GENERATED_FILES += $(PROJECT_NAME)-bindist.tgz
+.PHONY: echo.%
+echo.%:
+	@echo '$($*)'
