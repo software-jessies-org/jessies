@@ -149,7 +149,7 @@ public class FindAndReplaceAction extends ETextAction {
             
             // If there were captured groups, set the tooltip. (If not, avoid setting an empty
             // tooltip, because that's not the same as no tooltip, and looks rather silly.)
-            DisplayableMatch match = (DisplayableMatch) value;
+            FindAndReplaceAction.DisplayableMatch match = (FindAndReplaceAction.DisplayableMatch) value;
             String tooltip = match.getToolTipText();
             if (tooltip.length() > 0) {
                 setToolTipText(tooltip);
