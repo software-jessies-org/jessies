@@ -250,6 +250,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void repaintHighlight(PHighlight highlight) {
+        if (isShowing() == false) {
+            return;
+        }
         PCoordinates start = getCoordinates(highlight.getStart().getIndex());
         PCoordinates end = getCoordinates(highlight.getEnd().getIndex());
         repaintLines(start.getLineIndex(), end.getLineIndex());
