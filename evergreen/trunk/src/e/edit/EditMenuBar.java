@@ -80,8 +80,9 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(makeAcceleratedItem(new CutAction(), 'X'));
         menu.add(makeAcceleratedItem(new CopyAction(), 'C'));
         menu.add(makeAcceleratedItem(new PasteAction(), 'V'));
-        // FIXME: Should be "Delete" here.
-        // FIXME: menu.add(new DefaultEditorKit.SelectAllAction());
+
+        menu.add(new JSeparator());
+        menu.add(new ShowMisspellingsAction());
 
         return menu;
     }
