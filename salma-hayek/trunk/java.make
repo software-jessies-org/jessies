@@ -46,6 +46,8 @@ DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 KNOWN_RT_JAR_LOCATIONS+=$(JAVA_HOME)/jre/lib/rt.jar
 # Apple:
 KNOWN_RT_JAR_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
+# install-everything.sh:
+KNOWN_RT_JAR_LOCATIONS+=/usr/local/jdk1.5.0/jre/lib/rt.jar
 # Fall back to searching:
 KNOWN_RT_JAR_LOCATIONS:=$(KNOWN_RT_JAR_LOCATIONS) $(shell locate /rt.jar)
 

@@ -16,6 +16,8 @@ cd /usr/local/ || die "couldn't cd to /usr/local"
 java_installer=/home/elliotth/download/jdk-1_5_0-beta2-linux-i586.bin
 if test -f $java_installer && ! test -d /usr/local/jdk1.5.0 ; then
     $java_installer || die "installing Java"
+fi
+if test -d /usr/local/jdk1.5.0 ; then
     link_in_usr_local_bin /usr/local/jdk1.5.0/bin/java
     link_in_usr_local_bin /usr/local/jdk1.5.0/bin/javac
 fi
