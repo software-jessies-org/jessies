@@ -111,7 +111,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(makeAcceleratedItem(new GotoAction(), 'L'));
         
         menu.add(new JSeparator());
-        menu.add(makeAcceleratedItemEx(new FindFilesAction(), 'G', true));
+        menu.add(makeAcceleratedItemEx(new FindFilesContainingSelectionAction(), 'G', true));
         
         return menu;
     }
