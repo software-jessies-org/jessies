@@ -9,7 +9,7 @@ import java.awt.*;
  *
  * For now, I've subclassed this and overridden getBackground.
  */
-public class Style implements StyleMutator {
+public class Style {
 	// If any of these is null, it should be ignored.  We use Boolean references because they
 	// can be used to represent 3 states - null, TRUE and FALSE.
 	private Color foreground;
@@ -28,7 +28,18 @@ public class Style implements StyleMutator {
 		this.isUnderlined = isUnderlined;
 	}
 	
-	public Style mutate(Style originalStyle) {
+	/**
+	 * Returns a new Style that represents this style's elements applied
+	 * to the given style. Any attributes which this style doesn't have
+	 * will be copied from the given style.
+	 * 
+	 * There's a small, fixed set of possible styles returned from this
+	 * method, but we don't do any optimization to take advantage of this.
+	 * We might want to reconsider that; it looks to me that something like
+	 * sweeping a selection will needlessly create lots of new Style
+	 * instances.
+	 */
+	public Style appliedTo(Style originalStyle) {
 		Color mutatedForeground = hasForeground() ? getForeground() : originalStyle.getForeground();
 		Color mutatedBackground = hasBackground() ? getBackground() : originalStyle.getBackground();
 		boolean mutatedBold = hasBold() ? isBold() : originalStyle.isBold();
