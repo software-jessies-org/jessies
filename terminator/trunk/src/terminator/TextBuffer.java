@@ -365,7 +365,7 @@ public class TextBuffer implements TelnetListener {
 		this.height = height;
 		firstScrollLineIndex = 0;
 		lastScrollLineIndex = height - 1;
-		while (textLines.size() - getFirstDisplayLine() < height) {
+		while (getFirstDisplayLine() < 0) {
 			textLines.add(new TextLine());
 		}
 	}

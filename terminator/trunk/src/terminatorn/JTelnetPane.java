@@ -263,6 +263,7 @@ public class JTelnetPane extends JPanel {
 						break;
 					case 'k': case 'K':
 						textPane.clearScrollBuffer();
+						control.sendRedrawScreen();
 						break;
 					case 'n': case 'N':
 						// TODO: Open a new window.

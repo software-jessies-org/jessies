@@ -262,6 +262,16 @@ public class TelnetControl implements Runnable {
 		}
 	}
 	
+	/** Sends a ^L (form feed, aka redraw screen request) to the process. */
+	public void sendRedrawScreen() {
+		try {
+			out.write((byte) 12);
+			out.flush();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
 	public void sendChar(char ch) {
 		try {
 			out.write((byte) ch);
