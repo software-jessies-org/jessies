@@ -1,7 +1,7 @@
 package e.ptextarea;
 
-
 import java.awt.*;
+import java.util.*;
 import javax.swing.*;
 
 public class PTextWindow {
@@ -32,8 +32,6 @@ public class PTextWindow {
                     area.setTextStyler(styler);
                 }
                 stopWatch.print("added styler");
-                //new PTextAreaSpellingChecker(area).checkSpelling();
-                stopWatch.print("added spelling checker");
                 JFrame frame = new JFrame("PTextArea Test: " + filename);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 JScrollPane scroller = new JScrollPane(area);
@@ -53,6 +51,9 @@ public class PTextWindow {
             } else if (extension.equals("c")) {
                 return new PCTextStyler(textArea);
             } else if (extension.equals("java")) {
+                HashSet set = new HashSet();
+                set.add("println");
+                textArea.putClientProperty(PTextAreaSpellingChecker.KEYWORDS_JCOMPONENT_PROPERTY, set);
                 return new PJavaTextStyler(textArea);
             }
         }

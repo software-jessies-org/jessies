@@ -31,6 +31,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private PTextStyler textStyler;
     private int rightHandMarginColumn = NO_MARGIN;
     
+    private PTextAreaSpellingChecker spellingChecker;
+    
     public PTextArea(PTextBuffer text) {
         setText(text);
         addMouseListener(new PMouseHandler(this));
@@ -49,6 +51,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         setFocusTraversalKeysEnabled(false);
         requestFocus();
         showRightHandMarginAt(80);
+        initSpellingChecking();
+    }
+    
+    private void initSpellingChecking() {
+        spellingChecker = new PTextAreaSpellingChecker(this);
+        spellingChecker.checkSpelling();
     }
     
     // Utility methods.
@@ -96,6 +104,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public void removeHighlight(PHighlight highlight) {
         highlights.remove(highlight);
         repaintHighlight(highlight);
+    }
+    
+    public List getHighlights() {
+        return Collections.unmodifiableList(highlights);
     }
     
     public void removeHighlights(PHighlightMatcher matcher) {
@@ -249,8 +261,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
-    private void repaintHighlight(PHighlight highlight) {
-        if (isShowing() == false) {
+    private synchronized void repaintHighlight(PHighlight highlight) {
+        if (splitLines == null) {
             return;
         }
         PCoordinates start = getCoordinates(highlight.getStart().getIndex());
@@ -438,11 +450,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         repaint(0, top, getSize().width, bottom - top);
     }
     
-    private void invalidateLineWrappings() {
+    private synchronized void invalidateLineWrappings() {
         splitLines = null;
     }
 
-    private void generateLineWrappings() {
+    private synchronized void generateLineWrappings() {
         if (splitLines == null) {
             splitLines = new ArrayList();
             FontMetrics metrics = getFontMetrics(getFont());
