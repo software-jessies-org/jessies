@@ -357,7 +357,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void paintComponent(Graphics oldGraphics) {
-        StopWatch watch = new StopWatch();
+        //StopWatch watch = new StopWatch();
         initCharWidthCache();
         generateLineWrappings();
         Graphics2D graphics = (Graphics2D) oldGraphics;
@@ -378,7 +378,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             paintSegments(graphics, metrics, segments, baseline, caretCoords, drawCaret, showWrap);
             baseline += metrics.getHeight();
         }
-        watch.print("Repaint");
+        //watch.print("Repaint");
     }
     
     private boolean isNextLineAContinuationOf(int index) {
