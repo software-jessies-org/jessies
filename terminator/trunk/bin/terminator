@@ -2,14 +2,21 @@
 
 UNAME=`uname`
 
-if [ "$UNAME" != "Darwin" ] && [ "$DEBUGGING_TERMINATOR" == "" ] && [ $# == 0 ]
+# Make sure we have a directory for the terminal logs.
+if [ ! -d ~/.terminal-logs ]
+then
+  mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
+fi
+
+server_port_file=~/.terminal-logs/.terminator-server-port
+if [ "$UNAME" != "Darwin" ] && [ "$DEBUGGING_TERMINATOR" == "" ] && [ $# == 0 ] && [ -f $server_port_file ]
 then
   # See if there's already a Terminator running that can open us a new window.
   # This lets us emulate the Mac OS behavior when clicking on the Dock icon
   # on Linux (from gnome-panel or whatever). In particular, using this trick
   # we can open a new window quicker than xterm(1), from the user's point of
   # view.
-  port=`cat ~/.terminal-logs/.terminator-server-port`
+  port=`cat $server_port_file`
   socket_output=`echo new | socket localhost $port 2> /dev/null`
   if [ $? == 0 ]
   then
@@ -72,12 +79,6 @@ else
   then
     cp $TERMINATOR_HOME/doc/terminfo/terminator $TERMINFO_DST
   fi
-fi
-
-# Make sure we have a directory for the terminal logs.
-if [ ! -d ~/.terminal-logs ]
-then
-  mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
 fi
 
 # If we don't have a pre-compiled 'pty' program for this
