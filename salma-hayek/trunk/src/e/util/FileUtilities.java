@@ -35,6 +35,18 @@ public class FileUtilities {
             if (filename.length() > 1) {
                 result += File.separator + filename.substring(2);
             }
+        } else if (filename.startsWith("~")) {
+            // Assume that "~user/bin/vi" is equivalent to "~/../user/bin/vi".
+            Pattern pattern = Pattern.compile("^~([^/]+)(.*)$");
+            Matcher matcher = pattern.matcher(filename);
+            if (matcher.find()) {
+                String user = matcher.group(1);
+                File home = fileFromString(System.getProperty("user.home"));
+                File otherHome = fileFromParentAndString(home.getParent().toString(), user);
+                if (otherHome.exists() && otherHome.isDirectory()) {
+                    result = otherHome.toString() + matcher.group(2);
+                }
+            }
         }
         return result;
     }
@@ -212,6 +224,12 @@ public class FileUtilities {
             startPath = startPath.substring(0, lastSeparator);
         }
         return null;
+    }
+    
+    public static void main(String[] args) {
+        for (int i = 0; i < args.length; ++i) {
+            System.err.println(parseUserFriendlyName(args[i]));
+        }
     }
     
     private FileUtilities() { /* Not instantiable. */ }
