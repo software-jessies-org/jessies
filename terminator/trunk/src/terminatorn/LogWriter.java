@@ -3,7 +3,6 @@ package terminatorn;
 import java.io.*;
 import java.text.*;
 import java.util.*;
-import e.util.*;
 
 /**
  * Logs terminal output to a file in ~/.terminal-logs. If that directory
