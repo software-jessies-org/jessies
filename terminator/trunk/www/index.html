@@ -101,9 +101,9 @@ automatically.
 
 <p>Terminator has its own terminfo file.  This will be installed in your home
 directory unless Terminator is able to write to the system-wide
-terminfo directory (which will only be the case if you run Terminator as root).
+terminfo directory. This will only be the case if you run Terminator as root.
 
-<h4>Logging in as root</h4>
+<h4>Logging in as other users/root</h4>
 <p>If the terminfo file is only installed in your home directory then you
 will see "terminal is not fully functional" problems when using <tt>su(1)</tt>
 to switch to another user (although <tt>sudo(1)</tt> will work fine).
@@ -116,13 +116,22 @@ user, and use <tt>su(1)</tt> to become root.
 
 <h4>Logging in to remote systems</h4>
 <p>You will also need to ensure that any machines you'll be remotely logging
-in to (through <tt>ssh(1)</tt>, <tt>telnet</tt> or whatever) also have a copy
-of the terminfo file installed.  This can be done by copying the terminfo file
-to <tt>~/.terminfo/t/terminator</tt> on the remote machine (you'll need
-to <tt>mkdir -p ~/.terminfo/t</tt> if the directories don't already exist).
-This is enough on most GNU-based systems, such as Linux; if you still have
-problems (if 'vi' complains that the terminal is not fully functional), add
-the following lines to <tt>~/.profile</tt> file on the remote machine:
+in to also have a copy of the terminfo file installed. If you share a home
+directory on the local and remote machine, you'll have no trouble. Likewise if
+someone has run Terminator as as root on the remote machine.
+
+<p>(Note that if you're running Terminator on a remote machine, it probably
+won't be able to open a window. Nonetheless, it will get far enough to set up
+the terminfo file. Running Terminator on a remote machine as a matter of course
+is usually a mistake. You should run Terminator locally and log in remotely.)
+
+<p>If you're not able to run Terminator as root, you can copy
+the terminfo file to <tt>~/.terminfo/t/terminator</tt> on the remote
+machine (you'll need to <tt>mkdir -p ~/.terminfo/t</tt> if the directories
+don't already exist). This is enough on most GNU-based systems, such as Linux;
+if you still have problems (if 'vi' complains that the terminal is not fully
+functional), add the following lines to <tt>~/.profile</tt> file on the remote
+machine:
 <pre>
 export TERMINFO=~/.terminfo
 export TERM=$TERM
