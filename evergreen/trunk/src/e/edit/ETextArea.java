@@ -1,7 +1,6 @@
 package e.edit;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.awt.font.*;
 import java.text.*;
@@ -28,9 +27,6 @@ public class ETextArea extends JTextArea {
     private boolean showEightyColumnMargin = false;
     
     private Indenter indenter = new Indenter();
-
-    private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
-    private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f);
     
     public ETextArea() {
         setBackground(Color.WHITE);
@@ -38,7 +34,6 @@ public class ETextArea extends JTextArea {
         setDragEnabled(false);
         setLineWrap(true);
         setMargin(new Insets(4, 4, 4, 1));
-        initFocusListener();
         getCaret().addChangeListener(new MatchingBracketHighlighter(this));
         getKeymap().setDefaultAction(new DefaultKeyAction());
     }
@@ -467,23 +462,5 @@ public class ETextArea extends JTextArea {
         // Work around "JTextComponent.setSelectionColor doesn't cause repaint" (review ID 250065; Java Bug Parade id pending).
         super.setSelectionColor(newColor);
         repaint();
-    }
-    
-    public void updateWatermark() {
-        ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, this);
-        textWindow.updateWatermark();
-    }
-
-    private void initFocusListener() {
-        addFocusListener(new FocusListener() {
-            public void focusGained(FocusEvent e) {
-                setSelectionColor(FOCUSED_SELECTION_COLOR);
-                updateWatermark();
-            }
-
-            public void focusLost(FocusEvent e) {
-                setSelectionColor(UNFOCUSED_SELECTION_COLOR);
-            }
-        });
     }
 }
