@@ -27,8 +27,6 @@ public class ETextArea extends JTextArea {
     
     private Indenter indenter = new Indenter();
     
-    private static final FindAction FIND_ACTION = new FindAction();
-    
     public ETextArea() {
         setBackground(Color.WHITE);
         setCaret(new ECaret());
@@ -36,10 +34,6 @@ public class ETextArea extends JTextArea {
         setLineWrap(true);
         setMargin(new Insets(4, 4, 4, 1));
         initColors();
-    }
-    
-    public void find(String regularExpression) {
-        FIND_ACTION.findInText((ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, this), regularExpression);
     }
     
     public void initColors() {

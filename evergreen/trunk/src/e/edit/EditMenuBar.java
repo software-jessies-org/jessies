@@ -90,7 +90,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
 
     public JMenu makeFindMenu() {
         JMenu menu = new JMenu("Find");
-        menu.add(makeAcceleratedItem(new FindAction(), 'F'));
+        menu.add(makeAcceleratedItem(FindAction.INSTANCE, 'F'));
         menu.add(makeAcceleratedItem(new FindNextAction(), 'G'));
         menu.add(makeAcceleratedItem(new FindPreviousAction(), 'D'));
         //   Use Selection for Find C-E

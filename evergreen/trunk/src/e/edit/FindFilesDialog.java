@@ -40,7 +40,7 @@ public class FindFilesDialog {
             EWindow window = Edit.openFile(workspace.getRootDirectory() + File.separator + name);
             if (window instanceof ETextWindow) {
                 ETextWindow textWindow = (ETextWindow) window;
-                textWindow.getText().find(regularExpression);
+                FindAction.INSTANCE.findInText(textWindow, regularExpression);
                 textWindow.findNext();
             }
         }

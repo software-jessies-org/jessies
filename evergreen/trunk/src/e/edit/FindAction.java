@@ -14,9 +14,11 @@ TODO:
 public class FindAction extends ETextAction implements MinibufferUser {
     public static final String ACTION_NAME = "Find...";
     
+    public static final FindAction INSTANCE = new FindAction();
+    
     public ETextWindow currentTextWindow;
     
-    public FindAction() {
+    private FindAction() {
         super(ACTION_NAME);
     }
     
