@@ -48,11 +48,30 @@ public class HyperlinkHighlighter implements Highlighter {
 	
 	private ArrayList linkers = new ArrayList();
 	{
-		linkers.add(new HyperLinker("(\\b(http|https|ftp):/*[^\\s:\"]+(:\\d+)?[/\\w\\.\\?&=\\+]*)", 1, "open $1", false));
-		linkers.add(new HyperLinker("(?:^| |\")(/[^ :\"]+\\.\\w+([\\d:]+)?)", 1, "vi $1", false));
-		linkers.add(new HyperLinker("(\\btelnet:([a-zA-Z0-9-_\\.]+))", 1, "telnet $2", true));
-		linkers.add(new HyperLinker("(\\brsh:([a-zA-Z0-9-_\\.]+))", 1, "rsh $2", true));
-		linkers.add(new HyperLinker("(\\bssh:([a-zA-Z0-9-_\\.@]+))", 1, "ssh $2", true));
+		String[] linkerNames = Options.getSharedInstance().getPropertySetNames("Highlighter");
+		for (int i = 0; i < linkerNames.length; i++) {
+			Properties info = Options.getSharedInstance().getPropertySet("Highlighter", linkerNames[i]);
+			String regexp = info.getProperty("regexp");
+			if (regexp == null) {
+				Log.warn("Missing regexp in highlighter definition " + linkerNames[i] + ".");
+				continue;
+			}
+			String openInTabString = info.getProperty("openInTab", "false");
+			boolean openInTab = openInTabString.equalsIgnoreCase("yes") || openInTabString.equalsIgnoreCase("true");
+			int highlightGroup;
+			try {
+				highlightGroup = Integer.parseInt(info.getProperty("highlightGroup", "1"));
+			} catch (NumberFormatException ex) {
+				Log.warn("Invalid highlightGroup in highlighter definition " + linkerNames[i] + " (number expected).");
+				continue;
+			}
+			String command = info.getProperty("command");
+			if (command == null) {
+				Log.warn("Missing command in highlighter definition " + linkerNames[i] + ".");
+				continue;
+			}
+			linkers.add(new HyperLinker(regexp, highlightGroup, command, openInTab));
+		}
 	}
 
 	public String getName() {
