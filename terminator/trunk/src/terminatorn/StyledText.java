@@ -61,7 +61,11 @@ public class StyledText {
 		Color result = null;
 		Options opts = Options.getSharedInstance();
 		if (isBold) {
-			result = opts.getColor("color" + (colourIndex + 8));
+			// FIXME: disabled for now until I work out how to cope with
+			// the foreground/background thing we see below. How do
+			// we know the user's chosen a light foreground and so we
+			// should use a lighter color rather than a muddy gray?
+			//result = opts.getColor("color" + (colourIndex + 8));
 		}
 		if (result == null) {
 			if (colourIndex == BLACK) {
