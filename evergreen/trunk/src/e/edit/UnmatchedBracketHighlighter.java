@@ -19,6 +19,7 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
     
     public UnmatchedBracketHighlighter(JTextComponent textComponent) {
         this.textComponent = textComponent;
+        updateHighlights();
     }
 
     private boolean isBracket(char ch) {
