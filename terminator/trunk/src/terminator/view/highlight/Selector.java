@@ -23,7 +23,7 @@ public class Selector implements ClipboardOwner, MouseListener, MouseMotionListe
 	 * in response.
 	 */
 	private class SelectionStyle extends Style implements FocusListener {
-		private final Color UNFOCUSED_SELECTION_COLOR = new Color(0.5f, 0.5f, 0.5f);
+		private final Color unfocusedSelectionColor = new Color(0.5f, 0.5f, 0.5f);
 		private boolean focused = true;
 		
 		private SelectionStyle() {
@@ -34,7 +34,7 @@ public class Selector implements ClipboardOwner, MouseListener, MouseMotionListe
 			if (focused) {
 				return super.getBackground();
 			}
-			return UNFOCUSED_SELECTION_COLOR;
+			return unfocusedSelectionColor;
 		}
 		
 		public void focusGained(FocusEvent e) {
