@@ -43,7 +43,9 @@ date=info_lines.shift
 info_lines.shift
 comment=info_lines
 
-body = ""
+subject="#{repo} revision #{rev}"
+
+body = "<html><head><title>#{subject}</title></head><body>"
 
 # Output the overview.
 body << "<p><b>#{author}</b> #{date}</p>"
@@ -58,7 +60,7 @@ body << "<hr noshade>"
 # Get and output the patch.
 changes=`#{svnlook} diff #{repo} -r #{rev}`
 body << "<pre>"
-changes.split('\n').each() {
+changes.split("\n").each() {
     |line|
     color = "black"
     if line =~ /^Modified: / || line =~ /^=+$/ || line =~ /^@@ /
@@ -68,16 +70,16 @@ changes.split('\n').each() {
     elsif line =~ /^\+/
         color = "blue"
     end
-
     body << "<font color=\"#{color}\">#{CGI.escapeHTML(line)}</font>\n"
 }
 body << "</pre>"
+body << "</body></html>"
 
 # Write the header.
 header = ""
 header << "To: #{address}\n"
 header << "From: #{address}\n"
-header << "Subject: #{repo} revision #{rev}\n"
+header << "Subject: #{subject}\n"
 header << "Reply-to: #{address}\n"
 header << "MIME-Version: 1.0\n"
 header << "Content-Type: text/html; charset=UTF-8\n"
