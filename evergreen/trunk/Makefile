@@ -24,4 +24,4 @@ dist: build
 	rm edit.log; cd ..; \
 	tar cvf $(TAR_FILE_OF_THE_DAY) edit/; \
 	gzip $(TAR_FILE_OF_THE_DAY); \
-	scp $(TAR_FILE_OF_THE_DAY).gz kenny:~/
+	scp $(TAR_FILE_OF_THE_DAY).gz kenny:~/edit/
