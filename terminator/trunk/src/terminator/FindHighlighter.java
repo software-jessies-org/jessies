@@ -11,7 +11,7 @@ public class FindHighlighter implements Highlighter {
 	/** The highlighter pen style. */
 	private final Style style = new Style(Color.black, Color.yellow, null, null);
 
-	Pattern pattern;
+	private Pattern pattern;
 	
 	public String getName() {
 		return "Find Highlighter";
@@ -21,6 +21,11 @@ public class FindHighlighter implements Highlighter {
 		view.removeHighlightsFrom(this, 0);
 		this.pattern = Pattern.compile(regularExpression);
 		addHighlights(view, 0);
+	}
+	
+	public void forgetRegularExpression(JTextBuffer view) {
+		view.removeHighlightsFrom(this, 0);
+		this.pattern = null;
 	}
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
