@@ -671,12 +671,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             }
 
             File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
-            int which = tabbedPane.getTabCount() - 1;
+            int which = tabbedPane.indexOfComponent(workspace);
             if (rootDirectory.exists() == false) {
-                tabbedPane.setEnabledAt(which, false);
+                tabbedPane.setForegroundAt(which, Color.RED);
                 tabbedPane.setToolTipTextAt(which, root + " doesn't exist.");
             } else if (rootDirectory.isDirectory() == false) {
-                tabbedPane.setEnabledAt(which, false);
+                tabbedPane.setForegroundAt(which, Color.RED);
                 tabbedPane.setToolTipTextAt(which, root + " isn't a directory.");
             }
         }
