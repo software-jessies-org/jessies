@@ -106,9 +106,9 @@ public class TelnetControl implements Runnable {
 	
 	public void announceConnectionLost(String message) {
 		try {
-			String fullMessage = message + "\n\rPress alt-d to close this tab.\n\r";
-			final byte[] bytes = fullMessage.getBytes();
+			final byte[] bytes = message.getBytes();
 			processBuffer(bytes, bytes.length);
+			pane.getTextPane().setCaretDisplay(false);
 		} catch (Exception ex) {
 			Log.warn("Couldn't say '" + message + "'.", ex);
 		}
