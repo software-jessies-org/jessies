@@ -434,6 +434,11 @@ public class TextBuffer {
 		this.insertMode = insertMode;
 	}
 
+	/**
+	 * Process the characters in the given line. The string is composed of
+	 * normal printable characters, escape sequences having been extracted
+	 * elsewhere.
+	 */
 	public void processLine(String line) {
 		TextLine textLine = get(caretPosition.getLineIndex());
 		if (insertMode) {
