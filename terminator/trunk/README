@@ -12,7 +12,7 @@ in doc/README to install the terminfo file on the target system.
 
 Terminator will attempt to guess appropriate defaults when it's first run.
 If you run Terminator on multiple windowing environments with the same
-home directory then, er, we apologize.
+home directory then hopefully you want the same settings on all of them.
 
 Send bug reports to software@jessies.org, being sure to include the
 word "Terminator" in your Subject: line.
