@@ -63,7 +63,6 @@ public class TerminalControl implements Runnable {
 		(new Thread(this, "Terminal connection listener")).start();
 	}
 
-	private boolean localEcho = false;
 	private StringBuffer lineBuffer = new StringBuffer();
 
 	public static final int ESC = 0x1b;
@@ -120,8 +119,6 @@ public class TerminalControl implements Runnable {
 			Log.warn("Couldn't say '" + message + "'.", ex);
 		}
 	}
-	
-	private boolean nextByteIsCommand = false;
 	
 	/** Must be called in the AWT dispatcher thread. */
 	public void sizeChanged(final Dimension sizeInChars, final Dimension sizeInPixels) throws IOException {

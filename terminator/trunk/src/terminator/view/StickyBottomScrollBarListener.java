@@ -9,7 +9,6 @@ import javax.swing.event.*;
 */
 
 public class StickyBottomScrollBarListener implements ChangeListener {
-	private JScrollBar bar;
 	private BoundedRangeModel model;
 	private boolean wasAtBottom = true;
 	private int maximum;
@@ -17,7 +16,6 @@ public class StickyBottomScrollBarListener implements ChangeListener {
 	private int value;
 	
 	public StickyBottomScrollBarListener(JScrollBar bar) {
-		this.bar = bar;
 		model = bar.getModel();
 		model.addChangeListener(this);
 		updateValues();
