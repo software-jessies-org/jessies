@@ -1,5 +1,9 @@
 TODO list for Edit
 
+We should keep track of 'recent files' on a per-workspace basis. We
+should also use scm's ability to find what's modified in a repository (once
+it gains this ability) to be able to offer a list of modified files too.
+
 If we open (via the system open dialog or our 'vi' script) a file that
 isn't in the workspace file list but is under the workspace root, it should
 be added to the list.
@@ -136,12 +140,6 @@ auto-saving
     [ ] we start up with the same files that were open when we quit, but we
         don't remember how much space each had (or what order they were in),
         which detracts somewhat.
-        
-    [ ] if you quit cleanly during or before the loading of open-files-list
-        then the open-files-list gets effectively truncated to the list of files
-        that Edit had opened before you quit.  This throws away a form of user
-        input, though we had said that keeping open files as a TODO list
-        suggests something bigger is missing.
 
 [ ] should have an environment variable editor (like the Windows Control
     Panel one).
