@@ -28,6 +28,7 @@ public class PtyOutputStream extends OutputStream {
 		writeValueAt(values, 6, sizeInPixels.width);
 		writeValueAt(values, 8, sizeInPixels.height);
 		out.write(values);
+		out.flush();
 	}
 	
 	private void writeValueAt(byte[] target, int offset, int value) {
@@ -48,8 +49,8 @@ public class PtyOutputStream extends OutputStream {
 				outStart = i + 1;
 			}
 		}
-		if (length < 0) {
-			out.write(values, outStart, length);
+		if (length > outStart) {
+			out.write(values, outStart, length - outStart);
 		}
 	}
 	
