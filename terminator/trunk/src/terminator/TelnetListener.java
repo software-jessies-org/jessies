@@ -11,9 +11,13 @@ the number of SwingUtilities.invokeLater calls and tiny Runnable objects.
 */
 
 public interface TelnetListener {
+	public void processActions(TelnetAction[] actions);
+
 	public void fullReset();
 	
 	public void setStyle(int style);
+	
+	public int getStyle();
 	
 	/**
 	* Process the characters in the given line.  The string is composed of normally printable

@@ -36,18 +36,34 @@ public class StyledText {
 	}
 	
 	public int getForeground() {
-		return style & FOREGROUND_MASK;
+		return getForeground(style);
 	}
 	
 	public int getBackground() {
-		return (style & BACKGROUND_MASK) >> BACKGROUND_SHIFT;
+		return getBackground(style);
 	}
 	
 	public boolean isBold() {
-		return (style & IS_BOLD) != 0;
+		return isBold(style);
 	}
 	
 	public boolean isUnderlined() {
+		return isUnderlined(style);
+	}
+	
+	public static int getForeground(int style) {
+		return style & FOREGROUND_MASK;
+	}
+	
+	public static int getBackground(int style) {
+		return (style & BACKGROUND_MASK) >> BACKGROUND_SHIFT;
+	}
+	
+	public static boolean isBold(int style) {
+		return (style & IS_BOLD) != 0;
+	}
+	
+	public static boolean isUnderlined(int style) {
 		return (style & IS_UNDERLINED) != 0;
 	}
 	
