@@ -28,6 +28,12 @@ public interface TelnetListener {
 	/** Process a special character, one of CR, LF or BS. */
 	public void processSpecialCharacter(char ch);
 	
+	/** Saves the current style and location for retrieving later. */
+	public void saveCursor();
+	
+	/** Restores the saved style and location if it was saved earlier. */
+	public void restoreCursor();
+	
 	// VT100 command support.
 	
 	/** Sets whether the caret should be displayed. */

@@ -13,13 +13,6 @@ low-level telnet protocol (RFC 854).
 @author Elliott Hughes
 */
 
-// TODO: Our way of cutting the input into little chunks to be executed separately, each in their
-// own little Runnable on the AWT dispatch thread is leading to enormous performance problems.
-// We need to sort this out, using some kind of timer and event buffer so we can set one single
-// Runnable going which will execute each command which needs doing, keeping track of all
-// screen areas which have changed, and then finally cause a redraw/size update on the GUI
-// once all the work in that parcel is done.  This should help make us fast like we should be.
-
 public class TelnetControl implements Runnable {
 	private static final boolean DEBUG = false;
 	private static final boolean DEBUG_STEP_MODE = false;
@@ -53,9 +46,9 @@ public class TelnetControl implements Runnable {
 
 	private boolean localEcho = false;
 	private StringBuffer lineBuffer = new StringBuffer();
-	
-	private boolean readingOSC = false;
-	private StringBuffer oscBuffer;
+
+	public static final int ESC = 0x1b;
+	private EscapeParser escapeParser;
 	
 	public static void doStep() {
 		if (DEBUG_STEP_MODE) {
@@ -150,27 +143,6 @@ public class TelnetControl implements Runnable {
 	
 	public void processChar(final char ch) throws IOException {
 		logWriter.append(ch);
-		if (readingOSC) {
-			if (ch == '\\' || ch == 0x7) {
-				readingOSC = false;
-				processOSC();
-			} else {
-				oscBuffer.append(ch);
-			}
-			return;
-		}
-		if (ch <= 0x7) {
-			// Most telnetd(1) implementations seem to have a bug whereby
-			// they send the NUL byte at the end of the C strings they want to
-			// output when you first connect. Since all Unixes are pretty much
-			// copy and pasted from one another these days, this silly mistake
-			// only needed to be made once.
-			
-			// Nothing below BEL is printable anyway.
-			
-			// And neither is BEL, really.
-			return;
-		}
 		if (ch == ESC) {
 			flushLineBuffer();
 			// If the old escape sequence is interrupted; we start a new one.
@@ -187,7 +159,16 @@ public class TelnetControl implements Runnable {
 			flushLineBuffer();
 			doStep();
 			processSpecialCharacter(ch);
-		} else {
+		} else if (ch > 0x7) {
+			// Most telnetd(1) implementations seem to have a bug whereby
+			// they send the NUL byte at the end of the C strings they want to
+			// output when you first connect. Since all Unixes are pretty much
+			// copy and pasted from one another these days, this silly mistake
+			// only needed to be made once.
+			
+			// Nothing below BEL is printable anyway.
+			
+			// And neither is BEL, really.
 			lineBuffer.append(ch != '\t' ? ch : ' '); // FIXME: remove this tab-mangling hack!
 		}
 	}
@@ -226,228 +207,17 @@ public class TelnetControl implements Runnable {
 			}
 		});
 	}
-
-	public static final int ESC = 0x1b;
-	
-	private EscapeParser escapeParser;
 	
 	public void processEscape() {
-		final String sequence = escapeParser.toString();
-		if (sequence.startsWith("]")) {  // This one affects the stream, so we must deal with it now.
-			readingOSC = true;
-			oscBuffer = new StringBuffer(sequence);
-			return;
-		}
+		String sequence = escapeParser.toString();
 		
 		// Invoke all escape sequence handling in the AWT dispatch thread - otherwise we'd have
 		// to create billions upon billions of tiny little invokeLater(Runnable) things all over the place.
 		doStep();
-		telnetActions.add(new TelnetAction() {
-			public void perform(TelnetListener listener) {
-				try {
-					if (DEBUG) {
-						Log.warn("Escape sequence \"" + sequence + "\"");
-					}
-					if (sequence.startsWith("[")) {
-						if (processVT100BracketSequence(sequence) == false) {
-							Log.warn("Unknown escape sequence: \"" + sequence + "\"");
-						}
-					} else if (sequence.equals("c")) {
-						// Full reset (RIS).
-						listener.fullReset();
-					} else if (sequence.equals("D")) {
-						listener.scrollDisplayDown();
-					} else if (sequence.equals("M")) {
-						listener.scrollDisplayUp();
-					} else {
-						Log.warn("Unknown escape sequence: \"" + sequence + "\"");
-					}
-				} catch (Exception ex) {
-					Log.warn("Could not process escape sequence \"" + sequence + "\"", ex);
-				}
-			}
-		});
-	}
-	
-	/**
-	 * Handles the special escape sequence from xterm, called OSC by ECMA.
-	 * From rxvt:
-	 *
-	 * XTerm escape sequences: ESC ] Ps;Pt BEL
-	 *       0 = change iconName/title
-	 *       1 = change iconName
-	 *       2 = change title
-	 *      46 = change log file (not implemented)
-	 *      50 = change font
-	 *
-	 * rxvt extensions:
-	 *      10 = menu
-	 *      20 = bg pixmap
-	 *      39 = change default fg color
-	 *      49 = change default bg color
-	 */
-	public void processOSC() {
-		String osc = oscBuffer.toString();
-		oscBuffer = null;
-		if (osc.startsWith("]2;") || osc.startsWith("]0;")) {
-			String newWindowTitle = osc.substring(3);
-			listener.setWindowTitle(newWindowTitle);
+		TelnetAction action = escapeParser.getAction(this);
+		if (action != null) {
+			telnetActions.add(action);
 		}
-	}
-	
-	public boolean processVT100BracketSequence(String sequence) {
-		char lastChar = sequence.charAt(sequence.length() - 1);
-		String midSequence = sequence.substring(1, sequence.length() - 1);
-		switch (lastChar) {
-			case 'A': return moveCursor(midSequence, 0, -1);
-			case 'B': return moveCursor(midSequence, 0, 1);
-			case 'C': return moveCursor(midSequence, 1, 0);
-			case 'c': return deviceAttributesRequest(midSequence);
-			case 'D': return moveCursor(midSequence, -1, 0);
-			case 'f': case 'H': return moveCursorTo(midSequence);
-			case 'K': return killLineContents(midSequence);
-			case 'J': return killLines(midSequence);
-			case 'L': return insertLines(midSequence);
-			case 'M': return scrollDisplayUp(midSequence);
-			case 'P': return deleteCharacters(midSequence);
-			case 'h': return setMode(midSequence, true);
-			case 'l': return setMode(midSequence, false);
-			case 'm': return processFontEscape(midSequence);
-			case 'r': return setScrollScreen(midSequence);
-			default: return false;
-		}
-	}
-	
-	public boolean scrollDisplayUp(String seq) {
-		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
-		for (int i = 0; i < count; i++) {
-			listener.scrollDisplayDown();
-		}
-		return true;
-	}
-	
-	public boolean insertLines(String seq) {
-		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
-		listener.insertLines(count);
-		return true;
-	}
-	
-	public boolean setMode(String seq, boolean value) {
-		if (seq.startsWith("?")) {
-			String[] modes = seq.substring(1).split(";");
-			for (int i = 0; i < modes.length; i++) {
-				switch (Integer.parseInt(modes[i])) {
-					case 25: listener.setCaretDisplay(value); break;
-					default: Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
-				}
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	public boolean setScrollScreen(String seq) {
-		int index = seq.indexOf(';');
-		if (index == -1) {
-			listener.setScrollScreen(-1, -1);
-		} else {
-			listener.setScrollScreen(Integer.parseInt(seq.substring(0, index)), Integer.parseInt(seq.substring(index + 1)));
-		}
-		return true;
-	}
-	
-	public boolean deviceAttributesRequest(String seq) {
-		if (seq.equals("") || seq.equals("0")) {
-			sendEscapeString("[?1;0c");
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	public boolean deleteCharacters(String seq) {
-		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
-		listener.deleteCharacters(count);
-		return true;
-	}
-	
-	public boolean killLineContents(String seq) {
-		int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
-		boolean fromStart = (type >= 1);
-		boolean toEnd = (type != 1);
-		listener.killHorizontally(fromStart, toEnd);
-		return true;
-	}
-	
-	public boolean killLines(String seq) {
-		int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
-		boolean fromTop = (type >= 1);
-		boolean toBottom = (type != 1);
-		listener.killVertically(fromTop, toBottom);
-		return true;
-	}
-	
-	public boolean moveCursorTo(String seq) {
-		int x = 1;
-		int y = 1;
-		int splitIndex = seq.indexOf(';');
-		if (splitIndex != -1) {
-			y = Integer.parseInt(seq.substring(0, splitIndex));
-			x = Integer.parseInt(seq.substring(splitIndex + 1));
-		}
-		listener.setCursorPosition(x, y);
-		return true;
-	}
-	
-	public boolean moveCursor(String countString, int xDirection, int yDirection) {
-		int count = (countString.length() == 0) ? 1 : Integer.parseInt(countString);
-		if (xDirection != 0) {
-			listener.moveCursorHorizontally(xDirection * count);
-		}
-		if (yDirection != 0) {
-			listener.moveCursorVertically(yDirection * count);
-		}
-		return true;
-	}
-	
-	public boolean processFontEscape(String sequence) {
-		int oldStyle = listener.getStyle();
-		int foreground = StyledText.getForeground(oldStyle);
-		int background = StyledText.getBackground(oldStyle);
-		boolean isBold = StyledText.isBold(oldStyle);
-		boolean isUnderlined = StyledText.isUnderlined(oldStyle);
-		String[] bits = sequence.split(";");
-		for (int i = 0; i < bits.length; i++) {
-			int value = (bits[i].length() == 0) ? 0 : Integer.parseInt(bits[i]);
-			if (valueInRange(value, 0, 8)) {
-				switch (value) {
-					case 0:
-						foreground = StyledText.BLACK;
-						background = StyledText.WHITE;
-						isBold = false;
-						isUnderlined = false;
-						break;
-					case 1: isBold = true; break;
-					case 4: isUnderlined = true; break;
-					case 7:
-						int temp = foreground;
-						foreground = background;
-						background = temp;
-						break;
-				}
-			} else if (valueInRange(value, 30, 37)) {
-				foreground = value - 30;
-			} else if (valueInRange(value, 40, 47)) {
-				background = value - 40;
-			}
-		}
-		listener.setStyle(StyledText.getStyle(foreground, background, isBold, isUnderlined));
-		return true;
-	}
-	
-	public boolean valueInRange(int value, int min, int max) {
-		return (value >= min) && (value <= max);
 	}
 	
 	public void sendEscapeString(String str) {
