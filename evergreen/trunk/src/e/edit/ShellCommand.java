@@ -48,7 +48,11 @@ public class ShellCommand {
     }
 
     public String makePassThroughVariable(String name) {
-        String result = name + "=" + System.getProperty("env." + name);
+        String value = System.getProperty("env." + name);
+        if (value == null) {
+            return "";
+        }
+        String result = name + "=" + value;
         //System.err.println("made passthrough " + result);
         return result;
     }
