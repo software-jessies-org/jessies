@@ -2,17 +2,22 @@
 # Opens files in Edit.
 # @author Elliott Hughes <enh@acm.org>
 
-def previousViOnPath()
+def getPreviousViOnPath()
     begin
         require 'pathname'
         directories = ENV["PATH"].split(':')
         executables = directories.map() {
             |directory|
             pathname = Pathname.new("#{directory}/vi")
-            pathname.exist?() ? pathname.realpath().to_s() : nil
-        }.compact().uniq()
-        executables.delete($0)
-        return executables[0]
+            pathname.exist?() ? pathname.to_s() : nil
+        }.compact()
+        lastTriedIndex = executables.rindex($0)
+        if lastTriedIndex == nil then
+            firstUntriedIndex = 0
+        else
+            firstUntriedIndex = lastTriedIndex + 1
+        end
+        return executables[firstUntriedIndex]
     rescue LoadError
         print("Unable to search for a vi to fall back on; guessing 'vim'.\n")
         return "vim"
@@ -32,8 +37,9 @@ def openFileOnLocalhost(filename)
         print(telnet.readlines().join("\n"))
         telnet.close()
     rescue
-        print("Unable to talk to Edit; trying the next vi on the path.\n")
-        system("#{previousViOnPath()} #{filename}")
+        previousViOnPath = getPreviousViOnPath()
+        print("Unable to talk to Edit; trying the next vi on the path: #{previousViOnPath}.\n")
+        system("#{previousViOnPath} #{filename}")
     end
 end
 
