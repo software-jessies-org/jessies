@@ -6,11 +6,6 @@ import javax.swing.*;
 import e.forms.*;
 import e.util.*;
 
-/**
-The ETextArea action to open file properties dialog where you can view
-or alter the end of line string, indent string, and other stuff as we
-think of it. (File encoding would be one possibility.)
-*/
 public class SetBuildTargetAction extends ETextAction {
     public static final String ACTION_NAME = "Set Build Target...";
     
