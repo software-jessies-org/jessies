@@ -21,6 +21,8 @@ low-level terminal protocol.
 public class TerminalControl implements Runnable {
 	private static final boolean DEBUG = false;
 	private static final boolean DEBUG_STEP_MODE = false;
+	private static final boolean SHOW_ASCII_RENDITION = false;
+	
 	private static BufferedReader stepModeReader;
 
 	/**
@@ -167,6 +169,15 @@ public class TerminalControl implements Runnable {
 	private static final char ASCII_ESC = 0x1b;
 	
 	private void processChar(final char ch) throws IOException {
+		// Enable this if you're having trouble working out what we're being asked to interpret.
+		if (SHOW_ASCII_RENDITION) {
+			if (ch >= ' ' || ch == '\n') {
+				System.out.print(ch);
+			} else {
+				System.out.print(".");
+			}
+		}
+		
 		logWriter.append(ch);
 		if (ch == ASCII_ESC) {
 			flushLineBuffer();
@@ -259,6 +270,10 @@ public class TerminalControl implements Runnable {
 	
 	public synchronized void processEscape() {
 		String sequence = escapeParser.toString();
+		
+		if (DEBUG) {
+			Log.warn("Processing escape sequence \"" + sequence + "\"");
+		}
 		
 		// Invoke all escape sequence handling in the AWT dispatch thread - otherwise we'd have
 		// to create billions upon billions of tiny little invokeLater(Runnable) things all over the place.
