@@ -70,8 +70,18 @@ main(int argc, char *argv[])
     else if (pid == 0) {        /* child */
         if (noecho)
             set_noecho(STDIN_FILENO);    /* stdin is slave pty */
-/*            putenv("TERM=xterm-color");*/
             putenv("TERM=terminator");
+
+        /*
+        * rxvt resets these signal handlers, and we'll do the same, because it magically
+        * fixes the bug where ^c doesn't work if we're launched from KDE or Gnome's
+        * launcher program.  I don't quite understand why - maybe bash reads the existing
+        * SIGINT setting, and if it's set to something other than DFL it lets the parent process
+        * take care of job control.
+        */
+        signal(SIGINT, SIG_DFL);
+        signal(SIGQUIT, SIG_DFL);
+        signal(SIGCHLD, SIG_DFL);
 
         if (execvp(argv[optind], &argv[optind]) < 0)
             err_sys("can't execute: %s", argv[optind]);
