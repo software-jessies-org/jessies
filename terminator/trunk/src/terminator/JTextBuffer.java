@@ -2,6 +2,7 @@ package terminatorn;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 
 /**
@@ -18,6 +19,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	private Location caretPosition = new Location(0, 0);
 	private boolean hasFocus = false;
 	private boolean displayCaret = true;
+	private HashMap highlighters = new HashMap();
 	
 	public JTextBuffer() {
 		model = new TextBuffer(this, 80, 24);
@@ -88,6 +90,22 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		return new Dimension(model.getWidth() * metrics.charWidth('W'), model.getLineCount() * metrics.getHeight());
 	}
 	
+	// Highlighting support.
+	
+	public void setHighlighter(String name, Highlighter highlighter) {
+		highlighters.put(name, highlighter);
+	}
+	
+	public Highlighter getHighlighter(String name) {
+		return (Highlighter) highlighters.get(name);
+	}
+	
+	public Highlight[] getHighlightsForLine(int lineIndex) {
+		return new Highlight[] {
+			new Highlight(null, new Location(lineIndex, 5), new Location(lineIndex, 10), new Style(null, Color.blue, null, null))
+		};
+	}
+	
 	// Redraw code.
 	
 	private void redrawCaretPosition() {
@@ -106,7 +124,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		int lastTextLine = (rect.y + rect.height + metrics.getHeight() - 1) / metrics.getHeight();
 		lastTextLine = Math.min(lastTextLine, model.getLineCount() - 1);
 		for (int i = firstTextLine; i <= lastTextLine; i++) {
-			StyledText[] lineText = model.getLineText(i);
+			StyledText[] lineText = getLineText(i);
 			int x = 0;
 			int baseline = metrics.getHeight() * (i + 1) - metrics.getMaxDescent();
 			for (int j = 0; j < lineText.length; j++) {
@@ -124,23 +142,33 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		}
 	}
 	
+	public StyledText[] getLineText(int line) {
+		StyledText[] result = model.getLineText(line);
+		Highlight[] highlights = getHighlightsForLine(line);
+		for (int i = 0; i < highlights.length; i++) {
+			result = highlights[i].applyHighlight(result, new Location(line, 0));
+		}
+		return result;
+	}
+	
 	private void paintStyledText(Graphics graphics, StyledText text, int x, int y) {
 		FontMetrics metrics = getFontMetrics(getFont());
+		Style style = text.getStyle();
 		int textWidth = metrics.stringWidth(text.getText());
 //		if (text.getBackground() != StyledText.WHITE) {
-			graphics.setColor(text.getBackground());
+			graphics.setColor(style.getBackground());
 			graphics.fillRect(x, y - metrics.getMaxAscent(), textWidth, metrics.getHeight());
 //		}
-		graphics.setColor(text.getForeground());
-		if (text.isUnderlined()) {
+		graphics.setColor(style.getForeground());
+		if (style.isUnderlined()) {
 			graphics.drawLine(x, y + 1, x + textWidth, y + 1);
 		}
 		Font oldFont = graphics.getFont();
-		if (text.isBold()) {
+		if (style.isBold()) {
 			graphics.setFont(oldFont.deriveFont(Font.BOLD));
 		}
 		graphics.drawString(text.getText(), x, y);
-		if (text.isBold()) {
+		if (style.isBold()) {
 			graphics.setFont(oldFont);
 		}
 	}

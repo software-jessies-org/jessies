@@ -26,41 +26,27 @@ public class StyledText {
 	static final int IS_UNDERLINED = 1 << 7;
 
 	private String text;
-	private Color foreground;
-	private Color background;
-	private boolean isBold;
-	private boolean isUnderlined;
+	private Style style;
 	
 	public StyledText(String text, byte style) {
 		this(text, getForegroundColour(style), getBackgroundColour(style), isBold(style), isUnderlined(style));
 	}
 	
 	public StyledText(String text, Color foreground, Color background, boolean isBold, boolean isUnderlined) {
+		this(text, new Style(foreground, background, isBold, isUnderlined));
+	}
+	
+	public StyledText(String text, Style style) {
 		this.text = text;
-		this.foreground = foreground;
-		this.background = background;
-		this.isBold = isBold;
-		this.isUnderlined = isUnderlined;
+		this.style = style;
 	}
 	
 	public String getText() {
 		return text;
 	}
 	
-	public Color getForeground() {
-		return foreground;
-	}
-	
-	public Color getBackground() {
-		return background;
-	}
-	
-	public boolean isBold() {
-		return isBold;
-	}
-	
-	public boolean isUnderlined() {
-		return isUnderlined;
+	public Style getStyle() {
+		return style;
 	}
 	
 	public static Color getForegroundColour(int style) {
@@ -133,6 +119,7 @@ public class StyledText {
 	}
 	
 	public String getDescription() {
-		return "FG " + getForeground() + ", BG " + getBackground() + ", B=" + isBold() + ", U=" + isUnderlined();
+		return "FG " + style.getForeground() + ", BG " + style.getBackground() +
+				", B=" + style.isBold() + ", U=" + style.isUnderlined();
 	}
 }
