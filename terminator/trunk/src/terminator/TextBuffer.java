@@ -68,12 +68,13 @@ public class TextBuffer implements TelnetListener {
 	public void reset() {
 		// Revert to just the right number of empty lines to fill the
 		// current window size.
+		Dimension oldSize = getCurrentSizeInChars();
 		textLines = new ArrayList();
 		setSize(width, view.getVisibleSizeInCharacters().height);
 		maxLineWidth = width;
 		
 		// Make sure all the lines will be redrawn.
-		view.sizeChanged();
+		view.sizeChanged(oldSize, getCurrentSizeInChars());
 		lineIsDirty(0);
 		
 		// Home the cursor.
@@ -262,19 +263,23 @@ public class TextBuffer implements TelnetListener {
 		this.firstLineChanged = Math.min(this.firstLineChanged, firstLineChanged);
 	}
 	
+	public Dimension getCurrentSizeInChars() {
+		return new Dimension(getMaxLineWidth(), getLineCount());
+	}
+	
 	public void processActions(TelnetAction[] actions) {
 		firstLineChanged = Integer.MAX_VALUE;
 		boolean wereAtBottom = view.isAtBottom();
-		int initialLineCount = getLineCount();
-		int initialMaxLineWidth = getMaxLineWidth();
+		Dimension initialSize = getCurrentSizeInChars();
 		for (int i = 0; i < actions.length; i++) {
 			actions[i].perform(this);
 		}
 		if (firstLineChanged != Integer.MAX_VALUE) {
 			view.linesChangedFrom(firstLineChanged);
 		}
-		if ((getLineCount() != initialLineCount) || (getMaxLineWidth() != initialMaxLineWidth)) {
-			view.sizeChanged();
+		Dimension finalSize = getCurrentSizeInChars();
+		if (initialSize.equals(finalSize) == false) {
+			view.sizeChanged(initialSize, finalSize);
 		}
 		view.scrollOnTtyOutput(wereAtBottom);
 		view.setCaretPosition(caretPosition);

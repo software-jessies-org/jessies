@@ -141,8 +141,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		setMaximumSize(size);
 		setPreferredSize(size);
 		setSize(size);
-		redoHighlightsFrom(lineHighlights.size());
 		revalidate();
+	}
+	
+	public void sizeChanged(Dimension oldSizeInChars, Dimension newSizeInChars) {
+		sizeChanged();
+		redoHighlightsFrom(oldSizeInChars.height);
 	}
 	
 	public void scrollToBottom() {
