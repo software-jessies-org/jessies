@@ -26,13 +26,10 @@ public class TextLine {
 	private static final char TAB_START = '\t';
 	private static final char TAB_CONTINUE = '\r';
 	
-	public TextLine() {
-		this("", new byte[0]);
-	}
+	private static final byte[] EMPTY_STYLES = new byte[0];
 	
-	public TextLine(String text, byte[] styles) {
-		this.text = text;
-		this.styles = styles;
+	public TextLine() {
+		clear();
 	}
 	
 	public int getLineStartIndex() {
@@ -125,7 +122,7 @@ public class TextLine {
 	
 	public void clear() {
 		text = "";
-		styles = new byte[0];
+		styles = EMPTY_STYLES;
 	}
 	
 	public void killText(int startIndex, int endIndex) {
