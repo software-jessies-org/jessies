@@ -11,12 +11,14 @@ place we do this properly at the moment.
 Did you know that vim keeps a ~/.vim/backup/ directory, containing the
 equivalent of our .bak files?
 
-I want to start implementing some of this "code completion" stuff. On the
-Mac, any text field brings up a list of choices when you hit option-Escape,
-suggested completions of the word you've typed so far. It would be good to
-offer something like that. We have the JavaDoc summary for Java, and no
-matter what we're doing we can collect all the identifiers from the current
-file and sort them. That might be handy when dealing with long identifiers.
+The completion should work for languages other than Java. We can collect
+all the identifiers from the current file and sort them, at the very
+least.
+
+We could use the completion code's list of unique identifiers to prime
+the exceptions dictionary for spelling checking. No more balking at
+words like "Highlighter", that are in the JDK but not in ispell's
+dictionary.
 
 Java 1.5:
  1. use Thread.getAllStackTraces to let us type C-\ at the UI to see what
