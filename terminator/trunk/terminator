@@ -47,7 +47,7 @@ fi
 
 if [ "$TIC" != "" ]
 then
-    tic -o$TERMINFO_DST $TERMINFO_SRC
+    tic -o$TERMINFO $TERMINFO_SRC
 else
   if [ ! -e $TERMINFO_DST ]
   then
