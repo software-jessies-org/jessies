@@ -20,7 +20,7 @@ main(int argc, char *argv[])
     noecho = 0;
     verbose = 0;
     driver = NULL;
-
+    
 #if 0
     opterr = 0;        /* don't want getopt() writing to stderr */
     while ( (c = getopt(argc, argv, "d:einv")) != EOF) {

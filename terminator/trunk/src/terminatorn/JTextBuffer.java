@@ -105,14 +105,19 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		}
 	}
 	
+	/** Returns our visible size. */
+	public Dimension getVisibleSize() {
+		JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
+		return scrollPane.getViewport().getExtentSize();
+	}
+	
 	/**
 	 * Returns our size in character units, where 'width' is the number of
 	 * columns and 'height' the number of rows. (In case you were concerned
 	 * about the fact that terminals tend to refer to y,x coordinates.)
 	 */
 	public Dimension getVisibleSizeInCharacters() {
-		JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
-		Dimension result = scrollPane.getViewport().getExtentSize();
+		Dimension result = getVisibleSize();
 		FontMetrics metrics = getFontMetrics(getFont());
 		result.width /= metrics.charWidth(' ');
 		result.height /= metrics.getHeight();

@@ -79,8 +79,7 @@ public class TextBuffer implements TelnetListener {
 	}
 
 	public void sizeChanged(Dimension sizeInChars) {
-		width = sizeInChars.width;
-		height = sizeInChars.height;
+		setSize(sizeInChars.width, sizeInChars.height);
 		int caretCharIndex = getCharIndexFromLocation(caretPosition);
 		ArrayList newLines = new ArrayList();
 		TextLine currentLine = null;
@@ -124,7 +123,10 @@ public class TextBuffer implements TelnetListener {
 		} else {
 			for (int i = 0; i < height; i++) {
 				int lineIndex = getFirstDisplayLine() + i;
-				textLines.set(lineIndex, savedScreen[i]);
+				textLines.set(lineIndex, i >= savedScreen.length ? new TextLine() : savedScreen[i]);
+			}
+			for (int i = height; i < savedScreen.length; i++) {
+				textLines.add(savedScreen[i]);
 			}
 			savedScreen = null;
 		}
@@ -344,10 +346,24 @@ public class TextBuffer implements TelnetListener {
 
 	public void setSize(int width, int height) {
 		this.width = width;
+		if (this.height > height) {
+//			if (caretPosition.getLineIndex() >= getFirstDisplayLine() + height) {
+				Log.warn("Moving caret out of harm's way.");
+				int newLineIndex = Math.max(getFirstDisplayLine(), caretPosition.getLineIndex() + height - this.height);
+				caretPosition = new Location(newLineIndex, caretPosition.getCharOffset());
+//			}
+			for (int i = 0; i < (this.height - height); i++) {
+				textLines.remove(textLines.size() - 1);
+			}
+		} else if (this.height < height) {
+			for (int i = 0; i < (height - this.height); i++) {
+				textLines.add(new TextLine());
+			}
+		}
 		this.height = height;
 		firstScrollLineIndex = 0;
 		lastScrollLineIndex = height - 1;
-		while (textLines.size() < height) {
+		while (textLines.size() - getFirstDisplayLine() < height) {
 			textLines.add(new TextLine());
 		}
 	}

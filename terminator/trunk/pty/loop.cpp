@@ -82,12 +82,12 @@ void loop(int ptym, int ignoreeof)
                 } else {
                     if (bytesInBuffer >= SIZE_STRUCT_SIZE) {  /* escapeLength + sizeof(short) * 4 */
                         struct winsize size;
-                        size.ws_row = readUnsignedShort(buff + 2);
-                        size.ws_col = readUnsignedShort(buff + 4);
+                        size.ws_col = readUnsignedShort(buff + 2);
+                        size.ws_row = readUnsignedShort(buff + 4);
                         size.ws_xpixel = readUnsignedShort(buff + 6);
                         size.ws_ypixel = readUnsignedShort(buff + 8);
-                        if (ioctl(ptym, TIOCGWINSZ, (char *) &size) < 0) {
-                            err_sys("TIOCGWINSZ error");
+                        if (ioctl(ptym, TIOCSWINSZ, (char *) &size) < 0) {
+                            err_sys("TIOCSWINSZ error");
                         }
                         bytesInBuffer -= SIZE_STRUCT_SIZE;
                         memcpy(buff, buff + SIZE_STRUCT_SIZE, bytesInBuffer);
