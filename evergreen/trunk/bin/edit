@@ -1,12 +1,23 @@
 #!/usr/bin/ruby -w
 
-require 'fileutils.rb'
-require 'pathname.rb'
-
-# Cope with symbolic links to this script.
-edit_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
+begin
+  require 'fileutils.rb'
+  have_fileutils = true
+rescue LoadError
+  have_fileutils = false
+end
+begin
+  require 'pathname.rb'
+  have_pathname = true
+  # Cope with symbolic links to this script.
+  edit_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
+  salma_hayek = Pathname.new("#{edit_home}/../salma-hayek").realpath()
+rescue LoadError
+  edit_bin = `dirname #{__FILE__}`.chomp()
+  edit_home = "#{edit_bin}/.."
+  salma_hayek = "#{edit_home}/../salma-hayek"
+end
 ENV["EDIT_HOME"] = edit_home
-salma_hayek = Pathname.new("#{edit_home}/../salma-hayek").realpath()
 
 edit_class_name = "e.edit.Edit"
 HOME = ENV["HOME"]
@@ -54,15 +65,21 @@ if File.stat(edit_preferences_directory).directory? == false
     puts("Edit: Couldn't find preferences directory '#{edit_preferences_directory}.")
     puts("Edit: Creating preferences directory '#{edit_preferences_directory}'.")
     Dir.mkdir(edit_preferences_directory)
-    puts("Edit: Copying default preferences.")
-    FileUtils.cp("#{edit_home}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
-    puts("Edit: Away you go!")
+    if have_fileutils
+      puts("Edit: Copying default preferences.")
+      FileUtils.cp("#{edit_home}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
+      puts("Edit: Away you go!")
+    else
+      puts("Edit: need Ruby 1.8")
+    end
 end
 
 # Create a log file, and link to it as the newest.
 # Symbolically linking to a file which doesn't exist yet is perfectly legal.
 edit_log = "/tmp/edit.log.#$$"
-FileUtils.ln_sf(edit_log, "/tmp/edit.log")
+if have_fileutils
+  FileUtils.ln_sf(edit_log, "/tmp/edit.log")
+end
 
 fake_environment = ""
 ["CVS_RSH", "DISPLAY", "EDIT_HOME", "HOME", "JAVA_HOME", "PATH", "SHELL"].each() {
