@@ -9,7 +9,7 @@ import e.gui.*;
 import e.util.*;
 
 /**
- * Implements simple dialogs. You provide the content (probably with a FormPanel),
+ * Implements simple dialogs. You provide the content (using FormPanel),
  * and we'll provide the buttons and basic functionality. A non-modal dialog
  * gets just a Close button; a modal dialog gets OK and Cancel, and you can
  * also provide an extra button with any label.
@@ -45,7 +45,7 @@ public class FormDialog extends JDialog {
      * some action. This means that "Close" is not a suitable label. If that's
      * what you're looking for, try the other showNonModal method.
      */
-    public static void showNonModal(Frame parent, String title, Container contentPane, String actionLabel, ActionListener listener) {
+    public static void showNonModal(Frame parent, String title, FormPanel contentPane, String actionLabel, ActionListener listener) {
         FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, null, false);
         formDialog.listener = listener;
         formDialog.setVisible(true);
@@ -55,7 +55,7 @@ public class FormDialog extends JDialog {
      * Shows a non-modal dialog with a Close button that performs no action
      * when the dialog is accepted.
      */
-    public static void showNonModal(Frame parent, String title, Container contentPane) {
+    public static void showNonModal(Frame parent, String title, FormPanel contentPane) {
         showNonModal(parent, title, contentPane, "Close", null);
     }
     
@@ -63,7 +63,7 @@ public class FormDialog extends JDialog {
      * Shows a dialog with the usual OK and Cancel buttons.
      * See the note in the class documentation about "OK" buttons.
      */
-    public static boolean show(Frame parent, String title, Container contentPane, String actionLabel) {
+    public static boolean show(Frame parent, String title, FormPanel contentPane, String actionLabel) {
         return show(parent, title, contentPane, actionLabel, null);
     }
     
@@ -72,24 +72,32 @@ public class FormDialog extends JDialog {
      * you provide.
      * See the note in the class documentation about "OK" buttons.
      */
-    public static boolean show(Frame parent, String title, Container contentPane, String actionLabel, JButton extraButton) {
+    public static boolean show(Frame parent, String title, FormPanel contentPane, String actionLabel, JButton extraButton) {
         FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, extraButton, true);
         formDialog.setVisible(true);
         return formDialog.wasAccepted();
     }
 
-    private FormDialog(Frame parent, String title, Container contentPane, String actionLabel, JButton extraButton, boolean modal) {
+    private FormDialog(Frame parent, String title, FormPanel contentPane, String actionLabel, JButton extraButton, boolean modal) {
         super(parent, title, modal);
         init(parent, contentPane, actionLabel, extraButton);
     }
     
-    private void init(Frame parent, Container contentPane, String actionLabel, JButton extraButton) {
+    private void init(Frame parent, FormPanel contentPane, String actionLabel, JButton extraButton) {
         setResizable(true);
+        
+        JComponent statusBar = contentPane.getStatusBar();
+        if (extraButton != null && statusBar != null) {
+            // It looks bad if we have a status bar and an
+            // extra button together in the row of buttons.
+            contentPane.addRow("", statusBar);
+            statusBar = null;
+        }
         
         JPanel internalContentPane = new JPanel(new BorderLayout(componentSpacing, componentSpacing));
         internalContentPane.setBorder(BorderFactory.createEmptyBorder(componentSpacing, componentSpacing, componentSpacing, componentSpacing));
         internalContentPane.add(contentPane, BorderLayout.CENTER);
-        internalContentPane.add(makeButtonPanel(getRootPane(), actionLabel, extraButton), BorderLayout.SOUTH);
+        internalContentPane.add(makeButtonPanel(getRootPane(), actionLabel, extraButton, statusBar), BorderLayout.SOUTH);
         
         setContentPane(internalContentPane);
         
@@ -173,7 +181,7 @@ public class FormDialog extends JDialog {
         return wasAccepted;
     }
 
-    private JPanel makeButtonPanel(JRootPane rootPane, String actionLabel, JButton extraButton) {
+    private JPanel makeButtonPanel(JRootPane rootPane, String actionLabel, JButton extraButton, JComponent statusBar) {
         JButton actionButton = new JButton(actionLabel);
         actionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -191,7 +199,7 @@ public class FormDialog extends JDialog {
             cancelButton.addActionListener(closeAction);
             tieButtonSizes(actionButton, cancelButton);
         }
-        return makeButtonPanel(actionButton, cancelButton, extraButton);
+        return makeButtonPanel(actionButton, cancelButton, extraButton, statusBar);
     }
     
     /**
@@ -208,14 +216,17 @@ public class FormDialog extends JDialog {
         cancelButton.setPreferredSize(buttonSize);
     }
     
-    private JPanel makeButtonPanel(JButton actionButton, JButton cancelButton, JButton extraButton) {
+    private JPanel makeButtonPanel(JButton actionButton, JButton cancelButton, JButton extraButton, JComponent statusBar) {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(0, componentSpacing, componentSpacing, componentSpacing));
         //panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        
+
         if (GuiUtilities.isWindows()) {
             // Use the traditional Windows layout.
+            if (statusBar != null) {
+                panel.add(statusBar);
+            }
             panel.add(Box.createGlue());
             panel.add(actionButton);
             if (cancelButton != null) {
@@ -230,6 +241,9 @@ public class FormDialog extends JDialog {
             // Use the Mac OS layout.
             if (extraButton != null) {
                 panel.add(extraButton);
+            }
+            if (statusBar != null) {
+                panel.add(statusBar);
             }
             panel.add(Box.createGlue());
             if (cancelButton != null) {

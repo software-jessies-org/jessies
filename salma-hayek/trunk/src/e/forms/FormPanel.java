@@ -11,6 +11,8 @@ public class FormPanel extends JPanel {
 
     private int componentSpacing;
 
+    private JComponent statusBar;
+
     public FormPanel() {
         setLayout(new GridBagLayout());
         componentSpacing = FormDialog.getComponentSpacing();
@@ -50,5 +52,19 @@ public class FormPanel extends JPanel {
         add(component, componentConstraints);
 
         nextRow++;
+    }
+
+    /**
+     * Sets the status bar that any dialog using this panel
+     * should include. Using this in preference to adding
+     * a row will give us a chance to lay out the status bar
+     * in a more appropriate manner.
+     */
+    public void setStatusBar(JComponent component) {
+        this.statusBar = component;
+    }
+
+    JComponent getStatusBar() {
+        return this.statusBar;
     }
 }
