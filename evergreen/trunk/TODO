@@ -1,8 +1,5 @@
 TODO list for Edit
 
-* Need to remove the noHighlightsSet optimization from FindAction; it's
-  no longer valid now we're sharing a FindAction.
-
 * Try basing case-sensitivity for "Open Quickly" on whether or not there's
   any capitalization in the search string. Similarly for all searches?
 

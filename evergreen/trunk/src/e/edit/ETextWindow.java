@@ -431,12 +431,12 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
     }
     
     public void findNext() {
-        FindAction.INSTANCE.repeatLastFind();
+        FindAction.INSTANCE.repeatLastFind(this);
         findHighlight(true);
     }
     
     public void findPrevious() {
-        FindAction.INSTANCE.repeatLastFind();
+        FindAction.INSTANCE.repeatLastFind(this);
         findHighlight(false);
     }
     
