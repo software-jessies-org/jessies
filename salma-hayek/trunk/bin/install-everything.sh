@@ -42,6 +42,9 @@ for PROJECT in $PROJECTS; do
     make -C $PROJECT || die "building $PROJECT"
 done
 
+rm -f ~/.terminal-logs/.terminator-server-port
+#rm -f ~/.e.edit.Edit/edit-server-port
+
 # Put links to each of our shell scripts in /usr/local/bin.
 # This avoids the need to mess with anyone's $PATH.
 scripts=`find */bin -type f -perm +1`
