@@ -32,6 +32,9 @@ public class ETextArea extends JTextArea {
     private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
     private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f);
     
+    private static final Highlighter.HighlightPainter MATCHING_BRACKET_PAINTER = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.88f, 0.88f, 0.98f));
+    private Object matchingBracketHighlight;
+    
     public ETextArea() {
         setBackground(Color.WHITE);
         setCaret(new ECaret());
@@ -39,7 +42,41 @@ public class ETextArea extends JTextArea {
         setLineWrap(true);
         setMargin(new Insets(4, 4, 4, 1));
         initFocusListener();
+        getCaret().addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                updateMatchingBracketHighlight();
+            }
+        });
         getKeymap().setDefaultAction(new DefaultKeyAction());
+    }
+    
+    private void updateMatchingBracketHighlight() {
+        // Remove any existing highlight.
+        if (matchingBracketHighlight != null) {
+            getHighlighter().removeHighlight(matchingBracketHighlight);
+            matchingBracketHighlight = null;
+        }
+        
+        // If we can match a bracket, highlight it.
+        try {
+            int offset = getCaretPosition();
+            ECaret caret = (ECaret) getCaret();
+            char ch = getCharAt(offset);
+            int matchingBracketOffset = caret.findMatchingBracket(ETextArea.this, offset);
+            if (matchingBracketOffset != -1) {
+                int start = matchingBracketOffset;
+                int end = matchingBracketOffset;
+                if (caret.isCloseBracket(ch)) {
+                    --start;
+                } else {
+                    ++end;
+                }
+                matchingBracketHighlight = getHighlighter().addHighlight(start, end, MATCHING_BRACKET_PAINTER);
+            }
+        } catch (BadLocationException ex) {
+            // Can't happen.
+            ex = ex;
+        }
     }
     
     /** Returns a fake 'preferred size' if our parent's not tall enough for us to make it as far as the display. */
