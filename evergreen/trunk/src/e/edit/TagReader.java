@@ -130,7 +130,7 @@ public class TagReader {
     }
     
     public static class Tag {
-        public String typeSortOrder = "cdeECDfgimnpst";
+        public String typeSortOrder = "cdeECDmfginpst";
         public String classSeparator = ".";
         
         public String identifier;
@@ -244,8 +244,8 @@ public class TagReader {
     }
     
     public static class CTag extends Tag {
-        public CTag(String identifier, int lineNumber, char type, String context, String containingClass) {
-            super(identifier, lineNumber, type, context, containingClass);
+        public CTag(final String identifier, final int lineNumber, final char type, final String context, final String containingClass) {
+            super(identifier, lineNumber, fixType(type), context, containingClass);
             classSeparator = "::";
             
             // Recognize a C++ destructor.
@@ -254,14 +254,23 @@ public class TagReader {
             }
         }
         
+        private static char fixType(char type) {
+            switch (type) {
+            case 'f': return 'm'; // Function -> Method.
+            case 'm': return 'f'; // Member (data) -> Field.
+            case 'p': return 'm'; // Prototype -> Method.
+            default: return type;
+            }
+        }
+        
         public String describe() {
             switch (type) {
                 case 'c': return "class " + identifier;
                 case 'd': return identifier + " macro";
                 case 'e': return identifier;
-                case 'f': return identifier + "()";
+                case 'f': return identifier;
                 case 'g': return "enum " + identifier;
-                case 'm': return identifier;
+                case 'm': return identifier + "()";
                 case 'n': return "namespace " + identifier;
                 case 'p': return identifier + " prototype";
                 case 's': return "struct " + identifier;
