@@ -102,6 +102,7 @@ public class ShellCommand {
     
     /** Invoked by StreamMonitor when one of this task's streams is opened. */
     public synchronized void streamOpened() {
+        Edit.showProgressBar();
         openStreamCount++;
     }
     
@@ -110,6 +111,7 @@ public class ShellCommand {
     * streams left open, this task has finished and Edit is notified.
     */
     public synchronized void streamClosed() {
+        Edit.hideProgressBar();
         openStreamCount--;
         if (openStreamCount == 0) {
             try {
