@@ -14,6 +14,7 @@ public class LogWriter {
 	private FileWriter stream;
 	
 	public LogWriter(String prefix) throws IOException {
+		prefix = java.net.URLEncoder.encode(prefix, "UTF-8");
 		String timestamp = dateFormatter.format(new Date());
 		String logsDirectoryName = System.getProperty("user.home") + File.separator + ".terminal-logs" + File.separator;
 		File logsDirectory = new File(logsDirectoryName);
