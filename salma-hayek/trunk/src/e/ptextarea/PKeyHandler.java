@@ -158,6 +158,10 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private void moveCaret(KeyEvent event, int newCaretLocation) {
+        if (event.isShiftDown() == false) {
+            textArea.clearSelection();
+        }
+        
         if (textArea.getCaretLocation() != newCaretLocation) {
             if (event.isShiftDown()) {
                 int otherExtreme;
@@ -167,8 +171,6 @@ public class PKeyHandler extends KeyAdapter {
                     otherExtreme = textArea.getSelectionStart();
                 }
                 textArea.select(Math.min(otherExtreme, newCaretLocation), Math.max(otherExtreme, newCaretLocation));
-            } else {
-                textArea.clearSelection();
             }
             textArea.setCaretPosition(newCaretLocation);
         }
