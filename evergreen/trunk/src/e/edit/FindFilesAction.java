@@ -11,6 +11,6 @@ public class FindFilesAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Edit.getCurrentWorkspace().showFindFilesDialog(null, null);
+        Edit.getCurrentWorkspace().showFindFilesDialog("", "");
     }
 }

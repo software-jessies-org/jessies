@@ -193,9 +193,6 @@ public class FindFilesDialog {
     }
     
     public void setFilenamePattern(String pattern) {
-        if (pattern == null) {
-            return;
-        }
         directoryField.setText(pattern);
     }
     
