@@ -49,9 +49,36 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent event) {
 				requestFocus();
+				Highlight[] lights = getHighlightsForLocation(viewToModel(event.getPoint()));
+				for (int i = 0; i < lights.length; i++) {
+					lights[i].getHighlighter().highlightClicked(JTextBuffer.this, lights[i], getText(lights[i]), event);
+				}
+			}
+		});
+		addMouseMotionListener(new MouseMotionAdapter() {
+			private Location lastLocation = new Location(-1, -1);
+
+			public void mouseMoved(MouseEvent event) {
+				Location location = viewToModel(event.getPoint());
+				if (location != lastLocation) {
+					lastLocation = location;
+					Cursor cursor = null;
+					Highlight[] lights = getHighlightsForLocation(viewToModel(event.getPoint()));
+					for (int i = 0; i < lights.length; i++) {
+						if (lights[i].getCursor() != null) {
+							cursor = lights[i].getCursor();
+							break;
+						}
+					}
+					if (cursor == null) {
+						cursor = Cursor.getDefaultCursor();
+					}
+					setCursor(cursor);
+				}
 			}
 		});
 		addHighlighter(new TheHighlighter());
+		addHighlighter(new HyperlinkHighlighter());
 	}
 	
 	public TextBuffer getModel() {
@@ -93,6 +120,13 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			this.displayCaret = displayCaret;
 			redrawCaretPosition();
 		}
+	}
+	
+	private Location viewToModel(Point point) {
+		FontMetrics metrics = getFontMetrics(getFont());
+		int lineIndex = point.y / metrics.getHeight();
+		int charOffset = point.x / metrics.charWidth('W');
+		return new Location(lineIndex, charOffset);
 	}
 	
 	private Point getLineTop(Location charCoords) {
@@ -190,6 +224,23 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		((ArrayList) lineHighlights.get(lineIndex)).add(highlight);
 	}
 	
+	public Highlight[] getHighlightsForLocation(Location location) {
+		Highlight[] lineLights = getHighlightsForLine(location.getLineIndex());
+		ArrayList result = new ArrayList();
+		for (int i = 0; i < lineLights.length; i++) {
+			Location start = lineLights[i].getStart();
+			Location end = lineLights[i].getEnd();
+			boolean startOK = (location.getLineIndex() > start.getLineIndex()) ||
+					(location.getCharOffset() >= start.getCharOffset());
+			boolean endOK = (location.getLineIndex() < end.getLineIndex()) ||
+					(location.getCharOffset() < end.getCharOffset());
+			if (startOK && endOK) {
+				result.add(lineLights[i]);
+			}
+		}
+		return (Highlight[]) result.toArray(new Highlight[result.size()]);
+	}
+	
 	/** Returns an array containing all highlights in the indexed line.  This method never returns null. */
 	public Highlight[] getHighlightsForLine(int lineIndex) {
 		if (lineIndex >= lineHighlights.size() || lineHighlights.get(lineIndex) == null) {
@@ -198,6 +249,10 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			ArrayList highlights = (ArrayList) lineHighlights.get(lineIndex);
 			return (Highlight[]) highlights.toArray(new Highlight[highlights.size()]);
 		}
+	}
+	
+	public String getText(Highlight highlight) {
+		return model.getCharSequence(highlight.getStart(), highlight.getEnd()).toString();
 	}
 	
 	// Redraw code.

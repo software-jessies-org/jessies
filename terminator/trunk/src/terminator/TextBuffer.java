@@ -86,12 +86,16 @@ public class TextBuffer implements TelnetListener {
 		return getCharSequence(0, length());
 	}
 	
+	public CharSequence getCharSequence(Location start, Location end) {
+		return getCharSequence(getCharIndexFromLocation(start), getCharIndexFromLocation(end));
+	}
+	
 	public CharSequence getCharSequence(int startIndex, int endIndex) {
 		return new Sequence(startIndex, endIndex);
 	}
 	
 	private void lineIsDirty(int dirtyLineIndex) {
-		lastValidStartIndex = Math.min(lastValidStartIndex, dirtyLineIndex - 1);
+		lastValidStartIndex = Math.min(lastValidStartIndex, dirtyLineIndex + 1);
 	}
 	
 	private void ensureValidStartIndex(int lineIndex) {

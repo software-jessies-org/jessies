@@ -22,4 +22,8 @@ public class Location {
 	public int getCharOffset() {
 		return charOffset;
 	}
+	
+	public String toString() {
+		return "Location[line " + lineIndex + ", char " + charOffset + "]";
+	}
 }
