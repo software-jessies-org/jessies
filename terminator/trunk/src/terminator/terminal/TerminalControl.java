@@ -23,7 +23,7 @@ public class TerminalControl implements Runnable {
 	private static final boolean DEBUG_STEP_MODE = false;
 	private static BufferedReader stepModeReader;
 
-	private static final int INPUT_BUFFER_SIZE = 4096;
+	private static final int INPUT_BUFFER_SIZE = 8192;
 
 	private JTerminalPane pane;
 	private TerminalListener listener;
@@ -69,7 +69,7 @@ public class TerminalControl implements Runnable {
 
 	private EscapeParser escapeParser;
 	
-	public static void doStep() {
+	public static final void doStep() {
 		if (DEBUG_STEP_MODE) {
 			try {
 				if (stepModeReader == null) {
@@ -86,13 +86,8 @@ public class TerminalControl implements Runnable {
 		try {
 			byte[] buffer = new byte[INPUT_BUFFER_SIZE];
 			int readCount;
-			int remainCount = 0;
-			while ((readCount = in.read(buffer, remainCount, buffer.length - remainCount)) != -1) {
-				// Process all unprocessed bytes in buffer, and then move any which remain
-				// processed to the front of the buffer, noting how many there are.
-				readCount += remainCount;
-				remainCount = processBuffer(buffer, readCount);
-				System.arraycopy(buffer, readCount - remainCount, buffer, 0, remainCount);
+			while ((readCount = in.read(buffer, 0, buffer.length)) != -1) {
+				processBuffer(buffer, readCount);
 			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -138,50 +133,32 @@ public class TerminalControl implements Runnable {
 	}
 	
 	/** Returns the number of bytes in buffer which remain unprocessed. */
-	private int processBuffer(byte[] buffer, int size) throws IOException {
-		int i;
-		for (i = 0; i < size; i++) {
+	private synchronized void processBuffer(byte[] buffer, int size) throws IOException {
+		for (int i = 0; i < size; i++) {
 			int value = (buffer[i]) & 0xff;  // We don't handle negative bytes well.
 			processChar((char) value);
 		}
 		flushLineBuffer();
+		
 		final TerminalAction[] actions = (TerminalAction[]) terminalActions.toArray(new TerminalAction[terminalActions.size()]);
 		terminalActions.clear();
-		synchronized (this) {
-			terminalActionsProcessed = false;
-		}
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
 					listener.processActions(actions);
-				} finally {
-					synchronized (TerminalControl.this) {
-						terminalActionsProcessed = true;
-						TerminalControl.this.notifyAll();
-					}
 				}
-			}
-		});
-		synchronized (this) {
-			if (terminalActionsProcessed == false) {
-				try {
-					wait();
-				} catch (InterruptedException ex) {
-					Log.warn("Go away.", ex);
-				}
-			}
+			});
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
-		return size - i;
 	}
-	
-	private boolean terminalActionsProcessed = true;
 	
 	private static final char ASCII_BEL = 0x07;
 	private static final char ASCII_SO = 0x0e;
 	private static final char ASCII_SI = 0x0f;
 	private static final char ASCII_ESC = 0x1b;
 	
-	public void processChar(final char ch) throws IOException {
+	private void processChar(final char ch) throws IOException {
 		logWriter.append(ch);
 		if (ch == ASCII_ESC) {
 			flushLineBuffer();
@@ -225,9 +202,9 @@ public class TerminalControl implements Runnable {
 		}
 	}
 
-	public void flushLineBuffer() {
+	private synchronized void flushLineBuffer() {
 		final String line = lineBuffer.toString();
-		lineBuffer.setLength(0);
+		lineBuffer = new StringBuffer();
 		
 		// Conform to the stated claim that the listener's always called in the AWT dispatch thread.
 		if (line.length() > 0) {
@@ -247,7 +224,7 @@ public class TerminalControl implements Runnable {
 		}
 	}
 	
-	public void processSpecialCharacter(final char ch) {
+	public synchronized void processSpecialCharacter(final char ch) {
 		terminalActions.add(new TerminalAction() {
 			public void perform(TerminalListener listener) {
 				if (DEBUG) {
@@ -272,7 +249,7 @@ public class TerminalControl implements Runnable {
 		});
 	}
 	
-	public void processEscape() {
+	public synchronized void processEscape() {
 		String sequence = escapeParser.toString();
 		
 		// Invoke all escape sequence handling in the AWT dispatch thread - otherwise we'd have
@@ -326,6 +303,15 @@ public class TerminalControl implements Runnable {
 	public void sendChar(char ch) {
 		try {
 			out.write((byte) ch);
+			out.flush();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void sendString(String s) {
+		try {
+			out.write(s.getBytes());
 			out.flush();
 		} catch (IOException ex) {
 			ex.printStackTrace();
