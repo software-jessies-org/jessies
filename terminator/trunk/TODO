@@ -31,4 +31,3 @@ Elliott's TODOs:
 [3]	Implement searching.
 [3]	Add hyperlink following support for stuff like http: mailto: and telnet:
 [1] Implement something like gnome-terminal's ability to name each tab on the command-line.
-[1] Implement X11-style "-xrm resource-string" options, rather than the whole mess of xterm options.

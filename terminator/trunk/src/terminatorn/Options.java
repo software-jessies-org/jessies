@@ -3,6 +3,7 @@ package terminatorn;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.*;
 
 /**
@@ -23,6 +24,8 @@ import java.util.regex.*;
  */
 public class Options {
 	private static final Options INSTANCE = new Options();
+	
+	private final Pattern resourcePattern = Pattern.compile("(?:XTerm|Rxvt)(?:\\*|\\.)(\\S+):\\s*(.+)");
 	
 	private HashMap options = new HashMap();
 	private HashMap rgbColours = new HashMap();
@@ -120,6 +123,24 @@ public class Options {
 	}
 	
 	/**
+	 * Parses "-xrm <resource-string>" options from an array of
+	 * command-line arguments, returning the remaining arguments as
+	 * a List.
+	 */
+	public List parseCommandLine(String[] arguments) {
+		ArrayList otherArguments = new ArrayList();
+		for (int i = 0; i < arguments.length; ++i) {
+			if (arguments[i].equals("-xrm")) {
+				String resourceString = arguments[++i];
+				processResourceString(resourceString);
+			} else {
+				otherArguments.add(arguments[i]);
+			}
+		}
+		return otherArguments;
+	}
+	
+	/**
 	 * color0 to color7 are the normal colors (black, red3, green3,
 	 * yellow3, blue3, magenta3, cyan3, and gray90).
 	 *
@@ -213,7 +234,6 @@ public class Options {
 	}
 	
 	private void readOptionsFrom(File file) throws IOException {
-		Pattern pattern = Pattern.compile("(?:XTerm|Rxvt)(?:\\*|\\.)(\\S+):\\s*(.+)");
 		LineNumberReader in = new LineNumberReader(new FileReader(file));
 		String line;
 		while ((line = in.readLine()) != null) {
@@ -221,12 +241,16 @@ public class Options {
 			if (line.length() == 0 || line.startsWith("!")) {
 				continue;
 			}
-			Matcher matcher = pattern.matcher(line);
-			if (matcher.find()) {
-				String key = matcher.group(1);
-				String value = matcher.group(2);
-				options.put(key, value);
-			}
+			processResourceString(line);
+		}
+	}
+	
+	private void processResourceString(String resourceString) {
+		Matcher matcher = resourcePattern.matcher(resourceString);
+		if (matcher.find()) {
+			String key = matcher.group(1);
+			String value = matcher.group(2);
+			options.put(key, value);
 		}
 	}
 }
