@@ -117,7 +117,7 @@ public class JTerminalPane extends JPanel {
 		
 		scrollPane = new JScrollPane(new BorderPanel(textPane));
 		scrollPane.setBorder(null);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.getViewport().setBackground(textPane.getBackground());
 		
