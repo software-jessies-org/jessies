@@ -16,7 +16,7 @@ import java.util.List;
  * @author Phil Norman
  */
 
-public class PCLikeTextStyler implements PTextStyler, PTextListener {
+public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
     private PTextArea textArea;
     private HashSet keywords = new HashSet();
     private int lastGoodLine;
@@ -49,6 +49,11 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
             keywords.add(keywordList[i]);
         }
     }
+    
+    /**
+     * Returns true if the styler should comment to end of line on seeing '#'.
+     */
+    public abstract boolean supportShellComments();
     
     public Color getDefaultColor(int index) {
         return DEFAULT_COLORS[index];
@@ -150,9 +155,8 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
                 lastStart = commentEndIndex;
                 comment = false;
             } else {
-                switch (line.charAt(i)) {
-                    /*
-                case '#':
+                char ch = line.charAt(i);
+                if (supportShellComments() && ch == '#') {
                     comment = true;
                     if (lastStart < i) {
                         result.add(new PTextSegment(TYPE_NORMAL, line.substring(lastStart, i)));
@@ -160,10 +164,7 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
                     result.add(new PTextSegment(TYPE_COMMENT, line.substring(i)));
                     i = line.length();
                     lastStart = i;
-                    break;
-                    */
-                    
-                case '/':
+                } else if (ch == '/') {
                     if (i < line.length() - 1) {
                         if (line.charAt(i + 1) == '*') {
                             comment = true;
@@ -185,10 +186,7 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
                     } else {
                         i++;
                     }
-                    break;
-                    
-                case '"':
-                case '\'':
+                } else if (ch == '"' || ch == '\'') {
                     if (lastStart < i) {
                         result.add(new PTextSegment(TYPE_NORMAL, line.substring(lastStart, i)));
                     }
@@ -212,11 +210,8 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
                         i = stringEnd;
                     }
                     lastStart = i;
-                    break;
-                    
-                default:
+                } else {
                     i++;
-                    break;
                 }
             }
         }
@@ -251,7 +246,11 @@ public class PCLikeTextStyler implements PTextStyler, PTextListener {
         return commentCache[lineIndex];
     }
     
-    /** Returns if the given line will end commented. */
+    /**
+     * Returns true if the given line will end commented. By "end commented",
+     * I think this means "end in an open comment that implies that the next
+     * line begins inside a comment".
+     */
     private boolean lineEndsCommented(String line, boolean startsCommented) {
         boolean comment = startsCommented;
         int index = 0;

@@ -55,6 +55,8 @@ public class PTextWindow {
                 set.add("println");
                 textArea.putClientProperty(PTextAreaSpellingChecker.KEYWORDS_JCOMPONENT_PROPERTY, set);
                 return new PJavaTextStyler(textArea);
+            } else if (extension.equals("rb")) {
+                return new PRubyTextStyler(textArea);
             }
         }
         return null;

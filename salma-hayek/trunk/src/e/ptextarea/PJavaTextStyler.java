@@ -25,4 +25,8 @@ public class PJavaTextStyler extends PCLikeTextStyler {
         super(textArea);
         addKeywords(KEYWORDS);
     }
+    
+    public boolean supportShellComments() {
+        return false;
+    }
 }

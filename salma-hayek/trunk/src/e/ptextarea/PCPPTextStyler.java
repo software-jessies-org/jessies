@@ -91,4 +91,8 @@ public class PCPPTextStyler extends PCLikeTextStyler {
         super(textArea);
         addKeywords(CPP_KEYWORDS);
     }
+    
+    public boolean supportShellComments() {
+        return false;
+    }
 }
