@@ -362,7 +362,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             return null;
         }
         Workspace workspace = new Workspace(name, root);
-        workspace.updateFileList(null);
         addWorkspace(workspace);
         moveFilesToBestWorkspaces();
         return workspace;
