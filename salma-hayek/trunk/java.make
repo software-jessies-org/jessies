@@ -176,18 +176,23 @@ JAVA_FLAGS.jikes += +D +P +Pall +Pno-serial +Pno-redundant-modifiers
 
 JAVA_FLAGS.gcjx += -pedantic -verbose -fverify # -error -- reinstate later!
 
-# FIXME: this needs revisiting (not simply removing) when Mac OS gets 1.5.
-ifneq "$(TARGET_OS)" "Darwin"
+# At the moment, the only platforms with 1.5 are Linux, Solaris, and Windows.
+# None of the developers use Solaris or Windows, so for now it doesn't seem
+# to matter that they're left out. 
+ifeq "$(TARGET_OS)" "Linux"
   # Until Mac OS supports 1.5, we need to avoid using 1.5-specific options.
   JAVA_FLAGS.javac += -Xlint -Xlint:-serial
   JAVA_FLAGS.javac += -Xlint:-unchecked # until Jikes supports generics
-  # We should also ensure that we build class files that can be used on
-  # Mac OS, regardless of where we build.
-  JAVA_FLAGS += -target 1.4
-  # And while we're at it, it's probably worth refusing to compile source
-  # using 1.5 features as long as we have one platform that's not ready.
-  JAVA_FLAGS += -source 1.4
 endif
+
+# We should also ensure that we build class files that can be used on
+# Mac OS, regardless of where we build.
+JAVA_FLAGS += -target 1.4
+
+# While while we're at it, it's probably worth refusing to compile source
+# using 1.5 features as long as we have one platform that's not ready.
+# This should also weed out any attempt to use a Java older than 1.4.
+JAVA_FLAGS += -source 1.4
 
 # ----------------------------------------------------------------------------
 # Variables above this point,
