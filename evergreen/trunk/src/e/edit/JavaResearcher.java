@@ -164,11 +164,21 @@ public class JavaResearcher implements WorkspaceResearcher {
                 String className = line.substring(searchTerm.length());
                 /* Just check it is actually a class in this package, and not a class in a sub-package. */
                 if (Character.isUpperCase(className.charAt(0))) {
-                    result.append("<br><a href=\"file://" + htmlFile + "\">" + className + "</a>\n");
+                    result.append("<br><a href=\"" + urlFromHtmlFile(htmlFile) + "\">" + className + "</a>\n");
                 }
             }
         }
         return result.toString();
+    }
+    
+    private String urlFromHtmlFile(String htmlFile) {
+        if (FileUtilities.exists(htmlFile)) {
+            // The file exists locally, so we can use it.
+            return "file://" + htmlFile;
+        } else {
+            // The file doesn't exist locally, so we'll have to get it direct from Sun.
+            return Parameters.getParameter("java.advisor.doc") + htmlFile.replaceAll("^.*/api/", "/");
+        }
     }
     
     public String listMethodsOrFields(String name) {
@@ -184,7 +194,8 @@ public class JavaResearcher implements WorkspaceResearcher {
             } else if (line.startsWith("Class:")) {
                 className = line.substring(6);
             } else if ((matcher = pattern.matcher(line)).find()) {
-                result.append("<br><a href=\"file://" + htmlFile + "#" + matcher.group(1) + matcher.group(2) + "\">" + matcher.group(1) + "</a> in <a href=\"file://" + htmlFile + "\">" + className + "</a>\n");
+                String url = urlFromHtmlFile(htmlFile);
+                result.append("<br><a href=\"" + url + "#" + matcher.group(1) + matcher.group(2) + "\">" + matcher.group(1) + "</a> in <a href=\"" + url + "\">" + className + "</a>\n");
             }
         }
         if (result.length() == 0) {
