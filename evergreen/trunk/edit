@@ -56,4 +56,4 @@ $JAVA $OS_SPECIFIC_OPTIONS \
     -Denv.PATH=$PATH \
     -DpreferencesDirectory=$EDIT_PREFERENCES_DIRECTORY \
     $EDIT_CLASS_NAME \
->> $EDIT_LOG 2>&1 || cat $EDIT_LOG 1>&2
+>> $EDIT_LOG 2>&1 || cat $EDIT_LOG 1>&2 &
