@@ -245,6 +245,10 @@ public class JTerminalPane extends JPanel {
 			if (isKeyboardEquivalent(event)) {
 				return;
 			}
+			if (doKeyboardScroll(event)) {
+				event.consume();
+				return;
+			}
 			String sequence = getSequenceForKeyCode(event);
 			if (sequence != null) {
 				control.sendEscapeString(sequence);
@@ -299,6 +303,40 @@ public class JTerminalPane extends JPanel {
 				}
 			}
 			event.consume();
+		}
+		
+		private boolean doKeyboardScroll(KeyEvent event) {
+			if (event.isShiftDown()) {
+				switch (event.getKeyCode()) {
+					case KeyEvent.VK_HOME:
+					case KeyEvent.VK_LEFT:
+						scrollBy(-0.5, 0);
+						return true;
+					case KeyEvent.VK_END:
+					case KeyEvent.VK_RIGHT:
+						scrollBy(0.5, 0);
+						return true;
+					case KeyEvent.VK_PAGE_UP:
+					case KeyEvent.VK_UP:
+						scrollBy(0, -0.5);
+						return true;
+					case KeyEvent.VK_PAGE_DOWN:
+					case KeyEvent.VK_DOWN:
+						scrollBy(0, 0.5);
+						return true;
+					default:
+						return false;
+				}
+			} else {
+				return false;
+			}
+		}
+		
+		private void scrollBy(double xMul, double yMul) {
+			Rectangle rect = scrollPane.getViewport().getViewRect();
+			rect.x += (int) (xMul * rect.width);
+			rect.y += (int) (yMul * rect.height);
+			textPane.scrollRectToVisible(rect);
 		}
 		
 		/**
