@@ -141,7 +141,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             int caretPosition = text.getCaretPosition();
             int lineNumber = 1 + text.getLineOfOffset(caretPosition);
             int lineStart = text.getLineStartOffset(lineNumber - 1);
-            int columnNumber = 1 + emacsDistance(caretPosition, lineStart);
+            int columnNumber = 1 + emacsDistance(text.charSequence(), caretPosition, lineStart);
             return ":" + lineNumber + ":" + columnNumber;
         } catch (BadLocationException ex) {
             return "";
@@ -496,15 +496,11 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
      * other characters to be a single cell). So we, who use characters throughout, need to
      * translate emacs offsets into real offsets.
      */
-    private int emacsWalk(int offset, int howFar) {
-        try {
-            while (--howFar > 0) {
-                char c = text.getCharAt(offset);
-                if (c == '\t') howFar -= 7;
-                offset++;
-            }
-        } catch (javax.swing.text.BadLocationException ex) {
-            ex.printStackTrace();
+    private int emacsWalk(CharSequence chars, int offset, int howFar) {
+        while (--howFar > 0) {
+            char c = chars.charAt(offset);
+            if (c == '\t') howFar -= 7;
+            offset++;
         }
         return offset;
     }
@@ -514,29 +510,26 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
      * in emacs' corrupted tabs-are-eight-spaces-and-not-characters-in-their-own-right
      * terms. Damn that program to hell.
      */
-    private int emacsDistance(int pureCaretOffset, int lineStart) {
+    private int emacsDistance(CharSequence chars, int pureCaretOffset, int lineStart) {
         int result = 0;
-        try {
-            for (int offset = lineStart; offset < pureCaretOffset; offset++) {
-                char c = text.getCharAt(offset);
-                if (c == '\t') result += 7;
-                result++;
-            }
-        } catch (javax.swing.text.BadLocationException ex) {
-            ex.printStackTrace();
+        for (int offset = lineStart; offset < pureCaretOffset; offset++) {
+            char c = chars.charAt(offset);
+            if (c == '\t') result += 7;
+            result++;
         }
         return result;
     }
     
     public void jumpToAddress(String address) {
         try {
+            CharSequence chars = text.charSequence();
             StringTokenizer st = new StringTokenizer(address, ":");
             int line = Integer.parseInt(st.nextToken()) - 1;
             int offset = text.getLineStartOffset(line);
             int maxOffset = text.getLineEndOffset(line) - 1;
             if (st.hasMoreTokens()) {
                 try {
-                    offset = emacsWalk(offset, Integer.parseInt(st.nextToken()));
+                    offset = emacsWalk(chars, offset, Integer.parseInt(st.nextToken()));
                 } catch (NumberFormatException ex) {
                     ex = ex;
                 }
@@ -557,7 +550,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             if (st.hasMoreTokens()) {
                 try {
                     // emacs end offsets seem to include the character following.
-                    endOffset = emacsWalk(endOffset, Integer.parseInt(st.nextToken())) + 1;
+                    endOffset = emacsWalk(chars, endOffset, Integer.parseInt(st.nextToken())) + 1;
                 } catch (NumberFormatException ex) {
                     ex = ex;
                 }

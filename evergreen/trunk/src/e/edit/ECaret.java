@@ -91,7 +91,7 @@ public class ECaret extends DefaultCaret {
     
     private static final String PARTNERS = ")>]}{[<(";
     
-    public boolean isBracket(char ch) {
+    public static boolean isBracket(char ch) {
         return BRACKETS.indexOf(ch) != -1;
     }
     
@@ -103,12 +103,8 @@ public class ECaret extends DefaultCaret {
         return isBracket(ch) && isOpenBracket(ch) == false;
     }
     
-    public char getPartnerForBracket(char bracket) {
+    public static char getPartnerForBracket(char bracket) {
         return PARTNERS.charAt(BRACKETS.indexOf(bracket));
-    }
-    
-    public char getCharAt(int offset) throws BadLocationException {
-        return getComponent().getDocument().getText(offset, 1).charAt(0);
     }
     
     /* Some handy examples to try the bracket matching on.
@@ -120,32 +116,33 @@ public class ECaret extends DefaultCaret {
     */
     
     /** Returns the offset of the matching bracket, or -1. */
-    public int findMatchingBracket(int offset) throws BadLocationException {
+    public int findMatchingBracket(int offset) {
         //Log.warn("findMatchingBracket(offset="+offset+")");
-        char bracket = getCharAt(offset);
+        ETextArea textArea = (ETextArea) getComponent();
+        CharSequence chars = textArea.charSequence();
+        char bracket = chars.charAt(offset);
         if (isCloseBracket(bracket)) {
-            return findMatchingBracket(offset, false);
+            return findMatchingBracket(chars, offset, false);
         }
-        if (offset > 0 && isOpenBracket(getCharAt(offset - 1))) {
-            return findMatchingBracket(offset - 1, true);
+        if (offset > 0 && isOpenBracket(chars.charAt(offset - 1))) {
+            return findMatchingBracket(chars, offset - 1, true);
         }
         return -1;
     }
     
     /** Returns the offset of the matching bracket, scanning in the given direction, or -1. */
-    public int findMatchingBracket(int offset, boolean scanForwards) throws BadLocationException {
+    private static int findMatchingBracket(CharSequence chars, int offset, boolean scanForwards) {
         //Log.warn("findMatchingBracket(offset="+offset+",scanForwards="+scanForwards+")");
-        char bracket = getCharAt(offset);
+        char bracket = chars.charAt(offset);
         if (isBracket(bracket) == false) {
             return -1;
         }
-        JTextComponent text = getTextComponent();
         char partner = getPartnerForBracket(bracket);
         int nesting = 1;
         int step = scanForwards ? +1 : -1;
-        int stop = scanForwards ? text.getDocument().getLength() : 0;
+        int stop = scanForwards ? chars.length() : 0;
         for (offset += step; nesting != 0 && offset != stop; offset += step) {
-            char ch = getCharAt(offset);
+            char ch = chars.charAt(offset);
             if (ch == bracket) {
                 nesting++;
             } else if (ch == partner) {

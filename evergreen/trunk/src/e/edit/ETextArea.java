@@ -396,11 +396,6 @@ public class ETextArea extends JTextArea {
         return new DocumentCharSequence(getDocument());
     }
     
-    /** Returns the character at the given offset in the document, . */
-    public char getCharAt(int offset) throws BadLocationException {
-        return getDocument().getText(offset, 1).charAt(0);
-    }
-    
     /**
      * Returns the word up to but not past the caret. The intended use is
      * working out what to offer as completions in AutoCompleteAction.
@@ -408,10 +403,11 @@ public class ETextArea extends JTextArea {
     public String getWordUpToCaret() {
         String word = "";
         try {
+            CharSequence chars = charSequence();
             int end = getCaretPosition();
             int start = end;
             while (start > 0) {
-                char ch = getCharAt(start - 1);
+                char ch = chars.charAt(start - 1);
                 if (ch != '_' && Character.isLetterOrDigit(ch) == false) {
                     break;
                 }

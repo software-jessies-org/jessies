@@ -31,10 +31,11 @@ public class BackspaceAction extends TextAction {
         int position = target.getCaretPosition();
         String whitespace = target.getIndentationOfLineAtOffset(position);
         int lineOffset = position - target.getLineStartOffset(target.getLineOfOffset(position));
+        CharSequence chars = target.charSequence();
         if (Parameters.getParameter("hungryDelete", false)) {
             int startPosition = position - 1;
-            if (Character.isWhitespace(target.getCharAt(startPosition))) {
-                while (startPosition > 0 && Character.isWhitespace(target.getCharAt(startPosition - 1))) {
+            if (Character.isWhitespace(chars.charAt(startPosition))) {
+                while (startPosition > 0 && Character.isWhitespace(chars.charAt(startPosition - 1))) {
                     startPosition--;
                     charactersToDelete++;
                 }

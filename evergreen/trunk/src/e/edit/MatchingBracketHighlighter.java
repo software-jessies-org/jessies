@@ -46,13 +46,15 @@ public class MatchingBracketHighlighter implements ChangeListener {
         
         try {
             int offset = textComponent.getCaretPosition();
+            ETextArea textArea = (ETextArea) textComponent;
+            CharSequence chars = textArea.charSequence();
             ECaret caret = (ECaret) textComponent.getCaret();
             Highlighter highlighter = textComponent.getHighlighter();
-            char ch = caret.getCharAt(offset);
+            char ch = chars.charAt(offset);
             if (caret.isCloseBracket(ch)) {
                 matchingBracketHighlights[0] = highlighter.addHighlight(offset, offset + 1, MATCHING_BRACKET_PAINTER);
             } else if (offset > 0) {
-                char previousChar = caret.getCharAt(offset - 1);
+                char previousChar = chars.charAt(offset - 1);
                 if (caret.isOpenBracket(previousChar)) {
                     matchingBracketHighlights[0] = highlighter.addHighlight(offset - 1, offset, MATCHING_BRACKET_PAINTER);
                 }
