@@ -44,7 +44,7 @@ public class FilePropertiesAction extends ETextAction {
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);
-        boolean okay = FormDialog.show(Edit.getFrame(), "File Properties", formPanel);
+        boolean okay = FormDialog.show(Edit.getFrame(), "File Properties", formPanel, "Apply");
         
         if (okay == false) {
             return;

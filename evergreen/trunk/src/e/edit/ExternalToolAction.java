@@ -76,7 +76,7 @@ public class ExternalToolAction extends ETextAction {
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Command:", commandField);
         formPanel.addRow("Directory:", contextField);
-        boolean shouldRun = FormDialog.show(Edit.getFrame(), (String) getValue(Action.NAME), formPanel);
+        boolean shouldRun = FormDialog.show(Edit.getFrame(), (String) getValue(Action.NAME), formPanel, "Run");
         command = commandField.getText();
         context = contextField.getText();
 
