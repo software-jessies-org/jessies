@@ -24,19 +24,10 @@ public class Workspace extends JPanel {
     public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
         this.title = title;
-        this.rootDirectory = normalizeRootDirectory(rootDirectory);
+        this.rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
         
         add(makeUI(), BorderLayout.CENTER);
         updateFileList();
-    }
-    
-    /** Substitutes friendly names for canonical ones. */
-    public static String normalizeRootDirectory(String rootDirectory) {
-        rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
-        if (rootDirectory.endsWith(File.separator) == false) {
-            rootDirectory += File.separator;
-        }
-        return rootDirectory;
     }
     
     /**
