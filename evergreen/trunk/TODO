@@ -126,11 +126,6 @@ auto-saving
 [ ] should have an environment variable editor (like the Windows Control
     Panel one).
 
-[ ] upon performing 'new file', and including a non-existent directory as
-    part of the new filename, the directory should be created too, i think.
-    perhaps with a 'you've either mistyped that, or you want a new
-    directory as well, don't you?' kind of message.  
-
 [ ] We could support automatic "bk edit"ing of files using this command:
 
         bk sfiles -v ValidDeque.h

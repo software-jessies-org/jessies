@@ -26,20 +26,28 @@ public class NewFileAction extends ETextAction {
             filenameField.setPathname(window.getContext());
         }
 
-        FormPanel formPanel = new FormPanel();
-        formPanel.addRow("Filename:", filenameField);
-        boolean okay = FormDialog.show(Edit.getFrame(), "New File", formPanel, "Create");
-        
-        if (okay == false) {
-            return;
-        }
-        
-        createNewFile(filenameField.getPathname());
+        do {
+            FormPanel formPanel = new FormPanel();
+            formPanel.addRow("Filename:", filenameField);
+            boolean okay = FormDialog.show(Edit.getFrame(), "New File", formPanel, "Create");
+            
+            if (okay == false) {
+                return;
+            }
+        } while (createNewFile(filenameField.getPathname()) == false);
     }
 
-    public void createNewFile(String filename) {
+    public boolean createNewFile(String filename) {
         try {
             File newFile = FileUtilities.fileFromString(filename);
+            File directory = newFile.getParentFile();
+            if (directory.exists() == false) {
+                boolean createDirectory = Edit.askQuestion("New File", "The directory '" + directory + "' doesn't exist. Edit can either create the directory for you, or you can go back and re-type the filename.", "Create");
+                if (createDirectory == false) {
+                    return false;
+                }
+                directory.mkdirs();
+            }
             boolean created = newFile.createNewFile();
             if (created) {
                 Edit.getCurrentWorkspace().updateFileList(null);
@@ -48,9 +56,11 @@ public class NewFileAction extends ETextAction {
                 Edit.showAlert("Create", "File '" + filename + "' already exists.");
             }
             Edit.openFile(filename);
+            return true;
         } catch (IOException ex ) {
             ex.printStackTrace();
             Edit.showAlert("Create", "Failed to create file '" + filename + "' (" + ex.getMessage() + ").");
+            return false;
         }
     }
     
