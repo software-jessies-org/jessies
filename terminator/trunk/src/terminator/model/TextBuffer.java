@@ -318,7 +318,9 @@ public class TextBuffer implements TerminalListener {
 		final int firstDisplayLine = getFirstDisplayLine();
 		lineIsDirty(firstDisplayLine);
 		if (index > firstDisplayLine + lastScrollLineIndex) {
-			textLines.add(index, lineToInsert);
+			for (int i = firstDisplayLine + lastScrollLineIndex + 1; i <= index; i++) {
+				textLines.add(i, lineToInsert);
+			}
 			if (usingAlternativeBuffer() || (firstScrollLineIndex > 0)) {
 				// If the program has defined scroll bounds, newline-adding actually chucks away
 				// the first scroll line, rather than just scrolling everything upwards like we normally
@@ -390,10 +392,10 @@ public class TextBuffer implements TerminalListener {
 	public void processLine(String line) {
 		TextLine textLine = get(caretPosition.getLineIndex());
 		if (insertMode) {
-//			Log.warn("Inserting text \"" + line + "\" at " + caretPosition + ".");
+			Log.warn("Inserting text \"" + line + "\" at " + caretPosition + ".");
 			textLine.insertTextAt(caretPosition.getCharOffset(), line, currentStyle);
 		} else {
-//			Log.warn("Writing text \"" + line + "\" at " + caretPosition + ".");
+			Log.warn("Writing text \"" + line + "\" at " + caretPosition + ".");
 			textLine.writeTextAt(caretPosition.getCharOffset(), line, currentStyle);
 		}
 		textAdded(line.length());
@@ -497,6 +499,8 @@ public class TextBuffer implements TerminalListener {
 		// Note that here we also transform from 1-based coordinates to 0-based.
 		x = (x == -1) ? caretPosition.getCharOffset() : Math.max(0, x - 1);
 		y = (y == -1) ? caretPosition.getLineIndex() : Math.max(0, y - 1);
+		x = Math.min(x, width - 1);
+		y = Math.min(y, height - 1);
 
 		caretPosition = new Location(y + getFirstDisplayLine(), x);
 	}
