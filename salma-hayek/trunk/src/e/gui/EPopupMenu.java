@@ -46,7 +46,7 @@ public class EPopupMenu {
     
     /** Creates a MenuItem from an EAction and a location. */
     public JMenuItem createMenuItem(final Action action, final int x, final int y) {
-        JMenuItem menuItem = new JMenuItem((String) action.getValue(action.NAME));
+        JMenuItem menuItem = new JMenuItem((String) action.getValue(Action.NAME));
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 action.actionPerformed(new ActionEvent(new Point(x, y), e.getID(), e.getActionCommand(), e.getModifiers()));

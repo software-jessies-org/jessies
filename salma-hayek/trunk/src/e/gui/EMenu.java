@@ -8,7 +8,7 @@ public class EMenu extends Menu {
         super(name);
         for (int i = 0; i < items.length; i++) {
             if (items[i] != null) {
-                MenuItem item = new MenuItem((String) items[i].getValue(items[i].NAME));
+                MenuItem item = new MenuItem((String) items[i].getValue(Action.NAME));
                 item.addActionListener(items[i]);
                 add(item);
             } else {
