@@ -20,15 +20,104 @@ public class HyperlinkHighlighter implements Highlighter {
 	
 	private String directory = "~/";
 	
-	/**
-	 * This regular expression deliberately matches too much. We narrow it down a bit later.
+	/*
+	 * The regular expression constructed below deliberately matches too
+	 * much. We look more closely at its matches later on.
+	 * 
+	 * We build the expression up in pieces, because it's
+	 * complicated, and difficult to understand. Note the uses of ?> to
+	 * prevent backtracking. The regular expression this replaced used to
+	 * contain three points where backtracking could occur, and the output
+	 * of something like
+	 * 
+	 *   perl -e 'print "x" x 100_000 . "\n"'
+	 * 
+	 * could really bring Terminator to a complete stop for four whole
+	 * minutes. We're now down to ~40ms on the same machine, which is
+	 * a decimal order of magnitude worse than Perl, suggesting a missing
+	 * optimization.
+	 * 
+	 * Thanks to Markus Laker for this optimized regular expression.
 	 */
-	private Pattern pattern = Pattern.compile("(?:^| |\")([^ :\"]+(?:Makefile|\\w+\\.\\w+)([\\d:]+)?)");
+	
+	/**
+	 * A filename can start at the beginning of a line, after a quote, or
+	 * after whitespace.
+	 */
+	private static final String START = "(?: ^ | \" | \\s )";
+	
+	/**
+	 * A filename can end at the end of a line, before a quote, or before
+	 * whitespace.
+	 */
+	private static final String END = "(?: $ | \" | \\s )";
+	
+	/**
+	 * The (optional) directory part of a filename must end in a slash,
+	 * and may not contain whitespace, quotes, or colons.
+	 */
+	private static final String DIRECTORY = "(?> [^\\s:\"] * / ) ?";
+	
+	/**
+	 * The mandatory leaf part of a filename can either be "Makefile", or
+	 * non-whitespace before a '.' followed by non-whitespace. But there
+	 * has to be a '.', or we assume it's uninteresting.
+	 * 
+	 * The character class subtraction (a Java extension) lets us match
+	 * names such as "sigwinch-test.cpp" while keeping our non-backtracking
+	 * match of names containing a '.'.
+	 */
+	private static final String NAME = "Makefile | (?> [\\S && [^\\.]]+ ) \\. \\S+";
+	
+	/**
+	 * We're actually looking for a grep-style address, where there's an
+	 * optional :line:column:line:column sequence after the filename itself.
+	 * We're sloppy, and allow any combination of digits and colons.
+	 */
+	private static final String ADDRESS = "( [\\d:] + )?";
+	
+	/** The complete pattern. */
+	private static final Pattern PATTERN =
+		Pattern.compile("(?x)" +
+	                        START +
+	                        "(" + DIRECTORY + NAME + ADDRESS + ")" +
+	                        END);
 	
 	/**
 	 * This is the group within 'pattern' that should be taken as a filename.
 	 */
 	private int relevantGroup = 1;
+	
+	/**
+	 * Puts off work until we've not been asked to do anything for a while.
+	 * The code that calls us to addHighlights does so rather eagerly, and
+	 * that can really hurt when we're looking at a very long line.
+	 */
+	private class WorkDeferrer implements ActionListener {
+		private Timer timer;
+		private JTextBuffer view;
+		private int firstLineIndex;
+		
+		public WorkDeferrer() {
+			this.timer = new Timer(100, this);
+			this.timer.setRepeats(false);
+			this.firstLineIndex = Integer.MAX_VALUE;
+		}
+		
+		public void defer(JTextBuffer view, int lineIndex) {
+			this.view = view;
+			this.firstLineIndex = Math.min(firstLineIndex, lineIndex);
+			timer.restart();
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			reallyAddHighlights(view, firstLineIndex);
+			this.view = null;
+			this.firstLineIndex = Integer.MAX_VALUE;
+		}
+	}
+	
+	private WorkDeferrer workDeferrer = new WorkDeferrer();
 	
 	public String getName() {
 		return "Hyperlink Highlighter";
@@ -43,24 +132,36 @@ public class HyperlinkHighlighter implements Highlighter {
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
 	public int addHighlights(JTextBuffer view, int firstLineIndex) {
+		workDeferrer.defer(view, firstLineIndex);
+		return 0;
+	}
+	
+	/**
+	 * Invoked by the WorkDeferrer when it's time to do some work.
+	 */
+	private void reallyAddHighlights(JTextBuffer view, int firstLineIndex) {
 		TextBuffer model = view.getModel();
-		int count = 0;
 		for (int i = firstLineIndex; i < model.getLineCount(); i++) {
 			String line = model.getLine(i);
-			count += addHighlightsOnLine(view, i, line);
+			addHighlightsOnLine(view, i, line);
 		}
-		return count;
 	}
 	
 	private int addHighlightsOnLine(JTextBuffer view, int lineIndex, String text) {
+		if (text.length() == 0) {
+			return 0;
+		}
+		
 		int count = 0;
-		Matcher matcher = pattern.matcher(text);
+		//long startTime = System.currentTimeMillis();
+		Matcher matcher = PATTERN.matcher(text);
 		while (matcher.find()) {
 			/*
 			 * We're most useful in providing links to grep matches, so we
 			 * need to avoid being confused by stuff like File.java:123.
 			 */
 			String name = matcher.group(relevantGroup);
+			System.err.println(name);
 			int colonIndex = name.indexOf(':');
 			if (colonIndex != -1) {
 				name = name.substring(0, colonIndex);
@@ -86,12 +187,13 @@ public class HyperlinkHighlighter implements Highlighter {
 			view.addHighlight(highlight);
 			++count;
 		}
+		//System.err.println("addHighlightsOnLine (text.length() = " + text.length() + ") took " + (System.currentTimeMillis() - startTime) + " ms");
 		return count;
 	}
 
 	/** Request to do something when the user clicks on a Highlight generated by this Highlighter. */
 	public void highlightClicked(final JTextBuffer view, Highlight highlight, String text, MouseEvent event) {
-		Matcher matcher = pattern.matcher(text);
+		Matcher matcher = PATTERN.matcher(text);
 		while (matcher.find()) {
 			final String command = getEditor() + " " + matcher.group(relevantGroup);
 			ProcessUtilities.ProcessListener listener = new ProcessUtilities.ProcessListener() {
