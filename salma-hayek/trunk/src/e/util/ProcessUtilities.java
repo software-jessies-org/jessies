@@ -33,10 +33,14 @@ public class ProcessUtilities {
     public static int backQuote(final File directory, final String[] command, final LineListener outputLineListener, final LineListener errorLineListener) {
         ArrayList result = new ArrayList();
         try {
-            Process p = Runtime.getRuntime().exec(command, null, directory);
+            final Process p = Runtime.getRuntime().exec(command, null, directory);
             p.getOutputStream().close();
             readLinesFromStream(outputLineListener, p.getInputStream());
-            readLinesFromStream(errorLineListener, p.getErrorStream());
+            new Thread(new Runnable() {
+                public void run() {
+                    readLinesFromStream(errorLineListener, p.getErrorStream());
+                }
+            }).start();
             return p.waitFor();
         } catch (Exception ex) {
             ex.printStackTrace();
