@@ -303,15 +303,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     /** Returns the workspace whose root directory shares the longest common prefix with the given filename. */
-    public static Workspace getBestWorkspaceForFilenameWithExclusion(String filename, Workspace excludingWorkspace) {
+    public static Workspace getBestWorkspaceForFilename(String filename) {
         Workspace[] workspaces = getWorkspaces();
         int bestIndex = 0;
         int bestLength = 0;
         for (int i = 0; i < workspaces.length; i++) {
             Workspace workspace = workspaces[i];
-            if (workspace == excludingWorkspace) {
-                continue;
-            }
             String workspaceRoot = workspace.getRootDirectory();
             if (filename.startsWith(workspaceRoot)) {
                 int length = workspaceRoot.length();
@@ -322,10 +319,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             }
         }
         return workspaces[bestIndex];
-    }
-    
-    public static Workspace getBestWorkspaceForFilename(String filename) {
-        return getBestWorkspaceForFilenameWithExclusion(filename, null);
     }
     
     public static Workspace getCurrentWorkspace() {
@@ -377,7 +370,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
         Workspace workspace = new Workspace(name, root);
         addWorkspace(workspace);
-        reassessFileToWorkspaceMapping();
+        moveFilesToBestWorkspaces();
         return workspace;
     }
     
@@ -399,11 +392,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return true;
     }
     
-    public static void reassessFileToWorkspaceMapping() {
+    public static void moveFilesToBestWorkspaces() {
         Workspace[] workspaces = getWorkspaces();
         for (int i = 0; i < workspaces.length; i++) {
             Workspace workspace = workspaces[i];
-            workspace.reassessFileToWorkspaceMapping();
+            workspace.moveFilesToBestWorkspaces();
         }
     }
     
@@ -412,12 +405,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         if (workspace == null) {
             return;
         }
-        workspace.tryToMoveFilesToOtherWorkspaces();
-        if (workspace.isEmpty()) {
-            tabbedPane.remove(workspace);
-        } else {
-            Edit.showAlert("Edit", "The workspace '" + workspace.getTitle() + "' is not empty.");
+        if (getWorkspaces().length == 1) {
+            Edit.showAlert("Edit", "Cannot remove the last workspace.");
+            return;
         }
+        tabbedPane.remove(workspace);
+        workspace.moveFilesToBestWorkspaces();
     }
     
     public static void createWorkspaceForCurrentDirectory() {
