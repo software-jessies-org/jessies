@@ -583,6 +583,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             String currentContentInMemory = getText().getText();
             String currentContentOnDisk = StringUtilities.readFile(file);
             if (currentContentInMemory.equals(currentContentOnDisk)) {
+                lastModifiedTime = file.lastModified();
                 return false;
             }
         } catch (Exception ex) {
