@@ -1,5 +1,11 @@
 TODO list for Edit
 
+Title bar text:
+ 1. Don't show repository root prefix in title bars?
+ 2. Intelligently truncate titles too long for the title bar?
+
+Sort windows alphabetically?
+
 Subversion ignores the following by default; maybe we should hard-code
 something similar in Edit? I'd like to remove more of edit.properties,
 and at least only have it contain differences from some sensible default
