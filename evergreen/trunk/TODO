@@ -185,7 +185,7 @@ auto-saving
 [ ] Cursor movement infelicities/bugs.
 
     [ ] I'd be interested in making caseChangesLikeThis count
-        as word breaks.
+        as word breaks. (Xcode 1.5 does this with control + arrow keys.)
 
     [ ] Mac OS X and Windows: 'Up' should go to the start of the document
         if on the first line, not stay still (worked in 1.3.1, but Sun
