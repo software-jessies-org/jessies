@@ -425,7 +425,7 @@ public class TerminatorMenuBar extends JMenuBar {
 	public static class NextTerminalAction extends AbstractAction {
 		public NextTerminalAction() {
 			super("Next Terminal");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("RIGHT"));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(GuiUtilities.isMacOs() ? "RIGHT" : "PAGE_DOWN"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -439,7 +439,7 @@ public class TerminatorMenuBar extends JMenuBar {
 	public static class PreviousTerminalAction extends AbstractAction {
 		public PreviousTerminalAction() {
 			super("Previous Terminal");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("LEFT"));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(GuiUtilities.isMacOs() ? "LEFT" : "PAGE_UP"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
