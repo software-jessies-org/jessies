@@ -19,10 +19,6 @@ Unassigned TODOs:
 [1]	cursorColor should default to foreground rather than black.
 [1]	Shouldn't log while in alternate buffer mode.
 
-If we find life is unbearable without line wrapping:
-[1]	Get the wrapping toggle on/off to wrap/unwrap the text when triggered.
-[1]	Fix line wrapping so it really works properly, including getting highlighters to ignore fake line breaks.
-
 
 
 Phil's TODOs:

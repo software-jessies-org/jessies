@@ -267,9 +267,6 @@ public class JTelnetPane extends JPanel {
 					case 'n': case 'N':
 						// TODO: Open a new window.
 						break;
-					case 'r': case 'R':
-						textPane.getModel().setIsWrapping(! textPane.getModel().isWrapping());
-						break;
 					case 't': case 'T':
 						controller.openShellPane(true);
 						break;

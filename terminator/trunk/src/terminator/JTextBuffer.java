@@ -381,7 +381,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			int lineStart = (i == start.getLineIndex()) ? start.getCharOffset() : 0;
 			int lineEnd = (i == end.getLineIndex()) ? end.getCharOffset() : textLine.length();
 			buf.append(textLine.getTabbedText(lineStart, lineEnd));
-			if ((i != end.getLineIndex()) && textLine.hasNewline()) {
+			if (i != end.getLineIndex()) {
 				buf.append('\n');
 			}
 		}
