@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import e.gui.*;
 import e.util.*;
 
@@ -28,7 +29,7 @@ public class Workspace extends JPanel {
         this.rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
         
         add(makeUI(), BorderLayout.CENTER);
-        updateFileList();
+        updateFileList(null);
     }
     
     /**
@@ -37,12 +38,28 @@ public class Workspace extends JPanel {
      * list until the real one comes along. This means that clients should
      * never cache the result from getFileList.
      */
-    public void updateFileList() {
-        new Thread(new Runnable() {
-            public void run() {
-                fileList = scanWorkspaceForFiles();
+    public void updateFileList(ChangeListener listener) {
+        FileListUpdater fileListUpdater = new FileListUpdater(listener);
+        fileListUpdater.doScan();
+    }
+    
+    public class FileListUpdater extends SwingWorker {
+        ChangeListener listener;
+        FileListUpdater(ChangeListener listener) {
+            this.listener = listener;
+        }
+        public void doScan() {
+            start();
+        }
+        public Object construct() {
+            fileList = scanWorkspaceForFiles();
+            return fileList;
+        }
+        public void finished() {
+            if (listener != null) {
+                listener.stateChanged(null);
             }
-        }).start();
+        }
     }
     
     public String getTitle() {

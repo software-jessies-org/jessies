@@ -42,7 +42,7 @@ public class NewFileAction extends ETextAction {
             File newFile = FileUtilities.fileFromString(filename);
             boolean created = newFile.createNewFile();
             if (created) {
-                Edit.getCurrentWorkspace().updateFileList();
+                Edit.getCurrentWorkspace().updateFileList(null);
                 fillWithInitialContents(newFile);
             } else {
                 Edit.showAlert("Create", "File '" + filename + "' already exists.");

@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import e.forms.*;
 import e.gui.*;
 
@@ -19,8 +20,10 @@ import e.gui.*;
 public class OpenQuicklyDialog {
     private FileNamePatternField filenameField = new FileNamePatternField();
     private JList matchList;
+    private JLabel status = new JLabel(" ");
     
     private boolean haveSearched;
+    private boolean notRescanning;
     private DefaultListModel model;
     private PatternSyntaxException patternSyntaxException;
     
@@ -73,7 +76,7 @@ public class OpenQuicklyDialog {
         matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
+                if (notRescanning && e.getClickCount() == 2) {
                     int index = matchList.locationToIndex(e.getPoint());
                     String filename = (String) matchList.getModel().getElementAt(index);
                     Edit.openFile(workspace.getRootDirectory() + File.separator + filename);
@@ -99,14 +102,46 @@ public class OpenQuicklyDialog {
         filenameField.setText(filenamePattern);
     }
     
+    class RescanAction extends AbstractAction implements ChangeListener {
+        private JButton source;
+        
+        public RescanAction() {
+            super("Rescan");
+        }
+        
+        /**
+         * Hides any previous results and starts the rescan.
+         */
+        public void actionPerformed(ActionEvent e) {
+            source = (JButton) e.getSource();
+            source.setEnabled(false);
+            notRescanning = false;
+            switchToFakeList();
+            workspace.updateFileList(this);
+        }
+        
+        /**
+         * Responsible for providing some visual feedback that we're rescanning.
+         */
+        private void switchToFakeList() {
+            model = new DefaultListModel();
+            model.addElement("... rescan in progress ...");
+            matchList.setModel(model);
+        }
+        
+        /**
+         * Searches again when the file list has finished being updated.
+         */
+        public void stateChanged(ChangeEvent e) {
+            notRescanning = true;
+            showMatches();
+            source.setEnabled(true);
+            source = null;
+        }
+    }
+    
     public JButton makeRescanButton() {
-        JButton rescanButton = new JButton("Rescan");
-        rescanButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                workspace.updateFileList();
-            }
-        });
-        return rescanButton;
+        return new JButton(new RescanAction());
     }
     
     public void showDialog() {
@@ -119,6 +154,7 @@ public class OpenQuicklyDialog {
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Names Containing:", filenameField);
         formPanel.addRow("Matches:", new JScrollPane(matchList));
+        formPanel.addRow("", status);
         boolean okay = FormDialog.show(Edit.getFrame(), "Open Quickly", formPanel, makeRescanButton());
         
         if (okay == false) {
