@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.gui.*;
 import e.util.*;
 
 public class Workspace extends JPanel {
@@ -16,7 +17,7 @@ public class Workspace extends JPanel {
     private String title;
     private String rootDirectory;
     private OpenQuicklyDialog openQuicklyDialog;
-    private FileDialog openDialog;
+    private EFileOpenDialog openDialog;
     private FileDialog saveAsDialog;
     private FindFilesDialog findFilesDialog;
     
@@ -432,13 +433,12 @@ public class Workspace extends JPanel {
     
     public void showOpenDialog() {
         if (openDialog == null) {
-            openDialog = new FileDialog(Edit.getFrame(), "Open", FileDialog.LOAD);
-            openDialog.setDirectory(getRootDirectory());
+            openDialog = new EFileOpenDialog(Edit.getFrame(), getRootDirectory());
         }
         openDialog.show();
-        String leafname = openDialog.getFile();
-        if (leafname != null) {
-            Edit.openFile(openDialog.getDirectory() + File.separator + leafname);
+        String name = openDialog.getFile();
+        if (name != null) {
+            Edit.openFile(name);
         }
     }
 
