@@ -11,7 +11,7 @@ import e.util.*;
  * as a DocumentListener to your JTextComponent.
  */
 public class UnmatchedBracketHighlighter implements DocumentListener {
-    private static final Highlighter.HighlightPainter PAINTER = new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 0, 0, 128));
+    private static final Highlighter.HighlightPainter PAINTER = new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 0, 0, 32));
     
     private JTextComponent textComponent;
 
