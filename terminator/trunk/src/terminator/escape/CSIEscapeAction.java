@@ -175,7 +175,7 @@ public class CSIEscapeAction implements TelnetAction {
 		String[] bits = sequence.split(";");
 		for (int i = 0; i < bits.length; i++) {
 			int value = (bits[i].length() == 0) ? 0 : Integer.parseInt(bits[i]);
-			if (valueInRange(value, 0, 8)) {
+			if (valueInRange(value, 0, 29)) {
 				switch (value) {
 					case 0:
 						foreground = StyledText.BLACK;
@@ -190,6 +190,7 @@ public class CSIEscapeAction implements TelnetAction {
 						foreground = background;
 						background = temp;
 						break;
+					case 24: isUnderlined = false; break;
 				}
 			} else if (valueInRange(value, 30, 37)) {
 				foreground = value - 30;
