@@ -3,6 +3,7 @@
 
 #include <fcntl.h>
 #include <grp.h>
+#include <signal.h>
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
