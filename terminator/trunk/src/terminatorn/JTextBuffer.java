@@ -172,7 +172,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public void sizeChanged(Dimension oldSizeInChars, Dimension newSizeInChars) {
 		sizeChanged();
-		redoHighlightsFrom(oldSizeInChars.height);
+		redoHighlightsFrom(Math.min(oldSizeInChars.height, newSizeInChars.height));
 	}
 	
 	public void scrollToBottom() {
@@ -369,7 +369,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			}
 			lineHighlights.set(lineIndex, new ArrayList());
 		}
-		((ArrayList) lineHighlights.get(lineIndex)).add(highlight);
+		ArrayList line = (ArrayList) lineHighlights.get(lineIndex);
+		if (line.indexOf(highlight) == -1) {
+			line.add(highlight);
+		}
 	}
 	
 	/**

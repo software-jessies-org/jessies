@@ -49,6 +49,10 @@ public class Highlight {
 	public Cursor getCursor() {
 		return cursor;
 	}
+	
+	public String toString() {
+		return "Highlight[" + highlighter + " from " + start + " to " + end + "]";
+	}
 
 	/**
 	* Returns a modified set of styled text regions based upon the set passed in, which are
