@@ -148,18 +148,21 @@ public class FindAndReplaceAction extends ETextAction {
 
     public class DisplayableMatch {
         private String html;
-        private String tooltip;
+        private String toolTip;
+        private int lineNumber;
 
-        public DisplayableMatch(String line, String regex, String replacement) {
-            this.html = colorize(line, regex, replacement);
-            this.tooltip = "unimplemented";
+        public DisplayableMatch(final int lineNumber, final Matcher matcher, final String line, final String regularExpression, final String replacement) {
+            this.lineNumber = lineNumber;
+            this.html = colorize(line, regularExpression, replacement);
+            this.toolTip = makeToolTip(matcher);
         }
 
         public void doubleClick() {
+            textWindow.goToLine(lineNumber);
         }
         
         public String getToolTipText() {
-            return tooltip;
+            return toolTip;
         }
         
         public String makeToolTip(Matcher matcher) {
@@ -184,15 +187,15 @@ public class FindAndReplaceAction extends ETextAction {
         private static final String RED_ON = "<font color=red>";
         private static final String BLUE_ON = "<font color=blue>";
 
-        public String colorize(String line, String regex, String replacement) {
+        public String colorize(String line, String regularExpression, String replacement) {
             String colorOn = BLUE_ON;
             if (replacement == null) {
-                regex = "(" + regex + ")";
+                regularExpression = "(" + regularExpression + ")";
                 replacement = "$1";
                 colorOn = RED_ON;
             }
             replacement = "\u0000" + replacement + "\u0001";
-            Pattern pattern = Pattern.compile(regex);
+            Pattern pattern = Pattern.compile(regularExpression);
             html = pattern.matcher(line).replaceAll(replacement);
             StringBuffer buffer = new StringBuffer(html);
             for (int i = 0; i < buffer.length(); ++i) {
@@ -263,12 +266,13 @@ public class FindAndReplaceAction extends ETextAction {
                             return null;
                         }
                         ++matchCount;
+                        final int lineNumber = 1 + i;
                         
                         // Record the match.
-                        matchModel.addElement(new DisplayableMatch(line, regex, null));
+                        matchModel.addElement(new DisplayableMatch(lineNumber, matcher, line, regex, null));
                         
                         // Record the rewritten line.
-                        replacementsModel.addElement(new DisplayableMatch(line, regex, replacement));
+                        replacementsModel.addElement(new DisplayableMatch(lineNumber, matcher, line, regex, replacement));
                     }
                 }
             } catch (PatternSyntaxException ex) {

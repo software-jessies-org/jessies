@@ -29,21 +29,11 @@ spelling checking:
 
 symbolic links: given that we don't really (see FIXME in FileUtilities) recognize symbolic links properly, how about having "Add Workspace" automatically use the canonical path of whatever path you give it? though that might look ugly, and it is kind of doing exactly what someone's presumably trying to avoid by using a symbolic link: remembering a specific path that may change.
 
-Find/Replace
-
-    [ ] Find/Replace is broken for matches that span lines. (Try a find pattern
-        that contains "\n", for example.) [there's also a file "find-test.txt".]
-        
-        Martin just successfully deleted whole lines matching " *MONK\n",
-        although the Matches and Replacements boxes were empty. The problem
-        being that we use the Pattern.MULTILINE flag; " *MONK$" would have
-        looked right and worked. But this isn't generally true: "a\nb" is
-        not the same as "a$b".
-
-    [ ] Some way of marking submatch groups: the whole match is marked in
-        red or blue, but it would be good to also see the submatches within
-        that. At least some way of showing $1="hello", $2="world" as we used
-        to in the tool tip.
+Find/Replace:
+ 1. Find/Replace is broken for matches that span lines. (Try a find pattern that contains "\n", for example.) [there's also a file "find-test.txt".] Martin just successfully deleted whole lines matching " *MONK\n", although the Matches and Replacements boxes were empty. The problem being that we use the Pattern.MULTILINE flag; " *MONK$" would have looked right and worked. But this isn't generally true: "a\nb" is not the same as "a$b".
+ 2. Some way of marking submatch groups: the whole match is marked in red or blue, but it would be good to also see the submatches within that.
+ 3. If we're only going to act on the selection, we should only show matches in the selection.
+ 4. Should be able to select matches/replacements, and only apply the selected ones.
 
 [ ] parse the javadoc in the background as soon as Edit starts, and hope
     that it's ready by the time you want to use it. the delays from parsing
