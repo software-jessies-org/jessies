@@ -36,20 +36,22 @@ int ptym_open(std::string& pts_name) {
 int ptym_open(std::string& pts_name) {
     int ptmx_fd = open("/dev/ptmx", O_RDWR);
     if (ptmx_fd < 0) {
-        return -1;
+        panic("failed to open /dev/ptmx");
     }
-    
+
     const char* name = ptsname(ptmx_fd);
     if (name == 0) {
-        return -1;
+        std::ostringstream oss;
+        oss << ptmx_fd;
+        panic("failed to get ptsname for fd", oss.str().c_str());
     }
     pts_name = name;
     
     if (grantpt(ptmx_fd) != 0) {
-        return -1;
+        panic("failed to get grantpt", name);
     }
     if (unlockpt(ptmx_fd) != 0) {
-        return -1;
+        panic("failed to get unlockpt", name);
     }
     
     return ptmx_fd;
@@ -57,7 +59,7 @@ int ptym_open(std::string& pts_name) {
 
 #endif
 
-int ptys_open(int fdm, const char* pts_name) {
+int ptys_open(const char* pts_name) {
     struct group* grptr = getgrnam("tty");
     gid_t gid = (grptr != NULL) ? grptr->gr_gid : gid_t(-1);
     
@@ -66,8 +68,7 @@ int ptys_open(int fdm, const char* pts_name) {
     
     int fds = open(pts_name, O_RDWR);
     if (fds < 0) {
-        close(fdm);
-        return -1;
+        panic("failed to open", pts_name);
     }
     return fds;
 }
