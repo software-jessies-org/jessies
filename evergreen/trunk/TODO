@@ -218,15 +218,6 @@ auto-saving
     Canonicalization of filenames has provided a certainly adequate
     and probably superior solution to that part of the problem.
 
-[ ] Finish the tags support.
-
-    [ ] Like Ed says, we should probably have some kind of timer that
-        makes sure we keep the tags up-to-date as we edit (because the
-        focus won't be changing while we're making edits). My current
-        feeling is that what we probably want is a timer that's (re)started
-        each time a newline is entered (because only line changes are
-        significant?) and which causes a tags scan if it fires.
-
 [ ] Something like iCal's/Outlook's to-do list. Keep a pair of files at
     the root of a workspace: TODO and TODONE, say. Complete a task and
     (when you quit? after a fixed interval?) it moves to TODONE.
