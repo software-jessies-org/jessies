@@ -11,15 +11,63 @@ import java.util.*;
 public class PJavaTextStyler extends PCLikeTextStyler {
     
     private static final String[] KEYWORDS = new String[] {
-        // Keywords as defined in the java language specification.
-        "abstract", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue",
-        "default", "do", "double", "else", "extends", "final", "finally", "float", "for", "goto",
-        "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package",
-        "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized",
-        "this", "throw", "throws", "transient", "try", "void", "volatile", "while",
+        // JLS3, section 3.9: "Keywords"
+        "abstract",
+        "assert",
+        "boolean",
+        "break",
+        "byte",
+        "case",
+        "catch",
+        "char",
+        "class",
+        "const",
+        "continue",
+        "default",
+        "do",
+        "double",
+        "else",
+        "enum",
+        "extends",
+        "final",
+        "finally",
+        "float",
+        "for",
+        "if",
+        "goto",
+        "implements",
+        "import",
+        "instanceof",
+        "int",
+        "interface",
+        "long",
+        "native",
+        "new",
+        "package",
+        "private",
+        "protected",
+        "public",
+        "return",
+        "short",
+        "static",
+        "strictfp",
+        "super",
+        "switch",
+        "synchronized",
+        "this",
+        "throw",
+        "throws",
+        "transient",
+        "try",
+        "void",
+        "volatile",
+        "while",
         
-        // Technically these are literals, not keywords, but I'll treat them the same way anyway.
-        "true", "false", "null",
+        // JLS3, section 3.10.3: "Boolean Literals"
+        "true", "false",
+        
+        // JLS3, section 3.10.7: "The Null Literal"
+        "null",
     };
     
     public PJavaTextStyler(PTextArea textArea) {
