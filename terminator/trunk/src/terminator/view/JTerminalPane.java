@@ -497,6 +497,10 @@ public class JTerminalPane extends JPanel {
 	
 	public void doCloseAction() {
 		control.destroyProcess();
-		controller.closeTerminalPane(JTerminalPane.this);
+		getTerminatorFrame().closeTerminalPane(this);
+	}
+	
+	private TerminatorFrame getTerminatorFrame() {
+		return (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, this);
 	}
 }
