@@ -129,6 +129,7 @@ public class TextBuffer implements TelnetListener {
 			int index = getFirstDisplayLine() + i;
 			linesChangedFrom(index);
 		}
+		view.repaint();
 	}
 	
 	/** Returns true when the alternative buffer is in use. */
