@@ -264,11 +264,12 @@ public class TagsUpdater {
         public void finished() {
             if (progressTimer.isRunning() == false) {
                 Edit.getTagsPanel().hideProgressBar();
-            }
-            progressTimer.stop();
-            if (tagsHaveNotChanged) {
-                isRunning = false;
-                return;
+            } else {
+                progressTimer.stop();
+                if (tagsHaveNotChanged) {
+                    isRunning = false;
+                    return;
+                }
             }
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
