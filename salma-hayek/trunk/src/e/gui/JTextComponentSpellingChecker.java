@@ -385,8 +385,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
      */
     public static class UnderlineHighlightPainter extends LayeredHighlighter.LayerPainter {
         private static final boolean DASHED = GuiUtilities.isMacOs();
-        private static final Color COLOR = new Color(255, 0, 0, DASHED ? 128 : 72);
-        private static final Stroke DASHED_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 2.0f, 3.0f }, 0.0f);
+        private static final Color COLOR = new Color(255, 0, 0, DASHED ? 160 : 72);
         
         public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
             // Do nothing: this method will never be called
@@ -410,14 +409,26 @@ public class JTextComponentSpellingChecker implements DocumentListener {
             return r;
         }
         
+        /**
+         * Draws a dashed line by hand. I don't know why I couldn't persuade
+         * BasicStroke to draw a 2-pixel wide line, but I couldn't. The "- 1"s
+         * here are because the Rectangle is using a half-open range and line
+         * drawing uses closed ranges. I've heard the rationale for that, but
+         * I still think it causes more trouble than it solves the problem of
+         * drawing outlines of filled shapes. Surely the right solution is to
+         * have separate fill and outline colors for shape drawing?
+         */
         private void paintDashedLine(Graphics2D g, Rectangle r) {
-            int baseline = r.y + r.height - 1;
-            r.y += 2; r.height -= 2;
+            final int MARK = 3;
+            final int SPACE = 1;
             
-            Stroke originalStroke = g.getStroke();
-            g.setStroke(DASHED_STROKE);
-            g.drawLine(r.x, baseline, r.x + r.width, baseline);
-            g.setStroke(originalStroke);
+            final int baseline = r.y + r.height - 1;
+            final int stop = r.x + r.width - 1;
+            for (int x = r.x; x < stop; x += (MARK + SPACE)) {
+                int endX = Math.min(x + MARK - 1, stop);
+                g.drawLine(x, baseline, endX, baseline);
+                g.drawLine(x, baseline - 1, endX, baseline - 1);
+            }
         }
         
         private void paintWavyHorizontalLine(Graphics g, int x1, int x2, int y) {
