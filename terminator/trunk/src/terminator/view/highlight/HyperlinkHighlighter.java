@@ -63,11 +63,14 @@ public class HyperlinkHighlighter implements Highlighter {
 	 * non-whitespace before a '.' followed by non-whitespace. But there
 	 * has to be a '.', or we assume it's uninteresting.
 	 * 
-	 * The character class subtraction (a Java extension) lets us match
-	 * names such as "sigwinch-test.cpp" while keeping our non-backtracking
-	 * match of names containing a '.'.
+	 * The first character class subtraction (a Java extension) lets us
+	 * match names such as "sigwinch-test.cpp" while keeping our
+	 * non-backtracking match of names containing a '.'.
+	 * 
+	 * The second character class subtraction stops us matching run-on
+	 * text in a grep match like "file.cpp:123:#if 0".
 	 */
-	private static final String NAME = "Makefile | (?> [\\S && [^\\.]]+ ) \\. \\S+";
+	private static final String NAME = "(?: Makefile | (?> [\\S && [^\\.]]+ ) \\. [\\S && [^:]]+ )";
 	
 	/**
 	 * We're actually looking for a grep-style address, where there's an
