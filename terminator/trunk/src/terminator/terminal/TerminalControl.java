@@ -1,7 +1,6 @@
 package terminator.terminal;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
@@ -163,10 +162,13 @@ public class TerminalControl implements Runnable {
 		}
 	}
 	
-	private static final char ASCII_BEL = 0x07;
-	private static final char ASCII_SO = 0x0e;
-	private static final char ASCII_SI = 0x0f;
-	private static final char ASCII_ESC = 0x1b;
+	/**
+	 * According to vttest, these cursor movement characters are still
+	 * treated as such, even when they occur within an escape sequence.
+	 */
+	private final boolean countsTowardsEscapeSequence(char ch) {
+		return (ch != Ascii.BS && ch != Ascii.CR && ch != Ascii.VT);
+	}
 	
 	private void processChar(final char ch) throws IOException {
 		// Enable this if you're having trouble working out what we're being asked to interpret.
@@ -179,7 +181,7 @@ public class TerminalControl implements Runnable {
 		}
 		
 		logWriter.append(ch);
-		if (ch == ASCII_ESC) {
+		if (ch == Ascii.ESC) {
 			flushLineBuffer();
 			// If the old escape sequence is interrupted; we start a new one.
 			if (escapeParser != null) {
@@ -188,21 +190,21 @@ public class TerminalControl implements Runnable {
 			escapeParser = new EscapeParser();
 			return;
 		}
-		if (escapeParser != null) {
+		if (escapeParser != null && countsTowardsEscapeSequence(ch)) {
 			escapeParser.addChar(ch);
 			if (escapeParser.isComplete()) {
 				processEscape();
 				escapeParser = null;
 			}
-		} else if (ch == '\n' || ch == '\r' || ch == KeyEvent.VK_BACK_SPACE || ch == '\t') {
+		} else if (ch == Ascii.LF || ch == Ascii.CR || ch == Ascii.BS || ch == Ascii.HT || ch == Ascii.VT) {
 			flushLineBuffer();
 			doStep();
 			processSpecialCharacter(ch);
-		} else if (ch == ASCII_SO) {
+		} else if (ch == Ascii.SO) {
 			graphicalCharacterSet = true;
-		} else if (ch == ASCII_SI) {
+		} else if (ch == Ascii.SI) {
 			graphicalCharacterSet = false;
-		} else if (ch > ASCII_BEL) {
+		} else if (ch > Ascii.BEL) {
 			// Most telnetd(1) implementations seem to have a bug whereby
 			// they send the NUL byte at the end of the C strings they want to
 			// output when you first connect. Since all Unixes are pretty much
@@ -258,10 +260,11 @@ public class TerminalControl implements Runnable {
 			
 			private String getCharDesc(char ch) {
 				switch (ch) {
-					case '\n': return "LF";
-					case '\r': return "CR";
-					case '\t': return "TAB";
-					case KeyEvent.VK_BACK_SPACE: return "BS";
+					case Ascii.LF: return "LF";
+					case Ascii.CR: return "CR";
+					case Ascii.HT: return "HT";
+					case Ascii.VT: return "VT";
+					case Ascii.BS: return "BS";
 					default: return "UK";
 				}
 			}
@@ -360,7 +363,7 @@ public class TerminalControl implements Runnable {
 	public void sendEscapeString(String str) {
 		try {
 			if (processIsRunning) {
-				out.write((byte) ASCII_ESC);
+				out.write((byte) Ascii.ESC);
 				out.write(str.getBytes());
 				out.flush();
 			}
