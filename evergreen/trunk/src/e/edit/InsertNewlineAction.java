@@ -26,9 +26,8 @@ public class InsertNewlineAction extends TextAction {
             final int position = target.getCaretPosition();
             
             // Should we try to insert matching brace pairs?
-            String previousCharacter = (position == 0) ? "" : document.getText(position - 1, 1);
-            if (target.getIndenter().isElectric('}') && previousCharacter.equals("{")) {
-                System.err.println("insert brace pair");
+            String line = target.getLineTextAtOffset(position);
+            if (target.getIndenter().isElectric('}') && line.endsWith("{")) {
                 insertMatchingBrace(target);
             } else {
                 target.replaceSelection("\n");
