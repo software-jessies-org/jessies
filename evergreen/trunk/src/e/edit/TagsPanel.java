@@ -27,6 +27,18 @@ public class TagsPanel extends JPanel {
     public TagsPanel() {
         setLayout(new BorderLayout());
         add(createUI(), BorderLayout.CENTER);
+        startFollowingFocusChanges();
+    }
+    
+    private void startFollowingFocusChanges() {
+        new KeyboardFocusMonitor() {
+            public void focusChanged(Component oldOwner, Component newOwner) {
+                ETextWindow newTextWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, newOwner);
+                if (newTextWindow != null) {
+                    ensureTagsCorrespondTo(newTextWindow);
+                }
+            }
+        };
     }
     
     public JComponent createUI() {

@@ -6,9 +6,30 @@ import javax.swing.*;
 import e.util.*;
 
 /**
-A simple title-bar with a label and a right-aligned close button.
-*/
+ * A simple title-bar with a label and a right-aligned close button.
+ */
 public class ETitleBar extends JComponent implements MouseListener, MouseMotionListener {
+    /**
+     * Ensures that all title bars correctly reflect the focus ownership of
+     * their associated windows.
+     */
+    static {
+        new KeyboardFocusMonitor() {
+            public void focusChanged(Component oldOwner, Component newOwner) {
+                setActive(oldOwner, false);
+                setActive(newOwner, true);
+            }
+            
+            public void setActive(Component c, boolean active) {
+                EWindow window = (EWindow) SwingUtilities.getAncestorOfClass(EWindow.class, c);
+                if (window == null) {
+                    return;
+                }
+                window.getTitleBar().setActive(active);
+            }
+        };
+    }
+    
     private String name;
     
     private String displayTitle;

@@ -6,7 +6,7 @@ import java.util.*;
 import javax.swing.*;
 import e.edit.*;
 
-public class EWindow extends JComponent implements FocusListener {
+public class EWindow extends JComponent {
     private ETitleBar titleBar;
     
     private EPopupMenu popupMenu;
@@ -121,13 +121,5 @@ public class EWindow extends JComponent implements FocusListener {
                 /* Ignore: exceptions here are unfortunate but not fatal. */
             }
         }
-    }
-    
-    // FocusListener interface.
-    public void focusGained(FocusEvent e) {
-        getTitleBar().setActive(true);
-    }
-    public void focusLost(FocusEvent e) {
-        getTitleBar().setActive(false);
     }
 }
