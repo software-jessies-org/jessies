@@ -420,7 +420,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public void paintComponent(Graphics graphics) {
-		((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, ANTIALIAS ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+		((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, ANTIALIAS ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		FontMetrics metrics = getFontMetrics(getFont());
 		Rectangle rect = graphics.getClipBounds();
 		graphics.setColor(getBackground());
