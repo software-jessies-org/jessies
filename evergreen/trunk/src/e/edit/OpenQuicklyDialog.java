@@ -54,6 +54,8 @@ public class OpenQuicklyDialog {
             for (int i = 0; i < fileList.size(); i++) {
                 model.addElement(fileList.get(i));
             }
+            final int totalFileCount = workspace.getIndexedFileCount();
+            status.setText(fileList.size() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.");
         } catch (PatternSyntaxException ex) {
             patternSyntaxException = ex;
         } catch (Exception ex) {
