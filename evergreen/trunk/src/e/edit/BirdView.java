@@ -25,7 +25,7 @@ public class BirdView extends JComponent {
     private Method method;
 
     private BitSet matchingLines = new BitSet();
-    
+
     int nearestMatchingLine = -1;
 
     public BirdView(ETextWindow textWindow, JScrollBar scrollBar) {
@@ -110,9 +110,18 @@ public class BirdView extends JComponent {
         return usableArea;
     }
 
+    private void updateCursor() {
+        Cursor newCursor = (nearestMatchingLine != -1) ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : Cursor.getDefaultCursor();
+        if (newCursor != getCursor()) {
+            setCursor(newCursor);
+        }
+    }
+
     public void paintComponent(Graphics g) {
         g.setColor(SystemColor.control); //UIManager.getColor("Scrollbar.track"));
         g.fillRect(0, 0, getWidth(), getHeight());
+
+        updateCursor();
 
         Rectangle usableArea = getUsableArea();
 
