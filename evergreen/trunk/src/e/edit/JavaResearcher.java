@@ -39,6 +39,10 @@ public class JavaResearcher implements WorkspaceResearcher {
             String line = javaDocSummary[i];
             if (line.startsWith("Class:")) {
                 classCount++;
+                // Some classes don't have accessible constructors, so add
+                // the class name anyway (SwingUtilities is an example).
+                String className = line.substring(line.lastIndexOf('.') + 1);
+                uniqueIdentifiers.add(className);
             } else {
                 // Is it a constructor, method or field definition?
                 Matcher matcher = identifierPattern.matcher(line);
