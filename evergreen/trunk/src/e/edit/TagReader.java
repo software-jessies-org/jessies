@@ -215,7 +215,7 @@ public class TagReader {
         public String describe() {
             switch (type) {
                 case 'c': return "class " + identifier;
-                case 'C': return identifier;
+                case 'C': return identifier + "()";
                 case 'f': return identifier;
                 case 'i': return "interface " + identifier;
                 case 'm': return identifier + "()";
@@ -265,14 +265,13 @@ public class TagReader {
         
         public String describe() {
             switch (type) {
+                case 'C': case 'D': case 'm': return identifier + "()";
                 case 'c': return "class " + identifier;
                 case 'd': return identifier + " macro";
                 case 'e': return identifier;
                 case 'f': return identifier;
                 case 'g': return "enum " + identifier;
-                case 'm': return identifier + "()";
                 case 'n': return "namespace " + identifier;
-                case 'p': return identifier + " prototype";
                 case 's': return "struct " + identifier;
                 case 't': return "typedef " + identifier;
                 case 'u': return "union " + identifier;
