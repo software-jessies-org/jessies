@@ -13,14 +13,17 @@ public abstract class ETextAction extends TextAction {
     
     public abstract void actionPerformed(ActionEvent e);
 
-    public ETextWindow getFocusedTextWindow() {
-        Component focusedComponent = getFocusedComponent();
-        if (focusedComponent instanceof ETextArea == false) {
-            return null;
+    /**
+     * Use this unless you really need an ETextArea or ETextWindow.
+     * If you don't, your functionality won't be available on the errors
+     * window, for instance.
+     */
+    public JTextComponent getTextComponent() {
+        Component component = getFocusedComponent();
+        if (component instanceof JTextComponent) {
+            return (JTextComponent) component;
         }
-        ETextArea target = (ETextArea) focusedComponent;
-        ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, target);
-        return textWindow;
+        return null;
     }
 
     public ETextArea getTextArea() {
@@ -34,8 +37,18 @@ public abstract class ETextAction extends TextAction {
         return (ETextArea) (SwingUtilities.getAncestorOfClass(ETextArea.class, component));
     }
     
+    public ETextWindow getFocusedTextWindow() {
+        Component focusedComponent = getFocusedComponent();
+        if (focusedComponent instanceof ETextArea == false) {
+            return null;
+        }
+        ETextArea target = (ETextArea) focusedComponent;
+        ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, target);
+        return textWindow;
+    }
+    
     public String getSelectedText() {
-        ETextArea textArea = getTextArea();
-        return (textArea != null) ? textArea.getSelectedText() : "";
+        JTextComponent textComponent = getTextComponent();
+        return (textComponent != null) ? textComponent.getSelectedText() : "";
     }
 }
