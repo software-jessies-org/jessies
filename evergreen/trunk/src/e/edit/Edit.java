@@ -175,6 +175,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         try {
             return openFileNonInteractively(filename);
         } catch (Exception ex) {
+            ex.printStackTrace();
             Edit.showAlert("Open", ex.getMessage());
             return null;
         }
@@ -798,13 +799,14 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             createWorkspaceForCurrentDirectory();
         }
         
-        splitPane.setDividerLocation(0.8);
-        splitPane.setResizeWeight(0.8);
-        
-        frame.setVisible(true);
         openRememberedFiles();
         
         initializing = false;
+
+        frame.setVisible(true);
+        splitPane.setDividerLocation(0.8);
+        splitPane.setResizeWeight(0.8);
+        
         Log.warn("Ready to use!");
         
         startScanningWorkspaces();

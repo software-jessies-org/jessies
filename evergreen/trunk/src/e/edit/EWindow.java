@@ -34,6 +34,10 @@ public class EWindow extends JComponent {
     public String getTitle() {
         return titleBar.getTitle();
     }
+
+    public String toString() {
+        return getTitle();
+    }
     
     public void setTitle(String title) {
         titleBar.setTitle(title);
