@@ -32,14 +32,14 @@ fi
 mkdir -p $TERMINFO/t
 
 TERMINFO_SRC=$TERMINATOR_HOME/doc/terminfo/terminator.tic
-TERMINFO_DST=$TERMINFO/t/terminator.tic
+TERMINFO_DST=$TERMINFO/t/terminator
 if [ "`type -p tic`" != "" ]
 then
   tic $TERMINFO_SRC
 else
   if [ ! -e $TERMINFO_DST ]
   then
-    cp $TERMINFO_SRC $TERMINFO_DST
+    cp $TERMINATOR_HOME/doc/terminfo/terminator $TERMINFO_DST
   fi
 fi
 
