@@ -44,6 +44,7 @@ public class Terminator implements Controller {
 	
 	private void initFrame() {
 		frame = new JFrame(Options.getSharedInstance().getTitle());
+		frame.setBackground(Options.getSharedInstance().getColor("background"));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		initTerminals();
 		frame.pack();
