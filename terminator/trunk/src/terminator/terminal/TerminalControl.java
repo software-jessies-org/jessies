@@ -298,13 +298,9 @@ public class TerminalControl implements Runnable {
 	 * 
 	 * Or try test 3 of vttest.
 	 * 
-	 * We use the Unicode box-drawing characters, but the
-	 * glyphs don't fill the font's bounding box, so the effect is
-	 * not much better than the traditional ASCII-art rendition.
-	 * 
-	 * Also, the glyphs are bottom-heavy, making the effect even worse.
-	 * The strange thing is that the characters seem to extend out of
-	 * the bottom of the bounding box. Bug parade #4896465.
+	 * We use the Unicode box-drawing characters, but the characters
+	 * extend out of the bottom of the font's bounding box, spoiling
+	 * the effect. Bug parade #4896465.
 	 */
 	private char translateToGraphicalCharacterSet(char ch) {
 		switch (ch) {
