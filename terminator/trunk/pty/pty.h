@@ -17,6 +17,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#define SIZE_STRUCT_SIZE 10  /* 2 (escapeSequenceLength) + 4 * sizeof(unsigned short). */
+#define SIZE_ESCAPE 0    /* Magic character used to escape size change notifications */
+
 #define MAXLINE 4096   /* max line length */
 
 typedef void Sigfunc(int); /* for signal handlers */

@@ -7,11 +7,13 @@ void        loop(int, int);        /* in the file loop.c */
 int
 main(int argc, char *argv[])
 {
-    int                fdm, c, ignoreeof, interactive, noecho, verbose;
+    int                fdm, ignoreeof, interactive, noecho, verbose;
     pid_t            pid;
     char            *driver, slave_name[20];
     struct termios    orig_termios;
     struct winsize    size;
+    
+    argc = argc;  /* Stop gcc complaining. */
 
     interactive = isatty(STDIN_FILENO);
     ignoreeof = 0;
