@@ -276,13 +276,26 @@ public class FindAndReplaceAction extends ETextAction {
             try {
                 Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
                 String[] lines = text.getText().split("\n");
+                int lineStartOffset = 0; // Track our position in the text.
                 int matchCount = 0;
-                for (int i = 0; i < lines.length; ++i) {
-                    String line = lines[i];
+                String line;
+                for (int i = 0; i < lines.length; ++i, lineStartOffset += line.length() + 1) {
+                    line = lines[i];
                     Matcher matcher = pattern.matcher(line);
                     if (matcher.find()) {
                         if (matchCount > MAX_DISPLAYED_MATCH_COUNT || Thread.currentThread().isInterrupted()) {
                             return null;
+                        }
+                        if (isSelectionMeantAsScope()) {
+                            // Matches before the selection don't count.
+                            if (lineStartOffset + matcher.start() < text.getSelectionStart()) {
+                                continue;
+                            }
+                            // If we're past the end of the selection, we can
+                            // stop.
+                            if (lineStartOffset + matcher.end() > text.getSelectionEnd()) {
+                                break;
+                            }
                         }
                         ++matchCount;
                         final int lineNumber = 1 + i;
