@@ -50,7 +50,6 @@ public class Indenter {
             if (matcher.matches()) {
                 String indent = matcher.group(1);
                 if (indent.length() < emergencyAlternative.length()) {
-                    //indentations.add(indent);
                     emergencyAlternative = indent;
                 }
                 previousIndent = indent;
