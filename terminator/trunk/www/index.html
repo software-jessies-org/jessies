@@ -1,6 +1,17 @@
 <html>
 <head>
 <title>Terminator - a virtual terminal emulator</title>
+<style type="text/css">
+ body {
+  margin:20px 80px 100px;
+ }
+ h1 {
+  margin:0px -40px;
+ }
+ h2 {
+  margin:0px -40px;
+ }
+</style>
 </head>
 
 <body>
@@ -39,6 +50,14 @@ or <tt>svn update</tt> output, for example, becomes clickable.
 voluminous build output.
 <p>A screenshot of Terminator automatically providing links to <tt>grep(1)</tt> matches:
 <p align="center"><img src="mac-os-grep.png">
+<p>This works by reading your current directory from the window title, so
+you'll need something like this in your <tt>bash(1)</tt> start-up scripts:
+<blockquote><pre>
+if [ "$TERM" == "terminator" ]
+then
+  export PROMPT_COMMAND='echo -ne "\e2;`pwd`\a"'
+fi
+</pre></blockquote>
 
 <li><p><strong>Number reinterpretation</strong> - Terminator will recognize numbers
 in a variety of bases as the current selection, and add informational menu items to the
