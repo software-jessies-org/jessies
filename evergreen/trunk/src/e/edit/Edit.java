@@ -201,14 +201,9 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             throw new RuntimeException("Edit can't edit directories, which is what '" + filename + "' is.");
         }
         
-        /* Find which workspace this file is on/should be on, and make it visible. */
-        Workspace workspace = getBestWorkspaceForFilename(filename);
-        tabbedPane.setSelectedComponent(workspace);
-        
-        /* If the user already has this file open, we shouldn't open it again. */
-        EWindow alreadyOpenWindow = workspace.findIfAlreadyOpen(filename, address);
-        if (alreadyOpenWindow != null) {
-            return alreadyOpenWindow;
+        /* Refuse to open non-ASCII files. */
+        if (FileUtilities.isAsciiFile(FileUtilities.fileFromString(filename)) == false) {
+            throw new RuntimeException("Edit is a text editor, and can't handle binary files such as '" + filename + "'. This file will not be opened.");
         }
         
         /* Limit ourselves (rather arbitrarily) to files under half a gigabyte. That's quite a strain on us, at present. */
@@ -217,6 +212,16 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         long fileLength = FileUtilities.fileFromString(filename).length();
         if (fileLength > 512 * MB) {
             throw new RuntimeException("Edit can't really handle files as large as '" + filename + "', which is " + fileLength + " bytes long. This file will not be opened.");
+        }
+        
+        /* Find which workspace this file is on/should be on, and make it visible. */
+        Workspace workspace = getBestWorkspaceForFilename(filename);
+        tabbedPane.setSelectedComponent(workspace);
+        
+        /* If the user already has this file open, we shouldn't open it again. */
+        EWindow alreadyOpenWindow = workspace.findIfAlreadyOpen(filename, address);
+        if (alreadyOpenWindow != null) {
+            return alreadyOpenWindow;
         }
         
         /* Add an appropriate viewer for the filename to the chosen workspace. */
