@@ -1,5 +1,6 @@
 package e.edit;
 
+import java.util.*;
 import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {
@@ -9,15 +10,25 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
      * the empty string (not null) if it has nothing to say.
      */
     public String research(javax.swing.text.JTextComponent text, String string) {
-        String[] availableRis = ProcessUtilities.backQuote(new String[] { "which", "ri" });
-        if (availableRis == null) {
+        String ri = getRi();
+        if (ri == null) {
             return "";
         }
-        
-        String ri = availableRis[0];
-        String[] output = ProcessUtilities.backQuote(new String[] { "ruby", ri, "-T", "-f", "html", string });
-        String result = StringUtilities.join(output, "\n");
+        ArrayList lines = new ArrayList();
+        ArrayList errors = new ArrayList();
+        int status = ProcessUtilities.backQuote(null, new String[] { "ruby", ri, "-T", "-f", "html", string }, lines, errors);
+        String result = StringUtilities.join(lines, "\n");
         return (result.indexOf("<error>") != -1) ? "" : result.toString();
+    }
+    
+    private String getRi() {
+        ArrayList availableRis = new ArrayList();
+        ArrayList errors = new ArrayList();
+        int status = ProcessUtilities.backQuote(null, new String[] { "which", "ri" }, availableRis, errors);
+        if (status != 0 || availableRis.size() == 0) {
+            return null;
+        }
+        return (String) availableRis.get(0);
     }
     
     /** Returns true for Ruby files. */
