@@ -1,27 +1,26 @@
 package e.edit;
 
 import java.io.*;
-import javax.swing.*;
-import javax.swing.text.*;
+import java.awt.event.*;
 
 /**
  * Opens the "Find Files" dialog with the current selection entered in the dialog's
  * pattern field.
  */
-public class FindFilesContainingSelectionAction extends SelectedTextAction {
+public class FindFilesContainingSelectionAction extends ETextAction {
     public FindFilesContainingSelectionAction() {
         super("Find in Files...");
     }
     
-    public void actOnSelection(JTextComponent component, String selection) {
-        String directory = guessDirectoryToSearchIn(component);
-        Edit.getCurrentWorkspace().showFindFilesDialog(selection, directory);
+    public void actionPerformed(ActionEvent e) {
+        String directory = guessDirectoryToSearchIn();
+        Edit.getCurrentWorkspace().showFindFilesDialog(getSelectedText(), directory);
     }
     
-    public String guessDirectoryToSearchIn(JTextComponent component) {
-        ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, component);
+    public String guessDirectoryToSearchIn() {
+        ETextWindow textWindow = getFocusedTextWindow();
         if (textWindow == null) {
-            return null;
+            return "";
         }
         
         String directory = textWindow.getContext();

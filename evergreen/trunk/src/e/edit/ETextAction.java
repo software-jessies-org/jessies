@@ -33,4 +33,9 @@ public abstract class ETextAction extends TextAction {
         }
         return (ETextArea) (SwingUtilities.getAncestorOfClass(ETextArea.class, component));
     }
+    
+    public String getSelectedText() {
+        ETextArea textArea = getTextArea();
+        return (textArea != null) ? textArea.getSelectedText() : "";
+    }
 }

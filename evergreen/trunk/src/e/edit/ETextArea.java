@@ -375,6 +375,18 @@ public class ETextArea extends JTextArea {
     }
     
     /**
+     * Overrides getSelectedText to return the empty string instead of null
+     * when the selection is empty. Knowing you'll never see null is useful,
+     * and the empty string is every bit as good a representation of the
+     * empty selection. acme, wily and early versions of Edit using home-grown
+     * text components all worked perfectly well in such a world.
+     */
+    public String getSelectedText() {
+        String selection = super.getSelectedText();
+        return (selection != null) ? selection : "";
+    }
+    
+    /**
      * Returns the text of the line (without the newline) containing the
      * given offset in the document.
      */

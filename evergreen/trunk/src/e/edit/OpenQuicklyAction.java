@@ -11,6 +11,6 @@ public class OpenQuicklyAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Edit.getCurrentWorkspace().showOpenQuicklyDialog(null);
+        Edit.getCurrentWorkspace().showOpenQuicklyDialog("");
     }
 }

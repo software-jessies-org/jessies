@@ -339,27 +339,39 @@ public class Workspace extends JPanel {
     }
     
     /**
-     * Shows the "Find File" dialog with the given String as the contents of the text field.
-     * Use null to retain the current contents.
+     * Shows the "Find File" dialog with the given String as the contents of
+     * the text field. Use the empty string to retain the current contents.
+     * There's no way to empty the text field's contents, but that sounds like
+     * a bad idea anyway. Either you've got a better suggestion than what the
+     * user last typed, or you should leave things as they are.
      */
     public void showFindFilesDialog(String pattern, String filenamePattern) {
         if (findFilesDialog == null) {
             findFilesDialog = new FindFilesDialog(this);
         }
-        findFilesDialog.setPattern(pattern);
-        findFilesDialog.setFilenamePattern(filenamePattern);
+        if (pattern.length() > 0) {
+            findFilesDialog.setPattern(pattern);
+        }
+        if (filenamePattern.length() > 0) {
+            findFilesDialog.setFilenamePattern(filenamePattern);
+        }
         findFilesDialog.showDialog();
     }
     
     /**
-     * Shows the "Open Quickly" dialog with the given String as the contents of the text field.
-     * Use null to retain the current contents.
+     * Shows the "Open Quickly" dialog with the given String as the contents
+     * of the text field. Use the empty string to retain the current contents.
+     * There's no way to empty the text field's contents, but that sounds like
+     * a bad idea anyway. Either you've got a better suggestion than what the
+     * user last typed, or you should leave things as they are.
      */
     public void showOpenQuicklyDialog(String filenamePattern) {
         if (openQuicklyDialog == null) {
             openQuicklyDialog = new OpenQuicklyDialog(this);
         }
-        openQuicklyDialog.setFilenamePattern(filenamePattern);
+        if (filenamePattern.length() > 0) {
+            openQuicklyDialog.setFilenamePattern(filenamePattern);
+        }
         openQuicklyDialog.showDialog();
     }
     

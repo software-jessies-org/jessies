@@ -99,12 +99,8 @@ public class OpenQuicklyDialog {
 
     /**
      * Sets the contents of the text field.
-     * The value null causes the filename pattern to stay as it was.
      */
     public void setFilenamePattern(String filenamePattern) {
-        if (filenamePattern == null) {
-            return;
-        }
         filenameField.setText(filenamePattern);
     }
     
