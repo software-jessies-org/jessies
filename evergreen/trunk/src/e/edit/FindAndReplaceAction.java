@@ -115,16 +115,24 @@ public class FindAndReplaceAction extends ETextAction {
         matchList.setCellRenderer(new DisplayableMatchRenderer());
         
         replacementsList = new JList();
+        replacementsList.setCellRenderer(new DisplayableMatchRenderer());
+
+        // Make both lists scrollable...
+        JScrollPane matchPane = new JScrollPane(matchList);
+        JScrollPane replacementsPane = new JScrollPane(replacementsList);
+        // ...tie their scroll bars together...
+        BoundedRangeModel scrollModel = matchPane.getVerticalScrollBar().getModel();
+        replacementsPane.getVerticalScrollBar().setModel(scrollModel);
+        // ...and tie the lists' selections together.
+        ListSelectionModel selectionModel = matchList.getSelectionModel();
+        replacementsList.setSelectionModel(selectionModel);
 
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Find:", patternField);
         formPanel.addRow("Replace With:", replacementField);
         formPanel.addRow("", statusLabel);
-        formPanel.addRow("Matches:", new JScrollPane(matchList));
-        formPanel.addRow("Replacements:", new JScrollPane(replacementsList));
-//        formPanel.addRow("Matches:", new JScrollPane(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-//            new JScrollPane(matchList, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-//            new JScrollPane(replacementsList, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED))));
+        formPanel.addRow("Matches:", matchPane);
+        formPanel.addRow("Replacements:", replacementsPane);
         if (patternField.getText().length() > 0) {
             showMatches();
         }
@@ -182,10 +190,15 @@ public class FindAndReplaceAction extends ETextAction {
         return pattern.matcher(oldText).replaceAll(replacementPattern);
     }
 
-    public class DisplayableMatchRenderer extends DefaultListCellRenderer {
+    public static class DisplayableMatchRenderer extends DefaultListCellRenderer {
+        private static final Color ALTERNATE_ROW_COLOR = new Color(0.92f, 0.95f, 0.99f);
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             
+            if (!isSelected && index % 2 == 0) {
+                setBackground(ALTERNATE_ROW_COLOR);
+            }
+
             // If there were captured groups, set the tooltip. (If not, avoid setting an empty
             // tooltip, because that's not the same as no tooltip, and looks rather silly.)
             DisplayableMatch match = (DisplayableMatch) value;
