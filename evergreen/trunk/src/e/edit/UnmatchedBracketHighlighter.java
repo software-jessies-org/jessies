@@ -21,13 +21,19 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
         this.textComponent = textComponent;
     }
 
+    private boolean isBracket(char ch) {
+        return ch == '(' || ch == ')' || ch == '{' || ch == '}';
+    }
+    private boolean isIndentationCharacter(char ch) {
+        return ch == ' ' || ch == '\t';
+    }
     private boolean containsBrackets(String text) {
         for (int i = 0; i < text.length(); ++i) {
             char ch = text.charAt(i);
-            if (ch == '(' || ch == ')' || ch == '{' || ch == '}') {
+            if (isBracket(ch)) {
                 return true;
             }
-            if (ch == ' ' || ch == '\t') {
+            if (isIndentationCharacter(ch)) {
                 // We have to consider whitespace significant, too,
                 // because we don't just insist that braces match:
                 // we also insist that their indentation matches.
@@ -111,7 +117,7 @@ public class UnmatchedBracketHighlighter implements DocumentListener {
                     indentation = "";
                     withinIndent = true;
                 } else if (withinIndent) {
-                    if (ch == ' ' || ch == '\t') {
+                    if (isIndentationCharacter(ch)) {
                         indentation += ch;
                     } else {
                         withinIndent = false;
