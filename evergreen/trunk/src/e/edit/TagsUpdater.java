@@ -297,7 +297,7 @@ public class TagsUpdater {
         private SortedSet kidsNames = new TreeSet();
         
         public int getInsertIndex(TagReader.Tag tag) {
-            String insertString = tag.getTypeSortIndex() + tag.identifier + kidsNames.size();
+            String insertString = tag.getSortIdentifier() + kidsNames.size();
             kidsNames.add(insertString);
             return new ArrayList(kidsNames).indexOf(insertString);
         }

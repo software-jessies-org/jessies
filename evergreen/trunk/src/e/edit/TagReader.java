@@ -202,10 +202,10 @@ public class TagReader {
             DESCRIPTION_FORMATS.put(EXTERN, new MessageFormat(EXTERN + " {0}"));
         }
         
-        public List typeSortOrder = Collections.unmodifiableList(Arrays.asList(new String[] {
-            NAMESPACE, CLASS, MACRO, CONSTRUCTOR, DESTRUCTOR,
-            PROTOTYPE, METHOD, FIELD, ENUM, STRUCT, TYPEDEF
-        }));
+        public String[][] typeSortOrder = new String[][] {
+            { NAMESPACE }, { CLASS }, { MACRO }, { CONSTRUCTOR }, { DESTRUCTOR },
+            { PROTOTYPE, METHOD }, { FIELD }, { ENUM }, { STRUCT }, { TYPEDEF }
+        };
         public String classSeparator = ".";
         
         public String identifier;
@@ -278,8 +278,15 @@ public class TagReader {
             return CONTAINER_TYPES.contains(type);
         }
         
-        public int getTypeSortIndex() {
-            return typeSortOrder.indexOf(type);
+        public String getSortIdentifier() {
+            for (int i = 0; i < typeSortOrder.length; i++) {
+                for (int j = 0; j < typeSortOrder[i].length; j++) {
+                    if (typeSortOrder[i][j].equals(type)) {
+                        return i + identifier + j;
+                    }
+                }
+            }
+            return identifier;
         }
         
         public String getClassQualifiedName() {
@@ -294,9 +301,10 @@ public class TagReader {
     public static class JavaTag extends Tag {
         public JavaTag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
             super(identifier, lineNumber, tagType, context, containingClass);
-            typeSortOrder = Collections.unmodifiableList(Arrays.asList(new String[] {
-                PACKAGE, FIELD, CONSTRUCTOR, METHOD, CLASS, INTERFACE
-            }));
+            typeSortOrder = new String[][] {
+                { PACKAGE }, { FIELD }, { CONSTRUCTOR },
+                { METHOD }, { CLASS }, { INTERFACE }
+            };
             this.isAbstract = (type.equals(INTERFACE));
         }
     }
