@@ -194,6 +194,7 @@ public class Workspace extends JPanel {
                 ETextWindow textWindow = (ETextWindow) window;
                 textWindow.jumpToAddress(address);
             }
+            window.requestFocus();
             return window;
         }
         return null;
@@ -240,6 +241,7 @@ public class Workspace extends JPanel {
                 }
             });
         }
+        viewer.requestFocus();
         return viewer;
     }
     
