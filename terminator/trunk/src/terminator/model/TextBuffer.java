@@ -36,7 +36,7 @@ public class TextBuffer {
 	private Location savedPosition;
 	private short savedStyle;
 	
-	// Fields used for saving and restoring the 'real' screen while the alternative buffer is in use.
+	// Fields used for saving and restoring the 'real' screen while the alternate buffer is in use.
 	private TextLine[] savedScreen;
 	
 	public TextBuffer(JTextBuffer view, int width, int height) {
@@ -79,7 +79,7 @@ public class TextBuffer {
 	
 	public void clearScrollBuffer() {
 		// FIXME: really, we should still clear everything off-screen.
-		if (usingAlternativeBuffer()) {
+		if (usingAlternateBuffer()) {
 			return;
 		}
 		
@@ -141,12 +141,12 @@ public class TextBuffer {
 		return new Location(lineIndex, charOffset);
 	}
 	
-	/** Sets or unsets the use of the alternative buffer. */
-	public void useAlternativeBuffer(boolean useAlternativeBuffer) {
-		if (useAlternativeBuffer == usingAlternativeBuffer()) {
+	/** Sets or unsets the use of the alternate buffer. */
+	public void useAlternateBuffer(boolean useAlternateBuffer) {
+		if (useAlternateBuffer == usingAlternateBuffer()) {
 			return;
 		}
-		if (useAlternativeBuffer) {
+		if (useAlternateBuffer) {
 			savedScreen = new TextLine[height];
 			for (int i = 0; i < height; i++) {
 				int lineIndex = getFirstDisplayLine() + i;
@@ -172,8 +172,8 @@ public class TextBuffer {
 		checkInvariant();
 	}
 	
-	/** Returns true when the alternative buffer is in use. */
-	public boolean usingAlternativeBuffer() {
+	/** Returns true when the alternate buffer is in use. */
+	public boolean usingAlternateBuffer() {
 		return (savedScreen != null);
 	}
 
@@ -363,10 +363,10 @@ public class TextBuffer {
 			for (int i = firstDisplayLine + lastScrollLineIndex + 1; i <= index; i++) {
 				textLines.add(i, lineToInsert);
 			}
-			if (usingAlternativeBuffer() || (firstScrollLineIndex > 0)) {
+			if (usingAlternateBuffer() || (firstScrollLineIndex > 0)) {
 				// If the program has defined scroll bounds, newline-adding actually chucks away
 				// the first scroll line, rather than just scrolling everything upwards like we normally
-				// do.  This makes vim work better.  Also, if we're using the alternative buffer, we
+				// do.  This makes vim work better.  Also, if we're using the alternate buffer, we
 				// don't add anything going off the top into the history.
 				int removeIndex = firstDisplayLine + firstScrollLineIndex;
 				textLines.remove(removeIndex);
@@ -410,13 +410,13 @@ public class TextBuffer {
 		if (this.height > height && textLines.size() >= this.height) {
 			for (int i = 0; i < (this.height - height); i++) {
 				int lineToRemove = textLines.size() - 1;
-				if (usingAlternativeBuffer() || (get(lineToRemove).length() == 0 && cursorPosition.getLineIndex() != lineToRemove)) {
+				if (usingAlternateBuffer() || (get(lineToRemove).length() == 0 && cursorPosition.getLineIndex() != lineToRemove)) {
 					textLines.remove(lineToRemove);
 				}
 			}
 		} else if (this.height < height) {
 			for (int i = 0; i < (height - this.height); i++) {
-				if (usingAlternativeBuffer() || getFirstDisplayLine() <= 0) {
+				if (usingAlternateBuffer() || getFirstDisplayLine() <= 0) {
 					textLines.add(new TextLine());
 				}
 			}
