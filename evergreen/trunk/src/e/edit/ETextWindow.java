@@ -430,18 +430,6 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
         text.setText("");
     }
     
-    /**
-    * Used to mark the matches in the text as if they'd been gone over with a highlighter pen. We use
-    * full yellow with half-alpha so you can see the selection through, as a dirty smudge, just like a real
-    * highlighter pen might do.
-    */
-    private Highlighter.HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 0, 128));
-    
-    /** Returns the highlight painter that the find code should use to highlight matches. */
-    public Highlighter.HighlightPainter getMatchHighlightPainter() {
-        return painter;
-    }
-    
     public void findNext() {
         FindAction.INSTANCE.repeatLastFind();
         findHighlight(true);
@@ -459,7 +447,7 @@ public class ETextWindow extends ETextComponent implements ChangeListener, Docum
         int stop = forwards ? highlights.length : -1;
         int step = forwards ? 1 : -1;
         for (int i = start; i != stop; i += step) {
-            if (highlights[i].getPainter() == painter) {
+            if (highlights[i].getPainter() == FindAction.PAINTER) {
                 if (highlighterIsNext(forwards, highlights[i])) {
                     goToSelection(highlights[i].getStartOffset(), highlights[i].getEndOffset());
                     return;
