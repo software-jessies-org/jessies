@@ -207,13 +207,11 @@ public class ETextArea extends JTextArea {
     }
 
     /**
-     * Sets the content to be the given string. Also ensures that
-     * text is displayed in a suitable font for the content, and
+     * Sets the content to be the given string. Also
      * sets the caret position to the start of the document.
      */
     public void setText(String text) {
         super.setText(text);
-        setAppropriateFont();
         setCaretPosition(0);
     }
     
