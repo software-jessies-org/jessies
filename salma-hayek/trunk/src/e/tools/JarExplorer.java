@@ -1,8 +1,10 @@
 package e.tools;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.zip.*;
 import javax.swing.*;
 
@@ -15,6 +17,8 @@ import e.util.*;
  * @author Elliott Hughes
  */
 public class JarExplorer extends JFrame {
+    private JCheckBox showLineNumberAndLocalVariableTables;
+    private JCheckBox showVerboseDetail;
     private JList list;
     private DefaultListModel model;
 
@@ -62,6 +66,16 @@ public class JarExplorer extends JFrame {
     }
 
     private JComponent makeUi() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 10, 10));
+
+        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        showLineNumberAndLocalVariableTables = new JCheckBox("Show Line Number Tables");
+        checkBoxPanel.add(showLineNumberAndLocalVariableTables);
+        showVerboseDetail = new JCheckBox("Show Verbose Information");
+        checkBoxPanel.add(showVerboseDetail);
+        panel.add(checkBoxPanel, BorderLayout.NORTH);
+
         list = new JList(model);
         list.setVisibleRowCount(10);
         JScrollPane entriesScroller = new JScrollPane(list);
@@ -81,8 +95,10 @@ public class JarExplorer extends JFrame {
         tabbedPane.add("Summary", new JScrollPane(summaryTextArea));
         tabbedPane.add("Detail", new JScrollPane(detailTextArea));
 
-        return new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                              entriesScroller, tabbedPane);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                                              entriesScroller, tabbedPane);
+        panel.add(splitPane, BorderLayout.CENTER);
+        return panel;
     }
 
     private JTextArea makeTextArea() {
@@ -105,14 +121,21 @@ public class JarExplorer extends JFrame {
         }
     }
 
-    private String runJavaP(String className, boolean decompile) {
+    private String runJavaP(String className, boolean detail) {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
 
         ArrayList command = new ArrayList();
         command.add("javap");
-        if (decompile) {
+        command.add("-private");
+        if (detail) {
             command.add("-c");
+            if (showLineNumberAndLocalVariableTables.isSelected()) {
+                command.add("-l");
+            }
+            if (showVerboseDetail.isSelected()) {
+                command.add("-verbose");
+            }
         }
         command.add("-classpath");
         command.add(filename);
