@@ -82,8 +82,8 @@ public class JTelnetPane extends JScrollPane {
 				JTelnetPane telPane = new JTelnetPane(host, port);
 				frame.getContentPane().add(telPane);
 				frame.setSize(new Dimension(600, 400));
-				frame.setVisible(true);
 				frame.setLocationRelativeTo(null);
+				frame.setVisible(true);
 			}
 		});
 	}
