@@ -16,6 +16,10 @@ public class ETable extends JTable {
         Component c = super.prepareRenderer(renderer, row, column);
         if (isCellSelected(row, column) == false) {
             c.setBackground((row % 2 == 0) ? GuiUtilities.ALTERNATE_ROW_COLOR : getBackground());
+            c.setForeground(UIManager.getColor("Table.foreground"));
+        } else {
+            c.setBackground(UIManager.getColor("Table.selectionBackground"));
+            c.setForeground(UIManager.getColor("Table.selectionForeground"));
         }
         return c;
     }

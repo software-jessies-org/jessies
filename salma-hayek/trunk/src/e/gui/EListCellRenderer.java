@@ -4,6 +4,12 @@ import java.awt.*;
 import javax.swing.*;
 import e.util.*;
 
+/**
+ * Improves on Sun's default list cell renderer. In particular, we work
+ * around a couple of mis-features in JLabel concerning the empty string,
+ * and the tab character. We also offer the ability to render alternate
+ * lines with different background colors.
+ */
 public class EListCellRenderer extends DefaultListCellRenderer {
     private boolean alternateLineColor;
 
@@ -27,6 +33,10 @@ public class EListCellRenderer extends DefaultListCellRenderer {
         // Optionally use the line-printer paper trick of alternating row color.
         if (alternateLineColor && !isSelected && index % 2 == 0) {
             setBackground(GuiUtilities.ALTERNATE_ROW_COLOR);
+        }
+        if (isSelected) {
+            setBackground(UIManager.getColor("List.selectionBackground"));
+            setForeground(UIManager.getColor("List.selectionForeground"));
         }
 
         return this;

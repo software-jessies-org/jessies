@@ -12,6 +12,18 @@ public class GuiUtilities {
     public static final Color ALTERNATE_ROW_COLOR = new Color(0.92f, 0.95f, 0.99f);
     
     /**
+     * The background color for selected rows in lists and tables.
+     */
+    public static final Color SELECTED_ROW_COLOR = new Color(0.24f, 0.50f, 0.87f);
+    
+    static {
+        UIManager.put("List.selectionBackground", SELECTED_ROW_COLOR);
+        UIManager.put("List.selectionForeground", Color.WHITE);
+        UIManager.put("Table.selectionBackground", SELECTED_ROW_COLOR);
+        UIManager.put("Table.selectionForeground", Color.WHITE);
+    }
+    
+    /**
      * Tests whether we're running on Mac OS. The Mac is quite
      * different from Linux and Windows, and it's sometimes
      * necessary to put in special-case behavior if you're running
