@@ -164,7 +164,6 @@ public class JTerminalPane extends JPanel {
 					try {
 						control.sizeChanged(size, textPane.getVisibleSize());
 						controller.setTerminalSize(size);
-						textPane.scrollToBottom();
 					} catch (IOException ex) {
 						Log.warn("Failed to notify pty of size change.", ex);
 					}
