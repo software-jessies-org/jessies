@@ -9,12 +9,14 @@ import javax.swing.*;
 import javax.swing.event.*;
 import e.util.*;
 
+import javax.swing.Timer;
+
 public class Terminator implements Controller {
 	private List arguments;
 	
+	private Dimension terminalSize;
 	private JFrame frame;
 	private JTabbedPane tabbedPane;
-	private Dimension lastNoticedFrameSize;
 	
 	private ArrayList terminals = new ArrayList();
 
@@ -31,8 +33,16 @@ public class Terminator implements Controller {
 		initUi();
 	}
 	
-	public Dimension getLastNoticedFrameSize() {
-		return lastNoticedFrameSize;
+	public void updateFrameTitle() {
+		StringBuffer title = new StringBuffer("Terminator");
+		if (terminalSize != null) {
+			title.append(" [").append(terminalSize.width).append(" x ").append(terminalSize.height).append("]");
+		}
+		if (terminals.size() == 1) {
+			JTelnetPane pane = (JTelnetPane) terminals.get(0);
+			title.append(" - ").append(pane.getName());
+		}
+		frame.setTitle(title.toString());
 	}
 	
 	private void ensureRunnablePty() {
@@ -65,11 +75,6 @@ public class Terminator implements Controller {
 	
 	private void initFrame() {
 		frame = new JFrame(Options.getSharedInstance().getTitle());
-		frame.addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent event) {
-				lastNoticedFrameSize = ((JFrame) event.getSource()).getSize();
-			}
-		});
 		frame.setBackground(Options.getSharedInstance().getColor("background"));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		initTerminals();
@@ -235,6 +240,7 @@ public class Terminator implements Controller {
 			soleSurvivor.revalidate();
 			frame.repaint();
 			tabbedPane = null;
+			updateFrameTitle();
 		}
 	}
 	
@@ -252,6 +258,25 @@ public class Terminator implements Controller {
 	
 	public void openCommandPane(String command, boolean focusOnNewTab) {
 		addPane(JTelnetPane.newCommandWithTitle(this, command, command), focusOnNewTab);
+	}
+
+	private Timer terminalSizeTimer = null;
+
+	public void setTerminalSize(Dimension size) {
+		this.terminalSize = size;
+		updateFrameTitle();
+		if (terminalSizeTimer != null) {
+			terminalSizeTimer.stop();
+		}
+		terminalSizeTimer = new Timer(2000, new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				terminalSizeTimer = null;
+				terminalSize = null;
+				updateFrameTitle();
+			}
+		});
+		terminalSizeTimer.setRepeats(false);
+		terminalSizeTimer.start();
 	}
 	
 	private JWindow findWindow;
@@ -333,6 +358,7 @@ public class Terminator implements Controller {
 		if (focusOnNewTab) {
 			tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 		}
+		updateFrameTitle();
 	}
 	
 	private void addPaneToUI(JTelnetPane newPane) {
