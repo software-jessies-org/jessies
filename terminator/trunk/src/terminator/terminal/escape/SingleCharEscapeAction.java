@@ -5,9 +5,11 @@ import terminator.model.*;
 import terminator.terminal.*;
 
 public class SingleCharEscapeAction implements TerminalAction {
+	private TerminalControl control;
 	private char escChar;
 	
-	public SingleCharEscapeAction(char escChar) {
+	public SingleCharEscapeAction(TerminalControl control, char escChar) {
+		this.control = control;
 		this.escChar = escChar;
 	}
 
@@ -50,11 +52,17 @@ public class SingleCharEscapeAction implements TerminalAction {
 			case 'c':  // Power on (full reset).
 				listener.fullReset();
 				break;
-			case 'n':  // rxvt: scr_charset_choose(2)
-				unsupported("scr_charset_choose(2)");
+			case 'n':
+				control.invokeCharacterSet(2);
 				break;
-			case 'o':  // rxvt: scr_charset_choose(3)
-				unsupported("scr_charset_choose(3)");
+			case 'o':
+				control.invokeCharacterSet(3);
+				break;
+			case '|':
+			case '}':
+			case '~':
+				// Invoke the G3, G2, and G1 character sets as
+				// GR. Has no visible effect.
 				break;
 			default:
 				Log.warn("Unrecognized single-character escape \"" + escChar + "\".");

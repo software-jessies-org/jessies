@@ -138,6 +138,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	private TerminalControl terminalControl;
 	
+	public TerminalControl getTerminalControl() {
+		return terminalControl;
+	}
+	
 	public void setTerminalControl(TerminalControl terminalControl) {
 		this.terminalControl = terminalControl;
 	}

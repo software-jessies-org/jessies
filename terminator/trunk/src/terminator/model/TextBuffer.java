@@ -439,7 +439,8 @@ public class TextBuffer {
 	 * normal printable characters, escape sequences having been extracted
 	 * elsewhere.
 	 */
-	public void processLine(String line) {
+	public void processLine(String untranslatedLine) {
+		String line = view.getTerminalControl().translate(untranslatedLine);
 		TextLine textLine = get(caretPosition.getLineIndex());
 		if (insertMode) {
 //			Log.warn("Inserting text \"" + line + "\" at " + caretPosition + ".");

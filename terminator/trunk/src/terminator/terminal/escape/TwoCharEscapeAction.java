@@ -5,9 +5,11 @@ import terminator.model.*;
 import terminator.terminal.*;
 
 public class TwoCharEscapeAction implements TerminalAction {
+	private TerminalControl control;
 	private String sequence;
 	
-	public TwoCharEscapeAction(String sequence) {
+	public TwoCharEscapeAction(TerminalControl control, String sequence) {
+		this.control = control;
 		this.sequence = sequence;
 	}
 
@@ -16,17 +18,17 @@ public class TwoCharEscapeAction implements TerminalAction {
 			case '#':  // rxvt: if second char == '8', scr_E().
 				unsupported();
 				break;
-			case '(':  // rxvt: scr_charset_set(0, second char).
-				unsupported();
+			case '(':
+				control.designateCharacterSet(0, sequence.charAt(1));
 				break;
-			case ')':  // rxvt: scr_charset_set(1, second char).
-				unsupported();
+			case ')':
+				control.designateCharacterSet(1, sequence.charAt(1));
 				break;
-			case '*':  // rxvt: scr_charset_set(2, second char).
-				unsupported();
+			case '*':
+				control.designateCharacterSet(2, sequence.charAt(1));
 				break;
-			case '+':  // rxvt: scr_charset_set(3, second char).
-				unsupported();
+			case '+':
+				control.designateCharacterSet(3, sequence.charAt(1));
 				break;
 			case '$':  // rxvt: scr_charset_set(-2, second char).
 				unsupported();
