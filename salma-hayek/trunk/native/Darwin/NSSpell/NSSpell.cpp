@@ -4,7 +4,7 @@
 extern "C" void NSSpellChecker_showSuggestions(const char* word);
 extern "C" bool NSSpellChecker_isCorrect(const char* word);
 
-int main(int argc, char* argv[]) {
+int main(int /*argc*/, char* /*argv*/[]) {
     std::ostream& os(std::cout);
     os << "@(#) International Ispell 3.1.20 (but really NSSpellChecker)\n";
 

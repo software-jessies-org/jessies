@@ -3,10 +3,20 @@ COMPILE.m = $(COMPILE.c)
 .m.o:
 	$(COMPILE.m) $(OUTPUT_OPTION) $<
 
-CFLAGS += -g -W -Wall -Werror -std=c99
-LDFLAGS += -framework AppKit
+COMPILE.mm = $(COMPILE.cpp)
+.SUFFIXES: .o .mm
+.mm.o:
+	$(COMPILE.mm) $(OUTPUT_OPTION) $<
+
+C_AND_CXX_FLAGS = -g -W -Wall -Werror
+CFLAGS += $(C_AND_CXX_FLAGS)
+CXXFLAGS += $(C_AND_CXX_FLAGS)
+
+CFLAGS += -std=c99
+LDFLAGS += -framework Cocoa
 
 OBJS += $(patsubst %.cpp,%.o,$(wildcard *.cpp))
+OBJS += $(patsubst %.mm,%.o,$(wildcard *.mm))
 OBJS += $(patsubst %.m,%.o,$(wildcard *.m))
 
 CURRENT_DIRECTORY := $(shell pwd)
