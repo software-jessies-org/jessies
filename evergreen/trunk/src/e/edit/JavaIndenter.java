@@ -33,7 +33,7 @@ public class JavaIndenter extends Indenter {
         String trimmedLine = rawLine.trim();
         return isBlockBegin(trimmedLine) || isBlockEnd(trimmedLine) || isLabel(trimmedLine);
     }
-    
+        
     public int getPreviousDefinitiveLineNumber(ETextArea text, int startLineNumber) {
         try {
             for (int lineNumber = startLineNumber - 1; lineNumber > 0; lineNumber--) {
@@ -75,7 +75,7 @@ public class JavaIndenter extends Indenter {
                 // Whatever the previous line looks like, if it ends with
                 // a close of comment, we're not in a comment, and should
                 // do nothing.
-            } else if (previousLine.startsWith("/*") || previousLine.startsWith("* ")) {
+            } else if (previousLine.matches("/\\*{1,2}") || previousLine.startsWith("* ")) {
                 // We're in a doc comment.
                 if (activePartOfLine.startsWith("* ") || activePartOfLine.startsWith("*/")) {
                     // We already have the JavaDoc ASCII art, and just need to
