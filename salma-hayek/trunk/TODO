@@ -1,7 +1,5 @@
 Items to be done for PTextArea:
 
-* Rename "delete" as "remove", because that's more Java-like.
-
 * Only show the margin if a fixed-width font is in use. Trigger off setFont?
 
 * Create a language-specific API to work out double-click selections, and use this in the mouse handler.

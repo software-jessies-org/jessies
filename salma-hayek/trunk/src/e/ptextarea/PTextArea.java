@@ -699,7 +699,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * FIXME: should use PTextBuffer.replace, when it's available.
      */
     public void setText(String newText) {
-        getPTextBuffer().delete(0, getPTextBuffer().length());
+        getPTextBuffer().remove(0, getPTextBuffer().length());
         getPTextBuffer().insert(0, newText.toCharArray());
     }
     

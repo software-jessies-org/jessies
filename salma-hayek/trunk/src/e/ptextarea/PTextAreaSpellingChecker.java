@@ -132,7 +132,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
         
         public void actionPerformed(ActionEvent e) {
             // FIXME: should use PTextBuffer.replace, when available.
-            buffer.delete(startIndex, endIndex - startIndex);
+            buffer.remove(startIndex, endIndex - startIndex);
             buffer.insert(startIndex, replacement.toCharArray());
         }
     }

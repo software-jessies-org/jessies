@@ -230,15 +230,15 @@ public class PTextBuffer implements CharSequence {
         text = newText;
     }
     
-    /** Deletes the given number of characters, the lowest-indexed of which is at the given position. */
-    public void delete(int position, int count) {
+    /** Removes the given number of characters, the lowest-indexed of which is at the given position. */
+    public void remove(int position, int count) {
         char[] ch = copyChars(position, count);
-        undoBuffer.addDeletion(position, ch);
-        deleteWithoutUndo(position, ch);
+        undoBuffer.addRemoval(position, ch);
+        removeWithoutUndo(position, ch);
     }
     
-    /** Special deletion method used by the undo buffer. */
-    private void deleteWithoutUndo(int position, char[] ch) {
+    /** Special remove method used by the undo buffer. */
+    private void removeWithoutUndo(int position, char[] ch) {
         moveGap(position + ch.length);
         gapPosition -= ch.length;
         gapLength += ch.length;
@@ -336,7 +336,7 @@ public class PTextBuffer implements CharSequence {
             addDoable(new Doable(position, ch, false));
         }
         
-        private void addDeletion(int position, char[] ch) {
+        private void addRemoval(int position, char[] ch) {
             addDoable(new Doable(position, ch, true));
         }
         
@@ -387,13 +387,13 @@ public class PTextBuffer implements CharSequence {
             if (isDeletion) {
                 insertWithoutUndo(position, ch);
             } else {
-                deleteWithoutUndo(position, ch);
+                removeWithoutUndo(position, ch);
             }
         }
         
         public void redo() {
             if (isDeletion) {
-                deleteWithoutUndo(position, ch);
+                removeWithoutUndo(position, ch);
             } else {
                 insertWithoutUndo(position, ch);
             }

@@ -29,7 +29,7 @@ public class PKeyHandler extends KeyAdapter {
                 {
                     int caret = textArea.getCaretLocation();
                     int delCount = Math.min(caret, 20);
-                    textArea.getPTextBuffer().delete(caret - delCount, delCount);
+                    textArea.getPTextBuffer().remove(caret - delCount, delCount);
                     textArea.setCaretPosition(caret - delCount);
                 }
                 break;
@@ -129,7 +129,7 @@ public class PKeyHandler extends KeyAdapter {
         int selectionStart = textArea.getSelectionStart();
         int selectionLength = textArea.getSelectionEnd() - selectionStart;
         textArea.clearSelection();
-        textArea.getPTextBuffer().delete(selectionStart, selectionLength);
+        textArea.getPTextBuffer().remove(selectionStart, selectionLength);
         textArea.setCaretPosition(selectionStart);
     }
     
@@ -141,7 +141,7 @@ public class PKeyHandler extends KeyAdapter {
             if (caret > 0) {
                 caret--;
                 textArea.setCaretPosition(caret);
-                textArea.getPTextBuffer().delete(caret, 1);
+                textArea.getPTextBuffer().remove(caret, 1);
             }
         }
     }
@@ -153,7 +153,7 @@ public class PKeyHandler extends KeyAdapter {
             int caret = textArea.getCaretLocation();
             PTextBuffer buffer = textArea.getPTextBuffer();
             if (caret < buffer.length() - 1) {
-                buffer.delete(caret, 1);
+                buffer.remove(caret, 1);
             }
         }
     }
