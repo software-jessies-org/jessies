@@ -95,6 +95,19 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		}
 	}
 	
+	/**
+	 * Returns our size in character units, where 'width' is the number of
+	 * columns and 'height' the number of rows. (In case you were concerned
+	 * about the fact that terminals tend to refer to y,x coordinates.)
+	 */
+	public Dimension getSizeInCharacters() {
+		Dimension result = getSize();
+		FontMetrics metrics = getFontMetrics(getFont());
+		result.width /= metrics.charWidth(' ');
+		result.height /= metrics.getHeight();
+		return result;
+	}
+	
 	// Methods used by TextBuffer in order to update the display.
 	
 	public void lineSectionChanged(int lineIndex, int charStartIndex, int charEndIndex) {
