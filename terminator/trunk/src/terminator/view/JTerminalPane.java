@@ -476,18 +476,6 @@ public class JTerminalPane extends JPanel {
 		}
 	}*/
 	
-	public void doFindAction() {
-		controller.showFindDialogFor(textPane);
-	}
-	
-	public void doFindNextAction() {
-		textPane.findNext();
-	}
-	
-	public void doFindPreviousAction() {
-		textPane.findPrevious();
-	}
-	
 	public void doClearScrollbackAction() {
 		textPane.clearScrollBuffer();
 		control.sendRedrawScreen();

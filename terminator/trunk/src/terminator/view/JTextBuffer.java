@@ -423,47 +423,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		}
 	}
 	
-	/**
-	 * Tests whether any of the Highlight objects in the array is a FindHighlighter.
-	 */
-	private static boolean containsFindHighlight(Highlight[] highlights) {
-		for (int i = 0; i < highlights.length; ++i) {
-			if (highlights[i].getHighlighter() instanceof FindHighlighter) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Searches from startLine to endLine inclusive, incrementing the
-	 * current line by 'direction', looking for a line with a find highlight.
-	 * When one is found, the cursor is moved there.
-	 */
-	private void findAgain(int startLine, int endLine, int direction) {
-		for (int i = startLine; i != endLine; i += direction) {
-			Highlight[] highlights = getHighlightsForLine(i);
-			if (containsFindHighlight(highlights)) {
-				scrollToLine(i);
-				return;
-			}
-		}
-	}
-	
-	/**
-	 * Scrolls the display to the first find highlight not currently on the display.
-	 */
-	public void findPrevious() {
-		findAgain(getFirstVisibleLine() - 1, -1, -1);
-	}
-	
-	/**
-	 * Scrolls the display to the next find highlight not currently on the display.
-	 */
-	public void findNext() {
-		findAgain(getLastVisibleLine() + 1, getModel().getLineCount() + 1, 1);
-	}
-	
 	public JViewport getViewport() {
 		return (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, this);
 	}
