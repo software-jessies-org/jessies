@@ -22,6 +22,11 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     private boolean isDirty;
     private BirdView birdView;
     
+    /**
+     * Used to display a watermark to indicate such things as a read-only file.
+     */
+    private WatermarkViewPort watermarkViewPort;
+    
     public static final String UNKNOWN = "Unknown";
     public static final String C_PLUS_PLUS = "C++";
     public static final String JAVA = "Java";
@@ -57,7 +62,12 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         this.file = FileUtilities.fileFromString(filename);
         this.text = new ETextArea();
         attachPopupMenuTo(text);
-        JScrollPane scrollPane = new JScrollPane(text);
+        
+        this.watermarkViewPort = new WatermarkViewPort();
+        watermarkViewPort.setView(text);
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setViewport(watermarkViewPort);
+        
         this.birdView = new BirdView(text, scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
@@ -172,6 +182,11 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
                 text.setIndenter(new JavaIndenter());
             }
             initKeywordsForDocument();
+            
+            if (file.canWrite() == false) {
+                watermarkViewPort.setWatermark("(read-only)");
+                text.setOpaque(false);
+            }
             
             text.setText(content);
             text.setAppropriateFont();
