@@ -3,9 +3,7 @@ package e.edit;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.font.*;
-import java.awt.event.*;
 import java.text.*;
-import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -20,6 +18,7 @@ import e.util.*;
  */
 public class ETextArea extends JTextArea {
     private DocumentUndoFilter undoFilter;
+    
     private UndoManager undoManager = new UnlimitedUndoManager();
     
     private JTextComponentSpellingChecker spellingChecker;
@@ -29,40 +28,6 @@ public class ETextArea extends JTextArea {
     private Indenter indenter = new Indenter();
     
     private static final FindAction FIND_ACTION = new FindAction();
-    
-    /*
-    public static JTextComponent.KeyBinding makeShiftCommandKeyBinding(int virtualKey, String actionName) {
-        JTextComponent.KeyBinding result = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(virtualKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK), actionName);
-        if (result == null) {
-            throw new IllegalArgumentException("virtualKey=" + virtualKey + "; actionName=\"" + actionName + "\"");
-        }
-        return result;
-    }
-    
-    public static JTextComponent.KeyBinding makeCommandKeyBinding(int virtualKey, String actionName) {
-        JTextComponent.KeyBinding result = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(virtualKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), actionName);
-        if (result == null) {
-            throw new IllegalArgumentException("virtualKey=" + virtualKey + "; actionName=\"" + actionName + "\"");
-        }
-        return result;
-    }
-    
-    public static JTextComponent.KeyBinding makeKeyBinding(String key, String actionName) {
-        JTextComponent.KeyBinding result = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(key), actionName);
-        if (result == null) {
-            throw new IllegalArgumentException("key='" + key + "'; actionName=\"" + actionName + "\"");
-        }
-        return result;
-    }
-    
-    public static JTextComponent.KeyBinding makeCharacterKeyBinding(Character character, String actionName) {
-        JTextComponent.KeyBinding result = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(character, 0), actionName);
-        if (result == null) {
-            throw new IllegalArgumentException("character='" + character + "'; actionName=\"" + actionName + "\"");
-        }
-        return result;
-    }
-    */
     
     public ETextArea() {
         setBackground(Color.WHITE);
@@ -246,7 +211,6 @@ public class ETextArea extends JTextArea {
         // Overrides the DefaultEditorKit Home/End actions.
         getActionMap().put(DefaultEditorKit.beginLineAction, new StartOfLineAction(false));
         getActionMap().put(DefaultEditorKit.selectionBeginLineAction, new StartOfLineAction(true));
-        
         getActionMap().put(DefaultEditorKit.endLineAction, new EndOfLineAction(false));
         getActionMap().put(DefaultEditorKit.selectionEndLineAction, new EndOfLineAction(true));
         
