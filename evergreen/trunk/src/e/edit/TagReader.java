@@ -169,13 +169,17 @@ public class TagReader {
             }
         }
         
+        public static final Color PUBLIC = Color.GREEN.darker();
+        public static final Color PROTECTED = Color.ORANGE;
+        public static final Color PRIVATE = new Color(255, 140, 140);
+        
         public Color visibilityColor() {
             if (context.indexOf("access:public") != -1) {
-                return Color.GREEN.darker();
+                return PUBLIC;
             } else if (context.indexOf("access:private") != -1) {
-                return Color.RED.darker();
+                return PRIVATE;
             } else if (context.indexOf("access:protected") != -1) {
-                return Color.ORANGE;
+                return PROTECTED;
             } else {
                 return Color.GRAY;
             }
