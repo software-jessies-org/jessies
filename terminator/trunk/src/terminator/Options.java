@@ -94,7 +94,7 @@ public class Options {
 	}
 	
 	private boolean parseBoolean(String s) {
-		return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes");
+		return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on");
 	}
 	
 	/**
