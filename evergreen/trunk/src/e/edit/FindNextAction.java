@@ -10,6 +10,7 @@ public class FindNextAction extends ETextAction {
 
     public FindNextAction() {
         super(ACTION_NAME);
+        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("G", false));
     }
     
     public void actionPerformed(ActionEvent e) {

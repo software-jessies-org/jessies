@@ -7,6 +7,7 @@ public class SaveAsAction extends ETextAction {
     
     public SaveAsAction() {
         super(ACTION_NAME);
+        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("S", true));
     }
     
     public void actionPerformed(ActionEvent e) {

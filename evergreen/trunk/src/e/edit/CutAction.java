@@ -10,6 +10,7 @@ public class CutAction extends ETextAction {
 
     public CutAction() {
         super(ACTION_NAME);
+        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("X", false));
     }
 
     public void actionPerformed(ActionEvent e) {

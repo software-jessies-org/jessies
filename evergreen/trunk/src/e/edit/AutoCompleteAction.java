@@ -17,6 +17,7 @@ public class AutoCompleteAction extends ETextAction {
     
     public AutoCompleteAction() {
         super(ACTION_NAME);
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_MASK));
     }
     
     public void actionPerformed(ActionEvent e) {

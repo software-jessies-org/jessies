@@ -9,6 +9,7 @@ import java.awt.event.*;
 public class OpenSelectionAction extends ETextAction {
     public OpenSelectionAction() {
         super("Open Quickly...");
+        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("D", true));
     }
     
     public void actionPerformed(ActionEvent e) {

@@ -10,6 +10,7 @@ public class CopyAction extends ETextAction {
 
     public CopyAction() {
         super(ACTION_NAME);
+        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("C", false));
     }
 
     public void actionPerformed(ActionEvent e) {

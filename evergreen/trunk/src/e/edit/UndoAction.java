@@ -11,6 +11,7 @@ public class UndoAction extends ETextAction {
 
     public UndoAction() {
         super(ACTION_NAME);
+        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("Z", false));
     }
 
     public void actionPerformed(ActionEvent e) {
