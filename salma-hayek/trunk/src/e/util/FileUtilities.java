@@ -80,6 +80,14 @@ public class FileUtilities {
     }
     
     /**
+     * Checks solely whether anything with the given filename exists.
+     * This method is equivalent to fileFromParentAndString(parent, filename).exists().
+     */
+    public static boolean exists(String parent, String filename) {
+        return fileFromParentAndString(parent, filename).exists();
+    }
+    
+    /**
      * Checks that a name exists and is a directory. Returns null if it does, an error suitable for a UI
      * if not.
      */
