@@ -61,13 +61,3 @@ Should allow the user to specify a log filename per tab, on the command line.
   if you look at the two, it's obvious xterm is right), we have a pixel's gap
   between lines (which may not be our fault so much as the font's), and we've
   cleared the non-default background color to the right of the box.
-
-* on the "pixel's gap between lines" problem mentioned above; Mac OS has
-  selection redraw problems that would also be caused by a pixel's gap that
-  doesn't belong to either upper or lower line, but which one or other of them
-  draws into when drawing its selection highlight. [update: on the other hand,
-  running with "-xrm Terminator*fontName:Courier" fixes the problem, so i
-  still think this is probably a FontMetrics problem with the Monaco font. it
-  could be that we both have a design problem, evidenced by the whiptail bug,
-  and it just happens to be exacerbated by the Monaco font so we get to see
-  it where we'd otherwise be okay.]
