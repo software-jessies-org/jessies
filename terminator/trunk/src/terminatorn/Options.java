@@ -149,7 +149,7 @@ public class Options {
 	 * xterm also offers complete control over all the ECMA colors.
 	 */
 	public Color getColor(String name) {
-		Properties props = getPropertySet("Colours", "Colours");
+		Properties props = getPropertySet("Colors", "Colors");
 		if (props != null) {
 			String description = props.getProperty(name);
 			if (description != null) {
@@ -169,7 +169,7 @@ public class Options {
 	/** Sets the colour for the given name, writing it into the properties file. */
 	public void setColor(String name, Color colour) {
 		String encodedColour = "0x" + Integer.toHexString(colour.getRGB()).substring(2);
-		HashMap writeSet = getWritablePropertySet("Colours", "Colours");
+		HashMap writeSet = getWritablePropertySet("Colors", "Colors");
 		writeSet.put(name, encodedColour);
 		try {
 			writeTerminatorOptions(terminatorOptionsFile);
@@ -403,7 +403,7 @@ public class Options {
 			oldContents.add("");
 			colourInsertPos = oldContents.size();
 		}
-		Properties props = getPropertySet("Colours", "Colours");
+		Properties props = getPropertySet("Colors", "Colors");
 		if (props != null) {
 			oldContents.add(colourInsertPos++, "Colours Colours {");
 			String[] keys = (String[]) props.keySet().toArray(new String[0]);
