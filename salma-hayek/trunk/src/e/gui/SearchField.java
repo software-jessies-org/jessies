@@ -23,6 +23,7 @@ import javax.swing.border.*;
 public class SearchField extends JTextField {
     private static final Border CANCEL_BORDER = new CancelBorder();
     
+    private boolean sendsNotificationForEachKeystroke = false;
     private boolean showingPlaceholderText = false;
     private boolean armed = false;
     
@@ -30,6 +31,7 @@ public class SearchField extends JTextField {
         super(15);
         addFocusListener(new PlaceholderText(placeholderText));
         initBorder();
+        initKeyListener();
     }
     
     public SearchField() {
@@ -44,37 +46,32 @@ public class SearchField extends JTextField {
         addMouseMotionListener(mouseInputListener);
     }
     
-    private DocumentListener documentListener;
+    private void initKeyListener() {
+        addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    cancel();
+                } else if (sendsNotificationForEachKeystroke) {
+                    maybeNotify();
+                }
+            }
+        });
+    }
+    
+    private void cancel() {
+        setText("");
+        postActionEvent();
+    }
+    
+    private void maybeNotify() {
+        if (showingPlaceholderText) {
+            return;
+        }
+        postActionEvent();
+    }
     
     public void setSendsNotificationForEachKeystroke(boolean eachKeystroke) {
-        if (eachKeystroke) {
-            if (documentListener == null) {
-                documentListener = new DocumentListener() {
-                    public void changedUpdate(DocumentEvent e) {
-                        // Style changes aren't relevant.
-                    }
-                    
-                    public void insertUpdate(DocumentEvent e) {
-                        maybeNotify();
-                    }
-                    
-                    public void removeUpdate(DocumentEvent e) {
-                        maybeNotify();
-                    }
-                    
-                    public void maybeNotify() {
-                        if (showingPlaceholderText) {
-                            return;
-                        }
-                        postActionEvent();
-                    }
-                };
-                getDocument().addDocumentListener(documentListener);
-            }
-        } else {
-            getDocument().removeDocumentListener(documentListener);
-            documentListener = null;
-        }
+        this.sendsNotificationForEachKeystroke = eachKeystroke;
     }
     
     /**
@@ -147,8 +144,7 @@ public class SearchField extends JTextField {
         
         public void mouseReleased(MouseEvent e) {
             if (armed) {
-                setText("");
-                postActionEvent();
+                cancel();
             }
             disarm();
         }
