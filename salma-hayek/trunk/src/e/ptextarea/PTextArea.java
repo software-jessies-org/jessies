@@ -28,7 +28,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private int caretLocation;
     private PAnchorSet anchorSet = new PAnchorSet();
     private ArrayList highlights = new ArrayList();
-    private PTextStyler textStyler;
+    private PTextStyler textStyler = PPlainTextStyler.INSTANCE;
     private int rightHandMarginColumn = NO_MARGIN;
     
     private PTextAreaSpellingChecker spellingChecker;
@@ -168,17 +168,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private PLineSegment[] getLineSegments(int lineIndex) {
         SplitLine splitLine = getSplitLine(lineIndex);
-        PTextSegment[] text;
-        if (textStyler == null) {
-            CharSequence chars = splitLine.getContents();
-            if (chars.length() == 0) {
-                text = new PTextSegment[0];
-            } else {
-                text = new PTextSegment[] { new PTextSegment(0, chars.toString()) };
-            }
-        } else {
-            text = textStyler.getLineSegments(splitLine);
-        }
+        PTextSegment[] text = textStyler.getLineSegments(splitLine);
         return getTabbedSegments(text);
     }
     
@@ -352,7 +342,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private Color getColor(int index) {
-        return (textStyler == null) ? Color.BLACK : textStyler.getDefaultColor(index);
+        return textStyler.getDefaultColor(index);
     }
     
     private void paintSegments(Graphics2D graphics, FontMetrics metrics, PLineSegment[] segments, int baseline, PCoordinates caretCoords, boolean drawCaret, boolean showWrap) {
