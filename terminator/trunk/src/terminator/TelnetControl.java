@@ -298,6 +298,7 @@ public class TelnetControl implements Runnable {
 			case 'K': return killLineContents(midSequence);
 			case 'J': return killLines(midSequence);
 			case 'L': return insertLines(midSequence);
+			case 'P': return deleteCharacters(midSequence);
 			case 'h': return setMode(midSequence, true);
 			case 'l': return setMode(midSequence, false);
 			case 'm': return processFontEscape(midSequence);
@@ -344,6 +345,12 @@ public class TelnetControl implements Runnable {
 		} else {
 			return false;
 		}
+	}
+	
+	public boolean deleteCharacters(String seq) {
+		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
+		listener.deleteCharacters(count);
+		return true;
 	}
 	
 	public boolean killLineContents(String seq) {

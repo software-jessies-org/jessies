@@ -36,6 +36,9 @@ public interface TelnetListener {
 	/** Inserts lines at the current caret position. */
 	public void insertLines(int count);
 	
+	/** Deletes characters from the cursor position forward. */
+	public void deleteCharacters(int count);
+	
 	/** Erases from either the start of line or the cursor, to either the end of the line or the cursor. */
 	public void killHorizontally(boolean fromStart, boolean toEnd);
 
