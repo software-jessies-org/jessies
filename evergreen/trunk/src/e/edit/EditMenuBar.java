@@ -122,6 +122,9 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         final JMenu menu = new JMenu("Tools");
         menu.add(makeAcceleratedItem(new BuildAction(), 'B'));
         menu.add(new SetBuildTargetAction());
+        menu.add(new OpenMakefileAction());
+        
+        menu.add(new JSeparator());
         menu.add(new TelnetAction());
 
         menu.add(new JSeparator());

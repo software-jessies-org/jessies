@@ -24,18 +24,23 @@ public class BuildAction extends ETextAction {
             return;
         }
         
-        String makefileName = FileUtilities.findFileByNameSearchingUpFrom("build.xml", text.getContext());
-        if (makefileName != null) {
+        String makefileName = findMakefile(text.getContext());
+        if (makefileName == null) {
+            Edit.showAlert("Build", "It's not possible to build this project because neither a Makefile for make or a build.xml for Ant could be found.");
+        } else if (makefileName.endsWith("build.xml")) {
             invokeBuildTool(text, makefileName, "ant -emacs -quiet");
-            return;
-        }
-        makefileName = FileUtilities.findFileByNameSearchingUpFrom("Makefile", text.getContext());
-        if (makefileName != null) {
+        } else if (makefileName.endsWith("Makefile")) {
             String makeCommand = Parameters.getParameter("make.command", "make");
             invokeBuildTool(text, makefileName, makeCommand);
-            return;
         }
-        Edit.showAlert("Build", "It's not possible to build this project because neither a Makefile for make or a build.xml for Ant could be found.");
+    }
+    
+    public static String findMakefile(String startDirectory) {
+        String makefileName = FileUtilities.findFileByNameSearchingUpFrom("build.xml", startDirectory);
+        if (makefileName == null) {
+            makefileName = FileUtilities.findFileByNameSearchingUpFrom("Makefile", startDirectory);
+        }
+        return makefileName;
     }
     
     public void invokeBuildTool(ETextWindow text, String makefileName, String command) {
