@@ -135,7 +135,7 @@ public class Options {
 		aliasColorBD();
 		try {
 			readTerminatorOptions(terminatorOptionsFile);
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			Log.warn("Problem reading options from " + terminatorOptionsFile.getPath(), ex);
 		}
 	}
@@ -209,33 +209,17 @@ public class Options {
 	}
 	
 	private void readRGBFile() {
-		BufferedReader in = null;
-		try {
-			File rgbFile = new File("/usr/X11R6/lib/X11/rgb.txt");
-			if (rgbFile.exists()) {
-				in = new BufferedReader(new FileReader(rgbFile));
-				String line;
-				while ((line = in.readLine()) != null) {
-					if (line.startsWith("!")) {
-						continue;
-					}
-					int r = channelAt(line, 0);
-					int g = channelAt(line, 4);
-					int b = channelAt(line, 8);
-					line = line.substring(12).trim();
-					rgbColours.put(line.toLowerCase(), new Color(r, g, b));
-				}
+		String[] lines = StringUtilities.readLinesFromFile("/usr/X11R6/lib/X11/rgb.txt");
+		for (int i = 0; i < lines.length; ++i) {
+			String line = lines[i];
+			if (line.startsWith("!")) {
+				continue;
 			}
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException ex) {
-					Log.warn("Couldn't close file.", ex);
-				}
-			}
+			int r = channelAt(line, 0);
+			int g = channelAt(line, 4);
+			int b = channelAt(line, 8);
+			line = line.substring(12).trim();
+			rgbColours.put(line.toLowerCase(), new Color(r, g, b));
 		}
 	}
 	
@@ -250,31 +234,19 @@ public class Options {
 		}
 		try {
 			readOptionsFrom(file);
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			Log.warn("Problem reading options from " + filename, ex);
 		}
 	}
 	
-	private void readOptionsFrom(File file) throws IOException {
-		LineNumberReader in = null;
-		try {
-			in = new LineNumberReader(new FileReader(file));
-			String line;
-			while ((line = in.readLine()) != null) {
-				line = line.trim();
-				if (line.length() == 0 || line.startsWith("!")) {
-					continue;
-				}
-				processResourceString(line);
+	private void readOptionsFrom(File file) {
+		String[] lines = StringUtilities.readLinesFromFile(file.toString());
+		for (int i = 0; i < lines.length; ++i) {
+			String line = lines[i].trim();
+			if (line.length() == 0 || line.startsWith("!")) {
+				continue;
 			}
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException ex) {
-					Log.warn("Couldn't close stream.", ex);
-				}
-			}
+			processResourceString(line);
 		}
 	}
 	
