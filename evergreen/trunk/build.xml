@@ -1,0 +1,51 @@
+<project name="Edit" default="compile" basedir=".">
+
+    <property name="build.compiler" value="jikes"/>
+
+    <property name="src" value="src"/>
+    <property name="build" value="classes"/>
+    <property name="dist" location=".."/>
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="compile" depends="init" description="Compile Edit">
+        <javac srcdir="${src}" destdir="${build}" debug="true">
+            <classpath>
+                <pathelement path="/System/Library/Java" />
+                <pathelement path="MRJ141Stubs.jar" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="dist" depends="clean,compile" description="Generate the distribution">
+        <tar tarfile="${dist}/edit-${DSTAMP}.tgz" compression="gzip">
+            <tarfileset dir="." prefix="edit/">
+                <include name="**"/>
+                <exclude name="edit"/>
+                <exclude name="edit.log"/>
+                <exclude name="esgrep"/>
+                <exclude name="sfind"/>
+                <exclude name="sgrep"/>
+                <exclude name="vi"/>
+                <exclude name="**/*.bak"/>
+            </tarfileset>
+            <tarfileset dir="." mode="755" prefix="edit/">
+                <include name="edit"/>
+                <include name="esgrep"/>
+                <include name="sfind"/>
+                <include name="sgrep"/>
+                <include name="vi"/>
+            </tarfileset>
+        </tar>
+    </target>
+
+    <target name="clean" description="Clean up" >
+        <delete dir="${build}"/>
+        <delete> <fileset dir="." includes="**/*.bak"/> </delete>
+    </target>
+
+</project>

@@ -1,0 +1,25 @@
+
+regexp is
+
+[^:]*:
+
+ISSUED_HEADERS += ConnectionFramer.h
+ISSUED_HEADERS += Framer.h
+ISSUED_HEADERS += FramerFactory.h
+ISSUED_HEADERS += FramerType.h
+./lib.make:32:ISSUED_HEADERS += PortDecode2FramerType.h
+./lib.make:82:SRCS += ConnectionFramer.cpp
+./lib.make:83:SRCS += Framer.cpp
+./lib.make:84:SRCS += FramerType.cpp
+./lib.make:87:SRCS += PortDecode2FramerType.cpp
+./lib.make:24:ISSUED_HEADERS += AssertReassembler.h
+./lib.make:29:ISSUED_HEADERS += NetbiosReassembler.h
+./lib.make:30:ISSUED_HEADERS += NullReassembler.h
+./lib.make:33:ISSUED_HEADERS += Reassembler.h
+./lib.make:34:ISSUED_HEADERS += RPCReassembler.h
+./lib.make:66:SRCS += Reassembler.cpp
+./lib.make:81:SRCS += AssertReassembler.cpp
+./lib.make:85:#SRCS += NetbiosReassembler.cpp
+./lib.make:86:SRCS += NullReassembler.cpp
+./lib.make:88:SRCS += RPCReassembler.cpp
+./lib.make:89:#SRCS += SoftNetbiosReassembler.cpp
