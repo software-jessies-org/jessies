@@ -19,35 +19,56 @@ public class EditServer extends Thread {
         for (;;) {
             try {
                 Socket client = socket.accept();
-                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                PrintWriter out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
-                handleCommand(in, out);
-                in.close();
-                client.close();
-            } catch (Throwable th) {
-                th.printStackTrace();
+                handleClient(client);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
     
-    public void handleCommand(BufferedReader in, PrintWriter out) throws IOException {
+    public void handleClient(Socket client) {
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
+            handleCommand(in, out);
+            out.flush();
+            out.close();
+            in.close();
+            client.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public void handleCommand(final BufferedReader in, final PrintWriter out) throws IOException {
         String line = in.readLine();
         if (line == null || line.length() == 0) {
             Log.warn("EditServer ignoring empty request");
             return;
         }
         if (line.startsWith("open ")) {
-            final String what = line.substring("open ".length());
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    Edit.getFrame().toFront();
-                    Edit.openFile(what);
-                }
-            });
+            String filename = line.substring("open ".length());
+            open(out, filename);
         } else {
             out.println("EditServer: didn't understand request \"" + line + "\".");
         }
-        out.flush();
-        out.close();
+    }
+    
+    public void open(final PrintWriter out, final String filename) {
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    try {
+                        Edit.openFileNonInteractively(filename);
+                        Edit.getFrame().toFront();
+                        out.println("File '" + filename + "' opened OK.");
+                    } catch (Exception ex) {
+                        out.println(ex.getMessage());
+                    }
+                }
+            });
+        } catch (Exception ex) {
+            out.println(ex.getMessage());
+        }
     }
 }
