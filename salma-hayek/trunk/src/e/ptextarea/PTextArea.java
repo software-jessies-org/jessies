@@ -15,13 +15,13 @@ import java.util.List;
  */
 
 public class PTextArea extends JComponent implements PLineListener, Scrollable {
-    private static final Color SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
     private static final int MIN_WIDTH = 50;
     private static final int MAX_CACHED_CHAR = 128;
     private static final int NO_MARGIN = -1;
     
     private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.6f, 0.6f, 0.6f);
     private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.96f, 0.96f, 0.96f);
+    private static final Color SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f, 0.5f);
     
     private PLineList lines;
     private PHighlight selection;
