@@ -43,6 +43,10 @@ public class TextLine {
 		this.lineStartIndex = lineStartIndex;
 	}
 	
+	public byte getStyleAt(int index) {
+		return styles[index];
+	}
+	
 	public StyledText[] getStyledTextSegments() {
 		if (styles.length == 0) {
 			return new StyledText[0];

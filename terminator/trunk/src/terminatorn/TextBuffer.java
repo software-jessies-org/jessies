@@ -478,15 +478,19 @@ public class TextBuffer implements TerminalListener {
 		view.repaint();
 	}
 	
-	/** Sets the position of the cursor to the given x and y coordinates, counted from 1,1 at the top-left corner. */
+	/**
+	* Sets the position of the cursor to the given x and y coordinates, counted from 1,1 at the top-left corner.
+	* If either x or y is -1, that coordinate is left unchanged.
+	*/
 	public void setCursorPosition(int x, int y) {
 		// Although the cursor positions are supposed to be measured
 		// from (1,1), there's nothing to stop a badly-behaved program
 		// from sending (0,0). ASUS routers do this (they're rubbish).
-		x = Math.max(1, x);
-		y = Math.max(1, y);
+		// Note that here we also transform from 1-based coordinates to 0-based.
+		x = (x == -1) ? caretPosition.getCharOffset() : Math.max(0, x - 1);
+		y = (y == -1) ? caretPosition.getLineIndex() : Math.max(0, y - 1);
 
-		caretPosition = new Location(y - 1 + getFirstDisplayLine(), x - 1);
+		caretPosition = new Location(y + getFirstDisplayLine(), x);
 	}
 	
 	/** Moves the cursor horizontally by the number of characters in xDiff, negative for left, positive for right. */

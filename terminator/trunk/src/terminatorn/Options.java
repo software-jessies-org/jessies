@@ -31,6 +31,7 @@ public class Options {
 	private HashMap options = new HashMap();
 	private HashMap rgbColours = new HashMap();
 	
+	private File terminatorOptionsFile;
 	private HashMap propertySets = new HashMap();
 	
 	public static Options getSharedInstance() {
@@ -148,6 +149,13 @@ public class Options {
 	 * xterm also offers complete control over all the ECMA colors.
 	 */
 	public Color getColor(String name) {
+		Properties props = getPropertySet("Colours", "Colours");
+		if (props != null) {
+			String description = props.getProperty(name);
+			if (description != null) {
+				return Color.decode(description);
+			}
+		}
 		String description = (String) options.get(name);
 		if (description == null) {
 			return null;
@@ -155,6 +163,18 @@ public class Options {
 			return Color.decode("0x" + description.substring(1));
 		} else {
 			return (Color) rgbColours.get(description.toLowerCase());
+		}
+	}
+	
+	/** Sets the colour for the given name, writing it into the properties file. */
+	public void setColor(String name, Color colour) {
+		String encodedColour = "0x" + Integer.toHexString(colour.getRGB()).substring(2);
+		HashMap writeSet = getWritablePropertySet("Colours", "Colours");
+		writeSet.put(name, encodedColour);
+		try {
+			writeTerminatorOptions(terminatorOptionsFile);
+		} catch (IOException ex) {
+			Log.warn("Failed to write options file.", ex);
 		}
 	}
 	
@@ -178,7 +198,7 @@ public class Options {
 		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
-		File terminatorOptionsFile = new File(System.getProperty("user.home"), ".terminator");
+		terminatorOptionsFile = new File(System.getProperty("user.home"), ".terminator");
 		aliasColorBD();
 		try {
 			readTerminatorOptions(terminatorOptionsFile);
@@ -316,6 +336,21 @@ public class Options {
 		}
 	}
 	
+	public HashMap getWritablePropertySet(String type, String name) {
+		HashMap typeSets = ensureHashMap(propertySets, type);
+		return ensureHashMap(typeSets, name);
+	}
+	
+	private HashMap ensureHashMap(HashMap container, String key) {
+		if (container.containsKey(key)) {
+			return (HashMap) container.get(key);
+		} else {
+			HashMap result = new HashMap();
+			container.put(key, result);
+			return result;
+		}
+	}
+	
 	public Properties getPropertySet(String type, String name) {
 		HashMap typeSets = (HashMap) propertySets.get(type);
 		if (typeSets == null) {
@@ -328,6 +363,64 @@ public class Options {
 				Properties result = new Properties();
 				result.putAll(map);
 				return result;
+			}
+		}
+	}
+	
+	private void writeTerminatorOptions(File file) throws IOException {
+		ArrayList oldContents = new ArrayList();
+		int colourInsertPos = -1;
+		if (file.exists()) {
+			LineNumberReader in = null;
+			try {
+				in = new LineNumberReader(new FileReader(file));
+				Pattern colourOpener = Pattern.compile("^Colours\\s+Colours\\s+\\{");
+				boolean readingColours = false;
+				String line;
+				while ((line = in.readLine()) != null) {
+					if (readingColours) {
+						if (line.trim().equals("}")) {
+							readingColours = false;
+						}
+					} else if (colourOpener.matcher(line).matches()) {
+						readingColours = true;
+						colourInsertPos = oldContents.size();
+					} else {
+						oldContents.add(line);
+					}
+				}
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (IOException ex) {
+						Log.warn("Failed to close " + file.getPath(), ex);
+					}
+				}
+			}
+		}
+		if (colourInsertPos == -1) {
+			oldContents.add("");
+			colourInsertPos = oldContents.size();
+		}
+		Properties props = getPropertySet("Colours", "Colours");
+		if (props != null) {
+			oldContents.add(colourInsertPos++, "Colours Colours {");
+			String[] keys = (String[]) props.keySet().toArray(new String[0]);
+			for (int i = 0; i < keys.length; i++) {
+				oldContents.add(colourInsertPos++, "\t" + keys[i] + " = " + props.getProperty(keys[i]));
+			}
+			oldContents.add(colourInsertPos++, "}");
+		}
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter(new FileWriter(file));
+			for (int i = 0; i < oldContents.size(); i++) {
+				out.println((String) oldContents.get(i));
+			}
+		} finally {
+			if (out != null) {
+				out.close();
 			}
 		}
 	}

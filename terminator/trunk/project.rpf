@@ -1,5 +1,5 @@
 #Rotide Project File
-#Wed May 26 15:43:34 BST 2004
+#Mon Jun 14 09:59:14 BST 2004
 Diff\ Command=cvs diff ${FILE}
 Top-Level\ Source\ Directory=/home/phil/Development/terminator/src
 Javadoc\ Paths=

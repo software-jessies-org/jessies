@@ -19,6 +19,17 @@ public class StyledText {
 	public static final int CYAN = 6;
 	public static final int WHITE = 7;
 	
+	private static final String[] COLOUR_DESCRIPTIONS = new String[] {
+		"Black",
+		"Red",
+		"Green",
+		"Yellow",
+		"Blue",
+		"Magenta",
+		"Cyan",
+		"White",
+	};
+	
 	private static final int BACKGROUND_SHIFT = 3;
 	private static final int FOREGROUND_MASK = 7;
 	private static final int BACKGROUND_MASK = 7 << BACKGROUND_SHIFT;
@@ -68,6 +79,34 @@ public class StyledText {
 	
 	public static Color getBackgroundColour(int style) {
 		return getColour(getBackground(style), false);  // Background is never considered to be bold.
+	}
+	
+	public static String getForegroundColourName(int style) {
+		return getColourName(getForeground(style), isBold(style));
+	}
+	
+	public static String getBackgroundColourName(int style) {
+		return getColourName(getBackground(style), isBold(style));
+	}
+	
+	public static String getColourName(int colourIndex, boolean isBold) {
+		return "color" + (colourIndex + (isBold ? 8 : 0));
+	}
+	
+	public static String getForegroundColourDescription(int style) {
+		return getColourDescription(getForeground(style), isBold(style));
+	}
+	
+	public static String getBackgroundColourDescription(int style) {
+		return getColourDescription(getBackground(style), isBold(style));
+	}
+	
+	public static String getColourDescription(int colourIndex, boolean isBold) {
+		if (isBold) {
+			return COLOUR_DESCRIPTIONS[colourIndex] + " (Bold)";
+		} else {
+			return COLOUR_DESCRIPTIONS[colourIndex];
+		}
 	}
 	
 	public static Color getColour(int colourIndex, boolean isBold) {
