@@ -35,4 +35,4 @@ find $root \
     '(' -type d -name sun4_solaris_release -prune ')' -or \
     '(' -type d -name sun4_solaris_profile -prune ')' -or \
     -type f -print \
-    | grep -v -e "\.bak$" -e "\.i$" -e "\.class$" -e "/err$" -e "~$" -e ".swp$" -e "\.o$" -e "\.gdb_history$" | sed -e 's/\(.*\)/"\1"/'
+    | grep -v -e '/\.' -e "\.bak$" -e "\.i$" -e "\.class$" -e "/err$" -e "~$" -e ".swp$" -e "\.o$" -e "\.gdb_history$" | sed -e 's/\(.*\)/"\1"/'
