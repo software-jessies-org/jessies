@@ -258,7 +258,8 @@ public class FindAndReplaceAction extends ETextAction {
         private DefaultListModel matchModel;
         private DefaultListModel replacementsModel;
         
-        private Exception syntaxError;
+        private PatternSyntaxException patternSyntaxError;
+        private IndexOutOfBoundsException replacementSyntaxError;
         
         public void doFindForPattern(String pattern, String replacement) {
             this.matchModel = new DefaultListModel();
@@ -309,9 +310,9 @@ public class FindAndReplaceAction extends ETextAction {
                     }
                 }
             } catch (PatternSyntaxException ex) {
-                syntaxError = ex;
+                patternSyntaxError = ex;
             } catch (IndexOutOfBoundsException ex) {
-                syntaxError = ex;
+                replacementSyntaxError = ex;
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -323,12 +324,10 @@ public class FindAndReplaceAction extends ETextAction {
             workerThread = null;
             if (result == null) {
                 setStatusToBad("More than " + MAX_DISPLAYED_MATCH_COUNT + " matches. No matches will be shown.", patternField);
-            } else if (syntaxError != null) {
-                if (syntaxError instanceof PatternSyntaxException) {
-                    setStatusToBad(((PatternSyntaxException) syntaxError).getDescription(), patternField);
-                } else {
-                    setStatusToBad(syntaxError.getMessage(), replacementField);
-                }
+            } else if (patternSyntaxError != null) {
+                setStatusToBad(patternSyntaxError.getDescription(), patternField);
+            } else if (replacementSyntaxError != null) {
+                setStatusToBad(replacementSyntaxError.getMessage(), replacementField);
             } else {
                 matchList.setModel(matchModel);
                 replacementsList.setModel(replacementsModel);

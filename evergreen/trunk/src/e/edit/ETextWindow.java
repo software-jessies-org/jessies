@@ -328,24 +328,22 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
             private boolean needSeparator = true;
             
-            public void addItem(Action action) {
+            public void addItem(ExternalToolAction action) {
                 addAction(action);
             }
 
-            public void addItem(Action action, char keyboardEquivalent) {
+            public void addItem(ExternalToolAction action, char keyboardEquivalent) {
                 addAction(action);
             }
 
-            public void addAction(Action action) {
+            private void addAction(ExternalToolAction action) {
                 if (needSeparator) {
                     addSeparator();
                     needSeparator = false;
                 }
                 /* Ignore ExternalToolActions that aren't context-sensitive. */
-                if (action instanceof ExternalToolAction) {
-                    if (((ExternalToolAction) action).isContextSensitive() == false) {
+                if (action.isContextSensitive() == false) {
                         return;
-                    }
                 }
                 items.add(action);
             }
