@@ -34,6 +34,9 @@ public interface TelnetListener {
 	/** Restores the saved style and location if it was saved earlier. */
 	public void restoreCursor();
 	
+	/** Sets or unsets the use of the alternative buffer. */
+	public void useAlternativeBuffer(boolean useAlternativeBuffer);
+	
 	// VT100 command support.
 	
 	/** Sets whether the caret should be displayed. */

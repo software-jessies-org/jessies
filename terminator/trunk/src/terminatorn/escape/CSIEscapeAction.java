@@ -69,6 +69,7 @@ public class CSIEscapeAction implements TelnetAction {
 			for (int i = 0; i < modes.length; i++) {
 				switch (Integer.parseInt(modes[i])) {
 					case 25: listener.setCaretDisplay(value); break;
+					case 47: listener.useAlternativeBuffer(value); break;
 					default: Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
 				}
 			}

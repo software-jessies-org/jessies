@@ -17,7 +17,7 @@ public class SingleCharEscapeAction implements TelnetAction {
 	public void perform(TelnetListener listener) {
 		switch (escChar) {
 			case '6':  // rxvt: scr_backindex
-				unsupported();
+				unsupported("scr_backindex");
 				break;
 			case '7':  // Save cursor.  rxvt saves position, current style, and charset.
 				listener.saveCursor();
@@ -26,44 +26,44 @@ public class SingleCharEscapeAction implements TelnetAction {
 				listener.restoreCursor();
 				break;
 			case '9':  // rxvt: scr_forwardindex
-				unsupported();
+				unsupported("scr_forwardindex");
 				break;
 			case '=':  // rxvt: set private mode PrivMode_aplKP (keypad madness).
-				unsupported();
+				unsupported("set private mode PrivMode_aplKP (keypad madness).");
 				break;
 			case '>':  // rxvt: unset private mode PrivMode_aplKP (keypad madness).
-				unsupported();
+				unsupported("unset private mode PrivMode_aplKP (keypad madness).");
 				break;
 			case 'D':  // Scroll display down.
 				listener.scrollDisplayDown();
 				break;
 			case 'E':  // rxvt: scr_add_lines containing '\n\r', 1, 2
-				unsupported();
+				unsupported("scr_add_lines containing '\\n\\r', 1, 2");
 				break;
 			case 'H':  // rxvt: scr_set_tab(1)
-				unsupported();
+				unsupported("scr_set_tab(1)");
 				break;
 			case 'M':  // Scroll display up.
 				listener.scrollDisplayUp();
 				break;
 			case 'Z':  // rxvt: Print ESCZ_ANSWER
-				unsupported();
+				unsupported("Print ESCZ_ANSWER");
 				break;
 			case 'c':  // Power on (full reset).
 				listener.fullReset();
 				break;
 			case 'n':  // rxvt: scr_charset_choose(2)
-				unsupported();
+				unsupported("scr_charset_choose(2)");
 				break;
 			case 'o':  // rxvt: scr_charset_choose(3)
-				unsupported();
+				unsupported("scr_charset_choose(3)");
 				break;
 			default:
 				Log.warn("Unrecognised single-character escape \"" + escChar + "\".");
 		}
 	}
 	
-	private void unsupported() {
-		Log.warn("Unsupported single-character escape \"" + escChar + "\".");
+	private void unsupported(String description) {
+		Log.warn("Unsupported single-character escape \"" + escChar + "\" (" + description + ").");
 	}
 }
