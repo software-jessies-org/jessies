@@ -62,6 +62,7 @@ SUBDIRS += $(wildcard native/$(TARGET_OS)/*)
 # ----------------------------------------------------------------------------
 
 SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
 # By default, distributions end up under http://www.jessies.org/~enh/
 DIST_SCP_USER_AND_HOST=enh@jessies.org
@@ -228,7 +229,7 @@ dist: build
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM)); \
 	find . -name "*.bak" | xargs --no-run-if-empty rm; \
 	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
-	svn-log-to-html.rb < ChangeLog > ChangeLog.html && \
+	$(SCRIPT_PATH)/svn-log-to-html.rb < ChangeLog > ChangeLog.html && \
 	scp ChangeLog.html $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
 	scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
 	cd $(if $(wildcard ../trunk),../..,..) && \
