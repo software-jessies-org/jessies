@@ -45,6 +45,11 @@ public class OpenQuicklyDialog {
         }
     }
     
+    private void setStatus(boolean good, String text) {
+        status.setForeground(good ? Color.BLACK : Color.RED);
+        status.setText(text);
+    }
+    
     public synchronized void showMatches() {
         String regex = filenameField.getText();
     
@@ -55,11 +60,9 @@ public class OpenQuicklyDialog {
                 model.addElement(fileList.get(i));
             }
             final int totalFileCount = workspace.getIndexedFileCount();
-            status.setForeground(Color.BLACK);
-            status.setText(fileList.size() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.");
+            setStatus(true, fileList.size() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.");
         } catch (PatternSyntaxException ex) {
-            status.setForeground(Color.RED);
-            status.setText(ex.getDescription());
+            setStatus(false, ex.getDescription());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -118,6 +121,7 @@ public class OpenQuicklyDialog {
             source = (JButton) e.getSource();
             source.setEnabled(false);
             matchList.setEnabled(false);
+            setStatus(true, " ");
             switchToFakeList();
             workspace.updateFileList(this);
         }
@@ -129,6 +133,7 @@ public class OpenQuicklyDialog {
             showMatches();
             matchList.setEnabled(true);
             source.setEnabled(true);
+            filenameField.requestFocus();
             source = null;
         }
     }
