@@ -78,20 +78,34 @@ public class FindFilesDialog {
         private String directory;
         private volatile boolean resultNoLongerWanted;
         
+        private int doneFileCount;
+        private int totalFileCount;
+        private int percentage;
+        
         public synchronized void doFindInDirectory(String pattern, String directory) {
             System.err.println("---doFindInDirectory " + pattern + "...");
             this.matchModel = new DefaultListModel();
             this.regex = pattern;
             this.directory = directory;
             this.resultNoLongerWanted = false;
+            this.doneFileCount = 0;
+            this.totalFileCount = workspace.getIndexedFileCount();
+            this.percentage = -1;
             
             matchList.setModel(matchModel);
-            status.setText("Searching...");
             start();
         }
         
         public synchronized void giveUp() {
             resultNoLongerWanted = true;
+        }
+        
+        public void updateStatus() {
+            int newPercentage = (doneFileCount * 100) / totalFileCount;
+            if (newPercentage != percentage) {
+                percentage = newPercentage;
+                status.setText("Searching... " + percentage + "%");
+            }
         }
         
         public Object construct() {
@@ -103,13 +117,13 @@ public class FindFilesDialog {
                 FileSearcher fileSearcher = new FileSearcher(pattern);
                 String root = workspace.getRootDirectory();
                 long startTime = System.currentTimeMillis();
-                for (int i = 0; i < fileList.size(); i++) {
+                for (doneFileCount = 0; doneFileCount < fileList.size(); ++doneFileCount) {
                     if (resultNoLongerWanted) {
                         System.err.println("---Aborting search!");
                         return null;
                     }
                     try {
-                        String candidate = (String) fileList.get(i);
+                        String candidate = (String) fileList.get(doneFileCount);
                         if (regex.length() != 0) {
                             int matchCount = fileSearcher.searchFile(root, candidate);
                             if (matchCount > 0) {
@@ -122,6 +136,7 @@ public class FindFilesDialog {
                     } catch (FileNotFoundException ex) {
                         ex = ex; // Not our problem.
                     }
+                    updateStatus();
                 }
                 long endTime = System.currentTimeMillis();
                 System.err.println("----------took: " + (endTime - startTime) + " ms.");
@@ -144,7 +159,6 @@ public class FindFilesDialog {
             if (matchModel.getSize() == 1) {
                 matchList.setSelectedIndex(0);
             }
-            final int totalFileCount = workspace.getIndexedFileCount();
             status.setText(matchModel.getSize() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.");
         }
     }
