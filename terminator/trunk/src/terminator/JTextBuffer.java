@@ -8,9 +8,10 @@ import javax.swing.*;
 A JTextBuffer provides the visible display of the virtual terminal.
 
 @author Phil Norman
+@author Elliott Hughes
 */
 
-public class JTextBuffer extends JComponent implements FocusListener {
+public class JTextBuffer extends JComponent implements FocusListener, Scrollable {
 	private static final boolean ANTIALIAS = false;
 
 	private TextBuffer model;
@@ -20,7 +21,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	public JTextBuffer() {
 		model = new TextBuffer(this, 80, 24);
 		setFont(Font.decode("Monospaced"));
-		setBackground(Color.white);
+		setBackground(Color.WHITE);
 		addFocusListener(this);
 		requestFocus();
 		SwingUtilities.invokeLater(new Runnable() {
@@ -172,5 +173,37 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public boolean hasFocus() {
 		return hasFocus;
+	}
+	
+	//
+	// Scrollable interface.
+	//
+	
+	public Dimension getPreferredScrollableViewportSize() {
+		return getPreferredSize();
+	}
+	
+	public int getScrollableUnitIncrement(Rectangle visibleRectangle, int orientation, int direction) {
+		if (orientation == SwingConstants.VERTICAL) {
+			return visibleRectangle.height / 10;
+		} else {
+			return visibleRectangle.width / 10;
+		}
+	}
+	
+	public int getScrollableBlockIncrement(Rectangle visibleRectangle, int orientation, int direction) {
+		if (orientation == SwingConstants.VERTICAL) {
+			return visibleRectangle.height;
+		} else {
+			return visibleRectangle.width;
+		}
+	}
+	
+	public boolean getScrollableTracksViewportWidth() {
+		return true;
+	}
+	
+	public boolean getScrollableTracksViewportHeight() {
+		return false; // We want a vertical scroll-bar.
 	}
 }
