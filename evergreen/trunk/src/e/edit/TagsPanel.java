@@ -128,9 +128,6 @@ public class TagsPanel extends JPanel {
         setVisibleComponent(emptyPanel);
     }
     
-    public void processTagLine(DefaultMutableTreeNode root, String line) {
-    }
-    
     public void setVisibleComponent(Component c) {
         removeAll();
         add(c, BorderLayout.CENTER);
