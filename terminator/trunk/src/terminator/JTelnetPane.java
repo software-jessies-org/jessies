@@ -17,6 +17,14 @@ public class JTelnetPane extends JPanel {
 	private TelnetControl control;
 	private JTextBuffer textPane;
 	private String name;
+	private MenuKeyAction[] menuAndKeyActions = new MenuKeyAction[] {
+		new NewTabAction(),
+		new RunCommandAction(),
+		new CloseTabAction(),
+		new FindAction(),
+		new ClearScrollbackAction(),
+//		new NewWindowAction(),
+	};
 	
 	/**
 	 * Creates a new terminal with the given name, running the given command.
@@ -96,6 +104,7 @@ public class JTelnetPane extends JPanel {
 	private void init(String command, Process process) throws IOException {
 		textPane = new JTextBuffer(controller);
 		textPane.addKeyListener(new KeyHandler());
+		textPane.addMouseListener(new ContextMenuOpener());
 		
 		JScrollPane scrollPane = new JScrollPane(new BorderPanel(textPane));
 		scrollPane.setBorder(null);
@@ -251,30 +260,12 @@ public class JTelnetPane extends JPanel {
 		public void keyTyped(KeyEvent event) {
 			char ch = event.getKeyChar();
 			if (isKeyboardEquivalent(event)) {
-				switch (ch) {
-					case 'e': case 'E':
-						String commandToRun = StringEntryDialog.getString(JTelnetPane.this, "Enter Command to Run");
-						if (commandToRun != null && commandToRun.length() > 0) {
-							controller.openCommandPane(commandToRun, true);
-						}
+				for (int i = 0; i < menuAndKeyActions.length; i++) {
+					char actionChar = Character.toLowerCase(menuAndKeyActions[i].getHotkeyChar());
+					if (Character.toLowerCase(ch) == actionChar) {
+						menuAndKeyActions[i].performAction();
 						break;
-					case 'f': case 'F':
-						controller.showFindDialogFor(textPane);
-						break;
-					case 'k': case 'K':
-						textPane.clearScrollBuffer();
-						control.sendRedrawScreen();
-						break;
-					case 'n': case 'N':
-						// TODO: Open a new window.
-						break;
-					case 't': case 'T':
-						controller.openShellPane(true);
-						break;
-					case 'w': case 'W':
-						control.destroyProcess();
-						controller.closeTelnetPane(JTelnetPane.this);
-						break;
+					}
 				}
 			} else {
 				if (ch != KeyEvent.CHAR_UNDEFINED) {
@@ -302,5 +293,133 @@ public class JTelnetPane extends JPanel {
 	 */
 	public void requestFocus() {
 		textPane.requestFocus();
+	}
+	
+	public class ContextMenuOpener extends MouseAdapter {
+		public void mousePressed(MouseEvent event) {
+			maybeShowPopup(event);
+		}
+
+		public void mouseReleased(MouseEvent event) {
+			maybeShowPopup(event);
+		}
+
+		private void maybeShowPopup(MouseEvent event) {
+			if (event.isPopupTrigger()) {
+				JPopupMenu menu = new JPopupMenu();
+				for (int i = 0; i < menuAndKeyActions.length; i++) {
+					menu.add(getMenuItem(menuAndKeyActions[i]));
+				}
+				menu.show((Component) event.getSource(), event.getX() + 1, event.getY());
+			}
+		}
+		
+		private JMenuItem getMenuItem(final MenuKeyAction action) {
+			JMenuItem result = new JMenuItem(action.getName());
+			result.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent event) {
+					action.performAction();
+				}
+			});
+			result.setAccelerator(KeyStroke.getKeyStroke(new Character(action.getHotkeyChar()), InputEvent.ALT_MASK));
+			return result;
+		}
+	}
+	
+	public interface MenuKeyAction {
+		public String getName();
+		
+		public void performAction();
+		
+		public char getHotkeyChar();
+	}
+	
+	public class RunCommandAction implements MenuKeyAction {
+		public String getName() {
+			return "Run In Tab...";
+		}
+		
+		public void performAction() {
+			String commandToRun = StringEntryDialog.getString(JTelnetPane.this, "Enter Command to Run");
+			if (commandToRun != null && commandToRun.length() > 0) {
+				controller.openCommandPane(commandToRun, true);
+			}
+		}
+		
+		public char getHotkeyChar() {
+			return 'e';
+		}
+	}
+	
+	public class FindAction implements MenuKeyAction {
+		public String getName() {
+			return "Find...";
+		}
+		
+		public void performAction() {
+			controller.showFindDialogFor(textPane);
+		}
+		
+		public char getHotkeyChar() {
+			return 'f';
+		}
+	}
+	
+	public class ClearScrollbackAction implements MenuKeyAction {
+		public String getName() {
+			return "Clear Scrollback";
+		}
+		
+		public void performAction() {
+			textPane.clearScrollBuffer();
+			control.sendRedrawScreen();
+		}
+		
+		public char getHotkeyChar() {
+			return 'k';
+		}
+	}
+	
+	public class NewWindowAction implements MenuKeyAction {
+		public String getName() {
+			return "New Window";
+		}
+		
+		public void performAction() {
+			// TODO: Open a new window.
+		}
+		
+		public char getHotkeyChar() {
+			return 'n';
+		}
+	}
+	
+	public class NewTabAction implements MenuKeyAction {
+		public String getName() {
+			return "New Tab";
+		}
+		
+		public void performAction() {
+			controller.openShellPane(true);
+		}
+		
+		public char getHotkeyChar() {
+			return 't';
+		}
+	}
+	
+	public class CloseTabAction implements MenuKeyAction {
+		public String getName() {
+			return "Close Tab";
+		}
+		
+		public void performAction() {
+			control.destroyProcess();
+			controller.closeTelnetPane(JTelnetPane.this);
+		}
+		
+		public char getHotkeyChar() {
+			return 'w';
+		}
 	}
 }
