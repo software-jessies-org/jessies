@@ -1,5 +1,6 @@
 package e.ptextarea;
 
+import e.util.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
@@ -73,13 +74,7 @@ public class PTextBuffer implements CharSequence {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
-            if (dataInputStream != null) {
-                try {
-                    dataInputStream.close();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
+            FileUtilities.close(dataInputStream);
         }
     }
     
