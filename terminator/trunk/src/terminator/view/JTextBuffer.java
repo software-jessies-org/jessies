@@ -1,4 +1,4 @@
-package terminator;
+package terminator.view;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
@@ -7,6 +7,10 @@ import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
 import e.util.*;
+
+import terminator.*;
+import terminator.model.*;
+import terminator.view.highlight.*;
 
 /**
 A JTextBuffer provides the visible display of the virtual terminal.

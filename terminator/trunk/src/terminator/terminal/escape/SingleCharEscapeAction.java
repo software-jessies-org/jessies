@@ -1,7 +1,7 @@
-package terminator.escape;
+package terminator.terminal.escape;
 
 import e.util.*;
-import terminator.*;
+import terminator.terminal.*;
 
 /**
 

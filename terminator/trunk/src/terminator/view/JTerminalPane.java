@@ -1,4 +1,4 @@
-package terminator;
+package terminator.view;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -6,6 +6,9 @@ import java.io.*;
 import javax.swing.*;
 import e.forms.*;
 import e.util.*;
+import terminator.*;
+import terminator.model.*;
+import terminator.terminal.*;
 
 /**
 

@@ -1,8 +1,12 @@
-package terminator;
+package terminator.view.highlight;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+
+import terminator.*;
+import terminator.model.*;
+import terminator.view.*;
 
 /**
  * Implements the feel (rather than the look) of the selection. The look is

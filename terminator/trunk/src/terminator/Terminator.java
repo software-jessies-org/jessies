@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.List;
 import javax.swing.*;
 import e.util.*;
+import terminator.view.*;
 
 public class Terminator {
 	private List arguments;

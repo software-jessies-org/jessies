@@ -1,10 +1,14 @@
-package terminator;
+package terminator.view.highlight;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.regex.*;
 import e.util.*;
+
+import terminator.*;
+import terminator.model.*;
+import terminator.view.*;
 
 /**
 

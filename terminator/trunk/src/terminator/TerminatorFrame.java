@@ -7,6 +7,8 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import e.gui.*;
+import terminator.view.*;
+import terminator.view.highlight.*;
 
 import javax.swing.Timer;
 

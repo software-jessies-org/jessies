@@ -1,6 +1,7 @@
-package terminator;
+package terminator.model;
 
 import java.awt.*;
+import terminator.*;
 
 /**
 A StyledText represents a string of text with one particular style applied.  It also defines in

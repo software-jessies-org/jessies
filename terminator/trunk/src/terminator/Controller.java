@@ -2,6 +2,8 @@ package terminator;
 
 import java.awt.*;
 
+import terminator.view.*;
+
 /**
 A Controller is the master of a JTerminalPane, and allows the JTerminalPane to request its master
 to do stuff, like opening new tabs, closing itself, or whatever.

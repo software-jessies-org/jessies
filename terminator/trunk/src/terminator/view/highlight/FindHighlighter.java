@@ -1,8 +1,11 @@
-package terminator;
+package terminator.view.highlight;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
+
+import terminator.model.*;
+import terminator.view.*;
 
 /**
  * Highlights the results of user-initiated finds.

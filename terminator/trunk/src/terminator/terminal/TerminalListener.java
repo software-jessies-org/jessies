@@ -1,4 +1,4 @@
-package terminator;
+package terminator.terminal;
 
 import java.awt.*;
 

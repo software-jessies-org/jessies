@@ -1,10 +1,12 @@
-package terminator;
+package terminator.model;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import e.util.*;
+import terminator.terminal.*;
+import terminator.view.*;
 
 /**
 A TextBuffer represents all the text associated with a single connection.  It maintains a list of

@@ -4,6 +4,7 @@ import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 import java.util.List;
 import e.util.*;
+import terminator.view.*;
 
 /**
  * Makes a JTextBuffer a drop target for strings and files. Strings are

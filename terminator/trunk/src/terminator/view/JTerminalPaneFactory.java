@@ -1,7 +1,8 @@
-package terminator;
+package terminator.view;
 
 import java.io.*;
 import e.util.*;
+import terminator.*;
 
 /**
 
