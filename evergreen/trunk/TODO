@@ -1,5 +1,11 @@
 TODO list for Edit
 
+Add a field to "Add Workspace" so you can specify a build host. Any build
+commands are then prefixed with "ssh build-host ". Probably also need a way
+to edit a workspace's properties (which would sometimes have been useful
+previously, when a repository has changed location, or I've wanted to change
+its name).
+
 Title bar text:
  1. Don't show repository root prefix in title bars?
  2. Intelligently truncate titles too long for the title bar?
