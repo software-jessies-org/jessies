@@ -20,7 +20,7 @@ public class StyledText {
 	public static final int CYAN = 6;
 	public static final int WHITE = 7;
 	
-	private static final String[] COLOUR_DESCRIPTIONS = new String[] {
+	private static final String[] COLOR_DESCRIPTIONS = new String[] {
 		"Black",
 		"Red",
 		"Green",
@@ -42,7 +42,7 @@ public class StyledText {
 	private boolean continueToEnd = false;
 	
 	public StyledText(String text, byte style) {
-		this(text, getForegroundColour(style), getBackgroundColour(style), isBold(style), isUnderlined(style));
+		this(text, getForegroundColor(style), getBackgroundColor(style), isBold(style), isUnderlined(style));
 	}
 	
 	public StyledText(String text, Color foreground, Color background, boolean isBold, boolean isUnderlined) {
@@ -74,62 +74,62 @@ public class StyledText {
 		return style;
 	}
 	
-	public static Color getForegroundColour(int style) {
-		return getColour(getForeground(style), isBold(style));
+	public static Color getForegroundColor(int style) {
+		return getColor(getForeground(style), isBold(style));
 	}
 	
-	public static Color getBackgroundColour(int style) {
-		return getColour(getBackground(style), false);  // Background is never considered to be bold.
+	public static Color getBackgroundColor(int style) {
+		return getColor(getBackground(style), false);  // Background is never considered to be bold.
 	}
 	
-	public static String getForegroundColourName(int style) {
-		return getColourName(getForeground(style), isBold(style));
+	public static String getForegroundColorName(int style) {
+		return getColorName(getForeground(style), isBold(style));
 	}
 	
-	public static String getBackgroundColourName(int style) {
-		return getColourName(getBackground(style), isBold(style));
+	public static String getBackgroundColorName(int style) {
+		return getColorName(getBackground(style), isBold(style));
 	}
 	
-	public static String getColourName(int colourIndex, boolean isBold) {
-		return "color" + (colourIndex + (isBold ? 8 : 0));
+	public static String getColorName(int colorIndex, boolean isBold) {
+		return "color" + (colorIndex + (isBold ? 8 : 0));
 	}
 	
-	public static String getForegroundColourDescription(int style) {
-		return getColourDescription(getForeground(style), isBold(style));
+	public static String getForegroundColorDescription(int style) {
+		return getColorDescription(getForeground(style), isBold(style));
 	}
 	
-	public static String getBackgroundColourDescription(int style) {
-		return getColourDescription(getBackground(style), isBold(style));
+	public static String getBackgroundColorDescription(int style) {
+		return getColorDescription(getBackground(style), isBold(style));
 	}
 	
-	public static String getColourDescription(int colourIndex, boolean isBold) {
+	public static String getColorDescription(int colorIndex, boolean isBold) {
 		if (isBold) {
-			return COLOUR_DESCRIPTIONS[colourIndex] + " (Bold)";
+			return COLOR_DESCRIPTIONS[colorIndex] + " (Bold)";
 		} else {
-			return COLOUR_DESCRIPTIONS[colourIndex];
+			return COLOR_DESCRIPTIONS[colorIndex];
 		}
 	}
 	
-	public static Color getColour(int colourIndex, boolean isBold) {
+	public static Color getColor(int colorIndex, boolean isBold) {
 		Color result = null;
 		Options opts = Options.getSharedInstance();
-		boolean isForeground = (colourIndex == BLACK);
+		boolean isForeground = (colorIndex == BLACK);
 		if (isBold) {
 			if (isForeground) {
 				result = opts.getColor("colorBD");
-			} else if (colourIndex < 8) {
-				result = opts.getColor("color" + (colourIndex + 8));
+			} else if (colorIndex < 8) {
+				result = opts.getColor("color" + (colorIndex + 8));
 			}
 		}
 		if (result == null) {
 			if (isForeground) {
 				result = opts.getColor("foreground");
-			} else if (colourIndex == WHITE) {
+			} else if (colorIndex == WHITE) {
 				result = opts.getColor("background");
 			}
 		}
 		if (result == null) {
-			result = opts.getColor("color" + colourIndex);
+			result = opts.getColor("color" + colorIndex);
 		}
 		return result;
 	}
@@ -150,8 +150,8 @@ public class StyledText {
 		return (style & IS_UNDERLINED) != 0;
 	}
 	
-	public static int getNormalStyle(int colour) {
-		return colour;
+	public static int getNormalStyle(int color) {
+		return color;
 	}
 	
 	public static int getDefaultStyle() {
