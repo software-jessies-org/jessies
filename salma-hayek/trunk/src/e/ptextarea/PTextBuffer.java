@@ -14,12 +14,40 @@ import java.util.*;
  */
 
 public class PTextBuffer implements CharSequence {
+    public static final String LINE_ENDING_PROPERTY = "LineEndingProperty";
+    
     private static final String CHARSET = "UTF-8";
+    
     private char[] text = new char[0];
     private int gapPosition;
     private int gapLength;
     private ArrayList listeners = new ArrayList();
     private Undoer undoBuffer = new Undoer();
+    private HashMap properties = new HashMap();
+    
+    public PTextBuffer() {
+        initDefaultProperties();
+    }
+    
+    private void initDefaultProperties() {
+        putProperty(LINE_ENDING_PROPERTY, "\n");
+    }
+    
+    /**
+     * Returns the value of the named property.
+     */
+    public Object getProperty(String name) {
+        return properties.get(name);
+    }
+    
+    /**
+     * Associates 'value' with the property 'name'. You can either use one
+     * of the pre-defined property constant names, or your own names. Your
+     * own names should include your fully-qualified domain to avoid collision.
+     */
+    public void putProperty(String name, Object value) {
+        properties.put(name, value);
+    }
     
     public PUndoBuffer getUndoBuffer() {
         return undoBuffer;
@@ -92,17 +120,25 @@ public class PTextBuffer implements CharSequence {
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), CHARSET));
             
-            // FIXME: if the property says the line ending isn't "\n", split
-            // the text into lines, and write them out with the appropriate
-            // line ending.
-            
-            // Otherwise, just write out the two halves as they are.
-            if (gapPosition != 0) {
-                writer.write(text, 0, gapPosition);
-            }
-            final int gapEnd = gapPosition + gapLength;
-            if (gapEnd < text.length) {
-                writer.write(text, gapEnd, text.length - gapEnd);
+            String lineEnding = (String) getProperty(LINE_ENDING_PROPERTY);
+            if (lineEnding.equals("\n")) {
+                // Just write out the two halves as they are.
+                if (gapPosition != 0) {
+                    writer.write(text, 0, gapPosition);
+                }
+                final int gapEnd = gapPosition + gapLength;
+                if (gapEnd < text.length) {
+                    writer.write(text, gapEnd, text.length - gapEnd);
+                }
+            } else {
+                // Split our internal content into lines, and write them
+                // out individually. Expensive, but why aren't you using
+                // Unix line-endings, crazy person?
+                String[] lines = toString().split("\n");
+                for (int i = 0; i < lines.length; ++i) {
+                    writer.write(lines[i]);
+                    writer.write(lineEnding);
+                }
             }
             writer.flush();
         } catch (IOException ex) {
