@@ -58,10 +58,12 @@ public class PTextBuffer implements CharSequence {
     }
     
     /**
-     * Returns a copy of the specified region of text.  This involves making a complete copy of the
-     * specified region of text, and so is best avoided.  Use the CharSequence interface instead.
+     * Returns a copy of the specified region of text.  This involves making a
+     * complete copy of the specified region of text, and so should only be
+     * used if you need to keep the copy unchanged in the face of future edits.
+     * If not, use the CharSequence interface instead.
      */
-    public char[] getText(int start, int charCount) {
+    private char[] copyChars(int start, int charCount) {
         char[] result = new char[charCount];
         try {
             int copyCount = 0;
@@ -106,7 +108,7 @@ public class PTextBuffer implements CharSequence {
     
     /** Deletes the given number of characters, the lowest-indexed of which is at the given position. */
     public void delete(int position, int count) {
-        char[] ch = getText(position, count);
+        char[] ch = copyChars(position, count);
         undoBuffer.addDeletion(position, ch);
         deleteWithoutUndo(position, ch);
     }
@@ -198,7 +200,7 @@ public class PTextBuffer implements CharSequence {
         }
         
         public String toString() {
-            return new String(getText(start, end - start));
+            return new String(copyChars(start, end - start));
         }
     }
     
