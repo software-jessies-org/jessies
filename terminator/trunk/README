@@ -2,16 +2,19 @@ README file for Terminator, v0.9.
 
 Please do read this file first - it's short, but important.
 
-Terminator has its own terminfo file.  You'll need to install this in order
-for Terminator to work correctly.  For information on how to do this, read
-the doc/README file.
+Terminator has its own terminfo file.  This will be installed in your home
+directory unless you run terminator with privileges on the system-wide
+terminfo directory.  If it's only installed in your home directory then you
+will see "terminal is not fully functional" problems when using su to
+switch to another user (although sudo works fine).  Similarly, if you're
+using Terminator to run ssh, then you will want to follow the instructions
+in doc/README to install the terminfo file on the target system.
 
 In order to get the best out of Terminator, you're also recommended to
-create a ~/.terminator configuration file in order to enable hyperlinks.
-You can copy a pre-written one from doc/pros-examples/, where
-there are several for various different operating systems.  If you don't
-see your system listed, copy the nearest match and have a quick look
-through to make sure it's going to be running the right commands.
+customize the ~/.terminator configuration file to enable hyperlinks.
+Terminator will attempt to guess appropriate defaults when it's first run.
+If you run Terminator on multiple windowing environments with the same
+home directory then, er, we apologize.
 
 Terminator is a joint project between Phil Norman and Elliott Hughes.
 Started on 21st April 2004 after Elliott moaned about the lack of a really
