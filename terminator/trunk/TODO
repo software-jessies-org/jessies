@@ -34,17 +34,7 @@ Should allow the user to specify a log filename per tab, on the command line.
   good as Apple's. And I guess the right direction to go in is one that moves
   us away from .Xdefaults and .Xresources except as an initial land grab.
 
-* Remove the color-editing cruft, which doesn't really work properly anyway.
-
-* Fix Mac OS integration; primarily, this means supporting a single menu bar.
-
 * Rewrite the hyper-link code to be less eager.
-
-* Get the web page and images under version control; update them.
-
-* Some way to easily get the log filename for a given tab onto the clipboard.
-
-* Some way to turn off logging for a given connection.
 
 * Fix the speed of pasting large amounts of text (without breaking the
   correctness).
@@ -69,3 +59,8 @@ Should allow the user to specify a log filename per tab, on the command line.
   if you look at the two, it's obvious xterm is right), we have a pixel's gap
   between lines (which may not be our fault so much as the font's), and we've
   cleared the non-default background color to the right of the box.
+
+* on the "pixel's gap between lines" problem mentioned above; Mac OS has
+  selection redraw problems that would also be caused by a pixel's gap that
+  doesn't belong to either upper or lower line, but which one or other of them
+  draws into when drawing its selection highlight.
