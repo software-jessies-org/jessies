@@ -181,7 +181,10 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     public void updateWatermark() {
         watermarkViewPort.setSerious(false);
         ArrayList items = new ArrayList();
-        if (file.canWrite() == false) {
+        if (file.exists() == false) {
+            items.add("(removed on disk)");
+        }
+        if (file.exists() && file.canWrite() == false) {
             items.add("(read-only)");
         }
         if (isOutOfDateWithRespectToDisk()) {
