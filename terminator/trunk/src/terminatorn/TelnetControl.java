@@ -176,7 +176,7 @@ public class TelnetControl implements Runnable {
 			doStep();
 			processSpecialCharacter(ch);
 		} else {
-			lineBuffer.append(ch);
+			lineBuffer.append(ch != '\t' ? ch : ' '); // FIXME: remove this tab-mangling hack!
 		}
 	}
 
