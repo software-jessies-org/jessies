@@ -281,6 +281,7 @@ public class Options {
 	}
 	
 	private void readRGBFile() {
+		rgbColors = new HashMap();
 		String[] lines = StringUtilities.readLinesFromFile("/usr/X11R6/lib/X11/rgb.txt");
 		for (int i = 0; i < lines.length; ++i) {
 			String line = lines[i];
