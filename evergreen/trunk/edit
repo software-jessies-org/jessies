@@ -44,7 +44,7 @@ EDIT_LOG=/tmp/edit.log.$$
 # Symbolically linking to a file which doesn't exist is perfectly legal.
 ln -s -f $EDIT_LOG /tmp/edit.log
 
-exec $JAVA $OS_SPECIFIC_OPTIONS \
+$JAVA $OS_SPECIFIC_OPTIONS \
     $EXTRA_JAVA_OPTIONS \
     $HEAP_SIZE \
     -classpath $EDIT_HOME/classes:$EXTRA_CLASSPATH_ENTRIES \
@@ -56,4 +56,4 @@ exec $JAVA $OS_SPECIFIC_OPTIONS \
     -Denv.PATH=$PATH \
     -DpreferencesDirectory=$EDIT_PREFERENCES_DIRECTORY \
     $EDIT_CLASS_NAME \
->> $EDIT_LOG 2>&1
+>> $EDIT_LOG 2>&1 || cat $EDIT_LOG 1>&2
