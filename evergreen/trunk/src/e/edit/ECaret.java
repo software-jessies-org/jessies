@@ -46,16 +46,16 @@ public class ECaret extends DefaultCaret {
         return c == ' ' || c == '\t';
     }
     
-    private final String brackets = "(<[{}]>)";
+    private static final String BRACKETS = "(<[{}]>)";
     
-    private final String partners = ")>]}{[<(";
+    private static final String PARTNERS = ")>]}{[<(";
     
     public boolean isBracket(char ch) {
-        return brackets.indexOf(ch) != -1;
+        return BRACKETS.indexOf(ch) != -1;
     }
     
     public boolean isOpenBracket(char ch) {
-        return brackets.indexOf(ch) < partners.indexOf(ch);
+        return BRACKETS.indexOf(ch) < PARTNERS.indexOf(ch);
     }
     
     public boolean isCloseBracket(char ch) {
@@ -63,7 +63,7 @@ public class ECaret extends DefaultCaret {
     }
     
     public char getPartnerForBracket(char bracket) {
-        return partners.charAt(brackets.indexOf(bracket));
+        return PARTNERS.charAt(BRACKETS.indexOf(bracket));
     }
     
     public char getCharAt(int offset) throws BadLocationException {
