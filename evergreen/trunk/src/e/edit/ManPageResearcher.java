@@ -16,6 +16,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
      * Initializes the set of known man pages.
      */
     public ManPageResearcher() {
+        final long startTime = System.currentTimeMillis();
         knownManPages = new HashSet();
         
         /*
@@ -34,7 +35,8 @@ public class ManPageResearcher implements WorkspaceResearcher {
             knownManPages.add(manPages[i]);
         }
         
-        Log.warn("Known man pages: " + knownManPages.size());
+        final long duration = System.currentTimeMillis() - startTime;
+        Log.warn("Learned of " + knownManPages.size() + " man pages in " + duration + "ms.");
     }
     
     /**
