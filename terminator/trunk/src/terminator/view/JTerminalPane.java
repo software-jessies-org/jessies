@@ -331,19 +331,13 @@ public class JTerminalPane extends JPanel {
 					case KeyEvent.VK_END:
 						textPane.scrollToBottom();
 						return true;
-					case KeyEvent.VK_LEFT:
-						scrollBy(-0.5, 0);
-						return true;
-					case KeyEvent.VK_RIGHT:
-						scrollBy(0.5, 0);
-						return true;
 					case KeyEvent.VK_PAGE_UP:
 					case KeyEvent.VK_UP:
-						scrollBy(0, -0.5);
+						scrollVertically(-0.5);
 						return true;
 					case KeyEvent.VK_PAGE_DOWN:
 					case KeyEvent.VK_DOWN:
-						scrollBy(0, 0.5);
+						scrollVertically(0.5);
 						return true;
 					default:
 						return false;
@@ -353,11 +347,22 @@ public class JTerminalPane extends JPanel {
 			}
 		}
 		
-		private void scrollBy(double xMul, double yMul) {
-			Rectangle rect = scrollPane.getViewport().getViewRect();
-			rect.x += (int) (xMul * rect.width);
-			rect.y += (int) (yMul * rect.height);
-			textPane.scrollRectToVisible(rect);
+		private void scrollVertically(double yMul) {
+			JViewport viewport = scrollPane.getViewport();
+			
+			// Translate JViewport's terrible confusing names into plain English.
+			final int totalHeight = viewport.getViewSize().height;
+			final int visibleHeight = viewport.getExtentSize().height;
+			
+			Point p = viewport.getViewPosition();
+			p.y += (int) (yMul * visibleHeight);
+			
+			// Don't go off the top...
+			p.y = Math.max(0, p.y);
+			// Or bottom...
+			p.y = Math.min(p.y, totalHeight - visibleHeight);
+			
+			viewport.setViewPosition(p);
 		}
 		
 		/**
