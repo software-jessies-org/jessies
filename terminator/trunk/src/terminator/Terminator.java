@@ -18,6 +18,18 @@ public class Terminator {
 	
 	private Terminator() {
 		Log.setApplicationName("Terminator");
+		if (GuiUtilities.isMacOs()) {
+			initMenuBar();
+		}
+	}
+	
+	private void initMenuBar() {
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+		System.setProperty("apple.awt.window.position.forceSafeProgrammaticPositioning", "false");
+		JFrame hiddenFrame = new JFrame("Mac OS implementation detail");
+		hiddenFrame.setJMenuBar(new TerminatorMenuBar());
+		hiddenFrame.setLocation(30000, 30000);
+		hiddenFrame.setVisible(true);
 	}
 	
 	private void parseCommandLine(final String[] argumentArray) throws IOException {
