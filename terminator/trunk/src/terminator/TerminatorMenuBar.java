@@ -30,6 +30,7 @@ public class TerminatorMenuBar extends JMenuBar {
 	private JMenu makeFileMenu() {
 		JMenu menu = new JMenu("File");
 		menu.add(new JMenuItem(new NewShellAction()));
+		menu.add(new JMenuItem(new NewTabAction()));
 		//menu.add(makeAcceleratedItemEx(new NewCommandAction(), 'N', true));
 		//menu.add(makeAcceleratedItemEx(new ConnectToServerAction(), 'K', true));
 		
@@ -142,7 +143,21 @@ public class TerminatorMenuBar extends JMenuBar {
 			Terminator.getSharedInstance().openFrame();
 		}
 	}
-
+	
+	public static class NewTabAction extends AbstractAction {
+		public NewTabAction() {
+			super("New Tab");
+			putValue(ACCELERATOR_KEY, makeKeyStroke("T"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			TerminatorFrame frame = getFocusedTerminatorFrame();
+			if (frame != null) {
+				frame.openNewTab();
+			}
+		}
+	}
+	
 	class NewCommandAction extends AbstractAction {
 		public NewCommandAction() {
 			super("New Command...");
