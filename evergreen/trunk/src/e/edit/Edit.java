@@ -721,13 +721,37 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         Parameters.readPropertiesFile(getPreferenceFilename("edit.properties"));
     }
     
+    private static JPanel statusLineAndProgressContainer = new JPanel(new BorderLayout());
+    
     public void initStatusArea() {
         statusLine = new EStatusBar();
         minibuffer = new Minibuffer();
+        
+        statusLineAndProgressContainer.add(statusLine, BorderLayout.CENTER);
+        
         statusArea = new JPanel(new BorderLayout());
         statusArea.setBorder(new javax.swing.border.EmptyBorder(2, 2, 2, 2));
-        statusArea.add(statusLine, BorderLayout.NORTH);
+        statusArea.add(statusLineAndProgressContainer, BorderLayout.NORTH);
         statusArea.add(minibuffer, BorderLayout.SOUTH);
+    }
+    
+    private static int progressNesting = 0;
+    private static JProgressBar progressBar = new JProgressBar();
+    
+    public static synchronized void showProgressBar() {
+        if (progressNesting == 0) {
+            progressBar.setIndeterminate(true);
+            statusLineAndProgressContainer.add(progressBar, BorderLayout.EAST);
+        }
+        ++progressNesting;
+    }
+    
+    public static synchronized void hideProgressBar() {
+        --progressNesting;
+        if (progressNesting == 0) {
+            statusLineAndProgressContainer.remove(progressBar);
+            progressBar.setIndeterminate(false);
+        }
     }
     
     public static void showMinibuffer(MinibufferUser minibufferUser) {
