@@ -16,8 +16,6 @@ import javax.swing.event.*;
 public class JTelnetPane extends JPanel {
 	private TelnetControl control;
 	private JTextBuffer textPane;
-	private int viewWidth = 80;
-	private int viewHeight = 24;
 	private String name;
 	
 	/**
