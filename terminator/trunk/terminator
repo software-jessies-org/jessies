@@ -61,4 +61,4 @@ mkdir -p ~/.terminal-logs && chmod og-rx ~/.terminal-logs
 # architecture, try to build it.
 test -e $PTY_BINARY || make -C pty/
 
-exec java -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Dpty.binary=$PTY_BINARY terminator.Terminator "$@"
+exec java -Xmx1g -cp $CLASSPATH $OS_SPECIFIC_OPTIONS -Dpty.binary=$PTY_BINARY terminator.Terminator "$@"
