@@ -7,17 +7,13 @@
 
 <h1>Terminator</h1>
 
-<p><strong>Terminator is a free, functional terminal emulator, replacing xterm, rxvt, xwsh
-and friends on Unix systems, and Terminal.app on Mac OS X.</strong>
+<p><strong>Terminator is a GPL Unix terminal emulator with advanced features not
+yet found elsewhere, replacing xterm, rxvt, xwsh and friends on X11 systems,
+and Terminal.app on Mac OS X.</strong>
 
-<p>Terminator gives you a variety of features extremely useful to have in a terminal
-emulator, in a package which will run on Solaris, Linux, Mac OS X, BSD, IRIX, and probably
-quite a few other platforms too.
+<p>Terminator will run on any Unix with Java 1.4 or later, and a C++ compiler.
 
-
-<hr>
 <h2>Screenshots</h2>
-
 <p><img src="shot-linux.png">
 <p>Terminator running under KDE on Linux.  A few hyperlinks are highlighted, and one
 has been clicked on, running ssh in a separate tab.
@@ -26,110 +22,74 @@ has been clicked on, running ssh in a separate tab.
 <p>Terminator running on Mac OS X, after running 'man bash', and doing a find for
 '(?i)shell'.
 
-
-<hr>
 <h2>Features</h2>
 
-<p>Well, what separates Terminator from the competition?  Here's a list:
+<p>Here are some of the features unique to Terminator, or which are rare amongst the competition:
 
 <ul>
-<li><strong>Portability</strong> - Written in a combination of Java and POSIX C, Terminator
-	will run practically anywhere, with only a simple recompile of the C code.  If you use different
-	operating systems (for example, unix at work and Mac OS X at home), Terminator is
-	the only decent terminal emulator you can use on both systems.  Gone is the pain of
-	having to switch back and forth between different sets of hotkeys and functionality.
+<li><p><strong>Find</strong> - Terminator provides you with a find function so you can
+search for text and regular expressions within your terminal (including the scrollback),
+highlighting them all, in the style of <tt>less(1)</tt>, and offering quick movement to the
+next or previous match.  As far as we know, the only other terminal emulator with a find
+function is Apple's Terminal, and ours is better.
 
-<li><strong>Consistent Look and Feel</strong> - Terminator will fit in on any platform.  It
-	looks perfectly at home on Linux systems, and blends seamlessly into Mac OS X.
+<li><p><strong>Hyperlinks</strong> - Terminator will recognize the names of files, or
+grep-like addresses consisting of a filename and line number, and automatically
+turn the text into a link that will open the file in your configured editor. So <tt>grep -n</tt> output,
+or <tt>svn update</tt> output, for example, becomes clickable.
 
-<li><strong>Horizontal Scrolling</strong> - Most terminal emulators wrap text when it
-	intrudes upon the right margin.  Terminator doesn't - it instead provides a horizontal
-	scrollbar when necessary.  This brings clear benefits in terms of readability of program
-	output (or catted text files).
+<li><p><strong>Number reinterpretation</strong> - Terminator will recognize numbers
+in a variety of bases as the current selection, and add informational menu items to the
+pop-up menu showing the same number in other bases. No more <tt>man ascii</tt> or resorting
+to <tt>bc(1)</tt>.
 
-<li><strong>Find</strong> - Terminator provides you with a find function so you can
-	search for text and regular expressions within your terminal (including the scrollback),
-	highlighting them clearly.  As far as I know, the only other terminal emulator with a find
-	function is Apple's Terminal.
+<li><p><strong>Horizontal Scrolling</strong> - Most terminal emulators wrap text when it
+intrudes upon the right margin.  Terminator doesn't - it instead provides a horizontal
+scrollbar when necessary.  This brings clear benefits in terms of readability of program
+output, or text files sent to the display with <tt>cat(1)</tt>. (We tried both this and Apple-like
+reflowing of text when you change the window size, and we decided we preferred this. Sadly,
+we don't have the resources to support two implementations, so reflowing isn't an option; it's
+gone from the code.)
 
-<li><strong>Hyperlinks</strong> - Terminator will understand http, ftp, https, mailto, telnet,
-	ssh and rsh hyperlinks, will highlight them, and will run a program to deal with them when
-	you click on them.  You can add extra hyperlink recognizers as you like, change the
-	programs to be run, or remove ones you don't want.  Hyperlinks are recognized using
-	regular expressions.
+<li><p><strong>Multiple Tabs</strong> - Like tabbed browsing, only with terminals.
 
-<li><strong>Tabbed Shelling</strong> - Like tabbed browsing, only with terminals.  Unlike
-	other terminal emulators with tabbed shelling, with Terminator you can flip through the tabs
-	with hotkeys.
+<li><p><strong>Automatic Logging</strong> - Complete logs are automatically generated of all your
+terminal sessions.
 
-<li><strong>Automatic Logging</strong> - Logs are automatically generated of all your
-	terminal sessions.
+<li><p><strong>Proper Tab Character Handling</strong> - Most terminal emulators will translate
+tab characters into strings of spaces, which is very annoying if you then try to copy/paste
+a section of text from your terminal into a text editor.  Terminator handles tabs properly,
+remembering where the tabs are and copy/pasting them as tab characters.
 
-<li><strong>Proper Tab Character Handling</strong> - Most terminal emulators will translate
-	tab characters into strings of spaces, which is very annoying if you then try to copy/paste
-	a section of text from your terminal into a text editor.  Terminator handles tabs properly,
-	remembering where the tabs are and copy/pasting them as tab characters.
+<li><p><strong>Portability</strong> - Written in a combination of Java and POSIX C, Terminator
+is the best terminal emulator you can run on both Linux and Mac OS, or any other Unix.
 
-<li><strong>Freedom</strong> - Terminator is released under the GPL license.  If you don't
-	like how some aspect of it works, you can always modify it.
+<li><p><strong>Consistent Look and Feel</strong> - Terminator will fit in on any platform.  It
+looks perfectly at home on Linux systems, and blends seamlessly into Mac OS X.
+
+<li><p><strong>Freedom</strong> - Terminator is released under the GPL license.
 </ul>
 
-<p>We're aiming to make Terminator the clear choice for the discerning terminal user, so if
-you have any suggestions for new features, or how the program can be made more pleasing
-to use, please <a href="mailto:cuvy.abezna@virgin.net">let me know about it</a>.
+<p>We think Terminator is the clear choice for the discerning terminal user. Though originally written
+for Linux to make up for the fact that no Linux terminal emulator was as good as Mac OS' Terminal, it has
+now surpassed Terminal in several areas.
 
-
-<hr>
-<h2>A Word About Speed</h2>
-
-<p>Many people have the misconception that Java is slow, and whereas that was true in
-1999, Java's performance these days is extremely slick.  I run Terminator all the time on
-my 700MHz PC, and it's as responsive as I could wish for.
-
-
-<hr>
 <h2>Download</h2>
 
-<p><a href="TerminatorN-bindist.tgz">Download Terminator v1.1 Binary</a> - The Java
-binaries will, of course, work on any system.  The C program will be automatically
-recompiled if necessary (assuming you have make and gcc/g++ installed).
+<p>The source distribution is here (<a href="software/terminator/terminator.tgz">terminator.tgz</a>),
+but you'll also need a copy of the library to go with it (<a href="http://www.jessies.org/~enh/software/salma-hayek/salma-hayek.tgz">salma-hayek.tgz</a>).
 
-<p><a href="TerminatorN-2004-06-03.tar.gz">Download Terminator v1.1 Source</a>,
-and also <a href="salma-hayek-2004-06-03.tar.gz">some more source</a>.  The latter link
-is a Java library which Terminator relies upon.  Both archives contain compiled class files for
-all the java source, so you can just go into the TerminatorN directory and execute the 'terminator'
-script.
+<p>Terminator is written almost entirely in Java.  It has a small C++ back-end which runs
+a process, probably <tt>bash(1)</tt>, connected to a pseudo-terminal.
+For this reason, the native code is incredibly small and completely portable, and all we require
+on the Java side is a reasonably recent JRE. You should use at least 1.4, and go with 1.5
+if you can. The native code will automatically be recompiled assuming you
+have <tt>make(1)</tt> and <tt>g++(1)</tt> installed.
 
-<h3>Older Versions</h3>
+<p>Terminator will run fine on KDE, Gnome, an old-style X11 window manager like lwm,
+Mac OS, or anything else Java supports.  Linux users can now change their desktop
+environment without recompiling their terminal emulator, or having to switch to a new one!
 
-<p><a href="TerminatorN-2004-05-28.tar.gz">Download Terminator v1.0 Source</a>,
-and also <a href="salma-hayek-2004-05-28.tar.gz">some more source</a>.  The latter link
-is a Java library which Terminator relies upon.  Both archives contain compiled class files for
-all the java source, so you can just go into the TerminatorN directory and execute the 'terminator'
-script.
-
-
-<hr>
-<h2>Languages</h2>
-
-<p>Terminator is written almost entirely in Java.  It has a small C back-end which runs
-processes in a pty (in simple terms, the C code just does the stuff we can't do in Java).
-For this reason, the C code is incredibly small and completely portable, and all we require
-on the Java side is a reasonably recent JRE (you should use at least 1.4, although 1.5 fixes
-a fair few bugs in Swing, so I'd recommend it even though it's only beta at the moment).
-
-<p>Because of our use of Java, we don't have the same problems as many of the modern
-terminal emulators which, although better in terms of features than their more vintage
-counterparts, tend to be absolute hell to compile.  They all seem to require a vast number of rather large
-libraries, which in turn need yet more libraries.  If you've ever tried building a KDE application
-without having KDE first, you'll know what I mean.
-
-<p>Terminator, on the other hand, will run fine on KDE, on Gnome, lwm, or any other windowing system
-you care to imagine.  You can change your desktop environment without even recompiling
-your terminal emulator.
-
-
-<hr>
 <h2>Running</h2>
 
 <p>We have made great efforts to ensure that Terminator is as easy to run as possible.
@@ -137,31 +97,16 @@ The back-end C code will be compiled automatically the first time you run Termin
 you have 'make', 'gcc' and 'g++' installed), and the start-up script tries to ensure that the
 relevant terminfo entry is installed in the user's home directory.
 
-
-<h3>Configuration</h3>
-
-<p>Terminator expects to find a file called ~/.terminator, where it reads information about how
-to recognise hyperlinks, and what programs to run when you click on them.  The start-up script
-will attempt to guess what type of windowing system you're using (known systems are Mac OS X,
-KDE and Gnome), and if no ~/.terminator file is present, it will copy the relevant one from the
-distribution directory (doc/props-examples/).  If you're using a different system, you'll have to
-do this manually.
-
-<p>If you find that some of the guesses are wrong, for example if you prefer
-to use mozilla rather than konqueror to open http: URLs, just edit the ~/.terminator file and change
-the relevant entries.  You can, of course, disable entries, or add extra ones as you like.
-
-
 <h3>Terminfo/Curses</h3>
 
 <p>For best results, on computers where you'll be root some of the time, we recommend you
 install the terminfo file for Terminator in /usr/share/terminfo.  How this may be done is
-described in the doc/README file in both source and binary distributions.
+described in the doc/README file.
 
 <p>You will also need to ensure that any machines you'll be remotely logging into (through ssh,
 telnet or whatever) also have a copy of the terminfo file installed.  This can be done by copying
 the terminfo file to ~/.terminfo/t/terminator (creating the .terminfo and .terminfo/t directories)
-on the host machine.  This is enough on most GNU-based systems, like Linux for example; if
+on the host machine.  This is enough on most GNU-based systems, such as Linux; if
 you still have problems (if 'vi' complains that the terminal is not fully functional), add the following
 lines to your ~/.profile file on the host machine:
 
@@ -173,33 +118,16 @@ export TERM=$TERM
 <p>This informs the host system of where your user terminfo files are to be found (GNU-based
 systems look for this directory automatically).
 
+<h2>Authors</h2>
 
+<p>The original implementation and documentation was written by Phil Norman. Nearly all of the actual terminal emulation code remains unchanged.
 
-<hr>
-<h2>Who Wrote It?</h2>
+<p>The original idea of having a suitably hackable terminal emulator with which to experiment with advanced features came from Elliott Hughes. Not being married with children, he now takes care of most of the development.
 
-<p>The original idea, and quite a bit of the Java code came from
-<a href="http://www.enh.demon.co.uk/">Elliott Hughes</a>.
+<p>The 'pty' program is based on code from one of the examples in the
+book "Advanced Programming in the Unix Environment", by W Richard Stevens.
 
-<p>All the Java code he didn't write and the documentation was by me, Phil Norman.
-
-<p>The code-base for the 'pty' program was stolen from one of the examples in the
-"Advanced Programming in the Unix Environment" book, by W Richard Stevens.
-
-<p>Development began on 21st April 2004, v1.0 has been released today, the 28th
-May 2004.  Given that I was on holiday for a week
-during this time, that makes it roughly a month of development time.
-
-
-
-<hr>
-<h2>Feedback</h2>
-
-<p>If you have bugs to report, please email them to <a href="mailto:cuvy.abezna@virgin.net">
-Phil Norman</a>.
-
-<p>If you're dead impressed you might want to consider offering me a job.  Something
-Java programming related in Berkshire, UK would be nice.
+<p>Phil wrote the code that took us from nothing to a more-or-less usable replacement for <tt>rxvt</tt> on his own between 2004-04-21 and 2004-05-28. Given that he was on holiday for a week during this time, that makes roughly a month of development time. Since then, Terminator has been on the long slog towards Joel's <a href="http://www.joelonsoftware.com/articles/fog0000000017.html">ten years</a> of quality.
 
 </body>
 </html>
