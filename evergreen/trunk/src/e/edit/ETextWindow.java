@@ -695,18 +695,9 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         }
     }
     
-    /** Executes the given command. */
-    public void execute(String command) {
-        invokeShellCommand(command.trim());
-    }
-    
-    public void invokeShellCommand(String command) {
-        invokeShellCommand(getContext(), command);
-    }
-    
-    public void invokeShellCommand(String context, String command) {
+    public void invokeShellCommand(String context, String command, boolean shouldShowProgress) {
         try {
-            new ShellCommand(filename, getCurrentLineNumber(), getWorkspace(), context, command);
+            new ShellCommand(filename, getCurrentLineNumber(), getWorkspace(), shouldShowProgress, context, command);
         } catch (IOException ex) {
             Edit.showAlert("Run", "Can't start task (" + ex.getMessage() + ").");
         }

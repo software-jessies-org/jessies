@@ -739,11 +739,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     private static JProgressBar progressBar = new JProgressBar();
     
     public static synchronized void showProgressBar() {
-        if (progressNesting == 0) {
+        ++progressNesting;
+        if (progressNesting == 1) {
             progressBar.setIndeterminate(true);
             statusLineAndProgressContainer.add(progressBar, BorderLayout.EAST);
         }
-        ++progressNesting;
     }
     
     public static synchronized void hideProgressBar() {
