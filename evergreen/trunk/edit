@@ -39,6 +39,11 @@ fi
 # Java 1.5.0beta1 aborts if you use this option!
 HEAP_SIZE=-Xmx302m
 
+# Create a log file, and link to it as the newest.
+EDIT_LOG=/tmp/edit.log.$$
+touch $EDIT_LOG
+ln -s -f $EDIT_LOG /tmp/edit.log
+
 exec $JAVA $OS_SPECIFIC_OPTIONS \
     $EXTRA_JAVA_OPTIONS \
     $HEAP_SIZE \
@@ -51,4 +56,4 @@ exec $JAVA $OS_SPECIFIC_OPTIONS \
     -Denv.PATH=$PATH \
     -DpreferencesDirectory=$EDIT_PREFERENCES_DIRECTORY \
     $EDIT_CLASS_NAME \
->> $EDIT_HOME/edit.log 2>&1
+>> $EDIT_LOG 2>&1
