@@ -46,16 +46,14 @@ public class MatchingBracketHighlighter implements ChangeListener {
         
         try {
             int offset = textComponent.getCaretPosition();
-            ETextArea textArea = (ETextArea) textComponent;
-            CharSequence chars = textArea.charSequence();
-            ECaret caret = (ECaret) textComponent.getCaret();
+            DocumentCharSequence chars = new DocumentCharSequence(textComponent.getDocument());
             Highlighter highlighter = textComponent.getHighlighter();
             char ch = chars.charAt(offset);
-            if (caret.isCloseBracket(ch)) {
+            if (Brackets.isCloseBracket(ch)) {
                 matchingBracketHighlights[0] = highlighter.addHighlight(offset, offset + 1, MATCHING_BRACKET_PAINTER);
             } else if (offset > 0) {
                 char previousChar = chars.charAt(offset - 1);
-                if (caret.isOpenBracket(previousChar)) {
+                if (Brackets.isOpenBracket(previousChar)) {
                     matchingBracketHighlights[0] = highlighter.addHighlight(offset - 1, offset, MATCHING_BRACKET_PAINTER);
                 }
             }
@@ -63,11 +61,11 @@ public class MatchingBracketHighlighter implements ChangeListener {
                 return;
             }
             
-            int matchingBracketOffset = caret.findMatchingBracket(offset);
+            int matchingBracketOffset = Brackets.findMatchingBracket(chars, offset);
             if (matchingBracketOffset != -1) {
                 int start = matchingBracketOffset;
                 int end = matchingBracketOffset;
-                if (caret.isCloseBracket(ch)) {
+                if (Brackets.isCloseBracket(ch)) {
                     --start;
                 } else {
                     ++end;
