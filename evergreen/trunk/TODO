@@ -1,5 +1,9 @@
 TODO list for Edit
 
+If we open (via the system open dialog or our 'vi' script) a file that
+isn't in the workspace file list but is under the workspace root, it should
+be added to the list.
+
 Thinking about the literal string/regular expression problem I just
 fixed with FindFilesContainingSelectionAction, we should have a text
 field capable of automatically coloring invalid regular expressions
