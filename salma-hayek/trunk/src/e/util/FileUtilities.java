@@ -75,8 +75,8 @@ public class FileUtilities {
     }
     
     /**
-     * Checks solely whether a file of the given name exists.
-     * This method is equivalent to fileFromString().exists().
+     * Checks solely whether anything with the given filename exists.
+     * This method is equivalent to fileFromString(filename).exists().
      */
     public static boolean exists(String filename) {
         return fileFromString(filename).exists();
