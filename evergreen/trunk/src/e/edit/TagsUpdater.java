@@ -201,7 +201,7 @@ public class TagsUpdater {
                 return;
             }
             isRunning = true;
-            root = new DefaultMutableTreeNode("root");
+            root = new BranchNode("root");
             treeModel = new DefaultTreeModel(root);
             branches = new HashMap();
             branches.put("", root);
