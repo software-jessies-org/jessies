@@ -1,6 +1,7 @@
 package e.edit;
 
 import java.awt.event.*;
+import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
@@ -42,10 +43,18 @@ public class InsertNewlineAction extends TextAction {
     
     public void insertMatchingBrace(ETextArea target) {
         try {
+            ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, target);
+            boolean mightNeedSemicolon = textWindow != null && textWindow.isCPlusPlus();
+            
             final int position = target.getCaretPosition();
+            String line = target.getLineTextAtOffset(position);
             String whitespace = target.getIndentationOfLineAtOffset(position);
             String prefix = "\n" + whitespace + target.getIndentationString();
             String suffix = "\n" + whitespace + "}";
+            if (mightNeedSemicolon && line.matches(".*\\b(class|enum|struct|union)\\b.*")) {
+                // These C constructs need a semicolon after the closing brace.
+                suffix += ";";
+            }
             target.getDocument().insertString(position, prefix + suffix, null);
             target.setCaretPosition(position + prefix.length());
         } catch (BadLocationException ex) {
