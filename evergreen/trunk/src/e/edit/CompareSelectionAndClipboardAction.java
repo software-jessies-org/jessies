@@ -60,6 +60,10 @@ public class CompareSelectionAndClipboardAction extends ETextAction {
         String[] command = new String[] { "diff", "-u", "-b", "-B", "-L", "clipboard", clipboardFile, "-L", "selection", selectionFile };
         int status = ProcessUtilities.backQuote(null, command, lines, errors);
         
+        if (status == 0) {
+            lines.add("(No differences.)");
+        }
+        
         DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < lines.size(); ++i) {
             model.addElement(lines.get(i));
