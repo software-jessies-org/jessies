@@ -17,7 +17,7 @@ pid_t pty_fork(int* ptrfdm) {
             panic("setsid error");
 
         /* SVR4 acquires controlling terminal on open() */
-        int fds = ptys_open(fdm, pts_name);
+        int fds = ptys_open(pts_name);
         if (fds < 0)
             panic("can't open slave pty");
         close(fdm);        /* all done with master in child */
