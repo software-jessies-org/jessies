@@ -30,7 +30,7 @@ public class JTelnetPane extends JPanel {
 		try {
 			Log.warn("Starting process '" + command + "'");
 			final Process proc = Runtime.getRuntime().exec("pty " + command);
-			init(proc.getInputStream(), proc.getOutputStream());
+			init(command, proc.getInputStream(), proc.getOutputStream());
 			// Probably should do this somewhere else rather than setting up a whole Thread for it.
 			Thread reaper = new Thread(new Runnable() {
 				public void run() {
@@ -107,7 +107,7 @@ public class JTelnetPane extends JPanel {
 		return "bash";
 	}
 
-	private void init(InputStream in, OutputStream out) throws IOException {
+	private void init(String command, InputStream in, OutputStream out) throws IOException {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		
@@ -126,7 +126,7 @@ public class JTelnetPane extends JPanel {
 		
 		textPane.sizeChanged();
 		try {
-			control = new TelnetControl(textPane.getModel(), in, out);
+			control = new TelnetControl(textPane.getModel(), command, in, out);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
