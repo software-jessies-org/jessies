@@ -25,7 +25,7 @@ public class Terminator {
 	}
 	
 	private void startTerminatorServer() {
-		new InAppServer("Terminator", (new Integer(System.getProperty("terminator.port"))).intValue()) {
+		new InAppServer("Terminator", Integer.parseInt(System.getProperty("terminator.port"))) {
 			public boolean handleCommand(String line, PrintWriter out) {
 				if (line.equals("new")) {
 					Terminator.getSharedInstance().openFrame();
