@@ -3,9 +3,11 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.tree.*;
 import e.forms.*;
 import e.gui.*;
 import e.util.*;
@@ -17,7 +19,8 @@ public class FindFilesDialog {
     private CheapMonitoredField patternField = new CheapMonitoredField();
     private CheapMonitoredField directoryField = new CheapMonitoredField();
     private JLabel status = new JLabel(" ");
-    private JList matchList;
+    private ETree matchView;
+    private DefaultTreeModel matchTreeModel;
     
     private boolean haveSearched;
     
@@ -74,7 +77,7 @@ public class FindFilesDialog {
     
     public class FileFinder extends SwingWorker {
         private List fileList;
-        private DefaultListModel matchModel;
+        private DefaultMutableTreeNode matchRoot;
         private String regex;
         private String directory;
         private volatile boolean resultNoLongerWanted;
@@ -85,7 +88,7 @@ public class FindFilesDialog {
         
         public synchronized void doFindInDirectory(String pattern, String directory) {
             System.err.println("---doFindInDirectory " + pattern + "...");
-            this.matchModel = new DefaultListModel();
+            this.matchRoot = new DefaultMutableTreeNode();
             this.regex = pattern;
             this.directory = directory;
             this.resultNoLongerWanted = false;
@@ -94,7 +97,7 @@ public class FindFilesDialog {
             this.totalFileCount = fileList.size();
             this.percentage = -1;
             
-            matchList.setModel(matchModel);
+            matchTreeModel.setRoot(matchRoot);
             start();
         }
         
@@ -126,13 +129,18 @@ public class FindFilesDialog {
                     try {
                         String candidate = (String) fileList.get(doneFileCount);
                         if (regex.length() != 0) {
-                            int matchCount = fileSearcher.searchFile(root, candidate);
+                            ArrayList matches = new ArrayList();
+                            int matchCount = fileSearcher.searchFile(root, candidate, matches);
                             if (matchCount > 0) {
                                 DefinitionFinder definitionFinder = new DefinitionFinder(FileUtilities.fileFromParentAndString(root, candidate), regex);
-                                matchModel.addElement(new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition));
+                                DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition));
+                                for (int i = 0; i < matches.size(); ++i) {
+                                    fileNode.add(new DefaultMutableTreeNode(matches.get(i)));
+                                }
+                                matchRoot.add(fileNode);
                             }
                         } else {
-                            matchModel.addElement(new MatchingFile(candidate));
+                            matchRoot.add(new DefaultMutableTreeNode(new MatchingFile(candidate)));
                         }
                     } catch (FileNotFoundException ex) {
                         ex = ex; // Not our problem.
@@ -142,7 +150,7 @@ public class FindFilesDialog {
                 long endTime = System.currentTimeMillis();
                 System.err.println("----------took: " + (endTime - startTime) + " ms.");
                 
-                String status = matchModel.getSize() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "");
+                String status = matchTreeModel.getChildCount(matchTreeModel.getRoot()) + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "");
                 if (workspace.getIndexedFileCount() != totalFileCount) {
                     status += " (from " + workspace.getIndexedFileCount() + ")";
                 }
@@ -153,7 +161,7 @@ public class FindFilesDialog {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            return matchModel;
+            return matchRoot;
         }
         
         public void finished() {
@@ -165,7 +173,8 @@ public class FindFilesDialog {
             
             // If we don't set the selected index, the user won't be able to cycle the focus into the list with the Tab key.
             // This also means the user can just hit Return if there's only one match.
-            matchList.setSelectedIndex(0);
+            matchView.expandAll();
+//            matchView.setSelectedIndex(0);
         }
     }
     
@@ -219,21 +228,49 @@ public class FindFilesDialog {
     }
     
     public void initMatchList() {
-        if (matchList != null) {
+        if (matchView != null) {
             return;
         }
 
-        matchList = new JList();
-        matchList.setCellRenderer(new EListCellRenderer(true));
-        matchList.addMouseListener(new MouseAdapter() {
+        matchTreeModel = new DefaultTreeModel(null);
+        matchView = new ETree(matchTreeModel);
+        matchView.setRootVisible(false);
+        matchView.setShowsRootHandles(true);
+        
+        matchView.setCellRenderer(new MatchTreeCellRenderer());
+        matchView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    int index = matchList.locationToIndex(e.getPoint());
-                    MatchingFile match = (MatchingFile) matchList.getModel().getElementAt(index);
-                    match.open();
+                    TreePath path = matchView.getPathForLocation(e.getX(), e.getY());
+                    if (path != null) {
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+                        Object o = node.getUserObject();
+                        if (o instanceof MatchingFile) {
+                            MatchingFile match = (MatchingFile) o;
+                            match.open();
+                        } else {
+                            System.err.println(o);
+                        }
+                    }
                 }
             }
         });
+    }
+    
+    public class MatchTreeCellRenderer extends DefaultTreeCellRenderer {
+        public MatchTreeCellRenderer() {
+            setClosedIcon(null);
+            setOpenIcon(null);
+            setLeafIcon(null);
+        }
+        
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean isExpanded, boolean isLeaf,  int row,  boolean hasFocus) {
+            Component c = super.getTreeCellRendererComponent(tree, value, isSelected, isExpanded, isLeaf, row, hasFocus);
+            if (isLeaf) {
+                c.setForeground(Color.GRAY);
+            }
+            return c;
+        }
     }
     
     private void setStatus(String message, boolean isError) {
@@ -271,7 +308,7 @@ public class FindFilesDialog {
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Files Containing:", patternField);
         formPanel.addRow("Whose Names Match:", directoryField);
-        formPanel.addRow("Matches:", new JScrollPane(matchList));
+        formPanel.addRow("Matches:", new JScrollPane(matchView));
         formPanel.setStatusBar(status);
         
         ActionListener listener = new ActionListener() {
@@ -283,11 +320,13 @@ public class FindFilesDialog {
     }
     
     public void openSelectedFilesFromList() {
-        ListModel list = matchList.getModel();
-        int[] indices = matchList.getSelectedIndices();
+        /*
+        ListModel list = matchView.getModel();
+        int[] indices = matchView.getSelectedIndices();
         for (int i = 0; i < indices.length; i++) {
             MatchingFile file = (MatchingFile) list.getElementAt(indices[i]);
             file.open();
         }
+        */
     }
 }
