@@ -27,3 +27,4 @@ Phil's TODOs:
 
 Elliott's TODOs:
 ~~~~~~~~~~~
+[1] Add resources or other configuration file for hyperlink recognizers. Maybe allow arbitrary classes to be instantiated?
