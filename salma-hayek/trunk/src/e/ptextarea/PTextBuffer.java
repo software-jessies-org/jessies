@@ -99,16 +99,38 @@ public class PTextBuffer implements CharSequence {
             
             // And use the characters as our content.
             char[] chars = charBuffer.array();
-            setText(chars);
+            String lineEnding = "\n";
             
-            // FIXME: rewrite 'chars' replacing "\r" or "\r\n" with "\n", and
-            // storing the line ending the file had as a property on this
-            // document.
+            // Cope with weird line-endings.
+            if (charArrayContains(chars, '\r')) {
+                String s = new String(chars);
+                if (s.indexOf("\r\n") != -1) {
+                    lineEnding = "\r\n";
+                    s = s.replaceAll("\r\n", "\n");
+                } else {
+                    lineEnding = "\r";
+                    s = s.replaceAll("\r", "\n");
+                }
+                chars = s.toCharArray();
+            }
+            
+            putProperty(LINE_ENDING_PROPERTY, lineEnding);
+            setText(chars);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
             FileUtilities.close(dataInputStream);
         }
+    }
+    
+    private static final boolean charArrayContains(char[] chars, char ch) {
+        final int end = chars.length;
+        for (int i = 0; i < end; ++i) {
+            if (chars[i] == ch) {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
