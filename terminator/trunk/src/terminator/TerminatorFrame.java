@@ -298,6 +298,15 @@ public class TerminatorFrame implements TerminalPaneMaster {
 						getFindHighlighter().forgetRegularExpression(textToFindIn);
 					}
 				}
+				public void keyReleased(KeyEvent e) {
+					if ((e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) {
+						if (e.getKeyCode() == KeyEvent.VK_D) {
+							textToFindIn.findPrevious();
+						} else if (e.getKeyCode() == KeyEvent.VK_G) {
+							textToFindIn.findNext();
+						}
+					}
+				}
 			});
 		}
 		
