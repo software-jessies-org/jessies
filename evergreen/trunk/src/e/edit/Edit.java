@@ -430,8 +430,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         createWorkspace(workspaceName, currentDirectory);
     }
     
+    public static String getResourceFilename(String leafName) {
+        return System.getProperty("env.EDIT_HOME") + File.separatorChar + leafName;
+    }
+    
     public void initWindowIcon() {
-        ImageIcon icon = new ImageIcon(System.getProperty("env.EDIT_HOME") + File.separatorChar + "icon.gif");
+        ImageIcon icon = new ImageIcon(getResourceFilename("icon.gif"));
         frame.setIconImage(icon.getImage());
     }
     

@@ -49,7 +49,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     
     private static void initKeywordsFor(String language) {
         HashSet keywords = new HashSet();
-        String keywordsFileName = System.getProperty("env.EDIT_HOME") + File.separatorChar + "keywords-" + language;
+        String keywordsFileName = Edit.getResourceFilename("keywords-" + language);
         String[] keywordArray = StringUtilities.readLinesFromFile(keywordsFileName);
         for (int i = 0; i < keywordArray.length; i++) {
             if (keywordArray[i].startsWith("#")) {
