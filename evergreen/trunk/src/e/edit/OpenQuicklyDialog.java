@@ -1,5 +1,6 @@
 package e.edit;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.List;
@@ -24,7 +25,6 @@ public class OpenQuicklyDialog {
     
     private boolean haveSearched;
     private DefaultListModel model;
-    private PatternSyntaxException patternSyntaxException;
     
     private Workspace workspace;
     
@@ -55,9 +55,11 @@ public class OpenQuicklyDialog {
                 model.addElement(fileList.get(i));
             }
             final int totalFileCount = workspace.getIndexedFileCount();
+            status.setForeground(Color.BLACK);
             status.setText(fileList.size() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.");
         } catch (PatternSyntaxException ex) {
-            patternSyntaxException = ex;
+            status.setForeground(Color.RED);
+            status.setText(ex.getDescription());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -122,15 +124,6 @@ public class OpenQuicklyDialog {
         }
         
         /**
-         * Responsible for providing some visual feedback that we're rescanning.
-         */
-        private void switchToFakeList() {
-            model = new DefaultListModel();
-            model.addElement("Rescan in progress...");
-            matchList.setModel(model);
-        }
-        
-        /**
          * Searches again when the file list has finished being updated.
          */
         public void stateChanged(ChangeEvent e) {
@@ -139,6 +132,15 @@ public class OpenQuicklyDialog {
             source.setEnabled(true);
             source = null;
         }
+    }
+    
+    /**
+     * Responsible for providing some visual feedback that we're rescanning.
+     */
+    private synchronized void switchToFakeList() {
+        model = new DefaultListModel();
+        model.addElement("Rescan in progress...");
+        matchList.setModel(model);
     }
     
     public JButton makeRescanButton() {
