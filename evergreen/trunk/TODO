@@ -1,5 +1,12 @@
 TODO list for Edit
 
+I want to start implementing some of this "code completion" stuff. On the
+Mac, any text field brings up a list of choices when you hit option-Escape,
+suggested completions of the word you've typed so far. It would be good to
+offer something like that. We have the JavaDoc summary for Java, and no
+matter what we're doing we can collect all the identifiers from the current
+file and sort them. That might be handy when dealing with long identifiers.
+
 Java 1.5:
  1. use Thread.getAllStackTraces to let us type C-\ at the UI to see what
     it's doing. can this work? or is it most likely to be useful when the
