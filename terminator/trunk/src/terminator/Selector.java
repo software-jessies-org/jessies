@@ -143,7 +143,7 @@ public class Selector implements MouseListener, MouseMotionListener, Highlighter
 				return;
 			}
 			setHighlight(min(startLocation, endLocation), max(startLocation, endLocation));
-			view.scrollRectToVisible(new Rectangle(0, event.getY(), 10, 10));
+			view.scrollRectToVisible(new Rectangle(event.getX(), event.getY(), 10, 10));
 		}
 	}
 	
