@@ -60,7 +60,9 @@ public class EPopupMenu {
                 }
                 lastWasSeparator = true;
             } else {
-                menu.add(new JMenuItem(action));
+                JMenuItem menuItem = new JMenuItem(action);
+                menuItem.setAccelerator((KeyStroke) action.getValue(Action.ACCELERATOR_KEY));
+                menu.add(menuItem);
                 lastWasSeparator = false;
             }
         }
@@ -89,6 +91,10 @@ public class EPopupMenu {
     /** Creates a MenuItem from an Action and a location. */
     private MenuItem createMenuItem(final Action action, final int x, final int y) {
         MenuItem menuItem = new MenuItem((String) action.getValue(Action.NAME));
+        KeyStroke key = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+        if (key != null) {
+            menuItem.setShortcut(new MenuShortcut(key.getKeyCode(), (key.getModifiers() & InputEvent.SHIFT_MASK) != 0));
+        }
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 action.actionPerformed(new ActionEvent(new Point(x, y), e.getID(), e.getActionCommand(), e.getModifiers()));
