@@ -12,6 +12,7 @@ import javax.swing.*;
 */
 
 public class JTelnetPane extends JPanel {
+	private Controller controller;
 	private TelnetControl control;
 	private JTextBuffer textPane;
 	private String name;
@@ -33,7 +34,7 @@ public class JTelnetPane extends JPanel {
 					try {
 						int status = proc.waitFor();
 						if (status == 0) {
-							closeContainingTabOrWindow();
+							controller.closeTelnetPane(JTelnetPane.this);
 						} else {
 							control.announceConnectionLost("[Process exited with status " + status + ".]");
 						}
@@ -139,6 +140,14 @@ public class JTelnetPane extends JPanel {
 		}
 	}
 	
+	public void setController(Controller controller) {
+		this.controller = controller;
+	}
+	
+	public JTextBuffer getTextPane() {
+		return textPane;
+	}
+	
 	/**
 	 * Mac OS' grow box intrudes in the lower right corner of every window.
 	 * In our case, with a scroll bar hard against the right edge of the
@@ -172,27 +181,6 @@ public class JTelnetPane extends JPanel {
 		control.start();
 	}
 	
-	/**
-	 * Closes the tab or window containing this terminal.
-	 */
-	public void closeContainingTabOrWindow() {
-		// Look for a tabbed pane to remove ourselves from first,
-		// but only one with other tabs; if we're the last tab, we
-		// should fall through and close the window instead.
-		JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
-		if (tabbedPane != null && tabbedPane.getTabCount() > 1) {
-			tabbedPane.remove(this);
-			return;
-		}
-		
-		// Look for a window to close.
-		JFrame window = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, this);
-		if (window != null) {
-			window.setVisible(false);
-			window.dispose();
-		}
-	}
-	
 	public String getName() {
 		return name;
 	}
@@ -203,6 +191,9 @@ public class JTelnetPane extends JPanel {
 	
 	private class KeyHandler implements KeyListener {
 		public void keyPressed(KeyEvent event) {
+			if (event.isAltDown()) {
+				return;
+			}
 			String sequence = getSequenceForKeyCode(event);
 			if (sequence != null) {
 				control.sendEscapeString(sequence);
@@ -242,10 +233,23 @@ public class JTelnetPane extends JPanel {
 
 		public void keyTyped(KeyEvent event) {
 			char ch = event.getKeyChar();
-//			System.err.println("Got key " + ((int) ch));
-			if (ch != KeyEvent.CHAR_UNDEFINED) {
-				control.sendChar(ch);
-				scroll();
+			if (event.isAltDown()) {
+				switch (ch) {
+					case 'n': case 'N':
+						controller.openShellPane(true);
+						break;
+					case 'e': case 'E':
+						String commandToRun = StringEntryDialog.getString(JTelnetPane.this, "Enter Command to Run");
+						if (commandToRun != null && commandToRun.length() > 0) {
+							controller.openCommandPane(commandToRun, true);
+						}
+						break;
+				}
+			} else {
+				if (ch != KeyEvent.CHAR_UNDEFINED) {
+					control.sendChar(ch);
+					scroll();
+				}
 			}
 			event.consume();
 		}
