@@ -5,7 +5,8 @@
   take the clip rectangle into account to try to avoid work, and ask
   Graphics.drawString to render really long lines. On Mac OS, at least, this
   isn't a very good idea; even with a monospaced font, it seems to assume
-  you've done the clipping yourself.
+  you've done the clipping yourself. [This seems mainly to be a problem for
+  VNC users, not real people.]
 
 * Make an about box. [I still have the code to do a convincing imitation of
   NSApplication's orderFrontStandardAboutPanel lying around somewhere. I'm
