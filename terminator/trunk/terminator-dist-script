@@ -1,0 +1,5 @@
+#!/bin/bash
+TERMINATOR_HOME=`dirname $0`
+CLASSPATH=$TERMINATOR_HOME/terminator.jar
+
+exec java -cp $CLASSPATH -Dpty.binary=$TERMINATOR_HOME/pty terminatorn.Terminator "$@"
