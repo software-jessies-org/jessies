@@ -18,7 +18,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         ArrayList errors = new ArrayList();
         int status = ProcessUtilities.backQuote(null, new String[] { "ruby", ri, "-T", "-f", "html", string }, lines, errors);
         String result = StringUtilities.join(lines, "\n");
-        return (result.indexOf("<error>") != -1) ? "" : result.toString();
+        return (result.indexOf("<error>") != -1) ? "" : result;
     }
     
     private String getRi() {
