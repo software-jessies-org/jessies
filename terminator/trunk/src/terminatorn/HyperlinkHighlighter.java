@@ -18,6 +18,7 @@ public class HyperlinkHighlighter implements Highlighter {
 		Pattern pattern;
 		int relevantGroup;
 		String command;
+		boolean runInTab;
 		
 		/**
 		 * We need a regular expression to match with, the index of the
@@ -25,10 +26,11 @@ public class HyperlinkHighlighter implements Highlighter {
 		 * you want the whole expression highlighted, and the command
 		 * to be run when the link is followed.
 		 */
-		HyperLinker(String regularExpression, int relevantGroup, String command) {
+		HyperLinker(String regularExpression, int relevantGroup, String command, boolean runInTab) {
 			this.pattern = Pattern.compile(regularExpression);
 			this.relevantGroup = relevantGroup;
 			this.command = command;
+			this.runInTab = runInTab;
 		}
 		
 		Matcher matcher(String line) {
@@ -38,13 +40,20 @@ public class HyperlinkHighlighter implements Highlighter {
 		String command(Matcher matcher) {
 			return matcher.replaceFirst(command);
 		}
+		
+		boolean runInTab() {
+			return runInTab;
+		}
 	}
 	
 	private ArrayList linkers = new ArrayList();
 	{
-		linkers.add(new HyperLinker("(\\b(http|https|ftp):/*[^\\s:\"]+(:\\d+)?[/\\w\\.\\?&=\\+]*)", 1, "open $1"));
-		linkers.add(new HyperLinker("(?:^| |\")(/[^ :\"]+\\.\\w+([\\d:]+)?)", 1, "vi $1"));
-		linkers.add(new HyperLinker("mercury:([^$]+)\\$", 1, "echo $1"));
+		linkers.add(new HyperLinker("(\\b(http|https|ftp):/*[^\\s:\"]+(:\\d+)?[/\\w\\.\\?&=\\+]*)", 1, "open $1", false));
+		linkers.add(new HyperLinker("(?:^| |\")(/[^ :\"]+\\.\\w+([\\d:]+)?)", 1, "vi $1", false));
+		linkers.add(new HyperLinker("mercury:([^$]+)\\$", 1, "echo $1", false));
+		linkers.add(new HyperLinker("(\\btelnet:([a-zA-Z0-9-_\\.]+))", 1, "telnet $2", true));
+		linkers.add(new HyperLinker("(\\brsh:([a-zA-Z0-9-_\\.]+))", 1, "rsh $2", true));
+		linkers.add(new HyperLinker("(\\bssh:([a-zA-Z0-9-_\\.@]+))", 1, "ssh $2", true));
 	}
 
 	public String getName() {
@@ -80,10 +89,15 @@ public class HyperlinkHighlighter implements Highlighter {
 			HyperLinker linker = (HyperLinker) linkers.get(i);
 			Matcher matcher = linker.matcher(text);
 			while (matcher.find()) {
-				try {
-					Runtime.getRuntime().exec(linker.command(matcher));
-				} catch (Exception ex) {
-					Log.warn("Couldn't show '" + text + "' (with '" + linker.command(matcher) + "')", ex);
+				String command = linker.command(matcher);
+				if (linker.runInTab()) {
+					view.getController().openCommandPane(command, true);
+				} else {
+					try {
+						Runtime.getRuntime().exec(command);
+					} catch (Exception ex) {
+						Log.warn("Couldn't show '" + text + "' (with '" + linker.command(matcher) + "')", ex);
+					}
 				}
 			}
 		}

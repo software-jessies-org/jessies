@@ -20,8 +20,9 @@ public class JTelnetPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	private JTelnetPane(String name, String command) {
+	private JTelnetPane(Controller controller, String name, String command) {
 		super(new BorderLayout());
+		this.controller = controller;
 		this.name = name;
 		
 		try {
@@ -34,7 +35,7 @@ public class JTelnetPane extends JPanel {
 					try {
 						int status = proc.waitFor();
 						if (status == 0) {
-							controller.closeTelnetPane(JTelnetPane.this);
+							JTelnetPane.this.controller.closeTelnetPane(JTelnetPane.this);
 						} else {
 							control.announceConnectionLost("[Process exited with status " + status + ".]");
 						}
@@ -54,26 +55,26 @@ public class JTelnetPane extends JPanel {
 	 * title. If 'title' is null, we use the first word of the command
 	 * as the the title.
 	 */
-	public static JTelnetPane newCommandWithTitle(String command, String title) {
+	public static JTelnetPane newCommandWithTitle(Controller controller, String command, String title) {
 		if (title == null) {
 			title = command.trim();
 			if (title.indexOf(' ') != -1) {
 				title = title.substring(0, title.indexOf(' '));
 			}
 		}
-		return new JTelnetPane(title, command);
+		return new JTelnetPane(controller, title, command);
 	}
 	
 	/**
 	 * Creates a new terminal running the user's shell.
 	 */
-	public static JTelnetPane newShell() {
+	public static JTelnetPane newShell(Controller controller) {
 		String user = System.getProperty("user.name");
 		String command = getUserShell(user);
 		if (Options.getSharedInstance().isLoginShell()) {
 			command += " -l";
 		}
-		return new JTelnetPane(user + "@localhost", command);
+		return new JTelnetPane(controller, user + "@localhost", command);
 	}
 	
 	/**
@@ -106,7 +107,7 @@ public class JTelnetPane extends JPanel {
 	}
 
 	private void init(String command, InputStream in, OutputStream out) throws IOException {
-		textPane = new JTextBuffer();
+		textPane = new JTextBuffer(controller);
 		textPane.addComponentListener(new ComponentAdapter() {
 			private Dimension currentSize;
 			public void componentShown(ComponentEvent e) {
@@ -138,10 +139,6 @@ public class JTelnetPane extends JPanel {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-	}
-	
-	public void setController(Controller controller) {
-		this.controller = controller;
 	}
 	
 	public JTextBuffer getTextPane() {
