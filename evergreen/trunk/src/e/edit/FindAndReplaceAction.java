@@ -201,19 +201,13 @@ public class FindAndReplaceAction extends ETextAction {
     public class DisplayableMatch {
         private String html;
         private String tooltip;
-        private int start;
-        private int end;
-        private int lineStart;
 
-        public DisplayableMatch(Matcher matcher) {
-            this.start = matcher.start();
-            this.end = matcher.end();
-            this.tooltip = makeToolTip(matcher);
+        public DisplayableMatch(String line, String regex) {
+            this.html = colorize(line, regex);
+            this.tooltip = "unimplemented";
         }
 
         public void doubleClick() {
-            toString();
-            textWindow.goToSelection(start, end);
         }
         
         public String getToolTipText() {
@@ -236,31 +230,30 @@ public class FindAndReplaceAction extends ETextAction {
         }
 
         public String toString() {
-            if (html == null) {
-                try {
-                    int lineNumber = text.getLineOfOffset(start);
-                    lineStart = text.getLineStartOffset(lineNumber);
-                    String line = text.getLineTextAtOffset(start);
-                    html = colorize(line);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    html = ex.toString();
-                }
-            }
             return html;
         }
 
-        public String colorize(String line) {
-            // Because we're reusing the HTML rendering code, we need to make sure there's
-            // nothing that looks like HTML in the original text. To do this, we replace '<' with an
-            // 'unlikely' character, and replace that with "&lt;" at the end. We can't go straight to
-            // "&lt;", because it's three characters longer than '<', which would screw up our
-            // match start/end offsets.
-            StringBuffer result = new StringBuffer(line.replace('<', (char)0));
-System.err.println("match:"+start+".."+end+" lS:"+lineStart+" ll:"+line.length());
-            result.insert(end - lineStart, "</font>");
-            result.insert(start - lineStart, "<font color=green>");
-            return "<html><body>" + result.toString().replaceAll(" ", "&nbsp;").replaceAll("\0", "&lt;");
+        public String colorize(String line, String regex) {
+            Pattern pattern = Pattern.compile("(" + regex + ")");
+            html = pattern.matcher(line).replaceAll("\u0000$1\u0001");
+            StringBuffer buffer = new StringBuffer(html);
+            for (int i = 0; i < buffer.length(); ++i) {
+                String replacement = null;
+                if (buffer.charAt(i) == ' ') {
+                    replacement = "&nbsp;";
+                } else if (buffer.charAt(i) == '<') {
+                    replacement = "&lt;";
+                } else if (buffer.charAt(i) == '\u0000') {
+                    replacement = "<font color=red>";
+                } else if (buffer.charAt(i) == '\u0001') {
+                    replacement = "</font>";
+                }
+                if (replacement != null) {
+                    buffer.replace(i, i + 1, replacement);
+                    i += replacement.length() - 1;
+                }
+            }
+            return "<html>" + buffer.toString();
         }
     }
     
@@ -295,30 +288,28 @@ System.err.println("match:"+start+".."+end+" lS:"+lineStart+" ll:"+line.length()
         }
         
         public Object construct() {
+            if (regex.length() == 0) {
+                return matchModel;
+            }
+
             try {
-                if (regex.length() > 0) {
-                    Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-                    Matcher matcher = pattern.matcher(text.getText());
-                    int matchCount = 0;
-                    while (matcher.find()) {
+                Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+                String[] lines = text.getText().split("\n");
+                int matchCount = 0;
+                for (int i = 0; i < lines.length; ++i) {
+                    String line = lines[i];
+                    Matcher matcher = pattern.matcher(line);
+                    if (matcher.find()) {
                         if (matchCount > MAX_DISPLAYED_MATCH_COUNT || Thread.currentThread().isInterrupted()) {
                             return null;
                         }
-                        matchCount++;
+                        ++matchCount;
                         
                         // Record the match.
-                        matchModel.addElement(new DisplayableMatch(matcher));
+                        matchModel.addElement(new DisplayableMatch(line, regex));
                         
                         // Record the rewritten line.
-                        String originalLine = text.getLineTextAtOffset(matcher.start());
-                        if (false) {
-                            replacementsModel.addElement(originalLine.replaceAll(regex, replacement));
-                        } else {
-                            int lineStart = text.getLineStartOffset(text.getLineOfOffset(matcher.start()));
-                            StringBuffer rewrittenLine = new StringBuffer(originalLine);
-                            rewrittenLine.replace(matcher.start() - lineStart, matcher.end() - lineStart, makeReplacement(matcher, replacement));
-                            replacementsModel.addElement(rewrittenLine.toString());
-                        }
+                        replacementsModel.addElement(line.replaceAll(regex, replacement));
                     }
                 }
             } catch (PatternSyntaxException ex) {
