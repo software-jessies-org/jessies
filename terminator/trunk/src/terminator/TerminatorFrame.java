@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.forms.*;
 import e.gui.*;
 import terminator.view.*;
 import terminator.view.highlight.*;
@@ -33,7 +34,6 @@ public class TerminatorFrame implements TerminalPaneMaster {
 			terminals.add(panes[i]);
 		}
 		initFrame();
-		initFindField();
 		initFocus();
 		for (int i = 0; i < panes.length; i++) {
 			panes[i].start();
@@ -259,31 +259,23 @@ public class TerminatorFrame implements TerminalPaneMaster {
 	}
 
 	
-	private JWindow findWindow;
-	private JTextField findField;
+	private JTextField findField = new FindField();
+	private JLabel findStatus = new JLabel(" ");
 	private JTextBuffer textToFindIn;
 	
 	private class FindField extends EMonitoredTextField {
 		public FindField() {
 			super(40);
-			addFocusListener(new FocusAdapter() {
-				public void focusLost(FocusEvent e) {
-					hideFindDialog();
-				}
-			});
 			addKeyListener(new KeyAdapter() {
 				public void keyTyped(KeyEvent e) {
 					if (textToFindIn != null && e.getKeyChar() == '\n') {
 						find();
-						hideFindDialog();
 						e.consume();
 					}
 				}
 				public void keyPressed(KeyEvent e) {
 					if (textToFindIn != null && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						getFindHighlighter().forgetRegularExpression(textToFindIn);
-						hideFindDialog();
-						e.consume();
 					}
 				}
 			});
@@ -296,23 +288,14 @@ public class TerminatorFrame implements TerminalPaneMaster {
 		private void find() {
 			String regularExpression = getText();
 			try {
-				getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
+				int matchCount = getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
+				findStatus.setText("Matches: " + matchCount);
 				setForeground(UIManager.getColor("TextField.foreground"));
 			} catch (PatternSyntaxException ex) {
 				setForeground(Color.RED);
+				findStatus.setText(ex.getDescription());
 			}
 		}
-	}
-	
-	private void initFindField() {
-		findField = new FindField();
-		// Make sure the find dialog is closed if the user drags the window.
-		// Strangely, on Linux this doesn't seem to cause the find dialog to lose the focus.
-		frame.addComponentListener(new ComponentAdapter() {
-			public void componentMoved(ComponentEvent e) {
-				hideFindDialog();
-			}
-		});
 	}
 	
 	private FindHighlighter getFindHighlighter() {
@@ -320,38 +303,16 @@ public class TerminatorFrame implements TerminalPaneMaster {
 	}
 	
 	public void showFindDialogFor(JTextBuffer text) {
-		hideFindDialog();
-		
 		this.textToFindIn = text;
 		
-		Point location = frame.getLocationOnScreen();
-		location.y += frame.getHeight();
-		
-		findWindow = new JWindow(frame);
-		findWindow.setContentPane(findField);
-		findWindow.setLocation(location);
-		findWindow.pack();
-		
-		Dimension findWindowSize = findWindow.getSize();
-		findWindowSize.width = frame.getWidth();
-		findWindow.setSize(findWindowSize);
+		FormPanel formPanel = new FormPanel();
+		formPanel.addRow("Find:", findField);
+		formPanel.addRow("", findStatus);
+		FormDialog.showNonModal(frame, "Find", formPanel);
 		
 		findField.selectAll();
-		
-		findWindow.setVisible(true);
 		findField.requestFocus();
-	}
-	
-	private void hideFindDialog() {
-		if (findWindow != null) {
-			findWindow.setVisible(false);
-			findWindow.dispose();
-			findWindow = null;
-		}
-		if (textToFindIn != null) {
-			textToFindIn.requestFocus();
-			textToFindIn = null;
-		}
+		findStatus.setText(" ");
 	}
 	
 	private void addPane(JTerminalPane newPane, boolean focusOnNewTab) {
