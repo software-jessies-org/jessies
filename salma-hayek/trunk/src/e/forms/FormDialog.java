@@ -33,12 +33,8 @@ public class FormDialog extends JDialog {
     
     private ActionListener listener;
     
-    private static final boolean isWindows() {
-        return (System.getProperty("os.name").indexOf("Windows") != -1);
-    }
-    
     public static int getComponentSpacing() {
-        if (isWindows()) {
+        if (GuiUtilities.isWindows()) {
             return 4;
         }
         return 10;
@@ -217,7 +213,7 @@ public class FormDialog extends JDialog {
         //panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         
-        if (isWindows()) {
+        if (GuiUtilities.isWindows()) {
             // Use the traditional Windows layout.
             panel.add(Box.createGlue());
             panel.add(actionButton);
