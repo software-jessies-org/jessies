@@ -18,7 +18,7 @@ define GENERATE_CHANGE_LOG.svn
 endef
 
 define GENERATE_CHANGE_LOG.cvs
-  cvs2cl --hide-filenames
+  $(if $(shell which cvs2cl),cvs2cl,cvs2cl.pl) --hide-filenames
 endef
 
 .PHONY: build
