@@ -32,11 +32,9 @@ public class Terminator implements Controller {
 	
 	private void ensureRunnablePty() {
 		String ptyBin = System.getProperty("pty.binary");
-		try {
-			Process proc = Runtime.getRuntime().exec(ptyBin);
-			proc.waitFor();
-		} catch (Exception ex) {
-			System.err.println("The pty program (" + ptyBin + ") cannot be run.");
+		File pty = new File(ptyBin);
+		if (pty.exists() == false) {
+			System.err.println("The pty program (" + ptyBin + ") cannot be found.");
 			System.err.println("Terminator needs this program in order to function.");
 			System.err.println("To compile the program, go into the 'terminator-dist/pty' directory");
 			System.err.println("and type 'make'.");
