@@ -59,13 +59,12 @@ void loop(int ptym, int ignoreeof)
     int bytesInBuffer = 0;
     int bytesRequired = 1;
     if ( (child = fork()) < 0) {
-        err_sys("fork error");
-
+        panic("fork error");
     } else if (child == 0) {    /* child copies stdin to ptym */
         for ( ; ; ) {
             if (bytesInBuffer < bytesRequired) {
                 if ( (nread = read(STDIN_FILENO, buff + bytesInBuffer, BUFFSIZE - bytesInBuffer)) < 0)
-                    err_sys("read error from stdin");
+                    panic("read error from stdin");
                 else if (nread == 0)
                     break;        /* EOF on stdin means we're done */
                 bytesInBuffer += nread;
@@ -74,7 +73,7 @@ void loop(int ptym, int ignoreeof)
             if (buff[0] == SIZE_ESCAPE) {
                 if (bytesInBuffer >= 2 && buff[1] == SIZE_ESCAPE) {
                     if (writen(ptym, buff, 1) != 1) {
-                        err_sys("writen error to master pty");
+                        panic("writen error to master pty");
                     }
                     bytesInBuffer -= 2;
                     memmove(buff, buff + 2, bytesInBuffer);
@@ -87,7 +86,7 @@ void loop(int ptym, int ignoreeof)
                         size.ws_xpixel = readUnsignedShort(buff + 6);
                         size.ws_ypixel = readUnsignedShort(buff + 8);
                         if (ioctl(ptym, TIOCSWINSZ, (char *) &size) < 0) {
-                            err_sys("TIOCSWINSZ error");
+                            panic("TIOCSWINSZ error");
                         }
                         bytesInBuffer -= SIZE_STRUCT_SIZE;
                         memmove(buff, buff + SIZE_STRUCT_SIZE, bytesInBuffer);
@@ -100,7 +99,7 @@ void loop(int ptym, int ignoreeof)
                 for (index = 0; index <= bytesInBuffer; index++) {
                     if ((index == bytesInBuffer) || (buff[index] == SIZE_ESCAPE)) {
                         if (writen(ptym, buff, index) != index) {
-                            err_sys("writen error to master pty");
+                            panic("writen error to master pty");
                         }
                         bytesInBuffer = bytesInBuffer - index;  /* If there was no escape char, bytesInBuffer = 0, and 0 bytes copied. */
                         memmove(buff, buff + index, bytesInBuffer);
@@ -120,14 +119,14 @@ void loop(int ptym, int ignoreeof)
 
         /* parent copies ptym to stdout */
     if (signal_intr(SIGTERM, sig_term) == SIG_ERR)
-        err_sys("signal_intr error for SIGTERM");
+        panic("signal_intr error for SIGTERM");
 
     for ( ; ; ) {
         if ( (nread = read(ptym, buff, BUFFSIZE)) <= 0)
             break;        /* signal caught, error, or EOF */
 
         if (writen(STDOUT_FILENO, buff, nread) != nread)
-            err_sys("writen error to stdout");
+            panic("writen error to stdout");
     }
 
     /* There are three ways to get here: sig_term() below caught the

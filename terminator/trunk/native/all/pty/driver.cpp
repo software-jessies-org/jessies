@@ -9,40 +9,40 @@ void do_driver(const char *driver) {
     /* create a stream pipe to communicate with the driver */
     int pipe[2];
     if (s_pipe(pipe) < 0) {
-        err_sys("can't create stream pipe");
+        panic("can't create stream pipe");
     }
 
     pid_t child = fork();
     if (child < 0) {
-        err_sys("fork error");
+        panic("fork error");
     } else if (child == 0) {            /* child */
         close(pipe[1]);
 
         /* stdin for driver */
         if (dup2(pipe[0], STDIN_FILENO) != STDIN_FILENO) {
-            err_sys("dup2 error to stdin");
+            panic("dup2 error to stdin");
         }
 
         /* stdout for driver */
         if (dup2(pipe[0], STDOUT_FILENO) != STDOUT_FILENO) {
-            err_sys("dup2 error to stdout");
+            panic("dup2 error to stdout");
         }
         close(pipe[0]);
 
         /* leave stderr for driver alone */
 
         execlp(driver, driver, (char *) 0);
-        err_sys("execlp error for: %s", driver);
+        panic("execlp error for", driver);
     }
 
     close(pipe[0]);        /* parent */
 
     if (dup2(pipe[1], STDIN_FILENO) != STDIN_FILENO) {
-        err_sys("dup2 error to stdin");
+        panic("dup2 error to stdin");
     }
 
     if (dup2(pipe[1], STDOUT_FILENO) != STDOUT_FILENO) {
-        err_sys("dup2 error to stdout");
+        panic("dup2 error to stdout");
     }
     close(pipe[1]);
 
