@@ -20,19 +20,33 @@ public class BuildAction extends ETextAction {
     }
 
     public void buildProject(ETextWindow text) {
-        boolean shouldContinue = Edit.getCurrentWorkspace().prepareForAction("Build", "Save before building?");
+        Workspace workspace = Edit.getCurrentWorkspace();
+        boolean shouldContinue = workspace.prepareForAction("Build", "Save before building?");
         if (shouldContinue == false) {
             return;
         }
         
-        String makefileName = findMakefile(text.getContext());
+        String context;
+        if (text != null) {
+            context = text.getContext();
+        } else {
+            try {
+                context = workspace.getCanonicalRootDirectory();
+            } catch (IOException ex) {
+                Edit.showAlert("Build", "It's not possible to build this project because the workspace root could not be found.");
+                ex.printStackTrace();
+                return;
+            }
+        }
+        
+        String makefileName = findMakefile(context);
         if (makefileName == null) {
             Edit.showAlert("Build", "It's not possible to build this project because neither a Makefile for make or a build.xml for Ant could be found.");
         } else if (makefileName.endsWith("build.xml")) {
-            invokeBuildTool(text, makefileName, "ant -emacs -quiet");
+            invokeBuildTool(workspace, makefileName, "ant -emacs -quiet");
         } else if (makefileName.endsWith("Makefile")) {
             String makeCommand = Parameters.getParameter("make.command", "make");
-            invokeBuildTool(text, makefileName, makeCommand);
+            invokeBuildTool(workspace, makefileName, makeCommand);
         }
     }
     
@@ -44,10 +58,15 @@ public class BuildAction extends ETextAction {
         return makefileName;
     }
     
-    public void invokeBuildTool(ETextWindow text, String makefileName, String command) {
+    public void invokeBuildTool(Workspace workspace, String makefileName, String command) {
         String makefileDirectoryName = makefileName.substring(0, makefileName.lastIndexOf(File.separatorChar));
         command = addTarget(command);
-        text.invokeShellCommand(makefileDirectoryName, command, true);
+        try {
+            new ShellCommand("", 0, workspace, true, makefileDirectoryName, command);
+        } catch (IOException ex) {
+            Edit.showAlert("Run", "Can't start task (" + ex.getMessage() + ").");
+            ex.printStackTrace();
+        }
     }
     
     public String addTarget(String command) {

@@ -21,8 +21,12 @@ public class ShellCommand {
     /** The count of open streams. */
     private int openStreamCount = 0;
     
+    /**
+     * Starts a new task with no progress feedback in the system's temporary
+     * directory (probably /tmp on Unix).
+     */
     public ShellCommand(String command) throws IOException {
-        this("", 0, Edit.getCurrentWorkspace(), false, "/", command);
+        this("", 0, Edit.getCurrentWorkspace(), false, System.getProperty("java.io.tmpdir"), command);
     }
     
     /** Starts a new task. */
