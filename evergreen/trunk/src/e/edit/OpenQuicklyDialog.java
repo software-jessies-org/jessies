@@ -23,7 +23,6 @@ public class OpenQuicklyDialog {
     private JLabel status = new JLabel(" ");
     
     private boolean haveSearched;
-    private boolean notRescanning;
     private DefaultListModel model;
     private PatternSyntaxException patternSyntaxException;
     
@@ -76,7 +75,7 @@ public class OpenQuicklyDialog {
         matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (notRescanning && e.getClickCount() == 2) {
+                if (e.getClickCount() == 2) {
                     int index = matchList.locationToIndex(e.getPoint());
                     String filename = (String) matchList.getModel().getElementAt(index);
                     Edit.openFile(workspace.getRootDirectory() + File.separator + filename);
@@ -115,7 +114,7 @@ public class OpenQuicklyDialog {
         public void actionPerformed(ActionEvent e) {
             source = (JButton) e.getSource();
             source.setEnabled(false);
-            notRescanning = false;
+            matchList.setEnabled(false);
             switchToFakeList();
             workspace.updateFileList(this);
         }
@@ -125,7 +124,7 @@ public class OpenQuicklyDialog {
          */
         private void switchToFakeList() {
             model = new DefaultListModel();
-            model.addElement("... rescan in progress ...");
+            model.addElement("Rescan in progress...");
             matchList.setModel(model);
         }
         
@@ -133,8 +132,8 @@ public class OpenQuicklyDialog {
          * Searches again when the file list has finished being updated.
          */
         public void stateChanged(ChangeEvent e) {
-            notRescanning = true;
             showMatches();
+            matchList.setEnabled(true);
             source.setEnabled(true);
             source = null;
         }
