@@ -45,7 +45,7 @@ public class BorderPanel extends JPanel implements Scrollable {
     }
     
     public boolean getScrollableTracksViewportWidth() {
-        return true;
+        return false;
     }
     
     public boolean getScrollableTracksViewportHeight() {
