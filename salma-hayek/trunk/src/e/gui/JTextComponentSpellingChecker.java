@@ -56,7 +56,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
             }
 
             // Find a plausible place to finish after the end of the range affected by this event.
-            int toIndex = Math.max(fromIndex, Math.min(documentLength - 1, offset + e.getLength() + 1));
+            int toIndex = Math.max(fromIndex, Math.min(documentLength, offset + e.getLength() + 1));
             while (toIndex < documentLength && Character.isWhitespace(segment.charAt(toIndex)) == false) {
                 toIndex++;
             }
@@ -82,13 +82,22 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         }
     }
     
+    private void dumpHighlights() {
+        Highlighter highlighter = component.getHighlighter();
+        Highlighter.Highlight[] highlights = highlighter.getHighlights();
+        for (int i = 0; i < highlights.length; ++i) {
+            Highlighter.Highlight highlight = highlights[i];
+            System.err.println("  " + i + " : " + highlight.getStartOffset() + ".." + highlight.getEndOffset());
+        }
+    }
+    
     /** Ensures that there are no spelling-related highlights in the given range. */
     private void removeExistingHighlightsForRange(int fromIndex, int toIndex) {
         Highlighter highlighter = component.getHighlighter();
         Highlighter.Highlight[] highlights = highlighter.getHighlights();
         
-        //System.err.println("" + fromIndex + ".." + toIndex + " " + document.getLength() + " highlightCount = " + highlights.length);
-        for (int i = 0; i < highlights.length; i++) {
+        //System.err.println(fromIndex + ".." + toIndex + " (document length " + document.getLength() + ")");
+        for (int i = 0; i < highlights.length; ++i) {
             Highlighter.Highlight highlight = highlights[i];
             if (highlight.getPainter() == misspelledWordHighlightPainter && highlight.getStartOffset() >= fromIndex && highlight.getEndOffset() <= toIndex) {
                 highlighter.removeHighlight(highlight);
