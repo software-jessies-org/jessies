@@ -94,7 +94,7 @@ public class TagsUpdater {
         });
         tree.setCellRenderer(new TagsPanel.TagsTreeRenderer());
         
-        final SearchField searchField = new SearchField();
+        final SearchField searchField = new SearchField("Search Symbols");
         searchField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 tree.clearSelection();
