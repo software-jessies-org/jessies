@@ -267,6 +267,9 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_HOME: return "[H";
 				case KeyEvent.VK_END: return "[F";
 				
+				case KeyEvent.VK_PAGE_UP: return "[5~";
+				case KeyEvent.VK_PAGE_DOWN: return "[6~";
+				
 				case KeyEvent.VK_UP:
 				case KeyEvent.VK_DOWN:
 				case KeyEvent.VK_RIGHT:
