@@ -26,7 +26,22 @@ public class Terminator implements Controller {
 		if (arguments.contains("-v") || arguments.contains("-version") || arguments.contains("--version")) {
 			showVersion();
 		}
+		ensureRunnablePty();
 		initUi();
+	}
+	
+	private void ensureRunnablePty() {
+		String ptyBin = System.getProperty("pty.binary");
+		try {
+			Process proc = Runtime.getRuntime().exec(ptyBin);
+			proc.waitFor();
+		} catch (Exception ex) {
+			System.err.println("The pty program (" + ptyBin + ") cannot be run.");
+			System.err.println("Terminator needs this program in order to function.");
+			System.err.println("To compile the program, go into the 'terminator-dist/pty' directory");
+			System.err.println("and type 'make'.");
+			System.exit(1);
+		}
 	}
 	
 	/**
