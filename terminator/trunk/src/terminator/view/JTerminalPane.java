@@ -297,6 +297,11 @@ public class JTerminalPane extends JPanel {
 		public void keyTyped(KeyEvent event) {
 			if (TerminatorMenuBar.isKeyboardEquivalent(event) == false) {
 				char ch = event.getKeyChar();
+				if (ch == '\n') {
+					ch = '\r';
+				} else if (ch == KeyEvent.VK_BACK_SPACE) {
+					ch = 127;
+				}
 				if (ch != KeyEvent.CHAR_UNDEFINED) {
 					control.sendChar(ch);
 					textPane.userIsTyping();
