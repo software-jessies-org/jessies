@@ -16,12 +16,10 @@ EXECUTABLE_NAME ?= $(shell basename $(CURRENT_DIRECTORY))
 # ----------------------------------------------------------------------------
 
 COMPILE.m = $(COMPILE.c)
-.SUFFIXES: .o .m
 %.o: %.m
 	$(COMPILE.m) $(OUTPUT_OPTION) $<
 
 COMPILE.mm = $(COMPILE.cpp)
-.SUFFIXES: .o .mm
 %.o: %.mm
 	$(COMPILE.mm) $(OUTPUT_OPTION) $<
 
