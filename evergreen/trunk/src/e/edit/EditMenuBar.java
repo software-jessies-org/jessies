@@ -1,6 +1,5 @@
 package e.edit;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -55,25 +54,11 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
 
     private static JMenuItem makeAcceleratedItemEx(Action action, String key, boolean shifted) {
         JMenuItem item = new JMenuItem(action);
-        KeyStroke keyStroke = makeKeyStroke(key, shifted);
+        KeyStroke keyStroke = GuiUtilities.makeKeyStroke(key, shifted);
         if (keyStroke != null) {
             item.setAccelerator(keyStroke);
         }
         return item;
-    }
-    
-    public static KeyStroke makeKeyStroke(String key, boolean shifted) {
-        int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-        if (shifted) modifiers |= InputEvent.SHIFT_MASK;
-        String keycodeName = "VK_" + key;
-        int keycode;
-        try {
-            keycode = KeyEvent.class.getField(keycodeName).getInt(KeyEvent.class);
-            return KeyStroke.getKeyStroke(keycode, modifiers);
-        } catch (Exception ex) {
-            Log.warn("Couldn't find virtual keycode for '" + key + "'.", ex);
-        }
-        return null;
     }
     
     public JMenu makeEditMenu() {

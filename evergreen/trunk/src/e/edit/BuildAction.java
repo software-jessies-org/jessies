@@ -12,7 +12,7 @@ public class BuildAction extends ETextAction {
 
     public BuildAction() {
         super(ACTION_NAME);
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("B", false));
+        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("B", false));
     }
 
     public void actionPerformed(ActionEvent e) {

@@ -11,7 +11,7 @@ public class ScrollToSelectionAction extends ETextAction {
 
     public ScrollToSelectionAction() {
         super(ACTION_NAME);
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("J", false));
+        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("J", false));
     }
     
     public void actionPerformed(ActionEvent e) {

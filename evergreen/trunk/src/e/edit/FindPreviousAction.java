@@ -10,7 +10,7 @@ public class FindPreviousAction extends ETextAction {
 
     public FindPreviousAction() {
         super(ACTION_NAME);
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("D", false));
+        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("D", false));
     }
     
     public void actionPerformed(ActionEvent e) {

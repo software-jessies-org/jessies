@@ -11,7 +11,7 @@ public class RedoAction extends ETextAction {
 
     public RedoAction() {
         super(ACTION_NAME);
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("Z", true));
+        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("Z", true));
     }
 
     public void actionPerformed(ActionEvent e) {

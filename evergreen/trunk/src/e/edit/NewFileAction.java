@@ -18,7 +18,7 @@ public class NewFileAction extends ETextAction {
     
     public NewFileAction() {
         super(ACTION_NAME);
-        putValue(ACCELERATOR_KEY, EditMenuBar.makeKeyStroke("N", false));
+        putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("N", false));
     }
     
     public void actionPerformed(ActionEvent e) {
