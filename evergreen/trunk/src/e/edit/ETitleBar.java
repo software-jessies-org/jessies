@@ -58,11 +58,16 @@ public class ETitleBar extends JComponent implements MouseListener, MouseMotionL
     }
     
     public void checkForCounterpart() {
-        if (switchButton == null && window instanceof e.edit.ETextWindow) {
+        if (window instanceof e.edit.ETextWindow) {
             e.edit.ETextWindow textWindow = (e.edit.ETextWindow) window;
-            if (textWindow.getCounterpartFilename() != null) {
+            if (switchButton == null && textWindow.getCounterpartFilename() != null) {
                 this.switchButton = new ESwitchButton(textWindow);
                 add(switchButton);
+                revalidate();
+                repaint();
+            } else if (switchButton != null && textWindow.getCounterpartFilename() == null) {
+                remove(switchButton);
+                this.switchButton = null;
                 revalidate();
                 repaint();
             }
