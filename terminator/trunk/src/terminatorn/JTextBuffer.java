@@ -110,8 +110,9 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	 * columns and 'height' the number of rows. (In case you were concerned
 	 * about the fact that terminals tend to refer to y,x coordinates.)
 	 */
-	public Dimension getSizeInCharacters() {
-		Dimension result = getSize();
+	public Dimension getVisibleSizeInCharacters() {
+		JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
+		Dimension result = scrollPane.getViewport().getExtentSize();
 		FontMetrics metrics = getFontMetrics(getFont());
 		result.width /= metrics.charWidth(' ');
 		result.height /= metrics.getHeight();
@@ -134,6 +135,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		setPreferredSize(size);
 		setSize(size);
 		redoHighlightsFrom(lineHighlights.size());
+		revalidate();
 	}
 	
 	public void scrollToBottom() {
@@ -227,6 +229,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	public Dimension getOptimalViewSize() {
 		FontMetrics metrics = getFontMetrics(getFont());
 		return new Dimension(model.getWidth() * metrics.charWidth('W'), model.getLineCount() * metrics.getHeight());
+	}
+	
+	public void clearScrollBuffer() {
+		model.reset();
 	}
 	
 	// Highlighting support.
