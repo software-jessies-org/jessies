@@ -77,20 +77,25 @@ public class ProcessUtilities {
      * listener may be null.
      */
     public static void spawn(final File directory, final String[] command, final ProcessListener listener) {
-        new Thread() {
-            public void run() {
-                try {
-                    Process p = Runtime.getRuntime().exec(command, null, directory);
-                    p.getOutputStream().close();
-                    int status = p.waitFor();
-                    if (listener != null) {
-                        listener.processExited(status);
+        System.err.println("Spawning '" + StringUtilities.join(command, " ") + "'.");
+        try {
+            final Process p = Runtime.getRuntime().exec(command, null, directory);
+            new Thread() {
+                public void run() {
+                    try {
+                        p.getOutputStream().close();
+                        int status = p.waitFor();
+                        if (listener != null) {
+                            listener.processExited(status);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
                 }
-            }
-        }.start();
+            }.start();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public interface ProcessListener {
