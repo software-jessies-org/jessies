@@ -284,13 +284,12 @@ public class TerminalControl implements Runnable {
 	}
 	
 	public void sendEscapeString(String str) {
-		if (processIsRunning == false) {
-			return;
-		}
 		try {
-			out.write((byte) ASCII_ESC);
-			out.write(str.getBytes());
-			out.flush();
+			if (processIsRunning) {
+				out.write((byte) ASCII_ESC);
+				out.write(str.getBytes());
+				out.flush();
+			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
