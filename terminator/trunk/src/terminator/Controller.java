@@ -18,5 +18,5 @@ public interface Controller {
 	
 	public void showFindDialogFor(JTextBuffer textToFindIn);
 	
-	public Dimension getLastNoticedFrameSize();
+	public void setTerminalSize(Dimension size);
 }

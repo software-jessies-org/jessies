@@ -142,58 +142,24 @@ public class JTelnetPane extends JPanel {
 	}
 	
 	private void initSizeMonitoring(final JScrollPane scrollPane) {
-		class SizeMonitor extends ComponentAdapter implements ActionListener {
+		class SizeMonitor extends ComponentAdapter {
 			private Dimension currentSize;
-			private Timer timer;
+
 			public void componentShown(ComponentEvent event) {
 				currentSizeInChars = textPane.getVisibleSizeInCharacters();
-				forceSensibleSize();
 			}
 			
 			public void componentResized(ComponentEvent event) {
-				if (timer != null) {
-					timer.stop();
-					timer = null;
-				}
-				timer = new Timer(500, this);
-				timer.setRepeats(false);
-				timer.start();
-			}
-			
-			public void actionPerformed(ActionEvent event) {
 				Dimension size = textPane.getVisibleSizeInCharacters();
 				if (size.equals(currentSizeInChars) == false) {
 					try {
 						control.sizeChanged(size, textPane.getVisibleSize());
+						controller.setTerminalSize(size);
 					} catch (IOException ex) {
 						Log.warn("Failed to notify pty of size change.", ex);
 					}
 					currentSizeInChars = size;
 				}
-				forceSensibleSize();
-				timer = null;
-			}
-			
-			public void forceSensibleSize() {
-				Dimension sparePixels = getRemainder(scrollPane.getViewport().getSize(), textPane.getCharUnitSize());
-				if (sparePixels.width > 0 || sparePixels.height > 0) {
-					JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, textPane);
-					Dimension size = frame.getSize();
-					// Hack - we're going to lazily adjust our sizes if the user's in the middle of dragging.
-					if (size.equals(controller.getLastNoticedFrameSize())) {
-						size = subtract(size, sparePixels);
-						frame.setSize(size);
-					}
-				}
-			}
-		
-			private Dimension subtract(Dimension one, Dimension two) {
-				return new Dimension(one.width - two.width, one.height - two.height);
-			}
-			
-			private Dimension getRemainder(Dimension numerator, Dimension denominator) {
-				return new Dimension(numerator.width % denominator.width,
-						numerator.height % denominator.height);
 			}
 		};
 		scrollPane.getViewport().addComponentListener(new SizeMonitor());

@@ -132,7 +132,7 @@ public class TextBuffer implements TelnetListener {
 	}
 	
 	/** Returns true when the alternative buffer is in use. */
-	private boolean usingAlternativeBuffer() {
+	public boolean usingAlternativeBuffer() {
 		return (savedScreen != null);
 	}
 
@@ -331,7 +331,7 @@ public class TextBuffer implements TelnetListener {
 		}
 	}
 	
-	private int getFirstDisplayLine() {
+	public int getFirstDisplayLine() {
 		return textLines.size() - height;
 	}
 	
