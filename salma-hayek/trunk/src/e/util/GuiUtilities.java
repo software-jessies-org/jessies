@@ -12,7 +12,7 @@ public class GuiUtilities {
      * on the Mac.
      */
     public static boolean isMacOs() {
-        return (System.getProperty("os.name").indexOf("Mac") == -1);
+        return (System.getProperty("os.name").indexOf("Mac") != -1);
     }
     
     public static void initLookAndFeel() {
