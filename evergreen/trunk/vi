@@ -2,7 +2,19 @@
 # Opens files in Edit.
 # @author Elliott Hughes <enh@acm.org>
 
+require 'pathname'
 require 'net/telnet'
+
+def previousViOnPath()
+    directories = ENV["PATH"].split(':')
+    executables = directories.map() {
+        |directory|
+        pathname = Pathname.new("#{directory}/vi")
+        pathname.exist?() ? pathname.realpath().to_s() : nil
+    }.compact().uniq()
+    executables.delete($0)
+    return executables[0]
+end
 
 def openFileOnLocalhost(filename)
     host = ENV["EDIT_HOME_SERVER"]
@@ -16,9 +28,7 @@ def openFileOnLocalhost(filename)
         print(telnet.readlines().join("\n"))
         telnet.close()
     rescue
-        # Defer to the next 'vi' on the path if we failed.
-        us = $0
-        system("`type -p -a vi | xargs -n1 readlink -f | grep -v #{us} | uniq | tail +2 | head -1` #{filename}")
+        system("#{previousViOnPath()} #{filename}")
     end
 end
 
