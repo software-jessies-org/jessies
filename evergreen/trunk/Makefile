@@ -1,3 +1,3 @@
 PROJECT_NAME=edit
 
-include java.make
+include ../salma-hayek/java.make
