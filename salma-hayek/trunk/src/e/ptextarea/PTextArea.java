@@ -301,6 +301,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             repaintCaret();
             caretLocation = newLocation;
             repaintCaret();
+            Point point = getViewCoordinates(getCoordinates(caretLocation));
+            FontMetrics metrics = getFontMetrics(getFont());
+            scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
         }
     }
     
