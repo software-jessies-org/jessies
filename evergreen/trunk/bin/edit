@@ -36,7 +36,7 @@ if ARGV[0] =~ /^\+(\d+)$/
   ARGV[0] = "#{ARGV[0]}:#$1"
 end
 
-case `uname`
+case `uname`.chomp
 when /Darwin/
     # Darwin is what Mac OS X calls itself.
     edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
