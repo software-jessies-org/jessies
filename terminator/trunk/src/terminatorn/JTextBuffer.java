@@ -77,7 +77,6 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 				}
 			}
 		});
-		addHighlighter(new TheHighlighter());
 		addHighlighter(new HyperlinkHighlighter());
 	}
 	
