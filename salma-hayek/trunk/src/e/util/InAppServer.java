@@ -10,43 +10,58 @@ import java.net.*;
  * open files from the shell, and Terminator uses it so that successive
  * invocations don't need to start a new VM.
  */
-public abstract class InAppServer extends Thread {
-    private ServerSocket socket;
-    
+public abstract class InAppServer {
     /**
      * Override this and return true if you were able to interpret the
      * command, false otherwise.
      */
     public abstract boolean handleCommand(String line, PrintWriter out);
     
-    public InAppServer(String name, int port) {
-        setName(name + "Server");
+    public InAppServer(String name, String portFilename) {
+        String fullName = name + "Server";
         try {
-            this.socket = new ServerSocket(port);
-            start();
+            new Thread(new ConnectionAccepter(FileUtilities.fileFromString(portFilename)), fullName).start();
         } catch (Throwable th) {
-            Log.warn("Couldn't start " + getName(), th);
+            Log.warn("Couldn't start " + fullName, th);
         }
     }
     
-    public void run() {
-        for (;;) {
-            try {
-                Thread thread = new Thread(new ClientHandler(socket.accept()));
-                thread.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+    private class ConnectionAccepter implements Runnable {
+        private ServerSocket socket;
+        
+        private ConnectionAccepter(File portFile) throws IOException {
+            this.socket = new ServerSocket();
+            socket.bind(null);
+            writePortNumberToFile(portFile);
+        }
+        
+        private void writePortNumberToFile(File portFile) {
+            StringUtilities.writeFile(portFile, socket.getLocalPort() + "\n");
+        }
+        
+        public void run() {
+            acceptConnections();
+        }
+        
+        private void acceptConnections() {
+            for (;;) {
+                try {
+                    String handlerName = Thread.currentThread().getName() + "-Handler-" + Thread.activeCount();
+                    new Thread(new ClientHandler(socket.accept()), handlerName).start();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
     }
     
-    public class ClientHandler implements Runnable {
+    private final class ClientHandler implements Runnable {
         private Socket client;
         
         private BufferedReader in;
         private PrintWriter out;
         
-        public ClientHandler(Socket client) {
+        private ClientHandler(Socket client) {
             this.client = client;
         }
         
@@ -80,11 +95,11 @@ public abstract class InAppServer extends Thread {
         private void handleRequest() throws IOException {
             String line = in.readLine();
             if (line == null || line.length() == 0) {
-                Log.warn(getName() + " ignoring empty request");
+                Log.warn(Thread.currentThread().getName() + ": ignoring empty request");
                 return;
             }
             if (handleCommand(line, out) == false) {
-                out.println(getName() + ": didn't understand request \"" + line + "\".");
+                out.println(Thread.currentThread().getName() + ": didn't understand request \"" + line + "\"");
             }
         }
     }
