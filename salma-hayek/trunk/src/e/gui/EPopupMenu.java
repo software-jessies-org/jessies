@@ -49,7 +49,7 @@ public class EPopupMenu {
     }
     
     /** Sets up the menu with items that act upon what's at (x,y). */
-    public JPopupMenu createJMenu(final int x, final int y) {
+    private JPopupMenu createJMenu(final int x, final int y) {
         JPopupMenu menu = new JPopupMenu();
         boolean lastWasSeparator = false;
         for (int i = 0; i < menuItems.size(); i++) {
@@ -68,7 +68,7 @@ public class EPopupMenu {
     }
     
     /** Sets up the menu with items that act upon what's at (x,y). */
-    public PopupMenu createMenu(final int x, final int y) {
+    private PopupMenu createMenu(final int x, final int y) {
         PopupMenu menu = new PopupMenu();
         boolean lastWasSeparator = false;
         for (int i = 0; i < menuItems.size(); i++) {
@@ -87,7 +87,7 @@ public class EPopupMenu {
     }
     
     /** Creates a MenuItem from an Action and a location. */
-    public MenuItem createMenuItem(final Action action, final int x, final int y) {
+    private MenuItem createMenuItem(final Action action, final int x, final int y) {
         MenuItem menuItem = new MenuItem((String) action.getValue(Action.NAME));
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
