@@ -400,7 +400,7 @@ public class Workspace extends JPanel {
         if (openQuicklyDialog == null) {
             openQuicklyDialog = new OpenQuicklyDialog(this);
         }
-        if (filenamePattern.length() > 0) {
+        if (filenamePattern.length() > 0 && filenamePattern.indexOf("\n") == -1) {
             openQuicklyDialog.setFilenamePattern(filenamePattern);
         }
         openQuicklyDialog.showDialog();
