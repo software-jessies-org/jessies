@@ -405,6 +405,12 @@ public class ETextArea extends JTextArea {
         return (length > 0) ? getText(lineStart, length) : "";
     }
 
+    public void setSelectionColor(Color newColor) {
+        // Work around "JTextComponent.setSelectionColor doesn't cause repaint" (review ID 250065; Java Bug Parade id pending).
+        super.setSelectionColor(newColor);
+        repaint();
+    }
+
     private void initFocusListener() {
         addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
