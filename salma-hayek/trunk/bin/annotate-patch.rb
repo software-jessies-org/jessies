@@ -66,6 +66,7 @@ end
 
 def tags_for_file(filename)
   tag_lines = `ctags -n -f - #{filename}`.split('\n')
+  namespace_separator=(filename =~ /\.java$/) ? "." : "::"
   tags = Hash.new()
   tag_lines.each() {
     |line|
@@ -73,7 +74,7 @@ def tags_for_file(filename)
       line_number = $2.to_i()
       identifier = $1
       if $3 =~ /(?:struct|class|enum|interface|namespace):(\S+)/
-        identifier = "#$1.#{identifier}"
+        identifier = "#$1#{namespace_separator}#{identifier}"
       end
       tags[line_number] = identifier
     end
