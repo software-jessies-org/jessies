@@ -40,7 +40,7 @@ public class JTerminalPane extends JPanel {
 		this.name = name;
 		
 		try {
-			Log.warn("Starting process '" + command + "'");
+//			Log.warn("Starting process '" + command + "'");
 			final Process proc = Runtime.getRuntime().exec(System.getProperty("pty.binary") + " " + command);
 			init(command, proc, ignoreExitStatus);
 		} catch (IOException ex) {
@@ -145,6 +145,7 @@ public class JTerminalPane extends JPanel {
 	private void initSizeMonitoring(final JScrollPane scrollPane) {
 		class SizeMonitor extends ComponentAdapter {
 			private Dimension currentSize;
+			private boolean isAtEnd = true;
 
 			public void componentShown(ComponentEvent event) {
 				currentSizeInChars = textPane.getVisibleSizeInCharacters();
@@ -156,6 +157,7 @@ public class JTerminalPane extends JPanel {
 					try {
 						control.sizeChanged(size, textPane.getVisibleSize());
 						controller.setTerminalSize(size);
+						textPane.scrollToBottom();
 					} catch (IOException ex) {
 						Log.warn("Failed to notify pty of size change.", ex);
 					}

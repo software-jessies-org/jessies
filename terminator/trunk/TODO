@@ -8,13 +8,11 @@ When adding stuff, please put a priority to its left.  Priorities range from 1-5
 Unassigned TODOs:
 ~~~~~~~~~~~~~~
 [5]	Make an about box.
-[5]	Stop inserting blank lines at the bottom when we're resized.
 [5]	Implement "New Window" to go with "New Tab".
 [3]	Review the current properties reading, and see if it's really going to work well enough.  Possibly add "?MacOS:" stuff to it.
 [2]	Find some profiling tool to see if we can find simple ways of speeding up.
 [1]	Add bracket-matching double-click selection?
 [1]	Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
-[1]	Implement 'mode 1'.
 [1]	Feedback on other tabs when there's been output you haven't seen yet?
 [1]	cursorColor should default to foreground rather than black.
 [1]	Shouldn't log while in alternate buffer mode.
