@@ -174,6 +174,7 @@ public class TagsUpdater {
         private long startTime;
         private Timer progressTimer;
         private File temporaryFile;
+        private boolean isRunning;
         
         private DefaultMutableTreeNode root;
         private DefaultTreeModel treeModel;
@@ -189,6 +190,10 @@ public class TagsUpdater {
         }
         
         public void run() {
+            if (isRunning) {
+                return;
+            }
+            isRunning = true;
             root = new DefaultMutableTreeNode("root");
             treeModel = new DefaultTreeModel(root);
             branches = new HashMap();
@@ -262,11 +267,13 @@ public class TagsUpdater {
             }
             progressTimer.stop();
             if (tagsHaveNotChanged) {
+                isRunning = false;
                 return;
             }
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     setTreeModel(treeModel);
+                    isRunning = false;
                 }
             });
             
