@@ -282,13 +282,17 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         Edit.showStatus("Reverted to saved version of " + filename);
     }
     
+    private boolean confirmReversion() {
+        return Edit.askQuestion("Revert", "Revert to saved version of '" + file.getName() + "'?\nReverting will lose your current changes.", "Revert");
+    }
+    
     public void revertToSaved() {
         if (isDirty() == false && isOutOfDateWithRespectToDisk() == false) {
             Edit.showAlert("Revert", "'" + getFilename() + "' is the same on disk as in the editor.");
             return;
         }
-        boolean revert = Edit.askQuestion("Revert", "Revert to saved version of '" + file.getName() + "'?\nReverting will lose your current changes.", "Revert");
-        if (revert) {
+        boolean isConfirmationRequired = isDirty ();
+        if (isConfirmationRequired == false || confirmReversion()) {
             uncheckedRevertToSaved();
         }
     }
