@@ -1,4 +1,3 @@
-BADGER:=$(notdir $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))))
 SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
 ARCHIVE_HOST=locke
