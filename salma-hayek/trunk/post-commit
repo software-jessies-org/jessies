@@ -63,7 +63,10 @@ body << "<pre>"
 changes.split("\n").each() {
     |line|
     color = "black"
-    if line =~ /^Modified: / || line =~ /^=+$/ || line =~ /^@@ /
+    if line =~ /^Modified: /
+    elsif line =~ /^=+$/
+        body << "<hr noshade>
+    elsif line =~ /^@@ /
         color = "gray"
     elsif line =~ /^-/
         color = "red"
