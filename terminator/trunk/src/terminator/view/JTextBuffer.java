@@ -163,18 +163,16 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	 */
 	public Dimension getVisibleSizeInCharacters() {
 		Dimension result = getVisibleSize();
-		FontMetrics metrics = getFontMetrics(getFont());
-		result.width /= metrics.charWidth(' ');
-		result.height /= metrics.getHeight();
+		Dimension character = getCharUnitSize();
+		result.width /= character.width;
+		result.height /= character.height;
 		return result;
 	}
 	
 	// Methods used by TextBuffer in order to update the display.
 	
 	public void linesChangedFrom(int lineIndex) {
-		FontMetrics metrics = getFontMetrics(getFont());
 		Point redrawTop = getLineTop(new Location(lineIndex, 0));
-		int charHeight = metrics.getHeight();
 		redoHighlightsFrom(lineIndex);
 		Dimension size = getSize();
 		repaint(redrawTop.x, redrawTop.y, size.width, size.height - redrawTop.y);
@@ -203,8 +201,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public void scrollToLine(final int lineNumber) {
-		FontMetrics metrics = getFontMetrics(getFont());
-		scrollRectToVisible(new Rectangle(0, lineNumber * metrics.getHeight() - 10, 10, metrics.getHeight() + 20));
+		Dimension character = getCharUnitSize();
+		scrollRectToVisible(new Rectangle(0, lineNumber * character.height - 10, 10, character.height + 20));
 	}
 	
 	/**
@@ -265,8 +263,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public Location viewToModel(Point point) {
-		FontMetrics metrics = getFontMetrics(getFont());
-		int lineIndex = point.y / metrics.getHeight();
+		Dimension character = getCharUnitSize();
+		int lineIndex = point.y / character.height;
 		int charOffset = 0;
 		// If the line index is off the top or bottom, we leave charOffset = 0.  This gives us nicer
 		// selection functionality.
@@ -275,33 +273,30 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		} else if (lineIndex < 0) {
 			lineIndex = 0;
 		} else {
-			charOffset = Math.max(0, point.x / metrics.charWidth('W'));
+			charOffset = Math.max(0, point.x / character.width);
 			charOffset = Math.min(charOffset, model.get(lineIndex).length());
 		}
 		return new Location(lineIndex, charOffset);
 	}
 	
 	private Point getLineTop(Location charCoords) {
-		FontMetrics metrics = getFontMetrics(getFont());
-		return new Point(charCoords.getCharOffset() * metrics.charWidth('W'),
-				charCoords.getLineIndex() * metrics.getHeight());
+		Dimension character = getCharUnitSize();
+		return new Point(charCoords.getCharOffset() * character.width, charCoords.getLineIndex() * character.height);
 	}
 	
 	private Point getLineBottom(Location charCoords) {
-		FontMetrics metrics = getFontMetrics(getFont());
-		return new Point(charCoords.getCharOffset() * metrics.charWidth('W'),
-				(charCoords.getLineIndex() + 1) * metrics.getHeight());
+		Dimension character = getCharUnitSize();
+		return new Point(charCoords.getCharOffset() * character.width, (charCoords.getLineIndex() + 1) * character.height);
 	}
 	
 	private Point getBaseline(Location charCoords) {
-		FontMetrics metrics = getFontMetrics(getFont());
-		return new Point(charCoords.getCharOffset() * metrics.charWidth('W'),
-				(charCoords.getLineIndex() + 1) * metrics.getHeight() - metrics.getMaxDescent());
+		Dimension character = getCharUnitSize();
+		return new Point(charCoords.getCharOffset() * character.width, (charCoords.getLineIndex() + 1) * character.height - getFontMetrics(getFont()).getMaxDescent());
 	}
 	
 	public Dimension getOptimalViewSize() {
-		FontMetrics metrics = getFontMetrics(getFont());
-		return new Dimension(model.getMaxLineWidth() * metrics.charWidth('W'), model.getLineCount() * metrics.getHeight());
+		Dimension character = getCharUnitSize();
+		return new Dimension(model.getMaxLineWidth() * character.width, model.getLineCount() * character.height);
 	}
 	
 	public void clearScrollBuffer() {
@@ -461,15 +456,15 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public int getFirstVisibleLine() {
-		FontMetrics metrics = getFontMetrics(getFont());
+		Dimension character = getCharUnitSize();
 		Rectangle visibleBounds = getViewport().getViewRect();
-		return visibleBounds.y / metrics.getHeight();
+		return visibleBounds.y / character.height;
 	}
 	
 	public int getLastVisibleLine() {
-		FontMetrics metrics = getFontMetrics(getFont());
+		Dimension character = getCharUnitSize();
 		Rectangle visibleBounds = getViewport().getViewRect();
-		return (visibleBounds.y + visibleBounds.height) / metrics.getHeight();
+		return (visibleBounds.y + visibleBounds.height) / character.height;
 	}
 
 	public Highlight[] getHighlightsForLocation(Location location) {
@@ -527,8 +522,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	private void redrawCaretPosition() {
 		Point top = getLineTop(caretPosition);
-		FontMetrics metrics = getFontMetrics(getFont());
-		repaint(top.x, top.y, metrics.charWidth(' '), metrics.getHeight());
+		Dimension character = getCharUnitSize();
+		repaint(top.x, top.y, character.width, character.height);
 	}
 	
 	public void paintComponent(Graphics graphics) {
