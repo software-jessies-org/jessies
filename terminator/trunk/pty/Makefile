@@ -1,8 +1,9 @@
 SRCS=$(wildcard *.cpp)
+BINARY=$(shell echo pty-`uname`-`arch`)
 
-.PHONY: pty
-pty:	$(SRCS)
-	g++ -g -W -Wall -o pty-`uname`-`arch` $(SRCS)
+$(BINARY):	$(SRCS)
+	g++ -g -W -Wall -o $(BINARY) $(SRCS)
 
+.PHONY: clean
 clean:
 	rm -f *.o pty-`uname`-`arch`
