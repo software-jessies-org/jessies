@@ -24,6 +24,7 @@ cd /usr/local/www.jessies.org/ || die "making install directory"
 PROJECTS="salma-hayek edit scm terminator"
 for PROJECT in $PROJECTS; do
     wget -N http://www.jessies.org/~enh/software/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
+    rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar zxf $PROJECT.tgz || die "extracting $PROJECT"
 done
 
