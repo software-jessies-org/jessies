@@ -6,8 +6,6 @@
 
 Make an about box.
 
-Add bracket-matching double-click selection?
-
 Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 
 Feedback on other tabs when there's been output you haven't seen yet?
@@ -51,6 +49,10 @@ Should allow the user to specify a log filename per tab, on the command line.
   numbers in situations such as "offset=1234,length=5678". No-one does IP
   addresses well, that I've seen. [I take that back; Apple's Terminal does a
   pretty much perfect job. It has bracket matching, too.]
+  Add bracket-matching double-click selection. This and better double-click
+  selection are hard because we don't have anything that lets us iterate over
+  the model as if it were a String. That would be the right way to implement
+  this stuff; a TextBuffer.asCharSequence method.
 
 * "whiptail --yesno food 5 18" still isn't right in Terminator. We've got the
   foreground and background colors the wrong way round relative to xterm (and
