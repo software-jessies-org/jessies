@@ -27,13 +27,13 @@ for PROJECT in $PROJECTS; do
     tar zxf $PROJECT.tgz || die "extracting $PROJECT"
 done
 
-# This doesn't leave us with anything that works. Generate a
-# chunk of PATH-fiddling bash to be used with 'source'?
-#scripts=`find * -type f -maxdepth 1 -perm +1`
-#for script in $scripts
-#do
-#    link_in_usr_local_bin `pwd`/$script
-#done
+# Put links to each of our shell scripts in /usr/local/bin.
+# This avoids the need to mess with anyone's $PATH.
+scripts=`find * -type f -maxdepth 1 -perm +1`
+for script in $scripts
+do
+    link_in_usr_local_bin `pwd`/$script
+done
 
 echo "All done!"
 exit 0
