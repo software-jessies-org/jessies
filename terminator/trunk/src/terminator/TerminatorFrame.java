@@ -299,7 +299,7 @@ public class TerminatorFrame implements TerminalPaneMaster {
 					}
 				}
 				public void keyReleased(KeyEvent e) {
-					if ((e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) {
+					if (JTerminalPane.isKeyboardEquivalent(e)) {
 						if (e.getKeyCode() == KeyEvent.VK_D) {
 							textToFindIn.findPrevious();
 						} else if (e.getKeyCode() == KeyEvent.VK_G) {

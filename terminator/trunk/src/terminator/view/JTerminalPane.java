@@ -237,19 +237,19 @@ public class JTerminalPane extends JPanel {
 	 * conveniently for Mac users -- is in the same place on a PC
 	 * keyboard as Command on a Mac keyboard.
 	 */
-	private int keyboardEquivalentModifier = GuiUtilities.isMacOs() ? KeyEvent.META_MASK : KeyEvent.ALT_MASK;
+	private static final int KEYBOARD_EQUIVALENT_MODIFIER = GuiUtilities.isMacOs() ? KeyEvent.META_MASK : KeyEvent.ALT_MASK;
+	
+	/**
+	 * Tests whether the given event corresponds to a keyboard
+	 * equivalent. In the long run, this code should all disappear
+	 * and be replaced by a Swing menu, but in the meantime, this
+	 * abstracts away cross-platform differences.
+	 */
+	public static boolean isKeyboardEquivalent(KeyEvent event) {
+		return ((event.getModifiers() & KEYBOARD_EQUIVALENT_MODIFIER) == KEYBOARD_EQUIVALENT_MODIFIER);
+	}
 	
 	private class KeyHandler implements KeyListener {
-		/**
-		 * Tests whether the given event corresponds to a keyboard
-		 * equivalent. In the long run, this code should all disappear
-		 * and be replaced by a Swing menu, but in the meantime, this
-		 * abstracts away cross-platform differences.
-		 */
-		public boolean isKeyboardEquivalent(KeyEvent event) {
-			return ((event.getModifiers() & keyboardEquivalentModifier) == keyboardEquivalentModifier);
-		}
-		
 		public void keyPressed(KeyEvent event) {
 			if (isKeyboardEquivalent(event)) {
 				return;
@@ -404,7 +404,7 @@ public class JTerminalPane extends JPanel {
 			});
 			char hotkey = action.getHotkeyChar();
 			if (hotkey != (char) 0) {
-				result.setAccelerator(KeyStroke.getKeyStroke(new Character(hotkey), keyboardEquivalentModifier));
+				result.setAccelerator(KeyStroke.getKeyStroke(new Character(hotkey), KEYBOARD_EQUIVALENT_MODIFIER));
 			}
 			return result;
 		}
