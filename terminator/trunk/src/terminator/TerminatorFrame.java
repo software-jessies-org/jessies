@@ -82,6 +82,10 @@ public class TerminatorFrame extends JFrame {
 		}
 		addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent event) {
+				for (int i = 0; i < terminals.size(); ++i) {
+					JTerminalPane terminal = (JTerminalPane) terminals.get(i);
+					terminal.destroyProcess();
+				}
 				terminator.frameClosed(TerminatorFrame.this);
 			}
 		});
