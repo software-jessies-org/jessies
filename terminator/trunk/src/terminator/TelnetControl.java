@@ -142,26 +142,34 @@ public class TelnetControl implements Runnable {
 		flushLineBuffer();
 		final TelnetAction[] actions = (TelnetAction[]) telnetActions.toArray(new TelnetAction[telnetActions.size()]);
 		telnetActions.clear();
+		synchronized (this) {
+			telnetActionsProcessed = false;
+		}
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					listener.processActions(actions);
 				} finally {
 					synchronized (TelnetControl.this) {
+						telnetActionsProcessed = true;
 						TelnetControl.this.notifyAll();
 					}
 				}
 			}
 		});
 		synchronized (this) {
-			try {
-				wait();
-			} catch (InterruptedException ex) {
-				Log.warn("Go away.", ex);
+			if (telnetActionsProcessed == false) {
+				try {
+					wait();
+				} catch (InterruptedException ex) {
+					Log.warn("Go away.", ex);
+				}
 			}
 		}
 		return size - i;
 	}
+	
+	private boolean telnetActionsProcessed = true;
 	
 	public void processChar(final char ch) throws IOException {
 		logWriter.append(ch);
