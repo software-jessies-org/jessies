@@ -68,6 +68,14 @@ public class JavaIndenter extends Indenter {
             indentation = "";
         }
         
+        // Recognize doc comments, and help out with the ASCII art.
+        if (lineNumber > 0) {
+            String previousLine = text.getLineText(lineNumber - 1).trim();
+            if (previousLine.startsWith("/**") || previousLine.startsWith("* ")) {
+                indentation += " *";
+            }
+        }
+        
         return indentation;
     }
 }
