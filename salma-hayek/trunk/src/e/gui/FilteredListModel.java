@@ -27,7 +27,7 @@ public class FilteredListModel extends AbstractListModel {
         validIndexes = new ArrayList();
         for (int i = 0; i < model.getSize(); ++i) {
             String entry = model.getElementAt(i).toString().toLowerCase();
-            if (entry.indexOf(filter) != -1) {
+            if (entry.indexOf(substring) != -1) {
                 validIndexes.add(new Integer(i));
             }
         }
