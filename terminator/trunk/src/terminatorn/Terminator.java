@@ -46,9 +46,17 @@ public class Terminator {
 	}
 	
 	private JComponent makeContentPane() {
+		String name = null;
 		for (int i = 0; i < arguments.size(); ++i) {
-			String hostAndPort = (String) arguments.get(i);
-			terminals.add(JTelnetPane.newTelnetHostAndPort(hostAndPort));
+			String word = (String) arguments.get(i);
+			if (word.equals("-n")) {
+				name = (String) arguments.get(++i);
+				continue;
+			}
+			
+			String command = word;
+			terminals.add(JTelnetPane.newCommandWithTitle(command, name));
+			name = null;
 		}
 		
 		if (arguments.isEmpty()) {
@@ -102,7 +110,7 @@ public class Terminator {
 	}
 
 	public void showUsage() {
-		System.err.println("Usage: Terminator [--help] [<host>[:<port>]]...");
+		System.err.println("Usage: Terminator [--help] [[-n <name>] command]...");
 		System.exit(0);
 	}
 
