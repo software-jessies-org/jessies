@@ -4,14 +4,27 @@
   isn't a very good idea; even with a monospaced font, it seems to assume
   you've done the clipping yourself.
 
-Make an about box.
+* Make an about box. [I still have the code to do a convincing imitation of
+  NSApplication's orderFrontStandardAboutPanel lying around somewhere. I'm
+  still waiting for Swing to have a JAboutBox; unlike file choosers and font
+  panels, this is one that should be doable.]
 
-Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
+* Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
 
-Feedback on other tabs when there's been output you haven't seen yet?
+* Feedback on other tabs when there's been output you haven't seen yet? I'm
+  thinking of something like a Mac OS asynchronous progress indicator in the
+  tab ears of non-visible tabs. One turn per line of unseen output? That gives
+  you both a Boolean "is there anything I haven't seen?" plus an open-ended
+  way of showing further progress. Remember how much more useful Mail's dock
+  badge count is than Outlook's Boolean.
 
-Shouldn't log while in alternate buffer mode.
-Why not?  When catting the log files, I've found this useful.  It lets me see when johnh has been into vim.
+* Shouldn't log while in alternate buffer mode. martind thinks logging is
+  useful when looking at log files, to see when someone's used vim(1). My
+  background with xwsh(1) makes me think we shouldn't even show the scroll bar
+  in alternate buffer mode. Maybe we should ask you up-front, when you first
+  use Terminator, which of the great terminal emulators you think is the one
+  true emulator: xwsh or xterm? The former group get pretty much the current
+  set of defaults, and the latter get a more black-on-white style.
 
 * Phil suggested "add ability to view more than one terminal at a time, in a
   split pane, or in a 2d-tiled layout". I'm not entirely convinced, but can
@@ -23,7 +36,8 @@ Why not?  When catting the log files, I've found this useful.  It lets me see wh
   while working at the bottom (one presumes). I've no idea what this is for,
   but felt I should mention it.
 
-Should allow the user to specify a log filename per tab, on the command line.
+* Should allow the user to specify a log filename per tab, on the command line.
+  Mail chrisa@bluearc.com when this is done, because he wants to use it.
 
 * "Connect to Server" CS-K; don't implement Rendezvous (unless you're bored!)
   but take (user@)?host and port-scan for ssh, and fall back to telnet.
@@ -35,15 +49,18 @@ Should allow the user to specify a log filename per tab, on the command line.
   good as Apple's. And I guess the right direction to go in is one that moves
   us away from .Xdefaults and .Xresources except as an initial land grab.
 
-* Rewrite the hyper-link code to be less eager.
+* Rewrite the hyper-link code to be less eager. [It's already rewritten to be
+  less eager in the sense that I meant when I wrote this, but I wonder if the
+  user shouldn't have to explicitly ask us to look for possible links?]
 
 * Fix the speed of pasting large amounts of text (without breaking the
-  correctness).
+  correctness). [Have checked in code to fix this, but want a reproducible
+  test case before switching over.]
 
 * Fix the problem where sometimes the selection as pasted into another program
   doesn't match what appears to be selected. (I think this only happens when
   you've selected to the end of a line, and you get some amount of the text
-  that follows on later lines.)
+  that follows on later lines.) [Haven't seen this in a while.]
 
 * Now we support the graphical character set, we can get a terminal into the
   traditional unusable state. We should probably have a way to reset from
@@ -66,6 +83,6 @@ Should allow the user to specify a log filename per tab, on the command line.
   between lines (which may not be our fault so much as the font's), and we've
   cleared the non-default background color to the right of the box.
 
-* we should be able to "Copy With Styles" so we can paste color output into
+* We should be able to "Copy With Styles" so we can paste color output into
   a mailer or whatever, and preserve the formatting. Presumably we can put
-  HTML data on the clipboard?
+  HTML data on the clipboard? [See elliotth's blog for details.]
