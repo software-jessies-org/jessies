@@ -150,6 +150,7 @@ public class JTelnetPane extends JPanel {
 			String sequence = getSequenceForKeyCode(event);
 			if (sequence != null) {
 				control.sendEscapeString(sequence);
+				scroll();
 				event.consume();
 			}
 		}
@@ -188,11 +189,20 @@ public class JTelnetPane extends JPanel {
 //			System.err.println("Got key " + ((int) ch));
 			if (ch != KeyEvent.CHAR_UNDEFINED) {
 				control.sendChar(ch);
-				if (Options.getSharedInstance().isScrollKey()) {
-					textPane.scrollToBottom();
-				}
+				scroll();
 			}
 			event.consume();
+		}
+		
+		/**
+		 * Scrolls the display to the bottom if we're configured to do so.
+		 * This should be invoked after any action is performed as a
+		 * result of a key press/release/type.
+		 */
+		public void scroll() {
+			if (Options.getSharedInstance().isScrollKey()) {
+				textPane.scrollToBottom();
+			}
 		}
 	}
 	
