@@ -107,6 +107,7 @@ public class TagsPanel extends JPanel {
         {
             TYPE_SHAPES.put("c", CIRCLE);
             TYPE_SHAPES.put("C", CIRCLE);
+            TYPE_SHAPES.put("D", CIRCLE);
             TYPE_SHAPES.put("i", CIRCLE);
             TYPE_SHAPES.put("f", TRIANGLE);
             TYPE_SHAPES.put("m", SQUARE);
