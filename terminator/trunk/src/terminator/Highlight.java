@@ -1,6 +1,5 @@
 package terminatorn;
 
-import java.awt.*;
 import java.util.*;
 
 /**
@@ -16,9 +15,9 @@ public class Highlight {
 	private Highlighter highlighter;
 	private Location start;
 	private Location end;
-	private Style style;
+	private StyleMutator style;
 	
-	public Highlight(Highlighter highlighter, Location start, Location end, Style style) {
+	public Highlight(Highlighter highlighter, Location start, Location end, StyleMutator style) {
 		this.highlighter = highlighter;
 		this.start = start;
 		this.end = end;
@@ -37,7 +36,7 @@ public class Highlight {
 		return end;
 	}
 	
-	public Style getStyle() {
+	public StyleMutator getStyleMutator() {
 		return style;
 	}
 	
@@ -54,7 +53,7 @@ public class Highlight {
 			String unlitText = unlit[i].getText();
 			int unlitEnd = offset + unlitText.length();
 			if (startOffset <= offset && endOffset >= offset + unlitEnd) {  // unlit[i] completely within highlight.
-				result.add(new StyledText(unlitText, applyStyle(unlit[i].getStyle())));
+				result.add(new StyledText(unlitText, style.mutate(unlit[i].getStyle())));
 			} else if (startOffset >= unlitEnd || endOffset <= offset) {  // unlit[i] completely outside highlight.
 				result.add(unlit[i]);
 			} else {  // unlit[i] is partially inside highlight.
@@ -63,7 +62,7 @@ public class Highlight {
 				}
 				String midText = unlitText.substring(Math.max(0, startOffset - offset),
 						Math.min(unlitEnd - offset, endOffset - offset));
-				result.add(new StyledText(midText, applyStyle(unlit[i].getStyle())));
+				result.add(new StyledText(midText, style.mutate(unlit[i].getStyle())));
 				if (endOffset < unlitEnd) {  // highlight ends part-way through unlit[i].
 					result.add(new StyledText(unlitText.substring(endOffset - offset), unlit[i].getStyle()));
 				}
@@ -71,13 +70,5 @@ public class Highlight {
 			offset += unlitText.length();
 		}
 		return (StyledText[]) result.toArray(new StyledText[result.size()]);
-	}
-	
-	public Style applyStyle(Style other) {
-		Color foreground = style.hasForeground() ? style.getForeground() : other.getForeground();
-		Color background = style.hasBackground() ? style.getBackground() : other.getBackground();
-		boolean isBold = style.hasBold() ? style.isBold() : other.isBold();
-		boolean isUnderlined = style.hasUnderlined() ? style.isUnderlined() : other.isUnderlined();
-		return new Style(foreground, background, isBold, isUnderlined);
 	}
 }
