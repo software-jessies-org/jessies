@@ -31,6 +31,8 @@ public class FormDialog extends JDialog {
     
     private boolean wasAccepted;
     
+    private ActionListener listener;
+    
     private static final boolean isWindows() {
         return (System.getProperty("os.name").indexOf("Windows") != -1);
     }
@@ -42,10 +44,23 @@ public class FormDialog extends JDialog {
         return 10;
     }
     
-    /** Shows a non-modal dialog with just a Close button. */
-    public static void showNonModal(Frame parent, String title, Container contentPane) {
-        FormDialog formDialog = new FormDialog(parent, title, contentPane, "Close", null, false);
+    /**
+     * Shows a non-modal dialog with a single button that actually performs
+     * some action. This means that "Close" is not a suitable label. If that's
+     * what you're looking for, try the other showNonModal method.
+     */
+    public static void showNonModal(Frame parent, String title, Container contentPane, String actionLabel, ActionListener listener) {
+        FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, null, false);
+        formDialog.listener = listener;
         formDialog.show();
+    }
+    
+    /**
+     * Shows a non-modal dialog with a Close button that performs no action
+     * when the dialog is accepted.
+     */
+    public static void showNonModal(Frame parent, String title, Container contentPane) {
+        showNonModal(parent, title, contentPane, "Close", null);
     }
     
     /**
@@ -162,23 +177,31 @@ public class FormDialog extends JDialog {
     }
 
     private JPanel makeButtonPanel(JRootPane rootPane, String actionLabel, JButton extraButton) {
-        if (isModal() == false) {
-            JButton closeButton = new JButton(actionLabel);
-            closeButton.addActionListener(closeAction);
-            rootPane.setDefaultButton(closeButton);
-            return makeButtonPanel(closeButton, null, null);
-        }
-        
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(closeAction);
-
         JButton actionButton = new JButton(actionLabel);
         actionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 acceptDialog();
+                if (listener != null) {
+                    listener.actionPerformed(e);
+                }
             }
         });
+        rootPane.setDefaultButton(actionButton);
         
+        JButton cancelButton = null;
+        if (isModal()) {
+            cancelButton = new JButton("Cancel");
+            cancelButton.addActionListener(closeAction);
+            tieButtonSizes(actionButton, cancelButton);
+        }
+        return makeButtonPanel(actionButton, cancelButton, extraButton);
+    }
+    
+    /**
+     * Ensures that both buttons are the same size, and that the chosen size
+     * is sufficient to contain the content of either.
+     */
+    private void tieButtonSizes(JButton actionButton, JButton cancelButton) {
         Dimension cancelSize = cancelButton.getPreferredSize();
         Dimension actionSize = actionButton.getPreferredSize();
         final int width = (int) Math.max(actionSize.getWidth(), cancelSize.getWidth());
@@ -186,10 +209,6 @@ public class FormDialog extends JDialog {
         Dimension buttonSize = new Dimension(width, height);
         actionButton.setPreferredSize(buttonSize);
         cancelButton.setPreferredSize(buttonSize);
-        
-        rootPane.setDefaultButton(actionButton);
-
-        return makeButtonPanel(actionButton, cancelButton, extraButton);
     }
     
     private JPanel makeButtonPanel(JButton actionButton, JButton cancelButton, JButton extraButton) {
