@@ -61,6 +61,9 @@ public class Advisor extends JPanel {
         // We give the researchers the selection, if there is one.
         // If there isn't, we give them the current line up to the caret.
         String string = currentComponent.getSelectedText();
+        if (string == null) {
+            string = "";
+        }
         if (string.length() == 0) {
             if (currentComponent instanceof ETextArea == false) {
                 return "";
