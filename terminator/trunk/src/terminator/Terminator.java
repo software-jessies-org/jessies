@@ -23,6 +23,13 @@ public class Terminator {
 		}
 	}
 	
+	/**
+	 * Ensures that, on Mac OS, we always have our menu bar visible, even
+	 * when there are no terminal windows open. We use a dummy window with
+	 * a copy of the menu bar attached. When no other window has the focus,
+	 * but the application is focused, this hidden window gets the focus,
+	 * and its menu is used for the screen menu bar.
+	 */
 	private void initMenuBar() {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		JFrame hiddenFrame = new JFrame("Mac OS implementation detail");
