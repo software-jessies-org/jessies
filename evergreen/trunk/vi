@@ -14,7 +14,7 @@ def previousViOnPath()
         executables.delete($0)
         return executables[0]
     rescue LoadError
-        print("Unable to search for a vi to fall back on; guessing 'vim'.")
+        print("Unable to search for a vi to fall back on; guessing 'vim'.\n")
         return "vim"
     end
 end
@@ -32,7 +32,7 @@ def openFileOnLocalhost(filename)
         print(telnet.readlines().join("\n"))
         telnet.close()
     rescue
-        print("Unable to talk to Edit; trying the next vi on the path.")
+        print("Unable to talk to Edit; trying the next vi on the path.\n")
         system("#{previousViOnPath()} #{filename}")
     end
 end
