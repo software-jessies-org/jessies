@@ -13,7 +13,6 @@ import terminator.terminal.*;
 import terminator.view.highlight.*;
 
 public class JTerminalPane extends JPanel {
-	private TerminalPaneMaster controller;
 	private TerminalControl control;
 	private JTextBuffer textPane;
 	private JScrollPane scrollPane;
@@ -38,9 +37,8 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	public JTerminalPane(TerminalPaneMaster controller, String name, String command, boolean ignoreExitStatus) {
+	public JTerminalPane(String name, String command, boolean ignoreExitStatus) {
 		super(new BorderLayout());
-		this.controller = controller;
 		this.name = name;
 		
 		try {
@@ -57,26 +55,26 @@ public class JTerminalPane extends JPanel {
 	 * title. If 'title' is null, we use the first word of the command
 	 * as the the title.
 	 */
-	public static JTerminalPane newCommandWithTitle(TerminalPaneMaster controller, String command, String title) {
+	public static JTerminalPane newCommandWithTitle(String command, String title) {
 		if (title == null) {
 			title = command.trim();
 			if (title.indexOf(' ') != -1) {
 				title = title.substring(0, title.indexOf(' '));
 			}
 		}
-		return new JTerminalPane(controller, title, command, false);
+		return new JTerminalPane(title, command, false);
 	}
 	
 	/**
 	 * Creates a new terminal running the user's shell.
 	 */
-	public static JTerminalPane newShell(TerminalPaneMaster controller) {
+	public static JTerminalPane newShell() {
 		String user = System.getProperty("user.name");
 		String command = getUserShell(user);
 		if (Options.getSharedInstance().isLoginShell()) {
 			command += " -l";
 		}
-		return new JTerminalPane(controller, user + "@localhost", command, true);
+		return new JTerminalPane(user + "@localhost", command, true);
 	}
 	
 	public Dimension getPaneSize() {
@@ -107,7 +105,7 @@ public class JTerminalPane extends JPanel {
 	}
 
 	private void init(String command, Process process, boolean ignoreExitStatus) throws IOException {
-		textPane = new JTextBuffer(controller);
+		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		textPane.addMouseListener(new ContextMenuOpener());
 		
@@ -130,10 +128,6 @@ public class JTerminalPane extends JPanel {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-	}
-	
-	public TerminalPaneMaster getTerminalPaneMaster() {
-		return controller;
 	}
 	
 	private void initSizeMonitoring(final JScrollPane scrollPane) {
@@ -456,20 +450,6 @@ public class JTerminalPane extends JPanel {
 		textPane.clearScrollBuffer();
 		control.sendRedrawScreen();
 	}
-	
-/*	public class NewTabAction implements MenuKeyAction {
-		public String getName(Point mousePosition) {
-			return "New Tab";
-		}
-		
-		public void performAction() {
-			controller.openShellPane(true);
-		}
-		
-		public char getHotkeyChar() {
-			return 'T';
-		}
-	}*/
 	
 	public void doCloseAction() {
 		control.destroyProcess();
