@@ -13,7 +13,7 @@ import e.util.*;
 
 public class HyperlinkHighlighter implements Highlighter {
 	/** The underlined blue standard hyperlink style. */
-	private final Style style = new Style(Color.blue, null, null, Boolean.TRUE);
+	private final Style style = new Style(Options.getSharedInstance().getColor("linkColor"), null, null, Boolean.TRUE);
 
 	private static class HyperLinker {
 		Pattern pattern;

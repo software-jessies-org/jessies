@@ -216,6 +216,7 @@ public class Options {
 		options.put("color15", "white");
 		
 		options.put("cursorColor", "black");
+		options.put("linkColor", "blue");
 	}
 	
 	/**
