@@ -3,7 +3,6 @@ package terminatorn;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -21,17 +20,19 @@ public class JTelnetPane extends JPanel {
 	private int viewHeight = 24;
 	private String name;
 	
-	public JTelnetPane() {
+	/**
+	 * Creates a new terminal with the given name, running the given command.
+	 */
+	private JTelnetPane(String name, String command) {
 		super(new BorderLayout());
-		String user = System.getProperty("user.name");
-		this.name = user + "@localhost";
-		String shell = getUserShell(user);
+		this.name = name;
+		
 		try {
-			Log.warn("Starting process " + shell);
-			final Process proc = Runtime.getRuntime().exec("pty " + shell);
+			Log.warn("Starting process '" + command + "'");
+			final Process proc = Runtime.getRuntime().exec("pty " + command);
 			init(proc.getInputStream(), proc.getOutputStream());
 			// Probably should do this somewhere else rather than setting up a whole Thread for it.
-			(new Thread(new Runnable() {
+			Thread reaper = new Thread(new Runnable() {
 				public void run() {
 					try {
 						proc.waitFor();
@@ -39,40 +40,46 @@ public class JTelnetPane extends JPanel {
 						ex.printStackTrace();
 					}
 				}
-			})).start();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
-	
-	public JTelnetPane(String hostAndPort) {
-		super(new BorderLayout());
-		
-		this.name = hostAndPort;
-		
-		String host = hostAndPort;
-		int port = 23;
-		if (name.indexOf(':') != -1) {
-			port = Integer.parseInt(name.substring(name.indexOf(':') + 1));
-			host = name.substring(0, name.indexOf(':'));
-			if (name.endsWith("/")) {
-				name = name.substring(0, name.length() - 1);
-			}
-		}
-
-		try {
-			Socket sock = new Socket(host, port);
-			init(sock.getInputStream(), sock.getOutputStream());
+			});
+			reaper.start();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 	}
 	
 	/**
+	 * Creates a new terminal running telnet to the given host and port.
+	 * The hostAndPort parameter is of the form "host:port", as in a telnet:// URI.
+	 */
+	public static JTelnetPane newTelnetHostAndPort(String hostAndPort) {
+		String host = hostAndPort;
+		int port = 23;
+		String title = hostAndPort;
+		if (title.indexOf(':') != -1) {
+			port = Integer.parseInt(title.substring(title.indexOf(':') + 1));
+			host = title.substring(0, title.indexOf(':'));
+			if (title.endsWith("/")) {
+				title = title.substring(0, title.length() - 1);
+			}
+		}
+		String command = "telnet " + host + " " + port;
+		return new JTelnetPane(title, command);
+	}
+	
+	/**
+	 * Creates a new terminal running the user's shell.
+	 */
+	public static JTelnetPane newShell() {
+		String user = System.getProperty("user.name");
+		String command = getUserShell(user);
+		return new JTelnetPane(user + "@localhost", command);
+	}
+	
+	/**
 	* Returns the command to execute as the user's shell, parsed from the /etc/passwd file.
 	* On any kind of failure, 'bash' is returned as default.
 	*/
-	private String getUserShell(String user) {
+	private static String getUserShell(String user) {
 		File passwdFile = new File("/etc/passwd");
 		if (passwdFile.exists()) {
 			BufferedReader in = null;
@@ -190,10 +197,10 @@ public class JTelnetPane extends JPanel {
 				ArrayList telnetPanes = new ArrayList();
 				for (int i = 0; i < arguments.length; ++i) {
 					String hostAndPort = arguments[i];
-					telnetPanes.add(new JTelnetPane(hostAndPort));
+					telnetPanes.add(newTelnetHostAndPort(hostAndPort));
 				}
 				if (arguments.length == 0) {
-					telnetPanes.add(new JTelnetPane());
+					telnetPanes.add(newShell());
 				}
 
 				JComponent content = null;
@@ -222,6 +229,9 @@ public class JTelnetPane extends JPanel {
 				frame.setSize(new Dimension(600, 400));
 				frame.setLocationRelativeTo(null);
 				frame.setVisible(true);
+				
+				//
+				((JTelnetPane) telnetPanes.get(0)).requestFocus();
 				
 				// Start up the threads listening on the connections now that the UI is up.
 				// If we don't do this separately, we get a race condition whereby title
