@@ -193,8 +193,8 @@ public class JTerminalPane extends JPanel {
 		control.start();
 	}
 	
-	public String getLogFilename() {
-		return control.getLogWriter().getFilename();
+	public LogWriter getLogWriter() {
+		return control.getLogWriter();
 	}
 	
 	public String getName() {

@@ -13,17 +13,27 @@ public class LogWriter {
 	
 	private String filename;
 	private FileWriter stream;
+	private boolean suspended;
 	
 	public LogWriter(String prefix) throws IOException {
+		this.filename = makeLogFilename(prefix);
+		this.stream = new FileWriter(filename);
+		this.suspended = false;
+	}
+	
+	private static String makeLogFilename(String prefix) throws IOException {
 		prefix = java.net.URLEncoder.encode(prefix, "UTF-8");
 		String timestamp = dateFormatter.format(new Date());
 		String logsDirectoryName = System.getProperty("user.home") + File.separator + ".terminal-logs" + File.separator;
 		File logsDirectory = new File(logsDirectoryName);
-		this.filename = (logsDirectory.exists() ? (logsDirectoryName + prefix + '-' + timestamp + ".txt") : "/dev/null");
-		this.stream = new FileWriter(filename);
+		return (logsDirectory.exists() ? (logsDirectoryName + prefix + '-' + timestamp + ".txt") : "/dev/null");
 	}
 	
 	public void append(char ch) throws IOException {
+		if (suspended) {
+			return;
+		}
+		
 		stream.write(ch);
 		if (ch == '\n') {
 			stream.flush();
@@ -32,5 +42,13 @@ public class LogWriter {
 	
 	public String getFilename() {
 		return filename;
+	}
+	
+	public void setSuspended(boolean newState) {
+		this.suspended = newState;
+	}
+	
+	public boolean isSuspended() {
+		return suspended;
 	}
 }
