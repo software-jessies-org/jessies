@@ -377,19 +377,20 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return index;
     }
     
-    public static void createWorkspace(String name, String root) {
+    public static Workspace createWorkspace(String name, String root) {
         boolean noNonEmptyWorkspaceOfThisNameExists = removeWorkspaceByName(name);
         if (noNonEmptyWorkspaceOfThisNameExists == false) {
             Edit.showAlert("Edit", "A non-empty workspace of the name '" + name + "' already exists.");
-            return;
+            return null;
         }
         Workspace workspace = new Workspace(name, root);
-        tabbedPane.insertTab(name, null, workspace, root, getWorkspaceIndexInTabbedPane(name));
-        Edit.showStatus("Added workspace '" + name + "' (" + root + ")");
+        tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), getWorkspaceIndexInTabbedPane(name));
+        Edit.showStatus("Added workspace '" + name + "' (" + workspace.getRootDirectory() + ")");
         if (defaultWorkspace == null) defaultWorkspace = workspace;
         frame.invalidate();
         frame.validate();
         frame.repaint();
+        return workspace;
     }
     
     /**
@@ -648,9 +649,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             String name = lines[i];
             String root = lines[i + 1];
             Log.warn("Opening workspace '" + name + "' with root '" + root + "'");
-            createWorkspace(name, root);
+            Workspace workspace = createWorkspace(name, root);
+            if (workspace == null) {
+                continue;
+            }
 
-            File rootDirectory = FileUtilities.fileFromString(root);
+            File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
             int which = tabbedPane.getTabCount() - 1;
             if (rootDirectory.exists() == false) {
                 tabbedPane.setEnabledAt(which, false);
