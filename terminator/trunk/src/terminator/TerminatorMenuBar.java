@@ -123,14 +123,16 @@ public class TerminatorMenuBar extends JMenuBar {
 		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, true);
 	}
 	
+	private static Component getFocusedComponent() {
+		return KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+	}
+	
 	public static JTerminalPane getFocusedTerminalPane() {
-		Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-		return (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, focusOwner);
+		return (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, getFocusedComponent());
 	}
 	
 	public static TerminatorFrame getFocusedTerminatorFrame() {
-		Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-		return (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, focusOwner);
+		return (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, getFocusedComponent());
 	}
 	
 	public static class NewShellAction extends AbstractAction {
