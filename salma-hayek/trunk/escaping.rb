@@ -8,6 +8,11 @@ def escapeTextLineToHtml(line)
     # Embolden filenames:
     $_.gsub!(/^([^[:space:]\/]\S*): /, "<b>\\1</b>: ")
     
+    # Try to detect where martind has quoted a whole paragraph
+    # with a single "> " at the start.
+    # For example, in revision 445 of terminator.
+    $_.gsub!(/^&gt; (.{80,})$/, "<blockquote>\\1</blockquote>")
+
     # Try to detect quoted text (either traditional Unix mail style or
     # wiki-like leading whitespace):
     $_.gsub!(/^(?:&gt;| ) (.*)$/) {
