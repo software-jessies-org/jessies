@@ -220,6 +220,19 @@ public class StringUtilities {
         }
     }
     
+    /**
+     * Returns the number of times 'ch' occurs in 'chars'.
+     */
+    public static int count(CharSequence chars, char ch) {
+        int result = 0;
+        for (int i = 0; i < chars.length(); ++i) {
+            if (chars.charAt(i) == ch) {
+                ++result;
+            }
+        }
+        return result;
+    }
+    
     private StringUtilities() {
     }
 

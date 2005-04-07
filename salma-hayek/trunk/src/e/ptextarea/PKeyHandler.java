@@ -1,8 +1,8 @@
 package e.ptextarea;
 
-
 import java.awt.*;
 import java.awt.event.*;
+import e.util.*;
 
 public class PKeyHandler extends KeyAdapter {
     private PTextArea textArea;
@@ -21,7 +21,7 @@ public class PKeyHandler extends KeyAdapter {
                 {
                     int caret = textArea.getCaretLocation();
                     String insertion = "Insertion\nof some\ntext";
-                    textArea.getPTextBuffer().insert(caret, insertion.toCharArray());
+                    textArea.getPTextBuffer().insert(caret, insertion);
                     textArea.setCaretPosition(caret + insertion.length());
                 }
                 break;
@@ -120,7 +120,7 @@ public class PKeyHandler extends KeyAdapter {
         if (textArea.hasSelection()) {
             deleteSelection();
         }
-        textArea.getPTextBuffer().insert(textArea.getCaretLocation(), new char[] { ch });
+        textArea.getPTextBuffer().insert(textArea.getCaretLocation(), new CharArrayCharSequence(new char[] { ch }));
         textArea.setCaretPosition(textArea.getCaretLocation() + 1);
     }
     

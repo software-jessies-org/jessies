@@ -178,7 +178,7 @@ public class PTextBuffer implements CharSequence {
         this.text = text;
         gapPosition = 0;
         gapLength = 0;
-        fireEvent(new PTextEvent(this, PTextEvent.COMPLETE_REPLACEMENT, 0, text));
+        fireEvent(new PTextEvent(this, PTextEvent.COMPLETE_REPLACEMENT, 0, new CharArrayCharSequence(text)));
     }
     
     /**
@@ -187,7 +187,7 @@ public class PTextBuffer implements CharSequence {
      * used if you need to keep the copy unchanged in the face of future edits.
      * If not, use the CharSequence interface instead.
      */
-    private char[] copyChars(int start, int charCount) {
+    private CharSequence copyChars(int start, int charCount) {
         char[] result = new char[charCount];
         try {
             int copyCount = 0;
@@ -203,7 +203,7 @@ public class PTextBuffer implements CharSequence {
             System.err.println("Requested get text from " + start + ", length " + charCount + "; size is " + length());
             ex.printStackTrace();
         }
-        return result;
+        return new CharArrayCharSequence(result);
     }
     
     /** Moves the gap to the specified position. */
@@ -232,36 +232,43 @@ public class PTextBuffer implements CharSequence {
     
     /** Removes the given number of characters, the lowest-indexed of which is at the given position. */
     public void remove(int position, int count) {
-        char[] ch = copyChars(position, count);
-        undoBuffer.addRemoval(position, ch);
-        removeWithoutUndo(position, ch);
+        CharSequence chars = copyChars(position, count);
+        undoBuffer.addRemoval(position, chars);
+        removeWithoutUndo(position, chars);
     }
     
     /** Special remove method used by the undo buffer. */
-    private void removeWithoutUndo(int position, char[] ch) {
-        moveGap(position + ch.length);
-        gapPosition -= ch.length;
-        gapLength += ch.length;
-        fireEvent(new PTextEvent(this, PTextEvent.REMOVE, position, ch));
+    private void removeWithoutUndo(int position, CharSequence chars) {
+        moveGap(position + chars.length());
+        gapPosition -= chars.length();
+        gapLength += chars.length();
+        fireEvent(new PTextEvent(this, PTextEvent.REMOVE, position, chars));
     }
     
     /** Inserts the given characters to the right of the given position. */
-    public void insert(int position, char[] ch) {
-        undoBuffer.addInsertion(position, ch);
-        insertWithoutUndo(position, ch);
+    public void insert(int position, CharSequence chars) {
+        undoBuffer.addInsertion(position, chars);
+        insertWithoutUndo(position, chars);
     }
     
     /** Special insertion method used by the undo buffer. */
-    private void insertWithoutUndo(int position, char[] ch) {
+    private void insertWithoutUndo(int position, CharSequence chars) {
         moveGap(position);
-        int textLength = ch.length;
+        int textLength = chars.length();
         while (textLength > gapLength) {
             expandBuffer();
         }
-        System.arraycopy(ch, 0, text, gapPosition, textLength);
+        if (chars instanceof CharArrayCharSequence) {
+            ((CharArrayCharSequence) chars).copyTo(text, gapPosition);
+        } else {
+            // This is the price you pay for giving us a String.
+            for (int i = 0; i < chars.length(); ++i) {
+                text[gapPosition + i] = chars.charAt(i);
+            }
+        }
         gapPosition += textLength;
         gapLength -= textLength;
-        fireEvent(new PTextEvent(this, PTextEvent.INSERT, position, ch));
+        fireEvent(new PTextEvent(this, PTextEvent.INSERT, position, chars));
     }
     
     /** Returns the character at the given index.  Part of the CharSequence interface. */
@@ -324,7 +331,13 @@ public class PTextBuffer implements CharSequence {
         }
         
         public String toString() {
-            return new String(copyChars(start, end - start));
+            // FIXME: in 1.5, use "new StringBuilder(copyChars(start, end - start)).toString()".
+            StringBuffer result = new StringBuffer(end - start);
+            CharSequence chars = copyChars(start, end - start);
+            for (int i = 0; i < chars.length(); ++i) {
+                result.append(chars.charAt(i));
+            }
+            return result.toString();
         }
     }
     
@@ -332,12 +345,12 @@ public class PTextBuffer implements CharSequence {
         private ArrayList undoList = new ArrayList();
         private int undoPosition = 0;
         
-        private void addInsertion(int position, char[] ch) {
-            addDoable(new Doable(position, ch, false));
+        private void addInsertion(int position, CharSequence chars) {
+            addDoable(new Doable(position, chars, false));
         }
         
-        private void addRemoval(int position, char[] ch) {
-            addDoable(new Doable(position, ch, true));
+        private void addRemoval(int position, CharSequence chars) {
+            addDoable(new Doable(position, chars, true));
         }
         
         private void addDoable(Doable doable) {
@@ -374,28 +387,28 @@ public class PTextBuffer implements CharSequence {
     
     private class Doable {
         private int position;
-        private char[] ch;
+        private CharSequence chars;
         private boolean isDeletion;
         
-        public Doable(int position, char[] ch, boolean isDeletion) {
+        public Doable(int position, CharSequence chars, boolean isDeletion) {
             this.position = position;
-            this.ch = ch;
+            this.chars = chars;
             this.isDeletion = isDeletion;
         }
         
         public void undo() {
             if (isDeletion) {
-                insertWithoutUndo(position, ch);
+                insertWithoutUndo(position, chars);
             } else {
-                removeWithoutUndo(position, ch);
+                removeWithoutUndo(position, chars);
             }
         }
         
         public void redo() {
             if (isDeletion) {
-                removeWithoutUndo(position, ch);
+                removeWithoutUndo(position, chars);
             } else {
-                insertWithoutUndo(position, ch);
+                insertWithoutUndo(position, chars);
             }
         }
     }

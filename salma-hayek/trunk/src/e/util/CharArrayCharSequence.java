@@ -6,7 +6,7 @@ package e.util;
 public class CharArrayCharSequence implements CharSequence {
     private char[] chars;
     private int offset;
-    private int length;
+    private int count;
     
     /**
      * Constructs a sequence from all the chars in the given array. The array
@@ -17,14 +17,14 @@ public class CharArrayCharSequence implements CharSequence {
     }
     
     /**
-     * Constructs a sequence containing 'length' chars starting from
+     * Constructs a sequence containing 'count' chars starting from
      * offset 'offset' in the array 'chars'. The array is not copied, so
      * if it's mutated, so is this sequence.
      */
-    public CharArrayCharSequence(char[] chars, int offset, int length) {
+    public CharArrayCharSequence(char[] chars, int offset, int count) {
         this.chars = chars;
         this.offset = offset;
-        this.length = length;
+        this.count = count;
     }
     
     /**
@@ -38,7 +38,7 @@ public class CharArrayCharSequence implements CharSequence {
      * Returns the length of this sequence.
      */
     public int length() {
-        return length;
+        return count;
     }
     
     /**
@@ -56,6 +56,15 @@ public class CharArrayCharSequence implements CharSequence {
      * sequence will have no effect on the string.
      */
     public String toString() {
-        return new String(chars, offset, length);
+        return new String(chars, offset, count);
+    }
+    
+    /**
+     * Copies all this sequence's characters into the given array at the given
+     * offset. This will be faster than iterating through the sequence
+     * yourself.
+     */
+    public void copyTo(char[] destination, int destinationOffset) {
+        System.arraycopy(chars, offset, destination, destinationOffset, count);
     }
 }

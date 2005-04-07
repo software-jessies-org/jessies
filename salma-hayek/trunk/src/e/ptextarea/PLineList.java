@@ -1,7 +1,7 @@
 package e.ptextarea;
 
-
 import java.util.*;
+import e.util.*;
 
 /**
  * A PLineList is an abstraction on top of a PTextBuffer.  This class handles the splitting up of lines,
@@ -128,8 +128,8 @@ public class PLineList implements PTextListener {
     public void textInserted(PTextEvent event) {
         int lineIndex = getLineIndex(event.getOffset());
         int startIndex = lineIndex;
-        char[] chars = event.getCharacters();
-        int newlineCount = getNewlineCount(chars);
+        CharSequence chars = event.getCharacters();
+        int newlineCount = StringUtilities.count(chars, '\n');
         Line line = getLine(lineIndex);
         if (newlineCount > 0) {
             int[] segmentLengths = getLineSegmentLengths(chars, newlineCount);
@@ -143,7 +143,7 @@ public class PLineList implements PTextListener {
             }
             line.setLength(line.getLength() + endChars);
         } else {
-            line.setLength(line.getLength() + chars.length);
+            line.setLength(line.getLength() + chars.length());
         }
         linesAreInvalidAfter(lineIndex);
         fireEvent(new PLineEvent(this, PLineEvent.CHANGED, startIndex, 1));
@@ -155,8 +155,8 @@ public class PLineList implements PTextListener {
     /** Handles text removal notifications from the underlying PTextBuffer model. */
     public void textRemoved(PTextEvent event) {
         int lineIndex = getLineIndex(event.getOffset());
-        char[] chars = event.getCharacters();
-        int newlineCount = getNewlineCount(chars);
+        CharSequence chars = event.getCharacters();
+        int newlineCount = StringUtilities.count(chars, '\n');
         Line line = getLine(lineIndex);
         if (newlineCount > 0) {
             int[] segmentLengths = getLineSegmentLengths(chars, newlineCount);
@@ -168,7 +168,7 @@ public class PLineList implements PTextListener {
             lines.remove(lineIndex + 1);
             line.setLength(charOffset + endChars);
         } else {
-            line.setLength(line.getLength() - chars.length);
+            line.setLength(line.getLength() - chars.length());
         }
         linesAreInvalidAfter(lineIndex);
         fireEvent(new PLineEvent(this, PLineEvent.CHANGED, lineIndex, 1));
@@ -177,23 +177,13 @@ public class PLineList implements PTextListener {
         }
     }
     
-    private int[] getLineSegmentLengths(char[] ch, int newlineCount) {
+    private int[] getLineSegmentLengths(CharSequence chars, int newlineCount) {
         int[] result = new int[newlineCount + 1];
         int segment = 0;
-        for (int i = 0; i < ch.length; i++) {
+        for (int i = 0; i < chars.length(); ++i) {
             result[segment]++;
-            if (ch[i] == '\n') {
+            if (chars.charAt(i) == '\n') {
                 segment++;
-            }
-        }
-        return result;
-    }
-    
-    private int getNewlineCount(char[] ch) {
-        int result = 0;
-        for (int i = 0; i < ch.length; i++) {
-            if (ch[i] == '\n') {
-                result++;
             }
         }
         return result;

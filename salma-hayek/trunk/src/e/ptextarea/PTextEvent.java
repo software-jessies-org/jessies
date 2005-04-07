@@ -9,9 +9,9 @@ public class PTextEvent {
     private PTextBuffer pText;
     private int eventType;
     private int offset;
-    private char[] characters;
+    private CharSequence characters;
      
-    public PTextEvent(PTextBuffer pText, int eventType, int offset, char[] characters) {
+    public PTextEvent(PTextBuffer pText, int eventType, int offset, CharSequence characters) {
         this.pText = pText;
         this.eventType = eventType;
         this.offset = offset;
@@ -43,14 +43,14 @@ public class PTextEvent {
     }
     
     public int getLength() {
-        return characters.length;
+        return characters.length();
     }
     
-    public char[] getCharacters() {
+    public CharSequence getCharacters() {
         return characters;
     }
     
     public String getString() {
-        return new String(characters);
+        return characters.toString();
     }
 }

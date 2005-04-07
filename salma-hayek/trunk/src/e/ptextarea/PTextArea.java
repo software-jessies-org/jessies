@@ -703,7 +703,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      */
     public void setText(String newText) {
         getPTextBuffer().remove(0, getPTextBuffer().length());
-        getPTextBuffer().insert(0, newText.toCharArray());
+        getPTextBuffer().insert(0, newText);
     }
     
     /**
@@ -712,7 +712,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public void append(String newText) {
         PTextBuffer buffer = getPTextBuffer();
         synchronized (buffer) {
-            buffer.insert(buffer.length(), newText.toCharArray());
+            buffer.insert(buffer.length(), newText);
             setCaretPosition(buffer.length());
         }
     }
