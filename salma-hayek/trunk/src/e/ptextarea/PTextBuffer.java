@@ -17,6 +17,8 @@ public class PTextBuffer implements CharSequence {
     public static final String LINE_ENDING_PROPERTY = "LineEndingProperty";
     
     private static final String CHARSET = "UTF-8";
+    private static final int MIN_BUFFER_EXTENSION = 100;
+    private static final int MAX_GAP_SIZE = 1024 * 2;
     
     private char[] text = new char[0];
     private int gapPosition;
@@ -219,15 +221,27 @@ public class PTextBuffer implements CharSequence {
         gapPosition = newPosition;
     }
     
-    /** Expands the buffer. */
-    private void expandBuffer() {
-        char[] newText = new char[Math.max(64, text.length * 2)];
-        int sizeIncrease = newText.length - text.length;
+    private void changeBufferLength(int lengthChange) {
+        char[] newText = new char[text.length + lengthChange];
         System.arraycopy(text, 0, newText, 0, gapPosition);
         int endOffset = gapPosition + gapLength;
-        System.arraycopy(text, endOffset, newText, endOffset + sizeIncrease, text.length - endOffset);
-        gapLength += sizeIncrease;
+        System.arraycopy(text, endOffset, newText, endOffset + lengthChange, text.length - endOffset);
+        gapLength += lengthChange;
         text = newText;
+    }
+    
+    /** Expands the buffer. */
+    private void expandBuffer(int requiredGapLength) {
+        int desiredGapIncrease = requiredGapLength + Math.min(MAX_GAP_SIZE, requiredGapLength);
+        changeBufferLength(Math.max(MIN_BUFFER_EXTENSION, desiredGapIncrease));
+    }
+    
+    /** Shrinks the buffer. */
+    private void shrinkBuffer() {
+        if (gapLength > MAX_GAP_SIZE) {
+            int desiredGapLength = Math.max(MIN_BUFFER_EXTENSION, gapLength - MAX_GAP_SIZE);
+            changeBufferLength(desiredGapLength - gapLength);
+        }
     }
     
     /** Removes the given number of characters, the lowest-indexed of which is at the given position. */
@@ -242,6 +256,7 @@ public class PTextBuffer implements CharSequence {
         moveGap(position + chars.length());
         gapPosition -= chars.length();
         gapLength += chars.length();
+        shrinkBuffer();
         fireEvent(new PTextEvent(this, PTextEvent.REMOVE, position, chars));
     }
     
@@ -256,7 +271,7 @@ public class PTextBuffer implements CharSequence {
         moveGap(position);
         int textLength = chars.length();
         while (textLength > gapLength) {
-            expandBuffer();
+            expandBuffer(textLength);
         }
         if (chars instanceof CharArrayCharSequence) {
             ((CharArrayCharSequence) chars).copyTo(text, gapPosition);
