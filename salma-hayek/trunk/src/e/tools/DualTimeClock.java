@@ -35,10 +35,7 @@ public class DualTimeClock extends JWindow implements ActionListener {
     public DualTimeClock() {
         setContentPane(makeContentPane());
         pack();
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        final int x = screen.width - getWidth();
-        final int y = screen.height - getHeight();
-        setLocation(new Point(x, y));
+        updateWindow();
         setVisible(true);
         new Timer(1000, this).start();
     }
@@ -73,6 +70,7 @@ public class DualTimeClock extends JWindow implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         updateTimes();
+        updateWindow();
     }
 
     private void updateTimes() {
@@ -81,6 +79,14 @@ public class DualTimeClock extends JWindow implements ActionListener {
         right.setText(GB.format(now));
     }
 
+    private void updateWindow() {
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        final int x = screen.width - getWidth();
+        final int y = screen.height - getHeight();
+        setLocation(new Point(x, y));
+        toFront();
+    }
+    
     private JComponent makeContentPane() {
         initLabelsAndIcons();
         JComponent content = new JPanel(new BorderLayout());
