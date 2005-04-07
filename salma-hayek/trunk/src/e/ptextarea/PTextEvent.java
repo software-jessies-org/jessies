@@ -49,8 +49,4 @@ public class PTextEvent {
     public CharSequence getCharacters() {
         return characters;
     }
-    
-    public String getString() {
-        return characters.toString();
-    }
 }

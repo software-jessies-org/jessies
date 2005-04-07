@@ -233,6 +233,18 @@ public class StringUtilities {
         return result;
     }
     
+    /**
+     * Tests whether 'chars' contains at least one instance of 'ch'.
+     */
+    public static boolean contains(CharSequence chars, char ch) {
+        for (int i = 0; i < chars.length(); ++i) {
+            if (chars.charAt(i) == ch) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private StringUtilities() {
     }
 

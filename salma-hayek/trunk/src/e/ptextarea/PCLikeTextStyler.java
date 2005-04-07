@@ -1,11 +1,10 @@
 package e.ptextarea;
 
-
 import java.awt.*;
 import java.util.*;
 import java.util.regex.*;
-
 import java.util.List;
+import e.util.*;
 
 /**
  * A PCLikeTextStyler does the main work for the C, C++ and Java stylers.  The C, C++ and
@@ -333,16 +332,16 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
             endIndex += event.getLength();
         }
         String suffix = seq.subSequence(endIndex, Math.min(endIndex + 1, seq.length())).toString();
-        String withMiddleText = prefix + event.getString() + suffix;
+        String withMiddleText = prefix + event.getCharacters() + suffix;
         String withoutMiddleText = prefix + suffix;
-        if (hasCommentMarker(withMiddleText) || hasCommentMarker(withoutMiddleText) || hasNewline(event.getString())) {
+        if (hasCommentMarker(withMiddleText) || hasCommentMarker(withoutMiddleText) || hasNewline(event.getCharacters())) {
             lastGoodLine = Math.min(lastGoodLine, textArea.getLineList().getLineIndex(event.getOffset()));
             textArea.repaintFromLine(textArea.getSplitLineIndex(lastGoodLine));
         }
     }
     
-    private boolean hasNewline(String text) {
-        return (text.indexOf('\n') != -1);
+    private boolean hasNewline(CharSequence text) {
+        return StringUtilities.contains(text, '\n');
     }
     
     private boolean hasCommentMarker(String text) {
