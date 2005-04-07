@@ -360,8 +360,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private int getBaseline(FontMetrics metrics, int lineIndex) {
-        int leadingOffset = Math.round((float) metrics.getLeading() / 2.0f);
-        return (lineIndex + 1) * metrics.getHeight() - metrics.getMaxDescent() - leadingOffset;
+        return lineIndex * metrics.getHeight() + metrics.getMaxAscent();
     }
     
     public void paintComponent(Graphics oldGraphics) {
