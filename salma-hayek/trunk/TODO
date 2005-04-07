@@ -7,3 +7,5 @@ Items to be done for PTextArea:
 * Remember user-set horizontal caret position so we can move over short lines and come back to the right column. (Should it work on column, or pixels?)
 
 * Create a language-specific API to work out double-click selections, and use this in the mouse handler.
+
+* Add highlight click handling so we can implement hyperlink following, and thereby use PTextArea in the EErrorsWindow.  We will likely have to add this to the text styler interface rather than highlights themselves, since highlights may only change the background, which would preclude us from using blue foreground text for the hyperlinks.  A PHyperlinkTextStyler, anyone?
