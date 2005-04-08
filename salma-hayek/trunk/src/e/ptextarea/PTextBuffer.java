@@ -244,11 +244,15 @@ public class PTextBuffer implements CharSequence {
         }
     }
     
-    /** Removes the given number of characters, the lowest-indexed of which is at the given position. */
-    public void remove(int position, int count) {
-        CharSequence chars = copyChars(position, count);
-        undoBuffer.addRemoval(position, chars);
-        removeWithoutUndo(position, chars);
+    public void replace(CaretSetter beforeCaret, int position, int removeCount, CharSequence add, CaretSetter afterCaret) {
+        if (beforeCaret == null) {
+            beforeCaret = new NullCaretSetter();
+        }
+        if (afterCaret == null) {
+            afterCaret = new NullCaretSetter();
+        }
+        CharSequence removeChars = copyChars(position, removeCount);
+        undoBuffer.addAndDo(beforeCaret, position, removeChars, add, afterCaret);
     }
     
     /** Special remove method used by the undo buffer. */
@@ -258,12 +262,6 @@ public class PTextBuffer implements CharSequence {
         gapLength += chars.length();
         shrinkBuffer();
         fireEvent(new PTextEvent(this, PTextEvent.REMOVE, position, chars));
-    }
-    
-    /** Inserts the given characters to the right of the given position. */
-    public void insert(int position, CharSequence chars) {
-        undoBuffer.addInsertion(position, chars);
-        insertWithoutUndo(position, chars);
     }
     
     /** Special insertion method used by the undo buffer. */
@@ -360,20 +358,12 @@ public class PTextBuffer implements CharSequence {
         private ArrayList undoList = new ArrayList();
         private int undoPosition = 0;
         
-        private void addInsertion(int position, CharSequence chars) {
-            addDoable(new Doable(position, chars, false));
-        }
-        
-        private void addRemoval(int position, CharSequence chars) {
-            addDoable(new Doable(position, chars, true));
-        }
-        
-        private void addDoable(Doable doable) {
+        private void addAndDo(CaretSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, CaretSetter afterCaret) {
             while (undoList.size() > undoPosition) {
                 undoList.remove(undoPosition);
             }
-            undoList.add(doable);
-            undoPosition = undoList.size();
+            undoList.add(new Doable(beforeCaret, position, removeChars, insertChars, afterCaret));
+            redo();
         }
         
         public boolean canUndo() {
@@ -401,30 +391,45 @@ public class PTextBuffer implements CharSequence {
         }
     }
     
+    public interface CaretSetter {
+        public void setCaret();
+    }
+    
+    public class NullCaretSetter implements CaretSetter {
+        public void setCaret() { }
+    }
+    
     private class Doable {
+        private CaretSetter beforeCaret;
         private int position;
-        private CharSequence chars;
-        private boolean isDeletion;
+        private CharSequence removeChars;
+        private CharSequence insertChars;
+        private CaretSetter afterCaret;
         
-        public Doable(int position, CharSequence chars, boolean isDeletion) {
+        public Doable(CaretSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, CaretSetter afterCaret) {
+            this.beforeCaret = beforeCaret;
             this.position = position;
-            this.chars = chars;
-            this.isDeletion = isDeletion;
+            this.removeChars = removeChars;
+            this.insertChars = insertChars;
+            this.afterCaret = afterCaret;
         }
         
         public void undo() {
-            if (isDeletion) {
-                insertWithoutUndo(position, chars);
-            } else {
-                removeWithoutUndo(position, chars);
-            }
+            removeAndInsert(insertChars, removeChars);
+            beforeCaret.setCaret();
         }
         
         public void redo() {
-            if (isDeletion) {
-                removeWithoutUndo(position, chars);
-            } else {
-                insertWithoutUndo(position, chars);
+            removeAndInsert(removeChars, insertChars);
+            afterCaret.setCaret();
+        }
+        
+        private void removeAndInsert(CharSequence remove, CharSequence insert) {
+            if (remove != null) {
+                removeWithoutUndo(position, remove);
+            }
+            if (insert != null) {
+                insertWithoutUndo(position, insert);
             }
         }
     }

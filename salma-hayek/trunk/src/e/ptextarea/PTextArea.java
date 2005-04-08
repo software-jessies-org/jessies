@@ -119,6 +119,64 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
+    public void insert(CharSequence chars) {
+        PTextBuffer.CaretSetter startCaret = getCurrentCaretSetter();
+        PTextBuffer.CaretSetter endCaret =new PositionSetter(getSelectionStart() + chars.length());
+        int length = getSelectionEnd() - getSelectionStart();
+        getPTextBuffer().replace(startCaret, getSelectionStart(), length, chars, endCaret);
+    }
+    
+    public void deleteSelection() {
+        if (hasSelection()) {
+            PTextBuffer.CaretSetter startCaret = getCurrentCaretSetter();
+            PTextBuffer.CaretSetter endCaret = new PositionSetter(getSelectionStart());
+            int length = getSelectionEnd() - getSelectionStart();
+            getPTextBuffer().replace(startCaret, getSelectionStart(), length, "", endCaret);
+        }
+    }
+    
+    public void delete(int startFrom, int charCount) {
+        PTextBuffer.CaretSetter startCaret = getCurrentCaretSetter();
+        PTextBuffer.CaretSetter endCaret = new PositionSetter(startFrom);
+        getPTextBuffer().replace(startCaret, startFrom, charCount, "", endCaret);
+    }
+    
+    private PTextBuffer.CaretSetter getCurrentCaretSetter() {
+        if (hasSelection()) {
+            return new SelectionSetter(getSelectionStart(), getSelectionEnd());
+        } else {
+            return new PositionSetter(getCaretLocation());
+        }
+    }
+    
+    private class SelectionSetter implements PTextBuffer.CaretSetter {
+        private int start;
+        private int end;
+        
+        public SelectionSetter(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+        
+        public void setCaret() {
+            select(start, end);
+            setCaretPosition(end);
+        }
+    }
+    
+    private class PositionSetter implements PTextBuffer.CaretSetter {
+        private int position;
+        
+        public PositionSetter(int position) {
+            this.position = position;
+        }
+        
+        public void setCaret() {
+            clearSelection();
+            setCaretPosition(position);
+        }
+    }
+    
     public boolean hasSelection() {
         return (selection != null);
     }
@@ -698,11 +756,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     /**
      * Replaces the entire contents of this text area with the given string.
-     * FIXME: should use PTextBuffer.replace, when it's available.
      */
     public void setText(String newText) {
-        getPTextBuffer().remove(0, getPTextBuffer().length());
-        getPTextBuffer().insert(0, newText);
+        getPTextBuffer().replace(getCurrentCaretSetter(), 0, getPTextBuffer().length(), newText, new PositionSetter(0));
     }
     
     /**
@@ -711,8 +767,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public void append(String newText) {
         PTextBuffer buffer = getPTextBuffer();
         synchronized (buffer) {
-            buffer.insert(buffer.length(), newText);
-            setCaretPosition(buffer.length());
+            buffer.replace(getCurrentCaretSetter(), buffer.length(), 0, newText, new PositionSetter(buffer.length() + newText.length()));
         }
     }
     
