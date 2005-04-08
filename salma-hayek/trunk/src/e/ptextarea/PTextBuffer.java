@@ -373,6 +373,7 @@ public class PTextBuffer implements CharSequence {
                 undoList.remove(undoPosition);
             }
             undoList.add(doable);
+            undoPosition = undoList.size();
         }
         
         public boolean canUndo() {

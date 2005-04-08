@@ -17,45 +17,24 @@ public class PKeyHandler extends KeyAdapter {
             case KeyEvent.VK_T: textArea.printLineInfo(); break;
             case KeyEvent.VK_L: textArea.getLineList().printLineInfo(); break;
             case KeyEvent.VK_R: textArea.repaint(); break;
-            case KeyEvent.VK_I:
-                {
-                    int caret = textArea.getCaretLocation();
-                    String insertion = "Insertion\nof some\ntext";
-                    textArea.getPTextBuffer().insert(caret, insertion);
-                    textArea.setCaretPosition(caret + insertion.length());
-                }
-                break;
-            case KeyEvent.VK_D:
-                {
-                    int caret = textArea.getCaretLocation();
-                    int delCount = Math.min(caret, 20);
-                    textArea.getPTextBuffer().remove(caret - delCount, delCount);
-                    textArea.setCaretPosition(caret - delCount);
-                }
-                break;
-                
-            case KeyEvent.VK_H:
-                {
-                    int caret = textArea.getCaretLocation();
-                    int end = Math.min(caret + 20, textArea.getPTextBuffer().length());
-                    textArea.addHighlight(new PColoredHighlight(textArea, caret, end, Color.YELLOW));
-                }
-                break;
-                
-            case KeyEvent.VK_A:
-                {
-                    if (event.isShiftDown()) {
-                        textArea.removeHighlights(new PColoredHighlightMatcher(Color.CYAN));
-                    } else {
-                        for (int i = 0; i < textArea.getPTextBuffer().length() - 4; i += 4) {
-                            textArea.addHighlight(new PColoredHighlight(textArea, i, i + 2, Color.CYAN));
-                        }
-                    }
-                }
+            case KeyEvent.VK_Z: undoRedo(event.isShiftDown()); break;
             }
         } else {
             if (handleInvisibleKeyPressed(event)) {
                 event.consume();
+            }
+        }
+    }
+    
+    private void undoRedo(boolean isShifted) {
+        PUndoBuffer undoer = textArea.getPTextBuffer().getUndoBuffer();
+        if (isShifted) {
+            if (undoer.canRedo()) {
+                undoer.redo();
+            }
+        } else {
+            if (undoer.canUndo()) {
+                undoer.undo();
             }
         }
     }
