@@ -20,10 +20,6 @@ public class PTabSegment implements PLineSegment {
         this.text = text;
     }
     
-    public boolean isVisible() {
-        return false;
-    }
-    
     public int getStyleIndex() {
         return 0;
     }
@@ -61,4 +57,6 @@ public class PTabSegment implements PLineSegment {
         }
         return text.length();
     }
+    
+    public void paint(Graphics2D graphics, int x, int yBaseline) { }
 }

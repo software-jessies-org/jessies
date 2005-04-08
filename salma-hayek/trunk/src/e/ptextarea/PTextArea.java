@@ -494,10 +494,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         int charOffset = 0;
         for (int i = 0; i < segments.length; i++) {
             applyColor(graphics, textStyler.getColorForStyle(segments[i].getStyleIndex()));
+            segments[i].paint(graphics, x, baseline);
             String text = segments[i].getText();
-            if (segments[i].isVisible()) {
-                graphics.drawString(text, x, baseline);
-            }
             if (drawCaret && caretCoords.getCharOffset() < charOffset + text.length()) {
                 int caretX = x + segments[i].getDisplayWidth(metrics, x, caretCoords.getCharOffset() - charOffset);
                 paintCaret(graphics, metrics, caretX, baseline);

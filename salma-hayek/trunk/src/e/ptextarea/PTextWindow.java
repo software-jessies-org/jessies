@@ -65,6 +65,8 @@ public class PTextWindow {
                 return new PJavaTextStyler(textArea);
             } else if (extension.equals("rb")) {
                 return new PRubyTextStyler(textArea);
+            } else if (extension.equals("txt")) {
+                return new PHyperlinkTextStyler(textArea, "\\bhttp\\b");
             }
         }
         return null;

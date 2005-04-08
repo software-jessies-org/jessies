@@ -15,9 +15,6 @@ import java.awt.*;
  */
 
 public interface PLineSegment {
-    /** Returns true if this segment is visible.  The PTabSegment returns false here. */
-    public boolean isVisible();
-    
     /** Returns the index of the style to be used when painting this text. */
     public int getStyleIndex();
     
@@ -41,4 +38,9 @@ public interface PLineSegment {
      * 'x' position when this segment is drawn from the given startX position, measured in pixels.
      */
     public int getCharOffset(FontMetrics metrics, int startX, int x);
+    
+    /**
+     * Paints the text into the given location.
+     */
+    public void paint(Graphics2D graphics, int x, int yBaseline);
 }

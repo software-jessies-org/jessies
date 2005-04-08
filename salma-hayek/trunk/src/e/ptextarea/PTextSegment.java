@@ -18,10 +18,6 @@ public class PTextSegment implements PLineSegment {
         this.text = text;
     }
     
-    public boolean isVisible() {
-        return true;
-    }
-    
     public int getStyleIndex() {
         return styleIndex;
     }
@@ -68,6 +64,10 @@ public class PTextSegment implements PLineSegment {
             min++;
         }
         return min;
+    }
+    
+    public void paint(Graphics2D graphics, int x, int yBaseline) {
+        graphics.drawString(getText(), x, yBaseline);
     }
     
     public String toString() {

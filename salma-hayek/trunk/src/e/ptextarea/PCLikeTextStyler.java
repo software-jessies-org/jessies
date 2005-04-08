@@ -15,8 +15,7 @@ import e.util.*;
  * @author Phil Norman
  */
 
-public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
-    private PTextArea textArea;
+public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PTextListener {
     private HashSet keywords = new HashSet();
     private int lastGoodLine;
     private boolean[] commentCache;
@@ -38,7 +37,7 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
     }
     
     public PCLikeTextStyler(PTextArea textArea) {
-        this.textArea = textArea;
+        super(textArea);
         initCommentCache();
         textArea.getPTextBuffer().addTextListener(this);
         textArea.setTextStyler(this);
@@ -80,37 +79,8 @@ public abstract class PCLikeTextStyler implements PTextStyler, PTextListener {
             commentCache = newCache;
         }
     }
-
-    public PTextSegment[] getLineSegments(PTextArea.SplitLine splitLine) {
-        int lineIndex = splitLine.getLineIndex();
-        String fullLine = textArea.getLineList().getLine(lineIndex).getContents().toString();
-        List segments = getLineSegments(lineIndex, fullLine);
-        int index = 0;
-        ArrayList result = new ArrayList();
-        int start = splitLine.getOffset();
-        int end = start + splitLine.getLength();
-        
-        for (int i = 0; index < end && i < segments.size(); ++i) {
-            PTextSegment segment = (PTextSegment) segments.get(i);
-            if (start >= index + segment.getLength()) {
-                index += segment.getLength();
-                continue;
-            }
-            if (start > index) {
-                int skip = start - index;
-                segment = segment.subSegment(skip);
-                index += skip;
-            }
-            if (end < index + segment.getLength()) {
-                segment = segment.subSegment(0, end - index);
-            }
-            result.add(segment);
-            index += segment.getLength();
-        }
-        return (PTextSegment[]) result.toArray(new PTextSegment[result.size()]);
-    }
     
-    private List getLineSegments(int lineIndex, String line) {
+    public List getLineSegments(int lineIndex, String line) {
         List mainSegments = getMainSegments(lineIndex, line);
         if (keywords.size() == 0) {
             return mainSegments;
