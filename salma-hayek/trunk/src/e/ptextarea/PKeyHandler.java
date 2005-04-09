@@ -102,7 +102,7 @@ public class PKeyHandler extends KeyAdapter {
     
     private void backspace() {
         int start = textArea.getSelectionStart();
-        int end = textArea.getSelectionStart();
+        int end = textArea.getSelectionEnd();
         if (start == end && start > 0) {
             --start;
         }
@@ -113,7 +113,7 @@ public class PKeyHandler extends KeyAdapter {
     
     private void delete() {
         int start = textArea.getSelectionStart();
-        int end = textArea.getSelectionStart();
+        int end = textArea.getSelectionEnd();
         if (start == end && end < textArea.getPTextBuffer().length() - 1) {
             ++end;
         }
