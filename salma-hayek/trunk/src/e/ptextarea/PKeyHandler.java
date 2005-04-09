@@ -125,9 +125,7 @@ public class PKeyHandler extends KeyAdapter {
     private void moveCaret(boolean shiftDown, int newOffset) {
         int start = newOffset;
         int end = newOffset;
-        if (shiftDown == false) {
-            textArea.clearSelection();
-        } else {
+        if (shiftDown) {
             start = Math.min(textArea.getSelectionStart(), start);
             end = Math.max(textArea.getSelectionEnd(), end);
         }

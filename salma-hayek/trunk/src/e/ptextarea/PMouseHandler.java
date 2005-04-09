@@ -64,21 +64,17 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         
         public void makeInitialSelection(int pressedLocation) {
             this.pressedLocation = pressedLocation;
-            textArea.clearSelection();
-            textArea.setCaretPosition(pressedLocation);
+            textArea.select(pressedLocation, pressedLocation);
         }
         
         public void mouseDragged(MouseEvent event) {
             int location = getLocationOfMouse(event);
             textArea.select(Math.min(location, pressedLocation), Math.max(location, pressedLocation));
-            textArea.setCaretPosition(location);
             dragHandlerWasCalled = true;
         }
         
         public void mouseReleased(MouseEvent event) {
-            if (dragHandlerWasCalled == false) {
-                textArea.clearSelection();
-            }
+            // Do nothing. We've already positioned the caret.
         }
     }
     
@@ -102,7 +98,6 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void makeInitialSelection(int pressedLocation) {
             this.pressedLine = textArea.getLineOfOffset(pressedLocation);
             textArea.select(textArea.getLineStartOffset(pressedLine), getLineEndOffset(pressedLine));
-            textArea.setCaretPosition(getLineEndOffset(pressedLine));
         }
         
         private int getLineEndOffset(int line) {
@@ -118,11 +113,6 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             int minLine = Math.min(currentLine, pressedLine);
             int maxLine = Math.max(currentLine, pressedLine);
             textArea.select(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine));
-            if (currentLine == maxLine) {
-                textArea.setCaretPosition(getLineEndOffset(currentLine));
-            } else {
-                textArea.setCaretPosition(textArea.getLineStartOffset(currentLine));
-            }
         }
         
         public void mouseReleased(MouseEvent event) { }
