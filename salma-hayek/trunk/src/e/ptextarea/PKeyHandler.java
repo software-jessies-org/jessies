@@ -84,20 +84,20 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
-        boolean controlDown = event.isControlDown();
-        boolean shiftDown = event.isShiftDown();
+        boolean byWord = event.isControlDown();
+        boolean extendingSelection = event.isShiftDown();
         if (movementHandler.handleMovementKeys(event)) {
             return true;
         }
         switch (event.getKeyCode()) {
             case KeyEvent.VK_LEFT:
-                moveLeft(controlDown, shiftDown);
+                moveLeft(byWord, extendingSelection);
                 break;
             case KeyEvent.VK_RIGHT:
-                moveRight(controlDown, shiftDown);
+                moveRight(byWord, extendingSelection);
                 break;
-            case KeyEvent.VK_HOME: moveCaret(shiftDown, caretToStartOfLine()); break;
-            case KeyEvent.VK_END: moveCaret(shiftDown, caretToEndOfLine()); break;
+            case KeyEvent.VK_HOME: moveCaret(extendingSelection, caretToStartOfLine()); break;
+            case KeyEvent.VK_END: moveCaret(extendingSelection, caretToEndOfLine()); break;
             case KeyEvent.VK_BACK_SPACE: backspace(); break;
             case KeyEvent.VK_DELETE: delete(); break;
             
@@ -133,10 +133,10 @@ public class PKeyHandler extends KeyAdapter {
         }
     }
     
-    private void moveCaret(boolean shiftDown, int newOffset) {
+    private void moveCaret(boolean extendingSelection, int newOffset) {
         int start = newOffset;
         int end = newOffset;
-        if (shiftDown) {
+        if (extendingSelection) {
             start = Math.min(textArea.getSelectionStart(), start);
             end = Math.max(textArea.getSelectionEnd(), end);
         }
@@ -153,28 +153,28 @@ public class PKeyHandler extends KeyAdapter {
         return textArea.getLineEndOffset(lineIndex);
     }
     
-    private void moveLeft(boolean controlDown, boolean shiftDown) {
-        int newOffset = controlDown ? caretToPreviousWord() : caretLeft(shiftDown);
-        moveCaret(shiftDown, newOffset);
+    private void moveLeft(boolean byWord, boolean extendingSelection) {
+        int newOffset = byWord ? caretToPreviousWord() : caretLeft(extendingSelection);
+        moveCaret(extendingSelection, newOffset);
     }
     
-    private void moveRight(boolean controlDown, boolean shiftDown) {
-        int newOffset = controlDown ? caretToNextWord() : caretRight(shiftDown);
-        moveCaret(shiftDown, newOffset);
+    private void moveRight(boolean byWord, boolean extendingSelection) {
+        int newOffset = byWord ? caretToNextWord() : caretRight(extendingSelection);
+        moveCaret(extendingSelection, newOffset);
     }
     
-    private int caretLeft(boolean shiftDown) {
+    private int caretLeft(boolean extendingSelection) {
         // FIXME: we need to remember a bias for keyboard shift+arrow movement.
-        if (shiftDown || textArea.getSelectionStart() == textArea.getSelectionEnd()) {
+        if (extendingSelection || textArea.getSelectionStart() == textArea.getSelectionEnd()) {
             return Math.max(0, textArea.getSelectionStart() - 1);
         } else {
             return textArea.getSelectionStart();
         }
     }
     
-    private int caretRight(boolean shiftDown) {
+    private int caretRight(boolean extendingSelection) {
         // FIXME: we need to remember a bias for keyboard shift+arrow movement.
-        if (shiftDown || textArea.getSelectionStart() == textArea.getSelectionEnd()) {
+        if (extendingSelection || textArea.getSelectionStart() == textArea.getSelectionEnd()) {
             return Math.min(textArea.getSelectionEnd() + 1, textArea.getPTextBuffer().length());
         } else {
             return textArea.getSelectionEnd();
@@ -234,11 +234,11 @@ public class PKeyHandler extends KeyAdapter {
             if (xPixelLocation == -1) {
                 xPixelLocation = getCurrentXPixelLocation();
             }
-            boolean shiftDown = event.isShiftDown();
+            boolean extendingSelection = event.isShiftDown();
             try {
                 switch (event.getKeyCode()) {
-                    case KeyEvent.VK_UP: moveCaret(shiftDown, caretUp()); return true;
-                    case KeyEvent.VK_DOWN: moveCaret(shiftDown, caretDown()); return true;
+                    case KeyEvent.VK_UP: moveCaret(extendingSelection, caretUp()); return true;
+                    case KeyEvent.VK_DOWN: moveCaret(extendingSelection, caretDown()); return true;
                     default: return false;
                 }
             } finally {
