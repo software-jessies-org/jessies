@@ -1,6 +1,7 @@
 package e.ptextarea;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -39,6 +40,7 @@ public class PTextWindow {
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 JScrollPane scroller = new JScrollPane(area);
                 frame.getContentPane().add(scroller);
+                frame.setJMenuBar(makeMenuBar());
                 frame.setSize(new Dimension(600, 600));
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
@@ -66,9 +68,37 @@ public class PTextWindow {
             } else if (extension.equals("rb")) {
                 return new PRubyTextStyler(textArea);
             } else if (extension.equals("txt")) {
-                return new PHyperlinkTextStyler(textArea, "\\bhttp\\b");
+                return new PHyperlinkTextStyler(textArea, "\\bhttp://") {
+                    public void hyperlinkClicked(CharSequence linkText) {
+                        System.out.println("Hyperlink clicked: " + linkText);
+                    }
+                    public boolean isAcceptableMatch(java.util.regex.Matcher matcher) {
+                        return true;
+                    }
+                };
             }
         }
         return null;
+    }
+    
+    private static JMenuBar makeMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.add(new OpenAction());
+        menuBar.add(fileMenu);
+        
+        return menuBar;
+    }
+    
+    public static class OpenAction extends AbstractAction {
+        public OpenAction() {
+            super("Open...");
+            putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("O", false));
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("OpenAction.actionPerformed");
+        }
     }
 }

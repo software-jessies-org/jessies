@@ -14,7 +14,7 @@ import java.util.List;
  * @author Phil Norman
  */
 
-public class PHyperlinkTextStyler extends PAbstractTextStyler {
+public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
     private static final int NORMAL_STYLE = 0;
     private static final int HYPERLINK_STYLE = 1;
     
@@ -29,7 +29,7 @@ public class PHyperlinkTextStyler extends PAbstractTextStyler {
         ArrayList result = new ArrayList();
         Matcher matcher = highlightPattern.matcher(line);
         int lastStart = 0;
-        while (matcher.find()) {
+        while (matcher.find() && isAcceptableMatch(matcher)) {
             result.add(new PTextSegment(NORMAL_STYLE, line.substring(lastStart, matcher.start())));
             result.add(new PUnderlinedTextSegment(HYPERLINK_STYLE, line.substring(matcher.start(), matcher.end())));
             lastStart = matcher.end();
@@ -59,9 +59,17 @@ public class PHyperlinkTextStyler extends PAbstractTextStyler {
         }
     }
     
-    public void hyperlinkClicked(CharSequence hyperlinkText) {
-        System.out.println("Hyperlink clicked: " + hyperlinkText);
-    }
+    /**
+     * Override this to implement whatever behavior you want for a clicked-on
+     * link.
+     */
+    public abstract void hyperlinkClicked(CharSequence hyperlinkText);
+    
+    /**
+     * Override this to perform any extra processing that can't be done by a
+     * regular expression.
+     */
+    public abstract boolean isAcceptableMatch(Matcher matcher);
     
     /**
      * Optionally returns a special mouse cursor to use when over the given location.  A null
