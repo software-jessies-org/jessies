@@ -29,13 +29,9 @@ public class PKeyHandler extends KeyAdapter {
     private void undoRedo(boolean isShifted) {
         PUndoBuffer undoer = textArea.getPTextBuffer().getUndoBuffer();
         if (isShifted) {
-            if (undoer.canRedo()) {
-                undoer.redo();
-            }
+            undoer.redo();
         } else {
-            if (undoer.canUndo()) {
-                undoer.undo();
-            }
+            undoer.undo();
         }
     }
     
