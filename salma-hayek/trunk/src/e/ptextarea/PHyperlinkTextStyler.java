@@ -29,7 +29,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         ArrayList result = new ArrayList();
         Matcher matcher = highlightPattern.matcher(line);
         int lastStart = 0;
-        while (matcher.find() && isAcceptableMatch(matcher)) {
+        while (matcher.find() && isAcceptableMatch(line, matcher)) {
             result.add(new PTextSegment(NORMAL_STYLE, line.substring(lastStart, matcher.start())));
             result.add(new PUnderlinedTextSegment(HYPERLINK_STYLE, line.substring(matcher.start(), matcher.end())));
             lastStart = matcher.end();
@@ -69,7 +69,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      * Override this to perform any extra processing that can't be done by a
      * regular expression.
      */
-    public abstract boolean isAcceptableMatch(Matcher matcher);
+    public abstract boolean isAcceptableMatch(String line, Matcher matcher);
     
     /**
      * Optionally returns a special mouse cursor to use when over the given location.  A null

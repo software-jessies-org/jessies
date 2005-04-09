@@ -68,11 +68,11 @@ public class PTextWindow {
             } else if (extension.equals("rb")) {
                 return new PRubyTextStyler(textArea);
             } else if (extension.equals("txt")) {
-                return new PHyperlinkTextStyler(textArea, "\\bhttp://") {
+                return new PHyperlinkTextStyler(textArea, "\\bhttp://\\S+") {
                     public void hyperlinkClicked(CharSequence linkText) {
                         System.out.println("Hyperlink clicked: " + linkText);
                     }
-                    public boolean isAcceptableMatch(java.util.regex.Matcher matcher) {
+                    public boolean isAcceptableMatch(String line, java.util.regex.Matcher matcher) {
                         return true;
                     }
                 };
