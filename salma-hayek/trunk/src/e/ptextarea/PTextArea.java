@@ -60,8 +60,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             private int lastWidth;
             
             public void componentResized(ComponentEvent event) {
-                if (getSize().width != lastWidth) {
-                    lastWidth = getSize().width;
+                rewrap();
+            }
+            
+            private void rewrap() {
+                if (getWidth() != lastWidth) {
+                    lastWidth = getWidth();
                     invalidateLineWrappings();
                 }
             }
@@ -609,7 +613,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public void repaintLines(int minSplitIndex, int maxSplitIndex) {
         int top = getLineTop(minSplitIndex);
         int bottom = getLineTop(maxSplitIndex + 1);
-        repaint(0, top, getSize().width, bottom - top);
+        repaint(0, top, getWidth(), bottom - top);
     }
     
     private synchronized void invalidateLineWrappings() {
@@ -690,7 +694,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private int addSplitLines(int lineIndex, FontMetrics metrics, int index) {
         PLineList.Line line = lines.getLine(lineIndex);
         int addedCount = 0;
-        int width = getSize().width;
+        int width = getWidth();
         if (width == 0) {
             width = Integer.MAX_VALUE;  // Don't wrap if we don't have any size.
         }
@@ -877,7 +881,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             int lineHeight = textArea.getLineHeight();
             for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
                 int xStart = (i == start.getLineIndex()) ? startPt.x : 0;
-                int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getSize().width;
+                int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth();
                 graphics.setColor(SELECTION_COLOR);
                 paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
                 int yBottom = y + lineHeight - 1;
@@ -891,7 +895,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                     graphics.drawLine(0, y, Math.min(xEnd, startPt.x), y);
                 }
                 if (i == end.getLineIndex()) {
-                    if (xEnd < textArea.getSize().width) {
+                    if (xEnd < textArea.getWidth()) {
                         graphics.drawLine(xEnd, y, xEnd, yBottom);
                     }
                     graphics.drawLine(xStart, yBottom, xEnd, yBottom);

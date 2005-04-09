@@ -31,7 +31,7 @@ public class PColoredHighlight extends PHighlight {
         int lineHeight = textArea.getLineHeight();
         for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
             int xStart = (i == start.getLineIndex()) ? startPt.x : 0;
-            int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getSize().width;
+            int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth();
             paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
             y += lineHeight;
         }
