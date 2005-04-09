@@ -17,7 +17,8 @@ import e.util.*;
 public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private static final int MIN_WIDTH = 50;
     private static final int MAX_CACHED_CHAR = 128;
-    private static final int NO_MARGIN = -1;
+    
+    public static final int NO_MARGIN = -1;
     
     private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.6f, 0.6f, 0.6f);
     private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.96f, 0.96f, 0.96f);
@@ -114,10 +115,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return selection.getEndIndex();
     }
     
-    public void replaceSelection(String newContent) {
-        throw new UnsupportedOperationException("Can't do this yet.");
-    }
-    
     public void setCaretPosition(int offset) {
         select(offset, offset);
     }
@@ -153,34 +150,37 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void insert(CharSequence chars) {
-        PTextBuffer.CaretSetter startCaret = getCurrentCaretSetter();
-        PTextBuffer.CaretSetter endCaret =new PositionSetter(getSelectionStart() + chars.length());
+        SelectionSetter endCaret =new SelectionSetter(getSelectionStart() + chars.length());
         int length = getSelectionEnd() - getSelectionStart();
-        getPTextBuffer().replace(startCaret, getSelectionStart(), length, chars, endCaret);
+        getPTextBuffer().replace(new SelectionSetter(), getSelectionStart(), length, chars, endCaret);
     }
     
-    public void deleteSelection() {
+    public void replaceSelection(CharSequence replacement) {
         if (hasSelection()) {
-            PTextBuffer.CaretSetter startCaret = getCurrentCaretSetter();
-            PTextBuffer.CaretSetter endCaret = new PositionSetter(getSelectionStart());
+            SelectionSetter endCaret = new SelectionSetter(getSelectionStart() + replacement.length());
             int length = getSelectionEnd() - getSelectionStart();
-            getPTextBuffer().replace(startCaret, getSelectionStart(), length, "", endCaret);
+            getPTextBuffer().replace(new SelectionSetter(), getSelectionStart(), length, replacement, endCaret);
+        } else {
+            insert(replacement);
         }
     }
     
     public void delete(int startFrom, int charCount) {
-        PTextBuffer.CaretSetter startCaret = getCurrentCaretSetter();
-        PTextBuffer.CaretSetter endCaret = new PositionSetter(startFrom);
-        getPTextBuffer().replace(startCaret, startFrom, charCount, "", endCaret);
-    }
-    
-    private PTextBuffer.CaretSetter getCurrentCaretSetter() {
-        return new SelectionSetter(getSelectionStart(), getSelectionEnd());
+        SelectionSetter endCaret = new SelectionSetter(startFrom);
+        getPTextBuffer().replace(new SelectionSetter(), startFrom, charCount, "", endCaret);
     }
     
     private class SelectionSetter implements PTextBuffer.CaretSetter {
         private int start;
         private int end;
+        
+        public SelectionSetter() {
+            this(getSelectionStart(), getSelectionEnd());
+        }
+        
+        public SelectionSetter(int offset) {
+            this(offset, offset);
+        }
         
         public SelectionSetter(int start, int end) {
             this.start = start;
@@ -189,18 +189,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         
         public void setCaret() {
             select(start, end);
-        }
-    }
-    
-    private class PositionSetter implements PTextBuffer.CaretSetter {
-        private int position;
-        
-        public PositionSetter(int position) {
-            this.position = position;
-        }
-        
-        public void setCaret() {
-            select(position, position);
         }
     }
     
@@ -234,6 +222,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return getSplitLine(getCoordinates(offset).getLineIndex()).getLineIndex();
     }
     
+    /**
+     * Sets the column number at which to draw the margin. Typically, this is
+     * 80 when using a fixed-width font. Use the constant NO_MARGIN to suppress
+     * the drawing of any margin.
+     */
     public void showRightHandMarginAt(int rightHandMarginColumn) {
         this.rightHandMarginColumn = rightHandMarginColumn;
     }
@@ -329,6 +322,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public PLineSegment getLineSegmentAtLocation(Point point) {
+        generateLineWrappings();
         FontMetrics metrics = getFontMetrics(getFont());
         int line = point.y / metrics.getHeight();
         line = Math.max(0, Math.min(splitLines.size() - 1, line));
@@ -380,6 +374,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public PCoordinates getCoordinates(int location) {
+        if (isLineWrappingInvalid()) {
+            return new PCoordinates(-1, -1);
+        }
         int min = 0;
         int max = splitLines.size();
         while (max - min > 1) {
@@ -423,7 +420,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void repaintIndexRange(int startIndex, int endIndex) {
-        if (splitLines == null) {
+        if (isLineWrappingInvalid()) {
             return;
         }
         PCoordinates start = getCoordinates(startIndex);
@@ -432,6 +429,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void repaintCaret() {
+        if (isLineWrappingInvalid()) {
+            return;
+        }
         Point point = getViewCoordinates(getCoordinates(getSelectionStart()));
         FontMetrics metrics = getFontMetrics(getFont());
         repaint(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getMaxAscent() + metrics.getMaxDescent());
@@ -576,7 +576,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
 
     public void linesAdded(PLineEvent event) {
-        if (splitLines == null) {
+        if (isLineWrappingInvalid()) {
             return;
         }
         FontMetrics metrics = getFontMetrics(getFont());
@@ -592,7 +592,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void linesRemoved(PLineEvent event) {
-        if (splitLines == null) {
+        if (isLineWrappingInvalid()) {
             return;
         }
         int splitIndex = getSplitLineIndex(event.getIndex());
@@ -612,7 +612,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void linesChanged(PLineEvent event) {
-        if (splitLines == null) {
+        if (isLineWrappingInvalid()) {
             return;
         }
         FontMetrics metrics = getFontMetrics(getFont());
@@ -652,12 +652,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         repaint(0, top, getWidth(), bottom - top);
     }
     
+    private synchronized boolean isLineWrappingInvalid() {
+        return (splitLines == null);
+    }
+    
     private synchronized void invalidateLineWrappings() {
         splitLines = null;
     }
 
     private synchronized void generateLineWrappings() {
-        if (splitLines == null) {
+        if (isLineWrappingInvalid() && isShowing()) {
             splitLines = new ArrayList();
             FontMetrics metrics = getFontMetrics(getFont());
             for (int i = 0; i < lines.size(); i++) {
@@ -788,13 +792,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         lines.addLineListener(this);
         text.addTextListener(anchorSet);
         invalidateLineWrappings();
+        generateLineWrappings();
     }
     
     /**
      * Replaces the entire contents of this text area with the given string.
      */
     public void setText(String newText) {
-        getPTextBuffer().replace(getCurrentCaretSetter(), 0, getPTextBuffer().length(), newText, new PositionSetter(0));
+        getPTextBuffer().replace(new SelectionSetter(), 0, getPTextBuffer().length(), newText, new SelectionSetter(0));
     }
     
     /**
@@ -803,7 +808,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public void append(String newText) {
         PTextBuffer buffer = getPTextBuffer();
         synchronized (buffer) {
-            buffer.replace(getCurrentCaretSetter(), buffer.length(), 0, newText, new PositionSetter(buffer.length() + newText.length()));
+            buffer.replace(new SelectionSetter(), buffer.length(), 0, newText, new SelectionSetter(buffer.length() + newText.length()));
         }
     }
     

@@ -246,10 +246,10 @@ public class PTextBuffer implements CharSequence {
     
     public void replace(CaretSetter beforeCaret, int position, int removeCount, CharSequence add, CaretSetter afterCaret) {
         if (beforeCaret == null) {
-            beforeCaret = new NullCaretSetter();
+            throw new IllegalArgumentException("beforeCaret must not be null");
         }
         if (afterCaret == null) {
-            afterCaret = new NullCaretSetter();
+            throw new IllegalArgumentException("afterCaret must not be null");
         }
         CharSequence removeChars = copyChars(position, removeCount);
         undoBuffer.addAndDo(beforeCaret, position, removeChars, add, afterCaret);
@@ -393,10 +393,6 @@ public class PTextBuffer implements CharSequence {
     
     public interface CaretSetter {
         public void setCaret();
-    }
-    
-    public class NullCaretSetter implements CaretSetter {
-        public void setCaret() { }
     }
     
     private class Doable {

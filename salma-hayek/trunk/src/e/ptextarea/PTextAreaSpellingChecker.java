@@ -66,7 +66,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
                 // hyphenated words or multiple words.
                 suggestion = suggestion.replace('-', '_');
                 suggestion = convertMultipleWordsToCamelCase(suggestion);
-                menu.add(new CorrectSpellingAction(component.getPTextBuffer(), suggestion, actualRange.start, actualRange.end));
+                menu.add(new CorrectSpellingAction(component, suggestion, actualRange.start, actualRange.end));
             }
             if (suggestions.length == 0) {
                 menu.add(new NoSuggestionsAction());
@@ -117,21 +117,22 @@ public class PTextAreaSpellingChecker implements PTextListener {
     }
     
     private static class CorrectSpellingAction extends AbstractAction {
-        private PTextBuffer buffer;
+        private PTextArea textArea;
         private String replacement;
         private int startIndex;
         private int endIndex;
         
-        public CorrectSpellingAction(PTextBuffer buffer, String replacement, int startIndex, int endIndex) {
+        public CorrectSpellingAction(PTextArea textArea, String replacement, int startIndex, int endIndex) {
             super("Correct to '" + replacement + "'");
-            this.buffer = buffer;
+            this.textArea = textArea;
             this.replacement = replacement;
             this.startIndex = startIndex;
             this.endIndex = endIndex;
         }
         
         public void actionPerformed(ActionEvent e) {
-            buffer.replace(null, startIndex, endIndex - startIndex, replacement, null);
+            textArea.select(startIndex, endIndex);
+            textArea.replaceSelection(replacement);
         }
     }
     
