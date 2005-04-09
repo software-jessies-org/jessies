@@ -79,13 +79,14 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
+        boolean shiftDown = event.isShiftDown();
         switch (event.getKeyCode()) {
-            case KeyEvent.VK_LEFT: moveCaret(event, caretLeft()); break;
-            case KeyEvent.VK_RIGHT: moveCaret(event, caretRight()); break;
-            case KeyEvent.VK_UP: moveCaret(event, caretUp()); break;
-            case KeyEvent.VK_DOWN: moveCaret(event, caretDown()); break;
-            case KeyEvent.VK_HOME: moveCaret(event, caretToStartOfLine()); break;
-            case KeyEvent.VK_END: moveCaret(event, caretToEndOfLine()); break;
+            case KeyEvent.VK_LEFT: moveCaret(shiftDown, caretLeft(shiftDown)); break;
+            case KeyEvent.VK_RIGHT: moveCaret(shiftDown, caretRight(shiftDown)); break;
+            case KeyEvent.VK_UP: moveCaret(shiftDown, caretUp()); break;
+            case KeyEvent.VK_DOWN: moveCaret(shiftDown, caretDown()); break;
+            case KeyEvent.VK_HOME: moveCaret(shiftDown, caretToStartOfLine()); break;
+            case KeyEvent.VK_END: moveCaret(shiftDown, caretToEndOfLine()); break;
             case KeyEvent.VK_BACK_SPACE: backspace(); break;
             case KeyEvent.VK_DELETE: delete(); break;
 
@@ -100,78 +101,73 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private void backspace() {
-        if (textArea.hasSelection()) {
-            textArea.deleteSelection();
-        } else {
-            int caret = textArea.getCaretLocation();
-            if (caret > 0) {
-                textArea.delete(caret - 1, 1);
-            }
+        int start = textArea.getSelectionStart();
+        int end = textArea.getSelectionStart();
+        if (start == end && start > 0) {
+            --start;
+        }
+        if (start != end) {
+            textArea.delete(start, end - start);
         }
     }
     
     private void delete() {
-        if (textArea.hasSelection()) {
-            textArea.deleteSelection();
-        } else {
-            int caret = textArea.getCaretLocation();
-            if (caret < textArea.getPTextBuffer().length() - 1) {
-                textArea.delete(caret, 1);
-            }
+        int start = textArea.getSelectionStart();
+        int end = textArea.getSelectionStart();
+        if (start == end && end < textArea.getPTextBuffer().length() - 1) {
+            ++end;
+        }
+        if (start != end) {
+            textArea.delete(start, end - start);
         }
     }
     
-    private void moveCaret(KeyEvent event, int newCaretLocation) {
-        if (event.isShiftDown() == false) {
+    private void moveCaret(boolean shiftDown, int newOffset) {
+        int start = newOffset;
+        int end = newOffset;
+        if (shiftDown == false) {
             textArea.clearSelection();
+        } else {
+            start = Math.min(textArea.getSelectionStart(), start);
+            end = Math.max(textArea.getSelectionEnd(), end);
         }
-        
-        if (textArea.getCaretLocation() != newCaretLocation) {
-            if (event.isShiftDown()) {
-                int otherExtreme;
-                if (textArea.getCaretLocation() == textArea.getSelectionStart()) {
-                    otherExtreme = textArea.getSelectionEnd();
-                } else {
-                    otherExtreme = textArea.getSelectionStart();
-                }
-                textArea.select(Math.min(otherExtreme, newCaretLocation), Math.max(otherExtreme, newCaretLocation));
-            }
-            textArea.setCaretPosition(newCaretLocation);
-        }
+        textArea.select(start, end);
     }
     
     private int caretToStartOfLine() {
-        int lineIndex = textArea.getLineOfOffset(textArea.getCaretLocation());
+        int lineIndex = textArea.getLineOfOffset(textArea.getSelectionStart());
         return textArea.getLineStartOffset(lineIndex);
     }
     
     private int caretToEndOfLine() {
-        int lineIndex = textArea.getLineOfOffset(textArea.getCaretLocation());
+        int lineIndex = textArea.getLineOfOffset(textArea.getSelectionEnd());
         return textArea.getLineEndOffset(lineIndex);
     }
     
-    private int caretLeft() {
-        if (textArea.getCaretLocation() > 0) {
-            return textArea.getCaretLocation() - 1;
+    private int caretLeft(boolean shiftDown) {
+        // FIXME: we need to remember a bias for keyboard shift+arrow movement.
+        if (shiftDown || textArea.getSelectionStart() == textArea.getSelectionEnd()) {
+            return Math.max(0, textArea.getSelectionStart() - 1);
         } else {
-            return textArea.getCaretLocation();
+            return textArea.getSelectionStart();
         }
     }
     
-    private int caretRight() {
-        if (textArea.getCaretLocation() < textArea.getPTextBuffer().length()) {
-            return textArea.getCaretLocation() + 1;
+    private int caretRight(boolean shiftDown) {
+        // FIXME: we need to remember a bias for keyboard shift+arrow movement.
+        if (shiftDown || textArea.getSelectionStart() == textArea.getSelectionEnd()) {
+            return Math.min(textArea.getSelectionEnd() + 1, textArea.getPTextBuffer().length());
         } else {
-            return textArea.getCaretLocation();
+            return textArea.getSelectionEnd();
         }
     }
     
     private int caretUp() {
-        int lineIndex = textArea.getLineOfOffset(textArea.getCaretLocation());
+        int lineIndex = textArea.getLineOfOffset(textArea.getSelectionStart());
         if (lineIndex == 0) {
             return 0;
         } else {
-            int charOffset = textArea.getCaretLocation() - textArea.getLineStartOffset(lineIndex);
+            int charOffset = textArea.getSelectionStart() - textArea.getLineStartOffset(lineIndex);
             lineIndex--;
             charOffset = Math.min(charOffset, textArea.getLineList().getLine(lineIndex).getLengthBeforeTerminator());
             return textArea.getLineStartOffset(lineIndex) + charOffset;
@@ -179,11 +175,11 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private int caretDown() {
-        int lineIndex = textArea.getLineOfOffset(textArea.getCaretLocation());
+        int lineIndex = textArea.getLineOfOffset(textArea.getSelectionEnd());
         if (lineIndex == textArea.getLineCount() - 1) {
             return textArea.getPTextBuffer().length();
         } else {
-            int charOffset = textArea.getCaretLocation() - textArea.getLineStartOffset(lineIndex);
+            int charOffset = textArea.getSelectionEnd() - textArea.getLineStartOffset(lineIndex);
             lineIndex++;
             charOffset = Math.min(charOffset, textArea.getLineList().getLine(lineIndex).getLengthBeforeTerminator());
             return textArea.getLineStartOffset(lineIndex) + charOffset;
