@@ -244,7 +244,7 @@ public class PTextBuffer implements CharSequence {
         }
     }
     
-    public void replace(CaretSetter beforeCaret, int position, int removeCount, CharSequence add, CaretSetter afterCaret) {
+    public void replace(SelectionSetter beforeCaret, int position, int removeCount, CharSequence add, SelectionSetter afterCaret) {
         if (beforeCaret == null) {
             throw new IllegalArgumentException("beforeCaret must not be null");
         }
@@ -358,7 +358,7 @@ public class PTextBuffer implements CharSequence {
         private ArrayList undoList = new ArrayList();
         private int undoPosition = 0;
         
-        private void addAndDo(CaretSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, CaretSetter afterCaret) {
+        private void addAndDo(SelectionSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, SelectionSetter afterCaret) {
             while (undoList.size() > undoPosition) {
                 undoList.remove(undoPosition);
             }
@@ -391,18 +391,18 @@ public class PTextBuffer implements CharSequence {
         }
     }
     
-    public interface CaretSetter {
-        public void setCaret();
+    public interface SelectionSetter {
+        public void modifySelection();
     }
     
     private class Doable {
-        private CaretSetter beforeCaret;
+        private SelectionSetter beforeCaret;
         private int position;
         private CharSequence removeChars;
         private CharSequence insertChars;
-        private CaretSetter afterCaret;
+        private SelectionSetter afterCaret;
         
-        public Doable(CaretSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, CaretSetter afterCaret) {
+        public Doable(SelectionSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, SelectionSetter afterCaret) {
             this.beforeCaret = beforeCaret;
             this.position = position;
             this.removeChars = removeChars;
@@ -412,12 +412,12 @@ public class PTextBuffer implements CharSequence {
         
         public void undo() {
             removeAndInsert(insertChars, removeChars);
-            beforeCaret.setCaret();
+            beforeCaret.modifySelection();
         }
         
         public void redo() {
             removeAndInsert(removeChars, insertChars);
-            afterCaret.setCaret();
+            afterCaret.modifySelection();
         }
         
         private void removeAndInsert(CharSequence remove, CharSequence insert) {
