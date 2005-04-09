@@ -49,7 +49,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      * Optionally handles the given mouse click event.  This is called when a single click occurs on
      * the text component.  If the styler handles the event, it should consume it.
      */
-    public void mouseClicked(MouseEvent event, int clickLocation) {
+    public void mouseClicked(MouseEvent event, int offset) {
         PLineSegment segment = textArea.getLineSegmentAtLocation(event.getPoint());
         if (segment != null && segment.getStyleIndex() == HYPERLINK_STYLE) {
             hyperlinkClicked(segment.getText());

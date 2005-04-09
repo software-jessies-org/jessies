@@ -16,14 +16,14 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         if (e.isPopupTrigger()) {
             return;
         }
-        int pressedLocation = getLocationOfMouse(e);
+        int pressedOffset = getOffsetAtMouse(e);
         if (e.getClickCount() == 1) {
             textArea.requestFocus();
         }
-        textArea.getPTextStyler().mouseClicked(e, pressedLocation);
+        textArea.getPTextStyler().mouseClicked(e, pressedOffset);
         if (e.isConsumed() == false) {
             dragHandler = getDragHandlerForClick(e);
-            dragHandler.makeInitialSelection(pressedLocation);
+            dragHandler.makeInitialSelection(pressedOffset);
         }
     }
     
@@ -36,7 +36,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         }
     }
     
-    private int getLocationOfMouse(MouseEvent event) {
+    private int getOffsetAtMouse(MouseEvent event) {
         PCoordinates nearestChar = textArea.getNearestCoordinates(event.getPoint());
         return textArea.getTextIndex(nearestChar);
     }
@@ -60,23 +60,23 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     }
     
     private interface DragHandler {
-        public void makeInitialSelection(int pressedLocation);
+        public void makeInitialSelection(int pressedOffset);
         public void mouseDragged(MouseEvent event);
         public void mouseReleased(MouseEvent event);
     }
     
     private class SingleClickDragHandler implements DragHandler {
         private boolean dragHandlerWasCalled = false;
-        private int pressedLocation;
+        private int pressedOffset;
         
-        public void makeInitialSelection(int pressedLocation) {
-            this.pressedLocation = pressedLocation;
-            textArea.select(pressedLocation, pressedLocation);
+        public void makeInitialSelection(int pressedOffset) {
+            this.pressedOffset = pressedOffset;
+            textArea.select(pressedOffset, pressedOffset);
         }
         
         public void mouseDragged(MouseEvent event) {
-            int location = getLocationOfMouse(event);
-            textArea.select(Math.min(location, pressedLocation), Math.max(location, pressedLocation));
+            int offset = getOffsetAtMouse(event);
+            textArea.select(Math.min(offset, pressedOffset), Math.max(offset, pressedOffset));
             dragHandlerWasCalled = true;
         }
         
@@ -86,10 +86,10 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     }
     
     private class DoubleClickDragHandler implements DragHandler {
-        private int pressedLocation;
+        private int pressedOffset;
         
-        public void makeInitialSelection(int pressedLocation) {
-            this.pressedLocation = pressedLocation;
+        public void makeInitialSelection(int pressedOffset) {
+            this.pressedOffset = pressedOffset;
         }
         
         public void mouseDragged(MouseEvent event) {
@@ -102,8 +102,8 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     private class TripleClickDragHandler implements DragHandler {
         private int pressedLine;
         
-        public void makeInitialSelection(int pressedLocation) {
-            this.pressedLine = textArea.getLineOfOffset(pressedLocation);
+        public void makeInitialSelection(int pressedOffset) {
+            this.pressedLine = textArea.getLineOfOffset(pressedOffset);
             textArea.select(textArea.getLineStartOffset(pressedLine), getLineEndOffset(pressedLine));
         }
         
@@ -116,7 +116,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         }
         
         public void mouseDragged(MouseEvent event) {
-            int currentLine = textArea.getLineOfOffset(getLocationOfMouse(event));
+            int currentLine = textArea.getLineOfOffset(getOffsetAtMouse(event));
             int minLine = Math.min(currentLine, pressedLine);
             int maxLine = Math.max(currentLine, pressedLine);
             textArea.select(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine));

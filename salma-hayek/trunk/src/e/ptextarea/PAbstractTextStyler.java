@@ -62,7 +62,9 @@ public abstract class PAbstractTextStyler implements PTextStyler {
      * Optionally handles the given mouse click event.  This is called when a single click occurs on
      * the text component.  If the styler handles the event, it should consume it.
      */
-    public void mouseClicked(MouseEvent event, int clickLocation) { }
+    public void mouseClicked(MouseEvent event, int offset) {
+        // Do nothing.
+    }
     
     /**
      * Optionally returns a special mouse cursor to use when over the given location.  A null
