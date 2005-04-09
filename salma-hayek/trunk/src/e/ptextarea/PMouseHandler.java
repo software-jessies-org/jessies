@@ -1,6 +1,7 @@
 package e.ptextarea;
 
 
+import java.awt.*;
 import java.awt.event.*;
 
 public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
@@ -19,8 +20,11 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         if (e.getClickCount() == 1) {
             textArea.requestFocus();
         }
-        dragHandler = getDragHandlerForClick(e);
-        dragHandler.makeInitialSelection(pressedLocation);
+        textArea.getPTextStyler().mouseClicked(e, pressedLocation);
+        if (e.isConsumed() == false) {
+            dragHandler = getDragHandlerForClick(e);
+            dragHandler.makeInitialSelection(pressedLocation);
+        }
     }
     
     private DragHandler getDragHandlerForClick(MouseEvent e) {
@@ -50,7 +54,11 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         }
     }
     
-    public void mouseMoved(MouseEvent event) { }
+    public void mouseMoved(MouseEvent event) {
+        int textLocation = getLocationOfMouse(event);
+        Cursor newCursor = textArea.getPTextStyler().getCursorForPosition(textLocation);
+        textArea.setCursor(newCursor);
+    }
     
     private interface DragHandler {
         public void makeInitialSelection(int pressedLocation);

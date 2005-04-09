@@ -76,6 +76,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         initSpellingChecking();
     }
     
+    public PTextStyler getPTextStyler() {
+        return textStyler;
+    }
+    
     // Selection methods.
     public String getSelectedText() {
         int start = selection.getStartIndex();
