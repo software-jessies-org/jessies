@@ -131,8 +131,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
         }
         
         public void actionPerformed(ActionEvent e) {
-            textArea.select(startIndex, endIndex);
-            textArea.replaceSelection(replacement);
+            textArea.replaceRange(replacement, startIndex, endIndex);
         }
     }
     
