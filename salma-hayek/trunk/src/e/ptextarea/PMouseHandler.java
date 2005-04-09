@@ -90,6 +90,8 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         
         public void makeInitialSelection(int pressedOffset) {
             this.pressedOffset = pressedOffset;
+            String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
+            textArea.select(PWordUtilities.getWordStart(textArea.getPTextBuffer(), pressedOffset, stopChars), PWordUtilities.getWordEnd(textArea.getPTextBuffer(), pressedOffset, stopChars));
         }
         
         public void mouseDragged(MouseEvent event) {
