@@ -16,15 +16,22 @@ public class PKeyHandler extends KeyAdapter {
     public void keyPressed(KeyEvent event) {
         if (event.isControlDown()) {
             switch (event.getKeyCode()) {
-            case KeyEvent.VK_T: textArea.printLineInfo(); break;
-            case KeyEvent.VK_L: textArea.getLineList().printLineInfo(); break;
-            case KeyEvent.VK_R: textArea.repaint(); break;
-            case KeyEvent.VK_Z: undoRedo(event.isShiftDown()); break;
+            case KeyEvent.VK_T:
+                textArea.printLineInfo();
+                return;
+            case KeyEvent.VK_L:
+                textArea.getLineList().printLineInfo();
+                return;
+            case KeyEvent.VK_R:
+                textArea.repaint();
+                return;
+            case KeyEvent.VK_Z:
+                undoRedo(event.isShiftDown());
+                return;
             }
-        } else {
-            if (handleInvisibleKeyPressed(event)) {
-                event.consume();
-            }
+        }
+        if (handleInvisibleKeyPressed(event)) {
+            event.consume();
         }
     }
     
@@ -77,13 +84,18 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
+        boolean controlDown = event.isControlDown();
         boolean shiftDown = event.isShiftDown();
         if (movementHandler.handleMovementKeys(event)) {
             return true;
         }
         switch (event.getKeyCode()) {
-            case KeyEvent.VK_LEFT: moveCaret(shiftDown, caretLeft(shiftDown)); break;
-            case KeyEvent.VK_RIGHT: moveCaret(shiftDown, caretRight(shiftDown)); break;
+            case KeyEvent.VK_LEFT:
+                moveLeft(controlDown, shiftDown);
+                break;
+            case KeyEvent.VK_RIGHT:
+                moveRight(controlDown, shiftDown);
+                break;
             case KeyEvent.VK_HOME: moveCaret(shiftDown, caretToStartOfLine()); break;
             case KeyEvent.VK_END: moveCaret(shiftDown, caretToEndOfLine()); break;
             case KeyEvent.VK_BACK_SPACE: backspace(); break;
@@ -141,6 +153,16 @@ public class PKeyHandler extends KeyAdapter {
         return textArea.getLineEndOffset(lineIndex);
     }
     
+    private void moveLeft(boolean controlDown, boolean shiftDown) {
+        int newOffset = controlDown ? caretToPreviousWord() : caretLeft(shiftDown);
+        moveCaret(shiftDown, newOffset);
+    }
+    
+    private void moveRight(boolean controlDown, boolean shiftDown) {
+        int newOffset = controlDown ? caretToNextWord() : caretRight(shiftDown);
+        moveCaret(shiftDown, newOffset);
+    }
+    
     private int caretLeft(boolean shiftDown) {
         // FIXME: we need to remember a bias for keyboard shift+arrow movement.
         if (shiftDown || textArea.getSelectionStart() == textArea.getSelectionEnd()) {
@@ -157,6 +179,44 @@ public class PKeyHandler extends KeyAdapter {
         } else {
             return textArea.getSelectionEnd();
         }
+    }
+    
+    private int caretToPreviousWord() {
+        CharSequence chars = textArea.getPTextBuffer();
+        String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
+        int offset = textArea.getSelectionStart();
+        
+        // If we're at the start of the document, we're not going far.
+        if (offset == 0) {
+            return 0;
+        }
+        
+        // If we're at the start of a word, go to the start of the word before.
+        if (PWordUtilities.isInWord(chars, offset - 1, stopChars) == false) {
+            return PWordUtilities.getWordStart(chars, PWordUtilities.getNonWordStart(chars, offset - 1, stopChars), stopChars);
+        }
+        
+        // Otherwise go to the start of the current word.
+        return PWordUtilities.getWordStart(chars, offset, stopChars);
+    }
+    
+    private int caretToNextWord() {
+        CharSequence chars = textArea.getPTextBuffer();
+        String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
+        int offset = textArea.getSelectionEnd();
+        
+        // If we're at the end of the document, we're not going far.
+        if (offset == chars.length()) {
+            return 0;
+        }
+        
+        // If we're in a word, go to the end of this word.
+        if (PWordUtilities.isInWord(chars, offset, stopChars)) {
+            return PWordUtilities.getWordEnd(chars, offset, stopChars);
+        }
+        
+        // Otherwise go to the start of the next word.
+        return PWordUtilities.getWordEnd(chars, PWordUtilities.getNonWordEnd(chars, PWordUtilities.getWordEnd(chars, offset, stopChars), stopChars), stopChars);
     }
     
     private class UpDownMovementHandler implements PCaretListener {
