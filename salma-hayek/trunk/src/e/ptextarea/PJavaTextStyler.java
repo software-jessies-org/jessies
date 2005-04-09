@@ -103,7 +103,14 @@ public class PJavaTextStyler extends PCLikeTextStyler {
                 // after the escaping '\', since otherwise the line parser would have understood it as
                 // escaping our terminating ' or ".
                 if (string.charAt(i) == '\\') {
-                    if (isBasicEscapeCharacter(string.charAt(i + 1))) {
+                    if (isValidOctalDigit(string.charAt(i + 1))) {
+                        int maxDigits = (string.charAt(i + 1) <= '3') ? 3 : 2;
+                        for (increment = 1; increment <= maxDigits; increment++) {
+                            if (isValidOctalDigit(string.charAt(i + increment)) == false) {
+                                break;
+                            }
+                        }
+                    } else if (isBasicEscapeCharacter(string.charAt(i + 1))) {
                         increment = 2;
                     } else if (string.charAt(i + 1) == 'u') {
                         // From section 3.3 (Unicode Escapes) of the JLS.
@@ -118,7 +125,7 @@ public class PJavaTextStyler extends PCLikeTextStyler {
                         }
                         if (isError == false) {
                             // Cope with certain unicode escapes which are considered erroneous.
-                            isError = isInvalidUnicodeEscape(string.substring(i, i + increment));
+                            isError = isInvalidUnicodeEscape(string.substring(i, i + increment), string.charAt(0));
                         }
                     } else {
                         // Invalid escape sequence - we presume the user meant to use a two-character
@@ -154,13 +161,14 @@ public class PJavaTextStyler extends PCLikeTextStyler {
         segmentList.add(new PTextSegment(TYPE_STRING, string.substring(segmentStart)));
     }
     
-    private boolean isInvalidUnicodeEscape(String escapeHex) {
+    private boolean isInvalidUnicodeEscape(String escapeHex, char quoteType) {
         // From section 3.10.4 (Character Literals) of the JLS:
         // Because unicode escapes are processed very early in the compilation, it is
         // not valid to use them to represent newlines or carriage returns, since they would
         // be transformed into their line-terminating character equivalents before the string
         // is parsed.
-        return escapeHex.matches("[\\\\]u000[AaDd]");
+        String matchingQuoteUnicode = (quoteType == '"') ? "[\\\\]u0022" : "[\\\\]u0027";
+        return escapeHex.matches("[\\\\]u000[AaDd]") || escapeHex.matches(matchingQuoteUnicode);
     }
     
     private boolean isBasicEscapeCharacter(char ch) {
@@ -177,8 +185,7 @@ public class PJavaTextStyler extends PCLikeTextStyler {
             return true;
             
         default:
-            // Cope with octal escape sequences.
-            return isValidOctalDigit(ch);
+            return false;
         }
     }
     
