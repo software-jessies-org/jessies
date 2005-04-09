@@ -84,7 +84,7 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
-        boolean byWord = event.isControlDown();
+        boolean byWord = GuiUtilities.isMacOs() ? event.isAltDown() : event.isControlDown();
         boolean extendingSelection = event.isShiftDown();
         if (movementHandler.handleMovementKeys(event)) {
             return true;
