@@ -312,6 +312,24 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return new PCoordinates(lineIndex, charOffset);
     }
     
+    public PLineSegment getLineSegmentAtLocation(Point point) {
+        FontMetrics metrics = getFontMetrics(getFont());
+        int line = point.y / metrics.getHeight();
+        if (line >= getLineCount()) {
+            return null;
+        }
+        PLineSegment[] segments = getLineSegments(line);
+        int x = 0;
+        for (int i = 0; i < segments.length; i++) {
+            int width = segments[i].getDisplayWidth(metrics, x);
+            if (x + width > point.x) {
+                return segments[i];
+            }
+            x += width;
+        }
+        return null;
+    }
+    
     private PLineSegment[] getLineSegments(int lineIndex) {
         SplitLine splitLine = getSplitLine(lineIndex);
         PTextSegment[] text = textStyler.getLineSegments(splitLine);

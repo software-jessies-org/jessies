@@ -50,10 +50,12 @@ public class PHyperlinkTextStyler extends PAbstractTextStyler {
      * the text component.  If the styler handles the event, it should consume it.
      */
     public void mouseClicked(MouseEvent event, int clickLocation) {
-        CharSequence hyperlinkText = getHyperlinkCharSequenceAt(clickLocation);
-        if (hyperlinkText != null) {
-            hyperlinkClicked(hyperlinkText);
+        PLineSegment segment = textArea.getLineSegmentAtLocation(event.getPoint());
+        if (segment != null && segment.getStyleIndex() == HYPERLINK_STYLE) {
+            hyperlinkClicked(segment.getText());
             event.consume();
+        } else {
+            return;
         }
     }
     
@@ -65,28 +67,12 @@ public class PHyperlinkTextStyler extends PAbstractTextStyler {
      * Optionally returns a special mouse cursor to use when over the given location.  A null
      * return means that the default cursor should be used.
      */
-    public Cursor getCursorForPosition(int textLocation) {
-        if (getHyperlinkCharSequenceAt(textLocation) == null) {
-            return null;
-        } else {
+    public Cursor getCursorForLocation(Point point) {
+        PLineSegment segment = textArea.getLineSegmentAtLocation(point);
+        if (segment != null && segment.getStyleIndex() == HYPERLINK_STYLE) {
             return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+        } else {
+            return null;
         }
-    }
-    
-    private CharSequence getHyperlinkCharSequenceAt(int textLocation) {
-        int lineIndex = textArea.getLineOfOffset(textLocation);
-        int lineStart = textArea.getLineStartOffset(lineIndex);
-        int lineEnd = textArea.getLineEndOffset(lineIndex);
-        CharSequence line = textArea.getPTextBuffer().subSequence(lineStart, lineEnd);
-        Matcher matcher = highlightPattern.matcher(line);
-        int offsetInLine = textLocation - lineStart;
-        while (matcher.find()) {
-            if (offsetInLine >= matcher.start() && offsetInLine < matcher.end()) {
-                return line.subSequence(matcher.start(), matcher.end());
-            } else if (offsetInLine < matcher.start()) {
-                return null;  // Gone past - definitely no more work to do.
-            }
-        }
-        return null;
     }
 }
