@@ -55,8 +55,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     }
     
     public void mouseMoved(MouseEvent event) {
-        int textLocation = getLocationOfMouse(event);
-        Cursor newCursor = textArea.getPTextStyler().getCursorForPosition(textLocation);
+        Cursor newCursor = textArea.getPTextStyler().getCursorForLocation(event.getPoint());
         textArea.setCursor(newCursor);
     }
     

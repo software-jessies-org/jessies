@@ -38,7 +38,7 @@ public class PPlainTextStyler implements PTextStyler {
      * Optionally returns a special mouse cursor to use when over the given location.  A null
      * return means that the default cursor should be used.
      */
-    public Cursor getCursorForPosition(int textLocation) {
+    public Cursor getCursorForLocation(Point point) {
         return null;
     }
 }
