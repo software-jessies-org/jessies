@@ -66,7 +66,6 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     }
     
     private class SingleClickDragHandler implements DragHandler {
-        private boolean dragHandlerWasCalled = false;
         private int pressedOffset;
         
         public void makeInitialSelection(int pressedOffset) {
@@ -77,7 +76,6 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void mouseDragged(MouseEvent event) {
             int offset = getOffsetAtMouse(event);
             textArea.select(Math.min(offset, pressedOffset), Math.max(offset, pressedOffset));
-            dragHandlerWasCalled = true;
         }
         
         public void mouseReleased(MouseEvent event) {
