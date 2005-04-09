@@ -35,6 +35,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private ArrayList highlights = new ArrayList();
     private PTextStyler textStyler = PPlainTextStyler.INSTANCE;
     private int rightHandMarginColumn = NO_MARGIN;
+    private ArrayList caretListeners = new ArrayList();
     
     private int rowCount;
     private int columnCount;
@@ -74,6 +75,20 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         setFocusTraversalKeysEnabled(false);
         requestFocus();
         initSpellingChecking();
+    }
+    
+    public void addCaretListener(PCaretListener caretListener) {
+        caretListeners.add(caretListener);
+    }
+    
+    public void removeCaretListener(PCaretListener caretListener) {
+        caretListeners.remove(caretListener);
+    }
+    
+    private void fireCaretChangedEvent() {
+        for (int i = 0; i < caretListeners.size(); i++) {
+            ((PCaretListener) caretListeners.get(i)).caretMoved(getSelectionStart(), getSelectionEnd());
+        }
     }
     
     public PTextStyler getPTextStyler() {
@@ -134,6 +149,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         Point point = getViewCoordinates(getCoordinates(offsetToShow));
         FontMetrics metrics = getFontMetrics(getFont());
         scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
+        fireCaretChangedEvent();
     }
     
     public void insert(CharSequence chars) {
@@ -705,6 +721,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             SplitLine line = getSplitLine(i);
             System.err.println(i + ": line " + line.getLineIndex() + ", offset " + line.getOffset() + ", length " + line.getLength());
         }
+    }
+    
+    public int getVisibleLineCount() {
+        return splitLines.size();
     }
     
     private SplitLine getSplitLine(int index) {

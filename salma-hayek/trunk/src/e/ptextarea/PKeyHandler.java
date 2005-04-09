@@ -6,9 +6,11 @@ import e.util.*;
 
 public class PKeyHandler extends KeyAdapter {
     private PTextArea textArea;
+    private UpDownMovementHandler movementHandler = new UpDownMovementHandler();
     
     public PKeyHandler(PTextArea textArea) {
         this.textArea = textArea;
+        textArea.addCaretListener(movementHandler);
     }
     
     public void keyPressed(KeyEvent event) {
@@ -76,16 +78,17 @@ public class PKeyHandler extends KeyAdapter {
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
         boolean shiftDown = event.isShiftDown();
+        if (movementHandler.handleMovementKeys(event)) {
+            return true;
+        }
         switch (event.getKeyCode()) {
             case KeyEvent.VK_LEFT: moveCaret(shiftDown, caretLeft(shiftDown)); break;
             case KeyEvent.VK_RIGHT: moveCaret(shiftDown, caretRight(shiftDown)); break;
-            case KeyEvent.VK_UP: moveCaret(shiftDown, caretUp()); break;
-            case KeyEvent.VK_DOWN: moveCaret(shiftDown, caretDown()); break;
             case KeyEvent.VK_HOME: moveCaret(shiftDown, caretToStartOfLine()); break;
             case KeyEvent.VK_END: moveCaret(shiftDown, caretToEndOfLine()); break;
             case KeyEvent.VK_BACK_SPACE: backspace(); break;
             case KeyEvent.VK_DELETE: delete(); break;
-
+            
         default:
             return false;
         }
@@ -156,27 +159,58 @@ public class PKeyHandler extends KeyAdapter {
         }
     }
     
-    private int caretUp() {
-        int lineIndex = textArea.getLineOfOffset(textArea.getSelectionStart());
-        if (lineIndex == 0) {
-            return 0;
-        } else {
-            int charOffset = textArea.getSelectionStart() - textArea.getLineStartOffset(lineIndex);
-            lineIndex--;
-            charOffset = Math.min(charOffset, textArea.getLineList().getLine(lineIndex).getLengthBeforeTerminator());
-            return textArea.getLineStartOffset(lineIndex) + charOffset;
+    private class UpDownMovementHandler implements PCaretListener {
+        private boolean isEntered = false;
+        private int xPixelLocation = -1;
+        
+        public void caretMoved(int selectionStart, int selectionEnd) {
+            if (isEntered == false) {
+                xPixelLocation = -1;
+            }
         }
-    }
-    
-    private int caretDown() {
-        int lineIndex = textArea.getLineOfOffset(textArea.getSelectionEnd());
-        if (lineIndex == textArea.getLineCount() - 1) {
-            return textArea.getPTextBuffer().length();
-        } else {
-            int charOffset = textArea.getSelectionEnd() - textArea.getLineStartOffset(lineIndex);
-            lineIndex++;
-            charOffset = Math.min(charOffset, textArea.getLineList().getLine(lineIndex).getLengthBeforeTerminator());
-            return textArea.getLineStartOffset(lineIndex) + charOffset;
+        
+        public boolean handleMovementKeys(KeyEvent event) {
+            isEntered = true;
+            if (xPixelLocation == -1) {
+                xPixelLocation = getCurrentXPixelLocation();
+            }
+            boolean shiftDown = event.isShiftDown();
+            try {
+                switch (event.getKeyCode()) {
+                    case KeyEvent.VK_UP: moveCaret(shiftDown, caretUp()); return true;
+                    case KeyEvent.VK_DOWN: moveCaret(shiftDown, caretDown()); return true;
+                    default: return false;
+                }
+            } finally {
+                isEntered = false;
+            }
+        }
+        
+        private int getCurrentXPixelLocation() {
+            PCoordinates coords = textArea.getCoordinates(textArea.getSelectionStart());
+            return textArea.getViewCoordinates(coords).x;
+        }
+        
+        private int caretUp() {
+            PCoordinates coords = textArea.getCoordinates(textArea.getSelectionStart());
+            int lineIndex = coords.getLineIndex();
+            if (lineIndex == 0) {
+                return 0;
+            } else {
+                int y = textArea.getViewCoordinates(new PCoordinates(lineIndex - 1, 0)).y;
+                return textArea.getTextIndex(textArea.getNearestCoordinates(new Point(xPixelLocation, y)));
+            }
+        }
+        
+        private int caretDown() {
+            PCoordinates coords = textArea.getCoordinates(textArea.getSelectionStart());
+            int lineIndex = coords.getLineIndex();
+            if (lineIndex == textArea.getVisibleLineCount() - 1) {
+                return textArea.getPTextBuffer().length();
+            } else {
+                int y = textArea.getViewCoordinates(new PCoordinates(lineIndex + 1, 0)).y;
+                return textArea.getTextIndex(textArea.getNearestCoordinates(new Point(xPixelLocation, y)));
+            }
         }
     }
 }
