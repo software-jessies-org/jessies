@@ -2,6 +2,7 @@ package e.ptextarea;
 
 
 import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
@@ -859,6 +860,40 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             result.height = Math.max(result.height, rowCount * getLineHeight() + insets.top + insets.bottom);
         }
         return result;
+    }
+    
+    public void paste() {
+        try {
+            Toolkit toolkit = getToolkit();
+            Transferable contents = toolkit.getSystemClipboard().getContents(this);
+            if (toolkit.getSystemSelection() != null) {
+                contents = toolkit.getSystemSelection().getContents(this);
+            }
+            DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
+            String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
+            insert(string);
+        } catch (Exception ex) {
+            Log.warn("Couldn't paste.", ex);
+        }
+    }
+    
+    public void copy() {
+        if (hasSelection() == false) {
+            return;
+        }
+        StringSelection stringSelection = new StringSelection(getSelectedText());
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        toolkit.getSystemClipboard().setContents(stringSelection, null);
+        if (toolkit.getSystemSelection() != null) {
+            toolkit.getSystemSelection().setContents(stringSelection, null);
+        }
+    }
+    
+    public void cut() {
+        if (hasSelection()) {
+            copy();
+            replaceSelection("");
+        }
     }
     
     public class SplitLine {
