@@ -42,9 +42,6 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     }
     
     public void mouseReleased(MouseEvent event) {
-        if (dragHandler != null) {
-            dragHandler.mouseReleased(event);
-        }
         dragHandler = null;
     }
     
@@ -62,7 +59,6 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     private interface DragHandler {
         public void makeInitialSelection(int pressedOffset);
         public void mouseDragged(MouseEvent event);
-        public void mouseReleased(MouseEvent event);
     }
     
     private class SingleClickDragHandler implements DragHandler {
@@ -76,10 +72,6 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void mouseDragged(MouseEvent event) {
             int offset = getOffsetAtMouse(event);
             textArea.select(Math.min(offset, pressedOffset), Math.max(offset, pressedOffset));
-        }
-        
-        public void mouseReleased(MouseEvent event) {
-            // Do nothing. We've already positioned the caret.
         }
     }
     
@@ -100,10 +92,6 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void mouseDragged(MouseEvent event) {
             int offset = getOffsetAtMouse(event);
             selectByWord(Math.min(offset, pressedOffset), Math.max(offset, pressedOffset));
-        }
-        
-        public void mouseReleased(MouseEvent event) {
-            // Do nothing. We've already positioned the caret.
         }
     }
     
@@ -128,10 +116,6 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             int minLine = Math.min(currentLine, pressedLine);
             int maxLine = Math.max(currentLine, pressedLine);
             textArea.select(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine));
-        }
-        
-        public void mouseReleased(MouseEvent event) {
-            // Do nothing. We've already positioned the caret.
         }
     }
 }
