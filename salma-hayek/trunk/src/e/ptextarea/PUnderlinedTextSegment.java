@@ -14,4 +14,12 @@ public class PUnderlinedTextSegment extends PTextSegment {
         int width = getDisplayWidth(metrics, x);
         graphics.drawLine(x, yBaseline, x + width, yBaseline);
     }
+    
+    public PTextSegment subSegment(int start) {
+        return new PUnderlinedTextSegment(getStyleIndex(), getText().substring(start));
+    }
+    
+    public PTextSegment subSegment(int start, int end) {
+        return new PUnderlinedTextSegment(getStyleIndex(), getText().substring(start, end));
+    }
 }
