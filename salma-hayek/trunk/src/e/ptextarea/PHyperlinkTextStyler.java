@@ -50,12 +50,17 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      * the text component.  If the styler handles the event, it should consume it.
      */
     public void mouseClicked(MouseEvent event, int offset) {
-        PLineSegment segment = textArea.getLineSegmentAtLocation(event.getPoint());
-        if (segment != null && segment.getStyleIndex() == HYPERLINK_STYLE) {
-            hyperlinkClicked(segment.getText());
-            event.consume();
-        } else {
-            return;
+        int lineIndex = textArea.getLineOfOffset(offset);
+        int lineStart = textArea.getLineStartOffset(lineIndex);
+        int lineEnd = textArea.getLineEndOffset(lineIndex);
+        int lineOffset = offset - lineStart;
+        CharSequence line = textArea.getPTextBuffer().subSequence(lineStart, lineEnd);
+        Matcher matcher = highlightPattern.matcher(line);
+        while (matcher.find() && isAcceptableMatch(line, matcher)) {
+            if (lineOffset >= matcher.start() && lineOffset < matcher.end()) {
+                hyperlinkClicked(textArea.getPTextBuffer().subSequence(lineStart + matcher.start(), lineStart + matcher.end()));
+                event.consume();
+            }
         }
     }
     
@@ -69,7 +74,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      * Override this to perform any extra processing that can't be done by a
      * regular expression.
      */
-    public abstract boolean isAcceptableMatch(String line, Matcher matcher);
+    public abstract boolean isAcceptableMatch(CharSequence line, Matcher matcher);
     
     /**
      * Optionally returns a special mouse cursor to use when over the given location.  A null

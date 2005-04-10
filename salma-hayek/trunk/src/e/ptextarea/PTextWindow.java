@@ -72,7 +72,7 @@ public class PTextWindow {
                     public void hyperlinkClicked(CharSequence linkText) {
                         System.out.println("Hyperlink clicked: " + linkText);
                     }
-                    public boolean isAcceptableMatch(String line, java.util.regex.Matcher matcher) {
+                    public boolean isAcceptableMatch(CharSequence line, java.util.regex.Matcher matcher) {
                         return true;
                     }
                 };
