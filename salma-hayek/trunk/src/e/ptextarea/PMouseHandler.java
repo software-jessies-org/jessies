@@ -88,14 +88,22 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         
         public void makeInitialSelection(int pressedOffset) {
             this.pressedOffset = pressedOffset;
+            selectByWord(pressedOffset, pressedOffset);
+        }
+        
+        private void selectByWord(int startOffset, int endOffset) {
+            CharSequence chars = textArea.getPTextBuffer();
             String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
-            textArea.select(PWordUtilities.getWordStart(textArea.getPTextBuffer(), pressedOffset, stopChars), PWordUtilities.getWordEnd(textArea.getPTextBuffer(), pressedOffset, stopChars));
+            textArea.select(PWordUtilities.getWordStart(chars, startOffset, stopChars), PWordUtilities.getWordEnd(chars, endOffset, stopChars));
         }
         
         public void mouseDragged(MouseEvent event) {
+            int offset = getOffsetAtMouse(event);
+            selectByWord(Math.min(offset, pressedOffset), Math.max(offset, pressedOffset));
         }
         
         public void mouseReleased(MouseEvent event) {
+            // Do nothing. We've already positioned the caret.
         }
     }
     
@@ -122,6 +130,8 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             textArea.select(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine));
         }
         
-        public void mouseReleased(MouseEvent event) { }
+        public void mouseReleased(MouseEvent event) {
+            // Do nothing. We've already positioned the caret.
+        }
     }
 }
