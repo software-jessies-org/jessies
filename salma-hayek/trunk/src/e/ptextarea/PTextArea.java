@@ -309,13 +309,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             return new PCoordinates(0, 0);
         }
         generateLineWrappings();
-        final int maxLineIndex = splitLines.size() - 1;
-        FontMetrics metrics = getFontMetrics(getFont());
-        int lineIndex = point.y / metrics.getHeight();
-        if (lineIndex > maxLineIndex) {
-            point.x = Integer.MAX_VALUE;
-        }
-        lineIndex = Math.max(0, Math.min(maxLineIndex, lineIndex));
+        final int lineIndex = getLineIndexAtLocation(point);
+        final FontMetrics metrics = getFontMetrics(getFont());
         PLineSegment[] segments = getLineSegments(lineIndex);
         int charOffset = 0;
         int x = 0;
@@ -331,12 +326,31 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return new PCoordinates(lineIndex, charOffset);
     }
     
+    /**
+     * Returns the line index corresponding to the given point. To properly
+     * cope with clicks past the end of the text, this method may update point
+     * to have a huge x-coordinate. The line index will be that of the last
+     * line in the document, because that's how other text components behave;
+     * it's just that all clicks after the end of the text should correspond
+     * to the last character in the document, and a huge x-coordinate is the
+     * easiest way to ensure that code that goes on to work out which
+     * character we're pointing to on the returned line will behave correctly.
+     */
+    private int getLineIndexAtLocation(Point point) {
+        FontMetrics metrics = getFontMetrics(getFont());
+        final int maxLineIndex = splitLines.size() - 1;
+        int lineIndex = point.y / metrics.getHeight();
+        if (lineIndex > maxLineIndex) {
+            point.x = Integer.MAX_VALUE;
+        }
+        lineIndex = Math.max(0, Math.min(maxLineIndex, lineIndex));
+        return lineIndex;
+    }
+    
     public PLineSegment getLineSegmentAtLocation(Point point) {
         generateLineWrappings();
         FontMetrics metrics = getFontMetrics(getFont());
-        int line = point.y / metrics.getHeight();
-        line = Math.max(0, Math.min(splitLines.size() - 1, line));
-        PLineSegment[] segments = getLineSegments(line);
+        PLineSegment[] segments = getLineSegments(getLineIndexAtLocation(point));
         int x = 0;
         for (int i = 0; i < segments.length; i++) {
             int width = segments[i].getDisplayWidth(metrics, x);
