@@ -56,6 +56,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.selection = new SelectionHighlight(this, 0, 0);
+        setFont(UIManager.getFont("TextArea.font"));
         setAutoscrolls(true);
         setBackground(Color.WHITE);
         setText(new PTextBuffer());
@@ -863,7 +864,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public Dimension getPreferredSize() {
-        cacheFontMetrics();
         Dimension result = super.getPreferredSize();
         Insets insets = getInsets();
         if (columnCount != 0) {
