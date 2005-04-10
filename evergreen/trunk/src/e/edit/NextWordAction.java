@@ -11,7 +11,7 @@ public class NextWordAction extends WordAction {
     public int getNewOffset(CharSequence text, int offset, String stopChars) {
         // If we're at the end of the document, we're not going far.
         if (offset == text.length()) {
-            return 0;
+            return offset;
         }
         
         // If we're in a word, go to the end of this word.
