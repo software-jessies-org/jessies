@@ -7,7 +7,7 @@ import javax.swing.*;
 
 public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     private PTextArea textArea;
-    private DragHandler dragHandler;
+    private PDragHandler dragHandler;
     
     public PMouseHandler(PTextArea textArea) {
         this.textArea = textArea;
@@ -32,11 +32,13 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         }
     }
     
-    private DragHandler getDragHandlerForClick(MouseEvent e) {
+    private PDragHandler getDragHandlerForClick(MouseEvent e) {
         switch (e.getClickCount() % 3) {
         case 0: return new TripleClickDragHandler();
         case 1: return new SingleClickDragHandler();
-        case 2: return new DoubleClickDragHandler();
+        case 2:
+           PDragHandler result = textArea.getPTextStyler().getDoubleClickDragHandler(getOffsetAtMouse(e));
+            return (result == null) ? new DoubleClickDragHandler() : result;
         default: throw new RuntimeException("Logically impossible");
         }
     }
@@ -52,7 +54,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     
     public void mouseDragged(MouseEvent event) {
         if (dragHandler != null) {
-            dragHandler.mouseDragged(event);
+            dragHandler.mouseDragged(getOffsetAtMouse(event));
         }
     }
     
@@ -61,24 +63,21 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         textArea.setCursor(newCursor);
     }
     
-    private interface DragHandler {
-        public void makeInitialSelection(int pressedOffset);
-        public void mouseDragged(MouseEvent event);
-    }
-    
-    private class SingleClickDragHandler implements DragHandler {
+    private class SingleClickDragHandler implements PDragHandler {
         public void makeInitialSelection(int pressedOffset) {
             textArea.select(pressedOffset, pressedOffset);
         }
         
-        public void mouseDragged(MouseEvent event) {
-            textArea.changeUnanchoredSelectionExtreme(getOffsetAtMouse(event));
+        public void mouseDragged(int newOffset) {
+            textArea.changeUnanchoredSelectionExtreme(newOffset);
         }
     }
     
-    private class DoubleClickDragHandler implements DragHandler {
+    private class DoubleClickDragHandler implements PDragHandler {
         private int pressedOffset;
         
+        // FIXME: doesn't work the same as native components.  The initial selection start should remain the
+        // anchor in all cases.
         public void makeInitialSelection(int pressedOffset) {
             this.pressedOffset = pressedOffset;
             selectByWord(pressedOffset, pressedOffset, false);
@@ -90,15 +89,14 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             textArea.setSelection(PWordUtilities.getWordStart(chars, startOffset, stopChars), PWordUtilities.getWordEnd(chars, endOffset, stopChars), endIsAnchored);
         }
         
-        public void mouseDragged(MouseEvent event) {
-            int offset = getOffsetAtMouse(event);
-            int start = Math.min(offset, pressedOffset);
-            int end = Math.max(offset, pressedOffset);
+        public void mouseDragged(int newOffset) {
+            int start = Math.min(newOffset, pressedOffset);
+            int end = Math.max(newOffset, pressedOffset);
             selectByWord(start, end, (pressedOffset == start));
         }
     }
     
-    private class TripleClickDragHandler implements DragHandler {
+    private class TripleClickDragHandler implements PDragHandler {
         private int pressedLine;
         
         public void makeInitialSelection(int pressedOffset) {
@@ -114,8 +112,8 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             }
         }
         
-        public void mouseDragged(MouseEvent event) {
-            int currentLine = textArea.getLineOfOffset(getOffsetAtMouse(event));
+        public void mouseDragged(int newOffset) {
+            int currentLine = textArea.getLineOfOffset(newOffset);
             int minLine = Math.min(currentLine, pressedLine);
             int maxLine = Math.max(currentLine, pressedLine);
             textArea.setSelection(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine), (pressedLine == minLine));
