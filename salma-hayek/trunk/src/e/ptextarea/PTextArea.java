@@ -163,8 +163,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             }
         }
         
-        int offsetToShow = selectionEndIsAnchor ? getSelectionEnd() : getSelectionStart();
-        Point point = getViewCoordinates(getCoordinates(offsetToShow));
+        Point point = getViewCoordinates(getCoordinates(getUnanchoredSelectionExtreme()));
         scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
         fireCaretChangedEvent();
     }
