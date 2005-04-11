@@ -274,7 +274,7 @@ public class PKeyHandler extends KeyAdapter {
         }
         
         private int caretDown() {
-            PCoordinates coords = textArea.getCoordinates(textArea.getSelectionStart());
+            PCoordinates coords = textArea.getCoordinates(textArea.getSelectionEnd());
             int lineIndex = coords.getLineIndex();
             if (lineIndex == textArea.getVisibleLineCount() - 1) {
                 return textArea.getPTextBuffer().length();
