@@ -12,6 +12,10 @@ link_in_usr_local_bin() {
 
 cd /usr/local/ || die "couldn't cd to /usr/local"
 
+if ! test -w . ; then
+  die "cannot write to /usr/local - this script needs to be run as root"
+fi
+
 # Install Java in /usr/local, and put links to java and javac in /usr/local/bin.
 java_installer=/net/mirror/mirror-link/java/jdk-1_5_0_01-linux-i586.bin
 JAVA_INSTALL_DIR=/usr/local/jdk1.5.0_01
