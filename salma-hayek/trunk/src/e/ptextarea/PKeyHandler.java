@@ -145,13 +145,11 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private void moveCaret(boolean extendingSelection, int newOffset) {
-        int start = newOffset;
-        int end = newOffset;
         if (extendingSelection) {
-            start = Math.min(textArea.getSelectionStart(), start);
-            end = Math.max(textArea.getSelectionEnd(), end);
+            textArea.changeUnanchoredSelectionExtreme(newOffset);
+        } else {
+            textArea.setCaretPosition(newOffset);
         }
-        textArea.select(start, end);
     }
     
     private int caretToStartOfLine() {
@@ -165,37 +163,27 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private void moveLeft(boolean byWord, boolean extendingSelection) {
-        int newOffset = byWord ? caretToPreviousWord() : caretLeft(extendingSelection);
+        int newOffset = byWord ? caretToPreviousWord() : caretLeft();
         moveCaret(extendingSelection, newOffset);
     }
     
     private void moveRight(boolean byWord, boolean extendingSelection) {
-        int newOffset = byWord ? caretToNextWord() : caretRight(extendingSelection);
+        int newOffset = byWord ? caretToNextWord() : caretRight();
         moveCaret(extendingSelection, newOffset);
     }
     
-    private int caretLeft(boolean extendingSelection) {
-        // FIXME: we need to remember a bias for keyboard shift+arrow movement.
-        if (extendingSelection || textArea.getSelectionStart() == textArea.getSelectionEnd()) {
-            return Math.max(0, textArea.getSelectionStart() - 1);
-        } else {
-            return textArea.getSelectionStart();
-        }
+    private int caretLeft() {
+        return Math.max(0, textArea.getUnanchoredSelectionExtreme() - 1);
     }
     
-    private int caretRight(boolean extendingSelection) {
-        // FIXME: we need to remember a bias for keyboard shift+arrow movement.
-        if (extendingSelection || textArea.getSelectionStart() == textArea.getSelectionEnd()) {
-            return Math.min(textArea.getSelectionEnd() + 1, textArea.getPTextBuffer().length());
-        } else {
-            return textArea.getSelectionEnd();
-        }
+    private int caretRight() {
+        return Math.min(textArea.getUnanchoredSelectionExtreme() + 1, textArea.getPTextBuffer().length());
     }
     
     private int caretToPreviousWord() {
         CharSequence chars = textArea.getPTextBuffer();
         String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
-        int offset = textArea.getSelectionStart();
+        int offset = textArea.getUnanchoredSelectionExtreme();
         
         // If we're at the start of the document, we're not going far.
         if (offset == 0) {
@@ -214,7 +202,7 @@ public class PKeyHandler extends KeyAdapter {
     private int caretToNextWord() {
         CharSequence chars = textArea.getPTextBuffer();
         String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
-        int offset = textArea.getSelectionEnd();
+        int offset = textArea.getUnanchoredSelectionExtreme();
         
         // If we're at the end of the document, we're not going far.
         if (offset == chars.length()) {
@@ -258,12 +246,12 @@ public class PKeyHandler extends KeyAdapter {
         }
         
         private int getCurrentXPixelLocation() {
-            PCoordinates coords = textArea.getCoordinates(textArea.getSelectionStart());
+            PCoordinates coords = textArea.getCoordinates(textArea.getUnanchoredSelectionExtreme());
             return textArea.getViewCoordinates(coords).x;
         }
         
         private int caretUp() {
-            PCoordinates coords = textArea.getCoordinates(textArea.getSelectionStart());
+            PCoordinates coords = textArea.getCoordinates(textArea.getUnanchoredSelectionExtreme());
             int lineIndex = coords.getLineIndex();
             if (lineIndex == 0) {
                 return 0;
@@ -274,7 +262,7 @@ public class PKeyHandler extends KeyAdapter {
         }
         
         private int caretDown() {
-            PCoordinates coords = textArea.getCoordinates(textArea.getSelectionEnd());
+            PCoordinates coords = textArea.getCoordinates(textArea.getUnanchoredSelectionExtreme());
             int lineIndex = coords.getLineIndex();
             if (lineIndex == textArea.getVisibleLineCount() - 1) {
                 return textArea.getPTextBuffer().length();

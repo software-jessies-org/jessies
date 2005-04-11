@@ -67,16 +67,12 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     }
     
     private class SingleClickDragHandler implements DragHandler {
-        private int pressedOffset;
-        
         public void makeInitialSelection(int pressedOffset) {
-            this.pressedOffset = pressedOffset;
             textArea.select(pressedOffset, pressedOffset);
         }
         
         public void mouseDragged(MouseEvent event) {
-            int offset = getOffsetAtMouse(event);
-            textArea.select(Math.min(offset, pressedOffset), Math.max(offset, pressedOffset));
+            textArea.changeUnanchoredSelectionExtreme(getOffsetAtMouse(event));
         }
     }
     
@@ -85,18 +81,20 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         
         public void makeInitialSelection(int pressedOffset) {
             this.pressedOffset = pressedOffset;
-            selectByWord(pressedOffset, pressedOffset);
+            selectByWord(pressedOffset, pressedOffset, false);
         }
         
-        private void selectByWord(int startOffset, int endOffset) {
+        private void selectByWord(int startOffset, int endOffset, boolean endIsAnchored) {
             CharSequence chars = textArea.getPTextBuffer();
             String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
-            textArea.select(PWordUtilities.getWordStart(chars, startOffset, stopChars), PWordUtilities.getWordEnd(chars, endOffset, stopChars));
+            textArea.setSelection(PWordUtilities.getWordStart(chars, startOffset, stopChars), PWordUtilities.getWordEnd(chars, endOffset, stopChars), endIsAnchored);
         }
         
         public void mouseDragged(MouseEvent event) {
             int offset = getOffsetAtMouse(event);
-            selectByWord(Math.min(offset, pressedOffset), Math.max(offset, pressedOffset));
+            int start = Math.min(offset, pressedOffset);
+            int end = Math.max(offset, pressedOffset);
+            selectByWord(start, end, (pressedOffset == start));
         }
     }
     
@@ -120,7 +118,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             int currentLine = textArea.getLineOfOffset(getOffsetAtMouse(event));
             int minLine = Math.min(currentLine, pressedLine);
             int maxLine = Math.max(currentLine, pressedLine);
-            textArea.select(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine));
+            textArea.setSelection(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine), (pressedLine == minLine));
         }
     }
 }

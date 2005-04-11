@@ -1,3 +1,5 @@
 Items to be done for PTextArea:
 
 * Create a language-specific API to work out double-click selections, and use this in the mouse handler.
+
+* Refactor the way split lines are updated to work in terms of PLineSegments.

@@ -29,6 +29,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private static final Stroke WRAP_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 1.0f, 2.0f }, 0.0f);
     
     private SelectionHighlight selection;
+    private boolean selectionEndIsAnchor;  // Otherwise, selection start is anchor.
     
     private PLineList lines;
     private List splitLines;  // TODO - Write a split buffer-style List implementation.
@@ -125,7 +126,24 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         select(offset, offset);
     }
     
+    public int getUnanchoredSelectionExtreme() {
+        return selectionEndIsAnchor ? getSelectionStart() : getSelectionEnd();
+    }
+    
+    public void changeUnanchoredSelectionExtreme(int newPosition) {
+        int anchorPosition = selectionEndIsAnchor ? getSelectionEnd() : getSelectionStart();
+        int minPosition = Math.min(newPosition, anchorPosition);
+        int maxPosition = Math.max(newPosition, anchorPosition);
+        boolean endIsAnchor = (maxPosition == anchorPosition);
+        setSelection(minPosition, maxPosition, endIsAnchor);
+    }
+    
     public void select(int start, int end) {
+        setSelection(start, end, false);
+    }
+    
+    public void setSelection(int start, int end, boolean selectionEndIsAnchor) {
+        this.selectionEndIsAnchor = selectionEndIsAnchor;
         SelectionHighlight oldSelection = selection;
         repaintCaret();
         selection = new SelectionHighlight(this, start, end);
@@ -145,10 +163,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             }
         }
         
-        int offsetToShow = getSelectionStart();
-        if (oldSelection.getEndIndex() != getSelectionEnd()) {
-            offsetToShow = getSelectionEnd();
-        }
+        int offsetToShow = selectionEndIsAnchor ? getSelectionEnd() : getSelectionStart();
         Point point = getViewCoordinates(getCoordinates(offsetToShow));
         scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
         fireCaretChangedEvent();
