@@ -50,17 +50,10 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      * the text component.  If the styler handles the event, it should consume it.
      */
     public void mouseClicked(MouseEvent event, int offset) {
-        int lineIndex = textArea.getLineOfOffset(offset);
-        int lineStart = textArea.getLineStartOffset(lineIndex);
-        int lineEnd = textArea.getLineEndOffset(lineIndex);
-        int lineOffset = offset - lineStart;
-        CharSequence line = textArea.getPTextBuffer().subSequence(lineStart, lineEnd);
-        Matcher matcher = highlightPattern.matcher(line);
-        while (matcher.find() && isAcceptableMatch(line, matcher)) {
-            if (lineOffset >= matcher.start() && lineOffset < matcher.end()) {
-                hyperlinkClicked(textArea.getPTextBuffer().subSequence(lineStart + matcher.start(), lineStart + matcher.end()));
-                event.consume();
-            }
+        PLineSegment segment = textArea.getLineSegmentAtLocation(event.getPoint());
+        if (segment instanceof PTextSegment && segment.getStyleIndex() == HYPERLINK_STYLE) {
+            hyperlinkClicked(((PTextSegment) segment).getSuperSegment().getText());
+            event.consume();
         }
     }
     
