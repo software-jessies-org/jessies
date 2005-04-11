@@ -6,6 +6,10 @@ public class PUnderlinedTextSegment extends PTextSegment {
     public PUnderlinedTextSegment(int styleIndex, String text) {
         super(styleIndex, text);
     }
+
+    public PUnderlinedTextSegment(int styleIndex, String text, PTextSegment superSegment) {
+        super(styleIndex, text, superSegment);
+    }
     
     public void paint(Graphics2D graphics, int x, int yBaseline) {
         super.paint(graphics, x, yBaseline);
@@ -16,10 +20,10 @@ public class PUnderlinedTextSegment extends PTextSegment {
     }
     
     public PTextSegment subSegment(int start) {
-        return new PUnderlinedTextSegment(getStyleIndex(), getText().substring(start));
+        return new PUnderlinedTextSegment(getStyleIndex(), getText().substring(start), getSuperSegment());
     }
     
     public PTextSegment subSegment(int start, int end) {
-        return new PUnderlinedTextSegment(getStyleIndex(), getText().substring(start, end));
+        return new PUnderlinedTextSegment(getStyleIndex(), getText().substring(start, end), getSuperSegment());
     }
 }

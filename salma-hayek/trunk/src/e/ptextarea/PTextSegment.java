@@ -12,10 +12,18 @@ import java.awt.*;
 public class PTextSegment implements PLineSegment {
     private int styleIndex;
     private String text;
+    private PTextSegment superSegment;
     
     public PTextSegment(int styleIndex, String text) {
         this.styleIndex = styleIndex;
         this.text = text;
+        superSegment = this;
+    }
+    
+    public PTextSegment(int styleIndex, String text, PTextSegment superSegment) {
+        this.styleIndex = styleIndex;
+        this.text = text;
+        this.superSegment = superSegment;
     }
     
     public int getStyleIndex() {
@@ -26,12 +34,20 @@ public class PTextSegment implements PLineSegment {
         return text;
     }
     
+    /**
+     * Return the PTextSegment that this segment is a subsegment of, or <code>this</code>
+     * if this segment isn't a subsegment of another.
+     */
+    public PTextSegment getSuperSegment() {
+        return superSegment;
+    }
+    
     public PTextSegment subSegment(int start) {
-        return new PTextSegment(styleIndex, text.substring(start));
+        return new PTextSegment(styleIndex, text.substring(start), getSuperSegment());
     }
     
     public PTextSegment subSegment(int start, int end) {
-        return new PTextSegment(styleIndex, text.substring(start, end));
+        return new PTextSegment(styleIndex, text.substring(start, end), getSuperSegment());
     }
     
     public int getLength() {
