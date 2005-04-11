@@ -3,6 +3,7 @@ package e.ptextarea;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     private PTextArea textArea;
@@ -16,10 +17,14 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         if (e.isPopupTrigger()) {
             return;
         }
-        int pressedOffset = getOffsetAtMouse(e);
         if (e.getClickCount() == 1) {
             textArea.requestFocus();
+            if (SwingUtilities.isMiddleMouseButton(e)) {
+                textArea.pasteSystemSelection();
+                return;
+            }
         }
+        int pressedOffset = getOffsetAtMouse(e);
         textArea.getPTextStyler().mouseClicked(e, pressedOffset);
         if (e.isConsumed() == false) {
             dragHandler = getDragHandlerForClick(e);

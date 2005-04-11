@@ -875,11 +875,27 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return result;
     }
     
+    /**
+     * Pastes the clipboard contents or, if that's not available, the system
+     * selection. The pasted content replaces the selection.
+     */
     public void paste() {
+        paste(false);
+    }
+    
+    /**
+     * Pastes X11's "selection", an activity usually associated with a
+     * middle-button click. The pasted content replaces the selection.
+     */
+    public void pasteSystemSelection() {
+        paste(true);
+    }
+    
+    private void paste(boolean onlyPasteSystemSelection) {
         try {
             Toolkit toolkit = getToolkit();
             Transferable contents = toolkit.getSystemClipboard().getContents(this);
-            if (toolkit.getSystemSelection() != null) {
+            if (onlyPasteSystemSelection || toolkit.getSystemSelection() != null) {
                 contents = toolkit.getSystemSelection().getContents(this);
             }
             DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
