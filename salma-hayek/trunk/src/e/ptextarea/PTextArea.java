@@ -47,6 +47,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private int rowCount;
     private int columnCount;
     
+    private boolean wordWrap;
+    
     private PTextAreaSpellingChecker spellingChecker;
     
     public PTextArea() {
@@ -57,6 +59,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.selection = new SelectionHighlight(this, 0, 0);
+        this.wordWrap = false;
         setFont(UIManager.getFont("TextArea.font"));
         setAutoscrolls(true);
         setBackground(Color.WHITE);
@@ -250,6 +253,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return getSplitLine(getCoordinates(offset).getLineIndex()).getLineIndex();
     }
     
+    public void setWrapStyleWord(boolean newWordWrapState) {
+        if (wordWrap != newWordWrapState) {
+            wordWrap = newWordWrapState;
+            revalidateLineWrappings();
+        }
+    }
+    
     /**
      * Sets the column number at which to draw the margin. Typically, this is
      * 80 when using a fixed-width font. Use the constant NO_MARGIN to suppress
@@ -268,8 +278,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         super.setFont(font);
         cacheFontMetrics();
         showRightHandMarginAt(GuiUtilities.isFontFixedWidth(font) ? 80 : NO_MARGIN);
-        invalidateLineWrappings();
-        generateLineWrappings();
+        revalidateLineWrappings();
         repaint();
     }
     
@@ -694,6 +703,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return (splitLines == null);
     }
     
+    private synchronized void revalidateLineWrappings() {
+        invalidateLineWrappings();
+        generateLineWrappings();
+    }
+    
     private synchronized void invalidateLineWrappings() {
         splitLines = null;
     }
@@ -781,9 +795,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
         width = Math.max(width, MIN_WIDTH);  // Ensure we're at least a sensible width.
         if (line.getWidth() <= width) {
+            // The whole line fits.
             splitLines.add(index, new SplitLine(lineIndex, 0, line.getLength()));
             addedCount++;
         } else {
+            // The line's too long, so break it into SplitLines.
             int x = 0;
             CharSequence chars = line.getContents();
             int offset = 0;
@@ -791,6 +807,19 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 char ch = chars.charAt(i);
                 x = addCharWidth(x, ch);
                 if (x >= width - getMinimumWrapMarkWidth()) {
+                    if (wordWrap) {
+                        int splitOffset = i;
+                        for (; splitOffset >= 0; --splitOffset) {
+                            ch = chars.charAt(splitOffset);
+                            if (ch == ' ') {
+                                // Break so that the word goes to the next line
+                                // but the inter-word character stays where it
+                                // was.
+                                i = splitOffset + 1;
+                                break;
+                            }
+                        }
+                    }
                     splitLines.add(index++, new SplitLine(lineIndex, offset, i - offset));
                     addedCount++;
                     offset = i;
@@ -837,8 +866,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         lines = new PLineList(text);
         lines.addLineListener(this);
         text.addTextListener(anchorSet);
-        invalidateLineWrappings();
-        generateLineWrappings();
+        revalidateLineWrappings();
     }
     
     /**

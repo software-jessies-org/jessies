@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 public class PTextWindow {
     private PTextWindow() { }
@@ -39,7 +40,8 @@ public class PTextWindow {
                 JFrame frame = new JFrame("PTextArea Test: " + filename);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 JScrollPane scroller = new JScrollPane(area);
-                frame.getContentPane().add(scroller);
+                frame.getContentPane().add(scroller, BorderLayout.CENTER);
+                frame.getContentPane().add(makeControls(area), BorderLayout.NORTH);
                 frame.setJMenuBar(makeMenuBar());
                 frame.setSize(new Dimension(600, 600));
                 frame.setLocationRelativeTo(null);
@@ -51,6 +53,16 @@ public class PTextWindow {
                 });
             }
         });
+    }
+    
+    private static JComponent makeControls(final PTextArea area) {
+        final JCheckBox wordWrap = new JCheckBox("Word Wrap", false);
+        wordWrap.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                area.setWrapStyleWord(wordWrap.isSelected());
+            }
+        });
+        return wordWrap;
     }
     
     private static PTextStyler getTextStyler(String filename, PTextArea textArea) {
