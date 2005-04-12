@@ -808,8 +808,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 x = addCharWidth(x, ch);
                 if (x >= width - getMinimumWrapMarkWidth()) {
                     if (wordWrap) {
-                        int splitOffset = i;
-                        for (; splitOffset >= 0; --splitOffset) {
+                        for (int splitOffset = i; splitOffset >= 0; --splitOffset) {
                             if (chars.charAt(splitOffset) == ' ') {
                                 // Break so that the word goes to the next line
                                 // but the inter-word character stays where it
