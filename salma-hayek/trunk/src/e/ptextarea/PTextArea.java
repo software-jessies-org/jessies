@@ -810,12 +810,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                     if (wordWrap) {
                         int splitOffset = i;
                         for (; splitOffset >= 0; --splitOffset) {
-                            ch = chars.charAt(splitOffset);
-                            if (ch == ' ') {
+                            if (chars.charAt(splitOffset) == ' ') {
                                 // Break so that the word goes to the next line
                                 // but the inter-word character stays where it
                                 // was.
                                 i = splitOffset + 1;
+                                ch = chars.charAt(i);
                                 break;
                             }
                         }
