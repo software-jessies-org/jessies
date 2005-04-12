@@ -79,6 +79,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 if (getWidth() != lastWidth) {
                     lastWidth = getWidth();
                     invalidateLineWrappings();
+                    repaint();
                 }
             }
         });
