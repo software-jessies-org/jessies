@@ -790,7 +790,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             for (int i = 0; i < chars.length(); i++) {
                 char ch = chars.charAt(i);
                 x = addCharWidth(x, ch);
-                if (x >= width) {
+                if (x >= width - getMinimumWrapMarkWidth()) {
                     splitLines.add(index++, new SplitLine(lineIndex, offset, i - offset));
                     addedCount++;
                     offset = i;
@@ -803,6 +803,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             }
         }
         return addedCount;
+    }
+    
+    /**
+     * Returns the amount of space that must remain to the right of a character
+     * for that character not to cause a line wrap. We use this to ensure that
+     * there's at least this much space for the wrap mark.
+     */
+    private int getMinimumWrapMarkWidth() {
+        return widthCache['W'];
     }
     
     private int addCharWidth(int x, char ch) {
