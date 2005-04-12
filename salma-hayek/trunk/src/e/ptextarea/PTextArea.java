@@ -802,13 +802,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             // The line's too long, so break it into SplitLines.
             int x = 0;
             CharSequence chars = line.getContents();
-            int offset = 0;
+            int lastSplitIndex = 0;
             for (int i = 0; i < chars.length(); i++) {
                 char ch = chars.charAt(i);
                 x = addCharWidth(x, ch);
                 if (x >= width - getMinimumWrapMarkWidth()) {
                     if (wordWrap) {
-                        for (int splitOffset = i; splitOffset >= 0; --splitOffset) {
+                        for (int splitOffset = i; splitOffset >= lastSplitIndex; --splitOffset) {
                             if (chars.charAt(splitOffset) == ' ') {
                                 // Break so that the word goes to the next line
                                 // but the inter-word character stays where it
@@ -819,14 +819,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                             }
                         }
                     }
-                    splitLines.add(index++, new SplitLine(lineIndex, offset, i - offset));
+                    splitLines.add(index++, new SplitLine(lineIndex, lastSplitIndex, i - lastSplitIndex));
                     addedCount++;
-                    offset = i;
+                    lastSplitIndex = i;
                     x = addCharWidth(0, ch);
                 }
             }
             if (x > 0) {
-                splitLines.add(index++, new SplitLine(lineIndex, offset, chars.length() - offset));
+                splitLines.add(index++, new SplitLine(lineIndex, lastSplitIndex, chars.length() - lastSplitIndex));
                 addedCount++;
             }
         }
