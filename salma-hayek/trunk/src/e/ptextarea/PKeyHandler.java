@@ -181,21 +181,23 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private void moveLeft(boolean byWord, boolean extendingSelection) {
-        int newOffset = byWord ? caretToPreviousWord() : caretLeft();
+        int newOffset = byWord ? caretToPreviousWord() : caretLeft(extendingSelection);
         moveCaret(extendingSelection, newOffset);
     }
     
     private void moveRight(boolean byWord, boolean extendingSelection) {
-        int newOffset = byWord ? caretToNextWord() : caretRight();
+        int newOffset = byWord ? caretToNextWord() : caretRight(extendingSelection);
         moveCaret(extendingSelection, newOffset);
     }
     
-    private int caretLeft() {
-        return Math.max(0, textArea.getUnanchoredSelectionExtreme() - 1);
+    private int caretLeft(boolean extendingSelection) {
+        int newOffset = extendingSelection ? (textArea.getUnanchoredSelectionExtreme() - 1) : textArea.getSelectionStart();
+        return Math.max(0, newOffset);
     }
     
-    private int caretRight() {
-        return Math.min(textArea.getUnanchoredSelectionExtreme() + 1, textArea.getPTextBuffer().length());
+    private int caretRight(boolean extendingSelection) {
+        int newOffset = extendingSelection ? (textArea.getUnanchoredSelectionExtreme() + 1) : textArea.getSelectionEnd();
+        return Math.min(newOffset, textArea.getPTextBuffer().length());
     }
     
     private int caretToPreviousWord() {
