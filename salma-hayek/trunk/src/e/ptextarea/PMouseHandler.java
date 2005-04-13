@@ -83,7 +83,9 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             
             int bracketOffset = PBracketUtilities.findMatchingBracket(textArea.getPTextBuffer(), pressedOffset);
             if (bracketOffset != -1) {
-                textArea.setSelection(pressedOffset, bracketOffset, false);
+                int start = Math.min(pressedOffset, bracketOffset);
+                int end = Math.max(pressedOffset, bracketOffset);
+                textArea.setSelection(start, end, false);
                 return;
             }
             
