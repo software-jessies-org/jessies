@@ -2,83 +2,127 @@ package e.edit;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 import javax.swing.*;
-import javax.swing.text.*;
+import e.ptextarea.*;
+import e.util.*;
 
-public class EErrorsWindow extends EWindow implements LinkListener {
-    private JTextPane text;
-    
-    private LinkRecognizer linkRecognizer;
-    private LinkFormatter linkFormatter;
-    
-    private StyleContext styles = new StyleContext();
+public class EErrorsWindow extends EWindow {
+    private PTextArea textArea;
     
     public EErrorsWindow(String filename) {
         super(filename);
-        this.text = new JTextPane() {
-            /**
-             * Returns "" instead of null for the empty selection, for
-             * compatibility with ETextArea.
-             */
-            public String getSelectedText() {
-                String selection = super.getSelectedText();
-                return (selection != null) ? selection : "";
-            }
-        };
-        this.linkRecognizer = new LinkRecognizer(text, this);
-        this.linkFormatter = new LinkFormatter(text);
-        initTextStyles();
-        add(new JScrollPane(text), BorderLayout.CENTER);
-        attachPopupMenuTo(text);
-        
+        initTextArea();
+        add(new JScrollPane(textArea), BorderLayout.CENTER);
+    }
+    
+    private void initTextArea() {
+        textArea = new PTextArea();
         // Default to a fixed-pitch font in errors windows.
-        text.setFont(ETextArea.getConfiguredFixedFont());
+        textArea.setFont(ETextArea.getConfiguredFixedFont());
+        // But no margin, because all the text should be machine-generated.
+        textArea.showRightHandMarginAt(PTextArea.NO_MARGIN);
+        textArea.setTextStyler(new ErrorLinkStyler(textArea));
+        textArea.setWrapStyleWord(true);
+        attachPopupMenuTo(textArea);
     }
 
-    public void requestFocus() {
-        text.requestFocus();
-    }
-    
-    public void initTextStyles() {
-        Style plainStyle = styles.addStyle("plain", text.getLogicalStyle());
-        linkFormatter.setCurrentStyle(plainStyle);
+    private static class ErrorLinkStyler extends PHyperlinkTextStyler {
+        /**
+         * Matches addresses (such as "filename.ext:line:col:line:col").
+         * 
+         * We could also insist that there are more than 2 characters,
+         * and that an address can't end in a /. But this seems to work
+         * pretty nicely.
+         */
+        private static final String ADDRESS_PATTERN = "(?:^| |\")([^ :\"]+(?:Makefile|\\w+\\.\\w+)([\\d:]+)?)";
         
-        Style linkStyle = styles.addStyle("link", plainStyle);
-        StyleConstants.setForeground(linkStyle, Color.BLUE);
-        StyleConstants.setUnderline(linkStyle, true);
-        linkFormatter.setLinkStyle(linkStyle);
-    }
-    
-    public void append(String line) {
-        linkFormatter.appendLine(line + "\n");
-    }
-    
-    public void clear() {
-        text.setText("");
-        resetAutoScroll();
-    }
-    
-    /** Appends a JSeparator to the document. */
-    public void drawHorizontalRule() {
-        // This is a reimplementation of JTextPane.insertComponent to use Document.insertString so that we're not scrolled to the position of the insertion.
-        try {
-            MutableAttributeSet inputAttributes = text.getInputAttributes();
-            inputAttributes.removeAttributes(inputAttributes);
-            StyleConstants.setComponent(inputAttributes, new JSeparator());
-            text.getDocument().insertString(text.getDocument().getLength(), "\n", null);
-            text.getDocument().insertString(text.getDocument().getLength(), "\n", inputAttributes.copyAttributes());
-            //text.getDocument().insertString(text.getDocument().getLength(), "\n", null);
-            inputAttributes.removeAttributes(inputAttributes);
-            linkFormatter.autoScroll();
-        } catch (BadLocationException ex) {
-            // Can't happen.
-            ex.printStackTrace();
+        private static final Pattern MAKE_DIRECTORY_CHANGE = Pattern.compile("^make(?:\\[\\d+\\])?: (Entering|Leaving) directory `(.*)'$");
+        
+        private File currentDirectory;
+        
+        public ErrorLinkStyler(PTextArea textArea) {
+            super(textArea, ADDRESS_PATTERN);
+        }
+        
+        public void hyperlinkClicked(CharSequence hyperlinkText) {
+            Edit.openFile(hyperlinkText.toString());
+        }
+        
+        public boolean isAcceptableMatch(CharSequence line, Matcher address) {
+            Matcher directoryChangeMatcher = MAKE_DIRECTORY_CHANGE.matcher(line);
+            if (directoryChangeMatcher.find()) {
+                if (directoryChangeMatcher.group(1).equals("Entering")) {
+                    currentDirectory(directoryChangeMatcher.group(2));
+                }
+            }
+            
+            // We're most useful in providing links to grep matches, so we
+            // need to avoid being confused by stuff like File.java:123.
+            String name = address.group(1);
+            int colonIndex = name.indexOf(':');
+            if (colonIndex != -1) {
+                name = name.substring(0, colonIndex);
+            }
+            
+            // If the file doesn't exist, this wasn't a useful match.
+            File file = null;
+            if (name.startsWith("/") || name.startsWith("~")) {
+                file = FileUtilities.fileFromString(name);
+            } else {
+                file = new File(currentDirectory(), name);
+            }
+            return file.exists();
+        }
+        
+        private void currentDirectory(String directory) {
+            currentDirectory = new File(directory);
+        }
+        
+        private File currentDirectory() {
+            return currentDirectory;
         }
     }
     
+    public void requestFocus() {
+        textArea.requestFocus();
+    }
+    
+    private class AppendRunnable implements Runnable {
+        private String line;
+        
+        public AppendRunnable(String line) {
+            this.line = line + "\n";
+        }
+        
+        public void run() {
+            textArea.append(line);
+        }
+    }
+    
+    private class ClearRunnable implements Runnable {
+        public void run() {
+            textArea.setText("");
+            resetAutoScroll();
+        }
+    }
+    
+    public void append(String line) {
+        SwingUtilities.invokeLater(new AppendRunnable(line));
+    }
+    
+    public void clear() {
+        SwingUtilities.invokeLater(new ClearRunnable());
+    }
+    
+    public void drawHorizontalRule() {
+        append("-------------------------------------------------------------------------");
+    }
+    
     public void resetAutoScroll() {
-        linkFormatter.setAutoScroll(true);
+//        linkFormatter.setAutoScroll(true);
     }
     
     /** Errors windows have no initial content. */
@@ -120,9 +164,5 @@ public class EErrorsWindow extends EWindow implements LinkListener {
     public void windowClosing() {
         //getWorkspace().errorsWindowClosing();
         getWorkspace().unregisterTextComponent(getText());
-    }
-    
-    public void linkActivated(String link) {
-        Edit.openFile(link);
     }
 }
