@@ -95,27 +95,45 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
-        boolean byWord = GuiUtilities.isMacOs() ? event.isAltDown() : event.isControlDown();
-        boolean extendingSelection = event.isShiftDown();
         if (movementHandler.handleMovementKeys(event)) {
             return true;
         }
-        switch (event.getKeyCode()) {
-            case KeyEvent.VK_LEFT:
-                moveLeft(byWord, extendingSelection);
-                break;
-            case KeyEvent.VK_RIGHT:
-                moveRight(byWord, extendingSelection);
-                break;
-            case KeyEvent.VK_HOME: moveCaret(extendingSelection, caretToStartOfLine()); break;
-            case KeyEvent.VK_END: moveCaret(extendingSelection, caretToEndOfLine()); break;
-            case KeyEvent.VK_BACK_SPACE: backspace(); break;
-            case KeyEvent.VK_DELETE: delete(); break;
-            
-        default:
+        
+        boolean byWord = GuiUtilities.isMacOs() ? event.isAltDown() : event.isControlDown();
+        boolean extendingSelection = event.isShiftDown();
+        int key = event.getKeyCode();
+        if (isStartOfLineKey(event)) {
+            moveCaret(extendingSelection, caretToStartOfLine());
+        } else if (isEndOfLineKey(event)) {
+            moveCaret(extendingSelection, caretToEndOfLine());
+        } else if (key == KeyEvent.VK_LEFT) {
+            moveLeft(byWord, extendingSelection);
+        } else if (key == KeyEvent.VK_RIGHT) {
+            moveRight(byWord, extendingSelection);
+        } else if (key == KeyEvent.VK_BACK_SPACE) {
+            backspace();
+        } else if (key == KeyEvent.VK_DELETE) {
+            delete();
+        } else {
             return false;
         }
         return true;
+    }
+    
+    private boolean isStartOfLineKey(KeyEvent e) {
+        if (GuiUtilities.isMacOs()) {
+            return ((e.isControlDown() || e.isMetaDown()) && e.getKeyCode() == KeyEvent.VK_LEFT);
+        } else {
+            return (e.getKeyCode() == KeyEvent.VK_HOME);
+        }
+    }
+    
+    private boolean isEndOfLineKey(KeyEvent e) {
+        if (GuiUtilities.isMacOs()) {
+            return ((e.isControlDown() || e.isMetaDown()) && e.getKeyCode() == KeyEvent.VK_RIGHT);
+        } else {
+            return (e.getKeyCode() == KeyEvent.VK_END);
+        }
     }
     
     private void insertCharacter(char ch) {
