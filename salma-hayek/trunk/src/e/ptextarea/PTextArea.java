@@ -172,6 +172,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void ensureVisibilityOfOffset(int offset) {
+        if (isShowing() == false) {
+            // Avoid problems if splitLines == null.
+            return;
+        }
         Point point = getViewCoordinates(getCoordinates(offset));
         scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
     }
@@ -239,6 +243,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private void initSpellingChecking() {
         spellingChecker = new PTextAreaSpellingChecker(this);
         spellingChecker.checkSpelling();
+    }
+    
+    public PTextAreaSpellingChecker getSpellingChecker() {
+        return spellingChecker;
     }
     
     // Utility methods.
