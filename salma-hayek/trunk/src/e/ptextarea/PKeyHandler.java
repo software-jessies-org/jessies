@@ -191,12 +191,22 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private int caretLeft(boolean extendingSelection) {
-        int newOffset = extendingSelection ? (textArea.getUnanchoredSelectionExtreme() - 1) : textArea.getSelectionStart();
+        int newOffset = textArea.getSelectionStart();
+        if (extendingSelection) {
+            newOffset = textArea.getUnanchoredSelectionExtreme() - 1;
+        } else if (textArea.hasSelection() == false) {
+            --newOffset;
+        }
         return Math.max(0, newOffset);
     }
     
     private int caretRight(boolean extendingSelection) {
-        int newOffset = extendingSelection ? (textArea.getUnanchoredSelectionExtreme() + 1) : textArea.getSelectionEnd();
+        int newOffset = textArea.getSelectionEnd();
+        if (extendingSelection) {
+            newOffset = textArea.getUnanchoredSelectionExtreme() + 1;
+        } else if (textArea.hasSelection() == false) {
+            ++newOffset;
+        }
         return Math.min(newOffset, textArea.getPTextBuffer().length());
     }
     
