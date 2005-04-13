@@ -80,6 +80,13 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         // anchor in all cases.
         public void makeInitialSelection(int pressedOffset) {
             this.pressedOffset = pressedOffset;
+            
+            int bracketOffset = PBracketUtilities.findMatchingBracket(textArea.getPTextBuffer(), pressedOffset);
+            if (bracketOffset != -1) {
+                textArea.setSelection(pressedOffset, bracketOffset, false);
+                return;
+            }
+            
             selectByWord(pressedOffset, pressedOffset, false);
         }
         
