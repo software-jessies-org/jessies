@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.event.*;
 import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
@@ -15,7 +14,7 @@ import e.util.*;
 /**
  * A text-editing component.
  */
-public class ETextWindow extends EWindow implements DocumentListener {
+public class ETextWindow extends EWindow implements PTextListener {
     /**
      * Ensures that the TagsPanel is empty if the focused window isn't an ETextWindow.
      */
@@ -82,6 +81,7 @@ public class ETextWindow extends EWindow implements DocumentListener {
         this.filename = filename;
         this.file = FileUtilities.fileFromString(filename);
         this.text = new ETextArea();
+        text.getPTextBuffer().addTextListener(this);
         attachPopupMenuTo(text);
         
         this.watermarkViewPort = new WatermarkViewPort();
@@ -151,22 +151,18 @@ public class ETextWindow extends EWindow implements DocumentListener {
     }
     
     //
-    // DocumentListener interface.
+    // PTextListener interface.
     //
-
-    public void changedUpdate(DocumentEvent e) {
-        /*
-         * This represents a style change, which should not be
-         * considered as a dirtying because styles are meaningless
-         * in a programmer's editor, and don't get saved.
-         */
-    }
     
-    public void insertUpdate(DocumentEvent e) {
+    public void textCompletelyReplaced(PTextEvent e) {
         markAsDirty();
     }
     
-    public void removeUpdate(DocumentEvent e) {
+    public void textRemoved(PTextEvent e) {
+        markAsDirty();
+    }
+    
+    public void textInserted(PTextEvent e) {
         markAsDirty();
     }
     
@@ -255,8 +251,6 @@ public class ETextWindow extends EWindow implements DocumentListener {
             text.getIndenter().setIndentationPropertyBasedOnContent(text, content);
             // FIXME
             //text.getUndoManager().discardAllEdits();
-            // FIXME
-            //text.getDocument().addDocumentListener(this);
             if (fileType != UNKNOWN) {
                 text.enableAutoIndent();
                 // FIXME
@@ -451,7 +445,9 @@ public class ETextWindow extends EWindow implements DocumentListener {
     }
     
     public void markAsDirty() {
-        findResultsUpdater.restart();
+        if (findResultsUpdater != null) {
+            findResultsUpdater.restart();
+        }
         isDirty = true;
         repaint();
     }
