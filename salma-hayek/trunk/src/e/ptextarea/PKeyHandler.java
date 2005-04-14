@@ -106,6 +106,8 @@ public class PKeyHandler extends KeyAdapter {
             moveCaret(extendingSelection, caretToStartOfLine());
         } else if (isEndOfLineKey(event)) {
             moveCaret(extendingSelection, caretToEndOfLine());
+        } else if (GuiUtilities.isMacOs() && (key == KeyEvent.VK_HOME || key == KeyEvent.VK_END)) {
+            textArea.ensureVisibilityOfOffset((key == KeyEvent.VK_HOME) ? 0 : textArea.getPTextBuffer().length());
         } else if (key == KeyEvent.VK_LEFT) {
             moveLeft(byWord, extendingSelection);
         } else if (key == KeyEvent.VK_RIGHT) {
