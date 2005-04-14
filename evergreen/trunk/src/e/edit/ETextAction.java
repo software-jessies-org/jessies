@@ -3,37 +3,20 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.text.*;
 
-public abstract class ETextAction extends TextAction {
+public abstract class ETextAction extends AbstractAction {
     public ETextAction(String name) {
         super(name);
     }
     
     public abstract void actionPerformed(ActionEvent e);
 
-    /**
-     * Use this unless you really need an ETextArea or ETextWindow.
-     * If you don't, your functionality won't be available on the errors
-     * window, for instance.
-     */
-    public JTextComponent getTextComponent() {
-        Component component = getFocusedComponent();
-        if (component instanceof JTextComponent) {
-            return (JTextComponent) component;
-        }
-        return null;
+    public Component getFocusedComponent() {
+        return KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     }
-
+    
     public ETextArea getTextArea() {
-        Component component = getFocusedComponent();
-        if (component instanceof ETextArea) {
-            return (ETextArea) component;
-        }
-        if (component instanceof EWindow) {
-            return ((EWindow) component).getText();
-        }
-        return (ETextArea) (SwingUtilities.getAncestorOfClass(ETextArea.class, component));
+        return (ETextArea) (SwingUtilities.getAncestorOfClass(ETextArea.class, getFocusedComponent()));
     }
     
     public ETextWindow getFocusedTextWindow() {
@@ -47,7 +30,6 @@ public abstract class ETextAction extends TextAction {
     }
     
     public String getSelectedText() {
-        JTextComponent textComponent = getTextComponent();
-        return (textComponent != null) ? textComponent.getSelectedText() : "";
+        return (getTextArea() != null) ? getTextArea().getSelectedText() : "";
     }
 }

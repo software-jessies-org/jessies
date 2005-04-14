@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.text.*;
-import e.gui.*;
 import e.util.*;
 
 /**
@@ -110,7 +109,8 @@ public class FindAction extends ETextAction implements MinibufferUser {
     public void wasCanceled() {
         removeAllMatches();
         currentRegularExpression = null;
-        JTextComponentUtilities.goToSelection(currentTextWindow.getText(), initialSelectionStart, initialSelectionEnd);
+        // FIXME
+        //JTextComponentUtilities.goToSelection(currentTextWindow.getText(), initialSelectionStart, initialSelectionEnd);
     }
     
     //
@@ -132,7 +132,8 @@ public class FindAction extends ETextAction implements MinibufferUser {
     //
     
     public void removeAllMatches() {
-        JTextComponentUtilities.removeAllHighlightsUsingPainter(currentTextWindow.getText(), PAINTER);
+        // FIXME
+        //JTextComponentUtilities.removeAllHighlightsUsingPainter(currentTextWindow.getText(), PAINTER);
         currentTextWindow.getBirdView().clearMatchingLines();
     }
     
@@ -166,14 +167,12 @@ public class FindAction extends ETextAction implements MinibufferUser {
         // Find all the matches.
         int matchCount = 0;
         Matcher matcher = pattern.matcher(content);
-        Highlighter highlighter = textArea.getHighlighter();
+        // FIXME
+        //Highlighter highlighter = textArea.getHighlighter();
         while (matcher.find()) {
-            try {
-                currentTextWindow.getBirdView().addMatchingLine(textArea.getLineOfOffset(matcher.end()));
-                highlighter.addHighlight(matcher.start(), matcher.end(), PAINTER);
-            } catch (BadLocationException ex) {
-                ex.printStackTrace();
-            }
+            currentTextWindow.getBirdView().addMatchingLine(textArea.getLineOfOffset(matcher.end()));
+            // FIXME
+            //highlighter.addHighlight(matcher.start(), matcher.end(), PAINTER);
             matchCount++;
         }
         Edit.showStatus("Found " + matchCount + " " + (matchCount != 1 ? "matches" : "match"));

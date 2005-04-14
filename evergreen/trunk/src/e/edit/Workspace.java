@@ -8,6 +8,7 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 
 public class Workspace extends JPanel {
@@ -135,7 +136,8 @@ public class Workspace extends JPanel {
     
     public JComponent makeUI() {
         leftColumn.setErrorsWindow(errors);
-        registerTextComponent(errors.getText());
+        // FIXME: unbreak the advisor.
+        //registerTextComponent(errors.getText());
         return leftColumn;
     }
     
@@ -189,11 +191,11 @@ public class Workspace extends JPanel {
         return null;
     }
     
-    public void registerTextComponent(javax.swing.text.JTextComponent textComponent) {
+    public void registerTextComponent(PTextArea textComponent) {
         Edit.getAdvisor().registerTextComponent(textComponent);
     }
     
-    public void unregisterTextComponent(javax.swing.text.JTextComponent textComponent) {
+    public void unregisterTextComponent(PTextArea textComponent) {
         Edit.getAdvisor().unregisterTextComponent(textComponent);
     }
     
@@ -205,7 +207,8 @@ public class Workspace extends JPanel {
         } else {
             try {
                 ETextWindow newWindow = new ETextWindow(filename);
-                registerTextComponent(newWindow.getText());
+                // FIXME
+                //registerTextComponent(newWindow.getText());
                 window = addViewer(newWindow, address);
             } catch (Exception ex) {
                 ex.printStackTrace();

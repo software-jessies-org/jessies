@@ -1,40 +1,23 @@
 package e.edit;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
-import java.text.*;
 import java.util.regex.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.undo.*;
-
-import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 
 /**
  * A text-editing component.
  */
-public class ETextArea extends JTextArea {
-    private DocumentUndoFilter undoFilter;
-    
-    private UndoManager undoManager = new UnlimitedUndoManager();
-    
-    private JTextComponentSpellingChecker spellingChecker;
-    
-    private boolean showEightyColumnMargin = false;
-    
+public class ETextArea extends PTextArea {
     private Indenter indenter = new Indenter();
     
     public ETextArea() {
-        setBackground(Color.WHITE);
-        setCaret(new ECaret());
-        setDragEnabled(false);
-        setLineWrap(true);
-        setMargin(new Insets(4, 4, 4, 1));
-        getCaret().addChangeListener(new MatchingBracketHighlighter(this));
-        getKeymap().setDefaultAction(new DefaultKeyAction());
+        // FIXME
+        //setMargin(new Insets(4, 4, 4, 1));
+        // FIXME
+        //getCaret().addChangeListener(new MatchingBracketHighlighter(this));
+        // FIXME
+        //getKeymap().setDefaultAction(new DefaultKeyAction());
     }
     
     /** Returns a fake 'preferred size' if our parent's not tall enough for us to make it as far as the display. */
@@ -45,63 +28,19 @@ public class ETextArea extends JTextArea {
         return super.getPreferredSize();
     }
     
-    /**
-     * Ensures that the UndoManger corresponds to the Document and that the tab
-     * size is configured each time the Document changes.
-     */
-    public void setDocument(Document document) {
-        super.setDocument(document);
-        if (document != null) {
-            if (spellingChecker == null) {
-                spellingChecker = new JTextComponentSpellingChecker(this);
-            }
-            spellingChecker.setDocument(document);
-//            if (undoFilter == null) {
-//                undoFilter = new DocumentUndoFilter();
-//            }
-//            undoFilter.setTextComponent(this);
-//            undoFilter.addUndoableEditListener(undoManager);
-            document.addUndoableEditListener(new UndoableEditListener() {
-                public void undoableEditHappened(UndoableEditEvent e) {
-                    undoManager.addEdit(e.getEdit());
-                }
-            });
-        }
-    }
-
-    /**
-     * Sets the content to be the given string. Also
-     * sets the caret position to the start of the document.
-     */
-    public void setText(String text) {
-        super.setText(text);
-        setCaretPosition(0);
-    }
-    
-    public JTextComponentSpellingChecker getSpellingChecker() {
-        return spellingChecker;
-    }
-    
     public void setFont(Font font) {
         // Changing font can cause the area around the caret to have moved off-screen.
         // We also have to bear in mind that setFont is called early on during construction, so there may not be a caret!
-        int originalCaretPosition = (getCaret() != null) ? getCaretPosition() : 0;
+        int originalCaretPosition = getUnanchoredSelectionExtreme();
         super.setFont(font);
-        JTextComponentUtilities.ensureVisibilityOfOffset(this, originalCaretPosition);
+        ensureVisibilityOfOffset(originalCaretPosition);
         
         boolean fixedWidth = GuiUtilities.isFontFixedWidth(font);
-        setTabSize(fixedWidth ? 8 : 2);
-        setShowEightyColumnMargin(fixedWidth);
+        // FIXME
+        //setTabSize(fixedWidth ? 8 : 2);
+        showRightHandMarginAt(fixedWidth ? 80 : NO_MARGIN);
     }
     
-    public void setShowEightyColumnMargin(boolean showEightyColumnMargin) {
-        this.showEightyColumnMargin = showEightyColumnMargin;
-    }
-    
-    public UndoManager getUndoManager() {
-        return undoManager;
-    }
-
     /**
      * Sets an appropriate font for this text area's content.
      * Unless you're specifically setting the font to something
@@ -185,41 +124,17 @@ public class ETextArea extends JTextArea {
     /**
      * Sets the keymap, mixing in our slight modifications.
      */
-    public void setKeymap(Keymap map) {
-        super.setKeymap(map);
-        
+    public void initKeymap() {
         // Overrides a few DefaultEditorKit editing actions.
-        getActionMap().put(DefaultEditorKit.deletePrevCharAction, new BackspaceAction());
-        getActionMap().put(DefaultEditorKit.insertTabAction, new InsertTabAction());
+        // FIXME
+        //getActionMap().put(DefaultEditorKit.deletePrevCharAction, new BackspaceAction());
+        //getActionMap().put(DefaultEditorKit.insertTabAction, new InsertTabAction());
         // See also ETextArea.setIndenter.
-        
-        // Overrides the DefaultEditorKit Home/End actions.
-        getActionMap().put(DefaultEditorKit.beginLineAction, new StartOfLineAction(false));
-        getActionMap().put(DefaultEditorKit.selectionBeginLineAction, new StartOfLineAction(true));
-        getActionMap().put(DefaultEditorKit.endLineAction, new EndOfLineAction(false));
-        getActionMap().put(DefaultEditorKit.selectionEndLineAction, new EndOfLineAction(true));
-        
-        // Overrides the DefaultEditorKit actions for extending the selection or moving the caret to the beginning/end of the current word.
-        getActionMap().put(DefaultEditorKit.selectionPreviousWordAction, new PreviousWordAction(true));
-        getActionMap().put(DefaultEditorKit.previousWordAction, new PreviousWordAction(false));
-        getActionMap().put(DefaultEditorKit.selectionNextWordAction, new NextWordAction(true));
-        getActionMap().put(DefaultEditorKit.nextWordAction, new NextWordAction(false));
-    }
-    
-    /**
-     * Draws a vertical gray line at the 80 character mark, if we're using a fixed-width font.
-     */
-    public void paintBorder(Graphics g) {
-        super.paintBorder(g);
-        if (showEightyColumnMargin) {
-            final int x = getMargin().left + g.getFontMetrics().stringWidth("X") * 80;
-            g.setColor(Color.LIGHT_GRAY);
-            g.setXORMode(Color.WHITE);
-            g.drawLine(x, 0, x, getHeight() - 1);
-        }
     }
     
     public void paste() {
+        // FIXME
+        /*
         Clipboard clipboard = getToolkit().getSystemClipboard();
         if (isEnabled() == false || clipboard == null) {
             return;
@@ -260,6 +175,7 @@ public class ETextArea extends JTextArea {
         } finally {
             entireEdit.end();
         }
+        */
     }
     
     /** Returns the indenter in use for this file.
@@ -269,25 +185,25 @@ public class ETextArea extends JTextArea {
     }
     
     public String getIndentationString() {
-        return (String) getDocument().getProperty(Indenter.INDENTATION_PROPERTY);
+        return (String) getPTextBuffer().getProperty(Indenter.INDENTATION_PROPERTY);
     }
     
     /**
      * Returns a string corresponding to the spaces and tabs found at the
      * start of the line containing the given offset.
      */
-    public String getIndentationOfLineAtOffset(int offset) throws BadLocationException {
+    public String getIndentationOfLineAtOffset(int offset) {
         int lineNumber = getLineOfOffset(offset);
         return getIndentationOfLine(lineNumber);
     }
     
-    public String getIndentationOfLine(int lineNumber) throws BadLocationException {
+    public String getIndentationOfLine(int lineNumber) {
         int lineStart = getLineStartOffset(lineNumber);
         int lineEnd = getLineEndOffset(lineNumber);
-        Segment currentLine = new Segment();
-        getDocument().getText(lineStart, lineEnd - lineStart, currentLine);
+        String currentLine = getPTextBuffer().subSequence(lineStart, lineEnd - lineStart).toString();
         StringBuffer whitespace = new StringBuffer();
-        for (char c = currentLine.first(); c != CharacterIterator.DONE; c = currentLine.next()) {
+        for (int i = 0; i < currentLine.length(); ++i) {
+            char c = currentLine.charAt(i);
             if (c != ' ' && c != '\t') {
                 break;
             }
@@ -306,7 +222,8 @@ public class ETextArea extends JTextArea {
     }
     
     public void enableAutoIndent() {
-        getActionMap().put(DefaultEditorKit.insertBreakAction, new InsertNewlineAction());
+        // FIXME
+        //getActionMap().put(DefaultEditorKit.insertBreakAction, new InsertNewlineAction());
     }
     
     public void autoIndent() {
@@ -314,52 +231,47 @@ public class ETextArea extends JTextArea {
     }
     
     public int getPreviousNonBlankLineNumber(int startLineNumber) {
-        try {
-            for (int lineNumber = startLineNumber - 1; lineNumber > 0; lineNumber--) {
-                if (getLineText(lineNumber).trim().length() != 0) {
-                    return lineNumber;
-                }
+        for (int lineNumber = startLineNumber - 1; lineNumber > 0; lineNumber--) {
+            if (getLineText(lineNumber).trim().length() != 0) {
+                return lineNumber;
             }
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
         }
         return 0;
     }
     
     /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
     public boolean correctIndentation(boolean shouldMoveCaret) {
-        try {
-            int position = getCaretPosition();
-            int lineNumber = getLineOfOffset(position);
-
-            int offsetIntoLine = position - getLineStartOffset(lineNumber) - getIndentationOfLine(lineNumber).length();
-
-            String whitespace = indenter.getIndentation(this, lineNumber);
-            int lineStart = getLineStartOffset(lineNumber);
-            int lineLength = getLineEndOffset(lineNumber) - lineStart;
-            String originalLine = getLineText(lineNumber);
-            String line = originalLine.trim();
-            String replacement = whitespace + line;
-            //Log.warn("line=@" + originalLine + "@; replacement=@" + replacement + "@");
-            boolean lineChanged = (replacement.equals(originalLine) == false);
-            if (lineChanged) {
-                select(lineStart, lineStart + lineLength);
-                replaceSelection(whitespace + line + "\n");
-                if (shouldMoveCaret == false) {
-                    setCaretPosition(lineStart + whitespace.length() + offsetIntoLine);
-                }
+        // FIXME
+        /*
+        int position = getCaretPosition();
+        int lineNumber = getLineOfOffset(position);
+        
+        int offsetIntoLine = position - getLineStartOffset(lineNumber) - getIndentationOfLine(lineNumber).length();
+        
+        String whitespace = indenter.getIndentation(this, lineNumber);
+        int lineStart = getLineStartOffset(lineNumber);
+        int lineLength = getLineEndOffset(lineNumber) - lineStart;
+        String originalLine = getLineText(lineNumber);
+        String line = originalLine.trim();
+        String replacement = whitespace + line;
+        //Log.warn("line=@" + originalLine + "@; replacement=@" + replacement + "@");
+        boolean lineChanged = (replacement.equals(originalLine) == false);
+        if (lineChanged) {
+            select(lineStart, lineStart + lineLength);
+            replaceSelection(whitespace + line + "\n");
+            if (shouldMoveCaret == false) {
+                setCaretPosition(lineStart + whitespace.length() + offsetIntoLine);
             }
-            if (shouldMoveCaret) {
-                // Move the caret ready to perform the same service to the next line.
-                int newCaretPosition = lineStart + whitespace.length() + line.length() + 1;
-                newCaretPosition = Math.min(newCaretPosition, getDocument().getLength());
-                setCaretPosition(newCaretPosition);
-            }
-            return lineChanged;
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
-            return false;
         }
+        if (shouldMoveCaret) {
+            // Move the caret ready to perform the same service to the next line.
+            int newCaretPosition = lineStart + whitespace.length() + line.length() + 1;
+            newCaretPosition = Math.min(newCaretPosition, getDocument().getLength());
+            setCaretPosition(newCaretPosition);
+        }
+        return lineChanged;
+        */
+        return false;
     }
     
     private String wordSelectionStopChars = " \t\n!\"#%&'()*+,-./:;<=>?@`[\\]^{|}~";
@@ -373,7 +285,7 @@ public class ETextArea extends JTextArea {
     }
     
     public CharSequence charSequence() {
-        return new DocumentCharSequence(getDocument());
+        return getPTextBuffer();
     }
     
     /**
@@ -381,23 +293,18 @@ public class ETextArea extends JTextArea {
      * working out what to offer as completions in AutoCompleteAction.
      */
     public String getWordUpToCaret() {
-        String word = "";
-        try {
-            CharSequence chars = charSequence();
-            int end = getCaretPosition();
-            int start = end;
-            while (start > 0) {
-                char ch = chars.charAt(start - 1);
-                if (ch != '_' && Character.isLetterOrDigit(ch) == false) {
-                    break;
-                }
-                --start;
+        CharSequence chars = charSequence();
+        // FIXME
+        int end = getSelectionStart();
+        int start = end;
+        while (start > 0) {
+            char ch = chars.charAt(start - 1);
+            if (ch != '_' && Character.isLetterOrDigit(ch) == false) {
+                break;
             }
-            word = getText(start, end - start);
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
+            --start;
         }
-        return word;
+        return getPTextBuffer().subSequence(start, end - start).toString();
     }
 
     /**
@@ -416,24 +323,18 @@ public class ETextArea extends JTextArea {
      * Returns the text of the line (without the newline) containing the
      * given offset in the document.
      */
-    public String getLineTextAtOffset(int offset) throws BadLocationException {
+    public String getLineTextAtOffset(int offset) {
         return getLineText(getLineOfOffset(offset));
     }
     
     /** Returns the text of the given line (without the newline). */
-    public String getLineText(int lineNumber) throws BadLocationException {
+    public String getLineText(int lineNumber) {
         int lineStart = getLineStartOffset(lineNumber);
         int lineEnd = getLineEndOffset(lineNumber);
         int length = lineEnd - lineStart;
-        if (lineEnd != getDocument().getLength()) {
+        if (lineEnd != getPTextBuffer().length()) {
             length--;
         }
-        return (length > 0) ? getText(lineStart, length) : "";
-    }
-
-    public void setSelectionColor(Color newColor) {
-        // Work around "JTextComponent.setSelectionColor doesn't cause repaint" (review ID 250065; Java Bug Parade id pending).
-        super.setSelectionColor(newColor);
-        repaint();
+        return (length > 0) ? getPTextBuffer().subSequence(lineStart, length).toString() : "";
     }
 }

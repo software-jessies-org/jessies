@@ -3,8 +3,8 @@ package e.edit;
 import java.awt.event.*;
 
 /**
-The ETextArea action to copy to the clipboard.
-*/
+ * FIXME: PTextArea should export a copy action.
+ */
 public class CopyAction extends ETextAction {
     public static final String ACTION_NAME = "Copy";
 
@@ -14,7 +14,6 @@ public class CopyAction extends ETextAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        ETextArea target = (ETextArea) getFocusedComponent();
-        target.copy();
+        getTextArea().copy();
     }
 }

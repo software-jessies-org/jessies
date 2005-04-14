@@ -3,8 +3,6 @@ package e.edit;
 import java.awt.event.*;
 import java.lang.reflect.*;
 import java.util.regex.*;
-import javax.swing.text.*;
-import javax.swing.undo.*;
 
 public class InsertInterfaceAction extends ETextAction {
     public static final String ACTION_NAME = "Insert Java Interface";
@@ -14,8 +12,7 @@ public class InsertInterfaceAction extends ETextAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        ETextArea target = (ETextArea) getFocusedComponent();
-        insertSourceCode(target);
+        insertSourceCode(getTextArea());
     }
     
     public static String extractClassNameFrom(String text) {
@@ -40,6 +37,8 @@ public class InsertInterfaceAction extends ETextAction {
             return;
         }
         
+        // FIXME
+        /*
         CompoundEdit entireEdit = new CompoundEdit();
         target.getUndoManager().addEdit(entireEdit);
         try {
@@ -68,6 +67,7 @@ public class InsertInterfaceAction extends ETextAction {
         } finally {
             entireEdit.end();
         }
+        */
     }
     
     /**

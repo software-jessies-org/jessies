@@ -6,7 +6,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.*;
-import javax.swing.text.*;
+import e.ptextarea.*;
 
 public class Advisor extends JPanel {
     private ArrayList researchers = new ArrayList();
@@ -18,11 +18,13 @@ public class Advisor extends JPanel {
     private Timer timer;
     
     /** The text area on whose behalf the next research will be done. */
-    private JTextComponent currentComponent;
+    private PTextArea currentComponent;
     
     public Advisor() {
         setLayout(new BorderLayout());
         add(advicePane, BorderLayout.CENTER);
+        //FIXME
+        /*
         final JTextField textField = new JTextField();
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -33,6 +35,7 @@ public class Advisor extends JPanel {
         textField.setCaret(new ECaret());
         registerTextComponent(textField);
         add(textField, BorderLayout.SOUTH);
+        */
         setDelay(500);
         addResearcher(JavaResearcher.getSharedInstance());
         addResearcher(new ManPageResearcher());
@@ -74,14 +77,10 @@ public class Advisor extends JPanel {
                 return "";
             }
             ETextArea textArea = (ETextArea) currentComponent;
-            try {
-                int dot = textArea.getCaretPosition();
-                int lineNumber = textArea.getLineOfOffset(dot);
-                int lineStart = textArea.getLineStartOffset(lineNumber);
-                string = textArea.getText(lineStart, dot - lineStart);
-            } catch (BadLocationException ex) {
-                return "";
-            }
+            int dot = textArea.getSelectionStart();
+            int lineNumber = textArea.getLineOfOffset(dot);
+            int lineStart = textArea.getLineStartOffset(lineNumber);
+            string = textArea.getPTextBuffer().subSequence(lineStart, dot - lineStart).toString();
         }
         
         // If the user's selected more than a line, don't tell the researchers.
@@ -135,23 +134,26 @@ public class Advisor extends JPanel {
     }
     
     /** Registers a text component for advice tips. */
-    public void registerTextComponent(JTextComponent textArea) {
+    public void registerTextComponent(PTextArea textArea) {
         if (textArea == null) {
             return;
         }
         unregisterTextComponent(textArea); // Make sure each component is only registered once.
-        textArea.getCaret().addChangeListener(caretWatcher);
+        // FIXME
+        //textArea.getCaret().addChangeListener(caretWatcher);
     }
     
     /** Unregisters a text component for advice tips. */
-    public void unregisterTextComponent(JTextComponent textArea) {
-        textArea.getCaret().removeChangeListener(caretWatcher);
+    public void unregisterTextComponent(PTextArea textArea) {
+        // FIXME
+        //textArea.getCaret().removeChangeListener(caretWatcher);
     }
     
     /** Watches the carets in all the registered text components. */
     private ChangeListener caretWatcher = new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
-            currentComponent = ((ECaret) e.getSource()).getTextComponent();
+            // FIXME
+            //currentComponent = ((ECaret) e.getSource()).getTextComponent();
             timer.restart();
         }
     };

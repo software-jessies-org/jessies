@@ -6,10 +6,9 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.event.*;
-import javax.swing.text.*;
 import javax.swing.tree.*;
 import e.gui.*;
+import e.ptextarea.*;
 
 public class TagsUpdater {
     private ETree tree;
@@ -28,16 +27,18 @@ public class TagsUpdater {
     private void installListeners() {
         final ETextArea text = textWindow.getText();
         // Rebuild tags when the document line count changes.
-        text.getDocument().addDocumentListener(new DocumentListener() {
+        text.getPTextBuffer().addTextListener(new PTextListener() {
             private int lastLineCount;
             
-            public void changedUpdate(DocumentEvent e) {
-                // We don't care about style changes.
-            }
-            public void insertUpdate(DocumentEvent e) {
+            public void textCompletelyReplaced(PTextEvent e) {
                 update();
             }
-            public void removeUpdate(DocumentEvent e) {
+            
+            public void textRemoved(PTextEvent e) {
+                update();
+            }
+            
+            public void textInserted(PTextEvent e) {
                 update();
             }
             
@@ -58,8 +59,8 @@ public class TagsUpdater {
                 selectTagAtCaret(text);
             }
         });
-        text.getCaret().addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
+        text.addCaretListener(new PCaretListener() {
+            public void caretMoved(int oldOffset, int newOffset) {
                 if (followCaretChanges) {
                     selectTagAtCaret(text);
                 }
@@ -68,12 +69,9 @@ public class TagsUpdater {
     }
     
     private void selectTagAtCaret(ETextArea text) {
-        try {
-            int lineNumber = text.getLineOfOffset(text.getCaretPosition());
-            selectTreeNode(getTagForLine(lineNumber));
-        } catch (BadLocationException ex) {
-            ex = ex;
-        }
+        // FIXME - selection
+        int lineNumber = text.getLineOfOffset(text.getSelectionStart());
+        selectTreeNode(getTagForLine(lineNumber));
     }
     
     private void createUI() {
@@ -139,7 +137,7 @@ public class TagsUpdater {
      * tag for the line, finds the nearest tag before the caret. If that
      * fails, returns null.
      */
-    public TreeNode getTagForLine(int lineNumber) throws BadLocationException {
+    public TreeNode getTagForLine(int lineNumber) {
         lineNumber++; // JTextComponent numbers lines from 0, ectags from 1.
         
         TagReader.Tag nearestTag = null;
@@ -223,11 +221,7 @@ public class TagsUpdater {
         }
         
         public void tagFound(TagReader.Tag tag) {
-            try {
-                tag.toolTip = textWindow.getText().getLineText(tag.lineNumber - 1);
-            } catch (javax.swing.text.BadLocationException ex) {
-                ex.printStackTrace();
-            }
+            tag.toolTip = textWindow.getText().getLineText(tag.lineNumber - 1);
             
             DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
             
@@ -264,7 +258,7 @@ public class TagsUpdater {
                     temporaryFile = File.createTempFile("edit-", getFilenameSuffix());
                     temporaryFile.deleteOnExit();
                 }
-                getTextWindow().writeCopyTo(temporaryFile);
+                getTextWindow().getText().getPTextBuffer().writeToFile(temporaryFile);
                 TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), this);
                 String newDigest = tagReader.getTagsDigest();
                 tagsHaveNotChanged = newDigest.equals(digest);

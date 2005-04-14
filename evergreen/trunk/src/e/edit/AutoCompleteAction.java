@@ -4,8 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.text.*;
-import e.util.*;
 
 /**
  * Offers completions for the word before the caret.
@@ -21,7 +19,7 @@ public class AutoCompleteAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextArea target = (ETextArea) getFocusedComponent();
+        ETextArea target = getTextArea();
         if (target != null) {
             offerCompletions(target);
         }
@@ -29,7 +27,8 @@ public class AutoCompleteAction extends ETextAction {
     
     public void offerCompletions(final ETextArea target) {
         String prefix = target.getWordUpToCaret();
-        final int endPosition = target.getCaretPosition();
+        // FIXME - selection
+        final int endPosition = target.getSelectionStart();
         final int startPosition = endPosition - prefix.length();
         
         // FIXME: we should be able to offer completions for other languages.
@@ -70,7 +69,8 @@ public class AutoCompleteAction extends ETextAction {
         completionsUi.setFont(target.getFont());
         completionsUi.setVisibleRowCount(Math.min(20, completionsUi.getModel().getSize()));
         
-        try {
+        // FIXME
+        /*
             Rectangle startRectangle = target.modelToView(startPosition);
             Point origin = target.getLocationOnScreen();
             Point windowLocation = new Point(startRectangle.x, startRectangle.y + startRectangle.height);
@@ -79,9 +79,7 @@ public class AutoCompleteAction extends ETextAction {
             Frame owner = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, target);
             showCompletionsWindow(owner, windowLocation, new JScrollPane(completionsUi));
             completionsUi.requestFocus();
-        } catch (BadLocationException ex) {
-            Log.warn("Couldn't show the completions.", ex);
-        }
+        */
     }
     
     private void hideCompletionsWindow() {

@@ -8,15 +8,13 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.undo.*;
 import e.gui.*;
 import e.util.*;
 
 /**
  * A text-editing component.
  */
-public class ETextWindow extends ETextComponent implements DocumentListener {
+public class ETextWindow extends EWindow implements DocumentListener {
     /**
      * Ensures that the TagsPanel is empty if the focused window isn't an ETextWindow.
      */
@@ -112,12 +110,14 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         text.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
                 rememberWeHadFocusLast();
-                text.setSelectionColor(FOCUSED_SELECTION_COLOR);
+                // FIXME
+                //text.setSelectionColor(FOCUSED_SELECTION_COLOR);
                 updateWatermark();
             }
             
             public void focusLost(FocusEvent e) {
-                text.setSelectionColor(UNFOCUSED_SELECTION_COLOR);
+                // FIXME
+                //text.setSelectionColor(UNFOCUSED_SELECTION_COLOR);
             }
             
             private void rememberWeHadFocusLast() {
@@ -137,15 +137,12 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     
     /** Returns the grep-style ":<line>:<column>" address for the caret position. */
     public String getAddress() {
-        try {
-            int caretPosition = text.getCaretPosition();
-            int lineNumber = 1 + text.getLineOfOffset(caretPosition);
-            int lineStart = text.getLineStartOffset(lineNumber - 1);
-            int columnNumber = 1 + emacsDistance(text.charSequence(), caretPosition, lineStart);
-            return ":" + lineNumber + ":" + columnNumber;
-        } catch (BadLocationException ex) {
-            return "";
-        }
+        // FIXME - work with non-empty selections
+        int caretPosition = text.getSelectionStart();
+        int lineNumber = 1 + text.getLineOfOffset(caretPosition);
+        int lineStart = text.getLineStartOffset(lineNumber - 1);
+        int columnNumber = 1 + emacsDistance(text.charSequence(), caretPosition, lineStart);
+        return ":" + lineNumber + ":" + columnNumber;
     }
     
     public void requestFocus() {
@@ -170,10 +167,6 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     
     public void removeUpdate(DocumentEvent e) {
         markAsDirty();
-    }
-    
-    public UndoManager getUndoManager() {
-        return text.getUndoManager();
     }
     
     /** Tests whether the 'content' looks like a Unix shell script. */
@@ -210,7 +203,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         if (keywords == null) {
             keywords = new HashSet();
         }
-        text.getDocument().putProperty(JTextComponentSpellingChecker.KEYWORDS_DOCUMENT_PROPERTY, keywords);
+        text.getPTextBuffer().putProperty(JTextComponentSpellingChecker.KEYWORDS_DOCUMENT_PROPERTY, keywords);
     }
     
     public void updateWatermark() {
@@ -256,11 +249,14 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             text.setText(content);
             text.setAppropriateFont();
             text.getIndenter().setIndentationPropertyBasedOnContent(text, content);
-            text.getUndoManager().discardAllEdits();
-            text.getDocument().addDocumentListener(this);
+            // FIXME
+            //text.getUndoManager().discardAllEdits();
+            // FIXME
+            //text.getDocument().addDocumentListener(this);
             if (fileType != UNKNOWN) {
                 text.enableAutoIndent();
-                text.getDocument().addDocumentListener(new UnmatchedBracketHighlighter(text));
+                // FIXME
+                //text.getDocument().addDocumentListener(new UnmatchedBracketHighlighter(text));
             }
             markAsClean();
             getTitleBar().checkForCounterpart(); // If we don't do this, we don't get the icon until we get focus.
@@ -272,7 +268,8 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     }
     
     private void uncheckedRevertToSaved() {
-        int originalCaretPosition = text.getCaretPosition();
+        // FIXME - work with non-empty selection
+        int originalCaretPosition = text.getSelectionStart();
         fillWithContent();
         text.setCaretPosition(originalCaretPosition);
         Edit.showStatus("Reverted to saved version of " + filename);
@@ -432,24 +429,17 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     }
     
     public void goToLine(int line) {
-        try {
-            // Humans number lines from 1, JTextComponent from 0.
-            line--;
-            final int start = text.getLineStartOffset(line);
-            final int end = text.getLineEndOffset(line);
-            JTextComponentUtilities.goToSelection(text, start, end);
-        } catch (javax.swing.text.BadLocationException ex) {
-            ex.printStackTrace();
-        }
+        // Humans number lines from 1, JTextComponent from 0.
+        line--;
+        final int start = text.getLineStartOffset(line);
+        final int end = text.getLineEndOffset(line);
+        text.select(start, end);
     }
     
     public int getCurrentLineNumber() {
-        try {
-            // Humans number lines from 1, JTextComponent from 0.
-            return 1 + text.getLineOfOffset(text.getCaretPosition());
-        } catch (BadLocationException ex) {
-            return 0;
-        }
+        // Humans number lines from 1, JTextComponent from 0.
+        // FIXME - work with non-empty selections
+        return 1 + text.getLineOfOffset(text.getSelectionStart());
     }
     
     public boolean isDirty() {
@@ -473,12 +463,14 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     
     public void findNext() {
         updateFindResults();
-        JTextComponentUtilities.findNextHighlight(getText(), Position.Bias.Forward, FindAction.PAINTER);
+        // FIXME
+        //JTextComponentUtilities.findNextHighlight(getText(), Position.Bias.Forward, FindAction.PAINTER);
     }
     
     public void findPrevious() {
         updateFindResults();
-        JTextComponentUtilities.findNextHighlight(getText(), Position.Bias.Backward, FindAction.PAINTER);
+        // FIXME
+        //JTextComponentUtilities.findNextHighlight(getText(), Position.Bias.Backward, FindAction.PAINTER);
     }
     
     public void updateFindResults() {
@@ -521,46 +513,44 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
     }
     
     public void jumpToAddress(String address) {
-        try {
-            CharSequence chars = text.charSequence();
-            StringTokenizer st = new StringTokenizer(address, ":");
-            int line = Integer.parseInt(st.nextToken()) - 1;
-            int offset = text.getLineStartOffset(line);
-            int maxOffset = text.getLineEndOffset(line) - 1;
-            if (st.hasMoreTokens()) {
-                try {
-                    offset = emacsWalk(chars, offset, Integer.parseInt(st.nextToken()));
-                } catch (NumberFormatException ex) {
-                    ex = ex;
-                }
+        CharSequence chars = text.charSequence();
+        StringTokenizer st = new StringTokenizer(address, ":");
+        int line = Integer.parseInt(st.nextToken()) - 1;
+        int offset = text.getLineStartOffset(line);
+        int maxOffset = text.getLineEndOffset(line) - 1;
+        if (st.hasMoreTokens()) {
+            try {
+                offset = emacsWalk(chars, offset, Integer.parseInt(st.nextToken()));
+            } catch (NumberFormatException ex) {
+                ex = ex;
             }
-            
-            // We interpret address ending with a ":" (from grep and compilers) as requiring
-            // the line to be selected. Other addresses (such as from our open-file-list) just
-            // mean "position the caret".
-            int endOffset = (address.endsWith(":")) ? (maxOffset + 1) : offset;
-            
-            if (st.hasMoreTokens()) {
-                try {
-                    endOffset = text.getLineStartOffset(Integer.parseInt(st.nextToken()) - 1);
-                } catch (NumberFormatException ex) {
-                    ex = ex;
-                }
-            }
-            if (st.hasMoreTokens()) {
-                try {
-                    // emacs end offsets seem to include the character following.
-                    endOffset = emacsWalk(chars, endOffset, Integer.parseInt(st.nextToken())) + 1;
-                } catch (NumberFormatException ex) {
-                    ex = ex;
-                }
-            }
-            offset = Math.min(offset, maxOffset);
-            endOffset = Math.min(endOffset, maxOffset);
-            JTextComponentUtilities.goToSelection(text, offset, endOffset);
-        } catch (javax.swing.text.BadLocationException ex) {
-            ex.printStackTrace();
         }
+        
+        // We interpret address ending with a ":" (from grep and compilers) as requiring
+        // the line to be selected. Other addresses (such as from our open-file-list) just
+        // mean "position the caret".
+        int endOffset = (address.endsWith(":")) ? (maxOffset + 1) : offset;
+        
+        if (st.hasMoreTokens()) {
+            try {
+                endOffset = text.getLineStartOffset(Integer.parseInt(st.nextToken()) - 1);
+            } catch (NumberFormatException ex) {
+                ex = ex;
+            }
+        }
+        if (st.hasMoreTokens()) {
+            try {
+                // emacs end offsets seem to include the character following.
+                endOffset = emacsWalk(chars, endOffset, Integer.parseInt(st.nextToken())) + 1;
+            } catch (NumberFormatException ex) {
+                ex = ex;
+            }
+        }
+        offset = Math.min(offset, maxOffset);
+        endOffset = Math.min(endOffset, maxOffset);
+        // FIXME
+        //JTextComponentUtilities.goToSelection(text, offset, endOffset);
+        text.select(offset, endOffset);
     }
     
     /**
@@ -616,7 +606,7 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
         File backupFile = FileUtilities.fileFromString(this.filename + ".bak");
         if (file.exists()) {
             try {
-                writeCopyTo(backupFile);
+                text.getPTextBuffer().writeToFile(backupFile);
             } catch (Exception ex) {
                 Edit.showAlert("Save", "File '" + this.filename + "' wasn't saved! Couldn't create backup file.");
                 return false;
@@ -627,14 +617,14 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
             Edit.showStatus("Saving " + filename + "...");
             // The file may be a symlink on a cifs server.
             // In this case, it's important that we write into the original file rather than creating a new one.
-            writeCopyTo(file);
+            text.getPTextBuffer().writeToFile(file);
             Edit.showStatus("Saved " + filename);
             markAsClean();
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
             tagsUpdater.updateTags();
             return true;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Edit.showStatus("");
             Edit.showAlert("Save", "Couldn't save file '" + filename + "' (" + ex.getMessage() + ").");
             ex.printStackTrace();
@@ -652,19 +642,13 @@ public class ETextWindow extends ETextComponent implements DocumentListener {
                     return false;
                 }
             }
-            writeCopyTo(newFile);
+            text.getPTextBuffer().writeToFile(newFile);
             return true;
         } catch (Exception ex) {
             Edit.showAlert("Save As", "Couldn't save file '" + newFilename + "' (" + ex.getMessage() + ").");
             ex.printStackTrace();
         }
         return false;
-    }
-    
-    public void writeCopyTo(File file) throws IOException {
-        Writer writer = new BufferedWriter(new FileWriter(file));
-        text.write(writer);
-        writer.close();
     }
     
     public void invokeShellCommand(String context, String command, boolean shouldShowProgress) {

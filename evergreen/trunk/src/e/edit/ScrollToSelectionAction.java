@@ -1,11 +1,10 @@
 package e.edit;
 
 import java.awt.event.*;
-import e.gui.*;
 
 /**
-An action that ensures that the selection is visible.
-*/
+ * An action that ensures that the selection is visible.
+ */
 public class ScrollToSelectionAction extends ETextAction {
     public static final String ACTION_NAME = "Scroll to Selection";
 
@@ -15,10 +14,10 @@ public class ScrollToSelectionAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextWindow window = getFocusedTextWindow();
-        if (window == null) {
+        ETextArea area = getTextArea();
+        if (area == null) {
             return;
         }
-        JTextComponentUtilities.ensureVisibilityOfOffset(window.getText(), window.getText().getCaretPosition());
+        area.ensureVisibilityOfOffset(area.getUnanchoredSelectionExtreme());
     }
 }

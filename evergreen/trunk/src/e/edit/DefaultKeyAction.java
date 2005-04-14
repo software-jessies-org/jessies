@@ -1,7 +1,6 @@
 package e.edit;
 
 import java.awt.event.*;
-import javax.swing.undo.*;
 import e.util.*;
 
 public class DefaultKeyAction extends ETextAction {
@@ -15,10 +14,13 @@ public class DefaultKeyAction extends ETextAction {
             return;
         }
         
+        // FIXME
+        /*
         if ((! target.isEditable()) || (! target.isEnabled())) {
             javax.swing.UIManager.getLookAndFeel().provideErrorFeedback(target);
             return;
         }
+        */
         
         String content = e.getActionCommand();
         int mod = e.getModifiers();
@@ -31,6 +33,8 @@ public class DefaultKeyAction extends ETextAction {
             return;
         }
         
+        // FIXME
+        /*
         if (target.getIndenter().isElectric(c)) {
             CompoundEdit entireEdit = new CompoundEdit();
             target.getUndoManager().addEdit(entireEdit);
@@ -45,5 +49,6 @@ public class DefaultKeyAction extends ETextAction {
         } else {
             javax.swing.UIManager.getLookAndFeel().provideErrorFeedback(target);
         }
+        */
     }
 }

@@ -1,16 +1,12 @@
 package e.edit;
 
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.undo.*;
-
 import e.util.*;
 
 /**
 The ETextArea action that inserts a newline and performs auto-indentation.
 */
-public class InsertNewlineAction extends TextAction {
+public class InsertNewlineAction extends ETextAction {
     public static final String ACTION_NAME = "insert-newline-and-auto-indent";
 
     public InsertNewlineAction() {
@@ -18,7 +14,9 @@ public class InsertNewlineAction extends TextAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        ETextArea target = (ETextArea) getFocusedComponent();
+        // FIXME
+        /*
+        ETextArea target = getTextArea();
         CompoundEdit entireEdit = new CompoundEdit();
         target.getUndoManager().addEdit(entireEdit);
         try {
@@ -39,8 +37,10 @@ public class InsertNewlineAction extends TextAction {
         } finally {
             entireEdit.end();
         }
+        */
     }
     
+    /*
     public void insertMatchingBrace(ETextArea target) {
         try {
             ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, target);
@@ -61,19 +61,18 @@ public class InsertNewlineAction extends TextAction {
             Log.warn("Problem inserting brace pair.", ex);
         }
     }
+    */
     
     public void insertMatchingCloseComment(ETextArea target) {
-        try {
-            final int position = target.getCaretPosition();
-            String line = target.getLineTextAtOffset(position);
-            String whitespace = target.getIndentationOfLineAtOffset(position);
-            String prefix = "\n" + whitespace + " * ";
-            String suffix = "\n" + whitespace + " */";
-            target.getDocument().insertString(position, prefix + suffix, null);
-            target.setCaretPosition(position + prefix.length());
-        } catch (BadLocationException ex) {
-            Log.warn("Problem inserting close comment.", ex);
-        }
+        // FIXME - selection?
+        final int position = target.getSelectionStart();
+        String line = target.getLineTextAtOffset(position);
+        String whitespace = target.getIndentationOfLineAtOffset(position);
+        String prefix = "\n" + whitespace + " * ";
+        String suffix = "\n" + whitespace + " */";
+        target.insert(prefix + suffix);
+        // FIXME: this is automatic in PTextArea, no?
+        //target.setCaretPosition(position + prefix.length());
     }
     
     public boolean hasUnbalancedBraces(final String text) {

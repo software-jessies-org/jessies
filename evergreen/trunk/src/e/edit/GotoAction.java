@@ -1,7 +1,6 @@
 package e.edit;
 
 import java.awt.event.*;
-import javax.swing.text.*;
 import e.util.*;
 
 /**
@@ -23,7 +22,8 @@ public class GotoAction extends ETextAction implements MinibufferUser {
         if (currentTextWindow == null) {
             return;
         }
-        initialCaretPosition = currentTextWindow.getText().getCaretPosition();
+        // FIXME - selection
+        initialCaretPosition = currentTextWindow.getText().getSelectionStart();
         
         Edit.showMinibuffer(this);
     }
@@ -37,16 +37,10 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     }
     
     public String getInitialValue() {
-        String result = "";
-        try {
-            ETextArea textArea = currentTextWindow.getText();
-            int lineNumber = 1 + textArea.getLineOfOffset(textArea.getCaretPosition());
-            result = Integer.toString(lineNumber);
-        } catch (BadLocationException ex) {
-            // Ignore.
-            ex = ex;
-        }
-        return result;
+        ETextArea textArea = currentTextWindow.getText();
+        // FIXME - selection
+        int lineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
+        return Integer.toString(lineNumber);
     }
     
     public String getPrompt() {

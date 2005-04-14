@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.*;
-import javax.swing.undo.*;
 import e.forms.*;
 import e.gui.*;
 import e.util.*;
@@ -110,6 +109,8 @@ public class FindAndReplaceAction extends ETextAction {
     }
 
     public boolean doReplacementsInText() {
+        // FIXME
+        /*
         // Introduce a CompoundEdit to the UndoManager so that all our replacements are treated as a single UndoableEdit.
         CompoundEdit entireEdit = new CompoundEdit();
         UndoManager undoManager = text.getUndoManager();
@@ -136,6 +137,9 @@ public class FindAndReplaceAction extends ETextAction {
             // FIXME: We should probably undo the CompoundEdit if an exception was thrown, but as it is we're likely to want to fix what went wrong.
             entireEdit.end();
         }
+        */
+        Edit.showAlert("Find And Replace", "Not yet implemented.");
+        return false;
     }
 
     public String makeReplacedText(String oldText) {

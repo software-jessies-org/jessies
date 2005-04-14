@@ -36,7 +36,7 @@ public class Indenter {
     public void setIndentationPropertyBasedOnContent(ETextArea text, String content) {
         String indentation = text.getIndenter().guessIndentationFromFile(content);
         //System.err.println(filename + ": '" + indentation + "'");
-        text.getDocument().putProperty(Indenter.INDENTATION_PROPERTY, indentation);
+        text.getPTextBuffer().putProperty(Indenter.INDENTATION_PROPERTY, indentation);
     }
     
     public String guessIndentationFromFile(String fileContents) {

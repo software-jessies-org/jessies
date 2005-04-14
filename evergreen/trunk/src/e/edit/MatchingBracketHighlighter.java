@@ -3,6 +3,7 @@ package e.edit;
 import java.awt.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
+import e.ptextarea.*;
 
 /**
  * Highlights matching pairs of brackets in a JTextComponent. Add one of these
@@ -49,11 +50,11 @@ public class MatchingBracketHighlighter implements ChangeListener {
             DocumentCharSequence chars = new DocumentCharSequence(textComponent.getDocument());
             Highlighter highlighter = textComponent.getHighlighter();
             char ch = chars.charAt(offset);
-            if (Brackets.isCloseBracket(ch)) {
+            if (PBracketUtilities.isCloseBracket(ch)) {
                 matchingBracketHighlights[0] = highlighter.addHighlight(offset, offset + 1, MATCHING_BRACKET_PAINTER);
             } else if (offset > 0) {
                 char previousChar = chars.charAt(offset - 1);
-                if (Brackets.isOpenBracket(previousChar)) {
+                if (PBracketUtilities.isOpenBracket(previousChar)) {
                     matchingBracketHighlights[0] = highlighter.addHighlight(offset - 1, offset, MATCHING_BRACKET_PAINTER);
                 }
             }
@@ -61,11 +62,11 @@ public class MatchingBracketHighlighter implements ChangeListener {
                 return;
             }
             
-            int matchingBracketOffset = Brackets.findMatchingBracket(chars, offset);
+            int matchingBracketOffset = PBracketUtilities.findMatchingBracket(chars, offset);
             if (matchingBracketOffset != -1) {
                 int start = matchingBracketOffset;
                 int end = matchingBracketOffset;
-                if (Brackets.isCloseBracket(ch)) {
+                if (PBracketUtilities.isCloseBracket(ch)) {
                     --start;
                 } else {
                     ++end;
