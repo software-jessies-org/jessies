@@ -294,6 +294,9 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     }
     
     private void dirtyFromOffset(PTextEvent event) {
+        if (textArea.isLineWrappingInvalid()) {
+            return;
+        }
         CharSequence seq = textArea.getPTextBuffer();
         StringBuffer buf = new StringBuffer();
         String prefix = seq.subSequence(Math.max(0, event.getOffset() - 2), event.getOffset()).toString();

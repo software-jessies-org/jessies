@@ -712,7 +712,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         repaint(0, top, getWidth(), bottom - top);
     }
     
-    private synchronized boolean isLineWrappingInvalid() {
+    public synchronized boolean isLineWrappingInvalid() {
         return (splitLines == null);
     }
     
