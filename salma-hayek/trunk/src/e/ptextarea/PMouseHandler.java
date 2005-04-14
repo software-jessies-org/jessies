@@ -33,13 +33,13 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     }
     
     private PDragHandler getDragHandlerForClick(MouseEvent e) {
-        switch (e.getClickCount() % 3) {
-        case 0: return new TripleClickDragHandler();
-        case 1: return new SingleClickDragHandler();
-        case 2:
-           PDragHandler result = textArea.getPTextStyler().getDoubleClickDragHandler(getOffsetAtMouse(e));
+        if (e.getClickCount() == 1) {
+            return new SingleClickDragHandler();
+        } else if (e.getClickCount() == 2) {
+            PDragHandler result = textArea.getPTextStyler().getDoubleClickDragHandler(getOffsetAtMouse(e));
             return (result == null) ? new DoubleClickDragHandler() : result;
-        default: throw new RuntimeException("Logically impossible");
+        } else {
+            return new TripleClickDragHandler();
         }
     }
     
