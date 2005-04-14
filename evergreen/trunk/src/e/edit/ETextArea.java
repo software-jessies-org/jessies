@@ -200,7 +200,7 @@ public class ETextArea extends PTextArea {
     public String getIndentationOfLine(int lineNumber) {
         int lineStart = getLineStartOffset(lineNumber);
         int lineEnd = getLineEndOffset(lineNumber);
-        String currentLine = getPTextBuffer().subSequence(lineStart, lineEnd - lineStart).toString();
+        String currentLine = getPTextBuffer().subSequence(lineStart, lineEnd).toString();
         StringBuffer whitespace = new StringBuffer();
         for (int i = 0; i < currentLine.length(); ++i) {
             char c = currentLine.charAt(i);
@@ -304,7 +304,7 @@ public class ETextArea extends PTextArea {
             }
             --start;
         }
-        return getPTextBuffer().subSequence(start, end - start).toString();
+        return getPTextBuffer().subSequence(start, end).toString();
     }
 
     /**
@@ -335,6 +335,6 @@ public class ETextArea extends PTextArea {
         if (lineEnd != getPTextBuffer().length()) {
             length--;
         }
-        return (length > 0) ? getPTextBuffer().subSequence(lineStart, length).toString() : "";
+        return (length > 0) ? getPTextBuffer().subSequence(lineStart, lineStart + length).toString() : "";
     }
 }
