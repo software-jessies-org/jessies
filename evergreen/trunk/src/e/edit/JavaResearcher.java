@@ -4,6 +4,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
+import e.ptextarea.*;
 import e.util.*;
 
 public class JavaResearcher implements WorkspaceResearcher {
@@ -423,7 +424,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         return textWindow.isJava();
     }
     
-    public String research(javax.swing.text.JTextComponent textArea, String string) {
+    public String research(PTextArea textArea, String string) {
         if (string.startsWith("import ")) {
             return makePackageResult(string);
         } else {

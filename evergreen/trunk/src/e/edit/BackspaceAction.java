@@ -1,13 +1,12 @@
 package e.edit;
 
 import java.awt.event.*;
-import javax.swing.text.*;
 import e.util.*;
 
 /**
-The ETextArea action that removes characters.
-*/
-public class BackspaceAction extends TextAction {
+ * The ETextArea action that removes characters.
+ */
+public class BackspaceAction extends ETextAction {
     public static final String ACTION_NAME = "back-space";
 
     public BackspaceAction() {
@@ -15,20 +14,17 @@ public class BackspaceAction extends TextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextArea target = (ETextArea) getFocusedComponent();
-        try {
-            if (target.getSelectionStart() == target.getSelectionEnd()) {
-                selectSomethingToDelete(target);
-            }
-            target.replaceSelection("");
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
+        ETextArea target = getTextArea();
+        if (target.getSelectionStart() == target.getSelectionEnd()) {
+            selectSomethingToDelete(target);
         }
+        target.replaceSelection("");
     }
     
-    public void selectSomethingToDelete(ETextArea target) throws BadLocationException {
+    public void selectSomethingToDelete(ETextArea target) {
         int charactersToDelete = 1;
-        int position = target.getCaretPosition();
+        // FIXME - selection
+        int position = target.getSelectionStart();
         String whitespace = target.getIndentationOfLineAtOffset(position);
         int lineOffset = position - target.getLineStartOffset(target.getLineOfOffset(position));
         CharSequence chars = target.charSequence();

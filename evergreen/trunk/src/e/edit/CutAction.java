@@ -3,8 +3,8 @@ package e.edit;
 import java.awt.event.*;
 
 /**
-The ETextArea action to cut to the clipboard.
-*/
+ * FIXME: PTextArea should export a cut action.
+ */
 public class CutAction extends ETextAction {
     public static final String ACTION_NAME = "Cut";
 
@@ -14,7 +14,6 @@ public class CutAction extends ETextAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        ETextArea target = (ETextArea) getFocusedComponent();
-        target.cut();
+        getTextArea().cut();
     }
 }

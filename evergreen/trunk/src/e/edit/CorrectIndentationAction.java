@@ -1,12 +1,11 @@
 package e.edit;
 
 import java.awt.event.*;
-import javax.swing.text.*;
 
 /**
-The ETextArea action that automatically corrects the current line's indentation.
-*/
-public class CorrectIndentationAction extends TextAction {
+ * The ETextArea action that automatically corrects the current line's indentation.
+ */
+public class CorrectIndentationAction extends ETextAction {
     public static final String ACTION_NAME = "Correct Indentation";
 
     public CorrectIndentationAction() {
@@ -15,7 +14,6 @@ public class CorrectIndentationAction extends TextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextArea target = (ETextArea) getFocusedComponent();
-        target.correctIndentation();
+        getTextArea().correctIndentation();
     }
 }

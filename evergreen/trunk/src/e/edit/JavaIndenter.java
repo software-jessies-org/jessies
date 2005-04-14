@@ -35,14 +35,10 @@ public class JavaIndenter extends Indenter {
     }
         
     public int getPreviousDefinitiveLineNumber(ETextArea text, int startLineNumber) {
-        try {
-            for (int lineNumber = startLineNumber - 1; lineNumber > 0; lineNumber--) {
-                if (isDefinitive(text.getLineText(lineNumber))) {
-                    return lineNumber;
-                }
+        for (int lineNumber = startLineNumber - 1; lineNumber > 0; lineNumber--) {
+            if (isDefinitive(text.getLineText(lineNumber))) {
+                return lineNumber;
             }
-        } catch (javax.swing.text.BadLocationException ex) {
-            ex.printStackTrace();
         }
         return 0;
     }

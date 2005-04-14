@@ -1,6 +1,7 @@
 package e.edit;
 
 import java.util.*;
+import e.ptextarea.*;
 import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {
@@ -9,7 +10,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
      * containing information about what it found. Should return
      * the empty string (not null) if it has nothing to say.
      */
-    public String research(javax.swing.text.JTextComponent text, String string) {
+    public String research(PTextArea text, String string) {
         String ri = getRi();
         if (ri == null) {
             return "";

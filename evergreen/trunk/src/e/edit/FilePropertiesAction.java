@@ -2,9 +2,8 @@ package e.edit;
 
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.text.*;
-
 import e.forms.*;
+import e.ptextarea.*;
 import e.util.*;
 
 /**
@@ -29,8 +28,8 @@ public class FilePropertiesAction extends ETextAction {
         }
         
         ETextArea text = window.getText();
-        Document doc = text.getDocument();
-        String endOfLineString = (String) doc.getProperty(DefaultEditorKit.EndOfLineStringProperty);
+        PTextBuffer buffer = text.getPTextBuffer();
+        String endOfLineString = (String) buffer.getProperty(PTextBuffer.LINE_ENDING_PROPERTY);
         if (endOfLineString == null) {
             endOfLineString = System.getProperty("line.separator");
         }
@@ -51,8 +50,8 @@ public class FilePropertiesAction extends ETextAction {
         }
         
         String newEndOfLine = StringUtilities.unescapeJava(endOfLineStringField.getText());
-        doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, newEndOfLine);
+        buffer.putProperty(PTextBuffer.LINE_ENDING_PROPERTY, newEndOfLine);
         String newIndentationString = StringUtilities.unescapeJava(indentStringField.getText());
-        doc.putProperty(Indenter.INDENTATION_PROPERTY, newIndentationString);
+        buffer.putProperty(Indenter.INDENTATION_PROPERTY, newIndentationString);
     }
 }

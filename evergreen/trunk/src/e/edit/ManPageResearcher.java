@@ -1,6 +1,7 @@
 package e.edit;
 
 import java.util.*;
+import e.ptextarea.*;
 import e.util.*;
 
 /**
@@ -44,7 +45,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
      * containing information about what it found. Should return
      * the empty string (not null) if it has nothing to say.
      */
-    public String research(javax.swing.text.JTextComponent text, String string) {
+    public String research(PTextArea text, String string) {
         if (knownManPages.contains(string)) {
             return "Manual page for <a href=\"man:" + string + "\">" + string + "</a>";
         }

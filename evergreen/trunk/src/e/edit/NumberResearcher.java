@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.ptextarea.*;
 import e.util.*;
 
 public class NumberResearcher implements WorkspaceResearcher {
@@ -8,7 +9,7 @@ public class NumberResearcher implements WorkspaceResearcher {
      * containing information about what it found. Should return
      * the empty string (not null) if it has nothing to say.
      */
-    public String research(javax.swing.text.JTextComponent text, String string) {
+    public String research(PTextArea text, String string) {
         try {
             NumberDecoder numberDecoder = new NumberDecoder(string);
             return numberDecoder.toHtml();
