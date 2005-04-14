@@ -16,7 +16,11 @@ public abstract class ETextAction extends AbstractAction {
     }
     
     public ETextArea getTextArea() {
-        return (ETextArea) (SwingUtilities.getAncestorOfClass(ETextArea.class, getFocusedComponent()));
+        Component focusedComponent = getFocusedComponent();
+        if (focusedComponent instanceof ETextArea) {
+            return (ETextArea) focusedComponent;
+        }
+        return (ETextArea) SwingUtilities.getAncestorOfClass(ETextArea.class, focusedComponent);
     }
     
     public ETextWindow getFocusedTextWindow() {
