@@ -24,15 +24,24 @@ public class PTextBuffer implements CharSequence {
     private int gapPosition;
     private int gapLength;
     private ArrayList listeners = new ArrayList();
-    private Undoer undoBuffer = new Undoer();
+    private Undoer undoBuffer;
     private HashMap properties = new HashMap();
     
     public PTextBuffer() {
         initDefaultProperties();
+        resetUndoBuffer();
     }
     
     private void initDefaultProperties() {
         putProperty(LINE_ENDING_PROPERTY, "\n");
+    }
+    
+    /**
+     * Discards all edits from the undo buffer. Typically only useful if you're
+     * replacing the entire content of the text buffer.
+     */
+    public void resetUndoBuffer() {
+        undoBuffer = new Undoer();
     }
     
     /**
