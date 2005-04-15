@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.ptextarea.*;
 import e.util.*;
 import java.util.regex.*;
 import javax.swing.text.*;
@@ -31,12 +32,10 @@ public class Indenter {
         return text.getIndentationOfLine(text.getPreviousNonBlankLineNumber(lineNumber));
     }
     
-    public static final String INDENTATION_PROPERTY = "IndentationStringProperty";
-    
     public void setIndentationPropertyBasedOnContent(ETextArea text, String content) {
         String indentation = text.getIndenter().guessIndentationFromFile(content);
         //System.err.println(filename + ": '" + indentation + "'");
-        text.getPTextBuffer().putProperty(Indenter.INDENTATION_PROPERTY, indentation);
+        text.getPTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, indentation);
     }
     
     public String guessIndentationFromFile(String fileContents) {

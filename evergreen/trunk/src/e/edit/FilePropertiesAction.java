@@ -52,6 +52,6 @@ public class FilePropertiesAction extends ETextAction {
         String newEndOfLine = StringUtilities.unescapeJava(endOfLineStringField.getText());
         buffer.putProperty(PTextBuffer.LINE_ENDING_PROPERTY, newEndOfLine);
         String newIndentationString = StringUtilities.unescapeJava(indentStringField.getText());
-        buffer.putProperty(Indenter.INDENTATION_PROPERTY, newIndentationString);
+        buffer.putProperty(PTextBuffer.INDENTATION_PROPERTY, newIndentationString);
     }
 }
