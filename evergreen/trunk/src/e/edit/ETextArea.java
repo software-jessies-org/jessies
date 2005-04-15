@@ -184,10 +184,6 @@ public class ETextArea extends PTextArea {
         return indenter;
     }
     
-    public String getIndentationString() {
-        return (String) getPTextBuffer().getProperty(Indenter.INDENTATION_PROPERTY);
-    }
-    
     /**
      * Returns a string corresponding to the spaces and tabs found at the
      * start of the line containing the given offset.
