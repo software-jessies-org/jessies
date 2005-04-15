@@ -15,7 +15,7 @@ public final class PStyle {
     
     private Color color;
     
-    public final Color color() {
+    public final Color getColor() {
         return color;
     }
     
