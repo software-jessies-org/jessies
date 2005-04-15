@@ -139,7 +139,11 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private void insertCharacter(char ch) {
-        textArea.insert(new CharArrayCharSequence(new char[] { ch }));
+        if (ch == '\t') {
+            textArea.insertTab();
+        } else {
+            textArea.insert(new CharArrayCharSequence(new char[] { ch }));
+        }
     }
     
     private void backspace() {

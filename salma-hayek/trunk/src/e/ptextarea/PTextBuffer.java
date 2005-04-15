@@ -15,6 +15,7 @@ import java.util.*;
 
 public class PTextBuffer implements CharSequence {
     public static final String LINE_ENDING_PROPERTY = "LineEndingProperty";
+    public static final String INDENTATION_PROPERTY = "IndentationProperty";
     
     private static final String CHARSET = "UTF-8";
     private static final int MIN_BUFFER_EXTENSION = 100;

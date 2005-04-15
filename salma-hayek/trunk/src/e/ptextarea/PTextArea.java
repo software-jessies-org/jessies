@@ -180,6 +180,21 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
     }
     
+    public void insertTab() {
+        replaceSelection(getIndentationString());
+    }
+    
+    /**
+     * Returns the string to use as a single indent level in this text area.
+     */
+    public String getIndentationString() {
+        String result = (String) getPTextBuffer().getProperty(PTextBuffer.INDENTATION_PROPERTY);
+        if (result == null) {
+            result = "\t";
+        }
+        return result;
+    }
+    
     public void insert(CharSequence chars) {
         SelectionSetter endCaret =new SelectionSetter(getSelectionStart() + chars.length());
         int length = getSelectionEnd() - getSelectionStart();
