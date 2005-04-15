@@ -16,7 +16,7 @@ public final class PStyle {
     private String name;
     private Color color;
     
-    public final Color getColor() {
+    public Color getColor() {
         return color;
     }
     
