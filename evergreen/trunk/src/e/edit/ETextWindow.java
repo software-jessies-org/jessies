@@ -249,8 +249,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             text.setText(content);
             text.setAppropriateFont();
             text.getIndenter().setIndentationPropertyBasedOnContent(text, content);
-            // FIXME
-            //text.getUndoManager().discardAllEdits();
+            text.getPTextBuffer().resetUndoBuffer();
             if (fileType != UNKNOWN) {
                 text.enableAutoIndent();
                 // FIXME
