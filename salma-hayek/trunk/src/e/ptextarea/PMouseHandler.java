@@ -1,6 +1,5 @@
 package e.ptextarea;
 
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -54,7 +53,9 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     
     public void mouseDragged(MouseEvent event) {
         if (dragHandler != null) {
-            dragHandler.mouseDragged(getOffsetAtMouse(event));
+            int newOffset = getOffsetAtMouse(event);
+            dragHandler.mouseDragged(newOffset);
+            textArea.ensureVisibilityOfOffset(Math.min(Math.max(0, newOffset), textArea.getPTextBuffer().length()));
         }
     }
     

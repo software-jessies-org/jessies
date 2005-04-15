@@ -20,7 +20,7 @@ public class PPlainTextStyler implements PTextStyler {
             return EMPTY_LINE_SEGMENTS;
         }
         return new PTextSegment[] {
-            new PTextSegment(0, splitLine.getContents().toString())
+            new PTextSegment(PStyle.NORMAL, splitLine.getContents().toString())
         };
     }
 

@@ -15,9 +15,6 @@ import java.util.List;
  */
 
 public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
-    private static final int NORMAL_STYLE = 0;
-    private static final int HYPERLINK_STYLE = 1;
-    
     private Pattern highlightPattern;
     
     public PHyperlinkTextStyler(PTextArea textArea, String highlightPattern) {
@@ -30,19 +27,14 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         Matcher matcher = highlightPattern.matcher(line);
         int lastStart = 0;
         while (matcher.find() && isAcceptableMatch(line, matcher)) {
-            result.add(new PTextSegment(NORMAL_STYLE, line.substring(lastStart, matcher.start())));
-            result.add(new PUnderlinedTextSegment(HYPERLINK_STYLE, line.substring(matcher.start(), matcher.end())));
+            result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, matcher.start())));
+            result.add(new PUnderlinedTextSegment(PStyle.HYPERLINK, line.substring(matcher.start(), matcher.end())));
             lastStart = matcher.end();
         }
         if (lastStart < line.length()) {
-            result.add(new PTextSegment(NORMAL_STYLE, line.substring(lastStart)));
+            result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart)));
         }
         return result;
-    }
-    
-    /** Returns the color associated with an indexed style. */
-    public Color getColorForStyle(int style) {
-        return (style == 0) ? Color.BLACK : Color.BLUE;
     }
     
     /**
@@ -51,7 +43,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      */
     public void mouseClicked(MouseEvent event, int offset) {
         PLineSegment segment = textArea.getLineSegmentAtLocation(event.getPoint());
-        if (segment instanceof PTextSegment && segment.getStyleIndex() == HYPERLINK_STYLE) {
+        if (segment instanceof PTextSegment && segment.getStyle() == PStyle.HYPERLINK) {
             hyperlinkClicked(((PTextSegment) segment).getSuperSegment().getText());
             event.consume();
         }
@@ -75,7 +67,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      */
     public Cursor getCursorForLocation(Point point) {
         PLineSegment segment = textArea.getLineSegmentAtLocation(point);
-        if (segment != null && segment.getStyleIndex() == HYPERLINK_STYLE) {
+        if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
             return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
         } else {
             return null;

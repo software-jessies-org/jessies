@@ -15,8 +15,8 @@ import java.awt.*;
  */
 
 public interface PLineSegment {
-    /** Returns the index of the style to be used when painting this text. */
-    public int getStyleIndex();
+    /** Returns the style to be used when painting this text. */
+    public PStyle getStyle();
     
     /** Returns the text to be drawn. */
     public String getText();

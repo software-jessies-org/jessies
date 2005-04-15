@@ -20,8 +20,8 @@ public class PTabSegment implements PLineSegment {
         this.text = text;
     }
     
-    public int getStyleIndex() {
-        return 0;
+    public PStyle getStyle() {
+        return PStyle.NORMAL;
     }
     
     public String getText() {

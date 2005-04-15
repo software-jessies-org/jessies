@@ -55,9 +55,6 @@ public abstract class PAbstractTextStyler implements PTextStyler {
     
     public abstract List getLineSegments(int lineIndex, String line);
     
-    /** Returns the color associated with an indexed style. */
-    public abstract Color getColorForStyle(int style);
-    
     /**
      * Optionally handles the given mouse click event.  This is called when a single click occurs on
      * the text component.  If the styler handles the event, it should consume it.

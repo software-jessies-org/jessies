@@ -10,24 +10,24 @@ import java.awt.*;
  */
 
 public class PTextSegment implements PLineSegment {
-    private int styleIndex;
+    private PStyle style;
     private String text;
     private PTextSegment superSegment;
     
-    public PTextSegment(int styleIndex, String text) {
-        this.styleIndex = styleIndex;
+    public PTextSegment(PStyle style, String text) {
+        this.style = style;
         this.text = text;
         superSegment = this;
     }
     
-    public PTextSegment(int styleIndex, String text, PTextSegment superSegment) {
-        this.styleIndex = styleIndex;
+    public PTextSegment(PStyle style, String text, PTextSegment superSegment) {
+        this.style = style;
         this.text = text;
         this.superSegment = superSegment;
     }
     
-    public int getStyleIndex() {
-        return styleIndex;
+    public PStyle getStyle() {
+        return style;
     }
     
     public String getText() {
@@ -43,11 +43,11 @@ public class PTextSegment implements PLineSegment {
     }
     
     public PTextSegment subSegment(int start) {
-        return new PTextSegment(styleIndex, text.substring(start), getSuperSegment());
+        return new PTextSegment(style, text.substring(start), getSuperSegment());
     }
     
     public PTextSegment subSegment(int start, int end) {
-        return new PTextSegment(styleIndex, text.substring(start, end), getSuperSegment());
+        return new PTextSegment(style, text.substring(start, end), getSuperSegment());
     }
     
     public int getLength() {
@@ -87,6 +87,6 @@ public class PTextSegment implements PLineSegment {
     }
     
     public String toString() {
-        return "PTextSegment[" + styleIndex + ", " + text + "]";
+        return "PTextSegment[" + style + ", " + text + "]";
     }
 }

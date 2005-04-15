@@ -1,6 +1,5 @@
 package e.ptextarea;
 
-import java.awt.*;
 import java.util.*;
 import java.util.regex.*;
 import java.util.List;
@@ -20,21 +19,6 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     private int lastGoodLine;
     private boolean[] commentCache;
     private Pattern keywordPattern = Pattern.compile("\\b\\w+\\b");
-    
-    protected static final int TYPE_NORMAL = 0;
-    protected static final int TYPE_STRING = 1;
-    protected static final int TYPE_COMMENT = 2;
-    protected static final int TYPE_KEYWORD = 3;
-    protected static final int TYPE_ERROR = 4;
-    
-    private static final Color[] DEFAULT_COLORS = new Color[5];
-    static {
-        DEFAULT_COLORS[TYPE_NORMAL] = Color.BLACK;
-        DEFAULT_COLORS[TYPE_STRING] = Color.decode("#0000ff");
-        DEFAULT_COLORS[TYPE_COMMENT] = Color.decode("#227722");
-        DEFAULT_COLORS[TYPE_KEYWORD] = Color.decode("#770022");
-        DEFAULT_COLORS[TYPE_ERROR] = Color.decode("#ff0000");
-    }
     
     public PCLikeTextStyler(PTextArea textArea) {
         super(textArea);
@@ -60,11 +44,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
      * error-style sections into it.
      */
     public void addStringSegment(ArrayList segmentList, String string) {
-        segmentList.add(new PTextSegment(TYPE_STRING, string));
-    }
-    
-    public Color getColorForStyle(int index) {
-        return DEFAULT_COLORS[index];
+        segmentList.add(new PTextSegment(PStyle.STRING, string));
     }
     
     private void initCommentCache() {
@@ -88,7 +68,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
             ArrayList result = new ArrayList();
             for (int i = 0; i < mainSegments.size(); i++) {
                 PTextSegment mainSegment = (PTextSegment) mainSegments.get(i);
-                if (mainSegment.getStyleIndex() == TYPE_NORMAL) {
+                if (mainSegment.getStyle() == PStyle.NORMAL) {
                     result.addAll(getKeywordAddedSegments(mainSegment));
                 } else {
                     result.add(mainSegment);
@@ -106,13 +86,13 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         while (matcher.find()) {
             String keyword = matcher.group();
             if (keywords.contains(keyword)) {
-                result.add(new PTextSegment(TYPE_NORMAL, text.substring(normalStart, matcher.start())));
-                result.add(new PTextSegment(TYPE_KEYWORD, keyword));
+                result.add(new PTextSegment(PStyle.NORMAL, text.substring(normalStart, matcher.start())));
+                result.add(new PTextSegment(PStyle.KEYWORD, keyword));
                 normalStart = matcher.end();
             }
         }
         if (segment.getText().length() > normalStart) {
-            result.add(new PTextSegment(TYPE_NORMAL, text.substring(normalStart)));
+            result.add(new PTextSegment(PStyle.NORMAL, text.substring(normalStart)));
         }
         return result;
     }
@@ -129,7 +109,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                 } else {
                     commentEndIndex += 2;
                 }
-                result.add(new PTextSegment(TYPE_COMMENT, line.substring(lastStart, commentEndIndex)));
+                result.add(new PTextSegment(PStyle.COMMENT, line.substring(lastStart, commentEndIndex)));
                 i = commentEndIndex;
                 lastStart = commentEndIndex;
                 comment = false;
@@ -138,9 +118,9 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                 if (supportShellComments() && ch == '#') {
                     comment = true;
                     if (lastStart < i) {
-                        result.add(new PTextSegment(TYPE_NORMAL, line.substring(lastStart, i)));
+                        result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, i)));
                     }
-                    result.add(new PTextSegment(TYPE_COMMENT, line.substring(i)));
+                    result.add(new PTextSegment(PStyle.COMMENT, line.substring(i)));
                     i = line.length();
                     lastStart = i;
                 } else if (ch == '/') {
@@ -148,15 +128,15 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                         if (line.charAt(i + 1) == '*') {
                             comment = true;
                             if (lastStart < i) {
-                                result.add(new PTextSegment(TYPE_NORMAL, line.substring(lastStart, i)));
+                                result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, i)));
                             }
                             lastStart = i;
                             i += 2;
                         } else if (line.charAt(i + 1) == '/') {
                             if (lastStart < i) {
-                                result.add(new PTextSegment(TYPE_NORMAL, line.substring(lastStart, i)));
+                                result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, i)));
                             }
-                            result.add(new PTextSegment(TYPE_COMMENT, line.substring(i)));
+                            result.add(new PTextSegment(PStyle.COMMENT, line.substring(i)));
                             i = line.length();
                             lastStart = i;
                         } else {
@@ -167,7 +147,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                     }
                 } else if (ch == '"' || ch == '\'') {
                     if (lastStart < i) {
-                        result.add(new PTextSegment(TYPE_NORMAL, line.substring(lastStart, i)));
+                        result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, i)));
                     }
                     int stringEnd = i + 1;
                     String matchString = String.valueOf(line.charAt(i));
@@ -182,7 +162,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                     }
                     // If it falls out because stringEnd == -1, we have an unterminated string.
                     if (stringEnd == -1) {
-                        result.add(new PTextSegment(TYPE_ERROR, line.substring(i)));
+                        result.add(new PTextSegment(PStyle.ERROR, line.substring(i)));
                         i = line.length();
                     } else {
                         addStringSegment(result, line.substring(i, stringEnd));
@@ -195,7 +175,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
             }
         }
         if (lastStart < line.length()) {
-            result.add(new PTextSegment(comment ? TYPE_COMMENT : TYPE_NORMAL, line.substring(lastStart, line.length())));
+            result.add(new PTextSegment(comment ? PStyle.COMMENT : PStyle.NORMAL, line.substring(lastStart, line.length())));
         }
         return result;
     }

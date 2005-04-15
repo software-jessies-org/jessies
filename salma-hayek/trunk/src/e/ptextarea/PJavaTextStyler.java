@@ -140,13 +140,13 @@ public class PJavaTextStyler extends PCLikeTextStyler {
             }
             if (isError) {
                 if (segmentIsValid) {
-                    segmentList.add(new PTextSegment(TYPE_STRING, string.substring(segmentStart, i)));
+                    segmentList.add(new PTextSegment(PStyle.STRING, string.substring(segmentStart, i)));
                     segmentStart = i;
                     segmentIsValid = false;
                 }
             } else {
                 if (segmentIsValid == false) {
-                    segmentList.add(new PTextSegment(TYPE_ERROR, string.substring(segmentStart, i)));
+                    segmentList.add(new PTextSegment(PStyle.ERROR, string.substring(segmentStart, i)));
                     segmentStart = i;
                     segmentIsValid = true;
                 }
@@ -155,10 +155,10 @@ public class PJavaTextStyler extends PCLikeTextStyler {
             i += increment;
         }
         if (segmentIsValid == false) {
-            segmentList.add(new PTextSegment(TYPE_ERROR, string.substring(segmentStart, string.length() - 1)));
+            segmentList.add(new PTextSegment(PStyle.ERROR, string.substring(segmentStart, string.length() - 1)));
             segmentStart = string.length() - 1;
         }
-        segmentList.add(new PTextSegment(TYPE_STRING, string.substring(segmentStart)));
+        segmentList.add(new PTextSegment(PStyle.STRING, string.substring(segmentStart)));
     }
     
     private boolean isInvalidUnicodeEscape(String escapeHex, char quoteType) {

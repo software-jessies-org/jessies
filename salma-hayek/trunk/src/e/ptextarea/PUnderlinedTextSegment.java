@@ -3,11 +3,11 @@ package e.ptextarea;
 import java.awt.*;
 
 public class PUnderlinedTextSegment extends PTextSegment {
-    public PUnderlinedTextSegment(int styleIndex, String text) {
+    public PUnderlinedTextSegment(PStyle styleIndex, String text) {
         super(styleIndex, text);
     }
 
-    public PUnderlinedTextSegment(int styleIndex, String text, PTextSegment superSegment) {
+    public PUnderlinedTextSegment(PStyle styleIndex, String text, PTextSegment superSegment) {
         super(styleIndex, text, superSegment);
     }
     
@@ -20,10 +20,10 @@ public class PUnderlinedTextSegment extends PTextSegment {
     }
     
     public PTextSegment subSegment(int start) {
-        return new PUnderlinedTextSegment(getStyleIndex(), getText().substring(start), getSuperSegment());
+        return new PUnderlinedTextSegment(getStyle(), getText().substring(start), getSuperSegment());
     }
     
     public PTextSegment subSegment(int start, int end) {
-        return new PUnderlinedTextSegment(getStyleIndex(), getText().substring(start, end), getSuperSegment());
+        return new PUnderlinedTextSegment(getStyle(), getText().substring(start, end), getSuperSegment());
     }
 }
