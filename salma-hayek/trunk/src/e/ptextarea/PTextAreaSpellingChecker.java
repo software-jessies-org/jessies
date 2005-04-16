@@ -202,8 +202,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
         List highlights = component.getHighlights();
         for (int i = 0; i < highlights.size(); ++i) {
             PHighlight highlight = (PHighlight) highlights.get(i);
-            // FIXME: check we've found the right kind of highlight
-            if (true) {
+            if (highlight instanceof UnderlineHighlight) {
                 final int start = highlight.getStart().getIndex();
                 final int end = highlight.getEnd().getIndex();
                 String misspelling = component.getPTextBuffer().subSequence(start, end).toString();
@@ -229,8 +228,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
         List highlights = component.getHighlights();
         for (int i = 0; i < highlights.size(); ++i) {
             PHighlight highlight = (PHighlight) highlights.get(i);
-            // FIXME: check it's one of our highlights.
-            if (highlight.getStart().getIndex() <= fromIndex && highlight.getEnd().getIndex() >= toIndex) {
+            if (highlight instanceof UnderlineHighlight && highlight.getStart().getIndex() <= fromIndex && highlight.getEnd().getIndex() >= toIndex) {
                 actualRange.start = Math.min(highlight.getStart().getIndex(), highlight.getEnd().getIndex());
                 actualRange.end = Math.max(highlight.getStart().getIndex(), highlight.getEnd().getIndex());
                 return true;
