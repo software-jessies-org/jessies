@@ -111,8 +111,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     public void wasCanceled() {
         removeAllMatches();
         currentRegularExpression = null;
-        // FIXME
-        //JTextComponentUtilities.goToSelection(currentTextWindow.getText(), initialSelectionStart, initialSelectionEnd);
+        currentTextWindow.getText().select(initialSelectionStart, initialSelectionEnd);
     }
     
     //
