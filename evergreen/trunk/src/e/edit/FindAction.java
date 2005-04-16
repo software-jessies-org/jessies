@@ -3,13 +3,9 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
-import javax.swing.text.*;
+import e.ptextarea.*;
 import e.util.*;
 
-/**
-The ETextArea action to open a 'find' dialog.
-
-*/
 public class FindAction extends ETextAction implements MinibufferUser {
     public static final String ACTION_NAME = "Find...";
     
@@ -20,7 +16,13 @@ public class FindAction extends ETextAction implements MinibufferUser {
      * full yellow with half-alpha so you can see the selection through, as a dirty smudge, just like a real
      * highlighter pen might do.
      */
-    public static final Highlighter.HighlightPainter PAINTER = new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 255, 0, 128));
+    private static class MatchHighlight extends PColoredHighlight {
+        private static final Color MATCH_COLOR = new Color(255, 255, 0, 128);
+        
+        public MatchHighlight(PTextArea textArea, int startIndex, int endIndex) {
+            super(textArea, startIndex, endIndex, MATCH_COLOR);
+        }
+    }
     
     public ETextWindow currentTextWindow;
     
@@ -132,8 +134,11 @@ public class FindAction extends ETextAction implements MinibufferUser {
     //
     
     public void removeAllMatches() {
-        // FIXME
-        //JTextComponentUtilities.removeAllHighlightsUsingPainter(currentTextWindow.getText(), PAINTER);
+        currentTextWindow.getText().removeHighlights(new PHighlightMatcher() {
+            public boolean matches(PHighlight highlight) {
+                return (highlight instanceof MatchHighlight);
+            }
+        });
         currentTextWindow.getBirdView().clearMatchingLines();
     }
     
@@ -167,12 +172,9 @@ public class FindAction extends ETextAction implements MinibufferUser {
         // Find all the matches.
         int matchCount = 0;
         Matcher matcher = pattern.matcher(content);
-        // FIXME
-        //Highlighter highlighter = textArea.getHighlighter();
         while (matcher.find()) {
             currentTextWindow.getBirdView().addMatchingLine(textArea.getLineOfOffset(matcher.end()));
-            // FIXME
-            //highlighter.addHighlight(matcher.start(), matcher.end(), PAINTER);
+            textArea.addHighlight(new MatchHighlight(textArea, matcher.start(), matcher.end()));
             matchCount++;
         }
         Edit.showStatus("Found " + matchCount + " " + (matchCount != 1 ? "matches" : "match"));
