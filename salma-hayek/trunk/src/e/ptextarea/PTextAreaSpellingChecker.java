@@ -192,8 +192,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
     private void removeExistingHighlightsForRange(final int fromIndex, final int toIndex) {
         component.removeHighlights(new PHighlightMatcher() {
             public boolean matches(PHighlight highlight) {
-                // FIXME: also check we're removing the right kind of highlight
-                return (highlight.getStart().getIndex() < toIndex && highlight.getEnd().getIndex() >= fromIndex);
+                return (highlight instanceof UnderlineHighlight && highlight.getStart().getIndex() < toIndex && highlight.getEnd().getIndex() >= fromIndex);
             }
         });
     }
