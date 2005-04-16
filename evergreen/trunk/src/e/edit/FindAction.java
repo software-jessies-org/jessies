@@ -16,7 +16,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
      * full yellow with half-alpha so you can see the selection through, as a dirty smudge, just like a real
      * highlighter pen might do.
      */
-    private static class MatchHighlight extends PColoredHighlight {
+    public static class MatchHighlight extends PColoredHighlight {
         private static final Color MATCH_COLOR = new Color(255, 255, 0, 128);
         
         public MatchHighlight(PTextArea textArea, int startIndex, int endIndex) {
