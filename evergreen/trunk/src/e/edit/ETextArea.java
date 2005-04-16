@@ -270,16 +270,6 @@ public class ETextArea extends PTextArea {
         return false;
     }
     
-    private String wordSelectionStopChars = " \t\n!\"#%&'()*+,-./:;<=>?@`[\\]^{|}~";
-    
-    public String getWordSelectionStopChars() {
-        return wordSelectionStopChars;
-    }
-    
-    public void setWordSelectionStopChars(String newWordSelectionStopChars) {
-        wordSelectionStopChars = newWordSelectionStopChars;
-    }
-    
     public CharSequence charSequence() {
         return getPTextBuffer();
     }

@@ -152,10 +152,6 @@ public class EErrorsWindow extends EWindow {
         return false;
     }
     
-    public String getWordSelectionStopChars() {
-        return " \t\n";
-    }
-    
     public String getContext() {
         return "";
     }
