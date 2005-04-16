@@ -109,12 +109,6 @@ public class FindAndReplaceAction extends ETextAction {
     }
 
     public boolean doReplacementsInText() {
-        // FIXME
-        /*
-        // Introduce a CompoundEdit to the UndoManager so that all our replacements are treated as a single UndoableEdit.
-        CompoundEdit entireEdit = new CompoundEdit();
-        UndoManager undoManager = text.getUndoManager();
-        undoManager.addEdit(entireEdit);
         try {
             if (isSelectionMeantAsScope()) {
                 // There's a selection, so only replace in that.
@@ -124,7 +118,7 @@ public class FindAndReplaceAction extends ETextAction {
                 text.select(selectionStart, selectionStart + newText.length());
             } else {
                 // There's no selection, so do the whole text.
-                int caretPosition = text.getCaretPosition();
+                int caretPosition = text.getUnanchoredSelectionExtreme();
                 text.setText(makeReplacedText(text.getText()));
                 text.setCaretPosition(caretPosition);
             }
@@ -132,14 +126,7 @@ public class FindAndReplaceAction extends ETextAction {
         } catch (Exception ex) {
             Edit.showAlert("Find And Replace", "Couldn't perform the replacements (" + ex.getMessage() + ").");
             return false;
-        } finally {
-            // Ensure that, no matter what happens, we finish the CompoundEdit so life can go back to normal.
-            // FIXME: We should probably undo the CompoundEdit if an exception was thrown, but as it is we're likely to want to fix what went wrong.
-            entireEdit.end();
         }
-        */
-        Edit.showAlert("Find And Replace", "Not yet implemented.");
-        return false;
     }
 
     public String makeReplacedText(String oldText) {
