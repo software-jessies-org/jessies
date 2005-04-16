@@ -328,6 +328,24 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return Collections.unmodifiableList(highlights);
     }
     
+    /**
+     * Selects the first matching highlight (as judged by the given matcher),
+     * moving through the entire list of highlights in the given direction,
+     * ordered by FIXME: do we ensure the highlights are ordered? on what?
+     */
+    public void selectFirstMatchingHighlight(boolean searchingForwards, PHighlightMatcher matcher) {
+        final int start = searchingForwards ? 0 : highlights.size() - 1;
+        final int stop = searchingForwards ? highlights.size() : -1;
+        final int step = searchingForwards ? 1 : -1;
+        for (int i = start; i != stop; i += step) {
+            PHighlight highlight = (PHighlight) highlights.get(i);
+            if (matcher.matches(highlight)) {
+                select(highlight.getStartIndex(), highlight.getEndIndex());
+                return;
+            }
+        }
+    }
+    
     public void removeHighlights(PHighlightMatcher matcher) {
         PHighlight match = null;
         boolean isOnlyOneMatch = true;
