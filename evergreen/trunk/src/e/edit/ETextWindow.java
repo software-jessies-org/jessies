@@ -460,16 +460,35 @@ public class ETextWindow extends EWindow implements PTextListener {
         text.setText("");
     }
     
+    private class MatchHighlightMatcher implements PHighlightMatcher {
+        private  boolean forwards;
+        
+        public MatchHighlightMatcher(boolean forwards) {
+            this.forwards = forwards;
+        }
+        
+        public boolean matches(PHighlight highlight) {
+            if (highlight instanceof FindAction.MatchHighlight == false) {
+                return false;
+            }
+            final int minOffset = Math.min(highlight.getStartIndex(), highlight.getEndIndex());
+            final int maxOffset = Math.max(highlight.getStartIndex(), highlight.getEndIndex());
+            if (forwards) {
+                return minOffset > text.getSelectionEnd();
+            } else {
+                return maxOffset < text.getSelectionStart();
+            }
+        }
+    }
+    
     public void findNext() {
         updateFindResults();
-        // FIXME
-        //JTextComponentUtilities.findNextHighlight(getText(), Position.Bias.Forward, FindAction.PAINTER);
+        text.selectFirstMatchingHighlight(true, new MatchHighlightMatcher(true));
     }
     
     public void findPrevious() {
         updateFindResults();
-        // FIXME
-        //JTextComponentUtilities.findNextHighlight(getText(), Position.Bias.Backward, FindAction.PAINTER);
+        text.selectFirstMatchingHighlight(false, new MatchHighlightMatcher(false));
     }
     
     public void updateFindResults() {
