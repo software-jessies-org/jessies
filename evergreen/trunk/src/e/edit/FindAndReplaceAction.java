@@ -111,13 +111,14 @@ public class FindAndReplaceAction extends ETextAction {
     public boolean doReplacementsInText() {
         try {
             if (isSelectionMeantAsScope()) {
-                // There's a selection, so only replace in that.
+                // There's a suitable selection, so only replace in that.
                 int selectionStart = text.getSelectionStart();
                 String newText = makeReplacedText(text.getSelectedText());
                 text.replaceSelection(newText);
                 text.select(selectionStart, selectionStart + newText.length());
             } else {
-                // There's no selection, so do the whole text.
+                // There's no suitable selection, so do the whole text.
+                // FIXME - can we try to maintain the selection?
                 int caretPosition = text.getUnanchoredSelectionExtreme();
                 text.setText(makeReplacedText(text.getText()));
                 text.setCaretPosition(caretPosition);
