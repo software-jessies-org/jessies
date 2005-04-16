@@ -23,8 +23,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.6f, 0.6f, 0.6f);
     private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.96f, 0.96f, 0.96f);
-    private static final Color SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f, 0.5f);
-    private static final Color SELECTION_BOUNDARY_COLOR = new Color(0.5f, 0.55f, 0.7f, 0.75f);
+    
+    private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f, 0.5f);
+    private static final Color FOCUSED_SELECTION_BOUNDARY_COLOR = new Color(0.5f, 0.55f, 0.7f, 0.75f);
+    private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f, 0.5f);
     
     private static final Stroke WRAP_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 1.0f, 2.0f }, 0.0f);
     
@@ -86,6 +88,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         setOpaque(true);
         setFocusTraversalKeysEnabled(false);
         requestFocus();
+        initFocusListening();
         initSpellingChecking();
     }
     
@@ -253,6 +256,22 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public void selectAll() {
         select(0, getPTextBuffer().length());
+    }
+    
+    /**
+     * Repaints us when we gain/lose focus, so we can re-color the selection,
+     * like a native text component.
+     */
+    private void initFocusListening() {
+        addFocusListener(new FocusListener() {
+            public void focusGained(FocusEvent e) {
+                repaint();
+            }
+            
+            public void focusLost(FocusEvent e) {
+                repaint();
+            }
+        });
     }
     
     private void initSpellingChecking() {
@@ -1094,25 +1113,27 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
                 int xStart = (i == start.getLineIndex()) ? startPt.x : 0;
                 int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth();
-                graphics.setColor(SELECTION_COLOR);
+                graphics.setColor(isFocusOwner() ? FOCUSED_SELECTION_COLOR : UNFOCUSED_SELECTION_COLOR);
                 paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
                 int yBottom = y + lineHeight - 1;
-                graphics.setColor(SELECTION_BOUNDARY_COLOR);
-                if (i == start.getLineIndex()) {
-                    if (xStart > 0) {
-                        graphics.drawLine(xStart, y, xStart, yBottom);
+                if (isFocusOwner()) {
+                    graphics.setColor(FOCUSED_SELECTION_BOUNDARY_COLOR);
+                    if (i == start.getLineIndex()) {
+                        if (xStart > 0) {
+                            graphics.drawLine(xStart, y, xStart, yBottom);
+                        }
+                        graphics.drawLine(xStart, y, xEnd, y);
+                    } else if (i == start.getLineIndex() + 1) {
+                        graphics.drawLine(0, y, Math.min(xEnd, startPt.x), y);
                     }
-                    graphics.drawLine(xStart, y, xEnd, y);
-                } else if (i == start.getLineIndex() + 1) {
-                    graphics.drawLine(0, y, Math.min(xEnd, startPt.x), y);
-                }
-                if (i == end.getLineIndex()) {
-                    if (xEnd < textArea.getWidth()) {
-                        graphics.drawLine(xEnd, y, xEnd, yBottom);
+                    if (i == end.getLineIndex()) {
+                        if (xEnd < textArea.getWidth()) {
+                            graphics.drawLine(xEnd, y, xEnd, yBottom);
+                        }
+                        graphics.drawLine(xStart, yBottom, xEnd, yBottom);
+                    } else if (i == end.getLineIndex() - 1) {
+                        graphics.drawLine(Math.max(endPt.x, xStart), yBottom, xEnd, yBottom);
                     }
-                    graphics.drawLine(xStart, yBottom, xEnd, yBottom);
-                } else if (i == end.getLineIndex() - 1) {
-                    graphics.drawLine(Math.max(endPt.x, xStart), yBottom, xEnd, yBottom);
                 }
                 y += lineHeight;
             }
