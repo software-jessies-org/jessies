@@ -206,8 +206,7 @@ public class Workspace extends JPanel {
         } else {
             try {
                 ETextWindow newWindow = new ETextWindow(filename);
-                // FIXME
-                //registerTextComponent(newWindow.getText());
+                registerTextComponent(newWindow.getText());
                 window = addViewer(newWindow, address);
             } catch (Exception ex) {
                 ex.printStackTrace();
