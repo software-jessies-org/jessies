@@ -111,14 +111,10 @@ public class ETextWindow extends EWindow implements PTextListener {
         text.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
                 rememberWeHadFocusLast();
-                // FIXME
-                //text.setSelectionColor(FOCUSED_SELECTION_COLOR);
                 updateWatermark();
             }
             
             public void focusLost(FocusEvent e) {
-                // FIXME
-                //text.setSelectionColor(UNFOCUSED_SELECTION_COLOR);
             }
             
             private void rememberWeHadFocusLast() {
@@ -566,8 +562,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         offset = Math.min(offset, maxOffset);
         endOffset = Math.min(endOffset, maxOffset);
-        // FIXME
-        //JTextComponentUtilities.goToSelection(text, offset, endOffset);
         text.select(offset, endOffset);
     }
     
