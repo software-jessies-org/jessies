@@ -136,8 +136,7 @@ public class Workspace extends JPanel {
     
     public JComponent makeUI() {
         leftColumn.setErrorsWindow(errors);
-        // FIXME: unbreak the advisor.
-        //registerTextComponent(errors.getText());
+        registerTextComponent(errors.getText());
         return leftColumn;
     }
     
