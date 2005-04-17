@@ -1,7 +1,7 @@
 package e.edit;
 
 import java.awt.event.*;
-import e.util.*;
+//import e.util.*;
 
 /**
  * The ETextArea action that removes characters.
@@ -22,6 +22,7 @@ public class BackspaceAction extends ETextAction {
     }
     
     public void selectSomethingToDelete(ETextArea target) {
+        /*
         int charactersToDelete = 1;
         // FIXME - selection
         int position = target.getSelectionStart();
@@ -48,5 +49,6 @@ public class BackspaceAction extends ETextAction {
             }
         }
         target.select(position - charactersToDelete, position);
+        */
     }
 }

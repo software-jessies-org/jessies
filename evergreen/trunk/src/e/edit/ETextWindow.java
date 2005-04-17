@@ -226,19 +226,19 @@ public class ETextWindow extends EWindow implements PTextListener {
             
             if (filename.endsWith(".java")) {
                 fileType = JAVA;
-                text.setIndenter(new JavaIndenter());
+                text.setIndenter(new PJavaIndenter());
                 text.setTextStyler(new PJavaTextStyler(text));
             } else if (filename.endsWith(".rb") || isRubyContent(content)) {
                 fileType = RUBY;
-                text.setIndenter(new RubyIndenter());
+                text.setIndenter(new PRubyIndenter());
                 text.setTextStyler(new PRubyTextStyler(text));
             } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || content.startsWith("#ifndef") || isCPlusPlusContent(content)) {
                 fileType = C_PLUS_PLUS;
-                text.setIndenter(new JavaIndenter());
+                text.setIndenter(new PJavaIndenter());
                 text.setTextStyler(new PCPPTextStyler(text));
             } else if (filename.endsWith(".pl") || isPerlContent(content)) {
                 fileType = PERL;
-                text.setIndenter(new JavaIndenter());
+                text.setIndenter(new PJavaIndenter());
             }
             initKeywordsForDocument();
             updateWatermark();

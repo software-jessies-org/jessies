@@ -9,15 +9,11 @@ import e.util.*;
  * A text-editing component.
  */
 public class ETextArea extends PTextArea {
-    private Indenter indenter = new Indenter();
-    
     public ETextArea() {
         // FIXME
         //setMargin(new Insets(4, 4, 4, 1));
         // FIXME
         //getCaret().addChangeListener(new MatchingBracketHighlighter(this));
-        // FIXME
-        //getKeymap().setDefaultAction(new DefaultKeyAction());
     }
     
     /** Returns a fake 'preferred size' if our parent's not tall enough for us to make it as far as the display. */
@@ -121,15 +117,9 @@ public class ETextArea extends PTextArea {
         return new Font(fontName, Font.PLAIN, fontSize);
     }
 
-    /**
-     * Sets the keymap, mixing in our slight modifications.
-     */
     public void initKeymap() {
-        // Overrides a few DefaultEditorKit editing actions.
         // FIXME
         //getActionMap().put(DefaultEditorKit.deletePrevCharAction, new BackspaceAction());
-        //getActionMap().put(DefaultEditorKit.insertTabAction, new InsertTabAction());
-        // See also ETextArea.setIndenter.
     }
     
     public void paste() {
@@ -178,43 +168,9 @@ public class ETextArea extends PTextArea {
         */
     }
     
-    /** Returns the indenter in use for this file.
-     */
-    public Indenter getIndenter() {
-        return indenter;
-    }
-    
-    /**
-     * Returns a string corresponding to the spaces and tabs found at the
-     * start of the line containing the given offset.
-     */
-    public String getIndentationOfLineAtOffset(int offset) {
-        int lineNumber = getLineOfOffset(offset);
-        return getIndentationOfLine(lineNumber);
-    }
-    
-    public String getIndentationOfLine(int lineNumber) {
-        int lineStart = getLineStartOffset(lineNumber);
-        int lineEnd = getLineEndOffset(lineNumber);
-        String currentLine = getPTextBuffer().subSequence(lineStart, lineEnd).toString();
-        StringBuffer whitespace = new StringBuffer();
-        for (int i = 0; i < currentLine.length(); ++i) {
-            char c = currentLine.charAt(i);
-            if (c != ' ' && c != '\t') {
-                break;
-            }
-            whitespace.append(c);
-        }
-        return whitespace.toString();
-    }
-    
     /** Corrects the indentation of the line with the caret, moving the caret. Returns true if the contents of the current line were changed. */
     public boolean correctIndentation() {
         return correctIndentation(true);
-    }
-    
-    public void setIndenter(Indenter newIndenter) {
-        this.indenter = newIndenter;
     }
     
     public void enableAutoIndent() {
@@ -224,15 +180,6 @@ public class ETextArea extends PTextArea {
     
     public void autoIndent() {
         correctIndentation(false);
-    }
-    
-    public int getPreviousNonBlankLineNumber(int startLineNumber) {
-        for (int lineNumber = startLineNumber - 1; lineNumber > 0; lineNumber--) {
-            if (getLineText(lineNumber).trim().length() != 0) {
-                return lineNumber;
-            }
-        }
-        return 0;
     }
     
     /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
@@ -313,14 +260,4 @@ public class ETextArea extends PTextArea {
         return getLineText(getLineOfOffset(offset));
     }
     
-    /** Returns the text of the given line (without the newline). */
-    public String getLineText(int lineNumber) {
-        int lineStart = getLineStartOffset(lineNumber);
-        int lineEnd = getLineEndOffset(lineNumber);
-        int length = lineEnd - lineStart;
-        if (lineEnd != getPTextBuffer().length()) {
-            length--;
-        }
-        return (length > 0) ? getPTextBuffer().subSequence(lineStart, lineStart + length).toString() : "";
-    }
 }
