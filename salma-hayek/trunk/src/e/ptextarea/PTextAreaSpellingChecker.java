@@ -11,7 +11,7 @@ import e.util.*;
 public class PTextAreaSpellingChecker implements PTextListener {
     private PTextArea component;
     
-    public static final String KEYWORDS_JCOMPONENT_PROPERTY = "KeywordsHashSetPropertyKey";
+    public static final String SPELLING_EXCEPTIONS_PROPERTY = "SpellingExceptionsHashSetProperty";
     
     public PTextAreaSpellingChecker(PTextArea component) {
         this.component = component;
@@ -331,7 +331,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
     
     /** Tests whether the text component we're checking declares the given word as a keyword in its language. */
     private boolean isKeyword(String word) {
-        HashSet keywords = (HashSet) component.getClientProperty(KEYWORDS_JCOMPONENT_PROPERTY);
+        HashSet keywords = (HashSet) component.getClientProperty(SPELLING_EXCEPTIONS_PROPERTY);
         if (keywords == null) {
             return false;
         }

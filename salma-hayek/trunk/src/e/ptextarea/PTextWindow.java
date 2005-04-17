@@ -75,7 +75,7 @@ public class PTextWindow {
             } else if (extension.equals("java")) {
                 HashSet set = new HashSet();
                 set.add("println");
-                textArea.putClientProperty(PTextAreaSpellingChecker.KEYWORDS_JCOMPONENT_PROPERTY, set);
+                textArea.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, set);
                 return new PJavaTextStyler(textArea);
             } else if (extension.equals("rb")) {
                 return new PRubyTextStyler(textArea);
