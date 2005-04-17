@@ -148,8 +148,7 @@ public class PKeyHandler extends KeyAdapter {
             if (textArea.getIndenter().isElectric(ch)) {
                 // FIXME: start CompoundEdit
                 textArea.replaceSelection(content);
-                // FIXME: implement correctIndentation
-                //textArea.correctIndentation(false);
+                textArea.getIndenter().correctIndentation(false);
                 // FIXME: end CompoundEdit
             } else {
                 textArea.replaceSelection(content);
