@@ -19,11 +19,8 @@ public class UndoAction extends ETextAction {
             return;
         }
         target.getPTextBuffer().getUndoBuffer().undo();
-        // FIXME
-        /*
-        if (undoManager.canUndo() == false) {
+        if (target.getPTextBuffer().getUndoBuffer().canUndo() == false) {
             getFocusedTextWindow().markAsClean();
         }
-        */
     }
 }
