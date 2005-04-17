@@ -37,7 +37,7 @@ public class PIndenter {
     /**
      * Returns a copy of just the leading whitespace part of the given line.
      */
-    public String getIndentationOfLine(int lineNumber) {
+    public String getCurrentIndentationOfLine(int lineNumber) {
         int start = textArea.getLineStartOffset(lineNumber);
         int max = textArea.getLineEndOffset(lineNumber);
         int end;
@@ -54,7 +54,7 @@ public class PIndenter {
     /** Returns the whitespace that should be used for the given line number. */
     public String getIndentation(int lineNumber) {
         final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(lineNumber);
-        return (previousNonBlankLineNumber == -1) ? "" : getIndentationOfLine(previousNonBlankLineNumber);
+        return (previousNonBlankLineNumber == -1) ? "" : getCurrentIndentationOfLine(previousNonBlankLineNumber);
     }
     
     public void setIndentationPropertyBasedOnContent(String content) {
@@ -120,7 +120,7 @@ public class PIndenter {
         int position = textArea.getSelectionStart();
         int lineNumber = textArea.getLineOfOffset(position);
         
-        int offsetIntoLine = position - textArea.getLineStartOffset(lineNumber) - getIndentationOfLine(lineNumber).length();
+        int offsetIntoLine = position - textArea.getLineStartOffset(lineNumber) - getCurrentIndentationOfLine(lineNumber).length();
         
         String whitespace = getIndentation(lineNumber);
         int lineStart = textArea.getLineStartOffset(lineNumber);

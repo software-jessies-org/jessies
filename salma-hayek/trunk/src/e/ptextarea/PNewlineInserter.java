@@ -92,6 +92,6 @@ public class PNewlineInserter {
      */
     private String getIndentationOfLineAtOffset(int offset) {
         int lineNumber = textArea.getLineOfOffset(offset);
-        return textArea.getIndenter().getIndentationOfLine(lineNumber);
+        return textArea.getIndenter().getCurrentIndentationOfLine(lineNumber);
     }
 }

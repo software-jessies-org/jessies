@@ -53,7 +53,7 @@ public class PJavaIndenter extends PIndenter {
 
         int previousDefinitive = getPreviousDefinitiveLineNumber(lineNumber);
         if (previousDefinitive != -1) {
-            indentation = getIndentationOfLine(previousDefinitive);
+            indentation = getCurrentIndentationOfLine(previousDefinitive);
             
             String activePartOfPrevious = getActivePartOfLine(previousDefinitive);
             if (isBlockBegin(activePartOfPrevious) || isLabel(activePartOfPrevious)) {

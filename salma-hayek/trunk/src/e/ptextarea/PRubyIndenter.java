@@ -20,7 +20,7 @@ public class PRubyIndenter extends PIndenter {
             return "";
         }
         
-        String indentation = getIndentationOfLine(previousNonBlank);
+        String indentation = getCurrentIndentationOfLine(previousNonBlank);
         String trimmedPrevious = textArea.getLineText(previousNonBlank).trim();
         
         // Add a 'shiftwidth' after lines beginning with keywords that imply an increase in indentation.
