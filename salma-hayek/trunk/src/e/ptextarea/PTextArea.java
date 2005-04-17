@@ -724,6 +724,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void paintCaret(Graphics2D graphics, int x, int y) {
+        if (isFocusOwner() == false) {
+            // An unfocused component shouldn't render a caret. There should
+            // be at most one caret on the display.
+            return;
+        }
         applyColor(graphics, Color.RED);
         int yTop = y - metrics.getMaxAscent();
         int yBottom = y + metrics.getMaxDescent() - 1;
