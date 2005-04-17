@@ -3,6 +3,7 @@ elsif
 # Library identifiers.
 ARGV
 basename
+chdir
 chmod
 chown
 dirname
@@ -14,6 +15,7 @@ mkdir
 mkpath
 Mutex
 popen
+realpath
 Regexp
 rjust
 rmdir

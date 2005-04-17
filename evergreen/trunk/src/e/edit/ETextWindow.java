@@ -57,23 +57,23 @@ public class ETextWindow extends EWindow implements PTextListener {
     private Timer findResultsUpdater;
     
     static {
-        initKeywordsFor(C_PLUS_PLUS);
-        initKeywordsFor(JAVA);
-        initKeywordsFor(RUBY);
-        JavaResearcher.addJavaWords((Set) KEYWORDS_MAP.get(JAVA));
+        JavaResearcher.addJavaWords(getKeywordsForLanguage(JAVA));
     }
     
-    private static void initKeywordsFor(String language) {
+    private static HashSet initKeywordsFor(String language) {
         HashSet keywords = new HashSet();
         String keywordsFileName = Edit.getResourceFilename("keywords-" + language);
-        String[] keywordArray = StringUtilities.readLinesFromFile(keywordsFileName);
-        for (int i = 0; i < keywordArray.length; i++) {
-            if (keywordArray[i].startsWith("#")) {
-                continue; // Ignore comments.
+        if (FileUtilities.exists(keywordsFileName)) {
+            String[] keywordArray = StringUtilities.readLinesFromFile(keywordsFileName);
+            for (int i = 0; i < keywordArray.length; i++) {
+                if (keywordArray[i].startsWith("#")) {
+                    continue; // Ignore comments.
+                }
+                keywords.add(keywordArray[i]);
             }
-            keywords.add(keywordArray[i]);
         }
         KEYWORDS_MAP.put(language, keywords);
+        return keywords;
     }
     
     public ETextWindow(String filename) {
@@ -190,13 +190,17 @@ public class ETextWindow extends EWindow implements PTextListener {
         return content.startsWith("#ifndef") || content.matches(".*" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ".*");
     }
     
+    private static HashSet getKeywordsForLanguage(String language) {
+        HashSet keywords = (HashSet) KEYWORDS_MAP.get(language);
+        if (keywords == null) {
+            keywords = initKeywordsFor(language);
+        }
+        return keywords;
+    }
+    
     /** Attaches a set of keywords to a Document, tipping the spelling checker off that some words are okay. */
     private void initKeywordsForDocument() {
-        HashSet keywords = (HashSet) KEYWORDS_MAP.get(fileType);
-        if (keywords == null) {
-            keywords = new HashSet();
-        }
-        text.getPTextBuffer().putProperty(JTextComponentSpellingChecker.KEYWORDS_DOCUMENT_PROPERTY, keywords);
+        text.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, getKeywordsForLanguage(fileType));
     }
     
     public void updateWatermark() {
