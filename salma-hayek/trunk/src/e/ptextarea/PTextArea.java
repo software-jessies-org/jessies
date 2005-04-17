@@ -339,6 +339,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return lines.getLine(line).getStart();
     }
     
+    /**
+     * Returns the offset at the end of the given line, but before the
+     * newline. This differs from JTextArea, where the line end offset
+     * is taken to include the newline. We may want to rethink this, or
+     * we may just want to make this method private.
+     */
     public int getLineEndOffset(int line) {
         return lines.getLine(line).getEndOffsetBeforeTerminator();
     }
