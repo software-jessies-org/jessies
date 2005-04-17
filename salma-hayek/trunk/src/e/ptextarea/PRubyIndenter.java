@@ -12,7 +12,7 @@ public class PRubyIndenter extends PIndenter {
     
     public String getIndentation(PTextArea text, int lineNumber) {
         int previousNonBlank = getPreviousNonBlankLineNumber(text, lineNumber);
-        if (previousNonBlank == 0) {
+        if (previousNonBlank == -1) {
             return "";
         }
         

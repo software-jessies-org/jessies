@@ -33,21 +33,22 @@ public class PJavaIndenter extends PIndenter {
         String trimmedLine = rawLine.trim();
         return isBlockBegin(trimmedLine) || isBlockEnd(trimmedLine) || isLabel(trimmedLine);
     }
-        
+    
     public int getPreviousDefinitiveLineNumber(PTextArea text, int startLineNumber) {
-        for (int lineNumber = startLineNumber - 1; lineNumber > 0; lineNumber--) {
-            if (isDefinitive(text.getLineText(lineNumber))) {
+        for (int lineNumber = startLineNumber - 1; lineNumber >= 0; --lineNumber) {
+            String line = text.getLineText(lineNumber);
+            if (isDefinitive(line)) {
                 return lineNumber;
             }
         }
-        return 0;
+        return -1;
     }
     
     public String getIndentation(PTextArea text, int lineNumber) {
         String indentation = "";
 
         int previousDefinitive = getPreviousDefinitiveLineNumber(text, lineNumber);
-        if (previousDefinitive != 0) {
+        if (previousDefinitive != -1) {
             indentation = text.getIndentationOfLine(previousDefinitive);
             
             String activePartOfPrevious = getActivePartOfLine(text, previousDefinitive);
@@ -60,6 +61,7 @@ public class PJavaIndenter extends PIndenter {
         if (isBlockEnd(activePartOfLine) || isLabel(activePartOfLine)) {
             indentation = decreaseIndentation(text, indentation);
         }
+        // FIXME: this is a pain for Perl/Ruby.
         if (activePartOfLine.startsWith("#")) {
             indentation = "";
         }

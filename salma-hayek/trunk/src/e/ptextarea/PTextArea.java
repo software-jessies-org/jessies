@@ -215,34 +215,29 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     /**
      * Returns a copy of just the leading whitespace part of the given line.
+     * FIXME: move this into PIndenter.
      */
     public String getIndentationOfLine(int lineNumber) {
-        // FIXME: just iterate over the characters starting at lineStart.
-        int lineStart = getLineStartOffset(lineNumber);
-        int lineEnd = getLineEndOffset(lineNumber);
-        String currentLine = getPTextBuffer().subSequence(lineStart, lineEnd).toString();
-        StringBuffer whitespace = new StringBuffer();
-        for (int i = 0; i < currentLine.length(); ++i) {
-            char c = currentLine.charAt(i);
-            if (c != ' ' && c != '\t') {
+        int start = getLineStartOffset(lineNumber);
+        int max = getLineEndOffset(lineNumber);
+        int end;
+        CharSequence chars = getPTextBuffer();
+        for (end = start; end < max; ++end) {
+            char nextChar = chars.charAt(end);
+            if (nextChar != ' ' && nextChar != '\t') {
                 break;
             }
-            whitespace.append(c);
         }
-        return whitespace.toString();
+        return chars.subSequence(start, end).toString();
     }
     
     /**
      * Returns the text of the given line (without the newline).
      */
     public String getLineText(int lineNumber) {
-        int lineStart = getLineStartOffset(lineNumber);
-        int lineEnd = getLineEndOffset(lineNumber);
-        int length = lineEnd - lineStart;
-        if (lineEnd != getPTextBuffer().length()) {
-            length--;
-        }
-        return (length > 0) ? getPTextBuffer().subSequence(lineStart, lineStart + length).toString() : "";
+        int start = getLineStartOffset(lineNumber);
+        int end = getLineEndOffset(lineNumber);
+        return (start == end) ? "" : getPTextBuffer().subSequence(start, end).toString();
     }
     
     /**

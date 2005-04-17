@@ -27,7 +27,8 @@ public class PIndenter {
     
     /** Returns the whitespace that should be used for the given line number. */
     public String getIndentation(PTextArea text, int lineNumber) {
-        return text.getIndentationOfLine(getPreviousNonBlankLineNumber(text, lineNumber));
+        final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(text, lineNumber);
+        return (previousNonBlankLineNumber == -1) ? "" : text.getIndentationOfLine(previousNonBlankLineNumber);
     }
     
     public void setIndentationPropertyBasedOnContent(PTextArea text, String content) {
@@ -82,12 +83,12 @@ public class PIndenter {
     private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^(\\s*)[{}]$");
     
     protected static int getPreviousNonBlankLineNumber(PTextArea text, int startLineNumber) {
-        for (int lineNumber = startLineNumber - 1; lineNumber > 0; lineNumber--) {
+        for (int lineNumber = startLineNumber - 1; lineNumber >= 0; lineNumber--) {
             if (text.getLineText(lineNumber).trim().length() != 0) {
                 return lineNumber;
             }
         }
-        return 0;
+        return -1;
     }
     
     /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
@@ -107,8 +108,7 @@ public class PIndenter {
         //Log.warn("line=@" + originalLine + "@; replacement=@" + replacement + "@");
         boolean lineChanged = (replacement.equals(originalLine) == false);
         if (lineChanged) {
-            textArea.select(lineStart, lineStart + lineLength);
-            textArea.replaceSelection(whitespace + line + "\n");
+            textArea.replaceRange(whitespace + line, lineStart, lineStart + lineLength);
             if (shouldMoveCaret == false) {
                 final int offset = lineStart + whitespace.length() + offsetIntoLine;
                 textArea.select(offset, offset);
