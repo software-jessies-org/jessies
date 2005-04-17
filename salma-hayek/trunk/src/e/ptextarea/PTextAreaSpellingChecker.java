@@ -11,7 +11,7 @@ import e.util.*;
 public class PTextAreaSpellingChecker implements PTextListener {
     private PTextArea component;
     
-    public static final String SPELLING_EXCEPTIONS_PROPERTY = "SpellingExceptionsHashSetProperty";
+    public static final String SPELLING_EXCEPTIONS_PROPERTY = "org.jessies.e.ptextarea.SpellingExceptionsHashSetProperty";
     
     public PTextAreaSpellingChecker(PTextArea component) {
         this.component = component;
