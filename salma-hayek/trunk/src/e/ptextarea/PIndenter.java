@@ -4,12 +4,21 @@ import e.util.*;
 import java.util.regex.*;
 
 public class PIndenter {
-    public String increaseIndentation(PTextArea text, String original) {
-        return original + text.getIndentationString();
+    private static final Pattern INDENTATION_PATTERN_1 = Pattern.compile("^(\\s+)[A-Za-z].*$");
+    private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^(\\s*)[{}]$");
+    
+    protected PTextArea textArea;
+    
+    public PIndenter(PTextArea textArea) {
+        this.textArea = textArea;
     }
     
-    public String decreaseIndentation(PTextArea text, String original) {
-        String delta = text.getIndentationString();
+    public String increaseIndentation(String original) {
+        return original + textArea.getIndentationString();
+    }
+    
+    public String decreaseIndentation(String original) {
+        String delta = textArea.getIndentationString();
         if (original.endsWith(delta)) {
             return original.substring(0, original.length() - delta.length());
         }
@@ -25,16 +34,33 @@ public class PIndenter {
         return (c == '}');
     }
     
-    /** Returns the whitespace that should be used for the given line number. */
-    public String getIndentation(PTextArea text, int lineNumber) {
-        final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(text, lineNumber);
-        return (previousNonBlankLineNumber == -1) ? "" : text.getIndentationOfLine(previousNonBlankLineNumber);
+    /**
+     * Returns a copy of just the leading whitespace part of the given line.
+     */
+    public String getIndentationOfLine(int lineNumber) {
+        int start = textArea.getLineStartOffset(lineNumber);
+        int max = textArea.getLineEndOffset(lineNumber);
+        int end;
+        CharSequence chars = textArea.getPTextBuffer();
+        for (end = start; end < max; ++end) {
+            char nextChar = chars.charAt(end);
+            if (nextChar != ' ' && nextChar != '\t') {
+                break;
+            }
+        }
+        return chars.subSequence(start, end).toString();
     }
     
-    public void setIndentationPropertyBasedOnContent(PTextArea text, String content) {
-        String indentation = text.getIndenter().guessIndentationFromFile(content);
+    /** Returns the whitespace that should be used for the given line number. */
+    public String getIndentation(int lineNumber) {
+        final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(lineNumber);
+        return (previousNonBlankLineNumber == -1) ? "" : getIndentationOfLine(previousNonBlankLineNumber);
+    }
+    
+    public void setIndentationPropertyBasedOnContent(String content) {
+        String indentation = textArea.getIndenter().guessIndentationFromFile(content);
         //System.err.println(filename + ": '" + indentation + "'");
-        text.getPTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, indentation);
+        textArea.getPTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, indentation);
     }
     
     public String guessIndentationFromFile(String fileContents) {
@@ -79,12 +105,9 @@ public class PIndenter {
         return false;
     }
     
-    private static final Pattern INDENTATION_PATTERN_1 = Pattern.compile("^(\\s+)[A-Za-z].*$");
-    private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^(\\s*)[{}]$");
-    
-    protected static int getPreviousNonBlankLineNumber(PTextArea text, int startLineNumber) {
+    protected int getPreviousNonBlankLineNumber(int startLineNumber) {
         for (int lineNumber = startLineNumber - 1; lineNumber >= 0; lineNumber--) {
-            if (text.getLineText(lineNumber).trim().length() != 0) {
+            if (textArea.getLineText(lineNumber).trim().length() != 0) {
                 return lineNumber;
             }
         }
@@ -92,14 +115,14 @@ public class PIndenter {
     }
     
     /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
-    public boolean correctIndentation(PTextArea textArea, boolean shouldMoveCaret) {
+    public boolean correctIndentation(boolean shouldMoveCaret) {
         // FIXME - selection
         int position = textArea.getSelectionStart();
         int lineNumber = textArea.getLineOfOffset(position);
         
-        int offsetIntoLine = position - textArea.getLineStartOffset(lineNumber) - textArea.getIndentationOfLine(lineNumber).length();
+        int offsetIntoLine = position - textArea.getLineStartOffset(lineNumber) - getIndentationOfLine(lineNumber).length();
         
-        String whitespace = getIndentation(textArea, lineNumber);
+        String whitespace = getIndentation(lineNumber);
         int lineStart = textArea.getLineStartOffset(lineNumber);
         int lineLength = textArea.getLineEndOffset(lineNumber) - lineStart;
         String originalLine = textArea.getLineText(lineNumber);

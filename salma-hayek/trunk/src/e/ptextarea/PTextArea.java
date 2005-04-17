@@ -63,7 +63,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         this.columnCount = columnCount;
         this.selection = new SelectionHighlight(this, 0, 0);
         this.wordWrap = false;
-        this.indenter = new PIndenter();
+        this.indenter = new PIndenter(this);
         setFont(UIManager.getFont("TextArea.font"));
         setAutoscrolls(true);
         setBackground(Color.WHITE);
@@ -194,7 +194,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void autoIndent() {
-        getIndenter().correctIndentation(this, false);
+        getIndenter().correctIndentation(false);
     }
     
     /**
@@ -211,24 +211,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      */
     public void setIndenter(PIndenter newIndenter) {
         this.indenter = newIndenter;
-    }
-    
-    /**
-     * Returns a copy of just the leading whitespace part of the given line.
-     * FIXME: move this into PIndenter.
-     */
-    public String getIndentationOfLine(int lineNumber) {
-        int start = getLineStartOffset(lineNumber);
-        int max = getLineEndOffset(lineNumber);
-        int end;
-        CharSequence chars = getPTextBuffer();
-        for (end = start; end < max; ++end) {
-            char nextChar = chars.charAt(end);
-            if (nextChar != ' ' && nextChar != '\t') {
-                break;
-            }
-        }
-        return chars.subSequence(start, end).toString();
     }
     
     /**

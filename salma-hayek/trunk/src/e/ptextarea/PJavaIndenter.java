@@ -1,11 +1,15 @@
 package e.ptextarea;
 
 public class PJavaIndenter extends PIndenter {
+    public PJavaIndenter(PTextArea textArea) {
+        super(textArea);
+    }
+    
     /**
      * Returns that part of the given line number that isn't leading/trailing whitespace or comment.
      */
-    public String getActivePartOfLine(PTextArea text, int lineNumber) {
-        String trimmedLine = text.getLineText(lineNumber).trim();
+    public String getActivePartOfLine(int lineNumber) {
+        String trimmedLine = textArea.getLineText(lineNumber).trim();
         return trimmedLine.replaceFirst("//.*", "");
     }
     
@@ -34,9 +38,9 @@ public class PJavaIndenter extends PIndenter {
         return isBlockBegin(trimmedLine) || isBlockEnd(trimmedLine) || isLabel(trimmedLine);
     }
     
-    public int getPreviousDefinitiveLineNumber(PTextArea text, int startLineNumber) {
+    public int getPreviousDefinitiveLineNumber(int startLineNumber) {
         for (int lineNumber = startLineNumber - 1; lineNumber >= 0; --lineNumber) {
-            String line = text.getLineText(lineNumber);
+            String line = textArea.getLineText(lineNumber);
             if (isDefinitive(line)) {
                 return lineNumber;
             }
@@ -44,22 +48,22 @@ public class PJavaIndenter extends PIndenter {
         return -1;
     }
     
-    public String getIndentation(PTextArea text, int lineNumber) {
+    public String getIndentation(int lineNumber) {
         String indentation = "";
 
-        int previousDefinitive = getPreviousDefinitiveLineNumber(text, lineNumber);
+        int previousDefinitive = getPreviousDefinitiveLineNumber(lineNumber);
         if (previousDefinitive != -1) {
-            indentation = text.getIndentationOfLine(previousDefinitive);
+            indentation = getIndentationOfLine(previousDefinitive);
             
-            String activePartOfPrevious = getActivePartOfLine(text, previousDefinitive);
+            String activePartOfPrevious = getActivePartOfLine(previousDefinitive);
             if (isBlockBegin(activePartOfPrevious) || isLabel(activePartOfPrevious)) {
-                indentation = increaseIndentation(text, indentation);
+                indentation = increaseIndentation(indentation);
             }
         }
         
-        String activePartOfLine = getActivePartOfLine(text, lineNumber);
+        String activePartOfLine = getActivePartOfLine(lineNumber);
         if (isBlockEnd(activePartOfLine) || isLabel(activePartOfLine)) {
-            indentation = decreaseIndentation(text, indentation);
+            indentation = decreaseIndentation(indentation);
         }
         // FIXME: this is a pain for Perl/Ruby.
         if (activePartOfLine.startsWith("#")) {
@@ -68,7 +72,7 @@ public class PJavaIndenter extends PIndenter {
         
         // Recognize doc comments, and help out with the ASCII art.
         if (lineNumber > 0) {
-            String previousLine = text.getLineText(lineNumber - 1).trim();
+            String previousLine = textArea.getLineText(lineNumber - 1).trim();
             if (previousLine.endsWith("*/")) {
                 // Whatever the previous line looks like, if it ends with
                 // a close of comment, we're not in a comment, and should
