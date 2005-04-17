@@ -141,8 +141,19 @@ public class PKeyHandler extends KeyAdapter {
     private void insertCharacter(char ch) {
         if (ch == '\t') {
             textArea.insertTab();
+        } else if (ch == '\n') {
+            textArea.insertNewline();
         } else {
-            textArea.insert(new CharArrayCharSequence(new char[] { ch }));
+            CharSequence content = new CharArrayCharSequence(new char[] { ch });
+            if (textArea.getIndenter().isElectric(ch)) {
+                // FIXME: start CompoundEdit
+                textArea.replaceSelection(content);
+                // FIXME: implement correctIndentation
+                //textArea.correctIndentation(false);
+                // FIXME: end CompoundEdit
+            } else {
+                textArea.replaceSelection(content);
+            }
         }
     }
     

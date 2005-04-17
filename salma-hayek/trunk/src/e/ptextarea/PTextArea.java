@@ -51,6 +51,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private boolean wordWrap;
     
+    private PIndenter indenter;
     private PTextAreaSpellingChecker spellingChecker;
     
     public PTextArea() {
@@ -62,6 +63,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         this.columnCount = columnCount;
         this.selection = new SelectionHighlight(this, 0, 0);
         this.wordWrap = false;
+        this.indenter = new PIndenter();
         setFont(UIManager.getFont("TextArea.font"));
         setAutoscrolls(true);
         setBackground(Color.WHITE);
@@ -185,6 +187,58 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public void insertTab() {
         replaceSelection(getIndentationString());
+    }
+    
+    public void insertNewline() {
+        new PNewlineInserter(this).insertNewline();
+    }
+    
+    /**
+     * Returns the indenter responsible for auto-indent (and other aspects of
+     * indentation correction) in this text area.
+     */
+    public PIndenter getIndenter() {
+        return indenter;
+    }
+    
+    /**
+     * Sets the indenter responsible for this text area. Typically useful when
+     * you know more about the language of the content than PTextArea does.
+     */
+    public void setIndenter(PIndenter newIndenter) {
+        this.indenter = newIndenter;
+    }
+    
+    /**
+     * Returns a copy of just the leading whitespace part of the given line.
+     */
+    public String getIndentationOfLine(int lineNumber) {
+        // FIXME: just iterate over the characters starting at lineStart.
+        int lineStart = getLineStartOffset(lineNumber);
+        int lineEnd = getLineEndOffset(lineNumber);
+        String currentLine = getPTextBuffer().subSequence(lineStart, lineEnd).toString();
+        StringBuffer whitespace = new StringBuffer();
+        for (int i = 0; i < currentLine.length(); ++i) {
+            char c = currentLine.charAt(i);
+            if (c != ' ' && c != '\t') {
+                break;
+            }
+            whitespace.append(c);
+        }
+        return whitespace.toString();
+    }
+    
+    /**
+     * Returns the text of the given line (without the newline).
+     */
+    public String getLineText(int lineNumber) {
+        int lineStart = getLineStartOffset(lineNumber);
+        int lineEnd = getLineEndOffset(lineNumber);
+        int length = lineEnd - lineStart;
+        if (lineEnd != getPTextBuffer().length()) {
+            length--;
+        }
+        return (length > 0) ? getPTextBuffer().subSequence(lineStart, lineStart + length).toString() : "";
     }
     
     /**
