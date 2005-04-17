@@ -152,7 +152,7 @@ public class ETextArea extends PTextArea {
                 int lastLine = getLineOfOffset(getCaretPosition());
                 for (int line = firstLine; line < lastLine; line++) {
                     setCaretPosition(getLineStartOffset(line));
-                    correctIndentation(false);
+                    autoIndent();
                 }
             } else {
                 replaceSelection(replacementText);
@@ -170,51 +170,7 @@ public class ETextArea extends PTextArea {
     
     /** Corrects the indentation of the line with the caret, moving the caret. Returns true if the contents of the current line were changed. */
     public boolean correctIndentation() {
-        return correctIndentation(true);
-    }
-    
-    public void enableAutoIndent() {
-        // FIXME
-        //getActionMap().put(DefaultEditorKit.insertBreakAction, new InsertNewlineAction());
-    }
-    
-    public void autoIndent() {
-        correctIndentation(false);
-    }
-    
-    /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
-    public boolean correctIndentation(boolean shouldMoveCaret) {
-        // FIXME
-        /*
-        int position = getCaretPosition();
-        int lineNumber = getLineOfOffset(position);
-        
-        int offsetIntoLine = position - getLineStartOffset(lineNumber) - getIndentationOfLine(lineNumber).length();
-        
-        String whitespace = indenter.getIndentation(this, lineNumber);
-        int lineStart = getLineStartOffset(lineNumber);
-        int lineLength = getLineEndOffset(lineNumber) - lineStart;
-        String originalLine = getLineText(lineNumber);
-        String line = originalLine.trim();
-        String replacement = whitespace + line;
-        //Log.warn("line=@" + originalLine + "@; replacement=@" + replacement + "@");
-        boolean lineChanged = (replacement.equals(originalLine) == false);
-        if (lineChanged) {
-            select(lineStart, lineStart + lineLength);
-            replaceSelection(whitespace + line + "\n");
-            if (shouldMoveCaret == false) {
-                setCaretPosition(lineStart + whitespace.length() + offsetIntoLine);
-            }
-        }
-        if (shouldMoveCaret) {
-            // Move the caret ready to perform the same service to the next line.
-            int newCaretPosition = lineStart + whitespace.length() + line.length() + 1;
-            newCaretPosition = Math.min(newCaretPosition, getDocument().getLength());
-            setCaretPosition(newCaretPosition);
-        }
-        return lineChanged;
-        */
-        return false;
+        return getIndenter().correctIndentation(this, true);
     }
     
     public CharSequence charSequence() {

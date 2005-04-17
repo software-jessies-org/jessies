@@ -247,7 +247,6 @@ public class ETextWindow extends EWindow implements PTextListener {
             text.getIndenter().setIndentationPropertyBasedOnContent(text, content);
             text.getPTextBuffer().resetUndoBuffer();
             if (fileType != UNKNOWN) {
-                text.enableAutoIndent();
                 // FIXME
                 //text.getDocument().addDocumentListener(new UnmatchedBracketHighlighter(text));
             }
