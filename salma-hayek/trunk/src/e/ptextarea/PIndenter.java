@@ -2,7 +2,6 @@ package e.ptextarea;
 
 import e.util.*;
 import java.util.regex.*;
-import javax.swing.text.*;
 
 public class PIndenter {
     public String increaseIndentation(PTextArea text, String original) {
@@ -27,7 +26,7 @@ public class PIndenter {
     }
     
     /** Returns the whitespace that should be used for the given line number. */
-    public String getIndentation(PTextArea text, int lineNumber) throws BadLocationException {
+    public String getIndentation(PTextArea text, int lineNumber) {
         return text.getIndentationOfLine(getPreviousNonBlankLineNumber(text, lineNumber));
     }
     
@@ -89,5 +88,38 @@ public class PIndenter {
             }
         }
         return 0;
+    }
+    
+    /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
+    public boolean correctIndentation(PTextArea textArea, boolean shouldMoveCaret) {
+        // FIXME - selection
+        int position = textArea.getSelectionStart();
+        int lineNumber = textArea.getLineOfOffset(position);
+        
+        int offsetIntoLine = position - textArea.getLineStartOffset(lineNumber) - textArea.getIndentationOfLine(lineNumber).length();
+        
+        String whitespace = getIndentation(textArea, lineNumber);
+        int lineStart = textArea.getLineStartOffset(lineNumber);
+        int lineLength = textArea.getLineEndOffset(lineNumber) - lineStart;
+        String originalLine = textArea.getLineText(lineNumber);
+        String line = originalLine.trim();
+        String replacement = whitespace + line;
+        //Log.warn("line=@" + originalLine + "@; replacement=@" + replacement + "@");
+        boolean lineChanged = (replacement.equals(originalLine) == false);
+        if (lineChanged) {
+            textArea.select(lineStart, lineStart + lineLength);
+            textArea.replaceSelection(whitespace + line + "\n");
+            if (shouldMoveCaret == false) {
+                final int offset = lineStart + whitespace.length() + offsetIntoLine;
+                textArea.select(offset, offset);
+            }
+        }
+        if (shouldMoveCaret) {
+            // Move the caret ready to perform the same service to the next line.
+            int newCaretPosition = lineStart + whitespace.length() + line.length() + 1;
+            newCaretPosition = Math.min(newCaretPosition, textArea.getPTextBuffer().length());
+            textArea.select(newCaretPosition, newCaretPosition);
+        }
+        return lineChanged;
     }
 }

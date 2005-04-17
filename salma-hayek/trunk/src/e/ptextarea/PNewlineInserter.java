@@ -25,7 +25,7 @@ public class PNewlineInserter {
             insertMatchingCloseComment();
         } else {
             textArea.replaceSelection("\n");
-            //textArea.autoIndent();
+            textArea.autoIndent();
         }
         
         // FIXME: end CompoundEdit
@@ -54,8 +54,8 @@ public class PNewlineInserter {
         String prefix = "\n" + whitespace + " * ";
         String suffix = "\n" + whitespace + " */";
         textArea.insert(prefix + suffix);
-        // FIXME: this is automatic in PTextArea, no?
-        //textArea.setCaretPosition(position + prefix.length());
+        final int newOffset = position + prefix.length();
+        textArea.select(newOffset, newOffset);
     }
     
     public boolean hasUnbalancedBraces(final String text) {

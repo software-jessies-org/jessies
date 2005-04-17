@@ -10,7 +10,7 @@ public class PRubyIndenter extends PIndenter {
         return "defn}".indexOf(c) != -1;
     }
     
-    public String getIndentation(PTextArea text, int lineNumber) throws javax.swing.text.BadLocationException {
+    public String getIndentation(PTextArea text, int lineNumber) {
         int previousNonBlank = getPreviousNonBlankLineNumber(text, lineNumber);
         if (previousNonBlank == 0) {
             return "";

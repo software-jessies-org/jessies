@@ -4,7 +4,7 @@ public class PJavaIndenter extends PIndenter {
     /**
      * Returns that part of the given line number that isn't leading/trailing whitespace or comment.
      */
-    public String getActivePartOfLine(PTextArea text, int lineNumber) throws javax.swing.text.BadLocationException {
+    public String getActivePartOfLine(PTextArea text, int lineNumber) {
         String trimmedLine = text.getLineText(lineNumber).trim();
         return trimmedLine.replaceFirst("//.*", "");
     }
@@ -43,7 +43,7 @@ public class PJavaIndenter extends PIndenter {
         return 0;
     }
     
-    public String getIndentation(PTextArea text, int lineNumber) throws javax.swing.text.BadLocationException {
+    public String getIndentation(PTextArea text, int lineNumber) {
         String indentation = "";
 
         int previousDefinitive = getPreviousDefinitiveLineNumber(text, lineNumber);
