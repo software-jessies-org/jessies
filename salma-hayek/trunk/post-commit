@@ -74,7 +74,19 @@ patchToHtmlEmail(from_address, to_address, reply_to_address, subject, body, chan
 
 # Keep the post-commit trigger up-to-date.
 Dir.chdir(script_path)
-system("svn update")
+updateResult=`svn update 2>&1`
+if updateResult =~ /(Updated to|At) revision/
+    # Assume success
+else
+  begin
+      fd = open("|mail #{to_address}", "w")
+      fd.print("svn update failed with:\n")
+      fd.print(updateResult)
+  rescue
+      exit(1)
+  end
+  fd.close
+end
 
 # We're done.
 exit(0)
