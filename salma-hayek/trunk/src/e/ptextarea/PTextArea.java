@@ -257,20 +257,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void insert(CharSequence chars) {
-        SelectionSetter endCaret =new SelectionSetter(getSelectionStart() + chars.length());
+        SelectionSetter endCaret = new SelectionSetter(getSelectionStart() + chars.length());
         int length = getSelectionEnd() - getSelectionStart();
         getPTextBuffer().replace(new SelectionSetter(), getSelectionStart(), length, chars, endCaret);
     }
     
     public void replaceRange(CharSequence replacement, int start, int end) {
         SelectionSetter endCaret = new SelectionSetter(start + replacement.length());
-        int length = end - start;
-        PTextBuffer.SelectionSetter selectionPreserver = new PTextBuffer.SelectionSetter() {
-            public void modifySelection() {
-                // Replacing a range shouldn't involve any caret/selection changes.
-            }
-        };
-        getPTextBuffer().replace(selectionPreserver, start, length, replacement, selectionPreserver);
+        getPTextBuffer().replace(new SelectionSetter(), start, end - start, replacement, endCaret);
     }
     
     public void replaceSelection(CharSequence replacement) {
