@@ -3,6 +3,7 @@ package e.edit;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.ptextarea.*;
 import e.util.*;
 
 public class EditMenuBar extends JMenuBar implements MenuListener {
@@ -63,13 +64,13 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     
     public JMenu makeEditMenu() {
         JMenu menu = new JMenu("Edit");
-        menu.add(new UndoAction());
-        menu.add(new RedoAction());
+        menu.add(PActionFactory.makeUndoAction());
+        menu.add(PActionFactory.makeRedoAction());
 
         menu.add(new JSeparator());
-        menu.add(new CutAction());
-        menu.add(new CopyAction());
-        menu.add(new PasteAction());
+        menu.add(PActionFactory.makeCutAction());
+        menu.add(PActionFactory.makeCopyAction());
+        menu.add(PActionFactory.makePasteAction());
         menu.add(new AutoCompleteAction());
 
         menu.add(new JSeparator());
