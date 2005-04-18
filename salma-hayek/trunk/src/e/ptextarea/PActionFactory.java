@@ -17,6 +17,14 @@ public class PActionFactory {
         return new PasteAction();
     }
     
+    public static Action makeRedoAction() {
+        return new RedoAction();
+    }
+    
+    public static Action makeUndoAction() {
+        return new UndoAction();
+    }
+    
     public abstract static class PTextAction extends AbstractAction {
         public PTextAction(String name, KeyStroke keyStroke) {
             super(name);
@@ -68,6 +76,26 @@ public class PActionFactory {
         
         public void performOn(PTextArea textArea) {
             textArea.paste();
+        }
+    }
+    
+    public static class RedoAction extends PTextAction {
+        public RedoAction() {
+            super("Redo", e.util.GuiUtilities.makeKeyStroke("Z", true));
+        }
+        
+        public void performOn(PTextArea textArea) {
+            textArea.getPTextBuffer().getUndoBuffer().redo();
+        }
+    }
+    
+    public static class UndoAction extends PTextAction {
+        public UndoAction() {
+            super("Undo", e.util.GuiUtilities.makeKeyStroke("Z", false));
+        }
+        
+        public void performOn(PTextArea textArea) {
+            textArea.getPTextBuffer().getUndoBuffer().undo();
         }
     }
     

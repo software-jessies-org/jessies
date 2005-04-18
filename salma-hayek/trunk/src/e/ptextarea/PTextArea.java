@@ -99,6 +99,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         initKeyBinding(PActionFactory.makeCopyAction());
         initKeyBinding(PActionFactory.makeCutAction());
         initKeyBinding(PActionFactory.makePasteAction());
+        initKeyBinding(PActionFactory.makeRedoAction());
+        initKeyBinding(PActionFactory.makeUndoAction());
     }
     
     private void initKeyBinding(Action action) {

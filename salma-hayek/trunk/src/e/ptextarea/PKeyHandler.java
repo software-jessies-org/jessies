@@ -25,23 +25,10 @@ public class PKeyHandler extends KeyAdapter {
             case KeyEvent.VK_R:
                 textArea.repaint();
                 return;
-                
-            case KeyEvent.VK_Z:
-                undoRedo(event.isShiftDown());
-                return;
             }
         }
         if (handleInvisibleKeyPressed(event)) {
             event.consume();
-        }
-    }
-    
-    private void undoRedo(boolean isShifted) {
-        PUndoBuffer undoer = textArea.getPTextBuffer().getUndoBuffer();
-        if (isShifted) {
-            undoer.redo();
-        } else {
-            undoer.undo();
         }
     }
     
