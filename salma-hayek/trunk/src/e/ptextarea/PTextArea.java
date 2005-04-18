@@ -93,6 +93,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         initFocusListening();
         initKeyBindings();
         initSpellingChecking();
+        addCaretListener(new PMatchingBracketHighlighter(this));
     }
     
     private void initKeyBindings() {
