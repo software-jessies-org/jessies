@@ -198,8 +198,18 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             // Avoid problems if splitLines == null.
             return;
         }
+        
+        JViewport viewport = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, this);
+        if (viewport == null) {
+            return;
+        }
+        
         Point point = getViewCoordinates(getCoordinates(offset));
-        scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
+        final int height = viewport.getExtentSize().height;
+        int y = point.y - height/2;
+        y = Math.max(0, y);
+        y = Math.min(y, getHeight() - height);
+        viewport.setViewPosition(new Point(0, y));
     }
     
     public void insertTab() {
