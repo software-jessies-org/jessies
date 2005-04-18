@@ -116,7 +116,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         
         private int getLineEndOffset(int line) {
             if (line == textArea.getLineCount() - 1) {
-                return textArea.getLineEndOffset(line);
+                return textArea.getLineEndOffsetBeforeTerminator(line);
             } else {
                 return textArea.getLineStartOffset(line + 1);
             }

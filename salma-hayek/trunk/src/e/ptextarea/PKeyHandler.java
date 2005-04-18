@@ -170,7 +170,7 @@ public class PKeyHandler extends KeyAdapter {
     
     private int caretToEndOfLine() {
         int lineIndex = textArea.getLineOfOffset(textArea.getSelectionEnd());
-        return textArea.getLineEndOffset(lineIndex);
+        return textArea.getLineEndOffsetBeforeTerminator(lineIndex);
     }
     
     private void moveLeft(boolean byWord, boolean extendingSelection) {

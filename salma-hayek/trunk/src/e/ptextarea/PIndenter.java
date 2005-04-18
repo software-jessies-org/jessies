@@ -39,7 +39,7 @@ public class PIndenter {
      */
     public String getCurrentIndentationOfLine(int lineNumber) {
         int start = textArea.getLineStartOffset(lineNumber);
-        int max = textArea.getLineEndOffset(lineNumber);
+        int max = textArea.getLineEndOffsetBeforeTerminator(lineNumber);
         int end;
         CharSequence chars = textArea.getPTextBuffer();
         for (end = start; end < max; ++end) {
@@ -124,7 +124,7 @@ public class PIndenter {
         
         String whitespace = getIndentation(lineNumber);
         int lineStart = textArea.getLineStartOffset(lineNumber);
-        int lineLength = textArea.getLineEndOffset(lineNumber) - lineStart;
+        int lineLength = textArea.getLineEndOffsetBeforeTerminator(lineNumber) - lineStart;
         String originalLine = textArea.getLineText(lineNumber);
         String line = originalLine.trim();
         String replacement = whitespace + line;
