@@ -138,7 +138,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         int caretPosition = text.getSelectionStart();
         int lineNumber = 1 + text.getLineOfOffset(caretPosition);
         int lineStart = text.getLineStartOffset(lineNumber - 1);
-        int columnNumber = 1 + emacsDistance(text.charSequence(), caretPosition, lineStart);
+        int columnNumber = 1 + emacsDistance(text.getPTextBuffer(), caretPosition, lineStart);
         return ":" + lineNumber + ":" + columnNumber;
     }
     
@@ -428,7 +428,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         // Humans number lines from 1, JTextComponent from 0.
         line--;
         final int start = text.getLineStartOffset(line);
-        final int end = text.getLineEndOffset(line);
+        final int end = text.getLineEndOffsetBeforeTerminator(line);
         text.select(start, end);
     }
     
@@ -530,11 +530,11 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void jumpToAddress(String address) {
-        CharSequence chars = text.charSequence();
+        CharSequence chars = text.getPTextBuffer();
         StringTokenizer st = new StringTokenizer(address, ":");
         int line = Integer.parseInt(st.nextToken()) - 1;
         int offset = text.getLineStartOffset(line);
-        int maxOffset = text.getLineEndOffset(line) - 1;
+        int maxOffset = text.getLineEndOffsetBeforeTerminator(line);
         if (st.hasMoreTokens()) {
             try {
                 offset = emacsWalk(chars, offset, Integer.parseInt(st.nextToken()));

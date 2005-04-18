@@ -61,7 +61,7 @@ public class InsertInterfaceAction extends ETextAction {
             }
             
             // Position the caret inside the first method
-            target.setCaretPosition(target.getLineEndOffset(first + 3) - 1);
+            target.setCaretPosition(target.getLineEndOffsetBeforeTerminator(first + 3));
         } catch (BadLocationException ex) {
             ex.printStackTrace();
         } finally {

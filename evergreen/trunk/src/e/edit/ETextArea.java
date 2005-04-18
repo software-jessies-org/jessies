@@ -165,16 +165,12 @@ public class ETextArea extends PTextArea {
         return getIndenter().correctIndentation(true);
     }
     
-    public CharSequence charSequence() {
-        return getPTextBuffer();
-    }
-    
     /**
      * Returns the word up to but not past the caret. The intended use is
      * working out what to offer as completions in AutoCompleteAction.
      */
     public String getWordUpToCaret() {
-        CharSequence chars = charSequence();
+        CharSequence chars = getPTextBuffer();
         // FIXME - selection
         int end = getSelectionStart();
         int start = end;
