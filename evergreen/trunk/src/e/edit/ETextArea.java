@@ -122,9 +122,12 @@ public class ETextArea extends PTextArea {
         //getActionMap().put(DefaultEditorKit.deletePrevCharAction, new BackspaceAction());
     }
     
+    public String reformatPastedText(String pastedText) {
+        return pastedText.replace('\u00a0', ' ');
+    }
+    
+    /*
     public void paste() {
-        // FIXME
-        /*
         Clipboard clipboard = getToolkit().getSystemClipboard();
         if (isEnabled() == false || clipboard == null) {
             return;
@@ -135,9 +138,9 @@ public class ETextArea extends PTextArea {
             getToolkit().beep();
             return;
         }
-        CompoundEdit entireEdit = new CompoundEdit();
-        getUndoManager().addEdit(entireEdit);
-        try {
+        // FIXME: start CompoundEdit
+        //CompoundEdit entireEdit = new CompoundEdit();
+        //getUndoManager().addEdit(entireEdit);
             Position position = getDocument().createPosition(getSelectionEnd());
             
             String replacementText = (String) content.getTransferData(DataFlavor.stringFlavor);
@@ -159,14 +162,10 @@ public class ETextArea extends PTextArea {
             }
             
             setCaretPosition(position.getOffset());
-        } catch (Exception e) {
-            getToolkit().beep();
-            Log.warn("Exception in paste:" + e.toString());
-        } finally {
-            entireEdit.end();
-        }
-        */
+            // FIXME: end CompoundEdit
+            //entireEdit.end();
     }
+    */
     
     /** Corrects the indentation of the line with the caret, moving the caret. Returns true if the contents of the current line were changed. */
     public boolean correctIndentation() {
