@@ -26,16 +26,6 @@ public class PKeyHandler extends KeyAdapter {
                 textArea.repaint();
                 return;
                 
-            case KeyEvent.VK_X:
-                textArea.cut();
-                return;
-            case KeyEvent.VK_C:
-                textArea.copy();
-                return;
-            case KeyEvent.VK_V:
-                textArea.paste();
-                return;
-                
             case KeyEvent.VK_Z:
                 undoRedo(event.isShiftDown());
                 return;

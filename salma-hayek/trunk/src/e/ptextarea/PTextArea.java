@@ -91,7 +91,21 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         setFocusTraversalKeysEnabled(false);
         requestFocus();
         initFocusListening();
+        initKeyBindings();
         initSpellingChecking();
+    }
+    
+    private void initKeyBindings() {
+        initKeyBinding(PActionFactory.makeCopyAction());
+        initKeyBinding(PActionFactory.makeCutAction());
+        initKeyBinding(PActionFactory.makePasteAction());
+    }
+    
+    private void initKeyBinding(Action action) {
+        String name = (String) action.getValue(Action.NAME);
+        KeyStroke keyStroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+        getActionMap().put(name, action);
+        getInputMap().put(keyStroke, name);
     }
     
     public void addCaretListener(PCaretListener caretListener) {
