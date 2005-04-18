@@ -5,7 +5,6 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.event.*;
 import e.ptextarea.*;
 
 public class Advisor extends JPanel {
@@ -32,7 +31,6 @@ public class Advisor extends JPanel {
                 textField.selectAll();
             }
         });
-        textField.setCaret(new ECaret());
         registerTextComponent(textField);
         add(textField, BorderLayout.SOUTH);
         */
@@ -139,21 +137,18 @@ public class Advisor extends JPanel {
             return;
         }
         unregisterTextComponent(textArea); // Make sure each component is only registered once.
-        // FIXME
-        //textArea.getCaret().addChangeListener(caretWatcher);
+        textArea.addCaretListener(caretWatcher);
     }
     
     /** Unregisters a text component for advice tips. */
     public void unregisterTextComponent(PTextArea textArea) {
-        // FIXME
-        //textArea.getCaret().removeChangeListener(caretWatcher);
+        textArea.addCaretListener(caretWatcher);
     }
     
     /** Watches the carets in all the registered text components. */
-    private ChangeListener caretWatcher = new ChangeListener() {
-        public void stateChanged(ChangeEvent e) {
-            // FIXME
-            //currentComponent = ((ECaret) e.getSource()).getTextComponent();
+    private PCaretListener caretWatcher = new PCaretListener() {
+        public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
+            currentComponent = textArea;
             timer.restart();
         }
     };
