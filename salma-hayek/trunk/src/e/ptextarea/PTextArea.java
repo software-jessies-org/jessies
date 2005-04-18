@@ -349,7 +349,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public int getLineOfOffset(int offset) {
-        return getSplitLine(getCoordinates(offset).getLineIndex()).getLineIndex();
+        return lines.getLineIndex(offset);
     }
     
     public void setWrapStyleWord(boolean newWordWrapState) {
