@@ -205,6 +205,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
         
         Point point = getViewCoordinates(getCoordinates(offset));
+        if (viewport.getViewRect().contains(point)) {
+            return;
+        }
         final int height = viewport.getExtentSize().height;
         int y = point.y - height/2;
         y = Math.max(0, y);
