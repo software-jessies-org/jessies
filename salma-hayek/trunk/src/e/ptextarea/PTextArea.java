@@ -1060,6 +1060,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         paste(true);
     }
     
+    /**
+     * Override this to modify pasted text before it replaces the selection.
+     */
+    protected String reformatPastedText(String pastedText) {
+        return pastedText;
+    }
+    
     private void paste(boolean onlyPasteSystemSelection) {
         try {
             Toolkit toolkit = getToolkit();
@@ -1069,7 +1076,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             }
             DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
             String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            insert(string);
+            replaceSelection(reformatPastedText(string));
         } catch (Exception ex) {
             Log.warn("Couldn't paste.", ex);
         }
