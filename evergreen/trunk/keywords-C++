@@ -18,10 +18,12 @@ undef
 init
 uint
 # Standard C++ library identifiers.
+boolalpha
 cerr
 cout
 deque
 endl
+noboolalpha
 npos
 ostream
 ostringstream
