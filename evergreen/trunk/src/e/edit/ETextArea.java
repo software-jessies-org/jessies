@@ -12,8 +12,6 @@ public class ETextArea extends PTextArea {
     public ETextArea() {
         // FIXME
         //setMargin(new Insets(4, 4, 4, 1));
-        // FIXME
-        //getCaret().addChangeListener(new MatchingBracketHighlighter(this));
     }
     
     /** Returns a fake 'preferred size' if our parent's not tall enough for us to make it as far as the display. */
@@ -116,11 +114,6 @@ public class ETextArea extends PTextArea {
         int fontSize = Parameters.getParameter(parameterPrefix + ".size", defaultFontSize);
         return new Font(fontName, Font.PLAIN, fontSize);
     }
-
-    public void initKeymap() {
-        // FIXME
-        //getActionMap().put(DefaultEditorKit.deletePrevCharAction, new BackspaceAction());
-    }
     
     public String reformatPastedText(String pastedText) {
         return pastedText.replace('\u00a0', ' ');
@@ -182,7 +175,7 @@ public class ETextArea extends PTextArea {
      */
     public String getWordUpToCaret() {
         CharSequence chars = charSequence();
-        // FIXME
+        // FIXME - selection
         int end = getSelectionStart();
         int start = end;
         while (start > 0) {
