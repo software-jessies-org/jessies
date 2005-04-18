@@ -60,7 +60,7 @@ public class TagsUpdater {
             }
         });
         text.addCaretListener(new PCaretListener() {
-            public void caretMoved(int oldOffset, int newOffset) {
+            public void caretMoved(PTextArea textArea, int oldOffset, int newOffset) {
                 if (followCaretChanges) {
                     selectTagAtCaret(text);
                 }
