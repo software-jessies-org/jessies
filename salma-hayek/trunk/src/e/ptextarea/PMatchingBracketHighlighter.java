@@ -13,7 +13,7 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         this.textArea = textArea;
     }
     
-    public void caretMoved(int selectionStart, int selectionEnd) {
+    public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
         removeHighlights();
         if (selectionStart != selectionEnd) {
             return;

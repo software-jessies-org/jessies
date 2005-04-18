@@ -245,7 +245,7 @@ public class PKeyHandler extends KeyAdapter {
         private boolean isEntered = false;
         private int xPixelLocation = -1;
         
-        public void caretMoved(int selectionStart, int selectionEnd) {
+        public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
             if (isEntered == false) {
                 xPixelLocation = -1;
             }

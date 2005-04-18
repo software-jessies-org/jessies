@@ -121,7 +121,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private void fireCaretChangedEvent() {
         for (int i = 0; i < caretListeners.size(); i++) {
-            ((PCaretListener) caretListeners.get(i)).caretMoved(getSelectionStart(), getSelectionEnd());
+            ((PCaretListener) caretListeners.get(i)).caretMoved(this, getSelectionStart(), getSelectionEnd());
         }
     }
     
