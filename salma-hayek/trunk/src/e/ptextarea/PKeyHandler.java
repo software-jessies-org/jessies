@@ -163,7 +163,7 @@ public class PKeyHandler extends KeyAdapter {
     private void delete() {
         int start = textArea.getSelectionStart();
         int end = textArea.getSelectionEnd();
-        if (start == end && end < textArea.getPTextBuffer().length() - 1) {
+        if (start == end && end < textArea.getPTextBuffer().length()) {
             ++end;
         }
         if (start != end) {
