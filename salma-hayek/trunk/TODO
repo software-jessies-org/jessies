@@ -2,8 +2,6 @@ Items to be done for PTextArea:
 
 * Cope with insets. We're rendering text too close to the edge.
 
-* Use the UIManager's text color, rather than black.
-
 * Some way to monitor the undo manager, so we can clear the dirty flag in Edit. (And have the Undo/Redo menu items enable/disable themselves?)
 
 * Compound edit support.
