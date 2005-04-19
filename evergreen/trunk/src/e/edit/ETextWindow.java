@@ -429,8 +429,19 @@ public class ETextWindow extends EWindow implements PTextListener {
         line--;
         final int start = text.getLineStartOffset(line);
         final int end = text.getLineEndOffsetBeforeTerminator(line);
-        text.select(start, end);
+        centerOnNewSelection(start, end);
+    }
+    
+    /**
+     * Changes the selection, and centers the selection on the display.
+     */
+    private void centerOnNewSelection(final int start, final int end) {
+        // Center first, to avoid flicker because PTextArea.select may
+        // have caused some scrolling to ensure that the selection is
+        // visible, but probably won't have to scrolled such that our
+        // offset is centered.
         text.centerOffsetInDisplay(start);
+        text.select(start, end);
     }
     
     public int getCurrentLineNumber() {
@@ -566,8 +577,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         offset = Math.min(offset, maxOffset);
         endOffset = Math.min(endOffset, maxOffset);
-        text.select(offset, endOffset);
-        text.centerOffsetInDisplay(offset);
+        centerOnNewSelection(offset, endOffset);
     }
     
     /**
