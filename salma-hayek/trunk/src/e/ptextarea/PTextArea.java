@@ -188,12 +188,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 repaintLines(getCoordinates(minEnd).getLineIndex() - 1, getCoordinates(maxEnd).getLineIndex());
             }
         }
-        
         ensureVisibilityOfOffset(getUnanchoredSelectionExtreme());
         fireCaretChangedEvent();
     }
     
-    public void ensureVisibilityOfOffset(int offset) {
+    public void centerOffsetInDisplay(int offset) {
         if (isShowing() == false) {
             // Avoid problems if splitLines == null.
             return;
@@ -205,14 +204,21 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
         
         Point point = getViewCoordinates(getCoordinates(offset));
-        if (viewport.getViewRect().contains(point)) {
-            return;
-        }
         final int height = viewport.getExtentSize().height;
         int y = point.y - height/2;
         y = Math.max(0, y);
         y = Math.min(y, getHeight() - height);
         viewport.setViewPosition(new Point(0, y));
+    }
+    
+    public void ensureVisibilityOfOffset(int offset) {
+        if (isShowing() == false) {
+            // Avoid problems if splitLines == null.
+            return;
+        }
+        
+        Point point = getViewCoordinates(getCoordinates(offset));
+        scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
     }
     
     public void insertTab() {
