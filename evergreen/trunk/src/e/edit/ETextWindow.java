@@ -430,6 +430,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         final int start = text.getLineStartOffset(line);
         final int end = text.getLineEndOffsetBeforeTerminator(line);
         text.select(start, end);
+        text.centerOffsetInDisplay(start);
     }
     
     public int getCurrentLineNumber() {
@@ -566,6 +567,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         offset = Math.min(offset, maxOffset);
         endOffset = Math.min(endOffset, maxOffset);
         text.select(offset, endOffset);
+        text.centerOffsetInDisplay(offset);
     }
     
     /**
