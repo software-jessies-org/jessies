@@ -48,4 +48,4 @@ Index: src/e/ptextarea/PMouseHandler.java
 
 * we can perhaps take Ed's old suggestion for how menus should work into account, and have a constructive scheme, rather than a replacement scheme. (so there's basic stuff offered by the component, extra stuff from the spelling checker, extra stuff from the application, et cetera. Cocoa has hooks for random other bits of code to declare they have actions too.)
 
-* turn word-wrap on for non-source (like this file)?
+* delete doesn't work on the last character in a file.
