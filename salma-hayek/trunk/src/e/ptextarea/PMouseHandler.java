@@ -96,7 +96,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         private void selectByWord(int startOffset, int endOffset, boolean endIsAnchored) {
             CharSequence chars = textArea.getPTextBuffer();
             String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
-            textArea.setSelection(PWordUtilities.getWordStart(chars, startOffset, stopChars), PWordUtilities.getWordEnd(chars, endOffset, stopChars), endIsAnchored);
+            textArea.setSelectionWithoutScrolling(PWordUtilities.getWordStart(chars, startOffset, stopChars), PWordUtilities.getWordEnd(chars, endOffset, stopChars), endIsAnchored);
         }
         
         public void mouseDragged(int newOffset) {
@@ -126,7 +126,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             int currentLine = textArea.getLineOfOffset(newOffset);
             int minLine = Math.min(currentLine, pressedLine);
             int maxLine = Math.max(currentLine, pressedLine);
-            textArea.setSelection(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine), (pressedLine == minLine));
+            textArea.setSelectionWithoutScrolling(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine), (pressedLine == minLine));
         }
     }
 }

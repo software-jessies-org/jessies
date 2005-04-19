@@ -169,6 +169,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void setSelection(int start, int end, boolean selectionEndIsAnchor) {
+        setSelectionWithoutScrolling(start, end, selectionEndIsAnchor);
+        ensureVisibilityOfOffset(getUnanchoredSelectionExtreme());
+    }
+    
+    public void setSelectionWithoutScrolling(int start, int end, boolean selectionEndIsAnchor) {
         this.selectionEndIsAnchor = selectionEndIsAnchor;
         SelectionHighlight oldSelection = selection;
         repaintCaret();
@@ -188,7 +193,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 repaintLines(getCoordinates(minEnd).getLineIndex() - 1, getCoordinates(maxEnd).getLineIndex());
             }
         }
-        ensureVisibilityOfOffset(getUnanchoredSelectionExtreme());
         fireCaretChangedEvent();
     }
     
