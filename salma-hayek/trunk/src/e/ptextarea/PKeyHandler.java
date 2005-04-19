@@ -72,10 +72,6 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
-        if (movementHandler.handleMovementKeys(event)) {
-            return true;
-        }
-        
         boolean byWord = GuiUtilities.isMacOs() ? event.isAltDown() : event.isControlDown();
         boolean extendingSelection = event.isShiftDown();
         int key = event.getKeyCode();
@@ -83,6 +79,10 @@ public class PKeyHandler extends KeyAdapter {
             moveCaret(extendingSelection, caretToStartOfLine());
         } else if (isEndOfLineKey(event)) {
             moveCaret(extendingSelection, caretToEndOfLine());
+        } else if (isStartOfTextKey(event)) {
+            moveCaret(extendingSelection, 0);
+        } else if (isEndOfTextKey(event)) {
+            moveCaret(extendingSelection, textArea.getPTextBuffer().length());
         } else if (GuiUtilities.isMacOs() && (key == KeyEvent.VK_HOME || key == KeyEvent.VK_END)) {
             textArea.ensureVisibilityOfOffset((key == KeyEvent.VK_HOME) ? 0 : textArea.getPTextBuffer().length());
         } else if (key == KeyEvent.VK_LEFT) {
@@ -93,6 +93,8 @@ public class PKeyHandler extends KeyAdapter {
             backspace();
         } else if (key == KeyEvent.VK_DELETE) {
             delete();
+        } else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
+            movementHandler.handleMovementKeys(event);
         } else {
             return false;
         }
@@ -113,6 +115,20 @@ public class PKeyHandler extends KeyAdapter {
         } else {
             return (e.getKeyCode() == KeyEvent.VK_END);
         }
+    }
+    
+    private boolean isStartOfTextKey(KeyEvent e) {
+        if (e.isMetaDown() && e.getKeyCode() == KeyEvent.VK_UP) {
+            return true;
+        }
+        return (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_HOME);
+    }
+    
+    private boolean isEndOfTextKey(KeyEvent e) {
+        if (e.isMetaDown() && e.getKeyCode() == KeyEvent.VK_DOWN) {
+            return true;
+        }
+        return (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_END);
     }
     
     private void insertCharacter(char ch) {
@@ -251,18 +267,14 @@ public class PKeyHandler extends KeyAdapter {
             }
         }
         
-        public boolean handleMovementKeys(KeyEvent event) {
+        public void handleMovementKeys(KeyEvent event) {
             isEntered = true;
             if (xPixelLocation == -1) {
                 xPixelLocation = getCurrentXPixelLocation();
             }
             boolean extendingSelection = event.isShiftDown();
             try {
-                switch (event.getKeyCode()) {
-                    case KeyEvent.VK_UP: moveCaret(extendingSelection, caretUp()); return true;
-                    case KeyEvent.VK_DOWN: moveCaret(extendingSelection, caretDown()); return true;
-                    default: return false;
-                }
+                moveCaret(extendingSelection, event.getKeyCode() == KeyEvent.VK_UP ? caretUp() : caretDown());
             } finally {
                 isEntered = false;
             }
