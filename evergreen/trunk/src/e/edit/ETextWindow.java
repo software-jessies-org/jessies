@@ -242,7 +242,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 text.setTextStyler(new PCPPTextStyler(text));
             } else if (filename.endsWith(".pl") || isPerlContent(content)) {
                 fileType = PERL;
-                text.setIndenter(new PJavaIndenter(text));
+                text.setIndenter(new PPerlIndenter(text));
             } else {
                 // Plain text.
                 text.setWrapStyleWord(true);
