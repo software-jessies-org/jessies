@@ -72,6 +72,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(PActionFactory.makeCopyAction());
         menu.add(PActionFactory.makePasteAction());
         menu.add(new AutoCompleteAction());
+        menu.add(PActionFactory.makeSelectAllAction());
 
         menu.add(new JSeparator());
         menu.add(new CorrectIndentationAction());
