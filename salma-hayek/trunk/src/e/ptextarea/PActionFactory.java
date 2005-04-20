@@ -21,6 +21,10 @@ public class PActionFactory {
         return new RedoAction();
     }
     
+    public static Action makeSelectAllAction() {
+        return new SelectAllAction();
+    }
+    
     public static Action makeUndoAction() {
         return new UndoAction();
     }
@@ -86,6 +90,16 @@ public class PActionFactory {
         
         public void performOn(PTextArea textArea) {
             textArea.getPTextBuffer().getUndoBuffer().redo();
+        }
+    }
+    
+    public static class SelectAllAction extends PTextAction {
+        public SelectAllAction() {
+            super("Select All", e.util.GuiUtilities.makeKeyStroke("A", false));
+        }
+        
+        public void performOn(PTextArea textArea) {
+            textArea.selectAll();
         }
     }
     
