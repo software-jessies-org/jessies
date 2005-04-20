@@ -65,8 +65,7 @@ public class PJavaIndenter extends PIndenter {
         if (isBlockEnd(activePartOfLine) || isLabel(activePartOfLine)) {
             indentation = decreaseIndentation(indentation);
         }
-        // FIXME: this is a pain for Perl/Ruby.
-        if (activePartOfLine.startsWith("#")) {
+        if (shouldMoveHashToColumnZero() && activePartOfLine.startsWith("#")) {
             indentation = "";
         }
         
@@ -90,5 +89,9 @@ public class PJavaIndenter extends PIndenter {
         }
         
         return indentation;
+    }
+    
+    protected boolean shouldMoveHashToColumnZero() {
+        return true;
     }
 }
