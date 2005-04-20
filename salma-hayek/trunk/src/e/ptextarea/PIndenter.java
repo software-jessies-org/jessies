@@ -101,7 +101,6 @@ public class PIndenter {
     }
     
     public boolean isInNeedOfClosingSemicolon(String line) {
-        // FIXME: for C++ return line.matches(".*\\b(class|enum|struct|union)\\b.*")
         return false;
     }
     
