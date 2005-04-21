@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.*;
-
 /**
  * A PJavaTextStyler knows how to apply syntax highlighting for Java code.
  * 
@@ -79,20 +77,19 @@ public class PJavaTextStyler extends PCLikeTextStyler {
      * Overrides the default string segment addition, performing validation on the
      * string format and introducing error segment types where appropriate.
      */
-    public void addStringSegment(ArrayList segmentList, String string) {
-        if (string.startsWith("\'")) {
-            addSegments(segmentList, string, 1);
+    public void addStringSegment(PCLikeTextStyler.TextSegmentListBuilder builder, String line, int start, int end) {
+        if (line.charAt(start) == '\'') {
+            addSegments(builder, line, start, end, 1);
         } else {
-            addSegments(segmentList, string, Integer.MAX_VALUE);
+            addSegments(builder, line, start, end, Integer.MAX_VALUE);
         }
     }
     
-    private void addSegments(ArrayList segmentList, String string, int maxChars) {
-        int segmentStart = 0;
+    private void addSegments(PCLikeTextStyler.TextSegmentListBuilder builder, String string, int start, int end, int maxChars) {
         boolean segmentIsValid = true;
         int charCount = 0;
         // The increment step is done inside the loop.
-        for (int i = 1; i < string.length() - 1; ) {
+        for (int i = start + 1; i < end - 1; ) {
             boolean isError = false;
             int increment;
             if (charCount >= maxChars) {
@@ -138,27 +135,17 @@ public class PJavaTextStyler extends PCLikeTextStyler {
                     increment = 1;
                 }
             }
-            if (isError) {
-                if (segmentIsValid) {
-                    segmentList.add(new PTextSegment(PStyle.STRING, string.substring(segmentStart, i)));
-                    segmentStart = i;
-                    segmentIsValid = false;
-                }
-            } else {
-                if (segmentIsValid == false) {
-                    segmentList.add(new PTextSegment(PStyle.ERROR, string.substring(segmentStart, i)));
-                    segmentStart = i;
-                    segmentIsValid = true;
-                }
+            if (isError == segmentIsValid) {
+                builder.addStyledSegment(i, segmentIsValid ? PStyle.STRING : PStyle.ERROR);
+                segmentIsValid = !isError;
             }
             charCount++;
             i += increment;
         }
         if (segmentIsValid == false) {
-            segmentList.add(new PTextSegment(PStyle.ERROR, string.substring(segmentStart, string.length() - 1)));
-            segmentStart = string.length() - 1;
+            builder.addStyledSegment(end - 1, PStyle.ERROR);
         }
-        segmentList.add(new PTextSegment(PStyle.STRING, string.substring(segmentStart)));
+        builder.addStyledSegment(end, PStyle.STRING);
     }
     
     private boolean isInvalidUnicodeEscape(String escapeHex, char quoteType) {

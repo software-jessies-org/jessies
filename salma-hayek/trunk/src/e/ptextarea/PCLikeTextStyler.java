@@ -43,9 +43,44 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
      * this method if you wish to perform some validation on the string and introduce
      * error-style sections into it.
      */
-    public void addStringSegment(ArrayList segmentList, String string) {
-        segmentList.add(new PTextSegment(PStyle.STRING, string));
+    public void addStringSegment(TextSegmentListBuilder builder, String line, int start, int end) {
+        builder.addStyledSegment(end, PStyle.STRING);
     }
+    
+    /**
+     * Optionally returns a special double-click handler for use when a double-click occurs at
+     * the given position.  A null return value means the default handling should be performed.
+     */
+    public PDragHandler getDoubleClickDragHandler(int clickOffset) {
+//        int lineIndex = textArea.getLineOfOffset(clickOffset);
+//        int lineStart = textArea.getLineStartOffset(lineIndex);
+//        String line = textArea.getPTextBuffer().subSequence(lineStart, textArea.getLineEndOffset(lineIndex)).toString();
+//        int lineOffset = clickOffset - lineStart;
+//        PDragHandler result = getDragHandlerForString(lineIndex, line, lineOffset);
+//        if (result != null) {
+//            
+//        }
+        return null;
+    }
+    
+//    private PDragHandler getDragHandlerForString(int lineIndex, String line, int lineOffset) {
+//        int offset = 0;
+//        List segments = getLineSegments(lineIndex, line);
+//        for (int i = 0; i < segments.size(); i++) {
+//            PLineSegment segment = (PLineSegment) segments.get(i);
+//            if (lineOffset >= offset && lineOffset < offset + segment.length()) {
+//                if (segment.getStyleIndex() == TYPE_STRING) {
+//                    // Are we just inside either of the enclosing quotes?
+//                    if (Math.min(offset - lineOffset, offset + segment.length() - lineOffset) == 1) {
+//                        return new BracketMatchingDragHandler(offset + 1, offset + segment.length() - 1);
+//                    } else {
+//                        return null;
+//                    }
+//                }
+//            }
+//            offset += segment.length();
+//        }
+//    }
     
     private void initCommentCache() {
         lastGoodLine = 0;
@@ -60,12 +95,12 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         }
     }
     
-    public List getLineSegments(int lineIndex, String line) {
-        List mainSegments = getMainSegments(lineIndex, line);
-        if (keywords.size() == 0) {
-            return mainSegments;
-        } else {
-            ArrayList result = new ArrayList();
+    public PTextSegment[] getLineSegments(int lineIndex) {
+        String line = textArea.getLineContents(lineIndex).toString();
+        List result = getMainSegments(lineIndex, line);
+        if (keywords.size() > 0) {
+            List mainSegments = result;
+            result = new ArrayList();
             for (int i = 0; i < mainSegments.size(); i++) {
                 PTextSegment mainSegment = (PTextSegment) mainSegments.get(i);
                 if (mainSegment.getStyle() == PStyle.NORMAL) {
@@ -74,8 +109,8 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                     result.add(mainSegment);
                 }
             }
-            return result;
         }
+        return (PTextSegment[]) result.toArray(new PTextSegment[result.size()]);
     }
     
     private List getKeywordAddedSegments(PTextSegment segment) {
@@ -83,23 +118,26 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         String text = segment.getText();
         Matcher matcher = keywordPattern.matcher(text);
         int normalStart = 0;
+        int offset = segment.getOffset();
         while (matcher.find()) {
             String keyword = matcher.group();
             if (keywords.contains(keyword)) {
-                result.add(new PTextSegment(PStyle.NORMAL, text.substring(normalStart, matcher.start())));
-                result.add(new PTextSegment(PStyle.KEYWORD, keyword));
+                if (matcher.start() > normalStart) {
+                    result.add(segment.subSegment(normalStart, matcher.start()));
+                }
+                result.add(new PTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), PStyle.KEYWORD));
                 normalStart = matcher.end();
             }
         }
         if (segment.getText().length() > normalStart) {
-            result.add(new PTextSegment(PStyle.NORMAL, text.substring(normalStart)));
+            result.add(segment.subSegment(normalStart));
         }
         return result;
     }
     
     private List getMainSegments(int lineIndex, String line) {
+        TextSegmentListBuilder builder = new TextSegmentListBuilder(textArea.getLineStartOffset(lineIndex));
         boolean comment = startsCommented(lineIndex);
-        ArrayList result = new ArrayList();
         int lastStart = 0;
         for (int i = 0; i < line.length(); ) {
             if (comment) {
@@ -109,7 +147,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                 } else {
                     commentEndIndex += 2;
                 }
-                result.add(new PTextSegment(PStyle.COMMENT, line.substring(lastStart, commentEndIndex)));
+                builder.addStyledSegment(commentEndIndex, PStyle.COMMENT);
                 i = commentEndIndex;
                 lastStart = commentEndIndex;
                 comment = false;
@@ -118,9 +156,9 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                 if (supportShellComments() && ch == '#') {
                     comment = true;
                     if (lastStart < i) {
-                        result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, i)));
+                        builder.addStyledSegment(i, PStyle.NORMAL);
                     }
-                    result.add(new PTextSegment(PStyle.COMMENT, line.substring(i)));
+                    builder.addStyledSegment(line.length(), PStyle.COMMENT);
                     i = line.length();
                     lastStart = i;
                 } else if (ch == '/') {
@@ -128,15 +166,15 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                         if (line.charAt(i + 1) == '*') {
                             comment = true;
                             if (lastStart < i) {
-                                result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, i)));
+                                builder.addStyledSegment(i, PStyle.NORMAL);
                             }
                             lastStart = i;
                             i += 2;
                         } else if (line.charAt(i + 1) == '/') {
                             if (lastStart < i) {
-                                result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, i)));
+                                builder.addStyledSegment(i, PStyle.NORMAL);
                             }
-                            result.add(new PTextSegment(PStyle.COMMENT, line.substring(i)));
+                            builder.addStyledSegment(line.length(), PStyle.COMMENT);
                             i = line.length();
                             lastStart = i;
                         } else {
@@ -147,7 +185,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                     }
                 } else if (ch == '"' || ch == '\'') {
                     if (lastStart < i) {
-                        result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, i)));
+                        builder.addStyledSegment(i, PStyle.NORMAL);
                     }
                     int stringEnd = i + 1;
                     String matchString = String.valueOf(line.charAt(i));
@@ -162,10 +200,10 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                     }
                     // If it falls out because stringEnd == -1, we have an unterminated string.
                     if (stringEnd == -1) {
-                        result.add(new PTextSegment(PStyle.ERROR, line.substring(i)));
+                        builder.addStyledSegment(line.length(), PStyle.ERROR);
                         i = line.length();
                     } else {
-                        addStringSegment(result, line.substring(i, stringEnd));
+                        addStringSegment(builder, line, i, stringEnd);
                         i = stringEnd;
                     }
                     lastStart = i;
@@ -175,9 +213,9 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
             }
         }
         if (lastStart < line.length()) {
-            result.add(new PTextSegment(comment ? PStyle.COMMENT : PStyle.NORMAL, line.substring(lastStart, line.length())));
+            builder.addStyledSegment(line.length(), comment ? PStyle.COMMENT : PStyle.NORMAL);
         }
-        return result;
+        return builder.getSegmentList();
     }
     
     private int getBackslashBeforeCount(String string, int index) {
@@ -303,5 +341,34 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     
     public void textCompletelyReplaced(PTextEvent event) {
         initCommentCache();
+    }
+    
+    protected class TextSegmentListBuilder {
+        private ArrayList list = new ArrayList();
+        private int lineStartOffset;
+        private int start = 0;
+        
+        public TextSegmentListBuilder(int lineStartOffset) {
+            this.lineStartOffset = lineStartOffset;
+        }
+        
+        public void addStyledSegment(int end, PStyle style) {
+            list.add(new PTextSegment(textArea, lineStartOffset + start, lineStartOffset + end, style));
+            start = end;
+        }
+        
+        public List getSegmentList() {
+            return list;
+        }
+    }
+    
+    private class BracketMatchingDragHandler implements PDragHandler {
+        public void makeInitialSelection(int pressedOffset) {
+            
+        }
+        
+        public void mouseDragged(int newOffset) {
+            
+        }
     }
 }

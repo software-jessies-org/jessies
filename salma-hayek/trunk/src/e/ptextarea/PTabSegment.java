@@ -10,40 +10,26 @@ import java.awt.*;
  * @author Phil Norman
  */
 
-public class PTabSegment implements PLineSegment {
+public class PTabSegment extends PAbstractSegment {
     public static final int MIN_TAB_WIDTH = 5;
     public static final int TAB_WIDTH = 20;
     
-    private String text;
-    
-    public PTabSegment(String text) {
-        this.text = text;
+    public PTabSegment(PTextArea textArea, int start, int end) {
+        super(textArea, start, end, PStyle.NORMAL);
     }
     
-    public PStyle getStyle() {
-        return PStyle.NORMAL;
-    }
-    
-    public String getText() {
-        return text;
-    }
-    
-    public int getLength() {
-        return text.length();
+    public PLineSegment subSegment(int start, int end) {
+        return new PTabSegment(textArea, start + this.start, end + this.start);
     }
     
     public int getDisplayWidth(FontMetrics metrics, int startX) {
-        int x = startX + MIN_TAB_WIDTH + TAB_WIDTH * text.length();
+        int x = startX + MIN_TAB_WIDTH + TAB_WIDTH * getLength();
         x -= x % TAB_WIDTH;
         return (x - startX);
     }
     
-    public int getDisplayWidth(FontMetrics metrics, int startX, int charOffset) {
-        return (new PTabSegment(text.substring(0, charOffset))).getDisplayWidth(metrics, startX);
-    }
-    
     public int getCharOffset(FontMetrics metrics, int startX, int x) {
-        for (int i = 0; i < text.length(); i++) {
+        for (int i = 0; i < getLength(); i++) {
             int nextX = startX + MIN_TAB_WIDTH + TAB_WIDTH;
             nextX -= nextX % TAB_WIDTH;
             if (x < nextX) {
@@ -55,7 +41,7 @@ public class PTabSegment implements PLineSegment {
             }
             startX = nextX;
         }
-        return text.length();
+        return getLength();
     }
     
     public void paint(Graphics2D graphics, int x, int yBaseline) { }

@@ -6,8 +6,6 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.regex.*;
 
-import java.util.List;
-
 /**
  * A PHyperlinkTextStyler is a thing which knows how to apply hyperlinks to text.
  * 
@@ -22,19 +20,21 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         this.highlightPattern = Pattern.compile(highlightPattern);
     }
     
-    public List getLineSegments(int lineIndex, String line) {
+    public PTextSegment[] getLineSegments(int lineIndex) {
         ArrayList result = new ArrayList();
+        String line = textArea.getLineContents(lineIndex).toString();
+        int lineStart = textArea.getLineStartOffset(lineIndex);
         Matcher matcher = highlightPattern.matcher(line);
         int lastStart = 0;
         while (matcher.find() && isAcceptableMatch(line, matcher)) {
-            result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart, matcher.start())));
-            result.add(new PUnderlinedTextSegment(PStyle.HYPERLINK, line.substring(matcher.start(), matcher.end())));
+            result.add(new PTextSegment(textArea, lineStart + lastStart, lineStart + matcher.start(), PStyle.NORMAL));
+            result.add(new PUnderlinedTextSegment(textArea, lineStart + matcher.start(), lineStart + matcher.end(), PStyle.HYPERLINK));
             lastStart = matcher.end();
         }
         if (lastStart < line.length()) {
-            result.add(new PTextSegment(PStyle.NORMAL, line.substring(lastStart)));
+            result.add(new PTextSegment(textArea, lineStart + lastStart, lineStart + line.length(), PStyle.NORMAL));
         }
-        return result;
+        return (PTextSegment[]) result.toArray(new PTextSegment[result.size()]);
     }
     
     /**
@@ -42,10 +42,13 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      * the text component.  If the styler handles the event, it should consume it.
      */
     public void mouseClicked(MouseEvent event, int offset) {
-        PLineSegment segment = textArea.getLineSegmentAtLocation(event.getPoint());
-        if (segment instanceof PTextSegment && segment.getStyle() == PStyle.HYPERLINK) {
-            hyperlinkClicked(((PTextSegment) segment).getSuperSegment().getText());
-            event.consume();
+        PSegmentIterator iterator = textArea.getLogicalSegmentIterator(offset);
+        if (iterator.hasNext()) {
+            PLineSegment segment = iterator.next();
+            if (segment.getStyle() == PStyle.HYPERLINK) {
+                hyperlinkClicked(segment.getCharSequence());
+                event.consume();
+            }
         }
     }
     

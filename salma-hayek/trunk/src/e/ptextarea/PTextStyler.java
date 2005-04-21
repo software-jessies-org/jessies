@@ -14,9 +14,9 @@ import java.awt.event.*;
 public interface PTextStyler {
     /**
      * Returns a series of segments of text describing how to render each part of the
-     * specified line.
+     * specified logical line.
      */
-    public PTextSegment[] getLineSegments(PTextArea.SplitLine splitLine);
+    public PTextSegment[] getLineSegments(int lineIndex);
     
     /**
      * Optionally handles the given mouse click event.  This is called when a single click occurs on

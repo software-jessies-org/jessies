@@ -16,6 +16,8 @@ Items to be done for PTextArea:
 
 * Refactor the way split lines are updated to work in terms of PLineSegments.
 
+* Continue refactoring of line segment stuff in PTextArea.
+
 * Style C/C++ pre-processor tokens specially.
 
 * Auto-scroll on selection (all types) flickers more than I think it should.

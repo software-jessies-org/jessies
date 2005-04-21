@@ -42,7 +42,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private PAnchorSet anchorSet = new PAnchorSet();
     private ArrayList highlights = new ArrayList();
-    private PTextStyler textStyler = PPlainTextStyler.INSTANCE;
+    private PTextStyler textStyler = new PPlainTextStyler(this);
     private int rightHandMarginColumn = NO_MARGIN;
     private ArrayList caretListeners = new ArrayList();
     
@@ -358,6 +358,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return lines.size();
     }
     
+    /**
+     * Returns a CharSequence providing access to all the characters in the given line up to but not
+     * including the line terminator.
+     */
+    public CharSequence getLineContents(int line) {
+        return lines.getLine(line).getContents();
+    }
+    
     public int getLineStartOffset(int line) {
         return lines.getLine(line).getStart();
     }
@@ -482,7 +490,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
         generateLineWrappings();
         final int lineIndex = getLineIndexAtLocation(point);
-        PLineSegment[] segments = getLineSegments(lineIndex);
+        PLineSegment[] segments = getLineSegmentsForSplitLine(lineIndex);
         int charOffset = 0;
         int x = 0;
         for (int i = 0; i < segments.length; i++) {
@@ -519,7 +527,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public PLineSegment getLineSegmentAtLocation(Point point) {
         generateLineWrappings();
-        PLineSegment[] segments = getLineSegments(getLineIndexAtLocation(point));
+        PLineSegment[] segments = getLineSegmentsForSplitLine(getLineIndexAtLocation(point));
         int x = 0;
         for (int i = 0; i < segments.length; i++) {
             int width = segments[i].getDisplayWidth(metrics, x);
@@ -531,13 +539,58 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return null;
     }
     
-    private PLineSegment[] getLineSegments(int lineIndex) {
-        SplitLine splitLine = getSplitLine(lineIndex);
-        PTextSegment[] text = textStyler.getLineSegments(splitLine);
-        return getTabbedSegments(text);
+    public PSegmentIterator getLogicalSegmentIterator(int offset) {
+        return new PLogicalSegmentIterator(this, offset);
     }
     
-    private PLineSegment[] getTabbedSegments(PTextSegment[] segments) {
+    public PSegmentIterator getWrappedSegmentIterator(int offset) {
+        return new PWrappedSegmentIterator(this, offset);
+    }
+    
+    private PLineSegment[] getLineSegmentsForSplitLine(int splitLineIndex) {
+        return getLineSegmentsForSplitLine(getSplitLine(splitLineIndex));
+    }
+    
+    /**
+     * Returns a series of segments of text describing how to render each part of the
+     * specified line.
+     * FIXME - delete once all this is sorted out properly.
+     * FIXME - this is moved straight out of PAbstractTextStyler.  It needs major work.
+     */
+    private final PLineSegment[] getLineSegmentsForSplitLine(SplitLine splitLine) {
+        int lineIndex = splitLine.getLineIndex();
+        String fullLine = getLineList().getLine(lineIndex).getContents().toString();
+        PLineSegment[] segments = getLineSegments(lineIndex);
+        int index = 0;
+        ArrayList result = new ArrayList();
+        int start = splitLine.getOffset();
+        int end = start + splitLine.getLength();
+        
+        for (int i = 0; index < end && i < segments.length; ++i) {
+            PLineSegment segment = segments[i];
+            if (start >= index + segment.getLength()) {
+                index += segment.getLength();
+                continue;
+            }
+            if (start > index) {
+                int skip = start - index;
+                segment = segment.subSegment(skip);
+                index += skip;
+            }
+            if (end < index + segment.getLength()) {
+                segment = segment.subSegment(0, end - index);
+            }
+            result.add(segment);
+            index += segment.getLength();
+        }
+        return (PLineSegment[]) result.toArray(new PLineSegment[result.size()]);
+    }
+    
+    private PLineSegment[] getLineSegments(int lineIndex) {
+        return getTabbedSegments(textStyler.getLineSegments(lineIndex));
+    }
+    
+    private PLineSegment[] getTabbedSegments(PLineSegment[] segments) {
         ArrayList result = new ArrayList();
         for (int i = 0; i < segments.length; i++) {
             addTabbedSegments(segments[i], result);
@@ -545,7 +598,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return (PLineSegment[]) result.toArray(new PLineSegment[result.size()]);
     }
     
-    private void addTabbedSegments(PTextSegment segment, ArrayList target) {
+    private void addTabbedSegments(PLineSegment segment, ArrayList target) {
         while (true) {
             String text = segment.getText();
             int tabIndex = text.indexOf('\t');
@@ -558,7 +611,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             while (tabEnd < text.length() && text.charAt(tabEnd) == '\t') {
                 tabEnd++;
             }
-            target.add(new PTabSegment(text.substring(tabIndex, tabEnd)));
+            int offset = segment.getOffset();
+            target.add(new PTabSegment(this, offset + tabIndex, offset + tabEnd));
             segment = segment.subSegment(tabEnd);
             if (segment.getLength() == 0) {
                 return;
@@ -588,7 +642,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public Point getViewCoordinates(PCoordinates coordinates) {
         int baseline = getBaseline(coordinates.getLineIndex());
-        PLineSegment[] segments = getLineSegments(coordinates.getLineIndex());
+        PLineSegment[] segments = getLineSegmentsForSplitLine(coordinates.getLineIndex());
         int x = 0;
         int charOffset = 0;
         for (int i = 0; i < segments.length; i++) {
@@ -657,7 +711,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         PCoordinates caretCoords = getCaretCoordinates();
         paintHighlights(graphics, minLine, maxLine);
         for (int i = minLine; i <= maxLine; i++) {
-            PLineSegment[] segments = getLineSegments(i);
+            PLineSegment[] segments = getLineSegmentsForSplitLine(i);
             boolean drawCaret = (caretCoords.getLineIndex() == i);
             boolean showWrap = isNextLineAContinuationOf(i);
             paintSegments(graphics, segments, baseline, caretCoords, drawCaret, showWrap);
@@ -929,7 +983,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return splitLines.size();
     }
     
-    private SplitLine getSplitLine(int index) {
+    public SplitLine getSplitLineOfOffset(int offset) {
+        return getSplitLine(getCoordinates(offset).getLineIndex());
+    }
+    
+    public SplitLine getSplitLine(int index) {
         return (SplitLine) splitLines.get(index);
     }
     

@@ -18,11 +18,30 @@ public interface PLineSegment {
     /** Returns the style to be used when painting this text. */
     public PStyle getStyle();
     
+    /** Returns the char sequence represented by this segment. */
+    public CharSequence getCharSequence();
+    
     /** Returns the text to be drawn. */
     public String getText();
     
+    public PLineSegment subSegment(int start);
+    
+    public PLineSegment subSegment(int start, int end);
+    
+    /** Returns the text offset of the start of this segment. */
+    public int getOffset();
+    
+    /** Returns the text offset of the character just after the end of this segment. */
+    public int getEnd();
+    
     /** Returns the number of characters in the text. */
     public int getLength();
+    
+    /** Returns true if this segment represents any line break, be it caused by line wrap or a newline character. */
+    public boolean isNewline();
+    
+    /** Returns true only if this segment represents a hard newline (one representing a newline character). */
+    public boolean isHardNewline();
     
     /** Returns the width of this text in pixels, when painted from the given X position in pixels. */
     public int getDisplayWidth(FontMetrics metrics, int startX);
