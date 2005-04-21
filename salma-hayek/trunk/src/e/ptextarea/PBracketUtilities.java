@@ -33,7 +33,11 @@ public class PBracketUtilities {
     
     /** Returns the offset of the matching bracket, or -1. */
     public static int findMatchingBracket(CharSequence chars, int offset) {
-        //Log.warn("findMatchingBracket(offset="+offset+")");
+        if (offset >= chars.length()) {
+            // In most editors, you can position the caret after the last
+            // character in the buffer, so it probably makes sense to cope.
+            return -1;
+        }
         char bracket = chars.charAt(offset);
         if (isCloseBracket(bracket)) {
             return findMatchingBracket(chars, offset, false);
