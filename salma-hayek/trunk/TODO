@@ -27,3 +27,5 @@ Items to be done for PTextArea:
 * we can perhaps take Ed's old suggestion for how menus should work into account, and have a constructive scheme, rather than a replacement scheme. (so there's basic stuff offered by the component, extra stuff from the spelling checker, extra stuff from the application, et cetera. Cocoa has hooks for random other bits of code to declare they have actions too.)
 
 * Double-clicking in whitespace behaves neither like native components, nor like Edit used to. In particular, I'm used to double-clicking past the end of a line that doesn't end in '{' to select the line (an Edit/acme thing).
+
+* Bracket matching won't match the last character in the buffer.
