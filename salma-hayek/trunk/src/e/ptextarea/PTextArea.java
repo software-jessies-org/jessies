@@ -648,7 +648,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         Rectangle bounds = graphics.getClipBounds();
         int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds);
         graphics.setColor(getBackground());
-        graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
+        if (isOpaque()) {
+            graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
+        }
         int minLine = Math.min(splitLines.size() - 1, bounds.y / metrics.getHeight());
         int maxLine = Math.min(splitLines.size() - 1, (bounds.y + bounds.height) / metrics.getHeight());
         int baseline = getBaseline(minLine);
