@@ -75,14 +75,14 @@ public class PKeyHandler extends KeyAdapter {
         boolean byWord = GuiUtilities.isMacOs() ? event.isAltDown() : event.isControlDown();
         boolean extendingSelection = event.isShiftDown();
         int key = event.getKeyCode();
-        if (isStartOfLineKey(event)) {
-            moveCaret(extendingSelection, caretToStartOfLine());
-        } else if (isEndOfLineKey(event)) {
-            moveCaret(extendingSelection, caretToEndOfLine());
-        } else if (isStartOfTextKey(event)) {
+        if (isStartOfTextKey(event)) {
             moveCaret(extendingSelection, 0);
         } else if (isEndOfTextKey(event)) {
             moveCaret(extendingSelection, textArea.getPTextBuffer().length());
+        } else if (isStartOfLineKey(event)) {
+            moveCaret(extendingSelection, caretToStartOfLine());
+        } else if (isEndOfLineKey(event)) {
+            moveCaret(extendingSelection, caretToEndOfLine());
         } else if (GuiUtilities.isMacOs() && (key == KeyEvent.VK_HOME || key == KeyEvent.VK_END)) {
             textArea.ensureVisibilityOfOffset((key == KeyEvent.VK_HOME) ? 0 : textArea.getPTextBuffer().length());
         } else if (key == KeyEvent.VK_LEFT) {
