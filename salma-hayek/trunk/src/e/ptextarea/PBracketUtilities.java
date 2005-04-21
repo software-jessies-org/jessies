@@ -54,7 +54,7 @@ public class PBracketUtilities {
         char partner = getPartnerForBracket(bracket);
         int nesting = 1;
         int step = scanForwards ? +1 : -1;
-        int stop = scanForwards ? chars.length() : 0;
+        int stop = scanForwards ? chars.length() + 1 : 0;
         for (offset += step; nesting != 0 && offset != stop; offset += step) {
             char ch = chars.charAt(offset);
             if (ch == bracket) {
