@@ -16,6 +16,10 @@ public final class PStyle {
     private String name;
     private Color color;
     
+    public String getName() {
+        return name;
+    }
+    
     public Color getColor() {
         return color;
     }

@@ -21,7 +21,11 @@ public class PLogicalSegmentIterator implements PSegmentIterator {
                 break;
             }
         }
-        this.charOffset = lineSegments[segmentInLine].getOffset();
+        if (lineSegments.length == 0) {
+            this.charOffset = textArea.getLineStartOffset(lineIndex);
+        } else {
+            this.charOffset = lineSegments[segmentInLine].getOffset();
+        }
     }
     
     public boolean hasNext() {
@@ -40,6 +44,7 @@ public class PLogicalSegmentIterator implements PSegmentIterator {
             result = lineSegments[segmentInLine++];
         } else if (segmentInLine == lineSegments.length && lineIndex < textArea.getLineCount() - 1) {
             result = new PNewlineSegment(textArea, charOffset, charOffset + 1, PNewlineSegment.HARD_NEWLINE);
+            segmentInLine++;
         } else {
             throw new IndexOutOfBoundsException("Went off the end of the text buffer.");
         }

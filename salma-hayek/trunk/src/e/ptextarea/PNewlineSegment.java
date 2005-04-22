@@ -5,6 +5,8 @@ import java.awt.*;
 public class PNewlineSegment extends PAbstractSegment {
     public static final boolean WRAPPED = false;
     public static final boolean HARD_NEWLINE = true;
+
+    private static final Stroke WRAP_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 1.0f, 2.0f }, 0.0f);
     
     private boolean newlineType;
     
@@ -42,10 +44,22 @@ public class PNewlineSegment extends PAbstractSegment {
     }
     
     public void paint(Graphics2D graphics, int x, int yBaseline) {
-        // Consider moving the painting of the dotted line for wrapped text in here if we're a soft newline.
+        if (newlineType == WRAPPED) {
+            paintWrapMark(graphics, x, yBaseline);
+        }
+    }
+    
+    private void paintWrapMark(Graphics2D graphics, int x, int y) {
+        graphics.setColor(Color.BLACK);
+        Stroke oldStroke = graphics.getStroke();
+        graphics.setStroke(WRAP_STROKE);
+        int yMiddle = y - graphics.getFontMetrics().getMaxAscent() / 2;
+        graphics.drawLine(x, yMiddle, textArea.getWidth(), yMiddle);
+        graphics.setStroke(oldStroke);
     }
     
     public String toString() {
-        return "PNewlineSegment[" + style + ", " + getText() + "]";
+        return "PNewlineSegment[" + style.getName() + ", [" + getOffset() + ", " + getEnd() + "], " + getText() +
+                (newlineType ? ", HARD" : ", SOFT") + "]";
     }
 }
