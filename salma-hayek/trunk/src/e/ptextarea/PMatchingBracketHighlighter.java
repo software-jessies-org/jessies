@@ -6,6 +6,8 @@ import java.awt.*;
  * Highlights matching pairs of bracket characters in a text area.
  */
 public class PMatchingBracketHighlighter implements PCaretListener {
+    private static final Color FAILED_MATCH_COLOR = new Color(0.78f, 0.10f, 0.10f, 0.5f);
+    
     private PTextArea textArea;
     private PColoredHighlight[] highlights = new PColoredHighlight[2];
     
@@ -43,14 +45,11 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         int matchingBracketOffset = PBracketUtilities.findMatchingBracket(chars, offset);
         if (matchingBracketOffset != -1) {
             int start = matchingBracketOffset;
-            int end = matchingBracketOffset;
-            if (PBracketUtilities.isCloseBracket(ch)) {
-                --start;
-            } else {
-                ++end;
-            }
+            int end = start + 1;
             highlights[1] = new MatchingBracketHighlight(textArea, start, end);
             textArea.addHighlight(highlights[1]);
+        } else {
+            highlights[0].setColor(FAILED_MATCH_COLOR);
         }
     }
     

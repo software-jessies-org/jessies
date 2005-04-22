@@ -58,20 +58,19 @@ public class PBracketUtilities {
         char partner = getPartnerForBracket(bracket);
         int nesting = 1;
         int step = scanForwards ? +1 : -1;
-        int stop = scanForwards ? chars.length() : 0;
-        for (offset += step; nesting != 0 && offset != stop; offset += step) {
+        int stop = scanForwards ? chars.length() : -1;
+        for (offset += step; offset != stop; offset += step) {
             char ch = chars.charAt(offset);
             if (ch == bracket) {
-                nesting++;
+                ++nesting;
             } else if (ch == partner) {
-                nesting--;
+                --nesting;
+            }
+            if (nesting == 0) {
+                return offset;
             }
         }
-        if (offset != stop) {
-            // We actually want to stop just before the matching bracket.
-            offset += (scanForwards ? 1 : 2) * -step;
-        }
-        return offset;
+        return -1;
     }
     
     private PBracketUtilities() {
