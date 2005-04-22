@@ -12,7 +12,7 @@ to_address=from_address
 reply_to_address=to_address # Use "nil" to reply to author.
 subject="patch"
 preamble=""
-changes = $<.readlines
+changes = $<.readlines.map {|line| line.chomp}
 
 patchToHtmlEmail(from_address, to_address, reply_to_address, subject, preamble, changes)
 
