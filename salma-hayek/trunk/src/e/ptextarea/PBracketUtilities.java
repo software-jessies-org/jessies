@@ -49,7 +49,7 @@ public class PBracketUtilities {
     }
     
     /** Returns the offset of the matching bracket, scanning in the given direction, or -1. */
-    private static int findMatchingBracket(CharSequence chars, int startOffset, boolean scanForwards) {
+    private static int findMatchingBracket(CharSequence chars, final int startOffset, boolean scanForwards) {
         //Log.warn("findMatchingBracket(offset="+offset+",scanForwards="+scanForwards+")");
         char bracket = chars.charAt(startOffset);
         if (isBracket(bracket) == false) {
