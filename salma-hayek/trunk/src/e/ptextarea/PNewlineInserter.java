@@ -34,6 +34,9 @@ public class PNewlineInserter {
     public void insertMatchingBrace() {
         // FIXME - selection
         final int position = textArea.getSelectionStart();
+        int lineIndex = textArea.getLineOfOffset(position);
+        int restOfLineOffset = textArea.getLineEndOffsetBeforeTerminator(lineIndex);
+        textArea.select(position, restOfLineOffset);
         String line = getLineTextAtOffset(position);
         String whitespace = getIndentationOfLineAtOffset(position);
         String prefix = "\n" + whitespace + textArea.getIndentationString();
@@ -42,7 +45,7 @@ public class PNewlineInserter {
             suffix += ";";
         }
         final int newCaretPosition = position + prefix.length();
-        textArea.replaceSelection(prefix + suffix);
+        textArea.replaceSelection(prefix + textArea.getSelectedText() + suffix);
         textArea.select(newCaretPosition, newCaretPosition);
     }
     
