@@ -23,33 +23,35 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         
         int offset = selectionStart;
         CharSequence chars = textArea.getTextBuffer();
-        if (offset == chars.length()) {
-            return;
-        }
         
-        char ch = chars.charAt(offset);
-        if (PBracketUtilities.isCloseBracket(ch)) {
+        // Look for a bracket to match with.
+        if (offset < chars.length() && PBracketUtilities.isCloseBracket(chars.charAt(offset))) {
             highlights[0] = new MatchingBracketHighlight(textArea, offset, offset + 1);
-            textArea.addHighlight(highlights[0]);
-        } else if (offset > 0) {
-            char previousChar = chars.charAt(offset - 1);
-            if (PBracketUtilities.isOpenBracket(previousChar)) {
-                highlights[0] = new MatchingBracketHighlight(textArea, offset - 1, offset);
-                textArea.addHighlight(highlights[0]);
-            }
+        } else if (offset > 0 && PBracketUtilities.isOpenBracket(chars.charAt(offset - 1))) {
+            highlights[0] = new MatchingBracketHighlight(textArea, offset - 1, offset);
         }
+        
         if (highlights[0] == null) {
+            // We're not next to a bracket, so we've nothing to match.
             return;
         }
         
+        // Try to find a match.
         int matchingBracketOffset = PBracketUtilities.findMatchingBracket(chars, offset);
         if (matchingBracketOffset != -1) {
             int start = matchingBracketOffset;
             int end = start + 1;
             highlights[1] = new MatchingBracketHighlight(textArea, start, end);
-            textArea.addHighlight(highlights[1]);
         } else {
             highlights[0].setColor(FAILED_MATCH_COLOR);
+        }
+        
+        // Add any highlights now. We may only have one, if we detected a
+        // mis-match.
+        for (int i = 0; i < highlights.length; ++i) {
+            if (highlights[i] != null) {
+                textArea.addHighlight(highlights[i]);
+            }
         }
     }
     

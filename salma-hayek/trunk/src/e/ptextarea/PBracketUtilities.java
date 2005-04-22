@@ -31,15 +31,13 @@ public class PBracketUtilities {
         return PARTNERS.charAt(BRACKETS.indexOf(bracket));
     }
     
-    /** Returns the offset of the matching bracket, or -1. */
+    /**
+     * Returns the offset of the matching bracket, or -1.
+     * We look for a match if 'offset' is after an opening bracket, or before a
+     * closing bracket.
+     */
     public static int findMatchingBracket(CharSequence chars, int offset) {
-        if (offset >= chars.length()) {
-            // In most editors, you can position the caret after the last
-            // character in the buffer, so it probably makes sense to cope.
-            return -1;
-        }
-        char bracket = chars.charAt(offset);
-        if (isCloseBracket(bracket)) {
+        if (offset < chars.length() && isCloseBracket(chars.charAt(offset))) {
             return findMatchingBracket(chars, offset, false);
         }
         if (offset > 0 && isOpenBracket(chars.charAt(offset - 1))) {
@@ -48,7 +46,10 @@ public class PBracketUtilities {
         return -1;
     }
     
-    /** Returns the offset of the matching bracket, scanning in the given direction, or -1. */
+    /**
+     * Returns the offset of the matching bracket, scanning in the given
+     * direction, or -1.
+     */
     private static int findMatchingBracket(CharSequence chars, final int startOffset, boolean scanForwards) {
         char bracket = chars.charAt(startOffset);
         if (isBracket(bracket) == false) {
