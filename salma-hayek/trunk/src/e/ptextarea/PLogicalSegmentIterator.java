@@ -21,8 +21,8 @@ public class PLogicalSegmentIterator implements PSegmentIterator {
                 break;
             }
         }
-        if (lineSegments.length == 0) {
-            this.charOffset = textArea.getLineStartOffset(lineIndex);
+        if (segmentInLine == lineSegments.length) {
+            this.charOffset = textArea.getLineEndOffsetBeforeTerminator(lineIndex);
         } else {
             this.charOffset = lineSegments[segmentInLine].getOffset();
         }
