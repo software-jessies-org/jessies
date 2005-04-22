@@ -12,7 +12,7 @@ public abstract class ETextAction extends AbstractAction {
     public abstract void actionPerformed(ActionEvent e);
 
     public Component getFocusedComponent() {
-        return KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        return KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
     }
     
     public ETextArea getTextArea() {
