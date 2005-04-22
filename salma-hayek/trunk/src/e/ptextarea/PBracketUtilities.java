@@ -31,7 +31,7 @@ public class PBracketUtilities {
         return PARTNERS.charAt(BRACKETS.indexOf(bracket));
     }
     
-    /** Returns the offset *inside* the matching bracket, or -1. */
+    /** Returns the offset of the matching bracket, or -1. */
     public static int findMatchingBracket(CharSequence chars, int offset) {
         if (offset >= chars.length()) {
             // In most editors, you can position the caret after the last
@@ -48,36 +48,30 @@ public class PBracketUtilities {
         return -1;
     }
     
-    /** Returns the offset *inside* the matching bracket, scanning in the given direction, or -1. */
-    private static int findMatchingBracket(CharSequence chars, final int startOffset, boolean scanForwards) {
-        //Log.warn("findMatchingBracket(offset="+startOffset+",scanForwards="+scanForwards+")");
-        char bracket = chars.charAt(startOffset);
+    /** Returns the offset of the matching bracket, scanning in the given direction, or -1. */
+    private static int findMatchingBracket(CharSequence chars, int offset, boolean scanForwards) {
+        //Log.warn("findMatchingBracket(offset="+offset+",scanForwards="+scanForwards+")");
+        char bracket = chars.charAt(offset);
         if (isBracket(bracket) == false) {
             return -1;
         }
         char partner = getPartnerForBracket(bracket);
-        int nesting = 0;
+        int nesting = 1;
         int step = scanForwards ? +1 : -1;
-        // "stop" is one past the last, STL-style.
-        int stop = scanForwards ? chars.length() : -1;
-        for (int offset = startOffset; offset != stop; offset += step) {
+        int stop = scanForwards ? chars.length() : 0;
+        for (offset += step; nesting != 0 && offset != stop; offset += step) {
             char ch = chars.charAt(offset);
             if (ch == bracket) {
                 nesting++;
             } else if (ch == partner) {
                 nesting--;
-                if (nesting == 0) {
-                    // We want to stop inside the matching bracket.
-                    // If we're going forwards, that's the offset of the matching bracket.
-                    // If we're going backwards, that's the offset after the matching bracket.
-                    if (scanForwards == false) {
-                        offset++;
-                    }
-                    return offset;
-                }
             }
         }
-        return -1;
+        if (offset != stop) {
+            // We actually want to stop just before the matching bracket.
+            offset += (scanForwards ? 1 : 2) * -step;
+        }
+        return offset;
     }
     
     private PBracketUtilities() {
