@@ -28,7 +28,7 @@ public class FilePropertiesAction extends ETextAction {
         }
         
         ETextArea text = window.getText();
-        PTextBuffer buffer = text.getPTextBuffer();
+        PTextBuffer buffer = text.getTextBuffer();
         String endOfLineString = (String) buffer.getProperty(PTextBuffer.LINE_ENDING_PROPERTY);
         if (endOfLineString == null) {
             endOfLineString = System.getProperty("line.separator");

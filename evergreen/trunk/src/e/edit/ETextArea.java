@@ -170,7 +170,7 @@ public class ETextArea extends PTextArea {
      * working out what to offer as completions in AutoCompleteAction.
      */
     public String getWordUpToCaret() {
-        CharSequence chars = getPTextBuffer();
+        CharSequence chars = getTextBuffer();
         // FIXME - selection
         int end = getSelectionStart();
         int start = end;
@@ -181,7 +181,7 @@ public class ETextArea extends PTextArea {
             }
             --start;
         }
-        return getPTextBuffer().subSequence(start, end).toString();
+        return getTextBuffer().subSequence(start, end).toString();
     }
 
     /**
@@ -203,5 +203,4 @@ public class ETextArea extends PTextArea {
     public String getLineTextAtOffset(int offset) {
         return getLineText(getLineOfOffset(offset));
     }
-    
 }

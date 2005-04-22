@@ -27,7 +27,7 @@ public class TagsUpdater {
     private void installListeners() {
         final ETextArea text = textWindow.getText();
         // Rebuild tags when the document line count changes.
-        text.getPTextBuffer().addTextListener(new PTextListener() {
+        text.getTextBuffer().addTextListener(new PTextListener() {
             private int lastLineCount;
             
             public void textCompletelyReplaced(PTextEvent e) {
@@ -258,7 +258,7 @@ public class TagsUpdater {
                     temporaryFile = File.createTempFile("edit-", getFilenameSuffix());
                     temporaryFile.deleteOnExit();
                 }
-                getTextWindow().getText().getPTextBuffer().writeToFile(temporaryFile);
+                getTextWindow().getText().getTextBuffer().writeToFile(temporaryFile);
                 TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), this);
                 String newDigest = tagReader.getTagsDigest();
                 tagsHaveNotChanged = newDigest.equals(digest);
