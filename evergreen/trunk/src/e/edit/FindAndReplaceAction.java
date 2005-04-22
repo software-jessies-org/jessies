@@ -42,8 +42,14 @@ public class FindAndReplaceAction extends ETextAction {
     private void initPatternField() {
         String selection = text.getSelectedText();
         if (selection.length() > 0 && isSelectionMeantAsScope() == false) {
-            patternField.setText(StringUtilities.regularExpressionFromLiteral(selection));
-            replacementField.setText(StringUtilities.escapeForJava(StringUtilities.regularExpressionFromLiteral(selection)));
+            // Only update the fields if the pattern should change; that way
+            // we won't lose the user's replacement from the last time they
+            // used this pattern.
+            String newPattern = StringUtilities.regularExpressionFromLiteral(selection);
+            if (newPattern.equals(patternField.getText()) == false) {
+                patternField.setText(newPattern);
+                replacementField.setText(StringUtilities.escapeForJava(StringUtilities.regularExpressionFromLiteral(selection)));
+            }
         }
     }
     
