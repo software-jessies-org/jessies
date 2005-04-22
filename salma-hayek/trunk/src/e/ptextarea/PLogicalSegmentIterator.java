@@ -15,7 +15,7 @@ public class PLogicalSegmentIterator implements PSegmentIterator {
     public PLogicalSegmentIterator(PTextArea textArea, int offsetContainedByFirstSegment) {
         this.textArea = textArea;
         lineIndex = textArea.getLineOfOffset(offsetContainedByFirstSegment);
-        lineSegments = textArea.getPTextStyler().getLineSegments(lineIndex);
+        lineSegments = textArea.getTextStyler().getLineSegments(lineIndex);
         for (segmentInLine = 0; segmentInLine < lineSegments.length; segmentInLine++) {
             if (lineSegments[segmentInLine].getEnd() > offsetContainedByFirstSegment) {
                 break;
@@ -32,7 +32,7 @@ public class PLogicalSegmentIterator implements PSegmentIterator {
         PLineSegment result;
         if (segmentInLine > lineSegments.length) {
             lineIndex++;
-            lineSegments = textArea.getPTextStyler().getLineSegments(lineIndex);
+            lineSegments = textArea.getTextStyler().getLineSegments(lineIndex);
             segmentInLine = 0;
         }  // There is *deliberately* no else here - we wish to fall through to lower processing now.
         

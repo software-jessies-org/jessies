@@ -24,7 +24,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             }
         }
         int pressedOffset = getOffsetAtMouse(e);
-        textArea.getPTextStyler().mouseClicked(e, pressedOffset);
+        textArea.getTextStyler().mouseClicked(e, pressedOffset);
         if (e.isConsumed() == false) {
             dragHandler = getDragHandlerForClick(e);
             dragHandler.makeInitialSelection(pressedOffset);
@@ -35,7 +35,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         if (e.getClickCount() == 1) {
             return new SingleClickDragHandler();
         } else if (e.getClickCount() == 2) {
-            PDragHandler result = textArea.getPTextStyler().getDoubleClickDragHandler(getOffsetAtMouse(e));
+            PDragHandler result = textArea.getTextStyler().getDoubleClickDragHandler(getOffsetAtMouse(e));
             return (result == null) ? new DoubleClickDragHandler() : result;
         } else {
             return new TripleClickDragHandler();
@@ -60,7 +60,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     }
     
     public void mouseMoved(MouseEvent event) {
-        Cursor newCursor = textArea.getPTextStyler().getCursorForLocation(event.getPoint());
+        Cursor newCursor = textArea.getTextStyler().getCursorForLocation(event.getPoint());
         textArea.setCursor(newCursor);
     }
     
