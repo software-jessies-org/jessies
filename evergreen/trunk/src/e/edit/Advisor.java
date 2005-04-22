@@ -78,7 +78,7 @@ public class Advisor extends JPanel {
             int dot = textArea.getSelectionStart();
             int lineNumber = textArea.getLineOfOffset(dot);
             int lineStart = textArea.getLineStartOffset(lineNumber);
-            string = textArea.getPTextBuffer().subSequence(lineStart, dot).toString();
+            string = textArea.getTextBuffer().subSequence(lineStart, dot).toString();
         }
         
         // If the user's selected more than a line, don't tell the researchers.

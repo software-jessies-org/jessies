@@ -81,7 +81,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         this.filename = filename;
         this.file = FileUtilities.fileFromString(filename);
         this.text = new ETextArea();
-        text.getPTextBuffer().addTextListener(this);
+        text.getTextBuffer().addTextListener(this);
         attachPopupMenuTo(text);
         
         this.watermarkViewPort = new WatermarkViewPort();
@@ -138,7 +138,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         int caretPosition = text.getSelectionStart();
         int lineNumber = 1 + text.getLineOfOffset(caretPosition);
         int lineStart = text.getLineStartOffset(lineNumber - 1);
-        int columnNumber = 1 + emacsDistance(text.getPTextBuffer(), caretPosition, lineStart);
+        int columnNumber = 1 + emacsDistance(text.getTextBuffer(), caretPosition, lineStart);
         return ":" + lineNumber + ":" + columnNumber;
     }
     
@@ -252,7 +252,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             text.setText(content);
             text.setAppropriateFont();
             text.getIndenter().setIndentationPropertyBasedOnContent(content);
-            text.getPTextBuffer().resetUndoBuffer();
+            text.getTextBuffer().resetUndoBuffer();
             if (fileType != UNKNOWN) {
                 // FIXME
                 //text.getDocument().addDocumentListener(new UnmatchedBracketHighlighter(text));
@@ -545,7 +545,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void jumpToAddress(String address) {
-        CharSequence chars = text.getPTextBuffer();
+        CharSequence chars = text.getTextBuffer();
         StringTokenizer st = new StringTokenizer(address, ":");
         int line = Integer.parseInt(st.nextToken()) - 1;
         int offset = text.getLineStartOffset(line);
@@ -636,7 +636,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         File backupFile = FileUtilities.fileFromString(this.filename + ".bak");
         if (file.exists()) {
             try {
-                text.getPTextBuffer().writeToFile(backupFile);
+                text.getTextBuffer().writeToFile(backupFile);
             } catch (Exception ex) {
                 Edit.showAlert("Save", "File '" + this.filename + "' wasn't saved! Couldn't create backup file.");
                 return false;
@@ -647,7 +647,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             Edit.showStatus("Saving " + filename + "...");
             // The file may be a symlink on a cifs server.
             // In this case, it's important that we write into the original file rather than creating a new one.
-            text.getPTextBuffer().writeToFile(file);
+            text.getTextBuffer().writeToFile(file);
             Edit.showStatus("Saved " + filename);
             markAsClean();
             backupFile.delete();
@@ -672,7 +672,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                     return false;
                 }
             }
-            text.getPTextBuffer().writeToFile(newFile);
+            text.getTextBuffer().writeToFile(newFile);
             return true;
         } catch (Exception ex) {
             Edit.showAlert("Save As", "Couldn't save file '" + newFilename + "' (" + ex.getMessage() + ").");
