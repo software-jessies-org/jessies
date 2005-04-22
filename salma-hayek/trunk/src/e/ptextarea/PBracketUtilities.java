@@ -49,25 +49,25 @@ public class PBracketUtilities {
     }
     
     /** Returns the offset of the matching bracket, scanning in the given direction, or -1. */
-    private static int findMatchingBracket(CharSequence chars, int offset, boolean scanForwards) {
+    private static int findMatchingBracket(CharSequence chars, int startOffset, boolean scanForwards) {
         //Log.warn("findMatchingBracket(offset="+offset+",scanForwards="+scanForwards+")");
-        char bracket = chars.charAt(offset);
+        char bracket = chars.charAt(startOffset);
         if (isBracket(bracket) == false) {
             return -1;
         }
         char partner = getPartnerForBracket(bracket);
-        int nesting = 1;
+        int nesting = 0;
         int step = scanForwards ? +1 : -1;
-        int stop = scanForwards ? chars.length() : -1;
-        for (offset += step; offset != stop; offset += step) {
+        int end = scanForwards ? chars.length() : -1;
+        for (int offset = startOffset; offset != end; offset += step) {
             char ch = chars.charAt(offset);
             if (ch == bracket) {
                 ++nesting;
             } else if (ch == partner) {
                 --nesting;
-            }
-            if (nesting == 0) {
-                return offset;
+                if (nesting == 0) {
+                    return offset;
+                }
             }
         }
         return -1;
