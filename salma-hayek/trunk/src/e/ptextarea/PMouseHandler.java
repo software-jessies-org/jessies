@@ -84,7 +84,11 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             
             int bracketOffset = PBracketUtilities.findMatchingBracket(textArea.getPTextBuffer(), pressedOffset);
             if (bracketOffset != -1) {
-                int start = Math.min(pressedOffset, bracketOffset);
+                // We want to select *inside* the start bracket.
+                // findMatchingBracket returns the offset *of* the start bracket, which is one too early,
+                // or the offset of the end bracket, which is already greater than pressedOffset,
+                // and so will be discarded by Math.min anyway.
+                int start = Math.min(pressedOffset, bracketOffset + 1);
                 int end = Math.max(pressedOffset, bracketOffset);
                 textArea.setSelection(start, end, false);
                 return;
