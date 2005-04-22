@@ -24,25 +24,16 @@ public class PTextBuffer implements CharSequence {
     private char[] text = new char[0];
     private int gapPosition;
     private int gapLength;
-    private ArrayList listeners = new ArrayList();
-    private Undoer undoBuffer;
+    private ArrayList textListeners = new ArrayList();
+    private Undoer undoBuffer = new Undoer();
     private HashMap properties = new HashMap();
     
     public PTextBuffer() {
         initDefaultProperties();
-        resetUndoBuffer();
     }
     
     private void initDefaultProperties() {
         putProperty(LINE_ENDING_PROPERTY, "\n");
-    }
-    
-    /**
-     * Discards all edits from the undo buffer. Typically only useful if you're
-     * replacing the entire content of the text buffer.
-     */
-    public void resetUndoBuffer() {
-        undoBuffer = new Undoer();
     }
     
     /**
@@ -70,19 +61,19 @@ public class PTextBuffer implements CharSequence {
      * replaced.
      */
     public void addTextListener(PTextListener listener) {
-        listeners.add(listener);
+        textListeners.add(listener);
     }
     
     /**
      * Remove a previously added listener.
      */
     public void removeTextListener(PTextListener listener) {
-        listeners.remove(listener);
+        textListeners.remove(listener);
     }
     
-    private void fireEvent(PTextEvent event) {
-        for (int i = 0; i < listeners.size(); i++) {
-            PTextListener listener = (PTextListener) listeners.get(i);
+    private void fireTextEvent(PTextEvent event) {
+        for (int i = textListeners.size() - 1; i >= 0; --i) {
+            PTextListener listener = (PTextListener) textListeners.get(i);
             if (event.isInsert()) {
                 listener.textInserted(event);
             } else if (event.isRemove()) {
@@ -190,7 +181,7 @@ public class PTextBuffer implements CharSequence {
         this.text = text;
         gapPosition = 0;
         gapLength = 0;
-        fireEvent(new PTextEvent(this, PTextEvent.COMPLETE_REPLACEMENT, 0, new CharArrayCharSequence(text)));
+        fireTextEvent(new PTextEvent(this, PTextEvent.COMPLETE_REPLACEMENT, 0, new CharArrayCharSequence(text)));
     }
     
     /**
@@ -271,7 +262,7 @@ public class PTextBuffer implements CharSequence {
         gapPosition -= chars.length();
         gapLength += chars.length();
         shrinkBuffer();
-        fireEvent(new PTextEvent(this, PTextEvent.REMOVE, position, chars));
+        fireTextEvent(new PTextEvent(this, PTextEvent.REMOVE, position, chars));
     }
     
     /** Special insertion method used by the undo buffer. */
@@ -291,7 +282,7 @@ public class PTextBuffer implements CharSequence {
         }
         gapPosition += textLength;
         gapLength -= textLength;
-        fireEvent(new PTextEvent(this, PTextEvent.INSERT, position, chars));
+        fireTextEvent(new PTextEvent(this, PTextEvent.INSERT, position, chars));
     }
     
     /** Returns the character at the given index.  Part of the CharSequence interface. */
@@ -368,15 +359,28 @@ public class PTextBuffer implements CharSequence {
     }
     
     public class Undoer implements PUndoBuffer {
-        private ArrayList undoList = new ArrayList();
-        private int undoPosition = 0;
+        private ArrayList undoList;
+        private int undoPosition;
+        private ArrayList changeListeners = new ArrayList();
+        
+        public Undoer() {
+            resetUndoBuffer();
+        }
+        
+        public void resetUndoBuffer() {
+            this.undoList = new ArrayList();
+            this.undoPosition = 0;
+            fireChangeListeners();
+        }
         
         private void addAndDo(SelectionSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, SelectionSetter afterCaret) {
+            // FIXME: use ArrayList.removeRange.
             while (undoList.size() > undoPosition) {
                 undoList.remove(undoPosition);
             }
             undoList.add(new Doable(beforeCaret, position, removeChars, insertChars, afterCaret));
             redo();
+            fireChangeListeners();
         }
         
         public boolean canUndo() {
@@ -392,6 +396,7 @@ public class PTextBuffer implements CharSequence {
                 undoPosition--;
                 Doable doable = (Doable) undoList.get(undoPosition);
                 doable.undo();
+                fireChangeListeners();
             }
         }
         
@@ -400,6 +405,17 @@ public class PTextBuffer implements CharSequence {
                 Doable doable = (Doable) undoList.get(undoPosition);
                 undoPosition++;
                 doable.redo();
+                fireChangeListeners();
+            }
+        }
+        
+        public void addChangeListener(javax.swing.event.ChangeListener listener) {
+            changeListeners.add(listener);
+        }
+        
+        private void fireChangeListeners() {
+            for (int i = changeListeners.size() - 1; i >= 0; --i) {
+                ((javax.swing.event.ChangeListener) changeListeners.get(i)).stateChanged(new javax.swing.event.ChangeEvent(this));
             }
         }
     }
