@@ -442,6 +442,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         for (int i = start; i != stop; i += step) {
             PHighlight highlight = (PHighlight) highlights.get(i);
             if (matcher.matches(highlight)) {
+                centerOffsetInDisplay(highlight.getStartIndex());
                 select(highlight.getStartIndex(), highlight.getEndIndex());
                 return;
             }
