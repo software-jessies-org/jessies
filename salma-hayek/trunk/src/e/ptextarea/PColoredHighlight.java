@@ -22,6 +22,10 @@ public class PColoredHighlight extends PHighlight {
         return color;
     }
     
+    public void setColor(Color newColor) {
+        this.color = newColor;
+    }
+    
     public void paint(Graphics2D graphics, PCoordinates start, PCoordinates end) {
         Point startPt = textArea.getViewCoordinates(start);
         Point endPt = textArea.getViewCoordinates(end);
