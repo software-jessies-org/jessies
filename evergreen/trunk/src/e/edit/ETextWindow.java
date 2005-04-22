@@ -496,13 +496,16 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void findNext() {
-        updateFindResults();
-        text.selectFirstMatchingHighlight(true, new MatchHighlightMatcher(true));
+        findNextOrPrevious(true);
     }
     
     public void findPrevious() {
+        findNextOrPrevious(false);
+    }
+    
+    private void findNextOrPrevious(boolean next) {
         updateFindResults();
-        text.selectFirstMatchingHighlight(false, new MatchHighlightMatcher(false));
+        text.selectFirstMatchingHighlight(next, new MatchHighlightMatcher(next));
     }
     
     public void updateFindResults() {
