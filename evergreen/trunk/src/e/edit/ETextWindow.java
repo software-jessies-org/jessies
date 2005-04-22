@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.Timer;
 import e.gui.*;
 import e.ptextarea.*;
@@ -252,7 +253,14 @@ public class ETextWindow extends EWindow implements PTextListener {
             text.setText(content);
             text.setAppropriateFont();
             text.getIndenter().setIndentationPropertyBasedOnContent(content);
-            text.getTextBuffer().resetUndoBuffer();
+            text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
+            text.getTextBuffer().getUndoBuffer().addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    if (text.getTextBuffer().getUndoBuffer().canUndo() == false) {
+                        markAsClean();
+                    }
+                }
+            });
             if (fileType != UNKNOWN) {
                 // FIXME
                 //text.getDocument().addDocumentListener(new UnmatchedBracketHighlighter(text));
