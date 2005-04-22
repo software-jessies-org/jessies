@@ -2,6 +2,8 @@ package e.gui;
 
 import java.awt.*;
 import javax.swing.*;
+import e.forms.*;
+import e.ptextarea.*;
 
 public class SimpleDialog {
     /**
@@ -31,6 +33,22 @@ public class SimpleDialog {
     
     public static void showAlert(Frame frame, String title, String message) {
         JOptionPane.showMessageDialog(frame, breakLongMessageLines(message), title, JOptionPane.WARNING_MESSAGE);
+    }
+    
+    /**
+     * Intended for longer messages than showAlert, especially ones from other
+     * programs. Swing's message dialog doesn't let you copy text (regardless
+     * of whether or not the native system's dialog would); this uses a proper
+     * text area, so you can select and copy as you'd expect.
+     */
+    public static void showDetails(Frame frame, String title, String details) {
+        PTextArea textArea = new PTextArea(10, 40);
+        // FIXME: textArea.setEditable(false);
+        textArea.setText(details);
+        textArea.setWrapStyleWord(true);
+        FormPanel formPanel = new FormPanel();
+        formPanel.addRow("Details:", new JScrollPane(textArea));
+        FormDialog.showNonModal(frame, title, formPanel);
     }
     
     public static boolean askQuestion(Frame frame, String title, String message, String continueText) {
