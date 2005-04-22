@@ -4,10 +4,12 @@ import java.awt.*;
 
 /**
  * Highlights matching pairs of bracket characters in a text area.
+ * Will also highlight a mis-matched single bracket, in a different color.
  */
 public class PMatchingBracketHighlighter implements PCaretListener {
+    private static final Color MATCH_COLOR = new Color(0.10f, 0.78f, 0.10f, 0.5f);
     private static final Color FAILED_MATCH_COLOR = new Color(0.78f, 0.10f, 0.10f, 0.5f);
-    
+
     private PTextArea textArea;
     private PColoredHighlight[] highlights = new PColoredHighlight[2];
     
@@ -66,8 +68,6 @@ public class PMatchingBracketHighlighter implements PCaretListener {
     }
     
     public static class MatchingBracketHighlight extends PColoredHighlight {
-        private static final Color MATCH_COLOR = new Color(0.78f, 0.98f, 0.78f);
-        
         public MatchingBracketHighlight(PTextArea textArea, int startIndex, int endIndex) {
             super(textArea, startIndex, endIndex, MATCH_COLOR);
         }
