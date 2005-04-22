@@ -40,7 +40,7 @@ public class PLineList implements PTextListener {
     }
     
     /** Returns the underlying PTextBuffer model. */
-    public PTextBuffer getPTextBuffer() {
+    public PTextBuffer getTextBuffer() {
         return text;
     }
     

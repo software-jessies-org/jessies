@@ -23,7 +23,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     public PCLikeTextStyler(PTextArea textArea) {
         super(textArea);
         initCommentCache();
-        textArea.getPTextBuffer().addTextListener(this);
+        textArea.getTextBuffer().addTextListener(this);
         textArea.setTextStyler(this);
     }
     
@@ -54,7 +54,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     public PDragHandler getDoubleClickDragHandler(int clickOffset) {
 //        int lineIndex = textArea.getLineOfOffset(clickOffset);
 //        int lineStart = textArea.getLineStartOffset(lineIndex);
-//        String line = textArea.getPTextBuffer().subSequence(lineStart, textArea.getLineEndOffset(lineIndex)).toString();
+//        String line = textArea.getTextBuffer().subSequence(lineStart, textArea.getLineEndOffset(lineIndex)).toString();
 //        int lineOffset = clickOffset - lineStart;
 //        PDragHandler result = getDragHandlerForString(lineIndex, line, lineOffset);
 //        if (result != null) {
@@ -315,7 +315,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         if (textArea.isLineWrappingInvalid()) {
             return;
         }
-        CharSequence seq = textArea.getPTextBuffer();
+        CharSequence seq = textArea.getTextBuffer();
         StringBuffer buf = new StringBuffer();
         String prefix = seq.subSequence(Math.max(0, event.getOffset() - 2), event.getOffset()).toString();
         int endIndex = event.getOffset();

@@ -78,13 +78,13 @@ public class PKeyHandler extends KeyAdapter {
         if (isStartOfTextKey(event)) {
             moveCaret(extendingSelection, 0);
         } else if (isEndOfTextKey(event)) {
-            moveCaret(extendingSelection, textArea.getPTextBuffer().length());
+            moveCaret(extendingSelection, textArea.getTextBuffer().length());
         } else if (isStartOfLineKey(event)) {
             moveCaret(extendingSelection, caretToStartOfLine());
         } else if (isEndOfLineKey(event)) {
             moveCaret(extendingSelection, caretToEndOfLine());
         } else if (GuiUtilities.isMacOs() && (key == KeyEvent.VK_HOME || key == KeyEvent.VK_END)) {
-            textArea.ensureVisibilityOfOffset((key == KeyEvent.VK_HOME) ? 0 : textArea.getPTextBuffer().length());
+            textArea.ensureVisibilityOfOffset((key == KeyEvent.VK_HOME) ? 0 : textArea.getTextBuffer().length());
         } else if (key == KeyEvent.VK_LEFT) {
             moveLeft(byWord, extendingSelection);
         } else if (key == KeyEvent.VK_RIGHT) {
@@ -163,7 +163,7 @@ public class PKeyHandler extends KeyAdapter {
     private void delete() {
         int start = textArea.getSelectionStart();
         int end = textArea.getSelectionEnd();
-        if (start == end && end < textArea.getPTextBuffer().length()) {
+        if (start == end && end < textArea.getTextBuffer().length()) {
             ++end;
         }
         if (start != end) {
@@ -216,11 +216,11 @@ public class PKeyHandler extends KeyAdapter {
         } else if (textArea.hasSelection() == false) {
             ++newOffset;
         }
-        return Math.min(newOffset, textArea.getPTextBuffer().length());
+        return Math.min(newOffset, textArea.getTextBuffer().length());
     }
     
     private int caretToPreviousWord() {
-        CharSequence chars = textArea.getPTextBuffer();
+        CharSequence chars = textArea.getTextBuffer();
         String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
         int offset = textArea.getUnanchoredSelectionExtreme();
         
@@ -239,7 +239,7 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private int caretToNextWord() {
-        CharSequence chars = textArea.getPTextBuffer();
+        CharSequence chars = textArea.getTextBuffer();
         String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
         int offset = textArea.getUnanchoredSelectionExtreme();
         
@@ -300,7 +300,7 @@ public class PKeyHandler extends KeyAdapter {
             PCoordinates coords = textArea.getCoordinates(textArea.getUnanchoredSelectionExtreme());
             int lineIndex = coords.getLineIndex();
             if (lineIndex == textArea.getVisibleLineCount() - 1) {
-                return textArea.getPTextBuffer().length();
+                return textArea.getTextBuffer().length();
             } else {
                 int y = textArea.getViewCoordinates(new PCoordinates(lineIndex + 1, 0)).y;
                 return textArea.getTextIndex(textArea.getNearestCoordinates(new Point(xPixelLocation, y)));

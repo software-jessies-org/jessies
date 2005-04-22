@@ -20,7 +20,7 @@ public abstract class PAbstractSegment implements PLineSegment {
     }
     
     public CharSequence getCharSequence() {
-        return textArea.getPTextBuffer().subSequence(start, end);
+        return textArea.getTextBuffer().subSequence(start, end);
     }
     
     public String getText() {

@@ -89,7 +89,7 @@ public class PActionFactory {
         }
         
         public void performOn(PTextArea textArea) {
-            textArea.getPTextBuffer().getUndoBuffer().redo();
+            textArea.getTextBuffer().getUndoBuffer().redo();
         }
     }
     
@@ -109,7 +109,7 @@ public class PActionFactory {
         }
         
         public void performOn(PTextArea textArea) {
-            textArea.getPTextBuffer().getUndoBuffer().undo();
+            textArea.getTextBuffer().getUndoBuffer().undo();
         }
     }
     

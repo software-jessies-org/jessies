@@ -22,7 +22,7 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         }
         
         int offset = selectionStart;
-        CharSequence chars = textArea.getPTextBuffer();
+        CharSequence chars = textArea.getTextBuffer();
         if (offset == chars.length()) {
             return;
         }

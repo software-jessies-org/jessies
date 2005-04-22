@@ -137,7 +137,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (start == end) {
             return "";
         } else {
-            return getPTextBuffer().subSequence(start, end).toString();
+            return getTextBuffer().subSequence(start, end).toString();
         }
     }
     
@@ -260,14 +260,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public String getLineText(int lineNumber) {
         int start = getLineStartOffset(lineNumber);
         int end = getLineEndOffsetBeforeTerminator(lineNumber);
-        return (start == end) ? "" : getPTextBuffer().subSequence(start, end).toString();
+        return (start == end) ? "" : getTextBuffer().subSequence(start, end).toString();
     }
     
     /**
      * Returns the string to use as a single indent level in this text area.
      */
     public String getIndentationString() {
-        String result = (String) getPTextBuffer().getProperty(PTextBuffer.INDENTATION_PROPERTY);
+        String result = (String) getTextBuffer().getProperty(PTextBuffer.INDENTATION_PROPERTY);
         if (result == null) {
             result = "\t";
         }
@@ -277,12 +277,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public void insert(CharSequence chars) {
         SelectionSetter endCaret = new SelectionSetter(getSelectionStart() + chars.length());
         int length = getSelectionEnd() - getSelectionStart();
-        getPTextBuffer().replace(new SelectionSetter(), getSelectionStart(), length, chars, endCaret);
+        getTextBuffer().replace(new SelectionSetter(), getSelectionStart(), length, chars, endCaret);
     }
     
     public void replaceRange(CharSequence replacement, int start, int end) {
         SelectionSetter endCaret = new SelectionSetter(start + replacement.length());
-        getPTextBuffer().replace(new SelectionSetter(), start, end - start, replacement, endCaret);
+        getTextBuffer().replace(new SelectionSetter(), start, end - start, replacement, endCaret);
     }
     
     public void replaceSelection(CharSequence replacement) {
@@ -295,7 +295,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public void delete(int startFrom, int charCount) {
         SelectionSetter endCaret = new SelectionSetter(startFrom);
-        getPTextBuffer().replace(new SelectionSetter(), startFrom, charCount, "", endCaret);
+        getTextBuffer().replace(new SelectionSetter(), startFrom, charCount, "", endCaret);
     }
     
     private class SelectionSetter implements PTextBuffer.SelectionSetter {
@@ -325,7 +325,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void selectAll() {
-        select(0, getPTextBuffer().length());
+        select(0, getTextBuffer().length());
     }
     
     /**
@@ -480,8 +480,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return lines;
     }
     
-    public PTextBuffer getPTextBuffer() {
-        return lines.getPTextBuffer();
+    public PTextBuffer getTextBuffer() {
+        return lines.getTextBuffer();
     }
     
     public PCoordinates getNearestCoordinates(Point point) {
@@ -1075,14 +1075,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * Replaces the entire contents of this text area with the given string.
      */
     public void setText(String newText) {
-        getPTextBuffer().replace(new SelectionSetter(), 0, getPTextBuffer().length(), newText, new SelectionSetter(0));
+        getTextBuffer().replace(new SelectionSetter(), 0, getTextBuffer().length(), newText, new SelectionSetter(0));
     }
     
     /**
      * Appends the given string to the end of the text.
      */
     public void append(String newText) {
-        PTextBuffer buffer = getPTextBuffer();
+        PTextBuffer buffer = getTextBuffer();
         synchronized (buffer) {
             buffer.replace(new SelectionSetter(), buffer.length(), 0, newText, new SelectionSetter(buffer.length() + newText.length()));
         }
@@ -1092,7 +1092,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * Returns a copy of the text in this text area.
      */
     public String getText() {
-        return getPTextBuffer().toString();
+        return getTextBuffer().toString();
     }
     
     public Dimension getPreferredScrollableViewportSize() {

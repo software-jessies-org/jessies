@@ -16,7 +16,7 @@ public class PWrappedSegmentIterator implements PSegmentIterator {
     }
     
     public boolean hasNext() {
-        return (charOffset < textArea.getPTextBuffer().length());
+        return (charOffset < textArea.getTextBuffer().length());
     }
     
     public PLineSegment next() {

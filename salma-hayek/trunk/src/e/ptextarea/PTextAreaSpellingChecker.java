@@ -17,7 +17,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
         this.component = component;
         initPopUpMenu();
         InstanceTracker.addInstance(this);
-        component.getPTextBuffer().addTextListener(this);
+        component.getTextBuffer().addTextListener(this);
     }
     
     private void initPopUpMenu() {
@@ -57,7 +57,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
         final Range actualRange = new Range();
         if (isMisspelledWordBetween(offset, offset, actualRange)) {
             EPopupMenu menu = new EPopupMenu();
-            String misspelling = component.getPTextBuffer().subSequence(actualRange.start, actualRange.end).toString();
+            String misspelling = component.getTextBuffer().subSequence(actualRange.start, actualRange.end).toString();
             String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
             for (int i = 0; i < suggestions.length; i++) {
                 String suggestion = suggestions[i];
@@ -155,7 +155,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
      * the given DocumentEvent.
      */
     private void checkSpelling(PTextEvent e) {
-        PTextBuffer buffer = e.getPTextBuffer();
+        PTextBuffer buffer = e.getTextBuffer();
         final int offset = e.getOffset();
         final int documentLength = buffer.length();
         
@@ -182,7 +182,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
     public void checkSpelling() {
         new Thread(new Runnable() {
             public void run() {
-                PTextBuffer buffer = component.getPTextBuffer();
+                PTextBuffer buffer = component.getTextBuffer();
                 checkSpelling(buffer, 0, buffer.length());
             }
         }).start();
@@ -205,7 +205,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
             if (highlight instanceof UnderlineHighlight) {
                 final int start = highlight.getStart().getIndex();
                 final int end = highlight.getEnd().getIndex();
-                String misspelling = component.getPTextBuffer().subSequence(start, end).toString();
+                String misspelling = component.getTextBuffer().subSequence(start, end).toString();
                 result.add(misspelling);
             }
         }

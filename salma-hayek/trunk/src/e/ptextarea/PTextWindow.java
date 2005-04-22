@@ -28,7 +28,7 @@ public class PTextWindow {
                 area.setFont(new Font(e.util.GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12));
                 stopWatch.print("created text area");
                 
-                area.getPTextBuffer().readFromFile(new java.io.File(filename));
+                area.getTextBuffer().readFromFile(new java.io.File(filename));
                 stopWatch.print("read file");
 
                 PTextStyler styler = getTextStyler(filename, area);
@@ -48,7 +48,7 @@ public class PTextWindow {
                 frame.setVisible(true);
                 frame.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
-                        area.getPTextBuffer().writeToFile(new java.io.File(filename + ".bak"));
+                        area.getTextBuffer().writeToFile(new java.io.File(filename + ".bak"));
                     }
                 });
             }

@@ -18,7 +18,7 @@ public class PTextEvent {
         this.characters = characters;
     }
     
-    public PTextBuffer getPTextBuffer() {
+    public PTextBuffer getTextBuffer() {
         return pText;
     }
     

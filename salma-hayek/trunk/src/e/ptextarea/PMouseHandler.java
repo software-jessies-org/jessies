@@ -55,7 +55,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         if (dragHandler != null) {
             int newOffset = getOffsetAtMouse(event);
             dragHandler.mouseDragged(newOffset);
-            textArea.ensureVisibilityOfOffset(Math.min(Math.max(0, newOffset), textArea.getPTextBuffer().length()));
+            textArea.ensureVisibilityOfOffset(Math.min(Math.max(0, newOffset), textArea.getTextBuffer().length()));
         }
     }
     
@@ -82,7 +82,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void makeInitialSelection(int pressedOffset) {
             this.pressedOffset = pressedOffset;
             
-            int bracketOffset = PBracketUtilities.findMatchingBracket(textArea.getPTextBuffer(), pressedOffset);
+            int bracketOffset = PBracketUtilities.findMatchingBracket(textArea.getTextBuffer(), pressedOffset);
             if (bracketOffset != -1) {
                 // We want to select *inside* the start bracket.
                 // findMatchingBracket returns the offset *of* the start bracket, which is one too early,
@@ -98,7 +98,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         }
         
         private void selectByWord(int startOffset, int endOffset, boolean endIsAnchored) {
-            CharSequence chars = textArea.getPTextBuffer();
+            CharSequence chars = textArea.getTextBuffer();
             String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
             textArea.setSelectionWithoutScrolling(PWordUtilities.getWordStart(chars, startOffset, stopChars), PWordUtilities.getWordEnd(chars, endOffset, stopChars), endIsAnchored);
         }

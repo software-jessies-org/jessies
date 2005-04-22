@@ -41,7 +41,7 @@ public class PIndenter {
         int start = textArea.getLineStartOffset(lineNumber);
         int max = textArea.getLineEndOffsetBeforeTerminator(lineNumber);
         int end;
-        CharSequence chars = textArea.getPTextBuffer();
+        CharSequence chars = textArea.getTextBuffer();
         for (end = start; end < max; ++end) {
             char nextChar = chars.charAt(end);
             if (nextChar != ' ' && nextChar != '\t') {
@@ -60,7 +60,7 @@ public class PIndenter {
     public void setIndentationPropertyBasedOnContent(String content) {
         String indentation = textArea.getIndenter().guessIndentationFromFile(content);
         //System.err.println(filename + ": '" + indentation + "'");
-        textArea.getPTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, indentation);
+        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, indentation);
     }
     
     public String guessIndentationFromFile(String fileContents) {
@@ -139,7 +139,7 @@ public class PIndenter {
         if (shouldMoveCaret) {
             // Move the caret ready to perform the same service to the next line.
             int newCaretPosition = lineStart + whitespace.length() + line.length() + 1;
-            newCaretPosition = Math.min(newCaretPosition, textArea.getPTextBuffer().length());
+            newCaretPosition = Math.min(newCaretPosition, textArea.getTextBuffer().length());
             textArea.select(newCaretPosition, newCaretPosition);
         }
         return lineChanged;

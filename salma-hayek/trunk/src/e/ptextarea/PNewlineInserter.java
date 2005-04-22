@@ -19,7 +19,7 @@ public class PNewlineInserter {
         
         // Should we try to insert matching brace pairs?
         String line = getLineTextAtOffset(position);
-        if (textArea.getIndenter().isElectric('}') && position > 0 && textArea.getPTextBuffer().charAt(position - 1) == '{' && hasUnbalancedBraces(textArea.getText())) {
+        if (textArea.getIndenter().isElectric('}') && position > 0 && textArea.getTextBuffer().charAt(position - 1) == '{' && hasUnbalancedBraces(textArea.getText())) {
             insertMatchingBrace();
         } else if (line.endsWith("/*") || line.endsWith("/**")) {
             insertMatchingCloseComment();
