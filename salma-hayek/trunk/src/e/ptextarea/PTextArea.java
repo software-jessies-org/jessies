@@ -80,7 +80,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             private void rewrap() {
                 if (getWidth() != lastWidth) {
                     lastWidth = getWidth();
-                    invalidateLineWrappings();
+                    revalidateLineWrappings();
                     repaint();
                 }
             }
@@ -695,7 +695,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public void paintComponent(Graphics oldGraphics) {
         //StopWatch watch = new StopWatch();
-        initCharWidthCache();
         generateLineWrappings();
         Graphics2D graphics = (Graphics2D) oldGraphics;
         Rectangle bounds = graphics.getClipBounds();
@@ -793,9 +792,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void initCharWidthCache() {
-        widthCache = new int[MAX_CACHED_CHAR];
-        for (int i = 0; i < MAX_CACHED_CHAR; i++) {
-            widthCache[i] = metrics.charWidth(i);
+        if (widthCache == null) {
+            widthCache = new int[MAX_CACHED_CHAR];
+            for (int i = 0; i < MAX_CACHED_CHAR; i++) {
+                widthCache[i] = metrics.charWidth(i);
+            }
         }
     }
 
@@ -888,6 +889,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
 
     private synchronized void generateLineWrappings() {
+        initCharWidthCache();
         if (isLineWrappingInvalid() && isShowing()) {
             splitLines = new ArrayList();
             for (int i = 0; i < lines.size(); i++) {
