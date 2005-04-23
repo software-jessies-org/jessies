@@ -15,4 +15,8 @@ public class Range {
     public int length() {
         return (end - start);
     }
+    
+    public String toString() {
+        return "Range[start=" + start + ",end=" + end + "]";
+    }
 }

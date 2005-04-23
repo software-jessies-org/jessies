@@ -212,14 +212,6 @@ public class PTextAreaSpellingChecker implements PTextListener {
         return result;
     }
     
-    public static final class Range {
-        public int start;
-        public int end;
-        public String toString() {
-            return "Range[start=" + start + ",end=" + end + "]";
-        }
-    }
-    
     /** Tests whether there's a misspelled word in the given range of offsets. */
     public boolean isMisspelledWordBetween(int fromIndex, int toIndex, Range actualRange) {
         if (toIndex - fromIndex > 20) {
