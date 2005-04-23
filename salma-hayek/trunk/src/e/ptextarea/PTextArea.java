@@ -407,6 +407,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         cacheFontMetrics();
         showRightHandMarginAt(GuiUtilities.isFontFixedWidth(font) ? 80 : NO_MARGIN);
         revalidateLineWrappings();
+        invalidateCharWidthCache();
         repaint();
     }
     
@@ -791,6 +792,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         graphics.drawLine(x, yBottom - 1, x - 1, yBottom);
     }
     
+    private void invalidateCharWidthCache() {
+        widthCache = null;
+    }
+
     private void initCharWidthCache() {
         if (widthCache == null) {
             widthCache = new int[MAX_CACHED_CHAR];
