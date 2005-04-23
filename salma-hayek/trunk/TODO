@@ -20,7 +20,7 @@ Items to be done for PTextArea:
 
 * Auto-scroll on selection (all types) flickers more than I think it should.
 
-* martind reports a wrapping bug ("Breaking a wrapped line by pressing Enter in the middle of a line causes the second half of the line to be unwrapped until a resize rewraps it."); remove the newline before "^this sort of" above, then hit return. The long line is no longer wrapped. Resizing or editing within the line cause re-wrapping.
+* martind reports a wrapping bug ("Breaking a wrapped line by pressing Enter in the middle of a line causes the second half of the line to be unwrapped until a resize rewraps it."); hit return before the 'E' in "Enter" above. This line is no longer wrapped. Resizing or editing within the line cause re-wrapping.
 
 * the following JTextArea methods are thread-safe: append, insert, replace, and setText.
 
