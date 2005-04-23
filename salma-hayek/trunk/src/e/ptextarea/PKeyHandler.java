@@ -150,13 +150,9 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private void backspace() {
-        int start = textArea.getSelectionStart();
-        int end = textArea.getSelectionEnd();
-        if (start == end && start > 0) {
-            --start;
-        }
-        if (start != end) {
-            textArea.delete(start, end - start);
+        Range range = textArea.getIndenter().getRangeToRemove();
+        if (range.isNonEmpty()) {
+            textArea.delete(range.start, range.length());
         }
     }
     
