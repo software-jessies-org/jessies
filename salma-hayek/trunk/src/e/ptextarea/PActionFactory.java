@@ -88,6 +88,11 @@ public class PActionFactory {
             super("Redo", e.util.GuiUtilities.makeKeyStroke("Z", true));
         }
         
+        public boolean isEnabled() {
+            PTextArea textArea = getTextArea();
+            return (textArea != null && textArea.getTextBuffer().getUndoBuffer().canRedo());
+        }
+        
         public void performOn(PTextArea textArea) {
             textArea.getTextBuffer().getUndoBuffer().redo();
         }
@@ -106,6 +111,11 @@ public class PActionFactory {
     public static class UndoAction extends PTextAction {
         public UndoAction() {
             super("Undo", e.util.GuiUtilities.makeKeyStroke("Z", false));
+        }
+        
+        public boolean isEnabled() {
+            PTextArea textArea = getTextArea();
+            return (textArea != null && textArea.getTextBuffer().getUndoBuffer().canUndo());
         }
         
         public void performOn(PTextArea textArea) {
