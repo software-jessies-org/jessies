@@ -1,5 +1,7 @@
 Items to be done for PTextArea:
 
+* Misspell the word at the end of a line, and the misspelling highlight will extend to the right-hand edge of the component. (Only true if the end of the line isn't also the end of the buffer.)
+
 * Implement setEditable. (SCM is waiting for this.)
 
 * Implement a default find UI for applications other than Edit. (SCM is waiting for this, and it's always nice to have.)
