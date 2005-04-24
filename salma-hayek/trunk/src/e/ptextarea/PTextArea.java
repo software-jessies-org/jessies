@@ -407,12 +407,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         cacheFontMetrics();
         showRightHandMarginAt(GuiUtilities.isFontFixedWidth(font) ? 80 : NO_MARGIN);
         revalidateLineWrappings();
-        invalidateCharWidthCache();
         repaint();
     }
     
     private void cacheFontMetrics() {
         metrics = getFontMetrics(getFont());
+        widthCache = new int[MAX_CACHED_CHAR];
+        for (int i = 0; i < MAX_CACHED_CHAR; i++) {
+            widthCache[i] = metrics.charWidth(i);
+        }
     }
     
     public void addHighlight(PHighlight highlight) {
@@ -791,19 +794,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         graphics.drawLine(x, yBottom - 1, x + 1, yBottom);
         graphics.drawLine(x, yBottom - 1, x - 1, yBottom);
     }
-    
-    private void invalidateCharWidthCache() {
-        widthCache = null;
-    }
-
-    private void initCharWidthCache() {
-        if (widthCache == null) {
-            widthCache = new int[MAX_CACHED_CHAR];
-            for (int i = 0; i < MAX_CACHED_CHAR; i++) {
-                widthCache[i] = metrics.charWidth(i);
-            }
-        }
-    }
 
     public void linesAdded(PLineEvent event) {
         if (isLineWrappingInvalid()) {
@@ -894,7 +884,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
 
     private synchronized void generateLineWrappings() {
-        initCharWidthCache();
         if (isLineWrappingInvalid() && isShowing()) {
             splitLines = new ArrayList();
             for (int i = 0; i < lines.size(); i++) {
