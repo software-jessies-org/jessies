@@ -35,9 +35,7 @@ public class PNewlineInserter {
         final int start = textArea.getSelectionStart();
         final int end = textArea.getSelectionEnd();
         int endLineIndex = textArea.getLineOfOffset(end);
-        int restOfLineOffset = textArea.getLineEndOffsetBeforeTerminator(endLineIndex);
-        String restOfLine = textArea.getTextBuffer().subSequence(end, restOfLineOffset).toString();
-        textArea.select(start, restOfLineOffset);
+        int suffixPosition = textArea.getLineEndOffsetBeforeTerminator(endLineIndex);
         String startLine = getLineTextAtOffset(start);
         String whitespace = getIndentationOfLineAtOffset(start);
         String prefix = "\n" + whitespace + textArea.getIndentationString();
@@ -46,7 +44,13 @@ public class PNewlineInserter {
             suffix += ";";
         }
         final int newCaretPosition = start + prefix.length();
-        textArea.replaceSelection(prefix + restOfLine + suffix);
+        textArea.replaceSelection(prefix);
+        // suffixPosition is invalidated by replaceSelection.
+        // But we can't swap the calls because replaceRange clears the selection.
+        int selectionSize = end - start;
+        suffixPosition -= selectionSize;
+        suffixPosition += prefix.length();
+        textArea.replaceRange(suffix, suffixPosition, suffixPosition);
         textArea.select(newCaretPosition, newCaretPosition);
     }
     
