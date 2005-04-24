@@ -32,20 +32,21 @@ public class PNewlineInserter {
     }
     
     public void insertMatchingBrace() {
-        // FIXME - selection
-        final int position = textArea.getSelectionStart();
-        int lineIndex = textArea.getLineOfOffset(position);
-        int restOfLineOffset = textArea.getLineEndOffsetBeforeTerminator(lineIndex);
-        textArea.select(position, restOfLineOffset);
-        String line = getLineTextAtOffset(position);
-        String whitespace = getIndentationOfLineAtOffset(position);
+        final int start = textArea.getSelectionStart();
+        final int end = textArea.getSelectionEnd();
+        int endLineIndex = textArea.getLineOfOffset(end);
+        int restOfLineOffset = textArea.getLineEndOffsetBeforeTerminator(endLineIndex);
+        String restOfLine = textArea.getTextBuffer().subSequence(end, restOfLineOffset).toString();
+        textArea.select(start, restOfLineOffset);
+        String startLine = getLineTextAtOffset(start);
+        String whitespace = getIndentationOfLineAtOffset(start);
         String prefix = "\n" + whitespace + textArea.getIndentationString();
         String suffix = "\n" + whitespace + "}";
-        if (textArea.getIndenter().isInNeedOfClosingSemicolon(line)) {
+        if (textArea.getIndenter().isInNeedOfClosingSemicolon(startLine)) {
             suffix += ";";
         }
-        final int newCaretPosition = position + prefix.length();
-        textArea.replaceSelection(prefix + textArea.getSelectedText() + suffix);
+        final int newCaretPosition = start + prefix.length();
+        textArea.replaceSelection(prefix + restOfLine + suffix);
         textArea.select(newCaretPosition, newCaretPosition);
     }
     
