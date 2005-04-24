@@ -122,14 +122,10 @@ ifneq "$(JAVA_COMPILER)" ""
 
 else
 
-  # The user left the choice of compiler up to us.
-  # Favor Jikes, but fall back to javac.
-  JAVA_COMPILER = jikes
+  # The user left the choice of compiler up to us. We'll take javac.
+  JAVA_COMPILER = javac
   ifeq "$(wildcard $(JAVA_COMPILER))$(call pathsearch,$(JAVA_COMPILER))" ""
-    JAVA_COMPILER = javac
-    ifeq "$(wildcard $(JAVA_COMPILER))$(call pathsearch,$(JAVA_COMPILER))" ""
-      $(error Unable to find Jikes or javac)
-    endif
+    $(error Unable to find javac)
   endif
 
 endif
