@@ -54,7 +54,7 @@ public class Options {
 		return INSTANCE;
 	}
 	
-	public void showOptions(PrintStream out) {
+	public void showOptions(PrintWriter out) {
 		Object[] keys = options.keySet().toArray();
 		Arrays.sort(keys);
 		for (int i = 0; i < keys.length; ++i) {
