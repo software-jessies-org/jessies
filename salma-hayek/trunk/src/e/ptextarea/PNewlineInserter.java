@@ -12,23 +12,25 @@ public class PNewlineInserter {
     }
     
     public void insertNewline() {
-        // FIXME: start CompoundEdit
-        
-        // FIXME - selection
-        final int position = textArea.getSelectionStart();
-        
-        // Should we try to insert matching brace pairs?
-        String line = getLineTextAtOffset(position);
-        if (textArea.getIndenter().isElectric('}') && position > 0 && textArea.getTextBuffer().charAt(position - 1) == '{' && hasUnbalancedBraces(textArea.getText())) {
-            insertMatchingBrace();
-        } else if (line.endsWith("/*") || line.endsWith("/**")) {
-            insertMatchingCloseComment();
-        } else {
-            textArea.replaceSelection("\n");
-            textArea.autoIndent();
+        textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
+        try {
+            
+            // FIXME - selection
+            final int position = textArea.getSelectionStart();
+            
+            // Should we try to insert matching brace pairs?
+            String line = getLineTextAtOffset(position);
+            if (textArea.getIndenter().isElectric('}') && position > 0 && textArea.getTextBuffer().charAt(position - 1) == '{' && hasUnbalancedBraces(textArea.getText())) {
+                insertMatchingBrace();
+            } else if (line.endsWith("/*") || line.endsWith("/**")) {
+                insertMatchingCloseComment();
+            } else {
+                textArea.replaceSelection("\n");
+                textArea.autoIndent();
+            }
+        } finally {
+            textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();
         }
-        
-        // FIXME: end CompoundEdit
     }
     
     public void insertMatchingBrace() {

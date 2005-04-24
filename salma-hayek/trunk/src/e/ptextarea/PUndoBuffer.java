@@ -5,6 +5,17 @@ package e.ptextarea;
  */
 public interface PUndoBuffer {
     /**
+     * Starts a new compound edit (which may be nested within another). A
+     * compound edit will be undone/redone as a unit.
+     */
+    public void startCompoundEdit();
+    
+    /**
+     * Finishes the current most-nested compound edit.
+     */
+    public void finishCompoundEdit();
+
+    /**
      * Tests whether "undo" will actually do anything. Useful for disabling
      * menu items.
      */

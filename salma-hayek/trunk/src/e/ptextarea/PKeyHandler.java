@@ -139,10 +139,13 @@ public class PKeyHandler extends KeyAdapter {
         } else {
             CharSequence content = new CharArrayCharSequence(new char[] { ch });
             if (textArea.getIndenter().isElectric(ch)) {
-                // FIXME: start CompoundEdit
-                textArea.replaceSelection(content);
-                textArea.getIndenter().correctIndentation(false);
-                // FIXME: end CompoundEdit
+                textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
+                try {
+                    textArea.replaceSelection(content);
+                    textArea.getIndenter().correctIndentation(false);
+                } finally {
+                    textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();
+                }
             } else {
                 textArea.replaceSelection(content);
             }
