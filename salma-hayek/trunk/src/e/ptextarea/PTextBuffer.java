@@ -435,27 +435,28 @@ public class PTextBuffer implements CharSequence {
         
         /**
          * Tests whether the Doable at 'index' in the undo list is a
-         * continuation of the compound edit identified by 'id'.
+         * continuation of 'doable'.
          */
-        private boolean compoundContinuesAt(int id, int index) {
+        private boolean compoundContinuesAt(Doable doable, int index) {
+            if (doable.isNotCompound()) {
+                return false;
+            }
             if (index < 0 || index >= undoList.size()) {
                 return false;
             }
-            Doable doable = (Doable) undoList.get(index);
-            return (doable.getCompoundId() == id);
+            Doable indexedDoable = (Doable) undoList.get(index);
+            return (indexedDoable.getCompoundId() == doable.getCompoundId());
         }
         
         public void undo() {
             if (canUndo()) {
                 Doable doable;
-                int id;
                 do {
                     --undoPosition;
                     doable = (Doable) undoList.get(undoPosition);
-                    id = doable.getCompoundId();
                     //System.out.println("undo: " + doable);
                     doable.undo();
-                } while (id != NOT_COMPOUND && compoundContinuesAt(id, undoPosition - 1));
+                } while (compoundContinuesAt(doable, undoPosition - 1));
                 fireChangeListeners();
             }
         }
@@ -463,14 +464,12 @@ public class PTextBuffer implements CharSequence {
         public void redo() {
             if (canRedo()) {
                 Doable doable;
-                int id;
                 do {
                     doable = (Doable) undoList.get(undoPosition);
-                    id = doable.getCompoundId();
                     ++undoPosition;
                     //System.out.println("redo: " + doable);
                     doable.redo();
-                } while (id != NOT_COMPOUND && compoundContinuesAt(id, undoPosition));
+                } while (compoundContinuesAt(doable, undoPosition));
                 fireChangeListeners();
             }
         }
@@ -505,6 +504,10 @@ public class PTextBuffer implements CharSequence {
             this.removeChars = removeChars;
             this.insertChars = insertChars;
             this.afterCaret = afterCaret;
+        }
+        
+        public boolean isNotCompound() {
+            return (compoundId == Undoer.NOT_COMPOUND);
         }
         
         public int getCompoundId() {
