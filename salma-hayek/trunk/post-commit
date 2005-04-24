@@ -44,7 +44,7 @@ repo = ARGV.shift()
 rev = ARGV.shift()
 
 # Get the overview information.
-info=`#{svnlook} info #{repo} -r #{rev}`
+info=`#{svnlook} info #{repo} -r #{rev} | #{script_path}/bin/annotate-patch.rb`
 info_lines=info.split("\n")
 author=info_lines.shift
 date=info_lines.shift
