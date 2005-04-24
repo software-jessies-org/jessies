@@ -362,8 +362,16 @@ public class PTextBuffer implements CharSequence {
         private ArrayList undoList;
         private int undoPosition;
         
+        // How many levels of nested compound edits we have.
         private int compoundingDepth;
+        
+        // A sequence number for compound edits, so we can tell adjacent
+        // compound edits apart in the undo history, where the nesting is all
+        // flattened out.
         private int compoundId;
+        
+        // A special compoundId to make edits that aren't part of any compound
+        // edit easily recognizable.
         private static final int NOT_COMPOUND = -1;
         
         private ArrayList changeListeners = new ArrayList();
@@ -425,6 +433,10 @@ public class PTextBuffer implements CharSequence {
             return (undoPosition < undoList.size());
         }
         
+        /**
+         * Tests whether the Doable at 'index' in the undo list is a
+         * continuation of the compound edit identified by 'id'.
+         */
         private boolean compoundContinuesAt(int id, int index) {
             if (index < 0 || index >= undoList.size()) {
                 return false;
