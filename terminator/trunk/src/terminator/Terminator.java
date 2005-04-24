@@ -18,10 +18,6 @@ public class Terminator {
 	
 	private Terminator() {
 		Log.setApplicationName("Terminator");
-		startTerminatorServer();
-		if (GuiUtilities.isMacOs()) {
-			initMenuBar();
-		}
 	}
 	
 	private void startTerminatorServer() {
@@ -31,7 +27,7 @@ public class Terminator {
 					try {
 						String tail = line.substring(4);
 						String[] arguments = (tail.length() > 0) ? tail.split("\u0000") : new String[0];
-						Terminator.getSharedInstance().parseCommandLine(arguments);
+						Terminator.getSharedInstance().parseCommandLine(arguments, out, out);
 						return true;
 					} catch (Exception ex) {
 						ex.printStackTrace(out);
@@ -57,15 +53,27 @@ public class Terminator {
 		hiddenFrame.setVisible(true);
 	}
 	
-	private void parseCommandLine(final String[] argumentArray) throws IOException {
+	// Returns whether we started the UI.
+	private boolean parseCommandLine(final String[] argumentArray, PrintWriter out, PrintWriter err) throws IOException {
 		arguments = Options.getSharedInstance().parseCommandLine(argumentArray);
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
-			showUsage(System.out);
+			showUsage(out);
+		} else if (arguments.contains("-v") || arguments.contains("-version") || arguments.contains("--version")) {
+			showVersion(err);
+		} else {
+			initUi();
+			return true;
 		}
-		if (arguments.contains("-v") || arguments.contains("-version") || arguments.contains("--version")) {
-			showVersion();
+		return false;
+	}
+
+	private void parseOriginalCommandLine(final String[] argumentArray, PrintWriter out, PrintWriter err) throws IOException {
+		if (parseCommandLine(argumentArray, out, err)) {
+			startTerminatorServer();
+			if (GuiUtilities.isMacOs()) {
+				initMenuBar();
+			}
 		}
-		initUi();
 	}
 	
 	public void frameClosed(TerminatorFrame frame) {
@@ -117,7 +125,7 @@ public class Terminator {
 		return (JTerminalPaneFactory[]) result.toArray(new JTerminalPaneFactory[result.size()]);
 	}
 
-	public void showUsage(PrintStream out) {
+	public void showUsage(PrintWriter out) {
 		out.println("Usage: Terminator [--help] [-xrm <resource-string>]... [[-n <name>] command]...");
 		out.println();
 		out.println("Current resource settings:");
@@ -125,18 +133,20 @@ public class Terminator {
 		out.println();
 		out.println("Terminator will read your .Xdefaults and .Xresources files, and use");
 		out.println("resources of class Rxvt, Terminator or XTerm.");
-		System.exit(0);
 	}
 	
-	public void showVersion() {
-		System.err.println("Terminator (see ChangeLog for author and version information)");
-		System.err.println("Copyright (C) 2004-2005 Free Software Foundation, Inc.");
-		System.err.println("This is free software; see the source for copying conditions.  There is NO");
-		System.err.println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
-		System.exit(0);
+	public void showVersion(PrintWriter out) {
+		out.println("Terminator (see ChangeLog for author and version information)");
+		out.println("Copyright (C) 2004-2005 Free Software Foundation, Inc.");
+		out.println("This is free software; see the source for copying conditions.  There is NO");
+		out.println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
 	}
 
 	public static void main(final String[] arguments) throws IOException {
-		Terminator.getSharedInstance().parseCommandLine(arguments);
+		PrintWriter outWriter = new PrintWriter(System.out);
+		PrintWriter errWriter = new PrintWriter(System.err);
+		Terminator.getSharedInstance().parseOriginalCommandLine(arguments, outWriter, errWriter);
+		outWriter.flush();
+		errWriter.flush();
 	}
 }
