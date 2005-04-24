@@ -361,6 +361,11 @@ public class PTextBuffer implements CharSequence {
     public class Undoer implements PUndoBuffer {
         private ArrayList undoList;
         private int undoPosition;
+        
+        private int compoundingDepth;
+        private int compoundId;
+        private static final int NOT_COMPOUND = -1;
+        
         private ArrayList changeListeners = new ArrayList();
         
         public Undoer() {
@@ -370,6 +375,8 @@ public class PTextBuffer implements CharSequence {
         public void resetUndoBuffer() {
             this.undoList = new ArrayList();
             this.undoPosition = 0;
+            this.compoundingDepth = 0;
+            this.compoundId = 0;
             fireChangeListeners();
         }
         
@@ -379,53 +386,35 @@ public class PTextBuffer implements CharSequence {
                 undoList.remove(undoPosition);
             }
             
-            Doable newEdit = new DefaultDoable(beforeCaret, position, removeChars, insertChars, afterCaret);
-            appendNewEdit(newEdit);
-            
+            int id = (compoundingDepth == 0) ? NOT_COMPOUND : compoundId;
+            Doable newEdit = new Doable(id, beforeCaret, position, removeChars, insertChars, afterCaret);
+            undoList.add(newEdit);
             redo();
+            
             fireChangeListeners();
         }
         
-        private void appendNewEdit(Doable newEdit) {
-            CompoundDoable compound = getCompoundDoable();
-            if (compound != null) {
-                // Compound this edit.
-                compound.addEdit(newEdit);
-            } else {
-                // We couldn't compound, so add the new edit in its own right.
-                undoList.add(newEdit);
-            }
-        }
-        
-        /**
-         * Returns the current CompoundDoable, if there is one. Otherwise
-         * returns null.
-         */
-        private CompoundDoable getCompoundDoable() {
-            if (undoList.size() == 0) {
-                return null;
-            }
-            Object lastEdit = undoList.get(undoList.size() - 1);
-            if (lastEdit instanceof CompoundDoable == false) {
-                return null;
-            }
-            CompoundDoable compound = (CompoundDoable) lastEdit;
-            if (compound.isActive() == false) {
-                return null;
-            }
-            return compound;
-        }
-        
         public void startCompoundEdit() {
-            undoList.add(new CompoundDoable());
+            ++compoundingDepth;
+            //System.out.println("started compound edit");
+        }
+        
+        public void dump() {
+            for (int i = 0; i < undoList.size(); ++i) {
+                Doable edit = (Doable) undoList.get(i);
+                System.out.println(i + ": " + edit);
+            }
         }
         
         public void finishCompoundEdit() {
-            CompoundDoable compound = getCompoundDoable();
-            if (compound == null) {
+            if (compoundingDepth == 0) {
+                dump();
                 throw new IllegalStateException("can't finish a compound edit when there isn't one active");
             }
-            compound.finishCompoundEdit();
+            --compoundingDepth;
+            ++compoundId;
+            //System.out.println("finished compound edit");
+            //dump();
         }
         
         public boolean canUndo() {
@@ -436,11 +425,25 @@ public class PTextBuffer implements CharSequence {
             return (undoPosition < undoList.size());
         }
         
+        private boolean compoundContinuesAt(int id, int index) {
+            if (index < 0) {
+                return false;
+            }
+            Doable doable = (Doable) undoList.get(index);
+            return (doable.getCompoundId() == id);
+        }
+        
         public void undo() {
             if (canUndo()) {
-                undoPosition--;
-                Doable doable = (Doable) undoList.get(undoPosition);
-                doable.undo();
+                Doable doable;
+                int id;
+                do {
+                    --undoPosition;
+                    doable = (Doable) undoList.get(undoPosition);
+                    id = doable.getCompoundId();
+                    //System.out.println("undo: " + doable);
+                    doable.undo();
+                } while (id != NOT_COMPOUND && compoundContinuesAt(id, undoPosition - 1));
                 fireChangeListeners();
             }
         }
@@ -448,6 +451,7 @@ public class PTextBuffer implements CharSequence {
         public void redo() {
             if (canRedo()) {
                 Doable doable = (Doable) undoList.get(undoPosition);
+                //System.out.println("redo: " + doable);
                 undoPosition++;
                 doable.redo();
                 fireChangeListeners();
@@ -469,54 +473,29 @@ public class PTextBuffer implements CharSequence {
         public void modifySelection();
     }
     
-    private interface Doable {
-        public void undo();
-        public void redo();
-    }
-    
-    private class CompoundDoable implements Doable {
-        private ArrayList edits = new ArrayList();
-        private boolean active = true;
-        
-        public void addEdit(Doable edit) {
-            edits.add(edit);
-        }
-        
-        public boolean isActive() {
-            return active;
-        }
-        
-        public void finishCompoundEdit() {
-            edits.trimToSize();
-            active = false;
-        }
-        
-        public void undo() {
-            for (int i = 0; i < edits.size(); ++i) {
-                ((Doable) edits.get(i)).undo();
-            }
-        }
-        
-        public void redo() {
-            for (int i = 0; i < edits.size(); ++i) {
-                ((Doable) edits.get(i)).redo();
-            }
-        }
-    }
-    
-    private class DefaultDoable implements Doable {
+    private class Doable {
+        private int compoundId;
         private SelectionSetter beforeCaret;
         private int position;
         private CharSequence removeChars;
         private CharSequence insertChars;
         private SelectionSetter afterCaret;
         
-        public DefaultDoable(SelectionSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, SelectionSetter afterCaret) {
+        public Doable(int compoundId, SelectionSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, SelectionSetter afterCaret) {
+            this.compoundId = compoundId;
             this.beforeCaret = beforeCaret;
             this.position = position;
             this.removeChars = removeChars;
             this.insertChars = insertChars;
             this.afterCaret = afterCaret;
+        }
+        
+        public int getCompoundId() {
+            return compoundId;
+        }
+        
+        public String toString() {
+            return "Doable[compoundId=" + compoundId + ",position=" + position + ",removeChars=\"" + removeChars + "\",insertChars=\"" + insertChars + "\"]";
         }
         
         public void undo() {
