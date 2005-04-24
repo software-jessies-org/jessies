@@ -378,9 +378,54 @@ public class PTextBuffer implements CharSequence {
             while (undoList.size() > undoPosition) {
                 undoList.remove(undoPosition);
             }
-            undoList.add(new Doable(beforeCaret, position, removeChars, insertChars, afterCaret));
+            
+            Doable newEdit = new DefaultDoable(beforeCaret, position, removeChars, insertChars, afterCaret);
+            appendNewEdit(newEdit);
+            
             redo();
             fireChangeListeners();
+        }
+        
+        private void appendNewEdit(Doable newEdit) {
+            CompoundDoable compound = getCompoundDoable();
+            if (compound != null) {
+                // Compound this edit.
+                compound.addEdit(newEdit);
+            } else {
+                // We couldn't compound, so add the new edit in its own right.
+                undoList.add(newEdit);
+            }
+        }
+        
+        /**
+         * Returns the current CompoundDoable, if there is one. Otherwise
+         * returns null.
+         */
+        private CompoundDoable getCompoundDoable() {
+            if (undoList.size() == 0) {
+                return null;
+            }
+            Object lastEdit = undoList.get(undoList.size() - 1);
+            if (lastEdit instanceof CompoundDoable == false) {
+                return null;
+            }
+            CompoundDoable compound = (CompoundDoable) lastEdit;
+            if (compound.isActive() == false) {
+                return null;
+            }
+            return compound;
+        }
+        
+        public void startCompoundEdit() {
+            undoList.add(new CompoundDoable());
+        }
+        
+        public void finishCompoundEdit() {
+            CompoundDoable compound = getCompoundDoable();
+            if (compound == null) {
+                throw new IllegalStateException("can't finish a compound edit when there isn't one active");
+            }
+            compound.finishCompoundEdit();
         }
         
         public boolean canUndo() {
@@ -424,14 +469,49 @@ public class PTextBuffer implements CharSequence {
         public void modifySelection();
     }
     
-    private class Doable {
+    private interface Doable {
+        public void undo();
+        public void redo();
+    }
+    
+    private class CompoundDoable implements Doable {
+        private ArrayList edits = new ArrayList();
+        private boolean active = true;
+        
+        public void addEdit(Doable edit) {
+            edits.add(edit);
+        }
+        
+        public boolean isActive() {
+            return active;
+        }
+        
+        public void finishCompoundEdit() {
+            edits.trimToSize();
+            active = false;
+        }
+        
+        public void undo() {
+            for (int i = 0; i < edits.size(); ++i) {
+                ((Doable) edits.get(i)).undo();
+            }
+        }
+        
+        public void redo() {
+            for (int i = 0; i < edits.size(); ++i) {
+                ((Doable) edits.get(i)).redo();
+            }
+        }
+    }
+    
+    private class DefaultDoable implements Doable {
         private SelectionSetter beforeCaret;
         private int position;
         private CharSequence removeChars;
         private CharSequence insertChars;
         private SelectionSetter afterCaret;
         
-        public Doable(SelectionSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, SelectionSetter afterCaret) {
+        public DefaultDoable(SelectionSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, SelectionSetter afterCaret) {
             this.beforeCaret = beforeCaret;
             this.position = position;
             this.removeChars = removeChars;
