@@ -14,7 +14,6 @@ public class PNewlineInserter {
     public void insertNewline() {
         textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
         try {
-            
             // FIXME - selection
             final int position = textArea.getSelectionStart();
             

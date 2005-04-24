@@ -426,7 +426,7 @@ public class PTextBuffer implements CharSequence {
         }
         
         private boolean compoundContinuesAt(int id, int index) {
-            if (index < 0) {
+            if (index < 0 || index >= undoList.size()) {
                 return false;
             }
             Doable doable = (Doable) undoList.get(index);
@@ -450,10 +450,15 @@ public class PTextBuffer implements CharSequence {
         
         public void redo() {
             if (canRedo()) {
-                Doable doable = (Doable) undoList.get(undoPosition);
-                //System.out.println("redo: " + doable);
-                undoPosition++;
-                doable.redo();
+                Doable doable;
+                int id;
+                do {
+                    doable = (Doable) undoList.get(undoPosition);
+                    id = doable.getCompoundId();
+                    ++undoPosition;
+                    //System.out.println("redo: " + doable);
+                    doable.redo();
+                } while (id != NOT_COMPOUND && compoundContinuesAt(id, undoPosition));
                 fireChangeListeners();
             }
         }
