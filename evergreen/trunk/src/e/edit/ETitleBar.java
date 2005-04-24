@@ -45,7 +45,7 @@ public class ETitleBar extends JComponent {
     private boolean isActive;
     
     public ETitleBar(String name, EWindow window) {
-        setFont(getDefaultFont());
+        setFont(UIManager.getFont("TableHeader.font"));
         setOpaque(true);
         setTitle(name);
         this.window = window;
@@ -91,11 +91,6 @@ public class ETitleBar extends JComponent {
                 repaint();
             }
         }
-    }
-    
-    public Font getDefaultFont() {
-        return new Font(Parameters.getParameter("font.name"), Font.PLAIN,
-        Parameters.getParameter("font.size", 12));
     }
     
     public void setTitle(String title) {
@@ -208,7 +203,7 @@ public class ETitleBar extends JComponent {
     
     public void paintText(Graphics2D g) {
         g.setColor(UIManager.getColor(isActive ? "InternalFrame.activeTitleForeground" : "InternalFrame.inactiveTitleForeground"));
-        g.setFont(UIManager.getFont("InternalFrame.titleFont"));
+        g.setFont(getFont());
         
         if (UIManager.getLookAndFeel().getName().indexOf("GTK") != -1) {
             g.setColor(Color.BLACK);
