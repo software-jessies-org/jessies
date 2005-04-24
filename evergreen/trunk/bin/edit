@@ -33,7 +33,7 @@ def openFileOnEditServer(edit_preferences_directory, filename)
     require 'net/telnet'
     telnet = Net::Telnet.new('Host' => host, 'Port' => port.to_i(), 'Telnetmode' => false)
     telnet.puts("open #{filename}\r")
-    print(telnet.readlines().join("\n"))
+    print(telnet.readlines().join(""))
     telnet.close()
     return true
   rescue
