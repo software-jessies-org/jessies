@@ -60,15 +60,8 @@ public class PKeyHandler extends KeyAdapter {
             return false;
         }
         
-        switch (e.getKeyChar()) {
-        case KeyEvent.CHAR_UNDEFINED:
-        case '\010':  // backspace
-        case '\177':  // delete
-            return false;
-            
-        default:
-            return true;
-        }
+        char ch = e.getKeyChar();
+        return (ch != KeyEvent.CHAR_UNDEFINED && (ch == '\n' || ch == '\t' || ch >= ' ') && ch != Ascii.DEL);
     }
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
