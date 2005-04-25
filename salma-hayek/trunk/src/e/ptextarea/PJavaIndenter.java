@@ -5,19 +5,33 @@ public class PJavaIndenter extends PIndenter {
         super(textArea);
     }
     
+    public String stripComments(String line) {
+        // We should strip C comments but this is rarely important.
+        // C comments usually include the whole line,
+        // we're only stripping comments to find the "active" part of the line
+        // and a line which is entirely comment has no active part.
+        return line.replaceFirst("//.*", "");        
+    }
+    
     /**
      * Returns that part of the given line number that isn't leading/trailing whitespace or comment.
      */
     public String getActivePartOfLine(int lineNumber) {
-        String trimmedLine = textArea.getLineText(lineNumber).trim();
-        return trimmedLine.replaceFirst("//.*", "");
+        String line = textArea.getLineText(lineNumber);
+        return stripComments(line).trim();
     }
     
     public boolean isElectric(char c) {
         if (c == '#' && shouldMoveHashToColumnZero()) {
             return true;
         }
-        return (c == '}' || c == ':');
+        if (c == ':' && shouldMoveLabels()) {
+            return true;
+        }
+        if (c == '}') {
+            return true;
+        }
+        return false;
     }
     
     public boolean isBlockBegin(String activePartOfLine) {
@@ -26,8 +40,14 @@ public class PJavaIndenter extends PIndenter {
     public boolean isBlockEnd(String activePartOfLine) {
         return activePartOfLine.startsWith("}");
     }
+    public boolean isCppAccessSpecifier(String activePartOfLine) {
+        return activePartOfLine.matches("(private|public|protected)\\s*:");
+    }
+    public boolean isSwitchLabel(String activePartOfLine) {
+        return activePartOfLine.matches("(case\\b.*|default\\s*):");
+    }
     public boolean isLabel(String activePartOfLine) {
-        return activePartOfLine.matches("(private|public|protected|case|default)\\b.*:");
+        return isCppAccessSpecifier(activePartOfLine) || isSwitchLabel(activePartOfLine);
     }
     
     /**
@@ -73,7 +93,7 @@ public class PJavaIndenter extends PIndenter {
         }
         
         // Recognize doc comments, and help out with the ASCII art.
-        if (lineNumber > 0) {
+        if (lineNumber > 0 && shouldContinueDocComments()) {
             String previousLine = textArea.getLineText(lineNumber - 1).trim();
             if (previousLine.endsWith("*/")) {
                 // Whatever the previous line looks like, if it ends with
@@ -95,6 +115,12 @@ public class PJavaIndenter extends PIndenter {
     }
     
     protected boolean shouldMoveHashToColumnZero() {
+        return true;
+    }
+    protected boolean shouldMoveLabels() {
+        return true;
+    }
+    protected boolean shouldContinueDocComments() {
         return true;
     }
 }
