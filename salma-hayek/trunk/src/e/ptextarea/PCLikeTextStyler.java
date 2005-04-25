@@ -326,14 +326,4 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
             return list;
         }
     }
-    
-    private class BracketMatchingDragHandler implements PDragHandler {
-        public void makeInitialSelection(int pressedOffset) {
-            
-        }
-        
-        public void mouseDragged(int newOffset) {
-            
-        }
-    }
 }
