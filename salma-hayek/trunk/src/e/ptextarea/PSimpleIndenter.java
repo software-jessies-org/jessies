@@ -5,7 +5,7 @@ public abstract class PSimpleIndenter extends PIndenter {
         super(textArea);
     }
     
-    public String stripCppComments(String line) {
+    protected static String stripCppComments(String line) {
         // We should strip C comments but this is rarely important.
         // C comments usually include the whole line,
         // we're only stripping comments to find the "active" part of the line
