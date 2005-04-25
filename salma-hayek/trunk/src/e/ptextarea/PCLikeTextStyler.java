@@ -95,7 +95,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         }
     }
     
-    public PTextSegment[] getLineSegments(int lineIndex) {
+    public PTextSegment[] getTextSegments(int lineIndex) {
         String line = textArea.getLineContents(lineIndex).toString();
         List result = getMainSegments(lineIndex, line);
         if (keywords.size() > 0) {

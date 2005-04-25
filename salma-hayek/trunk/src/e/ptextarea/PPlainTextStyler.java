@@ -12,7 +12,7 @@ public class PPlainTextStyler extends PAbstractTextStyler {
         super(textArea);
     }
 
-    public PTextSegment[] getLineSegments(int line) {
+    public PTextSegment[] getTextSegments(int line) {
         int start = textArea.getLineStartOffset(line);
         int end = textArea.getLineEndOffsetBeforeTerminator(line);
         return new PTextSegment[] {

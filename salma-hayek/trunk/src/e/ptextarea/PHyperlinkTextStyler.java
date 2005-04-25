@@ -20,7 +20,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         this.highlightPattern = Pattern.compile(highlightPattern);
     }
     
-    public PTextSegment[] getLineSegments(int lineIndex) {
+    public PTextSegment[] getTextSegments(int lineIndex) {
         ArrayList result = new ArrayList();
         String line = textArea.getLineContents(lineIndex).toString();
         int lineStart = textArea.getLineStartOffset(lineIndex);

@@ -17,7 +17,7 @@ public abstract class PAbstractTextStyler implements PTextStyler {
         this.textArea = textArea;
     }
     
-    public abstract PTextSegment[] getLineSegments(int line);
+    public abstract PTextSegment[] getTextSegments(int line);
     
     /**
      * Optionally handles the given mouse click event.  This is called when a single click occurs on

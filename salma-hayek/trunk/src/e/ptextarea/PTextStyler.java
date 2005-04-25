@@ -16,7 +16,7 @@ public interface PTextStyler {
      * Returns a series of segments of text describing how to render each part of the
      * specified logical line.
      */
-    public PTextSegment[] getLineSegments(int lineIndex);
+    public PTextSegment[] getTextSegments(int lineIndex);
     
     /**
      * Optionally handles the given mouse click event.  This is called when a single click occurs on

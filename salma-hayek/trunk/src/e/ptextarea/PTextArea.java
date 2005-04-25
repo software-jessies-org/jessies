@@ -590,7 +590,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public PLineSegment[] getLineSegments(int lineIndex) {
-        return getTabbedSegments(textStyler.getLineSegments(lineIndex));
+        return getTabbedSegments(textStyler.getTextSegments(lineIndex));
     }
     
     private PLineSegment[] getTabbedSegments(PLineSegment[] segments) {
