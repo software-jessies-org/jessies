@@ -5,12 +5,12 @@ public class PJavaIndenter extends PIndenter {
         super(textArea);
     }
     
-    public String stripComments(String line) {
+    public String stripCppComments(String line) {
         // We should strip C comments but this is rarely important.
         // C comments usually include the whole line,
         // we're only stripping comments to find the "active" part of the line
         // and a line which is entirely comment has no active part.
-        return line.replaceFirst("//.*", "");        
+        return line.replaceFirst("//.*", "");
     }
     
     /**
@@ -40,14 +40,8 @@ public class PJavaIndenter extends PIndenter {
     public boolean isBlockEnd(String activePartOfLine) {
         return activePartOfLine.startsWith("}");
     }
-    public boolean isCppAccessSpecifier(String activePartOfLine) {
-        return activePartOfLine.matches("(private|public|protected)\\s*:");
-    }
     public boolean isSwitchLabel(String activePartOfLine) {
         return activePartOfLine.matches("(case\\b.*|default\\s*):");
-    }
-    public boolean isLabel(String activePartOfLine) {
-        return isCppAccessSpecifier(activePartOfLine) || isSwitchLabel(activePartOfLine);
     }
     
     /**
@@ -113,9 +107,17 @@ public class PJavaIndenter extends PIndenter {
         
         return indentation;
     }
+
+    protected String stripComments(String line) {
+        return stripCppComments(line);
+    }
+
+    protected boolean isLabel(String activePartOfLine) {
+        return isSwitchLabel(activePartOfLine);
+    }
     
     protected boolean shouldMoveHashToColumnZero() {
-        return true;
+        return false;
     }
     protected boolean shouldMoveLabels() {
         return true;
