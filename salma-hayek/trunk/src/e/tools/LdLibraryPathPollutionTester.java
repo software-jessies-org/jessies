@@ -5,7 +5,7 @@ public class LdLibraryPathPollutionTester {
   public static void main(String[] arguments) {
     try {
       final Process process = Runtime.getRuntime().exec("env");
-      LineNumberReader input = new LineNumberReader(new InputStreamReader(process.getInputStream()));
+      BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
       Pattern pattern = Pattern.compile("^LD_LIBRARY_PATH=(.*)$");
       String line;
       while ((line = input.readLine()) != null) {
