@@ -1,6 +1,6 @@
 package e.ptextarea;
 
-public class PSimpleIndenter extends PIndenter {
+public abstract class PSimpleIndenter extends PIndenter {
     public PSimpleIndenter(PTextArea textArea) {
         super(textArea);
     }
@@ -108,21 +108,9 @@ public class PSimpleIndenter extends PIndenter {
         return indentation;
     }
 
-    protected String stripComments(String line) {
-        return line;
-    }
-
-    protected boolean isLabel(String activePartOfLine) {
-        return false;
-    }
-    
-    protected boolean shouldMoveHashToColumnZero() {
-        return false;
-    }
-    protected boolean shouldMoveLabels() {
-        return false;
-    }
-    protected boolean shouldContinueDocComments() {
-        return false;
-    }
+    protected abstract String stripComments(String line);
+    protected abstract boolean isLabel(String activePartOfLine);
+    protected abstract boolean shouldMoveHashToColumnZero();
+    protected abstract boolean shouldMoveLabels();
+    protected abstract boolean shouldContinueDocComments();
 }
