@@ -31,7 +31,7 @@ public class PIndenter {
      * type it. Typically, this signifies the end of a block.
      */
     public boolean isElectric(char c) {
-        return (c == '}');
+        return false;
     }
     
     /**
