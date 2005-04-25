@@ -5,12 +5,22 @@ public abstract class PSimpleIndenter extends PIndenter {
         super(textArea);
     }
     
-    protected static String stripCppComments(String line) {
-        // We should strip C comments but this is rarely important.
-        // C comments usually include the whole line,
+    protected static String stripDoubleSlashComment(String line) {
+        return line.replaceFirst("//.*", "");
+    }
+    // Note the plural.  There /*can*/ /*be*/ several of these on one line.
+    protected static String stripMultiLineComments(String line) {
+        // We should strip these but this is rarely important.
+        // Multi-line comments usually include the whole line,
         // we're only stripping comments to find the "active" part of the line
         // and a line which is entirely comment has no active part.
-        return line.replaceFirst("//.*", "");
+        // This is fortunate because we don't have enough context
+        // to know that we're in the middle of a multi-line comment.
+        // Another case where we could ideally do with some Styler input?
+        return line;
+    }
+    protected static String stripHashComment(String line) {
+        return line.replaceFirst("#.*", "");
     }
     
     /**

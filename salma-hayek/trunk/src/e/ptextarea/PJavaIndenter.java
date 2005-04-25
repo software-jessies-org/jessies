@@ -6,7 +6,7 @@ public class PJavaIndenter extends PSimpleIndenter {
     }
     
     protected String stripComments(String line) {
-        return stripCppComments(line);
+        return stripMultiLineComments(stripDoubleSlashComment(line));
     }
 
     protected boolean isLabel(String activePartOfLine) {

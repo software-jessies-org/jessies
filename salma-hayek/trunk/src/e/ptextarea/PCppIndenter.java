@@ -9,12 +9,12 @@ public class PCppIndenter extends PSimpleIndenter {
         return line.matches(".*\\b(class|enum|struct|union)\\b.*");
     }
 
-    public static boolean isCppAccessSpecifier(String activePartOfLine) {
+    private static boolean isCppAccessSpecifier(String activePartOfLine) {
         return activePartOfLine.matches("(private|public|protected)\\s*:");
     }
     
     protected String stripComments(String line) {
-        return stripCppComments(line);
+        return stripMultiLineComments(stripDoubleSlashComment(line));
     }
     
     protected boolean isLabel(String activePartOfLine) {

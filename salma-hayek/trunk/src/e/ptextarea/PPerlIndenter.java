@@ -6,7 +6,7 @@ public class PPerlIndenter extends PSimpleIndenter {
     }
     
     protected String stripComments(String line) {
-        return line.replaceFirst("#.*", "");
+        return stripHashComment(line);
     }
 
     protected boolean isLabel(String activePartOfLine) {
