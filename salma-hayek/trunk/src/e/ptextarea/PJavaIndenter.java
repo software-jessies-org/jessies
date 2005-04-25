@@ -49,8 +49,12 @@ public class PJavaIndenter extends PIndenter {
     }
     
     public String getIndentation(int lineNumber) {
-        String indentation = "";
+        String activePartOfLine = getActivePartOfLine(lineNumber);
+        if (shouldMoveHashToColumnZero() && activePartOfLine.startsWith("#")) {
+            return "";
+        }
 
+        String indentation = "";
         int previousDefinitive = getPreviousDefinitiveLineNumber(lineNumber);
         if (previousDefinitive != -1) {
             indentation = getCurrentIndentationOfLine(previousDefinitive);
@@ -61,12 +65,8 @@ public class PJavaIndenter extends PIndenter {
             }
         }
         
-        String activePartOfLine = getActivePartOfLine(lineNumber);
         if (isBlockEnd(activePartOfLine) || isLabel(activePartOfLine)) {
             indentation = decreaseIndentation(indentation);
-        }
-        if (shouldMoveHashToColumnZero() && activePartOfLine.startsWith("#")) {
-            indentation = "";
         }
         
         // Recognize doc comments, and help out with the ASCII art.
