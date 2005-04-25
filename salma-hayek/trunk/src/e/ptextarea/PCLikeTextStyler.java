@@ -2,7 +2,6 @@ package e.ptextarea;
 
 import java.util.*;
 import java.util.regex.*;
-import java.util.List;
 import e.util.*;
 
 /**
@@ -17,7 +16,7 @@ import e.util.*;
 public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PTextListener {
     private HashSet keywords = new HashSet();
     private int lastGoodLine;
-    private boolean[] commentCache;
+    private BitSet commentCache;
     private Pattern keywordPattern = Pattern.compile("\\b\\w+\\b");
     
     public PCLikeTextStyler(PTextArea textArea) {
@@ -49,15 +48,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     
     private void initCommentCache() {
         lastGoodLine = 0;
-        commentCache = new boolean[100];
-    }
-    
-    private void ensureCommentCacheLength(int index) {
-        if (index >= commentCache.length) {
-            boolean[] newCache = new boolean[index + 100];
-            System.arraycopy(commentCache, 0, newCache, 0, commentCache.length);
-            commentCache = newCache;
-        }
+        commentCache = new BitSet();
     }
     
     public PTextSegment[] getTextSegments(int lineIndex) {
@@ -197,15 +188,14 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     
     private boolean startsCommented(int lineIndex) {
         if (lastGoodLine < lineIndex) {
-            ensureCommentCacheLength(lineIndex);
             PLineList lineList = textArea.getLineList();
             for (int i = lastGoodLine; i < lineIndex; i++) {
                 String line = lineList.getLine(i).getContents().toString();
-                commentCache[i + 1] = lineEndsCommented(line, commentCache[i]);
+                commentCache.set(i + 1, lineEndsCommented(line, commentCache.get(i)));
             }
             lastGoodLine = lineIndex;
         }
-        return commentCache[lineIndex];
+        return commentCache.get(lineIndex);
     }
     
     /**

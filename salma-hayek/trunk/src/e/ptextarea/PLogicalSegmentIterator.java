@@ -47,10 +47,11 @@ public class PLogicalSegmentIterator implements PSegmentIterator {
                 result = new PNewlineSegment(textArea, charOffset, charOffset + 1, PNewlineSegment.HARD_NEWLINE);
                 segmentInLine++;
             } else {
-                throw new IndexOutOfBoundsException("Went off the end of the text buffer.");
+                throw new IndexOutOfBoundsException("Went off the end of the text buffer processing segment " +
+                        segmentInLine + " of " + lineSegments.length + " in line " + lineIndex + "; char offset is " + charOffset);
             }
         }
-        
+       
         charOffset = result.getEnd();
         return result;
     }
