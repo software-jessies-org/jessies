@@ -6,11 +6,16 @@ def outputChanges(changes)
   body = ""
   changes.each {
     |line|
+    
+    # Output a horizontal rule before each file's patch. Before works well in
+    # conjunction with post-commit, which needs a separator after the check-in
+    # comment.
+    if line =~ /^--- /
+      body << "<hr noshade/>"
+    end
+    
     color = "black"
     if line =~ /^Modified: /
-      next
-    elsif line =~ /^=====/
-      body << "<hr noshade/>"
       next
     elsif line =~ /^@@ /
       color = "gray"
