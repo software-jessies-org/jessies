@@ -47,41 +47,6 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         builder.addStyledSegment(end, PStyle.STRING);
     }
     
-    /**
-     * Optionally returns a special double-click handler for use when a double-click occurs at
-     * the given position.  A null return value means the default handling should be performed.
-     */
-    public PDragHandler getDoubleClickDragHandler(int clickOffset) {
-//        int lineIndex = textArea.getLineOfOffset(clickOffset);
-//        int lineStart = textArea.getLineStartOffset(lineIndex);
-//        String line = textArea.getTextBuffer().subSequence(lineStart, textArea.getLineEndOffset(lineIndex)).toString();
-//        int lineOffset = clickOffset - lineStart;
-//        PDragHandler result = getDragHandlerForString(lineIndex, line, lineOffset);
-//        if (result != null) {
-//            
-//        }
-        return null;
-    }
-    
-//    private PDragHandler getDragHandlerForString(int lineIndex, String line, int lineOffset) {
-//        int offset = 0;
-//        List segments = getLineSegments(lineIndex, line);
-//        for (int i = 0; i < segments.size(); i++) {
-//            PLineSegment segment = (PLineSegment) segments.get(i);
-//            if (lineOffset >= offset && lineOffset < offset + segment.length()) {
-//                if (segment.getStyleIndex() == TYPE_STRING) {
-//                    // Are we just inside either of the enclosing quotes?
-//                    if (Math.min(offset - lineOffset, offset + segment.length() - lineOffset) == 1) {
-//                        return new BracketMatchingDragHandler(offset + 1, offset + segment.length() - 1);
-//                    } else {
-//                        return null;
-//                    }
-//                }
-//            }
-//            offset += segment.length();
-//        }
-//    }
-    
     private void initCommentCache() {
         lastGoodLine = 0;
         commentCache = new boolean[100];

@@ -34,12 +34,4 @@ public abstract class PAbstractTextStyler implements PTextStyler {
     public Cursor getCursorForLocation(Point point) {
         return null;
     }
-    
-    /**
-     * Optionally returns a special double-click handler for use when a double-click occurs at
-     * the given position.  A null return value means the default handling should be performed.
-     */
-    public PDragHandler getDoubleClickDragHandler(int clickOffset) {
-        return null;
-    }
 }

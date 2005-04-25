@@ -29,10 +29,4 @@ public interface PTextStyler {
      * return means that the default cursor should be used.
      */
     public Cursor getCursorForLocation(Point point);
-    
-    /**
-     * Optionally returns a special double-click handler for use when a double-click occurs at
-     * the given position.  A null return value means the default handling should be performed.
-     */
-    public PDragHandler getDoubleClickDragHandler(int clickOffset);
 }

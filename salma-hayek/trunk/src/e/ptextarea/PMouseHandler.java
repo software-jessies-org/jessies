@@ -35,8 +35,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         if (e.getClickCount() == 1) {
             return new SingleClickDragHandler();
         } else if (e.getClickCount() == 2) {
-            PDragHandler result = textArea.getTextStyler().getDoubleClickDragHandler(getOffsetAtMouse(e));
-            return (result == null) ? new DoubleClickDragHandler() : result;
+            return new DoubleClickDragHandler();
         } else {
             return new TripleClickDragHandler();
         }

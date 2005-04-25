@@ -10,8 +10,6 @@ Items to be done for PTextArea:
 
 * Compounding adjacent edits? Is there a behavior that we'd actually want? I usually find this more annoying than useful, even if it does save space.
 
-* Create a language-specific API to work out double-click selections, and use this in the mouse handler.
-
 * Refactor the way split lines are updated to work in terms of PLineSegments.
 
 * Continue refactoring of line segment stuff in PTextArea.
