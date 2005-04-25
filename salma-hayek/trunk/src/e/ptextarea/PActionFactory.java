@@ -30,9 +30,15 @@ public class PActionFactory {
     }
     
     public abstract static class PTextAction extends AbstractAction {
+        /**
+         * The parameter keyStroke can be null if you don't want to bind this
+         * action to a key.
+         */
         public PTextAction(String name, KeyStroke keyStroke) {
             super(name);
-            putValue(ACCELERATOR_KEY, keyStroke);
+            if (keyStroke != null) {
+                putValue(ACCELERATOR_KEY, keyStroke);
+            }
         }
         
         public void actionPerformed(ActionEvent e) {
