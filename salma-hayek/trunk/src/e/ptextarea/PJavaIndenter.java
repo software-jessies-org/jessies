@@ -14,7 +14,10 @@ public class PJavaIndenter extends PIndenter {
     }
     
     public boolean isElectric(char c) {
-        return (c == '}' || c == ':' || c == '#');
+        if (c == '#' && shouldMoveHashToColumnZero()) {
+            return true;
+        }
+        return (c == '}' || c == ':');
     }
     
     public boolean isBlockBegin(String activePartOfLine) {
