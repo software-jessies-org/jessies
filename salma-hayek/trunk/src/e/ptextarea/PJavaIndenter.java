@@ -1,25 +1,25 @@
 package e.ptextarea;
 
-public class PPerlIndenter extends PSimpleIndenter {
-    public PPerlIndenter(PTextArea textArea) {
+public class PJavaIndenter extends PSimpleIndenter {
+    public PJavaIndenter(PTextArea textArea) {
         super(textArea);
     }
     
     protected String stripComments(String line) {
-        return line.replaceFirst("#.*", "");
+        return stripCppComments(line);
     }
 
     protected boolean isLabel(String activePartOfLine) {
-        return false;
+        return isSwitchLabel(activePartOfLine);
     }
-
+    
     protected boolean shouldMoveHashToColumnZero() {
         return false;
     }
     protected boolean shouldMoveLabels() {
-        return false;
+        return true;
     }
     protected boolean shouldContinueDocComments() {
-        return false;
+        return true;
     }
 }

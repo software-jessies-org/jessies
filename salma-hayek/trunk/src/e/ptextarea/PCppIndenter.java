@@ -1,6 +1,6 @@
 package e.ptextarea;
 
-public class PCppIndenter extends PJavaIndenter {
+public class PCppIndenter extends PSimpleIndenter {
     public PCppIndenter(PTextArea textArea) {
         super(textArea);
     }

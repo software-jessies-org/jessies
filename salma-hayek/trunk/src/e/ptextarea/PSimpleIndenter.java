@@ -1,7 +1,7 @@
 package e.ptextarea;
 
-public class PJavaIndenter extends PIndenter {
-    public PJavaIndenter(PTextArea textArea) {
+public class PSimpleIndenter extends PIndenter {
+    public PSimpleIndenter(PTextArea textArea) {
         super(textArea);
     }
     
@@ -109,20 +109,20 @@ public class PJavaIndenter extends PIndenter {
     }
 
     protected String stripComments(String line) {
-        return stripCppComments(line);
+        return line;
     }
 
     protected boolean isLabel(String activePartOfLine) {
-        return isSwitchLabel(activePartOfLine);
+        return false;
     }
     
     protected boolean shouldMoveHashToColumnZero() {
         return false;
     }
     protected boolean shouldMoveLabels() {
-        return true;
+        return false;
     }
     protected boolean shouldContinueDocComments() {
-        return true;
+        return false;
     }
 }
