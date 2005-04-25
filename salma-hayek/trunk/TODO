@@ -8,9 +8,7 @@ Items to be done for PTextArea:
 
 * Cope with insets. We're rendering text too close to the edge.
 
-* Compound edit support.
-
-* Compounding adjacent edits?
+* Compounding adjacent edits? Is there a behavior that we'd actually want? I usually find this more annoying than useful, even if it does save space.
 
 * Create a language-specific API to work out double-click selections, and use this in the mouse handler.
 
