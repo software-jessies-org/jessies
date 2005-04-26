@@ -882,7 +882,19 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private synchronized void invalidateLineWrappings() {
         splitLines = null;
     }
-
+    
+    /**
+     * Calls generateLineWrappings so we're ready to use as soon as we're
+     * added to a parent, rather than having to wait until we're first
+     * painted. This means that we can be created on the Event Dispatch Thread
+     * and manipulated immediately (centerOffsetInDisplay being a common use
+     * case).
+     */
+    public void addNotify() {
+        super.addNotify();
+        generateLineWrappings();
+    }
+    
     private synchronized void generateLineWrappings() {
         if (isLineWrappingInvalid() && isShowing()) {
             splitLines = new ArrayList();
