@@ -96,6 +96,12 @@ end
 if tic_binary != ""
   system("#{tic_binary} -o#{terminfo} #{terminfo_SRC}")
 elsif test(?f, terminfo_DST) == false
+  # If you see an error like this:
+  # cp: /usr/local/bin/../doc/terminfo/terminator: No such file or directory
+  # It's because we haven't been able to find the ${terminator_home} directory.
+  # This is probably because you're running an old version of Ruby without
+  # the symlink following class.
+  # See the "require" statements above.
   system("cp #{terminator_home}/doc/terminfo/terminator #{terminfo_DST}")
 end
 
