@@ -739,7 +739,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         GuiUtilities.initLookAndFeel();
         
         frame = new JFrame("Edit");
-        frame.setVisible(true);
+        //frame.setVisible(true);
         
         initPreferences();
         FormDialog.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
