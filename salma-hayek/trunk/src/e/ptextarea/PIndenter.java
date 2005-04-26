@@ -3,7 +3,7 @@ package e.ptextarea;
 import e.util.*;
 import java.util.regex.*;
 
-public class PIndenter {
+abstract public class PIndenter {
     private static final Pattern INDENTATION_PATTERN_1 = Pattern.compile("^(\\s+)[A-Za-z].*$");
     private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^(\\s*)[{}]$");
     
@@ -30,9 +30,7 @@ public class PIndenter {
      * for a character that causes the indentation to be modified when you
      * type it. Typically, this signifies the end of a block.
      */
-    public boolean isElectric(char c) {
-        return false;
-    }
+    public abstract boolean isElectric(char c);
     
     /**
      * Returns a copy of just the leading whitespace part of the given line.
