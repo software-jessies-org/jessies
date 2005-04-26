@@ -198,10 +198,6 @@ public class PLineList implements PTextListener {
         lastValidLineIndex = Math.min(lastValidLineIndex, lineIndex);
     }
     
-    private void setLastValidLineIndex(int lastValidLineIndex) {
-        this.lastValidLineIndex = lastValidLineIndex;
-    }
-    
     private void validateStartPositions(int toLineIndex) {
         if (toLineIndex > lastValidLineIndex) {
             for (int i = lastValidLineIndex; i < toLineIndex; i++) {
