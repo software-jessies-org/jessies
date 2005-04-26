@@ -91,11 +91,11 @@ public class ETextWindow extends EWindow implements PTextListener {
         scrollPane.setViewport(watermarkViewPort);
         
         initFocusListener();
-        tagsUpdater = new TagsUpdater(this);
         this.birdView = new BirdView(this, scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
         fillWithContent();
+        tagsUpdater = new TagsUpdater(this);
         initFindResultsUpdater();
     }
     

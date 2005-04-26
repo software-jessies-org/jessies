@@ -15,17 +15,15 @@ public class TagsUpdater {
     private JPanel uiPanel;
     private ETextWindow textWindow;
     private boolean followCaretChanges;
-    private TreeModelBuilder treeModelBuilder;
     
     public TagsUpdater(ETextWindow textWindow) {
         this.textWindow = textWindow;
-        this.treeModelBuilder = new TreeModelBuilder();
         createUI();
         installListeners();
     }
     
     private void installListeners() {
-        final ETextArea text = textWindow.getText();
+        final ETextArea text = getTextArea();
         // Rebuild tags when the document line count changes.
         text.getTextBuffer().addTextListener(new PTextListener() {
             private int lastLineCount;
@@ -43,6 +41,8 @@ public class TagsUpdater {
             }
             
             public void update() {
+                // FIXME: shouldn't this be testing whether e.getCharacters()
+                // contains a '\n' instead of counting lines?
                 int newLineCount = text.getLineCount();
                 if (lastLineCount == newLineCount) {
                     return;
@@ -55,6 +55,7 @@ public class TagsUpdater {
         text.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 followCaretChanges = true;
+                updateTags();
                 showTags();
                 selectTagAtCaret(text);
             }
@@ -91,7 +92,7 @@ public class TagsUpdater {
                 }
                 followCaretChanges = false;
                 TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
-                textWindow.goToLine(tag.lineNumber);
+                getTextWindow().goToLine(tag.lineNumber);
             }
         });
         tree.setCellRenderer(new TagsPanel.TagsTreeRenderer());
@@ -117,15 +118,19 @@ public class TagsUpdater {
         return textWindow;
     }
     
+    public ETextArea getTextArea() {
+        return getTextWindow().getText();
+    }
+    
     public void updateTags() {
-        new Thread(treeModelBuilder).start();
+        new Thread(new TreeModelBuilder()).start();
     }
     
     public void setTreeModel(TreeModel treeModel) {
         tree.setModel(treeModel);
         tree.expandAll();
         showTags();
-        selectTagAtCaret(textWindow.getText());
+        selectTagAtCaret(getTextArea());
     }
     
     public void showTags() {
@@ -186,6 +191,8 @@ public class TagsUpdater {
         private DefaultTreeModel treeModel;
         private HashMap branches;
         
+        private ArrayList tags;
+        
         public TreeModelBuilder() {
             progressTimer = new Timer(500, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -204,6 +211,7 @@ public class TagsUpdater {
             treeModel = new DefaultTreeModel(root);
             branches = new HashMap();
             branches.put("", root);
+            tags = new ArrayList();
             startTime = System.currentTimeMillis();
             progressTimer.start();
             scanTags();
@@ -221,23 +229,7 @@ public class TagsUpdater {
         }
         
         public void tagFound(TagReader.Tag tag) {
-            tag.toolTip = textWindow.getText().getLineText(tag.lineNumber - 1);
-            
-            DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
-            
-            if (tag.isContainerType()) {
-                leaf = new BranchNode(tag);
-                branches.put(tag.getClassQualifiedName(), leaf);
-            }
-            
-            DefaultMutableTreeNode branch = (DefaultMutableTreeNode) branches.get(tag.containingClass);
-            if (branch == null) {
-                branch = new BranchNode(tag.containingClass);
-                branches.put(tag.containingClass, branch);
-                root.add(branch);
-            }
-            
-            branch.add(leaf);
+            tags.add(tag);
         }
         
         public void taggingFailed(Exception ex) {
@@ -258,7 +250,7 @@ public class TagsUpdater {
                     temporaryFile = File.createTempFile("edit-", getFilenameSuffix());
                     temporaryFile.deleteOnExit();
                 }
-                getTextWindow().getText().getTextBuffer().writeToFile(temporaryFile);
+                getTextArea().getTextBuffer().writeToFile(temporaryFile);
                 TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), this);
                 String newDigest = tagReader.getTagsDigest();
                 tagsHaveNotChanged = newDigest.equals(digest);
@@ -282,6 +274,27 @@ public class TagsUpdater {
             }
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    for (int i = 0; i < tags.size(); ++i) {
+                        TagReader.Tag tag = (TagReader.Tag) tags.get(i);
+                        tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1);
+                        
+                        DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
+                        
+                        if (tag.isContainerType()) {
+                            leaf = new BranchNode(tag);
+                            branches.put(tag.getClassQualifiedName(), leaf);
+                        }
+                        
+                        DefaultMutableTreeNode branch = (DefaultMutableTreeNode) branches.get(tag.containingClass);
+                        if (branch == null) {
+                            branch = new BranchNode(tag.containingClass);
+                            branches.put(tag.containingClass, branch);
+                            root.add(branch);
+                        }
+                        
+                        branch.add(leaf);
+                    }
+                    
                     setTreeModel(treeModel);
                     isRunning = false;
                 }
