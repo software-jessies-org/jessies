@@ -90,7 +90,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         requestFocus();
         initFocusListening();
         initKeyBindings();
-        initSpellingChecking();
         addCaretListener(new PMatchingBracketHighlighter(this));
     }
     
@@ -332,8 +331,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      */
     private void initFocusListening() {
         addFocusListener(new FocusListener() {
+            private boolean firstFocusGain = true;
+
             public void focusGained(FocusEvent e) {
                 repaint();
+                if (firstFocusGain) {
+                    initSpellingChecking();
+                    firstFocusGain = false;
+                }
             }
             
             public void focusLost(FocusEvent e) {
