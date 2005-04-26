@@ -35,10 +35,14 @@ public class Advisor extends JPanel {
         add(textField, BorderLayout.SOUTH);
         */
         setDelay(500);
-        addResearcher(JavaResearcher.getSharedInstance());
-        addResearcher(new ManPageResearcher());
-        addResearcher(new NumberResearcher());
-        addResearcher(new RubyDocumentationResearcher());
+        new Thread(new Runnable() {
+            public void run() {
+                addResearcher(JavaResearcher.getSharedInstance());
+                addResearcher(new ManPageResearcher());
+                addResearcher(new NumberResearcher());
+                addResearcher(new RubyDocumentationResearcher());
+            }
+        }).start();
     }
     
     /** Sets the time to wait before a lookup gets done, in milliseconds. */
