@@ -736,10 +736,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         application.addApplicationListener(this);
 
         Log.setApplicationName("Edit");
+        GuiUtilities.initLookAndFeel();
+        
         frame = new JFrame("Edit");
+        frame.setVisible(true);
         
         initPreferences();
-        GuiUtilities.initLookAndFeel();
         FormDialog.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
         
         /* FIXME: is there a better way round this two-stage menubar construction? */
@@ -799,10 +801,14 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
     }
     
-    public static void main(String[] args) {
-        instance = new Edit();
-        for (int i = 0; i < args.length; ++i) {
-            openFile(args[i]);
-        }
+    public static void main(final String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                instance = new Edit();
+                for (int i = 0; i < args.length; ++i) {
+                    openFile(args[i]);
+                }
+            }
+        });
     }
 }
