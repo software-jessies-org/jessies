@@ -56,11 +56,6 @@ else
     extra_classpath_entries = "#{salma_hayek}/MRJ141Stubs.jar"
 end
 
-filename = ARGV[0]
-if filename != nil && openFileOnEditServer(edit_preferences_directory, File.expand_path(filename))
-  exit(0)
-end
-
 if File.stat(edit_preferences_directory).directory? == false
     puts("Edit: Couldn't find preferences directory '#{edit_preferences_directory}.")
     puts("Edit: Creating preferences directory '#{edit_preferences_directory}'.")
@@ -72,6 +67,11 @@ if File.stat(edit_preferences_directory).directory? == false
     else
       puts("Edit: need Ruby 1.8")
     end
+end
+
+filename = ARGV[0]
+if filename != nil && openFileOnEditServer(edit_preferences_directory, File.expand_path(filename))
+  exit(0)
 end
 
 # Create a log file, and link to it as the newest.
