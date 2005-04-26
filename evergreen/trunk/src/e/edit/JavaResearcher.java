@@ -18,16 +18,19 @@ public class JavaResearcher implements WorkspaceResearcher {
     private static TreeSet uniqueIdentifiers;
     private static TreeSet uniqueWords;
     
-    private static final JavaResearcher INSTANCE = new JavaResearcher();
+    private static JavaResearcher INSTANCE = new JavaResearcher();
     
     private JavaResearcher() {
     }
     
-    public static JavaResearcher getSharedInstance() {
+    public synchronized static JavaResearcher getSharedInstance() {
+        if (javaDocSummary == null) {
+            readJavaDocSummary();
+        }
         return INSTANCE;
     }
     
-    private static void readJavaDocSummary() {
+    private synchronized static void readJavaDocSummary() {
         long start = System.currentTimeMillis();
         Log.warn("Reading JavaDoc summary...");
         
@@ -63,7 +66,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     /**
      * Extracts all the unique words from the identifiers in the JDK.
      */
-    private static void initUniqueWords() {
+    private synchronized static void initUniqueWords() {
         uniqueWords = new TreeSet();
         Iterator it = uniqueIdentifiers.iterator();
         while (it.hasNext()) {
@@ -79,11 +82,11 @@ public class JavaResearcher implements WorkspaceResearcher {
      * Adds all the unique words from the identifiers in the JDK to the given set.
      * This might be useful for spelling checking or word completion purposes.
      */
-    public static void addJavaWords(Set set) {
+    public synchronized static void addJavaWords(Set set) {
         set.addAll(uniqueWords);
     }
     
-    public List listIdentifiersStartingWith(String prefix) {
+    public synchronized List listIdentifiersStartingWith(String prefix) {
         ArrayList result = new ArrayList();
         final int prefixLength = prefix.length();
         Iterator it = uniqueIdentifiers.iterator();
@@ -94,10 +97,6 @@ public class JavaResearcher implements WorkspaceResearcher {
             }
         }
         return result;
-    }
-    
-    static {
-        readJavaDocSummary();
     }
     
     /**
@@ -179,7 +178,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     /**
      * Returns HTML linking to all the classes in the given package.
      */
-    public String listPackage(String packageName) {
+    public synchronized String listPackage(String packageName) {
         StringBuffer result = new StringBuffer(packageName + " contains:\n");
         String searchTerm = "Class:" + packageName + ".";
         String htmlFile = "";
@@ -208,7 +207,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
     }
     
-    public String listMethodsOrFields(String name) {
+    public synchronized String listMethodsOrFields(String name) {
         StringBuffer result = new StringBuffer();
         Pattern pattern = Pattern.compile("^[MF]:(" + StringUtilities.regularExpressionFromLiteral(name) + "[^(\t]*)(\\([^\t]+)\t");
         Matcher matcher;
