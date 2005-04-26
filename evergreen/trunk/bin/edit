@@ -56,7 +56,7 @@ else
     extra_classpath_entries = "#{salma_hayek}/MRJ141Stubs.jar"
 end
 
-if File.stat(edit_preferences_directory).directory? == false
+if FileTest.directory?(edit_preferences_directory) == false
     puts("Edit: Couldn't find preferences directory '#{edit_preferences_directory}.")
     puts("Edit: Creating preferences directory '#{edit_preferences_directory}'.")
     Dir.mkdir(edit_preferences_directory)
