@@ -659,6 +659,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             // The file may be a symlink on a cifs server.
             // In this case, it's important that we write into the original file rather than creating a new one.
             text.getTextBuffer().writeToFile(file);
+            text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
             Edit.showStatus("Saved " + filename);
             markAsClean();
             backupFile.delete();
