@@ -1,5 +1,7 @@
 package e.ptextarea;
 
+import java.util.*;
+
 public class PNewlineInserter {
     private PTextArea textArea;
     
@@ -9,16 +11,6 @@ public class PNewlineInserter {
     
     private String getLineTextAtOffset(int offset) {
         return textArea.getLineText(textArea.getLineOfOffset(offset));
-    }
-    
-    private boolean shouldInsertMatchingBracket(char lastChar) {
-        if (PBracketUtilities.isOpenBracket(lastChar)) {
-            char openBracket = lastChar;
-            if (hasUnbalancedBrackets(textArea.getText(), openBracket)) {
-                return true;
-            }
-        }
-        return false;
     }
     
     public void insertNewline() {
@@ -31,9 +23,12 @@ public class PNewlineInserter {
             String line = getLineTextAtOffset(position);
             if (position > 0) {
                 char lastChar = textArea.getTextBuffer().charAt(position - 1);
-                if (shouldInsertMatchingBracket(lastChar)) {
-                    insertMatchingBracket(lastChar);
-                    return;
+                if (PBracketUtilities.isOpenBracket(lastChar)) {
+                    String missingClosingBrackets = getMissingClosingBrackets(textArea.getText());
+                    if (missingClosingBrackets.length() > 0) {
+                        insertMatchingBrackets(missingClosingBrackets);
+                        return;
+                    }
                 }
             }
             if (line.endsWith("/*") || line.endsWith("/**")) {
@@ -47,8 +42,7 @@ public class PNewlineInserter {
         }
     }
     
-    public void insertMatchingBracket(char openBracket) {
-        final char closeBracket = PBracketUtilities.getPartnerForBracket(openBracket);
+    public void insertMatchingBrackets(final String closingBrackets) {
         final int start = textArea.getSelectionStart();
         final int end = textArea.getSelectionEnd();
         int endLineIndex = textArea.getLineOfOffset(end);
@@ -56,7 +50,7 @@ public class PNewlineInserter {
         String startLine = getLineTextAtOffset(start);
         String whitespace = getIndentationOfLineAtOffset(start);
         String prefix = "\n" + whitespace + textArea.getIndentationString();
-        String suffix = "\n" + whitespace + closeBracket;
+        String suffix = "\n" + whitespace + closingBrackets;
         if (textArea.getIndenter().isInNeedOfClosingSemicolon(startLine)) {
             suffix += ";";
         }
@@ -82,34 +76,36 @@ public class PNewlineInserter {
         final int newOffset = position + prefix.length();
         textArea.select(newOffset, newOffset);
     }
-    
-    public boolean hasUnbalancedBrackets(final String text, char openBracket) {
-        return (calculateBracketNesting(text, openBracket) != 0);
-    }
-    
-    /**
-     * Returns how many more opening braces there are than closing
-     * braces in the given String. Returns 0 if there are equal
-     * numbers of opening and closing braces; a negative number if
-     * there are more closing braces than opening braces.
-     */
-    public int calculateBracketNesting(final String initialText, char openBracket) {
-        final char closeBracket = PBracketUtilities.getPartnerForBracket(openBracket);
+        
+    private static String getMissingClosingBrackets(final String initialText) {
         String text = initialText.replaceAll("\\\\.", "_"); // Remove escaped characters.
         text = text.replaceAll("'.'", "_"); // Remove character literals.
         text = text.replaceAll("\"([^\\n]*?)\"", "_"); // Remove string literals.
         text = text.replaceAll("/\\*(?s).*?\\*/", "_"); // Remove C comments.
         text = text.replaceAll("//[^\\n]*", "_"); // Remove C++ comments.
-        int nestingDepth = 0;
+        Stack openBrackets = new Stack();
+        StringBuffer missingClosingBrackets = new StringBuffer();
         for (int i = 0; i < text.length(); ++i) {
             char ch = text.charAt(i);
-            if (ch == openBracket) {
-                ++nestingDepth;
-            } else if (ch == closeBracket) {
-                --nestingDepth;
+            if (PBracketUtilities.isOpenBracket(ch) && ch != '<') {
+                openBrackets.push(new Character(ch));
+            } else if (PBracketUtilities.isCloseBracket(ch) && ch != '>') {
+                while (openBrackets.empty() == false) {
+                    char openBracket = ((Character) openBrackets.pop()).charValue();
+                    char closeBracket = PBracketUtilities.getPartnerForBracket(openBracket);
+                    if (closeBracket == ch) {
+                        break;
+                    }
+                    missingClosingBrackets.append(closeBracket);
+                }
             }
         }
-        return nestingDepth;
+        while (openBrackets.empty() == false) {
+            char openBracket = ((Character) openBrackets.pop()).charValue();
+            char closeBracket = PBracketUtilities.getPartnerForBracket(openBracket);
+            missingClosingBrackets.append(closeBracket);
+        }
+        return missingClosingBrackets.toString();
     }
     
     /**
