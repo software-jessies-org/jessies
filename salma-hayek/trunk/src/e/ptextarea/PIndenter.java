@@ -27,8 +27,12 @@ abstract public class PIndenter {
     
     /**
      * Returns true if c is an 'electric' character, which is emacs terminology
-     * for a character that causes the indentation to be modified when you
+     * for a character that may cause the indentation to be modified when you
      * type it. Typically, this signifies the end of a block.
+     * Note the "may": this saves us correcting the indentation on every
+     * character insertion.  That's an optimisation but also prevents us being
+     * unusable when the indenter doesn't support the indentation style
+     * in use.
      */
     public abstract boolean isElectric(char c);
     

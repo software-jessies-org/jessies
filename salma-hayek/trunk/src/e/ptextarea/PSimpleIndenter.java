@@ -42,18 +42,34 @@ public abstract class PSimpleIndenter extends PIndenter {
         if (c == ':' && shouldMoveLabels()) {
             return true;
         }
-        if (c == '}') {
+        if (isBlockEnd(c)) {
             return true;
         }
         return false;
     }
     
+    public boolean isBlockBegin(char lastChar) {
+        return PBracketUtilities.isOpenBracket(lastChar);
+    }
+    public boolean isBlockEnd(char firstChar) {
+        return PBracketUtilities.isCloseBracket(firstChar);
+    }
+
     public boolean isBlockBegin(String activePartOfLine) {
-        return activePartOfLine.endsWith("{");
+        if (activePartOfLine.length() == 0) {
+            return false;
+        }
+        char lastChar = activePartOfLine.charAt(activePartOfLine.length() - 1);
+        return isBlockBegin(lastChar);
     }
     public boolean isBlockEnd(String activePartOfLine) {
-        return activePartOfLine.startsWith("}");
+        if (activePartOfLine.length() == 0) {
+            return false;
+        }
+        char firstChar = activePartOfLine.charAt(0);
+        return isBlockEnd(firstChar);
     }
+    
     public boolean isSwitchLabel(String activePartOfLine) {
         return activePartOfLine.matches("(case\\b.*|default\\s*):");
     }

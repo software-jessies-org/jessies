@@ -11,6 +11,16 @@ public class PNewlineInserter {
         return textArea.getLineText(textArea.getLineOfOffset(offset));
     }
     
+    private boolean shouldInsertMatchingBracket(char lastChar) {
+        if (PBracketUtilities.isOpenBracket(lastChar)) {
+            char openBracket = lastChar;
+            if (hasUnbalancedBrackets(textArea.getText(), openBracket)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void insertNewline() {
         textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
         try {
@@ -19,9 +29,14 @@ public class PNewlineInserter {
             
             // Should we try to insert matching brace pairs?
             String line = getLineTextAtOffset(position);
-            if (textArea.getIndenter().isElectric('}') && position > 0 && textArea.getTextBuffer().charAt(position - 1) == '{' && hasUnbalancedBraces(textArea.getText())) {
-                insertMatchingBrace();
-            } else if (line.endsWith("/*") || line.endsWith("/**")) {
+            if (position > 0) {
+                char lastChar = textArea.getTextBuffer().charAt(position - 1);
+                if (shouldInsertMatchingBracket(lastChar)) {
+                    insertMatchingBracket(lastChar);
+                    return;
+                }
+            }
+            if (line.endsWith("/*") || line.endsWith("/**")) {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");
@@ -32,7 +47,8 @@ public class PNewlineInserter {
         }
     }
     
-    public void insertMatchingBrace() {
+    public void insertMatchingBracket(char openBracket) {
+        final char closeBracket = PBracketUtilities.getPartnerForBracket(openBracket);
         final int start = textArea.getSelectionStart();
         final int end = textArea.getSelectionEnd();
         int endLineIndex = textArea.getLineOfOffset(end);
@@ -40,7 +56,7 @@ public class PNewlineInserter {
         String startLine = getLineTextAtOffset(start);
         String whitespace = getIndentationOfLineAtOffset(start);
         String prefix = "\n" + whitespace + textArea.getIndentationString();
-        String suffix = "\n" + whitespace + "}";
+        String suffix = "\n" + whitespace + closeBracket;
         if (textArea.getIndenter().isInNeedOfClosingSemicolon(startLine)) {
             suffix += ";";
         }
@@ -67,8 +83,8 @@ public class PNewlineInserter {
         textArea.select(newOffset, newOffset);
     }
     
-    public boolean hasUnbalancedBraces(final String text) {
-        return (calculateBraceNesting(text) != 0);
+    public boolean hasUnbalancedBrackets(final String text, char openBracket) {
+        return (calculateBracketNesting(text, openBracket) != 0);
     }
     
     /**
@@ -77,22 +93,23 @@ public class PNewlineInserter {
      * numbers of opening and closing braces; a negative number if
      * there are more closing braces than opening braces.
      */
-    public int calculateBraceNesting(final String initialText) {
+    public int calculateBracketNesting(final String initialText, char openBracket) {
+        final char closeBracket = PBracketUtilities.getPartnerForBracket(openBracket);
         String text = initialText.replaceAll("\\\\.", "_"); // Remove escaped characters.
         text = text.replaceAll("'.'", "_"); // Remove character literals.
         text = text.replaceAll("\"([^\\n]*?)\"", "_"); // Remove string literals.
         text = text.replaceAll("/\\*(?s).*?\\*/", "_"); // Remove C comments.
         text = text.replaceAll("//[^\\n]*", "_"); // Remove C++ comments.
-        int braceNesting = 0;
+        int nestingDepth = 0;
         for (int i = 0; i < text.length(); ++i) {
             char ch = text.charAt(i);
-            if (ch == '{') {
-                ++braceNesting;
-            } else if (ch == '}') {
-                --braceNesting;
+            if (ch == openBracket) {
+                ++nestingDepth;
+            } else if (ch == closeBracket) {
+                --nestingDepth;
             }
         }
-        return braceNesting;
+        return nestingDepth;
     }
     
     /**
