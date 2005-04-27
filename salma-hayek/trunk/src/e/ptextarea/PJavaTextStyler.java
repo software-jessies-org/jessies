@@ -187,4 +187,8 @@ public class PJavaTextStyler extends PCLikeTextStyler {
     public boolean supportShellComments() {
         return false;
     }
+
+    public boolean supportDoubleSlashComments() {
+        return true;
+    }
 }

@@ -53,4 +53,8 @@ public class PRubyTextStyler extends PCLikeTextStyler {
     public boolean supportShellComments() {
         return true;
     }
+
+    public boolean supportDoubleSlashComments() {
+        return false;
+    }
 }

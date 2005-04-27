@@ -38,6 +38,11 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     public abstract boolean supportShellComments();
     
     /**
+     * Returns true if the styler should comment to end of line on seeing '//'.
+     */
+    public abstract boolean supportDoubleSlashComments();
+    
+    /**
      * Adds a text segment of type String to the given segment list.  Override
      * this method if you wish to perform some validation on the string and introduce
      * error-style sections into it.
@@ -126,7 +131,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                             }
                             lastStart = i;
                             i += 2;
-                        } else if (line.charAt(i + 1) == '/') {
+                        } else if (supportDoubleSlashComments() && line.charAt(i + 1) == '/') {
                             if (lastStart < i) {
                                 builder.addStyledSegment(i, PStyle.NORMAL);
                             }
