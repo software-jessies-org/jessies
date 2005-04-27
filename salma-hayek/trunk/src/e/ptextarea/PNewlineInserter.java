@@ -51,7 +51,7 @@ public class PNewlineInserter {
         String whitespace = getIndentationOfLineAtOffset(start);
         String prefix = "\n" + whitespace + textArea.getIndentationString();
         String suffix = "\n" + whitespace + closingBrackets;
-        if (textArea.getIndenter().isInNeedOfClosingSemicolon(startLine)) {
+        if (closingBrackets.endsWith("}") == false || textArea.getIndenter().isInNeedOfClosingSemicolon(startLine)) {
             suffix += ";";
         }
         final int newCaretPosition = start + prefix.length();
