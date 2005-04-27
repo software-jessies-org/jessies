@@ -85,7 +85,13 @@ public class PKeyHandler extends KeyAdapter {
         } else if (key == KeyEvent.VK_BACK_SPACE) {
             backspace();
         } else if (key == KeyEvent.VK_DELETE) {
-            delete();
+            if (event.isShiftDown()) {
+                textArea.cut();
+            } else {
+                delete();
+            }
+        } else if (key == KeyEvent.VK_INSERT && event.isShiftDown()) {
+            textArea.paste();
         } else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
             movementHandler.handleMovementKeys(event);
         } else {
