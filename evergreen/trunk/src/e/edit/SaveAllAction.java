@@ -4,7 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class SaveAllAction extends AbstractAction {
-    public static final String ACTION_NAME = "Save All";
+    private static final String ACTION_NAME = "Save All";
     
     public SaveAllAction() {
         super(ACTION_NAME);
@@ -20,7 +20,7 @@ public class SaveAllAction extends AbstractAction {
             Workspace workspace = workspaces[i];
             if (workspace.saveAll() == false) {
                 if (interactive) {
-                    Edit.showAlert("Save All", "Unable to save everything on workspace '" + workspace.getTitle() + "'.");
+                    Edit.showAlert(ACTION_NAME, "Unable to save everything on workspace '" + workspace.getTitle() + "'.");
                 }
                 return;
             }

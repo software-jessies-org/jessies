@@ -12,7 +12,7 @@ import e.util.*;
 An action for the operation of creating and opening a new file.
 */
 public class NewFileAction extends ETextAction {
-    public static final String ACTION_NAME = "New File...";
+    private static final String ACTION_NAME = "New File...";
     
     private static FilenameChooserField filenameField = new FilenameChooserField(JFileChooser.FILES_AND_DIRECTORIES);
     
@@ -38,7 +38,7 @@ public class NewFileAction extends ETextAction {
         } while (createNewFile(filenameField.getPathname()) == false);
     }
 
-    public boolean createNewFile(String filename) {
+    private boolean createNewFile(String filename) {
         try {
             File newFile = FileUtilities.fileFromString(filename);
             File directory = newFile.getParentFile();
@@ -54,18 +54,18 @@ public class NewFileAction extends ETextAction {
                 Edit.getCurrentWorkspace().updateFileList(null);
                 fillWithInitialContents(newFile);
             } else {
-                Edit.showAlert("Create", "File '" + filename + "' already exists.");
+                Edit.showAlert(ACTION_NAME, "File '" + filename + "' already exists.");
             }
             Edit.openFile(filename);
             return true;
         } catch (IOException ex ) {
             ex.printStackTrace();
-            Edit.showAlert("Create", "Failed to create file '" + filename + "' (" + ex.getMessage() + ").");
+            Edit.showAlert(ACTION_NAME, "Failed to create file '" + filename + "' (" + ex.getMessage() + ").");
             return false;
         }
     }
     
-    public void fillWithInitialContents(File file) {
+    private void fillWithInitialContents(File file) {
         String name = file.getName();
         if (name.endsWith(".h")) {
             // Turn "SomeClass.h" into "SOME_CLASS_H_included".
@@ -80,7 +80,7 @@ public class NewFileAction extends ETextAction {
             content += "#endif\n";
             String result = StringUtilities.writeFile(file, content);
             if (result != null) {
-                Edit.showAlert("Create", "Failed to fill '" + file + "' with initial content (" + result + ").");
+                Edit.showAlert(ACTION_NAME, "Failed to fill '" + file + "' with initial content (" + result + ").");
             }
         }
     }
