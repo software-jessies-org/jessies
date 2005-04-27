@@ -11,7 +11,7 @@ import e.util.*;
  * which will then be created.
  */
 public class AddWorkspaceAction extends AbstractAction {
-    public static final String ACTION_NAME = "Add Workspace...";
+    private static final String ACTION_NAME = "Add Workspace...";
     
     private JTextField nameField = new JTextField("", 40);
     
@@ -34,7 +34,7 @@ public class AddWorkspaceAction extends AbstractAction {
         
         String message = FileUtilities.checkDirectoryExistence(filenameChooserField.getPathname());
         if (message != null) {
-            Edit.showAlert("Open Quickly", message);
+            Edit.showAlert(ACTION_NAME, message);
             return;
         }
         

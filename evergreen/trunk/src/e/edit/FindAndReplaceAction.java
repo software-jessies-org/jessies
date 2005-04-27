@@ -12,7 +12,7 @@ import e.util.*;
  * The ETextArea action to open a find and replace dialog.
  */
 public class FindAndReplaceAction extends ETextAction {
-    public static final String ACTION_NAME = "Find/Replace...";
+    private static final String ACTION_NAME = "Find/Replace...";
     
     public class LiveTextField extends EMonitoredTextField {
         public void timerExpired() {
@@ -132,7 +132,7 @@ public class FindAndReplaceAction extends ETextAction {
             }
             return true;
         } catch (Exception ex) {
-            Edit.showAlert("Find And Replace", "Couldn't perform the replacements (" + ex.getMessage() + ").");
+            Edit.showAlert(ACTION_NAME, "Couldn't perform the replacements (" + ex.getMessage() + ").");
             return false;
         }
     }

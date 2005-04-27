@@ -7,7 +7,7 @@ import e.util.*;
 The ETextArea action to open a 'goto' dialog.
 */
 public class GotoAction extends ETextAction implements MinibufferUser {
-    public static final String ACTION_NAME = "Go to Line...";
+    private static final String ACTION_NAME = "Go to Line...";
     
     public ETextWindow currentTextWindow;
     public int initialCaretPosition;
@@ -80,9 +80,9 @@ public class GotoAction extends ETextAction implements MinibufferUser {
                 currentTextWindow.goToLine(line);
                 return true;
             }
-            Edit.showAlert("Go To", "There is no line " + line + ".");
+            Edit.showAlert(ACTION_NAME, "There is no line " + line + ".");
         } catch (NumberFormatException ex) {
-            Edit.showAlert("Go To", "The text '" + value + "' isn't a line number.");
+            Edit.showAlert(ACTION_NAME, "The text '" + value + "' isn't a line number.");
         }
         return false;
     }
