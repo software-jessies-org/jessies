@@ -19,14 +19,12 @@ public class PNewlineInserter {
             // FIXME - selection
             final int position = textArea.getSelectionStart();
             
-            // Should we try to insert matching brace pairs?
+            // Should we try to insert matching brackets?
             String line = getLineTextAtOffset(position);
             if (position > 0) {
                 char lastChar = textArea.getTextBuffer().charAt(position - 1);
                 if (PBracketUtilities.isOpenBracket(lastChar)) {
-                    String missingClosingBrackets = getMissingClosingBrackets(textArea.getText());
-                    if (missingClosingBrackets.length() > 0) {
-                        insertMatchingBrackets(missingClosingBrackets);
+                    if (insertMatchingBrackets()) {
                         return;
                     }
                 }
@@ -42,11 +40,17 @@ public class PNewlineInserter {
         }
     }
     
-    public void insertMatchingBrackets(final String closingBrackets) {
+    private boolean insertMatchingBrackets() {
         final int start = textArea.getSelectionStart();
         final int end = textArea.getSelectionEnd();
         int endLineIndex = textArea.getLineOfOffset(end);
         int suffixPosition = textArea.getLineEndOffsetBeforeTerminator(endLineIndex);
+        StringBuffer textToSearchForBrackets = new StringBuffer(textArea.getText());
+        textToSearchForBrackets.delete(start, suffixPosition);
+        String closingBrackets = getMissingClosingBrackets(textToSearchForBrackets.toString());
+        if (closingBrackets.length() == 0) {
+            return false;
+        }
         String startLine = getLineTextAtOffset(start);
         String whitespace = getIndentationOfLineAtOffset(start);
         String prefix = "\n" + whitespace + textArea.getIndentationString();
@@ -63,6 +67,7 @@ public class PNewlineInserter {
         suffixPosition += prefix.length();
         textArea.replaceRange(suffix, suffixPosition, suffixPosition);
         textArea.select(newCaretPosition, newCaretPosition);
+        return true;
     }
     
     public void insertMatchingCloseComment() {
