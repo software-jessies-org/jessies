@@ -120,7 +120,7 @@ public class Minibuffer extends JPanel implements FocusListener {
             e.consume();
             notifyMinibufferUserOfTyping();
             String text = textField.getText();
-            shouldHide = minibufferUser.wasAccepted(text);
+            shouldHide = minibufferUser.isValid(text) && minibufferUser.wasAccepted(text);
             if (shouldHide) {
                 addToHistory();
             }
