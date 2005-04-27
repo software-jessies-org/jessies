@@ -52,7 +52,12 @@ public class Workspace extends JPanel {
             start();
         }
         public Object construct() {
-            fileList = scanWorkspaceForFiles();
+            ArrayList newFileList = scanWorkspaceForFiles();
+            // Many file systems will have returned the files not in
+            // alphabetical order, so we sort them ourselves here so
+            // that users of the list can assume it's in order.
+            Collections.sort(newFileList, String.CASE_INSENSITIVE_ORDER);
+            fileList = newFileList;
             return fileList;
         }
         public void finished() {
@@ -312,7 +317,7 @@ public class Workspace extends JPanel {
      * suggestion it's a project (as opposed to a home directory, say): no Makefile or build.xml,
      * and no CVS or SCCS directories are good clues that we're not looking at software.
      */
-    public ArrayList scanWorkspaceForFiles() {
+    private ArrayList scanWorkspaceForFiles() {
         long start = System.currentTimeMillis();
         
         String[] ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
