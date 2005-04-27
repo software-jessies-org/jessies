@@ -40,6 +40,20 @@ public class PNewlineInserter {
         }
     }
     
+    // TODO: Doesn't belong here.
+    public static String getCommonEnding(String left, String right) {
+        StringBuffer ending = new StringBuffer();
+        for (int i = 0; i < left.length() && i < right.length(); ++i) {
+            char leftChar = left.charAt(left.length() - 1 - i);
+            char rightChar = right.charAt(right.length() - 1 - i);
+            if (leftChar != rightChar) {
+                break;
+            }
+            ending.append(leftChar);
+        }
+        return ending.toString();
+    }
+    
     private boolean insertMatchingBrackets() {
         final int start = textArea.getSelectionStart();
         final int end = textArea.getSelectionEnd();
@@ -52,12 +66,15 @@ public class PNewlineInserter {
             return false;
         }
         String startLine = getLineTextAtOffset(start);
+        if (closingBrackets.endsWith("}") == false || textArea.getIndenter().isInNeedOfClosingSemicolon(startLine)) {
+            // TODO: "closingBrackets" is a bad name now it can have a semicolon on the end!
+            closingBrackets = closingBrackets + ";";
+        }
+        String candidateBlockContents = textArea.getTextBuffer().subSequence(end, suffixPosition).toString();
+        String commonEnding = getCommonEnding(candidateBlockContents, closingBrackets);
         String whitespace = getIndentationOfLineAtOffset(start);
         String prefix = "\n" + whitespace + textArea.getIndentationString();
         String suffix = "\n" + whitespace + closingBrackets;
-        if (closingBrackets.endsWith("}") == false || textArea.getIndenter().isInNeedOfClosingSemicolon(startLine)) {
-            suffix += ";";
-        }
         final int newCaretPosition = start + prefix.length();
         textArea.replaceSelection(prefix);
         // suffixPosition is invalidated by replaceSelection.
@@ -65,7 +82,7 @@ public class PNewlineInserter {
         int selectionSize = end - start;
         suffixPosition -= selectionSize;
         suffixPosition += prefix.length();
-        textArea.replaceRange(suffix, suffixPosition, suffixPosition);
+        textArea.replaceRange(suffix, suffixPosition - commonEnding.length(), suffixPosition);
         textArea.select(newCaretPosition, newCaretPosition);
         return true;
     }
