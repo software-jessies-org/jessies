@@ -74,17 +74,9 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     }
     
     public boolean wasAccepted(String value) {
-        try {
-            int line = Integer.parseInt(value);
-            if (line < currentTextWindow.getText().getLineCount()) {
-                currentTextWindow.goToLine(line);
-                return true;
-            }
-            Edit.showAlert(ACTION_NAME, "There is no line " + line + ".");
-        } catch (NumberFormatException ex) {
-            Edit.showAlert(ACTION_NAME, "The text '" + value + "' isn't a line number.");
-        }
-        return false;
+        int line = Integer.parseInt(value);
+        currentTextWindow.goToLine(line);
+        return true;
     }
     
     public void wasCanceled() {
