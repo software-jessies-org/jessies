@@ -27,9 +27,14 @@ def outputChanges(changes)
     body << "<font color=\"#{color}\">"
     line = CGI.escapeHTML(line)
     # Write the per-line prefix character in fixed width
-    line.gsub!(/^(---|\+\+\+|[-+ ])/) {|prefix| "<tt>#{prefix.gsub(' ', '&nbsp;')}</tt>"}
+    line.gsub!(/^(---|\+\+\+|[-+ ])/) {
+      |prefix| "<tt>#{prefix.gsub(' ', '&nbsp;')}</tt>"
+    }
     # Don't collapse indentation
-    line.gsub!(/( {2,})/) {|s| s.gsub(' ', '&nbsp;')}
+    line.gsub!(/( {2,})/) {
+      |s| s.gsub(' ', '&nbsp;')
+    }
+    line.gsub!(/\t/, '&nbsp;&nbsp;&nbsp;&nbsp;')
     body << "#{line}<br></font>\n"
   }
   return body
