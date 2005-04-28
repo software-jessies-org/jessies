@@ -37,6 +37,7 @@ public class TerminalControl implements Runnable {
 	private TextBuffer listener;
 	private Process process;
 	private boolean processIsRunning = true;
+	private boolean processIsBeingDestroyed = false;
 	private InputStream in;
 	private PtyOutputStream out;
 	
@@ -63,6 +64,7 @@ public class TerminalControl implements Runnable {
 	public void destroyProcess() {
 		if (processIsRunning) {
 			try {
+				processIsBeingDestroyed = true;
 				process.destroy();
 			} catch (Exception ex) {
 				Log.warn("Failed to destroy process.", ex);
@@ -133,7 +135,11 @@ public class TerminalControl implements Runnable {
 				if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
 					announceConnectionLost("\n\r[Process exited with status " + status + ".]");
 				} else {
-					pane.doCloseAction();
+					// If it wasn't a pane close that caused us to get here, close
+					// the pane.
+					if (processIsBeingDestroyed == false) {
+						pane.doCloseAction();
+					}
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
