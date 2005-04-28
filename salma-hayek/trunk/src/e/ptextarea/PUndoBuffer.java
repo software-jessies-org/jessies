@@ -14,6 +14,17 @@ public interface PUndoBuffer {
      * Finishes the current most-nested compound edit.
      */
     public void finishCompoundEdit();
+    
+    /**
+     * Sets the current undo position as being the 'clean' state, which is the
+     * only state at which 'isDirty' returns false.
+     */
+    public void setCurrentStateClean();
+    
+    /**
+     * Returns whether we're in the clean state.
+     */
+    public boolean isClean();
 
     /**
      * Tests whether "undo" will actually do anything. Useful for disabling

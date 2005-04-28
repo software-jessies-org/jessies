@@ -362,6 +362,8 @@ public class PTextBuffer implements CharSequence {
         private ArrayList undoList;
         private int undoPosition;
         
+        private int cleanPosition = -1;
+        
         // How many levels of nested compound edits we have.
         private int compoundingDepth;
         
@@ -391,6 +393,7 @@ public class PTextBuffer implements CharSequence {
         private void addAndDo(SelectionSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, SelectionSetter afterCaret) {
             // FIXME: use ArrayList.removeRange.
             while (undoList.size() > undoPosition) {
+                cleanPosition = -1;  // We can never be clean again until we save.
                 undoList.remove(undoPosition);
             }
             
@@ -423,6 +426,14 @@ public class PTextBuffer implements CharSequence {
             ++compoundId;
             //System.out.println("finished compound edit");
             //dump();
+        }
+        
+        public void setCurrentStateClean() {
+            cleanPosition = undoPosition;
+        }
+        
+        public boolean isClean() {
+            return (cleanPosition == undoPosition);
         }
         
         public boolean canUndo() {
