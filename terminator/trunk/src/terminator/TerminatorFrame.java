@@ -220,10 +220,11 @@ public class TerminatorFrame extends JFrame {
 	 */
 	private void closeTab(JTerminalPane victim) {
 		tabbedPane.remove(victim);
-		tabbedPane.getSelectedComponent().requestFocus();
 		if (tabbedPane.getTabCount() == 0) {
+			// Close the now-unnecessary window.
 			closeWindow();
 		} else if (tabbedPane.getTabCount() == 1) {
+			// Remove the now-unnecessary tabbed pane.
 			JTerminalPane soleSurvivor = (JTerminalPane) terminals.get(0);
 			soleSurvivor.invalidate();
 			setContentPane(soleSurvivor);
@@ -232,6 +233,9 @@ public class TerminatorFrame extends JFrame {
 			repaint();
 			tabbedPane = null;
 			updateFrameTitle();
+		} else {
+			// Just hand focus to the next terminal.
+			tabbedPane.getSelectedComponent().requestFocus();
 		}
 	}
 	
