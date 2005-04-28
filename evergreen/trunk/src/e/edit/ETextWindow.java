@@ -254,18 +254,12 @@ public class ETextWindow extends EWindow implements PTextListener {
             text.setAppropriateFont();
             text.getIndenter().setIndentationPropertyBasedOnContent(content);
             text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
-            text.getTextBuffer().getUndoBuffer().addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    if (text.getTextBuffer().getUndoBuffer().canUndo() == false) {
-                        markAsClean();
-                    }
-                }
-            });
+            text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             if (fileType != UNKNOWN) {
                 // FIXME
                 //text.getDocument().addDocumentListener(new UnmatchedBracketHighlighter(text));
             }
-            markAsClean();
+            updateCleanliness();
             getTitleBar().checkForCounterpart(); // If we don't do this, we don't get the icon until we get focus.
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
@@ -469,12 +463,11 @@ public class ETextWindow extends EWindow implements PTextListener {
         if (findResultsUpdater != null) {
             findResultsUpdater.restart();
         }
-        isDirty = true;
-        repaint();
+        updateCleanliness();
     }
     
-    public void markAsClean() {
-        isDirty = false;
+    public void updateCleanliness() {
+        isDirty = ! text.getTextBuffer().getUndoBuffer().isClean();
         repaint();
     }
     
@@ -659,9 +652,9 @@ public class ETextWindow extends EWindow implements PTextListener {
             // The file may be a symlink on a cifs server.
             // In this case, it's important that we write into the original file rather than creating a new one.
             text.getTextBuffer().writeToFile(file);
-            text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
+            text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             Edit.showStatus("Saved " + filename);
-            markAsClean();
+            updateCleanliness();
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
             tagsUpdater.updateTags();
