@@ -118,7 +118,10 @@ public class TerminatorFrame extends JFrame {
 		setTitle(terminalPane.getName());
 	}
 	
-	private void initTabbedPane() {
+	/**
+	 * Switches to a tabbed-pane UI where we can have one tab per terminal.
+	 */
+	private void switchToTabbedPane() {
 		if (tabbedPane != null) {
 			return;
 		}
@@ -138,7 +141,27 @@ public class TerminatorFrame extends JFrame {
 		validate();
 		
 		Dimension finalSize = oldContentPane.getSize();
-		fixTerminalSizesAfterAddingTabbedPane(initialSize, finalSize);
+		fixTerminalSizesAfterAddingOrRemovingTabbedPane(initialSize, finalSize);
+	}
+	
+	/**
+	 * Switches to a simple UI where we can have only one terminal.
+	 */
+	private void switchToSinglePane() {
+		JTerminalPane soleSurvivor = (JTerminalPane) terminals.get(0);
+		Dimension initialSize = soleSurvivor.getSize();
+		
+		soleSurvivor.invalidate();
+		setContentPane(soleSurvivor);
+		validate();
+		
+		soleSurvivor.requestFocus();
+		tabbedPane = null;
+		
+		Dimension finalSize = getContentPane().getSize();
+		fixTerminalSizesAfterAddingOrRemovingTabbedPane(initialSize, finalSize);
+		
+		updateFrameTitle();
 	}
 	
 	/**
@@ -165,7 +188,7 @@ public class TerminatorFrame extends JFrame {
 	 * should be that the terminal size remains constant but the window
 	 * grows.
 	 */
-	private void fixTerminalSizesAfterAddingTabbedPane(Dimension initialSize, Dimension finalSize) {
+	private void fixTerminalSizesAfterAddingOrRemovingTabbedPane(Dimension initialSize, Dimension finalSize) {
 		Dimension size = getSize();
 		size.height += (initialSize.height - finalSize.height);
 		size.width += (initialSize.width - finalSize.width);
@@ -178,7 +201,7 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	private void initTabbedTerminals() {
-		initTabbedPane();
+		switchToTabbedPane();
 		for (int i = 0; i < terminals.size(); ++i) {
 			JTerminalPane terminalPane = (JTerminalPane) terminals.get(i);
 			addPaneToUI(terminalPane);
@@ -221,20 +244,11 @@ public class TerminatorFrame extends JFrame {
 	private void closeTab(JTerminalPane victim) {
 		tabbedPane.remove(victim);
 		if (tabbedPane.getTabCount() == 0) {
-			// Close the now-unnecessary window.
 			closeWindow();
 		} else if (tabbedPane.getTabCount() == 1) {
-			// Remove the now-unnecessary tabbed pane.
-			JTerminalPane soleSurvivor = (JTerminalPane) terminals.get(0);
-			soleSurvivor.invalidate();
-			setContentPane(soleSurvivor);
-			soleSurvivor.revalidate();
-			soleSurvivor.requestFocus();
-			repaint();
-			tabbedPane = null;
-			updateFrameTitle();
+			switchToSinglePane();
 		} else {
-			// Just hand focus to the next terminal.
+			// Just hand focus to the visible tab's terminal.
 			tabbedPane.getSelectedComponent().requestFocus();
 		}
 	}
@@ -289,7 +303,7 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	private void addPaneToUI(JTerminalPane newPane) {
-		initTabbedPane();
+		switchToTabbedPane();
 		tabbedPane.add(newPane.getName(), newPane);
 	}
 }
