@@ -341,6 +341,10 @@ public class PTextAreaSpellingChecker implements PTextListener {
         public UnderlineHighlight(PTextArea textArea, int startIndex, int endIndex) {
             super(textArea, startIndex, endIndex, COLOR);
         }
+    
+        protected boolean paintsToEndOfLine() {
+            return false;
+        }
         
         public void paintRectangleContents(Graphics2D g, Rectangle r) {
             if (DASHED) {

@@ -26,6 +26,28 @@ public class PColoredHighlight extends PHighlight {
         this.color = newColor;
     }
     
+    protected boolean paintsToEndOfLine() {
+        return true;
+    }
+    
+    private int getRightHandLineLimit(int splitLineIndex) {
+        if (paintsToEndOfLine()) {
+            return textArea.getWidth();
+        } else {
+            int lineStart = textArea.getSplitLine(splitLineIndex).getTextIndex();
+            PSegmentIterator iterator = textArea.getWrappedSegmentIterator(lineStart);
+            int result = 0;
+            while (iterator.hasNext()) {
+                PLineSegment segment = iterator.next();
+                if (segment.isNewline()) {
+                    return result;
+                }
+                result += segment.getDisplayWidth(textArea.getFontMetrics(textArea.getFont()), result);
+            }
+            return textArea.getWidth();
+        }
+    }
+    
     public void paint(Graphics2D graphics, PCoordinates start, PCoordinates end) {
         Point startPt = textArea.getViewCoordinates(start);
         Point endPt = textArea.getViewCoordinates(end);
@@ -35,7 +57,7 @@ public class PColoredHighlight extends PHighlight {
         int lineHeight = textArea.getLineHeight();
         for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
             int xStart = (i == start.getLineIndex()) ? startPt.x : 0;
-            int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth();
+            int xEnd = (i == end.getLineIndex()) ? endPt.x : getRightHandLineLimit(i);
             paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
             y += lineHeight;
         }
