@@ -296,6 +296,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private class SelectionSetter implements PTextBuffer.SelectionSetter {
+        private static final int DO_NOT_CHANGE = -1;
+        
         private int start;
         private int end;
         
@@ -313,7 +315,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
         
         public void modifySelection() {
-            select(start, end);
+            if (start != DO_NOT_CHANGE && end != DO_NOT_CHANGE) {
+                select(start, end);
+            }
         }
     }
     
@@ -1069,12 +1073,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     /**
-     * Appends the given string to the end of the text.
+     * Appends the given string to the end of the text. This is meant for
+     * programmatic use, and so does not pay attention to or modify the
+     * selection.
      */
     public void append(String newText) {
+        SelectionSetter noChange = new SelectionSetter(SelectionSetter.DO_NOT_CHANGE);
         PTextBuffer buffer = getTextBuffer();
         synchronized (buffer) {
-            buffer.replace(new SelectionSetter(), buffer.length(), 0, newText, new SelectionSetter(buffer.length() + newText.length()));
+            buffer.replace(noChange, buffer.length(), 0, newText, noChange);
         }
     }
     
