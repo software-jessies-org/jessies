@@ -79,8 +79,26 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             
             private void rewrap() {
                 if (getWidth() != lastWidth) {
-                    lastWidth = getWidth();
+                    Rectangle visible = null;
+                    int charToKeepInPosition = getSelectionStart();
+                    int yPosition = -1;
+                    if (lastWidth != 0) {
+                        visible = getVisibleRect();
+                        yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
+                        if (yPosition < 0 || yPosition > visible.height) {
+                            yPosition = visible.y + visible.height / 2;
+                            charToKeepInPosition = getSplitLine(getNearestCoordinates(new Point(0, yPosition)).getLineIndex()).getTextIndex();
+                            yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
+                        }
+                    }
                     revalidateLineWrappings();
+                    if (lastWidth != 0) {
+                        visible = getVisibleRect();
+                        int newYPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
+                        visible.y += newYPosition - yPosition;
+                        scrollRectToVisible(visible);
+                    }
+                    lastWidth = getWidth();
                     repaint();
                 }
             }
@@ -1008,7 +1026,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                     if (wordWrap) {
                         // Try to find a break before the last break.
                         for (int splitOffset = i; splitOffset >= lastSplitOffset; --splitOffset) {
-                            if (chars.charAt(splitOffset) == ' ') {
+                            if (chars.charAt(splitOffset) == ' ' && splitOffset < chars.length() - 1) {
                                 // Break so that the word goes to the next line
                                 // but the inter-word character stays where it
                                 // was.
