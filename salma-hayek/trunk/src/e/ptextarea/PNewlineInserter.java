@@ -118,14 +118,14 @@ public class PNewlineInserter {
                     if (closeBracket == ch) {
                         break;
                     }
-                    missingClosingBrackets.append(closeBracket);
+                    missingClosingBrackets.insert(0, closeBracket);
                 }
             }
         }
         while (openBrackets.empty() == false) {
             char openBracket = ((Character) openBrackets.pop()).charValue();
             char closeBracket = PBracketUtilities.getPartnerForBracket(openBracket);
-            missingClosingBrackets.append(closeBracket);
+            missingClosingBrackets.insert(0, closeBracket);
         }
         return missingClosingBrackets.toString();
     }
