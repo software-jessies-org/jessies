@@ -686,15 +686,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         return false;
     }
-    
-    public void invokeShellCommand(String context, String command, boolean shouldShowProgress) {
-        try {
-            new ShellCommand(filename, getCurrentLineNumber(), getWorkspace(), shouldShowProgress, context, command);
-        } catch (IOException ex) {
-            Edit.showAlert("Run", "Can't start task (" + ex.getMessage() + ").");
-        }
-    }
-    
+        
     /**
      * Implements the Comparable interface so windows can be sorted
      * into alphabetical order by title.
