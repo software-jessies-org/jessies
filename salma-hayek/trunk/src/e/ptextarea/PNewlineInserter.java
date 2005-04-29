@@ -54,14 +54,31 @@ public class PNewlineInserter {
         return ending.toString();
     }
     
+    // TODO: Doesn't belong here.
+    public static String reflectBrackets(String originalBrackets) {
+        StringBuffer reflectedBrackets = new StringBuffer();
+        for (int i = 0; i != originalBrackets.length(); ++i) {
+            char originalBracket = originalBrackets.charAt(i);
+            char reflectedBracket = PBracketUtilities.getPartnerForBracket(originalBracket);
+            reflectedBrackets.append(reflectedBracket);
+        }
+        return reflectedBrackets.reverse().toString();
+    }
+
     private boolean insertMatchingBrackets() {
         final int start = textArea.getSelectionStart();
         final int end = textArea.getSelectionEnd();
         int endLineIndex = textArea.getLineOfOffset(end);
         int suffixPosition = textArea.getLineEndOffsetBeforeTerminator(endLineIndex);
-        StringBuffer textToSearchForBrackets = new StringBuffer(textArea.getText());
-        textToSearchForBrackets.delete(start, suffixPosition);
-        String closingBrackets = getMissingClosingBrackets(textToSearchForBrackets.toString());
+        String beforeInsertion = textArea.getTextBuffer().subSequence(0, start).toString();
+        String afterInsertion = textArea.getTextBuffer().subSequence(suffixPosition, textArea.getTextBuffer().length()).toString();
+        String unmatchedOpenBrackets = getUnmatchedBrackets(beforeInsertion);
+        String unmatchedCloseBrackets = getUnmatchedBrackets(afterInsertion);
+        String reflectedCloseBrackets = reflectBrackets(unmatchedCloseBrackets);
+        if (unmatchedOpenBrackets.startsWith(reflectedCloseBrackets) == false) {
+            return false;
+        }
+        String closingBrackets = reflectBrackets(unmatchedOpenBrackets.substring(reflectedCloseBrackets.length()));
         if (closingBrackets.length() == 0) {
             return false;
         }
@@ -99,35 +116,28 @@ public class PNewlineInserter {
         textArea.select(newOffset, newOffset);
     }
         
-    private static String getMissingClosingBrackets(final String initialText) {
+    private static String getUnmatchedBrackets(final String initialText) {
         String text = initialText.replaceAll("\\\\.", "_"); // Remove escaped characters.
         text = text.replaceAll("'.'", "_"); // Remove character literals.
         text = text.replaceAll("\"([^\\n]*?)\"", "_"); // Remove string literals.
         text = text.replaceAll("/\\*(?s).*?\\*/", "_"); // Remove C comments.
         text = text.replaceAll("//[^\\n]*", "_"); // Remove C++ comments.
-        Stack openBrackets = new Stack();
-        StringBuffer missingClosingBrackets = new StringBuffer();
+        StringBuffer unmatchedBrackets = new StringBuffer();
         for (int i = 0; i < text.length(); ++i) {
             char ch = text.charAt(i);
             if (PBracketUtilities.isOpenBracket(ch) && ch != '<') {
-                openBrackets.push(new Character(ch));
+                unmatchedBrackets.append(ch);
             } else if (PBracketUtilities.isCloseBracket(ch) && ch != '>') {
-                while (openBrackets.empty() == false) {
-                    char openBracket = ((Character) openBrackets.pop()).charValue();
-                    char closeBracket = PBracketUtilities.getPartnerForBracket(openBracket);
-                    if (closeBracket == ch) {
-                        break;
-                    }
-                    missingClosingBrackets.insert(0, closeBracket);
+                char openBracket = PBracketUtilities.getPartnerForBracket(ch);
+                int lastCharIndex = unmatchedBrackets.length() - 1;
+                if (lastCharIndex >= 0 && unmatchedBrackets.charAt(lastCharIndex) == openBracket) {
+                    unmatchedBrackets.deleteCharAt(lastCharIndex);
+                } else {
+                    unmatchedBrackets.append(ch);
                 }
             }
         }
-        while (openBrackets.empty() == false) {
-            char openBracket = ((Character) openBrackets.pop()).charValue();
-            char closeBracket = PBracketUtilities.getPartnerForBracket(openBracket);
-            missingClosingBrackets.insert(0, closeBracket);
-        }
-        return missingClosingBrackets.toString();
+        return unmatchedBrackets.toString();
     }
     
     /**
