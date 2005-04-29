@@ -79,11 +79,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             
             private void rewrap() {
                 if (getWidth() != lastWidth) {
-                    Rectangle visible = null;
                     int charToKeepInPosition = getSelectionStart();
                     int yPosition = -1;
                     if (lastWidth != 0) {
-                        visible = getVisibleRect();
+                        Rectangle visible = getVisibleRect();
                         yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
                         if (yPosition < 0 || yPosition > visible.height) {
                             yPosition = visible.y + visible.height / 2;
@@ -93,7 +92,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                     }
                     revalidateLineWrappings();
                     if (lastWidth != 0) {
-                        visible = getVisibleRect();
+                        Rectangle visible = getVisibleRect();
                         int newYPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
                         visible.y += newYPosition - yPosition;
                         scrollRectToVisible(visible);
