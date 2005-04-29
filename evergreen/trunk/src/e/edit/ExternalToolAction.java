@@ -35,7 +35,7 @@ public class ExternalToolAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextWindow textWindow = getFocusedTextWindow();
+        final ETextWindow textWindow = getFocusedTextWindow();
         if (needsFile && textWindow == null) {
             return;
         }
@@ -48,7 +48,19 @@ public class ExternalToolAction extends ETextAction {
         }
         
         if (textWindow != null) {
-            runCommand(textWindow.getFilename(), textWindow.getCurrentLineNumber(), textWindow.getWorkspace(), textWindow.getContext());
+            ShellCommand shellCommand = runCommand(textWindow.getFilename(), textWindow.getCurrentLineNumber(), textWindow.getWorkspace(), textWindow.getContext());
+            if (shellCommand != null) {
+                shellCommand.addCompletionListener(new ShellCommand.CompletionListener() {
+                    public void shellCommandCompleted() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                textWindow.updateWatermark();
+                                textWindow.repaint();
+                            }
+                        });
+                    }
+                });
+            }
         } else {
             Workspace workspace = Edit.getCurrentWorkspace();
             runCommand("", 0, workspace, workspace.getRootDirectory());
@@ -59,16 +71,16 @@ public class ExternalToolAction extends ETextAction {
         return commandPattern.indexOf("EDIT_") != -1;
     }
 
-    public void runCommand(String filename, int lineNumber, Workspace workspace, String context) {
+    public ShellCommand runCommand(String filename, int lineNumber, Workspace workspace, String context) {
         String command = commandPattern;
         if (requestConfirmation) {
-            confirmRunCommand(filename, lineNumber, workspace, context, command);
+            return confirmRunCommand(filename, lineNumber, workspace, context, command);
         } else {
-            safeRunCommand(filename, lineNumber, workspace, context, command);
+            return safeRunCommand(filename, lineNumber, workspace, context, command);
         }
     }
 
-    public void confirmRunCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
+    public ShellCommand confirmRunCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
         if (commandField == null) {
             commandField = new JTextField(command, 40);
             contextField = new JTextField(context, 40);
@@ -81,15 +93,18 @@ public class ExternalToolAction extends ETextAction {
         context = contextField.getText();
 
         if (shouldRun) {
-            safeRunCommand(filename, lineNumber, workspace, context, command);
+            return safeRunCommand(filename, lineNumber, workspace, context, command);
+        } else {
+            return null;
         }
     }
 
-    public void safeRunCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
+    public ShellCommand safeRunCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
         try {
-            new ShellCommand(filename, lineNumber, workspace, false, context, command);
+            return new ShellCommand(filename, lineNumber, workspace, false, context, command);
         } catch (IOException ex) {
             Edit.showAlert(context, "Can't start task (" + ex.getMessage() + ").");
         }
+        return null;
     }
 }
