@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 public class GuiUtilities {
     private GuiUtilities() { /* Not instantiable. */ }
@@ -131,5 +132,57 @@ public class GuiUtilities {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    
+    /**
+     * Scrolls so that the maximum value of the the scroll bar is visible,
+     * even as the scroll bar's range changes, unless the user has manually
+     * grabbed the thumb to look at some part of the history, in which case
+     * we leave the scroll bar alone until it's next at the maximum value.
+     */
+    public static final void keepMaximumShowing(final JScrollBar scrollBar) {
+        scrollBar.getModel().addChangeListener(new ChangeListener() {
+            private BoundedRangeModel model = scrollBar.getModel();
+            private boolean wasAtMaximum;
+            private int maximum;
+            private int extent;
+            private int value;
+            
+            // If we had a decent name for this class, it would be in its own
+            // file!
+            {
+                updateValues();
+                wasAtMaximum = isAtMaximum();
+            }
+            
+            private void updateValues() {
+                maximum = model.getMaximum();
+                extent = model.getExtent();
+                value = model.getValue();
+            }
+            
+            public void stateChanged(ChangeEvent event) {
+                if (model.getMaximum() != maximum || model.getExtent() != extent) {
+                    updateValues();
+                    if (wasAtMaximum) {
+                        scrollToBottom();
+                    }
+                    wasAtMaximum = isAtMaximum();
+                } else if (model.getValue() != value) {
+                    updateValues();
+                    wasAtMaximum = isAtMaximum();
+                } else {
+                    updateValues();
+                }
+            }
+            
+            private void scrollToBottom() {
+                model.setValue(maximum - extent);
+            }
+            
+            private boolean isAtMaximum() {
+                return (value + extent == maximum);
+            }
+        });
     }
 }
