@@ -209,6 +209,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         ArrayList items = new ArrayList();
         if (file.exists() == false) {
             items.add("(deleted)");
+            watermarkViewPort.setSerious(true);
         }
         if (file.exists() && file.canWrite() == false) {
             items.add("(read-only)");
