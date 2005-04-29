@@ -40,6 +40,10 @@ public class PAnchorRegion {
         return end.getIndex();
     }
     
+    public String toString() {
+        return "PAnchorRegion[start=" + start + ",end=" + end + "]";
+    }
+    
     /** Notification that either of the start and end anchors has been deleted. */
     public void delete() { }
     

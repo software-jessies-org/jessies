@@ -46,4 +46,8 @@ public class PAnchor implements Comparable {
     public int compareTo(Object obj) {
         return (((PAnchor) obj).index - index);
     }
+    
+    public String toString() {
+        return "PAnchor[index=" + index + "]";
+    }
 }
