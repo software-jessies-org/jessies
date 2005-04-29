@@ -191,6 +191,9 @@ public class PTextBuffer implements CharSequence {
      * If not, use the CharSequence interface instead.
      */
     private CharSequence copyChars(int start, int charCount) {
+        if (start < 0 || charCount < 0 || start + charCount > length()) {
+            throw new IllegalArgumentException("start=" + start + " charCount=" + charCount + " length()=" + length());
+        }
         char[] result = new char[charCount];
         try {
             int copyCount = 0;
