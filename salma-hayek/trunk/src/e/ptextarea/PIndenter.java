@@ -148,17 +148,18 @@ abstract public class PIndenter {
     }
     
     public Range getRangeToRemove() {
-        Range range = new Range();
-        
         if (textArea.hasSelection()) {
             // The user's already done our work for us.
-            range.start = textArea.getSelectionStart();
-            range.end = textArea.getSelectionEnd();
-            return range;
+            return new Range(textArea.getSelectionStart(), textArea.getSelectionEnd());
+        }
+        
+        int position = textArea.getSelectionStart();
+        if (position == 0) {
+            // We can't remove anything before the beginning.
+            return Range.NULL_RANGE;
         }
         
         int charactersToDelete = 1;
-        int position = textArea.getSelectionStart();
         final int lineNumber = textArea.getLineOfOffset(position);
         String whitespace = getCurrentIndentationOfLine(lineNumber);
         int lineOffset = position - textArea.getLineStartOffset(lineNumber);
@@ -183,8 +184,6 @@ abstract public class PIndenter {
             }
         }
         
-        range.start = position - charactersToDelete;
-        range.end = position;
-        return range;
+        return new Range(position - charactersToDelete, position);
     }
 }

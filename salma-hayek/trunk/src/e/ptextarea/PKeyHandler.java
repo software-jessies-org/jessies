@@ -154,7 +154,7 @@ public class PKeyHandler extends KeyAdapter {
     private void backspace() {
         Range range = textArea.getIndenter().getRangeToRemove();
         if (range.isNonEmpty()) {
-            textArea.delete(range.start, range.length());
+            textArea.delete(range.getStart(), range.length());
         }
     }
     

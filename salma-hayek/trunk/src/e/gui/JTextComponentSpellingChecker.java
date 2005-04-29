@@ -59,10 +59,10 @@ public class JTextComponentSpellingChecker implements DocumentListener {
                 return;
             }
             
-            final Range actualRange = new Range();
-            if (isMisspelledWordBetween(offset, offset, actualRange)) {
+            final Range actualRange = getRangeOfMisspelledWordBetween(offset, offset);
+            if (actualRange.isEmpty() == false) {
                 EPopupMenu menu = new EPopupMenu();
-                String misspelling = document.getText(actualRange.start, actualRange.end - actualRange.start);
+                String misspelling = document.getText(actualRange.getStart(), actualRange.length());
                 String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
                 for (int i = 0; i < suggestions.length; i++) {
                     String suggestion = suggestions[i];
@@ -71,7 +71,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
                     // hyphenated words or multiple words.
                     suggestion = suggestion.replace('-', '_');
                     suggestion = convertMultipleWordsToCamelCase(suggestion);
-                    menu.add(new CorrectSpellingAction(document, suggestion, actualRange.start, actualRange.end));
+                    menu.add(new CorrectSpellingAction(document, suggestion, actualRange.getStart(), actualRange.getEnd()));
                 }
                 if (suggestions.length == 0) {
                     menu.add(new NoSuggestionsAction());
@@ -264,9 +264,9 @@ public class JTextComponentSpellingChecker implements DocumentListener {
     }
     
     /** Tests whether there's a misspelled word in the given range of offsets. */
-    public boolean isMisspelledWordBetween(int fromIndex, int toIndex, Range actualRange) {
+    public Range getRangeOfMisspelledWordBetween(int fromIndex, int toIndex) {
         if (toIndex - fromIndex > 20) {
-            return false;
+            return Range.NULL_RANGE;
         }
         Highlighter highlighter = component.getHighlighter();
         Highlighter.Highlight[] highlights = highlighter.getHighlights();
@@ -274,12 +274,10 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         for (int i = 0; i < highlights.length; i++) {
             Highlighter.Highlight highlight = highlights[i];
             if (highlight.getPainter() == PAINTER && highlight.getStartOffset() <= fromIndex && highlight.getEndOffset() >= toIndex) {
-                actualRange.start = Math.min(highlight.getStartOffset(), highlight.getEndOffset());
-                actualRange.end = Math.max(highlight.getStartOffset(), highlight.getEndOffset());
-                return true;
+                return new Range(Math.min(highlight.getStartOffset(), highlight.getEndOffset()), Math.max(highlight.getStartOffset(), highlight.getEndOffset()));
             }
         }
-        return false;
+        return Range.NULL_RANGE;
     }
     
     private static final int UNKNOWN_CASE = 0;

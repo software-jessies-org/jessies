@@ -54,10 +54,10 @@ public class PTextAreaSpellingChecker implements PTextListener {
         
         // FIXME: Ignore this click if the user actually clicked in the right-hand margin.
         
-        final Range actualRange = new Range();
-        if (isMisspelledWordBetween(offset, offset, actualRange)) {
+        final Range actualRange = rangeOfMisspelledWordBetween(offset, offset);
+        if (actualRange.isEmpty() == false) {
             EPopupMenu menu = new EPopupMenu();
-            String misspelling = component.getTextBuffer().subSequence(actualRange.start, actualRange.end).toString();
+            String misspelling = component.getTextBuffer().subSequence(actualRange.getStart(), actualRange.getEnd()).toString();
             String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
             for (int i = 0; i < suggestions.length; i++) {
                 String suggestion = suggestions[i];
@@ -66,7 +66,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
                 // hyphenated words or multiple words.
                 suggestion = suggestion.replace('-', '_');
                 suggestion = convertMultipleWordsToCamelCase(suggestion);
-                menu.add(new CorrectSpellingAction(component, suggestion, actualRange.start, actualRange.end));
+                menu.add(new CorrectSpellingAction(component, suggestion, actualRange.getStart(), actualRange.getEnd()));
             }
             if (suggestions.length == 0) {
                 menu.add(new NoSuggestionsAction());
@@ -213,20 +213,18 @@ public class PTextAreaSpellingChecker implements PTextListener {
     }
     
     /** Tests whether there's a misspelled word in the given range of offsets. */
-    public boolean isMisspelledWordBetween(int fromIndex, int toIndex, Range actualRange) {
+    public Range rangeOfMisspelledWordBetween(int fromIndex, int toIndex) {
         if (toIndex - fromIndex > 20) {
-            return false;
+            return Range.NULL_RANGE;
         }
         List highlights = component.getHighlights();
         for (int i = 0; i < highlights.size(); ++i) {
             PHighlight highlight = (PHighlight) highlights.get(i);
             if (highlight instanceof UnderlineHighlight && highlight.getStart().getIndex() <= fromIndex && highlight.getEnd().getIndex() >= toIndex) {
-                actualRange.start = Math.min(highlight.getStart().getIndex(), highlight.getEnd().getIndex());
-                actualRange.end = Math.max(highlight.getStart().getIndex(), highlight.getEnd().getIndex());
-                return true;
+                return new Range(Math.min(highlight.getStart().getIndex(), highlight.getEnd().getIndex()), Math.max(highlight.getStart().getIndex(), highlight.getEnd().getIndex()));
             }
         }
-        return false;
+        return Range.NULL_RANGE;
     }
     
     private static final int UNKNOWN_CASE = 0;
