@@ -33,7 +33,6 @@ public class ETextWindow extends EWindow implements PTextListener {
     protected File file;
     private long lastModifiedTime;
     protected ETextArea text;
-    private boolean isDirty;
     private BirdView birdView;
     private TagsUpdater tagsUpdater;
     
@@ -152,15 +151,15 @@ public class ETextWindow extends EWindow implements PTextListener {
     //
     
     public void textCompletelyReplaced(PTextEvent e) {
-        markAsDirty();
+        textBecameDirty();
     }
     
     public void textRemoved(PTextEvent e) {
-        markAsDirty();
+        textBecameDirty();
     }
     
     public void textInserted(PTextEvent e) {
-        markAsDirty();
+        textBecameDirty();
     }
     
     /** Tests whether the 'content' looks like a Unix shell script. */
@@ -260,8 +259,8 @@ public class ETextWindow extends EWindow implements PTextListener {
                 // FIXME
                 //text.getDocument().addDocumentListener(new UnmatchedBracketHighlighter(text));
             }
-            updateCleanliness();
             getTitleBar().checkForCounterpart(); // If we don't do this, we don't get the icon until we get focus.
+            getTitleBar().repaint();
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
             Edit.showAlert("Open", "Couldn't open file '" + FileUtilities.getUserFriendlyName(file) + "' (" + th.getMessage() + ")");
@@ -286,7 +285,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             Edit.showAlert("Revert", "'" + getFilename() + "' is the same on disk as in the editor.");
             return;
         }
-        boolean isConfirmationRequired = isDirty ();
+        boolean isConfirmationRequired = isDirty();
         if (isConfirmationRequired == false || confirmReversion()) {
             uncheckedRevertToSaved();
         }
@@ -457,19 +456,14 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public boolean isDirty() {
-        return isDirty;
+        return ! text.getTextBuffer().getUndoBuffer().isClean();
     }
     
-    public void markAsDirty() {
+    public void textBecameDirty() {
         if (findResultsUpdater != null) {
             findResultsUpdater.restart();
         }
-        updateCleanliness();
-    }
-    
-    public void updateCleanliness() {
-        isDirty = ! text.getTextBuffer().getUndoBuffer().isClean();
-        repaint();
+        getTitleBar().repaint();
     }
     
     public void clear() {
@@ -654,8 +648,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             // In this case, it's important that we write into the original file rather than creating a new one.
             text.getTextBuffer().writeToFile(file);
             text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
+            getTitleBar().repaint();
             Edit.showStatus("Saved " + filename);
-            updateCleanliness();
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
             tagsUpdater.updateTags();
