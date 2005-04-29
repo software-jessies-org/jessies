@@ -71,14 +71,13 @@ public class HyperlinkHighlighter implements Highlighter {
 	 * The second character class subtraction stops us matching run-on
 	 * text in a grep match like "file.cpp:123:#if 0".
 	 */
-	private static final String NAME = "(?: Makefile | (?> [\\S && [^\\.]]+ ) \\. [\\S && [^:]]+ )";
+	private static final String NAME = "(?: Makefile \\b | (?> [\\S && [^\\.]]+ ) \\. [\\S && [^:]]+ )";
 	
 	/**
 	 * We're actually looking for a grep-style address, where there's an
 	 * optional :line:column:line:column sequence after the filename itself.
-	 * We're sloppy, and allow any combination of digits and colons.
 	 */
-	private static final String ADDRESS = "( [\\d:] + )?";
+	private static final String ADDRESS = "( :\\d+(?: :\\d+(?: :\\d+(?: :\\d+:?)?)?)? )?";
 	
 	/** The complete pattern. */
 	private static final Pattern PATTERN =
