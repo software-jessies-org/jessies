@@ -35,11 +35,11 @@ public class TerminalControl implements Runnable {
 
 	private JTerminalPane pane;
 	private TextBuffer listener;
-	private Process process;
+	private PtyProcess ptyProcess;
 	private boolean processIsRunning = true;
 	private boolean processIsBeingDestroyed = false;
 	private InputStream in;
-	private PtyOutputStream out;
+	private OutputStream out;
 	
 	private int characterSet;
 	private char[] g = new char[4];
@@ -51,21 +51,21 @@ public class TerminalControl implements Runnable {
 	// Buffer of TerminalActions to perform.
 	private ArrayList terminalActions = new ArrayList();
 	
-	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command, Process process) throws IOException {
+	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) throws IOException {
 		reset();
 		this.pane = pane;
 		this.listener = listener;
-		this.process = process;
-		this.in = process.getInputStream();
-		this.out = new PtyOutputStream(process.getOutputStream());
+		ptyProcess = new PtyProcess(command.split(" "));
+		this.in = ptyProcess.getInputStream();
+		this.out = ptyProcess.getOutputStream();
 		this.logWriter = new LogWriter(command);
 	}
 	
 	public void destroyProcess() {
 		if (processIsRunning) {
 			try {
+				ptyProcess.destroy();
 				processIsBeingDestroyed = true;
-				process.destroy();
 			} catch (Exception ex) {
 				Log.warn("Failed to destroy process.", ex);
 			}
@@ -131,7 +131,8 @@ public class TerminalControl implements Runnable {
 		} finally {
 			processIsRunning = false;
 			try {
-				int status = process.waitFor();
+				ptyProcess.waitFor();
+				int status = ptyProcess.getExitStatus();
 				if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
 					announceConnectionLost("\n\r[Process exited with status " + status + ".]");
 				} else {
@@ -170,7 +171,7 @@ public class TerminalControl implements Runnable {
 		};
 		listener.processActions(new TerminalAction[] { sizeChangeAction });
 		// Notify the pty that the size has changed.
-		out.sendResizeNotification(sizeInChars, sizeInPixels);
+		ptyProcess.sendResizeNotification(sizeInChars, sizeInPixels);
 	}
 	
 	/** Returns the number of bytes in buffer which remain unprocessed. */

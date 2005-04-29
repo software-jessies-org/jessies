@@ -54,7 +54,12 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
 end
 
 classpath="#{terminator_home}/classes:#{terminator_home}/../salma-hayek/classes:#{terminator_home}/terminator.jar"
-pty_binary="#{terminator_home}/native/all/pty/pty-#{UNAME}-#{`arch`}"
+pty_path="#{terminator_home}/native/#{UNAME}/libpty"
+if UNAME == "Darwin"
+  pty_binary="#{pty_path}/libpty.jnilib"
+else
+  pty_binary="#{pty_path}/libpty.so"
+end
 os_specific_options = []
 
 if test(?w, "/usr/share/terminfo")
@@ -107,11 +112,14 @@ end
 
 # If we don't have a pre-compiled 'pty' program for this
 # architecture, try to build it.
+system("echo PTY binary is in #{pty_binary}")
 if test(?x, pty_binary)
-  system("make -C `dirname #{pty_binary}`")
+else
+  system("echo Performing make in #{pty_path}")
+  system("make -C #{pty_path}")
 end
 
-options = [ "-Xmx1g", "-cp", classpath, "-Djava.awt.Window.locationByPlatform=true", "-Dpty.binary=#{pty_binary}" ]
+options = [ "-Xmx1g", "-cp", classpath, "-Djava.awt.Window.locationByPlatform=true", "-Djava.library.path=#{pty_path}" ]
 options.concat(os_specific_options)
 log_filename="#{log_directory}/terminator.log.#{$$}"
 

@@ -50,8 +50,6 @@ public class JTerminalPane extends JPanel {
 		this.name = name;
 		
 		try {
-//			Log.warn("Starting process '" + command + "'");
-			process = Runtime.getRuntime().exec(System.getProperty("pty.binary") + " " + command);
 			init(command);
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -126,11 +124,11 @@ public class JTerminalPane extends JPanel {
 		fixScrollBarForMacOs(scrollPane);
 		
 		add(scrollPane, BorderLayout.CENTER);
-		GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
+		//GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
 		
 		textPane.sizeChanged();
 		try {
-			control = new TerminalControl(this, textPane.getModel(), command, process);
+			control = new TerminalControl(this, textPane.getModel(), command);
 			textPane.setTerminalControl(control);
 			initSizeMonitoring();
 		} catch (IOException ex) {
