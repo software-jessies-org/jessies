@@ -21,6 +21,8 @@ public class ShellCommand {
     /** The count of open streams. */
     private int openStreamCount = 0;
     
+    private CompletionListener listener;
+    
     /**
      * Starts a new task with no progress feedback in the system's temporary
      * directory (probably /tmp on Unix).
@@ -43,7 +45,7 @@ public class ShellCommand {
         init(filename, lineNumber);
         runCommand();
     }
-
+    
 //    public void init(String filename, int lineNumber) {
 //        processBuilder = new ProcessBuilder(makeCommandLine(command));
 //        processBuilder.directory(FileUtilities.fileFromString(context));
@@ -136,6 +138,9 @@ public class ShellCommand {
             }
             workspace.getErrorsWindow().drawHorizontalRule();
             Edit.showStatus("Task '" + command + "' finished");
+            if (listener != null) {
+                listener.shellCommandCompleted();
+            }
         }
     }
     
@@ -170,5 +175,13 @@ public class ShellCommand {
     /** Returns the name of this task. Currently this is the whole text of the command. */
     public String getName() {
         return this.name;
+    }
+    
+    public void addCompletionListener(CompletionListener listener) {
+        this.listener = listener;
+    }
+
+    public interface CompletionListener {
+        public void shellCommandCompleted();
     }
 }
