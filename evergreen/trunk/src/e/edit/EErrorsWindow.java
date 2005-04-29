@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
 import e.ptextarea.*;
+import e.gui.*;
 import e.util.*;
 
 public class EErrorsWindow extends EWindow {
@@ -15,7 +16,9 @@ public class EErrorsWindow extends EWindow {
     public EErrorsWindow(String filename) {
         super(filename);
         initTextArea();
-        add(new JScrollPane(textArea), BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
+        add(scrollPane, BorderLayout.CENTER);
     }
     
     private void initTextArea() {
