@@ -1,6 +1,7 @@
 package e.edit;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -365,12 +366,32 @@ public class FindFilesDialog {
         
         initMatchList();
         
+        // Register for notifications of files saved while our dialog is up.
+        final SaveMonitor saveMonitor = SaveMonitor.getInstance();
+        final SaveMonitor.Listener saveListener = new SaveMonitor.Listener() {
+            /**
+             * Update the matches if a file is saved. Ideally, we'd be a bit
+             * more intelligent about this. I'd like to see a new UI that
+             * doesn't build a tree and present it all at once; I'd like to
+             * see matches as they're found.
+             */
+            public void fileSaved() {
+                showMatches();
+            }
+        };
+        saveMonitor.addSaveListener(saveListener);
+        ActionListener unregisterListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveMonitor.removeSaveListener(saveListener);
+            }
+        };
+        
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Files Containing:", patternField);
         formPanel.addRow("Whose Names Match:", directoryField);
         formPanel.addRow("Matches:", new JScrollPane(matchView));
         formPanel.setStatusBar(status);
         
-        FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel);
+        FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel, "Close", unregisterListener);
     }
 }

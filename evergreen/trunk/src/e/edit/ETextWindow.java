@@ -653,6 +653,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
             tagsUpdater.updateTags();
+            SaveMonitor.getInstance().fireSaveListeners();
             return true;
         } catch (Exception ex) {
             Edit.showStatus("");
