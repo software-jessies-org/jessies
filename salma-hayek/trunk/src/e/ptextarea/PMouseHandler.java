@@ -81,11 +81,21 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void makeInitialSelection(int pressedOffset) {
             this.pressedOffset = pressedOffset;
             
+            // A double-click after the end of the line should select the whole
+            // line. I don't know of any platform whose native behavior this is,
+            // but it's how acme used to work, and hence wily, and hence Edit,
+            // and I'm really used to it.
+            PTextBuffer textBuffer = textArea.getTextBuffer();
+            if (pressedOffset < textBuffer.length() && textBuffer.charAt(pressedOffset) == '\n') {
+                selectLine(textArea.getLineOfOffset(pressedOffset));
+                return;
+            }
+            
             if (selectStringLiteral()) {
                 return;
             }
             
-            int bracketOffset = PBracketUtilities.findMatchingBracket(textArea.getTextBuffer(), pressedOffset);
+            int bracketOffset = PBracketUtilities.findMatchingBracket(textBuffer, pressedOffset);
             if (bracketOffset != -1) {
                 if (pressedOffset <= bracketOffset) {
                     textArea.setSelection(pressedOffset, bracketOffset, false);
@@ -138,15 +148,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         
         public void makeInitialSelection(int pressedOffset) {
             this.pressedLine = textArea.getLineOfOffset(pressedOffset);
-            textArea.select(textArea.getLineStartOffset(pressedLine), getLineEndOffset(pressedLine));
-        }
-        
-        private int getLineEndOffset(int line) {
-            if (line == textArea.getLineCount() - 1) {
-                return textArea.getLineEndOffsetBeforeTerminator(line);
-            } else {
-                return textArea.getLineStartOffset(line + 1);
-            }
+            selectLine(pressedLine);
         }
         
         public void mouseDragged(int newOffset) {
@@ -154,6 +156,18 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             int minLine = Math.min(currentLine, pressedLine);
             int maxLine = Math.max(currentLine, pressedLine);
             textArea.setSelectionWithoutScrolling(textArea.getLineStartOffset(minLine), getLineEndOffset(maxLine), (pressedLine == minLine));
+        }
+    }
+    
+    private void selectLine(int line) {
+        textArea.select(textArea.getLineStartOffset(line), getLineEndOffset(line));
+    }
+    
+    private int getLineEndOffset(int line) {
+        if (line == textArea.getLineCount() - 1) {
+            return textArea.getLineEndOffsetBeforeTerminator(line);
+        } else {
+            return textArea.getLineStartOffset(line + 1);
         }
     }
 }
