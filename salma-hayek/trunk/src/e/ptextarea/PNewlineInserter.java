@@ -54,17 +54,6 @@ public class PNewlineInserter {
         return ending.toString();
     }
     
-    // TODO: Doesn't belong here.
-    public static String reflectBrackets(String originalBrackets) {
-        StringBuffer reflectedBrackets = new StringBuffer();
-        for (int i = 0; i != originalBrackets.length(); ++i) {
-            char originalBracket = originalBrackets.charAt(i);
-            char reflectedBracket = PBracketUtilities.getPartnerForBracket(originalBracket);
-            reflectedBrackets.append(reflectedBracket);
-        }
-        return reflectedBrackets.reverse().toString();
-    }
-
     private boolean insertMatchingBrackets() {
         final int start = textArea.getSelectionStart();
         final int end = textArea.getSelectionEnd();
@@ -74,11 +63,11 @@ public class PNewlineInserter {
         String afterInsertion = textArea.getTextBuffer().subSequence(suffixPosition, textArea.getTextBuffer().length()).toString();
         String unmatchedOpenBrackets = getUnmatchedBrackets(beforeInsertion);
         String unmatchedCloseBrackets = getUnmatchedBrackets(afterInsertion);
-        String reflectedCloseBrackets = reflectBrackets(unmatchedCloseBrackets);
+        String reflectedCloseBrackets = PBracketUtilities.reflectBrackets(unmatchedCloseBrackets);
         if (unmatchedOpenBrackets.startsWith(reflectedCloseBrackets) == false) {
             return false;
         }
-        String closingBrackets = reflectBrackets(unmatchedOpenBrackets.substring(reflectedCloseBrackets.length()));
+        String closingBrackets = PBracketUtilities.reflectBrackets(unmatchedOpenBrackets.substring(reflectedCloseBrackets.length()));
         if (closingBrackets.length() == 0) {
             return false;
         }

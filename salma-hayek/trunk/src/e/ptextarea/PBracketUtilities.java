@@ -73,6 +73,16 @@ public class PBracketUtilities {
         return -1;
     }
     
+    public static String reflectBrackets(String originalBrackets) {
+        StringBuffer reflectedBrackets = new StringBuffer();
+        for (int i = 0; i != originalBrackets.length(); ++i) {
+            char originalBracket = originalBrackets.charAt(i);
+            char reflectedBracket = PBracketUtilities.getPartnerForBracket(originalBracket);
+            reflectedBrackets.append(reflectedBracket);
+        }
+        return reflectedBrackets.reverse().toString();
+    }
+    
     private PBracketUtilities() {
         // Not for instantiation.
     }
