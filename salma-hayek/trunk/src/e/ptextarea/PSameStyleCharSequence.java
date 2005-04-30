@@ -14,7 +14,12 @@ public class PSameStyleCharSequence implements CharSequence {
     private StringBuffer mangledText;
     
     // FIXME: need to take an offset or a PLineSegment as a parameter so we
-    // know what to ignore.
+    // know what to ignore. I think there are two cases: if you're in style
+    // NORMAL, you want to see any other NORMAL text. If you're not, you only
+    // want to see text of the same style that's contiguous with where you
+    // are. A bracket in this comment, say, shouldn't match a bracket in
+    // another comment. Single-line comments make this difficult, but let's
+    // face it: the important case is the NORMAL case.
     public PSameStyleCharSequence(PTextArea textArea) {
         // FIXME: 1.5 has a StringBuffer(CharSequence) constructor.
         this.mangledText = new StringBuffer(textArea.getTextBuffer().toString());
