@@ -24,9 +24,9 @@ public class PSameStyleCharSequence implements CharSequence {
             PLineSegment segment = it.next();
             if (segment.getStyle() != PStyle.NORMAL) {
                 for (int i = segment.getOffset(); i < segment.getEnd(); ++i) {
+                    /* TEST: this { should match this } */
+                    /* TEST: the for loop's brace shouldn't match this } */
                     /* TEST: this { shouldn't match anything */
-                    /* TEST: ...not even this } */
-                    /* TEST: but this { should match this } */
                     mangledText.setCharAt(i, ' ');
                 }
             }
