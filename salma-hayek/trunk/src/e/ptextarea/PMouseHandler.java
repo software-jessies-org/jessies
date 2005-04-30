@@ -81,6 +81,10 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void makeInitialSelection(int pressedOffset) {
             this.pressedOffset = pressedOffset;
             
+            if (selectStringLiteral()) {
+                return;
+            }
+            
             int bracketOffset = PBracketUtilities.findMatchingBracket(textArea.getTextBuffer(), pressedOffset);
             if (bracketOffset != -1) {
                 if (pressedOffset <= bracketOffset) {
@@ -93,6 +97,27 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             }
             
             selectByWord(pressedOffset, pressedOffset, false);
+        }
+        
+        private boolean selectStringLiteral() {
+            // Are we in a string literal?
+            PSegmentIterator it = textArea.getLogicalSegmentIterator(pressedOffset);
+            if (it.hasNext() == false) {
+                return false;
+            }
+            PLineSegment segment = it.next();
+            if (segment.getStyle() != PStyle.STRING) {
+                return false;
+            }
+            
+            // If we're inside the " at either end, select the whole literal.
+            boolean atStart = (segment.getOffset() == pressedOffset - 1);
+            boolean atEnd = (segment.getEnd() == pressedOffset + 1);
+            if (atStart || atEnd) {
+                textArea.setSelection(segment.getOffset() + 1, segment.getEnd() - 1, false);
+                return true;
+            }
+            return false;
         }
         
         private void selectByWord(int startOffset, int endOffset, boolean endIsAnchored) {
