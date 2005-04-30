@@ -81,20 +81,13 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         public void makeInitialSelection(int pressedOffset) {
             this.pressedOffset = pressedOffset;
             
-            // A double-click after the end of the line should select the whole
-            // line. I don't know of any platform whose native behavior this is,
-            // but it's how acme used to work, and hence wily, and hence Edit,
-            // and I'm really used to it.
-            PTextBuffer textBuffer = textArea.getTextBuffer();
-            if (pressedOffset < textBuffer.length() && textBuffer.charAt(pressedOffset) == '\n') {
-                selectLine(textArea.getLineOfOffset(pressedOffset));
-                return;
-            }
-            
+            // 1. a string literal probably starts and ends with a word, so
+            // check for string literals first.
             if (selectStringLiteral()) {
                 return;
             }
             
+            // 2. then other bracket characters.
             PSameStyleCharSequence sameStyleCharSequence = new PSameStyleCharSequence(textArea);
             int bracketOffset = PBracketUtilities.findMatchingBracket(sameStyleCharSequence, pressedOffset);
             if (bracketOffset != -1) {
@@ -107,6 +100,18 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
                 return;
             }
             
+            // 3. we'll have dealt with braces at the ends of lines by now, so
+            // a double-click after the end of the line should select the whole
+            // line. I don't know of any platform whose native behavior this is,
+            // but it's how acme used to work, and hence wily, and hence Edit,
+            // and I'm really used to it.
+            PTextBuffer textBuffer = textArea.getTextBuffer();
+            if (pressedOffset < textBuffer.length() && textBuffer.charAt(pressedOffset) == '\n') {
+                selectLine(textArea.getLineOfOffset(pressedOffset));
+                return;
+            }
+            
+            // 4. our last resort is to select the word under the mouse.
             selectByWord(pressedOffset, pressedOffset, false);
         }
         
