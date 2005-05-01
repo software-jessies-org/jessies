@@ -88,7 +88,7 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
             }
             
             // 2. then other bracket characters.
-            PSameStyleCharSequence sameStyleCharSequence = new PSameStyleCharSequence(textArea);
+            CharSequence sameStyleCharSequence = PSameStyleCharSequence.forOffset(textArea, pressedOffset);
             int bracketOffset = PBracketUtilities.findMatchingBracket(sameStyleCharSequence, pressedOffset);
             if (bracketOffset != -1) {
                 if (pressedOffset <= bracketOffset) {

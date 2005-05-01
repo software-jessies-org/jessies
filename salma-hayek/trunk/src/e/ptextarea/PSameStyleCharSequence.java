@@ -10,43 +10,100 @@ package e.ptextarea;
  * because it iterates over all the logical segments, even if it doesn't need
  * to, and it copies the entire text.
  */
-public class PSameStyleCharSequence implements CharSequence {
-    private StringBuffer mangledText;
+public class PSameStyleCharSequence {
+    private PSameStyleCharSequence() {
+    }
     
-    // FIXME: need to take an offset or a PLineSegment as a parameter so we
-    // know what to ignore. I think there are two cases: if you're in style
-    // NORMAL, you want to see any other NORMAL text. If you're not, you only
-    // want to see text of the same style that's contiguous with where you
-    // are. A bracket in this comment, say, shouldn't match a bracket in
-    // another comment. Single-line comments make this difficult, but let's
-    // face it: the important case is the NORMAL case.
-    public PSameStyleCharSequence(PTextArea textArea) {
-        // FIXME: 1.5 has a StringBuffer(CharSequence) constructor.
-        this.mangledText = new StringBuffer(textArea.getTextBuffer().toString());
-        
-        PSegmentIterator it = textArea.getLogicalSegmentIterator(0);
-        while (it.hasNext()) {
+    /**
+     * Returns a CharSequence that masks out characters not relevant to the
+     * character at the given offset.
+     */
+    public static CharSequence forOffset(PTextArea textArea, int offset) {
+        PSegmentIterator it = textArea.getLogicalSegmentIterator(offset);
+        if (it.hasNext()) {
             PLineSegment segment = it.next();
-            if (segment.getStyle() != PStyle.NORMAL) {
-                for (int i = segment.getOffset(); i < segment.getEnd(); ++i) {
-                    /* TEST: this { should match this } */
-                    /* TEST: the for loop's brace shouldn't match this } */
-                    /* TEST: this { shouldn't match anything */
-                    mangledText.setCharAt(i, ' ');
-                }
+            PStyle style = segment.getStyle();
+            if (style == PStyle.STRING || style == PStyle.COMMENT) {
+                // We only want to match within one run of this style.
+                return new SingleSegmentCharSequence(textArea, segment);
             }
+        }
+        // We want to filter out all the rest.
+        return new MangledCharSequence(textArea);
+    }
+    
+    /**
+     * Masks out the characters in the text area that aren't in a particular
+     * line segment. This class isn't thread-safe; PTextBuffer should have a
+     * "modCount" like the java.util collections so we can throw a
+     * ConcurrentModificationException if we're no longer valid. (Note that
+     * because we haven't copied anything from the text buffer, it's not
+     * directly modifications to the text buffer we're afraid of; it's their
+     * knock-on effect of potentially invalidating the line segment. An
+     * alternative solution might be to pull the offset and end out of the
+     * segment and store them as anchors?)
+     */
+    public static class SingleSegmentCharSequence implements CharSequence {
+        private PTextBuffer textBuffer;
+        private PLineSegment segment;
+        
+        public SingleSegmentCharSequence(PTextArea textArea, PLineSegment segment) {
+            this.textBuffer = textArea.getTextBuffer();
+            this.segment = segment;
+        }
+        
+        public char charAt(int index) {
+            if (index >= segment.getOffset() && index < segment.getEnd()) {
+                return textBuffer.charAt(index);
+            }
+            return ' ';
+        }
+        
+        public int length() {
+            return textBuffer.length();
+        }
+        
+        public CharSequence subSequence(int start, int end) {
+            throw new UnsupportedOperationException("subSequence(" + start + ", " + end + ")");
         }
     }
     
-    public char charAt(int index) {
-        return mangledText.charAt(index);
-    }
-    
-    public int length() {
-        return mangledText.length();
-    }
-    
-    public CharSequence subSequence(int start, int end) {
-        throw new UnsupportedOperationException("subSequence(" + start + ", " + end + ")");
+    /**
+     * Masks out any non-NORMAL text in the text area. This class is not
+     * thread-safe (or efficient) because it copies the full text of the
+     * text area, and does nothing to cope with changes to the text area.
+     */
+    public static class MangledCharSequence implements CharSequence {
+        private StringBuffer mangledText;
+        
+        public MangledCharSequence(PTextArea textArea) {
+            // FIXME: 1.5 has a StringBuffer(CharSequence) constructor.
+            this.mangledText = new StringBuffer(textArea.getTextBuffer().toString());
+            
+            PSegmentIterator it = textArea.getLogicalSegmentIterator(0);
+            while (it.hasNext()) {
+                PLineSegment segment = it.next();
+                if (segment.getStyle() != PStyle.NORMAL) {
+                    for (int i = segment.getOffset(); i < segment.getEnd(); ++i) {
+                        /* TEST: this { should match this } */
+                        /* TEST: the for loop's brace shouldn't match this } */
+                        /* TEST: this { shouldn't match anything */
+                        mangledText.setCharAt(i, ' ');
+                    }
+                }
+            }
+        }
+        
+        public char charAt(int index) {
+            return mangledText.charAt(index);
+        }
+        
+        public int length() {
+            return mangledText.length();
+        }
+        
+        public CharSequence subSequence(int start, int end) {
+            throw new UnsupportedOperationException("subSequence(" + start + ", " + end + ")");
+        }
     }
 }
