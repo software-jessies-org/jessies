@@ -21,8 +21,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public static final int NO_MARGIN = -1;
     
-    private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.6f, 0.6f, 0.6f);
-    private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.96f, 0.96f, 0.96f);
+    private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.93f, 0.93f, 0.93f);
+    private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.97f, 0.97f, 0.97f);
     
     private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f, 0.5f);
     private static final Color FOCUSED_SELECTION_BOUNDARY_COLOR = new Color(0.5f, 0.55f, 0.7f, 0.75f);
