@@ -24,8 +24,20 @@ public class PSameStyleCharSequence {
             PLineSegment segment = it.next();
             PStyle style = segment.getStyle();
             if (style == PStyle.STRING || style == PStyle.COMMENT) {
-                // We only want to match within one run of this style.
-                return new SingleSegmentCharSequence(textArea, segment);
+                if (segment.getOffset() == offset) {
+                    // If we're at the start of a STRING or COMMENT segment, we
+                    // can't possibly match a bracket; our only chance is if the
+                    // last character of the previous segment (which would have
+                    // to be NORMAL, too) is an opening bracket, so we fall
+                    // through and return the NORMAL characters.
+                    // So this can match backwards (and only backwards):
+                    //   (/*k*/|)
+                    // And this can match forwards (and only forwards):
+                    //   (|/*k*/)
+                } else {
+                    // We only want to match within one run of this style.
+                    return new SingleSegmentCharSequence(textArea, segment);
+                }
             }
         }
         // We want to filter out all the rest.
