@@ -30,7 +30,9 @@ ostringstream
 setfill
 setw
 sstream
+streambuf
 substr
+tellp
 wstring
 # Standard functions from table 99 of ISO+IEC+14882-1998.
 abort
@@ -157,4 +159,5 @@ ptrdiff
 iomanip
 iostream
 sstream
+stddef
 typeinfo
