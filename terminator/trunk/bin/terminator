@@ -54,12 +54,17 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
 end
 
 classpath="#{terminator_home}/classes:#{terminator_home}/../salma-hayek/classes:#{terminator_home}/terminator.jar"
-pty_path="#{terminator_home}/native/#{UNAME}/libpty"
+
+
+pty_makefile_path="#{terminator_home}/native/all/libpty"
+pty_path="#{pty_makefile_path}/#{UNAME}"
+jni_lib_extension="so"
 if UNAME == "Darwin"
-  pty_library="#{pty_path}/libpty.jnilib"
-else
-  pty_library="#{pty_path}/libpty.so"
+  jni_lib_extension="jnilib"
 end
+pty_library="#{pty_path}/libpty.#{jni_lib_extension}"
+
+
 os_specific_options = []
 
 if test(?w, "/usr/share/terminfo")
@@ -114,7 +119,7 @@ end
 # architecture, try to build it.
 if test(?x, pty_library)
 else
-  system("make -C #{pty_path}")
+  system("make -C #{pty_makefile_path}")
 end
 
 options = [ "-Xmx1g", "-cp", classpath, "-Djava.awt.Window.locationByPlatform=true", "-Djava.library.path=#{pty_path}" ]
