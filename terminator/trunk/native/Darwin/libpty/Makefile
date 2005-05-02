@@ -1,4 +1,4 @@
-SRCS=$(wildcard ../../shared/libpty/*.cpp) Darwin_stubs.c
+SRCS=$(wildcard ../../shared/libpty/*.cpp)
 HEADERS=$(wildcard *.h)
 UNAME=$(shell uname)
 ARCH=$(shell arch)
