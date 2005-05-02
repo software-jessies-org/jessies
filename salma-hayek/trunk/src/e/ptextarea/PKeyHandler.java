@@ -141,7 +141,7 @@ public class PKeyHandler extends KeyAdapter {
                 textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
                 try {
                     textArea.replaceSelection(content);
-                    textArea.getIndenter().correctIndentation(false);
+                    textArea.getIndenter().fixIndentation(false);
                 } finally {
                     textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();
                 }

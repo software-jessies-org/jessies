@@ -76,7 +76,7 @@ abstract public class PIndenter {
     }
     
     /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
-    public boolean correctIndentation(boolean shouldMoveCaret) {
+    public boolean fixIndentation(boolean shouldMoveCaret) {
         // FIXME - selection
         int position = textArea.getSelectionStart();
         int lineNumber = textArea.getLineOfOffset(position);

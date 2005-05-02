@@ -249,7 +249,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void autoIndent() {
-        getIndenter().correctIndentation(false);
+        getIndenter().fixIndentation(false);
     }
     
     /**
