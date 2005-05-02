@@ -115,10 +115,9 @@ elsif test(?f, terminfo_DST) == false
   system("cp #{terminator_home}/doc/terminfo/terminator #{terminfo_DST}")
 end
 
-# If we don't have a pre-compiled 'pty' program for this
+# If we don't have a pre-compiled native library for this
 # architecture, try to build it.
-if test(?x, pty_library)
-else
+if test(?x, pty_library) == false
   system("make -C #{pty_makefile_path}")
 end
 
