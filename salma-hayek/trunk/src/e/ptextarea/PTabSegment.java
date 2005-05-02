@@ -11,8 +11,10 @@ import java.awt.*;
  */
 
 public class PTabSegment extends PAbstractSegment {
-    public static final int MIN_TAB_WIDTH = 5;
-    public static final int TAB_WIDTH = 20;
+    public static final PTabSegment SINGLE_TAB = new PTabSegment(null, 0, 1);
+    
+    private static final int MIN_TAB_WIDTH = 5;
+    private static final int TAB_WIDTH = 20;
     
     public PTabSegment(PTextArea textArea, int start, int end) {
         super(textArea, start, end, PStyle.NORMAL);

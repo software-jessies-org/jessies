@@ -1058,9 +1058,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private int addCharWidth(int x, char ch) {
         if (ch == '\t') {
-            x += PTabSegment.MIN_TAB_WIDTH;  // A tab's at least as wide as this.
-            x += PTabSegment.TAB_WIDTH;
-            return x - x % PTabSegment.TAB_WIDTH;
+            return x + PTabSegment.SINGLE_TAB.getDisplayWidth(metrics, x);
         } else if (ch < MAX_CACHED_CHAR) {
             return x + widthCache[(int) ch];
         } else {
