@@ -24,7 +24,7 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         }
         
         int offset = selectionStart;
-        CharSequence chars = textArea.getTextBuffer();
+        CharSequence chars = PSameStyleCharSequence.forOffset(textArea, offset);
         
         // Look for a bracket to match with.
         if (offset < chars.length() && PBracketUtilities.isCloseBracket(chars.charAt(offset))) {
