@@ -28,9 +28,11 @@ Items to be done for PTextArea:
 
 * Try to get rid of the "get methods which aren't" in the indentation code, perhaps by none, one or more ideas from this week's guest publication:
 
-class SourceLine {
-  Indentation indentation;
-  String code;
-}
+  class SourceLine {
+    Indentation indentation;
+    String code;
+  }
 
-CommentUtilities.stripDoubleSlashComment
+  CommentUtilities.stripDoubleSlashComment
+
+* Remove the need for the reimplementation of binary chop in PAnchorSet, perhaps by removing the need for WeakReference by explicitly removing the defunct anchors from the set.  This is waiting on approval or otherwise from Phil.
