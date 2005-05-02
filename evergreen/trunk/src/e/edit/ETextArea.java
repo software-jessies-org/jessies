@@ -161,8 +161,8 @@ public class ETextArea extends PTextArea {
     */
     
     /** Corrects the indentation of the line with the caret, moving the caret. Returns true if the contents of the current line were changed. */
-    public boolean correctIndentation() {
-        return getIndenter().correctIndentation(true);
+    public boolean fixIndentation() {
+        return getIndenter().fixIndentation(true);
     }
     
     /**

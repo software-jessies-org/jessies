@@ -57,7 +57,7 @@ public class InsertInterfaceAction extends ETextAction {
             int last = target.getLineOfOffset(dot + src.length()) + 1;
             target.setCaretPosition(dot);
             for (int i = first; i < last; i++) {
-                target.correctIndentation();
+                target.fixIndentation();
             }
             
             // Position the caret inside the first method
