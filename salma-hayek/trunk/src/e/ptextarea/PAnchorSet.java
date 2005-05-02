@@ -22,37 +22,43 @@ public class PAnchorSet implements PTextListener {
     private ArrayList anchors = new ArrayList();
     
     public void add(PAnchor anchor) {
-        int addIndex = getAnchorIndex(anchor.getIndex());
+        int addIndex = getFirstAnchorIndex(anchor.getIndex());
         anchors.add(addIndex, new WeakReference(anchor));
     }
     
+    // Returns the first position where an anchor for the textIndex could be inserted
+    // without violating the ordering.
+    // This is what the STL calls "lower_bound".
     // This may remove dead items from the anchors list.
-    private int getAnchorIndex(int textIndex) {
-        int min = 0;
-        int max = anchors.size();
-        while (max - min > 1) {
-            int mid = (min + max) / 2;
+    private int getFirstAnchorIndex(int textIndex) {
+        int start = 0;
+        int end = anchors.size();
+        while (end - start > 1) {
+            int mid = (start + end) / 2;
             PAnchor anchor = get(mid);
             if (anchor == null) {
                 anchors.remove(mid);
-                max -= 1;
+                end -= 1;
             } else {
                 if (anchor.getIndex() == textIndex) {
-                    return mid;
+                    if (end == mid + 1) {
+                        break;
+                    }
+                    end = mid + 1;
                 } else if (anchor.getIndex() > textIndex) {
-                    max = mid;
+                    end = mid;
                 } else {
-                    min = mid;
+                    start = mid;
                 }
             }
         }
-        if (min < anchors.size()) {
-            PAnchor anchor = get(min);
+        if (start < anchors.size()) {
+            PAnchor anchor = get(start);
             if (anchor != null && anchor.getIndex() < textIndex) {
-                min++;
+                start++;
             }
         }
-        return min;
+        return start;
     }
     
     // May return null!
@@ -62,7 +68,7 @@ public class PAnchorSet implements PTextListener {
     }
     
     public void textInserted(PTextEvent event) {
-        int start = getAnchorIndex(event.getOffset());
+        int start = getFirstAnchorIndex(event.getOffset());
         int insertionLength = event.getLength();
         for (int i = start; i < anchors.size(); i++) {
             PAnchor anchor = get(i);
@@ -87,7 +93,7 @@ public class PAnchorSet implements PTextListener {
     }
     
     public void textRemoved(PTextEvent event) {
-        int start = getAnchorIndex(event.getOffset());
+        int start = getFirstAnchorIndex(event.getOffset());
         int deletionLength = event.getLength();
         int deletionEnd = event.getOffset() + event.getLength();
         for (int i = start; i < anchors.size(); i++) {

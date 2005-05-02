@@ -795,7 +795,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         selection.paint(graphics);
         for (int i = 0; i < highlights.size(); i++) {
             PHighlight highlight = (PHighlight) highlights.get(i);
-            if (highlight.getStart().getIndex() <= maxChar && highlight.getEnd().getIndex() > minChar) {
+            if (highlight.getStartIndex() <= maxChar && highlight.getEndIndex() > minChar) {
                 highlight.paint(graphics);
             }
         }

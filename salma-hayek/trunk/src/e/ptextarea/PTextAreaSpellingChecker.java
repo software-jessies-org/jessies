@@ -192,7 +192,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
     private void removeExistingHighlightsForRange(final int fromIndex, final int toIndex) {
         component.removeHighlights(new PHighlightMatcher() {
             public boolean matches(PHighlight highlight) {
-                return (highlight instanceof UnderlineHighlight && highlight.getStart().getIndex() < toIndex && highlight.getEnd().getIndex() >= fromIndex);
+                return (highlight instanceof UnderlineHighlight && highlight.getStartIndex() < toIndex && highlight.getEndIndex() >= fromIndex);
             }
         });
     }
@@ -203,8 +203,8 @@ public class PTextAreaSpellingChecker implements PTextListener {
         for (int i = 0; i < highlights.size(); ++i) {
             PHighlight highlight = (PHighlight) highlights.get(i);
             if (highlight instanceof UnderlineHighlight) {
-                final int start = highlight.getStart().getIndex();
-                final int end = highlight.getEnd().getIndex();
+                final int start = highlight.getStartIndex();
+                final int end = highlight.getEndIndex();
                 String misspelling = component.getTextBuffer().subSequence(start, end).toString();
                 result.add(misspelling);
             }
@@ -220,8 +220,8 @@ public class PTextAreaSpellingChecker implements PTextListener {
         List highlights = component.getHighlights();
         for (int i = 0; i < highlights.size(); ++i) {
             PHighlight highlight = (PHighlight) highlights.get(i);
-            if (highlight instanceof UnderlineHighlight && highlight.getStart().getIndex() <= fromIndex && highlight.getEnd().getIndex() >= toIndex) {
-                return new Range(Math.min(highlight.getStart().getIndex(), highlight.getEnd().getIndex()), Math.max(highlight.getStart().getIndex(), highlight.getEnd().getIndex()));
+            if (highlight instanceof UnderlineHighlight && highlight.getStartIndex() <= fromIndex && highlight.getEndIndex() >= toIndex) {
+                return new Range(Math.min(highlight.getStartIndex(), highlight.getEndIndex()), Math.max(highlight.getStartIndex(), highlight.getEndIndex()));
             }
         }
         return Range.NULL_RANGE;

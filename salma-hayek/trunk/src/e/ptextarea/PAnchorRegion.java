@@ -22,16 +22,6 @@ public class PAnchorRegion {
         anchorSet.add(end);
     }
     
-    /** Returns the PAnchor defining the start of this region. */
-    public PAnchor getStart() {
-        return start;
-    }
-    
-    /** Returns the PAnchor defining the end of this region. */
-    public PAnchor getEnd() {
-        return end;
-    }
-    
     public int getStartIndex() {
         return start.getIndex();
     }

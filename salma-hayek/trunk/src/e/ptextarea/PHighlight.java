@@ -28,8 +28,8 @@ public abstract class PHighlight extends PAnchorRegion {
     }
     
     public void paint(Graphics2D graphics) {
-        PCoordinates start = textArea.getCoordinates(getStart().getIndex());
-        PCoordinates end = textArea.getCoordinates(getEnd().getIndex());
+        PCoordinates start = textArea.getCoordinates(getStartIndex());
+        PCoordinates end = textArea.getCoordinates(getEndIndex());
         paint(graphics, start, end);
     }
     
