@@ -76,8 +76,10 @@ public class HyperlinkHighlighter implements Highlighter {
 	/**
 	 * We're actually looking for a grep-style address, where there's an
 	 * optional :line:column:line:column sequence after the filename itself.
+	 * These are the forms Edit recognises although the pattern isn't quite
+	 * the same as the copy in Edit.java.
 	 */
-	private static final String ADDRESS = "( :\\d+(?: :\\d+(?: :\\d+(?: :\\d+:?)?)?)? )?";
+	private static final String ADDRESS = "((:\\d+){1,4})?";
 	
 	/** The complete pattern. */
 	private static final Pattern PATTERN =
