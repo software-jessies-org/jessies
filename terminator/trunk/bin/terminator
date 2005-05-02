@@ -56,9 +56,9 @@ end
 classpath="#{terminator_home}/classes:#{terminator_home}/../salma-hayek/classes:#{terminator_home}/terminator.jar"
 pty_path="#{terminator_home}/native/#{UNAME}/libpty"
 if UNAME == "Darwin"
-  pty_binary="#{pty_path}/libpty.jnilib"
+  pty_library="#{pty_path}/libpty.jnilib"
 else
-  pty_binary="#{pty_path}/libpty.so"
+  pty_library="#{pty_path}/libpty.so"
 end
 os_specific_options = []
 
@@ -112,10 +112,8 @@ end
 
 # If we don't have a pre-compiled 'pty' program for this
 # architecture, try to build it.
-system("echo PTY binary is in #{pty_binary}")
-if test(?x, pty_binary)
+if test(?x, pty_library)
 else
-  system("echo Performing make in #{pty_path}")
   system("make -C #{pty_path}")
 end
 
