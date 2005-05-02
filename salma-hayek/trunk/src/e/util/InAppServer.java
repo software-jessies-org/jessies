@@ -38,7 +38,7 @@ public abstract class InAppServer {
         private void writePortNumberToFile(File portFile) {
             int port = socket.getLocalPort();
             StringUtilities.writeFile(portFile, port + "\n");
-            Log.warn("echo " + port + " > " + portFile + "\n");
+            Log.warn("echo " + port + " > " + portFile);
         }
         
         public void run() {
