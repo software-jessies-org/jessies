@@ -32,8 +32,6 @@ url.prefixes=file://;ftp://;http://;https://
 ?Windows 2000:java.documentationIndex=file:///V:/download/java/docs/api/
 ?Linux:java.documentationIndex=file:///home/elliotth/download/java/docs/api/
 
-?Mac OS X:apple.laf.useScreenMenuBar=true
-
 ?Windows 2000:make.command=nmake
 
 tools.0.name=Shell Window
