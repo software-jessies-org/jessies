@@ -7,6 +7,12 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 public class GuiUtilities {
+    static {
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("swing.aatext", "true");
+        System.setProperty("swing.boldMetal", "false");
+    }
+    
     private GuiUtilities() { /* Not instantiable. */ }
     
     /**
@@ -108,14 +114,8 @@ public class GuiUtilities {
         return isMacOs() ? "Monaco" : "Monospaced";
     }
     
-    private static void initSwingProperties() {
-        System.setProperty("swing.aatext", "true");
-        System.setProperty("swing.boldMetal", "false");
-    }
-    
     public static void initLookAndFeel() {
         try {
-            initSwingProperties();
             String lafClassName = Parameters.getParameter("laf.className");
             if (lafClassName == null) {
                 lafClassName = UIManager.getSystemLookAndFeelClassName();
