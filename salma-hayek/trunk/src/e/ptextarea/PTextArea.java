@@ -1171,10 +1171,28 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 contents = toolkit.getSystemSelection().getContents(this);
             }
             DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
-            String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            replaceSelection(reformatPastedText(string));
+            String string = reformatPastedText((String) contents.getTransferData(DataFlavor.stringFlavor));
+            if (string.indexOf('\n') == -1) {
+                replaceSelection(string);
+            } else {
+                pasteAndReIndent(string);
+            }
         } catch (Exception ex) {
             Log.warn("Couldn't paste.", ex);
+        }
+    }
+    
+    private void pasteAndReIndent(String string) {
+        final int startLine = getLineOfOffset(getSelectionStart());
+        final int finishLine = startLine + StringUtilities.count(string, '\n');
+        getTextBuffer().getUndoBuffer().startCompoundEdit();
+        try {
+            replaceSelection((string));
+            for (int line = startLine; line <= finishLine; ++line) {
+                getIndenter().fixIndentationAt(true, getLineStartOffset(line));
+            }
+        } finally {
+            getTextBuffer().getUndoBuffer().finishCompoundEdit();
         }
     }
     

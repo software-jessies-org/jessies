@@ -1,3 +1,4 @@
+
 package e.ptextarea;
 
 import e.util.*;
@@ -77,8 +78,11 @@ abstract public class PIndenter {
     
     /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
     public boolean fixIndentation(boolean shouldMoveCaret) {
+        return fixIndentationAt(shouldMoveCaret, textArea.getSelectionStart());
+    }
+    
+    public boolean fixIndentationAt(boolean shouldMoveCaret, int position) {
         // FIXME - selection
-        int position = textArea.getSelectionStart();
         int lineNumber = textArea.getLineOfOffset(position);
         
         int offsetIntoLine = position - textArea.getLineStartOffset(lineNumber) - getCurrentIndentationOfLine(lineNumber).length();
