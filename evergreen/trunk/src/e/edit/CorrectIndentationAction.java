@@ -19,12 +19,12 @@ public class CorrectIndentationAction extends ETextAction {
         int position = textArea.getSelectionStart();
         if (position == textArea.getSelectionEnd()) {
             int desiredLineIndex = textArea.getLineOfOffset(position) + 1;
-            textArea.getIndenter().fixIndentation(false);
+            textArea.getIndenter().fixIndentation();
             desiredLineIndex = Math.min(desiredLineIndex, textArea.getLineCount() - 1);
             int desiredPosition = textArea.getLineStartOffset(desiredLineIndex);
             textArea.select(desiredPosition, desiredPosition);
         } else {
-            textArea.getIndenter().fixIndentation(false);
+            textArea.getIndenter().fixIndentation();
         }
     }
 }
