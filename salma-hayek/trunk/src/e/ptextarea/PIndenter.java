@@ -1,10 +1,9 @@
-
 package e.ptextarea;
 
 import e.util.*;
 import java.util.regex.*;
 
-abstract public class PIndenter {
+public abstract class PIndenter {
     protected PTextArea textArea;
     
     public PIndenter(PTextArea textArea) {
