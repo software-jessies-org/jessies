@@ -1172,8 +1172,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             }
             DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
             String string = reformatPastedText((String) contents.getTransferData(DataFlavor.stringFlavor));
+            // This special case wouldn't be needed if fixIndentation didn't mess around with the selection.
             if (string.indexOf('\n') == -1) {
                 replaceSelection(string);
+                getIndenter().fixIndentation(false);
             } else {
                 pasteAndReIndent(string);
             }
