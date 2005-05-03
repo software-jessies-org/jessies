@@ -14,6 +14,6 @@ public class CorrectIndentationAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        getTextArea().fixIndentation();
+        getTextArea().getIndenter().fixIndentation(true);
     }
 }

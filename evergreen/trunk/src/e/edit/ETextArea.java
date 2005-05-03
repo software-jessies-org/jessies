@@ -119,52 +119,6 @@ public class ETextArea extends PTextArea {
         return pastedText.replace('\u00a0', ' ');
     }
     
-    /*
-    public void paste() {
-        Clipboard clipboard = getToolkit().getSystemClipboard();
-        if (isEnabled() == false || clipboard == null) {
-            return;
-        }
-        
-        Transferable content = clipboard.getContents(this);
-        if (content == null) {
-            getToolkit().beep();
-            return;
-        }
-        // FIXME: start CompoundEdit
-        //CompoundEdit entireEdit = new CompoundEdit();
-        //getUndoManager().addEdit(entireEdit);
-            Position position = getDocument().createPosition(getSelectionEnd());
-            
-            String replacementText = (String) content.getTransferData(DataFlavor.stringFlavor);
-            
-            // You don't want to paste non-breakable spaces from HTML
-            // documentation into your code.
-            replacementText = replacementText.replace('\u00a0', ' ');
-            
-            if (Parameters.getParameter("reformatPastedText", true) && replacementText.indexOf('\n') != -1) {
-                int firstLine = getLineOfOffset(getCaretPosition());
-                replaceSelection(replacementText);
-                int lastLine = getLineOfOffset(getCaretPosition());
-                for (int line = firstLine; line < lastLine; line++) {
-                    setCaretPosition(getLineStartOffset(line));
-                    autoIndent();
-                }
-            } else {
-                replaceSelection(replacementText);
-            }
-            
-            setCaretPosition(position.getOffset());
-            // FIXME: end CompoundEdit
-            //entireEdit.end();
-    }
-    */
-    
-    /** Corrects the indentation of the line with the caret, moving the caret. Returns true if the contents of the current line were changed. */
-    public boolean fixIndentation() {
-        return getIndenter().fixIndentation(true);
-    }
-    
     /**
      * Returns the word up to but not past the caret. The intended use is
      * working out what to offer as completions in AutoCompleteAction.
