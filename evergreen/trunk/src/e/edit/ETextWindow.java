@@ -463,6 +463,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         if (findResultsUpdater != null) {
             findResultsUpdater.restart();
         }
+        updateWatermark();
         getTitleBar().repaint();
     }
     
