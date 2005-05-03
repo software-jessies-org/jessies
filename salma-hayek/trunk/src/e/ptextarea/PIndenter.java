@@ -80,11 +80,6 @@ public abstract class PIndenter {
         // FIXME - selection
         return fixIndentationAt(textArea.getSelectionStart());        
     }
-
-    // Temporary hack.
-    public boolean fixIndentation(boolean shouldMoveCaret) {
-        return fixIndentationAt(shouldMoveCaret, textArea.getSelectionStart());
-    }
     
     // charsInserted is allowed to be negative.
     private static int adjustOffsetAfterInsertion(int offsetToAdjust, int offsetOfInsertion, int charsInserted) {
@@ -93,11 +88,6 @@ public abstract class PIndenter {
         } else {
             return offsetToAdjust + charsInserted;
         }
-    }
-    
-    // Temporary hack.
-    public boolean fixIndentationAt(boolean shouldMoveCaret, int position) {
-        return fixIndentationAt(position);
     }
     
     public boolean fixIndentationAt(int position) {

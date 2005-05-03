@@ -1168,16 +1168,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             }
             DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
             String string = reformatPastedText((String) contents.getTransferData(DataFlavor.stringFlavor));
-            // This special case wouldn't be needed if fixIndentation didn't mess around with the selection.
-            if (string.indexOf('\n') == -1) {
-                replaceSelection(string);
-                // Desired semantics:
-                // There is no selection: fix the indentation of the current line and leave the caret at the same offset
-                // within the trimmed line.
-                getIndenter().fixIndentation(false);
-            } else {
-                pasteAndReIndent(string);
-            }
+            pasteAndReIndent(string);
         } catch (Exception ex) {
             Log.warn("Couldn't paste.", ex);
         }
@@ -1190,12 +1181,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         try {
             replaceSelection(string);
             for (int line = startLine; line <= finishLine; ++line) {
-                // Desired semantics:
-                // There is no selection: fix the indentation of the current line.
-                // At the end of this method, the caret should be left at the offset now corresponding to the end of the pasted area,
-                // which could be in the middle of a line.
-                // (That case isn't properly handled currently.)
-                getIndenter().fixIndentationAt(true, getLineStartOffset(line));
+                getIndenter().fixIndentationAt(getLineStartOffset(line));
             }
         } finally {
             getTextBuffer().getUndoBuffer().finishCompoundEdit();
