@@ -30,7 +30,7 @@ public class Log {
 
     public static void setApplicationName(String name) {
         applicationName = name;
-        warn("Application started.");
+        warn("Application started (using Java " + System.getProperty("java.version") + ").");
     }
 
     public static void warn(String message) {
