@@ -33,7 +33,10 @@ public class PNewlineInserter {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");
-                textArea.autoIndent();
+                // Desired semantics:
+                // There is no selection and we're at the start of an empty line:
+                // fix the indentation and leave the caret after the indentation.
+                textArea.getIndenter().fixIndentation(false);
             }
         } finally {
             textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();

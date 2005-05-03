@@ -141,6 +141,9 @@ public class PKeyHandler extends KeyAdapter {
                 textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
                 try {
                     textArea.replaceSelection(content);
+                    // Desired semantics:
+                    // There is no selection: fix the indentation of the current line and leave the caret at the same offset
+                    // within the trimmed line.
                     textArea.getIndenter().fixIndentation(false);
                 } finally {
                     textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();

@@ -248,10 +248,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         new PNewlineInserter(this).insertNewline();
     }
     
-    public void autoIndent() {
-        getIndenter().fixIndentation(false);
-    }
-    
     /**
      * Returns the indenter responsible for auto-indent (and other aspects of
      * indentation correction) in this text area.
@@ -1175,6 +1171,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             // This special case wouldn't be needed if fixIndentation didn't mess around with the selection.
             if (string.indexOf('\n') == -1) {
                 replaceSelection(string);
+                // Desired semantics:
+                // There is no selection: fix the indentation of the current line and leave the caret at the same offset
+                // within the trimmed line.
                 getIndenter().fixIndentation(false);
             } else {
                 pasteAndReIndent(string);
@@ -1189,8 +1188,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         final int finishLine = startLine + StringUtilities.count(string, '\n');
         getTextBuffer().getUndoBuffer().startCompoundEdit();
         try {
-            replaceSelection((string));
+            replaceSelection(string);
             for (int line = startLine; line <= finishLine; ++line) {
+                // Desired semantics:
+                // There is no selection: fix the indentation of the current line.
+                // At the end of this method, the caret should be left at the offset now corresponding to the end of the pasted area,
+                // which could be in the middle of a line.
+                // (That case isn't properly handled currently.)
                 getIndenter().fixIndentationAt(true, getLineStartOffset(line));
             }
         } finally {
