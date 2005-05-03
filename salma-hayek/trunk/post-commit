@@ -67,7 +67,9 @@ comment.each() {
 body << "</p>"
 
 # Get and output the patch.
-changes=`#{svnlook} diff #{repo} -r #{rev} | #{script_path}/bin/annotate-patch.rb`
+# We'd like to | #{script_path}/bin/annotate-patch.rb
+# But that requires that the correct version of the file is available as trunk/filename
+changes=`#{svnlook} diff #{repo} -r #{rev}`
 changes.gsub!(/\r/, "") # In case we're running on MS Windows.
 
 patchToHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes.split("\n"))
