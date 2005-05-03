@@ -76,36 +76,43 @@ public abstract class PIndenter {
     }
     
     /** Corrects the indentation of the line with the caret, optionally moving the caret. Returns true if the contents of the current line were changed. */
+    public boolean fixIndentation() {
+        // FIXME - selection
+        return fixIndentationAt(textArea.getSelectionStart());        
+    }
+
+    // Temporary hack.
     public boolean fixIndentation(boolean shouldMoveCaret) {
         return fixIndentationAt(shouldMoveCaret, textArea.getSelectionStart());
     }
     
-    public boolean fixIndentationAt(boolean shouldMoveCaret, int position) {
-        // FIXME - selection
-        int lineNumber = textArea.getLineOfOffset(position);
-        
-        int offsetIntoLine = position - textArea.getLineStartOffset(lineNumber) - getCurrentIndentationOfLine(lineNumber).length();
-        
-        String whitespace = getIndentation(lineNumber);
-        int lineStart = textArea.getLineStartOffset(lineNumber);
-        int lineLength = textArea.getLineEndOffsetBeforeTerminator(lineNumber) - lineStart;
-        String originalLine = textArea.getLineText(lineNumber);
-        String line = originalLine.trim();
-        String replacement = whitespace + line;
-        //Log.warn("line=@" + originalLine + "@; replacement=@" + replacement + "@");
-        boolean lineChanged = (replacement.equals(originalLine) == false);
-        if (lineChanged) {
-            textArea.replaceRange(whitespace + line, lineStart, lineStart + lineLength);
-            if (shouldMoveCaret == false) {
-                final int offset = lineStart + whitespace.length() + offsetIntoLine;
-                textArea.select(offset, offset);
-            }
+    // charsInserted is allowed to be negative.
+    private static int adjustOffsetAfterInsertion(int offsetToAdjust, int offsetOfInsertion, int charsInserted) {
+        if (offsetToAdjust < offsetOfInsertion) {
+            return offsetToAdjust;
+        } else {
+            return offsetToAdjust + charsInserted;
         }
-        if (shouldMoveCaret) {
-            // Move the caret ready to perform the same service to the next line.
-            int newCaretPosition = lineStart + whitespace.length() + line.length() + 1;
-            newCaretPosition = Math.min(newCaretPosition, textArea.getTextBuffer().length());
-            textArea.select(newCaretPosition, newCaretPosition);
+    }
+    
+    // Temporary hack.
+    public boolean fixIndentationAt(boolean shouldMoveCaret, int position) {
+        return fixIndentationAt(position);
+    }
+    
+    public boolean fixIndentationAt(int position) {
+        int lineIndex = textArea.getLineOfOffset(position);
+        String originalIndentation = getCurrentIndentationOfLine(lineIndex);
+        String replacementIndentation = getIndentation(lineIndex);
+        //Log.warn("originalIndentation=@" + originalIndentation + "@; replacementIndentation=@" + replacementIndentation + "@");
+        boolean lineChanged = (replacementIndentation.equals(originalIndentation) == false);
+        if (lineChanged) {
+            int lineStartOffset = textArea.getLineStartOffset(lineIndex);
+            int charsInserted = replacementIndentation.length() - originalIndentation.length();
+            int desiredStartOffset = adjustOffsetAfterInsertion(textArea.getSelectionStart(), lineStartOffset, charsInserted);
+            int desiredEndOffset = adjustOffsetAfterInsertion(textArea.getSelectionEnd(), lineStartOffset, charsInserted);
+            textArea.replaceRange(replacementIndentation, lineStartOffset, lineStartOffset + originalIndentation.length());
+            textArea.select(desiredStartOffset, desiredEndOffset);
         }
         return lineChanged;
     }
