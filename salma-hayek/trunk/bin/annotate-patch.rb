@@ -108,13 +108,17 @@ def annotate_patch()
   |line|
   if line =~ /^=+$/ || line =~ /^Index: /
    next
-  elsif plus_tags == nil && minus_tags == nil && line =~ /^\=\=\=\=\= (\S+) /
+  elsif line =~ /^\=\=\=\=\= (\S+) /
    plus_tags = tags_for_file($1)
    minus_tags = tags_for_file($1)
-  elsif plus_tags == nil && line =~ /^\+\+\+ (\S+)\s/
-   plus_tags = tags_for_file($1)
-  elsif minus_tags == nil && line =~ /^--- (\S+)\s/
-   minus_tags = tags_for_file($1)
+  elsif line =~ /^\+\+\+ (\S+)\s/
+   if test(?r, $1)
+    plus_tags = tags_for_file($1)
+   end
+  elsif line =~ /^--- (\S+)\s/
+   if test(?r, $1)
+    minus_tags = tags_for_file($1)
+   end
   elsif line =~ /^@@ -(\d+),\d+ \+(\d+),\d+ @@/
    plus_tag = find_tag_for_line(plus_tags, $2)
    minus_tag = find_tag_for_line(minus_tags, $1)
