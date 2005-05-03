@@ -14,6 +14,11 @@ public class CorrectIndentationAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
+        // Desired semantics:
+        // If there's a selection, fix the indentation of all the lines within the selection (and leave it selected?).
+        // (If the selection ends at the start of a line, that line shouldn't be touched.)
+        // If there's no selection, fix the indentation of the current line and move the caret to the next line.
+        // That hack should be in this function.
         getTextArea().getIndenter().fixIndentation(true);
     }
 }
