@@ -46,7 +46,6 @@ public class Terminator {
 	 * and its menu is used for the screen menu bar.
 	 */
 	private void initMenuBar() {
-		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		JFrame hiddenFrame = new JFrame("Mac OS implementation detail");
 		hiddenFrame.setJMenuBar(new TerminatorMenuBar());
 		hiddenFrame.setUndecorated(true);
