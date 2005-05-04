@@ -27,6 +27,7 @@ noboolalpha
 npos
 ostream
 ostringstream
+rbegin
 setfill
 setw
 sstream
