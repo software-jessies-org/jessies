@@ -105,8 +105,9 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     
     public JMenu makeViewMenu() {
         JMenu menu = new JMenu("View");
-        menu.add(new ChangeFontAction(true));
-        menu.add(new ChangeFontAction(false));
+        menu.add(new ProportionalFontAction());
+        menu.add(new FixedFontAction());
+        menu.add(new AppropriateFontAction());
 
         menu.add(new JSeparator());
         menu.add(new FilePropertiesAction());

@@ -4,19 +4,17 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
-The ETextArea action to change to a proportional/fixed-width font.
+The ETextArea action to change font.
 */
-public class ChangeFontAction extends ETextAction {
-    private boolean proportional;
-
-    public ChangeFontAction(boolean proportional) {
-        super("Use " + (proportional ? "Proportional" : "Fixed") + " Font");
-        this.proportional = proportional;
+public abstract class ChangeFontAction extends ETextAction {
+    public ChangeFontAction(String fontDescription) {
+        super("Use " + fontDescription + " Font");
     }
+    
+    public abstract Font getFont();
 
     public void actionPerformed(ActionEvent e) {
         ETextArea text = getTextArea();
-        Font font = proportional ? ETextArea.getConfiguredFont() : ETextArea.getConfiguredFixedFont();
-        text.setFont(font);
+        text.setFont(getFont());
     }
 }
