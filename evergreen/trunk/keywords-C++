@@ -16,7 +16,10 @@ ifndef
 undef
 # Common non-standard identifiers.
 init
+# POSIX.1 describes these as "in common usage", suggesting _SYSIII as a feature test macro.
 uint
+ulong
+ushort
 # Standard C++ library identifiers.
 boolalpha
 cerr
