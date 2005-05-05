@@ -23,16 +23,11 @@ public class ETextArea extends PTextArea {
     }
     
     public void setFont(Font font) {
-        // Changing font can cause the area around the caret to have moved off-screen.
-        // We also have to bear in mind that setFont is called early on during construction, so there may not be a caret!
-        int originalCaretPosition = getUnanchoredSelectionExtreme();
         super.setFont(font);
-        ensureVisibilityOfOffset(originalCaretPosition);
         
-        boolean fixedWidth = GuiUtilities.isFontFixedWidth(font);
         // FIXME
+        //boolean fixedWidth = GuiUtilities.isFontFixedWidth(font);
         //setTabSize(fixedWidth ? 8 : 2);
-        showRightHandMarginAt(fixedWidth ? 80 : NO_MARGIN);
     }
     
     /**
