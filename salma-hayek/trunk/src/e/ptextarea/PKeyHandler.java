@@ -4,6 +4,25 @@ import java.awt.*;
 import java.awt.event.*;
 import e.util.*;
 
+/**
+ * FIXME: This should probably be rewritten to use KeyStroke key bindings.
+ * 
+ * FIXME: This should pay attention to what system we're running on, and try
+ * to use the local key bindings. I've looked at the Mac OS key bindings in
+ * vim(1) before now, and don't really understand the format. There's some
+ * documentation at http://www.cocoadev.com/index.pl?KeyBindings but the
+ * Apple documentation (which you can get to from that page) seems mainly
+ * about a different format, used to override the StandardKeyBinding.dict
+ * bindings. Project Builder/Xcode seem to use that format for their overrides,
+ * and anywhere where we say we don't like the Mac OS behavior, we should be
+ * writing our own ~/Library/KeyBindings/DefaultKeyBinding.dict file to change
+ * all Mac OS applications, not just hacking about with PTextArea which just
+ * makes everything more confusing. (So I guess we need to cope both with the
+ * system-wide file and any user overrides.)
+ * 
+ * FIXME: we should find out if there are MS Windows/GNOME equivalents of the
+ * Mac OS key bindings files.
+ */
 public class PKeyHandler extends KeyAdapter {
     private PTextArea textArea;
     private UpDownMovementHandler movementHandler = new UpDownMovementHandler();
