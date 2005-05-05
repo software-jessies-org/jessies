@@ -178,12 +178,12 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private int caretToStartOfLine() {
-        int lineIndex = textArea.getLineOfOffset(textArea.getSelectionStart());
+        int lineIndex = textArea.getLineOfOffset(textArea.getUnanchoredSelectionExtreme());
         return textArea.getLineStartOffset(lineIndex);
     }
     
     private int caretToEndOfLine() {
-        int lineIndex = textArea.getLineOfOffset(textArea.getSelectionEnd());
+        int lineIndex = textArea.getLineOfOffset(textArea.getUnanchoredSelectionExtreme());
         return textArea.getLineEndOffsetBeforeTerminator(lineIndex);
     }
     
