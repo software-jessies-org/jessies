@@ -30,7 +30,24 @@ public class Log {
 
     public static void setApplicationName(String name) {
         applicationName = name;
-        warn("Application started (using Java " + System.getProperty("java.version") + ").");
+        showStartUpMessage();
+    }
+
+    private static void showStartUpMessage() {
+        warn("Application started.");
+        showJavaVersion();
+        showOsVersion();
+    }
+
+    private static void showJavaVersion() {
+        warn("Java " + System.getProperty("java.version") + ".");
+    }
+
+    private static void showOsVersion() {
+        String osName = System.getProperty("os.name");
+        String osVersion = System.getProperty("os.version");
+        String osArch = System.getProperty("os.arch");
+        warn(osName + " " + osVersion + " (" + osArch + ").");
     }
 
     public static void warn(String message) {
