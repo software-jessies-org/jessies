@@ -25,10 +25,14 @@ public class PTextBuffer implements CharSequence {
     private int gapPosition;
     private int gapLength;
     private ArrayList textListeners = new ArrayList();
+    private PAnchorSet anchorSet = new PAnchorSet();
     private Undoer undoBuffer = new Undoer();
     private HashMap properties = new HashMap();
     
     public PTextBuffer() {
+        // Our anchorSet *must* be the first listener.  It needs to update the anchor locations
+        // before anyone else starts messing about with them.
+        addTextListener(anchorSet);
         initDefaultProperties();
     }
     
@@ -52,6 +56,10 @@ public class PTextBuffer implements CharSequence {
         properties.put(name, value);
     }
     
+    public PAnchorSet getAnchorSet() {
+        return anchorSet;
+    }
+    
     public PUndoBuffer getUndoBuffer() {
         return undoBuffer;
     }
@@ -72,7 +80,15 @@ public class PTextBuffer implements CharSequence {
     }
     
     private void fireTextEvent(PTextEvent event) {
-        for (int i = textListeners.size() - 1; i >= 0; --i) {
+        // Although most Swing listeners are called in reverse order, these events are not
+        // consume()able, so I don't really see the point in doing so here.  It is vital that
+        // some listeners (the PLineList and PAnchorSet to name two) are called before
+        // anyone else, to maintain internal state properly.  Therefore this loop will go
+        // forwards through the listener list until someone comes up with a really good
+        // reason why backwards is better (at which point I'll add an extra 'internalListeners'
+        // list).
+//        for (int i = textListeners.size() - 1; i >= 0; --i) {
+        for (int i = 0; i < textListeners.size(); i++) {
             PTextListener listener = (PTextListener) textListeners.get(i);
             if (event.isInsert()) {
                 listener.textInserted(event);

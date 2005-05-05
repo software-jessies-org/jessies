@@ -22,49 +22,56 @@ public class PAnchorSet implements PTextListener {
     private ArrayList anchors = new ArrayList();
     
     public void add(PAnchor anchor) {
-        int addIndex = getFirstAnchorIndex(anchor.getIndex());
-        anchors.add(addIndex, new WeakReference(anchor));
+        anchors.add(getFirstAnchorIndex(anchor.getIndex()), anchor);
+    }
+    
+    public void remove(PAnchor anchor) {
+        int start = getFirstAnchorIndex(anchor.getIndex());
+        for (int i = start; i < anchors.size(); i++) {
+            if (anchor == anchors.get(i)) {
+                anchors.remove(i);
+                return;
+            }
+            if (get(i).getIndex() > anchor.getIndex()) {
+                break;
+            }
+        }
     }
     
     // Returns the first position where an anchor for the textIndex could be inserted
     // without violating the ordering.
     // This is what the STL calls "lower_bound".
-    // This may remove dead items from the anchors list.
     private int getFirstAnchorIndex(int textIndex) {
-        int start = 0;
-        int end = anchors.size();
-        while (end - start > 1) {
-            int mid = (start + end) / 2;
-            PAnchor anchor = get(mid);
-            if (anchor == null) {
-                anchors.remove(mid);
-                end -= 1;
-            } else {
-                if (anchor.getIndex() == textIndex) {
-                    if (end == mid + 1) {
-                        break;
-                    }
-                    end = mid + 1;
-                } else if (anchor.getIndex() > textIndex) {
-                    end = mid;
+        checkLinearity();    // Comment this out to improve speed, but remove warnings when our state goes wrong.
+        int index = Collections.binarySearch(anchors, new PAnchor(textIndex));
+        if (index < 0) {
+            return -index - 1;
+        } else {
+            while (index > 0) {
+                if (get(index - 1).getIndex() < textIndex) {
+                    break;
                 } else {
-                    start = mid;
+                    index--;
                 }
             }
+            return index;
         }
-        if (start < anchors.size()) {
-            PAnchor anchor = get(start);
-            if (anchor != null && anchor.getIndex() < textIndex) {
-                start++;
-            }
-        }
-        return start;
     }
     
-    // May return null!
+    private void checkLinearity() {
+        int lastIndex = -1;
+        for (int i = 0; i < anchors.size(); i++) {
+            PAnchor anchor = get(i);
+            if (anchor.getIndex() < lastIndex) {
+                dumpAnchorIndices();
+                throw new IllegalStateException("Linearity out of order at index " + i);
+            }
+            lastIndex = anchor.getIndex();
+        }
+    }
+    
     private PAnchor get(int index) {
-        Reference ref = (Reference) anchors.get(index);
-        return (PAnchor) ref.get();
+        return (PAnchor) anchors.get(index);
     }
     
     public void textInserted(PTextEvent event) {
@@ -72,44 +79,33 @@ public class PAnchorSet implements PTextListener {
         int insertionLength = event.getLength();
         for (int i = start; i < anchors.size(); i++) {
             PAnchor anchor = get(i);
-            if (anchor == null) {
-                anchors.remove(i);
-                i--;  // Counteract the loop increment.
-            } else {
-                anchor.setIndex(anchor.getIndex() + insertionLength);
-            }
+            anchor.setIndex(anchor.getIndex() + insertionLength);
         }
     }
     
-    private void dumpAnchorIndices() {
+    public void dumpAnchorIndices() {
         for (int i = 0; i < anchors.size(); i++) {
             PAnchor anchor = get(i);
-            if (anchor == null) {
-                System.err.println("Anchor " + i + ": null");
-            } else {
-                System.err.println("Anchor " + i + ": " + anchor.getIndex());
-            }
+            System.err.println("  Anchor " + i + ": " + anchor);
         }
     }
     
     public void textRemoved(PTextEvent event) {
+        LinkedList deletionList = new LinkedList();
         int start = getFirstAnchorIndex(event.getOffset());
         int deletionLength = event.getLength();
         int deletionEnd = event.getOffset() + event.getLength();
         for (int i = start; i < anchors.size(); i++) {
             PAnchor anchor = get(i);
-            if (anchor == null) {
-                anchors.remove(i);
-                i--;  // Counteract the loop increment.
+            if (anchor.getIndex() < deletionEnd) {
+                deletionList.add(anchor);
+                anchors.remove(i--);
             } else {
-                if (anchor.getIndex() < deletionEnd) {
-                    anchor.delete();
-                    anchors.remove(i);
-                    i--;  // Counteract the loop increment.
-                } else {
-                    anchor.setIndex(anchor.getIndex() - deletionLength);
-                }
+                anchor.setIndex(anchor.getIndex() - deletionLength);
             }
+        }
+        for (int i = 0; i < deletionList.size(); i++) {
+            ((PAnchor) deletionList.get(i)).delete();
         }
     }
     
@@ -125,5 +121,13 @@ public class PAnchorSet implements PTextListener {
             }
         }
         anchors.clear();
+    }
+    
+    private class AnchorComparator implements Comparator {
+        public int compare(Object obj1, Object obj2) {
+            PAnchor anchor1 = (PAnchor) obj1;
+            PAnchor anchor2 = (PAnchor) obj2;
+            return (anchor1.getIndex() - anchor1.getIndex());
+        }
     }
 }

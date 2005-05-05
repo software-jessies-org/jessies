@@ -39,12 +39,12 @@ public class PAnchor implements Comparable {
         return super.hashCode();
     }
     
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         return (index == ((PAnchor) obj).index);
     }
     
-    public int compareTo(Object obj) {
-        return (((PAnchor) obj).index - index);
+    public final int compareTo(Object obj) {
+        return (index - ((PAnchor) obj).index);
     }
     
     public String toString() {

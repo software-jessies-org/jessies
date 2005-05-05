@@ -38,7 +38,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private FontMetrics metrics;
     private int[] widthCache;
     
-    private PAnchorSet anchorSet = new PAnchorSet();
     private ArrayList highlights = new ArrayList();
     private PTextStyler textStyler = new PPlainTextStyler(this);
     private int rightHandMarginColumn = NO_MARGIN;
@@ -59,7 +58,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public PTextArea(int rowCount, int columnCount) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
-        this.selection = new SelectionHighlight(this, 0, 0);
         this.wordWrap = false;
         this.indenter = new PDefaultIndenter(this);
         setFont(UIManager.getFont("TextArea.font"));
@@ -79,24 +77,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             
             private void rewrap() {
                 if (getWidth() != lastWidth) {
-                    int charToKeepInPosition = getSelectionStart();
-                    int yPosition = -1;
-                    if (lastWidth != 0) {
-                        Rectangle visible = getVisibleRect();
-                        yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
-                        if (yPosition < 0 || yPosition > visible.height) {
-                            yPosition = visible.y + visible.height / 2;
-                            charToKeepInPosition = getSplitLine(getNearestCoordinates(new Point(0, yPosition)).getLineIndex()).getTextIndex();
-                            yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
+                    doSomethingWithoutMovingTheVisibleArea(new Runnable() {
+                        public void run() {
+                            revalidateLineWrappings();
                         }
-                    }
-                    revalidateLineWrappings();
-                    if (lastWidth != 0) {
-                        Rectangle visible = getVisibleRect();
-                        int newYPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
-                        visible.y += newYPosition - yPosition;
-                        scrollRectToVisible(visible);
-                    }
+                    });
                     lastWidth = getWidth();
                     repaint();
                 }
@@ -108,6 +93,27 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         initFocusListening();
         initKeyBindings();
         addCaretListener(new PMatchingBracketHighlighter(this));
+    }
+    
+    private void doSomethingWithoutMovingTheVisibleArea(Runnable somethingToDo) {
+        if (selection == null || isLineWrappingInvalid()) {
+            somethingToDo.run();
+        } else {
+            int charToKeepInPosition = getSelectionStart();
+            int yPosition = -1;
+            Rectangle visible = getVisibleRect();
+            yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
+            if (yPosition < 0 || yPosition > visible.height) {
+                yPosition = visible.y + visible.height / 2;
+                charToKeepInPosition = getSplitLine(getNearestCoordinates(new Point(0, yPosition)).getLineIndex()).getTextIndex();
+                yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
+            }
+            somethingToDo.run();
+            visible = getVisibleRect();
+            int newYPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
+            visible.y += newYPosition - yPosition;
+            scrollRectToVisible(visible);
+        }
     }
     
     private void initKeyBindings() {
@@ -194,8 +200,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         repaintCaret();
         selection = new SelectionHighlight(this, start, end);
         repaintCaret();
+        oldSelection.detachAnchors();
         if (oldSelection.isEmpty() != selection.isEmpty()) {
-            repaintAnchorRegion(selection.isEmpty() ? oldSelection : selection);
+            repaintHighlight(selection.isEmpty() ? oldSelection : selection);
         } else if (oldSelection.isEmpty() == false && selection.isEmpty() == false) {
             int minStart = Math.min(oldSelection.getStartIndex(), selection.getStartIndex());
             int maxStart = Math.max(oldSelection.getStartIndex(), selection.getStartIndex());
@@ -424,11 +431,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         repaint();
     }
     
-    public void setFont(Font font) {
-        super.setFont(font);
-        cacheFontMetrics();
-        showRightHandMarginAt(GuiUtilities.isFontFixedWidth(font) ? 80 : NO_MARGIN);
-        revalidateLineWrappings();
+    public void setFont(final Font font) {
+        doSomethingWithoutMovingTheVisibleArea(new Runnable() {
+            public void run() {
+                PTextArea.super.setFont(font);
+                cacheFontMetrics();
+                showRightHandMarginAt(GuiUtilities.isFontFixedWidth(font) ? 80 : NO_MARGIN);
+                revalidateLineWrappings();
+            }
+        });
         repaint();
     }
     
@@ -442,12 +453,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public void addHighlight(PHighlight highlight) {
         highlights.add(highlight);
-        repaintAnchorRegion(highlight);
-    }
-    
-    public void removeHighlight(PHighlight highlight) {
-        highlights.remove(highlight);
-        repaintAnchorRegion(highlight);
+        repaintHighlight(highlight);
     }
     
     public List getHighlights() {
@@ -484,12 +490,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 }
                 match = highlight;
                 highlights.remove(i);
+                highlight.detachAnchors();
                 i--;
             }
         }
         if (isOnlyOneMatch) {
             if (match != null) {
-                repaintAnchorRegion(match);
+                repaintHighlight(match);
             }
             // If isOnlyOneMatch is true, but match is null, nothing was removed and so we don't repaint at all.
         } else {
@@ -497,8 +504,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
+    public void removeHighlight(PHighlight highlight) {
+        highlights.remove(highlight);
+        highlight.detachAnchors();
+        repaintHighlight(highlight);
+    }
+    
     public PAnchorSet getAnchorSet() {
-        return anchorSet;
+        return getTextBuffer().getAnchorSet();
     }
     
     public PLineList getLineList() {
@@ -686,8 +699,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return getSplitLine(coordinates.getLineIndex()).getTextIndex() + coordinates.getCharOffset();
     }
     
-    private synchronized void repaintAnchorRegion(PAnchorRegion anchorRegion) {
-        repaintIndexRange(anchorRegion.getStartIndex(), anchorRegion.getEndIndex());
+    private synchronized void repaintHighlight(PHighlight highlight) {
+        repaintIndexRange(highlight.getStartIndex(), highlight.getEndIndex());
     }
     
     private void repaintIndexRange(int startIndex, int endIndex) {
@@ -1072,8 +1085,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
         lines = new PLineList(text);
         lines.addLineListener(this);
-        text.addTextListener(anchorSet);
         revalidateLineWrappings();
+        selection = new SelectionHighlight(this, 0, 0);
     }
     
     /**
@@ -1259,9 +1272,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
-    private class SelectionHighlight extends PHighlight {
+    private static class SelectionHighlight extends PHighlight {
+        private int id;
+        private static int nextId = 0;
+        
         public SelectionHighlight(PTextArea textArea, int startIndex, int endIndex) {
             super(textArea, startIndex, endIndex);
+            id = nextId++;
         }
         
         public boolean isEmpty() {
@@ -1280,10 +1297,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
                 int xStart = (i == start.getLineIndex()) ? startPt.x : 0;
                 int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth();
-                graphics.setColor(isFocusOwner() ? FOCUSED_SELECTION_COLOR : UNFOCUSED_SELECTION_COLOR);
+                graphics.setColor(textArea.isFocusOwner() ? FOCUSED_SELECTION_COLOR : UNFOCUSED_SELECTION_COLOR);
                 paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
                 int yBottom = y + lineHeight - 1;
-                if (isFocusOwner()) {
+                if (textArea.isFocusOwner()) {
                     graphics.setColor(FOCUSED_SELECTION_BOUNDARY_COLOR);
                     if (i == start.getLineIndex()) {
                         if (xStart > 0) {
@@ -1309,6 +1326,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         
         public void paintRectangleContents(Graphics2D graphics, Rectangle rectangle) {
             graphics.fill(rectangle);
+        }
+        
+        public String toString() {
+            return "SelectionHighlight[" + id + ": " + getStartIndex() + ", " + getEndIndex() + "]";
         }
     }
 }

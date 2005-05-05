@@ -35,8 +35,6 @@ Items to be done for PTextArea:
 
   CommentUtilities.stripDoubleSlashComment
 
-* Remove the need for the reimplementation of binary chop in PAnchorSet, perhaps by removing the need for WeakReference by explicitly removing the defunct anchors from the set.  This is waiting on approval or otherwise from Phil.
-
 * Improve PNewlineInserter:
 
   (1) int fn(|P0 a0) {
