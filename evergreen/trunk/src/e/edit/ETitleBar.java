@@ -84,12 +84,13 @@ public class ETitleBar extends JPanel {
     }
     
     public void checkForCounterpart() {
-        if (window instanceof e.edit.ETextWindow) {
-            e.edit.ETextWindow textWindow = (e.edit.ETextWindow) window;
-            if (switchButton == null && textWindow.getCounterpartFilename() != null) {
+        if (window instanceof ETextWindow) {
+            ETextWindow textWindow = (ETextWindow) window;
+            boolean hasCounterpart = (textWindow.getCounterpartFilename() != null);
+            if (switchButton == null && hasCounterpart) {
                 this.switchButton = new ESwitchButton(textWindow);
                 buttonsPanel.add(switchButton, BorderLayout.WEST);
-            } else if (switchButton != null && textWindow.getCounterpartFilename() == null) {
+            } else if (switchButton != null && hasCounterpart == false) {
                 buttonsPanel.remove(switchButton);
                 this.switchButton = null;
             }
