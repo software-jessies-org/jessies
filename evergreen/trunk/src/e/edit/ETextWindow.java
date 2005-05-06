@@ -277,6 +277,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     private boolean confirmReversion() {
+        SimplePatchDialog.showPatchBetween("Disk/Memory Comparison", "disk", StringUtilities.readFile(file), "memory", text.getTextBuffer().toString());
         return Edit.askQuestion("Revert", "Revert to saved version of '" + file.getName() + "'?\nReverting will lose your current changes.", "Revert");
     }
     
