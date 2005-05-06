@@ -9,9 +9,7 @@ public class ECloseButton extends EButton implements ActionListener {
     private static final Color DIRTY_COLOR = new Color(255, 0, 0);
     
     public ECloseButton(EWindow window) {
-        super("");
         this.window = window;
-        addActionListener(this);
     }
 
     public void paint(Graphics g) {

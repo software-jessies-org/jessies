@@ -6,40 +6,27 @@ import java.awt.event.*;
 import e.gui.*;
 
 /**
-A simple labelled button. 
-*/
-public class EButton extends ELabel implements MouseListener {
-    /** The action listener. */
-    private ActionListener listener;
-
+ * A simple iconic button for the title bar.
+ */
+public abstract class EButton extends JComponent implements ActionListener, MouseListener {
     /** Whether the button is currently pressed. */
     protected boolean pressed = false;
 
     /** Whether the button should be considered pressed if the pointer re-enters it. */
     private boolean wasPressed = false;
-
-    public EButton(AbstractAction action) {
-        this((String) action.getValue(Action.NAME), action);
-    }
-
-    public EButton(String label) {
-        this(label, null);
-    }
-
-    /** Creates a new button with the given label. */
-    public EButton(String label, ActionListener actionListener) {
-        super(label);
-        addActionListener(actionListener);
+    
+    public EButton() {
         addMouseListener(this);
     }
-
+    
+    public abstract void actionPerformed(ActionEvent e);
+    
     /**
      * Draws the button. The button is a thin 3D rectangle lowered when the
      * button is pressed, raised otherwise. The label is drawn in the centre.
      */
     public void paint(Graphics g) {
         paintButtonBorder(g);
-        paintText(g);
     }
 
     public void paintButtonBorder(Graphics g) {
@@ -56,11 +43,6 @@ public class EButton extends ELabel implements MouseListener {
         g.drawLine(width, 0, width, height);
         g.drawLine(0, height, width, height);
     }
-    
-    /** Adds an action listener to be notified when the button is clicked. */
-    public void addActionListener(ActionListener listener) {
-        this.listener = listener;
-    }
 
     /** Ignores mouse click events. */
     public void mouseClicked(MouseEvent e) { }
@@ -73,8 +55,8 @@ public class EButton extends ELabel implements MouseListener {
 
     /** Resets the button to its unpressed state, notifying the listener if this constitutes a click. */
     public void mouseReleased(MouseEvent e) {
-        if (pressed && listener != null) {
-            listener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, getLabel()));
+        if (pressed) {
+            actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
         }
         pressed = wasPressed = false;
         repaint();
@@ -91,5 +73,9 @@ public class EButton extends ELabel implements MouseListener {
     public void mouseEntered(MouseEvent e) {
         pressed = wasPressed;
         repaint();
+    }
+    
+    public Dimension getPreferredSize() {
+        return new Dimension(20, 20);
     }
 }
