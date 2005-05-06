@@ -89,18 +89,15 @@ public class ETitleBar extends JPanel {
             if (switchButton == null && textWindow.getCounterpartFilename() != null) {
                 this.switchButton = new ESwitchButton(textWindow);
                 buttonsPanel.add(switchButton, BorderLayout.WEST);
-                repaint();
             } else if (switchButton != null && textWindow.getCounterpartFilename() == null) {
                 buttonsPanel.remove(switchButton);
                 this.switchButton = null;
-                repaint();
             }
         }
     }
     
     public void setTitle(String title) {
         titleLabel.setText(title);
-        repaint();
     }
     
     public String getTitle() {
@@ -132,7 +129,5 @@ public class ETitleBar extends JPanel {
             setBackground(UIManager.getColor("InternalFrame.inactiveTitleBackground"));
             titleLabel.setForeground(UIManager.getColor("InternalFrame.inactiveTitleForeground"));
         }
-        
-        repaint();
     }
 }
