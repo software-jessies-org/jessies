@@ -17,7 +17,7 @@ public class SimplePatchDialog {
     private SimplePatchDialog() {
     }
     
-    public static void showPatchBetween(String title, String fromName, String fromContent, String toName, String toContent) {
+    public static JList makePatchView(String fromName, String fromContent, String toName, String toContent) {
         String fromFile = FileUtilities.createTemporaryFile(PREFIX, "file containing " + fromName, fromContent);
         String toFile = FileUtilities.createTemporaryFile(PREFIX, "file containing " + toName, toContent);
         
@@ -35,13 +35,17 @@ public class SimplePatchDialog {
             model.addElement(lines.get(i));
         }
         
-        JList patch = new JList();
-        patch.setCellRenderer(PatchListCellRenderer.INSTANCE);
-        patch.setFont(ETextArea.getConfiguredFixedFont());
-        patch.setModel(model);
-        
+        JList result = new JList();
+        result.setCellRenderer(PatchListCellRenderer.INSTANCE);
+        result.setFont(ETextArea.getConfiguredFixedFont());
+        result.setModel(model);
+        return result;
+    }
+    
+    public static void showPatchBetween(String title, String fromName, String fromContent, String toName, String toContent) {
+        JList patchView = makePatchView(fromName, fromContent, toName, toContent);
         FormPanel formPanel = new FormPanel();
-        formPanel.addRow("Differences:", new JScrollPane(patch));
+        formPanel.addRow("Differences:", new JScrollPane(patchView));
         FormDialog.showNonModal(Edit.getFrame(), title, formPanel);
     }
 }
