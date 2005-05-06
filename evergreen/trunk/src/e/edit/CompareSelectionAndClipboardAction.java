@@ -28,14 +28,9 @@ import e.util.*;
  */
 public class CompareSelectionAndClipboardAction extends ETextAction {
     public static final String ACTION_NAME = "Compare Selection and Clipboard...";
-    public static final String PREFIX = "e.edit.CompareSelectionAndClipboardAction-";
-    
-    private JList patch = new JList();
     
     public CompareSelectionAndClipboardAction() {
         super(ACTION_NAME);
-        patch.setCellRenderer(PatchListCellRenderer.INSTANCE);
-        patch.setFont(ETextArea.getConfiguredFixedFont());
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -52,27 +47,7 @@ public class CompareSelectionAndClipboardAction extends ETextAction {
         selection += "\n";
         clipboard += "\n";
         
-        String selectionFile = FileUtilities.createTemporaryFile(PREFIX, "file containing selection", selection);
-        String clipboardFile = FileUtilities.createTemporaryFile(PREFIX, "file containing clipboard", clipboard);
-        
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
-        String[] command = new String[] { "diff", "-u", "-b", "-B", "-L", "clipboard", clipboardFile, "-L", "selection", selectionFile };
-        int status = ProcessUtilities.backQuote(null, command, lines, errors);
-        
-        if (status == 0) {
-            lines.add("(No differences.)");
-        }
-        
-        DefaultListModel model = new DefaultListModel();
-        for (int i = 0; i < lines.size(); ++i) {
-            model.addElement(lines.get(i));
-        }
-        patch.setModel(model);
-        
-        FormPanel formPanel = new FormPanel();
-        formPanel.addRow("Differences:", new JScrollPane(patch));
-        FormDialog.showNonModal(Edit.getFrame(), "Selection/Clipboard Comparison", formPanel);
+        SimplePatchDialog.showPatchBetween("Selection/Clipboard Comparison", "selection", selection, "clipboard", clipboard);
     }
     
     private String getClipboardText() {
