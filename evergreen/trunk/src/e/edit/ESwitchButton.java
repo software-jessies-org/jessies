@@ -7,9 +7,7 @@ public class ESwitchButton extends EButton implements ActionListener {
     private ETextWindow window;
     
     public ESwitchButton(ETextWindow window) {
-        super("");
         this.window = window;
-        addActionListener(this);
     }
 
     public void paint(Graphics g) {
