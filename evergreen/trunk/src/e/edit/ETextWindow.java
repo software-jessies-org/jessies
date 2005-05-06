@@ -8,6 +8,7 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.Timer;
+import e.forms.*;
 import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
@@ -277,8 +278,11 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     private boolean confirmReversion() {
-        SimplePatchDialog.showPatchBetween("Disk/Memory Comparison", "disk", StringUtilities.readFile(file), "memory", text.getTextBuffer().toString());
-        return Edit.askQuestion("Revert", "Revert to saved version of '" + file.getName() + "'?\nReverting will lose your current changes.", "Revert");
+        JList patchView = SimplePatchDialog.makePatchView("disk", StringUtilities.readFile(file), "memory", text.getTextBuffer().toString());
+        FormPanel formPanel = new FormPanel();
+        formPanel.addRow("", new JLabel("Revert to saved version of '" + file.getName() + "'?"));
+        formPanel.addRow("Patch:", new JScrollPane(patchView));
+        return FormDialog.show(Edit.getFrame(), "Revert", formPanel, "Revert");
     }
     
     public void revertToSaved() {
