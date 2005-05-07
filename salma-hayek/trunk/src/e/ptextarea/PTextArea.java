@@ -1302,20 +1302,39 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 int yBottom = y + lineHeight - 1;
                 if (textArea.isFocusOwner()) {
                     graphics.setColor(FOCUSED_SELECTION_BOUNDARY_COLOR);
+                    // Draw this shape at the top of the selection (C will be
+                    // zero-length for a single-line selection):
+                    //        _____________________
+                    // _______|B         A
+                    //    C
                     if (i == start.getLineIndex()) {
                         if (xStart > 0) {
+                            // B
                             graphics.drawLine(xStart, y, xStart, yBottom);
                         }
+                        // A
                         graphics.drawLine(xStart, y, xEnd, y);
                     } else if (i == start.getLineIndex() + 1) {
-                        graphics.drawLine(0, y, Math.min(xEnd, startPt.x), y);
+                        final int Bx = Math.min(xEnd, startPt.x);
+                        if (Bx > 0) {
+                            // C
+                            graphics.drawLine(0, y, Bx, y);
+                        }
                     }
+                    // Draw this shape at the bottom of the selection (E will
+                    // be zero-length for a single-line selection):
+                    //            _________________
+                    // ___________|D     E
+                    //      F
                     if (i == end.getLineIndex()) {
                         if (xEnd < textArea.getWidth()) {
+                            // D
                             graphics.drawLine(xEnd, y, xEnd, yBottom);
                         }
+                        // F
                         graphics.drawLine(xStart, yBottom, xEnd, yBottom);
                     } else if (i == end.getLineIndex() - 1) {
+                        // E
                         graphics.drawLine(Math.max(endPt.x, xStart), yBottom, xEnd, yBottom);
                     }
                 }
