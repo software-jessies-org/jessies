@@ -107,12 +107,4 @@ public class ETextArea extends PTextArea {
     public String reformatPastedText(String pastedText) {
         return pastedText.replace('\u00a0', ' ');
     }
-    
-    /**
-     * Returns the text of the line (without the newline) containing the
-     * given offset in the document.
-     */
-    public String getLineTextAtOffset(int offset) {
-        return getLineText(getLineOfOffset(offset));
-    }
 }
