@@ -3,7 +3,6 @@ SOURCES := $(wildcard *.cpp)
 HEADERS := $(wildcard *.h)
 
 TARGET_OS := $(shell uname)
-ARCH := $(shell arch)
 
 JAVA_HOME ?= $(error Please set $$(JAVA_HOME) (the calling Makefile should have done this for you))
 
