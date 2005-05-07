@@ -19,16 +19,16 @@ public class AutoCompleteAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextArea target = getTextArea();
-        if (target != null) {
-            offerCompletions(target);
+        ETextArea textArea = getTextArea();
+        if (textArea != null) {
+            offerCompletions(textArea);
         }
     }
     
-    public void offerCompletions(final ETextArea target) {
-        String prefix = target.getWordUpToCaret();
+    public void offerCompletions(final ETextArea textArea) {
+        String prefix = textArea.getWordUpToCaret();
         // FIXME - selection
-        final int endPosition = target.getSelectionStart();
+        final int endPosition = textArea.getSelectionStart();
         final int startPosition = endPosition - prefix.length();
         
         // FIXME: we should be able to offer completions for other languages.
@@ -49,16 +49,16 @@ public class AutoCompleteAction extends ETextAction {
         completionsUi.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 if (e.getKeyChar() == '\n') {
-                    target.replaceRange((String) completionsUi.getSelectedValue(), startPosition, endPosition);
+                    textArea.replaceRange((String) completionsUi.getSelectedValue(), startPosition, endPosition);
                     hideCompletionsWindow();
-                    target.requestFocus();
+                    textArea.requestFocus();
                     e.consume();
                 }
             }
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     hideCompletionsWindow();
-                    target.requestFocus();
+                    textArea.requestFocus();
                     e.consume();
                 }
             }
@@ -66,20 +66,16 @@ public class AutoCompleteAction extends ETextAction {
         if (noCompletions) {
             completionsUi.setForeground(Color.GRAY);
         }
-        completionsUi.setFont(target.getFont());
+        completionsUi.setFont(textArea.getFont());
         completionsUi.setVisibleRowCount(Math.min(20, completionsUi.getModel().getSize()));
         
-        // FIXME
-        /*
-            Rectangle startRectangle = target.modelToView(startPosition);
-            Point origin = target.getLocationOnScreen();
-            Point windowLocation = new Point(startRectangle.x, startRectangle.y + startRectangle.height);
-            windowLocation.translate(origin.x, origin.y);
-            
-            Frame owner = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, target);
-            showCompletionsWindow(owner, windowLocation, new JScrollPane(completionsUi));
-            completionsUi.requestFocus();
-        */
+        Point origin = textArea.getLocationOnScreen();
+        Point windowLocation = textArea.getViewCoordinates(textArea.getCoordinates(startPosition));
+        windowLocation.translate(origin.x, origin.y);
+        
+        Frame owner = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, textArea);
+        showCompletionsWindow(owner, windowLocation, new JScrollPane(completionsUi));
+        completionsUi.requestFocus();
     }
     
     private void hideCompletionsWindow() {
