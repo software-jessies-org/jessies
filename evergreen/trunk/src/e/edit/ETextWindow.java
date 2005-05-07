@@ -252,7 +252,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             initKeywordsForDocument();
             updateWatermark();
             text.setText(content);
-            text.setAppropriateFont();
+            text.setFont(ChangeFontAction.getAppropriateFontForContent(content));
             text.getIndenter().setIndentationPropertyBasedOnContent(content);
             text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
             text.getTextBuffer().getUndoBuffer().setCurrentStateClean();

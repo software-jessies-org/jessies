@@ -12,7 +12,6 @@ public class AppropriateFontAction extends ChangeFontAction {
   }
   
   public Font getFont() {
-    ETextArea text = getTextArea();
-    return text.getAppropriateFontForContent();
+    return getAppropriateFontForContent(getTextArea().getText());
   }
 }

@@ -12,6 +12,6 @@ public class ProportionalFontAction extends ChangeFontAction {
   }
   
   public Font getFont() {
-    return ETextArea.getConfiguredFont();
+    return getConfiguredFont();
   }
 }
