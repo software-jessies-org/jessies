@@ -42,7 +42,7 @@ SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
 SHARED_LIBRARY_EXTENSION.Darwin = jnilib
 # The default linker doesn't do the right thing on Darwin.
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
-LD = $(CXX)
+CC = $(CXX)
 
 JNI_PATH.Linux += $(JAVA_HOME)/include
 JNI_PATH.Linux += $(JAVA_HOME)/include/linux
@@ -73,7 +73,8 @@ TARGET_OS := $(shell uname)
 
 GENERATED_DIRECTORY = $(TARGET_OS)
 
-OBJECTS = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst %.$(EXTENSION),%.o,$(filter %.$(EXTENSION),$(SOURCES))))
+OBJECTS = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst %.$(EXTENSION),$(GENERATED_DIRECTORY)/%.o,$(filter %.$(EXTENSION),$(SOURCES))))
+SOURCE_LINKS = $(addprefix $(GENERATED_DIRECTORY)/,$(SOURCES) $(HEADERS))
 
 # ----------------------------------------------------------------------------
 # Add the Cocoa framework if we're building Objective-C/C++.
@@ -84,19 +85,41 @@ ifneq "$(filter %.m %.mm,$(SOURCES))" ""
 endif
 
 # ----------------------------------------------------------------------------
-# Our targets; first, the executable (the default target).
+# Our executable target.
 # ----------------------------------------------------------------------------
 
-$(BASE_NAME): $(OBJECTS)
-	$(CXX) -o $(BASE_NAME) $(LDFLAGS) $^
+$(GENERATED_DIRECTORY)/$(BASE_NAME): $(OBJECTS)
 
-# Rather than track dependencies properly, or have the compiler do it, we
+# ----------------------------------------------------------------------------
+# Our shared library target.
+# ----------------------------------------------------------------------------
+
+# There is no default rule for shared library building on my system.
+$(GENERATED_DIRECTORY)/$(BASE_NAME).$(SHARED_LIBRARY_EXTENSION): $(OBJECTS)
+	$(LD) $(OBJECTS) -o $@ $(SHARED_LIBRARY_LDFLAGS)
+
+# ----------------------------------------------------------------------------
+# Create "the build tree", GNU-style.
+# ----------------------------------------------------------------------------
+
+# This way, we can use the built-in compilation rules which assume everything's
+# in the same directory.
+$(SOURCE_LINKS): $(GENERATED_DIRECTORY)/%: %
+	mkdir -p $(dir $@) && \
+	rm -f $@ && \
+	ln -s ../$< $@
+
+# ----------------------------------------------------------------------------
+# Dependencies.
+# ----------------------------------------------------------------------------
+
+# Rather than have the compiler track dependencies we
 # conservatively assume that if a header files changes, we have to recompile
 # everything.
-$(OBJECTS): $(HEADERS) $(MAKEFILE_LIST)
+$(OBJECTS): $(SOURCE_LINKS) $(HEADERS) $(MAKEFILE_LIST)
 
 # ----------------------------------------------------------------------------
-# Rules for compiling Objective C and Objective C++ source.
+# Implicit rules for compiling Objective C and Objective C++ source.
 # ----------------------------------------------------------------------------
 
 COMPILE.m = $(COMPILE.c)
@@ -110,7 +133,7 @@ COMPILE.mm = $(COMPILE.cpp)
 # ----------------------------------------------------------------------------
 # Rules for tidying-up.
 # ----------------------------------------------------------------------------
-	
+
 .PHONY: clean
 clean:
-	rm -f $(EXECUTABLE_NAME) $(OBJECTS)
+	rm -rf $(GENERATED_DIRECTORY)
