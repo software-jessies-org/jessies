@@ -23,13 +23,17 @@ JNI_PATH += $(JNI_PATH.$(TARGET_OS))
 SHARED_LIBRARY_LDFLAGS += $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
 SHARED_LIBRARY_EXTENSION = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
 
-CPPFLAGS += -fPIC
-CPPFLAGS += -g
+CFLAGS += -std=c99
+C_AND_CXXFLAGS += -fPIC
+C_AND_CXXFLAGS += -g
 # Maximum warnings...
-CPPFLAGS += -W -Wall -pedantic
+C_AND_CXXFLAGS += -W -Wall -Werror -pedantic
 # ... but assume that C++ will eventually subsume C99.
-CPPFLAGS += -Wno-long-long
+CXXFLAGS += -Wno-long-long
 CPPFLAGS += $(addprefix -I,$(JNI_PATH))
+
+CFLAGS += $(C_AND_CXX_FLAGS)
+CXXFLAGS += $(C_AND_CXX_FLAGS)
 
 GENERATED_DIRECTORY = $(TARGET_OS)
 
