@@ -32,10 +32,17 @@ CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
 
 # ----------------------------------------------------------------------------
-# Extra compiler and (mainly) linker flags for building JNI.
+# Locate Java.
 # ----------------------------------------------------------------------------
 
+# Assume the tools are on the path if $(JAVA_HOME) isn't specified.
+JAVAH := $(if $(JAVA_HOME),$(JAVA_HOME)/bin/)javah
+
 JAVA_HOME ?= $(error Please set $$(JAVA_HOME) (the calling Makefile should have done this for you))
+
+# ----------------------------------------------------------------------------
+# Extra compiler and (mainly) linker flags for building JNI.
+# ----------------------------------------------------------------------------
 
 JNI_PATH.Darwin += /System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
 SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
@@ -129,7 +136,7 @@ $(SHARED_LIBRARY): $(OBJECTS)
 
 $(JNI_HEADER): $(JNI_CLASS_FILE)
 	rm -f $@ && \
-	$(JAVA_HOME)/bin/javah -classpath $(CLASSES_DIRECTORY) -d $(JNI_DIRECTORY) $(JNI_CLASS_NAME)
+	$(JAVAH) -classpath $(CLASSES_DIRECTORY) -d $(JNI_DIRECTORY) $(JNI_CLASS_NAME)
 
 $(JNI_OBJECT): $(JNI_HEADER)
 
