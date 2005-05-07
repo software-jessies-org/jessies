@@ -77,7 +77,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             
             private void rewrap() {
                 if (getWidth() != lastWidth) {
-                    doSomethingWithoutMovingTheVisibleArea(new Runnable() {
+                    runWithoutMovingTheVisibleArea(new Runnable() {
                         public void run() {
                             revalidateLineWrappings();
                         }
@@ -95,9 +95,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         addCaretListener(new PMatchingBracketHighlighter(this));
     }
     
-    private void doSomethingWithoutMovingTheVisibleArea(Runnable somethingToDo) {
+    private void runWithoutMovingTheVisibleArea(Runnable runnable) {
         if (selection == null || isLineWrappingInvalid()) {
-            somethingToDo.run();
+            runnable.run();
         } else {
             int charToKeepInPosition = getSelectionStart();
             int yPosition = -1;
@@ -108,7 +108,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 charToKeepInPosition = getSplitLine(getNearestCoordinates(new Point(0, yPosition)).getLineIndex()).getTextIndex();
                 yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
             }
-            somethingToDo.run();
+            runnable.run();
             visible = getVisibleRect();
             int newYPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
             visible.y += newYPosition - yPosition;
@@ -432,7 +432,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void setFont(final Font font) {
-        doSomethingWithoutMovingTheVisibleArea(new Runnable() {
+        runWithoutMovingTheVisibleArea(new Runnable() {
             public void run() {
                 PTextArea.super.setFont(font);
                 cacheFontMetrics();
