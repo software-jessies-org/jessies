@@ -59,6 +59,7 @@ public class ETitleBar extends JPanel {
         this.closeButton = new ECloseButton(window);
         buttonsPanel.add(closeButton, BorderLayout.EAST);
         
+        setActive(false);
         setTitle(name);
         initListener();
     }
