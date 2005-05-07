@@ -4,8 +4,11 @@
 # Disable legacy make behavior.
 # ----------------------------------------------------------------------------
 
-.DEFAULT:
+# We used to disable suffix rules, but the default compilation rules are suffix
+# rules, and we want to use them in "native.make".
 #.SUFFIXES:
+
+.DEFAULT:
 .DELETE_ON_ERROR:
 .SECONDARY:
 
