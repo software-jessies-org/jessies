@@ -10,6 +10,13 @@
 #  LDFLAGS         - flags for the linker.
 
 # ----------------------------------------------------------------------------
+# Include GNU make boilerplate.
+# ----------------------------------------------------------------------------
+
+MOST_RECENT_MAKEFILE_DIRECTORY = $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+include $(MOST_RECENT_MAKEFILE_DIRECTORY)/variables.make
+
+# ----------------------------------------------------------------------------
 # Choose the basename(1) for the target
 # ----------------------------------------------------------------------------
 
@@ -34,9 +41,6 @@ CXXFLAGS += $(C_AND_CXX_FLAGS)
 # ----------------------------------------------------------------------------
 # Locate Java.
 # ----------------------------------------------------------------------------
-
-# Assume the tools are on the path if $(JAVA_HOME) isn't specified.
-JAVAH := $(if $(JAVA_HOME),$(JAVA_HOME)/bin/)javah
 
 JAVA_HOME ?= $(error Please set $$(JAVA_HOME) (the calling Makefile should have done this for you))
 
@@ -74,19 +78,12 @@ LDFLAGS += $(if $(BUILDING_COCOA),-framework Cocoa)
 # Find the source.
 # ----------------------------------------------------------------------------
 
-SOURCE_EXTENSIONS += c
-SOURCE_EXTENSIONS += cpp
-SOURCE_EXTENSIONS += m
-SOURCE_EXTENSIONS += mm
-
 SOURCES := $(wildcard $(addprefix *.,$(SOURCE_EXTENSIONS)))
 HEADERS := $(wildcard *.h)
 
 # ----------------------------------------------------------------------------
 # Work out what we're going to generate.
 # ----------------------------------------------------------------------------
-
-TARGET_OS := $(shell uname)
 
 GENERATED_DIRECTORY = $(TARGET_OS)
 
@@ -108,6 +105,11 @@ JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 JNI_DIRECTORY = $(GENERATED_DIRECTORY)
 CLASSES_DIRECTORY = ../../../classes
 JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
+
+# ----------------------------------------------------------------------------
+# Variables above this point,
+# rules below...
+# ----------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------
 # Our default target.
@@ -173,17 +175,15 @@ COMPILE.mm = $(COMPILE.cpp)
 	$(COMPILE.mm) $(OUTPUT_OPTION) $<
 
 # ----------------------------------------------------------------------------
-# Rules for debugging.
-# ----------------------------------------------------------------------------
-	
-.PHONY: echo.%
-echo.%:
-	@echo '$($*)'
-
-# ----------------------------------------------------------------------------
 # Rules for tidying-up.
 # ----------------------------------------------------------------------------
 
 .PHONY: clean
 clean:
 	rm -rf $(GENERATED_DIRECTORY)
+
+# ----------------------------------------------------------------------------
+# Boilerplate rules.
+# ----------------------------------------------------------------------------
+	
+include $(SALMA_HAYEK)/rules.make

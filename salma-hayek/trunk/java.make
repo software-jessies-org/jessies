@@ -26,6 +26,8 @@
 # Ensure we're running a suitable version of make(1).
 # ----------------------------------------------------------------------------
 
+# It would be nice if this could be included in the boilerplate but $(MAKEFILE_LIST)
+# is only available in make-3.80 and, without that, we can't include the boilerplate.
 REQUIRED_MAKE_VERSION = 3.80
 REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
 EARLIER_MAKE_VERSION = $(firstword $(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))
@@ -34,38 +36,22 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
 endif
 
 # ----------------------------------------------------------------------------
-# Disable legacy make behavior.
+# Include GNU make boilerplate.
 # ----------------------------------------------------------------------------
 
-.DEFAULT:
-.SUFFIXES:
-.DELETE_ON_ERROR:
-.SECONDARY:
-
-# ----------------------------------------------------------------------------
-# Define useful stuff not provided by GNU make.
-# ----------------------------------------------------------------------------
-
-pathsearch = $(firstword $(wildcard $(addsuffix /$(1),$(subst :, ,$(PATH)))))
-makepath = $(subst $(SPACE),:,$(strip $(1)))
-getAbsolutePath = $(patsubst @%,$(CURDIR)/%,$(patsubst @/%,/%,$(patsubst %,@%,$(1))))
-
-SPACE := $(subst :, ,:)
+MOST_RECENT_MAKEFILE_DIRECTORY = $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+include $(MOST_RECENT_MAKEFILE_DIRECTORY)/variables.make
 
 # ----------------------------------------------------------------------------
 # Work out what native code, if any, we need to build. 
 # ----------------------------------------------------------------------------
 
-TARGET_OS := $(shell uname)
-
-NATIVE_SOURCE_DIRECTORIES += $(wildcard native/all/*/.svn)
-NATIVE_SOURCE_DIRECTORIES += $(wildcard native/$(TARGET_OS)/*/.svn)
-SUBDIRS += $(dir $(NATIVE_SOURCE_DIRECTORIES))
+NATIVE_SOURCE_PATTERN = native/$(OS)/*/*.$(EXTENSION)
+NATIVE_SOURCE = $(foreach OS,all $(TARGET_OS),$(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(NATIVE_SOURCE_PATTERN)))
+SUBDIRS := $(sort $(dir $(wildcard $(NATIVE_SOURCE))))
 
 # ----------------------------------------------------------------------------
 
-SALMA_HAYEK=$(call getAbsolutePath,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
-export SALMA_HAYEK
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
 # By default, distributions end up under http://www.jessies.org/~enh/
@@ -85,7 +71,6 @@ define GENERATE_CHANGE_LOG.cvs
   $(if $(shell which cvs2cl),cvs2cl,cvs2cl.pl) --hide-filenames
 endef
 
-JAR=$(if $(JAVA_HOME),$(JAVA_HOME)/bin/)jar
 CREATE_OR_UPDATE_JAR=cd $(2) && $(JAR) $(1)f $(CURDIR)/$@ -C classes $(notdir $(wildcard $(2)/classes/*))
 
 GENERATED_FILES += classes
@@ -256,10 +241,6 @@ $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
 build.subdirs:
 	@$(foreach SUBDIR,$(SUBDIRS),$(MAKE) -C $(SUBDIR);)
 
-.PHONY: echo.%
-echo.%:
-	@echo '$($*)'
-
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
 # ----------------------------------------------------------------------------
@@ -276,3 +257,8 @@ app: build
 	echo -e '#!/bin/bash\ncd\nexec `dirname $$0`/../Resources/$(PROJECT_NAME)/bin/$(PROJECT_NAME)\n' > $(PROJECT_NAME) && \
 	chmod a+x $(PROJECT_NAME)
 
+# ----------------------------------------------------------------------------
+# Boilerplate rules.
+# ----------------------------------------------------------------------------
+
+include $(SALMA_HAYEK)/rules.make
