@@ -109,25 +109,6 @@ public class ETextArea extends PTextArea {
     }
     
     /**
-     * Returns the word up to but not past the caret. The intended use is
-     * working out what to offer as completions in AutoCompleteAction.
-     */
-    public String getWordUpToCaret() {
-        CharSequence chars = getTextBuffer();
-        // FIXME - selection
-        int end = getSelectionStart();
-        int start = end;
-        while (start > 0) {
-            char ch = chars.charAt(start - 1);
-            if (ch != '_' && Character.isLetterOrDigit(ch) == false) {
-                break;
-            }
-            --start;
-        }
-        return chars.subSequence(start, end).toString();
-    }
-    
-    /**
      * Returns the text of the line (without the newline) containing the
      * given offset in the document.
      */
