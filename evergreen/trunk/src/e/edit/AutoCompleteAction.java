@@ -25,8 +25,27 @@ public class AutoCompleteAction extends ETextAction {
         }
     }
     
+    /**
+     * Returns the word up to but not past the caret. The intended use is
+     * working out what to offer as completions in AutoCompleteAction.
+     */
+    private static String getWordUpToCaret(ETextArea textArea) {
+        CharSequence chars = textArea.getTextBuffer();
+        // FIXME - selection
+        int end = textArea.getSelectionStart();
+        int start = end;
+        while (start > 0) {
+            char ch = chars.charAt(start - 1);
+            if (ch != '_' && Character.isLetterOrDigit(ch) == false) {
+                break;
+            }
+            --start;
+        }
+        return chars.subSequence(start, end).toString();
+    }
+    
     public void offerCompletions(final ETextArea textArea) {
-        String prefix = textArea.getWordUpToCaret();
+        String prefix = getWordUpToCaret(textArea);
         // FIXME - selection
         final int endPosition = textArea.getSelectionStart();
         final int startPosition = endPosition - prefix.length();
