@@ -124,7 +124,7 @@ public class ETextArea extends PTextArea {
             }
             --start;
         }
-        return getTextBuffer().subSequence(start, end).toString();
+        return chars.subSequence(start, end).toString();
     }
     
     /**
