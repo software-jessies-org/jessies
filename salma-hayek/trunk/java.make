@@ -146,7 +146,7 @@ ifeq "$(wildcard $(RT_JAR))" ""
   RT_JAR=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
   ifeq "$(wildcard $(RT_JAR))" ""
     # Where install-everything.sh leaves stuff:
-    RT_JAR=/usr/local/jdk1.5.0/jre/lib/rt.jar
+    export JAVA_HOME := $(shell perl -ne 'm/JAVA_INSTALL_DIR *= *(.*)/ && print ("$$1")' $(SALMA_HAYEK)/bin/install-everything.sh)
     ifeq "$(wildcard $(RT_JAR))" ""
       # Fall back to searching:
       RT_JAR=$(firstword $(shell locate /rt.jar))

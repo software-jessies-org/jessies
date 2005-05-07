@@ -18,6 +18,7 @@ fi
 
 # Install Java in /usr/local, and put links to java and javac in /usr/local/bin.
 java_installer=/net/mirror/mirror-link/java/jdk-1_5_0_01-linux-i586.bin
+# java.make reads this file to find JAVA_INSTALL_DIR
 JAVA_INSTALL_DIR=/usr/local/jdk1.5.0_01
 if test -f $java_installer && ! test -d $JAVA_INSTALL_DIR ; then
     $java_installer || die "installing Java"
