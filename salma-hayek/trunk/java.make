@@ -56,8 +56,9 @@ SPACE := $(subst :, ,:)
 # ----------------------------------------------------------------------------
 
 TARGET_OS = $(shell uname)
-SUBDIRS += $(wildcard native/all/*)
-SUBDIRS += $(wildcard native/$(TARGET_OS)/*)
+NATIVE_MAKEFILES += $(wildcard native/all/*/Makefile)
+NATIVE_MAKEFILES += $(wildcard native/$(TARGET_OS)/*/Makefile)
+SUBDIRS += $(dir $(NATIVE_MAKEFILES))
 
 # ----------------------------------------------------------------------------
 
