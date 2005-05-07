@@ -12,6 +12,6 @@ public class FixedFontAction extends ChangeFontAction {
   }
   
   public Font getFont() {
-    return ETextArea.getConfiguredFixedFont();
+    return getConfiguredFixedFont();
   }
 }

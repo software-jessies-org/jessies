@@ -37,7 +37,7 @@ public class SimplePatchDialog {
         
         JList result = new JList();
         result.setCellRenderer(PatchListCellRenderer.INSTANCE);
-        result.setFont(ETextArea.getConfiguredFixedFont());
+        result.setFont(ChangeFontAction.getConfiguredFixedFont());
         result.setModel(model);
         return result;
     }

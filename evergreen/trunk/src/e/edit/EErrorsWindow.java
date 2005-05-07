@@ -24,7 +24,7 @@ public class EErrorsWindow extends EWindow {
     private void initTextArea() {
         textArea = new PTextArea();
         // Default to a fixed-pitch font in errors windows.
-        textArea.setFont(ETextArea.getConfiguredFixedFont());
+        textArea.setFont(ChangeFontAction.getConfiguredFixedFont());
         // But no margin, because all the text should be machine-generated.
         textArea.showRightHandMarginAt(PTextArea.NO_MARGIN);
         textArea.setTextStyler(new ErrorLinkStyler(textArea));
