@@ -395,7 +395,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
      */
     public static class UnderlineHighlightPainter extends LayeredHighlighter.LayerPainter {
         private static final boolean DASHED = GuiUtilities.isMacOs();
-        private static final Color COLOR = new Color(255, 0, 0); //, DASHED ? 160 : 72);
+        private static final Color COLOR = new Color(255, 0, 0, DASHED ? 160 : 72);
         
         public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
             // Do nothing: this method will never be called
