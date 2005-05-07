@@ -95,6 +95,7 @@ public class TagsUpdater {
                 getTextWindow().goToLine(tag.lineNumber);
             }
         });
+        tree.setFont(UIManager.getFont("TableHeader.font"));
         tree.setCellRenderer(new TagsPanel.TagsTreeRenderer());
         
         final SearchField searchField = new SearchField("Search Symbols");

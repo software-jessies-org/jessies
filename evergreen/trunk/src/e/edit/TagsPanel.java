@@ -82,8 +82,7 @@ public class TagsPanel extends JPanel {
             TYPE_SHAPES.put(TagReader.Tag.PROTOTYPE, SQUARE);
         }
         
-        private static Font normalFont = ETextArea.getConfiguredFont();
-        private static Font boldFont = normalFont.deriveFont(Font.BOLD);
+        private static Font boldFont = UIManager.getFont("TableHeader.font").deriveFont(Font.BOLD);
         
         private final Icon icon = new DrawnIcon(new Dimension(10, 10)) {
             public void paintIcon(Component c, Graphics og, int x, int y) {
@@ -117,7 +116,7 @@ public class TagsPanel extends JPanel {
             if (node.getUserObject() instanceof TagReader.Tag) {
                 tag = (TagReader.Tag) node.getUserObject();
                 setForeground(tag.visibilityColor() == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
-                setFont((tag.isStatic && tag.visibilityColor() != TagReader.Tag.PRIVATE) ? boldFont : normalFont);
+                setFont((tag.isStatic && tag.visibilityColor() != TagReader.Tag.PRIVATE) ? boldFont : tree.getFont());
                 setToolTipText(tag.toolTip);
                 Shape typeMarker = (Shape) TYPE_SHAPES.get(tag.type);
                 if (typeMarker != null) {
