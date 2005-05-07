@@ -10,16 +10,10 @@ import e.util.*;
  */
 public class ETextArea extends PTextArea {
     public ETextArea() {
-        // FIXME
-        //setMargin(new Insets(4, 4, 4, 1));
-    }
-    
-    /** Returns a fake 'preferred size' if our parent's not tall enough for us to make it as far as the display. */
-    public Dimension getPreferredSize() {
-        if (getParent().getHeight() <= 0) {
-            return new Dimension(0, 0);
-        }
-        return super.getPreferredSize();
+        // FIXME: PTextArea doesn't handle this; should we, or should we just
+        // force people to add a surrounding JPanel? Swing really made insets
+        // and borders way more awkward than they should have been.
+        setBorder(new javax.swing.border.EmptyBorder(4, 4, 4, 1));
     }
     
     public void setFont(Font font) {
@@ -131,18 +125,6 @@ public class ETextArea extends PTextArea {
             --start;
         }
         return getTextBuffer().subSequence(start, end).toString();
-    }
-
-    /**
-     * Overrides getSelectedText to return the empty string instead of null
-     * when the selection is empty. Knowing you'll never see null is useful,
-     * and the empty string is every bit as good a representation of the
-     * empty selection. acme, wily and early versions of Edit using home-grown
-     * text components all worked perfectly well in such a world.
-     */
-    public String getSelectedText() {
-        String selection = super.getSelectedText();
-        return (selection != null) ? selection : "";
     }
     
     /**
