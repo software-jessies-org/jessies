@@ -205,9 +205,19 @@ public class FileUtilities {
         return FileUtilities.nameEndsWithOneOf(file, ignoredExtensions);
     }
     
+    private static String getUninterestingDirectoryPattern() {
+        String defaultPattern = "\\.deps|\\.svn|BitKeeper|CVS|SCCS";
+        String customPattern = Parameters.getParameter("directories.uninterestingNames", "");
+        if (customPattern.length() > 0) {
+            return customPattern + "|" + defaultPattern;
+        } else {
+            return defaultPattern;
+        }
+    }
+    
     public static boolean isIgnoredDirectory(File directory) {
         if (uninterestingDirectoryNames == null) {
-            uninterestingDirectoryNames = Pattern.compile(Parameters.getParameter("directories.uninterestingNames", "(\\.deps|\\.svn|BitKeeper|CVS|SCCS)"));
+            uninterestingDirectoryNames = Pattern.compile(getUninterestingDirectoryPattern());
         }
         return uninterestingDirectoryNames.matcher(directory.getName()).matches();
     }
