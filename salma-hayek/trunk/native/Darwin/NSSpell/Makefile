@@ -1,1 +1,1 @@
-include ../../../objective-c.make
+include ../../../native.make
