@@ -48,6 +48,7 @@ endif
 
 pathsearch = $(firstword $(wildcard $(addsuffix /$(1),$(subst :, ,$(PATH)))))
 makepath = $(subst $(SPACE),:,$(strip $(1)))
+getAbsolutePath = $(patsubst @%,$(CURDIR)/%,$(patsubst @/%,/%,$(patsubst %,@%,$(1))))
 
 SPACE := $(subst :, ,:)
 
@@ -63,7 +64,7 @@ SUBDIRS += $(dir $(NATIVE_SOURCE_DIRECTORIES))
 
 # ----------------------------------------------------------------------------
 
-SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+SALMA_HAYEK=$(call getAbsolutePath,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
 export SALMA_HAYEK
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
