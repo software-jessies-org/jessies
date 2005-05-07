@@ -84,13 +84,23 @@ TARGET_OS := $(shell uname)
 GENERATED_DIRECTORY = $(TARGET_OS)
 
 OBJECTS = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst %.$(EXTENSION),$(GENERATED_DIRECTORY)/%.o,$(filter %.$(EXTENSION),$(SOURCES))))
-SOURCE_LINKS = $(addprefix $(GENERATED_DIRECTORY)/,$(SOURCES) $(HEADERS))
+HEADER_LINKS = $(addprefix $(GENERATED_DIRECTORY)/,$(HEADERS))
 
 EXECUTABLE = $(GENERATED_DIRECTORY)/$(BASE_NAME)
 SHARED_LIBRARY = $(GENERATED_DIRECTORY)/$(BASE_NAME).$(SHARED_LIBRARY_EXTENSION)
 
 BUILDING_SHARED_LIBRARY = $(filter lib%,$(BASE_NAME))
 DEFAULT_TARGET = $(if $(BUILDING_SHARED_LIBRARY),$(SHARED_LIBRARY),$(EXECUTABLE))
+
+JNI_SOURCE = $(foreach SOURCE,$(SOURCES),$(if $(findstring _,$(SOURCE)),$(SOURCE)))
+JNI_BASE_NAME = $(basename $(JNI_SOURCE))
+JNI_HEADER = $(JNI_BASE_NAME).h
+HEADERS += $(JNI_HEADER)
+JNI_OBJECT = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).o
+JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
+JNI_DIRECTORY = $(CURDIR)
+CLASSES_DIRECTORY = ../../../classes
+JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 
 # ----------------------------------------------------------------------------
 # Our default target.
@@ -114,12 +124,19 @@ $(SHARED_LIBRARY): $(OBJECTS)
 	$(LD) $(OBJECTS) -o $@ $(SHARED_LIBRARY_LDFLAGS)
 
 # ----------------------------------------------------------------------------
+# Generate our JNI header.
+# ----------------------------------------------------------------------------
+	
+$(JNI_HEADER): $(JNI_CLASS_FILE)
+	$(JAVA_HOME)/bin/javah -classpath $(CLASSES_DIRECTORY) -d $(JNI_DIRECTORY) $(JNI_CLASS_NAME)
+
+# ----------------------------------------------------------------------------
 # Create "the build tree", GNU-style.
 # ----------------------------------------------------------------------------
 
 # This way, we can use the built-in compilation rules which assume everything's
 # in the same directory.
-$(SOURCE_LINKS): $(GENERATED_DIRECTORY)/%: %
+$(GENERATED_DIRECTORY)/%: %
 	mkdir -p $(dir $@) && \
 	rm -f $@ && \
 	ln -s ../$< $@
@@ -131,7 +148,7 @@ $(SOURCE_LINKS): $(GENERATED_DIRECTORY)/%: %
 # Rather than have the compiler track dependencies we
 # conservatively assume that if a header files changes, we have to recompile
 # everything.
-$(OBJECTS): $(SOURCE_LINKS) $(HEADERS) $(MAKEFILE_LIST)
+$(OBJECTS): $(HEADER_LINKS) $(HEADERS) $(MAKEFILE_LIST)
 
 # ----------------------------------------------------------------------------
 # Implicit rules for compiling Objective C and Objective C++ source.
@@ -144,6 +161,14 @@ COMPILE.m = $(COMPILE.c)
 COMPILE.mm = $(COMPILE.cpp)
 %.o: %.mm
 	$(COMPILE.mm) $(OUTPUT_OPTION) $<
+	
+# ----------------------------------------------------------------------------
+# Rules for debugging.
+# ----------------------------------------------------------------------------
+	
+.PHONY: echo.%
+echo.%:
+	@echo '$($*)'
 
 # ----------------------------------------------------------------------------
 # Rules for tidying-up.
