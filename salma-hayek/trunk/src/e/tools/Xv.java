@@ -1,15 +1,21 @@
 package e.tools;
 
 import javax.swing.*;
+import java.awt.*;
 import e.util.*;
 
 public class Xv extends JFrame {
-    
     public Xv(String filename) {
         super(filename);
         Log.warn("Opening '" + filename + "'.");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setContentPane(new JLabel(new ImageIcon(filename)));
+
+        ImageIcon originalIcon = new ImageIcon(filename);
+        Image originalImage = originalIcon.getImage();
+        ImageIcon scaledIcon = new ImageIcon();
+        scaledIcon.setImage(originalImage.getScaledInstance(200, -1, Image.SCALE_FAST));
+
+        setContentPane(new JLabel(originalIcon));
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
