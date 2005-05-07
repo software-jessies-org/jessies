@@ -1,1 +1,1 @@
-include ../../../native.make
+include $(SALMA_HAYEK)/native.make

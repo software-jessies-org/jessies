@@ -40,8 +40,10 @@ JAVA_HOME ?= $(error Please set $$(JAVA_HOME) (the calling Makefile should have 
 JNI_PATH.Darwin += /System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
 SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
 SHARED_LIBRARY_EXTENSION.Darwin = jnilib
-# The default linker doesn't do the right thing on Darwin.
+# The default $(LD) doesn't know about -dynamiclib on Darwin.
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
+LD = $(CXX)
+# The default $(CC) used by $(LINK.o) doesn't know about the Darwin equivalent of -lstdc++.
 CC = $(CXX)
 
 JNI_PATH.Linux += $(JAVA_HOME)/include
@@ -52,6 +54,14 @@ SHARED_LIBRARY_EXTENSION.Linux = so
 JNI_PATH += $(JNI_PATH.$(TARGET_OS))
 SHARED_LIBRARY_LDFLAGS += $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
 SHARED_LIBRARY_EXTENSION = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
+
+# ----------------------------------------------------------------------------
+# Add the Cocoa framework if we're building Objective-C/C++.
+# ----------------------------------------------------------------------------
+
+BUILDING_COCOA = $(filter %.m %.mm,$(SOURCES))
+
+LDFLAGS += $(if $(BUILDING_COCOA),-framework Cocoa)
 
 # ----------------------------------------------------------------------------
 # Find the source.
@@ -76,26 +86,31 @@ GENERATED_DIRECTORY = $(TARGET_OS)
 OBJECTS = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst %.$(EXTENSION),$(GENERATED_DIRECTORY)/%.o,$(filter %.$(EXTENSION),$(SOURCES))))
 SOURCE_LINKS = $(addprefix $(GENERATED_DIRECTORY)/,$(SOURCES) $(HEADERS))
 
+EXECUTABLE = $(GENERATED_DIRECTORY)/$(BASE_NAME)
+SHARED_LIBRARY = $(GENERATED_DIRECTORY)/$(BASE_NAME).$(SHARED_LIBRARY_EXTENSION)
+
+BUILDING_SHARED_LIBRARY = $(filter lib%,$(BASE_NAME))
+DEFAULT_TARGET = $(if $(BUILDING_SHARED_LIBRARY),$(SHARED_LIBRARY),$(EXECUTABLE))
+
 # ----------------------------------------------------------------------------
-# Add the Cocoa framework if we're building Objective-C/C++.
+# Our default target.
 # ----------------------------------------------------------------------------
 
-ifneq "$(filter %.m %.mm,$(SOURCES))" ""
-  LDFLAGS += -framework Cocoa
-endif
+.PHONY: default
+default: $(DEFAULT_TARGET)
 
 # ----------------------------------------------------------------------------
 # Our executable target.
 # ----------------------------------------------------------------------------
 
-$(GENERATED_DIRECTORY)/$(BASE_NAME): $(OBJECTS)
+$(EXECUTABLE): $(OBJECTS)
 
 # ----------------------------------------------------------------------------
 # Our shared library target.
 # ----------------------------------------------------------------------------
 
 # There is no default rule for shared library building on my system.
-$(GENERATED_DIRECTORY)/$(BASE_NAME).$(SHARED_LIBRARY_EXTENSION): $(OBJECTS)
+$(SHARED_LIBRARY): $(OBJECTS)
 	$(LD) $(OBJECTS) -o $@ $(SHARED_LIBRARY_LDFLAGS)
 
 # ----------------------------------------------------------------------------
