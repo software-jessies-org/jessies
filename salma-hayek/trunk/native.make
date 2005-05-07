@@ -1,8 +1,8 @@
 # This makefile compiles all the C/C++/Objective-C/Objective-C++ source found
 # in the directory into a single executable or shared library.
 
-# These flags, some of them traditional, are used, but you should probably refrain from
-# modifying them outside this file, for portability's sake:
+# These flags, some of them traditional, are used, but you should probably
+# refrain from modifying them outside this file, for portability's sake:
 #
 #  CFLAGS          - flags for the C/Objective-C compiler.
 #  CXXFLAGS        - flags for the C++/Objective-C++ compiler.
@@ -30,7 +30,7 @@ CFLAGS += -std=c99
 C_AND_CXXFLAGS += -fPIC
 C_AND_CXXFLAGS += -g
 # Maximum warnings...
-C_AND_CXXFLAGS += -W -Wall -Werror -pedantic
+C_AND_CXX_FLAGS += -W -Wall -Werror -pedantic
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
 CPPFLAGS += $(addprefix -I,$(JNI_PATH))
