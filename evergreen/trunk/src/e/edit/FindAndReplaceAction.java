@@ -73,10 +73,12 @@ public class FindAndReplaceAction extends ETextAction {
             }
         });
         Font textFont = text.getFont();
-        matchList.setCellRenderer(new DisplayableMatchRenderer(textFont));
+        matchList.setFont(textFont);
+        matchList.setCellRenderer(new DisplayableMatchRenderer());
         
         replacementsList = new JList();
-        replacementsList.setCellRenderer(new DisplayableMatchRenderer(textFont));
+        replacementsList.setFont(textFont);
+        replacementsList.setCellRenderer(new DisplayableMatchRenderer());
 
         // Make both lists scrollable...
         JScrollPane matchPane = new JScrollPane(matchList);
@@ -145,12 +147,8 @@ public class FindAndReplaceAction extends ETextAction {
     }
 
     public static class DisplayableMatchRenderer extends EListCellRenderer {
-        private Font font;
-        
-        public DisplayableMatchRenderer(Font font) {
+        public DisplayableMatchRenderer() {
             super(true);
-            this.font = font;
-            setFont(font);
         }
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -163,7 +161,6 @@ public class FindAndReplaceAction extends ETextAction {
             if (tooltip.length() > 0) {
                 setToolTipText(tooltip);
             }
-            setFont(font);
             
             return this;
         }
