@@ -20,8 +20,7 @@
 # Choose a default executable name if the user didn't supply one.
 # ----------------------------------------------------------------------------
 
-CURRENT_DIRECTORY := $(shell pwd)
-EXECUTABLE_NAME ?= $(shell basename $(CURRENT_DIRECTORY))
+EXECUTABLE_NAME ?= $(notdir $(CURDIR))
 
 # ----------------------------------------------------------------------------
 # Rules for compiling Objective C and Objective C++ source.
