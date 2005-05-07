@@ -55,14 +55,16 @@ SPACE := $(subst :, ,:)
 # Work out what native code, if any, we need to build. 
 # ----------------------------------------------------------------------------
 
-TARGET_OS = $(shell uname)
-NATIVE_MAKEFILES += $(wildcard native/all/*/Makefile)
-NATIVE_MAKEFILES += $(wildcard native/$(TARGET_OS)/*/Makefile)
-SUBDIRS += $(dir $(NATIVE_MAKEFILES))
+TARGET_OS := $(shell uname)
+
+NATIVE_SOURCE_DIRECTORIES += $(wildcard native/all/*/.svn)
+NATIVE_SOURCE_DIRECTORIES += $(wildcard native/$(TARGET_OS)/*/.svn)
+SUBDIRS += $(dir $(NATIVE_SOURCE_DIRECTORIES))
 
 # ----------------------------------------------------------------------------
 
 SALMA_HAYEK=$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+export SALMA_HAYEK
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
 # By default, distributions end up under http://www.jessies.org/~enh/
