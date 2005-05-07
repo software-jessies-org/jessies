@@ -5,6 +5,8 @@ HEADERS := $(wildcard *.h)
 TARGET_OS := $(shell uname)
 ARCH := $(shell arch)
 
+JAVA_HOME ?= $(error Please set $$(JAVA_HOME) (the calling Makefile should have done this for you))
+
 JNI_PATH.Darwin += /System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
 SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
 SHARED_LIBRARY_EXTENSION.Darwin = jnilib
@@ -12,7 +14,6 @@ SHARED_LIBRARY_EXTENSION.Darwin = jnilib
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
 LD = $(CXX)
 
-JNI_PATH.Linux += $(if $(JAVA_HOME),,$(error Please set $$(JAVA_HOME) (the calling Makefile should have done this for you)))
 JNI_PATH.Linux += $(JAVA_HOME)/include
 JNI_PATH.Linux += $(JAVA_HOME)/include/linux
 SHARED_LIBRARY_LDFLAGS.Linux += -shared
