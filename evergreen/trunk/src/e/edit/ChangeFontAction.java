@@ -5,9 +5,6 @@ import java.awt.event.*;
 import java.util.regex.*;
 import e.util.*;
 
-/**
-The ETextArea action to change font.
-*/
 public abstract class ChangeFontAction extends ETextAction {
     public ChangeFontAction(String fontDescription) {
         super("Use " + fontDescription + " Font");
