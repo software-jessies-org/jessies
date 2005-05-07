@@ -333,8 +333,12 @@ public class PTextAreaSpellingChecker implements PTextListener {
      * line. Elsewhere, it's a wavy line.
      */
     public static class UnderlineHighlight extends PColoredHighlight {
+        // Mac OS uses a dashed underline; MS Windows a wavy one.
         private static final boolean DASHED = GuiUtilities.isMacOs();
-        private static final Color COLOR = new Color(255, 0, 0, DASHED ? 160 : 72);
+        
+        // On Linux, painting with an alpha color is *really* slow, so use an
+        // approximate pink if we're not on Mac OS.
+        private static final Color COLOR = DASHED ? new Color(255, 0, 0, 160) : new Color(255, 102, 102);
         
         public UnderlineHighlight(PTextArea textArea, int startIndex, int endIndex) {
             super(textArea, startIndex, endIndex, COLOR);
