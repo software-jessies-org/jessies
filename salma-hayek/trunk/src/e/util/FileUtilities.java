@@ -207,7 +207,7 @@ public class FileUtilities {
     
     public static boolean isIgnoredDirectory(File directory) {
         if (uninterestingDirectoryNames == null) {
-            uninterestingDirectoryNames = Pattern.compile(Parameters.getParameter("directories.uninterestingNames", "(SCCS|CVS)"));
+            uninterestingDirectoryNames = Pattern.compile(Parameters.getParameter("directories.uninterestingNames", "(\\.deps|\\.svn|BitKeeper|CVS|SCCS)"));
         }
         return uninterestingDirectoryNames.matcher(directory.getName()).matches();
     }
