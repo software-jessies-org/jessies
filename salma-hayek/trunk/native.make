@@ -52,7 +52,7 @@ JAVA_HOME ?= $(error Please set $$(JAVA_HOME) (the calling Makefile should have 
 # Extra compiler and (mainly) linker flags for building JNI.
 # ----------------------------------------------------------------------------
 
-JNI_PATH.Darwin += /System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
+JNI_PATH.Darwin += /System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers
 SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
 SHARED_LIBRARY_EXTENSION.Darwin = jnilib
 # The default $(LD) doesn't know about -dynamiclib on Darwin.
