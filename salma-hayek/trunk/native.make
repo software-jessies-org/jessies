@@ -24,7 +24,6 @@ include $(MOST_RECENT_MAKEFILE_DIRECTORY)/variables.make
 # Choose the basename(1) for the target
 # ----------------------------------------------------------------------------
 
-SOURCE_DIRECTORY = $(CURDIR)
 BASE_NAME = $(notdir $(SOURCE_DIRECTORY))
 
 # ----------------------------------------------------------------------------

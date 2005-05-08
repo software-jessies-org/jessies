@@ -46,7 +46,7 @@ include $(MOST_RECENT_MAKEFILE_DIRECTORY)/variables.make
 # Work out what native code, if any, we need to build. 
 # ----------------------------------------------------------------------------
 
-NATIVE_SOURCE_PATTERN = native/$(OS)/*/*.$(EXTENSION)
+NATIVE_SOURCE_PATTERN = $(CURDIR)/native/$(OS)/*/*.$(EXTENSION)
 NATIVE_SOURCE = $(foreach OS,all $(TARGET_OS),$(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(NATIVE_SOURCE_PATTERN)))
 SUBDIRS := $(sort $(dir $(wildcard $(NATIVE_SOURCE))))
 
@@ -213,7 +213,7 @@ clean:
 
 .PHONY: clobber
 clobber: clean
-	@$(foreach SUBDIR,$(SUBDIRS),$(MAKE) -C $(SUBDIR) -f $(SALMA_HAYEK)/native.make clean;)
+	@$(foreach SUBDIR,$(SUBDIRS),export SOURCE_DIRECTORY=$(SUBDIR) && $(MAKE) -f $(SALMA_HAYEK)/native.make clean;)
 
 .PHONY: dist
 dist: build
@@ -242,7 +242,7 @@ $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
 
 .PHONY: build.subdirs
 build.subdirs:
-	@$(foreach SUBDIR,$(SUBDIRS),$(MAKE) -C $(SUBDIR) -f $(SALMA_HAYEK)/native.make;)
+	@$(foreach SUBDIR,$(SUBDIRS),export SOURCE_DIRECTORY=$(SUBDIR) && $(MAKE) -f $(SALMA_HAYEK)/native.make;)
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
