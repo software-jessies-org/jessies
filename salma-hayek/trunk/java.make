@@ -48,7 +48,7 @@ include $(MOST_RECENT_MAKEFILE_DIRECTORY)/variables.make
 
 NATIVE_SOURCE_PATTERN = $(CURDIR)/native/$(OS)/*/*.$(EXTENSION)
 NATIVE_SOURCE = $(foreach OS,all $(TARGET_OS),$(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(NATIVE_SOURCE_PATTERN)))
-SUBDIRS := $(sort $(dir $(wildcard $(NATIVE_SOURCE))))
+SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 
 # ----------------------------------------------------------------------------
 
