@@ -42,7 +42,7 @@ public class SpellingChecker {
             // means we can offer system spelling checking on Mac OS with
             // no installation necessary.
             
-            String nsspellPath = FileUtilities.getSalmaHayekFile("/native/Darwin/NSSpell/NSSpell").toString();
+            String nsspellPath = FileUtilities.getSalmaHayekFile("/generated/native/Darwin/NSSpell/Darwin/NSSpell").toString();
             found = connectTo(new String[] { nsspellPath });
         }
         
