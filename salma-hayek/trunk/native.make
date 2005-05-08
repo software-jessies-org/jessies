@@ -1,24 +1,12 @@
 # This makefile compiles all the C/C++/Objective-C/Objective-C++ source found
-# in the directory into a single executable or JNI library.
+# in $(SOURCE_DIRECTORY) into a single executable or JNI library.
 
-# The decision about whether to build an executable or JNI library is made
-# based on the directory name. A JNI library must be in a directory whose
-# name begins "lib".
+# It assumes variables.make and rules.make are included, so it's only suitable
+# for inclusion by java.make.
 
-# These flags, some of them traditional, are used, but you should probably
-# refrain from modifying them outside this file, for portability's sake:
-#
-#  CFLAGS          - flags for the C/Objective-C compiler.
-#  CXXFLAGS        - flags for the C++/Objective-C++ compiler.
-#  C_AND_CXX_FLAGS - flags for both compilers.
-#  LDFLAGS         - flags for the linker.
-
-# ----------------------------------------------------------------------------
-# Include GNU make boilerplate.
-# ----------------------------------------------------------------------------
-
-MOST_RECENT_MAKEFILE_DIRECTORY = $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
-include $(MOST_RECENT_MAKEFILE_DIRECTORY)/variables.make
+# Unusually, it is included multiple times so be careful with += etc.
+# As a rule of thumb, do not define any variables here which aren't dependent
+# on the particular directory being built.
 
 # ----------------------------------------------------------------------------
 # Choose the basename(1) for the target
@@ -73,8 +61,8 @@ JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 # Select the default target.
 # ----------------------------------------------------------------------------
 
-.PHONY: default
-default: $(DEFAULT_TARGET)
+.PHONY: build
+build: $(DEFAULT_TARGET)
 
 # ----------------------------------------------------------------------------
 # Our executable target.
@@ -130,9 +118,3 @@ clean: clean.$(GENERATED_DIRECTORY)
 .PHONY: clean.$(GENERATED_DIRECTORY)
 clean.$(GENERATED_DIRECTORY):
 	rm -rf $(GENERATED_DIRECTORY)
-
-# ----------------------------------------------------------------------------
-# Boilerplate rules.
-# ----------------------------------------------------------------------------
-
-include $(SALMA_HAYEK)/rules.make

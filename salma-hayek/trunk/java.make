@@ -10,7 +10,6 @@
 # Your calling Makefile:
 #   must define PROJECT_NAME
 #   may append to BINDIST_FILES
-#   may append to SUBDIRS
 #   must include ../salma-hayek/java.make
 
 #   must have any extra rules after the include
@@ -198,7 +197,7 @@ JAVA_FLAGS += -source 1.4
 # ----------------------------------------------------------------------------
 
 .PHONY: build
-build: build.java build.subdirs
+build: build.java
 
 .PHONY: build.java
 build.java: $(SOURCE_FILES)
@@ -208,12 +207,8 @@ build.java: $(SOURCE_FILES)
 	 $(JAVA_COMPILER) $(JAVA_FLAGS) $(SOURCE_FILES)
 
 .PHONY: clean
-clean: clean.subdirs
+clean:
 	@$(RM) -rf $(GENERATED_FILES)
-
-.PHONY: clean.subdirs
-clean.subdirs:
-	@$(foreach SUBDIR,$(SUBDIRS),export SOURCE_DIRECTORY=$(SUBDIR) && $(MAKE) -f $(SALMA_HAYEK)/native.make clean;)
 
 .PHONY: dist
 dist: build
@@ -240,9 +235,16 @@ bindist: $(PROJECT_NAME)-bindist.tgz
 $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
 	@cd .. && tar -zcf $(addprefix $(DIRECTORY_NAME)/,$@ $(FILTERED_BINDIST_FILES))
 
-.PHONY: build.subdirs
-build.subdirs:
-	@$(foreach SUBDIR,$(SUBDIRS),export SOURCE_DIRECTORY=$(SUBDIR) && $(MAKE) -f $(SALMA_HAYEK)/native.make;)
+# ----------------------------------------------------------------------------
+# The magic incantation to build and clean all the native subdirectories.
+# ----------------------------------------------------------------------------
+
+define buildNativeDirectory
+  SOURCE_DIRECTORY = $(1)
+  include $(SALMA_HAYEK)/native.make
+endef
+
+$(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR))))
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
