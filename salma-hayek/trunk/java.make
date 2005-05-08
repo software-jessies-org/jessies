@@ -203,16 +203,16 @@ build: build.java build.subdirs
 .PHONY: build.java
 build.java: $(SOURCE_FILES)
 	@echo Recompiling the world... && \
-	 $(MAKE) clean && \
+	 rm -rf classes && \
 	 mkdir -p classes && \
 	 $(JAVA_COMPILER) $(JAVA_FLAGS) $(SOURCE_FILES)
 
 .PHONY: clean
-clean:
+clean: clean.subdirs
 	@$(RM) -rf $(GENERATED_FILES)
 
-.PHONY: clobber
-clobber: clean
+.PHONY: clean.subdirs
+clean.subdirs:
 	@$(foreach SUBDIR,$(SUBDIRS),export SOURCE_DIRECTORY=$(SUBDIR) && $(MAKE) -f $(SALMA_HAYEK)/native.make clean;)
 
 .PHONY: dist
