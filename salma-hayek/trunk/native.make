@@ -27,56 +27,10 @@ include $(MOST_RECENT_MAKEFILE_DIRECTORY)/variables.make
 BASE_NAME = $(notdir $(SOURCE_DIRECTORY))
 
 # ----------------------------------------------------------------------------
-# Sensible C family compiler flags.
-# ----------------------------------------------------------------------------
-
-CFLAGS += -std=c99
-C_AND_CXXFLAGS += -fPIC
-C_AND_CXXFLAGS += -g
-# Maximum warnings...
-C_AND_CXX_FLAGS += -W -Wall -Werror -pedantic
-# ... but assume that C++ will eventually subsume C99.
-CXXFLAGS += -Wno-long-long
-CPPFLAGS += $(addprefix -I,$(JNI_PATH))
-
-CFLAGS += $(C_AND_CXX_FLAGS)
-CXXFLAGS += $(C_AND_CXX_FLAGS)
-
-# ----------------------------------------------------------------------------
 # Locate Java.
 # ----------------------------------------------------------------------------
 
 JAVA_HOME ?= $(error Please set $$(JAVA_HOME) (the calling Makefile should have done this for you))
-
-# ----------------------------------------------------------------------------
-# Extra compiler and (mainly) linker flags for building JNI.
-# ----------------------------------------------------------------------------
-
-JNI_PATH.Darwin += /System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers
-SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
-SHARED_LIBRARY_EXTENSION.Darwin = jnilib
-# The default $(LD) doesn't know about -dynamiclib on Darwin.
-# This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
-LD = $(CXX)
-# The default $(CC) used by $(LINK.o) doesn't know about the Darwin equivalent of -lstdc++.
-CC = $(CXX)
-
-JNI_PATH.Linux += $(JAVA_HOME)/include
-JNI_PATH.Linux += $(JAVA_HOME)/include/linux
-SHARED_LIBRARY_LDFLAGS.Linux += -shared
-SHARED_LIBRARY_EXTENSION.Linux = so
-
-JNI_PATH += $(JNI_PATH.$(TARGET_OS))
-SHARED_LIBRARY_LDFLAGS += $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
-SHARED_LIBRARY_EXTENSION = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
-
-# ----------------------------------------------------------------------------
-# Add the Cocoa framework if we're building Objective-C/C++.
-# ----------------------------------------------------------------------------
-
-BUILDING_COCOA = $(filter %.m %.mm,$(SOURCES))
-
-LDFLAGS += $(if $(BUILDING_COCOA),-framework Cocoa)
 
 # ----------------------------------------------------------------------------
 # Find the source.
@@ -167,18 +121,6 @@ $(SOURCE_LINKS) $(HEADER_LINKS): $(GENERATED_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
 $(OBJECTS): $(HEADER_LINKS) $(HEADERS) $(MAKEFILE_LIST)
 
 # ----------------------------------------------------------------------------
-# Implicit rules for compiling Objective C and Objective C++ source.
-# ----------------------------------------------------------------------------
-
-COMPILE.m = $(COMPILE.c)
-%.o: %.m
-	$(COMPILE.m) $(OUTPUT_OPTION) $<
-
-COMPILE.mm = $(COMPILE.cpp)
-%.o: %.mm
-	$(COMPILE.mm) $(OUTPUT_OPTION) $<
-
-# ----------------------------------------------------------------------------
 # Rules for tidying-up.
 # ----------------------------------------------------------------------------
 
@@ -192,5 +134,5 @@ clean.$(GENERATED_DIRECTORY):
 # ----------------------------------------------------------------------------
 # Boilerplate rules.
 # ----------------------------------------------------------------------------
-	
+
 include $(SALMA_HAYEK)/rules.make
