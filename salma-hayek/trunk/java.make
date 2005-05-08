@@ -67,9 +67,15 @@ SALMA_HAYEK := $(call getAbsolutePath,$(MOST_RECENT_MAKEFILE_DIRECTORY))
 # Locate Java.
 # ----------------------------------------------------------------------------
 
+# The current version of Java has a well-known home on Darwin.
+DEFAULT_JAVA_HOME.Darwin = /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
+
 # Assume the tools are on the path if $(JAVA_HOME) isn't specified.
-# Note the := to evaluate $(JAVA_HOME) before native.make defaults it to a $(error).
+# Note the := to evaluate $(JAVA_HOME) before we potentially default it to a $(error).
 JAVA_PATH := $(if $(JAVA_HOME),$(JAVA_HOME)/bin/)
+
+DEFAULT_JAVA_HOME = $(DEFAULT_JAVA_HOME.$(TARGET_OS))
+JAVA_HOME ?= $(if $(DEFAULT_JAVA_HOME),$(DEFAULT_JAVA_HOME),$(error Please set $$(JAVA_HOME)))
 
 JAR = $(JAVA_PATH)jar
 JAVAH := $(JAVA_PATH)javah
@@ -111,7 +117,6 @@ CXXFLAGS += $(C_AND_CXX_FLAGS)
 # Extra compiler and (mainly) linker flags for building JNI.
 # ----------------------------------------------------------------------------
 
-JNI_PATH.Darwin += /System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers
 SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
 SHARED_LIBRARY_EXTENSION.Darwin = jnilib
 # The default $(LD) doesn't know about -dynamiclib on Darwin.
@@ -120,11 +125,11 @@ LD = $(CXX)
 # The default $(CC) used by $(LINK.o) doesn't know about the Darwin equivalent of -lstdc++.
 CC = $(CXX)
 
-JNI_PATH.Linux += $(JAVA_HOME)/include
 JNI_PATH.Linux += $(JAVA_HOME)/include/linux
 SHARED_LIBRARY_LDFLAGS.Linux += -shared
 SHARED_LIBRARY_EXTENSION.Linux = so
 
+JNI_PATH += $(JAVA_HOME)/include
 JNI_PATH += $(JNI_PATH.$(TARGET_OS))
 SHARED_LIBRARY_LDFLAGS += $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
 SHARED_LIBRARY_EXTENSION = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
@@ -230,12 +235,8 @@ ifeq "$(wildcard $(RT_JAR))" ""
   # Apple:
   RT_JAR=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
   ifeq "$(wildcard $(RT_JAR))" ""
-    # Where install-everything.sh leaves stuff:
-    JAVA_HOME := $(shell perl -ne 'm/JAVA_INSTALL_DIR *= *(.*)/ && print ("$$1")' $(SALMA_HAYEK)/bin/install-everything.sh)
-    ifeq "$(wildcard $(RT_JAR))" ""
-      # Fall back to searching:
-      RT_JAR=$(firstword $(shell locate /rt.jar))
-    endif
+    # Fall back to searching:
+    RT_JAR=$(firstword $(shell locate /rt.jar))
   endif
 endif
 
