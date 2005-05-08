@@ -48,6 +48,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private boolean wordWrap;
     
+    private boolean editable;
+    
     private PIndenter indenter;
     private PTextAreaSpellingChecker spellingChecker;
     
@@ -58,6 +60,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public PTextArea(int rowCount, int columnCount) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
+        this.editable = true;
         this.wordWrap = false;
         this.indenter = new PDefaultIndenter(this);
         setFont(UIManager.getFont("TextArea.font"));
@@ -1175,6 +1178,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void paste(boolean onlyPasteSystemSelection) {
+        if (isEditable() == false) {
+            return;
+        }
+        
         try {
             Toolkit toolkit = getToolkit();
             Transferable contents = toolkit.getSystemClipboard().getContents(this);
@@ -1214,10 +1221,27 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void cut() {
-        if (hasSelection()) {
+        if (hasSelection() && isEditable()) {
             copy();
             replaceSelection("");
         }
+    }
+    
+    public boolean isEditable() {
+        return editable;
+    }
+    
+    /**
+     * Sets whether or not this text component should be editable by the user.
+     * A PropertyChange event ("editable") is fired when the state is changed.
+     */
+    public void setEditable(boolean newState) {
+        if (editable == newState) {
+            return;
+        }
+        boolean oldState = this.editable;
+        this.editable = newState;
+        firePropertyChange("editable", Boolean.valueOf(oldState), Boolean.valueOf(newState));
     }
     
     public class SplitLine {

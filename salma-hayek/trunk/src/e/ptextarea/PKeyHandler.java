@@ -68,7 +68,7 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     public void keyTyped(KeyEvent event) {
-        if (isInsertableCharacter(event)) {
+        if (isInsertableCharacter(event) && textArea.isEditable()) {
             insertCharacter(event.getKeyChar());
             event.consume();
         }
@@ -113,10 +113,21 @@ public class PKeyHandler extends KeyAdapter {
             textArea.paste();
         } else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
             movementHandler.handleMovementKeys(event);
+        } else if (GuiUtilities.isMacOs() && key == KeyEvent.VK_D && event.isControlDown() && event.isMetaDown()) {
+            // doesn't work because Mac OS is swallowing the key event.
+            showDictionaryDefinition();
         } else {
             return false;
         }
         return true;
+    }
+    
+    private void showDictionaryDefinition() {
+        System.out.println("showDictionaryDefinition");
+        if (textArea.hasSelection()) {
+            System.out.println("showDictionaryDefinition " + textArea.getSelectedText());
+            ProcessUtilities.spawn(null, new String[] { "open", "dict:///" + textArea.getSelectedText() });
+        }
     }
     
     private boolean isStartOfLineKey(KeyEvent e) {
@@ -171,6 +182,10 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private void backspace() {
+        if (textArea.isEditable() == false) {
+            return;
+        }
+        
         Range range = textArea.getIndenter().getRangeToRemove();
         if (range.isNonEmpty()) {
             textArea.delete(range.getStart(), range.length());
@@ -178,6 +193,10 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private void delete() {
+        if (textArea.isEditable() == false) {
+            return;
+        }
+        
         int start = textArea.getSelectionStart();
         int end = textArea.getSelectionEnd();
         if (start == end && end < textArea.getTextBuffer().length()) {
