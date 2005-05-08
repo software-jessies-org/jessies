@@ -333,17 +333,6 @@ $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
 	@cd .. && tar -zcf $(addprefix $(DIRECTORY_NAME)/,$@ $(FILTERED_BINDIST_FILES))
 
 # ----------------------------------------------------------------------------
-# The magic incantation to build and clean all the native subdirectories.
-# ----------------------------------------------------------------------------
-
-define buildNativeDirectory
-  SOURCE_DIRECTORY = $(1)
-  include $(SALMA_HAYEK)/native.make
-endef
-
-$(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR))))
-
-# ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
 # ----------------------------------------------------------------------------
 
@@ -378,3 +367,18 @@ COMPILE.mm = $(COMPILE.cpp)
 .PHONY: echo.%
 echo.%:
 	@echo '$($*)'
+
+# ----------------------------------------------------------------------------
+# The magic incantation to build and clean all the native subdirectories.
+# Including native.make more than once is bound to violate the
+# variables-before-rules dictum.
+# native.make needs to cope with that but it'd be best if it doesn't impose
+# that constraint on the rest of java.make - so let's keep this last.
+# ----------------------------------------------------------------------------
+
+define buildNativeDirectory
+  SOURCE_DIRECTORY = $(1)
+  include $(SALMA_HAYEK)/native.make
+endef
+
+$(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR))))

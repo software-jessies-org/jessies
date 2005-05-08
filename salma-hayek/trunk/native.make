@@ -42,7 +42,7 @@ SHARED_LIBRARY = $(GENERATED_DIRECTORY)/$(BASE_NAME).$(SHARED_LIBRARY_EXTENSION)
 BUILDING_SHARED_LIBRARY = $(filter lib%,$(BASE_NAME))
 DEFAULT_TARGET = $(if $(BUILDING_SHARED_LIBRARY),$(SHARED_LIBRARY),$(EXECUTABLE))
 
-JNI_SOURCE = $(foreach SOURCE,$(SOURCES),$(if $(findstring _,$(SOURCE)),$(SOURCE)))
+JNI_SOURCE = $(strip $(foreach SOURCE,$(SOURCES),$(if $(findstring _,$(SOURCE)),$(SOURCE))))
 JNI_BASE_NAME = $(basename $(notdir $(JNI_SOURCE)))
 GENERATED_JNI_DIRECTORY = $(GENERATED_DIRECTORY)/jni
 GENERATED_JNI_HEADER = $(GENERATED_JNI_DIRECTORY)/$(JNI_BASE_NAME).h
@@ -82,9 +82,10 @@ $(SHARED_LIBRARY): $(OBJECTS)
 # Generate our JNI header.
 # ----------------------------------------------------------------------------
 
-ifneq "$(strip $(JNI_SOURCE))" ""
+ifneq "$(JNI_SOURCE)" ""
 
 $(GENERATED_JNI_HEADER): $(JNI_CLASS_FILE)
+	@echo Generating JNI header... && \
 	mkdir -p $(@D) && \
 	rm -f $@ && \
 	$(JAVAH) -classpath $(CLASSES_DIRECTORY) -d $(GENERATED_JNI_DIRECTORY) $(JNI_CLASS_NAME) && \
