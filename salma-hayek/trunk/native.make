@@ -31,7 +31,7 @@ HEADERS := $(wildcard $(addprefix $(SOURCE_DIRECTORY)/*.,$(HEADER_EXTENSIONS)))
 # Work out what we're going to generate.
 # ----------------------------------------------------------------------------
 
-GENERATED_DIRECTORY = $(SOURCE_DIRECTORY)/$(TARGET_OS)
+GENERATED_DIRECTORY = $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_ROOT)/generated/%/$(TARGET_OS),$(SOURCE_DIRECTORY))
 
 OBJECTS = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst $(SOURCE_DIRECTORY)/%.$(EXTENSION),$(GENERATED_DIRECTORY)/%.o,$(filter %.$(EXTENSION),$(SOURCES))))
 SOURCE_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(SOURCES))
