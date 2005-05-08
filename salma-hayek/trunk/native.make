@@ -24,7 +24,8 @@ include $(MOST_RECENT_MAKEFILE_DIRECTORY)/variables.make
 # Choose the basename(1) for the target
 # ----------------------------------------------------------------------------
 
-BASE_NAME = $(notdir $(CURDIR))
+SOURCE_DIRECTORY = $(CURDIR)
+BASE_NAME = $(notdir $(SOURCE_DIRECTORY))
 
 # ----------------------------------------------------------------------------
 # Sensible C family compiler flags.
@@ -82,18 +83,18 @@ LDFLAGS += $(if $(BUILDING_COCOA),-framework Cocoa)
 # Find the source.
 # ----------------------------------------------------------------------------
 
-SOURCES := $(wildcard $(addprefix *.,$(SOURCE_EXTENSIONS)))
-HEADERS := $(wildcard *.h)
+SOURCES := $(wildcard $(addprefix $(SOURCE_DIRECTORY)/*.,$(SOURCE_EXTENSIONS)))
+HEADERS := $(wildcard $(addprefix $(SOURCE_DIRECTORY)/*.,$(HEADER_EXTENSIONS)))
 
 # ----------------------------------------------------------------------------
 # Work out what we're going to generate.
 # ----------------------------------------------------------------------------
 
-GENERATED_DIRECTORY = $(TARGET_OS)
+GENERATED_DIRECTORY = $(SOURCE_DIRECTORY)/$(TARGET_OS)
 
-OBJECTS = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst %.$(EXTENSION),$(GENERATED_DIRECTORY)/%.o,$(filter %.$(EXTENSION),$(SOURCES))))
-SOURCE_LINKS = $(addprefix $(GENERATED_DIRECTORY)/,$(SOURCES))
-HEADER_LINKS = $(addprefix $(GENERATED_DIRECTORY)/,$(HEADERS))
+OBJECTS = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst $(SOURCE_DIRECTORY)/%.$(EXTENSION),$(GENERATED_DIRECTORY)/%.o,$(filter %.$(EXTENSION),$(SOURCES))))
+SOURCE_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(SOURCES))
+HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(HEADERS))
 
 EXECUTABLE = $(GENERATED_DIRECTORY)/$(BASE_NAME)
 SHARED_LIBRARY = $(GENERATED_DIRECTORY)/$(BASE_NAME).$(SHARED_LIBRARY_EXTENSION)
@@ -102,12 +103,12 @@ BUILDING_SHARED_LIBRARY = $(filter lib%,$(BASE_NAME))
 DEFAULT_TARGET = $(if $(BUILDING_SHARED_LIBRARY),$(SHARED_LIBRARY),$(EXECUTABLE))
 
 JNI_SOURCE = $(foreach SOURCE,$(SOURCES),$(if $(findstring _,$(SOURCE)),$(SOURCE)))
-JNI_BASE_NAME = $(basename $(JNI_SOURCE))
+JNI_BASE_NAME = $(basename $(notdir $(JNI_SOURCE)))
 JNI_HEADER = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).h
 JNI_OBJECT = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).o
 JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 JNI_DIRECTORY = $(GENERATED_DIRECTORY)
-CLASSES_DIRECTORY = ../../../classes
+CLASSES_DIRECTORY = $(PROJECT_ROOT)/classes
 JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 
 # ----------------------------------------------------------------------------
@@ -116,7 +117,7 @@ JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 # ----------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------
-# Our default target.
+# Select the default target.
 # ----------------------------------------------------------------------------
 
 .PHONY: default
@@ -152,10 +153,10 @@ $(JNI_OBJECT): $(JNI_HEADER)
 
 # This way, we can use the built-in compilation rules which assume everything's
 # in the same directory.
-$(SOURCE_LINKS) $(HEADER_LINKS): $(GENERATED_DIRECTORY)/%: %
+$(SOURCE_LINKS) $(HEADER_LINKS): $(GENERATED_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
 	mkdir -p $(dir $@) && \
 	rm -f $@ && \
-	ln -s ../$< $@
+	ln -s $< $@
 
 # ----------------------------------------------------------------------------
 # Dependencies.
@@ -183,7 +184,10 @@ COMPILE.mm = $(COMPILE.cpp)
 # ----------------------------------------------------------------------------
 
 .PHONY: clean
-clean:
+clean: clean.$(GENERATED_DIRECTORY)
+
+.PHONY: clean.$(GENERATED_DIRECTORY)
+clean.$(GENERATED_DIRECTORY):
 	rm -rf $(GENERATED_DIRECTORY)
 
 # ----------------------------------------------------------------------------

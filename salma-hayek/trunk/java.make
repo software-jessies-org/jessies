@@ -52,6 +52,9 @@ SUBDIRS := $(sort $(dir $(wildcard $(NATIVE_SOURCE))))
 
 # ----------------------------------------------------------------------------
 
+PROJECT_ROOT := $(CURDIR)
+export PROJECT_ROOT
+
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
 # By default, distributions end up under http://www.jessies.org/~enh/

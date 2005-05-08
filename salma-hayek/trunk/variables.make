@@ -49,6 +49,8 @@ SOURCE_EXTENSIONS += cpp
 SOURCE_EXTENSIONS += m
 SOURCE_EXTENSIONS += mm
 
+HEADER_EXTENSIONS += h
+
 # ----------------------------------------------------------------------------
 # Work out what we're going to generate.
 # ----------------------------------------------------------------------------
