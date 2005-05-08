@@ -1,8 +1,7 @@
 # This makefile compiles all the C/C++/Objective-C/Objective-C++ source found
 # in $(SOURCE_DIRECTORY) into a single executable or JNI library.
 
-# It assumes variables.make and rules.make are included, so it's only suitable
-# for inclusion by java.make.
+# It is only suitable for inclusion by java.make.
 
 # Unusually, it is included multiple times so be careful with += etc.
 # As a rule of thumb, do not define any variables here which aren't dependent
