@@ -56,8 +56,7 @@ end
 classpath="#{terminator_home}/classes:#{terminator_home}/../salma-hayek/classes:#{terminator_home}/terminator.jar"
 
 
-pty_makefile_path="#{terminator_home}/native/all/libpty"
-pty_path="#{pty_makefile_path}/#{UNAME}"
+pty_path="#{terminator_home}/generated/native/all/libpty/#{UNAME}"
 jni_lib_extension="so"
 if UNAME == "Darwin"
   jni_lib_extension="jnilib"
@@ -118,7 +117,7 @@ end
 # If we don't have a pre-compiled native library for this
 # architecture, try to build it.
 if test(?x, pty_library) == false
-  system("make -C #{pty_makefile_path}")
+  system("make #{pty_library}")
 end
 
 options = [ "-Xmx1g", "-cp", classpath, "-Djava.awt.Window.locationByPlatform=true", "-Djava.library.path=#{pty_path}" ]
