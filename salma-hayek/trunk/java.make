@@ -210,7 +210,7 @@ clean:
 
 .PHONY: clobber
 clobber: clean
-	@$(foreach SUBDIR,$(SUBDIRS),$(MAKE) -C $(SUBDIR) clean;)
+	@$(foreach SUBDIR,$(SUBDIRS),$(MAKE) -C $(SUBDIR) -f $(SALMA_HAYEK)/native.make clean;)
 
 .PHONY: dist
 dist: build
@@ -239,7 +239,7 @@ $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
 
 .PHONY: build.subdirs
 build.subdirs:
-	@$(foreach SUBDIR,$(SUBDIRS),$(MAKE) -C $(SUBDIR);)
+	@$(foreach SUBDIR,$(SUBDIRS),$(MAKE) -C $(SUBDIR) -f $(SALMA_HAYEK)/native.make;)
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS

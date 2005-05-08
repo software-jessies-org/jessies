@@ -2,9 +2,8 @@
 # in the directory into a single executable or JNI library.
 
 # The decision about whether to build an executable or JNI library is made
-# based on the directory name (your Makefile should just contain the
-# line "include $(SALMA_HAYEK)/native.make"). A JNI library must be in a
-# directory whose name begins "lib".
+# based on the directory name. A JNI library must be in a directory whose
+# name begins "lib".
 
 # These flags, some of them traditional, are used, but you should probably
 # refrain from modifying them outside this file, for portability's sake:
