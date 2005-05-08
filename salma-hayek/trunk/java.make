@@ -62,7 +62,6 @@ SPACE := $(subst :, ,:)
 
 MOST_RECENT_MAKEFILE_DIRECTORY = $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 SALMA_HAYEK := $(call getAbsolutePath,$(MOST_RECENT_MAKEFILE_DIRECTORY))
-export SALMA_HAYEK
 
 # ----------------------------------------------------------------------------
 # Locate Java.
@@ -148,8 +147,7 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 
 # ----------------------------------------------------------------------------
 
-PROJECT_ROOT := $(CURDIR)
-export PROJECT_ROOT
+PROJECT_ROOT = $(CURDIR)
 
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
@@ -233,7 +231,7 @@ ifeq "$(wildcard $(RT_JAR))" ""
   RT_JAR=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
   ifeq "$(wildcard $(RT_JAR))" ""
     # Where install-everything.sh leaves stuff:
-    export JAVA_HOME := $(shell perl -ne 'm/JAVA_INSTALL_DIR *= *(.*)/ && print ("$$1")' $(SALMA_HAYEK)/bin/install-everything.sh)
+    JAVA_HOME := $(shell perl -ne 'm/JAVA_INSTALL_DIR *= *(.*)/ && print ("$$1")' $(SALMA_HAYEK)/bin/install-everything.sh)
     ifeq "$(wildcard $(RT_JAR))" ""
       # Fall back to searching:
       RT_JAR=$(firstword $(shell locate /rt.jar))
@@ -366,7 +364,7 @@ COMPILE.mm = $(COMPILE.cpp)
 
 .PHONY: echo.%
 echo.%:
-	@echo '$($*)'
+	@echo '"$($*)"'
 
 # ----------------------------------------------------------------------------
 # The magic incantation to build and clean all the native subdirectories.

@@ -42,6 +42,8 @@ SHARED_LIBRARY = $(GENERATED_DIRECTORY)/$(BASE_NAME).$(SHARED_LIBRARY_EXTENSION)
 BUILDING_SHARED_LIBRARY = $(filter lib%,$(BASE_NAME))
 DEFAULT_TARGET = $(if $(BUILDING_SHARED_LIBRARY),$(SHARED_LIBRARY),$(EXECUTABLE))
 
+# $(foreach) generates a space-separated list even where the elements either side are empty strings.
+# $(strip) removes spurious spaces.
 JNI_SOURCE = $(strip $(foreach SOURCE,$(SOURCES),$(if $(findstring _,$(SOURCE)),$(SOURCE))))
 JNI_BASE_NAME = $(basename $(notdir $(JNI_SOURCE)))
 GENERATED_JNI_DIRECTORY = $(GENERATED_DIRECTORY)/jni
