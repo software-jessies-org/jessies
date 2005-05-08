@@ -45,10 +45,11 @@ DEFAULT_TARGET = $(if $(BUILDING_SHARED_LIBRARY),$(SHARED_LIBRARY),$(EXECUTABLE)
 
 JNI_SOURCE = $(foreach SOURCE,$(SOURCES),$(if $(findstring _,$(SOURCE)),$(SOURCE)))
 JNI_BASE_NAME = $(basename $(notdir $(JNI_SOURCE)))
-JNI_HEADER = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).h
+GENERATED_JNI_DIRECTORY = $(GENERATED_DIRECTORY)/jni
+GENERATED_JNI_HEADER = $(GENERATED_JNI_DIRECTORY)/$(JNI_BASE_NAME).h
+COMPILED_JNI_HEADER = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).h
 JNI_OBJECT = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).o
 JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
-JNI_DIRECTORY = $(GENERATED_DIRECTORY)
 CLASSES_DIRECTORY = $(PROJECT_ROOT)/classes
 JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 
@@ -82,11 +83,19 @@ $(SHARED_LIBRARY): $(OBJECTS)
 # Generate our JNI header.
 # ----------------------------------------------------------------------------
 
-$(JNI_HEADER): $(JNI_CLASS_FILE)
-	rm -f $@ && \
-	$(JAVAH) -classpath $(CLASSES_DIRECTORY) -d $(JNI_DIRECTORY) $(JNI_CLASS_NAME)
+ifneq "$(strip $(JNI_SOURCE))" ""
 
-$(JNI_OBJECT): $(JNI_HEADER)
+$(GENERATED_JNI_HEADER): $(JNI_CLASS_FILE)
+	mkdir -p $(@D) && \
+	rm -f $@ && \
+	$(JAVAH) -classpath $(CLASSES_DIRECTORY) -d $(GENERATED_JNI_DIRECTORY) $(JNI_CLASS_NAME) && \
+	{ cmp --quiet $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
+
+$(JNI_OBJECT): $(COMPILED_JNI_HEADER)
+build: $(GENERATED_JNI_HEADER)
+$(COMPILED_JNI_HEADER): | $(GENERATED_JNI_HEADER);
+
+endif
 
 # ----------------------------------------------------------------------------
 # Create "the build tree", GNU-style.
