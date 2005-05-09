@@ -123,7 +123,7 @@ public class EColumn extends JSplitPane {
             if (getComponentCount() == 0) {
                 GraphicsUtilities.paintPaper(g, 240);
             } else {
-                super.paintComponents(g);
+                super.paint(g);
             }
         }
         
