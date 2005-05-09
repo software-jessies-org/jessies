@@ -31,10 +31,10 @@ SOURCE_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(SOURC
 HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(HEADERS))
 
 EXECUTABLE = $(GENERATED_DIRECTORY)/$(BASE_NAME)
-SHARED_LIBRARY = $(GENERATED_DIRECTORY)/$(BASE_NAME).$(SHARED_LIBRARY_EXTENSION)
+JNI_LIBRARY = $(GENERATED_DIRECTORY)/$(BASE_NAME).$(JNI_LIBRARY_EXTENSION)
 
-BUILDING_SHARED_LIBRARY = $(filter lib%,$(BASE_NAME))
-DEFAULT_TARGET = $(if $(BUILDING_SHARED_LIBRARY),$(SHARED_LIBRARY),$(EXECUTABLE))
+BUILDING_JNI_LIBRARY = $(JNI_SOURCE)
+DEFAULT_TARGET = $(if $(BUILDING_JNI_LIBRARY),$(JNI_LIBRARY),$(EXECUTABLE))
 
 # $(foreach) generates a space-separated list even where the elements either side are empty strings.
 # $(strip) removes spurious spaces.
@@ -67,12 +67,12 @@ build: $(DEFAULT_TARGET)
 $(EXECUTABLE): $(OBJECTS)
 
 # ----------------------------------------------------------------------------
-# Our shared library target.
+# Our JNI library target.
 # ----------------------------------------------------------------------------
 
 # There is no default rule for shared library building on my system.
-$(SHARED_LIBRARY): $(OBJECTS)
-	$(LD) $(OBJECTS) -o $@ $(SHARED_LIBRARY_LDFLAGS)
+$(JNI_LIBRARY): $(OBJECTS)
+	$(LD) $(OBJECTS) -o $@ $(JNI_LIBRARY_LDFLAGS)
 
 # ----------------------------------------------------------------------------
 # Generate our JNI header.

@@ -117,8 +117,8 @@ CXXFLAGS += $(C_AND_CXX_FLAGS)
 # Extra compiler and (mainly) linker flags for building JNI.
 # ----------------------------------------------------------------------------
 
-SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
-SHARED_LIBRARY_EXTENSION.Darwin = jnilib
+JNI_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
+JNI_LIBRARY_EXTENSION.Darwin = jnilib
 # The default $(LD) doesn't know about -dynamiclib on Darwin.
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
 LD = $(CXX)
@@ -126,13 +126,13 @@ LD = $(CXX)
 CC = $(CXX)
 
 JNI_PATH.Linux += $(JAVA_HOME)/include/linux
-SHARED_LIBRARY_LDFLAGS.Linux += -shared
-SHARED_LIBRARY_EXTENSION.Linux = so
+JNI_LIBRARY_LDFLAGS.Linux += -shared
+JNI_LIBRARY_EXTENSION.Linux = so
 
 JNI_PATH += $(JAVA_HOME)/include
 JNI_PATH += $(JNI_PATH.$(TARGET_OS))
-SHARED_LIBRARY_LDFLAGS += $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
-SHARED_LIBRARY_EXTENSION = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
+JNI_LIBRARY_LDFLAGS += $(JNI_LIBRARY_LDFLAGS.$(TARGET_OS))
+JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
 # Add the Cocoa framework if we're building Objective-C/C++.
