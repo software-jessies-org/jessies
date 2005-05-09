@@ -50,8 +50,16 @@ endif
 # Define useful stuff not provided by GNU make.
 # ----------------------------------------------------------------------------
 
-pathsearch = $(firstword $(wildcard $(addsuffix /$(1),$(subst :, ,$(PATH)))))
-makepath = $(subst $(SPACE),:,$(strip $(1)))
+EXE_SUFFIX.CYGWIN_NT-5.0 = .exe
+EXE_SUFFIX = $(EXE_SUFFIX.$(TARGET_OS))
+
+PATH_SEPARATOR.CYGWIN_NT-5.0 = '";"'
+PATH_SEPARATOR = $(if $(PATH_SEPARATOR.$(TARGET_OS)),$(PATH_SEPARATOR.$(TARGET_OS)),:)
+
+convertCygwinToWin32Path = $(shell echo $(1) | perl -pe 's@/cygdrive/([a-z])@$$1:@g')
+
+pathsearch = $(firstword $(wildcard $(addsuffix /$(1)$(EXE_SUFFIX),$(subst :, ,$(PATH)))))
+makepath = $(call convertCygwinToWin32Path,$(subst $(SPACE),$(PATH_SEPARATOR),$(strip $(1))))
 getAbsolutePath = $(patsubst @%,$(CURDIR)/%,$(patsubst @/%,/%,$(patsubst %,@%,$(1))))
 
 SPACE := $(subst :, ,:)
@@ -108,7 +116,7 @@ C_AND_CXXFLAGS += -g
 C_AND_CXX_FLAGS += -W -Wall -Werror -pedantic
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
-CPPFLAGS += $(addprefix -I,$(JNI_PATH))
+CPPFLAGS += $(subst $(SPACE)", -I", $(JNI_PATH))
 
 CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
@@ -118,6 +126,7 @@ CXXFLAGS += $(C_AND_CXX_FLAGS)
 # ----------------------------------------------------------------------------
 
 JNI_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
+JNI_LIBRARY_PREFIX.Darwin = lib
 JNI_LIBRARY_EXTENSION.Darwin = jnilib
 # The default $(LD) doesn't know about -dynamiclib on Darwin.
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
@@ -125,13 +134,20 @@ LD = $(CXX)
 # The default $(CC) used by $(LINK.o) doesn't know about the Darwin equivalent of -lstdc++.
 CC = $(CXX)
 
-JNI_PATH.Linux += $(JAVA_HOME)/include/linux
+JNI_PATH.Linux += "$(JAVA_HOME)/include/linux"
 JNI_LIBRARY_LDFLAGS.Linux += -shared
+JNI_LIBRARY_PREFIX.Linux = lib
 JNI_LIBRARY_EXTENSION.Linux = so
 
-JNI_PATH += $(JAVA_HOME)/include
+JNI_PATH.CYGWIN_NT-5.0 += "$(JAVA_HOME)/include/win32"
+JNI_LIBRARY_LDFLAGS.CYGWIN_NT-5.0 += -shared -Wl,--add-stdcall-alias
+JNI_LIBRARY_PREFIX.CYGWIN_NT-5.0 =
+JNI_LIBRARY_EXTENSION.CYGWIN_NT-5.0 = dll
+
+JNI_PATH += "$(JAVA_HOME)/include"
 JNI_PATH += $(JNI_PATH.$(TARGET_OS))
 JNI_LIBRARY_LDFLAGS += $(JNI_LIBRARY_LDFLAGS.$(TARGET_OS))
+JNI_LIBRARY_PREFIX = $(JNI_LIBRARY_PREFIX.$(TARGET_OS))
 JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
@@ -290,7 +306,7 @@ build.java: $(SOURCE_FILES)
 	@echo Recompiling the world... && \
 	 rm -rf classes && \
 	 mkdir -p classes && \
-	 $(JAVA_COMPILER) $(JAVA_FLAGS) $(SOURCE_FILES)
+	 $(JAVA_COMPILER) $(JAVA_FLAGS) $(call convertCygwinToWin32Path,$(SOURCE_FILES))
 
 .PHONY: clean
 clean:
