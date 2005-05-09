@@ -10,7 +10,7 @@ public class ESwitchButton extends EButton implements ActionListener {
         this.window = window;
     }
 
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
         g.setColor(getGlyphColor());
         paintGlyph(g, 5, 5);
     }
