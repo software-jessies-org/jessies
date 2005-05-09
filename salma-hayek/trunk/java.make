@@ -176,7 +176,7 @@ SCRIPT_PATH=$(SALMA_HAYEK)/bin
 DIST_SCP_USER_AND_HOST=enh@jessies.org
 DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 
-SOURCE_FILES=$(shell find `pwd`/src -type f -name "*.java")
+SOURCE_FILES=$(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
 TAR_FILE_OF_THE_DAY=`date +$(PROJECT_NAME)-%Y-%m-%d.tar`
 
 REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
@@ -296,6 +296,13 @@ JAVA_FLAGS += -target 1.4
 # This should also weed out any attempt to use a Java older than 1.4.
 JAVA_FLAGS += -source 1.4
 
+define BUILD_JAVA
+  @echo Recompiling the world... && \
+  rm -rf classes && \
+  mkdir -p classes && \
+  $(JAVA_COMPILER) $(JAVA_FLAGS) $(call convertCygwinToWin32Path,$(SOURCE_FILES))
+endef
+
 # ----------------------------------------------------------------------------
 # Variables above this point,
 # rules below...
@@ -306,10 +313,15 @@ build: build.java
 
 .PHONY: build.java
 build.java: $(SOURCE_FILES)
-	@echo Recompiling the world... && \
-	 rm -rf classes && \
-	 mkdir -p classes && \
-	 $(JAVA_COMPILER) $(JAVA_FLAGS) $(call convertCygwinToWin32Path,$(SOURCE_FILES))
+	$(BUILD_JAVA)
+
+# We don't usually build individual classes but rule for generating the JNI
+# header correctly specifies a dependency on a .class file which may be
+# absent.
+# If we were to make this class file depend on PHONY build.java, it would
+# always be rebuilt.
+%.class: $(SOURCE_FILES)
+	$(BUILD_JAVA)
 
 .PHONY: clean
 clean:
