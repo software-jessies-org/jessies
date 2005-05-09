@@ -204,21 +204,11 @@ FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE
 # Choose a Java compiler.
 # ----------------------------------------------------------------------------
 
-ifneq "$(JAVA_COMPILER)" ""
+JAVA_COMPILER ?= javac
 
-  # The user asked for a specific compiler, so check that we can find it.
-  ifeq "$(wildcard $(JAVA_COMPILER))$(call pathsearch,$(JAVA_COMPILER))" ""
-    $(error Unable to find $(JAVA_COMPILER))
-  endif
-
-else
-
-  # The user left the choice of compiler up to us. We'll take javac.
-  JAVA_COMPILER = javac
-  ifeq "$(wildcard $(JAVA_COMPILER))$(call pathsearch,$(JAVA_COMPILER))" ""
-    $(error Unable to find javac)
-  endif
-
+ifeq "$(wildcard $(JAVA_COMPILER))$(call pathsearch,$(JAVA_COMPILER))" ""
+  REQUESTED_JAVA_COMPILER := $(JAVA_COMPILER)
+  JAVA_COMPILER = $(error Unable to find $(REQUESTED_JAVA_COMPILER))
 endif
 
 # Make the compiler's leafname available for simple javac/jikes tests.
