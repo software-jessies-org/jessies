@@ -19,18 +19,17 @@ import e.forms.*;
 import e.gui.*;
 import e.util.*;
 
-/** A demonstration of our text-editing component. */
 public class Edit implements com.apple.eawt.ApplicationListener {
-    private static com.apple.eawt.Application application;
     private static Edit instance;
     
+    private com.apple.eawt.Application application;
     private static JFrame frame;
     private static JTabbedPane tabbedPane;
     private static TagsPanel tagsPanel;
     private static Advisor advisor;
     private static EStatusBar statusLine;
     private static Minibuffer minibuffer;
-    private static JPanel statusArea;
+    private JPanel statusArea;
     
     /** The global find history for all FindDialog instances. */
     private static EHistoryComboBoxModel findHistory = new ChronologicalComboBoxModel();
@@ -39,6 +38,9 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     private static boolean initializing = true;
     
     public static Edit getInstance() {
+        if (instance == null) {
+            instance = new Edit();
+        }
         return instance;
     }
     
@@ -725,19 +727,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         minibuffer.activate(minibufferUser);
     }
     
-    public static void hideMinibuffer() {
-        minibuffer.deactivate();
-    }
-    
     private Edit() {
         long start = System.currentTimeMillis();
         
         application = new com.apple.eawt.Application();
         application.addApplicationListener(this);
 
-        Log.setApplicationName("Edit");
-        GuiUtilities.initLookAndFeel();
-        
         frame = new JFrame("Edit");
         if (GuiUtilities.isMacOs()) {
             frame.setVisible(true);
@@ -801,16 +796,5 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         for (int i = 0; i < workspaces.length; ++i) {
             workspaces[i].updateFileList(null);
         }
-    }
-    
-    public static void main(final String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                instance = new Edit();
-                for (int i = 0; i < args.length; ++i) {
-                    openFile(args[i]);
-                }
-            }
-        });
     }
 }
