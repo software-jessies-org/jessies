@@ -96,7 +96,7 @@ heap_size = "-Xmx1g"
 options = "#{os_specific_options} #{heap_size} #{fake_environment} #{classpath} -DpreferencesDirectory=#{edit_preferences_directory}"
 
 if ENV["DEBUGGING_EDIT"] != nil
-  system("java #{options} #{edit_class_name} #{filename}")
+  system("java #{options} e.util.Launcher Edit #{edit_class_name}Launchable #{filename}")
 else
-  system("java #{options} #{edit_class_name} #{filename} > #{edit_log} 2>&1 || cat #{edit_log} 1>&2 &")
+  system("java #{options} e.util.Launcher Edit #{edit_class_name}Launchable #{filename} > #{edit_log} 2>&1 || cat #{edit_log} 1>&2 &")
 end
