@@ -1,4 +1,20 @@
+typedef long long __int64;
+
 #include "terminator_terminal_PtyProcess.h"
+
+#ifdef _WIN32
+
+extern "C" jint Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *, jobject, jobjectArray, jobject, jobject) {
+    return (jint)-1;
+}
+extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEnv *, jobject, jobject, jobject) {
+}
+extern "C"  void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *, jobject) {
+}
+extern "C"  void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
+}
+
+#else
 
 #include <errno.h>
 #include <grp.h>
@@ -315,3 +331,5 @@ extern "C"  void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *env, jobjec
 extern "C"  void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *env, jobject ptyProcess) {
     waitFor(env, ptyProcess, getPid(env, ptyProcess));
 }
+
+#endif

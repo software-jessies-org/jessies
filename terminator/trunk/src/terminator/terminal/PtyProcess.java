@@ -19,7 +19,7 @@ public class PtyProcess {
                 System.loadLibrary("pty");
                 libraryLoaded = true;
             } catch (UnsatisfiedLinkError error) {
-                System.err.println("Serious error: cannot load libpty.");
+                System.err.println("Serious error: cannot load pty JNI library.");
                 error.printStackTrace();
                 throw new IOException("Unable to launch pty processes");
             }

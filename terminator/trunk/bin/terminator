@@ -61,7 +61,7 @@ native_terminator_home=terminator_home.to_s.sub(/^\/cygdrive\/([a-z])/, '\1:')
 classpath="#{native_terminator_home}/classes#{path_separator}#{native_terminator_home}/../salma-hayek/classes#{path_separator}#{native_terminator_home}/terminator.jar"
 
 
-pty_path="#{native_terminator_home}/generated/native/all/libpty/#{UNAME}"
+pty_path="#{native_terminator_home}/generated/native/all/pty/#{UNAME}"
 jni_lib_prefix="lib"
 jni_lib_extension="so"
 if UNAME == "Darwin"
