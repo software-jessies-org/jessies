@@ -53,15 +53,24 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   end
 end
 
-classpath="#{terminator_home}/classes:#{terminator_home}/../salma-hayek/classes:#{terminator_home}/terminator.jar"
+path_separator=":"
+if UNAME == "CYGWIN_NT-5.0"
+  path_separator=';'
+end
+native_terminator_home=terminator_home.to_s.sub(/^\/cygdrive\/([a-z])/, '\1:')
+classpath="#{native_terminator_home}/classes#{path_separator}#{native_terminator_home}/../salma-hayek/classes#{path_separator}#{native_terminator_home}/terminator.jar"
 
 
-pty_path="#{terminator_home}/generated/native/all/libpty/#{UNAME}"
+pty_path="#{native_terminator_home}/generated/native/all/libpty/#{UNAME}"
+jni_lib_prefix="lib"
 jni_lib_extension="so"
 if UNAME == "Darwin"
   jni_lib_extension="jnilib"
+elsif UNAME == "CYGWIN_NT-5.0"
+  jni_lib_prefix=""
+  jni_lib_extension="dll"
 end
-pty_library="#{pty_path}/libpty.#{jni_lib_extension}"
+pty_library="#{pty_path}/#{jni_lib_prefix}pty.#{jni_lib_extension}"
 
 
 os_specific_options = []
