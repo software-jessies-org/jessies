@@ -222,9 +222,12 @@ FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE
 
 JAVA_COMPILER ?= javac
 
-ifeq "$(wildcard $(JAVA_COMPILER))$(call pathsearch,$(JAVA_COMPILER))" ""
+ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))$(call pathsearch,$(JAVA_COMPILER))" ""
   REQUESTED_JAVA_COMPILER := $(JAVA_COMPILER)
-  JAVA_COMPILER = $(error Unable to find $(REQUESTED_JAVA_COMPILER))
+  JAVA_COMPILER = $(JAVA_HOME)/bin/$(REQUESTED_JAVA_COMPILER)
+  ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
+    JAVA_COMPILER = $(error Unable to find $(REQUESTED_JAVA_COMPILER))
+  endif
 endif
 
 # Make the compiler's leafname available for simple javac/jikes tests.
