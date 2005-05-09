@@ -1,4 +1,6 @@
+#ifdef __CYGWIN__
 typedef long long __int64;
+#endif
 
 #include "terminator_terminal_PtyProcess.h"
 
