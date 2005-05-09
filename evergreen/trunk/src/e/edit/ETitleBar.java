@@ -50,10 +50,12 @@ public class ETitleBar extends JPanel {
         
         titleLabel = new JLabel(" ");
         titleLabel.setFont(UIManager.getFont("TableHeader.font"));
+        titleLabel.setOpaque(false);
         
         add(titleLabel, BorderLayout.CENTER);
         
         buttonsPanel = new JPanel(new BorderLayout());
+        buttonsPanel.setOpaque(false);
         add(buttonsPanel, BorderLayout.EAST);
         
         this.closeButton = new ECloseButton(window);

@@ -12,7 +12,7 @@ public class ECloseButton extends EButton implements ActionListener {
         this.window = window;
     }
 
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
         g.setColor(getCrossColor());
         paintCross(g, 5, 5);
     }

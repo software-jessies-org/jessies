@@ -21,29 +21,6 @@ public abstract class EButton extends JComponent implements ActionListener, Mous
     
     public abstract void actionPerformed(ActionEvent e);
     
-    /**
-     * Draws the button. The button is a thin 3D rectangle lowered when the
-     * button is pressed, raised otherwise. The label is drawn in the centre.
-     */
-    public void paint(Graphics g) {
-        paintButtonBorder(g);
-    }
-
-    public void paintButtonBorder(Graphics g) {
-        int height = getHeight() - 1;
-        int width = getWidth() - 1;
-
-        g.setColor(pressed ? new Color(200, 200, 200) : new Color(213, 213, 213));
-        g.fillRect(0, 0, width, height);
-
-        g.setColor(pressed ? SystemColor.controlShadow : SystemColor.controlHighlight);
-        g.drawLine(0, 0, width, 0);
-        g.drawLine(0, 0, 0, height);
-        g.setColor(pressed ? SystemColor.controlHighlight : SystemColor.controlShadow);
-        g.drawLine(width, 0, width, height);
-        g.drawLine(0, height, width, height);
-    }
-
     /** Ignores mouse click events. */
     public void mouseClicked(MouseEvent e) { }
 
