@@ -1155,39 +1155,23 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     /**
-     * Pastes the clipboard contents or, if that's not available, the system
-     * selection. The pasted content replaces the selection.
-     */
-    public void paste() {
-        paste(false);
-    }
-    
-    /**
-     * Pastes X11's "selection", an activity usually associated with a
-     * middle-button click. The pasted content replaces the selection.
-     */
-    public void pasteSystemSelection() {
-        paste(true);
-    }
-    
-    /**
      * Override this to modify pasted text before it replaces the selection.
      */
     protected String reformatPastedText(String pastedText) {
         return pastedText;
     }
     
-    private void paste(boolean onlyPasteSystemSelection) {
+    /**
+     * Pastes the clipboard contents. The pasted content replaces the selection.
+     */
+    public void paste() {
         if (isEditable() == false) {
             return;
         }
         
         try {
             Toolkit toolkit = getToolkit();
-            Transferable contents = toolkit.getSystemSelection().getContents(this);
-            if (onlyPasteSystemSelection == false && toolkit.getSystemClipboard() != null) {
-                contents = toolkit.getSystemClipboard().getContents(this);
-            }
+            Transferable contents = toolkit.getSystemClipboard().getContents(this);
             DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
             String string = reformatPastedText((String) contents.getTransferData(DataFlavor.stringFlavor));
             pasteAndReIndent(string);
@@ -1215,9 +1199,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         StringSelection stringSelection = new StringSelection(getSelectedText());
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         toolkit.getSystemClipboard().setContents(stringSelection, null);
-        if (toolkit.getSystemSelection() != null) {
-            toolkit.getSystemSelection().setContents(stringSelection, null);
-        }
     }
     
     public void cut() {
@@ -1243,6 +1224,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         this.editable = newState;
         firePropertyChange("editable", Boolean.valueOf(oldState), Boolean.valueOf(newState));
     }
+    
+    //
+    // Nested classes below this point...
+    //
     
     public class SplitLine {
         private int lineIndex;
