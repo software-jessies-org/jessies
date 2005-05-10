@@ -102,7 +102,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     private void initFindResultsUpdater() {
         findResultsUpdater = new Timer(150, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                updateFindResults();
+                text.updateFindResults();
             }
         });
         findResultsUpdater.setRepeats(false);
@@ -470,44 +470,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         updateWatermark();
         getTitleBar().repaint();
-    }
-    
-    private class MatchHighlightMatcher implements PHighlightMatcher {
-        private  boolean forwards;
-        
-        public MatchHighlightMatcher(boolean forwards) {
-            this.forwards = forwards;
-        }
-        
-        public boolean matches(PHighlight highlight) {
-            if (highlight instanceof FindAction.MatchHighlight == false) {
-                return false;
-            }
-            final int minOffset = Math.min(highlight.getStartIndex(), highlight.getEndIndex());
-            final int maxOffset = Math.max(highlight.getStartIndex(), highlight.getEndIndex());
-            if (forwards) {
-                return minOffset > text.getSelectionEnd();
-            } else {
-                return maxOffset < text.getSelectionStart();
-            }
-        }
-    }
-    
-    public void findNext() {
-        findNextOrPrevious(true);
-    }
-    
-    public void findPrevious() {
-        findNextOrPrevious(false);
-    }
-    
-    private void findNextOrPrevious(boolean next) {
-        updateFindResults();
-        text.selectFirstMatchingHighlight(next, new MatchHighlightMatcher(next));
-    }
-    
-    public void updateFindResults() {
-        FindAction.INSTANCE.repeatLastFind(this);
     }
     
     public boolean isFocusCycleRoot() {

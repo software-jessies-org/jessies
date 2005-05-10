@@ -6,27 +6,20 @@ import e.util.*;
 import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.*;
+import e.ptextarea.*;
 
-public class ShowMisspellingsAction extends ETextAction {
-    public static final String ACTION_NAME = "Show Misspellings...";
-    
+public class ShowMisspellingsAction extends PActionFactory.PTextAction {
     public ShowMisspellingsAction() {
-        super(ACTION_NAME);
+        super("Show Misspellings...", null);
     }
     
     private static String regularExpressionForWord(String word) {
         return "(?i)\\b" + StringUtilities.regularExpressionFromLiteral(word) + "\\b";
     }
     
-    public void actionPerformed(ActionEvent e) {
-        final ETextWindow window = getFocusedTextWindow();
-        if (window == null) {
-            return;
-        }
-        
-        final ETextArea text = window.getText();
-        String content = text.getText();
-        Object[] misspelledWords = text.getSpellingChecker().listMisspellings().toArray();
+    public void performOn(final PTextArea textArea) {
+        String content = textArea.getText();
+        Object[] misspelledWords = textArea.getSpellingChecker().listMisspellings().toArray();
         String[] listItems = new String[misspelledWords.length];
         for (int i = 0; i < listItems.length; ++i) {
             String word = (String) misspelledWords[i];
@@ -46,13 +39,14 @@ public class ShowMisspellingsAction extends ETextAction {
                 if (e.getClickCount() != 2) {
                     return;
                 }
+                ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, textArea);
                 // Highlight all matches of this misspelling.
                 String literal = (String) list.getSelectedValue();
                 literal = literal.substring(0, literal.indexOf(" ("));
-                FindAction.INSTANCE.findInText(window, regularExpressionForWord(literal));
+                FindAction.INSTANCE.findInText(textWindow, regularExpressionForWord(literal));
                 // Go to first match.
-                text.setCaretPosition(0);
-                window.findNext();
+                textArea.setCaretPosition(0);
+                textArea.findNext();
             }
         });
         list.setCellRenderer(new EListCellRenderer(true));

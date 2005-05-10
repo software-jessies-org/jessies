@@ -11,19 +11,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     public static final FindAction INSTANCE = new FindAction();
     
-    /**
-     * Used to mark the matches in the text as if they'd been gone over with a highlighter pen. We use
-     * full yellow with half-alpha so you can see the selection through, as a dirty smudge, just like a real
-     * highlighter pen might do.
-     */
-    public static class MatchHighlight extends PColoredHighlight {
-        private static final Color MATCH_COLOR = new Color(255, 255, 0, 128);
-        
-        public MatchHighlight(PTextArea textArea, int startIndex, int endIndex) {
-            super(textArea, startIndex, endIndex, MATCH_COLOR);
-        }
-    }
-    
     public ETextWindow currentTextWindow;
     
     public String currentRegularExpression;
@@ -94,11 +81,11 @@ public class FindAction extends ETextAction implements MinibufferUser {
      */
     public boolean interpretSpecialKeystroke(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_D) {
-            currentTextWindow.findPrevious();
+            currentTextWindow.getText().findPrevious();
             return true;
         }
         if (e.getKeyCode() == KeyEvent.VK_G) {
-            currentTextWindow.findNext();
+            currentTextWindow.getText().findNext();
             return true;
         }
         return false;
@@ -135,7 +122,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     public void removeAllMatches() {
         currentTextWindow.getText().removeHighlights(new PHighlightMatcher() {
             public boolean matches(PHighlight highlight) {
-                return (highlight instanceof MatchHighlight);
+                return (highlight instanceof PFind.MatchHighlight);
             }
         });
         currentTextWindow.getBirdView().clearMatchingLines();
@@ -173,7 +160,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             currentTextWindow.getBirdView().addMatchingLine(textArea.getLineOfOffset(matcher.end()));
-            textArea.addHighlight(new MatchHighlight(textArea, matcher.start(), matcher.end()));
+            textArea.addHighlight(new PFind.MatchHighlight(textArea, matcher.start(), matcher.end()));
             matchCount++;
         }
         Edit.showStatus("Found " + matchCount + " " + (matchCount != 1 ? "matches" : "match"));
