@@ -13,6 +13,14 @@ public class PActionFactory {
         return new CutAction();
     }
     
+    public static Action makeFindNextAction() {
+        return new FindNextAction();
+    }
+    
+    public static Action makeFindPreviousAction() {
+        return new FindPreviousAction();
+    }
+    
     public static Action makePasteAction() {
         return new PasteAction();
     }
@@ -76,6 +84,26 @@ public class PActionFactory {
         
         public void performOn(PTextArea textArea) {
             textArea.cut();
+        }
+    }
+    
+    public static class FindNextAction extends PTextAction {
+        public FindNextAction() {
+            super("Find Next", e.util.GuiUtilities.makeKeyStroke("G", false));
+        }
+        
+        public void performOn(PTextArea textArea) {
+            textArea.findNext();
+        }
+    }
+    
+    public static class FindPreviousAction extends PTextAction {
+        public FindPreviousAction() {
+            super("Find Previous", e.util.GuiUtilities.makeKeyStroke("D", false));
+        }
+        
+        public void performOn(PTextArea textArea) {
+            textArea.findPrevious();
         }
     }
     

@@ -1225,6 +1225,20 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         firePropertyChange("editable", Boolean.valueOf(oldState), Boolean.valueOf(newState));
     }
     
+    public void findNext() {
+        findNextOrPrevious(true);
+    }
+    
+    public void findPrevious() {
+        findNextOrPrevious(false);
+    }
+    
+    protected void findNextOrPrevious(boolean next) {
+        // FIXME: when we do this, make this method private.
+        //updateFindResults();
+        selectFirstMatchingHighlight(next, new PFind.MatchHighlightMatcher(next, this));
+    }
+    
     //
     // Nested classes below this point...
     //
