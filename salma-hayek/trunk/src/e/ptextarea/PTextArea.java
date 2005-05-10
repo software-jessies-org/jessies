@@ -1184,9 +1184,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         
         try {
             Toolkit toolkit = getToolkit();
-            Transferable contents = toolkit.getSystemClipboard().getContents(this);
-            if (onlyPasteSystemSelection || toolkit.getSystemSelection() != null) {
-                contents = toolkit.getSystemSelection().getContents(this);
+            Transferable contents = toolkit.getSystemSelection().getContents(this);
+            if (onlyPasteSystemSelection == false && toolkit.getSystemClipboard() != null) {
+                contents = toolkit.getSystemClipboard().getContents(this);
             }
             DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
             String string = reformatPastedText((String) contents.getTransferData(DataFlavor.stringFlavor));
