@@ -146,7 +146,7 @@ public class EErrorsWindow extends EWindow {
             super("Clear");
         }
         public void actionPerformed(ActionEvent e) {
-            clear();
+            textArea.setText("");
         }
     }
     

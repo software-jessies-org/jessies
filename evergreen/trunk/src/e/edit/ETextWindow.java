@@ -472,10 +472,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         getTitleBar().repaint();
     }
     
-    public void clear() {
-        text.setText("");
-    }
-    
     private class MatchHighlightMatcher implements PHighlightMatcher {
         private  boolean forwards;
         
