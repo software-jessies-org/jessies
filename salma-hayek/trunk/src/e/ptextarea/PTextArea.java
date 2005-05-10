@@ -1,6 +1,5 @@
 package e.ptextarea;
 
-
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
@@ -1165,33 +1164,25 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * Pastes the clipboard contents. The pasted content replaces the selection.
      */
     public void paste() {
-        pasteClipboard(new ClipboardChooser() {
-            public Clipboard chooseClipboard(Toolkit toolkit) {
-                return toolkit.getSystemClipboard();
-            }
-        });
+        pasteClipboard(getToolkit().getSystemClipboard());
     }
     
+    /**
+     * Pastes the system selection, generally only available on X11.
+     */
     public void pasteSystemSelection() {
-        pasteClipboard(new ClipboardChooser() {
-            public Clipboard chooseClipboard(Toolkit toolkit) {
-                return toolkit.getSystemSelection();
-            }
-        });
+        Clipboard systemSelection = getToolkit().getSystemSelection();
+        if (systemSelection != null) {
+            pasteClipboard(systemSelection);
+        }
     }
     
-    public void pasteClipboard(ClipboardChooser clipboardChooser) {
+    private void pasteClipboard(Clipboard clipboard) {
         if (isEditable() == false) {
             return;
         }
         
         try {
-            Toolkit toolkit = getToolkit();
-            Clipboard clipboard = clipboardChooser.chooseClipboard(toolkit);
-            if (clipboard == null) {
-                Log.warn("Could not get clipboard.");
-                return;
-            }
             Transferable contents = clipboard.getContents(this);
             DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
             String string = reformatPastedText((String) contents.getTransferData(DataFlavor.stringFlavor));
@@ -1399,9 +1390,5 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         public String toString() {
             return "SelectionHighlight[" + id + ": " + getStartIndex() + ", " + getEndIndex() + "]";
         }
-    }
-    
-    public static abstract class ClipboardChooser {
-        public abstract Clipboard chooseClipboard(Toolkit toolkit);
     }
 }
