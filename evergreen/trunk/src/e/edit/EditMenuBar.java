@@ -87,8 +87,8 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     public JMenu makeFindMenu() {
         JMenu menu = new JMenu("Find");
         menu.add(FindAction.INSTANCE);
-        menu.add(new FindNextAction());
-        menu.add(new FindPreviousAction());
+        menu.add(PActionFactory.makeFindNextAction());
+        menu.add(PActionFactory.makeFindPreviousAction());
         menu.add(new ScrollToSelectionAction());
 
         menu.add(new JSeparator());

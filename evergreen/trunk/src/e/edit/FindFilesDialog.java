@@ -88,7 +88,7 @@ public class FindFilesDialog {
             if (window instanceof ETextWindow && regularExpression != null) {
                 ETextWindow textWindow = (ETextWindow) window;
                 FindAction.INSTANCE.findInText(textWindow, regularExpression);
-                textWindow.findNext();
+                textWindow.getText().findNext();
             }
         }
         
