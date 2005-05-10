@@ -13,8 +13,8 @@ begin
   terminator_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
   salma_hayek = Pathname.new("#{terminator_home}/../salma-hayek").realpath()
 rescue LoadError
-  terminator_bin = `dirname #{__FILE__}`.chomp()
-  terminator_home = "#{terminator_bin}/.."
+  terminator_bin = `cd #{File.dirname(File.expand_path(__FILE__))} && /bin/pwd`.chomp()
+  terminator_home = File.dirname(terminator_bin)
   salma_hayek = "#{terminator_home}/../salma-hayek"
 end
 ENV["TERMINATOR_HOME"] = terminator_home
