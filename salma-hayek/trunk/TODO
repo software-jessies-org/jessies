@@ -1,5 +1,7 @@
 Items to be done for PTextArea:
 
+* Write a PTextStyler for patches.
+
 * Change the PTextStyler interface to work in terms of Lists of segments, rather than arrays of them.
 
 * Make a PSegmentIterator implement the Iterator interface when we have the generics of 1.5.  For now, doing so would just get in our way, forcing us to return Object when we know damned well what we want returned).
