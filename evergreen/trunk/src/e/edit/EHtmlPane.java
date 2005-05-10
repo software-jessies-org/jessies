@@ -34,10 +34,6 @@ public class EHtmlPane extends JComponent implements HyperlinkListener {
         label = new JLabel(text);
     }
     
-    public void clear() {
-        setText("");
-    }
-    
     public void hyperlinkUpdate(HyperlinkEvent e) {
         // Welcome to the wonderful world of OOP, featuring nested-if polymorphism.
         if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
