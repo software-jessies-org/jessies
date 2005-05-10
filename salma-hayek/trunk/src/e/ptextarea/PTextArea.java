@@ -1220,6 +1220,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         StringSelection stringSelection = new StringSelection(getSelectedText());
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         toolkit.getSystemClipboard().setContents(stringSelection, null);
+        if (toolkit.getSystemSelection() != null) {
+            toolkit.getSystemSelection().setContents(stringSelection, null);
+        }
     }
     
     public void cut() {
