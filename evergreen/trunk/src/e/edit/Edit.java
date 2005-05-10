@@ -524,17 +524,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     /** Opens all the files listed in the file we remembered them to last time we quit. */
     public void openRememberedFiles() {
         Edit.showStatus("Opening remembered files...");
-        
-        // FIXME: remove this when everyone's upgraded.
-        if (initialFilenames == null) {
-            final String filename = getOpenFileListPreferenceFilename();
-            if (FileUtilities.exists(filename) == false) {
-                Edit.showStatus("No list of files to open");
-                return; // It's not an error to not have any stored state.
-            }
-            initialFilenames = Arrays.asList(StringUtilities.readLinesFromFile(filename));
-        }
-        
         for (int i = 0; i < initialFilenames.size(); i++) {
             Edit.openFile((String) initialFilenames.get(i));
         }
@@ -550,25 +539,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
                 addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"));
             }
             return;
-        }
-        
-        // FIXME: remove this code when everyone's upgraded.
-        
-        final String filename = getOpenWorkspaceListPreferenceFilename();
-        if (FileUtilities.exists(filename) == false) {
-            return; // It's not an error to not have any stored state.
-        }
-        
-        String[] lines = StringUtilities.readLinesFromFile(filename);
-        if (lines.length == 0) {
-            return; // No remembered workspaces.
-        }
-
-        for (int i = 0; i < lines.length - 1; i += 2) {
-            String name = lines[i];
-            String root = lines[i + 1];
-            String buildTarget = "";
-            addWorkspace(name, root, buildTarget);
         }
     }
     
