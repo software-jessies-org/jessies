@@ -1,4 +1,3 @@
-
 package e.ptextarea;
 
 import java.awt.*;
@@ -19,6 +18,10 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         }
         if (e.getClickCount() == 1) {
             textArea.requestFocus();
+            if (SwingUtilities.isMiddleMouseButton(e)) {
+                textArea.pasteSystemSelection();
+                return;
+            }
         }
         int pressedOffset = getOffsetAtMouse(e);
         textArea.getTextStyler().mouseClicked(e, pressedOffset);
