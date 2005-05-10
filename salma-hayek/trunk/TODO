@@ -45,6 +45,6 @@ Items to be done for PTextArea:
          P0 a0
        ) {
 
-       This is waiting for a good idea.  That may come in the form of generalising the problem or of deciding on an elegant way to implement it.
+       This is waiting for a good idea.  That may come in the form of generalizing the problem or of deciding on an elegant way to implement it.
        
   (2) Use PSameStyleCharSequence instead of regular expressions to exclude comments etc from the code which finds the mismatched brackets whose partners should be inserted.
