@@ -10,6 +10,7 @@ typeid
 typename
 wchar
 # Pre-processor directives.
+elif
 endif
 ifdef
 ifndef
