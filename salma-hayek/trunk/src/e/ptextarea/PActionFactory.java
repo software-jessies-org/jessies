@@ -13,6 +13,10 @@ public class PActionFactory {
         return new CutAction();
     }
     
+    public static Action makeFindAction() {
+        return new PFind.FindAction();
+    }
+    
     public static Action makeFindNextAction() {
         return new FindNextAction();
     }

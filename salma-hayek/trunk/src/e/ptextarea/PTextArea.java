@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.regex.*;
 import javax.swing.*;
 import java.util.List;
 import e.util.*;
@@ -119,19 +120,22 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void initKeyBindings() {
-        initKeyBinding(PActionFactory.makeCopyAction());
-        initKeyBinding(PActionFactory.makeCutAction());
-        initKeyBinding(PActionFactory.makePasteAction());
-        initKeyBinding(PActionFactory.makeRedoAction());
-        initKeyBinding(PActionFactory.makeSelectAllAction());
-        initKeyBinding(PActionFactory.makeUndoAction());
+        initKeyBinding(this, PActionFactory.makeCopyAction());
+        initKeyBinding(this, PActionFactory.makeCutAction());
+        initKeyBinding(this, PActionFactory.makeFindAction());
+        initKeyBinding(this, PActionFactory.makeFindNextAction());
+        initKeyBinding(this, PActionFactory.makeFindPreviousAction());
+        initKeyBinding(this, PActionFactory.makePasteAction());
+        initKeyBinding(this, PActionFactory.makeRedoAction());
+        initKeyBinding(this, PActionFactory.makeSelectAllAction());
+        initKeyBinding(this, PActionFactory.makeUndoAction());
     }
     
-    private void initKeyBinding(Action action) {
+    public static void initKeyBinding(JComponent component, Action action) {
         String name = (String) action.getValue(Action.NAME);
         KeyStroke keyStroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
-        getActionMap().put(name, action);
-        getInputMap().put(keyStroke, name);
+        component.getActionMap().put(name, action);
+        component.getInputMap().put(keyStroke, name);
     }
     
     public void addCaretListener(PCaretListener caretListener) {
@@ -1238,6 +1242,42 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         boolean oldState = this.editable;
         this.editable = newState;
         firePropertyChange("editable", Boolean.valueOf(oldState), Boolean.valueOf(newState));
+    }
+    
+    //
+    // Find functionality.
+    //
+    
+    /**
+     * Highlights all matches of the given regular expression.
+     */
+    public int findAllMatches(String regularExpression) {
+        clearFindMatches();
+        
+        // Anything to search for?
+        if (regularExpression == null || regularExpression.length() == 0) {
+            return 0;
+        }
+        
+        // Find all the matches.
+        int matchCount = 0;
+        Matcher matcher = Pattern.compile(regularExpression).matcher(getTextBuffer());
+        while (matcher.find()) {
+            addHighlight(new PFind.MatchHighlight(this, matcher.start(), matcher.end()));
+            ++matchCount;
+        }
+        return matchCount;
+    }
+    
+    /**
+     * Clears all find match highlights.
+     */
+    public void clearFindMatches() {
+        removeHighlights(new PHighlightMatcher() {
+            public boolean matches(PHighlight highlight) {
+                return (highlight instanceof PFind.MatchHighlight);
+            }
+        });
     }
     
     public void findNext() {
