@@ -120,11 +120,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     //
     
     public void removeAllMatches() {
-        currentTextWindow.getText().removeHighlights(new PHighlightMatcher() {
-            public boolean matches(PHighlight highlight) {
-                return (highlight instanceof PFind.MatchHighlight);
-            }
-        });
+        currentTextWindow.getText().clearFindMatches();
         currentTextWindow.getBirdView().clearMatchingLines();
     }
     
