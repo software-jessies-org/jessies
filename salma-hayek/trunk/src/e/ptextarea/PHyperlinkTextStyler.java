@@ -7,16 +7,15 @@ import java.util.*;
 import java.util.regex.*;
 
 /**
- * A PHyperlinkTextStyler is a thing which knows how to apply hyperlinks to text.
- * 
- * @author Phil Norman
+ * Styles capturing group 1 from the given regular expression as a link, in
+ * the traditional web browser way of using blue text and an underline.
  */
-
 public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
     private Pattern highlightPattern;
     
     public PHyperlinkTextStyler(PTextArea textArea, String highlightPattern) {
         super(textArea);
+        // FIXME: can we check that there is a capturing group 1?
         this.highlightPattern = Pattern.compile(highlightPattern);
     }
     
@@ -27,9 +26,9 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         Matcher matcher = highlightPattern.matcher(line);
         int lastStart = 0;
         while (matcher.find() && isAcceptableMatch(line, matcher)) {
-            result.add(new PTextSegment(textArea, lineStart + lastStart, lineStart + matcher.start(), PStyle.NORMAL));
-            result.add(new PUnderlinedTextSegment(textArea, lineStart + matcher.start(), lineStart + matcher.end(), PStyle.HYPERLINK));
-            lastStart = matcher.end();
+            result.add(new PTextSegment(textArea, lineStart + lastStart, lineStart + matcher.start(1), PStyle.NORMAL));
+            result.add(new PUnderlinedTextSegment(textArea, lineStart + matcher.start(1), lineStart + matcher.end(1), PStyle.HYPERLINK));
+            lastStart = matcher.end(1);
         }
         if (lastStart < line.length()) {
             result.add(new PTextSegment(textArea, lineStart + lastStart, lineStart + line.length(), PStyle.NORMAL));
