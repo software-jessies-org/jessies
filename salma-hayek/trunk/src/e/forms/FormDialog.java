@@ -31,11 +31,6 @@ public class FormDialog extends JDialog {
     
     private boolean wasAccepted;
     
-    public abstract static class DialogClosedListener implements EventListener {
-        public abstract void dialogClosed(boolean isAcceptance);
-    }
-    private DialogClosedListener listener;
-    
     public static int getComponentSpacing() {
         if (GuiUtilities.isWindows()) {
             return 4;
@@ -44,22 +39,13 @@ public class FormDialog extends JDialog {
     }
     
     /**
-     * Shows a non-modal dialog with a single button that actually performs
-     * some action. If you don't want to take any action when the dialog is closed,
-     * try the other showNonModal method.
-     */
-    public static void showNonModal(Frame parent, String title, FormPanel contentPane, String actionLabel, DialogClosedListener listener) {
-        FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, null, false);
-        formDialog.listener = listener;
-        formDialog.setVisible(true);
-    }
-    
-    /**
      * Shows a non-modal dialog with a Close button that performs no action
      * when the dialog is accepted.
      */
-    public static void showNonModal(Frame parent, String title, FormPanel contentPane) {
-        showNonModal(parent, title, contentPane, "Close", null);
+    public static FormDialog showNonModal(Frame parent, String title, FormPanel contentPane) {
+        FormDialog formDialog = new FormDialog(parent, title, contentPane, "Close", null, false);
+        formDialog.setVisible(true);
+        return formDialog;
     }
     
     /**
@@ -183,9 +169,6 @@ public class FormDialog extends JDialog {
     public void processUserChoice(boolean isAcceptance) {
         dialogGeometries.put(getTitle(), getBounds());
         wasAccepted = isAcceptance;
-        if (listener != null) {
-            listener.dialogClosed(isAcceptance);
-        }
         dispose();
     }
 
