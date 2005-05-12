@@ -324,6 +324,11 @@ public class FindAndReplaceAction extends ETextAction {
         
         public void finished() {
             Object result = getValue();
+            // If the caller has already created a new WorkerThread, then we're obsolete.
+            // This happens because of the LIFO order in which Swing seems to execute invokeAndLater callbacks.
+            if (workerThread != this) {
+                return;
+            }
             workerThread = null;
             if (result == null) {
                 setStatusToBad("More than " + MAX_DISPLAYED_MATCH_COUNT + " matches. No matches will be shown.", patternField);
