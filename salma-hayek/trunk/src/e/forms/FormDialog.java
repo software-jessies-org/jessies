@@ -114,6 +114,7 @@ public class FormDialog extends JDialog {
     private void initWindowManagerCloseBehavior() {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            // windowClosing only applies to closes via the window manager.
             public void windowClosing(WindowEvent windowEvent) {
                 cancelDialog();
             }
