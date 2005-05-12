@@ -31,7 +31,10 @@ public class FormDialog extends JDialog {
     
     private boolean wasAccepted;
     
-    private ActionListener listener;
+    public abstract static class DialogClosedListener implements EventListener {
+        public abstract void dialogClosed(boolean isAcceptance);
+    }
+    private DialogClosedListener listener;
     
     public static int getComponentSpacing() {
         if (GuiUtilities.isWindows()) {
@@ -42,10 +45,10 @@ public class FormDialog extends JDialog {
     
     /**
      * Shows a non-modal dialog with a single button that actually performs
-     * some action. This means that "Close" is not a suitable label. If that's
-     * what you're looking for, try the other showNonModal method.
+     * some action. If you don't want to take any action when the dialog is closed,
+     * try the other showNonModal method.
      */
-    public static void showNonModal(Frame parent, String title, FormPanel contentPane, String actionLabel, ActionListener listener) {
+    public static void showNonModal(Frame parent, String title, FormPanel contentPane, String actionLabel, DialogClosedListener listener) {
         FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, null, false);
         formDialog.listener = listener;
         formDialog.setVisible(true);
@@ -180,6 +183,9 @@ public class FormDialog extends JDialog {
     public void processUserChoice(boolean isAcceptance) {
         dialogGeometries.put(getTitle(), getBounds());
         wasAccepted = isAcceptance;
+        if (listener != null) {
+            listener.dialogClosed(isAcceptance);
+        }
         dispose();
     }
 
@@ -192,9 +198,6 @@ public class FormDialog extends JDialog {
         actionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 acceptDialog();
-                if (listener != null) {
-                    listener.actionPerformed(e);
-                }
             }
         });
         rootPane.setDefaultButton(actionButton);
