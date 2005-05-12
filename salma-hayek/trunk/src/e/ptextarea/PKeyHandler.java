@@ -33,7 +33,7 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     public void keyPressed(KeyEvent event) {
-        if (event.isControlDown()) {
+        if (event.isControlDown() && event.isShiftDown()) {
             switch (event.getKeyCode()) {
             case KeyEvent.VK_T:
                 textArea.printLineInfo();
