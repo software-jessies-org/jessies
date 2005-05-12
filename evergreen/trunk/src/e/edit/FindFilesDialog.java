@@ -380,8 +380,8 @@ public class FindFilesDialog {
             }
         };
         saveMonitor.addSaveListener(saveListener);
-        ActionListener unregisterListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        FormDialog.DialogClosedListener unregisterListener = new FormDialog.DialogClosedListener() {
+            public void dialogClosed(boolean isAcceptance) {
                 saveMonitor.removeSaveListener(saveListener);
             }
         };
