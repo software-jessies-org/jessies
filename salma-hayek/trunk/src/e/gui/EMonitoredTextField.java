@@ -4,8 +4,9 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-public class EMonitoredTextField extends JTextField {
+public abstract class EMonitoredTextField extends JTextField {
     private Timer timer;
+    private boolean callerIsReady = false;
     
     public EMonitoredTextField() {
         this(0);
@@ -23,15 +24,31 @@ public class EMonitoredTextField extends JTextField {
                 timerExpired();
             }
         });
-        timer.setRepeats(false);
+        timer.setRepeats(false);                
+        timer.stop();
+    }
+    
+    /** Called by FormDialog when it's ready. */
+    public void startMonitoring() {
+        // All of our users want to be called soon after the dialog is displayed
+        // to populate the match list from the initial field contents.
+        timerExpired();
+        callerIsReady = true;
+    }
+    
+    /** Called by FormDialog when it's done. */
+    public void stopMonitoring() {
+        callerIsReady = false;
+        timer.stop();
     }
 
     /** Override this to do something. */
-    public void timerExpired() {
-    }
+    public abstract void timerExpired();
 
     /** Restarts the timer every time the text changes. */
     public void textChanged() {
-        timer.restart();
+        if (callerIsReady) {
+            timer.restart();
+        }
     }
 }

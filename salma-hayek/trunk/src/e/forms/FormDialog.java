@@ -31,6 +31,8 @@ public class FormDialog extends JDialog {
     
     private boolean wasAccepted;
     
+    private FormPanel contentPane;
+    
     public static int getComponentSpacing() {
         if (GuiUtilities.isWindows()) {
             return 4;
@@ -69,10 +71,11 @@ public class FormDialog extends JDialog {
 
     private FormDialog(Frame parent, String title, FormPanel contentPane, String actionLabel, JButton extraButton, boolean modal) {
         super(parent, title, modal);
-        init(parent, contentPane, actionLabel, extraButton);
+        this.contentPane = contentPane;
+        init(parent, actionLabel, extraButton);
     }
     
-    private void init(Frame parent, FormPanel contentPane, String actionLabel, JButton extraButton) {
+    private void init(Frame parent, String actionLabel, JButton extraButton) {
         setResizable(true);
         
         JComponent statusBar = contentPane.getStatusBar();
@@ -99,6 +102,29 @@ public class FormDialog extends JDialog {
         
         initCloseBehavior();
         initFocus(contentPane);
+        
+        startMonitors();
+    }
+    
+    private void startMonitors() {
+        setMonitorState(true);
+    }
+    private void stopMonitors() {
+        setMonitorState(false);
+    }
+    
+    private void setMonitorState(boolean callerIsReady) {
+        for (int i = 0; i < contentPane.getComponentCount(); ++i) {
+            Component component = contentPane.getComponent(i);
+            if (component instanceof EMonitoredTextField) {
+                EMonitoredTextField monitoredTextField = (EMonitoredTextField) component;
+                if (callerIsReady) {
+                    monitoredTextField.startMonitoring();
+                } else {                    
+                    monitoredTextField.stopMonitoring();
+                }
+            }
+        }
     }
     
     private void initCloseBehavior() {
@@ -170,6 +196,7 @@ public class FormDialog extends JDialog {
     public void processUserChoice(boolean isAcceptance) {
         dialogGeometries.put(getTitle(), getBounds());
         wasAccepted = isAcceptance;
+        stopMonitors();
         dispose();
     }
 
