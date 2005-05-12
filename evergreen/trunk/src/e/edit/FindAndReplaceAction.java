@@ -96,9 +96,6 @@ public class FindAndReplaceAction extends ETextAction {
         formPanel.addRow("", statusLabel);
         formPanel.addRow("Matches:", matchPane);
         formPanel.addRow("Replacements:", replacementsPane);
-        if (patternField.getText().length() > 0) {
-            showMatches();
-        }
         
         // We keep going around the loop of show-dialog/process-text until:
         // (a) the user cancels the dialog.
