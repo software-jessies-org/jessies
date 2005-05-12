@@ -230,6 +230,10 @@ public class TagReader {
                 tagType = 'C';
             }
             this.type = (String) TYPES.get(String.valueOf(tagType));
+            if (this.type == null) {
+                this.type = "unknown tag type '" + tagType + "'";
+                Log.warn(this.type);
+            }
         }
         
         public String describeVisibility() {
