@@ -43,7 +43,7 @@ public class SimpleDialog {
      */
     public static void showDetails(Frame frame, String title, String details) {
         PTextArea textArea = new PTextArea(10, 40);
-        // FIXME: textArea.setEditable(false);
+        textArea.setEditable(false);
         textArea.setText(details);
         textArea.setWrapStyleWord(true);
         FormPanel formPanel = new FormPanel();
