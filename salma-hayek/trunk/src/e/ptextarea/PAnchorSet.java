@@ -114,6 +114,7 @@ public class PAnchorSet implements PTextListener {
     }
     
     public void clear() {
+        checkLinearity();
         for (int i = 0; i < anchors.size(); i++) {
             PAnchor anchor = get(i);
             if (anchor != null) {
