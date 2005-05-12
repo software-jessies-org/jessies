@@ -524,10 +524,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     /** Opens all the files listed in the file we remembered them to last time we quit. */
     public void openRememberedFiles() {
         Edit.showStatus("Opening remembered files...");
-        for (int i = 0; i < initialFilenames.size(); i++) {
-            Edit.openFile((String) initialFilenames.get(i));
+        if (initialFilenames != null) {
+            for (int i = 0; i < initialFilenames.size(); i++) {
+                Edit.openFile((String) initialFilenames.get(i));
+            }
+            Edit.showStatus((initialFilenames.size() == 0) ? "No files to open" : "Finished opening files");
         }
-        Edit.showStatus((initialFilenames.size() == 0) ? "No files to open" : "Finished opening files");
     }
     
     /** Opens all the workspaces listed in the file we remembered them to last time we quit. */
