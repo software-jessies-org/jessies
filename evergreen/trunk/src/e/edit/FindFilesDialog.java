@@ -380,11 +380,6 @@ public class FindFilesDialog {
             }
         };
         saveMonitor.addSaveListener(saveListener);
-        FormDialog.DialogClosedListener unregisterListener = new FormDialog.DialogClosedListener() {
-            public void dialogClosed(boolean isAcceptance) {
-                saveMonitor.removeSaveListener(saveListener);
-            }
-        };
         
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Files Containing:", patternField);
@@ -392,6 +387,13 @@ public class FindFilesDialog {
         formPanel.addRow("Matches:", new JScrollPane(matchView));
         formPanel.setStatusBar(status);
         
-        FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel, "Close", unregisterListener);
+        FormDialog formDialog = FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel);
+        
+        // Remove our save listener when the dialog is dismissed.
+        formDialog.addWindowListener(new WindowAdapter() {
+            public void windowClosed(WindowEvent windowEvent) {
+                saveMonitor.removeSaveListener(saveListener);
+            }
+        });
     }
 }
