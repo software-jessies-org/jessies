@@ -69,9 +69,6 @@ public class PAnchorSet implements PTextListener {
             }
             lastIndex = anchor.getIndex();
         }
-        if (SwingUtilities.isEventDispatchThread() == false) {
-            throw new ConcurrentModificationException("The PAnchorSet must only be accessed from the event dispatch thread");
-        }
     }
     
     private PAnchor get(int index) {
