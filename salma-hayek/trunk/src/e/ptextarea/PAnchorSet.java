@@ -3,6 +3,7 @@ package e.ptextarea;
 
 import java.lang.ref.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
  * A PAnchorSet contains a sorted list of anchors, referred to weakly so they automatically
@@ -67,6 +68,9 @@ public class PAnchorSet implements PTextListener {
                 throw new IllegalStateException("Linearity out of order at index " + i);
             }
             lastIndex = anchor.getIndex();
+        }
+        if (SwingUtilities.isEventDispatchThread() == false) {
+            throw new ConcurrentModificationException("The PAnchorSet must only be accessed from the event dispatch thread");
         }
     }
     

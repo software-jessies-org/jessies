@@ -2,6 +2,7 @@ package e.ptextarea;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -156,7 +157,10 @@ public class PTextAreaSpellingChecker implements PTextListener {
      */
     private void checkSpelling(PTextEvent e) {
         PTextBuffer buffer = e.getTextBuffer();
-        final int offset = e.getOffset();
+        checkSpellingAround(buffer, e.getOffset(), e.getLength());
+    }
+    
+    private void checkSpellingAround(PTextBuffer buffer, final int offset, final int length) {
         final int documentLength = buffer.length();
         
         // Find a plausible place to start before the offset.
@@ -166,7 +170,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
         }
         
         // Find a plausible place to finish after the end of the range affected by this event.
-        int toIndex = Math.max(fromIndex, Math.min(documentLength, offset + e.getLength() + 1));
+        int toIndex = Math.max(fromIndex, Math.min(documentLength, offset + length + 1));
         while (toIndex < documentLength && Character.isWhitespace(buffer.charAt(toIndex)) == false) {
             toIndex++;
         }
@@ -180,10 +184,32 @@ public class PTextAreaSpellingChecker implements PTextListener {
      * it can take a second or more for a large file.
      */
     public void checkSpelling() {
+        final PTextBuffer buffer = component.getTextBuffer();
+        final int documentLength = buffer.length();
         new Thread(new Runnable() {
             public void run() {
-                PTextBuffer buffer = component.getTextBuffer();
-                checkSpelling(buffer, 0, buffer.length());
+                try {
+                    long startTime = System.currentTimeMillis();
+                    System.err.println("started spell check...");
+                    final int blockSize = 1024; // How much we can check quickly.  Pulled out of the air.
+                    for (int i = 0; i < documentLength; i += blockSize) {
+                        final int offset = i;
+                        // Wait for the check to complete before starting another one rather than flaying
+                        // the Swing event queue with all of our requests at once.
+                        // This is intended to allow other UI interaction to happen "concurrently".
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            public void run() {
+                                // checkSpellingAround validates the offsets.
+                                checkSpellingAround(buffer, offset, blockSize);
+                            }
+                        });
+                    }
+                    System.err.println("... took " + (System.currentTimeMillis() - startTime) + "ms to check " + documentLength + " bytes");
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                } catch (InvocationTargetException ex) {
+                    ex = ex;
+                }
             }
         }).start();
     }
