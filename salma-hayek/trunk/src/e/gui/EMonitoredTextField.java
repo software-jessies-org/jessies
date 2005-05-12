@@ -25,7 +25,6 @@ public abstract class EMonitoredTextField extends JTextField {
             }
         });
         timer.setRepeats(false);                
-        timer.stop();
     }
     
     /** Called by FormDialog when it's ready. */
