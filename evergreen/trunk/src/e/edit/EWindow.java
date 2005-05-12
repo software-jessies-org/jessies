@@ -49,7 +49,7 @@ public class EWindow extends JComponent {
     
     /** Closes this window by removing it from its column. */
     public void closeWindow() {
-        windowClosing();
+        windowWillClose();
         removeFromColumn();
     }
     
@@ -59,7 +59,8 @@ public class EWindow extends JComponent {
     }
     
     /** Invoked when the window is about to be closed. */
-    public void windowClosing() { }
+    public void windowWillClose() {
+    }
     
     public void ensureSufficientlyVisible() {
         if (getHeight() < 2 * titleBar.getHeight()) {

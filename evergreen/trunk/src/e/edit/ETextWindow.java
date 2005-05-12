@@ -300,7 +300,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         return text;
     }
     
-    public void windowClosing() {
+    public void windowWillClose() {
         if (findResultsUpdater != null) {
             findResultsUpdater.stop();
             findResultsUpdater = null;

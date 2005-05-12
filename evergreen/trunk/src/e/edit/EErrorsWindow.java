@@ -158,10 +158,4 @@ public class EErrorsWindow extends EWindow {
     public String getContext() {
         return "";
     }
-    
-    /** Removes this as the Workspace's errors window. */
-    public void windowClosing() {
-        //getWorkspace().errorsWindowClosing();
-        getWorkspace().unregisterTextComponent(getText());
-    }
 }
