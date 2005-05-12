@@ -105,6 +105,14 @@ public class PAnchorSet implements PTextListener {
                 anchor.setIndex(anchor.getIndex() - deletionLength);
             }
         }
+        // We call all the anchors' delete methods after we've updated all the
+        // anchors.  This is because calling the delete method of an anchor
+        // marking a bound of a highlight will cause the deletion of the anchor
+        // marking the highlight's other bound.  This causes reentrancy into
+        // this object while we're messing about with the anchors' offsets, and
+        // changes to the indexing of the latter anchors.  In short, it leads
+        // to a loss of linearity in the anchor list (which must be kept
+        // sorted), and thus bugs.
         for (int i = 0; i < deletionList.size(); i++) {
             ((PAnchor) deletionList.get(i)).delete();
         }
