@@ -323,7 +323,7 @@ public class FindAndReplaceAction extends ETextAction {
         }
         
         public void finished() {
-            Object result = get();
+            Object result = getValue();
             workerThread = null;
             if (result == null) {
                 setStatusToBad("More than " + MAX_DISPLAYED_MATCH_COUNT + " matches. No matches will be shown.", patternField);
@@ -340,9 +340,8 @@ public class FindAndReplaceAction extends ETextAction {
     }
     
     public synchronized void showMatches() {
-        while (workerThread != null) {
+        if (workerThread != null) {
             workerThread.interrupt();
-            workerThread = null;
         }
         workerThread = new MatchFinder();
         workerThread.doFindForPattern(patternField.getText(), replacementField.getText());
