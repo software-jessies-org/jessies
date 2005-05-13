@@ -223,7 +223,10 @@ public class TerminatorMenuBar extends JMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			// FIXME: we should probably have an "explicit copy" mode.
+			JTerminalPane terminal = getFocusedTerminalPane();
+			if (terminal != null) {
+				terminal.doCopyAction();
+			}
 		}
 	}
 	

@@ -99,7 +99,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	
 	public void mouseReleased(MouseEvent event) {
 		if (SwingUtilities.isLeftMouseButton(event)) {
-			copy();
+			copyToSystemSelection();
 		}
 	}
 	
@@ -116,15 +116,6 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	}
 	
 	public void mouseExited(MouseEvent event) {
-	}
-	
-	/**
-	 * Copies the selected text to the clipboard.
-	 */
-	private void copy() {
-		if (highlight != null) {
-			setClipboard(view.getTabbedText(highlight));
-		}
 	}
 	
 	public boolean isWordChar(char ch) {
@@ -151,7 +142,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		}
 		startLocation = new Location(lineNumber, start);
 		setHighlight(startLocation, new Location(lineNumber, end));
-		copy();
+		copyToSystemSelection();
 	}
 	
 	private void clearSelection() {
@@ -165,7 +156,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		Location end = new Location(view.getModel().getLineCount(), 0);
 		startLocation = start;
 		setHighlight(start, end);
-		copy();
+		copyToSystemSelection();
 	}
 	
 	private void selectLine(Location location) {
@@ -173,19 +164,34 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		Location end = new Location(location.getLineIndex() + 1, 0);
 		startLocation = start;
 		setHighlight(start, end);
-		copy();
+		copyToSystemSelection();
 	}
 	
 	/**
-	 * Sets the clipboard (and X11's nasty hacky semi-duplicate).
+	 * Copies the selected text to the clipboard.
 	 */
-	private void setClipboard(String newContents) {
-		StringSelection selection = new StringSelection(newContents);
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		toolkit.getSystemClipboard().setContents(selection, this);
-		if (toolkit.getSystemSelection() != null) {
-			toolkit.getSystemSelection().setContents(selection, this);
+	public void copy() {
+		copyToClipboard(view.getToolkit().getSystemClipboard());
+	}
+
+	/**
+	 * Copies the selected text to X11's selection.
+	 * Does nothing on other platforms.
+	 */
+	public void copyToSystemSelection() {
+		Clipboard systemSelection = view.getToolkit().getSystemSelection();
+		if (systemSelection != null) {
+			copyToClipboard(systemSelection);
 		}
+	}
+	
+	private void copyToClipboard(Clipboard clipboard) {
+		if (highlight == null) {
+			return;
+		}
+		String newContents = view.getTabbedText(highlight);
+		StringSelection selection = new StringSelection(newContents);
+		clipboard.setContents(selection, this);
 	}
 	
 	/**
