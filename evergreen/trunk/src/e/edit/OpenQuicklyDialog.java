@@ -19,7 +19,7 @@ import e.gui.*;
  * there's just the one.
  */
 public class OpenQuicklyDialog {
-    private FileNamePatternField filenameField = new FileNamePatternField();
+    private JTextField filenameField = new JTextField(40);
     private JList matchList;
     private JLabel status = new JLabel(" ");
     
@@ -27,23 +27,6 @@ public class OpenQuicklyDialog {
     private DefaultListModel model;
     
     private Workspace workspace;
-    
-    public class FileNamePatternField extends EMonitoredTextField {
-        public FileNamePatternField() {
-            super(40);
-        }
-        
-        /** Tracks (cheaply) *every* keypress, because it's important to know whether the search results are up-to-date. */
-        public void textChanged() {
-            super.textChanged();
-            haveSearched = false;
-        }
-        
-        public void timerExpired() {
-            haveSearched = true;
-            showMatches();
-        }
-    }
     
     private void setStatus(boolean good, String text) {
         status.setForeground(good ? Color.BLACK : Color.RED);
@@ -162,6 +145,11 @@ public class OpenQuicklyDialog {
         formPanel.addRow("Names Containing:", filenameField);
         formPanel.addRow("Matches:", new JScrollPane(matchList));
         formPanel.setStatusBar(status);
+        formPanel.setTypingTimeoutActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showMatches();
+            }
+        });
         boolean okay = FormDialog.show(Edit.getFrame(), "Open Quickly", formPanel, "Open", makeRescanButton());
         
         if (okay == false) {
