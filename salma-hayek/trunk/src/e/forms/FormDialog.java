@@ -40,6 +40,8 @@ public class FormDialog extends JDialog {
     
     private Timer textChangeTimer;
     
+    private boolean isListenerUpToDate;
+    
     private boolean wasAccepted;
     
     public static int getComponentSpacing() {
@@ -120,7 +122,7 @@ public class FormDialog extends JDialog {
         
         // Support for "as-you-type" interfaces that update whenever the user
         // pauses in their typing.
-        initComponentShownListener(contentPane.getTypingTimeoutActionListener());
+        initComponentListener(contentPane.getTypingTimeoutActionListener());
         initDocumentListener();
         initTextChangeTimer(contentPane.getTypingTimeoutActionListener());
         addTextFieldListeners(contentPane);
@@ -128,12 +130,20 @@ public class FormDialog extends JDialog {
     
     /**
      * Prods the typing timeout listener as soon as we're shown so that we're
-     * showing up-to-date information before the user starts typing.
+     * showing up-to-date information before the user starts typing. Also prods
+     * it if we're accepted without having notified the listener of the latest
+     * typing.
      */
-    private void initComponentShownListener(final ActionListener listener) {
+    private void initComponentListener(final ActionListener listener) {
         addComponentListener(new ComponentAdapter() {
             public void componentShown(ComponentEvent e) {
                 listener.actionPerformed(null);
+            }
+            
+            public void componentHidden(ComponentEvent e) {
+                if (wasAccepted && isListenerUpToDate == false) {
+                    listener.actionPerformed(null);
+                }
             }
         });
     }
@@ -157,6 +167,7 @@ public class FormDialog extends JDialog {
             
             private void textChanged() {
                 textChangeTimer.restart();
+                isListenerUpToDate = false;
             }
         };
     }
@@ -171,10 +182,14 @@ public class FormDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 if (isShowing()) {
                     listener.actionPerformed(null);
+                    isListenerUpToDate = true;
                 }
             }
         });
         textChangeTimer.setRepeats(false);
+        // It doesn't matter what we initialize this to; our ComponentListener
+        // will do the right thing either way. But "true" seems more natural.
+        isListenerUpToDate = true;
     }
     
     /**
