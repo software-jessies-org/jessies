@@ -122,9 +122,14 @@ public class FormDialog extends JDialog {
         
         // Support for "as-you-type" interfaces that update whenever the user
         // pauses in their typing.
-        initComponentListener(contentPane.getTypingTimeoutActionListener());
+        ActionListener listener = contentPane.getTypingTimeoutActionListener();
+        if (listener == null) {
+            return;
+        }
+        initComponentListener(listener);
+        initTextChangeTimer(listener);
+        // Operates on the textChangeTimer.
         initDocumentListener();
-        initTextChangeTimer(contentPane.getTypingTimeoutActionListener());
         addTextFieldListeners(contentPane);
     }
     
@@ -207,6 +212,9 @@ public class FormDialog extends JDialog {
     }
     
     private void removeTextFieldListeners() {
+        if (listenedToTextFields == null) {
+            return;
+        }
         for (int i = 0; i < listenedToTextFields.size(); ++i) {
             ((JTextComponent) listenedToTextFields.get(i)).getDocument().removeDocumentListener(documentListener);
         }
@@ -280,7 +288,9 @@ public class FormDialog extends JDialog {
     }
 
     private void processUserChoice(boolean isAcceptance) {
-        textChangeTimer.stop();
+        if (textChangeTimer != null) {
+            textChangeTimer.stop();
+        }
         dialogGeometries.put(getTitle(), getBounds());
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
