@@ -39,7 +39,7 @@ public class JTextComponentFind {
      */
     private int initialSelectionEnd;
     
-    private FindField findField = new FindField();
+    private JTextField findField = new JTextField(40);
     
     /**
      * Used to show the number of matches, or report errors in the user's
@@ -76,13 +76,22 @@ public class JTextComponentFind {
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Find:", findField);
         formPanel.setStatusBar(findStatus);
+        formPanel.setTypingTimeoutActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    findField.setForeground(UIManager.getColor("TextField.foreground"));
+                    updateFindResults();
+                } catch (PatternSyntaxException ex) {
+                    findField.setForeground(Color.RED);
+                    findStatus.setText(ex.getDescription());
+                }
+            }
+        });
         FormDialog.showNonModal(frame, "Find", formPanel);
         
         findField.selectAll();
         findField.requestFocus();
         findStatus.setText(" ");
-        
-        findField.find();
     }
     
     private void cancelFind() {
@@ -133,6 +142,7 @@ public class JTextComponentFind {
     
     private JTextComponentFind(final JTextComponent textComponent) {
         this.textComponent = textComponent;
+        FormDialog.markAsMonitoredField(findField);
         initKeyStrokes(textComponent, true);
         initKeyStrokes(findField, false);
     }
@@ -166,51 +176,6 @@ public class JTextComponentFind {
         public void actionPerformed(ActionEvent e) {
             updateFindResults();
             JTextComponentUtilities.findNextHighlight(textComponent, Position.Bias.Backward, PAINTER);
-        }
-    }
-    
-    private class FindField extends EMonitoredTextField {
-        public FindField() {
-            super(40);
-            addKeyListener(new KeyAdapter() {
-                public void keyTyped(KeyEvent e) {
-                    if (e.getKeyChar() == '\n') {
-                        find();
-                        e.consume();
-                    }
-                }
-                
-                public void keyPressed(KeyEvent e) {
-                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                        cancelFind();
-                    }
-                }
-                
-/*
-                public void keyReleased(KeyEvent e) {
-                    if (JTerminalPane.isKeyboardEquivalent(e)) {
-                        if (e.getKeyCode() == KeyEvent.VK_D) {
-                            textToFindIn.findPrevious();
-                        } else if (e.getKeyCode() == KeyEvent.VK_G) {
-                            textToFindIn.findNext();
-                        }
-                    }
-                }*/
-            });
-        }
-        
-        public void timerExpired() {
-            find();
-        }
-        
-        public void find() {
-            try {
-                setForeground(UIManager.getColor("TextField.foreground"));
-                updateFindResults();
-            } catch (PatternSyntaxException ex) {
-                setForeground(Color.RED);
-                findStatus.setText(ex.getDescription());
-            }
         }
     }
 }

@@ -4,6 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.Timer;
+import javax.swing.event.*;
+import javax.swing.text.*;
 
 import e.gui.*;
 import e.util.*;
@@ -25,19 +28,32 @@ import e.util.*;
  * will be preserved.
  */
 public class FormDialog extends JDialog {
+    private static final String MONITORED_FIELD_KEY = "e.forms.FormDialog.MONITORED_FIELD_KEY";
+    
     private static int componentSpacing = getComponentSpacing();
     
     private static HashMap dialogGeometries = new HashMap();
     
-    private boolean wasAccepted;
+    private ArrayList listenedToTextFields;
     
-    private FormPanel contentPane;
+    private DocumentListener documentListener;
+    
+    private Timer textChangeTimer;
+    
+    private boolean wasAccepted;
     
     public static int getComponentSpacing() {
         if (GuiUtilities.isWindows()) {
             return 4;
         }
         return 10;
+    }
+    
+    /**
+     * Tells the form about a text component you want to monitor typing in.
+     */
+    public static void markAsMonitoredField(JTextComponent component) {
+        component.putClientProperty(MONITORED_FIELD_KEY, Boolean.TRUE);
     }
     
     /**
@@ -71,11 +87,10 @@ public class FormDialog extends JDialog {
 
     private FormDialog(Frame parent, String title, FormPanel contentPane, String actionLabel, JButton extraButton, boolean modal) {
         super(parent, title, modal);
-        this.contentPane = contentPane;
-        init(parent, actionLabel, extraButton);
+        init(parent, contentPane, actionLabel, extraButton);
     }
     
-    private void init(Frame parent, String actionLabel, JButton extraButton) {
+    private void init(Frame parent, FormPanel contentPane, String actionLabel, JButton extraButton) {
         setResizable(true);
         
         JComponent statusBar = contentPane.getStatusBar();
@@ -103,28 +118,84 @@ public class FormDialog extends JDialog {
         initCloseBehavior();
         initFocus(contentPane);
         
-        startMonitors();
+        // Support for "as-you-type" interfaces that update whenever the user
+        // pauses in their typing.
+        initComponentShownListener(contentPane.getTypingTimeoutActionListener());
+        initDocumentListener();
+        initTextChangeTimer(contentPane.getTypingTimeoutActionListener());
+        addTextFieldListeners(contentPane);
     }
     
-    private void startMonitors() {
-        setMonitorState(true);
-    }
-    private void stopMonitors() {
-        setMonitorState(false);
+    /**
+     * Prods the typing timeout listener as soon as we're shown so that we're
+     * showing up-to-date information before the user starts typing.
+     */
+    private void initComponentShownListener(final ActionListener listener) {
+        addComponentListener(new ComponentAdapter() {
+            public void componentShown(ComponentEvent e) {
+                listener.actionPerformed(null);
+            }
+        });
     }
     
-    private void setMonitorState(boolean callerIsReady) {
-        for (int i = 0; i < contentPane.getComponentCount(); ++i) {
-            Component component = contentPane.getComponent(i);
-            if (component instanceof EMonitoredTextField) {
-                EMonitoredTextField monitoredTextField = (EMonitoredTextField) component;
-                if (callerIsReady) {
-                    monitoredTextField.startMonitoring();
-                } else {                    
-                    monitoredTextField.stopMonitoring();
+    /**
+     * Restarts our timer whenever the user types.
+     */
+    private void initDocumentListener() {
+        documentListener = new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                textChanged();
+            }
+            
+            public void insertUpdate(DocumentEvent e) {
+                textChanged();
+            }
+            
+            public void removeUpdate(DocumentEvent e) {
+                textChanged();
+            }
+            
+            private void textChanged() {
+                textChangeTimer.restart();
+            }
+        };
+    }
+    
+    /**
+     * Notifies the FormPanel's typing timeout listener if it's been more
+     * than 0.5s since the user typed anything, on the assumption that it's
+     * time to update the UI in response.
+     */
+    private void initTextChangeTimer(final ActionListener listener) {
+        textChangeTimer = new Timer(500, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (isShowing()) {
+                    listener.actionPerformed(null);
                 }
             }
+        });
+        textChangeTimer.setRepeats(false);
+    }
+    
+    /**
+     * Adds listeners to all the text fields marked with markAsMonitoredField.
+     */
+    private void addTextFieldListeners(FormPanel contentPane) {
+        listenedToTextFields = new ArrayList();
+        for (int i = 0; i < contentPane.getComponentCount(); ++i) {
+            JComponent component = (JComponent) contentPane.getComponent(i);
+            if (component.getClientProperty(FormDialog.MONITORED_FIELD_KEY) != null) {
+                ((JTextComponent) component).getDocument().addDocumentListener(documentListener);
+                listenedToTextFields.add(component);
+            }
         }
+    }
+    
+    private void removeTextFieldListeners() {
+        for (int i = 0; i < listenedToTextFields.size(); ++i) {
+            ((JTextComponent) listenedToTextFields.get(i)).getDocument().removeDocumentListener(documentListener);
+        }
+        listenedToTextFields = null;
     }
     
     private void initCloseBehavior() {
@@ -194,9 +265,10 @@ public class FormDialog extends JDialog {
     }
 
     public void processUserChoice(boolean isAcceptance) {
+        textChangeTimer.stop();
         dialogGeometries.put(getTitle(), getBounds());
         wasAccepted = isAcceptance;
-        stopMonitors();
+        removeTextFieldListeners();
         dispose();
     }
 

@@ -53,12 +53,13 @@ public class PFind {
      * Offers a default find dialog.
      */
     public static class FindAction extends PActionFactory.PTextAction {
-        private FindField findField = new FindField();
+        private JTextField findField = new JTextField(40);
         private JLabel findStatus = new JLabel(" ");
         private PTextArea textArea;
         
         public FindAction() {
             super("Find...", e.util.GuiUtilities.makeKeyStroke("F", false));
+            FormDialog.markAsMonitoredField(findField);
             PTextArea.initKeyBinding(findField, PActionFactory.makeFindNextAction());
             PTextArea.initKeyBinding(findField, PActionFactory.makeFindPreviousAction());
         }
@@ -74,52 +75,27 @@ public class PFind {
             FormPanel formPanel = new FormPanel();
             formPanel.addRow("Find:", findField);
             formPanel.setStatusBar(findStatus);
+            formPanel.setTypingTimeoutActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        findField.setForeground(UIManager.getColor("TextField.foreground"));
+                        updateFindResults();
+                    } catch (java.util.regex.PatternSyntaxException ex) {
+                        findField.setForeground(Color.RED);
+                        findStatus.setText(ex.getDescription());
+                    }
+                }
+            });
             FormDialog.showNonModal(frame, "Find", formPanel);
             
             findField.selectAll();
             findField.requestFocus();
             findStatus.setText(" ");
-            
-            findField.find();
         }
         
         private void updateFindResults() {
             int matchCount = textArea.findAllMatches(findField.getText());
             findStatus.setText("Matches: " + matchCount);
-        }
-        
-        private class FindField extends EMonitoredTextField {
-            public FindField() {
-                super(40);
-                addKeyListener(new KeyAdapter() {
-                    public void keyTyped(KeyEvent e) {
-                        if (e.getKeyChar() == '\n') {
-                            find();
-                            e.consume();
-                        }
-                    }
-                    
-                    public void keyPressed(KeyEvent e) {
-                        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                            // FIXME: cancelFind();
-                        }
-                    }
-                });
-            }
-            
-            public void timerExpired() {
-                find();
-            }
-            
-            public void find() {
-                try {
-                    setForeground(UIManager.getColor("TextField.foreground"));
-                    updateFindResults();
-                } catch (java.util.regex.PatternSyntaxException ex) {
-                    setForeground(Color.RED);
-                    findStatus.setText(ex.getDescription());
-                }
-            }
         }
     }
 }

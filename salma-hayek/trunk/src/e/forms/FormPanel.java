@@ -1,6 +1,7 @@
 package e.forms;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 /**
@@ -12,7 +13,9 @@ public class FormPanel extends JPanel {
     private int componentSpacing;
 
     private JComponent statusBar;
-
+    
+    private ActionListener typingTimeoutActionListener;
+    
     public FormPanel() {
         setLayout(new GridBagLayout());
         componentSpacing = FormDialog.getComponentSpacing();
@@ -66,5 +69,13 @@ public class FormPanel extends JPanel {
 
     JComponent getStatusBar() {
         return this.statusBar;
+    }
+    
+    public void setTypingTimeoutActionListener(ActionListener listener) {
+        this.typingTimeoutActionListener = listener;
+    }
+    
+    ActionListener getTypingTimeoutActionListener() {
+        return this.typingTimeoutActionListener;
     }
 }
