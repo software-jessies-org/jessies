@@ -22,11 +22,11 @@ import javax.swing.*;
 public class PAnchorSet implements PTextListener {
     private ArrayList anchors = new ArrayList();
     
-    public void add(PAnchor anchor) {
+    public synchronized void add(PAnchor anchor) {
         anchors.add(getFirstAnchorIndex(anchor.getIndex()), anchor);
     }
     
-    public void remove(PAnchor anchor) {
+    public synchronized void remove(PAnchor anchor) {
         int start = getFirstAnchorIndex(anchor.getIndex());
         for (int i = start; i < anchors.size(); i++) {
             if (anchor == anchors.get(i)) {
@@ -75,7 +75,7 @@ public class PAnchorSet implements PTextListener {
         return (PAnchor) anchors.get(index);
     }
     
-    public void textInserted(PTextEvent event) {
+    public synchronized void textInserted(PTextEvent event) {
         int start = getFirstAnchorIndex(event.getOffset());
         int insertionLength = event.getLength();
         for (int i = start; i < anchors.size(); i++) {
@@ -84,7 +84,7 @@ public class PAnchorSet implements PTextListener {
         }
     }
     
-    public void dumpAnchorIndices() {
+    public synchronized void dumpAnchorIndices() {
         for (int i = 0; i < anchors.size(); i++) {
             PAnchor anchor = get(i);
             System.err.println("  Anchor " + i + ": " + anchor);
@@ -93,16 +93,18 @@ public class PAnchorSet implements PTextListener {
     
     public void textRemoved(PTextEvent event) {
         LinkedList deletionList = new LinkedList();
-        int start = getFirstAnchorIndex(event.getOffset());
-        int deletionLength = event.getLength();
-        int deletionEnd = event.getOffset() + event.getLength();
-        for (int i = start; i < anchors.size(); i++) {
-            PAnchor anchor = get(i);
-            if (anchor.getIndex() < deletionEnd) {
-                deletionList.add(anchor);
-                anchors.remove(i--);
-            } else {
-                anchor.setIndex(anchor.getIndex() - deletionLength);
+        synchronized (this) {
+            int start = getFirstAnchorIndex(event.getOffset());
+            int deletionLength = event.getLength();
+            int deletionEnd = event.getOffset() + event.getLength();
+            for (int i = start; i < anchors.size(); i++) {
+                PAnchor anchor = get(i);
+                if (anchor.getIndex() < deletionEnd) {
+                    deletionList.add(anchor);
+                    anchors.remove(i--);
+                } else {
+                    anchor.setIndex(anchor.getIndex() - deletionLength);
+                }
             }
         }
         // We call all the anchors' delete methods after we've updated all the
@@ -113,16 +115,19 @@ public class PAnchorSet implements PTextListener {
         // changes to the indexing of the latter anchors.  In short, it leads
         // to a loss of linearity in the anchor list (which must be kept
         // sorted), and thus bugs.
+        //
+        // This code is not synchronized, because calling out to arbitrary code
+        // from a synchronized state is just damned dangerous.
         for (int i = 0; i < deletionList.size(); i++) {
             ((PAnchor) deletionList.get(i)).delete();
         }
     }
     
-    public void textCompletelyReplaced(PTextEvent event) {
+    public synchronized void textCompletelyReplaced(PTextEvent event) {
         clear();
     }
     
-    public void clear() {
+    public synchronized void clear() {
         checkLinearity();
         for (int i = 0; i < anchors.size(); i++) {
             PAnchor anchor = get(i);
