@@ -84,7 +84,7 @@ public class FormDialog extends JDialog {
     public static boolean show(Frame parent, String title, FormPanel contentPane, String actionLabel, JButton extraButton) {
         FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, extraButton, true);
         formDialog.setVisible(true);
-        return formDialog.wasAccepted();
+        return formDialog.wasAccepted;
     }
 
     private FormDialog(Frame parent, String title, FormPanel contentPane, String actionLabel, JButton extraButton, boolean modal) {
@@ -260,7 +260,7 @@ public class FormDialog extends JDialog {
      * the LayoutManager was allowing my JButton to be clipped. It wasn't; this
      * code was forcing the clipping to occur. Hence the restriction now.)
      */
-    public void restorePreviousSize() {
+    private void restorePreviousSize() {
         Rectangle previousBounds = (Rectangle) dialogGeometries.get(getTitle());
         if (previousBounds != null) {
             setLocation(previousBounds.getLocation());
@@ -271,26 +271,22 @@ public class FormDialog extends JDialog {
         }
     }
     
-    public void acceptDialog() {
+    private void acceptDialog() {
         processUserChoice(true);
     }
 
-    public void cancelDialog() {
+    private void cancelDialog() {
         processUserChoice(false);
     }
 
-    public void processUserChoice(boolean isAcceptance) {
+    private void processUserChoice(boolean isAcceptance) {
         textChangeTimer.stop();
         dialogGeometries.put(getTitle(), getBounds());
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
         dispose();
     }
-
-    public boolean wasAccepted() {
-        return wasAccepted;
-    }
-
+    
     private JPanel makeButtonPanel(JRootPane rootPane, String actionLabel, JButton extraButton, JComponent statusBar) {
         JButton actionButton = new JButton(actionLabel);
         actionButton.addActionListener(new ActionListener() {
