@@ -122,12 +122,22 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	 * Pastes the text on the clipboard into the terminal.
 	 */
 	public void paste() {
+		pasteClipboard(getToolkit().getSystemClipboard());
+	}
+	
+	/**
+	 * Pastes the system selection, generally only available on X11.
+	 */
+	public void pasteSystemSelection() {
+		Clipboard systemSelection = getToolkit().getSystemSelection();
+		if (systemSelection != null) {
+			pasteClipboard(systemSelection);
+		}
+	}
+	
+	private void pasteClipboard(Clipboard clipboard) {
 		try {
-			Toolkit toolkit = getToolkit();
-			Transferable contents = toolkit.getSystemClipboard().getContents(this);
-			if (toolkit.getSystemSelection() != null) {
-				contents = toolkit.getSystemSelection().getContents(this);
-			}
+			Transferable contents = clipboard.getContents(this);
 			DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
 			String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
 			insertText(string);
