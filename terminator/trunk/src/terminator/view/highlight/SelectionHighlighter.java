@@ -93,7 +93,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	
 	public void mouseClicked(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON2) {
-			view.paste();
+			view.pasteSystemSelection();
 		}
 	}
 	
