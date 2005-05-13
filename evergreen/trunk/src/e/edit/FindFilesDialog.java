@@ -23,8 +23,6 @@ public class FindFilesDialog {
     private ETree matchView;
     private DefaultTreeModel matchTreeModel;
     
-    private boolean haveSearched;
-    
     private Workspace workspace;
     
     private FileFinder workerThread;
@@ -330,7 +328,6 @@ public class FindFilesDialog {
     
     public FindFilesDialog(Workspace workspace) {
         this.workspace = workspace;
-        this.haveSearched = false;
     }
 
     /**

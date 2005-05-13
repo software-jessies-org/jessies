@@ -23,7 +23,6 @@ public class OpenQuicklyDialog {
     private JList matchList;
     private JLabel status = new JLabel(" ");
     
-    private boolean haveSearched;
     private DefaultListModel model;
     
     private Workspace workspace;
@@ -80,7 +79,6 @@ public class OpenQuicklyDialog {
     
     public OpenQuicklyDialog(Workspace workspace) {
         this.workspace = workspace;
-        this.haveSearched = false;
         FormDialog.markAsMonitoredField(filenameField);
     }
 
@@ -155,11 +153,6 @@ public class OpenQuicklyDialog {
         
         if (okay == false) {
             return;
-        }
-        
-        // Ensure that, if the user was too fast in hitting return, we've definitely searched.
-        if (haveSearched == false) {
-            showMatches();
         }
         
         openSelectedFilesFromList();
