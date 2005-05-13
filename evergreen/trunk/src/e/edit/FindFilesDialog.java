@@ -372,6 +372,11 @@ public class FindFilesDialog {
         formPanel.addRow("Whose Names Match:", directoryField);
         formPanel.addRow("Matches:", new JScrollPane(matchView));
         formPanel.setStatusBar(status);
+        formPanel.setTypingTimeoutActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showMatches();
+            }
+        });
         
         FormDialog formDialog = FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel);
         
