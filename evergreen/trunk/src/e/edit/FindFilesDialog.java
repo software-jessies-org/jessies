@@ -17,8 +17,8 @@ import e.util.*;
  * 
  */
 public class FindFilesDialog {
-    private CheapMonitoredField patternField = new CheapMonitoredField();
-    private CheapMonitoredField directoryField = new CheapMonitoredField();
+    private JTextField patternField = new JTextField();
+    private JTextField directoryField = new JTextField();
     private JLabel status = new JLabel(" ");
     private ETree matchView;
     private DefaultTreeModel matchTreeModel;
@@ -243,23 +243,6 @@ public class FindFilesDialog {
         }
         public void taggingFailed(Exception ex) {
             Log.warn("Failed to use tags to check for a definition.", ex);
-        }
-    }
-    
-    public class CheapMonitoredField extends EMonitoredTextField {
-        public CheapMonitoredField() {
-            super(40);
-        }
-        
-        /** Tracks (cheaply) *every* keypress, because it's important to know whether the search results are up-to-date. */
-        public void textChanged() {
-            super.textChanged();
-            haveSearched = false;
-        }
-        
-        public void timerExpired() {
-            haveSearched = true;
-            showMatches();
         }
     }
     

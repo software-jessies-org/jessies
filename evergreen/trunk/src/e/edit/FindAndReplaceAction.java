@@ -14,14 +14,8 @@ import e.util.*;
 public class FindAndReplaceAction extends ETextAction {
     private static final String ACTION_NAME = "Find/Replace...";
     
-    public class LiveTextField extends EMonitoredTextField {
-        public void timerExpired() {
-            showMatches();
-        }
-    }
-    
-    private LiveTextField patternField = new LiveTextField();
-    private LiveTextField replacementField = new LiveTextField();
+    private JTextField patternField = new JTextField(40);
+    private JTextField replacementField = new JTextField(40);
     private JLabel statusLabel = new JLabel(" ");
     private JList matchList;
     private JList replacementsList;
@@ -30,6 +24,8 @@ public class FindAndReplaceAction extends ETextAction {
     public FindAndReplaceAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("R", false));
+        FormDialog.markAsMonitoredField(patternField);
+        FormDialog.markAsMonitoredField(replacementField);
     }
     
     private ETextWindow textWindow;
@@ -96,6 +92,11 @@ public class FindAndReplaceAction extends ETextAction {
         formPanel.addRow("", statusLabel);
         formPanel.addRow("Matches:", matchPane);
         formPanel.addRow("Replacements:", replacementsPane);
+        formPanel.setTypingTimeoutActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showMatches();
+            }
+        });
         
         // We keep going around the loop of show-dialog/process-text until:
         // (a) the user cancels the dialog.
@@ -249,7 +250,7 @@ public class FindAndReplaceAction extends ETextAction {
         statusLabel.setText("Matches: " + matchCount);
     }
     
-    public void setStatusToBad(String explanation, LiveTextField badField) {
+    public void setStatusToBad(String explanation, JTextField badField) {
         badField.setForeground(Color.RED);
         statusLabel.setText(explanation);
     }
