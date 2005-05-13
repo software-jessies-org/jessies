@@ -129,6 +129,10 @@ public class TagReader {
             tag = new RubyTag(identifier, lineNumber, type, context, containingClass);
         } else {
             tag = new TagReader.Tag(identifier, lineNumber, type, context, containingClass);
+            if (tag.type == null) {
+                tag.type = "unknown tag type '" + type + "'";
+                Log.warn(tag.type + " at line " + line);
+            }
         }
         
         tag.isStatic = (lineNumber == staticTagLineNumber | tag.isStatic);
@@ -230,10 +234,6 @@ public class TagReader {
                 tagType = 'C';
             }
             this.type = (String) TYPES.get(String.valueOf(tagType));
-            if (this.type == null) {
-                this.type = "unknown tag type '" + tagType + "'";
-                Log.warn(this.type);
-            }
         }
         
         public String describeVisibility() {
