@@ -81,6 +81,7 @@ public class OpenQuicklyDialog {
     public OpenQuicklyDialog(Workspace workspace) {
         this.workspace = workspace;
         this.haveSearched = false;
+        FormDialog.markAsMonitoredField(filenameField);
     }
 
     /**

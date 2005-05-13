@@ -17,8 +17,8 @@ import e.util.*;
  * 
  */
 public class FindFilesDialog {
-    private JTextField patternField = new JTextField();
-    private JTextField directoryField = new JTextField();
+    private JTextField patternField = new JTextField(40);
+    private JTextField directoryField = new JTextField(40);
     private JLabel status = new JLabel(" ");
     private ETree matchView;
     private DefaultTreeModel matchTreeModel;
