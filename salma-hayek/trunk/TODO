@@ -48,3 +48,9 @@ Items to be done for PTextArea:
        This is waiting for a good idea.  That may come in the form of generalizing the problem or of deciding on an elegant way to implement it.
        
   (2) Use PSameStyleCharSequence instead of regular expressions to exclude comments etc from the code which finds the mismatched brackets whose partners should be inserted.
+
+* Tags:
+
+  add canonical tag types to TagReader.Tag for ctags' html tag types, and implement TagReader.HtmlTag to make sure that there are no tag name clashes.
+
+  2005-05-13T04:11:45.322-0700 Edit: unknown tag type 'a' at line __index__ /home/martind/playpen/bit-errors/netdisco-0.93/doc/INSTALL.html 9;" a
