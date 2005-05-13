@@ -328,6 +328,8 @@ public class FindFilesDialog {
     
     public FindFilesDialog(Workspace workspace) {
         this.workspace = workspace;
+        FormDialog.markAsMonitoredField(patternField);
+        FormDialog.markAsMonitoredField(directoryField);
     }
 
     /**
