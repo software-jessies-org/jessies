@@ -353,9 +353,12 @@ public class JTerminalPane extends JPanel {
 		}
 	}
 	
+	private SelectionHighlighter getSelectionHighlighter() {
+		return (SelectionHighlighter) textPane.getHighlighterOfClass(SelectionHighlighter.class);
+	}
+	
 	public void selectAll() {
-		SelectionHighlighter selectionHighlighter = (SelectionHighlighter) textPane.getHighlighterOfClass(SelectionHighlighter.class);
-		selectionHighlighter.selectAll();
+		getSelectionHighlighter().selectAll();
 	}
 	
 	public void pageUp() {
@@ -495,6 +498,9 @@ public class JTerminalPane extends JPanel {
 		return new InfoAction(text);
 	}
 	
+	public void doCopyAction() {
+		getSelectionHighlighter().copy();
+	}
 	public void doPasteAction() {
 		textPane.paste();
 	}
