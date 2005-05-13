@@ -1,5 +1,6 @@
 package e.forms;
 
+import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -14,7 +15,7 @@ public class FormPanel extends JPanel {
 
     private JComponent statusBar;
     
-    private ActionListener typingTimeoutActionListener;
+    private ActionListener typingTimeoutActionListener = new NoOpAction();
     
     public FormPanel() {
         setLayout(new GridBagLayout());

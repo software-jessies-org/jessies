@@ -123,14 +123,9 @@ public class FormDialog extends JDialog {
         // Support for "as-you-type" interfaces that update whenever the user
         // pauses in their typing.
         ActionListener listener = contentPane.getTypingTimeoutActionListener();
-        if (listener == null) {
-            return;
-        }
         initComponentListener(listener);
         initTextChangeTimer(listener);
-        // Operates on the textChangeTimer.
-        initDocumentListener();
-        addTextFieldListeners(contentPane);
+        initDocumentListener(contentPane);
     }
     
     /**
@@ -156,7 +151,8 @@ public class FormDialog extends JDialog {
     /**
      * Restarts our timer whenever the user types.
      */
-    private void initDocumentListener() {
+    private void initDocumentListener(FormPanel contentPane) {
+        // Create a listener...
         documentListener = new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 textChanged();
@@ -175,6 +171,8 @@ public class FormDialog extends JDialog {
                 isListenerUpToDate = false;
             }
         };
+        // ...and attach it to the text fields.
+        addTextFieldListeners(contentPane);
     }
     
     /**
@@ -212,13 +210,10 @@ public class FormDialog extends JDialog {
     }
     
     private void removeTextFieldListeners() {
-        if (listenedToTextFields == null) {
-            return;
+        for (int i = listenedToTextFields.size() - 1; i >= 0; --i) {
+            JTextComponent field = (JTextComponent) listenedToTextFields.remove(i);
+            field.getDocument().removeDocumentListener(documentListener);
         }
-        for (int i = 0; i < listenedToTextFields.size(); ++i) {
-            ((JTextComponent) listenedToTextFields.get(i)).getDocument().removeDocumentListener(documentListener);
-        }
-        listenedToTextFields = null;
     }
     
     private void initCloseBehavior() {
@@ -288,9 +283,7 @@ public class FormDialog extends JDialog {
     }
 
     private void processUserChoice(boolean isAcceptance) {
-        if (textChangeTimer != null) {
-            textChangeTimer.stop();
-        }
+        textChangeTimer.stop();
         dialogGeometries.put(getTitle(), getBounds());
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
