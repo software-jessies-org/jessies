@@ -17,7 +17,6 @@ public class FindDialog {
     private JTextBuffer textToFindIn;
     
     private FindDialog() {
-        FormDialog.markAsMonitoredField(findField);
     }
     
     public static FindDialog getSharedInstance() {
