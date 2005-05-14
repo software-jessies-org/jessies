@@ -599,7 +599,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         File backupFile = FileUtilities.fileFromString(this.filename + ".bak");
         if (file.exists()) {
             try {
-                text.getTextBuffer().writeToFile(backupFile);
+                writeToFile(backupFile);
             } catch (Exception ex) {
                 Edit.showAlert("Save", "File '" + this.filename + "' wasn't saved! Couldn't create backup file.");
                 return false;
@@ -610,7 +610,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             Edit.showStatus("Saving " + filename + "...");
             // The file may be a symlink on a cifs server.
             // In this case, it's important that we write into the original file rather than creating a new one.
-            text.getTextBuffer().writeToFile(file);
+            writeToFile(file);
             text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
             Edit.showStatus("Saved " + filename);
@@ -637,7 +637,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                     return false;
                 }
             }
-            text.getTextBuffer().writeToFile(newFile);
+            writeToFile(newFile);
             return true;
         } catch (Exception ex) {
             Edit.showAlert("Save As", "Couldn't save file '" + newFilename + "' (" + ex.getMessage() + ").");
@@ -645,7 +645,28 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         return false;
     }
-        
+    
+    private void writeToFile(File file) {
+        ensureBufferEndsInNewline();
+        text.getTextBuffer().writeToFile(file);
+    }
+    
+    /**
+     * JLS3 3.4 implies that all files must end with a line terminator. It's
+     * pointless requiring a round trip for the user if this isn't the case,
+     * so we silently fix their files.
+     */
+    private void ensureBufferEndsInNewline() {
+        if (isCPlusPlus() || isJava()) {
+            PTextBuffer buffer = text.getTextBuffer();
+            if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '\n') {
+                System.out.println("no newline at end of buffer");
+                // '\n' is always correct; the buffer will translate if needed.
+                text.append("\n");
+            }
+        }
+    }
+    
     /**
      * Implements the Comparable interface so windows can be sorted
      * into alphabetical order by title.
@@ -654,3 +675,4 @@ public class ETextWindow extends EWindow implements PTextListener {
         return getTitle().compareTo(((EWindow) other).getTitle());
     }
 }
+
