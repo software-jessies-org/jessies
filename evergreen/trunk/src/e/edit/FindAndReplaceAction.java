@@ -24,8 +24,6 @@ public class FindAndReplaceAction extends ETextAction {
     public FindAndReplaceAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("R", false));
-        FormDialog.markAsMonitoredField(patternField);
-        FormDialog.markAsMonitoredField(replacementField);
     }
     
     private ETextWindow textWindow;
