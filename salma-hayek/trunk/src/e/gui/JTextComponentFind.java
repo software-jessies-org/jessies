@@ -142,7 +142,6 @@ public class JTextComponentFind {
     
     private JTextComponentFind(final JTextComponent textComponent) {
         this.textComponent = textComponent;
-        FormDialog.markAsMonitoredField(findField);
         initKeyStrokes(textComponent, true);
         initKeyStrokes(findField, false);
     }

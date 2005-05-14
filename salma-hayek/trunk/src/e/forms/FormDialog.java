@@ -28,8 +28,6 @@ import e.util.*;
  * will be preserved.
  */
 public class FormDialog extends JDialog {
-    private static final String MONITORED_FIELD_KEY = "e.forms.FormDialog.MONITORED_FIELD_KEY";
-    
     private static int componentSpacing = getComponentSpacing();
     
     private static HashMap dialogGeometries = new HashMap();
@@ -49,13 +47,6 @@ public class FormDialog extends JDialog {
             return 4;
         }
         return 10;
-    }
-    
-    /**
-     * Tells the form about a text component you want to monitor typing in.
-     */
-    public static void markAsMonitoredField(JTextComponent component) {
-        component.putClientProperty(MONITORED_FIELD_KEY, Boolean.TRUE);
     }
     
     /**
@@ -196,13 +187,13 @@ public class FormDialog extends JDialog {
     }
     
     /**
-     * Adds listeners to all the text fields marked with markAsMonitoredField.
+     * Adds listeners to all the text fields.
      */
     private void addTextFieldListeners(FormPanel contentPane) {
         listenedToTextFields = new ArrayList();
         for (int i = 0; i < contentPane.getComponentCount(); ++i) {
             JComponent component = (JComponent) contentPane.getComponent(i);
-            if (component.getClientProperty(FormDialog.MONITORED_FIELD_KEY) != null) {
+            if (component instanceof JTextComponent) {
                 ((JTextComponent) component).getDocument().addDocumentListener(documentListener);
                 listenedToTextFields.add(component);
             }

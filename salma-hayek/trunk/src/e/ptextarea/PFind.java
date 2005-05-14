@@ -59,7 +59,6 @@ public class PFind {
         
         public FindAction() {
             super("Find...", e.util.GuiUtilities.makeKeyStroke("F", false));
-            FormDialog.markAsMonitoredField(findField);
             PTextArea.initKeyBinding(findField, PActionFactory.makeFindNextAction());
             PTextArea.initKeyBinding(findField, PActionFactory.makeFindPreviousAction());
         }
