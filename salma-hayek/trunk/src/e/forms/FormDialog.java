@@ -163,7 +163,8 @@ public class FormDialog extends JDialog {
             }
         };
         // ...and attach it to the text fields.
-        addTextFieldListeners(contentPane);
+        this.listenedToTextFields = contentPane.getTextComponents();
+        addTextFieldListeners();
     }
     
     /**
@@ -189,14 +190,10 @@ public class FormDialog extends JDialog {
     /**
      * Adds listeners to all the text fields.
      */
-    private void addTextFieldListeners(FormPanel contentPane) {
-        listenedToTextFields = new ArrayList();
-        for (int i = 0; i < contentPane.getComponentCount(); ++i) {
-            JComponent component = (JComponent) contentPane.getComponent(i);
-            if (component instanceof JTextComponent) {
-                ((JTextComponent) component).getDocument().addDocumentListener(documentListener);
-                listenedToTextFields.add(component);
-            }
+    private void addTextFieldListeners() {
+        for (int i = 0; i < listenedToTextFields.size(); ++i) {
+            JTextComponent field = (JTextComponent) listenedToTextFields.get(i);
+            field.getDocument().addDocumentListener(documentListener);
         }
     }
     

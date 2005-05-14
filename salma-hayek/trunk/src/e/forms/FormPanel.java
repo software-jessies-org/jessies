@@ -3,6 +3,7 @@ package e.forms;
 import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 
 /**
@@ -17,11 +18,23 @@ public class FormPanel extends JPanel {
     
     private ActionListener typingTimeoutActionListener = new NoOpAction();
     
+    private ArrayList textComponents = new ArrayList();
+    
     public FormPanel() {
         setLayout(new GridBagLayout());
         componentSpacing = FormDialog.getComponentSpacing();
     }
-
+    
+    /**
+     * Adds a row consisting of a label and a corresponding text component.
+     * Text components are automatically listened to for changes; see
+     * setTypingTimeoutAction.
+     */
+    public void addRow(String text, javax.swing.text.JTextComponent component) {
+        textComponents.add(component);
+        addRow(text, (Component) component);
+    }
+    
     /**
      * Adds a row consisting of a label and a corresponding component.
      */
@@ -70,6 +83,10 @@ public class FormPanel extends JPanel {
 
     JComponent getStatusBar() {
         return this.statusBar;
+    }
+    
+    ArrayList getTextComponents() {
+        return this.textComponents;
     }
     
     public void setTypingTimeoutActionListener(ActionListener listener) {
