@@ -157,6 +157,8 @@ JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
 BUILDING_COCOA = $(filter %.m %.mm,$(SOURCES))
 
 LDFLAGS += $(if $(BUILDING_COCOA),-framework Cocoa)
+LDFLAGS += $(if $(BUILDING_COCOA),-F/System/Library/PrivateFrameworks)
+LDFLAGS += $(if $(BUILDING_COCOA),-framework Slideshow)
 
 # ----------------------------------------------------------------------------
 # Work out what native code, if any, we need to build. 
