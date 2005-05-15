@@ -1,7 +1,7 @@
 # This makefile fragment compiles all the C/C++/Objective-C/Objective-C++ source found
 # in $(SOURCE_DIRECTORY) into a single executable or JNI library.
 
-# It is only suitable for inclusion by java.make.
+# It is only suitable for inclusion by universal.make.
 
 # Unusually, it is included multiple times so be careful with += etc.
 # Do not define any variables here which aren't dependent

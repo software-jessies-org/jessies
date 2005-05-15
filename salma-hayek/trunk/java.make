@@ -10,7 +10,7 @@
 # Your calling Makefile:
 #   must define PROJECT_NAME
 #   may append to BINDIST_FILES
-#   must include ../salma-hayek/java.make
+#   must include ../salma-hayek/universal.make
 
 #   must have any extra rules after the include
 #   must set any variables before the include
@@ -298,7 +298,7 @@ define BUILD_JAVA
 endef
 
 # ----------------------------------------------------------------------------
-# Prevent us from using per-directory.make's local variables in java.make
+# Prevent us from using per-directory.make's local variables in universal.make
 # make doesn't support variable scoping, so this requires some cunning.
 # ----------------------------------------------------------------------------
 
@@ -418,7 +418,7 @@ echo.%:
 # Rules for making makefiles.
 # ----------------------------------------------------------------------------
 
-generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/java.make
+generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
 	@mkdir -p $(@D) && \
 	perl -w -ne '(m/^\s*(\S+)\s*[:+]?=/ || m/^\s*define\s*(\S+)/) && print("LOCAL_VARIABLES += $$1\n")' $< | sort -u > $@
 
@@ -427,7 +427,7 @@ generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)
 # Including per-directory.make more than once is bound to violate the
 # variables-before-rules dictum.
 # per-directory.make needs to cope with that but it'd be best if it doesn't impose
-# that constraint on the rest of java.make - so let's keep this last.
+# that constraint on the rest of universal.make - so let's keep this last.
 # ----------------------------------------------------------------------------
 
 define buildNativeDirectory
