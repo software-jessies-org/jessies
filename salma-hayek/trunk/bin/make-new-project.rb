@@ -40,6 +40,13 @@ echo "Making the initial import..."
 svn import $name svn+ssh://$svn_host/home/software/svnroot/$name -m 'New project, $name.'
 echo "Checking back out..."
 svn co svn+ssh://$svn_host/home/software/svnroot/$name $projects_dir/$name
+echo "Telling Subversion to ignore generated files..."
+svn propset svn:ignore 'classes
+generated' .
+echo "Getting Subversion to commit that change..."
+svn update
+echo "Prompting you to manually commit that change..."
+checkintool
 
 echo "Done!"
 exit 0
