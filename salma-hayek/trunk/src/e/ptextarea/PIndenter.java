@@ -5,6 +5,7 @@ import java.util.regex.*;
 
 public abstract class PIndenter {
     protected PTextArea textArea;
+    private Pattern indentationPattern = Pattern.compile("(^[ \\t]*(?:\\* )?).*$");
     
     public PIndenter(PTextArea textArea) {
         this.textArea = textArea;
@@ -34,23 +35,22 @@ public abstract class PIndenter {
     public abstract boolean isElectric(char c);
     
     /**
-     * Returns a copy of just the leading whitespace part of the given line.
+     * Returns a copy of just the leading part of the given line.
+     * Usually that just contains whitespace but the asterisks at the start
+     * of the body lines of a doc-comment are also considered as indentation
+     * because they end in (a single character of) whitespace.
      */
     public String getCurrentIndentationOfLine(int lineNumber) {
-        int start = textArea.getLineStartOffset(lineNumber);
-        int max = textArea.getLineEndOffsetBeforeTerminator(lineNumber);
-        int end;
-        CharSequence chars = textArea.getTextBuffer();
-        for (end = start; end < max; ++end) {
-            char nextChar = chars.charAt(end);
-            if (nextChar != ' ' && nextChar != '\t') {
-                break;
-            }
+        String line = textArea.getLineText(lineNumber);
+        Matcher matcher = indentationPattern.matcher(line);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        } else {
+            throw new IllegalArgumentException("line number " + lineNumber + " \"" + line + "\" has impossible indentation");
         }
-        return chars.subSequence(start, end).toString();
     }
     
-    /** Returns the whitespace that should be used for the given line number. */
+    /** Returns the indentation which should be used for the given line number. */
     public String getIndentation(int lineNumber) {
         final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(lineNumber);
         return (previousNonBlankLineNumber == -1) ? "" : getCurrentIndentationOfLine(previousNonBlankLineNumber);
@@ -80,12 +80,23 @@ public abstract class PIndenter {
         fixIndentationBetween(textArea.getSelectionStart(), textArea.getSelectionEnd());        
     }
     
-    // charsInserted is allowed to be negative.
-    private static int adjustOffsetAfterInsertion(int offsetToAdjust, int offsetOfInsertion, int charsInserted) {
-        if (offsetToAdjust < offsetOfInsertion) {
+    private static int adjustOffsetAfterInsertion(int offsetToAdjust, int lineStartOffset, String originalIndentation, String replacementIndentation) {
+        if (offsetToAdjust < lineStartOffset) {
             return offsetToAdjust;
-        } else {
+        } else if (offsetToAdjust > lineStartOffset + originalIndentation.length()) {
+            int charsInserted = replacementIndentation.length() - originalIndentation.length();
             return offsetToAdjust + charsInserted;
+        } else {
+            return lineStartOffset + replacementIndentation.length();
+        }
+    }
+    private static int adjustOffsetAfterDeletion(int offsetToAdjust, int offsetOfDeletion, int charsDeleted) {
+        if (offsetToAdjust < offsetOfDeletion) {
+            return offsetToAdjust;
+        } else if (offsetToAdjust > offsetOfDeletion + charsDeleted) {
+            return offsetToAdjust - charsDeleted;
+        } else {
+            return offsetOfDeletion;
         }
     }
     
@@ -102,15 +113,21 @@ public abstract class PIndenter {
         int lineIndex = textArea.getLineOfOffset(position);
         String originalIndentation = getCurrentIndentationOfLine(lineIndex);
         String replacementIndentation = getIndentation(lineIndex);
+        String originalLine = textArea.getLineText(lineIndex);
+        String replacementLine = replacementIndentation + originalLine.substring(originalIndentation.length()).trim();
         //Log.warn("originalIndentation=@" + originalIndentation + "@; replacementIndentation=@" + replacementIndentation + "@");
-        if (replacementIndentation.equals(originalIndentation)) {
+        if (replacementLine.equals(originalLine)) {
             return;
         }
         int lineStartOffset = textArea.getLineStartOffset(lineIndex);
         int charsInserted = replacementIndentation.length() - originalIndentation.length();
-        int desiredStartOffset = adjustOffsetAfterInsertion(textArea.getSelectionStart(), lineStartOffset, charsInserted);
-        int desiredEndOffset = adjustOffsetAfterInsertion(textArea.getSelectionEnd(), lineStartOffset, charsInserted);
-        textArea.replaceRange(replacementIndentation, lineStartOffset, lineStartOffset + originalIndentation.length());
+        int desiredStartOffset = adjustOffsetAfterInsertion(textArea.getSelectionStart(), lineStartOffset, originalIndentation, replacementIndentation);
+        int desiredEndOffset = adjustOffsetAfterInsertion(textArea.getSelectionEnd(), lineStartOffset, originalIndentation, replacementIndentation);
+        int trimOffset = lineStartOffset + replacementLine.length();
+        int charsTrimmed = originalLine.length() - (replacementLine.length() - charsInserted);
+        desiredStartOffset = adjustOffsetAfterDeletion(desiredStartOffset, trimOffset, charsTrimmed);
+        desiredEndOffset = adjustOffsetAfterDeletion(desiredEndOffset, trimOffset, charsTrimmed);
+        textArea.replaceRange(replacementLine, lineStartOffset, lineStartOffset + originalLine.length());
         textArea.select(desiredStartOffset, desiredEndOffset);
     }
     

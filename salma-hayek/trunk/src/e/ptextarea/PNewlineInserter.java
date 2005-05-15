@@ -33,6 +33,7 @@ public class PNewlineInserter {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");
+                textArea.getIndenter().fixIndentationAt(position);
                 textArea.getIndenter().fixIndentation();
             }
         } finally {
