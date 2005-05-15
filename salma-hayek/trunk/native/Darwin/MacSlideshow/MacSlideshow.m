@@ -5,7 +5,7 @@
 #import "PrivateFrameworks/Slideshow.h"
 
 @interface MyDelegate : NSObject {
-  NSMutableArray* mFilenames;
+    NSMutableArray* mFilenames;
 }
 - (void) addFilename:(const char*)utf8;
 @end
@@ -50,8 +50,8 @@
     [slideshow runSlideshowWithDataSource:self options:nil];
 
     if (false) {
-    NSURL* pdfUrl = [NSURL fileURLWithPath:@"/Users/elliotth/Desktop/putfield.pdf"];
-    [slideshow runSlideshowWithPDF:pdfUrl options:nil];
+        NSURL* pdfUrl = [NSURL fileURLWithPath:@"/Users/elliotth/Desktop/putfield.pdf"];
+        [slideshow runSlideshowWithPDF:pdfUrl options:nil];
     }
 }
 
@@ -73,7 +73,7 @@ int main(int argCount, char* argValues[]) {
     MyDelegate* delegate = [[MyDelegate alloc] init];
     (void) argCount;
     while (*++argValues) {
-      [delegate addFilename: *argValues];
+        [delegate addFilename: *argValues];
     }
     [application setDelegate: delegate];
     [application run];
