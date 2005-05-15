@@ -23,8 +23,11 @@ BASE_NAME = $(notdir $(SOURCE_DIRECTORY))
 # Find the source.
 # ----------------------------------------------------------------------------
 
-SOURCES := $(wildcard $(addprefix $(SOURCE_DIRECTORY)/*.,$(SOURCE_EXTENSIONS)))
-HEADERS := $(wildcard $(addprefix $(SOURCE_DIRECTORY)/*.,$(HEADER_EXTENSIONS)))
+# BSD find's -false is a synonym for -not.  I kid you false.
+FIND_FALSE = -not -prune
+findCode = $(shell find $(SOURCE_DIRECTORY) -type f '(' $(foreach EXTENSION,$(1),-name "*.$(EXTENSION)" -or) $(FIND_FALSE) ')')
+SOURCES := $(call findCode,$(SOURCE_EXTENSIONS))
+HEADERS := $(call findCode,$(HEADER_EXTENSIONS))
 
 # ----------------------------------------------------------------------------
 # Work out what we're going to generate.
@@ -71,7 +74,7 @@ LOCAL_LDFLAGS += $(if $(BUILDING_COCOA),-framework Slideshow)
 headerToFramework = $(PRIVATE_FRAMEWORKS_DIRECTORY)/$(basename $(notdir $(1))).framework
 frameworkToLinkerFlag = -framework $(basename $(notdir $(1)))
 
-PRIVATE_FRAMEWORK_HEADERS = $(filter PrivateFrameworks/%,$(HEADERS))
+PRIVATE_FRAMEWORK_HEADERS = $(filter $(SOURCE_DIRECTORY)/PrivateFrameworks/%,$(HEADERS))
 PRIVATE_FRAMEWORKS_USED = $(wildcard $(foreach HEADER,$(PRIVATE_FRAMEWORK_HEADERS),$(call headerToFramework,$(HEADER))))
 LOCAL_LDFLAGS += $(foreach PRIVATE_FRAMEWORK,$(PRIVATE_FRAMEWORKS_USED),$(call frameworkToLinkerFlag,$(PRIVATE_FRAMEWORK)))
 
