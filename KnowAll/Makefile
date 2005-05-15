@@ -1,3 +1,3 @@
 PROJECT_NAME=KnowAll
 
-include ../salma-hayek/java.make
+include ../salma-hayek/universal.make
