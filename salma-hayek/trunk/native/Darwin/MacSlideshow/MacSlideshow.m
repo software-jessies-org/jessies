@@ -1,8 +1,8 @@
 // gcc -o slideshow slideshow.m -framework Cocoa -F/System/Library/PrivateFrameworks -framework Slideshow && ./slideshow
 
-#include <Cocoa/Cocoa.h>
+#import <Cocoa/Cocoa.h>
 
-#include "PrivateFrameworks/Slideshow.h"
+#import "PrivateFrameworks/Slideshow.h"
 
 @interface MyDelegate : NSObject {
   NSMutableArray* mFilenames;

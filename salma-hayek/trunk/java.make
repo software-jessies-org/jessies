@@ -113,7 +113,7 @@ CFLAGS += -std=c99
 C_AND_CXXFLAGS += -fPIC
 C_AND_CXXFLAGS += -g
 # Maximum warnings...
-C_AND_CXX_FLAGS += -W -Wall -Werror -pedantic
+C_AND_CXX_FLAGS += -W -Wall -Werror
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
 CPPFLAGS += $(subst $(SPACE)", -I", $(JNI_PATH))
