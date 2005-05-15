@@ -8,6 +8,12 @@
 # on the particular directory being built.
 
 # ----------------------------------------------------------------------------
+# Initialize any directory-specific variables we want to append to here
+# ----------------------------------------------------------------------------
+
+LOCAL_LDFLAGS := $(LDFLAGS)
+
+# ----------------------------------------------------------------------------
 # Choose the basename(1) for the target
 # ----------------------------------------------------------------------------
 
@@ -47,6 +53,36 @@ JNI_OBJECT = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).o
 JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 CLASSES_DIRECTORY = $(PROJECT_ROOT)/classes
 JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
+
+# ----------------------------------------------------------------------------
+# Add Cocoa frameworks if we're building Objective-C/C++.
+# ----------------------------------------------------------------------------
+
+PRIVATE_FRAMEWORKS_DIRECTORY = /System/Library/PrivateFrameworks
+
+BUILDING_COCOA = $(filter %.m %.mm,$(SOURCES))
+
+LOCAL_LDFLAGS += $(if $(BUILDING_COCOA),-framework Cocoa)
+LOCAL_LDFLAGS += $(if $(BUILDING_COCOA),-F$(PRIVATE_FRAMEWORKS_DIRECTORY))
+# TODO: This should come out if the Slideshow interface can be abstracted-out into
+# native/Darwin/MacSlideshow/PrivateFrameworks/Slideshow.h.
+LOCAL_LDFLAGS += $(if $(BUILDING_COCOA),-framework Slideshow)
+
+headerToFramework = $(PRIVATE_FRAMEWORKS_DIRECTORY)/$(basename $(notdir $(1))).framework
+frameworkToLinkerFlag = -framework $(basename $(notdir $(1)))
+
+PRIVATE_FRAMEWORK_HEADERS = $(filter PrivateFrameworks/%,$(HEADERS))
+PRIVATE_FRAMEWORKS_USED = $(wildcard $(foreach HEADER,$(PRIVATE_FRAMEWORK_HEADERS),$(call headerToFramework,$(HEADER))))
+LOCAL_LDFLAGS += $(foreach PRIVATE_FRAMEWORK,$(PRIVATE_FRAMEWORKS_USED),$(call frameworkToLinkerFlag,$(PRIVATE_FRAMEWORK)))
+
+# ----------------------------------------------------------------------------
+# Target-specific variables.
+# These need to be assigned while the right hand side is valid so need to use :=
+# That means they should be after the right hand side is finalized which means
+# after other assignments.
+# ----------------------------------------------------------------------------
+
+$(EXECUTABLE): LDFLAGS := $(LOCAL_LDFLAGS)
 
 # ----------------------------------------------------------------------------
 # Variables above this point,

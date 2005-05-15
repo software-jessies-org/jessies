@@ -151,17 +151,7 @@ JNI_LIBRARY_PREFIX = $(JNI_LIBRARY_PREFIX.$(TARGET_OS))
 JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
-# Add the Cocoa framework if we're building Objective-C/C++.
-# ----------------------------------------------------------------------------
-
-BUILDING_COCOA = $(filter %.m %.mm,$(SOURCES))
-
-LDFLAGS += $(if $(BUILDING_COCOA),-framework Cocoa)
-LDFLAGS += $(if $(BUILDING_COCOA),-F/System/Library/PrivateFrameworks)
-LDFLAGS += $(if $(BUILDING_COCOA),-framework Slideshow)
-
-# ----------------------------------------------------------------------------
-# Work out what native code, if any, we need to build. 
+# Work out what native code, if any, we need to build.
 # ----------------------------------------------------------------------------
 
 NATIVE_SOURCE_PATTERN = $(CURDIR)/native/$(OS)/*/*.$(EXTENSION)
@@ -282,7 +272,7 @@ JAVA_FLAGS.gcjx += -pedantic -verbose -fverify # -error -- reinstate later!
 
 # At the moment, the only platforms with 1.5 are Linux, Solaris, and Windows.
 # None of the developers use Solaris or Windows, so for now it doesn't seem
-# to matter that they're left out. 
+# to matter that they're left out.
 ifeq "$(TARGET_OS)" "Linux"
   # Until Mac OS supports 1.5, we need to avoid using 1.5-specific options.
   JAVA_FLAGS.javac += -Xlint -Xlint:-serial
@@ -304,6 +294,25 @@ define BUILD_JAVA
   mkdir -p classes && \
   $(JAVA_COMPILER) $(JAVA_FLAGS) $(call convertCygwinToWin32Path,$(SOURCE_FILES))
 endef
+
+# ----------------------------------------------------------------------------
+# Prevent us from using native.make's local variables in java.make
+# make doesn't support variable scoping, so this requires some cunning.
+# ----------------------------------------------------------------------------
+
+# -include because, on the first run, it doesn't exist and, even it has seen
+# the rule for building it, make doesn't run the rule (it doesn't run any
+# rules in that phase of makefile processing).
+# You still seem to get protection of a new local variable the first time you
+# run make after adding it.
+# So that's OK then.
+-include generated/local-variables.make
+
+define unsetLocalVariable
+  $(1) = $$(error makefile bug: local variable $(1) was referred to outside its scope)
+endef
+
+unsetLocalVariables = $(foreach LOCAL_VARIABLE,$(LOCAL_VARIABLES),$(eval $(call unsetLocalVariable,$(LOCAL_VARIABLE))))
 
 # ----------------------------------------------------------------------------
 # Variables above this point,
@@ -391,6 +400,14 @@ echo.%:
 	@echo '"$($*)"'
 
 # ----------------------------------------------------------------------------
+# Rules for making makefiles.
+# ----------------------------------------------------------------------------
+
+generated/local-variables.make: $(SALMA_HAYEK)/native.make
+	@mkdir -p $(@D) && \
+	perl -ne 'm/^(\S+) *[:+]?=/ && print ("LOCAL_VARIABLES += $$1\n")' $< | sort -u > $@
+
+# ----------------------------------------------------------------------------
 # The magic incantation to build and clean all the native subdirectories.
 # Including native.make more than once is bound to violate the
 # variables-before-rules dictum.
@@ -401,6 +418,7 @@ echo.%:
 define buildNativeDirectory
   SOURCE_DIRECTORY = $(1)
   include $(SALMA_HAYEK)/native.make
+  $(unsetLocalVariables)
 endef
 
 $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR))))
