@@ -1,10 +1,10 @@
-# This makefile compiles all the C/C++/Objective-C/Objective-C++ source found
+# This makefile fragment compiles all the C/C++/Objective-C/Objective-C++ source found
 # in $(SOURCE_DIRECTORY) into a single executable or JNI library.
 
 # It is only suitable for inclusion by java.make.
 
 # Unusually, it is included multiple times so be careful with += etc.
-# As a rule of thumb, do not define any variables here which aren't dependent
+# Do not define any variables here which aren't dependent
 # on the particular directory being built.
 
 # ----------------------------------------------------------------------------

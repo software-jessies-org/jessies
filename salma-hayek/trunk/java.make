@@ -310,11 +310,14 @@ endef
 # So that's OK then.
 -include generated/local-variables.make
 
+# We want to use the $(BASE_NAME) of the preceding scope in error messages.
+LOCAL_VARIABLES := $(filter-out BASE_NAME,$(LOCAL_VARIABLES))
+
 define copyLocalVariable
   $(1).$(BASE_NAME) := $$($(1))
 endef
 define unsetLocalVariable
-  $(1) = $$(error makefile bug: local variable $(1) was referred to outside its scope)
+  $(1) = $$(shell $(RM) generated/local-variables.make)$$(error makefile bug: local variable $(1) from scope $(BASE_NAME) was referred to in scope $$(BASE_NAME))
 endef
 
 # We need to $(eval) each assignment individually before they're concatenated
@@ -433,3 +436,4 @@ define buildNativeDirectory
 endef
 
 DUMMY := $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR)))$(closeLocalVariableScope))
+BASE_NAME = (rules)
