@@ -18,6 +18,8 @@ Items to be done for PTextArea:
 
 * Style C/C++ pre-processor tokens specially.
 
+* Auto-scroll on selection (all types) flickers more than I think it should when there's a wrapped line.
+
 * the following JTextArea methods are thread-safe: append, insert, replace, and setText.
 
 * we can perhaps take Ed's old suggestion for how menus should work into account, and have a constructive scheme, rather than a replacement scheme. (so there's basic stuff offered by the component, extra stuff from the spelling checker, extra stuff from the application, et cetera. Cocoa has hooks for random other bits of code to declare they have actions too.)
