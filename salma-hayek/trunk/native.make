@@ -12,6 +12,7 @@
 # ----------------------------------------------------------------------------
 
 LOCAL_LDFLAGS := $(LDFLAGS)
+MISSING_PREREQUISITES :=
 
 # ----------------------------------------------------------------------------
 # Choose the basename(1) for the target
@@ -30,7 +31,7 @@ SOURCES := $(call findCode,$(SOURCE_EXTENSIONS))
 HEADERS := $(call findCode,$(HEADER_EXTENSIONS))
 
 # ----------------------------------------------------------------------------
-# Work out what we're going to generate.
+# Locate the common intermediate files.
 # ----------------------------------------------------------------------------
 
 GENERATED_DIRECTORY = $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_ROOT)/generated/%/$(TARGET_OS),$(SOURCE_DIRECTORY))
@@ -39,11 +40,17 @@ OBJECTS = $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst $(SOURCE_DIRECTORY
 SOURCE_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(SOURCES))
 HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(HEADERS))
 
-EXECUTABLE = $(GENERATED_DIRECTORY)/$(BASE_NAME)
-JNI_LIBRARY = $(GENERATED_DIRECTORY)/$(JNI_LIBRARY_PREFIX)$(BASE_NAME).$(JNI_LIBRARY_EXTENSION)
+# ----------------------------------------------------------------------------
+# Locate the executable.
+# ----------------------------------------------------------------------------
 
-BUILDING_JNI_LIBRARY = $(JNI_SOURCE)
-DEFAULT_TARGET = $(if $(BUILDING_JNI_LIBRARY),$(JNI_LIBRARY),$(EXECUTABLE))
+EXECUTABLE = $(GENERATED_DIRECTORY)/$(BASE_NAME)
+
+# ----------------------------------------------------------------------------
+# Locate the JNI library and its intermediate files.
+# ----------------------------------------------------------------------------
+
+JNI_LIBRARY = $(GENERATED_DIRECTORY)/$(JNI_LIBRARY_PREFIX)$(BASE_NAME).$(JNI_LIBRARY_EXTENSION)
 
 # $(foreach) generates a space-separated list even where the elements either side are empty strings.
 # $(strip) removes spurious spaces.
@@ -57,6 +64,11 @@ JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 CLASSES_DIRECTORY = $(PROJECT_ROOT)/classes
 JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 
+define JAVAH_RULE
+  "$(JAVAH)" -classpath $(call convertCygwinToWin32Path,$(CLASSES_DIRECTORY)) -d $(call convertCygwinToWin32Path,$(GENERATED_JNI_DIRECTORY)) $(JNI_CLASS_NAME) && \
+  { cmp --quiet $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
+endef
+
 # ----------------------------------------------------------------------------
 # Add Cocoa frameworks if we're building Objective-C/C++.
 # ----------------------------------------------------------------------------
@@ -67,16 +79,30 @@ BUILDING_COCOA = $(filter %.m %.mm,$(SOURCES))
 
 LOCAL_LDFLAGS += $(if $(BUILDING_COCOA),-framework Cocoa)
 LOCAL_LDFLAGS += $(if $(BUILDING_COCOA),-F$(PRIVATE_FRAMEWORKS_DIRECTORY))
-# TODO: This should come out if the Slideshow interface can be abstracted-out into
-# native/Darwin/MacSlideshow/PrivateFrameworks/Slideshow.h.
-LOCAL_LDFLAGS += $(if $(BUILDING_COCOA),-framework Slideshow)
 
 headerToFramework = $(PRIVATE_FRAMEWORKS_DIRECTORY)/$(basename $(notdir $(1))).framework
 frameworkToLinkerFlag = -framework $(basename $(notdir $(1)))
 
 PRIVATE_FRAMEWORK_HEADERS = $(filter $(SOURCE_DIRECTORY)/PrivateFrameworks/%,$(HEADERS))
-PRIVATE_FRAMEWORKS_USED = $(wildcard $(foreach HEADER,$(PRIVATE_FRAMEWORK_HEADERS),$(call headerToFramework,$(HEADER))))
+PRIVATE_FRAMEWORKS_USED = $(foreach HEADER,$(PRIVATE_FRAMEWORK_HEADERS),$(call headerToFramework,$(HEADER)))
 LOCAL_LDFLAGS += $(foreach PRIVATE_FRAMEWORK,$(PRIVATE_FRAMEWORKS_USED),$(call frameworkToLinkerFlag,$(PRIVATE_FRAMEWORK)))
+
+MISSING_PRIVATE_FRAMEWORKS := $(filter-out $(wildcard $(PRIVATE_FRAMEWORKS_USED)),$(PRIVATE_FRAMEWORKS_USED))
+MISSING_PREREQUISITES += $(MISSING_PRIVATE_FRAMEWORKS)
+
+# ----------------------------------------------------------------------------
+# Decide on the default target.
+# ----------------------------------------------------------------------------
+
+BUILDING_JNI_LIBRARY = $(JNI_SOURCE)
+DESIRED_TARGET = $(if $(BUILDING_JNI_LIBRARY),$(JNI_LIBRARY),$(EXECUTABLE))
+DEFAULT_TARGET = $(if $(strip $(MISSING_PREREQUISITES)),missing-prerequisites.$(BASE_NAME),$(DESIRED_TARGET))
+
+define MISSING_PREREQUISITES_RULE
+  @echo "*** Can't build $(BASE_NAME) because of missing prerequisites:" && \
+  $(foreach PREREQUISITE,$(MISSING_PREREQUISITES),echo "  \"$(PREREQUISITE)\"" &&) \
+  true
+endef
 
 # ----------------------------------------------------------------------------
 # Target-specific variables.
@@ -86,6 +112,9 @@ LOCAL_LDFLAGS += $(foreach PRIVATE_FRAMEWORK,$(PRIVATE_FRAMEWORKS_USED),$(call f
 # ----------------------------------------------------------------------------
 
 $(EXECUTABLE): LDFLAGS := $(LOCAL_LDFLAGS)
+$(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
+$(GENERATED_JNI_HEADER): RULE := $(JAVAH_RULE)
+missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
 # ----------------------------------------------------------------------------
 # Variables above this point,
@@ -111,7 +140,7 @@ $(EXECUTABLE): $(OBJECTS)
 
 # There is no default rule for shared library building on my system.
 $(JNI_LIBRARY): $(OBJECTS)
-	$(LD) $(OBJECTS) -o $@ $(JNI_LIBRARY_LDFLAGS)
+	$(LD) $^ -o $@ $(LDFLAGS)
 
 # ----------------------------------------------------------------------------
 # Generate our JNI header.
@@ -123,14 +152,21 @@ $(GENERATED_JNI_HEADER): $(JNI_CLASS_FILE)
 	@echo Generating JNI header... && \
 	mkdir -p $(@D) && \
 	rm -f $@ && \
-	"$(JAVAH)" -classpath $(call convertCygwinToWin32Path,$(CLASSES_DIRECTORY)) -d $(call convertCygwinToWin32Path,$(GENERATED_JNI_DIRECTORY)) $(JNI_CLASS_NAME) && \
-	{ cmp --quiet $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
+	$(RULE)
 
 $(JNI_OBJECT): $(COMPILED_JNI_HEADER)
 build: $(GENERATED_JNI_HEADER)
 $(COMPILED_JNI_HEADER): | $(GENERATED_JNI_HEADER);
 
 endif
+
+# ----------------------------------------------------------------------------
+# What to do if something we need isn't installed but we want to continue building everything else.
+# ----------------------------------------------------------------------------
+
+.PHONY: missing-prerequisites.$(BASE_NAME)
+missing-prerequisites.$(BASE_NAME):
+	$(RULE)
 
 # ----------------------------------------------------------------------------
 # Create "the build tree", GNU-style.
@@ -151,14 +187,3 @@ $(SOURCE_LINKS) $(HEADER_LINKS): $(GENERATED_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
 # conservatively assume that if a header files changes, we have to recompile
 # everything.
 $(OBJECTS): $(HEADER_LINKS) $(HEADERS) $(MAKEFILE_LIST)
-
-# ----------------------------------------------------------------------------
-# Rules for tidying-up.
-# ----------------------------------------------------------------------------
-
-.PHONY: clean
-clean: clean.$(GENERATED_DIRECTORY)
-
-.PHONY: clean.$(GENERATED_DIRECTORY)
-clean.$(GENERATED_DIRECTORY):
-	rm -rf $(GENERATED_DIRECTORY)

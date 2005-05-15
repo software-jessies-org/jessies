@@ -184,6 +184,7 @@ endef
 CREATE_OR_UPDATE_JAR=cd $(2) && $(JAR) $(1)f $(CURDIR)/$@ -C classes $(notdir $(wildcard $(2)/classes/*))
 
 GENERATED_FILES += classes
+GENERATED_FILES += generated
 GENERATED_FILES += $(PROJECT_NAME).jar
 GENERATED_FILES += $(PROJECT_NAME)-bindist.tgz
 
@@ -308,11 +309,21 @@ endef
 # So that's OK then.
 -include generated/local-variables.make
 
+define copyLocalVariable
+  $(1).$(BASE_NAME) := $$($(1))
+endef
 define unsetLocalVariable
   $(1) = $$(error makefile bug: local variable $(1) was referred to outside its scope)
 endef
 
-unsetLocalVariables = $(foreach LOCAL_VARIABLE,$(LOCAL_VARIABLES),$(eval $(call unsetLocalVariable,$(LOCAL_VARIABLE))))
+# We need to $(eval) each assignment individually before they're concatenated
+# by $(foreach) and hence turned into a syntax error.
+forEachLocalVariable = $(foreach LOCAL_VARIABLE,$(LOCAL_VARIABLES),$(eval $(call $(1),$(LOCAL_VARIABLE))))
+
+define closeLocalVariableScope
+  $(call forEachLocalVariable,copyLocalVariable)
+  $(call forEachLocalVariable,unsetLocalVariable)
+endef
 
 # ----------------------------------------------------------------------------
 # Variables above this point,
@@ -336,7 +347,7 @@ build.java: $(SOURCE_FILES)
 
 .PHONY: clean
 clean:
-	@$(RM) -rf $(GENERATED_FILES)
+	@$(RM) -r $(GENERATED_FILES)
 
 .PHONY: dist
 dist: build
@@ -418,7 +429,6 @@ generated/local-variables.make: $(SALMA_HAYEK)/native.make
 define buildNativeDirectory
   SOURCE_DIRECTORY = $(1)
   include $(SALMA_HAYEK)/native.make
-  $(unsetLocalVariables)
 endef
 
-$(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR))))
+DUMMY := $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR)))$(closeLocalVariableScope))
