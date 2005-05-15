@@ -414,9 +414,9 @@ echo.%:
 # Rules for making makefiles.
 # ----------------------------------------------------------------------------
 
-generated/local-variables.make: $(SALMA_HAYEK)/native.make
+generated/local-variables.make: $(SALMA_HAYEK)/native.make $(SALMA_HAYEK)/java.make
 	@mkdir -p $(@D) && \
-	perl -ne 'm/^(\S+) *[:+]?=/ && print ("LOCAL_VARIABLES += $$1\n")' $< | sort -u > $@
+	perl -w -ne '(m/^\s*(\S+)\s*[:+]?=/ || m/^\s*define\s*(\S+)/) && print("LOCAL_VARIABLES += $$1\n")' $< | sort -u > $@
 
 # ----------------------------------------------------------------------------
 # The magic incantation to build and clean all the native subdirectories.
