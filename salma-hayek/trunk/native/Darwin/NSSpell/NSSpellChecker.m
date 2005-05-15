@@ -1,4 +1,4 @@
-#include <AppKit/AppKit.h>
+#import <AppKit/AppKit.h>
 
 static NSSpellChecker* NSSpellChecker_init() {
     static NSSpellChecker* checker = 0;
