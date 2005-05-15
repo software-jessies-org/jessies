@@ -39,7 +39,7 @@ endif
 # ----------------------------------------------------------------------------
 
 # We used to disable suffix rules, but the default compilation rules are suffix
-# rules, and we want to use them in "native.make".
+# rules, and we want to use them in per-directory.make.
 #.SUFFIXES:
 
 .DEFAULT:
@@ -298,7 +298,7 @@ define BUILD_JAVA
 endef
 
 # ----------------------------------------------------------------------------
-# Prevent us from using native.make's local variables in java.make
+# Prevent us from using per-directory.make's local variables in java.make
 # make doesn't support variable scoping, so this requires some cunning.
 # ----------------------------------------------------------------------------
 
@@ -418,21 +418,21 @@ echo.%:
 # Rules for making makefiles.
 # ----------------------------------------------------------------------------
 
-generated/local-variables.make: $(SALMA_HAYEK)/native.make $(SALMA_HAYEK)/java.make
+generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/java.make
 	@mkdir -p $(@D) && \
 	perl -w -ne '(m/^\s*(\S+)\s*[:+]?=/ || m/^\s*define\s*(\S+)/) && print("LOCAL_VARIABLES += $$1\n")' $< | sort -u > $@
 
 # ----------------------------------------------------------------------------
 # The magic incantation to build and clean all the native subdirectories.
-# Including native.make more than once is bound to violate the
+# Including per-directory.make more than once is bound to violate the
 # variables-before-rules dictum.
-# native.make needs to cope with that but it'd be best if it doesn't impose
+# per-directory.make needs to cope with that but it'd be best if it doesn't impose
 # that constraint on the rest of java.make - so let's keep this last.
 # ----------------------------------------------------------------------------
 
 define buildNativeDirectory
   SOURCE_DIRECTORY = $(1)
-  include $(SALMA_HAYEK)/native.make
+  include $(SALMA_HAYEK)/per-directory.make
 endef
 
 DUMMY := $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR)))$(closeLocalVariableScope))
