@@ -14,9 +14,9 @@
 - (void)dealloc;
 - (void)setDataSource:(id)fp8;
 - (void)loadConfigData;
-- (void)runSlideshowWithDataSource:(id)dataSource options:(id)options;
+- (void)runSlideshowWithDataSource:(id)dataSource options:(NSDictionary*)options;
 - (void)startSlideshow:(id)fp8;
-- (void)runSlideshowWithPDF:(NSURL*)pdfUrl options:(id)options;
+- (void)runSlideshowWithPDF:(NSURL*)pdfUrl options:(NSDictionary*)options;
 - (void)stopSlideshow:(id)fp8;
 - (void)noteNumberOfItemsChanged;
 - (void)reloadData;
