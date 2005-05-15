@@ -114,6 +114,7 @@ C_AND_CXXFLAGS += -fPIC
 C_AND_CXXFLAGS += -g
 # Maximum warnings...
 C_AND_CXX_FLAGS += -W -Wall -Werror
+OBJC_AND_OBJCXX_FLAGS += -Wno-protocol -Wundeclared-selector
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
 CPPFLAGS += $(subst $(SPACE)", -I", $(JNI_PATH))
@@ -394,11 +395,11 @@ app: build
 # Implicit rules for compiling Objective C and Objective C++ source.
 # ----------------------------------------------------------------------------
 
-COMPILE.m = $(COMPILE.c)
+COMPILE.m = $(COMPILE.c) $(OBJC_AND_OBJCXX_FLAGS)
 %.o: %.m
 	$(COMPILE.m) $(OUTPUT_OPTION) $<
 
-COMPILE.mm = $(COMPILE.cpp)
+COMPILE.mm = $(COMPILE.cpp) $(OBJC_AND_OBJCXX_FLAGS)
 %.o: %.mm
 	$(COMPILE.mm) $(OUTPUT_OPTION) $<
 
