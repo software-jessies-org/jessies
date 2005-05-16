@@ -95,6 +95,10 @@ public class PKeyHandler extends KeyAdapter {
             moveCaret(extendingSelection, caretToStartOfLine());
         } else if (isEndOfLineKey(event)) {
             moveCaret(extendingSelection, caretToEndOfLine());
+        } else if (extendingSelection && key == KeyEvent.VK_PAGE_DOWN) {
+            moveCaret(extendingSelection, caretPageDown());
+        } else if (extendingSelection && key == KeyEvent.VK_PAGE_UP) {
+            moveCaret(extendingSelection, caretPageUp());
         } else if (GuiUtilities.isMacOs() && (key == KeyEvent.VK_HOME || key == KeyEvent.VK_END)) {
             textArea.ensureVisibilityOfOffset((key == KeyEvent.VK_HOME) ? 0 : textArea.getTextBuffer().length());
         } else if (key == KeyEvent.VK_LEFT) {
@@ -213,6 +217,18 @@ public class PKeyHandler extends KeyAdapter {
         } else {
             textArea.setCaretPosition(newOffset);
         }
+    }
+    
+    private int caretPageDown() {
+        int lineIndex = textArea.getLineOfOffset(textArea.getUnanchoredSelectionExtreme());
+        int pageLineCount = textArea.getVisibleRect().height / textArea.getLineHeight();
+        return textArea.getLineStartOffset(Math.min(lineIndex + pageLineCount, textArea.getLineCount() - 1));
+    }
+    
+    private int caretPageUp() {
+        int lineIndex = textArea.getLineOfOffset(textArea.getUnanchoredSelectionExtreme());
+        int pageLineCount = textArea.getVisibleRect().height / textArea.getLineHeight();
+        return textArea.getLineStartOffset(Math.max(0, lineIndex - pageLineCount));
     }
     
     private int caretToStartOfLine() {
@@ -335,7 +351,7 @@ public class PKeyHandler extends KeyAdapter {
         private int caretDown() {
             PCoordinates coords = textArea.getCoordinates(textArea.getUnanchoredSelectionExtreme());
             int lineIndex = coords.getLineIndex();
-            if (lineIndex == textArea.getVisibleLineCount() - 1) {
+            if (lineIndex == textArea.getSplitLineCount() - 1) {
                 return textArea.getTextBuffer().length();
             } else {
                 int y = textArea.getViewCoordinates(new PCoordinates(lineIndex + 1, 0)).y;

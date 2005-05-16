@@ -1004,7 +1004,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
-    public int getVisibleLineCount() {
+    public int getSplitLineCount() {
         return splitLines.size();
     }
     
