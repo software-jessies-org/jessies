@@ -80,11 +80,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             
             private void rewrap() {
                 if (getWidth() != lastWidth) {
-                    runWithoutMovingTheVisibleArea(new Runnable() {
-                        public void run() {
-                            revalidateLineWrappings();
-                        }
-                    });
+                    if (isShowing()) {
+                        runWithoutMovingTheVisibleArea(new Runnable() {
+                            public void run() {
+                                revalidateLineWrappings();
+                            }
+                        });
+                    }
                     lastWidth = getWidth();
                     repaint();
                 }
@@ -918,12 +920,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private synchronized void revalidateLineWrappings() {
-        invalidateLineWrappings();
-        generateLineWrappings();
-    }
-    
-    private synchronized void invalidateLineWrappings() {
         splitLines = null;
+        generateLineWrappings();
     }
     
     /**
