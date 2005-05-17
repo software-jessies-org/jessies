@@ -303,10 +303,15 @@ extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEn
     }
 }
 
-static void waitFor(JNIEnv *env, jobject ptyProcess, pid_t pid) {
-    int status;
+extern "C"  void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *env, jobject ptyProcess) {
+    pid_t pid = getPid(env, ptyProcess);
     // FIXME: note that we really want to signal the process group, not the process.
-    waitpid(pid, &status, 0);
+    kill(pid, SIGTERM);
+}
+
+extern "C"  void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *env, jobject ptyProcess) {
+    int status;
+    waitpid(getPid(env, ptyProcess), &status, 0);
     
     int exitValue = WEXITSTATUS(status);
     jclass ptyClass = env->GetObjectClass(ptyProcess);
@@ -314,16 +319,6 @@ static void waitFor(JNIEnv *env, jobject ptyProcess, pid_t pid) {
     env->SetBooleanField(ptyProcess, fid, JNI_TRUE);
     fid = env->GetFieldID(ptyClass, "exitValue", "I");
     env->SetIntField(ptyProcess, fid, exitValue);
-}
-
-extern "C"  void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *env, jobject ptyProcess) {
-    pid_t pid = getPid(env, ptyProcess);
-    kill(pid, SIGTERM);
-    waitFor(env, ptyProcess, pid);
-}
-
-extern "C"  void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *env, jobject ptyProcess) {
-    waitFor(env, ptyProcess, getPid(env, ptyProcess));
 }
 
 #endif
