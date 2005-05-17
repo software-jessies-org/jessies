@@ -65,8 +65,8 @@ class IOException {
     std::string message;
     
 public:
-    IOException(const std::string& msg) : message(msg) { }
-    IOException(const char* msg) : message(std::string(msg)) { }
+    IOException(const std::string& msg) : message(msg) {
+    }
     
     const char* getMessage() const {
         return message.c_str();
@@ -136,13 +136,10 @@ class PtyGenerator {
     }
     
 public:
-    PtyGenerator() : ptyName(std::string("")), masterFd(-1) { }
+    PtyGenerator() : masterFd(-1) {
+    }
     
     // NO VIRTUAL DESTRUCTOR!  DO NOT SUBCLASS!
-    
-    int getMasterFd() {
-        return masterFd;
-    }
     
     bool openMaster() {
         masterFd = ptym_open(ptyName);
@@ -166,13 +163,13 @@ public:
         close(masterFd);
         return fds;
     }
+    
+    void setFileDescriptor(JNIEnv *env, jobject fileDescriptor) {
+        jclass fileDescriptorClass = env->GetObjectClass(fileDescriptor);
+        jfieldID fid = env->GetFieldID(fileDescriptorClass, "fd", "I");
+        env->SetIntField(fileDescriptor, fid, masterFd);
+    }
 };
-
-static void setFileDescriptor(JNIEnv *env, jobject fileDescriptor, int fd) {
-    jclass fileDescriptorClass = env->GetObjectClass(fileDescriptor);
-    jfieldID fid = env->GetFieldID(fileDescriptorClass, "fd", "I");
-    env->SetIntField(fileDescriptor, fid, fd);
-}
 
 static int getIntField(JNIEnv *env, jobject obj, const char *fieldName) {
     jclass objClass = env->GetObjectClass(obj);
@@ -284,12 +281,9 @@ extern "C" jint Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *env, jo
         }
         free(strings);
         free(cmd);
-        setFileDescriptor(env, inDescriptor, ptyGenerator.getMasterFd());
-//        if (fcntl(outDescriptor, F_NOCACHE, 1) < 0) {
-//            throw IOException("Failed to disable pipe cache.");
-//        }
-        setFileDescriptor(env, outDescriptor, ptyGenerator.getMasterFd());
-        setFileDescriptor(env, ptyProcess, ptyGenerator.getMasterFd());
+        ptyGenerator.setFileDescriptor(env, inDescriptor);
+        ptyGenerator.setFileDescriptor(env, outDescriptor);
+        ptyGenerator.setFileDescriptor(env, ptyProcess);
     } catch (const IOException& exception) {
         throwJavaIOException(env, exception.getMessage());
     }
