@@ -16,24 +16,24 @@ public class PNewlineInserter {
     public void insertNewline() {
         textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
         try {
-            // FIXME - selection
-            final int position = textArea.getSelectionStart();
-            
-            // Should we try to insert matching brackets?
-            String line = getLineTextAtOffset(position);
-            if (position > 0) {
-                char lastChar = textArea.getTextBuffer().charAt(position - 1);
+            final int startPosition = textArea.getSelectionStart();
+            if (startPosition > 0) {
+                char lastChar = textArea.getTextBuffer().charAt(startPosition - 1);
                 if (PBracketUtilities.isOpenBracket(lastChar)) {
                     if (insertMatchingBrackets()) {
                         return;
                     }
                 }
             }
-            if (line.endsWith("/*") || line.endsWith("/**")) {
+            
+            int startLineIndex = textArea.getLineOfOffset(startPosition);
+            int startLineStartOffset = textArea.getLineStartOffset(startLineIndex);
+            String lineBeforeInsertionPoint = getLineTextAtOffset(startPosition).substring(0, startPosition - startLineStartOffset);
+            if (lineBeforeInsertionPoint.matches("[ \t]*/\\*{1,2}")) {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");
-                textArea.getIndenter().fixIndentationAt(position);
+                textArea.getIndenter().fixIndentationAt(startPosition);
                 textArea.getIndenter().fixIndentation();
             }
         } finally {
@@ -95,13 +95,12 @@ public class PNewlineInserter {
     }
     
     public void insertMatchingCloseComment() {
-        // FIXME - selection?
         final int position = textArea.getSelectionStart();
         String line = getLineTextAtOffset(position);
         String whitespace = getIndentationOfLineAtOffset(position);
         String prefix = "\n" + whitespace + " * ";
         String suffix = "\n" + whitespace + " */";
-        textArea.insert(prefix + suffix);
+        textArea.replaceSelection(prefix + suffix);
         final int newOffset = position + prefix.length();
         textArea.select(newOffset, newOffset);
     }
