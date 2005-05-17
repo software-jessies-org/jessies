@@ -38,9 +38,9 @@ public class HungAwtExit {
         try {
             Class timerQueueClass = Class.forName("javax.swing.TimerQueue");
             Method sharedInstanceMethod =
-                timerQueueClass.getDeclaredMethod("sharedInstance", (Class) null);
+                timerQueueClass.getDeclaredMethod("sharedInstance", new Class[0]);
             sharedInstanceMethod.setAccessible(true);
-            Object sharedInstance = sharedInstanceMethod.invoke(null, (Object) null);
+            Object sharedInstance = sharedInstanceMethod.invoke(null, new Object[0]);
 
             Field firstTimerField =
                 timerQueueClass.getDeclaredField("firstTimer");

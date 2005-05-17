@@ -420,8 +420,6 @@ public class PTextBuffer implements CharSequence {
             Doable newEdit = new Doable(id, beforeCaret, position, removeChars, insertChars, afterCaret);
             undoList.add(newEdit);
             redo();
-            
-            fireChangeListeners();
         }
         
         public void startCompoundEdit() {
