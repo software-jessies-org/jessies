@@ -9,7 +9,7 @@ import java.util.*;
  * doesn't exist, logs to /dev/null.
  */
 public class LogWriter {
-	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ssZ");
+	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HHmmssZ");
 	
 	private String filename;
 	private FileWriter stream;
