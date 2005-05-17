@@ -161,7 +161,10 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 # ----------------------------------------------------------------------------
 
 PROJECT_ROOT = $(CURDIR)
-PROJECT_NAME = $(shell svn info | perl -w -ne 'm{URL: .*?/([^/]*)(/trunk)?$$} && print($$1);')
+
+SVN := $(call pathsearch,svn)
+PROJECT_NAME_FROM_SVN = $(shell svn info | perl -w -ne 'm{URL: .*?/([^/]*)(/trunk)?$$} && print($$1);')
+PROJECT_NAME := $(if $(SVN),$(PROJECT_NAME_FROM_SVN),$(notdir $(PROJECT_ROOT)))
 
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
