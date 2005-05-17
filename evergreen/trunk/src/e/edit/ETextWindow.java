@@ -306,7 +306,6 @@ public class ETextWindow extends EWindow implements PTextListener {
             findResultsUpdater = null;
         }
         Edit.showStatus("Closed " + filename);
-        this.file = null;
         getWorkspace().unregisterTextComponent(getText());
         // FIXME: what else needs doing to ensure that we give back memory?
     }
