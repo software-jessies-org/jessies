@@ -139,8 +139,6 @@ public:
     PtyGenerator() : masterFd(-1) {
     }
     
-    // NO VIRTUAL DESTRUCTOR!  DO NOT SUBCLASS!
-    
     bool openMaster() {
         masterFd = ptym_open(ptyName);
         return (masterFd >= 0);
