@@ -8,7 +8,6 @@
 #   JAVA_COMPILER to "jikes", "javac", or a binary of your choice.
 
 # Your calling Makefile:
-#   may define PROJECT_NAME (otherwise it's taken from the directory name)
 #   may append to BINDIST_FILES
 #   must include ../salma-hayek/universal.make
 
@@ -162,7 +161,7 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 # ----------------------------------------------------------------------------
 
 PROJECT_ROOT = $(CURDIR)
-PROJECT_NAME ?= $(notdir $(PROJECT_ROOT))
+PROJECT_NAME = $(shell svn info | perl -w -ne 'm{URL: .*?/([^/]*)(/trunk)?$$} && print($$1);')
 
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 

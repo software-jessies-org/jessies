@@ -25,8 +25,6 @@ mkdir -p $name/src
 
 echo "Creating Makefile..."
 cat > $name/Makefile <<EOF
-PROJECT_NAME=$name
-
 include ../salma-hayek/universal.make
 EOF
 
