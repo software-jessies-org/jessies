@@ -17,14 +17,6 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         this.textArea = textArea;
     }
     
-    private static boolean beforeCloseBracket(CharSequence chars, int offset) {
-        return (offset < chars.length() && PBracketUtilities.isCloseBracket(chars.charAt(offset)));
-    }
-    
-    private static boolean afterOpenBracket(CharSequence chars, int offset) {
-        return (offset > 0 && PBracketUtilities.isOpenBracket(chars.charAt(offset - 1)));
-    }
-    
     public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
         removeHighlights();
         if (selectionStart != selectionEnd) {
@@ -36,16 +28,16 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         // The same-style char sequence is expensive, but there's a cheap way
         // to exclude most cases where we don't need it:
         CharSequence chars = textArea.getTextBuffer();
-        if (beforeCloseBracket(chars, offset) == false && afterOpenBracket(chars, offset) == false) {
+        if (PBracketUtilities.beforeCloseBracket(chars, offset) == false && PBracketUtilities.afterOpenBracket(chars, offset) == false) {
             return;
         }
         // Now we'll pay:
         chars = PSameStyleCharSequence.forOffset(textArea, offset);
         
         // Look for a bracket to match with.
-        if (beforeCloseBracket(chars, offset)) {
+        if (PBracketUtilities.beforeCloseBracket(chars, offset)) {
             highlights[0] = new MatchingBracketHighlight(textArea, offset, offset + 1);
-        } else if (afterOpenBracket(chars, offset)) {
+        } else if (PBracketUtilities.afterOpenBracket(chars, offset)) {
             highlights[0] = new MatchingBracketHighlight(textArea, offset - 1, offset);
         }
         

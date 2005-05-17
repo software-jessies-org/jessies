@@ -1,6 +1,7 @@
 package e.ptextarea;
 
 import java.util.*;
+import java.util.regex.*;
 
 public class PNewlineInserter {
     private PTextArea textArea;
@@ -17,19 +18,16 @@ public class PNewlineInserter {
         textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
         try {
             final int startPosition = textArea.getSelectionStart();
-            if (startPosition > 0) {
-                char lastChar = textArea.getTextBuffer().charAt(startPosition - 1);
-                if (PBracketUtilities.isOpenBracket(lastChar)) {
-                    if (insertMatchingBrackets()) {
-                        return;
-                    }
-                }
+            CharSequence chars = textArea.getTextBuffer();
+            
+            if (PBracketUtilities.afterOpenBracket(chars, startPosition) && insertMatchingBrackets()) {
+                return;
             }
             
             int startLineIndex = textArea.getLineOfOffset(startPosition);
             int startLineStartOffset = textArea.getLineStartOffset(startLineIndex);
-            String lineBeforeInsertionPoint = getLineTextAtOffset(startPosition).substring(0, startPosition - startLineStartOffset);
-            if (lineBeforeInsertionPoint.matches("[ \t]*/\\*{1,2}")) {
+            CharSequence lineToTheLeft = chars.subSequence(startLineStartOffset, startPosition);
+            if (Pattern.matches("[ \t]*/\\*{1,2}", lineToTheLeft)) {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");

@@ -83,6 +83,14 @@ public class PBracketUtilities {
         return reflectedBrackets.reverse().toString();
     }
     
+    public static boolean beforeCloseBracket(CharSequence chars, int offset) {
+        return (offset < chars.length() && isCloseBracket(chars.charAt(offset)));
+    }
+    
+    public static boolean afterOpenBracket(CharSequence chars, int offset) {
+        return (offset > 0 && isOpenBracket(chars.charAt(offset - 1)));
+    }
+    
     private PBracketUtilities() {
         // Not for instantiation.
     }
