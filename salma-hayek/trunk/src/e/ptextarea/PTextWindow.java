@@ -81,7 +81,7 @@ public class PTextWindow {
                 return new PRubyTextStyler(textArea);
             } else if (extension.equals("txt")) {
                 return new PHyperlinkTextStyler(textArea, "\\bhttp://\\S+") {
-                    public void hyperlinkClicked(CharSequence linkText) {
+                    public void hyperlinkClicked(CharSequence linkText, java.util.regex.Matcher matcher) {
                         System.out.println("Hyperlink clicked: " + linkText);
                     }
                     public boolean isAcceptableMatch(CharSequence line, java.util.regex.Matcher matcher) {

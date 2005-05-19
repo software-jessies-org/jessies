@@ -45,7 +45,10 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         if (iterator.hasNext()) {
             PLineSegment segment = iterator.next();
             if (segment.getStyle() == PStyle.HYPERLINK) {
-                hyperlinkClicked(segment.getCharSequence());
+                CharSequence chars = segment.getCharSequence();
+                Matcher matcher = highlightPattern.matcher(chars);
+                matcher.matches(); // FIXME: what if this returns false?
+                hyperlinkClicked(chars, matcher);
                 event.consume();
             }
         }
@@ -55,7 +58,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      * Override this to implement whatever behavior you want for a clicked-on
      * link.
      */
-    public abstract void hyperlinkClicked(CharSequence hyperlinkText);
+    public abstract void hyperlinkClicked(CharSequence hyperlinkText, Matcher matcher);
     
     /**
      * Override this to perform any extra processing that can't be done by a
