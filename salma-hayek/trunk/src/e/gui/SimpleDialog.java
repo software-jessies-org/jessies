@@ -1,6 +1,7 @@
 package e.gui;
 
 import java.awt.*;
+import java.io.*;
 import javax.swing.*;
 import e.forms.*;
 import e.ptextarea.*;
@@ -49,6 +50,20 @@ public class SimpleDialog {
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Details:", new JScrollPane(textArea));
         FormDialog.showNonModal(frame, title, formPanel);
+    }
+    
+    /**
+     * Shows a message in a similar manner to the other method of this name,
+     * but in this case the message is the text of the Throwable's stack trace.
+     * This is currently most useful for things that couldn't possibly happen.
+     * It's not very friendly, but it's probably more friendly than just
+     * writing output to the console/log.
+     */
+    public static void showDetails(Frame frame, String title, Throwable throwable) {
+        StringWriter stringWriter = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(stringWriter));
+        String exceptionDetails = stringWriter.toString();
+        showDetails(frame, title, exceptionDetails);
     }
     
     public static boolean askQuestion(Frame frame, String title, String message, String continueText) {
