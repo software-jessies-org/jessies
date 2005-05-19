@@ -32,9 +32,8 @@ import java.lang.reflect.Method;
  * have the Internet Scripting AppleScript dictionary installed in the Scripting Additions folder
  * in the Extensions folder (which is installed by default as far as I know under Mac OS 8.0 and
  * 8.1), and for all Mac OS 8.5 and later systems.  On Windows, it only runs under Win32 systems
- * (Windows 95, 98, and NT 4.0, as well as later versions of all).  On other systems, this drops
- * back from the inherently platform-sensitive concept of a default browser and simply attempts
- * to launch Netscape via a shell command.
+ * (Windows 95, 98, and NT 4.0, as well as later versions of all).  On other systems, we assume
+ * the /usr/bin/sensible-browser command is available.
  * <p>
  * This code is Copyright 1999-2001 by Eric Albert (ejalbert@cs.stanford.edu) and may be
  * redistributed or modified in any form without restrictions as long as the portion of this
@@ -179,14 +178,6 @@ public class BrowserLauncher {
      * URLs containing spaces to work.
      */
     private static final String THIRD_WINDOWS_PARAMETER = "\"\"";
-	
-	/**
-	 * The shell parameters for Netscape that opens a given URL in an already-open copy of Netscape
-	 * on many command-line systems.
-	 */
-	private static final String NETSCAPE_REMOTE_PARAMETER = "-remote";
-	private static final String NETSCAPE_OPEN_PARAMETER_START = "'openURL(";
-	private static final String NETSCAPE_OPEN_PARAMETER_END = ")'";
 	
 	/**
 	 * The message from any exception thrown throughout the initialization process.
@@ -459,7 +450,7 @@ public class BrowserLauncher {
 				break;
 			case OTHER:
 			default:
-				browser = "netscape";
+				browser = "/usr/bin/sensible-browser";
 				break;
 		}
 		return browser;
@@ -549,25 +540,8 @@ public class BrowserLauncher {
 				}
 				break;
 			case OTHER:
-				// Assume that we're on Unix and that Netscape is installed
-				
-				// First, attempt to open the URL in a currently running session of Netscape
-				process = Runtime.getRuntime().exec(new String[] { (String) browser,
-													NETSCAPE_REMOTE_PARAMETER,
-													NETSCAPE_OPEN_PARAMETER_START +
-													url +
-													NETSCAPE_OPEN_PARAMETER_END });
-				try {
-					int exitCode = process.waitFor();
-					if (exitCode != 0) {	// if Netscape was not open
-						Runtime.getRuntime().exec(new String[] { (String) browser, url });
-					}
-				} catch (InterruptedException ie) {
-					throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
-				}
-				break;
 			default:
-				// This should never occur, but if it does, we'll try the simplest thing possible
+				// Try the simplest thing possible
 				Runtime.getRuntime().exec(new String[] { (String) browser, url });
 				break;
 		}
