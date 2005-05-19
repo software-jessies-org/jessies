@@ -77,24 +77,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return SimpleDialog.askQuestion(Edit.getFrame(), title, message, continueTextYes, continueTextNo);
     }
 
-    public static void showDocument(String uri) {
+    private static void showDocument(String url) {
         try {
-            // FIXME: this is an ugly hack; where's the right place to sort this out?
-            if (uri.startsWith("file:/") && !uri.startsWith("file:///")) {
-                uri = "file:///" + uri.substring(6);
-            }
-            /* we could use a class provided by Apple on Mac OS, but it doesn't seem to offer any advantage.
-            if (System.getProperty("os.name").indexOf("Mac") != -1) {
-                System.err.println(uri);
-                Class.forName("com.apple.eio.FileManager").getMethod("openURL", new Class[] { String.class }).invoke(null, new Object[] { uri });
-                return;
-            }*/
-            Runtime.getRuntime().exec(new String[] {
-                Parameters.getParameter("browser"), uri
-            });
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            Edit.showAlert("Hyperlink", "Couldn't show '" + uri + "' (" + ex.getMessage() + ")");
+            BrowserLauncher.openURL(url);
+        } catch (Throwable th) {
+            SimpleDialog.showDetails(getFrame(), "Hyperlink", th);
         }
     }
     
