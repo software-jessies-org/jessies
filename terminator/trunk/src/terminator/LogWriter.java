@@ -1,6 +1,6 @@
-
 package terminator;
 
+import e.gui.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -16,10 +16,15 @@ public class LogWriter {
 	private BufferedWriter stream;
 	private boolean suspended;
 	
-	public LogWriter(String prefix) throws IOException {
-		this.filename = makeLogFilename(prefix);
-		this.stream = new BufferedWriter(new FileWriter(filename));
-		this.suspended = false;
+	public LogWriter(String prefix) {
+		try {
+			this.filename = makeLogFilename(prefix);
+			this.stream = new BufferedWriter(new FileWriter(filename));
+		} catch (Throwable th) {
+			SimpleDialog.showDetails(null, "Couldn't Open Log File", th);
+		} finally {
+			this.suspended = (stream == null);
+		}
 	}
 	
 	private static String makeLogFilename(String prefix) throws IOException {
@@ -46,7 +51,9 @@ public class LogWriter {
 	}
 	
 	public void setSuspended(boolean newState) {
-		this.suspended = newState;
+		if (stream != null) {
+			suspended = newState;
+		}
 	}
 	
 	public boolean isSuspended() {
