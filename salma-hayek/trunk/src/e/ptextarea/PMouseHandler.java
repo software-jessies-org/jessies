@@ -3,8 +3,9 @@ package e.ptextarea;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
-public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
+public class PMouseHandler implements MouseInputListener {
     private PTextArea textArea;
     private PDragHandler dragHandler;
     
@@ -50,6 +51,10 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
         dragHandler = null;
     }
     
+    public void mouseClicked(MouseEvent event) {
+        // No explicit action.
+    }
+    
     public void mouseDragged(MouseEvent event) {
         if (dragHandler != null) {
             int newOffset = getOffsetAtMouse(event);
@@ -59,9 +64,21 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     }
     
     public void mouseMoved(MouseEvent event) {
-        Cursor newCursor = textArea.getTextStyler().getCursorForLocation(event.getPoint());
+        updateCursorAndToolTip(event.getPoint());
+    }
+    
+    public void mouseEntered(MouseEvent event) {
+        updateCursorAndToolTip(event.getPoint());
+    }
+    
+    public void mouseExited(MouseEvent event) {
+        updateCursorAndToolTip(event.getPoint());
+    }
+    
+    private void updateCursorAndToolTip(Point p) {
+        Cursor newCursor = textArea.getTextStyler().getCursorForLocation(p);
         textArea.setCursor(newCursor);
-        String newToolTip = textArea.getTextStyler().getToolTipForLocation(event.getPoint());
+        String newToolTip = textArea.getTextStyler().getToolTipForLocation(p);
         textArea.setToolTipText(newToolTip);
     }
     
