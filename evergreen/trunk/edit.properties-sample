@@ -21,10 +21,6 @@ files.externalApplicationExtensions=.icns;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 #Not yet implemented. See e.util.FileUtilities.
 #files.binaryExtensions=.gif;.gz;.icns;.jpg;.jpeg;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 
-?Mac OS X:browser=/usr/bin/open
-?Windows 2000:browser=c:\Program Files\Internet Explorer\IEXPLORE.EXE
-?Linux:browser=mozilla
-
 # Prefixes that imply we should defer to the web browser.
 url.prefixes=file://;ftp://;http://;https://
 
