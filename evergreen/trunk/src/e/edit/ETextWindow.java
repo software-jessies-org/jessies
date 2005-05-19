@@ -509,6 +509,9 @@ public class ETextWindow extends EWindow implements PTextListener {
     public void jumpToAddress(String address) {
         CharSequence chars = text.getTextBuffer();
         StringTokenizer st = new StringTokenizer(address, ":");
+        if (st.hasMoreTokens() == false) {
+            return;
+        }
         int line = Integer.parseInt(st.nextToken()) - 1;
         int offset = text.getLineStartOffset(line);
         int maxOffset = text.getLineEndOffsetBeforeTerminator(line);
