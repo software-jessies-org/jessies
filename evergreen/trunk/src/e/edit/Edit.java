@@ -169,14 +169,14 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
         
         /* Extract any address; a trailing sequence of ":\d+" with an optional trailing ':'. */
-        Pattern addressPattern = Pattern.compile("^(.+?)((:\\d+)+):?$");
+        Pattern addressPattern = Pattern.compile("^(.+?)((:\\d+)*):?$");
         Matcher addressMatcher = addressPattern.matcher(filename);
         final String address;
         if (addressMatcher.find()) {
             address = addressMatcher.group(2);
             filename = addressMatcher.group(1);
         } else {
-            address = null;
+            address = "";
         }
         
         Log.warn("Opening '" + filename + "' at '" + address + "'");

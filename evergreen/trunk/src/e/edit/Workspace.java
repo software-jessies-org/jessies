@@ -186,10 +186,8 @@ public class Workspace extends JPanel {
         if (window != null) {
             leftColumn.setSelectedWindow(window);
             window.ensureSufficientlyVisible();
-            if (address != null) {
-                ETextWindow textWindow = (ETextWindow) window;
-                textWindow.jumpToAddress(address);
-            }
+            ETextWindow textWindow = (ETextWindow) window;
+            textWindow.jumpToAddress(address);
             window.requestFocus();
             return window;
         }
