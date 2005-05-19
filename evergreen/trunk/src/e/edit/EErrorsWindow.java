@@ -50,7 +50,7 @@ public class EErrorsWindow extends EWindow {
             super(textArea, ADDRESS_PATTERN);
         }
         
-        public void hyperlinkClicked(CharSequence hyperlinkText) {
+        public void hyperlinkClicked(CharSequence hyperlinkText, Matcher matcher) {
             Edit.openFile(hyperlinkText.toString());
         }
         
