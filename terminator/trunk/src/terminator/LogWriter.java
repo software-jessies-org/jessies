@@ -1,3 +1,4 @@
+
 package terminator;
 
 import java.io.*;
@@ -12,12 +13,12 @@ public class LogWriter {
 	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HHmmssZ");
 	
 	private String filename;
-	private FileWriter stream;
+	private BufferedWriter stream;
 	private boolean suspended;
 	
 	public LogWriter(String prefix) throws IOException {
 		this.filename = makeLogFilename(prefix);
-		this.stream = new FileWriter(filename);
+		this.stream = new BufferedWriter(new FileWriter(filename));
 		this.suspended = false;
 	}
 	
