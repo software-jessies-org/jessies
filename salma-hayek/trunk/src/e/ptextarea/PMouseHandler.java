@@ -61,6 +61,8 @@ public class PMouseHandler extends MouseAdapter implements MouseMotionListener {
     public void mouseMoved(MouseEvent event) {
         Cursor newCursor = textArea.getTextStyler().getCursorForLocation(event.getPoint());
         textArea.setCursor(newCursor);
+        String newToolTip = textArea.getTextStyler().getToolTipForLocation(event.getPoint());
+        textArea.setToolTipText(newToolTip);
     }
     
     private class SingleClickDragHandler implements PDragHandler {

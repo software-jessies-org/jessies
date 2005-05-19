@@ -27,7 +27,9 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         int lastStart = 0;
         while (matcher.find() && isAcceptableMatch(line, matcher)) {
             result.add(new PTextSegment(textArea, lineStart + lastStart, lineStart + matcher.start(1), PStyle.NORMAL));
-            result.add(new PUnderlinedTextSegment(textArea, lineStart + matcher.start(1), lineStart + matcher.end(1), PStyle.HYPERLINK));
+            PTextSegment linkSegment = new PUnderlinedTextSegment(textArea, lineStart + matcher.start(1), lineStart + matcher.end(1), PStyle.HYPERLINK);
+            linkSegment.setToolTip(makeToolTip(matcher));
+            result.add(linkSegment);
             lastStart = matcher.end(1);
         }
         if (lastStart < line.length()) {
@@ -65,6 +67,13 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
      * regular expression.
      */
     public abstract boolean isAcceptableMatch(CharSequence line, Matcher matcher);
+    
+    /**
+     * Override this to return a custom tool-tip for your link.
+     */
+    public String makeToolTip(Matcher matcher) {
+       return null;
+    }
     
     /**
      * Optionally returns a special mouse cursor to use when over the given location.  A null

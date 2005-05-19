@@ -34,4 +34,13 @@ public abstract class PAbstractTextStyler implements PTextStyler {
     public Cursor getCursorForLocation(Point point) {
         return null;
     }
+    
+    public String getToolTipForLocation(Point point) {
+        PLineSegment segment = textArea.getLineSegmentAtLocation(point);
+        if (segment != null && segment instanceof PTextSegment) {
+            return ((PTextSegment) segment).getToolTip();
+        } else {
+            return null;
+        }
+    }
 }

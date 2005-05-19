@@ -1,6 +1,5 @@
 package e.ptextarea;
 
-
 import java.awt.*;
 
 /**
@@ -8,8 +7,8 @@ import java.awt.*;
  * 
  * @author Phil Norman
  */
-
 public class PTextSegment extends PAbstractSegment {
+    private String toolTip;
     
     public PTextSegment(PTextArea textArea, int start, int end, PStyle style) {
         super(textArea, start, end, style);
@@ -47,7 +46,20 @@ public class PTextSegment extends PAbstractSegment {
         graphics.drawString(getText(), x, yBaseline);
     }
     
+    public String getToolTip() {
+        return toolTip;
+    }
+    
+    public void setToolTip(String toolTip) {
+        this.toolTip = toolTip;
+    }
+    
     public String toString() {
-        return "PTextSegment[" + style + ", " + getText() + "]";
+        String result = "PTextSegment[" + style + ",text=" + getText();
+        if (toolTip != null) {
+            result += ",toolTip=" + toolTip;
+        }
+        result += "]";
+        return result;
     }
 }
