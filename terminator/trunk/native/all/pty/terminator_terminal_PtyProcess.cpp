@@ -139,6 +139,9 @@ public:
     PtyGenerator() : masterFd(-1) {
     }
     
+    virtual ~PtyGenerator() {
+    }
+    
     bool openMaster() {
         masterFd = ptym_open(ptyName);
         return (masterFd >= 0);
