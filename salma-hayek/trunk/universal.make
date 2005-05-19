@@ -320,7 +320,7 @@ define copyLocalVariable
   $(1).$(BASE_NAME) := $$($(1))
 endef
 define unsetLocalVariable
-  $(1) = $$(shell $(RM) generated/local-variables.make)$$(error makefile bug: local variable $(1) from scope $(BASE_NAME) was referred to in scope $$(BASE_NAME))
+  $(1) = $$(shell $(RM) generated/local-variables.make)$$(error makefile bug: local variable $(1) from scope $(BASE_NAME) (with value "$($(1).$(BASE_NAME))") was referred to in scope $$(BASE_NAME))
 endef
 
 # We need to $(eval) each assignment individually before they're concatenated
