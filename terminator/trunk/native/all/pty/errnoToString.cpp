@@ -9,11 +9,11 @@ int gnuCompatibleStrerror(int (*strerror_r)(int, char*, size_t), int errorNumber
 }
 
 int gnuCompatibleStrerror(char* (*strerror_r)(int, char*, size_t), int errorNumber, char* messageBuffer, size_t bufferSize) {
-  const char* destination = strerror_r(errorNumber, messageBuffer, bufferSize);
-  // strcpy doesn't support copying over oneself.
-  if (destination != messageBuffer) {
-    // The string is guaranteed to be zero-terminated.
-    strcpy(messageBuffer, destination);
+  const char* intermediateBuffer = strerror_r(errorNumber, messageBuffer, bufferSize);
+  // strncpy doesn't support copying over oneself.
+  if (intermediateBuffer != messageBuffer) {
+    strncpy(messageBuffer, intermediateBuffer, bufferSize);
+    messageBuffer[bufferSize - 1] = 0;
   }
   return 0;
 }
