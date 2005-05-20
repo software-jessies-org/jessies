@@ -18,6 +18,8 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 
 #else
 
+#include "errnoToString.h"
+
 #include <errno.h>
 #include <grp.h>
 #include <jni.h>
@@ -256,7 +258,7 @@ static pid_t doExecution(char * const *cmd, PtyGenerator& ptyGenerator) {
 static void appendErrno(std::ostream& message) {
     message << ": (errno=" << errno;
     if (errno != 0) {
-        message << " - " << strerror(errno);
+        message << " - " << errnoToString(errno);
     }
     message << ")";
 }
