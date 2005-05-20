@@ -1,5 +1,6 @@
 package e.util;
 
+import java.io.*;
 import java.lang.reflect.*;
 
 public class Log {
@@ -27,6 +28,18 @@ public class Log {
     }
     
     private static String applicationName = "unknown";
+    
+    private static PrintStream out = System.err;
+    static {
+        String logFilename = System.getProperty("e.util.Log.filename");
+        try {
+            if (logFilename != null) {
+                out = new PrintStream(logFilename, "utf-8");
+            }
+        } catch (Throwable th) {
+            Log.warn("Couldn't redirect logging to \"" + logFilename + "\"", th);
+        }
+    }
 
     public static void setApplicationName(String name) {
         applicationName = name;
@@ -55,9 +68,9 @@ public class Log {
     }
 
     public static void warn(String message, Throwable th) {
-        System.err.println(TimeUtilities.currentIsoString() + " " + applicationName + ": "  + message);
+        out.println(TimeUtilities.currentIsoString() + " " + applicationName + ": "  + message);
         if (th != null) {
-            System.err.println("Associated exception:");
+            out.println("Associated exception:");
             th.printStackTrace();
         }
     }
@@ -124,10 +137,10 @@ public class Log {
     
     public static void main(String[] args) {
         int[] numbers = new int[] { 1, 4, 173 };
-        System.err.println(inspect(Boolean.TRUE));
-        System.err.println(inspect(java.awt.Color.RED));
-        System.err.println(inspect(args));
-        System.err.println(inspect(numbers));
+        System.out.println(inspect(Boolean.TRUE));
+        System.out.println(inspect(java.awt.Color.RED));
+        System.out.println(inspect(args));
+        System.out.println(inspect(numbers));
     }
 
     /** Protects against instantiation. */
