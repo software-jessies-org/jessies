@@ -42,7 +42,7 @@ for PROJECT in $PROJECTS; do
     rm -f $PROJECT.tgz
     wget -C off -N http://www.jessies.org/~enh/software/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
-    tar zxf $PROJECT.tgz || die "extracting $PROJECT"
+    tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
     make -C $PROJECT || die "building $PROJECT"
 done
 
