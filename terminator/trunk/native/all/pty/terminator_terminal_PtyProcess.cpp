@@ -120,7 +120,7 @@ class PtyGenerator {
         if (name == 0) {
             std::ostringstream oss;
             oss << "Failed to get ptysname for file descriptor " << ptmx_fd;
-            throw IOException(oss.str().c_str());
+            throw IOException(oss.str());
         }
         pts_name = name;
         
