@@ -253,8 +253,16 @@ static pid_t doExecution(char * const *cmd, PtyGenerator& ptyGenerator) {
     }
 }
 
+static void appendErrno(std::ostringstream& message) {
+    message << ": (errno=" << errno;
+    if (errno != 0) {
+        message << " - " << strerror(errno);
+    }
+    message << ")";
+}
+
 static void throwJavaIOException(JNIEnv* env, std::ostringstream& message) {
-    message << ": (errno=" << errno << " - " << strerror(errno) << ")";
+    appendErrno(message);
     jclass exceptionClass = env->FindClass("java/io/IOException");
     if (exceptionClass) {
         env->ThrowNew(exceptionClass, message.str().c_str());
