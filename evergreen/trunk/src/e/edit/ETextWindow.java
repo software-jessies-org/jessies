@@ -277,12 +277,24 @@ public class ETextWindow extends EWindow implements PTextListener {
         Edit.showStatus("Reverted to saved version of " + filename);
     }
     
-    private boolean confirmReversion() {
-        JList patchView = SimplePatchDialog.makePatchView("disk", StringUtilities.readFile(file), "memory", text.getTextBuffer().toString());
+    private boolean showPatchAndAskForConfirmation(String verb, String question, boolean fromDiskToMemory) {
+        String diskContent = StringUtilities.readFile(file);
+        String memoryContent = text.getTextBuffer().toString();
+        
+        // TODO: add the times for the two versions to the labels (in ISO format).
+        String fromLabel = fromDiskToMemory ? "disk" : "memory";
+        String toLabel = fromDiskToMemory ? "memory" : "disk";
+        
+        String fromContent = fromDiskToMemory ? diskContent : memoryContent;
+        String toContent = fromDiskToMemory ? memoryContent : diskContent;
+        
+        JList patchView = SimplePatchDialog.makePatchView(fromLabel, fromContent, toLabel, toContent);
         FormPanel formPanel = new FormPanel();
-        formPanel.addRow("", new JLabel("Revert to saved version of '" + file.getName() + "'?"));
+        formPanel.addRow("", new JLabel(question));
         formPanel.addRow("Patch:", new JScrollPane(patchView));
-        return FormDialog.show(Edit.getFrame(), "Revert", formPanel, "Revert");
+        String title = verb;
+        String buttonLabel = verb;
+        return FormDialog.show(Edit.getFrame(), title, formPanel, buttonLabel);
     }
     
     public void revertToSaved() {
@@ -290,7 +302,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             Edit.showAlert("Revert", "'" + getFilename() + "' is the same on disk as in the editor.");
             return;
         }
-        if (confirmReversion()) {
+        if (showPatchAndAskForConfirmation("Revert", "Revert to saved version of '" + file.getName() + "'? (Equivalent to applying the following patch.)", true)) {
             uncheckedRevertToSaved();
         }
     }
@@ -588,9 +600,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     /** Saves the text. Returns true if the file was saved okay. */
     public boolean save() {
         if (isOutOfDateWithRespectToDisk()) {
-            //TODO: report when the file was modified & when your copy dates from.
-            boolean replace = Edit.askQuestion("Save", "The file '" + this.filename + "' has been modified since it was read in. Do you want to replace it with the version you are saving?", "Replace");
-            if (replace == false) {
+            if (showPatchAndAskForConfirmation("Overwrite", "Overwrite the currently saved version of '" + file.getName() + "'? (Equivalent to applying the following patch.)", false) == false) {
                 return false;
             }
         }
