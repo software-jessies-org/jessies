@@ -326,8 +326,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     public void closeWindow() {
         if (isDirty()) {
-            boolean discard = Edit.askQuestion("Close", "Do you want to discard the changes you made to the file\n'" + filename + "'?", "Discard");
-            if (discard == false) {
+            if (showPatchAndAskForConfirmation("Discard", "Discard changes to '" + file.getName() + "'? (Equivalent to applying the following patch.)", true) == false) {
                 return;
             }
         }
