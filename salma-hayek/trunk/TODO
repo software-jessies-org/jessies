@@ -1,7 +1,5 @@
 Items to be done for PTextArea:
 
-* Write a PTextStyler for patches.
-
 * Change the PTextStyler interface to work in terms of Lists of segments, rather than arrays of them.
 
 * Make a PSegmentIterator implement the Iterator interface when we have the generics of 1.5.  For now, doing so would just get in our way, forcing us to return Object when we know damned well what we want returned).
@@ -23,8 +21,6 @@ Items to be done for PTextArea:
 * the following JTextArea methods are thread-safe: append, insert, replace, and setText.
 
 * we can perhaps take Ed's old suggestion for how menus should work into account, and have a constructive scheme, rather than a replacement scheme. (so there's basic stuff offered by the component, extra stuff from the spelling checker, extra stuff from the application, et cetera. Cocoa has hooks for random other bits of code to declare they have actions too.)
-
-* Double-clicking in whitespace behaves neither like native components, nor like Edit used to. In particular, I'm used to double-clicking past the end of a line that doesn't end in '{' to select the line (an Edit/acme thing).
 
 * Try to get rid of the "get methods which aren't" in the indentation code, perhaps by none, one or more ideas from this week's guest publication:
 
