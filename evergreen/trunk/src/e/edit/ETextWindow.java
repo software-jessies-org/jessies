@@ -290,8 +290,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             Edit.showAlert("Revert", "'" + getFilename() + "' is the same on disk as in the editor.");
             return;
         }
-        boolean isConfirmationRequired = isDirty();
-        if (isConfirmationRequired == false || confirmReversion()) {
+        if (confirmReversion()) {
             uncheckedRevertToSaved();
         }
     }
