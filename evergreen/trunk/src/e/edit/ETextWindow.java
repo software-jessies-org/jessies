@@ -617,6 +617,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             Edit.showStatus("Saved " + filename);
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
+            updateWatermark();
             tagsUpdater.updateTags();
             SaveMonitor.getInstance().fireSaveListeners();
             return true;
