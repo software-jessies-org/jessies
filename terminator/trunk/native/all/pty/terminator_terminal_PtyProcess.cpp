@@ -11,9 +11,9 @@ extern "C" jint Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *, jobje
 }
 extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEnv *, jobject, jobject, jobject) {
 }
-extern "C"  void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *, jobject) {
+extern "C" void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *, jobject) {
 }
-extern "C"  void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
+extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 }
 
 #else
@@ -253,10 +253,11 @@ static pid_t doExecution(char * const *cmd, PtyGenerator& ptyGenerator) {
     }
 }
 
-static void throwJavaIOException(JNIEnv *env, const char *message) {
+static void throwJavaIOException(JNIEnv* env, std::ostringstream& message) {
+    message << ": (errno=" << errno << " - " << strerror(errno) << ")";
     jclass exceptionClass = env->FindClass("java/io/IOException");
     if (exceptionClass) {
-        env->ThrowNew(exceptionClass, message);
+        env->ThrowNew(exceptionClass, message.str().c_str());
     }
 }
 
@@ -286,7 +287,9 @@ extern "C" jint Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *env, jo
         ptyGenerator.setFileDescriptor(env, outDescriptor);
         ptyGenerator.setFileDescriptor(env, ptyProcess);
     } catch (const IOException& exception) {
-        throwJavaIOException(env, exception.getMessage());
+        std::ostringstream oss;
+        oss << exception.getMessage();
+        throwJavaIOException(env, oss);
     }
     return (jint) pid;
 }
@@ -301,20 +304,33 @@ extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEn
     size.ws_row = getDimensionField(env, sizeInChars, "height");
     size.ws_xpixel = getDimensionField(env, sizeInPixels, "width");
     size.ws_ypixel = getDimensionField(env, sizeInPixels, "height");
-    if (ioctl(getFileDescriptor(env, ptyProcess), TIOCSWINSZ, (char *) &size) < 0) {
-        throwJavaIOException(env, "TIOCSWINSZ error");
+    int fd = getFileDescriptor(env, ptyProcess);
+    if (ioctl(fd, TIOCSWINSZ, (char *) &size) < 0) {
+        std::ostringstream oss;
+        oss << "ioctl(" << fd << ", TIOCSWINSZ, &size) failed";
+        throwJavaIOException(env, oss);
     }
 }
 
-extern "C"  void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *env, jobject ptyProcess) {
+extern "C" void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *env, jobject ptyProcess) {
     pid_t pid = getPid(env, ptyProcess);
-    // FIXME: note that we really want to signal the process group, not the process.
-    kill(pid, SIGTERM);
+    int status = killpg(pid, SIGHUP);
+    if (status < 0) {
+        std::ostringstream oss;
+        oss << "killpg(" << pid << ", SIGHUP) failed";
+        throwJavaIOException(env, oss);
+    }
 }
 
-extern "C"  void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *env, jobject ptyProcess) {
+extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *env, jobject ptyProcess) {
+    pid_t pid = getPid(env, ptyProcess);
     int status;
-    waitpid(getPid(env, ptyProcess), &status, 0);
+    pid_t result = waitpid(pid, &status, 0);
+    if (result < 0) {
+        std::ostringstream oss;
+        oss << "waitpid(" << pid << ", &status, 0) failed";
+        throwJavaIOException(env, oss);
+    }
     
     int exitValue = WEXITSTATUS(status);
     jclass ptyClass = env->GetObjectClass(ptyProcess);
