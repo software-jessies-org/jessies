@@ -662,7 +662,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         if (isCPlusPlus() || isJava()) {
             PTextBuffer buffer = text.getTextBuffer();
             if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '\n') {
-                System.out.println("no newline at end of buffer");
                 // '\n' is always correct; the buffer will translate if needed.
                 text.append("\n");
             }
