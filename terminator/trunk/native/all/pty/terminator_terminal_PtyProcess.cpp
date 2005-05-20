@@ -253,7 +253,7 @@ static pid_t doExecution(char * const *cmd, PtyGenerator& ptyGenerator) {
     }
 }
 
-static void appendErrno(std::ostringstream& message) {
+static void appendErrno(std::ostream& message) {
     message << ": (errno=" << errno;
     if (errno != 0) {
         message << " - " << strerror(errno);
