@@ -47,11 +47,12 @@ if ARGV[0] =~ /^\+(\d+)$/
   ARGV[0] = "#{ARGV[0]}:#$1"
 end
 
+os_specific_options = []
 case `uname`.chomp
 when /Darwin/
     # Darwin is what Mac OS X calls itself.
     edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
-    os_specific_options = "-Xdock:name=Edit:icon=/Developer/Examples/Carbon/SimpleText/SimpleText.icns"
+    os_specific_options.push("-Xdock:name=Edit:icon=/Developer/Examples/Carbon/SimpleText/SimpleText.icns")
 else
     extra_classpath_entries = "#{salma_hayek}/MRJ141Stubs.jar"
 end
@@ -76,27 +77,37 @@ end
 
 # Create a log file, and link to it as the newest.
 # Symbolically linking to a file which doesn't exist yet is perfectly legal.
-edit_log = "/tmp/edit.log.#$$"
+log_filename = "/tmp/edit.log.#$$"
 if have_fileutils
-  FileUtils.ln_sf(edit_log, "/tmp/edit.log")
+  FileUtils.ln_sf(log_filename, "/tmp/edit.log")
 end
 
-fake_environment = ""
+fake_environment = []
 ["CVS_RSH", "DISPLAY", "EDIT_HOME", "HOME", "JAVA_HOME", "PATH", "SHELL"].each() {
   |variable|
   value = ENV[variable]
   if value != nil
-    fake_environment << " -Denv.#{variable}=#{value}"
+    fake_environment.push("-Denv.#{variable}=#{value}")
   end
 }
 
-classpath = "-classpath #{edit_home}/classes:#{salma_hayek}/classes:#{extra_classpath_entries}"
-heap_size = "-Xmx1g"
+classpath = "#{edit_home}/classes:#{salma_hayek}/classes:#{extra_classpath_entries}"
 
-options = "#{os_specific_options} #{heap_size} #{fake_environment} #{classpath} -DpreferencesDirectory=#{edit_preferences_directory}"
-
-if ENV["DEBUGGING_EDIT"] != nil
-  system("java #{options} e.util.Launcher Edit #{edit_class_name}Launchable #{filename}")
-else
-  system("java #{options} e.util.Launcher Edit #{edit_class_name}Launchable #{filename} > #{edit_log} 2>&1 || cat #{edit_log} 1>&2 &")
+options = [ "-Xmx1g", "-cp", classpath, "-Djava.awt.Window.locationByPlatform=true", "-DpreferencesDirectory=#{edit_preferences_directory}" ]
+#options.push("-agentlib:yjpagent")
+options.concat(fake_environment)
+options.concat(os_specific_options)
+if ENV["DEBUGGING_EDIT"] == nil
+  options.push("-De.util.Log.filename=#{log_filename}")
 end
+
+args = [ "java" ]
+args.concat(options)
+args.push("e.util.Launcher")
+args.push("Edit")
+args.push("#{edit_class_name}Launchable")
+args.concat(ARGV)
+if filename != nil
+  args.push(filename)
+end
+system(*args) || system("cat", log_filename)
