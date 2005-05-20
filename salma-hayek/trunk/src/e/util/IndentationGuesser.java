@@ -43,7 +43,7 @@ public class IndentationGuesser {
         }
         //System.out.println("indentations=" + indentations);
         if (indentations.isEmpty()) {
-            System.out.println(" - no line just containing an indented brace?");
+            //System.out.println(" - no line just containing an indented brace?");
             return emergencyAlternative;
         } else {
             return (String) indentations.commonestItem();
