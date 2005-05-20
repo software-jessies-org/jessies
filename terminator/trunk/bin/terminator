@@ -132,13 +132,12 @@ end
 options = [ "-Xmx1g", "-cp", classpath, "-Djava.awt.Window.locationByPlatform=true", "-Djava.library.path=#{pty_path}" ]
 options.concat(os_specific_options)
 log_filename="#{log_directory}/terminator.log.#{$$}"
+if ENV["DEBUGGING_TERMINATOR"] == nil
+  options.push("-De.util.Log.filename=#{log_filename}")
+end
 
 args = [ "java" ]
 args.concat(options)
 args.push(class_name)
 args.concat(ARGV)
-#if ENV["DEBUGGING_TERMINATOR"] != nil
-  system(*args)
-#else
-#  system(... "> #{log_filename} 2>&1 || cat #{log_filename} 1>&2 &")
-#end
+system(*args) || system("cat", log_filename)
