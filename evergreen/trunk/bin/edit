@@ -24,14 +24,12 @@ HOME = ENV["HOME"]
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
 
 def openFileOnEditServer(edit_preferences_directory, filename)
-  host = ENV["EDIT_HOME_SERVER"]
-  if host == nil then
-    host = 'localhost'
-  end
   begin
-    port = File.new("#{edit_preferences_directory}/edit-server-port").read()
+    File.new("#{edit_preferences_directory}/edit-server-port").read() =~ /^(.+):(\d+)$/
+    host = $1
+    port = $2.to_i()
     require 'net/telnet'
-    telnet = Net::Telnet.new('Host' => host, 'Port' => port.to_i(), 'Telnetmode' => false)
+    telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
     telnet.puts("open #{filename}\r")
     print(telnet.readlines().join(""))
     telnet.close()
