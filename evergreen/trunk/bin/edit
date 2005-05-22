@@ -21,6 +21,7 @@ ENV["EDIT_HOME"] = edit_home
 
 edit_class_name = "e.edit.Edit"
 HOME = ENV["HOME"]
+UNAME=`uname`.chomp()
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
 
 def openFileOnEditServer(edit_preferences_directory, filename)
@@ -46,7 +47,7 @@ if ARGV[0] =~ /^\+(\d+)$/
 end
 
 os_specific_options = []
-case `uname`.chomp
+case UNAME
 when /Darwin/
     # Darwin is what Mac OS X calls itself.
     edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
@@ -89,7 +90,11 @@ fake_environment = []
   end
 }
 
-classpath = "#{edit_home}/classes:#{salma_hayek}/classes:#{extra_classpath_entries}"
+path_separator=":"
+if UNAME == "CYGWIN_NT-5.0"
+  path_separator=';'
+end
+classpath = "#{edit_home}/classes#{path_separator}#{salma_hayek}/classes#{path_separator}#{extra_classpath_entries}"
 
 options = [ "-Xmx1g", "-cp", classpath, "-Djava.awt.Window.locationByPlatform=true", "-DpreferencesDirectory=#{edit_preferences_directory}" ]
 #options.push("-agentlib:yjpagent")
@@ -108,4 +113,8 @@ args.concat(ARGV)
 if filename != nil
   args.push(filename)
 end
+args.map! {
+  |arg|
+  arg.gsub(/\/cygdrive\/([a-z])/, '\1:')
+}
 system(*args) || system("cat", log_filename)
