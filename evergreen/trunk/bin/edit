@@ -23,6 +23,7 @@ edit_class_name = "e.edit.Edit"
 HOME = ENV["HOME"]
 UNAME=`uname`.chomp()
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
+classpath_entries = [ "#{edit_home}/classes", "#{salma_hayek}/classes" ]
 
 def openFileOnEditServer(edit_preferences_directory, filename)
   begin
@@ -53,7 +54,7 @@ when /Darwin/
     edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
     os_specific_options.push("-Xdock:name=Edit:icon=/Developer/Examples/Carbon/SimpleText/SimpleText.icns")
 else
-    extra_classpath_entries = "#{salma_hayek}/MRJ141Stubs.jar"
+    classpath_entries << "#{salma_hayek}/MRJ141Stubs.jar"
 end
 
 if FileTest.directory?(edit_preferences_directory) == false
@@ -90,13 +91,10 @@ fake_environment = []
   end
 }
 
-path_separator=":"
-if UNAME == "CYGWIN_NT-5.0"
-  path_separator=';'
-end
-classpath = "#{edit_home}/classes#{path_separator}#{salma_hayek}/classes#{path_separator}#{extra_classpath_entries}"
-
-options = [ "-Xmx1g", "-cp", classpath, "-Djava.awt.Window.locationByPlatform=true", "-DpreferencesDirectory=#{edit_preferences_directory}" ]
+options = [ "-cp", "#{classpath_entries.join(File::PATH_SEPARATOR)}" ]
+options.push("-Djava.awt.Window.locationByPlatform=true")
+options.push("-DpreferencesDirectory=#{edit_preferences_directory}")
+options.push("-Xmx1g")
 #options.push("-agentlib:yjpagent")
 options.concat(fake_environment)
 options.concat(os_specific_options)
