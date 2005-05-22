@@ -282,8 +282,6 @@ auto-saving
 
 [ ] Handle out-of-date files better
 
-    A way of seeing the diff between an out-of-date watermarked file and the current buffer contents would be useful (to Ed but I've wanted this too).
-    
     If we kept a copy of the file's contents last time we knew we were clean, we could also provide diffs to the common ancestor.  Experience merging changes with BitKeeper shows that this isn't often useful but it's sometimes very useful.
     
     If we had that, we could notice that the file on disk was touched but its contents didn't change.  This would help me avoid spurious out-of-date watermarks with my bk edit setup.
