@@ -41,9 +41,12 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   # we can open a new window quicker than xterm(1), from the user's point of
   # view.
   begin
-    port = File.new(server_port_file).read()
+    File.new(server_port_file).read() =~ /^(.+):(\d+)$/
+    host = $1
+    port = $2.to_i()
+    
     require 'net/telnet'
-    telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port.to_i(), 'Telnetmode' => false)
+    telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port, 'Telnetmode' => false)
     telnet.puts("new #{command}")
     print(telnet.readlines().join(""))
     telnet.close()
