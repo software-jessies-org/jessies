@@ -7,19 +7,47 @@ import javax.swing.*;
 import e.forms.*;
 
 public class ExternalToolAction extends ETextAction {
+    // FIXME: use an enum in 1.5
+    private static final int NO_INPUT_AND_NO_OUTPUT = 0;
+    private static final int INPUT_ONLY = 1;
+    private static final int OUTPUT_ONLY = 2;
+    private static final int INPUT_AND_OUTPUT = 3;
+    
     private String commandPattern;
+    private int type;
     private boolean checkEverythingSaved;
     private boolean needsFile;
     private boolean requestConfirmation;
     private JTextField commandField;
     private JTextField contextField;
-
+    
+    /**
+     * Creates a new tool action.
+     */
     public ExternalToolAction(String name, String commandPattern) {
         super(name);
-        this.commandPattern = commandPattern;
+        setCommandPattern(commandPattern);
         this.checkEverythingSaved = false;
         this.requestConfirmation = false;
         this.needsFile = false;
+    }
+    
+    private void setCommandPattern(String newPattern) {
+        this.type = NO_INPUT_AND_NO_OUTPUT;
+        if (newPattern.startsWith("<")) {
+            this.type = OUTPUT_ONLY;
+            this.needsFile = true;
+            newPattern = newPattern.substring(1);
+        } else if (newPattern.startsWith(">")) {
+            this.type = INPUT_ONLY;
+            this.needsFile = true;
+            newPattern = newPattern.substring(1);
+        } else if (newPattern.startsWith("|")) {
+            this.type = INPUT_AND_OUTPUT;
+            this.needsFile = true;
+            newPattern = newPattern.substring(1);
+        }
+        this.commandPattern = newPattern;
     }
     
     public void setRequestsConfirmation(boolean newState) {
@@ -50,14 +78,10 @@ public class ExternalToolAction extends ETextAction {
         if (textWindow != null) {
             ShellCommand shellCommand = runCommand(textWindow.getFilename(), textWindow.getCurrentLineNumber(), textWindow.getWorkspace(), textWindow.getContext());
             if (shellCommand != null) {
-                shellCommand.addCompletionListener(new ShellCommand.CompletionListener() {
-                    public void shellCommandCompleted() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                textWindow.updateWatermark();
-                                textWindow.repaint();
-                            }
-                        });
+                shellCommand.setCompletionRunnable(new Runnable() {
+                    public void run() {
+                        textWindow.updateWatermark();
+                        textWindow.repaint();
                     }
                 });
             }
@@ -101,7 +125,9 @@ public class ExternalToolAction extends ETextAction {
 
     public ShellCommand safeRunCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
         try {
-            return new ShellCommand(filename, lineNumber, workspace, false, context, command);
+            ShellCommand shellCommand = new ShellCommand(filename, lineNumber, workspace, context, command);
+            shellCommand.runCommand();
+            return shellCommand;
         } catch (IOException ex) {
             Edit.showAlert(context, "Can't start task (" + ex.getMessage() + ").");
         }

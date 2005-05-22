@@ -54,7 +54,7 @@ public class EHtmlPane extends JComponent implements HyperlinkListener {
         if (url.startsWith("man:")) {
             String page = url.substring(4);
             try {
-                new ShellCommand("man -a " + page + " | col -b");
+                new ShellCommand("man -a " + page + " | col -b").runCommand();
             } catch (Throwable th) {
                 Edit.showAlert("Man Page", "Can't run man(1) (" + th.getMessage() + ").");
             }
