@@ -5,7 +5,7 @@ import java.awt.event.*;
 /**
  * Useful to avoid conditional code in places where you have 0 or 1 listeners.
  */
-public class NoOpAction implements ActionListener {
+public final class NoOpAction implements ActionListener {
     /**
      * Does nothing.
      */
