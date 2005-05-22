@@ -41,11 +41,6 @@ The completion should work for languages other than Java. We can collect
 all the identifiers from the current file and sort them, at the very
 least.
 
-find in files:
- 1. don't search twice for the same thing. we're not that fast!
- 3. show the matching line(s).
- 8. sometimes (not always) i see the list of matches get populated, and then everything vanishes at the last moment. i seem to remember the open quickly dialog used to do that too, but stopped doing it some time ago. it seems particularly prone to it if the list of matches is long.
-
 spelling checking:
  1. add a way to show a short list of the misspelled words in the current file. and a way to add them to an exclusion list? or find/replace them?
  2. should we be less eager? have a timer so we don't literally check as you type each character? i think what i'd really like is two alpha values: one for misspelling-in-progress that's significantly lighter than finished-misspelling (which can be the same as what we're using at the moment), or some kind of scheme where alpha increases with age?
