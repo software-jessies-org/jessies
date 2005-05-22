@@ -116,10 +116,16 @@ C_AND_CXX_FLAGS += -W -Wall -Werror
 OBJC_AND_OBJCXX_FLAGS += -Wno-protocol -Wundeclared-selector
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
+PURE_C_AND_CXX_FLAGS += -pedantic
 CPPFLAGS += $(subst $(SPACE)", -I", $(JNI_PATH))
 
 CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
+
+OBJECTIVE_SOURCE_PATTERNS += %.m
+OBJECTIVE_SOURCE_PATTERNS += %.mm
+
+C_AND_CXX_FLAGS += $(if $(filter $(OBJECTIVE_SOURCE_PATTERNS),$<),,$(PURE_C_AND_CXX_FLAGS))
 
 # ----------------------------------------------------------------------------
 # Extra compiler and (mainly) linker flags for building JNI.
