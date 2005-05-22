@@ -5,6 +5,8 @@ import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
 import java.util.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * A PTextBuffer is the Document of the PTextArea.  It implements the CharSequence interface, and is
@@ -24,10 +26,10 @@ public class PTextBuffer implements CharSequence {
     private char[] text = new char[0];
     private int gapPosition;
     private int gapLength;
-    private ArrayList textListeners = new ArrayList();
+    private ArrayList<PTextListener> textListeners = new ArrayList<PTextListener>();
     private PAnchorSet anchorSet = new PAnchorSet();
     private Undoer undoBuffer = new Undoer();
-    private HashMap properties = new HashMap();
+    private HashMap<String, Object> properties = new HashMap<String, Object>();
     
     public PTextBuffer() {
         // Our anchorSet *must* be the first listener.  It needs to update the anchor locations
@@ -87,9 +89,7 @@ public class PTextBuffer implements CharSequence {
         // forwards through the listener list until someone comes up with a really good
         // reason why backwards is better (at which point I'll add an extra 'internalListeners'
         // list).
-//        for (int i = textListeners.size() - 1; i >= 0; --i) {
-        for (int i = 0; i < textListeners.size(); i++) {
-            PTextListener listener = (PTextListener) textListeners.get(i);
+        for (PTextListener listener : textListeners) {
             if (event.isInsert()) {
                 listener.textInserted(event);
             } else if (event.isRemove()) {
@@ -378,7 +378,7 @@ public class PTextBuffer implements CharSequence {
     }
     
     public class Undoer implements PUndoBuffer {
-        private ArrayList undoList;
+        private ArrayList<Doable> undoList;
         private int undoPosition;
         
         private int cleanPosition = -1;
@@ -395,14 +395,14 @@ public class PTextBuffer implements CharSequence {
         // edit easily recognizable.
         private static final int NOT_COMPOUND = -1;
         
-        private ArrayList changeListeners = new ArrayList();
+        private ArrayList<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
         
         public Undoer() {
             resetUndoBuffer();
         }
         
         public void resetUndoBuffer() {
-            this.undoList = new ArrayList();
+            this.undoList = new ArrayList<Doable>();
             this.undoPosition = 0;
             this.compoundingDepth = 0;
             this.compoundId = 0;
@@ -428,9 +428,9 @@ public class PTextBuffer implements CharSequence {
         }
         
         public void dump() {
-            for (int i = 0; i < undoList.size(); ++i) {
-                Doable edit = (Doable) undoList.get(i);
-                System.out.println(i + ": " + edit);
+            int i = 0;
+            for (Doable edit : undoList) {
+                System.out.println(i++ + ": " + edit);
             }
         }
         
@@ -472,7 +472,7 @@ public class PTextBuffer implements CharSequence {
             if (index < 0 || index >= undoList.size()) {
                 return false;
             }
-            Doable indexedDoable = (Doable) undoList.get(index);
+            Doable indexedDoable = undoList.get(index);
             return (indexedDoable.getCompoundId() == doable.getCompoundId());
         }
         
@@ -481,7 +481,7 @@ public class PTextBuffer implements CharSequence {
                 Doable doable;
                 do {
                     --undoPosition;
-                    doable = (Doable) undoList.get(undoPosition);
+                    doable = undoList.get(undoPosition);
                     //System.out.println("undo: " + doable);
                     doable.undo();
                 } while (compoundContinuesAt(doable, undoPosition - 1));
@@ -493,7 +493,7 @@ public class PTextBuffer implements CharSequence {
             if (canRedo()) {
                 Doable doable;
                 do {
-                    doable = (Doable) undoList.get(undoPosition);
+                    doable = undoList.get(undoPosition);
                     ++undoPosition;
                     //System.out.println("redo: " + doable);
                     doable.redo();
@@ -502,13 +502,13 @@ public class PTextBuffer implements CharSequence {
             }
         }
         
-        public void addChangeListener(javax.swing.event.ChangeListener listener) {
+        public void addChangeListener(ChangeListener listener) {
             changeListeners.add(listener);
         }
         
         private void fireChangeListeners() {
             for (int i = changeListeners.size() - 1; i >= 0; --i) {
-                ((javax.swing.event.ChangeListener) changeListeners.get(i)).stateChanged(new javax.swing.event.ChangeEvent(this));
+                changeListeners.get(i).stateChanged(new ChangeEvent(this));
             }
         }
     }

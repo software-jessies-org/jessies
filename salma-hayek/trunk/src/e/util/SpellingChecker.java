@@ -12,8 +12,8 @@ public class SpellingChecker {
     private PrintWriter out;
     private BufferedReader in;
     
-    private static HashSet knownGood = new HashSet();
-    private static HashSet knownBad = new HashSet();
+    private static HashSet<String> knownGood = new HashSet<String>();
+    private static HashSet<String> knownBad = new HashSet<String>();
     
     private static SpellingChecker instance;
     
@@ -109,12 +109,12 @@ public class SpellingChecker {
     }
     
     public synchronized String[] getSuggestionsFor(String misspelledWord) {
-        ArrayList suggestions = new ArrayList();
+        ArrayList<String> suggestions = new ArrayList<String>();
         boolean isMisspelled = isMisspelledWordAccordingToIspell(misspelledWord, suggestions);
         if (isMisspelled == false) {
             return new String[0];
         }
-        return (String[]) suggestions.toArray(new String[suggestions.size()]);
+        return suggestions.toArray(new String[suggestions.size()]);
     }
     
     /**
@@ -137,9 +137,9 @@ public class SpellingChecker {
     public static synchronized void dumpKnownBadWordsTo(PrintStream out) {
         // Get a sorted list of the known bad words.
         Iterator it = knownBad.iterator();
-        ArrayList words = new ArrayList();
-        while (it.hasNext()) {
-            words.add(it.next());
+        ArrayList<String> words = new ArrayList<String>();
+        for (String word : knownBad) {
+            words.add(word);
         }
         Collections.sort(words);
         
@@ -151,7 +151,7 @@ public class SpellingChecker {
         out.println("=" + words.size());
     }
     
-    private boolean isMisspelledWordAccordingToIspell(String word, Collection returnSuggestions) {
+    private boolean isMisspelledWordAccordingToIspell(String word, Collection<String> returnSuggestions) {
         // Send the word to ispell for checking.
         String request = "^" + word;
         //System.err.println(request);
@@ -225,7 +225,7 @@ public class SpellingChecker {
         if (matcher.find() == false) {
             return false; // We don't understand what ispell's said, so let's not assume anything.
         }
-        List suggestions = new ArrayList();
+        List<String> suggestions = new ArrayList<String>();
         fillCollectionWithSuggestions(response, suggestions);
         for (Iterator i = suggestions.iterator(); i.hasNext(); ) {
             String suggestion = (String) i.next();
@@ -245,10 +245,10 @@ public class SpellingChecker {
         return response.replaceFirst("^[&\\?] .* \\d+ \\d+: ", "").split(", ");
     }
     
-    private void fillCollectionWithSuggestions(String response, Collection returnSuggestions) {
+    private void fillCollectionWithSuggestions(String response, Collection<String> returnSuggestions) {
         String[] suggestions = extractSuggestions(response);
-        for (int i = 0; i < suggestions.length; i++) {
-            returnSuggestions.add(suggestions[i]);
+        for (String suggestion : suggestions) {
+            returnSuggestions.add(suggestion);
         }
     }
 }

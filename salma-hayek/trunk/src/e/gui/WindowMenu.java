@@ -22,10 +22,10 @@ public class WindowMenu {
     private final WindowEventListener windowEventListener = new WindowEventListener();
     private final WindowTitleListener windowTitleListener = new WindowTitleListener();
     
-    private Vector windows;
+    private ArrayList<Frame> windows;
     
     private WindowMenu() {
-        windows = new Vector();
+        windows = new ArrayList<Frame>();
     }
     
     /**
@@ -175,7 +175,7 @@ public class WindowMenu {
     }
     
     private Frame[] getFrames() {
-        return (Frame[]) windows.toArray(new Frame[windows.size()]);
+        return windows.toArray(new Frame[windows.size()]);
     }
     
     private void bringAllToFront() {

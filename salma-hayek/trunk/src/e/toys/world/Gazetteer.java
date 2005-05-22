@@ -31,7 +31,7 @@ public class Gazetteer {
         long startTime = System.currentTimeMillis();
         final String filename = "~/Desktop/popdata/towns.txt";
         if (FileUtilities.exists(filename)) {
-            ArrayList result = new ArrayList();
+            ArrayList<Place> result = new ArrayList<Place>();
             String[] lines = StringUtilities.readLinesFromFile(filename);
             for (int i = 1; i < lines.length; ++i) {
                 String line = lines[i];

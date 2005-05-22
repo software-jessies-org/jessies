@@ -7,10 +7,11 @@ import javax.swing.*;
 import e.util.*;
 
 public class EPopupMenu {
-    private ArrayList menuItems = new ArrayList();
+    private ArrayList<Action> menuItems = new ArrayList<Action>();
     
     /** Creates a new popup menu. */
-    public EPopupMenu() { }
+    public EPopupMenu() {
+    }
     
     /** Adds a single item. */
     public void add(Action item) {

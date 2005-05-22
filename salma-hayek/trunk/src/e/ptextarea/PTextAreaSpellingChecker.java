@@ -198,10 +198,9 @@ public class PTextAreaSpellingChecker implements PTextListener {
     }
 
     public Collection listMisspellings() {
-        TreeSet result = new TreeSet();
-        List highlights = component.getHighlights();
-        for (int i = 0; i < highlights.size(); ++i) {
-            PHighlight highlight = (PHighlight) highlights.get(i);
+        TreeSet<String> result = new TreeSet<String>();
+        List<PHighlight> highlights = component.getHighlights();
+        for (PHighlight highlight : highlights) {
             if (highlight instanceof UnderlineHighlight) {
                 final int start = highlight.getStartIndex();
                 final int end = highlight.getEndIndex();

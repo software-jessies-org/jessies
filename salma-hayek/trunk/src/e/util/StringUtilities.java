@@ -6,7 +6,7 @@ import java.util.*;
 public class StringUtilities {
     /** Reads all the lines from the named file into a string array. Throws a RuntimeException on failure. */
     public static String[] readLinesFromFile(String filename) {
-        ArrayList result = new ArrayList();
+        ArrayList<String> result = new ArrayList<String>();
         LineNumberReader in = null;
         try {
             File file = FileUtilities.fileFromString(filename);
@@ -15,7 +15,7 @@ public class StringUtilities {
             while ((line = in.readLine()) != null) {
                 result.add(line);
             }
-            return (String[]) result.toArray(new String[result.size()]);
+            return result.toArray(new String[result.size()]);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {

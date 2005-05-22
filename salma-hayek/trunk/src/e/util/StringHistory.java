@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class StringHistory {
     private String filename;
-    private ArrayList history = new ArrayList();
+    private ArrayList<String> history = new ArrayList<String>();
     
     public StringHistory() {
         this(null);
@@ -33,7 +33,7 @@ public class StringHistory {
     }
     
     public String get(int index) {
-        return (String) history.get(index);
+        return history.get(index);
     }
     
     public void add(String string) {
@@ -46,14 +46,14 @@ public class StringHistory {
     }
     
     public void clear() {
-        history = new ArrayList();
+        history = new ArrayList<String>();
         if (filename != null) {
             FileUtilities.fileFromString(filename).delete();
         }
     }
     
     public void readHistoryFile() throws IOException {
-        history = new ArrayList();
+        history = new ArrayList<String>();
         if (filename == null) {
             return;
         }

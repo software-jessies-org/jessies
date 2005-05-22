@@ -32,16 +32,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private boolean selectionEndIsAnchor;  // Otherwise, selection start is anchor.
     
     private PLineList lines;
-    private List splitLines;  // TODO - Write a split buffer-style List implementation.
+    private List<SplitLine> splitLines;  // TODO - Write a split buffer-style List implementation.
     
     // We cache the FontMetrics for readability rather than performance.
     private FontMetrics metrics;
     private int[] widthCache;
     
-    private ArrayList highlights = new ArrayList();
+    private ArrayList<PHighlight> highlights = new ArrayList<PHighlight>();
     private PTextStyler textStyler = new PPlainTextStyler(this);
     private int rightHandMarginColumn = NO_MARGIN;
-    private ArrayList caretListeners = new ArrayList();
+    private ArrayList<PCaretListener> caretListeners = new ArrayList<PCaretListener>();
     
     private int rowCount;
     private int columnCount;
@@ -466,7 +466,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         repaintHighlight(highlight);
     }
     
-    public List getHighlights() {
+    public List<PHighlight> getHighlights() {
         return Collections.unmodifiableList(highlights);
     }
     
@@ -610,7 +610,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         String fullLine = getLineList().getLine(lineIndex).getContents().toString();
         PLineSegment[] segments = getLineSegments(lineIndex);
         int index = 0;
-        ArrayList result = new ArrayList();
+        ArrayList<PLineSegment> result = new ArrayList<PLineSegment>();
         int start = splitLine.getOffset();
         int end = start + splitLine.getLength();
         
@@ -631,7 +631,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             result.add(segment);
             index += segment.getLength();
         }
-        return (PLineSegment[]) result.toArray(new PLineSegment[result.size()]);
+        return result.toArray(new PLineSegment[result.size()]);
     }
     
     public PLineSegment[] getLineSegments(int lineIndex) {
@@ -639,14 +639,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private PLineSegment[] getTabbedSegments(PLineSegment[] segments) {
-        ArrayList result = new ArrayList();
+        ArrayList<PLineSegment> result = new ArrayList<PLineSegment>();
         for (int i = 0; i < segments.length; i++) {
             addTabbedSegments(segments[i], result);
         }
-        return (PLineSegment[]) result.toArray(new PLineSegment[result.size()]);
+        return result.toArray(new PLineSegment[result.size()]);
     }
     
-    private void addTabbedSegments(PLineSegment segment, ArrayList target) {
+    private void addTabbedSegments(PLineSegment segment, ArrayList<PLineSegment> target) {
         while (true) {
             String text = segment.getText();
             int tabIndex = text.indexOf('\t');
@@ -938,7 +938,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private synchronized void generateLineWrappings() {
         if (isLineWrappingInvalid() && isShowing()) {
-            splitLines = new ArrayList();
+            splitLines = new ArrayList<SplitLine>();
             for (int i = 0; i < lines.size(); i++) {
                 PLineList.Line line = lines.getLine(i);
                 if (line.isWidthValid() == false) {
@@ -1011,7 +1011,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public SplitLine getSplitLine(int index) {
-        return (SplitLine) splitLines.get(index);
+        return splitLines.get(index);
     }
     
     private int addSplitLines(int lineIndex, int index) {

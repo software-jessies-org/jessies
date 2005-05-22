@@ -30,7 +30,7 @@ import e.util.*;
 public class FormDialog extends JDialog {
     private static int componentSpacing = getComponentSpacing();
     
-    private static HashMap dialogGeometries = new HashMap();
+    private static HashMap<String, Rectangle> dialogGeometries = new HashMap<String, Rectangle>();
     
     private ArrayList listenedToTextFields;
     
@@ -252,7 +252,7 @@ public class FormDialog extends JDialog {
      * code was forcing the clipping to occur. Hence the restriction now.)
      */
     private void restorePreviousSize() {
-        Rectangle previousBounds = (Rectangle) dialogGeometries.get(getTitle());
+        Rectangle previousBounds = dialogGeometries.get(getTitle());
         if (previousBounds != null) {
             setLocation(previousBounds.getLocation());
             Dimension newSize = previousBounds.getSize();
@@ -356,10 +356,8 @@ public class FormDialog extends JDialog {
      */
     public static void writeGeometriesTo(String filename) {
         StringBuffer content = new StringBuffer();
-        Iterator it = dialogGeometries.keySet().iterator();
-        while (it.hasNext()) {
-            String name = (String) it.next();
-            Rectangle bounds = (Rectangle) dialogGeometries.get(name);
+        for (String name : dialogGeometries.keySet()) {
+            Rectangle bounds = dialogGeometries.get(name);
             content.append(name + "\n");
             content.append(bounds.x + "\n");
             content.append(bounds.y + "\n");

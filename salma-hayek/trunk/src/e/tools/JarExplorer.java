@@ -61,7 +61,7 @@ public class JarExplorer extends JFrame {
         final int totalEntryCount = zipFile.size();
         int entryCount = 0;
 
-        ArrayList entries = new ArrayList();
+        ArrayList<String> entries = new ArrayList<String>();
         Enumeration e = zipFile.entries();
         while (e.hasMoreElements()) {
             ++entryCount;
@@ -152,10 +152,10 @@ public class JarExplorer extends JFrame {
     }
 
     private String runJavaP(String className, boolean detail) {
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
 
-        ArrayList command = new ArrayList();
+        ArrayList<String> command = new ArrayList<String>();
         command.add("javap");
         command.add("-private");
         if (detail) {
@@ -177,8 +177,8 @@ public class JarExplorer extends JFrame {
         return StringUtilities.join(source, "\n");
     }
 
-    private String[] makeArray(final List list) {
-        return (String[]) list.toArray(new String[list.size()]);
+    private String[] makeArray(final List<String> list) {
+        return list.toArray(new String[list.size()]);
     }
 
     public static void main(String[] filenames) {

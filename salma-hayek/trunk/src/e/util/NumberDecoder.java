@@ -108,11 +108,11 @@ public class NumberDecoder {
         return result.toString();
     }
     
-    public List toStrings() {
+    public List<String> toStrings() {
         if (valid == false) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
-        ArrayList result = new ArrayList();
+        ArrayList<String> result = new ArrayList<String>();
         result.add(toString(radix, number) + ":");
         for (int i = 0; i < bases.length; i++) {
             if (bases[i] != radix) {

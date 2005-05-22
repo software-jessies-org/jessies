@@ -20,7 +20,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
     }
     
     public PTextSegment[] getTextSegments(int lineIndex) {
-        ArrayList result = new ArrayList();
+        ArrayList<PTextSegment> result = new ArrayList<PTextSegment>();
         String line = textArea.getLineContents(lineIndex).toString();
         int lineStart = textArea.getLineStartOffset(lineIndex);
         Matcher matcher = highlightPattern.matcher(line);
@@ -35,7 +35,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         if (lastStart < line.length()) {
             result.add(new PTextSegment(textArea, lineStart + lastStart, lineStart + line.length(), PStyle.NORMAL));
         }
-        return (PTextSegment[]) result.toArray(new PTextSegment[result.size()]);
+        return result.toArray(new PTextSegment[result.size()]);
     }
     
     /**

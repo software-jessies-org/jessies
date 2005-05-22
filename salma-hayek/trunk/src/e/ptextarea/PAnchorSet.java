@@ -20,7 +20,7 @@ import javax.swing.*;
  */
 
 public class PAnchorSet implements PTextListener {
-    private ArrayList anchors = new ArrayList();
+    private ArrayList<PAnchor> anchors = new ArrayList<PAnchor>();
     
     public synchronized void add(PAnchor anchor) {
         anchors.add(getFirstAnchorIndex(anchor.getIndex()), anchor);
@@ -44,7 +44,7 @@ public class PAnchorSet implements PTextListener {
     // This is what the STL calls "lower_bound".
     private int getFirstAnchorIndex(int textIndex) {
         checkLinearity();    // Comment this out to improve speed, but remove warnings when our state goes wrong.
-        int index = Collections.binarySearch(anchors, new PAnchor(textIndex));
+        int index = Collections.binarySearch(anchors, new PAnchor(textIndex), new AnchorComparator());
         if (index < 0) {
             return -index - 1;
         } else {
@@ -92,7 +92,7 @@ public class PAnchorSet implements PTextListener {
     }
     
     public void textRemoved(PTextEvent event) {
-        LinkedList deletionList = new LinkedList();
+        LinkedList<PAnchor> deletionList = new LinkedList<PAnchor>();
         synchronized (this) {
             int start = getFirstAnchorIndex(event.getOffset());
             int deletionLength = event.getLength();
@@ -138,11 +138,9 @@ public class PAnchorSet implements PTextListener {
         anchors.clear();
     }
     
-    private class AnchorComparator implements Comparator {
-        public int compare(Object obj1, Object obj2) {
-            PAnchor anchor1 = (PAnchor) obj1;
-            PAnchor anchor2 = (PAnchor) obj2;
-            return (anchor1.getIndex() - anchor1.getIndex());
+    private class AnchorComparator implements Comparator<PAnchor> {
+        public int compare(PAnchor lhs, PAnchor rhs) {
+            return (lhs.getIndex() - rhs.getIndex());
         }
     }
 }

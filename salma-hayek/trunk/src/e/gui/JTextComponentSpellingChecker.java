@@ -246,7 +246,7 @@ public class JTextComponentSpellingChecker implements DocumentListener {
         Highlighter highlighter = component.getHighlighter();
         Highlighter.Highlight[] highlights = highlighter.getHighlights();
         
-        TreeSet result = new TreeSet();
+        TreeSet<String> result = new TreeSet<String>();
         for (int i = 0; i < highlights.length; i++) {
             Highlighter.Highlight highlight = highlights[i];
             if (highlight.getPainter() == PAINTER) {

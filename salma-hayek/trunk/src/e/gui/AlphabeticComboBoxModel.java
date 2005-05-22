@@ -4,7 +4,7 @@ import java.util.*;
 
 public class AlphabeticComboBoxModel extends EHistoryComboBoxModel {
     public AlphabeticComboBoxModel() {
-        this.model = new TreeSet();
+        this.model = new TreeSet<String>();
     }
     
     public Object getElementAt(int index) {

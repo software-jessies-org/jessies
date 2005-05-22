@@ -14,9 +14,9 @@ import e.util.*;
 
 public class PLineList implements PTextListener {
     private PTextBuffer text;
-    private ArrayList lines;
+    private ArrayList<Line> lines;
     private int lastValidLineIndex;
-    private ArrayList listeners = new ArrayList();
+    private ArrayList<PLineListener> listeners = new ArrayList<PLineListener>();
     
     public PLineList(PTextBuffer text) {
         setPTextBuffer(text);
@@ -24,7 +24,7 @@ public class PLineList implements PTextListener {
     
     public void printLineInfo() {
         for (int i = 0; i < lines.size(); i++) {
-            Line line = (Line) lines.get(i);
+            Line line = lines.get(i);
             System.err.println(i + ": start " + line.getStart() + ", length " + line.getLength() + ", end " + (line.getStart() + line.getLength()));
         }
     }
@@ -110,16 +110,21 @@ public class PLineList implements PTextListener {
     /** Returns an object representing information about the line with the given index. */
     public Line getLine(int lineIndex) {
         validateStartPositions(lineIndex);
-        return (Line) lines.get(lineIndex);
+        return lines.get(lineIndex);
     }
     
     private void fireEvent(PLineEvent event) {
-        for (int i = 0; i < listeners.size(); i++) {
-            PLineListener listener = (PLineListener) listeners.get(i);
+        for (PLineListener listener : listeners) {
             switch (event.getType()) {
-            case PLineEvent.ADDED: listener.linesAdded(event); break;
-            case PLineEvent.REMOVED: listener.linesRemoved(event); break;
-            case PLineEvent.CHANGED: listener.linesChanged(event); break;
+            case PLineEvent.ADDED:
+                listener.linesAdded(event);
+                break;
+            case PLineEvent.REMOVED:
+                listener.linesRemoved(event);
+                break;
+            case PLineEvent.CHANGED:
+                listener.linesChanged(event);
+                break;
             }
         }
     }
@@ -203,8 +208,8 @@ public class PLineList implements PTextListener {
             for (int i = lastValidLineIndex; i < toLineIndex; i++) {
                 // We must get the lines straight out of the ArrayList, and must not call getLine,
                 // since that in turn would call this method, resulting in an infinite recursion.
-                Line prevLine = (Line) lines.get(i);
-                Line thisLine = (Line) lines.get(i + 1);
+                Line prevLine = lines.get(i);
+                Line thisLine = lines.get(i + 1);
                 thisLine.setStart(prevLine.getStart() + prevLine.getLength());
             }
             lastValidLineIndex = toLineIndex;
@@ -212,7 +217,7 @@ public class PLineList implements PTextListener {
     }
     
     private void generateLines() {
-        lines = new ArrayList();
+        lines = new ArrayList<Line>();
         int start = 0;
         for (int i = 0; i < text.length(); i++) {
             if (text.charAt(i) == '\n') {

@@ -5,13 +5,14 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 public abstract class EHistoryComboBoxModel implements MutableComboBoxModel {
-    private ArrayList listeners = new ArrayList();
+    private ArrayList<ListDataListener> listeners = new ArrayList<ListDataListener>();
     private Object selectedItem;
-    protected Collection model;
+    protected Collection<String> model;
     
     public void addElement(Object element) {
-        if (element != null && (((String) element).length() > 0)) {
-            model.add(element);
+        String string = (String) element;
+        if (string != null && string.length() > 0) {
+            model.add(string);
             fireChangeNotification();
         }
     }
@@ -41,7 +42,7 @@ public abstract class EHistoryComboBoxModel implements MutableComboBoxModel {
     }
     
     public void insertElementAt(Object element, int index) {
-        model.add(element);
+        model.add((String) element);
         fireChangeNotification();
     }
     

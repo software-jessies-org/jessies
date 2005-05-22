@@ -12,10 +12,11 @@ public class SortedComboBoxModel extends DefaultComboBoxModel {
      * implement the Comparable interface.
      */
     public void addElement(Object element) {
+        String string = (String) element;
         int i = 0;
         for (i = 0; i < getSize(); ++i) {
-            Comparable c = (Comparable) getElementAt(i);
-            if (c.compareTo(element) > 0) {
+            String other = (String) getElementAt(i);
+            if (other.compareTo(string) > 0) {
                 break;
             }
         }

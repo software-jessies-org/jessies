@@ -29,7 +29,7 @@ public class FileSearcher {
      * Use the linePattern to break the given CharBuffer into lines, applying
      * the input pattern to each line to see if we have a match.
      */
-    private int searchCharBuffer(String fileName, CharSequence charSequence, Collection matches) {
+    private int searchCharBuffer(String fileName, CharSequence charSequence, Collection<String> matches) {
         // Early exit on non-matching files.
         Matcher firstMatch = pattern.matcher(charSequence);
         if (firstMatch.find() == false) {
@@ -72,7 +72,7 @@ public class FileSearcher {
      * Search for occurrences of the input pattern in the given file.
      * Returns the number of matches.
      */
-    public int searchFile(String path, String fileName, Collection matches) throws IOException {
+    public int searchFile(String path, String fileName, Collection<String> matches) throws IOException {
         File file = FileUtilities.fileFromParentAndString(path, fileName);
         int byteCount = (int) file.length();
         

@@ -4,13 +4,14 @@ import java.util.*;
 
 public class ChronologicalComboBoxModel extends EHistoryComboBoxModel {
     public ChronologicalComboBoxModel() {
-        this.model = new Vector();
+        this.model = new ArrayList<String>();
     }
     
     public void addElement(Object element) {
-        if (element != null && (((String) element).length() > 0)) {
-            model.remove(element);
-            model.add(element);
+        String string = (String) element;
+        if (string != null && string.length() > 0) {
+            model.remove(string);
+            model.add(string);
             fireChangeNotification();
         }
     }
@@ -19,7 +20,7 @@ public class ChronologicalComboBoxModel extends EHistoryComboBoxModel {
         if (index < 0) {
             return "<invalid item>";
         }
-        Object result = ((Vector) model).get(index);
+        Object result = ((ArrayList) model).get(index);
         return result;
     }
 }

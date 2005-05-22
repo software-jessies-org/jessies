@@ -9,7 +9,7 @@ import javax.swing.*;
  */
 public class FilteredListModel extends AbstractListModel {
     private ListModel model;
-    private ArrayList validIndexes;
+    private ArrayList<Integer> validIndexes;
     
     public FilteredListModel(final ListModel model) {
         this.model = model;
@@ -24,11 +24,11 @@ public class FilteredListModel extends AbstractListModel {
      */
     public void setFilter(final String filter) {
         String substring = filter.toLowerCase();
-        validIndexes = new ArrayList();
+        validIndexes = new ArrayList<Integer>();
         for (int i = 0; i < model.getSize(); ++i) {
             String entry = model.getElementAt(i).toString().toLowerCase();
             if (entry.indexOf(substring) != -1) {
-                validIndexes.add(new Integer(i));
+                validIndexes.add(i);
             }
         }
         // We can't use fireContentsChanged here because it doesn't imply

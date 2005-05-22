@@ -10,7 +10,7 @@ public class ProcessUtilities {
      * Lines written to standard output are appended to 'lines'.
      * Lines written to standard error are appended to 'errors'.
      */
-    public static int backQuote(final File directory, final String[] command, final ArrayList lines, final ArrayList errors) {
+    public static int backQuote(final File directory, final String[] command, final ArrayList<String> lines, final ArrayList<String> errors) {
         if (lines == null) {
             throw new IllegalArgumentException("ArrayList 'lines' may not be null");
         }
@@ -57,9 +57,9 @@ public class ProcessUtilities {
      * Collects lines into an ArrayList.
      */
     public static class ArrayListLineListener implements LineListener {
-        private ArrayList arrayList;
+        private ArrayList<String> arrayList;
         
-        public ArrayListLineListener(final ArrayList arrayList) {
+        public ArrayListLineListener(final ArrayList<String> arrayList) {
             this.arrayList = arrayList;
             if (arrayList == null) {
                 throw new IllegalArgumentException("ArrayList 'arrayList' may not be null");

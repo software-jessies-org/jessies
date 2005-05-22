@@ -10,21 +10,21 @@ import java.util.*;
  * that are still extant.
  */
 public class InstanceTracker {
-    private static final HashMap CLASS_TO_INSTANCES_MAP = new HashMap();
+    private static final HashMap<Class, ArrayList<WeakReference>> CLASS_TO_INSTANCES_MAP = new HashMap<Class, ArrayList<WeakReference>>();
     private static final boolean DEBUG = false;
     
-    public static synchronized void addInstance(Object instance) {
+    public static synchronized <T> void addInstance(T instance) {
         if (DEBUG) {
             System.err.println("Adding " + instance + " of class " + instance.getClass() + ".");
         }
-        ArrayList instances = instancesOfClass(instance.getClass());
+        ArrayList<WeakReference> instances = instancesOfClass(instance.getClass());
         instances.add(new WeakReference(instance));
     }
     
-    private static synchronized ArrayList instancesOfClass(Class klass) {
-        ArrayList instances = (ArrayList) CLASS_TO_INSTANCES_MAP.get(klass);
+    private static synchronized ArrayList<WeakReference> instancesOfClass(Class klass) {
+        ArrayList<WeakReference> instances = (ArrayList<WeakReference>) CLASS_TO_INSTANCES_MAP.get(klass);
         if (instances == null) {
-            instances = new ArrayList();
+            instances = new ArrayList<WeakReference>();
             CLASS_TO_INSTANCES_MAP.put(klass, instances);
         }
         if (DEBUG) {
@@ -33,15 +33,15 @@ public class InstanceTracker {
         return instances;
     }
     
-    public static synchronized Object[] getInstancesOfClass(Class klass) {
-        ArrayList result = new ArrayList();
+    public static synchronized <T> Object[] getInstancesOfClass(Class<T> klass) {
+        ArrayList<T> result = new ArrayList<T>();
         List weakReferences = instancesOfClass(klass);
         if (DEBUG) {
             System.err.println("Weak references: " + weakReferences.size());
         }
         for (int i = 0; i < weakReferences.size(); ++i) {
             WeakReference weakReference = (WeakReference) weakReferences.get(i);
-            Object instance = weakReference.get();
+            T instance = (T) weakReference.get();
             if (instance != null) {
                 result.add(instance);
             }
@@ -49,7 +49,7 @@ public class InstanceTracker {
         if (DEBUG) {
             System.err.println("References: " + result.size());
         }
-        return result.toArray(new Object[result.size()]);
+        return (Object[]) result.toArray(new Object[result.size()]);
     }
     
     private InstanceTracker() {

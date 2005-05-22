@@ -73,7 +73,7 @@ public class PTextWindow {
             } else if (extension.equals("c")) {
                 return new PCTextStyler(textArea);
             } else if (extension.equals("java")) {
-                HashSet set = new HashSet();
+                HashSet<String> set = new HashSet<String>();
                 set.add("println");
                 textArea.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, set);
                 return new PJavaTextStyler(textArea);
