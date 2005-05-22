@@ -9,6 +9,8 @@ The ETextArea build-project action. Works for either Ant or make.
 */
 public class BuildAction extends ETextAction {
     private static final String ACTION_NAME = "Build Project";
+    
+    private boolean building = false;
 
     public BuildAction() {
         super(ACTION_NAME);
@@ -20,6 +22,11 @@ public class BuildAction extends ETextAction {
     }
 
     private void buildProject(ETextWindow text) {
+        if (building) {
+            Edit.showAlert(ACTION_NAME, "A target is already being built. Please wait for the build to complete.");
+            return;
+        }
+        
         Workspace workspace = Edit.getCurrentWorkspace();
         boolean shouldContinue = workspace.prepareForAction("Build", "Save before building?");
         if (shouldContinue == false) {
@@ -62,7 +69,20 @@ public class BuildAction extends ETextAction {
         String makefileDirectoryName = makefileName.substring(0, makefileName.lastIndexOf(File.separatorChar));
         command = addTarget(workspace, command);
         try {
-            new ShellCommand("", 0, workspace, true, makefileDirectoryName, command);
+            final ShellCommand shellCommand = new ShellCommand("", 0, workspace, makefileDirectoryName, command);
+            shellCommand.setLaunchRunnable(new Runnable() {
+                public void run() {
+                    building = true;
+                    Edit.showProgressBar(shellCommand.getProcess());
+                }
+            });
+            shellCommand.setCompletionRunnable(new Runnable() {
+                public void run() {
+                    Edit.hideProgressBar();
+                    building = false;
+                }
+            });
+            shellCommand.runCommand();
         } catch (IOException ex) {
             Edit.showAlert(ACTION_NAME, "Can't start task (" + ex.getMessage() + ").");
             ex.printStackTrace();

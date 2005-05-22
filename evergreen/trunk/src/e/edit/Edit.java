@@ -661,25 +661,41 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         // ...and so that it doesn't intrude on the area reserved for the
         // grow box (and flicker as they fight about who gets drawn on top).
         statusLineAndProgressContainer.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 20));
+        
+        progressBarAndKillButton.add(progressBar, BorderLayout.CENTER);
+        progressBarAndKillButton.add(makeKillButton(), BorderLayout.EAST);
     }
     
-    private static int progressNesting = 0;
-    private static JProgressBar progressBar = new JProgressBar();
+    private static JButton makeKillButton() {
+        JButton killButton = new JButton(new e.gui.StopIcon(Color.RED));
+        killButton.setPressedIcon(new e.gui.StopIcon(Color.RED.darker()));
+        killButton.setRolloverIcon(new e.gui.StopIcon(new Color(255, 100, 100)));
+        killButton.setRolloverEnabled(true);
+        killButton.setBorder(null);
+        killButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ProcessUtilities.spawn(null, new String[] { "kill", "-TERM", Integer.toString(ProcessUtilities.getProcessId(process)) });
+            }
+        });
+        return killButton;
+    }
     
-    public static synchronized void showProgressBar() {
-        ++progressNesting;
-        if (progressNesting == 1) {
-            progressBar.setIndeterminate(true);
-            statusLineAndProgressContainer.add(progressBar, BorderLayout.EAST);
-        }
+    private static JProgressBar progressBar = new JProgressBar();
+    private static JPanel progressBarAndKillButton = new JPanel(new BorderLayout());
+    private static Process process;
+    
+    public static synchronized void showProgressBar(Process process) {
+        Edit.process = process;
+        progressBar.setIndeterminate(true);
+        statusLineAndProgressContainer.add(progressBarAndKillButton, BorderLayout.EAST);
+        statusLineAndProgressContainer.repaint();
     }
     
     public static synchronized void hideProgressBar() {
-        --progressNesting;
-        if (progressNesting == 0) {
-            statusLineAndProgressContainer.remove(progressBar);
-            progressBar.setIndeterminate(false);
-        }
+        Edit.process = null;
+        statusLineAndProgressContainer.remove(progressBarAndKillButton);
+        progressBar.setIndeterminate(false);
+        statusLineAndProgressContainer.repaint();
     }
     
     public static void showMinibuffer(MinibufferUser minibufferUser) {

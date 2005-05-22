@@ -269,16 +269,8 @@ auto-saving
 
 [ ] wily-style access to |, > and < commands?
 
-[ ] Tidy-up ShellCommand:
-
-    (1) i think you should either say setCompletionListener or implement an actual list, as implied by the way addXListener works elsewhere.
-
-    (2) i'd have been tempted by setCompletionAction(Action action) and not having a new listener interface
-        (I think, by that, Elliott means "extend AbstractAction".)
-
     (3) use ShellCommand as a container for its arguments and delay invocation until an explicit method call.
         That would remove all the duplication of parameter lists from ExternalToolAction.
-        Ed says there's precedent in new Thread(new Runnable())
 
 [ ] Handle out-of-date files better
 

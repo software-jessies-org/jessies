@@ -1,15 +1,14 @@
 package e.edit;
 
-import java.io.*;
 import e.util.*;
+import java.io.*;
+import javax.swing.*;
 
 public class ShellCommand {
     private Workspace workspace;
     private String command;
     private String context;
     private String name;
-    
-    private boolean shouldShowProgress;
     
     private String[] envp;
 // the ProcessBuilder stuff is the right way to do things when we can
@@ -21,29 +20,28 @@ public class ShellCommand {
     /** The count of open streams. */
     private int openStreamCount = 0;
     
-    private CompletionListener listener;
+    private Runnable launchRunnable = new NoOpRunnable();
+    private Runnable completionRunnable = new NoOpRunnable();
     
     /**
      * Starts a new task with no progress feedback in the system's temporary
      * directory (probably /tmp on Unix).
      */
     public ShellCommand(String command) throws IOException {
-        this("", 0, Edit.getCurrentWorkspace(), false, System.getProperty("java.io.tmpdir"), command);
+        this("", 0, Edit.getCurrentWorkspace(), System.getProperty("java.io.tmpdir"), command);
     }
     
     /** Starts a new task. */
-    public ShellCommand(String filename, int lineNumber, Workspace workspace, boolean shouldShowProgress, String context, String command) throws IOException {
+    public ShellCommand(String filename, int lineNumber, Workspace workspace, String context, String command) throws IOException {
         this.command = command.trim();
 
         /* FIXME: we also need to mangle UTF-8. for each byte, we need to have the 'character' corresponding to the byte. the JVM 'translates' non-ASCII characters by just sending the first byte, it seems. */
         
         this.workspace = workspace;
-        this.shouldShowProgress = shouldShowProgress;
         this.context = context;
         this.name = command;
 
         init(filename, lineNumber);
-        runCommand();
     }
     
 //    public void init(String filename, int lineNumber) {
@@ -84,8 +82,10 @@ public class ShellCommand {
         process = Runtime.getRuntime().exec(makeCommandLine(command), envp, FileUtilities.fileFromString(context));
 //        process = processBuilder.start();
 
+        SwingUtilities.invokeLater(launchRunnable);
+        
         Edit.showStatus("Started task '" + command + "'");
-
+        
         startMonitoringStream(process.getInputStream());
         startMonitoringStream(process.getErrorStream());
         
@@ -111,9 +111,6 @@ public class ShellCommand {
     
     /** Invoked by StreamMonitor when one of this task's streams is opened. */
     public synchronized void streamOpened() {
-        if (shouldShowProgress) {
-            Edit.showProgressBar();
-        }
         openStreamCount++;
     }
     
@@ -122,9 +119,6 @@ public class ShellCommand {
     * streams left open, this task has finished and Edit is notified.
     */
     public synchronized void streamClosed() {
-        if (shouldShowProgress) {
-            Edit.hideProgressBar();
-        }
         openStreamCount--;
         if (openStreamCount == 0) {
             try {
@@ -138,9 +132,7 @@ public class ShellCommand {
             }
             workspace.getErrorsWindow().drawHorizontalRule();
             Edit.showStatus("Task '" + command + "' finished");
-            if (listener != null) {
-                listener.shellCommandCompleted();
-            }
+            SwingUtilities.invokeLater(completionRunnable);
         }
     }
     
@@ -177,11 +169,26 @@ public class ShellCommand {
         return this.name;
     }
     
-    public void addCompletionListener(CompletionListener listener) {
-        this.listener = listener;
+    /**
+     * Sets the Runnable to be invoked on the event dispatch thread when the
+     * shell command completes.
+     */
+    public void setCompletionRunnable(Runnable completionRunnable) {
+        this.completionRunnable = completionRunnable;
     }
-
-    public interface CompletionListener {
-        public void shellCommandCompleted();
+    
+    /**
+     * Sets the Runnable to be invoked on the event dispatch thread when the
+     * shell command is started.
+     */
+    public void setLaunchRunnable(Runnable launchRunnable) {
+        this.launchRunnable = launchRunnable;
+    }
+    
+    /**
+     * Returns the underlying Process instance.
+     */
+    public Process getProcess() {
+        return process;
     }
 }
