@@ -38,6 +38,7 @@ public abstract class InAppServer {
         private void writeHostAndPortToFile(File portFile) {
             String host = socket.getInetAddress().getHostName();
             int port = socket.getLocalPort();
+            Log.warn("echo " + host + ":" + port + " > " + portFile);
             StringUtilities.writeFile(portFile, host + ":" + port + "\n");
         }
         
