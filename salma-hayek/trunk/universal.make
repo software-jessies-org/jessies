@@ -116,7 +116,6 @@ C_AND_CXX_FLAGS += -W -Wall -Werror
 OBJC_AND_OBJCXX_FLAGS += -Wno-protocol -Wundeclared-selector
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
-CXXFLAGS += -pedantic
 CPPFLAGS += $(subst $(SPACE)", -I", $(JNI_PATH))
 
 CFLAGS += $(C_AND_CXX_FLAGS)
@@ -287,12 +286,12 @@ endif
 
 # We should also ensure that we build class files that can be used on
 # Mac OS, regardless of where we build.
-JAVA_FLAGS += -target 1.4
+JAVA_FLAGS += -target 1.5
 
 # While while we're at it, it's probably worth refusing to compile source
 # using 1.5 features as long as we have one platform that's not ready.
 # This should also weed out any attempt to use a Java older than 1.4.
-JAVA_FLAGS += -source 1.4
+JAVA_FLAGS += -source 1.5
 
 define BUILD_JAVA
   @echo Recompiling the world... && \
