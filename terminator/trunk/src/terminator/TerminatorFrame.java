@@ -15,7 +15,7 @@ public class TerminatorFrame extends JFrame {
 	private Dimension terminalSize;
 	private JTabbedPane tabbedPane;
 	
-	private ArrayList terminals = new ArrayList();
+	private ArrayList<JTerminalPane> terminals = new ArrayList<JTerminalPane>();
 
 	public TerminatorFrame(Terminator terminator, JTerminalPaneFactory[] paneFactories) {
 		super(Options.getSharedInstance().getTitle());
@@ -196,8 +196,9 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	public static void disableFocusTraversal(Component c) {
-		c.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
-		c.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
+		HashSet<AWTKeyStroke> emptySet = new HashSet<AWTKeyStroke>();
+		c.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, emptySet);
+		c.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, emptySet);
 	}
 	
 	private void initTabbedTerminals() {

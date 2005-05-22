@@ -49,7 +49,7 @@ public class TerminalControl implements Runnable {
 	private LogWriter logWriter;
 	
 	// Buffer of TerminalActions to perform.
-	private ArrayList terminalActions = new ArrayList();
+	private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
 	
 	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) throws IOException {
 		reset();

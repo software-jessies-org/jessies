@@ -10,7 +10,7 @@ import terminator.view.*;
 public class Terminator {
 	private static final Terminator INSTANCE = new Terminator();
 	private List arguments;
-	private ArrayList frames = new ArrayList();
+	private ArrayList<TerminatorFrame> frames = new ArrayList<TerminatorFrame>();
 	
 	public static Terminator getSharedInstance() {
 		return INSTANCE;
@@ -104,7 +104,7 @@ public class Terminator {
 	}
 	
 	private JTerminalPaneFactory[] getInitialTerminals() {
-		ArrayList result = new ArrayList();
+		ArrayList<JTerminalPaneFactory> result = new ArrayList<JTerminalPaneFactory>();
 		String name = null;
 		for (int i = 0; i < arguments.size(); ++i) {
 			String word = (String) arguments.get(i);
@@ -121,7 +121,7 @@ public class Terminator {
 		if (arguments.isEmpty()) {
 			result.add(new JTerminalPaneFactory.Shell());
 		}
-		return (JTerminalPaneFactory[]) result.toArray(new JTerminalPaneFactory[result.size()]);
+		return result.toArray(new JTerminalPaneFactory[result.size()]);
 	}
 
 	public void showUsage(PrintWriter out) {

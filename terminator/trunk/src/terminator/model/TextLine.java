@@ -44,11 +44,11 @@ public class TextLine {
 		return styles[index];
 	}
 	
-	public List/*<StyledText>*/ getStyledTextSegments() {
+	public List<StyledText> getStyledTextSegments() {
 		if (styles.length == 0) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
-		ArrayList result = new ArrayList();
+		ArrayList<StyledText> result = new ArrayList<StyledText>();
 		int startIndex = 0;
 		short startStyle = styles[0];
 		for (int i = 1; i < styles.length; i++) {

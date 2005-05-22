@@ -18,7 +18,7 @@ public class EscapeParser {
 
 	private SequenceRecognizer seqRecognizer;
 	
-	private static final HashMap SEQ_RECOGNIZERS = new HashMap();
+	private static final HashMap<Character, SequenceRecognizer> SEQ_RECOGNIZERS = new HashMap<Character, SequenceRecognizer>();
 	static {
 		addSequenceRecognizers("6789=>DEHMZcno", new SingleCharSequenceRecognizer());
 		addSequenceRecognizers("#()*+$@", new TwoCharSequenceRecognizer());

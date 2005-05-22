@@ -30,7 +30,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private boolean displayCursor = true;
 	private boolean blinkOn = true;
 	private CursorBlinker cursorBlinker;
-	private HashMap highlighters = new HashMap();
+	private HashMap<Class, Highlighter> highlighters = new HashMap<Class, Highlighter>();
 	
 	/**
 	* The highlights present in each line.  The highlights for a line are stored at the index in
@@ -43,7 +43,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	* implemented methods for accessing this structure whenever possible in order to hide all the
 	* necessary checks.
 	*/
-	private ArrayList lineHighlights = new ArrayList();
+	private ArrayList<ArrayList<Highlight>> lineHighlights = new ArrayList<ArrayList<Highlight>>();
 	
 	public JTextBuffer() {
 		Options options = Options.getSharedInstance();
@@ -395,10 +395,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	 * Returns the highlighter of the given class.
 	 */
 	public Highlighter getHighlighterOfClass(Class kind) {
-		return (Highlighter) highlighters.get(kind);
+		return highlighters.get(kind);
 	}
 	
-	public Collection/*<Highlighter>*/ getHighlighters() {
+	public Collection<Highlighter> getHighlighters() {
 		return Collections.unmodifiableCollection(highlighters.values());
 	}
 	
@@ -427,7 +427,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public void removeHighlightsFrom(Highlighter highlighter, int firstLineIndex) {
 		for (int i = firstLineIndex; i < lineHighlights.size(); i++) {
-			ArrayList list = (ArrayList) lineHighlights.get(i);
+			ArrayList<Highlight> list = lineHighlights.get(i);
 			if (list != null) {
 				Iterator it = list.iterator();
 				while (it.hasNext()) {
@@ -469,9 +469,9 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			for (int i = lineHighlights.size(); i <= lineIndex; i++) {
 				lineHighlights.add(i, null);
 			}
-			lineHighlights.set(lineIndex, new ArrayList());
+			lineHighlights.set(lineIndex, new ArrayList<Highlight>());
 		}
-		ArrayList line = (ArrayList) lineHighlights.get(lineIndex);
+		ArrayList<Highlight> line = lineHighlights.get(lineIndex);
 		if (line.indexOf(highlight) == -1) {
 			line.add(highlight);
 		}
@@ -536,11 +536,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return (visibleBounds.y + visibleBounds.height) / character.height;
 	}
 
-	public List getHighlightsForLocation(Location location) {
-		List highlights = getHighlightsForLine(location.getLineIndex());
-		ArrayList result = new ArrayList();
-		for (int i = 0; i < highlights.size(); i++) {
-			Highlight highlight = (Highlight) highlights.get(i);
+	public List<Highlight> getHighlightsForLocation(Location location) {
+		List<Highlight> highlights = getHighlightsForLine(location.getLineIndex());
+		ArrayList<Highlight> result = new ArrayList<Highlight>();
+		for (Highlight highlight : highlights) {
 			Location start = highlight.getStart();
 			Location end = highlight.getEnd();
 			boolean startOK = (location.getLineIndex() > start.getLineIndex()) ||
@@ -555,11 +554,11 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	/** Returns a (possibly empty) list containing all highlights in the indexed line. */
-	private List/*<Highlight>*/ getHighlightsForLine(int lineIndex) {
+	private List<Highlight> getHighlightsForLine(int lineIndex) {
 		if (lineIndex >= lineHighlights.size() || lineHighlights.get(lineIndex) == null) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		} else {
-			return Collections.unmodifiableList((ArrayList) lineHighlights.get(lineIndex));
+			return Collections.unmodifiableList(lineHighlights.get(lineIndex));
 		}
 	}
 	
@@ -632,11 +631,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		}
 	}
 	
-	public List/*<StyledText>*/ getLineText(int line) {
-		List result = model.getLineText(line);
-		List highlights = getHighlightsForLine(line);
-		for (int i = 0; i < highlights.size(); i++) {
-			Highlight highlight = (Highlight) highlights.get(i);
+	public List<StyledText> getLineText(int line) {
+		List<StyledText> result = model.getLineText(line);
+		List<Highlight> highlights = getHighlightsForLine(line);
+		for (Highlight highlight : highlights) {
 			result = highlight.applyHighlight(result, new Location(line, 0));
 		}
 		return result;

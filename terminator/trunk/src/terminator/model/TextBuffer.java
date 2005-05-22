@@ -19,14 +19,14 @@ public class TextBuffer {
 	private JTextBuffer view;
 	private int width;
 	private int height;
-	private ArrayList textLines = new ArrayList();
+	private ArrayList<TextLine> textLines = new ArrayList<TextLine>();
 	private short currentStyle = StyledText.getDefaultStyle();
 	private int firstScrollLineIndex;
 	private int lastScrollLineIndex;
 	private Location cursorPosition;
 	private int lastValidStartIndex = 0;
 	private boolean insertMode = false;
-	private ArrayList tabPositions = new ArrayList();
+	private ArrayList<Integer> tabPositions = new ArrayList<Integer>();
 	private int maxLineWidth = width;
 	
 	// Used for reducing the number of lines changed events sent up to the view.
@@ -93,7 +93,7 @@ public class TextBuffer {
 		// multiple physical lines, and the cursor may not be on the
 		// first of those lines. Ideally we should keep all pertinent
 		// lines. Unfortunately, I can't see how we'd know.
-		ArrayList retainedLines = new ArrayList(textLines.subList(cursorPosition.getLineIndex(), textLines.size()));
+		ArrayList<TextLine> retainedLines = new ArrayList<TextLine>(textLines.subList(cursorPosition.getLineIndex(), textLines.size()));
 
 		// Revert to just the right number of empty lines to fill the
 		// current window size.
@@ -102,7 +102,7 @@ public class TextBuffer {
 		// being that we're most likely to be asked to clear the
 		// scrollback when it's insanely large.
 		Dimension oldSize = getCurrentSizeInChars();
-		textLines = new ArrayList();
+		textLines = new ArrayList<TextLine>();
 		setSize(width, view.getVisibleSizeInCharacters().height);
 		maxLineWidth = width;
 		
@@ -180,19 +180,19 @@ public class TextBuffer {
 	public void setTabAtCursor() {
 		int newPos = cursorPosition.getCharOffset();
 		for (int i = 0; i < tabPositions.size(); i++) {
-			int pos = ((Integer) tabPositions.get(i)).intValue();
+			int pos = tabPositions.get(i);
 			if (pos == newPos) {
 				return;
 			} else if (pos > newPos) {
-				tabPositions.add(i, new Integer(newPos));
+				tabPositions.add(i, newPos);
 				return;
 			}
 		}
-		tabPositions.add(new Integer(newPos));
+		tabPositions.add(newPos);
 	}
 	
 	public void removeTabAtCursor() {
-		tabPositions.remove(new Integer(cursorPosition.getCharOffset()));
+		tabPositions.remove(cursorPosition.getCharOffset());
 	}
 	
 	public void removeAllTabs() {
@@ -201,7 +201,7 @@ public class TextBuffer {
 	
 	private int getNextTabPosition(int charOffset) {
 		for (int i = 0; i < tabPositions.size(); i++) {
-			int pos = ((Integer) tabPositions.get(i)).intValue();
+			int pos = tabPositions.get(i);
 			if (pos > charOffset) {
 				return pos;
 			}
@@ -392,7 +392,7 @@ public class TextBuffer {
 		return width;
 	}
 	
-	public List/*<StyledText>*/ getLineText(int lineIndex) {
+	public List<StyledText> getLineText(int lineIndex) {
 		return get(lineIndex).getStyledTextSegments();
 	}
 	
