@@ -41,15 +41,6 @@ The completion should work for languages other than Java. We can collect
 all the identifiers from the current file and sort them, at the very
 least.
 
-Java 1.5:
- 1. use Thread.getAllStackTraces to let us type C-\ at the UI to see what
-    it's doing. can this work? or is it most likely to be useful when the
-    event handling thread's too busy? maybe what we want is to implement
-    some kind of Pure Java sampling profiler. you could turn that on
-    before the expensive operation, and check its findings afterwards.
-    wouldn't help with kind of problem that exhibits itself as a random
-    pause, but it would help with more general slowness.
-
 find in files:
  1. don't search twice for the same thing. we're not that fast!
  3. show the matching line(s).
