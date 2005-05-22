@@ -40,6 +40,11 @@ public abstract class ExternalToolsParser {
             }
 
             String command = Parameters.getParameter(prefix + "command");
+            if (command == null) {
+                Log.warn("Missing property " + prefix + "command for external tool \"" + name + "\"");
+                Log.warn("Perhaps you need to specify a command specific for " + System.getProperty("os.name") + "?");
+                continue;
+            }
             if (firstItem) {
                 addSeparator();
                 firstItem = false;
