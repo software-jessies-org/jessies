@@ -53,10 +53,6 @@ Find/Replace:
  2. Some way of marking submatch groups: the whole match is marked in red or blue, but it would be good to also see the submatches within that.
  4. Should be able to select matches/replacements, and only apply the selected ones.
 
-use Position instead of an int and arithmetic to re-position the caret
-after an editing operation. it's clearer, and we seem to keep getting
-the arithmetic wrong.
-
 we've removed most uses of "new File" and FileUtilities.parseUserFriendlyName
 in favor of FileUtilities.fileFromString, but should probably have something
 similar in the other direction, where special JFilenameField components would
