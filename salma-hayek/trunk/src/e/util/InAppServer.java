@@ -32,13 +32,13 @@ public abstract class InAppServer {
         private ConnectionAccepter(File portFile) throws IOException {
             this.socket = new ServerSocket();
             socket.bind(null);
-            writePortNumberToFile(portFile);
+            writeHostAndPortToFile(portFile);
         }
         
-        private void writePortNumberToFile(File portFile) {
+        private void writeHostAndPortToFile(File portFile) {
+            String host = socket.getInetAddress().getHostName();
             int port = socket.getLocalPort();
-            StringUtilities.writeFile(portFile, port + "\n");
-            Log.warn("echo " + port + " > " + portFile);
+            StringUtilities.writeFile(portFile, host + ":" + port + "\n");
         }
         
         public void run() {
