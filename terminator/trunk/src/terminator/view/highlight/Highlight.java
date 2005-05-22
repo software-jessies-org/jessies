@@ -57,8 +57,8 @@ public class Highlight {
 	* Returns a modified set of styled text regions based upon the set passed in, which are
 	* at the given location.  The returned array will be at least as long as the given array.
 	*/
-	public List/*<StyledText>*/ applyHighlight(List/*<StyledText>*/ unlit, Location unlitStart) {
-		ArrayList result = new ArrayList();
+	public List<StyledText> applyHighlight(List<StyledText> unlit, Location unlitStart) {
+		ArrayList<StyledText> result = new ArrayList<StyledText>();
 		int startOffset = (unlitStart.getLineIndex() == start.getLineIndex()) ? start.getCharOffset() : 0;
 		int endOffset = (unlitStart.getLineIndex() == end.getLineIndex()) ? end.getCharOffset() : Integer.MAX_VALUE;
 		int offset = 0;
@@ -94,20 +94,19 @@ public class Highlight {
 				StyledText empty = new StyledText("", StyledText.getDefaultStyle());
 				result.add(new StyledText("", style.appliedTo(empty.getStyle())));
 			}
-			((StyledText) result.get(result.size() - 1)).setContinueToEnd(true);
+			result.get(result.size() - 1).setContinueToEnd(true);
 		}
 		
 		return result;
 	}
 	
 	/** Returns true if the highlight's first character is just after the end of the line. */
-	private boolean highlightStartsAtEndOfLine(List/*<StyledText>*/ unlit, Location unlitStart) {
+	private boolean highlightStartsAtEndOfLine(List<StyledText> unlit, Location unlitStart) {
 		if (start.getLineIndex() < unlitStart.getLineIndex()) {
 			return false;
 		}
 		int totalLength = 0;
-		for (int i = 0; i < unlit.size(); i++) {
-			StyledText styledText = (StyledText) unlit.get(i);
+		for (StyledText styledText : unlit) {
 			totalLength += styledText.getText().length();
 		}
 		return (start.getCharOffset() == totalLength);

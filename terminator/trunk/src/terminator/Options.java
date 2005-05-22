@@ -46,9 +46,9 @@ public class Options {
 	
 	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt|Terminator)(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
-	private HashMap options = new HashMap();
-	private HashMap descriptions = new HashMap();
-	private HashMap rgbColors = null;
+	private HashMap<String, String> options = new HashMap<String, String>();
+	private HashMap<String, String> descriptions = new HashMap<String, String>();
+	private HashMap<String, Color> rgbColors = null;
 	
 	public static Options getSharedInstance() {
 		return INSTANCE;
@@ -220,7 +220,7 @@ public class Options {
 	 * a List.
 	 */
 	public List parseCommandLine(String[] arguments) {
-		ArrayList otherArguments = new ArrayList();
+		ArrayList<String> otherArguments = new ArrayList<String>();
 		for (int i = 0; i < arguments.length; ++i) {
 			if (arguments[i].equals("-xrm")) {
 				String resourceString = arguments[++i];
@@ -314,7 +314,7 @@ public class Options {
 	}
 	
 	private void readRGBFile() {
-		rgbColors = new HashMap();
+		rgbColors = new HashMap<String, Color>();
 		String[] lines = StringUtilities.readLinesFromFile("/usr/X11R6/lib/X11/rgb.txt");
 		for (int i = 0; i < lines.length; ++i) {
 			String line = lines[i];
