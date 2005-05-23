@@ -164,7 +164,7 @@ public class FindFilesDialog {
                             continue;
                         }
                         if (regex.length() != 0) {
-                            ArrayList matches = new ArrayList();
+                            ArrayList<String> matches = new ArrayList<String>();
                             long t0 = System.currentTimeMillis();
                             int matchCount = fileSearcher.searchFile(root, candidate, matches);
                             long t1 = System.currentTimeMillis();
@@ -175,8 +175,7 @@ public class FindFilesDialog {
                                 DefinitionFinder definitionFinder = new DefinitionFinder(file, regex);
                                 MatchingFile matchingFile = new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition);
                                 DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
-                                for (int i = 0; i < matches.size(); ++i) {
-                                    String line = (String) matches.get(i);
+                                for (String line : matches) {
                                     fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file)));
                                 }
                                 matchRoot.add(fileNode);

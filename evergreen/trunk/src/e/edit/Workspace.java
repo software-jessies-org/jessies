@@ -24,7 +24,7 @@ public class Workspace extends JPanel {
     private EFileOpenDialog openDialog;
     private FileDialog saveAsDialog;
     
-    private ArrayList fileList;
+    private ArrayList<String> fileList;
     
     public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
@@ -53,7 +53,7 @@ public class Workspace extends JPanel {
             start();
         }
         public Object construct() {
-            ArrayList newFileList = scanWorkspaceForFiles();
+            ArrayList<String> newFileList = scanWorkspaceForFiles();
             // Many file systems will have returned the files not in
             // alphabetical order, so we sort them ourselves here so
             // that users of the list can assume it's in order.
@@ -121,10 +121,9 @@ public class Workspace extends JPanel {
         Pattern pattern = Pattern.compile(regularExpression, caseInsensitive ? Pattern.CASE_INSENSITIVE : 0);
         
         // Collect the matches.
-        ArrayList result = new ArrayList();
-        List allFiles = fileList;
-        for (int i = 0; i < allFiles.size(); ++i) {
-            String candidate = (String) allFiles.get(i);
+        ArrayList<String> result = new ArrayList<String>();
+        List<String> allFiles = fileList;
+        for (String candidate : allFiles) {
             Matcher matcher = pattern.matcher(candidate);
             if (matcher.find()) {
                 result.add(candidate);
@@ -153,15 +152,14 @@ public class Workspace extends JPanel {
     
     /** Returns an array of this workspace's dirty text windows. */
     public ETextWindow[] getDirtyTextWindows() {
-        ArrayList dirtyTextWindows = new ArrayList();
+        ArrayList<ETextWindow> dirtyTextWindows = new ArrayList<ETextWindow>();
         ETextWindow[] textWindows = leftColumn.getTextWindows();
-        for (int i = 0; i < textWindows.length; i++) {
-            ETextWindow textWindow = textWindows[i];
+        for (ETextWindow textWindow : textWindows) {
             if (textWindow.isDirty()) {
                 dirtyTextWindows.add(textWindow);
             }
         }
-        return (ETextWindow[]) dirtyTextWindows.toArray(new ETextWindow[dirtyTextWindows.size()]);
+        return dirtyTextWindows.toArray(new ETextWindow[dirtyTextWindows.size()]);
     }
     
     public EWindow findWindowByName(String name) {
@@ -288,7 +286,7 @@ public class Workspace extends JPanel {
         return true;
     }
     
-    public void scanDirectory(String directory, String[] ignoredExtensions, ArrayList result) {
+    public void scanDirectory(String directory, String[] ignoredExtensions, ArrayList<String> result) {
         File dir = FileUtilities.fileFromString(directory);
         File[] files = dir.listFiles();
         if (files == null) {
@@ -316,12 +314,12 @@ public class Workspace extends JPanel {
      * suggestion it's a project (as opposed to a home directory, say): no Makefile or build.xml,
      * and no CVS or SCCS directories are good clues that we're not looking at software.
      */
-    private ArrayList scanWorkspaceForFiles() {
+    private ArrayList<String> scanWorkspaceForFiles() {
         long start = System.currentTimeMillis();
         
         String[] ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
 
-        ArrayList result = new ArrayList();
+        ArrayList<String> result = new ArrayList<String>();
         
         // If a workspace is under the user's home directory, we're happy to scan it.
         File userHome = FileUtilities.fileFromString(System.getProperty("user.dir"));

@@ -15,8 +15,8 @@ public class JavaResearcher implements WorkspaceResearcher {
     public static final Pattern NEW_PATTERN = Pattern.compile("(?x) .* \\b new \\s+ (\\S+) \\s* \\($");
     
     private static String[] javaDocSummary;
-    private static TreeSet uniqueIdentifiers;
-    private static TreeSet uniqueWords;
+    private static TreeSet<String> uniqueIdentifiers;
+    private static TreeSet<String> uniqueWords;
     
     private static JavaResearcher INSTANCE = new JavaResearcher();
     
@@ -37,7 +37,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         javaDocSummary = StringUtilities.readLinesFromFile(Edit.getResourceFilename("javadoc-summary.txt"));
         
         Pattern identifierPattern = Pattern.compile("^[MCFEA]:(\\S+?)(\\(|\t).*$");
-        uniqueIdentifiers = new TreeSet();
+        uniqueIdentifiers = new TreeSet<String>();
         
         int classCount = 0;
         for (int i = 0; i < javaDocSummary.length; i++) {
@@ -67,10 +67,8 @@ public class JavaResearcher implements WorkspaceResearcher {
      * Extracts all the unique words from the identifiers in the JDK.
      */
     private synchronized static void initUniqueWords() {
-        uniqueWords = new TreeSet();
-        Iterator it = uniqueIdentifiers.iterator();
-        while (it.hasNext()) {
-            String identifier = (String) it.next();
+        uniqueWords = new TreeSet<String>();
+        for (String identifier : uniqueIdentifiers) {
             String[] words = identifier.replace('_', ' ').replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase().split(" ");
             for (int i = 0; i < words.length; ++i) {
                 uniqueWords.add(words[i]);
@@ -82,16 +80,14 @@ public class JavaResearcher implements WorkspaceResearcher {
      * Adds all the unique words from the identifiers in the JDK to the given set.
      * This might be useful for spelling checking or word completion purposes.
      */
-    public synchronized static void addJavaWords(Set set) {
+    public synchronized static void addJavaWords(Set<String> set) {
         set.addAll(uniqueWords);
     }
     
-    public synchronized List listIdentifiersStartingWith(String prefix) {
-        ArrayList result = new ArrayList();
+    public synchronized List<String> listIdentifiersStartingWith(String prefix) {
+        ArrayList<String> result = new ArrayList<String>();
         final int prefixLength = prefix.length();
-        Iterator it = uniqueIdentifiers.iterator();
-        while (it.hasNext()) {
-            String identifier = (String) it.next();
+        for (String identifier : uniqueIdentifiers) {
             if (identifier.startsWith(prefix)) {
                 result.add(identifier);
             }
@@ -280,14 +276,14 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     public String makeMethodLinks(Method[] methods) {
-        ArrayList list = new ArrayList();
-        for (int i = 0; i < methods.length; i++) {
-            list.add(makeMethodLink(methods[i]));
+        ArrayList<String> list = new ArrayList<String>();
+        for (Method method : methods) {
+            list.add(makeMethodLink(method));
         }
         return joinAfterSorting(list);
     }
     
-    public static String joinAfterSorting(List list) {
+    public static String joinAfterSorting(List<String> list) {
         Collections.sort(list);
         StringBuffer s = new StringBuffer();
         for (int i = 0; i < list.size(); i++) {
@@ -382,15 +378,15 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     /** Sorts the strings in the given List, then appends them to the StringBuffer. */
-    private void appendAfterSorting(StringBuffer stringBuffer, List items) {
+    private void appendAfterSorting(StringBuffer stringBuffer, List<String> items) {
         Collections.sort(items);
         for (int i = 0; i < items.size(); i++) {
             stringBuffer.append(items.get(i));
         }
     }
     
-    private List collectFields(Class c) {
-        ArrayList result = new ArrayList();
+    private List<String> collectFields(Class c) {
+        ArrayList<String> result = new ArrayList<String>();
         Field[] fields = c.getFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
@@ -401,8 +397,8 @@ public class JavaResearcher implements WorkspaceResearcher {
         return result;
     }
     
-    private List collectMethods(Class c) {
-        ArrayList result = new ArrayList();
+    private List<String> collectMethods(Class c) {
+        ArrayList<String> result = new ArrayList<String>();
         Method[] methods = c.getMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];

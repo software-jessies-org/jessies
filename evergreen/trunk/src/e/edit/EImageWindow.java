@@ -12,7 +12,7 @@ public class EImageWindow extends EWindow {
     private Image image = null;
     private ImageIcon icon = null;
     private ImageRenderer imageRenderer;
-    private Collection menuItems;
+    private Collection<Action> menuItems;
     
     public EImageWindow(String filename) {
         super(filename);
@@ -26,12 +26,12 @@ public class EImageWindow extends EWindow {
         retitle();
     }
     
-    public Collection getPopupMenuItems() {
+    public Collection<Action> getPopupMenuItems() {
         return menuItems;
     }
     
     public void initPopupMenuItems() {
-        menuItems = new ArrayList();
+        menuItems = new ArrayList<Action>();
         menuItems.add(new ZoomInAction());
         menuItems.add(new ZoomOutAction());
         menuItems.add(new ActualSizeAction());

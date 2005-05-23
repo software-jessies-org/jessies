@@ -8,7 +8,7 @@ import javax.swing.Timer;
 import e.ptextarea.*;
 
 public class Advisor extends JPanel {
-    private ArrayList researchers = new ArrayList();
+    private ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
     
     /** The advice window. */
     private EHtmlPane advicePane = new EHtmlPane();
@@ -105,8 +105,7 @@ public class Advisor extends JPanel {
         ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, currentComponent);
         
         StringBuffer newText = new StringBuffer("<html><head><title></title></head><body bgcolor=#FFFFFF>");
-        for (int i = 0; i < researchers.size(); i++) {
-            WorkspaceResearcher researcher = (WorkspaceResearcher) researchers.get(i);
+        for (WorkspaceResearcher researcher : researchers) {
             if (textWindow == null || researcher.isSuitable(textWindow)) {
                 String result = researcher.research(currentComponent, text);
                 if (result != null && result.length() > 0) {

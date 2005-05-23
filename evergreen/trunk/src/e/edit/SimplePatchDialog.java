@@ -21,8 +21,8 @@ public class SimplePatchDialog {
         String fromFile = FileUtilities.createTemporaryFile(PREFIX, "file containing " + fromName, fromContent);
         String toFile = FileUtilities.createTemporaryFile(PREFIX, "file containing " + toName, toContent);
         
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         String[] command = new String[] { "diff", "-u", "-b", "-B", "-L", toName, toFile, "-L", fromName, fromFile };
         int status = ProcessUtilities.backQuote(null, command, lines, errors);
         

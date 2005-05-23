@@ -16,7 +16,7 @@ FIXME: parts of this class are pretty much vestigial; most of the methods in her
 */
 public class JavaDoc {
     /** Holds the name of every package we know of. */
-    private static ArrayList packageNames = new ArrayList();
+    private static ArrayList<String> packageNames = new ArrayList<String>();
     
     /** Places to look for javadoc. */
     private static String[] docs = new String[0];
@@ -25,10 +25,10 @@ public class JavaDoc {
     private static String[] sources = new String[0];
     
     /** Cached javadoc locations for classes we've already seen. */
-    private static HashMap docLinks = new HashMap();
+    private static HashMap<String, String> docLinks = new HashMap<String, String>();
     
     /** Cached source code locations for classes we've already seen. */
-    private static HashMap sourceLinks = new HashMap();
+    private static HashMap<String, String> sourceLinks = new HashMap<String, String>();
     
     /** Tells us if the text around the caret is a genuine classname or not. */
     private static URLClassLoader classLoader;
@@ -54,10 +54,10 @@ public class JavaDoc {
         * Find all the packages specified by the "java.advisor.classpath" property.
         */
         String[] advisorClasspath = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.classpath", ""));
-        ArrayList urls = new ArrayList();
-        for (int i = 0; i < advisorClasspath.length; i++) {
-            if (advisorClasspath[i].length() > 0) {
-                File classpath = FileUtilities.fileFromString((String) advisorClasspath[i]);
+        ArrayList<URL> urls = new ArrayList<URL>();
+        for (String classPathItem : advisorClasspath) {
+            if (classPathItem.length() > 0) {
+                File classpath = FileUtilities.fileFromString(classPathItem);
                 try {
                     urls.add(classpath.toURL());
                     findPackagesIn(classpath);
@@ -179,9 +179,9 @@ public class JavaDoc {
     
     public static String getLink(String className, String pkg, boolean showPkg, int type) {
         String[] roots = (type == DOC) ? docs : sources;
-        HashMap map = (type == DOC) ? docLinks : sourceLinks;
+        HashMap<String, String> map = (type == DOC) ? docLinks : sourceLinks;
         String key = (type == DOC) ? (className + "." + pkg + String.valueOf(showPkg)) : (className + "." + pkg);
-        String cached = (String) map.get(key);
+        String cached = map.get(key);
         if (cached != null) {
             return cached;
         }
@@ -363,7 +363,7 @@ public class JavaDoc {
     * Returns all classes whose name matches the supplied string.
     */
     public static Class[] getClasses(String className) {
-        ArrayList classes = new ArrayList();
+        ArrayList<Class> classes = new ArrayList<Class>();
         for (int j = 0; j < packageNames.size(); j++) {
             String pkg = (String) packageNames.get(j);
             String soughtClass = pkg + ((pkg.length() > 0) ? "." : "") + className;
@@ -378,7 +378,7 @@ public class JavaDoc {
                 ex = ex;
             }
         }
-        return (Class[]) classes.toArray(new Class[classes.size()]);
+        return classes.toArray(new Class[classes.size()]);
     }
 
     /** Prevents instantiation. */

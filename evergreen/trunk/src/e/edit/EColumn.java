@@ -84,14 +84,14 @@ public class EColumn extends JSplitPane {
     }
 
     public ETextWindow[] getTextWindows() {
-        ArrayList result = new ArrayList();
+        ArrayList<ETextWindow> result = new ArrayList<ETextWindow>();
         Component[] cs = bottomPanel.getComponents();
         for (int i = 0; i < cs.length; i++) {
             if (cs[i] instanceof ETextWindow) {
-                result.add(cs[i]);
+                result.add((ETextWindow) cs[i]);
             }
         }
-        return (ETextWindow[]) result.toArray(new ETextWindow[result.size()]);
+        return result.toArray(new ETextWindow[result.size()]);
     }
     
     public EWindow findWindowByName(String name) {

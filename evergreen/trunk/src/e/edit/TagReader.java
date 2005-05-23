@@ -163,7 +163,7 @@ public class TagReader {
         public static final String UNION = "union";
         public static final String VARIABLE = "variable";
         
-        private static final Map TYPES = new HashMap();
+        private static final Map<String, String> TYPES = new HashMap<String, String>();
         static {
             TYPES.put("c", CLASS);
             TYPES.put("C", CONSTRUCTOR);
@@ -189,7 +189,7 @@ public class TagReader {
             CLASS, ENUM, INTERFACE, NAMESPACE, STRUCT, MODULE
         }));
         
-        private static final Map DESCRIPTION_FORMATS = new HashMap();
+        private static final Map<String, MessageFormat> DESCRIPTION_FORMATS = new HashMap<String, MessageFormat>();
         static {
             DESCRIPTION_FORMATS.put(PACKAGE, new MessageFormat(PACKAGE + " {0}"));
             DESCRIPTION_FORMATS.put(CLASS, new MessageFormat(CLASS + " {0}"));
@@ -233,7 +233,7 @@ public class TagReader {
             if (containingClass.equals(identifier)) {
                 tagType = 'C';
             }
-            this.type = (String) TYPES.get(String.valueOf(tagType));
+            this.type = TYPES.get(String.valueOf(tagType));
         }
         
         public String describeVisibility() {
@@ -265,7 +265,7 @@ public class TagReader {
         }
         
         public String describe() {
-            MessageFormat formatter = (MessageFormat) DESCRIPTION_FORMATS.get(type);
+            MessageFormat formatter = DESCRIPTION_FORMATS.get(type);
             if (formatter != null) {
                 return formatter.format(new String[] { identifier });
             } else {
