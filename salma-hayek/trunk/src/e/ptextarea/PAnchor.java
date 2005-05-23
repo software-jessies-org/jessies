@@ -12,7 +12,7 @@ package e.ptextarea;
  * @author Phil Norman
  */
 
-public class PAnchor implements Comparable {
+public class PAnchor implements Comparable<PAnchor> {
     private int index;
     
     public PAnchor(int index) {
@@ -43,8 +43,8 @@ public class PAnchor implements Comparable {
         return (index == ((PAnchor) obj).index);
     }
     
-    public final int compareTo(Object obj) {
-        return (index - ((PAnchor) obj).index);
+    public final int compareTo(PAnchor other) {
+        return (index - other.index);
     }
     
     public String toString() {

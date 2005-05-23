@@ -44,7 +44,7 @@ public class PAnchorSet implements PTextListener {
     // This is what the STL calls "lower_bound".
     private int getFirstAnchorIndex(int textIndex) {
         checkLinearity();    // Comment this out to improve speed, but remove warnings when our state goes wrong.
-        int index = Collections.binarySearch(anchors, new PAnchor(textIndex), new AnchorComparator());
+        int index = Collections.binarySearch(anchors, new PAnchor(textIndex));
         if (index < 0) {
             return -index - 1;
         } else {
@@ -136,11 +136,5 @@ public class PAnchorSet implements PTextListener {
             }
         }
         anchors.clear();
-    }
-    
-    private class AnchorComparator implements Comparator<PAnchor> {
-        public int compare(PAnchor lhs, PAnchor rhs) {
-            return (lhs.getIndex() - rhs.getIndex());
-        }
     }
 }
