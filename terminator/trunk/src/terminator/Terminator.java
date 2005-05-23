@@ -9,7 +9,7 @@ import terminator.view.*;
 
 public class Terminator {
 	private static final Terminator INSTANCE = new Terminator();
-	private List arguments;
+	private List<String> arguments;
 	private ArrayList<TerminatorFrame> frames = new ArrayList<TerminatorFrame>();
 	
 	public static Terminator getSharedInstance() {

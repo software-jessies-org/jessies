@@ -40,7 +40,7 @@ public class TerminatorFrame extends JFrame {
 		if (terminals.size() >= 1) {
 			JTerminalPane pane;
 			if (tabbedPane == null) {
-				pane = (JTerminalPane) terminals.get(0);
+				pane = terminals.get(0);
 			} else {
 				pane = (JTerminalPane) tabbedPane.getSelectedComponent();
 			}
@@ -83,7 +83,7 @@ public class TerminatorFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent event) {
 				for (int i = 0; i < terminals.size(); ++i) {
-					JTerminalPane terminal = (JTerminalPane) terminals.get(i);
+					JTerminalPane terminal = terminals.get(i);
 					terminal.destroyProcess();
 				}
 				terminator.frameClosed(TerminatorFrame.this);
@@ -109,11 +109,11 @@ public class TerminatorFrame extends JFrame {
 	 * Give focus to the first terminal.
 	 */
 	private void initFocus() {
-		((JTerminalPane) terminals.get(0)).requestFocus();
+		terminals.get(0).requestFocus();
 	}
 	
 	private void initSingleTerminal() {
-		JTerminalPane terminalPane = (JTerminalPane) terminals.get(0);
+		JTerminalPane terminalPane = terminals.get(0);
 		setContentPane(terminalPane);
 		setTitle(terminalPane.getName());
 	}
@@ -148,7 +148,7 @@ public class TerminatorFrame extends JFrame {
 	 * Switches to a simple UI where we can have only one terminal.
 	 */
 	private void switchToSinglePane() {
-		JTerminalPane soleSurvivor = (JTerminalPane) terminals.get(0);
+		JTerminalPane soleSurvivor = terminals.get(0);
 		Dimension initialSize = soleSurvivor.getSize();
 		
 		soleSurvivor.invalidate();
@@ -204,7 +204,7 @@ public class TerminatorFrame extends JFrame {
 	private void initTabbedTerminals() {
 		switchToTabbedPane();
 		for (int i = 0; i < terminals.size(); ++i) {
-			JTerminalPane terminalPane = (JTerminalPane) terminals.get(i);
+			JTerminalPane terminalPane = terminals.get(i);
 			addPaneToUI(terminalPane);
 		}
 	}
