@@ -5,7 +5,7 @@
 #   make bindist
 
 # You can set:
-#   JAVA_COMPILER to "jikes", "javac", or a binary of your choice.
+#   JAVA_COMPILER to "gcjx", "javac", or a binary of your choice.
 
 # Your calling Makefile:
 #   may append to BINDIST_FILES
@@ -233,7 +233,7 @@ ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))$(call pathsearch,$(JAVA_COMPILER
   endif
 endif
 
-# Make the compiler's leafname available for simple javac/jikes tests.
+# Make the compiler's leafname available for simple javac/gcjx tests.
 COMPILER_TYPE = $(notdir $(JAVA_COMPILER))
 
 # ----------------------------------------------------------------------------
@@ -255,7 +255,6 @@ endif
 # ----------------------------------------------------------------------------
 # Set up the bootclasspath.
 # ----------------------------------------------------------------------------
-BOOT_CLASS_PATH.jikes += $(RT_JAR)
 BOOT_CLASS_PATH.gcjx += $(RT_JAR)
 BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(COMPILER_TYPE))
 
@@ -277,18 +276,9 @@ JAVA_FLAGS += -d classes/
 JAVA_FLAGS += -sourcepath src/
 JAVA_FLAGS += -deprecation
 
-JAVA_FLAGS.jikes += +D +P +Pall +Pno-serial +Pno-redundant-modifiers
-
 JAVA_FLAGS.gcjx += -pedantic -verbose -fverify # -error -- reinstate later!
 
-# At the moment, the only platforms with 1.5 are Linux, Solaris, and Windows.
-# None of the developers use Solaris or Windows, so for now it doesn't seem
-# to matter that they're left out.
-ifeq "$(TARGET_OS)" "Linux"
-  # Until Mac OS supports 1.5, we need to avoid using 1.5-specific options.
-  JAVA_FLAGS.javac += -Xlint -Xlint:-serial
-  JAVA_FLAGS.javac += -Xlint:-unchecked # until Jikes supports generics
-endif
+JAVA_FLAGS.javac += -Xlint -Xlint:-serial
 
 # We should also ensure that we build class files that can be used on
 # Mac OS, regardless of where we build.
