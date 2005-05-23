@@ -103,38 +103,14 @@ public class FileUtilities {
     }
     
     /**
-     * Closes the given InputStream, if it's non-null.
-     * FIXME: change the parameter to Closeable when we allow 1.5-only API.
+     * Closes the given Closeable, if it's non-null.
      */
-    public static void close(InputStream in) {
-        if (in == null) {
+    public static void close(Closeable closeable) {
+        if (closeable == null) {
             return;
         }
         try {
-            in.close();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-    
-    public static void close(LineNumberReader in) {
-        if (in == null) {
-            return;
-        }
-        try {
-            in.close();
-        } catch (IOException ex) {
-            // This method's purpose is to ignore this exception!
-            ex = ex;
-        }
-    }
-    
-    public static void close(Writer out) {
-        if (out == null) {
-            return;
-        }
-        try {
-            out.close();
+            closeable.close();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
