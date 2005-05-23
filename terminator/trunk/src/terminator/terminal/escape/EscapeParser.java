@@ -34,7 +34,7 @@ public class EscapeParser {
 	public void addChar(char ch) {
 		sequence += ch;
 		if (sequence.length() == 1) {
-			seqRecognizer = (SequenceRecognizer) SEQ_RECOGNIZERS.get(new Character(ch));
+			seqRecognizer = SEQ_RECOGNIZERS.get(new Character(ch));
 			if (seqRecognizer == null) {
 				Log.warn("Unable to find escape sequence end recognizer for start char \"" + ch + "\"");
 			}

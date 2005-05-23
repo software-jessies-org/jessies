@@ -62,9 +62,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			}
 
 			public void highlightClicked(MouseEvent event) {
-				List highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
-				for (int i = 0; i < highlights.size(); i++) {
-					Highlight highlight = (Highlight) highlights.get(i);
+				List<Highlight> highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
+				for (Highlight highlight : highlights) {
 					highlight.getHighlighter().highlightClicked(JTextBuffer.this, highlight, getTextFromHighlight(highlight), event);
 				}
 			}
@@ -83,9 +82,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				}
 				lastLocation = location;
 				Cursor cursor = null;
-				List highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
-				for (int i = 0; i < highlights.size(); i++) {
-					Highlight highlight = (Highlight) highlights.get(i);
+				List<Highlight> highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
+				for (Highlight highlight : highlights) {
 					if (highlight.getCursor() != null) {
 						cursor = highlight.getCursor();
 						break;
@@ -484,7 +482,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	 */
 	private void findAgain(Class highlighterClass, int startLine, int endLine, int direction) {
 		for (int i = startLine; i != endLine; i += direction) {
-			List highlights = getHighlightsForLine(i);
+			List<Highlight> highlights = getHighlightsForLine(i);
 			Highlight match = firstHighlightOfClass(highlights, highlighterClass);
 			if (match != null) {
 				scrollTo(i, match.getStart().getCharOffset(), match.getEnd().getCharOffset());
@@ -496,9 +494,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	/**
 	 * Tests whether any of the Highlight objects in the list is a FindHighlighter.
 	 */
-	private static Highlight firstHighlightOfClass(List highlights, Class highlighterClass) {
-		for (int i = 0; i < highlights.size(); ++i) {
-			Highlight highlight = (Highlight) highlights.get(i);
+	private static Highlight firstHighlightOfClass(List<Highlight> highlights, Class highlighterClass) {
+		for (Highlight highlight : highlights) {
 			if (highlight.getHighlighter().getClass() == highlighterClass) {
 				return highlight;
 			}

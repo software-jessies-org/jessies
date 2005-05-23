@@ -156,7 +156,7 @@ public class Options {
 	}
 	
 	private String stringResource(String name) {
-		return (String) options.get(name);
+		return options.get(name);
 	}
 	
 	private boolean booleanResource(String name) {
@@ -218,7 +218,7 @@ public class Options {
 	 * command-line arguments, returning the remaining arguments as
 	 * a List.
 	 */
-	public List parseCommandLine(String[] arguments) {
+	public List<String> parseCommandLine(String[] arguments) {
 		ArrayList<String> otherArguments = new ArrayList<String>();
 		for (int i = 0; i < arguments.length; ++i) {
 			if (arguments[i].equals("-xrm")) {
@@ -335,7 +335,7 @@ public class Options {
 				Log.warn("Problem reading X11 colors", ex);
 			}
 		}
-		return (Color) rgbColors.get(description.toLowerCase());
+		return rgbColors.get(description.toLowerCase());
 	}
 	
 	private int channelAt(String line, int offset) {

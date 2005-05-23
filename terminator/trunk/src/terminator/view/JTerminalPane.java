@@ -464,9 +464,8 @@ public class JTerminalPane extends JPanel {
 		NumberDecoder numberDecoder = new NumberDecoder(selectedText);
 		if (numberDecoder.isValid()) {
 			menu.addSeparator();
-			List items = numberDecoder.toStrings();
-			for (int i = 0; i < items.size(); ++i) {
-				String item = (String) items.get(i);
+			List<String> items = numberDecoder.toStrings();
+			for (String item : items) {
 				menu.add(makeInfoItem(item));
 			}
 		}

@@ -62,8 +62,7 @@ public class Highlight {
 		int startOffset = (unlitStart.getLineIndex() == start.getLineIndex()) ? start.getCharOffset() : 0;
 		int endOffset = (unlitStart.getLineIndex() == end.getLineIndex()) ? end.getCharOffset() : Integer.MAX_VALUE;
 		int offset = 0;
-		for (int i = 0; i < unlit.size(); i++) {
-			StyledText styledText = (StyledText) unlit.get(i);
+		for (StyledText styledText : unlit) {
 			String unlitText = styledText.getText();
 			int unlitEnd = offset + unlitText.length();
 			if (startOffset <= offset && endOffset >= offset + unlitEnd) {  // styledText completely within highlight.

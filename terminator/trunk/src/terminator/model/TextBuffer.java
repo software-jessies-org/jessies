@@ -70,7 +70,7 @@ public class TextBuffer {
 	public void checkInvariant() {
 		int highestStartLineIndex = -1;
 		for (int lineNumber = 0; lineNumber <= lastValidStartIndex; ++ lineNumber) {
-			int thisStartLineIndex = ((TextLine) textLines.get(lineNumber)).getLineStartIndex();
+			int thisStartLineIndex = textLines.get(lineNumber).getLineStartIndex();
 			if (thisStartLineIndex <= highestStartLineIndex) {
 				throw new RuntimeException("the lineStartIndex must increase monotonically as the line number increases");
 			}
@@ -108,7 +108,7 @@ public class TextBuffer {
 		
 		// Re-insert the lines after the cursor.
 		for (int i = 0; i < retainedLines.size(); ++i) {
-			insertLine(i, (TextLine) retainedLines.get(i));
+			insertLine(i, retainedLines.get(i));
 		}
 		
 		// Make sure all the lines will be redrawn.
@@ -401,7 +401,7 @@ public class TextBuffer {
 			Log.warn("TextLine requested for index " + index + ", size of buffer is " + textLines.size() + ".");
 			return new TextLine();
 		}
-		return (TextLine) textLines.get(index);
+		return textLines.get(index);
 	}
 
 	public void setSize(int width, int height) {
