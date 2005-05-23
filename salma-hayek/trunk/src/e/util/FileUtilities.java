@@ -2,6 +2,7 @@ package e.util;
 
 import java.io.*;
 import java.security.*;
+import java.util.*;
 import java.util.regex.*;
 
 /**
@@ -355,6 +356,10 @@ public class FileUtilities {
         } catch (IOException ex) {
             throw new RuntimeException("Couldn't create " + humanReadableName + ": " + ex.getMessage());
         }
+    }
+    
+    public static String getLastModifiedTime(File file) {
+        return TimeUtilities.toIsoString(new Date(file.lastModified()));
     }
     
     public static void main(String[] args) {
