@@ -308,9 +308,8 @@ public class JavaDoc {
     */
     public static Class[] getClasses(String className) {
         ArrayList<Class> classes = new ArrayList<Class>();
-        for (int j = 0; j < packageNames.size(); j++) {
-            String pkg = (String) packageNames.get(j);
-            String soughtClass = pkg + ((pkg.length() > 0) ? "." : "") + className;
+        for (String packageName : packageNames) {
+            String soughtClass = packageName + ((packageName.length() > 0) ? "." : "") + className;
             try {
                 classes.add(Class.forName(soughtClass, false, classLoader));
             } catch (ClassNotFoundException ex) {

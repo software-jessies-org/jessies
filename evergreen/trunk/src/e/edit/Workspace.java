@@ -108,7 +108,7 @@ public class Workspace extends JPanel {
     /**
      * Returns a list of the files matching the given regular expression.
      */
-    public List/*<String>*/ getListOfFilesMatching(String regularExpression) {
+    public List<String> getListOfFilesMatching(String regularExpression) {
         // If the user typed a capital, assume that means something, and we
         // should do a case-sensitive search. If everything's lower-case,
         // assume they don't care.

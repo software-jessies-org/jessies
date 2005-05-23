@@ -290,7 +290,7 @@ public class TagsUpdater {
                             branches.put(tag.getClassQualifiedName(), leaf);
                         }
                         
-                        DefaultMutableTreeNode branch = (DefaultMutableTreeNode) branches.get(tag.containingClass);
+                        DefaultMutableTreeNode branch = branches.get(tag.containingClass);
                         if (branch == null) {
                             branch = new BranchNode(tag.containingClass);
                             branches.put(tag.containingClass, branch);
