@@ -278,13 +278,13 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     private boolean showPatchAndAskForConfirmation(String verb, String question, boolean fromDiskToMemory) {
+        String diskLabel = "disk at " + FileUtilities.getLastModifiedTime(file);
+        String memoryLabel = "memory";
+        String fromLabel = fromDiskToMemory ? diskLabel : memoryLabel;
+        String toLabel = fromDiskToMemory ? memoryLabel : diskLabel;
+        
         String diskContent = StringUtilities.readFile(file);
         String memoryContent = text.getTextBuffer().toString();
-        
-        // TODO: add the times for the two versions to the labels (in ISO format).
-        String fromLabel = fromDiskToMemory ? "disk" : "memory";
-        String toLabel = fromDiskToMemory ? "memory" : "disk";
-        
         String fromContent = fromDiskToMemory ? diskContent : memoryContent;
         String toContent = fromDiskToMemory ? memoryContent : diskContent;
         
