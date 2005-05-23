@@ -108,13 +108,13 @@ public abstract class PIndenter {
             fixIndentationAt(textArea.getLineStartOffset(line));
         }
     }
-    
+
     public void fixIndentationAt(int position) {
         int lineIndex = textArea.getLineOfOffset(position);
         String originalIndentation = getCurrentIndentationOfLine(lineIndex);
         String replacementIndentation = getIndentation(lineIndex);
         String originalLine = textArea.getLineText(lineIndex);
-        String replacementLine = replacementIndentation + originalLine.substring(originalIndentation.length()).trim();
+        String replacementLine = replacementIndentation + StringUtilities.trimTrailingWhitespace(originalLine.substring(originalIndentation.length()));
         //Log.warn("originalIndentation=@" + originalIndentation + "@; replacementIndentation=@" + replacementIndentation + "@");
         if (replacementLine.equals(originalLine)) {
             return;

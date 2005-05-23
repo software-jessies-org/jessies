@@ -201,7 +201,7 @@ public class StringUtilities {
      */
     public static String trimTrailingWhitespace(String s) {
         final int length = s.length();
-        int i = length - 1;
+        int i = length;
         while (i > 0 && s.charAt(i - 1) <= ' ') {
             --i;
         }
