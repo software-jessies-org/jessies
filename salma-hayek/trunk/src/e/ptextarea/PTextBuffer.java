@@ -367,13 +367,7 @@ public class PTextBuffer implements CharSequence {
         }
         
         public String toString() {
-            // FIXME: in 1.5, use "new StringBuilder(copyChars(start, end - start)).toString()".
-            StringBuffer result = new StringBuffer(end - start);
-            CharSequence chars = copyChars(start, end - start);
-            for (int i = 0; i < chars.length(); ++i) {
-                result.append(chars.charAt(i));
-            }
-            return result.toString();
+            return new StringBuilder(copyChars(start, end - start)).toString();
         }
     }
     
