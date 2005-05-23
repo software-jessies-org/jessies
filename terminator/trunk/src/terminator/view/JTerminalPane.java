@@ -64,7 +64,7 @@ public class JTerminalPane extends JPanel {
 	public static JTerminalPane newCommandWithTitle(String command, String title) {
 		if (title == null) {
 			title = command.trim();
-			if (title.indexOf(' ') != -1) {
+			if (title.contains(" ")) {
 				title = title.substring(0, title.indexOf(' '));
 			}
 		}
@@ -458,7 +458,7 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	private void addNumberInfoItems(EPopupMenu menu, String selectedText) {
-		if (selectedText.indexOf("\n") != -1) {
+		if (selectedText.contains("\n")) {
 			return;
 		}
 		
