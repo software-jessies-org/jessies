@@ -159,9 +159,8 @@ public class OpenQuicklyDialog {
     
     public void openSelectedFilesFromList() {
         ListModel list = matchList.getModel();
-        int[] indices = matchList.getSelectedIndices();
-        for (int i = 0; i < indices.length; i++) {
-            String filename = (String) list.getElementAt(indices[i]);
+        for (int index : matchList.getSelectedIndices()) {
+            String filename = (String) list.getElementAt(index);
             Edit.openFile(workspace.getRootDirectory() + File.separator + filename);
         }
     }

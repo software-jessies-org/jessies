@@ -231,7 +231,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     /** Returns an array of all the workspaces. */
     public static Workspace[] getWorkspaces() {
         Workspace[] result = new Workspace[tabbedPane.getTabCount()];
-        for (int i = 0; i < result.length; i++) {
+        for (int i = 0; i < result.length; ++i) {
             result[i] = (Workspace) tabbedPane.getComponentAt(i);
         }
         return result;
@@ -252,10 +252,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * FileUtilities.getUserFriendlyName rather than Edit.openFile.
      */
     public static String normalizeWorkspacePrefix(String filename) {
-        Workspace[] workspaces = getWorkspaces();
-        for (int i = 0; i < workspaces.length; i++) {
+        for (Workspace workspace : getWorkspaces()) {
             try {
-                Workspace workspace = workspaces[i];
                 String friendlyPrefix = workspace.getRootDirectory();
                 String canonicalPrefix = workspace.getCanonicalRootDirectory();
                 if (filename.startsWith(canonicalPrefix)) {
@@ -271,21 +269,19 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     
     /** Returns the workspace whose root directory shares the longest common prefix with the given filename. */
     public static Workspace getBestWorkspaceForFilename(String filename) {
-        Workspace[] workspaces = getWorkspaces();
-        int bestIndex = (tabbedPane == null) ? 0 : tabbedPane.getSelectedIndex();
+        Workspace bestWorkspace = (Workspace) tabbedPane.getSelectedComponent();
         int bestLength = 0;
-        for (int i = 0; i < workspaces.length; i++) {
-            Workspace workspace = workspaces[i];
+        for (Workspace workspace : getWorkspaces()) {
             String workspaceRoot = workspace.getRootDirectory();
             if (filename.startsWith(workspaceRoot)) {
                 int length = workspaceRoot.length();
                 if (length > bestLength) {
-                    bestIndex = i;
+                    bestWorkspace = workspace;
                     bestLength = length;
                 }
             }
         }
-        return workspaces[bestIndex];
+        return bestWorkspace;
     }
     
     public static Workspace getCurrentWorkspace() {
@@ -346,9 +342,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * but it couldn't be removed because it had open files, true otherwise.
      */
     public static boolean removeWorkspaceByName(String name) {
-        Workspace[] workspaces = getWorkspaces();
-        for (int i = 0; i < workspaces.length; i++) {
-            Workspace workspace = workspaces[i];
+        for (Workspace workspace : getWorkspaces()) {
             if (workspace.getTitle().equals(name)) {
                 if (workspace.isEmpty() == false) {
                     return false;
@@ -360,9 +354,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     public static void moveFilesToBestWorkspaces() {
-        Workspace[] workspaces = getWorkspaces();
-        for (int i = 0; i < workspaces.length; i++) {
-            Workspace workspace = workspaces[i];
+        for (Workspace workspace : getWorkspaces()) {
             workspace.moveFilesToBestWorkspaces();
         }
     }
@@ -435,12 +427,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     public void handleQuit(com.apple.eawt.ApplicationEvent e) {
         boolean isSafeToQuit = true;
         boolean onMacOS = (e != null);
-        Workspace[] workspaces = getWorkspaces();
-        for (int i = 0; i < workspaces.length; i++) {
-            if (workspaces[i].getDirtyTextWindows().length != 0) {
+        for (Workspace workspace : getWorkspaces()) {
+            if (workspace.getDirtyTextWindows().length != 0) {
                 isSafeToQuit = false;
                 // Ensure that the workspace in question is visible.
-                tabbedPane.setSelectedIndex(i);
+                tabbedPane.setSelectedComponent(workspace);
             }
         }
         
@@ -575,9 +566,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             root.setAttribute("width", Integer.toString((int) size.getWidth()));
             root.setAttribute("height", Integer.toString((int) size.getHeight()));
             
-            Workspace[] workspaceList = getWorkspaces();
-            for (int i = 0; i < workspaceList.length; ++i) {
-                workspaceList[i].serializeAsXml(document, root);
+            for (Workspace workspace : getWorkspaces()) {
+                workspace.serializeAsXml(document, root);
             }
             
             // Write the XML to a new file...
@@ -766,9 +756,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
 
     private void startScanningWorkspaces() {
-        Workspace[] workspaces = getWorkspaces();
-        for (int i = 0; i < workspaces.length; ++i) {
-            workspaces[i].updateFileList(null);
+        for (Workspace workspace : getWorkspaces()) {
+            workspace.updateFileList(null);
         }
     }
 }

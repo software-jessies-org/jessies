@@ -86,8 +86,7 @@ public class InsertInterfaceAction extends ETextAction {
     
     private static String implementMethods(Method[] methods, boolean implementAbstractMethods) {
         StringBuffer s = new StringBuffer();
-        for (int i = 0; i < methods.length; i++) {
-            Method m = methods[i];
+        for (Method m : methods) {
             int mods = m.getModifiers();
             if (Modifier.isPublic(mods) && Modifier.isAbstract(mods) == implementAbstractMethods) {
                 s.append("\n/**  */\npublic ");
@@ -118,15 +117,14 @@ public class InsertInterfaceAction extends ETextAction {
     
     private static String listClassNames(Class[] classes, boolean inventNames) {
         StringBuffer s = new StringBuffer();
-        for (int i = 0; i < classes.length; i++) {
-            Class c = classes[i];
+        for (Class c : classes) {
             String name = c.getName();
+            if (s.length() > 0) {
+                s.append(", ");
+            }
             s.append(name.substring(name.lastIndexOf(".") + 1));
             if (inventNames) {
                 s.append(getParameterNameFor(c));
-            }
-            if (i < classes.length - 1) {
-                s.append(", ");
             }
         }
         return s.toString();

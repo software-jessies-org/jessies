@@ -15,9 +15,7 @@ public class SaveAllAction extends AbstractAction {
     }
 
     public static void saveAll(boolean interactive) {
-        Workspace[] workspaces = Edit.getWorkspaces();
-        for (int i = 0; i < workspaces.length; ++i) {
-            Workspace workspace = workspaces[i];
+        for (Workspace workspace : Edit.getWorkspaces()) {
             if (workspace.saveAll() == false) {
                 if (interactive) {
                     Edit.showAlert(ACTION_NAME, "Unable to save everything on workspace '" + workspace.getTitle() + "'.");

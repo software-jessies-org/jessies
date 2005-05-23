@@ -85,10 +85,9 @@ public class EColumn extends JSplitPane {
 
     public ETextWindow[] getTextWindows() {
         ArrayList<ETextWindow> result = new ArrayList<ETextWindow>();
-        Component[] cs = bottomPanel.getComponents();
-        for (int i = 0; i < cs.length; i++) {
-            if (cs[i] instanceof ETextWindow) {
-                result.add((ETextWindow) cs[i]);
+        for (Component c : bottomPanel.getComponents()) {
+            if (c instanceof ETextWindow) {
+                result.add(ETextWindow.class.cast(c));
             }
         }
         return result.toArray(new ETextWindow[result.size()]);
@@ -96,10 +95,9 @@ public class EColumn extends JSplitPane {
     
     public EWindow findWindowByName(String name) {
         name = name.toLowerCase();
-        ETextWindow[] texts = getTextWindows();
-        for (int i = 0; i < texts.length; i++) {
-            if (texts[i].getTitle().toLowerCase().endsWith(name)) {
-                return texts[i];
+        for (ETextWindow text : getTextWindows()) {
+            if (text.getTitle().toLowerCase().endsWith(name)) {
+                return text;
             }
         }
         return null;
@@ -354,8 +352,8 @@ public class EColumn extends JSplitPane {
         
         /** Ensures all the components in the column have the given width. */
         private void setWidthsOfComponents(Component[] components, int width) {
-            for (int i = 0; i < components.length; i++) {
-                setWidthOfComponent(components[i], width);
+            for (Component component : components) {
+                setWidthOfComponent(component, width);
             }
         }
         

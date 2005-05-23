@@ -41,9 +41,8 @@ public class JavaDoc {
         * Find all the packages that are on Edit's classpath. All classes in these packages can
         * be loaded by the system classloader without any help.
         */
-        Package[] ps = Package.getPackages();
-        for (int i = 0; i < ps.length; i++) {
-            packageNames.add(ps[i].getName());
+        for (Package p : Package.getPackages()) {
+            packageNames.add(p.getName());
         }
         
         // Add the default package, and also permit looking for a fully-qualified class name.
@@ -96,13 +95,11 @@ public class JavaDoc {
     */
     public static void addPackagesInDirectory(File startingDirectory, String classpath) {
         if (startingDirectory.isDirectory() == false) { return; }
-        File[] files = startingDirectory.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory() && FileUtilities.isIgnoredDirectory(files[i]) == false) {
-                String packageName = files[i].getAbsolutePath().substring(classpath.length() + 1).replace(File.separatorChar, '.');
-//                System.err.println(packageName);
+        for (File file : startingDirectory.listFiles()) {
+            if (file.isDirectory() && FileUtilities.isIgnoredDirectory(file) == false) {
+                String packageName = file.getAbsolutePath().substring(classpath.length() + 1).replace(File.separatorChar, '.');
                 packageNames.add(packageName);
-                addPackagesInDirectory(files[i], classpath);
+                addPackagesInDirectory(file, classpath);
             }
         }
     }
@@ -185,8 +182,8 @@ public class JavaDoc {
         if (cached != null) {
             return cached;
         }
-        for (int i = 0; i < roots.length; i++) {
-            if (roots[i].length() == 0) {
+        for (String root : roots) {
+            if (root.length() == 0) {
                 continue;
             }
             
@@ -195,7 +192,7 @@ public class JavaDoc {
             char separator = (type == DOC) ? '/' : File.separatorChar;
             
             // Start with a root that ends in a separator.
-            StringBuffer s = new StringBuffer(roots[i]);
+            StringBuffer s = new StringBuffer(root);
             if (s.charAt(s.length() - 1) != separator) {
                 s.append(separator);
             }

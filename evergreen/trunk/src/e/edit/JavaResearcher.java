@@ -40,8 +40,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         uniqueIdentifiers = new TreeSet<String>();
         
         int classCount = 0;
-        for (int i = 0; i < javaDocSummary.length; i++) {
-            String line = javaDocSummary[i];
+        for (String line : javaDocSummary) {
             if (line.startsWith("Class:")) {
                 classCount++;
                 // Some classes don't have accessible constructors, so add
@@ -70,8 +69,8 @@ public class JavaResearcher implements WorkspaceResearcher {
         uniqueWords = new TreeSet<String>();
         for (String identifier : uniqueIdentifiers) {
             String[] words = identifier.replace('_', ' ').replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase().split(" ");
-            for (int i = 0; i < words.length; ++i) {
-                uniqueWords.add(words[i]);
+            for (String word : words) {
+                uniqueWords.add(word);
             }
         }
     }
@@ -130,18 +129,18 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
 
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < classes.length; i++) {
-            if (i > 0) {
+        for (Class klass : classes) {
+            if (result.length() > 0) {
                 result.append("<br><br>");
             }
             if (listClasses) {
-                result.append(listClass(classes[i]));
+                result.append(listClass(klass));
             }
             if (listConstructors) {
-                result.append(listConstructors(classes[i]));
+                result.append(listConstructors(klass));
             }
             if (listMembers) {
-                result.append(listMembers(classes[i]));
+                result.append(listMembers(klass));
             }
         }
         return result.toString();
@@ -178,8 +177,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         StringBuffer result = new StringBuffer(packageName + " contains:\n");
         String searchTerm = "Class:" + packageName + ".";
         String htmlFile = "";
-        for (int i = 0; i < javaDocSummary.length; i++) {
-            String line = javaDocSummary[i];
+        for (String line : javaDocSummary) {
             if (line.startsWith("File:")) {
                 htmlFile = line.substring(5);
             } else if (line.startsWith(searchTerm)) {
@@ -209,8 +207,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         Matcher matcher;
         String htmlFile = "";
         String className = "";
-        for (int i = 0; i < javaDocSummary.length; i++) {
-            String line = javaDocSummary[i];
+        for (String line : javaDocSummary) {
             if (line.startsWith("File:")) {
                 htmlFile = line.substring(5);
             } else if (line.startsWith("Class:")) {
@@ -230,11 +227,11 @@ public class JavaResearcher implements WorkspaceResearcher {
     /** Formats class names as a list of links if there's javadoc for them. */
     public String makeClassLinks(Class[] classes, boolean pkg, String conjunct, boolean showSourceLink) {
         StringBuffer s = new StringBuffer();
-        for (int i = 0; i < classes.length; i++) {
-            s.append(makeClassLink(classes[i], pkg, showSourceLink));
-            if (i < classes.length - 1) {
+        for (Class klass : classes) {
+            if (s.length() > 0) {
                 s.append(conjunct);
             }
+            s.append(makeClassLink(klass, pkg, showSourceLink));
         }
         return s.toString();
     }
@@ -346,14 +343,13 @@ public class JavaResearcher implements WorkspaceResearcher {
         s.append(makeClassLink(c, true, true));
         s.append("<br>");
         Constructor[] constructors = c.getConstructors();
-        for (int i = 0; i < constructors.length; i++) {
-            Constructor con = constructors[i];
+        for (Constructor constructor : constructors) {
             s.append("<br>");
             s.append(classLink);
             s.append("(");
-            s.append(makeClassLinks(con.getParameterTypes(), false, COMMA, false));
+            s.append(makeClassLinks(constructor.getParameterTypes(), false, COMMA, false));
             s.append(")");
-            Class[] exceptions = con.getExceptionTypes();
+            Class[] exceptions = constructor.getExceptionTypes();
             if (exceptions.length > 0) {
                 s.append(NEWLINE);
                 s.append(" throws ");
@@ -387,9 +383,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     private List<String> collectFields(Class c) {
         ArrayList<String> result = new ArrayList<String>();
-        Field[] fields = c.getFields();
-        for (int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
+        for (Field field : c.getFields()) {
             if (Modifier.isPrivate(field.getModifiers()) == false) {
                 result.add(makeFieldLink(field));
             }
@@ -399,9 +393,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     private List<String> collectMethods(Class c) {
         ArrayList<String> result = new ArrayList<String>();
-        Method[] methods = c.getMethods();
-        for (int i = 0; i < methods.length; i++) {
-            Method method = methods[i];
+        for (Method method : c.getMethods()) {
             int modifiers = method.getModifiers();
             if (Modifier.isPrivate(modifiers) == false && Modifier.isStatic(modifiers)) {
                 result.add(makeMethodLink(method));
