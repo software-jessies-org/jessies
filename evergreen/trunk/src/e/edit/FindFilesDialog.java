@@ -303,7 +303,7 @@ public class FindFilesDialog {
             
             // Work around JLabel's tab-rendering stupidity.
             String text = getText();
-            if (text != null && text.indexOf('\t') != -1) {
+            if (text != null && text.contains("\t")) {
                 setText(text.replaceAll("\t", "    "));
             }
             

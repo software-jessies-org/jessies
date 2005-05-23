@@ -237,11 +237,11 @@ public class TagReader {
         }
         
         public String describeVisibility() {
-            if (context.indexOf("access:public") != -1) {
+            if (context.contains("access:public")) {
                 return "+";
-            } else if (context.indexOf("access:private") != -1) {
+            } else if (context.contains("access:private")) {
                 return "-";
-            } else if (context.indexOf("access:protected") != -1) {
+            } else if (context.contains("access:protected")) {
                 return "#";
             } else {
                 return "?";
@@ -253,11 +253,11 @@ public class TagReader {
         public static final Color PRIVATE = new Color(255, 140, 140);
         
         public Color visibilityColor() {
-            if (context.indexOf("access:public") != -1) {
+            if (context.contains("access:public")) {
                 return PUBLIC;
-            } else if (context.indexOf("access:private") != -1) {
+            } else if (context.contains("access:private")) {
                 return PRIVATE;
-            } else if (context.indexOf("access:protected") != -1) {
+            } else if (context.contains("access:protected")) {
                 return PROTECTED;
             } else {
                 return Color.GRAY;

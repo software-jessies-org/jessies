@@ -30,7 +30,7 @@ public class FindAndReplaceAction extends ETextAction {
     private ETextArea text;
 
     private boolean isSelectionMeantAsScope() {
-        return (text.getSelectedText().indexOf("\n") != -1);
+        return text.getSelectedText().contains("\n");
     }
     
     private void initPatternField() {

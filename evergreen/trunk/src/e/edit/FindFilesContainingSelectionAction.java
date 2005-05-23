@@ -23,7 +23,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
         
         // Only use the selection as a pattern if there are no embedded newlines.
         String pattern = null;
-        if (selection.length() > 0 && selection.indexOf("\n") == -1) {
+        if (selection.length() > 0 && selection.contains("\n") == false) {
             pattern = StringUtilities.regularExpressionFromLiteral(selection);
         }
         String directory = guessDirectoryToSearchIn();

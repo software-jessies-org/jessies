@@ -143,8 +143,7 @@ public class ShellCommand {
     * environment variable is queried. If this isn't set, a default of /bin/sh is used.
     */
     public String[] makeCommandLine(String command) {
-        boolean windows = System.getProperty("os.name").indexOf("Windows") != -1;
-        if (windows) {
+        if (GuiUtilities.isWindows()) {
             return new String[] { "cmd", "/c", command };
         } else {
             String shell = System.getProperty("env.SHELL");
