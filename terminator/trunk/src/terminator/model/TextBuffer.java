@@ -317,8 +317,8 @@ public class TextBuffer {
 		boolean wereAtBottom = view.isAtBottom();
 		boolean needsScroll = false;
 		Dimension initialSize = getCurrentSizeInChars();
-		for (int i = 0; i < actions.length; i++) {
-			actions[i].perform(this);
+		for (TerminalAction action : actions) {
+			action.perform(this);
 		}
 		if (firstLineChanged != Integer.MAX_VALUE) {
 			needsScroll = true;

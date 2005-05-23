@@ -88,16 +88,16 @@ public class CSIEscapeAction implements TerminalAction {
 	private boolean setMode(TextBuffer listener, String seq, boolean value) {
 		boolean isPrivateMode = seq.startsWith("?");
 		String[] modes = (isPrivateMode ? seq.substring(1) : seq).split(";");
-		for (int i = 0; i < modes.length; i++) {
-			int mode = Integer.parseInt(modes[i]);
+		for (String modeString : modes) {
+			int mode = Integer.parseInt(modeString);
 			if (isPrivateMode) {
-				switch (Integer.parseInt(modes[i])) {
+				switch (mode) {
 					case 25: listener.setCursorVisible(value); break;
 					case 47: listener.useAlternateBuffer(value); break;
-					default: Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
+					default: Log.warn("Unknown mode " + mode + " in [" + seq + (value ? 'h' : 'l'));
 				}
 			} else {
-				switch (Integer.parseInt(modes[i])) {
+				switch (mode) {
 				case 4:
 					listener.setInsertMode(value);
 					break;
@@ -105,7 +105,7 @@ public class CSIEscapeAction implements TerminalAction {
 					control.setAutomaticNewline(value);
 					break;
 				default:
-					Log.warn("Unknown mode " + modes[i] + " in [" + seq + (value ? 'h' : 'l'));
+					Log.warn("Unknown mode " + mode + " in [" + seq + (value ? 'h' : 'l'));
 				}
 			}
 		}
@@ -212,8 +212,8 @@ public class CSIEscapeAction implements TerminalAction {
 		boolean hasForeground = StyledText.hasForeground(oldStyle);
 		boolean hasBackground = StyledText.hasBackground(oldStyle);
 		String[] chunks = sequence.split(";");
-		for (int i = 0; i < chunks.length; i++) {
-			int value = (chunks[i].length() == 0) ? 0 : Integer.parseInt(chunks[i]);
+		for (String chunk : chunks) {
+			int value = (chunk.length() == 0) ? 0 : Integer.parseInt(chunk);
 			switch (value) {
 			case 0:
 				// Clear all attributes.

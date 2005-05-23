@@ -98,8 +98,7 @@ public class JTerminalPane extends JPanel {
 	private static String getUserShell(String user) {
 		try {
 			String[] lines = StringUtilities.readLinesFromFile("/etc/passwd");
-			for (int i = 0; i < lines.length; ++i) {
-				String line = lines[i];
+			for (String line : lines) {
 				if (line.startsWith(user + ":")) {
 					return line.substring(line.lastIndexOf(':') + 1);
 				}
@@ -231,14 +230,14 @@ public class JTerminalPane extends JPanel {
 		 * Action ourselves.
 		 */
 		private void handleKeyboardEquivalent(KeyEvent event) {
-			for (int i = 0; i < menuAndKeyActions.length; i++) {
-				if (menuAndKeyActions[i] == null) {
+			for (Action action : menuAndKeyActions) {
+				if (action == null) {
 					continue;
 				}
-				KeyStroke accelerator = (KeyStroke) menuAndKeyActions[i].getValue(Action.ACCELERATOR_KEY);
+				KeyStroke accelerator = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
 				KeyStroke thisStroke = KeyStroke.getKeyStrokeForEvent(event);
 				if (thisStroke.equals(accelerator)) {
-					menuAndKeyActions[i].actionPerformed(null);
+					action.actionPerformed(null);
 					break;
 				}
 			}
@@ -414,11 +413,11 @@ public class JTerminalPane extends JPanel {
 		private void maybeShowPopup(MouseEvent event) {
 			if (event.isPopupTrigger()) {
 				EPopupMenu menu = new EPopupMenu();
-				for (int i = 0; i < menuAndKeyActions.length; i++) {
-					if (menuAndKeyActions[i] == null) {
+				for (Action action : menuAndKeyActions) {
+					if (action == null) {
 						menu.addSeparator();
 					} else {
-						menu.add(menuAndKeyActions[i]);
+						menu.add(action);
 					}
 				}
 				addInfoItems(menu);

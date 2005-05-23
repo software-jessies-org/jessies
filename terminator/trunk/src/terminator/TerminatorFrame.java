@@ -21,14 +21,14 @@ public class TerminatorFrame extends JFrame {
 		super(Options.getSharedInstance().getTitle());
 		this.terminator = terminator;
 		JTerminalPane[] panes = new JTerminalPane[paneFactories.length];
-		for (int i = 0; i < paneFactories.length; i++) {
+		for (int i = 0; i < paneFactories.length; ++i) {
 			panes[i] = paneFactories[i].create();
 			terminals.add(panes[i]);
 		}
 		initFrame();
 		initFocus();
-		for (int i = 0; i < panes.length; i++) {
-			panes[i].start();
+		for (JTerminalPane pane : panes) {
+			pane.start();
 		}
 	}
 	

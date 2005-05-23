@@ -55,11 +55,10 @@ public class Options {
 	}
 	
 	public void showOptions(PrintWriter out) {
-		Object[] keys = options.keySet().toArray();
+		String[] keys = options.keySet().toArray(new String[options.size()]);
 		Arrays.sort(keys);
-		for (int i = 0; i < keys.length; ++i) {
-			String key = (String) keys[i];
-			String description = (String) descriptions.get(key);
+		for (String key : keys) {
+			String description = descriptions.get(key);
 			if (description != null) {
 				out.println("\n# " + description);
 			}
@@ -316,8 +315,7 @@ public class Options {
 	private void readRGBFile() {
 		rgbColors = new HashMap<String, Color>();
 		String[] lines = StringUtilities.readLinesFromFile("/usr/X11R6/lib/X11/rgb.txt");
-		for (int i = 0; i < lines.length; ++i) {
-			String line = lines[i];
+		for (String line : lines) {
 			if (line.startsWith("!")) {
 				continue;
 			}
@@ -358,8 +356,8 @@ public class Options {
 	
 	private void readOptionsFrom(File file) {
 		String[] lines = StringUtilities.readLinesFromFile(file.toString());
-		for (int i = 0; i < lines.length; ++i) {
-			String line = lines[i].trim();
+		for (String line : lines) {
+			line = line.trim();
 			if (line.length() == 0 || line.startsWith("!")) {
 				continue;
 			}
