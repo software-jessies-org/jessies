@@ -89,8 +89,7 @@ public class PSameStyleCharSequence {
         private StringBuffer mangledText;
         
         public MangledCharSequence(PTextArea textArea) {
-            // FIXME: 1.5 has a StringBuffer(CharSequence) constructor.
-            this.mangledText = new StringBuffer(textArea.getTextBuffer().toString());
+            this.mangledText = new StringBuffer(textArea.getTextBuffer());
             
             PSegmentIterator it = textArea.getLogicalSegmentIterator(0);
             while (it.hasNext()) {
