@@ -304,59 +304,6 @@ public class JavaDoc {
     */
     public static String[] getPackageInfo(String pkgName) {
         return new String[] { getLink("package-summary", pkgName, true, DOC) };
-        /*        String docIndex = "";
-        for (Iterator i = groups.iterator(); i.hasNext(); ) {
-            ArrayList packages = (ArrayList) i.next();
-            if (packages.contains(pkgName)) {
-                docIndex = (String) docIndices.get(packages);
-                break;
-            }
-        }
-        ArrayList pkgInfo = new ArrayList();
-        String uri = docIndex + pkgName.replace('.', '/') + "/package-summary.html";
-        try {
-            URL url = new URL(uri);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-            
-            StringBuffer summary = new StringBuffer();
-            boolean readingSummary = false;
-            boolean readSummary = false;
-            String line;
-            while ((line = reader.readLine()) != null && readSummary == false) {
-                if (readingSummary && line.indexOf("<P>") != -1) {
-                    readingSummary = false;
-                    readSummary = true;
-                }
-                if (readingSummary) {
-                    summary.append(line);
-                    summary.append("\n");
-                }
-                if (line.indexOf("</H2>") != -1) {
-                    readingSummary = true;
-                }
-            }
-            pkgInfo.add(summary.toString());
-            
-            boolean expectingClass = false;
-            while ((line = reader.readLine()) != null) {
-                if (expectingClass) {
-                    int start = line.indexOf("<A HREF=\"") + 9;
-                    int end = line.indexOf(".html\">");
-                    pkgInfo.add(line.substring(start, end));
-                    expectingClass = false;
-                }
-                if (line.indexOf("TableRowColor") != -1) {
-                    expectingClass = true;
-                }
-            }
-            reader.close();
-        } catch (FileNotFoundException fnfex) {
-            return new String[] { "No javadoc for " + pkgName + ".", "" };
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return (String[]) pkgInfo.toArray(new String[pkgInfo.size()]);
-        */
     }
     
     /**

@@ -260,7 +260,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     /** Formats a class name as a link if there's javadoc for it. */
     public String makeClassLink(String className, String pkg, boolean showPkg, boolean showSourceLink) {
         StringBuffer s = new StringBuffer();
-        if (className.indexOf(".") != -1) {
+        if (className.contains(".")) {
             s.append(className);
             return s.toString();
         }

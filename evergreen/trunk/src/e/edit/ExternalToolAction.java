@@ -92,7 +92,7 @@ public class ExternalToolAction extends ETextAction {
     }
 
     public boolean isContextSensitive() {
-        return commandPattern.indexOf("EDIT_") != -1;
+        return commandPattern.contains("EDIT_");
     }
 
     public ShellCommand runCommand(String filename, int lineNumber, Workspace workspace, String context) {

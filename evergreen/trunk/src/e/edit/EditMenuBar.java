@@ -42,7 +42,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(new SaveAllAction());
         menu.add(new RevertToSavedAction());
 
-        if (System.getProperty("os.name").indexOf("Mac") == -1) {
+        if (GuiUtilities.isMacOs() == false) {
             menu.add(new JSeparator());
             menu.add(new JMenuItem(new ExitAction()));
         }

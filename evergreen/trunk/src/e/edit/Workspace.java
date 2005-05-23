@@ -168,8 +168,7 @@ public class Workspace extends JPanel {
     }
     
     public static boolean isAbsolute(String filename) {
-        boolean windows = System.getProperty("os.name").indexOf("Windows") != -1;
-        if (windows) {
+        if (GuiUtilities.isWindows()) {
             /* FIXME: is this a good test for Windows? What about \\ names? */
             return (filename.length() > 1) && (filename.charAt(1) == ':');
         } else {
@@ -391,7 +390,7 @@ public class Workspace extends JPanel {
         if (openQuicklyDialog == null) {
             openQuicklyDialog = new OpenQuicklyDialog(this);
         }
-        if (filenamePattern != null && filenamePattern.length() > 0 && filenamePattern.indexOf("\n") == -1) {
+        if (filenamePattern != null && filenamePattern.length() > 0 && filenamePattern.contains("\n") == false) {
             openQuicklyDialog.setFilenamePattern(filenamePattern);
         }
         openQuicklyDialog.showDialog();
