@@ -63,7 +63,7 @@ public class ETree extends JTree {
                 selectNodesMatching(path, string);
             }
         }
-        if (node.toString().toLowerCase().indexOf(string) != -1) {
+        if (node.toString().toLowerCase().contains(string)) {
             addSelectionPath(parent);
         }
     }

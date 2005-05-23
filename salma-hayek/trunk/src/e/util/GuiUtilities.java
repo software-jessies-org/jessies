@@ -3,10 +3,15 @@ package e.util;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
 public class GuiUtilities {
+    static {
+        e.debug.EventDispatchThreadHangMonitor.initMonitoring();
+    }
+    
     static {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("swing.aatext", "true");
@@ -72,14 +77,14 @@ public class GuiUtilities {
      * on the Mac.
      */
     public static boolean isMacOs() {
-        return (System.getProperty("os.name").indexOf("Mac") != -1);
+        return System.getProperty("os.name").contains("Mac");
     }
     
     /**
      * Tests whether we're running on Windows.
      */
     public static boolean isWindows() {
-        return (System.getProperty("os.name").indexOf("Windows") != -1);
+        return System.getProperty("os.name").contains("Windows");
     }
     
     /**
@@ -120,11 +125,11 @@ public class GuiUtilities {
             if (lafClassName == null) {
                 lafClassName = UIManager.getSystemLookAndFeelClassName();
             }
-            if (lafClassName.indexOf("GTK") != -1) {
+            if (lafClassName.contains("GTK")) {
                 lafClassName = UIManager.getCrossPlatformLookAndFeelClassName();
             }
             UIManager.setLookAndFeel(lafClassName);
-            if (lafClassName.indexOf("Metal") != -1) {
+            if (lafClassName.contains("Metal")) {
                 Object font = UIManager.get("Table.font");
                 UIManager.put("Menu.font", font);
                 UIManager.put("MenuItem.font", font);

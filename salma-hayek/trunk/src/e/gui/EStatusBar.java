@@ -20,7 +20,7 @@ public class EStatusBar extends JLabel {
         super(" ");
         
         // Use the slimmer menu font on Linux.
-        if (System.getProperty("os.name").indexOf("Linux") != -1) {
+        if (System.getProperty("os.name").contains("Linux")) {
             setFont(UIManager.getFont("Menu.font"));
         }
         

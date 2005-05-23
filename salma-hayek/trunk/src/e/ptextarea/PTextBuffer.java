@@ -123,7 +123,7 @@ public class PTextBuffer implements CharSequence {
             // Cope with weird line-endings.
             if (charArrayContains(chars, '\r')) {
                 String s = new String(chars);
-                if (s.indexOf("\r\n") != -1) {
+                if (s.contains("\r\n")) {
                     lineEnding = "\r\n";
                     s = s.replaceAll("\r\n", "\n");
                 } else {

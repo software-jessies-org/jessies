@@ -25,7 +25,7 @@ public class EListCellRenderer extends DefaultListCellRenderer {
         if (text.length() == 0) {
             // Prevent blank lines from being squashed (mis-feature in JLabel).
             setText(" ");
-        } else if (text.indexOf('\t') != -1) {
+        } else if (text.contains("\t")) {
             // Prevent tabs from being squashed (mis-feature in JLabel).
             setText(text.replaceAll("\t", "    "));
         }

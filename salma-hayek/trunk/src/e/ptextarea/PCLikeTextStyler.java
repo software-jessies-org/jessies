@@ -296,7 +296,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     }
     
     private boolean hasCommentMarker(String text) {
-        return (text.indexOf("/*") != -1) || (text.indexOf("*/") != -1);
+        return text.contains("/*") || text.contains("*/");
     }
     
     public void textCompletelyReplaced(PTextEvent event) {

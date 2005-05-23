@@ -39,7 +39,7 @@ public class Gazetteer {
                 String[] fields = line.split("\t");
                 
                 // Filter out some of the dodgy data.
-                if (fields.length != 8 || line.indexOf("&deg;") != -1) {
+                if (fields.length != 8 || line.contains("&deg;")) {
                     System.err.println(line);
                     continue;
                 }

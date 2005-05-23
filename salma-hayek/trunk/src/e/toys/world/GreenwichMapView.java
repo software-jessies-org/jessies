@@ -77,7 +77,7 @@ public class GreenwichMapView extends JComponent {
         Gazetteer gazetteer = Gazetteer.getInstance();
         for (int i = 0; i < gazetteer.size(); ++i) {
             Place place = gazetteer.get(i);
-            if (true || place.name.indexOf("Turkey") != -1) {
+            if (true || place.name.contains("Turkey")) {
                 double x = (place.longitude + 180.0) * (double) dayMap.getWidth() / 360.0;
                 double y = (90.0 - place.latitude) * (double) dayMap.getHeight() / 180.0;
                 g.fillRect((int) x, (int) y, 1, 1);
