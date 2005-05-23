@@ -275,9 +275,8 @@ public class Workspace extends JPanel {
      * Returns true if all saves were successful, false otherwise.
      */
     public boolean saveAll() {
-        ETextWindow[] dirtyWindows = getDirtyTextWindows();
-        for (int i = 0; i < dirtyWindows.length; i++) {
-            boolean savedOkay = dirtyWindows[i].save();
+        for (ETextWindow dirtyWindow : getDirtyTextWindows()) {
+            boolean savedOkay = dirtyWindow.save();
             if (savedOkay == false) {
                 return false;
             }
@@ -291,8 +290,7 @@ public class Workspace extends JPanel {
         if (files == null) {
             return;
         }
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
+        for (File file : files) {
             if (FileUtilities.isIgnored(file)) {
                 continue;
             }
@@ -351,8 +349,8 @@ public class Workspace extends JPanel {
      * it may well be ridiculously expensive to scan. Particularly because we blindly follow symlinks.
      */
     public boolean isSensibleToScan(File[] contents) {
-        for (int i = 0; i < contents.length; i++) {
-            if (contents[i].toString().matches(".*(CVS|SCCS|\\.svn|Makefile|makefile|build\\.xml)")) {
+        for (File file : contents) {
+            if (file.toString().matches(".*(CVS|SCCS|\\.svn|Makefile|makefile|build\\.xml)")) {
                 return true;
             }
         }
@@ -427,9 +425,7 @@ public class Workspace extends JPanel {
     }
     
     public void moveFilesToBestWorkspaces() {
-        ETextWindow[] textWindows = leftColumn.getTextWindows();
-        for (int i = 0; i < textWindows.length; i++) {
-            ETextWindow textWindow = textWindows[i];
+        for (ETextWindow textWindow : leftColumn.getTextWindows()) {
             Workspace bestWorkspace = Edit.getBestWorkspaceForFilename(textWindow.getFilename());
             if (bestWorkspace != this) {
                 bestWorkspace.takeWindow(textWindow);
@@ -467,9 +463,7 @@ public class Workspace extends JPanel {
         workspace.setAttribute("name", getTitle());
         workspace.setAttribute("root", getRootDirectory());
         workspace.setAttribute("buildTarget", getBuildTarget());
-        ETextWindow[] textWindows = leftColumn.getTextWindows();
-        for (int i = 0; i < textWindows.length; ++i) {
-            ETextWindow textWindow = textWindows[i];
+        for (ETextWindow textWindow : leftColumn.getTextWindows()) {
             org.w3c.dom.Element file = document.createElement("file");
             workspace.appendChild(file);
             file.setAttribute("name", textWindow.getFilename() + textWindow.getAddress());
