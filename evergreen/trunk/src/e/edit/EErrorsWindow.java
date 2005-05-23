@@ -132,8 +132,8 @@ public class EErrorsWindow extends EWindow {
     public void fillWithContent() {
     }
     
-    public Collection getPopupMenuItems() {
-        ArrayList items = new ArrayList();
+    public Collection<Action> getPopupMenuItems() {
+        ArrayList<Action> items = new ArrayList<Action>();
         items.add(new OpenQuicklyAction());
         items.add(new FindFilesContainingSelectionAction());
         items.add(null);

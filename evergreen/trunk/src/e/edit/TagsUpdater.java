@@ -194,9 +194,9 @@ public class TagsUpdater {
         
         private DefaultMutableTreeNode root;
         private DefaultTreeModel treeModel;
-        private HashMap branches;
+        private HashMap<String, DefaultMutableTreeNode> branches;
         
-        private ArrayList tags;
+        private ArrayList<TagReader.Tag> tags;
         
         public TreeModelBuilder() {
             progressTimer = new Timer(500, new ActionListener() {
@@ -214,9 +214,9 @@ public class TagsUpdater {
             isRunning = true;
             root = new BranchNode("root");
             treeModel = new DefaultTreeModel(root);
-            branches = new HashMap();
+            branches = new HashMap<String, DefaultMutableTreeNode>();
             branches.put("", root);
-            tags = new ArrayList();
+            tags = new ArrayList<TagReader.Tag>();
             startTime = System.currentTimeMillis();
             progressTimer.start();
             scanTags();
@@ -325,12 +325,12 @@ public class TagsUpdater {
             }
         }
         
-        private SortedSet kidsNames = new TreeSet(String.CASE_INSENSITIVE_ORDER);
+        private SortedSet<String> kidsNames = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         
         public int getInsertIndex(TagReader.Tag tag) {
             String insertString = tag.getSortIdentifier() + kidsNames.size();
             kidsNames.add(insertString);
-            return new ArrayList(kidsNames).indexOf(insertString);
+            return new ArrayList<String>(kidsNames).indexOf(insertString);
         }
     }
 }

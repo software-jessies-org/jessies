@@ -53,7 +53,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     private String fileType = UNKNOWN;
     
-    private static final Hashtable KEYWORDS_MAP = new Hashtable();
+    private static final HashMap<String, HashSet<String>> KEYWORDS_MAP = new HashMap<String, HashSet<String>>();
 
     private Timer findResultsUpdater;
     
@@ -61,16 +61,16 @@ public class ETextWindow extends EWindow implements PTextListener {
         JavaResearcher.addJavaWords(getKeywordsForLanguage(JAVA));
     }
     
-    private static HashSet initKeywordsFor(String language) {
-        HashSet keywords = new HashSet();
+    private static HashSet<String> initKeywordsFor(String language) {
+        HashSet<String> keywords = new HashSet<String>();
         String keywordsFileName = Edit.getResourceFilename("keywords-" + language);
         if (FileUtilities.exists(keywordsFileName)) {
             String[] keywordArray = StringUtilities.readLinesFromFile(keywordsFileName);
-            for (int i = 0; i < keywordArray.length; i++) {
-                if (keywordArray[i].startsWith("#")) {
+            for (String keyword : keywords) {
+                if (keyword.startsWith("#")) {
                     continue; // Ignore comments.
                 }
-                keywords.add(keywordArray[i]);
+                keywords.add(keyword);
             }
         }
         KEYWORDS_MAP.put(language, keywords);
@@ -191,8 +191,8 @@ public class ETextWindow extends EWindow implements PTextListener {
         return content.startsWith("#ifndef") || content.matches(".*" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ".*");
     }
     
-    private static HashSet getKeywordsForLanguage(String language) {
-        HashSet keywords = (HashSet) KEYWORDS_MAP.get(language);
+    private static HashSet<String> getKeywordsForLanguage(String language) {
+        HashSet<String> keywords = KEYWORDS_MAP.get(language);
         if (keywords == null) {
             keywords = initKeywordsFor(language);
         }
@@ -206,7 +206,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     public void updateWatermark() {
         watermarkViewPort.setSerious(false);
-        ArrayList items = new ArrayList();
+        ArrayList<String> items = new ArrayList<String>();
         if (file.exists() == false) {
             items.add("(deleted)");
             watermarkViewPort.setSerious(true);
@@ -334,8 +334,8 @@ public class ETextWindow extends EWindow implements PTextListener {
         super.closeWindow();
     }
     
-    public Collection getPopupMenuItems() {
-        ArrayList items = new ArrayList();
+    public Collection<Action> getPopupMenuItems() {
+        ArrayList<Action> items = new ArrayList<Action>();
         items.add(new OpenQuicklyAction());
         items.add(new FindFilesContainingSelectionAction());
         items.add(new RevertToSavedAction());
@@ -347,7 +347,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         return items;
     }
 
-    public void addExternalToolMenuItems(final Collection items) {
+    public void addExternalToolMenuItems(final Collection<Action> items) {
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
             private boolean needSeparator = true;
             

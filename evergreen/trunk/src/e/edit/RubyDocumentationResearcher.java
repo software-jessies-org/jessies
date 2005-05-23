@@ -15,16 +15,16 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         if (ri == null) {
             return "";
         }
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(null, new String[] { "ruby", ri, "-T", "-f", "html", string }, lines, errors);
         String result = StringUtilities.join(lines, "\n");
         return (result.indexOf("<error>") != -1) ? "" : result;
     }
     
     private String getRi() {
-        ArrayList availableRis = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> availableRis = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(null, new String[] { "which", "ri" }, availableRis, errors);
         if (status != 0 || availableRis.size() == 0) {
             return null;

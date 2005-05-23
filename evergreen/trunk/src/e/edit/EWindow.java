@@ -76,15 +76,15 @@ public class EWindow extends JComponent {
         return (EColumn) SwingUtilities.getAncestorOfClass(EColumn.class, this);
     }
     
-    public Collection getPopupMenuItems() {
+    public Collection<Action> getPopupMenuItems() {
         return null;
     }
 
     public void showPopupMenu(MouseEvent e) {
-        Collection items = getPopupMenuItems();
+        Collection<Action> items = getPopupMenuItems();
         if (items != null && items.size() > 0) {
             popupMenu = new EPopupMenu();
-            popupMenu.add((Action[]) items.toArray(new Action[items.size()]));
+            popupMenu.add(items.toArray(new Action[items.size()]));
             popupMenu.show((Component) e.getSource(), e.getX(), e.getY());
         }
     }

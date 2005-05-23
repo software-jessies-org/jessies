@@ -16,7 +16,7 @@ public class SaveMonitor {
     private SaveMonitor() {
     }
     
-    private ArrayList saveListeners = new ArrayList();
+    private ArrayList<SaveMonitor.Listener> saveListeners = new ArrayList<SaveMonitor.Listener>();
     
     /**
      * Adds a listener to be notified when any file is saved.
@@ -34,7 +34,7 @@ public class SaveMonitor {
      */
     public synchronized void fireSaveListeners() {
         for (int i = saveListeners.size() - 1; i >= 0; --i) {
-            SaveMonitor.Listener listener = (SaveMonitor.Listener) saveListeners.get(i);
+            SaveMonitor.Listener listener = saveListeners.get(i);
             listener.fileSaved();
         }
     }

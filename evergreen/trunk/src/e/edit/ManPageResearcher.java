@@ -11,14 +11,14 @@ Offers man page entries corresponding to selected words.
  */
 public class ManPageResearcher implements WorkspaceResearcher {
     /** Keep the names of all the known man pages. */
-    private Set knownManPages;
+    private Set<String> knownManPages;
     
     /**
      * Initializes the set of known man pages.
      */
     public ManPageResearcher() {
         final long startTime = System.currentTimeMillis();
-        knownManPages = new HashSet();
+        knownManPages = new HashSet<String>();
         
         /*
          * Should really do something equivalent to this:
@@ -32,8 +32,8 @@ public class ManPageResearcher implements WorkspaceResearcher {
          */
         
         String[] manPages = StringUtilities.readLinesFromFile(Edit.getResourceFilename("manpages"));
-        for (int i = 0; i < manPages.length; i++) {
-            knownManPages.add(manPages[i]);
+        for (String manPage : manPages) {
+            knownManPages.add(manPage);
         }
         
         final long duration = System.currentTimeMillis() - startTime;

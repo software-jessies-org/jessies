@@ -506,14 +506,14 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         frame.setSize(initialWidth, initialHeight);
     }
     
-    private List initialFilenames;
+    private List<String> initialFilenames;
     
     /** Opens all the files listed in the file we remembered them to last time we quit. */
     public void openRememberedFiles() {
         Edit.showStatus("Opening remembered files...");
         if (initialFilenames != null) {
-            for (int i = 0; i < initialFilenames.size(); i++) {
-                Edit.openFile((String) initialFilenames.get(i));
+            for (String filename : initialFilenames) {
+                Edit.openFile(filename);
             }
             Edit.showStatus((initialFilenames.size() == 0) ? "No files to open" : "Finished opening files");
         }
@@ -523,15 +523,14 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     public void openRememberedWorkspaces() {
         Log.warn("Opening remembered workspaces...");
         if (initialWorkspaces != null) {
-            for (int i = 0; i < initialWorkspaces.size(); ++i) {
-                Element info = (Element) initialWorkspaces.get(i);
+            for (Element info : initialWorkspaces) {
                 addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"));
             }
             return;
         }
     }
     
-    private ArrayList initialWorkspaces;
+    private ArrayList<Element> initialWorkspaces;
 
     private void readSavedState() {
         try {
@@ -544,11 +543,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             initialWidth = Integer.parseInt(root.getAttribute("width"));
             initialHeight = Integer.parseInt(root.getAttribute("height"));
             
-            initialWorkspaces = new ArrayList();
-            initialFilenames = new ArrayList();
+            initialWorkspaces = new ArrayList<Element>();
+            initialFilenames = new ArrayList<String>();
             for (Node workspace = root.getFirstChild(); workspace != null; workspace = workspace.getNextSibling()) {
                 if (workspace instanceof Element) {
-                    initialWorkspaces.add(workspace);
+                    initialWorkspaces.add((Element) workspace);
                     for (Node file = workspace.getFirstChild(); file != null; file = file.getNextSibling()) {
                         if (file instanceof Element) {
                             initialFilenames.add(((Element) file).getAttribute("name"));

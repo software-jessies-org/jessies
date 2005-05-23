@@ -52,7 +52,7 @@ public class AutoCompleteAction extends ETextAction {
         
         // FIXME: we should be able to offer completions for other languages.
         JavaResearcher javaResearcher = JavaResearcher.getSharedInstance();
-        List completionsList = javaResearcher.listIdentifiersStartingWith(prefix);
+        List<String> completionsList = javaResearcher.listIdentifiersStartingWith(prefix);
         boolean noCompletions = completionsList.isEmpty();
         if (noCompletions) {
             completionsList.add("No completions found.");
