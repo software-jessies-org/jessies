@@ -58,9 +58,9 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         
         // Add any highlights now. We may only have one, if we detected a
         // mis-match.
-        for (int i = 0; i < highlights.length; ++i) {
-            if (highlights[i] != null) {
-                textArea.addHighlight(highlights[i]);
+        for (PHighlight highlight : highlights) {
+            if (highlight != null) {
+                textArea.addHighlight(highlight);
             }
         }
     }

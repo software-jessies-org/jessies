@@ -25,9 +25,7 @@ public class EPopupMenu {
     
     /** Adds a group of Action items to the end of the current list of items. */
     public void add(Action[] items) {
-        for (int i = 0; i < items.length; i++) {
-            menuItems.add(items[i]);
-        }
+        menuItems.addAll(Arrays.asList(items));
         // Remove any trailing null.
         int lastIndex = menuItems.size() - 1;
         if (menuItems.get(lastIndex) == null) {

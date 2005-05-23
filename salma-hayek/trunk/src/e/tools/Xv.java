@@ -18,8 +18,8 @@ public class Xv extends JFrame {
     public static void main(String[] arguments) {
         Log.setApplicationName("Xv");
         GuiUtilities.initLookAndFeel();
-        for (int i = 0; i < arguments.length; ++i) {
-            Xv xv = new Xv(arguments[i]);
+        for (String argument : arguments) {
+            Xv xv = new Xv(argument);
         }
     }
 }

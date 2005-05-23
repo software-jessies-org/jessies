@@ -27,8 +27,8 @@ public class StringUtilities {
     public static String readFile(String filename) {
         StringBuffer result = new StringBuffer();
         String[] lines = readLinesFromFile(filename);
-        for (int i = 0; i < lines.length; i++) {
-            result.append(lines[i]);
+        for (String line : lines) {
+            result.append(line);
             result.append('\n');
         }
         return result.toString();
@@ -159,11 +159,11 @@ public class StringUtilities {
      */
     public static String join(String[] strings, String separator) {
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < strings.length; ++i) {
-            if (i > 0) {
+        for (String string : strings) {
+            if (result.length() > 0) {
                 result.append(separator);
             }
-            result.append(strings[i]);
+            result.append(string);
         }
         return result.toString();
     }
@@ -248,13 +248,13 @@ public class StringUtilities {
     private StringUtilities() {
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] arguments) {
         System.out.println("'" + trimLeadingWhitespace("  hello world  ") + "'");
         System.out.println("'" + trimTrailingWhitespace("  hello world  ") + "'");
         System.out.println("blah="+escapeForJava("hello\tworld\u01f8\n"));
         System.out.println("blah2="+escapeForJava(unescapeJava(escapeForJava("hello\tworld\u01f8\n"))));
-        for (int i = 0; i < args.length; i++) {
-            String escaped = escapeForJava(args[i]);
+        for (String argument : arguments) {
+            String escaped = escapeForJava(argument);
             System.out.println("escaped="+escaped);
             System.out.println("unescaped="+unescapeJava(escaped));
         }

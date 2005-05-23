@@ -59,8 +59,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
             EPopupMenu menu = new EPopupMenu();
             String misspelling = component.getTextBuffer().subSequence(actualRange.getStart(), actualRange.getEnd()).toString();
             String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
-            for (int i = 0; i < suggestions.length; i++) {
-                String suggestion = suggestions[i];
+            for (String suggestion : suggestions) {
                 // Since we're mainly used for editing source, camelCase
                 // and underscored_identifiers are more likely than
                 // hyphenated words or multiple words.
@@ -99,8 +98,8 @@ public class PTextAreaSpellingChecker implements PTextListener {
         public void actionPerformed(ActionEvent e) {
             SpellingChecker.getSharedSpellingCheckerInstance().acceptSpelling(word);
             Object[] spellingCheckers = InstanceTracker.getInstancesOfClass(PTextAreaSpellingChecker.class);
-            for (int i = 0; i < spellingCheckers.length; ++i) {
-                ((PTextAreaSpellingChecker) spellingCheckers[i]).checkSpelling();
+            for (Object spellingChecker : spellingCheckers) {
+                PTextAreaSpellingChecker.class.cast(spellingChecker).checkSpelling();
             }
         }
     }

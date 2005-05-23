@@ -18,8 +18,7 @@ public class IndentationGuesser {
         Bag indentations = new Bag();
         String emergencyAlternative = Parameters.getParameter("indent.string", "    ");
         String[] lines = fileContents.split("\n");
-        for (int i = 0; i < lines.length; ++i) {
-            String line = lines[i];
+        for (String line : lines) {
             Matcher matcher = INDENTATION_PATTERN_1.matcher(line);
             if (matcher.matches()) {
                 String indent = matcher.group(1);

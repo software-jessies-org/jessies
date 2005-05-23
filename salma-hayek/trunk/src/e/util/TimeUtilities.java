@@ -76,7 +76,7 @@ public class TimeUtilities {
     private TimeUtilities() {
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] arguments) {
         Date startDate = new Date();
         long start = System.currentTimeMillis();
         System.out.println(currentIsoString());
@@ -90,8 +90,8 @@ public class TimeUtilities {
         System.out.println(currentIsoString());
         System.out.println(durationToIsoString(end - start));
         System.out.println(durationToIsoString(millisecondsBetween(startDate, endDate)));
-        for (int i = 0; i < args.length; ++i) {
-            System.out.println(durationToIsoString(Long.parseLong(args[i])));
+        for (String argument : arguments) {
+            System.out.println(durationToIsoString(Long.parseLong(argument)));
         }
     }
 }

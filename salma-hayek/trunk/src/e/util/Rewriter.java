@@ -86,8 +86,8 @@ public abstract class Rewriter {
                 return TimeUtilities.durationToIsoString(milliseconds);
             }
         };
-        for (int i = 0; i < arguments.length; ++i) {
-            System.err.println(rewriter.rewrite(arguments[i]));
+        for (String argument : arguments) {
+            System.err.println(rewriter.rewrite(argument));
         }
     }
 }

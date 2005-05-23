@@ -56,7 +56,7 @@ public class GuiUtilities {
     public static boolean isFontFixedWidth(Font font) {
         int maxWidth = 0;
         char[] testChars = "ILMWilmw01".toCharArray();
-        for (int i = 0; i < testChars.length; i++) {
+        for (int i = 0; i < testChars.length; ++i) {
             java.awt.geom.Rectangle2D stringBounds = font.getStringBounds(testChars, i, i + 1, DEFAULT_FONT_RENDER_CONTEXT);
             int width = (int) Math.ceil(stringBounds.getWidth());
             if (maxWidth == 0) {

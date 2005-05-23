@@ -33,13 +33,13 @@ public class DialogFocusRedirector implements FocusListener {
     }
     
     public boolean giveFocusToFirstTextComponentIn(Component[] components) {
-        for (int i = 0; i < components.length; i++) {
-            if (isWorthGivingFocusTo(components[i])) {
-                components[i].requestFocus();
-                ((JTextField) components[i]).selectAll();
+        for (Component component : components) {
+            if (isWorthGivingFocusTo(component)) {
+                component.requestFocus();
+                JTextField.class.cast(component).selectAll();
                 return true;
-            } else if (components[i] instanceof Container) {
-                Component[] newComponents = ((Container) components[i]).getComponents();
+            } else if (component instanceof Container) {
+                Component[] newComponents = Container.class.cast(component).getComponents();
                 boolean focusGivenAway = giveFocusToFirstTextComponentIn(newComponents);
                 if (focusGivenAway) return true;
             }

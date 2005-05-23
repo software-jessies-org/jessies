@@ -14,8 +14,8 @@ public class PTextWindow {
             System.err.println("Syntax: PTextWindow <filename>...");
             System.exit(1);
         }
-        for (int i = 0; i < filenames.length; ++i) {
-            open(filenames[i]);
+        for (String filename : filenames) {
+            open(filename);
         }
     }
     

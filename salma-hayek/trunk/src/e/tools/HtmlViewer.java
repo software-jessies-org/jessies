@@ -56,10 +56,10 @@ public class HtmlViewer extends JFrame {
         textPane.setCaretPosition(0);
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] arguments) {
         GuiUtilities.initLookAndFeel();
-        for (int i = 0; i < args.length; i++) {
-            String text = StringUtilities.readFile(args[i]);
+        for (String argument : arguments) {
+            String text = StringUtilities.readFile(argument);
             HtmlViewer htmlViewer = new HtmlViewer(text);
             htmlViewer.setVisible(true);
         }

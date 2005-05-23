@@ -27,9 +27,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     }
     
     protected void addKeywords(String[] keywordList) {
-        for (int i = 0; i < keywordList.length; i++) {
-            keywords.add(keywordList[i]);
-        }
+        keywords.addAll(Arrays.asList(keywordList));
     }
     
     /**

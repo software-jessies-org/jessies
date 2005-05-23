@@ -233,17 +233,17 @@ public class FileUtilities {
     }
     
     public static boolean nameEndsWithOneOf(String name, String[] extensions) {
-        for (int i = 0; i < extensions.length; i++) {
-            if (name.endsWith(extensions[i])) {
+        for (String extension : extensions) {
+            if (name.endsWith(extension)) {
                 return true;
             }
         }
         return false;
     }
     
-    public static boolean nameStartsWithOneOf(String name, String[] extensions) {
-        for (int i = 0; i < extensions.length; i++) {
-            if (name.startsWith(extensions[i])) {
+    public static boolean nameStartsWithOneOf(String name, String[] prefixes) {
+        for (String prefix : prefixes) {
+            if (name.startsWith(prefix)) {
                 return true;
             }
         }
@@ -319,8 +319,7 @@ public class FileUtilities {
         }
         
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < digest.length; ++i) {
-            byte b = digest[i];
+        for (byte b : digest) {
             result.append(Integer.toHexString((b >> 4) & 0xf));
             result.append(Integer.toHexString(b & 0xf));
         }
@@ -362,9 +361,8 @@ public class FileUtilities {
         return TimeUtilities.toIsoString(new Date(file.lastModified()));
     }
     
-    public static void main(String[] args) {
-        for (int i = 0; i < args.length; ++i) {
-            String filename = args[i];
+    public static void main(String[] arguments) {
+        for (String filename : arguments) {
             System.err.println(parseUserFriendlyName(filename));
             System.err.println(md5(fileFromString(filename)) + "\t" + filename);
         }

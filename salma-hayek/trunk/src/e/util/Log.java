@@ -93,8 +93,7 @@ public class Log {
         
         Field[] fields = c.getDeclaredFields();
         boolean needComma = false;
-        for (int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
+        for (Field field : fields) {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }

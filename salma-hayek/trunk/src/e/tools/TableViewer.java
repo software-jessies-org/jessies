@@ -70,11 +70,11 @@ public class TableViewer extends JFrame {
         column.setPreferredWidth(width + 4);
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] arguments) {
         try {
             GuiUtilities.initLookAndFeel();
-            for (int i = 0; i < args.length; i++) {
-                TableViewer tableViewer = new TableViewer(args[i]);
+            for (String argument : arguments) {
+                TableViewer tableViewer = new TableViewer(argument);
                 tableViewer.setVisible(true);
             }
         } catch (Exception ex) {

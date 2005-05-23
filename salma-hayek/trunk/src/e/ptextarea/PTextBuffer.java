@@ -176,8 +176,8 @@ public class PTextBuffer implements CharSequence {
                 // out individually. Expensive, but why aren't you using
                 // Unix line-endings, crazy person?
                 String[] lines = toString().split("\n");
-                for (int i = 0; i < lines.length; ++i) {
-                    writer.write(lines[i]);
+                for (String line : lines) {
+                    writer.write(line);
                     writer.write(lineEnding);
                 }
             }

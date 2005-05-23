@@ -18,8 +18,8 @@ public class DualTimeClock extends JWindow implements ActionListener {
     static {
         /*
         String[] ids = TimeZone.getAvailableIDs();
-        for (int i = 0; i < ids.length; ++i) {
-            System.err.println(ids[i]);
+        for (String id : ids) {
+            System.err.println(id);
         }
         */
         GB.setTimeZone(TimeZone.getTimeZone("Europe/London"));

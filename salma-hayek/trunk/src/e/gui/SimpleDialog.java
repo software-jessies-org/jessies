@@ -19,7 +19,7 @@ public class SimpleDialog {
         }
         StringBuffer result = new StringBuffer(message);
         int chunkLength = 0;
-        for (int i = 0; i < result.length(); i++) {
+        for (int i = 0; i < result.length(); ++i) {
             if (result.charAt(i) == '\n') {
                 chunkLength = 0;
             } else {

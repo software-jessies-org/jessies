@@ -23,9 +23,9 @@ public class HungAwtExit {
         Frame[] frames = Frame.getFrames();
         System.err.println("Extant frames: " + frames.length);
         int displayableFrameCount = 0;
-        for (int i = 0; i < frames.length; ++i) {
-            if (frames[i].isDisplayable()) {
-                System.err.println("Displayable frame: " + frames[i]);
+        for (Frame frame : frames) {
+            if (frame.isDisplayable()) {
+                System.err.println("Displayable frame: " + frame);
                 ++displayableFrameCount;
             }
         }

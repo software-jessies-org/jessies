@@ -114,9 +114,9 @@ public class NumberDecoder {
         }
         ArrayList<String> result = new ArrayList<String>();
         result.add(toString(radix, number) + ":");
-        for (int i = 0; i < bases.length; i++) {
-            if (bases[i] != radix) {
-                result.add("    " + toString(bases[i], number));
+        for (int possibleBase : bases) {
+            if (possibleBase != radix) {
+                result.add("    " + toString(possibleBase, number));
             }
         }
         if (radix == 16) {
