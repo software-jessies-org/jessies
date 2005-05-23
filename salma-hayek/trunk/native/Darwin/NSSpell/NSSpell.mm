@@ -8,13 +8,13 @@
  * release an autorelease pool on every exit point from a method is silly, but
  * Objective-C++ lets us fix this.
  */
-class LocalAutoReleasePool {
+class ScopedAutoReleasePool {
 public:
-    LocalAutoReleasePool() {
+    ScopedAutoReleasePool() {
         m_pool =  [[NSAutoreleasePool alloc] init];
     }
     
-    ~LocalAutoReleasePool() {
+    ~ScopedAutoReleasePool() {
         [m_pool release];
     }
     
@@ -39,7 +39,7 @@ std::ostream& operator<<(std::ostream& os, NSString* rhs) {
 NSSpellChecker* checker;
 
 + (void) showSuggestionsForWord:(NSString*) word {
-    LocalAutoReleasePool pool;
+    ScopedAutoReleasePool pool;
     std::ostream& os = std::cout;
     
     NSArray* guesses = [checker guessesForWord:word];
@@ -60,7 +60,7 @@ NSSpellChecker* checker;
 }
 
 + (bool) isCorrect:(NSString*) word {
-    LocalAutoReleasePool pool;
+    ScopedAutoReleasePool pool;
     NSRange range = [checker checkSpellingOfString:word startingAt:0];
     bool isCorrect = (range.length == 0);
     return isCorrect;
@@ -70,12 +70,13 @@ NSSpellChecker* checker;
     (void) unusedParameter;
     
     // Each thread needs its own pool, and we don't get one for free.
-    LocalAutoReleasePool pool;
+    ScopedAutoReleasePool pool;
     checker = [NSSpellChecker sharedSpellChecker];
     
     std::ostream& os(std::cout);
     os << "@(#) International Ispell 3.1.20 (but really NSSpellChecker)\n";
     while (true) {
+        ScopedAutoReleasePool pool;
         std::string line;
         getline(std::cin, line);
         if (line.length() == 0) {
@@ -102,7 +103,7 @@ NSSpellChecker* checker;
 @end
 
 int main(int /*argc*/, char* /*argv*/[]) {
-    LocalAutoReleasePool pool;
+    ScopedAutoReleasePool pool;
     
     // Pretend to be ispell in a new thread, so we can enter the normal event
     // loop and prevent Spin Control from mistakenly diagnosing us as a hung
