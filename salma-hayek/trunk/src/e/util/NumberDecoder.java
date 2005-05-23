@@ -129,10 +129,9 @@ public class NumberDecoder {
         if (valid == false) {
             return "";
         }
-        List strings = toStrings();
+        List<String> strings = toStrings();
         StringBuffer result = new StringBuffer("<html>");
-        for (int i = 0; i < strings.size(); ++i) {
-            String string = (String) strings.get(i);
+        for (String string : strings) {
             result.append(string);
             result.append("<br>\n");
         }

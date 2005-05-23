@@ -26,9 +26,8 @@ public abstract class EHistoryComboBoxModel implements MutableComboBoxModel {
     public void fireChangeNotification() {
         synchronized (listeners) {
             ListDataEvent e = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, getSize());
-            for (int i = 0; i < listeners.size(); i++) {
-                ListDataListener l = (ListDataListener) listeners.get(i);
-                l.contentsChanged(e);
+            for (ListDataListener listener : listeners) {
+                listener.contentsChanged(e);
             }
         }
     }

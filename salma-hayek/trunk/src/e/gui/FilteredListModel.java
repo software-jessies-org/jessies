@@ -56,7 +56,7 @@ public class FilteredListModel extends AbstractListModel {
     }
     
     public Object getElementAt(int index) {
-        int newIndex = ((Integer) validIndexes.get(index)).intValue();
+        int newIndex = validIndexes.get(index);
         return model.getElementAt(newIndex);
     }
     

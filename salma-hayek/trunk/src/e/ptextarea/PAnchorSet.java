@@ -72,7 +72,7 @@ public class PAnchorSet implements PTextListener {
     }
     
     private PAnchor get(int index) {
-        return (PAnchor) anchors.get(index);
+        return anchors.get(index);
     }
     
     public synchronized void textInserted(PTextEvent event) {
@@ -119,7 +119,7 @@ public class PAnchorSet implements PTextListener {
         // This code is not synchronized, because calling out to arbitrary code
         // from a synchronized state is just damned dangerous.
         for (int i = 0; i < deletionList.size(); i++) {
-            ((PAnchor) deletionList.get(i)).delete();
+            deletionList.get(i).delete();
         }
     }
     

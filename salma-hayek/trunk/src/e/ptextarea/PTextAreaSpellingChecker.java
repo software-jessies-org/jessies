@@ -216,9 +216,8 @@ public class PTextAreaSpellingChecker implements PTextListener {
         if (toIndex - fromIndex > 20) {
             return Range.NULL_RANGE;
         }
-        List highlights = component.getHighlights();
-        for (int i = 0; i < highlights.size(); ++i) {
-            PHighlight highlight = (PHighlight) highlights.get(i);
+        List<PHighlight> highlights = component.getHighlights();
+        for (PHighlight highlight : highlights) {
             if (highlight instanceof UnderlineHighlight && highlight.getStartIndex() <= fromIndex && highlight.getEndIndex() >= toIndex) {
                 return new Range(Math.min(highlight.getStartIndex(), highlight.getEndIndex()), Math.max(highlight.getStartIndex(), highlight.getEndIndex()));
             }

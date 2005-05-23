@@ -35,12 +35,11 @@ public class InstanceTracker {
     
     public static synchronized <T> Object[] getInstancesOfClass(Class<T> klass) {
         ArrayList<T> result = new ArrayList<T>();
-        List weakReferences = instancesOfClass(klass);
+        List<WeakReference> weakReferences = instancesOfClass(klass);
         if (DEBUG) {
             System.err.println("Weak references: " + weakReferences.size());
         }
-        for (int i = 0; i < weakReferences.size(); ++i) {
-            WeakReference weakReference = (WeakReference) weakReferences.get(i);
+        for (WeakReference weakReference : weakReferences) {
             T instance = klass.cast(weakReference.get());
             if (instance != null) {
                 result.add(instance);

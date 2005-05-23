@@ -32,7 +32,7 @@ public class FormDialog extends JDialog {
     
     private static HashMap<String, Rectangle> dialogGeometries = new HashMap<String, Rectangle>();
     
-    private ArrayList listenedToTextFields;
+    private ArrayList<JTextComponent> listenedToTextFields;
     
     private DocumentListener documentListener;
     
@@ -191,15 +191,14 @@ public class FormDialog extends JDialog {
      * Adds listeners to all the text fields.
      */
     private void addTextFieldListeners() {
-        for (int i = 0; i < listenedToTextFields.size(); ++i) {
-            JTextComponent field = (JTextComponent) listenedToTextFields.get(i);
+        for (JTextComponent field : listenedToTextFields) {
             field.getDocument().addDocumentListener(documentListener);
         }
     }
     
     private void removeTextFieldListeners() {
         for (int i = listenedToTextFields.size() - 1; i >= 0; --i) {
-            JTextComponent field = (JTextComponent) listenedToTextFields.remove(i);
+            JTextComponent field = listenedToTextFields.remove(i);
             field.getDocument().removeDocumentListener(documentListener);
         }
     }

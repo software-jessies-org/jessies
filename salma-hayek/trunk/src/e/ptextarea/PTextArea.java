@@ -149,8 +149,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void fireCaretChangedEvent() {
-        for (int i = 0; i < caretListeners.size(); i++) {
-            ((PCaretListener) caretListeners.get(i)).caretMoved(this, getSelectionStart(), getSelectionEnd());
+        for (PCaretListener caretListener : caretListeners) {
+            caretListener.caretMoved(this, getSelectionStart(), getSelectionEnd());
         }
     }
     
@@ -480,7 +480,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         final int stop = searchingForwards ? highlights.size() : -1;
         final int step = searchingForwards ? 1 : -1;
         for (int i = start; i != stop; i += step) {
-            PHighlight highlight = (PHighlight) highlights.get(i);
+            PHighlight highlight = highlights.get(i);
             if (matcher.matches(highlight)) {
                 centerOffsetInDisplay(highlight.getStartIndex());
                 select(highlight.getStartIndex(), highlight.getEndIndex());
@@ -493,7 +493,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         PHighlight match = null;
         boolean isOnlyOneMatch = true;
         for (int i = 0; i < highlights.size(); i++) {
-            PHighlight highlight = (PHighlight) highlights.get(i);
+            PHighlight highlight = highlights.get(i);
             if (matcher.matches(highlight)) {
                 if (match != null) {
                     isOnlyOneMatch = false;
@@ -813,7 +813,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         int maxChar = max.getTextIndex() + max.getLength();
         selection.paint(graphics);
         for (int i = 0; i < highlights.size(); i++) {
-            PHighlight highlight = (PHighlight) highlights.get(i);
+            PHighlight highlight = highlights.get(i);
             if (highlight.getStartIndex() <= maxChar && highlight.getEndIndex() > minChar) {
                 highlight.paint(graphics);
             }

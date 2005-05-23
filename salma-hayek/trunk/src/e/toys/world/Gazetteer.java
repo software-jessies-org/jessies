@@ -9,7 +9,7 @@ public class Gazetteer {
         instance = new Gazetteer();
     }
     
-    private ArrayList places;
+    private ArrayList<Place> places;
     
     private Gazetteer() {
         readPlaceInformation();
@@ -20,7 +20,7 @@ public class Gazetteer {
     }
     
     public Place get(int i) {
-        return (Place) places.get(i);
+        return places.get(i);
     }
     
     public int size() {

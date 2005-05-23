@@ -53,8 +53,7 @@ public class EPopupMenu {
     private JPopupMenu createJMenu(final int x, final int y) {
         JPopupMenu menu = new JPopupMenu();
         boolean lastWasSeparator = false;
-        for (int i = 0; i < menuItems.size(); i++) {
-            final Action action = (Action) menuItems.get(i);
+        for (Action action : menuItems) {
             if (action == null) {
                 if (lastWasSeparator == false) {
                     menu.addSeparator();
@@ -74,8 +73,7 @@ public class EPopupMenu {
     private PopupMenu createMenu(final int x, final int y) {
         PopupMenu menu = new PopupMenu();
         boolean lastWasSeparator = false;
-        for (int i = 0; i < menuItems.size(); i++) {
-            final Action action = (Action) menuItems.get(i);
+        for (Action action : menuItems) {
             if (action == null) {
                 if (lastWasSeparator == false) {
                     menu.addSeparator();
