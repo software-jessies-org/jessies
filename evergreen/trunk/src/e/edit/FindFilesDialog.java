@@ -106,7 +106,7 @@ public class FindFilesDialog {
     }
     
     public class FileFinder extends SwingWorker {
-        private List fileList;
+        private List<String> fileList;
         private DefaultMutableTreeNode matchRoot;
         private String regex;
         private String directory;
@@ -157,7 +157,7 @@ public class FindFilesDialog {
                         return null;
                     }
                     try {
-                        String candidate = (String) fileList.get(doneFileCount);
+                        String candidate = fileList.get(doneFileCount);
                         File file = FileUtilities.fileFromParentAndString(root, candidate);
                         if (FileUtilities.isTextFile(file) == false) {
                             // FIXME: should we do the grep(1) thing of "binary file <x> matches"?

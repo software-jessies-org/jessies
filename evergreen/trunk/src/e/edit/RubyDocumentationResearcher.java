@@ -29,7 +29,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         if (status != 0 || availableRis.size() == 0) {
             return null;
         }
-        return (String) availableRis.get(0);
+        return availableRis.get(0);
     }
     
     /** Returns true for Ruby files. */
