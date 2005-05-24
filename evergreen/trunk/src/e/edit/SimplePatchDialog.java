@@ -27,7 +27,7 @@ public class SimplePatchDialog {
         int status = ProcessUtilities.backQuote(null, command, lines, errors);
         
         if (status == 0) {
-            lines.add("(No differences.)");
+            lines.add("(No non-whitespace differences.)");
         }
         
         DefaultListModel model = new DefaultListModel();
