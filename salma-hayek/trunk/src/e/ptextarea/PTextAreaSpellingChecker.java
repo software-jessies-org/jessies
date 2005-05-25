@@ -321,7 +321,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
      * as a spelling exception in its language.
      */
     private boolean isException(String word) {
-        HashSet exceptions = (HashSet) component.getClientProperty(SPELLING_EXCEPTIONS_PROPERTY);
+        HashSet exceptions = HashSet.class.cast(component.getClientProperty(SPELLING_EXCEPTIONS_PROPERTY));
         if (exceptions == null) {
             return false;
         }
