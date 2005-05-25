@@ -1,14 +1,3 @@
-# C++ keywords.
-bool
-const
-enum
-inline
-namespace
-sizeof
-struct
-typeid
-typename
-wchar
 # Pre-processor directives.
 elif
 endif

@@ -79,7 +79,7 @@ public class JavaResearcher implements WorkspaceResearcher {
      * Adds all the unique words from the identifiers in the JDK to the given set.
      * This might be useful for spelling checking or word completion purposes.
      */
-    public synchronized static void addJavaWords(Set<String> set) {
+    public synchronized static void addJavaWordsTo(Set<String> set) {
         set.addAll(uniqueWords);
     }
     
