@@ -62,19 +62,19 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     private static HashSet<String> initKeywordsFor(String language) {
-        HashSet<String> keywords = new HashSet<String>();
+        HashSet<String> result = new HashSet<String>();
         String keywordsFileName = Edit.getResourceFilename("keywords-" + language);
         if (FileUtilities.exists(keywordsFileName)) {
             String[] keywordArray = StringUtilities.readLinesFromFile(keywordsFileName);
-            for (String keyword : keywords) {
+            for (String keyword : keywordArray) {
                 if (keyword.startsWith("#")) {
                     continue; // Ignore comments.
                 }
-                keywords.add(keyword);
+                result.add(keyword);
             }
         }
-        KEYWORDS_MAP.put(language, keywords);
-        return keywords;
+        KEYWORDS_MAP.put(language, result);
+        return result;
     }
     
     public ETextWindow(String filename) {
