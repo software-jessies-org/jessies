@@ -53,19 +53,28 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     private String fileType = UNKNOWN;
     
-    private static final HashMap<String, HashSet<String>> KEYWORDS_MAP = new HashMap<String, HashSet<String>>();
+    private static final HashMap<String, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<String, HashSet<String>>();
 
     private Timer findResultsUpdater;
     
     static {
-        JavaResearcher.addJavaWords(getKeywordsForLanguage(JAVA));
     }
     
-    private static HashSet<String> initKeywordsFor(String language) {
+    private HashSet<String> initSpellingExceptionsFor(String language) {
         HashSet<String> result = new HashSet<String>();
-        String keywordsFileName = Edit.getResourceFilename("keywords-" + language);
-        if (FileUtilities.exists(keywordsFileName)) {
-            String[] keywordArray = StringUtilities.readLinesFromFile(keywordsFileName);
+        
+        // The text styler knows all the language's keywords.
+        text.getTextStyler().addKeywordsTo(result);
+        
+        // The JavaResearcher knows all the words used in JDK identifiers.
+        if (language == JAVA) {
+            JavaResearcher.addJavaWordsTo(result);
+        }
+        
+        // And there may be a file of extra spelling exceptions for this language.
+        String exceptionsFileName = Edit.getResourceFilename("keywords-" + language);
+        if (FileUtilities.exists(exceptionsFileName)) {
+            String[] keywordArray = StringUtilities.readLinesFromFile(exceptionsFileName);
             for (String keyword : keywordArray) {
                 if (keyword.startsWith("#")) {
                     continue; // Ignore comments.
@@ -73,7 +82,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 result.add(keyword);
             }
         }
-        KEYWORDS_MAP.put(language, result);
+        SPELLING_EXCEPTIONS_MAP.put(language, result);
         return result;
     }
     
@@ -191,17 +200,19 @@ public class ETextWindow extends EWindow implements PTextListener {
         return content.startsWith("#ifndef") || content.matches(".*" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ".*");
     }
     
-    private static HashSet<String> getKeywordsForLanguage(String language) {
-        HashSet<String> keywords = KEYWORDS_MAP.get(language);
-        if (keywords == null) {
-            keywords = initKeywordsFor(language);
+    private HashSet<String> getSpellingExceptionsForLanguage(String language) {
+        HashSet<String> exceptions = SPELLING_EXCEPTIONS_MAP.get(language);
+        if (exceptions == null) {
+            exceptions = initSpellingExceptionsFor(language);
         }
-        return keywords;
+        return exceptions;
     }
     
-    /** Attaches a set of keywords to a Document, tipping the spelling checker off that some words are okay. */
-    private void initKeywordsForDocument() {
-        text.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, getKeywordsForLanguage(fileType));
+    /**
+     * Attaches an appropriate set of spelling exceptions to our document.
+     */
+    private void initSpellingExceptionsForDocument() {
+        text.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, getSpellingExceptionsForLanguage(fileType));
     }
     
     public void updateWatermark() {
@@ -249,7 +260,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 // Plain text.
                 text.setWrapStyleWord(true);
             }
-            initKeywordsForDocument();
+            initSpellingExceptionsForDocument();
             updateWatermark();
             text.setText(content);
             text.setFont(ChangeFontAction.getAppropriateFontForContent(content));

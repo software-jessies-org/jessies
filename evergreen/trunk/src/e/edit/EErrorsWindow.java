@@ -87,6 +87,9 @@ public class EErrorsWindow extends EWindow {
         private File currentDirectory() {
             return currentDirectory;
         }
+        
+        public void addKeywordsTo(Collection<String> collection) {
+        }
     }
     
     public void requestFocus() {
