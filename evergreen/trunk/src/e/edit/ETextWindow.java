@@ -72,14 +72,13 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         
         // And there may be a file of extra spelling exceptions for this language.
-        String exceptionsFileName = Edit.getResourceFilename("keywords-" + language);
+        String exceptionsFileName = Edit.getResourceFilename("spelling-exceptions-" + language);
         if (FileUtilities.exists(exceptionsFileName)) {
-            String[] keywordArray = StringUtilities.readLinesFromFile(exceptionsFileName);
-            for (String keyword : keywordArray) {
-                if (keyword.startsWith("#")) {
+            for (String exception : StringUtilities.readLinesFromFile(exceptionsFileName)) {
+                if (exception.startsWith("#")) {
                     continue; // Ignore comments.
                 }
-                result.add(keyword);
+                result.add(exception);
             }
         }
         SPELLING_EXCEPTIONS_MAP.put(language, result);
