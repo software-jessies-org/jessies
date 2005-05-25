@@ -4,12 +4,6 @@ package e.ptextarea;
 import java.awt.*;
 import java.awt.event.*;
 
-/**
- * A PAbstractTextStyler is a thing.
- * 
- * @author Phil Norman
- */
-
 public abstract class PAbstractTextStyler implements PTextStyler {
     protected PTextArea textArea;
     
