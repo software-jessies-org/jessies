@@ -1,8 +1,10 @@
 package e.ptextarea;
 
+import java.util.*;
+
 public class PRubyTextStyler extends PCLikeTextStyler {
     // http://www.rubycentral.com/book/language.html table 18.3 "Reserved Words":
-    private static final String[] RUBY_KEYWORDS = new String[] {
+    private static final String[] KEYWORDS = new String[] {
         "__FILE__",
         "__LINE__",
         "BEGIN",
@@ -47,7 +49,6 @@ public class PRubyTextStyler extends PCLikeTextStyler {
     
     public PRubyTextStyler(PTextArea textArea) {
         super(textArea);
-        addKeywords(RUBY_KEYWORDS);
     }
     
     public boolean supportShellComments() {
@@ -56,5 +57,9 @@ public class PRubyTextStyler extends PCLikeTextStyler {
 
     public boolean supportDoubleSlashComments() {
         return false;
+    }
+    
+    public void addKeywordsTo(Collection<String> collection) {
+        collection.addAll(Arrays.asList(KEYWORDS));
     }
 }

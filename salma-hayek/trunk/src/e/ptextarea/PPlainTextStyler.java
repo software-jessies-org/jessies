@@ -1,6 +1,7 @@
 package e.ptextarea;
 
 import java.awt.*;
+import java.util.*;
 
 /**
  * A trivial styler for plain text, which colors all text black.
@@ -22,5 +23,9 @@ public class PPlainTextStyler extends PAbstractTextStyler {
 
     public Color getColorForStyle(int style) {
         return Color.BLACK;
+    }
+    
+    public void addKeywordsTo(Collection<String> collection) {
+        // We have no language, so we have no keywords.
     }
 }

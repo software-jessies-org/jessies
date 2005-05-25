@@ -1,8 +1,8 @@
 package e.ptextarea;
 
-
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 /**
  * A PTextStyler is a thing which knows how to apply styles to lines of text.  This is used for
@@ -10,7 +10,6 @@ import java.awt.event.*;
  * 
  * @author Phil Norman
  */
-
 public interface PTextStyler {
     /**
      * Returns a series of segments of text describing how to render each part of the
@@ -35,4 +34,11 @@ public interface PTextStyler {
      * no tool-tip.
      */
     public String getToolTipForLocation(Point point);
+    
+    /**
+     * Adds this language's keywords to the given collection. This lets
+     * something like a spelling checker automatically share the knowledge of
+     * the keywords.
+     */
+    public void addKeywordsTo(Collection<String> collection);
 }

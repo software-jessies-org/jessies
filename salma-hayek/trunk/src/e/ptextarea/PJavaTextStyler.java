@@ -1,13 +1,13 @@
 package e.ptextarea;
 
+import java.util.*;
+
 /**
  * A PJavaTextStyler knows how to apply syntax highlighting for Java code.
  * 
  * @author Phil Norman
  */
-
 public class PJavaTextStyler extends PCLikeTextStyler {
-    
     private static final String[] KEYWORDS = new String[] {
         // JLS3, section 3.9: "Keywords"
         "abstract",
@@ -70,7 +70,6 @@ public class PJavaTextStyler extends PCLikeTextStyler {
     
     public PJavaTextStyler(PTextArea textArea) {
         super(textArea);
-        addKeywords(KEYWORDS);
     }
     
     /**
@@ -190,5 +189,9 @@ public class PJavaTextStyler extends PCLikeTextStyler {
 
     public boolean supportDoubleSlashComments() {
         return true;
+    }
+    
+    public void addKeywordsTo(Collection<String> collection) {
+        collection.addAll(Arrays.asList(KEYWORDS));
     }
 }

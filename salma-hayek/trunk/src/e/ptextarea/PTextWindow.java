@@ -87,6 +87,8 @@ public class PTextWindow {
                     public boolean isAcceptableMatch(CharSequence line, java.util.regex.Matcher matcher) {
                         return true;
                     }
+                    public void addKeywordsTo(Collection<String> collection) {
+                    }
                 };
             }
         }

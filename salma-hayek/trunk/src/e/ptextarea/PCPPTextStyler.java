@@ -1,14 +1,14 @@
 package e.ptextarea;
 
+import java.util.*;
 
 /**
  * A PCPPTextStyler knows how to apply syntax highlighting for C++ code.
  * 
  * @author Phil Norman
  */
-
 public class PCPPTextStyler extends PCLikeTextStyler {
-    private static final String[] CPP_KEYWORDS = new String[] {
+    private static final String[] KEYWORDS = new String[] {
         // ISO+IEC+14882-1998 2.11 table 3:
         "asm",
         "auto",
@@ -89,7 +89,6 @@ public class PCPPTextStyler extends PCLikeTextStyler {
     
     public PCPPTextStyler(PTextArea textArea) {
         super(textArea);
-        addKeywords(CPP_KEYWORDS);
     }
     
     public boolean supportShellComments() {
@@ -98,5 +97,9 @@ public class PCPPTextStyler extends PCLikeTextStyler {
 
     public boolean supportDoubleSlashComments() {
         return true;
+    }
+    
+    public void addKeywordsTo(Collection<String> collection) {
+        collection.addAll(Arrays.asList(KEYWORDS));
     }
 }

@@ -21,13 +21,10 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     
     public PCLikeTextStyler(PTextArea textArea) {
         super(textArea);
+        addKeywordsTo(keywords);
         initCommentCache();
         textArea.getTextBuffer().addTextListener(this);
         textArea.setTextStyler(this);
-    }
-    
-    protected void addKeywords(String[] keywordList) {
-        keywords.addAll(Arrays.asList(keywordList));
     }
     
     /**
