@@ -304,7 +304,7 @@ public class PTextAreaSpellingChecker implements PTextListener {
             
             //System.err.println(">>" + word + " " + wordLength);
             checkCount++;
-            if (isKeyword(word) == false && spellingChecker.isMisspelledWord(word)) {
+            if (isException(word) == false && spellingChecker.isMisspelledWord(word)) {
                 misspellingCount++;
                 //System.err.println("Misspelled word '" + word + "'");
                 component.addHighlight(new UnderlineHighlight(component, start, finish));
@@ -316,13 +316,17 @@ public class PTextAreaSpellingChecker implements PTextListener {
         //System.err.println("Took " + (System.currentTimeMillis() - startTime) + "ms to check " + fromIndex + ".." + toIndex + " words:" + checkCount + " misspellings:" + misspellingCount);
     }
     
-    /** Tests whether the text component we're checking declares the given word as a keyword in its language. */
-    private boolean isKeyword(String word) {
-        HashSet keywords = (HashSet) component.getClientProperty(SPELLING_EXCEPTIONS_PROPERTY);
-        if (keywords == null) {
+    /**
+     * Tests whether the text component we're checking declares the given word
+     * as a spelling exception in its language.
+     */
+    private boolean isException(String word) {
+        HashSet exceptions = (HashSet) component.getClientProperty(SPELLING_EXCEPTIONS_PROPERTY);
+        if (exceptions == null) {
             return false;
         }
-        return keywords.contains(word) || keywords.contains(word.toLowerCase());
+        String lowerCaseWord = word.toLowerCase();
+        return exceptions.contains(word) || exceptions.contains(lowerCaseWord);
     }
     
     /**
