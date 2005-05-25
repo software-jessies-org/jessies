@@ -310,10 +310,10 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     public void revertToSaved() {
         if (isDirty() == false && isOutOfDateWithRespectToDisk() == false) {
-            Edit.showAlert("Revert", "'" + getFilename() + "' is the same on disk as in the editor.");
+            Edit.showAlert("Revert to Saved", "'" + getFilename() + "' is the same on disk as in the editor.");
             return;
         }
-        if (showPatchAndAskForConfirmation("Revert", "Revert to saved version of '" + file.getName() + "'? (Equivalent to applying the following patch.)", true)) {
+        if (showPatchAndAskForConfirmation("Revert to Saved", "Revert to on-disk version of '" + file.getName() + "'? (Equivalent to applying the following patch.)", true)) {
             uncheckedRevertToSaved();
         }
     }
