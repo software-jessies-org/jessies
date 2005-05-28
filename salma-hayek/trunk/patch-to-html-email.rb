@@ -6,7 +6,9 @@ def outputChanges(changes)
   body = ""
   changes.each {
     |line|
+    line = CGI.escapeHTML(line)
     color = "black"
+    
     if line =~ /^Modified: /
       next
     elsif line =~ /^@@ /
@@ -16,16 +18,16 @@ def outputChanges(changes)
     elsif line =~ /^\+/
       color = "blue"
     end
-    body << "<font color=\"#{color}\">"
-    line = CGI.escapeHTML(line)
-    # Use <tt> for ---/+++ so they line up, and use distinctive background
-    # colors.
-    line.gsub!(/^(---|\+\+\+)(.*)$/) {
-      |prefix|
-      # We can't use "---" and "+++" as class names, sadly.
+    
+    if line =~ /^(---|\+\+\+)(.*)$/
+      # Use <tt> for ---/+++ so they line up, and use distinctive background
+      # colors. We can't use "---" and "+++" as class names, sadly.
       class_name = ($1 == "---" ? "triple-minus-line" : "triple-plus-line")
-      "<div class=\"#{class_name}\"><tt>#{prefix.gsub(' ', '&nbsp;')}</tt>#$2</div>"
-    }
+      body << "<div class=\"#{class_name}\"><tt>#$1</tt>#$2</div>"
+      next
+    end
+    
+    body << "<font color=\"#{color}\">"
     # Write the per-line prefix characters in fixed width
     line.gsub!(/^([-+ ])/) {
       |prefix|
@@ -63,8 +65,8 @@ def patchToHtml(subject, preamble, changes)
   body << "  <style>\n"
   body << ".revision-header {background: #cccccc; padding-top: 6pt; padding-bottom: 6pt;}\n"
   body << ".check-in-comment {background: #eeeeee; padding-bottom: 6pt;}\n"
-  body << ".triple-minus-line {background: #ffcccc;}\n"
-  body << ".triple-plus-line {background: #ccccff;}\n"
+  body << ".triple-minus-line {background: #ffcccc; color: red;}\n"
+  body << ".triple-plus-line {background: #ccccff; color: blue;}\n"
   body << "  </style>\n"
   
   body << " </head>\n"
