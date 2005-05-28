@@ -58,13 +58,14 @@ subject="#{repository_name} revision #{rev}"
 body = ""
 
 # Output the overview.
-body << "<p><b>#{author}</b> #{date}</p>"
+body << "<div class=\"check-in-comment\">\n"
+body << "<p class=\"revision-header\"><b>#{author}</b> #{date}</p>\n"
 body << "<p>"
 comment.each() {
     |line|
     body << escapeTextLineToHtml(line)
 }
-body << "</p>"
+body << "</p></div>\n"
 
 # Get and output the patch.
 # We'd like to | #{script_path}/bin/annotate-patch.rb

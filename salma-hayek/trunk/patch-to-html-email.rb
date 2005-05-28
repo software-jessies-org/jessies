@@ -56,8 +56,14 @@ def patchToHtmlEmail(from_address, to_address, reply_to_address, subject, preamb
   body = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"
   body << "<html>\n"
   body << "<head>\n"
-  body << "<title>#{subject}</title>\n"
-  body << "</head>\n"
+  body << " <title>#{subject}</title>\n"
+  
+  body << "  <style>\n"
+  body << ".revision-header {background: #cccccc; padding-top: 6pt; padding-bottom: 6pt;}\n"
+  body << ".check-in-comment {background: #eeeeee; padding-bottom: 6pt;}\n"
+  body << "  </style>\n"
+  
+  body << " </head>\n"
   body << "<body>\n"
   body << preamble
   
