@@ -8,7 +8,7 @@ import javax.swing.*;
 import e.gui.*;
 import e.util.*;
 
-public class PTextAreaSpellingChecker implements PTextListener {
+public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider {
     private PTextArea component;
     
     public static final String SPELLING_EXCEPTIONS_PROPERTY = "org.jessies.e.ptextarea.SpellingExceptionsHashSetProperty";
@@ -21,33 +21,10 @@ public class PTextAreaSpellingChecker implements PTextListener {
     }
     
     private void initPopUpMenu() {
-        component.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                maybeShowSpellingMenu(e);
-            }
-            
-            public void mouseReleased(MouseEvent e) {
-                maybeShowSpellingMenu(e);
-            }
-        });
+        component.getPopupMenu().addMenuItemProvider(this);
     }
     
-    /**
-     * Pops up a menu containing suggested corrections to
-     * the spelling mistake at the coordinates given by the
-     * MouseEvent.
-     * 
-     * If there is no mistake, no menu is shown.
-     * 
-     * The MouseEvent is consumed if a menu is shown, so
-     * other MouseListeners checking isPopupTrigger can
-     * also check isConsumed.
-     */
-    private void maybeShowSpellingMenu(MouseEvent e) {
-        if (e.isPopupTrigger() == false) {
-            return;
-        }
-        
+    public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
         final Point mousePosition = e.getPoint();
         PCoordinates coordinates = component.getNearestCoordinates(mousePosition);
         final int offset = component.getTextIndex(coordinates);
@@ -56,7 +33,6 @@ public class PTextAreaSpellingChecker implements PTextListener {
         
         final Range actualRange = rangeOfMisspelledWordBetween(offset, offset);
         if (actualRange.isEmpty() == false) {
-            EPopupMenu menu = new EPopupMenu();
             String misspelling = component.getTextBuffer().subSequence(actualRange.getStart(), actualRange.getEnd()).toString();
             String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
             for (String suggestion : suggestions) {
@@ -65,15 +41,13 @@ public class PTextAreaSpellingChecker implements PTextListener {
                 // hyphenated words or multiple words.
                 suggestion = suggestion.replace('-', '_');
                 suggestion = convertMultipleWordsToCamelCase(suggestion);
-                menu.add(new CorrectSpellingAction(component, suggestion, actualRange.getStart(), actualRange.getEnd()));
+                actions.add(new CorrectSpellingAction(component, suggestion, actualRange.getStart(), actualRange.getEnd()));
             }
             if (suggestions.length == 0) {
-                menu.add(new NoSuggestionsAction());
+                actions.add(new NoSuggestionsAction());
             }
-            menu.addSeparator();
-            menu.add(new AcceptSpellingAction(misspelling));
-            menu.show(component, e.getX(), e.getY());
-            e.consume();
+            actions.add(null);
+            actions.add(new AcceptSpellingAction(misspelling));
         }
     }
     

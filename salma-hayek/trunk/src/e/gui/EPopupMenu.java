@@ -3,52 +3,48 @@ package e.gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import e.util.*;
 
 public class EPopupMenu {
-    private ArrayList<Action> menuItems = new ArrayList<Action>();
+    private ArrayList<MenuItemProvider> providers = new ArrayList<MenuItemProvider>();
+    private Component componentWithMenu;
+    
+    private void attachPopupMenuTo(Component c) {
+        componentWithMenu = c;
+        componentWithMenu.addMouseListener(new MenuMouseListener());
+    }
     
     /** Creates a new popup menu. */
-    public EPopupMenu() {
+    public EPopupMenu(Component component) {
+        attachPopupMenuTo(component);
     }
     
-    /** Adds a single item. */
-    public void add(Action item) {
-        menuItems.add(item);
+    public void addMenuItemProvider(MenuItemProvider provider) {
+        providers.add(provider);
     }
     
-    /** Adds a separator. */
-    public void addSeparator() {
-        menuItems.add(null);
-    }
-    
-    /** Adds a group of Action items to the end of the current list of items. */
-    public void add(Action[] items) {
-        menuItems.addAll(Arrays.asList(items));
-        // Remove any trailing null.
-        int lastIndex = menuItems.size() - 1;
-        if (menuItems.get(lastIndex) == null) {
-            menuItems.remove(lastIndex);
-        }
+    public void removeMenuItemProvider(MenuItemProvider provider) {
+        providers.remove(provider);
     }
     
     /** Ensures that the menu is on the display & ready for action. */
-    public void show(Component origin, int x, int y) {
+    private void show(List<Action> menuItems, Component origin, int x, int y) {
         if (GuiUtilities.isMacOs()) {
             // Mac OS' JPopupMenu is so bad we should
             // use the AWT PopupMenu instead.
-            PopupMenu menu = createMenu(x, y);
+            PopupMenu menu = createMenu(menuItems, x, y);
             origin.add(menu);
             menu.show(origin, x, y);
         } else {
-            JPopupMenu menu = createJMenu(x, y);
+            JPopupMenu menu = createJMenu(menuItems, x, y);
             menu.show(origin, x, y);
         }
     }
     
     /** Sets up the menu with items that act upon what's at (x,y). */
-    private JPopupMenu createJMenu(final int x, final int y) {
+    private JPopupMenu createJMenu(List<Action> menuItems, final int x, final int y) {
         JPopupMenu menu = new JPopupMenu();
         boolean lastWasSeparator = false;
         for (Action action : menuItems) {
@@ -68,7 +64,7 @@ public class EPopupMenu {
     }
     
     /** Sets up the menu with items that act upon what's at (x,y). */
-    private PopupMenu createMenu(final int x, final int y) {
+    private PopupMenu createMenu(List<Action> menuItems, final int x, final int y) {
         PopupMenu menu = new PopupMenu();
         boolean lastWasSeparator = false;
         for (Action action : menuItems) {
@@ -99,5 +95,48 @@ public class EPopupMenu {
         });
         menuItem.setEnabled(action.isEnabled());
         return menuItem;
+    }
+    
+    public class MenuMouseListener extends MouseAdapter {
+        public void mousePressed(MouseEvent e) {
+            handle(e);
+        }
+        
+        public void mouseReleased(MouseEvent e) {
+            handle(e);
+        }
+        
+        private void handle(MouseEvent e) {
+            if (e.isConsumed() == false && e.isPopupTrigger()) {
+                requestFocusOnComponentWithMenu();
+                showPopupMenuLater(e);
+            }
+        }
+    }
+    
+    private void requestFocusOnComponentWithMenu() {
+        componentWithMenu.requestFocus();
+    }
+    
+    private void showPopupMenuLater(final MouseEvent e) {
+        try {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    showPopupMenu(e);
+                }
+            });
+        } catch (Exception ex) {
+            Log.warn("Exception while trying to show pop-up menu", ex);
+        }
+    }
+    
+    private void showPopupMenu(MouseEvent e) {
+        List<Action> menuItems = new ArrayList<Action>();
+        for (MenuItemProvider provider : providers) {
+            provider.provideMenuItems(e, menuItems);
+        }
+        if (menuItems.size() > 0) {
+            show(menuItems, (Component) e.getSource(), e.getX(), e.getY());
+        }
     }
 }

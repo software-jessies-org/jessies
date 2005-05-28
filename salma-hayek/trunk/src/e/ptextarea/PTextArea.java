@@ -4,9 +4,10 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
-import java.util.List;
+import e.gui.*;
 import e.util.*;
 
 /**
@@ -52,6 +53,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private PIndenter indenter;
     private PTextAreaSpellingChecker spellingChecker;
+    private EPopupMenu popupMenu;
     
     public PTextArea() {
         this(0, 0);
@@ -63,6 +65,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         this.editable = true;
         this.wordWrap = false;
         this.indenter = new PDefaultIndenter(this);
+        this.popupMenu =  new EPopupMenu(this);
         setFont(UIManager.getFont("TextArea.font"));
         setAutoscrolls(true);
         setBackground(Color.WHITE);
@@ -1290,6 +1293,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         // FIXME: when we do this, make this method private.
         //updateFindResults();
         selectFirstMatchingHighlight(next, new PFind.MatchHighlightMatcher(next, this));
+    }
+    
+    public EPopupMenu getPopupMenu() {
+        return popupMenu;
     }
     
     //
