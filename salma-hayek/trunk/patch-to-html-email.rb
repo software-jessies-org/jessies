@@ -71,6 +71,7 @@ def patchToHtmlEmail(from_address, to_address, reply_to_address, subject, preamb
       body << outputFormattedChanges(asciiArt, changesSoFar)
       asciiArt = false
       changesSoFar = Array.new
+      next
     end
     
     # ETextArea says 3 spaces and you're art
