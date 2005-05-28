@@ -7,4 +7,4 @@
 # FIXME: only works for section 1.
 # FIXME: doesn't use curl(1) to check that the man page exists.
 
-s|(\w+)\(1\)|<a href="http://developer.apple.com/documentation/Darwin/Reference/ManPages/man1/\1.1.html">\1(1)</a>|g ; print $_
+s|(\w+)\(1\)|<a href="http://developer.apple.com/documentation/Darwin/Reference/ManPages/man1/$1.1.html">$1(1)</a>|g ; print $_
