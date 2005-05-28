@@ -40,29 +40,6 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 #include <sstream>
 #include <string>
 
-#ifdef __APPLE__
-
-// Apple has helpfully commented these out in stdlib.h, so although the code
-// in this file should compile on all POSIX systems, we need these stubs on
-// Mac OS 10.3 where I notice there's also a posix_openpt(3) which sounds
-// like it would pretty interesting if it weren't also commented out:
-// http://www.opengroup.org/onlinepubs/009695399/functions/posix_openpt.html
-
-int grantpt(int) {
-    return -1;
-}
-
-char* ptsname(int) {
-    return 0;
-}
-
-int unlockpt(int) {
-    return -1;
-}
-
-#endif
-
-
 class IOException {
     std::string message;
     
