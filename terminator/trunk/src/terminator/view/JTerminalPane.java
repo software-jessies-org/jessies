@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.*;
 import java.util.List;
 import javax.swing.*;
 import e.gui.*;
@@ -112,7 +113,9 @@ public class JTerminalPane extends JPanel {
 	private void init(String command) throws IOException {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
-		textPane.addMouseListener(new ContextMenuOpener());
+		
+		EPopupMenu popupMenu = new EPopupMenu(textPane);
+		popupMenu.addMenuItemProvider(new TerminatorMenuItemProvider());
 		
 		scrollPane = new JScrollPane(new BorderPanel(textPane));
 		scrollPane.setBorder(null);
@@ -401,32 +404,58 @@ public class JTerminalPane extends JPanel {
 		textPane.requestFocus();
 	}
 	
-	public class ContextMenuOpener extends MouseAdapter {
-		public void mousePressed(MouseEvent event) {
-			maybeShowPopup(event);
+	private class TerminatorMenuItemProvider implements MenuItemProvider {
+		public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+			actions.addAll(Arrays.asList(menuAndKeyActions));
+			addInfoItems(actions);
 		}
-
-		public void mouseReleased(MouseEvent event) {
-			maybeShowPopup(event);
+		
+		private void addInfoItems(Collection<Action> actions) {
+			String selectedText = getSelectedText();
+			addSelectionInfoItems(actions, selectedText);
+			addNumberInfoItems(actions, selectedText);
 		}
-
-		private void maybeShowPopup(MouseEvent event) {
-			if (event.isPopupTrigger()) {
-				EPopupMenu menu = new EPopupMenu();
-				for (Action action : menuAndKeyActions) {
-					if (action == null) {
-						menu.addSeparator();
-					} else {
-						menu.add(action);
-					}
-				}
-				addInfoItems(menu);
-				menu.show((Component) event.getSource(), event.getX() + 1, event.getY());
+		
+		private void addSelectionInfoItems(Collection<Action> actions, String selectedText) {
+			if (selectedText.length() == 0) {
+				return;
 			}
+			
+			int selectedLineCount = 0;
+			for (int i = 0; i < selectedText.length(); ++i) {
+				if (selectedText.charAt(i) == '\n') {
+					++selectedLineCount;
+				}
+			}
+			actions.add(null);
+			actions.add(makeInfoItem("Selection"));
+			actions.add(makeInfoItem("  characters: " + selectedText.length()));
+			if (selectedLineCount != 0) {
+				actions.add(makeInfoItem("  lines: " + selectedLineCount));
+			}
+		}
+		
+		private void addNumberInfoItems(Collection<Action> actions, String selectedText) {
+			if (selectedText.contains("\n")) {
+				return;
+			}
+			
+			NumberDecoder numberDecoder = new NumberDecoder(selectedText);
+			if (numberDecoder.isValid()) {
+				actions.add(null);
+				List<String> items = numberDecoder.toStrings();
+				for (String item : items) {
+					actions.add(makeInfoItem(item));
+				}
+			}
+		}
+		
+		private Action makeInfoItem(String text) {
+			return new InfoAction(text);
 		}
 	}
 	
-	public class InfoAction extends AbstractAction {
+	public static class InfoAction extends AbstractAction {
 		public InfoAction(String text) {
 			super(text);
 			setEnabled(false);
@@ -435,46 +464,6 @@ public class JTerminalPane extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			// Do nothing.
 		}
-	}
-	
-	private void addSelectionInfoItems(EPopupMenu menu, String selectedText) {
-		if (selectedText.length() == 0) {
-			return;
-		}
-		
-		int selectedLineCount = 0;
-		for (int i = 0; i < selectedText.length(); ++i) {
-			if (selectedText.charAt(i) == '\n') {
-				++selectedLineCount;
-			}
-		}
-		menu.addSeparator();
-		menu.add(makeInfoItem("Selection"));
-		menu.add(makeInfoItem("  characters: " + selectedText.length()));
-		if (selectedLineCount != 0) {
-			menu.add(makeInfoItem("  lines: " + selectedLineCount));
-		}
-	}
-	
-	private void addNumberInfoItems(EPopupMenu menu, String selectedText) {
-		if (selectedText.contains("\n")) {
-			return;
-		}
-		
-		NumberDecoder numberDecoder = new NumberDecoder(selectedText);
-		if (numberDecoder.isValid()) {
-			menu.addSeparator();
-			List<String> items = numberDecoder.toStrings();
-			for (String item : items) {
-				menu.add(makeInfoItem(item));
-			}
-		}
-	}
-	
-	private void addInfoItems(EPopupMenu menu) {
-		String selectedText = getSelectedText();
-		addSelectionInfoItems(menu, selectedText);
-		addNumberInfoItems(menu, selectedText);
 	}
 	
 	private String getSelectedText() {
@@ -490,10 +479,6 @@ public class JTerminalPane extends JPanel {
 			Log.warn("Couldn't get system selection.", ex);
 		}
 		return result;
-	}
-	
-	private Action makeInfoItem(String text) {
-		return new InfoAction(text);
 	}
 	
 	public void doCopyAction() {
