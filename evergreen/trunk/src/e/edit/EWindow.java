@@ -107,18 +107,18 @@ public class EWindow extends JComponent {
             handle(e);
         }
         
-        public void handle(MouseEvent e) {
+        private void handle(MouseEvent e) {
             if (e.isConsumed() == false && e.isPopupTrigger()) {
                 requestFocusOnComponentWithMenu();
                 showPopupMenuLater(e);
             }
         }
         
-        public void requestFocusOnComponentWithMenu() {
+        private void requestFocusOnComponentWithMenu() {
             componentWithMenu.requestFocus();
         }
         
-        public void showPopupMenuLater(final MouseEvent e) {
+        private void showPopupMenuLater(final MouseEvent e) {
             try {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
