@@ -73,7 +73,7 @@ body << "</p></div>\n"
 changes=`#{svnlook} diff #{repo} -r #{rev}`
 changes.gsub!(/\r/, "") # In case we're running on MS Windows.
 
-patchToHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes.split("\n"))
+sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes.split("\n"))
 
 # Keep the post-commit trigger up-to-date.
 Dir.chdir(script_path)

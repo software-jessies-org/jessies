@@ -15,11 +15,8 @@ to_address=from_address
 reply_to_address=to_address # Use "nil" to reply to author.
 subject="patch"
 preamble=""
-changes = $<.readlines().map() {
-    |line|
-    line.chomp()
-}
+changes = ARGF.readlines()
 
-patchToHtmlEmail(from_address, to_address, reply_to_address, subject, preamble, changes)
+sendHtmlEmail(from_address, to_address, reply_to_address, subject, preamble, changes)
 
 exit(0)

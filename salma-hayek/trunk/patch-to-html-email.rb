@@ -54,7 +54,7 @@ def outputFormattedChanges(asciiArt, changes)
   return body
 end
 
-def patchToHtmlEmail(from_address, to_address, reply_to_address, subject, preamble, changes)
+def patchToHtml(subject, preamble, changes)
   body = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"
   body << "<html>\n"
   body << "<head>\n"
@@ -75,8 +75,10 @@ def patchToHtmlEmail(from_address, to_address, reply_to_address, subject, preamb
   asciiArt = false
   changesSoFar = Array.new
   
-  changes.each {
+  changes.each() {
     |line|
+    line = line.chomp()
+    
     if line =~ /^=====/
       body << outputFormattedChanges(asciiArt, changesSoFar)
       asciiArt = false
@@ -91,8 +93,13 @@ def patchToHtmlEmail(from_address, to_address, reply_to_address, subject, preamb
     changesSoFar.push(line)
   }
   body << outputFormattedChanges(asciiArt, changesSoFar)
-
+  
   body << "</body></html>"
+  return body
+end
+
+def sendHtmlEmail(from_address, to_address, reply_to_address, subject, preamble, changes)
+  body = patchToHtml(subject, preamble, changes)
   
   # Write the header.
   header = ""
@@ -116,4 +123,9 @@ def patchToHtmlEmail(from_address, to_address, reply_to_address, subject, preamb
     exit(1)
   end
   fd.close
+end
+
+# Work as a filter if we're run as a program rather than used as a library.
+if __FILE__ == $0
+  puts(patchToHtml("<stdin>", "", ARGF.readlines()))
 end
