@@ -202,16 +202,12 @@ public class Workspace extends JPanel {
     public EWindow addViewerForFile(String filename, String address) {
         Edit.showStatus("Opening " + filename + "...");
         EWindow window = null;
-        if (filename.endsWith(".gif") || filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
-            window = addViewer(new EImageWindow(filename));
-        } else {
-            try {
-                ETextWindow newWindow = new ETextWindow(filename);
-                registerTextComponent(newWindow.getText());
-                window = addViewer(newWindow, address);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        try {
+            ETextWindow newWindow = new ETextWindow(filename);
+            registerTextComponent(newWindow.getText());
+            window = addViewer(newWindow, address);
+        } catch (Exception ex) {
+            Log.warn("Exception while opening file", ex);
         }
         Edit.showStatus("Opened " + filename);
         return window;

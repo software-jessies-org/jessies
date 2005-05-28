@@ -9,9 +9,6 @@ import e.gui.*;
 public class EWindow extends JComponent {
     private ETitleBar titleBar;
     
-    private EPopupMenu popupMenu;
-    private Component componentWithMenu;
-    
     public EWindow(String name) {
         setBackground(Color.WHITE);
         setCursor(Cursor.getDefaultCursor());
@@ -76,59 +73,7 @@ public class EWindow extends JComponent {
         return (EColumn) SwingUtilities.getAncestorOfClass(EColumn.class, this);
     }
     
-    public Collection<Action> getPopupMenuItems() {
-        return null;
-    }
-
-    public void showPopupMenu(MouseEvent e) {
-        Collection<Action> items = getPopupMenuItems();
-        if (items != null && items.size() > 0) {
-            popupMenu = new EPopupMenu();
-            popupMenu.add(items.toArray(new Action[items.size()]));
-            popupMenu.show((Component) e.getSource(), e.getX(), e.getY());
-        }
-    }
-    
-    public void attachPopupMenuTo(Component c) {
-        componentWithMenu = c;
-        componentWithMenu.addMouseListener(new MenuMouseListener());
-    }
-    
     public e.edit.Workspace getWorkspace() {
         return (e.edit.Workspace) SwingUtilities.getAncestorOfClass(e.edit.Workspace.class, this);
-    }
-    
-    public class MenuMouseListener extends MouseAdapter {
-        public void mousePressed(MouseEvent e) {
-            handle(e);
-        }
-        
-        public void mouseReleased(MouseEvent e) {
-            handle(e);
-        }
-        
-        private void handle(MouseEvent e) {
-            if (e.isConsumed() == false && e.isPopupTrigger()) {
-                requestFocusOnComponentWithMenu();
-                showPopupMenuLater(e);
-            }
-        }
-        
-        private void requestFocusOnComponentWithMenu() {
-            componentWithMenu.requestFocus();
-        }
-        
-        private void showPopupMenuLater(final MouseEvent e) {
-            try {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        showPopupMenu(e);
-                    }
-                });
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                /* Ignore: exceptions here are unfortunate but not fatal. */
-            }
-        }
     }
 }

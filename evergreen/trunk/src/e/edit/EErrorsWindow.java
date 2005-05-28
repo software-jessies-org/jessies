@@ -29,7 +29,7 @@ public class EErrorsWindow extends EWindow {
         textArea.showRightHandMarginAt(PTextArea.NO_MARGIN);
         textArea.setTextStyler(new ErrorLinkStyler(textArea));
         textArea.setWrapStyleWord(true);
-        attachPopupMenuTo(textArea);
+        initTextAreaPopupMenu();
     }
 
     private static class ErrorLinkStyler extends PHyperlinkTextStyler {
@@ -135,13 +135,15 @@ public class EErrorsWindow extends EWindow {
     public void fillWithContent() {
     }
     
-    public Collection<Action> getPopupMenuItems() {
-        ArrayList<Action> items = new ArrayList<Action>();
-        items.add(new OpenQuicklyAction());
-        items.add(new FindFilesContainingSelectionAction());
-        items.add(null);
-        items.add(new ClearErrorsAction());
-        return items;
+    public void initTextAreaPopupMenu() {
+        textArea.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
+            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+                actions.add(new OpenQuicklyAction());
+                actions.add(new FindFilesContainingSelectionAction());
+                actions.add(null);
+                actions.add(new ClearErrorsAction());
+            }
+        });
     }
     
     public class ClearErrorsAction extends AbstractAction {
