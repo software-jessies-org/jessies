@@ -2,7 +2,7 @@
 
 require 'cgi'
 
-def outputChanges(changes)
+def formatChanges(changes)
   body = ""
   changes.each {
     |line|
@@ -48,10 +48,10 @@ def outputFormattedChanges(asciiArt, changes)
   body = ""
   if asciiArt
     body << "<tt>"
-    body << outputChanges(changes)
+    body << formatChanges(changes)
     body << "</tt>"
   else
-    body << outputChanges(changes)
+    body << formatChanges(changes)
   end
   return body
 end
