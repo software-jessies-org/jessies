@@ -76,6 +76,11 @@ changes.gsub!(/\r/, "") # In case we're running on MS Windows.
 sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes.split("\n"))
 
 # Keep the post-commit trigger up-to-date.
+
+# FIXME: if there's a script error which prevents us from getting this far, it
+# will require manual intervention to fix, because we'll be stuck at the broken
+# revision forever.
+
 Dir.chdir(script_path)
 updateResult=`svn update 2>&1`
 if updateResult =~ /(Updated to|At) revision/
