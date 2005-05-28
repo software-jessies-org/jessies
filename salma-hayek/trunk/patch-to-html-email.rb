@@ -21,17 +21,20 @@ def outputChanges(changes)
     # Use <tt> for ---/+++ so they line up, and use distinctive background
     # colors.
     line.gsub!(/^(---|\+\+\+)(.*)$/) {
+      |prefix|
       # We can't use "---" and "+++" as class names, sadly.
       class_name = ($1 == "---" ? "triple-minus-line" : "triple-plus-line")
-      |prefix| "<div class=\"#{class_name}\"><tt>#{prefix.gsub(' ', '&nbsp;')}</tt>#$2</div>"
+      "<div class=\"#{class_name}\"><tt>#{prefix.gsub(' ', '&nbsp;')}</tt>#$2</div>"
     }
     # Write the per-line prefix characters in fixed width
     line.gsub!(/^([-+ ])/) {
-      |prefix| "<tt>#{prefix.gsub(' ', '&nbsp;')}</tt>"
+      |prefix|
+      "<tt>#{prefix.gsub(' ', '&nbsp;')}</tt>"
     }
     # Don't collapse indentation
     line.gsub!(/( {2,})/) {
-      |s| s.gsub(' ', '&nbsp;')
+      |s|
+      s.gsub(' ', '&nbsp;')
     }
     line.gsub!(/\t/, '&nbsp;&nbsp;&nbsp;&nbsp;')
     body << "#{line}<br></font>\n"
