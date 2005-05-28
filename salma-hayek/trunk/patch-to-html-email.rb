@@ -6,14 +6,6 @@ def outputChanges(changes)
   body = ""
   changes.each {
     |line|
-    
-    # Output a horizontal rule before each file's patch. Before works well in
-    # conjunction with post-commit, which needs a separator after the check-in
-    # comment.
-    if line =~ /^--- /
-      body << "<hr noshade/>"
-    end
-    
     color = "black"
     if line =~ /^Modified: /
       next
@@ -26,8 +18,14 @@ def outputChanges(changes)
     end
     body << "<font color=\"#{color}\">"
     line = CGI.escapeHTML(line)
-    # Write the per-line prefix character in fixed width
-    line.gsub!(/^(---|\+\+\+|[-+ ])/) {
+    # Use <tt> for ---/+++ so they line up, and use distinctive background
+    # colors.
+    line.gsub!(/^(---|\+\+\+)(.*)$/) {
+      class_name = ($1 == "---" ? "triple-minus-line" : "triple-plus-line")
+      |prefix| "<div class=\"#{class_name}\"><tt>#{prefix.gsub(' ', '&nbsp;')}</tt>#$2</div>"
+    }
+    # Write the per-line prefix characters in fixed width
+    line.gsub!(/^([-+ ])/) {
       |prefix| "<tt>#{prefix.gsub(' ', '&nbsp;')}</tt>"
     }
     # Don't collapse indentation
@@ -61,6 +59,8 @@ def patchToHtmlEmail(from_address, to_address, reply_to_address, subject, preamb
   body << "  <style>\n"
   body << ".revision-header {background: #cccccc; padding-top: 6pt; padding-bottom: 6pt;}\n"
   body << ".check-in-comment {background: #eeeeee; padding-bottom: 6pt;}\n"
+  body << ".triple-minus-line {background: #ffcccc;}\n"
+  body << ".triple-plus-line {background: #ccccff;}\n"
   body << "  </style>\n"
   
   body << " </head>\n"
