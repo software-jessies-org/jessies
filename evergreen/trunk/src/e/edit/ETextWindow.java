@@ -91,7 +91,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         this.file = FileUtilities.fileFromString(filename);
         this.text = new ETextArea();
         text.getTextBuffer().addTextListener(this);
-        attachPopupMenuTo(text);
+        initTextAreaPopupMenu();
         
         this.watermarkViewPort = new WatermarkViewPort();
         watermarkViewPort.setView(text);
@@ -345,17 +345,19 @@ public class ETextWindow extends EWindow implements PTextListener {
         super.closeWindow();
     }
     
-    public Collection<Action> getPopupMenuItems() {
-        ArrayList<Action> items = new ArrayList<Action>();
-        items.add(new OpenQuicklyAction());
-        items.add(new FindFilesContainingSelectionAction());
-        items.add(new RevertToSavedAction());
-        items.add(null);
-        items.add(new CheckInChangesAction());
-        items.add(new ShowHistoryAction());
-        addContextSpecificMenuItems(items);
-        addExternalToolMenuItems(items);
-        return items;
+    public void initTextAreaPopupMenu() {
+        text.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
+            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+                actions.add(new OpenQuicklyAction());
+                actions.add(new FindFilesContainingSelectionAction());
+                actions.add(new RevertToSavedAction());
+                actions.add(null);
+                actions.add(new CheckInChangesAction());
+                actions.add(new ShowHistoryAction());
+                // FIXME: this could be an additional provider. Would there be any advantage?
+                addExternalToolMenuItems(actions);
+            }
+        });
     }
 
     public void addExternalToolMenuItems(final Collection<Action> items) {
@@ -448,10 +450,6 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     public String getFileType() {
         return fileType;
-    }
-    
-    public void addContextSpecificMenuItems(Collection items) {
-        boolean needSeparator = true;
     }
     
     public void goToLine(int line) {
