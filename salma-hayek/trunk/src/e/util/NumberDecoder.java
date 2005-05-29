@@ -133,7 +133,7 @@ public class NumberDecoder {
         StringBuffer result = new StringBuffer("<html>");
         for (String string : strings) {
             result.append(string);
-            result.append("<br>\n");
+            result.append("<br/>\n");
         }
         return result.toString().replaceAll(" ", "&nbsp;");
     }

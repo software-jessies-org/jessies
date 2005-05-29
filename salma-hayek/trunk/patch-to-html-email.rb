@@ -39,7 +39,7 @@ def formatChanges(changes)
       s.gsub(' ', '&nbsp;')
     }
     line.gsub!(/\t/, '&nbsp;&nbsp;&nbsp;&nbsp;')
-    body << "#{line}<br></font>\n"
+    body << "#{line}<br/></font>\n"
   }
   return body
 end
@@ -57,8 +57,10 @@ def outputFormattedChanges(asciiArt, changes)
 end
 
 def patchToHtml(subject, preamble, changes)
-  body = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"
-  body << "<html>\n"
+  body = ""
+  body << "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+  body << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+  body << "<html lang=\"EN\">\n"
   body << "<head>\n"
   body << " <title>#{subject}</title>\n"
   

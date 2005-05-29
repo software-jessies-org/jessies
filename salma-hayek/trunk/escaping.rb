@@ -28,5 +28,5 @@ def escapeTextLineToHtml(line)
     $_.gsub!(/ --- /, "&nbsp;&mdash; ")
     
     # Each input line gets a line-break in the HTML:
-    return "#{$_}<br>\n"
+    return "#{$_}<br/>\n"
 end
