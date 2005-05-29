@@ -14,6 +14,11 @@ class ExternalSearchItemProvider implements MenuItemProvider {
     }
     
     public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+        // All these menu items require a non-empty selection.
+        if (textArea.getSelectedText().trim().length() == 0) {
+            return;
+        }
+        
         if (GuiUtilities.isMacOs()) {
             actions.add(new SearchInSpotlightAction());
         }
