@@ -24,7 +24,12 @@ class ExternalSearchItemProvider implements MenuItemProvider {
         }
         
         public void actionPerformed(ActionEvent e) {
-            // FIXME
+            try {
+                String encodedSelection = StringUtilities.urlEncode(textArea.getSelectedText().trim());
+                BrowserLauncher.openURL("http://www.google.com/search?q=" + encodedSelection + "&ie=UTF-8&oe=UTF-8");
+            } catch (Exception ex) {
+                Log.warn("Exception launching browser", ex);
+            }
         }
     }
     
