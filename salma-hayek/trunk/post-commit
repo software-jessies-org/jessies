@@ -51,6 +51,9 @@ date=info_lines.shift
 info_lines.shift
 comment=info_lines
 
+# Remove the localized date that follows the ISO date.
+date = date.gsub(/ \(.*\)$/, "")
+
 from_address="#{author}@#{mail_domain}"
 
 subject="#{repository_name} revision #{rev}"
@@ -59,7 +62,7 @@ body = ""
 
 # Output the overview.
 body << "<div class=\"check-in-comment\">\n"
-body << "<p class=\"revision-header\"><b>#{author}</b> #{date}</p>\n"
+body << "<p class=\"revision-header\"><b>#{author}</b> &mdash; #{date}</p>\n"
 body << "<p>"
 comment.each() {
     |line|
