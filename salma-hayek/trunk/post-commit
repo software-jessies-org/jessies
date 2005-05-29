@@ -61,8 +61,8 @@ subject="#{repository_name} revision #{rev}"
 body = ""
 
 # Output the overview.
+body << "<p class=\"revision-header\">#{date} / <b>#{author}</b></p>\n"
 body << "<div class=\"check-in-comment\">\n"
-body << "<p class=\"revision-header\">#{date} / <b>#{author}</b>&nbsp;</p>\n"
 body << "<p>"
 comment.each() {
     |line|
