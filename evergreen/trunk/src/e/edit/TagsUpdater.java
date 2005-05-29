@@ -285,7 +285,7 @@ public class TagsUpdater {
                         
                         DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
                         
-                        if (tag.isContainerType()) {
+                        if (tag.type.isContainer()) {
                             leaf = new BranchNode(tag);
                             branches.put(tag.getClassQualifiedName(), leaf);
                         }
