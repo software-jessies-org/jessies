@@ -38,7 +38,7 @@ public class SearchField extends JTextField {
     
     private void initBorder() {
         new CancelBorder().attachTo(this);
-        new MenuBorder().attachTo(this);
+        //FIXME: new MenuBorder().attachTo(this);
     }
     
     private void initKeyListener() {
@@ -93,7 +93,9 @@ public class SearchField extends JTextField {
         }
     }
     
-    public void showMenu(int x, int y) {
+    private void showMenu(int x, int y) {
+        // FIXME
+        /*
         EPopupMenu menu = new EPopupMenu();
         for (int i = 0; i < history.size(); ++i) {
             menu.add(new SearchHistoryAction(history.get(i)));
@@ -101,6 +103,7 @@ public class SearchField extends JTextField {
         menu.addSeparator();
         menu.add(new ClearHistoryAction());
         menu.show(this, x, y);
+        */
     }
     
     private static final Color GRAY = new Color(0.7f, 0.7f, 0.7f);
