@@ -68,7 +68,13 @@ public class JavaDoc {
         classLoader = new URLClassLoader((URL []) urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
         
         // Note the locations of documents and source files.
-        docs = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.doc", "http://java.sun.com/j2se/1.5.0/docs/api/"));
+        String defaultApiLocation = "http://java.sun.com/j2se/1.5.0/docs/api/";
+        // FIXME: this should be CurrentJDK rather than 1.5.0, but 1.5.0 isn't the default on Mac OS yet.
+        String macOsApiPath = "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/doc/api/";
+        if (FileUtilities.exists(macOsApiPath)) {
+            defaultApiLocation = "file://" + macOsApiPath;
+        }
+        docs = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.doc", defaultApiLocation));
         sources = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.source", ""));
         
         int totalPkgs = packageNames.size();
