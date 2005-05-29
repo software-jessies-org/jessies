@@ -21,7 +21,13 @@ public class FilenameChooserField extends JPanel implements ActionListener {
     /** We're (optionally) given this one, if we're supposed to update another field with the chosen leafname. */
     private JTextField companionNameField;
     
-    /** fileChooserMode is one of the JFileChooser file selection mode constants. Which will hopefully become enums in Java 1.5. */
+    /**
+     * fileChooserMode is one of the JFileChooser file selection mode constants:
+     * 
+     * JFileChooser.FILES_ONLY
+     * JFileChooser.DIRECTORIES_ONLY
+     * JFileChooser.FILES_AND_DIRECTORIES
+     */
     public FilenameChooserField(int fileChooserMode) {
         this.fileChooserMode = fileChooserMode;
         initUI();
