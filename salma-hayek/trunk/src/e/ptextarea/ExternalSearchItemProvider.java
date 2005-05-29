@@ -14,8 +14,23 @@ class ExternalSearchItemProvider implements MenuItemProvider {
     }
     
     public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+        if (GuiUtilities.isMacOs()) {
+            actions.add(new SearchInSpotlightAction());
+        }
         actions.add(new SearchInGoogleAction());
         actions.add(new LookUpInDictionaryAction());
+    }
+    
+    private class SearchInSpotlightAction extends AbstractAction {
+        public SearchInSpotlightAction() {
+            super("Search in Spotlight");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            String nsPerformServicePath = FileUtilities.getSalmaHayekFile("/generated/native/Darwin/NSPerformService/Darwin/NSPerformService").toString();
+            String searchTerm = textArea.getSelectedText().trim();
+            ProcessUtilities.spawn(null, new String[] { nsPerformServicePath, "Spotlight", searchTerm });
+        }
     }
     
     private class SearchInGoogleAction extends AbstractAction {
