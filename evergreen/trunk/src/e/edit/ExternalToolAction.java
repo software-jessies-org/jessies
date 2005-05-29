@@ -7,14 +7,15 @@ import javax.swing.*;
 import e.forms.*;
 
 public class ExternalToolAction extends ETextAction {
-    // FIXME: use an enum in 1.5
-    private static final int NO_INPUT_AND_NO_OUTPUT = 0;
-    private static final int INPUT_ONLY = 1;
-    private static final int OUTPUT_ONLY = 2;
-    private static final int INPUT_AND_OUTPUT = 3;
+    private enum ToolType {
+        NO_INPUT_AND_NO_OUTPUT,
+        INPUT_ONLY,
+        OUTPUT_ONLY,
+        INPUT_AND_OUTPUT;
+    }
     
     private String commandPattern;
-    private int type;
+    private ToolType type;
     private boolean checkEverythingSaved;
     private boolean needsFile;
     private boolean requestConfirmation;
@@ -33,17 +34,17 @@ public class ExternalToolAction extends ETextAction {
     }
     
     private void setCommandPattern(String newPattern) {
-        this.type = NO_INPUT_AND_NO_OUTPUT;
+        this.type = ToolType.NO_INPUT_AND_NO_OUTPUT;
         if (newPattern.startsWith("<")) {
-            this.type = OUTPUT_ONLY;
+            this.type = ToolType.OUTPUT_ONLY;
             this.needsFile = true;
             newPattern = newPattern.substring(1);
         } else if (newPattern.startsWith(">")) {
-            this.type = INPUT_ONLY;
+            this.type = ToolType.INPUT_ONLY;
             this.needsFile = true;
             newPattern = newPattern.substring(1);
         } else if (newPattern.startsWith("|")) {
-            this.type = INPUT_AND_OUTPUT;
+            this.type = ToolType.INPUT_AND_OUTPUT;
             this.needsFile = true;
             newPattern = newPattern.substring(1);
         }
