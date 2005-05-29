@@ -91,8 +91,7 @@ public class TerminatorFrame extends JFrame {
 		});
 		initTerminals();
 		pack();
-		// FIXME: until Mac OS has Java 1.5, we'll have to set the java.awt.Window.locationByPlatform property instead.
-		//setLocationByPlatform(true);
+		setLocationByPlatform(true);
 		setVisible(true);
 		WindowMenu.getSharedInstance().addWindow(this);
 	}
