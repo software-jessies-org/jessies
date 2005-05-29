@@ -35,7 +35,21 @@ class ExternalSearchItemProvider implements MenuItemProvider {
         }
         
         public void actionPerformed(ActionEvent e) {
-            // FIXME
+            try {
+                // We need to rewrite spaces as "%20" for them to find their
+                // way to Dictionary.app unmolested. The usual url-encoded
+                // form ("+") doesn't work, for some reason.
+                String encodedSelection = textArea.getSelectedText().trim().replaceAll("\\s+", "%20");
+                // In Mac OS 10.4.1, a dict: URI that causes Dictionary.app to
+                // start doesn't actually cause the definition to be shown, so
+                // we need to ask twice. If we knew the dictionary was already
+                // open, we could avoid the flicker. But we may as well wait
+                // for Apple to fix the underlying problem.
+                BrowserLauncher.openURL("dict:///");
+                BrowserLauncher.openURL("dict:///" + encodedSelection);
+            } catch (Exception ex) {
+                Log.warn("Exception launching browser", ex);
+            }
         }
     }
 }
