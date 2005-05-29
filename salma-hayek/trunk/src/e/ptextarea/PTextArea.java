@@ -65,7 +65,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         this.editable = true;
         this.wordWrap = false;
         this.indenter = new PDefaultIndenter(this);
-        this.popupMenu =  new EPopupMenu(this);
+        initPopupMenu();
         setFont(UIManager.getFont("TextArea.font"));
         setAutoscrolls(true);
         setBackground(Color.WHITE);
@@ -1297,6 +1297,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public EPopupMenu getPopupMenu() {
         return popupMenu;
+    }
+    
+    private void initPopupMenu() {
+        popupMenu =  new EPopupMenu(this);
+        popupMenu.addMenuItemProvider(new ExternalSearchItemProvider(this));
     }
     
     //
