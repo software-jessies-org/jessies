@@ -228,10 +228,10 @@ public class FindFilesDialog {
         }
         public void tagFound(TagReader.Tag tag) {
             // Function prototypes and Java packages probably aren't interesting.
-            if (tag.type.equals(TagReader.Tag.PROTOTYPE)) {
+            if (tag.type == TagType.PROTOTYPE) {
                return;
             }
-            if (tag.type.equals(TagReader.Tag.PACKAGE)) {
+            if (tag.type == TagType.PACKAGE) {
                return;
             }
             if (pattern.matcher(tag.identifier).find()) {

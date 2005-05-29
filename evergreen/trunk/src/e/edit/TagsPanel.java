@@ -66,22 +66,6 @@ public class TagsPanel extends JPanel {
     }
     
     public static class TagsTreeRenderer extends DefaultTreeCellRenderer {
-        
-        private static final Shape CIRCLE = new java.awt.geom.Ellipse2D.Float(1, 1, 8, 8);
-        private static final Shape SQUARE = new Rectangle(1, 2, 7, 7);
-        private static final Shape TRIANGLE = new Polygon(new int[] { 0, 4, 8 }, new int[] { 8, 1, 8 }, 3);
-        
-        private static final Map<String, Shape> TYPE_SHAPES = new HashMap<String, Shape>();
-        {
-            TYPE_SHAPES.put(TagReader.Tag.CLASS, CIRCLE);
-            TYPE_SHAPES.put(TagReader.Tag.CONSTRUCTOR, CIRCLE);
-            TYPE_SHAPES.put(TagReader.Tag.DESTRUCTOR, CIRCLE);
-            TYPE_SHAPES.put(TagReader.Tag.INTERFACE, CIRCLE);
-            TYPE_SHAPES.put(TagReader.Tag.FIELD, TRIANGLE);
-            TYPE_SHAPES.put(TagReader.Tag.METHOD, SQUARE);
-            TYPE_SHAPES.put(TagReader.Tag.PROTOTYPE, SQUARE);
-        }
-        
         private static Font boldFont = UIManager.getFont("TableHeader.font").deriveFont(Font.BOLD);
         
         private final Icon icon = new DrawnIcon(new Dimension(10, 10)) {
@@ -91,7 +75,7 @@ public class TagsPanel extends JPanel {
                 g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                 g.setColor(tag.visibilityColor());
                 g.translate(x, y);
-                Shape typeMarker = TYPE_SHAPES.get(tag.type);
+                Shape typeMarker = tag.type.getShape();
                 g.draw(typeMarker);
                 if (tag.isAbstract == false) {
                     g.fill(typeMarker);
@@ -118,7 +102,7 @@ public class TagsPanel extends JPanel {
                 setForeground(tag.visibilityColor() == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
                 setFont((tag.isStatic && tag.visibilityColor() != TagReader.Tag.PRIVATE) ? boldFont : tree.getFont());
                 setToolTipText(tag.toolTip);
-                Shape typeMarker = TYPE_SHAPES.get(tag.type);
+                Shape typeMarker = tag.type.getShape();
                 if (typeMarker != null) {
                     setIcon(icon);
                 }

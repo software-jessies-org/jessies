@@ -2,7 +2,6 @@ package e.edit;
 
 import java.awt.Color;
 import java.io.*;
-import java.text.*;
 import java.util.*;
 import java.util.regex.*;
 import e.util.*;
@@ -129,10 +128,6 @@ public class TagReader {
             tag = new RubyTag(identifier, lineNumber, type, context, containingClass);
         } else {
             tag = new TagReader.Tag(identifier, lineNumber, type, context, containingClass);
-            if (tag.type == null) {
-                tag.type = "unknown tag type '" + type + "'";
-                Log.warn(tag.type + " at line " + line);
-            }
         }
         
         tag.isStatic = (lineNumber == staticTagLineNumber | tag.isStatic);
@@ -144,77 +139,22 @@ public class TagReader {
     }
     
     public static class Tag {
-        public static final String CLASS = "class";
-        public static final String CONSTRUCTOR = "constructor";
-        public static final String DESTRUCTOR = "destructor";
-        public static final String ENUM = "enum";
-        public static final String ENUMERATOR = "enumerator";
-        public static final String EXTERN = "extern";
-        public static final String FIELD = "field";
-        public static final String INTERFACE = "interface";
-        public static final String MACRO = "macro";
-        public static final String METHOD = "method";
-        public static final String MODULE = "module";
-        public static final String NAMESPACE = "namespace";
-        public static final String PACKAGE = "package";
-        public static final String PROTOTYPE = "prototype";
-        public static final String STRUCT = "struct";
-        public static final String TYPEDEF = "typedef";
-        public static final String UNION = "union";
-        public static final String VARIABLE = "variable";
-        
-        private static final Map<String, String> TYPES = new HashMap<String, String>();
-        static {
-            TYPES.put("c", CLASS);
-            TYPES.put("C", CONSTRUCTOR);
-            TYPES.put("d", MACRO);
-            TYPES.put("D", DESTRUCTOR);
-            TYPES.put("e", ENUMERATOR);
-            TYPES.put("f", FIELD);
-            TYPES.put("g", ENUM);
-            TYPES.put("i", INTERFACE);
-            TYPES.put("m", METHOD);
-            TYPES.put("M", MODULE);
-            TYPES.put("n", NAMESPACE);
-            TYPES.put("p", PACKAGE);
-            TYPES.put("P", PROTOTYPE);
-            TYPES.put("s", STRUCT);
-            TYPES.put("t", TYPEDEF);
-            TYPES.put("u", UNION);
-            TYPES.put("v", VARIABLE);
-            TYPES.put("x", EXTERN);
-        }
-        
-        public static final List CONTAINER_TYPES = Collections.unmodifiableList(Arrays.asList(new String[] {
-            CLASS, ENUM, INTERFACE, NAMESPACE, STRUCT, MODULE
-        }));
-        
-        private static final Map<String, MessageFormat> DESCRIPTION_FORMATS = new HashMap<String, MessageFormat>();
-        static {
-            DESCRIPTION_FORMATS.put(PACKAGE, new MessageFormat(PACKAGE + " {0}"));
-            DESCRIPTION_FORMATS.put(CLASS, new MessageFormat(CLASS + " {0}"));
-            DESCRIPTION_FORMATS.put(INTERFACE, new MessageFormat(INTERFACE + " {0}"));
-            DESCRIPTION_FORMATS.put(METHOD, new MessageFormat("{0}()"));
-            DESCRIPTION_FORMATS.put(CONSTRUCTOR, new MessageFormat("{0}()"));
-            DESCRIPTION_FORMATS.put(DESTRUCTOR, new MessageFormat("{0}()"));
-            DESCRIPTION_FORMATS.put(MODULE, new MessageFormat(MODULE + " {0}"));
-            DESCRIPTION_FORMATS.put(ENUM, new MessageFormat(ENUM + " {0}"));
-            DESCRIPTION_FORMATS.put(NAMESPACE, new MessageFormat(NAMESPACE + " {0}"));
-            DESCRIPTION_FORMATS.put(PROTOTYPE, new MessageFormat("{0}() " + PROTOTYPE));
-            DESCRIPTION_FORMATS.put(STRUCT, new MessageFormat(STRUCT + " {0}"));
-            DESCRIPTION_FORMATS.put(TYPEDEF, new MessageFormat(TYPEDEF + " {0}"));
-            DESCRIPTION_FORMATS.put(UNION, new MessageFormat(UNION + " {0}"));
-            DESCRIPTION_FORMATS.put(EXTERN, new MessageFormat(EXTERN + " {0}"));
-        }
-        
-        public String[][] typeSortOrder = new String[][] {
-            { NAMESPACE }, { CLASS }, { MACRO }, { CONSTRUCTOR }, { DESTRUCTOR },
-            { PROTOTYPE, METHOD }, { FIELD }, { ENUM }, { STRUCT }, { TYPEDEF }
+        public TagType[][] typeSortOrder = new TagType[][] {
+            { TagType.NAMESPACE },
+            { TagType.CLASS },
+            { TagType.MACRO },
+            { TagType.CONSTRUCTOR },
+            { TagType.DESTRUCTOR },
+            { TagType.PROTOTYPE, TagType.METHOD },
+            { TagType.FIELD },
+            { TagType.ENUM },
+            { TagType.STRUCT },
+            { TagType.TYPEDEF }
         };
         public String classSeparator = ".";
         
         public String identifier;
-        public String type;
+        public TagType type;
         public String context;
         public String containingClass;
         public int lineNumber;
@@ -233,7 +173,7 @@ public class TagReader {
             if (containingClass.equals(identifier)) {
                 tagType = 'C';
             }
-            this.type = TYPES.get(String.valueOf(tagType));
+            this.type = TagType.fromChar(tagType);
         }
         
         public String describeVisibility() {
@@ -265,20 +205,11 @@ public class TagReader {
         }
         
         public String describe() {
-            MessageFormat formatter = DESCRIPTION_FORMATS.get(type);
-            if (formatter != null) {
-                return formatter.format(new String[] { identifier });
-            } else {
-                return identifier;
-            }
+            return type.describe(identifier);
         }
         
         public String toString() {
             return describe();
-        }
-        
-        public boolean isContainerType() {
-            return CONTAINER_TYPES.contains(type);
         }
         
         public String getSortIdentifier() {
@@ -304,15 +235,15 @@ public class TagReader {
     public static class JavaTag extends Tag {
         public JavaTag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
             super(identifier, lineNumber, tagType, context, containingClass);
-            typeSortOrder = new String[][] {
-                { PACKAGE }, { FIELD }, { CONSTRUCTOR },
-                { METHOD }, { CLASS }, { INTERFACE }
+            typeSortOrder = new TagType[][] {
+                { TagType.PACKAGE }, { TagType.FIELD }, { TagType.CONSTRUCTOR },
+                { TagType.METHOD }, { TagType.CLASS }, { TagType.INTERFACE }
             };
-            this.isAbstract = (type.equals(INTERFACE));
+            this.isAbstract = (type == TagType.INTERFACE);
             
             if (containingClass.endsWith("." + identifier)) {
                 // An inner class constructor.
-                this.type = CONSTRUCTOR;
+                this.type = TagType.CONSTRUCTOR;
             }
         }
     }
@@ -349,10 +280,10 @@ public class TagReader {
             classSeparator = "::";
             
             if (identifier.charAt(0) == '~') {
-                this.type = DESTRUCTOR;
+                this.type = TagType.DESTRUCTOR;
             } else if (containingClass.endsWith("::" + identifier)) {
                 // A constructor in a namespace.
-                this.type = CONSTRUCTOR;
+                this.type = TagType.CONSTRUCTOR;
             }
         }
         
