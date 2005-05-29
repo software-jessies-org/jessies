@@ -1,5 +1,5 @@
-#include <Cocoa/Cocoa.h>
-#include <iostream>
+#import <Cocoa/Cocoa.h>
+#import <iostream>
 
 void doService(const std::string& service, const std::string& text) {
   NSPasteboard* pb = [NSPasteboard pasteboardWithUniqueName];
