@@ -12,7 +12,7 @@ puts("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\
 puts("<title>ChangeLog</title>")
 puts("<style type=\"text/css\">");
 puts("  html, body {");
-puts("    width:45em");
+puts("    width:50em");
 puts("  }");
 puts("</style>");
 puts("</head>")
