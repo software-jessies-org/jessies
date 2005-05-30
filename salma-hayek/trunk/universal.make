@@ -108,6 +108,9 @@ TARGET_OS := $(shell uname)
 # Sensible C family compiler flags.
 # ----------------------------------------------------------------------------
 
+EXTRA_INCLUDE_PATH += $(SALMA_HAYEK)/native/Headers
+EXTRA_INCLUDE_PATH += $(JNI_PATH)
+
 CFLAGS += -std=c99
 C_AND_CXXFLAGS += -fPIC
 C_AND_CXXFLAGS += -g
@@ -117,7 +120,7 @@ OBJC_AND_OBJCXX_FLAGS += -Wno-protocol -Wundeclared-selector
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
 PURE_C_AND_CXX_FLAGS += -pedantic
-CPPFLAGS += $(subst $(SPACE)", -I", $(JNI_PATH))
+CPPFLAGS += $(foreach dir, $(EXTRA_INCLUDE_PATH), -I"$(dir)")
 
 CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)

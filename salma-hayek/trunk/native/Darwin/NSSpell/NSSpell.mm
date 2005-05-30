@@ -1,26 +1,7 @@
+#import <AppKit/AppKit.h>
 #include <iostream>
 #include <string>
-
-#import <AppKit/AppKit.h>
-
-/**
- * Creates and releases an NSAutoreleasePool in its scope. Having to manually
- * release an autorelease pool on every exit point from a method is silly, but
- * Objective-C++ lets us fix this.
- */
-class ScopedAutoReleasePool {
-public:
-    ScopedAutoReleasePool() {
-        m_pool =  [[NSAutoreleasePool alloc] init];
-    }
-    
-    ~ScopedAutoReleasePool() {
-        [m_pool release];
-    }
-    
-private:
-    NSAutoreleasePool* m_pool;
-};
+#import "ScopedAutoReleasePool.h"
 
 /**
  * Allows NSString to be output like std::string or a const char*.

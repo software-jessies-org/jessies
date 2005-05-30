@@ -1,5 +1,7 @@
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import <iostream>
+#include <string>
+#import "ScopedAutoReleasePool.h"
 
 void doService(const std::string& service, const std::string& text) {
   NSPasteboard* pb = [NSPasteboard pasteboardWithUniqueName];
@@ -29,10 +31,9 @@ int main(int argCount, char* args[]) {
     usage(std::cerr, args[0]);
     exit(1);
   }
-
-  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+  
+  ScopedAutoReleasePool pool;
   [NSApplication sharedApplication];
   doService(args[1], args[2]);
-  [pool release];
   return 0;
 }

@@ -1,7 +1,4 @@
-// gcc -o slideshow slideshow.m -framework Cocoa -F/System/Library/PrivateFrameworks -framework Slideshow && ./slideshow
-
-#import <Cocoa/Cocoa.h>
-
+#import <AppKit/AppKit.h>
 #import "PrivateFrameworks/Slideshow.h"
 
 @interface MyDelegate : NSObject {
