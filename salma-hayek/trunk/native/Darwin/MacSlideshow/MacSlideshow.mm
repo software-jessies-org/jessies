@@ -1,5 +1,6 @@
 #import <AppKit/AppKit.h>
 #import "PrivateFrameworks/Slideshow.h"
+#import "ScopedAutoReleasePool.h"
 
 @interface MyDelegate : NSObject {
     NSMutableArray* mFilenames;
@@ -61,17 +62,15 @@
 @end
 
 int main(int argCount, char* argValues[]) {
-    // These are required if we want Cocoa to work.
-    static NSAutoreleasePool* global_pool;
-    global_pool = [[NSAutoreleasePool alloc] init];
-    static NSApplication* application;
-    application = [NSApplication sharedApplication];
+    ScopedAutoReleasePool pool;
 
     MyDelegate* delegate = [[MyDelegate alloc] init];
     (void) argCount;
     while (*++argValues) {
         [delegate addFilename: *argValues];
     }
+
+    NSApplication* application = [NSApplication sharedApplication];
     [application setDelegate: delegate];
     [application run];
 
