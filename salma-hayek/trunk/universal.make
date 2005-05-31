@@ -108,8 +108,7 @@ TARGET_OS := $(shell uname)
 # Sensible C family compiler flags.
 # ----------------------------------------------------------------------------
 
-EXTRA_INCLUDE_PATH += $(SALMA_HAYEK)/native/Headers
-EXTRA_INCLUDE_PATH += $(JNI_PATH)
+EXTRA_INCLUDE_PATH += "$(SALMA_HAYEK)/native/Headers"
 
 CFLAGS += -std=c99
 C_AND_CXXFLAGS += -fPIC
@@ -120,7 +119,9 @@ OBJC_AND_OBJCXX_FLAGS += -Wno-protocol -Wundeclared-selector
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
 PURE_C_AND_CXX_FLAGS += -pedantic
-CPPFLAGS += $(foreach dir, $(EXTRA_INCLUDE_PATH), -I"$(dir)")
+# The use of whitespace here is carefully crafted to work with directories
+# whose names contain spaces, something common on Win32.
+CPPFLAGS += $(subst $(SPACE)", -I", $(EXTRA_INCLUDE_PATH))
 
 CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
@@ -143,18 +144,18 @@ LD = $(CXX)
 # The default $(CC) used by $(LINK.o) doesn't know about the Darwin equivalent of -lstdc++.
 CC = $(CXX)
 
-JNI_PATH.Linux += "$(JAVA_HOME)/include/linux"
+EXTRA_INCLUDE_PATH.Linux += "$(JAVA_HOME)/include/linux"
 JNI_LIBRARY_LDFLAGS.Linux += -shared
 JNI_LIBRARY_PREFIX.Linux = lib
 JNI_LIBRARY_EXTENSION.Linux = so
 
-JNI_PATH.CYGWIN_NT-5.0 += "$(JAVA_HOME)/include/win32"
+EXTRA_INCLUDE_PATH.CYGWIN_NT-5.0 += "$(JAVA_HOME)/include/win32"
 JNI_LIBRARY_LDFLAGS.CYGWIN_NT-5.0 += -shared -Wl,--add-stdcall-alias
 JNI_LIBRARY_PREFIX.CYGWIN_NT-5.0 =
 JNI_LIBRARY_EXTENSION.CYGWIN_NT-5.0 = dll
 
-JNI_PATH += "$(JAVA_HOME)/include"
-JNI_PATH += $(JNI_PATH.$(TARGET_OS))
+EXTRA_INCLUDE_PATH += "$(JAVA_HOME)/include"
+EXTRA_INCLUDE_PATH += $(EXTRA_INCLUDE_PATH.$(TARGET_OS))
 JNI_LIBRARY_LDFLAGS += $(JNI_LIBRARY_LDFLAGS.$(TARGET_OS))
 JNI_LIBRARY_PREFIX = $(JNI_LIBRARY_PREFIX.$(TARGET_OS))
 JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
