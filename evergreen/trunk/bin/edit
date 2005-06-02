@@ -94,21 +94,11 @@ def cygpath(filenameOrPath)
   return `#{args.join(" ")}`.chomp
 end
 
-fake_environment = []
-["CVS_RSH", "DISPLAY", "EDIT_HOME", "HOME", "JAVA_HOME", "PATH", "SHELL"].each() {
-  |variable|
-  value = ENV[variable]
-  if value != nil
-    fake_environment.push("-Denv.#{variable}=#{cygpath(value)}")
-  end
-}
-
 options = [ "-cp", "#{cygpath(classpath_entries.join(File::PATH_SEPARATOR))}" ]
 options.push("-Djava.awt.Window.locationByPlatform=true")
 options.push("-DpreferencesDirectory=#{cygpath(edit_preferences_directory)}")
 options.push("-Xmx1g")
 #options.push("-agentlib:yjpagent")
-options.concat(fake_environment)
 options.concat(os_specific_options)
 if ENV["DEBUGGING_EDIT"] == nil
   options.push("-De.util.Log.filename=#{cygpath(log_filename)}")

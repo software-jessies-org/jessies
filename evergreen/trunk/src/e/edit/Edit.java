@@ -379,7 +379,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     public static String getResourceFilename(String leafName) {
-        return System.getProperty("env.EDIT_HOME") + File.separatorChar + leafName;
+        return System.getenv("EDIT_HOME") + File.separatorChar + leafName;
     }
     
     public void initWindowIcon() {
