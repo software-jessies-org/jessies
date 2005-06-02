@@ -142,18 +142,9 @@ public class EErrorsWindow extends EWindow {
                 actions.add(new OpenQuicklyAction());
                 actions.add(new FindFilesContainingSelectionAction());
                 actions.add(null);
-                actions.add(new ClearErrorsAction());
+                actions.add(new KillErrorsAction());
             }
         });
-    }
-    
-    public class ClearErrorsAction extends AbstractAction {
-        public ClearErrorsAction() {
-            super("Clear");
-        }
-        public void actionPerformed(ActionEvent e) {
-            clear();
-        }
     }
     
     /** Errors windows are never considered dirty because they're not worth preserving. */
