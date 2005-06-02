@@ -1,5 +1,7 @@
 package e.ptextarea;
 
+import java.util.*;
+
 /**
  * A CharSequence that returns ' ' for uninteresting characters, for the
  * purposes of bracket matching. For example, if you're matching a bracket
@@ -19,7 +21,7 @@ public class PSameStyleCharSequence {
      * character at the given offset.
      */
     public static CharSequence forOffset(PTextArea textArea, int offset) {
-        PSegmentIterator it = textArea.getLogicalSegmentIterator(offset);
+        Iterator<PLineSegment> it = textArea.getLogicalSegmentIterator(offset);
         if (it.hasNext()) {
             PLineSegment segment = it.next();
             PStyle style = segment.getStyle();
@@ -90,8 +92,7 @@ public class PSameStyleCharSequence {
         
         public MangledCharSequence(PTextArea textArea) {
             this.mangledText = new StringBuffer(textArea.getTextBuffer());
-            
-            PSegmentIterator it = textArea.getLogicalSegmentIterator(0);
+            Iterator<PLineSegment> it = textArea.getLogicalSegmentIterator(0);
             while (it.hasNext()) {
                 PLineSegment segment = it.next();
                 if (segment.getStyle() != PStyle.NORMAL) {

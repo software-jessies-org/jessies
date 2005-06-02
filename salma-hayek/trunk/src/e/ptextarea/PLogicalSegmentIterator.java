@@ -1,6 +1,8 @@
 package e.ptextarea;
 
-public class PLogicalSegmentIterator implements PSegmentIterator {
+import java.util.*;
+
+public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
     private PTextArea textArea;
     private int lineIndex;
     private int segmentInLine;
@@ -54,5 +56,9 @@ public class PLogicalSegmentIterator implements PSegmentIterator {
        
         charOffset = result.getEnd();
         return result;
+    }
+    
+    public void remove() {
+        throw new UnsupportedOperationException();
     }
 }

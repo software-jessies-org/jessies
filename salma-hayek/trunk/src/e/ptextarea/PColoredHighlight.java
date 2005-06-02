@@ -1,7 +1,7 @@
 package e.ptextarea;
 
-
 import java.awt.*;
+import java.util.*;
 
 /**
  * A PColoredHighlight is a type of PHighlight which paints itself as a solid block of color on the
@@ -35,10 +35,10 @@ public class PColoredHighlight extends PHighlight {
             return textArea.getWidth();
         } else {
             int lineStart = textArea.getSplitLine(splitLineIndex).getTextIndex();
-            PSegmentIterator iterator = textArea.getWrappedSegmentIterator(lineStart);
+            Iterator<PLineSegment> it = textArea.getWrappedSegmentIterator(lineStart);
             int result = 0;
-            while (iterator.hasNext()) {
-                PLineSegment segment = iterator.next();
+            while (it.hasNext()) {
+                PLineSegment segment = it.next();
                 if (segment.isNewline()) {
                     return result;
                 }

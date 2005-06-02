@@ -1,6 +1,8 @@
 package e.ptextarea;
 
-public class PWrappedSegmentIterator implements PSegmentIterator {
+import java.util.*;
+
+public class PWrappedSegmentIterator implements Iterator<PLineSegment> {
     private PTextArea textArea;
     private int charOffset;
     private int nextSplitLineIndex;
@@ -51,11 +53,15 @@ public class PWrappedSegmentIterator implements PSegmentIterator {
         return result;
     }
     
-    private class CachedSegmentIterator implements PSegmentIterator {
-        private PSegmentIterator source;
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+    
+    private class CachedSegmentIterator implements Iterator<PLineSegment> {
+        private Iterator<PLineSegment> source;
         private PLineSegment next = null;
         
-        private CachedSegmentIterator(PSegmentIterator source) {
+        private CachedSegmentIterator(Iterator<PLineSegment> source) {
             this.source = source;
         }
         
@@ -74,6 +80,10 @@ public class PWrappedSegmentIterator implements PSegmentIterator {
         
         public boolean hasNext() {
             return (next != null) || source.hasNext();
+        }
+        
+        public void remove() {
+            throw new UnsupportedOperationException();
         }
     }
 }

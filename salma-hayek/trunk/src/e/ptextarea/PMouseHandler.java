@@ -2,6 +2,7 @@ package e.ptextarea;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -136,7 +137,7 @@ public class PMouseHandler implements MouseInputListener {
         
         private boolean selectStringLiteral() {
             // Are we in a string literal?
-            PSegmentIterator it = textArea.getLogicalSegmentIterator(pressedOffset);
+            Iterator<PLineSegment> it = textArea.getLogicalSegmentIterator(pressedOffset);
             if (it.hasNext() == false) {
                 return false;
             }

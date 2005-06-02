@@ -590,11 +590,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return null;
     }
     
-    public PSegmentIterator getLogicalSegmentIterator(int offset) {
+    public Iterator<PLineSegment> getLogicalSegmentIterator(int offset) {
         return new PLogicalSegmentIterator(this, offset);
     }
     
-    public PSegmentIterator getWrappedSegmentIterator(int offset) {
+    public Iterator<PLineSegment> getWrappedSegmentIterator(int offset) {
         return new PWrappedSegmentIterator(this, offset);
     }
     
@@ -760,12 +760,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         int baseline = getBaseline(minLine);
         paintHighlights(graphics, minLine, maxLine);
         int paintCharOffset = getSplitLine(minLine).getTextIndex();
-        PSegmentIterator iterator = getWrappedSegmentIterator(paintCharOffset);
         int x = 0;
         int line = minLine;
         int caretOffset = hasSelection() ? -1 : getSelectionStart();
-        while (iterator.hasNext()) {
-            PLineSegment segment = iterator.next();
+        Iterator<PLineSegment> it = getWrappedSegmentIterator(paintCharOffset);
+        while (it.hasNext()) {
+            PLineSegment segment = it.next();
             paintCharOffset = segment.getEnd();
             applyColor(graphics, segment.getStyle().getColor());
             segment.paint(graphics, x, baseline);
