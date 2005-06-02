@@ -68,6 +68,6 @@ public abstract class PAbstractSegment implements PLineSegment {
     public abstract void paint(Graphics2D graphics, int x, int yBaseline);
     
     public String toString() {
-        return "PLineSegment[" + style + ", " + getText() + "]";
+        return "PAbstractSegment[" + style + ",start=" + start + ",end=" + end + ",\"" + getText() + "\"]";
     }
 }

@@ -55,7 +55,7 @@ public class PTextSegment extends PAbstractSegment {
     }
     
     public String toString() {
-        String result = "PTextSegment[" + style + ",text=" + getText();
+        String result = "PTextSegment[" + super.toString();
         if (toolTip != null) {
             result += ",toolTip=" + toolTip;
         }
