@@ -362,8 +362,6 @@ public class ETextWindow extends EWindow implements PTextListener {
 
     public void addExternalToolMenuItems(final Collection<Action> items) {
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
-            private boolean needSeparator = true;
-            
             public void addItem(ExternalToolAction action) {
                 addAction(action);
             }
@@ -373,10 +371,6 @@ public class ETextWindow extends EWindow implements PTextListener {
             }
 
             private void addAction(ExternalToolAction action) {
-                if (needSeparator) {
-                    addSeparator();
-                    needSeparator = false;
-                }
                 /* Ignore ExternalToolActions that aren't context-sensitive. */
                 if (action.isContextSensitive() == false) {
                         return;
