@@ -2,6 +2,7 @@ package e.edit;
 
 import e.util.*;
 import java.io.*;
+import java.util.*;
 import javax.swing.*;
 
 public class ShellCommand {
@@ -10,11 +11,7 @@ public class ShellCommand {
     private String context;
     private String name;
     
-    private String[] envp;
-// the ProcessBuilder stuff is the right way to do things when we can
-// ditch 1.4.2 compatibility (probably not before "H1 2005", for Mac OS).
-//    private ProcessBuilder processBuilder;
-
+    private ProcessBuilder processBuilder;
     private Process process;
     
     /** The count of open streams. */
@@ -44,43 +41,18 @@ public class ShellCommand {
         init(filename, lineNumber);
     }
     
-//    public void init(String filename, int lineNumber) {
-//        processBuilder = new ProcessBuilder(makeCommandLine(command));
-//        processBuilder.directory(FileUtilities.fileFromString(context));
-//        processBuilder.environment().put("EDIT_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
-//        processBuilder.environment().put("EDIT_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(filename));
-//        processBuilder.environment().put("EDIT_CURRENT_LINE_NUMBER", Integer.toString(lineNumber));
-//        processBuilder.environment().put("EDIT_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(getWorkspace().getRootDirectory()));
-//    }
-
-    public void init(String filename, int lineNumber) {
-        envp = new String[] {
-            "EDIT_CURRENT_DIRECTORY=" + FileUtilities.parseUserFriendlyName(context),
-            "EDIT_CURRENT_FILENAME=" + FileUtilities.parseUserFriendlyName(filename),
-            "EDIT_CURRENT_LINE_NUMBER=" + lineNumber,
-            "EDIT_WORKSPACE_ROOT=" + FileUtilities.parseUserFriendlyName(getWorkspace().getRootDirectory()),
-            /* FIXME: we can do better when Java 1.5 is out. */
-            makePassThroughVariable("CVS_RSH"),
-            makePassThroughVariable("DISPLAY"),
-            makePassThroughVariable("HOME"),
-            makePassThroughVariable("JAVA_HOME"),
-            makePassThroughVariable("PATH")
-        };
-    }
-
-    public String makePassThroughVariable(String name) {
-        String value = System.getProperty("env." + name);
-        if (value == null) {
-            return "";
-        }
-        String result = name + "=" + value;
-        //System.err.println("made passthrough " + result);
-        return result;
+    private void init(String filename, int lineNumber) {
+        processBuilder = new ProcessBuilder(makeCommandLine(command));
+        processBuilder.directory(FileUtilities.fileFromString(context));
+        Map<String, String> environment = processBuilder.environment();
+        environment.put("EDIT_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
+        environment.put("EDIT_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(filename));
+        environment.put("EDIT_CURRENT_LINE_NUMBER", Integer.toString(lineNumber));
+        environment.put("EDIT_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(getWorkspace().getRootDirectory()));
     }
 
     public void runCommand() throws IOException {
-        process = Runtime.getRuntime().exec(makeCommandLine(command), envp, FileUtilities.fileFromString(context));
-//        process = processBuilder.start();
+        process = processBuilder.start();
 
         SwingUtilities.invokeLater(launchRunnable);
         
@@ -137,16 +109,17 @@ public class ShellCommand {
     }
     
     /**
-    * Returns the arguments to exec to invoke a command interpreter to run the given
-    * command. The details of this are obviously OS-specific. Under Windows, cmd.exe
-    * is used as a command interpreter. Under other operating systems, the SHELL
-    * environment variable is queried. If this isn't set, a default of /bin/sh is used.
-    */
-    public String[] makeCommandLine(String command) {
+     * Returns the arguments to exec to invoke a command interpreter to run the
+     * given command. The details of this are obviously OS-specific. Under
+     * Windows, cmd.exe is used as a command interpreter. Under other operating
+     * systems, the SHELL environment variable is queried. If this isn't set,
+     * a default of /bin/sh is used.
+     */
+    private String[] makeCommandLine(String command) {
         if (GuiUtilities.isWindows()) {
             return new String[] { "cmd", "/c", command };
         } else {
-            String shell = System.getProperty("env.SHELL");
+            String shell = System.getenv("SHELL");
             if (shell == null) {
                 shell = "/bin/sh";
             }
