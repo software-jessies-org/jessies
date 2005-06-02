@@ -7,6 +7,11 @@ import java.util.List;
 import javax.swing.*;
 import e.util.*;
 
+/**
+ * Attaches a pop-up menu to a Component. The menu is built by querying a
+ * collection of MenuItemProvider instances for menu items each time the menu
+ * needs to be shown.
+ */
 public class EPopupMenu {
     private ArrayList<MenuItemProvider> providers = new ArrayList<MenuItemProvider>();
     private Component componentWithMenu;
@@ -132,9 +137,24 @@ public class EPopupMenu {
     
     private void showPopupMenu(MouseEvent e) {
         List<Action> menuItems = new ArrayList<Action>();
+        
         for (MenuItemProvider provider : providers) {
-            provider.provideMenuItems(e, menuItems);
+            // Collect this provider's items.
+            List<Action> newItems = new ArrayList<Action>();
+            provider.provideMenuItems(e, newItems);
+            
+            // Did it have anything to add?
+            if (newItems.size() > 0) {
+                if (menuItems.size() > 0) {
+                    // Make sure we've got a separator between the last
+                    // provider's items and the new items.
+                    menuItems.add(null);
+                }
+                menuItems.addAll(newItems);
+            }
         }
+        
+        // Do we have anything worth showing?
         if (menuItems.size() > 0) {
             show(menuItems, (Component) e.getSource(), e.getX(), e.getY());
         }
