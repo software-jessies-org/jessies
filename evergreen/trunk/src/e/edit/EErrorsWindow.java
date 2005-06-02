@@ -111,6 +111,7 @@ public class EErrorsWindow extends EWindow {
     private class ClearRunnable implements Runnable {
         public void run() {
             textArea.setText("");
+            textArea.getTextBuffer().getUndoBuffer().resetUndoBuffer();
             resetAutoScroll();
         }
     }
@@ -151,7 +152,7 @@ public class EErrorsWindow extends EWindow {
             super("Clear");
         }
         public void actionPerformed(ActionEvent e) {
-            textArea.setText("");
+            clear();
         }
     }
     
