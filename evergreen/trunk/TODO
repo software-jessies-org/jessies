@@ -187,10 +187,6 @@ auto-saving
     Canonicalization of filenames has provided a certainly adequate
     and probably superior solution to that part of the problem.
 
-[ ] Something like iCal's/Outlook's to-do list. Keep a pair of files at
-    the root of a workspace: TODO and TODONE, say. Complete a task and
-    (when you quit? after a fixed interval?) it moves to TODONE.
-
 [ ] The code for correcting indentation could be smarter. It doesn't do
     well with any of the things mentioned below.
     
