@@ -15,6 +15,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         add(makeEditMenu());
         add(makeFindMenu());
         add(makeViewMenu());
+        add(makeScmMenu());
         add(makeWorkspaceMenu());
         add(makeToolsMenu());
     }
@@ -123,10 +124,6 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(new JSeparator());
         menu.add(new KillErrorsAction());
         
-        menu.add(new JSeparator());
-        menu.add(new CheckInChangesAction());
-        menu.add(new ShowHistoryAction());
-
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
             public void addItem(ExternalToolAction action) {
                 menu.add(action);
@@ -143,7 +140,14 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         toolsParser.parse();
         return menu;
     }
-
+    
+    public JMenu makeScmMenu() {
+        JMenu menu = new JMenu("SCM");
+        menu.add(new CheckInChangesAction());
+        menu.add(new ShowHistoryAction());
+        return menu;
+    }
+    
     public JMenu makeWorkspaceMenu() {
         JMenu menu = new JMenu("Workspace");
         menu.add(new AddWorkspaceAction());
