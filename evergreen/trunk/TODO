@@ -86,12 +86,6 @@ let us always show the user-friendly forms.
     This only applies the first time the dialog is opened. Thereafter, it should
     re-appear where it was when it was closed.
 
-[ ] find out (using jdb?) where the OutOfMemoryException is thrown if
-    you load a huge file, and plug the leak. then we could optimistically
-    try to load huge files and fail gracefully. (catching the exception in
-    the right place, we could also present an appropriate error to the
-    user.)
-
 auto-saving
 
     [ ] Store divider position on quit. Restore on start.
