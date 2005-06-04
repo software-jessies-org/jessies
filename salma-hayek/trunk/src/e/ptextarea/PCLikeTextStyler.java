@@ -17,11 +17,14 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     private HashSet<String> keywords = new HashSet<String>();
     private int lastGoodLine;
     private BitSet commentCache;
-    private Pattern keywordPattern = Pattern.compile("\\b\\w+\\b");
+    private List<StyleApplicator> styleApplicators = new ArrayList<StyleApplicator>();
     
     public PCLikeTextStyler(PTextArea textArea) {
         super(textArea);
         addKeywordsTo(keywords);
+        if (keywords.size() > 0) {
+            styleApplicators.add(new KeywordStyleApplicator(textArea, keywords));
+        }
         initCommentCache();
         textArea.getTextBuffer().addTextListener(this);
         textArea.setTextStyler(this);
@@ -54,41 +57,18 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     public PTextSegment[] getTextSegments(int lineIndex) {
         String line = textArea.getLineContents(lineIndex).toString();
         List<PTextSegment> result = getMainSegments(lineIndex, line);
-        if (keywords.size() > 0) {
-            List<PTextSegment> mainSegments = result;
+        for (StyleApplicator styleApplicator : styleApplicators) {
+            List<PTextSegment> inputSegments = result;
             result = new ArrayList<PTextSegment>();
-            for (int i = 0; i < mainSegments.size(); i++) {
-                PTextSegment mainSegment = mainSegments.get(i);
-                if (mainSegment.getStyle() == PStyle.NORMAL) {
-                    result.addAll(getKeywordAddedSegments(mainSegment));
+            for (PTextSegment segment : inputSegments) {
+                if (segment.getStyle() == PStyle.NORMAL) {
+                    result.addAll(styleApplicator.applyStylingTo(segment));
                 } else {
-                    result.add(mainSegment);
+                    result.add(segment);
                 }
             }
         }
         return result.toArray(new PTextSegment[result.size()]);
-    }
-    
-    private List<PTextSegment> getKeywordAddedSegments(PTextSegment segment) {
-        ArrayList<PTextSegment> result = new ArrayList<PTextSegment>();
-        String text = segment.getText();
-        Matcher matcher = keywordPattern.matcher(text);
-        int normalStart = 0;
-        int offset = segment.getOffset();
-        while (matcher.find()) {
-            String keyword = matcher.group();
-            if (keywords.contains(keyword)) {
-                if (matcher.start() > normalStart) {
-                    result.add((PTextSegment) segment.subSegment(normalStart, matcher.start()));
-                }
-                result.add(new PTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), PStyle.KEYWORD));
-                normalStart = matcher.end();
-            }
-        }
-        if (segment.getText().length() > normalStart) {
-            result.add((PTextSegment) segment.subSegment(normalStart));
-        }
-        return result;
     }
     
     private List<PTextSegment> getMainSegments(int lineIndex, String line) {
