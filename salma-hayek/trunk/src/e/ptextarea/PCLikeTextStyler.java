@@ -23,11 +23,15 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         super(textArea);
         addKeywordsTo(keywords);
         if (keywords.size() > 0) {
-            styleApplicators.add(new KeywordStyleApplicator(textArea, keywords));
+            addStyleApplicator(new KeywordStyleApplicator(textArea, keywords));
         }
         initCommentCache();
         textArea.getTextBuffer().addTextListener(this);
         textArea.setTextStyler(this);
+    }
+    
+    protected void addStyleApplicator(StyleApplicator styleApplicator) {
+        styleApplicators.add(styleApplicator);
     }
     
     /**

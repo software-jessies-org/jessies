@@ -12,6 +12,7 @@ public enum PStyle {
     KEYWORD("keyword", Color.decode("#770022")),
     ERROR("error", Color.RED),
     HYPERLINK("hyperlink", Color.BLUE),
+    PREPROCESSOR("preprocessor", Color.decode("#708090")),
     ;
     
     private String name;

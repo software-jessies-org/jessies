@@ -10,8 +10,6 @@ Items to be done for PTextArea:
 
 * Continue refactoring of line segment stuff in PTextArea.
 
-* Style C/C++ pre-processor tokens specially.
-
 * Auto-scroll on selection (all types) flickers more than I think it should when there's a wrapped line.
 
 * the following JTextArea methods are thread-safe: append, insert, replace, and setText.
