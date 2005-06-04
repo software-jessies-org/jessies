@@ -76,28 +76,20 @@ public class ExternalToolAction extends ETextAction {
             }
         }
         
-        // Set defaults.
-        String filename = "";
-        int lineNumber = 0;
-        Workspace workspace = Edit.getCurrentWorkspace();
-        String context = workspace.getRootDirectory();
-        
-        // Override them if we have a focused text window.
+        ShellCommand shellCommand = new ShellCommand(commandPattern);
         if (textWindow != null) {
-            filename = textWindow.getFilename();
-            lineNumber = textWindow.getCurrentLineNumber();
-            workspace = textWindow.getWorkspace();
-            context = textWindow.getContext();
-        }
-        
-        ShellCommand shellCommand = new ShellCommand(filename, lineNumber, workspace, context, commandPattern);
-        if (textWindow != null) {
+            shellCommand.setFilename(textWindow.getFilename());
+            shellCommand.setLineNumber(textWindow.getCurrentLineNumber());
+            shellCommand.setWorkspace(textWindow.getWorkspace());
+            shellCommand.setContext(textWindow.getContext());
             shellCommand.setCompletionRunnable(new Runnable() {
                 public void run() {
                     textWindow.updateWatermark();
                     textWindow.repaint();
                 }
             });
+        } else {
+            shellCommand.setContext(shellCommand.getWorkspace().getRootDirectory());
         }
         runCommand(shellCommand);
     }
