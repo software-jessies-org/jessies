@@ -89,7 +89,7 @@ public class PCPPTextStyler extends PCLikeTextStyler {
     
     public PCPPTextStyler(PTextArea textArea) {
         super(textArea);
-        addStyleApplicator(new PreprocessorStyleApplicator(textArea, false));
+        textArea.addStyleApplicator(new PreprocessorStyleApplicator(textArea, false));
     }
     
     public boolean supportShellComments() {

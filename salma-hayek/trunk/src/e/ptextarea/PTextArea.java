@@ -41,6 +41,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private ArrayList<PHighlight> highlights = new ArrayList<PHighlight>();
     private PTextStyler textStyler = new PPlainTextStyler(this);
+    private List<StyleApplicator> styleApplicators = new ArrayList<StyleApplicator>();
+    
     private int rightHandMarginColumn = NO_MARGIN;
     private ArrayList<PCaretListener> caretListeners = new ArrayList<PCaretListener>();
     
@@ -159,6 +161,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public PTextStyler getTextStyler() {
         return textStyler;
+    }
+    
+    public void addStyleApplicator(StyleApplicator styleApplicator) {
+        styleApplicators.add(styleApplicator);
     }
     
     // Selection methods.
@@ -638,7 +644,27 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public PLineSegment[] getLineSegments(int lineIndex) {
-        return getTabbedSegments(textStyler.getTextSegments(lineIndex));
+        // Let the styler have the first go.
+        PTextSegment[] textSegments = textStyler.getTextSegments(lineIndex);
+        
+        // Then let the style applicators add their finishing touches.
+        List<PTextSegment> result = Arrays.asList(textSegments);
+        String line = getLineContents(lineIndex).toString();
+        for (StyleApplicator styleApplicator : styleApplicators) {
+            EnumSet<PStyle> applicableStyles = styleApplicator.getSourceStyles();
+            List<PTextSegment> inputSegments = result;
+            result = new ArrayList<PTextSegment>();
+            for (PTextSegment segment : inputSegments) {
+                if (applicableStyles.contains(segment.getStyle())) {
+                    result.addAll(styleApplicator.applyStylingTo(line, segment));
+                } else {
+                    result.add(segment);
+                }
+            }
+        }
+        
+        // Finally, deal with tabs.
+        return getTabbedSegments(result.toArray(new PTextSegment[result.size()]));
     }
     
     private PLineSegment[] getTabbedSegments(PLineSegment[] segments) {

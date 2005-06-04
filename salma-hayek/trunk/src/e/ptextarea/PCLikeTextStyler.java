@@ -17,21 +17,16 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     private HashSet<String> keywords = new HashSet<String>();
     private int lastGoodLine;
     private BitSet commentCache;
-    private List<StyleApplicator> styleApplicators = new ArrayList<StyleApplicator>();
     
     public PCLikeTextStyler(PTextArea textArea) {
         super(textArea);
         addKeywordsTo(keywords);
         if (keywords.size() > 0) {
-            addStyleApplicator(new KeywordStyleApplicator(textArea, keywords));
+            textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords));
         }
         initCommentCache();
         textArea.getTextBuffer().addTextListener(this);
         textArea.setTextStyler(this);
-    }
-    
-    protected void addStyleApplicator(StyleApplicator styleApplicator) {
-        styleApplicators.add(styleApplicator);
     }
     
     /**
@@ -61,18 +56,6 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     public PTextSegment[] getTextSegments(int lineIndex) {
         String line = textArea.getLineContents(lineIndex).toString();
         List<PTextSegment> result = getMainSegments(lineIndex, line);
-        for (StyleApplicator styleApplicator : styleApplicators) {
-            EnumSet<PStyle> applicableStyles = styleApplicator.getSourceStyles();
-            List<PTextSegment> inputSegments = result;
-            result = new ArrayList<PTextSegment>();
-            for (PTextSegment segment : inputSegments) {
-                if (applicableStyles.contains(segment.getStyle())) {
-                    result.addAll(styleApplicator.applyStylingTo(line, segment));
-                } else {
-                    result.add(segment);
-                }
-            }
-        }
         return result.toArray(new PTextSegment[result.size()]);
     }
     
