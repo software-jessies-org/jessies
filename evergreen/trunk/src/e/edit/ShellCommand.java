@@ -25,7 +25,7 @@ public class ShellCommand {
      * new task in the system's temporary directory (probably /tmp on Unix).
      * There will be no progress feedback from Edit.
      */
-    public ShellCommand(String command) throws IOException {
+    public ShellCommand(String command) {
         this("", 0, Edit.getCurrentWorkspace(), System.getProperty("java.io.tmpdir"), command);
     }
     
@@ -37,7 +37,7 @@ public class ShellCommand {
     public ShellCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
         this.filename = filename;
         this.lineNumber = lineNumber;
-        this.workspace = workspace;
+        setWorkspace(workspace);
         setContext(context);
         setCommand(command);
         /* FIXME: we also need to mangle UTF-8. for each byte, we need to have the 'character' corresponding to the byte. the JVM 'translates' non-ASCII characters by just sending the first byte, it seems. */
@@ -135,6 +135,18 @@ public class ShellCommand {
     
     public Workspace getWorkspace() {
         return workspace;
+    }
+    
+    public void setWorkspace(Workspace newWorkspace) {
+        this.workspace = newWorkspace;
+    }
+    
+    public void setLineNumber(int newLineNumber) {
+        this.lineNumber = newLineNumber;
+    }
+    
+    public void setFilename(String newFilename) {
+        this.filename = newFilename;
     }
     
     /** Returns the context for this task. */
