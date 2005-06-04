@@ -28,7 +28,12 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
                 if (matcher.start() > normalStart) {
                     result.add((PTextSegment) segment.subSegment(normalStart, matcher.start()));
                 }
-                result.add(new PTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style));
+                // FIXME: underlining should be a PStyle attribute.
+                if (style != PStyle.HYPERLINK) {
+                    result.add(new PTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style));
+                } else {
+                    result.add(new PUnderlinedTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style));
+                }
                 normalStart = matcher.end();
             }
         }
