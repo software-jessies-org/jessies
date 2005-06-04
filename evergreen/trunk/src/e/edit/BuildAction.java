@@ -69,7 +69,9 @@ public class BuildAction extends ETextAction {
         String makefileDirectoryName = makefileName.substring(0, makefileName.lastIndexOf(File.separatorChar));
         command = addTarget(workspace, command);
         try {
-            final ShellCommand shellCommand = new ShellCommand("", 0, workspace, makefileDirectoryName, command);
+            final ShellCommand shellCommand = new ShellCommand(command);
+            shellCommand.setWorkspace(workspace);
+            shellCommand.setContext(makefileDirectoryName);
             shellCommand.setLaunchRunnable(new Runnable() {
                 public void run() {
                     building = true;
