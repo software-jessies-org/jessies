@@ -10,4 +10,10 @@ public interface StyleApplicator {
      * NORMAL style.
      */
     public List<PTextSegment> applyStylingTo(String line, PTextSegment normalSegment);
+    
+    /**
+     * Returns the styles this style applicator works on. applyStylingTo will
+     * only be passed text segments with one of these styles.
+     */
+    public EnumSet<PStyle> getSourceStyles();
 }

@@ -7,6 +7,7 @@ import java.util.regex.*;
  * Styles any chunk of text matching a regular expression. 
  */
 public class RegularExpressionStyleApplicator implements StyleApplicator {
+    private static final EnumSet<PStyle> SOURCE_STYLES = EnumSet.of(PStyle.NORMAL);
     private PTextArea textArea;
     private Pattern pattern;
     private PStyle style;
@@ -46,5 +47,9 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
      */
     public boolean isAcceptableMatch(CharSequence line, Matcher matcher) {
         return true;
+    }
+    
+    public EnumSet<PStyle> getSourceStyles() {
+        return SOURCE_STYLES;
     }
 }
