@@ -76,62 +76,65 @@ public class ExternalToolAction extends ETextAction {
             }
         }
         
+        // Set defaults.
+        String filename = "";
+        int lineNumber = 0;
+        Workspace workspace = Edit.getCurrentWorkspace();
+        String context = workspace.getRootDirectory();
+        
+        // Override them if we have a focused text window.
         if (textWindow != null) {
-            ShellCommand shellCommand = runCommand(textWindow.getFilename(), textWindow.getCurrentLineNumber(), textWindow.getWorkspace(), textWindow.getContext());
-            if (shellCommand != null) {
-                shellCommand.setCompletionRunnable(new Runnable() {
-                    public void run() {
-                        textWindow.updateWatermark();
-                        textWindow.repaint();
-                    }
-                });
-            }
-        } else {
-            Workspace workspace = Edit.getCurrentWorkspace();
-            runCommand("", 0, workspace, workspace.getRootDirectory());
+            filename = textWindow.getFilename();
+            lineNumber = textWindow.getCurrentLineNumber();
+            workspace = textWindow.getWorkspace();
+            context = textWindow.getContext();
         }
+        
+        ShellCommand shellCommand = new ShellCommand(filename, lineNumber, workspace, context, commandPattern);
+        if (textWindow != null) {
+            shellCommand.setCompletionRunnable(new Runnable() {
+                public void run() {
+                    textWindow.updateWatermark();
+                    textWindow.repaint();
+                }
+            });
+        }
+        runCommand(shellCommand);
     }
 
     public boolean isContextSensitive() {
         return commandPattern.contains("EDIT_");
     }
 
-    public ShellCommand runCommand(String filename, int lineNumber, Workspace workspace, String context) {
-        String command = commandPattern;
+    private void runCommand(ShellCommand shellCommand) {
         if (requestConfirmation) {
-            return confirmRunCommand(filename, lineNumber, workspace, context, command);
+            confirmRunCommand(shellCommand);
         } else {
-            return safeRunCommand(filename, lineNumber, workspace, context, command);
+            safeRunCommand(shellCommand);
         }
     }
 
-    public ShellCommand confirmRunCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
+    private void confirmRunCommand(ShellCommand shellCommand) {
         if (commandField == null) {
-            commandField = new JTextField(command, 40);
-            contextField = new JTextField(context, 40);
+            commandField = new JTextField(shellCommand.getCommand(), 40);
+            contextField = new JTextField(shellCommand.getContext(), 40);
         }
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Command:", commandField);
         formPanel.addRow("Directory:", contextField);
         boolean shouldRun = FormDialog.show(Edit.getFrame(), (String) getValue(Action.NAME), formPanel, "Run");
-        command = commandField.getText();
-        context = contextField.getText();
-
         if (shouldRun) {
-            return safeRunCommand(filename, lineNumber, workspace, context, command);
-        } else {
-            return null;
+            shellCommand.setCommand(commandField.getText());
+            shellCommand.setContext(contextField.getText());
+            safeRunCommand(shellCommand);
         }
     }
 
-    public ShellCommand safeRunCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
+    private void safeRunCommand(ShellCommand shellCommand) {
         try {
-            ShellCommand shellCommand = new ShellCommand(filename, lineNumber, workspace, context, command);
             shellCommand.runCommand();
-            return shellCommand;
         } catch (IOException ex) {
-            Edit.showAlert(context, "Can't start task (" + ex.getMessage() + ").");
+            Edit.showAlert(shellCommand.getContext(), "Can't start task (" + ex.getMessage() + ").");
         }
-        return null;
     }
 }

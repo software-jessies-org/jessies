@@ -6,12 +6,12 @@ import java.util.*;
 import javax.swing.*;
 
 public class ShellCommand {
+    private String filename;
+    private int lineNumber;
     private Workspace workspace;
     private String command;
     private String context;
-    private String name;
     
-    private ProcessBuilder processBuilder;
     private Process process;
     
     /** The count of open streams. */
@@ -21,38 +21,41 @@ public class ShellCommand {
     private Runnable completionRunnable = new NoOpRunnable();
     
     /**
-     * Starts a new task with no progress feedback in the system's temporary
-     * directory (probably /tmp on Unix).
+     * Creates a ShellCommand that, when runCommand is invoked, will start a
+     * new task in the system's temporary directory (probably /tmp on Unix).
+     * There will be no progress feedback from Edit.
      */
     public ShellCommand(String command) throws IOException {
         this("", 0, Edit.getCurrentWorkspace(), System.getProperty("java.io.tmpdir"), command);
     }
     
-    /** Starts a new task. */
-    public ShellCommand(String filename, int lineNumber, Workspace workspace, String context, String command) throws IOException {
-        this.command = command.trim();
-
-        /* FIXME: we also need to mangle UTF-8. for each byte, we need to have the 'character' corresponding to the byte. the JVM 'translates' non-ASCII characters by just sending the first byte, it seems. */
-        
+    /**
+     * Creates a ShellCommand that won't be run until runCommand is invoked.
+     * Until that time, you're at liberty to change any of the command's
+     * properties through the relevant accessor methods.
+     */
+    public ShellCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
+        this.filename = filename;
+        this.lineNumber = lineNumber;
         this.workspace = workspace;
-        this.context = context;
-        this.name = command;
-
-        init(filename, lineNumber);
+        setContext(context);
+        setCommand(command);
+        /* FIXME: we also need to mangle UTF-8. for each byte, we need to have the 'character' corresponding to the byte. the JVM 'translates' non-ASCII characters by just sending the first byte, it seems. */
     }
     
-    private void init(String filename, int lineNumber) {
-        processBuilder = new ProcessBuilder(makeCommandLine(command));
+    private ProcessBuilder makeProcessBuilder() {
+        ProcessBuilder processBuilder = new ProcessBuilder(makeCommandLine(command));
         processBuilder.directory(FileUtilities.fileFromString(context));
         Map<String, String> environment = processBuilder.environment();
         environment.put("EDIT_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
         environment.put("EDIT_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(filename));
         environment.put("EDIT_CURRENT_LINE_NUMBER", Integer.toString(lineNumber));
         environment.put("EDIT_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(getWorkspace().getRootDirectory()));
+        return processBuilder;
     }
 
     public void runCommand() throws IOException {
-        process = processBuilder.start();
+        process = makeProcessBuilder().start();
 
         SwingUtilities.invokeLater(launchRunnable);
         
@@ -81,15 +84,18 @@ public class ShellCommand {
         streamMonitor.start();
     }
     
-    /** Invoked by StreamMonitor when one of this task's streams is opened. */
+    /**
+     * Invoked by StreamMonitor when one of this task's streams is opened.
+     */
     public synchronized void streamOpened() {
-        openStreamCount++;
+        ++openStreamCount;
     }
     
     /**
-    * Invoked by StreamMonitor when one of this task's streams is closed. If there are no
-    * streams left open, this task has finished and Edit is notified.
-    */
+     * Invoked by StreamMonitor when one of this task's streams is closed. If
+     * there are no streams left open, this task has finished and the
+     * completion runnable is run on the event dispatch thread.
+     */
     public synchronized void streamClosed() {
         openStreamCount--;
         if (openStreamCount == 0) {
@@ -136,9 +142,16 @@ public class ShellCommand {
         return this.context;
     }
     
-    /** Returns the name of this task. Currently this is the whole text of the command. */
-    public String getName() {
-        return this.name;
+    public void setContext(String newContext) {
+        this.context = newContext;
+    }
+    
+    public String getCommand() {
+        return this.command;
+    }
+    
+    public void setCommand(String newCommand) {
+        this.command = newCommand.trim();
     }
     
     /**
