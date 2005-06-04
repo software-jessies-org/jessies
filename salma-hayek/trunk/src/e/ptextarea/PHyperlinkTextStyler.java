@@ -21,7 +21,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
     
     public PTextSegment[] getTextSegments(int lineIndex) {
         ArrayList<PTextSegment> result = new ArrayList<PTextSegment>();
-        String line = textArea.getLineContents(lineIndex).toString();
+        CharSequence line = textArea.getLineContents(lineIndex);
         int lineStart = textArea.getLineStartOffset(lineIndex);
         Matcher matcher = highlightPattern.matcher(line);
         int lastStart = 0;

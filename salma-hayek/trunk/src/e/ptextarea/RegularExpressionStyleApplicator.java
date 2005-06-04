@@ -17,13 +17,13 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
         this.style = style;
     }
     
-    public List<PTextSegment> applyStylingTo(PTextSegment segment) {
+    public List<PTextSegment> applyStylingTo(String line, PTextSegment segment) {
         ArrayList<PTextSegment> result = new ArrayList<PTextSegment>();
         Matcher matcher = pattern.matcher(segment.getCharSequence());
         int normalStart = 0;
         int offset = segment.getOffset();
         while (matcher.find()) {
-            if (isGoodMatch(matcher)) {
+            if (isAcceptableMatch(line, matcher)) {
                 if (matcher.start() > normalStart) {
                     result.add((PTextSegment) segment.subSegment(normalStart, matcher.start()));
                 }
@@ -44,7 +44,7 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
      * a keyword here. That works around Java 1.5 performance problems with
      * regular expressions that are long sequences like "a|b|...|y|z".
      */
-    public boolean isGoodMatch(Matcher matcher) {
+    public boolean isAcceptableMatch(CharSequence line, Matcher matcher) {
         return true;
     }
 }

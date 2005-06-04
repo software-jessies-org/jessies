@@ -66,7 +66,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
             result = new ArrayList<PTextSegment>();
             for (PTextSegment segment : inputSegments) {
                 if (segment.getStyle() == PStyle.NORMAL) {
-                    result.addAll(styleApplicator.applyStylingTo(segment));
+                    result.addAll(styleApplicator.applyStylingTo(line, segment));
                 } else {
                     result.add(segment);
                 }

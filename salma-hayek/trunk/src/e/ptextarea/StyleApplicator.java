@@ -9,5 +9,5 @@ public interface StyleApplicator {
      * keyword styler to return segments of KEYWORD style within runs of
      * NORMAL style.
      */
-    public List<PTextSegment> applyStylingTo(PTextSegment normalSegment);
+    public List<PTextSegment> applyStylingTo(String line, PTextSegment normalSegment);
 }

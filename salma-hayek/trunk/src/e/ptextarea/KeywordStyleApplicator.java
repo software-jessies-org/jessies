@@ -15,7 +15,7 @@ public class KeywordStyleApplicator extends RegularExpressionStyleApplicator {
     }
     
     @Override
-    public boolean isGoodMatch(Matcher matcher) {
+    public boolean isAcceptableMatch(CharSequence line, Matcher matcher) {
         return keywords.contains(matcher.group());
     }
 }
