@@ -53,10 +53,9 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         commentCache = new BitSet();
     }
     
-    public PTextSegment[] getTextSegments(int lineIndex) {
+    public List<PTextSegment> getTextSegments(int lineIndex) {
         String line = textArea.getLineContents(lineIndex).toString();
-        List<PTextSegment> result = getMainSegments(lineIndex, line);
-        return result.toArray(new PTextSegment[result.size()]);
+        return getMainSegments(lineIndex, line);
     }
     
     private List<PTextSegment> getMainSegments(int lineIndex, String line) {

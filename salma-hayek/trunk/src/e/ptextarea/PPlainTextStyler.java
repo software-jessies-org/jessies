@@ -2,6 +2,7 @@ package e.ptextarea;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * A trivial styler for plain text, which colors all text black.
@@ -13,12 +14,12 @@ public class PPlainTextStyler extends PAbstractTextStyler {
         super(textArea);
     }
 
-    public PTextSegment[] getTextSegments(int line) {
+    public List<PTextSegment> getTextSegments(int line) {
         int start = textArea.getLineStartOffset(line);
         int end = textArea.getLineEndOffsetBeforeTerminator(line);
-        return new PTextSegment[] {
-            new PTextSegment(textArea, start, end, PStyle.NORMAL)
-        };
+        List<PTextSegment> result = new ArrayList<PTextSegment>();
+        result.add(new PTextSegment(textArea, start, end, PStyle.NORMAL));
+        return result;
     }
 
     public Color getColorForStyle(int style) {

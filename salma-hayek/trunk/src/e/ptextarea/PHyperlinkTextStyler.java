@@ -1,9 +1,9 @@
 package e.ptextarea;
 
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.*;
 
 /**
@@ -19,7 +19,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         this.highlightPattern = Pattern.compile(highlightPattern);
     }
     
-    public PTextSegment[] getTextSegments(int lineIndex) {
+    public List<PTextSegment> getTextSegments(int lineIndex) {
         ArrayList<PTextSegment> result = new ArrayList<PTextSegment>();
         CharSequence line = textArea.getLineContents(lineIndex);
         int lineStart = textArea.getLineStartOffset(lineIndex);
@@ -35,7 +35,7 @@ public abstract class PHyperlinkTextStyler extends PAbstractTextStyler {
         if (lastStart < line.length()) {
             result.add(new PTextSegment(textArea, lineStart + lastStart, lineStart + line.length(), PStyle.NORMAL));
         }
-        return result.toArray(new PTextSegment[result.size()]);
+        return result;
     }
     
     /**

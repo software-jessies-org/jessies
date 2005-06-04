@@ -645,10 +645,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public PLineSegment[] getLineSegments(int lineIndex) {
         // Let the styler have the first go.
-        PTextSegment[] textSegments = textStyler.getTextSegments(lineIndex);
+        List<PTextSegment> result = textStyler.getTextSegments(lineIndex);
         
         // Then let the style applicators add their finishing touches.
-        List<PTextSegment> result = Arrays.asList(textSegments);
         String line = getLineContents(lineIndex).toString();
         for (StyleApplicator styleApplicator : styleApplicators) {
             EnumSet<PStyle> applicableStyles = styleApplicator.getSourceStyles();
@@ -664,10 +663,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
         
         // Finally, deal with tabs.
-        return getTabbedSegments(result.toArray(new PTextSegment[result.size()]));
+        return getTabbedSegments(result);
     }
     
-    private PLineSegment[] getTabbedSegments(PLineSegment[] segments) {
+    private PLineSegment[] getTabbedSegments(List<PTextSegment> segments) {
         ArrayList<PLineSegment> result = new ArrayList<PLineSegment>();
         for (PLineSegment segment : segments) {
             addTabbedSegments(segment, result);

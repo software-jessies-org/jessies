@@ -3,6 +3,7 @@ package e.ptextarea;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * A PTextStyler is a thing which knows how to apply styles to lines of text.  This is used for
@@ -15,7 +16,7 @@ public interface PTextStyler {
      * Returns a series of segments of text describing how to render each part of the
      * specified logical line.
      */
-    public PTextSegment[] getTextSegments(int lineIndex);
+    public List<PTextSegment> getTextSegments(int lineIndex);
     
     /**
      * Optionally handles the given mouse click event.  This is called when a single click occurs on
