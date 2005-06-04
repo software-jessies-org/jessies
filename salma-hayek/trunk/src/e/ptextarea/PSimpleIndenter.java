@@ -123,7 +123,7 @@ public abstract class PSimpleIndenter extends PIndenter {
                 // Whatever the previous line looks like, if it ends with
                 // a close of comment, we're not in a comment, and should
                 // do nothing.
-            } else if (previousLine.matches("/\\*{1,2}") || previousLine.startsWith("*")) {
+            } else if (previousLine.matches("/\\*{1,2}") || previousLine.startsWith("* ") || previousLine.equals("*")) {
                 // We're in a doc comment.
                 if (activePartOfLine.startsWith("*/")) {
                     // We already have the JavaDoc ASCII art, and just need to
