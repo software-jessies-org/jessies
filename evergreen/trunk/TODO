@@ -259,9 +259,6 @@ auto-saving
 
 [ ] wily-style access to |, > and < commands?
 
-    (3) use ShellCommand as a container for its arguments and delay invocation until an explicit method call.
-        That would remove all the duplication of parameter lists from ExternalToolAction.
-
 [ ] Handle out-of-date files better
 
     If we kept a copy of the file's contents last time we knew we were clean, we could also provide diffs to the common ancestor.  Experience merging changes with BitKeeper shows that this isn't often useful but it's sometimes very useful.
