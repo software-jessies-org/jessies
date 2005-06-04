@@ -23,24 +23,15 @@ public class ShellCommand {
     /**
      * Creates a ShellCommand that, when runCommand is invoked, will start a
      * new task in the system's temporary directory (probably /tmp on Unix).
-     * There will be no progress feedback from Edit.
+     * Until you invoke runCommand, you're at liberty to change any of the
+     * command's properties through the relevant accessor methods.
      */
     public ShellCommand(String command) {
-        this("", 0, Edit.getCurrentWorkspace(), System.getProperty("java.io.tmpdir"), command);
-    }
-    
-    /**
-     * Creates a ShellCommand that won't be run until runCommand is invoked.
-     * Until that time, you're at liberty to change any of the command's
-     * properties through the relevant accessor methods.
-     */
-    public ShellCommand(String filename, int lineNumber, Workspace workspace, String context, String command) {
-        this.filename = filename;
-        this.lineNumber = lineNumber;
-        setWorkspace(workspace);
-        setContext(context);
         setCommand(command);
-        /* FIXME: we also need to mangle UTF-8. for each byte, we need to have the 'character' corresponding to the byte. the JVM 'translates' non-ASCII characters by just sending the first byte, it seems. */
+        setFilename("");
+        setLineNumber(0);
+        setWorkspace(Edit.getCurrentWorkspace());
+        setContext(System.getProperty("java.io.tmpdir"));
     }
     
     private ProcessBuilder makeProcessBuilder() {
