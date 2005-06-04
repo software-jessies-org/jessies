@@ -5,7 +5,7 @@ import java.util.regex.*;
 
 public abstract class PIndenter {
     protected PTextArea textArea;
-    private Pattern indentationPattern = Pattern.compile("(^[ \\t]*(?:\\* )?).*$");
+    private Pattern indentationPattern = Pattern.compile("(^[ \\t]*(?:\\*(?: |$))?).*$");
     
     public PIndenter(PTextArea textArea) {
         this.textArea = textArea;
