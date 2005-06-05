@@ -1,22 +1,12 @@
 #!/usr/bin/ruby -w
 
-begin
-  require 'fileutils.rb'
-  have_fileutils = true
-rescue LoadError
-  have_fileutils = false
-end
-begin
-  require 'pathname.rb'
-  have_pathname = true
-  # Cope with symbolic links to this script.
-  edit_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
-  salma_hayek = Pathname.new("#{edit_home}/../salma-hayek").realpath()
-rescue LoadError
-  edit_bin = `dirname #{__FILE__}`.chomp()
-  edit_home = "#{edit_bin}/.."
-  salma_hayek = "#{edit_home}/../salma-hayek"
-end
+require 'fileutils.rb'
+require 'pathname.rb'
+
+# Cope with symbolic links to this script.
+edit_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
+salma_hayek = Pathname.new("#{edit_home}/../salma-hayek").realpath()
+
 ENV["EDIT_HOME"] = edit_home
 
 edit_class_name = "e.edit.Edit"
@@ -24,6 +14,11 @@ HOME = ENV["HOME"]
 UNAME=`uname`.chomp()
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
 classpath_entries = [ "#{edit_home}/classes", "#{salma_hayek}/classes" ]
+
+scm_home = Pathname.new("#{edit_home}/../scm").realpath()
+if FileTest.directory?(scm_home)
+  classpath_entries << "#{scm_home}/classes"
+end
 
 def openFileOnEditServer(edit_preferences_directory, filename)
   begin
@@ -61,13 +56,9 @@ if FileTest.directory?(edit_preferences_directory) == false
     puts("Edit: Couldn't find preferences directory '#{edit_preferences_directory}.")
     puts("Edit: Creating preferences directory '#{edit_preferences_directory}'.")
     Dir.mkdir(edit_preferences_directory)
-    if have_fileutils
-      puts("Edit: Copying default preferences.")
-      FileUtils.cp("#{edit_home}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
-      puts("Edit: Away you go!")
-    else
-      puts("Edit: need Ruby 1.8")
-    end
+    puts("Edit: Copying default preferences.")
+    FileUtils.cp("#{edit_home}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
+    puts("Edit: Away you go!")
 end
 
 filename = ARGV[0]
@@ -78,9 +69,7 @@ end
 # Create a log file, and link to it as the newest.
 # Symbolically linking to a file which doesn't exist yet is perfectly legal.
 log_filename = "/tmp/edit.log.#$$"
-if have_fileutils
-  FileUtils.ln_sf(log_filename, "/tmp/edit.log")
-end
+FileUtils.ln_sf(log_filename, "/tmp/edit.log")
 
 def cygpath(filenameOrPath)
   if UNAME != "CYGWIN_NT-5.0"
