@@ -27,12 +27,12 @@ public class EErrorsWindow extends EWindow {
         textArea.setFont(ChangeFontAction.getConfiguredFixedFont());
         // But no margin, because all the text should be machine-generated.
         textArea.showRightHandMarginAt(PTextArea.NO_MARGIN);
-        textArea.setTextStyler(new ErrorLinkStyler(textArea));
+        textArea.addStyleApplicator(new ErrorLinkStyler(textArea));
         textArea.setWrapStyleWord(true);
         initTextAreaPopupMenu();
     }
 
-    private static class ErrorLinkStyler extends PHyperlinkTextStyler {
+    private static class ErrorLinkStyler extends RegularExpressionStyleApplicator {
         /**
          * Matches addresses (such as "filename.ext:line:col:line:col").
          * 
@@ -47,13 +47,15 @@ public class EErrorsWindow extends EWindow {
         private File currentDirectory;
         
         public ErrorLinkStyler(PTextArea textArea) {
-            super(textArea, ADDRESS_PATTERN);
+            super(textArea, ADDRESS_PATTERN, PStyle.HYPERLINK);
         }
         
-        public void hyperlinkClicked(CharSequence hyperlinkText, Matcher matcher) {
-            Edit.openFile(hyperlinkText.toString());
+        @Override
+        protected void configureSegment(PTextSegment segment, Matcher matcher) {
+            segment.setLinkAction(new ErrorLinkActionListener(matcher.group(1)));
         }
         
+        @Override
         public boolean isAcceptableMatch(CharSequence line, Matcher address) {
             Matcher directoryChangeMatcher = MAKE_DIRECTORY_CHANGE.matcher(line);
             if (directoryChangeMatcher.find()) {
@@ -87,8 +89,17 @@ public class EErrorsWindow extends EWindow {
         private File currentDirectory() {
             return currentDirectory;
         }
+    }
+    
+    private static class ErrorLinkActionListener implements ActionListener {
+        private String address;
         
-        public void addKeywordsTo(Collection<String> collection) {
+        public ErrorLinkActionListener(String address) {
+            this.address = address;
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            Edit.openFile(address);
         }
     }
     
