@@ -20,11 +20,8 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     
     public PCLikeTextStyler(PTextArea textArea) {
         super(textArea);
-        addKeywordsTo(keywords);
-        if (keywords.size() > 0) {
-            textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords));
-        }
         initCommentCache();
+        initStyleApplicators();
         textArea.getTextBuffer().addTextListener(this);
         textArea.setTextStyler(this);
     }
@@ -46,6 +43,17 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
      */
     public void addStringSegment(TextSegmentListBuilder builder, String line, int start, int end) {
         builder.addStyledSegment(end, PStyle.STRING);
+    }
+    
+    /**
+     * Override this to add your own style applicators, but don't forget to
+     * invoke this method too.
+     */
+    protected void initStyleApplicators() {
+        addKeywordsTo(keywords);
+        if (keywords.size() > 0) {
+            textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords));
+        }
     }
     
     private void initCommentCache() {

@@ -89,7 +89,13 @@ public class PCPPTextStyler extends PCLikeTextStyler {
     
     public PCPPTextStyler(PTextArea textArea) {
         super(textArea);
+    }
+    
+    protected void initStyleApplicators() {
+        // "#else" is PREPROCESSOR, but "else" is KEYWORD, so we need to look
+        // for preprocessor directives first.
         textArea.addStyleApplicator(new PreprocessorStyleApplicator(textArea, false));
+        super.initStyleApplicators();
     }
     
     public boolean supportShellComments() {
