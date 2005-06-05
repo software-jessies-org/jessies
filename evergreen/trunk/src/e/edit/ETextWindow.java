@@ -91,6 +91,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         this.file = FileUtilities.fileFromString(filename);
         this.text = new ETextArea();
         text.getTextBuffer().addTextListener(this);
+        initBugDatabaseLinks();
         initTextAreaPopupMenu();
         
         this.watermarkViewPort = new WatermarkViewPort();
@@ -105,6 +106,20 @@ public class ETextWindow extends EWindow implements PTextListener {
         fillWithContent();
         tagsUpdater = new TagsUpdater(this);
         initFindResultsUpdater();
+    }
+    
+    private void initBugDatabaseLinks() {
+        try {
+            // See if SCM's bug database link code is available.
+            Class klass = Class.forName("e.scm.BugDatabaseHighlighter");
+            // Use it.
+            java.lang.reflect.Constructor constructor = klass.getConstructor(PTextArea.class);
+            text.addStyleApplicator(StyleApplicator.class.cast(constructor.newInstance(text)));
+        } catch (Exception ex) {
+            // We can survive without this functionality, but there's probably
+            // something odd going on if we can't find it.
+            Log.warn("Couldn't initialize bug database links.", ex);
+        }
     }
     
     private void initFindResultsUpdater() {
