@@ -10,7 +10,7 @@ import java.util.regex.*;
  * comment, which vim(1) does.
  */
 public class PreprocessorStyleApplicator extends RegularExpressionStyleApplicator {
-    private static final String PATTERN = "\\s*[#]\\s*(define|elif|else|endif|error|ifdef|ifndef|include|import|line|pragma|undef|warn|warning)\\b";
+    private static final String PATTERN = "\\s*([#]\\s*(define|elif|else|endif|error|ifdef|ifndef|include|import|line|pragma|undef|warn|warning))\\b";
     
     private boolean isObjectiveC;
     
@@ -30,10 +30,10 @@ public class PreprocessorStyleApplicator extends RegularExpressionStyleApplicato
         
         if (isObjectiveC) {
             // #include is legal in Objective C++, but you want #import instead.
-            return (matcher.group(1).equals("include") == false);
+            return (matcher.group(2).equals("include") == false);
         } else {
             // #import is not legal in other languages.
-            return (matcher.group(1).equals("import") == false);
+            return (matcher.group(2).equals("import") == false);
         }
     }
 }

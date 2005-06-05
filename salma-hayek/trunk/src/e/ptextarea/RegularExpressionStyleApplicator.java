@@ -6,7 +6,8 @@ import java.util.*;
 import java.util.regex.*;
 
 /**
- * Styles any chunk of text matching a regular expression. 
+ * Styles any chunk of text matching a regular expression. Capturing group 1 is
+ * used as the range to be styled.
  */
 public class RegularExpressionStyleApplicator implements StyleApplicator {
     private static final EnumSet<PStyle> SOURCE_STYLES = EnumSet.of(PStyle.NORMAL);
@@ -27,19 +28,21 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
         int offset = segment.getOffset();
         while (matcher.find()) {
             if (isAcceptableMatch(line, matcher)) {
-                if (matcher.start() > normalStart) {
-                    result.add((PTextSegment) segment.subSegment(normalStart, matcher.start()));
+                final int matchStart = matcher.start(1);
+                final int matchEnd = matcher.end(1);
+                if (matchStart > normalStart) {
+                    result.add((PTextSegment) segment.subSegment(normalStart, matchStart));
                 }
                 // FIXME: underlining should be a PStyle attribute.
                 PTextSegment newSegment;
                 if (style != PStyle.HYPERLINK) {
-                    newSegment = new PTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style);
+                    newSegment = new PTextSegment(textArea, offset + matchStart, offset + matchEnd, style);
                 } else {
-                    newSegment = new PUnderlinedTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style);
+                    newSegment = new PUnderlinedTextSegment(textArea, offset + matchStart, offset + matchEnd, style);
                     configureSegment(newSegment, matcher);
                 }
                 result.add(newSegment);
-                normalStart = matcher.end();
+                normalStart = matchEnd;
             }
         }
         if (segment.getText().length() > normalStart) {

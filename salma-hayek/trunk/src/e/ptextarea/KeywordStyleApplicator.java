@@ -10,7 +10,7 @@ public class KeywordStyleApplicator extends RegularExpressionStyleApplicator {
     private HashSet<String> keywords;
     
     public KeywordStyleApplicator(PTextArea textArea, HashSet<String> keywords) {
-        super(textArea, "\\b\\w+\\b", PStyle.KEYWORD);
+        super(textArea, "\\b(\\w+)\\b", PStyle.KEYWORD);
         this.keywords = keywords;
     }
     
