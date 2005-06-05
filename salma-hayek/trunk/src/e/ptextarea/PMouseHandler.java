@@ -76,8 +76,21 @@ public class PMouseHandler implements MouseInputListener {
         updateCursorAndToolTip(event.getPoint());
     }
     
+    /**
+     * Optionally returns a special mouse cursor to use when over the given location.  A null
+     * return means that the default cursor should be used.
+     */
+    private Cursor getCursorForLocation(Point point) {
+        PLineSegment segment = textArea.getLineSegmentAtLocation(point);
+        if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
+            return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+        } else {
+            return null;
+        }
+    }
+    
     private void updateCursorAndToolTip(Point p) {
-        Cursor newCursor = textArea.getTextStyler().getCursorForLocation(p);
+        Cursor newCursor = getCursorForLocation(p);
         textArea.setCursor(newCursor);
         String newToolTip = textArea.getTextStyler().getToolTipForLocation(p);
         textArea.setToolTipText(newToolTip);

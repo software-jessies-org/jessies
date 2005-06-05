@@ -21,19 +21,6 @@ public abstract class PAbstractTextStyler implements PTextStyler {
         // Do nothing.
     }
     
-    /**
-     * Optionally returns a special mouse cursor to use when over the given location.  A null
-     * return means that the default cursor should be used.
-     */
-    public Cursor getCursorForLocation(Point point) {
-        PLineSegment segment = textArea.getLineSegmentAtLocation(point);
-        if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
-            return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-        } else {
-            return null;
-        }
-    }
-    
     public String getToolTipForLocation(Point point) {
         PLineSegment segment = textArea.getLineSegmentAtLocation(point);
         if (segment != null && segment instanceof PTextSegment) {

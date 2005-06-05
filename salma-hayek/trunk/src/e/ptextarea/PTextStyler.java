@@ -25,12 +25,6 @@ public interface PTextStyler {
     public void mouseClicked(MouseEvent event, int offset);
     
     /**
-     * Returns the mouse cursor to use when over the given location, or null
-     * to use the default cursor.
-     */
-    public Cursor getCursorForLocation(Point point);
-    
-    /**
      * Returns the tool-tip to use when over the given location, or null for
      * no tool-tip.
      */
