@@ -17,7 +17,7 @@ public class FormPanel extends JPanel {
 
     private JComponent statusBar;
     
-    private ActionListener typingTimeoutActionListener = new NoOpAction();
+    private ActionListener typingTimeoutActionListener = NoOpAction.INSTANCE;
     
     private ArrayList<JTextComponent> textComponents = new ArrayList<JTextComponent>();
     
