@@ -25,12 +25,6 @@ public interface PTextStyler {
     public void mouseClicked(MouseEvent event, int offset);
     
     /**
-     * Returns the tool-tip to use when over the given location, or null for
-     * no tool-tip.
-     */
-    public String getToolTipForLocation(Point point);
-    
-    /**
      * Adds this language's keywords to the given collection. This lets
      * something like a spelling checker automatically share the knowledge of
      * the keywords.

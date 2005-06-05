@@ -89,10 +89,19 @@ public class PMouseHandler implements MouseInputListener {
         }
     }
     
+    private String getToolTipForLocation(Point point) {
+        PLineSegment segment = textArea.getLineSegmentAtLocation(point);
+        if (segment != null && segment instanceof PTextSegment) {
+            return ((PTextSegment) segment).getToolTip();
+        } else {
+            return null;
+        }
+    }
+    
     private void updateCursorAndToolTip(Point p) {
         Cursor newCursor = getCursorForLocation(p);
         textArea.setCursor(newCursor);
-        String newToolTip = textArea.getTextStyler().getToolTipForLocation(p);
+        String newToolTip = getToolTipForLocation(p);
         textArea.setToolTipText(newToolTip);
     }
     

@@ -20,13 +20,4 @@ public abstract class PAbstractTextStyler implements PTextStyler {
     public void mouseClicked(MouseEvent event, int offset) {
         // Do nothing.
     }
-    
-    public String getToolTipForLocation(Point point) {
-        PLineSegment segment = textArea.getLineSegmentAtLocation(point);
-        if (segment != null && segment instanceof PTextSegment) {
-            return ((PTextSegment) segment).getToolTip();
-        } else {
-            return null;
-        }
-    }
 }
