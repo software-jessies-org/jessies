@@ -36,7 +36,7 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
                     newSegment = new PTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style);
                 } else {
                     newSegment = new PUnderlinedTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style);
-                    newSegment.setLinkAction(getLinkAction(matcher));
+                    configureSegment(newSegment, matcher);
                 }
                 result.add(newSegment);
                 normalStart = matcher.end();
@@ -63,7 +63,9 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
         return SOURCE_STYLES;
     }
     
-    public ActionListener getLinkAction(Matcher matcher) {
-        return NoOpAction.INSTANCE;
+    /**
+     * Override this to configure each matching text segment.
+     */
+    protected void configureSegment(PTextSegment segment, Matcher matcher) {
     }
 }
