@@ -12,12 +12,4 @@ public abstract class PAbstractTextStyler implements PTextStyler {
     }
     
     public abstract List<PTextSegment> getTextSegments(int line);
-    
-    /**
-     * Optionally handles the given mouse click event.  This is called when a single click occurs on
-     * the text component.  If the styler handles the event, it should consume it.
-     */
-    public void mouseClicked(MouseEvent event, int offset) {
-        // Do nothing.
-    }
 }

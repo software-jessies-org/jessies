@@ -1,5 +1,7 @@
 package e.ptextarea;
 
+import e.gui.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -29,11 +31,14 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
                     result.add((PTextSegment) segment.subSegment(normalStart, matcher.start()));
                 }
                 // FIXME: underlining should be a PStyle attribute.
+                PTextSegment newSegment;
                 if (style != PStyle.HYPERLINK) {
-                    result.add(new PTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style));
+                    newSegment = new PTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style);
                 } else {
-                    result.add(new PUnderlinedTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style));
+                    newSegment = new PUnderlinedTextSegment(textArea, offset + matcher.start(), offset + matcher.end(), style);
+                    newSegment.setLinkAction(getLinkAction(matcher));
                 }
+                result.add(newSegment);
                 normalStart = matcher.end();
             }
         }
@@ -56,5 +61,9 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
     
     public EnumSet<PStyle> getSourceStyles() {
         return SOURCE_STYLES;
+    }
+    
+    public ActionListener getLinkAction(Matcher matcher) {
+        return NoOpAction.INSTANCE;
     }
 }

@@ -19,12 +19,6 @@ public interface PTextStyler {
     public List<PTextSegment> getTextSegments(int lineIndex);
     
     /**
-     * Optionally handles the given mouse click event.  This is called when a single click occurs on
-     * the text component.  If the styler handles the event, it should consume it.
-     */
-    public void mouseClicked(MouseEvent event, int offset);
-    
-    /**
      * Adds this language's keywords to the given collection. This lets
      * something like a spelling checker automatically share the knowledge of
      * the keywords.

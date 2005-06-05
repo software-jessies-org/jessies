@@ -25,11 +25,10 @@ public class PMouseHandler implements MouseInputListener {
                 return;
             }
         }
-        int pressedOffset = getOffsetAtMouse(e);
-        textArea.getTextStyler().mouseClicked(e, pressedOffset);
+        handleHyperlinks(e);
         if (e.isConsumed() == false) {
             dragHandler = getDragHandlerForClick(e);
-            dragHandler.makeInitialSelection(pressedOffset);
+            dragHandler.makeInitialSelection(getOffsetAtMouse(e));
         }
     }
     
@@ -86,6 +85,15 @@ public class PMouseHandler implements MouseInputListener {
         }
         textArea.setCursor(newCursor);
         textArea.setToolTipText(newToolTip);
+    }
+    
+    private void handleHyperlinks(MouseEvent e) {
+        PLineSegment segment = textArea.getLineSegmentAtLocation(e.getPoint());
+        if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
+            CharSequence chars = segment.getCharSequence();
+            PTextSegment.class.cast(segment).linkClicked();
+            e.consume();
+        }
     }
     
     private class SingleClickDragHandler implements PDragHandler {

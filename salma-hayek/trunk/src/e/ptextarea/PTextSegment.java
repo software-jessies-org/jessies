@@ -1,6 +1,8 @@
 package e.ptextarea;
 
+import e.gui.*;
 import java.awt.*;
+import java.awt.event.*;
 
 /**
  * A PTextSegment is a PLineSegment which knows how to deal with styled characters.
@@ -9,6 +11,7 @@ import java.awt.*;
  */
 public class PTextSegment extends PAbstractSegment {
     private String toolTip;
+    private ActionListener linkAction;
     
     public PTextSegment(PTextArea textArea, int start, int end, PStyle style) {
         super(textArea, start, end, style);
@@ -52,6 +55,14 @@ public class PTextSegment extends PAbstractSegment {
     
     public void setToolTip(String toolTip) {
         this.toolTip = toolTip;
+    }
+    
+    public void setLinkAction(ActionListener actionListener) {
+        this.linkAction = actionListener;
+    }
+    
+    public void linkClicked() {
+        linkAction.actionPerformed(null);
     }
     
     public String toString() {
