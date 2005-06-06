@@ -724,7 +724,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         int charOffset = 0;
         for (PLineSegment segment : segments) {
             String text = segment.getText();
-            if (coordinates.getCharOffset() < charOffset + text.length()) {
+            if (coordinates.getCharOffset() <= charOffset + text.length()) {
                 x += segment.getDisplayWidth(metrics, x, coordinates.getCharOffset() - charOffset);
                 return new Point(x, baseline);
             }

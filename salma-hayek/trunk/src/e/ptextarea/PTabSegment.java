@@ -19,6 +19,9 @@ public class PTabSegment extends PAbstractSegment {
     
     public PTabSegment(PTextArea textArea, int start, int end) {
         super(textArea, start, end, PStyle.NORMAL);
+        if (end == start) {
+            throw new IllegalArgumentException("getDisplayWidth incorrectly doesn't always return zero for zero length tab segments");
+        }
     }
     
     public PLineSegment subSegment(int start, int end) {
