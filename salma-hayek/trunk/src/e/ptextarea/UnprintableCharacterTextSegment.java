@@ -9,15 +9,18 @@ public class UnprintableCharacterTextSegment extends PTextSegment {
         super(textArea, start, end, style);
     }
     
+    @Override
     public PLineSegment subSegment(int start, int end) {
         return new UnprintableCharacterTextSegment(textArea, start + this.start, end + this.start, style);
     }
     
+    @Override
     public String getText() {
         String unprintableCharacters = super.getText();
         return e.util.StringUtilities.escapeForJava(unprintableCharacters);
     }
     
+    @Override
     public String toString() {
         return "UnprintableCharacterSegment[" + super.toString() + "]";
     }
