@@ -33,15 +33,7 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
                 if (matchStart > normalStart) {
                     result.add((PTextSegment) segment.subSegment(normalStart, matchStart));
                 }
-                // FIXME: underlining should be a PStyle attribute.
-                PTextSegment newSegment;
-                if (style != PStyle.HYPERLINK) {
-                    newSegment = new PTextSegment(textArea, offset + matchStart, offset + matchEnd, style);
-                } else {
-                    newSegment = new PUnderlinedTextSegment(textArea, offset + matchStart, offset + matchEnd, style);
-                    configureSegment(newSegment, matcher);
-                }
-                result.add(newSegment);
+                result.add(makeNewSegment(textArea, matcher, offset + matchStart, offset + matchEnd, style));
                 normalStart = matchEnd;
             }
         }
@@ -49,6 +41,17 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
             result.add((PTextSegment) segment.subSegment(normalStart));
         }
         return result;
+    }
+    
+    protected PTextSegment makeNewSegment(PTextArea textArea, Matcher matcher, int start, int end, PStyle style) {
+        // FIXME: underlining should be a PStyle attribute.
+        if (style == PStyle.HYPERLINK) {
+            PTextSegment result = new PUnderlinedTextSegment(textArea, start, end, style);
+            configureSegment(result, matcher);
+            return result;
+        } else {
+            return new PTextSegment(textArea, start, end, style);
+        }
     }
     
     /**

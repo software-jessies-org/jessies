@@ -13,6 +13,7 @@ public enum PStyle {
     ERROR("error", Color.RED),
     HYPERLINK("hyperlink", Color.BLUE),
     PREPROCESSOR("preprocessor", Color.decode("#708090")),
+    UNPRINTABLE("unprintable", Color.RED),
     ;
     
     private String name;
