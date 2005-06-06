@@ -21,10 +21,6 @@ public class PTextSegment extends PAbstractSegment {
         return new PTextSegment(textArea, start + this.start, end + this.start, style);
     }
     
-    public int getDisplayWidth(FontMetrics metrics, int startX) {
-        return metrics.stringWidth(getText());
-    }
-    
     public int getCharOffset(FontMetrics metrics, int startX, int x) {
         char[] ch = getText().toCharArray();
         int min = 0;
