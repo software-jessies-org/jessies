@@ -22,7 +22,7 @@ public interface PLineSegment {
     public CharSequence getCharSequence();
     
     /** Returns the text to be drawn. */
-    public String getText();
+    public String getViewText();
     
     public PLineSegment subSegment(int start);
     
@@ -35,7 +35,7 @@ public interface PLineSegment {
     public int getEnd();
     
     /** Returns the number of characters in the text. */
-    public int getLength();
+    public int getModelTextLength();
     
     /** Returns true if this segment represents any line break, be it caused by line wrap or a newline character. */
     public boolean isNewline();

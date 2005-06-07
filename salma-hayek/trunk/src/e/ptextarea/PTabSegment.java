@@ -34,14 +34,14 @@ public class PTabSegment extends PAbstractSegment {
     
     public int getDisplayWidth(FontMetrics metrics, int startX) {
         final int tabWidth = tabWidth(metrics);
-        int x = startX + MIN_TAB_WIDTH_IN_PIXELS + tabWidth * getLength();
+        int x = startX + MIN_TAB_WIDTH_IN_PIXELS + tabWidth * getModelTextLength();
         x -= x % tabWidth;
         return (x - startX);
     }
     
     public int getCharOffset(FontMetrics metrics, int startX, int x) {
         final int tabWidth = tabWidth(metrics);
-        for (int i = 0; i < getLength(); i++) {
+        for (int i = 0; i < getModelTextLength(); i++) {
             int nextX = startX + MIN_TAB_WIDTH_IN_PIXELS + tabWidth;
             nextX -= nextX % tabWidth;
             if (x < nextX) {
@@ -53,7 +53,7 @@ public class PTabSegment extends PAbstractSegment {
             }
             startX = nextX;
         }
-        return getLength();
+        return getModelTextLength();
     }
     
     public void paint(Graphics2D graphics, int x, int yBaseline) { }

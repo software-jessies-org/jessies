@@ -557,7 +557,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 charOffset += segment.getCharOffset(metrics, x, point.x);
                 return new PCoordinates(lineIndex, charOffset);
             }
-            charOffset += segment.getText().length();
+            charOffset += segment.getViewText().length();
             x += width;
         }
         return new PCoordinates(lineIndex, charOffset);
@@ -626,8 +626,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         
         for (int i = 0; index < end && i < segments.length; ++i) {
             PLineSegment segment = segments[i];
-            if (start >= index + segment.getLength()) {
-                index += segment.getLength();
+            if (start >= index + segment.getModelTextLength()) {
+                index += segment.getModelTextLength();
                 continue;
             }
             if (start > index) {
@@ -635,11 +635,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 segment = segment.subSegment(skip);
                 index += skip;
             }
-            if (end < index + segment.getLength()) {
+            if (end < index + segment.getModelTextLength()) {
                 segment = segment.subSegment(0, end - index);
             }
             result.add(segment);
-            index += segment.getLength();
+            index += segment.getModelTextLength();
         }
         return result.toArray(new PLineSegment[result.size()]);
     }
@@ -677,7 +677,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private void addTabbedSegments(PLineSegment segment, ArrayList<PLineSegment> target) {
         while (true) {
-            String text = segment.getText();
+            String text = segment.getViewText();
             int tabIndex = text.indexOf('\t');
             if (tabIndex == -1) {
                 target.add(segment);
@@ -691,7 +691,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             int offset = segment.getOffset();
             target.add(new PTabSegment(this, offset + tabIndex, offset + tabEnd));
             segment = segment.subSegment(tabEnd);
-            if (segment.getLength() == 0) {
+            if (segment.getModelTextLength() == 0) {
                 return;
             }
         }
@@ -723,7 +723,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         int x = 0;
         int charOffset = 0;
         for (PLineSegment segment : segments) {
-            String text = segment.getText();
+            String text = segment.getViewText();
             if (coordinates.getCharOffset() <= charOffset + text.length()) {
                 x += segment.getDisplayWidth(metrics, x, coordinates.getCharOffset() - charOffset);
                 return new Point(x, baseline);

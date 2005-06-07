@@ -17,12 +17,14 @@ public class PTextSegment extends PAbstractSegment {
         super(textArea, start, end, style);
     }
     
+    @Override
     public PLineSegment subSegment(int start, int end) {
         return new PTextSegment(textArea, start + this.start, end + this.start, style);
     }
     
+    @Override
     public int getCharOffset(FontMetrics metrics, int startX, int x) {
-        char[] ch = getText().toCharArray();
+        char[] ch = getViewText().toCharArray();
         int min = 0;
         int max = ch.length;
         while (max - min > 1) {
@@ -41,8 +43,9 @@ public class PTextSegment extends PAbstractSegment {
         return min;
     }
     
+    @Override
     public void paint(Graphics2D graphics, int x, int yBaseline) {
-        graphics.drawString(getText(), x, yBaseline);
+        graphics.drawString(getViewText(), x, yBaseline);
     }
     
     public String getToolTip() {
@@ -61,6 +64,7 @@ public class PTextSegment extends PAbstractSegment {
         linkAction.actionPerformed(null);
     }
     
+    @Override
     public String toString() {
         String result = "PTextSegment[" + super.toString();
         if (toolTip != null) {

@@ -15,6 +15,7 @@ public class PNewlineSegment extends PAbstractSegment {
         this.newlineType = isHardNewline;
     }
     
+    @Override
     public PLineSegment subSegment(int start, int end) {
         return new PNewlineSegment(textArea, start + this.start, end + this.start, newlineType);
     }
@@ -29,20 +30,24 @@ public class PNewlineSegment extends PAbstractSegment {
         return newlineType;
     }
     
+    @Override
     public int getDisplayWidth(FontMetrics metrics, int startX) {
         // Might need to cope with being as wide as the available space on screen if we move dotted
         // line painting in here.
         return 0;
     }
     
+    @Override
     public int getDisplayWidth(FontMetrics metrics, int startX, int charOffset) {
         return subSegment(0, charOffset).getDisplayWidth(metrics, startX);
     }
     
+    @Override
     public int getCharOffset(FontMetrics metrics, int startX, int x) {
         return 0;
     }
     
+    @Override
     public void paint(Graphics2D graphics, int x, int yBaseline) {
         if (newlineType == WRAPPED) {
             paintWrapMark(graphics, x, yBaseline);
@@ -58,8 +63,9 @@ public class PNewlineSegment extends PAbstractSegment {
         graphics.setStroke(oldStroke);
     }
     
+    @Override
     public String toString() {
-        return "PNewlineSegment[" + style.getName() + ", [" + getOffset() + ", " + getEnd() + "], " + getText() +
+        return "PNewlineSegment[" + style.getName() + ", [" + getOffset() + ", " + getEnd() + "], " + getViewText() +
                 (newlineType ? ", HARD" : ", SOFT") + "]";
     }
 }

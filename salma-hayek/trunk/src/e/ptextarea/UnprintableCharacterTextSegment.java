@@ -15,8 +15,8 @@ public class UnprintableCharacterTextSegment extends PTextSegment {
     }
     
     @Override
-    public String getText() {
-        String unprintableCharacters = super.getText();
+    public String getViewText() {
+        String unprintableCharacters = super.getViewText();
         return e.util.StringUtilities.escapeForJava(unprintableCharacters);
     }
     

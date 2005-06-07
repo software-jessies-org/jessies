@@ -7,6 +7,7 @@ public class PUnderlinedTextSegment extends PTextSegment {
         super(textArea, start, end, style);
     }
     
+    @Override
     public void paint(Graphics2D graphics, int x, int yBaseline) {
         super.paint(graphics, x, yBaseline);
         FontMetrics metrics = graphics.getFontMetrics();
@@ -15,6 +16,7 @@ public class PUnderlinedTextSegment extends PTextSegment {
         graphics.drawLine(x, yBaseline, x + width, yBaseline);
     }
     
+    @Override
     public PLineSegment subSegment(int start, int end) {
         return new PUnderlinedTextSegment(textArea, getOffset() + start, getOffset() + end, getStyle());
     }

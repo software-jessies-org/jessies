@@ -36,7 +36,7 @@ public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
     
     public PLineSegment next() {
         PLineSegment result = null;
-        while (result == null || result.getLength() == 0) {
+        while (result == null || result.getModelTextLength() == 0) {
             if (segmentInLine > lineSegments.length) {
                 lineIndex++;
                 lineSegments = textArea.getLineSegments(lineIndex);

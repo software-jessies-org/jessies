@@ -23,12 +23,12 @@ public abstract class PAbstractSegment implements PLineSegment {
         return textArea.getTextBuffer().subSequence(start, end);
     }
     
-    public String getText() {
+    public String getViewText() {
         return getCharSequence().toString();
     }
     
     public PLineSegment subSegment(int start) {
-        return subSegment(start, getLength());
+        return subSegment(start, getModelTextLength());
     }
     
     public abstract PLineSegment subSegment(int start, int end);
@@ -37,7 +37,7 @@ public abstract class PAbstractSegment implements PLineSegment {
         return start;
     }
     
-    public int getLength() {
+    public int getModelTextLength() {
         return end - start;
     }
     
@@ -56,7 +56,7 @@ public abstract class PAbstractSegment implements PLineSegment {
     }
     
     public int getDisplayWidth(FontMetrics metrics, int startX) {
-        return metrics.stringWidth(getText());
+        return metrics.stringWidth(getViewText());
     }
     
     public int getDisplayWidth(FontMetrics metrics, int startX, int charOffset) {
@@ -68,6 +68,6 @@ public abstract class PAbstractSegment implements PLineSegment {
     public abstract void paint(Graphics2D graphics, int x, int yBaseline);
     
     public String toString() {
-        return "PAbstractSegment[" + style + ",start=" + start + ",end=" + end + ",\"" + getText() + "\"]";
+        return "PAbstractSegment[" + style + ",start=" + start + ",end=" + end + ",\"" + getViewText() + "\"]";
     }
 }
