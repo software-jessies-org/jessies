@@ -643,25 +643,29 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     public PLineSegment[] getLineSegments(int lineIndex) {
         // Let the styler have the first go.
-        List<PTextSegment> result = textStyler.getTextSegments(lineIndex);
+        List<PTextSegment> segments = textStyler.getTextSegments(lineIndex);
         
         // Then let the style applicators add their finishing touches.
         String line = getLineContents(lineIndex).toString();
         for (StyleApplicator styleApplicator : styleApplicators) {
-            EnumSet<PStyle> applicableStyles = styleApplicator.getSourceStyles();
-            List<PTextSegment> inputSegments = result;
-            result = new ArrayList<PTextSegment>();
-            for (PTextSegment segment : inputSegments) {
-                if (applicableStyles.contains(segment.getStyle())) {
-                    result.addAll(styleApplicator.applyStylingTo(line, segment));
-                } else {
-                    result.add(segment);
-                }
-            }
+            segments = applyStyleApplicator(styleApplicator, line, segments);
         }
         
         // Finally, deal with tabs.
-        return getTabbedSegments(result);
+        return getTabbedSegments(segments);
+    }
+    
+    private List<PTextSegment> applyStyleApplicator(StyleApplicator styleApplicator, String line, List<PTextSegment> inputSegments) {
+        EnumSet<PStyle> applicableStyles = styleApplicator.getSourceStyles();
+        List<PTextSegment> result = new ArrayList<PTextSegment>();
+        for (PTextSegment segment : inputSegments) {
+            if (applicableStyles.contains(segment.getStyle())) {
+                result.addAll(styleApplicator.applyStylingTo(line, segment));
+            } else {
+                result.add(segment);
+            }
+        }
+        return result;
     }
     
     private PLineSegment[] getTabbedSegments(List<PTextSegment> segments) {
