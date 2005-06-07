@@ -66,7 +66,7 @@ def patchToHtml(subject, preamble, changes)
   
   body << "  <style type=\"text/css\">\n"
   body << ".revision-header {background: #cccccc; padding: 6pt; margin-bottom: 0pt; text-align: right;}\n"
-  body << ".check-in-comment {background: #eeeeee; padding-bottom: 6pt; padding-left: 6pt; padding-top: 6pt; margin-bottom: 6pt;}\n"
+  body << ".check-in-comment {background: #eeeeee; padding: 6pt; margin-bottom: 6pt;}\n"
   body << ".triple-minus-line {background: #ffcccc; color: red;}\n"
   body << ".triple-plus-line {background: #ccccff; color: blue;}\n"
   body << "  </style>\n"
