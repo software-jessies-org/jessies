@@ -15,7 +15,6 @@ import e.util.*;
  * 
  * @author Phil Norman
  */
-
 public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private static final int MIN_WIDTH = 50;
     private static final int MAX_CACHED_CHAR = 128;
@@ -557,7 +556,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                 charOffset += segment.getCharOffset(metrics, x, point.x);
                 return new PCoordinates(lineIndex, charOffset);
             }
-            charOffset += segment.getViewText().length();
+            charOffset += segment.getModelTextLength();
             x += width;
         }
         return new PCoordinates(lineIndex, charOffset);
@@ -723,12 +722,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         int x = 0;
         int charOffset = 0;
         for (PLineSegment segment : segments) {
-            String text = segment.getViewText();
-            if (coordinates.getCharOffset() <= charOffset + text.length()) {
+            if (coordinates.getCharOffset() <= charOffset + segment.getModelTextLength()) {
                 x += segment.getDisplayWidth(metrics, x, coordinates.getCharOffset() - charOffset);
                 return new Point(x, baseline);
             }
-            charOffset += text.length();
+            charOffset += segment.getModelTextLength();
             x += segment.getDisplayWidth(metrics, x);
         }
         return new Point(x, baseline);

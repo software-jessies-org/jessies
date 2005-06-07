@@ -37,7 +37,7 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
                 normalStart = matchEnd;
             }
         }
-        if (segment.getViewText().length() > normalStart) {
+        if (segment.getModelTextLength() > normalStart) {
             result.add((PTextSegment) segment.subSegment(normalStart));
         }
         return result;

@@ -1,27 +1,32 @@
 package e.ptextarea;
 
-
 import java.awt.*;
 
 /**
- * A PLineSegment represents a section of text which should be painted in the
- * text component.  It knows about styles, the text it contains, and can calculate
- * how wide its text should appear.
- *
- * There are two implementations of this class: one to handle tab characters, and one
- * for normal text.
+ * A PLineSegment represents a section of text which should be painted using a
+ * single style. It knows which style to use, what range of characters in the
+ * model this segment represents, what characters will actually be displayed
+ * in the view (which need not be the same), how to paint this segment, and
+ * how to convert between the model and view coordinate spaces.
  * 
  * @author Phil Norman
  */
-
 public interface PLineSegment {
     /** Returns the style to be used when painting this text. */
     public PStyle getStyle();
     
-    /** Returns the char sequence represented by this segment. */
+    /**
+     * Returns the model CharSequence represented by this segment. Contrast
+     * with getViewText, which what will be rendered, rather than what the
+     * rendered text represents. 
+     */
     public CharSequence getCharSequence();
     
-    /** Returns the text to be drawn. */
+    /**
+     * Returns the text to be drawn. This is overridden by
+     * UnprintableCharacterTextSegment to show control characters in
+     * their escaped form.
+     */
     public String getViewText();
     
     public PLineSegment subSegment(int start);
@@ -34,7 +39,11 @@ public interface PLineSegment {
     /** Returns the text offset of the character just after the end of this segment. */
     public int getEnd();
     
-    /** Returns the number of characters in the text. */
+    /**
+     * Returns the number of characters in the model that this segment
+     * represents. This may or may not correspond to the number of characters
+     * in the view.
+     */
     public int getModelTextLength();
     
     /** Returns true if this segment represents any line break, be it caused by line wrap or a newline character. */
