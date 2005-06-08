@@ -1,6 +1,5 @@
 package e.ptextarea;
 
-
 import java.awt.*;
 
 /**
@@ -9,7 +8,6 @@ import java.awt.*;
  * 
  * @author Phil Norman
  */
-
 public class PTabSegment extends PAbstractSegment {
     public static final PTabSegment SINGLE_TAB = new PTabSegment(null, 0, 1);
     
@@ -19,9 +17,6 @@ public class PTabSegment extends PAbstractSegment {
     
     public PTabSegment(PTextArea textArea, int start, int end) {
         super(textArea, start, end, PStyle.NORMAL);
-        if (end == start) {
-            throw new IllegalArgumentException("getDisplayWidth incorrectly doesn't always return zero for zero length tab segments");
-        }
     }
     
     public PLineSegment subSegment(int start, int end) {
@@ -33,6 +28,9 @@ public class PTabSegment extends PAbstractSegment {
     }
     
     public int getDisplayWidth(FontMetrics metrics, int startX) {
+        if (getModelTextLength() == 0) {
+            return 0;
+        }
         final int tabWidth = tabWidth(metrics);
         int x = startX + MIN_TAB_WIDTH_IN_PIXELS + tabWidth * getModelTextLength();
         x -= x % tabWidth;
@@ -56,5 +54,7 @@ public class PTabSegment extends PAbstractSegment {
         return getModelTextLength();
     }
     
-    public void paint(Graphics2D graphics, int x, int yBaseline) { }
+    public void paint(Graphics2D graphics, int x, int yBaseline) {
+        // FIXME: an option to render tabs visibly?
+    }
 }
