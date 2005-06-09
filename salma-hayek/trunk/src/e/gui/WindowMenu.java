@@ -164,13 +164,12 @@ public class WindowMenu {
     }
     
     private void updateMenus() {
-        Object[] menus = InstanceTracker.getInstancesOfClass(UpdatableJMenu.class);
         Frame[] frames = null;
-        for (int i = 0; i < menus.length; ++i) {
+        for (UpdatableJMenu menu : InstanceTracker.getInstancesOfClass(UpdatableJMenu.class)) {
             if (frames == null) {
                 frames = getFrames();
             }
-            ((UpdatableJMenu) menus[i]).updateMenu(frames);
+            menu.updateMenu(frames);
         }
     }
     

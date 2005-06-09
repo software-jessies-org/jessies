@@ -33,7 +33,7 @@ public class InstanceTracker {
         return instances;
     }
     
-    public static synchronized <T> Object[] getInstancesOfClass(Class<T> klass) {
+    public static synchronized <T> List<T> getInstancesOfClass(Class<T> klass) {
         ArrayList<T> result = new ArrayList<T>();
         List<WeakReference> weakReferences = instancesOfClass(klass);
         if (DEBUG) {
@@ -48,7 +48,7 @@ public class InstanceTracker {
         if (DEBUG) {
             System.err.println("References: " + result.size());
         }
-        return (Object[]) result.toArray(new Object[result.size()]);
+        return result;
     }
     
     private InstanceTracker() {

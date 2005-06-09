@@ -71,9 +71,8 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         
         public void actionPerformed(ActionEvent e) {
             SpellingChecker.getSharedSpellingCheckerInstance().acceptSpelling(word);
-            Object[] spellingCheckers = InstanceTracker.getInstancesOfClass(PTextAreaSpellingChecker.class);
-            for (Object spellingChecker : spellingCheckers) {
-                PTextAreaSpellingChecker.class.cast(spellingChecker).checkSpelling();
+            for (PTextAreaSpellingChecker spellingChecker : InstanceTracker.getInstancesOfClass(PTextAreaSpellingChecker.class)) {
+                spellingChecker.checkSpelling();
             }
         }
     }
