@@ -10,7 +10,7 @@ import java.util.regex.*;
  * comment, which vim(1) does.
  */
 public class PreprocessorStyleApplicator extends RegularExpressionStyleApplicator {
-    private static final String PATTERN = "\\s*([#]\\s*(define|elif|else|endif|error|ifdef|ifndef|include|import|line|pragma|undef|warn|warning))\\b";
+    private static final String PATTERN = "\\s*([#]\\s*(define|elif|else|endif|error|if|ifdef|ifndef|include|import|line|pragma|undef|warn|warning))\\b";
     
     private boolean isObjectiveC;
     
