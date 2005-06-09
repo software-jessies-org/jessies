@@ -68,7 +68,7 @@ public class TextLine {
 	
 	/** Returns the text, with all the tabs put back in for use with clipboard stuff. */
 	public String getTabbedText(int start, int end) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (int i = start; i < end; i++) {
 			char ch = text.charAt(i);
 			if (ch != TAB_CONTINUE) {

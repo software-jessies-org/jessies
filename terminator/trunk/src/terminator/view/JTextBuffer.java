@@ -562,7 +562,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	public String getTabbedText(Highlight highlight) {
 		Location start = highlight.getStart();
 		Location end = highlight.getEnd();
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
 			// Necessary to cope with selections extending to the bottom of the buffer.
 			if (i == end.getLineIndex() && end.getCharOffset() == 0) {

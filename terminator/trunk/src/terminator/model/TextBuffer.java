@@ -639,7 +639,7 @@ public class TextBuffer {
 		}
 		
 		public String toString() {
-			StringBuffer buf = new StringBuffer(length());
+			StringBuilder buf = new StringBuilder(length());
 			Location loc = getLocationFromCharIndex(start);
 			int charsLeft = end - start;
 			while (charsLeft > 0) {

@@ -102,7 +102,7 @@ public class TerminalControl implements Runnable {
 		g[index] = set;
 	}
 	
-	private StringBuffer lineBuffer = new StringBuffer();
+	private StringBuilder lineBuffer = new StringBuilder();
 
 	private EscapeParser escapeParser;
 	
@@ -210,7 +210,7 @@ public class TerminalControl implements Runnable {
 		return (ch != Ascii.BS && ch != Ascii.CR && ch != Ascii.VT);
 	}
 	
-	private void processChar(final char ch) throws IOException {
+	private synchronized void processChar(final char ch) throws IOException {
 		// Enable this if you're having trouble working out what we're being asked to interpret.
 		if (SHOW_ASCII_RENDITION) {
 			if (ch >= ' ' || ch == '\n') {
@@ -282,7 +282,7 @@ public class TerminalControl implements Runnable {
 		if (g[characterSet] == 'B') {
 			return characters;
 		}
-		StringBuffer translation = new StringBuffer(characters.length());
+		StringBuilder translation = new StringBuilder(characters.length());
 		for (int i = 0; i < characters.length(); ++i) {
 			translation.append(translateToCharacterSet(characters.charAt(i)));
 		}
@@ -291,7 +291,7 @@ public class TerminalControl implements Runnable {
 	
 	private synchronized void flushLineBuffer() {
 		final String line = lineBuffer.toString();
-		lineBuffer = new StringBuffer();
+		lineBuffer = new StringBuilder();
 		
 		// Conform to the stated claim that the listener's always called in the AWT dispatch thread.
 		if (line.length() > 0) {
