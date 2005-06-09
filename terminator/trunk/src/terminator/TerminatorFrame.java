@@ -33,7 +33,7 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	public void updateFrameTitle() {
-		StringBuffer title = new StringBuffer();
+		StringBuilder title = new StringBuilder();
 		if (terminalSize != null) {
 			title.append("[").append(terminalSize.width).append(" x ").append(terminalSize.height).append("] ");
 		}
