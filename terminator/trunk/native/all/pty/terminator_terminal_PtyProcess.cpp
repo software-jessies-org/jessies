@@ -6,7 +6,7 @@ typedef long long __int64;
 
 #ifdef _WIN32
 
-extern "C" jint Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *, jobject, jobjectArray, jobject, jobject) {
+extern "C" void Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *, jobject, jobjectArray, jobject, jobject) {
     return (jint)-1;
 }
 extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEnv *, jobject, jobject, jobject) {
@@ -39,6 +39,37 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 #include <iostream>
 #include <sstream>
 #include <string>
+
+// ---------------------------------------------------------------------------
+
+static jfieldID getFieldID(JNIEnv* env, jobject object, const char* fieldName, const char* fieldSignature) {
+    jclass objectClass = env->GetObjectClass(object);
+    jfieldID result = env->GetFieldID(objectClass, fieldName, fieldSignature);
+    return result;
+}
+
+// ---------------------------------------------------------------------------
+
+template <typename T>
+static void setField(JNIEnv* env, jobject object, const char* fieldName, const T& newValue);
+
+template <>
+static void setField(JNIEnv* env, jobject object, const char* fieldName, const int& newValue) {
+    env->SetIntField(object, getFieldID(env, object, fieldName, "I"), newValue);
+}
+
+template <>
+static void setField(JNIEnv* env, jobject object, const char* fieldName, const bool& newValue) {
+    env->SetIntField(object, getFieldID(env, object, fieldName, "Z"), newValue ? JNI_TRUE : JNI_FALSE);
+}
+
+// ---------------------------------------------------------------------------
+
+static int getIntField(JNIEnv* env, jobject object, const char* fieldName) {
+    return env->GetIntField(object, getFieldID(env, object, fieldName, "I"));
+}
+
+// ---------------------------------------------------------------------------
 
 class IOException {
     std::string message;
@@ -144,22 +175,10 @@ public:
         return fds;
     }
     
-    void setFileDescriptor(JNIEnv *env, jobject fileDescriptor) {
-        jclass fileDescriptorClass = env->GetObjectClass(fileDescriptor);
-        jfieldID fid = env->GetFieldID(fileDescriptorClass, "fd", "I");
-        env->SetIntField(fileDescriptor, fid, masterFd);
+    int getMasterFd() {
+        return masterFd;
     }
 };
-
-static int getIntField(JNIEnv *env, jobject obj, const char *fieldName) {
-    jclass objClass = env->GetObjectClass(obj);
-    jfieldID fid = env->GetFieldID(objClass, fieldName, "I");
-    return (unsigned short) env->GetIntField(obj, fid);
-}
-
-static int getFileDescriptor(JNIEnv *env, jobject ptyProcess) {
-    return getIntField(env, ptyProcess, "fd");
-}
 
 static pid_t getPid(JNIEnv *env, jobject ptyProcess) {
     return (pid_t) getIntField(env, ptyProcess, "processId");
@@ -248,8 +267,7 @@ static void throwJavaIOException(JNIEnv* env, std::ostringstream& message) {
     }
 }
 
-extern "C" jint Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *env, jobject ptyProcess, jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
-    (void) ptyProcess;
+extern "C" void Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *env, jobject ptyProcess, jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
     int cmdLength = env->GetArrayLength(command);
     char **cmd = (char **) calloc(cmdLength + 1, sizeof(char *));
     jstring *strings = (jstring *) calloc(cmdLength, sizeof(jstring));
@@ -260,38 +278,38 @@ extern "C" jint Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *env, jo
     }
     PtyGenerator ptyGenerator;
     if (ptyGenerator.openMaster() == false) {
-        return (jint) -1;
+        std::ostringstream oss;
+        oss << "couldn't open master";
+        throwJavaIOException(env, oss);
+        return;
     }
-    pid_t pid;
     try {
-        pid = doExecution(cmd, ptyGenerator);
+        pid_t pid = doExecution(cmd, ptyGenerator);
+        setField(env, ptyProcess, "processId", pid);
         for (int i = 0; i < cmdLength; i++) {
             env->ReleaseStringUTFChars(strings[i], cmd[i]);
         }
         free(strings);
         free(cmd);
-        ptyGenerator.setFileDescriptor(env, inDescriptor);
-        ptyGenerator.setFileDescriptor(env, outDescriptor);
-        ptyGenerator.setFileDescriptor(env, ptyProcess);
+        int masterFd = ptyGenerator.getMasterFd();
+        setField(env, inDescriptor, "fd", masterFd);
+        setField(env, outDescriptor, "fd", masterFd);
+        setField(env, ptyProcess, "fd", masterFd);
     } catch (const IOException& exception) {
         std::ostringstream oss;
         oss << exception.getMessage();
         throwJavaIOException(env, oss);
+        return;
     }
-    return (jint) pid;
-}
-
-static unsigned short getDimensionField(JNIEnv *env, jobject dimension, const char *fieldName) {
-    return (unsigned short) getIntField(env, dimension, fieldName);
 }
 
 extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEnv *env, jobject ptyProcess, jobject sizeInChars, jobject sizeInPixels) {
     struct winsize size;
-    size.ws_col = getDimensionField(env, sizeInChars, "width");
-    size.ws_row = getDimensionField(env, sizeInChars, "height");
-    size.ws_xpixel = getDimensionField(env, sizeInPixels, "width");
-    size.ws_ypixel = getDimensionField(env, sizeInPixels, "height");
-    int fd = getFileDescriptor(env, ptyProcess);
+    size.ws_col = getIntField(env, sizeInChars, "width");
+    size.ws_row = getIntField(env, sizeInChars, "height");
+    size.ws_xpixel = getIntField(env, sizeInPixels, "width");
+    size.ws_ypixel = getIntField(env, sizeInPixels, "height");
+    int fd = getIntField(env, ptyProcess, "fd");
     if (ioctl(fd, TIOCSWINSZ, (char *) &size) < 0) {
         std::ostringstream oss;
         oss << "ioctl(" << fd << ", TIOCSWINSZ, &size) failed";
@@ -321,11 +339,8 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *env, jobject
     }
     
     int exitValue = WEXITSTATUS(status);
-    jclass ptyClass = env->GetObjectClass(ptyProcess);
-    jfieldID fid = env->GetFieldID(ptyClass, "hasTerminated", "Z");
-    env->SetBooleanField(ptyProcess, fid, JNI_TRUE);
-    fid = env->GetFieldID(ptyClass, "exitValue", "I");
-    env->SetIntField(ptyProcess, fid, exitValue);
+    setField(env, ptyProcess, "hasTerminated", true);
+    setField(env, ptyProcess, "exitValue", exitValue);
 }
 
 #endif
