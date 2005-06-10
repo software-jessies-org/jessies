@@ -183,7 +183,6 @@ DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 
 SOURCE_FILES=$(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
 TAR_FILE_OF_THE_DAY := $(shell date +$(PROJECT_NAME)-%Y-%m-%d.tar)
-DIRECTORY_FOR_TAR_FILE_OF_THE_DAY := $(if $(wildcard ../trunk),../..,..)
 
 REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
 
@@ -222,14 +221,18 @@ define GENERATE_FILE_LIST.cvs
   cvs ls -R -P -e | perl -ne 'm/(.*):$$/ && ($$dir = "$$1"); m@^/([^/]*)/@ && print ("$$dir/$$1\n")'
 endef
 define GENERATE_FILE_LIST.svn
-  svn list -R
+  svn status -v | cut -c6- | perl -pe 's/ +/ /g' | cut -f5 -d' '
 endef
 
-FILE_LIST_WITH_DIRECTORIES = $(shell $(GENERATE_FILE_LIST.$(REVISION_CONTROL_SYSTEM)))
-FILE_LIST_WITH_DIRECTORIES += classes
-FILE_LIST_WITH_DIRECTORIES += generated
-FILE_LIST_WITH_DIRECTORIES += ChangeLog # The ChangeLog should never be checked in, but should be in distributions.
-FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE_LIST_WITH_DIRECTORIES)),$(FILE_LIST_WITH_DIRECTORIES))))
+REVISION_CONTROLLED_FILES_AND_DIRECTORIES := $(shell $(GENERATE_FILE_LIST.$(REVISION_CONTROL_SYSTEM)))
+# You might think this is cunning (I did) but svn cares about directory properties
+# and (perhaps because of that) controls even empty directories like native/Darwin/NSSpell/src.
+#POSSIBLY_REVISION_CONTROLLED_DIRECTORIES = $(sort $(patsubst %/,%,$(dir $(REVISION_CONTROLLED_FILES_AND_DIRECTORIES))))
+POSSIBLY_REVISION_CONTROLLED_DIRECTORIES := $(patsubst ./%,%,$(shell find . -type d))
+FILE_LIST += $(filter-out $(POSSIBLY_REVISION_CONTROLLED_DIRECTORIES),$(REVISION_CONTROLLED_FILES_AND_DIRECTORIES))
+FILE_LIST += classes
+FILE_LIST += generated
+FILE_LIST += ChangeLog # The ChangeLog should never be checked in, but should be in distributions.
 
 # ----------------------------------------------------------------------------
 # Choose a Java compiler.
@@ -362,23 +365,30 @@ build.java: $(SOURCE_FILES)
 
 .PHONY: clean
 clean:
-	@$(RM) -r $(GENERATED_FILES)
+	@$(RM) -r $(GENERATED_FILES) && \
+	find . -name "*.bak" | xargs --no-run-if-empty $(RM)
 
-$(DIRECTORY_FOR_TAR_FILE_OF_THE_DAY)/$(TAR_FILE_OF_THE_DAY).gz: build
-	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM)); \
-	find . -name "*.bak" | xargs --no-run-if-empty rm; \
-	$(SCRIPT_PATH)/svn-log-to-html.rb < ChangeLog > ChangeLog.html && \
-	cd $(DIRECTORY_FOR_TAR_FILE_OF_THE_DAY) && \
-	tar -cf $(TAR_FILE_OF_THE_DAY) $(FILE_LIST) && \
-	rm -f $(TAR_FILE_OF_THE_DAY).gz && \
-	gzip $(TAR_FILE_OF_THE_DAY)
+ChangeLog.html: ChangeLog
+	$(SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
+
+.PHONY: ChangeLog
+ChangeLog:
+	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM))
+
+%.tar.gz: %.tar
+	rm -f $@ && \
+	gzip $<
+
+../$(TAR_FILE_OF_THE_DAY): build $(FILE_LIST)
+	cd .. && \
+	tar -cf $(TAR_FILE_OF_THE_DAY) $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
 
 .PHONY: dist
-dist: $(DIRECTORY_FOR_TAR_FILE_OF_THE_DAY)/$(TAR_FILE_OF_THE_DAY).gz
+dist: ../$(TAR_FILE_OF_THE_DAY).gz ChangeLog.html
 	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
 	scp ChangeLog.html $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
 	scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
-	scp $< $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
+	scp ../$(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
 	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME).tgz
 
 $(PROJECT_NAME).jar: build
