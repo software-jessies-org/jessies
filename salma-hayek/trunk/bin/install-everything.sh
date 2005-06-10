@@ -38,12 +38,13 @@ cd /usr/local/www.jessies.org/ || die "making install directory"
 
 # Download and extract the latest nightly builds.
 PROJECTS="salma-hayek edit scm terminator"
+BROKEN_PROJECTS=""
 for PROJECT in $PROJECTS; do
     rm -f $PROJECT.tgz
     wget -C off -N http://www.jessies.org/~enh/software/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
-    make -C $PROJECT || die "building $PROJECT"
+    make -C $PROJECT || BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
 done
 
 rm -f ~/.terminal-logs/.terminator-server-port
@@ -64,5 +65,9 @@ if test -f /etc/debian_version ; then
     update-alternatives --auto x-terminal-emulator
 fi
 
+if [ "$BROKEN_PROJECTS" != "" ]
+then
+    die "failed to build $BROKEN_PROJECTS"
+fi
 echo "All done!"
 exit 0
