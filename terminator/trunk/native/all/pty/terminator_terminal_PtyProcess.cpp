@@ -25,6 +25,9 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 #include <stdlib.h>
 #include <termios.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
