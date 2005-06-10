@@ -197,6 +197,8 @@ endef
 
 CREATE_OR_UPDATE_JAR=cd $(2)/classes && $(JAR) $(1)f $(CURDIR)/$@ $(notdir $(wildcard $(2)/classes/*))
 
+GENERATED_FILES += ChangeLog
+GENERATED_FILES += ChangeLog.html
 GENERATED_FILES += classes
 GENERATED_FILES += generated
 GENERATED_FILES += $(PROJECT_NAME).jar
