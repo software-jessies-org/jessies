@@ -7,7 +7,6 @@ typedef long long __int64;
 #ifdef _WIN32
 
 extern "C" void Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *, jobject, jobjectArray, jobject, jobject) {
-    return (jint)-1;
 }
 extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEnv *, jobject, jobject, jobject) {
 }
@@ -19,32 +18,39 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 #else
 
 #include "errnoToString.h"
+#include "PtyGenerator.h"
 
-#include <errno.h>
-#include <grp.h>
-#include <jni.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <termios.h>
-#include <fcntl.h>
-
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
+
+// ---------------------------------------------------------------------------
+
+// Based on code by Kevlin Henney, shown in "Exceptional C++ Style".
+template <typename T>
+std::string toString(const T& value) {
+    std::stringstream interpreter;
+    std::string result;
+    if (!(interpreter << value) || !(interpreter >> result) || !(interpreter >> std::ws).eof()) {
+        throw std::runtime_error("bad lexical cast");
+    }
+    return result;
+}
 
 // ---------------------------------------------------------------------------
 
 static jfieldID getFieldID(JNIEnv* env, jobject object, const char* fieldName, const char* fieldSignature) {
     jclass objectClass = env->GetObjectClass(object);
     jfieldID result = env->GetFieldID(objectClass, fieldName, fieldSignature);
+    if (result == 0) {
+        throw std::runtime_error(std::string() + "couldn't find field " + fieldName + " (" + fieldSignature + ")");
+    }
     return result;
 }
 
@@ -71,121 +77,12 @@ static int getIntField(JNIEnv* env, jobject object, const char* fieldName) {
 
 // ---------------------------------------------------------------------------
 
-class IOException {
-    std::string message;
-    
-public:
-    IOException(const std::string& msg) : message(msg) {
-    }
-    
-    const char* getMessage() const {
-        return message.c_str();
-    }
-};
-
-class PtyGenerator {
-    std::string ptyName;
-    int masterFd;
-
-    int search_for_pty(std::string& pts_name) {
-        for (char* ptr1 = "pqrstuvwxyzPQRST"; *ptr1 != 0; ++ptr1) {
-            for (char* ptr2 = "0123456789abcdef"; *ptr2 != 0; ++ptr2) {
-                pts_name = "/dev/pty";
-                pts_name.append(1, *ptr1);
-                pts_name.append(1, *ptr2);
-                
-                /* try to open master */
-                int fdm = open(pts_name.c_str(), O_RDWR);
-                if (fdm < 0) {
-                    if (errno == ENOENT) {
-                        /* Different from EIO. */
-                        throw IOException("Out of pseudo-terminal devices");
-                    } else {
-                        /* Try next pty device. */
-                        continue;
-                    }
-                }
-                
-                /* Return name of slave. */
-                pts_name = "/dev/tty";
-                pts_name.append(1, *ptr1);
-                pts_name.append(1, *ptr2);
-                
-                /* Return fd of master. */
-                return fdm;
-            }
-        }
-        throw IOException("Out of pseudo-terminal devices");
-    }
-    
-    int ptym_open(std::string& pts_name) {
-        int ptmx_fd = open("/dev/ptmx", O_RDWR);
-        if (ptmx_fd < 0) {
-            return search_for_pty(pts_name);
-        }
-        
-        const char* name = ptsname(ptmx_fd);
-        if (name == 0) {
-            std::ostringstream oss;
-            oss << "Failed to get ptysname for file descriptor " << ptmx_fd;
-            throw IOException(oss.str());
-        }
-        pts_name = name;
-        
-        if (grantpt(ptmx_fd) != 0) {
-            std::ostringstream oss;
-            oss << "Failed to get grantpt for " << name;
-            throw IOException(oss.str());
-        }
-        if (unlockpt(ptmx_fd) != 0) {
-            std::ostringstream oss;
-            oss << "Failed to get unlockpt for " << name;
-            throw IOException(oss.str());
-        }
-        return ptmx_fd;
-    }
-    
-public:
-    PtyGenerator() : masterFd(-1) {
-    }
-    
-    virtual ~PtyGenerator() {
-    }
-    
-    bool openMaster() {
-        masterFd = ptym_open(ptyName);
-        return (masterFd >= 0);
-    }
-  
-    int openSlaveAndCloseMaster() {
-        struct group* grptr = getgrnam("tty");
-        gid_t gid = (grptr != NULL) ? grptr->gr_gid : gid_t(-1);
-        
-        const char *cName = ptyName.c_str();
-        chown(cName, getuid(), gid);
-        chmod(cName, S_IRUSR | S_IWUSR | S_IWGRP);
-        
-        int fds = open(cName, O_RDWR);
-        if (fds < 0) {
-            std::ostringstream oss;
-            oss << "Failed to open " << cName;
-            throw IOException(oss.str());
-        }
-        close(masterFd);
-        return fds;
-    }
-    
-    int getMasterFd() {
-        return masterFd;
-    }
-};
-
 static pid_t getPid(JNIEnv *env, jobject ptyProcess) {
     return (pid_t) getIntField(env, ptyProcess, "processId");
 }
 
 static void clientPanic(int fd, const char *message) {
-    FILE *tunnel = fdopen(fd, "w");
+    FILE* tunnel = fdopen(fd, "w");
     fprintf(tunnel, "Error from child: %s\n", message);
     exit(1);
 }
@@ -200,7 +97,7 @@ static int runChild(char * const *cmd, PtyGenerator& ptyGenerator) {
         fprintf(stderr, "Failed to open client's side of the pty.\n");
         exit(2);
     }
-#if    defined(TIOCSCTTY) && !defined(CIBAUD)
+#if defined(TIOCSCTTY) && !defined(CIBAUD)
     /* 44BSD way to acquire controlling terminal */
     /* !CIBAUD to avoid doing this under SunOS */
     if (ioctl(childFd, TIOCSCTTY, (char *) 0) < 0) {
@@ -259,51 +156,52 @@ static void appendErrno(std::ostream& message) {
     message << ")";
 }
 
-static void throwJavaIOException(JNIEnv* env, std::ostringstream& message) {
-    appendErrno(message);
+static void throwJavaIOException(JNIEnv* env, const std::exception& ex) {
+    std::ostringstream oss;
+    oss << ex.what();
+    appendErrno(oss);
+    
     jclass exceptionClass = env->FindClass("java/io/IOException");
     if (exceptionClass) {
-        env->ThrowNew(exceptionClass, message.str().c_str());
+        env->ThrowNew(exceptionClass, oss.str().c_str());
     }
 }
 
-extern "C" void Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *env, jobject ptyProcess, jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
+static void PtyProcess_startProcess(JNIEnv *env, jobject ptyProcess, jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
     int cmdLength = env->GetArrayLength(command);
     char **cmd = (char **) calloc(cmdLength + 1, sizeof(char *));
     jstring *strings = (jstring *) calloc(cmdLength, sizeof(jstring));
     for (int i = 0; i < cmdLength; i++) {
         jobject obj = env->GetObjectArrayElement(command, i);
         strings[i] = (jstring) obj;
-        cmd[i] = (char *) env->GetStringUTFChars(strings[i], 0);
+        cmd[i] = const_cast<char*>(env->GetStringUTFChars(strings[i], 0));
     }
     PtyGenerator ptyGenerator;
     if (ptyGenerator.openMaster() == false) {
-        std::ostringstream oss;
-        oss << "couldn't open master";
-        throwJavaIOException(env, oss);
-        return;
+        throw std::runtime_error("couldn't open master");
     }
+    pid_t pid = doExecution(cmd, ptyGenerator);
+    setField(env, ptyProcess, "processId", pid);
+    for (int i = 0; i < cmdLength; i++) {
+        env->ReleaseStringUTFChars(strings[i], cmd[i]);
+    }
+    free(strings);
+    free(cmd);
+    int masterFd = ptyGenerator.getMasterFd();
+    setField(env, inDescriptor, "fd", masterFd);
+    setField(env, outDescriptor, "fd", masterFd);
+    setField(env, ptyProcess, "fd", masterFd);
+}
+
+extern "C" void Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *env, jobject ptyProcess, jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
     try {
-        pid_t pid = doExecution(cmd, ptyGenerator);
-        setField(env, ptyProcess, "processId", pid);
-        for (int i = 0; i < cmdLength; i++) {
-            env->ReleaseStringUTFChars(strings[i], cmd[i]);
-        }
-        free(strings);
-        free(cmd);
-        int masterFd = ptyGenerator.getMasterFd();
-        setField(env, inDescriptor, "fd", masterFd);
-        setField(env, outDescriptor, "fd", masterFd);
-        setField(env, ptyProcess, "fd", masterFd);
-    } catch (const IOException& exception) {
-        std::ostringstream oss;
-        oss << exception.getMessage();
-        throwJavaIOException(env, oss);
-        return;
+        PtyProcess_startProcess(env, ptyProcess, command, inDescriptor, outDescriptor);
+    } catch (const std::exception& ex) {
+        throwJavaIOException(env, ex);
     }
 }
 
-extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEnv *env, jobject ptyProcess, jobject sizeInChars, jobject sizeInPixels) {
+static void PtyProcess_sendResizeNotification(JNIEnv *env, jobject ptyProcess, jobject sizeInChars, jobject sizeInPixels) {
     struct winsize size;
     size.ws_col = getIntField(env, sizeInChars, "width");
     size.ws_row = getIntField(env, sizeInChars, "height");
@@ -311,36 +209,53 @@ extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEn
     size.ws_ypixel = getIntField(env, sizeInPixels, "height");
     int fd = getIntField(env, ptyProcess, "fd");
     if (ioctl(fd, TIOCSWINSZ, (char *) &size) < 0) {
-        std::ostringstream oss;
-        oss << "ioctl(" << fd << ", TIOCSWINSZ, &size) failed";
-        throwJavaIOException(env, oss);
+        throw std::runtime_error("ioctl(" + toString(fd) + ", TIOCSWINSZ, &size) failed");
+    }
+}
+
+extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEnv *env, jobject ptyProcess, jobject sizeInChars, jobject sizeInPixels) {
+    try {
+        PtyProcess_sendResizeNotification(env, ptyProcess, sizeInChars, sizeInPixels);
+    } catch (const std::exception& ex) {
+        throwJavaIOException(env, ex);
+    }
+}
+
+static void PtyProcess_destroy(JNIEnv *env, jobject ptyProcess) {
+    pid_t pid = getPid(env, ptyProcess);
+    int status = killpg(pid, SIGHUP);
+    if (status < 0) {
+        throw std::runtime_error("killpg(" + toString(pid) + ", SIGHUP) failed");
     }
 }
 
 extern "C" void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *env, jobject ptyProcess) {
-    pid_t pid = getPid(env, ptyProcess);
-    int status = killpg(pid, SIGHUP);
-    if (status < 0) {
-        std::ostringstream oss;
-        oss << "killpg(" << pid << ", SIGHUP) failed";
-        throwJavaIOException(env, oss);
+    try {
+        PtyProcess_destroy(env, ptyProcess);
+    } catch (const std::exception& ex) {
+        throwJavaIOException(env, ex);
     }
 }
 
-extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *env, jobject ptyProcess) {
+static void PtyProcess_waitFor(JNIEnv *env, jobject ptyProcess) {
     pid_t pid = getPid(env, ptyProcess);
     int status;
     pid_t result = waitpid(pid, &status, 0);
     if (result < 0) {
-        std::ostringstream oss;
-        oss << "waitpid(" << pid << ", &status, 0) failed";
-        throwJavaIOException(env, oss);
-        return;
+        throw std::runtime_error("waitpid(" + toString(pid) + ", &status, 0) failed");
     }
     
     int exitValue = WEXITSTATUS(status);
     setField(env, ptyProcess, "hasTerminated", true);
     setField(env, ptyProcess, "exitValue", exitValue);
+}
+
+extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *env, jobject ptyProcess) {
+    try {
+        PtyProcess_waitFor(env, ptyProcess);
+    } catch (std::exception& ex) {
+        throwJavaIOException(env, ex);
+    }
 }
 
 #endif
