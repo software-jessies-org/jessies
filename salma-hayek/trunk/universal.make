@@ -8,7 +8,6 @@
 #   JAVA_COMPILER to "gcjx", "javac", or a binary of your choice.
 
 # Your calling Makefile:
-#   may append to BINDIST_FILES
 #   must include ../salma-hayek/universal.make
 
 #   must have any extra rules after the include
@@ -183,7 +182,8 @@ DIST_SCP_USER_AND_HOST=enh@jessies.org
 DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 
 SOURCE_FILES=$(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
-TAR_FILE_OF_THE_DAY=`date +$(PROJECT_NAME)-%Y-%m-%d.tar`
+TAR_FILE_OF_THE_DAY := $(shell date +$(PROJECT_NAME)-%Y-%m-%d.tar)
+DIRECTORY_FOR_TAR_FILE_OF_THE_DAY := $(if $(wildcard ../trunk),../..,..)
 
 REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
 
@@ -195,7 +195,7 @@ define GENERATE_CHANGE_LOG.cvs
   $(if $(shell which cvs2cl),cvs2cl,cvs2cl.pl) --hide-filenames
 endef
 
-CREATE_OR_UPDATE_JAR=cd $(2) && $(JAR) $(1)f $(CURDIR)/$@ -C classes $(notdir $(wildcard $(2)/classes/*))
+CREATE_OR_UPDATE_JAR=cd $(2)/classes && $(JAR) $(1)f $(CURDIR)/$@ $(notdir $(wildcard $(2)/classes/*))
 
 GENERATED_FILES += classes
 GENERATED_FILES += generated
@@ -205,8 +205,13 @@ GENERATED_FILES += $(PROJECT_NAME)-bindist.tgz
 grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
 DIRECTORY_NAME := $(notdir $(CURDIR))
 
-BINDIST_FILES += README COPYING $(PROJECT_NAME).jar
-FILTERED_BINDIST_FILES = $(shell find $(BINDIST_FILES) -type f | grep -v /CVS/)
+BINDIST_FILES += $(PROJECT_NAME).jar
+BINDIST_FILES += COPYING
+BINDIST_FILES += README
+BINDIST_FILES += $(foreach BASE_NAME,$(notdir $(SUBDIRS)),$(patsubst $(CURDIR)/%,%,$(DEFAULT_TARGET.$(BASE_NAME))))
+BINDIST_DIRS += bin
+BINDIST_DIRS += $(wildcard doc)
+BINDIST_FILES += $(shell find $(BINDIST_DIRS) -type f | perl -ne 'm@(^|/)(CVS|\.svn)($|/)@ || print')
 
 define GENERATE_FILE_LIST.bk
   bk sfiles -g
@@ -220,6 +225,7 @@ endef
 
 FILE_LIST_WITH_DIRECTORIES = $(shell $(GENERATE_FILE_LIST.$(REVISION_CONTROL_SYSTEM)))
 FILE_LIST_WITH_DIRECTORIES += classes
+FILE_LIST_WITH_DIRECTORIES += generated
 FILE_LIST_WITH_DIRECTORIES += ChangeLog # The ChangeLog should never be checked in, but should be in distributions.
 FILE_LIST = $(subst /./,/,$(addprefix $(PROJECT_NAME)/,$(filter-out $(dir $(FILE_LIST_WITH_DIRECTORIES)),$(FILE_LIST_WITH_DIRECTORIES))))
 
@@ -356,19 +362,21 @@ build.java: $(SOURCE_FILES)
 clean:
 	@$(RM) -r $(GENERATED_FILES)
 
-.PHONY: dist
-dist: build
+$(DIRECTORY_FOR_TAR_FILE_OF_THE_DAY)/$(TAR_FILE_OF_THE_DAY).gz: build
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM)); \
 	find . -name "*.bak" | xargs --no-run-if-empty rm; \
-	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
 	$(SCRIPT_PATH)/svn-log-to-html.rb < ChangeLog > ChangeLog.html && \
-	scp ChangeLog.html $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
-	scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
-	cd $(if $(wildcard ../trunk),../..,..) && \
+	cd $(DIRECTORY_FOR_TAR_FILE_OF_THE_DAY) && \
 	tar -cf $(TAR_FILE_OF_THE_DAY) $(FILE_LIST) && \
 	rm -f $(TAR_FILE_OF_THE_DAY).gz && \
-	gzip $(TAR_FILE_OF_THE_DAY) && \
-	scp $(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
+	gzip $(TAR_FILE_OF_THE_DAY)
+
+.PHONY: dist
+dist: $(DIRECTORY_FOR_TAR_FILE_OF_THE_DAY)/$(TAR_FILE_OF_THE_DAY).gz
+	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
+	scp ChangeLog.html $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
+	scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
+	scp $< $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
 	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME).tgz
 
 $(PROJECT_NAME).jar: build
@@ -379,7 +387,7 @@ $(PROJECT_NAME).jar: build
 bindist: $(PROJECT_NAME)-bindist.tgz
 
 $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
-	@cd .. && tar -zcf $(addprefix $(DIRECTORY_NAME)/,$@ $(FILTERED_BINDIST_FILES))
+	@cd .. && tar -zcf $(addprefix $(DIRECTORY_NAME)/,$@ $(BINDIST_FILES))
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
