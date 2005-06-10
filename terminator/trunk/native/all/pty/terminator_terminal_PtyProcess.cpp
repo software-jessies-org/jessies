@@ -317,6 +317,7 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *env, jobject
         std::ostringstream oss;
         oss << "waitpid(" << pid << ", &status, 0) failed";
         throwJavaIOException(env, oss);
+        return;
     }
     
     int exitValue = WEXITSTATUS(status);
