@@ -34,7 +34,7 @@ public class PtyProcess {
         ensureLibrary();
         FileDescriptor inDescriptor = new FileDescriptor();
         FileDescriptor outDescriptor = new FileDescriptor();
-        processId = startProcess(command, inDescriptor, outDescriptor);
+        startProcess(command, inDescriptor, outDescriptor);
         if (processId == -1) {
             throw new IOException("Could not start process \"" + command + "\".");
         }
@@ -50,7 +50,7 @@ public class PtyProcess {
         return outStream;
     }
     
-    private native int startProcess(String[] command, FileDescriptor inDescriptor, FileDescriptor outDescriptor) throws IOException;
+    private native void startProcess(String[] command, FileDescriptor inDescriptor, FileDescriptor outDescriptor) throws IOException;
     
     public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
     
