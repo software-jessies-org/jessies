@@ -6,6 +6,11 @@ import java.io.*;
  * Indents source output via the println method. The indentation is primitive,
  * but should be sufficient for anything you'd reasonably want to do in
  * generated C++ or Java. ('switch' statements being an obvious exception.)
+ * 
+ * Note: no-one should put too much effort into improving this class; the right
+ * fix for aberrant behavior is to make it take an instance of what's currently
+ * called PIndenter, but which could probably be generalized out of the
+ * PTextArea code.
  */
 public class IndentedSourceWriter {
     private PrintStream out;
@@ -18,7 +23,7 @@ public class IndentedSourceWriter {
     
     public void println(String line) {
         line = line.trim();
-        if (line.equals("}")) {
+        if (line.startsWith("}")) {
             --indentationDepth;
         }
         if (line.endsWith(":") == false) {
