@@ -182,7 +182,7 @@ DIST_SCP_USER_AND_HOST=enh@jessies.org
 DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 
 SOURCE_FILES=$(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
-TAR_FILE_OF_THE_DAY := $(shell date +$(PROJECT_NAME)-%Y-%m-%d.tar)
+DIST_FILE_OF_THE_DAY := $(shell date +$(PROJECT_NAME)-%Y-%m-%d.tar.gz)
 
 REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
 
@@ -375,12 +375,12 @@ ChangeLog:
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM))
 
 .PHONY: dist
-dist: ../$(TAR_FILE_OF_THE_DAY).gz ChangeLog.html
+dist: ../$(DIST_FILE_OF_THE_DAY) ChangeLog.html
 	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
 	scp ChangeLog.html $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
 	scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
-	scp ../$(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
-	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(TAR_FILE_OF_THE_DAY).gz $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME).tgz
+	scp ../$(DIST_FILE_OF_THE_DAY) $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
+	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME).tgz
 
 $(PROJECT_NAME).jar: build
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
@@ -393,9 +393,9 @@ $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
 	cd .. && \
 	tar -zcf $(addprefix $(PROJECT_NAME)/,$@ $(BINDIST_FILES))
 
-../$(TAR_FILE_OF_THE_DAY).gz: build $(FILE_LIST)
+../$(DIST_FILE_OF_THE_DAY): build $(FILE_LIST)
 	cd .. && \
-	tar -zcf $(TAR_FILE_OF_THE_DAY).gz $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
+	tar -zcf $(DIST_FILE_OF_THE_DAY) $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
