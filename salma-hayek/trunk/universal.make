@@ -204,7 +204,6 @@ GENERATED_FILES += $(PROJECT_NAME).jar
 GENERATED_FILES += $(PROJECT_NAME)-bindist.tgz
 
 grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
-DIRECTORY_NAME := $(notdir $(CURDIR))
 
 BINDIST_FILES += $(PROJECT_NAME).jar
 BINDIST_FILES += COPYING
@@ -375,10 +374,6 @@ ChangeLog.html: ChangeLog
 ChangeLog:
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM))
 
-../$(TAR_FILE_OF_THE_DAY).gz: build $(FILE_LIST)
-	cd .. && \
-	tar -zcf $(TAR_FILE_OF_THE_DAY).gz $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
-
 .PHONY: dist
 dist: ../$(TAR_FILE_OF_THE_DAY).gz ChangeLog.html
 	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
@@ -395,7 +390,12 @@ $(PROJECT_NAME).jar: build
 bindist: $(PROJECT_NAME)-bindist.tgz
 
 $(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
-	@cd .. && tar -zcf $(addprefix $(DIRECTORY_NAME)/,$@ $(BINDIST_FILES))
+	cd .. && \
+	tar -zcf $(addprefix $(PROJECT_NAME)/,$@ $(BINDIST_FILES))
+
+../$(TAR_FILE_OF_THE_DAY).gz: build $(FILE_LIST)
+	cd .. && \
+	tar -zcf $(TAR_FILE_OF_THE_DAY).gz $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
