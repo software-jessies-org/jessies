@@ -375,13 +375,9 @@ ChangeLog.html: ChangeLog
 ChangeLog:
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM))
 
-%.tar.gz: %.tar
-	rm -f $@ && \
-	gzip $<
-
-../$(TAR_FILE_OF_THE_DAY): build $(FILE_LIST)
+../$(TAR_FILE_OF_THE_DAY).gz: build $(FILE_LIST)
 	cd .. && \
-	tar -cf $(TAR_FILE_OF_THE_DAY) $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
+	tar -zcf $(TAR_FILE_OF_THE_DAY).gz $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
 
 .PHONY: dist
 dist: ../$(TAR_FILE_OF_THE_DAY).gz ChangeLog.html
