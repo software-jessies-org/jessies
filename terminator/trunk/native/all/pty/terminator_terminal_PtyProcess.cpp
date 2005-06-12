@@ -17,8 +17,9 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 
 #else
 
-#include "errnoToString.h"
 #include "PtyGenerator.h"
+#include "toString.h"
+#include "UnixException.h"
 
 #include <signal.h>
 #include <stdio.h>
@@ -34,21 +35,6 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 #include <string>
 #include <vector>
 
-// ---------------------------------------------------------------------------
-
-// Based on code by Kevlin Henney, shown in "Exceptional C++ Style".
-template <typename T>
-std::string toString(const T& value) {
-    std::stringstream interpreter;
-    std::string result;
-    if (!(interpreter << value) || !(interpreter >> result) || !(interpreter >> std::ws).eof()) {
-        throw std::runtime_error("bad lexical cast");
-    }
-    return result;
-}
-
-// ---------------------------------------------------------------------------
-
 struct Arguments : std::vector<std::string> {
     Arguments(JNIEnv* env, jobjectArray command) {
         int arrayLength = env->GetArrayLength(command);
@@ -57,7 +43,7 @@ struct Arguments : std::vector<std::string> {
             const char* utfChars = env->GetStringUTFChars(javaString, 0);
             push_back(utfChars);
             env->ReleaseStringUTFChars(javaString, utfChars);
-        }        
+        }
     }
 };
 
@@ -94,7 +80,7 @@ void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars,
     size.ws_xpixel = JniField<jint>(m_env, sizeInPixels, "width", "I").get();
     size.ws_ypixel = JniField<jint>(m_env, sizeInPixels, "height", "I").get();
     if (ioctl(fd.get(), TIOCSWINSZ, (char *) &size) < 0) {
-        throw std::runtime_error("ioctl(" + toString(fd.get()) + ", TIOCSWINSZ, &size) failed" + errnoToString());
+        throw UnixException("ioctl(" + toString(fd.get()) + ", TIOCSWINSZ, &size)");
     }
 }
 
@@ -102,7 +88,7 @@ void terminator_terminal_PtyProcess::destroy() {
     pid_t pid = processId.get();
     int status = killpg(pid, SIGHUP);
     if (status < 0) {
-        throw std::runtime_error("killpg(" + toString(pid) + ", SIGHUP) failed" + errnoToString());
+        throw UnixException("killpg(" + toString(pid) + ", SIGHUP)");
     }
 }
 
@@ -111,7 +97,7 @@ void terminator_terminal_PtyProcess::waitFor() {
     int status;
     pid_t result = waitpid(pid, &status, 0);
     if (result < 0) {
-        throw std::runtime_error("waitpid(" + toString(pid) + ", &status, 0) failed" + errnoToString());
+        throw UnixException("waitpid(" + toString(pid) + ", &status, 0)");
     }
     
     exitValue = WEXITSTATUS(status);
