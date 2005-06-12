@@ -5,10 +5,10 @@
 
 #include <stdexcept>
 
-class UnixException : std::runtime_error {
+class UnixException : public std::runtime_error {
 public:
-    UnixException(const std::string& str)
-    : std::runtime_error(str + " failed" + errnoToString()) {
+    UnixException(const std::string& message)
+    : std::runtime_error(message + " failed" + errnoToString()) {
     }
 };
 
