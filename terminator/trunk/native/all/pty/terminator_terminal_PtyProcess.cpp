@@ -41,7 +41,7 @@ struct JavaStringArrayToStringArray : StringArray {
     JavaStringArrayToStringArray(JNIEnv* env, jobjectArray javaStringArray) {
         int arrayLength = env->GetArrayLength(javaStringArray);
         for (int i = 0; i != arrayLength; ++i) {
-            jstring javaString = (jstring) env->GetObjectArrayElement(javaStringArray, i);
+            jstring javaString = static_cast<jstring>(env->GetObjectArrayElement(javaStringArray, i));
             const char* utfChars = env->GetStringUTFChars(javaString, 0);
             push_back(utfChars);
             env->ReleaseStringUTFChars(javaString, utfChars);
@@ -81,7 +81,7 @@ void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars,
     size.ws_row = JniField<jint>(m_env, sizeInChars, "height", "I").get();
     size.ws_xpixel = JniField<jint>(m_env, sizeInPixels, "width", "I").get();
     size.ws_ypixel = JniField<jint>(m_env, sizeInPixels, "height", "I").get();
-    if (ioctl(fd.get(), TIOCSWINSZ, (char *) &size) < 0) {
+    if (ioctl(fd.get(), TIOCSWINSZ, &size) < 0) {
         throw UnixException("ioctl(" + toString(fd.get()) + ", TIOCSWINSZ, &size)");
     }
 }
