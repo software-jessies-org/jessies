@@ -119,14 +119,10 @@ private:
     
     static int runChild(char * const *cmd, PtyGenerator& ptyGenerator) {
         if (setsid() < 0) {
-            fprintf(stderr, "Failed to setsid.\n");
+            std::cerr << "Failed to setsid" << errnoToString() << std::endl;
             exit(1);
         }
         int childFd = ptyGenerator.openSlaveAndCloseMaster();
-        if (childFd < 0) {
-            fprintf(stderr, "Failed to open client's side of the pty.\n");
-            exit(2);
-        }
 #if defined(TIOCSCTTY) && !defined(CIBAUD)
         /* 44BSD way to acquire controlling terminal */
         /* !CIBAUD to avoid doing this under SunOS */
@@ -161,7 +157,7 @@ private:
         signal(SIGCHLD, SIG_DFL);
         
         if (execvp(cmd[0], cmd) < 0) {
-            fprintf(stderr, "Error from child: Can't execute %s\n", cmd[0]);
+            std::cerr << "Error from child: Can't execute '" << cmd[0] << "'" << errnoToString() << std::endl;
             exit(1);
         }
         
