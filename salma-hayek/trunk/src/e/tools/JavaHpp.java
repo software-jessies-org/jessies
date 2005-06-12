@@ -36,25 +36,8 @@ public class JavaHpp {
         out.println("#include <stdexcept>");
         
         Class klass = Class.forName(className, false, new URLClassLoader(classpath.toArray(new URL[0])));
-        List<Method> nativeMethods = new ArrayList<Method>();
-        for (Method method : klass.getDeclaredMethods()) {
-            if ((method.getModifiers() & Modifier.NATIVE) != 0) {
-                if (method.getReturnType() != Void.TYPE) {
-                    throw new RuntimeException("methods such as '" + method + "' with a return type other than 'void' are deliberately not supported; set a field instead");
-                }
-                nativeMethods.add(method);
-            }
-        }
-        
-        List<Field> instanceFields = new ArrayList<Field>();
-        for (Field field : klass.getDeclaredFields()) {
-            if ((field.getModifiers() & Modifier.STATIC) != 0) {
-                // JniField.h doesn't support static fields, though there's no
-                // reason why we couldn't write JniStaticField if we needed it.
-                continue;
-            }
-            instanceFields.add(field);
-        }
+        List<Method> nativeMethods = extractNativeMethods(klass.getDeclaredMethods());
+        List<Field> instanceFields = extractInstanceFields(klass.getDeclaredFields());
         
         String proxyClassName = className.replace('.', '_');
         out.println("class " + proxyClassName + " {");
@@ -114,6 +97,32 @@ public class JavaHpp {
         }
         
         out.println("#endif // " + includeGuardName);
+    }
+    
+    private List<Method> extractNativeMethods(Method[] methods) {
+        List<Method> nativeMethods = new ArrayList<Method>();
+        for (Method method : methods) {
+            if ((method.getModifiers() & Modifier.NATIVE) != 0) {
+                if (method.getReturnType() != Void.TYPE) {
+                    throw new RuntimeException("methods such as '" + method + "' with a return type other than 'void' are deliberately not supported; set a field instead");
+                }
+                nativeMethods.add(method);
+            }
+        }
+        return nativeMethods;
+    }
+    
+    private List<Field> extractInstanceFields(Field[] fields) {
+        List<Field> instanceFields = new ArrayList<Field>();
+        for (Field field : fields) {
+            if ((field.getModifiers() & Modifier.STATIC) != 0) {
+                // JniField.h doesn't support static fields, though there's no
+                // reason why we couldn't write JniStaticField if we needed it.
+                continue;
+            }
+            instanceFields.add(field);
+        }
+        return instanceFields;
     }
     
     private void emit_translateToJavaException(IndentedSourceWriter out) {
