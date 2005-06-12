@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <grp.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
