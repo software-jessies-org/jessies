@@ -35,11 +35,13 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 #include <string>
 #include <vector>
 
-struct Arguments : std::vector<std::string> {
-    Arguments(JNIEnv* env, jobjectArray command) {
-        int arrayLength = env->GetArrayLength(command);
+typedef std::vector<std::string> StringArray;
+
+struct JavaStringArrayToStringArray : StringArray {
+    JavaStringArrayToStringArray(JNIEnv* env, jobjectArray javaStringArray) {
+        int arrayLength = env->GetArrayLength(javaStringArray);
         for (int i = 0; i != arrayLength; ++i) {
-            jstring javaString = (jstring) env->GetObjectArrayElement(command, i);
+            jstring javaString = (jstring) env->GetObjectArrayElement(javaStringArray, i);
             const char* utfChars = env->GetStringUTFChars(javaString, 0);
             push_back(utfChars);
             env->ReleaseStringUTFChars(javaString, utfChars);
@@ -49,8 +51,8 @@ struct Arguments : std::vector<std::string> {
 
 struct Argv : std::vector<char*> {
     // Non-const because execvp is anti-social about const.
-    Argv(Arguments& arguments) {
-        for (Arguments::iterator it = arguments.begin(); it != arguments.end(); ++it) {
+    Argv(StringArray& arguments) {
+        for (StringArray::iterator it = arguments.begin(); it != arguments.end(); ++it) {
             // We must point to the memory in arguments, not a local.
             std::string& argument = *it;
             push_back(&argument[0]);
@@ -64,7 +66,7 @@ void terminator_terminal_PtyProcess::startProcess(jobjectArray command, jobject 
     PtyGenerator ptyGenerator;
     int masterFd = ptyGenerator.openMaster();
     
-    Arguments arguments(m_env, command);
+    JavaStringArrayToStringArray arguments(m_env, command);
     Argv argv(arguments);
     processId = ptyGenerator.forkAndExec(&argv[0]);
     
