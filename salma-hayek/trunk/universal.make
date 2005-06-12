@@ -84,7 +84,7 @@ DEFAULT_JAVA_HOME = $(DEFAULT_JAVA_HOME.$(TARGET_OS))
 JAVA_HOME ?= $(if $(DEFAULT_JAVA_HOME),$(DEFAULT_JAVA_HOME),$(error Please set $$(JAVA_HOME)))
 
 JAR = $(JAVA_PATH)jar
-JAVAH := $(JAVA_PATH)javah
+JAVAHPP := $(SALMA_HAYEK)bin/javahpp
 
 # ----------------------------------------------------------------------------
 # Find the source.

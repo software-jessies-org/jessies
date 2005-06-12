@@ -64,9 +64,9 @@ JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 CLASSES_DIRECTORY = $(PROJECT_ROOT)/classes
 JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 
-define JAVAH_RULE
-  "$(JAVAH)" -classpath $(call convertCygwinToWin32Path,$(CLASSES_DIRECTORY)) -d $(call convertCygwinToWin32Path,$(GENERATED_JNI_DIRECTORY)) $(JNI_CLASS_NAME) && \
-  { cmp --quiet $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
+define JAVAHPP_RULE
+"$(JAVAHPP)" -classpath $(call convertCygwinToWin32Path,$(CLASSES_DIRECTORY)) $(JNI_CLASS_NAME) > $(call convertCygwinToWin32Path,$(GENERATED_JNI_HEADER)) && \
+{ cmp --quiet $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
 endef
 
 # ----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ endef
 
 $(EXECUTABLE): LDFLAGS := $(LOCAL_LDFLAGS)
 $(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
-$(GENERATED_JNI_HEADER): RULE := $(JAVAH_RULE)
+$(GENERATED_JNI_HEADER): RULE := $(JAVAHPP_RULE)
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
 # ----------------------------------------------------------------------------
