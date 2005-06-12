@@ -19,11 +19,9 @@ int gnuCompatibleStrerror(char* (*strerror_r)(int, char*, size_t), int errorNumb
 }
 
 std::string errnoToString() {
+  // I'm concerned that errno may have changed by the time this function is called.
+  // I suppose there's no sense in paying for the solution for that problem until we have the problem.
   int errorNumber = errno;
-  if (errorNumber == 0) {
-    return "";
-  }
-  
   char messageBuffer[1024];
   if (gnuCompatibleStrerror(&strerror_r, errorNumber, &messageBuffer[0], sizeof(messageBuffer)) == -1) {
     int decodingError = errno;
@@ -41,8 +39,6 @@ std::string errnoToString() {
     }
     return os.str();
   } else {
-    std::ostringstream oss;
-    oss << ": (" << messageBuffer << ")";
-    return oss.str();
+    return messageBuffer;
   }
 }
