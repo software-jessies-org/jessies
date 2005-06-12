@@ -17,6 +17,8 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 
 #else
 
+#include <JniString.h>
+
 #include "PtyGenerator.h"
 #include "toString.h"
 #include "unix_exception.h"
@@ -41,10 +43,8 @@ struct JavaStringArrayToStringArray : StringArray {
     JavaStringArrayToStringArray(JNIEnv* env, jobjectArray javaStringArray) {
         int arrayLength = env->GetArrayLength(javaStringArray);
         for (int i = 0; i != arrayLength; ++i) {
-            jstring javaString = static_cast<jstring>(env->GetObjectArrayElement(javaStringArray, i));
-            const char* utfChars = env->GetStringUTFChars(javaString, 0);
-            push_back(utfChars);
-            env->ReleaseStringUTFChars(javaString, utfChars);
+            JniString jniString(env, static_cast<jstring>(env->GetObjectArrayElement(javaStringArray, i)));
+            push_back(jniString.str());
         }
     }
 };
