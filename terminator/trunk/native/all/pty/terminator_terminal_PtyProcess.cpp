@@ -49,73 +49,6 @@ std::string toString(const T& value) {
 
 // ---------------------------------------------------------------------------
 
-static void clientPanic(int fd, const char *message) {
-    FILE* tunnel = fdopen(fd, "w");
-    fprintf(tunnel, "Error from child: %s\n", message);
-    exit(1);
-}
-
-static int runChild(char * const *cmd, PtyGenerator& ptyGenerator) {
-    if (setsid() < 0) {
-        fprintf(stderr, "Failed to setsid.\n");
-        exit(1);
-    }
-    int childFd = ptyGenerator.openSlaveAndCloseMaster();
-    if (childFd < 0) {
-        fprintf(stderr, "Failed to open client's side of the pty.\n");
-        exit(2);
-    }
-#if defined(TIOCSCTTY) && !defined(CIBAUD)
-    /* 44BSD way to acquire controlling terminal */
-    /* !CIBAUD to avoid doing this under SunOS */
-    if (ioctl(childFd, TIOCSCTTY, (char *) 0) < 0) {
-        clientPanic(childFd, "TIOCSCTTY error");
-    }
-#endif
-    /* slave becomes stdin/stdout/stderr of child */
-    if (dup2(childFd, STDIN_FILENO) != STDIN_FILENO) {
-        clientPanic(childFd, "dup2 error to stdin");
-    }
-    if (dup2(childFd, STDOUT_FILENO) != STDOUT_FILENO) {
-        clientPanic(childFd, "dup2 error to stdout");
-    }
-    if (dup2(childFd, STDERR_FILENO) != STDERR_FILENO) {
-        clientPanic(childFd, "dup2 error to stderr");
-    }
-    if (childFd > STDERR_FILENO) {
-        close(childFd);
-    }
-    putenv("TERM=terminator");
-    
-    /*
-     * rxvt resets these signal handlers, and we'll do the same, because it magically
-     * fixes the bug where ^c doesn't work if we're launched from KDE or Gnome's
-     * launcher program.  I don't quite understand why - maybe bash reads the existing
-     * SIGINT setting, and if it's set to something other than DFL it lets the parent process
-     * take care of job control.
-     */
-    signal(SIGINT, SIG_DFL);
-    signal(SIGQUIT, SIG_DFL);
-    signal(SIGCHLD, SIG_DFL);
-    
-    if (execvp(cmd[0], cmd) < 0) {
-        fprintf(stderr, "Error from child: Can't execute %s\n", cmd[0]);
-        exit(1);
-    }
-    return(0);        /* child returns 0 just like fork() */
-}
-
-static pid_t doExecution(char * const *cmd, PtyGenerator& ptyGenerator) {
-    pid_t pid = fork();
-    if (pid < 0) {
-        return -1;
-    } else if (pid == 0) {
-        return runChild(cmd, ptyGenerator);  // Should never return.
-    } else {
-        return pid;
-    }
-}
-
 struct Arguments : std::vector<std::string> {
     Arguments(JNIEnv* env, jobjectArray command) {
         int arrayLength = env->GetArrayLength(command);
@@ -147,7 +80,7 @@ void terminator_terminal_PtyProcess::startProcess(jobjectArray command, jobject 
     
     Arguments arguments(m_env, command);
     Argv argv(arguments);
-    processId = doExecution(&argv[0], ptyGenerator);
+    processId = ptyGenerator.forkAndExec(&argv[0]);
     
     fd = masterFd;
     JniField<jint>(m_env, inDescriptor, "fd", "I") = masterFd;
