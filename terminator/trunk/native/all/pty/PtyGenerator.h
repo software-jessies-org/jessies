@@ -43,7 +43,7 @@ public:
         
         int fds = open(cName, O_RDWR);
         if (fds < 0) {
-            throw unix_exception("open(" + toString(cName) + ", O_RDWR)");
+            throw unix_exception("open(" + toString(cName) + ", O_RDWR) failed");
         }
         close(masterFd);
         return fds;
@@ -105,15 +105,15 @@ private:
         
         const char* name = ptsname(ptmx_fd);
         if (name == 0) {
-            throw unix_exception("ptsname(" + toString(ptmx_fd) + ")");
+            throw unix_exception("ptsname(" + toString(ptmx_fd) + ") failed");
         }
         pts_name = name;
         
         if (grantpt(ptmx_fd) != 0) {
-            throw unix_exception("grantpt(" + toString(name) + ")");
+            throw unix_exception("grantpt(" + toString(name) + ") failed");
         }
         if (unlockpt(ptmx_fd) != 0) {
-            throw unix_exception("unlockpt(" + toString(name) + ")");
+            throw unix_exception("unlockpt(" + toString(name) + ") failed");
         }
         return ptmx_fd;
     }
@@ -175,7 +175,7 @@ private:
         signal(SIGCHLD, SIG_DFL);
         
         execvp(cmd[0], cmd);
-        throw child_exception("Can't execute '" + toString(cmd[0]) + "'");
+        throw unix_exception("Can't execute '" + toString(cmd[0]) + "'");
     }
 };
 
