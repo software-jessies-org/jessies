@@ -26,8 +26,11 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
     // Time to wait between checks that the event dispatch thread isn't hung.
     private static final long CHECK_INTERVAL_MS = 100;
     
-    // Maximum time we won't warn about.
-    private static final long UNREASONABLE_DISPATCH_DURATION_MS = 500;
+    // Maximum time we won't warn about. This used to be 500 ms, but 1.5 on
+    // late-2004 hardware isn't really up to it; there are too many parts of
+    // the JDK that can go away for that long (often code that has to be
+    // called on the event dispatch thread, like font loading).
+    private static final long UNREASONABLE_DISPATCH_DURATION_MS = 1000;
     
     // Used as the value of startedLastEventDispatchAt when we're not in
     // the middle of event dispatch.
