@@ -3,6 +3,7 @@
 
 #include <string>
 
-std::string errnoToString(int errorNumber);
+/** Converts the current value of 'errno' to a string. */
+std::string errnoToString();
 
 #endif

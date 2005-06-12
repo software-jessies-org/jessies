@@ -18,8 +18,13 @@ int gnuCompatibleStrerror(char* (*strerror_r)(int, char*, size_t), int errorNumb
   return 0;
 }
 
-std::string errnoToString(int errorNumber) {
-  char messageBuffer [1024];
+std::string errnoToString() {
+  int errorNumber = errno;
+  if (errorNumber == 0) {
+    return "";
+  }
+  
+  char messageBuffer[1024];
   if (gnuCompatibleStrerror(&strerror_r, errorNumber, &messageBuffer[0], sizeof(messageBuffer)) == -1) {
     int decodingError = errno;
     std::ostringstream os;
@@ -36,6 +41,8 @@ std::string errnoToString(int errorNumber) {
     }
     return os.str();
   } else {
-    return messageBuffer;
+    std::ostringstream oss;
+    oss << ": (" << messageBuffer << ")";
+    return oss.str();
   }
 }

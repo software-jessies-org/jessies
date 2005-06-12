@@ -143,18 +143,15 @@ struct Argv : std::vector<char*> {
 
 void terminator_terminal_PtyProcess::startProcess(jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
     PtyGenerator ptyGenerator;
-    if (ptyGenerator.openMaster() == false) {
-        throw std::runtime_error("couldn't open master");
-    }
+    int masterFd = ptyGenerator.openMaster();
     
     Arguments arguments(m_env, command);
     Argv argv(arguments);
     processId = doExecution(&argv[0], ptyGenerator);
     
-    int masterFd = ptyGenerator.getMasterFd();
+    fd = masterFd;
     JniField<jint>(m_env, inDescriptor, "fd", "I") = masterFd;
     JniField<jint>(m_env, outDescriptor, "fd", "I") = masterFd;
-    fd = masterFd;
 }
 
 void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars, jobject sizeInPixels) {
@@ -164,7 +161,7 @@ void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars,
     size.ws_xpixel = JniField<jint>(m_env, sizeInPixels, "width", "I").get();
     size.ws_ypixel = JniField<jint>(m_env, sizeInPixels, "height", "I").get();
     if (ioctl(fd.get(), TIOCSWINSZ, (char *) &size) < 0) {
-        throw std::runtime_error("ioctl(" + toString(fd.get()) + ", TIOCSWINSZ, &size) failed");
+        throw std::runtime_error("ioctl(" + toString(fd.get()) + ", TIOCSWINSZ, &size) failed" + errnoToString());
     }
 }
 
@@ -172,7 +169,7 @@ void terminator_terminal_PtyProcess::destroy() {
     pid_t pid = processId.get();
     int status = killpg(pid, SIGHUP);
     if (status < 0) {
-        throw std::runtime_error("killpg(" + toString(pid) + ", SIGHUP) failed");
+        throw std::runtime_error("killpg(" + toString(pid) + ", SIGHUP) failed" + errnoToString());
     }
 }
 
@@ -181,7 +178,7 @@ void terminator_terminal_PtyProcess::waitFor() {
     int status;
     pid_t result = waitpid(pid, &status, 0);
     if (result < 0) {
-        throw std::runtime_error("waitpid(" + toString(pid) + ", &status, 0) failed");
+        throw std::runtime_error("waitpid(" + toString(pid) + ", &status, 0) failed" + errnoToString());
     }
     
     exitValue = WEXITSTATUS(status);
