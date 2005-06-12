@@ -48,6 +48,9 @@ private:
         // It's not a valid optimization to cache field ids in face of class
         // unloading. We could keep a global reference to the class to prevent
         // it being unloaded, but that seems unfriendly.
+        
+        // The JNI specification suggests that GetObjectClass can't fail.
+        // http://java.sun.com/j2se/1.5.0/docs/guide/jni/spec/functions.html
         jclass objectClass = m_env->GetObjectClass(m_instance);
         jfieldID result = m_env->GetFieldID(objectClass, m_fieldName, m_fieldSignature);
         if (result == 0) {
