@@ -2,6 +2,7 @@
 #define JNI_FIELD_H_included
 
 #include <jni.h>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
