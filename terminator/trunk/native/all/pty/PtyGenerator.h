@@ -57,19 +57,19 @@ class PtyGenerator {
         const char* name = ptsname(ptmx_fd);
         if (name == 0) {
             std::ostringstream oss;
-            oss << "Failed to get ptysname for file descriptor " << ptmx_fd;
+            oss << "Failed to get ptysname for file descriptor " << ptmx_fd << errnoToString();
             throw std::runtime_error(oss.str());
         }
         pts_name = name;
         
         if (grantpt(ptmx_fd) != 0) {
             std::ostringstream oss;
-            oss << "Failed to get grantpt for " << name;
+            oss << "Failed to get grantpt for " << name << errnoToString();
             throw std::runtime_error(oss.str());
         }
         if (unlockpt(ptmx_fd) != 0) {
             std::ostringstream oss;
-            oss << "Failed to get unlockpt for " << name;
+            oss << "Failed to get unlockpt for " << name << errnoToString();
             throw std::runtime_error(oss.str());
         }
         return ptmx_fd;
@@ -82,9 +82,9 @@ public:
     virtual ~PtyGenerator() {
     }
     
-    bool openMaster() {
+    int openMaster() {
         masterFd = ptym_open(ptyName);
-        return (masterFd >= 0);
+        return masterFd;
     }
     
     int openSlaveAndCloseMaster() {
@@ -98,15 +98,11 @@ public:
         int fds = open(cName, O_RDWR);
         if (fds < 0) {
             std::ostringstream oss;
-            oss << "Failed to open " << cName;
+            oss << "Failed to open " << cName << errnoToString();
             throw std::runtime_error(oss.str());
         }
         close(masterFd);
         return fds;
-    }
-    
-    int getMasterFd() {
-        return masterFd;
     }
 };
 
