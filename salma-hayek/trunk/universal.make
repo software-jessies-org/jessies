@@ -172,8 +172,7 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 PROJECT_ROOT = $(CURDIR)
 
 SVN := $(call pathsearch,svn)
-PROJECT_NAME_FROM_SVN = $(shell svn info | perl -w -ne 'm{URL: .*?/([^/]*)(/trunk)?$$} && print($$1);')
-PROJECT_NAME := $(if $(SVN),$(PROJECT_NAME_FROM_SVN),$(notdir $(PROJECT_ROOT)))
+PROJECT_NAME = $(notdir $(PROJECT_ROOT))
 
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
@@ -184,10 +183,10 @@ DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 SOURCE_FILES=$(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
 DIST_FILE_OF_THE_DAY := $(shell date +$(PROJECT_NAME)-%Y-%m-%d.tar.gz)
 
-REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,cvs)
+REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,$(if $(wildcard CVS),cvs,$(if (wildcard SCCS),bk,unknown)))
 
 define GENERATE_CHANGE_LOG.svn
-  svn log > ChangeLog
+  $(SVN) log > ChangeLog
 endef
 
 define GENERATE_CHANGE_LOG.cvs
@@ -213,6 +212,8 @@ BINDIST_DIRS += bin
 BINDIST_DIRS += $(wildcard doc)
 BINDIST_FILES += $(shell find $(BINDIST_DIRS) -type f | perl -ne 'm@(^|/)(CVS|\.svn)($|/)@ || print')
 
+define GENERATE_FILE_LIST.unknown
+endef
 define GENERATE_FILE_LIST.bk
   bk sfiles -g
 endef
