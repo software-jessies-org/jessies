@@ -8,7 +8,7 @@
 class UnixException : public std::runtime_error {
 public:
     UnixException(const std::string& message)
-    : std::runtime_error(message + " failed" + errnoToString()) {
+    : std::runtime_error(message + " failed" + (errno ? ": (" + errnoToString() + ")" : "")) {
     }
 };
 
