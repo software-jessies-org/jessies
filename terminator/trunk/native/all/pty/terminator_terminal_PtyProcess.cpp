@@ -19,7 +19,7 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 
 #include "PtyGenerator.h"
 #include "toString.h"
-#include "UnixException.h"
+#include "unix_exception.h"
 
 #include <signal.h>
 #include <stdio.h>
@@ -82,7 +82,7 @@ void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars,
     size.ws_xpixel = JniField<jint>(m_env, sizeInPixels, "width", "I").get();
     size.ws_ypixel = JniField<jint>(m_env, sizeInPixels, "height", "I").get();
     if (ioctl(fd.get(), TIOCSWINSZ, &size) < 0) {
-        throw UnixException("ioctl(" + toString(fd.get()) + ", TIOCSWINSZ, &size)");
+        throw unix_exception("ioctl(" + toString(fd.get()) + ", TIOCSWINSZ, &size)");
     }
 }
 
@@ -90,7 +90,7 @@ void terminator_terminal_PtyProcess::destroy() {
     pid_t pid = processId.get();
     int status = killpg(pid, SIGHUP);
     if (status < 0) {
-        throw UnixException("killpg(" + toString(pid) + ", SIGHUP)");
+        throw unix_exception("killpg(" + toString(pid) + ", SIGHUP)");
     }
 }
 
@@ -99,7 +99,7 @@ void terminator_terminal_PtyProcess::waitFor() {
     int status;
     pid_t result = waitpid(pid, &status, 0);
     if (result < 0) {
-        throw UnixException("waitpid(" + toString(pid) + ", &status, 0)");
+        throw unix_exception("waitpid(" + toString(pid) + ", &status, 0)");
     }
     
     exitValue = WEXITSTATUS(status);

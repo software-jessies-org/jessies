@@ -2,7 +2,7 @@
 #define PTY_GENERATOR_H_included
 
 #include "toString.h"
-#include "UnixException.h"
+#include "unix_exception.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -43,7 +43,7 @@ public:
         
         int fds = open(cName, O_RDWR);
         if (fds < 0) {
-            throw UnixException("open(" + toString(cName) + ", O_RDWR)");
+            throw unix_exception("open(" + toString(cName) + ", O_RDWR)");
         }
         close(masterFd);
         return fds;
@@ -105,30 +105,30 @@ private:
         
         const char* name = ptsname(ptmx_fd);
         if (name == 0) {
-            throw UnixException("ptsname(" + toString(ptmx_fd) + ")");
+            throw unix_exception("ptsname(" + toString(ptmx_fd) + ")");
         }
         pts_name = name;
         
         if (grantpt(ptmx_fd) != 0) {
-            throw UnixException("grantpt(" + toString(name) + ")");
+            throw unix_exception("grantpt(" + toString(name) + ")");
         }
         if (unlockpt(ptmx_fd) != 0) {
-            throw UnixException("unlockpt(" + toString(name) + ")");
+            throw unix_exception("unlockpt(" + toString(name) + ")");
         }
         return ptmx_fd;
     }
     
-    class ChildException : public UnixException {
+    class child_exception : public unix_exception {
     public:
-        ChildException(const std::string& message)
-        : UnixException("Error from child: " + message) {
+        child_exception(const std::string& message)
+        : unix_exception("Error from child: " + message) {
         }
     };
     
-    class ChildExceptionViaPipe : ChildException {
+    class child_exception_via_pipe : child_exception {
     public:
-        ChildExceptionViaPipe(int pipeFd, const std::string& message)
-        : ChildException(message) {
+        child_exception_via_pipe(int pipeFd, const std::string& message)
+        : child_exception(message) {
             // Take special measures to ensure that the error message is displayed,
             // given that std::err may not be working at this point.
             FILE* tunnel = fdopen(pipeFd, "w");
@@ -138,25 +138,25 @@ private:
     
     static void runChild(char * const *cmd, PtyGenerator& ptyGenerator) {
         if (setsid() < 0) {
-            throw ChildException("setsid()");
+            throw child_exception("setsid()");
         }
         int childFd = ptyGenerator.openSlaveAndCloseMaster();
 #if defined(TIOCSCTTY) && !defined(CIBAUD)
         /* 44BSD way to acquire controlling terminal */
         /* !CIBAUD to avoid doing this under SunOS */
         if (ioctl(childFd, TIOCSCTTY, 0) < 0) {
-            throw ChildExceptionViaPipe(childFd, "ioctl(" + toString(childFd) + ", TIOCSCTTY, 0)");
+            throw child_exception_via_pipe(childFd, "ioctl(" + toString(childFd) + ", TIOCSCTTY, 0)");
         }
 #endif
         /* slave becomes stdin/stdout/stderr of child */
         if (dup2(childFd, STDIN_FILENO) != STDIN_FILENO) {
-            throw ChildExceptionViaPipe(childFd, "dup2(" + toString(childFd) + ", STDIN_FILENO)");
+            throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDIN_FILENO)");
         }
         if (dup2(childFd, STDOUT_FILENO) != STDOUT_FILENO) {
-            throw ChildExceptionViaPipe(childFd, "dup2(" + toString(childFd) + ", STDOUT_FILENO)");
+            throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDOUT_FILENO)");
         }
         if (dup2(childFd, STDERR_FILENO) != STDERR_FILENO) {
-            throw ChildExceptionViaPipe(childFd, "dup2(" + toString(childFd) + ", STDERR_FILENO)");
+            throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDERR_FILENO)");
         }
         if (childFd > STDERR_FILENO) {
             close(childFd);
@@ -175,7 +175,7 @@ private:
         signal(SIGCHLD, SIG_DFL);
         
         execvp(cmd[0], cmd);
-        throw ChildException("Can't execute '" + toString(cmd[0]) + "'");
+        throw child_exception("Can't execute '" + toString(cmd[0]) + "'");
     }
 };
 
