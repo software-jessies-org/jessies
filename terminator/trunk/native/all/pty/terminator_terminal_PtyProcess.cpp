@@ -184,6 +184,7 @@ static void PtyProcess_startProcess(JNIEnv *env, jobject ptyProcess, jobjectArra
         throw std::runtime_error("couldn't open master");
     }
     pid_t pid = doExecution(cmd, ptyGenerator);
+    // The pid isn't simply returned because the exception handler would have to invent one.
     setField(env, ptyProcess, "processId", pid);
     for (int i = 0; i < cmdLength; i++) {
         env->ReleaseStringUTFChars(strings[i], cmd[i]);
