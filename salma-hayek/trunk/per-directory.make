@@ -65,7 +65,7 @@ CLASSES_DIRECTORY = $(PROJECT_ROOT)/classes
 JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 
 define JAVAHPP_RULE
-"$(JAVAHPP)" -classpath $(call convertCygwinToWin32Path,$(CLASSES_DIRECTORY)) $(JNI_CLASS_NAME) > $(call convertCygwinToWin32Path,$(GENERATED_JNI_HEADER)) && \
+$(JAVAHPP) -classpath $(call convertCygwinToWin32Path,$(CLASSES_DIRECTORY)) $(JNI_CLASS_NAME) > $(call convertCygwinToWin32Path,$(GENERATED_JNI_HEADER)) && \
 { cmp --quiet $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
 endef
 
@@ -148,7 +148,7 @@ $(JNI_LIBRARY): $(OBJECTS)
 
 ifneq "$(JNI_SOURCE)" ""
 
-$(GENERATED_JNI_HEADER): $(JNI_CLASS_FILE)
+$(GENERATED_JNI_HEADER): $(JNI_CLASS_FILE) $(JAVAHPP) $(SALMA_HAYEK)/classes/e/tools/JavaHpp.class
 	@echo Generating JNI header... && \
 	mkdir -p $(@D) && \
 	rm -f $@ && \
