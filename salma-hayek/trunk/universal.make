@@ -183,7 +183,11 @@ DIST_SCP_DIRECTORY="~/public_html/software/$(PROJECT_NAME)/nightly-builds"
 SOURCE_FILES=$(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
 DIST_FILE_OF_THE_DAY := $(shell date +$(PROJECT_NAME)-%Y-%m-%d.tar.gz)
 
-REVISION_CONTROL_SYSTEM := $(if $(wildcard .svn),svn,$(if $(wildcard CVS),cvs,$(if $(wildcard SCCS),bk,unknown)))
+REVISION_CONTROL_SYSTEM += $(if $(wildcard .svn),svn)
+REVISION_CONTROL_SYSTEM += $(if $(wildcard CVS),cvs)
+REVISION_CONTROL_SYSTEM += $(if $(wildcard SCCS),bk)
+REVISION_CONTROL_SYSTEM := $(strip $(REVISION_CONTROL_SYSTEM))
+REVISION_CONTROL_SYSTEM := $(if $(REVISION_CONTROL_SYSTEM),$(REVISION_CONTROL_SYSTEM),unknown)
 
 define GENERATE_CHANGE_LOG.svn
   $(SVN) log > ChangeLog
