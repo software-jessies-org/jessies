@@ -60,7 +60,7 @@ pathsearch = $(firstword $(wildcard $(addsuffix /$(1)$(EXE_SUFFIX),$(subst :, ,$
 makepath = $(call convertCygwinToWin32Path,$(subst $(SPACE),$(PATH_SEPARATOR),$(strip $(1))))
 getAbsolutePath = $(patsubst @%,$(CURDIR)/%,$(patsubst @/%,/%,$(patsubst %,@%,$(1))))
 
-SPACE := $(subst :, ,:)
+SPACE = $(subst :, ,:)
 
 # ----------------------------------------------------------------------------
 # Locate salma-hayek.
@@ -84,7 +84,7 @@ DEFAULT_JAVA_HOME = $(DEFAULT_JAVA_HOME.$(TARGET_OS))
 JAVA_HOME ?= $(if $(DEFAULT_JAVA_HOME),$(DEFAULT_JAVA_HOME),$(error Please set $$(JAVA_HOME)))
 
 JAR = $(JAVA_PATH)jar
-JAVAHPP := $(SALMA_HAYEK)bin/javahpp
+JAVAHPP = $(SALMA_HAYEK)bin/javahpp
 
 # ----------------------------------------------------------------------------
 # Find the source.
