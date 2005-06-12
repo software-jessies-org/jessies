@@ -53,7 +53,12 @@ public:
         if (pid < 0) {
             return -1;
         } else if (pid == 0) {
-            return runChild(cmd, *this);  // Should never return.
+            try {
+                runChild(cmd, *this);  // Should never return.
+            } catch (const std::exception& ex) {
+                std::cerr << ex.what() << std::endl;
+            }
+            exit(1); // We're only exit()ing the child, not the VM.
         } else {
             return pid;
         }
@@ -112,28 +117,45 @@ private:
         return ptmx_fd;
     }
     
-    static int runChild(char * const *cmd, PtyGenerator& ptyGenerator) {
+    class ChildException : public UnixException {
+    public:
+        ChildException(const std::string& message)
+        : UnixException("Error from child: " + message) {
+        }
+    };
+    
+    class ChildExceptionViaPipe : ChildException {
+    public:
+        ChildExceptionViaPipe(int pipeFd, const std::string& message)
+        : ChildException(message) {
+            // Take special measures to ensure that the error message is displayed,
+            // given that std::err may not be working at this point.
+            FILE* tunnel = fdopen(pipeFd, "w");
+            fprintf(tunnel, "%s\n", what());
+        }
+    };
+    
+    static void runChild(char * const *cmd, PtyGenerator& ptyGenerator) {
         if (setsid() < 0) {
-            std::cerr << "Failed to setsid" << errnoToString() << std::endl;
-            exit(1);
+            throw ChildException("setsid()");
         }
         int childFd = ptyGenerator.openSlaveAndCloseMaster();
 #if defined(TIOCSCTTY) && !defined(CIBAUD)
         /* 44BSD way to acquire controlling terminal */
         /* !CIBAUD to avoid doing this under SunOS */
-        if (ioctl(childFd, TIOCSCTTY, (char *) 0) < 0) {
-            clientPanic(childFd, "TIOCSCTTY error");
+        if (ioctl(childFd, TIOCSCTTY, 0) < 0) {
+            throw ChildExceptionViaPipe(childFd, "ioctl(" + toString(childFd) + ", TIOCSCTTY, 0)");
         }
 #endif
         /* slave becomes stdin/stdout/stderr of child */
         if (dup2(childFd, STDIN_FILENO) != STDIN_FILENO) {
-            clientPanic(childFd, "dup2 error to stdin");
+            throw ChildExceptionViaPipe(childFd, "dup2(" + toString(childFd) + ", STDIN_FILENO)");
         }
         if (dup2(childFd, STDOUT_FILENO) != STDOUT_FILENO) {
-            clientPanic(childFd, "dup2 error to stdout");
+            throw ChildExceptionViaPipe(childFd, "dup2(" + toString(childFd) + ", STDOUT_FILENO)");
         }
         if (dup2(childFd, STDERR_FILENO) != STDERR_FILENO) {
-            clientPanic(childFd, "dup2 error to stderr");
+            throw ChildExceptionViaPipe(childFd, "dup2(" + toString(childFd) + ", STDERR_FILENO)");
         }
         if (childFd > STDERR_FILENO) {
             close(childFd);
@@ -151,19 +173,8 @@ private:
         signal(SIGQUIT, SIG_DFL);
         signal(SIGCHLD, SIG_DFL);
         
-        if (execvp(cmd[0], cmd) < 0) {
-            std::cerr << "Error from child: Can't execute '" << cmd[0] << "'" << errnoToString() << std::endl;
-            exit(1);
-        }
-        
-        // child returns 0 just like fork().
-        return 0;
-    }
-    
-    static void clientPanic(int fd, const char *message) {
-        FILE* tunnel = fdopen(fd, "w");
-        fprintf(tunnel, "Error from child: %s\n", message);
-        exit(1);
+        execvp(cmd[0], cmd);
+        throw ChildException("Can't execute '" + toString(cmd[0]) + "'");
     }
 };
 
