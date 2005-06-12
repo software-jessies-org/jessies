@@ -1,6 +1,9 @@
 #ifndef PTY_GENERATOR_H_included
 #define PTY_GENERATOR_H_included
 
+#include "toString.h"
+#include "UnixException.h"
+
 #include <errno.h>
 #include <fcntl.h>
 #include <grp.h>
@@ -10,7 +13,6 @@
 #include <sys/types.h>
 
 #include <iostream>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -40,9 +42,7 @@ public:
         
         int fds = open(cName, O_RDWR);
         if (fds < 0) {
-            std::ostringstream oss;
-            oss << "Failed to open " << cName << errnoToString();
-            throw std::runtime_error(oss.str());
+            throw UnixException("open(" + toString(cName) + ", O_RDWR)");
         }
         close(masterFd);
         return fds;
@@ -99,21 +99,15 @@ private:
         
         const char* name = ptsname(ptmx_fd);
         if (name == 0) {
-            std::ostringstream oss;
-            oss << "Failed to get ptysname for file descriptor " << ptmx_fd << errnoToString();
-            throw std::runtime_error(oss.str());
+            throw UnixException("ptsname(" + toString(ptmx_fd) + ")");
         }
         pts_name = name;
         
         if (grantpt(ptmx_fd) != 0) {
-            std::ostringstream oss;
-            oss << "Failed to get grantpt for " << name << errnoToString();
-            throw std::runtime_error(oss.str());
+            throw UnixException("grantpt(" + toString(name) + ")");
         }
         if (unlockpt(ptmx_fd) != 0) {
-            std::ostringstream oss;
-            oss << "Failed to get unlockpt for " << name << errnoToString();
-            throw std::runtime_error(oss.str());
+            throw UnixException("unlockpt(" + toString(name) + ")");
         }
         return ptmx_fd;
     }
