@@ -46,19 +46,29 @@ public class JavaHpp {
             }
         }
         
+        List<Field> instanceFields = new ArrayList<Field>();
+        for (Field field : klass.getDeclaredFields()) {
+            if ((field.getModifiers() & Modifier.STATIC) != 0) {
+                // JniField.h doesn't support static fields, though there's no
+                // reason why we couldn't write JniStaticField if we needed it.
+                continue;
+            }
+            instanceFields.add(field);
+        }
+        
         String proxyClassName = className.replace('.', '_');
         out.println("class " + proxyClassName + " {");
         out.println("private:");
         out.println("JNIEnv* m_env;");
         out.println("jobject m_instance;");
-        for (Field field : klass.getDeclaredFields()) {
+        for (Field field : instanceFields) {
             out.println("JniField<" + jniTypeNameFor(field.getType()) + "> " + field.getName() + ";");
         }
         out.println("public:");
         out.println(proxyClassName + "(JNIEnv* env, jobject instance)");
         out.println(": m_env(env)");
         out.println(", m_instance(instance)");
-        for (Field field : klass.getDeclaredFields()) {
+        for (Field field : instanceFields) {
             out.println(", " + field.getName() + "(env, instance, \"" + field.getName() + "\", \"" + encodedTypeNameFor(field.getType()) + "\")");
         }
         out.println("{");
