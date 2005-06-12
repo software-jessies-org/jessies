@@ -32,6 +32,7 @@ extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 // ---------------------------------------------------------------------------
 
@@ -170,27 +171,41 @@ static void throwJavaIOException(JNIEnv* env, const std::exception& ex) {
     }
 }
 
-static void PtyProcess_startProcess(JNIEnv *env, jobject ptyProcess, jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
-    int cmdLength = env->GetArrayLength(command);
-    char **cmd = (char **) calloc(cmdLength + 1, sizeof(char *));
-    jstring *strings = (jstring *) calloc(cmdLength, sizeof(jstring));
-    for (int i = 0; i < cmdLength; i++) {
-        jobject obj = env->GetObjectArrayElement(command, i);
-        strings[i] = (jstring) obj;
-        cmd[i] = const_cast<char*>(env->GetStringUTFChars(strings[i], 0));
+struct Arguments : std::vector<std::string> {
+    Arguments (JNIEnv* env, jobjectArray command) {
+        int arrayLength = env->GetArrayLength(command);
+        for (int i = 0; i != arrayLength; ++i) {
+            jstring javaString = (jstring) env->GetObjectArrayElement(command, i);
+            const char* utfChars = env->GetStringUTFChars(javaString, 0);
+            push_back(utfChars);
+            env->ReleaseStringUTFChars(javaString, utfChars);
+        }        
     }
+};
+
+struct Argv : std::vector<char*> {
+    // Non-const because execvp is anti-social about const.
+    Argv (Arguments& arguments) {
+        for (Arguments::iterator it = arguments.begin(); it != arguments.end(); ++it) {
+            // We must point to the memory in arguments, not a local.
+            std::string& argument = *it;
+            push_back(&argument[0]);
+        }
+        // execvp wants a null-terminated array of pointers to null terminated strings.
+        push_back(0);
+    }
+};
+
+static void PtyProcess_startProcess(JNIEnv *env, jobject ptyProcess, jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
+    Arguments arguments(env, command);
+    Argv argv(arguments);
     PtyGenerator ptyGenerator;
     if (ptyGenerator.openMaster() == false) {
         throw std::runtime_error("couldn't open master");
     }
-    pid_t pid = doExecution(cmd, ptyGenerator);
+    pid_t pid = doExecution(&argv[0], ptyGenerator);
     // The pid isn't simply returned because the exception handler would have to invent one.
     setField(env, ptyProcess, "processId", pid);
-    for (int i = 0; i < cmdLength; i++) {
-        env->ReleaseStringUTFChars(strings[i], cmd[i]);
-    }
-    free(strings);
-    free(cmd);
     int masterFd = ptyGenerator.getMasterFd();
     setField(env, inDescriptor, "fd", masterFd);
     setField(env, outDescriptor, "fd", masterFd);
