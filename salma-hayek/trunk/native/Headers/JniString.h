@@ -6,8 +6,7 @@
 #include <string>
 
 /**
- * Copies the characters from a jstring and makes them available in the
- * form of either a C or C++ string.
+ * Copies the characters from a jstring and makes them available.
  */
 class JniString {
     std::string m_utf8;
@@ -20,10 +19,6 @@ public:
         }
         m_utf8.assign(utf8Chars);
         env->ReleaseStringUTFChars(instance, utf8Chars);
-    }
-    
-    const char* c_str() const {
-        return m_utf8.c_str();
     }
     
     std::string str() const {
