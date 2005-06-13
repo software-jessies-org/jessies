@@ -26,7 +26,7 @@ public:
         return m_utf8.c_str();
     }
     
-    const std::string str() const {
+    std::string str() const {
         return m_utf8;
     }
 };
