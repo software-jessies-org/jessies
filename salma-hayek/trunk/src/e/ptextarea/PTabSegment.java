@@ -19,6 +19,7 @@ public class PTabSegment extends PAbstractSegment {
         super(textArea, start, end, PStyle.NORMAL);
     }
     
+    @Override
     public PLineSegment subSegment(int start, int end) {
         return new PTabSegment(textArea, start + this.start, end + this.start);
     }
