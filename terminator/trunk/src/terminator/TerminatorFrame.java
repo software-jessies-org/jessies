@@ -248,8 +248,15 @@ public class TerminatorFrame extends JFrame {
 		} else if (tabbedPane.getTabCount() == 1) {
 			switchToSinglePane();
 		} else {
-			// Just hand focus to the visible tab's terminal.
-			tabbedPane.getSelectedComponent().requestFocus();
+			// Just hand focus to the visible tab's terminal. We
+			// do this later because otherwise Swing seems to give
+			// the focus to the tab itself, rather than the
+			// component on the tab.
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					tabbedPane.getSelectedComponent().requestFocus();
+				}
+			});
 		}
 	}
 	
