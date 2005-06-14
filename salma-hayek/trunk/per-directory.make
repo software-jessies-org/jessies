@@ -36,7 +36,8 @@ HEADERS := $(call findCode,$(HEADER_EXTENSIONS))
 
 GENERATED_DIRECTORY = $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_ROOT)/generated/%/$(TARGET_OS),$(SOURCE_DIRECTORY))
 
-OBJECTS = $(strip $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(patsubst $(SOURCE_DIRECTORY)/%.$(EXTENSION),$(GENERATED_DIRECTORY)/%.o,$(filter %.$(EXTENSION),$(SOURCES)))))
+$(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(eval $(call defineObjectsPerLanguage,$(EXTENSION))))
+OBJECTS = $(strip $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(OBJECTS.$(EXTENSION))))
 SOURCE_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(SOURCES))
 HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(HEADERS))
 
@@ -159,6 +160,16 @@ build: $(GENERATED_JNI_HEADER)
 $(COMPILED_JNI_HEADER): | $(GENERATED_JNI_HEADER);
 
 endif
+
+# ----------------------------------------------------------------------------
+# Rules for compiling Objective C and Objective C++ source.
+# ----------------------------------------------------------------------------
+
+$(OBJECTS.m): %.o: %.m
+	$(COMPILE.m) $(OUTPUT_OPTION) $<
+
+$(OBJECTS.mm): %.o: %.mm
+	$(COMPILE.mm) $(OUTPUT_OPTION) $<
 
 # ----------------------------------------------------------------------------
 # What to do if something we need isn't installed but we want to continue building everything else.

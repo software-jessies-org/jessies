@@ -130,6 +130,19 @@ OBJECTIVE_SOURCE_PATTERNS += %.mm
 
 C_AND_CXX_FLAGS += $(if $(filter $(OBJECTIVE_SOURCE_PATTERNS),$<),,$(PURE_C_AND_CXX_FLAGS))
 
+COMPILE.m = $(COMPILE.c) $(OBJC_AND_OBJCXX_FLAGS)
+COMPILE.mm = $(COMPILE.cpp) $(OBJC_AND_OBJCXX_FLAGS)
+
+# The local variable support doesn't like this (and perhaps code macros in general)
+# being defined in per-directory.make.
+# You end up with a variable called OBJECTS.copyLocalVariable, containing a $(error),
+# being evaluated by the call to copyLocalVariable at the end of the next scope.
+define defineObjectsPerLanguage
+  OBJECTS.$(1) = $(patsubst $(SOURCE_DIRECTORY)/%.$(1),$(GENERATED_DIRECTORY)/%.o,$(filter %.$(1),$(SOURCES)))
+  # The Perl script needs help if we're going to have variable variable names.
+  LOCAL_VARIABLES += OBJECTS.$(1)
+endef
+
 # ----------------------------------------------------------------------------
 # Extra compiler and (mainly) linker flags for building JNI.
 # ----------------------------------------------------------------------------
@@ -417,18 +430,6 @@ app: build
 	cd $$APP_DIR/MacOS && \
 	echo -e '#!/bin/bash\ncd\nexec `dirname $$0`/../Resources/$(PROJECT_NAME)/bin/$(PROJECT_NAME)\n' > $(PROJECT_NAME) && \
 	chmod a+x $(PROJECT_NAME)
-
-# ----------------------------------------------------------------------------
-# Implicit rules for compiling Objective C and Objective C++ source.
-# ----------------------------------------------------------------------------
-
-COMPILE.m = $(COMPILE.c) $(OBJC_AND_OBJCXX_FLAGS)
-%.o: %.m
-	$(COMPILE.m) $(OUTPUT_OPTION) $<
-
-COMPILE.mm = $(COMPILE.cpp) $(OBJC_AND_OBJCXX_FLAGS)
-%.o: %.mm
-	$(COMPILE.mm) $(OUTPUT_OPTION) $<
 
 # ----------------------------------------------------------------------------
 # Rules for debugging.
