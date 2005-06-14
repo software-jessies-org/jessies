@@ -42,7 +42,7 @@ public class Bag {
     }
     
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append("Bag[");
         for (Map.Entry<Object, Integer> entry : objectToCountMap.entrySet()) {
             int thisCount = entry.getValue();

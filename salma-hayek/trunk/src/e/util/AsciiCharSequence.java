@@ -33,7 +33,7 @@ public final class AsciiCharSequence implements CharSequence {
     }
     
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < length(); i++) {
             result.append(charAt(i));
         }

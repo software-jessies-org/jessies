@@ -294,7 +294,7 @@ public class FileUtilities {
             return null;
         }
         
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (byte b : digest) {
             result.append(Integer.toHexString((b >> 4) & 0xf));
             result.append(Integer.toHexString(b & 0xf));

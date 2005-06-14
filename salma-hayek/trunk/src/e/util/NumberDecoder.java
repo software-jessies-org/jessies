@@ -89,7 +89,7 @@ public class NumberDecoder {
     }
     
     private String toASCII(long number) {
-        StringBuffer result = new StringBuffer("\"");
+        StringBuilder result = new StringBuilder("\"");
         int byteCount = ((number >> 32) != 0) ? 8 : 4;
         for (int i = 0; i < byteCount; i++) {
             char c = (char) (number & 0xff);
@@ -130,7 +130,7 @@ public class NumberDecoder {
             return "";
         }
         List<String> strings = toStrings();
-        StringBuffer result = new StringBuffer("<html>");
+        StringBuilder result = new StringBuilder("<html>");
         for (String string : strings) {
             result.append(string);
             result.append("<br/>\n");

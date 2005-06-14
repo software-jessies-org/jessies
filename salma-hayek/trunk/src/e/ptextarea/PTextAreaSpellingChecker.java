@@ -78,7 +78,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
     }
     
     private String convertMultipleWordsToCamelCase(String original) {
-        StringBuffer result = new StringBuffer(original);
+        StringBuilder result = new StringBuilder(original);
         for (int i = 0; i < result.length(); ++i) {
             if (result.charAt(i) == ' ' && i < result.length() - 1) {
                 result.deleteCharAt(i);

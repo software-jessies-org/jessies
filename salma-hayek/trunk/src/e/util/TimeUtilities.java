@@ -44,7 +44,7 @@ public class TimeUtilities {
         duration /= 60;
         long hours = duration;
 
-        StringBuffer result = new StringBuffer("P");
+        StringBuilder result = new StringBuilder("P");
         if (hours != 0) {
             result.append(hours);
             result.append('H');

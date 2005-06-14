@@ -88,10 +88,10 @@ public class PSameStyleCharSequence {
      * text area, and does nothing to cope with changes to the text area.
      */
     public static class MangledCharSequence implements CharSequence {
-        private StringBuffer mangledText;
+        private StringBuilder mangledText;
         
         public MangledCharSequence(PTextArea textArea) {
-            this.mangledText = new StringBuffer(textArea.getTextBuffer());
+            this.mangledText = new StringBuilder(textArea.getTextBuffer());
             Iterator<PLineSegment> it = textArea.getLogicalSegmentIterator(0);
             while (it.hasNext()) {
                 PLineSegment segment = it.next();

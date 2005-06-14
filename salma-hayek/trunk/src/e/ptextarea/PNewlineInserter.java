@@ -41,7 +41,7 @@ public class PNewlineInserter {
     
     // TODO: Doesn't belong here.
     public static String getCommonEnding(String left, String right) {
-        StringBuffer ending = new StringBuffer();
+        StringBuilder ending = new StringBuilder();
         for (int i = 0; i < left.length() && i < right.length(); ++i) {
             char leftChar = left.charAt(left.length() - 1 - i);
             char rightChar = right.charAt(right.length() - 1 - i);
@@ -109,7 +109,7 @@ public class PNewlineInserter {
         text = text.replaceAll("\"([^\\n]*?)\"", "_"); // Remove string literals.
         text = text.replaceAll("/\\*(?s).*?\\*/", "_"); // Remove C comments.
         text = text.replaceAll("//[^\\n]*", "_"); // Remove C++ comments.
-        StringBuffer unmatchedBrackets = new StringBuffer();
+        StringBuilder unmatchedBrackets = new StringBuilder();
         for (int i = 0; i < text.length(); ++i) {
             char ch = text.charAt(i);
             if (PBracketUtilities.isOpenBracket(ch) && ch != '<') {

@@ -52,6 +52,7 @@ public abstract class Rewriter {
      */
     public String rewrite(CharSequence original) {
         this.matcher = pattern.matcher(original);
+        // We have to use StringBuffer because that's Matcher's API.
         StringBuffer result = new StringBuffer(original.length());
         while (matcher.find()) {
             matcher.appendReplacement(result, replacement());

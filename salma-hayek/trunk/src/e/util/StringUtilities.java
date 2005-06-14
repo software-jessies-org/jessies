@@ -25,7 +25,7 @@ public class StringUtilities {
     
     /** Reads the entire contents of the named file into a String. Throws a RuntimeException on failure. */
     public static String readFile(String filename) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String[] lines = readLinesFromFile(filename);
         for (String line : lines) {
             result.append(line);
@@ -67,7 +67,7 @@ public class StringUtilities {
     
     /** Turns a string into a printable Java string literal (minus the quotes). So a tab is converted to "\t", et cetera. */
     public static String escapeForJava(String s) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c == '\\') {
@@ -92,7 +92,7 @@ public class StringUtilities {
     
     /** Turns a printable Java string literal (minus the quotes) into a string. So "\t" is converted to a tab, et cetera. */
     public static String unescapeJava(String s) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c == '\\' && i < s.length() - 1) {
@@ -119,7 +119,7 @@ public class StringUtilities {
     
     /** Converts a string into a regular expression matching exactly that string. */
     public static String regularExpressionFromLiteral(String literal) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         final String REGEXP_META_CHARACTERS = "|[().\\^$?+*{";
         for (int i = 0; i < literal.length(); i++) {
             char c = literal.charAt(i);
@@ -158,7 +158,7 @@ public class StringUtilities {
      * Joins the strings in 'strings' with 'separator' between each.
      */
     public static String join(String[] strings, String separator) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (String string : strings) {
             if (result.length() > 0) {
                 result.append(separator);
@@ -172,7 +172,7 @@ public class StringUtilities {
      * Joins the strings in 'strings' with 'separator' between each.
      */
     public static String join(List strings, String separator) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < strings.size(); ++i) {
             if (i > 0) {
                 result.append(separator);

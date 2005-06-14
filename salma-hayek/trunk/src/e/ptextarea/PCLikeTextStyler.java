@@ -246,7 +246,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
             return;
         }
         CharSequence seq = textArea.getTextBuffer();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         String prefix = seq.subSequence(Math.max(0, event.getOffset() - 2), event.getOffset()).toString();
         int endIndex = event.getOffset();
         if (event.isInsert()) {

@@ -74,7 +74,7 @@ public class PBracketUtilities {
     }
     
     public static String reflectBrackets(String originalBrackets) {
-        StringBuffer reflectedBrackets = new StringBuffer();
+        StringBuilder reflectedBrackets = new StringBuilder();
         for (int i = 0; i != originalBrackets.length(); ++i) {
             char originalBracket = originalBrackets.charAt(i);
             char reflectedBracket = PBracketUtilities.getPartnerForBracket(originalBracket);

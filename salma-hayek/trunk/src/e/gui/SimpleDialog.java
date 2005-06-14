@@ -17,7 +17,7 @@ public class SimpleDialog {
         if (message.length() < MAX_LINE_LENGTH) {
             return message;
         }
-        StringBuffer result = new StringBuffer(message);
+        StringBuilder result = new StringBuilder(message);
         int chunkLength = 0;
         for (int i = 0; i < result.length(); ++i) {
             if (result.charAt(i) == '\n') {

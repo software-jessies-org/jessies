@@ -330,7 +330,7 @@ public class PTextBuffer implements CharSequence {
      * for preference.
      */
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append(text, 0, gapPosition);
         result.append(text, gapPosition + gapLength, text.length - gapPosition - gapLength);
         return result.toString();

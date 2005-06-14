@@ -354,7 +354,7 @@ public class FormDialog extends JDialog {
      * The format isn't very human-readable, because I couldn't get MessageFormat to work.
      */
     public static void writeGeometriesTo(String filename) {
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
         for (String name : dialogGeometries.keySet()) {
             Rectangle bounds = dialogGeometries.get(name);
             content.append(name + "\n");

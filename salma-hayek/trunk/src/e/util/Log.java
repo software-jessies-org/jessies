@@ -88,7 +88,7 @@ public class Log {
             return "" + o;
         }
         
-        StringBuffer result = new StringBuffer(c.getName());
+        StringBuilder result = new StringBuilder(c.getName());
         result.append('[');
         
         Field[] fields = c.getDeclaredFields();
@@ -117,7 +117,7 @@ public class Log {
     public static String inspectArray(Object o) {
         Class c = o.getClass();
         Class itemClass = c.getComponentType();
-        StringBuffer result = new StringBuffer(itemClass.getName());
+        StringBuilder result = new StringBuilder(itemClass.getName());
         result.append("[] = {");
         if (itemClass.isPrimitive()) {
             result.append("primitives!");
