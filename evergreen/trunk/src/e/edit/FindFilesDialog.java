@@ -91,7 +91,7 @@ public class FindFilesDialog {
         }
         
         public String toString() {
-            StringBuffer result = new StringBuffer(name);
+            StringBuilder result = new StringBuilder(name);
             if (matchCount != 0) {
                 result.append(" (");
                 result.append(matchCount);

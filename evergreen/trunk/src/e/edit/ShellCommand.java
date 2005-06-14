@@ -62,7 +62,7 @@ public class ShellCommand {
 //        BufferedReader in = new BufferedReader(new InputStreamReader(inStream));
 //        int count;
 //        char[] chars = new char[8192];
-//        StringBuffer buf = new StringBuffer();
+//        StringBuilder buf = new StringBuilder();
 //        while ((count = in.read(chars)) > 0) {
 //            buf.append(chars, 0, count);
 //        }

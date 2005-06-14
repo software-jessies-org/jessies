@@ -104,7 +104,7 @@ public class Advisor extends JPanel {
         
         ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, currentComponent);
         
-        StringBuffer newText = new StringBuffer("<html><head><title></title></head><body bgcolor=#FFFFFF>");
+        StringBuilder newText = new StringBuilder("<html><head><title></title></head><body bgcolor=#FFFFFF>");
         for (WorkspaceResearcher researcher : researchers) {
             if (textWindow == null || researcher.isSuitable(textWindow)) {
                 String result = researcher.research(currentComponent, text);

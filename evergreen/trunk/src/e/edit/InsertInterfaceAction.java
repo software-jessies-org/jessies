@@ -74,7 +74,7 @@ public class InsertInterfaceAction extends ETextAction {
     * Makes Java source code to implement all the public abstract methods in a class.
     */
     private static String getSourceCodeFor(Class c) {
-        StringBuffer s = new StringBuffer(") {");
+        StringBuilder s = new StringBuilder(") {");
         if (c.getName().endsWith("Adapter")) {
             s.append(implementMethods(c.getDeclaredMethods(), false));
         } else {
@@ -85,7 +85,7 @@ public class InsertInterfaceAction extends ETextAction {
     }
     
     private static String implementMethods(Method[] methods, boolean implementAbstractMethods) {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         for (Method m : methods) {
             int mods = m.getModifiers();
             if (Modifier.isPublic(mods) && Modifier.isAbstract(mods) == implementAbstractMethods) {
@@ -97,7 +97,7 @@ public class InsertInterfaceAction extends ETextAction {
     }
     
     private static String getSourceCodeFor(Method m) {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         String rtype = m.getReturnType().getName();
         rtype = rtype.substring(rtype.lastIndexOf(".") + 1);
         s.append(rtype);
@@ -116,7 +116,7 @@ public class InsertInterfaceAction extends ETextAction {
     }
     
     private static String listClassNames(Class[] classes, boolean inventNames) {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         for (Class c : classes) {
             String name = c.getName();
             if (s.length() > 0) {
