@@ -198,7 +198,7 @@ public class JavaDoc {
             char separator = (type == DOC) ? '/' : File.separatorChar;
             
             // Start with a root that ends in a separator.
-            StringBuffer s = new StringBuffer(root);
+            StringBuilder s = new StringBuilder(root);
             if (s.charAt(s.length() - 1) != separator) {
                 s.append(separator);
             }
@@ -269,7 +269,7 @@ public class JavaDoc {
     public static final String LINK_END = "</a>";
     
     public static String formatAsSourceLink(String uri) {
-        StringBuffer link = new StringBuffer();
+        StringBuilder link = new StringBuilder();
         link.append("[");
         link.append(UNDECORATED_LINK_START);
         link.append(uri);
@@ -281,7 +281,7 @@ public class JavaDoc {
     }
     
     public static String formatAsDocLink(String uri, String className, String pkg, boolean showPkg) {
-        StringBuffer link = new StringBuffer();
+        StringBuilder link = new StringBuilder();
         if (showPkg) {
             String packageIndex = uri.substring(0, uri.lastIndexOf("/")) + "/package-summary.html";
             link.append(UNDECORATED_LINK_START);

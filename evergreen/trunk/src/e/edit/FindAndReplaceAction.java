@@ -189,7 +189,7 @@ public class FindAndReplaceAction extends ETextAction {
                 return "";
             }
             
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             for (int i = 1; i <= matcher.groupCount(); i++) {
                 if (i > 1) buffer.append(", ");
                 buffer.append("$" + i + "=\"");
@@ -221,7 +221,7 @@ public class FindAndReplaceAction extends ETextAction {
             } catch (IllegalArgumentException ex) {
                 return ex.getMessage();
             }
-            StringBuffer buffer = new StringBuffer(replacedLine);
+            StringBuilder buffer = new StringBuilder(replacedLine);
             for (int i = 0; i < buffer.length(); ++i) {
                 String insert = null;
                 if (buffer.charAt(i) == ' ') {

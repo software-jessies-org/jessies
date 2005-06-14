@@ -128,7 +128,7 @@ public class JavaResearcher implements WorkspaceResearcher {
             return "";
         }
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (Class klass : classes) {
             if (result.length() > 0) {
                 result.append("<br><br>");
@@ -174,7 +174,7 @@ public class JavaResearcher implements WorkspaceResearcher {
      * Returns HTML linking to all the classes in the given package.
      */
     public synchronized String listPackage(String packageName) {
-        StringBuffer result = new StringBuffer(packageName + " contains:\n");
+        StringBuilder result = new StringBuilder(packageName + " contains:\n");
         String searchTerm = "Class:" + packageName + ".";
         String htmlFile = "";
         for (String line : javaDocSummary) {
@@ -202,7 +202,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     public synchronized String listMethodsOrFields(String name) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         Pattern pattern = Pattern.compile("^[MF]:(" + StringUtilities.regularExpressionFromLiteral(name) + "[^(\t]*)(\\([^\t]+)\t");
         Matcher matcher;
         String htmlFile = "";
@@ -226,7 +226,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     /** Formats class names as a list of links if there's javadoc for them. */
     public String makeClassLinks(Class[] classes, boolean pkg, String conjunct, boolean showSourceLink) {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         for (Class klass : classes) {
             if (s.length() > 0) {
                 s.append(conjunct);
@@ -256,7 +256,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     /** Formats a class name as a link if there's javadoc for it. */
     public String makeClassLink(String className, String pkg, boolean showPkg, boolean showSourceLink) {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         if (className.contains(".")) {
             s.append(className);
             return s.toString();
@@ -282,7 +282,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     public static String joinAfterSorting(List<String> list) {
         Collections.sort(list);
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         for (int i = 0; i < list.size(); i++) {
             s.append(list.get(i));
         }
@@ -309,7 +309,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     * the superclass name and all implemented interfaces.
     */
     public String listClass(Class c) {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         int modifiers = c.getModifiers();
         if (c.isInterface()) {
             modifiers &= ~Modifier.ABSTRACT;
@@ -338,7 +338,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     /** Lists the class name and all the constructors. */
     public String listConstructors(Class c) {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         String classLink = makeClassLink(c, false, false);
         s.append(makeClassLink(c, true, true));
         s.append("<br>");
@@ -366,15 +366,15 @@ public class JavaResearcher implements WorkspaceResearcher {
      * Lists all non-private fields and non-private static methods of a class.
      */
     public String listMembers(Class c) {
-        StringBuffer s = new StringBuffer("<br>");
+        StringBuilder s = new StringBuilder("<br>");
         appendAfterSorting(s, collectFields(c));
         s.append("<br>");
         appendAfterSorting(s, collectMethods(c));
         return s.toString();
     }
     
-    /** Sorts the strings in the given List, then appends them to the StringBuffer. */
-    private void appendAfterSorting(StringBuffer stringBuffer, List<String> items) {
+    /** Sorts the strings in the given List, then appends them to the StringBuilder. */
+    private void appendAfterSorting(StringBuilder stringBuffer, List<String> items) {
         Collections.sort(items);
         for (int i = 0; i < items.size(); i++) {
             stringBuffer.append(items.get(i));
