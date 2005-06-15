@@ -258,6 +258,9 @@ public class EColumn extends JSplitPane {
                 return;
             }
             int newIndex = (index + indexDelta) % getComponentCount();
+            if (newIndex == -1) {
+                newIndex = getComponentCount() - 1;
+            }
             getComponent(newIndex).requestFocus();
         }
         
