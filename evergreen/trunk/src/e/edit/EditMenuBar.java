@@ -18,6 +18,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         add(makeScmMenu());
         add(makeWorkspaceMenu());
         add(makeToolsMenu());
+        add(makeWindowMenu());
     }
     
     public class ExitAction extends AbstractAction {
@@ -152,6 +153,13 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         JMenu menu = new JMenu("Workspace");
         menu.add(new AddWorkspaceAction());
         menu.add(new RemoveWorkspaceAction());
+        return menu;
+    }
+    
+    public JMenu makeWindowMenu() {
+        JMenu menu = new JMenu("Window");
+        menu.add(new CycleWindowsAction(1));
+        menu.add(new CycleWindowsAction(-1));
         return menu;
     }
     
