@@ -82,7 +82,11 @@ public class EColumn extends JSplitPane {
     public void moveTo(Component c, int y) {
         bottomPanel.moveTo(c, y);
     }
-
+    
+    public void cycleWindow(EWindow window, int indexDelta) {
+        bottomPanel.cycleWindow(window, indexDelta);
+    }
+    
     public ETextWindow[] getTextWindows() {
         ArrayList<ETextWindow> result = new ArrayList<ETextWindow>();
         for (Component c : bottomPanel.getComponents()) {
@@ -246,6 +250,15 @@ public class EColumn extends JSplitPane {
                 }
             }
             return -1;
+        }
+        
+        public void cycleWindow(EWindow c, int indexDelta) {
+            int index = getComponentIndex(c);
+            if (index == -1) {
+                return;
+            }
+            int newIndex = (index + indexDelta) % getComponentCount();
+            getComponent(newIndex).requestFocus();
         }
         
         private boolean isThereAnySpaceAboveComponent(int which) {
