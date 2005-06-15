@@ -151,6 +151,9 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     
     public JMenu makeWorkspaceMenu() {
         JMenu menu = new JMenu("Workspace");
+        menu.add(new CycleWorkspacesAction(1));
+        menu.add(new CycleWorkspacesAction(-1));
+        menu.add(new JSeparator());
         menu.add(new AddWorkspaceAction());
         menu.add(new RemoveWorkspaceAction());
         return menu;
