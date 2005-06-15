@@ -310,6 +310,18 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return index;
     }
     
+    public static void cycleWorkspaces(int indexDelta) {
+        int index = tabbedPane.getSelectedIndex();
+        if (index == -1) {
+            return;
+        }
+        int newIndex = (index + indexDelta) % tabbedPane.getTabCount();
+        if (newIndex == -1) {
+            newIndex = tabbedPane.getTabCount() - 1;
+        }
+        tabbedPane.setSelectedIndex(newIndex);
+    }
+    
     private static void addWorkspace(final Workspace workspace) {
         String name = workspace.getTitle();
         tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), getWorkspaceIndexInTabbedPane(name));
