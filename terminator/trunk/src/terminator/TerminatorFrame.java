@@ -130,7 +130,7 @@ public class TerminatorFrame extends JFrame {
 		
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addChangeListener(new TerminalFocuser());
-		disableFocusTraversal(tabbedPane);
+		ComponentUtilities.disableFocusTraversal(tabbedPane);
 		
 		if (oldContentPane instanceof JTerminalPane) {
 			addPaneToUI((JTerminalPane) oldContentPane);
@@ -192,12 +192,6 @@ public class TerminatorFrame extends JFrame {
 		size.height += (initialSize.height - finalSize.height);
 		size.width += (initialSize.width - finalSize.width);
 		setSize(size);
-	}
-	
-	public static void disableFocusTraversal(Component c) {
-		HashSet<AWTKeyStroke> emptySet = new HashSet<AWTKeyStroke>();
-		c.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, emptySet);
-		c.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, emptySet);
 	}
 	
 	private void initTabbedTerminals() {
