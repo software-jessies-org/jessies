@@ -64,12 +64,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			public void highlightClicked(MouseEvent event) {
 				List<Highlight> highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
 				for (Highlight highlight : highlights) {
-					highlight.getHighlighter().highlightClicked(JTextBuffer.this, highlight, getTextFromHighlight(highlight), event);
+					highlight.getHighlighter().highlightClicked(JTextBuffer.this, highlight, getTabbedText(highlight), event);
 				}
-			}
-			
-			private String getTextFromHighlight(Highlight highlight) {
-				return model.getCharSequence(highlight.getStart(), highlight.getEnd()).toString();
 			}
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
