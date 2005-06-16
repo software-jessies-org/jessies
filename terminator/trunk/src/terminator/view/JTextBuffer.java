@@ -48,7 +48,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	public JTextBuffer() {
 		Options options = Options.getSharedInstance();
 		model = new TextBuffer(this, options.getInitialColumnCount(), options.getInitialRowCount());
-		TerminatorFrame.disableFocusTraversal(this);
+		ComponentUtilities.disableFocusTraversal(this);
 		setFont(options.getFont());
 		setForeground(options.getColor("foreground"));
 		setBackground(options.getColor("background"));
