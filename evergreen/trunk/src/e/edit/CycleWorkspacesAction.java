@@ -19,10 +19,13 @@ public class CycleWorkspacesAction extends ETextAction {
     private void initKeyboardEquivalent() {
         String key = "TAB";
         boolean shifted = (indexDelta == -1);
-        if (GuiUtilities.isMacOs()) {
+        
+        boolean tabDoesNotWork = true;
+        if (tabDoesNotWork || GuiUtilities.isMacOs()) {
             key = (indexDelta == -1) ? "OPEN_BRACKET" : "CLOSE_BRACKET";
             shifted = true;
         }
+        
         putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke(key, shifted));
     }
     
