@@ -61,12 +61,12 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         commentCache = new BitSet();
     }
     
-    public List<PTextSegment> getTextSegments(int lineIndex) {
+    public List<PLineSegment> getTextSegments(int lineIndex) {
         String line = textArea.getLineContents(lineIndex).toString();
         return getMainSegments(lineIndex, line);
     }
     
-    private List<PTextSegment> getMainSegments(int lineIndex, String line) {
+    private List<PLineSegment> getMainSegments(int lineIndex, String line) {
         TextSegmentListBuilder builder = new TextSegmentListBuilder(textArea.getLineStartOffset(lineIndex));
         boolean comment = startsCommented(lineIndex);
         int lastStart = 0;
@@ -274,7 +274,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     }
     
     protected class TextSegmentListBuilder {
-        private ArrayList<PTextSegment> list = new ArrayList<PTextSegment>();
+        private ArrayList<PLineSegment> list = new ArrayList<PLineSegment>();
         private int lineStartOffset;
         private int start = 0;
         
@@ -287,7 +287,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
             start = end;
         }
         
-        public List<PTextSegment> getSegmentList() {
+        public List<PLineSegment> getSegmentList() {
             return list;
         }
     }

@@ -14,10 +14,10 @@ public class PPlainTextStyler extends PAbstractTextStyler {
         super(textArea);
     }
 
-    public List<PTextSegment> getTextSegments(int line) {
+    public List<PLineSegment> getTextSegments(int line) {
         int start = textArea.getLineStartOffset(line);
         int end = textArea.getLineEndOffsetBeforeTerminator(line);
-        List<PTextSegment> result = new ArrayList<PTextSegment>();
+        List<PLineSegment> result = new ArrayList<PLineSegment>();
         result.add(new PTextSegment(textArea, start, end, PStyle.NORMAL));
         return result;
     }

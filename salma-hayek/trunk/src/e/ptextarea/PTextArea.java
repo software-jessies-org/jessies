@@ -37,6 +37,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private ArrayList<PHighlight> highlights = new ArrayList<PHighlight>();
     private PTextStyler textStyler = new PPlainTextStyler(this);
     private List<StyleApplicator> styleApplicators = new ArrayList<StyleApplicator>();
+    private TabStyleApplicator tabStyleApplicator = new TabStyleApplicator(this);
     
     private int rightHandMarginColumn = NO_MARGIN;
     private ArrayList<PCaretListener> caretListeners = new ArrayList<PCaretListener>();
@@ -611,14 +612,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private final List<PLineSegment> getLineSegmentsForSplitLine(SplitLine splitLine) {
         int lineIndex = splitLine.getLineIndex();
         String fullLine = getLineList().getLine(lineIndex).getContents().toString();
-        PLineSegment[] segments = getLineSegments(lineIndex);
+        List<PLineSegment> segments = getLineSegments(lineIndex);
         int index = 0;
         ArrayList<PLineSegment> result = new ArrayList<PLineSegment>();
         int start = splitLine.getOffset();
         int end = start + splitLine.getLength();
         
-        for (int i = 0; index < end && i < segments.length; ++i) {
-            PLineSegment segment = segments[i];
+        for (int i = 0; index < end && i < segments.size(); ++i) {
+            PLineSegment segment = segments.get(i);
             if (start >= index + segment.getModelTextLength()) {
                 index += segment.getModelTextLength();
                 continue;
@@ -637,9 +638,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return result;
     }
     
-    public PLineSegment[] getLineSegments(int lineIndex) {
+    public List<PLineSegment> getLineSegments(int lineIndex) {
         // Let the styler have the first go.
-        List<PTextSegment> segments = textStyler.getTextSegments(lineIndex);
+        List<PLineSegment> segments = textStyler.getTextSegments(lineIndex);
         
         // Then let the style applicators add their finishing touches.
         String line = getLineContents(lineIndex).toString();
@@ -648,13 +649,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
         
         // Finally, deal with tabs.
-        return getTabbedSegments(segments);
+        segments = applyStyleApplicator(tabStyleApplicator, line, segments);
+        return segments;
     }
     
-    private List<PTextSegment> applyStyleApplicator(StyleApplicator styleApplicator, String line, List<PTextSegment> inputSegments) {
+    private List<PLineSegment> applyStyleApplicator(StyleApplicator styleApplicator, String line, List<PLineSegment> inputSegments) {
         EnumSet<PStyle> applicableStyles = styleApplicator.getSourceStyles();
-        List<PTextSegment> result = new ArrayList<PTextSegment>();
-        for (PTextSegment segment : inputSegments) {
+        List<PLineSegment> result = new ArrayList<PLineSegment>();
+        for (PLineSegment segment : inputSegments) {
             if (applicableStyles.contains(segment.getStyle())) {
                 result.addAll(styleApplicator.applyStylingTo(line, segment));
             } else {
@@ -662,14 +664,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             }
         }
         return result;
-    }
-    
-    private PLineSegment[] getTabbedSegments(List<PTextSegment> segments) {
-        ArrayList<PLineSegment> result = new ArrayList<PLineSegment>();
-        for (PLineSegment segment : segments) {
-            addTabbedSegments(segment, result);
-        }
-        return result.toArray(new PLineSegment[result.size()]);
     }
     
     private void addTabbedSegments(PLineSegment segment, ArrayList<PLineSegment> target) {
@@ -1022,7 +1016,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public void printLineInfo() {
         for (int i = 0; i < splitLines.size(); i++) {
             SplitLine line = getSplitLine(i);
-            System.err.println(i + ": line " + line.getLineIndex() + ", offset " + line.getOffset() + ", length " + line.getLength());
+            System.err.println("SplitLine " + i + ": line " + line.getLineIndex() + ", offset " + line.getOffset() + ", length " + line.getLength());
         }
     }
     

@@ -21,8 +21,8 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
         this.style = style;
     }
     
-    public List<PTextSegment> applyStylingTo(String line, PTextSegment segment) {
-        ArrayList<PTextSegment> result = new ArrayList<PTextSegment>();
+    public List<PLineSegment> applyStylingTo(String line, PLineSegment segment) {
+        ArrayList<PLineSegment> result = new ArrayList<PLineSegment>();
         Matcher matcher = pattern.matcher(segment.getCharSequence());
         int normalStart = 0;
         int offset = segment.getOffset();
@@ -31,19 +31,19 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
                 final int matchStart = matcher.start(1);
                 final int matchEnd = matcher.end(1);
                 if (matchStart > normalStart) {
-                    result.add((PTextSegment) segment.subSegment(normalStart, matchStart));
+                    result.add(segment.subSegment(normalStart, matchStart));
                 }
                 result.add(makeNewSegment(textArea, matcher, offset + matchStart, offset + matchEnd, style));
                 normalStart = matchEnd;
             }
         }
         if (segment.getModelTextLength() > normalStart) {
-            result.add((PTextSegment) segment.subSegment(normalStart));
+            result.add(segment.subSegment(normalStart));
         }
         return result;
     }
     
-    protected PTextSegment makeNewSegment(PTextArea textArea, Matcher matcher, int start, int end, PStyle style) {
+    protected PLineSegment makeNewSegment(PTextArea textArea, Matcher matcher, int start, int end, PStyle style) {
         // FIXME: underlining should be a PStyle attribute.
         if (style == PStyle.HYPERLINK) {
             PTextSegment result = new PUnderlinedTextSegment(textArea, start, end, style);

@@ -7,7 +7,7 @@ public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
     private int lineIndex;
     private int segmentInLine;
     private int charOffset;
-    private PLineSegment[] lineSegments;
+    private List<PLineSegment> lineSegments;
     
     /**
      * Creates a new PLogicalSegmentIterator which will iterate over the unwrapped segments,
@@ -18,15 +18,15 @@ public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
         this.textArea = textArea;
         lineIndex = textArea.getLineOfOffset(offsetContainedByFirstSegment);
         lineSegments = textArea.getLineSegments(lineIndex);
-        for (segmentInLine = 0; segmentInLine < lineSegments.length; segmentInLine++) {
-            if (lineSegments[segmentInLine].getEnd() > offsetContainedByFirstSegment) {
+        for (segmentInLine = 0; segmentInLine < lineSegments.size(); ++segmentInLine) {
+            if (lineSegments.get(segmentInLine).getEnd() > offsetContainedByFirstSegment) {
                 break;
             }
         }
-        if (segmentInLine == lineSegments.length) {
+        if (segmentInLine == lineSegments.size()) {
             this.charOffset = textArea.getLineEndOffsetBeforeTerminator(lineIndex);
         } else {
-            this.charOffset = lineSegments[segmentInLine].getOffset();
+            this.charOffset = lineSegments.get(segmentInLine).getOffset();
         }
     }
     
@@ -37,20 +37,19 @@ public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
     public PLineSegment next() {
         PLineSegment result = null;
         while (result == null || result.getModelTextLength() == 0) {
-            if (segmentInLine > lineSegments.length) {
+            if (segmentInLine > lineSegments.size()) {
                 lineIndex++;
                 lineSegments = textArea.getLineSegments(lineIndex);
                 segmentInLine = 0;
             }  // There is *deliberately* no else here - we wish to fall through to lower processing now.
             
-            if (segmentInLine < lineSegments.length) {
-                result = lineSegments[segmentInLine++];
-            } else if (segmentInLine == lineSegments.length && lineIndex < textArea.getLineCount() - 1) {
+            if (segmentInLine < lineSegments.size()) {
+                result = lineSegments.get(segmentInLine++);
+            } else if (segmentInLine == lineSegments.size() && lineIndex < textArea.getLineCount() - 1) {
                 result = new PNewlineSegment(textArea, charOffset, charOffset + 1, PNewlineSegment.HARD_NEWLINE);
                 segmentInLine++;
             } else {
-                throw new IndexOutOfBoundsException("Went off the end of the text buffer processing segment " +
-                        segmentInLine + " of " + lineSegments.length + " in line " + lineIndex + "; char offset is " + charOffset);
+                throw new IndexOutOfBoundsException("Went off the end of the text buffer processing segment " + segmentInLine + " of " + lineSegments.size() + " in line " + lineIndex + "; char offset is " + charOffset);
             }
         }
        

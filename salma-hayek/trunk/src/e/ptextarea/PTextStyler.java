@@ -16,7 +16,7 @@ public interface PTextStyler {
      * Returns a series of segments of text describing how to render each part of the
      * specified logical line.
      */
-    public List<PTextSegment> getTextSegments(int lineIndex);
+    public List<PLineSegment> getTextSegments(int lineIndex);
     
     /**
      * Adds this language's keywords to the given collection. This lets

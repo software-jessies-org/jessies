@@ -11,5 +11,5 @@ public abstract class PAbstractTextStyler implements PTextStyler {
         this.textArea = textArea;
     }
     
-    public abstract List<PTextSegment> getTextSegments(int line);
+    public abstract List<PLineSegment> getTextSegments(int line);
 }
