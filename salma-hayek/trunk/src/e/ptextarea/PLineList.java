@@ -25,7 +25,7 @@ public class PLineList implements PTextListener {
     public void printLineInfo() {
         for (int i = 0; i < lines.size(); i++) {
             Line line = lines.get(i);
-            System.err.println(i + ": start " + line.getStart() + ", length " + line.getLength() + ", end " + (line.getStart() + line.getLength()));
+            System.err.println(i + ": start " + line.getStart() + ", length " + line.getLength() + ", end " + (line.getStart() + line.getLength()) + ", width " + line.getWidth());
         }
     }
     
