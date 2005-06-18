@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.*;
 import javax.swing.plaf.basic.*;
+import e.ptextarea.*;
 import e.util.*;
 
 /**
@@ -17,6 +18,8 @@ import e.util.*;
  * 
  * If you hover over the view, the nearest mark (if it's close enough) will be highlighted.
  * Clicking will take you to that match.
+ * 
+ * A mark on the line with the caret will be highlighted in the caret color.
  */
 public class BirdView extends JComponent {
     private ETextWindow textWindow;
@@ -25,8 +28,9 @@ public class BirdView extends JComponent {
     private Method method;
 
     private BitSet matchingLines = new BitSet();
-
-    int nearestMatchingLine = -1;
+    
+    private int currentLineInTextArea;
+    private int nearestLineToMouseInBirdView = -1;
 
     public BirdView(ETextWindow textWindow, JScrollBar scrollBar) {
         this.textWindow = textWindow;
@@ -37,20 +41,30 @@ public class BirdView extends JComponent {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        initCaretListener();
         initMouseListener();
+    }
+    
+    private void initCaretListener() {
+        PCaretListener listener = new PCaretListener() {
+            public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
+                currentLineInTextArea = textWindow.getText().getLineOfOffset(selectionStart);
+            }
+        };
+        textWindow.getText().addCaretListener(listener);
     }
     
     private void initMouseListener() {
         MouseInputListener listener = new MouseInputAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e) && nearestMatchingLine != -1) {
+                if (SwingUtilities.isLeftMouseButton(e) && nearestLineToMouseInBirdView != -1) {
                     // Humans and goToLine() number lines from 1.
-                    textWindow.goToLine(nearestMatchingLine + 1);
+                    textWindow.goToLine(nearestLineToMouseInBirdView + 1);
                 }
             }
             
             public void mouseExited(MouseEvent e) {
-                nearestMatchingLine = -1;
+                nearestLineToMouseInBirdView = -1;
                 repaint();
             }
             
@@ -72,8 +86,8 @@ public class BirdView extends JComponent {
     }
     
     private void findNearestMatchingLineTo(int exactLine) {
-        nearestMatchingLine = -1;
-        for (int distance = 0; nearestMatchingLine == -1 && distance < 10; ++distance) {
+        nearestLineToMouseInBirdView = -1;
+        for (int distance = 0; nearestLineToMouseInBirdView == -1 && distance < 10; ++distance) {
             setNearestLineIfMatching(exactLine - distance);
             setNearestLineIfMatching(exactLine + distance);
         }
@@ -81,7 +95,7 @@ public class BirdView extends JComponent {
     
     private void setNearestLineIfMatching(final int line) {
         if (line >= 0 && line < matchingLines.length() && matchingLines.get(line)) {
-            nearestMatchingLine = line;
+            nearestLineToMouseInBirdView = line;
         }
     }
 
@@ -111,7 +125,7 @@ public class BirdView extends JComponent {
     }
 
     private void updateCursor() {
-        Cursor newCursor = (nearestMatchingLine != -1) ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : Cursor.getDefaultCursor();
+        Cursor newCursor = (nearestLineToMouseInBirdView != -1) ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : Cursor.getDefaultCursor();
         if (newCursor != getCursor()) {
             setCursor(newCursor);
         }
@@ -134,7 +148,13 @@ public class BirdView extends JComponent {
         double scaleFactor = getLineScaleFactor(usableArea);
         for (int i = 0; i < matchingLines.length(); i++) {
             if (matchingLines.get(i)) {
-                g.setColor(i == nearestMatchingLine ? Color.CYAN : Color.BLACK);
+                Color color = Color.BLACK;
+                if (i == nearestLineToMouseInBirdView) {
+                    color = Color.CYAN;
+                } else if (i == currentLineInTextArea) {
+                    color = Color.RED;
+                }
+                g.setColor(color);
                 int y = usableArea.y + (int) ((double) i * scaleFactor);
                 g.drawLine(usableArea.x, y, usableArea.width, y);
             }
