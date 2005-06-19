@@ -19,7 +19,9 @@ public class PLineList implements PTextListener {
     private ArrayList<PLineListener> listeners = new ArrayList<PLineListener>();
     
     public PLineList(PTextBuffer text) {
-        setPTextBuffer(text);
+        this.text = text;
+        text.addTextListener(this);
+        generateLines();
     }
     
     public void printLineInfo() {
@@ -42,16 +44,6 @@ public class PLineList implements PTextListener {
     /** Returns the underlying PTextBuffer model. */
     public PTextBuffer getTextBuffer() {
         return text;
-    }
-    
-    /** Replaces the underlying PTextBuffer model with a new one. */
-    public void setPTextBuffer(PTextBuffer text) {
-        if (this.text != null) {
-            this.text.removeTextListener(this);
-        }
-        this.text = text;
-        text.addTextListener(this);
-        generateLines();
     }
     
     /**
@@ -196,7 +188,7 @@ public class PLineList implements PTextListener {
     
     /** Handles complete text replacement notifications from the underlying PTextBuffer model. */
     public void textCompletelyReplaced(PTextEvent event) {
-        setPTextBuffer(text);  // Forces all the relevant regeneration of internals.
+        generateLines();
     }
     
     private void linesAreInvalidAfter(int lineIndex) {
