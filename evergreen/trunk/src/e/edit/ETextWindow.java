@@ -264,7 +264,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 fileType = RUBY;
                 text.setIndenter(new PRubyIndenter(text));
                 text.setTextStyler(new PRubyTextStyler(text));
-            } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || isCPlusPlusContent(content)) {
+            } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || filename.endsWith(".strings") || isCPlusPlusContent(content)) {
                 fileType = C_PLUS_PLUS;
                 text.setIndenter(new PCppIndenter(text));
                 text.setTextStyler(new PCPPTextStyler(text));
