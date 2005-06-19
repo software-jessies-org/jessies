@@ -7,10 +7,10 @@ import e.ptextarea.*;
 import e.util.*;
 
 /**
-The ETextArea action to open file properties dialog where you can view
-or alter the end of line string, indentation string, and other stuff as we
-think of it. (File encoding would be one possibility.)
-*/
+ * The ETextArea action to open file properties dialog where you can view
+ * or alter the end of line string, indentation string, and character
+ * encoding.
+ */
 public class FilePropertiesAction extends ETextAction {
     public static final String ACTION_NAME = "File Properties...";
     
@@ -31,9 +31,6 @@ public class FilePropertiesAction extends ETextAction {
         ETextArea text = window.getText();
         PTextBuffer buffer = text.getTextBuffer();
         String endOfLineString = (String) buffer.getProperty(PTextBuffer.LINE_ENDING_PROPERTY);
-        if (endOfLineString == null) {
-            endOfLineString = System.getProperty("line.separator");
-        }
         String initialEndOfLine = StringUtilities.escapeForJava(endOfLineString);
         endOfLineStringField.setText(initialEndOfLine);
         
