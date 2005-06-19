@@ -56,7 +56,7 @@ public abstract class PIndenter {
         return (previousNonBlankLineNumber == -1) ? "" : getCurrentIndentationOfLine(previousNonBlankLineNumber);
     }
     
-    public void setIndentationPropertyBasedOnContent(String content) {
+    public void setIndentationPropertyBasedOnContent(CharSequence content) {
         String indentation = IndentationGuesser.guessIndentationFromFile(content);
         //System.err.println(filename + ": '" + indentation + "'");
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, indentation);

@@ -13,7 +13,10 @@ public class IndentationGuesser {
     /**
      * Returns the best guess at the indentation in use in the given content.
      */
-    public static String guessIndentationFromFile(String fileContents) {
+    public static String guessIndentationFromFile(CharSequence chars) {
+        // FIXME: we shouldn't force our callers to pay for this!
+        String fileContents = chars.toString();
+
         String previousIndent = "";
         Bag indentations = new Bag();
         String emergencyAlternative = Parameters.getParameter("indent.string", "    ");
