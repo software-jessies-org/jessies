@@ -201,11 +201,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             throw new RuntimeException("Edit can't edit directories, which is what '" + filename + "' is.");
         }
         
-        /* Refuse to open non-text files. */
-        if (FileUtilities.isTextFile(FileUtilities.fileFromString(filename)) == false) {
-            throw new RuntimeException("Edit is a text editor, and can't handle binary files such as '" + filename + "'. This file will not be opened.");
-        }
-        
         /* Limit ourselves (rather arbitrarily) to files under half a gigabyte. That's quite a strain on us, at present. */
         final int KB = 1024;
         final int MB = 1024 * KB;

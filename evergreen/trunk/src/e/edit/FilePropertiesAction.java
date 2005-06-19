@@ -16,6 +16,7 @@ public class FilePropertiesAction extends ETextAction {
     
     private JTextField endOfLineStringField = new JTextField("", 40);
     private JTextField indentStringField = new JTextField("", 40);
+    private JTextField charsetStringField = new JTextField("", 40);
     
     public FilePropertiesAction() {
         super(ACTION_NAME);
@@ -39,10 +40,14 @@ public class FilePropertiesAction extends ETextAction {
         String indentationString = text.getIndentationString();
         String initialIndentationString = StringUtilities.escapeForJava(indentationString);
         indentStringField.setText(initialIndentationString);
-
+        
+        charsetStringField.setText((String) buffer.getProperty(PTextBuffer.CHARSET_PROPERTY));
+        charsetStringField.setEditable(false);
+        
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);
+        formPanel.addRow("Character Encoding:", charsetStringField);
         boolean okay = FormDialog.show(Edit.getFrame(), "File Properties", formPanel, "Apply");
         
         if (okay == false) {
