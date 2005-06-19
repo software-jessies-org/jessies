@@ -32,7 +32,7 @@ public abstract class ChangeFontAction extends ETextAction {
      * unless the content seems to be such that it would be
      * unreadable except with a fixed font.
      */
-    public static Font getAppropriateFontForContent(String content) {
+    public static Font getAppropriateFontForContent(CharSequence content) {
         return shouldUseFixedFontFor(content) ? getConfiguredFixedFont() : getConfiguredFont();
     }
     
@@ -41,7 +41,7 @@ public abstract class ChangeFontAction extends ETextAction {
      * to be legible. GNU-style indentation and ASCII art are two examples
      * of the kind of thing that requires a fixed font.
      */
-    private static boolean shouldUseFixedFontFor(String content) {
+    private static boolean shouldUseFixedFontFor(CharSequence content) {
         if (Boolean.getBoolean("fixedFont.default")) {
             return true;
         }
@@ -63,7 +63,7 @@ public abstract class ChangeFontAction extends ETextAction {
      * decide whether or not the file will be unreadable without using a
      * fixed font, and JavaDoc looks fine either way.
      */
-    private static boolean hasMixedTabsAndSpaces(String content) {
+    private static boolean hasMixedTabsAndSpaces(CharSequence content) {
         Pattern pattern = Pattern.compile("\\t [^*]", Pattern.MULTILINE);
         return pattern.matcher(content).find();
     }
@@ -74,7 +74,7 @@ public abstract class ChangeFontAction extends ETextAction {
      * art. The numbers zero, one and two all exist in the world of computer
      * science, but any more and we're dealing with art.
      */
-    private static boolean hasMidLineAsciiArt(String content) {
+    private static boolean hasMidLineAsciiArt(CharSequence content) {
         // "\\S\\s{3,}" doesn't work because \s matches newlines even
         // in MULTILINE mode, so we use ' ' instead.
         Pattern pattern = Pattern.compile("\\S {3,}", Pattern.MULTILINE);

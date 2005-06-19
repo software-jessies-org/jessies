@@ -187,17 +187,17 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     /** Tests whether the 'content' looks like a Unix shell script. */
-    private static boolean isInterpretedContent(String content, String interpreter) {
+    private static boolean isInterpretedContent(CharSequence content, String interpreter) {
         return Pattern.compile("^#![^\\n]*" + interpreter).matcher(content).find();
     }
     
     /** Tests whether the 'content' looks like a Unix shell script, of the Ruby variety. */
-    private static boolean isRubyContent(String content) {
+    private static boolean isRubyContent(CharSequence content) {
         return isInterpretedContent(content, "ruby");
     }
     
     /** Tests whether the 'content' looks like a Unix shell script, of the Perl variety. */
-    private static boolean isPerlContent(String content) {
+    private static boolean isPerlContent(CharSequence content) {
         return isInterpretedContent(content, "perl");
     }
     
@@ -210,8 +210,8 @@ public class ETextWindow extends EWindow implements PTextListener {
      * GNU headers tend to have an emacs mode hint, so let's obey those too (I think
      * emacs scans the whole file, but GNU headers seem to use the first line).
      */
-    private static boolean isCPlusPlusContent(String content) {
-        return content.startsWith("#ifndef") || content.matches(".*" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ".*");
+    private static boolean isCPlusPlusContent(CharSequence content) {
+        return Pattern.compile("(#ifndef|" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ")").matcher(content).find();
     }
     
     private HashSet<String> getSpellingExceptionsForLanguage(String language) {
@@ -252,9 +252,10 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     public void fillWithContent() {
         try {
-            String content  = StringUtilities.readFile(file.getAbsolutePath());
+            text.getTextBuffer().readFromFile(file);
             lastModifiedTime = file.lastModified();
             
+            CharSequence content  = text.getTextBuffer();
             if (filename.endsWith(".java")) {
                 fileType = JAVA;
                 text.setIndenter(new PJavaIndenter(text));
@@ -263,7 +264,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 fileType = RUBY;
                 text.setIndenter(new PRubyIndenter(text));
                 text.setTextStyler(new PRubyTextStyler(text));
-            } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || content.startsWith("#ifndef") || isCPlusPlusContent(content)) {
+            } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || isCPlusPlusContent(content)) {
                 fileType = C_PLUS_PLUS;
                 text.setIndenter(new PCppIndenter(text));
                 text.setTextStyler(new PCPPTextStyler(text));
@@ -277,7 +278,6 @@ public class ETextWindow extends EWindow implements PTextListener {
             }
             initSpellingExceptionsForDocument();
             updateWatermark();
-            text.getTextBuffer().readFromFile(file);
             text.setFont(ChangeFontAction.getAppropriateFontForContent(content));
             text.getIndenter().setIndentationPropertyBasedOnContent(content);
             text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
