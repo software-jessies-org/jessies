@@ -44,6 +44,7 @@ public class PTextBuffer implements CharSequence {
     }
     
     private void initDefaultProperties() {
+        putProperty(CHARSET_PROPERTY, UTF8_CHARSET);
         putProperty(LINE_ENDING_PROPERTY, "\n");
     }
     
