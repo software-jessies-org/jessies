@@ -38,12 +38,46 @@ public class PSameStyleCharSequence {
                     //   (|/*k*/)
                 } else {
                     // We only want to match within one run of this style.
-                    return new SingleSegmentCharSequence(textArea, segment);
+                    return new SegmentRunCharSequence(textArea, collectRun(segment, it));
                 }
             }
         }
         // We want to filter out all the rest.
         return new MangledCharSequence(textArea);
+    }
+    
+    /**
+     * Returns a list of segments starting with 'firstSegment' and continuing
+     * with as many consecutive elements from 'it' as have the same style. We
+     * include newline segments as being unimportant. Note that this code has
+     * the perhaps surprising (but not illogical) behavior of considering
+     * adjacent lines of a multi-line comment as part of a run, but adjacent
+     * comment-to-end-of-line lines as separate single-item runs. (This is
+     * because only in the former case does the indentation have the COMMENT
+     * style. In the latter case, it has NORMAL style.)
+     * 
+     * TEST: That means that the parentheses in that paragraph can be matched,
+     * but the ones inside the method above can't.
+     */
+    private static List<PLineSegment> collectRun(PLineSegment firstSegment, Iterator<PLineSegment> it) {
+        final PStyle firstStyle = firstSegment.getStyle();
+        
+        ArrayList<PLineSegment> run = new ArrayList<PLineSegment>();
+        run.add(firstSegment);
+        
+        while (it.hasNext()) {
+            PLineSegment segment = it.next();
+            PStyle thisStyle = segment.getStyle();
+            if (thisStyle == PStyle.NEWLINE) {
+                // Don't bother adding it to the run, but consider it the end
+                // of the run, either.
+            } else if (thisStyle != firstStyle) {
+                break;
+            } else {
+                run.add(segment);
+            }
+        }
+        return run;
     }
     
     /**
@@ -57,18 +91,20 @@ public class PSameStyleCharSequence {
      * alternative solution might be to pull the offset and end out of the
      * segment and store them as anchors?)
      */
-    public static class SingleSegmentCharSequence implements CharSequence {
+    public static class SegmentRunCharSequence implements CharSequence {
         private PTextBuffer textBuffer;
-        private PLineSegment segment;
+        private List<PLineSegment> run;
         
-        public SingleSegmentCharSequence(PTextArea textArea, PLineSegment segment) {
+        public SegmentRunCharSequence(PTextArea textArea, List<PLineSegment> run) {
             this.textBuffer = textArea.getTextBuffer();
-            this.segment = segment;
+            this.run = run;
         }
         
         public char charAt(int index) {
-            if (index >= segment.getOffset() && index < segment.getEnd()) {
-                return textBuffer.charAt(index);
+            for (PLineSegment segment : run) {
+                if (index >= segment.getOffset() && index < segment.getEnd()) {
+                    return textBuffer.charAt(index);
+                }
             }
             return ' ';
         }

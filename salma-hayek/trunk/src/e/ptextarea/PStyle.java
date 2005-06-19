@@ -7,6 +7,7 @@ import java.awt.*;
  */
 public enum PStyle {
     NORMAL("normal", javax.swing.UIManager.getColor("TextArea.foreground")),
+    NEWLINE("newline", null),
     STRING("string", Color.decode("#0000ff")),
     COMMENT("comment", Color.decode("#227722")),
     KEYWORD("keyword", Color.decode("#770022")),

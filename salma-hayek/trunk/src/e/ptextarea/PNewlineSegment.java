@@ -1,5 +1,6 @@
 package e.ptextarea;
 
+import e.util.*;
 import java.awt.*;
 
 public class PNewlineSegment extends PAbstractSegment {
@@ -11,7 +12,7 @@ public class PNewlineSegment extends PAbstractSegment {
     private boolean newlineType;
     
     public PNewlineSegment(PTextArea textArea, int start, int end, boolean isHardNewline) {
-        super(textArea, start, end, PStyle.NORMAL);
+        super(textArea, start, end, PStyle.NEWLINE);
         this.newlineType = isHardNewline;
     }
     
@@ -65,7 +66,6 @@ public class PNewlineSegment extends PAbstractSegment {
     
     @Override
     public String toString() {
-        return "PNewlineSegment[" + style.getName() + ", [" + getOffset() + ", " + getEnd() + "], " + getViewText() +
-                (newlineType ? ", HARD" : ", SOFT") + "]";
+        return "PNewlineSegment[" + style.getName() + ", [" + getOffset() + ", " + getEnd() + "], " + StringUtilities.escapeForJava(getViewText()) + (newlineType ? ", HARD" : ", SOFT") + "]";
     }
 }
