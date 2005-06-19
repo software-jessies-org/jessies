@@ -3,8 +3,7 @@ package e.ptextarea;
 import java.awt.*;
 
 /**
- * A PTabSegment is a PLineSegment which knows how to draw, and calculate positions of,
- * one or more tab characters.
+ * A PTabSegment is a PLineSegment for runs of tab characters.
  * 
  * @author Phil Norman
  */
@@ -14,6 +13,8 @@ public class PTabSegment extends PAbstractSegment {
     private static final int MIN_TAB_WIDTH_IN_PIXELS = 5;
     
     private static final int SPACES_PER_TAB = 8;
+    
+    private static final Stroke STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 7.0f, 1.0f }, 0.0f);
     
     public PTabSegment(PTextArea textArea, int start, int end) {
         super(textArea, start, end, PStyle.NORMAL);
@@ -28,6 +29,7 @@ public class PTabSegment extends PAbstractSegment {
         return (SPACES_PER_TAB * metrics.charWidth(' '));
     }
     
+    @Override
     public int getDisplayWidth(FontMetrics metrics, int startX) {
         if (getModelTextLength() == 0) {
             return 0;
@@ -38,6 +40,7 @@ public class PTabSegment extends PAbstractSegment {
         return (x - startX);
     }
     
+    @Override
     public int getCharOffset(FontMetrics metrics, int startX, int x) {
         final int tabWidth = tabWidth(metrics);
         for (int i = 0; i < getModelTextLength(); i++) {
@@ -55,7 +58,30 @@ public class PTabSegment extends PAbstractSegment {
         return getModelTextLength();
     }
     
-    public void paint(Graphics2D graphics, int x, int yBaseline) {
-        // FIXME: an option to render tabs visibly?
+    private void paintArrow(Graphics2D g, FontMetrics metrics, int x, int yMiddle, int yBaseline) {
+        g.drawLine(x, yBaseline, x, yBaseline - metrics.getMaxAscent());
+        
+        g.drawLine(x - 3, yMiddle - 3, x, yMiddle);
+        g.drawLine(x - 3, yMiddle + 3, x, yMiddle);
+    }
+    
+    @Override
+    public void paint(Graphics2D g, int x, int yBaseline) {
+        FontMetrics metrics = g.getFontMetrics();
+        final int yMiddle = yBaseline - metrics.getAscent() / 2;
+        final int xStop = x + getDisplayWidth(metrics, x) - 1;
+        
+        // Draw a dashed line for the entire length.
+        g.setColor(Color.LIGHT_GRAY);
+        Stroke oldStroke = g.getStroke();
+        g.setStroke(STROKE);
+        g.drawLine(x, yMiddle, xStop, yMiddle);
+        g.setStroke(oldStroke);
+        
+        // Draw traditional tab-stop marks at each tab stop.
+        final int tabWidth = tabWidth(metrics);
+        for (int tabStopX = xStop; tabStopX > x; tabStopX -= tabWidth) {
+            paintArrow(g, metrics, tabStopX, yMiddle, yBaseline);
+        }
     }
 }
