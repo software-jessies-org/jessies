@@ -15,4 +15,9 @@ public class TabStyleApplicator extends RegularExpressionStyleApplicator {
     protected PLineSegment makeNewSegment(PTextArea textArea, Matcher matcher, int start, int end, PStyle style) {
         return new PTabSegment(textArea, start, end);
     }
+    
+    @Override
+    public boolean canApplyStylingTo(PStyle style) {
+        return true;
+    }
 }

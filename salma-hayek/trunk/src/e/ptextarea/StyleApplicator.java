@@ -12,8 +12,9 @@ public interface StyleApplicator {
     public List<PLineSegment> applyStylingTo(String line, PLineSegment normalSegment);
     
     /**
-     * Returns the styles this style applicator works on. applyStylingTo will
-     * only be passed text segments with one of these styles.
+     * Tests whether this style applicator works on the given style.
+     * applyStylingTo will only be passed segments of a style for which
+     * this method returns true.
      */
-    public EnumSet<PStyle> getSourceStyles();
+    public boolean canApplyStylingTo(PStyle style);
 }

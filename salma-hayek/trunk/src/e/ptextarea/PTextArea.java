@@ -654,10 +654,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private List<PLineSegment> applyStyleApplicator(StyleApplicator styleApplicator, String line, List<PLineSegment> inputSegments) {
-        EnumSet<PStyle> applicableStyles = styleApplicator.getSourceStyles();
         List<PLineSegment> result = new ArrayList<PLineSegment>();
         for (PLineSegment segment : inputSegments) {
-            if (applicableStyles.contains(segment.getStyle())) {
+            if (styleApplicator.canApplyStylingTo(segment.getStyle())) {
                 result.addAll(styleApplicator.applyStylingTo(line, segment));
             } else {
                 result.add(segment);
@@ -1100,7 +1099,21 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void setLineWidth(PLineList.Line line) {
-        line.setWidth(metrics.stringWidth(line.getContents().toString()));
+        // FIXME: this is a work-around; an earlier version of this method
+        // used stringWidth, which didn't work for tabs. This implementation
+        // works for tabs (thanks to the hack in addCharWidth), but doesn't
+        // work, for example, for unprintable characters. In general, we need
+        // to work on List<PLineSegment> --- the current implementation is
+        // insufficient to support segments that are rendered other than by
+        // simply invoking drawString on the model text. (Yes, we could
+        // continue to add hacks to addCharWidth, but that's obviously wrong,
+        // and broken in face of user-supplied StyleApplicators.)
+        CharSequence chars = line.getContents();
+        int width = 0;
+        for (int i = 0; i < chars.length(); ++i) {
+            width = addCharWidth(width, chars.charAt(i));
+        }
+        line.setWidth(width);
     }
     
     private void setText(PTextBuffer text) {

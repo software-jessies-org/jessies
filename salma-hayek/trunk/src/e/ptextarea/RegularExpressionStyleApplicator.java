@@ -10,7 +10,6 @@ import java.util.regex.*;
  * used as the range to be styled.
  */
 public class RegularExpressionStyleApplicator implements StyleApplicator {
-    private static final EnumSet<PStyle> SOURCE_STYLES = EnumSet.of(PStyle.NORMAL);
     private PTextArea textArea;
     private Pattern pattern;
     private PStyle style;
@@ -65,8 +64,8 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
         return true;
     }
     
-    public EnumSet<PStyle> getSourceStyles() {
-        return SOURCE_STYLES;
+    public boolean canApplyStylingTo(PStyle style) {
+        return (style == PStyle.NORMAL);
     }
     
     /**
