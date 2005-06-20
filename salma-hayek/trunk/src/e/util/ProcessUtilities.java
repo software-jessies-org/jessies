@@ -115,7 +115,7 @@ public class ProcessUtilities {
     private static void readLinesFromStream(LineListener listener, InputStream stream) {
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(stream));
+            in = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
             String line;
             while ((line = in.readLine()) != null) {
                 listener.processLine(line);
