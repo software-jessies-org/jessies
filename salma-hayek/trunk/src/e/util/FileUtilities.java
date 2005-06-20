@@ -324,7 +324,7 @@ public class FileUtilities {
         try {
             File file = File.createTempFile(prefix, null);
             file.deleteOnExit();
-            PrintWriter out = new PrintWriter(new FileOutputStream(file));
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
             out.print(content);
             out.close();
             return file.toString();

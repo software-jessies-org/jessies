@@ -52,7 +52,7 @@ public class StringUtilities {
     private static String writeFile(File file, String content, boolean append) {
         PrintWriter out = null;
         try {
-            out = new PrintWriter(new FileOutputStream(file, append));
+            out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file, append), "UTF-8"));
             out.print(content);
             return null;
         } catch (IOException ex) {
