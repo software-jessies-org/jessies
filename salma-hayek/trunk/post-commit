@@ -13,7 +13,7 @@ mail_domain="jessies.org" # Assumes all authors (and the list) share a domain.
 to_address="software@#{mail_domain}"
 reply_to_address=to_address # Use "nil" to reply to author.
 
-svnlook="/opt/subversion-1.1.0-rc2/bin/svnlook"
+svnlook="/usr/bin/svnlook"
 
 if `whoami` =~ /^(elliotth|martind)$/
   to_address=$1
