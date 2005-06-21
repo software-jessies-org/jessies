@@ -46,7 +46,7 @@ rev = ARGV.shift()
 # Get the overview information.
 # Despite storing everything as UTF-8, svn(1) insists that your LC_CTYPE is
 # set to request UTF-8 if you want it to refrain from mangling text such
-# as 宮部みゆき.
+# as 宮部みゆき or 火車.
 ENV["LC_CTYPE"] = "en_US.UTF-8"
 info=`#{svnlook} info #{repo} -r #{rev}`
 info_lines=info.split("\n")
