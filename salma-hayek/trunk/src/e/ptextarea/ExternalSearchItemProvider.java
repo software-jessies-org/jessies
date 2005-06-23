@@ -56,7 +56,6 @@ class ExternalSearchItemProvider implements MenuItemProvider {
     private class LookUpInDictionaryAction extends AbstractAction {
         public LookUpInDictionaryAction() {
             super("Look Up in Dictionary");
-            setEnabled(GuiUtilities.isMacOs());
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -65,13 +64,17 @@ class ExternalSearchItemProvider implements MenuItemProvider {
                 // way to Dictionary.app unmolested. The usual url-encoded
                 // form ("+") doesn't work, for some reason.
                 String encodedSelection = textArea.getSelectedText().trim().replaceAll("\\s+", "%20");
-                // In Mac OS 10.4.1, a dict: URI that causes Dictionary.app to
-                // start doesn't actually cause the definition to be shown, so
-                // we need to ask twice. If we knew the dictionary was already
-                // open, we could avoid the flicker. But we may as well wait
-                // for Apple to fix the underlying problem.
-                BrowserLauncher.openURL("dict:///");
-                BrowserLauncher.openURL("dict:///" + encodedSelection);
+                if (GuiUtilities.isMacOs()) {
+                    // In Mac OS 10.4.1, a dict: URI that causes Dictionary.app to
+                    // start doesn't actually cause the definition to be shown, so
+                    // we need to ask twice. If we knew the dictionary was already
+                    // open, we could avoid the flicker. But we may as well wait
+                    // for Apple to fix the underlying problem.
+                    BrowserLauncher.openURL("dict:///");
+                    BrowserLauncher.openURL("dict:///" + encodedSelection);
+                } else {
+                    BrowserLauncher.openURL("http://www.answers.com/" + encodedSelection);
+                }
             } catch (Exception ex) {
                 Log.warn("Exception launching browser", ex);
             }
