@@ -109,9 +109,6 @@ public class FindAndReplaceAction extends ETextAction {
             }
         }
         
-        // Give the focus to the window we've modified.
-        textWindow.requestFocus();
-        
         textWindow = null;
         text = null;
     }
