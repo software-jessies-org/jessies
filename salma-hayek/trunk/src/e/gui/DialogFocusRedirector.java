@@ -4,28 +4,24 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class DialogFocusRedirector implements FocusListener {
+public class DialogFocusRedirector {
     private Container ui;
+    private Component originalFocusOwner;
     
     public DialogFocusRedirector(Container ui) {
         this.ui = ui;
     }
     
-    /**
-    * Invoked when our dialog gains the focus; gives the focus to the first
-    * text component it finds.
-    */
-    public void focusGained(FocusEvent e) {
-        redirectFocus();
-    }
-    
-    /* Ignores focus-lost events. */
-    public void focusLost(FocusEvent e) {
-    }
-    
     public void redirectFocus() {
+        originalFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         Component[] components = ui.getComponents();
         giveFocusToFirstTextComponentIn(components);
+    }
+    
+    public void restoreFocus() {
+        if (originalFocusOwner != null) {
+            originalFocusOwner.requestFocus();
+        }
     }
     
     public boolean isWorthGivingFocusTo(Component c) {

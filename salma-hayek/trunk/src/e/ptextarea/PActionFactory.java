@@ -5,43 +5,45 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class PActionFactory {
-    public static Action makeCopyAction() {
+    public static PTextAction makeCopyAction() {
         return new CopyAction();
     }
     
-    public static Action makeCutAction() {
+    public static PTextAction makeCutAction() {
         return new CutAction();
     }
     
-    public static Action makeFindAction() {
+    public static PTextAction makeFindAction() {
         return new PFind.FindAction();
     }
     
-    public static Action makeFindNextAction() {
+    public static PTextAction makeFindNextAction() {
         return new FindNextAction();
     }
     
-    public static Action makeFindPreviousAction() {
+    public static PTextAction makeFindPreviousAction() {
         return new FindPreviousAction();
     }
     
-    public static Action makePasteAction() {
+    public static PTextAction makePasteAction() {
         return new PasteAction();
     }
     
-    public static Action makeRedoAction() {
+    public static PTextAction makeRedoAction() {
         return new RedoAction();
     }
     
-    public static Action makeSelectAllAction() {
+    public static PTextAction makeSelectAllAction() {
         return new SelectAllAction();
     }
     
-    public static Action makeUndoAction() {
+    public static PTextAction makeUndoAction() {
         return new UndoAction();
     }
     
     public abstract static class PTextAction extends AbstractAction {
+        private PTextArea boundTextArea;
+        
         /**
          * The parameter keyStroke can be null if you don't want to bind this
          * action to a key.
@@ -62,7 +64,14 @@ public class PActionFactory {
         
         public abstract void performOn(PTextArea textArea);
         
-        public PTextArea getTextArea() {
+        public void bindTo(PTextArea textArea) {
+            this.boundTextArea = textArea;
+        }
+        
+        protected PTextArea getTextArea() {
+            if (boundTextArea != null) {
+                return boundTextArea;
+            }
             Component component = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
             if (component instanceof PTextArea) {
                 return (PTextArea) component;

@@ -9,12 +9,37 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * A PTextBuffer is the Document of the PTextArea.  It implements the CharSequence interface, and is
- * responsible for maintaining undo lists.
+ * The PTextArea's model. It can be used as a CharSequence, for efficient
+ * access to the underlying characters. Try to avoid use of 'toString' for
+ * maximum efficiency.
  * 
+ * The 'replace' method is the only way to change the document. PTextArea
+ * offers various other convenience methods. You can be notified of changes
+ * via 'addTextListener' (see also 'removeTextListener').
+ * 
+ * This class is responsible for maintaining an undo buffer, accessible via
+ * 'getUndoBuffer'.
+ * 
+ * In addition to the characters, this class also stores metadata, called
+ * properties. There are certain well-known properties, whose names are
+ * exported as constants. No caller should cache these properties; a caller
+ * that sets a property should expect it to take immediate effect (though
+ * 'immediate' may not be meaningful until the text is next written to disk,
+ * as in the case of the character encoding). See 'getProperty' and
+ * 'setProperty'.
+ * 
+ * When a file is read from disk with 'readFromFile', we recognize UTF-16BE
+ * and UTF-16LE, and -- in the absence of either of their byte-order marks, we
+ * fall back to UTF-8. If the file doesn't decode correctly, we try ISO-8859-1.
+ * If that also fails, we throw an exception.
+ * 
+ * A file written to disk with 'writeToFile' will use the current
+ * CHARSET_PROPERTY, which will have been initialized to correspond to the
+ * encoding the file had when read from disk, or UTF-8 if this is a new file.
+ * 
+ * @author Elliott Hughes
  * @author Phil Norman
  */
-
 public class PTextBuffer implements CharSequence {
     public static final String CHARSET_PROPERTY = "CharsetProperty";
     public static final String INDENTATION_PROPERTY = "IndentationProperty";
@@ -119,60 +144,106 @@ public class PTextBuffer implements CharSequence {
             dataInputStream = new DataInputStream(fileInputStream);
             dataInputStream.readFully(byteBuffer.array());
             
-            // Assume UTF-8, but check for a UTF-16 BOM.
-            String charsetName = UTF8_CHARSET;
-            if (byteCount > 1) {
-                int possibleBom = byteBuffer.getShort(0) & 0xffff;
-                if (possibleBom == 0xfeff) {
-                    charsetName = UTF16BE_CHARSET;
-                } else if (possibleBom == 0xfffe) {
-                    charsetName = UTF16LE_CHARSET;
-                }
-            }
+            // Turn the raw bytes into a char[].
+            CharBuffer charBuffer = decodeByteBuffer(byteBuffer, byteCount);
+            char[] chars = extractCharArray(charBuffer);
+            chars = fixLineEndings(chars);
             
-            // Convert the bytes to characters.
-            CharBuffer charBuffer = Charset.forName(charsetName).decode(byteBuffer);
-            
-            // Get hold of the characters.
-            // FIXME: Strictly, we need to check hasArray and isReadOnly to
-            // know whether we can use the array; if not, we need to fall
-            // back to using charBuffer as a CharSequence and copying out.
-            char[] chars = charBuffer.array();
-            
-            // The 1.5 UTF-8 decoder leaves us with a directly usable backing
-            // array, but the UTF-16 decoders don't because they swallow the
-            // BOM, so in those cases we need to re-copy the relevant portion.
-            // We could fix that by skipping the BOM when we read it above,
-            // but I'd rather have this safety net. UTF-8 is the expected
-            // format anyway, and this won't harm UTF-8 performance.
-            if (chars.length != charBuffer.length()) {
-                char[] newChars = new char[charBuffer.length()];
-                System.arraycopy(chars, charBuffer.arrayOffset(), newChars, 0, newChars.length);
-                chars = newChars;
-            }
-            
-            // Cope with weird line-endings.
-            String lineEnding = "\n";
-            if (charArrayContains(chars, '\r')) {
-                String s = new String(chars);
-                if (s.contains("\r\n")) {
-                    lineEnding = "\r\n";
-                    s = s.replaceAll("\r\n", "\n");
-                } else {
-                    lineEnding = "\r";
-                    s = s.replaceAll("\r", "\n");
-                }
-                chars = s.toCharArray();
-            }
-            
-            putProperty(CHARSET_PROPERTY, charsetName);
-            putProperty(LINE_ENDING_PROPERTY, lineEnding);
             setText(chars);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
             FileUtilities.close(dataInputStream);
         }
+    }
+    
+    private CharBuffer decodeByteBuffer(ByteBuffer byteBuffer, long byteCount) {
+        // Assume UTF-8, but check for a UTF-16 BOM.
+        String charsetName = UTF8_CHARSET;
+        if (byteCount > 1) {
+            int possibleBom = byteBuffer.getShort(0) & 0xffff;
+            if (possibleBom == 0xfeff) {
+                charsetName = UTF16BE_CHARSET;
+            } else if (possibleBom == 0xfffe) {
+                charsetName = UTF16LE_CHARSET;
+            }
+        }
+        
+        try {
+            return attemptDecoding(byteBuffer, charsetName);
+        } catch (Exception unused) {
+            // Try again with the most popular parochial format (in my part of
+            // the world). The various parochial formats will almost certainly
+            // decode without error (in the sense that they'll accept pretty
+            // much any byte sequence), but the result may be gibberish. I
+            // think this is the best we can do, programmatically, though it's
+            // quite tempting to just let attemptDecoding throw an exception
+            // and encourage people to recode non-UTF files.
+            byteBuffer.rewind();
+            try {
+                return attemptDecoding(byteBuffer, "ISO-8859-1");
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+    
+    private CharBuffer attemptDecoding(ByteBuffer byteBuffer, String charsetName) throws CharacterCodingException {
+        CharsetDecoder decoder = makeReportingCharsetDecoder(charsetName);
+        CharBuffer charBuffer = decoder.decode(byteBuffer);
+        putProperty(CHARSET_PROPERTY, charsetName);
+        return charBuffer;
+    }
+    
+    private static CharsetDecoder makeReportingCharsetDecoder(String charsetName) {
+        CharsetDecoder decoder = Charset.forName(charsetName).newDecoder();
+        decoder.onMalformedInput(CodingErrorAction.REPORT);
+        decoder.onUnmappableCharacter(CodingErrorAction.REPORT);
+        return decoder;
+    }
+    
+    private static char[] extractCharArray(CharBuffer charBuffer) {
+        // See if we need to copy the characters into a new char[].
+        if (charBuffer.hasArray() == false || charBuffer.isReadOnly()) {
+            char[] chars = new char[charBuffer.length()];
+            for (int i = 0; i < chars.length; ++i) {
+                chars[i] = charBuffer.charAt(i);
+            }
+            return chars;
+        }
+        
+        // We may be able to use the buffer's char[] directly.
+        char[] chars = charBuffer.array();
+        
+        // The 1.5 UTF-8 decoder leaves us with a directly usable char[],
+        // but the UTF-16 decoders don't because they swallow the
+        // BOM, so in those cases we need to re-copy the relevant portion.
+        // We could fix that by skipping the BOM when we read it in,
+        // but I'd rather have this safety net. UTF-8 is the expected
+        // format anyway, and this won't harm UTF-8 performance.
+        if (chars.length != charBuffer.length()) {
+            char[] newChars = new char[charBuffer.length()];
+            System.arraycopy(chars, charBuffer.arrayOffset(), newChars, 0, newChars.length);
+            chars = newChars;
+        }
+        return chars;
+    }
+    
+    private char[] fixLineEndings(char[] chars) {
+        String lineEnding = "\n";
+        if (charArrayContains(chars, '\r')) {
+            String s = new String(chars);
+            if (s.contains("\r\n")) {
+                lineEnding = "\r\n";
+                s = s.replaceAll("\r\n", "\n");
+            } else {
+                lineEnding = "\r";
+                s = s.replaceAll("\r", "\n");
+            }
+            chars = s.toCharArray();
+        }
+        putProperty(LINE_ENDING_PROPERTY, lineEnding);
+        return chars;
     }
     
     private static final boolean charArrayContains(char[] chars, char ch) {

@@ -4,6 +4,8 @@ import e.forms.*;
 import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
+import java.util.List;
 import javax.swing.*;
 
 public class PFind {
@@ -57,14 +59,28 @@ public class PFind {
         private JLabel findStatus = new JLabel(" ");
         private PTextArea textArea;
         
+        private List<PActionFactory.PTextAction> actions = new ArrayList<PActionFactory.PTextAction>();
+        
         public FindAction() {
             super("Find...", e.util.GuiUtilities.makeKeyStroke("F", false));
-            PTextArea.initKeyBinding(findField, PActionFactory.makeFindNextAction());
-            PTextArea.initKeyBinding(findField, PActionFactory.makeFindPreviousAction());
+            initAction(PActionFactory.makeFindNextAction());
+            initAction(PActionFactory.makeFindPreviousAction());
+        }
+        
+        private void initAction(PActionFactory.PTextAction action) {
+            actions.add(action);
+            PTextArea.initKeyBinding(findField, action);
+        }
+        
+        private void rebindActions() {
+            for (PActionFactory.PTextAction action : actions) {
+                action.bindTo(textArea);
+            }
         }
         
         public void performOn(PTextArea textArea) {
             this.textArea = textArea;
+            rebindActions();
             showFindDialog();
         }
         

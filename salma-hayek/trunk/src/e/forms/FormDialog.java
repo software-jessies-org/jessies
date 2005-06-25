@@ -42,6 +42,8 @@ public class FormDialog extends JDialog {
     
     private boolean wasAccepted;
     
+    private DialogFocusRedirector dialogFocusRedirector;
+    
     public static int getComponentSpacing() {
         if (GuiUtilities.isWindows()) {
             return 4;
@@ -209,7 +211,7 @@ public class FormDialog extends JDialog {
     }
 
     private void initFocus(Container contentPane) {
-        DialogFocusRedirector dialogFocusRedirector = new DialogFocusRedirector(contentPane);
+        dialogFocusRedirector = new DialogFocusRedirector(contentPane);
         dialogFocusRedirector.redirectFocus();
     }
     
@@ -275,6 +277,7 @@ public class FormDialog extends JDialog {
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
         dispose();
+        dialogFocusRedirector.restoreFocus();
     }
     
     private JPanel makeButtonPanel(JRootPane rootPane, String actionLabel, JButton extraButton, JComponent statusBar) {
