@@ -55,12 +55,12 @@ public class PFind {
     /**
      * Offers a default find dialog.
      */
-    public static class FindAction extends PActionFactory.PTextAction {
+    public static class FindAction extends PTextAction {
         private JTextField findField = new JTextField(40);
         private JLabel findStatus = new JLabel(" ");
         private PTextArea textArea;
         
-        private List<PActionFactory.PTextAction> actions = new ArrayList<PActionFactory.PTextAction>();
+        private List<PTextAction> actions = new ArrayList<PTextAction>();
         
         public FindAction() {
             super("Find...", e.util.GuiUtilities.makeKeyStroke("F", false));
@@ -68,13 +68,13 @@ public class PFind {
             initAction(PActionFactory.makeFindPreviousAction());
         }
         
-        private void initAction(PActionFactory.PTextAction action) {
+        private void initAction(PTextAction action) {
             actions.add(action);
             ComponentUtilities.initKeyBinding(findField, action);
         }
         
         private void rebindActions() {
-            for (PActionFactory.PTextAction action : actions) {
+            for (PTextAction action : actions) {
                 action.bindTo(textArea);
             }
         }
