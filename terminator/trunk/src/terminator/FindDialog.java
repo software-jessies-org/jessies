@@ -2,6 +2,7 @@ package terminator;
 
 import e.forms.*;
 import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
@@ -12,21 +13,34 @@ import terminator.view.highlight.*;
 public class FindDialog {
     private static final FindDialog INSTANCE = new FindDialog();
     
-    private JTextField findField = new JTextField(40);
+    private JTextField findField;
     private JLabel findStatus = new JLabel(" ");
     private JTextBuffer textToFindIn;
+    private TerminatorMenuBar.BindableAction findNextAction;
+    private TerminatorMenuBar.BindableAction findPreviousAction;
     
     private FindDialog() {
+        initFindField();
+    }
+    
+    private void initFindField() {
+        findField = new JTextField(40);
+        findNextAction = new TerminatorMenuBar.FindNextAction();
+        ComponentUtilities.initKeyBinding(findField, findNextAction);
+        findPreviousAction = new TerminatorMenuBar.FindPreviousAction();
+        ComponentUtilities.initKeyBinding(findField, findPreviousAction);
     }
     
     public static FindDialog getSharedInstance() {
         return INSTANCE;
     }
     
-    public void showFindDialogFor(JTextBuffer text) {
-        this.textToFindIn = text;
+    public void showFindDialogFor(final JTerminalPane terminalPane) {
+        this.textToFindIn = terminalPane.getTextPane();
+        findNextAction.bindTo(terminalPane);
+        findPreviousAction.bindTo(terminalPane);
         
-        JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, text);
+        JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, terminalPane);
         
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Find:", findField);
@@ -77,18 +91,4 @@ public class FindDialog {
             findStatus.setText(ex.getDescription());
         }
     }
-    
-    /*
-            addKeyListener(new KeyAdapter() {
-                public void keyReleased(KeyEvent e) {
-                    if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
-                        if (e.getKeyCode() == KeyEvent.VK_D) {
-                            textToFindIn.findPrevious(FindHighlighter.class);
-                        } else if (e.getKeyCode() == KeyEvent.VK_G) {
-                            textToFindIn.findNext(FindHighlighter.class);
-                        }
-                    }
-                }
-            });
-    */
 }

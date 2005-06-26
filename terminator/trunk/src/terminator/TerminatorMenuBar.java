@@ -280,22 +280,43 @@ public class TerminatorMenuBar extends JMenuBar {
 		public void actionPerformed(ActionEvent e) {
 			JTerminalPane terminal = getFocusedTerminalPane();
 			if (terminal != null) {
-				FindDialog.getSharedInstance().showFindDialogFor(terminal.getTextPane());
+				FindDialog.getSharedInstance().showFindDialogFor(terminal);
 			}
 		}
 	}
 	
-	public static class FindNextAction extends AbstractAction {
+	public abstract static class BindableAction extends AbstractAction {
+		private JTerminalPane boundTerminalPane;
+		
+		public BindableAction(String name) {
+			super(name);
+		}
+		
+		public void bindTo(JTerminalPane terminalPane) {
+			this.boundTerminalPane = terminalPane;
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminal = boundTerminalPane;
+			if (terminal == null) {
+				terminal = getFocusedTerminalPane();
+			}
+			if (terminal != null) {
+				performOn(terminal);
+			}
+		}
+		
+		public abstract void performOn(JTerminalPane terminal);
+	}
+	
+	public static class FindNextAction extends BindableAction {
 		public FindNextAction() {
 			super("Find Next");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("G"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.getTextPane().findNext(FindHighlighter.class);
-			}
+		public void performOn(JTerminalPane terminal) {
+			terminal.getTextPane().findNext(FindHighlighter.class);
 		}
 	}
 	
@@ -313,17 +334,14 @@ public class TerminatorMenuBar extends JMenuBar {
 		}
 	}
 	
-	public static class FindPreviousAction extends AbstractAction {
+	public static class FindPreviousAction extends BindableAction {
 		public FindPreviousAction() {
 			super("Find Previous");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("D"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.getTextPane().findPrevious(FindHighlighter.class);
-			}
+		public void performOn(JTerminalPane terminal) {
+			terminal.getTextPane().findPrevious(FindHighlighter.class);
 		}
 	}
 	
