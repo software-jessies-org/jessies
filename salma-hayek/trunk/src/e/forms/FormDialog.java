@@ -44,6 +44,9 @@ public class FormDialog extends JDialog {
     
     private DialogFocusRedirector dialogFocusRedirector;
     
+    private Runnable acceptRunnable = new NoOpRunnable();
+    private Runnable cancelRunnable = new NoOpRunnable();
+    
     public static int getComponentSpacing() {
         if (GuiUtilities.isWindows()) {
             return 4;
@@ -264,10 +267,12 @@ public class FormDialog extends JDialog {
     }
     
     private void acceptDialog() {
+        acceptRunnable.run();
         processUserChoice(true);
     }
 
     private void cancelDialog() {
+        cancelRunnable.run();
         processUserChoice(false);
     }
 
@@ -391,5 +396,21 @@ public class FormDialog extends JDialog {
         } catch (Exception ex) {
             Log.warn("Failed to read geometries from '" + filename + "'", ex);
         }
+    }
+    
+    /**
+     * Sets an optional runnable that will be run if this dialog is accepted,
+     * just before the dialog is removed from the display.
+     */
+    public void setAcceptRunnable(Runnable runnable) {
+        acceptRunnable = runnable;
+    }
+    
+    /**
+     * Sets an optional runnable that will be run if this dialog is canceled,
+     * just before the dialog is removed from the display.
+     */
+    public void setCancelRunnable(Runnable runnable) {
+        cancelRunnable = runnable;
     }
 }
