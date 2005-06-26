@@ -2,6 +2,7 @@ package e.ptextarea;
 
 import e.forms.*;
 import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -69,7 +70,7 @@ public class PFind {
         
         private void initAction(PActionFactory.PTextAction action) {
             actions.add(action);
-            PTextArea.initKeyBinding(findField, action);
+            ComponentUtilities.initKeyBinding(findField, action);
         }
         
         private void rebindActions() {

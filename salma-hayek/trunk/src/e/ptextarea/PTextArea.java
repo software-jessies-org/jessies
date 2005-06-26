@@ -124,22 +124,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void initKeyBindings() {
-        initKeyBinding(this, PActionFactory.makeCopyAction());
-        initKeyBinding(this, PActionFactory.makeCutAction());
-        initKeyBinding(this, PActionFactory.makeFindAction());
-        initKeyBinding(this, PActionFactory.makeFindNextAction());
-        initKeyBinding(this, PActionFactory.makeFindPreviousAction());
-        initKeyBinding(this, PActionFactory.makePasteAction());
-        initKeyBinding(this, PActionFactory.makeRedoAction());
-        initKeyBinding(this, PActionFactory.makeSelectAllAction());
-        initKeyBinding(this, PActionFactory.makeUndoAction());
-    }
-    
-    public static void initKeyBinding(JComponent component, Action action) {
-        String name = (String) action.getValue(Action.NAME);
-        KeyStroke keyStroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
-        component.getActionMap().put(name, action);
-        component.getInputMap().put(keyStroke, name);
+        ComponentUtilities.initKeyBinding(this, PActionFactory.makeCopyAction());
+        ComponentUtilities.initKeyBinding(this, PActionFactory.makeCutAction());
+        ComponentUtilities.initKeyBinding(this, PActionFactory.makeFindAction());
+        ComponentUtilities.initKeyBinding(this, PActionFactory.makeFindNextAction());
+        ComponentUtilities.initKeyBinding(this, PActionFactory.makeFindPreviousAction());
+        ComponentUtilities.initKeyBinding(this, PActionFactory.makePasteAction());
+        ComponentUtilities.initKeyBinding(this, PActionFactory.makeRedoAction());
+        ComponentUtilities.initKeyBinding(this, PActionFactory.makeSelectAllAction());
+        ComponentUtilities.initKeyBinding(this, PActionFactory.makeUndoAction());
     }
     
     public void addCaretListener(PCaretListener caretListener) {
