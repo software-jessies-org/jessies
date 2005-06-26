@@ -33,19 +33,24 @@ public class FindDialog {
         formPanel.setStatusBar(findStatus);
         formPanel.setTypingTimeoutActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String regularExpression = findField.getText();
-                try {
-                    int matchCount = getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
-                    findStatus.setText("Matches: " + matchCount);
-                    findField.setForeground(UIManager.getColor("TextField.foreground"));
-                } catch (PatternSyntaxException ex) {
-                    findField.setForeground(Color.RED);
-                    findStatus.setText(ex.getDescription());
-                }
+                find();
             }
         });
         
         FormDialog dialog = FormDialog.showNonModal(frame, "Find", formPanel);
+        dialog.setAcceptRunnable(new Runnable() {
+            public void run() {
+                // If the user brought up the dialog, typed a regular
+                // expression, and hit return before the typing timeout went
+                // off, we need to find. Unfortunately, we don't know if we
+                // already did, so the slow typist pays a little extra.
+                // FXIME: Should accepting a FormDialog always force the typing
+                // timeout? A quick search of the places we're currently using
+                // it suggests it would mostly be unwanted. But maybe there's
+                // some better pattern we just haven't found yet.
+                find();
+            }
+        });
         dialog.setCancelRunnable(new Runnable() {
             public void run() {
                 getFindHighlighter().forgetRegularExpression(textToFindIn);
@@ -61,16 +66,20 @@ public class FindDialog {
         return (FindHighlighter) textToFindIn.getHighlighterOfClass(FindHighlighter.class);
     }
     
+    private void find() {
+        String regularExpression = findField.getText();
+        try {
+            int matchCount = getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
+            findStatus.setText("Matches: " + matchCount);
+            findField.setForeground(UIManager.getColor("TextField.foreground"));
+        } catch (PatternSyntaxException ex) {
+            findField.setForeground(Color.RED);
+            findStatus.setText(ex.getDescription());
+        }
+    }
+    
     /*
             addKeyListener(new KeyAdapter() {
-                public void keyTyped(KeyEvent e) {
-                    if (textToFindIn != null && e.getKeyChar() == '\n') {
-                        find();
-                        e.consume();
-                        textToFindIn.requestFocus();
-                    }
-                }
-                
                 public void keyReleased(KeyEvent e) {
                     if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
                         if (e.getKeyCode() == KeyEvent.VK_D) {
