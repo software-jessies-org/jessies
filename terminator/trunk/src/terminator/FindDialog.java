@@ -44,7 +44,13 @@ public class FindDialog {
                 }
             }
         });
-        FormDialog.showNonModal(frame, "Find", formPanel);
+        
+        FormDialog dialog = FormDialog.showNonModal(frame, "Find", formPanel);
+        dialog.setCancelRunnable(new Runnable() {
+            public void run() {
+                getFindHighlighter().forgetRegularExpression(textToFindIn);
+            }
+        });
         
         findField.selectAll();
         findField.requestFocus();
@@ -61,13 +67,6 @@ public class FindDialog {
                     if (textToFindIn != null && e.getKeyChar() == '\n') {
                         find();
                         e.consume();
-                        textToFindIn.requestFocus();
-                    }
-                }
-                
-                public void keyPressed(KeyEvent e) {
-                    if (textToFindIn != null && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                        getFindHighlighter().forgetRegularExpression(textToFindIn);
                         textToFindIn.requestFocus();
                     }
                 }
