@@ -8,7 +8,7 @@ import java.util.regex.*;
 import javax.swing.*;
 import e.ptextarea.*;
 
-public class ShowMisspellingsAction extends PActionFactory.PTextAction {
+public class ShowMisspellingsAction extends PTextAction {
     public ShowMisspellingsAction() {
         super("Show Misspellings...", null);
     }
