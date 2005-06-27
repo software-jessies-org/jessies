@@ -103,5 +103,7 @@ else
     fd.close
 end
 
+system("find #{repository_name}/db -name \"log.*\" -not -perm -g+w | xargs --no-run-if-empty chmod g+w")
+
 # We're done.
 exit(0)
