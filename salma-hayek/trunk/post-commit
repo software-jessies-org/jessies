@@ -40,7 +40,7 @@ require 'patch-to-html-email.rb'
 Dir.chdir("/tmp")
 
 # What revision in what repository?
-repo = ARGV.shift()
+repository_path = ARGV.shift()
 rev = ARGV.shift()
 
 # Get the overview information.
@@ -48,7 +48,7 @@ rev = ARGV.shift()
 # set to request UTF-8 if you want it to refrain from mangling text such
 # as 宮部みゆき or 火車!
 ENV["LC_CTYPE"] = "en_US.UTF-8"
-info=`#{svnlook} info #{repo} -r #{rev}`
+info=`#{svnlook} info #{repository_path} -r #{rev}`
 info_lines=info.split("\n")
 author=info_lines.shift
 date=info_lines.shift
@@ -77,7 +77,7 @@ body << "</p></div>\n"
 # Get and output the patch.
 # We'd like to | #{script_path}/bin/annotate-patch.rb
 # But that requires that the correct version of the file is available as trunk/filename
-changes=`#{svnlook} diff #{repo} -r #{rev}`
+changes=`#{svnlook} diff #{repository_path} -r #{rev}`
 changes.gsub!(/\r/, "") # In case we're running on MS Windows.
 
 sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes.split("\n"))
@@ -106,7 +106,7 @@ end
 # Fix the permissions on any new log file created by Subversion's Berkeley db because bdb creates a new file,
 # obeying umask, rather than copying the mode of the current log file.
 # Although the setgid directory means that the file's group is "software", that doesn't help its permissions.
-system("find #{repository_name}/db -name \"log.*\" -not -perm -g+w | xargs --no-run-if-empty chmod g+w")
+system("find #{repository_path}/db -name \"log.*\" -not -perm -g+w | xargs --no-run-if-empty chmod g+w")
 
 # We're done.
 exit(0)
