@@ -82,6 +82,11 @@ changes.gsub!(/\r/, "") # In case we're running on MS Windows.
 
 sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes.split("\n"))
 
+# Fix the permissions on any new log file created by Subversion's Berkeley db because bdb creates a new file,
+# obeying umask, rather than copying the mode of the current log file.
+# Although the setgid directory means that the file's group is "software", that doesn't help its permissions.
+system("find #{repository_path}/db -name \"log.*\" -not -perm -g+w | xargs --no-run-if-empty chmod g+w")
+
 # Keep the post-commit trigger up-to-date.
 
 # FIXME: if there's a script error which prevents us from getting this far, it
@@ -102,11 +107,6 @@ else
     end
     fd.close
 end
-
-# Fix the permissions on any new log file created by Subversion's Berkeley db because bdb creates a new file,
-# obeying umask, rather than copying the mode of the current log file.
-# Although the setgid directory means that the file's group is "software", that doesn't help its permissions.
-system("find #{repository_path}/db -name \"log.*\" -not -perm -g+w | xargs --no-run-if-empty chmod g+w")
 
 # We're done.
 exit(0)
