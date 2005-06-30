@@ -20,20 +20,26 @@ if FileTest.directory?(scm_home)
   classpath_entries << "#{scm_home}/classes"
 end
 
-def openFileOnEditServer(edit_preferences_directory, filename)
+def openFileOnEditServer(edit_preferences_directory, filename, shouldBlock)
   begin
     File.new("#{edit_preferences_directory}/edit-server-port").read() =~ /^(.+):(\d+)$/
     host = $1
     port = $2.to_i()
     require 'net/telnet'
     telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
-    telnet.puts("open #{filename}\r")
+    telnet.puts("#{shouldBlock ? 'open-and-block' : 'open'} #{filename}\r")
     print(telnet.readlines().join(""))
     telnet.close()
     return true
   rescue
     return false
   end
+end
+
+shouldBlock = false
+if ARGV[0] == "--block"
+  ARGV.shift
+  shouldBlock = true
 end
 
 # Translate vi/gvim line number specifications.
@@ -62,7 +68,7 @@ if FileTest.directory?(edit_preferences_directory) == false
 end
 
 filename = ARGV[0]
-if filename != nil && openFileOnEditServer(edit_preferences_directory, File.expand_path(filename))
+if filename != nil && openFileOnEditServer(edit_preferences_directory, File.expand_path(filename), shouldBlock)
   exit(0)
 end
 
