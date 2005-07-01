@@ -81,8 +81,16 @@ public class PFind {
         
         public void performOn(PTextArea textArea) {
             this.textArea = textArea;
+            initFindField();
             rebindActions();
             showFindDialog();
+        }
+        
+        private void initFindField() {
+            String selection = textArea.getSelectedText();
+            if (selection.length() > 0) {
+                findField.setText(StringUtilities.regularExpressionFromLiteral(selection));
+            }
         }
         
         private void showFindDialog() {
@@ -102,7 +110,12 @@ public class PFind {
                     }
                 }
             });
-            FormDialog.showNonModal(frame, "Find", formPanel);
+            FormDialog dialog = FormDialog.showNonModal(frame, "Find", formPanel);
+            dialog.setCancelRunnable(new Runnable() {
+                public void run() {
+                    textArea.clearFindMatches();
+                }
+            });
             
             findField.selectAll();
             findField.requestFocus();
