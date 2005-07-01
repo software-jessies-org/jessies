@@ -35,10 +35,18 @@ public class FindDialog {
         return INSTANCE;
     }
     
-    public void showFindDialogFor(final JTerminalPane terminalPane) {
-        this.textToFindIn = terminalPane.getTextPane();
+    private void initFindField(final JTerminalPane terminalPane) {
         findNextAction.bindTo(terminalPane);
         findPreviousAction.bindTo(terminalPane);
+        String selection = terminalPane.getSelectionHighlighter().getTabbedText();
+        if (selection.length() > 0) {
+            findField.setText(selection);
+        }
+    }
+    
+    public void showFindDialogFor(final JTerminalPane terminalPane) {
+        this.textToFindIn = terminalPane.getTextPane();
+        initFindField(terminalPane);
         
         JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, terminalPane);
         
