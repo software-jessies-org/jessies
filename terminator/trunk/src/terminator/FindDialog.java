@@ -40,7 +40,7 @@ public class FindDialog {
         findPreviousAction.bindTo(terminalPane);
         String selection = terminalPane.getSelectionHighlighter().getTabbedText();
         if (selection.length() > 0) {
-            findField.setText(selection);
+            findField.setText(StringUtilities.regularExpressionFromLiteral(selection));
         }
     }
     
