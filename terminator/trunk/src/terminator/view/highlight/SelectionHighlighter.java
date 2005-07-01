@@ -189,9 +189,13 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		if (highlight == null) {
 			return;
 		}
-		String newContents = view.getTabbedText(highlight);
+		String newContents = getTabbedText();
 		StringSelection selection = new StringSelection(newContents);
 		clipboard.setContents(selection, this);
+	}
+	
+	public String getTabbedText() {
+		return (highlight != null) ? view.getTabbedText(highlight) : "";
 	}
 	
 	/**
