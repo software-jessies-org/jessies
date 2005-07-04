@@ -230,20 +230,41 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void updateWatermark() {
-        watermarkViewPort.setSerious(false);
-        ArrayList<String> items = new ArrayList<String>();
-        if (file.exists() == false) {
-            items.add("(deleted)");
-            watermarkViewPort.setSerious(true);
-        }
-        if (file.exists() && file.canWrite() == false) {
-            items.add("(read-only)");
-        }
-        if (isOutOfDateWithRespectToDisk()) {
-            items.add("(out-of-date)");
-            watermarkViewPort.setSerious(true);
-        }
-        watermarkViewPort.setWatermark(items.size() > 0 ? StringUtilities.join(items, " ") : null);
+        Thread watermarkUpdater = new Thread(new Runnable() {
+            private ArrayList<String> items;
+            private boolean isSerious;
+            
+            public void run() {
+                items = new ArrayList<String>();
+                isSerious = false;
+                doFileChecks();
+                doWatermarkUpdateOnEventThread();
+            }
+            
+            private void doFileChecks() {
+                if (file.exists() == false) {
+                    items.add("(deleted)");
+                    isSerious = true;
+                }
+                if (file.exists() && file.canWrite() == false) {
+                    items.add("(read-only)");
+                }
+                if (isOutOfDateWithRespectToDisk()) {
+                    items.add("(out-of-date)");
+                    isSerious = true;
+                }
+            }
+            
+            private void doWatermarkUpdateOnEventThread() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        watermarkViewPort.setSerious(isSerious);
+                        watermarkViewPort.setWatermark(items.size() > 0 ? StringUtilities.join(items, " ") : null);
+                    }
+                });
+            }
+        });
+        watermarkUpdater.start();
     }
     
     /**
