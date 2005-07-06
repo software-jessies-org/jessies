@@ -43,14 +43,11 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
     }
     
     protected PLineSegment makeNewSegment(PTextArea textArea, Matcher matcher, int start, int end, PStyle style) {
-        // FIXME: underlining should be a PStyle attribute.
+        PTextSegment result = new PTextSegment(textArea, start, end, style);
         if (style == PStyle.HYPERLINK) {
-            PTextSegment result = new PUnderlinedTextSegment(textArea, start, end, style);
             configureSegment(result, matcher);
-            return result;
-        } else {
-            return new PTextSegment(textArea, start, end, style);
         }
+        return result;
     }
     
     /**

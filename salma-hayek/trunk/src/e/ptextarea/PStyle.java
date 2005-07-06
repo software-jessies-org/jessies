@@ -33,6 +33,10 @@ public enum PStyle {
         return color;
     }
     
+    public boolean isUnderlined() {
+        return (this == PStyle.HYPERLINK);
+    }
+    
     public String toString() {
         return "PStyle[" + name + ",color=" + color + "]";
     }

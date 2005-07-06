@@ -19,7 +19,10 @@ public class PTextSegment extends PAbstractSegment {
     
     @Override
     public PLineSegment subSegment(int start, int end) {
-        return new PTextSegment(textArea, start + this.start, end + this.start, style);
+        PTextSegment subSegment = new PTextSegment(textArea, start + this.start, end + this.start, style);
+        subSegment.toolTip = toolTip;
+        subSegment.linkAction = linkAction;
+        return subSegment;
     }
     
     @Override
@@ -44,8 +47,18 @@ public class PTextSegment extends PAbstractSegment {
     }
     
     @Override
-    public void paint(Graphics2D graphics, int x, int yBaseline) {
-        graphics.drawString(getViewText(), x, yBaseline);
+    public void paint(Graphics2D g, int x, int yBaseline) {
+        g.drawString(getViewText(), x, yBaseline);
+        if (style.isUnderlined()) {
+            paintUnderline(g, x, yBaseline);
+        }
+    }
+    
+    private void paintUnderline(Graphics2D g, int x, int yBaseline) {
+        FontMetrics metrics = g.getFontMetrics();
+        yBaseline += Math.min(2, metrics.getMaxDescent());
+        int width = getDisplayWidth(metrics, x);
+        g.drawLine(x, yBaseline, x + width, yBaseline);
     }
     
     public String getToolTip() {
@@ -69,6 +82,9 @@ public class PTextSegment extends PAbstractSegment {
         String result = "PTextSegment[" + super.toString();
         if (toolTip != null) {
             result += ",toolTip=" + toolTip;
+        }
+        if (linkAction != NoOpAction.INSTANCE) {
+            result += ",linkAction=" + linkAction;
         }
         result += "]";
         return result;
