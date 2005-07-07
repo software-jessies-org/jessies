@@ -39,10 +39,12 @@ public class WatermarkViewPort extends JViewport {
     
     /**
      * Sets the watermark string; ensures the view has the appropriate opacity.
+     * Use null rather than the empty string if you want no watermark.
      */
     public void setWatermark(final String newWatermark) {
-        watermark = newWatermark;
-        ((JComponent) getView()).setOpaque(watermark == null);
+        this.watermark = newWatermark;
+        JComponent view = JComponent.class.cast(getView());
+        view.setOpaque(watermark == null);
         repaint();
     }
     
