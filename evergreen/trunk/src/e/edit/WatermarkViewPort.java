@@ -43,6 +43,7 @@ public class WatermarkViewPort extends JViewport {
     public void setWatermark(final String newWatermark) {
         watermark = newWatermark;
         ((JComponent) getView()).setOpaque(watermark == null);
+        repaint();
     }
     
     public void paintComponent(final Graphics g) {
