@@ -14,6 +14,11 @@ import javax.swing.*;
  * 
  * Much of the rendering code was originally from O'Reilly's "Swing Hacks"
  * hack #47 "Indefinite Progress Indicator".
+ * 
+ * There are two typical patterns for use. In the first, isDisplayedWhenStopped
+ * is false, and you invoke startAnimation when your task begins, and invoke
+ * stopAnimation when it finishes. In the second, isDisplayedWhenStopped is
+ * true, and you repeatedly invoke animateOneFrame.
  */
 public class JAsynchronousProgressIndicator extends JComponent {
     private static final int DIAMETER = 16;
@@ -22,6 +27,7 @@ public class JAsynchronousProgressIndicator extends JComponent {
     private static Color[] colors;
     private Timer timer;
     private int currentBar = 0;
+    private boolean isDisplayedWhenStopped = false;
     
     public JAsynchronousProgressIndicator() {
         initBars();
@@ -29,12 +35,15 @@ public class JAsynchronousProgressIndicator extends JComponent {
         initTimer();
     }
     
-    public void paintComponent(Graphics oldG) {
-        Graphics2D g = (Graphics2D) oldG;
-        
+    public void paintComponent(Graphics g) {
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
-        
+        if (isDisplayedWhenStopped || timer.isRunning()) {
+            paintBars((Graphics2D) g);
+        }
+    }
+    
+    private void paintBars(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.transform(AffineTransform.getTranslateInstance(getWidth() / 2, getHeight() /2));
         for (int i = 0; i < bars.length; ++i) {
@@ -46,12 +55,35 @@ public class JAsynchronousProgressIndicator extends JComponent {
     private void initTimer() {
         timer = new Timer(50, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                currentBar = (currentBar + 1) % bars.length;
-                repaint();
+                animateOneFrame();
             }
         });
         timer.setRepeats(true);
+    }
+    
+    public void startAnimation() {
         timer.start();
+    }
+    
+    public void stopAnimation() {
+        timer.stop();
+        repaint();
+    }
+    
+    public void animateOneFrame() {
+        currentBar = (currentBar + 1) % bars.length;
+        repaint();
+    }
+    
+    public boolean isDisplayedWhenStopped() {
+        return isDisplayedWhenStopped;
+    }
+    
+    public void setDisplayedWhenStopped(boolean newState) {
+        if (isDisplayedWhenStopped != newState) {
+            isDisplayedWhenStopped = newState;
+            repaint();
+        }
     }
     
     private synchronized static void initColors() {
@@ -107,8 +139,45 @@ public class JAsynchronousProgressIndicator extends JComponent {
     }
     
     public static void main(String[] args) {
-        JFrame f = new JFrame("test");
-        f.getContentPane().add(new JAsynchronousProgressIndicator());
+        // FIXME: we could auto-generate this kind of code via reflection.
+        JFrame f = new JFrame("JAsynchronousProgressIndicator test");
+        
+        final JAsynchronousProgressIndicator asynchronousProgressIndicator = new JAsynchronousProgressIndicator();
+        
+        final JCheckBox displayedWhenStoppedCheckbox = new JCheckBox("displayedWhenStopped", asynchronousProgressIndicator.isDisplayedWhenStopped());
+        displayedWhenStoppedCheckbox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                asynchronousProgressIndicator.setDisplayedWhenStopped(displayedWhenStoppedCheckbox.isSelected());
+            }
+        });
+        
+        JButton startButton = new JButton("startAnimation");
+        startButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                asynchronousProgressIndicator.startAnimation();
+            }
+        });
+        
+        JButton stopButton = new JButton("stopAnimation");
+        stopButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                asynchronousProgressIndicator.stopAnimation();
+            }
+        });
+        
+        JButton animateOneFrameButton = new JButton("animateOneFrame");
+        animateOneFrameButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                asynchronousProgressIndicator.animateOneFrame();
+            }
+        });
+        
+        f.getContentPane().setLayout(new FlowLayout());
+        f.getContentPane().add(asynchronousProgressIndicator);
+        f.getContentPane().add(animateOneFrameButton);
+        f.getContentPane().add(startButton);
+        f.getContentPane().add(stopButton);
+        f.getContentPane().add(displayedWhenStoppedCheckbox);
         f.pack();
         f.setVisible(true);
     }
