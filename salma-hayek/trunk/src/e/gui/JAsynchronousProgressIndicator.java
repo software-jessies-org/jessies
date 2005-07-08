@@ -61,7 +61,7 @@ public class JAsynchronousProgressIndicator extends JComponent {
         
         colors = new Color[BAR_COUNT];
         for (int i = 0; i < colors.length; ++i) {
-            int value = 224 - 128 / (i + 1);
+            int value = 210 - 128 / (i + 1);
             colors[i] = new Color(value, value, value);
         }
     }
@@ -92,9 +92,10 @@ public class JAsynchronousProgressIndicator extends JComponent {
     }
     
     private static Area makeBar() {
-        Rectangle2D.Double body = new Rectangle2D.Double(6, 0, 30, 12);
-        Ellipse2D.Double head = new Ellipse2D.Double(0, 0, 12, 12);
-        Ellipse2D.Double tail = new Ellipse2D.Double(30, 0, 12, 12);
+        int barThickness = 20;
+        Rectangle2D.Double body = new Rectangle2D.Double(6, 0, 30, barThickness);
+        Ellipse2D.Double head = new Ellipse2D.Double(0, 0, barThickness, barThickness);
+        Ellipse2D.Double tail = new Ellipse2D.Double(30, 0, barThickness, barThickness);
         Area tick = new Area(body);
         tick.add(new Area(head));
         tick.add(new Area(tail));
