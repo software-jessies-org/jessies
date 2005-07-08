@@ -20,6 +20,7 @@ public class JTerminalPane extends JPanel {
 	private JScrollPane scrollPane;
 	private String name;
 	private Dimension currentSizeInChars;
+	private JAsynchronousProgressIndicator outputSpinner;
 	private Action[] menuAndKeyActions = new Action[] {
 		new TerminatorMenuBar.CopyAction(),
 		new TerminatorMenuBar.PasteAction(),
@@ -114,6 +115,8 @@ public class JTerminalPane extends JPanel {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		
+		initOutputSpinner();
+		
 		EPopupMenu popupMenu = new EPopupMenu(textPane);
 		popupMenu.addMenuItemProvider(new TerminatorMenuItemProvider());
 		
@@ -136,6 +139,15 @@ public class JTerminalPane extends JPanel {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	private void initOutputSpinner() {
+		outputSpinner = new JAsynchronousProgressIndicator();
+		outputSpinner.setDisplayedWhenStopped(true);
+	}
+	
+	public JAsynchronousProgressIndicator getOutputSpinner() {
+		return outputSpinner;
 	}
 	
 	private void initSizeMonitoring() {

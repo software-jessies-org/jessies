@@ -298,6 +298,8 @@ public class TerminalControl implements Runnable {
 			doStep();
 			terminalActions.add(new PlainTextAction(line));
 		}
+		
+		//pane.getOutputSpinner().animateOneFrame();
 	}
 	
 	public synchronized void processSpecialCharacter(final char ch) {
