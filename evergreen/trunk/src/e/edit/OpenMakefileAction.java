@@ -16,7 +16,7 @@ public class OpenMakefileAction extends ETextAction {
         }
         String makefileName = BuildAction.findMakefile(window.getContext());
         if (makefileName != null) {
-            Edit.openFile(makefileName);
+            Edit.getInstance().openFile(makefileName);
         }
     }
 }

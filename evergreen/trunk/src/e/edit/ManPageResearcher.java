@@ -31,7 +31,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
          * This has the advantage that you can remove any entries that annoy you.
          */
         
-        String[] manPages = StringUtilities.readLinesFromFile(Edit.getResourceFilename("manpages"));
+        String[] manPages = StringUtilities.readLinesFromFile(Edit.getInstance().getResourceFilename("manpages"));
         for (String manPage : manPages) {
             knownManPages.add(manPage);
         }

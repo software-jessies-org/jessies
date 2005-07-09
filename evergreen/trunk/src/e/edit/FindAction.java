@@ -20,7 +20,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     private FindAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("F", false));
-        regularExpressionHistory = new StringHistory(Edit.getPreferenceFilename("e.edit.FindAction-history"));
+        regularExpressionHistory = new StringHistory(Edit.getInstance().getPreferenceFilename("e.edit.FindAction-history"));
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -29,7 +29,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
             return;
         }
         
-        Edit.showMinibuffer(this);
+        Edit.getInstance().showMinibuffer(this);
     }
     
     //
@@ -146,7 +146,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
         try {
             pattern = Pattern.compile(regularExpression);
         } catch (PatternSyntaxException patternSyntaxException) {
-            Edit.showStatus(patternSyntaxException.getDescription());
+            Edit.getInstance().showStatus(patternSyntaxException.getDescription());
             patternSyntaxException.printStackTrace();
             return;
         }
@@ -159,6 +159,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
             textArea.addHighlight(new PFind.MatchHighlight(textArea, matcher.start(), matcher.end()));
             matchCount++;
         }
-        Edit.showStatus("Found " + matchCount + " " + (matchCount != 1 ? "matches" : "match"));
+        Edit.getInstance().showStatus("Found " + matchCount + " " + (matchCount != 1 ? "matches" : "match"));
     }
 }

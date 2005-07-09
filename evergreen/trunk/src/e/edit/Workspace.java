@@ -95,11 +95,11 @@ public class Workspace extends JPanel {
      */
     public boolean isFileListUnsuitableFor(String purpose) {
         if (fileList == null) {
-            Edit.showAlert(purpose, "The list of files for " + getTitle() + " is not yet available.");
+            Edit.getInstance().showAlert(purpose, "The list of files for " + getTitle() + " is not yet available.");
             return true;
         }
         if (fileList.isEmpty()) {
-            Edit.showAlert(purpose, "The list of files for " + getTitle() + " is empty.");
+            Edit.getInstance().showAlert(purpose, "The list of files for " + getTitle() + " is empty.");
             return true;
         }
         return false;
@@ -192,15 +192,15 @@ public class Workspace extends JPanel {
     }
     
     public void registerTextComponent(PTextArea textComponent) {
-        Edit.getAdvisor().registerTextComponent(textComponent);
+        Edit.getInstance().getAdvisor().registerTextComponent(textComponent);
     }
     
     public void unregisterTextComponent(PTextArea textComponent) {
-        Edit.getAdvisor().unregisterTextComponent(textComponent);
+        Edit.getInstance().getAdvisor().unregisterTextComponent(textComponent);
     }
     
     public EWindow addViewerForFile(String filename, String address) {
-        Edit.showStatus("Opening " + filename + "...");
+        Edit.getInstance().showStatus("Opening " + filename + "...");
         EWindow window = null;
         try {
             ETextWindow newWindow = new ETextWindow(filename);
@@ -209,7 +209,7 @@ public class Workspace extends JPanel {
         } catch (Exception ex) {
             Log.warn("Exception while opening file", ex);
         }
-        Edit.showStatus("Opened " + filename);
+        Edit.getInstance().showStatus("Opened " + filename);
         return window;
     }
     
@@ -249,7 +249,7 @@ public class Workspace extends JPanel {
     public boolean prepareForAction(String activity, String unsavedDataPrompt) {
         ETextWindow[] dirtyWindows = getDirtyTextWindows();
         if (dirtyWindows.length > 0) {
-            String choice = Edit.askQuestion(activity, unsavedDataPrompt, "Save All", "Don't Save");
+            String choice = Edit.getInstance().askQuestion(activity, unsavedDataPrompt, "Save All", "Don't Save");
             if (choice.equals("Cancel")) {
                 return false;
             }
@@ -331,7 +331,7 @@ public class Workspace extends JPanel {
             Log.warn("Scanning " + getRootDirectory() + " for interesting files.");
             scanDirectory(getRootDirectory(), ignoredExtensions, result);
             Log.warn("Scan of " + getRootDirectory() + " took " + (System.currentTimeMillis() - start) + "ms; found " + result.size() + " files.");
-            Edit.showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
+            Edit.getInstance().showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
         } else {
             Log.warn("Skipping scanning of " + getRootDirectory() + " because it doesn't look like a project.");
         }
@@ -392,19 +392,19 @@ public class Workspace extends JPanel {
     
     public void showOpenDialog() {
         if (openDialog == null) {
-            openDialog = new EFileOpenDialog(Edit.getFrame(), getRootDirectory());
+            openDialog = new EFileOpenDialog(Edit.getInstance().getFrame(), getRootDirectory());
         }
         openDialog.show();
         String name = openDialog.getFile();
         if (name != null) {
-            Edit.openFile(name);
+            Edit.getInstance().openFile(name);
         }
     }
 
     /** Returns the chosen save-as name, or null. */
     public String showSaveAsDialog() {
         if (saveAsDialog == null) {
-            saveAsDialog = new FileDialog(Edit.getFrame(), "Save As", FileDialog.SAVE);
+            saveAsDialog = new FileDialog(Edit.getInstance().getFrame(), "Save As", FileDialog.SAVE);
             saveAsDialog.setDirectory(getRootDirectory());
         }
         saveAsDialog.setVisible(true);
@@ -422,7 +422,7 @@ public class Workspace extends JPanel {
     
     public void moveFilesToBestWorkspaces() {
         for (ETextWindow textWindow : leftColumn.getTextWindows()) {
-            Workspace bestWorkspace = Edit.getBestWorkspaceForFilename(textWindow.getFilename());
+            Workspace bestWorkspace = Edit.getInstance().getBestWorkspaceForFilename(textWindow.getFilename());
             if (bestWorkspace != this) {
                 bestWorkspace.takeWindow(textWindow);
             }

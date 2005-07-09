@@ -23,11 +23,11 @@ public class BuildAction extends ETextAction {
 
     private void buildProject(ETextWindow text) {
         if (building) {
-            Edit.showAlert(ACTION_NAME, "A target is already being built. Please wait for the build to complete.");
+            Edit.getInstance().showAlert(ACTION_NAME, "A target is already being built. Please wait for the build to complete.");
             return;
         }
         
-        Workspace workspace = Edit.getCurrentWorkspace();
+        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
         boolean shouldContinue = workspace.prepareForAction("Build", "Save before building?");
         if (shouldContinue == false) {
             return;
@@ -40,7 +40,7 @@ public class BuildAction extends ETextAction {
             try {
                 context = workspace.getCanonicalRootDirectory();
             } catch (IOException ex) {
-                Edit.showAlert(ACTION_NAME, "It's not possible to build this project because the workspace root could not be found.");
+                Edit.getInstance().showAlert(ACTION_NAME, "It's not possible to build this project because the workspace root could not be found.");
                 ex.printStackTrace();
                 return;
             }
@@ -48,7 +48,7 @@ public class BuildAction extends ETextAction {
         
         String makefileName = findMakefile(context);
         if (makefileName == null) {
-            Edit.showAlert(ACTION_NAME, "It's not possible to build this project because neither a Makefile for make or a build.xml for Ant could be found.");
+            Edit.getInstance().showAlert(ACTION_NAME, "It's not possible to build this project because neither a Makefile for make or a build.xml for Ant could be found.");
         } else if (makefileName.endsWith("build.xml")) {
             invokeBuildTool(workspace, makefileName, "ant -emacs -quiet");
         } else if (makefileName.endsWith("Makefile")) {
@@ -75,18 +75,18 @@ public class BuildAction extends ETextAction {
             shellCommand.setLaunchRunnable(new Runnable() {
                 public void run() {
                     building = true;
-                    Edit.showProgressBar(shellCommand.getProcess());
+                    Edit.getInstance().showProgressBar(shellCommand.getProcess());
                 }
             });
             shellCommand.setCompletionRunnable(new Runnable() {
                 public void run() {
-                    Edit.hideProgressBar();
+                    Edit.getInstance().hideProgressBar();
                     building = false;
                 }
             });
             shellCommand.runCommand();
         } catch (IOException ex) {
-            Edit.showAlert(ACTION_NAME, "Can't start task (" + ex.getMessage() + ").");
+            Edit.getInstance().showAlert(ACTION_NAME, "Can't start task (" + ex.getMessage() + ").");
             ex.printStackTrace();
         }
     }

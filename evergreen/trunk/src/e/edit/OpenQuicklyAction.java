@@ -13,6 +13,6 @@ public class OpenQuicklyAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Edit.getCurrentWorkspace().showOpenQuicklyDialog(getSelectedText());
+        Edit.getInstance().getCurrentWorkspace().showOpenQuicklyDialog(getSelectedText());
     }
 }

@@ -30,7 +30,7 @@ public class ShellCommand {
         setCommand(command);
         setFilename("");
         setLineNumber(0);
-        setWorkspace(Edit.getCurrentWorkspace());
+        setWorkspace(Edit.getInstance().getCurrentWorkspace());
         setContext(System.getProperty("java.io.tmpdir"));
     }
     
@@ -50,7 +50,7 @@ public class ShellCommand {
 
         SwingUtilities.invokeLater(launchRunnable);
         
-        Edit.showStatus("Started task '" + command + "'");
+        Edit.getInstance().showStatus("Started task '" + command + "'");
         
         startMonitoringStream(process.getInputStream());
         startMonitoringStream(process.getErrorStream());
@@ -100,7 +100,7 @@ public class ShellCommand {
                 ex = ex;
             }
             workspace.getErrorsWindow().drawHorizontalRule();
-            Edit.showStatus("Task '" + command + "' finished");
+            Edit.getInstance().showStatus("Task '" + command + "' finished");
             SwingUtilities.invokeLater(completionRunnable);
         }
     }

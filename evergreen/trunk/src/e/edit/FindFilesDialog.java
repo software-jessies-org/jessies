@@ -41,7 +41,7 @@ public class FindFilesDialog {
         }
         
         public void open() {
-            EWindow window = Edit.openFile(file.toString());
+            EWindow window = Edit.getInstance().openFile(file.toString());
             if (window instanceof ETextWindow) {
                 ETextWindow textWindow = (ETextWindow) window;
                 final int lineNumber = Integer.parseInt(line.substring(1, line.indexOf(':', 1)));
@@ -82,7 +82,7 @@ public class FindFilesDialog {
         }
         
         public void open() {
-            EWindow window = Edit.openFile(workspace.getRootDirectory() + File.separator + name);
+            EWindow window = Edit.getInstance().openFile(workspace.getRootDirectory() + File.separator + name);
             if (window instanceof ETextWindow && regularExpression != null) {
                 ETextWindow textWindow = (ETextWindow) window;
                 FindAction.INSTANCE.findInText(textWindow, regularExpression);
@@ -377,7 +377,7 @@ public class FindFilesDialog {
             }
         });
         
-        FormDialog formDialog = FormDialog.showNonModal(Edit.getFrame(), "Find Files", formPanel);
+        FormDialog formDialog = FormDialog.showNonModal(Edit.getInstance().getFrame(), "Find Files", formPanel);
         
         // Remove our save listener when the dialog is dismissed.
         formDialog.addWindowListener(new WindowAdapter() {

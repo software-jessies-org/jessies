@@ -7,8 +7,10 @@ import javax.swing.*;
 import e.util.*;
 
 public final class EditServer extends InAppServer {
-    public EditServer() {
-        super("Edit", Edit.getPreferenceFilename("edit-server-port"));
+    private Edit edit;
+    
+    public EditServer(Edit edit) {
+        super("Edit", edit.getPreferenceFilename("edit-server-port"));
     }
     
     public boolean handleCommand(String line, PrintWriter out) {
@@ -19,7 +21,7 @@ public final class EditServer extends InAppServer {
             String filename = line.substring("open ".length());
             handleOpen(filename, false, out);
         } else if (line.equals("remember-state")) {
-            Edit.getInstance().rememberState();
+            edit.rememberState();
         } else if (line.equals("save-all")) {
             SaveAllAction.saveAll(false);
         } else {
@@ -50,8 +52,8 @@ public final class EditServer extends InAppServer {
         
         public void run() {
             try {
-                this.window = Edit.openFileNonInteractively(filename);
-                Edit.getFrame().toFront();
+                this.window = edit.openFileNonInteractively(filename);
+                edit.getFrame().toFront();
                 out.println("File '" + filename + "' opened OK.");
             } catch (Exception ex) {
                 out.println(ex.getMessage());

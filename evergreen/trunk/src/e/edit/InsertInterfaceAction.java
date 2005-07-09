@@ -24,7 +24,7 @@ public class InsertInterfaceAction extends ETextAction {
     }
     
     public static void insertSourceCode(ETextArea target) {
-        String className = extractClassNameFrom(Edit.getAdvisor().getLookupString());
+        String className = extractClassNameFrom(Edit.getInstance().getAdvisor().getLookupString());
         if (className == null) {
             return;
         }

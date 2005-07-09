@@ -139,7 +139,7 @@ public class TagsUpdater {
     }
     
     public void showTags() {
-        Edit.getTagsPanel().setTagsTree(uiPanel);
+        Edit.getInstance().getTagsPanel().setTagsTree(uiPanel);
     }
     
     /**
@@ -201,7 +201,7 @@ public class TagsUpdater {
         public TreeModelBuilder() {
             progressTimer = new Timer(500, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Edit.getTagsPanel().showProgressBar();
+                    Edit.getInstance().getTagsPanel().showProgressBar();
                 }
             });
             progressTimer.setRepeats(false);
@@ -239,7 +239,7 @@ public class TagsUpdater {
         
         public void taggingFailed(Exception ex) {
             ex.printStackTrace();
-            Edit.getCurrentWorkspace().reportError("", "There was an error reading the tags (" + ex.getMessage() + ")");
+            Edit.getInstance().getCurrentWorkspace().reportError("", "There was an error reading the tags (" + ex.getMessage() + ")");
         }
         
         public void scanTags() {
@@ -262,14 +262,14 @@ public class TagsUpdater {
                 digest = newDigest;
                 temporaryFile.delete();
             } catch (Exception ex) {
-                Edit.getCurrentWorkspace().reportError("Tags", "Couldn't make tags.");
+                Edit.getInstance().getCurrentWorkspace().reportError("Tags", "Couldn't make tags.");
                 ex.printStackTrace();
             }
         }
         
         public void finished() {
             if (progressTimer.isRunning() == false) {
-                Edit.getTagsPanel().hideProgressBar();
+                Edit.getInstance().getTagsPanel().hideProgressBar();
             } else {
                 progressTimer.stop();
                 if (tagsHaveNotChanged) {

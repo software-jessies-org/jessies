@@ -66,7 +66,7 @@ public class OpenQuicklyDialog {
                 if (e.getClickCount() == 2) {
                     int index = matchList.locationToIndex(e.getPoint());
                     String filename = (String) matchList.getModel().getElementAt(index);
-                    Edit.openFile(workspace.getRootDirectory() + File.separator + filename);
+                    Edit.getInstance().openFile(workspace.getRootDirectory() + File.separator + filename);
                     
                     // Wrestle focus back from the file we've just opened.
                     JDialog dialog = (JDialog) SwingUtilities.getAncestorOfClass(JDialog.class, matchList);
@@ -148,7 +148,7 @@ public class OpenQuicklyDialog {
                 showMatches();
             }
         });
-        boolean okay = FormDialog.show(Edit.getFrame(), "Open Quickly", formPanel, "Open", makeRescanButton());
+        boolean okay = FormDialog.show(Edit.getInstance().getFrame(), "Open Quickly", formPanel, "Open", makeRescanButton());
         
         if (okay == false) {
             return;
@@ -161,7 +161,7 @@ public class OpenQuicklyDialog {
         ListModel list = matchList.getModel();
         for (int index : matchList.getSelectedIndices()) {
             String filename = (String) list.getElementAt(index);
-            Edit.openFile(workspace.getRootDirectory() + File.separator + filename);
+            Edit.getInstance().openFile(workspace.getRootDirectory() + File.separator + filename);
         }
     }
 }

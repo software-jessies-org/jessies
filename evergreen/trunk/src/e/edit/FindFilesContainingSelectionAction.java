@@ -27,7 +27,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
             pattern = StringUtilities.regularExpressionFromLiteral(selection);
         }
         String directory = guessDirectoryToSearchIn();
-        Edit.getCurrentWorkspace().showFindFilesDialog(pattern, directory);
+        Edit.getInstance().getCurrentWorkspace().showFindFilesDialog(pattern, directory);
     }
     
     public String guessDirectoryToSearchIn() {
@@ -40,7 +40,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
         // automatically restricting the search to a specific directory.
         // Note that "" actually means "use whatever's already in the
         // field" rather than "nothing".
-        Workspace workspace = Edit.getCurrentWorkspace();
+        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
         if (workspace.getIndexedFileCount() < 1000) {
             return "";
         }
@@ -49,7 +49,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
         System.err.println(directory);
         
         // Strip the workspace root.
-        String possiblePrefix = Edit.getCurrentWorkspace().getRootDirectory();
+        String possiblePrefix = Edit.getInstance().getCurrentWorkspace().getRootDirectory();
         if (directory.startsWith(possiblePrefix)) {
             directory = directory.substring(possiblePrefix.length());
             System.err.println(directory);

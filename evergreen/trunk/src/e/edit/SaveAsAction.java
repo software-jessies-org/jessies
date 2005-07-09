@@ -12,7 +12,7 @@ public class SaveAsAction extends ETextAction {
     
     public void actionPerformed(ActionEvent e) {
         ETextWindow window = getFocusedTextWindow();
-        String filename = Edit.getCurrentWorkspace().showSaveAsDialog();
+        String filename = Edit.getInstance().getCurrentWorkspace().showSaveAsDialog();
         if (filename != null) {
             window.saveAs(filename);
         }

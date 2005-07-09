@@ -15,10 +15,10 @@ public class SaveAllAction extends AbstractAction {
     }
 
     public static void saveAll(boolean interactive) {
-        for (Workspace workspace : Edit.getWorkspaces()) {
+        for (Workspace workspace : Edit.getInstance().getWorkspaces()) {
             if (workspace.saveAll() == false) {
                 if (interactive) {
-                    Edit.showAlert(ACTION_NAME, "Unable to save everything on workspace '" + workspace.getTitle() + "'.");
+                    Edit.getInstance().showAlert(ACTION_NAME, "Unable to save everything on workspace '" + workspace.getTitle() + "'.");
                 }
                 return;
             }

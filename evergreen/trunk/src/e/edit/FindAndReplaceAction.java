@@ -101,7 +101,7 @@ public class FindAndReplaceAction extends ETextAction {
         // (b) we make it all through the text performing replacements.
         boolean finished = false;
         while (!finished) {
-            boolean shouldReplace = FormDialog.show(Edit.getFrame(), "Find/Replace", formPanel, "Replace");
+            boolean shouldReplace = FormDialog.show(Edit.getInstance().getFrame(), "Find/Replace", formPanel, "Replace");
             if (shouldReplace == false) {
                 finished = true;
             } else {
@@ -130,7 +130,7 @@ public class FindAndReplaceAction extends ETextAction {
             }
             return true;
         } catch (Exception ex) {
-            Edit.showAlert(ACTION_NAME, "Couldn't perform the replacements (" + ex.getMessage() + ").");
+            Edit.getInstance().showAlert(ACTION_NAME, "Couldn't perform the replacements (" + ex.getMessage() + ").");
             return false;
         }
     }

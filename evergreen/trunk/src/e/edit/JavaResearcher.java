@@ -34,7 +34,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         long start = System.currentTimeMillis();
         Log.warn("Reading JavaDoc summary...");
         
-        javaDocSummary = StringUtilities.readLinesFromFile(Edit.getResourceFilename("javadoc-summary.txt"));
+        javaDocSummary = StringUtilities.readLinesFromFile(Edit.getInstance().getResourceFilename("javadoc-summary.txt"));
         
         Pattern identifierPattern = Pattern.compile("^[MCFEA]:(\\S+?)(\\(|\t).*$");
         uniqueIdentifiers = new TreeSet<String>();

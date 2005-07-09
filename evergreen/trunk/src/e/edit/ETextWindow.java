@@ -24,7 +24,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         new KeyboardFocusMonitor() {
             public void focusChanged(Component oldOwner, Component newOwner) {
                 if (newOwner instanceof EWindow && newOwner instanceof ETextWindow == false) {
-                    Edit.getTagsPanel().ensureTagsAreHidden();
+                    Edit.getInstance().getTagsPanel().ensureTagsAreHidden();
                 }
             }
         };
@@ -72,7 +72,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         
         // And there may be a file of extra spelling exceptions for this language.
-        String exceptionsFileName = Edit.getResourceFilename("spelling-exceptions-" + language);
+        String exceptionsFileName = Edit.getInstance().getResourceFilename("spelling-exceptions-" + language);
         if (FileUtilities.exists(exceptionsFileName)) {
             for (String exception : StringUtilities.readLinesFromFile(exceptionsFileName)) {
                 if (exception.startsWith("#")) {
@@ -311,7 +311,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             getTitleBar().repaint();
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
-            Edit.showAlert("Open", "Couldn't open file '" + FileUtilities.getUserFriendlyName(file) + "' (" + th.getMessage() + ")");
+            Edit.getInstance().showAlert("Open", "Couldn't open file '" + FileUtilities.getUserFriendlyName(file) + "' (" + th.getMessage() + ")");
             throw new RuntimeException("can't open " + FileUtilities.getUserFriendlyName(file));
         }
     }
@@ -321,7 +321,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         int originalCaretPosition = text.getSelectionStart();
         fillWithContent();
         text.setCaretPosition(originalCaretPosition);
-        Edit.showStatus("Reverted to saved version of " + filename);
+        Edit.getInstance().showStatus("Reverted to saved version of " + filename);
     }
     
     private boolean showPatchAndAskForConfirmation(String verb, String question, boolean fromDiskToMemory) {
@@ -341,12 +341,12 @@ public class ETextWindow extends EWindow implements PTextListener {
         formPanel.addRow("Patch:", new JScrollPane(patchView));
         String title = verb;
         String buttonLabel = verb;
-        return FormDialog.show(Edit.getFrame(), title, formPanel, buttonLabel);
+        return FormDialog.show(Edit.getInstance().getFrame(), title, formPanel, buttonLabel);
     }
     
     public void revertToSaved() {
         if (isDirty() == false && isOutOfDateWithRespectToDisk() == false) {
-            Edit.showAlert("Revert to Saved", "'" + getFilename() + "' is the same on disk as in the editor.");
+            Edit.getInstance().showAlert("Revert to Saved", "'" + getFilename() + "' is the same on disk as in the editor.");
             return;
         }
         if (showPatchAndAskForConfirmation("Revert to Saved", "Revert to on-disk version of '" + file.getName() + "'? (Equivalent to applying the following patch.)", true)) {
@@ -363,7 +363,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             findResultsUpdater.stop();
             findResultsUpdater = null;
         }
-        Edit.showStatus("Closed " + filename);
+        Edit.getInstance().showStatus("Closed " + filename);
         getWorkspace().unregisterTextComponent(getText());
         // FIXME: what else needs doing to ensure that we give back memory?
     }
@@ -377,7 +377,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 return;
             }
         }
-        Edit.getTagsPanel().ensureTagsAreHidden();
+        Edit.getInstance().getTagsPanel().ensureTagsAreHidden();
         super.closeWindow();
     }
     
@@ -455,9 +455,9 @@ public class ETextWindow extends EWindow implements PTextListener {
     public void switchToCounterpart() {
         String counterpartFilename = getCounterpartFilename();
         if (counterpartFilename != null) {
-            Edit.openFile(getContext() + File.separator + counterpartFilename);
+            Edit.getInstance().openFile(getContext() + File.separator + counterpartFilename);
         } else {
-            Edit.showAlert("Switch To Counterpart", "File '" + filename + "' has no counterpart.");
+            Edit.getInstance().showAlert("Switch To Counterpart", "File '" + filename + "' has no counterpart.");
         }
     }
 
@@ -643,6 +643,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             }
         }
         
+        Edit edit = Edit.getInstance();
+        
         // Try to save a backup copy first. Ideally, we should do this from
         // a timer and always have a recent backup around.
         File backupFile = FileUtilities.fileFromString(this.filename + ".bak");
@@ -650,19 +652,19 @@ public class ETextWindow extends EWindow implements PTextListener {
             try {
                 writeToFile(backupFile);
             } catch (Exception ex) {
-                Edit.showAlert("Save", "File '" + this.filename + "' wasn't saved! Couldn't create backup file.");
+                edit.showAlert("Save", "File '" + this.filename + "' wasn't saved! Couldn't create backup file.");
                 return false;
             }
         }
         
         try {
-            Edit.showStatus("Saving " + filename + "...");
+            edit.showStatus("Saving " + filename + "...");
             // The file may be a symlink on a cifs server.
             // In this case, it's important that we write into the original file rather than creating a new one.
             writeToFile(file);
             text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
-            Edit.showStatus("Saved " + filename);
+            edit.showStatus("Saved " + filename);
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
             updateWatermark();
@@ -670,8 +672,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             SaveMonitor.getInstance().fireSaveListeners();
             return true;
         } catch (Exception ex) {
-            Edit.showStatus("");
-            Edit.showAlert("Save", "Couldn't save file '" + filename + "' (" + ex.getMessage() + ").");
+            edit.showStatus("");
+            edit.showAlert("Save", "Couldn't save file '" + filename + "' (" + ex.getMessage() + ").");
             ex.printStackTrace();
         }
         return false;
@@ -682,7 +684,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         try {
             File newFile = FileUtilities.fileFromString(newFilename);
             if (newFile.exists()) {
-                boolean replace = Edit.askQuestion("Save As", "An item named '" + newFilename + "' already exists in this location. Do you want to replace it with the one you are saving?", "Replace");
+                boolean replace = Edit.getInstance().askQuestion("Save As", "An item named '" + newFilename + "' already exists in this location. Do you want to replace it with the one you are saving?", "Replace");
                 if (replace == false) {
                     return false;
                 }
@@ -690,7 +692,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             writeToFile(newFile);
             return true;
         } catch (Exception ex) {
-            Edit.showAlert("Save As", "Couldn't save file '" + newFilename + "' (" + ex.getMessage() + ").");
+            Edit.getInstance().showAlert("Save As", "Couldn't save file '" + newFilename + "' (" + ex.getMessage() + ").");
             ex.printStackTrace();
         }
         return false;

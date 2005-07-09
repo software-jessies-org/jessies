@@ -14,6 +14,6 @@ public class RemoveWorkspaceAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Edit.removeCurrentWorkspace();
+        Edit.getInstance().removeCurrentWorkspace();
     }
 }
