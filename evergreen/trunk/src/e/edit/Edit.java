@@ -40,11 +40,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     /** Tests false once we're fully started. */
     private boolean initializing = true;
     
-    private int initialX = 0;
-    private int initialY = 0;
-    private int initialWidth = 800;
-    private int initialHeight = 730;
-    
     private List<String> initialFilenames;
     
     private ArrayList<Element> initialWorkspaces;
@@ -528,11 +523,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return getPreferenceFilename("open-workspace-list");
     }
     
-    public void initWindowPosition() {
-        frame.setLocation(initialX, initialY);
-        frame.setSize(initialWidth, initialHeight);
-    }
-    
     /** Opens all the files listed in the file we remembered them to last time we quit. */
     public void openRememberedFiles() {
         showStatus("Opening remembered files...");
@@ -556,15 +546,17 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     private void readSavedState() {
+        Point initialLocation = new Point(0, 0);
+        Dimension initialSize = new Dimension(800, 730);
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml")));
             
             Element root = document.getDocumentElement();
-            initialX = Integer.parseInt(root.getAttribute("x"));
-            initialY = Integer.parseInt(root.getAttribute("y"));
-            initialWidth = Integer.parseInt(root.getAttribute("width"));
-            initialHeight = Integer.parseInt(root.getAttribute("height"));
+            initialLocation.x = Integer.parseInt(root.getAttribute("x"));
+            initialLocation.y = Integer.parseInt(root.getAttribute("y"));
+            initialSize.width = Integer.parseInt(root.getAttribute("width"));
+            initialSize.height = Integer.parseInt(root.getAttribute("height"));
             
             initialWorkspaces = new ArrayList<Element>();
             initialFilenames = new ArrayList<String>();
@@ -581,6 +573,8 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         } catch (Exception ex) {
             Log.warn("Problem reading saved state", ex);
         }
+        frame.setLocation(initialLocation);
+        frame.setSize(initialSize);
     }
     
     private synchronized void writeSavedState() {
@@ -646,7 +640,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     public void initWindow() {
-        initWindowPosition();
         initWindowIcon();
         initWindowListener();
     }
