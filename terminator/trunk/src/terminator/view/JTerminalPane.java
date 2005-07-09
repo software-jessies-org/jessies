@@ -152,10 +152,12 @@ public class JTerminalPane extends JPanel {
 	
 	private void initSizeMonitoring() {
 		class SizeMonitor extends ComponentAdapter {
+			@Override
 			public void componentShown(ComponentEvent event) {
 				currentSizeInChars = textPane.getVisibleSizeInCharacters();
 			}
 			
+			@Override
 			public void componentResized(ComponentEvent event) {
 				Dimension size = textPane.getVisibleSizeInCharacters();
 				if (size.equals(currentSizeInChars) == false) {
