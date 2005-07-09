@@ -26,7 +26,7 @@ public class AddWorkspaceAction extends AbstractAction {
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Name:", nameField);
         formPanel.addRow("Root Directory:", filenameChooserField);
-        boolean okay = FormDialog.show(Edit.getFrame(), "Add Workspace", formPanel, "Add");
+        boolean okay = FormDialog.show(Edit.getInstance().getFrame(), "Add Workspace", formPanel, "Add");
         
         if (okay == false) {
             return;
@@ -34,11 +34,11 @@ public class AddWorkspaceAction extends AbstractAction {
         
         String message = FileUtilities.checkDirectoryExistence(filenameChooserField.getPathname());
         if (message != null) {
-            Edit.showAlert(ACTION_NAME, message);
+            Edit.getInstance().showAlert(ACTION_NAME, message);
             return;
         }
         
-        Workspace workspace = Edit.createWorkspace(nameField.getText(), filenameChooserField.getPathname());
+        Workspace workspace = Edit.getInstance().createWorkspace(nameField.getText(), filenameChooserField.getPathname());
         workspace.updateFileList(null);
     }
 }

@@ -1,6 +1,8 @@
 package e.edit;
 
 import java.awt.event.*;
+import java.nio.charset.*;
+import java.util.*;
 import javax.swing.*;
 import e.forms.*;
 import e.ptextarea.*;
@@ -40,12 +42,18 @@ public class FilePropertiesAction extends ETextAction {
         
         charsetStringField.setText((String) buffer.getProperty(PTextBuffer.CHARSET_PROPERTY));
         charsetStringField.setEditable(false);
+        charsetStringField.setEnabled(false);
+        
+        SortedMap<String, Charset> charsets = Charset.availableCharsets();
+        for (String charset : charsets.keySet()) {
+            System.out.println(charset + " = " + Charset.forName(charset).displayName());
+        }
         
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);
         formPanel.addRow("Character Encoding:", charsetStringField);
-        boolean okay = FormDialog.show(Edit.getFrame(), "File Properties", formPanel, "Apply");
+        boolean okay = FormDialog.show(Edit.getInstance().getFrame(), "File Properties", formPanel, "Apply");
         
         if (okay == false) {
             return;

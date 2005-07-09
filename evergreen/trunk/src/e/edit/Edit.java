@@ -23,61 +23,80 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     private static Edit instance;
     
     private com.apple.eawt.Application application;
-    private static JFrame frame;
-    private static JTabbedPane tabbedPane;
-    private static TagsPanel tagsPanel;
-    private static Advisor advisor;
-    private static EStatusBar statusLine;
-    private static Minibuffer minibuffer;
+    private JFrame frame;
+    private JTabbedPane tabbedPane;
+    private TagsPanel tagsPanel;
+    private Advisor advisor;
+    private EStatusBar statusLine;
+    private Minibuffer minibuffer;
     private JPanel statusArea;
     
+    /** Extensions that shouldn't be opened by Edit. */
+    private String[] externalApplicationExtensions;
+    
     /** The global find history for all FindDialog instances. */
-    private static EHistoryComboBoxModel findHistory = new ChronologicalComboBoxModel();
+    private EHistoryComboBoxModel findHistory = new ChronologicalComboBoxModel();
     
     /** Tests false once we're fully started. */
-    private static boolean initializing = true;
+    private boolean initializing = true;
     
-    public static Edit getInstance() {
+    private int initialX = 0;
+    private int initialY = 0;
+    private int initialWidth = 800;
+    private int initialHeight = 730;
+    
+    private List<String> initialFilenames;
+    
+    private ArrayList<Element> initialWorkspaces;
+    
+    private JPanel statusLineAndProgressContainer = new JPanel(new BorderLayout());
+    
+    private JProgressBar progressBar = new JProgressBar();
+    private JPanel progressBarAndKillButton = new JPanel(new BorderLayout());
+    private Process process;
+    
+    public static synchronized Edit getInstance() {
         if (instance == null) {
             instance = new Edit();
+            instance.init();
         }
         return instance;
     }
     
     /** Returns the frame Edit is using for its main window. */
-    public static Frame getFrame() {
+    public Frame getFrame() {
         return (Frame) frame;
     }
     
-    public static EHistoryComboBoxModel getFindHistory() {
+    public EHistoryComboBoxModel getFindHistory() {
         return findHistory;
     }
     
-    public static TagsPanel getTagsPanel() {
+    public TagsPanel getTagsPanel() {
         return tagsPanel;
     }
 
-    public static Advisor getAdvisor() {
+    public Advisor getAdvisor() {
         return advisor;
     }
 
-    public static void showStatus(String status) {
+    public void showStatus(String status) {
         statusLine.setText(status);
     }
 
-    public static void showAlert(String title, String message) {
-        SimpleDialog.showAlert(Edit.getFrame(), title, message);
+    public void showAlert(String title, String message) {
+        SimpleDialog.showAlert(getFrame(), title, message);
     }
 
-    public static boolean askQuestion(String title, String message, String continueText) {
-        return SimpleDialog.askQuestion(Edit.getFrame(), title, message, continueText);
+    public boolean askQuestion(String title, String message, String continueText) {
+        return SimpleDialog.askQuestion(getFrame(), title, message, continueText);
     }
 
-    public static String askQuestion(String title, String message, String continueTextYes, String continueTextNo) {
-        return SimpleDialog.askQuestion(Edit.getFrame(), title, message, continueTextYes, continueTextNo);
+    public String askQuestion(String title, String message, String continueTextYes, String continueTextNo) {
+        return SimpleDialog.askQuestion(getFrame(), title, message, continueTextYes, continueTextNo);
     }
 
-    private static void showDocument(String url) {
+    private void showDocument(String url) {
         try {
             BrowserLauncher.openURL(url);
         } catch (Throwable th) {
@@ -85,23 +104,20 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
     }
     
-    /** Extensions that shouldn't be opened by Edit. */
-    private static String[] externalApplicationExtensions;
-    
-    public static boolean isFileForExternalApplication(String filename) {
+    public boolean isFileForExternalApplication(String filename) {
         if (externalApplicationExtensions == null) {
             externalApplicationExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.externalApplicationExtensions", ""));
         }
         return FileUtilities.nameEndsWithOneOf(filename, externalApplicationExtensions);
     }
     
-    public static void openFileWithExternalApplication(String filename) {
+    public void openFileWithExternalApplication(String filename) {
         try {
             Runtime.getRuntime().exec(new String[] {
                 Parameters.getParameter("open.command"), filename
             });
         } catch (Exception ex) {
-            Edit.showAlert("Run", "Couldn't open '" + filename + "' with an external application (" + ex.getMessage() + ")");
+            showAlert("Run", "Couldn't open '" + filename + "' with an external application (" + ex.getMessage() + ")");
         }
     }
     
@@ -110,7 +126,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * and replaces the matching prefix with the appropriate substitution. Returns the
      * original filename if there's no applicable rewrite.
      */
-    public static String processPathRewrites(String filename) {
+    public String processPathRewrites(String filename) {
         String from;
         for (int i = 0; (from = Parameters.getParameter("path.rewrite.from." + i)) != null; i++) {
             if (filename.startsWith(from)) {
@@ -129,20 +145,20 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * Returns the EWindow corresponding to the file opened, or null if
      * no file was opened or the file was passed to an external program.
      */
-    public static EWindow openFile(String filename) {
+    public EWindow openFile(String filename) {
         try {
             return openFileNonInteractively(filename);
         } catch (Exception ex) {
             ex.printStackTrace();
-            Edit.showAlert("Open", ex.getMessage());
+            showAlert("Open", ex.getMessage());
             return null;
         }
     }
     
-    public static EWindow openFileNonInteractively(String filename) {
+    public EWindow openFileNonInteractively(String filename) {
         /* Special case for a URI. */
         if (FileUtilities.nameStartsWithOneOf(filename, FileUtilities.getArrayOfPathElements(Parameters.getParameter("url.prefixes", "")))) {
-            Edit.showDocument(filename);
+            showDocument(filename);
             return null;
         }
         
@@ -224,7 +240,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     /** Returns an array of all the workspaces. */
-    public static Workspace[] getWorkspaces() {
+    public Workspace[] getWorkspaces() {
         Workspace[] result = new Workspace[tabbedPane.getTabCount()];
         for (int i = 0; i < result.length; ++i) {
             result[i] = (Workspace) tabbedPane.getComponentAt(i);
@@ -246,7 +262,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * FIXME: Consistency probably demands that this be called from
      * FileUtilities.getUserFriendlyName rather than Edit.openFile.
      */
-    public static String normalizeWorkspacePrefix(String filename) {
+    public String normalizeWorkspacePrefix(String filename) {
         for (Workspace workspace : getWorkspaces()) {
             try {
                 String friendlyPrefix = workspace.getRootDirectory();
@@ -263,7 +279,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     /** Returns the workspace whose root directory shares the longest common prefix with the given filename. */
-    public static Workspace getBestWorkspaceForFilename(String filename) {
+    public Workspace getBestWorkspaceForFilename(String filename) {
         Workspace bestWorkspace = (Workspace) tabbedPane.getSelectedComponent();
         int bestLength = 0;
         for (Workspace workspace : getWorkspaces()) {
@@ -279,7 +295,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return bestWorkspace;
     }
     
-    public static Workspace getCurrentWorkspace() {
+    public Workspace getCurrentWorkspace() {
         if (tabbedPane == null) {
             return null;
         }
@@ -293,7 +309,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * we shouldn't be upset by a workspace seeming to be in the wrong place, as was
      * so easily the case with the previous implicit chronological order.
      */
-    public static int getWorkspaceIndexInTabbedPane(String name) {
+    public int getWorkspaceIndexInTabbedPane(String name) {
         int index = 0;
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             String title = tabbedPane.getTitleAt(i);
@@ -305,7 +321,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return index;
     }
     
-    public static void cycleWorkspaces(int indexDelta) {
+    public void cycleWorkspaces(int indexDelta) {
         int index = tabbedPane.getSelectedIndex();
         if (index == -1) {
             return;
@@ -317,10 +333,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         tabbedPane.setSelectedIndex(newIndex);
     }
     
-    private static void addWorkspace(final Workspace workspace) {
+    private void addWorkspace(final Workspace workspace) {
         String name = workspace.getTitle();
         tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), getWorkspaceIndexInTabbedPane(name));
         tabbedPane.setSelectedComponent(workspace);
+        fireTabbedPaneTabCountChange();
         
         // We need to ensure that the workspace has been validated so that it
         // and its children have bounds, so that EColumn has a non-zero height
@@ -329,13 +346,13 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         workspace.revalidate();
         frame.validate();
         
-        Edit.showStatus("Added workspace '" + name + "' (" + workspace.getRootDirectory() + ")");
+        showStatus("Added workspace '" + name + "' (" + workspace.getRootDirectory() + ")");
     }
 
-    public static Workspace createWorkspace(String name, String root) {
+    public Workspace createWorkspace(String name, String root) {
         boolean noNonEmptyWorkspaceOfThisNameExists = removeWorkspaceByName(name);
         if (noNonEmptyWorkspaceOfThisNameExists == false) {
-            Edit.showAlert("Edit", "A non-empty workspace of the name '" + name + "' already exists.");
+            showAlert("Edit", "A non-empty workspace of the name '" + name + "' already exists.");
             return null;
         }
         Workspace workspace = new Workspace(name, root);
@@ -348,44 +365,61 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * Removes any workspaces with the given name. Returns false if there was a workspace,
      * but it couldn't be removed because it had open files, true otherwise.
      */
-    public static boolean removeWorkspaceByName(String name) {
+    public boolean removeWorkspaceByName(String name) {
         for (Workspace workspace : getWorkspaces()) {
             if (workspace.getTitle().equals(name)) {
                 if (workspace.isEmpty() == false) {
                     return false;
                 }
                 tabbedPane.remove(workspace);
+                fireTabbedPaneTabCountChange();
             }
         }
         return true;
     }
     
-    public static void moveFilesToBestWorkspaces() {
+    public void moveFilesToBestWorkspaces() {
         for (Workspace workspace : getWorkspaces()) {
             workspace.moveFilesToBestWorkspaces();
         }
     }
     
-    public static void removeCurrentWorkspace() {
+    public void removeCurrentWorkspace() {
         Workspace workspace = getCurrentWorkspace();
         if (workspace == null) {
             return;
         }
         if (getWorkspaces().length == 1) {
-            Edit.showAlert("Edit", "Cannot remove the last workspace.");
+            showAlert("Edit", "Cannot remove the last workspace.");
             return;
         }
         tabbedPane.remove(workspace);
+        fireTabbedPaneTabCountChange();
         workspace.moveFilesToBestWorkspaces();
     }
     
-    public static void createWorkspaceForCurrentDirectory() {
+    /**
+     * Writes out the workspace list on a new thread to avoid disk access on
+     * the event dispatch thread. Any code that adds or removes workspaces
+     * should invoke this method. Annoyingly, JTabbedPane doesn't make such
+     * changes observable, so it's down to us to be careful.
+     */
+    private void fireTabbedPaneTabCountChange() {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                rememberState();
+            }
+        });
+        thread.start();
+    }
+    
+    public void createWorkspaceForCurrentDirectory() {
         String currentDirectory = Parameters.getParameter("user.dir");
         String workspaceName = currentDirectory.substring(currentDirectory.lastIndexOf(File.separatorChar) + 1);
         createWorkspace(workspaceName, currentDirectory);
     }
     
-    public static String getResourceFilename(String leafName) {
+    public String getResourceFilename(String leafName) {
         return System.getenv("EDIT_HOME") + File.separatorChar + leafName;
     }
     
@@ -395,7 +429,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     public void handleAbout(com.apple.eawt.ApplicationEvent e) {
-        Edit.showAlert("Edit", "Edit is free software. See the file COPYING for copying permission.");
+        showAlert("Edit", "Edit is free software. See the file COPYING for copying permission.");
         if (e != null) {
             e.setHandled(true);
         }
@@ -478,42 +512,35 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     /** Returns the full pathname for the given preference file. */
-    public static String getPreferenceFilename(String leafname) {
+    public String getPreferenceFilename(String leafname) {
         return System.getProperty("preferencesDirectory") + File.separator + leafname;
     }
     
-    public static String getDialogGeometriesPreferenceFilename() {
+    public String getDialogGeometriesPreferenceFilename() {
         return getPreferenceFilename("dialog-geometries");
     }
     
-    public static String getOpenFileListPreferenceFilename() {
+    public String getOpenFileListPreferenceFilename() {
         return getPreferenceFilename("open-file-list");
     }
     
-    public static String getOpenWorkspaceListPreferenceFilename() {
+    public String getOpenWorkspaceListPreferenceFilename() {
         return getPreferenceFilename("open-workspace-list");
     }
-    
-    private int initialX = 0;
-    private int initialY = 0;
-    private int initialWidth = 800;
-    private int initialHeight = 730;
     
     public void initWindowPosition() {
         frame.setLocation(initialX, initialY);
         frame.setSize(initialWidth, initialHeight);
     }
     
-    private List<String> initialFilenames;
-    
     /** Opens all the files listed in the file we remembered them to last time we quit. */
     public void openRememberedFiles() {
-        Edit.showStatus("Opening remembered files...");
+        showStatus("Opening remembered files...");
         if (initialFilenames != null) {
             for (String filename : initialFilenames) {
-                Edit.openFile(filename);
+                openFile(filename);
             }
-            Edit.showStatus((initialFilenames.size() == 0) ? "No files to open" : "Finished opening files");
+            showStatus((initialFilenames.size() == 0) ? "No files to open" : "Finished opening files");
         }
     }
     
@@ -528,8 +555,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
     }
     
-    private ArrayList<Element> initialWorkspaces;
-
     private void readSavedState() {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -558,7 +583,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
     }
     
-    private void writeSavedState() {
+    private synchronized void writeSavedState() {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.newDocument();
@@ -638,8 +663,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         Parameters.readPropertiesFile(getPreferenceFilename("edit.properties"));
     }
     
-    private static JPanel statusLineAndProgressContainer = new JPanel(new BorderLayout());
-    
     public void initStatusArea() {
         statusLine = new EStatusBar();
         minibuffer = new Minibuffer();
@@ -662,7 +685,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         progressBarAndKillButton.add(makeKillButton(), BorderLayout.EAST);
     }
     
-    private static JButton makeKillButton() {
+    private JButton makeKillButton() {
         JButton killButton = new JButton(new e.gui.StopIcon(Color.RED));
         killButton.setPressedIcon(new e.gui.StopIcon(Color.RED.darker()));
         killButton.setRolloverIcon(new e.gui.StopIcon(new Color(255, 100, 100)));
@@ -676,29 +699,28 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         return killButton;
     }
     
-    private static JProgressBar progressBar = new JProgressBar();
-    private static JPanel progressBarAndKillButton = new JPanel(new BorderLayout());
-    private static Process process;
-    
-    public static synchronized void showProgressBar(Process process) {
-        Edit.process = process;
+    public synchronized void showProgressBar(Process process) {
+        this.process = process;
         progressBar.setIndeterminate(true);
         statusLineAndProgressContainer.add(progressBarAndKillButton, BorderLayout.EAST);
         statusLineAndProgressContainer.repaint();
     }
     
-    public static synchronized void hideProgressBar() {
-        Edit.process = null;
+    public synchronized void hideProgressBar() {
+        this.process = null;
         statusLineAndProgressContainer.remove(progressBarAndKillButton);
         progressBar.setIndeterminate(false);
         statusLineAndProgressContainer.repaint();
     }
     
-    public static void showMinibuffer(MinibufferUser minibufferUser) {
+    public void showMinibuffer(MinibufferUser minibufferUser) {
         minibuffer.activate(minibufferUser);
     }
     
     private Edit() {
+    }
+
+    private void init() {
         long start = System.currentTimeMillis();
         
         application = new com.apple.eawt.Application();
@@ -723,13 +745,13 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         initAdvisor();
         initStatusArea();
         
-        new EditServer();
+        new EditServer(this);
         
         UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
         tabbedPane = new JTabbedPane(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                Edit.getTagsPanel().ensureTagsAreHidden();
+                Edit.getInstance().getTagsPanel().ensureTagsAreHidden();
                 getCurrentWorkspace().restoreFocusToRememberedTextWindow();
             }
         });
@@ -748,9 +770,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             createWorkspaceForCurrentDirectory();
         }
         
-        openRememberedFiles();
-        
-        initializing = false;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                openRememberedFiles();
+                initializing = false;
+            }
+        });
         
         frame.setVisible(true);
         splitPane.setDividerLocation(0.8);

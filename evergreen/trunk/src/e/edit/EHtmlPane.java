@@ -37,9 +37,9 @@ public class EHtmlPane extends JComponent implements HyperlinkListener {
     public void hyperlinkUpdate(HyperlinkEvent e) {
         // Welcome to the wonderful world of OOP, featuring nested-if polymorphism.
         if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-            Edit.showStatus("Open " + e.getDescription());
+            Edit.getInstance().showStatus("Open " + e.getDescription());
         } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
-            Edit.showStatus("");
+            Edit.getInstance().showStatus("");
         } else if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e instanceof HTMLFrameHyperlinkEvent) {
                 ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
@@ -56,12 +56,12 @@ public class EHtmlPane extends JComponent implements HyperlinkListener {
             try {
                 new ShellCommand("man -a " + page + " | col -b").runCommand();
             } catch (Throwable th) {
-                Edit.showAlert("Man Page", "Can't run man(1) (" + th.getMessage() + ").");
+                Edit.getInstance().showAlert("Man Page", "Can't run man(1) (" + th.getMessage() + ").");
             }
             return;
         }
         
         // Hand it on to Edit to work out what to do with it.
-        Edit.openFile(url);
+        Edit.getInstance().openFile(url);
     }
 }

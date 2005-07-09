@@ -12,7 +12,7 @@ public class KillErrorsAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Workspace workspace = Edit.getCurrentWorkspace();
+        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
         if (workspace == null) {
             return;
         }

@@ -14,13 +14,13 @@ public class SetBuildTargetAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Workspace workspace = Edit.getCurrentWorkspace();
+        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
 
         buildTargetField.setText(workspace.getBuildTarget());
         
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Build Target:", buildTargetField);
-        boolean okay = FormDialog.show(Edit.getFrame(), workspace.getTitle() + " Build Target", formPanel, "Apply");
+        boolean okay = FormDialog.show(Edit.getInstance().getFrame(), workspace.getTitle() + " Build Target", formPanel, "Apply");
         
         if (okay == false) {
             return;

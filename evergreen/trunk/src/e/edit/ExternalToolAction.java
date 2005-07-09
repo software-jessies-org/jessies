@@ -70,7 +70,7 @@ public class ExternalToolAction extends ETextAction {
         }
         
         if (checkEverythingSaved) {
-            boolean shouldContinue = Edit.getCurrentWorkspace().prepareForAction(NAME, "Save unsaved files first?");
+            boolean shouldContinue = Edit.getInstance().getCurrentWorkspace().prepareForAction(NAME, "Save unsaved files first?");
             if (shouldContinue == false) {
                 return;
             }
@@ -114,7 +114,7 @@ public class ExternalToolAction extends ETextAction {
         FormPanel formPanel = new FormPanel();
         formPanel.addRow("Command:", commandField);
         formPanel.addRow("Directory:", contextField);
-        boolean shouldRun = FormDialog.show(Edit.getFrame(), (String) getValue(Action.NAME), formPanel, "Run");
+        boolean shouldRun = FormDialog.show(Edit.getInstance().getFrame(), (String) getValue(Action.NAME), formPanel, "Run");
         if (shouldRun) {
             shellCommand.setCommand(commandField.getText());
             shellCommand.setContext(contextField.getText());
@@ -126,7 +126,7 @@ public class ExternalToolAction extends ETextAction {
         try {
             shellCommand.runCommand();
         } catch (IOException ex) {
-            Edit.showAlert(shellCommand.getContext(), "Can't start task (" + ex.getMessage() + ").");
+            Edit.getInstance().showAlert(shellCommand.getContext(), "Can't start task (" + ex.getMessage() + ").");
         }
     }
 }

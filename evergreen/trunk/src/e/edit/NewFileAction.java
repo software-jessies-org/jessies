@@ -30,7 +30,7 @@ public class NewFileAction extends ETextAction {
         do {
             FormPanel formPanel = new FormPanel();
             formPanel.addRow("Filename:", filenameField);
-            boolean okay = FormDialog.show(Edit.getFrame(), "New File", formPanel, "Create");
+            boolean okay = FormDialog.show(Edit.getInstance().getFrame(), "New File", formPanel, "Create");
             
             if (okay == false) {
                 return;
@@ -39,11 +39,12 @@ public class NewFileAction extends ETextAction {
     }
 
     private boolean createNewFile(String filename) {
+        Edit edit = Edit.getInstance();
         try {
             File newFile = FileUtilities.fileFromString(filename);
             File directory = newFile.getParentFile();
             if (directory.exists() == false) {
-                boolean createDirectory = Edit.askQuestion("New File", "The directory '" + directory + "' doesn't exist. Edit can either create the directory for you, or you can go back and re-type the filename.", "Create");
+                boolean createDirectory = edit.askQuestion("New File", "The directory '" + directory + "' doesn't exist. Edit can either create the directory for you, or you can go back and re-type the filename.", "Create");
                 if (createDirectory == false) {
                     return false;
                 }
@@ -51,16 +52,16 @@ public class NewFileAction extends ETextAction {
             }
             boolean created = newFile.createNewFile();
             if (created) {
-                Edit.getCurrentWorkspace().updateFileList(null);
+                edit.getCurrentWorkspace().updateFileList(null);
                 fillWithInitialContents(newFile);
             } else {
-                Edit.showAlert(ACTION_NAME, "File '" + filename + "' already exists.");
+                edit.showAlert(ACTION_NAME, "File '" + filename + "' already exists.");
             }
-            Edit.openFile(filename);
+            edit.openFile(filename);
             return true;
         } catch (IOException ex ) {
             ex.printStackTrace();
-            Edit.showAlert(ACTION_NAME, "Failed to create file '" + filename + "' (" + ex.getMessage() + ").");
+            edit.showAlert(ACTION_NAME, "Failed to create file '" + filename + "' (" + ex.getMessage() + ").");
             return false;
         }
     }
@@ -80,7 +81,7 @@ public class NewFileAction extends ETextAction {
             content += "#endif\n";
             String result = StringUtilities.writeFile(file, content);
             if (result != null) {
-                Edit.showAlert(ACTION_NAME, "Failed to fill '" + file + "' with initial content (" + result + ").");
+                Edit.getInstance().showAlert(ACTION_NAME, "Failed to fill '" + file + "' with initial content (" + result + ").");
             }
         }
     }
