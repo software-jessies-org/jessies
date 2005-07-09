@@ -32,6 +32,44 @@ public class TerminatorFrame extends JFrame {
 		}
 	}
 	
+	/**
+	 * Quantizes any resize of the frame so that our terminals have an
+	 * integer number of rows and columns. X11 provides direct support
+	 * for communicating this desire to the window manager, but we can't
+	 * use that, and it wouldn't work on other OSes anyway.
+	 * 
+	 * This code is based on hack #33 "Window Snapping" from O'Reilly's
+	 * book "Swing Hacks". (Their hack doesn't actually work, at least on
+	 * Mac OS.)
+	 */
+	private void initSizeMonitoring() {
+		class SizeMonitor extends ComponentAdapter {
+			private Dimension lastSize;
+			private boolean syntheticResize = false;
+			
+			@Override
+			public void componentShown(ComponentEvent e) {
+				lastSize = getSize();
+			}
+			
+			@Override
+			public void componentResized(ComponentEvent e) {
+				if (lastSize == null || syntheticResize) {
+					return;
+				}
+				Dimension charSize = terminals.get(0).getTextPane().getCharUnitSize();
+				Dimension suggestedSize = getSize();
+				Dimension newSize = new Dimension();
+				newSize.width = suggestedSize.width - (suggestedSize.width - lastSize.width) % charSize.width;
+				newSize.height = suggestedSize.height - (suggestedSize.height - lastSize.height) % charSize.height;
+				syntheticResize = true;
+				setSize(newSize);
+				syntheticResize = false;
+			}
+		}
+		addComponentListener(new SizeMonitor());
+	}
+	
 	public void updateFrameTitle() {
 		StringBuilder title = new StringBuilder();
 		if (terminalSize != null) {
@@ -93,6 +131,8 @@ public class TerminatorFrame extends JFrame {
 		pack();
 		setLocationByPlatform(true);
 		setVisible(true);
+		initSizeMonitoring();
+		
 		WindowMenu.getSharedInstance().addWindow(this);
 	}
 	
