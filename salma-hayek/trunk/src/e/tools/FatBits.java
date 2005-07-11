@@ -2,7 +2,10 @@ package e.tools;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
+import java.awt.image.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import e.util.*;
 
 /**
@@ -14,6 +17,7 @@ public class FatBits extends JFrame {
     private Robot robot;
     private Timer timer;
     private ImageIcon icon;
+    private int scaleFactor;
     
     public FatBits() {
         super("FatBits");
@@ -23,11 +27,26 @@ public class FatBits extends JFrame {
         } catch (AWTException ex) {
             Log.warn("failed to create a Robot", ex);
         }
-        timer = new Timer(200, new MouseTracker());
+        timer = new Timer(50, new MouseTracker());
         setSize(new Dimension(200, 200));
         icon = new ImageIcon();
-        setContentPane(new JLabel(icon));
+        setContentPane(makeUi());
         timer.start();
+    }
+    
+    private JComponent makeUi() {
+        final JSlider scaleSlider = new JSlider(1, 64);
+        scaleSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                scaleFactor = scaleSlider.getValue();
+            }
+        });
+        scaleSlider.setValue(8);
+        
+        JPanel result = new JPanel(new BorderLayout());
+        result.add(new JLabel(icon), BorderLayout.CENTER);
+        //result.add(scaleSlider, BorderLayout.SOUTH);
+        return result;
     }
     
     private class MouseTracker implements ActionListener {
@@ -42,7 +61,13 @@ public class FatBits extends JFrame {
             lastPosition = center;
             
             Rectangle screenCaptureBounds = getScreenCaptureBounds(center);
-            icon.setImage(robot.createScreenCapture(screenCaptureBounds));
+            BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
+            // FIXME: this seems to be a great way to use far too much memory;
+            // we should probably stop using JLabel and paint the image ourselves
+            // using the Graphics.drawImage method that scales. That probably
+            // translates directly to hardware-accelerated rendering.
+            BufferedImage scaledImage = new AffineTransformOp(AffineTransform.getScaleInstance(scaleFactor, scaleFactor), AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(capturedImage, null);
+            icon.setImage(scaledImage);
             repaint();
         }
         
@@ -61,7 +86,6 @@ public class FatBits extends JFrame {
             if (result.y + result.height > screenSize.height) {
                 result.y = screenSize.height - result.height;
             }
-            
             return result;
         }
     }
