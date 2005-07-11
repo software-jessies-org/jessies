@@ -16,7 +16,7 @@ import e.util.*;
 public class FatBits extends JFrame {
     private Robot robot;
     private Timer timer;
-    private ImageIcon icon;
+    private Image image;
     private int scaleFactor;
     
     public FatBits() {
@@ -29,24 +29,31 @@ public class FatBits extends JFrame {
         }
         timer = new Timer(50, new MouseTracker());
         setSize(new Dimension(200, 200));
-        icon = new ImageIcon();
         setContentPane(makeUi());
         timer.start();
     }
     
     private JComponent makeUi() {
-        final JSlider scaleSlider = new JSlider(1, 64);
+        final JSlider scaleSlider = new JSlider(2, 16);
         scaleSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 scaleFactor = scaleSlider.getValue();
             }
         });
-        scaleSlider.setValue(8);
+        scaleSlider.setPaintTicks(true);
+        scaleSlider.setSnapToTicks(true);
+        scaleSlider.setValue(2);
         
         JPanel result = new JPanel(new BorderLayout());
-        result.add(new JLabel(icon), BorderLayout.CENTER);
-        //result.add(scaleSlider, BorderLayout.SOUTH);
+        result.add(new ScaledImagePanel(), BorderLayout.CENTER);
+        result.add(scaleSlider, BorderLayout.SOUTH);
         return result;
+    }
+    
+    private class ScaledImagePanel extends JComponent {
+        public void paintComponent(Graphics g) {
+            g.drawImage(image, 0, 0, null);
+        }
     }
     
     private class MouseTracker implements ActionListener {
@@ -62,12 +69,8 @@ public class FatBits extends JFrame {
             
             Rectangle screenCaptureBounds = getScreenCaptureBounds(center);
             BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
-            // FIXME: this seems to be a great way to use far too much memory;
-            // we should probably stop using JLabel and paint the image ourselves
-            // using the Graphics.drawImage method that scales. That probably
-            // translates directly to hardware-accelerated rendering.
-            BufferedImage scaledImage = new AffineTransformOp(AffineTransform.getScaleInstance(scaleFactor, scaleFactor), AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(capturedImage, null);
-            icon.setImage(scaledImage);
+            Image scaledImage = capturedImage.getScaledInstance(getWidth() * scaleFactor, getHeight() * scaleFactor, Image.SCALE_REPLICATE);
+            image = scaledImage;
             repaint();
         }
         
