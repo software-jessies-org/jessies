@@ -23,7 +23,7 @@ public class FatBits extends JFrame {
         } catch (AWTException ex) {
             Log.warn("failed to create a Robot", ex);
         }
-        timer = new Timer(500, new MouseTracker());
+        timer = new Timer(200, new MouseTracker());
         setSize(new Dimension(200, 200));
         icon = new ImageIcon();
         setContentPane(new JLabel(icon));
@@ -40,10 +40,29 @@ public class FatBits extends JFrame {
                 return;
             }
             lastPosition = center;
-            Point topLeft = new Point(center.x - getWidth() / 2, center.y - getHeight() / 2);
-            Rectangle rectangle = new Rectangle(topLeft, getSize());
-            icon.setImage(robot.createScreenCapture(rectangle));
+            
+            Rectangle screenCaptureBounds = getScreenCaptureBounds(center);
+            icon.setImage(robot.createScreenCapture(screenCaptureBounds));
             repaint();
+        }
+        
+        private Rectangle getScreenCaptureBounds(Point center) {
+            Point topLeft = new Point(center.x - getWidth() / 2, center.y - getHeight() / 2);
+            Rectangle result = new Rectangle(topLeft, getSize());
+            
+            // Constrain the capture to the display.
+            // Apple's 1.5 VM crashes if you don't.
+            result.x = Math.max(result.x, 0);
+            result.y = Math.max(result.y, 0);
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            if (result.x + result.width > screenSize.width) {
+                result.x = screenSize.width - result.width;
+            }
+            if (result.y + result.height > screenSize.height) {
+                result.y = screenSize.height - result.height;
+            }
+            
+            return result;
         }
     }
     
