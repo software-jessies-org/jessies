@@ -31,14 +31,9 @@ public class FatBits extends JFrame {
     }
     
     private class MouseTracker implements ActionListener {
-    private Point lastPosition = null;
+        private Point lastPosition = null;
 
         public void actionPerformed(ActionEvent e) {
-            /*
-             * FIXME: this code requires 1.5; I don't think we can implement
-             * this for 1.4 at all.
-             */
-/*
             PointerInfo pointerInfo = MouseInfo.getPointerInfo();
             Point center = pointerInfo.getLocation();
             if (lastPosition != null && lastPosition.equals(center)) {
@@ -49,7 +44,6 @@ public class FatBits extends JFrame {
             Rectangle rectangle = new Rectangle(topLeft, getSize());
             icon.setImage(robot.createScreenCapture(rectangle));
             repaint();
-*/
         }
     }
     
