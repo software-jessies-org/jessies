@@ -30,19 +30,34 @@ public class FatBits extends JFrame {
         timer = new Timer(50, new MouseTracker());
         setSize(new Dimension(200, 200));
         setContentPane(makeUi());
+        
+        //
+        // FIXME: support keyboard operation:
+        //
+        //   '+': increase scale (also with command, like Preview?)
+        //   '-': decrease scale
+        //   ' ': play/pause following pointer position (also C-L like Pixie?)
+        //   arrow keys: move Robot for finer positioning than with the mouse
+        //
+        
         timer.start();
     }
     
     private JComponent makeUi() {
+        // FIXME: the slider should use integer values [1..4] and the scale
+        // should be (1 << value). The labels should read "2x" et cetera.
         final JSlider scaleSlider = new JSlider(2, 16);
         scaleSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 scaleFactor = scaleSlider.getValue();
+                repaint();
             }
         });
         scaleSlider.setPaintTicks(true);
         scaleSlider.setSnapToTicks(true);
         scaleSlider.setValue(2);
+        
+        // FIXME: NORTH should have a panel showing color information.
         
         JPanel result = new JPanel(new BorderLayout());
         result.add(new ScaledImagePanel(), BorderLayout.CENTER);
@@ -53,6 +68,12 @@ public class FatBits extends JFrame {
     private class ScaledImagePanel extends JComponent {
         public void paintComponent(Graphics g) {
             g.drawImage(image, 0, 0, null);
+            paintGridLines(g);
+        }
+        
+        private void paintGridLines(Graphics g) {
+            g.setColor(Color.BLACK);
+            // FIXME: draw horizontal and vertical lines demarcating the pixels.
         }
     }
     
@@ -75,6 +96,13 @@ public class FatBits extends JFrame {
         }
         
         private Rectangle getScreenCaptureBounds(Point center) {
+            //
+            // FIXME: we need to take the scale factor into account in this
+            // method, both so that topLeft is right, and so we don't grab
+            // more than we need (given that we can grab again if the user
+            // decreases the scale factor).
+            //
+            
             Point topLeft = new Point(center.x - getWidth() / 2, center.y - getHeight() / 2);
             Rectangle result = new Rectangle(topLeft, getSize());
             
@@ -91,22 +119,6 @@ public class FatBits extends JFrame {
             }
             return result;
         }
-    }
-    
-    /**
-     * Returns the bounds of the virtual device (all displays). This code
-     * based on the example in the JavaDoc for GraphicsConfiguration.
-     * I was hoping it would let me account for the screen menu bar on Mac OS,
-     * but it doesn't. I think the problem is with the native Robot code.
-     */
-    private static Rectangle getVirtualDeviceBounds() {
-        Rectangle result = new Rectangle();
-        for (GraphicsDevice graphicsDevice : GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()) {
-            for (GraphicsConfiguration graphicsConfiguration : graphicsDevice.getConfigurations()) {
-                result = result.union(graphicsConfiguration.getBounds());
-            }
-        }
-        return result;
     }
     
     public static void main(String[] args) {
