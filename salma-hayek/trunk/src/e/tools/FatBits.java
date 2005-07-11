@@ -66,6 +66,22 @@ public class FatBits extends JFrame {
         }
     }
     
+    /**
+     * Returns the bounds of the virtual device (all displays). This code
+     * based on the example in the JavaDoc for GraphicsConfiguration.
+     * I was hoping it would let me account for the screen menu bar on Mac OS,
+     * but it doesn't. I think the problem is with the native Robot code.
+     */
+    private static Rectangle getVirtualDeviceBounds() {
+        Rectangle result = new Rectangle();
+        for (GraphicsDevice graphicsDevice : GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()) {
+            for (GraphicsConfiguration graphicsConfiguration : graphicsDevice.getConfigurations()) {
+                result = result.union(graphicsConfiguration.getBounds());
+            }
+        }
+        return result;
+    }
+    
     public static void main(String[] args) {
         new FatBits().setVisible(true);
     }
