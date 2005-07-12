@@ -4,7 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
+import java.util.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.*;
 import e.util.*;
 
@@ -44,25 +46,31 @@ public class FatBits extends JFrame {
     }
     
     private JComponent makeUi() {
-        // FIXME: the slider should use integer values [1..4] and the scale
-        // should be (1 << value). The labels should read "2x" et cetera.
-        final JSlider scaleSlider = new JSlider(2, 16);
+        // FIXME: NORTH should have a panel showing color information.
+        JPanel result = new JPanel(new BorderLayout());
+        result.add(new ScaledImagePanel(), BorderLayout.CENTER);
+        result.add(makeScaleSlider(), BorderLayout.SOUTH);
+        return result;
+    }
+    
+    private JSlider makeScaleSlider() {
+        final JSlider scaleSlider = new JSlider(1, 4);
         scaleSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                scaleFactor = scaleSlider.getValue();
+                scaleFactor = (1 << scaleSlider.getValue());
                 repaint();
             }
         });
+        Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
+        for (int i = scaleSlider.getMinimum(); i <= scaleSlider.getMaximum(); ++i) {
+            labels.put(i, new JLabel(Integer.toString(1 << i) + "x"));
+        }
+        scaleSlider.setLabelTable(labels);
+        scaleSlider.setPaintLabels(true);
         scaleSlider.setPaintTicks(true);
         scaleSlider.setSnapToTicks(true);
-        scaleSlider.setValue(2);
-        
-        // FIXME: NORTH should have a panel showing color information.
-        
-        JPanel result = new JPanel(new BorderLayout());
-        result.add(new ScaledImagePanel(), BorderLayout.CENTER);
-        result.add(scaleSlider, BorderLayout.SOUTH);
-        return result;
+        scaleSlider.setValue(1);
+        return scaleSlider;
     }
     
     private class ScaledImagePanel extends JComponent {
