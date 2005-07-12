@@ -239,7 +239,7 @@ public class TagsUpdater {
         
         public void taggingFailed(Exception ex) {
             ex.printStackTrace();
-            Edit.getInstance().getCurrentWorkspace().reportError("", "There was an error reading the tags (" + ex.getMessage() + ")");
+            Edit.getInstance().getCurrentWorkspace().reportError("", "Is Exuberant ctags installed and on your path? There was an error reading the tags: " + ex.getMessage());
         }
         
         public void scanTags() {
