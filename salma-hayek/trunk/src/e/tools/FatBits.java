@@ -18,7 +18,7 @@ import e.util.*;
 public class FatBits extends JFrame {
     private Robot robot;
     private Timer timer;
-    private Image image;
+    private ScaledImagePanel scaledImagePanel;
     private int scaleFactor;
     
     public FatBits() {
@@ -48,7 +48,7 @@ public class FatBits extends JFrame {
     private JComponent makeUi() {
         // FIXME: NORTH should have a panel showing color information.
         JPanel result = new JPanel(new BorderLayout());
-        result.add(new ScaledImagePanel(), BorderLayout.CENTER);
+        result.add(scaledImagePanel = new ScaledImagePanel(), BorderLayout.CENTER);
         result.add(makeScaleSlider(), BorderLayout.SOUTH);
         return result;
     }
@@ -74,6 +74,13 @@ public class FatBits extends JFrame {
     }
     
     private class ScaledImagePanel extends JComponent {
+        private Image image;
+        
+        public void setImage(Image image) {
+            this.image = image;
+            repaint();
+        }
+        
         public void paintComponent(Graphics g) {
             g.drawImage(image, 0, 0, null);
             paintGridLines(g);
@@ -106,21 +113,15 @@ public class FatBits extends JFrame {
             
             Rectangle screenCaptureBounds = getScreenCaptureBounds(center);
             BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
-            Image scaledImage = capturedImage.getScaledInstance(getWidth() * scaleFactor, getHeight() * scaleFactor, Image.SCALE_REPLICATE);
-            image = scaledImage;
-            repaint();
+            Image scaledImage = capturedImage.getScaledInstance(scaledImagePanel.getWidth(), scaledImagePanel.getHeight(), Image.SCALE_REPLICATE);
+            scaledImagePanel.setImage(scaledImage);
         }
         
         private Rectangle getScreenCaptureBounds(Point center) {
-            //
-            // FIXME: we need to take the scale factor into account in this
-            // method, both so that topLeft is right, and so we don't grab
-            // more than we need (given that we can grab again if the user
-            // decreases the scale factor).
-            //
-            
-            Point topLeft = new Point(center.x - getWidth() / 2, center.y - getHeight() / 2);
-            Rectangle result = new Rectangle(topLeft, getSize());
+            Point topLeft = new Point(center.x - scaledImagePanel.getWidth() / (2 * scaleFactor), center.y - scaledImagePanel.getHeight() / (2 * scaleFactor));
+            Rectangle result = new Rectangle(topLeft, scaledImagePanel.getSize());
+            result.width /= scaleFactor;
+            result.height /= scaleFactor;
             
             // Constrain the capture to the display.
             // Apple's 1.5 VM crashes if you don't.
