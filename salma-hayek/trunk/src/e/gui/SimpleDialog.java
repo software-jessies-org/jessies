@@ -17,19 +17,28 @@ public class SimpleDialog {
         if (message.length() < MAX_LINE_LENGTH) {
             return message;
         }
-        StringBuilder result = new StringBuilder(message);
+        
+        StringBuilder brokenMessage = new StringBuilder(message);
         int chunkLength = 0;
-        for (int i = 0; i < result.length(); ++i) {
-            if (result.charAt(i) == '\n') {
+        for (int i = 0; i < brokenMessage.length(); ++i) {
+            if (brokenMessage.charAt(i) == '\n') {
                 chunkLength = 0;
             } else {
                 chunkLength++;
-                if (chunkLength > MAX_LINE_LENGTH && result.charAt(i) == ' ') {
-                    result.insert(i + 1, '\n');
+                if (chunkLength > MAX_LINE_LENGTH && brokenMessage.charAt(i) == ' ') {
+                    brokenMessage.insert(i + 1, '\n');
                 }
             }
         }
-        return result.toString();
+        
+        String result = brokenMessage.toString();
+        if (message.startsWith("<html>")) {
+            // If we pass an HTML message to JOptionPane, it must not contain
+            // newlines. If it does, only the first line is treated as HTML.
+            // (Tested on Mac OS' Java 5.)
+            result = result.replaceAll("\n", "<br>");
+        }
+        return result;
     }
     
     public static void showAlert(Frame frame, String title, String message) {
