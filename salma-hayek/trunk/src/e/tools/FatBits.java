@@ -80,8 +80,16 @@ public class FatBits extends JFrame {
         }
         
         private void paintGridLines(Graphics g) {
+            if (scaleFactor < 4) {
+                return;
+            }
             g.setColor(Color.BLACK);
-            // FIXME: draw horizontal and vertical lines demarcating the pixels.
+            for (int x = scaleFactor; x < getWidth(); x += scaleFactor) {
+                g.drawLine(x, 0, x, getHeight());
+            }
+            for (int y = scaleFactor; y < getHeight(); y += scaleFactor) {
+                g.drawLine(0, y, getWidth(), y);
+            }
         }
     }
     
