@@ -42,6 +42,11 @@ public class NewFileAction extends ETextAction {
         Edit edit = Edit.getInstance();
         try {
             File newFile = FileUtilities.fileFromString(filename);
+            if (newFile.isAbsolute() == false) {
+                // A new file, if no absolute path is specified, should be
+                // created relative to the root of the current workspace.
+                newFile = FileUtilities.fileFromParentAndString(edit.getCurrentWorkspace().getCanonicalRootDirectory(), filename);
+            }
             File directory = newFile.getParentFile();
             if (directory.exists() == false) {
                 boolean createDirectory = edit.askQuestion("New File", "The directory '" + directory + "' doesn't exist. Edit can either create the directory for you, or you can go back and re-type the filename.", "Create");
