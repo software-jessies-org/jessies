@@ -30,7 +30,7 @@ public class FatBits extends JFrame {
             Log.warn("failed to create a Robot", ex);
         }
         timer = new Timer(50, new MouseTracker());
-        setSize(new Dimension(200, 200));
+        setSize(new Dimension(250, 300));
         setContentPane(makeUi());
         
         //
@@ -49,8 +49,27 @@ public class FatBits extends JFrame {
         // FIXME: NORTH should have a panel showing color information.
         JPanel result = new JPanel(new BorderLayout());
         result.add(scaledImagePanel = new ScaledImagePanel(), BorderLayout.CENTER);
-        result.add(makeScaleSlider(), BorderLayout.SOUTH);
+        result.add(makeControlPanel(), BorderLayout.SOUTH);
         return result;
+    }
+    
+    private JComponent makeControlPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(makeScaleSlider(), BorderLayout.CENTER);
+        panel.add(makeShowGridCheckBox(), BorderLayout.EAST);
+        panel.setBorder(new javax.swing.border.EmptyBorder(0, 12, 4, 12));
+        return panel;
+    }
+    
+    private JCheckBox makeShowGridCheckBox() {
+        final JCheckBox checkBox = new JCheckBox("Show Grid");
+        checkBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                scaledImagePanel.setShowGrid(checkBox.isSelected());
+            }
+        });
+        checkBox.setSelected(false);
+        return checkBox;
     }
     
     private JSlider makeScaleSlider() {
@@ -75,9 +94,15 @@ public class FatBits extends JFrame {
     
     private class ScaledImagePanel extends JComponent {
         private Image image;
+        private boolean showGrid;
         
         public void setImage(Image image) {
             this.image = image;
+            repaint();
+        }
+        
+        public void setShowGrid(boolean showGrid) {
+            this.showGrid = showGrid;
             repaint();
         }
         
@@ -87,7 +112,7 @@ public class FatBits extends JFrame {
         }
         
         private void paintGridLines(Graphics g) {
-            if (scaleFactor < 4) {
+            if (showGrid == false) {
                 return;
             }
             g.setColor(Color.BLACK);
