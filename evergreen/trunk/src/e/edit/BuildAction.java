@@ -48,7 +48,7 @@ public class BuildAction extends ETextAction {
         
         String makefileName = findMakefile(context);
         if (makefileName == null) {
-            Edit.getInstance().showAlert(ACTION_NAME, "It's not possible to build this project because neither a Makefile for make or a build.xml for Ant could be found.");
+            Edit.getInstance().showAlert(ACTION_NAME, "It's not possible to build this project because neither a Makefile for make(1) nor a build.xml for Ant could be found.");
         } else if (makefileName.endsWith("build.xml")) {
             invokeBuildTool(workspace, makefileName, "ant -emacs -quiet");
         } else if (makefileName.endsWith("Makefile")) {
