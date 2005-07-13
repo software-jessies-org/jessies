@@ -11,6 +11,7 @@ public final class EditServer extends InAppServer {
     
     public EditServer(Edit edit) {
         super("Edit", edit.getPreferenceFilename("edit-server-port"));
+        this.edit = edit;
     }
     
     public boolean handleCommand(String line, PrintWriter out) {
@@ -57,6 +58,7 @@ public final class EditServer extends InAppServer {
                 out.println("File '" + filename + "' opened OK.");
             } catch (Exception ex) {
                 out.println(ex.getMessage());
+                ex.printStackTrace(out);
             }
         }
     }
