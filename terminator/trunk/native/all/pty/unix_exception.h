@@ -3,6 +3,7 @@
 
 #include "errnoToString.h"
 
+#include <errno.h>
 #include <stdexcept>
 
 class unix_exception : public std::runtime_error {
