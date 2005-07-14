@@ -129,6 +129,10 @@ public class FatBits extends JFrame {
         private Point lastPosition = null;
 
         public void actionPerformed(ActionEvent e) {
+            if (scaledImagePanel.isShowing() == false) {
+                return;
+            }
+            
             PointerInfo pointerInfo = MouseInfo.getPointerInfo();
             Point center = pointerInfo.getLocation();
             if (lastPosition != null && lastPosition.equals(center)) {
