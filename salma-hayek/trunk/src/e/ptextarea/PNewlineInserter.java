@@ -14,19 +14,36 @@ public class PNewlineInserter {
         return textArea.getLineText(textArea.getLineOfOffset(offset));
     }
     
+    // PSimpleIndenter has such a method but it's not exposed in the base class.
+    private boolean isBlockBegin(CharSequence lineToTheLeft) {
+        if (lineToTheLeft.length() == 0) {
+            return false;
+        }
+        char lastChar = lineToTheLeft.charAt(lineToTheLeft.length() - 1);
+        if (PBracketUtilities.isOpenBracket(lastChar) == false) {
+            return false;
+        }
+        char closeBracket = PBracketUtilities.getPartnerForBracket(lastChar);
+        if (textArea.getIndenter().isElectric(closeBracket) == false) {
+            return false;
+        }
+        return true;
+    }
+    
     public void insertNewline() {
         textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
         try {
             final int startPosition = textArea.getSelectionStart();
             CharSequence chars = textArea.getTextBuffer();
             
-            if (PBracketUtilities.afterOpenBracket(chars, startPosition) && insertMatchingBrackets()) {
-                return;
-            }
-            
             int startLineIndex = textArea.getLineOfOffset(startPosition);
             int startLineStartOffset = textArea.getLineStartOffset(startLineIndex);
             CharSequence lineToTheLeft = chars.subSequence(startLineStartOffset, startPosition);
+            
+            if (isBlockBegin(lineToTheLeft) && insertMatchingBrackets()) {
+                return;
+            }
+            
             if (Pattern.matches("[ \t]*/\\*{1,2}", lineToTheLeft)) {
                 insertMatchingCloseComment();
             } else {
@@ -78,6 +95,7 @@ public class PNewlineInserter {
         String candidateBlockContents = textArea.getTextBuffer().subSequence(end, suffixPosition).toString();
         String commonEnding = getCommonEnding(candidateBlockContents, closingBrackets);
         String whitespace = getIndentationOfLineAtOffset(start);
+        // TODO: The newline inserter has no business thinking it knows how to increase the indent.
         String prefix = "\n" + whitespace + textArea.getIndentationString();
         String suffix = "\n" + whitespace + closingBrackets;
         final int newCaretPosition = start + prefix.length();
