@@ -144,7 +144,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         try {
             return openFileNonInteractively(filename);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.warn("Problem opening file \"" + filename + "\"", ex);
             showAlert("Open", ex.getMessage());
             return null;
         }

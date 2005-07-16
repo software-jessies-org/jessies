@@ -61,7 +61,7 @@ public class JavaDoc {
                     urls.add(classpath.toURL());
                     findPackagesIn(classpath);
                 } catch (MalformedURLException ex) {
-                    ex.printStackTrace();
+                    Log.warn("Bad URL on java.advisor.classpath (" + classpath + ")", ex);
                 }
             }
         }
@@ -142,7 +142,7 @@ public class JavaDoc {
                 }
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Log.warn("Problem scanning " + jarFile, ex);
         }
         System.err.println("Finished scanning " + jarFile);
     }

@@ -45,8 +45,6 @@ public class OpenQuicklyDialog {
             setStatus(true, fileList.size() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.");
         } catch (PatternSyntaxException ex) {
             setStatus(false, ex.getDescription());
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
         matchList.setModel(model);
         

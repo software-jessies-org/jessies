@@ -9,6 +9,7 @@ import javax.swing.Timer;
 import javax.swing.tree.*;
 import e.gui.*;
 import e.ptextarea.*;
+import e.util.*;
 
 public class TagsUpdater {
     private ETree tree;
@@ -238,8 +239,8 @@ public class TagsUpdater {
         }
         
         public void taggingFailed(Exception ex) {
-            ex.printStackTrace();
             Edit.getInstance().getCurrentWorkspace().reportError("", "Is Exuberant ctags installed and on your path? There was an error reading the tags: " + ex.getMessage());
+            Log.warn("Tag parsing failed", ex);
         }
         
         public void scanTags() {
@@ -263,7 +264,7 @@ public class TagsUpdater {
                 temporaryFile.delete();
             } catch (Exception ex) {
                 Edit.getInstance().getCurrentWorkspace().reportError("Tags", "Couldn't make tags.");
-                ex.printStackTrace();
+                Log.warn("Tag creation failed", ex);
             }
         }
         

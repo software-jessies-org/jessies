@@ -147,7 +147,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
             pattern = Pattern.compile(regularExpression);
         } catch (PatternSyntaxException patternSyntaxException) {
             Edit.getInstance().showStatus(patternSyntaxException.getDescription());
-            patternSyntaxException.printStackTrace();
             return;
         }
         

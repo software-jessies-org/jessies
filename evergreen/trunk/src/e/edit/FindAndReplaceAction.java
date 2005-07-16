@@ -315,8 +315,6 @@ public class FindAndReplaceAction extends ETextAction {
                 patternSyntaxError = ex;
             } catch (IndexOutOfBoundsException ex) {
                 replacementSyntaxError = ex;
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
             return matchModel;
         }
