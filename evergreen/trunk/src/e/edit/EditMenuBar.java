@@ -78,7 +78,8 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
 
         menu.add(new JSeparator());
         menu.add(new CorrectIndentationAction());
-
+        menu.add(new InsertInterfaceAction());
+        
         menu.add(new JSeparator());
         menu.add(new ShowMisspellingsAction());
         menu.add(new CompareSelectionAndClipboardAction());
