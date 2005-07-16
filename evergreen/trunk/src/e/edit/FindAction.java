@@ -159,6 +159,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
             textArea.addHighlight(new PFind.MatchHighlight(textArea, matcher.start(), matcher.end()));
             matchCount++;
         }
-        Edit.getInstance().showStatus("Found " + matchCount + " " + (matchCount != 1 ? "matches" : "match"));
+        Edit.getInstance().showStatus("Found " + matchCount + " " + (matchCount != 1 ? "matches" : "match") + " for \"" + regularExpression + "\"");
     }
 }
