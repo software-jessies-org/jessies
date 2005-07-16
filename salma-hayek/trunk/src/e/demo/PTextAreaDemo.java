@@ -1,15 +1,17 @@
-package e.ptextarea;
+package e.demo;
 
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 
-public class PTextWindow {
-    private PTextWindow() { }
+import e.ptextarea.*;
+
+public class PTextAreaDemo {
+    private PTextAreaDemo() { }
     
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Syntax: PTextWindow <filename>");
+            System.err.println("Syntax: PTextAreaDemo <filename>");
             System.exit(1);
         }
         final File file = new File(args[0]);
