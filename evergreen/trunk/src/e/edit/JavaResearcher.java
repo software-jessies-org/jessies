@@ -12,7 +12,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     private static final String COMMA = ",&nbsp;";
     
     /** A regular expression matching 'new' expressions. */
-    public static final Pattern NEW_PATTERN = Pattern.compile("(?x) .* \\b new \\s+ (\\S+) \\s* \\($");
+    private static final Pattern NEW_PATTERN = Pattern.compile("(?x) .* \\b new \\s+ (\\S+) \\s* \\($");
     
     private static String[] javaDocSummary;
     private static TreeSet<String> uniqueIdentifiers;
