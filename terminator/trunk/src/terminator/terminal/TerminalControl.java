@@ -114,7 +114,7 @@ public class TerminalControl implements Runnable {
 				}
 				stepModeReader.readLine();
 			} catch (IOException ex) {
-				ex.printStackTrace();
+				Log.warn("Problem waiting for stepping input", ex);
 			}
 		}
 	}
@@ -127,31 +127,35 @@ public class TerminalControl implements Runnable {
 				processBuffer(buffer, readCount);
 			}
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			Log.warn("Problem reading process output", ex);
 		} finally {
-			processIsRunning = false;
-			try {
-				ptyProcess.waitFor();
-				if (ptyProcess.didExitNormally()) {
-					int status = ptyProcess.getExitStatus();
-					if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
-						announceConnectionLost("\n\r[Process exited with status " + status + ".]");
-						return;
-					}
-				} else if (ptyProcess.wasSignaled()) {
-					int signal = ptyProcess.getTerminatingSignal();
-					announceConnectionLost("\n\r[Process killed by signal " + signal + ".]");
+			handleProcessTermination();
+		}
+	}
+	
+	private void handleProcessTermination() {
+		processIsRunning = false;
+		try {
+			ptyProcess.waitFor();
+			if (ptyProcess.didExitNormally()) {
+				int status = ptyProcess.getExitStatus();
+				if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
+					announceConnectionLost("\n\r[Process exited with status " + status + ".]");
 					return;
-				} else {
-					// If it wasn't a pane close that caused us to get here, close
-					// the pane.
-					if (processIsBeingDestroyed == false) {
-						pane.doCloseAction();
-					}
 				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
+			} else if (ptyProcess.wasSignaled()) {
+				int signal = ptyProcess.getTerminatingSignal();
+				announceConnectionLost("\n\r[Process killed by signal " + signal + ".]");
+				return;
+			} else {
+				// If it wasn't a pane close that caused us to get here, close
+				// the pane.
+				if (processIsBeingDestroyed == false) {
+					pane.doCloseAction();
+				}
 			}
+		} catch (Exception ex) {
+			Log.warn("Problem handling process termination", ex);
 		}
 	}
 	
@@ -161,7 +165,7 @@ public class TerminalControl implements Runnable {
 			processBuffer(bytes, bytes.length);
 			pane.getTextPane().setCursorVisible(false);
 		} catch (Exception ex) {
-			Log.warn("Couldn't say '" + message + "'.", ex);
+			Log.warn("Couldn't say '" + message + "'", ex);
 		}
 	}
 	
@@ -205,7 +209,7 @@ public class TerminalControl implements Runnable {
 				}
 			});
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Log.warn("Couldn't flush terminal actions", ex);
 		}
 	}
 	
@@ -232,7 +236,7 @@ public class TerminalControl implements Runnable {
 			flushLineBuffer();
 			// If the old escape sequence is interrupted; we start a new one.
 			if (escapeParser != null) {
-				Log.warn("Escape parser discarded with string \"" + escapeParser + "\".");
+				Log.warn("Escape parser discarded with string \"" + escapeParser + "\"");
 			}
 			escapeParser = new EscapeParser();
 			return;
@@ -339,7 +343,7 @@ public class TerminalControl implements Runnable {
 		String sequence = escapeParser.toString();
 		
 		if (DEBUG) {
-			Log.warn("Processing escape sequence \"" + sequence + "\"");
+			Log.warn("Processing escape sequence \"" + StringUtilities.escapeForJava(sequence) + "\"");
 		}
 		
 		// Invoke all escape sequence handling in the AWT dispatch thread - otherwise we'd have
@@ -448,15 +452,15 @@ public class TerminalControl implements Runnable {
 		return (ch == '#') ? '\u00a3' : ch;
 	}
 	
-	public void sendEscapeString(String str) {
+	public void sendEscapeString(String s) {
 		try {
 			if (processIsRunning) {
 				out.write((byte) Ascii.ESC);
-				out.write(str.getBytes());
+				out.write(s.getBytes());
 				out.flush();
 			}
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			reportFailedSend("escape sequence", s, ex);
 		}
 	}
 	
@@ -467,7 +471,7 @@ public class TerminalControl implements Runnable {
 				out.flush();
 			}
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			reportFailedSend("char", Character.toString(ch), ex);
 		}
 	}
 	
@@ -478,7 +482,7 @@ public class TerminalControl implements Runnable {
 				out.flush();
 			}
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			reportFailedSend("string", s, ex);
 		}
 	}
 	
@@ -491,8 +495,12 @@ public class TerminalControl implements Runnable {
 				out.flush();
 			}
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			reportFailedSend("line", line, ex);
 		}
+	}
+	
+	private void reportFailedSend(String kind, String value, Exception ex) {
+		Log.warn("Couldn't send " + kind + " \"" + StringUtilities.escapeForJava(value) + "\"", ex);
 	}
 	
 	public LogWriter getLogWriter() {

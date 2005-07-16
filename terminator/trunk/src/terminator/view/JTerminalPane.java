@@ -50,12 +50,7 @@ public class JTerminalPane extends JPanel {
 	public JTerminalPane(String name, String command) {
 		super(new BorderLayout());
 		this.name = name;
-		
-		try {
-			init(command);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
+		init(command);
 	}
 	
 	/**
@@ -106,12 +101,12 @@ public class JTerminalPane extends JPanel {
 				}
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Log.warn("Couldn't get user's shell from \"/etc/passwd\"", ex);
 		}
 		return "bash";
 	}
 
-	private void init(String command) throws IOException {
+	private void init(String command) {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		
@@ -137,7 +132,7 @@ public class JTerminalPane extends JPanel {
 			textPane.setTerminalControl(control);
 			initSizeMonitoring();
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			Log.warn("Couldn't initialize terminal", ex);
 		}
 	}
 	
@@ -165,7 +160,7 @@ public class JTerminalPane extends JPanel {
 						control.sizeChanged(size, textPane.getVisibleSize());
 						getTerminatorFrame().setTerminalSize(size);
 					} catch (IOException ex) {
-						Log.warn("Failed to notify pty of size change.", ex);
+						Log.warn("Failed to notify process of size change", ex);
 					}
 					currentSizeInChars = size;
 				}
@@ -490,7 +485,7 @@ public class JTerminalPane extends JPanel {
 			Transferable transferable = selection.getContents(null);
 			result = (String) transferable.getTransferData(DataFlavor.stringFlavor);
 		} catch (Exception ex) {
-			Log.warn("Couldn't get system selection.", ex);
+			Log.warn("Couldn't get system selection", ex);
 		}
 		return result;
 	}
