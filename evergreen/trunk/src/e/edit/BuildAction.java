@@ -40,8 +40,7 @@ public class BuildAction extends ETextAction {
             try {
                 context = workspace.getCanonicalRootDirectory();
             } catch (IOException ex) {
-                Edit.getInstance().showAlert(ACTION_NAME, "It's not possible to build this project because the workspace root could not be found.");
-                ex.printStackTrace();
+                Edit.getInstance().showAlert(ACTION_NAME, "It's not possible to build this project because the workspace root could not be found (" + ex.getMessage() + ").");
                 return;
             }
         }
@@ -87,7 +86,7 @@ public class BuildAction extends ETextAction {
             shellCommand.runCommand();
         } catch (IOException ex) {
             Edit.getInstance().showAlert(ACTION_NAME, "Can't start task (" + ex.getMessage() + ").");
-            ex.printStackTrace();
+            Log.warn("Couldn't start \"" + command + "\"", ex);
         }
     }
     

@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.io.*;
 
 public class StreamMonitor extends Thread {
@@ -20,7 +21,7 @@ public class StreamMonitor extends Thread {
                 task.getWorkspace().reportError(context, line);
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Log.warn("Unexpected stream closure", ex);
         } finally {
             task.streamClosed();
         }

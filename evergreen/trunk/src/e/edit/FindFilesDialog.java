@@ -200,7 +200,7 @@ public class FindFilesDialog {
             } catch (PatternSyntaxException ex) {
                 setStatus(ex.getDescription(), true);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                Log.warn("Problem searching files for ", ex);
             }
             return matchRoot;
         }

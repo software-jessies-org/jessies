@@ -674,7 +674,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         } catch (Exception ex) {
             edit.showStatus("");
             edit.showAlert("Save", "Couldn't save file '" + filename + "' (" + ex.getMessage() + ").");
-            ex.printStackTrace();
+            Log.warn("Problem saving \"" + filename + "\"", ex);
         }
         return false;
     }
@@ -693,7 +693,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             return true;
         } catch (Exception ex) {
             Edit.getInstance().showAlert("Save As", "Couldn't save file '" + newFilename + "' (" + ex.getMessage() + ").");
-            ex.printStackTrace();
+            Log.warn("Problem saving as \"" + newFilename + "\"", ex);
         }
         return false;
     }

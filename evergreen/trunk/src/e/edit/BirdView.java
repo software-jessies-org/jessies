@@ -39,7 +39,7 @@ public class BirdView extends JComponent {
             method = BasicScrollBarUI.class.getDeclaredMethod("getTrackBounds", new Class[] {});
             method.setAccessible(true);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.warn("Couldn't get access to getTrackBounds", ex);
         }
         initCaretListener();
         initMouseListener();
@@ -106,7 +106,7 @@ public class BirdView extends JComponent {
     public Rectangle getUsableArea() {
         Rectangle usableArea = new Rectangle(0, 0, getWidth() - 1, getHeight() - 1);
         ScrollBarUI scrollUi = scrollBar.getUI();
-        if (scrollUi instanceof BasicScrollBarUI) {
+        if (method != null && scrollUi instanceof BasicScrollBarUI) {
             BasicScrollBarUI basicUi = (BasicScrollBarUI) scrollUi;
             try {
                 Rectangle trackArea = (Rectangle) method.invoke(basicUi, new Object[0]);
@@ -114,7 +114,8 @@ public class BirdView extends JComponent {
                 usableArea.y = trackArea.y + pane.getInsets().top;
                 usableArea.height = trackArea.height;
             } catch (Exception ex) {
-                ex.printStackTrace();
+                Log.warn("Couldn't invoke getTrackBounds; won't try again", ex);
+                method = null;
             }
         } else if (GuiUtilities.isMacOs()) {
             // These values were measured using Pixie. I don't know how to get them at run-time.

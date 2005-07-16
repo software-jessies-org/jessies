@@ -64,8 +64,7 @@ public class NewFileAction extends ETextAction {
             }
             edit.openFile(filename);
             return true;
-        } catch (IOException ex ) {
-            ex.printStackTrace();
+        } catch (IOException ex) {
             edit.showAlert(ACTION_NAME, "Failed to create file '" + filename + "' (" + ex.getMessage() + ").");
             return false;
         }
