@@ -132,9 +132,16 @@ public class TerminalControl implements Runnable {
 			processIsRunning = false;
 			try {
 				ptyProcess.waitFor();
-				int status = ptyProcess.getExitStatus();
-				if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
-					announceConnectionLost("\n\r[Process exited with status " + status + ".]");
+				if (ptyProcess.didExitNormally()) {
+					int status = ptyProcess.getExitStatus();
+					if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
+						announceConnectionLost("\n\r[Process exited with status " + status + ".]");
+						return;
+					}
+				} else if (ptyProcess.wasSignaled()) {
+					int signal = ptyProcess.getTerminatingSignal();
+					announceConnectionLost("\n\r[Process killed by signal " + signal + ".]");
+					return;
 				} else {
 					// If it wasn't a pane close that caused us to get here, close
 					// the pane.
