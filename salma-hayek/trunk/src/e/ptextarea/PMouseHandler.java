@@ -121,16 +121,20 @@ public class PMouseHandler implements MouseInputListener {
             }
             
             // 2. then other bracket characters.
-            CharSequence sameStyleCharSequence = PSameStyleCharSequence.forOffset(textArea, pressedOffset);
-            int bracketOffset = PBracketUtilities.findMatchingBracket(sameStyleCharSequence, pressedOffset);
-            if (bracketOffset != -1) {
-                if (pressedOffset <= bracketOffset) {
-                    textArea.setSelection(pressedOffset, bracketOffset, false);
-                } else {
-                    // Selecting the region inside the brackets means starting one beyond the bracket.
-                    textArea.setSelection(bracketOffset + 1, pressedOffset, false);
+            // Constructing a same-style char sequence is hideously expensive, so we first
+            // check whether we're next to a bracket at all.
+            if (PBracketUtilities.isNextToBracket(textArea.getTextBuffer(), pressedOffset)) {
+                CharSequence sameStyleCharSequence = PSameStyleCharSequence.forOffset(textArea, pressedOffset);
+                int bracketOffset = PBracketUtilities.findMatchingBracket(sameStyleCharSequence, pressedOffset);
+                if (bracketOffset != -1) {
+                    if (pressedOffset <= bracketOffset) {
+                        textArea.setSelection(pressedOffset, bracketOffset, false);
+                    } else {
+                        // Selecting the region inside the brackets means starting one beyond the bracket.
+                        textArea.setSelection(bracketOffset + 1, pressedOffset, false);
+                    }
+                    return;
                 }
-                return;
             }
             
             // 3. we'll have dealt with braces at the ends of lines by now, so

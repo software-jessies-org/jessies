@@ -126,6 +126,8 @@ public class PSameStyleCharSequence {
     public static class MangledCharSequence implements CharSequence {
         private StringBuilder mangledText;
         
+        // This constructor is *hideously* expensive.  We need to replace this
+        // with something a bit more cycle-friendly.
         public MangledCharSequence(PTextArea textArea) {
             this.mangledText = new StringBuilder(textArea.getTextBuffer());
             Iterator<PLineSegment> it = textArea.getLogicalSegmentIterator(0);

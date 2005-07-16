@@ -376,7 +376,10 @@ public class PTextBuffer implements CharSequence {
         if (afterCaret == null) {
             throw new IllegalArgumentException("afterCaret must not be null");
         }
-        CharSequence removeChars = copyChars(position, removeCount);
+        CharSequence removeChars = (removeCount == 0) ? null : copyChars(position, removeCount);
+        if (add != null && add.length() == 0) {
+            add = null;
+        }
         undoBuffer.addAndDo(beforeCaret, position, removeChars, add, afterCaret);
     }
     

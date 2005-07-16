@@ -37,13 +37,21 @@ public class PBracketUtilities {
      * closing bracket.
      */
     public static int findMatchingBracket(CharSequence chars, int offset) {
-        if (offset < chars.length() && isCloseBracket(chars.charAt(offset))) {
+        if (beforeCloseBracket(chars, offset)) {
             return findMatchingBracket(chars, offset, false);
         }
-        if (offset > 0 && isOpenBracket(chars.charAt(offset - 1))) {
+        if (afterOpenBracket(chars, offset)) {
             return findMatchingBracket(chars, offset - 1, true);
         }
         return -1;
+    }
+    
+    /**
+     * Returns true when the given offset is either just to the right of an open
+     * bracket, or just to the left of a close bracket.
+     */
+    public static boolean isNextToBracket(CharSequence chars, int offset) {
+        return (beforeCloseBracket(chars, offset) || afterOpenBracket(chars, offset));
     }
     
     /**

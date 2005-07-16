@@ -28,7 +28,7 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         // The same-style char sequence is expensive, but there's a cheap way
         // to exclude most cases where we don't need it:
         CharSequence chars = textArea.getTextBuffer();
-        if (PBracketUtilities.beforeCloseBracket(chars, offset) == false && PBracketUtilities.afterOpenBracket(chars, offset) == false) {
+        if (PBracketUtilities.isNextToBracket(chars, offset) == false) {
             return;
         }
         // Now we'll pay:
