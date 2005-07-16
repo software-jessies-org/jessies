@@ -24,8 +24,8 @@ public class AddWorkspaceAction extends AbstractAction {
         filenameChooserField.setCompanionNameField(nameField);
         
         FormPanel formPanel = new FormPanel();
-        formPanel.addRow("Name:", nameField);
         formPanel.addRow("Root Directory:", filenameChooserField);
+        formPanel.addRow("Name:", nameField);
         
         boolean finished = false;
         while (finished == false) {
