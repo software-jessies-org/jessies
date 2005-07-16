@@ -102,8 +102,14 @@ void terminator_terminal_PtyProcess::waitFor() {
         throw unix_exception("waitpid(" + toString(pid) + ", &status, 0) failed");
     }
     
-    exitValue = WEXITSTATUS(status);
-    hasTerminated = true;
+    if (WIFEXITED(status)) {
+        exitValue = WEXITSTATUS(status);
+        didExitNormally = true;
+    }
+    if (WIFSIGNALED(status)) {
+        exitValue = WTERMSIG(status);
+        wasSignaled = true;
+    }
 }
 
 #endif

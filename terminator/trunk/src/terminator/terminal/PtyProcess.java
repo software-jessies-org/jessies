@@ -1,13 +1,17 @@
 package terminator.terminal;
 
+import e.util.*;
 import java.awt.*;
 import java.io.*;
 
 public class PtyProcess {
     private int fd;
     private int processId;
-    private boolean hasTerminated;
+    
+    private boolean didExitNormally = false;
+    private boolean wasSignaled = false;
     private int exitValue;
+    
     private FileInputStream inStream;
     private FileOutputStream outStream;
     
@@ -18,15 +22,32 @@ public class PtyProcess {
             try {
                 System.loadLibrary("pty");
                 libraryLoaded = true;
-            } catch (UnsatisfiedLinkError error) {
-                System.err.println("Serious error: cannot load pty JNI library.");
-                error.printStackTrace();
+            } catch (UnsatisfiedLinkError ex) {
+                Log.warn("Cannot load JNI library", ex);
                 throw new IOException("Unable to launch pty processes");
             }
         }
     }
     
+    public boolean wasSignaled() {
+        return wasSignaled;
+    }
+    
+    public boolean didExitNormally() {
+        return didExitNormally;
+    }
+    
     public int getExitStatus() {
+        if (didExitNormally() == false) {
+            throw new IllegalStateException("Process did not exit normally.");
+        }
+        return exitValue;
+    }
+    
+    public int getTerminatingSignal() {
+        if (wasSignaled() == false) {
+            throw new IllegalStateException("Process was not signaled.");
+        }
         return exitValue;
     }
     
