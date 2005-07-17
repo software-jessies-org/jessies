@@ -81,16 +81,21 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             }
             
             private void rewrap() {
-                if (getWidth() != lastWidth) {
-                    if (isShowing()) {
-                        runWithoutMovingTheVisibleArea(new Runnable() {
-                            public void run() {
-                                revalidateLineWrappings();
-                            }
-                        });
+                getLock().getReadLock();
+                try {
+                    if (getWidth() != lastWidth) {
+                        if (isShowing()) {
+                            runWithoutMovingTheVisibleArea(new Runnable() {
+                                public void run() {
+                                    revalidateLineWrappings();
+                                }
+                            });
+                        }
+                        lastWidth = getWidth();
+                        repaint();
                     }
-                    lastWidth = getWidth();
-                    repaint();
+                } finally {
+                    getLock().relinquishReadLock();
                 }
             }
         });
@@ -100,6 +105,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         initFocusListening();
         initKeyBindings();
         addCaretListener(new PMatchingBracketHighlighter(this));
+    }
+    
+    /**
+     * Returns the lock object for this component's underlying buffer.  This should only be used within this package.
+     */
+    PLock getLock() {
+        return getTextBuffer().getLock();
     }
     
     private void runWithoutMovingTheVisibleArea(Runnable runnable) {
@@ -159,12 +171,17 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     // Selection methods.
     public String getSelectedText() {
-        int start = selection.getStartIndex();
-        int end = selection.getEndIndex();
-        if (start == end) {
-            return "";
-        } else {
-            return getTextBuffer().subSequence(start, end).toString();
+        getLock().getReadLock();
+        try {
+            int start = selection.getStartIndex();
+            int end = selection.getEndIndex();
+            if (start == end) {
+                return "";
+            } else {
+                return getTextBuffer().subSequence(start, end).toString();
+            }
+        } finally {
+            getLock().relinquishReadLock();
         }
     }
     
@@ -197,32 +214,42 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void setSelection(int start, int end, boolean selectionEndIsAnchor) {
-        setSelectionWithoutScrolling(start, end, selectionEndIsAnchor);
-        ensureVisibilityOfOffset(getUnanchoredSelectionExtreme());
+        getLock().getWriteLock();
+        try {
+            setSelectionWithoutScrolling(start, end, selectionEndIsAnchor);
+            ensureVisibilityOfOffset(getUnanchoredSelectionExtreme());
+        } finally {
+            getLock().relinquishWriteLock();
+        }
     }
     
     public void setSelectionWithoutScrolling(int start, int end, boolean selectionEndIsAnchor) {
-        this.selectionEndIsAnchor = selectionEndIsAnchor;
-        SelectionHighlight oldSelection = selection;
-        repaintCaret();
-        selection = new SelectionHighlight(this, start, end);
-        repaintCaret();
-        oldSelection.detachAnchors();
-        if (oldSelection.isEmpty() != selection.isEmpty()) {
-            repaintHighlight(selection.isEmpty() ? oldSelection : selection);
-        } else if (oldSelection.isEmpty() == false && selection.isEmpty() == false) {
-            int minStart = Math.min(oldSelection.getStartIndex(), selection.getStartIndex());
-            int maxStart = Math.max(oldSelection.getStartIndex(), selection.getStartIndex());
-            if (minStart != maxStart) {
-                repaintLines(getCoordinates(minStart).getLineIndex(), getCoordinates(maxStart).getLineIndex() + 1);
+        getLock().getWriteLock();
+        try {
+            this.selectionEndIsAnchor = selectionEndIsAnchor;
+            SelectionHighlight oldSelection = selection;
+            repaintCaret();
+            selection = new SelectionHighlight(this, start, end);
+            repaintCaret();
+            oldSelection.detachAnchors();
+            if (oldSelection.isEmpty() != selection.isEmpty()) {
+                repaintHighlight(selection.isEmpty() ? oldSelection : selection);
+            } else if (oldSelection.isEmpty() == false && selection.isEmpty() == false) {
+                int minStart = Math.min(oldSelection.getStartIndex(), selection.getStartIndex());
+                int maxStart = Math.max(oldSelection.getStartIndex(), selection.getStartIndex());
+                if (minStart != maxStart) {
+                    repaintLines(getCoordinates(minStart).getLineIndex(), getCoordinates(maxStart).getLineIndex() + 1);
+                }
+                int minEnd = Math.min(oldSelection.getEndIndex(), selection.getEndIndex());
+                int maxEnd = Math.max(oldSelection.getEndIndex(), selection.getEndIndex());
+                if (minEnd != maxEnd) {
+                    repaintLines(getCoordinates(minEnd).getLineIndex() - 1, getCoordinates(maxEnd).getLineIndex());
+                }
             }
-            int minEnd = Math.min(oldSelection.getEndIndex(), selection.getEndIndex());
-            int maxEnd = Math.max(oldSelection.getEndIndex(), selection.getEndIndex());
-            if (minEnd != maxEnd) {
-                repaintLines(getCoordinates(minEnd).getLineIndex() - 1, getCoordinates(maxEnd).getLineIndex());
-            }
+            fireCaretChangedEvent();
+        } finally {
+            getLock().relinquishWriteLock();
         }
-        fireCaretChangedEvent();
     }
     
     public void centerOffsetInDisplay(int offset) {
@@ -282,9 +309,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * Returns the text of the given line (without the newline).
      */
     public String getLineText(int lineNumber) {
-        int start = getLineStartOffset(lineNumber);
-        int end = getLineEndOffsetBeforeTerminator(lineNumber);
-        return (start == end) ? "" : getTextBuffer().subSequence(start, end).toString();
+        getLock().getReadLock();
+        try {
+            int start = getLineStartOffset(lineNumber);
+            int end = getLineEndOffsetBeforeTerminator(lineNumber);
+            return (start == end) ? "" : getTextBuffer().subSequence(start, end).toString();
+        } finally {
+            getLock().relinquishReadLock();
+        }
     }
     
     /**
@@ -299,27 +331,47 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void insert(CharSequence chars) {
-        SelectionSetter endCaret = new SelectionSetter(getSelectionStart() + chars.length());
-        int length = getSelectionEnd() - getSelectionStart();
-        getTextBuffer().replace(new SelectionSetter(), getSelectionStart(), length, chars, endCaret);
+        getLock().getWriteLock();
+        try {
+            SelectionSetter endCaret = new SelectionSetter(getSelectionStart() + chars.length());
+            int length = getSelectionEnd() - getSelectionStart();
+            getTextBuffer().replace(new SelectionSetter(), getSelectionStart(), length, chars, endCaret);
+        } finally {
+            getLock().relinquishWriteLock();
+        }
     }
     
     public void replaceRange(CharSequence replacement, int start, int end) {
-        SelectionSetter endCaret = new SelectionSetter(start + replacement.length());
-        getTextBuffer().replace(new SelectionSetter(), start, end - start, replacement, endCaret);
+        getLock().getWriteLock();
+        try {
+            SelectionSetter endCaret = new SelectionSetter(start + replacement.length());
+            getTextBuffer().replace(new SelectionSetter(), start, end - start, replacement, endCaret);
+        } finally {
+            getLock().relinquishWriteLock();
+        }
     }
     
     public void replaceSelection(CharSequence replacement) {
-        if (hasSelection()) {
-            replaceRange(replacement, getSelectionStart(), getSelectionEnd());
-        } else {
-            insert(replacement);
+        getLock().getWriteLock();
+        try {
+            if (hasSelection()) {
+                replaceRange(replacement, getSelectionStart(), getSelectionEnd());
+            } else {
+                insert(replacement);
+            }
+        } finally {
+            getLock().relinquishWriteLock();
         }
     }
     
     public void delete(int startFrom, int charCount) {
-        SelectionSetter endCaret = new SelectionSetter(startFrom);
-        getTextBuffer().replace(new SelectionSetter(), startFrom, charCount, "", endCaret);
+        getLock().getWriteLock();
+        try {
+            SelectionSetter endCaret = new SelectionSetter(startFrom);
+            getTextBuffer().replace(new SelectionSetter(), startFrom, charCount, "", endCaret);
+        } finally {
+            getLock().relinquishWriteLock();
+        }
     }
     
     private class SelectionSetter implements PTextBuffer.SelectionSetter {
@@ -353,7 +405,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void selectAll() {
-        select(0, getTextBuffer().length());
+        getLock().getReadLock();
+        try {
+            select(0, getTextBuffer().length());
+        } finally {
+            getLock().relinquishReadLock();
+        }
     }
     
     /**
@@ -397,11 +454,21 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * including the line terminator.
      */
     public CharSequence getLineContents(int line) {
-        return lines.getLine(line).getContents();
+        getLock().getReadLock();
+        try {
+            return lines.getLine(line).getContents();
+        } finally {
+            getLock().relinquishReadLock();
+        }
     }
     
     public int getLineStartOffset(int line) {
-        return lines.getLine(line).getStart();
+        getLock().getReadLock();
+        try {
+            return lines.getLine(line).getStart();
+        } finally {
+            getLock().relinquishReadLock();
+        }
     }
     
     /**
@@ -410,11 +477,21 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * line end offset is taken to include the newline.
      */
     public int getLineEndOffsetBeforeTerminator(int line) {
-        return lines.getLine(line).getEndOffsetBeforeTerminator();
+        getLock().getReadLock();
+        try {
+            return lines.getLine(line).getEndOffsetBeforeTerminator();
+        } finally {
+            getLock().relinquishReadLock();
+        }
     }
     
     public int getLineOfOffset(int offset) {
-        return lines.getLineIndex(offset);
+        getLock().getReadLock();
+        try {
+            return lines.getLineIndex(offset);
+        } finally {
+            getLock().relinquishReadLock();
+        }
     }
     
     public void setWrapStyleWord(boolean newWordWrapState) {
@@ -461,12 +538,22 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void addHighlight(PHighlight highlight) {
-        highlights.add(highlight);
+        getLock().getWriteLock();
+        try {
+            highlights.add(highlight);
+        } finally {
+            getLock().relinquishWriteLock();
+        }
         repaintHighlight(highlight);
     }
     
     public List<PHighlight> getHighlights() {
-        return Collections.unmodifiableList(highlights);
+        getLock().getReadLock();
+        try {
+            return Collections.unmodifiableList(highlights);
+        } finally {
+            getLock().relinquishReadLock();
+        }
     }
     
     /**
@@ -475,33 +562,43 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * ordered by FIXME: do we ensure the highlights are ordered? on what?
      */
     public void selectFirstMatchingHighlight(boolean searchingForwards, PHighlightMatcher matcher) {
-        final int start = searchingForwards ? 0 : highlights.size() - 1;
-        final int stop = searchingForwards ? highlights.size() : -1;
-        final int step = searchingForwards ? 1 : -1;
-        for (int i = start; i != stop; i += step) {
-            PHighlight highlight = highlights.get(i);
-            if (matcher.matches(highlight)) {
-                centerOffsetInDisplay(highlight.getStartIndex());
-                select(highlight.getStartIndex(), highlight.getEndIndex());
-                return;
+        getLock().getReadLock();
+        try {
+            final int start = searchingForwards ? 0 : highlights.size() - 1;
+            final int stop = searchingForwards ? highlights.size() : -1;
+            final int step = searchingForwards ? 1 : -1;
+            for (int i = start; i != stop; i += step) {
+                PHighlight highlight = highlights.get(i);
+                if (matcher.matches(highlight)) {
+                    centerOffsetInDisplay(highlight.getStartIndex());
+                    select(highlight.getStartIndex(), highlight.getEndIndex());
+                    return;
+                }
             }
+        } finally {
+            getLock().relinquishReadLock();
         }
     }
     
     public void removeHighlights(PHighlightMatcher matcher) {
         PHighlight match = null;
         boolean isOnlyOneMatch = true;
-        for (int i = 0; i < highlights.size(); i++) {
-            PHighlight highlight = highlights.get(i);
-            if (matcher.matches(highlight)) {
-                if (match != null) {
-                    isOnlyOneMatch = false;
+        getLock().getWriteLock();
+        try {
+            for (int i = 0; i < highlights.size(); i++) {
+                PHighlight highlight = highlights.get(i);
+                if (matcher.matches(highlight)) {
+                    if (match != null) {
+                        isOnlyOneMatch = false;
+                    }
+                    match = highlight;
+                    highlights.remove(i);
+                    highlight.detachAnchors();
+                    i--;
                 }
-                match = highlight;
-                highlights.remove(i);
-                highlight.detachAnchors();
-                i--;
             }
+        } finally {
+            getLock().relinquishWriteLock();
         }
         if (isOnlyOneMatch) {
             if (match != null) {
@@ -514,9 +611,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void removeHighlight(PHighlight highlight) {
-        highlights.remove(highlight);
-        highlight.detachAnchors();
-        repaintHighlight(highlight);
+        getLock().getWriteLock();
+        try {
+            highlights.remove(highlight);
+            highlight.detachAnchors();
+            repaintHighlight(highlight);
+        } finally {
+            getLock().relinquishWriteLock();
+        }
     }
     
     public PAnchorSet getAnchorSet() {
@@ -532,23 +634,28 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public PCoordinates getNearestCoordinates(Point point) {
-        if (point.y < 0) {
-            return new PCoordinates(0, 0);
-        }
-        generateLineWrappings();
-        final int lineIndex = getLineIndexAtLocation(point);
-        int charOffset = 0;
-        int x = 0;
-        for (PLineSegment segment : getLineSegmentsForSplitLine(lineIndex)) {
-            int width = segment.getDisplayWidth(metrics, x);
-            if (x + width > point.x) {
-                charOffset += segment.getCharOffset(metrics, x, point.x);
-                return new PCoordinates(lineIndex, charOffset);
+        getLock().getReadLock();
+        try {
+            if (point.y < 0) {
+                return new PCoordinates(0, 0);
             }
-            charOffset += segment.getModelTextLength();
-            x += width;
+            generateLineWrappings();
+            final int lineIndex = getLineIndexAtLocation(point);
+            int charOffset = 0;
+            int x = 0;
+            for (PLineSegment segment : getLineSegmentsForSplitLine(lineIndex)) {
+                int width = segment.getDisplayWidth(metrics, x);
+                if (x + width > point.x) {
+                    charOffset += segment.getCharOffset(metrics, x, point.x);
+                    return new PCoordinates(lineIndex, charOffset);
+                }
+                charOffset += segment.getModelTextLength();
+                x += width;
+            }
+            return new PCoordinates(lineIndex, charOffset);
+        } finally {
+            getLock().relinquishReadLock();
         }
-        return new PCoordinates(lineIndex, charOffset);
     }
     
     /**
@@ -572,16 +679,21 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public PLineSegment getLineSegmentAtLocation(Point point) {
-        generateLineWrappings();
-        int x = 0;
-        for (PLineSegment segment : getLineSegmentsForSplitLine(getLineIndexAtLocation(point))) {
-            int width = segment.getDisplayWidth(metrics, x);
-            if (x + width > point.x) {
-                return segment;
+        getLock().getReadLock();
+        try {
+            generateLineWrappings();
+            int x = 0;
+            for (PLineSegment segment : getLineSegmentsForSplitLine(getLineIndexAtLocation(point))) {
+                int width = segment.getDisplayWidth(metrics, x);
+                if (x + width > point.x) {
+                    return segment;
+                }
+                x += width;
             }
-            x += width;
+            return null;
+        } finally {
+            getLock().relinquishReadLock();
         }
-        return null;
     }
     
     public Iterator<PLineSegment> getLogicalSegmentIterator(int offset) {
@@ -632,18 +744,23 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public List<PLineSegment> getLineSegments(int lineIndex) {
-        // Let the styler have the first go.
-        List<PLineSegment> segments = textStyler.getTextSegments(lineIndex);
-        
-        // Then let the style applicators add their finishing touches.
-        String line = getLineContents(lineIndex).toString();
-        for (StyleApplicator styleApplicator : styleApplicators) {
-            segments = applyStyleApplicator(styleApplicator, line, segments);
+        getLock().getReadLock();
+        try {
+            // Let the styler have the first go.
+            List<PLineSegment> segments = textStyler.getTextSegments(lineIndex);
+            
+            // Then let the style applicators add their finishing touches.
+            String line = getLineContents(lineIndex).toString();
+            for (StyleApplicator styleApplicator : styleApplicators) {
+                segments = applyStyleApplicator(styleApplicator, line, segments);
+            }
+            
+            // Finally, deal with tabs.
+            segments = applyStyleApplicator(tabStyleApplicator, line, segments);
+            return segments;
+        } finally {
+            getLock().relinquishReadLock();
         }
-        
-        // Finally, deal with tabs.
-        segments = applyStyleApplicator(tabStyleApplicator, line, segments);
-        return segments;
     }
     
     private List<PLineSegment> applyStyleApplicator(StyleApplicator styleApplicator, String line, List<PLineSegment> inputSegments) {
@@ -681,38 +798,48 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public PCoordinates getCoordinates(int location) {
-        if (isLineWrappingInvalid()) {
-            return new PCoordinates(-1, -1);
-        }
-        int min = 0;
-        int max = splitLines.size();
-        while (max - min > 1) {
-            int mid = (min + max) / 2;
-            SplitLine line = getSplitLine(mid);
-            if (line.containsIndex(location)) {
-                return new PCoordinates(mid, location - line.getTextIndex());
-            } else if (location < line.getTextIndex()) {
-                max = mid;
-            } else {
-                min = mid;
+        getLock().getReadLock();
+        try {
+            if (isLineWrappingInvalid()) {
+                return new PCoordinates(-1, -1);
             }
+            int min = 0;
+            int max = splitLines.size();
+            while (max - min > 1) {
+                int mid = (min + max) / 2;
+                SplitLine line = getSplitLine(mid);
+                if (line.containsIndex(location)) {
+                    return new PCoordinates(mid, location - line.getTextIndex());
+                } else if (location < line.getTextIndex()) {
+                    max = mid;
+                } else {
+                    min = mid;
+                }
+            }
+            return new PCoordinates(min, location - getSplitLine(min).getTextIndex());
+        } finally {
+            getLock().relinquishReadLock();
         }
-        return new PCoordinates(min, location - getSplitLine(min).getTextIndex());
     }
     
     public Point getViewCoordinates(PCoordinates coordinates) {
-        int baseline = getBaseline(coordinates.getLineIndex());
-        int x = 0;
-        int charOffset = 0;
-        for (PLineSegment segment : getLineSegmentsForSplitLine(coordinates.getLineIndex())) {
-            if (coordinates.getCharOffset() <= charOffset + segment.getModelTextLength()) {
-                x += segment.getDisplayWidth(metrics, x, coordinates.getCharOffset() - charOffset);
-                return new Point(x, baseline);
+        getLock().getReadLock();
+        try {
+            int baseline = getBaseline(coordinates.getLineIndex());
+            int x = 0;
+            int charOffset = 0;
+            for (PLineSegment segment : getLineSegmentsForSplitLine(coordinates.getLineIndex())) {
+                if (coordinates.getCharOffset() <= charOffset + segment.getModelTextLength()) {
+                    x += segment.getDisplayWidth(metrics, x, coordinates.getCharOffset() - charOffset);
+                    return new Point(x, baseline);
+                }
+                charOffset += segment.getModelTextLength();
+                x += segment.getDisplayWidth(metrics, x);
             }
-            charOffset += segment.getModelTextLength();
-            x += segment.getDisplayWidth(metrics, x);
+            return new Point(x, baseline);
+        } finally {
+            getLock().relinquishReadLock();
         }
-        return new Point(x, baseline);
     }
     
     public int getTextIndex(PCoordinates coordinates) {
@@ -753,49 +880,54 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void paintComponent(Graphics oldGraphics) {
-        //StopWatch watch = new StopWatch();
-        generateLineWrappings();
-        Graphics2D graphics = (Graphics2D) oldGraphics;
-        Rectangle bounds = graphics.getClipBounds();
-        int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds);
-        graphics.setColor(getBackground());
-        if (isOpaque()) {
-            graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
-        }
-        int minLine = Math.min(splitLines.size() - 1, bounds.y / metrics.getHeight());
-        int maxLine = Math.min(splitLines.size() - 1, (bounds.y + bounds.height) / metrics.getHeight());
-        int baseline = getBaseline(minLine);
-        paintHighlights(graphics, minLine, maxLine);
-        int paintCharOffset = getSplitLine(minLine).getTextIndex();
-        int x = 0;
-        int line = minLine;
-        int caretOffset = hasSelection() ? -1 : getSelectionStart();
-        Iterator<PLineSegment> it = getWrappedSegmentIterator(paintCharOffset);
-        while (it.hasNext()) {
-            PLineSegment segment = it.next();
-            paintCharOffset = segment.getEnd();
-            applyColor(graphics, segment.getStyle().getColor());
-            segment.paint(graphics, x, baseline);
-            if (segment.getOffset() == caretOffset && segment.isNewline() == false) {
-                paintCaret(graphics, x, baseline);
-            } else if (segment.getOffset() <= caretOffset && segment.getEnd() > caretOffset) {
-                int caretX = x + segment.getDisplayWidth(metrics, x, caretOffset - segment.getOffset());
-                paintCaret(graphics, caretX, baseline);
+        getLock().getReadLock();
+        try {
+            //StopWatch watch = new StopWatch();
+            generateLineWrappings();
+            Graphics2D graphics = (Graphics2D) oldGraphics;
+            Rectangle bounds = graphics.getClipBounds();
+            int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds);
+            graphics.setColor(getBackground());
+            if (isOpaque()) {
+                graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
             }
-            x += segment.getDisplayWidth(metrics, x);
-            if (segment.isNewline()) {
-                x = 0;
-                baseline += metrics.getHeight();
-                line++;
-                if (line > maxLine) {
-                    break;
+            int minLine = Math.min(splitLines.size() - 1, bounds.y / metrics.getHeight());
+            int maxLine = Math.min(splitLines.size() - 1, (bounds.y + bounds.height) / metrics.getHeight());
+            int baseline = getBaseline(minLine);
+            paintHighlights(graphics, minLine, maxLine);
+            int paintCharOffset = getSplitLine(minLine).getTextIndex();
+            int x = 0;
+            int line = minLine;
+            int caretOffset = hasSelection() ? -1 : getSelectionStart();
+            Iterator<PLineSegment> it = getWrappedSegmentIterator(paintCharOffset);
+            while (it.hasNext()) {
+                PLineSegment segment = it.next();
+                paintCharOffset = segment.getEnd();
+                applyColor(graphics, segment.getStyle().getColor());
+                segment.paint(graphics, x, baseline);
+                if (segment.getOffset() == caretOffset && segment.isNewline() == false) {
+                    paintCaret(graphics, x, baseline);
+                } else if (segment.getOffset() <= caretOffset && segment.getEnd() > caretOffset) {
+                    int caretX = x + segment.getDisplayWidth(metrics, x, caretOffset - segment.getOffset());
+                    paintCaret(graphics, caretX, baseline);
+                }
+                x += segment.getDisplayWidth(metrics, x);
+                if (segment.isNewline()) {
+                    x = 0;
+                    baseline += metrics.getHeight();
+                    line++;
+                    if (line > maxLine) {
+                        break;
+                    }
                 }
             }
+            if (caretOffset == paintCharOffset) {
+                paintCaret(graphics, x, baseline);
+            }
+            //watch.print("Repaint");
+        } finally {
+            getLock().relinquishReadLock();
         }
-        if (caretOffset == paintCharOffset) {
-            paintCaret(graphics, x, baseline);
-        }
-        //watch.print("Repaint");
     }
     
     /**
@@ -979,23 +1111,28 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public int getSplitLineIndex(int lineIndex) {
-        if (lineIndex > getSplitLine(splitLines.size() - 1).getLineIndex()) {
-            return splitLines.size();
-        }
-        int min = 0;
-        int max = splitLines.size();
-        while (max - min > 1) {
-            int mid = (min + max) / 2;
-            int midIndex = getSplitLine(mid).getLineIndex();
-            if (midIndex == lineIndex) {
-                return backtrackToLineStart(mid);
-            } else if (midIndex > lineIndex) {
-                max = mid;
-            } else {
-                min = mid;
+        getLock().getReadLock();
+        try {
+            if (lineIndex > getSplitLine(splitLines.size() - 1).getLineIndex()) {
+                return splitLines.size();
             }
+            int min = 0;
+            int max = splitLines.size();
+            while (max - min > 1) {
+                int mid = (min + max) / 2;
+                int midIndex = getSplitLine(mid).getLineIndex();
+                if (midIndex == lineIndex) {
+                    return backtrackToLineStart(mid);
+                } else if (midIndex > lineIndex) {
+                    max = mid;
+                } else {
+                    min = mid;
+                }
+            }
+            return backtrackToLineStart(min);
+        } finally {
+            getLock().relinquishReadLock();
         }
-        return backtrackToLineStart(min);
     }
     
     private int backtrackToLineStart(int splitIndex) {
@@ -1143,7 +1280,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * Returns a copy of the text in this text area.
      */
     public String getText() {
-        return getTextBuffer().toString();
+        getLock().getReadLock();
+        try {
+            return getTextBuffer().toString();
+        } finally {
+            getLock().relinquishReadLock();
+        }
     }
     
     public Dimension getPreferredScrollableViewportSize() {
@@ -1207,7 +1349,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (isEditable() == false) {
             return;
         }
-        
+        getLock().getReadLock();
         try {
             Transferable contents = clipboard.getContents(this);
             DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
@@ -1215,6 +1357,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             pasteAndReIndent(string);
         } catch (Exception ex) {
             Log.warn("Couldn't paste.", ex);
+        } finally {
+            getLock().relinquishReadLock();
         }
     }
     
@@ -1231,21 +1375,31 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void copy() {
-        if (hasSelection() == false) {
-            return;
-        }
-        StringSelection stringSelection = new StringSelection(getSelectedText());
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        toolkit.getSystemClipboard().setContents(stringSelection, null);
-        if (toolkit.getSystemSelection() != null) {
-            toolkit.getSystemSelection().setContents(stringSelection, null);
+        getLock().getReadLock();
+        try {
+            if (hasSelection() == false) {
+                return;
+            }
+            StringSelection stringSelection = new StringSelection(getSelectedText());
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            toolkit.getSystemClipboard().setContents(stringSelection, null);
+            if (toolkit.getSystemSelection() != null) {
+                toolkit.getSystemSelection().setContents(stringSelection, null);
+            }
+        } finally {
+            getLock().relinquishReadLock();
         }
     }
     
     public void cut() {
-        if (hasSelection() && isEditable()) {
-            copy();
-            replaceSelection("");
+        getLock().getWriteLock();
+        try {
+            if (hasSelection() && isEditable()) {
+                copy();
+                replaceSelection("");
+            }
+        } finally {
+            getLock().relinquishWriteLock();
         }
     }
     
@@ -1274,32 +1428,42 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * Highlights all matches of the given regular expression.
      */
     public int findAllMatches(String regularExpression) {
-        clearFindMatches();
-        
-        // Anything to search for?
-        if (regularExpression == null || regularExpression.length() == 0) {
-            return 0;
+        getLock().getWriteLock();
+        try {
+            clearFindMatches();
+            
+            // Anything to search for?
+            if (regularExpression == null || regularExpression.length() == 0) {
+                return 0;
+            }
+            
+            // Find all the matches.
+            int matchCount = 0;
+            Matcher matcher = Pattern.compile(regularExpression).matcher(getTextBuffer());
+            while (matcher.find()) {
+                addHighlight(new PFind.MatchHighlight(this, matcher.start(), matcher.end()));
+                ++matchCount;
+            }
+            return matchCount;
+        } finally {
+            getLock().relinquishWriteLock();
         }
-        
-        // Find all the matches.
-        int matchCount = 0;
-        Matcher matcher = Pattern.compile(regularExpression).matcher(getTextBuffer());
-        while (matcher.find()) {
-            addHighlight(new PFind.MatchHighlight(this, matcher.start(), matcher.end()));
-            ++matchCount;
-        }
-        return matchCount;
     }
     
     /**
      * Clears all find match highlights.
      */
     public void clearFindMatches() {
-        removeHighlights(new PHighlightMatcher() {
-            public boolean matches(PHighlight highlight) {
-                return (highlight instanceof PFind.MatchHighlight);
-            }
-        });
+        getLock().getWriteLock();
+        try {
+            removeHighlights(new PHighlightMatcher() {
+                public boolean matches(PHighlight highlight) {
+                    return (highlight instanceof PFind.MatchHighlight);
+                }
+            });
+        } finally {
+            getLock().relinquishWriteLock();
+        }
     }
     
     public void findNext() {

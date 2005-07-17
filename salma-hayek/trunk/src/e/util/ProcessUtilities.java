@@ -40,7 +40,7 @@ public class ProcessUtilities {
                 public void run() {
                     readLinesFromStream(errorLineListener, p.getErrorStream());
                 }
-            }).start();
+            }, "Process Back-Quote: " + command[0]).start();
             return p.waitFor();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -90,7 +90,7 @@ public class ProcessUtilities {
         System.err.println("Spawning '" + StringUtilities.join(command, " ") + "'.");
         try {
             final Process p = Runtime.getRuntime().exec(command, null, directory);
-            new Thread() {
+            new Thread("Process Spawn: " + command[0]) {
                 public void run() {
                     try {
                         p.getOutputStream().close();

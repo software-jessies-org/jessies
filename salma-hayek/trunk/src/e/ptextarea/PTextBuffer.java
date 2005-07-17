@@ -60,12 +60,20 @@ public class PTextBuffer implements CharSequence {
     private PAnchorSet anchorSet = new PAnchorSet();
     private Undoer undoBuffer = new Undoer();
     private HashMap<String, Object> properties = new HashMap<String, Object>();
+    private PLock lock = new PLock();
     
     public PTextBuffer() {
         // Our anchorSet *must* be the first listener.  It needs to update the anchor locations
         // before anyone else starts messing about with them.
         addTextListener(anchorSet);
         initDefaultProperties();
+    }
+    
+    /**
+     * Returns the lock object for this buffer.  This should only be used within this package.
+     */
+    PLock getLock() {
+        return lock;
     }
     
     private void initDefaultProperties() {
@@ -102,14 +110,18 @@ public class PTextBuffer implements CharSequence {
      * replaced.
      */
     public void addTextListener(PTextListener listener) {
-        textListeners.add(listener);
+        synchronized (textListeners) {
+            textListeners.add(listener);
+        }
     }
     
     /**
      * Remove a previously added listener.
      */
     public void removeTextListener(PTextListener listener) {
-        textListeners.remove(listener);
+        synchronized (textListeners) {
+            textListeners.remove(listener);
+        }
     }
     
     private void fireTextEvent(PTextEvent event) {
@@ -120,13 +132,15 @@ public class PTextBuffer implements CharSequence {
         // forwards through the listener list until someone comes up with a really good
         // reason why backwards is better (at which point I'll add an extra 'internalListeners'
         // list).
-        for (PTextListener listener : textListeners) {
-            if (event.isInsert()) {
-                listener.textInserted(event);
-            } else if (event.isRemove()) {
-                listener.textRemoved(event);
-            } else {
-                listener.textCompletelyReplaced(event);
+        synchronized (textListeners) {
+            for (PTextListener listener : textListeners) {
+                if (event.isInsert()) {
+                    listener.textInserted(event);
+                } else if (event.isRemove()) {
+                    listener.textRemoved(event);
+                } else {
+                    listener.textCompletelyReplaced(event);
+                }
             }
         }
     }
@@ -136,6 +150,7 @@ public class PTextBuffer implements CharSequence {
      */
     public void readFromFile(File file) {
         DataInputStream dataInputStream = null;
+        getLock().getWriteLock();
         try {
             // Read all the bytes in.
             long byteCount = file.length();
@@ -153,6 +168,7 @@ public class PTextBuffer implements CharSequence {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
+            getLock().relinquishWriteLock();
             FileUtilities.close(dataInputStream);
         }
     }
@@ -262,6 +278,7 @@ public class PTextBuffer implements CharSequence {
      */
     public void writeToFile(File file) {
         Writer writer = null;
+        getLock().getReadLock();
         try {
             String charsetName = (String) getProperty(CHARSET_PROPERTY);
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charsetName));
@@ -290,6 +307,7 @@ public class PTextBuffer implements CharSequence {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
+            getLock().relinquishReadLock();
             FileUtilities.close(writer);
         }
     }
@@ -299,10 +317,15 @@ public class PTextBuffer implements CharSequence {
      * Note that this method does not copy the given char[].
      */
     private void setText(char[] text) {
-        this.text = text;
-        gapPosition = 0;
-        gapLength = 0;
-        fireTextEvent(new PTextEvent(this, PTextEvent.COMPLETE_REPLACEMENT, 0, new CharArrayCharSequence(text)));
+        getLock().getWriteLock();
+        try {
+            this.text = text;
+            gapPosition = 0;
+            gapLength = 0;
+            fireTextEvent(new PTextEvent(this, PTextEvent.COMPLETE_REPLACEMENT, 0, new CharArrayCharSequence(text)));
+        } finally {
+            getLock().relinquishWriteLock();
+        }
     }
     
     /**
@@ -312,25 +335,30 @@ public class PTextBuffer implements CharSequence {
      * If not, use the CharSequence interface instead.
      */
     private CharSequence copyChars(int start, int charCount) {
-        if (start < 0 || charCount < 0 || start + charCount > length()) {
-            throw new IllegalArgumentException("start=" + start + " charCount=" + charCount + " length()=" + length());
-        }
-        char[] result = new char[charCount];
+        getLock().getReadLock();
         try {
-            int copyCount = 0;
-            if (start < gapPosition) {
-                copyCount = Math.min(charCount, gapPosition - start);
-                System.arraycopy(text, start, result, 0, copyCount);
+            if (start < 0 || charCount < 0 || start + charCount > length()) {
+                throw new IllegalArgumentException("start=" + start + " charCount=" + charCount + " length()=" + length());
             }
-            if (start + charCount >= gapPosition) {
-                int textPosition = Math.max(start, gapPosition) + gapLength;
-                System.arraycopy(text, textPosition, result, copyCount, result.length - copyCount);
+            char[] result = new char[charCount];
+            try {
+                int copyCount = 0;
+                if (start < gapPosition) {
+                    copyCount = Math.min(charCount, gapPosition - start);
+                    System.arraycopy(text, start, result, 0, copyCount);
+                }
+                if (start + charCount >= gapPosition) {
+                    int textPosition = Math.max(start, gapPosition) + gapLength;
+                    System.arraycopy(text, textPosition, result, copyCount, result.length - copyCount);
+                }
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                System.err.println("Requested get text from " + start + ", length " + charCount + "; size is " + length());
+                ex.printStackTrace();
             }
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            System.err.println("Requested get text from " + start + ", length " + charCount + "; size is " + length());
-            ex.printStackTrace();
+            return new CharArrayCharSequence(result);
+        } finally {
+            getLock().relinquishReadLock();
         }
-        return new CharArrayCharSequence(result);
     }
     
     /** Moves the gap to the specified position. */
@@ -370,17 +398,22 @@ public class PTextBuffer implements CharSequence {
     }
     
     public void replace(SelectionSetter beforeCaret, int position, int removeCount, CharSequence add, SelectionSetter afterCaret) {
-        if (beforeCaret == null) {
-            throw new IllegalArgumentException("beforeCaret must not be null");
+        getLock().getWriteLock();
+        try {
+            if (beforeCaret == null) {
+                throw new IllegalArgumentException("beforeCaret must not be null");
+            }
+            if (afterCaret == null) {
+                throw new IllegalArgumentException("afterCaret must not be null");
+            }
+            CharSequence removeChars = (removeCount == 0) ? null : copyChars(position, removeCount);
+            if (add != null && add.length() == 0) {
+                add = null;
+            }
+            undoBuffer.addAndDo(beforeCaret, position, removeChars, add, afterCaret);
+        } finally {
+            getLock().relinquishWriteLock();
         }
-        if (afterCaret == null) {
-            throw new IllegalArgumentException("afterCaret must not be null");
-        }
-        CharSequence removeChars = (removeCount == 0) ? null : copyChars(position, removeCount);
-        if (add != null && add.length() == 0) {
-            add = null;
-        }
-        undoBuffer.addAndDo(beforeCaret, position, removeChars, add, afterCaret);
     }
     
     /** Special remove method used by the undo buffer. */
@@ -438,10 +471,15 @@ public class PTextBuffer implements CharSequence {
      * for preference.
      */
     public String toString() {
-        StringBuilder result = new StringBuilder();
-        result.append(text, 0, gapPosition);
-        result.append(text, gapPosition + gapLength, text.length - gapPosition - gapLength);
-        return result.toString();
+        getLock().getReadLock();
+        try {
+            StringBuilder result = new StringBuilder();
+            result.append(text, 0, gapPosition);
+            result.append(text, gapPosition + gapLength, text.length - gapPosition - gapLength);
+            return result.toString();
+        } finally {
+            getLock().relinquishReadLock();
+        }
     }
     
     /**
@@ -580,26 +618,36 @@ public class PTextBuffer implements CharSequence {
         
         public void undo() {
             if (canUndo()) {
-                Doable doable;
-                do {
-                    --undoPosition;
-                    doable = undoList.get(undoPosition);
-                    //System.out.println("undo: " + doable);
-                    doable.undo();
-                } while (compoundContinuesAt(doable, undoPosition - 1));
+                getLock().getWriteLock();
+                try {
+                    Doable doable;
+                    do {
+                        --undoPosition;
+                        doable = undoList.get(undoPosition);
+                        //System.out.println("undo: " + doable);
+                        doable.undo();
+                    } while (compoundContinuesAt(doable, undoPosition - 1));
+                } finally {
+                    getLock().relinquishWriteLock();
+                }
                 fireChangeListeners();
             }
         }
         
         public void redo() {
             if (canRedo()) {
-                Doable doable;
-                do {
-                    doable = undoList.get(undoPosition);
-                    ++undoPosition;
-                    //System.out.println("redo: " + doable);
-                    doable.redo();
-                } while (compoundContinuesAt(doable, undoPosition));
+                getLock().getWriteLock();
+                try {
+                    Doable doable;
+                    do {
+                        doable = undoList.get(undoPosition);
+                        ++undoPosition;
+                        //System.out.println("redo: " + doable);
+                        doable.redo();
+                    } while (compoundContinuesAt(doable, undoPosition));
+                } finally {
+                    getLock().relinquishWriteLock();
+                }
                 fireChangeListeners();
             }
         }

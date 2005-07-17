@@ -157,7 +157,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
                 PTextBuffer buffer = component.getTextBuffer();
                 checkSpelling(buffer, 0, buffer.length());
             }
-        }).start();
+        }, "Spell-Checker Thread").start();
     }
     
     /** Ensures that there are no spelling-related highlights in the given range. */
