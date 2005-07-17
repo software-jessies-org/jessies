@@ -41,6 +41,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     private int rightHandMarginColumn = NO_MARGIN;
     private ArrayList<PCaretListener> caretListeners = new ArrayList<PCaretListener>();
+    private TreeMap<Integer, List<PLineSegment>> segmentCache = new TreeMap<Integer, List<PLineSegment>>();
     
     private int rowCount;
     private int columnCount;
@@ -746,6 +747,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public List<PLineSegment> getLineSegments(int lineIndex) {
         getLock().getReadLock();
         try {
+            // Return it straight away if we've already cached it.
+            synchronized (segmentCache) {
+                if (segmentCache.containsKey(lineIndex)) {
+                    return segmentCache.get(lineIndex);
+                }
+            }
+            
             // Let the styler have the first go.
             List<PLineSegment> segments = textStyler.getTextSegments(lineIndex);
             
@@ -757,9 +765,24 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             
             // Finally, deal with tabs.
             segments = applyStyleApplicator(tabStyleApplicator, line, segments);
+            synchronized (segmentCache) {
+                segmentCache.put(lineIndex, segments);
+            }
             return segments;
         } finally {
             getLock().relinquishReadLock();
+        }
+    }
+    
+    private void flushSegmentCacheFrom(int lineIndex) {
+        synchronized (segmentCache) {
+            // Take a copy of the indices.  Otherwise, if we try removing stuff from the segment cache
+            // based on values taken from the sub-tree from the line index onwards, we incur a
+            // concurrent modification exception.
+            Integer[] indices = segmentCache.tailMap(lineIndex).keySet().toArray(new Integer[0]);
+            for (int index : indices) {
+                segmentCache.remove(index);
+            }
         }
     }
     
@@ -987,6 +1010,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             return;
         }
         int lineIndex = event.getLineIndex();
+        flushSegmentCacheFrom(lineIndex);
         int splitIndex = getSplitLineIndex(lineIndex);
         int firstSplitIndex = splitIndex;
         changeLineIndices(lineIndex, event.getLength());
@@ -1001,6 +1025,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (isLineWrappingInvalid()) {
             return;
         }
+        flushSegmentCacheFrom(event.getLineIndex());
         int splitIndex = getSplitLineIndex(event.getLineIndex());
         for (int i = 0; i < event.getLength(); i++) {
             removeSplitLines(splitIndex);
@@ -1021,6 +1046,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (isLineWrappingInvalid()) {
             return;
         }
+        flushSegmentCacheFrom(event.getLineIndex());
         int lineCountChange = 0;
         int minLine = Integer.MAX_VALUE;
         int visibleLineCount = 0;
