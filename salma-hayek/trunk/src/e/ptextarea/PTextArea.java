@@ -986,7 +986,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (isLineWrappingInvalid()) {
             return;
         }
-        int lineIndex = event.getIndex();
+        int lineIndex = event.getLineIndex();
         int splitIndex = getSplitLineIndex(lineIndex);
         int firstSplitIndex = splitIndex;
         changeLineIndices(lineIndex, event.getLength());
@@ -1001,11 +1001,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (isLineWrappingInvalid()) {
             return;
         }
-        int splitIndex = getSplitLineIndex(event.getIndex());
+        int splitIndex = getSplitLineIndex(event.getLineIndex());
         for (int i = 0; i < event.getLength(); i++) {
             removeSplitLines(splitIndex);
         }
-        changeLineIndices(event.getIndex() + event.getLength(), -event.getLength());
+        changeLineIndices(event.getLineIndex() + event.getLength(), -event.getLength());
         updateHeight();
         repaintFromLine(splitIndex);
     }
@@ -1025,21 +1025,21 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         int minLine = Integer.MAX_VALUE;
         int visibleLineCount = 0;
         for (int i = 0; i < event.getLength(); i++) {
-            PLineList.Line line = lines.getLine(event.getIndex() + i);
+            PLineList.Line line = lines.getLine(event.getLineIndex() + i);
             setLineWidth(line);
-            int splitIndex = getSplitLineIndex(event.getIndex());
+            int splitIndex = getSplitLineIndex(event.getLineIndex());
             if (i == 0) {
                 minLine = splitIndex;
             }
             int removedCount = removeSplitLines(splitIndex);
             lineCountChange -= removedCount;
-            int addedCount = addSplitLines(event.getIndex(), splitIndex);
+            int addedCount = addSplitLines(event.getLineIndex(), splitIndex);
             lineCountChange += addedCount;
             visibleLineCount += addedCount;
         }
         if (lineCountChange != 0) {
             updateHeight();
-            repaintFromLine(getSplitLineIndex(event.getIndex()));
+            repaintFromLine(getSplitLineIndex(event.getLineIndex()));
         } else {
             repaintLines(minLine, minLine + visibleLineCount);
         }
@@ -1362,15 +1362,20 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
-    private void pasteAndReIndent(String string) {
-        final int startOffsetOfReplacement = getSelectionStart();
-        final int endOffsetOfReplacement = startOffsetOfReplacement + string.length();
-        getTextBuffer().getUndoBuffer().startCompoundEdit();
+    public void pasteAndReIndent(String string) {
+        getLock().getWriteLock();
         try {
-            replaceSelection(string);
-            getIndenter().fixIndentationBetween(startOffsetOfReplacement, endOffsetOfReplacement);
+            final int startOffsetOfReplacement = getSelectionStart();
+            final int endOffsetOfReplacement = startOffsetOfReplacement + string.length();
+            getTextBuffer().getUndoBuffer().startCompoundEdit();
+            try {
+                replaceSelection(string);
+                getIndenter().fixIndentationBetween(startOffsetOfReplacement, endOffsetOfReplacement);
+            } finally {
+                getTextBuffer().getUndoBuffer().finishCompoundEdit();
+            }
         } finally {
-            getTextBuffer().getUndoBuffer().finishCompoundEdit();
+            getLock().relinquishWriteLock();
         }
     }
     

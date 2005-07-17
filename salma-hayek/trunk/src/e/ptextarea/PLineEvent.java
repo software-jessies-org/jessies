@@ -8,13 +8,13 @@ public class PLineEvent {
     
     private PLineList lines;
     private int type;
-    private int index;
+    private int lineIndex;
     private int length;
     
-    public PLineEvent(PLineList lines, int type, int index, int length) {
+    public PLineEvent(PLineList lines, int type, int lineIndex, int length) {
         this.lines = lines;
         this.type = type;
-        this.index = index;
+        this.lineIndex = lineIndex;
         this.length = length;
     }
     
@@ -26,8 +26,8 @@ public class PLineEvent {
         return type;
     }
     
-    public int getIndex() {
-        return index;
+    public int getLineIndex() {
+        return lineIndex;
     }
     
     public int getLength() {
