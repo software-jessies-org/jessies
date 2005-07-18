@@ -63,13 +63,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         this.columnCount = columnCount;
         this.editable = true;
         this.wordWrap = false;
+        setText(new PTextBuffer());
         this.indenter = new PDefaultIndenter(this);
         addStyleApplicator(new UnprintableCharacterStyleApplicator(this));
         initPopupMenu();
         setFont(UIManager.getFont("TextArea.font"));
         setAutoscrolls(true);
         setBackground(Color.WHITE);
-        setText(new PTextBuffer());
         PMouseHandler mouseHandler = new PMouseHandler(this);
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
@@ -542,10 +542,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         getLock().getWriteLock();
         try {
             highlights.add(highlight);
+            repaintHighlight(highlight);
         } finally {
             getLock().relinquishWriteLock();
         }
-        repaintHighlight(highlight);
     }
     
     public List<PHighlight> getHighlights() {
@@ -582,10 +582,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void removeHighlights(PHighlightMatcher matcher) {
-        PHighlight match = null;
-        boolean isOnlyOneMatch = true;
         getLock().getWriteLock();
         try {
+            PHighlight match = null;
+            boolean isOnlyOneMatch = true;
             for (int i = 0; i < highlights.size(); i++) {
                 PHighlight highlight = highlights.get(i);
                 if (matcher.matches(highlight)) {
@@ -598,16 +598,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
                     i--;
                 }
             }
+            if (isOnlyOneMatch) {
+                if (match != null) {
+                    repaintHighlight(match);
+                }
+                // If isOnlyOneMatch is true, but match is null, nothing was removed and so we don't repaint at all.
+            } else {
+                repaint();
+            }
         } finally {
             getLock().relinquishWriteLock();
-        }
-        if (isOnlyOneMatch) {
-            if (match != null) {
-                repaintHighlight(match);
-            }
-            // If isOnlyOneMatch is true, but match is null, nothing was removed and so we don't repaint at all.
-        } else {
-            repaint();
         }
     }
     
@@ -869,7 +869,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         return getSplitLine(coordinates.getLineIndex()).getTextIndex() + coordinates.getCharOffset();
     }
     
-    private synchronized void repaintHighlight(PHighlight highlight) {
+    private void repaintHighlight(PHighlight highlight) {
         repaintIndexRange(highlight.getStartIndex(), highlight.getEndIndex());
     }
     
@@ -1083,13 +1083,18 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         repaint(0, top, getWidth(), bottom - top);
     }
     
-    public synchronized boolean isLineWrappingInvalid() {
+    public boolean isLineWrappingInvalid() {
         return (splitLines == null);
     }
     
-    private synchronized void revalidateLineWrappings() {
-        splitLines = null;
-        generateLineWrappings();
+    private void revalidateLineWrappings() {
+        getLock().getWriteLock();
+        try {
+            splitLines = null;
+            generateLineWrappings();
+        } finally {
+            getLock().relinquishWriteLock();
+        }
     }
     
     /**
@@ -1104,17 +1109,22 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         generateLineWrappings();
     }
     
-    private synchronized void generateLineWrappings() {
-        if (isLineWrappingInvalid() && isShowing()) {
-            splitLines = new ArrayList<SplitLine>();
-            for (int i = 0; i < lines.size(); i++) {
-                PLineList.Line line = lines.getLine(i);
-                if (line.isWidthValid() == false) {
-                    setLineWidth(line);
+    private void generateLineWrappings() {
+        getLock().getWriteLock();
+        try {
+            if (isLineWrappingInvalid() && isShowing()) {
+                splitLines = new ArrayList<SplitLine>();
+                for (int i = 0; i < lines.size(); i++) {
+                    PLineList.Line line = lines.getLine(i);
+                    if (line.isWidthValid() == false) {
+                        setLineWidth(line);
+                    }
+                    addSplitLines(i, splitLines.size());
                 }
-                addSplitLines(i, splitLines.size());
+                updateHeight();
             }
-            updateHeight();
+        } finally {
+            getLock().relinquishWriteLock();
         }
     }
     
@@ -1295,10 +1305,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
      * selection.
      */
     public void append(String newText) {
-        SelectionSetter noChange = new SelectionSetter(SelectionSetter.DO_NOT_CHANGE);
-        PTextBuffer buffer = getTextBuffer();
-        synchronized (buffer) {
+        getLock().getWriteLock();
+        try {
+            SelectionSetter noChange = new SelectionSetter(SelectionSetter.DO_NOT_CHANGE);
+            PTextBuffer buffer = getTextBuffer();
             buffer.replace(noChange, buffer.length(), 0, newText, noChange);
+        } finally {
+            getLock().relinquishWriteLock();
         }
     }
     

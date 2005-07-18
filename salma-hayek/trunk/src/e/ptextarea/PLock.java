@@ -50,7 +50,7 @@ public class PLock {
         }
         if (gotStuck) {
             long time = System.currentTimeMillis() - start;
-            Log.warn("Thread " + currentThread + " waited to get read lock for " + time + "ms.");
+            Log.warn("PLock: " + currentThread + " waited to get read lock for " + time + "ms.");
         }
         if (readLocks.containsKey(currentThread)) {
             readLocks.put(currentThread, 1 + readLocks.get(currentThread));
@@ -71,13 +71,15 @@ public class PLock {
         int newLockCount = readLocks.get(currentThread) - 1;
         if (newLockCount == 0) {
             readLocks.remove(currentThread);
+            notifyAll();  // IMPORTANT: allow other threads to wake up and check if they can get locks now.
         } else {
             readLocks.put(currentThread, newLockCount);
-            notifyAll();  // IMPORTANT: allow other threads to wake up and check if they can get locks now.
         }
     }
     
     public synchronized void getWriteLock() {
+        //Log.warn("getWriteLock() in thread " + Thread.currentThread());
+        //dumpLocks();
         Thread currentThread = Thread.currentThread();
         long start = System.currentTimeMillis();
         boolean gotStuck = false;
@@ -91,7 +93,7 @@ public class PLock {
         }
         if (gotStuck) {
             long time = System.currentTimeMillis() - start;
-            Log.warn("Thread " + currentThread + " waited to get read lock for " + time + "ms.");
+            Log.warn("PLock: " + currentThread + " waited to get read lock for " + time + "ms.");
         }
         writeLock = currentThread;
         writeLockCount++;
@@ -112,14 +114,28 @@ public class PLock {
     }
     
     public synchronized void relinquishWriteLock() {
+        //Log.warn("relinquishWriteLock() in thread " + Thread.currentThread());
         Thread currentThread = Thread.currentThread();
         if (writeLock != currentThread) {
             throw new RuntimeException("Cannot relinquish write lock on thread " + currentThread + " because it does not hold the lock.");
+        }
+        if (writeLockCount <= 0) {
+            throw new RuntimeException("Tried to relinquish write lock on thread " + currentThread + " while write lock count is " + writeLockCount);
         }
         writeLockCount--;
         if (writeLockCount == 0) {
             writeLock = null;
             notifyAll();  // IMPORTANT: allow other threads to wake up and check if they can get locks now.
         }
+    }
+    
+    private synchronized void dumpLocks() {
+        Log.warn("PLock dump...");
+        Log.warn("Write lock on " + writeLock + " (count=" + writeLockCount + ")");
+        Log.warn(readLocks.size() + " read locks:");
+        for (Thread thread : readLocks.keySet()) {
+            Log.warn("  on " + thread + " (count=" + readLocks.get(thread) + ")");
+        }
+        Log.warn("End of PLock dump.");
     }
 }
