@@ -5,6 +5,7 @@ public class PLineEvent {
     public static final int CHANGED = 1;
     public static final int ADDED = 2;
     public static final int REMOVED = 3;
+    public static final int COMPLETELY_REPLACED = 4;
     
     private PLineList lines;
     private int type;

@@ -117,6 +117,9 @@ public class PLineList implements PTextListener {
             case PLineEvent.CHANGED:
                 listener.linesChanged(event);
                 break;
+            case PLineEvent.COMPLETELY_REPLACED:
+                listener.linesCompletelyReplaced(event);
+                break;
             }
         }
     }
@@ -189,6 +192,7 @@ public class PLineList implements PTextListener {
     /** Handles complete text replacement notifications from the underlying PTextBuffer model. */
     public void textCompletelyReplaced(PTextEvent event) {
         generateLines();
+        fireEvent(new PLineEvent(this, PLineEvent.COMPLETELY_REPLACED, 0, lines.size()));
     }
     
     private void linesAreInvalidAfter(int lineIndex) {

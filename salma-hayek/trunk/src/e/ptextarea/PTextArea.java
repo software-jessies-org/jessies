@@ -774,7 +774,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
-    private void flushSegmentCacheFrom(int lineIndex) {
+    private void clearSegmentCacheFrom(int lineIndex) {
         synchronized (segmentCache) {
             // Take a copy of the indices.  Otherwise, if we try removing stuff from the segment cache
             // based on values taken from the sub-tree from the line index onwards, we incur a
@@ -783,6 +783,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             for (int index : indices) {
                 segmentCache.remove(index);
             }
+        }
+    }
+    
+    private void clearSegmentCache() {
+        synchronized (segmentCache) {
+            segmentCache.clear();
         }
     }
     
@@ -1010,7 +1016,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             return;
         }
         int lineIndex = event.getLineIndex();
-        flushSegmentCacheFrom(lineIndex);
+        clearSegmentCacheFrom(lineIndex);
         int splitIndex = getSplitLineIndex(lineIndex);
         int firstSplitIndex = splitIndex;
         changeLineIndices(lineIndex, event.getLength());
@@ -1025,7 +1031,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (isLineWrappingInvalid()) {
             return;
         }
-        flushSegmentCacheFrom(event.getLineIndex());
+        clearSegmentCacheFrom(event.getLineIndex());
         int splitIndex = getSplitLineIndex(event.getLineIndex());
         for (int i = 0; i < event.getLength(); i++) {
             removeSplitLines(splitIndex);
@@ -1033,6 +1039,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         changeLineIndices(event.getLineIndex() + event.getLength(), -event.getLength());
         updateHeight();
         repaintFromLine(splitIndex);
+    }
+    
+    public void linesCompletelyReplaced(PLineEvent event) {
+        clearSegmentCache();
+        revalidateLineWrappings();
     }
     
     private void changeLineIndices(int lineIndex, int change) {
@@ -1046,7 +1057,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         if (isLineWrappingInvalid()) {
             return;
         }
-        flushSegmentCacheFrom(event.getLineIndex());
+        clearSegmentCacheFrom(event.getLineIndex());
         int lineCountChange = 0;
         int minLine = Integer.MAX_VALUE;
         int visibleLineCount = 0;
@@ -1283,11 +1294,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void setText(PTextBuffer text) {
+        clearSegmentCache();
         if (lines != null) {
             lines.removeLineListener(this);
         }
         lines = new PLineList(text);
         lines.addLineListener(this);
+        clearSegmentCache();
         revalidateLineWrappings();
         selection = new SelectionHighlight(this, 0, 0);
     }

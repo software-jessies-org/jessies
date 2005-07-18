@@ -17,4 +17,7 @@ public interface PLineListener {
     
     /** Notification that one or more lines have had their contents change in the PLineList. */
     public void linesChanged(PLineEvent event);
+    
+    /** Notification that the entire text of the buffer has been completely replaced. */
+    public void linesCompletelyReplaced(PLineEvent event);
 }
