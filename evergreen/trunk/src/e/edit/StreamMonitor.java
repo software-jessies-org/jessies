@@ -3,7 +3,7 @@ package e.edit;
 import e.util.*;
 import java.io.*;
 
-public class StreamMonitor extends Thread {
+public class StreamMonitor implements Runnable {
     private BufferedReader stream;
     private ShellCommand task;
     

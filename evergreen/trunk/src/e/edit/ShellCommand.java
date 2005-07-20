@@ -71,8 +71,8 @@ public class ShellCommand {
 
     public void startMonitoringStream(InputStream stream) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(stream, "UTF-8");
-        StreamMonitor streamMonitor = new StreamMonitor(new BufferedReader(inputStreamReader), this);
-        streamMonitor.start();
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        new Thread(new StreamMonitor(bufferedReader, this)).start();
     }
     
     /**
