@@ -249,7 +249,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 if (file.exists() && file.canWrite() == false) {
                     items.add("(read-only)");
                 }
-                if (isOutOfDateWithRespectToDisk()) {
+                if (file.exists() && isOutOfDateWithRespectToDisk()) {
                     items.add("(out-of-date)");
                     isSerious = true;
                 }
@@ -345,7 +345,11 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void revertToSaved() {
-        if (isDirty() == false && isOutOfDateWithRespectToDisk() == false) {
+        if (file.exists() == false) {
+            Edit.getInstance().showAlert("Revert to Saved", "'" + getFilename() + "' does not exist.");
+            return;
+        }
+        if (isDirty() == false && file.exists() && isOutOfDateWithRespectToDisk() == false) {
             Edit.getInstance().showAlert("Revert to Saved", "'" + getFilename() + "' is the same on disk as in the editor.");
             return;
         }
@@ -608,11 +612,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         getWorkspace().reportError(getContext(), error);
     }
     
-    public boolean isOutOfDateWithRespectToDisk() {
-        if (file.exists() == false) {
-            return false;
-        }
-        
+    private boolean isOutOfDateWithRespectToDisk() {
         // If the time stamp on disk is the same as it was when we last read
         // or wrote the file, assume it hasn't changed.
         if (file.lastModified() == lastModifiedTime) {
@@ -637,7 +637,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     /** Saves the text. Returns true if the file was saved okay. */
     public boolean save() {
-        if (isOutOfDateWithRespectToDisk()) {
+        if (file.exists() && isOutOfDateWithRespectToDisk()) {
             if (showPatchAndAskForConfirmation("Overwrite", "Overwrite the currently saved version of '" + file.getName() + "'? (Equivalent to applying the following patch.)", false) == false) {
                 return false;
             }
