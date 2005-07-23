@@ -8,6 +8,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.*;
+import e.gui.*;
 import e.util.*;
 
 /**
@@ -20,6 +21,8 @@ public class FatBits extends JFrame {
     private Timer timer;
     private ScaledImagePanel scaledImagePanel;
     private int scaleFactor;
+    private JLabel colorLabel;
+    private ColorSwatchIcon colorSwatch;
     
     public FatBits() {
         super("FatBits");
@@ -46,7 +49,6 @@ public class FatBits extends JFrame {
     }
     
     private JComponent makeUi() {
-        // FIXME: NORTH should have a panel showing color information.
         JPanel result = new JPanel(new BorderLayout());
         result.add(scaledImagePanel = new ScaledImagePanel(), BorderLayout.CENTER);
         result.add(makeControlPanel(), BorderLayout.SOUTH);
@@ -57,8 +59,24 @@ public class FatBits extends JFrame {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(makeScaleSlider(), BorderLayout.CENTER);
         panel.add(makeShowGridCheckBox(), BorderLayout.EAST);
+        panel.add(makeColorPanel(), BorderLayout.SOUTH);
         panel.setBorder(new javax.swing.border.EmptyBorder(0, 12, 4, 12));
         return panel;
+    }
+    
+    private JLabel makeColorPanel() {
+        this.colorLabel = new JLabel(" ");
+        Font font = colorLabel.getFont();
+        colorLabel.setFont(new Font(GuiUtilities.getMonospacedFontName(), font.getStyle(), font.getSize()));
+        int height = colorLabel.getPreferredSize().height - 2;
+        this.colorSwatch = new ColorSwatchIcon(null, new Dimension(20, height));
+        colorLabel.setIcon(colorSwatch);
+        return colorLabel;
+    }
+    
+    private void updateCenterColor(int argb) {
+        colorLabel.setText(String.format("%06x", argb & 0xffffff));
+        colorSwatch.setColor(new Color(argb));
     }
     
     private JCheckBox makeShowGridCheckBox() {
@@ -142,6 +160,8 @@ public class FatBits extends JFrame {
             
             Rectangle screenCaptureBounds = getScreenCaptureBounds(center);
             BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
+            updateCenterColor(capturedImage.getRGB(capturedImage.getWidth() / 2, capturedImage.getHeight() / 2));
+            
             Image scaledImage = capturedImage.getScaledInstance(scaledImagePanel.getWidth(), scaledImagePanel.getHeight(), Image.SCALE_REPLICATE);
             scaledImagePanel.setImage(scaledImage);
         }
