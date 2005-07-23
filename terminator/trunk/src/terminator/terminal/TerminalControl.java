@@ -147,12 +147,11 @@ public class TerminalControl implements Runnable {
 				int signal = ptyProcess.getTerminatingSignal();
 				announceConnectionLost("\n\r[Process killed by signal " + signal + ".]");
 				return;
-			} else {
-				// If it wasn't a pane close that caused us to get here, close
-				// the pane.
-				if (processIsBeingDestroyed == false) {
-					pane.doCloseAction();
-				}
+			}
+			// If it wasn't a pane close that caused us to get here, close
+			// the pane.
+			if (processIsBeingDestroyed == false) {
+				pane.doCloseAction();
 			}
 		} catch (Exception ex) {
 			Log.warn("Problem handling process termination", ex);
