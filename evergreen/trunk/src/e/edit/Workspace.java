@@ -21,8 +21,8 @@ public class Workspace extends JPanel {
     
     private FindFilesDialog findFilesDialog;
     private OpenQuicklyDialog openQuicklyDialog;
-    private EFileOpenDialog openDialog;
-    private FileDialog saveAsDialog;
+    private EFileDialog openDialog;
+    private EFileDialog saveAsDialog;
     
     private ArrayList<String> fileList;
     
@@ -392,7 +392,7 @@ public class Workspace extends JPanel {
     
     public void showOpenDialog() {
         if (openDialog == null) {
-            openDialog = new EFileOpenDialog(Edit.getInstance().getFrame(), getRootDirectory());
+            openDialog = EFileDialog.makeOpenDialog(Edit.getInstance().getFrame(), getRootDirectory());
         }
         openDialog.show();
         String name = openDialog.getFile();
@@ -404,15 +404,10 @@ public class Workspace extends JPanel {
     /** Returns the chosen save-as name, or null. */
     public String showSaveAsDialog() {
         if (saveAsDialog == null) {
-            saveAsDialog = new FileDialog(Edit.getInstance().getFrame(), "Save As", FileDialog.SAVE);
-            saveAsDialog.setDirectory(getRootDirectory());
+            saveAsDialog = EFileDialog.makeSaveDialog(Edit.getInstance().getFrame(), getRootDirectory());
         }
-        saveAsDialog.setVisible(true);
-        String leafname = saveAsDialog.getFile();
-        if (leafname == null) {
-            return null;
-        }
-        return saveAsDialog.getDirectory() + File.separator + leafname;
+        saveAsDialog.show();
+        return saveAsDialog.getFile();
     }
     
     public void takeWindow(EWindow window) {
