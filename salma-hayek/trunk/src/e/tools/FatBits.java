@@ -21,6 +21,9 @@ public class FatBits extends JFrame {
     private Timer timer;
     private ScaledImagePanel scaledImagePanel;
     private int scaleFactor;
+    
+    private JLabel positionLabel;
+    
     private JLabel colorLabel;
     private ColorSwatchIcon colorSwatch;
     
@@ -49,6 +52,9 @@ public class FatBits extends JFrame {
     }
     
     private JComponent makeUi() {
+        initColorLabel();
+        initPositionLabel();
+        
         JPanel result = new JPanel(new BorderLayout());
         result.add(scaledImagePanel = new ScaledImagePanel(), BorderLayout.CENTER);
         result.add(makeControlPanel(), BorderLayout.SOUTH);
@@ -59,19 +65,33 @@ public class FatBits extends JFrame {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(makeScaleSlider(), BorderLayout.CENTER);
         panel.add(makeShowGridCheckBox(), BorderLayout.EAST);
-        panel.add(makeColorPanel(), BorderLayout.SOUTH);
-        panel.setBorder(new javax.swing.border.EmptyBorder(0, 12, 4, 12));
+        panel.add(makeInfoPanel(), BorderLayout.SOUTH);
+        panel.setBorder(new javax.swing.border.EmptyBorder(0, 12, 4, 24));
         return panel;
     }
     
-    private JLabel makeColorPanel() {
+    private JPanel makeInfoPanel() {
+        JPanel result = new JPanel(new BorderLayout());
+        result.add(colorLabel, BorderLayout.WEST);
+        result.add(positionLabel, BorderLayout.EAST);
+        return result;
+    }
+    
+    private void initPositionLabel() {
+        this.positionLabel = new JLabel(" ");
+    }
+    
+    private void updatePosition(Point p) {
+        positionLabel.setText("(" + p.x + "," + p.y + ")");
+    }
+    
+    private void initColorLabel() {
         this.colorLabel = new JLabel(" ");
         Font font = colorLabel.getFont();
         colorLabel.setFont(new Font(GuiUtilities.getMonospacedFontName(), font.getStyle(), font.getSize()));
         int height = colorLabel.getPreferredSize().height - 2;
         this.colorSwatch = new ColorSwatchIcon(null, new Dimension(20, height));
         colorLabel.setIcon(colorSwatch);
-        return colorLabel;
     }
     
     private void updateCenterColor(int argb) {
@@ -157,6 +177,7 @@ public class FatBits extends JFrame {
                 return;
             }
             lastPosition = center;
+            updatePosition(lastPosition);
             
             Rectangle screenCaptureBounds = getScreenCaptureBounds(center);
             BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
