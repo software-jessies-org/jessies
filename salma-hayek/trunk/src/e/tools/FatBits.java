@@ -87,7 +87,18 @@ public class FatBits extends JFrame {
     }
     
     private void updatePosition(Point p) {
+        if (scaledImagePanel.isShowing() == false) {
+            return;
+        }
+        
         positionLabel.setText("(" + p.x + "," + p.y + ")");
+        
+        Rectangle screenCaptureBounds = getScreenCaptureBounds(p);
+        BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
+        updateCenterColor(capturedImage.getRGB(capturedImage.getWidth() / 2, capturedImage.getHeight() / 2));
+        
+        Image scaledImage = capturedImage.getScaledInstance(roundLengthDown(scaledImagePanel.getWidth()), roundLengthDown(scaledImagePanel.getHeight()), Image.SCALE_REPLICATE);
+        scaledImagePanel.setImage(scaledImage);
     }
     
     private void initColorLabel() {
@@ -120,7 +131,7 @@ public class FatBits extends JFrame {
         scaleSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 scaleFactor = (1 << scaleSlider.getValue());
-                repaint();
+                updatePosition(getPointerLocation());
             }
         });
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
@@ -137,6 +148,31 @@ public class FatBits extends JFrame {
     
     private int roundLengthDown(int length) {
         return (length - (length % scaleFactor));
+    }
+    
+    private Rectangle getScreenCaptureBounds(Point center) {
+        Point topLeft = new Point(center.x - scaledImagePanel.getWidth() / (2 * scaleFactor), center.y - scaledImagePanel.getHeight() / (2 * scaleFactor));
+        Rectangle result = new Rectangle(topLeft, scaledImagePanel.getSize());
+        result.width /= scaleFactor;
+        result.height /= scaleFactor;
+        
+        // Constrain the capture to the display.
+        // Apple's 1.5 VM crashes if you don't.
+        result.x = Math.max(result.x, 0);
+        result.y = Math.max(result.y, 0);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        if (result.x + result.width > screenSize.width) {
+            result.x = screenSize.width - result.width;
+        }
+        if (result.y + result.height > screenSize.height) {
+            result.y = screenSize.height - result.height;
+        }
+        return result;
+    }
+    
+    private Point getPointerLocation() {
+        PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+        return pointerInfo.getLocation();
     }
     
     private class ScaledImagePanel extends JComponent {
@@ -192,44 +228,12 @@ public class FatBits extends JFrame {
         private Point lastPosition = null;
 
         public void actionPerformed(ActionEvent e) {
-            if (scaledImagePanel.isShowing() == false) {
+            Point p = getPointerLocation();
+            if (lastPosition != null && lastPosition.equals(p)) {
                 return;
             }
-            
-            PointerInfo pointerInfo = MouseInfo.getPointerInfo();
-            Point center = pointerInfo.getLocation();
-            if (lastPosition != null && lastPosition.equals(center)) {
-                return;
-            }
-            lastPosition = center;
+            lastPosition = p;
             updatePosition(lastPosition);
-            
-            Rectangle screenCaptureBounds = getScreenCaptureBounds(center);
-            BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
-            updateCenterColor(capturedImage.getRGB(capturedImage.getWidth() / 2, capturedImage.getHeight() / 2));
-            
-            Image scaledImage = capturedImage.getScaledInstance(roundLengthDown(scaledImagePanel.getWidth()), roundLengthDown(scaledImagePanel.getHeight()), Image.SCALE_REPLICATE);
-            scaledImagePanel.setImage(scaledImage);
-        }
-        
-        private Rectangle getScreenCaptureBounds(Point center) {
-            Point topLeft = new Point(center.x - scaledImagePanel.getWidth() / (2 * scaleFactor), center.y - scaledImagePanel.getHeight() / (2 * scaleFactor));
-            Rectangle result = new Rectangle(topLeft, scaledImagePanel.getSize());
-            result.width /= scaleFactor;
-            result.height /= scaleFactor;
-            
-            // Constrain the capture to the display.
-            // Apple's 1.5 VM crashes if you don't.
-            result.x = Math.max(result.x, 0);
-            result.y = Math.max(result.y, 0);
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            if (result.x + result.width > screenSize.width) {
-                result.x = screenSize.width - result.width;
-            }
-            if (result.y + result.height > screenSize.height) {
-                result.y = screenSize.height - result.height;
-            }
-            return result;
         }
     }
     
