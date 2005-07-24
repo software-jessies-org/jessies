@@ -54,9 +54,10 @@ public class FatBits extends JFrame {
     private JComponent makeUi() {
         initColorLabel();
         initPositionLabel();
+        initScaledImagePanel();
         
         JPanel result = new JPanel(new BorderLayout());
-        result.add(scaledImagePanel = new ScaledImagePanel(), BorderLayout.CENTER);
+        result.add(scaledImagePanel, BorderLayout.CENTER);
         result.add(makeControlPanel(), BorderLayout.SOUTH);
         return result;
     }
@@ -75,6 +76,10 @@ public class FatBits extends JFrame {
         result.add(colorLabel, BorderLayout.WEST);
         result.add(positionLabel, BorderLayout.EAST);
         return result;
+    }
+    
+    private void initScaledImagePanel() {
+        this.scaledImagePanel = new ScaledImagePanel();
     }
     
     private void initPositionLabel() {
@@ -130,6 +135,10 @@ public class FatBits extends JFrame {
         return scaleSlider;
     }
     
+    private int roundLengthDown(int length) {
+        return (length - (length % scaleFactor));
+    }
+    
     private class ScaledImagePanel extends JComponent {
         private Image image;
         private boolean showGrid;
@@ -145,21 +154,37 @@ public class FatBits extends JFrame {
         }
         
         public void paintComponent(Graphics g) {
-            g.drawImage(image, 0, 0, null);
-            paintGridLines(g);
+            int xOrigin = xOrigin();
+            int yOrigin = yOrigin();
+            g.drawImage(image, xOrigin, yOrigin, null);
+            paintGridLines(g, xOrigin, yOrigin);
         }
         
-        private void paintGridLines(Graphics g) {
+        private void paintGridLines(Graphics g, int xOrigin, int yOrigin) {
             if (showGrid == false) {
                 return;
             }
             g.setColor(Color.BLACK);
-            for (int x = scaleFactor; x < getWidth(); x += scaleFactor) {
-                g.drawLine(x, 0, x, getHeight());
+            final int maxX = xOrigin + roundLengthDown(getWidth());
+            final int maxY = yOrigin + roundLengthDown(getHeight());
+            for (int x = xOrigin + scaleFactor; x < maxX; x += scaleFactor) {
+                g.drawLine(x, yOrigin, x, maxY - 1);
             }
-            for (int y = scaleFactor; y < getHeight(); y += scaleFactor) {
-                g.drawLine(0, y, getWidth(), y);
+            for (int y = yOrigin + scaleFactor; y < maxY; y += scaleFactor) {
+                g.drawLine(xOrigin, y, maxX - 1, y);
             }
+        }
+        
+        private int xOrigin() {
+            return origin(getWidth());
+        }
+        
+        private int yOrigin() {
+            return origin(getHeight());
+        }
+        
+        private int origin(int dimension) {
+            return (dimension - roundLengthDown(dimension)) / 2;
         }
     }
     
@@ -183,7 +208,7 @@ public class FatBits extends JFrame {
             BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
             updateCenterColor(capturedImage.getRGB(capturedImage.getWidth() / 2, capturedImage.getHeight() / 2));
             
-            Image scaledImage = capturedImage.getScaledInstance(scaledImagePanel.getWidth(), scaledImagePanel.getHeight(), Image.SCALE_REPLICATE);
+            Image scaledImage = capturedImage.getScaledInstance(roundLengthDown(scaledImagePanel.getWidth()), roundLengthDown(scaledImagePanel.getHeight()), Image.SCALE_REPLICATE);
             scaledImagePanel.setImage(scaledImage);
         }
         
