@@ -135,7 +135,7 @@ public class JAsynchronousProgressIndicator extends JComponent {
     }
     
     public Dimension getPreferredSize() {
-        return new Dimension(DIAMETER, DIAMETER);
+        return new Dimension(DIAMETER + 2, DIAMETER);
     }
     
     public static void main(String[] args) {
