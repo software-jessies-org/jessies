@@ -71,11 +71,11 @@ public class PtyProcess {
         return outStream;
     }
     
-    private native void startProcess(String[] command, FileDescriptor inDescriptor, FileDescriptor outDescriptor) throws IOException;
+    private native void startProcess(String[] command, FileDescriptor inDescriptor, FileDescriptor outDescriptor) throws RuntimeException;
     
-    public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
+    public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws RuntimeException;
     
-    public native void destroy() throws IOException;
+    public native void destroy() throws RuntimeException;
     
-    public native void waitFor() throws IOException;
+    public native void waitFor() throws RuntimeException;
 }
