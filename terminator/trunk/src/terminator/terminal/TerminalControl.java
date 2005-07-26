@@ -136,7 +136,14 @@ public class TerminalControl implements Runnable {
 	private void handleProcessTermination() {
 		processIsRunning = false;
 		try {
-			ptyProcess.waitFor();
+			// Java 1.5.0_03 on Linux 2.4.27 doesn't seem to use LWP threads (according to ps -eLf)
+			// for Java threads.
+			// Consequently, only the Java thread which forked a child can wait for it.
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					ptyProcess.waitFor();
+				}
+			});
 			if (ptyProcess.didExitNormally()) {
 				int status = ptyProcess.getExitStatus();
 				if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
