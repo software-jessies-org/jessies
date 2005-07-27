@@ -1,8 +1,9 @@
 package terminator.terminal;
 
 import e.util.*;
-import java.awt.*;
+import java.awt.Dimension;
 import java.io.*;
+import java.util.concurrent.*;
 
 public class PtyProcess {
     private int fd;
@@ -14,6 +15,8 @@ public class PtyProcess {
     
     private FileInputStream inStream;
     private FileOutputStream outStream;
+    
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
     
     private static boolean libraryLoaded = false;
     
@@ -51,7 +54,7 @@ public class PtyProcess {
         return exitValue;
     }
     
-    public PtyProcess(String[] command) throws IOException {
+    public PtyProcess(String[] command) throws Exception {
         ensureLibrary();
         FileDescriptor inDescriptor = new FileDescriptor();
         FileDescriptor outDescriptor = new FileDescriptor();
@@ -71,11 +74,50 @@ public class PtyProcess {
         return outStream;
     }
     
-    private native void startProcess(String[] command, FileDescriptor inDescriptor, FileDescriptor outDescriptor) throws RuntimeException;
+    public void startProcess(final String[] command, final FileDescriptor inDescriptor, final FileDescriptor outDescriptor) throws Exception {
+        invoke(new Callable<Exception>() {
+            public Exception call() {
+                try {
+                    nativeStartProcess(command, inDescriptor, outDescriptor);
+                    return null;
+                } catch (Exception ex) {
+                    return ex;
+                }
+            }
+        });
+    }
     
-    public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws RuntimeException;
+    public void waitFor() throws Exception {
+        invoke(new Callable<Exception>() {
+            public Exception call() {
+                try {
+                    nativeWaitFor();
+                    return null;
+                } catch (Exception ex) {
+                    return ex;
+                }
+            }
+        });
+    }
     
-    public native void destroy() throws RuntimeException;
+    /**
+     * Java 1.5.0_03 on Linux 2.4.27 doesn't seem to use LWP threads (according
+     * to ps -eLf) for Java threads. Linux 2.4 is broken such that only the
+     * Java thread which forked a child can wait for it.
+     */
+    private void invoke(Callable<Exception> callable) throws Exception {
+        Future<Exception> future = executorService.submit(callable);
+        Exception exception = future.get();
+        if (exception != null) {
+            throw exception;
+        }
+    }
     
-    public native void waitFor() throws RuntimeException;
+    private native void nativeStartProcess(String[] command, FileDescriptor inDescriptor, FileDescriptor outDescriptor) throws IOException;
+    
+    public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
+    
+    public native void destroy() throws IOException;
+    
+    private native void nativeWaitFor() throws IOException;
 }

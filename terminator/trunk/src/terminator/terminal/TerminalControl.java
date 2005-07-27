@@ -51,7 +51,7 @@ public class TerminalControl implements Runnable {
 	// Buffer of TerminalActions to perform.
 	private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
 	
-	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) throws IOException {
+	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) throws Exception {
 		reset();
 		this.pane = pane;
 		this.listener = listener;
@@ -66,7 +66,7 @@ public class TerminalControl implements Runnable {
 			try {
 				ptyProcess.destroy();
 				processIsBeingDestroyed = true;
-			} catch (Exception ex) {
+			} catch (IOException ex) {
 				Log.warn("Failed to destroy process.", ex);
 			}
 		}
@@ -136,32 +136,25 @@ public class TerminalControl implements Runnable {
 	private void handleProcessTermination() {
 		processIsRunning = false;
 		try {
-			// Java 1.5.0_03 on Linux 2.4.27 doesn't seem to use LWP threads (according to ps -eLf)
-			// for Java threads.
-			// Consequently, only the Java thread which forked a child can wait for it.
-			SwingUtilities.invokeAndWait(new Runnable() {
-				public void run() {
-					ptyProcess.waitFor();
-				}
-			});
-			if (ptyProcess.didExitNormally()) {
-				int status = ptyProcess.getExitStatus();
-				if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
-					announceConnectionLost("\n\r[Process exited with status " + status + ".]");
-					return;
-				}
-			} else if (ptyProcess.wasSignaled()) {
-				int signal = ptyProcess.getTerminatingSignal();
-				announceConnectionLost("\n\r[Process killed by signal " + signal + ".]");
+			ptyProcess.waitFor();
+		} catch (Exception ex) {
+			Log.warn("Problem waiting for process", ex);
+		}
+		if (ptyProcess.didExitNormally()) {
+			int status = ptyProcess.getExitStatus();
+			if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
+				announceConnectionLost("\n\r[Process exited with status " + status + ".]");
 				return;
 			}
-			// If it wasn't a pane close that caused us to get here, close
-			// the pane.
-			if (processIsBeingDestroyed == false) {
-				pane.doCloseAction();
-			}
-		} catch (Exception ex) {
-			Log.warn("Problem handling process termination", ex);
+		} else if (ptyProcess.wasSignaled()) {
+			int signal = ptyProcess.getTerminatingSignal();
+			announceConnectionLost("\n\r[Process killed by signal " + signal + ".]");
+			return;
+		}
+		// If it wasn't a pane close that caused us to get here, close
+		// the pane.
+		if (processIsBeingDestroyed == false) {
+			pane.doCloseAction();
 		}
 	}
 	
