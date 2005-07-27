@@ -131,7 +131,7 @@ public class JTerminalPane extends JPanel {
 			control = new TerminalControl(this, textPane.getModel(), command);
 			textPane.setTerminalControl(control);
 			initSizeMonitoring();
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			Log.warn("Couldn't initialize terminal", ex);
 		}
 	}

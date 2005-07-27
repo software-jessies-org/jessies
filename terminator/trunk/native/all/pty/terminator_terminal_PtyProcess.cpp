@@ -62,7 +62,7 @@ struct Argv : std::vector<char*> {
     }
 };
 
-void terminator_terminal_PtyProcess::startProcess(jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
+void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jobject inDescriptor, jobject outDescriptor) {
     PtyGenerator ptyGenerator;
     int masterFd = ptyGenerator.openMaster();
     
@@ -94,7 +94,7 @@ void terminator_terminal_PtyProcess::destroy() {
     }
 }
 
-void terminator_terminal_PtyProcess::waitFor() {
+void terminator_terminal_PtyProcess::nativeWaitFor() {
     pid_t pid = processId.get();
     int status;
     pid_t result = waitpid(pid, &status, 0);
