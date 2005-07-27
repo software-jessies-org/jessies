@@ -74,7 +74,7 @@ public class PtyProcess {
         return outStream;
     }
     
-    public void startProcess(final String[] command, final FileDescriptor inDescriptor, final FileDescriptor outDescriptor) throws Exception {
+    private void startProcess(final String[] command, final FileDescriptor inDescriptor, final FileDescriptor outDescriptor) throws Exception {
         invoke(new Callable<Exception>() {
             public Exception call() {
                 try {
