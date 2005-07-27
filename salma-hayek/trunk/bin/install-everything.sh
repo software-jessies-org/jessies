@@ -39,9 +39,14 @@ cd /usr/local/www.jessies.org/ || die "making install directory"
 # Download and extract the latest nightly builds.
 PROJECTS="salma-hayek edit scm terminator"
 BROKEN_PROJECTS=""
+WGET_OPTIONS="-C off"
+if ! wget --no-cache 2>&1 | grep unrecognized > /dev/null
+then
+    WGET_OPTIONS="--no-cache"
+fi
 for PROJECT in $PROJECTS; do
     rm -f $PROJECT.tgz
-    wget -C off -N http://www.jessies.org/~enh/software/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
+    wget $WGET_OPTIONS -N http://www.jessies.org/~enh/software/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
     make -C $PROJECT || BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
