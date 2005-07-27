@@ -86,17 +86,28 @@ public class JavaHpp {
                 arguments += "a" + argCount;
                 ++argCount;
             }
+            
             out.println("extern \"C\" JNIEXPORT " + jniReturnType + " JNICALL " + jniMangledName + "(" + parameters + ") {");
             out.println("try {");
             out.println(proxyClassName + " proxy(env, instance);");
             out.println("proxy." + method.getName() + "(" + arguments + ");");
             out.println("} catch (std::exception& ex) {");
-            out.println("translateToJavaException(env, ex);");
+            out.println("translateToJavaException(env, \"" + chooseExceptionClassName(method) + "\", ex);");
             out.println("}");
             out.println("}");
         }
         
         out.println("#endif // " + includeGuardName);
+    }
+    
+    private String chooseExceptionClassName(Method method) {
+        Class[] exceptionTypes = method.getExceptionTypes();
+        if (exceptionTypes.length == 0) {
+            return "java/lang/RuntimeException";
+        } else if (exceptionTypes.length == 1) {
+            return exceptionTypes[0].getCanonicalName().replace('.', '/');
+        }
+        throw new RuntimeException("methods such as '" + method + "' with multiple exception types are not supported; please choose a single exception type or enhance JavaHpp to use an annotation to choose a wrapper exception for C++ exceptions");
     }
     
     private List<Method> extractNativeMethods(Method[] methods) {
@@ -126,8 +137,8 @@ public class JavaHpp {
     }
     
     private void emit_translateToJavaException(IndentedSourceWriter out) {
-        out.println("static void translateToJavaException(JNIEnv* env, const std::exception& ex) {");
-        out.println("    jclass exceptionClass = env->FindClass(\"java/lang/RuntimeException\");");
+        out.println("static void translateToJavaException(JNIEnv* env, const char* exceptionClassName, const std::exception& ex) {");
+        out.println("    jclass exceptionClass = env->FindClass(exceptionClassName);");
         out.println("    if (exceptionClass) {");
         out.println("        env->ThrowNew(exceptionClass, ex.what());");
         out.println("    }");
