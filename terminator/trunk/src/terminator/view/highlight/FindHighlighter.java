@@ -25,6 +25,8 @@ public class FindHighlighter implements Highlighter {
 		if (regularExpression.length() > 0) {
 			this.pattern = Pattern.compile(regularExpression);
 			return addHighlights(view, 0);
+		} else {
+			forgetRegularExpression(view);
 		}
 		return 0;
 	}
