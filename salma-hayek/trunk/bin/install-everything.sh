@@ -40,7 +40,7 @@ cd /usr/local/www.jessies.org/ || die "making install directory"
 PROJECTS="salma-hayek edit scm terminator"
 BROKEN_PROJECTS=""
 WGET_OPTIONS="-C off"
-if ! wget --no-cache 2>&1 | grep unrecognized > /dev/null
+if ! wget --no-cache 2>&1 | grep unrecogni[sz]ed > /dev/null
 then
     WGET_OPTIONS="--no-cache"
 fi
