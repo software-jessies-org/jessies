@@ -27,8 +27,8 @@ public class FindHighlighter implements Highlighter {
 			return addHighlights(view, 0);
 		} else {
 			forgetRegularExpression(view);
+			return 0;
 		}
-		return 0;
 	}
 	
 	public void forgetRegularExpression(JTextBuffer view) {
