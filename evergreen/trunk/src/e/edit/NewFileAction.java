@@ -28,9 +28,9 @@ public class NewFileAction extends ETextAction {
         }
 
         do {
-            FormPanel formPanel = new FormPanel();
-            formPanel.addRow("Filename:", filenameField);
-            boolean okay = FormDialog.show(Edit.getInstance().getFrame(), "New File", formPanel, "Create");
+            FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "New File");
+            form.getFormPanel().addRow("Filename:", filenameField);
+            boolean okay = form.show("Create");
             
             if (okay == false) {
                 return;

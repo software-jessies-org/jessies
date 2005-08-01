@@ -18,9 +18,9 @@ public class SetBuildTargetAction extends ETextAction {
 
         buildTargetField.setText(workspace.getBuildTarget());
         
-        FormPanel formPanel = new FormPanel();
-        formPanel.addRow("Build Target:", buildTargetField);
-        boolean okay = FormDialog.show(Edit.getInstance().getFrame(), workspace.getTitle() + " Build Target", formPanel, "Apply");
+        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), workspace.getTitle() + " Build Target");
+        form.getFormPanel().addRow("Build Target:", buildTargetField);
+        boolean okay = form.show("Apply");
         
         if (okay == false) {
             return;

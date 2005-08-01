@@ -111,10 +111,11 @@ public class ExternalToolAction extends ETextAction {
             commandField = new JTextField(shellCommand.getCommand(), 40);
             contextField = new JTextField(shellCommand.getContext(), 40);
         }
-        FormPanel formPanel = new FormPanel();
+        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), (String) getValue(Action.NAME));
+        FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Command:", commandField);
         formPanel.addRow("Directory:", contextField);
-        boolean shouldRun = FormDialog.show(Edit.getInstance().getFrame(), (String) getValue(Action.NAME), formPanel, "Run");
+        boolean shouldRun = form.show("Run");
         if (shouldRun) {
             shellCommand.setCommand(commandField.getText());
             shellCommand.setContext(contextField.getText());
