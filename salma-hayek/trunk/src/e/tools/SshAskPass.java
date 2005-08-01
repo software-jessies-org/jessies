@@ -23,9 +23,9 @@ public class SshAskPass extends JFrame {
     }
     
     private SshAskPass() {
-        FormPanel formPanel = new FormPanel();
-        formPanel.addRow("Password:", passwordField);
-        boolean accepted = FormDialog.show(null, "SSH Password Dialog", formPanel, "OK");
+        FormBuilder form = new FormBuilder(null, "SSH Password Dialog");
+        form.getFormPanel().addRow("Password:", passwordField);
+        boolean accepted = form.show("OK");
         if (accepted) {
             System.out.println(new String(passwordField.getPassword()));
             System.exit(EXIT_ACCEPT);

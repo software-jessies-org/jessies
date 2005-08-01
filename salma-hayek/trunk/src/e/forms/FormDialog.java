@@ -27,7 +27,7 @@ import e.util.*;
  * on quit and initialization respectively, passing the same filename to each, your geometries
  * will be preserved.
  */
-public class FormDialog extends JDialog {
+public class FormDialog {
     private static int componentSpacing = getComponentSpacing();
     
     private static HashMap<String, Rectangle> dialogGeometries = new HashMap<String, Rectangle>();
@@ -47,6 +47,14 @@ public class FormDialog extends JDialog {
     private Runnable acceptRunnable = new NoOpRunnable();
     private Runnable cancelRunnable = new NoOpRunnable();
     
+    private FormPanel formPanel;
+    
+    private String actionLabel;
+    
+    private JButton extraButton;
+    
+    private JDialog dialog;
+    
     public static int getComponentSpacing() {
         if (GuiUtilities.isWindows()) {
             return 4;
@@ -55,73 +63,67 @@ public class FormDialog extends JDialog {
     }
     
     /**
-     * Shows a non-modal dialog with a Close button that performs no action
-     * when the dialog is accepted.
+     * Shows a non-modal dialog with a Close button.
      */
-    public static FormDialog showNonModal(Frame parent, String title, FormPanel contentPane) {
-        FormDialog formDialog = new FormDialog(parent, title, contentPane, "Close", null, false);
-        formDialog.setVisible(true);
-        return formDialog;
+    public void showNonModal() {
+        this.actionLabel = "Close";
+        configureDialog();
+        dialog.setModal(false);
+        dialog.setVisible(true);
     }
     
     /**
-     * Shows a dialog with the usual OK and Cancel buttons.
-     * See the note in the class documentation about "OK" buttons.
+     * Shows a dialog with a Cancel button, and a button with the given label.
+     * See the note in the class documentation about why you shouldn't label
+     * a button "OK".
      */
-    public static boolean show(Frame parent, String title, FormPanel contentPane, String actionLabel) {
-        return show(parent, title, contentPane, actionLabel, null);
-    }
-    
-    /**
-     * Shows a dialog with the usual OK and Cancel buttons plus an extra button
-     * you provide.
-     * See the note in the class documentation about "OK" buttons.
-     */
-    public static boolean show(Frame parent, String title, FormPanel contentPane, String actionLabel, JButton extraButton) {
-        FormDialog formDialog = new FormDialog(parent, title, contentPane, actionLabel, extraButton, true);
-        formDialog.setVisible(true);
-        return formDialog.wasAccepted;
+    public boolean show(String actionLabel) {
+        this.actionLabel = actionLabel;
+        configureDialog();
+        dialog.setModal(true);
+        dialog.setVisible(true);
+        return wasAccepted;
     }
 
-    private FormDialog(Frame parent, String title, FormPanel contentPane, String actionLabel, JButton extraButton, boolean modal) {
-        super(parent, title, modal);
-        init(parent, contentPane, actionLabel, extraButton);
+    FormDialog(Frame parent, String title, FormPanel formPanel) {
+        this.dialog = new JDialog(parent, title);
+        this.formPanel = formPanel;
     }
     
-    private void init(Frame parent, FormPanel contentPane, String actionLabel, JButton extraButton) {
-        setResizable(true);
+    private void configureDialog() {
+        dialog.setResizable(true);
         
-        JComponent statusBar = contentPane.getStatusBar();
+        JComponent statusBar = formPanel.getStatusBar();
         if (extraButton != null && statusBar != null) {
             // It looks bad if we have a status bar and an
             // extra button together in the row of buttons.
-            contentPane.addRow("", statusBar);
+            formPanel.addRow("", statusBar);
             statusBar = null;
         }
         
         JPanel internalContentPane = new JPanel(new BorderLayout(componentSpacing, componentSpacing));
         internalContentPane.setBorder(BorderFactory.createEmptyBorder(componentSpacing, componentSpacing, componentSpacing, componentSpacing));
-        internalContentPane.add(contentPane, BorderLayout.CENTER);
-        internalContentPane.add(makeButtonPanel(getRootPane(), actionLabel, extraButton, statusBar), BorderLayout.SOUTH);
+        internalContentPane.add(formPanel, BorderLayout.CENTER);
+        internalContentPane.add(makeButtonPanel(dialog.getRootPane(), actionLabel, statusBar), BorderLayout.SOUTH);
         
-        setContentPane(internalContentPane);
+        dialog.setContentPane(internalContentPane);
         
         // Set sensible defaults for size and location.
-        pack();
-        setLocationRelativeTo(parent);
+        dialog.pack();
+        dialog.setLocationRelativeTo(dialog.getParent());
         
         // But if we've shown this dialog before, put it back where it last was.
         restorePreviousSize();
         
         initCloseBehavior();
-        initFocus(contentPane);
+        initFocus(formPanel);
         
         // Support for "as-you-type" interfaces that update whenever the user
         // pauses in their typing.
-        ActionListener listener = contentPane.getTypingTimeoutActionListener();
+        ActionListener listener = formPanel.getTypingTimeoutActionListener();
         initComponentListener(listener);
         initTextChangeTimer(listener);
-        initDocumentListener(contentPane);
+        initDocumentListener(formPanel);
     }
     
     /**
@@ -131,7 +133,7 @@ public class FormDialog extends JDialog {
      * typing.
      */
     private void initComponentListener(final ActionListener listener) {
-        addComponentListener(new ComponentAdapter() {
+        dialog.addComponentListener(new ComponentAdapter() {
             public void componentShown(ComponentEvent e) {
                 listener.actionPerformed(null);
             }
@@ -147,7 +149,7 @@ public class FormDialog extends JDialog {
     /**
      * Restarts our timer whenever the user types.
      */
-    private void initDocumentListener(FormPanel contentPane) {
+    private void initDocumentListener(FormPanel formPanel) {
         // Create a listener...
         documentListener = new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
@@ -168,7 +170,7 @@ public class FormDialog extends JDialog {
             }
         };
         // ...and attach it to the text fields.
-        this.listenedToTextFields = contentPane.getTextComponents();
+        this.listenedToTextFields = formPanel.getTextComponents();
         addTextFieldListeners();
     }
     
@@ -180,7 +182,7 @@ public class FormDialog extends JDialog {
     private void initTextChangeTimer(final ActionListener listener) {
         textChangeTimer = new Timer(500, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (isShowing()) {
+                if (dialog.isShowing()) {
                     listener.actionPerformed(null);
                     isListenerUpToDate = true;
                 }
@@ -213,14 +215,14 @@ public class FormDialog extends JDialog {
         initKeyboardCloseBehavior();
     }
 
-    private void initFocus(Container contentPane) {
-        dialogFocusRedirector = new DialogFocusRedirector(contentPane);
+    private void initFocus(Container formPanel) {
+        dialogFocusRedirector = new DialogFocusRedirector(formPanel);
         dialogFocusRedirector.redirectFocus();
     }
     
     private void initWindowManagerCloseBehavior() {
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.addWindowListener(new WindowAdapter() {
             // windowClosing only applies to closes via the window manager.
             public void windowClosing(WindowEvent windowEvent) {
                 cancelDialog();
@@ -243,8 +245,8 @@ public class FormDialog extends JDialog {
     
     private void closeOnKeyStroke(KeyStroke keyStroke) {
         final String CLOSE_ACTION = "e.forms.FormDialog.CloseDialogIfEscapePressed";
-        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, CLOSE_ACTION);
-        getRootPane().getActionMap().put(CLOSE_ACTION, closeAction);
+        dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, CLOSE_ACTION);
+        dialog.getRootPane().getActionMap().put(CLOSE_ACTION, closeAction);
     }
     
     /**
@@ -256,13 +258,13 @@ public class FormDialog extends JDialog {
      * code was forcing the clipping to occur. Hence the restriction now.)
      */
     private void restorePreviousSize() {
-        Rectangle previousBounds = dialogGeometries.get(getTitle());
+        Rectangle previousBounds = dialogGeometries.get(dialog.getTitle());
         if (previousBounds != null) {
-            setLocation(previousBounds.getLocation());
+            dialog.setLocation(previousBounds.getLocation());
             Dimension newSize = previousBounds.getSize();
-            newSize.height = Math.max(newSize.height, getHeight());
-            newSize.width = Math.max(newSize.width, getWidth());
-            setSize(newSize);
+            newSize.height = Math.max(newSize.height, dialog.getHeight());
+            newSize.width = Math.max(newSize.width, dialog.getWidth());
+            dialog.setSize(newSize);
         }
     }
     
@@ -278,14 +280,14 @@ public class FormDialog extends JDialog {
 
     private void processUserChoice(boolean isAcceptance) {
         textChangeTimer.stop();
-        dialogGeometries.put(getTitle(), getBounds());
+        dialogGeometries.put(dialog.getTitle(), dialog.getBounds());
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
-        dispose();
+        dialog.dispose();
         dialogFocusRedirector.restoreFocus();
     }
     
-    private JPanel makeButtonPanel(JRootPane rootPane, String actionLabel, JButton extraButton, JComponent statusBar) {
+    private JPanel makeButtonPanel(JRootPane rootPane, String actionLabel, JComponent statusBar) {
         JButton actionButton = new JButton(actionLabel);
         actionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -295,12 +297,12 @@ public class FormDialog extends JDialog {
         rootPane.setDefaultButton(actionButton);
         
         JButton cancelButton = null;
-        if (isModal()) {
+        if (dialog.isModal()) {
             cancelButton = new JButton("Cancel");
             cancelButton.addActionListener(closeAction);
             tieButtonSizes(actionButton, cancelButton);
         }
-        return makeButtonPanel(actionButton, cancelButton, extraButton, statusBar);
+        return makeButtonPanel(actionButton, cancelButton, statusBar);
     }
     
     /**
@@ -317,7 +319,7 @@ public class FormDialog extends JDialog {
         cancelButton.setPreferredSize(buttonSize);
     }
     
-    private JPanel makeButtonPanel(JButton actionButton, JButton cancelButton, JButton extraButton, JComponent statusBar) {
+    private JPanel makeButtonPanel(JButton actionButton, JButton cancelButton, JComponent statusBar) {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(0, componentSpacing, componentSpacing, componentSpacing));
         //panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -403,7 +405,7 @@ public class FormDialog extends JDialog {
      * just before the dialog is removed from the display.
      */
     public void setAcceptRunnable(Runnable runnable) {
-        acceptRunnable = runnable;
+        this.acceptRunnable = runnable;
     }
     
     /**
@@ -411,6 +413,10 @@ public class FormDialog extends JDialog {
      * just before the dialog is removed from the display.
      */
     public void setCancelRunnable(Runnable runnable) {
-        cancelRunnable = runnable;
+        this.cancelRunnable = runnable;
+    }
+    
+    public void setExtraButton(JButton button) {
+        this.extraButton = button;
     }
 }

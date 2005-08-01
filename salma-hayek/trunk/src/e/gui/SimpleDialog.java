@@ -56,9 +56,9 @@ public class SimpleDialog {
         textArea.setEditable(false);
         textArea.setText(details);
         textArea.setWrapStyleWord(true);
-        FormPanel formPanel = new FormPanel();
-        formPanel.addRow("Details:", new JScrollPane(textArea));
-        FormDialog.showNonModal(frame, title, formPanel);
+        FormBuilder form = new FormBuilder(frame, title);
+        form.getFormPanel().addRow("Details:", new JScrollPane(textArea));
+        form.showNonModal();
     }
     
     /**

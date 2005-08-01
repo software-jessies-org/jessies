@@ -96,7 +96,8 @@ public class PFind {
         private void showFindDialog() {
             Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, textArea);
             
-            FormPanel formPanel = new FormPanel();
+            FormBuilder form = new FormBuilder(frame, "Find");
+            FormPanel formPanel = form.getFormPanel();
             formPanel.addRow("Find:", findField);
             formPanel.setStatusBar(findStatus);
             formPanel.setTypingTimeoutActionListener(new ActionListener() {
@@ -110,12 +111,12 @@ public class PFind {
                     }
                 }
             });
-            FormDialog dialog = FormDialog.showNonModal(frame, "Find", formPanel);
-            dialog.setCancelRunnable(new Runnable() {
+            form.getFormDialog().setCancelRunnable(new Runnable() {
                 public void run() {
                     textArea.clearFindMatches();
                 }
             });
+            form.showNonModal();
             
             findField.selectAll();
             findField.requestFocus();
