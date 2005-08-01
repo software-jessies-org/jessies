@@ -21,9 +21,6 @@ public class CircularButton extends JComponent {
     public CircularButton() {
         addMouseListener(new MouseListener() {
             public void mousePressed(MouseEvent e) {
-                if (isInterestingEvent(e)) {
-                    buttonActivated(e);
-                }
                 arm(e);
             }
             public void mouseReleased(MouseEvent e) {
