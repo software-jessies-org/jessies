@@ -138,7 +138,7 @@ public class OpenQuicklyDialog {
         initMatchList();
         
         FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Open Quickly");
-        FormPanel formPanel = new FormPanel();
+        FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Names Containing:", filenameField);
         formPanel.addRow("Matches:", new JScrollPane(matchList));
         formPanel.setStatusBar(status);
