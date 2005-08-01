@@ -55,6 +55,8 @@ public class FormDialog {
     
     private JDialog dialog;
     
+    private boolean doNotRememberBounds = false;
+    
     public static int getComponentSpacing() {
         if (GuiUtilities.isWindows()) {
             return 4;
@@ -258,6 +260,9 @@ public class FormDialog {
      * code was forcing the clipping to occur. Hence the restriction now.)
      */
     private void restorePreviousSize() {
+        if (doNotRememberBounds) {
+            return;
+        }
         Rectangle previousBounds = dialogGeometries.get(dialog.getTitle());
         if (previousBounds != null) {
             dialog.setLocation(previousBounds.getLocation());
@@ -280,7 +285,9 @@ public class FormDialog {
 
     private void processUserChoice(boolean isAcceptance) {
         textChangeTimer.stop();
-        dialogGeometries.put(dialog.getTitle(), dialog.getBounds());
+        if (doNotRememberBounds == false) {
+            dialogGeometries.put(dialog.getTitle(), dialog.getBounds());
+        }
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
         dialog.dispose();
@@ -418,5 +425,9 @@ public class FormDialog {
     
     public void setExtraButton(JButton button) {
         this.extraButton = button;
+    }
+    
+    public void setRememberBounds(boolean rememberBounds) {
+        this.doNotRememberBounds = !rememberBounds;
     }
 }
