@@ -61,11 +61,14 @@ public class InfoDialog {
         logFilename.setText(logWriter.getFilename());
         suspendLogging.setSelected(logWriter.isSuspended());
         
-        FormPanel formPanel = new FormPanel();
+        JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, terminal);
+        
+        FormBuilder form = new FormBuilder(frame, "Info");
+        FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Title:", title);
         formPanel.addRow("Dimensions:", dimensions);
         formPanel.addRow("Log Filename:", logFilename);
         formPanel.addRow("", suspendLogging);
-        FormDialog.showNonModal(null, "Info", formPanel);
+        form.showNonModal();
     }
 }
