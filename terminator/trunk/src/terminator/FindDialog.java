@@ -79,6 +79,7 @@ public class FindDialog {
                 getFindHighlighter().forgetRegularExpression(textToFindIn);
             }
         });
+        dialog.setRememberBounds(false);
         form.showNonModal();
         
         findField.selectAll();

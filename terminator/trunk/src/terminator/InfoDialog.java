@@ -69,6 +69,7 @@ public class InfoDialog {
         formPanel.addRow("Dimensions:", dimensions);
         formPanel.addRow("Log Filename:", logFilename);
         formPanel.addRow("", suspendLogging);
+        form.getFormDialog().setRememberBounds(false);
         form.showNonModal();
     }
 }
