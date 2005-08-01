@@ -8,6 +8,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.*;
+import e.forms.*;
 import e.gui.*;
 import e.util.*;
 
@@ -21,6 +22,9 @@ public class FatBits extends JFrame {
     private Timer timer;
     private ScaledImagePanel scaledImagePanel;
     private int scaleFactor;
+    
+    private JSlider scaleSlider;
+    private JCheckBox showGridCheckBox;
     
     private JLabel positionLabel;
     
@@ -55,26 +59,38 @@ public class FatBits extends JFrame {
         initColorLabel();
         initPositionLabel();
         initScaledImagePanel();
+        initScaleSlider();
+        initShowGridCheckBox();
         
         JPanel result = new JPanel(new BorderLayout());
         result.add(scaledImagePanel, BorderLayout.CENTER);
-        result.add(makeControlPanel(), BorderLayout.SOUTH);
+        result.add(makeInfoPanel(), BorderLayout.SOUTH);
         return result;
     }
     
-    private JComponent makeControlPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(makeScaleSlider(), BorderLayout.CENTER);
-        panel.add(makeShowGridCheckBox(), BorderLayout.EAST);
-        panel.add(makeInfoPanel(), BorderLayout.SOUTH);
-        panel.setBorder(new javax.swing.border.EmptyBorder(0, 12, 4, 24));
-        return panel;
-    }
-    
     private JPanel makeInfoPanel() {
-        JPanel result = new JPanel(new BorderLayout());
+        CircularButton infoButton = new CircularButton();
+        infoButton.setActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                FormBuilder form = new FormBuilder(FatBits.this, "FatBits Preferences");
+                FormPanel formPanel = form.getFormPanel();
+                formPanel.addRow("Scale:", scaleSlider);
+                formPanel.addRow("", showGridCheckBox);
+                form.showNonModal();
+                // FIXME: show a dialog with the various controls in it.
+                // also: [x] refresh only when mouse moves
+                //       [ ] keep window on top
+                //       [ ] show mouse hot-spot
+                // alternative grid colors?
+            }
+        });
+        JPanel result = new JPanel(new BorderLayout(8, 0));
+        // FIXME: the right border should only be large on Mac OS, and should
+        // correspond more closely to the grow box inset.
+        result.setBorder(new javax.swing.border.EmptyBorder(4, 4, 4, 24));
         result.add(colorLabel, BorderLayout.WEST);
-        result.add(positionLabel, BorderLayout.EAST);
+        result.add(positionLabel, BorderLayout.CENTER);
+        result.add(infoButton, BorderLayout.EAST);
         return result;
     }
     
@@ -84,6 +100,7 @@ public class FatBits extends JFrame {
     
     private void initPositionLabel() {
         this.positionLabel = new JLabel(" ");
+        positionLabel.setFont(colorLabel.getFont());
     }
     
     private void updatePosition(Point p) {
@@ -115,19 +132,18 @@ public class FatBits extends JFrame {
         colorSwatch.setColor(new Color(argb));
     }
     
-    private JCheckBox makeShowGridCheckBox() {
-        final JCheckBox checkBox = new JCheckBox("Show Grid");
-        checkBox.addItemListener(new ItemListener() {
+    private void initShowGridCheckBox() {
+        this.showGridCheckBox = new JCheckBox("Show grid");
+        showGridCheckBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                scaledImagePanel.setShowGrid(checkBox.isSelected());
+                scaledImagePanel.setShowGrid(showGridCheckBox.isSelected());
             }
         });
-        checkBox.setSelected(false);
-        return checkBox;
+        showGridCheckBox.setSelected(false);
     }
     
-    private JSlider makeScaleSlider() {
-        final JSlider scaleSlider = new JSlider(1, 4);
+    private void initScaleSlider() {
+        this.scaleSlider = new JSlider(1, 4);
         scaleSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 scaleFactor = (1 << scaleSlider.getValue());
@@ -143,7 +159,6 @@ public class FatBits extends JFrame {
         scaleSlider.setPaintTicks(true);
         scaleSlider.setSnapToTicks(true);
         scaleSlider.setValue(1);
-        return scaleSlider;
     }
     
     private int roundLengthDown(int length) {
