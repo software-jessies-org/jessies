@@ -50,7 +50,8 @@ public class FindDialog {
         
         JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, terminalPane);
         
-        FormPanel formPanel = new FormPanel();
+        FormBuilder form = new FormBuilder(frame, "Find");
+        FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Find:", findField);
         formPanel.setStatusBar(findStatus);
         formPanel.setTypingTimeoutActionListener(new ActionListener() {
@@ -59,7 +60,7 @@ public class FindDialog {
             }
         });
         
-        FormDialog dialog = FormDialog.showNonModal(frame, "Find", formPanel);
+        FormDialog dialog = form.getFormDialog();
         dialog.setAcceptRunnable(new Runnable() {
             public void run() {
                 // If the user brought up the dialog, typed a regular
@@ -78,6 +79,7 @@ public class FindDialog {
                 getFindHighlighter().forgetRegularExpression(textToFindIn);
             }
         });
+        form.showNonModal();
         
         findField.selectAll();
         findField.requestFocus();
