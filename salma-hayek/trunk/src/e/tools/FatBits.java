@@ -25,6 +25,7 @@ public class FatBits extends JFrame {
     
     private JSlider scaleSlider;
     private JCheckBox showGridCheckBox;
+    private JCheckBox keepOnTopCheckBox;
     
     private JLabel positionLabel;
     
@@ -57,6 +58,7 @@ public class FatBits extends JFrame {
     
     private JComponent makeUi() {
         initColorLabel();
+        initKeepOnTopCheckBox();
         initPositionLabel();
         initScaledImagePanel();
         initScaleSlider();
@@ -76,10 +78,10 @@ public class FatBits extends JFrame {
                 FormPanel formPanel = form.getFormPanel();
                 formPanel.addRow("Scale:", scaleSlider);
                 formPanel.addRow("", showGridCheckBox);
+                formPanel.addRow("", keepOnTopCheckBox);
                 form.showNonModal();
                 // FIXME: show a dialog with the various controls in it.
                 // also: [x] refresh only when mouse moves
-                //       [ ] keep window on top
                 //       [ ] show mouse hot-spot
                 // alternative grid colors?
             }
@@ -140,6 +142,16 @@ public class FatBits extends JFrame {
             }
         });
         showGridCheckBox.setSelected(false);
+    }
+    
+    private void initKeepOnTopCheckBox() {
+        this.keepOnTopCheckBox = new JCheckBox("Keep window on top");
+        keepOnTopCheckBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                FatBits.this.setAlwaysOnTop(keepOnTopCheckBox.isSelected());
+            }
+        });
+        keepOnTopCheckBox.setSelected(false);
     }
     
     private void initScaleSlider() {
