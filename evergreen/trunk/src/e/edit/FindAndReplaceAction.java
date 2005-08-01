@@ -83,8 +83,9 @@ public class FindAndReplaceAction extends ETextAction {
         // ...and tie the lists' selections together.
         ListSelectionModel selectionModel = matchList.getSelectionModel();
         replacementsList.setSelectionModel(selectionModel);
-
-        FormPanel formPanel = new FormPanel();
+        
+        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Find/Replace");
+        FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Find:", patternField);
         formPanel.addRow("Replace With:", replacementField);
         formPanel.addRow("", statusLabel);
@@ -101,7 +102,7 @@ public class FindAndReplaceAction extends ETextAction {
         // (b) we make it all through the text performing replacements.
         boolean finished = false;
         while (!finished) {
-            boolean shouldReplace = FormDialog.show(Edit.getInstance().getFrame(), "Find/Replace", formPanel, "Replace");
+            boolean shouldReplace = form.show("Replace");
             if (shouldReplace == false) {
                 finished = true;
             } else {

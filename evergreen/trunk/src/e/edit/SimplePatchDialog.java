@@ -44,8 +44,8 @@ public class SimplePatchDialog {
     
     public static void showPatchBetween(String title, String fromName, String fromContent, String toName, String toContent) {
         JList patchView = makePatchView(fromName, fromContent, toName, toContent);
-        FormPanel formPanel = new FormPanel();
-        formPanel.addRow("Differences:", new JScrollPane(patchView));
-        FormDialog.showNonModal(Edit.getInstance().getFrame(), title, formPanel);
+        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), title);
+        form.getFormPanel().addRow("Differences:", new JScrollPane(patchView));
+        form.showNonModal();
     }
 }

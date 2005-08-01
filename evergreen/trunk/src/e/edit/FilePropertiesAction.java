@@ -46,14 +46,15 @@ public class FilePropertiesAction extends ETextAction {
         
         SortedMap<String, Charset> charsets = Charset.availableCharsets();
         for (String charset : charsets.keySet()) {
-            System.out.println(charset + " = " + Charset.forName(charset).displayName());
+            //System.out.println(charset + " = " + Charset.forName(charset).displayName());
         }
         
-        FormPanel formPanel = new FormPanel();
+        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "File Properties");
+        FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);
         formPanel.addRow("Character Encoding:", charsetStringField);
-        boolean okay = FormDialog.show(Edit.getInstance().getFrame(), "File Properties", formPanel, "Apply");
+        boolean okay = form.show("Apply");
         
         if (okay == false) {
             return;

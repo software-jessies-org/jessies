@@ -23,13 +23,14 @@ public class AddWorkspaceAction extends AbstractAction {
         FilenameChooserField filenameChooserField = new FilenameChooserField(JFileChooser.DIRECTORIES_ONLY);
         filenameChooserField.setCompanionNameField(nameField);
         
-        FormPanel formPanel = new FormPanel();
+        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Add Workspace");
+        FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Root Directory:", filenameChooserField);
         formPanel.addRow("Name:", nameField);
         
         boolean finished = false;
         while (finished == false) {
-            boolean okay = FormDialog.show(Edit.getInstance().getFrame(), "Add Workspace", formPanel, "Add");
+            boolean okay = form.show("Add");
             if (okay == false) {
                 return;
             }

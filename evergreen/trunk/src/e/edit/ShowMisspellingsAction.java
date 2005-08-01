@@ -50,9 +50,9 @@ public class ShowMisspellingsAction extends PTextAction {
             }
         });
         list.setCellRenderer(new EListCellRenderer(true));
-
-        FormPanel formPanel = new FormPanel();
-        formPanel.addRow("Misspellings:", new JScrollPane(list));
-        FormDialog.showNonModal(Edit.getInstance().getFrame(), "Misspellings", formPanel);
+        
+        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Misspellings");
+        form.getFormPanel().addRow("Misspellings:", new JScrollPane(list));
+        form.showNonModal();
     }
 }
