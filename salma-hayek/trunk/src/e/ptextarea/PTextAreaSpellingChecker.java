@@ -11,6 +11,7 @@ import e.util.*;
 public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider {
     private PTextArea component;
     
+    private static final String HIGHLIGHTER_NAME = "PTextAreaSpellingChecker";
     public static final String SPELLING_EXCEPTIONS_PROPERTY = "org.jessies.e.ptextarea.SpellingExceptionsHashSetProperty";
     
     public PTextAreaSpellingChecker(PTextArea component) {
@@ -161,24 +162,17 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
     }
     
     /** Ensures that there are no spelling-related highlights in the given range. */
-    private void removeExistingHighlightsForRange(final int fromIndex, final int toIndex) {
-        component.removeHighlights(new PHighlightMatcher() {
-            public boolean matches(PHighlight highlight) {
-                return (highlight instanceof UnderlineHighlight && highlight.getStartIndex() < toIndex && highlight.getEndIndex() >= fromIndex);
-            }
-        });
+    private void removeExistingHighlightsForRange(int fromIndex, int toIndex) {
+        component.removeHighlights(HIGHLIGHTER_NAME, fromIndex, toIndex);
     }
 
     public Collection listMisspellings() {
         TreeSet<String> result = new TreeSet<String>();
-        List<PHighlight> highlights = component.getHighlights();
-        for (PHighlight highlight : highlights) {
-            if (highlight instanceof UnderlineHighlight) {
-                final int start = highlight.getStartIndex();
-                final int end = highlight.getEndIndex();
-                String misspelling = component.getTextBuffer().subSequence(start, end).toString();
-                result.add(misspelling);
-            }
+        for (PHighlight highlight : component.getHighlights(HIGHLIGHTER_NAME)) {
+            final int start = highlight.getStartIndex();
+            final int end = highlight.getEndIndex();
+            String misspelling = component.getTextBuffer().subSequence(start, end).toString();
+            result.add(misspelling);
         }
         return result;
     }
@@ -188,13 +182,12 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         if (toIndex - fromIndex > 20) {
             return Range.NULL_RANGE;
         }
-        List<PHighlight> highlights = component.getHighlights();
-        for (PHighlight highlight : highlights) {
-            if (highlight instanceof UnderlineHighlight && highlight.getStartIndex() <= fromIndex && highlight.getEndIndex() >= toIndex) {
-                return new Range(Math.min(highlight.getStartIndex(), highlight.getEndIndex()), Math.max(highlight.getStartIndex(), highlight.getEndIndex()));
-            }
+        List<PHighlight> highlights = component.getHighlights(HIGHLIGHTER_NAME, fromIndex, toIndex);
+        if (highlights.size() > 0) {
+            return new Range(highlights.get(0).getStartIndex(), highlights.get(0).getEndIndex());
+        } else {
+            return Range.NULL_RANGE;
         }
-        return Range.NULL_RANGE;
     }
     
     private static final int UNKNOWN_CASE = 0;
@@ -328,6 +321,10 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             } else {
                 paintWavyHorizontalLine(g, r.x, r.x + r.width, r.y + r.height - 1);
             }
+        }
+        
+        public String getHighlighterName() {
+            return HIGHLIGHTER_NAME;
         }
         
         /*

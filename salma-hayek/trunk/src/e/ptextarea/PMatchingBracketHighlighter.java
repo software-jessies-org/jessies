@@ -9,6 +9,7 @@ import java.awt.*;
 public class PMatchingBracketHighlighter implements PCaretListener {
     private static final Color MATCH_COLOR = new Color(0.10f, 0.78f, 0.10f, 0.5f);
     private static final Color FAILED_MATCH_COLOR = new Color(0.78f, 0.10f, 0.10f, 0.5f);
+    private static final String HIGHLIGHTER_NAME = "PMatchingBracketHighlighter";
 
     private PTextArea textArea;
     private PColoredHighlight[] highlights = new PColoredHighlight[2];
@@ -78,6 +79,10 @@ public class PMatchingBracketHighlighter implements PCaretListener {
     public static class MatchingBracketHighlight extends PColoredHighlight {
         public MatchingBracketHighlight(PTextArea textArea, int startIndex, int endIndex) {
             super(textArea, startIndex, endIndex, MATCH_COLOR);
+        }
+        
+        public String getHighlighterName() {
+            return HIGHLIGHTER_NAME;
         }
     }
 }

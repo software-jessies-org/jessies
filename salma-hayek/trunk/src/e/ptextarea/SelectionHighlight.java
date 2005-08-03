@@ -89,4 +89,8 @@ public class SelectionHighlight extends PHighlight {
     public String toString() {
         return "SelectionHighlight[" + id + ": " + getStartIndex() + ", " + getEndIndex() + "]";
     }
+    
+    public String getHighlighterName() {
+        return "Selection";
+    }
 }

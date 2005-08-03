@@ -51,22 +51,6 @@ public class PKeyHandler extends KeyAdapter {
         }
     }
     
-    public class PColoredHighlightMatcher implements PHighlightMatcher {
-        private Color color;
-        
-        public PColoredHighlightMatcher(Color color) {
-            this.color = color;
-        }
-        
-        public boolean matches(PHighlight highlight) {
-            if (highlight instanceof PColoredHighlight) {
-                return ((PColoredHighlight) highlight).getColor().equals(color);
-            } else {
-                return false;
-            }
-        }
-    }
-    
     public void keyTyped(KeyEvent event) {
         if (isInsertableCharacter(event) && textArea.isEditable()) {
             insertCharacter(event.getKeyChar());

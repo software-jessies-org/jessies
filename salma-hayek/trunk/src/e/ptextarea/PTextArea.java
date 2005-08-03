@@ -34,7 +34,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     private FontMetrics metrics;
     private int[] widthCache;
     
-    private ArrayList<PHighlight> highlights = new ArrayList<PHighlight>();
+    private PHighlightManager highlights = new PHighlightManager();
     private PTextStyler textStyler = new PPlainTextStyler(this);
     private List<StyleApplicator> styleApplicators = new ArrayList<StyleApplicator>();
     private TabStyleApplicator tabStyleApplicator = new TabStyleApplicator(this);
@@ -548,62 +548,47 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
-    public List<PHighlight> getHighlights() {
+    public List<PHighlight> getHighlights(String highlightManager) {
+        return getHighlights(highlightManager, 0, getTextBuffer().length());
+    }
+    
+    public List<PHighlight> getHighlights(String highlightManager, int startOffset, int endOffset) {
         getLock().getReadLock();
         try {
-            return Collections.unmodifiableList(highlights);
+            return highlights.getHighlights(highlightManager, startOffset, endOffset);
         } finally {
             getLock().relinquishReadLock();
         }
     }
     
     /**
-     * Selects the first matching highlight (as judged by the given matcher),
-     * moving through the entire list of highlights in the given direction,
-     * ordered by FIXME: do we ensure the highlights are ordered? on what?
+     * Selects the given highlight.
      */
-    public void selectFirstMatchingHighlight(boolean searchingForwards, PHighlightMatcher matcher) {
+    public void selectHighlight(PHighlight highlight) {
         getLock().getReadLock();
         try {
-            final int start = searchingForwards ? 0 : highlights.size() - 1;
-            final int stop = searchingForwards ? highlights.size() : -1;
-            final int step = searchingForwards ? 1 : -1;
-            for (int i = start; i != stop; i += step) {
-                PHighlight highlight = highlights.get(i);
-                if (matcher.matches(highlight)) {
-                    centerOffsetInDisplay(highlight.getStartIndex());
-                    select(highlight.getStartIndex(), highlight.getEndIndex());
-                    return;
-                }
-            }
+            centerOffsetInDisplay(highlight.getStartIndex());
+            select(highlight.getStartIndex(), highlight.getEndIndex());
         } finally {
             getLock().relinquishReadLock();
         }
     }
     
-    public void removeHighlights(PHighlightMatcher matcher) {
+    public void removeHighlights(String highlightManager) {
+        removeHighlights(highlightManager, 0, getTextBuffer().length());
+    }
+    
+    public void removeHighlights(String highlighterName, int startOffset, int endOffset) {
         getLock().getWriteLock();
         try {
-            PHighlight match = null;
-            boolean isOnlyOneMatch = true;
-            for (int i = 0; i < highlights.size(); i++) {
-                PHighlight highlight = highlights.get(i);
-                if (matcher.matches(highlight)) {
-                    if (match != null) {
-                        isOnlyOneMatch = false;
-                    }
-                    match = highlight;
-                    highlights.remove(i);
-                    highlight.detachAnchors();
-                    i--;
-                }
+            List<PHighlight> removeList = highlights.getHighlights(highlighterName, startOffset, endOffset);
+            for (PHighlight highlight : removeList) {
+                highlights.remove(highlight);
+                highlight.detachAnchors();
             }
-            if (isOnlyOneMatch) {
-                if (match != null) {
-                    repaintHighlight(match);
-                }
-                // If isOnlyOneMatch is true, but match is null, nothing was removed and so we don't repaint at all.
-            } else {
+            if (removeList.size() == 1) {
+                repaintHighlight(removeList.get(0));
+            } else if (removeList.size() > 1) {
                 repaint();
             }
         } finally {
@@ -979,16 +964,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     private void paintHighlights(Graphics2D graphics, int minLine, int maxLine) {
+        long startTime = System.currentTimeMillis();
         int minChar = getSplitLine(minLine).getTextIndex();
         SplitLine max = getSplitLine(maxLine);
         int maxChar = max.getTextIndex() + max.getLength();
         selection.paint(graphics);
-        for (int i = 0; i < highlights.size(); i++) {
-            PHighlight highlight = highlights.get(i);
-            if (highlight.getStartIndex() <= maxChar && highlight.getEndIndex() > minChar) {
-                highlight.paint(graphics);
-            }
+        List<PHighlight> highlightList = highlights.getHighlights(minChar, maxChar);
+        for (PHighlight highlight : highlightList) {
+            highlight.paint(graphics);
         }
+        System.err.println("Highlights painted in " + (System.currentTimeMillis() - startTime) + "ms");
     }
     
     private void applyColor(Graphics2D graphics, Color color) {
@@ -1513,28 +1498,24 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public void clearFindMatches() {
         getLock().getWriteLock();
         try {
-            removeHighlights(new PHighlightMatcher() {
-                public boolean matches(PHighlight highlight) {
-                    return (highlight instanceof PFind.MatchHighlight);
-                }
-            });
+            removeHighlights(PFind.HIGHLIGHTER_NAME);
         } finally {
             getLock().relinquishWriteLock();
         }
     }
     
     public void findNext() {
-        findNextOrPrevious(true);
+        PHighlight next = highlights.getHighlightAfter(PFind.HIGHLIGHTER_NAME, getSelectionEnd());
+        if (next != null) {
+            selectHighlight(next);
+        }
     }
     
     public void findPrevious() {
-        findNextOrPrevious(false);
-    }
-    
-    protected void findNextOrPrevious(boolean next) {
-        // FIXME: when we do this, make this method private.
-        //updateFindResults();
-        selectFirstMatchingHighlight(next, new PFind.MatchHighlightMatcher(next, this));
+        PHighlight next = highlights.getHighlightBefore(PFind.HIGHLIGHTER_NAME, getSelectionStart());
+        if (next != null) {
+            selectHighlight(next);
+        }
     }
     
     public EPopupMenu getPopupMenu() {

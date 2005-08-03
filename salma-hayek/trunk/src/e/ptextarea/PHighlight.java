@@ -64,6 +64,12 @@ public abstract class PHighlight {
      */
     public abstract void paint(Graphics2D graphics, PCoordinates start, PCoordinates end);
     
+    /**
+     * Override this at the lowest level possible in order to provide the name of the
+     * object generating this type of highlight.
+     */
+    public abstract String getHighlighterName();
+    
     public String toString() {
         return "PHighlight[start=" + getStartIndex() + ",end=" + getEndIndex() + "]";
     }

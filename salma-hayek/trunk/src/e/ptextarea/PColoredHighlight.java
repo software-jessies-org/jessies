@@ -10,7 +10,7 @@ import java.util.*;
  * @author Phil Norman
  */
 
-public class PColoredHighlight extends PHighlight {
+public abstract class PColoredHighlight extends PHighlight {
     private Color color;
     
     public PColoredHighlight(PTextArea textArea, int startIndex, int endIndex, Color color) {
