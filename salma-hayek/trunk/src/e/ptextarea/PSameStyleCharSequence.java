@@ -57,7 +57,7 @@ public class PSameStyleCharSequence {
      * style. In the latter case, it has NORMAL style.)
      * 
      * TEST: That means that the parentheses in that paragraph can be matched,
-     * but the ones inside the method above can't.
+     * but the ones inside the 'forOffset' method above can't.
      */
     private static List<PLineSegment> collectRun(PLineSegment firstSegment, Iterator<PLineSegment> it) {
         final PStyle firstStyle = firstSegment.getStyle();
@@ -69,8 +69,8 @@ public class PSameStyleCharSequence {
             PLineSegment segment = it.next();
             PStyle thisStyle = segment.getStyle();
             if (thisStyle == PStyle.NEWLINE) {
-                // Don't bother adding it to the run, but consider it the end
-                // of the run, either.
+                // Don't bother adding it to the run, but don't consider it the
+                // end of the run, either.
             } else if (thisStyle != firstStyle) {
                 break;
             } else {
