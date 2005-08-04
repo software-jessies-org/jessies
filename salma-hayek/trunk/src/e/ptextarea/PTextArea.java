@@ -973,7 +973,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         for (PHighlight highlight : highlightList) {
             highlight.paint(graphics);
         }
-        System.err.println("Highlights painted in " + (System.currentTimeMillis() - startTime) + "ms");
+        //System.err.println("Highlights painted in " + (System.currentTimeMillis() - startTime) + "ms");
     }
     
     private void applyColor(Graphics2D graphics, Color color) {
