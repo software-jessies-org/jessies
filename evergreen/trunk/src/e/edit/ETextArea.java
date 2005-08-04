@@ -12,20 +12,13 @@ public class ETextArea extends PTextArea {
         getActionMap().remove(PActionFactory.makeFindAction().getValue(Action.NAME));
     }
     
+    @Override
     public String reformatPastedText(String pastedText) {
         return pastedText.replace('\u00a0', ' ');
     }
     
-    //
-    // Work round PTextArea's unfinished find functionality.
-    //
-    
-    protected void findNextOrPrevious(boolean next) {
-        updateFindResults();
-        super.findNextOrPrevious(next);
-    }
-    
-    public void updateFindResults() {
+    @Override
+    protected void updateFindResults() {
         ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, this);
         FindAction.INSTANCE.repeatLastFind(textWindow);
     }
