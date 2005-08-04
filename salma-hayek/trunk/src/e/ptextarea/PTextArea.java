@@ -1505,17 +1505,27 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     }
     
     public void findNext() {
-        PHighlight next = highlights.getHighlightAfter(PFind.HIGHLIGHTER_NAME, getSelectionEnd());
-        if (next != null) {
-            selectHighlight(next);
-        }
+        findNextOrPrevious(true);
     }
     
     public void findPrevious() {
-        PHighlight next = highlights.getHighlightBefore(PFind.HIGHLIGHTER_NAME, getSelectionStart());
-        if (next != null) {
-            selectHighlight(next);
+        findNextOrPrevious(false);
+    }
+    
+    protected void findNextOrPrevious(boolean next) {
+        updateFindResults();
+        PHighlight nextHighlight = highlights.getNextOrPreviousHighlight(PFind.HIGHLIGHTER_NAME, next, next ? getSelectionEnd() : getSelectionStart());
+        if (nextHighlight != null) {
+            selectHighlight(nextHighlight);
         }
+    }
+    
+    /**
+     * Override this to update the find results just in time when the user
+     * tries to move to the next or previous match.
+     */
+    protected void updateFindResults() {
+        // Do nothing.
     }
     
     public EPopupMenu getPopupMenu() {

@@ -36,20 +36,12 @@ public class PHighlightManager {
         }
     }
     
-    public synchronized PHighlight getHighlightBefore(String highlighter, int offset) {
-        if (highlighterSets.containsKey(highlighter)) {
-            return highlighterSets.get(highlighter).getHighlightBefore(offset);
-        } else {
+    public synchronized PHighlight getNextOrPreviousHighlight(String highlighter, boolean next, int offset) {
+        if (highlighterSets.containsKey(highlighter) == false) {
             return null;
         }
-    }
-    
-    public synchronized PHighlight getHighlightAfter(String highlighter, int offset) {
-        if (highlighterSets.containsKey(highlighter)) {
-            return highlighterSets.get(highlighter).getHighlightAfter(offset);
-        } else {
-            return null;
-        }
+        HighlightSet set = highlighterSets.get(highlighter);
+        return next ? set.getHighlightAfter(offset) : set.getHighlightBefore(offset);
     }
     
     private static class HighlightSet {
