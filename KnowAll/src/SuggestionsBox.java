@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, Elliott Hughes.
+    Copyright (C) 2004-2005, Elliott Hughes.
 
     This file is part of KnowAll.
 
@@ -22,7 +22,7 @@
 import java.util.*;
 
 public class SuggestionsBox {
-    private ArrayList suggestions = new ArrayList();
+    private ArrayList<Suggestion> suggestions = new ArrayList<Suggestion>();
 
     public void addSuggestion(Suggestion suggestion) {
         suggestions.add(suggestion);
@@ -33,6 +33,6 @@ public class SuggestionsBox {
     }
 
     public Suggestion getSuggestion(int i) {
-        return (Suggestion) suggestions.get(i);
+        return suggestions.get(i);
     }
 }

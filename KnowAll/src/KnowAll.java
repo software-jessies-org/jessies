@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002, Elliott Hughes.
+    Copyright (C) 2002-2005, Elliott Hughes.
 
     This file is part of KnowAll.
 
@@ -31,7 +31,7 @@ public class KnowAll extends JFrame {
     private JTextPane textPane = new JTextPane();
     private JLabel statusBar = new JLabel(" ");
 
-    private ArrayList advisors = new ArrayList();
+    private ArrayList<Advisor> advisors = new ArrayList<Advisor>();
 
     private ClipboardMonitor clipboardMonitor;
 
@@ -111,8 +111,7 @@ public class KnowAll extends JFrame {
         text += "</pre>";
         text += "<hr noshade>";
         SuggestionsBox suggestionsBox = new SuggestionsBox();
-        for (int i = 0; i < advisors.size(); ++i) {
-            Advisor advisor = (Advisor) advisors.get(i);
+        for (Advisor advisor : advisors) {
             advisor.advise(suggestionsBox, input);
         }
         String lastHeading = "";
