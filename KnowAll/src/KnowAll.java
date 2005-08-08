@@ -19,6 +19,8 @@
 
  */
 
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
@@ -49,7 +51,11 @@ public class KnowAll extends JFrame {
         textPane.addHyperlinkListener(new HyperlinkListener() {
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    openUrl(e.getURL().toString());
+                    try {
+                        BrowserLauncher.openURL(e.getURL().toString());
+                    } catch (Throwable th) {
+                        SimpleDialog.showDetails(KnowAll.this, "KnowAll", th);
+                    }
                 } else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
                     setStatus(e.getURL().toString());
                 } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
@@ -134,15 +140,6 @@ public class KnowAll extends JFrame {
     public static String titledText(String heading, String text) {
         // FIXME: do this with a style sheet.
         return "<h4><u>" + heading + "</u></h4>" + text;
-    }
-
-    public void openUrl(final String url) {
-        try {
-            // FIXME: this only works on Mac OS.
-            Runtime.getRuntime().exec("open " + url);
-        } catch (Exception ex) {
-            ex.printStackTrace(); // FIXME: report in a dialog.
-        }
     }
 
     public String chooseSearchUrl(String s) {
