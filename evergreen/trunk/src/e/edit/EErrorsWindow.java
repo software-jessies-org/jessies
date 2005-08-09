@@ -33,7 +33,6 @@ public class EErrorsWindow extends EWindow {
         textArea.showRightHandMarginAt(PTextArea.NO_MARGIN);
         textArea.addStyleApplicator(new ErrorLinkStyler(textArea));
         textArea.setWrapStyleWord(true);
-        textArea.setText("hello\bworld!\n\f\nmore text");
         initTextAreaPopupMenu();
     }
 
