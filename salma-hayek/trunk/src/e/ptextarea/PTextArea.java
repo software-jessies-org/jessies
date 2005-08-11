@@ -902,6 +902,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             Rectangle bounds = graphics.getClipBounds();
             int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds);
             graphics.setColor(getBackground());
+            graphics.setFont(getFont());
             if (isOpaque()) {
                 graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
             }
