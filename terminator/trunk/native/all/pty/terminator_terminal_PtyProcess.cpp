@@ -4,19 +4,6 @@ typedef long long __int64;
 
 #include "terminator_terminal_PtyProcess.h"
 
-#ifdef _WIN32
-
-extern "C" void Java_terminator_terminal_PtyProcess_startProcess(JNIEnv *, jobject, jobjectArray, jobject, jobject) {
-}
-extern "C" void Java_terminator_terminal_PtyProcess_sendResizeNotification(JNIEnv *, jobject, jobject, jobject) {
-}
-extern "C" void Java_terminator_terminal_PtyProcess_destroy(JNIEnv *, jobject) {
-}
-extern "C" void Java_terminator_terminal_PtyProcess_waitFor(JNIEnv *, jobject) {
-}
-
-#else
-
 #include <JniString.h>
 
 #include "PtyGenerator.h"
@@ -111,5 +98,3 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
         wasSignaled = true;
     }
 }
-
-#endif
