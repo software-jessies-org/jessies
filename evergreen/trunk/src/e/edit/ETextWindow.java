@@ -57,9 +57,6 @@ public class ETextWindow extends EWindow implements PTextListener {
 
     private Timer findResultsUpdater;
     
-    static {
-    }
-    
     private HashSet<String> initSpellingExceptionsFor(String language) {
         HashSet<String> result = new HashSet<String>();
         
