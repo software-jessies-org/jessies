@@ -155,11 +155,17 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     /** Returns the grep-style ":<line>:<column>" address for the caret position. */
     public String getAddress() {
-        // FIXME - work with non-empty selections
-        int caretPosition = text.getSelectionStart();
-        int lineNumber = 1 + text.getLineOfOffset(caretPosition);
+        String result = addressFromOffset(text.getSelectionStart());
+        if (text.hasSelection()) {
+            result += addressFromOffset(text.getSelectionEnd());
+        }
+        return result;
+    }
+    
+    private String addressFromOffset(int offset) {
+        int lineNumber = 1 + text.getLineOfOffset(offset);
         int lineStart = text.getLineStartOffset(lineNumber - 1);
-        int columnNumber = 1 + emacsDistance(text.getTextBuffer(), caretPosition, lineStart);
+        int columnNumber = 1 + emacsDistance(text.getTextBuffer(), offset, lineStart);
         return ":" + lineNumber + ":" + columnNumber;
     }
     
