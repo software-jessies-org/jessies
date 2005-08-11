@@ -157,7 +157,8 @@ public class ETextWindow extends EWindow implements PTextListener {
     public String getAddress() {
         String result = addressFromOffset(text.getSelectionStart());
         if (text.hasSelection()) {
-            result += addressFromOffset(text.getSelectionEnd());
+            // emacs end offsets seem to include the character following.
+            result += addressFromOffset(text.getSelectionEnd() - 1);
         }
         return result;
     }
@@ -580,11 +581,13 @@ public class ETextWindow extends EWindow implements PTextListener {
                 ex = ex;
             }
         }
+        offset = Math.min(offset, maxOffset);
         
         // We interpret address ending with a ":" (from grep and compilers) as requiring
         // the line to be selected. Other addresses (such as from our open-file-list) just
         // mean "position the caret".
         int endOffset = (address.endsWith(":")) ? (maxOffset + 1) : offset;
+        endOffset = Math.min(endOffset, maxOffset);
         
         if (st.hasMoreTokens()) {
             try {
@@ -601,8 +604,6 @@ public class ETextWindow extends EWindow implements PTextListener {
                 ex = ex;
             }
         }
-        offset = Math.min(offset, maxOffset);
-        endOffset = Math.min(endOffset, maxOffset);
         centerOnNewSelection(offset, endOffset);
     }
     
