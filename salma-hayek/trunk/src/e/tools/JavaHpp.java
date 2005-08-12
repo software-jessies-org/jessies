@@ -152,6 +152,10 @@ public class JavaHpp {
             }
             return "j" + type.toString();
         } else if (type.isArray()) {
+            // Note that we shouldn't recurse here because there are no JNI
+            // types for arrays of arrays. If we ever write our own C++ wrapper
+            // for JNI arrays, this might have to change. (We don't need to
+            // worry about void[] either, because there's no such thing.)
             Class componentType = type.getComponentType();
             if (componentType.isPrimitive()) {
                 return "j" + componentType.toString() + "Array";
