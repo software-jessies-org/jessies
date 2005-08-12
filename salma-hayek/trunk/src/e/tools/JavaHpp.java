@@ -105,7 +105,7 @@ public class JavaHpp {
         if (exceptionTypes.length == 0) {
             return "java/lang/RuntimeException";
         } else if (exceptionTypes.length == 1) {
-            return exceptionTypes[0].getCanonicalName().replace('.', '/');
+            return slashStyleClassName(exceptionTypes[0]);
         }
         throw new RuntimeException("methods such as '" + method + "' with multiple exception types are not supported; please choose a single exception type or enhance JavaHpp to use an annotation to choose a wrapper exception for C++ exceptions");
     }
@@ -187,8 +187,22 @@ public class JavaHpp {
         } else if (type == void.class) {
             return "V";
         } else {
-            return "L" + type.getCanonicalName() + ";";
+            return "L" + slashStyleClassName(type) + ";";
         }
+    }
+    
+    /**
+     * Returns the name used by JNI to refer to a class, which isn't directly
+     * available otherwise.
+     */
+    public static String slashStyleClassName(Class c) {
+        String name = c.getCanonicalName().replace('.', '/');
+        if (c.getEnclosingClass() != null) {
+            // Replace the last '/' with a '$'. This isn't correct in general,
+            // but it copes with the simplest inner classes.
+            name = name.replaceFirst("^(.*)/([^/]+)$", "$1\\$$2");
+        }
+        return name;
     }
     
     public static void main(String[] arguments) throws Exception {
