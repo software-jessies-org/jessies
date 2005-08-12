@@ -20,14 +20,15 @@ public class PtyProcess {
     
     private static boolean libraryLoaded = false;
     
-    private static synchronized void ensureLibrary() throws IOException {
+    private static synchronized void ensureLibraryLoaded() throws IOException {
         if (libraryLoaded == false) {
             try {
                 System.loadLibrary("pty");
                 libraryLoaded = true;
             } catch (UnsatisfiedLinkError ex) {
-                Log.warn("Cannot load JNI library", ex);
-                throw new IOException("Unable to launch pty processes");
+                String problem = "Unable to load JNI library.";
+                Log.warn(problem, ex);
+                throw new IOException(problem);
             }
         }
     }
@@ -55,7 +56,7 @@ public class PtyProcess {
     }
     
     public PtyProcess(String[] command) throws Exception {
-        ensureLibrary();
+        ensureLibraryLoaded();
         FileDescriptor inDescriptor = new FileDescriptor();
         FileDescriptor outDescriptor = new FileDescriptor();
         startProcess(command, inDescriptor, outDescriptor);
