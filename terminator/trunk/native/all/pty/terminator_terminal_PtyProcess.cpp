@@ -1,5 +1,6 @@
 #ifdef __CYGWIN__
-typedef long long __int64;
+#include <io.h>
+#include <windows.h>
 #endif
 
 #include "terminator_terminal_PtyProcess.h"
@@ -58,8 +59,17 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jo
     processId = ptyGenerator.forkAndExec(&argv[0]);
     
     fd = masterFd;
+#ifdef __CYGWIN__
+    long inputHandle = get_osfhandle(masterFd);
+    JniField<jlong>(m_env, inDescriptor, "handle", "J") = inputHandle;
+    for (int ii = 0; ii != 2; ++ ii) {
+        std::cerr << "write returned " << write(masterFd, "echo hello world\n", 17) << std::endl;
+    }
+    (void) outDescriptor;
+#else
     JniField<jint>(m_env, inDescriptor, "fd", "I") = masterFd;
     JniField<jint>(m_env, outDescriptor, "fd", "I") = masterFd;
+#endif
 }
 
 void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars, jobject sizeInPixels) {
