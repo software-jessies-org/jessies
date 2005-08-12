@@ -6,6 +6,39 @@ import java.io.*;
 import java.util.concurrent.*;
 
 public class PtyProcess {
+    // We're compelled to do something distasteful by the inability to return an integer from JavaHpp's JNI.
+    private static class PtyReadResult {
+        public int bytesRead;
+    }
+    
+    private class PtyInputStream extends InputStream {
+        // InputStream compels us to implement the single byte version.
+        @Override
+        public int read() throws IOException {
+            byte[] b = new byte[1];
+            return read(b, 0, 1);
+        }
+        /**
+         * If we don't implement this variant, the default implementation
+         * won't return to TerminalControl until INPUT_BUFFER_SIZE bytes
+         * have been read.  We need to return as soon as a single read(2)
+         * returns.
+         */
+        @Override
+        public int read(byte[] destination, int arrayOffset, int desiredLength) throws IOException {
+            PtyReadResult ptyReadResult = new PtyReadResult();
+            nativeRead(destination, arrayOffset, desiredLength, ptyReadResult);
+            return ptyReadResult.bytesRead;
+        }
+    }
+    
+    private class PtyOutputStream extends OutputStream {
+        @Override
+        public void write(int source) throws IOException {
+            nativeWrite(source);
+        }
+    }
+    
     private int fd;
     private int processId;
     
@@ -13,8 +46,8 @@ public class PtyProcess {
     private boolean wasSignaled = false;
     private int exitValue;
     
-    private FileInputStream inStream;
-    private FileOutputStream outStream;
+    private InputStream inStream;
+    private OutputStream outStream;
     
     private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
     
@@ -57,14 +90,18 @@ public class PtyProcess {
     
     public PtyProcess(String[] command) throws Exception {
         ensureLibraryLoaded();
-        FileDescriptor inDescriptor = new FileDescriptor();
-        FileDescriptor outDescriptor = new FileDescriptor();
-        startProcess(command, inDescriptor, outDescriptor);
+        FileDescriptor descriptor = new FileDescriptor();
+        startProcess(command, descriptor);
         if (processId == -1) {
             throw new IOException("Could not start process \"" + command + "\".");
         }
-        inStream = new FileInputStream(inDescriptor);
-        outStream = new FileOutputStream(outDescriptor);
+        if (descriptor.valid ()) {
+            inStream = new FileInputStream(descriptor);
+            outStream = new FileOutputStream(descriptor);
+        } else {
+            inStream = new PtyInputStream();
+            outStream = new PtyOutputStream();
+        }
     }
     
     public InputStream getInputStream() {
@@ -75,11 +112,11 @@ public class PtyProcess {
         return outStream;
     }
     
-    private void startProcess(final String[] command, final FileDescriptor inDescriptor, final FileDescriptor outDescriptor) throws Exception {
+    private void startProcess(final String[] command, final FileDescriptor descriptor) throws Exception {
         invoke(new Callable<Exception>() {
             public Exception call() {
                 try {
-                    nativeStartProcess(command, inDescriptor, outDescriptor);
+                    nativeStartProcess(command, descriptor);
                     return null;
                 } catch (Exception ex) {
                     return ex;
@@ -114,8 +151,10 @@ public class PtyProcess {
         }
     }
     
-    private native void nativeStartProcess(String[] command, FileDescriptor inDescriptor, FileDescriptor outDescriptor) throws IOException;
+    private native void nativeStartProcess(String[] command, FileDescriptor descriptor) throws IOException;
     
+    public native void nativeRead(byte[] destination, int arrayOffset, int desiredLength, PtyReadResult ptyReadResult) throws IOException;
+    public native void nativeWrite(int source) throws IOException;
     public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
     
     public native void destroy() throws IOException;
