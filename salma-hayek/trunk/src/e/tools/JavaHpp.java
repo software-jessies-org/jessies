@@ -150,12 +150,12 @@ public class JavaHpp {
             if (type == void.class) {
                 return "void";
             }
-            String result = "j" + type.toString();
-            if (type.isArray()) {
-                result += "Array";
-            }
-            return result;
+            return "j" + type.toString();
         } else if (type.isArray()) {
+            Class componentType = type.getComponentType();
+            if (componentType.isPrimitive()) {
+                return "j" + componentType.toString() + "Array";
+            }
             return "jobjectArray";
         } else if (type == String.class) {
             return "jstring";
