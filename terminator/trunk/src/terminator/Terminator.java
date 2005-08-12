@@ -142,6 +142,7 @@ public class Terminator {
 	}
 
 	public static void main(final String[] arguments) throws IOException {
+		GuiUtilities.initLookAndFeel();
 		PrintWriter outWriter = new PrintWriter(System.out);
 		PrintWriter errWriter = new PrintWriter(System.err);
 		Terminator.getSharedInstance().parseOriginalCommandLine(arguments, outWriter, errWriter);
