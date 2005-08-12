@@ -75,6 +75,12 @@ elsif UNAME == "CYGWIN_NT-5.0"
 end
 pty_library="#{pty_path}/#{jni_lib_prefix}pty.#{jni_lib_extension}"
 
+heap_size="1g"
+launcher="java"
+if UNAME == "CYGWIN_NT-5.0"
+  heap_size="100m"
+  launcher="java-cygwin"
+end
 
 os_specific_options = []
 
@@ -132,14 +138,14 @@ if test(?x, pty_library) == false
   system("make #{pty_library}")
 end
 
-options = [ "-Xmx1g", "-cp", classpath, "-Djava.library.path=#{pty_path}" ]
+options = [ "-Xmx#{heap_size}", "-cp", classpath, "-Djava.library.path=#{pty_path}" ]
 options.concat(os_specific_options)
 log_filename="#{log_directory}/terminator.log.#{$$}"
 if ENV["DEBUGGING_TERMINATOR"] == nil
   options.push("-De.util.Log.filename=#{log_filename}")
 end
 
-args = [ "java" ]
+args = [ launcher ]
 args.concat(options)
 args.push(class_name)
 args.concat(ARGV)
