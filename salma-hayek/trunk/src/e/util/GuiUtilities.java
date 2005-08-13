@@ -113,10 +113,13 @@ public class GuiUtilities {
     }
     
     /**
-     * Returns the name of the system's best monospaced font.
+     * Returns the name of the system's best monospaced font. Linux and Solaris
+     * are fine (Lucida Sans Typewriter is their default), but Mac OS has an
+     * even nicer font available in Monaco, and Win32 seems to use Courier (the
+     * version where '1' and 'l' look the same) as its "Monospaced".
      */
     public static String getMonospacedFontName() {
-        return isMacOs() ? "Monaco" : "Monospaced";
+        return isMacOs() ? "Monaco" : "Lucida Sans Typewriter";
     }
     
     public static void initLookAndFeel() {
