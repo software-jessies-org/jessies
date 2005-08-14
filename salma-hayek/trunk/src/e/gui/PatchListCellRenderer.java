@@ -39,8 +39,8 @@ public class PatchListCellRenderer extends EListCellRenderer {
                 setBackground(TRIPLE_MINUS_BACKGROUND);
             }
         } else if (line.startsWith("@@ ")) {
-            setBackground(VERY_LIGHT_GRAY);
             setForeground(Color.GRAY);
+            setBackground(VERY_LIGHT_GRAY);
         }
         return this;
     }

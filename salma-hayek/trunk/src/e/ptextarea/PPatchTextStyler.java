@@ -23,6 +23,8 @@ public class PPatchTextStyler extends PAbstractTextStyler {
             style = PStyle.PATCH_PLUS;
         } else if (lineText.startsWith("-")) {
             style = PStyle.PATCH_MINUS;
+        } else if (lineText.startsWith("@")) {
+            style = PStyle.PATCH_AT;
         }
         result.add(new PTextSegment(textArea, start, end, style));
         return result;
