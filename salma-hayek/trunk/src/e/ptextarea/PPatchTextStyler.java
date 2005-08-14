@@ -5,10 +5,10 @@ import java.util.*;
 import java.util.List;
 
 /**
- * A trivial styler for plain text, which colors all text black.
+ * A simple styler for patches.
  */
-public class PPlainTextStyler extends PAbstractTextStyler {
-    public PPlainTextStyler(PTextArea textArea) {
+public class PPatchTextStyler extends PAbstractTextStyler {
+    public PPatchTextStyler(PTextArea textArea) {
         super(textArea);
     }
     
@@ -17,10 +17,17 @@ public class PPlainTextStyler extends PAbstractTextStyler {
         int start = textArea.getLineStartOffset(line);
         int end = textArea.getLineEndOffsetBeforeTerminator(line);
         List<PLineSegment> result = new ArrayList<PLineSegment>();
-        result.add(new PTextSegment(textArea, start, end, PStyle.NORMAL));
+        String lineText = textArea.getLineText(line);
+        PStyle style = PStyle.NORMAL;
+        if (lineText.startsWith("+")) {
+            style = PStyle.PATCH_PLUS;
+        } else if (lineText.startsWith("-")) {
+            style = PStyle.PATCH_MINUS;
+        }
+        result.add(new PTextSegment(textArea, start, end, style));
         return result;
     }
-
+    
     public void addKeywordsTo(Collection<String> collection) {
         // We have no language, so we have no keywords.
     }

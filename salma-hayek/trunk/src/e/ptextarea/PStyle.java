@@ -15,6 +15,8 @@ public enum PStyle {
     HYPERLINK("hyperlink", Color.BLUE),
     PREPROCESSOR("preprocessor", Color.decode("#708090")),
     UNPRINTABLE("unprintable", Color.RED),
+    PATCH_MINUS("patch-minus", Color.RED),
+    PATCH_PLUS("patch-plus", Color.BLUE),
     ;
     
     private String name;
