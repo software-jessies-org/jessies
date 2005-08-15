@@ -1,5 +1,6 @@
 package terminator;
 
+import java.awt.EventQueue;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -94,7 +95,7 @@ public class Terminator {
 	 * supposed to do this.
 	 */
 	private void initUi() {
-		SwingUtilities.invokeLater(new Runnable() {
+		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				JTerminalPaneFactory[] terminals = getInitialTerminals();
 				TerminatorFrame frame = new TerminatorFrame(Terminator.this, terminals);

@@ -202,7 +202,7 @@ public class TerminalControl implements Runnable {
 		final TerminalAction[] actions = (TerminalAction[]) terminalActions.toArray(new TerminalAction[terminalActions.size()]);
 		terminalActions.clear();
 		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
+			EventQueue.invokeAndWait(new Runnable() {
 				public void run() {
 					listener.processActions(actions);
 				}
