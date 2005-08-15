@@ -15,7 +15,7 @@ public class PTextAreaDemo {
             System.exit(1);
         }
         final File file = new File(args[0]);
-        SwingUtilities.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
                 PTextArea area = new PTextArea();
                 area.setText(new String(getFileText(file)));

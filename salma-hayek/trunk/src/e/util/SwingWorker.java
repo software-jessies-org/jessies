@@ -1,6 +1,6 @@
 package e.util;
 
-import javax.swing.SwingUtilities;
+import java.awt.EventQueue;
 
 /**
  * This is the 3rd version of SwingWorker (also known as
@@ -111,7 +111,7 @@ public abstract class SwingWorker {
                     threadVar.clear();
                 }
 
-                SwingUtilities.invokeLater(doFinished);
+                EventQueue.invokeLater(doFinished);
             }
         };
 

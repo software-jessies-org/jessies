@@ -24,7 +24,7 @@ public class Launcher {
         Log.setApplicationName(appName);
         GuiUtilities.initLookAndFeel();
         app.parseCommandLine(appArguments);
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 app.startGui();
             }

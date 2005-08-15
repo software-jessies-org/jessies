@@ -125,7 +125,7 @@ public class EPopupMenu {
     
     private void showPopupMenuLater(final MouseEvent e) {
         try {
-            SwingUtilities.invokeLater(new Runnable() {
+            EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     showPopupMenu(e);
                 }

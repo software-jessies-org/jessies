@@ -10,7 +10,7 @@ public class JTextComponentUtilities {
             doGoToSelection(textComponent, startOffset, endOffset);
         } else {
             try {
-                SwingUtilities.invokeLater(new Runnable() {
+                EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         doGoToSelection(textComponent, startOffset, endOffset);
                     }

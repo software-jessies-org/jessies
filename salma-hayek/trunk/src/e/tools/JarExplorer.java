@@ -182,7 +182,7 @@ public class JarExplorer extends JFrame {
 
     public static void main(String[] filenames) {
         for (final String filename : filenames) {
-            SwingUtilities.invokeLater(new Runnable() {
+            EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     new JarExplorer(filename);
                 }
