@@ -139,11 +139,11 @@ public class EErrorsWindow extends EWindow {
     }
     
     public void append(String line) {
-        SwingUtilities.invokeLater(new AppendRunnable(line));
+        EventQueue.invokeLater(new AppendRunnable(line));
     }
     
     public void clear() {
-        SwingUtilities.invokeLater(new ClearRunnable());
+        EventQueue.invokeLater(new ClearRunnable());
     }
     
     public void drawHorizontalRule() {

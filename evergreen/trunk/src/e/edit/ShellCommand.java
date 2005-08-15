@@ -1,9 +1,9 @@
 package e.edit;
 
 import e.util.*;
+import java.awt.EventQueue;
 import java.io.*;
 import java.util.*;
-import javax.swing.*;
 
 public class ShellCommand {
     private String filename;
@@ -48,7 +48,7 @@ public class ShellCommand {
     public void runCommand() throws IOException {
         process = makeProcessBuilder().start();
 
-        SwingUtilities.invokeLater(launchRunnable);
+        EventQueue.invokeLater(launchRunnable);
         
         Edit.getInstance().showStatus("Started task '" + command + "'");
         
@@ -101,7 +101,7 @@ public class ShellCommand {
             }
             workspace.getErrorsWindow().drawHorizontalRule();
             Edit.getInstance().showStatus("Task '" + command + "' finished");
-            SwingUtilities.invokeLater(completionRunnable);
+            EventQueue.invokeLater(completionRunnable);
         }
     }
     

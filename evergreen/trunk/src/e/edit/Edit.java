@@ -763,7 +763,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             createWorkspaceForCurrentDirectory();
         }
         
-        SwingUtilities.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
                 openRememberedFiles();
                 initializing = false;

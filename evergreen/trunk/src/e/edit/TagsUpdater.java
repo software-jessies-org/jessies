@@ -278,7 +278,7 @@ public class TagsUpdater {
                     return;
                 }
             }
-            SwingUtilities.invokeLater(new Runnable() {
+            EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     for (int i = 0; i < tags.size(); ++i) {
                         TagReader.Tag tag = (TagReader.Tag) tags.get(i);

@@ -260,7 +260,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             }
             
             private void doWatermarkUpdateOnEventThread() {
-                SwingUtilities.invokeLater(new Runnable() {
+                EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         watermarkViewPort.setSerious(isSerious);
                         watermarkViewPort.setWatermark(items.size() > 0 ? StringUtilities.join(items, " ") : null);
