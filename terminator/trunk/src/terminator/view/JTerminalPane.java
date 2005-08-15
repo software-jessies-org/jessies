@@ -94,7 +94,7 @@ public class JTerminalPane extends JPanel {
 	*/
 	private static String getUserShell(String user) {
 		// FIXME: replace this whole method with JNI.
-		String passwordFilename = GuiUtilities.isWindows() ? "c:\\cygwin\\etc\\passwd" : "/etc/passwd";
+		String passwordFilename = GuiUtilities.isWindows() ? "c:/cygwin/etc/passwd" : "/etc/passwd";
 		try {
 			String[] lines = StringUtilities.readLinesFromFile(passwordFilename);
 			for (String line : lines) {
