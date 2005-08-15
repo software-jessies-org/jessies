@@ -211,7 +211,7 @@ public class TerminatorFrame extends JFrame {
 			final Component selected = tabbedPane.getSelectedComponent();
 			if (selected != null) {
 				// I dislike the invokeLater, but it's sadly necessary.
-				SwingUtilities.invokeLater(new Runnable() {
+				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						selected.requestFocus();
 					}
@@ -286,7 +286,7 @@ public class TerminatorFrame extends JFrame {
 			// do this later because otherwise Swing seems to give
 			// the focus to the tab itself, rather than the
 			// component on the tab.
-			SwingUtilities.invokeLater(new Runnable() {
+			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					tabbedPane.getSelectedComponent().requestFocus();
 				}
