@@ -120,10 +120,14 @@ public class FindAction extends ETextAction implements MinibufferUser {
     //
     
     public void removeAllMatches() {
-        currentTextWindow.getText().clearFindMatches();
+        currentTextWindow.getText().removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
         currentTextWindow.getBirdView().clearMatchingLines();
     }
     
+    // FIXME: this could defer to PTextArea.findAllMatches if we:
+    // 1. caught the PatternSyntaxException here
+    // 2. used the match count returned by PTextArea
+    // 3. had some way to get the line numbers of matches so we can tell the bird view (it might even be better than the current system if we can give them all at once as an int[])
     public void findAllMatches(String regularExpression) {
         removeAllMatches();
         
