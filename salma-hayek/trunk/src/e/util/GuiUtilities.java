@@ -119,6 +119,10 @@ public class GuiUtilities {
      * version where '1' and 'l' look the same) as its "Monospaced".
      */
     public static String getMonospacedFontName() {
+        // FIXME: http://java.sun.com/j2se/1.5.0/docs/guide/intl/font.html says
+        // that Lucida Sans Typewriter isn't included with the Win32 JRE. I
+        // do have it, but simonj doesn't. So we probably need to be more clever
+        // here (and probably cache the result).
         return isMacOs() ? "Monaco" : "Lucida Sans Typewriter";
     }
     
