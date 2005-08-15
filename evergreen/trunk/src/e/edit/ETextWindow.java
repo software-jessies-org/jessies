@@ -339,14 +339,14 @@ public class ETextWindow extends EWindow implements PTextListener {
         String fromContent = fromDiskToMemory ? diskContent : memoryContent;
         String toContent = fromDiskToMemory ? memoryContent : diskContent;
         
-        JList patchView = SimplePatchDialog.makePatchView(fromLabel, fromContent, toLabel, toContent);
+        JComponent patchView = SimplePatchDialog.makeScrollablePatchView(fromLabel, fromContent, toLabel, toContent);
         
         String title = verb;
         String buttonLabel = verb;
         FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), title);
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("", new JLabel(question));
-        formPanel.addRow("Patch:", new JScrollPane(patchView));
+        formPanel.addRow("Patch:", patchView);
         return form.show(buttonLabel);
     }
     
