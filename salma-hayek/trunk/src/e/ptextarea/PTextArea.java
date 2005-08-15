@@ -1473,7 +1473,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     public int findAllMatches(String regularExpression) {
         getLock().getWriteLock();
         try {
-            clearFindMatches();
+            removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
             
             // Anything to search for?
             if (regularExpression == null || regularExpression.length() == 0) {
@@ -1493,18 +1493,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         }
     }
     
-    /**
-     * Clears all find match highlights.
-     */
-    public void clearFindMatches() {
-        getLock().getWriteLock();
-        try {
-            removeHighlights(PFind.HIGHLIGHTER_NAME);
-        } finally {
-            getLock().relinquishWriteLock();
-        }
-    }
-    
     public void findNext() {
         findNextOrPrevious(true);
     }
@@ -1515,7 +1503,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
     
     protected void findNextOrPrevious(boolean next) {
         updateFindResults();
-        PHighlight nextHighlight = highlights.getNextOrPreviousHighlight(PFind.HIGHLIGHTER_NAME, next, next ? getSelectionEnd() : getSelectionStart());
+        PHighlight nextHighlight = highlights.getNextOrPreviousHighlight(PFind.MatchHighlight.HIGHLIGHTER_NAME, next, next ? getSelectionEnd() : getSelectionStart());
         if (nextHighlight != null) {
             selectHighlight(nextHighlight);
         }

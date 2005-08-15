@@ -10,8 +10,6 @@ import java.util.List;
 import javax.swing.*;
 
 public class PFind {
-    public static final String HIGHLIGHTER_NAME = "PFind";
-    
     /**
      * Used to mark the matches in the text as if they'd been gone over with a highlighter pen. We use
      * full yellow with half-alpha so you can see the selection through, as a dirty smudge, just like a real
@@ -19,6 +17,8 @@ public class PFind {
      */
     public static class MatchHighlight extends PColoredHighlight {
         private static final Color MATCH_COLOR = new Color(255, 255, 0, 128);
+        
+        public static final String HIGHLIGHTER_NAME = "MatchHighlight";
         
         public MatchHighlight(PTextArea textArea, int startIndex, int endIndex) {
             super(textArea, startIndex, endIndex, MATCH_COLOR);
@@ -90,7 +90,7 @@ public class PFind {
             });
             form.getFormDialog().setCancelRunnable(new Runnable() {
                 public void run() {
-                    textArea.clearFindMatches();
+                    textArea.removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
                 }
             });
             form.showNonModal();
