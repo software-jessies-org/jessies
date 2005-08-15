@@ -13,13 +13,13 @@ import e.util.*;
 
 public class SimplePatchDialog {
     /** Background color for the @@ lines. */
-    private static final Color VERY_LIGHT_GRAY = new Color(230, 230, 230);
+    private static final Color VERY_LIGHT_GRAY = new Color(230, 230, 230, 128);
     
     /** Background color for the +++ lines. */
-    private static final Color TRIPLE_PLUS_BACKGROUND = new Color(0xcc, 0xcc, 0xff);
+    private static final Color TRIPLE_PLUS_BACKGROUND = new Color(0xcc, 0xcc, 0xff, 128);
     
     /** Background color for the --- lines. */
-    private static final Color TRIPLE_MINUS_BACKGROUND = new Color(0xff, 0xcc, 0xcc);
+    private static final Color TRIPLE_MINUS_BACKGROUND = new Color(0xff, 0xcc, 0xcc, 128);
     
     private static final String PREFIX = "e.edit.SimplePatchDialog-";
     
