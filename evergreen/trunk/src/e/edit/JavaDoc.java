@@ -58,7 +58,7 @@ public class JavaDoc {
             if (classPathItem.length() > 0) {
                 File classpath = FileUtilities.fileFromString(classPathItem);
                 try {
-                    urls.add(classpath.toURL());
+                    urls.add(classpath.toURI().toURL());
                     findPackagesIn(classpath);
                 } catch (MalformedURLException ex) {
                     Log.warn("Bad URL on java.advisor.classpath (" + classpath + ")", ex);
