@@ -16,7 +16,7 @@ public class JavaHpp {
         for (int i = 0; i < arguments.length; ++i) {
             String argument = arguments[i];
             if (argument.equals("-classpath")) {
-                URL url = new File(arguments[++i]).toURL();
+                URL url = new File(arguments[++i]).toURI().toURL();
                 classpath.add(url);
             } else {
                 String className = argument;
