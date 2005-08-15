@@ -222,7 +222,7 @@ public class Workspace extends JPanel {
         leftColumn.addComponent(viewer);
         if (address != null) {
             final ETextWindow textWindow = (ETextWindow) viewer;
-            SwingUtilities.invokeLater(new Runnable() {
+            EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     textWindow.jumpToAddress(address);
                 }
@@ -432,7 +432,7 @@ public class Workspace extends JPanel {
     
     public void restoreFocusToRememberedTextWindow() {
         if (rememberedTextWindow != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     rememberedTextWindow.requestFocus();
                 }

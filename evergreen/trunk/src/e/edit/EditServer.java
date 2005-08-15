@@ -1,8 +1,8 @@
 package e.edit;
 
+import java.awt.EventQueue;
 import java.awt.event.*;
 import java.io.*;
-import javax.swing.*;
 
 import e.util.*;
 
@@ -44,7 +44,7 @@ public final class EditServer extends InAppServer {
         
         public EWindow open() {
             try {
-                SwingUtilities.invokeAndWait(this);
+                EventQueue.invokeAndWait(this);
             } catch (Exception ex) {
                 out.println(ex.getMessage());
             }
