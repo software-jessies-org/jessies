@@ -33,4 +33,14 @@ public class PPatchTextStyler extends PAbstractTextStyler {
     public void addKeywordsTo(Collection<String> collection) {
         // We have no language, so we have no keywords.
     }
+    
+    public static class PatchHighlight extends PColoredHighlight {
+        public PatchHighlight(PTextArea textArea, int startIndex, int endIndex, Color color) {
+            super(textArea, startIndex, endIndex, color);
+        }
+        
+        public String getHighlighterName() {
+            return "PatchHighlight";
+        }
+    }
 }
