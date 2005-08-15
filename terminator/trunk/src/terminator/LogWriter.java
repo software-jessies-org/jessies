@@ -32,7 +32,8 @@ public class LogWriter {
 		String timestamp = dateFormatter.format(new Date());
 		String logsDirectoryName = System.getProperty("user.home") + File.separator + ".terminal-logs" + File.separator;
 		File logsDirectory = new File(logsDirectoryName);
-		return (logsDirectory.exists() ? (logsDirectoryName + prefix + '-' + timestamp + ".txt") : "/dev/null");
+		String sinkFilename = e.util.GuiUtilities.isWindows() ? "nul:" : "/dev/null";
+		return (logsDirectory.exists() ? (logsDirectoryName + prefix + '-' + timestamp + ".txt") : sinkFilename);
 	}
 	
 	public void append(char ch) throws IOException {
