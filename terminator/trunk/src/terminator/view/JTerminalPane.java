@@ -93,15 +93,17 @@ public class JTerminalPane extends JPanel {
 	* On any kind of failure, 'bash' is returned as default.
 	*/
 	private static String getUserShell(String user) {
+		// FIXME: replace this whole method with JNI.
+		String passwordFilename = GuiUtilities.isWindows() ? "c:\\cygwin\\etc\\passwd" : "/etc/passwd";
 		try {
-			String[] lines = StringUtilities.readLinesFromFile("/etc/passwd");
+			String[] lines = StringUtilities.readLinesFromFile(passwordFilename);
 			for (String line : lines) {
 				if (line.startsWith(user + ":")) {
 					return line.substring(line.lastIndexOf(':') + 1);
 				}
 			}
 		} catch (Exception ex) {
-			Log.warn("Couldn't get user's shell from \"/etc/passwd\"", ex);
+			Log.warn("Couldn't get user's shell from \"" + passwordFilename + "\"", ex);
 		}
 		return "bash";
 	}
