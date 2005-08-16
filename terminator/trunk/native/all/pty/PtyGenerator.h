@@ -149,13 +149,13 @@ private:
         }
 #endif
         /* slave becomes stdin/stdout/stderr of child */
-        if (dup2(childFd, STDIN_FILENO) != STDIN_FILENO) {
+        if (childFd != STDIN_FILENO && dup2(childFd, STDIN_FILENO) != STDIN_FILENO) {
             throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDIN_FILENO)");
         }
-        if (dup2(childFd, STDOUT_FILENO) != STDOUT_FILENO) {
+        if (childFd != STDOUT_FILENO && dup2(childFd, STDOUT_FILENO) != STDOUT_FILENO) {
             throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDOUT_FILENO)");
         }
-        if (dup2(childFd, STDERR_FILENO) != STDERR_FILENO) {
+        if (childFd != STDERR_FILENO && dup2(childFd, STDERR_FILENO) != STDERR_FILENO) {
             throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDERR_FILENO)");
         }
         if (childFd > STDERR_FILENO) {
