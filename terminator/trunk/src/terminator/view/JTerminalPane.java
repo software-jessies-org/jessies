@@ -69,11 +69,12 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	/**
-	 * Creates a new terminal running the user's shell.
+	 * Creates a new terminal running bash(1), which is assumed to be the
+	 * user's shell.
 	 */
 	public static JTerminalPane newShell() {
 		String user = System.getProperty("user.name");
-		String command = getUserShell(user);
+		String command = "bash";
 		if (Options.getSharedInstance().isLoginShell()) {
 			command += " -l";
 		}
@@ -88,26 +89,6 @@ public class JTerminalPane extends JPanel {
 		return textPane.getCharUnitSize();
 	}
 	
-	/**
-	* Returns the command to execute as the user's shell, parsed from the /etc/passwd file.
-	* On any kind of failure, 'bash' is returned as default.
-	*/
-	private static String getUserShell(String user) {
-		// FIXME: replace this whole method with JNI.
-		String passwordFilename = GuiUtilities.isWindows() ? "c:/cygwin/etc/passwd" : "/etc/passwd";
-		try {
-			String[] lines = StringUtilities.readLinesFromFile(passwordFilename);
-			for (String line : lines) {
-				if (line.startsWith(user + ":")) {
-					return line.substring(line.lastIndexOf(':') + 1);
-				}
-			}
-		} catch (Exception ex) {
-			Log.warn("Couldn't get user's shell from \"" + passwordFilename + "\"", ex);
-		}
-		return "bash";
-	}
-
 	private void init(String command) {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
