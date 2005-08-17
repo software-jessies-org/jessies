@@ -1,3 +1,0 @@
-#!/usr/bin/ruby -w
-$stderr.print("e: this command is no longer in use; please use "edit" instead.\n")
-exit(1)
