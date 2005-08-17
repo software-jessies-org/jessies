@@ -58,7 +58,7 @@ public class InfoDialog {
         Dimension size = terminal.getTextPane().getVisibleSizeInCharacters();
         dimensions.setText(size.width + " x " + size.height);
         LogWriter logWriter = terminal.getLogWriter();
-        logFilename.setText(logWriter.getFilename());
+        logFilename.setText(logWriter.getInfo());
         suspendLogging.setSelected(logWriter.isSuspended());
         
         JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, terminal);

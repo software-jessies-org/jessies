@@ -12,14 +12,13 @@ import java.util.*;
 public class LogWriter {
 	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HHmmssZ");
 	
-	private String filename;
+	private String info = "(not logging)";
 	private BufferedWriter stream;
 	private boolean suspended;
 	
 	public LogWriter(String prefix) {
 		try {
-			this.filename = makeLogFilename(prefix);
-			this.stream = new BufferedWriter(new FileWriter(filename));
+			initLogging(prefix);
 		} catch (Throwable th) {
 			SimpleDialog.showDetails(null, "Couldn't Open Log File", th);
 		} finally {
@@ -27,13 +26,18 @@ public class LogWriter {
 		}
 	}
 	
-	private static String makeLogFilename(String prefix) throws IOException {
+	private void initLogging(String prefix) throws IOException {
 		prefix = java.net.URLEncoder.encode(prefix, "UTF-8");
 		String timestamp = dateFormatter.format(new Date());
 		String logsDirectoryName = System.getProperty("user.home") + File.separator + ".terminal-logs" + File.separator;
 		File logsDirectory = new File(logsDirectoryName);
-		String sinkFilename = e.util.GuiUtilities.isWindows() ? "nul:" : "/dev/null";
-		return (logsDirectory.exists() ? (logsDirectoryName + prefix + '-' + timestamp + ".txt") : sinkFilename);
+		if (logsDirectory.exists()) {
+			String filename = logsDirectoryName + prefix + '-' + timestamp + ".txt";
+			this.info = filename;
+			this.stream = new BufferedWriter(new FileWriter(filename));
+		} else {
+			this.info = "(" + logsDirectoryName + " does not exist)";
+		}
 	}
 	
 	public void append(char ch) throws IOException {
@@ -47,8 +51,8 @@ public class LogWriter {
 		}
 	}
 	
-	public String getFilename() {
-		return filename;
+	public String getInfo() {
+		return info;
 	}
 	
 	public void setSuspended(boolean newState) {
