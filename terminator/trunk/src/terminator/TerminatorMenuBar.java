@@ -166,7 +166,7 @@ public class TerminatorMenuBar extends JMenuBar {
 			super("New Command...");
 		}
 		public void actionPerformed(ActionEvent e) {
-			//paste();
+			//pasteSystemClipboard();
 		}
 	}
 
@@ -175,7 +175,7 @@ public class TerminatorMenuBar extends JMenuBar {
 			super("Connect to Server...");
 		}
 		public void actionPerformed(ActionEvent e) {
-			//paste();
+			//pasteSystemClipboard();
 		}
 	}
 
@@ -212,7 +212,7 @@ public class TerminatorMenuBar extends JMenuBar {
 			super("Save As...");
 		}
 		public void actionPerformed(ActionEvent e) {
-			//paste();
+			//pasteSystemClipboard();
 		}
 	}
 	

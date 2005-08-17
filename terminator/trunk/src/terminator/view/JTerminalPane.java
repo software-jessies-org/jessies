@@ -474,10 +474,10 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public void doCopyAction() {
-		getSelectionHighlighter().copy();
+		getSelectionHighlighter().copyToSystemClipboard();
 	}
 	public void doPasteAction() {
-		textPane.paste();
+		textPane.pasteSystemClipboard();
 	}
 	
 	public void destroyProcess() {
