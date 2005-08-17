@@ -114,16 +114,42 @@ public class GuiUtilities {
     
     /**
      * Returns the name of the system's best monospaced font. Linux and Solaris
-     * are fine (Lucida Sans Typewriter is their default), but Mac OS has an
-     * even nicer font available in Monaco, and Win32 seems to use Courier (the
-     * version where '1' and 'l' look the same) as its "Monospaced".
+     * are fine (Lucida Sans Typewriter is their default for "Monospaced"), but
+     * Mac OS has an even nicer font available in Monaco, and some Win32 JRE
+     * installations use Courier (the version where '1' and 'l' look the same)
+     * because they don't include Lucida Sans Typewriter (see
+     * http://java.sun.com/j2se/1.5.0/docs/guide/intl/font.html), despite their
+     * claim that they include the Lucida fonts so that all JVMs have a
+     * portable set of attractive fonts available.
      */
-    public static String getMonospacedFontName() {
-        // FIXME: http://java.sun.com/j2se/1.5.0/docs/guide/intl/font.html says
-        // that Lucida Sans Typewriter isn't included with the Win32 JRE. I
-        // do have it, but simonj doesn't. So we probably need to be more clever
-        // here (and probably cache the result).
-        return isMacOs() ? "Monaco" : "Lucida Sans Typewriter";
+    public synchronized static String getMonospacedFontName() {
+        if (monospacedFontName == null) {
+            monospacedFontName = findMonospacedFontName();
+        }
+        return monospacedFontName;
+    }
+    
+    private static String monospacedFontName;
+    
+    private static String findMonospacedFontName() {
+        Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+        Set<String> familyNames = new HashSet<String>();
+        for (Font font : fonts) {
+            familyNames.add(font.getFamily());
+        }
+        // Monaco is probably only available on Mac OS.
+        String monaco = "Monaco";
+        if (familyNames.contains(monaco)) {
+            return monaco;
+        }
+        // Lucida Sans Typewriter should be on all Unixes, and all JDKs.
+        String lucidaSansTypewriter = "Lucida Sans Typewriter";
+        if (familyNames.contains(lucidaSansTypewriter)) {
+            return lucidaSansTypewriter;
+        }
+        // If we get here, we don't have a good answer, so let the JVM choose.
+        // It will probably go for Courier, but there's not much we can do.
+        return "Monospaced";
     }
     
     public static void initLookAndFeel() {
