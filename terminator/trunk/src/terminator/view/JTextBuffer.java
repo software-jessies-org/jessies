@@ -115,7 +115,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	/**
 	 * Pastes the text on the clipboard into the terminal.
 	 */
-	public void paste() {
+	public void pasteSystemClipboard() {
 		pasteClipboard(getToolkit().getSystemClipboard());
 	}
 	
@@ -129,6 +129,18 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		}
 	}
 	
+	/**
+	 * Pastes the system selection on X11, the clipboard on Windows
+	 * and nothing on Mac OS X.
+	 */
+	public void middleButtonPaste() {
+		if (GuiUtilities.isWindows()) {
+			pasteSystemClipboard();
+		} else {
+			pasteSystemSelection();
+		}
+	}
+		
 	private void pasteClipboard(Clipboard clipboard) {
 		try {
 			Transferable contents = clipboard.getContents(this);

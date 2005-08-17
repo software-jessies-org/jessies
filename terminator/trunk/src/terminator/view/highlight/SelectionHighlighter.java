@@ -93,13 +93,13 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	
 	public void mouseClicked(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON2) {
-			view.pasteSystemSelection();
+			view.middleButtonPaste();
 		}
 	}
 	
 	public void mouseReleased(MouseEvent event) {
 		if (SwingUtilities.isLeftMouseButton(event)) {
-			copyToSystemSelection();
+			copyChangedSelection();
 		}
 	}
 	
@@ -142,7 +142,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		}
 		startLocation = new Location(lineNumber, start);
 		setHighlight(startLocation, new Location(lineNumber, end));
-		copyToSystemSelection();
+		copyChangedSelection();
 	}
 	
 	private void clearSelection() {
@@ -156,7 +156,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		Location end = new Location(view.getModel().getLineCount(), 0);
 		startLocation = start;
 		setHighlight(start, end);
-		copyToSystemSelection();
+		copyChangedSelection();
 	}
 	
 	private void selectLine(Location location) {
@@ -164,16 +164,16 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		Location end = new Location(location.getLineIndex() + 1, 0);
 		startLocation = start;
 		setHighlight(start, end);
-		copyToSystemSelection();
+		copyChangedSelection();
 	}
 	
 	/**
 	 * Copies the selected text to the clipboard.
 	 */
-	public void copy() {
+	public void copyToSystemClipboard() {
 		copyToClipboard(view.getToolkit().getSystemClipboard());
 	}
-
+	
 	/**
 	 * Copies the selected text to X11's selection.
 	 * Does nothing on other platforms.
@@ -182,6 +182,20 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		Clipboard systemSelection = view.getToolkit().getSystemSelection();
 		if (systemSelection != null) {
 			copyToClipboard(systemSelection);
+		}
+	}
+	
+	/**
+	 * Copies the selected text to X11's selection (behaving like X terminals)
+	 * and Windows's clipboard (behaving like PuTTY).
+	 * Does nothing on Mac OS X (meaning that the menu showing "info"
+	 * about the selection presumably doesn't work there)..
+	 */
+	public void copyChangedSelection() {
+		if (e.util.GuiUtilities.isWindows()) {
+			copyToSystemClipboard();
+		} else {
+			copyToSystemSelection();
 		}
 	}
 	
