@@ -198,7 +198,11 @@ public class EColumn extends JSplitPane {
                 int y = largest.getY() + largest.getHeight() / 2;
                 add(c, index + 1);
                 placeComponent(index + 1, c);
-                moveTo(c, y);
+                try {
+                    moveTo(c, y);
+                } catch (StackOverflowError ex) {
+                    Log.warn("the total height of the title bars is too large for the parent window", ex);
+                }
             }
             addListenersTo(c);
         }
