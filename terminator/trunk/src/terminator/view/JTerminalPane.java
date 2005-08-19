@@ -306,6 +306,9 @@ public class JTerminalPane extends JPanel {
 				if (ch == KeyEvent.CHAR_UNDEFINED) {
 					return;
 				}
+				
+				// FIXME: we should also translate non-ASCII characters to a UTF-8 string here, in which case we could probably remove the conditional below by having the code above choose "\r\n" as our UTF-8 string if ch was Ascii.LF.
+				
 				control.sendChar(ch);
 				if (ch == Ascii.CR && control.isAutomaticNewline()) {
 					control.sendChar(Ascii.LF);
