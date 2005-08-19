@@ -315,8 +315,11 @@ public class FileUtilities {
     }
     
     public static File findOnPath(String executableName) {
+        if (GuiUtilities.isWindows()) {
+            executableName += ".exe";
+        }
         String path = System.getenv("PATH");
-        String[] directories = path.split(":");
+        String[] directories = path.split(File.pathSeparator);
         for (String directory : directories) {
             File file = fileFromParentAndString(directory, executableName);
             if (file.exists()) {
