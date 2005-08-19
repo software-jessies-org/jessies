@@ -451,18 +451,6 @@ public class TerminalControl implements Runnable {
 		return (ch == '#') ? '\u00a3' : ch;
 	}
 	
-	public void sendEscapeString(String s) {
-		try {
-			if (processIsRunning) {
-				out.write((byte) Ascii.ESC);
-				out.write(s.getBytes());
-				out.flush();
-			}
-		} catch (IOException ex) {
-			reportFailedSend("escape sequence", s, ex);
-		}
-	}
-	
 	public void sendChar(char ch) {
 		try {
 			if (processIsRunning) {
