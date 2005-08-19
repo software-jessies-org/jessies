@@ -169,13 +169,15 @@ public class ProcessUtilities {
      * Sends the given signal to the given process. Returns false if
      * the signal could not be sent.
      */
-    public static boolean signalProcess(Process process, int signal) {
+    public static boolean terminateProcess(Process process) {
         int pid = getProcessId(process);
         if (pid == -1) {
             return false;
         }
         try {
-            Runtime.getRuntime().exec("kill -" + signal + " " + pid);
+            System.out.println("killing " + pid);
+            Runtime.getRuntime().exec("kill -" + SIGTERM + " -" + pid);
+            Runtime.getRuntime().exec("kill -" + SIGTERM + " " + pid);
             return true;
         } catch (IOException ex) {
             return false;

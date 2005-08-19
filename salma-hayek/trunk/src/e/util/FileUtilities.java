@@ -314,6 +314,19 @@ public class FileUtilities {
         return fileFromParentAndString(salmaHayekRoot, pathFromSalmaHayekRoot);
     }
     
+    public static File findOnPath(String executableName) {
+        String path = System.getenv("PATH");
+        String[] directories = path.split(":");
+        for (String directory : directories) {
+            File file = fileFromParentAndString(directory, executableName);
+            if (file.exists()) {
+                // FIXME: in Java 6, check for executable permission too.
+                return file;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Creates a temporary file containing 'content' where the temporary file's
      * name begins with 'prefix'. Returns the name of the temporary file.
