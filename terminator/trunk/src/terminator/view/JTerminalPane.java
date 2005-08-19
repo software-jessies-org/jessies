@@ -14,6 +14,9 @@ import terminator.terminal.*;
 import terminator.view.highlight.*;
 
 public class JTerminalPane extends JPanel {
+	// The probably over-simplified belief here is that Unix terminals always send ^? and Windows always sends ^H.
+	private static final char ERASE_CHAR = GuiUtilities.isWindows() ? Ascii.BS : Ascii.DEL;
+	
 	private Process process;
 	private TerminalControl control;
 	private JTextBuffer textPane;
@@ -298,7 +301,7 @@ public class JTerminalPane extends JPanel {
 				if (ch == Ascii.LF) {
 					ch = Ascii.CR;
 				} else if (ch == Ascii.BS) {
-					ch = Ascii.DEL;
+					ch = ERASE_CHAR;
 				}
 				if (ch != KeyEvent.CHAR_UNDEFINED) {
 					control.sendChar(ch);
