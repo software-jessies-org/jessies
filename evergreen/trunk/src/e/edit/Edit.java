@@ -686,7 +686,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         killButton.setBorder(null);
         killButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ProcessUtilities.signalProcess(process, ProcessUtilities.SIGTERM);
+                ProcessUtilities.terminateProcess(process);
             }
         });
         return killButton;
