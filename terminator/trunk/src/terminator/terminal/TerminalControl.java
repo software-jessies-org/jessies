@@ -462,7 +462,7 @@ public class TerminalControl implements Runnable {
 		}
 	}
 	
-	public void sendString(String s) {
+	public void sendUtf8String(String s) {
 		try {
 			if (processIsRunning) {
 				out.write(s.getBytes());

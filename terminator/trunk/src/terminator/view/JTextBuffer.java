@@ -172,7 +172,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				String remainder = text;
 				while (remainder.length() > 0) {
 					int chunkLength = Math.min(1024, remainder.length());
-					terminalControl.sendString(remainder.substring(0, chunkLength));
+					terminalControl.sendUtf8String(remainder.substring(0, chunkLength));
 					remainder = remainder.substring(chunkLength);
 				}
 				*/
