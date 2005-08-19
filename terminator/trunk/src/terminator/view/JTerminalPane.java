@@ -251,25 +251,25 @@ public class JTerminalPane extends JPanel {
 				return;
 			}
 			
-			String sequence = getSequenceForKeyCode(event);
+			String sequence = getEscapeSequenceForKeyCode(event);
 			if (sequence != null) {
-				control.sendEscapeString(sequence);
+				control.sendString(sequence);
 				textPane.userIsTyping();
 				scroll();
 				event.consume();
 			}
 		}
 
-		private String getSequenceForKeyCode(KeyEvent event) {
+		private String getEscapeSequenceForKeyCode(KeyEvent event) {
 			int keyCode = event.getKeyCode();
 			switch (keyCode) {
-				case KeyEvent.VK_ESCAPE: return "";
+				case KeyEvent.VK_ESCAPE: return Ascii.ESC + "";
 				
-				case KeyEvent.VK_HOME: return "[H";
-				case KeyEvent.VK_END: return "[F";
+				case KeyEvent.VK_HOME: return Ascii.ESC + "[H";
+				case KeyEvent.VK_END: return Ascii.ESC + "[F";
 				
-				case KeyEvent.VK_PAGE_UP: return "[5~";
-				case KeyEvent.VK_PAGE_DOWN: return "[6~";
+				case KeyEvent.VK_PAGE_UP: return Ascii.ESC + "[5~";
+				case KeyEvent.VK_PAGE_DOWN: return Ascii.ESC + "[6~";
 				
 				case KeyEvent.VK_UP:
 				case KeyEvent.VK_DOWN:
@@ -279,9 +279,9 @@ public class JTerminalPane extends JPanel {
 					/* Send xterm sequences. */
 					char letter = "DACB".charAt(keyCode - KeyEvent.VK_LEFT);
 					if (event.isControlDown()) {
-						return "[5" + letter;
+						return Ascii.ESC + "[5" + letter;
 					} else {
-						return "[" + letter;
+						return Ascii.ESC + "[" + letter;
 					}
 				}
 
