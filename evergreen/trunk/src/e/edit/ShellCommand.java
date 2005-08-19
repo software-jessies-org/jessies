@@ -116,6 +116,13 @@ public class ShellCommand {
         if (GuiUtilities.isWindows()) {
             return new String[] { "cmd", "/c", command };
         } else {
+            // Try to put the command in its own process group, so it's easier
+            // to kill it and its children.
+            File setSidBinary = FileUtilities.findOnPath("setsid");
+            if (setSidBinary != null) {
+                command = setSidBinary.toString() + " " + command;
+            }
+            
             String shell = System.getenv("SHELL");
             if (shell == null) {
                 shell = "/bin/sh";

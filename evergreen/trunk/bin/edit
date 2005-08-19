@@ -7,11 +7,13 @@ require 'pathname.rb'
 edit_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
 salma_hayek = Pathname.new("#{edit_home}/../salma-hayek").realpath()
 
-ENV["EDIT_HOME"] = edit_home
-
-edit_class_name = "e.edit.Edit"
 HOME = ENV["HOME"]
 UNAME=`uname`.chomp()
+
+ENV["EDIT_HOME"] = edit_home
+ENV["PATH"] = "#{ENV["PATH"]}:#{salma_hayek}/generated/native/all/setsid/#{UNAME}"
+
+edit_class_name = "e.edit.Edit"
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
 classpath_entries = [ "#{edit_home}/classes", "#{salma_hayek}/classes" ]
 
