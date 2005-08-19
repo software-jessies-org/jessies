@@ -124,7 +124,7 @@ public class CSIEscapeAction implements TerminalAction {
 	
 	public boolean deviceAttributesRequest(TextBuffer listener, String seq) {
 		if (seq.equals("") || seq.equals("0")) {
-			control.sendString(Ascii.ESC + "[?1;0c");
+			control.sendUtf8String(Ascii.ESC + "[?1;0c");
 			return true;
 		} else {
 			return false;
@@ -189,13 +189,13 @@ public class CSIEscapeAction implements TerminalAction {
 	private boolean processDeviceStatusReport(TextBuffer listener, String sequence) {
 		switch (Integer.parseInt(sequence)) {
 		case 5:
-			control.sendString(Ascii.ESC + "[0n");
+			control.sendUtf8String(Ascii.ESC + "[0n");
 			return true;
 		case 6:
 			Location location = listener.getCursorPosition();
 			int row = location.getLineIndex() - listener.getFirstDisplayLine() + 1;
 			int column = location.getCharOffset() + 1;
-			control.sendString(Ascii.ESC + "[" + row + ";" + column + "R");
+			control.sendUtf8String(Ascii.ESC + "[" + row + ";" + column + "R");
 			return true;
 		default:
 			return false;

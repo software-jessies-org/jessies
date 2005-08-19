@@ -253,7 +253,7 @@ public class JTerminalPane extends JPanel {
 			
 			String sequence = getEscapeSequenceForKeyCode(event);
 			if (sequence != null) {
-				control.sendString(sequence);
+				control.sendUtf8String(sequence);
 				textPane.userIsTyping();
 				scroll();
 				event.consume();
