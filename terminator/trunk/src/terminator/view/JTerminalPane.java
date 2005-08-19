@@ -303,14 +303,15 @@ public class JTerminalPane extends JPanel {
 				} else if (ch == Ascii.BS) {
 					ch = ERASE_CHAR;
 				}
-				if (ch != KeyEvent.CHAR_UNDEFINED) {
-					control.sendChar(ch);
-					if (ch == Ascii.CR && control.isAutomaticNewline()) {
-						control.sendChar(Ascii.LF);
-					}
-					textPane.userIsTyping();
-					scroll();
+				if (ch == KeyEvent.CHAR_UNDEFINED) {
+					return;
 				}
+				control.sendChar(ch);
+				if (ch == Ascii.CR && control.isAutomaticNewline()) {
+					control.sendChar(Ascii.LF);
+				}
+				textPane.userIsTyping();
+				scroll();
 			}
 			event.consume();
 		}
