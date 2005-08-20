@@ -3,6 +3,7 @@ package terminator.terminal;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 import javax.swing.*;
 import e.util.*;
 import terminator.*;
@@ -50,6 +51,8 @@ public class TerminalControl implements Runnable {
 	
 	// Buffer of TerminalActions to perform.
 	private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
+	
+	private static final ExecutorService writerExecutor = Executors.newSingleThreadExecutor();
 	
 	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) throws Exception {
 		reset();
@@ -451,15 +454,19 @@ public class TerminalControl implements Runnable {
 		return (ch == '#') ? '\u00a3' : ch;
 	}
 	
-	public void sendUtf8String(String s) {
-		try {
-			if (processIsRunning) {
-				out.write(s.getBytes("UTF-8"));
-				out.flush();
+	public void sendUtf8String(final String s) {
+		writerExecutor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (processIsRunning) {
+						out.write(s.getBytes("UTF-8"));
+						out.flush();
+					}
+				} catch (IOException ex) {
+					reportFailedSend("string", s, ex);
+				}
 			}
-		} catch (IOException ex) {
-			reportFailedSend("string", s, ex);
-		}
+		});
 	}
 	
 	private void reportFailedSend(String kind, String value, Exception ex) {
