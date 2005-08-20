@@ -91,35 +91,36 @@ public class PAnchorSet implements PTextListener {
         }
     }
     
-    public void textRemoved(PTextEvent event) {
-        LinkedList<PAnchor> deletionList = new LinkedList<PAnchor>();
-        synchronized (this) {
-            int start = getFirstAnchorIndex(event.getOffset());
-            int deletionLength = event.getLength();
-            int deletionEnd = event.getOffset() + event.getLength();
-            for (int i = start; i < anchors.size(); i++) {
-                PAnchor anchor = get(i);
-                if (anchor.getIndex() < deletionEnd) {
-                    deletionList.add(anchor);
-                    anchors.remove(i--);
-                } else {
-                    anchor.setIndex(anchor.getIndex() - deletionLength);
-                }
+    private int countAnchorsInRegion(int firstAnchorIndex, int offset, int length) {
+        int result = 0;
+        int endOffset = offset + length;
+        for (int i = firstAnchorIndex; i < anchors.size(); i++) {
+            if (get(i).getIndex() < endOffset) {
+                result++;
+            } else {
+                break;
             }
         }
-        // We call all the anchors' delete methods after we've updated all the
-        // anchors.  This is because calling the delete method of an anchor
-        // marking a bound of a highlight will cause the deletion of the anchor
-        // marking the highlight's other bound.  This causes reentrancy into
-        // this object while we're messing about with the anchors' offsets, and
-        // changes to the indexing of the latter anchors.  In short, it leads
-        // to a loss of linearity in the anchor list (which must be kept
-        // sorted), and thus bugs.
-        //
-        // This code is not synchronized, because calling out to arbitrary code
-        // from a synchronized state is just damned dangerous.
-        for (int i = 0; i < deletionList.size(); i++) {
-            deletionList.get(i).delete();
+        return result;
+    }
+    
+    public synchronized void textRemoved(PTextEvent event) {
+        int deletionLength = event.getLength();
+        int firstAnchorIndex = getFirstAnchorIndex(event.getOffset());
+        int removeCount = countAnchorsInRegion(firstAnchorIndex, event.getOffset(), deletionLength);
+        List<PAnchor> anchorsToRemove = new LinkedList<PAnchor>();
+        for (int i = 0; i < removeCount; i++) {
+            anchorsToRemove.add(anchors.remove(firstAnchorIndex));
+        }
+        for (PAnchor anchor : anchorsToRemove) {
+            anchor.delete();
+        }
+        // We must recalculate the first anchor index, because the one we calculated
+        // before could be wrong if an anchor's deletion caused the deletion of another.
+        int start = getFirstAnchorIndex(event.getOffset());
+        for (int i = start; i < anchors.size(); i++) {
+            PAnchor anchor = get(i);
+            anchor.setIndex(anchor.getIndex() - deletionLength);
         }
     }
     
