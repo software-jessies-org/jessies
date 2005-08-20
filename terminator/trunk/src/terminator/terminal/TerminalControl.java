@@ -462,19 +462,6 @@ public class TerminalControl implements Runnable {
 		}
 	}
 	
-	public void sendLine(String line) {
-		try {
-			if (processIsRunning) {
-				out.write(line.getBytes("UTF-8"));
-				out.write('\r');
-				out.write('\n');
-				out.flush();
-			}
-		} catch (IOException ex) {
-			reportFailedSend("line", line, ex);
-		}
-	}
-	
 	private void reportFailedSend(String kind, String value, Exception ex) {
 		Log.warn("Couldn't send " + kind + " \"" + StringUtilities.escapeForJava(value) + "\"", ex);
 	}
