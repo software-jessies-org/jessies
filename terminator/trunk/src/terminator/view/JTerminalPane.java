@@ -15,7 +15,7 @@ import terminator.view.highlight.*;
 
 public class JTerminalPane extends JPanel {
 	// The probably over-simplified belief here is that Unix terminals always send ^? and Windows always sends ^H.
-	private static final char ERASE_CHAR = GuiUtilities.isWindows() ? Ascii.BS : Ascii.DEL;
+	private static final String ERASE_STRING = String.valueOf(GuiUtilities.isWindows() ? Ascii.BS : Ascii.DEL);
 	
 	private Process process;
 	private TerminalControl control;
@@ -294,25 +294,24 @@ public class JTerminalPane extends JPanel {
 
 		public void keyReleased(KeyEvent event) {
 		}
-
+		
+		private String getUtf8ForKeyEvent(KeyEvent e) {
+			char ch = e.getKeyChar();
+			if (ch == Ascii.LF) {
+				return String.valueOf(Ascii.CR);
+			} else if (ch == Ascii.CR) {
+				return control.isAutomaticNewline() ? "\r\n" : "\r";
+			} else if (ch == Ascii.BS) {
+				return ERASE_STRING;
+			} else {
+				return String.valueOf(ch);
+			}
+		}
+		
 		public void keyTyped(KeyEvent event) {
 			if (TerminatorMenuBar.isKeyboardEquivalent(event) == false) {
-				char ch = event.getKeyChar();
-				if (ch == Ascii.LF) {
-					ch = Ascii.CR;
-				} else if (ch == Ascii.BS) {
-					ch = ERASE_CHAR;
-				}
-				if (ch == KeyEvent.CHAR_UNDEFINED) {
-					return;
-				}
-				
-				// FIXME: we should also translate non-ASCII characters to a UTF-8 string here, in which case we could probably remove the conditional below by having the code above choose "\r\n" as our UTF-8 string if ch was Ascii.LF.
-				
-				control.sendChar(ch);
-				if (ch == Ascii.CR && control.isAutomaticNewline()) {
-					control.sendChar(Ascii.LF);
-				}
+				String utf8 = getUtf8ForKeyEvent(event);
+				control.sendUtf8String(utf8);
 				textPane.userIsTyping();
 				scroll();
 			}
