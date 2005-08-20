@@ -99,7 +99,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	
 	public void mouseReleased(MouseEvent event) {
 		if (SwingUtilities.isLeftMouseButton(event)) {
-			copyChangedSelection();
+			selectionChanged();
 		}
 	}
 	
@@ -142,7 +142,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		}
 		startLocation = new Location(lineNumber, start);
 		setHighlight(startLocation, new Location(lineNumber, end));
-		copyChangedSelection();
+		selectionChanged();
 	}
 	
 	private void clearSelection() {
@@ -156,7 +156,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		Location end = new Location(view.getModel().getLineCount(), 0);
 		startLocation = start;
 		setHighlight(start, end);
-		copyChangedSelection();
+		selectionChanged();
 	}
 	
 	private void selectLine(Location location) {
@@ -164,7 +164,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		Location end = new Location(location.getLineIndex() + 1, 0);
 		startLocation = start;
 		setHighlight(start, end);
-		copyChangedSelection();
+		selectionChanged();
 	}
 	
 	/**
@@ -191,7 +191,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	 * Does nothing on Mac OS X (meaning that the menu showing "info"
 	 * about the selection presumably doesn't work there)..
 	 */
-	public void copyChangedSelection() {
+	private void selectionChanged() {
 		if (e.util.GuiUtilities.isWindows()) {
 			copyToSystemClipboard();
 		} else {
