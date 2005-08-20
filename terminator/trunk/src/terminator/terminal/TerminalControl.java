@@ -160,7 +160,7 @@ public class TerminalControl implements Runnable {
 	
 	public void announceConnectionLost(String message) {
 		try {
-			final byte[] bytes = message.getBytes();
+			final byte[] bytes = message.getBytes("UTF-8");
 			processBuffer(bytes, bytes.length);
 			pane.getTextPane().setCursorVisible(false);
 		} catch (Exception ex) {
@@ -454,7 +454,7 @@ public class TerminalControl implements Runnable {
 	public void sendUtf8String(String s) {
 		try {
 			if (processIsRunning) {
-				out.write(s.getBytes());
+				out.write(s.getBytes("UTF-8"));
 				out.flush();
 			}
 		} catch (IOException ex) {
@@ -465,7 +465,7 @@ public class TerminalControl implements Runnable {
 	public void sendLine(String line) {
 		try {
 			if (processIsRunning) {
-				out.write(line.getBytes());
+				out.write(line.getBytes("UTF-8"));
 				out.write('\r');
 				out.write('\n');
 				out.flush();
