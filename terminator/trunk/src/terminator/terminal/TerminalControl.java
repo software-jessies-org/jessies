@@ -451,17 +451,6 @@ public class TerminalControl implements Runnable {
 		return (ch == '#') ? '\u00a3' : ch;
 	}
 	
-	public void sendChar(char ch) {
-		try {
-			if (processIsRunning) {
-				out.write((byte) ch);
-				out.flush();
-			}
-		} catch (IOException ex) {
-			reportFailedSend("char", Character.toString(ch), ex);
-		}
-	}
-	
 	public void sendUtf8String(String s) {
 		try {
 			if (processIsRunning) {
