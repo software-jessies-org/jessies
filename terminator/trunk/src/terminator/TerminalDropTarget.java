@@ -21,28 +21,28 @@ public class TerminalDropTarget extends DropTargetAdapter {
 	
 	public void drop(DropTargetDropEvent e) {
 		try {
+			String textToInsert = "";
 			Transferable transferable = e.getTransferable();
 			if (e.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 				e.acceptDrop(DnDConstants.ACTION_COPY);
-				String text = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+				textToInsert = (String) transferable.getTransferData(DataFlavor.stringFlavor);
 				e.getDropTargetContext().dropComplete(true);
-				textBuffer.insertText(text);
 			} else if (e.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 				e.acceptDrop(DnDConstants.ACTION_COPY);
-				String text = "";
 				List files = (List) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 				for (int i = 0; i < files.size(); ++i) {
 					java.io.File file = (java.io.File) files.get(i);
-					if (text.length() > 0) {
-						text += ' ';
+					if (textToInsert.length() > 0) {
+						textToInsert += ' ';
 					}
-					text += file.toString();
+					textToInsert += file.toString();
 				}
 				e.getDropTargetContext().dropComplete(true);
-				textBuffer.insertText(text);
 			} else {
 				e.rejectDrop();
+				return;
 			}
+			textBuffer.getTerminalControl().sendUtf8String(textToInsert);
 		} catch (Exception ex) {
 			Log.warn("Drop failed.", ex);
 			e.rejectDrop();

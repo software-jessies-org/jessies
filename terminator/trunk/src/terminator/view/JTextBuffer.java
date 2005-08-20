@@ -146,7 +146,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			Transferable contents = clipboard.getContents(this);
 			DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
 			String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
-			insertText(string);
+			terminalControl.sendUtf8String(string);
 		} catch (Exception ex) {
 			Log.warn("Couldn't paste.", ex);
 		}
@@ -160,10 +160,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public void setTerminalControl(TerminalControl terminalControl) {
 		this.terminalControl = terminalControl;
-	}
-	
-	public void insertText(final String text) {
-		terminalControl.sendUtf8String(text);
 	}
 	
 	/** Returns our visible size. */
