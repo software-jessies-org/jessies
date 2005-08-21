@@ -152,6 +152,33 @@ public class GuiUtilities {
         return "Monospaced";
     }
     
+    /**
+     * Returns the index into 'chars' of the character at offset 'x' when the
+     * characters are rendered from 'startX' with font metrics 'metrics'. Note
+     * that there's no font rendering context, so this won't account for
+     * anti-aliasing et cetera.
+     * 
+     * Useful for hit-testing.
+     */
+    public static int getCharOffset(FontMetrics metrics, int startX, int x, char[] chars) {
+        int min = 0;
+        int max = chars.length;
+        while (max - min > 1) {
+            int mid = (min + max) / 2;
+            int width = metrics.charsWidth(chars, 0, mid);
+            if (width > x - startX) {
+                max = mid;
+            } else {
+                min = mid;
+            }
+        }
+        int charPixelOffset = x - startX - metrics.charsWidth(chars, 0, min);
+        if (charPixelOffset > metrics.charWidth(chars[min]) / 2) {
+            ++min;
+        }
+        return min;
+    }
+    
     public static void initLookAndFeel() {
         try {
             String lafClassName = Parameters.getParameter("laf.className");

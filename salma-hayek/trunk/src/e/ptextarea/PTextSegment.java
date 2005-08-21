@@ -1,6 +1,7 @@
 package e.ptextarea;
 
 import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -27,23 +28,7 @@ public class PTextSegment extends PAbstractSegment {
     
     @Override
     public int getCharOffset(FontMetrics metrics, int startX, int x) {
-        char[] ch = getViewText().toCharArray();
-        int min = 0;
-        int max = ch.length;
-        while (max - min > 1) {
-            int mid = (min + max) / 2;
-            int width = metrics.charsWidth(ch, 0, mid);
-            if (width > x - startX) {
-                max = mid;
-            } else {
-                min = mid;
-            }
-        }
-        int charPixelOffset = x - startX - metrics.charsWidth(ch, 0, min);
-        if (charPixelOffset > metrics.charWidth(ch[min]) / 2) {
-            min++;
-        }
-        return min;
+        return GuiUtilities.getCharOffset(metrics, startX, x, getViewText().toCharArray());
     }
     
     @Override
