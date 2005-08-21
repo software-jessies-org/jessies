@@ -41,7 +41,7 @@ public class FindHighlighter implements Highlighter {
 		TextBuffer model = view.getModel();
 		int count = 0;
 		for (int i = firstLineIndex; i < model.getLineCount(); i++) {
-			String line = model.getLine(i);
+			String line = model.getTextLine(i).getText();
 			count += addHighlightsOnLine(view, i, line);
 		}
 		return count;

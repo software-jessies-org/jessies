@@ -150,7 +150,7 @@ public class TextBuffer {
 			savedScreen = new TextLine[height];
 			for (int i = 0; i < height; i++) {
 				int lineIndex = getFirstDisplayLine() + i;
-				savedScreen[i] = get(lineIndex);
+				savedScreen[i] = getTextLine(lineIndex);
 				textLines.set(lineIndex, new TextLine());
 			}
 		} else {
@@ -209,21 +209,16 @@ public class TextBuffer {
 		// No special tab to our right; return the default 8-separated tab stop.
 		return (charOffset + 8) & ~7;
 	}
-
-	/** Returns the contents of the indexed line excluding the terminating NL. */
-	public String getLine(int lineIndex) {
-		return get(lineIndex).getText();
-	}
 	
 	/** Returns the length of the indexed line including the terminating NL. */
 	public int getLineLength(int lineIndex) {
-		return get(lineIndex).length() + 1;
+		return getTextLine(lineIndex).length() + 1;
 	}
 	
 	/** Returns the start character index of the indexed line. */
 	public int getStartIndex(int lineIndex) {
 		ensureValidStartIndex(lineIndex);
-		return get(lineIndex).getLineStartIndex();
+		return getTextLine(lineIndex).getLineStartIndex();
 	}
 	
 	/**
@@ -281,8 +276,8 @@ public class TextBuffer {
 	private void ensureValidStartIndex(int lineIndex) {
 		if (lineIndex > lastValidStartIndex) {
 			for (int i = lastValidStartIndex; i < lineIndex; i++) {
-				TextLine line = get(i);
-				get(i + 1).setLineStartIndex(line.getLineStartIndex() + line.lengthIncludingNewline());
+				TextLine line = getTextLine(i);
+				getTextLine(i + 1).setLineStartIndex(line.getLineStartIndex() + line.lengthIncludingNewline());
 			}
 			lastValidStartIndex = lineIndex;
 		}
@@ -295,7 +290,7 @@ public class TextBuffer {
 	public void fullReset() {
 		int firstLineToClear = getFirstDisplayLine();
 		for (int i = 0; i < height; i++) {
-			get(firstLineToClear + i).clear();
+			getTextLine(firstLineToClear + i).clear();
 		}
 		view.repaint();
 	}
@@ -392,11 +387,11 @@ public class TextBuffer {
 		return width;
 	}
 	
-	public List<StyledText> getLineText(int lineIndex) {
-		return get(lineIndex).getStyledTextSegments();
+	public List<StyledText> getLineStyledText(int lineIndex) {
+		return getTextLine(lineIndex).getStyledTextSegments();
 	}
 	
-	public TextLine get(int index) {
+	public TextLine getTextLine(int index) {
 		if (index >= textLines.size()) {
 			Log.warn("TextLine requested for index " + index + ", size of buffer is " + textLines.size() + ".");
 			return new TextLine();
@@ -410,7 +405,7 @@ public class TextBuffer {
 		if (this.height > height && textLines.size() >= this.height) {
 			for (int i = 0; i < (this.height - height); i++) {
 				int lineToRemove = textLines.size() - 1;
-				if (usingAlternateBuffer() || (get(lineToRemove).length() == 0 && cursorPosition.getLineIndex() != lineToRemove)) {
+				if (usingAlternateBuffer() || (getTextLine(lineToRemove).length() == 0 && cursorPosition.getLineIndex() != lineToRemove)) {
 					textLines.remove(lineToRemove);
 				}
 			}
@@ -441,7 +436,7 @@ public class TextBuffer {
 	 */
 	public void processLine(String untranslatedLine) {
 		String line = view.getTerminalControl().translate(untranslatedLine);
-		TextLine textLine = get(cursorPosition.getLineIndex());
+		TextLine textLine = getTextLine(cursorPosition.getLineIndex());
 		if (insertMode) {
 //			Log.warn("Inserting text \"" + line + "\" at " + cursorPosition + ".");
 			textLine.insertTextAt(cursorPosition.getCharOffset(), line, currentStyle);
@@ -453,7 +448,7 @@ public class TextBuffer {
 	}
 	
 	private void textAdded(int length) {
-		TextLine textLine = get(cursorPosition.getLineIndex());
+		TextLine textLine = getTextLine(cursorPosition.getLineIndex());
 		int currentLine = cursorPosition.getLineIndex();
 		updateMaxLineWidth(textLine.length());
 		lineIsDirty(cursorPosition.getLineIndex() + 1);  // cursorPosition's line still has a valid *start* index.
@@ -486,7 +481,7 @@ public class TextBuffer {
 	
 	private void insertTab() {
 		int nextTabLocation = getNextTabPosition(cursorPosition.getCharOffset());
-		TextLine textLine = get(cursorPosition.getLineIndex());
+		TextLine textLine = getTextLine(cursorPosition.getLineIndex());
 		int startOffset = cursorPosition.getCharOffset();
 		int tabLength = nextTabLocation - startOffset;
 		if (insertMode) {
@@ -510,7 +505,7 @@ public class TextBuffer {
 	}
 	
 	public void deleteCharacters(int count) {
-		TextLine line = get(cursorPosition.getLineIndex());
+		TextLine line = getTextLine(cursorPosition.getLineIndex());
 		int oldLineLength = line.length();
 		int start = cursorPosition.getCharOffset();
 		int end = start + count;
@@ -520,7 +515,7 @@ public class TextBuffer {
 	}
 	
 	public void killHorizontally(boolean fromStart, boolean toEnd) {
-		TextLine line = get(cursorPosition.getLineIndex());
+		TextLine line = getTextLine(cursorPosition.getLineIndex());
 		int oldLineLength = line.length();
 		int start = fromStart ? 0 : cursorPosition.getCharOffset();
 		int end = toEnd ? oldLineLength : cursorPosition.getCharOffset();
@@ -534,7 +529,7 @@ public class TextBuffer {
 		int start = fromTop ? getFirstDisplayLine() : cursorPosition.getLineIndex();
 		int end = toBottom ? getLineCount() : cursorPosition.getLineIndex();
 		for (int i = start; i < end; i++) {
-			get(i).clear();
+			getTextLine(i).clear();
 		}
 		if (fromTop && toBottom) {
 			setCursorPosition(1, 1);  // Clear screen also implies moving the cursor to 'home'.
@@ -565,7 +560,7 @@ public class TextBuffer {
 		int charOffset = cursorPosition.getCharOffset() + xDiff;
 		int lineIndex = cursorPosition.getLineIndex();
 		while (charOffset < 0) {
-			TextLine lineAbove = get(--lineIndex);
+			TextLine lineAbove = getTextLine(--lineIndex);
 			charOffset += lineAbove.length();
 		}
 		cursorPosition = new Location(lineIndex, charOffset);
@@ -622,7 +617,7 @@ public class TextBuffer {
 		
 		public char charAt(int index) {
 			Location loc = getLocationFromCharIndex(start + index);
-			String line = get(loc.getLineIndex()).getText();
+			String line = getTextLine(loc.getLineIndex()).getText();
 			if (line.length() > loc.getCharOffset()) {
 				return line.charAt(loc.getCharOffset());
 			} else {
@@ -643,7 +638,7 @@ public class TextBuffer {
 			Location loc = getLocationFromCharIndex(start);
 			int charsLeft = end - start;
 			while (charsLeft > 0) {
-				TextLine line = get(loc.getLineIndex());
+				TextLine line = getTextLine(loc.getLineIndex());
 				String str = line.getText() + '\n';
 				str = str.substring(loc.getCharOffset());
 				if (charsLeft < str.length()) {
