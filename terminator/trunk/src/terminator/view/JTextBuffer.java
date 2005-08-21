@@ -168,6 +168,16 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return scrollPane.getViewport().getExtentSize();
 	}
 	
+	/**
+	 * Returns the dimensions of an average character. Note that even though
+	 * we use a fixed-width font, some glyphs for non-ASCII characters can
+	 * be wider than this. See Markus Kuhn's UTF-8-demo.txt for examples,
+	 * particularly among the Greek (where some glyphs are normal-width
+	 * and others are wider) and Japanese (where most glyphs are wide).
+	 * 
+	 * This isn't exactly deprecated, but you should really think hard
+	 * before using it.
+	 */
 	public Dimension getCharUnitSize() {
 		FontMetrics metrics = getFontMetrics(getFont());
 		return new Dimension(metrics.charWidth('W'), metrics.getHeight());
@@ -345,7 +355,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			lineIndex = 0;
 		} else {
 			charOffset = Math.max(0, point.x / character.width);
-			charOffset = Math.min(charOffset, model.get(lineIndex).length());
+			charOffset = Math.min(charOffset, model.getTextLine(lineIndex).length());
 		}
 		return new Location(lineIndex, charOffset);
 	}
@@ -558,7 +568,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			if (i == end.getLineIndex() && end.getCharOffset() == 0) {
 				break;
 			}
-			TextLine textLine = model.get(i);
+			TextLine textLine = model.getTextLine(i);
 			int lineStart = (i == start.getLineIndex()) ? start.getCharOffset() : 0;
 			int lineEnd = (i == end.getLineIndex()) ? end.getCharOffset() : textLine.length();
 			buf.append(textLine.getTabbedText(lineStart, lineEnd));
@@ -595,7 +605,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			int x = 0;
 			int baseline = metrics.getHeight() * (i + 1) - metrics.getMaxDescent();
 			int startOffset = 0;
-			Iterator it = getLineText(i).iterator();
+			Iterator it = getLineStyledText(i).iterator();
 			while (it.hasNext()) {
 				StyledText chunk = (StyledText) it.next();
 				x += paintStyledText(graphics, chunk, x, baseline);
@@ -618,8 +628,8 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		}
 	}
 	
-	public List<StyledText> getLineText(int line) {
-		List<StyledText> result = model.getLineText(line);
+	public List<StyledText> getLineStyledText(int line) {
+		List<StyledText> result = model.getLineStyledText(line);
 		List<Highlight> highlights = getHighlightsForLine(line);
 		for (Highlight highlight : highlights) {
 			result = highlight.applyHighlight(result, new Location(line, 0));

@@ -127,7 +127,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	
 	public void selectWord(Location location) {
 		final int lineNumber= location.getLineIndex();
-		String line = view.getModel().getLine(lineNumber);
+		String line = view.getModel().getTextLine(lineNumber).getText();
 		if (location.getCharOffset() >= line.length()) {
 			return;
 		}
@@ -236,11 +236,11 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	}
 	
 	private void setHighlight(Location start, Location end) {
-		TextLine startLine = view.getModel().get(start.getLineIndex());
+		TextLine startLine = view.getModel().getTextLine(start.getLineIndex());
 		start = new Location(start.getLineIndex(), startLine.getEffectiveCharStartOffset(start.getCharOffset()));
 		// Cope with selections off the bottom of the screen.
 		if (end.getCharOffset() != 0) {
-			TextLine endLine = view.getModel().get(end.getLineIndex());
+			TextLine endLine = view.getModel().getTextLine(end.getLineIndex());
 			end = new Location(end.getLineIndex(), endLine.getEffectiveCharEndOffset(end.getCharOffset()));
 		}
 		highlight = new Highlight(this, start, end, style);
@@ -269,7 +269,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		if (location.getLineIndex() >= model.getLineCount()) {
 			return false;
 		}
-		TextLine line = model.get(location.getLineIndex());
+		TextLine line = model.getTextLine(location.getLineIndex());
 		if (location.getCharOffset() >= line.length()) {
 			return false;
 		}
