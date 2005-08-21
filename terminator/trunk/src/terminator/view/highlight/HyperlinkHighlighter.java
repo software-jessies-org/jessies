@@ -147,7 +147,7 @@ public class HyperlinkHighlighter implements Highlighter {
 	private void reallyAddHighlights(JTextBuffer view, int firstLineIndex) {
 		TextBuffer model = view.getModel();
 		for (int i = firstLineIndex; i < model.getLineCount(); i++) {
-			String line = model.getTextLine(i).getText();
+			String line = model.getTextLine(i).getString();
 			addHighlightsOnLine(view, i, line);
 		}
 	}

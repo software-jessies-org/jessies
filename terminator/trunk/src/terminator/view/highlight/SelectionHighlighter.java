@@ -127,7 +127,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	
 	public void selectWord(Location location) {
 		final int lineNumber= location.getLineIndex();
-		String line = view.getModel().getTextLine(lineNumber).getText();
+		String line = view.getModel().getTextLine(lineNumber).getString();
 		if (location.getCharOffset() >= line.length()) {
 			return;
 		}
@@ -203,13 +203,13 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		if (highlight == null) {
 			return;
 		}
-		String newContents = getTabbedText();
+		String newContents = getTabbedString();
 		StringSelection selection = new StringSelection(newContents);
 		clipboard.setContents(selection, this);
 	}
 	
-	public String getTabbedText() {
-		return (highlight != null) ? view.getTabbedText(highlight) : "";
+	public String getTabbedString() {
+		return (highlight != null) ? view.getTabbedString(highlight) : "";
 	}
 	
 	/**

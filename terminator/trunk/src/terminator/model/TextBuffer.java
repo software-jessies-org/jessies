@@ -617,7 +617,7 @@ public class TextBuffer {
 		
 		public char charAt(int index) {
 			Location loc = getLocationFromCharIndex(start + index);
-			String line = getTextLine(loc.getLineIndex()).getText();
+			String line = getTextLine(loc.getLineIndex()).getString();
 			if (line.length() > loc.getCharOffset()) {
 				return line.charAt(loc.getCharOffset());
 			} else {
@@ -639,7 +639,7 @@ public class TextBuffer {
 			int charsLeft = end - start;
 			while (charsLeft > 0) {
 				TextLine line = getTextLine(loc.getLineIndex());
-				String str = line.getText() + '\n';
+				String str = line.getString() + '\n';
 				str = str.substring(loc.getCharOffset());
 				if (charsLeft < str.length()) {
 					str = str.substring(0, charsLeft);
