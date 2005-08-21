@@ -21,11 +21,11 @@
 
 <h1>Terminator</h1>
 
-<p><strong>Terminator is a GPL Unix terminal emulator with advanced features not
-yet found elsewhere, replacing xterm, rxvt, xwsh and friends on X11 systems,
-and Terminal.app on Mac OS X.</strong>
+<p><strong>Terminator is a GPL terminal emulator with advanced features not
+yet found elsewhere, suitable to replace xterm, rxvt, xwsh and friends on X11 systems,
+Terminal.app on Mac OS X and PuTTY on Windows.</strong>
 
-<p>Terminator will run on any Unix with Java 1.5 or later and a C++ compiler.
+<p>Terminator will run on any modern POSIX system with Java 1.5 or later and a C++ compiler.
 
 <h2>Features</h2>
 
@@ -85,17 +85,19 @@ tab characters into strings of spaces, which is very annoying if you then try to
 a section of text from your terminal into a text editor.  Terminator handles tabs properly,
 remembering where the tabs are and copy/pasting them as tab characters.
 
-<li><p><strong>Portability</strong> - Written in a combination of Java and POSIX C, Terminator
-is the best terminal emulator you can run on both Linux and Mac OS, or any other Unix.
+<li><p><strong>Portability</strong> - Written in a combination of Java and POSIX C++, Terminator
+should compile out of the box on most modern desktop operating systems.
 
 <li><p><strong>Consistent Look and Feel</strong> - Terminator will fit in on any platform.  It
 looks perfectly at home on Linux systems, and blends seamlessly into Mac OS X.
 
 <li><p><strong>Freedom</strong> - Terminator is released under the GPL.
+
+<li><p><strong>UTF-8</strong> - Terminator won't mangle your favorite accented characters.
 </ul>
 
 <p>We think Terminator is the clear choice for the discerning terminal user. Though originally written
-for Linux to make up for the fact that no Linux terminal emulator was as good as Mac OS' Terminal, it has
+for Linux to make up for the fact that no Linux terminal emulator was as good as Mac OS X's Terminal, it has
 now surpassed Terminal in several areas.
 
 <h2>Download</h2>
@@ -109,13 +111,27 @@ but you'll also need a copy of the library to go with it (<a href="http://www.je
 which runs a process connected to a pseudo-terminal. You will need
 Java 1.5.
 
-<p>Terminator will run fine on Mac OS, KDE, Gnome, or even an old-style X11
+<p>On Windows, you will need Cygwin.  The current version at the time of porting
+was 1.5.18-1.  The startup script requires Ruby, which isn't part of Cygwin's default
+installation.  It's easily added to an additional installation (by a human but not, sadly,
+by the script) by rerunning the installer.  You also need a version of java.exe - or
+another Java launcher - that was compiled with Cygwin.  If you're l33t enough to
+know about src/launcher then, heh, please tell us how we can most easily redistribute
+an appropriate launcher.
+
+<p>(NT's built-in POSIX subsystem won't let you launch Win32 applications or
+interact with the network, so that wasn't an option.
+Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which
+we use to support window resizing, not to mention containing a port of one of
+the most widely used ssh programs.)
+
+<p>Terminator will run fine on Mac OS X, KDE, Gnome, or even an old-style X11
 window manager like lwm. Now you can use the same terminal emulator everywhere!
 
 <h2>Running</h2>
 
-<p>We have made great efforts to ensure that Terminator is as easy to run as
-possible. The native code will automatically be compiled the first time you run
+<p>We have made some effort to ensure that Terminator is easy to run.
+The native code will automatically be compiled the first time you run
 Terminator on a new architecture, assuming you have <tt>make(1)</tt> and
 <tt>g++(1)</tt> installed. A single Terminator installation may contain native
 binaries for a variety of different architectures; this is handled
