@@ -143,9 +143,21 @@ define defineObjectsPerLanguage
   LOCAL_VARIABLES += OBJECTS.$(1)
 endef
 
+# It's non-obvious but utterly essential for single threaded
+# applications which dynamically load multi-threaded libraries
+# to use this option - or runtime crashes await.
+# The default allocator is *not* thread-safe, despite g++ -v's
+# apparent claims to the contrary (which, I think, are actually
+# just claiming the availability of a thread-safe allocator).
+LDFLAGS.Linux += -pthread
+
+LDFLAGS += $(LDFLAGS.$(TARGET_OS))
+
 # ----------------------------------------------------------------------------
 # Extra compiler and (mainly) linker flags for building JNI.
 # ----------------------------------------------------------------------------
+
+JNI_LIBRARY_LDFLAGS += $(LDFLAGS)
 
 JNI_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
 JNI_LIBRARY_PREFIX.Darwin = lib
