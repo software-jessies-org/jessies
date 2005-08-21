@@ -32,6 +32,9 @@ Terminal.app on Mac OS X and PuTTY on Windows.</strong>
 <p>Here are some of the features unique to Terminator, or which are rare amongst the competition:
 
 <ul>
+<li><p><strong>Automatic Logging</strong> - Complete logs are automatically generated of all your
+terminal sessions.
+
 <li><p><strong>Find</strong> - Terminator provides you with a find function so you can
 search for text and regular expressions within your terminal (including the scrollback),
 highlighting them all, in the style of <tt>less(1)</tt>, and offering quick movement to the
@@ -41,9 +44,24 @@ function is Apple's Terminal, and ours is better.
 output in a great stream of output, this is a really great way to make it blindingly obvious
 when it appears.
 <p>A screenshot of Terminator on Mac OS X, after running 'man bash', and doing a find for
-'(?i)shell'. Despite the evidence that a pager is running, this is Terminator doing the
-highlighting&nbsp;&mdash; one of the authors uses <tt>cat(1)</tt> as his pager:
+'(?i)shell':
 <p align="center" ><img src="mac-os-man-bash-find.png">
+<p>Despite the evidence that a pager is running, this is Terminator doing the
+highlighting&nbsp;&mdash; one of the authors uses <tt>cat(1)</tt> as his pager.
+
+<li><p><strong>Drop Target</strong> - Text and URLs, and even files from
+Finder/Nautilus/Windows Explorer can be dropped on Terminator to be inserted
+as text, with automatic quoting of filenames containing shell metacharacters.
+
+<li><p><strong>Freedom</strong> - Terminator is released under the GPL.
+
+<li><p><strong>Horizontal Scrolling</strong> - Most terminal emulators wrap text when it
+intrudes upon the right margin.  Terminator doesn't - it instead provides a horizontal
+scrollbar when necessary.  This brings clear benefits in terms of readability of program
+output, or text files sent to the display with <tt>cat(1)</tt>. (We tried both this and Apple-like
+reflowing of text when you change the window size, and we decided we preferred this. Sadly,
+we don't have the resources to support two implementations, so reflowing isn't an option; it's
+gone from the code.)
 
 <li><p><strong>Hyperlinks</strong> - Terminator will recognize the names of files, or
 grep-like addresses consisting of a filename and line number, and automatically
@@ -62,36 +80,20 @@ then
 fi
 </pre>
 
+<li><p><strong>Multiple Tabs</strong> - Like tabbed browsing, only with terminals.
+
 <li><p><strong>Number reinterpretation</strong> - Terminator will recognize numbers
 in a variety of bases as the current selection, and add informational menu items to the
 pop-up menu showing the same number in other bases. No more <tt>man ascii</tt> or resorting
 to <tt>bc(1)</tt>.
 
-<li><p><strong>Horizontal Scrolling</strong> - Most terminal emulators wrap text when it
-intrudes upon the right margin.  Terminator doesn't - it instead provides a horizontal
-scrollbar when necessary.  This brings clear benefits in terms of readability of program
-output, or text files sent to the display with <tt>cat(1)</tt>. (We tried both this and Apple-like
-reflowing of text when you change the window size, and we decided we preferred this. Sadly,
-we don't have the resources to support two implementations, so reflowing isn't an option; it's
-gone from the code.)
-
-<li><p><strong>Multiple Tabs</strong> - Like tabbed browsing, only with terminals.
-
-<li><p><strong>Automatic Logging</strong> - Complete logs are automatically generated of all your
-terminal sessions.
+<li><p><strong>Portability</strong> - Written in a combination of Java and POSIX C++, Terminator
+should compile out of the box on most modern desktop operating systems.
 
 <li><p><strong>Proper Tab Character Handling</strong> - Most terminal emulators will translate
 tab characters into strings of spaces, which is very annoying if you then try to copy/paste
 a section of text from your terminal into a text editor.  Terminator handles tabs properly,
 remembering where the tabs are and copy/pasting them as tab characters.
-
-<li><p><strong>Portability</strong> - Written in a combination of Java and POSIX C++, Terminator
-should compile out of the box on most modern desktop operating systems.
-
-<li><p><strong>Consistent Look and Feel</strong> - Terminator will fit in on any platform.  It
-looks perfectly at home on Linux systems, and blends seamlessly into Mac OS X.
-
-<li><p><strong>Freedom</strong> - Terminator is released under the GPL.
 
 <li><p><strong>UTF-8</strong> - Terminator won't mangle your favorite accented characters.
 </ul>
@@ -179,11 +181,11 @@ export TERM=$TERM
 
 <h3>Pasting in VNC</h3>
 
-<p>If you're using VNC, you may experience problems pasting into Terminator, accompanied by the following exception:
+<p>If you're using an old version of VNC, you may experience problems pasting into Terminator, accompanied by the following exception:
 <pre>
 java.awt.datatransfer.UnsupportedFlavorException: Unicode String
 </pre>
-<p>This is a bug in old versions of the X11 VNC server. On Debian, you should remove the <tt>vncserver</tt> package and install the <tt>vnc4server</tt> package, and run <tt>vnc4server</tt> (it takes the same arguments as <tt>vncserver</tt>)&nbsp;&mdash; just upgrading your existing <tt>vncserver</tt> package will not help. Switching package will also a fix a bunch of other problems you may or may not have noticed with VNC.
+<p>This is caused by a bug in old versions of the X11 VNC server. On Debian, you should remove the <tt>vncserver</tt> package and install the <tt>vnc4server</tt> package, and run <tt>vnc4server</tt> (it takes the same arguments as <tt>vncserver</tt>)&nbsp;&mdash; just upgrading your existing <tt>vncserver</tt> package will not help. Switching package will also a fix a bunch of other problems you may or may not have noticed with VNC.
 
 <h3>X11-style resources</h3>
 
