@@ -39,7 +39,7 @@ public class TerminalControl implements Runnable {
 	private PtyProcess ptyProcess;
 	private boolean processIsRunning = true;
 	private boolean processIsBeingDestroyed = false;
-	private InputStream in;
+	private InputStreamReader in;
 	private OutputStream out;
 	
 	private int characterSet;
@@ -59,7 +59,7 @@ public class TerminalControl implements Runnable {
 		this.pane = pane;
 		this.listener = listener;
 		ptyProcess = new PtyProcess(command.split(" "));
-		this.in = ptyProcess.getInputStream();
+		this.in = new InputStreamReader(ptyProcess.getInputStream(), "UTF-8");
 		this.out = ptyProcess.getOutputStream();
 		this.logWriter = new LogWriter(command);
 	}
@@ -124,7 +124,7 @@ public class TerminalControl implements Runnable {
 	
 	public void run() {
 		try {
-			byte[] buffer = new byte[INPUT_BUFFER_SIZE];
+			char[] buffer = new char[INPUT_BUFFER_SIZE];
 			int readCount;
 			while ((readCount = in.read(buffer, 0, buffer.length)) != -1) {
 				processBuffer(buffer, readCount);
@@ -163,8 +163,8 @@ public class TerminalControl implements Runnable {
 	
 	public void announceConnectionLost(String message) {
 		try {
-			final byte[] bytes = message.getBytes("UTF-8");
-			processBuffer(bytes, bytes.length);
+			final char[] buffer = message.toCharArray();
+			processBuffer(buffer, buffer.length);
 			pane.getTextPane().setCursorVisible(false);
 		} catch (Exception ex) {
 			Log.warn("Couldn't say '" + message + "'", ex);
@@ -187,11 +187,9 @@ public class TerminalControl implements Runnable {
 		ptyProcess.sendResizeNotification(sizeInChars, sizeInPixels);
 	}
 	
-	/** Returns the number of bytes in buffer which remain unprocessed. */
-	private synchronized void processBuffer(byte[] buffer, int size) throws IOException {
+	private synchronized void processBuffer(char[] buffer, int size) throws IOException {
 		for (int i = 0; i < size; i++) {
-			int value = (buffer[i]) & 0xff;  // We don't handle negative bytes well.
-			processChar((char) value);
+			processChar(buffer[i]);
 		}
 		flushLineBuffer();
 		flushTerminalActions();
