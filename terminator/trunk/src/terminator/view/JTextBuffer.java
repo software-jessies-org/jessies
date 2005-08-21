@@ -379,7 +379,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public Dimension getOptimalViewSize() {
 		Dimension character = getCharUnitSize();
-		return new Dimension(model.getMaxLineWidth() * character.width, model.getLineCount() * character.height);
+		// FIXME: really, we need to track the maximum pixel width.
+		final int width = model.getMaxLineWidth() * character.width;
+		final int height = model.getLineCount() * character.height;
+		return new Dimension(width, height);
 	}
 	
 	// Highlighting support.
