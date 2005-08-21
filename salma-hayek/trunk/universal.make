@@ -154,6 +154,11 @@ LDFLAGS.Linux += -pthread
 # launcher needs this on Linux
 LDFLAGS.Linux += -ldl
 
+# So that launcher doesn't open a window for its console output.
+# Its console output still comes out in the window it's run from,
+# if it's run from a shell.
+LDFLAGS.CYGWIN_NT-5.0 += -Wl,--subsystem,windows
+
 LDFLAGS += $(LDFLAGS.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
