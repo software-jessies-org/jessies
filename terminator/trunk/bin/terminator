@@ -19,7 +19,7 @@ rescue LoadError
 end
 ENV["TERMINATOR_HOME"] = terminator_home
 
-class_name = "terminator.Terminator"
+class_name = "terminator/Terminator"
 HOME = ENV["HOME"]
 
 UNAME=`uname`.chomp()
@@ -56,15 +56,22 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   end
 end
 
-path_separator=":"
-if UNAME == "CYGWIN_NT-5.0"
-  path_separator=';'
+def cygpath(filenameOrPath)
+  if UNAME != "CYGWIN_NT-5.0"
+    return filenameOrPath
+  end
+  args = [ "cygpath", "--windows" ]
+  if filenameOrPath =~ /:/
+    args.push("--path")
+  end
+  args.push('"' + filenameOrPath + '"')
+  return `#{args.join(" ")}`.chomp
 end
-native_terminator_home=terminator_home.to_s.sub(/^\/cygdrive\/([a-z])/, '\1:')
-classpath="#{native_terminator_home}/classes#{path_separator}#{native_terminator_home}/../salma-hayek/classes#{path_separator}#{native_terminator_home}/terminator.jar"
+
+classpath="#{terminator_home}/classes:#{salma_hayek}/classes:#{terminator_home}/terminator.jar"
 
 
-pty_path="#{native_terminator_home}/generated/native/all/pty/#{UNAME}"
+pty_path="#{terminator_home}/generated/native/all/pty/#{UNAME}"
 jni_lib_prefix="lib"
 jni_lib_extension="so"
 if UNAME == "Darwin"
@@ -79,7 +86,7 @@ heap_size="1g"
 launcher="java"
 if UNAME == "CYGWIN_NT-5.0"
   heap_size="100m"
-  launcher="java-cygwin"
+  launcher="#{salma_hayek}/generated/native/all/launcher/#{UNAME}/launcher"
 end
 
 os_specific_options = []
@@ -138,11 +145,11 @@ if test(?x, pty_library) == false
   system("make #{pty_library}")
 end
 
-options = [ "-Xmx#{heap_size}", "-cp", classpath, "-Djava.library.path=#{pty_path}" ]
+options = [ "-Xmx#{heap_size}", "-Djava.class.path=#{cygpath(classpath)}", "-Djava.library.path=#{cygpath(pty_path)}" ]
 options.concat(os_specific_options)
 log_filename="#{log_directory}/terminator.log.#{$$}"
 if ENV["DEBUGGING_TERMINATOR"] == nil
-  options.push("-De.util.Log.filename=#{log_filename}")
+  options.push("-De.util.Log.filename=#{cygpath(log_filename)}")
 end
 
 args = [ launcher ]
