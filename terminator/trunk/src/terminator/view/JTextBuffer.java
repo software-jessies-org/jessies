@@ -64,7 +64,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			public void highlightClicked(MouseEvent event) {
 				List<Highlight> highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
 				for (Highlight highlight : highlights) {
-					highlight.getHighlighter().highlightClicked(JTextBuffer.this, highlight, getTabbedText(highlight), event);
+					highlight.getHighlighter().highlightClicked(JTextBuffer.this, highlight, getTabbedString(highlight), event);
 				}
 			}
 		});
@@ -559,7 +559,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		}
 	}
 	
-	public String getTabbedText(Highlight highlight) {
+	public String getTabbedString(Highlight highlight) {
 		Location start = highlight.getStart();
 		Location end = highlight.getEnd();
 		StringBuilder buf = new StringBuilder();
@@ -571,7 +571,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			TextLine textLine = model.getTextLine(i);
 			int lineStart = (i == start.getLineIndex()) ? start.getCharOffset() : 0;
 			int lineEnd = (i == end.getLineIndex()) ? end.getCharOffset() : textLine.length();
-			buf.append(textLine.getTabbedText(lineStart, lineEnd));
+			buf.append(textLine.getTabbedString(lineStart, lineEnd));
 			if (i != end.getLineIndex()) {
 				buf.append('\n');
 			}

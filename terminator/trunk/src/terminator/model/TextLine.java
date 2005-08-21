@@ -53,21 +53,28 @@ public class TextLine {
 		short startStyle = styles[0];
 		for (int i = 1; i < styles.length; i++) {
 			if (styles[i] != startStyle) {
-				result.add(new StyledText(getText().substring(startIndex, i), startStyle));
+				result.add(new StyledText(getString().substring(startIndex, i), startStyle));
 				startIndex = i;
 				startStyle = styles[i];
 			}
 		}
-		result.add(new StyledText(getText().substring(startIndex, styles.length), startStyle));
+		result.add(new StyledText(getString().substring(startIndex, styles.length), startStyle));
 		return result;
 	}
 	
-	public String getText() {
+	/**
+	 * Returns the text of this line with spaces instead of tabs (or,
+	 * indeed, instead of the special representation we use internally).
+	 * 
+	 * This isn't called toString because you need to come here and think
+	 * about whether you want this method of getTabbedString instead.
+	 */
+	public String getString() {
 		return text.replace(TAB_START, ' ').replace(TAB_CONTINUE, ' ');
 	}
 	
 	/** Returns the text, with all the tabs put back in for use with clipboard stuff. */
-	public String getTabbedText(int start, int end) {
+	public String getTabbedString(int start, int end) {
 		StringBuilder buf = new StringBuilder();
 		for (int i = start; i < end; i++) {
 			char ch = text.charAt(i);
