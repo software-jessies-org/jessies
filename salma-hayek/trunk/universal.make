@@ -151,6 +151,9 @@ endef
 # just claiming the availability of a thread-safe allocator).
 LDFLAGS.Linux += -pthread
 
+# launcher needs this on Linux
+LDFLAGS.Linux += -ldl
+
 LDFLAGS += $(LDFLAGS.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
