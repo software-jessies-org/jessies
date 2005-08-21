@@ -344,8 +344,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public Location viewToModel(Point point) {
-		Dimension character = getCharUnitSize();
-		int lineIndex = point.y / character.height;
+		int lineIndex = point.y / getCharUnitSize().height;
 		int charOffset = 0;
 		// If the line index is off the top or bottom, we leave charOffset = 0.  This gives us nicer
 		// selection functionality.
@@ -354,20 +353,28 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		} else if (lineIndex < 0) {
 			lineIndex = 0;
 		} else {
-			charOffset = Math.max(0, point.x / character.width);
-			charOffset = Math.min(charOffset, model.getTextLine(lineIndex).length());
+			char[] chars = model.getTextLine(lineIndex).getString().toCharArray();
+			if (chars.length > 0) {
+				charOffset = GuiUtilities.getCharOffset(getFontMetrics(getFont()), 0, point.x, chars);
+			}
 		}
 		return new Location(lineIndex, charOffset);
 	}
 	
+	private int modelToViewX(Location charCoords) {
+		String string = model.getTextLine(charCoords.getLineIndex()).getString();
+		if (charCoords.getCharOffset() < string.length()) {
+			string = string.substring(0, charCoords.getCharOffset());
+		}
+		return getFontMetrics(getFont()).stringWidth(string);
+	}
+	
 	private Point getLineTop(Location charCoords) {
-		Dimension character = getCharUnitSize();
-		return new Point(charCoords.getCharOffset() * character.width, charCoords.getLineIndex() * character.height);
+		return new Point(modelToViewX(charCoords), charCoords.getLineIndex() * getCharUnitSize().height);
 	}
 	
 	private Point getLineBottom(Location charCoords) {
-		Dimension character = getCharUnitSize();
-		return new Point(charCoords.getCharOffset() * character.width, (charCoords.getLineIndex() + 1) * character.height);
+		return new Point(modelToViewX(charCoords), (charCoords.getLineIndex() + 1) * getCharUnitSize().height);
 	}
 	
 	public Dimension getOptimalViewSize() {
@@ -522,15 +529,15 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	public int getFirstVisibleLine() {
-		Dimension character = getCharUnitSize();
+		int lineHeight = getCharUnitSize().height;
 		Rectangle visibleBounds = getViewport().getViewRect();
-		return visibleBounds.y / character.height;
+		return visibleBounds.y / lineHeight;
 	}
 	
 	public int getLastVisibleLine() {
-		Dimension character = getCharUnitSize();
+		int lineHeight = getCharUnitSize().height;
 		Rectangle visibleBounds = getViewport().getViewRect();
-		return (visibleBounds.y + visibleBounds.height) / character.height;
+		return (visibleBounds.y + visibleBounds.height) / lineHeight;
 	}
 
 	public List<Highlight> getHighlightsForLocation(Location location) {
