@@ -88,10 +88,6 @@ public class JTerminalPane extends JPanel {
 		return scrollPane.getViewport().getSize();
 	}
 	
-	public Dimension getCharUnitSize() {
-		return textPane.getCharUnitSize();
-	}
-	
 	private void init(String command) {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
