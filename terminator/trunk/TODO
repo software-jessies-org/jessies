@@ -58,10 +58,6 @@
   user shouldn't have to explicitly ask us to look for possible links? That
   might also give us scope for offering various selection-related actions.]
 
-* Fix the speed of pasting large amounts of text (without breaking the
-  correctness). [Have checked in code to fix this, but want a reproducible
-  test case before switching over.]
-
 * Our double-click selection may be pretty clever in situations where xterm
   and rxvt aren't, but it doesn't work as well in situations they're good at:
   numbers in situations such as "offset=1234,length=5678". No-one does IP
