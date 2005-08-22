@@ -159,6 +159,9 @@ public class GuiUtilities {
      * anti-aliasing et cetera.
      * 
      * Useful for hit-testing.
+     * 
+     * Note: this is broken for combining characters. See the Thai example
+     * in Markus Kuhn's "UTF-8-test.txt".
      */
     public static int getCharOffset(FontMetrics metrics, int startX, int x, char[] chars) {
         int min = 0;
