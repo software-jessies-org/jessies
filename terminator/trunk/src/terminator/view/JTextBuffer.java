@@ -199,7 +199,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	// Methods used by TextBuffer in order to update the display.
 	
 	public void linesChangedFrom(int lineIndex) {
-		Point redrawTop = getLineTop(new Location(lineIndex, 0));
+		Point redrawTop = modelToView(new Location(lineIndex, 0)).getLocation();
 		redoHighlightsFrom(lineIndex);
 		Dimension size = getSize();
 		repaint(redrawTop.x, redrawTop.y, size.width, size.height - redrawTop.y);
@@ -361,20 +361,22 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return new Location(lineIndex, charOffset);
 	}
 	
-	private int modelToViewX(Location charCoords) {
+	private Rectangle modelToView(Location charCoords) {
 		String string = model.getTextLine(charCoords.getLineIndex()).getString();
+		final int offset = charCoords.getCharOffset();
+		String characterAtLocation;
 		if (charCoords.getCharOffset() < string.length()) {
-			string = string.substring(0, charCoords.getCharOffset());
+			characterAtLocation = string.substring(offset, offset + 1);
+			string = string.substring(0, offset);
+		} else {
+			characterAtLocation = "n";
 		}
-		return getFontMetrics(getFont()).stringWidth(string);
-	}
-	
-	private Point getLineTop(Location charCoords) {
-		return new Point(modelToViewX(charCoords), charCoords.getLineIndex() * getCharUnitSize().height);
-	}
-	
-	private Point getLineBottom(Location charCoords) {
-		return new Point(modelToViewX(charCoords), (charCoords.getLineIndex() + 1) * getCharUnitSize().height);
+		FontMetrics fontMetrics = getFontMetrics(getFont());
+		final int x = fontMetrics.stringWidth(string);
+		final int width = fontMetrics.stringWidth(characterAtLocation);
+		final int height = getCharUnitSize().height;
+		final int y = charCoords.getLineIndex() * height;
+		return new Rectangle(x, y, width, height);
 	}
 	
 	public Dimension getOptimalViewSize() {
@@ -457,14 +459,15 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	private void repaintFromLine(int firstLineToRepaint) {
-		int top = getLineTop(new Location(firstLineToRepaint, 0)).y;
+		int top = modelToView(new Location(firstLineToRepaint, 0)).y;
 		Dimension size = getSize();
 		repaint(0, top, size.width, size.height - top);
 	}
 	
 	private void repaintHighlight(Highlight highlight) {
-		Point redrawStart = getLineTop(highlight.getStart());
-		Point redrawEnd = getLineBottom(highlight.getEnd());
+		Point redrawStart = modelToView(highlight.getStart()).getLocation();
+		Rectangle endRect = modelToView(highlight.getEnd());
+		Point redrawEnd = new Point(endRect.x + endRect.width, endRect.y + endRect.height);
 		if (highlight.getStart().getLineIndex() == highlight.getEnd().getLineIndex()) {
 			repaint(redrawStart.x, redrawStart.y, redrawEnd.x - redrawStart.x, redrawEnd.y - redrawStart.y);
 		} else {
@@ -592,17 +595,17 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	// Redraw code.
 	
 	private void redrawCursorPosition() {
-		Point top = getLineTop(cursorPosition);
-		Dimension character = getCharUnitSize();
-		repaint(top.x, top.y, character.width, character.height);
+		Rectangle cursorRect = modelToView(cursorPosition);
+		repaint(cursorRect);
 	}
 	
-	public void paintComponent(Graphics graphics) {
-		((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, ANTIALIAS ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+	public void paintComponent(Graphics oldGraphics) {
+		Graphics2D graphics = (Graphics2D) oldGraphics;
+		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, ANTIALIAS ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		FontMetrics metrics = getFontMetrics(getFont());
 		Rectangle rect = graphics.getClipBounds();
 		graphics.setColor(getBackground());
-		graphics.fillRect(rect.x, rect.y, rect.width, rect.height);
+		graphics.fill(rect);
 		int firstTextLine = rect.y / metrics.getHeight();
 		int lastTextLine = (rect.y + rect.height + metrics.getHeight() - 1) / metrics.getHeight();
 		lastTextLine = Math.min(lastTextLine, model.getLineCount() - 1);
@@ -634,7 +637,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			}
 		}
 		if (ANTIALIAS) {
-			((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
+			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
 		}
 	}
 	
@@ -652,25 +655,25 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	 * The cursor may actually be invisible because it's blinking and in
 	 * the 'off' state.
 	 */
-	private void paintCursor(Graphics graphics, FontMetrics metrics, String characterUnderCursor, int baseline) {
+	private void paintCursor(Graphics2D graphics, FontMetrics metrics, String characterUnderCursor, int baseline) {
 		graphics.setColor(getCursorColor());
-		Point top = getLineTop(cursorPosition);
-		final int bottomY = top.y + metrics.getHeight() - 1;
+		Rectangle cursorRect = modelToView(cursorPosition);
+		final int bottomY = cursorRect.y + cursorRect.height - 1;
 		if (hasFocus) {
 			if (Options.getSharedInstance().isBlockCursor()) {
 				// Block.
 				if (blinkOn) {
 					// Paint over the character underneath.
-					graphics.fillRect(top.x, top.y, metrics.charWidth(' '), metrics.getHeight());
+					graphics.fill(cursorRect);
 					// Redraw the character in the
 					// background color.
 					graphics.setColor(Options.getSharedInstance().getColor("background"));
-					graphics.drawString(characterUnderCursor, top.x, baseline);
+					graphics.drawString(characterUnderCursor, cursorRect.x, baseline);
 				}
 			} else {
 				// Underline.
 				if (blinkOn) {
-					graphics.drawLine(top.x, bottomY, top.x + metrics.charWidth(' ') - 1, bottomY);
+					graphics.drawLine(cursorRect.x, bottomY, cursorRect.x + cursorRect.width - 1, bottomY);
 				}
 			}
 		} else {
@@ -679,14 +682,14 @@ public class JTextBuffer extends JComponent implements FocusListener {
 			// of what shape they're using for the focused cursor.
 			// It's not obvious what else they could do that would
 			// look better.
-			graphics.drawRect(top.x, top.y, metrics.charWidth(' ') - 1, metrics.getHeight() - 1);
+			graphics.drawRect(cursorRect.x, cursorRect.y, cursorRect.width - 1, cursorRect.height - 1);
 		}
 	}
 	
 	/**
 	 * Paints the text. Returns how many pixels wide the text was.
 	 */
-	private int paintStyledText(Graphics graphics, StyledText text, int x, int y) {
+	private int paintStyledText(Graphics2D graphics, StyledText text, int x, int y) {
 		FontMetrics metrics = getFontMetrics(getFont());
 		Style style = text.getStyle();
 		Color foreground = style.getForeground();
