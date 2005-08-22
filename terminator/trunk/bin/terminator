@@ -102,12 +102,7 @@ tic_binary=`bash -c "type -p tic"`.chomp()
 terminfo_SRC="#{terminator_home}/doc/terminfo/terminator.tic"
 terminfo_DST="#{terminfo}/t/terminator"
 if UNAME == "Darwin"
-  if `uname -r` =~ /^7\./
-    # Mac OS X 10.3 only looks in /74/, but tic puts stuff in /t/.
-    terminfo_DST="#{terminfo}/74/terminator"
-    tic_binary=""
-  end
-  # While we're here, make ourselves look a little better...
+  # Make ourselves look a little better...
   os_specific_options = [ "-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns" ]
 end
 if test(?e, terminfo_DST) == false
