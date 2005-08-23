@@ -296,14 +296,19 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_F8:
 				case KeyEvent.VK_F9:
 				case KeyEvent.VK_F10:
+					// "ESC[16~" isn't used.
 					return functionKeySequence(17, keyCode, KeyEvent.VK_F6);
 				case KeyEvent.VK_F11:
 				case KeyEvent.VK_F12:
+					// "ESC[22~" isn't used.
+					return functionKeySequence(23, keyCode, KeyEvent.VK_F11);
 				case KeyEvent.VK_F13:
 				case KeyEvent.VK_F14:
-					return functionKeySequence(23, keyCode, KeyEvent.VK_F11);
+					// Java has a discontinuity between VK_F12 and VK_F13.
+					return functionKeySequence(25, keyCode, KeyEvent.VK_F13);
 				case KeyEvent.VK_F15:
 				case KeyEvent.VK_F16:
+					// "ESC[27~" isn't used.
 					return functionKeySequence(28, keyCode, KeyEvent.VK_F15);
 				case KeyEvent.VK_F17:
 				case KeyEvent.VK_F18:
@@ -313,7 +318,7 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_F22:
 				case KeyEvent.VK_F23:
 				case KeyEvent.VK_F24:
-					// X11 supports more, but Java stops here. F16 is the highest on my Mac keyboard.
+					// X11 supports up to F35, but Java stops here. F16 is the highest on my Mac keyboard.
 					return functionKeySequence(31, keyCode, KeyEvent.VK_F17);
 					
 				default:
