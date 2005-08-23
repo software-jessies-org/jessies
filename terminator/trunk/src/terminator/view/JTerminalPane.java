@@ -284,31 +284,48 @@ public class JTerminalPane extends JPanel {
 					}
 				}
 				
+				// Function key encodings based on xterm's decfuncvalue() and rxvt's rxvt_lookup_key().
 				case KeyEvent.VK_F1:
 				case KeyEvent.VK_F2:
 				case KeyEvent.VK_F3:
 				case KeyEvent.VK_F4:
 				case KeyEvent.VK_F5:
-					{
-						int argument = 11 + keyCode - KeyEvent.VK_F1;
-						return Ascii.ESC + "[" + argument + "~";
-					}
+					return functionKeySequence(11, keyCode, KeyEvent.VK_F1);
 				case KeyEvent.VK_F6:
 				case KeyEvent.VK_F7:
 				case KeyEvent.VK_F8:
 				case KeyEvent.VK_F9:
 				case KeyEvent.VK_F10:
+					return functionKeySequence(17, keyCode, KeyEvent.VK_F6);
 				case KeyEvent.VK_F11:
 				case KeyEvent.VK_F12:
-					{
-						int argument = 17 + keyCode - KeyEvent.VK_F6;
-						return Ascii.ESC + "[" + argument + "~";
-					}
+				case KeyEvent.VK_F13:
+				case KeyEvent.VK_F14:
+					return functionKeySequence(23, keyCode, KeyEvent.VK_F11);
+				case KeyEvent.VK_F15:
+				case KeyEvent.VK_F16:
+					return functionKeySequence(28, keyCode, KeyEvent.VK_F15);
+				case KeyEvent.VK_F17:
+				case KeyEvent.VK_F18:
+				case KeyEvent.VK_F19:
+				case KeyEvent.VK_F20:
+				case KeyEvent.VK_F21:
+				case KeyEvent.VK_F22:
+				case KeyEvent.VK_F23:
+				case KeyEvent.VK_F24:
+					// X11 supports more, but Java stops here. F16 is the highest on my Mac keyboard.
+					return functionKeySequence(31, keyCode, KeyEvent.VK_F17);
 					
-				default: return null;
+				default:
+					return null;
 			}
 		}
-
+		
+		private String functionKeySequence(int base, int keyCode, int keyCodeBase) {
+			int argument = base + (keyCode - keyCodeBase);
+			return Ascii.ESC + "[" + argument + "~";
+		}
+		
 		public void keyReleased(KeyEvent event) {
 		}
 		
