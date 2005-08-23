@@ -302,6 +302,8 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_F12:
 					// "ESC[22~" isn't used.
 					return functionKeySequence(23, keyCode, KeyEvent.VK_F11);
+					// The function key codes from here on are inconsistent with the latest xterm terminfo
+					// but consistent with the latest xterm source.
 				case KeyEvent.VK_F13:
 				case KeyEvent.VK_F14:
 					// Java has a discontinuity between VK_F12 and VK_F13.
@@ -314,6 +316,9 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_F18:
 				case KeyEvent.VK_F19:
 				case KeyEvent.VK_F20:
+					// The function key codes from here on are inconsistent with the latest rxvt terminfo
+					// but consistent with the latest rxvt source.
+					// The function key codes from here on are inconsistent with the latest xterm source.
 				case KeyEvent.VK_F21:
 				case KeyEvent.VK_F22:
 				case KeyEvent.VK_F23:
