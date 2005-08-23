@@ -277,8 +277,8 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     public void fillWithContent() {
         try {
-            text.getTextBuffer().readFromFile(file);
             lastModifiedTime = file.lastModified();
+            text.getTextBuffer().readFromFile(file);
             
             CharSequence content  = text.getTextBuffer();
             if (filename.endsWith(".java")) {
