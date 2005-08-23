@@ -68,7 +68,7 @@ public class Log {
     }
 
     public static void warn(String message, Throwable th) {
-        out.println(TimeUtilities.currentIsoString() + " " + applicationName + ": "  + message);
+        out.println(TimeUtilities.currentIsoString() + " " + applicationName + ": " + message);
         if (th != null) {
             out.println("Associated exception:");
             th.printStackTrace(out);
