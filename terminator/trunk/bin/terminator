@@ -123,7 +123,7 @@ if UNAME == "Linux"
 end
 
 if tic_binary != ""
-  system("#{tic_binary} -o#{terminfo} #{terminfo_SRC}")
+  system("#{tic_binary} -v10 -o#{terminfo} #{terminfo_SRC}")
 elsif test(?f, terminfo_DST) == false
   # If you see an error like this:
   # cp: /usr/local/bin/../doc/terminfo/terminator: No such file or directory
