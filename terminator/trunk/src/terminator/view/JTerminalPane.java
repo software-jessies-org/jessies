@@ -283,7 +283,28 @@ public class JTerminalPane extends JPanel {
 						return Ascii.ESC + "[" + letter;
 					}
 				}
-
+				
+				case KeyEvent.VK_F1:
+				case KeyEvent.VK_F2:
+				case KeyEvent.VK_F3:
+				case KeyEvent.VK_F4:
+				case KeyEvent.VK_F5:
+					{
+						int argument = 11 + keyCode - KeyEvent.VK_F1;
+						return Ascii.ESC + "[" + argument + "~";
+					}
+				case KeyEvent.VK_F6:
+				case KeyEvent.VK_F7:
+				case KeyEvent.VK_F8:
+				case KeyEvent.VK_F9:
+				case KeyEvent.VK_F10:
+				case KeyEvent.VK_F11:
+				case KeyEvent.VK_F12:
+					{
+						int argument = 17 + keyCode - KeyEvent.VK_F6;
+						return Ascii.ESC + "[" + argument + "~";
+					}
+					
 				default: return null;
 			}
 		}
