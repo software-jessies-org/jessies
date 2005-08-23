@@ -1,5 +1,6 @@
 package e.debug;
 
+import e.util.Log;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -41,6 +42,9 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
     
     // Have we already dumped a stack trace for the current event dispatch?
     private boolean reportedHang = false;
+    
+    // Help distinguish multiple hangs in the log, and match start and end too.
+    private int hangCount = 0;
     
     // The event dispatch thread, for the purpose of getting stack traces.
     private Thread eventDispatchThread = null;
@@ -88,22 +92,23 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             }
             
             reportedHang = true;
-            System.out.println("--- event dispatch thread stuck processing event for " +  timeSoFar() + " ms:");
-            StackTraceElement[] stackTrace = eventDispatchThread.getStackTrace();
-            printStackTrace(System.out, stackTrace);
+            String stackTrace = stackTraceToString(eventDispatchThread.getStackTrace());
+            Log.warn("(hang #" + ++hangCount + ") event dispatch thread stuck processing event for " +  timeSoFar() + " ms:" + stackTrace);
         }
         
-        private void printStackTrace(PrintStream out, StackTraceElement[] stackTrace) {
+        private String stackTraceToString(StackTraceElement[] stackTrace) {
+            StringBuilder result = new StringBuilder();
             // We know that it's not interesting to show any code above where
             // we get involved in event dispatch, so we stop printing the stack
             // trace when we get as far back as our code.
             final String ourEventQueueClassName = EventDispatchThreadHangMonitor.class.getName();
             for (StackTraceElement stackTraceElement : stackTrace) {
                 if (stackTraceElement.getClassName().equals(ourEventQueueClassName)) {
-                    return;
+                    break;
                 }
-                out.println("    " + stackTraceElement);
+                result.append("\n    " + stackTraceElement);
             }
+            return result.toString();
         }
     }
     
@@ -155,7 +160,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
      */
     private synchronized void postDispatchEvent() {
         if (reportedHang) {
-            System.out.println("--- event dispatch thread unstuck after " + timeSoFar() + " ms.");
+            Log.warn("(hang #" + hangCount + ") event dispatch thread unstuck after " + timeSoFar() + " ms.");
         }
         startedLastEventDispatchAt = NO_CURRENT_EVENT;
     }
