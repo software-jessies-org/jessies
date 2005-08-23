@@ -71,7 +71,7 @@ public class Log {
         out.println(TimeUtilities.currentIsoString() + " " + applicationName + ": "  + message);
         if (th != null) {
             out.println("Associated exception:");
-            th.printStackTrace();
+            th.printStackTrace(out);
         }
     }
     
