@@ -86,17 +86,13 @@ public class ETitleBar extends JPanel {
         });
     }
     
-    public void checkForCounterpart() {
-        if (window instanceof ETextWindow) {
-            ETextWindow textWindow = (ETextWindow) window;
-            boolean hasCounterpart = (textWindow.getCounterpartFilename() != null);
-            if (switchButton == null && hasCounterpart) {
-                this.switchButton = new ESwitchButton(textWindow);
-                buttonsPanel.add(switchButton, BorderLayout.WEST);
-            } else if (switchButton != null && hasCounterpart == false) {
-                buttonsPanel.remove(switchButton);
-                this.switchButton = null;
-            }
+    public void setShowSwitchButton(boolean shouldShow) {
+        if (switchButton == null && shouldShow) {
+            this.switchButton = new ESwitchButton((ETextWindow) window);
+            buttonsPanel.add(switchButton, BorderLayout.WEST);
+        } else if (switchButton != null && shouldShow == false) {
+            buttonsPanel.remove(switchButton);
+            this.switchButton = null;
         }
     }
     
@@ -114,17 +110,19 @@ public class ETitleBar extends JPanel {
     
     public void setActive(boolean isActive) {
         this.isActive = isActive;
-        if (isActive) {
-            checkForCounterpart();
-        }
-        
+        updateColors();
+    }
+    
+    private void updateColors() {
         /*
-         * Paints a reasonable title bar background for Mac OS. Although you might
-         * expect that this gives exactly the result you see with JInternalFrame,
-         * it doesn't. As of 1.4.2, Apple invoke apple.laf.AquaImageFactory's
-         * drawFrameTitleBackground method rather than using these colors. We
-         * could use reflection to do the same, but that seems unnecessarily
-         * fragile.
+         * Use the JInternalFrame colors to distinguish focused from unfocused
+         * windows.
+         * 
+         * On Mac OS, although you might expect that this gives exactly the
+         * result you see with JInternalFrame, it doesn't. As of 1.4.2, Apple
+         * invoke apple.laf.AquaImageFactory's drawFrameTitleBackground method
+         * rather than using these colors. We could use reflection to do the
+         * same, but that seems unnecessarily fragile.
          */
         if (isActive) {
             setBackground(UIManager.getColor("InternalFrame.activeTitleBackground"));

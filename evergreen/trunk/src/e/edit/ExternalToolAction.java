@@ -84,7 +84,7 @@ public class ExternalToolAction extends ETextAction {
             shellCommand.setContext(textWindow.getContext());
             shellCommand.setCompletionRunnable(new Runnable() {
                 public void run() {
-                    textWindow.updateWatermark();
+                    textWindow.updateWatermarkAndTitleBar();
                     textWindow.repaint();
                 }
             });
