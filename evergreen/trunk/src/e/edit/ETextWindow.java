@@ -132,7 +132,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         text.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
                 rememberWeHadFocusLast();
-                updateWatermark();
+                updateWatermarkAndTitleBar();
             }
             
             public void focusLost(FocusEvent e) {
@@ -233,16 +233,23 @@ public class ETextWindow extends EWindow implements PTextListener {
         text.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, getSpellingExceptionsForLanguage(fileType));
     }
     
-    public void updateWatermark() {
+    public void updateWatermarkAndTitleBar() {
         Thread watermarkUpdater = new Thread(new Runnable() {
+            // Fields initialized in "run" so not even that work is done on the EDT.
             private ArrayList<String> items;
             private boolean isSerious;
+            private boolean hasCounterpart;
             
-            public void run() {
+            private void init() {
                 items = new ArrayList<String>();
                 isSerious = false;
+                hasCounterpart = false;
+            }
+            
+            public void run() {
+                init();
                 doFileChecks();
-                doWatermarkUpdateOnEventThread();
+                updateUiOnEventThread();
             }
             
             private void doFileChecks() {
@@ -257,13 +264,15 @@ public class ETextWindow extends EWindow implements PTextListener {
                     items.add("(out-of-date)");
                     isSerious = true;
                 }
+                hasCounterpart = (getCounterpartFilename() != null);
             }
             
-            private void doWatermarkUpdateOnEventThread() {
+            private void updateUiOnEventThread() {
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         watermarkViewPort.setSerious(isSerious);
                         watermarkViewPort.setWatermark(items.size() > 0 ? StringUtilities.join(items, " ") : null);
+                        getTitleBar().setShowSwitchButton(hasCounterpart);
                     }
                 });
             }
@@ -302,16 +311,11 @@ public class ETextWindow extends EWindow implements PTextListener {
                 text.setWrapStyleWord(true);
             }
             initSpellingExceptionsForDocument();
-            updateWatermark();
+            updateWatermarkAndTitleBar();
             text.setFont(ChangeFontAction.getAppropriateFontForContent(content));
             text.getIndenter().setIndentationPropertyBasedOnContent(content);
             text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
             text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
-            if (fileType != UNKNOWN) {
-                // FIXME
-                //text.getDocument().addDocumentListener(new UnmatchedBracketHighlighter(text));
-            }
-            getTitleBar().checkForCounterpart(); // If we don't do this, we don't get the icon until we get focus.
             getTitleBar().repaint();
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
@@ -526,7 +530,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         if (findResultsUpdater != null) {
             findResultsUpdater.restart();
         }
-        updateWatermark();
+        updateWatermarkAndTitleBar();
         getTitleBar().repaint();
     }
     
@@ -673,7 +677,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             edit.showStatus("Saved " + filename);
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
-            updateWatermark();
+            updateWatermarkAndTitleBar();
             tagsUpdater.updateTags();
             SaveMonitor.getInstance().fireSaveListeners();
             return true;
