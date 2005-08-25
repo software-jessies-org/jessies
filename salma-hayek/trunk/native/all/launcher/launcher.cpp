@@ -12,6 +12,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <vector>
 
 struct UsageError : std::runtime_error {
