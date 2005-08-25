@@ -36,8 +36,12 @@ private:
     if (javaHome == 0) {
       throw UsageError("please set $JAVA_HOME");
     }
-    const char* pathToJvmFromJavaHome = "/jre/bin/client/jvm.dll";
-    return std::string(javaHome).append(pathToJvmFromJavaHome);
+    std::string pathToJre(javaHome);
+    pathToJre.append("/jre");
+    if (access(pathToJre.c_str(), X_OK) != 0) {
+      pathToJre = javaHome;
+    }
+    return pathToJre + "/bin/client/jvm.dll";
 #else
     // This only works on Linux if LD_LIBRARY_PATH is already setup.
     return "libjvm.so";
