@@ -2,10 +2,14 @@
 #include <windows.h>
 #endif
 
+#include "DirectoryIterator.h"
+
 #include <jni.h>
 
+#include <algorithm>
 #include <deque>
 #include <dlfcn.h>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -31,8 +35,7 @@ private:
   JNIEnv* env;
   
 private:
-  static std::string findJvmLibraryFilename() {
-#if defined(__CYGWIN__)
+  static std::string findJvmLibraryUsingJavaHome() {
     const char* javaHome = getenv("JAVA_HOME");
     if (javaHome == 0) {
       throw UsageError("please set $JAVA_HOME");
@@ -43,6 +46,58 @@ private:
       pathToJre = javaHome;
     }
     return pathToJre + "/bin/client/jvm.dll";
+  }
+  
+  static std::string findJvmLibraryUsingRegistry() {
+    const char* jreRegistryPath = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment";
+    std::vector<std::string> versions;
+    for (DirectoryIterator it(jreRegistryPath); it.isValid(); ++ it) {
+      std::string version = it->getName();
+      if (version != "CurrentVersion") {
+        versions.push_back(version);
+      }
+    }
+    std::sort(versions.begin(), versions.end());
+    if (versions.empty()) {
+      throw UsageError("please install JRE");
+    }
+    std::string version = versions.back();
+    std::string jvmRegistryPath = std::string(jreRegistryPath) + "/" + version + "/RuntimeLib";
+    std::cerr << "jvmRegistryPath is " << jvmRegistryPath << ":" << std::endl;
+    std::ifstream is(jvmRegistryPath.c_str());
+    if (is.bad()) {
+      throw UsageError("couldn't open " + jvmRegistryPath);
+    }
+    std::ostringstream jvmLibraryPath;
+    jvmLibraryPath << is.rdbuf();
+    return jvmLibraryPath.str();
+  }
+  
+  static std::string findWin32JvmLibrary() {
+    std::ostringstream os;
+    os << "couldn't find jvm.dll - please set $JAVA_HOME or install a JRE";
+    os << "error messages were:";
+    os << std::endl;
+    try {
+      return findJvmLibraryUsingJavaHome();
+    } catch (const std::exception& ex) {
+      os << "  ";
+      os << ex.what();
+      os << std::endl;
+    }
+    try {
+      return findJvmLibraryUsingRegistry();
+    } catch (const std::exception& ex) {
+      os << "  ";
+      os << ex.what();
+      os << std::endl;
+    }
+    throw UsageError(os.str());
+  }
+  
+  static std::string findJvmLibraryFilename() {
+#if defined(__CYGWIN__)
+    return findWin32JvmLibrary();
 #else
     // This only works on Linux if LD_LIBRARY_PATH is already setup.
     return "libjvm.so";
