@@ -27,6 +27,8 @@ public class ETitleBar extends JPanel {
                     return;
                 }
                 window.getTitleBar().setActive(active);
+                // Make sure the JScrollPane focus ring is redrawn on Mac OS.
+                window.repaint();
             }
         };
     }
@@ -90,10 +92,18 @@ public class ETitleBar extends JPanel {
         if (switchButton == null && shouldShow) {
             this.switchButton = new ESwitchButton((ETextWindow) window);
             buttonsPanel.add(switchButton, BorderLayout.WEST);
+            forceRepaint();
         } else if (switchButton != null && shouldShow == false) {
             buttonsPanel.remove(switchButton);
             this.switchButton = null;
+            forceRepaint();
         }
+    }
+    
+    private void forceRepaint() {
+        invalidate();
+        validate();
+        repaint();
     }
     
     public void setTitle(String title) {

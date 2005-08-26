@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -37,10 +38,10 @@ public class ETextWindow extends EWindow implements PTextListener {
     private BirdView birdView;
     private TagsUpdater tagsUpdater;
     
-    /**
-     * Used to display a watermark to indicate such things as a read-only file.
-     */
+    // Used to display a watermark to indicate such things as a read-only file.
     private WatermarkViewPort watermarkViewPort;
+    // Used to update the watermark without creating and destroying an excessive number of threads.
+    private final ExecutorService watermarkUpdateExecutor = Executors.newSingleThreadExecutor();
     
     private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
     private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f);
@@ -234,7 +235,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void updateWatermarkAndTitleBar() {
-        Thread watermarkUpdater = new Thread(new Runnable() {
+        watermarkUpdateExecutor.execute(new Runnable() {
             // Fields initialized in "run" so not even that work is done on the EDT.
             private ArrayList<String> items;
             private boolean isSerious;
@@ -277,7 +278,6 @@ public class ETextWindow extends EWindow implements PTextListener {
                 });
             }
         });
-        watermarkUpdater.start();
     }
     
     /**
@@ -530,7 +530,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         if (findResultsUpdater != null) {
             findResultsUpdater.restart();
         }
-        updateWatermarkAndTitleBar();
         getTitleBar().repaint();
     }
     
