@@ -3,6 +3,7 @@
 #endif
 
 #include "DirectoryIterator.h"
+#include "join.h"
 
 #include <jni.h>
 
@@ -273,7 +274,12 @@ int main(int, char** argv) {
     std::ostream& os = std::cerr;
     os << usageError.what() << std::endl;
     os << "Usage: " << programName << " -options class [args...]" << std::endl;
-    os << "where options are Java Virtual Machine options:" << std::endl;
+    os << "where options are Java Virtual Machine options" << std::endl;
+    os << "Command line was:";
+    os << std::endl;
+    os << programName << " ";
+    os << join (" ", launcherArguments);
+    os << std::endl;
     return 1;
   }
 }
