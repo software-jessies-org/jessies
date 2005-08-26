@@ -120,10 +120,15 @@ Java 1.5.
 <p>On Windows, you will need Cygwin.  The current version at the time of porting
 was 1.5.18-1.  The startup script requires Ruby, which isn't part of Cygwin's default
 installation.  It's easily added to an additional installation (by a human but not, sadly,
-by the script) by rerunning the installer.  You also need a version of java.exe - or
-another Java launcher - that was compiled with Cygwin.  If you're l33t enough to
-know about src/launcher then, heh, please tell us how we can most easily redistribute
-an appropriate launcher.
+by the script) by rerunning the installer.  You might also want the net.inetutils package
+which is where Cygwin's telnet lives.  If you only have the JRE installed, then you may
+want to rerun the JRE installer and choose a Custom installation so that you get
+LucidaTypewriterRegular.ttf installed, otherwise you'll end up with Courier and being
+unable to distinguish l and 1.
+
+<p>To build Terminator, you'll need a recent make and g++.  We don't yet
+include Win32 binaries in the distribution.  You'll need to point $JAVA_HOME at the
+root of your JDK.
 
 <p>(NT's built-in POSIX subsystem won't let you launch Win32 applications or
 interact with the network, so that wasn't an option.
