@@ -271,15 +271,19 @@ int main(int, char** argv) {
     JavaInvocation javaInvocation(parser.getJvmArguments());
     javaInvocation.invokeMain(parser.getClassName(), parser.getMainArguments());
   } catch (const UsageError& usageError) {
-    std::ostream& os = std::cerr;
+    std::ostringstream os;
     os << usageError.what() << std::endl;
     os << "Usage: " << programName << " -options class [args...]" << std::endl;
     os << "where options are Java Virtual Machine options" << std::endl;
     os << "Command line was:";
     os << std::endl;
     os << programName << " ";
-    os << join (" ", launcherArguments);
+    os << join(" ", launcherArguments);
     os << std::endl;
+    std::cerr << os.str();
+#ifdef __CYGWIN__
+    MessageBox(GetActiveWindow(), os.str().c_str(), "Launcher", MB_OK);
+#endif
     return 1;
   }
 }
