@@ -23,9 +23,9 @@
 
 <p><strong>Terminator is a GPL terminal emulator with advanced features not
 yet found elsewhere, suitable to replace xterm, rxvt, xwsh and friends on X11 systems,
-Terminal.app on Mac OS X and PuTTY on Windows.</strong>
+Terminal.app on Mac OS X and PuTTY on MS&nbsp;Windows.</strong>
 
-<p>Terminator will run on any modern POSIX system with Java 1.5 or later and a C++ compiler.
+<p>Terminator will run on any modern POSIX system with Java 5 or later and a C++ compiler.
 
 <h2>Features</h2>
 
@@ -56,7 +56,7 @@ as text, with automatic quoting of filenames containing shell metacharacters.
 <li><p><strong>Freedom</strong> - Terminator is released under the GPL.
 
 <li><p><strong>Horizontal Scrolling</strong> - Most terminal emulators wrap text when it
-intrudes upon the right margin.  Terminator doesn't - it instead provides a horizontal
+intrudes upon the right margin.  Terminator doesn't &mdash; it instead provides a horizontal
 scrollbar when necessary.  This brings clear benefits in terms of readability of program
 output, or text files sent to the display with <tt>cat(1)</tt>. (We tried both this and Apple-like
 reflowing of text when you change the window size, and we decided we preferred this. Sadly,
@@ -99,7 +99,9 @@ remembering where the tabs are and copy/pasting them as tab characters.
 <p align="center"><img src="mac-os-greek.png">
 <p>The text is Markus Kuhn's <a href="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-demo.txt">UTF-8-demo.txt</a> if you want to see what a mess Terminal.app makes of it. (Terminal.app beats us on Thai, but we're better at Cyrillic, Greek, and Japanese.) The non-default settings in the screenshot were achieved thus:
 <blockquote><tt>terminator -xrm fontName:Monaco -xrm fontSize:13 -xrm antiAlias:true -xrm foreground:black -xrm background:white -xrm selectionColor:\#b4d5fe</tt></blockquote>
-<p>One side-effect of proper support for variable-width glyphs is that you're not restricted to fixed-width fonts in Terminator, even if the only language you're using is English.
+<p>One side-effect of proper support for variable-width glyphs is that you're not restricted to fixed-width fonts in Terminator, even if the only language you're using is English. GNU readline might get confused about the line length, though.
+<p>Here's a more convincingly terminal-like example of fixed-width English and variable-width Japanese; output from javac(1):
+<p align="center"><img src="javac-jp-monaco.png">
 </ul>
 
 <p>We think Terminator is the clear choice for the discerning terminal user. Though originally written
@@ -136,7 +138,7 @@ Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support whic
 we use to support window resizing, not to mention containing a port of one of
 the most widely used ssh programs.)
 
-<p>Terminator will run fine on Mac OS X, KDE, Gnome, or even an old-style X11
+<p>Terminator will run fine on Mac OS X, KDE, GNOME, or even an old-style X11
 window manager like lwm. Now you can use the same terminal emulator everywhere!
 
 <h2>Running</h2>
