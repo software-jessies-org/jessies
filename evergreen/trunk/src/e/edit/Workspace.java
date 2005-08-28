@@ -54,7 +54,8 @@ public class Workspace extends JPanel {
             fileList = null;
         }
         
-        public ArrayList<String> doInBackground() {
+        @Override
+        protected ArrayList<String> doInBackground() {
             ArrayList<String> newFileList = scanWorkspaceForFiles();
             // Many file systems will have returned the files not in
             // alphabetical order, so we sort them ourselves here so
@@ -137,6 +138,7 @@ public class Workspace extends JPanel {
             }
         }
         
+        @Override
         public void done() {
             if (listener != null) {
                 listener.stateChanged(null);
