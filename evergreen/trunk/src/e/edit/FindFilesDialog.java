@@ -26,7 +26,9 @@ public class FindFilesDialog {
     private Workspace workspace;
     
     private FileFinder worker;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService fileFinderExecutor = Executors.newSingleThreadExecutor();
+    
+    private static final ExecutorService definitionFinderExecutor = Executors.newFixedThreadPool(8);
     
     public interface ClickableTreeItem {
         public void open();
@@ -65,17 +67,24 @@ public class FindFilesDialog {
          * For matches based just on filename.
          */
         public MatchingFile(String name) {
-            this(name, 0, null, false);
+            this(null, name, 0, null);
         }
         
         /**
          * For matches based on filename and a regular expression.
          */
-        public MatchingFile(String name, int matchCount, String regularExpression, boolean containsDefinition) {
+        public MatchingFile(File file, String name, int matchCount, String regularExpression) {
             this.name = name;
             this.matchCount = matchCount;
             this.regularExpression = regularExpression;
             this.containsDefinition = containsDefinition;
+            if (regularExpression != null) {
+                definitionFinderExecutor.submit(new DefinitionFinder(file, regularExpression, this));
+            }
+        }
+        
+        public void setContainsDefinition(boolean newState) {
+            this.containsDefinition = newState;
         }
         
         public boolean containsDefinition() {
@@ -165,8 +174,7 @@ public class FindFilesDialog {
                             }
                             final int matchCount = matches.size();
                             if (matchCount > 0) {
-                                DefinitionFinder definitionFinder = new DefinitionFinder(file, regex);
-                                MatchingFile matchingFile = new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition);
+                                MatchingFile matchingFile = new MatchingFile(file, candidate, matchCount, regex);
                                 DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
                                 for (String line : matches) {
                                     fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file)));
@@ -218,13 +226,21 @@ public class FindFilesDialog {
         }
     }
     
-    public static class DefinitionFinder implements TagReader.TagListener {
-        public boolean foundDefinition = false;
+    public static class DefinitionFinder implements Runnable, TagReader.TagListener {
+        private File file;
+        private MatchingFile matchingFile;
         private Pattern pattern;
-        public DefinitionFinder(File file, String regularExpression) {
+        
+        public DefinitionFinder(File file, String regularExpression, MatchingFile matchingFile) {
+            this.file = file;
+            this.matchingFile = matchingFile;
             this.pattern = Pattern.compile(regularExpression);
+        }
+        
+        public void run() {
             new TagReader(file, null, this);
         }
+        
         public void tagFound(TagReader.Tag tag) {
             // Function prototypes and Java packages probably aren't interesting.
             if (tag.type == TagType.PROTOTYPE) {
@@ -234,9 +250,10 @@ public class FindFilesDialog {
                return;
             }
             if (pattern.matcher(tag.identifier).find()) {
-                foundDefinition = true;
+                matchingFile.setContainsDefinition(true);
             }
         }
+        
         public void taggingFailed(Exception ex) {
             Log.warn("Failed to use tags to check for a definition.", ex);
         }
@@ -248,7 +265,7 @@ public class FindFilesDialog {
         }
         
         worker = new FileFinder();
-        executor.submit(worker);
+        fileFinderExecutor.submit(worker);
     }
     
     public void initMatchList() {
