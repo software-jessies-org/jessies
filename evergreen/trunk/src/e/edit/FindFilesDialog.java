@@ -85,6 +85,7 @@ public class FindFilesDialog {
         
         public void setContainsDefinition(boolean newState) {
             this.containsDefinition = newState;
+            matchView.repaint();
         }
         
         public boolean containsDefinition() {
