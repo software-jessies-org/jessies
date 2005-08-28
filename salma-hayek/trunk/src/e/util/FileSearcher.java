@@ -29,32 +29,24 @@ public class FileSearcher {
      * Use the linePattern to break the given CharBuffer into lines, applying
      * the input pattern to each line to see if we have a match.
      */
-    private int searchCharBuffer(String fileName, CharSequence charSequence, Collection<String> matches) {
+    private void searchCharBuffer(CharSequence charSequence, Collection<String> matches) {
         // Early exit on non-matching files.
         Matcher firstMatch = pattern.matcher(charSequence);
         if (firstMatch.find() == false) {
-            return 0;
+            return;
         }
         
-        Matcher patternMatcher = null;
-        int matchCount = 0;
+        Matcher patternMatcher = pattern.matcher("");
         int start = 0;
         for (int lineNumber = 1; start < charSequence.length(); lineNumber++) {
             int end = findEndOfLine(charSequence, start);
             CharSequence currentLine = charSequence.subSequence(start, end);
-            if (patternMatcher == null) {
-                patternMatcher = pattern.matcher(currentLine);
-            } else {
-                patternMatcher.reset(currentLine);
-            }
+            patternMatcher.reset(currentLine);
             if (patternMatcher.find()) {
                 matches.add(":" + lineNumber + ":" + currentLine);
-                ++matchCount;
             }
-            
             start = end + 1;
         }
-        return matchCount;
     }
     
     private boolean isBinaryByteBuffer(ByteBuffer byteBuffer, final int byteCount) {
@@ -70,10 +62,9 @@ public class FileSearcher {
     
     /**
      * Search for occurrences of the input pattern in the given file.
-     * Returns the number of matches.
+     * Returns false if unable to search; true otherwise.
      */
-    public int searchFile(String path, String fileName, Collection<String> matches) throws IOException {
-        File file = FileUtilities.fileFromParentAndString(path, fileName);
+    public boolean searchFile(File file, Collection<String> matches) throws IOException {
         int byteCount = (int) file.length();
         
         DataInputStream dataInputStream = null;
@@ -96,10 +87,10 @@ public class FileSearcher {
             }
             
             if (isBinaryByteBuffer(byteBuffer, byteCount)) {
-                return 0;
+                return false;
             }
             CharSequence charSequence = new AsciiCharSequence(byteBuffer, 0, byteCount);
-            return searchCharBuffer(fileName, charSequence, matches);
+            searchCharBuffer(charSequence, matches);
         } finally {
             if (fileChannel != null) {
                 fileChannel.close();
@@ -108,5 +99,6 @@ public class FileSearcher {
                 dataInputStream.close();
             }
         }
+        return true;
     }
 }
