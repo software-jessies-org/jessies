@@ -15,7 +15,7 @@ ENV["PATH"] = "#{ENV["PATH"]}:#{salma_hayek}/generated/native/all/setsid/#{UNAME
 
 edit_class_name = "e.edit.Edit"
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
-classpath_entries = [ "#{edit_home}/classes", "#{salma_hayek}/classes" ]
+classpath_entries = [ "#{edit_home}/classes", "#{salma_hayek}/classes", "#{salma_hayek}/swing-worker.jar" ]
 
 scm_home = Pathname.new("#{edit_home}/../scm").realpath()
 if FileTest.directory?(scm_home)

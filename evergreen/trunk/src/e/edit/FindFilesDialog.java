@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.util.List;
+import java.util.concurrent.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -13,19 +13,20 @@ import e.forms.*;
 import e.gui.*;
 import e.util.*;
 
-/**
- * 
- */
+import java.util.List;
+import org.jdesktop.swingworker.SwingWorker;
+
 public class FindFilesDialog {
-    private JTextField patternField = new JTextField(40);
-    private JTextField directoryField = new JTextField(40);
+    private JTextField regexField = new JTextField(40);
+    private JTextField filenameRegexField = new JTextField(40);
     private JLabel status = new JLabel(" ");
     private ETree matchView;
     private DefaultTreeModel matchTreeModel;
     
     private Workspace workspace;
     
-    private FileFinder workerThread;
+    private FileFinder worker;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     
     public interface ClickableTreeItem {
         public void open();
@@ -105,37 +106,29 @@ public class FindFilesDialog {
         }
     }
     
-    public class FileFinder extends SwingWorker {
+    public class FileFinder extends SwingWorker<DefaultMutableTreeNode, DefaultMutableTreeNode> {
         private List<String> fileList;
         private DefaultMutableTreeNode matchRoot;
         private String regex;
-        private String directory;
-        private volatile boolean resultNoLongerWanted;
+        private String fileRegex;
         
-        private int doneFileCount;
+        private int doneFileCount = 0;
         private int totalFileCount;
-        private int percentage;
+        private int percentage = -1;
         
-        public synchronized void doFindInDirectory(String pattern, String directory) {
-            System.err.println("---doFindInDirectory " + pattern + "...");
+        public FileFinder() {
             this.matchRoot = new DefaultMutableTreeNode();
-            this.regex = pattern;
-            this.directory = directory;
-            this.resultNoLongerWanted = false;
+            this.regex = regexField.getText();
+            this.fileRegex = filenameRegexField.getText();
             this.doneFileCount = 0;
-            this.fileList = workspace.getListOfFilesMatching(directory);
+            this.fileList = workspace.getListOfFilesMatching(fileRegex);
             this.totalFileCount = fileList.size();
             this.percentage = -1;
             
             matchTreeModel.setRoot(matchRoot);
-            start();
         }
         
-        public synchronized void giveUp() {
-            resultNoLongerWanted = true;
-        }
-        
-        public void updateStatus() {
+        private void updateStatus() {
             int newPercentage = (doneFileCount * 100) / totalFileCount;
             if (newPercentage != percentage) {
                 percentage = newPercentage;
@@ -143,17 +136,16 @@ public class FindFilesDialog {
             }
         }
         
-        public Object construct() {
-            System.err.println("---Starting search for " + regex + " in files matching " + directory + "...");
-            Thread.currentThread().setName("Search for '" + regex + "' in " + directory);
+        @Override
+        public DefaultMutableTreeNode doInBackground() {
+            Thread.currentThread().setName("Search for '" + regex + "' in files matching '" + fileRegex + "'");
             try {
                 Pattern pattern = Pattern.compile(regex);
                 FileSearcher fileSearcher = new FileSearcher(pattern);
                 String root = workspace.getRootDirectory();
                 long startTime = System.currentTimeMillis();
                 for (doneFileCount = 0; doneFileCount < fileList.size(); ++doneFileCount) {
-                    if (resultNoLongerWanted) {
-                        System.err.println("---Aborting search!");
+                    if (isCancelled()) {
                         return null;
                     }
                     try {
@@ -169,7 +161,7 @@ public class FindFilesDialog {
                             int matchCount = fileSearcher.searchFile(root, candidate, matches);
                             long t1 = System.currentTimeMillis();
                             if (t1 - t0 > 500) {
-                                System.err.println(file + " " + (t1-t0) + "ms");
+                                Log.warn("Searching file \"" + file + "\" for '" + regex + "' took " + (t1 - t0) + "ms!");
                             }
                             if (matchCount > 0) {
                                 DefinitionFinder definitionFinder = new DefinitionFinder(file, regex);
@@ -189,14 +181,7 @@ public class FindFilesDialog {
                     updateStatus();
                 }
                 long endTime = System.currentTimeMillis();
-                System.err.println("----------took: " + (endTime - startTime) + " ms.");
-                
-                String status = matchTreeModel.getChildCount(matchTreeModel.getRoot()) + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "");
-                if (workspace.getIndexedFileCount() != totalFileCount) {
-                    status += " (from " + workspace.getIndexedFileCount() + ")";
-                }
-                status += " match.";
-                setStatus(status, false);
+                Log.warn("Search for '" + regex + "' in files matching '" + fileRegex + "' took " + (endTime - startTime) + " ms.");
             } catch (PatternSyntaxException ex) {
                 setStatus(ex.getDescription(), true);
             } catch (Exception ex) {
@@ -205,17 +190,24 @@ public class FindFilesDialog {
             return matchRoot;
         }
         
-        public void finished() {
-            Object result = getValue();
-            workerHasFinished();
-            if (resultNoLongerWanted) {
+        @Override
+        protected void done() {
+            synchronized (FindFilesDialog.this) {
+                worker = null;
+            }
+            
+            if (isCancelled()) {
                 return;
             }
             
-            // If we don't set the selected index, the user won't be able to cycle the focus into the list with the Tab key.
-            // This also means the user can just hit Return if there's only one match.
+            String status = matchTreeModel.getChildCount(matchTreeModel.getRoot()) + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "");
+            if (workspace.getIndexedFileCount() != totalFileCount) {
+                status += " (from " + workspace.getIndexedFileCount() + ")";
+            }
+            status += " match.";
+            setStatus(status, false);
+            
             matchView.expandAll();
-//            matchView.setSelectedIndex(0);
         }
     }
     
@@ -244,17 +236,12 @@ public class FindFilesDialog {
     }
     
     public synchronized void showMatches() {
-        if (workerThread != null) {
-            workerThread.giveUp();
+        if (worker != null) {
+            worker.cancel(true);
         }
         
-        FileFinder newWorkerThread = new FileFinder();
-        newWorkerThread.doFindInDirectory(patternField.getText(), directoryField.getText());
-        workerThread = newWorkerThread;
-    }
-    
-    public synchronized void workerHasFinished() {
-        workerThread = null;
+        worker = new FileFinder();
+        executor.submit(worker);
     }
     
     public void initMatchList() {
@@ -320,9 +307,13 @@ public class FindFilesDialog {
         }
     }
     
-    private void setStatus(String message, boolean isError) {
-        status.setForeground(isError ? Color.RED : Color.BLACK);
-        status.setText(message);
+    private void setStatus(final String message, final boolean isError) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                status.setForeground(isError ? Color.RED : Color.BLACK);
+                status.setText(message);
+            }
+        });
     }
     
     public FindFilesDialog(Workspace workspace) {
@@ -337,11 +328,11 @@ public class FindFilesDialog {
         if (pattern == null) {
             return;
         }
-        patternField.setText(pattern);
+        regexField.setText(pattern);
     }
     
     public void setFilenamePattern(String pattern) {
-        directoryField.setText(pattern);
+        filenameRegexField.setText(pattern);
     }
     
     public void showDialog() {
@@ -368,8 +359,8 @@ public class FindFilesDialog {
         
         FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Find Files");
         FormPanel formPanel = form.getFormPanel();
-        formPanel.addRow("Files Containing:", patternField);
-        formPanel.addRow("Whose Names Match:", directoryField);
+        formPanel.addRow("Files Containing:", regexField);
+        formPanel.addRow("Whose Names Match:", filenameRegexField);
         formPanel.addRow("Matches:", new JScrollPane(matchView));
         formPanel.setStatusBar(status);
         formPanel.setTypingTimeoutActionListener(new ActionListener() {
