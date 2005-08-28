@@ -1,5 +1,8 @@
 package e.edit;
 
+import e.gui.*;
+import e.ptextarea.*;
+import e.util.*;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
@@ -7,9 +10,7 @@ import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import e.gui.*;
-import e.ptextarea.*;
-import e.util.*;
+import org.jdesktop.swingworker.SwingWorker;
 
 public class Workspace extends JPanel {
     private EColumn leftColumn = new EColumn();
@@ -26,6 +27,8 @@ public class Workspace extends JPanel {
     
     private ArrayList<String> fileList;
     
+    private ETextWindow rememberedTextWindow;
+    
     public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
         this.title = title;
@@ -40,19 +43,18 @@ public class Workspace extends JPanel {
      */
     public void updateFileList(ChangeListener listener) {
         FileListUpdater fileListUpdater = new FileListUpdater(listener);
-        fileListUpdater.doScan();
+        fileListUpdater.execute();
     }
     
-    public class FileListUpdater extends SwingWorker {
-        ChangeListener listener;
-        FileListUpdater(ChangeListener listener) {
+    public class FileListUpdater extends SwingWorker<ArrayList<String>, Object> {
+        private ChangeListener listener;
+        
+        public FileListUpdater(ChangeListener listener) {
             this.listener = listener;
             fileList = null;
         }
-        public void doScan() {
-            start();
-        }
-        public Object construct() {
+        
+        public ArrayList<String> doInBackground() {
             ArrayList<String> newFileList = scanWorkspaceForFiles();
             // Many file systems will have returned the files not in
             // alphabetical order, so we sort them ourselves here so
@@ -61,7 +63,81 @@ public class Workspace extends JPanel {
             fileList = newFileList;
             return fileList;
         }
-        public void finished() {
+        
+        /**
+         * Builds a list of files for Open Quickly. Doesn't bother indexing a workspace if there's no
+         * suggestion it's a project (as opposed to a home directory, say): no Makefile or build.xml,
+         * and no CVS or SCCS directories are good clues that we're not looking at software.
+         */
+        private ArrayList<String> scanWorkspaceForFiles() {
+            long start = System.currentTimeMillis();
+            
+            String[] ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
+            
+            ArrayList<String> result = new ArrayList<String>();
+            
+            // If a workspace is under the user's home directory, we're happy to scan it.
+            File userHome = FileUtilities.fileFromString(System.getProperty("user.dir"));
+            File workspaceRoot = FileUtilities.fileFromString(getRootDirectory());
+            boolean isUnderUserHome;
+            try {
+                isUnderUserHome = workspaceRoot.equals(userHome) == false && workspaceRoot.getCanonicalPath().startsWith(userHome.getCanonicalPath());
+            } catch (IOException ex) {
+                return result;
+            }
+            
+            // If we haven't already decided to scan a workspace, see if it contains interesting files that
+            // suggest it should be scanned.
+            File[] rootFiles = workspaceRoot.listFiles();
+            if (isUnderUserHome || (rootFiles != null && isSensibleToScan(rootFiles))) {
+                Log.warn("Scanning " + getRootDirectory() + " for interesting files.");
+                scanDirectory(getRootDirectory(), ignoredExtensions, result);
+                Log.warn("Scan of " + getRootDirectory() + " took " + (System.currentTimeMillis() - start) + "ms; found " + result.size() + " files.");
+                Edit.getInstance().showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
+            } else {
+                Log.warn("Skipping scanning of " + getRootDirectory() + " because it doesn't look like a project.");
+            }
+            
+            return result;
+        }
+        
+        /**
+         * Tests whether the given directory contents suggest that we should be indexing this workspace.
+         * The idea is that if it looks like a software project, it's worth the cost (whatever), but if it doesn't,
+         * it may well be ridiculously expensive to scan. Particularly because we blindly follow symlinks.
+         */
+        private boolean isSensibleToScan(File[] contents) {
+            for (File file : contents) {
+                if (file.toString().matches(".*(CVS|SCCS|\\.svn|Makefile|makefile|build\\.xml)")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        private void scanDirectory(String directory, String[] ignoredExtensions, ArrayList<String> result) {
+            File dir = FileUtilities.fileFromString(directory);
+            File[] files = dir.listFiles();
+            if (files == null) {
+                return;
+            }
+            for (File file : files) {
+                if (FileUtilities.isIgnored(file)) {
+                    continue;
+                }
+                String filename = file.toString();
+                if (file.isDirectory()) {
+                    scanDirectory(filename, ignoredExtensions, result);
+                } else {
+                    if (FileUtilities.nameEndsWithOneOf(filename, ignoredExtensions) == false && FileUtilities.isSymbolicLink(file) == false) {
+                        int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(getRootDirectory()).length();
+                        result.add(filename.substring(prefixCharsToSkip));
+                    }
+                }
+            }
+        }
+        
+        public void done() {
             if (listener != null) {
                 listener.stateChanged(null);
             }
@@ -280,79 +356,6 @@ public class Workspace extends JPanel {
         return true;
     }
     
-    public void scanDirectory(String directory, String[] ignoredExtensions, ArrayList<String> result) {
-        File dir = FileUtilities.fileFromString(directory);
-        File[] files = dir.listFiles();
-        if (files == null) {
-            return;
-        }
-        for (File file : files) {
-            if (FileUtilities.isIgnored(file)) {
-                continue;
-            }
-            String filename = file.toString();
-            if (file.isDirectory()) {
-                scanDirectory(filename, ignoredExtensions, result);
-            } else {
-                if (FileUtilities.nameEndsWithOneOf(filename, ignoredExtensions) == false && FileUtilities.isSymbolicLink(file) == false) {
-                    int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(getRootDirectory()).length();
-                    result.add(filename.substring(prefixCharsToSkip));
-                }
-            }
-        }
-    }
-    
-    /**
-     * Builds a list of files for Open Quickly. Doesn't bother indexing a workspace if there's no
-     * suggestion it's a project (as opposed to a home directory, say): no Makefile or build.xml,
-     * and no CVS or SCCS directories are good clues that we're not looking at software.
-     */
-    private ArrayList<String> scanWorkspaceForFiles() {
-        long start = System.currentTimeMillis();
-        
-        String[] ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
-
-        ArrayList<String> result = new ArrayList<String>();
-        
-        // If a workspace is under the user's home directory, we're happy to scan it.
-        File userHome = FileUtilities.fileFromString(System.getProperty("user.dir"));
-        File workspaceRoot = FileUtilities.fileFromString(getRootDirectory());
-        boolean isUnderUserHome;
-        try {
-            isUnderUserHome = workspaceRoot.equals(userHome) == false && workspaceRoot.getCanonicalPath().startsWith(userHome.getCanonicalPath());
-        } catch (IOException ex) {
-            return result;
-        }
-        
-        // If we haven't already decided to scan a workspace, see if it contains interesting files that
-        // suggest it should be scanned.
-        File[] rootFiles = workspaceRoot.listFiles();
-        if (isUnderUserHome || (rootFiles != null && isSensibleToScan(rootFiles))) {
-            Log.warn("Scanning " + getRootDirectory() + " for interesting files.");
-            scanDirectory(getRootDirectory(), ignoredExtensions, result);
-            Log.warn("Scan of " + getRootDirectory() + " took " + (System.currentTimeMillis() - start) + "ms; found " + result.size() + " files.");
-            Edit.getInstance().showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
-        } else {
-            Log.warn("Skipping scanning of " + getRootDirectory() + " because it doesn't look like a project.");
-        }
-        
-        return result;
-    }
-    
-    /**
-     * Tests whether the given directory contents suggest that we should be indexing this workspace.
-     * The idea is that if it looks like a software project, it's worth the cost (whatever), but if it doesn't,
-     * it may well be ridiculously expensive to scan. Particularly because we blindly follow symlinks.
-     */
-    public boolean isSensibleToScan(File[] contents) {
-        for (File file : contents) {
-            if (file.toString().matches(".*(CVS|SCCS|\\.svn|Makefile|makefile|build\\.xml)")) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     /**
      * Shows the "Find File" dialog with the given String as the contents of
      * the text field. Use the empty string to retain the current contents.
@@ -423,8 +426,6 @@ public class Workspace extends JPanel {
             }
         }        
     }
-    
-    private ETextWindow rememberedTextWindow;
     
     public void rememberFocusedTextWindow(ETextWindow textWindow) {
         rememberedTextWindow = textWindow;
