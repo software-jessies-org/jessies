@@ -315,6 +315,7 @@ BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(COMPILER_TYPE))
 # ----------------------------------------------------------------------------
 CLASS_PATH += $(SALMA_HAYEK)/classes
 CLASS_PATH += $(SALMA_HAYEK)/MRJ141Stubs.jar
+CLASS_PATH += $(SALMA_HAYEK)/swing-worker.jar
 CLASS_PATH += $(CLASS_PATH.$(COMPILER_TYPE))
 
 # ----------------------------------------------------------------------------
