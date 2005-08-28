@@ -1,12 +1,14 @@
 package e.edit;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.regex.*;
-import javax.swing.*;
 import e.forms.*;
 import e.gui.*;
 import e.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.concurrent.*;
+import java.util.regex.*;
+import javax.swing.*;
+import org.jdesktop.swingworker.SwingWorker;
 
 /**
  * The ETextArea action to open a find and replace dialog.
@@ -19,7 +21,9 @@ public class FindAndReplaceAction extends ETextAction {
     private JLabel statusLabel = new JLabel(" ");
     private JList matchList;
     private JList replacementsList;
-    private MatchFinder workerThread;
+    
+    private MatchFinder worker;
+    private static final ExecutorService matchFinderExecutor = Executors.newSingleThreadExecutor();
     
     public FindAndReplaceAction() {
         super(ACTION_NAME);
@@ -256,24 +260,26 @@ public class FindAndReplaceAction extends ETextAction {
     
     private static final int MAX_DISPLAYED_MATCH_COUNT = 100;
     
-    public class MatchFinder extends SwingWorker {
+    public class MatchFinder extends SwingWorker<DefaultListModel, Object> {
         private String regex;
         private String replacement;
+        
         private DefaultListModel matchModel;
         private DefaultListModel replacementsModel;
         
         private PatternSyntaxException patternSyntaxError;
         private IndexOutOfBoundsException replacementSyntaxError;
+        private boolean aborted = false;
         
-        public void doFindForPattern(String pattern, String replacement) {
+        public MatchFinder(String pattern, String replacement) {
             this.matchModel = new DefaultListModel();
             this.replacementsModel = new DefaultListModel();
             this.regex = pattern;
             this.replacement = StringUtilities.unescapeJava(replacement);
-            start();
         }
         
-        public Object construct() {
+        @Override
+        protected DefaultListModel doInBackground() {
             if (regex.length() == 0) {
                 return matchModel;
             }
@@ -288,7 +294,8 @@ public class FindAndReplaceAction extends ETextAction {
                     line = lines[i];
                     Matcher matcher = pattern.matcher(line);
                     if (matcher.find()) {
-                        if (matchCount > MAX_DISPLAYED_MATCH_COUNT || Thread.currentThread().isInterrupted()) {
+                        if (matchCount > MAX_DISPLAYED_MATCH_COUNT || isCancelled()) {
+                            aborted = true;
                             return null;
                         }
                         if (isSelectionMeantAsScope()) {
@@ -320,15 +327,17 @@ public class FindAndReplaceAction extends ETextAction {
             return matchModel;
         }
         
-        public void finished() {
-            Object result = getValue();
-            // If the caller has already created a new WorkerThread, then we're obsolete.
-            // This happens because of the LIFO order in which Swing seems to execute invokeAndLater callbacks.
-            if (workerThread != this) {
+        @Override
+        public void done() {
+            synchronized (FindAndReplaceAction.this) {
+                worker = null;
+            }
+            
+            if (isCancelled()) {
                 return;
             }
-            workerThread = null;
-            if (result == null) {
+            
+            if (aborted) {
                 setStatusToBad("More than " + MAX_DISPLAYED_MATCH_COUNT + " matches. No matches will be shown.", patternField);
             } else if (patternSyntaxError != null) {
                 setStatusToBad(patternSyntaxError.getDescription(), patternField);
@@ -343,10 +352,10 @@ public class FindAndReplaceAction extends ETextAction {
     }
     
     public synchronized void showMatches() {
-        if (workerThread != null) {
-            workerThread.interrupt();
+        if (worker != null) {
+            worker.cancel(true);
         }
-        workerThread = new MatchFinder();
-        workerThread.doFindForPattern(patternField.getText(), replacementField.getText());
+        worker = new MatchFinder(patternField.getText(), replacementField.getText());
+        matchFinderExecutor.submit(worker);
     }
 }
