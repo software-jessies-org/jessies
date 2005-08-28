@@ -151,18 +151,19 @@ public class FindFilesDialog {
                     try {
                         String candidate = fileList.get(doneFileCount);
                         File file = FileUtilities.fileFromParentAndString(root, candidate);
-                        if (FileUtilities.isTextFile(file) == false) {
-                            // FIXME: should we do the grep(1) thing of "binary file <x> matches"?
-                            continue;
-                        }
                         if (regex.length() != 0) {
                             ArrayList<String> matches = new ArrayList<String>();
                             long t0 = System.currentTimeMillis();
-                            int matchCount = fileSearcher.searchFile(root, candidate, matches);
+                            boolean wasText = fileSearcher.searchFile(file, matches);
+                            if (wasText == false) {
+                                // FIXME: should we do the grep(1) thing of "binary file <x> matches"?
+                                continue;
+                            }
                             long t1 = System.currentTimeMillis();
                             if (t1 - t0 > 500) {
                                 Log.warn("Searching file \"" + file + "\" for '" + regex + "' took " + (t1 - t0) + "ms!");
                             }
+                            final int matchCount = matches.size();
                             if (matchCount > 0) {
                                 DefinitionFinder definitionFinder = new DefinitionFinder(file, regex);
                                 MatchingFile matchingFile = new MatchingFile(candidate, matchCount, regex, definitionFinder.foundDefinition);
@@ -178,7 +179,13 @@ public class FindFilesDialog {
                     } catch (FileNotFoundException ex) {
                         ex = ex; // Not our problem.
                     }
-                    updateStatus();
+                    
+                    // Update our percentage-complete status, but only if we've
+                    // taken enough time for the user to start caring, so we
+                    // don't make quick searches unnecessarily slow.
+                    if (System.currentTimeMillis() - startTime > 300) {
+                        updateStatus();
+                    }
                 }
                 long endTime = System.currentTimeMillis();
                 Log.warn("Search for '" + regex + "' in files matching '" + fileRegex + "' took " + (endTime - startTime) + " ms.");
