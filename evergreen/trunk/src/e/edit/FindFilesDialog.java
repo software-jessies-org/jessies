@@ -147,7 +147,7 @@ public class FindFilesDialog {
         }
         
         @Override
-        public DefaultMutableTreeNode doInBackground() {
+        protected DefaultMutableTreeNode doInBackground() {
             Thread.currentThread().setName("Search for '" + regex + "' in files matching '" + fileRegex + "'");
             try {
                 Pattern pattern = Pattern.compile(regex);
