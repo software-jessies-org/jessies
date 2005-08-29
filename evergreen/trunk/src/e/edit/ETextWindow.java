@@ -335,18 +335,22 @@ public class ETextWindow extends EWindow implements PTextListener {
     private boolean showPatchAndAskForConfirmation(String verb, String question, boolean fromDiskToMemory) {
         String diskLabel = "disk at " + FileUtilities.getLastModifiedTime(file);
         String memoryLabel = "memory";
+        
+        String diskContent;
+        try {
+            diskContent = StringUtilities.readFile(file);
+        } catch (Exception ex) {
+            Log.warn("Couldn't read file for patch", ex);
+            // Pretend that the file is empty. The most likely reason for being
+            // here is that the file has been deleted.
+            diskContent = "";
+            diskLabel = "(couldn't read file)";
+        }
+        String memoryContent = text.getTextBuffer().toString();
+        
         String fromLabel = fromDiskToMemory ? diskLabel : memoryLabel;
         String toLabel = fromDiskToMemory ? memoryLabel : diskLabel;
         
-        // Pretend the file is empty if we can't read it because, for example,
-        // it's been deleted.
-        String diskContent = "";
-        try {
-            StringUtilities.readFile(file);
-        } catch (Exception ex) {
-            Log.warn("reading file for patch", ex);
-        }
-        String memoryContent = text.getTextBuffer().toString();
         String fromContent = fromDiskToMemory ? diskContent : memoryContent;
         String toContent = fromDiskToMemory ? memoryContent : diskContent;
         
