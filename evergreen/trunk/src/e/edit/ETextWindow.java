@@ -338,7 +338,14 @@ public class ETextWindow extends EWindow implements PTextListener {
         String fromLabel = fromDiskToMemory ? diskLabel : memoryLabel;
         String toLabel = fromDiskToMemory ? memoryLabel : diskLabel;
         
-        String diskContent = StringUtilities.readFile(file);
+        // Pretend the file is empty if we can't read it because, for example,
+        // it's been deleted.
+        String diskContent = "";
+        try {
+            StringUtilities.readFile(file);
+        } catch (Exception ex) {
+            Log.warn("reading file for patch", ex);
+        }
         String memoryContent = text.getTextBuffer().toString();
         String fromContent = fromDiskToMemory ? diskContent : memoryContent;
         String toContent = fromDiskToMemory ? memoryContent : diskContent;
