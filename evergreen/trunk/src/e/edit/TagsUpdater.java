@@ -282,7 +282,7 @@ public class TagsUpdater {
                 public void run() {
                     for (int i = 0; i < tags.size(); ++i) {
                         TagReader.Tag tag = (TagReader.Tag) tags.get(i);
-                        tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1);
+                        tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
                         
                         DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
                         
