@@ -33,3 +33,51 @@ For general users:
 * friends' names -> address book entries
 * matching tracks in iTunes
 * matching web browser bookmarks
+* show current iTunes track.
+* countdown clocks (to code freezes, for example).
+* package tracking.
+
+--BEGIN--
+
+there's only one class of program that i can think of that we're really missing (which doesn't mean there aren't lots more i'll use when someone invents them), and that's something along the lines of the GNOME Dashboard (nothing to do with Apple's). i made a start in 2002 on a thing i called KnowAll, but it's hampered by lack of a suitable API to monitor, for example, what i'm typing in Mail right now. which is why there are special-case hacks like Terminator's number base convertor and Edit's Java/Ruby/man page advisors. really, i ought to be able to type 3,405,691,582 here and have KnowAll say 0xcafebabe as i do. or FileDescriptor and have a link to the JavaDoc immediately available. despite the fact that i'm in my mailer rather than my editor.
+
+i think GNOME Dashboard got too tied up in crap that wasn't any use (or maybe they just use their computers for very different things than i do), and as far as i can tell is mainly dormant now. there's also the emacs Remembrance Agent, but that seems to have been too early; there wasn't as much useful stuff on the web in those days, and screens were small (and it's crippled by being emacs-specific). as far as i can tell, emacs RA is basically poor man's Spotlight (except as you type in emacs rather than the Spotlight dialog).
+
+what do i waste my time on?
+
+programming reference material: javadoc/ri/man pages, et cetera.
+
+converting bases/recognizing ASCII in numbers.
+
+information about movies/actors: imdb.
+
+information about cinemas: if i'm writing "Four Brothers" in Mail, show me the times it's on at my favorite cinema so i can paste it in.
+
+weather.
+
+public transport.
+
+"google". (NSTextView now has a default "Search in Google" on its pop-up menu, and i've added something similar to salma-hayek's PTextArea. but i'm not always using NSTextView or PTextArea.)
+
+contact information, given a name. also reverse lookup (do i know +1 408 555-1234?).
+
+units conversion. what's 5'3"? how heavy is 140 lbs? what's ¥80,000? (i tried to solve this with a web proxy, and i see there's a GreaseMonkey script, but the fact is that bad units don't always come from the web.)
+
+dictionary and wikipedia lookup.
+
+the hard part, i think, is that there are several different interfaces here:
+
+weather, for example, i usually just want San Jose weather. but sometimes i want the weather of a place i'm going, or where someone else is. so i'd either just want an easily-available button, or a text field. (i've long said weather belongs in the calendar, but though GNOME thinks the same, Apple doesn't.)
+
+converting bases, for example, i'm almost always looking at the number. i'd probably want to point/select/copy to clipboard the number.
+
+javadoc, for example, i'm almost always just typing FileDescriptor or arraycopy, and i want the computer to have been paying attention.
+
+buttons, text fields, and clipboard monitoring: they're easily done. but they're not what would make this really cool. i assume we could use some sort of accessibility API to read text as it's written, but that's going to need re-doing for each platform, and i've no idea how any of that stuff works. (the Java accessibility stuff doesn't seem to be meant for building accessibility tools so much as making applications accessible.)
+
+--END--
+
+relevant Apple links:
+http://developer.apple.com/releasenotes/Accessibility/AssistiveAPI.html [api]
+http://developer.apple.com/samplecode/UIElementInspector/UIElementInspector.html [example]
+http://www.cocoabuilder.com/archive/message/cocoa/2003/12/7/89341
