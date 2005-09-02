@@ -261,16 +261,12 @@ public class JTerminalPane extends JPanel {
 
 		private String getEscapeSequenceForKeyCode(KeyEvent event) {
 			int keyCode = event.getKeyCode();
+			// If the key press wll generate a keyTyped event, you must NOT handle it here.
 			switch (keyCode) {
 				case KeyEvent.VK_ESCAPE: return Ascii.ESC + "";
 				
 				case KeyEvent.VK_HOME: return Ascii.ESC + "[H";
 				case KeyEvent.VK_END: return Ascii.ESC + "[F";
-				
-				case KeyEvent.VK_DELETE: return Ascii.ESC + "[3~";
-				case KeyEvent.VK_BACK_SPACE: return ERASE_STRING;
-				
-				case KeyEvent.VK_ENTER: return String.valueOf(Ascii.CR);
 				
 				case KeyEvent.VK_PAGE_UP: return Ascii.ESC + "[5~";
 				case KeyEvent.VK_PAGE_DOWN: return Ascii.ESC + "[6~";
@@ -344,10 +340,17 @@ public class JTerminalPane extends JPanel {
 		public void keyReleased(KeyEvent event) {
 		}
 		
+		// Handle key presses which generate keyTyped events.
 		private String getUtf8ForKeyEvent(KeyEvent e) {
 			char ch = e.getKeyChar();
-			if (ch == Ascii.CR) {
+			if (ch == Ascii.LF) {
+				return String.valueOf(Ascii.CR);
+			} else if (ch == Ascii.CR) {
 				return control.isAutomaticNewline() ? "\r\n" : "\r";
+			} else if (ch == Ascii.BS) {
+				return ERASE_STRING;
+			} else if (ch == Ascii.DEL) {
+				return Ascii.ESC + "[3~";
 			} else {
 				return String.valueOf(ch);
 			}
