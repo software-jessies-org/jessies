@@ -343,6 +343,13 @@ public class JTerminalPane extends JPanel {
 		// Handle key presses which generate keyTyped events.
 		private String getUtf8ForKeyEvent(KeyEvent e) {
 			char ch = e.getKeyChar();
+			// This modifier test lets Ctrl-H and Ctrl-J generate ^H and ^J instead of
+			// mangling them into ^? and ^M.
+			// That's useful on those rare but annoying occasions where Backspace and
+			// Enter aren't working and it's how other terminals behave.
+			if (e.getModifiers() != 0) {
+				return String.valueOf(ch);
+			}
 			if (ch == Ascii.LF) {
 				return String.valueOf(Ascii.CR);
 			} else if (ch == Ascii.CR) {
