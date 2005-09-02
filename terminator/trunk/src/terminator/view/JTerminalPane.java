@@ -268,6 +268,7 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_END: return Ascii.ESC + "[F";
 				
 				case KeyEvent.VK_DELETE: return Ascii.ESC + "[3~";
+				case KeyEvent.VK_BACK_SPACE: return ERASE_STRING;
 				
 				case KeyEvent.VK_PAGE_UP: return Ascii.ESC + "[5~";
 				case KeyEvent.VK_PAGE_DOWN: return Ascii.ESC + "[6~";
@@ -347,8 +348,6 @@ public class JTerminalPane extends JPanel {
 				return String.valueOf(Ascii.CR);
 			} else if (ch == Ascii.CR) {
 				return control.isAutomaticNewline() ? "\r\n" : "\r";
-			} else if (ch == Ascii.BS) {
-				return ERASE_STRING;
 			} else {
 				return String.valueOf(ch);
 			}
