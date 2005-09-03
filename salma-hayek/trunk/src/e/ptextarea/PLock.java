@@ -38,7 +38,7 @@ public class PLock {
     
     public synchronized void getReadLock() {
         Thread currentThread = Thread.currentThread();
-        long start = System.currentTimeMillis();
+        long startTimeMillis = System.currentTimeMillis();
         boolean gotStuck = false;
         while (canClaimReadLock(currentThread) == false) {
             gotStuck = true;
@@ -48,10 +48,7 @@ public class PLock {
                 Log.warn("Interrupted while attempting to get read lock.", ex);
             }
         }
-        if (gotStuck) {
-            long time = System.currentTimeMillis() - start;
-            Log.warn("PLock: " + currentThread + " waited to get read lock for " + time + "ms.");
-        }
+        report(gotStuck, startTimeMillis, "read");
         if (readLocks.containsKey(currentThread)) {
             readLocks.put(currentThread, 1 + readLocks.get(currentThread));
         } else {
@@ -81,7 +78,7 @@ public class PLock {
         //Log.warn("getWriteLock() in thread " + Thread.currentThread());
         //dumpLocks();
         Thread currentThread = Thread.currentThread();
-        long start = System.currentTimeMillis();
+        long startTimeMillis = System.currentTimeMillis();
         boolean gotStuck = false;
         while (canClaimWriteLock(currentThread) == false) {
             gotStuck = true;
@@ -91,10 +88,7 @@ public class PLock {
                 Log.warn("Interrupted while attempting to get write lock.", ex);
             }
         }
-        if (gotStuck) {
-            long time = System.currentTimeMillis() - start;
-            Log.warn("PLock: " + currentThread + " waited to get read lock for " + time + "ms.");
-        }
+        report(gotStuck, startTimeMillis, "write");
         writeLock = currentThread;
         writeLockCount++;
     }
@@ -127,6 +121,17 @@ public class PLock {
             writeLock = null;
             notifyAll();  // IMPORTANT: allow other threads to wake up and check if they can get locks now.
         }
+    }
+    
+    private void report(boolean gotStuck, long startTimeMillis, String type) {
+        if (gotStuck == false) {
+            return;
+        }
+        long durationMillis = System.currentTimeMillis() - startTimeMillis;
+        if (durationMillis < 10) {
+            return;
+        }
+        Log.warn("PLock: " + Thread.currentThread() + " waited to get " + type + " lock for " + durationMillis + "ms.");
     }
     
     private synchronized void dumpLocks() {
