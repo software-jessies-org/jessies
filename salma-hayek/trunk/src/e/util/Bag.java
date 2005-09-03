@@ -3,7 +3,7 @@ package e.util;
 import java.util.*;
 
 public class Bag {
-    private static final Integer ONE = new Integer(1);
+    private static final Integer ONE = Integer.valueOf(1);
     private Map<Object, Integer> objectToCountMap = new TreeMap<Object, Integer>();
     
     public Bag() {
