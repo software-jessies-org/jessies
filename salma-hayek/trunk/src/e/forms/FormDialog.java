@@ -88,8 +88,8 @@ public class FormDialog {
         return wasAccepted;
     }
 
-    FormDialog(Frame parent, String title, FormPanel formPanel) {
-        this.dialog = new JDialog(parent, title);
+    FormDialog(Frame owner, String title, FormPanel formPanel) {
+        this.dialog = new JDialog(owner, title);
         this.formPanel = formPanel;
         initAlwaysOnTopMonitoring();
     }
