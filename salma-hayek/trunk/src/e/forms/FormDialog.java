@@ -135,7 +135,7 @@ public class FormDialog {
         
         // Set sensible defaults for size and location.
         dialog.pack();
-        dialog.setLocationRelativeTo(dialog.getParent());
+        dialog.setLocationRelativeTo(dialog.getOwner());
         
         // But if we've shown this dialog before, put it back where it last was.
         restorePreviousSize();
