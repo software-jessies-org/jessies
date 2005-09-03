@@ -764,7 +764,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             // Take a copy of the indices.  Otherwise, if we try removing stuff from the segment cache
             // based on values taken from the sub-tree from the line index onwards, we incur a
             // concurrent modification exception.
-            Integer[] indices = segmentCache.tailMap(lineIndex).keySet().toArray(new Integer[0]);
+            // FIXME: http://java.sun.com/j2se/1.5.0/docs/api/java/util/HashMap.html#keySet() implies that we can use Iterator.remove to avoid this copy.
+            Set<Integer> keySet = segmentCache.tailMap(lineIndex).keySet();
+            Integer[] indices = keySet.toArray(new Integer[keySet.size()]);
             for (int index : indices) {
                 segmentCache.remove(index);
             }
