@@ -95,10 +95,16 @@ public class FormDialog {
     }
     
     // A dialog that doesn't track its owner's always-on-top state risks being
-    // lost beneath its owner.
+    // lost beneath its owner. The documentation for Window.setAlwaysOnTop
+    // states that all owned windows will inherit the always-on-top state, but
+    // this doesn't appear to apply to owned dialogs. I'm not sure if this is
+    // a documentation bug or an implementation bug.
     private void initAlwaysOnTopMonitoring() {
         copyOwnerAlwaysOnTopState();
         dialog.getOwner().addPropertyChangeListener("alwaysOnTop", new PropertyChangeListener() {
+            // One of the Java tutorial's example PropertyChangeListeners says
+            // "propertyChanged", which is what you'd expect, but the
+            // method appears to be "propertyChange" (as in the other example).
             public void propertyChange(PropertyChangeEvent e) {
                 copyOwnerAlwaysOnTopState();
             }
