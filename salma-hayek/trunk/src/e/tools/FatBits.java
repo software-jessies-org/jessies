@@ -6,11 +6,13 @@ import java.awt.geom.*;
 import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.Timer;
+import javax.swing.border.*;
 import javax.swing.event.*;
 import e.forms.*;
 import e.gui.*;
 import e.util.*;
+
+import javax.swing.Timer;
 
 /**
  * A Java equivalent of Apple's Pixie.app magnifying glass utility. This is
@@ -87,13 +89,20 @@ public class FatBits extends JFrame {
             }
         });
         JPanel result = new JPanel(new BorderLayout(8, 0));
-        // FIXME: the right border should only be large on Mac OS, and should
-        // correspond more closely to the grow box inset.
-        result.setBorder(new javax.swing.border.EmptyBorder(4, 4, 4, 24));
+        result.setBorder(makeInfoPanelBorder());
         result.add(colorLabel, BorderLayout.WEST);
         result.add(positionLabel, BorderLayout.CENTER);
         result.add(infoButton, BorderLayout.EAST);
         return result;
+    }
+    
+    private Border makeInfoPanelBorder() {
+        int rightInset = 4;
+        // Make room for the grow box on Mac OS.
+        if (GuiUtilities.isMacOs()) {
+            rightInset += new JScrollBar().getPreferredSize().width;
+        }
+        return new EmptyBorder(4, 4, 4, rightInset);
     }
     
     private void initScaledImagePanel() {
