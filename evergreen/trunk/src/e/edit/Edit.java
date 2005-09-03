@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 
 import javax.xml.parsers.*;
@@ -663,16 +664,20 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         statusLineAndProgressContainer.add(statusLine, BorderLayout.CENTER);
         
         statusArea = new JPanel(new BorderLayout());
-        statusArea.setBorder(new javax.swing.border.EmptyBorder(2, 2, 2, 2));
+        statusArea.setBorder(new EmptyBorder(2, 2, 2, 2));
         statusArea.add(statusLineAndProgressContainer, BorderLayout.NORTH);
         statusArea.add(minibuffer, BorderLayout.SOUTH);
         
-        // Add some padding so that the tall Mac OS progress bar doesn't cause
-        // the status line to jiggle when it appears...
-        statusLine.setBorder(new javax.swing.border.EmptyBorder(2, 0, 2, 0));
-        // ...and so that it doesn't intrude on the area reserved for the
-        // grow box (and flicker as they fight about who gets drawn on top).
-        statusLineAndProgressContainer.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 20));
+        // Add some padding so that the tall and fixed-height Mac OS progress
+        // bar doesn't cause the status line to jiggle when it appears, and so
+        // that on Linux the progress bar doesn't allow itself to look squashed.
+        statusLine.setBorder(new EmptyBorder(2, 0, 2, 0));
+        if (GuiUtilities.isMacOs()) {
+            // Make room on Mac OS so that our components don't intrude on the
+            // area reserved for the grow box (and cause flicker as they fight
+            // about who gets drawn on top).
+            statusLineAndProgressContainer.setBorder(new EmptyBorder(0, 0, 0, 20));
+        }
         
         progressBarAndKillButton.add(progressBar, BorderLayout.CENTER);
         progressBarAndKillButton.add(makeKillButton(), BorderLayout.EAST);
