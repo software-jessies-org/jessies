@@ -2,6 +2,7 @@ package e.forms;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -90,6 +91,22 @@ public class FormDialog {
     FormDialog(Frame parent, String title, FormPanel formPanel) {
         this.dialog = new JDialog(parent, title);
         this.formPanel = formPanel;
+        initAlwaysOnTopMonitoring();
+    }
+    
+    // A dialog that doesn't track its owner's always-on-top state risks being
+    // lost beneath its owner.
+    private void initAlwaysOnTopMonitoring() {
+        copyOwnerAlwaysOnTopState();
+        dialog.getOwner().addPropertyChangeListener("alwaysOnTop", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent e) {
+                copyOwnerAlwaysOnTopState();
+            }
+        });
+    }
+    
+    private void copyOwnerAlwaysOnTopState() {
+        dialog.setAlwaysOnTop(dialog.getOwner().isAlwaysOnTop());
     }
     
     private void configureDialog() {
