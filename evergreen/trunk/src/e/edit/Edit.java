@@ -47,7 +47,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     private JPanel statusLineAndProgressContainer = new JPanel(new BorderLayout());
     
     private JProgressBar progressBar = new JProgressBar();
-    private JPanel progressBarAndKillButton = new JPanel(new BorderLayout());
+    private JPanel progressBarAndKillButton = new JPanel(new BorderLayout(4, 0));
     private Process process;
     
     public static synchronized Edit getInstance() {
@@ -679,11 +679,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     private JButton makeKillButton() {
-        JButton killButton = new JButton(new e.gui.StopIcon(Color.RED));
-        killButton.setPressedIcon(new e.gui.StopIcon(Color.RED.darker()));
-        killButton.setRolloverIcon(new e.gui.StopIcon(new Color(255, 100, 100)));
-        killButton.setRolloverEnabled(true);
-        killButton.setBorder(null);
+        JButton killButton = StopIcon.makeStopButton();
         killButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ProcessUtilities.terminateProcess(process);
