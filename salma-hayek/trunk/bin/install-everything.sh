@@ -49,10 +49,16 @@ for PROJECT in $PROJECTS; do
     wget $WGET_OPTIONS -N http://www.jessies.org/~enh/software/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
+    make -C $PROJECT clean
     make -C $PROJECT || BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
 done
 
-rm -f ~/.terminal-logs/.terminator-server-port
+# Although /proc/mounts is Linux-specific, it doesn't hang when one of the mounts is
+# currently unavailable.
+cat /proc/mounts | perl -ne '
+if (m@^/dev/\w+ (/home/\w+) @) {
+system("rm -f $1/.terminal-logs/.terminator-server-port");
+}'
 #rm -f ~/.e.edit.Edit/edit-server-port
 
 # Put links to each of our shell scripts in /usr/local/bin.
