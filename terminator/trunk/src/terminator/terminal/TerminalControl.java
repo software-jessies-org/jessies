@@ -54,7 +54,7 @@ public class TerminalControl implements Runnable {
 	
 	private static final ExecutorService writerExecutor = Executors.newSingleThreadExecutor();
 	
-	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) throws Exception {
+	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) throws Throwable {
 		reset();
 		this.pane = pane;
 		this.listener = listener;
