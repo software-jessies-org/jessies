@@ -1,5 +1,6 @@
 package terminator.terminal;
 
+import e.gui.*;
 import e.util.*;
 import java.awt.Dimension;
 import java.io.*;
@@ -53,16 +54,10 @@ public class PtyProcess {
     
     private static boolean libraryLoaded = false;
     
-    private static synchronized void ensureLibraryLoaded() throws IOException {
+    private static synchronized void ensureLibraryLoaded() throws UnsatisfiedLinkError {
         if (libraryLoaded == false) {
-            try {
-                System.loadLibrary("pty");
-                libraryLoaded = true;
-            } catch (UnsatisfiedLinkError ex) {
-                String problem = "Unable to load JNI library.";
-                Log.warn(problem, ex);
-                throw new IOException(problem);
-            }
+            System.loadLibrary("pty");
+            libraryLoaded = true;
         }
     }
     
