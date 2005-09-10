@@ -45,6 +45,7 @@ public class FatBits extends JFrame {
         timer = new Timer(50, new MouseTracker());
         setSize(new Dimension(250, 300));
         setContentPane(makeUi());
+        setJMenuBar(new FatBitsMenuBar());
         
         //
         // FIXME: support keyboard operation:
@@ -273,7 +274,46 @@ public class FatBits extends JFrame {
         }
     }
     
+    private class FatBitsMenuBar extends JMenuBar {
+        private FatBitsMenuBar() {
+            add(makeImageMenu());
+        }
+        
+        private JMenu makeImageMenu() {
+            JMenu menu = new JMenu("Image");
+            menu.add(new JMenuItem("Copy"));
+            menu.add(new JSeparator());
+            menu.add(new MouseMotionAction("Left") { void transform(Point p) { p.x -= 1; } });
+            menu.add(new MouseMotionAction("Right") { void transform(Point p) { p.x += 1; } });
+            menu.add(new MouseMotionAction("Up") { void transform(Point p) { p.y -= 1; } });
+            menu.add(new MouseMotionAction("Down") { void transform(Point p) { p.y += 1; } });
+            menu.add(new JSeparator());
+            menu.add(new JMenuItem("Lock Image"));
+            return menu;
+        }
+    }
+    
+    private abstract class MouseMotionAction extends AbstractAction {
+        MouseMotionAction(String direction) {
+            super("Move " + direction);
+            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke(direction.toUpperCase(), false));
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            Point p = getPointerLocation();
+            transform(p);
+            robot.mouseMove(p.x, p.y);
+        }
+        
+        abstract void transform(Point p);
+    }
+    
     public static void main(String[] args) {
-        new FatBits().setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                GuiUtilities.initLookAndFeel();
+                new FatBits().setVisible(true);
+            }
+        });
     }
 }
