@@ -46,16 +46,6 @@ public class FatBits extends JFrame {
         setSize(new Dimension(250, 300));
         setContentPane(makeUi());
         setJMenuBar(new FatBitsMenuBar());
-        
-        //
-        // FIXME: support keyboard operation:
-        //
-        //   '+': increase scale (also with command, like Preview?)
-        //   '-': decrease scale
-        //   ' ': play/pause following pointer position (also C-L like Pixie?)
-        //   arrow keys: move Robot for finer positioning than with the mouse
-        //
-        
         timer.start();
     }
     
@@ -83,7 +73,6 @@ public class FatBits extends JFrame {
                 formPanel.addRow("", showGridCheckBox);
                 formPanel.addRow("", keepOnTopCheckBox);
                 form.showNonModal();
-                // FIXME: show a dialog with the various controls in it.
                 // also: [x] refresh only when mouse moves
                 //       [ ] show mouse hot-spot
                 // alternative grid colors?
@@ -221,6 +210,10 @@ public class FatBits extends JFrame {
             repaint();
         }
         
+        public Image getImage() {
+            return image;
+        }
+        
         public void setShowGrid(boolean showGrid) {
             this.showGrid = showGrid;
             repaint();
@@ -281,7 +274,7 @@ public class FatBits extends JFrame {
         
         private JMenu makeImageMenu() {
             JMenu menu = new JMenu("Image");
-            menu.add(new JMenuItem("Copy"));
+            menu.add(new CopyImageAction());
             menu.add(new JSeparator());
             menu.add(new MouseMotionAction("Left") { void transform(Point p) { p.x -= 1; } });
             menu.add(new MouseMotionAction("Right") { void transform(Point p) { p.x += 1; } });
@@ -306,6 +299,18 @@ public class FatBits extends JFrame {
         }
         
         abstract void transform(Point p);
+    }
+    
+    private class CopyImageAction extends AbstractAction {
+        CopyImageAction() {
+            super("Copy Image");
+            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("C", false));
+            setEnabled(GuiUtilities.isMacOs() == false);
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            ImageSelection.copyImageToClipboard(scaledImagePanel.getImage());
+        }
     }
     
     public static void main(String[] args) {
