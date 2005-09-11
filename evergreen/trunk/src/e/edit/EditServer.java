@@ -54,7 +54,11 @@ public final class EditServer extends InAppServer {
         public void run() {
             try {
                 this.window = edit.openFileNonInteractively(filename);
-                edit.getFrame().toFront();
+                if (GuiUtilities.isMacOs()) {
+                    ProcessUtilities.spawn(null, new String[] { FileUtilities.findOnPath("BringProcessToFront").toString() });
+                } else {
+                    edit.getFrame().toFront();
+                }
                 out.println("File '" + filename + "' opened OK.");
             } catch (Exception ex) {
                 out.println(ex.getMessage());

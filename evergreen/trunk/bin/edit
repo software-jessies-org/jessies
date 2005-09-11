@@ -11,7 +11,7 @@ HOME = ENV["HOME"]
 UNAME=`uname`.chomp()
 
 ENV["EDIT_HOME"] = edit_home
-ENV["PATH"] = "#{ENV["PATH"]}:#{salma_hayek}/generated/native/all/setsid/#{UNAME}"
+ENV["PATH"] = "#{ENV["PATH"]}:#{salma_hayek}/generated/native/all/setsid/#{UNAME}:#{salma_hayek}/generated/native/#{UNAME}/BringProcessToFront/#{UNAME}"
 
 edit_class_name = "e.edit.Edit"
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
