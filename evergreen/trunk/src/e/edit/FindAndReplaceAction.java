@@ -258,7 +258,7 @@ public class FindAndReplaceAction extends ETextAction {
         statusLabel.setText(explanation);
     }
     
-    private static final int MAX_DISPLAYED_MATCH_COUNT = 100;
+    private static final int MAX_DISPLAYED_MATCH_COUNT = 1000;
     
     public class MatchFinder extends SwingWorker<DefaultListModel, Object> {
         private String regex;
