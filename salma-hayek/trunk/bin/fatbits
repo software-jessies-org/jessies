@@ -7,10 +7,11 @@ require 'pathname.rb'
 salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
 UNAME=`uname`.chomp()
 
-args = [ "java", "-cp", "#{salma_hayek}/classes", "e.tools.FatBits" ]
+args = [ "java", "-cp", "#{salma_hayek}/classes" ]
 if UNAME == "Darwin"
   args << "-Xdock:name=FatBits"
   args << "-Xdock:icon=/Developer/Applications/Graphics Tools/Pixie.app/Contents/Resources/Big.icns"
 end
+args << "e.tools.FatBits"
 args.concat(ARGV)
 system(*args)
