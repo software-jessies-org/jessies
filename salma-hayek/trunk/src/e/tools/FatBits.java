@@ -281,7 +281,7 @@ public class FatBits extends JFrame {
             menu.add(new MouseMotionAction("Up", 0, -1));
             menu.add(new MouseMotionAction("Down", 0, +1));
             menu.add(new JSeparator());
-            menu.add(new JMenuItem("Lock Image"));
+            menu.add(new JCheckBoxMenuItem(new LockImageAction()));
             return menu;
         }
     }
@@ -290,7 +290,7 @@ public class FatBits extends JFrame {
         private int dx;
         private int dy;
         
-        MouseMotionAction(String direction, int dx, int dy) {
+        private MouseMotionAction(String direction, int dx, int dy) {
             super("Move " + direction);
             this.dx = dx;
             this.dy = dy;
@@ -304,7 +304,7 @@ public class FatBits extends JFrame {
     }
     
     private class CopyImageAction extends AbstractAction {
-        CopyImageAction() {
+        private CopyImageAction() {
             super("Copy Image");
             putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("C", false));
             setEnabled(GuiUtilities.isMacOs() == false);
@@ -312,6 +312,23 @@ public class FatBits extends JFrame {
         
         public void actionPerformed(ActionEvent e) {
             ImageSelection.copyImageToClipboard(scaledImagePanel.getImage());
+        }
+    }
+    
+    private class LockImageAction extends AbstractAction {
+        private LockImageAction() {
+            super("Lock Image");
+            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("L", false));
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) e.getSource();
+            boolean lock = menuItem.getState();
+            if (lock) {
+                timer.stop();
+            } else {
+                timer.start();
+            }
         }
     }
     
