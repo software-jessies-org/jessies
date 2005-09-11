@@ -276,29 +276,31 @@ public class FatBits extends JFrame {
             JMenu menu = new JMenu("Image");
             menu.add(new CopyImageAction());
             menu.add(new JSeparator());
-            menu.add(new MouseMotionAction("Left") { void transform(Point p) { p.x -= 1; } });
-            menu.add(new MouseMotionAction("Right") { void transform(Point p) { p.x += 1; } });
-            menu.add(new MouseMotionAction("Up") { void transform(Point p) { p.y -= 1; } });
-            menu.add(new MouseMotionAction("Down") { void transform(Point p) { p.y += 1; } });
+            menu.add(new MouseMotionAction("Left", -1, 0));
+            menu.add(new MouseMotionAction("Right", +1, 0));
+            menu.add(new MouseMotionAction("Up", 0, -1));
+            menu.add(new MouseMotionAction("Down", 0, +1));
             menu.add(new JSeparator());
             menu.add(new JMenuItem("Lock Image"));
             return menu;
         }
     }
     
-    private abstract class MouseMotionAction extends AbstractAction {
-        MouseMotionAction(String direction) {
+    private class MouseMotionAction extends AbstractAction {
+        private int dx;
+        private int dy;
+        
+        MouseMotionAction(String direction, int dx, int dy) {
             super("Move " + direction);
+            this.dx = dx;
+            this.dy = dy;
             putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke(direction.toUpperCase(), false));
         }
         
         public void actionPerformed(ActionEvent e) {
             Point p = getPointerLocation();
-            transform(p);
-            robot.mouseMove(p.x, p.y);
+            robot.mouseMove(p.x + dx, p.y + dy);
         }
-        
-        abstract void transform(Point p);
     }
     
     private class CopyImageAction extends AbstractAction {
