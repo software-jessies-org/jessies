@@ -11,6 +11,8 @@ def formatChanges(changes)
     
     if line =~ /^Modified: /
       next
+    elsif line =~ /^Added: /
+      next
     elsif line =~ /^@@ /
       color = "gray"
     elsif line =~ /^-/
