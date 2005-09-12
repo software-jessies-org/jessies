@@ -307,7 +307,6 @@ public class FatBits extends JFrame {
         private CopyImageAction() {
             super("Copy Image");
             putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("C", false));
-            setEnabled(GuiUtilities.isMacOs() == false);
         }
         
         public void actionPerformed(ActionEvent e) {
