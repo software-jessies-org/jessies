@@ -58,6 +58,7 @@ public class FindFilesDialog {
     }
     
     public class MatchingFile implements ClickableTreeItem {
+        private File file;
         private String name;
         private int matchCount;
         private String regularExpression;
@@ -66,14 +67,15 @@ public class FindFilesDialog {
         /**
          * For matches based just on filename.
          */
-        public MatchingFile(String name) {
-            this(null, name, 0, null);
+        public MatchingFile(File file, String name) {
+            this(file, name, 0, null);
         }
         
         /**
          * For matches based on filename and a regular expression.
          */
         public MatchingFile(File file, String name, int matchCount, String regularExpression) {
+            this.file = file;
             this.name = name;
             this.matchCount = matchCount;
             this.regularExpression = regularExpression;
@@ -102,7 +104,7 @@ public class FindFilesDialog {
         }
         
         public String toString() {
-            StringBuilder result = new StringBuilder(name);
+            StringBuilder result = new StringBuilder(file.getName());
             if (matchCount != 0) {
                 result.append(" (");
                 result.append(matchCount);
@@ -121,6 +123,8 @@ public class FindFilesDialog {
         private DefaultMutableTreeNode matchRoot;
         private String regex;
         private String fileRegex;
+        
+        private HashMap<String, DefaultMutableTreeNode> pathMap = new HashMap<String, DefaultMutableTreeNode>();
         
         private int doneFileCount = 0;
         private int totalFileCount;
@@ -175,15 +179,17 @@ public class FindFilesDialog {
                             }
                             final int matchCount = matches.size();
                             if (matchCount > 0) {
+                                DefaultMutableTreeNode pathNode = getPathNode(candidate);
                                 MatchingFile matchingFile = new MatchingFile(file, candidate, matchCount, regex);
                                 DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
                                 for (String line : matches) {
                                     fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file)));
                                 }
-                                matchRoot.add(fileNode);
+                                pathNode.add(fileNode);
                             }
                         } else {
-                            matchRoot.add(new DefaultMutableTreeNode(new MatchingFile(candidate)));
+                            DefaultMutableTreeNode pathNode = getPathNode(candidate);
+                            pathNode.add(new DefaultMutableTreeNode(new MatchingFile(file, candidate)));
                         }
                     } catch (FileNotFoundException ex) {
                         ex = ex; // Not our problem.
@@ -204,6 +210,24 @@ public class FindFilesDialog {
                 Log.warn("Problem searching files for ", ex);
             }
             return matchRoot;
+        }
+        
+        private DefaultMutableTreeNode getPathNode(String pathname) {
+            String[] pathElements = pathname.split(File.separator);
+            String pathSoFar = "";
+            DefaultMutableTreeNode parentNode = matchRoot;
+            DefaultMutableTreeNode node = matchRoot;
+            for (int i = 0; i < pathElements.length - 1; ++i) {
+                pathSoFar += pathElements[i] + File.separator;
+                node = pathMap.get(pathSoFar);
+                if (node == null) {
+                    node = new DefaultMutableTreeNode(pathElements[i] + File.separator);
+                    parentNode.add(node);
+                    pathMap.put(pathSoFar, node);
+                }
+                parentNode = node;
+            }
+            return node;
         }
         
         @Override
@@ -288,8 +312,12 @@ public class FindFilesDialog {
                     return;
                 }
                 
-                ClickableTreeItem match = (ClickableTreeItem) node.getUserObject();
-                match.open();
+                // Directories are currently represented by String objects.
+                Object userObject = node.getUserObject();
+                if (userObject instanceof ClickableTreeItem) {
+                    ClickableTreeItem match = (ClickableTreeItem) node.getUserObject();
+                    match.open();
+                }
             }
         });
     }
@@ -361,7 +389,7 @@ public class FindFilesDialog {
     }
     
     public void showDialog() {
-        if (workspace.isFileListUnsuitableFor("Find Files")) {
+        if (workspace.isFileListUnsuitableFor("Find in Files")) {
             return;
         }
         
