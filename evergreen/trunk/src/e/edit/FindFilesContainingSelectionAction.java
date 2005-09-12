@@ -16,6 +16,13 @@ public class FindFilesContainingSelectionAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
+        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
+        // FindFilesDialog.showDialog will make this check, but not before
+        // guessDirectoryToSearchIn has already failed.
+        if (workspace.isFileListUnsuitableFor("Find in Files")) {
+            return;
+        }
+        
         String selection = getSelectedText();
         
         // Remove trailing newlines.
@@ -27,7 +34,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
             pattern = StringUtilities.regularExpressionFromLiteral(selection);
         }
         String directory = guessDirectoryToSearchIn();
-        Edit.getInstance().getCurrentWorkspace().showFindFilesDialog(pattern, directory);
+        workspace.showFindFilesDialog(pattern, directory);
     }
     
     public String guessDirectoryToSearchIn() {
