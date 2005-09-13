@@ -204,7 +204,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
      * I'll worry about them when I have reason to.
      */
     private final boolean isWordCharacter(char c) {
-        return Character.isLetterOrDigit(c) || c == '\'';
+        return Character.isLetter(c) || c == '\'';
     }
     
     private void checkSpelling(PTextBuffer buffer, int fromIndex, int toIndex) {
@@ -219,21 +219,10 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         // Breaks the given range up into words, where a changeOfCase or the presence_of_underscores constitutes a word boundary.
         int start = fromIndex;
         int rememberedCase = UNKNOWN_CASE;
-        int lineStart = start;
         while (start < toIndex) {
             // Skip un-checkable junk.
-            int spaceStart = start;
-            while (start < toIndex && Character.isLetterOrDigit(buffer.charAt(start)) == false) {
-                char ch = buffer.charAt(start);
-                if (ch == '\n') {
-                    if (spaceStart != start && spaceStart != lineStart) {
-                        component.addHighlight(new UnderlineHighlight(component, spaceStart, start));
-                    }
-                    spaceStart = lineStart = start + 1;
-                } else if (Character.isWhitespace(ch) == false) {
-                    spaceStart = start + 1;
-                }
-                start++;
+            while (start < toIndex && Character.isLetter(buffer.charAt(start)) == false) {
+              start++;
             }
             
             // Extract a word.
@@ -281,8 +270,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             
             //System.err.println(">>" + word + " " + wordLength);
             checkCount++;
-            boolean isNumber = word.matches("(?:0x[0-9A-Fa-f]+|[1-9][0-9]*)U?L?L?");
-            if (isException(word) == false && isNumber == false && spellingChecker.isMisspelledWord(word)) {
+            if (isException(word) == false && spellingChecker.isMisspelledWord(word)) {
                 misspellingCount++;
                 //System.err.println("Misspelled word '" + word + "'");
                 component.addHighlight(new UnderlineHighlight(component, start, finish));
