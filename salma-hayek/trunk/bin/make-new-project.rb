@@ -1,7 +1,7 @@
 #!/bin/bash
 # usage: make-new-project.rb <name>
 
-svn_host=enh@jessies.org
+svn_host=software@jessies.org
 projects_dir=~/Projects
 
 name=$1
@@ -39,8 +39,11 @@ svn import $name svn+ssh://$svn_host/home/software/svnroot/$name -m 'New project
 echo "Checking back out..."
 svn co svn+ssh://$svn_host/home/software/svnroot/$name $projects_dir/$name
 echo "Telling Subversion to ignore generated files..."
-svn propset svn:ignore 'classes
-generated' .
+svn propset svn:ignore "ChangeLog
+ChangeLog.html
+classes
+generated
+$name.jar" .
 echo "Getting Subversion to commit that change..."
 svn update
 echo "Prompting you to manually commit that change..."
