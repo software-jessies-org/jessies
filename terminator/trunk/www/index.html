@@ -128,11 +128,13 @@ want to rerun the JRE installer and choose a Custom installation so that you get
 LucidaTypewriterRegular.ttf installed, otherwise you'll end up with Courier and being
 unable to distinguish l and 1.
 
-<p>To build Terminator, you'll need g++ and a very recent make.  Debian's make-3.80-11 is
+<p>To build Terminator, you'll need g++ and a very recent make.  Debian's make-3.80-9 is
 fine.  The make which comes with Mac OS X 10.4.2 isn't.  The make which comes with Cygwin
 1.5.18-1 isn't.
 Debian's make source (apt-get source make) compiles and works fine on Mac OS X and Cygwin.
 <a href="ftp://alpha.gnu.org/gnu/make/make-3.81beta3.tar.gz">make-3.81beta3</a> is also good.
+We have binaries for <a href="../3rdParty/make-3.80-9/Darwin/make">Mac OS X</a>
+and <a href="../3rdParty/make-3.80-9/CYGWIN_NT-5.0/make.exe">Cygwin</a>.
 
 <p>We don't yet include anything other than Linux binaries in the distribution.  You'll need to
 point $JAVA_HOME at the root of your JDK.
