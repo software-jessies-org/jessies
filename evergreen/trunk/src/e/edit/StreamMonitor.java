@@ -32,8 +32,7 @@ public class StreamMonitor extends SwingWorker<Object, String> {
     @Override
     protected void process(String... lines) {
         for (String line : lines) {
-            String context = task.getContext();
-            task.getWorkspace().reportError(context, line);
+            task.getWorkspace().reportError(line);
         }
     }
 }

@@ -628,8 +628,8 @@ public class ETextWindow extends EWindow implements PTextListener {
         return FileUtilities.getUserFriendlyName(file.getParent());
     }
     
-    public void reportError(String error) {
-        getWorkspace().reportError(getContext(), error);
+    public void reportError(final String error) {
+        getWorkspace().reportError(error);
     }
     
     private boolean isOutOfDateWithRespectToDisk() {
