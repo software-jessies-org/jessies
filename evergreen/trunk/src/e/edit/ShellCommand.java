@@ -90,17 +90,23 @@ public class ShellCommand {
     public synchronized void streamClosed() {
         openStreamCount--;
         if (openStreamCount == 0) {
+            int exitStatus = 0;
             try {
-                int exitStatus = process.waitFor();
-                if (exitStatus != 0) {
-                    workspace.reportError(context, "Task '" + command + "' failed with exit status " + exitStatus);
-                }
+                exitStatus = process.waitFor();
             } catch (InterruptedException ex) {
                 /* Ignore what we don't understand. */
                 ex = ex;
             }
-            workspace.getErrorsWindow().drawHorizontalRule();
-            Edit.getInstance().showStatus("Task '" + command + "' finished");
+            final int finalExitStatus = exitStatus;
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    if (finalExitStatus != 0) {
+                        workspace.reportError("Task '" + command + "' failed with exit status " + finalExitStatus);
+                    }
+                    workspace.getErrorsWindow().drawHorizontalRule();
+                    Edit.getInstance().showStatus("Task '" + command + "' finished");
+                }
+            });
             EventQueue.invokeLater(completionRunnable);
         }
     }

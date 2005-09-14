@@ -310,7 +310,7 @@ public class Workspace extends JPanel {
         return viewer;
     }
     
-    public synchronized void reportError(String context, final String error) {
+    public synchronized void reportError(final String error) {
         errors.append(error);
     }
     
