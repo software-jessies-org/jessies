@@ -62,7 +62,10 @@ public class FormDialog {
         if (GuiUtilities.isWindows()) {
             return 4;
         }
-        return 10;
+        if (GuiUtilities.isMacOs()) {
+            return 10;
+        }
+        return 6;
     }
     
     /**
