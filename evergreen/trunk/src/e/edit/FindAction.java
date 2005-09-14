@@ -24,11 +24,15 @@ public class FindAction extends ETextAction implements MinibufferUser {
     }
     
     public void actionPerformed(ActionEvent e) {
-        currentTextWindow = getFocusedTextWindow();
-        if (currentTextWindow == null) {
+        ETextWindow newCurrentTextWindow = getFocusedTextWindow();
+        if (newCurrentTextWindow == null) {
             return;
         }
         
+        // Only now can we set currentTextWindow; otherwise "Find" while the
+        // find mini-buffer is already up fails, and causes "Find Next" and
+        // "Find Previous" to also fail.
+        currentTextWindow = newCurrentTextWindow;
         Edit.getInstance().showMinibuffer(this);
     }
     
