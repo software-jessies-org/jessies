@@ -484,3 +484,10 @@ endef
 
 DUMMY := $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR)))$(closeLocalVariableScope))
 BASE_NAME = (rules)
+
+# Needs to be after we've included per-directory.make.
+ALL_NATIVE_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGET.$(notdir $(SUBDIR))))
+
+.PHONY: native
+# Needs to be after ALL_NATIVE_TARGETS is defined.
+native: $(ALL_NATIVE_TARGETS)
