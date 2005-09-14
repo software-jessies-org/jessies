@@ -2,8 +2,9 @@ package e.edit;
 
 import e.util.*;
 import java.io.*;
+import org.jdesktop.swingworker.SwingWorker;
 
-public class StreamMonitor implements Runnable {
+public class StreamMonitor extends SwingWorker<Object, String> {
     private BufferedReader stream;
     private ShellCommand task;
     
@@ -12,18 +13,27 @@ public class StreamMonitor implements Runnable {
         this.task = task;
     }
     
-    public void run() {
+    @Override
+    protected Object doInBackground() {
         task.streamOpened();
         try {
-            String context = task.getContext();
             String line;
             while ((line = stream.readLine()) != null) {
-                task.getWorkspace().reportError(context, line);
+                publish(line);
             }
         } catch (IOException ex) {
             Log.warn("Unexpected stream closure", ex);
         } finally {
             task.streamClosed();
+        }
+        return null;
+    }
+    
+    @Override
+    protected void process(String... lines) {
+        for (String line : lines) {
+            String context = task.getContext();
+            task.getWorkspace().reportError(context, line);
         }
     }
 }

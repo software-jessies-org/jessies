@@ -72,7 +72,7 @@ public class ShellCommand {
     public void startMonitoringStream(InputStream stream) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(stream, "UTF-8");
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        new Thread(new StreamMonitor(bufferedReader, this)).start();
+        (new StreamMonitor(bufferedReader, this)).execute();
     }
     
     /**
