@@ -291,10 +291,23 @@ public class FormDialog {
         }
         Rectangle previousBounds = dialogGeometries.get(dialog.getTitle());
         if (previousBounds != null) {
-            dialog.setLocation(previousBounds.getLocation());
+            Point newLocation = previousBounds.getLocation();
             Dimension newSize = previousBounds.getSize();
+            
+            // Don't shrink the dialog below its "pack" size.
             newSize.height = Math.max(newSize.height, dialog.getHeight());
             newSize.width = Math.max(newSize.width, dialog.getWidth());
+            
+            // Constrain the dialog to fit on the display.
+            Rectangle displayBounds = dialog.getGraphicsConfiguration().getBounds();
+            if (newLocation.x + newSize.width > displayBounds.width) {
+                newSize.width = displayBounds.width - newLocation.x;
+            }
+            if (newLocation.y + newSize.height > displayBounds.height) {
+                newSize.height = displayBounds.height - newLocation.y;
+            }
+            
+            dialog.setLocation(newLocation);
             dialog.setSize(newSize);
         }
     }
