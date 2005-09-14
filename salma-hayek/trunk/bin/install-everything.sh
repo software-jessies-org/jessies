@@ -46,7 +46,7 @@ then
 fi
 for PROJECT in $PROJECTS; do
     rm -f $PROJECT.tgz
-    wget $WGET_OPTIONS -N http://www.jessies.org/~enh/software/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
+    wget $WGET_OPTIONS -N http://www.jessies.org/~software/downloads/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
     make -C $PROJECT clean
