@@ -3,6 +3,7 @@
 #   make clean
 #   make dist
 #   make native
+#   make native-dist
 
 # You can set:
 #   JAVA_COMPILER to "gcjx", "javac", or a binary of your choice.
@@ -221,7 +222,9 @@ DIST_SCP_DIRECTORY="~/downloads/$(PROJECT_NAME)/builds"
 $(takeProfileSample)
 SOURCE_FILES := $(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
 $(takeProfileSample)
-DIST_FILE_OF_THE_DAY := $(shell date +$(PROJECT_NAME)-%Y-%m-%d.tar.gz)
+DATE := $(shell date +%Y-%m-%d)
+DIST_FILE_OF_THE_DAY = $(PROJECT_NAME)-$(DATE).tar.gz
+NATIVE_DIST_FILE_OF_THE_DAY = $(PROJECT_NAME)-$(TARGET_OS)-$(DATE).tar.gz
 
 REVISION_CONTROL_SYSTEM += $(if $(wildcard .svn),svn)
 REVISION_CONTROL_SYSTEM += $(if $(wildcard CVS),cvs)
@@ -424,6 +427,12 @@ dist: ../$(DIST_FILE_OF_THE_DAY) ChangeLog.html
 	scp ../$(DIST_FILE_OF_THE_DAY) $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
 	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME).tgz
 
+.PHONY: native-dist
+native-dist: ../$(NATIVE_DIST_FILE_OF_THE_DAY)
+	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
+	scp ../$(NATIVE_DIST_FILE_OF_THE_DAY) $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
+	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(NATIVE_DIST_FILE_OF_THE_DAY) $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME)-$(TARGET_OS).tgz
+
 $(PROJECT_NAME).jar: build
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
@@ -488,3 +497,7 @@ ALL_NATIVE_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGET.$(notdir $(SUB
 .PHONY: native
 # Needs to be after ALL_NATIVE_TARGETS is defined.
 native: $(ALL_NATIVE_TARGETS)
+
+../$(NATIVE_DIST_FILE_OF_THE_DAY): $(ALL_NATIVE_TARGETS)
+	cd .. && \
+	tar -zcf $(NATIVE_DIST_FILE_OF_THE_DAY) $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_NAME)/%,$(ALL_NATIVE_TARGETS))

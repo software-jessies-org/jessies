@@ -45,7 +45,7 @@ HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(HEADE
 # Locate the executable.
 # ----------------------------------------------------------------------------
 
-EXECUTABLE = $(GENERATED_DIRECTORY)/$(BASE_NAME)
+EXECUTABLE = $(GENERATED_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
 
 # ----------------------------------------------------------------------------
 # Locate the JNI library and its intermediate files.
