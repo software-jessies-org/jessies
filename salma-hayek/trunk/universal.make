@@ -2,7 +2,7 @@
 #   make
 #   make clean
 #   make dist
-#   make bindist
+#   make native
 
 # You can set:
 #   JAVA_COMPILER to "gcjx", "javac", or a binary of your choice.
@@ -61,6 +61,10 @@ makepath = $(call convertCygwinToWin32Path,$(subst $(SPACE),$(PATH_SEPARATOR),$(
 getAbsolutePath = $(patsubst @%,$(CURDIR)/%,$(patsubst @/%,/%,$(patsubst %,@%,$(1))))
 
 SPACE = $(subst :, ,:)
+
+# A really poor man's profiler
+#takeProfileSample = $(eval $(shell date --iso=s 1>&2))
+takeProfileSample =
 
 # ----------------------------------------------------------------------------
 # Locate salma-hayek.
@@ -214,7 +218,9 @@ DIST_SCP_USER_AND_HOST=software@jessies.org
 # The html files are copied into the parent directory.
 DIST_SCP_DIRECTORY="~/downloads/$(PROJECT_NAME)/builds"
 
-SOURCE_FILES=$(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
+$(takeProfileSample)
+SOURCE_FILES := $(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
+$(takeProfileSample)
 DIST_FILE_OF_THE_DAY := $(shell date +$(PROJECT_NAME)-%Y-%m-%d.tar.gz)
 
 REVISION_CONTROL_SYSTEM += $(if $(wildcard .svn),svn)
@@ -238,17 +244,8 @@ GENERATED_FILES += ChangeLog.html
 GENERATED_FILES += classes
 GENERATED_FILES += generated
 GENERATED_FILES += $(PROJECT_NAME).jar
-GENERATED_FILES += $(PROJECT_NAME)-bindist.tgz
 
 grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
-
-BINDIST_FILES += $(PROJECT_NAME).jar
-BINDIST_FILES += COPYING
-BINDIST_FILES += README
-BINDIST_FILES += $(foreach BASE_NAME,$(notdir $(SUBDIRS)),$(patsubst $(CURDIR)/%,%,$(DEFAULT_TARGET.$(BASE_NAME))))
-BINDIST_DIRS += bin
-BINDIST_DIRS += $(wildcard doc)
-BINDIST_FILES += $(shell find $(BINDIST_DIRS) -type f | perl -ne 'm@(^|/)(CVS|\.svn)($|/)@ || print')
 
 define GENERATE_FILE_LIST.unknown
 endef
@@ -262,15 +259,20 @@ define GENERATE_FILE_LIST.svn
   svn status -v | cut -c6- | perl -pe 's/ +/ /g' | cut -f5 -d' '
 endef
 
-REVISION_CONTROLLED_FILES_AND_DIRECTORIES := $(shell $(GENERATE_FILE_LIST.$(REVISION_CONTROL_SYSTEM)))
+REVISION_CONTROLLED_FILES_AND_DIRECTORIES = $(shell $(GENERATE_FILE_LIST.$(REVISION_CONTROL_SYSTEM)))
 # You might think this is cunning (I did) but svn cares about directory properties
 # and (perhaps because of that) controls even empty directories like native/Darwin/NSSpell/src.
 #POSSIBLY_REVISION_CONTROLLED_DIRECTORIES = $(sort $(patsubst %/,%,$(dir $(REVISION_CONTROLLED_FILES_AND_DIRECTORIES))))
-POSSIBLY_REVISION_CONTROLLED_DIRECTORIES := $(patsubst ./%,%,$(shell find . -type d))
+POSSIBLY_REVISION_CONTROLLED_DIRECTORIES = $(patsubst ./%,%,$(shell find . -type d))
 FILE_LIST += $(filter-out $(POSSIBLY_REVISION_CONTROLLED_DIRECTORIES),$(REVISION_CONTROLLED_FILES_AND_DIRECTORIES))
 FILE_LIST += classes
 FILE_LIST += generated
 FILE_LIST += ChangeLog # The ChangeLog should never be checked in, but should be in distributions.
+
+# make evaluates prerequisites of rules which aren't executed.
+# This hack saves >20s out of 30s to the hot-cache, already-built "make native"
+# in terminator on Cygwin via Samba.
+FILE_LIST_DEPENDENCIES := $(if $(filter dist,$(MAKECMDGOALS)),$(FILE_LIST))
 
 # ----------------------------------------------------------------------------
 # Choose a Java compiler.
@@ -394,7 +396,7 @@ build: build.java
 build.java: $(SOURCE_FILES)
 	$(BUILD_JAVA)
 
-# We don't usually build individual classes but rule for generating the JNI
+# We don't usually build individual classes but the rule for generating the JNI
 # header correctly specifies a dependency on a .class file which may be
 # absent.
 # If we were to make this class file depend on PHONY build.java, it would
@@ -426,14 +428,7 @@ $(PROJECT_NAME).jar: build
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
-.PHONY: bindist
-bindist: $(PROJECT_NAME)-bindist.tgz
-
-$(PROJECT_NAME)-bindist.tgz: build $(BINDIST_FILES)
-	cd .. && \
-	tar -zcf $(addprefix $(PROJECT_NAME)/,$@ $(BINDIST_FILES))
-
-../$(DIST_FILE_OF_THE_DAY): build $(FILE_LIST)
+../$(DIST_FILE_OF_THE_DAY): build $(FILE_LIST_DEPENDENCIES)
 	cd .. && \
 	tar -zcf $(DIST_FILE_OF_THE_DAY) $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
 
@@ -482,8 +477,10 @@ define buildNativeDirectory
   include $(SALMA_HAYEK)/per-directory.make
 endef
 
+$(takeProfileSample)
 DUMMY := $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR)))$(closeLocalVariableScope))
 BASE_NAME = (rules)
+$(takeProfileSample)
 
 # Needs to be after we've included per-directory.make.
 ALL_NATIVE_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGET.$(notdir $(SUBDIR))))
