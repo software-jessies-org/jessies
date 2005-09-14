@@ -63,7 +63,13 @@ getAbsolutePath = $(patsubst @%,$(CURDIR)/%,$(patsubst @/%,/%,$(patsubst %,@%,$(
 
 SPACE = $(subst :, ,:)
 
-# A really poor man's profiler
+# I sprinkled the code with calls to dump the wall-clock time and counted the
+# lines of output to work out between which calls the time was disappearing.
+# I moved the calls around to isolate the particularly expensive lines.
+# When I'd isolated things which I couldn't easily improve,
+# I left one copy either side of each line - so you can get some idea of the time
+# taken by the line.
+# Yes, it's crude but, when faced with a build time of ~30s, it was adequate.
 #takeProfileSample = $(eval $(shell date --iso=s 1>&2))
 takeProfileSample =
 
