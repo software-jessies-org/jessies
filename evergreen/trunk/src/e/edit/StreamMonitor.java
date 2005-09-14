@@ -4,6 +4,11 @@ import e.util.*;
 import java.io.*;
 import org.jdesktop.swingworker.SwingWorker;
 
+/**
+ * Forwards lines of output from the given BufferedReader to the ShellCommand's
+ * Workspace's errors window. Also informs the ShellCommand when the stream
+ * closes.
+ */
 public class StreamMonitor extends SwingWorker<Object, String> {
     private BufferedReader stream;
     private ShellCommand task;
