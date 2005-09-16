@@ -165,11 +165,6 @@ LDFLAGS.Linux += -pthread
 # launcher needs this on Linux
 LDFLAGS.Linux += -ldl
 
-# So that launcher doesn't open a window for its console output.
-# Its console output still comes out in the window it's run from,
-# if it's run from a shell.
-LDFLAGS.CYGWIN_NT-5.0 += -Wl,--subsystem,windows
-
 LDFLAGS += $(LDFLAGS.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
@@ -498,7 +493,7 @@ BASE_NAME = (rules)
 $(takeProfileSample)
 
 # Needs to be after we've included per-directory.make.
-ALL_NATIVE_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGET.$(notdir $(SUBDIR))))
+ALL_NATIVE_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
 
 .PHONY: native
 # Needs to be after ALL_NATIVE_TARGETS is defined.

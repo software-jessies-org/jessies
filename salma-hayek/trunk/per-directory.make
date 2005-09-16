@@ -13,6 +13,8 @@
 
 LOCAL_LDFLAGS := $(LDFLAGS)
 MISSING_PREREQUISITES :=
+EXECUTABLES :=
+EXECUTABLES.CYGWIN_NT-5.0 :=
 
 # ----------------------------------------------------------------------------
 # Choose the basename(1) for the target
@@ -42,10 +44,14 @@ SOURCE_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(SOURC
 HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(HEADERS))
 
 # ----------------------------------------------------------------------------
-# Locate the executable.
+# Locate the executables.
 # ----------------------------------------------------------------------------
 
-EXECUTABLE = $(GENERATED_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
+EXECUTABLES += $(GENERATED_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
+
+EXECUTABLES.CYGWIN_NT-5.0 += $(GENERATED_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
+
+EXECUTABLES += $(EXECUTABLES.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
 # Locate the JNI library and its intermediate files.
@@ -96,8 +102,8 @@ MISSING_PREREQUISITES += $(MISSING_PRIVATE_FRAMEWORKS)
 # ----------------------------------------------------------------------------
 
 BUILDING_JNI_LIBRARY = $(JNI_SOURCE)
-DESIRED_TARGET = $(if $(BUILDING_JNI_LIBRARY),$(JNI_LIBRARY),$(EXECUTABLE))
-DEFAULT_TARGET = $(if $(strip $(MISSING_PREREQUISITES)),missing-prerequisites.$(BASE_NAME),$(DESIRED_TARGET))
+DESIRED_TARGETS = $(if $(BUILDING_JNI_LIBRARY),$(JNI_LIBRARY),$(EXECUTABLES))
+DEFAULT_TARGETS = $(if $(strip $(MISSING_PREREQUISITES)),missing-prerequisites.$(BASE_NAME),$(DESIRED_TARGETS))
 
 define MISSING_PREREQUISITES_RULE
   @echo "*** Can't build $(BASE_NAME) because of missing prerequisites:" && \
@@ -112,7 +118,8 @@ endef
 # after other assignments.
 # ----------------------------------------------------------------------------
 
-$(EXECUTABLE): LDFLAGS := $(LOCAL_LDFLAGS)
+$(EXECUTABLES.CYGWIN_NT-5.0): LOCAL_LDFLAGS += -Wl,--subsystem,windows
+$(EXECUTABLES): LDFLAGS := $(LOCAL_LDFLAGS)
 $(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
 $(GENERATED_JNI_HEADER): RULE := $(JAVAHPP_RULE)
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
@@ -123,24 +130,17 @@ missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 # ----------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------
-# Select the default target.
+# Select the default targets.
 # ----------------------------------------------------------------------------
 
 .PHONY: build
-build: $(DEFAULT_TARGET)
+build: $(DEFAULT_TARGETS)
 
 # ----------------------------------------------------------------------------
-# Our executable target.
+# Our linked targets.
 # ----------------------------------------------------------------------------
 
-$(EXECUTABLE): $(OBJECTS)
-
-# ----------------------------------------------------------------------------
-# Our JNI library target.
-# ----------------------------------------------------------------------------
-
-# There is no default rule for shared library building on my system.
-$(JNI_LIBRARY): $(OBJECTS)
+$(EXECUTABLES) $(JNI_LIBRARY): $(OBJECTS)
 	$(LD) $^ -o $@ $(LDFLAGS)
 
 # ----------------------------------------------------------------------------
