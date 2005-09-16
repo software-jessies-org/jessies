@@ -1,5 +1,7 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title>Terminator - a virtual terminal emulator</title>
 <style type="text/css">
  body {
@@ -45,7 +47,7 @@ output in a great stream of output, this is a really great way to make it blindi
 when it appears.
 <p>A screenshot of Terminator on Mac OS X, after running 'man bash', and doing a find for
 '(?i)shell':
-<p align="center" ><img src="mac-os-man-bash-find.png">
+<p align="center" ><img src="mac-os-man-bash-find.png" alt="mac-os-man-bash-find.png">
 <p>Despite the evidence that a pager is running, this is Terminator doing the
 highlighting&nbsp;&mdash; one of the authors uses <tt>cat(1)</tt> as his pager.
 
@@ -70,7 +72,7 @@ or <tt>svn update</tt> output, for example, becomes clickable.
 <p>Terminator can also jump to the next/previous link, which is great for quickly scanning
 voluminous build output.
 <p>A screenshot of Terminator automatically providing links to <tt>grep(1)</tt> matches:
-<p align="center"><img src="mac-os-grep.png">
+<p align="center"><img src="mac-os-grep.png" alt="mac-os-grep.png">
 <p>This works by reading your current directory from the window title, so
 you'll need something like this in your <tt>bash(1)</tt> start-up scripts:
 <pre>
@@ -96,12 +98,12 @@ a section of text from your terminal into a text editor.  Terminator handles tab
 remembering where the tabs are and copy/pasting them as tab characters.
 
 <li><p><strong>UTF-8</strong> - Terminator won't mangle your favorite accented characters, and it copes well with languages such as Greek where there's a mix of normal and wide glyphs:
-<p align="center"><img src="mac-os-greek.png">
+<p align="center"><img src="mac-os-greek.png" alt="mac-os-greek.png">
 <p>The text is Markus Kuhn's <a href="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-demo.txt">UTF-8-demo.txt</a> if you want to see what a mess Terminal.app makes of it. (Terminal.app beats us on Thai, but we're better at Cyrillic, Greek, and Japanese.) The non-default settings in the screenshot were achieved thus:
 <blockquote><tt>terminator -xrm fontName:Monaco -xrm fontSize:13 -xrm antiAlias:true -xrm foreground:black -xrm background:white -xrm selectionColor:\#b4d5fe</tt></blockquote>
 <p>One side-effect of proper support for variable-width glyphs is that you're not restricted to fixed-width fonts in Terminator, even if the only language you're using is English. GNU readline might get confused about the line length, though.
 <p>Here's a more convincingly terminal-like example of fixed-width English and variable-width Japanese; output from javac(1):
-<p align="center"><img src="javac-jp-monaco.png">
+<p align="center"><img src="javac-jp-monaco.png" alt="javac-jp-monaco.png">
 </ul>
 
 <p>We think Terminator is the clear choice for the discerning terminal user. Though originally written
@@ -120,7 +122,7 @@ and <a href="terminator-Darwin.tgz">Mac OS X</a>.
 
 <p>On Cygwin, you'll also need launcher.exe from salma-hayek,
 which you can build yourself or find in the
-<a href="../salma-hayek/salma-hayek-CYGWIN_NT-5.0.tgz">salma-hayek Cygwin binary distribution<a>.
+<a href="../salma-hayek/salma-hayek-CYGWIN_NT-5.0.tgz">salma-hayek Cygwin binary distribution</a>.
 
 <p>The <a href="ChangeLog.html">ChangeLog</a> is available separately.
 
