@@ -126,7 +126,7 @@ which you can build yourself or find in the
 
 <p>Terminator is written almost entirely in Java with a small bit of JNI
 which runs a process connected to a pseudo-terminal. You will need
-Java 1.5.
+Java 1.5.  You'll need to point $JAVA_HOME at the root of your JDK.
 
 <p>On Windows, you will need Cygwin.  The current version at the time of porting
 was 1.5.18-1.  The startup script requires Ruby, which isn't part of Cygwin's default
@@ -137,6 +137,12 @@ want to rerun the JRE installer and choose a Custom installation so that you get
 LucidaTypewriterRegular.ttf installed, otherwise you'll end up with Courier and being
 unable to distinguish l and 1.
 
+<p>(NT's built-in POSIX subsystem won't let you launch Win32 applications or
+interact with the network, so that wasn't an option.
+Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which
+we use to support window resizing, not to mention containing a port of one of
+the most widely used ssh programs.)
+
 <p>To build Terminator, you'll need g++ and a very recent make.  Debian's make-3.80-9 is
 fine.  The make which comes with Mac OS X 10.4.2 isn't.  The make which comes with Cygwin
 1.5.18-1 isn't.
@@ -145,18 +151,10 @@ Debian's make source (apt-get source make) compiles and works fine on Mac OS X a
 We have binaries for <a href="../3rdParty/make-3.80-9/Darwin/make">Mac OS X</a>
 and <a href="../3rdParty/make-3.80-9/CYGWIN_NT-5.0/make.exe">Cygwin</a>.
 
-<p>You'll need to point $JAVA_HOME at the root of your JDK.
-
-<p>(NT's built-in POSIX subsystem won't let you launch Win32 applications or
-interact with the network, so that wasn't an option.
-Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which
-we use to support window resizing, not to mention containing a port of one of
-the most widely used ssh programs.)
+<h2>Running</h2>
 
 <p>Terminator will run fine on Mac OS X, KDE, GNOME, or even an old-style X11
 window manager like lwm. Now you can use the same terminal emulator everywhere!
-
-<h2>Running</h2>
 
 <p>We have made some effort to ensure that Terminator is easy to run.
 The native code will automatically be compiled the first time you run
