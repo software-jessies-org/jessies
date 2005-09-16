@@ -153,7 +153,7 @@ and <a href="../3rdParty/make-3.80-9/CYGWIN_NT-5.0/make.exe">Cygwin</a>.
 
 <h2>Running</h2>
 
-<p>Terminator will run fine on Mac OS X, KDE, GNOME, or even an old-style X11
+<p>Terminator will run fine on Mac OS X, Windows, KDE, GNOME, or even an old-style X11
 window manager like lwm. Now you can use the same terminal emulator everywhere!
 
 <p>We have made some effort to ensure that Terminator is easy to run.
@@ -233,6 +233,30 @@ defaults similar to SGI's <tt>xwsh(1)</tt>.
 <p>Terminator uses the same names for fonts as Java. (This is why we use
 different resources to specify a font, and won't even try to translate X11
 logical font descriptions.)
+
+<h3>Running on Windows</h3>
+
+<p>We don't yet have any nicely packaged double-click installer.
+Sorry, you'll need to create your own Shortcut on the Desktop.
+This is the command I use in the Shortcut:
+
+<pre>
+C:\cygwin\bin\rubyw.exe /cygdrive/f/software.jessies.org/terminator/bin/terminator
+</pre>
+
+<p>Note the use of a Cygwin-style path rather than F:\software.jessies.org\terminator\bin\terminator.
+
+<p>If you're having trouble starting terminator, you may want to try running it from bash
+instead of from the icon until you work out what's wrong.
+That's because rubyw.exe is a version of Ruby linked with the -subsystem windows instead of
+-subsystem console.
+This subsystem throws away the standard I/O streams but it does mean that you don't get
+a spurious window.
+Any console output from the Java, as opposed to the start-up script, is recorded in a file in
+$HOME/.terminal-logs/ along with a file containing a log of each tab's output.
+
+<p>You can get a new terminal window very quickly, running in the same virtual machine, with Alt-N.
+That's much quicker than what happens when you double-click on the icon.
 
 <h2>Authors</h2>
 
