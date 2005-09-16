@@ -87,6 +87,9 @@ launcher="java"
 if UNAME == "CYGWIN_NT-5.0"
   heap_size="100m"
   launcher="#{salma_hayek}/generated/native/all/launcher/#{UNAME}/launcher"
+  if ENV["DEBUGGING_TERMINATOR"] == nil
+    launcher="#{launcher}w"
+  end
 end
 
 os_specific_options = []
