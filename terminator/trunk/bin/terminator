@@ -22,7 +22,7 @@ ENV["TERMINATOR_HOME"] = terminator_home
 class_name = "terminator/Terminator"
 HOME = ENV["HOME"]
 
-UNAME=`uname`.chomp()
+TARGET_OS=`#{salma_hayek}/bin/target-os.rb`.chomp()
 
 # Make sure we have a directory for the terminal logs.
 log_directory="#{HOME}/.terminal-logs"
@@ -57,7 +57,7 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
 end
 
 def cygpath(filenameOrPath)
-  if UNAME != "CYGWIN_NT-5.0"
+  if TARGET_OS != "Cygwin"
     return filenameOrPath
   end
   args = [ "cygpath", "--windows" ]
@@ -71,12 +71,12 @@ end
 classpath="#{terminator_home}/classes:#{salma_hayek}/classes:#{terminator_home}/terminator.jar"
 
 
-pty_path="#{terminator_home}/generated/native/all/pty/#{UNAME}"
+pty_path="#{terminator_home}/generated/native/all/pty/#{TARGET_OS}"
 jni_lib_prefix="lib"
 jni_lib_extension="so"
-if UNAME == "Darwin"
+if TARGET_OS == "Darwin"
   jni_lib_extension="jnilib"
-elsif UNAME == "CYGWIN_NT-5.0"
+elsif TARGET_OS == "Cygwin"
   jni_lib_prefix=""
   jni_lib_extension="dll"
 end
@@ -84,9 +84,9 @@ pty_library="#{pty_path}/#{jni_lib_prefix}pty.#{jni_lib_extension}"
 
 heap_size="1g"
 launcher="java"
-if UNAME == "CYGWIN_NT-5.0"
+if TARGET_OS == "Cygwin"
   heap_size="100m"
-  launcher="#{salma_hayek}/generated/native/all/launcher/#{UNAME}/launcher"
+  launcher="#{salma_hayek}/generated/native/all/launcher/#{TARGET_OS}/launcher"
   if ENV["DEBUGGING_TERMINATOR"] == nil
     launcher="#{launcher}w"
   end
@@ -104,7 +104,7 @@ ENV["TERMINFO"]=terminfo
 tic_binary=`bash -c "type -p tic"`.chomp()
 terminfo_SRC="#{terminator_home}/doc/terminfo/terminator.tic"
 terminfo_DST="#{terminfo}/t/terminator"
-if UNAME == "Darwin"
+if TARGET_OS == "Darwin"
   # Make ourselves look a little better...
   os_specific_options = [ "-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns" ]
 end
@@ -112,7 +112,7 @@ if test(?e, terminfo_DST) == false
   system("mkdir -p #{terminfo_DST} && rmdir #{terminfo_DST}")
 end
 
-if UNAME == "Linux"
+if TARGET_OS == "Linux"
   # Use locate(1) to find the gnome-terminal icon.
   # Cache the result, because this is the single most expensive part of
   # the script.
