@@ -32,6 +32,11 @@ if test -d $JAVA_INSTALL_DIR ; then
     done
 fi
 
+if test -f /etc/debian_version ; then
+    apt-get update
+    apt-get -y install exuberant-ctags ri
+fi
+
 # Create a directory in /usr/local for all our stuff.
 mkdir -p /usr/local/www.jessies.org/ && \
 cd /usr/local/www.jessies.org/ || die "making install directory"
@@ -71,8 +76,6 @@ do
 done
 
 if test -f /etc/debian_version ; then
-    apt-get update
-    apt-get -y install exuberant-ctags ri
     update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/local/bin/terminator 50
     update-alternatives --auto x-terminal-emulator
 fi
