@@ -8,10 +8,10 @@ edit_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
 salma_hayek = Pathname.new("#{edit_home}/../salma-hayek").realpath()
 
 HOME = ENV["HOME"]
-UNAME=`uname`.chomp()
+TARGET_OS=`#{salma_hayek}/bin/target-os.rb`.chomp()
 
 ENV["EDIT_HOME"] = edit_home
-ENV["PATH"] = "#{ENV["PATH"]}:#{salma_hayek}/generated/native/all/setsid/#{UNAME}:#{salma_hayek}/generated/native/#{UNAME}/BringProcessToFront/#{UNAME}"
+ENV["PATH"] = "#{ENV["PATH"]}:#{salma_hayek}/generated/native/all/setsid/#{TARGET_OS}:#{salma_hayek}/generated/native/#{TARGET_OS}/BringProcessToFront/#{TARGET_OS}"
 
 edit_class_name = "e.edit.Edit"
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
@@ -51,7 +51,7 @@ if ARGV[0] =~ /^\+(\d+)$/
 end
 
 os_specific_options = []
-case UNAME
+case TARGET_OS
 when /Darwin/
     # Darwin is what Mac OS X calls itself.
     edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
@@ -80,7 +80,7 @@ log_filename = "/tmp/edit.log.#$$"
 FileUtils.ln_sf(log_filename, "/tmp/edit.log")
 
 def cygpath(filenameOrPath)
-  if UNAME != "CYGWIN_NT-5.0"
+  if TARGET_OS != "Cygwin"
     return filenameOrPath
   end
   args = [ "cygpath", "--windows" ]
