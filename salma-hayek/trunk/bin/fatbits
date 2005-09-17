@@ -5,10 +5,10 @@ require 'pathname.rb'
 
 # Cope with symbolic links to this script.
 salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
-UNAME=`uname`.chomp()
+TARGET_OS=`#{salma_hayek}/bin/target-os.rb`.chomp()
 
 args = [ "java", "-cp", "#{salma_hayek}/classes" ]
-if UNAME == "Darwin"
+if TARGET_OS == "Darwin"
   args << "-Xdock:name=FatBits"
   args << "-Xdock:icon=/Developer/Applications/Graphics Tools/Pixie.app/Contents/Resources/Big.icns"
 end

@@ -49,10 +49,10 @@ endif
 # Define useful stuff not provided by GNU make.
 # ----------------------------------------------------------------------------
 
-EXE_SUFFIX.CYGWIN_NT-5.0 = .exe
+EXE_SUFFIX.Cygwin = .exe
 EXE_SUFFIX = $(EXE_SUFFIX.$(TARGET_OS))
 
-PATH_SEPARATOR.CYGWIN_NT-5.0 = '";"'
+PATH_SEPARATOR.Cygwin = '";"'
 PATH_SEPARATOR = $(if $(PATH_SEPARATOR.$(TARGET_OS)),$(PATH_SEPARATOR.$(TARGET_OS)),:)
 
 convertCygwinToWin32Path = $(shell echo $(1) | perl -pe 's@/cygdrive/([a-z])@$$1:@g')
@@ -112,7 +112,7 @@ HEADER_EXTENSIONS += h
 # Work out what we're going to generate.
 # ----------------------------------------------------------------------------
 
-TARGET_OS := $(shell uname)
+TARGET_OS := $(shell $(SALMA_HAYEK)/bin/target-os.rb)
 
 # ----------------------------------------------------------------------------
 # Sensible C family compiler flags.
@@ -187,10 +187,10 @@ JNI_LIBRARY_LDFLAGS.Linux += -shared
 JNI_LIBRARY_PREFIX.Linux = lib
 JNI_LIBRARY_EXTENSION.Linux = so
 
-EXTRA_INCLUDE_PATH.CYGWIN_NT-5.0 += "$(JAVA_HOME)/include/win32"
-JNI_LIBRARY_LDFLAGS.CYGWIN_NT-5.0 += -shared -Wl,--add-stdcall-alias -Wl,--image-base,0x68000000
-JNI_LIBRARY_PREFIX.CYGWIN_NT-5.0 =
-JNI_LIBRARY_EXTENSION.CYGWIN_NT-5.0 = dll
+EXTRA_INCLUDE_PATH.Cygwin += "$(JAVA_HOME)/include/win32"
+JNI_LIBRARY_LDFLAGS.Cygwin += -shared -Wl,--add-stdcall-alias -Wl,--image-base,0x68000000
+JNI_LIBRARY_PREFIX.Cygwin =
+JNI_LIBRARY_EXTENSION.Cygwin = dll
 
 EXTRA_INCLUDE_PATH += "$(JAVA_HOME)/include"
 EXTRA_INCLUDE_PATH += $(EXTRA_INCLUDE_PATH.$(TARGET_OS))

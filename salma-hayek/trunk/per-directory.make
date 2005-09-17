@@ -14,7 +14,7 @@
 LOCAL_LDFLAGS := $(LDFLAGS)
 MISSING_PREREQUISITES :=
 EXECUTABLES :=
-EXECUTABLES.CYGWIN_NT-5.0 :=
+EXECUTABLES.Cygwin :=
 
 # ----------------------------------------------------------------------------
 # Choose the basename(1) for the target
@@ -49,7 +49,7 @@ HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(HEADE
 
 EXECUTABLES += $(GENERATED_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
 
-EXECUTABLES.CYGWIN_NT-5.0 += $(GENERATED_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
+EXECUTABLES.Cygwin += $(GENERATED_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
 
 EXECUTABLES += $(EXECUTABLES.$(TARGET_OS))
 
@@ -118,7 +118,7 @@ endef
 # after other assignments.
 # ----------------------------------------------------------------------------
 
-$(EXECUTABLES.CYGWIN_NT-5.0): LOCAL_LDFLAGS += -Wl,--subsystem,windows
+$(EXECUTABLES.Cygwin): LOCAL_LDFLAGS += -Wl,--subsystem,windows
 $(EXECUTABLES): LDFLAGS := $(LOCAL_LDFLAGS)
 $(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
 $(GENERATED_JNI_HEADER): RULE := $(JAVAHPP_RULE)
