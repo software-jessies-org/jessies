@@ -104,27 +104,9 @@ ENV["TERMINFO"]=terminfo
 tic_binary=`bash -c "type -p tic"`.chomp()
 terminfo_SRC="#{terminator_home}/doc/terminfo/terminator.tic"
 terminfo_DST="#{terminfo}/t/terminator"
-if TARGET_OS == "Darwin"
-  # Make ourselves look a little better...
-  os_specific_options = [ "-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns" ]
-end
 if test(?e, terminfo_DST) == false
   system("mkdir -p #{terminfo_DST} && rmdir #{terminfo_DST}")
 end
-
-if TARGET_OS == "Linux"
-  # Use locate(1) to find the gnome-terminal icon.
-  # Cache the result, because this is the single most expensive part of
-  # the script.
-#  icon_filename_file=$log_directory/.cached-icon
-#  if [ ! -f $icon_filename_file ] || [ ! -f `cat $icon_filename_file` ]
-#  then
-#    locate gnome-terminal.png | grep 32x32 | head -1 > $icon_filename_file
-#  fi
-#  icon_file=`cat $icon_filename_file`
-#  os_specific_options=-Dterminator.frame.icon=$icon_file
-end
-
 if tic_binary != ""
   if TARGET_OS == "SunOS"
     system("#{tic_binary} #{terminfo_SRC}")
@@ -145,6 +127,22 @@ end
 # architecture, try to build it.
 if test(?x, pty_library) == false
   system("make #{pty_library}")
+end
+
+if TARGET_OS == "Darwin"
+  # Make ourselves look a little better...
+  os_specific_options = [ "-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns" ]
+elsif TARGET_OS == "Linux"
+  # Use locate(1) to find the gnome-terminal icon.
+  # Cache the result, because this is the single most expensive part of
+  # the script.
+  #  icon_filename_file=$log_directory/.cached-icon
+  #  if [ ! -f $icon_filename_file ] || [ ! -f `cat $icon_filename_file` ]
+  #  then
+  #    locate gnome-terminal.png | grep 32x32 | head -1 > $icon_filename_file
+  #  fi
+  #  icon_file=`cat $icon_filename_file`
+  #  os_specific_options=-Dterminator.frame.icon=$icon_file
 end
 
 options = [ "-Xmx#{heap_size}", "-Djava.class.path=#{cygpath(classpath)}", "-Djava.library.path=#{cygpath(pty_path)}" ]

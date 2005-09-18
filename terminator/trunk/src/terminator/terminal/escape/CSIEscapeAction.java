@@ -92,9 +92,14 @@ public class CSIEscapeAction implements TerminalAction {
 			int mode = Integer.parseInt(modeString);
 			if (isPrivateMode) {
 				switch (mode) {
-					case 25: listener.setCursorVisible(value); break;
-					case 47: listener.useAlternateBuffer(value); break;
-					default: Log.warn("Unknown mode " + mode + " in [" + seq + (value ? 'h' : 'l'));
+				case 25:
+					listener.setCursorVisible(value);
+					break;
+				case 47:
+					listener.useAlternateBuffer(value);
+					break;
+				default:
+					Log.warn("Unknown private mode " + mode + " in [" + seq + (value ? 'h' : 'l'));
 				}
 			} else {
 				switch (mode) {
