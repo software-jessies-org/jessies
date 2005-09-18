@@ -13,6 +13,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#if defined(__sun__)
+#include <sys/stropts.h>
+#endif
+
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -41,9 +45,9 @@ public:
         chown(cName, getuid(), gid);
         chmod(cName, S_IRUSR | S_IWUSR | S_IWGRP);
         
-        int fds = open(cName, O_RDWR);
+        int fds = open(cName, O_RDWR | O_NOCTTY);
         if (fds < 0) {
-            throw unix_exception("open(" + toString(cName) + ", O_RDWR) failed");
+            throw unix_exception("open(" + toString(cName) + ", O_RDWR | O_NOCTTY) failed");
         }
         close(masterFd);
         return fds;
@@ -140,15 +144,24 @@ private:
         if (setsid() < 0) {
             throw child_exception("setsid()");
         }
+
         int childFd = ptyGenerator.openSlaveAndCloseMaster();
-#if defined(TIOCSCTTY) && !defined(CIBAUD)
-        /* 44BSD way to acquire controlling terminal */
-        /* !CIBAUD to avoid doing this under SunOS */
+
+#if defined(TIOCSCTTY)
+        /* Give up the controlling terminal. */
         if (ioctl(childFd, TIOCSCTTY, 0) < 0) {
             throw child_exception_via_pipe(childFd, "ioctl(" + toString(childFd) + ", TIOCSCTTY, 0)");
         }
 #endif
-        /* slave becomes stdin/stdout/stderr of child */
+
+#if defined(__sun__)
+        /* This seems to be necessary on Solaris to make STREAMS behave. */
+        ioctl(childFd, I_PUSH, "ptem");
+        ioctl(childFd, I_PUSH, "ldterm");
+        ioctl(childFd, I_PUSH, "ttcompat");
+#endif
+
+        /* Slave becomes stdin/stdout/stderr of child. */
         if (childFd != STDIN_FILENO && dup2(childFd, STDIN_FILENO) != STDIN_FILENO) {
             throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDIN_FILENO)");
         }
