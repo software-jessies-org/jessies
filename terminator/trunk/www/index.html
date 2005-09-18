@@ -257,6 +257,18 @@ a spurious window.
 Any console output from the Java, as opposed to the start-up script, is recorded in a file in
 $HOME/.terminal-logs/ along with a file containing a log of each tab's output.
 
+<p>You may see warnings from Ruby like this:
+
+<pre>
+terminator:25: warning: Insecure world writable dir /usr/local/bin, mode 040777
+</pre>
+
+<p>This seems to solve them with no ill effect:
+
+<pre>
+chmod o-w /usr/local/bin
+</pre>
+
 <h2>Authors</h2>
 
 <p>The original implementation and documentation was written by Phil Norman. Nearly all of the actual terminal emulation code remains unchanged.
