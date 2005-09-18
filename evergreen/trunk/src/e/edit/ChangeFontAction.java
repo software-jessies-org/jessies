@@ -17,7 +17,7 @@ public abstract class ChangeFontAction extends ETextAction {
     }
     
     public static Font getConfiguredFixedFont() {
-        return getConfiguredFont("fixedFont", "lucida sans typewriter", 12);
+        return new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
     }
     
     public static Font getConfiguredFont(String parameterPrefix, String defaultFontName, int defaultFontSize) {

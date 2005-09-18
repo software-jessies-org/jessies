@@ -1,13 +1,7 @@
 font.name=SansSerif
 font.size=12
 
-fixedFont.name=Monospaced
-?Mac OS X:fixedFont.name=Monaco
-fixedFont.size=10
-
 fixedFont.default=false
-
-?Windows 2000:fixedFont.name=lucida sans typewriter
 
 hungryDelete=true
 indent.string=    
