@@ -27,8 +27,8 @@ BASE_NAME = $(notdir $(SOURCE_DIRECTORY))
 # ----------------------------------------------------------------------------
 
 # BSD find's -false is a synonym for -not.  I kid you false.
-FIND_FALSE = -not -prune
-findCode = $(shell find $(SOURCE_DIRECTORY) -type f '(' $(foreach EXTENSION,$(1),-name "*.$(EXTENSION)" -or) $(FIND_FALSE) ')')
+FIND_FALSE = ! -prune
+findCode = $(shell find $(SOURCE_DIRECTORY) -type f '(' $(foreach EXTENSION,$(1),-name "*.$(EXTENSION)" -o) $(FIND_FALSE) ')')
 SOURCES := $(call findCode,$(SOURCE_EXTENSIONS))
 HEADERS := $(call findCode,$(HEADER_EXTENSIONS))
 
@@ -73,7 +73,7 @@ JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 
 define JAVAHPP_RULE
 $(JAVAHPP) -classpath $(call convertCygwinToWin32Path,$(CLASSES_DIRECTORY)) $(JNI_CLASS_NAME) > $(call convertCygwinToWin32Path,$(GENERATED_JNI_HEADER)) && \
-{ cmp --quiet $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
+{ cmp -s $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
 endef
 
 # ----------------------------------------------------------------------------

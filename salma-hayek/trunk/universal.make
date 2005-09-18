@@ -182,6 +182,14 @@ LD = $(CXX)
 # The default $(CC) used by $(LINK.o) doesn't know about the Darwin equivalent of -lstdc++.
 CC = $(CXX)
 
+# Note that our Solaris build assumes GCC rather than Sun's compiler.
+# GCC's -shared option, which we use on Linux, exists, but produces link
+# errors. -G, as used in Sun's tutorial examples with their own compiler works.
+EXTRA_INCLUDE_PATH.SunOS += "$(JAVA_HOME)/include/solaris"
+JNI_LIBRARY_LDFLAGS.SunOS += -G
+JNI_LIBRARY_PREFIX.SunOS = lib
+JNI_LIBRARY_EXTENSION.SunOS = so
+
 EXTRA_INCLUDE_PATH.Linux += "$(JAVA_HOME)/include/linux"
 JNI_LIBRARY_LDFLAGS.Linux += -shared
 JNI_LIBRARY_PREFIX.Linux = lib
