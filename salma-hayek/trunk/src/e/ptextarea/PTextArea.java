@@ -15,7 +15,7 @@ import e.util.*;
  * 
  * @author Phil Norman
  */
-public class PTextArea extends JComponent implements PLineListener, Scrollable {
+public class PTextArea extends JComponent implements PLineListener, Scrollable, ClipboardOwner {
     private static final int MIN_WIDTH = 50;
     private static final int MAX_CACHED_CHAR = 128;
     
@@ -231,6 +231,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             SelectionHighlight oldSelection = selection;
             repaintCaret();
             selection = new SelectionHighlight(this, start, end);
+            copyToSystemSelection();
             repaintCaret();
             oldSelection.detachAnchors();
             if (oldSelection.isEmpty() != selection.isEmpty()) {
@@ -251,6 +252,36 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
         } finally {
             getLock().relinquishWriteLock();
         }
+    }
+    
+    /**
+     * Copies the selected text to X11's selection.
+     * Does nothing on other platforms.
+     */
+    private void copyToSystemSelection() {
+        Clipboard systemSelection = getToolkit().getSystemSelection();
+        if (systemSelection != null) {
+            copyToClipboard(systemSelection);
+        }
+    }
+    
+    private void copyToClipboard(Clipboard clipboard) {
+        String newContents = getSelectedText();
+        StringSelection selection = new StringSelection(newContents);
+        clipboard.setContents(selection, this);
+    }
+    
+    /**
+     * Invoked to notify us that we no longer own the clipboard.
+     */
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+        // Firefox doesn't clear its selection when someone else claims the
+        // X11 selection and I imagine it could be quite annoying in Edit.
+        // So deliberately do nothing.
+        
+        // If we already have the read lock and ask for the write lock in
+        // setSelectionWithoutScrolling, that would cause deadlock if
+        // another thread has the read lock and is waiting for this thread.
     }
     
     public void centerOffsetInDisplay(int offset) {
@@ -1428,9 +1459,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable {
             StringSelection stringSelection = new StringSelection(getSelectedText());
             Toolkit toolkit = Toolkit.getDefaultToolkit();
             toolkit.getSystemClipboard().setContents(stringSelection, null);
-            if (toolkit.getSystemSelection() != null) {
-                toolkit.getSystemSelection().setContents(stringSelection, null);
-            }
         } finally {
             getLock().relinquishReadLock();
         }
