@@ -63,7 +63,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         this.columnCount = columnCount;
         this.editable = true;
         this.wordWrap = false;
-        setText(new PTextBuffer());
+        setTextBuffer(new PTextBuffer());
         this.indenter = new PDefaultIndenter(this);
         addStyleApplicator(new UnprintableCharacterStyleApplicator(this));
         initPopupMenu();
@@ -1312,7 +1312,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         line.setWidth(width);
     }
     
-    private void setText(PTextBuffer text) {
+    private void setTextBuffer(PTextBuffer text) {
         clearSegmentCache();
         if (lines != null) {
             lines.removeLineListener(this);
