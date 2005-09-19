@@ -63,24 +63,35 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         this.columnCount = columnCount;
         this.editable = true;
         this.wordWrap = false;
-        setTextBuffer(new PTextBuffer());
+        this.lines = new PLineList(new PTextBuffer());
+        this.selection = new SelectionHighlight(this, 0, 0);
         this.indenter = new PDefaultIndenter(this);
+        
         addStyleApplicator(new UnprintableCharacterStyleApplicator(this));
-        initPopupMenu();
-        setFont(UIManager.getFont("TextArea.font"));
+        lines.addLineListener(this);
+        revalidateLineWrappings();
+        
         setAutoscrolls(true);
         setBackground(Color.WHITE);
+        setFont(UIManager.getFont("TextArea.font"));
+        setOpaque(true);
+        setFocusTraversalKeysEnabled(false);
+        
+        requestFocusInWindow();
+        
+        initKeyBindings();
+        initListeners();
+        initPopupMenu();
+    }
+    
+    private void initListeners() {
+        addComponentListener(new Rewrapper(this));
+        addCaretListener(new PMatchingBracketHighlighter(this));
+        addKeyListener(new PKeyHandler(this));
         PMouseHandler mouseHandler = new PMouseHandler(this);
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
-        addKeyListener(new PKeyHandler(this));
-        addComponentListener(new Rewrapper(this));
-        setOpaque(true);
-        setFocusTraversalKeysEnabled(false);
-        requestFocus();
         initFocusListening();
-        initKeyBindings();
-        addCaretListener(new PMatchingBracketHighlighter(this));
     }
     
     /**
@@ -1296,18 +1307,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             width = addCharWidth(width, chars.charAt(i));
         }
         line.setWidth(width);
-    }
-    
-    private void setTextBuffer(PTextBuffer text) {
-        clearSegmentCache();
-        if (lines != null) {
-            lines.removeLineListener(this);
-        }
-        lines = new PLineList(text);
-        lines.addLineListener(this);
-        clearSegmentCache();
-        revalidateLineWrappings();
-        selection = new SelectionHighlight(this, 0, 0);
     }
     
     /**
