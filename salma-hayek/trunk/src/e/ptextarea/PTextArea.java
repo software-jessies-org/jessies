@@ -74,32 +74,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
         addKeyListener(new PKeyHandler(this));
-        addComponentListener(new ComponentAdapter() {
-            private int lastWidth;
-            
-            public void componentResized(ComponentEvent event) {
-                rewrap();
-            }
-            
-            private void rewrap() {
-                getLock().getReadLock();
-                try {
-                    if (getWidth() != lastWidth) {
-                        if (isShowing()) {
-                            runWithoutMovingTheVisibleArea(new Runnable() {
-                                public void run() {
-                                    revalidateLineWrappings();
-                                }
-                            });
-                        }
-                        lastWidth = getWidth();
-                        repaint();
-                    }
-                } finally {
-                    getLock().relinquishReadLock();
-                }
-            }
-        });
+        addComponentListener(new Rewrapper(this));
         setOpaque(true);
         setFocusTraversalKeysEnabled(false);
         requestFocus();
@@ -1124,6 +1099,17 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             generateLineWrappings();
         } finally {
             getLock().relinquishWriteLock();
+        }
+    }
+    
+    /** Only for use by class Rewrapper. */
+    void rewrap() {
+        if (isShowing()) {
+            runWithoutMovingTheVisibleArea(new Runnable() {
+                public void run() {
+                    revalidateLineWrappings();
+                }
+            });
         }
     }
     
