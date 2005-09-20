@@ -530,6 +530,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     public void setTextStyler(PTextStyler textStyler) {
         this.textStyler = textStyler;
+        clearSegmentCache();
         repaint();
     }
     
