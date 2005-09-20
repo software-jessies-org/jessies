@@ -289,31 +289,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             lastModifiedTime = file.lastModified();
             text.getTextBuffer().readFromFile(file);
             
-            CharSequence content  = text.getTextBuffer();
-            if (filename.endsWith(".java")) {
-                fileType = JAVA;
-                text.setIndenter(new PJavaIndenter(text));
-                text.setTextStyler(new PJavaTextStyler(text));
-            } else if (filename.endsWith(".rb") || isRubyContent(content)) {
-                fileType = RUBY;
-                text.setIndenter(new PRubyIndenter(text));
-                text.setTextStyler(new PRubyTextStyler(text));
-            } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || filename.endsWith(".strings") || isCPlusPlusContent(content)) {
-                fileType = C_PLUS_PLUS;
-                text.setIndenter(new PCppIndenter(text));
-                text.setTextStyler(new PCPPTextStyler(text));
-            } else if (filename.endsWith(".pl") || filename.endsWith(".pm") || isPerlContent(content)) {
-                fileType = PERL;
-                text.setIndenter(new PPerlIndenter(text));
-                text.setTextStyler(new PPerlTextStyler(text));
-            } else {
-                // Plain text.
-                text.setWrapStyleWord(true);
-            }
-            initSpellingExceptionsForDocument();
+            configureForGuessedFileType();
             updateWatermarkAndTitleBar();
-            text.setFont(ChangeFontAction.getAppropriateFontForContent(content));
-            text.getIndenter().setIndentationPropertyBasedOnContent(content);
             text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
             text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
@@ -322,6 +299,36 @@ public class ETextWindow extends EWindow implements PTextListener {
             Edit.getInstance().showAlert("Open", "Couldn't open file '" + FileUtilities.getUserFriendlyName(file) + "' (" + th.getMessage() + ")");
             throw new RuntimeException("can't open " + FileUtilities.getUserFriendlyName(file));
         }
+    }
+    
+    private void configureForGuessedFileType() {
+        String originalFileType = fileType;
+        CharSequence content  = text.getTextBuffer();
+        if (filename.endsWith(".java")) {
+            fileType = JAVA;
+            text.setIndenter(new PJavaIndenter(text));
+            text.setTextStyler(new PJavaTextStyler(text));
+        } else if (filename.endsWith(".rb") || isRubyContent(content)) {
+            fileType = RUBY;
+            text.setIndenter(new PRubyIndenter(text));
+            text.setTextStyler(new PRubyTextStyler(text));
+        } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || filename.endsWith(".strings") || isCPlusPlusContent(content)) {
+            fileType = C_PLUS_PLUS;
+            text.setIndenter(new PCppIndenter(text));
+            text.setTextStyler(new PCPPTextStyler(text));
+        } else if (filename.endsWith(".pl") || filename.endsWith(".pm") || isPerlContent(content)) {
+            fileType = PERL;
+            text.setIndenter(new PPerlIndenter(text));
+            text.setTextStyler(new PPerlTextStyler(text));
+        } else {
+            // Plain text.
+            text.setWrapStyleWord(true);
+        }
+        if (fileType != originalFileType) {
+            initSpellingExceptionsForDocument();
+        }
+        text.setFont(ChangeFontAction.getAppropriateFontForContent(content));
+        text.getIndenter().setIndentationPropertyBasedOnContent(content);
     }
     
     private void uncheckedRevertToSaved() {
@@ -687,6 +694,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             edit.showStatus("Saved " + filename);
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
+            configureForGuessedFileType();
             updateWatermarkAndTitleBar();
             tagsUpdater.updateTags();
             SaveMonitor.getInstance().fireSaveListeners();
