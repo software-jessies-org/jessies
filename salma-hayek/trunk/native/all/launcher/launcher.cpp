@@ -28,7 +28,9 @@ struct UsageError : std::runtime_error {
 
 typedef std::deque<std::string> NativeArguments;
 
-extern "C" typedef jint JNICALL (*CreateJavaVM)(JavaVM**, void**, void*);
+extern "C" {
+  typedef jint JNICALL (*CreateJavaVM)(JavaVM**, void**, void*);
+}
 
 struct JavaInvocation {
 private:
