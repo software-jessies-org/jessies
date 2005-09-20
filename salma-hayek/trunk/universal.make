@@ -133,6 +133,12 @@ PURE_C_AND_CXX_FLAGS += -pedantic
 # whose names contain spaces, something common on Win32.
 CPPFLAGS += $(subst $(SPACE)", -I", $(EXTRA_INCLUDE_PATH))
 
+# Exposes ptsname on libc22 per the Linux man page but causes this on Mac OS X:
+# /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MacMemory.h:1587: error: 'bzero' was not declared in this scope
+# The 600 figure is from /usr/include/features.h.
+CPPFLAGS.Linux += -D_XOPEN_SOURCE=600
+CPPFLAGS += $(CPPFLAGS.$(TARGET_OS))
+
 CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
 
