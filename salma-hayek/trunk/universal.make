@@ -278,7 +278,6 @@ REVISION_CONTROLLED_FILES_AND_DIRECTORIES = $(shell $(GENERATE_FILE_LIST.$(REVIS
 POSSIBLY_REVISION_CONTROLLED_DIRECTORIES = $(patsubst ./%,%,$(shell find . -type d))
 FILE_LIST += $(filter-out $(POSSIBLY_REVISION_CONTROLLED_DIRECTORIES),$(REVISION_CONTROLLED_FILES_AND_DIRECTORIES))
 FILE_LIST += classes
-FILE_LIST += generated
 FILE_LIST += ChangeLog # The ChangeLog should never be checked in, but should be in distributions.
 
 # make evaluates prerequisites of rules which aren't executed.
