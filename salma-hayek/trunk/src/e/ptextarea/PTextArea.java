@@ -253,6 +253,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     private void copyToClipboard(Clipboard clipboard) {
         String newContents = getSelectedText();
+        if (newContents.length() == 0) {
+            return;
+        }
         StringSelection selection = new StringSelection(newContents);
         clipboard.setContents(selection, this);
     }
@@ -1437,17 +1440,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     public void copy() {
-        getLock().getReadLock();
-        try {
-            if (hasSelection() == false) {
-                return;
-            }
-            StringSelection stringSelection = new StringSelection(getSelectedText());
-            Toolkit toolkit = Toolkit.getDefaultToolkit();
-            toolkit.getSystemClipboard().setContents(stringSelection, null);
-        } finally {
-            getLock().relinquishReadLock();
-        }
+        copyToClipboard(getToolkit().getSystemClipboard());
     }
     
     public void cut() {
