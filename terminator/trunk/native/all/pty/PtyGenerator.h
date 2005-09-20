@@ -12,6 +12,7 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #if defined(__sun__)
 #include <sys/stropts.h>
