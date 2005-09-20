@@ -32,8 +32,6 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         if (PBracketUtilities.isNextToBracket(chars, offset) == false) {
             return;
         }
-        // Now we'll pay:
-        chars = PSameStyleCharSequence.forOffset(textArea, offset);
         
         // Look for a bracket to match with.
         if (PBracketUtilities.beforeCloseBracket(chars, offset)) {
@@ -48,7 +46,7 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         }
         
         // Try to find a match.
-        int matchingBracketOffset = PBracketUtilities.findMatchingBracket(chars, offset);
+        int matchingBracketOffset = PBracketUtilities.findMatchingBracketInSameStyle(textArea, offset);
         if (matchingBracketOffset != -1) {
             int start = matchingBracketOffset;
             int end = start + 1;

@@ -1,5 +1,7 @@
 package e.ptextarea;
 
+import java.util.*;
+
 /**
  * Utilities related to bracket-matching.
  * 
@@ -31,19 +33,24 @@ public class PBracketUtilities {
         return PARTNERS.charAt(BRACKETS.indexOf(bracket));
     }
     
-    /**
-     * Returns the offset of the matching bracket, or -1.
-     * We look for a match if 'offset' is after an opening bracket, or before a
-     * closing bracket.
-     */
-    public static int findMatchingBracket(CharSequence chars, int offset) {
-        if (beforeCloseBracket(chars, offset)) {
-            return findMatchingBracket(chars, offset, false);
+    public static int findMatchingBracketInSameStyle(PTextArea textArea, int offset)
+    {
+        StopWatch watch = new StopWatch();
+        try {
+            CharSequence chars = textArea.getTextBuffer();
+            PCharIterator iterator;
+            if (afterOpenBracket(chars, offset)) {
+                Iterator<PLineSegment> segments = new PSameStyleSegmentIterator(textArea.getLogicalSegmentIterator(offset - 1));
+                iterator = new PSegmentCharIterator(segments, offset - 1, true);
+            } else if (beforeCloseBracket(chars, offset)) {
+                iterator = new PCharSequenceIterator(PSameStyleCharSequence.forOffset(textArea, offset), offset, false);
+            } else {
+                throw new IllegalArgumentException("No bracket at offset " + offset);
+            }
+            return findMatchingBracket(iterator);
+        } finally {
+            watch.print("Matching brackets");
         }
-        if (afterOpenBracket(chars, offset)) {
-            return findMatchingBracket(chars, offset - 1, true);
-        }
-        return -1;
     }
     
     /**
@@ -58,23 +65,21 @@ public class PBracketUtilities {
      * Returns the offset of the matching bracket, scanning in the given
      * direction, or -1.
      */
-    private static int findMatchingBracket(CharSequence chars, final int startOffset, boolean scanForwards) {
-        char bracket = chars.charAt(startOffset);
+    private static int findMatchingBracket(PCharIterator chars) {
+        char bracket = chars.next();
         if (isBracket(bracket) == false) {
             return -1;
         }
         char partner = getPartnerForBracket(bracket);
-        int nesting = 0;
-        int step = scanForwards ? +1 : -1;
-        int onePastTheEnd = scanForwards ? chars.length() : -1;
-        for (int offset = startOffset; offset != onePastTheEnd; offset += step) {
-            char ch = chars.charAt(offset);
+        int nesting = 1;
+        while (chars.hasNext()) {
+            char ch = chars.next();
             if (ch == bracket) {
                 ++nesting;
             } else if (ch == partner) {
                 --nesting;
                 if (nesting == 0) {
-                    return offset;
+                    return chars.getOffsetOfLastChar();
                 }
             }
         }

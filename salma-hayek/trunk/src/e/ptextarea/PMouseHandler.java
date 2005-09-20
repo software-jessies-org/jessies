@@ -124,8 +124,7 @@ public class PMouseHandler implements MouseInputListener {
             // Constructing a same-style char sequence is hideously expensive, so we first
             // check whether we're next to a bracket at all.
             if (PBracketUtilities.isNextToBracket(textArea.getTextBuffer(), pressedOffset)) {
-                CharSequence sameStyleCharSequence = PSameStyleCharSequence.forOffset(textArea, pressedOffset);
-                int bracketOffset = PBracketUtilities.findMatchingBracket(sameStyleCharSequence, pressedOffset);
+                int bracketOffset = PBracketUtilities.findMatchingBracketInSameStyle(textArea, pressedOffset);
                 if (bracketOffset != -1) {
                     if (pressedOffset <= bracketOffset) {
                         textArea.setSelection(pressedOffset, bracketOffset, false);
