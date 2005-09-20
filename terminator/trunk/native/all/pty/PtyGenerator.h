@@ -175,6 +175,7 @@ private:
         if (childFd > STDERR_FILENO) {
             close(childFd);
         }
+        closeUnusedFiles();
         putenv("TERM=terminator");
         
         /*
@@ -190,6 +191,19 @@ private:
         
         execvp(cmd[0], cmd);
         throw unix_exception("Can't execute '" + toString(cmd[0]) + "'");
+    }
+    
+    /*
+     * This allows the terminator-server-port socket to close when terminator quits
+     * while a child is still running.
+     */
+    static void closeUnusedFiles() {
+        // man sysconf says "it gives a guaranteed value, and more might actually be supported".
+        // So this may not work all the time, though it's likely to work most of the time.
+        int maxNumberOfFiles = sysconf(_SC_OPEN_MAX);
+        for (int fd = STDERR_FILENO + 1; fd < maxNumberOfFiles; ++fd) {
+            close(fd);
+        }
     }
 };
 
