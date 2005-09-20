@@ -186,7 +186,7 @@ public class FatBits extends JFrame {
         // Apple's 1.5 VM crashes if you don't.
         result.x = Math.max(result.x, 0);
         result.y = Math.max(result.y, 0);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension screenSize = getToolkit().getScreenSize();
         if (result.x + result.width > screenSize.width) {
             result.x = screenSize.width - result.width;
         }
