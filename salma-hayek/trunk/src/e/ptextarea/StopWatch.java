@@ -1,6 +1,5 @@
 package e.ptextarea;
 
-
 public class StopWatch {
     private long lastTime;
     private String prefix;
@@ -19,8 +18,10 @@ public class StopWatch {
     }
     
     public void print(String reason) {
-        long timeTaken = System.currentTimeMillis() - lastTime;
-        System.err.println(prefix + reason + " in " + timeTaken + "ms");
+        long durationMillis = System.currentTimeMillis() - lastTime;
+        if (durationMillis > 10) {
+            System.err.println(prefix + reason + " took " + durationMillis + "ms");
+        }
         updateLastTime();
     }
 }
