@@ -397,7 +397,7 @@ build.java: $(SOURCE_FILES)
 
 .PHONY: clean
 clean:
-	@BAK_FILES=`find . -name "*.bak"` $(RM) -r $(GENERATED_FILES) $(BAK_FILES)
+	@find . -name "*.bak" | xargs $(RM) -r $(GENERATED_FILES)
 
 ChangeLog.html: ChangeLog
 	$(SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
