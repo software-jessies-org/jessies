@@ -33,8 +33,12 @@ public class PBracketUtilities {
         return PARTNERS.charAt(BRACKETS.indexOf(bracket));
     }
     
-    public static int findMatchingBracketInSameStyle(PTextArea textArea, int offset)
-    {
+    /**
+     * Returns the offset of the matching bracket, or -1 if there's no match.
+     * We look for a match if 'offset' is after an opening bracket, or before a
+     * closing bracket. An exception is thrown if we're not next to a bracket.
+     */
+    public static int findMatchingBracketInSameStyle(PTextArea textArea, int offset) {
         StopWatch watch = new StopWatch();
         try {
             CharSequence chars = textArea.getTextBuffer();
