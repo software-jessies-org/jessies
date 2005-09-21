@@ -361,18 +361,36 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		return new Location(lineIndex, charOffset);
 	}
 	
-	private Rectangle modelToView(Location charCoords) {
-		String string = model.getTextLine(charCoords.getLineIndex()).getString();
-		final int offset = charCoords.getCharOffset();
-		String characterAtLocation;
-		if (charCoords.getCharOffset() < string.length()) {
-			characterAtLocation = string.substring(offset, offset + 1);
-			string = string.substring(0, offset);
-		} else {
-			characterAtLocation = "n";
+	private static class SpaceSequence implements CharSequence {
+		private int length;
+		public SpaceSequence(int length) {
+			this.length = length;
 		}
+		public char charAt(int i) {
+			return ' ';
+		}
+		public int length() {
+			return length;
+		}
+		public CharSequence subSequence(int start, int end) {
+			throw new UnsupportedOperationException("subSequence not implemented");
+		}
+	}
+	
+	private Rectangle modelToView(Location charCoords) {
+		String line = model.getTextLine(charCoords.getLineIndex()).getString();
+		final int offset = charCoords.getCharOffset();
+		final int desiredLength = offset + 1;
+		if (line.length() < desiredLength) {
+			StringBuilder builder = new StringBuilder(line);
+			final int charactersOfPaddingRequired = desiredLength - line.length();
+			builder.append(new SpaceSequence(charactersOfPaddingRequired));
+			line = builder.toString();
+		}
+		String characterAtLocation = line.substring(offset, offset + 1);
+		String lineBeforeOffset = line.substring(0, offset);
 		FontMetrics fontMetrics = getFontMetrics(getFont());
-		final int x = fontMetrics.stringWidth(string);
+		final int x = fontMetrics.stringWidth(lineBeforeOffset);
 		final int width = fontMetrics.stringWidth(characterAtLocation);
 		final int height = getCharUnitSize().height;
 		final int y = charCoords.getLineIndex() * height;
