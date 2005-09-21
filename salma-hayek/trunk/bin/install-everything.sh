@@ -54,7 +54,16 @@ for PROJECT in $PROJECTS; do
     wget $WGET_OPTIONS -N http://www.jessies.org/~software/downloads/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
-    make -C $PROJECT native || BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
+    if ! make -C $PROJECT native
+    then
+        TARGET_OS=`./salma-hayek/bin/target-os.rb`
+        if wget $WGET_OPTIONS -N http://www.jessies.org/~software/downloads/$PROJECT/$PROJECT-$TARGET_OS.tgz
+        then
+            tar --no-same-owner -zxf $PROJECT-$TARGET_OS.tgz || die "extracting $PROJECT-$TARGET_OS"
+        else
+            BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
+        fi
+    fi
 done
 
 # Although /proc/mounts is Linux-specific, it doesn't hang when one of the mounts is
