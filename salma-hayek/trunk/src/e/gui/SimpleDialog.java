@@ -1,10 +1,11 @@
 package e.gui;
 
+import e.forms.*;
+import e.ptextarea.*;
+import e.util.*;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
-import e.forms.*;
-import e.ptextarea.*;
 
 public class SimpleDialog {
     /**
@@ -70,10 +71,7 @@ public class SimpleDialog {
      * writing output to the console/log.
      */
     public static FormDialog showDetails(Frame frame, String title, Throwable throwable) {
-        StringWriter stringWriter = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(stringWriter));
-        String exceptionDetails = stringWriter.toString();
-        return showDetails(frame, title, exceptionDetails);
+        return showDetails(frame, title, StringUtilities.stackTraceFromThrowable(throwable));
     }
     
     public static boolean askQuestion(Frame frame, String title, String message, String continueText) {

@@ -245,6 +245,12 @@ public class StringUtilities {
         return false;
     }
     
+    public static String stackTraceFromThrowable(Throwable throwable) {
+        StringWriter stringWriter = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(stringWriter));
+        return stringWriter.toString();
+    }
+    
     private StringUtilities() {
     }
 
