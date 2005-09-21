@@ -129,7 +129,11 @@ which you can build yourself or find in the
 
 <p>Terminator is written almost entirely in Java with a small bit of JNI
 which runs a process connected to a pseudo-terminal. You will need
-Java 1.5.  You'll need to point $JAVA_HOME at the root of your JDK.
+Java 1.5.
+
+<p>You'll need to point $JAVA_HOME at the root of your JDK to compile terminator.
+A JRE is sufficient to run terminator.  You needn't set $JAVA_HOME to run terminator
+if your path includes an appropriate "java" executable.
 
 <p>On Windows, you will need Cygwin.  The current version at the time of porting
 was 1.5.18-1.  The startup script requires Ruby, which isn't part of Cygwin's default
@@ -145,6 +149,15 @@ interact with the network, so that wasn't an option.
 Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which
 we use to support window resizing, not to mention containing a port of one of
 the most widely used ssh programs.)
+
+<p>On Cygwin, the launcher will use $JAVA_HOME to find your jvm.dll if you've
+specified it.  You can use a Windows or a POSIX style path for $JAVA_HOME.
+The maintainer uses a Windows-style path on the assumption that other
+Windows Java tools (of which he has none) would want it that way.
+Be sure not to include any spurious quotes in the value of $JAVA_HOME.
+You may point $JAVA_HOME at a JRE if you only want to run terminator and not compile it.
+Better still, you may leave $JAVA_HOME unset, in which case the launcher will find
+an appropriate jvm.dll using the Registry.
 
 <p>To build Terminator, you'll need g++ and a very recent make.  Debian's make-3.80-9 is
 fine.  The make which comes with Mac OS X 10.4.2 isn't.  The make which comes with Cygwin
