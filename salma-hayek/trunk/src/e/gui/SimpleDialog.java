@@ -51,7 +51,7 @@ public class SimpleDialog {
      * of whether or not the native system's dialog would); this uses a proper
      * text area, so you can select and copy as you'd expect.
      */
-    public static void showDetails(Frame frame, String title, String details) {
+    public static FormDialog showDetails(Frame frame, String title, String details) {
         PTextArea textArea = new PTextArea(10, 40);
         textArea.setEditable(false);
         textArea.setText(details);
@@ -59,6 +59,7 @@ public class SimpleDialog {
         FormBuilder form = new FormBuilder(frame, title);
         form.getFormPanel().addRow("Details:", new JScrollPane(textArea));
         form.showNonModal();
+        return form.getFormDialog();
     }
     
     /**
@@ -68,11 +69,11 @@ public class SimpleDialog {
      * It's not very friendly, but it's probably more friendly than just
      * writing output to the console/log.
      */
-    public static void showDetails(Frame frame, String title, Throwable throwable) {
+    public static FormDialog showDetails(Frame frame, String title, Throwable throwable) {
         StringWriter stringWriter = new StringWriter();
         throwable.printStackTrace(new PrintWriter(stringWriter));
         String exceptionDetails = stringWriter.toString();
-        showDetails(frame, title, exceptionDetails);
+        return showDetails(frame, title, exceptionDetails);
     }
     
     public static boolean askQuestion(Frame frame, String title, String message, String continueText) {
