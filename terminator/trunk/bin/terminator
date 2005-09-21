@@ -71,7 +71,7 @@ end
 classpath="#{terminator_home}/classes:#{salma_hayek}/classes"
 
 
-pty_path="#{terminator_home}/generated/native/all/pty/#{TARGET_OS}"
+pty_path="#{terminator_home}/.generated/native/all/pty/#{TARGET_OS}"
 jni_lib_prefix="lib"
 jni_lib_extension="so"
 if TARGET_OS == "Darwin"
@@ -86,7 +86,7 @@ heap_size="1g"
 launcher="java"
 if TARGET_OS == "Cygwin"
   heap_size="100m"
-  launcher="#{salma_hayek}/generated/native/all/launcher/#{TARGET_OS}/launcher"
+  launcher="#{salma_hayek}/.generated/native/all/launcher/#{TARGET_OS}/launcher"
   if ENV["DEBUGGING_TERMINATOR"] == nil
     launcher="#{launcher}w"
   end
