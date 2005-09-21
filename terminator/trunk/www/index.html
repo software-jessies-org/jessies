@@ -170,6 +170,18 @@ We have binaries for
 and <a href="../3rdParty/make-3.80-9/Cygwin/make.exe">Cygwin</a>
 which used to work but may not longer be good enough.
 
+<p>This:
+
+<pre>
+make: *** virtual memory exhausted.  Stop.
+</pre>
+
+<p>... or this sort of nonsensical error message are typical symptoms that your make isn't shiny enough:
+
+<pre>
+../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setsid (with value "! -prune") was referred to in scope setsid.  Stop.
+</pre>
+
 <h2>Running</h2>
 
 <p>Terminator will run fine on Mac OS X, Windows, KDE, GNOME, or even an old-style X11
