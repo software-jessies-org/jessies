@@ -152,7 +152,7 @@ ifneq "$(JNI_SOURCE)" ""
 $(GENERATED_JNI_HEADER): $(JNI_CLASS_FILE) $(JAVAHPP) $(SALMA_HAYEK)/classes/e/tools/JavaHpp.class
 	@echo Generating JNI header... && \
 	mkdir -p $(@D) && \
-	rm -f $@ && \
+	$(RM) $@ && \
 	$(RULE)
 
 $(JNI_OBJECT): $(COMPILED_JNI_HEADER)
@@ -187,7 +187,7 @@ missing-prerequisites.$(BASE_NAME):
 # in the same directory.
 $(SOURCE_LINKS) $(HEADER_LINKS): $(GENERATED_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
 	mkdir -p $(dir $@) && \
-	rm -f $@ && \
+	$(RM) $@ && \
 	ln -s $< $@
 
 # ----------------------------------------------------------------------------

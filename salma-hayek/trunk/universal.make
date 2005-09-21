@@ -336,7 +336,7 @@ JAVA_FLAGS += -source 1.5
 
 define BUILD_JAVA
   @echo Recompiling the world... && \
-  rm -rf classes && \
+  $(RM) -r classes && \
   mkdir -p classes && \
   $(JAVA_COMPILER) $(JAVA_FLAGS) $(call convertCygwinToWin32Path,$(SOURCE_FILES))
 endef
