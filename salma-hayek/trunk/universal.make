@@ -286,11 +286,6 @@ FILE_LIST += $(filter-out $(POSSIBLY_REVISION_CONTROLLED_DIRECTORIES),$(REVISION
 FILE_LIST += classes
 FILE_LIST += ChangeLog # The ChangeLog should never be checked in, but should be in distributions.
 
-# make evaluates prerequisites of rules which aren't executed.
-# This hack saves >20s out of 30s to the hot-cache, already-built "make native"
-# in terminator on Cygwin via Samba.
-FILE_LIST_DEPENDENCIES := $(if $(filter dist,$(MAKECMDGOALS)),$(FILE_LIST))
-
 # ----------------------------------------------------------------------------
 # Choose a Java compiler.
 # ----------------------------------------------------------------------------
@@ -453,7 +448,7 @@ $(PROJECT_NAME).jar: build.java
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
-../$(DIST_FILE_OF_THE_DAY): build.java $(FILE_LIST_DEPENDENCIES)
+../$(DIST_FILE_OF_THE_DAY): build.java ChangeLog
 	cd .. && \
 	tar -zcf $(DIST_FILE_OF_THE_DAY) $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
 
