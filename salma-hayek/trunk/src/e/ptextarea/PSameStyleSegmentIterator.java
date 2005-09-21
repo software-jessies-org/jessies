@@ -4,7 +4,7 @@ import java.util.*;
 
 public class PSameStyleSegmentIterator implements Iterator<PLineSegment> {
     private Iterator<PLineSegment> source;
-    PLineSegment nextSegment = null;
+    private PLineSegment nextSegment = null;
     private PStyle allowedStyle;
     
     public PSameStyleSegmentIterator(Iterator<PLineSegment> source) {
