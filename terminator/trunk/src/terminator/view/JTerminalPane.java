@@ -112,14 +112,19 @@ public class JTerminalPane extends JPanel {
 		try {
 			control = new TerminalControl(this, textPane.getModel(), command);
 			textPane.setTerminalControl(control);
+			control.initProcess();
 			initSizeMonitoring();
-		} catch (Throwable th) {
+		} catch (final Throwable th) {
 			Log.warn("Couldn't initialize terminal", th);
-			SimpleDialog.showDetails(null, "Initialization Error", th).setAcceptRunnable(new Runnable() {
+			// We can't call announceConnectionLost off the EDT.
+			new Thread(new Runnable() {
 				public void run() {
-					System.exit(1);
+					StringWriter stringWriter = new StringWriter();
+					th.printStackTrace(new PrintWriter(stringWriter));
+					String exceptionDetails = stringWriter.toString().replaceAll("\n", "\n\r");
+					control.announceConnectionLost(exceptionDetails + "[Couldn't initialize terminal: " + th.getClass().getSimpleName() + ".]");
 				}
-			});
+			}).start();
 		}
 	}
 	

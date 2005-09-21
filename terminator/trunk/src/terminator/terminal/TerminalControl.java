@@ -36,6 +36,7 @@ public class TerminalControl implements Runnable {
 
 	private JTerminalPane pane;
 	private TextBuffer listener;
+	private String[] command;
 	private PtyProcess ptyProcess;
 	private boolean processIsRunning = true;
 	private boolean processIsBeingDestroyed = false;
@@ -54,14 +55,18 @@ public class TerminalControl implements Runnable {
 	
 	private static final ExecutorService writerExecutor = Executors.newSingleThreadExecutor();
 	
-	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) throws Throwable {
+	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) {
 		reset();
 		this.pane = pane;
 		this.listener = listener;
-		ptyProcess = new PtyProcess(command.split(" "));
+		this.command = command.split(" ");
+		this.logWriter = new LogWriter(command);
+	}
+	
+	public void initProcess() throws Throwable {
+		this.ptyProcess = new PtyProcess(command);
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), "UTF-8");
 		this.out = ptyProcess.getOutputStream();
-		this.logWriter = new LogWriter(command);
 	}
 	
 	public void destroyProcess() {
