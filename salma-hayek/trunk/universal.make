@@ -3,6 +3,7 @@
 #   make clean
 #   make dist
 #   make native
+#   make native-clean
 #   make native-dist
 
 # You can set:
@@ -398,6 +399,10 @@ build.java: $(SOURCE_FILES)
 .PHONY: clean
 clean:
 	@find . -name "*.bak" | xargs $(RM) -r $(GENERATED_FILES)
+
+.PHONY: native-clean
+native-clean:
+	@$(RM) -r .generated/native
 
 ChangeLog.html: ChangeLog
 	$(SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
