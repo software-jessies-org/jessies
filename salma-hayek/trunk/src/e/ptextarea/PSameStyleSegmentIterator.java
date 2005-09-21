@@ -24,10 +24,10 @@ public class PSameStyleSegmentIterator implements Iterator<PLineSegment> {
         while (source.hasNext()) {
             nextSegment = source.next();
             if (nextSegment.getStyle().equals(allowedStyle)) {
-                break;
+                return result;
             }
-            nextSegment = null;
         }
+        nextSegment = null;
         return result;
     }
     
