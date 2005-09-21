@@ -1,7 +1,5 @@
 Items to be done for PTextArea:
 
-* Change the PTextStyler interface to work in terms of Lists of segments, rather than arrays of them.
-
 * Cope with insets. We're rendering text too close to the edge.
 
 * Compounding adjacent edits? Is there a behavior that we'd actually want? I usually find this more annoying than useful, even if it does save space.
@@ -35,4 +33,4 @@ Items to be done for PTextArea:
 
        This is waiting for a good idea.  That may come in the form of generalizing the problem or of deciding on an elegant way to implement it.
        
-  (2) Use PSameStyleCharSequence instead of regular expressions to exclude comments etc from the code which finds the mismatched brackets whose partners should be inserted.
+  (2) Exclude comments etc from the code which finds the mismatched brackets whose partners should be inserted.
