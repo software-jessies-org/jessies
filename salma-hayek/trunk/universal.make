@@ -263,29 +263,6 @@ GENERATED_FILES += classes
 GENERATED_FILES += .generated
 GENERATED_FILES += $(PROJECT_NAME).jar
 
-grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
-
-define GENERATE_FILE_LIST.unknown
-endef
-define GENERATE_FILE_LIST.bk
-  bk sfiles -g
-endef
-define GENERATE_FILE_LIST.cvs
-  cvs ls -R -P -e | perl -ne 'm/(.*):$$/ && ($$dir = "$$1"); m@^/([^/]*)/@ && print ("$$dir/$$1\n")'
-endef
-define GENERATE_FILE_LIST.svn
-  svn status -v | cut -c6- | perl -pe 's/ +/ /g' | cut -f5 -d' '
-endef
-
-REVISION_CONTROLLED_FILES_AND_DIRECTORIES = $(shell $(GENERATE_FILE_LIST.$(REVISION_CONTROL_SYSTEM)))
-# You might think this is cunning (I did) but svn cares about directory properties
-# and (perhaps because of that) controls even empty directories like native/Darwin/NSSpell/src.
-#POSSIBLY_REVISION_CONTROLLED_DIRECTORIES = $(sort $(patsubst %/,%,$(dir $(REVISION_CONTROLLED_FILES_AND_DIRECTORIES))))
-POSSIBLY_REVISION_CONTROLLED_DIRECTORIES = $(patsubst ./%,%,$(shell find . -type d))
-FILE_LIST += $(filter-out $(POSSIBLY_REVISION_CONTROLLED_DIRECTORIES),$(REVISION_CONTROLLED_FILES_AND_DIRECTORIES))
-FILE_LIST += classes
-FILE_LIST += ChangeLog # The ChangeLog should never be checked in, but should be in distributions.
-
 # ----------------------------------------------------------------------------
 # Choose a Java compiler.
 # ----------------------------------------------------------------------------
@@ -450,7 +427,7 @@ $(PROJECT_NAME).jar: build.java
 
 ../$(DIST_FILE_OF_THE_DAY): build.java ChangeLog
 	cd .. && \
-	tar -zcf $(DIST_FILE_OF_THE_DAY) $(addprefix $(PROJECT_NAME)/,$(FILE_LIST))
+	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(DIST_FILE_OF_THE_DAY) $(PROJECT_NAME)/*
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
