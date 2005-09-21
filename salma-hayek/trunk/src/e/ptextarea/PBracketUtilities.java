@@ -39,21 +39,18 @@ public class PBracketUtilities {
      * closing bracket. An exception is thrown if we're not next to a bracket.
      */
     public static int findMatchingBracketInSameStyle(PTextArea textArea, int offset) {
-        StopWatch watch = new StopWatch();
-        try {
-            CharSequence chars = textArea.getTextBuffer();
-            PCharIterator iterator;
-            if (afterOpenBracket(chars, offset)) {
-                Iterator<PLineSegment> segments = new PSameStyleSegmentIterator(textArea.getLogicalSegmentIterator(offset - 1));
-                iterator = new PSegmentCharIterator(segments, offset - 1, true);
-            } else if (beforeCloseBracket(chars, offset)) {
-                iterator = new PCharSequenceIterator(PSameStyleCharSequence.forOffset(textArea, offset), offset, false);
-            } else {
-                throw new IllegalArgumentException("No bracket at offset " + offset);
-            }
-            return findMatchingBracket(iterator);
-        } finally {
-            watch.print("Matching brackets");
+        if (afterOpenBracket(textArea.getTextBuffer(), offset)) {
+            Iterator<PLineSegment> segments = textArea.getLogicalSegmentIterator(offset - 1);
+            segments = new PSameStyleSegmentIterator(segments);
+            return findMatchingBracket(new PSegmentCharIterator(segments, offset - 1, true));
+            
+        } else if (beforeCloseBracket(textArea.getTextBuffer(), offset)) {
+            Iterator<PLineSegment> segments = new PReverseSegmentIterator(textArea, offset);
+            segments = new PSameStyleSegmentIterator(segments);
+            return findMatchingBracket(new PSegmentCharIterator(segments, offset, false));
+            
+        } else {
+            throw new IllegalArgumentException("No bracket at offset " + offset);
         }
     }
     

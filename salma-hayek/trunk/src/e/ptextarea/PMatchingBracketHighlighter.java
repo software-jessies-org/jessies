@@ -26,21 +26,12 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         
         int offset = selectionStart;
         
-        // The same-style char sequence is expensive, but there's a cheap way
-        // to exclude most cases where we don't need it:
-        CharSequence chars = textArea.getTextBuffer();
-        if (PBracketUtilities.isNextToBracket(chars, offset) == false) {
-            return;
-        }
-        
         // Look for a bracket to match with.
-        if (PBracketUtilities.beforeCloseBracket(chars, offset)) {
+        if (PBracketUtilities.beforeCloseBracket(textArea.getTextBuffer(), offset)) {
             highlights[0] = new MatchingBracketHighlight(textArea, offset, offset + 1);
-        } else if (PBracketUtilities.afterOpenBracket(chars, offset)) {
+        } else if (PBracketUtilities.afterOpenBracket(textArea.getTextBuffer(), offset)) {
             highlights[0] = new MatchingBracketHighlight(textArea, offset - 1, offset);
-        }
-        
-        if (highlights[0] == null) {
+        } else {
             // We're not next to a bracket, so we've nothing to match.
             return;
         }

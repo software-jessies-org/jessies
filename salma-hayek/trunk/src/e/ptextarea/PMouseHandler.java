@@ -90,7 +90,6 @@ public class PMouseHandler implements MouseInputListener {
     private void handleHyperlinks(MouseEvent e) {
         PLineSegment segment = textArea.getLineSegmentAtLocation(e.getPoint());
         if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
-            CharSequence chars = segment.getCharSequence();
             PTextSegment.class.cast(segment).linkClicked();
             e.consume();
         }
@@ -121,8 +120,6 @@ public class PMouseHandler implements MouseInputListener {
             }
             
             // 2. then other bracket characters.
-            // Constructing a same-style char sequence is hideously expensive, so we first
-            // check whether we're next to a bracket at all.
             if (PBracketUtilities.isNextToBracket(textArea.getTextBuffer(), pressedOffset)) {
                 int bracketOffset = PBracketUtilities.findMatchingBracketInSameStyle(textArea, pressedOffset);
                 if (bracketOffset != -1) {
