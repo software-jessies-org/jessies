@@ -1,6 +1,7 @@
 package terminator;
 
 import e.gui.*;
+import e.util.Log;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -57,6 +58,11 @@ public class LogWriter {
 	
 	public void setSuspended(boolean newState) {
 		if (stream != null) {
+			try {
+				stream.flush();
+			} catch (Throwable th) {
+				Log.warn("Exception occurred flushing the log stream.", th);
+			}
 			suspended = newState;
 		}
 	}
