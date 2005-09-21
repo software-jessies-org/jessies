@@ -260,7 +260,7 @@ CREATE_OR_UPDATE_JAR=cd $(2)/classes && $(JAR) $(1)f $(CURDIR)/$@ $(notdir $(wil
 GENERATED_FILES += ChangeLog
 GENERATED_FILES += ChangeLog.html
 GENERATED_FILES += classes
-GENERATED_FILES += generated
+GENERATED_FILES += .generated
 GENERATED_FILES += $(PROJECT_NAME).jar
 
 grep-v = $(filter-out @@%,$(filter-out %@@,$(subst $(1),@@ @@,$(2))))
@@ -380,7 +380,7 @@ endef
 # You still seem to get protection of a new local variable the first time you
 # run make after adding it.
 # So that's OK then.
--include generated/local-variables.make
+-include .generated/local-variables.make
 
 # We want to use the $(BASE_NAME) of the preceding scope in error messages.
 LOCAL_VARIABLES := $(filter-out BASE_NAME,$(LOCAL_VARIABLES))
@@ -390,7 +390,7 @@ define copyLocalVariable
   $(1).$(BASE_NAME) := $$($(1))
 endef
 define unsetLocalVariable
-  ERROR.$(1) = $$(shell $(RM) generated/local-variables.make)$$(error makefile bug: local variable $(1) from scope $(BASE_NAME) (with value "$($(1).$(BASE_NAME))") was referred to in scope $$(BASE_NAME))
+  ERROR.$(1) = $$(shell $(RM) .generated/local-variables.make)$$(error makefile bug: local variable $(1) from scope $(BASE_NAME) (with value "$($(1).$(BASE_NAME))") was referred to in scope $$(BASE_NAME))
   $(1) = $$(ERROR.$(1))
 endef
 
@@ -485,7 +485,7 @@ echo.%:
 # Rules for making makefiles.
 # ----------------------------------------------------------------------------
 
-generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
+.generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
 	@mkdir -p $(@D) && \
 	perl -w -ne '(m/^\s*(\S+)\s*[:+]?=/ || m/^\s*define\s*(\S+)/) && print("LOCAL_VARIABLES += $$1\n")' $< | sort -u > $@
 

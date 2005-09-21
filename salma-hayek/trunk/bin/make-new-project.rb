@@ -42,7 +42,7 @@ echo "Telling Subversion to ignore generated files..."
 svn propset svn:ignore "ChangeLog
 ChangeLog.html
 classes
-generated
+.generated
 $name.jar" .
 echo "Getting Subversion to commit that change..."
 svn update
