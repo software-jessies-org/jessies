@@ -21,6 +21,7 @@ public class JTerminalPane extends JPanel {
 	private TerminalControl control;
 	private JTextBuffer textPane;
 	private JScrollPane scrollPane;
+	private VisualBellViewport viewport;
 	private String name;
 	private Dimension currentSizeInChars;
 	private JAsynchronousProgressIndicator outputSpinner;
@@ -85,7 +86,7 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public Dimension getPaneSize() {
-		return scrollPane.getViewport().getSize();
+		return viewport.getSize();
 	}
 	
 	private void init(String command) {
@@ -97,11 +98,17 @@ public class JTerminalPane extends JPanel {
 		EPopupMenu popupMenu = new EPopupMenu(textPane);
 		popupMenu.addMenuItemProvider(new TerminatorMenuItemProvider());
 		
-		scrollPane = new JScrollPane(new BorderPanel(textPane));
+		JComponent view = new BorderPanel(textPane);
+		
+		viewport = new VisualBellViewport();
+		viewport.setBackground(textPane.getBackground());
+		viewport.setView(view);
+		
+		scrollPane = new JScrollPane();
 		scrollPane.setBorder(null);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.getViewport().setBackground(textPane.getBackground());
+		scrollPane.setViewport(viewport);
 		
 		fixScrollBarForMacOs(scrollPane);
 		
@@ -443,8 +450,6 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	private void scrollVertically(double yMul) {
-		JViewport viewport = scrollPane.getViewport();
-		
 		// Translate JViewport's terrible confusing names into plain English.
 		final int totalHeight = viewport.getViewSize().height;
 		final int visibleHeight = viewport.getExtentSize().height;
@@ -562,5 +567,12 @@ public class JTerminalPane extends JPanel {
 	
 	private TerminatorFrame getTerminatorFrame() {
 		return (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, this);
+	}
+	
+	/**
+	 * Implements visual bell.
+	 */
+	public void flash() {
+		viewport.flash();
 	}
 }

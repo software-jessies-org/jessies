@@ -11,9 +11,8 @@ terminator|Terminator no line wrap,
     lines#24,
 # Tabs initially every 8 spaces.
     it#8,
-# Audible bell. We should probably remove this capability, and give "flash"
-# this value, and implement flash in some attractive way.
-    bel=^G,
+# Visible bell. We don't support an audible bell ("bell").
+    flash=^G,
 # Cursor visibility. We don't support control over cursor blink, so
 # there's no cvvis capability here.
     civis=\E[?25l,
