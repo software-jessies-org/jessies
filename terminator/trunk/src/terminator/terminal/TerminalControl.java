@@ -260,17 +260,15 @@ public class TerminalControl implements Runnable {
 			invokeCharacterSet(1);
 		} else if (ch == Ascii.SI) {
 			invokeCharacterSet(0);
-		} else if (ch > Ascii.BEL) {
+		} else if (ch == Ascii.BEL) {
+			pane.getToolkit().beep();
+		} else if (ch == Ascii.NUL) {
 			// Most telnetd(1) implementations seem to have a bug whereby
 			// they send the NUL byte at the end of the C strings they want to
 			// output when you first connect. Since all Unixes are pretty much
 			// copy and pasted from one another these days, this silly mistake
 			// only needed to be made once.
-			
-			// Nothing below BEL is printable anyway.
-			
-			// And neither is BEL, really.
-			
+		} else {
 			lineBuffer.append(ch);
 		}
 	}
