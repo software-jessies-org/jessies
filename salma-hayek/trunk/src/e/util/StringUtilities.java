@@ -251,6 +251,17 @@ public class StringUtilities {
         return stringWriter.toString();
     }
     
+    /**
+     * Returns a string consisting of 'count' copies of 'ch'.
+     */
+    public static String nCopies(int count, char ch) {
+        StringBuilder builder = new StringBuilder(count);
+        for (int i = 0; i < count; ++i) {
+            builder.append(ch);
+        }
+        return builder.toString();
+    }
+    
     private StringUtilities() {
     }
 
