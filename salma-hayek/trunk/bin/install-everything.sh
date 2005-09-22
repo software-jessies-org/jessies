@@ -33,8 +33,11 @@ if test -d $JAVA_HOME ; then
 fi
 
 if test -f /etc/debian_version ; then
-    apt-get update
-    apt-get -y install exuberant-ctags ri
+    if [[ ! -x /usr/bin/ctags-exuberant || ! -x /usr/bin/ri ]]
+    then
+        apt-get update
+        apt-get -y install exuberant-ctags ri
+    fi
 fi
 
 # Create a directory in /usr/local for all our stuff.
