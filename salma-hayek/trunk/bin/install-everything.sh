@@ -72,7 +72,7 @@ done
 # currently unavailable.
 cat /proc/mounts | perl -ne '
 if (m@^/dev/\w+ (/home/\w+) @) {
-system("rm -f $1/.terminal-logs/.terminator-server-port");
+    system("echo rm -f $1/.terminal-logs/.terminator-server-port | bash -x");
 }'
 #rm -f ~/.e.edit.Edit/edit-server-port
 tic terminator/doc/terminfo/terminator.tic
