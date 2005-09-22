@@ -261,7 +261,7 @@ public class TerminalControl implements Runnable {
 		} else if (ch == Ascii.SI) {
 			invokeCharacterSet(0);
 		} else if (ch == Ascii.BEL) {
-			pane.getToolkit().beep();
+			pane.flash();
 		} else if (ch == Ascii.NUL) {
 			// Most telnetd(1) implementations seem to have a bug whereby
 			// they send the NUL byte at the end of the C strings they want to
