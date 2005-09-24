@@ -187,18 +187,7 @@ public class Workspace extends JPanel {
      * Returns a list of the files matching the given regular expression.
      */
     public List<String> getListOfFilesMatching(String regularExpression) {
-        // If the user typed a capital, assume that means something, and we
-        // should do a case-sensitive search. If everything's lower-case,
-        // assume they don't care.
-        boolean caseInsensitive = true;
-        for (int i = 0; i < regularExpression.length(); ++i) {
-            if (Character.isUpperCase(regularExpression.charAt(i))) {
-                caseInsensitive = false;
-            }
-        }
-        Pattern pattern = Pattern.compile(regularExpression, caseInsensitive ? Pattern.CASE_INSENSITIVE : 0);
-        
-        // Collect the matches.
+        Pattern pattern = PatternUtilities.smartCaseCompile(regularExpression);
         ArrayList<String> result = new ArrayList<String>();
         List<String> allFiles = fileList;
         for (String candidate : allFiles) {

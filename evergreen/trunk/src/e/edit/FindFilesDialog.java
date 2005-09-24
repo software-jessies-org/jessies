@@ -37,16 +37,19 @@ public class FindFilesDialog {
     public class MatchingLine implements ClickableTreeItem {
         private String line;
         private File file;
+        private Pattern pattern;
         
-        public MatchingLine(String line, File file) {
+        public MatchingLine(String line, File file, Pattern pattern) {
             this.line = line;
             this.file = file;
+            this.pattern = pattern;
         }
         
         public void open() {
             EWindow window = Edit.getInstance().openFile(file.toString());
             if (window instanceof ETextWindow) {
                 ETextWindow textWindow = (ETextWindow) window;
+                FindAction.INSTANCE.findInText(textWindow, PatternUtilities.toString(pattern));
                 final int lineNumber = Integer.parseInt(line.substring(1, line.indexOf(':', 1)));
                 textWindow.goToLine(lineNumber);
             }
@@ -61,7 +64,7 @@ public class FindFilesDialog {
         private File file;
         private String name;
         private int matchCount;
-        private String regularExpression;
+        private Pattern pattern;
         private boolean containsDefinition;
         
         /**
@@ -74,14 +77,14 @@ public class FindFilesDialog {
         /**
          * For matches based on filename and a regular expression.
          */
-        public MatchingFile(File file, String name, int matchCount, String regularExpression) {
+        public MatchingFile(File file, String name, int matchCount, Pattern pattern) {
             this.file = file;
             this.name = name;
             this.matchCount = matchCount;
-            this.regularExpression = regularExpression;
+            this.pattern = pattern;
             this.containsDefinition = containsDefinition;
-            if (regularExpression != null) {
-                definitionFinderExecutor.submit(new DefinitionFinder(file, regularExpression, this));
+            if (pattern != null) {
+                definitionFinderExecutor.submit(new DefinitionFinder(file, pattern, this));
             }
         }
         
@@ -96,9 +99,9 @@ public class FindFilesDialog {
         
         public void open() {
             EWindow window = Edit.getInstance().openFile(workspace.getRootDirectory() + File.separator + name);
-            if (window instanceof ETextWindow && regularExpression != null) {
+            if (window instanceof ETextWindow && pattern != null) {
                 ETextWindow textWindow = (ETextWindow) window;
-                FindAction.INSTANCE.findInText(textWindow, regularExpression);
+                FindAction.INSTANCE.findInText(textWindow, PatternUtilities.toString(pattern));
                 textWindow.getText().findNext();
             }
         }
@@ -154,7 +157,7 @@ public class FindFilesDialog {
         protected DefaultMutableTreeNode doInBackground() {
             Thread.currentThread().setName("Search for '" + regex + "' in files matching '" + fileRegex + "'");
             try {
-                Pattern pattern = Pattern.compile(regex);
+                Pattern pattern = PatternUtilities.smartCaseCompile(regex);
                 FileSearcher fileSearcher = new FileSearcher(pattern);
                 String root = workspace.getRootDirectory();
                 long startTime = System.currentTimeMillis();
@@ -180,10 +183,10 @@ public class FindFilesDialog {
                             final int matchCount = matches.size();
                             if (matchCount > 0) {
                                 DefaultMutableTreeNode pathNode = getPathNode(candidate);
-                                MatchingFile matchingFile = new MatchingFile(file, candidate, matchCount, regex);
+                                MatchingFile matchingFile = new MatchingFile(file, candidate, matchCount, pattern);
                                 DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
                                 for (String line : matches) {
-                                    fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file)));
+                                    fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file, pattern)));
                                 }
                                 pathNode.add(fileNode);
                             }
@@ -256,10 +259,10 @@ public class FindFilesDialog {
         private MatchingFile matchingFile;
         private Pattern pattern;
         
-        public DefinitionFinder(File file, String regularExpression, MatchingFile matchingFile) {
+        public DefinitionFinder(File file, Pattern pattern, MatchingFile matchingFile) {
             this.file = file;
             this.matchingFile = matchingFile;
-            this.pattern = Pattern.compile(regularExpression);
+            this.pattern = pattern;
         }
         
         public void run() {
