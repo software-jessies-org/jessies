@@ -55,7 +55,8 @@ public abstract class Rewriter {
         // We have to use StringBuffer because that's Matcher's API.
         StringBuffer result = new StringBuffer(original.length());
         while (matcher.find()) {
-            matcher.appendReplacement(result, replacement());
+            matcher.appendReplacement(result, "");
+            result.append(replacement());
         }
         matcher.appendTail(result);
         return result.toString();
@@ -80,6 +81,14 @@ public abstract class Rewriter {
         }.rewrite("ab12 cd efg34");
         System.out.println(result);
         
+        result = new Rewriter("([0-9]+) US cents") {
+            public String replacement() {
+                long dollars = Long.parseLong(group(1))/100;
+                return "$" + dollars;
+            }
+        }.rewrite("5000 US cents");
+        System.out.println(result);
+        
         // Rewrite durations in milliseconds in ISO 8601 format.
         Rewriter rewriter = new Rewriter("(\\d+)\\s*ms") {
             public String replacement() {
@@ -87,8 +96,11 @@ public abstract class Rewriter {
                 return TimeUtilities.durationToIsoString(milliseconds);
             }
         };
+        result = rewriter.rewrite("232341243 ms");
+        System.out.println(result);
+        
         for (String argument : arguments) {
-            System.err.println(rewriter.rewrite(argument));
+            System.out.println(rewriter.rewrite(argument));
         }
     }
 }
