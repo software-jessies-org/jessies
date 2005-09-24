@@ -43,6 +43,7 @@ public class FatBits extends JFrame {
             Log.warn("failed to create a Robot", ex);
         }
         timer = new Timer(50, new MouseTracker());
+        setLocationByPlatform(true);
         setSize(new Dimension(250, 300));
         setContentPane(makeUi());
         setJMenuBar(new FatBitsMenuBar());
@@ -332,7 +333,7 @@ public class FatBits extends JFrame {
     }
     
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
                 GuiUtilities.initLookAndFeel();
                 new FatBits().setVisible(true);
