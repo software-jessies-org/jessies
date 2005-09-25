@@ -30,18 +30,18 @@ public class FindHighlighter implements Highlighter {
 	 * 
 	 * Returns the current number of matches.
 	 */
-	public void setRegularExpression(JTextBuffer view, Pattern newPattern, JLabel statusLine) {
+	public void setPattern(JTextBuffer view, Pattern newPattern, JLabel statusLine) {
 		view.removeHighlightsFrom(this, 0);
 		if (newPattern != null) {
 			this.pattern = newPattern;
 			int matchCount = addHighlights(view, 0);
 			statusLine.setText("Matches: " + matchCount);
 		} else {
-			forgetRegularExpression(view);
+			forgetPattern(view);
 		}
 	}
 	
-	public void forgetRegularExpression(JTextBuffer view) {
+	public void forgetPattern(JTextBuffer view) {
 		view.removeHighlightsFrom(this, 0);
 		this.pattern = null;
 	}
