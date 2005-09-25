@@ -31,13 +31,11 @@ public class FindHighlighter implements Highlighter {
 	 * Returns the current number of matches.
 	 */
 	public void setPattern(JTextBuffer view, Pattern newPattern, JLabel statusLine) {
-		view.removeHighlightsFrom(this, 0);
+		forgetPattern(view);
 		if (newPattern != null) {
 			this.pattern = newPattern;
 			int matchCount = addHighlights(view, 0);
 			statusLine.setText("Matches: " + matchCount);
-		} else {
-			forgetPattern(view);
 		}
 	}
 	
