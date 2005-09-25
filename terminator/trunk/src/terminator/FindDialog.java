@@ -104,8 +104,7 @@ public class FindDialog {
             }
         }
         
-        int matchCount = getFindHighlighter().setRegularExpression(textToFindIn, pattern);
-        setStatus("Matches: " + matchCount, false);
+        getFindHighlighter().setRegularExpression(textToFindIn, pattern, findStatus);
     }
     
     private void setStatus(String text, boolean isError) {
