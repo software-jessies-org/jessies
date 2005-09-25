@@ -93,13 +93,27 @@ public class FindDialog {
     
     private void find() {
         String regularExpression = findField.getText();
-        try {
-            int matchCount = getFindHighlighter().setRegularExpression(textToFindIn, regularExpression);
-            findStatus.setText("Matches: " + matchCount);
-            findField.setForeground(UIManager.getColor("TextField.foreground"));
-        } catch (PatternSyntaxException ex) {
-            findField.setForeground(Color.RED);
-            findStatus.setText(ex.getDescription());
+        Pattern pattern = null;
+        if (regularExpression.length() > 0) {
+            try {
+                pattern = PatternUtilities.smartCaseCompile(regularExpression);
+                clearStatus();
+            } catch (PatternSyntaxException ex) {
+                setStatus(ex.getDescription(), true);
+                return;
+            }
         }
+        
+        int matchCount = getFindHighlighter().setRegularExpression(textToFindIn, pattern);
+        setStatus("Matches: " + matchCount, false);
+    }
+    
+    private void setStatus(String text, boolean isError) {
+        findField.setForeground(isError ? Color.RED : UIManager.getColor("TextField.foreground"));
+        findStatus.setText(text);
+    }
+    
+    private void clearStatus() {
+        setStatus(" ", false);
     }
 }
