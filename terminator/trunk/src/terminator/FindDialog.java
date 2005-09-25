@@ -76,7 +76,7 @@ public class FindDialog {
         });
         dialog.setCancelRunnable(new Runnable() {
             public void run() {
-                getFindHighlighter().forgetRegularExpression(textToFindIn);
+                getFindHighlighter().forgetPattern(textToFindIn);
             }
         });
         dialog.setRememberBounds(false);
@@ -104,7 +104,7 @@ public class FindDialog {
             }
         }
         
-        getFindHighlighter().setRegularExpression(textToFindIn, pattern, findStatus);
+        getFindHighlighter().setPattern(textToFindIn, pattern, findStatus);
     }
     
     private void setStatus(String text, boolean isError) {
