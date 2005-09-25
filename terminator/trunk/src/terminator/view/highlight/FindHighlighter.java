@@ -2,9 +2,10 @@ package terminator.view.highlight;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.*;
 import java.util.regex.*;
 import javax.swing.*;
-
+import org.jdesktop.swingworker.SwingWorker;
 import terminator.model.*;
 import terminator.view.*;
 
@@ -12,6 +13,8 @@ import terminator.view.*;
  * Highlights the results of user-initiated finds.
  */
 public class FindHighlighter implements Highlighter {
+	private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
 	/** The highlighter pen style. */
 	private final Style style = new Style(Color.black, Color.yellow, null, null, false);
 
@@ -30,13 +33,27 @@ public class FindHighlighter implements Highlighter {
 	 * 
 	 * Returns the current number of matches.
 	 */
-	public void setPattern(JTextBuffer view, Pattern newPattern, JLabel statusLine) {
+	public void setPattern(final JTextBuffer view, Pattern newPattern, final JLabel statusLine) {
 		forgetPattern(view);
-		if (newPattern != null) {
-			this.pattern = newPattern;
-			int matchCount = addHighlights(view, 0);
-			statusLine.setText("Matches: " + matchCount);
+		if (newPattern == null) {
+			return;
 		}
+		
+		this.pattern = newPattern;
+		executorService.execute(new SwingWorker<Object, Object>() {
+			private int matchCount;
+			
+			@Override
+			protected Object doInBackground() {
+				matchCount = addHighlights(view, 0);
+				return null;
+			}
+			
+			@Override
+			protected void done() {
+				statusLine.setText("Matches: " + matchCount);
+			}
+		});
 	}
 	
 	public void forgetPattern(JTextBuffer view) {
