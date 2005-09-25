@@ -215,13 +215,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         try {
             this.selectionEndIsAnchor = selectionEndIsAnchor;
             SelectionHighlight oldSelection = selection;
-            repaintCaret();
             selection = new SelectionHighlight(this, start, end);
             copyToSystemSelection();
-            repaintCaret();
             oldSelection.detachAnchors();
             if (oldSelection.isEmpty() != selection.isEmpty()) {
                 repaintHighlight(selection.isEmpty() ? oldSelection : selection);
+                repaintCaret(selection.isEmpty() ? selection : oldSelection);
             } else if (oldSelection.isEmpty() == false && selection.isEmpty() == false) {
                 int minStart = Math.min(oldSelection.getStartIndex(), selection.getStartIndex());
                 int maxStart = Math.max(oldSelection.getStartIndex(), selection.getStartIndex());
@@ -233,6 +232,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                 if (minEnd != maxEnd) {
                     repaintLines(getCoordinates(minEnd).getLineIndex() - 1, getCoordinates(maxEnd).getLineIndex());
                 }
+            } else {
+                repaintCaret(oldSelection);
+                repaintCaret(selection);
             }
             fireCaretChangedEvent();
         } finally {
@@ -896,11 +898,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         repaintLines(start.getLineIndex(), end.getLineIndex());
     }
     
-    private void repaintCaret() {
+    private void repaintCaret(SelectionHighlight caret) {
         if (isLineWrappingInvalid()) {
             return;
         }
-        Point point = getViewCoordinates(getCoordinates(getSelectionStart()));
+        Point point = getViewCoordinates(getCoordinates(caret.getStartIndex()));
         repaint(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getMaxAscent() + metrics.getMaxDescent());
     }
     
