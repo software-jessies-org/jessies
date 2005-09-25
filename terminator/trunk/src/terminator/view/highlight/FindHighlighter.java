@@ -20,10 +20,19 @@ public class FindHighlighter implements Highlighter {
 		return "Find Highlighter";
 	}
 	
-	public int setRegularExpression(JTextBuffer view, String regularExpression) {
+	/**
+	 * Sets the current sought regular expression. Existing highlights will
+	 * be removed, matches in the current text will be found, and future
+	 * matches will be found as they appear.
+	 * 
+	 * 'newPattern' can be null to cancel match highlighting.
+	 * 
+	 * Returns the current number of matches.
+	 */
+	public int setRegularExpression(JTextBuffer view, Pattern newPattern) {
 		view.removeHighlightsFrom(this, 0);
-		if (regularExpression.length() > 0) {
-			this.pattern = Pattern.compile(regularExpression);
+		if (newPattern != null) {
+			this.pattern = newPattern;
 			return addHighlights(view, 0);
 		} else {
 			forgetRegularExpression(view);
