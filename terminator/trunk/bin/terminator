@@ -68,7 +68,7 @@ def cygpath(filenameOrPath)
   return `#{args.join(" ")}`.chomp
 end
 
-classpath="#{terminator_home}/classes:#{salma_hayek}/classes"
+classpath="#{terminator_home}/classes:#{salma_hayek}/classes:#{salma_hayek}/swing-worker.jar"
 
 
 pty_path="#{terminator_home}/.generated/native/all/pty/#{TARGET_OS}"
