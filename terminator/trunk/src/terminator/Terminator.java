@@ -142,12 +142,20 @@ public class Terminator {
 		out.println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
 	}
 
-	public static void main(final String[] arguments) throws IOException {
-		GuiUtilities.initLookAndFeel();
-		PrintWriter outWriter = new PrintWriter(System.out);
-		PrintWriter errWriter = new PrintWriter(System.err);
-		Terminator.getSharedInstance().parseOriginalCommandLine(arguments, outWriter, errWriter);
-		outWriter.flush();
-		errWriter.flush();
+	public static void main(final String[] arguments) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				GuiUtilities.initLookAndFeel();
+				try {
+					PrintWriter outWriter = new PrintWriter(System.out);
+					PrintWriter errWriter = new PrintWriter(System.err);
+					Terminator.getSharedInstance().parseOriginalCommandLine(arguments, outWriter, errWriter);
+					outWriter.flush();
+					errWriter.flush();
+				} catch (Throwable th) {
+					Log.warn("Couldn't start Terminator.", th);
+				}
+			}
+		});
 	}
 }
