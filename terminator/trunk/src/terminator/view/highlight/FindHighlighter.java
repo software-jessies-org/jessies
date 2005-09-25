@@ -3,6 +3,7 @@ package terminator.view.highlight;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
+import javax.swing.*;
 
 import terminator.model.*;
 import terminator.view.*;
@@ -29,14 +30,14 @@ public class FindHighlighter implements Highlighter {
 	 * 
 	 * Returns the current number of matches.
 	 */
-	public int setRegularExpression(JTextBuffer view, Pattern newPattern) {
+	public void setRegularExpression(JTextBuffer view, Pattern newPattern, JLabel statusLine) {
 		view.removeHighlightsFrom(this, 0);
 		if (newPattern != null) {
 			this.pattern = newPattern;
-			return addHighlights(view, 0);
+			int matchCount = addHighlights(view, 0);
+			statusLine.setText("Matches: " + matchCount);
 		} else {
 			forgetRegularExpression(view);
-			return 0;
 		}
 	}
 	
