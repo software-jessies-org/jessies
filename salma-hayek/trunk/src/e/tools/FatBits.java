@@ -17,7 +17,7 @@ import javax.swing.Timer;
 /**
  * A Java equivalent of Apple's Pixie.app magnifying glass utility. This is
  * useful for checking layout, graphics, and colors in your own programs and
- * others.
+ * those of others.
  */
 public class FatBits extends JFrame {
     private Robot robot;
