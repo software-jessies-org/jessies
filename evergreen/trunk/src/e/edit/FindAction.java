@@ -58,7 +58,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
         if (selectedText.length() == 0) {
             return currentRegularExpression;
         }
-        return StringUtilities.regularExpressionFromLiteral(selectedText);
+        return "(?-i)" + StringUtilities.regularExpressionFromLiteral(selectedText);
     }
     
     public String getPrompt() {
@@ -152,7 +152,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
         // Compile the regular expression.
         Pattern pattern;
         try {
-            pattern = Pattern.compile(regularExpression);
+            pattern = PatternUtilities.smartCaseCompile(regularExpression);
         } catch (PatternSyntaxException patternSyntaxException) {
             Edit.getInstance().showStatus(patternSyntaxException.getDescription());
             return;
