@@ -1493,7 +1493,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             
             // Find all the matches.
             int matchCount = 0;
-            Matcher matcher = Pattern.compile(regularExpression).matcher(getTextBuffer());
+            Matcher matcher = PatternUtilities.smartCaseCompile(regularExpression).matcher(getTextBuffer());
             while (matcher.find()) {
                 addHighlight(new PFind.MatchHighlight(this, matcher.start(), matcher.end()));
                 ++matchCount;
