@@ -66,6 +66,7 @@ if FileTest.directory?(edit_preferences_directory) == false
     Dir.mkdir(edit_preferences_directory)
     puts("Edit: Copying default preferences.")
     FileUtils.cp("#{edit_home}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
+    FileUtils.cp("#{edit_home}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
     puts("Edit: Away you go!")
 end
 
