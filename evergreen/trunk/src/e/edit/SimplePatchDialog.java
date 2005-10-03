@@ -30,14 +30,29 @@ public class SimplePatchDialog {
         return new JScrollPane(makePatchView(fromName, fromContent, toName, toContent));
     }
     
+    private static int runDiff(ArrayList<String> lines, ArrayList<String> errors, String fromName, String fromFile, String toName, String toFile, boolean useGnuExtensions) {
+        String[] command = new String[] { "diff", "-u", "-b", "-B", "-L", toName, toFile, "-L", fromName, fromFile };
+        if (useGnuExtensions == false) {
+            // Use only POSIX diff(1) options http://www.opengroup.org/onlinepubs/009695399/utilities/diff.html
+            // One day, son, all this useless variation will be a bad memory.
+            command = new String[] { "diff", "-u", "-b", toFile, fromFile };
+        }
+        return ProcessUtilities.backQuote(null, command, lines, errors);
+    }
+    
     public static JComponent makePatchView(String fromName, String fromContent, String toName, String toContent) {
         String fromFile = FileUtilities.createTemporaryFile(PREFIX, "file containing " + fromName, fromContent);
         String toFile = FileUtilities.createTemporaryFile(PREFIX, "file containing " + toName, toContent);
         
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        String[] command = new String[] { "diff", "-u", "-b", "-B", "-L", toName, toFile, "-L", fromName, fromFile };
-        int status = ProcessUtilities.backQuote(null, command, lines, errors);
+        int status = runDiff(lines, errors, fromName, fromFile, toName, toFile, true);
+        if (status == 2) {
+            lines.clear();
+            errors.clear();
+            status = runDiff(lines, errors, fromName, fromFile, toName, toFile, false);
+            lines.add(0, "@@ (You should consider upgrading to GNU diff(1).) @@");
+        }
         
         if (status == 0) {
             lines.add("(No non-whitespace differences.)");
