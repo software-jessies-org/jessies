@@ -10,15 +10,31 @@ import e.ptextarea.*;
 import e.gui.*;
 import e.util.*;
 
+/**
+ * Keeps track of the current directory based on the messages about
+ * entering and leaving directories in GNU Make output.
+ * 
+ * This was called on the event dispatch thread via EErrorsWindow.append,
+ * rather than ErrorLinkStyler (where it used to be) because the link
+ * styler is called over and over again as we're redrawn or the mouse
+ * moves across us, et cetera. Unfortunately, this wasn't the right place
+ * either, because the styler still has to use this information to try
+ * to turn a relative name into an absolute name, and a big recursive
+ * build may have moved on since the output we were currently redrawing.
+ * 
+ * As far as I know, the best solution is to make sure that your
+ * build output only contains absolute names, and to not rely on this
+ * code to do anything useful.
+ */
 public class EErrorsWindow extends EWindow {
-    private static final Pattern MAKE_DIRECTORY_CHANGE = Pattern.compile("^make(?:\\[\\d+\\])?: (Entering|Leaving) directory `(.*)'$");
+    private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory `(.*)'$");
     
-    private File currentDirectory;
-    
+    private final Workspace workspace;
     private PTextArea textArea;
     
-    public EErrorsWindow(String filename) {
-        super(filename);
+    public EErrorsWindow(Workspace workspace) {
+        super("+Errors");
+        this.workspace = workspace;
         initTextArea();
         JScrollPane scrollPane = new JScrollPane(textArea);
         GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
@@ -54,36 +70,42 @@ public class EErrorsWindow extends EWindow {
         protected void configureSegment(PTextSegment segment, Matcher matcher) {
             segment.setLinkAction(new ErrorLinkActionListener(matcher.group(1)));
         }
-        
-        @Override
-        public boolean isAcceptableMatch(CharSequence line, Matcher address) {
-            // We're most useful in providing links to grep matches, so we
-            // need to avoid being confused by stuff like File.java:123.
-            String name = address.group(1);
-            int colonIndex = name.indexOf(':');
-            if (colonIndex != -1) {
-                name = name.substring(0, colonIndex);
-            }
-            
-            // If the file doesn't exist, this wasn't a useful match.
-            File file = null;
-            if (name.startsWith("/") || name.startsWith("~")) {
-                file = FileUtilities.fileFromString(name);
-            } else {
-                file = new File(currentDirectory, name);
-            }
-            return file.exists();
-        }
     }
     
-    private static class ErrorLinkActionListener implements ActionListener {
-        private String address;
+    private class ErrorLinkActionListener implements ActionListener {
+        private final String address;
         
         public ErrorLinkActionListener(String address) {
             this.address = address;
         }
         
         public void actionPerformed(ActionEvent e) {
+            // We're most useful in providing links to grep matches, so we
+            // need to avoid being confused by stuff like File.java:123.
+            String name = address;
+            int colonIndex = name.indexOf(':');
+            if (colonIndex != -1) {
+                name = name.substring(0, colonIndex);
+            }
+            String tail = address.substring(colonIndex);
+            
+            File file = null;
+            if (name.startsWith("/") || name.startsWith("~")) {
+                open(address);
+            } else {
+                // Try to resolve the non-canonical name.
+                String currentDirectory = workspace.getRootDirectory();
+                String errors = textArea.getText();
+                // FIXME: we shouldn't search past the point at which the user clicked, but how do we know where that is?
+                Matcher matcher = MAKE_ENTERING_DIRECTORY_PATTERN.matcher(errors);
+                while (matcher.find()) {
+                    currentDirectory = matcher.group(1);
+                }
+                open(currentDirectory + File.separator + name + tail);
+            }
+        }
+        
+        private void open(String address) {
             Edit.getInstance().openFile(address);
         }
     }
@@ -100,33 +122,7 @@ public class EErrorsWindow extends EWindow {
         }
         
         public void run() {
-            updateCurrentDirectory(line);
             textArea.append(line);
-        }
-    }
-    
-    /**
-     * Keeps track of the current directory based on the messages about
-     * entering and leaving directories in GNU Make output.
-     * 
-     * This is called on the event dispatch thread via EErrorsWindow.append,
-     * rather than ErrorLinkStyler (where it used to be) because the link
-     * styler is called over and over again as we're redrawn or the mouse
-     * moves across us, et cetera. Unfortunately, this isn't the right place
-     * either, because the styler still has to use this information to try
-     * to turn a relative name into an absolute name, and a big recursive
-     * build may have moved on since the output we're currently redrawing.
-     * 
-     * As far as I know, the only real solution is to make sure that your
-     * build output only contains absolute names, and to not rely on this
-     * code to do anything useful.
-     */
-    private void updateCurrentDirectory(String line) {
-        Matcher directoryChangeMatcher = MAKE_DIRECTORY_CHANGE.matcher(line);
-        if (directoryChangeMatcher.find()) {
-            if (directoryChangeMatcher.group(1).equals("Entering")) {
-                currentDirectory = new File(directoryChangeMatcher.group(2));
-            }
         }
     }
     
@@ -151,7 +147,8 @@ public class EErrorsWindow extends EWindow {
     }
     
     public void resetAutoScroll() {
-//        linkFormatter.setAutoScroll(true);
+        // FIXME: differentiate between stdout and stderr, and pause scrolling as soon as we see anything on stderr.
+        //linkFormatter.setAutoScroll(true);
     }
     
     /** Errors windows have no initial content. */
