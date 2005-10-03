@@ -14,7 +14,7 @@ import org.jdesktop.swingworker.SwingWorker;
 
 public class Workspace extends JPanel {
     private EColumn leftColumn = new EColumn();
-    private EErrorsWindow errors = new EErrorsWindow("+Errors");
+    private EErrorsWindow errors = new EErrorsWindow(this);
 
     private String title;
     private String rootDirectory;
