@@ -41,6 +41,8 @@ public class SimplePatchDialog {
         
         if (status == 0) {
             lines.add("(No non-whitespace differences.)");
+        } else if (status > 1) {
+            lines.add("diff(1) failed.");
         }
         
         StringBuilder builder = new StringBuilder();
