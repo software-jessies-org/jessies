@@ -32,13 +32,12 @@ extern "C" {
   typedef jint JNICALL (*CreateJavaVM)(JavaVM**, void**, void*);
 }
 
-struct JavaInvocation {
+struct JvmLocation {
 private:
-  JavaVM* vm;
-  JNIEnv* env;
+  std::string jvmDirectory;
   
-private:
-  static std::string findJvmLibraryUsingJavaHome() {
+public:
+  std::string findJvmLibraryUsingJavaHome() const {
     const char* javaHome = getenv("JAVA_HOME");
     if (javaHome == 0) {
       throw UsageError("please set $JAVA_HOME");
@@ -48,10 +47,11 @@ private:
     if (access(pathToJre.c_str(), X_OK) != 0) {
       pathToJre = javaHome;
     }
-    return pathToJre + "/bin/client/jvm.dll";
+    return pathToJre + "/bin/" + jvmDirectory + "/jvm.dll";
   }
   
-  static std::string findJvmLibraryUsingRegistry() {
+  // What should we do if this points to "client" when we want "server"?
+  std::string findJvmLibraryUsingRegistry() const {
     const char* jreRegistryPath = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment";
     std::vector<std::string> versions;
     for (DirectoryIterator it(jreRegistryPath); it.isValid(); ++ it) {
@@ -76,7 +76,7 @@ private:
     return jvmLibraryPath.str();
   }
   
-  static std::string findWin32JvmLibrary() {
+  std::string findWin32JvmLibrary() const {
     std::ostringstream os;
     os << "couldn't find jvm.dll - please set $JAVA_HOME or install a JRE";
     os << "error messages were:";
@@ -98,15 +98,37 @@ private:
     throw UsageError(os.str());
   }
   
-  static std::string findJvmLibraryFilename() {
+  std::string findJvmLibraryFilename() const {
 #if defined(__CYGWIN__)
     return findWin32JvmLibrary();
 #else
-    // This only works on Linux if LD_LIBRARY_PATH is already setup.
+    // This only works on Linux if LD_LIBRARY_PATH is already set up to include something like:
+    // "$JAVA_HOME/jre/lib/$ARCH/" + jvmDirectory
+    // "$JAVA_HOME/jre/lib/$ARCH"
+    // "$JAVA_HOME/jre/../lib/$ARCH"
+    // Where $ARCH is "i386" rather than `arch`.
     return "libjvm.so";
 #endif
   }
   
+  void setClientClass() {
+    jvmDirectory = "client";
+  }
+  void setServerClass() {
+    jvmDirectory = "server";
+  }
+  
+  JvmLocation() {
+    setClientClass();
+  }
+};
+
+struct JavaInvocation {
+private:
+  JavaVM* vm;
+  JNIEnv* env;
+  
+private:
   static CreateJavaVM findCreateJavaVM(const char* sharedLibraryFilename) {
     void* sharedLibraryHandle = dlopen(sharedLibraryFilename, RTLD_LAZY);
     if (sharedLibraryHandle == 0) {
@@ -171,8 +193,7 @@ private:
   }
   
 public:
-  JavaInvocation(const NativeArguments& jvmArguments) {
-    std::string jvmLibraryFilename = findJvmLibraryFilename();
+  JavaInvocation(const std::string& jvmLibraryFilename, const NativeArguments& jvmArguments) {
     CreateJavaVM createJavaVM = findCreateJavaVM(jvmLibraryFilename.c_str());
     
     typedef std::vector<JavaVMOption> JavaVMOptions; // Required to be contiguous.
@@ -221,6 +242,7 @@ public:
 
 struct LauncherArgumentParser {
 private:
+  JvmLocation jvmLocation;
   NativeArguments jvmArguments;
   std::string className;
   NativeArguments mainArguments;
@@ -235,7 +257,14 @@ public:
     NativeArguments::const_iterator it = launcherArguments.begin();
     NativeArguments::const_iterator end = launcherArguments.end();
     while (it != end && beginsWith(*it, "-")) {
-      jvmArguments.push_back(*it);
+      std::string option = *it;
+      if (option == "-client") {
+        jvmLocation.setClientClass();
+      } else if (option == "-server") {
+        jvmLocation.setServerClass();
+      } else {
+        jvmArguments.push_back(option);
+      }
       ++ it;
     }
     if (it == end) {
@@ -249,6 +278,9 @@ public:
     }
   }
   
+  std::string getJvmLibraryFilename() const {
+    return jvmLocation.findJvmLibraryFilename();
+  }
   NativeArguments getJvmArguments() const {
     return jvmArguments;
   }
@@ -270,13 +302,17 @@ int main(int, char** argv) {
   }
   try {
     LauncherArgumentParser parser(launcherArguments);
-    JavaInvocation javaInvocation(parser.getJvmArguments());
+    JavaInvocation javaInvocation(parser.getJvmLibraryFilename(), parser.getJvmArguments());
     javaInvocation.invokeMain(parser.getClassName(), parser.getMainArguments());
   } catch (const UsageError& usageError) {
     std::ostringstream os;
     os << usageError.what() << std::endl;
     os << "Usage: " << programName << " -options class [args...]" << std::endl;
-    os << "where options are Java Virtual Machine options" << std::endl;
+    os << "where options are Java Virtual Machine options or:" << std::endl;
+    os << "  -client";
+    os << std::endl;
+    os << "  -server ... to select a JVM";
+    os << std::endl;
     os << "Command line was:";
     os << std::endl;
     os << programName << " ";
