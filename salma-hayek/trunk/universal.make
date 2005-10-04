@@ -123,11 +123,20 @@ JAVAHPP = $(SALMA_HAYEK)bin/javahpp.rb
 # ----------------------------------------------------------------------------
 
 SOURCE_EXTENSIONS += c
+OBJECT_EXTENSION.c = o
 SOURCE_EXTENSIONS += cpp
+OBJECT_EXTENSION.cpp = o
 SOURCE_EXTENSIONS += m
+OBJECT_EXTENSION.m = o
 SOURCE_EXTENSIONS += mm
+OBJECT_EXTENSION.mm = o
+
+SOURCE_EXTENSIONS += wxs
+OBJECT_EXTENSION.wxs = wixobj
 
 HEADER_EXTENSIONS += h
+
+HEADER_EXTENSIONS += wxi
 
 # ----------------------------------------------------------------------------
 # Sensible C family compiler flags.
@@ -170,7 +179,7 @@ COMPILE.mm = $(COMPILE.cpp) $(OBJC_AND_OBJCXX_FLAGS)
 # You end up with a variable called OBJECTS.copyLocalVariable, containing a $(error),
 # being evaluated by the call to copyLocalVariable at the end of the next scope.
 define defineObjectsPerLanguage
-  OBJECTS.$(1) = $(patsubst $(SOURCE_DIRECTORY)/%.$(1),$(GENERATED_DIRECTORY)/%.o,$(filter %.$(1),$(SOURCES)))
+  OBJECTS.$(1) = $(patsubst $(SOURCE_DIRECTORY)/%.$(1),$(GENERATED_DIRECTORY)/%.$(OBJECT_EXTENSION.$(1)),$(filter %.$(1),$(SOURCES)))
   # The Perl script needs help if we're going to have variable variable names.
   LOCAL_VARIABLES += OBJECTS.$(1)
 endef
@@ -355,6 +364,14 @@ define BUILD_JAVA
   mkdir -p classes && \
   $(JAVA_COMPILER) $(JAVA_FLAGS) $(call convertToNativeFilenames,$(SOURCE_FILES))
 endef
+
+# ----------------------------------------------------------------------------
+# Find WiX
+# ----------------------------------------------------------------------------
+
+WIX_PATH = /tmp/wix/
+CANDLE = $(WIX_PATH)candle
+LIGHT = $(WIX_PATH)light
 
 # ----------------------------------------------------------------------------
 # Prevent us from using per-directory.make's local variables in universal.make

@@ -98,11 +98,24 @@ MISSING_PRIVATE_FRAMEWORKS := $(filter-out $(wildcard $(PRIVATE_FRAMEWORKS_USED)
 MISSING_PREREQUISITES += $(MISSING_PRIVATE_FRAMEWORKS)
 
 # ----------------------------------------------------------------------------
+# The WiX installer and intermediate files.
+# ----------------------------------------------------------------------------
+
+WIX_SOURCE = $(filter %.wxs,$(SOURCES))
+WIX_BASE_NAME = $(basename $(notdir $(WIX_SOURCE)))
+WIX_COMPONENT_DEFINITIONS = $(GENERATED_DIRECTORY)/component-definitions.wxi
+WIX_COMPONENT_REFERENCES = $(GENERATED_DIRECTORY)/component-references.wxi
+WIX_OBJECTS = $(GENERATED_DIRECTORY)/$(WIX_BASE_NAME).wixobj
+WIX_INSTALLER = $(GENERATED_DIRECTORY)/$(WIX_BASE_NAME).msi
+
+# ----------------------------------------------------------------------------
 # Decide on the default target.
 # ----------------------------------------------------------------------------
 
-BUILDING_JNI_LIBRARY = $(JNI_SOURCE)
-DESIRED_TARGETS = $(if $(BUILDING_JNI_LIBRARY),$(JNI_LIBRARY),$(EXECUTABLES))
+DESIRED_TARGETS =
+DESIRED_TARGETS += $(if $(JNI_SOURCE),$(JNI_LIBRARY))
+DESIRED_TARGETS += $(if $(WIX_SOURCE),$(WIX_INSTALLER))
+DESIRED_TARGETS := $(if $(strip $(DESIRED_TARGETS)),$(DESIRED_TARGETS),$(EXECUTABLES))
 DEFAULT_TARGETS = $(if $(strip $(MISSING_PREREQUISITES)),missing-prerequisites.$(BASE_NAME),$(DESIRED_TARGETS))
 
 define MISSING_PREREQUISITES_RULE
@@ -172,6 +185,25 @@ $(OBJECTS.mm): %.o: %.mm
 	$(COMPILE.mm) $(OUTPUT_OPTION) $<
 
 # ----------------------------------------------------------------------------
+# WiX
+# ----------------------------------------------------------------------------
+# At the moment I'm just hard-coding the file list while I get the make
+# mechanics working.
+$(WIX_COMPONENT_DEFINITIONS): $(MAKEFILE_LIST)
+
+# This silliness is probably sufficient (as well as sadly necessary).
+$(WIX_COMPONENT_REFERENCES): $(WIX_COMPONENT_DEFINITIONS) $(MAKEFILE_LIST)
+	perl -ne 'm/Include/ && print; m/<Component (Id='\''component\d+'\'')>/ && print("<ComponentRef $$1 />\n")' < $< > $@
+
+$(WIX_OBJECTS): $(WIX_COMPONENT_REFERENCES) $(WIX_COMPONENT_DEFINITIONS)
+
+$(WIX_OBJECTS): %.wixobj: %.wxs
+	$(CANDLE) -nologo -out $(call convertToNativeFilenames,$@ $<)
+
+$(WIX_INSTALLER): %.msi: $(WIX_OBJECTS)
+	$(LIGHT) -nologo -out $(call convertToNativeFilenames,$@ $^)
+
+# ----------------------------------------------------------------------------
 # What to do if something we need isn't installed but we want to continue building everything else.
 # ----------------------------------------------------------------------------
 
@@ -183,12 +215,14 @@ missing-prerequisites.$(BASE_NAME):
 # Create "the build tree", GNU-style.
 # ----------------------------------------------------------------------------
 
-# This way, we can use the built-in compilation rules which assume everything's
+# This way, we can use compilation rules which assume everything's
 # in the same directory.
+# Using cp for the benefit of Windows native compilers which don't
+# understand "symlinks".
 $(SOURCE_LINKS) $(HEADER_LINKS): $(GENERATED_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
 	mkdir -p $(dir $@) && \
 	$(RM) $@ && \
-	ln -s $< $@
+	cp $< $@
 
 # ----------------------------------------------------------------------------
 # Dependencies.
