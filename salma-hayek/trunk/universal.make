@@ -236,7 +236,7 @@ DIST_SCP_USER_AND_HOST=software@jessies.org
 DIST_SCP_DIRECTORY="~/downloads/$(PROJECT_NAME)/builds"
 
 $(takeProfileSample)
-SOURCE_FILES := $(shell find src -type f -name "*.java")
+SOURCE_FILES := $(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
 $(takeProfileSample)
 DATE := $(shell date +%Y-%m-%d)
 DIST_FILE_OF_THE_DAY = $(PROJECT_NAME)-$(DATE).tar.gz
