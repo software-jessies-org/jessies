@@ -72,7 +72,7 @@ CLASSES_DIRECTORY = $(PROJECT_ROOT)/classes
 JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
 
 define JAVAHPP_RULE
-$(JAVAHPP) -classpath $(call convertCygwinToWin32Path,$(CLASSES_DIRECTORY)) $(JNI_CLASS_NAME) > $(call convertCygwinToWin32Path,$(GENERATED_JNI_HEADER)) && \
+$(JAVAHPP) -classpath $(call makeNativePath,$(CLASSES_DIRECTORY)) $(JNI_CLASS_NAME) > $(GENERATED_JNI_HEADER) && \
 { cmp -s $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
 endef
 

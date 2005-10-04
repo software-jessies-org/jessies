@@ -47,20 +47,39 @@ endif
 .SECONDARY:
 
 # ----------------------------------------------------------------------------
+# Locate salma-hayek.
+# ----------------------------------------------------------------------------
+
+getAbsolutePath = $(patsubst @%,$(CURDIR)/%,$(patsubst @/%,/%,$(patsubst %,@%,$(1))))
+
+MOST_RECENT_MAKEFILE_DIRECTORY = $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+SALMA_HAYEK := $(call getAbsolutePath,$(MOST_RECENT_MAKEFILE_DIRECTORY))
+
+# ----------------------------------------------------------------------------
+# Work out what we're going to generate.
+# ----------------------------------------------------------------------------
+
+TARGET_OS := $(shell $(SALMA_HAYEK)/bin/target-os.rb)
+
+# ----------------------------------------------------------------------------
 # Define useful stuff not provided by GNU make.
 # ----------------------------------------------------------------------------
 
 EXE_SUFFIX.Cygwin = .exe
 EXE_SUFFIX = $(EXE_SUFFIX.$(TARGET_OS))
 
-PATH_SEPARATOR.Cygwin = '";"'
-PATH_SEPARATOR = $(if $(PATH_SEPARATOR.$(TARGET_OS)),$(PATH_SEPARATOR.$(TARGET_OS)),:)
+NATIVE_PATH_SEPARATOR.$(TARGET_OS) = :
+# Quoted to get through bash without being treated as a statement terminator.
+NATIVE_PATH_SEPARATOR.Cygwin = ";"
+NATIVE_PATH_SEPARATOR = $(NATIVE_PATH_SEPARATOR.$(TARGET_OS))
 
-convertCygwinToWin32Path = $(shell echo $(1) | perl -pe 's@/cygdrive/([a-z])@$$1:@g')
+convertToNativeFilenames.$(TARGET_OS) = $(1)
+# javac is happy with forward slashes (as is the underlying Win32 API).
+convertToNativeFilenames.Cygwin = $(if $(1),$(foreach FILE,$(shell cygpath --mixed $(1)),$(FILE)))
+convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 
-pathsearch = $(firstword $(wildcard $(addsuffix /$(1)$(EXE_SUFFIX),$(subst :, ,$(PATH)))))
-makepath = $(call convertCygwinToWin32Path,$(subst $(SPACE),$(PATH_SEPARATOR),$(strip $(1))))
-getAbsolutePath = $(patsubst @%,$(CURDIR)/%,$(patsubst @/%,/%,$(patsubst %,@%,$(1))))
+searchPath = $(firstword $(wildcard $(addsuffix /$(1)$(EXE_SUFFIX),$(subst :, ,$(PATH)))))
+makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(1)))
 
 SPACE = $(subst :, ,:)
 
@@ -75,22 +94,23 @@ SPACE = $(subst :, ,:)
 takeProfileSample =
 
 # ----------------------------------------------------------------------------
-# Locate salma-hayek.
-# ----------------------------------------------------------------------------
-
-MOST_RECENT_MAKEFILE_DIRECTORY = $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
-SALMA_HAYEK := $(call getAbsolutePath,$(MOST_RECENT_MAKEFILE_DIRECTORY))
-
-# ----------------------------------------------------------------------------
 # Locate Java.
 # ----------------------------------------------------------------------------
 
-# The current version of Java has a well-known home on Darwin.
-DEFAULT_JAVA_HOME.Darwin = /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
+findMakeFriendlyEquivalentName.$(TARGET_OS) = $(1)
+# make-friendly means forward slashes and no spaces.
+# Quoted because the original may contain backslashes.
+findMakeFriendlyEquivalentName.Cygwin = $(shell cygpath --mixed --short-name '$(1)')
+findMakeFriendlyEquivalentName = $(findMakeFriendlyEquivalentName.$(TARGET_OS))
+
+JAVA_HOME := $(call findMakeFriendlyEquivalentName,$(JAVA_HOME))
 
 # Assume the tools are on the path if $(JAVA_HOME) isn't specified.
 # Note the := to evaluate $(JAVA_HOME) before we potentially default it to a $(error).
 JAVA_PATH := $(if $(JAVA_HOME),$(JAVA_HOME)/bin/)
+
+# The current version of Java has a well-known home on Darwin.
+DEFAULT_JAVA_HOME.Darwin = /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
 
 DEFAULT_JAVA_HOME = $(DEFAULT_JAVA_HOME.$(TARGET_OS))
 JAVA_HOME ?= $(if $(DEFAULT_JAVA_HOME),$(DEFAULT_JAVA_HOME),$(error Please set $$(JAVA_HOME)))
@@ -108,12 +128,6 @@ SOURCE_EXTENSIONS += m
 SOURCE_EXTENSIONS += mm
 
 HEADER_EXTENSIONS += h
-
-# ----------------------------------------------------------------------------
-# Work out what we're going to generate.
-# ----------------------------------------------------------------------------
-
-TARGET_OS := $(shell $(SALMA_HAYEK)/bin/target-os.rb)
 
 # ----------------------------------------------------------------------------
 # Sensible C family compiler flags.
@@ -225,7 +239,7 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 
 PROJECT_ROOT = $(CURDIR)
 
-SVN := $(call pathsearch,svn)
+SVN := $(call searchPath,svn)
 PROJECT_NAME = $(notdir $(PROJECT_ROOT))
 
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
@@ -270,9 +284,9 @@ GENERATED_FILES += $(PROJECT_NAME).jar
 
 JAVA_COMPILER ?= javac
 
-ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))$(call pathsearch,$(JAVA_COMPILER))" ""
+ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))$(call searchPath,$(JAVA_COMPILER))" ""
   REQUESTED_JAVA_COMPILER := $(JAVA_COMPILER)
-  JAVA_COMPILER = $(JAVA_HOME)/bin/$(REQUESTED_JAVA_COMPILER)
+  JAVA_COMPILER = $(JAVA_PATH)$(REQUESTED_JAVA_COMPILER)
   ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
     JAVA_COMPILER = $(error Unable to find $(REQUESTED_JAVA_COMPILER))
   endif
@@ -316,8 +330,8 @@ CLASS_PATH += $(CLASS_PATH.$(COMPILER_TYPE))
 # ----------------------------------------------------------------------------
 
 JAVA_FLAGS += $(JAVA_FLAGS.$(COMPILER_TYPE))
-JAVA_FLAGS += $(addprefix -bootclasspath ,$(call makepath,$(BOOT_CLASS_PATH)))
-JAVA_FLAGS += $(addprefix -classpath ,$(call makepath,$(CLASS_PATH)))
+JAVA_FLAGS += $(addprefix -bootclasspath ,$(call makeNativePath,$(BOOT_CLASS_PATH)))
+JAVA_FLAGS += $(addprefix -classpath ,$(call makeNativePath,$(CLASS_PATH)))
 JAVA_FLAGS += -d classes/
 JAVA_FLAGS += -sourcepath src/
 JAVA_FLAGS += -deprecation
@@ -339,7 +353,7 @@ define BUILD_JAVA
   @echo Recompiling the world... && \
   $(RM) -r classes && \
   mkdir -p classes && \
-  $(JAVA_COMPILER) $(JAVA_FLAGS) $(call convertCygwinToWin32Path,$(SOURCE_FILES))
+  $(JAVA_COMPILER) $(JAVA_FLAGS) $(call convertToNativeFilenames,$(SOURCE_FILES))
 endef
 
 # ----------------------------------------------------------------------------
@@ -461,6 +475,7 @@ echo.%:
 # Rules for making makefiles.
 # ----------------------------------------------------------------------------
 
+# The $$1 here is a Perl variable, not a make one.
 .generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
 	@mkdir -p $(@D) && \
 	perl -w -ne '(m/^\s*(\S+)\s*[:+]?=/ || m/^\s*define\s*(\S+)/) && print("LOCAL_VARIABLES += $$1\n")' $< | sort -u > $@
