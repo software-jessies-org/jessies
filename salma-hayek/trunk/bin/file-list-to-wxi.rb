@@ -1,4 +1,5 @@
 #!/usr/bin/ruby -w
+diskIdTag = "DiskId='1'"
 puts("<Include>")
 directoryNumber = 0
 fileNumber = 0
@@ -13,7 +14,7 @@ $stdin.each() {
     directoryNumber += 1
   }
   puts("<Component Id='component#{fileNumber}'>")
-  puts("<File Id='file#{fileNumber}' Name='name#{fileNumber}' LongName='#{fileName}' DiskId='1' src='#{filePath}' />")
+  puts("<File Id='file#{fileNumber}' Name='name#{fileNumber}' LongName='#{fileName}' #{diskIdTag} src='#{filePath}' />")
   puts("</Component>")
   fileNumber += 1
   pathComponents.reverse().each() {

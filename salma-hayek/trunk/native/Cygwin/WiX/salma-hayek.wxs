@@ -1,0 +1,24 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
+<Module Id='salma-hayek' Guid='d7665d40-3540-11da-8cd6-0800200c9a66' Language='1033'
+Version='$(env.REVISION)'>
+<Package Id='d7665d40-3540-11da-8cd6-0800200c9a66'
+Manufacturer='http://software.jessies.org/~software/downloads/salma-hayek/'
+Compressed='yes' />
+
+<Directory Id='TARGETDIR' Name='SourceDir'>
+<Directory Id='ProgramFilesFolder' Name='Name' LongName='Program Files'>
+<Directory Id='company' Name='Name' LongName='software.jessies.org'>
+<Directory Id='product' Name='Name' LongName='salma-hayek'>
+<Component Id='StandardTextFiles'>
+<File Id='COPYING' Name='COPYING.txt' src='COPYING' />
+</Component>
+<?include component-definitions.wxi ?>
+</Directory>
+</Directory>
+</Directory>
+</Directory>
+
+</Module>
+
+</Wix>
