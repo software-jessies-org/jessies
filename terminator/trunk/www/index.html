@@ -285,19 +285,10 @@ logical font descriptions.)
 
 <h3>Running on Windows</h3>
 
-<p>We don't yet have any nicely packaged double-click installer.
-Sorry, you'll need to create your own Shortcut on the Desktop.
-This is the command I use in the Shortcut:
-
-<pre>
-C:\cygwin\bin\rubyw.exe /cygdrive/f/software.jessies.org/terminator/bin/terminator
-</pre>
-
-<p>Note the use of a Cygwin-style path rather than F:\software.jessies.org\terminator\bin\terminator.
-
 <p>If you're having trouble starting terminator, you may want to try running it from bash
 instead of from the icon until you work out what's wrong.
-That's because rubyw.exe is a version of Ruby linked with the --subsystem windows instead of
+If you do that, use ruby.exe rather than rubyw.exe.
+rubyw.exe is a version of Ruby linked with the --subsystem windows instead of
 --subsystem console.
 This subsystem throws away the standard I/O streams but it does mean that you don't get
 a spurious window.
