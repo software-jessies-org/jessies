@@ -14,6 +14,8 @@ Version='$(env.REVISION)' Manufacturer='http://software.jessies.org/~software/do
 <File Id='README' Name='README.txt' DiskId='1' src='README' />
 <File Id='COPYING' Name='COPYING.txt' DiskId='1' src='COPYING' />
 </Component>
+<Merge Id='salma-hayek.d7665d40-3540-11da-8cd6-0800200c9a66'
+Language='1033' src='../salma-hayek/.generated/native/Cygwin/WiX/Cygwin/salma-hayek.msi' DiskId='1' />
 <?include component-definitions.wxi ?>
 </Directory>
 </Directory>
@@ -22,6 +24,7 @@ Version='$(env.REVISION)' Manufacturer='http://software.jessies.org/~software/do
 
 <Feature Id='product' Title='terminator' Level='1'>
 <ComponentRef Id='StandardTextFiles' />
+<MergeRef Id='salma-hayek.d7665d40-3540-11da-8cd6-0800200c9a66' />
 <?include component-references.wxi ?>
 </Feature>
 
