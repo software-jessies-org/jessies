@@ -374,6 +374,7 @@ endef
 WIX_PATH = /tmp/wix/
 CANDLE = $(WIX_PATH)candle
 LIGHT = $(WIX_PATH)light
+FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
 
 # ----------------------------------------------------------------------------
 # Prevent us from using per-directory.make's local variables in universal.make

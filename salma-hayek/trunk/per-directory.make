@@ -187,9 +187,11 @@ $(OBJECTS.mm): %.o: %.mm
 # ----------------------------------------------------------------------------
 # WiX
 # ----------------------------------------------------------------------------
-# At the moment I'm just hard-coding the file list while I get the make
-# mechanics working.
-$(WIX_COMPONENT_DEFINITIONS): $(MAKEFILE_LIST)
+# TODO: The dependency is wrong - the file needs to be re-generated whenever any of its
+# contents would change, yet we don't want to regenerate anything which depends on it
+# if its contents turn out not to change.
+$(WIX_COMPONENT_DEFINITIONS): $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
+	find classes doc bin -name .svn -prune -o -type f -print | $(FILE_LIST_TO_WXI) > $@
 
 # This silliness is probably sufficient (as well as sadly necessary).
 $(WIX_COMPONENT_REFERENCES): $(WIX_COMPONENT_DEFINITIONS) $(MAKEFILE_LIST)
