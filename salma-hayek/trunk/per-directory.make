@@ -107,6 +107,8 @@ WIX_COMPONENT_DEFINITIONS = $(GENERATED_DIRECTORY)/component-definitions.wxi
 WIX_COMPONENT_REFERENCES = $(GENERATED_DIRECTORY)/component-references.wxi
 WIX_OBJECTS = $(GENERATED_DIRECTORY)/$(WIX_BASE_NAME).wixobj
 WIX_INSTALLER = $(GENERATED_DIRECTORY)/$(WIX_BASE_NAME).msi
+WIX_MODULE = $(GENERATED_DIRECTORY)/$(WIX_BASE_NAME).msm
+WIX_TARGET := $(if $(WIX_SOURCE),$(if $(shell grep "Product Id" $(WIX_SOURCE)),INSTALLER,MODULE))
 
 # ----------------------------------------------------------------------------
 # Decide on the default target.
@@ -114,7 +116,7 @@ WIX_INSTALLER = $(GENERATED_DIRECTORY)/$(WIX_BASE_NAME).msi
 
 DESIRED_TARGETS =
 DESIRED_TARGETS += $(if $(JNI_SOURCE),$(JNI_LIBRARY))
-DESIRED_TARGETS += $(if $(WIX_SOURCE),$(WIX_INSTALLER))
+DESIRED_TARGETS += $(if $(WIX_TARGET),$(WIX_$(WIX_TARGET)))
 DESIRED_TARGETS := $(if $(strip $(DESIRED_TARGETS)),$(DESIRED_TARGETS),$(EXECUTABLES))
 DEFAULT_TARGETS = $(if $(strip $(MISSING_PREREQUISITES)),missing-prerequisites.$(BASE_NAME),$(DESIRED_TARGETS))
 
@@ -135,6 +137,7 @@ $(EXECUTABLES.Cygwin): LOCAL_LDFLAGS += -Wl,--subsystem,windows
 $(EXECUTABLES): LDFLAGS := $(LOCAL_LDFLAGS)
 $(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
 $(GENERATED_JNI_HEADER): RULE := $(JAVAHPP_RULE)
+$(WIX_INSTALLER): FILE_LIST_TO_WXI_FLAGS := --diskId
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
 # ----------------------------------------------------------------------------
@@ -191,7 +194,7 @@ $(OBJECTS.mm): %.o: %.mm
 # contents would change, yet we don't want to regenerate anything which depends on it
 # if its contents turn out not to change.
 $(WIX_COMPONENT_DEFINITIONS): $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
-	find classes doc bin -name .svn -prune -o -type f -print | $(FILE_LIST_TO_WXI) > $@
+	find $(wildcard classes doc bin) -name .svn -prune -o -type f -print | $(FILE_LIST_TO_WXI) $(FILE_LIST_TO_WXI_FLAGS) > $@
 
 # This silliness is probably sufficient (as well as sadly necessary).
 $(WIX_COMPONENT_REFERENCES): $(WIX_COMPONENT_DEFINITIONS) $(MAKEFILE_LIST)
@@ -201,6 +204,9 @@ $(WIX_OBJECTS): $(WIX_COMPONENT_REFERENCES) $(WIX_COMPONENT_DEFINITIONS)
 
 $(WIX_OBJECTS): %.wixobj: %.wxs
 	$(CANDLE) -nologo -out $(call convertToNativeFilenames,$@ $<)
+
+$(WIX_MODULE): %.msm: $(WIX_OBJECTS)
+	$(LIGHT) -nologo -out $(call convertToNativeFilenames,$@ $^)
 
 $(WIX_INSTALLER): %.msi: $(WIX_OBJECTS)
 	$(LIGHT) -nologo -out $(call convertToNativeFilenames,$@ $^)

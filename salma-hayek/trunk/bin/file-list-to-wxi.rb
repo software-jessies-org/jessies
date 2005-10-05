@@ -1,5 +1,9 @@
 #!/usr/bin/ruby -w
-diskIdTag = "DiskId='1'"
+if ARGV[0] == "--diskId"
+  diskIdTag = "DiskId='1'"
+else
+  diskIdTag = ""
+end
 puts("<Include>")
 directoryNumber = 0
 fileNumber = 0
