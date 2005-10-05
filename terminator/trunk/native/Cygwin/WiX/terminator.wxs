@@ -7,7 +7,7 @@ Version='$(env.REVISION)' Manufacturer='http://software.jessies.org/~software/do
 <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
 
 <Property Id='RUBYW'>
-<DirectorySearch Id='RUBYW.dir' Path='$(env.SystemDrive)\cygwin\bin' Depth='0'>
+<DirectorySearch Id='RUBYW.dir' Path='\cygwin\bin' Depth='0'>
 <FileSearch Id='RUBYW.file' Name='rubyw.exe' />
 </DirectorySearch>
 </Property>
