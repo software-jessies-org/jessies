@@ -22,7 +22,7 @@ ENV["TERMINATOR_HOME"] = terminator_home
 class_name = "terminator/Terminator"
 HOME = ENV["HOME"]
 
-TARGET_OS=`#{salma_hayek}/bin/target-os.rb`.chomp()
+TARGET_OS=`"#{salma_hayek}"/bin/target-os.rb`.chomp()
 
 # Make sure we have a directory for the terminal logs.
 log_directory="#{HOME}/.terminal-logs"
