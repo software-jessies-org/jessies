@@ -9,7 +9,7 @@ Manufacturer='software.jessies.org' InstallerVersion='200' Compressed='yes' />
 <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
 
 <Directory Id='TARGETDIR' Name='SourceDir'>
-<Directory Id='ProgramFilesFolder' Name='PFiles'>
+<Directory Id='ProgramFilesFolder' Name='Name' LongName='Program Files'>
 <Directory Id='company' Name='Name' LongName='software.jessies.org'>
 <Directory Id='product' Name='Name' LongName='terminator'>
 <?include component-definitions.wxi ?>
