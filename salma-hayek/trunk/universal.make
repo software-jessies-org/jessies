@@ -287,6 +287,8 @@ GENERATED_FILES += classes
 GENERATED_FILES += .generated
 GENERATED_FILES += $(PROJECT_NAME).jar
 
+export REVISION := $(shell svn info | perl -ne 'm/^Revision: (\d+)/ && print("$$1\n")')
+
 # ----------------------------------------------------------------------------
 # Choose a Java compiler.
 # ----------------------------------------------------------------------------
