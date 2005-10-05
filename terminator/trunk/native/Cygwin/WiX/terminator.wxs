@@ -10,6 +10,10 @@ Version='$(env.REVISION)' Manufacturer='http://software.jessies.org/~software/do
 <Directory Id='ProgramFilesFolder' Name='Name' LongName='Program Files'>
 <Directory Id='company' Name='Name' LongName='software.jessies.org'>
 <Directory Id='product' Name='Name' LongName='terminator'>
+<Component Id='StandardTextFiles'>
+<File Id='README' Name='README.txt' DiskId='1' src='README' />
+<File Id='COPYING' Name='COPYING.txt' DiskId='1' src='COPYING' />
+</Component>
 <?include component-definitions.wxi ?>
 </Directory>
 </Directory>
@@ -17,6 +21,7 @@ Version='$(env.REVISION)' Manufacturer='http://software.jessies.org/~software/do
 </Directory>
 
 <Feature Id='product' Title='terminator' Level='1'>
+<ComponentRef Id='StandardTextFiles' />
 <?include component-references.wxi ?>
 </Feature>
 
