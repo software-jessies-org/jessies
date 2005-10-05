@@ -138,6 +138,8 @@ $(EXECUTABLES): LDFLAGS := $(LOCAL_LDFLAGS)
 $(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
 $(GENERATED_JNI_HEADER): RULE := $(JAVAHPP_RULE)
 $(WIX_INSTALLER): FILE_LIST_TO_WXI_FLAGS := --diskId
+# We mustn't := evaluate $@ and $<
+$(WIX_INSTALLER) $(WIX_MODULE): RULE = $(LIGHT) -nologo -out $(call convertToNativeFilenames,$@ $(filter %.wixobj,$^))
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
 # ----------------------------------------------------------------------------
@@ -194,7 +196,7 @@ $(OBJECTS.mm): %.o: %.mm
 # contents would change, yet we don't want to regenerate anything which depends on it
 # if its contents turn out not to change.
 $(WIX_COMPONENT_DEFINITIONS): $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
-	find $(wildcard classes doc bin) -name .svn -prune -o -type f -print | $(FILE_LIST_TO_WXI) $(FILE_LIST_TO_WXI_FLAGS) > $@
+	$(MAKE_INSTALLER_FILE_LIST) | $(FILE_LIST_TO_WXI) $(FILE_LIST_TO_WXI_FLAGS) > $@
 
 # This silliness is probably sufficient (as well as sadly necessary).
 $(WIX_COMPONENT_REFERENCES): $(WIX_COMPONENT_DEFINITIONS) $(MAKEFILE_LIST)
@@ -206,10 +208,10 @@ $(WIX_OBJECTS): %.wixobj: %.wxs
 	$(CANDLE) -nologo -out $(call convertToNativeFilenames,$@ $<)
 
 $(WIX_MODULE): %.msm: $(WIX_OBJECTS)
-	$(LIGHT) -nologo -out $(call convertToNativeFilenames,$@ $^)
+	$(RULE)
 
 $(WIX_INSTALLER): %.msi: $(WIX_OBJECTS)
-	$(LIGHT) -nologo -out $(call convertToNativeFilenames,$@ $^)
+	$(RULE)
 
 # ----------------------------------------------------------------------------
 # What to do if something we need isn't installed but we want to continue building everything else.
