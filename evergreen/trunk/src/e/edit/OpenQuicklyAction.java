@@ -13,6 +13,12 @@ public class OpenQuicklyAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Edit.getInstance().getCurrentWorkspace().showOpenQuicklyDialog(getSelectedText());
+        String filename = getSelectedText();
+        if (filename.startsWith("~") || filename.startsWith("/")) {
+            // If we have an absolute name, we can go straight there.
+            Edit.getInstance().openFile(filename);
+        } else {
+            Edit.getInstance().getCurrentWorkspace().showOpenQuicklyDialog(filename);
+        }
     }
 }
