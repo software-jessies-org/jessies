@@ -36,7 +36,7 @@ if test -f /etc/debian_version ; then
     if [[ ! -x /usr/bin/ctags-exuberant || ! -x /usr/bin/ri ]]
     then
         apt-get update
-        apt-get -y install exuberant-ctags ri
+        apt-get -y install exuberant-ctags ri subversion
     fi
 fi
 
