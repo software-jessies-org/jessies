@@ -9,8 +9,8 @@ public class Xv extends JFrame {
         super(filename);
         Log.warn("Opening '" + filename + "'.");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setContentPane(new JLabel(new ImageIcon(filename)));
-        pack();
+        setContentPane(new JScrollPane(new JLabel(new ImageIcon(filename))));
+        //pack();
         setLocationRelativeTo(null);
         setVisible(true);
     }
