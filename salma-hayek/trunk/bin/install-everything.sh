@@ -33,7 +33,7 @@ if test -d $JAVA_HOME ; then
 fi
 
 if test -f /etc/debian_version ; then
-    if [[ ! -x /usr/bin/ctags-exuberant || ! -x /usr/bin/ri ]]
+    if [[ ! -x /usr/bin/ctags-exuberant || ! -x /usr/bin/ri || ! -x /usr/bin/svn ]]
     then
         apt-get update
         apt-get -y install exuberant-ctags ri subversion
