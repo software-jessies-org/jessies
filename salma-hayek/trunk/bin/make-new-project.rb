@@ -38,6 +38,8 @@ echo "Making the initial import..."
 svn import $name svn+ssh://$svn_host/home/software/svnroot/$name -m 'New project, $name.'
 echo "Checking back out..."
 svn co svn+ssh://$svn_host/home/software/svnroot/$name $projects_dir/$name
+cd $projects_dir/$name
+
 echo "Telling Subversion to ignore generated files..."
 svn propset svn:ignore "ChangeLog
 ChangeLog.html
