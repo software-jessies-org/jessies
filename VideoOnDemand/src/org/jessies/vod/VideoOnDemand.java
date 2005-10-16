@@ -15,6 +15,7 @@ import javax.swing.*;
 
 public class VideoOnDemand extends JFrame {
     private Movie movie;
+    private MovieController movieController;
     private double fps;
     private String[] subtitles;
     
@@ -25,6 +26,7 @@ public class VideoOnDemand extends JFrame {
         
         try {
             this.movie = movieFromFilename(movieName);
+            this.movieController = new MovieController(movie);
             
             initFramesPerSecond();
             initSubtitles(movieName);
@@ -47,24 +49,17 @@ public class VideoOnDemand extends JFrame {
                 String searchTerm = field.getText();
                 // FIXME: this is way too primitive! Searching shouldn't be line-based.
                 for (String line : subtitles) {
-                    // FIXME: this is way too primitive! Searching should allow regular expressions and be case-insensitive (since subtitles are ALL CAPS).
+                    // FIXME: this is way too primitive! Searching should allow regular expressions and be case-insensitive (since subtitles are often ALL CAPS).
                     if (line.contains(searchTerm)) {
                         Matcher matcher = Pattern.compile("^\\{(\\d+)\\}\\{\\d+\\}(.*)$").matcher(line);
                         if (matcher.matches()) {
                             showCurrentTime();
-                            long startFrame = Long.parseLong(matcher.group(1));
+                            int startFrame = Integer.parseInt(matcher.group(1));
                             String text = matcher.group(2);
-                            int newTime = (int) ((double) startFrame / fps);
-                            System.out.println(startFrame + " (" + newTime + ") : " + text);
-                            try {
-                                MovieController movieController = new MovieController(movie);
-                                movieController.goToTime(new TimeRecord(1, (int) ((double) startFrame / fps)));
-                                showCurrentTime();
-                                field.selectAll();
-                                return;
-                            } catch (QTException ex) {
-                                ex.printStackTrace();
-                            }
+                            goToFrame(startFrame);
+                            showCurrentTime();
+                            field.selectAll();
+                            return;
                         } else {
                             System.err.println("Couldn't parse .sub line:");
                             System.err.println(line);
@@ -74,6 +69,14 @@ public class VideoOnDemand extends JFrame {
             }
         });
         return field;
+    }
+    
+    private void goToFrame(int frame) {
+        try {
+            movieController.goToTime(new TimeRecord(1, (int) ((double) frame / fps)));
+        } catch (QTException ex) {
+            ex.printStackTrace();
+        }
     }
     
     private void showCurrentTime() {
