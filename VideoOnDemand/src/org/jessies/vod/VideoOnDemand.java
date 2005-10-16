@@ -4,6 +4,7 @@ import e.util.*;
 import quicktime.*;
 import quicktime.app.view.*;
 import quicktime.io.*;
+import quicktime.qd.*;
 import quicktime.std.*;
 import quicktime.std.clocks.*;
 import quicktime.std.movies.*;
@@ -31,11 +32,17 @@ public class VideoOnDemand extends JFrame {
             initFramesPerSecond();
             initSubtitles(movieName);
             
-            QTComponent movieView = QTFactory.makeQTComponent(movie);
-            getContentPane().add(movieView.asComponent(), BorderLayout.CENTER);
+            Component movieView = QTFactory.makeQTComponent(movie).asComponent();
+            getContentPane().add(movieView, BorderLayout.CENTER);
+            // FIXME: this should be a dialog.
             getContentPane().add(makeSearchField(), BorderLayout.SOUTH);
-            pack();
+            
+            QDRect movieRect = movie.getNaturalBoundsRect();
+            Dimension movieSize = new Dimension(movieRect.getWidth(), movieRect.getHeight());
+            setSize(movieSize);
+            setLocationRelativeTo(null);
             setVisible(true);
+            
             movie.start();
         } catch (Exception ex) {
             ex.printStackTrace();
