@@ -46,11 +46,11 @@ public class VideoOnDemand extends JFrame {
         final JTextField field = new JTextField(80);
         field.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String searchTerm = field.getText();
+                String searchTerm = field.getText().toLowerCase();
                 // FIXME: this is way too primitive! Searching shouldn't be line-based.
                 for (String line : subtitles) {
                     // FIXME: this is way too primitive! Searching should allow regular expressions and be case-insensitive (since subtitles are often ALL CAPS).
-                    if (line.contains(searchTerm)) {
+                    if (line.toLowerCase().contains(searchTerm)) {
                         Matcher matcher = Pattern.compile("^\\{(\\d+)\\}\\{\\d+\\}(.*)$").matcher(line);
                         if (matcher.matches()) {
                             showCurrentTime();
