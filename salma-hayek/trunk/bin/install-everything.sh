@@ -19,8 +19,10 @@ fi
 # Install Java in /usr/local, and put links to java and javac in /usr/local/bin.
 java_installer=/net/mirror/mirror-link/java/jdk-1_5_0_03-linux-i586.bin
 export JAVA_HOME=/usr/local/jdk1.5.0_03
-if test -f $java_installer && ! test -d $JAVA_HOME ; then
-    $java_installer || die "installing Java"
+if sudo -u devadmin test -f $java_installer && ! test -d $JAVA_HOME ; then
+    sudo -u devadmin cp $java_installer /tmp/jdk &&
+    /tmp/jdk ||
+    die "installing Java"
 fi
 if test -d $JAVA_HOME ; then
     link_in_usr_local_bin $JAVA_HOME/bin/java
