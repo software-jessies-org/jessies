@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.event.*;
 
 /**
@@ -18,7 +19,7 @@ public class OpenQuicklyAction extends ETextAction {
             // If we have an absolute name, we can go straight there.
             Edit.getInstance().openFile(filename);
         } else {
-            Edit.getInstance().getCurrentWorkspace().showOpenQuicklyDialog(filename);
+            Edit.getInstance().getCurrentWorkspace().showOpenQuicklyDialog(StringUtilities.regularExpressionFromLiteral(filename));
         }
     }
 }
