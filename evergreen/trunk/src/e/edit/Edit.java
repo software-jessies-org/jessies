@@ -161,6 +161,10 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         filename = processPathRewrites(filename);
         
         // Extract any address, which here means a trailing sequence of ":\d+"s.
+        // Note that we try hard to cope with trailing junk so we can work with
+        // grep(1) matches along the lines of "file.cpp:123:void something()"
+        // where the end of the address and the beginning of the actual line
+        // are run together. We keep regressing on this behavior!
         Pattern addressPattern = Pattern.compile("^(.+?)((:\\d+)*)(:|:?$)");
         Matcher addressMatcher = addressPattern.matcher(filename);
         final String address;
