@@ -129,16 +129,19 @@ public class FindFilesDialog {
         
         private HashMap<String, DefaultMutableTreeNode> pathMap = new HashMap<String, DefaultMutableTreeNode>();
         
-        private int doneFileCount = 0;
+        private int doneFileCount;
+        private int matchingFileCount;
         private int totalFileCount;
-        private int percentage = -1;
+        private int percentage;
         
         public FileFinder() {
             this.matchRoot = new DefaultMutableTreeNode();
             this.regex = regexField.getText();
             this.fileRegex = filenameRegexField.getText();
-            this.doneFileCount = 0;
             this.fileList = workspace.getListOfFilesMatching(fileRegex);
+            
+            this.doneFileCount = 0;
+            this.matchingFileCount = 0;
             this.totalFileCount = fileList.size();
             this.percentage = -1;
             
@@ -189,6 +192,7 @@ public class FindFilesDialog {
                                     fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file, pattern)));
                                 }
                                 pathNode.add(fileNode);
+                                ++matchingFileCount;
                             }
                         } else {
                             DefaultMutableTreeNode pathNode = getPathNode(candidate);
@@ -243,7 +247,7 @@ public class FindFilesDialog {
                 return;
             }
             
-            String status = matchTreeModel.getChildCount(matchTreeModel.getRoot()) + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "");
+            String status = matchingFileCount + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "");
             if (workspace.getIndexedFileCount() != totalFileCount) {
                 status += " (from " + workspace.getIndexedFileCount() + ")";
             }
