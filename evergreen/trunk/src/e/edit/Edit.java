@@ -160,13 +160,6 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         
         filename = processPathRewrites(filename);
         
-        /* Tidy up wrong-OS pathnames. Programs like jikes do this to us. */
-        if (File.separatorChar == '\\') {
-            filename = filename.replace('/', '\\');
-        } else {
-            filename = filename.replace('\\', '/');
-        }
-        
         // Extract any address, which here means a trailing sequence of ":\d+"s.
         Pattern addressPattern = Pattern.compile("^(.+?)((:\\d+)*)(:|:?$)");
         Matcher addressMatcher = addressPattern.matcher(filename);
