@@ -1,3 +1,4 @@
+
 package terminator.view;
 
 import java.awt.*;
@@ -38,6 +39,7 @@ public class VisualBellViewport extends JViewport {
             }
         };
         timer = new Timer(100, actionListener);
+        timer.setRepeats(false);
     }
     
     @Override
