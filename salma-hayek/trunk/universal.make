@@ -59,7 +59,9 @@ SALMA_HAYEK := $(call getAbsolutePath,$(MOST_RECENT_MAKEFILE_DIRECTORY))
 # Work out what we're going to generate.
 # ----------------------------------------------------------------------------
 
-TARGET_OS := $(shell $(SALMA_HAYEK)/bin/target-os.rb)
+TARGET_OS_SCRIPT = $(SALMA_HAYEK)/bin/target-os.rb
+SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(TARGET_OS_SCRIPT)
+TARGET_OS := $(shell $(TARGET_OS_SCRIPT))
 
 # ----------------------------------------------------------------------------
 # Define useful stuff not provided by GNU make.
@@ -103,7 +105,9 @@ findMakeFriendlyEquivalentName.$(TARGET_OS) = $(1)
 findMakeFriendlyEquivalentName.Cygwin = $(shell cygpath --mixed --short-name '$(1)')
 findMakeFriendlyEquivalentName = $(findMakeFriendlyEquivalentName.$(TARGET_OS))
 
-JAVA_HOME := $(call findMakeFriendlyEquivalentName,$(shell $(SALMA_HAYEK)/bin/find-java-home.rb))
+JAVA_HOME_SCRIPT = $(SALMA_HAYEK)/bin/find-java-home.rb
+SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JAVA_HOME_SCRIPT)
+JAVA_HOME := $(call findMakeFriendlyEquivalentName,$(shell $(JAVA_HOME_SCRIPT)))
 
 # ----------------------------------------------------------------------------
 # We use our own replacement for javah(1).
@@ -486,6 +490,21 @@ echo.%:
 .generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
 	@mkdir -p $(@D) && \
 	perl -w -ne '(m/^\s*(\S+)\s*[:+]?=/ || m/^\s*define\s*(\S+)/) && print("LOCAL_VARIABLES += $$1\n")' $< | sort -u > $@
+
+# Several of the rules include $(MAKEFILE_LIST) in their prerequisites.
+# All of the .o files, for example, depend on the makefiles.
+# The makefiles delegate some of their work to scripts.
+# These scripts help to determine, for example, compiler flags,
+# so the .o files should depend on the scripts too.
+# MAKEFILE_LIST is set by make itself.
+# I'm not sure we can alter it.
+# This empty makefile fragment will save us having to remember to use a
+# different variable in place of MAKEFILE_LIST.
+.generated/recompilation-trigger.make: $(SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS)
+	@mkdir -p $(@D) && \
+	touch $@
+
+-include .generated/recompilation-trigger.make
 
 # ----------------------------------------------------------------------------
 # The magic incantation to build and clean all the native subdirectories.
