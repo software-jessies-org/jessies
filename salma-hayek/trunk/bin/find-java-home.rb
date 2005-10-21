@@ -30,7 +30,7 @@
 #   Java 5 the default, this is Apple's recommended way of using the Java 5
 #   previews.
 
-if `uname` == "Darwin"
+if `uname`.chomp() == "Darwin"
     # The current version of Java has a well-known home on Darwin. (If you
     # read the comment above, you'll realize that this means we'll be using the
     # Java 1.4.2 installation on Mac OS, and this script is actually broken
