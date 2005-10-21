@@ -12,7 +12,9 @@
 #
 # * Using symbolic links requires a link for each program and makes it
 #   unnecessarily difficult to switch if you need to test with a newer or
-#   older version.
+#   older version. Also, since the OS probably installed the symbolic
+#   links in /usr/bin, they're prone to being overwritten without your
+#   direct consent.
 # * Using aliases has the same problem, and is also specific to your particular
 #   shell, so isn't usefully inherited by subprocesses.
 # * Using $JAVA_HOME -- as was common practice in Java 1.1 days -- requires
