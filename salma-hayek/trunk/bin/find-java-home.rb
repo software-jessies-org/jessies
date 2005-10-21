@@ -30,15 +30,6 @@
 #   Java 5 the default, this is Apple's recommended way of using the Java 5
 #   previews.
 
-if `uname`.chomp() == "Darwin"
-    # The current version of Java has a well-known home on Darwin. (If you
-    # read the comment above, you'll realize that this means we'll be using the
-    # Java 1.4.2 installation on Mac OS, and this script is actually broken
-    # right now. Oops. But it's no more broken than the make rules used to be.)
-    puts("/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home")
-    exit(0)
-end
-
 require 'pathname.rb'
 
 # Find java(1) on the path.
@@ -55,6 +46,13 @@ java_bin=java_in_actual_location.dirname()
 # Assume the directory above the bin/ directory is the "home" directory; the
 # directory that contains bin/ and include/ and so on.
 java_home=java_bin.dirname()
+
+if `uname`.chomp() == "Darwin"
+    # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
+    # that contains a JDK-like directory structure of links to the files in
+    # the Apple tree.
+    java_home="#{java_home}/Home"
+end
 
 puts(java_home)
 exit(0)
