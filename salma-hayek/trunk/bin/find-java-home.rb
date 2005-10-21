@@ -18,7 +18,10 @@
 # * Using aliases has the same problem, and is also specific to your particular
 #   shell, so isn't usefully inherited by subprocesses.
 # * Using $JAVA_HOME -- as was common practice in Java 1.1 days -- requires
-#   everyone to abide by the (deprecated) convention.
+#   everyone to abide by the (deprecated) convention. Because you're probably
+#   still running the tools from $PATH regardless of any $JAVA_HOME setting,
+#   it's easy to miss when this is set wrong. Using out-of-date header files,
+#   for example, isn't always going to be easy to spot.
 #
 # * Using $PATH is slightly awkward to switch versions (unless you're happy to
 #   just keep prepending), but doesn't require you to know about every utility,
