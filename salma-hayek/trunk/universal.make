@@ -103,19 +103,12 @@ findMakeFriendlyEquivalentName.$(TARGET_OS) = $(1)
 findMakeFriendlyEquivalentName.Cygwin = $(shell cygpath --mixed --short-name '$(1)')
 findMakeFriendlyEquivalentName = $(findMakeFriendlyEquivalentName.$(TARGET_OS))
 
-JAVA_HOME := $(call findMakeFriendlyEquivalentName,$(JAVA_HOME))
+JAVA_HOME := $(call findMakeFriendlyEquivalentName,$(shell $(SALMA_HAYEK)/bin/find-java-home.rb))
 
-# Assume the tools are on the path if $(JAVA_HOME) isn't specified.
-# Note the := to evaluate $(JAVA_HOME) before we potentially default it to a $(error).
-JAVA_PATH := $(if $(JAVA_HOME),$(JAVA_HOME)/bin/)
+# ----------------------------------------------------------------------------
+# We use our own replacement for javah(1).
+# ----------------------------------------------------------------------------
 
-# The current version of Java has a well-known home on Darwin.
-DEFAULT_JAVA_HOME.Darwin = /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
-
-DEFAULT_JAVA_HOME = $(DEFAULT_JAVA_HOME.$(TARGET_OS))
-JAVA_HOME ?= $(if $(DEFAULT_JAVA_HOME),$(DEFAULT_JAVA_HOME),$(error Please set $$(JAVA_HOME)))
-
-JAR = $(JAVA_PATH)jar
 JAVAHPP = $(SALMA_HAYEK)bin/javahpp.rb
 
 # ----------------------------------------------------------------------------
@@ -279,7 +272,7 @@ define GENERATE_CHANGE_LOG.cvs
   $(if $(shell which cvs2cl),cvs2cl,cvs2cl.pl) --hide-filenames
 endef
 
-CREATE_OR_UPDATE_JAR=cd $(2)/classes && $(JAR) $(1)f $(CURDIR)/$@ $(notdir $(wildcard $(2)/classes/*))
+CREATE_OR_UPDATE_JAR=cd $(2)/classes && jar $(1)f $(CURDIR)/$@ $(notdir $(wildcard $(2)/classes/*))
 
 GENERATED_FILES += ChangeLog
 GENERATED_FILES += ChangeLog.html
@@ -297,7 +290,7 @@ JAVA_COMPILER ?= javac
 
 ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))$(call searchPath,$(JAVA_COMPILER))" ""
   REQUESTED_JAVA_COMPILER := $(JAVA_COMPILER)
-  JAVA_COMPILER = $(JAVA_PATH)$(REQUESTED_JAVA_COMPILER)
+  JAVA_COMPILER = $(REQUESTED_JAVA_COMPILER)
   ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
     JAVA_COMPILER = $(error Unable to find $(REQUESTED_JAVA_COMPILER))
   endif
