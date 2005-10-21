@@ -1,4 +1,3 @@
-
 package terminator.view;
 
 import java.awt.*;
