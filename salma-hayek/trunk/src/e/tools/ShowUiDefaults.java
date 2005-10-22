@@ -18,8 +18,8 @@ public class ShowUiDefaults {
     
     public static void main(String[] args) {
         UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-        for (Enumeration e = defaults.keys() ; e.hasMoreElements() ;) {
-            String key = (String) e.nextElement();
+        for (Enumeration e = defaults.keys(); e.hasMoreElements();) {
+            Object key = e.nextElement();
             System.out.println(key + "=" + defaults.get(key));
         }
     }
