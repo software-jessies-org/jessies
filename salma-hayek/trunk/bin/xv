@@ -1,7 +1,16 @@
-#!/bin/sh
+#!/usr/bin/ruby -w
 
-real_script=`readlink $0 || echo $0` # Deals with symbolic links to this script.
+require 'fileutils.rb'
+require 'pathname.rb'
 
-XV_HOME=`dirname $real_script`/..
+# Cope with symbolic links to this script.
+salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
+TARGET_OS=`#{salma_hayek}/bin/target-os.rb`.chomp()
 
-java -Xmx1g -cp $XV_HOME/classes:$XV_HOME/../salma-hayek/classes e.tools.Xv "$@"
+args = [ "java", "-cp", "#{salma_hayek}/classes" ]
+if TARGET_OS == "Darwin"
+    args << "-Xdock:name=Xv"
+end
+args << "e.tools.Xv"
+args.concat(ARGV)
+system(*args)
