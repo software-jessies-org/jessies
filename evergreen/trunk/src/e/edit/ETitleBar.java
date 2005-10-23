@@ -33,9 +33,34 @@ public class ETitleBar extends JPanel {
         };
     }
     
-    private EWindow window;
-    
     public static final int TITLE_HEIGHT = 20;
+    
+    private static final Color activeForeground;
+    private static final Color activeBackground;
+    private static final Color inactiveForeground;
+    private static final Color inactiveBackground;
+    
+    static {
+        if (GuiUtilities.isGtk()) {
+            // The Java 6 GTK+ LAF doesn't offer useful InternalFrame colors.
+            // The TabbedPane colors might seem more sensible, but somehow that
+            // ends up looking the wrong way round; dark seems more "focused".
+            // The TextArea colors seem reasonable, at least for the Solaris 10
+            // default theme. I don't know how much this is likely to be
+            // affected by other themes.
+            activeBackground = UIManager.getColor("TextArea.selectionBackground");
+            activeForeground = UIManager.getColor("TextArea.selectionForeground");
+            inactiveBackground = UIManager.getColor("TextArea.background");
+            inactiveForeground = UIManager.getColor("TextArea.foreground");
+        } else {
+            activeBackground = UIManager.getColor("InternalFrame.activeTitleBackground");
+            activeForeground = UIManager.getColor("InternalFrame.activeTitleForeground");
+            inactiveBackground = UIManager.getColor("InternalFrame.inactiveTitleBackground");
+            inactiveForeground = UIManager.getColor("InternalFrame.inactiveTitleForeground");
+        }
+    }
+    
+    private EWindow window;
     
     private JLabel titleLabel;
     private ECloseButton closeButton;
@@ -135,11 +160,11 @@ public class ETitleBar extends JPanel {
          * same, but that seems unnecessarily fragile.
          */
         if (isActive) {
-            setBackground(UIManager.getColor("InternalFrame.activeTitleBackground"));
-            titleLabel.setForeground(UIManager.getColor("InternalFrame.activeTitleForeground"));
+            setBackground(activeBackground);
+            titleLabel.setForeground(activeForeground);
         } else {
-            setBackground(UIManager.getColor("InternalFrame.inactiveTitleBackground"));
-            titleLabel.setForeground(UIManager.getColor("InternalFrame.inactiveTitleForeground"));
+            setBackground(inactiveBackground);
+            titleLabel.setForeground(inactiveForeground);
         }
     }
 }
