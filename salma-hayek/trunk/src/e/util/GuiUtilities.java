@@ -88,6 +88,13 @@ public class GuiUtilities {
     }
     
     /**
+     * Tests whether we're using the GTK+ LAF (and so are probably on Linux or Solaris).
+     */
+    public static boolean isGtk() {
+        return UIManager.getSystemLookAndFeelClassName().contains("GTK");
+    }
+    
+    /**
      * Returns a KeyStroke suitable for passing to putValue(Action.ACCELERATOR_KEY) to
      * set up a keyboard equivalent for an Action.
      */
