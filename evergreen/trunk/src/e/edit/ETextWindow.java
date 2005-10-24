@@ -102,9 +102,26 @@ public class ETextWindow extends EWindow implements PTextListener {
         this.birdView = new BirdView(this, scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
+        
         fillWithContent();
+        initUserConfigurableDefaults();
+        
         tagsUpdater = new TagsUpdater(this);
         initFindResultsUpdater();
+    }
+    
+    private void initUserConfigurableDefaults() {
+        // Since the user can modify these settings, we should only set them
+        // from the constructor to avoid reverting the user's configuration.
+        // I don't think that even reverting to the saved content should revert
+        // configuration changes, until I see a convincing demonstration
+        // otherwise.
+        // Phil's been bitten by the indentation string reverting while editing
+        // TSV files, and I've been repeatedly bitten by a file I want to see
+        // in a fixed font reverting to a proportional font each time I save.
+        CharSequence content = text.getTextBuffer();
+        text.setFont(ChangeFontAction.getAppropriateFontForContent(content));
+        text.getIndenter().setIndentationPropertyBasedOnContent(content);
     }
     
     private void initBugDatabaseLinks() {
@@ -331,8 +348,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         if (fileType != originalFileType) {
             initSpellingExceptionsForDocument();
         }
-        text.setFont(ChangeFontAction.getAppropriateFontForContent(content));
-        text.getIndenter().setIndentationPropertyBasedOnContent(content);
     }
     
     private void uncheckedRevertToSaved() {
