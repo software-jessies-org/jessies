@@ -1,7 +1,15 @@
 #!/bin/bash
 # usage: make-new-project.rb <name>
 
+# It's important that you make a new project as the general repository owner,
+# but it's also important that you check out again as your individual owner
+# before committing actual changes to the repository.
+# Hopefully we'll have moved to Mercurial or something before we next need to
+# worry about this.
 svn_host=software@jessies.org
+
+# ----------------------------------------------------------------------------
+
 projects_dir=~/Projects
 
 name=$1
