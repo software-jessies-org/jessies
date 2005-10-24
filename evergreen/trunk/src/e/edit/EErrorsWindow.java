@@ -151,10 +151,6 @@ public class EErrorsWindow extends EWindow {
         //linkFormatter.setAutoScroll(true);
     }
     
-    /** Errors windows have no initial content. */
-    public void fillWithContent() {
-    }
-    
     public void initTextAreaPopupMenu() {
         textArea.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
             public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
