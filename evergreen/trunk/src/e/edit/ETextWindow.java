@@ -285,11 +285,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         });
     }
     
-    /**
-     * Invoked during construction. Override this if you don't want to read from a file with
-     * the same name as the window's title.
-     */
-    public void fillWithContent() {
+    private void fillWithContent() {
         try {
             lastModifiedTime = file.lastModified();
             text.getTextBuffer().readFromFile(file);
