@@ -18,18 +18,18 @@ fi
 
 # Install Java in /usr/local, and put links to java and javac in /usr/local/bin.
 java_installer=/net/mirror/mirror-link/java/jdk-1_5_0_03-linux-i586.bin
-export JAVA_HOME=/usr/local/jdk1.5.0_03
-if sudo -u devadmin test -f $java_installer && ! test -d $JAVA_HOME ; then
+java_home=/usr/local/jdk1.5.0_03
+if sudo -u devadmin test -f $java_installer && ! test -d $java_home ; then
     sudo -u devadmin cp $java_installer /tmp/jdk &&
     /tmp/jdk ||
     die "installing Java"
 fi
-if test -d $JAVA_HOME ; then
-    link_in_usr_local_bin $JAVA_HOME/bin/java
-    link_in_usr_local_bin $JAVA_HOME/bin/javac
+if test -d $java_home ; then
+    link_in_usr_local_bin $java_home/bin/java
+    link_in_usr_local_bin $java_home/bin/javac
     for BROWSER in mozilla mozilla-firefox; do
         if test -d /usr/lib/$BROWSER/plugins; then
-            ln -s $JAVA_HOME/jre/plugin/i386/ns7/libjavaplugin_oji.so /usr/lib/$BROWSER/plugins
+            ln -s $java_home/jre/plugin/i386/ns7/libjavaplugin_oji.so /usr/lib/$BROWSER/plugins
         fi
     done
 fi
