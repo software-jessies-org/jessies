@@ -451,9 +451,10 @@ public class BrowserLauncher {
 			case OTHER:
 			default:
 				browser = "";
-				for (String candidateBrowser : new String[] { "/usr/bin/sensible-browser", "/usr/bin/gnome-open", "/opt/gnome/bin/gnome-open" }) {
-					if (FileUtilities.exists(candidateBrowser)) {
+				for (String candidateBrowser : new String[] { "sensible-browser", "gnome-open" }) {
+					if (FileUtilities.findOnPath(candidateBrowser) != null) {
 						browser = candidateBrowser;
+						break;
 					}
 				}
 				break;
