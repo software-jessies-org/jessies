@@ -47,6 +47,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f);
     
     public static final String UNKNOWN = "Unknown";
+    public static final String BASH = "Bash";
     public static final String C_PLUS_PLUS = "C++";
     public static final String JAVA = "Java";
     public static final String RUBY = "Ruby";
@@ -198,12 +199,16 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     /** Tests whether the 'content' looks like a Unix shell script, of the Ruby variety. */
     private static boolean isRubyContent(CharSequence content) {
-        return isInterpretedContent(content, "ruby");
+        return isInterpretedContent(content, "/ruby");
     }
     
     /** Tests whether the 'content' looks like a Unix shell script, of the Perl variety. */
     private static boolean isPerlContent(CharSequence content) {
-        return isInterpretedContent(content, "perl");
+        return isInterpretedContent(content, "/perl");
+    }
+    
+    private static boolean isBashContent(CharSequence content) {
+        return isInterpretedContent(content, "/(bash|sh)");
     }
     
     /**
@@ -308,7 +313,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             fileType = JAVA;
             text.setIndenter(new PJavaIndenter(text));
             text.setTextStyler(new PJavaTextStyler(text));
-        } else if (filename.endsWith(".rb") || isRubyContent(content)) {
+        } else if (isRubyContent(content)) {
             fileType = RUBY;
             text.setIndenter(new PRubyIndenter(text));
             text.setTextStyler(new PRubyTextStyler(text));
@@ -320,6 +325,9 @@ public class ETextWindow extends EWindow implements PTextListener {
             fileType = PERL;
             text.setIndenter(new PPerlIndenter(text));
             text.setTextStyler(new PPerlTextStyler(text));
+        } else if (isBashContent(content)) {
+            fileType = BASH;
+            text.setTextStyler(new PBashTextStyler(text));
         } else {
             // Plain text.
             text.setWrapStyleWord(true);
