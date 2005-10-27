@@ -152,40 +152,42 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     public EWindow openFileNonInteractively(String filename) {
-        /* Special case for a URI. */
+        // Special cases for URIs and files for external applications.
         if (FileUtilities.nameStartsWithOneOf(filename, FileUtilities.getArrayOfPathElements(Parameters.getParameter("url.prefixes", "")))) {
             showDocument(filename);
+            return null;
+        }
+        if (isFileForExternalApplication(filename)) {
+            openFileWithExternalApplication(filename);
             return null;
         }
         
         filename = processPathRewrites(filename);
         
-        // Extract any address, which here means a trailing sequence of ":\d+"s.
-        // Note that we try hard to cope with trailing junk so we can work with
-        // grep(1) matches along the lines of "file.cpp:123:void something()"
-        // where the end of the address and the beginning of the actual line
-        // are run together. We keep regressing on this behavior!
-        Pattern addressPattern = Pattern.compile("^(.+?)((:\\d+)*)(:|:?$)");
-        Matcher addressMatcher = addressPattern.matcher(filename);
-        final String address;
-        if (addressMatcher.find()) {
-            address = addressMatcher.group(2);
-            filename = addressMatcher.group(1);
-        } else {
-            address = "";
-        }
-        
-        Log.warn("Opening '" + filename + "' at '" + address + "'");
-        
-        /* Remove local-directory fluff. */
+        // Remove local-directory fluff.
         if (filename.startsWith("./") || filename.startsWith(".\\")) {
             filename = filename.substring(2);
         }
         
-        if (isFileForExternalApplication(filename)) {
-            openFileWithExternalApplication(filename);
-            return null;
+        // Extract the address and any trailing junk, if this isn't just a
+        // filename. We check for the file's existence first to cope with such
+        // unfortunate names as "titanfs1-fsm_console-2005-10-27-09:47:47.txt".
+        String address = "";
+        if (FileUtilities.exists(filename) == false) {
+            // Extract any address, which here means a trailing sequence of ":\d+"s.
+            // Note that we try hard to cope with trailing junk so we can work with
+            // grep(1) matches along the lines of "file.cpp:123:void something()"
+            // where the end of the address and the beginning of the actual line
+            // are run together. We keep regressing on this behavior!
+            Pattern addressPattern = Pattern.compile("^(.+?)((:\\d+)*)(:|:?$)");
+            Matcher addressMatcher = addressPattern.matcher(filename);
+            if (addressMatcher.find()) {
+                address = addressMatcher.group(2);
+                filename = addressMatcher.group(1);
+            }
         }
+        
+        Log.warn("Opening '" + filename + "'" + (address.length() > 0 ? (" at '" + address + "'") : ""));
         
         /* Give up if the file doesn't exist. */
         if (FileUtilities.exists(filename) == false) {
