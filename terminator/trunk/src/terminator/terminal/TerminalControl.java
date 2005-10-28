@@ -150,7 +150,7 @@ public class TerminalControl implements Runnable {
 		}
 		if (ptyProcess.didExitNormally()) {
 			int status = ptyProcess.getExitStatus();
-			if (status != 0 && Options.getSharedInstance().isErrorExitHolding()) {
+			if (status != 0 && pane.isErrorExitHolding()) {
 				announceConnectionLost("\n\r[Process exited with status " + status + ".]");
 				return;
 			}
