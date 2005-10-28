@@ -41,7 +41,19 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     /** Tests false once we're fully started. */
     private boolean initializing = true;
     
-    private List<String> initialFilenames;
+    private class InitialFile {
+        String filename;
+        int y;
+        private InitialFile(String filename, int y) {
+            this.filename = filename;
+            this.y = y;
+        }
+        private InitialFile(String filename) {
+            this(filename, -1);
+        }
+    }
+    
+    private List<InitialFile> initialFiles;
     
     private ArrayList<Element> initialWorkspaces;
     
@@ -133,7 +145,17 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
         return filename;
     }
-
+    
+    private EWindow openFile(InitialFile file) {
+        try {
+            return openFileNonInteractively(file);
+        } catch (Exception ex) {
+            Log.warn("Problem opening file \"" + file.filename + "\"", ex);
+            showAlert("Open", ex.getMessage());
+            return null;
+        }
+    }
+    
     /**
      * Opens a file. If the file's already open, it receives the focus. The 'filename'
      * parameter is actually a grep-style filename:address string.
@@ -142,16 +164,16 @@ public class Edit implements com.apple.eawt.ApplicationListener {
      * no file was opened or the file was passed to an external program.
      */
     public EWindow openFile(String filename) {
-        try {
-            return openFileNonInteractively(filename);
-        } catch (Exception ex) {
-            Log.warn("Problem opening file \"" + filename + "\"", ex);
-            showAlert("Open", ex.getMessage());
-            return null;
-        }
+        return openFile(new InitialFile(filename));
     }
     
     public EWindow openFileNonInteractively(String filename) {
+        return openFileNonInteractively(new InitialFile(filename));
+    }
+    
+    public EWindow openFileNonInteractively(InitialFile file) {
+        String filename = file.filename;
+        
         // Special cases for URIs and files for external applications.
         if (FileUtilities.nameStartsWithOneOf(filename, FileUtilities.getArrayOfPathElements(Parameters.getParameter("url.prefixes", "")))) {
             showDocument(filename);
@@ -189,7 +211,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         
         Log.warn("Opening '" + filename + "'" + (address.length() > 0 ? (" at '" + address + "'") : ""));
         
-        /* Give up if the file doesn't exist. */
+        // Give up if the file doesn't exist.
         if (FileUtilities.exists(filename) == false) {
             throw new RuntimeException("File '" + filename + "' does not exist.");
         }
@@ -207,12 +229,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         filename = normalizeWorkspacePrefix(filename);
         filename = FileUtilities.getUserFriendlyName(filename);
         
-        /* Refuse to open directories. */
+        // Refuse to open directories.
         if (FileUtilities.fileFromString(filename).isDirectory()) {
             throw new RuntimeException("Edit can't edit directories, which is what '" + filename + "' is.");
         }
         
-        /* Limit ourselves (rather arbitrarily) to files under half a gigabyte. That's quite a strain on us, at present. */
+        // Limit ourselves (rather arbitrarily) to files under half a gigabyte. That's quite a strain on us, at present.
         final int KB = 1024;
         final int MB = 1024 * KB;
         long fileLength = FileUtilities.fileFromString(filename).length();
@@ -220,18 +242,18 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             throw new RuntimeException("Edit can't really handle files as large as '" + filename + "', which is " + fileLength + " bytes long. This file will not be opened.");
         }
         
-        /* Find which workspace this file is on/should be on, and make it visible. */
+        // Find which workspace this file is on/should be on, and make it visible.
         Workspace workspace = getBestWorkspaceForFilename(filename);
         tabbedPane.setSelectedComponent(workspace);
         
-        /* If the user already has this file open, we shouldn't open it again. */
+        // If the user already has this file open, we shouldn't open it again.
         EWindow alreadyOpenWindow = workspace.findIfAlreadyOpen(filename, address);
         if (alreadyOpenWindow != null) {
             return alreadyOpenWindow;
         }
         
-        /* Add an appropriate viewer for the filename to the chosen workspace. */
-        return workspace.addViewerForFile(filename, address);
+        // Add an appropriate viewer for the filename to the chosen workspace.
+        return workspace.addViewerForFile(filename, address, file.y);
     }
     
     /** Returns an array of all the workspaces. */
@@ -526,11 +548,11 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     /** Opens all the files listed in the file we remembered them to last time we quit. */
     public void openRememberedFiles() {
         showStatus("Opening remembered files...");
-        if (initialFilenames != null) {
-            for (String filename : initialFilenames) {
-                openFile(filename);
+        if (initialFiles != null) {
+            for (InitialFile file : initialFiles) {
+                openFile(file);
             }
-            showStatus((initialFilenames.size() == 0) ? "No files to open" : "Finished opening files");
+            showStatus((initialFiles.size() == 0) ? "No files to open" : "Finished opening files");
         }
     }
     
@@ -559,13 +581,17 @@ public class Edit implements com.apple.eawt.ApplicationListener {
             initialSize.height = Integer.parseInt(root.getAttribute("height"));
             
             initialWorkspaces = new ArrayList<Element>();
-            initialFilenames = new ArrayList<String>();
+            initialFiles = new ArrayList<InitialFile>();
             for (Node workspace = root.getFirstChild(); workspace != null; workspace = workspace.getNextSibling()) {
                 if (workspace instanceof Element) {
                     initialWorkspaces.add((Element) workspace);
                     for (Node file = workspace.getFirstChild(); file != null; file = file.getNextSibling()) {
                         if (file instanceof Element) {
-                            initialFilenames.add(((Element) file).getAttribute("name"));
+                            Element fileElement = (Element) file;
+                            // FIXME: this is only needed until everyone's saved state has been upgraded.
+                            int y = fileElement.hasAttribute("y") ? Integer.parseInt(fileElement.getAttribute("y")) : -1;
+                            InitialFile initialFile = new InitialFile(fileElement.getAttribute("name"), y);
+                            initialFiles.add(initialFile);
                         }
                     }
                 }

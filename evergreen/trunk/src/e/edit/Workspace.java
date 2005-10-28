@@ -266,13 +266,13 @@ public class Workspace extends JPanel {
         Edit.getInstance().getAdvisor().unregisterTextComponent(textComponent);
     }
     
-    public EWindow addViewerForFile(String filename, String address) {
+    public EWindow addViewerForFile(final String filename, final String address, final int y) {
         Edit.getInstance().showStatus("Opening " + filename + "...");
         EWindow window = null;
         try {
             ETextWindow newWindow = new ETextWindow(filename);
             registerTextComponent(newWindow.getText());
-            window = addViewer(newWindow, address);
+            window = addViewer(newWindow, address, y);
         } catch (Exception ex) {
             Log.warn("Exception while opening file", ex);
         }
@@ -280,13 +280,8 @@ public class Workspace extends JPanel {
         return window;
     }
     
-    public EWindow addViewer(EWindow viewer) {
-        addViewer(viewer, null);
-        return viewer;
-    }
-    
-    public EWindow addViewer(EWindow viewer, final String address) {
-        leftColumn.addComponent(viewer);
+    private EWindow addViewer(EWindow viewer, final String address, final int y) {
+        leftColumn.addComponent(viewer, y);
         if (address != null) {
             final ETextWindow textWindow = (ETextWindow) viewer;
             EventQueue.invokeLater(new Runnable() {
@@ -406,7 +401,7 @@ public class Workspace extends JPanel {
     
     public void takeWindow(EWindow window) {
         window.removeFromColumn();
-        leftColumn.addComponent(window);
+        leftColumn.addComponent(window, -1);
     }
     
     public void moveFilesToBestWorkspaces() {
@@ -450,6 +445,7 @@ public class Workspace extends JPanel {
             org.w3c.dom.Element file = document.createElement("file");
             workspace.appendChild(file);
             file.setAttribute("name", textWindow.getFilename() + textWindow.getAddress());
+            file.setAttribute("y", Integer.toString(textWindow.getY()));
         }
     }
 }
