@@ -62,8 +62,16 @@ public class StringUtilities {
         }
     }
     
-    /** Used by the escape method to pad Unicode escapes to four digits. */
+    /** Used by the appendUnicodeEscape to pad Unicode escapes to four digits. */
     private static final char[] ZEROES = { '0', '0', '0' };
+    
+    /** Appends the Unicode escape sequence for 'c' to 'result'. */
+    private static void appendUnicodeEscape(StringBuilder result, char c) {
+        result.append("\\u");
+        String digits = Integer.toString((int) c, 16);
+        result.append(ZEROES, 0, 4 - digits.length());
+        result.append(digits);
+    }
     
     /** Turns a string into a printable Java string literal (minus the quotes). So a tab is converted to "\t", et cetera. */
     public static String escapeForJava(String s) {
@@ -79,10 +87,7 @@ public class StringUtilities {
             } else if (c == '\t') {
                 result.append("\\t");
             } else if (c < ' ' || c > '~') {
-                result.append("\\u");
-                String digits = Integer.toString((int) c, 16);
-                result.append(ZEROES, 0, 4 - digits.length());
-                result.append(digits);
+                appendUnicodeEscape(result, c);
             } else {
                 result.append(c);
             }
@@ -125,16 +130,16 @@ public class StringUtilities {
             char c = literal.charAt(i);
             if (c == '\n') {
                 result.append("\\n");
-                continue;
-            }
-            if (c == '\t') {
+            } else if (c == '\t') {
                 result.append("\\t");
-                continue;
+            } else if (c < ' ' || c > '~') {
+                appendUnicodeEscape(result, c);
+            } else {
+                if (REGEXP_META_CHARACTERS.indexOf(c) != -1) {
+                    result.append('\\');
+                }
+                result.append(c);
             }
-            if (REGEXP_META_CHARACTERS.indexOf(c) != -1) {
-                result.append('\\');
-            }
-            result.append(c);
         }
         return result.toString();
     }
