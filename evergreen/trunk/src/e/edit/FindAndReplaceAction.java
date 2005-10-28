@@ -247,14 +247,18 @@ public class FindAndReplaceAction extends ETextAction {
         }
     }
     
-    public void setStatusToGood(int matchCount) {
+    private void setStatusToGood(int matchCount) {
         patternField.setForeground(UIManager.getColor("TextField.foreground"));
         replacementField.setForeground(UIManager.getColor("TextField.foreground"));
-        statusLabel.setText("Matches: " + matchCount);
+        setStatus("Matches: " + matchCount);
     }
     
-    public void setStatusToBad(String explanation, JTextField badField) {
+    private void setStatusToBad(String explanation, JTextField badField) {
         badField.setForeground(Color.RED);
+        setStatus(explanation);
+    }
+    
+    private void setStatus(String explanation) {
         statusLabel.setText(explanation);
     }
     
@@ -338,7 +342,7 @@ public class FindAndReplaceAction extends ETextAction {
             }
             
             if (aborted) {
-                setStatusToBad("More than " + MAX_DISPLAYED_MATCH_COUNT + " matches. No matches will be shown.", patternField);
+                setStatus("More than " + MAX_DISPLAYED_MATCH_COUNT + " matches. No matches will be shown.");
             } else if (patternSyntaxError != null) {
                 setStatusToBad(patternSyntaxError.getDescription(), patternField);
             } else if (replacementSyntaxError != null) {
