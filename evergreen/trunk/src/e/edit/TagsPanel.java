@@ -99,7 +99,10 @@ public class TagsPanel extends JPanel {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
             if (node.getUserObject() instanceof TagReader.Tag) {
                 tag = (TagReader.Tag) node.getUserObject();
-                setForeground(tag.visibilityColor() == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
+                if (selected == false) {
+                    // Some LAFs have selection backgrounds that are too dark for black and gray.
+                    setForeground(tag.visibilityColor() == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
+                }
                 setFont((tag.isStatic && tag.visibilityColor() != TagReader.Tag.PRIVATE) ? boldFont : tree.getFont());
                 setToolTipText(tag.toolTip);
                 Shape typeMarker = tag.type.getShape();
