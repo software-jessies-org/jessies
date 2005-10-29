@@ -90,10 +90,6 @@ auto-saving
 
     [ ] Store divider position on quit. Restore on start.
 
-    [ ] we start up with the same files that were open when we quit, but we
-        don't remember how much space each had (or what order they were in),
-        which detracts somewhat.
-
 [ ] should have an environment variable editor (like the Windows Control
     Panel one).
 
