@@ -91,7 +91,7 @@ public class GuiUtilities {
      * Tests whether we're using the GTK+ LAF (and so are probably on Linux or Solaris).
      */
     public static boolean isGtk() {
-        return UIManager.getSystemLookAndFeelClassName().contains("GTK");
+        return UIManager.getLookAndFeel().getClass().getName().contains("GTK");
     }
     
     /**
