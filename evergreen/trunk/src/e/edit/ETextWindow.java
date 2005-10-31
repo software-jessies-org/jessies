@@ -245,6 +245,14 @@ public class ETextWindow extends EWindow implements PTextListener {
      * emacs scans the whole file, but GNU headers seem to use the first line).
      */
     private static boolean isCPlusPlusContent(CharSequence content) {
+        // FIXME: this method has an over-simplified idea of emacs mode strings, based on the STL header file usage.
+        // Here are two examples. The former shows that we could use a similar check for Ruby; the latter that we ought to recognize another form, and that we can also potentially find the tab string this way.
+        // hydrogen:/usr/lib/ruby/1.8$ grep -n -- '-\*-' *
+        // getoptlong.rb:1:#                                                         -*- Ruby -*-
+        // yaml.rb:1:# -*- mode: ruby; ruby-indent-level: 4; tab-width: 4 -*- vim: sw=4 ts=4
+        // We should also probably recognize plain C (since C_PLUS_PLUS in Edit means C/C++/Objective-C/Objective-C++):
+        // powerpc-darwin8.0/dl.h:1:/* -*- C -*-
+        // FIXME: emacs mode strings should be handled separately, and override content-based file type determination.
         return Pattern.compile("(#ifndef|" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ")").matcher(content).find();
     }
     
