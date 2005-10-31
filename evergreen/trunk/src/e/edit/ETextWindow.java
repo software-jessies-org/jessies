@@ -209,19 +209,26 @@ public class ETextWindow extends EWindow implements PTextListener {
         textBecameDirty();
     }
     
-    /** Tests whether the 'content' looks like a Unix shell script. */
+    /**
+     * Tests whether the 'content' looks like a Unix shell script. If
+     * 'interpreter' is a shell, you should probably prepend "/" to avoid
+     * false positives; if 'interpreter' is a scripting language, you should
+     * probably avoid doing so because it's still relatively common practise
+     * to use the env(1) hack. We could perhaps automate this by matching
+     * either ("/" + interpreter) or ("/env\\s[^\\n]*" + interpreter).
+     */
     private static boolean isInterpretedContent(CharSequence content, String interpreter) {
         return Pattern.compile("^#![^\\n]*" + interpreter).matcher(content).find();
     }
     
     /** Tests whether the 'content' looks like a Unix shell script, of the Ruby variety. */
     private static boolean isRubyContent(CharSequence content) {
-        return isInterpretedContent(content, "/ruby");
+        return isInterpretedContent(content, "ruby");
     }
     
     /** Tests whether the 'content' looks like a Unix shell script, of the Perl variety. */
     private static boolean isPerlContent(CharSequence content) {
-        return isInterpretedContent(content, "/perl");
+        return isInterpretedContent(content, "perl");
     }
     
     private static boolean isBashContent(CharSequence content) {
@@ -319,27 +326,67 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
     }
     
-    private void configureForGuessedFileType() {
-        String originalFileType = fileType;
+    /**
+     * There are three main ways to guess a file's type: by content, by name,
+     * or by emacs mode string. The initFileType methods implement this, though
+     * there's no uniform checking for emacs mode strings (the perlrun man page,
+     * for example, mentions "#!/bin/sh -- # -*- perl -*- -p" but we wouldn't
+     * currently recognize such a script as a Perl script, even though we would
+     * recognize a C++ files by its emacs mode string).
+     */
+    private void initFileType() {
+        // See if we can infer the type by content first.
+        // FIXME: emacs mode strings should come first.
+        initFileTypeByContent();
+        if (fileType == UNKNOWN) {
+            // Fall back to guessing from the filename.
+            initFileTypeByName();
+        }
+    }
+    private void initFileTypeByContent() {
         CharSequence content  = text.getTextBuffer();
-        if (filename.endsWith(".java")) {
-            fileType = JAVA;
-            text.setIndenter(new PJavaIndenter(text));
-            text.setTextStyler(new PJavaTextStyler(text));
-        } else if (isRubyContent(content)) {
+        if (isRubyContent(content)) {
             fileType = RUBY;
-            text.setIndenter(new PRubyIndenter(text));
-            text.setTextStyler(new PRubyTextStyler(text));
-        } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || filename.endsWith(".strings") || isCPlusPlusContent(content)) {
-            fileType = C_PLUS_PLUS;
-            text.setIndenter(new PCppIndenter(text));
-            text.setTextStyler(new PCPPTextStyler(text));
-        } else if (filename.endsWith(".pl") || filename.endsWith(".pm") || isPerlContent(content)) {
-            fileType = PERL;
-            text.setIndenter(new PPerlIndenter(text));
-            text.setTextStyler(new PPerlTextStyler(text));
         } else if (isBashContent(content)) {
             fileType = BASH;
+        } else if (isCPlusPlusContent(content)) {
+            fileType = C_PLUS_PLUS;
+        } else if (isPerlContent(content)) {
+            fileType = PERL;
+        } else {
+            fileType = UNKNOWN;
+        }
+    }
+    private void initFileTypeByName() {
+        if (filename.endsWith(".java")) {
+            fileType = JAVA;
+        } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || filename.endsWith(".strings")) {
+            fileType = C_PLUS_PLUS;
+        } else if (filename.endsWith(".pl") || filename.endsWith(".pm")) {
+            fileType = PERL;
+        } else if (filename.endsWith(".rb")) {
+            fileType = RUBY;
+        } else {
+            fileType = UNKNOWN;
+        }
+    }
+    
+    private void configureForGuessedFileType() {
+        String originalFileType = fileType;
+        initFileType();
+        if (fileType == JAVA) {
+            text.setIndenter(new PJavaIndenter(text));
+            text.setTextStyler(new PJavaTextStyler(text));
+        } else if (fileType == RUBY) {
+            text.setIndenter(new PRubyIndenter(text));
+            text.setTextStyler(new PRubyTextStyler(text));
+        } else if (fileType == C_PLUS_PLUS) {
+            text.setIndenter(new PCppIndenter(text));
+            text.setTextStyler(new PCPPTextStyler(text));
+        } else if (fileType == PERL) {
+            text.setIndenter(new PPerlIndenter(text));
+            text.setTextStyler(new PPerlTextStyler(text));
+        } else if (fileType == BASH) {
             text.setTextStyler(new PBashTextStyler(text));
         } else {
             // Plain text.
