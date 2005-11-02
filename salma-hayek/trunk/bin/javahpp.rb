@@ -5,10 +5,10 @@ require 'pathname.rb'
 
 # Cope with symbolic links to this script.
 salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
-TARGET_OS=`#{salma_hayek}/bin/target-os.rb`.chomp()
+require "#{salma_hayek}/bin/target-os.rb"
 
 def cygpath(filenameOrPath)
-  if TARGET_OS != "Cygwin"
+  if target_os() != "Cygwin"
     return filenameOrPath
   end
   args = [ "cygpath", "--windows" ]

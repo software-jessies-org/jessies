@@ -5,10 +5,10 @@ require 'pathname.rb'
 
 # Cope with symbolic links to this script.
 salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
-TARGET_OS=`#{salma_hayek}/bin/target-os.rb`.chomp()
+require "#{salma_hayek}/bin/target-os.rb"
 
 args = [ "java", "-cp", "#{salma_hayek}/classes" ]
-if TARGET_OS == "Darwin"
+if target_os() == "Darwin"
   args << "-Xdock:name=Dictionary"
 end
 args << "e.tools.dict.DictionaryBrowser"
