@@ -352,6 +352,7 @@ JAVA_FLAGS += $(addprefix -classpath ,$(call makeNativePath,$(CLASS_PATH)))
 JAVA_FLAGS += -d classes/
 JAVA_FLAGS += -sourcepath src/
 JAVA_FLAGS += -deprecation
+JAVA_FLAGS += -g
 
 JAVA_FLAGS.gcjx += -pedantic -verbose -fverify # -error -- reinstate later!
 
