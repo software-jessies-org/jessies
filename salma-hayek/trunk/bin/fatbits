@@ -5,13 +5,6 @@ require 'pathname.rb'
 
 # Cope with symbolic links to this script.
 salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
-require "#{salma_hayek}/bin/target-os.rb"
+require "#{salma_hayek}/bin/invoke-java.rb"
 
-args = [ "java", "-cp", "#{salma_hayek}/classes" ]
-if target_os() == "Darwin"
-  args << "-Xdock:name=FatBits"
-  args << "-Xdock:icon=/Developer/Applications/Graphics Tools/Pixie.app/Contents/Resources/Big.icns"
-end
-args << "e.tools.FatBits"
-args.concat(ARGV)
-system(*args)
+invoke_java("FatBits", "/Developer/Applications/Graphics Tools/Pixie.app/Contents/Resources/Big.icns", "e/tools/FatBits")
