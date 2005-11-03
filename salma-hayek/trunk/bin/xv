@@ -5,12 +5,6 @@ require 'pathname.rb'
 
 # Cope with symbolic links to this script.
 salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
-require "#{salma_hayek}/bin/target-os.rb"
+require "#{salma_hayek}/bin/invoke-java.rb"
 
-args = [ "java", "-cp", "#{salma_hayek}/classes" ]
-if target_os() == "Darwin"
-    args << "-Xdock:name=Xv"
-end
-args << "e.tools.Xv"
-args.concat(ARGV)
-system(*args)
+invoke_java("Xv", "", "e/tools/Xv", [])
