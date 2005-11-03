@@ -262,7 +262,7 @@ SCRIPT_PATH=$(SALMA_HAYEK)/bin
 # By default, distributions end up under http://www.jessies.org/~software/downloads/
 DIST_SCP_USER_AND_HOST=software@jessies.org
 # The html files are copied into the parent directory.
-DIST_SCP_DIRECTORY=~/downloads/$(PROJECT_NAME)/builds
+DIST_SCP_DIRECTORY=/home/software/downloads/$(PROJECT_NAME)/builds
 
 $(takeProfileSample)
 SOURCE_FILES := $(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
