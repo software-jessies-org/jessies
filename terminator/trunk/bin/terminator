@@ -24,6 +24,7 @@ HOME = ENV["HOME"]
 
 require "#{salma_hayek}/bin/target-os.rb"
 TARGET_OS = target_os()
+require "#{salma_hayek}/bin/invoke-java.rb"
 
 # Make sure we have a directory for the terminal logs.
 log_directory="#{HOME}/.terminal-logs"
@@ -55,18 +56,6 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   rescue
     # fall through...
   end
-end
-
-def cygpath(filenameOrPath)
-  if TARGET_OS != "Cygwin"
-    return filenameOrPath
-  end
-  args = [ "cygpath", "--windows" ]
-  if filenameOrPath =~ /:/
-    args.push("--path")
-  end
-  args.push('"' + filenameOrPath + '"')
-  return `#{args.join(" ")}`.chomp
 end
 
 classpath="#{terminator_home}/classes:#{salma_hayek}/classes:#{salma_hayek}/swing-worker.jar"
