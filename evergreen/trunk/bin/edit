@@ -10,9 +10,10 @@ require "#{salma_hayek}/bin/target-os.rb"
 require "#{salma_hayek}/bin/invoke-java.rb"
 
 HOME = ENV["HOME"]
+TARGET_OS = target_os()
 
 ENV["EDIT_HOME"] = project_root
-ENV["PATH"] = "#{ENV["PATH"]}:#{salma_hayek}/.generated/native/all/setsid/#{target_os()}:#{salma_hayek}/.generated/native/#{target_os()}/BringProcessToFront/#{target_os()}"
+ENV["PATH"] = "#{salma_hayek}/.generated/native/all/setsid/#{TARGET_OS}:#{salma_hayek}/.generated/native/#{TARGET_OS}/BringProcessToFront/#{TARGET_OS}:#{ENV["PATH"]}"
 
 edit_class_name = "e.edit.Edit"
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
@@ -52,7 +53,7 @@ if ARGV[0] =~ /^\+(\d+)$/
 end
 
 os_specific_options = []
-case target_os()
+case TARGET_OS
 when /Darwin/
     # Darwin is what Mac OS X calls itself.
     edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
