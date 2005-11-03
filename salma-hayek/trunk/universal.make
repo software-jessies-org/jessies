@@ -105,9 +105,9 @@ findMakeFriendlyEquivalentName.$(TARGET_OS) = $(1)
 findMakeFriendlyEquivalentName.Cygwin = $(shell cygpath --mixed --short-name '$(1)')
 findMakeFriendlyEquivalentName = $(findMakeFriendlyEquivalentName.$(TARGET_OS))
 
-JAVA_HOME_SCRIPT = $(SALMA_HAYEK)/bin/find-java-home.rb
-SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JAVA_HOME_SCRIPT)
-JAVA_HOME := $(call findMakeFriendlyEquivalentName,$(shell $(JAVA_HOME_SCRIPT)))
+JDK_ROOT_SCRIPT = $(SALMA_HAYEK)/bin/find-jdk-root.rb
+SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JDK_ROOT_SCRIPT)
+JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell $(JDK_ROOT_SCRIPT)))
 
 # ----------------------------------------------------------------------------
 # We use our own replacement for javah(1).
@@ -215,22 +215,22 @@ CC = $(CXX)
 # Note that our Solaris build assumes GCC rather than Sun's compiler.
 # GCC's -shared option, which we use on Linux, exists, but produces link
 # errors. -G, as used in Sun's tutorial examples with their own compiler works.
-EXTRA_INCLUDE_PATH.SunOS += $(JAVA_HOME)/include/solaris
+EXTRA_INCLUDE_PATH.SunOS += $(JDK_ROOT)/include/solaris
 JNI_LIBRARY_LDFLAGS.SunOS += -G
 JNI_LIBRARY_PREFIX.SunOS = lib
 JNI_LIBRARY_EXTENSION.SunOS = so
 
-EXTRA_INCLUDE_PATH.Linux += $(JAVA_HOME)/include/linux
+EXTRA_INCLUDE_PATH.Linux += $(JDK_ROOT)/include/linux
 JNI_LIBRARY_LDFLAGS.Linux += -shared
 JNI_LIBRARY_PREFIX.Linux = lib
 JNI_LIBRARY_EXTENSION.Linux = so
 
-EXTRA_INCLUDE_PATH.Cygwin += $(JAVA_HOME)/include/win32
+EXTRA_INCLUDE_PATH.Cygwin += $(JDK_ROOT)/include/win32
 JNI_LIBRARY_LDFLAGS.Cygwin += -shared -Wl,--add-stdcall-alias -Wl,--image-base,0x68000000
 JNI_LIBRARY_PREFIX.Cygwin =
 JNI_LIBRARY_EXTENSION.Cygwin = dll
 
-EXTRA_INCLUDE_PATH += $(JAVA_HOME)/include
+EXTRA_INCLUDE_PATH += $(JDK_ROOT)/include
 EXTRA_INCLUDE_PATH += $(EXTRA_INCLUDE_PATH.$(TARGET_OS))
 
 NON_EXISTENT_INCLUDE_DIRECTORIES := $(filter-out $(wildcard $(EXTRA_INCLUDE_PATH)),$(EXTRA_INCLUDE_PATH))
@@ -318,7 +318,7 @@ COMPILER_TYPE = $(notdir $(JAVA_COMPILER))
 # ----------------------------------------------------------------------------
 
 # Traditional Java location:
-RT_JAR=$(JAVA_HOME)/jre/lib/rt.jar
+RT_JAR=$(JDK_ROOT)/jre/lib/rt.jar
 ifeq "$(wildcard $(RT_JAR))" ""
   # Apple:
   RT_JAR=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar

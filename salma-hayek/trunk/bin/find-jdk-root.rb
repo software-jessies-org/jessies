@@ -45,14 +45,14 @@ java_bin=java_in_actual_location.dirname()
 
 # Assume the directory above the bin/ directory is the "home" directory; the
 # directory that contains bin/ and include/ and so on.
-java_home=java_bin.dirname()
+jdk_root=java_bin.dirname()
 
 if `uname`.chomp() == "Darwin"
     # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
     # that contains a JDK-like directory structure of links to the files in
     # the Apple tree.
-    java_home="#{java_home}/Home"
+    jdk_root="#{jdk_root}/Home"
 end
 
-puts(java_home)
+puts(jdk_root)
 exit(0)
