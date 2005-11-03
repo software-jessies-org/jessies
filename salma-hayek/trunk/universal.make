@@ -142,8 +142,8 @@ HEADER_EXTENSIONS += wxi
 EXTRA_INCLUDE_PATH += "$(SALMA_HAYEK)/native/Headers"
 
 CFLAGS += -std=c99
-C_AND_CXXFLAGS += -fPIC
-C_AND_CXXFLAGS += -g
+C_AND_CXX_FLAGS += -fPIC
+C_AND_CXX_FLAGS += -g
 # Maximum warnings...
 C_AND_CXX_FLAGS += -W -Wall -Werror
 OBJC_AND_OBJCXX_FLAGS += -Wno-protocol -Wundeclared-selector
