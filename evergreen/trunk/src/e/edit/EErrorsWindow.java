@@ -68,15 +68,17 @@ public class EErrorsWindow extends EWindow {
         
         @Override
         protected void configureSegment(PTextSegment segment, Matcher matcher) {
-            segment.setLinkAction(new ErrorLinkActionListener(matcher.group(1)));
+            segment.setLinkAction(new ErrorLinkActionListener(matcher.group(1), segment.getOffset()));
         }
     }
     
     private class ErrorLinkActionListener implements ActionListener {
         private final String address;
+        private final int offset;
         
-        public ErrorLinkActionListener(String address) {
+        public ErrorLinkActionListener(String address, int offset) {
             this.address = address;
+            this.offset = offset;
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -96,9 +98,8 @@ public class EErrorsWindow extends EWindow {
                 // Try to resolve the non-canonical name.
                 String currentDirectory = workspace.getRootDirectory();
                 String errors = textArea.getText();
-                // FIXME: we shouldn't search past the point at which the user clicked, but how do we know where that is?
                 Matcher matcher = MAKE_ENTERING_DIRECTORY_PATTERN.matcher(errors);
-                while (matcher.find()) {
+                while (matcher.find() && matcher.start() < offset) {
                     currentDirectory = matcher.group(1);
                 }
                 open(currentDirectory + File.separator + name + tail);
