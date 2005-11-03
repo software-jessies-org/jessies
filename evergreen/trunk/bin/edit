@@ -4,20 +4,21 @@ require 'fileutils.rb'
 require 'pathname.rb'
 
 # Cope with symbolic links to this script.
-edit_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
-salma_hayek = Pathname.new("#{edit_home}/../salma-hayek").realpath()
+project_root = Pathname.new("#{__FILE__}/..").realpath().dirname()
+salma_hayek = Pathname.new("#{project_root}/../salma-hayek").realpath()
+require "#{salma_hayek}/bin/target-os.rb"
+require "#{salma_hayek}/bin/invoke-java.rb"
 
 HOME = ENV["HOME"]
-TARGET_OS=`#{salma_hayek}/bin/target-os.rb`.chomp()
 
-ENV["EDIT_HOME"] = edit_home
-ENV["PATH"] = "#{ENV["PATH"]}:#{salma_hayek}/.generated/native/all/setsid/#{TARGET_OS}:#{salma_hayek}/.generated/native/#{TARGET_OS}/BringProcessToFront/#{TARGET_OS}"
+ENV["EDIT_HOME"] = project_root
+ENV["PATH"] = "#{ENV["PATH"]}:#{salma_hayek}/.generated/native/all/setsid/#{target_os()}:#{salma_hayek}/.generated/native/#{target_os()}/BringProcessToFront/#{target_os()}"
 
 edit_class_name = "e.edit.Edit"
 edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
-classpath_entries = [ "#{edit_home}/classes", "#{salma_hayek}/classes", "#{salma_hayek}/swing-worker.jar" ]
+classpath_entries = [ "#{project_root}/classes", "#{salma_hayek}/classes", "#{salma_hayek}/swing-worker.jar" ]
 
-scm_home = Pathname.new("#{edit_home}/../scm").realpath()
+scm_home = Pathname.new("#{project_root}/../scm").realpath()
 if FileTest.directory?(scm_home)
   classpath_entries << "#{scm_home}/classes"
 end
@@ -51,7 +52,7 @@ if ARGV[0] =~ /^\+(\d+)$/
 end
 
 os_specific_options = []
-case TARGET_OS
+case target_os()
 when /Darwin/
     # Darwin is what Mac OS X calls itself.
     edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
@@ -65,8 +66,8 @@ if FileTest.directory?(edit_preferences_directory) == false
     puts("Edit: Creating preferences directory '#{edit_preferences_directory}'.")
     Dir.mkdir(edit_preferences_directory)
     puts("Edit: Copying default preferences.")
-    FileUtils.cp("#{edit_home}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
-    FileUtils.cp("#{edit_home}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
+    FileUtils.cp("#{project_root}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
+    FileUtils.cp("#{project_root}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
     puts("Edit: Away you go!")
 end
 
@@ -80,19 +81,7 @@ end
 log_filename = "/tmp/edit.log.#$$"
 FileUtils.ln_sf(log_filename, "/tmp/edit.log")
 
-def cygpath(filenameOrPath)
-  if TARGET_OS != "Cygwin"
-    return filenameOrPath
-  end
-  args = [ "cygpath", "--windows" ]
-  if filenameOrPath =~ /:/
-    args.push("--path")
-  end
-  args.push('"' + filenameOrPath + '"')
-  return `#{args.join(" ")}`.chomp
-end
-
-options = [ "-cp", "#{cygpath(classpath_entries.join(File::PATH_SEPARATOR))}" ]
+options = [ "-cp", cygpath(classpath_entries.join(":")) ]
 options.push("-Djava.awt.Window.locationByPlatform=true")
 options.push("-DpreferencesDirectory=#{cygpath(edit_preferences_directory)}")
 options.push("-Xmx1g")
