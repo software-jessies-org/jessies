@@ -8,7 +8,12 @@ def invoke_java(dock_name, dock_icon, class_name)
   # Cope with symbolic links to this script.
   require "#{salma_hayek}/bin/target-os.rb"
   
-  args = [ "java", "-cp", "#{salma_hayek}/classes" ]
+  heap_size="1g"
+  if target_os() == "Cygwin"
+    heap_size="100m"
+  end
+  
+  args = [ "java", "-Xmx#{heap_size}", "-cp", "#{salma_hayek}/classes" ]
   if target_os() == "Darwin"
     args << "-Xdock:name=#{dock_name}"
     args << "-Xdock:icon=#{dock_icon}"
