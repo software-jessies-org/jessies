@@ -3,6 +3,18 @@
 require 'fileutils.rb'
 require 'pathname.rb'
 
+def cygpath(filenameOrPath)
+  if target_os() != "Cygwin"
+    return filenameOrPath
+  end
+  args = [ "cygpath", "--windows" ]
+  if filenameOrPath =~ /:/
+    args.push("--path")
+  end
+  args.push('"' + filenameOrPath + '"')
+  return `#{args.join(" ")}`.chomp
+end
+
 def invoke_java(dock_name, dock_icon, class_name, extra_arguments)
   project_root = Pathname.new("#{$0}/..").realpath().dirname()
   salma_hayek = Pathname.new("#{project_root}/../salma-hayek").realpath()
@@ -20,7 +32,7 @@ def invoke_java(dock_name, dock_icon, class_name, extra_arguments)
     class_path << "#{salma_hayek}/MRJ141Stubs.jar"
   end
   
-  args = [ "java", "-Xmx#{heap_size}", "-cp", class_path.join(":") ]
+  args = [ "java", "-Xmx#{heap_size}", "-cp", cygpath(class_path.join(":")) ]
   if target_os() == "Darwin"
     args << "-Xdock:name=#{dock_name}"
     # Does it matter that we set this to the empty string where previously we left the icon argument off?
