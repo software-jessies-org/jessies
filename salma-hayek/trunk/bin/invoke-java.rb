@@ -46,5 +46,5 @@ end
 
 if __FILE__ == $0
   # Just an example.
-  invoke_java("invoke-java", "", "e/util/Launcher")
+  invoke_java("invoke-java", "", "e/util/Launcher", [])
 end
