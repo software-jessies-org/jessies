@@ -267,6 +267,10 @@ public class StringUtilities {
         return builder.toString();
     }
     
+    public static String pluralize(int value, String singularForm, String pluralForm) {
+        return Integer.toString(value) + " " + (value == 1 ? singularForm : pluralForm);
+    }
+    
     private StringUtilities() {
     }
 
