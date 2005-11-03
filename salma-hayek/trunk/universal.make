@@ -139,7 +139,7 @@ HEADER_EXTENSIONS += wxi
 # Sensible C family compiler flags.
 # ----------------------------------------------------------------------------
 
-EXTRA_INCLUDE_PATH += "$(SALMA_HAYEK)/native/Headers"
+EXTRA_INCLUDE_PATH += $(SALMA_HAYEK)/native/Headers
 
 CFLAGS += -std=c99
 C_AND_CXX_FLAGS += -fPIC
@@ -150,9 +150,7 @@ OBJC_AND_OBJCXX_FLAGS += -Wno-protocol -Wundeclared-selector
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
 PURE_C_AND_CXX_FLAGS += -pedantic
-# The use of whitespace here is carefully crafted to work with directories
-# whose names contain spaces, something common on Win32.
-CPPFLAGS += $(subst $(SPACE)", -I", $(EXTRA_INCLUDE_PATH))
+CPPFLAGS += $(foreach DIRECTORY,$(EXTRA_INCLUDE_PATH),-I$(DIRECTORY))
 
 # Exposes ptsname on libc22 per the Linux man page but causes this on Mac OS X:
 # /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MacMemory.h:1587: error: 'bzero' was not declared in this scope
@@ -212,22 +210,22 @@ CC = $(CXX)
 # Note that our Solaris build assumes GCC rather than Sun's compiler.
 # GCC's -shared option, which we use on Linux, exists, but produces link
 # errors. -G, as used in Sun's tutorial examples with their own compiler works.
-EXTRA_INCLUDE_PATH.SunOS += "$(JAVA_HOME)/include/solaris"
+EXTRA_INCLUDE_PATH.SunOS += $(JAVA_HOME)/include/solaris
 JNI_LIBRARY_LDFLAGS.SunOS += -G
 JNI_LIBRARY_PREFIX.SunOS = lib
 JNI_LIBRARY_EXTENSION.SunOS = so
 
-EXTRA_INCLUDE_PATH.Linux += "$(JAVA_HOME)/include/linux"
+EXTRA_INCLUDE_PATH.Linux += $(JAVA_HOME)/include/linux
 JNI_LIBRARY_LDFLAGS.Linux += -shared
 JNI_LIBRARY_PREFIX.Linux = lib
 JNI_LIBRARY_EXTENSION.Linux = so
 
-EXTRA_INCLUDE_PATH.Cygwin += "$(JAVA_HOME)/include/win32"
+EXTRA_INCLUDE_PATH.Cygwin += $(JAVA_HOME)/include/win32
 JNI_LIBRARY_LDFLAGS.Cygwin += -shared -Wl,--add-stdcall-alias -Wl,--image-base,0x68000000
 JNI_LIBRARY_PREFIX.Cygwin =
 JNI_LIBRARY_EXTENSION.Cygwin = dll
 
-EXTRA_INCLUDE_PATH += "$(JAVA_HOME)/include"
+EXTRA_INCLUDE_PATH += $(JAVA_HOME)/include
 EXTRA_INCLUDE_PATH += $(EXTRA_INCLUDE_PATH.$(TARGET_OS))
 JNI_LIBRARY_LDFLAGS += $(JNI_LIBRARY_LDFLAGS.$(TARGET_OS))
 JNI_LIBRARY_PREFIX = $(JNI_LIBRARY_PREFIX.$(TARGET_OS))
@@ -253,7 +251,7 @@ SCRIPT_PATH=$(SALMA_HAYEK)/bin
 # By default, distributions end up under http://www.jessies.org/~software/downloads/
 DIST_SCP_USER_AND_HOST=software@jessies.org
 # The html files are copied into the parent directory.
-DIST_SCP_DIRECTORY="~/downloads/$(PROJECT_NAME)/builds"
+DIST_SCP_DIRECTORY=~/downloads/$(PROJECT_NAME)/builds
 
 $(takeProfileSample)
 SOURCE_FILES := $(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
