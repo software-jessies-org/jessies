@@ -189,11 +189,15 @@ public class EColumn extends JSplitPane {
         private final TitleBarMouseInputListener titleBarMouseInputListener = new TitleBarMouseInputListener();
         
         public void addComponent(final EWindow c, final int y) {
-            if (y == -1) {
-                addComponentHeuristically(c);
-            } else {
-                add(c);
-                moveTo(c, y);
+            try {
+                if (y == -1) {
+                    addComponentHeuristically(c);
+                } else {
+                    add(c);
+                    moveTo(c, y);
+                }
+            } catch (StackOverflowError ex) {
+                Log.warn("the total height of the title bars is too large for the parent window", ex);
             }
             addListenersTo(c);
         }
@@ -208,11 +212,7 @@ public class EColumn extends JSplitPane {
                 int y = largest.getY() + largest.getHeight() / 2;
                 add(c, index + 1);
                 placeComponent(index + 1, c);
-                try {
-                    moveTo(c, y);
-                } catch (StackOverflowError ex) {
-                    Log.warn("the total height of the title bars is too large for the parent window", ex);
-                }
+                moveTo(c, y);
             }
         }
         
