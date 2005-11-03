@@ -1,18 +1,14 @@
-#!/bin/bash
-real_script=`readlink $0 || echo $0`
-class_path=`dirname $real_script`/../classes
+#!/usr/bin/ruby -w
 
-app_name=Notepad
-class_name=e.tools.notepad.Notepad
+require 'fileutils.rb'
+require 'pathname.rb'
 
-shift
-case "`uname`" in
-Darwin)
-    os_specific_options=-Xdock:name=$app_name
-    ;;
-*)
-    class_path=$class_path:$tools_dir/../salma-hayek/MRJ141Stubs.jar
-    ;;
-esac
+# Cope with symbolic links to this script.
+salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
 
-exec java $os_specific_options -Xmx1g -cp $class_path e.util.Launcher $app_name $class_name "$@"
+require "#{salma_hayek}/bin/invoke-java.rb"
+
+app_name="Notepad"
+class_name="e.tools.notepad.Notepad"
+
+invoke_java("Notepad", "", "e/util/Launcher", [ app_name, class_name ])
