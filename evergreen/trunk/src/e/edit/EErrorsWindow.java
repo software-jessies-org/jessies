@@ -27,7 +27,7 @@ import e.util.*;
  * code to do anything useful.
  */
 public class EErrorsWindow extends EWindow {
-    private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory `(.*)'$");
+    private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory `(.*)'$", Pattern.MULTILINE);
     
     private final Workspace workspace;
     private PTextArea textArea;
