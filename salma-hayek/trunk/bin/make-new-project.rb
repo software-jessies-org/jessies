@@ -1,9 +1,14 @@
 #!/bin/bash
 # usage: make-new-project.rb <name>
 
-# It's important that you make a new project as the general repository owner,
-# but it's also important that you check out again as your individual owner
+# It's important that you make a new project as the general repository owner
+# so that file permissions are correct.
+# mad alleges that other users' umask will be wrong, and (presumably) that
+# the chmod in this script is insufficient to fix the problem.
+
+# It's also important that you check out again as your individual owner
 # before committing actual changes to the repository.
+
 # Hopefully we'll have moved to Mercurial or something before we next need to
 # worry about this.
 svn_host=software@jessies.org
