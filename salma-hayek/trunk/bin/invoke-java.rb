@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 
-require 'fileutils.rb'
-require 'pathname.rb'
+require "fileutils.rb"
+require "pathname.rb"
 
 def cygpath(filenameOrPath)
   if target_os() != "Cygwin"
