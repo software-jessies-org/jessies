@@ -137,7 +137,9 @@ $(EXECUTABLES.Cygwin): LOCAL_LDFLAGS += -Wl,--subsystem,windows
 $(EXECUTABLES): LDFLAGS := $(LOCAL_LDFLAGS)
 $(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
 $(GENERATED_JNI_HEADER): RULE := $(JAVAHPP_RULE)
-$(WIX_INSTALLER): FILE_LIST_TO_WXI_FLAGS := --diskId
+ifeq "$(WIX_TARGET)" "INSTALLER"
+$(WIX_COMPONENT_DEFINITIONS): FILE_LIST_TO_WXI_FLAGS := --diskId
+endif
 # We mustn't := evaluate $@ and $<
 $(WIX_INSTALLER) $(WIX_MODULE): RULE = $(LIGHT) -nologo -out $(call convertToNativeFilenames,$@ $(filter %.wixobj,$^))
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
