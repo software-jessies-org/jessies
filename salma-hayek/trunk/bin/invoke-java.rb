@@ -31,6 +31,8 @@ def invoke_java(dock_name, dock_icon, class_name, extra_arguments)
   if target_os() != "Darwin"
     class_path << "#{salma_hayek}/MRJ141Stubs.jar"
   end
+  # Until Java 6, we need the back-ported SwingWorker.
+  class_path << "#{salma_hayek}/swing-worker.jar"
   
   args = [ "java", "-Xmx#{heap_size}", "-cp", cygpath(class_path.join(":")) ]
   if target_os() == "Darwin"
