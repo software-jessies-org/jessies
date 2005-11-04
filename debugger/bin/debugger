@@ -39,8 +39,9 @@ when /Darwin/
 	# Darwin is what Mac OS X calls itself.
 	debugger_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{debugger_class_name}"
 else
+	require "#{salma_hayek}/bin/find-jdk-root.rb"
 	classpath_entries << "#{salma_hayek}/MRJ141Stubs.jar"
-	classpath_entries << "/usr/java/jdk/lib/tools.jar"
+	classpath_entries << "#{find_jdk_root()}/lib/tools.jar"
 end
 
 if FileTest.directory?(debugger_preferences_directory) == false
