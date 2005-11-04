@@ -16,12 +16,12 @@ def cygpath(filenameOrPath)
 end
 
 def invoke_java(dock_name, dock_icon, class_name, extra_arguments)
+  # Cope with symbolic links to this script.
   project_root = Pathname.new("#{$0}/..").realpath().dirname()
   salma_hayek = Pathname.new("#{project_root}/../salma-hayek").realpath()
   
-  # Cope with symbolic links to this script.
   require "#{salma_hayek}/bin/target-os.rb"
-  
+ 
   heap_size="1g"
   if target_os() == "Cygwin"
     heap_size="100m"
@@ -33,6 +33,14 @@ def invoke_java(dock_name, dock_icon, class_name, extra_arguments)
   end
   # Until Java 6, we need the back-ported SwingWorker.
   class_path << "#{salma_hayek}/swing-worker.jar"
+  require "#{salma_hayek}/bin/find-jdk-root.rb"
+  jdk_root=find_jdk_root()
+  
+  # This doesn't exist on Mac OS X
+  tools_jar="#{jdk_root}/lib/tools.jar"
+  if Pathname.new(tools_jar).exist?
+    class_path << tools_jar
+  end
   
   args = [ "java", "-Xmx#{heap_size}", "-cp", cygpath(class_path.join(":")) ]
   if target_os() == "Darwin"

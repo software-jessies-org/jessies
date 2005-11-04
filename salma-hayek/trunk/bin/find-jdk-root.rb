@@ -30,29 +30,35 @@
 #   Java 5 the default, this is Apple's recommended way of using the Java 5
 #   previews.
 
-require 'pathname.rb'
-
-# Find java(1) on the path.
-java_on_path=`which java`.chomp()
-
-# Neophyte users are likely to be using whatever's in /usr/bin, and that's
-# likely to be a link to where there's a JDK or JRE installation. So we need
-# to follow the links to the actual installation.
-java_in_actual_location=Pathname.new(java_on_path).realpath()
-
-# Assume we're in the JDK/JRE bin/ directory.
-java_bin=java_in_actual_location.dirname()
-
-# Assume the directory above the bin/ directory is the "home" directory; the
-# directory that contains bin/ and include/ and so on.
-jdk_root=java_bin.dirname()
-
-if `uname`.chomp() == "Darwin"
+def find_jdk_root()
+  require "pathname.rb"
+  
+  # Find java(1) on the path.
+  java_on_path=`which java`.chomp()
+  
+  # Neophyte users are likely to be using whatever's in /usr/bin, and that's
+  # likely to be a link to where there's a JDK or JRE installation. So we need
+  # to follow the links to the actual installation.
+  java_in_actual_location=Pathname.new(java_on_path).realpath()
+  
+  # Assume we're in the JDK/JRE bin/ directory.
+  java_bin=java_in_actual_location.dirname()
+  
+  # Assume the directory above the bin/ directory is the "home" directory; the
+  # directory that contains bin/ and include/ and so on.
+  jdk_root=java_bin.dirname()
+  
+  if `uname`.chomp() == "Darwin"
     # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
     # that contains a JDK-like directory structure of links to the files in
     # the Apple tree.
     jdk_root="#{jdk_root}/Home"
+  end
+  
+  return jdk_root
 end
 
-puts(jdk_root)
-exit(0)
+if __FILE__ == $0
+  puts(find_jdk_root())
+  exit(0)
+end
