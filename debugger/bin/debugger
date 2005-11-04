@@ -1,0 +1,79 @@
+#!/usr/bin/ruby -w
+
+require 'fileutils.rb'
+require 'pathname.rb'
+
+# Cope with symbolic links to this script.
+project_root = Pathname.new("#{__FILE__}/..").realpath().dirname()
+salma_hayek = Pathname.new("#{project_root}/../salma-hayek").realpath()
+require "#{salma_hayek}/bin/target-os.rb"
+require "#{salma_hayek}/bin/invoke-java.rb"
+
+HOME = ENV["HOME"]
+TARGET_OS = target_os()
+
+debugger_class_name = "e.debugger.Debugger"
+debugger_preferences_directory = "#{HOME}/.#{debugger_class_name}"
+classpath_entries = [ "#{project_root}/classes", "#{salma_hayek}/classes", "#{salma_hayek}/swing-worker.jar" ]
+
+
+def issueDebuggerCommand(debugger_preferences_directory, command)
+	begin
+		File.new("#{debugger_preferences_directory}/debugger-server-port").read() =~ /^(.+):(\d+)$/
+		host = $1
+		port = $2.to_i()
+		require 'net/telnet'
+		telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
+		telnet.puts("#{command}\r")
+		print(telnet.readlines().join(""))
+		telnet.close()
+		return true
+	rescue
+		return false
+	end
+end
+
+os_specific_options = []
+case TARGET_OS
+when /Darwin/
+	# Darwin is what Mac OS X calls itself.
+	debugger_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{debugger_class_name}"
+else
+	classpath_entries << "#{salma_hayek}/MRJ141Stubs.jar"
+	classpath_entries << "/usr/java/jdk/lib/tools.jar"
+end
+
+if FileTest.directory?(debugger_preferences_directory) == false
+	puts("Debugger: Couldn't find preferences directory '#{debugger_preferences_directory}.")
+	puts("Debugger: Creating preferences directory '#{debugger_preferences_directory}'.")
+	Dir.mkdir(debugger_preferences_directory)
+end
+
+if ARGV.size > 0
+	command = ARGV.join(" ");
+	if issueDebuggerCommand(debugger_preferences_directory, command)
+		exit(0)
+	end
+end
+
+# Create a log file, and link to it as the newest.
+# Symbolically linking to a file which doesn't exist yet is perfectly legal.
+log_filename = "/tmp/debugger.log.#$$"
+FileUtils.ln_sf(log_filename, "/tmp/debugger.log")
+
+options = [ "-cp", cygpath(classpath_entries.join(":")) ]
+options.push("-Djava.awt.Window.locationByPlatform=true")
+options.push("-DpreferencesDirectory=#{cygpath(debugger_preferences_directory)}")
+#options.push("-agentlib:yjpagent")
+options.concat(os_specific_options)
+if ENV["DEBUGGING_DEBUGGER"] == nil
+#	options.push("-De.util.Log.filename=#{cygpath(log_filename)}")
+end
+
+args = [ "java" ]
+args.concat(options)
+args.push("e.util.Launcher")
+args.push("Debugger")
+args.push("#{debugger_class_name}Launchable")
+
+system(*args) || system("cat", log_filename)
