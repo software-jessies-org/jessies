@@ -112,7 +112,7 @@ public class ProcessUtilities {
         public void processExited(int status);
     }
     
-    private static void readLinesFromStream(LineListener listener, InputStream stream) {
+    public static void readLinesFromStream(LineListener listener, InputStream stream) {
         BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
