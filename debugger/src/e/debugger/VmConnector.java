@@ -84,9 +84,11 @@ public class VmConnector {
 		args.get("options").setValue("-classpath " + classpath);
 		args.get("main").setValue(mainClass + (options == null ? "" : " " + options));
 		for (String arg : args.keySet()) {
-			System.err.println(args.get(arg));
+			Log.warn("Connect argument: " + args.get(arg));
 		}
-		return new TargetVm(connector.launch(args));
+		VirtualMachine vm = connector.launch(args);
+		Log.warn("Connected to " + vm);
+		return new TargetVm(vm);
 	}
 	
 	/**
@@ -122,9 +124,11 @@ public class VmConnector {
 			args.get("name").setValue(address);
 		}
 		for (String arg : args.keySet()) {
-			System.err.println(args.get(arg));
+			Log.warn("Connect argument: " + args.get(arg));
 		}
-		return new TargetVm(connector.attach(args));
+		VirtualMachine vm = connector.attach(args);
+		Log.warn("Connected to " + vm);
+		return new TargetVm(vm);
 	}
 	
 	/**
@@ -143,6 +147,7 @@ public class VmConnector {
 				return connector;
 			}
 		}
+		Log.warn("Couldn't find a connector for " + transport);
 		return null;
 	}
 }
