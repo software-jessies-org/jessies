@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.*;
@@ -13,6 +14,7 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class TagsUpdater {
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private ETree tree;
     private JPanel uiPanel;
     private ETextWindow textWindow;
@@ -132,7 +134,7 @@ public class TagsUpdater {
     }
     
     public void updateTags() {
-        new Thread(new TreeModelBuilder()).start();
+        executorService.execute(new TreeModelBuilder());
     }
     
     public void setTreeModel(TreeModel treeModel) {
