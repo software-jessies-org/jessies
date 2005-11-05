@@ -228,19 +228,16 @@ public class JavaDoc {
                     }
                     return link;
                 }
-            } else if (candidate.startsWith(File.separator)) {
-                File file = FileUtilities.fileFromString(candidate);
-                if (file.exists()) {
-                    String link;
-                    if (type == DOC) {
-                        link = formatAsDocLink(candidate, className, pkg, showPkg);
-                        map.put(className + "." + pkg + String.valueOf(showPkg), link);
-                    } else {
-                        link = formatAsSourceLink(candidate);
-                        map.put(className + "." + pkg, link);
-                    }
-                    return link;
+            } else if (FileUtilities.fileFromString(candidate).exists()) {
+                String link;
+                if (type == DOC) {
+                    link = formatAsDocLink(candidate, className, pkg, showPkg);
+                    map.put(className + "." + pkg + String.valueOf(showPkg), link);
+                } else {
+                    link = formatAsSourceLink(candidate);
+                    map.put(className + "." + pkg, link);
                 }
+                return link;
             }
         }
         
