@@ -62,6 +62,7 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
         splitPane.setRightComponent(createTabbedPane());
         add(splitPane, BorderLayout.CENTER);
         add(statusBar = new EStatusBar(), BorderLayout.SOUTH);
+        new DebuggerServer(this);
     }
     
     private Component createTabbedPane() {
@@ -208,7 +209,6 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
     
     public void setTargetVm(TargetVm vm) {
         this.vm = vm;
-        new DebuggerServer(this);
         
         // Set status text and highlight the location in the editor when a breakpoint is reached.
         vm.getEventQueue().addVmEventListener(new VmEventListener() {
@@ -224,6 +224,9 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
                 openLocation(location);
             }
         });
+        
+        // Requests are associated with a specific VirtualMachine, so the old one won't work any more.
+        stepRequest = null;
         
         // Highlight the location in the editor when a step is performed.
         vm.getEventQueue().addVmEventListener(new VmEventListener() {
@@ -364,5 +367,16 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
     
     public void stepOut() {
         step(StepRequest.STEP_OUT);
+    }
+    
+    /**
+     * Connect using dt_socket transport to a running process listening at address.
+     */
+    public void connect(String address) {
+        Map<String, String> args = new HashMap<String, String>();
+        args.put(VmConnector.CONNECTION_TYPE_KEY, VmConnector.CONNECTION_TYPE_ATTACH);
+        args.put(VmConnector.ATTACH_TRANSPORT, VmConnector.ATTACH_TRANSPORT_SOCKET);
+        args.put(VmConnector.ATTACH_ADDRESS, address);
+        executorService.execute(new VmConnectorWorker(args));
     }
 }
