@@ -4,9 +4,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.*;
+import org.jdesktop.swingworker.SwingWorker;
 import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
@@ -16,6 +18,8 @@ public class TagsUpdater {
     private JPanel uiPanel;
     private ETextWindow textWindow;
     private boolean followCaretChanges;
+    private File temporaryFile;
+    private String tagsDigest;
     
     public TagsUpdater(ETextWindow textWindow) {
         this.textWindow = textWindow;
@@ -185,19 +189,14 @@ public class TagsUpdater {
         }
     }
     
-    public class TreeModelBuilder implements Runnable, TagReader.TagListener {
-        private boolean tagsHaveNotChanged;
-        private String digest;
+    public class TreeModelBuilder extends SwingWorker<TreeModel, TagReader.Tag> implements TagReader.TagListener {
+        private boolean tagsHaveChanged;
         private long startTime;
         private Timer progressTimer;
-        private File temporaryFile;
-        private boolean isRunning;
         
         private DefaultMutableTreeNode root;
         private DefaultTreeModel treeModel;
-        private HashMap<String, DefaultMutableTreeNode> branches;
-        
-        private ArrayList<TagReader.Tag> tags;
+        private Map<String, DefaultMutableTreeNode> branches = new HashMap<String, DefaultMutableTreeNode>();
         
         public TreeModelBuilder() {
             progressTimer = new Timer(500, new ActionListener() {
@@ -208,20 +207,16 @@ public class TagsUpdater {
             progressTimer.setRepeats(false);
         }
         
-        public void run() {
-            if (isRunning) {
-                return;
-            }
-            isRunning = true;
+        @Override
+        protected TreeModel doInBackground() {
             root = new BranchNode("root");
             treeModel = new DefaultTreeModel(root);
-            branches = new HashMap<String, DefaultMutableTreeNode>();
+            branches.clear();
             branches.put("", root);
-            tags = new ArrayList<TagReader.Tag>();
             startTime = System.currentTimeMillis();
             progressTimer.start();
             scanTags();
-            finished();
+            return treeModel;
         }
         
         public String getFilenameSuffix() {
@@ -235,7 +230,30 @@ public class TagsUpdater {
         }
         
         public void tagFound(TagReader.Tag tag) {
-            tags.add(tag);
+            publish(tag);
+        }
+        
+        @Override
+        protected void process(TagReader.Tag... tags) {
+            for (TagReader.Tag tag : tags) {
+                tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
+                
+                DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
+                
+                if (tag.type.isContainer()) {
+                    leaf = new BranchNode(tag);
+                    branches.put(tag.getClassQualifiedName(), leaf);
+                }
+                
+                DefaultMutableTreeNode branch = branches.get(tag.containingClass);
+                if (branch == null) {
+                    branch = new BranchNode(tag.containingClass);
+                    branches.put(tag.containingClass, branch);
+                    root.add(branch);
+                }
+                
+                branch.add(leaf);
+            }
         }
         
         public void taggingFailed(Exception ex) {
@@ -259,8 +277,8 @@ public class TagsUpdater {
                 getTextArea().getTextBuffer().writeToFile(temporaryFile);
                 TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), this);
                 String newDigest = tagReader.getTagsDigest();
-                tagsHaveNotChanged = newDigest.equals(digest);
-                digest = newDigest;
+                tagsHaveChanged = ! newDigest.equals(tagsDigest);
+                tagsDigest = newDigest;
                 temporaryFile.delete();
             } catch (Exception ex) {
                 Edit.getInstance().getCurrentWorkspace().reportError("Couldn't make tags.");
@@ -268,44 +286,13 @@ public class TagsUpdater {
             }
         }
         
-        public void finished() {
-            if (progressTimer.isRunning() == false) {
-                Edit.getInstance().getTagsPanel().hideProgressBar();
-            } else {
-                progressTimer.stop();
-                if (tagsHaveNotChanged) {
-                    isRunning = false;
-                    return;
-                }
+        @Override
+        protected void done() {
+            progressTimer.stop();
+            showTags();
+            if (tagsHaveChanged) {
+                setTreeModel(treeModel);
             }
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    for (int i = 0; i < tags.size(); ++i) {
-                        TagReader.Tag tag = (TagReader.Tag) tags.get(i);
-                        tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
-                        
-                        DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
-                        
-                        if (tag.type.isContainer()) {
-                            leaf = new BranchNode(tag);
-                            branches.put(tag.getClassQualifiedName(), leaf);
-                        }
-                        
-                        DefaultMutableTreeNode branch = branches.get(tag.containingClass);
-                        if (branch == null) {
-                            branch = new BranchNode(tag.containingClass);
-                            branches.put(tag.containingClass, branch);
-                            root.add(branch);
-                        }
-                        
-                        branch.add(leaf);
-                    }
-                    
-                    setTreeModel(treeModel);
-                    isRunning = false;
-                }
-            });
-            
             long endTime = System.currentTimeMillis();
             double duration = ((double) (endTime - startTime)) / 1000.0;
             //Log.warn("Time taken reading tags: " + duration + "s");
