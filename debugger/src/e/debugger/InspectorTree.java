@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import e.gui.*;
@@ -15,7 +16,7 @@ import e.util.*;
  * visible in a StackFrame, and allows the user to explore the contents of any
  * reference type values by expanding the tree nodes.
  */
-public class InspectorTree extends ETree {
+public class InspectorTree extends ETree implements TreeWillExpandListener {
     
     public static final String SORT_FIRST = "A";
     public static final String SORT_SECOND = "B";
@@ -27,7 +28,29 @@ public class InspectorTree extends ETree {
         setShowsRootHandles(true);
         getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         setCellRenderer(new InspectorTreeCellRenderer());
+        addTreeWillExpandListener(this);
     }
+    
+    /**
+     * Fill in the children of a ReferenceType node before the tree expands.
+     */
+    public void treeWillExpand(TreeExpansionEvent tee) {
+        TreePath path = tee.getPath();
+        BranchNode node = (BranchNode) path.getLastPathComponent();
+        for (Enumeration e = node.children(); e.hasMoreElements(); ) {
+            BranchNode child = (BranchNode) e.nextElement();
+            if (child.getUserObject() == UNEXPANDED_NODE_OBJECT) {
+                ((DefaultTreeModel) getModel()).removeNodeFromParent(child);
+                ObjectReference object = node.getObjectReference();
+                if (object != null) {
+                    insertFieldsInto(node, object.getValues(node.getReferenceType().fields()));
+                }
+            }
+        }
+    }
+    
+    // Not interested in tree collapse events.
+    public void treeWillCollapse(TreeExpansionEvent e) { }
     
     /**
      * Resets the tree to show just the given StackFrame. 
@@ -71,8 +94,10 @@ public class InspectorTree extends ETree {
     public static class BranchNode extends DefaultMutableTreeNode {
         public BranchNode(NodeObject userObject) {
             super(userObject);
-            if (userObject != null && userObject.isReferenceType()) {
-                add(new BranchNode(UNEXPANDED_NODE_OBJECT));
+            if (userObject != null) {
+                if (userObject.isReferenceType() && userObject.getReferenceType().fields().size() > 0) {
+                    add(new BranchNode(UNEXPANDED_NODE_OBJECT));
+                }
             }
         }
         
@@ -91,6 +116,14 @@ public class InspectorTree extends ETree {
         
         public boolean isReferenceType() {
             return ((NodeObject) getUserObject()).isReferenceType();
+        }
+        
+        public ReferenceType getReferenceType() {
+            return ((NodeObject) getUserObject()).getReferenceType();
+        }
+        
+        public ObjectReference getObjectReference() {
+            return (ObjectReference) ((NodeObject) getUserObject()).getValue();
         }
     }
     

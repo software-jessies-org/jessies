@@ -270,7 +270,7 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
         BreakpointHandler breakpointHandler = vm.getBreakpointHandler();
         breakpointList.setModel(breakpointHandler);
         // FIXME
-        setBreakpoint("e.debugger.TestProgram", "14");
+        setBreakpoint("e.debugger.TestProgram", "28");
         processMonitorPanel.setProcess(vm.getProcess());
         suspendButton.setEnabled(true);
         setStatusText("Connected to target VM.");
