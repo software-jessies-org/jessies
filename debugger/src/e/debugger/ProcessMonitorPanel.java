@@ -27,6 +27,7 @@ public class ProcessMonitorPanel extends JPanel {
     public void setProcess(final Process p) {
         textArea.setText("");
         if (p == null) {
+            textArea.setText("<No Process available>");
             return;
         }
         new Thread(new Runnable() {
