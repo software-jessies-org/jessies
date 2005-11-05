@@ -18,4 +18,10 @@ public interface DebuggerCommandHandler {
     public void step();
     public void stepInto();
     public void stepOut();
+    
+    /**
+     * Connect to a running VM that was started with -agentlib:jdwp=transport=dt_socket,server=y
+     * @param address the socket address the target is listening on.
+     */
+    public void connect(String address);
 }
