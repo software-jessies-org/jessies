@@ -207,7 +207,7 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
         executorService.execute(new VmConnectorWorker(args));
     }
     
-    public void setTargetVm(TargetVm vm) {
+    public void setTargetVm(final TargetVm vm) {
         this.vm = vm;
         
         // Set status text and highlight the location in the editor when a breakpoint is reached.
@@ -255,6 +255,17 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
             }
         });
         
+        // Sort out the UI and begin execution when a VM is ready to start.
+        vm.getEventQueue().addVmEventListener(new VmEventListener() {
+            public Class getEventClass() {
+                return VMStartEvent.class;
+            }
+            // The VM is launched, and suspended at the start of main(). Let the UI sort itself out.
+            public void eventDispatched(Event e) {
+                vm.resume();
+            }
+        });
+        
         threadTree.enableThreadEvents(vm);
         BreakpointHandler breakpointHandler = vm.getBreakpointHandler();
         breakpointList.setModel(breakpointHandler);
@@ -263,6 +274,8 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
         processMonitorPanel.setProcess(vm.getProcess());
         suspendButton.setEnabled(true);
         setStatusText("Connected to target VM.");
+        // Connecting to an already-running VM doesn't send a VMStartEvent.
+        vm.resume();
     }
     
     /**
