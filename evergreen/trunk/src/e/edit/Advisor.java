@@ -3,11 +3,15 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.concurrent.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import e.ptextarea.*;
 
 public class Advisor extends JPanel {
+    
+    private static final ExecutorService executorService = Executors.newCachedThreadPool();
+    
     private ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
     
     /** The advice window. */
@@ -45,17 +49,23 @@ public class Advisor extends JPanel {
         }).start();
     }
     
+    /** The running advice research task, if any. */
+    private Future researchTask;
+    
     /** Sets the time to wait before a lookup gets done, in milliseconds. */
     public void setDelay(int ms) {
         timer = new Timer(ms, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (currentComponent != null) {
-                    Thread worker = new Thread() {
+                    if (researchTask != null) {
+                        researchTask.cancel(true);
+                    }
+                    researchTask = executorService.submit(new Runnable() {
                         public void run() {
                             doResearch();
+                            researchTask = null;
                         }
-                    };
-                    worker.start();
+                    });
                 }
             }
         });
