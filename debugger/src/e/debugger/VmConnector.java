@@ -109,14 +109,16 @@ public class VmConnector {
 		AttachingConnector connector = getAttachingConnector(transport);
 		Map<String, Connector.Argument> args = connector.defaultArguments();
 		if (transport.equals(ATTACH_TRANSPORT_SOCKET)) {
-			// match hostname:port, where hostname is optional.
-			Pattern p = Pattern.compile("^(.*):(\\d+)$");
+			// match hostname:port, where hostname: is optional.
+			Pattern p = Pattern.compile("^((.+):)?(\\d+)$");
 			Matcher m = p.matcher(address);
 			if (m.matches()) {
-				if (m.group(1).length() > 0) {
-					args.get("hostname").setValue(m.group(1));
+				String hostname = m.group(2);
+				String port = m.group(3);
+				if (hostname != null) {
+					args.get("hostname").setValue(hostname);
 				}
-				args.get("port").setValue(m.group(2));
+				args.get("port").setValue(port);
 			}
 		} else if (transport.equals(ATTACH_TRANSPORT_PID)) {
 			args.get("pid").setValue(address);
