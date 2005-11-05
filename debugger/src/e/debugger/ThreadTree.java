@@ -56,6 +56,7 @@ public class ThreadTree extends ETree {
         ThreadDeathRequest deathRequest = eventManager.createThreadDeathRequest();
         startRequest.setEnabled(true);
         deathRequest.setEnabled(true);
+        setThreads(vm.getAllThreads());
     }
     
     public void setEnabled(boolean enabled) {
