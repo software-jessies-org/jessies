@@ -10,7 +10,7 @@ import e.ptextarea.*;
 
 public class Advisor extends JPanel {
     
-    private static final ExecutorService executorService = Executors.newCachedThreadPool();
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
     
     private ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
     
@@ -49,21 +49,14 @@ public class Advisor extends JPanel {
         }).start();
     }
     
-    /** The running advice research task, if any. */
-    private Future researchTask;
-    
     /** Sets the time to wait before a lookup gets done, in milliseconds. */
     public void setDelay(int ms) {
         timer = new Timer(ms, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (currentComponent != null) {
-                    if (researchTask != null) {
-                        researchTask.cancel(true);
-                    }
-                    researchTask = executorService.submit(new Runnable() {
+                    executorService.execute(new Runnable() {
                         public void run() {
                             doResearch();
-                            researchTask = null;
                         }
                     });
                 }
