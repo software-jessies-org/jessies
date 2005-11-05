@@ -24,16 +24,6 @@ public class TargetVm {
         this.eventRequestManager = vm.eventRequestManager();
         this.eventQueue = createEventQueue(vm);
         this.breakpointHandler = new BreakpointHandler(this);
-        eventQueue.addVmEventListener(new VmEventListener() {
-            public Class getEventClass() {
-                return VMStartEvent.class;
-            }
-            // Start the VM running as soon as it's ready.
-            public void eventDispatched(Event e) {
-                fireVmSuspensionChange(false);
-                vm.resume();
-            }
-        });
     }
     
     public EventRequestManager getEventRequestManager() {
