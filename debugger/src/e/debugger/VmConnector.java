@@ -25,8 +25,8 @@ public class VmConnector {
 	public static final String CONNECTION_TYPE_ATTACH = "Attach";
 	
 	/** Options to specify when the connection type is "Attach". */
-	public static final String ATTACH_TRANSPORT = "main_class";
-	public static final String ATTACH_ADDRESS = "options";
+	public static final String ATTACH_TRANSPORT = "transport";
+	public static final String ATTACH_ADDRESS = "address";
 	
 	/** Valid values for the Transport parameter. */
 	public static final String ATTACH_TRANSPORT_SOCKET = "dt_socket";
