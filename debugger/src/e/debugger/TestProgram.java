@@ -24,7 +24,7 @@ public class TestProgram {
     }
     
     public void thatMethod(int b, int c) {
-        Object o = new Object();
+        NestedType o = new NestedType();
         theOtherMethod(o, new Object(), 4, 5, 6);
     }
     
@@ -54,6 +54,7 @@ public class TestProgram {
     }
     
     public class NestedType extends Object {
-        
+        private Object aField;
+        private String anotherField = "hello world";
     }
 }
