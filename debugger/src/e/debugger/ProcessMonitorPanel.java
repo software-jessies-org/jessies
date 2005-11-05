@@ -26,6 +26,9 @@ public class ProcessMonitorPanel extends JPanel {
     
     public void setProcess(final Process p) {
         textArea.setText("");
+        if (p == null) {
+            return;
+        }
         new Thread(new Runnable() {
             public void run() {
                 ProcessUtilities.readLinesFromStream(new ProcessUtilities.LineListener() {
