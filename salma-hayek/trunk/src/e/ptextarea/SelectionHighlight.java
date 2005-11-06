@@ -38,6 +38,12 @@ public class SelectionHighlight extends PHighlight {
             int xStart = (i == start.getLineIndex()) ? startPt.x : insets.left;
             int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth() - insets.right;
             if (xStart == xEnd) {
+                // If there's nothing to highlight on a line, avoid painting
+                // the border. If it's painted, it'll be visible as a single
+                // pixel wide, one line high tail at the bottom left corner of
+                // the highlight. Arguably this is useful because it shows that
+                // the newline is part of the selection, but no other text
+                // component highlights like this.
                 continue;
             }
             graphics.setColor(textArea.isFocusOwner() ? FOCUSED_SELECTION_COLOR : UNFOCUSED_SELECTION_COLOR);
