@@ -174,8 +174,22 @@ public class JavaDoc {
     }
     
     /**
-    * Returns the location of the source code for a class.
-    */
+     * Returns the location of the source file, as a plain String.
+     */
+    public static String getSourceFilename(String className) {
+        className = className.replace('.', File.separatorChar);
+        for (String source : sources) {
+            String candidate = source + File.separator + className + ".java";
+            if (FileUtilities.fileFromString(candidate).exists()) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Returns the location of the source code for a class, formatted as HTML.
+     */
     public static String getSourceLink(String className, String pkg) {
         return getLink(className, pkg, false, SRC);
     }
