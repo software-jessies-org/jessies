@@ -37,6 +37,9 @@ public class SelectionHighlight extends PHighlight {
         for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
             int xStart = (i == start.getLineIndex()) ? startPt.x : insets.left;
             int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth() - insets.right;
+            if (xStart == xEnd) {
+                continue;
+            }
             graphics.setColor(textArea.isFocusOwner() ? FOCUSED_SELECTION_COLOR : UNFOCUSED_SELECTION_COLOR);
             paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
             int yBottom = y + lineHeight - 1;
