@@ -26,9 +26,9 @@ public class FindFilesDialog {
     private Workspace workspace;
     
     private FileFinder worker;
-    private static final ExecutorService fileFinderExecutor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService fileFinderExecutor = ThreadUtilities.newSingleThreadExecutor("Find Files");
     
-    private static final ExecutorService definitionFinderExecutor = Executors.newFixedThreadPool(8);
+    private static final ExecutorService definitionFinderExecutor = ThreadUtilities.newFixedThreadPool(8, "Find Definitions");
     
     public interface ClickableTreeItem {
         public void open();

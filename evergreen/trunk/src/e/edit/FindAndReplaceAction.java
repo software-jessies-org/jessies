@@ -23,7 +23,7 @@ public class FindAndReplaceAction extends ETextAction {
     private JList replacementsList;
     
     private MatchFinder worker;
-    private static final ExecutorService matchFinderExecutor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService matchFinderExecutor = ThreadUtilities.newSingleThreadExecutor("Find and Replace");
     
     public FindAndReplaceAction() {
         super(ACTION_NAME);

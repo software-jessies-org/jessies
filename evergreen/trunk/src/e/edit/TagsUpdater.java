@@ -14,7 +14,7 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class TagsUpdater {
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Tags Updater");
     private ETree tree;
     private JPanel uiPanel;
     private ETextWindow textWindow;

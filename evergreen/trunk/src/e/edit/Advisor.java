@@ -7,10 +7,11 @@ import java.util.concurrent.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import e.ptextarea.*;
+import e.util.*;
 
 public class Advisor extends JPanel {
     
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Advisor");
     
     private ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
     
