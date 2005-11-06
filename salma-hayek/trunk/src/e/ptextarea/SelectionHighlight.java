@@ -31,11 +31,12 @@ public class SelectionHighlight extends PHighlight {
         Point startPt = textArea.getViewCoordinates(start);
         Point endPt = textArea.getViewCoordinates(end);
         Color oldColor = graphics.getColor();
+        Insets insets = textArea.getInsets();
         int y = textArea.getLineTop(start.getLineIndex());
         int lineHeight = textArea.getLineHeight();
         for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
-            int xStart = (i == start.getLineIndex()) ? startPt.x : 0;
-            int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth();
+            int xStart = (i == start.getLineIndex()) ? startPt.x : insets.left;
+            int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth() - insets.right;
             graphics.setColor(textArea.isFocusOwner() ? FOCUSED_SELECTION_COLOR : UNFOCUSED_SELECTION_COLOR);
             paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
             int yBottom = y + lineHeight - 1;
@@ -55,9 +56,9 @@ public class SelectionHighlight extends PHighlight {
                     graphics.drawLine(xStart, y, xEnd, y);
                 } else if (i == start.getLineIndex() + 1) {
                     final int Bx = Math.min(xEnd, startPt.x);
-                    if (Bx > 0) {
+                    if (Bx > insets.left) {
                         // C
-                        graphics.drawLine(0, y, Bx, y);
+                        graphics.drawLine(insets.left, y, Bx, y);
                     }
                 }
                 // Draw this shape at the bottom of the selection (E will
@@ -66,7 +67,7 @@ public class SelectionHighlight extends PHighlight {
                 // ___________|D     E
                 //      F
                 if (i == end.getLineIndex()) {
-                    if (xEnd < textArea.getWidth()) {
+                    if (xEnd < textArea.getWidth() - insets.right) {
                         // D
                         graphics.drawLine(xEnd, y, xEnd, yBottom);
                     }

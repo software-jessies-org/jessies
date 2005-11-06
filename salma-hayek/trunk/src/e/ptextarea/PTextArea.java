@@ -645,13 +645,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     public PCoordinates getNearestCoordinates(Point point) {
         getLock().getReadLock();
         try {
-            if (point.y < 0) {
+            Insets insets = getInsets();
+            if (point.y < insets.top) {
                 return new PCoordinates(0, 0);
             }
             generateLineWrappings();
             final int lineIndex = getLineIndexAtLocation(point);
             int charOffset = 0;
-            int x = 0;
+            int x = insets.left;
             for (PLineSegment segment : getLineSegmentsForSplitLine(lineIndex)) {
                 int width = segment.getDisplayWidth(metrics, x);
                 if (x + width > point.x) {
@@ -679,7 +680,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      */
     private int getLineIndexAtLocation(Point point) {
         final int maxLineIndex = splitLines.size() - 1;
-        int lineIndex = point.y / metrics.getHeight();
+        int lineIndex = (point.y - getInsets().top) / metrics.getHeight();
         if (lineIndex > maxLineIndex) {
             point.x = Integer.MAX_VALUE;
         }
@@ -691,7 +692,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         getLock().getReadLock();
         try {
             generateLineWrappings();
-            int x = 0;
+            int x = getInsets().left;
             for (PLineSegment segment : getLineSegmentsForSplitLine(getLineIndexAtLocation(point))) {
                 int width = segment.getDisplayWidth(metrics, x);
                 if (x + width > point.x) {
@@ -865,7 +866,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         getLock().getReadLock();
         try {
             int baseline = getBaseline(coordinates.getLineIndex());
-            int x = 0;
+            int x = getInsets().left;
             int charOffset = 0;
             for (PLineSegment segment : getLineSegmentsForSplitLine(coordinates.getLineIndex())) {
                 if (coordinates.getCharOffset() <= charOffset + segment.getModelTextLength()) {
@@ -907,7 +908,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     public int getLineTop(int lineIndex) {
-        return lineIndex * metrics.getHeight();
+        return lineIndex * metrics.getHeight() + getInsets().top;
     }
     
     public int getLineHeight() {
@@ -915,7 +916,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     private int getBaseline(int lineIndex) {
-        return lineIndex * metrics.getHeight() + metrics.getMaxAscent();
+        return lineIndex * metrics.getHeight() + metrics.getMaxAscent() + getInsets().top;
     }
     
     public void paintComponent(Graphics oldGraphics) {
@@ -931,12 +932,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             if (isOpaque()) {
                 graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
             }
-            int minLine = Math.min(splitLines.size() - 1, bounds.y / metrics.getHeight());
-            int maxLine = Math.min(splitLines.size() - 1, (bounds.y + bounds.height) / metrics.getHeight());
+            Insets insets = getInsets();
+            int minLine = (bounds.y - insets.top) / metrics.getHeight();
+            int maxLine = (bounds.y - insets.top + bounds.height) / metrics.getHeight();
+            minLine = Math.max(0, Math.min(splitLines.size() - 1, minLine));
+            maxLine = Math.max(0, Math.min(splitLines.size() - 1, maxLine));
+            
             int baseline = getBaseline(minLine);
             paintHighlights(graphics, minLine, maxLine);
             int paintCharOffset = getSplitLine(minLine).getTextIndex();
-            int x = 0;
+            int x = insets.left;
             int line = minLine;
             int caretOffset = hasSelection() ? -1 : getSelectionStart();
             Iterator<PLineSegment> it = getWrappedSegmentIterator(paintCharOffset);
@@ -953,7 +958,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                 }
                 x += segment.getDisplayWidth(metrics, x);
                 if (segment.isNewline()) {
-                    x = 0;
+                    x = insets.left;
                     baseline += metrics.getHeight();
                     line++;
                     if (line > maxLine) {
@@ -979,7 +984,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private int paintRightHandMargin(Graphics2D graphics, Rectangle bounds) {
         int whiteBackgroundWidth = bounds.width;
         if (rightHandMarginColumn != NO_MARGIN) {
-            int offset = metrics.stringWidth("n") * rightHandMarginColumn;
+            int offset = metrics.stringWidth("n") * rightHandMarginColumn + getInsets().left;
             graphics.setColor(MARGIN_BOUNDARY_COLOR);
             graphics.drawLine(offset, bounds.y, offset, bounds.y + bounds.height);
             graphics.setColor(MARGIN_OUTSIDE_COLOR);
@@ -1163,7 +1168,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     private void updateHeight() {
         Dimension size = getSize();
-        size.height = metrics.getHeight() * splitLines.size();
+        Insets insets = getInsets();
+        size.height = metrics.getHeight() * splitLines.size() + insets.top + insets.bottom;
         setSize(size);
         setPreferredSize(size);
     }
@@ -1236,8 +1242,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         if (line.isWidthValid() == false) {
             setLineWidth(line);
         }
-        int width = getWidth();
-        if (width == 0) {
+        Insets insets = getInsets();
+        int width = getWidth() - insets.left - insets.right;
+        if (width <= 0) {
             width = Integer.MAX_VALUE;  // Don't wrap if we don't have any size.
         }
         width = Math.max(width, MIN_WIDTH);  // Ensure we're at least a sensible width.
@@ -1246,13 +1253,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             splitLines.add(index, new SplitLine(lineIndex, 0, line.getContents().length()));
         } else {
             // The line's too long, so break it into SplitLines.
-            int x = 0;
+            int x = insets.left;
             CharSequence chars = line.getContents();
             int lastSplitOffset = 0;
             for (int i = 0; i < chars.length(); i++) {
                 char ch = chars.charAt(i);
                 x = addCharWidth(x, ch);
-                if (x >= width - getMinimumWrapMarkWidth()) {
+                if (x >= width - insets.right - getMinimumWrapMarkWidth()) {
                     if (wordWrap) {
                         // Try to find a break before the last break.
                         for (int splitOffset = i; splitOffset >= lastSplitOffset; --splitOffset) {

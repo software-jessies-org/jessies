@@ -3,6 +3,7 @@ package e.demo;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
+import javax.swing.border.*;
 
 import e.ptextarea.*;
 
@@ -19,6 +20,7 @@ public class PTextAreaDemo {
             public void run() {
                 PTextArea area = new PTextArea();
                 area.setText(new String(getFileText(file)));
+                area.setBorder(new EmptyBorder(100, 75, 50, 30));
                 PTextStyler styler = getTextStyler(file, area);
                 if (styler != null) {
                     area.setTextStyler(styler);
