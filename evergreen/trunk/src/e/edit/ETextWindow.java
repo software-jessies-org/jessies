@@ -41,7 +41,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     // Used to display a watermark to indicate such things as a read-only file.
     private WatermarkViewPort watermarkViewPort;
     // Used to update the watermark without creating and destroying an excessive number of threads.
-    private final ExecutorService watermarkUpdateExecutor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService watermarkUpdateExecutor = ThreadUtilities.newSingleThreadExecutor("Watermark Updater");
     
     private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
     private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f);
