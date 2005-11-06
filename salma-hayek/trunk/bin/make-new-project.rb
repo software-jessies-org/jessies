@@ -55,7 +55,6 @@ cp $projects_dir/edit/COPYING $project_name/COPYING
 
 echo "Creating a new Subversion repository..."
 ssh $svn_user_and_host svnadmin create /home/software/svnroot/$project_name
-ssh $svn_user_and_host chmod -R g+w /home/software/svnroot/$project_name/db
 ssh $svn_user_and_host ln -s /home/software/checked-out/salma-hayek/post-commit /home/software/svnroot/$project_name/hooks
 echo "Making the initial import..."
 svn import $project_name svn+ssh://$svn_user_and_host/home/software/svnroot/$project_name -m "New project, $project_name."
