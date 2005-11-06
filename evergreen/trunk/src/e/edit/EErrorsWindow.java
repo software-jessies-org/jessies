@@ -29,6 +29,11 @@ import e.util.*;
 public class EErrorsWindow extends EWindow {
     private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory `(.*)'$", Pattern.MULTILINE);
     
+    /**
+     * Matches lines in a Java stack trace, such as "package.Class$Inner$1.method(Class.java:line)"
+     */
+    private static final Pattern JAVA_STACK_TRACE_PATTERN = Pattern.compile("([\\.\\w]+)(?:(?:\\$\\w+)*?\\.)[\\w\\$<>]+\\(\\w+\\.java(:\\d+)");
+    
     private final Workspace workspace;
     private PTextArea textArea;
     
@@ -92,14 +97,20 @@ public class EErrorsWindow extends EWindow {
                 tail = address.substring(colonIndex);
             }
             
-            File file = null;
-            if (name.startsWith("/") || name.startsWith("~")) {
+            Matcher matcher = JAVA_STACK_TRACE_PATTERN.matcher(address);
+            if (matcher.matches()) {
+                name = JavaDoc.getSourceFilename(matcher.group(1));
+                tail = matcher.group(2);
+                if (name != null) {
+                    open(name + tail);
+                }
+            } else if (name.startsWith("/") || name.startsWith("~")) {
                 open(address);
             } else {
                 // Try to resolve the non-canonical name.
                 String currentDirectory = workspace.getRootDirectory();
                 String errors = textArea.getText();
-                Matcher matcher = MAKE_ENTERING_DIRECTORY_PATTERN.matcher(errors);
+                matcher = MAKE_ENTERING_DIRECTORY_PATTERN.matcher(errors);
                 while (matcher.find() && matcher.start() < offset) {
                     currentDirectory = matcher.group(1);
                 }
