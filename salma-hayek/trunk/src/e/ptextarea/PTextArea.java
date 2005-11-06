@@ -1253,13 +1253,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             splitLines.add(index, new SplitLine(lineIndex, 0, line.getContents().length()));
         } else {
             // The line's too long, so break it into SplitLines.
-            int x = insets.left;
+            int x = 0;
             CharSequence chars = line.getContents();
             int lastSplitOffset = 0;
             for (int i = 0; i < chars.length(); i++) {
                 char ch = chars.charAt(i);
                 x = addCharWidth(x, ch);
-                if (x >= width - insets.right - getMinimumWrapMarkWidth()) {
+                if (x >= width - getMinimumWrapMarkWidth()) {
                     if (wordWrap) {
                         // Try to find a break before the last break.
                         for (int splitOffset = i; splitOffset >= lastSplitOffset; --splitOffset) {
