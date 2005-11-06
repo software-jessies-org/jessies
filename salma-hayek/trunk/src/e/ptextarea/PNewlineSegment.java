@@ -60,7 +60,7 @@ public class PNewlineSegment extends PAbstractSegment {
         Stroke oldStroke = graphics.getStroke();
         graphics.setStroke(WRAP_STROKE);
         int yMiddle = y - graphics.getFontMetrics().getMaxAscent() / 2;
-        graphics.drawLine(x, yMiddle, textArea.getWidth(), yMiddle);
+        graphics.drawLine(x, yMiddle, textArea.getWidth() - textArea.getInsets().right, yMiddle);
         graphics.setStroke(oldStroke);
     }
     

@@ -32,7 +32,7 @@ public abstract class PColoredHighlight extends PHighlight {
     
     private int getRightHandLineLimit(int splitLineIndex) {
         if (paintsToEndOfLine()) {
-            return textArea.getWidth();
+            return textArea.getWidth() - textArea.getInsets().right;
         } else {
             int lineStart = textArea.getSplitLine(splitLineIndex).getTextIndex();
             Iterator<PLineSegment> it = textArea.getWrappedSegmentIterator(lineStart);
@@ -44,7 +44,7 @@ public abstract class PColoredHighlight extends PHighlight {
                 }
                 result += segment.getDisplayWidth(textArea.getFontMetrics(textArea.getFont()), result);
             }
-            return textArea.getWidth();
+            return textArea.getWidth() - textArea.getInsets().right;
         }
     }
     
@@ -55,8 +55,9 @@ public abstract class PColoredHighlight extends PHighlight {
         graphics.setColor(color);
         int y = textArea.getLineTop(start.getLineIndex());
         int lineHeight = textArea.getLineHeight();
+        int leftInset = textArea.getInsets().left;
         for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
-            int xStart = (i == start.getLineIndex()) ? startPt.x : 0;
+            int xStart = (i == start.getLineIndex()) ? startPt.x : leftInset;
             int xEnd = (i == end.getLineIndex()) ? endPt.x : getRightHandLineLimit(i);
             paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
             y += lineHeight;
