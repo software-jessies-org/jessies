@@ -85,11 +85,12 @@ public class EErrorsWindow extends EWindow {
             // We're most useful in providing links to grep matches, so we
             // need to avoid being confused by stuff like File.java:123.
             String name = address;
+            String tail ="";
             int colonIndex = name.indexOf(':');
             if (colonIndex != -1) {
                 name = name.substring(0, colonIndex);
+                tail = address.substring(colonIndex);
             }
-            String tail = address.substring(colonIndex);
             
             File file = null;
             if (name.startsWith("/") || name.startsWith("~")) {
