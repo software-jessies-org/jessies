@@ -61,6 +61,7 @@ public class SelectionHighlight extends PHighlight {
                         graphics.drawLine(insets.left, y, Bx, y);
                     }
                 }
+                
                 // Draw this shape at the bottom of the selection (E will
                 // be zero-length for a single-line selection):
                 //            _________________
@@ -77,6 +78,12 @@ public class SelectionHighlight extends PHighlight {
                     // E
                     graphics.drawLine(Math.max(endPt.x, xStart), yBottom, xEnd, yBottom);
                 }
+                
+                // Draw vertical lines at the left and right edges of the
+                // selection; we only really need these if we have non-zero
+                // margins, but they're important then.
+                graphics.drawLine(xStart, y, xStart, yBottom);
+                graphics.drawLine(xEnd, y, xEnd, yBottom);
             }
             y += lineHeight;
         }
