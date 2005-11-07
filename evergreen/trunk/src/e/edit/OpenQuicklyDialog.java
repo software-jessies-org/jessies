@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import e.forms.*;
 import e.gui.*;
+import e.util.*;
 
 /**
  * Improves on Apple Project Builder's "Open Quickly",
@@ -42,7 +43,7 @@ public class OpenQuicklyDialog {
                 model.addElement(fileList.get(i));
             }
             final int totalFileCount = workspace.getIndexedFileCount();
-            setStatus(true, fileList.size() + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "") + " match.");
+            setStatus(true, fileList.size() + " / " + StringUtilities.pluralize(totalFileCount, "file", "files") + " match.");
         } catch (PatternSyntaxException ex) {
             setStatus(false, ex.getDescription());
         }

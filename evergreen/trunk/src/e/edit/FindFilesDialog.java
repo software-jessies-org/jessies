@@ -110,8 +110,7 @@ public class FindFilesDialog {
             StringBuilder result = new StringBuilder(file.getName());
             if (matchCount != 0) {
                 result.append(" (");
-                result.append(matchCount);
-                result.append(matchCount == 1 ? " match" : " matches");
+                result.append(StringUtilities.pluralize(matchCount, "match", " matches"));
                 if (containsDefinition) {
                     result.append(" including definition");
                 }
@@ -247,7 +246,7 @@ public class FindFilesDialog {
                 return;
             }
             
-            String status = matchingFileCount + " / " + totalFileCount + " file" + (totalFileCount != 1 ? "s" : "");
+            String status = matchingFileCount + " / " + StringUtilities.pluralize(totalFileCount, "file", "files");
             if (workspace.getIndexedFileCount() != totalFileCount) {
                 status += " (from " + workspace.getIndexedFileCount() + ")";
             }
