@@ -57,9 +57,9 @@ public class BuildAction extends ETextAction {
     }
     
     public static String findMakefile(String startDirectory) {
-        String makefileName = FileUtilities.findFileByNameSearchingUpFrom("build.xml", startDirectory);
+        String makefileName = FileUtilities.findFileByNameSearchingUpFrom("Makefile", startDirectory);
         if (makefileName == null) {
-            makefileName = FileUtilities.findFileByNameSearchingUpFrom("Makefile", startDirectory);
+            makefileName = FileUtilities.findFileByNameSearchingUpFrom("build.xml", startDirectory);
         }
         return makefileName;
     }
