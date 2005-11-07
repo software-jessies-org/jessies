@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.border.*;
 import e.gui.*;
 import e.util.*;
 
@@ -73,6 +74,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         
         setAutoscrolls(true);
         setBackground(Color.WHITE);
+        setBorder(new EmptyBorder(0, 3, 0, 3));
         setFont(UIManager.getFont("TextArea.font"));
         setOpaque(true);
         setFocusTraversalKeysEnabled(false);
