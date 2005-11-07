@@ -1,5 +1,6 @@
 package terminator;
 
+import com.apple.eawt.*;
 import java.awt.EventQueue;
 import java.io.*;
 import java.util.*;
@@ -19,6 +20,20 @@ public class Terminator {
 	
 	private Terminator() {
 		Log.setApplicationName("Terminator");
+		Application application = new Application();
+		application.addApplicationListener(new ApplicationAdapter() {
+			public void handleReOpenApplication(ApplicationEvent e) {
+				if (frames.size() == 0) {
+					openFrame();
+				}
+				e.setHandled(true);
+			}
+			public void handleQuit(ApplicationEvent e) {
+				if (frames.size() == 0) {
+					e.setHandled(true);
+				}
+			}
+		});
 	}
 	
 	private void startTerminatorServer() {
