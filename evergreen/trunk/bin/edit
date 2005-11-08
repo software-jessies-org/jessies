@@ -31,7 +31,7 @@ def openFileOnEditServer(edit_preferences_directory, filename, shouldBlock)
     port = $2.to_i()
     require 'net/telnet'
     telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
-    telnet.puts("#{shouldBlock ? 'open-and-block' : 'open'} #{filename}\r")
+    telnet.puts("#{shouldBlock ? 'openAndBlock' : 'open'} #{filename}\r")
     print(telnet.readlines().join(""))
     telnet.close()
     return true
