@@ -37,21 +37,7 @@ public class Terminator {
 	}
 	
 	private void startTerminatorServer() {
-		new InAppServer("Terminator", "~/.terminal-logs/.terminator-server-port") {
-			public boolean handleCommand(String line, PrintWriter out) {
-				if (line.startsWith("new ")) {
-					try {
-						String tail = line.substring(4);
-						String[] arguments = (tail.length() > 0) ? tail.split("\u0000") : new String[0];
-						Terminator.getSharedInstance().parseCommandLine(arguments, out, out);
-						return true;
-					} catch (Exception ex) {
-						ex.printStackTrace(out);
-					}
-				}
-				return false;
-			}
-		};
+		new InAppServer("Terminator", "~/.terminal-logs/.terminator-server-port", TerminatorServer.class, new TerminatorServer());
 	}
 	
 	/**
@@ -69,7 +55,7 @@ public class Terminator {
 	}
 	
 	// Returns whether we started the UI.
-	private boolean parseCommandLine(final String[] argumentArray, PrintWriter out, PrintWriter err) throws IOException {
+	public boolean parseCommandLine(final String[] argumentArray, PrintWriter out, PrintWriter err) throws IOException {
 		arguments = Options.getSharedInstance().parseCommandLine(argumentArray);
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
 			showUsage(out);

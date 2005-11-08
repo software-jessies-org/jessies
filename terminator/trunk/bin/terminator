@@ -49,7 +49,7 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
     
     require 'net/telnet'
     telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port, 'Telnetmode' => false)
-    telnet.puts("new #{command}")
+    telnet.puts("newTerminal #{command}")
     print(telnet.readlines().join(""))
     telnet.close()
     exit(0)
