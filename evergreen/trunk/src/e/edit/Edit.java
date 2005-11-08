@@ -764,7 +764,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         initAdvisor();
         initStatusArea();
         
-        new EditServer(this);
+        new InAppServer("EditServer", getPreferenceFilename("edit-server-port"), EditServer.class, new EditServer(this));
         
         UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
         tabbedPane = new JTabbedPane(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);

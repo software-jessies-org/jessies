@@ -6,29 +6,29 @@ import java.io.*;
 
 import e.util.*;
 
-public final class EditServer extends InAppServer {
+public final class EditServer {
     private Edit edit;
     
     public EditServer(Edit edit) {
-        super("Edit", edit.getPreferenceFilename("edit-server-port"));
         this.edit = edit;
     }
     
-    public boolean handleCommand(String line, PrintWriter out) {
-        if (line.startsWith("open-and-block ")) {
-            String filename = line.substring("open-and-block ".length());
-            handleOpen(filename, true, out);
-        } else if (line.startsWith("open ")) {
-            String filename = line.substring("open ".length());
-            handleOpen(filename, false, out);
-        } else if (line.equals("remember-state")) {
-            edit.rememberState();
-        } else if (line.equals("save-all")) {
-            SaveAllAction.saveAll(false);
-        } else {
-            return false;
-        }
-        return true;
+    public void open(PrintWriter out, String line) {
+        String filename = line.substring("open ".length());
+        handleOpen(filename, false, out);
+    }
+    
+    public void openAndBlock(PrintWriter out, String line) {
+        String filename = line.substring("openAndBlock ".length());
+        handleOpen(filename, true, out);
+    }
+    
+    public void rememberState() {
+        edit.rememberState();
+    }
+    
+    public void saveAll() {
+        SaveAllAction.saveAll(false);
     }
     
     private class Opener implements Runnable {
