@@ -1,30 +1,21 @@
 #!/usr/bin/ruby -w
 
-begin
-  require 'fileutils.rb'
-  have_fileutils = true
-rescue LoadError
-  have_fileutils = false
-end
-begin
-  require 'pathname.rb'
-  have_pathname = true
-  # Cope with symbolic links to this script.
-  terminator_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
-  salma_hayek = Pathname.new("#{terminator_home}/../salma-hayek").realpath()
-rescue LoadError
-  terminator_bin = `cd #{File.dirname(File.expand_path(__FILE__))} && /bin/pwd`.chomp()
-  terminator_home = File.dirname(terminator_bin)
-  salma_hayek = "#{terminator_home}/../salma-hayek"
-end
+require "fileutils.rb"
+require "pathname.rb"
+
+# Cope with symbolic links to this script.
+terminator_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
+salma_hayek = Pathname.new("#{terminator_home}/../salma-hayek").realpath()
+
+require "#{salma_hayek}/bin/target-os.rb"
+require "#{salma_hayek}/bin/invoke-java.rb"
+
 ENV["TERMINATOR_HOME"] = terminator_home
 
 class_name = "terminator/Terminator"
 HOME = ENV["HOME"]
 
-require "#{salma_hayek}/bin/target-os.rb"
 TARGET_OS = target_os()
-require "#{salma_hayek}/bin/invoke-java.rb"
 
 # Make sure we have a directory for the terminal logs.
 log_directory="#{HOME}/.terminal-logs"
@@ -58,8 +49,10 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   end
 end
 
-classpath="#{terminator_home}/classes:#{salma_hayek}/classes:#{salma_hayek}/swing-worker.jar"
-
+classpath_entries = [ "#{terminator_home}/classes", "#{salma_hayek}/classes", "#{salma_hayek}/swing-worker.jar" ]
+if TARGET_OS != "Darwin"
+  classpath_entries << "#{salma_hayek}/MRJ141Stubs.jar"
+end
 
 pty_path="#{terminator_home}/.generated/native/all/pty/#{TARGET_OS}"
 jni_lib_prefix="lib"
@@ -135,7 +128,7 @@ elsif TARGET_OS == "Linux"
   #  os_specific_options=-Dterminator.frame.icon=$icon_file
 end
 
-options = [ "-Xmx#{heap_size}", "-Djava.class.path=#{cygpath(classpath)}", "-Djava.library.path=#{cygpath(pty_path)}" ]
+options = [ "-Xmx#{heap_size}", "-Djava.class.path=#{cygpath(classpath_entries.join(File::PATH_SEPARATOR))}", "-Djava.library.path=#{cygpath(pty_path)}" ]
 options.concat(os_specific_options)
 log_filename="#{log_directory}/terminator.log.#{$$}"
 if ENV["DEBUGGING_TERMINATOR"] == nil
