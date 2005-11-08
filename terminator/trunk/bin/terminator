@@ -128,7 +128,7 @@ elsif TARGET_OS == "Linux"
   #  os_specific_options=-Dterminator.frame.icon=$icon_file
 end
 
-options = [ "-Xmx#{heap_size}", "-Djava.class.path=#{cygpath(classpath_entries.join(File::PATH_SEPARATOR))}", "-Djava.library.path=#{cygpath(pty_path)}" ]
+options = [ "-Xmx#{heap_size}", "-Djava.class.path=#{cygpath(classpath_entries.join(":"))}", "-Djava.library.path=#{cygpath(pty_path)}" ]
 options.concat(os_specific_options)
 log_filename="#{log_directory}/terminator.log.#{$$}"
 if ENV["DEBUGGING_TERMINATOR"] == nil
