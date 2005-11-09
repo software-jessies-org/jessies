@@ -258,7 +258,7 @@ public class TagsUpdater {
         }
         
         public void taggingFailed(Exception ex) {
-            Edit.getInstance().getCurrentWorkspace().reportError("Is Exuberant ctags installed and on your path? There was an error reading the tags: " + ex.getMessage());
+            Edit.getInstance().getCurrentWorkspace().reportErrors("Is Exuberant ctags installed and on your path? There was an error reading the tags: " + ex.getMessage());
             Log.warn("Tag parsing failed", ex);
         }
         
@@ -282,7 +282,7 @@ public class TagsUpdater {
                 tagsDigest = newDigest;
                 temporaryFile.delete();
             } catch (Exception ex) {
-                Edit.getInstance().getCurrentWorkspace().reportError("Couldn't make tags.");
+                Edit.getInstance().getCurrentWorkspace().reportErrors("Couldn't make tags.");
                 Log.warn("Tag creation failed", ex);
             }
         }

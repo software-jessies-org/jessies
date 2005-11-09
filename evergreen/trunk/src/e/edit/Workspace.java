@@ -14,7 +14,7 @@ import org.jdesktop.swingworker.SwingWorker;
 
 public class Workspace extends JPanel {
     private EColumn leftColumn = new EColumn();
-    private EErrorsWindow errors = new EErrorsWindow(this);
+    private EErrorsWindow errorsWindow = new EErrorsWindow(this);
 
     private String title;
     private String rootDirectory;
@@ -206,8 +206,8 @@ public class Workspace extends JPanel {
     }
     
     public JComponent makeUI() {
-        leftColumn.setErrorsWindow(errors);
-        registerTextComponent(errors.getText());
+        leftColumn.setErrorsWindow(errorsWindow);
+        registerTextComponent(errorsWindow.getText());
         return leftColumn;
     }
     
@@ -293,12 +293,12 @@ public class Workspace extends JPanel {
         return viewer;
     }
     
-    public synchronized void reportError(final String error) {
-        errors.append(error);
+    public synchronized void reportErrors(final String... errors) {
+        errorsWindow.append(errors);
     }
     
     public EErrorsWindow getErrorsWindow() {
-        return errors;
+        return errorsWindow;
     }
     
     /**

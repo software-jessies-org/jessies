@@ -128,14 +128,14 @@ public class EErrorsWindow extends EWindow {
     }
     
     private class AppendRunnable implements Runnable {
-        private String line;
+        private String text;
         
-        public AppendRunnable(String line) {
-            this.line = line + "\n";
+        public AppendRunnable(String[] lines) {
+            this.text = StringUtilities.join(lines, "\n") + "\n";
         }
         
         public void run() {
-            textArea.append(line);
+            textArea.append(text);
         }
     }
     
@@ -147,8 +147,8 @@ public class EErrorsWindow extends EWindow {
         }
     }
     
-    public void append(String line) {
-        EventQueue.invokeLater(new AppendRunnable(line));
+    public void append(String... lines) {
+        EventQueue.invokeLater(new AppendRunnable(lines));
     }
     
     public void clear() {
