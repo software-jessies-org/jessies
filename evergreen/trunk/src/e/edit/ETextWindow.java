@@ -709,10 +709,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         return FileUtilities.getUserFriendlyName(file.getParent());
     }
     
-    public void reportError(final String error) {
-        getWorkspace().reportError(error);
-    }
-    
     private boolean isOutOfDateWithRespectToDisk() {
         // If the time stamp on disk is the same as it was when we last read
         // or wrote the file, assume it hasn't changed.

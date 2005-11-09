@@ -101,7 +101,7 @@ public class ShellCommand {
             EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     if (finalExitStatus != 0) {
-                        workspace.reportError("Task '" + command + "' failed with exit status " + finalExitStatus);
+                        workspace.reportErrors("Task '" + command + "' failed with exit status " + finalExitStatus);
                     }
                     workspace.getErrorsWindow().drawHorizontalRule();
                     Edit.getInstance().showStatus("Task '" + command + "' finished");
