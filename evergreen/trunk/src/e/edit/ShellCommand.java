@@ -100,10 +100,12 @@ public class ShellCommand {
             final int finalExitStatus = exitStatus;
             EventQueue.invokeLater(new Runnable() {
                 public void run() {
+                    ArrayList<String> footer = new ArrayList<String>();
                     if (finalExitStatus != 0) {
-                        workspace.reportErrors("Task '" + command + "' failed with exit status " + finalExitStatus);
+                        footer.add("Task '" + command + "' failed with exit status " + finalExitStatus);
                     }
-                    workspace.getErrorsWindow().drawHorizontalRule();
+                    footer.add("-------------------------------------------------------------------------");
+                    workspace.getErrorsWindow().append(footer.toArray(new String[footer.size()]));
                     Edit.getInstance().showStatus("Task '" + command + "' finished");
                 }
             });
