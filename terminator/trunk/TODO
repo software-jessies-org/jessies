@@ -1,6 +1,3 @@
-* On Mac OS, a click on the Dock icon when we have no windows open ought to
-  open a new window.
-
 * Our sideways-scrolling performance is weak when we have long lines. We don't
   take the clip rectangle into account to try to avoid work, and ask
   Graphics.drawString to render really long lines. On Mac OS, at least, this
