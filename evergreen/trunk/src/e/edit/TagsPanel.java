@@ -55,14 +55,13 @@ public class TagsPanel extends JPanel {
         repaint();
     }
     
+    public void showError(String error) {
+        setVisibleComponent(new JLabel("<html>" + error));
+    }
+    
     public void showProgressBar() {
         setVisibleComponent(progressPanel);
         progressBar.setIndeterminate(true);
-    }
-    
-    public void hideProgressBar() {
-        setVisibleComponent(emptyPanel);
-        progressBar.setIndeterminate(false);
     }
     
     public static class TagsTreeRenderer extends DefaultTreeCellRenderer {
