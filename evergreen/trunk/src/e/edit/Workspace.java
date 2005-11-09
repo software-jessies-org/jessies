@@ -293,10 +293,6 @@ public class Workspace extends JPanel {
         return viewer;
     }
     
-    public synchronized void reportErrors(final String... errors) {
-        errorsWindow.append(errors);
-    }
-    
     public EErrorsWindow getErrorsWindow() {
         return errorsWindow;
     }

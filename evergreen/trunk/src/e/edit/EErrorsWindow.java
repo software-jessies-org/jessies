@@ -147,16 +147,12 @@ public class EErrorsWindow extends EWindow {
         }
     }
     
-    public void append(String... lines) {
+    public void append(String[] lines) {
         EventQueue.invokeLater(new AppendRunnable(lines));
     }
     
     public void clear() {
         EventQueue.invokeLater(new ClearRunnable());
-    }
-    
-    public void drawHorizontalRule() {
-        append("-------------------------------------------------------------------------");
     }
     
     public void resetAutoScroll() {
