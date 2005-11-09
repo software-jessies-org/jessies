@@ -258,8 +258,7 @@ public class TagsUpdater {
         }
         
         public void taggingFailed(Exception ex) {
-            Edit.getInstance().getCurrentWorkspace().reportErrors("Is Exuberant ctags installed and on your path? There was an error reading the tags: " + ex.getMessage());
-            Log.warn("Tag parsing failed", ex);
+            Edit.getInstance().getTagsPanel().showError("Is Exuberant ctags installed and on your path? There was an error reading the tags: " + ex.getMessage());
         }
         
         public void scanTags() {
@@ -278,20 +277,20 @@ public class TagsUpdater {
                 getTextArea().getTextBuffer().writeToFile(temporaryFile);
                 TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), this);
                 String newDigest = tagReader.getTagsDigest();
-                tagsHaveChanged = ! newDigest.equals(tagsDigest);
+                tagsHaveChanged = (newDigest != null) && ! newDigest.equals(tagsDigest);
                 tagsDigest = newDigest;
                 temporaryFile.delete();
             } catch (Exception ex) {
-                Edit.getInstance().getCurrentWorkspace().reportErrors("Couldn't make tags.");
-                Log.warn("Tag creation failed", ex);
+                Edit.getInstance().getTagsPanel().showError("Couldn't make tags: " + ex.getMessage());
+                Log.warn("Couldn't make tags", ex);
             }
         }
         
         @Override
         protected void done() {
             progressTimer.stop();
-            showTags();
             if (tagsHaveChanged) {
+                showTags();
                 setTreeModel(treeModel);
             }
             long endTime = System.currentTimeMillis();
