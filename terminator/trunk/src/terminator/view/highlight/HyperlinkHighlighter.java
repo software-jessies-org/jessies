@@ -212,9 +212,8 @@ public class HyperlinkHighlighter implements Highlighter {
 			ProcessUtilities.ProcessListener listener = new ProcessUtilities.ProcessListener() {
 				public void processExited(int status) {
 					if (status != 0) {
-						Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, view);
-						frame.toFront();
-						JOptionPane.showMessageDialog(frame, "Process '" + command + "' exited with status " + status + ".", "Terminator", JOptionPane.WARNING_MESSAGE);
+						SwingUtilities.getWindowAncestor(view).toFront();
+						JOptionPane.showMessageDialog(view, "Process '" + command + "' exited with status " + status + ".", "Terminator", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			};
