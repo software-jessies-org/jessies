@@ -23,7 +23,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     
     public class ExitAction extends AbstractAction {
         public ExitAction() {
-            super("Exit");
+            super(GuiUtilities.isWindows() ? "Exit" : "Quit");
         }
         public void actionPerformed(ActionEvent e) {
             Edit.getInstance().handleQuit(null);
