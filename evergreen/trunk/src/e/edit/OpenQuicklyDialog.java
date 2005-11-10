@@ -68,8 +68,7 @@ public class OpenQuicklyDialog {
                     Edit.getInstance().openFile(workspace.getRootDirectory() + File.separator + filename);
                     
                     // Wrestle focus back from the file we've just opened.
-                    JDialog dialog = (JDialog) SwingUtilities.getAncestorOfClass(JDialog.class, matchList);
-                    dialog.toFront();
+                    SwingUtilities.getWindowAncestor(matchList).toFront();
                 }
             }
         });

@@ -199,7 +199,7 @@ public class Minibuffer extends JPanel implements FocusListener {
             // FIXME: why doesn't this look like it's worked? If you hit a key or wiggle the mouse,
             // you can see that it *has* actually transferred the focus, but nothing seems to have
             // noticed the fact. The following line is Ed's workaround:
-            ((Window) SwingUtilities.getAncestorOfClass(Window.class, previousFocusOwner)).repaint();
+            SwingUtilities.getWindowAncestor(previousFocusOwner).repaint();
             previousFocusOwner = null;
         }
     }

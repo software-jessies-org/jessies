@@ -39,7 +39,7 @@ public class CycleWindowsAction extends ETextAction {
         if (window == null) {
             return;
         }
-        EColumn column = (EColumn) SwingUtilities.getAncestorOfClass(EColumn.class, window);
+        EColumn column = window.getColumn();
         if (column == null) {
             return;
         }

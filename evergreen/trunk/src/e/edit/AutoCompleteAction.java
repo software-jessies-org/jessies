@@ -92,7 +92,7 @@ public class AutoCompleteAction extends ETextAction {
         Point windowLocation = textArea.getViewCoordinates(textArea.getCoordinates(startPosition));
         windowLocation.translate(origin.x, origin.y);
         
-        Frame owner = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, textArea);
+        Window owner = SwingUtilities.getWindowAncestor(textArea);
         showCompletionsWindow(owner, windowLocation, new JScrollPane(completionsUi));
         completionsUi.requestFocus();
     }
@@ -105,7 +105,7 @@ public class AutoCompleteAction extends ETextAction {
         }
     }
     
-    private void showCompletionsWindow(Frame owner, Point location, Container content) {
+    private void showCompletionsWindow(Window owner, Point location, Container content) {
         hideCompletionsWindow();
         
         completionsWindow = new JWindow(owner);
