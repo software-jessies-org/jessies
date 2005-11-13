@@ -7,4 +7,6 @@ require 'pathname.rb'
 salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
 require "#{salma_hayek}/bin/invoke-java.rb"
 
-invoke_java("Dictionary", "", "e/tools/dict/DictionaryBrowser", [])
+invoker = Java.new("Dictionary", "e/tools/dict/DictionaryBrowser")
+invoker.dock_icon = "/Applications/Dictionary.app/Contents/Resources/Dictionary.icns"
+invoker.invoke()

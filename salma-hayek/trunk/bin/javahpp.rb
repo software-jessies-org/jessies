@@ -7,4 +7,5 @@ require 'pathname.rb'
 salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
 require "#{salma_hayek}/bin/invoke-java.rb"
 
-invoke_java("JavaHpp", "", "e/tools/JavaHpp", [])
+invoker = Java.new("JavaHpp", "e/tools/JavaHpp")
+invoker.invoke()
