@@ -1,12 +1,13 @@
 package terminator;
 
 import com.apple.eawt.*;
+import e.gui.*;
+import e.util.*;
 import java.awt.EventQueue;
 import java.io.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import e.util.*;
 import terminator.view.*;
 
 public class Terminator {
@@ -29,7 +30,11 @@ public class Terminator {
 				e.setHandled(true);
 			}
 			public void handleQuit(ApplicationEvent e) {
-				if (frames.size() == 0) {
+				boolean quit = true;
+				if (frames.size() != 0) {
+					quit = SimpleDialog.askQuestion(frames.get(0), "Terminator", "You have " + StringUtilities.pluralize(frames.size(), "window", "windows") + " which may contain running processes. Do you want to quit and risk terminating these processes?", "Quit");
+				}
+				if (quit) {
 					e.setHandled(true);
 				}
 			}
