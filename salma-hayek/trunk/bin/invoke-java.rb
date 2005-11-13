@@ -20,6 +20,7 @@ class Java
 
   def initialize(name, class_name)
     @dock_name = name
+    @dock_icon = ""
     @class_name = class_name
 
     # Cope with symbolic links to this script.
@@ -27,8 +28,18 @@ class Java
     @salma_hayek = Pathname.new("#{@project_root}/../salma-hayek").realpath()
     require "#{@salma_hayek}/bin/target-os.rb"
 
+    @extra_java_arguments = []
+
     init_default_heap_size()
     init_default_class_path()
+  end
+
+  def add_class_path_entries(new_entries)
+    @class_path.concat(new_entries)
+  end
+
+  def add_extra_java_arguments(new_java_arguments)
+    @extra_java_arguments.concat(new_java_arguments)
   end
 
   def init_default_heap_size()
@@ -62,14 +73,15 @@ class Java
     @class_path << "#{@salma_hayek}/swing-worker.jar"
   end
 
-  def invoke(extra_arguments = [])
+  def invoke(extra_app_arguments = [])
     args = [ "java", "-Xmx#{@heap_size}", "-cp", cygpath(@class_path.uniq().join(":")) ]
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@dock_name}"
       args << "-Xdock:icon=#{@dock_icon}"
     end
+    args.concat(@extra_java_arguments)
     args << @class_name
-    args.concat(extra_arguments)
+    args.concat(extra_app_arguments)
     args.concat(ARGV)
     #$stderr.puts(args)
     return system(*args)
