@@ -16,12 +16,13 @@ def cygpath(filenameOrPath)
 end
 
 class Java
-  attr_accessor :dock_name, :dock_icon
+  attr_accessor :dock_name, :dock_icon, :launcher
 
   def initialize(name, class_name)
     @dock_name = name
     @dock_icon = ""
     @class_name = class_name
+    @launcher = "java"
 
     # Cope with symbolic links to this script.
     @project_root = Pathname.new("#{$0}/..").realpath().dirname()
@@ -74,7 +75,7 @@ class Java
   end
 
   def invoke(extra_app_arguments = [])
-    args = [ "java", "-Xmx#{@heap_size}", "-cp", cygpath(@class_path.uniq().join(":")) ]
+    args = [ @launcher, "-Xmx#{@heap_size}", "-cp", cygpath(@class_path.uniq().join(":")) ]
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@dock_name}"
       args << "-Xdock:icon=#{@dock_icon}"
