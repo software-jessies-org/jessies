@@ -42,11 +42,11 @@ public class FatBits extends JFrame {
         } catch (AWTException ex) {
             Log.warn("failed to create a Robot", ex);
         }
-        timer = new Timer(50, new MouseTracker());
         setLocationByPlatform(true);
         setSize(new Dimension(250, 300));
         setContentPane(makeUi());
         setJMenuBar(new FatBitsMenuBar());
+        timer = new Timer(50, new MouseTracker());
         timer.start();
     }
     
@@ -105,9 +105,9 @@ public class FatBits extends JFrame {
         positionLabel.setFont(colorLabel.getFont());
     }
     
-    private void updatePosition(Point p) {
+    private boolean updatePosition(Point p) {
         if (scaledImagePanel.isShowing() == false) {
-            return;
+            return false;
         }
         
         positionLabel.setText("(" + p.x + "," + p.y + ")");
@@ -118,6 +118,8 @@ public class FatBits extends JFrame {
         
         Image scaledImage = capturedImage.getScaledInstance(roundLengthDown(scaledImagePanel.getWidth()), roundLengthDown(scaledImagePanel.getHeight()), Image.SCALE_REPLICATE);
         scaledImagePanel.setImage(scaledImage);
+        
+        return true;
     }
     
     private void initColorLabel() {
@@ -259,12 +261,17 @@ public class FatBits extends JFrame {
         private Point lastPosition = null;
 
         public void actionPerformed(ActionEvent e) {
+            // Has the pointer moved?
             Point p = getPointerLocation();
-            if (lastPosition != null && lastPosition.equals(p)) {
+            if (scaledImagePanel.isShowing() && lastPosition != null && lastPosition.equals(p)) {
                 return;
             }
-            lastPosition = p;
-            updatePosition(lastPosition);
+            
+            // Update.
+            boolean updated = updatePosition(p);
+            if (updated) {
+                lastPosition = p;
+            }
         }
     }
     
