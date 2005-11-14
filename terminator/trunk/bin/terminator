@@ -11,20 +11,16 @@ require "#{salma_hayek}/bin/target-os.rb"
 require "#{salma_hayek}/bin/invoke-java.rb"
 
 ENV["TERMINATOR_HOME"] = terminator_home
-
-class_name = "terminator/Terminator"
 HOME = ENV["HOME"]
 
-TARGET_OS = target_os()
-
 # Make sure we have a directory for the terminal logs.
-log_directory="#{HOME}/.terminal-logs"
+log_directory = "#{HOME}/.terminal-logs"
 if test(?d, log_directory) == false
   Dir.mkdir(log_directory)
   system("chmod og-rx #{log_directory}")
 end
 
-server_port_file="#{log_directory}/.terminator-server-port"
+server_port_file = "#{log_directory}/.terminator-server-port"
 
 if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   command = ARGV.join("\0")
@@ -38,7 +34,7 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
     host = $1
     port = $2.to_i()
     
-    require 'net/telnet'
+    require "net/telnet"
     telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port, 'Telnetmode' => false)
     telnet.puts("newTerminal #{command}")
     print(telnet.readlines().join(""))
@@ -49,49 +45,40 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   end
 end
 
-classpath_entries = [ "#{terminator_home}/classes", "#{salma_hayek}/classes", "#{salma_hayek}/swing-worker.jar" ]
-if TARGET_OS != "Darwin"
-  classpath_entries << "#{salma_hayek}/MRJ141Stubs.jar"
+pty_path = "#{terminator_home}/.generated/native/all/pty/#{target_os()}"
+jni_lib_prefix = "lib"
+jni_lib_extension = "so"
+if target_os() == "Darwin"
+  jni_lib_extension = "jnilib"
+elsif target_os() == "Cygwin"
+  jni_lib_prefix = ""
+  jni_lib_extension = "dll"
 end
+pty_library = "#{pty_path}/#{jni_lib_prefix}pty.#{jni_lib_extension}"
 
-pty_path="#{terminator_home}/.generated/native/all/pty/#{TARGET_OS}"
-jni_lib_prefix="lib"
-jni_lib_extension="so"
-if TARGET_OS == "Darwin"
-  jni_lib_extension="jnilib"
-elsif TARGET_OS == "Cygwin"
-  jni_lib_prefix=""
-  jni_lib_extension="dll"
-end
-pty_library="#{pty_path}/#{jni_lib_prefix}pty.#{jni_lib_extension}"
-
-heap_size="1g"
-launcher="java"
-if TARGET_OS == "Cygwin"
-  heap_size="100m"
-  launcher="#{salma_hayek}/.generated/native/all/launcher/#{TARGET_OS}/launcher"
+launcher = "java"
+if target_os() == "Cygwin"
+  launcher = "#{salma_hayek}/.generated/native/all/launcher/#{target_os()}/launcher"
   if ENV["DEBUGGING_TERMINATOR"] == nil
-    launcher="#{launcher}w"
+    launcher = "#{launcher}w"
   end
 end
 
-os_specific_options = []
-
 if test(?w, "/usr/share/terminfo")
-  terminfo="/usr/share/terminfo"
+  terminfo = "/usr/share/terminfo"
 else
-  terminfo="#{HOME}/.terminfo"
+  terminfo = "#{HOME}/.terminfo"
 end
-ENV["TERMINFO"]=terminfo
+ENV["TERMINFO"] = terminfo
 
-tic_binary=`bash -c "type -p tic"`.chomp()
-terminfo_SRC="#{terminator_home}/doc/terminfo/terminator.tic"
-terminfo_DST="#{terminfo}/t/terminator"
+tic_binary = `bash -c "type -p tic"`.chomp()
+terminfo_SRC = "#{terminator_home}/doc/terminfo/terminator.tic"
+terminfo_DST = "#{terminfo}/t/terminator"
 if test(?e, terminfo_DST) == false
   system("mkdir -p #{terminfo_DST} && rmdir #{terminfo_DST}")
 end
 if tic_binary != ""
-  if TARGET_OS == "SunOS"
+  if target_os() == "SunOS"
     system("#{tic_binary} #{terminfo_SRC}")
   else
     system("#{tic_binary} -v10 -o#{terminfo} #{terminfo_SRC}")
@@ -112,10 +99,7 @@ if test(?x, pty_library) == false
   system("make #{pty_library}")
 end
 
-if TARGET_OS == "Darwin"
-  # Make ourselves look a little better...
-  os_specific_options = [ "-Xdock:name=Terminator:icon=/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns" ]
-elsif TARGET_OS == "Linux"
+if target_os() == "Linux"
   # Use locate(1) to find the gnome-terminal icon.
   # Cache the result, because this is the single most expensive part of
   # the script.
@@ -125,18 +109,17 @@ elsif TARGET_OS == "Linux"
   #    locate gnome-terminal.png | grep 32x32 | head -1 > $icon_filename_file
   #  fi
   #  icon_file=`cat $icon_filename_file`
-  #  os_specific_options=-Dterminator.frame.icon=$icon_file
+  #  options=-Dterminator.frame.icon=$icon_file
 end
 
-options = [ "-Xmx#{heap_size}", "-Djava.class.path=#{cygpath(classpath_entries.join(":"))}", "-Djava.library.path=#{cygpath(pty_path)}" ]
-options.concat(os_specific_options)
-log_filename="#{log_directory}/terminator.log.#{$$}"
+options = [ "-Djava.library.path=#{cygpath(pty_path)}" ]
+log_filename = "#{log_directory}/terminator.log.#{$$}"
 if ENV["DEBUGGING_TERMINATOR"] == nil
   options.push("-De.util.Log.filename=#{cygpath(log_filename)}")
 end
 
-args = [ launcher ]
-args.concat(options)
-args.push(class_name)
-args.concat(ARGV)
-system(*args) || system("cat", log_filename)
+invoker = Java.new("Terminator", "terminator/Terminator")
+invoker.dock_icon = "/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns"
+invoker.add_extra_java_arguments(options)
+invoker.launcher = launcher
+invoker.invoke() || system("cat", log_filename)
