@@ -55,7 +55,7 @@ class Java
     @class_path = [ "#{@project_root}/classes", "#{@salma_hayek}/classes" ]
 
     if target_os() != "Darwin"
-      @class_path << "#{salma_hayek}/MRJ141Stubs.jar"
+      @class_path << "#{@salma_hayek}/MRJ141Stubs.jar"
 
       require "#{@salma_hayek}/bin/find-jdk-root.rb"
       jdk_root=find_jdk_root()
