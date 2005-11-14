@@ -75,7 +75,12 @@ class Java
   end
 
   def invoke(extra_app_arguments = [])
-    args = [ @launcher, "-Xmx#{@heap_size}", "-cp", cygpath(@class_path.uniq().join(":")) ]
+    args = [ @launcher ]
+    # Set the class path directly with a system property rather than -cp so
+    # that our custom Win32 launcher doesn't have to convert between the two
+    # forms.
+    args << "-Djava.class.path=#{cygpath(@class_path.uniq().join(":"))}"
+    args << "-Xmx#{@heap_size}"
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@dock_name}"
       args << "-Xdock:icon=#{@dock_icon}"
