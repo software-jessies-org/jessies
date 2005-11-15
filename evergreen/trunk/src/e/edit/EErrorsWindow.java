@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import e.ptextarea.*;
@@ -99,7 +100,11 @@ public class EErrorsWindow extends EWindow {
             
             Matcher matcher = JAVA_STACK_TRACE_PATTERN.matcher(address);
             if (matcher.matches()) {
-                name = JavaDoc.getSourceFilename(matcher.group(1));
+                String dottedClassName = matcher.group(1);
+                List<String> candidates = JavaDoc.findSourceFilenames(dottedClassName);
+                if (candidates.size() == 1) {
+                    name = candidates.get(0);
+                }
                 tail = matcher.group(2);
                 if (name != null) {
                     open(name + tail);

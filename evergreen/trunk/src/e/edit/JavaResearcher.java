@@ -263,11 +263,12 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
         s.append(JavaDoc.getDocLink(className, pkg, showPkg));
         if (showSourceLink) {
-        	String sourceFile = JavaDoc.getSourceLink(className, pkg);
-        	if (sourceFile != null) {
-        		s.append("&nbsp;");
-        		s.append(sourceFile);
-        	}
+            String dottedClassName = pkg + "." + className;
+            List<String> sourceFiles = JavaDoc.findSourceFilenames(dottedClassName);
+            for (String sourceFile : sourceFiles) {
+                s.append("&nbsp;");
+                s.append(JavaDoc.formatAsSourceLink(sourceFile));
+            }
         }
         return s.toString();
     }
