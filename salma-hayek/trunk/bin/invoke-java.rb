@@ -79,6 +79,13 @@ class Java
     # Set the class path directly with a system property rather than -cp so
     # that our custom Win32 launcher doesn't have to convert between the two
     # forms.
+    # cygpath's argument is a cygwin filename or path, so it should have a cygwin
+    # path separator - which is colon, not the Windows native semicolon.
+    # cygpath returns a native path - for the benefit of the non-cygwin JVM - but it
+    # doesn't take one.
+    # Cygwin's ruby's File::PATH_SEPARATOR is colon.
+    # This is (now, if it hasn't always been) the only caller which takes advantage of
+    # the --path conditional in cygpath.
     args << "-Djava.class.path=#{cygpath(@class_path.uniq().join(":"))}"
     args << "-Xmx#{@heap_size}"
     if target_os() == "Darwin"
