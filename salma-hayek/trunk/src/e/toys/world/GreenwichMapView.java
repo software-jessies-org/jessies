@@ -1,5 +1,6 @@
 package e.toys.world;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
@@ -48,7 +49,7 @@ public class GreenwichMapView extends JComponent {
         final int height = icon.getIconHeight() / 2;
         
         // Get a scaled copy.
-        Image scaledMap = icon.getImage().getScaledInstance(width, height, Image.SCALE_AREA_AVERAGING);
+        Image scaledMap = ImageUtilities.scale(icon.getImage(), width, height, ImageUtilities.InterpolationHint.NONE);
         new ImageIcon(scaledMap); // Force the image to be prepared.
         
         // Draw the scaled copy into a BufferedImage so we can read/write it.

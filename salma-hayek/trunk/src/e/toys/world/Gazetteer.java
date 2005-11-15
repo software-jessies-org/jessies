@@ -62,6 +62,7 @@ public class Gazetteer {
             System.out.println("Took: " + (System.currentTimeMillis() - startTime) + "ms");
         } else {
             System.err.println("Download population data from http://www.world-gazetteer.com/st/popdata.zip");
+            this.places = new ArrayList<Place>();
         }
     }
 }

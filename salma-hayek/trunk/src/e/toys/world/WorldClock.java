@@ -31,14 +31,8 @@ public class WorldClock extends JFrame implements LocationListener {
         GB.setTimeZone(TimeZone.getTimeZone("Europe/London"));
     }
 
-    private ImageIcon usIcon;
-    private ImageIcon gbIcon;
-    
     private GreenwichMapView mapView;
     private JLabel location;
-
-    private JLabel left;
-    private JLabel right;
 
     public WorldClock() {
         super("World Clock");
@@ -92,42 +86,6 @@ public class WorldClock extends JFrame implements LocationListener {
         setLocation(new Point(x, y));
     }
 
-    private ImageIcon makeIcon(String filename, String url) {
-        ImageIcon icon = new ImageIcon(filename);
-        if (icon.getImageLoadStatus() != MediaTracker.COMPLETE) {
-            try {
-                icon = new ImageIcon(new URL(url));
-            } catch (java.io.IOException ex) {
-                // Give up!
-                ex = ex;
-            }
-        }
-        final int preferredHeight = (int) new JLabel(" ").getPreferredSize().getHeight();
-        if (icon.getIconHeight() > preferredHeight) {
-            Image image = icon.getImage();
-            icon = new ImageIcon(image.getScaledInstance(-1, preferredHeight, Image.SCALE_AREA_AVERAGING));
-        }
-        return icon;
-    }
-
-    private void initLabelsAndIcons() {
-        usIcon = makeIcon("/usr/share/locale/l10n/us/flag.png",
-            "http://www.cia.gov/cia/publications/factbook/flags/us-flag.gif");
-        gbIcon = makeIcon("/usr/share/locale/l10n/gb/flag.png",
-            "http://www.cia.gov/cia/publications/factbook/flags/uk-flag.gif");
-        left = new JLabel("", usIcon, SwingConstants.LEFT);
-        right = new JLabel("", gbIcon, SwingConstants.RIGHT);
-        updateTimes();
-    }
-
-    private void updateTimes() {
-        /*
-        Date now = new Date();
-        left.setText(LOCAL.format(now));
-        right.setText(GB.format(now));
-        */
-    }
-    
     private JComponent makeControls() {
         JPanel controls = new JPanel(new BorderLayout());
         

@@ -1,5 +1,6 @@
 package e.tools;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
@@ -52,8 +53,7 @@ public class DualTimeClock extends JWindow implements ActionListener {
         }
         final int preferredHeight = (int) new JLabel(" ").getPreferredSize().getHeight();
         if (icon.getIconHeight() > preferredHeight) {
-            Image image = icon.getImage();
-            icon = new ImageIcon(image.getScaledInstance(-1, preferredHeight, Image.SCALE_AREA_AVERAGING));
+            icon = new ImageIcon(ImageUtilities.scale(icon.getImage(), -1, preferredHeight, ImageUtilities.InterpolationHint.BICUBIC));
         }
         return icon;
     }

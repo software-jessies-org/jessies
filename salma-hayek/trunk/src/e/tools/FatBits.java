@@ -116,10 +116,19 @@ public class FatBits extends JFrame {
         BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
         updateCenterColor(capturedImage.getRGB(capturedImage.getWidth() / 2, capturedImage.getHeight() / 2));
         
-        Image scaledImage = capturedImage.getScaledInstance(roundLengthDown(scaledImagePanel.getWidth()), roundLengthDown(scaledImagePanel.getHeight()), Image.SCALE_REPLICATE);
+        Image scaledImage = scaleImage(capturedImage, roundLengthDown(scaledImagePanel.getWidth()), roundLengthDown(scaledImagePanel.getHeight()));
         scaledImagePanel.setImage(scaledImage);
         
         return true;
+    }
+    
+    private static Image scaleImage(Image sourceImage, int width, int height) {
+        // An alternative would be to return the result of calling
+        // sourceImage.getScaledInstance(width, height, Image.SCALE_REPLICATE)
+        // but that can't be handed off to the graphics hardware in the same
+        // way as this code. There's about a 10% difference in CPU usage on
+        // Linux with Java 5.
+        return ImageUtilities.scale(sourceImage, width, height, ImageUtilities.InterpolationHint.NONE);
     }
     
     private void initColorLabel() {
