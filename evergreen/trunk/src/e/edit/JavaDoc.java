@@ -18,17 +18,11 @@ public class JavaDoc {
     /** Holds the name of every package we know of. */
     private static ArrayList<String> packageNames = new ArrayList<String>();
     
-    /** Places to look for javadoc. */
-    private static String[] docs = new String[0];
+    /** Places to look for JavaDoc. */
+    private static ArrayList<String> javaDocLocations = new ArrayList<String>();
     
-    /** Places to look for source code. */
-    private static String[] sources = new String[0];
-    
-    /** Cached javadoc locations for classes we've already seen. */
+    /** Cached JavaDoc locations for classes we've already seen. */
     private static HashMap<String, String> docLinks = new HashMap<String, String>();
-    
-    /** Cached source code locations for classes we've already seen. */
-    private static HashMap<String, String> sourceLinks = new HashMap<String, String>();
     
     /** Tells us if the text around the caret is a genuine classname or not. */
     private static URLClassLoader classLoader;
@@ -67,15 +61,14 @@ public class JavaDoc {
         }
         classLoader = new URLClassLoader((URL []) urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
         
-        // Note the locations of documents and source files.
+        // Note the locations of JavaDoc HTML files.
         String defaultApiLocation = "http://java.sun.com/j2se/1.5.0/docs/api/";
         // FIXME: this should be CurrentJDK rather than 1.5.0, but 1.5.0 isn't the default on Mac OS yet.
         String macOsApiPath = "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/doc/api/";
         if (FileUtilities.exists(macOsApiPath)) {
             defaultApiLocation = "file://" + macOsApiPath;
         }
-        docs = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.doc", defaultApiLocation));
-        sources = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.source", ""));
+        javaDocLocations.addAll(Arrays.asList(FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.doc", defaultApiLocation))));
         
         int totalPkgs = packageNames.size();
         long timeTaken = System.currentTimeMillis() - start;
@@ -162,54 +155,36 @@ public class JavaDoc {
         }
     }
     
-    /** Used to choose between source or javadoc links. */
-    private static final int DOC = 0;
-    private static final int SRC = 1;
-    
-    /**
-    * Returns the location of the documentation for a class.
-    */
-    public static String getDocLink(String className, String pkg, boolean showPkg) {
-        return getLink(className, pkg, showPkg, DOC);
-    }
-    
     /**
      * Returns the location of the source file, as a plain String.
      */
-    public static String getSourceFilename(String className) {
-        className = className.replace('.', File.separatorChar);
-        for (String source : sources) {
-            String candidate = source + File.separator + className + ".java";
-            if (FileUtilities.fileFromString(candidate).exists()) {
-                return candidate;
+    public static List<String> findSourceFilenames(String dottedClassName) {
+        String suffix = "\\b" + dottedClassName.replace('.', File.separatorChar) + "\\.java$";
+        List<String> result = new ArrayList<String>();
+        for (Workspace workspace : Edit.getInstance().getWorkspaces()) {
+            for (String leafName : workspace.getListOfFilesMatching(suffix)) {
+                result.add(workspace.getRootDirectory() + File.separator + leafName);
             }
         }
-        return null;
+        return result;
     }
     
     /**
-     * Returns the location of the source code for a class, formatted as HTML.
+     * Returns the location of the documentation for a class.
      */
-    public static String getSourceLink(String className, String pkg) {
-        return getLink(className, pkg, false, SRC);
-    }
-    
-    public static String getLink(String className, String pkg, boolean showPkg, int type) {
-        String[] roots = (type == DOC) ? docs : sources;
-        HashMap<String, String> map = (type == DOC) ? docLinks : sourceLinks;
-        String key = (type == DOC) ? (className + "." + pkg + String.valueOf(showPkg)) : (className + "." + pkg);
-        String cached = map.get(key);
+    public static String getDocLink(String className, String pkg, boolean showPkg) {
+        String key = (className + "." + pkg + String.valueOf(showPkg));
+        String cached = docLinks.get(key);
         if (cached != null) {
             return cached;
         }
-        for (String root : roots) {
+        for (String root : javaDocLocations) {
             if (root.length() == 0) {
                 continue;
             }
             
-            // The separator is always '/' for a URL, but it might not be for source.
-            // FIXME: should we insist on "file://" for specifying source locations?
-            char separator = (type == DOC) ? '/' : File.separatorChar;
+            // The separator is always '/' for a URL.
+            char separator = '/';
             
             // Start with a root that ends in a separator.
             StringBuilder s = new StringBuilder(root);
@@ -223,41 +198,25 @@ public class JavaDoc {
             s.append(className.replace('.', separator));
             
             // And finally add the file type.
-            if (type == DOC) {
-                s.append(".html");
-            } else if (type == SRC) {
-                s.append(".java");
-            }
+            s.append(".html");
             
             String candidate = s.toString();
             if (FileUtilities.nameStartsWithOneOf(candidate, FileUtilities.getArrayOfPathElements(Parameters.getParameter("url.prefixes", "")))) {
                 if (urlExists(candidate)) {
-                    String link;
-                    if (type == DOC) {
-                        link = formatAsDocLink(candidate, className, pkg, showPkg);
-                        map.put(className + "." + pkg + String.valueOf(showPkg), link);
-                    } else {
-                        link = formatAsSourceLink(candidate);
-                        map.put(className + "." + pkg, link);
-                    }
+                    String link = formatAsDocLink(candidate, className, pkg, showPkg);
+                    docLinks.put(className + "." + pkg + String.valueOf(showPkg), link);
                     return link;
                 }
             } else if (FileUtilities.fileFromString(candidate).exists()) {
-                String link;
-                if (type == DOC) {
-                    link = formatAsDocLink(candidate, className, pkg, showPkg);
-                    map.put(className + "." + pkg + String.valueOf(showPkg), link);
-                } else {
-                    link = formatAsSourceLink(candidate);
-                    map.put(className + "." + pkg, link);
-                }
+                String link = formatAsDocLink(candidate, className, pkg, showPkg);
+                docLinks.put(className + "." + pkg + String.valueOf(showPkg), link);
                 return link;
             }
         }
         
-        // Didn't find any links at all. Return a classname in plain text, or nothing at all if there's no source.
-        String link = (type == DOC) ? pkg + "." + className : "";
-        map.put(key, link);
+        // Didn't find any links at all. Return a classname in plain text.
+        String link = pkg + "." + className;
+        docLinks.put(key, link);
         return link;
     }
     
@@ -317,7 +276,7 @@ public class JavaDoc {
     * of all classes in it.
     */
     public static String[] getPackageInfo(String pkgName) {
-        return new String[] { getLink("package-summary", pkgName, true, DOC) };
+        return new String[] { getDocLink("package-summary", pkgName, true) };
     }
     
     /**
