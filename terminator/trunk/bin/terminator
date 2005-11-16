@@ -112,15 +112,9 @@ if target_os() == "Linux"
   #  options=-Dterminator.frame.icon=$icon_file
 end
 
-options = []
-log_filename = "#{log_directory}/terminator.log.#{$$}"
-if ENV["DEBUGGING_TERMINATOR"] == nil
-  options.push("-De.util.Log.filename=#{cygpath(log_filename)}")
-end
-
 invoker = Java.new("Terminator", "terminator/Terminator")
 invoker.dock_icon = "/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns"
 invoker.add_library_path_entries([ pty_path ])
-invoker.add_extra_java_arguments(options)
+invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
 invoker.launcher = launcher
 invoker.invoke() || system("cat", log_filename)
