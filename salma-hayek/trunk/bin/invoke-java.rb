@@ -33,12 +33,17 @@ class Java
 
     init_default_heap_size()
     init_default_class_path()
+    @library_path = []
   end
 
   def add_class_path_entries(new_entries)
     @class_path.concat(new_entries)
   end
-
+  
+  def add_library_path_entries(new_entries)
+    @library_path.concat(new_entries)
+  end
+  
   def add_extra_java_arguments(new_java_arguments)
     @extra_java_arguments.concat(new_java_arguments)
   end
@@ -87,6 +92,7 @@ class Java
     # This is (now, if it hasn't always been) the only caller which takes advantage of
     # the --path conditional in cygpath.
     args << "-Djava.class.path=#{cygpath(@class_path.uniq().join(":"))}"
+    args << "-Djava.library.path=#{cygpath(@library_path.uniq().join(":"))}"
     args << "-Xmx#{@heap_size}"
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@dock_name}"
