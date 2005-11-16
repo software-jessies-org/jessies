@@ -16,13 +16,17 @@ def cygpath(filenameOrPath)
 end
 
 class Java
-  attr_accessor :dock_name, :dock_icon, :launcher
+  attr_accessor(:dock_name)
+  attr_accessor(:dock_icon)
+  attr_accessor(:launcher)
+  attr_accessor(:log_filename)
 
   def initialize(name, class_name)
     @dock_name = name
     @dock_icon = ""
     @class_name = class_name
     @launcher = "java"
+    @log_filename = ""
 
     # Cope with symbolic links to this script.
     @project_root = Pathname.new("#{$0}/..").realpath().dirname()
@@ -93,6 +97,10 @@ class Java
     # the --path conditional in cygpath.
     args << "-Djava.class.path=#{cygpath(@class_path.uniq().join(":"))}"
     args << "-Djava.library.path=#{cygpath(@library_path.uniq().join(":"))}"
+    applicationEnvironmentName = @dock_name.upcase()
+    if ENV["DEBUGGING_#{applicationEnvironmentName}"] == nil
+      args << "-De.util.Log.filename=#{cygpath(log_filename)}"
+    end
     args << "-Xmx#{@heap_size}"
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@dock_name}"
