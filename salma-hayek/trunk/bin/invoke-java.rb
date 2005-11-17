@@ -112,8 +112,7 @@ class Java
     args.concat(extra_app_arguments)
     args.concat(ARGV)
     #$stderr.puts(args)
-    rc = system(*args)
-    failed = rc == false || $? != 0
+    failed = system(*args) == false
     if failed && logging
       puts(File.new(@log_filename).readlines())
     end
