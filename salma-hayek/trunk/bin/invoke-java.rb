@@ -100,6 +100,7 @@ class Java
     applicationEnvironmentName = @dock_name.upcase()
     logging = ENV["DEBUGGING_#{applicationEnvironmentName}"] == nil && @log_filename != ""
     if logging
+      File.new(@log_filename, "w")
       args << "-De.util.Log.filename=#{cygpath(@log_filename)}"
     end
     args << "-Xmx#{@heap_size}"

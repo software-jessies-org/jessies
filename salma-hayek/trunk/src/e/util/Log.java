@@ -34,7 +34,8 @@ public class Log {
         String logFilename = System.getProperty("e.util.Log.filename");
         try {
             if (logFilename != null) {
-                out = new PrintStream(logFilename, "utf-8");
+                // This is like new PrintStream(logFilename, "utf-8") but appending rather than truncating.
+                out = new PrintStream(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFilename, true), "utf-8")), false);
             }
         } catch (Throwable th) {
             Log.warn("Couldn't redirect logging to \"" + logFilename + "\"", th);
