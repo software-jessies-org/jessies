@@ -78,11 +78,15 @@ if test(?e, terminfo_DST) == false
   system("mkdir -p #{terminfo_DST} && rmdir #{terminfo_DST}")
 end
 if tic_binary != ""
-  if target_os() == "SunOS"
-    system("#{tic_binary} #{terminfo_SRC}")
-  else
-    system("#{tic_binary} -v10 -o#{terminfo} #{terminfo_SRC}")
+  tic_command = [ tic_binary ]
+  if ENV["DEBUGGING_TERMINATOR"] != nil
+    tic_command << "-v10"
   end
+  if target_os() != "SunOS"
+    tic_command << "-o#{terminfo}"
+  end
+  tic_command << terminfo_SRC
+  system(*tic_command)
 elsif test(?f, terminfo_DST) == false
   # If you see an error like this:
   # cp: /usr/local/bin/../doc/terminfo/terminator: No such file or directory
