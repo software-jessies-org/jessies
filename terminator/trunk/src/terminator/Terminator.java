@@ -151,8 +151,8 @@ public class Terminator {
 	public static void main(final String[] arguments) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				GuiUtilities.initLookAndFeel();
 				try {
+					GuiUtilities.initLookAndFeel();
 					PrintWriter outWriter = new PrintWriter(System.out);
 					PrintWriter errWriter = new PrintWriter(System.err);
 					Terminator.getSharedInstance().parseOriginalCommandLine(arguments, outWriter, errWriter);
@@ -160,6 +160,7 @@ public class Terminator {
 					errWriter.flush();
 				} catch (Throwable th) {
 					Log.warn("Couldn't start Terminator.", th);
+					System.exit(1);
 				}
 			}
 		});
