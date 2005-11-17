@@ -98,8 +98,9 @@ class Java
     args << "-Djava.class.path=#{cygpath(@class_path.uniq().join(":"))}"
     args << "-Djava.library.path=#{cygpath(@library_path.uniq().join(":"))}"
     applicationEnvironmentName = @dock_name.upcase()
-    if ENV["DEBUGGING_#{applicationEnvironmentName}"] == nil
-      args << "-De.util.Log.filename=#{cygpath(log_filename)}"
+    logging = ENV["DEBUGGING_#{applicationEnvironmentName}"] == nil && @log_filename != ""
+    if logging
+      args << "-De.util.Log.filename=#{cygpath(@log_filename)}"
     end
     args << "-Xmx#{@heap_size}"
     if target_os() == "Darwin"
@@ -111,7 +112,13 @@ class Java
     args.concat(extra_app_arguments)
     args.concat(ARGV)
     #$stderr.puts(args)
-    return system(*args)
+    rc = system(*args)
+    failed = rc == false || $? != 0
+    if failed && logging
+      puts(File.new(@log_filename).readlines())
+    end
+    # The return can be deleted when none of the callers care any more
+    return failed == false
   end
 end
 
