@@ -121,4 +121,4 @@ invoker.dock_icon = "/Applications/Utilities/Terminal.app/Contents/Resources/ico
 invoker.add_library_path_entries([ pty_path ])
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
 invoker.launcher = launcher
-invoker.invoke() || system("cat", invoker.log_filename)
+invoker.invoke()
