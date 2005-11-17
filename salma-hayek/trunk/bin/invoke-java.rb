@@ -117,8 +117,6 @@ class Java
     if failed && logging
       puts(File.new(@log_filename).readlines())
     end
-    # The return can be deleted when none of the callers care any more
-    return failed == false
   end
 end
 
