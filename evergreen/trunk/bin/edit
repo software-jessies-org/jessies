@@ -88,4 +88,4 @@ if FileTest.directory?(scm_home)
 end
 invoker.log_filename = log_filename
 invoker.add_extra_java_arguments(options)
-invoker.invoke([ "Edit", "#{edit_class_name}Launchable" ]) || system("cat", log_filename)
+invoker.invoke([ "Edit", "#{edit_class_name}Launchable" ])
