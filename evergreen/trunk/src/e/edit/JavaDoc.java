@@ -233,41 +233,22 @@ public class JavaDoc {
         }
     }
     
-    public static final String DECORATED_LINK_START = "<a href=\"";
-    public static final String UNDECORATED_LINK_START = "<a style=\"text-decoration: none\" href=\"";
-    public static final String HREF_END = "\">";
-    public static final String LINK_END = "</a>";
-    
-    public static String formatAsSourceLink(String uri) {
-        StringBuilder link = new StringBuilder();
-        link.append("[");
-        link.append(UNDECORATED_LINK_START);
-        link.append(uri);
-        link.append(HREF_END);
-        link.append("src");
-        link.append(LINK_END);
-        link.append("]");
-        return link.toString();
+    private static String formatAnchor(String uri, String text) {
+        return  "<a style=\"text-decoration: none\" href=\"" + uri + "\" alt=\"" + uri + "\">" + text + "</a>";
     }
     
-    public static String formatAsDocLink(String uri, String className, String pkg, boolean showPkg) {
+    public static String formatAsSourceLink(String uri) {
+        return "[" + formatAnchor(uri, "src") + "]";
+    }
+    
+    public static String formatAsDocLink(String uri, String className, String packageName, boolean showPackage) {
         StringBuilder link = new StringBuilder();
-        if (showPkg) {
-            String packageIndex = uri.substring(0, uri.lastIndexOf("/")) + "/package-summary.html";
-            link.append(UNDECORATED_LINK_START);
-            link.append(packageIndex);
-            link.append(HREF_END);
-            link.append(pkg);
-            link.append(LINK_END);
+        if (showPackage) {
+            String packageIndexUri = uri.substring(0, uri.lastIndexOf("/")) + "/package-summary.html";
+            link.append(formatAnchor(packageIndexUri, packageName));
             link.append("<br>");
-            link.append(UNDECORATED_LINK_START);
-        } else {
-            link.append(UNDECORATED_LINK_START);
         }
-        link.append(uri);
-        link.append(HREF_END);
-        link.append(className);
-        link.append(LINK_END);
+        link.append(formatAnchor(uri, className));
         return link.toString();
     }
     
