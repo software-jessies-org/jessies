@@ -22,7 +22,7 @@ public class InstanceTracker {
     }
     
     private static synchronized ArrayList<WeakReference> instancesOfClass(Class klass) {
-        ArrayList<WeakReference> instances = (ArrayList<WeakReference>) CLASS_TO_INSTANCES_MAP.get(klass);
+        ArrayList<WeakReference> instances = CLASS_TO_INSTANCES_MAP.get(klass);
         if (instances == null) {
             instances = new ArrayList<WeakReference>();
             CLASS_TO_INSTANCES_MAP.put(klass, instances);

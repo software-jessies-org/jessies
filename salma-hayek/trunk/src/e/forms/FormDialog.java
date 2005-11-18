@@ -433,7 +433,7 @@ public class FormDialog {
         String[] lines = StringUtilities.readLinesFromFile(filename);
         try {
             for (int i = 0; i < lines.length;) {
-                String name = (String) lines[i++];
+                String name = lines[i++];
                 int x = Integer.parseInt(lines[i++]);
                 int y = Integer.parseInt(lines[i++]);
                 int width = Integer.parseInt(lines[i++]);

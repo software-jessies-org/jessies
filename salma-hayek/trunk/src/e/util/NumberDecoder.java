@@ -44,7 +44,7 @@ public class NumberDecoder {
         Long result;
         try {
             result = Long.valueOf(s.substring(index), radix);
-            result = negative ? Long.valueOf((long)-result.longValue()) : result;
+            result = negative ? Long.valueOf(-result.longValue()) : result;
             number = result.longValue();
             valid = true;
         } catch (NumberFormatException ex) {
