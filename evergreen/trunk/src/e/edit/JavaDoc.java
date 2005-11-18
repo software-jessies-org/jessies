@@ -59,7 +59,7 @@ public class JavaDoc {
                 }
             }
         }
-        classLoader = new URLClassLoader((URL []) urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
+        classLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
         
         // Note the locations of JavaDoc HTML files.
         String defaultApiLocation = "http://java.sun.com/j2se/1.5.0/docs/api/";
