@@ -114,9 +114,9 @@ public class Terminator {
 		ArrayList<JTerminalPaneFactory> result = new ArrayList<JTerminalPaneFactory>();
 		String name = null;
 		for (int i = 0; i < arguments.size(); ++i) {
-			String word = (String) arguments.get(i);
+			String word = arguments.get(i);
 			if (word.equals("-n")) {
-				name = (String) arguments.get(++i);
+				name = arguments.get(++i);
 				continue;
 			}
 			

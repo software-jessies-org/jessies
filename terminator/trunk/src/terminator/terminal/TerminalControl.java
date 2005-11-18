@@ -205,7 +205,7 @@ public class TerminalControl implements Runnable {
 			return;
 		}
 		
-		final TerminalAction[] actions = (TerminalAction[]) terminalActions.toArray(new TerminalAction[terminalActions.size()]);
+		final TerminalAction[] actions = terminalActions.toArray(new TerminalAction[terminalActions.size()]);
 		terminalActions.clear();
 		try {
 			EventQueue.invokeAndWait(new Runnable() {
