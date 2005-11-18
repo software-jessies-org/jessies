@@ -58,7 +58,7 @@ public class AutoCompleteAction extends ETextAction {
             completionsList.add("No completions found.");
         }
         
-        String[] completions = (String[]) completionsList.toArray(new String[completionsList.size()]);
+        String[] completions = completionsList.toArray(new String[completionsList.size()]);
         final JList completionsUi = new JList(completions);
         completionsUi.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
