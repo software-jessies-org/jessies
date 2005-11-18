@@ -253,6 +253,13 @@ public class JavaResearcher implements WorkspaceResearcher {
                 this.className = qualifiedName.substring(dot + 1);
             }
         }
+        
+        String qualifiedName() {
+            if (packageName.length() == 0) {
+                return className;
+            }
+            return packageName + "." + className;
+        }
     }
     
     /** Formats a class name as a link if there's javadoc for it. */
@@ -276,8 +283,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
         s.append(JavaDoc.getDocLink(classAndPackage.className, classAndPackage.packageName, showPkg));
         if (showSourceLink) {
-            String dottedClassName = classAndPackage.packageName + "." + classAndPackage.className;
-            List<String> sourceFiles = JavaDoc.findSourceFilenames(dottedClassName);
+            List<String> sourceFiles = JavaDoc.findSourceFilenames(classAndPackage.qualifiedName());
             for (String sourceFile : sourceFiles) {
                 s.append("&nbsp;");
                 s.append(JavaDoc.formatAsSourceLink(sourceFile));
@@ -383,7 +389,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         StringBuilder s = new StringBuilder("<br>");
         appendAfterSorting(s, collectFields(c));
         s.append("<br>");
-        appendAfterSorting(s, collectMethods(c));
+        appendAfterSorting(s, collectStaticMethods(c));
         return s.toString();
     }
     
@@ -405,7 +411,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         return result;
     }
     
-    private List<String> collectMethods(Class c) {
+    private List<String> collectStaticMethods(Class c) {
         ArrayList<String> result = new ArrayList<String>();
         for (Method method : c.getMethods()) {
             int modifiers = method.getModifiers();
