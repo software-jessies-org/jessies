@@ -33,7 +33,7 @@ public final class InAppServer {
     }
     
     public boolean handleCommand(String line, PrintWriter out) {
-        System.err.println(line);
+        Log.warn("InAppServer received command " + line);
         String[] split = line.split("[\t ]");
         String commandName = split[0];
         
