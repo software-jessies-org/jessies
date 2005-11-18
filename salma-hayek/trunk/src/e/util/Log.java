@@ -29,13 +29,17 @@ public class Log {
     
     private static String applicationName = "unknown";
     
-    private static PrintStream out = System.err;
+    private static PrintWriter out = new PrintWriter(System.err, true);
     static {
         String logFilename = System.getProperty("e.util.Log.filename");
         try {
             if (logFilename != null) {
-                // This is like new PrintStream(logFilename, "utf-8") but appending rather than truncating.
-                out = new PrintStream(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFilename, true), "utf-8")), false);
+                // Append to, rather than truncate, the log.
+                FileOutputStream fileOutputStream = new FileOutputStream(logFilename, true);
+                // Use the UTF-8 character encoding.
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "utf-8");
+                // Auto-flush when println is called.
+                out = new PrintWriter(outputStreamWriter, true);
             }
         } catch (Throwable th) {
             Log.warn("Couldn't redirect logging to \"" + logFilename + "\"", th);
