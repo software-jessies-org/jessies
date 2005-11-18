@@ -98,7 +98,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     * Builds HTML containing useful information
     * about the text around the caret.
     */
-    public String makeResult(String text) {
+    private String makeResult(String text) {
         // Does it look like the user wants help with a constructor?
         boolean listConstructors = false;
         Matcher newMatcher = NEW_PATTERN.matcher(text);
@@ -146,7 +146,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         return result.toString();
     }
     
-    public String makePackageResult(String text) {
+    private String makePackageResult(String text) {
         Pattern importPattern = Pattern.compile("import (.+)\\..+;");
         Matcher matcher = importPattern.matcher(text);
         if (matcher.find()) {
@@ -157,7 +157,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
     }
     
-    public String makeInstanceMethodOrFieldResult(String text) {
+    private String makeInstanceMethodOrFieldResult(String text) {
         // FIXME: ideally, we'd find the name of the most recent method with unclosed parentheses.
         // So, in "doSomething(getThing(x), " we'd know that "doSomething" is interesting and "getThing" isn't.
         Pattern namePattern = Pattern.compile("(\\S+)\\s*(\\(?).*");
@@ -173,7 +173,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     /**
      * Returns HTML linking to all the classes in the given package.
      */
-    public synchronized String listPackage(String packageName) {
+    private synchronized String listPackage(String packageName) {
         StringBuilder result = new StringBuilder(packageName + " contains:\n");
         String searchTerm = "Class:" + packageName + ".";
         String htmlFile = "";
@@ -201,7 +201,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
     }
     
-    public synchronized String listMethodsOrFields(String name) {
+    private synchronized String listMethodsOrFields(String name) {
         StringBuilder result = new StringBuilder();
         Pattern pattern = Pattern.compile("^[MF]:(" + StringUtilities.regularExpressionFromLiteral(name) + "[^(\t]*)(\\([^\t]+)\t");
         Matcher matcher;
@@ -214,7 +214,7 @@ public class JavaResearcher implements WorkspaceResearcher {
                 className = line.substring(6);
             } else if ((matcher = pattern.matcher(line)).find()) {
                 String url = urlFromHtmlFile(htmlFile);
-                result.append("<br><a href=\"" + url + "#" + matcher.group(1) + matcher.group(2) + "\">" + matcher.group(1) + "</a> in <a href=\"" + url + "\">" + className + "</a>\n");
+                result.append("<br><a href=\"" + url + "#" + matcher.group(1) + matcher.group(2) + "\">" + matcher.group(1) + "</a> in " + makeClassLink(new ClassAndPackage(className), true, true));
             }
         }
         if (result.length() == 0) {
@@ -225,7 +225,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     /** Formats class names as a list of links if there's javadoc for them. */
-    public String makeClassLinks(Class[] classes, boolean pkg, String conjunct, boolean showSourceLink) {
+    private String makeClassLinks(Class[] classes, boolean pkg, String conjunct, boolean showSourceLink) {
         StringBuilder s = new StringBuilder();
         for (Class klass : classes) {
             if (s.length() > 0) {
@@ -236,34 +236,47 @@ public class JavaResearcher implements WorkspaceResearcher {
         return s.toString();
     }
     
-    /** Formats a class name as a link if there's javadoc for it. */
-    public String makeClassLink(Class c, boolean showPkg, boolean showSourceLink) {
-        String className = c.getName();
-        String pkg = "";
-        int dot = className.lastIndexOf(".");
-        if (dot != -1) {
-            pkg = className.substring(0, dot);
-            className = className.substring(dot + 1);
+    private static class ClassAndPackage {
+        String className;
+        String packageName;
+        
+        ClassAndPackage(String className, String packageName) {
+            this.className = className;
+            this.packageName = packageName;
         }
+        
+        ClassAndPackage(String qualifiedName) {
+            this.packageName = "";
+            final int dot = qualifiedName.lastIndexOf(".");
+            if (dot != -1) {
+                this.packageName = qualifiedName.substring(0, dot);
+                this.className = qualifiedName.substring(dot + 1);
+            }
+        }
+    }
+    
+    /** Formats a class name as a link if there's javadoc for it. */
+    private String makeClassLink(Class c, boolean showPkg, boolean showSourceLink) {
+        ClassAndPackage classAndPackage = new ClassAndPackage(c.getName());
         if (c.isArray()) {
             return makeClassLink(c.getComponentType(), showPkg, showSourceLink) + "[]";
         }
         if (c.isPrimitive()) {
-            return showPkg ? c.getName() : className;
+            return c.getName();
         }
-        return makeClassLink(className, pkg, showPkg, showSourceLink);
+        return makeClassLink(classAndPackage, showPkg, showSourceLink);
     }
     
     /** Formats a class name as a link if there's javadoc for it. */
-    public String makeClassLink(String className, String pkg, boolean showPkg, boolean showSourceLink) {
+    private String makeClassLink(ClassAndPackage classAndPackage, boolean showPkg, boolean showSourceLink) {
         StringBuilder s = new StringBuilder();
-        if (className.contains(".")) {
-            s.append(className);
+        if (classAndPackage.className.contains(".")) {
+            s.append(classAndPackage.className);
             return s.toString();
         }
-        s.append(JavaDoc.getDocLink(className, pkg, showPkg));
+        s.append(JavaDoc.getDocLink(classAndPackage.className, classAndPackage.packageName, showPkg));
         if (showSourceLink) {
-            String dottedClassName = pkg + "." + className;
+            String dottedClassName = classAndPackage.packageName + "." + classAndPackage.className;
             List<String> sourceFiles = JavaDoc.findSourceFilenames(dottedClassName);
             for (String sourceFile : sourceFiles) {
                 s.append("&nbsp;");
