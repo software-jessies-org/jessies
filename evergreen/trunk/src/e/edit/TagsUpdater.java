@@ -289,8 +289,8 @@ public class TagsUpdater {
         @Override
         protected void done() {
             progressTimer.stop();
+            showTags();
             if (tagsHaveChanged) {
-                showTags();
                 setTreeModel(treeModel);
             }
             long endTime = System.currentTimeMillis();
