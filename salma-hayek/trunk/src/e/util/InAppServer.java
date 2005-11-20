@@ -16,13 +16,21 @@ import java.util.*;
  */
 public final class InAppServer {
     private String fullName;
+    
+    // I think that having a generic constructor provides all the safety we
+    // can get from generics, and that keeping the type information here would
+    // only add inconvenience because we'd need to make this a generic class.
     private Class exportedInterface;
     private Object handler;
     
-    public InAppServer(String name, String portFilename, Class exportedInterface, Object handler) {
+    /**
+     * 'handler' can be of any type that implements 'exportedInterface', but
+     * only methods declared by the interface (and its superinterfaces) will be
+     * invocable.
+     */
+    public <T> InAppServer(String name, String portFilename, Class<T> exportedInterface, T handler) {
         this.fullName = name + "Server";
         this.exportedInterface = exportedInterface;
-        // FIXME: better type-safety?
         this.handler = handler;
         
         try {
@@ -33,14 +41,13 @@ public final class InAppServer {
     }
     
     public boolean handleCommand(String line, PrintWriter out) {
-        Log.warn("InAppServer received command " + line);
         String[] split = line.split("[\t ]");
         String commandName = split[0];
         
         try {
             Method[] methods = exportedInterface.getMethods();
             for (Method method : methods) {
-                if (method.getName().equals(commandName)) {
+                if (method.getName().equals(commandName) && method.getReturnType() == void.class) {
                     return invokeMethod(line, out, method, split);
                 }
             }
@@ -78,8 +85,7 @@ public final class InAppServer {
             }
         }
         
-        Object result = method.invoke(handler, methodArguments.toArray());
-        out.println((result == null) ? "OK" : result.toString());
+        method.invoke(handler, methodArguments.toArray());
         return true;
     }
     
