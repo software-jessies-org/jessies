@@ -90,6 +90,21 @@ public class FindFilesDialog {
         
         public void setContainsDefinition(boolean newState) {
             this.containsDefinition = newState;
+            // The check-in comment for revision 673 mentioned that JTree
+            // caches node widths, and that changing the font for an individual
+            // node could lead to unwanted clipping. The caching is done by
+            // subclasses of javax.swing.tree.AbstractLayoutCache, and there
+            // are methods called invalidatePathBounds and invalidateSizes, but
+            // neither is easily accesible. We can access the first only via
+            // the support for editable nodes. The latter we can access via
+            // various setters. This relies on the fact that the setter
+            // setRootVisible doesn't optimize out the case where the new state
+            // is the same as the old state. We also need to explicitly request
+            // a repaint. But this potentially fragile hack does let us work
+            // around a visual glitch in the absence of an approved means of
+            // invalidating the JTree UI delegate's layout cache. Having the
+            // source is one of the things that makes Java great!
+            matchView.setRootVisible(false);
             matchView.repaint();
         }
         
