@@ -212,10 +212,13 @@ public class PTextBuffer implements CharSequence {
     }
     
     private static CharsetDecoder makeReportingCharsetDecoder(String charsetName) {
-        CharsetDecoder decoder = Charset.forName(charsetName).newDecoder();
-        decoder.onMalformedInput(CodingErrorAction.REPORT);
-        decoder.onUnmappableCharacter(CodingErrorAction.REPORT);
-        return decoder;
+        // CharsetDecoder is reporting by default.
+        return Charset.forName(charsetName).newDecoder();
+    }
+    
+    private static CharsetEncoder makeReportingCharsetEncoder(String charsetName) {
+        // CharsetEncoder is reporting by default.
+        return Charset.forName(charsetName).newEncoder();
     }
     
     private static char[] extractCharArray(CharBuffer charBuffer) {
@@ -277,11 +280,46 @@ public class PTextBuffer implements CharSequence {
      * whatever's already there.
      */
     public void writeToFile(File file) {
-        Writer writer = null;
+        FileOutputStream openFile = null;
+        try {
+            openFile = new FileOutputStream(file);
+            String charsetName = (String) getProperty(CHARSET_PROPERTY);
+            // The CharsetEncoder created here will silently replace characters which cannot
+            // be encoded with question marks.
+            // This will currently happen if, for example, you have a file "recognized" as ISO-8859-1
+            // into which you paste a UTF-8 character which isn't Latin1.
+            writeToStream(new OutputStreamWriter(openFile, charsetName));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            FileUtilities.close(openFile);
+        }
+    }
+    
+    /**
+     * Switch charset encoding if the encoding works.
+     */
+    public void attemptEncoding(String charsetName) {
+        try {
+            CharsetEncoder charsetEncoder = makeReportingCharsetEncoder(charsetName);
+            writeToStream(new OutputStreamWriter(new NullOutputStream(), charsetEncoder));
+            putProperty(CHARSET_PROPERTY, charsetName);
+        } catch (Exception ex) {
+            // FIXME: Present encoding errors to the user in a more palatable fashion.
+            // Currently, this just says:
+            // java.lang.RuntimeException: java.nio.charset.UnmappableCharacterException: Input length = 1
+            // UnmappableCharacterException doesn't appear to have stashed any other, more interesting information.
+            // One idea would be to maintain a set of unique characters used in a buffer,
+            // to discover which of those characters cannot be encoded in the desired encoding
+            // and to highlight them, perhaps as Find matches.
+            Log.warn("Failed to encode buffer in charset " + charsetName, ex);
+        }
+    }
+    
+    private void writeToStream(OutputStreamWriter outputStreamWriter) {
         getLock().getReadLock();
         try {
-            String charsetName = (String) getProperty(CHARSET_PROPERTY);
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charsetName));
+            Writer writer = new BufferedWriter(outputStreamWriter);
             
             String lineEnding = (String) getProperty(LINE_ENDING_PROPERTY);
             if (lineEnding.equals("\n")) {
@@ -308,7 +346,6 @@ public class PTextBuffer implements CharSequence {
             throw new RuntimeException(ex);
         } finally {
             getLock().relinquishReadLock();
-            FileUtilities.close(writer);
         }
     }
     
