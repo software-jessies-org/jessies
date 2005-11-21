@@ -7,8 +7,10 @@ import java.text.*;
 import java.util.*;
 
 /**
- * Logs terminal output to a file in ~/.terminal-logs. If that directory
- * doesn't exist, logs to /dev/null.
+ * Logs terminal output to a file in ~/.terminal-logs. Logging can be
+ * temporarily suspended. If the terminal logs directory does not exist
+ * or we can't open the log file for some other reason, logging is
+ * automatically suspended, and can't be un-suspended.
  */
 public class LogWriter {
 	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HHmmssZ");
