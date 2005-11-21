@@ -19,6 +19,9 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(null, new String[] { "ruby", ri, "-T", "-f", "html", string }, lines, errors);
         String result = StringUtilities.join(lines, "\n");
+        // Rewrite IO#puts as a link to ri:IO#puts and Zlib::GzipWriter#puts similarly.
+        // An interesting case is the link to IO#printf in the IO#puts page, which is embedded in TT tags.
+        result = result.replaceAll("(([A-Za-z0-9_?]+)((#|::)[A-Za-z0-9_?]+)+)(, )?", "<a href=\"ri:$1\">$1</a><br>");
         return (result.contains("<error>") ? "" : result);
     }
     

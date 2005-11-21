@@ -98,9 +98,11 @@ public class Advisor extends JPanel {
         return string.trim();
     }
     
-    public void doResearch() {
-        String text = getLookupString();
-        
+    private void doResearch() {
+        research(getLookupString());
+    }
+    
+    public void research(String text) {
         // If there's nothing to look at, don't wake the researchers.
         if (text.length() == 0) {
             return;
