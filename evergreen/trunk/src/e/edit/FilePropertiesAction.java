@@ -41,8 +41,6 @@ public class FilePropertiesAction extends ETextAction {
         indentStringField.setText(initialIndentationString);
         
         charsetStringField.setText((String) buffer.getProperty(PTextBuffer.CHARSET_PROPERTY));
-        charsetStringField.setEditable(false);
-        charsetStringField.setEnabled(false);
         
         SortedMap<String, Charset> charsets = Charset.availableCharsets();
         for (String charset : charsets.keySet()) {
@@ -64,5 +62,7 @@ public class FilePropertiesAction extends ETextAction {
         buffer.putProperty(PTextBuffer.LINE_ENDING_PROPERTY, newEndOfLine);
         String newIndentationString = StringUtilities.unescapeJava(indentStringField.getText());
         buffer.putProperty(PTextBuffer.INDENTATION_PROPERTY, newIndentationString);
+        String newCharsetName = charsetStringField.getText();
+        buffer.attemptEncoding(newCharsetName);
     }
 }
