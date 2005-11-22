@@ -17,8 +17,8 @@ if ! test -w . ; then
 fi
 
 # Install Java in /usr/local, and put links to java and javac in /usr/local/bin.
-java_installer=/net/mirror/mirror-link/java/jdk-1_5_0_03-linux-i586.bin
-java_home=/usr/local/jdk1.5.0_03
+java_installer=/net/mirror/mirror-link/java/jdk-1_5_0_05-linux-i586.bin
+java_home=/usr/local/jdk1.5.0_05
 if sudo -u devadmin test -f $java_installer && ! test -d $java_home ; then
     sudo -u devadmin cp $java_installer /tmp/jdk &&
     /tmp/jdk ||
