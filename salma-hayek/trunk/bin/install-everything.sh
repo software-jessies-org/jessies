@@ -1,4 +1,5 @@
 #!/bin/bash
+# FIXME: rewrite this in Ruby!
 
 die() {
     echo $*
@@ -17,6 +18,7 @@ if ! test -w . ; then
 fi
 
 # Choose the latest Java in /usr/local. If there isn't one, run the latest installer.
+# FIXME: we should check whether the latest installer offers a newer Java than the current installation.
 java_installer=`ls -1 /net/mirror/mirror-link/java/jdk-1_5_0_*-linux-i586.bin | tail -1`
 java_home=`ls -1 /usr/local/jdk1.5.0* | tail -1`
 if sudo -u devadmin test -f $java_installer && ! test -d $java_home ; then
@@ -24,7 +26,8 @@ if sudo -u devadmin test -f $java_installer && ! test -d $java_home ; then
     /tmp/jdk ||
     die "installing Java"
 fi
-# Put links to java and javac in /usr/local/bin because it's easier to insist that that's on the user's $PATH than some random JDK directory. Can we do this better with update-alternatives(1)?
+# Put links to java and javac in /usr/local/bin because it's easier to insist that that's on the user's $PATH than some random JDK directory.
+# FIXME: Can we do this better with update-alternatives(1)?
 if test -d $java_home ; then
     link_in_usr_local_bin $java_home/bin/java
     link_in_usr_local_bin $java_home/bin/javac
