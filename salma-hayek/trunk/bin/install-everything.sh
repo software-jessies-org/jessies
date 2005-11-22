@@ -16,14 +16,15 @@ if ! test -w . ; then
   die "cannot write to /usr/local - this script needs to be run as root"
 fi
 
-# Install Java in /usr/local, and put links to java and javac in /usr/local/bin.
-java_installer=/net/mirror/mirror-link/java/jdk-1_5_0_05-linux-i586.bin
-java_home=/usr/local/jdk1.5.0_05
+# Choose the latest Java in /usr/local. If there isn't one, run the latest installer.
+java_installer=`ls -1 /net/mirror/mirror-link/java/jdk-1_5_0_*-linux-i586.bin | tail -1`
+java_home=`ls -1 /usr/local/jdk1.5.0* | tail -1`
 if sudo -u devadmin test -f $java_installer && ! test -d $java_home ; then
     sudo -u devadmin cp $java_installer /tmp/jdk &&
     /tmp/jdk ||
     die "installing Java"
 fi
+# Put links to java and javac in /usr/local/bin because it's easier to insist that that's on the user's $PATH than some random JDK directory. Can we do this better with update-alternatives(1)?
 if test -d $java_home ; then
     link_in_usr_local_bin $java_home/bin/java
     link_in_usr_local_bin $java_home/bin/javac
@@ -34,6 +35,7 @@ if test -d $java_home ; then
     done
 fi
 
+# Install various other packages we need.
 if test -f /etc/debian_version ; then
     if [[ ! -x /usr/bin/ctags-exuberant || ! -x /usr/bin/ri || ! -x /usr/bin/svn ]]
     then
