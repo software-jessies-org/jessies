@@ -276,6 +276,14 @@ public class JavaDoc {
                  * after all.
                  */
                 ex = ex;
+            } catch (NoClassDefFoundError ex) {
+                /*
+                 * Ignore: occurs when the text next to the caret is a real class
+                 * name followed by a dot, but the text is in the wrong case. E.g.:
+                 * positioning the caret just beyond " javadoc. " will cause
+                 * java.lang.NoClassDefFoundError: e/edit/javadoc (wrong name: e/edit/JavaDoc)
+                 */
+                ex = ex;
             }
         }
         return classes.toArray(new Class[classes.size()]);
