@@ -5,11 +5,11 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
 
-public class EHtmlPane extends JComponent implements HyperlinkListener {
+public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     private JTextPane textPane;
     private JLabel label;
     
-    public EHtmlPane() {
+    public AdvisorHtmlPane() {
         createTextPane();
         JScrollPane scrollPane = new JScrollPane(textPane);
         //scrollPane.setBorder(javax.swing.border.LineBorder.createBlackLineBorder());

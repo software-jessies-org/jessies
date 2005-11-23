@@ -16,7 +16,7 @@ public class Advisor extends JPanel {
     private ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
     
     /** The advice window. */
-    private EHtmlPane advicePane = new EHtmlPane();
+    private AdvisorHtmlPane advicePane = new AdvisorHtmlPane();
     
     /** Counts down until the next research event. */
     private Timer timer;
