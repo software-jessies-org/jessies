@@ -95,7 +95,7 @@ public class FindFilesDialog {
             // node could lead to unwanted clipping. The caching is done by
             // subclasses of javax.swing.tree.AbstractLayoutCache, and there
             // are methods called invalidatePathBounds and invalidateSizes, but
-            // neither is easily accesible. We can access the first only via
+            // neither is easily accessible. We can access the first only via
             // the support for editable nodes. The latter we can access via
             // various setters. This relies on the fact that the setter
             // setRootVisible doesn't optimize out the case where the new state
@@ -104,8 +104,13 @@ public class FindFilesDialog {
             // around a visual glitch in the absence of an approved means of
             // invalidating the JTree UI delegate's layout cache. Having the
             // source is one of the things that makes Java great!
-            matchView.setRootVisible(false);
-            matchView.repaint();
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    matchView.setRootVisible(true);
+                    matchView.setRootVisible(false);
+                    matchView.repaint();
+                }
+            });
         }
         
         public boolean containsDefinition() {
