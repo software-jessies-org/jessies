@@ -21,7 +21,7 @@ fi
 # FIXME: we should check whether the latest installer offers a newer Java than the current installation.
 java_installer=`ls -1 /net/mirror/mirror-link/java/jdk-1_5_0_*-linux-i586.bin | tail -1`
 java_home=`ls -d -1 /usr/local/jdk1.5.0* | tail -1`
-if sudo -u devadmin test -f $java_installer && ! test -d $java_home ; then
+if sudo -u devadmin test -f "$java_installer" && ! test -d "$java_home"; then
     sudo -u devadmin cp $java_installer /tmp/jdk &&
     /tmp/jdk ||
     die "installing Java"
@@ -30,7 +30,7 @@ fi
 java_home=`ls -d -1 /usr/local/jdk1.5.0* | tail -1`
 # Put links to java and javac in /usr/local/bin because it's easier to insist that that's on the user's $PATH than some random JDK directory.
 # FIXME: Can we do this better with update-alternatives(1)?
-if test -d $java_home ; then
+if test -d "$java_home" ; then
     link_in_usr_local_bin $java_home/bin/java
     link_in_usr_local_bin $java_home/bin/javac
     for BROWSER in mozilla mozilla-firefox; do
