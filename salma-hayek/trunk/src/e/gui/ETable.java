@@ -13,6 +13,10 @@ import e.util.*;
  */
 public class ETable extends JTable {
     public ETable() {
+        if (GuiUtilities.isMacOs()) {
+            // Work-around for Apple 4352937.
+            JLabel.class.cast(getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.LEADING);
+        }
     }
 
     /**
@@ -74,6 +78,23 @@ public class ETable extends JTable {
             c.setBackground(UIManager.getColor("Table.selectionBackground"));
             c.setForeground(UIManager.getColor("Table.selectionForeground"));
         }
+        
+        if (c instanceof JComponent) {
+            initToolTip(JComponent.class.cast(c), row, column);
+        }
+        
         return c;
+    }
+    
+    /**
+     * Sets the component's tool tip if the component is being rendered smaller than its preferred size.
+     * This means that all users automatically get tool tips on truncated text fields that show them the full value.
+     */
+    private void initToolTip(JComponent c, int row, int column) {
+        String toolTipText = null;
+        if (c.getPreferredSize().width > getCellRect(row, column, false).width) {
+            toolTipText = getValueAt(row, column).toString();
+        }
+        c.setToolTipText(toolTipText);
     }
 }
