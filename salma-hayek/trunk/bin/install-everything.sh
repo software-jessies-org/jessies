@@ -20,7 +20,7 @@ fi
 # Choose the latest Java in /usr/local. If there isn't one, run the latest installer.
 # FIXME: we should check whether the latest installer offers a newer Java than the current installation.
 java_installer=`ls -1 /net/mirror/mirror-link/java/jdk-1_5_0_*-linux-i586.bin | tail -1`
-java_home=`ls -1 /usr/local/jdk1.5.0* | tail -1`
+java_home=`ls -d -1 /usr/local/jdk1.5.0* | tail -1`
 if sudo -u devadmin test -f $java_installer && ! test -d $java_home ; then
     sudo -u devadmin cp $java_installer /tmp/jdk &&
     /tmp/jdk ||
