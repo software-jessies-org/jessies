@@ -19,12 +19,19 @@ fi
 
 # Choose the latest Java in /usr/local. If there isn't one, run the latest installer.
 # FIXME: we should check whether the latest installer offers a newer Java than the current installation.
+# At the moment we'll continue to use an obsolete version.
 java_installer=`ls -1 /net/mirror/mirror-link/java/jdk-1_5_0_*-linux-i586.bin | tail -1`
 java_home=`ls -d -1 /usr/local/jdk1.5.0* | tail -1`
 if sudo -u devadmin test -f "$java_installer" && ! test -d "$java_home"; then
-    sudo -u devadmin cp $java_installer /tmp/jdk &&
-    /tmp/jdk ||
-    die "installing Java"
+    if tty --silent; then
+        sudo -u devadmin cp $java_installer /tmp/jdk &&
+        /tmp/jdk ||
+        die "installing Java"
+    else
+        echo You should sudo install-everything.sh from a terminal to install the JDK
+        # It's still worth continuing because we'll download a new version of this script, for one thing,
+        # which may have improvements.
+    fi
 fi
 # Use the JDK we just installed rather than the previous one.
 java_home=`ls -d -1 /usr/local/jdk1.5.0* | tail -1`
