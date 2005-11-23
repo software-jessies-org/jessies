@@ -26,6 +26,7 @@ if sudo -u devadmin test -f $java_installer && ! test -d $java_home ; then
     /tmp/jdk ||
     die "installing Java"
 fi
+java_home=`ls -d -1 /usr/local/jdk1.5.0* | tail -1`
 # Put links to java and javac in /usr/local/bin because it's easier to insist that that's on the user's $PATH than some random JDK directory.
 # FIXME: Can we do this better with update-alternatives(1)?
 if test -d $java_home ; then
