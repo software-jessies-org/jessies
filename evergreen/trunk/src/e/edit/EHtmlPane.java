@@ -25,7 +25,7 @@ public class EHtmlPane extends JComponent implements HyperlinkListener {
         HTMLEditorKit editorKit = (HTMLEditorKit) textPane.getEditorKit();
         StyleSheet styleSheet = editorKit.getStyleSheet();
         styleSheet.removeStyle("body");
-        styleSheet.addRule("body { font-family: Arial, Helvetica, sans-serif }");
+        styleSheet.addRule("body { font-family: \"Lucida Grande\", Arial, Helvetica, sans-serif }");
     }
     
     public void setText(String text) {
