@@ -161,4 +161,15 @@ public class Advisor extends JPanel {
             timer.restart();
         }
     };
+    
+    public void linkClicked(String link) {
+        // Offer the link to each researcher.
+        for (WorkspaceResearcher researcher : researchers) {
+            if (researcher.handleLink(link)) {
+                return;
+            }
+        }
+        // Hand it on to Edit to work out what to do with it.
+        Edit.getInstance().openFile(link);
+    }
 }

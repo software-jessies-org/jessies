@@ -17,4 +17,12 @@ public interface WorkspaceResearcher {
     * a Ruby program.
     */
     public boolean isSuitable(ETextWindow textWindow);
+    
+    /**
+     * Some researchers need to invent their own URI schemes such as "man:" or
+     * "ri:"; this method is invoked when such a link is clicked on to see if
+     * this researcher knows how to handle such links. Return true if you've
+     * handled the link, and it won't be passed to further researchers.
+     */
+    public boolean handleLink(String link);
 }

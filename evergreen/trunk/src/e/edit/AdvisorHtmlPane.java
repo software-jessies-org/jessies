@@ -44,27 +44,8 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             if (e instanceof HTMLFrameHyperlinkEvent) {
                 ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
             } else {
-                linkClicked(e.getDescription());
+                Edit.getInstance().getAdvisor().linkClicked(e.getDescription());
             }
         }
-    }
-    
-    public void linkClicked(String url) {
-        // TODO: should this code be in Edit.openFile?
-        if (url.startsWith("man:")) {
-            String page = url.substring(4);
-            try {
-                new ShellCommand("man -a " + page + " | col -b").runCommand();
-            } catch (Throwable th) {
-                Edit.getInstance().showAlert("Man Page", "Can't run man(1) (" + th.getMessage() + ").");
-            }
-            return;
-        } else if (url.startsWith("ri:")) {
-            Edit.getInstance().getAdvisor().research(url.substring(3));
-            return;
-        }
-        
-        // Hand it on to Edit to work out what to do with it.
-        Edit.getInstance().openFile(url);
     }
 }
