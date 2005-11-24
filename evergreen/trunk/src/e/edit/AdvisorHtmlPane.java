@@ -7,18 +7,15 @@ import javax.swing.text.html.*;
 
 public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     private JTextPane textPane;
-    private JLabel label;
     
     public AdvisorHtmlPane() {
-        createTextPane();
-        JScrollPane scrollPane = new JScrollPane(textPane);
-        //scrollPane.setBorder(javax.swing.border.LineBorder.createBlackLineBorder());
+        initTextPane();
         setLayout(new BorderLayout());
-        add(scrollPane, BorderLayout.CENTER);
+        add(new JScrollPane(textPane), BorderLayout.CENTER);
     }
     
-    public void createTextPane() {
-        textPane = new JTextPane();
+    private void initTextPane() {
+        this.textPane = new JTextPane();
         textPane.setEditable(false);
         textPane.setContentType("text/html");
         textPane.addHyperlinkListener(this);
@@ -31,7 +28,6 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     public void setText(String text) {
         textPane.setText(text);
         textPane.setCaretPosition(0);
-        label = new JLabel(text);
     }
     
     public void hyperlinkUpdate(HyperlinkEvent e) {
