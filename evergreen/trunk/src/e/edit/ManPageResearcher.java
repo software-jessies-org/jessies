@@ -56,4 +56,18 @@ public class ManPageResearcher implements WorkspaceResearcher {
     public boolean isSuitable(ETextWindow textWindow) {
         return textWindow.isCPlusPlus();
     }
+    
+    /** Handles our non-standard "man:" scheme. */
+    public boolean handleLink(String link) {
+        if (link.startsWith("man:")) {
+            String page = link.substring(4);
+            try {
+                new ShellCommand("man -a " + page + " | col -b").runCommand();
+            } catch (Throwable th) {
+                Edit.getInstance().showAlert("Man Page", "Can't run man(1) (" + th.getMessage() + ").");
+            }
+            return true;
+        }
+        return false;
+    }
 }

@@ -22,4 +22,9 @@ public class NumberResearcher implements WorkspaceResearcher {
     public boolean isSuitable(ETextWindow textWindow) {
         return true;
     }
+    
+    /** We don't implement any non-standard URI schemes. */
+    public boolean handleLink(String link) {
+        return false;
+    }
 }

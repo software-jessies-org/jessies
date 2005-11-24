@@ -438,4 +438,9 @@ public class JavaResearcher implements WorkspaceResearcher {
             return makeResult(string);
         }
     }
+    
+    /** We don't implement any non-standard URI schemes. */
+    public boolean handleLink(String link) {
+        return false;
+    }
 }
