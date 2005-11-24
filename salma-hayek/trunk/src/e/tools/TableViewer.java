@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 import javax.swing.table.*;
+import e.gui.*;
 import e.util.*;
 
 /**
@@ -25,7 +26,7 @@ public class TableViewer extends JFrame {
     }
     
     public void initTable(String filename) throws IOException {
-        table = new JTable();
+        table = new ETable();
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         InputStream inputStream = System.in;
