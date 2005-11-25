@@ -1,6 +1,6 @@
 #import <AppKit/AppKit.h>
-#include <iostream>
-#include <string>
+#import <iostream>
+#import <string>
 #import "ScopedAutoReleasePool.h"
 
 /**
