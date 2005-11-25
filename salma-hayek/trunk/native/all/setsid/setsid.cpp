@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
- 
+
 static void ensureCallerIsProcessGroupLeader() {
   if (getpid() == getpgrp()) {
     return;
@@ -14,7 +14,7 @@ static void ensureCallerIsProcessGroupLeader() {
     exit(EXIT_FAILURE);
   }
 }
- 
+
 int main(int, char* argv[]) {
   if (*++argv == 0) {
     std::cerr << "usage: setsid PROGRAM [ARGUMENTS...]" << std::endl;
