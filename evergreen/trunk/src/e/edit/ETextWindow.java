@@ -390,7 +390,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             text.setTextStyler(new PRubyTextStyler(text));
         } else if (fileType == C_PLUS_PLUS) {
             text.setIndenter(new PCppIndenter(text));
-            text.setTextStyler(new PCPPTextStyler(text));
+            text.setTextStyler(new PCPPTextStyler(text, filename.matches(".*\\.(m|mm)$")));
         } else if (fileType == PERL) {
             text.setIndenter(new PPerlIndenter(text));
             text.setTextStyler(new PPerlTextStyler(text));
