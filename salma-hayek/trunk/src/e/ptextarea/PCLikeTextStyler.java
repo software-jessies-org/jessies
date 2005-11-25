@@ -5,14 +5,14 @@ import java.util.regex.*;
 import e.util.*;
 
 /**
- * A PCLikeTextStyler does the main work for the C, C++ and Java stylers.  The C, C++ and
- * Java subclasses provide only information about valid keywords.  This class understands the
- * single- and multi-line comment structures, quoted strings, and how to find keywords in what's
- * left over.
+ * A PCLikeTextStyler does the main work for the C, C++ and Java stylers.  The
+ * various subclasses (supporting languages such as C++ and Java) configure
+ * functionality implemented here.  This class understands the single- and
+ * multi-line comment structures, quoted strings, and how to find keywords in
+ * what's left over.
  * 
  * @author Phil Norman
  */
-
 public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PTextListener {
     private HashSet<String> keywords = new HashSet<String>();
     private int lastGoodLine;
@@ -21,7 +21,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     public PCLikeTextStyler(PTextArea textArea) {
         super(textArea);
         initCommentCache();
-        initStyleApplicators();
+        initStyleApplicator();
         textArea.getTextBuffer().addTextListener(this);
         textArea.setTextStyler(this);
     }
@@ -45,11 +45,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         builder.addStyledSegment(end, PStyle.STRING);
     }
     
-    /**
-     * Override this to add your own style applicators, but don't forget to
-     * invoke this method too.
-     */
-    protected void initStyleApplicators() {
+    private void initStyleApplicator() {
         addKeywordsTo(keywords);
         if (keywords.size() > 0) {
             textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords));

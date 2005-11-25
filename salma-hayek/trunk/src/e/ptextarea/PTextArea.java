@@ -158,6 +158,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         styleApplicators.add(styleApplicator);
     }
     
+    public void addStyleApplicatorFirst(StyleApplicator styleApplicator) {
+        styleApplicators.add(0, styleApplicator);
+    }
+    
     // Selection methods.
     public String getSelectedText() {
         getLock().getReadLock();

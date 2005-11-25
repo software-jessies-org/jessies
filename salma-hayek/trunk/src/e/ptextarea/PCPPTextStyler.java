@@ -87,15 +87,11 @@ public class PCPPTextStyler extends PCLikeTextStyler {
         "xor_eq",
     };
     
-    public PCPPTextStyler(PTextArea textArea) {
+    public PCPPTextStyler(PTextArea textArea, boolean isObjective) {
         super(textArea);
-    }
-    
-    protected void initStyleApplicators() {
         // "#else" is PREPROCESSOR, but "else" is KEYWORD, so we need to look
         // for preprocessor directives first.
-        textArea.addStyleApplicator(new PreprocessorStyleApplicator(textArea, false));
-        super.initStyleApplicators();
+        textArea.addStyleApplicatorFirst(new PreprocessorStyleApplicator(textArea, isObjective));
     }
     
     public boolean supportShellComments() {

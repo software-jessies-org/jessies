@@ -41,7 +41,7 @@ public class PTextAreaDemo {
         if (name.indexOf('.') != -1) {
             String extension = name.substring(name.lastIndexOf('.') + 1);
             if (extension.equals("cpp") || extension.equals("h")) {
-                return new PCPPTextStyler(textArea);
+                return new PCPPTextStyler(textArea, false);
             } else if (extension.equals("c")) {
                 return new PCTextStyler(textArea);
             } else if (extension.equals("java")) {
