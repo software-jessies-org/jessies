@@ -9,10 +9,10 @@ import e.gui.*;
 import e.util.*;
 
 public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider {
-    private PTextArea component;
-    
     private static final String HIGHLIGHTER_NAME = "PTextAreaSpellingChecker";
     public static final String SPELLING_EXCEPTIONS_PROPERTY = "org.jessies.e.ptextarea.SpellingExceptionsHashSetProperty";
+    
+    private PTextArea component;
     
     public PTextAreaSpellingChecker(PTextArea component) {
         this.component = component;
@@ -262,6 +262,13 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             }
             
             String word = buffer.subSequence(start, finish).toString();
+            
+            // Ignore all-capital words less than 7 characters, on the assumption that they're acronyms.
+            // I'm not sure 7 characters isn't too many, but that's what Mac OS' native spelling checker uses.
+            if (wordLength < 7 && word.equals(word.toUpperCase())) {
+                start = finish;
+                continue;
+            }
             
             // Ignore 's as a suffix. Should this be done by SpellingChecker instead?
             if (word.endsWith("'s")) {

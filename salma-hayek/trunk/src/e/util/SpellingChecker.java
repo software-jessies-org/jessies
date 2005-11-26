@@ -8,20 +8,18 @@ import java.util.regex.*;
  * Uses ispell(1) to check spelling.
  */
 public class SpellingChecker {
-    private Process ispell;
-    private PrintWriter out;
-    private BufferedReader in;
+    private static final SpellingChecker instance = new SpellingChecker();
+    private static final boolean DEBUGGING = false;
     
     private static HashSet<String> knownGood = new HashSet<String>();
     private static HashSet<String> knownBad = new HashSet<String>();
     
-    private static SpellingChecker instance;
+    private Process ispell;
+    private PrintWriter out;
+    private BufferedReader in;
     
     /** Returns the single instance of SpellingChecker. */
     public static synchronized SpellingChecker getSharedSpellingCheckerInstance() {
-        if (instance == null) {
-            instance = new SpellingChecker();
-        }
         return instance;
     }
     
@@ -85,6 +83,7 @@ public class SpellingChecker {
      */
     public synchronized boolean isMisspelledWord(String word) {
         if (ispell == null) {
+            debug("ispell == null");
             return false;
         }
         
@@ -154,7 +153,7 @@ public class SpellingChecker {
     private boolean isMisspelledWordAccordingToIspell(String word, Collection<String> returnSuggestions) {
         // Send the word to ispell for checking.
         String request = "^" + word;
-        //System.err.println(request);
+        debug(request);
         out.println(request);
         out.flush();
         
@@ -166,6 +165,7 @@ public class SpellingChecker {
             
             // A blank line means "correctly spelled".
             if (response.length() == 0) {
+                debug("'" + word + "' response length == 0");
                 return false;
             }
             
@@ -174,7 +174,7 @@ public class SpellingChecker {
             // #: no suggestions
             boolean misspelled = true;
             while (response.length() > 0 && "&?#+-".indexOf(response.charAt(0)) != -1) {
-                //System.err.println(" " + response);
+                debug(" " + response);
                 
                 if (response.charAt(0) == '&' && isCorrectIgnoringCase(word, response)) {
                     misspelled = false;
@@ -188,7 +188,7 @@ public class SpellingChecker {
             }
             
             if (response.length() != 0) {
-                System.err.println("ispell: garbled response: '" + response + "'");
+                Log.warn("ispell: garbled response: '" + response + "'");
             }
             
             return misspelled;
@@ -249,6 +249,12 @@ public class SpellingChecker {
         String[] suggestions = extractSuggestions(response);
         for (String suggestion : suggestions) {
             returnSuggestions.add(suggestion);
+        }
+    }
+    
+    private void debug(String message) {
+        if (DEBUGGING) {
+            Log.warn("SpellingChecker: " + message);
         }
     }
 }

@@ -6,24 +6,29 @@
 /**
  * Allows NSString to be output like std::string or a const char*.
  */
-std::ostream& operator<<(std::ostream& os, NSString* rhs) {
+static std::ostream& operator<<(std::ostream& os, NSString* rhs) {
     os << [rhs UTF8String];
     return os;
 }
 
-@interface Ispell : NSObject
-+ (void) ispellRunLoop:(id) unusedParameter;
-@end
+/**
+ * Tests whether 'word' is correctly spelled.
+ */
+static bool isCorrect(NSString* word) {
+    ScopedAutoReleasePool pool;
+    NSRange range = [[NSSpellChecker sharedSpellChecker] checkSpellingOfString:word startingAt:0];
+    // We only check the NSRange's length field because the location field appears to be set to an uninitialized value for incorrectly-spelled words.
+    return (range.length == 0);
+}
 
-@implementation Ispell
-
-NSSpellChecker* checker;
-
-+ (void) showSuggestionsForWord:(NSString*) word {
+/**
+ * Outputs suggested corrections for the misspelled word 'word' in ispell(1) format.
+ */
+static void showSuggestionsForWord(NSString* word) {
     ScopedAutoReleasePool pool;
     std::ostream& os = std::cout;
     
-    NSArray* guesses = [checker guessesForWord:word];
+    NSArray* guesses = [[NSSpellChecker sharedSpellChecker] guessesForWord:word];
     if ([guesses count] == 0) {
         os << "# " << word << " 0" << std::endl;
         return;
@@ -40,19 +45,9 @@ NSSpellChecker* checker;
     os << std::endl;
 }
 
-+ (bool) isCorrect:(NSString*) word {
-    ScopedAutoReleasePool pool;
-    NSRange range = [checker checkSpellingOfString:word startingAt:0];
-    bool isCorrect = (range.length == 0);
-    return isCorrect;
-}
-
-+ (void) ispellRunLoop:(id) unusedParameter {
-    (void) unusedParameter;
-    
+static void ispellLoop() {
     // Each thread needs its own pool, and we don't get one for free.
     ScopedAutoReleasePool pool;
-    checker = [NSSpellChecker sharedSpellChecker];
     
     std::ostream& os(std::cout);
     os << "@(#) International Ispell 3.1.20 (but really NSSpellChecker)" << std::endl;
@@ -68,8 +63,8 @@ NSSpellChecker* checker;
         } else if (line[0] == '^') {
             std::string word(line.substr(1));
             NSString* string = [NSString stringWithUTF8String:word.c_str()];
-            if ([Ispell isCorrect:string] == false) {
-                [Ispell showSuggestionsForWord:string];
+            if (isCorrect(string) == false) {
+                showSuggestionsForWord(string);
             }
             os << std::endl;
         } else if (line[0] == '*') {
@@ -81,6 +76,15 @@ NSSpellChecker* checker;
     }
 }
 
+@interface Ispell : NSObject
+- (void) ispellRunLoop:(id) unusedParameter;
+@end
+
+@implementation Ispell
+- (void) ispellRunLoop:(id) unusedParameter {
+    (void) unusedParameter;
+    ispellLoop();
+}
 @end
 
 int main(int /*argc*/, char* /*argv*/[]) {
@@ -89,9 +93,10 @@ int main(int /*argc*/, char* /*argv*/[]) {
     // Pretend to be ispell in a new thread, so we can enter the normal event
     // loop and prevent Spin Control from mistakenly diagnosing us as a hung
     // GUI application.
-    [NSThread detachNewThreadSelector:@selector(ispellRunLoop:)
-                             toTarget:[Ispell class]
-                           withObject:nil];
+    // It seems to be important that we invoke an instance method rather than
+    // a class method.
+    Ispell* ispell = [[Ispell alloc] init];
+    [NSThread detachNewThreadSelector:@selector(ispellRunLoop:) toTarget:ispell withObject:nil];
     
     [[NSApplication sharedApplication] run];
 }
