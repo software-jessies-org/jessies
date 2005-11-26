@@ -213,7 +213,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      * Tests whether the 'content' looks like a Unix shell script. If
      * 'interpreter' is a shell, you should probably prepend "/" to avoid
      * false positives; if 'interpreter' is a scripting language, you should
-     * probably avoid doing so because it's still relatively common practise
+     * probably avoid doing so because it's still relatively common practice
      * to use the env(1) hack. We could perhaps automate this by matching
      * either ("/" + interpreter) or ("/env\\s[^\\n]*" + interpreter).
      */
@@ -756,7 +756,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         
         try {
             edit.showStatus("Saving " + filename + "...");
-            // The file may be a symlink on a cifs server.
+            // The file may be a symbolic link on a CIFS server.
             // In this case, it's important that we write into the original file rather than creating a new one.
             writeToFile(file);
             text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
