@@ -25,7 +25,7 @@ NSSpellChecker* checker;
     
     NSArray* guesses = [checker guessesForWord:word];
     if ([guesses count] == 0) {
-        os << "# " << word << " 0\n";
+        os << "# " << word << " 0" << std::endl;
         return;
     }
     
@@ -37,7 +37,7 @@ NSSpellChecker* checker;
         NSString* guess = [guesses objectAtIndex:i];
         os << guess;
     }
-    os << "\n";
+    os << std::endl;
 }
 
 + (bool) isCorrect:(NSString*) word {
@@ -55,7 +55,7 @@ NSSpellChecker* checker;
     checker = [NSSpellChecker sharedSpellChecker];
     
     std::ostream& os(std::cout);
-    os << "@(#) International Ispell 3.1.20 (but really NSSpellChecker)\n";
+    os << "@(#) International Ispell 3.1.20 (but really NSSpellChecker)" << std::endl;
     while (true) {
         ScopedAutoReleasePool pool;
         std::string line;
