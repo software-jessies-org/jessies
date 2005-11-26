@@ -77,7 +77,7 @@ public class Workspace extends JPanel {
             ArrayList<String> result = new ArrayList<String>();
             
             // If a workspace is under the user's home directory, we're happy to scan it.
-            File userHome = FileUtilities.fileFromString(System.getProperty("user.dir"));
+            File userHome = FileUtilities.fileFromString(System.getProperty("user.home"));
             File workspaceRoot = FileUtilities.fileFromString(getRootDirectory());
             boolean isUnderUserHome;
             try {
