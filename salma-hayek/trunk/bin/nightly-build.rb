@@ -14,10 +14,7 @@ svn_projects.uniq!()
 # ----------------------------------------------------------------------------
 # Of the jessies.org projects, salma-hayek must come first. Performance anxiety.
 # ----------------------------------------------------------------------------
-salma_hayek = svn_projects.find() {
-  |item|
-  item.include?("/salma-hayek/")
-}
+salma_hayek = svn_projects.find() { |item| item.include?("/salma-hayek/") }
 svn_projects.delete(salma_hayek)
 svn_projects.insert(0, salma_hayek)
 
