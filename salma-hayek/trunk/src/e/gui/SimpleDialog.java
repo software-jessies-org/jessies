@@ -9,20 +9,40 @@ import javax.swing.*;
 
 public class SimpleDialog {
     /**
+     * CSS for Mac OS to get Mac-like dialog text.
+     */
+    private static final String MAC_CSS = "<head><style type=\"text/css\">b { font: 13pt \"Lucida Grande\" } p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style></head>";
+    
+    /**
      * How many characters to aim for when breaking a message
      * into reasonable-length lines for a dialog.
      */
     private static final int MAX_LINE_LENGTH = 72;
     
+    /**
+     * Adds line breaks to a text/plain or text/html string.
+     * 
+     * Existing newline characters or HTML tags are taken as explicit breaks.
+     * 
+     * On Mac OS, the "P" and "B" tags' appearance is modified via CSS to resemble the Mac UI guidelines for dialog text.
+     * See http://www.randelshofer.ch/quaqua/guide/joptionpane.html for the inspiration.
+     */
     public static String breakLongMessageLines(String message) {
         if (message.length() < MAX_LINE_LENGTH) {
             return message;
         }
         
+        boolean html = message.startsWith("<html>");
+        if (html) {
+            message = message.substring(6);
+        }
+        
         StringBuilder brokenMessage = new StringBuilder(message);
         int chunkLength = 0;
         for (int i = 0; i < brokenMessage.length(); ++i) {
-            if (brokenMessage.charAt(i) == '\n') {
+            if (brokenMessage.charAt(i) == '\n' || (html && brokenMessage.charAt(i) == '<')) {
+                // An explicit newline is taken as a manual split.
+                // Similarly, an HTML tag is assumed to be "<p>" or "<br>".
                 chunkLength = 0;
             } else {
                 chunkLength++;
@@ -33,7 +53,11 @@ public class SimpleDialog {
         }
         
         String result = brokenMessage.toString();
-        if (message.startsWith("<html>")) {
+        if (html) {
+            // On Mac OS, make CSS available to make Mac-like formatting easier.
+            if (GuiUtilities.isMacOs()) {
+                result ="<html>" + MAC_CSS + result;
+            }
             // If we pass an HTML message to JOptionPane, it must not contain
             // newlines. If it does, only the first line is treated as HTML.
             // (Tested on Mac OS' Java 5.)
@@ -42,6 +66,9 @@ public class SimpleDialog {
         return result;
     }
     
+    /**
+     * Wraps JOptionPane.showMessageDialog using breakLongMessageLines to improve readability.
+     */
     public static void showAlert(Frame frame, String title, String message) {
         JOptionPane.showMessageDialog(frame, breakLongMessageLines(message), title, JOptionPane.WARNING_MESSAGE);
     }
