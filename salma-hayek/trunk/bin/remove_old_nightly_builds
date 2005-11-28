@@ -1,4 +1,4 @@
 #!/bin/bash
 # I'm deliberately not using xargs --no-run-if-empty so we get an error mail if there's nothing to remove.
 # That would indicate that there's something wrong - like all the builds have moved and the script hasn't been updated.
-find ~/downloads/ -ctime +2 -type f | perl -ne 'm/-\d\d\d\d-\d\d-\d\d\.t(ar\.)?gz/ && print' | xargs rm -f
+find ~/downloads/ -ctime +2 -type f | perl -ne 'm/-\d\d\d\d-\d\d-\d\d\.t(ar\.)?gz/ && print' | xargs rm
