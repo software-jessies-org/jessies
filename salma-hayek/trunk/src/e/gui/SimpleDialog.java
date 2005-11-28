@@ -101,15 +101,15 @@ public class SimpleDialog {
         return showDetails(frame, title, StringUtilities.stackTraceFromThrowable(throwable));
     }
     
-    public static boolean askQuestion(Frame frame, String title, String message, String continueText) {
+    public static boolean askQuestion(Component owner, String title, String message, String continueText) {
         Object[] options = { continueText, "Cancel" };
-        int option = JOptionPane.showOptionDialog(frame, breakLongMessageLines(message), title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        int option = JOptionPane.showOptionDialog(owner, breakLongMessageLines(message), title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         return (option == JOptionPane.YES_OPTION);
     }
     
-    public static String askQuestion(Frame frame, String title, String message, String continueTextYes, String continueTextNo) {
+    public static String askQuestion(Component owner, String title, String message, String continueTextYes, String continueTextNo) {
         Object[] options = { continueTextYes, continueTextNo, "Cancel" };
-        int option = JOptionPane.showOptionDialog(frame, breakLongMessageLines(message), title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        int option = JOptionPane.showOptionDialog(owner, breakLongMessageLines(message), title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         if (option == JOptionPane.YES_OPTION) {
             return continueTextYes;
         } else if (option == JOptionPane.NO_OPTION) {
