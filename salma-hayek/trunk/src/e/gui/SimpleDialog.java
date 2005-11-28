@@ -79,7 +79,12 @@ public class SimpleDialog {
      * of whether or not the native system's dialog would); this uses a proper
      * text area, so you can select and copy as you'd expect.
      */
-    public static FormDialog showDetails(Frame frame, String title, String details) {
+    public static FormDialog showDetails(Component owner, String title, String details) {
+        Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, owner);
+        if (frame == null) {
+            throw new IllegalArgumentException("Owner (" + owner + ") must have a Frame ancestor.");
+        }
+        
         PTextArea textArea = new PTextArea(10, 40);
         textArea.setEditable(false);
         textArea.setText(details);
@@ -97,8 +102,8 @@ public class SimpleDialog {
      * It's not very friendly, but it's probably more friendly than just
      * writing output to the console/log.
      */
-    public static FormDialog showDetails(Frame frame, String title, Throwable throwable) {
-        return showDetails(frame, title, StringUtilities.stackTraceFromThrowable(throwable));
+    public static FormDialog showDetails(Component owner, String title, Throwable throwable) {
+        return showDetails(owner, title, StringUtilities.stackTraceFromThrowable(throwable));
     }
     
     public static boolean askQuestion(Component owner, String title, String message, String continueText) {
