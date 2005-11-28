@@ -446,7 +446,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     public void handleAbout(com.apple.eawt.ApplicationEvent e) {
-        showAlert("Edit", "Edit is free software. See the file COPYING for copying permission.");
+        showAlert("", "<html><b>Edit (see ChangeLog for author and version information)</b><p>Copyright (C) 2004-2005 Free Software Foundation, Inc.<p>This is free software; see the file COPYING for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
         if (e != null) {
             e.setHandled(true);
         }
