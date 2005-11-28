@@ -69,8 +69,8 @@ public class SimpleDialog {
     /**
      * Wraps JOptionPane.showMessageDialog using breakLongMessageLines to improve readability.
      */
-    public static void showAlert(Frame frame, String title, String message) {
-        JOptionPane.showMessageDialog(frame, breakLongMessageLines(message), title, JOptionPane.WARNING_MESSAGE);
+    public static void showAlert(Component owner, String title, String message) {
+        JOptionPane.showMessageDialog(owner, breakLongMessageLines(message), title, JOptionPane.WARNING_MESSAGE);
     }
     
     /**
