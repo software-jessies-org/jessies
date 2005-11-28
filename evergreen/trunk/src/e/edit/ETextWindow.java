@@ -343,12 +343,14 @@ public class ETextWindow extends EWindow implements PTextListener {
      * recognize a C++ files by its emacs mode string).
      */
     private void initFileType() {
-        // See if we can infer the type by content first.
-        // FIXME: emacs mode strings should come first.
-        initFileTypeByContent();
+        // See if we can infer the type by name first and fall back to guessing
+        // from the content. If you don't do it this way round, you get fooled
+        // by files (such as this one) that contain things that look like
+        // suggestive content. It's hard to see that there's ever any excuse
+        // for having the wrong filename extension.
+        initFileTypeByName();
         if (fileType == UNKNOWN) {
-            // Fall back to guessing from the filename.
-            initFileTypeByName();
+            initFileTypeByContent();
         }
     }
     private void initFileTypeByContent() {
