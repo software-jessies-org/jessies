@@ -1,0 +1,2 @@
+#!/bin/bash
+find ~/public_html/software/ -ctime +2 -name '*-200?-??-??.tar.gz' -exec rm -f {} \;
