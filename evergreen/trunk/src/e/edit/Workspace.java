@@ -65,54 +65,19 @@ public class Workspace extends JPanel {
         }
         
         /**
-         * Builds a list of files for Open Quickly. Doesn't bother indexing a workspace if there's no
-         * suggestion it's a project (as opposed to a home directory, say): no Makefile or build.xml,
-         * and no CVS or SCCS directories are good clues that we're not looking at software.
+         * Builds a list of files for Open Quickly.
          */
         private ArrayList<String> scanWorkspaceForFiles() {
+            Log.warn("Scanning " + getRootDirectory() + " for interesting files.");
             long start = System.currentTimeMillis();
             
             String[] ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
-            
             ArrayList<String> result = new ArrayList<String>();
+            scanDirectory(getRootDirectory(), ignoredExtensions, result);
+            Edit.getInstance().showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
             
-            // If a workspace is under the user's home directory, we're happy to scan it.
-            File userHome = FileUtilities.fileFromString(System.getProperty("user.home"));
-            File workspaceRoot = FileUtilities.fileFromString(getRootDirectory());
-            boolean isUnderUserHome;
-            try {
-                isUnderUserHome = workspaceRoot.equals(userHome) == false && workspaceRoot.getCanonicalPath().startsWith(userHome.getCanonicalPath());
-            } catch (IOException ex) {
-                return result;
-            }
-            
-            // If we haven't already decided to scan a workspace, see if it contains interesting files that
-            // suggest it should be scanned.
-            File[] rootFiles = workspaceRoot.listFiles();
-            if (isUnderUserHome || (rootFiles != null && isSensibleToScan(rootFiles))) {
-                Log.warn("Scanning " + getRootDirectory() + " for interesting files.");
-                scanDirectory(getRootDirectory(), ignoredExtensions, result);
-                Log.warn("Scan of " + getRootDirectory() + " took " + (System.currentTimeMillis() - start) + "ms; found " + result.size() + " files.");
-                Edit.getInstance().showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
-            } else {
-                Log.warn("Skipping scanning of " + getRootDirectory() + " because it doesn't look like a project.");
-            }
-            
+            Log.warn("Scan of " + getRootDirectory() + " took " + (System.currentTimeMillis() - start) + "ms; found " + result.size() + " files.");
             return result;
-        }
-        
-        /**
-         * Tests whether the given directory contents suggest that we should be indexing this workspace.
-         * The idea is that if it looks like a software project, it's worth the cost (whatever), but if it doesn't,
-         * it may well be ridiculously expensive to scan. Particularly because we blindly follow symlinks.
-         */
-        private boolean isSensibleToScan(File[] contents) {
-            for (File file : contents) {
-                if (file.toString().matches(".*(CVS|SCCS|\\.svn|Makefile|makefile|build\\.xml)")) {
-                    return true;
-                }
-            }
-            return false;
         }
         
         private void scanDirectory(String directory, String[] ignoredExtensions, ArrayList<String> result) {

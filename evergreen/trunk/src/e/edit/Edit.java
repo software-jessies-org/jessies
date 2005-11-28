@@ -784,15 +784,16 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         frame.getContentPane().add(statusArea, BorderLayout.SOUTH);
         
         openRememberedWorkspaces();
-        // If that didn't create any workspaces, give the user one for free...
-        if (tabbedPane.getTabCount() == 0) {
-            createWorkspaceForCurrentDirectory();
-        }
         
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 openRememberedFiles();
                 initializing = false;
+                
+                // If we didn't create any workspaces, give the user some help...
+                if (tabbedPane.getTabCount() == 0) {
+                    showAlert("Welcome!", "<html><b>Welcome to Edit!</b><p>This looks like the first time you've used Edit. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
+                }
             }
         });
         
