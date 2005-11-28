@@ -129,8 +129,8 @@ public class FileUtilities {
      * In isSymbolicLink("/u/u58/martind/kipper/include/PtrTraits.h"):
      *   up           := "/u/u58/martind/kipper/include"
      *   upThenFollow := "/u/u58/martind/kipper/include"
+     *   upFollowDown := "/u/u58/martind/kipper/include/PtrTraits.h"
      *   follow       := "/u/u58/martind/kipper/libs/RCPtr/PtrTraits.h"
-     *   followThenUp := "/u/u58/martind/kipper/libs/RCPtr"
      *        => true
      *
      * Now consider the case where the file in question isn't a symbolic link
@@ -143,21 +143,39 @@ public class FileUtilities {
      * In isSymbolicLink("/home/martind/kipper/include"):
      *   up           := "/home/martind/kipper"
      *   upThenFollow := "/u/u58/martind/kipper"
+     *   upFollowDown := "/u/u58/martind/kipper/include"
      *   follow       := "/u/u58/martind/kipper/include"
-     *   followThenUp := "/u/u58/martind/kipper"
      *        => false
+     * 
+     * Finally, consider the case where the file is a symbolic link
+     * within the directory.  The link in question is:
+     *   "/home/martind/playpen/symlink"
+     * which has as its link target:
+     *   "/u/u58/martind/playpen/target"
+     * In isSymbolicLink("/home/martind/playpen/symlink"):
+     *   up           := "/home/martind/playpen"
+     *   upThenFollow := "/u/u58/martind/playpen"
+     *   upFollowDown := "/u/u58/martind/playpen/symlink"
+     *   follow       := "/u/u58/martind/playpen/target"
+     *        => true
      */
     public static boolean isSymbolicLink(String filename) {
         File file = FileUtilities.fileFromString(filename);
         return isSymbolicLink(file);
     }
     public static boolean isSymbolicLink(File file) {
+        if (file.exists() == false) {
+            // There are more causes of non-existent files than dangling
+            // and cyclic symbolic links but, like Java, we're happy to treat
+            // them the same.
+            return true;
+        }
         try {
-            File up = new File(file.getAbsolutePath());
-            String upThenFollow = up.getParentFile().getCanonicalPath();
-            File follow = new File(file.getCanonicalPath());
-            String followThenUp = follow.getParent();
-            return !upThenFollow.equals(followThenUp);
+            File up = file.getAbsoluteFile().getParentFile();
+            File upThenFollow = up.getCanonicalFile();
+            File upFollowDown = new File(upThenFollow, file.getName());
+            File follow = file.getCanonicalFile();
+            return !follow.equals(upFollowDown);
         } catch (IOException ex) {
             return false;
         }
