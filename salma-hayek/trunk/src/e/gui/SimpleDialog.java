@@ -81,10 +81,6 @@ public class SimpleDialog {
      */
     public static FormDialog showDetails(Component owner, String title, String details) {
         Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, owner);
-        if (frame == null) {
-            throw new IllegalArgumentException("Owner (" + owner + ") must have a Frame ancestor.");
-        }
-        
         PTextArea textArea = new PTextArea(10, 40);
         textArea.setEditable(false);
         textArea.setText(details);
