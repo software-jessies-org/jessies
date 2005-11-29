@@ -151,12 +151,12 @@ public class FileUtilities {
      * within the directory.  The link in question is:
      *   "/home/martind/playpen/symlink"
      * which has as its link target:
-     *   "/u/u58/martind/playpen/target"
+     *   "/home/martind/playpen/target"
      * In isSymbolicLink("/home/martind/playpen/symlink"):
      *   up           := "/home/martind/playpen"
-     *   upThenFollow := "/u/u58/martind/playpen"
-     *   upFollowDown := "/u/u58/martind/playpen/symlink"
-     *   follow       := "/u/u58/martind/playpen/target"
+     *   upThenFollow := "/home/martind/playpen"
+     *   upFollowDown := "/home/martind/playpen/symlink"
+     *   follow       := "/home/martind/playpen/target"
      *        => true
      */
     public static boolean isSymbolicLink(String filename) {
