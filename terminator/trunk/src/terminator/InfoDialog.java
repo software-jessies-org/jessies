@@ -10,28 +10,35 @@ import terminator.view.*;
 public class InfoDialog {
     private static final InfoDialog INSTANCE = new InfoDialog();
     
-    private ETextField dimensions;
     private ETextField title;
+    private ETextField dimensions;
     private ETextField logFilename;
     private JCheckBox suspendLogging;
     private JTerminalPane terminal;
     
     private InfoDialog() {
-        this.dimensions = makeTextField();
-        this.title = makeTextField();
-        this.logFilename = makeTextField();
+        this.title = new TitleField();
+        this.dimensions = new UneditableField();
+        this.logFilename = new UneditableField();
         this.suspendLogging = makeSuspendLoggingCheckBox();
     }
     
-    private ETextField makeTextField() {
-        ETextField result = new ETextField();
-        result.setEditable(false);
-        result.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                ((ETextField) e.getSource()).selectAll();
-            }
-        });
-        return result;
+    private static class UneditableField extends ETextField {
+        public UneditableField() {
+            setEditable(false);
+            addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    selectAll();
+                }
+            });
+        }
+    }
+    
+    private class TitleField extends ETextField {
+        @Override
+        public void textChanged() {
+            terminal.setName(title.getText());
+        }
     }
     
     private JCheckBox makeSuspendLoggingCheckBox() {
