@@ -181,42 +181,6 @@ public class FileUtilities {
         }
     }
     
-    /** Extensions that shouldn't be shown in directory windows. */
-    private static String[] ignoredExtensions;
-    
-    /** Names of directories that shouldn't be shown in directory windows. */
-    private static Pattern uninterestingDirectoryNames;
-    
-    public static boolean isIgnored(File file) {
-        if (file.isHidden() || file.getName().startsWith(".") || file.getName().endsWith("~")) {
-            return true;
-        }
-        if (file.isDirectory()) {
-            return isIgnoredDirectory(file);
-        }
-        if (ignoredExtensions == null) {
-            ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
-        }
-        return FileUtilities.nameEndsWithOneOf(file, ignoredExtensions);
-    }
-    
-    private static String getUninterestingDirectoryPattern() {
-        String defaultPattern = "\\.deps|\\.svn|BitKeeper|CVS|SCCS";
-        String customPattern = Parameters.getParameter("directories.uninterestingNames", "");
-        if (customPattern.length() > 0) {
-            return customPattern + "|" + defaultPattern;
-        } else {
-            return defaultPattern;
-        }
-    }
-    
-    public static boolean isIgnoredDirectory(File directory) {
-        if (uninterestingDirectoryNames == null) {
-            uninterestingDirectoryNames = Pattern.compile(getUninterestingDirectoryPattern());
-        }
-        return uninterestingDirectoryNames.matcher(directory.getName()).matches();
-    }
-    
     /** Returns an array with an item for each semicolon-separated element of the path. */
     public static String[] getArrayOfPathElements(String path) {
         return path.split(";");
