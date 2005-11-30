@@ -84,7 +84,8 @@ public class JavaDoc {
         if (path.endsWith(".jar")) {
             addPackagesInJarFile(classpath);
         } else {
-            addPackagesInDirectory(classpath, path);
+            FileIgnorer fileIgnorer = new FileIgnorer(path);
+            addPackagesInDirectory(classpath, path, fileIgnorer);
         }
     }
     
@@ -92,13 +93,13 @@ public class JavaDoc {
     * Finds all the directories below the starting directory that haven't been marked as uninteresting,
     * and adds their names to the list of known packages.
     */
-    public static void addPackagesInDirectory(File startingDirectory, String classpath) {
+    public static void addPackagesInDirectory(File startingDirectory, String classpath, FileIgnorer fileIgnorer) {
         if (startingDirectory.isDirectory() == false) { return; }
         for (File file : startingDirectory.listFiles()) {
-            if (file.isDirectory() && FileUtilities.isIgnoredDirectory(file) == false) {
+            if (file.isDirectory() && fileIgnorer.isIgnoredDirectory(file) == false) {
                 String packageName = file.getAbsolutePath().substring(classpath.length() + 1).replace(File.separatorChar, '.');
                 packageNames.add(packageName);
-                addPackagesInDirectory(file, classpath);
+                addPackagesInDirectory(file, classpath, fileIgnorer);
             }
         }
     }
