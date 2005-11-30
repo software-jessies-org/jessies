@@ -71,30 +71,30 @@ public class Workspace extends JPanel {
             Log.warn("Scanning " + getRootDirectory() + " for interesting files.");
             long start = System.currentTimeMillis();
             
-            String[] ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
+            FileIgnorer fileIgnorer = new FileIgnorer(getRootDirectory());
             ArrayList<String> result = new ArrayList<String>();
-            scanDirectory(getRootDirectory(), ignoredExtensions, result);
+            scanDirectory(getRootDirectory(), fileIgnorer, result);
             Edit.getInstance().showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
             
             Log.warn("Scan of " + getRootDirectory() + " took " + (System.currentTimeMillis() - start) + "ms; found " + result.size() + " files.");
             return result;
         }
         
-        private void scanDirectory(String directory, String[] ignoredExtensions, ArrayList<String> result) {
+        private void scanDirectory(String directory, FileIgnorer fileIgnorer, ArrayList<String> result) {
             File dir = FileUtilities.fileFromString(directory);
             File[] files = dir.listFiles();
             if (files == null) {
                 return;
             }
             for (File file : files) {
-                if (FileUtilities.isIgnored(file)) {
+                if (fileIgnorer.isIgnored(file)) {
                     continue;
                 }
                 String filename = file.toString();
                 if (file.isDirectory()) {
-                    scanDirectory(filename, ignoredExtensions, result);
+                    scanDirectory(filename, fileIgnorer, result);
                 } else {
-                    if (FileUtilities.nameEndsWithOneOf(filename, ignoredExtensions) == false && FileUtilities.isSymbolicLink(file) == false) {
+                    if (FileUtilities.isSymbolicLink(file) == false) {
                         int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(getRootDirectory()).length();
                         result.add(filename.substring(prefixCharsToSkip));
                     }
