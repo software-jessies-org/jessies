@@ -39,10 +39,6 @@ public class FileIgnorer {
     patterns.add("BitKeeper");
     patterns.add("CVS");
     patterns.add("SCCS");
-    String customPattern = Parameters.getParameter("directories.uninterestingNames", "");
-    if (customPattern.length() > 0) {
-      patterns.add(customPattern);
-    }
     return StringUtilities.join(patterns, "|");
   }
   
