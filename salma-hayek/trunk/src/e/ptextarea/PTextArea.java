@@ -301,8 +301,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     public void ensureVisibilityOfOffset(int offset) {
-        if (isShowing() == false) {
-            // Avoid problems if splitLines == null.
+        if (isLineWrappingInvalid() || isShowing() == false) {
             return;
         }
         
