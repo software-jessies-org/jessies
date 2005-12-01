@@ -1,6 +1,7 @@
 package e.edit;
 
 import java.io.*;
+import java.util.*;
 import java.util.regex.*;
 import e.util.*;
 
@@ -11,7 +12,8 @@ public class FileIgnorer {
   /** Names of directories that shouldn't be shown in directory windows. */
   private Pattern uninterestingDirectoryNames;
   
-  public FileIgnorer(String rootDirectory) {
+  public FileIgnorer(String rootDirectoryPath) {
+    File rootDirectory = FileUtilities.fileFromString(rootDirectoryPath);
     ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
     uninterestingDirectoryNames = Pattern.compile(getUninterestingDirectoryPattern(rootDirectory));
   }
@@ -26,14 +28,22 @@ public class FileIgnorer {
     return FileUtilities.nameEndsWithOneOf(file, ignoredExtensions);
   }
   
-  private static String getUninterestingDirectoryPattern(String rootDirectory) {
-    String defaultPattern = "\\.deps|\\.svn|BitKeeper|CVS|SCCS";
+  private static String getUninterestingDirectoryPattern(File rootDirectory) {
+    String[] command = new String[] { "echo-local-non-source-directory-pattern" };
+    ArrayList<String> patterns = new ArrayList<String>();
+    // A "not found" error is expected by default and ignored.
+    ArrayList<String> errors = new ArrayList<String>();
+    ProcessUtilities.backQuote(rootDirectory, command, patterns, errors);
+    patterns.add("\\.deps");
+    patterns.add("\\.svn");
+    patterns.add("BitKeeper");
+    patterns.add("CVS");
+    patterns.add("SCCS");
     String customPattern = Parameters.getParameter("directories.uninterestingNames", "");
     if (customPattern.length() > 0) {
-      return customPattern + "|" + defaultPattern;
-    } else {
-      return defaultPattern;
+      patterns.add(customPattern);
     }
+    return StringUtilities.join(patterns, "|");
   }
   
   public boolean isIgnoredDirectory(File directory) {
