@@ -9,7 +9,6 @@ indent.string=
 ?Mac OS X:open.command=/usr/bin/open
 ?Windows 2000:open.command=start
 
-directories.uninterestingNames=(billbox|ppc|ix86|sun4)_(BOS(-(eabi|icc))?|linux(_libc-2\.(1|2|3))?|mingw32msvc|solaris|darwin[78]\.0)_(debug|release|profile)
 files.uninterestingExtensions=.a;.aux;.bak;.bin;.class;.d;.elf;.exe;.jar;.lib;.log;.map;.o;.obj;.orig;.swp;.texshop;.toc
 files.externalApplicationExtensions=.icns;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 #Not yet implemented. See e.util.FileUtilities.
