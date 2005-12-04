@@ -20,7 +20,8 @@ if test(?d, log_directory) == false
   system("chmod og-rx #{log_directory}")
 end
 
-server_port_file = "#{log_directory}/.terminator-server-port"
+DISPLAY = ENV["DISPLAY"]
+server_port_file = "#{log_directory}/.terminator-server-port#{DISPLAY}"
 
 if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   command = ARGV.join("\0")
@@ -31,6 +32,9 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   # view.
   begin
     File.new(server_port_file).read() =~ /^(.+):(\d+)$/
+    # Some machines have more than one host name.
+    # Fortunately, if host isn't the same machine as localhost, the connection
+    # below is unlikely to work.
     host = $1
     port = $2.to_i()
     
