@@ -116,9 +116,9 @@ now surpassed Terminal in several areas.
 but you'll also need a copy of the library to go with it (<a href="../salma-hayek/salma-hayek.tgz">salma-hayek.tgz</a>).
 
 <p>The distribution contains Java classes but no native shared library.
-We also have binaries for
+We also have pre-built libraries for
 <a href="terminator-Linux.tgz">Linux</a>
-and <a href="terminator-Darwin.tgz">Mac OS X</a>.
+and <a href="terminator-Darwin.tgz">Mac OS X</a> that you can install over a Java-only installation.
 
 <p>On Cygwin, there's
 <a href="terminator-Cygwin.msi">an installer</a>,
@@ -159,8 +159,8 @@ Better still, you may leave $JAVA_HOME unset, in which case the launcher will fi
 an appropriate jvm.dll using the Registry.
 
 <p>To build Terminator, you'll need g++ and a very recent make.
-<a href="ftp://alpha.gnu.org/gnu/make/make-3.81beta3.tar.gz">make-3.81beta3-src</a> is good.
-Debian's make-3.80-9 used to be OK but may not be any more or may be only OK in some circumstances.
+<a href="ftp://alpha.gnu.org/gnu/make/make-3.81beta3.tar.gz">make-3.81beta3-src</a> works.
+Debian's make-3.80-9 works.
 The make 3.80 which comes with Mac OS X 10.4.2 isn't good enough.
 The make which comes with Cygwin 1.5.18-1 isn't good enough.
 Debian's make source (apt-get source make) compiles and runs on Mac OS X and Cygwin.
