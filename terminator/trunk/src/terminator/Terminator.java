@@ -42,7 +42,11 @@ public class Terminator {
 	}
 	
 	private void startTerminatorServer() {
-		new InAppServer("Terminator", "~/.terminal-logs/.terminator-server-port", TerminatorServer.class, new TerminatorServer());
+		String display = System.getenv("DISPLAY");
+		if (display == null) {
+			display = "";
+		}
+		new InAppServer("Terminator", "~/.terminal-logs/.terminator-server-port" + display, TerminatorServer.class, new TerminatorServer());
 	}
 	
 	/**
