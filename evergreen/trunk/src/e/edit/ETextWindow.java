@@ -129,8 +129,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             // See if SCM's bug database link code is available.
             Class klass = Class.forName("e.scm.BugDatabaseHighlighter");
             // Use it.
-            java.lang.reflect.Constructor constructor = klass.getConstructor(PTextArea.class);
-            text.addStyleApplicator(StyleApplicator.class.cast(constructor.newInstance(text)));
+            java.lang.reflect.Method method = klass.getDeclaredMethod("highlightBugs", PTextArea.class);
+            method.invoke(null, text);
         } catch (Exception ex) {
             // We can survive without this functionality, but there's probably
             // something odd going on if we can't find it.
