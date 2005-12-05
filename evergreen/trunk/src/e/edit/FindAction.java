@@ -1,10 +1,11 @@
 package e.edit;
 
+import e.gui.*;
+import e.ptextarea.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
-import e.ptextarea.*;
-import e.util.*;
 
 public class FindAction extends ETextAction implements MinibufferUser {
     public static final String ACTION_NAME = "Find...";
@@ -20,6 +21,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     private FindAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("F", false));
+        GnomeStockIcon.useStockIcon(this, "gtk-find");
         regularExpressionHistory = new StringHistory(Edit.getInstance().getPreferenceFilename("e.edit.FindAction-history"));
     }
     

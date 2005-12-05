@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.gui.*;
 import e.util.*;
 import java.awt.event.*;
 
@@ -11,6 +12,7 @@ public class OpenQuicklyAction extends ETextAction {
     public OpenQuicklyAction() {
         super("Open Quickly...");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("O", false));
+        GnomeStockIcon.useStockIcon(this, "gtk-open");
     }
     
     public void actionPerformed(ActionEvent e) {

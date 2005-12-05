@@ -3,6 +3,7 @@ package e.edit;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 
@@ -24,6 +25,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
     public class ExitAction extends AbstractAction {
         public ExitAction() {
             super(GuiUtilities.isWindows() ? "Exit" : "Quit");
+            GnomeStockIcon.useStockIcon(this, "gtk-quit");
         }
         public void actionPerformed(ActionEvent e) {
             Edit.getInstance().handleQuit(null);

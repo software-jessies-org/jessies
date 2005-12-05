@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.gui.*;
 import java.awt.event.*;
 
 /**
@@ -10,6 +11,7 @@ public class RevertToSavedAction extends ETextAction {
     
     public RevertToSavedAction() {
         super(ACTION_NAME);
+        GnomeStockIcon.useStockIcon(this, "gtk-revert-to-saved");
     }
     
     public void actionPerformed(ActionEvent e) {

@@ -28,6 +28,7 @@ public class FindAndReplaceAction extends ETextAction {
     public FindAndReplaceAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("R", false));
+        GnomeStockIcon.useStockIcon(this, "gtk-find-and-replace");
     }
     
     private ETextWindow textWindow;

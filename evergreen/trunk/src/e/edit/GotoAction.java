@@ -1,7 +1,8 @@
 package e.edit;
 
-import java.awt.event.*;
+import e.gui.*;
 import e.util.*;
+import java.awt.event.*;
 
 /**
 The ETextArea action to open a 'goto' dialog.
@@ -15,6 +16,7 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     public GotoAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("L", false));
+        GnomeStockIcon.useStockIcon(this, "gtk-jump-to");
     }
     
     public void actionPerformed(ActionEvent e) {

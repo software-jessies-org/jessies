@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.gui.*;
 import e.ptextarea.*;
 import java.awt.event.*;
 
@@ -12,6 +13,7 @@ public class CorrectIndentationAction extends ETextAction {
     public CorrectIndentationAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("I", false));
+        GnomeStockIcon.useStockIcon(this, "gtk-indent");
     }
     
     public void actionPerformed(ActionEvent e) {
