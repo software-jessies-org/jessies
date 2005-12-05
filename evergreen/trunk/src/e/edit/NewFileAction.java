@@ -19,6 +19,7 @@ public class NewFileAction extends ETextAction {
     public NewFileAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("N", false));
+        GnomeStockIcon.useStockIcon(this, "gtk-new");
     }
     
     public void actionPerformed(ActionEvent e) {

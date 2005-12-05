@@ -1,8 +1,9 @@
 package e.edit;
 
+import e.gui.*;
+import e.util.*;
 import java.awt.event.*;
 import java.io.*;
-import e.util.*;
 
 /**
 The ETextArea build-project action. Works for either Ant or make.
@@ -15,6 +16,7 @@ public class BuildAction extends ETextAction {
     public BuildAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("B", false));
+        GnomeStockIcon.useStockIcon(this, "gtk-execute");
     }
 
     public void actionPerformed(ActionEvent e) {

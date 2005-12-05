@@ -1,12 +1,13 @@
 package e.edit;
 
+import e.forms.*;
+import e.gui.*;
+import e.ptextarea.*;
+import e.util.*;
 import java.awt.event.*;
 import java.nio.charset.*;
 import java.util.*;
 import javax.swing.*;
-import e.forms.*;
-import e.ptextarea.*;
-import e.util.*;
 
 /**
  * The ETextArea action to open file properties dialog where you can view
@@ -22,6 +23,7 @@ public class FilePropertiesAction extends ETextAction {
     
     public FilePropertiesAction() {
         super(ACTION_NAME);
+        GnomeStockIcon.useStockIcon(this, "gtk-info");
     }
     
     public void actionPerformed(ActionEvent e) {

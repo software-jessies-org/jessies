@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.gui.*;
 import java.awt.event.*;
 
 /**
@@ -11,6 +12,7 @@ public class SaveAction extends ETextAction {
     public SaveAction() {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("S", false));
+        GnomeStockIcon.useStockIcon(this, "gtk-save");
     }
     
     public void actionPerformed(ActionEvent e) {
