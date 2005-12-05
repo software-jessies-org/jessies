@@ -1,5 +1,6 @@
 package e.ptextarea;
 
+import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -44,6 +45,7 @@ public class PActionFactory {
     public static class CopyAction extends PTextAction {
         public CopyAction() {
             super("Copy", e.util.GuiUtilities.makeKeyStroke("C", false));
+            GnomeStockIcon.useStockIcon(this, "gtk-copy");
         }
         
         public void performOn(PTextArea textArea) {
@@ -54,6 +56,7 @@ public class PActionFactory {
     public static class CutAction extends PTextAction {
         public CutAction() {
             super("Cut", e.util.GuiUtilities.makeKeyStroke("X", false));
+            GnomeStockIcon.useStockIcon(this, "gtk-cut");
         }
         
         public void performOn(PTextArea textArea) {
@@ -84,6 +87,7 @@ public class PActionFactory {
     public static class PasteAction extends PTextAction {
         public PasteAction() {
             super("Paste", e.util.GuiUtilities.makeKeyStroke("V", false));
+            GnomeStockIcon.useStockIcon(this, "gtk-paste");
         }
         
         public void performOn(PTextArea textArea) {
@@ -94,6 +98,7 @@ public class PActionFactory {
     public static class RedoAction extends PTextAction {
         public RedoAction() {
             super("Redo", e.util.GuiUtilities.makeKeyStroke("Z", true));
+            GnomeStockIcon.useStockIcon(this, "gtk-redo");
         }
         
         public boolean isEnabled() {
@@ -109,6 +114,7 @@ public class PActionFactory {
     public static class SelectAllAction extends PTextAction {
         public SelectAllAction() {
             super("Select All", e.util.GuiUtilities.makeKeyStroke("A", false));
+            GnomeStockIcon.useStockIcon(this, "gtk-select-all");
         }
         
         public void performOn(PTextArea textArea) {
@@ -119,6 +125,7 @@ public class PActionFactory {
     public static class UndoAction extends PTextAction {
         public UndoAction() {
             super("Undo", e.util.GuiUtilities.makeKeyStroke("Z", false));
+            GnomeStockIcon.useStockIcon(this, "gtk-undo");
         }
         
         public boolean isEnabled() {
