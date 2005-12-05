@@ -149,6 +149,8 @@ stdin
 stdout
 # Standard types from table 97 of ISO+IEC+14882-1998.
 ptrdiff
+# Standard types from section 7.18 of ISO+IEC+9899-1999.
+uintptr_t
 # Standard headers
 iomanip
 iostream
