@@ -25,7 +25,7 @@ if test -f /etc/debian_version ; then
         apt-get -y install build-essential exuberant-ctags make g++ ri ruby subversion
     fi
     # It's important to have a non-free JDK, because the free ones aren't finished.
-    apt-get -y install j2sdk1.5
+    apt-get -y install sun-j2sdk1.5
 fi
 
 # Create a directory in /usr/local for all our stuff.
