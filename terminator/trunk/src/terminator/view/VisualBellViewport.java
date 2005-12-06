@@ -20,15 +20,7 @@ public class VisualBellViewport extends JViewport {
     private Timer timer;
     
     public VisualBellViewport() {
-        initColor();
         initTimer();
-    }
-    
-    private void initColor() {
-        // We need to choose a color that will show up against the background.
-        // A reasonable assumption is that the user's chosen such a color for their foreground.
-        Color baseColor = Options.getSharedInstance().getColor("foreground");
-        color = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 100);
     }
     
     private void initTimer() {
@@ -50,8 +42,36 @@ public class VisualBellViewport extends JViewport {
     }
     
     private void paintBell(Graphics g) {
-        g.setColor(color);
-        g.fillRect(0, 0, getWidth(), getHeight());
+        Color foreground = Options.getSharedInstance().getColor("foreground");
+        if (Options.getSharedInstance().isFancyBell()) {
+            // On decent hardware, we can produce a really tasteful effect
+            // by compositing a transparent rectangle over the terminal.
+            // We need to choose a color that will show up against the
+            // background; a reasonable assumption is that the user has
+            // already chosen such a color for the foreground.
+            Color color = new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 100);
+            g.setColor(color);
+            g.fillRect(0, 0, getWidth(), getHeight());
+        } else {
+            // We used to composite a flash over the terminal, but on a remote
+            // X11 display that was prohibitively expensive, so we offer XOR
+            // instead.
+            Color background = Options.getSharedInstance().getColor("background");
+            final int R = blend(background.getRed(), foreground.getRed());
+            final int G = blend(background.getGreen(), foreground.getGreen());
+            final int B = blend(background.getBlue(), foreground.getBlue());
+            g.setColor(background);
+            g.setXORMode(new Color(R, G, B));
+            g.fillRect(0, 0, getWidth(), getHeight());
+            g.setPaintMode();
+        }
+    }
+    
+    /**
+     * Imitates the effect of alpha-blending the foreground 40% with the background.
+     */
+    private static final int blend(float back, float fore) {
+        return (int)(0.4f * fore + 0.6f * back);
     }
     
     public void flash() {

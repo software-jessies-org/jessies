@@ -33,6 +33,7 @@ public class Options {
 	private static final String BLOCK_CURSOR = "blockCursor";
 	private static final String CURSOR_BLINK = "cursorBlink";
 	private static final String ERROR_EXIT_HOLDING = "errorExitHolding";
+	private static final String FANCY_BELL = "fancyBell";
 	private static final String FONT_NAME = "fontName";
 	private static final String FONT_SIZE = "fontSize";
 	private static final String INITIAL_COLUMN_COUNT = "initialColumnCount";
@@ -109,6 +110,16 @@ public class Options {
 	 */
 	public boolean isErrorExitHolding() {
 		return booleanResource(ERROR_EXIT_HOLDING);
+	}
+	
+	/**
+	 * Whether or not to use a nicer-looking but more expensive visual
+	 * bell rendition. If there were a way to detect a remote X11 display --
+	 * the only place where we really need to disable this -- we could
+	 * remove this option, but I don't know of one.
+	 */
+	public boolean isFancyBell() {
+		return booleanResource(FANCY_BELL);
 	}
 	
 	/**
@@ -244,6 +255,7 @@ public class Options {
 		addDefault(BLOCK_CURSOR, "false", "Use a block cursor instead of an underline?");
 		addDefault(CURSOR_BLINK, "true", "Blink the cursor?");
 		addDefault(ERROR_EXIT_HOLDING, "true", "Keep the window open if the child exits with an error status?");
+		addDefault(FANCY_BELL, "true", "Use alpha rather than XOR for the visual bell?");
 		addDefault(FONT_NAME, GuiUtilities.getMonospacedFontName(), "The name of the font to use (not an X11 font)");
 		addDefault(FONT_SIZE, "12", "The size of text, in points");
 		addDefault(INITIAL_COLUMN_COUNT, "80", "The number of columns in a new terminal");
