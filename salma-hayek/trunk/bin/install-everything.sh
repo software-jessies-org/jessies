@@ -1,5 +1,5 @@
 #!/bin/bash
-# FIXME: rewrite this in Ruby!
+# FIXME: rewrite this in Ruby! (The fact that Ruby isn't installed by default on Solaris or Ubuntu points to one possible advantage to keeping this in sh, or at least in having a bootstrap stage that installs Ruby.)
 
 die() {
     echo $*
@@ -17,43 +17,15 @@ if ! test -w . ; then
   die "cannot write to /usr/local - this script needs to be run as root"
 fi
 
-# Choose the latest Java in /usr/local. If there isn't one, run the latest installer.
-# FIXME: we should check whether the latest installer offers a newer Java than the current installation.
-# At the moment we'll continue to use an obsolete version.
-java_installer=`ls -1 /net/mirror/mirror-link/java/jdk-1_5_0_*-linux-i586.bin | tail -1`
-java_home=`ls -d -1 /usr/local/jdk1.5.0* | tail -1`
-if sudo -u devadmin test -f "$java_installer" && ! test -d "$java_home"; then
-    if tty --silent; then
-        sudo -u devadmin cp $java_installer /tmp/jdk &&
-        /tmp/jdk ||
-        die "installing Java"
-    else
-        echo You should sudo install-everything.sh from a terminal to install the JDK
-        # It's still worth continuing because we'll download a new version of this script, for one thing,
-        # which may have improvements.
-    fi
-fi
-# Use the JDK we just installed rather than the previous one.
-java_home=`ls -d -1 /usr/local/jdk1.5.0* | tail -1`
-# Put links to java and javac in /usr/local/bin because it's easier to insist that that's on the user's $PATH than some random JDK directory.
-# FIXME: Can we do this better with update-alternatives(1)?
-if test -d "$java_home" ; then
-    link_in_usr_local_bin $java_home/bin/java
-    link_in_usr_local_bin $java_home/bin/javac
-    for BROWSER in mozilla mozilla-firefox; do
-        if test -d /usr/lib/$BROWSER/plugins; then
-            ln -s $java_home/jre/plugin/i386/ns7/libjavaplugin_oji.so /usr/lib/$BROWSER/plugins
-        fi
-    done
-fi
-
-# Install various other packages we need.
+# Install various packages we need.
 if test -f /etc/debian_version ; then
-    if [[ ! -x /usr/bin/ctags-exuberant || ! -x /usr/bin/ri || ! -x /usr/bin/svn ]]
+    if [[ ! -x /usr/bin/ctags-exuberant || ! -x /usr/bin/g++ || ! -x /usr/bin/make || ! -x /usr/bin/ri || ! -x /usr/bin/ruby || ! -x /usr/bin/svn ]]
     then
         apt-get update
-        apt-get -y install exuberant-ctags ri subversion
+        apt-get -y install build-essential exuberant-ctags make g++ ri ruby subversion
     fi
+    # It's important to have a non-free JDK, because the free ones aren't finished.
+    apt-get -y install j2sdk1.5
 fi
 
 # Create a directory in /usr/local for all our stuff.
