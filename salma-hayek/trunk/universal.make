@@ -554,6 +554,14 @@ $(INSTALLER_TARGETS): $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
 # Needs to be after ALL_NATIVE_TARGETS is defined.
 native: $(ALL_NATIVE_TARGETS)
 
+# Avoid:
+# tar: Cowardly refusing to create an empty archive
+ifeq "$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)" ""
+
+native-dist:;
+
+else
+
 ../$(NATIVE_TGZ_FILE_OF_THE_DAY): $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
 	cd .. && \
 	tar -zcf $(NATIVE_TGZ_FILE_OF_THE_DAY) $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_NAME)/%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS))
@@ -563,3 +571,5 @@ native-dist: $(NATIVE_DIST_FILE_OF_THE_DAY)
 	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
 	scp $< $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)-$(DATE)$(suffix $<) && \
 	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)-$(DATE)$(suffix $<) $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
+
+endif
