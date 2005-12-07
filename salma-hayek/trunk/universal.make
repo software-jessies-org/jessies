@@ -476,7 +476,7 @@ $(PROJECT_NAME).jar: build.java
 
 .PHONY: app
 app: build
-	make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK)
+	$(SCRIPT_PATH)/make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK)
 
 # ----------------------------------------------------------------------------
 # Rules for debugging.
