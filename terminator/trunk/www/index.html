@@ -78,7 +78,7 @@ you'll need something like this in your <tt>bash(1)</tt> start-up scripts:
 <pre>
 if [ "$TERM" == "terminator" ]
 then
-  export PROMPT_COMMAND='echo -ne "\e2;`pwd`\a"'
+  export PROMPT_COMMAND='echo -ne "\e]2;`pwd`\a"'
 fi
 </pre>
 
