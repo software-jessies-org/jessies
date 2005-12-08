@@ -4,8 +4,6 @@ Items to be done for PTextArea:
 
 * Refactor the way split lines are updated to work in terms of PLineSegments.
 
-* Continue refactoring of line segment stuff in PTextArea.
-
 * Auto-scroll on selection (all types) flickers more than I think it should when there's a wrapped line.
 
 * the following JTextArea methods are thread-safe: append, insert, replace, and setText.
