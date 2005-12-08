@@ -33,6 +33,27 @@ public class PBracketUtilities {
         return PARTNERS.charAt(BRACKETS.indexOf(bracket));
     }
     
+    public static boolean isAllowedCharInBracket(char character, char bracket) {
+        switch (bracket) {
+        case '<':
+        case '>':
+            return ("{}[]()".indexOf(character) == -1);
+            
+        default:
+            return true;
+        }
+    }
+    
+    public static boolean isNestableBracketInBracket(char innerBracket, char outerBracket) {
+        if ("[]{}()".indexOf(outerBracket) != -1) {
+            return ("[]{}()".indexOf(innerBracket) != -1);
+        } else if ("<>".indexOf(outerBracket) != -1) {
+            return ("<>".indexOf(innerBracket) != -1);
+        } else {
+            throw new IllegalArgumentException("Character " + outerBracket + " is not a bracket.");
+        }
+    }
+    
     /**
      * Returns the offset of the matching bracket, or -1 if there's no match.
      * We look for a match if 'offset' is after an opening bracket, or before a
@@ -42,12 +63,12 @@ public class PBracketUtilities {
         if (afterOpenBracket(textArea.getTextBuffer(), offset)) {
             Iterator<PLineSegment> segments = textArea.getLogicalSegmentIterator(offset - 1);
             segments = new PSameStyleSegmentIterator(segments);
-            return findMatchingBracket(new PSegmentCharIterator(segments, offset - 1, true));
+            return findMatchingBracket(new PSegmentCharIterator(segments, offset - 1, true), true);
             
         } else if (beforeCloseBracket(textArea.getTextBuffer(), offset)) {
             Iterator<PLineSegment> segments = new PReverseSegmentIterator(textArea, offset);
             segments = new PSameStyleSegmentIterator(segments);
-            return findMatchingBracket(new PSegmentCharIterator(segments, offset, false));
+            return findMatchingBracket(new PSegmentCharIterator(segments, offset, false), false);
             
         } else {
             throw new IllegalArgumentException("No bracket at offset " + offset);
@@ -66,22 +87,30 @@ public class PBracketUtilities {
      * Returns the offset of the matching bracket, scanning in the given
      * direction, or -1.
      */
-    private static int findMatchingBracket(PCharIterator chars) {
+    private static int findMatchingBracket(PCharIterator chars, boolean isForward) {
         char bracket = chars.next();
         if (isBracket(bracket) == false) {
             return -1;
         }
-        char partner = getPartnerForBracket(bracket);
-        int nesting = 1;
+        Stack<Character> bracketStack = new Stack<Character>();
+        bracketStack.push(bracket);
         while (chars.hasNext()) {
             char ch = chars.next();
-            if (ch == bracket) {
-                ++nesting;
-            } else if (ch == partner) {
-                --nesting;
-                if (nesting == 0) {
-                    return chars.getOffsetOfLastChar();
+            if (isAllowedCharInBracket(ch, bracket)) {
+                if (isNestableBracketInBracket(ch, bracket)) {
+                    if (isOpenBracket(ch) == isForward) {
+                        bracketStack.push(ch);
+                    } else {
+                        char requiredMatch = getPartnerForBracket(bracketStack.pop());
+                        if (requiredMatch != ch) {
+                            return -1;  // The nesting of brackets is wrong.
+                        } else if (bracketStack.empty()) {
+                            return chars.getOffsetOfLastChar();
+                        }
+                    }
                 }
+            } else {
+                return -1;  // Illegal characters in the way: we're not going to find a match here.
             }
         }
         return -1;
