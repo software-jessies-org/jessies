@@ -11,11 +11,11 @@ public abstract class PIndenter {
         this.textArea = textArea;
     }
     
-    public String increaseIndentation(String original) {
+    protected String increaseIndentation(String original) {
         return original + textArea.getIndentationString();
     }
     
-    public String decreaseIndentation(String original) {
+    protected String decreaseIndentation(String original) {
         String delta = textArea.getIndentationString();
         if (original.endsWith(delta)) {
             return original.substring(0, original.length() - delta.length());
@@ -51,7 +51,7 @@ public abstract class PIndenter {
     }
     
     /** Returns the indentation which should be used for the given line number. */
-    public String getIndentation(int lineNumber) {
+    private String getIndentation(int lineNumber) {
         final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(lineNumber);
         return (previousNonBlankLineNumber == -1) ? "" : getCurrentIndentationOfLine(previousNonBlankLineNumber);
     }
@@ -90,6 +90,7 @@ public abstract class PIndenter {
             return lineStartOffset + replacementIndentation.length();
         }
     }
+    
     private static int adjustOffsetAfterDeletion(int offsetToAdjust, int offsetOfDeletion, int charsDeleted) {
         if (offsetToAdjust < offsetOfDeletion) {
             return offsetToAdjust;

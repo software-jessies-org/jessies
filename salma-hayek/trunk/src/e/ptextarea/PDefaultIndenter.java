@@ -8,4 +8,8 @@ public class PDefaultIndenter extends PIndenter {
     public boolean isElectric(char c) {
         return false;
     }
+    
+    public void fixIndentationAt(int position) {
+        // Do nothing.
+    }
 }
