@@ -5,9 +5,7 @@ import java.util.*;
 public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
     private PTextArea textArea;
     private int lineIndex;
-    private int segmentInLine;
-    private int charOffset;
-    private List<PLineSegment> lineSegments;
+    private LinkedList<PLineSegment> segmentBuffer = new LinkedList<PLineSegment>();
     
     /**
      * Creates a new PLogicalSegmentIterator which will iterate over the unwrapped segments,
@@ -17,43 +15,36 @@ public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
     public PLogicalSegmentIterator(PTextArea textArea, int offsetContainedByFirstSegment) {
         this.textArea = textArea;
         lineIndex = textArea.getLineOfOffset(offsetContainedByFirstSegment);
-        lineSegments = textArea.getLineSegments(lineIndex);
-        for (segmentInLine = 0; segmentInLine < lineSegments.size(); ++segmentInLine) {
-            if (lineSegments.get(segmentInLine).getEnd() > offsetContainedByFirstSegment) {
+        List<PLineSegment> segments = textArea.getLineSegments(lineIndex);
+        for (int i = 0; i < segments.size(); ++i) {
+            if (segments.get(i).getEnd() > offsetContainedByFirstSegment) {
+                segmentBuffer.addAll(segments.subList(i, segments.size()));
                 break;
             }
         }
-        if (segmentInLine == lineSegments.size()) {
-            this.charOffset = textArea.getLineEndOffsetBeforeTerminator(lineIndex);
-        } else {
-            this.charOffset = lineSegments.get(segmentInLine).getOffset();
-        }
+        int offset = textArea.getLineEndOffsetBeforeTerminator(lineIndex);
+        segmentBuffer.add(new PNewlineSegment(textArea, offset, offset + 1, PNewlineSegment.HARD_NEWLINE));
+        lineIndex++;
     }
     
     public boolean hasNext() {
-        return (charOffset < textArea.getTextBuffer().length());
+        return (segmentBuffer.size() > 0);
+    }
+    
+    private void ensureSegmentBufferIsNotEmpty() {
+        while (lineIndex < textArea.getLineCount() && segmentBuffer.size() == 0) {
+            for (PLineSegment segment : textArea.getLineSegments(lineIndex)) {
+                segmentBuffer.addLast(segment);
+            }
+            int newlineOffset = textArea.getLineEndOffsetBeforeTerminator(lineIndex);
+            segmentBuffer.addLast(new PNewlineSegment(textArea, newlineOffset, newlineOffset + 1, PNewlineSegment.HARD_NEWLINE));
+            lineIndex++;
+        }
     }
     
     public PLineSegment next() {
-        PLineSegment result = null;
-        while (result == null || result.getModelTextLength() == 0) {
-            if (segmentInLine > lineSegments.size()) {
-                lineIndex++;
-                lineSegments = textArea.getLineSegments(lineIndex);
-                segmentInLine = 0;
-            }  // There is *deliberately* no else here - we wish to fall through to lower processing now.
-            
-            if (segmentInLine < lineSegments.size()) {
-                result = lineSegments.get(segmentInLine++);
-            } else if (segmentInLine == lineSegments.size() && lineIndex < textArea.getLineCount() - 1) {
-                result = new PNewlineSegment(textArea, charOffset, charOffset + 1, PNewlineSegment.HARD_NEWLINE);
-                segmentInLine++;
-            } else {
-                throw new IndexOutOfBoundsException("Went off the end of the text buffer processing segment " + segmentInLine + " of " + lineSegments.size() + " in line " + lineIndex + "; char offset is " + charOffset);
-            }
-        }
-       
-        charOffset = result.getEnd();
+        PLineSegment result = segmentBuffer.removeFirst();
+        ensureSegmentBufferIsNotEmpty();
         return result;
     }
     
