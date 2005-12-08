@@ -49,7 +49,7 @@ public class GreenwichMapView extends JComponent {
         final int height = icon.getIconHeight() / 2;
         
         // Get a scaled copy.
-        Image scaledMap = ImageUtilities.scale(icon.getImage(), width, height, ImageUtilities.InterpolationHint.NONE);
+        Image scaledMap = ImageUtilities.scale(icon.getImage(), width, height, ImageUtilities.InterpolationHint.REPLICATE);
         new ImageIcon(scaledMap); // Force the image to be prepared.
         
         // Draw the scaled copy into a BufferedImage so we can read/write it.

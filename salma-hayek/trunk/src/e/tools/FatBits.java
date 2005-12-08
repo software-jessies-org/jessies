@@ -123,12 +123,7 @@ public class FatBits extends JFrame {
     }
     
     private static Image scaleImage(Image sourceImage, int width, int height) {
-        // An alternative would be to return the result of calling
-        // sourceImage.getScaledInstance(width, height, Image.SCALE_REPLICATE)
-        // but that can't be handed off to the graphics hardware in the same
-        // way as this code. There's about a 10% difference in CPU usage on
-        // Linux with Java 5.
-        return ImageUtilities.scale(sourceImage, width, height, ImageUtilities.InterpolationHint.NONE);
+        return ImageUtilities.scale(sourceImage, width, height, ImageUtilities.InterpolationHint.REPLICATE);
     }
     
     private void initColorLabel() {
