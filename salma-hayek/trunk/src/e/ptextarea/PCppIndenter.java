@@ -5,6 +5,7 @@ public class PCppIndenter extends PSimpleIndenter {
         super(textArea);
     }
     
+    @Override
     public boolean isInNeedOfClosingSemicolon(String line) {
         return line.matches(".*\\b(class|enum|struct|union)\\b.*");
     }
@@ -13,20 +14,25 @@ public class PCppIndenter extends PSimpleIndenter {
         return activePartOfLine.matches("(private|public|protected)\\s*:");
     }
     
+    @Override
     protected String stripComments(String line) {
         return stripMultiLineComments(stripDoubleSlashComment(line));
     }
     
+    @Override
     protected boolean isLabel(String activePartOfLine) {
         return isCppAccessSpecifier(activePartOfLine) || isSwitchLabel(activePartOfLine);
     }
 
+    @Override
     protected boolean shouldMoveHashToColumnZero() {
         return true;
     }
+    @Override
     protected boolean shouldMoveLabels() {
         return true;
     }
+    @Override
     protected boolean shouldContinueDocComments() {
         return true;
     }

@@ -51,7 +51,7 @@ public abstract class PIndenter {
     }
     
     /** Returns the indentation which should be used for the given line number. */
-    private String getIndentation(int lineNumber) {
+    public String getIndentation(int lineNumber) {
         final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(lineNumber);
         return (previousNonBlankLineNumber == -1) ? "" : getCurrentIndentationOfLine(previousNonBlankLineNumber);
     }

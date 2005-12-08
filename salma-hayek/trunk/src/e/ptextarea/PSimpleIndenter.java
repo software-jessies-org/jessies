@@ -35,6 +35,7 @@ public abstract class PSimpleIndenter extends PIndenter {
         return stripComments(line).trim();
     }
     
+    @Override
     public boolean isElectric(char c) {
         if (c == '#' && shouldMoveHashToColumnZero()) {
             return true;
@@ -95,6 +96,7 @@ public abstract class PSimpleIndenter extends PIndenter {
         return -1;
     }
     
+    @Override
     public String getIndentation(int lineNumber) {
         String activePartOfLine = getActivePartOfLine(lineNumber);
         if (shouldMoveHashToColumnZero() && activePartOfLine.startsWith("#")) {
