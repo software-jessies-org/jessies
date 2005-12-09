@@ -31,7 +31,7 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
      * The target is connected to outside of the EDT, which is especially important if we're
      * using a ListeningConnector.
      */
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("VM Connector");
     
     TargetVm vm;
     
