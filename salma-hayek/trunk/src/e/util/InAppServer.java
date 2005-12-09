@@ -34,7 +34,10 @@ public final class InAppServer {
         this.handler = handler;
         
         try {
-            new Thread(new ConnectionAccepter(FileUtilities.fileFromString(portFilename)), fullName).start();
+            Thread serverThread = new Thread(new ConnectionAccepter(FileUtilities.fileFromString(portFilename)), fullName);
+            // If there are no other threads left, the InApp server shouldn't keep us alive.
+            serverThread.setDaemon(true);
+            serverThread.start();
         } catch (Throwable th) {
             Log.warn("Couldn't start " + fullName, th);
         }

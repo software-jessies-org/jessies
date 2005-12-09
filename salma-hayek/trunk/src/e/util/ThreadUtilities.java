@@ -31,17 +31,21 @@ public class ThreadUtilities {
     }
     
     private static class NamedThreadFactory implements ThreadFactory {
-        
-        final AtomicInteger threadNumber = new AtomicInteger(1);
-        final String namePrefix;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
         
         NamedThreadFactory(String poolName) {
-            namePrefix = poolName + "-thread-";
+            this.namePrefix = poolName + "-thread-";
         }
         
         public Thread newThread(Runnable r) {
-            return new Thread(r, namePrefix + threadNumber.getAndIncrement());
+            Thread thread = new Thread(r, namePrefix + threadNumber.getAndIncrement());
+            // I was going to make this a run-time option, but right now I
+            // can't think why you'd ever want a worker thread to be anything
+            // other than a daemon. I don't see why an idle worker thread
+            // should be able to prevent the VM from exiting.
+            thread.setDaemon(true);
+            return thread;
          }
     }
-    
 }
