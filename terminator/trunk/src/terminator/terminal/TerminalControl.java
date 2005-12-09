@@ -53,7 +53,7 @@ public class TerminalControl implements Runnable {
 	// Buffer of TerminalActions to perform.
 	private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
 	
-	private static final ExecutorService writerExecutor = Executors.newSingleThreadExecutor();
+	private static final ExecutorService writerExecutor = ThreadUtilities.newSingleThreadExecutor("UTF-8 Writer");
 	
 	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) {
 		reset();

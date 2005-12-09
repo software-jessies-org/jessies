@@ -1,5 +1,6 @@
 package terminator.view.highlight;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.concurrent.*;
@@ -13,7 +14,7 @@ import terminator.view.*;
  * Highlights the results of user-initiated finds.
  */
 public class FindHighlighter implements Highlighter {
-	private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Background Find");
 	
 	/** The highlighter pen style. */
 	private final Style style = new Style(Color.black, Color.yellow, null, null, false);
