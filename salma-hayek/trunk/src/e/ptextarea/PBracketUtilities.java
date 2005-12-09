@@ -37,6 +37,9 @@ public class PBracketUtilities {
         switch (bracket) {
         case '<':
         case '>':
+            // Strictly speaking, this isn't a valid optimization for C++
+            // but it's unlikely we'll ever see a failure case and
+            // Phil thinks it "should" speed things up.
             return ("{}[]()".indexOf(character) == -1);
             
         default:
