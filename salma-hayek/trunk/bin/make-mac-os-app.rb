@@ -39,6 +39,13 @@ def copy_required_directories(src, dst)
     system("cp -r #{src}/bin #{dst}")
     system("cp -r #{src}/classes #{dst}")
     system("cp -r #{src}/.generated #{dst}")
+    
+    # Copy JAR files, if there are any.
+    # FIXME: we should move these into a subdirectory of the project root. lib/? or a separate jars/?
+    if Dir.glob("#{src}/*.jar").length() > 0
+        # Let the shell worry about quoting.
+        system("cp #{src}/*.jar #{dst}")
+    end
 end
 copy_required_directories("../#{project_name}", "#{app_dir}/Resources/#{project_name}")
 copy_required_directories(salma_hayek, "#{app_dir}/Resources/salma-hayek")
