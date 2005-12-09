@@ -36,7 +36,9 @@ def copy_required_directories(src, dst)
     FileUtils.mkdir_p("#{dst}/classes")
     FileUtils.mkdir_p("#{dst}/.generated")
     
-    system("cp -r #{src}/bin #{dst}")
+    # bin/ is under revision control, so avoid the .svn directories.
+    system("find #{src}/bin -name .svn -prune -or -type f -print0 | xargs -0 -J % cp -r % #{dst}/bin")
+    
     system("cp -r #{src}/classes #{dst}")
     system("cp -r #{src}/.generated #{dst}")
     
