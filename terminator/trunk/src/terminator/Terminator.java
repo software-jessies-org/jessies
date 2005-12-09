@@ -13,7 +13,7 @@ import terminator.view.*;
 public class Terminator {
 	private static final Terminator INSTANCE = new Terminator();
 	private List<String> arguments;
-	private ArrayList<TerminatorFrame> frames = new ArrayList<TerminatorFrame>();
+	private Frames frames = new Frames();
 	
 	public static Terminator getSharedInstance() {
 		return INSTANCE;
@@ -24,14 +24,14 @@ public class Terminator {
 		Application application = new Application();
 		application.addApplicationListener(new ApplicationAdapter() {
 			public void handleReOpenApplication(ApplicationEvent e) {
-				if (frames.size() == 0) {
+				if (frames.isEmpty()) {
 					openFrame();
 				}
 				e.setHandled(true);
 			}
 			public void handleQuit(ApplicationEvent e) {
 				boolean quit = true;
-				if (frames.size() != 0) {
+				if (frames.isEmpty() == false) {
 					quit = SimpleDialog.askQuestion(frames.get(0), "Terminator", "You have " + StringUtilities.pluralize(frames.size(), "window", "windows") + " which may contain running processes. Do you want to quit and risk terminating these processes?", "Quit");
 				}
 				if (quit) {
@@ -47,20 +47,6 @@ public class Terminator {
 			display = "";
 		}
 		new InAppServer("Terminator", "~/.terminal-logs/.terminator-server-port" + display, TerminatorServer.class, new TerminatorServer());
-	}
-	
-	/**
-	 * Ensures that, on Mac OS, we always have our menu bar visible, even
-	 * when there are no terminal windows open. We use a dummy window with
-	 * a copy of the menu bar attached. When no other window has the focus,
-	 * but the application is focused, this hidden window gets the focus,
-	 * and its menu is used for the screen menu bar.
-	 */
-	private void initMenuBar() {
-		JFrame hiddenFrame = new JFrame("Mac OS implementation detail");
-		hiddenFrame.setJMenuBar(new TerminatorMenuBar());
-		hiddenFrame.setUndecorated(true);
-		hiddenFrame.setVisible(true);
 	}
 	
 	// Returns whether we started the UI.
@@ -80,17 +66,11 @@ public class Terminator {
 	private void parseOriginalCommandLine(final String[] argumentArray, PrintWriter out, PrintWriter err) throws IOException {
 		if (parseCommandLine(argumentArray, out, err)) {
 			startTerminatorServer();
-			if (GuiUtilities.isMacOs()) {
-				initMenuBar();
-			}
 		}
 	}
 	
 	public void frameClosed(TerminatorFrame frame) {
 		frames.remove(frame);
-		if (frames.size() == 0 && GuiUtilities.isMacOs() == false) {
-			System.exit(0);
-		}
 	}
 	
 	public void openFrame() {
