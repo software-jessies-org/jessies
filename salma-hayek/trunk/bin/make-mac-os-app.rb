@@ -32,14 +32,19 @@ FileUtils.mkdir_p("#{app_dir}/Resources")
 # Copy in the required bin/, classes/ and .generated/ directories.
 # Unfortunately, the start-up scripts tend to go looking for salma-hayek, so we can't just have Resources/bin and Resources/classes; we have to keep the multi-directory structure. For now.
 def copy_required_directories(src, dst)
-    FileUtils.mkdir_p("#{dst}/bin")
-    FileUtils.mkdir_p("#{dst}/classes")
-    FileUtils.mkdir_p("#{dst}/.generated")
-    
     # bin/ is under revision control, so avoid the .svn directories.
+    # FIXME: this assumes bin/ contains no subdirectories, which is currently true.
+    FileUtils.mkdir_p("#{dst}/bin")
     system("find #{src}/bin -name .svn -prune -or -type f -print0 | xargs -0 -J % cp -r % #{dst}/bin")
     
+    # classes/ contains only stuff we need, if you ignore the fact that not every application uses every class. There's also the question of whether we should be using JAR files for our classes, which I still have to look into.
+    FileUtils.mkdir_p("#{dst}/classes")
     system("cp -r #{src}/classes #{dst}")
+    
+    # .generated/ contains symbolic links to all the native source (which "-type f" ignores), contains object files, generated JNI header files, and generated make files. None of which we need to distribute, and which add up for some projects.
+    FileUtils.mkdir_p("#{dst}/.generated")
+    # FIXME: this flattens out the .generated/ subtree, which means we can no longer find the files. martind is going to improve the make rules to separate the generated products from the byproducts.
+    #system("find .generated/ -not -name '*.o' -not -name '*.h' -not -name '*.make' -type f -print0 | xargs -0 -J % cp -r % #{dst}/.generated")
     system("cp -r #{src}/.generated #{dst}")
     
     # Copy JAR files, if there are any.
