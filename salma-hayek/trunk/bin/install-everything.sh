@@ -63,7 +63,7 @@ if (m@^/dev/\w+ (/home/\w+) @) {
     system("echo rm -f $1/.terminal-logs/.terminator-server-port | bash -x");
 }'
 #rm -f ~/.e.edit.Edit/edit-server-port
-tic terminator/doc/terminfo/terminator.tic
+tic terminator/lib/terminfo/terminator.tic
 
 # Put links to each of our shell scripts in /usr/local/bin.
 # This avoids the need to mess with anyone's $PATH.
