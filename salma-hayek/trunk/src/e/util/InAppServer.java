@@ -33,6 +33,12 @@ public final class InAppServer {
         this.exportedInterface = exportedInterface;
         this.handler = handler;
         
+        // In the absence of authentication, we shouldn't risk starting a server as root.
+        if (System.getProperty("user.name").equals("root")) {
+            Log.warn("Refusing to start unauthenticated server '" + fullName + "' as root!");
+            return;
+        }
+        
         try {
             Thread serverThread = new Thread(new ConnectionAccepter(FileUtilities.fileFromString(portFilename)), fullName);
             // If there are no other threads left, the InApp server shouldn't keep us alive.
