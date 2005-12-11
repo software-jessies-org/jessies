@@ -14,8 +14,8 @@ import terminator.view.highlight.*;
  */
 public class TerminatorMenuBar extends JMenuBar {
 	private Action[] customWindowMenuItems = new Action[] {
-		new NextTerminalAction(),
-		new PreviousTerminalAction()
+		new NextTabAction(),
+		new PreviousTabAction()
 	};
 	
 	public TerminatorMenuBar() {
@@ -457,9 +457,9 @@ public class TerminatorMenuBar extends JMenuBar {
 		}
 	}
 	
-	public static class NextTerminalAction extends AbstractAction {
-		public NextTerminalAction() {
-			super("Next Terminal");
+	public static class NextTabAction extends AbstractAction {
+		public NextTabAction() {
+			super("Select Next Tab");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(GuiUtilities.isMacOs() ? "RIGHT" : "PAGE_DOWN"));
 		}
 		
@@ -469,11 +469,13 @@ public class TerminatorMenuBar extends JMenuBar {
 				frame.switchToNextTab();
 			}
 		}
+		
+		// FIXME: implement isEnabled.
 	}
 	
-	public static class PreviousTerminalAction extends AbstractAction {
-		public PreviousTerminalAction() {
-			super("Previous Terminal");
+	public static class PreviousTabAction extends AbstractAction {
+		public PreviousTabAction() {
+			super("Select Previous Tab");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(GuiUtilities.isMacOs() ? "LEFT" : "PAGE_UP"));
 		}
 		
@@ -483,5 +485,7 @@ public class TerminatorMenuBar extends JMenuBar {
 				frame.switchToPreviousTab();
 			}
 		}
+		
+		// FIXME: implement isEnabled.
 	}
 }
