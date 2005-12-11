@@ -460,7 +460,12 @@ public class TerminatorMenuBar extends JMenuBar {
 	public static class NextTabAction extends AbstractAction {
 		public NextTabAction() {
 			super("Select Next Tab");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(GuiUtilities.isMacOs() ? "RIGHT" : "PAGE_DOWN"));
+			if (GuiUtilities.isMacOs()) {
+				// Sun bug 6350813 prevents this from looking right on Mac OS, but at least it's the same keystroke as Safari.
+				putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("CLOSE_BRACKET", true));
+			} else {
+				putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("PAGE_DOWN"));
+			}
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -476,7 +481,12 @@ public class TerminatorMenuBar extends JMenuBar {
 	public static class PreviousTabAction extends AbstractAction {
 		public PreviousTabAction() {
 			super("Select Previous Tab");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(GuiUtilities.isMacOs() ? "LEFT" : "PAGE_UP"));
+			if (GuiUtilities.isMacOs()) {
+				// Sun bug 6350813 prevents this from looking right on Mac OS, but at least it's the same keystroke as Safari.
+				putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("OPEN_BRACKET", true));
+			} else {
+				putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("PAGE_UP"));
+			}
 		}
 		
 		public void actionPerformed(ActionEvent e) {
