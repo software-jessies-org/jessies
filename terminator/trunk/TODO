@@ -74,3 +74,7 @@
   sibling. If we fixed the menu bar to work on Linux, is there a way to have
   it present (for key handling) but invisible? That would be the nicest
   solution to this problem.
+
+* the absence of system wide C-`/C-~ functionality would make cycling through
+  windows even more useful on Linux, so maybe we should support alt-` and
+  alt-~ there?
