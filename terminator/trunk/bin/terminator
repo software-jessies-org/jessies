@@ -76,7 +76,7 @@ end
 ENV["TERMINFO"] = terminfo
 
 tic_binary = `bash -c "type -p tic"`.chomp()
-terminfo_SRC = "#{terminator_home}/doc/terminfo/terminator.tic"
+terminfo_SRC = "#{terminator_home}/lib/terminfo/terminator.tic"
 terminfo_DST = "#{terminfo}/t/terminator"
 if test(?e, terminfo_DST) == false
   system("mkdir -p #{terminfo_DST} && rmdir #{terminfo_DST}")
@@ -93,12 +93,12 @@ if tic_binary != ""
   system(*tic_command)
 elsif test(?f, terminfo_DST) == false
   # If you see an error like this:
-  # cp: /usr/local/bin/../doc/terminfo/terminator: No such file or directory
+  # cp: /usr/local/bin/../lib/terminfo/terminator: No such file or directory
   # It's because we haven't been able to find the ${terminator_home} directory.
   # This is probably because you're running an old version of Ruby without
   # the symlink-following class.
   # See the "require" statements above.
-  system("cp #{terminator_home}/doc/terminfo/terminator #{terminfo_DST}")
+  system("cp #{terminator_home}/lib/terminfo/terminator #{terminfo_DST}")
 end
 
 # If we don't have a pre-compiled native library for this
