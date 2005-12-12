@@ -33,10 +33,10 @@ class JdkInstaller
 
  def install_jdk(jdk_url, jdk_filename, jdk_build_number)
   if FileTest.directory?("#{@local_jdks_directory}/jdk1.6.0#{jdk_build_number}")
-   puts("You already have the latest JDK build installed (1.6.0#{jdk_build_number})")
+   $stderr.puts("You already have the latest JDK build installed (1.6.0#{jdk_build_number})")
   else
-   puts("#{jdk_url} not yet installed; downloading...")
-   system("wget #{jdk_url} --output-document=/tmp/#{jdk_filename}")
+   $stderr.puts("Downloading JDK 1.6.0#{jdk_build_number}...")
+   system("wget --no-verbose --output-document=/tmp/#{jdk_filename} #{jdk_url}")
 
    # This lets us run the installer from cron, by accepting the license for us.
    system("sed 's/^more <<\"EOF\"$/cat <<\"EOF\"/;s/^ *read reply leftover$/reply=YES/' < /tmp/#{jdk_filename} > /tmp/#{jdk_filename}-auto.bin")
@@ -52,9 +52,9 @@ class JdkInstaller
  end
 
  def install_changes_html(jdk_build_number)
-  puts("Looking for list of changes on web...")
+  $stderr.puts("Looking for list of changes on web...")
   url = nil
-  `wget --output-document=/tmp/jdk-changes-$$.html --no-check-certificate #{@sun_changes_url} && grep -- '#{jdk_build_number}\.html"' /tmp/jdk-changes-$$.html`.split("\n").each() {
+  `wget --no-verbose --output-document=/tmp/jdk-changes-$$.html --no-check-certificate #{@sun_changes_url} && grep -- '#{jdk_build_number}\.html"' /tmp/jdk-changes-$$.html`.split("\n").each() {
    |line|
    if line =~ /href="(.*#{jdk_build_number}\.html)"/
     url = $1
@@ -64,8 +64,8 @@ class JdkInstaller
    end
   }
   if url != nil
-   puts("Downloading #{url}...")
-   system("wget --output-document=#{@local_jdks_directory}/jdk1.6.0#{jdk_build_number}/changes.html --no-check-certificate #{url}")
+   $stderr.puts("Downloading #{url}...")
+   system("wget --no-verbose --output-document=#{@local_jdks_directory}/jdk1.6.0#{jdk_build_number}/changes.html --no-check-certificate #{url}")
   end
  end
 
