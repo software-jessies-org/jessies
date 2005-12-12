@@ -32,7 +32,7 @@ class JdkInstaller
  end
 
  def install_jdk(jdk_url, jdk_filename, jdk_build_number)
-  if FileTest.directory?("#{@local_jdks_directory}/jdk1.6.0#{jdk_build_number}") == false
+  if FileTest.directory?("#{@local_jdks_directory}/jdk1.6.0#{jdk_build_number}")
    puts("You already have the latest JDK build installed (1.6.0#{jdk_build_number})")
   else
    puts("#{jdk_url} not yet installed; downloading...")
