@@ -48,8 +48,10 @@ def copy_required_directories(src, dst)
     system("cp -r #{src}/.generated #{dst}")
     
     # lib/ contains support files that we have to assume we need.
-    FileUtils.mkdir_p("#{dst}/lib")
-    system("cp -r #{src}/lib #{dst}")
+    if FileTest.directory?("#{src}/lib")
+        FileUtils.mkdir_p("#{dst}/lib")
+        system("cp -r #{src}/lib #{dst}")
+    end
     
     # Copy JAR files, if there are any.
     # FIXME: we should move these into a subdirectory of the project root. lib/? or a separate jars/?
