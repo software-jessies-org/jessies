@@ -82,10 +82,6 @@ end
 
 invoker = Java.new("Edit", "e/util/Launcher")
 invoker.dock_icon = "/Developer/Examples/Carbon/SimpleText/SimpleText.icns"
-scm_home = Pathname.new("#{project_root}/../scm").realpath()
-if FileTest.directory?(scm_home)
-  invoker.add_class_path_entries([ "#{scm_home}/classes" ])
-end
 invoker.log_filename = log_filename
 invoker.add_extra_java_arguments(options)
 invoker.invoke([ "Edit", "#{edit_class_name}Launchable" ])
