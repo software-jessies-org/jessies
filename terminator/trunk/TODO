@@ -78,3 +78,46 @@
 * the absence of system wide C-`/C-~ functionality would make cycling through
   windows even more useful on Linux, so maybe we should support alt-` and
   alt-~ there?
+
+* car: "edit-style marking of the matches, notches next to the slider?
+  In voluminous output, indication of clustering of matches could be
+  helpful to me."
+
+* car: "Is it possible to detach tabbed instances out to their own window?
+  I've seen one that did this before (Konsole, I think) and I've found it
+  useful.  I've also found Terminal's split-view useful, in similar-ish
+  circumstances.  Both are pretty much a sop against either a lack of
+  forethought or plain old laziness." or "floating off a separate read-only
+  instance of the same terminal".
+
+* car: "Lack of any obvious preferences/ configuration mechanism (font's
+  too big)"
+
+* car: "lack of anything resembling accessible help (even just a link back
+  to http://software.jessies.org/terminator/) ...  A "--help" switch isn't
+  much help when terminator isn't in your PATH."
+
+* car: on Mac OS, at least, open(1) is perhaps a better idea than $EDITOR.
+  "start" on Win32?
+
+* car: "Starting a terminator window running vi is a bit grungy, and
+  can't be done as of the now (because terminator build a command string,
+  then terminator interprets the command "/bin/vi" and the filename as two
+  commands, starting me a two-tabbed window.)"
+
+* If the text changes under the selection, i think the selection should be
+  cleared.
+
+  1. run vim on some file larger than a screen's worth.
+  2. select a few lines in the middle.
+  3. scroll with C-e and C-y.
+
+  notice also that the selection *is* cleared if you scroll an empty line
+  into the selection.
+
+  Another demonstration of the problem is selecting some text in vi(1),
+  then quitting. We switch out of alternate buffer mode, but don't clear
+  the selection highlight.
+
+  There are many bugs involving the highlight updating. (First reported
+  on software@ on 2004-11-02.)
