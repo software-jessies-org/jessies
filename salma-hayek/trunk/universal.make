@@ -260,9 +260,9 @@ PROJECT_NAME = $(notdir $(PROJECT_ROOT))
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
 # By default, distributions end up under http://www.jessies.org/~software/downloads/
-DIST_SCP_USER_AND_HOST=software@jessies.org
+DIST_SSH_USER_AND_HOST=software@jessies.org
 # The html files are copied into the parent directory.
-DIST_SCP_DIRECTORY=/home/software/downloads/$(PROJECT_NAME)/builds
+DIST_DIRECTORY=/home/software/downloads/$(PROJECT_NAME)/builds
 
 $(takeProfileSample)
 SOURCE_FILES := $(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
@@ -456,11 +456,11 @@ ChangeLog:
 
 .PHONY: dist
 dist: ../$(DIST_FILE_OF_THE_DAY) ChangeLog.html
-	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
-	scp ChangeLog.html $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. && \
-	if [ -d www/ ] ; then scp -r www/* $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/.. ; fi && \
-	scp $< $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/ && \
-	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME)$(suffix $<)
+	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
+	scp ChangeLog.html $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/.. && \
+	if [ -d www/ ] ; then scp -r www/* $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/.. ; fi && \
+	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/ && \
+	ssh $(DIST_SSH_USER_AND_HOST) ln -s -f $(DIST_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_DIRECTORY)/../$(PROJECT_NAME)$(suffix $<)
 
 $(PROJECT_NAME).jar: build.java
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
@@ -560,8 +560,8 @@ else
 
 .PHONY: native-dist
 native-dist: $(NATIVE_DIST_FILE_OF_THE_DAY)
-	ssh $(DIST_SCP_USER_AND_HOST) mkdir -p $(DIST_SCP_DIRECTORY) && \
-	scp $< $(DIST_SCP_USER_AND_HOST):$(DIST_SCP_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)-$(DATE)$(suffix $<) && \
-	ssh $(DIST_SCP_USER_AND_HOST) ln -s -f $(DIST_SCP_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)-$(DATE)$(suffix $<) $(DIST_SCP_DIRECTORY)/../$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
+	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
+	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)-$(DATE)$(suffix $<) && \
+	ssh $(DIST_SSH_USER_AND_HOST) ln -s -f $(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)-$(DATE)$(suffix $<) $(DIST_DIRECTORY)/../$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
 
 endif
