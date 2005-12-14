@@ -81,7 +81,6 @@ convertToNativeFilenames.Cygwin = $(if $(1),$(foreach FILE,$(shell cygpath --mix
 convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 
 searchPath = $(firstword $(wildcard $(addsuffix /$(1)$(EXE_SUFFIX),$(subst :, ,$(PATH)))))
-dieWithUsefulErrorMessageIfNotFoundOnPath = $(if $(call searchPath,$(1)),$(1),$(error $(1) not found on $(PATH)))
 makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(1)))
 
 SPACE = $(subst :, ,:)
@@ -255,7 +254,6 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 
 PROJECT_ROOT = $(CURDIR)
 
-SVN = $(call dieWithUsefulErrorMessageIfNotFoundOnPath,svn)
 PROJECT_NAME = $(notdir $(PROJECT_ROOT))
 
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
@@ -279,7 +277,7 @@ REVISION_CONTROL_SYSTEM := $(strip $(REVISION_CONTROL_SYSTEM))
 REVISION_CONTROL_SYSTEM := $(if $(REVISION_CONTROL_SYSTEM),$(REVISION_CONTROL_SYSTEM),unknown)
 
 define GENERATE_CHANGE_LOG.svn
-  $(SVN) log > ChangeLog
+  svn log > ChangeLog
 endef
 
 define GENERATE_CHANGE_LOG.cvs
