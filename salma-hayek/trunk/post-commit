@@ -95,7 +95,7 @@ system("find #{repository_path}/db -name \"log.*\" -not -perm -g+w | xargs --no-
 
 begin
     Dir.chdir("#{script_path}/../#{repository_name}")
-    updateResult=`svn update 2>&1`
+    updateResult=`{ svn update && make www-dist; } 2>&1`
 rescue Exception => ex
     updateResult = ex.to_s()
 end
