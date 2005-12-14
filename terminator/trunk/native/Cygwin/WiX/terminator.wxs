@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
 <Product Id='79086527-df6c-4454-8997-26b349605f51' Name='Terminator' Language='1033'
-Version='$(env.REVISION)' Manufacturer='http://software.jessies.org/~software/downloads/terminator/'>
+Version='$(env.REVISION)' Manufacturer='http://software.jessies.org/terminator/'>
 <Package Id='????????-????-????-????-????????????' Compressed='yes' />
 
 <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
