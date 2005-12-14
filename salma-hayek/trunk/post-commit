@@ -97,15 +97,8 @@ system("find #{repository_path}/db -name \"log.*\" -not -perm -g+w | xargs --no-
 # will require manual intervention to fix, because we'll be stuck at the broken
 # revision forever.
 
-begin
-    Dir.chdir("#{script_path}/../#{repository_name}")
-    updateResult=`{ svn update && make www-dist; } 2>&1`
-rescue Exception => ex
-    updateResult = ex.to_s()
-end
-if updateResult =~ /(Updated to|At) revision/
-    # Assume success
-else
+updateResult=`{ cd #{script_path}/../#{repository_name} && svn update && make www-dist; } 2>&1`
+if $? != 0
     begin
         fd = open("|mail -s 'the post-commit svn update failed' #{to_address}", "w")
         fd.print("\n")
