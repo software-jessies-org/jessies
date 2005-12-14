@@ -460,7 +460,7 @@ ChangeLog:
 .PHONY: source-dist
 source-dist: ../$(DIST_FILE_OF_THE_DAY)
 	mkdir -p $(DIST_DIRECTORY) && \
-	cp $< $(DIST_DIRECTORY)/ && \
+	cp -f $< $(DIST_DIRECTORY)/ && \
 	ln -s -f $(DIST_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_DIRECTORY)/../$(PROJECT_NAME)$(suffix $<)
 
 $(PROJECT_NAME).jar: build.java
@@ -475,7 +475,7 @@ $(PROJECT_NAME).jar: build.java
 .PHONY: www-dist
 www-dist: ChangeLog.html
 	mkdir -p $(DIST_DIRECTORY) && \
-	cp ChangeLog.html $(DIST_DIRECTORY)/.. && \
+	cp -f ChangeLog.html $(DIST_DIRECTORY)/.. && \
 	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_DIRECTORY)/.. ; fi
 
 # ----------------------------------------------------------------------------
