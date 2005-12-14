@@ -458,7 +458,7 @@ ChangeLog:
 dist: ../$(DIST_FILE_OF_THE_DAY) ChangeLog.html
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	scp ChangeLog.html $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/.. && \
-	if [ -d www/ ] ; then scp -r www/* $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/.. ; fi && \
+	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/.. ; fi && \
 	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/ && \
 	ssh $(DIST_SSH_USER_AND_HOST) ln -s -f $(DIST_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_DIRECTORY)/../$(PROJECT_NAME)$(suffix $<)
 
