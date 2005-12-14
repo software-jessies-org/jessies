@@ -470,6 +470,13 @@ $(PROJECT_NAME).jar: build.java
 	cd .. && \
 	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(DIST_FILE_OF_THE_DAY) $(PROJECT_NAME)/*
 
+# This is only designed to be run on jessies.org itself.
+.PHONY: www-dist
+www-dist: ChangeLog.html
+	mkdir -p $(DIST_DIRECTORY) && \
+	cp ChangeLog.html $(DIST_DIRECTORY)/.. && \
+	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_DIRECTORY)/.. ; fi
+
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
 # ----------------------------------------------------------------------------
