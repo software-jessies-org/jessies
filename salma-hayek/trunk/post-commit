@@ -4,6 +4,9 @@
 # copy into your repository's hooks/ directory as "post-commit". Don't
 # forget to "chmod a+x post-commit".
 
+# You can test this script without checking in bogus revisions with, for example:
+# /home/software/svnroot/salma-hayek/hooks/post-commit /home/software/svnroot/salma-hayek 1237
+
 # ------------------------------------------------------------------------
 
 # You *will* need to change these.
@@ -87,7 +90,7 @@ sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes
 # Although the setgid directory means that the file's group is "software", that doesn't help its permissions.
 system("find #{repository_path}/db -name \"log.*\" -not -perm -g+w | xargs --no-run-if-empty chmod g+w")
 
-# Keep the post-commit trigger up-to-date.
+# Update the checked-out copy which, in salma-hayek, includes the post-commit trigger.
 
 # FIXME: if there's a script error which prevents us from getting this far, it
 # will require manual intervention to fix, because we'll be stuck at the broken
