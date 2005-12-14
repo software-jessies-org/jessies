@@ -19,10 +19,16 @@ fi
 
 # Install various packages we need.
 if test -f /etc/debian_version ; then
+    apt-get update
+    # Some of these are needed to build our stuff, some to run it, and some are "optional" to take best advantage of our features.
     if [[ ! -x /usr/bin/ctags-exuberant || ! -x /usr/bin/g++ || ! -x /usr/bin/make || ! -x /usr/bin/ri || ! -x /usr/bin/ruby || ! -x /usr/bin/svn ]]
     then
-        apt-get update
         apt-get -y install build-essential exuberant-ctags make g++ ri ruby subversion
+    fi
+    # You definitely want ispell(1) installed. Choosing a language is difficult, because a lot of people are parochial. So only install international English ispell if they haven't already installed ispell. (Last time I looked, whichever dictionary you install last becomes the default.)
+    if [[ ! -x /usr/bin/ispell ]]
+    then
+        apt-get -y install iamerican
     fi
     # It's important to have a non-free JDK, because the free ones aren't finished.
     apt-get -y install sun-j2sdk1.5
