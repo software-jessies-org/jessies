@@ -50,6 +50,7 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
 end
 
 pty_path = "#{terminator_home}/.generated/native/all/pty/#{target_os()}"
+# TODO: Find a way to remove the duplication between this and universal.make.
 jni_lib_prefix = "lib"
 jni_lib_extension = "so"
 if target_os() == "Darwin"
