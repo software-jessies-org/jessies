@@ -41,13 +41,13 @@ then
     WGET_OPTIONS="--no-cache"
 fi
 for PROJECT in $PROJECTS; do
-    wget $WGET_OPTIONS -N http://www.jessies.org/~software/downloads/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
+    wget $WGET_OPTIONS -N http://software.jessies.org/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
     if ! make -C $PROJECT
     then
         TARGET_OS=`./salma-hayek/bin/target-os.rb`
-        if wget $WGET_OPTIONS -N http://www.jessies.org/~software/downloads/$PROJECT/$PROJECT-$TARGET_OS.tgz
+        if wget $WGET_OPTIONS -N http://software.jessies.org/$PROJECT/$PROJECT-$TARGET_OS.tgz
         then
             tar --no-same-owner -zxf $PROJECT-$TARGET_OS.tgz || die "extracting $PROJECT-$TARGET_OS"
         else

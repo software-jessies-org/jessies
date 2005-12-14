@@ -259,7 +259,7 @@ PROJECT_NAME = $(notdir $(PROJECT_ROOT))
 
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
 
-# By default, distributions end up under http://www.jessies.org/~software/downloads/
+# By default, distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST=software@jessies.org
 # The html files are copied into the parent directory.
 DIST_DIRECTORY=/home/software/downloads/$(PROJECT_NAME)/builds

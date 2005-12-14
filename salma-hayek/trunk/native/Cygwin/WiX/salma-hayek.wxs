@@ -3,7 +3,7 @@
 <Module Id='salma-hayek' Guid='d7665d40-3540-11da-8cd6-0800200c9a66' Language='1033'
 Version='$(env.REVISION)'>
 <Package Id='d7665d40-3540-11da-8cd6-0800200c9a66'
-Manufacturer='http://software.jessies.org/~software/downloads/salma-hayek/'
+Manufacturer='http://software.jessies.org/salma-hayek/'
 Compressed='yes' />
 
 <Directory Id='TARGETDIR' Name='SourceDir'>
