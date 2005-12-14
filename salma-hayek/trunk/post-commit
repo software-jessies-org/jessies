@@ -98,7 +98,7 @@ system("find #{repository_path}/db -name \"log.*\" -not -perm -g+w | xargs --no-
 # will require manual intervention to fix, because we'll be stuck at the broken
 # revision forever.
 
-updateResult=`{ cd #{script_path}/../#{repository_name} && svn update && make www-dist; } 2>&1`
+updateResult=`{ cd #{script_path}/../#{repository_name} && svn update && make www-dist source-dist; } 2>&1`
 if $? != 0
     begin
         fd = open("|mail -s 'the post-commit update and dist failed' #{to_address}", "w")

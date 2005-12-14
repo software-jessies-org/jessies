@@ -1,10 +1,11 @@
 # You may use:
 #   make
 #   make clean
-#   make dist
 #   make native
 #   make native-clean
 #   make native-dist
+#   make source-dist
+#   make www-dist
 
 # You can set:
 #   JAVA_COMPILER to "gcjx", "javac", or a binary of your choice.
@@ -455,11 +456,12 @@ ChangeLog:
 	$(RM) $@ && \
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM))
 
-.PHONY: dist
-dist: ../$(DIST_FILE_OF_THE_DAY)
-	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
-	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/ && \
-	ssh $(DIST_SSH_USER_AND_HOST) ln -s -f $(DIST_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_DIRECTORY)/../$(PROJECT_NAME)$(suffix $<)
+# This is only designed to be run on jessies.org itself.
+.PHONY: source-dist
+source-dist: ../$(DIST_FILE_OF_THE_DAY)
+	mkdir -p $(DIST_DIRECTORY) && \
+	cp $< $(DIST_DIRECTORY)/ && \
+	ln -s -f $(DIST_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_DIRECTORY)/../$(PROJECT_NAME)$(suffix $<)
 
 $(PROJECT_NAME).jar: build.java
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
