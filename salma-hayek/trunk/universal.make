@@ -448,10 +448,12 @@ native-clean:
 	@$(RM) -r .generated/native
 
 ChangeLog.html: ChangeLog
+	$(RM) $@ && \
 	$(SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
 
 .PHONY: ChangeLog
 ChangeLog:
+	$(RM) $@ && \
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM))
 
 .PHONY: dist

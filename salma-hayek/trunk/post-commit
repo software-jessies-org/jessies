@@ -5,6 +5,7 @@
 # forget to "chmod a+x post-commit".
 
 # You can test this script without checking in bogus revisions with, for example:
+# umask 0002
 # /home/software/svnroot/salma-hayek/hooks/post-commit /home/software/svnroot/salma-hayek 1237
 
 # ------------------------------------------------------------------------
