@@ -50,18 +50,6 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
 end
 
 pty_path = "#{terminator_home}/.generated/native/all/pty/#{target_os()}"
-# TODO: Find a way to remove the duplication between this and universal.make.
-# Unconditionally running "make native" would do the trick but it might be slow
-# and it might not work on all of our users' machines.
-jni_lib_prefix = "lib"
-jni_lib_extension = "so"
-if target_os() == "Darwin"
-  jni_lib_extension = "jnilib"
-elsif target_os() == "Cygwin"
-  jni_lib_prefix = ""
-  jni_lib_extension = "dll"
-end
-pty_library = "#{pty_path}/#{jni_lib_prefix}pty.#{jni_lib_extension}"
 
 launcher = "java"
 if target_os() == "Cygwin"
@@ -102,12 +90,6 @@ elsif test(?f, terminfo_DST) == false
   # the symlink-following class.
   # See the "require" statements above.
   system("cp #{terminator_home}/lib/terminfo/terminator #{terminfo_DST}")
-end
-
-# If we don't have a pre-compiled native library for this
-# architecture, try to build it.
-if test(?x, pty_library) == false
-  system("make #{pty_library}")
 end
 
 if target_os() == "Linux"
