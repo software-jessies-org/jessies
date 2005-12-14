@@ -93,8 +93,12 @@ system("find #{repository_path}/db -name \"log.*\" -not -perm -g+w | xargs --no-
 # will require manual intervention to fix, because we'll be stuck at the broken
 # revision forever.
 
-Dir.chdir(script_path)
-updateResult=`svn update 2>&1`
+begin
+    Dir.chdir("#{script_path}/../#{repository_name}")
+    updateResult=`svn update 2>&1`
+rescue Exception => ex
+    updateResult = ex.to_s()
+end
 if updateResult =~ /(Updated to|At) revision/
     # Assume success
 else
