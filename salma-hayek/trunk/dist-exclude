@@ -2,3 +2,4 @@
 *.rej
 .svn
 ChangeLog.html
+classes

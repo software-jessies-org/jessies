@@ -465,7 +465,7 @@ $(PROJECT_NAME).jar: build.java
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
-../$(DIST_FILE_OF_THE_DAY): build.java ChangeLog
+../$(DIST_FILE_OF_THE_DAY): ChangeLog
 	cd .. && \
 	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(DIST_FILE_OF_THE_DAY) $(PROJECT_NAME)/*
 
