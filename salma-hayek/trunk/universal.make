@@ -81,6 +81,7 @@ convertToNativeFilenames.Cygwin = $(if $(1),$(foreach FILE,$(shell cygpath --mix
 convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 
 searchPath = $(firstword $(wildcard $(addsuffix /$(1)$(EXE_SUFFIX),$(subst :, ,$(PATH)))))
+dieWithUsefulErrorMessageIfNotFoundOnPath = $(if $(call searchPath,$(1)),$(1),$(error $(1) not found on $(PATH)))
 makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(1)))
 
 SPACE = $(subst :, ,:)
@@ -254,7 +255,7 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 
 PROJECT_ROOT = $(CURDIR)
 
-SVN := $(call searchPath,svn)
+SVN = $(call dieWithUsefulErrorMessageIfNotFoundOnPath,svn)
 PROJECT_NAME = $(notdir $(PROJECT_ROOT))
 
 SCRIPT_PATH=$(SALMA_HAYEK)/bin
