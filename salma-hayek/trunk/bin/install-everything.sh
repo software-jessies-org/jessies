@@ -62,6 +62,8 @@ cat /proc/mounts | perl -ne '
 if (m@^/dev/\w+ (/home/\w+) @) {
     system("echo rm -f $1/.terminal-logs/.terminator-server-port | bash -x");
 }'
+# If you've left Edit running overnight (as I sometimes do), you won't expect the first file
+# you edit in the morning from Terminator to spawn a new Edit.
 #rm -f ~/.e.edit.Edit/edit-server-port
 tic terminator/lib/terminfo/terminator.tic
 
