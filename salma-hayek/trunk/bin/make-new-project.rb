@@ -55,7 +55,10 @@ cp $projects_dir/edit/COPYING $project_name/COPYING
 
 echo "Creating a new Subversion repository..."
 ssh $svn_user_and_host svnadmin create /home/software/svnroot/$project_name
+echo "Creating the post-commit hook..."
 ssh $svn_user_and_host ln -s /home/software/checked-out/salma-hayek/post-commit /home/software/svnroot/$project_name/hooks
+echo "Creating the checked-out copy in /home/software..."
+ssh $svn_user_and_host svn co file:///home/software/svnroot/$project_name/trunk /home/software/checked-out/$project_name
 echo "Making the initial import..."
 svn import $project_name svn+ssh://$svn_user_and_host/home/software/svnroot/$project_name -m "New project, $project_name."
 echo "Checking back out..."
