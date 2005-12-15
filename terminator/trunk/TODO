@@ -91,11 +91,8 @@
   instance of the same terminal".
 
 * car: "Lack of any obvious preferences/ configuration mechanism (font's
-  too big)"
-
-* car: "lack of anything resembling accessible help (even just a link back
-  to http://software.jessies.org/terminator/) ...  A "--help" switch isn't
-  much help when terminator isn't in your PATH."
+  too big)". "--help" tells you about the resources, but (a) that's not
+  available from within Terminator, and (b) that's not exactly friendly.
 
 * car: on Mac OS, at least, open(1) is perhaps a better idea than $EDITOR.
   "start" on Win32?
