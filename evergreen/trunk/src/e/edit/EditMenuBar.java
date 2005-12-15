@@ -20,6 +20,7 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         add(makeWorkspaceMenu());
         add(makeToolsMenu());
         add(makeWindowMenu());
+        add(makeHelpMenu());
     }
     
     public class ExitAction extends AbstractAction {
@@ -167,6 +168,13 @@ public class EditMenuBar extends JMenuBar implements MenuListener {
         menu.add(new CycleWindowsAction(1));
         menu.add(new CycleWindowsAction(-1));
         return menu;
+    }
+    
+    private JMenu makeHelpMenu() {
+        HelpMenu helpMenu = new HelpMenu("Edit");
+        helpMenu.setWebsite("http://software.jessies.org/edit/");
+        helpMenu.setChangeLog("http://software.jessies.org/edit/ChangeLog.html");
+        return helpMenu.makeJMenu();
     }
     
     public JMenu add(JMenu menu) {
