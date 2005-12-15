@@ -278,9 +278,11 @@ this file, Terminator only understands colors in the form #rrggbb.
 <p>If you don't have any colors configured, Terminator will use built-in
 defaults similar to SGI's <tt>xwsh(1)</tt>.
 
-<p>Terminator uses the same names for fonts as Java. (This is why we use
-different resources to specify a font, and won't even try to translate X11
-logical font descriptions.)
+<p>Terminator uses the same names for fonts as Java. This is why we use
+different resources from XTerm to specify a font, and won't even try to
+translate X11's so-called "logical font descriptions". Set
+<tt>Terminator*fontName</tt> to a font name understood by Java, and use
+<tt>Terminator*fontSize</tt> to choose the font's point size.
 
 <h3>Running on Windows</h3>
 
