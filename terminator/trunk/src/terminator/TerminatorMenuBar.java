@@ -24,7 +24,7 @@ public class TerminatorMenuBar extends JMenuBar {
 		add(makeScrollbackMenu());
 		//add(makeFontMenu());
 		add(WindowMenu.getSharedInstance().makeJMenu(customWindowMenuItems));
-		//addHelpMenu();
+		add(makeHelpMenu());
 	}
 	
 	private JMenu makeFileMenu() {
@@ -95,6 +95,13 @@ public class TerminatorMenuBar extends JMenuBar {
 		//menu.add(new JMenuItem(new SmallerFontAction()));
 		
 		return menu;
+	}
+	
+	private JMenu makeHelpMenu() {
+		HelpMenu helpMenu = new HelpMenu("Terminator");
+		helpMenu.setWebsite("http://software.jessies.org/terminator/");
+		helpMenu.setChangeLog("http://software.jessies.org/terminator/ChangeLog.html");
+		return helpMenu.makeJMenu();
 	}
 	
 	/**
