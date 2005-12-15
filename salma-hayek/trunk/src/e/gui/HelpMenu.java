@@ -30,10 +30,10 @@ public class HelpMenu {
         //menu.addSeparator();
         
         if (websiteUrl != null) {
-            menu.add(new WebLinkAction(applicationName + " Website", websiteUrl));
+            menu.add(new WebLinkAction("Go To Website", websiteUrl));
         }
         if (changeLogUrl != null) {
-            menu.add(new WebLinkAction(applicationName + " Change Log", changeLogUrl));
+            menu.add(new WebLinkAction("View Change Log", changeLogUrl));
         }
         
         // We don't support this yet, because we've got nothing to point it to.

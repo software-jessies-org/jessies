@@ -5,6 +5,10 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 
+/**
+ * Opens a web browser at the given URL. Also takes a name for use in menus
+ * or on buttons.
+ */
 public class WebLinkAction extends AbstractAction {
     private String url;
     
