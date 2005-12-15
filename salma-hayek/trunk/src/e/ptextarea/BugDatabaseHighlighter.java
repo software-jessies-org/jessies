@@ -52,23 +52,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     @Override
     protected void configureSegment(PTextSegment segment, Matcher matcher) {
         String url = urlForMatcher(matcher);
-        segment.setLinkAction(new BugLinkActionListener(url));
+        segment.setLinkAction(new WebLinkAction("Bug Database Link", url));
         segment.setToolTip(url);
-    }
-    
-    private static class BugLinkActionListener implements ActionListener {
-        private String url;
-        
-        public BugLinkActionListener(String url) {
-            this.url = url;
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            try {
-                BrowserLauncher.openURL(url);
-            } catch (IOException ex) {
-                SimpleDialog.showDetails(null, "Bug Database Link", ex);
-            }
-        }
     }
 }
