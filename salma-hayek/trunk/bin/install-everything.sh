@@ -48,6 +48,10 @@ if test -f /etc/debian_version ; then
     # It's important to have a non-free JDK, because the free ones aren't finished.
     # We build this package ourselves, so it's unlikely to be updated often and to cause spurious libc updates.
     apt-get -y install sun-j2sdk1.5
+    # The first of the things we'll have to install to be able to build .deb installers.
+    # This particular package is unlikely to cause libc updates.
+    # The need for further packages will be removed by the Build-Depends line in the .deb's control file.
+    apt-get -y install build-essential
 fi
 
 # Create a directory in /usr/local for all our stuff.
