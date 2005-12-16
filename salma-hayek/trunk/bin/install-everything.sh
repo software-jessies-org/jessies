@@ -22,9 +22,14 @@ fi
 # By installing the packages one at a time, we ensure that packages which can't be
 # installed don't stop those which can.
 installMissingExecutable() {
+    # We could scrape the output of dpkg --status but -x is easy and robust under eg i18n.
     if [[ ! -x $1 ]]
     then
-        apt-get -y install $2
+        # We don't care what version gets installed, so use -t to encourage apt-get to pick
+        # an old version which is, we might guess, less likely to cause a libc update.
+        # I haven't seen a case where this worked yet but it seems not to be harmful.
+        # One day, we'll have a proper installer and all this dubious cruft can go.
+        apt-get -y install -t stable $2
     fi
 }
 
