@@ -18,7 +18,7 @@ public class TerminatorFrame extends JFrame {
 	private ArrayList<JTerminalPane> terminals = new ArrayList<JTerminalPane>();
 
 	public TerminatorFrame(Terminator terminator, JTerminalPaneFactory[] paneFactories) {
-		super(Options.getSharedInstance().getTitle());
+		super("Terminator");
 		this.terminator = terminator;
 		JTerminalPane[] panes = new JTerminalPane[paneFactories.length];
 		for (int i = 0; i < paneFactories.length; ++i) {

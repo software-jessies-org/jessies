@@ -1,11 +1,15 @@
 package terminator;
 
+import e.forms.*;
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
-import e.util.*;
+import javax.swing.*;
 
 /**
  * Reads in settings from the file system and makes them conveniently
@@ -42,12 +46,11 @@ public class Options {
 	private static final String LOGIN_SHELL = "loginShell";
 	private static final String SCROLL_KEY = "scrollKey";
 	private static final String SCROLL_TTY_OUTPUT = "scrollTtyOutput";
-	private static final String TITLE = "title";
 	private static final String USE_MENU_BAR = "useMenuBar";
 	
 	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt|Terminator)(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
-	private HashMap<String, String> options = new HashMap<String, String>();
+	private HashMap<String, Object> options = new HashMap<String, Object>();
 	private HashMap<String, String> descriptions = new HashMap<String, String>();
 	private HashMap<String, Color> rgbColors = null;
 	
@@ -136,14 +139,6 @@ public class Options {
 		return booleanResource(USE_MENU_BAR);
 	}
 	
-	/**
-	 * Returns a string suitable for the window manager to use as a window
-	 * title.
-	 */
-	public String getTitle() {
-		return stringResource(TITLE);
-	}
-	
 	public int getInternalBorder() {
 		return integerResource(INTERNAL_BORDER);
 	}
@@ -167,7 +162,7 @@ public class Options {
 	}
 	
 	private String stringResource(String name) {
-		return options.get(name);
+		return options.get(name).toString();
 	}
 	
 	private boolean booleanResource(String name) {
@@ -213,7 +208,7 @@ public class Options {
 	 * "fontName" and "fontSize".
 	 */
 	public Font getFont() {
-		return new Font(stringResource(FONT_NAME), Font.PLAIN, integerResource(FONT_SIZE));
+		return new Font(Font.class.cast(options.get(FONT_NAME)).getFamily(), Font.PLAIN, integerResource(FONT_SIZE));
 	}
 	
 	private Options() {
@@ -221,6 +216,7 @@ public class Options {
 		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
+		// FIXME: read options from our own private stash, which we can safely rewrite.
 		aliasColorBD();
 	}
 	
@@ -242,30 +238,151 @@ public class Options {
 		return otherArguments;
 	}
 	
-	private void addDefault(String name, String value, String description) {
+	private void addDefault(String name, Object value, String description) {
 		options.put(name, value);
 		descriptions.put(name, description);
+	}
+	
+	private Font makePrototypeFont(String familyName) {
+		return new Font(familyName, Font.PLAIN, 1);
 	}
 	
 	/**
 	 * Sets the defaults for non-color options.
 	 */
 	private void initDefaults() {
-		addDefault(ANTI_ALIAS, "false", "Use anti-aliased text?");
-		addDefault(BLOCK_CURSOR, "false", "Use a block cursor instead of an underline?");
-		addDefault(CURSOR_BLINK, "true", "Blink the cursor?");
-		addDefault(ERROR_EXIT_HOLDING, "true", "Keep the window open if the child exits with an error status?");
-		addDefault(FANCY_BELL, "true", "Use alpha rather than XOR for the visual bell?");
-		addDefault(FONT_NAME, GuiUtilities.getMonospacedFontName(), "The name of the font to use (not an X11 font)");
-		addDefault(FONT_SIZE, "12", "The size of text, in points");
-		addDefault(INITIAL_COLUMN_COUNT, "80", "The number of columns in a new terminal");
-		addDefault(INITIAL_ROW_COUNT, "24", "The number of rows in a new terminal");
-		addDefault(INTERNAL_BORDER, "2", "The number of pixels spacing between the text and the edge of the window");
-		addDefault(LOGIN_SHELL, "true", "Start the child with a '-l' argument?");
-		addDefault(SCROLL_KEY, "true", "Move the scrollbar to the bottom when a key is pressed?");
-		addDefault(SCROLL_TTY_OUTPUT, "false", "Move the scrollbar to the bottom when something is output?");
-		addDefault(TITLE, "Terminator", "The default title string for new terminals");
-		addDefault(USE_MENU_BAR, Boolean.toString(GuiUtilities.isMacOs()), "Use a menu bar?");
+		addDefault(ANTI_ALIAS, Boolean.FALSE, "Anti-alias text?");
+		addDefault(BLOCK_CURSOR, Boolean.FALSE, "Use block cursor?");
+		addDefault(CURSOR_BLINK, Boolean.TRUE, "Blink cursor?");
+		addDefault(ERROR_EXIT_HOLDING, Boolean.TRUE, "Keep terminal if child exits with error status?");
+		addDefault(FANCY_BELL, Boolean.TRUE, "High-quality rendering of the visual bell?");
+		addDefault(FONT_NAME, makePrototypeFont(GuiUtilities.getMonospacedFontName()), "Font family");
+		addDefault(FONT_SIZE, Integer.valueOf(12), "Font size (points)");
+		addDefault(INITIAL_COLUMN_COUNT, Integer.valueOf(80), "New terminal width");
+		addDefault(INITIAL_ROW_COUNT, Integer.valueOf(24), "New terminal height");
+		addDefault(INTERNAL_BORDER, Integer.valueOf(2), "Terminal border width");
+		addDefault(LOGIN_SHELL, Boolean.TRUE, "Start the child with a '-l' argument?");
+		addDefault(SCROLL_KEY, Boolean.TRUE, "Scroll to bottom on key press?");
+		addDefault(SCROLL_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output?");
+		
+		if (GuiUtilities.isMacOs()) {
+			// Mac users don't get a choice about this, though if they're insane they can override this in their resources.
+			// FIXME: don't allow this to be overridden on Mac OS.
+			options.put(USE_MENU_BAR, Boolean.TRUE);
+		} else {
+			addDefault(USE_MENU_BAR, Boolean.FALSE, "Use a menu bar?");
+		}
+	}
+	
+	public void showPreferencesDialog() {
+		// FIXME: the info dialog keeps the Terminator menu bar; is that because we give it an owner?
+		FormBuilder form = new FormBuilder(null, "Preferences");
+		FormPanel formPanel = form.getFormPanel();
+		
+		String[] keys = options.keySet().toArray(new String[options.size()]);
+		Arrays.sort(keys);
+		for (String key : keys) {
+			String description = descriptions.get(key);
+			if (description != null) {
+				Object value = options.get(key);
+				if (value instanceof Boolean) {
+					formPanel.addRow("", new BooleanPreferenceAction(key).makeUi());
+				} else if (value instanceof Integer) {
+					formPanel.addRow(description + ":", new IntegerPreferenceAction(key).makeUi());
+				} else if (value instanceof Font) {
+					formPanel.addRow(description + ":", new FontPreferenceAction(key).makeUi());
+				} else {
+					// FIXME: we should probably handle String.
+					// FIXME: the Final Solution should use a HashMap<Class, ActionAndUi>.
+					continue;
+				}
+			}
+		}
+		
+		form.showNonModal();
+		// FIXME: write options to our own private stash.
+	}
+	
+	private class BooleanPreferenceAction extends AbstractAction {
+		private String key;
+		
+		public BooleanPreferenceAction(String key) {
+			this.key = key;
+			putValue(NAME, descriptions.get(key));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox checkBox = JCheckBox.class.cast(e.getSource());
+			options.put(key, checkBox.isSelected());
+		}
+		
+		public JComponent makeUi() {
+			JCheckBox checkBox = new JCheckBox(this);
+			checkBox.setSelected(Boolean.class.cast(options.get(key)).booleanValue());
+			return checkBox;
+		}
+	}
+	
+	private class FontPreferenceAction extends AbstractAction {
+		private String key;
+		
+		public FontPreferenceAction(String key) {
+			this.key = key;
+			putValue(NAME, descriptions.get(key));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JComboBox comboBox = JComboBox.class.cast(e.getSource());
+			options.put(key, makePrototypeFont(comboBox.getSelectedItem().toString()));
+		}
+		
+		public JComponent makeUi() {
+			JComboBox comboBox = new JComboBox();
+			// FIXME: filter out unsuitable fonts. "Zapf Dingbats", for example.
+			// FIXME: pull fixed fonts to the top of the list?
+			for (String name : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
+				comboBox.addItem(name);
+			}
+			comboBox.setSelectedItem(Font.class.cast(options.get(key)).getFamily());
+			comboBox.addActionListener(this);
+			// FIXME: add a custom renderer so you can see the fonts.
+			return comboBox;
+		}
+	}
+	
+	private class IntegerPreferenceAction extends AbstractAction {
+		private String key;
+		
+		public IntegerPreferenceAction(String key) {
+			this.key = key;
+			putValue(NAME, descriptions.get(key));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTextField textField = JTextField.class.cast(e.getSource());
+			boolean okay = false;
+			try {
+				String text = textField.getText();
+				int newValue = Integer.parseInt(text);
+				// FIXME: really, an integer preference should have an explicit range.
+				if (newValue > 0) {
+					options.put(key, newValue);
+					okay = true;
+				}
+			} catch (NumberFormatException ex) {
+			}
+			textField.setForeground(okay ? UIManager.getColor("TextField.foreground") : Color.RED);
+		}
+		
+		public JComponent makeUi() {
+			final ETextField textField = new ETextField(options.get(key).toString()) {
+				@Override
+				public void textChanged() {
+					actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+				}
+			};
+			return textField;
+		}
 	}
 	
 	/**

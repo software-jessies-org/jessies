@@ -22,13 +22,27 @@ public class Terminator {
 	private Terminator() {
 		Log.setApplicationName("Terminator");
 		Application application = new Application();
+		application.setEnabledPreferencesMenu(true);
 		application.addApplicationListener(new ApplicationAdapter() {
+//			public void handleAbout(ApplicationEvent e) {
+//				AboutBox aboutBox = new AboutBox("Terminator");
+//				aboutBox.makeUi();
+//				aboutBox.setVisible(true);
+//				e.setHandled(true);
+//			}
+			
 			public void handleReOpenApplication(ApplicationEvent e) {
 				if (frames.isEmpty()) {
 					openFrame();
 				}
 				e.setHandled(true);
 			}
+			
+			public void handlePreferences(ApplicationEvent e) {
+				Options.getSharedInstance().showPreferencesDialog();
+				e.setHandled(true);
+			}
+			
 			public void handleQuit(ApplicationEvent e) {
 				boolean quit = true;
 				if (frames.isEmpty() == false) {
