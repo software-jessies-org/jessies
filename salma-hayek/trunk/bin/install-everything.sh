@@ -1,5 +1,5 @@
 #!/bin/bash
-# FIXME: rewrite this in Ruby! (The fact that Ruby isn't installed by default on Solaris or Ubuntu points to one possible advantage to keeping this in sh, or at least in having a bootstrap stage that installs Ruby.)
+# FIXME: rewrite this in Ruby! (The fact that Ruby isn't installed by default on Solaris or Ubuntu points to one possible advantage to keeping this in sh, or at least in having a bootstrap stage that installs Ruby.  A proper packaging system will let us specify a dependency on Ruby, so we shouldn't feel constrained.)
 
 die() {
     echo $*
@@ -17,20 +17,31 @@ if ! test -w . ; then
   die "cannot write to /usr/local - this script needs to be run as root"
 fi
 
+# The motivation to make the installation conditional was to stop spurious libc updates
+# which usually eventually require a reboot to get the system properly working again.
+# By installing the packages one at a time, we ensure that packages which can't be
+# installed don't stop those which can.
+installMissingExecutable() {
+    if [[ ! -x $1 ]]
+    then
+        apt-get -y install $2
+    fi
+}
+
 # Install various packages we need.
 if test -f /etc/debian_version ; then
     apt-get update
     # Some of these are needed to build our stuff, some to run it, and some are "optional" to take best advantage of our features.
-    if [[ ! -x /usr/bin/ctags-exuberant || ! -x /usr/bin/g++ || ! -x /usr/bin/make || ! -x /usr/bin/ri || ! -x /usr/bin/ruby || ! -x /usr/bin/svn ]]
-    then
-        apt-get -y install build-essential exuberant-ctags make g++ ri ruby subversion
-    fi
+    installMissingExecutable /usr/bin/ctags-exuberant exuberant-ctags
+    installMissingExecutable /usr/bin/g++ g++
+    installMissingExecutable /usr/bin/make make
+    installMissingExecutable /usr/bin/ri ri
+    installMissingExecutable /usr/bin/ruby ruby
+    installMissingExecutable /usr/bin/svn subversion
     # You definitely want ispell(1) installed. Choosing a language is difficult, because a lot of people are parochial. So only install international English ispell if they haven't already installed ispell. (Last time I looked, whichever dictionary you install last becomes the default.)
-    if [[ ! -x /usr/bin/ispell ]]
-    then
-        apt-get -y install iamerican
-    fi
+    installMissingExecutable /usr/bin/ispell iamerican
     # It's important to have a non-free JDK, because the free ones aren't finished.
+    # We build this package ourselves, so it's unlikely to be updated often and to cause spurious libc updates.
     apt-get -y install sun-j2sdk1.5
 fi
 
