@@ -20,7 +20,7 @@ edit_class_name = "e.edit.Edit"
 
 def openFileOnEditServer(edit_preferences_directory, filename, shouldBlock)
   begin
-    File.new("#{edit_preferences_directory}/edit-server-port").read() =~ /^(.+):(\d+)$/
+    File.open("#{edit_preferences_directory}/edit-server-port") { |f| f.read() =~ /^(.+):(\d+)$/ }
     host = $1
     port = $2.to_i()
     require "net/telnet"
