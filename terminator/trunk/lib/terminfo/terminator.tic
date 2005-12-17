@@ -105,6 +105,21 @@ terminator|Terminator no line wrap,
     sgr0=\E[m,
     setaf=\E[%p1%{30}%+%dm,
 #
+# Use the title bar as a status line. Because we don't set $WINDOWID, you'll
+# have to "set title" in your .vimrc to get vim(1) to behave as it does with
+# xterm(1) or rxvt(1). This line was constructed based on information in
+# the "Status Lines" section of:
+#
+#  http://publib16.boulder.ibm.com/pseries/en_US/files/aixfiles/terminfo.htm
+#
+# which implied that we shouldn't use "hs" because our status line is not
+# cursor-addressable. We also shouldn't specify eslok (because we don't
+# support escape sequences in titles), or wsl (because the title bar is
+# roughly the width of the terminal). We ignore the parameter to tsl, which
+# is the column of the status line in which to start.
+#
+    dsl=\E]2;\007, fsl=^G, tsl=\E]2;%p1,
+#
 # Keys
 #
 # Function keys.
