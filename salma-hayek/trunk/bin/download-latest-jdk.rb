@@ -14,6 +14,12 @@ class JdkInstaller
   @sun_site = "http://download.java.net"
   @sun_binaries_url = "#{@sun_site}/jdk6/binaries/"
   @sun_changes_url = "https://mustang.dev.java.net/servlets/ProjectDocumentList?folderID=2855"
+  
+  @should_be_quiet = false
+ end
+
+ def should_be_quiet()
+  @should_be_quiet = true
  end
 
  # Get the OS in Sun's nomenclature.
@@ -34,7 +40,9 @@ class JdkInstaller
 
  def install_jdk(jdk_url, jdk_filename, jdk_build_number)
   if FileTest.directory?("#{@local_jdks_directory}/jdk1.6.0#{jdk_build_number}")
-   $stderr.puts("You already have the latest JDK build installed (1.6.0#{jdk_build_number})")
+   if @should_be_quiet == false
+    $stderr.puts("You already have the latest JDK build installed (1.6.0#{jdk_build_number})")
+   end
   else
    $stderr.puts("Downloading JDK 1.6.0#{jdk_build_number}...")
    system("wget --no-verbose --output-document=/tmp/#{jdk_filename} #{jdk_url}")
@@ -96,5 +104,25 @@ class JdkInstaller
  end
 end
 
-JdkInstaller.new().check_web_site()
+def die(message)
+ $stderr.puts(message)
+ exit(1)
+end
+
+accept_sun_license = false
+jdk_installer = JdkInstaller.new()
+ARGV.each() {
+ |arg|
+ if arg == "-q"
+  jdk_installer.should_be_quiet()
+ elsif arg == "--accept-sun-license"
+  accept_sun_license = true
+ else
+  die("usage: #{`basename #$0`.chomp()} [-q] --accept-sun-license")
+ end
+}
+if accept_sun_license == false
+ die("You must accept Sun's license with --accept-sun-license to run this script.")
+end
+jdk_installer.check_web_site()
 exit(0)
