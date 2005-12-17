@@ -31,7 +31,7 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
   # we can open a new window quicker than xterm(1), from the user's point of
   # view.
   begin
-    File.new(server_port_file).read() =~ /^(.+):(\d+)$/
+    File.open(server_port_file) { |f| f.read() =~ /^(.+):(\d+)$/ }
     # Some machines have more than one host name.
     # Fortunately, if host isn't the same machine as localhost, the connection
     # below is unlikely to work.
