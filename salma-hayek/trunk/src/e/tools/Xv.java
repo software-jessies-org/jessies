@@ -13,7 +13,24 @@ public class Xv extends JFrame {
         super(filename);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
-        BufferedImage image = ImageIO.read(new File(filename));
+        fillWithContent(filename);
+        setLocationByPlatform(true);
+        setVisible(true);
+    }
+    
+    private void fillWithContent(String filename) {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(new File(filename));
+            if (image == null) {
+                setErrorContent("Couldn't open \"" + filename + "\"");
+                return;
+            }
+        } catch (Exception ex) {
+            setErrorContent("Error opening \"" + filename + "\" (" + ex.getMessage() + ")");
+            return;
+        }
+        
         Log.warn("Opened '" + filename + "' (" + image.getWidth() + "x" + image.getHeight() + ").");
         
         setContentPane(new JScrollPane(new JLabel(new ImageIcon(image))));
@@ -24,10 +41,13 @@ public class Xv extends JFrame {
         } else {
             pack();
         }
-        setLocationByPlatform(true);
-        setVisible(true);
     }
-
+    
+    private void setErrorContent(String text) {
+        setContentPane(new JLabel(text, SwingConstants.CENTER));
+        pack();
+    }
+    
     public static void main(String[] arguments) throws IOException {
         Log.setApplicationName("Xv");
         GuiUtilities.initLookAndFeel();
