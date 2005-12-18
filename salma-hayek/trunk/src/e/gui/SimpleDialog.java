@@ -32,7 +32,7 @@ public class SimpleDialog {
             return message;
         }
         
-        boolean html = message.startsWith("<html>");
+        boolean html = message.matches("^(?i)<html>.*");
         if (html) {
             message = message.substring(6);
         }
