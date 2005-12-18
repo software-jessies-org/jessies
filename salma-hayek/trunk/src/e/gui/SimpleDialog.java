@@ -56,8 +56,11 @@ public class SimpleDialog {
         if (html) {
             // On Mac OS, make CSS available to make Mac-like formatting easier.
             if (GuiUtilities.isMacOs()) {
-                result ="<html>" + MAC_CSS + result;
+                result = MAC_CSS + result;
             }
+            // Put back the leading "<html>" that we stripped earlier.
+            result = "<html>" + result;
+            
             // If we pass an HTML message to JOptionPane, it must not contain
             // newlines. If it does, only the first line is treated as HTML.
             // (Tested on Mac OS' Java 5.)
