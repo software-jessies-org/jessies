@@ -218,8 +218,15 @@ directory unless Terminator is able to write to the system-wide
 terminfo directory. This will only be the case if you run Terminator as root.
 
 <p>FreeBSD doesn't come with the necessary terminfo support installed by
-default.  It's apparently a snap to install it, perhaps via the devel/ncurses package
-from <a href="http://www.freebsd.org/ports/">the ports collection</a>.
+default.  It's apparently a snap to install the
+<a href="http://www.freebsd.org/cgi/url.cgi?ports/devel/ncurses/pkg-descr">devel/ncurses</a>
+package from <a href="http://www.freebsd.org/ports/">the ports collection</a>,
+perhaps with:
+
+<pre>
+cd /usr/ports/devel/ncurses
+make install
+</pre>
 
 <h4>Logging in as other users/root</h4>
 <p>If the terminfo file is only installed in your home directory then you
