@@ -216,6 +216,7 @@ public class Options {
 		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
+		// FIXME: read Mac OS Terminal.app settings if running on Mac OS.
 		// FIXME: read options from our own private stash, which we can safely rewrite.
 		aliasColorBD();
 	}

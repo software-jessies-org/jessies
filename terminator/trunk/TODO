@@ -5,13 +5,6 @@
   you've done the clipping yourself. [This seems mainly to be a problem for
   VNC users, not real people.]
 
-* Make an about box. [I still have the code to do a convincing imitation of
-  NSApplication's orderFrontStandardAboutPanel lying around somewhere. I'm
-  still waiting for Swing to have a JAboutBox; unlike file choosers and font
-  panels, this is one that should be doable.]
-
-* Parse Mac OS Terminal.app settings. (Only if running on Mac OS?)
-
 * Feedback on other tabs when there's been output you haven't seen yet? I'm
   thinking of something like a Mac OS asynchronous progress indicator in the
   tab ears of non-visible tabs. One turn per line of unseen output? That gives
