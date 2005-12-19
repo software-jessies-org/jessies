@@ -516,7 +516,22 @@ public class Options {
 		if (matcher.find()) {
 			String key = matcher.group(1);
 			String value = matcher.group(2);
-			options.put(key, value);
+			Object currentValue = options.get(key);
+			if (currentValue == null) {
+				// Silently ignore resources we don't recognize.
+				// FIXME: we should probably distinguish between XTerm or RXvt resources (where this is expected) and Terminator resources, where this shouldn't happen.
+				return;
+			}
+			Class currentClass = currentValue.getClass();
+			if (currentClass == Boolean.class) {
+				options.put(key, Boolean.valueOf(value));
+			} else if (currentClass == Font.class) {
+				options.put(key, makePrototypeFont(value));
+			} else if (currentClass == Integer.class) {
+				options.put(key, Integer.valueOf(value));
+			} else {
+				throw new RuntimeException("Resource '" + key + "' had default value " + currentValue + " of class " + currentClass);
+			}
 		}
 	}
 }
