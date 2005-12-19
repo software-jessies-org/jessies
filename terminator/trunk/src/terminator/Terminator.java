@@ -22,6 +22,14 @@ public class Terminator {
 	private Terminator() {
 		Log.setApplicationName("Terminator");
 		initAboutBox();
+		initMacOsEventHandlers();
+	}
+	
+	private void initMacOsEventHandlers() {
+		if (GuiUtilities.isMacOs() == false) {
+			return;
+		}
+		
 		Application.getApplication().setEnabledPreferencesMenu(true);
 		Application.getApplication().addApplicationListener(new ApplicationAdapter() {
 			public void handleReOpenApplication(ApplicationEvent e) {
