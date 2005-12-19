@@ -461,6 +461,7 @@ ChangeLog:
 source-dist: ../$(DIST_FILE_OF_THE_DAY)
 	mkdir -p $(DIST_DIRECTORY) && \
 	cp -f $< $(DIST_DIRECTORY)/ && \
+	find $(DIST_DIRECTORY) -ctime +2 -type f | perl -ne 'm/$(PROJECT_NAME)-\d\d\d\d-\d\d-\d\d\.tgz/ && print' | xargs --no-run-if-empty $(RM) && \
 	ln -s -f $(DIST_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_DIRECTORY)/../$(PROJECT_NAME)$(suffix $<)
 
 $(PROJECT_NAME).jar: build.java
