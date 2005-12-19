@@ -21,16 +21,10 @@ public class Terminator {
 	
 	private Terminator() {
 		Log.setApplicationName("Terminator");
+		initAboutBox();
 		Application application = new Application();
 		application.setEnabledPreferencesMenu(true);
 		application.addApplicationListener(new ApplicationAdapter() {
-//			public void handleAbout(ApplicationEvent e) {
-//				AboutBox aboutBox = new AboutBox("Terminator");
-//				aboutBox.makeUi();
-//				aboutBox.setVisible(true);
-//				e.setHandled(true);
-//			}
-			
 			public void handleReOpenApplication(ApplicationEvent e) {
 				if (frames.isEmpty()) {
 					openFrame();
@@ -53,6 +47,13 @@ public class Terminator {
 				}
 			}
 		});
+	}
+	
+	private void initAboutBox() {
+		AboutBox aboutBox = AboutBox.getSharedInstance();
+		aboutBox.setApplicationName("Terminator");
+		aboutBox.addCopyright("Copyright (C) 2004-2005 Free Software Foundation, Inc.");
+		aboutBox.addCopyright("All Rights Reserved.");
 	}
 	
 	private void startTerminatorServer() {
