@@ -9,13 +9,26 @@ import javax.swing.border.*;
  * A simple "about box".
  */
 public class AboutBox extends JDialog {
+    private static final AboutBox INSTANCE = new AboutBox();
+    
     private Icon icon;
-    private String title;
+    private String applicationName;
     private String version;
     private ArrayList<String> copyrightLines = new ArrayList<String>();
     
-    public AboutBox(String title) {
-        this.title = title;
+    private AboutBox() {
+    }
+    
+    public static AboutBox getSharedInstance() {
+        return INSTANCE;
+    }
+    
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+    
+    public boolean isConfigured() {
+        return (applicationName != null);
     }
     
     public void setImage(String filename) {
@@ -38,7 +51,14 @@ public class AboutBox extends JDialog {
         copyrightLines.add(copyright.replaceAll("\\([Cc]\\)", "\u00a9"));
     }
     
-    public void makeUi() {
+    public void setVisible(boolean visible) {
+        if (visible == true) {
+            makeUi();
+        }
+        super.setVisible(visible);
+    }
+    
+    private void makeUi() {
         // FIXME: add GNOME and Win32 implementations.
         makeMacUi();
     }
@@ -46,7 +66,7 @@ public class AboutBox extends JDialog {
     private void makeMacUi() {
         // http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/XHIGWindows/chapter_17_section_5.html#//apple_ref/doc/uid/20000961-TPXREF17
         
-        Font titleFont = new Font("Lucida Grande", Font.BOLD, 14);
+        Font applicationNameFont = new Font("Lucida Grande", Font.BOLD, 14);
         Font versionFont = new Font("Lucida Grande", Font.PLAIN, 10);
         Font copyrightFont = new Font("Lucida Grande", Font.PLAIN, 10);
         
@@ -66,7 +86,7 @@ public class AboutBox extends JDialog {
             panel.add(Box.createRigidArea(spacerSize));
         }
         
-        addLabel(panel, titleFont, title);
+        addLabel(panel, applicationNameFont, applicationName);
         panel.add(Box.createRigidArea(spacerSize));
         
         if (version != null) {

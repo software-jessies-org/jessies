@@ -1,5 +1,8 @@
 package e.gui;
 
+import e.util.*;
+import java.io.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 /**
@@ -43,7 +46,10 @@ public class HelpMenu {
         menu.add(makeDisabledItem("View Bugs List"));
         menu.add(makeDisabledItem("Report a Bug"));
         
-        // FIXME: GNOME users would expect a link to the application's about box here.
+        if (GuiUtilities.isMacOs() == false) {
+            // GNOME and Win32 users expect a link to the application's about box on the help menu.
+            menu.add(new AboutBoxAction());
+        }
         
         return menu;
     }
@@ -52,5 +58,24 @@ public class HelpMenu {
         JMenuItem item = new JMenuItem(name);
         item.setEnabled(false);
         return item;
+    }
+    
+    private class AboutBoxAction extends AbstractAction {
+        private AboutBoxAction() {
+            String name = "About";
+            if (GuiUtilities.isWindows()) {
+                name += " " + applicationName;
+            }
+            putValue(NAME, name);
+            GnomeStockIcon.useStockIcon(this, "gtk-about");
+        }
+        
+        public boolean isEnabled() {
+            return AboutBox.getSharedInstance().isConfigured();
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            AboutBox.getSharedInstance().setVisible(true);
+        }
     }
 }
