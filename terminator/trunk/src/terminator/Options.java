@@ -216,9 +216,25 @@ public class Options {
 		initDefaultColors();
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
-		// FIXME: read Mac OS Terminal.app settings if running on Mac OS.
+		readAppleTerminalOptions();
 		// FIXME: read options from our own private stash, which we can safely rewrite.
 		aliasColorBD();
+	}
+	
+	private void readAppleTerminalOptions() {
+		// FIXME: read Mac OS Terminal.app settings if running on Mac OS.
+		// We can't parse the XML ourselves because Apple switched to binary plists in 10.4.
+		// `defaults read com.apple.Terminal NSFixedPitchFont` == "Monaco\n"
+		// Obvious:
+		//   NSFixedPitchFont (Monaco)
+		//   NSFixedPitchFontSize (12)
+		//   FontAntialiasing (NO)
+		//   Columns (80)
+		//   BlinkCursor (YES)
+		//   CursorShape (1="underline"; we don't support vertical bar, so anything else should be "block")
+		// Less obvious:
+		//   ShellExitAction (1)
+		//   TextColors (0.905 0.905 0.905 0.000 0.000 0.270 1.000 1.000 1.000 1.000 1.000 1.000 0.000 0.000 0.270 0.905 0.905 0.905 0.111 0.167 1.000 0.333 1.000 0.333)
 	}
 	
 	/**
