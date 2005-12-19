@@ -27,9 +27,7 @@ public class AboutBox extends JDialog {
             return;
         }
         
-        // Despite the fact that this appears to be a new instance, it doesn't interfere with the application's own instance. I don't know what Apple were thinking when they designed this.
-        Application application = new Application();
-        application.addApplicationListener(new ApplicationAdapter() {
+        Application.getApplication().addApplicationListener(new ApplicationAdapter() {
             public void handleAbout(ApplicationEvent e) {
                 AboutBox.getSharedInstance().setVisible(true);
                 e.setHandled(true);
