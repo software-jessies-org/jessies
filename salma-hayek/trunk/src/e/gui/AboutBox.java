@@ -1,5 +1,7 @@
 package e.gui;
 
+import com.apple.eawt.*;
+import e.util.*;
 import java.awt.*;
 import java.util.*;
 import javax.swing.*;
@@ -17,6 +19,22 @@ public class AboutBox extends JDialog {
     private ArrayList<String> copyrightLines = new ArrayList<String>();
     
     private AboutBox() {
+        initMacOsAboutMenu();
+    }
+    
+    private void initMacOsAboutMenu() {
+        if (GuiUtilities.isMacOs() == false) {
+            return;
+        }
+        
+        // Despite the fact that this appears to be a new instance, it doesn't interfere with the application's own instance. I don't know what Apple were thinking when they designed this.
+        Application application = new Application();
+        application.addApplicationListener(new ApplicationAdapter() {
+            public void handleAbout(ApplicationEvent e) {
+                AboutBox.getSharedInstance().setVisible(true);
+                e.setHandled(true);
+            }
+        });
     }
     
     public static AboutBox getSharedInstance() {
