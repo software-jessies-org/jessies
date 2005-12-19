@@ -62,13 +62,20 @@ public class JavaDoc {
         classLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
         
         // Note the locations of JavaDoc HTML files.
-        String defaultApiLocation = "http://java.sun.com/j2se/1.5.0/docs/api/";
+        javaDocLocations.addAll(Arrays.asList(FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.doc", ""))));
+        
+        // On Mac OS, we may have the documentation installed in a well-known place.
         // FIXME: this should be CurrentJDK rather than 1.5.0, but 1.5.0 isn't the default on Mac OS yet.
-        String macOsApiPath = "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/doc/api/";
-        if (FileUtilities.exists(macOsApiPath)) {
-            defaultApiLocation = "file://" + macOsApiPath;
+        String macOsJavaDocDir = "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/";
+        if (FileUtilities.exists(macOsJavaDocDir)) {
+            javaDocLocations.add("file://" + macOsJavaDocDir + "doc/api/");
+            javaDocLocations.add("file://" + macOsJavaDocDir + "appledoc/api/");
         }
-        javaDocLocations.addAll(Arrays.asList(FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.doc", defaultApiLocation))));
+        
+        // In an emergency, fall back to Sun's copy on the web.
+        if (javaDocLocations.isEmpty()) {
+            javaDocLocations.add("http://java.sun.com/j2se/1.5.0/docs/api/");
+        }
         
         int totalPkgs = packageNames.size();
         long timeTaken = System.currentTimeMillis() - start;

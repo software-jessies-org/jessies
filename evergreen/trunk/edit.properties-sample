@@ -17,10 +17,6 @@ files.externalApplicationExtensions=.icns;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 # Prefixes that imply we should defer to the web browser.
 url.prefixes=file://;ftp://;http://;https://
 
-?Mac OS X:java.documentationIndex=file:///System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Resources/Documentation/Reference/doc/api/
-?Windows 2000:java.documentationIndex=file:///V:/download/java/docs/api/
-?Linux:java.documentationIndex=file:///home/elliotth/download/java/docs/api/
-
 ?Windows 2000:make.command=nmake
 
 tools.0.name=Shell Window
