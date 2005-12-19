@@ -22,9 +22,8 @@ public class Terminator {
 	private Terminator() {
 		Log.setApplicationName("Terminator");
 		initAboutBox();
-		Application application = new Application();
-		application.setEnabledPreferencesMenu(true);
-		application.addApplicationListener(new ApplicationAdapter() {
+		Application.getApplication().setEnabledPreferencesMenu(true);
+		Application.getApplication().addApplicationListener(new ApplicationAdapter() {
 			public void handleReOpenApplication(ApplicationEvent e) {
 				if (frames.isEmpty()) {
 					openFrame();
