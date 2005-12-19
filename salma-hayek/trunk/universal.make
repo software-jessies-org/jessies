@@ -338,7 +338,7 @@ BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(COMPILER_TYPE))
 # Set up the classpath.
 # ----------------------------------------------------------------------------
 CLASS_PATH += $(SALMA_HAYEK)/classes
-CLASS_PATH += $(SALMA_HAYEK)/MRJ141Stubs.jar
+CLASS_PATH += $(SALMA_HAYEK)/AppleJavaExtensions.jar
 CLASS_PATH += $(SALMA_HAYEK)/swing-worker.jar
 TOOLS_JAR := $(wildcard $(JDK_ROOT)/lib/tools.jar)
 CLASS_PATH += $(TOOLS_JAR)
