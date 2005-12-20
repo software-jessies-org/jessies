@@ -290,8 +290,8 @@ public class JTerminalPane extends JPanel {
 			switch (keyCode) {
 				case KeyEvent.VK_ESCAPE: return Ascii.ESC + "";
 				
-				case KeyEvent.VK_HOME: return Ascii.ESC + "[H";
-				case KeyEvent.VK_END: return Ascii.ESC + "[F";
+				case KeyEvent.VK_HOME: return Ascii.ESC + "[1~";
+				case KeyEvent.VK_END: return Ascii.ESC + "[4~";
 				
 				case KeyEvent.VK_INSERT: return Ascii.ESC + "[2~";
 				
