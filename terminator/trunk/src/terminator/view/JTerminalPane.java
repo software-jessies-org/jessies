@@ -303,7 +303,6 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_RIGHT:
 				case KeyEvent.VK_LEFT:
 				{
-					/* Send xterm sequences. */
 					char letter = "DACB".charAt(keyCode - KeyEvent.VK_LEFT);
 					if (event.isControlDown()) {
 						return Ascii.ESC + "[5" + letter;
@@ -312,7 +311,6 @@ public class JTerminalPane extends JPanel {
 					}
 				}
 				
-				// Function key encodings based on xterm's decfuncvalue() and rxvt's rxvt_lookup_key().
 				case KeyEvent.VK_F1:
 				case KeyEvent.VK_F2:
 				case KeyEvent.VK_F3:
@@ -330,8 +328,7 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_F12:
 					// "ESC[22~" isn't used.
 					return functionKeySequence(23, keyCode, KeyEvent.VK_F11);
-					// The function key codes from here on are inconsistent with the latest xterm terminfo
-					// but consistent with the latest xterm source.
+					// The function key codes from here on are VT220 codes.
 				case KeyEvent.VK_F13:
 				case KeyEvent.VK_F14:
 					// Java has a discontinuity between VK_F12 and VK_F13.
@@ -340,19 +337,10 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_F16:
 					// "ESC[27~" isn't used.
 					return functionKeySequence(28, keyCode, KeyEvent.VK_F15);
-				case KeyEvent.VK_F17:
-				case KeyEvent.VK_F18:
-				case KeyEvent.VK_F19:
-				case KeyEvent.VK_F20:
-					// The function key codes from here on are inconsistent with the latest rxvt terminfo
-					// but consistent with the latest rxvt source.
-					// The function key codes from here on are inconsistent with the latest xterm source.
-				case KeyEvent.VK_F21:
-				case KeyEvent.VK_F22:
-				case KeyEvent.VK_F23:
-				case KeyEvent.VK_F24:
-					// X11 supports up to F35, but Java stops here. F16 is the highest on my Mac keyboard.
-					return functionKeySequence(31, keyCode, KeyEvent.VK_F17);
+					// X11 key codes go up to F35.
+					// Java key codes goes up to F24.
+					// Escape sequences mentioned in XTerm's "ctlseqs.ms" go up to F20 (VT220).
+					// Current Apple keyboards go up to F16, so that's where we stop.
 					
 				default:
 					return null;
@@ -360,6 +348,7 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		private String functionKeySequence(int base, int keyCode, int keyCodeBase) {
+			// FIXME: we should also send the modifier keys after a ';'.
 			int argument = base + (keyCode - keyCodeBase);
 			return Ascii.ESC + "[" + argument + "~";
 		}
