@@ -190,10 +190,11 @@ public class Options {
 	 * xterm also offers complete control over all the ECMA colors.
 	 */
 	public Color getColor(String name) {
-		String description = stringResource(name);
-		if (description == null) {
-			return null;
-		} else if (description.startsWith("#")) {
+		return (Color) options.get(name);
+	}
+	
+	private Color colorFromString(String description) {
+		if (description.startsWith("#")) {
 			return Color.decode("0x" + description.substring(1));
 		} else {
 			return getRgbColor(description);
@@ -308,6 +309,9 @@ public class Options {
 					formPanel.addRow(description + ":", new IntegerPreferenceAction(key).makeUi());
 				} else if (value instanceof Font) {
 					formPanel.addRow(description + ":", new FontPreferenceAction(key).makeUi());
+				} else if (value instanceof Color) {
+					// Ignore colors.
+					// FIXME: there are some colors we should probably handle; the ones with names.
 				} else {
 					// FIXME: we should probably handle String.
 					// FIXME: the Final Solution should use a HashMap<Class, ActionAndUi>.
@@ -410,31 +414,31 @@ public class Options {
 	 * blue, magenta, cyan, and white).
 	 */
 	private void initDefaultColors() {
-		options.put("color0", "#000000"); // black
-		options.put("color1", "#cd0000"); // red3
-		options.put("color2", "#00cd00"); // green3
-		options.put("color3", "#cdcd00"); // yellow3
-		options.put("color4", "#0000cd"); // blue3
-		options.put("color5", "#cd00cd"); // magenta3
-		options.put("color6", "#00cdcd"); // cyan3
-		options.put("color7", "#e5e5e5"); // grey90
+		addDefault("color0", colorFromString("#000000"), "Color 0: black");
+		addDefault("color1", colorFromString("#cd0000"), "Color 1: red3");
+		addDefault("color2", colorFromString("#00cd00"), "Color 2: green3");
+		addDefault("color3", colorFromString("#cdcd00"), "Color 3: yellow3");
+		addDefault("color4", colorFromString("#0000cd"), "Color 4: blue3");
+		addDefault("color5", colorFromString("#cd00cd"), "Color 5: magenta3");
+		addDefault("color6", colorFromString("#00cdcd"), "Color 6: cyan3");
+		addDefault("color7", colorFromString("#e5e5e5"), "Color 7: grey90");
 		
-		options.put("color8", "#4d4d4d"); // gray30
-		options.put("color9", "#ff0000"); // red
-		options.put("color10", "#00ff00"); // green
-		options.put("color11", "#ffff00"); // yellow
-		options.put("color12", "#0000ff"); // blue
-		options.put("color13", "#ff00ff"); // magenta
-		options.put("color14", "#00ffff"); // cyan
-		options.put("color15", "#ffffff"); // white
+		addDefault("color8", colorFromString("#4d4d4d"), "Color 8: gray30");
+		addDefault("color9", colorFromString("#ff0000"), "Color 9: red");
+		addDefault("color10", colorFromString("#00ff00"), "Color 10: green");
+		addDefault("color11", colorFromString("#ffff00"), "Color 11: yellow");
+		addDefault("color12", colorFromString("#0000ff"), "Color 12: blue");
+		addDefault("color13", colorFromString("#ff00ff"), "Color 13: magenta");
+		addDefault("color14", colorFromString("#00ffff"), "Color 14: cyan");
+		addDefault("color15", colorFromString("#ffffff"), "Color 15: white");
 		
 		// Defaults reminiscent of SGI's xwsh(1).
-		options.put("background", "#000045"); // dark blue
-		options.put("colorBD", "#ffffff"); // white
-		options.put("cursorColor", "#00ff00"); // green
-		options.put("foreground", "#e7e7e7"); // off-white
-		options.put("linkColor", "#00ffff"); // cyan
-		options.put("selectionColor", "#1c2bff"); // light blue
+		addDefault("background", colorFromString("#000045"), "Background"); // dark blue
+		addDefault("colorBD", colorFromString("#ffffff"), "Bold color"); // white
+		addDefault("cursorColor", colorFromString("#00ff00"), "Cursor color"); // green
+		addDefault("foreground", colorFromString("#e7e7e7"), "Foreground"); // off-white
+		addDefault("linkColor", colorFromString("#00ffff"), "Link color"); // cyan
+		addDefault("selectionColor", colorFromString("#1c2bff"), "Selection color"); // light blue
 	}
 	
 	/**
@@ -459,6 +463,7 @@ public class Options {
 	}
 	
 	private void readRGBFile() {
+		// FIXME: with Sun's JVM, there's a class in XAWT that has a Color constant for each color in "rgb.txt".
 		rgbColors = new HashMap<String, Color>();
 		String[] lines = StringUtilities.readLinesFromFile("/usr/X11R6/lib/X11/rgb.txt");
 		for (String line : lines) {
@@ -529,6 +534,8 @@ public class Options {
 				options.put(key, makePrototypeFont(value));
 			} else if (currentClass == Integer.class) {
 				options.put(key, Integer.valueOf(value));
+			} else if (currentClass == Color.class) {
+				options.put(key, colorFromString(value));
 			} else {
 				throw new RuntimeException("Resource '" + key + "' had default value " + currentValue + " of class " + currentClass);
 			}
