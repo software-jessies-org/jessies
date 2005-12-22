@@ -6,10 +6,10 @@ import java.util.regex.*;
 import e.util.*;
 
 public class FileIgnorer {
-  /** Extensions that shouldn't be shown in directory windows. */
+  /** Extensions of files that shouldn't be indexed. */
   private String[] ignoredExtensions;
   
-  /** Names of directories that shouldn't be shown in directory windows. */
+  /** Names of directories that shouldn't be entered when indexing. */
   private Pattern uninterestingDirectoryNames;
   
   public FileIgnorer(String rootDirectoryPath) {
@@ -29,16 +29,23 @@ public class FileIgnorer {
   }
   
   private static String getUninterestingDirectoryPattern(File rootDirectory) {
-    String[] command = new String[] { "echo-local-non-source-directory-pattern" };
+    // Add the default ignored directory patterns.
     ArrayList<String> patterns = new ArrayList<String>();
-    // A "not found" error is expected by default and ignored.
-    ArrayList<String> errors = new ArrayList<String>();
-    ProcessUtilities.backQuote(rootDirectory, command, patterns, errors);
     patterns.add("\\.deps");
     patterns.add("\\.svn");
     patterns.add("BitKeeper");
     patterns.add("CVS");
     patterns.add("SCCS");
+    
+    // Run a per-workspace script if there is one.
+    final String scriptName = "echo-local-non-source-directory-pattern";
+    if (new File(rootDirectory, scriptName).exists()) {
+      String[] command = new String[] { scriptName };
+      ArrayList<String> errors = new ArrayList<String>();
+      ProcessUtilities.backQuote(rootDirectory, command, patterns, errors);
+    }
+    
+    // Make a regular expression.
     return StringUtilities.join(patterns, "|");
   }
   
