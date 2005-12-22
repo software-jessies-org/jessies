@@ -56,6 +56,8 @@ if FileTest.directory?(edit_preferences_directory) == false
   puts("Edit: Couldn't find preferences directory '#{edit_preferences_directory}.")
   puts("Edit: Creating preferences directory '#{edit_preferences_directory}'.")
   Dir.mkdir(edit_preferences_directory)
+end
+if FileTest.exists?("#{edit_preferences_directory}/edit.properties") == false
   puts("Edit: Copying default preferences.")
   FileUtils.cp("#{project_root}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
   FileUtils.cp("#{project_root}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
