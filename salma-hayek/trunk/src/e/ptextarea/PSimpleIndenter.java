@@ -12,6 +12,7 @@ public abstract class PSimpleIndenter extends PIndenter {
         // FIXME: Another case where we could do with Styler input?
         return line.replaceFirst("//.*", "");
     }
+    
     // Note the plural.  There /*can*/ /*be*/ several of these on one line.
     protected static String stripMultiLineComments(String line) {
         // We should strip these but this is rarely important.
@@ -23,6 +24,7 @@ public abstract class PSimpleIndenter extends PIndenter {
         // Another case where we could ideally do with some Styler input?
         return line;
     }
+    
     protected static String stripHashComment(String line) {
         return line.replaceFirst("#.*", "");
     }
@@ -52,6 +54,7 @@ public abstract class PSimpleIndenter extends PIndenter {
     public boolean isBlockBegin(char lastChar) {
         return PBracketUtilities.isOpenBracket(lastChar);
     }
+    
     public boolean isBlockEnd(char firstChar) {
         return PBracketUtilities.isCloseBracket(firstChar);
     }
@@ -63,6 +66,7 @@ public abstract class PSimpleIndenter extends PIndenter {
         char lastChar = activePartOfLine.charAt(activePartOfLine.length() - 1);
         return isBlockBegin(lastChar);
     }
+    
     public boolean isBlockEnd(String activePartOfLine) {
         if (activePartOfLine.length() == 0) {
             return false;
