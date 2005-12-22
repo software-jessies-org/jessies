@@ -82,7 +82,41 @@ class Java
     # Until Java 6, we need the back-ported SwingWorker.
     @class_path << "#{@salma_hayek}/swing-worker.jar"
   end
-
+  
+  def getExtraPathComponents()
+    subProjectRoots = [ @project_root, @salma_hayek ]
+    # Premature: the make code to build the per-target common bin directory doesn't exist yet.
+    executableSubDirectories = [ "bin", ".generated/#{target_os()}/bin" ]
+    extraPathComponents = []
+    subProjectRoots.each() {
+      |subProjectRoot|
+      executableSubDirectories.each() {
+        |executableSubDirectory|
+        directory = "#{subProjectRoot}/#{executableSubDirectory}"
+        if FileTest.directory?(directory)
+          extraPathComponents << directory
+        end
+      }
+    }
+    return extraPathComponents
+  end
+  
+  def subvertPath()
+    # When run from Cygwin, we need to use colon as the PATH separator, rather than the native semi-colon.
+    originalPathComponents = ENV["PATH"].split(":")
+    newPathComponents = []
+    # Putting ourselves on the end of the PATH means that the user can override
+    # our default echo-local-non-source-directory-pattern and avoids hubristically increasing the length
+    # of successful PATH searches in, for example, terminator shells.
+    # Yes, perhaps I am protesting too much.
+    newPathComponents.concat(originalPathComponents)
+    newPathComponents.concat(getExtraPathComponents())
+    # uniq() seems to do The Right Thing with unsorted duplicates:
+    # removing the later ones, preserving order.
+    # @salma_hayek may be the same as @project_root, particular with installed versions.
+    ENV["PATH"] = newPathComponents.uniq().join(":")
+  end
+  
   def invoke(extra_app_arguments = [])
     args = [ @launcher ]
     # Set the class path directly with a system property rather than -cp so
@@ -113,6 +147,7 @@ class Java
     args.concat(extra_app_arguments)
     args.concat(ARGV)
     #$stderr.puts(args)
+    subvertPath()
     failed = system(*args) == false
     if failed && logging
       puts(File.new(@log_filename).readlines())
