@@ -9,7 +9,7 @@ public abstract class PSimpleIndenter extends PIndenter {
         // This doesn't work for comments in string literals.
         // That *is* a real problem in:
         // if (line.startsWith("//")) {
-        // Another case where we could do with Styler input?
+        // FIXME: Another case where we could do with Styler input?
         return line.replaceFirst("//.*", "");
     }
     // Note the plural.  There /*can*/ /*be*/ several of these on one line.
