@@ -262,14 +262,13 @@ SCRIPT_PATH=$(SALMA_HAYEK)/bin
 # By default, distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST=software@jessies.org
 # The html files are copied into the parent directory.
-DIST_DIRECTORY=/home/software/downloads/$(PROJECT_NAME)/builds
+DIST_DIRECTORY=/home/software/downloads/$(PROJECT_NAME)
 
 $(takeProfileSample)
 SOURCE_FILES := $(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
 $(takeProfileSample)
-DATE := $(shell date +%Y-%m-%d)
-DIST_FILE_OF_THE_DAY = $(PROJECT_NAME)-$(DATE).tgz
-NATIVE_TGZ_FILE_OF_THE_DAY = $(PROJECT_NAME)-$(TARGET_OS)-$(DATE).tgz
+SOURCE_DIST_FILE = $(PROJECT_NAME).tgz
+NATIVE_TGZ_FILE = $(PROJECT_NAME)-$(TARGET_OS).tgz
 
 REVISION_CONTROL_SYSTEM += $(if $(wildcard .svn),svn)
 REVISION_CONTROL_SYSTEM += $(if $(wildcard CVS),cvs)
@@ -458,26 +457,24 @@ ChangeLog:
 
 # This is only designed to be run on jessies.org itself.
 .PHONY: source-dist
-source-dist: ../$(DIST_FILE_OF_THE_DAY)
+source-dist: ../$(SOURCE_DIST_FILE)
 	mkdir -p $(DIST_DIRECTORY) && \
-	cp -f $< $(DIST_DIRECTORY)/ && \
-	find $(DIST_DIRECTORY) -ctime +2 -type f | perl -ne 'm/$(PROJECT_NAME)-\d\d\d\d-\d\d-\d\d\.tgz/ && print' | xargs --no-run-if-empty $(RM) && \
-	ln -s -f $(DIST_DIRECTORY)/$(DIST_FILE_OF_THE_DAY) $(DIST_DIRECTORY)/../$(PROJECT_NAME)$(suffix $<)
+	cp -f $< $(DIST_DIRECTORY)/
 
 $(PROJECT_NAME).jar: build.java
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
-../$(DIST_FILE_OF_THE_DAY): ChangeLog
+../$(SOURCE_DIST_FILE): ChangeLog
 	cd .. && \
-	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(DIST_FILE_OF_THE_DAY) $(PROJECT_NAME)/*
+	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_NAME)/*
 
 # This is only designed to be run on jessies.org itself.
 .PHONY: www-dist
 www-dist: ChangeLog.html
 	mkdir -p $(DIST_DIRECTORY) && \
-	cp -f ChangeLog.html $(DIST_DIRECTORY)/.. && \
-	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_DIRECTORY)/.. ; fi
+	cp -f ChangeLog.html $(DIST_DIRECTORY)/ && \
+	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_DIRECTORY)/ ; fi
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS
@@ -547,7 +544,7 @@ MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin) $(patsubst $(PROJECT
 
 # %.msm files aren't stand-alone installers
 INSTALLER_BINARY = $(filter %.msi,$(ALL_NATIVE_TARGETS))
-NATIVE_DIST_FILE_OF_THE_DAY = $(if $(INSTALLER_BINARY),$(INSTALLER_BINARY),../$(NATIVE_TGZ_FILE_OF_THE_DAY))
+NATIVE_DIST_FILE = $(if $(INSTALLER_BINARY),$(INSTALLER_BINARY),../$(NATIVE_TGZ_FILE))
 
 $(INSTALLER_TARGETS): $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
 
@@ -563,14 +560,13 @@ native-dist:;
 
 else
 
-../$(NATIVE_TGZ_FILE_OF_THE_DAY): $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
+../$(NATIVE_TGZ_FILE): $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
 	cd .. && \
-	tar -zcf $(NATIVE_TGZ_FILE_OF_THE_DAY) $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_NAME)/%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS))
+	tar -zcf $(NATIVE_TGZ_FILE) $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_NAME)/%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS))
 
 .PHONY: native-dist
-native-dist: $(NATIVE_DIST_FILE_OF_THE_DAY)
+native-dist: $(NATIVE_DIST_FILE)
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
-	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)-$(DATE)$(suffix $<) && \
-	ssh $(DIST_SSH_USER_AND_HOST) ln -s -f $(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)-$(DATE)$(suffix $<) $(DIST_DIRECTORY)/../$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
+	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
 
 endif
