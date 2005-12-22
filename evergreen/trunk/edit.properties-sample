@@ -6,11 +6,8 @@ fixedFont.default=false
 hungryDelete=true
 indent.string=    
 
-?Mac OS X:open.command=/usr/bin/open
-?Windows 2000:open.command=start
-
 files.uninterestingExtensions=.a;.aux;.bak;.bin;.class;.d;.elf;.exe;.jar;.lib;.log;.map;.o;.obj;.orig;.swp;.texshop;.toc
-files.externalApplicationExtensions=.icns;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
+files.externalApplicationExtensions=.icns;.jpeg;.jpg;.mov;.mp3;.mpeg;.mpg;.pdf;.png;.tiff
 #Not yet implemented. See e.util.FileUtilities.
 #files.binaryExtensions=.gif;.gz;.icns;.jpg;.jpeg;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 
