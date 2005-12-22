@@ -37,13 +37,11 @@ public class FileIgnorer {
     patterns.add("CVS");
     patterns.add("SCCS");
     
-    // Run a per-workspace script if there is one.
+    // This is not a per-workspace script, it's a site-local script.
     final String scriptName = "echo-local-non-source-directory-pattern";
-    if (new File(rootDirectory, scriptName).exists()) {
-      String[] command = new String[] { scriptName };
-      ArrayList<String> errors = new ArrayList<String>();
-      ProcessUtilities.backQuote(rootDirectory, command, patterns, errors);
-    }
+    String[] command = new String[] { scriptName };
+    ArrayList<String> errors = new ArrayList<String>();
+    ProcessUtilities.backQuote(rootDirectory, command, patterns, errors);
     
     // Make a regular expression.
     return StringUtilities.join(patterns, "|");
