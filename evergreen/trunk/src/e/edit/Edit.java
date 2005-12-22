@@ -174,11 +174,12 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     public EWindow openFileNonInteractively(InitialFile file) {
         String filename = file.filename;
         
-        // Special cases for URIs and files for external applications.
-        if (FileUtilities.nameStartsWithOneOf(filename, FileUtilities.getArrayOfPathElements(Parameters.getParameter("url.prefixes", "")))) {
+        // Special case for URIs.
+        if (filename.matches("^[a-z]+://.*")) {
             showDocument(filename);
             return null;
         }
+        // Special case for files to open in external applications.
         if (isFileForExternalApplication(filename)) {
             openFileWithExternalApplication(filename);
             return null;

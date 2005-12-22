@@ -14,9 +14,6 @@ files.externalApplicationExtensions=.icns;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 #Not yet implemented. See e.util.FileUtilities.
 #files.binaryExtensions=.gif;.gz;.icns;.jpg;.jpeg;.mov;.mp3;.mpeg;.mpg;.pdf;.tiff
 
-# Prefixes that imply we should defer to the web browser.
-url.prefixes=file://;ftp://;http://;https://
-
 ?Windows 2000:make.command=nmake
 
 tools.0.name=Shell Window
