@@ -112,18 +112,23 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         }
     }
     
-    public boolean isFileForExternalApplication(String filename) {
+    private boolean isFileForExternalApplication(String filename) {
         if (externalApplicationExtensions == null) {
             externalApplicationExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.externalApplicationExtensions", ""));
         }
         return FileUtilities.nameEndsWithOneOf(filename, externalApplicationExtensions);
     }
     
-    public void openFileWithExternalApplication(String filename) {
+    private void openFileWithExternalApplication(String filename) {
         try {
-            Runtime.getRuntime().exec(new String[] {
-                Parameters.getParameter("open.command"), filename
-            });
+            // FIXME: for Java 6, use java.awt.Desktop instead.
+            String openCommand = "gnome-open";
+            if (GuiUtilities.isMacOs()) {
+                openCommand = "/usr/bin/open";
+            } else if (GuiUtilities.isWindows()) {
+                openCommand = "start";
+            }
+            ProcessUtilities.spawn(null, new String[] { openCommand, FileUtilities.parseUserFriendlyName(filename) });
         } catch (Exception ex) {
             showAlert("Run", "Couldn't open '" + filename + "' with an external application (" + ex.getMessage() + ")");
         }
