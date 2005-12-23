@@ -459,7 +459,7 @@ ChangeLog:
 .PHONY: source-dist
 source-dist: ../$(SOURCE_DIST_FILE)
 	mkdir -p $(DIST_DIRECTORY) && \
-	rm -f $(DIST_DIRECTORY)/$(SOURCE_DIST_FILE) && \
+	$(RM) $(DIST_DIRECTORY)/$(SOURCE_DIST_FILE) && \
 	cp $< $(DIST_DIRECTORY)/
 
 $(PROJECT_NAME).jar: build.java
