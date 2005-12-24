@@ -279,7 +279,7 @@ public class Options {
 		addDefault(INITIAL_COLUMN_COUNT, Integer.valueOf(80), "New terminal width");
 		addDefault(INITIAL_ROW_COUNT, Integer.valueOf(24), "New terminal height");
 		addDefault(INTERNAL_BORDER, Integer.valueOf(2), "Terminal border width");
-		addDefault(LOGIN_SHELL, Boolean.TRUE, "Start the child with a '-l' argument?");
+		addDefault(LOGIN_SHELL, Boolean.TRUE, "Start child process with a '-l' argument?");
 		addDefault(SCROLL_KEY, Boolean.TRUE, "Scroll to bottom on key press?");
 		addDefault(SCROLL_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output?");
 		
