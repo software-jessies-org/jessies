@@ -335,6 +335,7 @@ public class Options {
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox checkBox = JCheckBox.class.cast(e.getSource());
 			options.put(key, checkBox.isSelected());
+			Terminator.getSharedInstance().repaintUi();
 		}
 		
 		public JComponent makeUi() {
@@ -355,6 +356,7 @@ public class Options {
 		public void actionPerformed(ActionEvent e) {
 			JComboBox comboBox = JComboBox.class.cast(e.getSource());
 			options.put(key, makePrototypeFont(comboBox.getSelectedItem().toString()));
+			Terminator.getSharedInstance().repaintUi();
 		}
 		
 		public JComponent makeUi() {
@@ -388,6 +390,7 @@ public class Options {
 				// FIXME: really, an integer preference should have an explicit range.
 				if (newValue > 0) {
 					options.put(key, newValue);
+					Terminator.getSharedInstance().repaintUi();
 					okay = true;
 				}
 			} catch (NumberFormatException ex) {
