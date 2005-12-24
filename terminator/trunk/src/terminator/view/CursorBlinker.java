@@ -10,24 +10,20 @@ public class CursorBlinker implements ActionListener {
 	
 	public CursorBlinker(JTextBuffer text) {
 		this.text = text;
-		if (Options.getSharedInstance().shouldCursorBlink()) {
-			this.timer = new Timer(500, this);
-		}
+		this.timer = new Timer(500, this);
 	}
 	
 	public void start() {
-		if (timer != null) {
-			timer.start();
-		}
+		timer.start();
 	}
 	
 	public void stop() {
-		if (timer != null) {
-			timer.stop();
-		}
+		timer.stop();
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		text.blinkCursor();
+		if (Options.getSharedInstance().shouldCursorBlink()) {
+			text.blinkCursor();
+		}
 	}
 }
