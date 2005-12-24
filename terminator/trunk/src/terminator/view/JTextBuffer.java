@@ -21,7 +21,6 @@ A JTextBuffer provides the visible display of the virtual terminal.
 */
 
 public class JTextBuffer extends JComponent implements FocusListener {
-	private static final boolean ANTIALIAS = Options.getSharedInstance().isAntiAliased();
 	private static final boolean MAC_OS = GuiUtilities.isMacOs();
 
 	private TextBuffer model;
@@ -601,7 +600,10 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	
 	public void paintComponent(Graphics oldGraphics) {
 		Graphics2D graphics = (Graphics2D) oldGraphics;
-		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, ANTIALIAS ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		
+		Object antiAliasHint = graphics.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
+		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, Options.getSharedInstance().isAntiAliased() ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		
 		FontMetrics metrics = getFontMetrics(getFont());
 		Rectangle rect = graphics.getClipBounds();
 		graphics.setColor(getBackground());
@@ -636,9 +638,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				paintCursor(graphics, metrics, "", baseline);
 			}
 		}
-		if (ANTIALIAS) {
-			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
-		}
+		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antiAliasHint);
 	}
 	
 	public List<StyledText> getLineStyledText(int line) {
