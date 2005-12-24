@@ -116,6 +116,15 @@ public class Terminator {
 		});
 	}
 	
+	/**
+	 * Invoked by the preferences dialog whenever an option is changed.
+	 */
+	public void repaintUi() {
+		for (int i = 0; i < frames.size(); ++i) {
+			frames.get(i).repaint();
+		}
+	}
+	
 	private JTerminalPaneFactory[] getInitialTerminals() {
 		ArrayList<JTerminalPaneFactory> result = new ArrayList<JTerminalPaneFactory>();
 		String name = null;
