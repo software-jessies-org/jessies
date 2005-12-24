@@ -23,7 +23,6 @@ public class JTerminalPane extends JPanel {
 	private JScrollPane scrollPane;
 	private VisualBellViewport viewport;
 	private String name;
-	private boolean errorExitHolding;
 	private Dimension currentSizeInChars;
 	private JAsynchronousProgressIndicator outputSpinner;
 	private Action[] menuAndKeyActions = new Action[] {
@@ -52,10 +51,9 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	public JTerminalPane(String name, String command, boolean errorExitHolding) {
+	public JTerminalPane(String name, String command) {
 		super(new BorderLayout());
 		this.name = name;
-		this.errorExitHolding = errorExitHolding;
 		init(command);
 	}
 	
@@ -71,8 +69,7 @@ public class JTerminalPane extends JPanel {
 				title = title.substring(0, title.indexOf(' '));
 			}
 		}
-		boolean errorExitHolding = Options.getSharedInstance().isErrorExitHolding();
-		return new JTerminalPane(title, command, errorExitHolding);
+		return new JTerminalPane(title, command);
 	}
 	
 	/**
@@ -85,10 +82,7 @@ public class JTerminalPane extends JPanel {
 		if (Options.getSharedInstance().isLoginShell()) {
 			command += " -l";
 		}
-		// The user will already have seen any failure in a shell window.
-		// bash (and probably other shells) return as their own exit status that of the last command executed.
-		boolean errorExitHolding = false;
-		return new JTerminalPane(user + "@localhost", command, errorExitHolding);
+		return new JTerminalPane(user + "@localhost", command);
 	}
 	
 	public Dimension getPaneSize() {
@@ -224,10 +218,6 @@ public class JTerminalPane extends JPanel {
 	
 	public String getName() {
 		return name;
-	}
-	
-	public boolean isErrorExitHolding() {
-		return errorExitHolding;
 	}
 	
 	public void setName(String name) {
