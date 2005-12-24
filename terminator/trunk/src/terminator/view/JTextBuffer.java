@@ -638,7 +638,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				paintCursor(graphics, metrics, "", baseline);
 			}
 		}
-		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antiAliasHint);
+		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasHint);
 	}
 	
 	public List<StyledText> getLineStyledText(int line) {
