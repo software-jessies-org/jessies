@@ -660,9 +660,12 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		Rectangle cursorRect = modelToView(cursorPosition);
 		final int bottomY = cursorRect.y + cursorRect.height - 1;
 		if (hasFocus) {
+			// The CursorBlinker may have left blinkOn in either state if the user changed the cursor blink preference.
+			// Ignore blinkOn if the cursor shouldn't be blinking right now.
+			boolean cursorIsVisible = (Options.getSharedInstance().shouldCursorBlink() == false) || blinkOn;
 			if (Options.getSharedInstance().isBlockCursor()) {
 				// Block.
-				if (blinkOn) {
+				if (cursorIsVisible) {
 					// Paint over the character underneath.
 					graphics.fill(cursorRect);
 					// Redraw the character in the
@@ -672,7 +675,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				}
 			} else {
 				// Underline.
-				if (blinkOn) {
+				if (cursorIsVisible) {
 					graphics.drawLine(cursorRect.x, bottomY, cursorRect.x + cursorRect.width - 1, bottomY);
 				}
 			}
