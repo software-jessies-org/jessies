@@ -6,9 +6,10 @@
 #   $ echo normal $(tput rev) reversed $(tput rmso) normal
 
 terminator|Terminator no line wrap, 
-# Pretend to be 80x24.
+# Pretend to be 80x24, but with an arbitrary number of lines in memory.
     cols#80,
     lines#24,
+    lm#0,
 # Tabs initially every 8 spaces.
     it#8,
 # Visible bell. We don't support an audible bell ("bell").
@@ -68,11 +69,14 @@ terminator|Terminator no line wrap,
     smul=\E[4m,
     tbc=\E[3g,
     vpa=\E[%i%p1%dd,
+    sgr0=\E[m,
+# We offer 8 colors, in any foreground/background combination.
     colors#8,
     pairs#64,
+# Return to the original pair of colors.
     op=\E[39;49m,
+# Set ANSI background and foreground colors.
     setab=\E[%p1%{40}%+%dm,
-    sgr0=\E[m,
     setaf=\E[%p1%{30}%+%dm,
 #
 # Use the title bar as a status line. Because we don't set $WINDOWID, you'll

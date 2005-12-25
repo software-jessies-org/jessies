@@ -426,14 +426,17 @@ public class Options {
 		addDefault("color6", colorFromString("#00cdcd"), "Color 6: cyan3");
 		addDefault("color7", colorFromString("#e5e5e5"), "Color 7: grey90");
 		
-		addDefault("color8", colorFromString("#4d4d4d"), "Color 8: gray30");
-		addDefault("color9", colorFromString("#ff0000"), "Color 9: red");
-		addDefault("color10", colorFromString("#00ff00"), "Color 10: green");
-		addDefault("color11", colorFromString("#ffff00"), "Color 11: yellow");
-		addDefault("color12", colorFromString("#0000ff"), "Color 12: blue");
-		addDefault("color13", colorFromString("#ff00ff"), "Color 13: magenta");
-		addDefault("color14", colorFromString("#00ffff"), "Color 14: cyan");
-		addDefault("color15", colorFromString("#ffffff"), "Color 15: white");
+		// If we supported 16 colors, they would be these bright versions of the colors above:
+		// Color 8: gray30
+		// Color 9: red
+		// Color 10: green
+		// Color 11: yellow
+		// Color 12: blue
+		// Color 13: magenta
+		// Color 14: cyan
+		// Color 15: white
+		// Both the xterm-color nor rxvt-color terminfo entries just claim 8 colors.
+		// There are xterm-16color and rxvt-16color variants, but I've not seen them used, and don't know of anything that would take advantage of the extra colors (which would require a significantly more complicated terminfo, and support for extra sequences).
 		
 		// Defaults reminiscent of SGI's xwsh(1).
 		addDefault("background", colorFromString("#000045"), "Background"); // dark blue
