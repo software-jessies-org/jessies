@@ -468,12 +468,28 @@ public class Options {
 		}
 	}
 	
-	private void readRGBFile() {
-		// FIXME: with Sun's JVM, there's a class in XAWT that has a Color constant for each color in "rgb.txt".
+	/**
+	 * Returns the name of the first "rgb.txt" file it finds.
+	 */
+	private String findRgbDotTxt() {
+		String[] possibleRgbDotTxtLocations = {
+			"/usr/X11R6/lib/X11/rgb.txt", // Linux, Mac OS with X11 installed.
+			"/usr/share/emacs/21.2/etc/rgb.txt", // Mac OS without X11 installed.
+		};
+		for (String possibleLocation : possibleRgbDotTxtLocations) {
+			if (FileUtilities.exists(possibleLocation)) {
+				return possibleLocation;
+			}
+		}
+		return null;
+	}
+	
+	private void readRGBFile(String rgbDotTxtFilename) {
 		rgbColors = new HashMap<String, Color>();
-		String[] lines = StringUtilities.readLinesFromFile("/usr/X11R6/lib/X11/rgb.txt");
+		String[] lines = StringUtilities.readLinesFromFile(rgbDotTxtFilename);
 		for (String line : lines) {
-			if (line.startsWith("!")) {
+			if (line.length() == 0 || line.startsWith("!") || line.startsWith("#")) {
+				// X11's "rgb.txt" uses !-commenting, but Emacs' copy uses #-commenting, and contains an empty line.
 				continue;
 			}
 			int r = channelAt(line, 0);
@@ -485,11 +501,16 @@ public class Options {
 	}
 	
 	private Color getRgbColor(String description) {
+		// FIXME: with Sun's JVM, com.sun.java.swing.plaf.gtk.XColors.lookupColor returns a Color for each color named in "rgb.txt". We should try that (via reflection) first, and only then resort to reading "rgb.txt".
 		if (rgbColors == null) {
+			final String filename = findRgbDotTxt();
+			if (filename == null) {
+				return null;
+			}
 			try {
-				readRGBFile();
+				readRGBFile(filename);
 			} catch (Exception ex) {
-				Log.warn("Problem reading X11 colors", ex);
+				Log.warn("Problem reading colors from \"" + filename + "\"", ex);
 			}
 		}
 		return rgbColors.get(description.toLowerCase());
