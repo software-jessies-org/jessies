@@ -752,14 +752,10 @@ public class Edit implements com.apple.eawt.ApplicationListener {
         application.addApplicationListener(this);
 
         frame = new JFrame("Edit");
+        frame.setJMenuBar(new EditMenuBar());
         
         initPreferences();
         FormDialog.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
-        
-        /* FIXME: is there a better way round this two-stage menubar construction? */
-        EditMenuBar menuBar = new EditMenuBar();
-        frame.setJMenuBar(menuBar);
-        menuBar.populate();
         
         readSavedState();
         initWindow();
