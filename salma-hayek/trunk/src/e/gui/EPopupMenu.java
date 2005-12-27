@@ -95,7 +95,7 @@ public class EPopupMenu {
         }
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                action.actionPerformed(new ActionEvent(new Point(x, y), e.getID(), e.getActionCommand(), e.getModifiers()));
+                action.actionPerformed(new ActionEvent(componentWithMenu, e.getID(), e.getActionCommand(), e.getModifiers()));
             }
         });
         menuItem.setEnabled(action.isEnabled());
