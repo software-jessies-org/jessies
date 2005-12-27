@@ -248,6 +248,10 @@ public class TerminatorFrame extends JFrame {
 		}
 	}
 	
+	public boolean hasMultipleTabs() {
+		return (tabbedPane != null);
+	}
+	
 	public void switchToNextTab() {
 		if (tabbedPane != null) {
 			setSelectedTab(tabbedPane.getSelectedIndex() + 1);

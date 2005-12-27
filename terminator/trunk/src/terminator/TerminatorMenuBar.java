@@ -12,7 +12,7 @@ import terminator.view.highlight.*;
  * Provides a menu bar for Mac OS, and acts as a source of Action instances for
  * the pop-up menu on all platforms.
  */
-public class TerminatorMenuBar extends JMenuBar {
+public class TerminatorMenuBar extends EMenuBar {
 	private Action[] customWindowMenuItems = new Action[] {
 		new NextTabAction(),
 		new PreviousTabAction()
@@ -482,7 +482,11 @@ public class TerminatorMenuBar extends JMenuBar {
 			}
 		}
 		
-		// FIXME: implement isEnabled.
+		@Override
+		public boolean isEnabled() {
+			TerminatorFrame frame = getFocusedTerminatorFrame();
+			return frame != null && frame.hasMultipleTabs();
+		}
 	}
 	
 	public static class PreviousTabAction extends AbstractAction {
@@ -503,6 +507,10 @@ public class TerminatorMenuBar extends JMenuBar {
 			}
 		}
 		
-		// FIXME: implement isEnabled.
+		@Override
+		public boolean isEnabled() {
+			TerminatorFrame frame = getFocusedTerminatorFrame();
+			return frame != null && frame.hasMultipleTabs();
+		}
 	}
 }
