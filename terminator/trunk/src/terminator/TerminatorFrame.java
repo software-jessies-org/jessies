@@ -172,6 +172,20 @@ public class TerminatorFrame extends JFrame {
 		tabbedPane.addChangeListener(new TerminalFocuser());
 		ComponentUtilities.disableFocusTraversal(tabbedPane);
 		
+		EPopupMenu tabMenu = new EPopupMenu(tabbedPane);
+		tabMenu.addMenuItemProvider(new MenuItemProvider() {
+			public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+				// If the user clicked on some part of the tabbed pane that isn't actually a tab, we're not interested.
+				int tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
+				if (tabIndex == -1) {
+					return;
+				}
+				
+				actions.add(new TerminatorMenuBar.NewTabAction());
+				actions.add(new TerminatorMenuBar.CloseAction());
+			}
+		});
+		
 		// The tabs themselves (the components with the labels)
 		// shouldn't be able to get the focus. If they can, clicking
 		// on an already-selected tab takes focus away from the
