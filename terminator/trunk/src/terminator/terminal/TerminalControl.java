@@ -19,7 +19,7 @@ low-level terminal protocol.
 @author Elliott Hughes
 */
 
-public class TerminalControl implements Runnable {
+public class TerminalControl {
 	private static final boolean DEBUG = false;
 	private static final boolean DEBUG_STEP_MODE = false;
 	private static final boolean SHOW_ASCII_RENDITION = false;
@@ -33,7 +33,8 @@ public class TerminalControl implements Runnable {
 	 * the stdio buffer size or something?
 	 */
 	private static final int INPUT_BUFFER_SIZE = 8 * 1024;
-
+	
+	private Thread thread;
 	private JTerminalPane pane;
 	private TextBuffer listener;
 	private String[] command;
@@ -80,9 +81,34 @@ public class TerminalControl implements Runnable {
 		}
 	}
 	
-	/** Starts the process listening once all the user interface stuff is set up. */
+	/**
+	 * Starts listening to output from the child process. This method is
+	 * invoked when all the user interface stuff is set up.
+	 */
 	public void start() {
-		(new Thread(this, "Terminal connection listener")).start();
+		if (thread != null) {
+			// Detaching a tab causes start to be invoked again, but we shouldn't do anything.
+			return;
+		}
+		
+		thread = new Thread(new TerminalRunnable(), "Terminal connection listener");
+		thread.start();
+	}
+	
+	private class TerminalRunnable implements Runnable {
+		public void run() {
+			try {
+				char[] buffer = new char[INPUT_BUFFER_SIZE];
+				int readCount;
+				while ((readCount = in.read(buffer, 0, buffer.length)) != -1) {
+					processBuffer(buffer, readCount);
+				}
+			} catch (IOException ex) {
+				Log.warn("Problem reading process output", ex);
+			} finally {
+				handleProcessTermination();
+			}
+		}
 	}
 	
 	public void invokeCharacterSet(int index) {
@@ -124,20 +150,6 @@ public class TerminalControl implements Runnable {
 			} catch (IOException ex) {
 				Log.warn("Problem waiting for stepping input", ex);
 			}
-		}
-	}
-	
-	public void run() {
-		try {
-			char[] buffer = new char[INPUT_BUFFER_SIZE];
-			int readCount;
-			while ((readCount = in.read(buffer, 0, buffer.length)) != -1) {
-				processBuffer(buffer, readCount);
-			}
-		} catch (IOException ex) {
-			Log.warn("Problem reading process output", ex);
-		} finally {
-			handleProcessTermination();
 		}
 	}
 	
