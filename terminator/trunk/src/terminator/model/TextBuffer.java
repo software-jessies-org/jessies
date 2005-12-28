@@ -543,16 +543,32 @@ public class TextBuffer {
 	* If either x or y is -1, that coordinate is left unchanged.
 	*/
 	public void setCursorPosition(int x, int y) {
+		if (x == -1) {
+			x = cursorPosition.getCharOffset();
+		} else {
+			// Translate from 1-based coordinates to 0-based.
+			x = Math.max(0, x - 1);
+		}
+		
+		if (y == -1) {
+			y = cursorPosition.getLineIndex();
+		} else {
+			// Translate from 1-based coordinates to 0-based.
+			y = Math.max(0, y - 1);
+			// Although the escape sequence was in terms of a line on the display, we need to take the lines above the display into account.
+			y = getFirstDisplayLine() + y;
+		}
+		
+		// Constrain the cursor to be on the display.
 		// Although the cursor positions are supposed to be measured
 		// from (1,1), there's nothing to stop a badly-behaved program
 		// from sending (0,0). ASUS routers do this (they're rubbish).
-		// Note that here we also transform from 1-based coordinates to 0-based.
-		x = (x == -1) ? cursorPosition.getCharOffset() : Math.max(0, x - 1);
-		y = (y == -1) ? cursorPosition.getLineIndex() : Math.max(0, y - 1);
 		x = Math.min(x, width - 1);
 		y = Math.min(y, height - 1);
-
-		cursorPosition = new Location(y + getFirstDisplayLine(), x);
+		x = Math.max(0, x);
+		y = Math.max(0, y);
+		
+		cursorPosition = new Location(y, x);
 	}
 	
 	/** Moves the cursor horizontally by the number of characters in xDiff, negative for left, positive for right. */
