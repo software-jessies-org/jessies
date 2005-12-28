@@ -179,6 +179,8 @@ public class TerminatorFrame extends JFrame {
 				}
 				
 				actions.add(new TerminatorMenuBar.NewTabAction());
+				actions.add(new TerminatorMenuBar.DetachTabAction());
+				actions.add(null);
 				actions.add(new TerminatorMenuBar.CloseAction());
 			}
 		});
@@ -261,6 +263,13 @@ public class TerminatorFrame extends JFrame {
 	
 	public boolean hasMultipleTabs() {
 		return (tabbedPane != null);
+	}
+	
+	public void detachCurrentTab() {
+		JTerminalPane escapee = (JTerminalPane) tabbedPane.getSelectedComponent();
+		terminals.remove(escapee);
+		closeTab(escapee);
+		Terminator.getSharedInstance().openFrame(escapee);
 	}
 	
 	public void switchToNextTab() {
