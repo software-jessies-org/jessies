@@ -5,6 +5,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.*;
@@ -16,19 +17,15 @@ public class TerminatorFrame extends JFrame {
 	private JTabbedPane tabbedPane;
 	
 	private ArrayList<JTerminalPane> terminals = new ArrayList<JTerminalPane>();
-
-	public TerminatorFrame(Terminator terminator, JTerminalPaneFactory[] paneFactories) {
+	
+	public TerminatorFrame(Terminator terminator, List<JTerminalPane> initialTerminalPanes) {
 		super("Terminator");
 		this.terminator = terminator;
-		JTerminalPane[] panes = new JTerminalPane[paneFactories.length];
-		for (int i = 0; i < paneFactories.length; ++i) {
-			panes[i] = paneFactories[i].create();
-			terminals.add(panes[i]);
-		}
+		this.terminals.addAll(initialTerminalPanes);
 		initFrame();
 		initFocus();
-		for (JTerminalPane pane : panes) {
-			pane.start();
+		for (JTerminalPane terminal : terminals) {
+			terminal.start();
 		}
 	}
 	
