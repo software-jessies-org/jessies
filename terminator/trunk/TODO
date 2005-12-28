@@ -76,13 +76,6 @@
   In voluminous output, indication of clustering of matches could be
   helpful to me."
 
-* car: "Is it possible to detach tabbed instances out to their own window?
-  I've seen one that did this before (Konsole, I think) and I've found it
-  useful.  I've also found Terminal's split-view useful, in similar-ish
-  circumstances.  Both are pretty much a sop against either a lack of
-  forethought or plain old laziness." or "floating off a separate read-only
-  instance of the same terminal".
-
 * car: "Lack of any obvious preferences/ configuration mechanism (font's
   too big)". "--help" tells you about the resources, but (a) that's not
   available from within Terminator, and (b) that's not exactly friendly.

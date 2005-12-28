@@ -35,7 +35,8 @@ public class TerminatorMenuBar extends EMenuBar {
 		//menu.add(makeAcceleratedItemEx(new ConnectToServerAction(), 'K', true));
 		
 		menu.add(new JSeparator());
-		menu.add(new JMenuItem(new CloseAction()));
+		menu.add(new CloseAction());
+		menu.add(new DetachTabAction());
 		//menu.add(new JMenuItem(new SaveAsAction()));
 		
 		menu.add(new JSeparator());
@@ -150,7 +151,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			Terminator.getSharedInstance().openFrame();
+			Terminator.getSharedInstance().openFrame(JTerminalPane.newShell());
 		}
 	}
 	
@@ -197,6 +198,25 @@ public class TerminatorMenuBar extends EMenuBar {
 			if (terminal != null) {
 				terminal.doCloseAction();
 			}
+		}
+	}
+	
+	public static class DetachTabAction extends AbstractAction {
+		public DetachTabAction() {
+			super("Detach Tab");
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			TerminatorFrame frame = getFocusedTerminatorFrame();
+			if (frame != null) {
+				frame.detachCurrentTab();
+			}
+		}
+		
+		@Override
+		public boolean isEnabled() {
+			TerminatorFrame frame = getFocusedTerminatorFrame();
+			return frame != null && frame.hasMultipleTabs();
 		}
 	}
 	

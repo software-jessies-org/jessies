@@ -34,7 +34,7 @@ public class Terminator {
 		Application.getApplication().addApplicationListener(new ApplicationAdapter() {
 			public void handleReOpenApplication(ApplicationEvent e) {
 				if (frames.isEmpty()) {
-					openFrame();
+					openFrame(JTerminalPane.newShell());
 				}
 				e.setHandled(true);
 			}
@@ -95,8 +95,8 @@ public class Terminator {
 		frames.remove(frame);
 	}
 	
-	public void openFrame() {
-		TerminatorFrame frame = new TerminatorFrame(this, Collections.singletonList(JTerminalPane.newShell()));
+	public void openFrame(JTerminalPane terminalPane) {
+		TerminatorFrame frame = new TerminatorFrame(this, Collections.singletonList(terminalPane));
 		frames.add(frame);
 	}
 	
