@@ -96,8 +96,7 @@ public class Terminator {
 	}
 	
 	public void openFrame() {
-		JTerminalPaneFactory pane = new JTerminalPaneFactory.Shell();
-		TerminatorFrame frame = new TerminatorFrame(this, new JTerminalPaneFactory[] { pane });
+		TerminatorFrame frame = new TerminatorFrame(this, Collections.singletonList(JTerminalPane.newShell()));
 		frames.add(frame);
 	}
 	
@@ -109,8 +108,13 @@ public class Terminator {
 	private void initUi() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				JTerminalPaneFactory[] terminals = getInitialTerminals();
-				TerminatorFrame frame = new TerminatorFrame(Terminator.this, terminals);
+				ArrayList<JTerminalPane> terminalPanes = new ArrayList<JTerminalPane>();
+				JTerminalPaneFactory[] paneFactories = getInitialTerminals();
+				for (int i = 0; i < paneFactories.length; ++i) {
+					terminalPanes.add(paneFactories[i].create());
+				}
+				
+				TerminatorFrame frame = new TerminatorFrame(Terminator.this, terminalPanes);
 				frames.add(frame);
 			}
 		});

@@ -1,5 +1,8 @@
 package terminator.view;
 
+/**
+ * FIXME: do we need this class? Why can't we work directly with JTerminalPane instances?
+ */
 public interface JTerminalPaneFactory {
 	public JTerminalPane create();
 	
