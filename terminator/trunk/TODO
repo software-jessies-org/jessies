@@ -104,3 +104,6 @@
 
   There are many bugs involving the highlight updating. (First reported
   on software@ on 2004-11-02.)
+
+* There are some interesting features and bugs mentioned on the Konsole
+  ChangeLog page: http://konsole.kde.org/changelog.php
