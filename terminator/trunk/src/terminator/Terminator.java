@@ -96,7 +96,7 @@ public class Terminator {
 	}
 	
 	public void openFrame(JTerminalPane terminalPane) {
-		TerminatorFrame frame = new TerminatorFrame(this, Collections.singletonList(terminalPane));
+		TerminatorFrame frame = new TerminatorFrame(Collections.singletonList(terminalPane));
 		frames.add(frame);
 	}
 	
@@ -106,7 +106,7 @@ public class Terminator {
 	private void initUi() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				TerminatorFrame frame = new TerminatorFrame(Terminator.this, getInitialTerminals());
+				TerminatorFrame frame = new TerminatorFrame(getInitialTerminals());
 				frames.add(frame);
 			}
 		});
