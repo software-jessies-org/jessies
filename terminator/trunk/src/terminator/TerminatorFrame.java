@@ -12,16 +12,14 @@ import javax.swing.event.*;
 import terminator.view.*;
 
 public class TerminatorFrame extends JFrame {
-	private Terminator terminator;
 	private Dimension terminalSize;
 	private JTabbedPane tabbedPane;
 	
 	private ArrayList<JTerminalPane> terminals = new ArrayList<JTerminalPane>();
 	
-	public TerminatorFrame(Terminator terminator, List<JTerminalPane> initialTerminalPanes) {
+	public TerminatorFrame(List<JTerminalPane> initialTerminalPanes) {
 		super("Terminator");
-		this.terminator = terminator;
-		this.terminals.addAll(initialTerminalPanes);
+		terminals.addAll(initialTerminalPanes);
 		initFrame();
 		initFocus();
 		for (JTerminalPane terminal : terminals) {
@@ -121,7 +119,7 @@ public class TerminatorFrame extends JFrame {
 					JTerminalPane terminal = terminals.get(i);
 					terminal.destroyProcess();
 				}
-				terminator.frameClosed(TerminatorFrame.this);
+				Terminator.getSharedInstance().frameClosed(TerminatorFrame.this);
 			}
 		});
 		initTerminals();
