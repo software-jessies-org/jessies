@@ -74,7 +74,9 @@ if test(?e, terminfo_DST) == false
 end
 if tic_binary != ""
   tic_command = [ tic_binary ]
-  if ENV["DEBUGGING_TERMINATOR"] != nil
+  if target_os() != "Linux"
+    # Debian testing/unstable's tic(1) is currently broken, and won't write an output file if asked to be verbose. All you'll get is this on stderr:
+    # "/home/elliotth/Projects/terminator/lib/terminfo/terminator.tic", line 8, 'terminator' /usr/bin/tic: symbol lookup error: /usr/bin/tic: undefined symbol: _tracef
     tic_command << "-v10"
   end
   if target_os() != "SunOS"
