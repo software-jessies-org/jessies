@@ -101,20 +101,12 @@ public class Terminator {
 	}
 	
 	/**
-	 * Sets up the user interface on the AWT event thread. I've never
-	 * seen this matter in practice, but strictly speaking, you're
-	 * supposed to do this.
+	 * Sets up the user interface on the AWT event thread.
 	 */
 	private void initUi() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				ArrayList<JTerminalPane> terminalPanes = new ArrayList<JTerminalPane>();
-				JTerminalPaneFactory[] paneFactories = getInitialTerminals();
-				for (int i = 0; i < paneFactories.length; ++i) {
-					terminalPanes.add(paneFactories[i].create());
-				}
-				
-				TerminatorFrame frame = new TerminatorFrame(Terminator.this, terminalPanes);
+				TerminatorFrame frame = new TerminatorFrame(Terminator.this, getInitialTerminals());
 				frames.add(frame);
 			}
 		});
@@ -129,8 +121,8 @@ public class Terminator {
 		}
 	}
 	
-	private JTerminalPaneFactory[] getInitialTerminals() {
-		ArrayList<JTerminalPaneFactory> result = new ArrayList<JTerminalPaneFactory>();
+	private List<JTerminalPane> getInitialTerminals() {
+		ArrayList<JTerminalPane> result = new ArrayList<JTerminalPane>();
 		String name = null;
 		for (int i = 0; i < arguments.size(); ++i) {
 			String word = arguments.get(i);
@@ -140,14 +132,14 @@ public class Terminator {
 			}
 			
 			String command = word;
-			result.add(new JTerminalPaneFactory.Command(command, name));
+			result.add(JTerminalPane.newCommandWithTitle(command, name));
 			name = null;
 		}
 		
 		if (arguments.isEmpty()) {
-			result.add(new JTerminalPaneFactory.Shell());
+			result.add(JTerminalPane.newShell());
 		}
-		return result.toArray(new JTerminalPaneFactory[result.size()]);
+		return result;
 	}
 
 	public void showUsage(PrintWriter out) {
