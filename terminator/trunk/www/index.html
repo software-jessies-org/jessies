@@ -99,94 +99,15 @@ remembering where the tabs are and copy/pasting them as tab characters.
 for Linux to make up for the fact that no Linux terminal emulator was as good as Mac OS X's Terminal, it has
 now surpassed Terminal in several areas.
 
-<h2>Download</h2>
+<h2>Downloads</h2>
 
-<p>The distribution is here (<a href="terminator.tgz">terminator.tgz</a>),
-but you'll also need a copy of the library to go with it (<a href="../salma-hayek/salma-hayek.tgz">salma-hayek.tgz</a>).
+<p>For Mac OS 10.4, there's <a href="terminator.dmg">terminator.dmg</a> which contains an app bundle that you can drag and drop to install.
 
-<p>The distribution contains Java classes but no native shared library.
-We also have pre-built libraries for
-<a href="terminator-Linux.tgz">Linux</a>
-and <a href="terminator-Darwin.tgz">Mac OS X</a> that you can install over a Java-only installation.
+<p>For Win32, there's <a href="terminator-Cygwin.msi">a Win32 installer</a> which requires that you've already installed Cygwin yourself but is otherwise complete.
 
-<p>On Cygwin, there's
-<a href="terminator-Cygwin.msi">an installer</a>,
-which also installs salma-hayek,
-including its Cygwin Java launcher, which is necessary for terminator on Cygwin.
+<p>(As of 2005-12-28, these builds still aren't automatically updated. That should be fixed shortly.)
 
 <p>The <a href="ChangeLog.html">ChangeLog</a> is available separately.
-
-<p>Terminator is written almost entirely in Java with a small bit of JNI
-which runs a process connected to a pseudo-terminal. You will need
-Java 1.5.
-
-<p>You'll need a JDK on your path to build terminator.
-A JRE is sufficient to run terminator.
-
-<p>On Windows, you will need Cygwin.  The current version at the time of porting
-was 1.5.18-1.  The startup script requires Ruby, which isn't part of Cygwin's default
-installation.  It's easily added to an additional installation (by a human but not, sadly,
-by the script) by rerunning the installer.  You might also want the net.inetutils package
-which is where Cygwin's telnet lives.  If you only have the JRE installed, then you may
-want to rerun the JRE installer and choose a Custom installation so that you get
-LucidaTypewriterRegular.ttf installed, otherwise you'll end up with Courier and being
-unable to distinguish l and 1.
-
-<p>(NT's built-in POSIX subsystem won't let you launch Win32 applications or
-interact with the network, so that wasn't an option.
-Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which
-we use to support window resizing, not to mention containing a port of one of
-the most widely used ssh programs.)
-
-<p>On Cygwin, the launcher will use $JAVA_HOME to find your jvm.dll if you've
-specified it.  You can use a Windows or a POSIX style path for $JAVA_HOME.
-The maintainer uses a Windows-style path on the assumption that other
-Windows Java tools (of which he has none) would want it that way.
-Be sure not to include any spurious quotes in the value of $JAVA_HOME.
-You may point $JAVA_HOME at a JRE if you only want to run terminator and not compile it.
-Better still, you may leave $JAVA_HOME unset, in which case the launcher will find
-an appropriate jvm.dll using the Registry.
-
-<p>To build Terminator, you'll need g++ and a very recent make.
-<a href="ftp://alpha.gnu.org/gnu/make/make-3.81beta3.tar.gz">make-3.81beta3-src</a> works.
-Debian's make-3.80-9 works.
-The make 3.80 which comes with Mac OS X 10.4.2 isn't good enough.
-The make which comes with Cygwin 1.5.18-1 isn't good enough.
-Debian's make source (apt-get source make) compiles and runs on Mac OS X and Cygwin.
-We have binaries for
-<a href="../3rdParty/make-3.80-9/Cygwin/make.exe">make-3.80-9-cygwin-i686</a>,
-<a href="../3rdParty/make-3.80-9-darwin-ppc">make-3.80-9-darwin-ppc</a>,
-<a href="../3rdParty/make-3.81beta3-linux-i686-glibc-2.3">make-3.81beta3-linux-i686-glibc-2.3</a>
-and <a href="../3rdParty/make-3.81beta3-solaris-amd64">make-3.81beta3-solaris-amd64</a>.
-
-<p>This:
-<pre>
-make: *** virtual memory exhausted.  Stop.
-</pre>
-<p>... or this sort of nonsensical error message are typical symptoms that your make isn't good enough:
-<pre>
-../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setsid (with value "! -prune") was referred to in scope setsid.  Stop.
-</pre>
-
-<p>To build the Windows installer, you need Microsoft's open source Windows installer compiler,
-<a href="http://sourceforge.net/projects/wix/">WiX</a>, installed, currently in /tmp/wix until a maintainer thinks of a better way to locate it.
-
-<p>If you see this error when building terminator for Cygwin:
-<pre>
-light.exe : error LGHT0001 : COM object with CLSID {F94985D5-29F9-4743-9805-99BC3F35B678} is either not valid or not registered.
-</pre>
-
-<p>Then you also need MergeMod.dll to be installed and registered.
-This appears to be installed by the Platform SDK among other things.
-The Platform SDK is now
-<a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=A55B6B43-E24F-4EA3-A93E-40C0EC4F68E5&displaylang=en">a free download</a>.
-(The original author got his from there but microsoft.com links have a habit of breaking quickly.)
-This is how you register the COM object, according to <a href="http://support.microsoft.com/kb/329214/EN-US/">the instructions</a>, once it's installed:
-<pre>
-regsvr32 "C:\Program Files\Microsoft Platform SDK\Bin\MergeMod.Dll"
-</pre>
-
-<p>No, honestly: that's how the original author did it and it worked for him.
 
 <h2>Running</h2>
 
@@ -195,7 +116,7 @@ window manager like lwm. Now you can use the same terminal emulator everywhere!
 
 <p>We have made some effort to ensure that Terminator is easy to run.
 The native code will automatically be compiled the first time you run
-Terminator on a new architecture, assuming you have <tt>make(1)</tt> and
+Terminator on a new architecture, assuming you have GNU make and
 <tt>g++(1)</tt> installed. A single Terminator installation may contain native
 binaries for a variety of different architectures; this is handled
 automatically.
@@ -211,7 +132,6 @@ default.  It's apparently a snap to install the
 <a href="http://www.freebsd.org/cgi/url.cgi?ports/devel/ncurses/pkg-descr">devel/ncurses</a>
 package from <a href="http://www.freebsd.org/ports/">the ports collection</a>,
 perhaps with:
-
 <pre>
 cd /usr/ports/devel/ncurses
 make install
@@ -308,11 +228,82 @@ terminator:25: warning: Insecure world writable dir /usr/local/bin, mode 040777
 chmod o-w /usr/local/bin
 </pre>
 
+<h2>Building from source</h2>
+
+<p>There's a source distribution (<a href="terminator.tgz">terminator.tgz</a>),
+and you'll also need the source to the library it uses (<a href="../salma-hayek/salma-hayek.tgz">salma-hayek.tgz</a>).
+
+<p>Terminator is written almost entirely in Java with a small bit of JNI
+which runs a process connected to a pseudo-terminal. You will need
+Java 1.5. A JRE is sufficient to run terminator but you'll need a JDK
+to build terminator. If you only have the JRE installed, then you may
+want to rerun the JRE installer and choose a Custom installation so that you get
+LucidaTypewriterRegular.ttf installed, otherwise you'll end up with Courier and being
+unable to distinguish l and 1.
+
+<p>For the JNI part, you'll need g++ and a very recent GNU make.
+<a href="ftp://alpha.gnu.org/gnu/make/">GNU make 3.81 betas</a> work.
+Debian's make-3.80-9 works.
+The make 3.80 which comes with Mac OS X 10.4.2 isn't good enough.
+The make which comes with Cygwin 1.5.18-1 isn't good enough.
+Debian's make source (apt-get source make) compiles and runs on Mac OS X and Cygwin.
+We have binaries for
+<a href="../3rdParty/make-3.80-9/Cygwin/make.exe">make-3.80-9-cygwin-i686</a>,
+<a href="../3rdParty/make-3.80-9-darwin-ppc">make-3.80-9-darwin-ppc</a>,
+and <a href="../3rdParty/make-3.81beta3-solaris-amd64">make-3.81beta3-solaris-amd64</a>.
+
+<p>This:
+<pre>
+make: *** virtual memory exhausted.  Stop.
+</pre>
+<p>... or this sort of nonsensical error message are typical symptoms that your make isn't good enough:
+<pre>
+../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setsid (with value "! -prune") was referred to in scope setsid.  Stop.
+</pre>
+
+<h3>Win32</h3>
+
+<p>On Windows, you will need Cygwin.  The current version at the time of porting
+was 1.5.18-1.  The startup script requires Ruby, which isn't part of Cygwin's default
+installation.  It's easily added to an additional installation (by a human but not, sadly,
+by the script) by rerunning the installer.  You might also want the net.inetutils package
+which is where Cygwin's telnet lives.
+
+<p>(NT's built-in POSIX subsystem won't let you launch Win32 applications or
+interact with the network, so that wasn't an option.
+Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which
+we use to support window resizing, not to mention containing a port of one of
+the most widely used ssh programs.)
+
+<p>On Cygwin, the launcher will use $JAVA_HOME to find your jvm.dll if you've
+specified it.  You can use a Windows or a POSIX style path for $JAVA_HOME.
+The maintainer uses a Windows-style path on the assumption that other
+Windows Java tools (of which he has none) would want it that way.
+Be sure not to include any spurious quotes in the value of $JAVA_HOME.
+You may point $JAVA_HOME at a JRE if you only want to run terminator and not compile it.
+Better still, you may leave $JAVA_HOME unset, in which case the launcher will find
+an appropriate jvm.dll using the Registry.
+
+<p>To build the Windows installer, you need Microsoft's open source Windows installer compiler, <a href="http://sourceforge.net/projects/wix/">WiX</a>, installed, currently in /tmp/wix until a maintainer thinks of a better way to locate it.
+
+<p>If you see this error when building terminator for Cygwin:
+<pre>
+light.exe : error LGHT0001 : COM object with CLSID {F94985D5-29F9-4743-9805-99BC3F35B678} is either not valid or not registered.
+</pre>
+you also need MergeMod.dll to be installed and registered.
+This appears to be part of the free <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=A55B6B43-E24F-4EA3-A93E-40C0EC4F68E5&displaylang=en">Microsoft Windows Platform SDK</a> among other things.
+This is how you register the COM object, according to <a href="http://support.microsoft.com/kb/329214/EN-US/">the instructions</a>, once it's installed:
+<pre>
+regsvr32 "C:\Program Files\Microsoft Platform SDK\Bin\MergeMod.Dll"
+</pre>
+
 <h2>Authors</h2>
 
 <p>The original implementation and documentation was written by Phil Norman. Nearly all of the actual terminal emulation code remains unchanged.
 
 <p>The original idea of having a suitably hackable terminal emulator with which to experiment with advanced features came from Elliott Hughes. Not being married with children, he now takes care of most of the development.
+
+<p>Martin Dorey was responsible for the Cygwin port; we wrote more about <a href="http://elliotth.blogspot.com/2005/08/porting-jni-code-to-win32-with-cygwin.html">Porting JNI code Win32 with Cygwin</a> and <a href="http://elliotth.blogspot.com/2005/08/javaiofiledescriptor-on-win32.html">java.io.FileDescriptor on Win32</a>.
 
 <p>Phil wrote the code that took us from nothing to a more-or-less usable replacement for <tt>rxvt</tt> on his own between 2004-04-21 and 2004-05-28. Given that he was on holiday for a week during this time, that made roughly a month of development time.
 
