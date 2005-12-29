@@ -107,7 +107,7 @@ now surpassed Terminal in several areas.
 
 <p>(As of 2005-12-28, these builds still aren't automatically updated. That should be fixed shortly.)
 
-<p>The <a href="ChangeLog.html">ChangeLog</a> is available separately.
+<p>The <a href="ChangeLog.html">Terminator ChangeLog</a> is available separately.
 
 <h2>Running</h2>
 
@@ -126,16 +126,6 @@ automatically.
 <p>Terminator has its own terminfo file.  This will be installed in your home
 directory unless Terminator is able to write to the system-wide
 terminfo directory. This will only be the case if you run Terminator as root.
-
-<p>FreeBSD doesn't come with the necessary terminfo support installed by
-default.  It's apparently a snap to install the
-<a href="http://www.freebsd.org/cgi/url.cgi?ports/devel/ncurses/pkg-descr">devel/ncurses</a>
-package from <a href="http://www.freebsd.org/ports/">the ports collection</a>,
-perhaps with:
-<pre>
-cd /usr/ports/devel/ncurses
-make install
-</pre>
 
 <h4>Logging in as other users/root</h4>
 <p>If the terminfo file is only installed in your home directory then you
@@ -170,6 +160,11 @@ machine:
 export TERMINFO=~/.terminfo
 export TERM=$TERM
 </pre>
+
+<p>FreeBSD systems don't come with the necessary terminfo support installed by
+default.  It's apparently a snap to install the
+<a href="http://www.freebsd.org/cgi/url.cgi?ports/devel/ncurses/pkg-descr">devel/ncurses</a>
+package from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports and Packages Collection</a>.
 
 <h3>Pasting in VNC</h3>
 
@@ -217,13 +212,10 @@ Any console output from the Java, as opposed to the start-up script, is recorded
 $HOME/.terminal-logs/ along with a file containing a log of each tab's output.
 
 <p>You may see warnings from Ruby like this:
-
 <pre>
 terminator:25: warning: Insecure world writable dir /usr/local/bin, mode 040777
 </pre>
-
-<p>This seems to solve them with no ill effect:
-
+which can be cured thus:
 <pre>
 chmod o-w /usr/local/bin
 </pre>
