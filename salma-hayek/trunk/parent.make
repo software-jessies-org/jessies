@@ -3,9 +3,13 @@
 .SECONDARY:
 
 SUBDIRS += salma-hayek
+
 SUBDIRS += edit
-SUBDIRS += terminator
+SUBDIRS += KnowAll
 SUBDIRS += scm
+SUBDIRS += terminator
+
+SUBDIRS := $(wildcard $(SUBDIRS))
 
 PROJECT_NAME = software.jessies.org
 DIST_FILE_OF_THE_DAY := $(shell date +$(PROJECT_NAME)-%Y-%m-%d.tar.gz)
