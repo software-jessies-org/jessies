@@ -107,3 +107,7 @@
 
 * There are some interesting features and bugs mentioned on the Konsole
   ChangeLog page: http://konsole.kde.org/changelog.php
+
+* On Mac OS, Safari-style tabs would be much better than the usual Aqua ones
+  for our purposes. They take up significantly less space, and don't require
+  a border. We'd have to implement them ourselves, though.
