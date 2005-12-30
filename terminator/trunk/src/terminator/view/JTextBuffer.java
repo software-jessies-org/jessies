@@ -367,7 +367,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		// Rather than have special case code in each caller, simply return a reasonable result.
 		// Note that it's okay to have the empty string as the default here because we'll pad if necessary later in this method.
 		String line = "";
-		if (charCoords.getLineIndex() < model.getLineCount()) {
+		if (charCoords.getLineIndex() < model.getLineCount() - 1) {
 			line = model.getTextLine(charCoords.getLineIndex()).getString();
 		}
 		
