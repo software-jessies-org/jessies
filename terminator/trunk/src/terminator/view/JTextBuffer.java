@@ -361,7 +361,16 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	}
 	
 	private Rectangle modelToView(Location charCoords) {
-		String line = model.getTextLine(charCoords.getLineIndex()).getString();
+		// We can be asked the view rectangle of locations that are past the bottom of the text in various circumstances. Examples:
+		// 1. If the user sweeps a selection too far.
+		// 2. If the user starts a new shell, types "man bash", and then clears the history; we move the cursor, and want to know the old cursor location to remove the cursor from, even though there's no longer any text there.
+		// Rather than have special case code in each caller, simply return a reasonable result.
+		// Note that it's okay to have the empty string as the default here because we'll pad if necessary later in this method.
+		String line = "";
+		if (charCoords.getLineIndex() < model.getLineCount()) {
+			line = model.getTextLine(charCoords.getLineIndex()).getString();
+		}
+		
 		final int offset = charCoords.getCharOffset();
 		final int desiredLength = offset + 1;
 		if (line.length() < desiredLength) {
