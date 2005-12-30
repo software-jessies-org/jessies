@@ -51,7 +51,7 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	public JTerminalPane(String name, String command) {
+	private JTerminalPane(String name, String[] command) {
 		super(new BorderLayout());
 		this.name = name;
 		init(command);
@@ -62,34 +62,38 @@ public class JTerminalPane extends JPanel {
 	 * title. If 'title' is null, we use the first word of the command
 	 * as the the title.
 	 */
-	public static JTerminalPane newCommandWithTitle(String command, String title) {
+	public static JTerminalPane newCommandWithTitle(String[] command, String title) {
 		if (title == null) {
-			title = command.trim();
-			if (title.contains(" ")) {
-				title = title.substring(0, title.indexOf(' '));
-			}
+			title = command[0].trim();
 		}
 		return new JTerminalPane(title, command);
 	}
 	
 	/**
-	 * Creates a new terminal running bash(1), which is assumed to be the
-	 * user's shell.
+	 * Creates a new terminal running the user's shell.
 	 */
 	public static JTerminalPane newShell() {
-		String user = System.getProperty("user.name");
-		String command = "bash";
-		if (Options.getSharedInstance().isLoginShell()) {
-			command += " -l";
+		String shell = System.getenv("SHELL");
+		if (shell == null) {
+			// Has there ever been a Unix without a /bin/sh?
+			shell = "/bin/sh";
 		}
-		return new JTerminalPane(user + "@localhost", command);
+		
+		ArrayList<String> command = new ArrayList<String>();
+		command.add(shell);
+		if (Options.getSharedInstance().isLoginShell()) {
+			command.add("-l");
+		}
+		
+		String user = System.getProperty("user.name");
+		return new JTerminalPane(user + "@localhost", command.toArray(new String[command.size()]));
 	}
 	
 	public Dimension getPaneSize() {
 		return viewport.getSize();
 	}
 	
-	private void init(String command) {
+	private void init(String[] command) {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		
@@ -117,9 +121,9 @@ public class JTerminalPane extends JPanel {
 		
 		textPane.sizeChanged();
 		try {
-			control = new TerminalControl(this, textPane.getModel(), command);
+			control = new TerminalControl(this, textPane.getModel());
 			textPane.setTerminalControl(control);
-			control.initProcess();
+			control.initProcess(command);
 			initSizeMonitoring();
 		} catch (final Throwable th) {
 			Log.warn("Couldn't initialize terminal", th);

@@ -132,7 +132,7 @@ public class Terminator {
 			}
 			
 			String command = word;
-			result.add(JTerminalPane.newCommandWithTitle(command, name));
+			result.add(JTerminalPane.newCommandWithTitle(command.split(" "), name));
 			name = null;
 		}
 		

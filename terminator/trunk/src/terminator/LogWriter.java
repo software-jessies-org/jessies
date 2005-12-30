@@ -1,7 +1,7 @@
 package terminator;
 
 import e.gui.*;
-import e.util.Log;
+import e.util.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -19,8 +19,9 @@ public class LogWriter {
 	private BufferedWriter stream;
 	private boolean suspended;
 	
-	public LogWriter(String prefix) {
+	public LogWriter(String[] command) {
 		try {
+			String prefix = StringUtilities.join(command, " ");
 			initLogging(prefix);
 		} catch (Throwable th) {
 			SimpleDialog.showDetails(null, "Couldn't Open Log File", th);

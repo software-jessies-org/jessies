@@ -37,7 +37,6 @@ public class TerminalControl {
 	private Thread thread;
 	private JTerminalPane pane;
 	private TextBuffer listener;
-	private String[] command;
 	private PtyProcess ptyProcess;
 	private boolean processIsRunning = true;
 	private boolean processIsBeingDestroyed = false;
@@ -56,15 +55,14 @@ public class TerminalControl {
 	
 	private static final ExecutorService writerExecutor = ThreadUtilities.newSingleThreadExecutor("UTF-8 Writer");
 	
-	public TerminalControl(JTerminalPane pane, TextBuffer listener, String command) {
+	public TerminalControl(JTerminalPane pane, TextBuffer listener) {
 		reset();
 		this.pane = pane;
 		this.listener = listener;
-		this.command = command.split(" ");
-		this.logWriter = new LogWriter(command);
 	}
 	
-	public void initProcess() throws Throwable {
+	public void initProcess(String[] command) throws Throwable {
+		this.logWriter = new LogWriter(command);
 		this.ptyProcess = new PtyProcess(command);
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), "UTF-8");
 		this.out = ptyProcess.getOutputStream();
