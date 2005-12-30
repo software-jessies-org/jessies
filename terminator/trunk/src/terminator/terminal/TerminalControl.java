@@ -24,8 +24,6 @@ public class TerminalControl {
 	private static final boolean DEBUG_STEP_MODE = false;
 	private static final boolean SHOW_ASCII_RENDITION = false;
 	
-	private static BufferedReader stepModeReader;
-
 	/**
 	 * On Mac OS, this seems to be an optimal size; any smaller and we end
 	 * up doing more reads from programs that produce a lot of output, but
@@ -33,6 +31,10 @@ public class TerminalControl {
 	 * the stdio buffer size or something?
 	 */
 	private static final int INPUT_BUFFER_SIZE = 8 * 1024;
+	
+	private static final ExecutorService writerExecutor = ThreadUtilities.newSingleThreadExecutor("UTF-8 Writer");
+	
+	private static BufferedReader stepModeReader;
 	
 	private Thread thread;
 	private JTerminalPane pane;
@@ -50,10 +52,12 @@ public class TerminalControl {
 	
 	private LogWriter logWriter;
 	
+	private StringBuilder lineBuffer = new StringBuilder();
+	
+	private EscapeParser escapeParser;
+	
 	// Buffer of TerminalActions to perform.
 	private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
-	
-	private static final ExecutorService writerExecutor = ThreadUtilities.newSingleThreadExecutor("UTF-8 Writer");
 	
 	public TerminalControl(JTerminalPane pane, TextBuffer listener) {
 		reset();
@@ -134,11 +138,7 @@ public class TerminalControl {
 		g[index] = set;
 	}
 	
-	private StringBuilder lineBuffer = new StringBuilder();
-
-	private EscapeParser escapeParser;
-	
-	public static final void doStep() {
+	private static final void doStep() {
 		if (DEBUG_STEP_MODE) {
 			try {
 				if (stepModeReader == null) {
@@ -353,10 +353,8 @@ public class TerminalControl {
 	}
 	
 	public synchronized void processEscape() {
-		String sequence = escapeParser.toString();
-		
 		if (DEBUG) {
-			Log.warn("Processing escape sequence \"" + StringUtilities.escapeForJava(sequence) + "\"");
+			Log.warn("Processing escape sequence \"" + StringUtilities.escapeForJava(escapeParser.toString()) + "\"");
 		}
 		
 		// Invoke all escape sequence handling in the AWT dispatch thread - otherwise we'd have
@@ -393,6 +391,10 @@ public class TerminalControl {
 	 * We use the Unicode box-drawing characters, but the characters
 	 * extend out of the bottom of the font's bounding box, spoiling
 	 * the effect. Bug parade #4896465.
+	 * 
+	 * Konsole initially used fonts but switched to doing actual drawing
+	 * because of this kind of problem. (Konsole has a menu item to run
+	 * a new instance of mc(1), so they need this.)
 	 */
 	private char translateToGraphicalCharacterSet(char ch) {
 		switch (ch) {
