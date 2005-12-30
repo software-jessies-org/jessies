@@ -15,6 +15,8 @@ import terminator.Options;
  * particularly impressive.
  */
 public class VisualBellViewport extends JViewport {
+    private static final int BELL_VISIBLE_MS = 200;
+    
     private Color color;
     private boolean isBellVisible = false;
     private Timer timer;
@@ -29,7 +31,7 @@ public class VisualBellViewport extends JViewport {
                 setBellVisibility(false);
             }
         };
-        timer = new Timer(100, actionListener);
+        timer = new Timer(BELL_VISIBLE_MS, actionListener);
         timer.setRepeats(false);
     }
     
