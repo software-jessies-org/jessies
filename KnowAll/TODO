@@ -54,7 +54,16 @@ programming reference material: javadoc/ri/man pages, et cetera.
 
 converting bases/recognizing ASCII in numbers.
 
-information about movies/actors: imdb.
+information about movies/actors: IMDb. car points out that the raw IMDb data is available for download:
+> > why doesn't imdb let you search on multiple actors, and show the films 
+> > they were both in? it's my most frequent use of imdb "what's this i'm 
+> > watching, starring x and y?"
+> 
+> Perhaps they offer that if you pay.
+> 
+> Otherwise:
+> 
+> http://www.imdb.com/interfaces/#plain
 
 information about cinemas: if i'm writing "Four Brothers" in Mail, show me the times it's on at my favorite cinema so i can paste it in.
 
