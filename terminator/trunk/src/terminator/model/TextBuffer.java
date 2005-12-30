@@ -112,7 +112,7 @@ public class TextBuffer {
 		}
 		
 		// Make sure all the lines will be redrawn.
-		view.sizeChanged(oldSize, getCurrentSizeInChars());
+		view.sizeChanged();
 		lineIsDirty(0);
 		
 		// Re-position the cursor.
