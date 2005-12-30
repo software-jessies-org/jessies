@@ -37,6 +37,11 @@ For general users:
 * countdown clocks (to code freezes, for example).
 * package tracking.
 
+simonj:
+
+* MAC address -> dev password (hard-coded for now, but we should offer to run arbitrary scripts)
+* calculator
+
 --BEGIN--
 
 there's only one class of program that i can think of that we're really missing (which doesn't mean there aren't lots more i'll use when someone invents them), and that's something along the lines of the GNOME Dashboard (nothing to do with Apple's). i made a start in 2002 on a thing i called KnowAll, but it's hampered by lack of a suitable API to monitor, for example, what i'm typing in Mail right now. which is why there are special-case hacks like Terminator's number base convertor and Edit's Java/Ruby/man page advisors. really, i ought to be able to type 3,405,691,582 here and have KnowAll say 0xcafebabe as i do. or FileDescriptor and have a link to the JavaDoc immediately available. despite the fact that i'm in my mailer rather than my editor.

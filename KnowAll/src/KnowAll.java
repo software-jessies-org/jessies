@@ -39,6 +39,7 @@ public class KnowAll extends JFrame {
 
     public KnowAll() {
         super("KnowAll");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         initAdvisors();
         initTextPane();
         initUi();
@@ -74,7 +75,6 @@ public class KnowAll extends JFrame {
         getContentPane().add(new JScrollPane(textPane), BorderLayout.CENTER);
         getContentPane().add(statusBar, BorderLayout.SOUTH);
         setSize(300, 500);
-        setVisible(true);
     }
 
     private void initClipboardMonitor() {
@@ -94,10 +94,8 @@ public class KnowAll extends JFrame {
         advisors.add(new IsbnAdvisor());
         advisors.add(new NumberAdvisor());
         advisors.add(new UkPostCodeAdvisor());
-    }
-
-    private String pluralize(int i, String singular, String plural) {
-        return i + " " + (i == 1 ? singular : plural);
+        // FIXME: don't hard-code this:
+        advisors.add(new ScriptAdvisor("MAC address", "\\b((\\p{XDigit}{2}[.:-]){5}\\p{XDigit}{2})\\b", "dev_passwd $1"));
     }
 
     public void searchFor(final String input) throws UnsupportedEncodingException {
@@ -107,8 +105,7 @@ public class KnowAll extends JFrame {
         }
         lines = Math.max(1, lines);
         String text = "<html>";
-        text += pluralize(input.length(), "character", "characters");
-        text += " on " + pluralize(lines, " line", " lines") + ".";
+        text += StringUtilities.pluralize(input.length(), "character", "characters") + " on " + StringUtilities.pluralize(lines, " line", " lines") + ".";
         text += "<br><hr noshade>";
         text += "<tt>";
         text += "<font size=-8>";
@@ -120,6 +117,7 @@ public class KnowAll extends JFrame {
         for (Advisor advisor : advisors) {
             advisor.advise(suggestionsBox, input);
         }
+        // FIXME: sort the results alphabetically by heading?
         String lastHeading = "";
         for (int i = 0; i < suggestionsBox.size(); ++i) {
             Suggestion suggestion = suggestionsBox.getSuggestion(i);
@@ -141,8 +139,9 @@ public class KnowAll extends JFrame {
         // FIXME: do this with a style sheet.
         return "<h4><u>" + heading + "</u></h4>" + text;
     }
-
-    public String chooseSearchUrl(String s) {
+    
+    // FIXME: dead code, waiting to have its useful bits sucked out.
+    private String chooseSearchUrl(String s) {
         if (s.startsWith("train")) {
             // FIXME: can we do something better here, filling in some details?
             return "http://212.87.65.227/bin/newquery.exe/en";
@@ -191,6 +190,12 @@ public class KnowAll extends JFrame {
     }
 
     public static void main(String[] args) {
-        KnowAll knowAll = new KnowAll();
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                GuiUtilities.initLookAndFeel();
+                KnowAll knowAll = new KnowAll();
+                knowAll.setVisible(true);
+            }
+        });
     }
 }
