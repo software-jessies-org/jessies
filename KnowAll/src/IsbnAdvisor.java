@@ -26,8 +26,11 @@ public class IsbnAdvisor implements Advisor {
      * An ISBN is a 10-digit number (where the last digit may be 'X'), with
      * optional dashes between pretty much any of the digits:
      * http://isbn-international.org/en/userman/chapter4.html
+     * 
+     * The final [^-] is so we don't match MAC addresses written with '-'
+     * instead of ':'.
      */
-    private static final Pattern PATTERN = Pattern.compile("(\\d-?\\d-?\\d-?\\d-?\\d-?\\d-?\\d-?\\d-?\\d-?[\\dX])");
+    private static final Pattern PATTERN = Pattern.compile("\\b(\\d-?\\d-?\\d-?\\d-?\\d-?\\d-?\\d-?\\d-?\\d-?[\\dX])[^-]");
 
     public void advise(SuggestionsBox suggestionsBox, String text) {
         Matcher matcher = PATTERN.matcher(text);
