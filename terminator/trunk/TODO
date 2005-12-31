@@ -111,3 +111,7 @@
 * On Mac OS, Safari-style tabs would be much better than the usual Aqua ones
   for our purposes. They take up significantly less space, and don't require
   a border. We'd have to implement them ourselves, though.
+
+* If the user tries to close a window with a still-running process, and we
+  can see that it's not an idle shell [can Apple's Terminal tell when a shell
+  has stopped jobs?], we should ask for confirmation.
