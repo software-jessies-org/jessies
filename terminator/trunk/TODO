@@ -113,5 +113,8 @@
   a border. We'd have to implement them ourselves, though.
 
 * If the user tries to close a window with a still-running process, and we
-  can see that it's not an idle shell [can Apple's Terminal tell when a shell
-  has stopped jobs?], we should ask for confirmation.
+  can see that it's not a childless shell, we should ask for confirmation.
+  (On Linux, we can get what we need via /proc. On Mac OS (and, judging by
+  the Mac OS man page, on Solaris too), kvm_getprocs(3) looks like the nearest
+  equivalent. I haven't used ktrace(1) to see if that's actually what Terminal
+  does, though. A quick Google suggests that Cygwin source uses Win32 API.
