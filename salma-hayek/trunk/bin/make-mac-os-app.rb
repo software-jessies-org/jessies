@@ -69,7 +69,12 @@ File.open(script_name, "w") {
     |file|
     file.puts("#!/bin/bash")
     file.puts("cd # So user.dir is ~/ rather than the directory containing this script.")
-    file.puts("exec `dirname $0`/../Resources/#{project_name}/bin/#{project_name}")
+    
+    file.puts("# Apple hasn't yet released a 1.5.0 that makes itself the default. When they do, we can remove this.")
+    file.puts("export PATH=/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Commands/:$PATH")
+    
+    file.puts("resources=`dirname $0`/../Resources")
+    file.puts("$resources/salma-hayek/bin/ensure-suitable-mac-os-version.rb && exec $resources/#{project_name}/bin/#{project_name}")
 }
 system("chmod a+x #{script_name}")
 
