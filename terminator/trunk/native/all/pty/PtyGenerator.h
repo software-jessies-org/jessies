@@ -200,6 +200,7 @@ private:
     static void closeUnusedFiles() {
         // man sysconf says "it gives a guaranteed value, and more might actually be supported".
         // So this may not work all the time, though it's likely to work most of the time.
+        // FIXME: on Linux, a better solution might use the contents of /proc/self/fd/, though you'd need two passes to avoid the opendir(3) file descriptor.
         int maxNumberOfFiles = sysconf(_SC_OPEN_MAX);
         for (int fd = STDERR_FILENO + 1; fd < maxNumberOfFiles; ++fd) {
             close(fd);
