@@ -28,6 +28,32 @@ FileUtils.mkdir_p(tmp_dir)
 app_dir = "#{tmp_dir}/#{project_name}.app/Contents"
 FileUtils.mkdir_p("#{app_dir}/MacOS")
 FileUtils.mkdir_p("#{app_dir}/Resources")
+system("echo -n 'APPL????' > #{app_dir}/PkgInfo")
+
+# Create a minimal "Info.plist".
+File.open("#{app_dir}/Info.plist", "w") {
+    |file|
+    # http://developer.apple.com/documentation/MacOSX/Conceptual/BPRuntimeConfig/index.html
+    # Contrary to the documentation, CFBundleIconFile must end ".icns".
+    file.puts <<EOS
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+ <dict>
+  <key>CFBundleIconFile</key>
+  <string>#{project_name}.icns</string>
+  <key>CFBundleIdentifier</key>
+  <string>org.jessies.#{project_name}</string>
+  <key>CFBundleName</key>
+  <string>#{project_name}</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleSignature</key>
+  <string>????</string>
+ </dict>
+</plist>
+EOS
+}
 
 # Copy in the required bin/, classes/ and .generated/ directories.
 # Unfortunately, the start-up scripts tend to go looking for salma-hayek, so we can't just have Resources/bin and Resources/classes; we have to keep the multi-directory structure. For now.
@@ -62,6 +88,9 @@ def copy_required_directories(src, dst)
 end
 copy_required_directories("../#{project_name}", "#{app_dir}/Resources/#{project_name}")
 copy_required_directories(salma_hayek, "#{app_dir}/Resources/salma-hayek")
+
+# Apple doesn't let you give a path to a .icns file, so we have to move it into position.
+system("ln -s #{app_dir}/Resources/#{project_name}/lib/#{project_name}.icns #{app_dir}/Resources/")
 
 # Make a bogus start-up script.
 script_name = "#{app_dir}/MacOS/#{project_name}"
