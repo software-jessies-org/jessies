@@ -3,8 +3,10 @@
 # Reports (via its status code on exit) whether we're running on a suitable
 # Mac OS installation.
 
-# Based on the idea at http://weblog.bignerdranch.com/?p=13 which was written
-# in response to the complaint at http://www.gigliwood.com/weblog/Cocoa/AppleBugFriday__Min.html
+# This script is based on the idea at
+#  http://weblog.bignerdranch.com/?p=13
+# which was written in response to the complaint at
+#  http://www.gigliwood.com/weblog/Cocoa/AppleBugFriday__Min.html
 # about Apple's solution (which only works on 10.4 and doesn't tell you what
 # version is required or what version you have).
 
@@ -20,9 +22,17 @@
 # FIXME: we should be clever enough to offer to open Software Update if you only need to go up a minor revision.
 
 def informational_alert(title, message)
-    # FIXME: "display alert" is only available on 10.4; before then we need "display dialog". See http://daringfireball.net/2005/10/css_checker_101 for details and an example work-around.
-    # FIXME: a nice way solution would implement (at least part of the functionality of) zenity(1) as a script that works on any version of Mac OS.
-    system("osascript -e 'tell application \"Finder\"' -e 'activate' -e 'display alert \"#{title}\" message \"#{message}\" as informational' -e 'end tell' > /dev/null")
+    # The whole point of this script is to cope with old software, and "display alert" is only available on 10.4.
+    # Before then we need "display dialog".
+    # See http://daringfireball.net/2005/10/css_checker_101 for an explanation of this work-around.
+    # Running osascript(1) twice is slow, but slightly less unclear and who cares about performance in a failure case anyway?
+    has_display_alert = `osascript -e 'property AS_VERSION_1_10 : 17826208' -e '((system attribute \"ascv\") >= AS_VERSION_1_10)'`.chomp() == "true"
+    if has_display_alert
+        display_command = "display alert \"#{title}\" message \"#{message}\" as informational"
+    else
+        display_command = "display dialog \"#{title}\" & return & return & \"#{message}\" buttons { \"OK\" } default button 1 with icon note"
+    end
+    system("osascript -e 'tell application \"Finder\"' -e 'activate' -e '#{display_command}' -e 'end tell' > /dev/null")
 end
 
 # Do we have a good enough version of Mac OS?
