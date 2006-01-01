@@ -83,11 +83,6 @@
 * car: on Mac OS, at least, open(1) is perhaps a better idea than $EDITOR.
   "start" on Win32?
 
-* car: "Starting a terminator window running vi is a bit grungy, and
-  can't be done as of the now (because terminator build a command string,
-  then terminator interprets the command "/bin/vi" and the filename as two
-  commands, starting me a two-tabbed window.)"
-
 * If the text changes under the selection, i think the selection should be
   cleared.
 
