@@ -36,7 +36,6 @@ public class Options {
 	private static final String ANTI_ALIAS = "antiAlias";
 	private static final String BLOCK_CURSOR = "blockCursor";
 	private static final String CURSOR_BLINK = "cursorBlink";
-	private static final String ERROR_EXIT_HOLDING = "errorExitHolding";
 	private static final String FANCY_BELL = "fancyBell";
 	private static final String FONT_NAME = "fontName";
 	private static final String FONT_SIZE = "fontSize";
@@ -105,14 +104,6 @@ public class Options {
 	 */
 	public boolean isBlockCursor() {
 		return booleanResource(BLOCK_CURSOR);
-	}
-	
-	/**
-	 * Whether or not to keep the window up if the child exits with an
-	 * error status code.
-	 */
-	public boolean isErrorExitHolding() {
-		return booleanResource(ERROR_EXIT_HOLDING);
 	}
 	
 	/**
@@ -272,7 +263,6 @@ public class Options {
 		addDefault(ANTI_ALIAS, Boolean.FALSE, "Anti-alias text?");
 		addDefault(BLOCK_CURSOR, Boolean.FALSE, "Use block cursor?");
 		addDefault(CURSOR_BLINK, Boolean.TRUE, "Blink cursor?");
-		addDefault(ERROR_EXIT_HOLDING, Boolean.TRUE, "Keep terminal if child exits with error status?");
 		addDefault(FANCY_BELL, Boolean.TRUE, "High-quality rendering of the visual bell?");
 		addDefault(FONT_NAME, makePrototypeFont(GuiUtilities.getMonospacedFontName()), "Font family");
 		addDefault(FONT_SIZE, Integer.valueOf(12), "Font size (points)");
