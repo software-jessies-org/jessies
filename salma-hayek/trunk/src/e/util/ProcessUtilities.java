@@ -214,6 +214,29 @@ public class ProcessUtilities {
         }
     }
     
+    /**
+     * Returns a single string representing the given command, quoted for
+     * passing to a shell or, more usually, for unambiguous human-readable
+     * output.
+     */
+    public static String shellQuotedFormOf(List<String> command) {
+        // FIXME: we only cope with spaces in commands, not other shell meta-characters.
+        StringBuilder result = new StringBuilder();
+        for (String word : command) {
+            if (result.length() > 0) {
+                result.append(' ');
+            }
+            if (word.contains(" ")) {
+                result.append('"');
+                result.append(word);
+                result.append('"');
+            } else {
+                result.append(word);
+            }
+        }
+        return result.toString();
+    }
+    
     /** Prevents instantiation. */
     private ProcessUtilities() {
     }
