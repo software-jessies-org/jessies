@@ -108,7 +108,7 @@ if target_os() == "Linux"
 end
 
 invoker = Java.new("Terminator", "terminator/Terminator")
-invoker.dock_icon = "/Applications/Utilities/Terminal.app/Contents/Resources/icon.icns"
+invoker.dock_icon = "#{terminator_home}/lib/terminator.icns"
 invoker.add_library_path_entries([ pty_path ])
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
 invoker.launcher = launcher
