@@ -133,8 +133,9 @@ public class Terminator {
 				continue;
 			}
 			
+			// We can't hope to imitate the shell's parsing of a string, so pass it unmolested to the shell.
 			String command = word;
-			result.add(JTerminalPane.newCommandWithTitle(command.split(" "), name));
+			result.add(JTerminalPane.newCommandWithTitle(command, name));
 			name = null;
 		}
 		
