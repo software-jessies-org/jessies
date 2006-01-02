@@ -151,8 +151,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			String name = null;
-			Terminator.getSharedInstance().openFrame(JTerminalPane.newShell(name));
+			Terminator.getSharedInstance().openFrame(JTerminalPane.newShell());
 		}
 	}
 	

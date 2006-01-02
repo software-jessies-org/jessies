@@ -358,8 +358,7 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	public void openNewTab() {
-		String name = null;
-		addPane(JTerminalPane.newShell(name), true);
+		addPane(JTerminalPane.newShell(), true);
 	}
 	
 	private void addPane(JTerminalPane newPane, boolean focusOnNewTab) {

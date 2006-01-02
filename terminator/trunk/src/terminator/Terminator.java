@@ -36,8 +36,7 @@ public class Terminator {
 		Application.getApplication().addApplicationListener(new ApplicationAdapter() {
 			public void handleReOpenApplication(ApplicationEvent e) {
 				if (frames.isEmpty()) {
-					String name = null;
-					openFrame(JTerminalPane.newShell(name));
+					openFrame(JTerminalPane.newShell());
 				}
 				e.setHandled(true);
 			}
@@ -138,12 +137,12 @@ public class Terminator {
 			
 			// We can't hope to imitate the shell's parsing of a string, so pass it unmolested to the shell.
 			String command = word;
-			result.add(JTerminalPane.newCommandWithTitle(command, name));
+			result.add(JTerminalPane.newCommandWithName(command, name));
 			name = null;
 		}
 		
 		if (result.isEmpty()) {
-			result.add(JTerminalPane.newShell(name));
+			result.add(JTerminalPane.newShellWithName(name));
 		}
 		return result;
 	}
