@@ -29,7 +29,7 @@ public class HelpMenu {
         JMenu menu = new JMenu("Help");
         
         // We don't support this yet, because we've got nothing to point it to.
-        //menu.add(makeDisabledItem(applicationName + " Help"));
+        //menu.add(new PlaceholderAction(applicationName + " Help"));
         //menu.addSeparator();
         
         if (websiteUrl != null) {
@@ -43,7 +43,7 @@ public class HelpMenu {
         if (menu.getItemCount() > 0) {
             menu.addSeparator();
         }
-        menu.add(makeDisabledItem("View Bugs List"));
+        menu.add(new PlaceholderAction("View Bugs List"));
         // FIXME: anyone else using HelpMenu is going to want some control over this. "bk sendbug" and Safari's "Report Bugs to Apple..." are both good role models.
         menu.add(new WebLinkAction("Report a Bug", "mailto:software@jessies.org?subject=" + applicationName + "%20bug"));
         
@@ -53,12 +53,6 @@ public class HelpMenu {
         }
         
         return menu;
-    }
-    
-    private JMenuItem makeDisabledItem(String name) {
-        JMenuItem item = new JMenuItem(name);
-        item.setEnabled(false);
-        return item;
     }
     
     private class AboutBoxAction extends AbstractAction {
