@@ -280,7 +280,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		if (shouldRun == false) {
 			return null;
 		}
-		return JTerminalPane.newCommandWithName(commandField.getText(), null, false);
+		return JTerminalPane.newCommandWithName(commandField.getText(), null);
 	}
 	
 	public static class NewCommandAction extends AbstractAction {
