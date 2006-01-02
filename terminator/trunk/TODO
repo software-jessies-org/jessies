@@ -114,3 +114,20 @@
   does: "Where Terminal gets it wrong, though, is that it blocks input to the
   terminal while it's asking me to confirm.  Canceling the shutdown so
   that I can hit ^:wq and then starting the shutdown again is a pain".
+
+* car: "Not so long ago, when I was a SuSE/konsole user, and even back when I
+  was a student using xwsh, I'd have a few different default sets, for
+  different tasks, like tailing log files or ftping the output of xfig
+  over to the AIX box I was writing my troff on.  It'd be cool to have
+  terminator recognize the title of my window (set by me opening a "New
+  Command") and say "hey, dude's tailing query.log again, best drop the
+  font size to 8 points and the terminal width to 132 characters."  You'd
+  only have to recognize it once, when the window is created, and that way
+  you could even have your different defaults for different shells, if you
+  were that way inclined.  Doesn't sound like rocket science, but then
+  again it does sound a bit "green courier on black."  PuTTY does allow
+  you to do the same thing, in a roundabout way." Several people I know use
+  terminals in this kind of way, with (effectively) per-title settings.
+  Personally, the only interest I've ever had for it was in distinguishing
+  local and remote windows. I can't think how to do any of this without making
+  the existing configuration problems worse, though.
