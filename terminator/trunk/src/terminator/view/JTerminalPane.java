@@ -80,12 +80,16 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Creates a new terminal running the user's shell.
 	 */
-	public static JTerminalPane newShell() {
-		String user = System.getProperty("user.name");
+	public static JTerminalPane newShell(String title) {
+		if (title == null) {
+			String user = System.getProperty("user.name");
+			title = user + "@localhost";
+		}
+		
 		// The user will already have seen any failure in a shell window.
 		// bash (and probably other shells) return as their own exit status that of the last command executed.
 		boolean errorExitHolding = false;
-		return new JTerminalPane(user + "@localhost", getShellCommand(), errorExitHolding);
+		return new JTerminalPane(title, getShellCommand(), errorExitHolding);
 	}
 	
 	private static ArrayList<String> getShellCommand() {

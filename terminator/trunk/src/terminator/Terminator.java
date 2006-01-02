@@ -36,7 +36,8 @@ public class Terminator {
 		Application.getApplication().addApplicationListener(new ApplicationAdapter() {
 			public void handleReOpenApplication(ApplicationEvent e) {
 				if (frames.isEmpty()) {
-					openFrame(JTerminalPane.newShell());
+					String name = null;
+					openFrame(JTerminalPane.newShell(name));
 				}
 				e.setHandled(true);
 			}
@@ -141,14 +142,14 @@ public class Terminator {
 			name = null;
 		}
 		
-		if (arguments.isEmpty()) {
-			result.add(JTerminalPane.newShell());
+		if (result.isEmpty()) {
+			result.add(JTerminalPane.newShell(name));
 		}
 		return result;
 	}
 
 	public void showUsage(PrintWriter out) {
-		out.println("Usage: Terminator [--help] [-xrm <resource-string>]... [[-n <name>] command]...");
+		out.println("Usage: terminator [--help | --version] [-xrm <resource-string>]... [[-n <name>] [<command>]]...");
 		out.println();
 		out.println("Current resource settings:");
 		Options.getSharedInstance().showOptions(out);
