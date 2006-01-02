@@ -135,9 +135,7 @@ public class Terminator {
 				name = arguments.get(++i);
 				continue;
 			}
-			// -hold is xterm's name, --noclose is konsole's.
-			// --hold per the handling of the help and version arguments.
-			if (word.equals("-hold") || word.equals("--hold") || word.equals("--noclose")) {
+			if (word.equals("--hold")) {
 				holdOnExit = true;
 				continue;
 			}
