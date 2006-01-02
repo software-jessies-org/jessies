@@ -571,3 +571,23 @@ native-dist: $(INSTALLER_BINARY)
 	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
 
 endif
+
+ifeq "$(TARGET_OS)" "Cygwin"
+
+# Among its many breakages, msiexec is more restrictive about slashes than Win32.
+NATIVE_NAME_FOR_INSTALLER := '$(subst /,\,$(call convertToNativeFilenames,$(INSTALLER_BINARY)))'
+
+# Use make -n install-commands to tell you what to copy and paste.
+# Doing "make install" is too slow for experimentation.
+.PHONY: install-commands
+install-commands:
+	# This (and double clicking) doesn't usually work if we're already installed.
+	msiexec /i $(NATIVE_NAME_FOR_INSTALLER) /l'*'v .generated/install.log
+	# Notepad because the log is in UCS-2.
+	notepad .generated/install.log
+	# This doesn't work if we're not already installed and doesn't fix deleted shortcuts if we are.
+	msiexec /i $(NATIVE_NAME_FOR_INSTALLER) /l'*'v .generated/install.log REINSTALL=ALL REINSTALLMODE=vomus
+	# This doesn't work unless it's exactly the same installer as you used to install it.
+	msiexec /x $(NATIVE_NAME_FOR_INSTALLER)
+
+endif
