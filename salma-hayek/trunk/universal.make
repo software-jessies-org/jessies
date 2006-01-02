@@ -552,7 +552,6 @@ MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin) $(patsubst $(PROJECT
 
 # %.msm files aren't stand-alone installers
 INSTALLER_BINARY = $(filter %.msi,$(ALL_NATIVE_TARGETS))
-NATIVE_DIST_FILE = $(if $(INSTALLER_BINARY),$(INSTALLER_BINARY),../$(NATIVE_TGZ_FILE))
 
 $(INSTALLER_TARGETS): $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
 
@@ -560,20 +559,16 @@ $(INSTALLER_TARGETS): $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
 # Needs to be after ALL_NATIVE_TARGETS is defined.
 native: $(ALL_NATIVE_TARGETS)
 
-# Avoid:
-# tar: Cowardly refusing to create an empty archive
-ifeq "$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)" ""
+# make native-dist a silent no-op where there's nothing for it to do for the
+# benefit of a simple, uniform nightly build script.
+ifeq "$(INSTALLER_BINARY)" ""
 
 native-dist:;
 
 else
 
-../$(NATIVE_TGZ_FILE): $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
-	cd .. && \
-	tar -zcf $(NATIVE_TGZ_FILE) $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_NAME)/%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS))
-
 .PHONY: native-dist
-native-dist: $(NATIVE_DIST_FILE)
+native-dist: $(INSTALLER_BINARY)
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
 
