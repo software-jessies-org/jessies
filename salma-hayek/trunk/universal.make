@@ -587,7 +587,8 @@ install-commands:
 	notepad .generated/install.log
 	# This doesn't work if we're not already installed and doesn't fix deleted shortcuts if we are.
 	msiexec /i $(NATIVE_NAME_FOR_INSTALLER) /l'*'v .generated/install.log REINSTALL=ALL REINSTALLMODE=vomus
-	# This doesn't work unless it's exactly the same installer as you used to install it.
-	msiexec /x $(NATIVE_NAME_FOR_INSTALLER)
+	# This is terminator's GUID, which wants pulling out of the .wxs,
+	# which wants to use more $(env) parameters (or equivalent).
+	msiexec /x '{79086527-df6c-4454-8997-26b349605f51}'
 
 endif
