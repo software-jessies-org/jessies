@@ -268,7 +268,6 @@ $(takeProfileSample)
 SOURCE_FILES := $(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
 $(takeProfileSample)
 SOURCE_DIST_FILE = $(PROJECT_NAME).tgz
-NATIVE_TGZ_FILE = $(PROJECT_NAME)-$(TARGET_OS).tgz
 
 REVISION_CONTROL_SYSTEM += $(if $(wildcard .svn),svn)
 REVISION_CONTROL_SYSTEM += $(if $(wildcard CVS),cvs)
