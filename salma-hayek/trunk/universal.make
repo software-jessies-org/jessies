@@ -81,7 +81,7 @@ convertToNativeFilenames.$(TARGET_OS) = $(1)
 convertToNativeFilenames.Cygwin = $(if $(1),$(foreach FILE,$(shell cygpath --mixed $(1)),$(FILE)))
 convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 
-searchPath = $(firstword $(wildcard $(addsuffix /$(1)$(EXE_SUFFIX),$(subst :, ,$(PATH)))))
+searchPath = $(shell which $(1))
 makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(1)))
 
 SPACE = $(subst :, ,:)
@@ -554,7 +554,13 @@ MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin) $(patsubst $(PROJECT
 # %.msm files aren't stand-alone installers
 INSTALLER_BINARY = $(filter %.msi,$(ALL_NATIVE_TARGETS))
 
-$(PROJECT_ROOT)/.generated/native/Cygwin/WiX/Cygwin/component-definitions.wxi: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
+# TODO: The installer needs to be sure the Java is built but building Java
+# on Windows into a Samba directory isn't working for me at the moment.
+# Building on Cygwin is slow enough that it will be distressing, for the
+# makefile maintainer, to keep rebuilding this unnecessarily.
+# It shouldn't be impractical to notice that no .java file has changed and none
+# have been added or removed.
+$(PROJECT_ROOT)/.generated/native/Cygwin/WiX/Cygwin/component-definitions.wxi: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) #build
 
 .PHONY: native
 # Needs to be after ALL_NATIVE_TARGETS is defined.
