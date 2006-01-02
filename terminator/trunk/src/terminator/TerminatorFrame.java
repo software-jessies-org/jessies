@@ -259,8 +259,11 @@ public class TerminatorFrame extends JFrame {
 		}
 	}
 	
-	public boolean hasMultipleTabs() {
-		return (tabbedPane != null);
+	public int getTerminalPaneCount() {
+		if (tabbedPane == null) {
+			return 1;
+		}
+		return tabbedPane.getTabCount();
 	}
 	
 	public void detachCurrentTab() {

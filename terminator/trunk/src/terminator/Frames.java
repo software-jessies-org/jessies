@@ -11,7 +11,7 @@ import javax.swing.*;
  * but the application is focused, this hidden window gets the focus,
  * and its menu is used for the screen menu bar.
  */
-public class Frames {
+public class Frames implements Iterable<TerminatorFrame> {
     private ArrayList<TerminatorFrame> list = new ArrayList<TerminatorFrame>();
     private JFrame hiddenFrame; // Mac OS X only.
     
@@ -49,6 +49,13 @@ public class Frames {
     
     public int size() {
         return list.size();
+    }
+    
+    /**
+     * Implements java.lang.Iterable so we can be used with the new for loop.
+     */
+    public Iterator<TerminatorFrame> iterator() {
+        return list.iterator();
     }
     
     /**

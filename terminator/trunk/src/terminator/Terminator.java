@@ -48,10 +48,15 @@ public class Terminator {
 			
 			public void handleQuit(ApplicationEvent e) {
 				boolean quit = true;
-				if (frames.isEmpty() == false) {
+				
+				int terminalCount = 0;
+				for (TerminatorFrame frame : frames) {
+					terminalCount += frame.getTerminalPaneCount();
+				}
+				if (terminalCount > 0) {
 					// FIXME: we shouldn't count windows whose terminals' PtyProcesses have finished.
 					// FIXME: can we find out, like Terminal, what processes are at risk and name them?
-					quit = SimpleDialog.askQuestion(frames.get(0), "Terminator", "<html><b>Quit Terminator?</b><p>You have " + StringUtilities.pluralize(frames.size(), "window", "windows") + " which may contain running processes. Do you want to quit and risk terminating these processes?", "Quit");
+					quit = SimpleDialog.askQuestion(frames.get(0), "Terminator", "<html><b>Quit Terminator?</b><p>You have " + StringUtilities.pluralize(terminalCount, "terminal", "terminals") + " which may contain running processes. Do you want to quit and risk terminating these processes?", "Quit");
 				}
 				if (quit) {
 					e.setHandled(true);
