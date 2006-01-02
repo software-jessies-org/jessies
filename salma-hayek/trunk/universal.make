@@ -78,7 +78,7 @@ NATIVE_PATH_SEPARATOR = $(NATIVE_PATH_SEPARATOR.$(TARGET_OS))
 
 convertToNativeFilenames.$(TARGET_OS) = $(1)
 # javac is happy with forward slashes (as is the underlying Win32 API).
-convertToNativeFilenames.Cygwin = $(if $(1),$(foreach FILE,$(shell cygpath --mixed $(1)),$(FILE)))
+convertToNativeFilenames.Cygwin = $(if $(1),$(shell cygpath --mixed $(1)))
 convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 
 searchPath = $(shell which $(1))
@@ -431,14 +431,6 @@ build: build.java
 build.java: $(SOURCE_FILES)
 	$(BUILD_JAVA)
 
-# We don't usually build individual classes but the rule for generating the JNI
-# header correctly specifies a dependency on a .class file which may be
-# absent.
-# If we were to make this class file depend on PHONY build.java, it would
-# always be rebuilt.
-%.class: $(SOURCE_FILES)
-	$(BUILD_JAVA)
-
 .PHONY: clean
 clean:
 	@find . -name "*.bak" | xargs $(RM) -r $(GENERATED_FILES)
@@ -559,7 +551,7 @@ INSTALLER_BINARY = $(filter %.msi,$(ALL_NATIVE_TARGETS))
 # makefile maintainer, to keep rebuilding this unnecessarily.
 # It shouldn't be impractical to notice that no .java file has changed and none
 # have been added or removed.
-$(PROJECT_ROOT)/.generated/native/Cygwin/WiX/Cygwin/component-definitions.wxi: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) #build
+$(PROJECT_ROOT)/.generated/native/Cygwin/WiX/Cygwin/component-definitions.wxi: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) build.java
 
 .PHONY: native
 # Needs to be after ALL_NATIVE_TARGETS is defined.

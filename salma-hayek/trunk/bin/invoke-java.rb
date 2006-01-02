@@ -7,6 +7,9 @@ def cygpath(filenameOrPath)
   if target_os() != "Cygwin"
     return filenameOrPath
   end
+  if filenameOrPath == ""
+    return ""
+  end
   args = [ "cygpath", "--windows" ]
   if filenameOrPath =~ /:/
     args.push("--path")

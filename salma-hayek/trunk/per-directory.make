@@ -68,11 +68,10 @@ GENERATED_JNI_HEADER = $(GENERATED_JNI_DIRECTORY)/$(JNI_BASE_NAME).h
 COMPILED_JNI_HEADER = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).h
 JNI_OBJECT = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).o
 JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
-CLASSES_DIRECTORY = $(PROJECT_ROOT)/classes
-JNI_CLASS_FILE = $(CLASSES_DIRECTORY)/$(subst .,/,$(JNI_CLASS_NAME)).class
+JNI_CLASS_FILE = classes/$(subst .,/,$(JNI_CLASS_NAME)).class
 
 define JAVAHPP_RULE
-$(JAVAHPP) -classpath $(call makeNativePath,$(CLASSES_DIRECTORY)) $(JNI_CLASS_NAME) > $(GENERATED_JNI_HEADER) && \
+$(JAVAHPP) -classpath classes $(JNI_CLASS_NAME) > $(GENERATED_JNI_HEADER) && \
 { cmp -s $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
 endef
 
@@ -168,6 +167,9 @@ $(EXECUTABLES) $(JNI_LIBRARY): $(OBJECTS)
 # ----------------------------------------------------------------------------
 
 ifneq "$(JNI_SOURCE)" ""
+
+$(JNI_CLASS_FILE): $(SOURCE_FILES)
+	$(BUILD_JAVA)
 
 $(GENERATED_JNI_HEADER): $(JNI_CLASS_FILE) $(JAVAHPP) $(SALMA_HAYEK)/classes/e/tools/JavaHpp.class
 	@echo Generating JNI header... && \
