@@ -160,7 +160,7 @@ public class TerminalControl {
 		}
 		if (ptyProcess.didExitNormally()) {
 			int status = ptyProcess.getExitStatus();
-			if (status != 0 && pane.isErrorExitHolding()) {
+			if (pane.shouldHoldOnExit(status)) {
 				announceConnectionLost("\n\r[Process exited with status " + status + ".]");
 				return;
 			}
