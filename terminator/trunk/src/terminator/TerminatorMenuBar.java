@@ -138,7 +138,7 @@ public class TerminatorMenuBar extends EMenuBar {
 	
 	private static boolean focusedFrameHasMultipleTabs() {
 		TerminatorFrame frame = getFocusedTerminatorFrame();
-		return frame != null && frame.hasMultipleTabs();
+		return (frame != null) && (frame.getTerminalPaneCount() > 1);
 	}
 	
 	//
