@@ -51,10 +51,8 @@ endif
 # Locate salma-hayek.
 # ----------------------------------------------------------------------------
 
-getAbsolutePath = $(patsubst @%,$(CURDIR)/%,$(patsubst @/%,/%,$(patsubst %,@%,$(1))))
-
-MOST_RECENT_MAKEFILE_DIRECTORY = $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
-SALMA_HAYEK := $(call getAbsolutePath,$(MOST_RECENT_MAKEFILE_DIRECTORY))
+MOST_RECENT_MAKEFILE_DIRECTORY = $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
+SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTORY))
 
 # ----------------------------------------------------------------------------
 # Work out what we're going to generate.
@@ -114,7 +112,7 @@ JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell $(JDK_ROOT_SCRIPT)))
 # We use our own replacement for javah(1).
 # ----------------------------------------------------------------------------
 
-JAVAHPP = $(SALMA_HAYEK)bin/javahpp.rb
+JAVAHPP = $(SALMA_HAYEK)/bin/javahpp.rb
 
 # ----------------------------------------------------------------------------
 # Find the source.
@@ -540,7 +538,10 @@ ALL_NATIVE_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SU
 
 INSTALLER_PATTERN = %.msi %.msm
 ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS = $(filter-out $(INSTALLER_PATTERN),$(ALL_NATIVE_TARGETS))
-MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)) -name .svn -prune -o -type f -print
+# FIXME: This wants turning into a script and collapsing with the semi-duplicate in make-mac-os-app.rb.
+# FIXME: The WiX installer needs a deinstallation file list too (there isn't currently a good place
+# to put this comment but I know I won't forget it here).
+MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) -name .svn -prune -o -type f -print
 
 # %.msm files aren't stand-alone installers
 INSTALLER_BINARY = $(filter %.msi,$(ALL_NATIVE_TARGETS))

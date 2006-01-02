@@ -66,7 +66,6 @@ public:
     }
     std::string version = versions.back();
     std::string jvmRegistryPath = std::string(jreRegistryPath) + "/" + version + "/RuntimeLib";
-    std::cerr << "jvmRegistryPath is " << jvmRegistryPath << ":" << std::endl;
     std::ifstream is(jvmRegistryPath.c_str());
     if (is.bad()) {
       throw UsageError("couldn't open " + jvmRegistryPath);
