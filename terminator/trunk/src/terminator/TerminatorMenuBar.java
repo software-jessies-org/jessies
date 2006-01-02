@@ -1,10 +1,11 @@
 package terminator;
 
+import e.forms.*;
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import e.gui.*;
-import e.util.*;
 import terminator.view.*;
 import terminator.view.highlight.*;
 
@@ -22,31 +23,31 @@ public class TerminatorMenuBar extends EMenuBar {
 		add(makeFileMenu());
 		add(makeEditMenu());
 		add(makeScrollbackMenu());
-		//add(makeFontMenu());
 		add(WindowMenu.getSharedInstance().makeJMenu(customWindowMenuItems));
 		add(makeHelpMenu());
 	}
 	
 	private JMenu makeFileMenu() {
 		JMenu menu = new JMenu("File");
-		menu.add(new JMenuItem(new NewShellAction()));
-		menu.add(new JMenuItem(new NewTabAction()));
-		//menu.add(makeAcceleratedItemEx(new NewCommandAction(), 'N', true));
-		//menu.add(makeAcceleratedItemEx(new ConnectToServerAction(), 'K', true));
+		menu.add(new NewShellAction());
+		menu.add(new NewCommandAction());
 		
-		menu.add(new JSeparator());
-		menu.add(new CloseAction());
+		menu.addSeparator();
+		menu.add(new NewTabAction());
+		menu.add(new NewCommandTabAction());
 		menu.add(new DetachTabAction());
-		//menu.add(new JMenuItem(new SaveAsAction()));
 		
-		menu.add(new JSeparator());
-		menu.add(new JMenuItem(new ShowInfoAction()));
-		menu.add(new JMenuItem(new ResetAction()));
+		menu.addSeparator();
+		menu.add(new CloseAction());
+		
+		menu.addSeparator();
+		menu.add(new ShowInfoAction());
+		menu.add(new ResetAction());
 		
 		/*
 		if (GuiUtilities.isMacOs() == false) {
-			menu.add(new JSeparator());
-			menu.add(new JMenuItem(new ExitAction()));
+			menu.addSeparator();
+			menu.add(new ExitAction());
 		}
 		*/
 		return menu;
@@ -54,46 +55,37 @@ public class TerminatorMenuBar extends EMenuBar {
 	
 	private JMenu makeEditMenu() {
 		JMenu menu = new JMenu("Edit");
-		menu.add(new JMenuItem(new CopyAction()));
-		menu.add(new JMenuItem(new PasteAction()));
-		menu.add(new JMenuItem(new SelectAllAction()));
+		menu.add(new CopyAction());
+		menu.add(new PasteAction());
+		menu.add(new SelectAllAction());
 		
-		menu.add(new JSeparator());
-		menu.add(new JMenuItem(new FindAction()));
-		menu.add(new JMenuItem(new FindNextAction()));
-		menu.add(new JMenuItem(new FindPreviousAction()));
+		menu.addSeparator();
+		menu.add(new FindAction());
+		menu.add(new FindNextAction());
+		menu.add(new FindPreviousAction());
 		
-		menu.add(new JSeparator());
-		menu.add(new JMenuItem(new FindNextLinkAction()));
-		menu.add(new JMenuItem(new FindPreviousLinkAction()));
+		menu.addSeparator();
+		menu.add(new FindNextLinkAction());
+		menu.add(new FindPreviousLinkAction());
 		return menu;
 	}
 	
 	private JMenu makeScrollbackMenu() {
 		JMenu menu = new JMenu("Scrollback");
 		
-		menu.add(new JMenuItem(new ScrollToTopAction()));
-		menu.add(new JMenuItem(new ScrollToBottomAction()));
+		menu.add(new ScrollToTopAction());
+		menu.add(new ScrollToBottomAction());
 		
-		menu.add(new JSeparator());
-		menu.add(new JMenuItem(new PageUpAction()));
-		menu.add(new JMenuItem(new PageDownAction()));
+		menu.addSeparator();
+		menu.add(new PageUpAction());
+		menu.add(new PageDownAction());
 		
-		menu.add(new JSeparator());
-		menu.add(new JMenuItem(new LineUpAction()));
-		menu.add(new JMenuItem(new LineDownAction()));
+		menu.addSeparator();
+		menu.add(new LineUpAction());
+		menu.add(new LineDownAction());
 		
-		menu.add(new JSeparator());
-		menu.add(new JMenuItem(new ClearScrollbackAction()));
-		
-		return menu;
-	}
-	
-	private JMenu makeFontMenu() {
-		JMenu menu = new JMenu("Font");
-		
-		//menu.add(new JMenuItem(new BiggerFontAction()));
-		//menu.add(new JMenuItem(new SmallerFontAction()));
+		menu.addSeparator();
+		menu.add(new ClearScrollbackAction());
 		
 		return menu;
 	}
@@ -124,11 +116,11 @@ public class TerminatorMenuBar extends EMenuBar {
 		return ((event.getModifiers() & KEYBOARD_EQUIVALENT_MODIFIER) == KEYBOARD_EQUIVALENT_MODIFIER);
 	}
 	
-	public static KeyStroke makeKeyStroke(String key) {
+	private static KeyStroke makeKeyStroke(String key) {
 		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, false);
 	}
 	
-	public static KeyStroke makeShiftedKeyStroke(String key) {
+	private static KeyStroke makeShiftedKeyStroke(String key) {
 		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, true);
 	}
 	
@@ -136,179 +128,85 @@ public class TerminatorMenuBar extends EMenuBar {
 		return KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
 	}
 	
-	public static JTerminalPane getFocusedTerminalPane() {
+	private static JTerminalPane getFocusedTerminalPane() {
 		return (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, getFocusedComponent());
 	}
 	
-	public static TerminatorFrame getFocusedTerminatorFrame() {
+	private static TerminatorFrame getFocusedTerminatorFrame() {
 		return (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, getFocusedComponent());
 	}
 	
-	public static class NewShellAction extends AbstractAction {
-		public NewShellAction() {
-			super("New Shell");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("N"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			Terminator.getSharedInstance().openFrame(JTerminalPane.newShell());
-		}
+	private static boolean focusedFrameHasMultipleTabs() {
+		TerminatorFrame frame = getFocusedTerminatorFrame();
+		return frame != null && frame.hasMultipleTabs();
 	}
 	
-	public static class NewTabAction extends AbstractAction {
-		public NewTabAction() {
-			super("New Tab");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("T"));
+	//
+	// Any new Action should probably subclass one of these abstract
+	// classes. Only if your action requires neither a frame nor a
+	// terminal pane (i.e. acts upon the application as a whole) should
+	// you subclass AbstractAction directly.
+	//
+	
+	/**
+	 * Superclass for actions that just need a TerminatorFrame.
+	 */
+	private abstract static class AbstractFrameAction extends AbstractAction {
+		public AbstractFrameAction(String name) {
+			super(name);
 		}
 		
 		public void actionPerformed(ActionEvent e) {
 			TerminatorFrame frame = getFocusedTerminatorFrame();
 			if (frame != null) {
-				frame.openNewTab();
+				performFrameAction(frame);
 			}
+		}
+		
+		protected abstract void performFrameAction(TerminatorFrame frame);
+		
+		@Override
+		public boolean isEnabled() {
+			return (getFocusedTerminatorFrame() != null);
 		}
 	}
 	
-	class NewCommandAction extends AbstractAction {
-		public NewCommandAction() {
-			super("New Command...");
-		}
-		public void actionPerformed(ActionEvent e) {
-			//pasteSystemClipboard();
-		}
-	}
-
-	class ConnectToServerAction extends AbstractAction {
-		public ConnectToServerAction() {
-			super("Connect to Server...");
-		}
-		public void actionPerformed(ActionEvent e) {
-			//pasteSystemClipboard();
-		}
-	}
-
-	public static class CloseAction extends AbstractAction {
-		public CloseAction() {
-			super("Close");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("W"));
+	/**
+	 * Superclass for actions that need a JTerminalPane (that may or may
+	 * not have a frame to itself).
+	 */
+	private abstract static class AbstractPaneAction extends AbstractAction {
+		public AbstractPaneAction(String name) {
+			super(name);
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.doCloseAction();
+			JTerminalPane terminalPane = getFocusedTerminalPane();
+			if (terminalPane != null) {
+				performPaneAction(terminalPane);
 			}
+		}
+		
+		protected abstract void performPaneAction(JTerminalPane terminalPane);
+		
+		@Override
+		public boolean isEnabled() {
+			return (getFocusedTerminatorFrame() != null);
 		}
 	}
 	
-	public static class DetachTabAction extends AbstractAction {
-		public DetachTabAction() {
-			super("Detach Tab");
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			TerminatorFrame frame = getFocusedTerminatorFrame();
-			if (frame != null) {
-				frame.detachCurrentTab();
-			}
+	/**
+	 * Superclass for actions that need a JTerminalPane that must be on a
+	 * tab rather than in a frame by itself.
+	 */
+	private abstract static class AbstractTabAction extends AbstractFrameAction {
+		public AbstractTabAction(String name) {
+			super(name);
 		}
 		
 		@Override
 		public boolean isEnabled() {
-			TerminatorFrame frame = getFocusedTerminatorFrame();
-			return frame != null && frame.hasMultipleTabs();
-		}
-	}
-	
-	public static class ShowInfoAction extends AbstractAction {
-		public ShowInfoAction() {
-			super("Show Info");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("I"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				InfoDialog.getSharedInstance().showInfoDialogFor(terminal);
-			}
-		}
-	}
-	
-	class SaveAsAction extends AbstractAction {
-		public SaveAsAction() {
-			super("Save As...");
-		}
-		public void actionPerformed(ActionEvent e) {
-			//pasteSystemClipboard();
-		}
-	}
-	
-	public static class CopyAction extends AbstractAction {
-		public CopyAction() {
-			super("Copy");
-			putValue(ACCELERATOR_KEY, makeKeyStroke("C"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.doCopyAction();
-			}
-		}
-	}
-	
-	public static class PasteAction extends AbstractAction {
-		public PasteAction() {
-			super("Paste");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("V"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.doPasteAction();
-			}
-		}
-	}
-	
-	private static class SelectAllAction extends AbstractAction {
-		public SelectAllAction() {
-			super("Select All");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("A"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.selectAll();
-			}
-		}
-	}
-	
-	public static class ResetAction extends AbstractAction {
-		public ResetAction() {
-			super("Reset");
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.reset();
-			}
-		}
-	}
-	
-	public static class FindAction extends AbstractAction {
-		public FindAction() {
-			super("Find...");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("F"));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				FindDialog.getSharedInstance().showFindDialogFor(terminal);
-			}
+			return focusedFrameHasMultipleTabs();
 		}
 	}
 	
@@ -324,16 +222,187 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = boundTerminalPane;
-			if (terminal == null) {
-				terminal = getFocusedTerminalPane();
+			JTerminalPane terminalPane = boundTerminalPane;
+			if (terminalPane == null) {
+				terminalPane = getFocusedTerminalPane();
 			}
-			if (terminal != null) {
-				performOn(terminal);
+			if (terminalPane != null) {
+				performOn(terminalPane);
 			}
 		}
 		
-		public abstract void performOn(JTerminalPane terminal);
+		public abstract void performOn(JTerminalPane terminalPane);
+		
+		
+		@Override
+		public boolean isEnabled() {
+			return (boundTerminalPane != null || getFocusedTerminalPane() != null);
+		}
+	}
+	
+	//
+	// Terminator's Actions.
+	//
+	
+	public static class NewShellAction extends AbstractAction {
+		public NewShellAction() {
+			super("New Shell");
+			putValue(ACCELERATOR_KEY, makeKeyStroke("N"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			Terminator.getSharedInstance().openFrame(JTerminalPane.newShell());
+		}
+	}
+	
+	public static class NewTabAction extends AbstractFrameAction {
+		public NewTabAction() {
+			super("New Shell Tab");
+			putValue(ACCELERATOR_KEY, makeKeyStroke("T"));
+		}
+		
+		@Override
+		protected void performFrameAction(TerminatorFrame frame) {
+			frame.addTab(JTerminalPane.newShell());
+		}
+	}
+	
+	private static JTerminalPane runCommand(JFrame frame) {
+		JTextField commandField = new JTextField(40);
+		
+		JFrame parent = (frame != null) ? frame : Terminator.getSharedInstance().getSuitableParentFrameForForms();
+		FormBuilder form = new FormBuilder(parent, "Run Command");
+		FormPanel formPanel = form.getFormPanel();
+		formPanel.addRow("Command:", commandField);
+		form.getFormDialog().setRememberBounds(false);
+		
+		boolean shouldRun = form.show("Run");
+		if (shouldRun == false) {
+			return null;
+		}
+		return JTerminalPane.newCommandWithName(commandField.getText(), null, false);
+	}
+	
+	public static class NewCommandAction extends AbstractAction {
+		public NewCommandAction() {
+			super("New Command...");
+			putValue(ACCELERATOR_KEY, makeShiftedKeyStroke("N"));
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			JTerminalPane terminalPane = runCommand(null);
+			if (terminalPane != null) {
+				Terminator.getSharedInstance().openFrame(terminalPane);
+			}
+		}
+	}
+	
+	public static class NewCommandTabAction extends AbstractFrameAction {
+		public NewCommandTabAction() {
+			super("New Command Tab...");
+			putValue(ACCELERATOR_KEY, makeShiftedKeyStroke("T"));
+		}
+		
+		@Override
+		protected void performFrameAction(TerminatorFrame frame) {
+			JTerminalPane terminalPane = runCommand(frame);
+			if (terminalPane != null) {
+				frame.addTab(terminalPane);
+			}
+		}
+	}
+	
+	public static class CloseAction extends AbstractPaneAction {
+		public CloseAction() {
+			super("Close");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("W"));
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.doCloseAction();
+		}
+	}
+	
+	public static class DetachTabAction extends AbstractTabAction {
+		public DetachTabAction() {
+			super("Detach Tab");
+		}
+		
+		public void performFrameAction(TerminatorFrame frame) {
+			frame.detachCurrentTab();
+		}
+	}
+	
+	public static class ShowInfoAction extends AbstractPaneAction {
+		public ShowInfoAction() {
+			super("Show Info");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("I"));
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			InfoDialog.getSharedInstance().showInfoDialogFor(terminalPane);
+		}
+	}
+	
+	public static class CopyAction extends AbstractPaneAction {
+		public CopyAction() {
+			super("Copy");
+			putValue(ACCELERATOR_KEY, makeKeyStroke("C"));
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.doCopyAction();
+		}
+	}
+	
+	public static class PasteAction extends AbstractPaneAction {
+		public PasteAction() {
+			super("Paste");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("V"));
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.doPasteAction();
+		}
+	}
+	
+	private static class SelectAllAction extends AbstractPaneAction {
+		public SelectAllAction() {
+			super("Select All");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("A"));
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.selectAll();
+		}
+	}
+	
+	public static class ResetAction extends AbstractPaneAction {
+		public ResetAction() {
+			super("Reset");
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.reset();
+		}
+	}
+	
+	public static class FindAction extends AbstractPaneAction {
+		public FindAction() {
+			super("Find...");
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("F"));
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			FindDialog.getSharedInstance().showFindDialogFor(terminalPane);
+		}
 	}
 	
 	public static class FindNextAction extends BindableAction {
@@ -342,22 +411,20 @@ public class TerminatorMenuBar extends EMenuBar {
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("G"));
 		}
 		
-		public void performOn(JTerminalPane terminal) {
-			terminal.getTextPane().findNext(FindHighlighter.class);
+		public void performOn(JTerminalPane terminalPane) {
+			terminalPane.getTextPane().findNext(FindHighlighter.class);
 		}
 	}
 	
-	public static class FindNextLinkAction extends AbstractAction {
+	public static class FindNextLinkAction extends AbstractPaneAction {
 		public FindNextLinkAction() {
 			super("Find Next Link");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedKeyStroke("G"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.getTextPane().findNext(HyperlinkHighlighter.class);
-			}
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.getTextPane().findNext(HyperlinkHighlighter.class);
 		}
 	}
 	
@@ -367,124 +434,108 @@ public class TerminatorMenuBar extends EMenuBar {
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("D"));
 		}
 		
-		public void performOn(JTerminalPane terminal) {
-			terminal.getTextPane().findPrevious(FindHighlighter.class);
+		public void performOn(JTerminalPane terminalPane) {
+			terminalPane.getTextPane().findPrevious(FindHighlighter.class);
 		}
 	}
 	
-	public static class FindPreviousLinkAction extends AbstractAction {
+	public static class FindPreviousLinkAction extends AbstractPaneAction {
 		public FindPreviousLinkAction() {
 			super("Find Previous Link");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedKeyStroke("D"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.getTextPane().findPrevious(HyperlinkHighlighter.class);
-			}
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.getTextPane().findPrevious(HyperlinkHighlighter.class);
 		}
 	}
 	
-	public static class ScrollToTopAction extends AbstractAction {
+	public static class ScrollToTopAction extends AbstractPaneAction {
 		public ScrollToTopAction() {
 			super("Scroll To Top");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("HOME"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.getTextPane().scrollToTop();
-			}
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.getTextPane().scrollToTop();
 		}
 	}
 	
-	public static class ScrollToBottomAction extends AbstractAction {
+	public static class ScrollToBottomAction extends AbstractPaneAction {
 		public ScrollToBottomAction() {
 			super("Scroll To Bottom");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("END"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.getTextPane().scrollToBottom();
-			}
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.getTextPane().scrollToBottom();
 		}
 	}
 	
-	public static class PageUpAction extends AbstractAction {
+	public static class PageUpAction extends AbstractPaneAction {
 		public PageUpAction() {
 			super("Page Up");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("PAGE_UP"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.pageUp();
-			}
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.pageUp();
 		}
 	}
 	
-	public static class PageDownAction extends AbstractAction {
+	public static class PageDownAction extends AbstractPaneAction {
 		public PageDownAction() {
 			super("Page Down");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("PAGE_DOWN"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.pageDown();
-			}
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.pageDown();
 		}
 	}
 	
-	public static class LineUpAction extends AbstractAction {
+	public static class LineUpAction extends AbstractPaneAction {
 		public LineUpAction() {
 			super("Line Up");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("UP"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.lineUp();
-			}
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.lineUp();
 		}
 	}
 	
-	public static class LineDownAction extends AbstractAction {
+	public static class LineDownAction extends AbstractPaneAction {
 		public LineDownAction() {
 			super("Line Down");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("DOWN"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.lineDown();
-			}
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.lineDown();
 		}
 	}
 	
-	public static class ClearScrollbackAction extends AbstractAction {
+	public static class ClearScrollbackAction extends AbstractPaneAction {
 		public ClearScrollbackAction() {
 			super("Clear Scrollback");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("K"));
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminal = getFocusedTerminalPane();
-			if (terminal != null) {
-				terminal.getTextPane().getModel().clearScrollBuffer();
-			}
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			terminalPane.getTextPane().getModel().clearScrollBuffer();
 		}
 	}
 	
-	public static class NextTabAction extends AbstractAction {
+	public static class NextTabAction extends AbstractTabAction {
 		public NextTabAction() {
 			super("Select Next Tab");
 			if (GuiUtilities.isMacOs()) {
@@ -495,21 +546,13 @@ public class TerminatorMenuBar extends EMenuBar {
 			}
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			TerminatorFrame frame = getFocusedTerminatorFrame();
-			if (frame != null) {
-				frame.switchToNextTab();
-			}
-		}
-		
 		@Override
-		public boolean isEnabled() {
-			TerminatorFrame frame = getFocusedTerminatorFrame();
-			return frame != null && frame.hasMultipleTabs();
+		protected void performFrameAction(TerminatorFrame frame) {
+			frame.switchToNextTab();
 		}
 	}
 	
-	public static class PreviousTabAction extends AbstractAction {
+	public static class PreviousTabAction extends AbstractTabAction {
 		public PreviousTabAction() {
 			super("Select Previous Tab");
 			if (GuiUtilities.isMacOs()) {
@@ -520,17 +563,9 @@ public class TerminatorMenuBar extends EMenuBar {
 			}
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			TerminatorFrame frame = getFocusedTerminatorFrame();
-			if (frame != null) {
-				frame.switchToPreviousTab();
-			}
-		}
-		
 		@Override
-		public boolean isEnabled() {
-			TerminatorFrame frame = getFocusedTerminatorFrame();
-			return frame != null && frame.hasMultipleTabs();
+		protected void performFrameAction(TerminatorFrame frame) {
+			frame.switchToPreviousTab();
 		}
 	}
 }

@@ -50,4 +50,16 @@ public class Frames {
     public int size() {
         return list.size();
     }
+    
+    /**
+     * Returns a JFrame with the application menu bar, or null. Useful on
+     * Mac OS for ensuring that a form gets a suitable parent frame so that
+     * it can inherit the screen menu bar.
+     */
+    public JFrame getFrame() {
+        if (list.isEmpty() == false) {
+            return list.get(0);
+        }
+        return hiddenFrame;
+    }
 }

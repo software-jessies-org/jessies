@@ -357,17 +357,11 @@ public class TerminatorFrame extends JFrame {
 		updateFrameTitle();
 	}
 	
-	public void openNewTab() {
-		addPane(JTerminalPane.newShell(), true);
-	}
-	
-	private void addPane(JTerminalPane newPane, boolean focusOnNewTab) {
+	public void addTab(JTerminalPane newPane) {
 		terminals.add(newPane);
 		addPaneToUI(newPane);
 		newPane.start();
-		if (focusOnNewTab) {
-			tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
-		}
+		tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 		updateFrameTitle();
 	}
 	
