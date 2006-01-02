@@ -120,13 +120,13 @@ public class WindowMenu {
         }
         
         private void addStandardItems() {
-            add(new JMenuItem(new MinimizeAction()));
-            add(new JMenuItem(new ZoomAction()));
+            add(new MinimizeAction());
+            add(new ZoomAction());
             
             addCustomItems();
             
             add(new JSeparator());
-            add(new JMenuItem(new BringAllToFrontAction()));
+            add(new BringAllToFrontAction());
         }
         
         private void addCustomItems() {
@@ -136,7 +136,7 @@ public class WindowMenu {
             
             add(new JSeparator());
             for (int i = 0; i < customItems.length; ++i) {
-                add(new JMenuItem(customItems[i]));
+                add(customItems[i]);
             }
         }
         
@@ -196,6 +196,11 @@ public class WindowMenu {
                 window.setExtendedState(window.getExtendedState() | Frame.ICONIFIED);
             }
         }
+        
+        @Override
+        public boolean isEnabled() {
+            return (getFocusedFrame() != null);
+        }
     }
     
     private static class ZoomAction extends AbstractAction {
@@ -209,6 +214,11 @@ public class WindowMenu {
                 window.setExtendedState(window.getExtendedState() | Frame.MAXIMIZED_BOTH);
             }
         }
+        
+        @Override
+        public boolean isEnabled() {
+            return (getFocusedFrame() != null);
+        }
     }
     
     private class BringAllToFrontAction extends AbstractAction {
@@ -218,6 +228,11 @@ public class WindowMenu {
         
         public void actionPerformed(ActionEvent e) {
             bringAllToFront();
+        }
+        
+        @Override
+        public boolean isEnabled() {
+            return (windows.isEmpty() == false);
         }
     }
 }
