@@ -132,32 +132,27 @@ public class Terminator {
 	private List<JTerminalPane> getInitialTerminals() {
 		ArrayList<JTerminalPane> result = new ArrayList<JTerminalPane>();
 		String name = null;
-		boolean holdOnExit = false;
 		for (int i = 0; i < arguments.size(); ++i) {
 			String word = arguments.get(i);
 			if (word.equals("-n")) {
 				name = arguments.get(++i);
 				continue;
 			}
-			if (word.equals("--hold")) {
-				holdOnExit = true;
-				continue;
-			}
 			
 			// We can't hope to imitate the shell's parsing of a string, so pass it unmolested to the shell.
 			String command = word;
-			result.add(JTerminalPane.newCommandWithName(command, name, holdOnExit));
+			result.add(JTerminalPane.newCommandWithName(command, name));
 			name = null;
 		}
 		
 		if (result.isEmpty()) {
-			result.add(JTerminalPane.newShellWithName(name, holdOnExit));
+			result.add(JTerminalPane.newShellWithName(name));
 		}
 		return result;
 	}
 
 	public void showUsage(PrintWriter out) {
-		out.println("Usage: terminator [--help | --version] [-xrm <resource-string>]... [--hold] [[-n <name>] [<command>]]...");
+		out.println("Usage: terminator [--help | --version] [-xrm <resource-string>]... [[-n <name>] [<command>]]...");
 		out.println();
 		out.println("Current resource settings:");
 		Options.getSharedInstance().showOptions(out);
