@@ -113,3 +113,7 @@
   the Mac OS man page, on Solaris too), kvm_getprocs(3) looks like the nearest
   equivalent. I haven't used ktrace(1) to see if that's actually what Terminal
   does, though. martind claims that Cygwin implements a Linux-like /proc.
+  car makes an argument for not having window-modal confirmation like Terminal
+  does: "Where Terminal gets it wrong, though, is that it blocks input to the
+  terminal while it's asking me to confirm.  Canceling the shutdown so
+  that I can hit ^:wq and then starting the shutdown again is a pain".
