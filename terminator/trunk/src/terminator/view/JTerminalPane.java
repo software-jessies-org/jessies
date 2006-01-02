@@ -61,11 +61,11 @@ public class JTerminalPane extends JPanel {
 	
 	/**
 	 * Creates a new terminal running the given command, with the given
-	 * title. If 'title' is null, we use the command as the the title.
+	 * name. If 'name' is null, we use the command as the the name.
 	 */
-	public static JTerminalPane newCommandWithTitle(String originalCommand, String title) {
-		if (title == null) {
-			title = originalCommand;
+	public static JTerminalPane newCommandWithName(String originalCommand, String name) {
+		if (name == null) {
+			name = originalCommand;
 		}
 		
 		// Avoid having to interpret the command (as java.lang.Process brokenly does) by passing it to the shell as-is.
@@ -74,22 +74,28 @@ public class JTerminalPane extends JPanel {
 		command.add(originalCommand);
 		
 		boolean errorExitHolding = true;
-		return new JTerminalPane(title, command, errorExitHolding);
+		return new JTerminalPane(name, command, errorExitHolding);
 	}
 	
 	/**
 	 * Creates a new terminal running the user's shell.
 	 */
-	public static JTerminalPane newShell(String title) {
-		if (title == null) {
+	public static JTerminalPane newShell() {
+		return newShellWithName(null);
+	}
+	
+	/**
+	 * Creates a new terminal running the user's shell with the given name.
+	 */
+	public static JTerminalPane newShellWithName(String name) {
+		if (name == null) {
 			String user = System.getProperty("user.name");
-			title = user + "@localhost";
+			name = user + "@localhost";
 		}
-		
 		// The user will already have seen any failure in a shell window.
 		// bash (and probably other shells) return as their own exit status that of the last command executed.
 		boolean errorExitHolding = false;
-		return new JTerminalPane(title, getShellCommand(), errorExitHolding);
+		return new JTerminalPane(name, getShellCommand(), errorExitHolding);
 	}
 	
 	private static ArrayList<String> getShellCommand() {
