@@ -478,12 +478,17 @@ www-dist: ChangeLog.html
 	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_DIRECTORY)/ ; fi
 
 # ----------------------------------------------------------------------------
-# How to build a .app directory for Mac OS
+# How to build a .app directory for Mac OS, package it as a ".dmg", and copy
+# it to the web server.
 # ----------------------------------------------------------------------------
 
-.PHONY: app
-app: build
+$(PROJECT_NAME).dmg: build
 	@$(SCRIPT_PATH)/make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK)
+
+.PHONY: app-dist
+app-dist: $(PROJECT_NAME).dmg
+	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
+	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/
 
 # ----------------------------------------------------------------------------
 # Rules for debugging.
