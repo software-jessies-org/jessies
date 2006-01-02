@@ -33,9 +33,6 @@
 * Should allow the user to specify a log filename per tab, on the command line.
   Mail chrisa@bluearc.com when this is done, because he wants to use it.
 
-* "Connect to Server" CS-K; don't implement Rendezvous (unless you're bored!)
-  but take (user@)?host and port-scan for ssh, and fall back to telnet.
-
 * Try to make sure we never cache options. Then we can think about adding stuff
   to e.forms to automatically generate a dialog. And -- scarier still --
   writing stuff back to .Xdefaults or whatever. This is probably a longer-term
