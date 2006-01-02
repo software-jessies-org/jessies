@@ -194,9 +194,7 @@ $(OBJECTS.mm): %.o: %.mm
 # ----------------------------------------------------------------------------
 # WiX
 # ----------------------------------------------------------------------------
-# TODO: The dependency is wrong - the file needs to be re-generated whenever any of its
-# contents would change, yet we don't want to regenerate anything which depends on it
-# if its contents turn out not to change.
+# universal.make adds more dependencies - only it knows $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS).
 $(WIX_COMPONENT_DEFINITIONS): $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
 	$(MAKE_INSTALLER_FILE_LIST) | $(FILE_LIST_TO_WXI) $(FILE_LIST_TO_WXI_FLAGS) > $@
 

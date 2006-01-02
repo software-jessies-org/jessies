@@ -548,14 +548,13 @@ $(takeProfileSample)
 ALL_NATIVE_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
 
 INSTALLER_PATTERN = %.msi %.msm
-INSTALLER_TARGETS = $(filter $(INSTALLER_PATTERN),$(ALL_NATIVE_TARGETS))
 ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS = $(filter-out $(INSTALLER_PATTERN),$(ALL_NATIVE_TARGETS))
 MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)) -name .svn -prune -o -type f -print
 
 # %.msm files aren't stand-alone installers
 INSTALLER_BINARY = $(filter %.msi,$(ALL_NATIVE_TARGETS))
 
-$(INSTALLER_TARGETS): $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
+$(PROJECT_ROOT)/.generated/native/Cygwin/WiX/Cygwin/component-definitions.wxi: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
 
 .PHONY: native
 # Needs to be after ALL_NATIVE_TARGETS is defined.
