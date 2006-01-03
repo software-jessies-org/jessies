@@ -83,7 +83,7 @@ if filename != nil
 end
 
 invoker = Java.new("Edit", "e/util/Launcher")
-invoker.dock_icon = "/Developer/Examples/Carbon/SimpleText/SimpleText.icns"
+invoker.dock_icon = "#{project_root}/lib/edit.icns"
 invoker.log_filename = log_filename
 invoker.add_extra_java_arguments(options)
 invoker.invoke([ "Edit", "#{edit_class_name}Launchable" ])
