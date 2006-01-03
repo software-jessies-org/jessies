@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 
-require 'fileutils.rb'
-require 'pathname.rb'
+require "fileutils.rb"
+require "pathname.rb"
 
 # Cope with symbolic links to this script.
 project_root = Pathname.new("#{__FILE__}/..").realpath().dirname()
@@ -14,8 +14,9 @@ TARGET_OS = target_os()
 
 debugger_class_name = "e.debugger.Debugger"
 debugger_preferences_directory = "#{HOME}/.#{debugger_class_name}"
-classpath_entries = [ "#{project_root}/classes", "#{salma_hayek}/classes", "#{salma_hayek}/swing-worker.jar" ]
-
+if TARGET_OS == "Darwin"
+	debugger_preferences_directory = "#{HOME}/Library/Preferences/#{debugger_class_name}"
+end
 
 def issueDebuggerCommand(debugger_preferences_directory, command)
 	begin
@@ -33,24 +34,13 @@ def issueDebuggerCommand(debugger_preferences_directory, command)
 	end
 end
 
-os_specific_options = []
-case TARGET_OS
-when /Darwin/
-	# Darwin is what Mac OS X calls itself.
-	debugger_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{debugger_class_name}"
-else
-	require "#{salma_hayek}/bin/find-jdk-root.rb"
-	classpath_entries << "#{salma_hayek}/MRJ141Stubs.jar"
-	classpath_entries << "#{find_jdk_root()}/lib/tools.jar"
-end
-
 if FileTest.directory?(debugger_preferences_directory) == false
 	puts("Debugger: Couldn't find preferences directory '#{debugger_preferences_directory}.")
 	puts("Debugger: Creating preferences directory '#{debugger_preferences_directory}'.")
 	Dir.mkdir(debugger_preferences_directory)
 end
 
-if ARGV.size > 0
+if ARGV.size() > 0
 	command = ARGV.join(" ");
 	if issueDebuggerCommand(debugger_preferences_directory, command)
 		exit(0)
@@ -62,19 +52,12 @@ end
 log_filename = "/tmp/debugger.log.#$$"
 FileUtils.ln_sf(log_filename, "/tmp/debugger.log")
 
-options = [ "-cp", cygpath(classpath_entries.join(":")) ]
+options = []
 options.push("-Djava.awt.Window.locationByPlatform=true")
 options.push("-DpreferencesDirectory=#{cygpath(debugger_preferences_directory)}")
-#options.push("-agentlib:yjpagent")
-options.concat(os_specific_options)
-if ENV["DEBUGGING_DEBUGGER"] == nil
-#	options.push("-De.util.Log.filename=#{cygpath(log_filename)}")
-end
 
-args = [ "java" ]
-args.concat(options)
-args.push("e.util.Launcher")
-args.push("Debugger")
-args.push("#{debugger_class_name}Launchable")
-
-system(*args) || system("cat", log_filename)
+invoker = Java.new("Debugger", "e/util/Launcher")
+invoker.dock_icon = "#{project_root}/lib/debugger.icns"
+invoker.log_filename = log_filename
+invoker.add_extra_java_arguments(options)
+invoker.invoke([ "Debugger", "#{debugger_class_name}Launchable" ])
