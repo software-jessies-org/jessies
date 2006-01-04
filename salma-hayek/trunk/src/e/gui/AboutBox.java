@@ -13,7 +13,7 @@ import javax.swing.border.*;
 public class AboutBox extends JDialog {
     private static final AboutBox INSTANCE = new AboutBox();
     
-    private Icon icon;
+    private ImageIcon icon;
     private String applicationName;
     private String version;
     private ArrayList<String> copyrightLines = new ArrayList<String>();
@@ -49,6 +49,15 @@ public class AboutBox extends JDialog {
     
     public void setImage(String filename) {
         this.icon = new ImageIcon(filename);
+        if (GuiUtilities.isMacOs()) {
+            // FIXME: 64x64 is the Mac OS standard, but we should support whatever GNOME does too.
+            this.icon = new ImageIcon(ImageUtilities.scale(icon.getImage(), 64, 64, ImageUtilities.InterpolationHint.BICUBIC));
+            // Apple's HIG says that these dialog icons should be the application icon.
+            UIManager.put("OptionPane.errorIcon", icon);
+            UIManager.put("OptionPane.informationIcon", icon);
+            UIManager.put("OptionPane.questionIcon", icon);
+            UIManager.put("OptionPane.warningIcon", icon);
+        }
     }
     
     public void setVersion(String version, String build) {
@@ -100,7 +109,6 @@ public class AboutBox extends JDialog {
         }
         
         if (icon != null) {
-            // FIXME: scale images to 64x64 for Mac OS?
             addLabel(panel, new JLabel(icon));
             panel.add(Box.createRigidArea(spacerSize));
             panel.add(Box.createRigidArea(spacerSize));

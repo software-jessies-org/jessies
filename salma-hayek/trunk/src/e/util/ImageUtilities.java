@@ -53,7 +53,11 @@ public class ImageUtilities {
             newHeight = srcHeight * newWidth / srcWidth;
         }
         
-        BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+        // FIXME: one of ARGB or RGBA has bad performance characteristics on Mac OS, but I don't know which.
+        // FIXME: I don't know how to get the system's preferred image type.
+        // FIXME: I don't know how to only ask for an alpha channel if we need one.
+        int type = BufferedImage.TYPE_INT_ARGB;
+        BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, type);
         Graphics2D g = scaledImage.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolationHint.hint);
         g.drawImage(sourceImage, 0, 0, newWidth, newHeight, null);
