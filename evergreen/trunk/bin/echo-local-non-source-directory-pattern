@@ -1,4 +1,0 @@
-#!/usr/bin/ruby -w
-# The current directory will be the directory being scanned, in case you want to do something specific to a work area.
-# Example:
-#puts("\.generated")
