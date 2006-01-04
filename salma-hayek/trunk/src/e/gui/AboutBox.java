@@ -95,6 +95,10 @@ public class AboutBox extends JDialog {
         
         Dimension spacerSize = new Dimension(1, 8);
         
+        if (icon == null) {
+            lookForMacIcon();
+        }
+        
         if (icon != null) {
             // FIXME: scale images to 64x64 for Mac OS?
             addLabel(panel, new JLabel(icon));
@@ -144,5 +148,18 @@ public class AboutBox extends JDialog {
     private static void addLabel(JPanel panel, JLabel label) {
         label.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         panel.add(label);
+    }
+    
+    private void lookForMacIcon() {
+        // FIXME: we need to look for the icon in a way that will work on Linux too.
+        Map<String, String> env = System.getenv();
+        for (String key : env.keySet()) {
+            if (key.startsWith("APP_ICON_")) {
+                String icnsFilename = env.get(key);
+                String pngFilename = icnsFilename.replaceAll("\\.icns$", "-128.png");
+                setImage(pngFilename);
+                return;
+            }
+        }
     }
 }
