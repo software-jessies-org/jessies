@@ -26,7 +26,7 @@ public class FindFilesDialog {
     private Workspace workspace;
     
     private FileFinder worker;
-    private static final ExecutorService fileFinderExecutor = ThreadUtilities.newSingleThreadExecutor("Find Files");
+    private static final ExecutorService fileFinderExecutor = ThreadUtilities.newSingleThreadExecutor("Find in Files");
     
     private static final ExecutorService definitionFinderExecutor = ThreadUtilities.newFixedThreadPool(8, "Find Definitions");
     
@@ -436,7 +436,7 @@ public class FindFilesDialog {
         };
         saveMonitor.addSaveListener(saveListener);
         
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Find Files");
+        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Find in Files");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Files Containing:", regexField);
         formPanel.addRow("Whose Names Match:", filenameRegexField);
