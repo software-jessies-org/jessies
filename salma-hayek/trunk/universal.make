@@ -345,6 +345,8 @@ CLASS_PATH += $(CLASS_PATH.$(COMPILER_TYPE))
 # ----------------------------------------------------------------------------
 
 JAVA_FLAGS += $(JAVA_FLAGS.$(COMPILER_TYPE))
+# TODO: Consider whether we could defer to invoke-java.rb to run the compiler
+# and so lose this duplication.
 JAVA_FLAGS += $(addprefix -bootclasspath ,$(call makeNativePath,$(BOOT_CLASS_PATH)))
 JAVA_FLAGS += $(addprefix -classpath ,$(call makeNativePath,$(CLASS_PATH)))
 JAVA_FLAGS += -d classes/
