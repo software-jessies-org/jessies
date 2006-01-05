@@ -6,7 +6,7 @@ import java.awt.event.*;
 import e.util.*;
 
 /**
- * Opens the "Find Files" dialog with a regular expression to match the current
+ * Opens the "Find in Files" dialog with a regular expression to match the current
  * selection entered in the dialog's pattern field.
  */
 public class FindFilesContainingSelectionAction extends ETextAction {
