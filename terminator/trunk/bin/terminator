@@ -94,20 +94,8 @@ elsif test(?f, terminfo_DST) == false
   system("cp #{terminator_home}/lib/terminfo/terminator #{terminfo_DST}")
 end
 
-if target_os() == "Linux"
-  # Use locate(1) to find the gnome-terminal icon.
-  # Cache the result, because this is the single most expensive part of
-  # the script.
-  #  icon_filename_file=$log_directory/.cached-icon
-  #  if [ ! -f $icon_filename_file ] || [ ! -f `cat $icon_filename_file` ]
-  #  then
-  #    locate gnome-terminal.png | grep 32x32 | head -1 > $icon_filename_file
-  #  fi
-  #  icon_file=`cat $icon_filename_file`
-  #  options=-Dterminator.frame.icon=$icon_file
-end
-
 options = []
+options.push("-Dorg.jessies.terminator.frameIcon=#{terminator_home}/lib/terminator-128.png")
 # Ruby knows the mapping from signal number to signal name, but Java doesn't
 # and POSIX doesn't either. So pass the information along to Java in a way
 # that won't leak through to our children.

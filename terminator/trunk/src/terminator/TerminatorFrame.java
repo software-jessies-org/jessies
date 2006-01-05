@@ -86,14 +86,10 @@ public class TerminatorFrame extends JFrame {
 	
 	/**
 	 * An icon to use for each frame, if the terminator shell script suggested one.
-	 * We don't use this on Mac OS, because there windows don't have icons
-	 * unless the window's contents are themselves a graphic. On Linux, we use
-	 * one of the available GNOME icons so we look like a terminal rather than a
-	 * generic 'window'.
 	 */
 	private static final Image FRAME_ICON;
 	static {
-		String iconFile = System.getProperty("terminator.frame.icon");
+		String iconFile = System.getProperty("org.jessies.terminator.frameIcon");
 		FRAME_ICON = (iconFile != null) ? new ImageIcon(iconFile).getImage() : null;
 	}
 	
