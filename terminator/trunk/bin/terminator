@@ -107,9 +107,19 @@ if target_os() == "Linux"
   #  options=-Dterminator.frame.icon=$icon_file
 end
 
+options = []
+# Ruby knows the mapping from signal number to signal name, but Java doesn't
+# and POSIX doesn't either. So pass the information along to Java in a way
+# that won't leak through to our children.
+Signal.list().each() {
+  | signal_name, signal_number |
+  options.push("-Dorg.jessies.terminator.signal.#{signal_number}=SIG#{signal_name}")
+}
+
 invoker = Java.new("Terminator", "terminator/Terminator")
 invoker.dock_icon = "#{terminator_home}/lib/terminator.icns"
 invoker.add_library_path_entries([ pty_path ])
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
 invoker.launcher = launcher
+invoker.add_extra_java_arguments(options)
 invoker.invoke()

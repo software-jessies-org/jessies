@@ -76,11 +76,20 @@ public class PtyProcess {
         return exitValue;
     }
     
-    public int getTerminatingSignal() {
+    public String getTerminatingSignal() {
         if (wasSignaled() == false) {
             throw new IllegalStateException("Process was not signaled.");
         }
-        return exitValue;
+        return signalDescription(exitValue);
+    }
+    
+    private static String signalDescription(int signal) {
+        String signalDescription = "signal " + signal;
+        String signalName = System.getProperty("org.jessies.terminator.signal." + signal);
+        if (signalName != null) {
+            signalDescription += " (" + signalName + ")";
+        }
+        return signalDescription;
     }
     
     public PtyProcess(String[] command) throws Exception {

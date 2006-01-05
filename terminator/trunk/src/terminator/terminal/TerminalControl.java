@@ -165,8 +165,7 @@ public class TerminalControl {
 				return;
 			}
 		} else if (ptyProcess.wasSignaled()) {
-			int signal = ptyProcess.getTerminatingSignal();
-			announceConnectionLost("\n\r[Process killed by signal " + signal + ".]");
+			announceConnectionLost("\n\r[Process killed by " + ptyProcess.getTerminatingSignal() + ".]");
 			return;
 		}
 		// If it wasn't a pane close that caused us to get here, close
