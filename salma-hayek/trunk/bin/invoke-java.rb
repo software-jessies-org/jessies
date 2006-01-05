@@ -108,12 +108,10 @@ class Java
     # When run from Cygwin, we need to use colon as the PATH separator, rather than the native semi-colon.
     originalPathComponents = ENV["PATH"].split(":")
     newPathComponents = []
-    # Putting ourselves on the end of the PATH means that the user can override
-    # our default echo-local-non-source-directory-pattern and avoids hubristically increasing the length
-    # of successful PATH searches in, for example, terminator shells.
-    # Yes, perhaps I am protesting too much.
-    newPathComponents.concat(originalPathComponents)
+    # Put our setsid(1) ahead of any pre-installed one, for the potential benefit of edit.
+    # Experience suggests that various startup files are likely to reset the PATH in terminator shells.
     newPathComponents.concat(getExtraPathComponents())
+    newPathComponents.concat(originalPathComponents)
     # uniq() seems to do The Right Thing with unsorted duplicates:
     # removing the later ones, preserving order.
     # @salma_hayek may be the same as @project_root, particular with installed versions.
