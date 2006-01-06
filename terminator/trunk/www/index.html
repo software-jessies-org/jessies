@@ -209,7 +209,7 @@ rubyw.exe is a version of Ruby linked with the --subsystem windows instead of
 This subsystem throws away the standard I/O streams but it does mean that you don't get
 a spurious window.
 Any console output from the Java, as opposed to the start-up script, is recorded in a file in
-$HOME/.terminal-logs/ along with a file containing a log of each tab's output.
+<tt>~/.terminal-logs/</tt> along with a file containing a log of each tab's output.
 
 <p>You may see warnings from Ruby like this:
 <pre>
@@ -257,17 +257,9 @@ make: *** virtual memory exhausted.  Stop.
 
 <h3>Win32</h3>
 
-<p>On Windows, you will need Cygwin.  The current version at the time of porting
-was 1.5.18-1.  The startup script requires Ruby, which isn't part of Cygwin's default
-installation.  It's easily added to an additional installation (by a human but not, sadly,
-by the script) by rerunning the installer.  You might also want the net.inetutils package
-which is where Cygwin's telnet lives.
+<p>On Windows, you will need Cygwin. We have more information about <a href="/salma-hayek/cygwin-setup.html">setting up Cygwin</a>.
 
-<p>(NT's built-in POSIX subsystem won't let you launch Win32 applications or
-interact with the network, so that wasn't an option.
-Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which
-we use to support window resizing, not to mention containing a port of one of
-the most widely used ssh programs.)
+<p>(Why did we choose Cygwin? NT's built-in POSIX subsystem won't let you launch Win32 applications or interact with the network, so that wasn't an option. Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which we use to support window resizing, not to mention containing a port of one of the most widely used ssh programs.)
 
 <p>On Cygwin, the launcher will use $JAVA_HOME to find your jvm.dll if you've
 specified it.  You can use a Windows or a POSIX style path for $JAVA_HOME.
