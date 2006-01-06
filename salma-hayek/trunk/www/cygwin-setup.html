@@ -1,0 +1,77 @@
+<html>
+<head>
+<title>Cygwin Setup</title>
+<link rel="stylesheet" type="text/css" href="/salma-hayek/styles.css" />
+</head>
+<body>
+
+<h1>Cygwin Setup</h1>
+
+<h2>What is Cygwin?</h2>
+<p>Cygwin is a Linux-like environment for MS Windows. You can read more about it on the <a href="http://www.cygwin.com">Cygwin home page</a>, but this page assumes you know what it is and want it. If you're a Unix user and you're stuck with a Win32 box, you probably do. It's quite a remarkable hack.
+
+<h2>Installation</h2>
+<p>Run the initial installer <a href="http://www.cygwin.com/setup.exe">setup.exe</a> and hit Next. Answer "Install from Internet" and hit Next. Answer "c:\cygwin", "All Users", "Unix / binary", and hit Next. I don't think the local package directory matters, so just hit Next. Hit Next again. Choose a nearby server and hit Next.
+
+<h3>Approximating apt-get(1)</h3>
+<p>You'll now be asked to select packages. The interface is a nightmare along the lines of dselect(1), and not scriptable in any way. This section assumes that you'd rather have something along the lines of apt-get(1).
+
+<p>For our purposes we only need two packages over the default. Expand "Interpreters" and click on the weird circular icon on the line with "python". Expand "Web" and click on the weird circular icon on the line with "wget". Hit Next.
+
+<p>Double-click on the Cygwin icon on your desktop, and run:
+<pre>
+wget <a href="http://www.lilypond.org/~janneke/software/cyg-apt">http://www.lilypond.org/~janneke/software/cyg-apt</a>
+mv cyg-apt /bin
+cyg-apt setup
+cyg-apt update
+</pre>
+
+<p>You now have cyg-apt(1), a useful imitation of apt-get(1).
+
+<h3>A better command prompt</h3>
+<p>The Cygwin icon on your desktop starts Microsoft's command prompt window, albeit with bash(1) inside. You can do better than that, though. There's a port of rxvt(1) that doesn't require X11.
+<pre>
+cyg-apt install rxvt
+</pre>
+<p>Right-click on the Cygwin shortcut, choose "Properties", and paste the following into the "Target" field:
+<pre>c:\cygwin\bin\rxvt.exe -bg blue4 -fg white -scrollBar_right -fn Terminal
+</pre>
+
+<h3>Other useful packages</h3>
+<p>You might want to install the following packages:
+<pre>
+cyg-apt install perl ruby # run Perl or Ruby scripts
+cyg-apt install vim       # edit stuff locally
+cyg-apt install inetutils # telnet(1)
+cyg-apt install openssh   # SSH (client and server)
+</pre>
+
+<h2>Configuration</h2>
+
+<h3>Home directory</h3>
+
+<p>If you have a CIFS share on your real Unix box (via Samba, say), you should map that as a network drive (U:, say). You can then set the Win32 environment variable HOME to "U:\" and Cygwin will do the right thing, including running your existing login scripts. (You may want to have installed Perl and Ruby first, and you'll want to follow the usual rules when messing around with login scripts. In particular, keep a working window open at all times!)
+
+<p>You can set Win32 environment variables from the control panel. Double-click "System", click the "Advanced" tab, and click the "Environment Variables..." button. Click the upper "New..." button to create a new user variable.
+
+<h3>Default permissions</h3>
+<p>As mentioned in <a href="http://cygwin.com/ml/cygwin/2006-01/msg00257.html">http://cygwin.com/ml/cygwin/2006-01/msg00257.html</a>, the default permissions for a Cygwin installation are rwxrwxrwx. Even if you don't care about the security implications, Ruby does. You might get sick of seeing Ruby make complaints like:
+<pre>
+warning: Insecure world writable dir /usr/local/bin, mode 040777
+</pre>
+The directory and exact mode may differ, but you'll need to <tt>chmod o-w</tt> the directory in question. Here's the minimal set of changes I needed to make to keep Ruby quiet:
+<pre>
+chmod o-w /usr/local/bin
+chmod o-w /usr/local
+chmod o-w /usr
+chmod o-w /etc
+chmod o-w /usr/sbin
+chmod o-w /usr/bin
+chmod o-w /usr/X11R6/bin
+chmod o-w /usr/X11R6
+chmod o-w /cygdrive/c
+</pre>
+<p>Of course, this still leaves every binary on your system world-writable. Strangely, Ruby's happy to run world-writable binaries, as long as the directory they're in isn't world-writable.
+
+</body>
+</html>
