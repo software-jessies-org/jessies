@@ -16,7 +16,7 @@ import e.util.*;
 import java.util.List;
 import org.jdesktop.swingworker.SwingWorker;
 
-public class FindFilesDialog {
+public class FindInFilesDialog {
     private JTextField regexField = new JTextField(40);
     private JTextField filenameRegexField = new JTextField(40);
     private JLabel status = new JLabel(" ");
@@ -258,7 +258,7 @@ public class FindFilesDialog {
         
         @Override
         protected void done() {
-            synchronized (FindFilesDialog.this) {
+            synchronized (FindInFilesDialog.this) {
                 worker = null;
             }
             
@@ -395,7 +395,7 @@ public class FindFilesDialog {
         });
     }
     
-    public FindFilesDialog(Workspace workspace) {
+    public FindInFilesDialog(Workspace workspace) {
         this.workspace = workspace;
     }
 

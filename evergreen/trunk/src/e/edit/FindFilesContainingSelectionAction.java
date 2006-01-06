@@ -17,7 +17,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
     
     public void actionPerformed(ActionEvent e) {
         Workspace workspace = Edit.getInstance().getCurrentWorkspace();
-        // FindFilesDialog.showDialog will make this check, but not before
+        // FindInFilesDialog.showDialog will make this check, but not before
         // guessDirectoryToSearchIn has already failed.
         if (workspace.isFileListUnsuitableFor("Find in Files")) {
             return;
@@ -34,7 +34,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
             pattern = StringUtilities.regularExpressionFromLiteral(selection);
         }
         String directory = guessDirectoryToSearchIn();
-        workspace.showFindFilesDialog(pattern, directory);
+        workspace.showFindInFilesDialog(pattern, directory);
     }
     
     public String guessDirectoryToSearchIn() {
