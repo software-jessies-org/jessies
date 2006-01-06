@@ -3,7 +3,7 @@ package e.edit;
 import java.util.*;
 
 /**
- * Used by the FindFilesDialog to know when results are potentially out of
+ * Used by the FindInFilesDialog to know when results are potentially out of
  * date.
  */
 public class SaveMonitor {

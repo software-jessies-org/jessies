@@ -309,15 +309,15 @@ public class Workspace extends JPanel {
      * a bad idea anyway. Either you've got a better suggestion than what the
      * user last typed, or you should leave things as they are.
      */
-    public void showFindFilesDialog(String pattern, String filenamePattern) {
-        FindFilesDialog findFilesDialog = new FindFilesDialog(this);
+    public void showFindInFilesDialog(String pattern, String filenamePattern) {
+        FindInFilesDialog findInFilesDialog = new FindInFilesDialog(this);
         if (pattern != null && pattern.length() > 0) {
-            findFilesDialog.setPattern(pattern);
+            findInFilesDialog.setPattern(pattern);
         }
         if (filenamePattern != null && filenamePattern.length() > 0) {
-            findFilesDialog.setFilenamePattern(filenamePattern);
+            findInFilesDialog.setFilenamePattern(filenamePattern);
         }
-        findFilesDialog.showDialog();
+        findInFilesDialog.showDialog();
     }
     
     /**
