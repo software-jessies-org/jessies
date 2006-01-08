@@ -6,6 +6,7 @@
 
 #include <JniString.h>
 
+#include "join.h"
 #include "PtyGenerator.h"
 #include "toString.h"
 #include "unix_exception.h"
@@ -16,8 +17,11 @@
 #include <termios.h>
 
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/sysctl.h>
 #include <sys/wait.h>
 
+#include <deque>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -57,6 +61,8 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jo
     Argv argv(arguments);
     processId = ptyGenerator.forkAndExec(&argv[0]);
     
+    slavePtyName = newStringUtf8(ptyGenerator.getSlavePtyName());
+    
     fd = masterFd;
 #ifdef __CYGWIN__
     (void) descriptor;
@@ -79,19 +85,17 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jo
 
 // The back-end for a Win32-compatible InputStream.
 // This absolutely needs to be native code on cygwin because cygwin's syscalls implement the pseudo-terminal behavior.
-void terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arrayOffset, jint desiredLength, jobject ptyReadResult) {
+jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arrayOffset, jint desiredLength) {
     std::vector<jbyte> temporary(desiredLength);
     ssize_t bytesTransferred = read(fd.get(), &temporary[0], desiredLength);
     if (bytesTransferred < 0) {
         throw unix_exception("read(" + toString(fd.get()) + ", &array[" + toString(arrayOffset) +"], " + toString(desiredLength) + ") failed");
     }
-    JniField<jint> bytesRead(m_env, ptyReadResult, "bytesRead", "I");
     if (bytesTransferred == 0) {
-        bytesRead = -1;
-    } else {
-        m_env->SetByteArrayRegion(destination, arrayOffset, bytesTransferred, &temporary[0]);
-        bytesRead = bytesTransferred;
+        return -1;
     }
+    m_env->SetByteArrayRegion(destination, arrayOffset, bytesTransferred, &temporary[0]);
+    return bytesTransferred;
 }
 
 // The back-end for a Win32-compatible OutputStream.
@@ -138,5 +142,49 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
     if (WIFSIGNALED(status)) {
         exitValue = WTERMSIG(status);
         wasSignaled = true;
+        if (WCOREDUMP(status)) {
+            didDumpCore = true;
+        }
     }
+}
+
+jstring terminator_terminal_PtyProcess::listProcessesUsingTty() {
+#ifndef __APPLE__
+    return newStringUtf8("listProcessesUsingTty only supported on Mac OS");
+#else
+    // Which tty?
+    struct stat sb;
+    JniString filename(m_env, slavePtyName.get());
+    if (stat(filename.str().c_str(), &sb) != 0) {
+        throw unix_exception("stat(" + filename.str() + ", &sb) failed");
+    }
+    
+    // Fill out our MIB.
+    int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_TTY, sb.st_rdev };
+    
+    // How much space will we need?
+    size_t byteCount = 0;
+    if (sysctl(mib, sizeof(mib)/sizeof(int), NULL, &byteCount, NULL, 0) == -1) {
+        throw unix_exception("stat(mib, " + toString(sizeof(mib)/sizeof(int)) + ", NULL, &byteCount, NULL, 0) failed");
+    }
+    
+    // Actually get the process information.
+    std::vector<char> buffer;
+    buffer.resize(byteCount);
+    if (sysctl(mib, sizeof(mib)/sizeof(int), &buffer[0], &byteCount, NULL, 0) == -1) {
+        throw unix_exception("stat(mib, " + toString(sizeof(mib)/sizeof(int)) + ", &buffer[0], &byteCount, NULL, 0) failed");
+    }
+    
+    // Collect the process names.
+    std::deque<std::string> processNames;
+    int count = byteCount / sizeof(kinfo_proc);
+    kinfo_proc* kp = (kinfo_proc*) &buffer[0];
+    for (int i = 0; i < count; ++i) {
+        // FIXME: sort on "kp->kp_proc.p_pid"?
+        processNames.push_back(kp->kp_proc.p_comm);
+        ++kp;
+    }
+    
+    return newStringUtf8(join(", ", processNames));
+#endif
 }

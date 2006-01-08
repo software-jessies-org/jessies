@@ -131,3 +131,6 @@
   Personally, the only interest I've ever had for it was in distinguishing
   local and remote windows. I can't think how to do any of this without making
   the existing configuration problems worse, though.
+
+* On Mac OS, we should probably do what Terminal does to subvert keystroke
+  logging (http://www.cocoadev.com/index.pl?SecureKeyboardEntry).

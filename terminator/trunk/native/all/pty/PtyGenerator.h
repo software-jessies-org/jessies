@@ -33,6 +33,10 @@ public:
     virtual ~PtyGenerator() {
     }
     
+    std::string getSlavePtyName() {
+        return ptyName;
+    }
+    
     int openMaster() {
         masterFd = ptym_open(ptyName);
         return masterFd;
