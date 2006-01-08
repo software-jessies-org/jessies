@@ -11,7 +11,6 @@ import javax.swing.*;
 import terminator.view.*;
 
 public class Terminator {
-	private static final String COPYRIGHT = "Copyright (C) 2004-2006 Free Software Foundation, Inc.";
 	private static final Terminator INSTANCE = new Terminator();
 	
 	private List<String> arguments;
@@ -68,7 +67,7 @@ public class Terminator {
 	private void initAboutBox() {
 		AboutBox aboutBox = AboutBox.getSharedInstance();
 		aboutBox.setApplicationName("Terminator");
-		aboutBox.addCopyright(COPYRIGHT);
+		aboutBox.addCopyright("Copyright (C) 2004-2006 Free Software Foundation, Inc.");
 		aboutBox.addCopyright("All Rights Reserved.");
 	}
 	
@@ -85,8 +84,6 @@ public class Terminator {
 		arguments = Options.getSharedInstance().parseCommandLine(argumentArray);
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
 			showUsage(out);
-		} else if (arguments.contains("-v") || arguments.contains("-version") || arguments.contains("--version")) {
-			showVersion(err);
 		} else {
 			initUi();
 			return true;
@@ -166,13 +163,6 @@ public class Terminator {
 		out.println("resources of class Rxvt, Terminator or XTerm.");
 	}
 	
-	public void showVersion(PrintWriter out) {
-		out.println("Terminator (see ChangeLog for author and version information)");
-		out.println(COPYRIGHT);
-		out.println("This is free software; see the source for copying conditions.  There is NO");
-		out.println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
-	}
-
 	public static void main(final String[] arguments) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
