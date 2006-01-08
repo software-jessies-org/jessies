@@ -17,7 +17,6 @@ public class JTerminalPane extends JPanel {
 	// The probably over-simplified belief here is that Unix terminals always send ^? and Windows always sends ^H.
 	private static final String ERASE_STRING = String.valueOf(GuiUtilities.isWindows() ? Ascii.BS : Ascii.DEL);
 	
-	private Process process;
 	private TerminalControl control;
 	private JTextBuffer textPane;
 	private JScrollPane scrollPane;
