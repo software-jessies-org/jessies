@@ -19,20 +19,7 @@ public class AboutBox extends JDialog {
     private ArrayList<String> copyrightLines = new ArrayList<String>();
     
     private AboutBox() {
-        initMacOsAboutMenu();
-    }
-    
-    private void initMacOsAboutMenu() {
-        if (GuiUtilities.isMacOs() == false) {
-            return;
-        }
-        
-        Application.getApplication().addApplicationListener(new ApplicationAdapter() {
-            public void handleAbout(ApplicationEvent e) {
-                AboutBox.getSharedInstance().setVisible(true);
-                e.setHandled(true);
-            }
-        });
+        initMacOs();
     }
     
     public static AboutBox getSharedInstance() {
@@ -99,14 +86,7 @@ public class AboutBox extends JDialog {
         panel.setBorder(new EmptyBorder(8, 12, 20, 12));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
-        // FIXME: we need a .icns reader. Given that, we can get the filename automatically from the environment.
-        //panel.add(new JLabel(new ImageIcon("/Applications/Utilities/Terminal.app/Contents/Resources/term_icon.icns")));
-        
         Dimension spacerSize = new Dimension(1, 8);
-        
-        if (icon == null) {
-            lookForMacIcon();
-        }
         
         if (icon != null) {
             addLabel(panel, new JLabel(icon));
@@ -158,12 +138,30 @@ public class AboutBox extends JDialog {
         panel.add(label);
     }
     
-    private void lookForMacIcon() {
+    private void initMacOs() {
+        if (GuiUtilities.isMacOs() == false) {
+            return;
+        }
+        initMacOsAboutMenu();
+        initMacOsIcon();
+    }
+    
+    private void initMacOsAboutMenu() {
+        Application.getApplication().addApplicationListener(new ApplicationAdapter() {
+            public void handleAbout(ApplicationEvent e) {
+                AboutBox.getSharedInstance().setVisible(true);
+                e.setHandled(true);
+            }
+        });
+    }
+    
+    private void initMacOsIcon() {
         // FIXME: we need to look for the icon in a way that will work on Linux too.
         Map<String, String> env = System.getenv();
         for (String key : env.keySet()) {
             if (key.startsWith("APP_ICON_")) {
                 String icnsFilename = env.get(key);
+                // FIXME: if we had a .icns reader for ImageIO, we wouldn't need to mess around like this.
                 String pngFilename = icnsFilename.replaceAll("\\.icns$", "-128.png");
                 setImage(pngFilename);
                 return;
