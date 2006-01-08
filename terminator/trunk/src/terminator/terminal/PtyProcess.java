@@ -7,11 +7,6 @@ import java.io.*;
 import java.util.concurrent.*;
 
 public class PtyProcess {
-    // We're compelled to do something distasteful by the inability to return an integer from JavaHpp's JNI.
-    private static class PtyReadResult {
-        public int bytesRead;
-    }
-    
     private class PtyInputStream extends InputStream {
         // InputStream compels us to implement the single byte version.
         @Override
@@ -27,9 +22,7 @@ public class PtyProcess {
          */
         @Override
         public int read(byte[] destination, int arrayOffset, int desiredLength) throws IOException {
-            PtyReadResult ptyReadResult = new PtyReadResult();
-            nativeRead(destination, arrayOffset, desiredLength, ptyReadResult);
-            return ptyReadResult.bytesRead;
+            return nativeRead(destination, arrayOffset, desiredLength);
         }
     }
     
@@ -42,7 +35,9 @@ public class PtyProcess {
     
     private int fd;
     private int processId;
+    private String slavePtyName;
     
+    private boolean didDumpCore = false;
     private boolean didExitNormally = false;
     private boolean wasSignaled = false;
     private int exitValue;
@@ -76,18 +71,20 @@ public class PtyProcess {
         return exitValue;
     }
     
-    public String getTerminatingSignal() {
+    public String getSignalDescription() {
         if (wasSignaled() == false) {
             throw new IllegalStateException("Process was not signaled.");
         }
-        return signalDescription(exitValue);
-    }
-    
-    private static String signalDescription(int signal) {
+        
+        final int signal = exitValue;
         String signalDescription = "signal " + signal;
         String signalName = System.getProperty("org.jessies.terminator.signal." + signal);
         if (signalName != null) {
             signalDescription += " (" + signalName + ")";
+        }
+        
+        if (didDumpCore) {
+            signalDescription += " --- core dumped";
         }
         return signalDescription;
     }
@@ -99,7 +96,7 @@ public class PtyProcess {
         if (processId == -1) {
             throw new IOException("Could not start process \"" + command + "\".");
         }
-        if (descriptor.valid ()) {
+        if (descriptor.valid()) {
             inStream = new FileInputStream(descriptor);
             outStream = new FileOutputStream(descriptor);
         } else {
@@ -133,6 +130,7 @@ public class PtyProcess {
         invoke(new Callable<Exception>() {
             public Exception call() {
                 try {
+                    System.err.println(listProcessesUsingTty());
                     nativeWaitFor();
                     return null;
                 } catch (Exception ex) {
@@ -156,12 +154,13 @@ public class PtyProcess {
     }
     
     private native void nativeStartProcess(String[] command, FileDescriptor descriptor) throws IOException;
-    
-    public native void nativeRead(byte[] destination, int arrayOffset, int desiredLength, PtyReadResult ptyReadResult) throws IOException;
-    public native void nativeWrite(int source) throws IOException;
-    public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
-    
+    private native void nativeWaitFor() throws IOException;
     public native void destroy() throws IOException;
     
-    private native void nativeWaitFor() throws IOException;
+    public native int nativeRead(byte[] destination, int arrayOffset, int desiredLength) throws IOException;
+    public native void nativeWrite(int source) throws IOException;
+    
+    public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
+    
+    private native String listProcessesUsingTty() throws IOException;
 }
