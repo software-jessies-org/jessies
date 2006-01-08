@@ -59,7 +59,20 @@ public class PKeyHandler extends KeyAdapter {
     }
     
     private boolean isInsertableCharacter(KeyEvent e) {
-        if (e.isAltDown() || e.isAltGraphDown() || e.isControlDown() || e.isMetaDown()) {
+        // On Mac OS, 'alt' is used to insert special characters (alt-3, for example, gives whichever of # and £ isn't on the key cap).
+        // On other systems, we should ignore keys typed with 'alt' down. GNOME and Win32 use 'alt' to traverse menus.
+        if (GuiUtilities.isMacOs() == false && e.isAltDown()) {
+            return false;
+        }
+        
+        // FIXME: is 'alt graph' a special case on some systems? For now, assume it isn't.
+        if (e.isAltGraphDown()) {
+            return false;
+        }
+        
+        // The 'control' key only inserts characters in terminal emulators.
+        // The 'meta' (aka 'command' on Mac OS) key never inserts a character.
+        if (e.isControlDown() || e.isMetaDown()) {
             return false;
         }
         
