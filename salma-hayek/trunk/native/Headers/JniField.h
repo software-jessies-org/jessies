@@ -62,6 +62,9 @@ private:
     }
 };
 
+template <> void JniField<jstring>::set(const jstring& rhs) {
+    m_env->SetObjectField(m_instance, getFieldID(), rhs);
+}
 template <> void JniField<jobject>::set(const jobject& rhs) {
     m_env->SetObjectField(m_instance, getFieldID(), rhs);
 }
@@ -90,6 +93,9 @@ template <> void JniField<jdouble>::set(const jdouble& rhs) {
     m_env->SetDoubleField(m_instance, getFieldID(), rhs);
 }
 
+template <> void JniField<jstring>::get(jstring& result) const {
+    result = (jstring) m_env->GetObjectField(m_instance, getFieldID());
+}
 template <> void JniField<jobject>::get(jobject& result) const {
     result = m_env->GetObjectField(m_instance, getFieldID());
 }

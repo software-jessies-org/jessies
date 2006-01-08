@@ -47,6 +47,8 @@ public class JavaHpp {
         for (Field field : instanceFields) {
             out.println("JniField<" + jniTypeNameFor(field.getType()) + "> " + field.getName() + ";");
         }
+        emit_newStringUtf8(out);
+        
         out.println("public:");
         out.println(proxyClassName + "(JNIEnv* env, jobject instance)");
         out.println(": m_env(env)");
@@ -64,7 +66,7 @@ public class JavaHpp {
                 }
                 proxyMethodArguments.append(jniTypeNameFor(parameterType));
             }
-            out.println("void " + method.getName() + "(" + proxyMethodArguments + ");");
+            out.println(jniTypeNameFor(method.getReturnType()) + " " + method.getName() + "(" + proxyMethodArguments + ");");
         }
         out.println("};");
         
@@ -90,9 +92,17 @@ public class JavaHpp {
             out.println("extern \"C\" JNIEXPORT " + jniReturnType + " JNICALL " + jniMangledName + "(" + parameters + ") {");
             out.println("try {");
             out.println(proxyClassName + " proxy(env, instance);");
-            out.println("proxy." + method.getName() + "(" + arguments + ");");
+            String proxyMethodCall = "proxy." + method.getName() + "(" + arguments + ")";
+            if (method.getReturnType() == Void.TYPE) {
+                out.println(proxyMethodCall + ";");
+            } else {
+                out.println("return " + proxyMethodCall + ";");
+            }
             out.println("} catch (std::exception& ex) {");
             out.println("translateToJavaException(env, \"" + chooseExceptionClassName(method) + "\", ex);");
+            if (method.getReturnType() != Void.TYPE) {
+                out.println("return " + jniTypeNameFor(method.getReturnType()) + "();");
+            }
             out.println("}");
             out.println("}");
         }
@@ -114,9 +124,6 @@ public class JavaHpp {
         List<Method> nativeMethods = new ArrayList<Method>();
         for (Method method : methods) {
             if ((method.getModifiers() & Modifier.NATIVE) != 0) {
-                if (method.getReturnType() != Void.TYPE) {
-                    throw new RuntimeException("methods such as '" + method + "' with a return type other than 'void' are deliberately not supported; set a field instead");
-                }
                 nativeMethods.add(method);
             }
         }
@@ -142,6 +149,12 @@ public class JavaHpp {
         out.println("    if (exceptionClass) {");
         out.println("        env->ThrowNew(exceptionClass, ex.what());");
         out.println("    }");
+        out.println("}");
+    }
+    
+    private void emit_newStringUtf8(IndentedSourceWriter out) {
+        out.println("jstring newStringUtf8(const std::string& s) {");
+        out.println("    return m_env->NewStringUTF(s.c_str());");
         out.println("}");
     }
     
