@@ -130,7 +130,6 @@ public class PtyProcess {
         invoke(new Callable<Exception>() {
             public Exception call() {
                 try {
-                    System.err.println(listProcessesUsingTty());
                     nativeWaitFor();
                     return null;
                 } catch (Exception ex) {
