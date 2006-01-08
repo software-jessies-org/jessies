@@ -111,8 +111,7 @@ public class TerminatorFrame extends JFrame {
 		}
 		addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent event) {
-				for (int i = 0; i < terminals.size(); ++i) {
-					JTerminalPane terminal = terminals.get(i);
+				for (JTerminalPane terminal : terminals) {
 					terminal.destroyProcess();
 				}
 				Terminator.getSharedInstance().frameClosed(TerminatorFrame.this);
