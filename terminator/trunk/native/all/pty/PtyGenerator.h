@@ -180,7 +180,7 @@ private:
             close(childFd);
         }
         closeUnusedFiles();
-        putenv("TERM=terminator");
+        fixEnvironment();
         
         /*
          * rxvt resets these signal handlers, and we'll do the same, because it magically
@@ -195,6 +195,29 @@ private:
         
         execvp(cmd[0], cmd);
         throw unix_exception("Can't execute '" + toString(cmd[0]) + "'");
+    }
+    
+    static void fixEnvironment() {
+        // Tell the world which terminfo entry to use.
+        putenv("TERM=terminator");
+        
+        // X11 terminal emulators set this.
+        // http://elliotth.blogspot.com/2005/12/why-terminator-doesnt-support-windowid.html
+        unsetenv("WINDOWID");
+        
+#ifdef __APPLE__
+        // Apple's Java launcher uses environment variables to implement the -Xdock options.
+        pid_t ppid = getppid();
+        unsetenv(("APP_ICON_" + toString(ppid)).c_str());
+        unsetenv(("APP_NAME_" + toString(ppid)).c_str());
+        unsetenv(("JAVA_MAIN_CLASS_" + toString(ppid)).c_str());
+        
+        // Apple's Terminal sets these, and some programs/scripts identify Terminal this way.
+        // In real life, these shouldn't be set, but they will be if we're debugging Terminator and running it from Terminal.
+        // It's always confusing when programs behave differently during debugging!
+        unsetenv("TERM_PROGRAM");
+        unsetenv("TERM_PROGRAM_VERSION");
+#endif
     }
     
     /*
