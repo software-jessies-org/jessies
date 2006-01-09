@@ -136,7 +136,13 @@
 * On Mac OS, if you resize a Terminator window, it flashes white as it
   seemingly fills the background before we do. if you force the LAF to be
   Metal, it works. so it's something to do with the Aqua LAF. it's not fixed
-  by calling setOpaque(true) in JTerminalPane's constructor.
+  by calling setOpaque(true) in JTerminalPane's constructor. (It looks as if
+  the problem is that ComponentUI.update fills a component with the background
+  color, and our JPanel's background color -- thanks to Mac OS' JTabbedPane --
+  has to be the SystemColor for a panel. We could possibly work around this
+  for the single-terminal case, but the only real solution is going to be
+  writing our own JTabbedPane UI delegate that's more like Safari's, and
+  doesn't rely on transparency.)
 
 * car: Terminator's "select words" (aka double-click) and "select lines" (aka
   triple-click) modes are forgotten when I move the end of the selection.  In
