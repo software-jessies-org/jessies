@@ -10,7 +10,6 @@ salma_hayek = Pathname.new("#{terminator_home}/../salma-hayek").realpath()
 require "#{salma_hayek}/bin/target-os.rb"
 require "#{salma_hayek}/bin/invoke-java.rb"
 
-ENV["TERMINATOR_HOME"] = terminator_home
 HOME = ENV["HOME"]
 
 # Make sure we have a directory for the terminal logs.
