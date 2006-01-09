@@ -117,8 +117,10 @@ public class EMenuBar extends JMenuBar {
                 } else {
                     JMenuItem menuItem = (JMenuItem) elements[i];
                     Action action = menuItem.getAction();
-                    if (action == null && menuItem instanceof JMenu == false) {
-                        Log.warn("Actionless menu item found: " + menuItem);
+                    if (action == null) {
+                        if (menuItem instanceof JMenu == false) {
+                            Log.warn("Actionless menu item found: " + menuItem);
+                        }
                     } else {
                         menuItem.setEnabled(action.isEnabled());
                     }
@@ -131,8 +133,10 @@ public class EMenuBar extends JMenuBar {
             for (int i = 0; i < elements.length; i++) {
                 JMenuItem menuItem = (JMenuItem) elements[i];
                 Action action = menuItem.getAction();
-                if (action == null && menuItem instanceof JMenu == false) {
-                    Log.warn("Actionless popup menu item found: " + menuItem);
+                if (action == null) {
+                    if (menuItem instanceof JMenu == false) {
+                        Log.warn("Actionless popup menu item found: " + menuItem);
+                    }
                 } else {
                     menuItem.setEnabled(action.isEnabled());
                 }
