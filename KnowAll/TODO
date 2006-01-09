@@ -95,3 +95,41 @@ relevant Apple links:
 http://developer.apple.com/releasenotes/Accessibility/AssistiveAPI.html [api]
 http://developer.apple.com/samplecode/UIElementInspector/UIElementInspector.html [example]
 http://www.cocoabuilder.com/archive/message/cocoa/2003/12/7/89341
+
+--BEGIN "rant on unit-conversion-by-analogy"--
+On Jan 30, 2005, at 01:31, Ed Porter wrote:
+> http://www.users.globalnet.co.uk/~kelky/sk/sizeofwales.html
+
+"2m is approximately 0 times the length of the River Nile".
+
+impressive.
+
+in fact, playing with it for about a minute, i failed to have it come up with anything i have a good idea of the length or height of, and i wasn't impressed by its choice of strange multiples.
+
+when i followed the link, i had that sinking feeling of someone having implemented my idea (compositing same-scale maps of two towns to give you an idea of their relative size; the idea being that one of the towns is somewhere you choose because you know it well). and when that passed, i had the disappointment of a really lame implementation of a not obviously good idea.
+
+surely, to be successful, such a thing *has* to use pictures? and has to be tailored to stuff you know, so no "Nelson's column", "River Nile", and the like (for me).
+
+interesting that it featured on BBC *radio* rather than TV. i'm sure it didn't come across so badly on radio, because it's no worse than what you usually get. on TV it would have been obvious that it was a poor use of a visual medium.
+
+we're monkeys, damn it! with monkey brains!
+
+SMP never made math any easier by using a picture of a bunny instead of 'x' and a picture of a cake instead of 'y'. all they did was piss me off by insulting me, the cretins.
+
+[don't get me wrong; this was still interesting as an example of how to fuck up the basic idea, so ta for that!]
+
+i realize there's a deeper question of whether it makes any sense to say Texas is twice the size of Germany (because who has a solid understanding of how large Germany really is, and who of those people can "double it"?), but i'd like to see the basic problem solved.
+
+choosing the benchmarks is hard, though.
+
+length:
+1cm..4m - comparisons with the human body?
+10m..2km - distance from your doorstep?
+2km..500km - distances to other cities?
+500km..3000km - distances to other countries?
+give up?
+
+and what question are you trying to answer: "how much is that?" or "how does x compare to y?" the latter's easily done by compositing two equal-scale pictures (ignoring the likes of "how does the thickness of my fingernail compare to the distance to Venus", which i don't believe a human can understand). but the former's quite personal. taking weight, say, anything heavier than 70kg is pretty much meaningless to me. that's all "infinitely heavy". i could probably recognize a difference by trying to lift heavier objects, but i have so little experience of that that it's bogus, and it won't extend beyond, say, 200kg.
+
+so faced with "how much does Safeways weigh?" we can answer the easier "how many rhinos does Safeways weigh?" -- though compositing arbitrary herds of rhinos might be tricky ;-)  --but i can't get much of an idea of anything that's outside my normal experience.
+--END "rant on unit-conversion-by-analogy"--
