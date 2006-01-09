@@ -106,10 +106,8 @@
 
 * If the user tries to close a window with a still-running process, and we
   can see that it's not a childless shell, we should ask for confirmation.
-  (On Linux, we can get what we need via /proc. On Mac OS (and, judging by
-  the Mac OS man page, on Solaris too), kvm_getprocs(3) looks like the nearest
-  equivalent. I haven't used ktrace(1) to see if that's actually what Terminal
-  does, though. martind claims that Cygwin implements a Linux-like /proc.
+  On Linux, we can get what we need via /proc. On Mac OS, we already have
+  the JNI. martind claims that Cygwin implements a Linux-like /proc.
   car makes an argument for not having window-modal confirmation like Terminal
   does: "Where Terminal gets it wrong, though, is that it blocks input to the
   terminal while it's asking me to confirm.  Canceling the shutdown so
@@ -139,3 +137,10 @@
   seemingly fills the background before we do. if you force the LAF to be
   Metal, it works. so it's something to do with the Aqua LAF. it's not fixed
   by calling setOpaque(true) in JTerminalPane's constructor.
+
+* car: Terminator's "select words" (aka double-click) and "select lines" (aka
+  triple-click) modes are forgotten when I move the end of the selection.  In
+  most other apps, it seems, if I double-click and drag, I want the selected
+  area increment or decrement by whole words.  Ditto when I'm selecting lines.
+  Terminator, as soon as I move the end of the selected text, drops back to
+  character increments.
