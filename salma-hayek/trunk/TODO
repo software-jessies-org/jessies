@@ -30,3 +30,11 @@ Items to be done for PTextArea:
        This is waiting for a good idea.  That may come in the form of generalizing the problem or of deciding on an elegant way to implement it.
        
   (2) Exclude comments etc from the code which finds the mismatched brackets whose partners should be inserted.
+
+* [2005-06-18 16:11:10 PDT] Wrapping of lines with tabs is broken in PTextArea:
+
+    private void setLineWidth(PLineList.Line line) {
+        line.setWidth(metrics.stringWidth(line.getContents().toString()));
+    }
+
+  that's not the width of the line, and never has been. so presumably we've only ever wrapped lines with tabs right when they've been very much longer than the width of the window. (because then we'll measure them properly, and thus wrap them correctly, despite being mistaken about how necessary it was to do so.)
