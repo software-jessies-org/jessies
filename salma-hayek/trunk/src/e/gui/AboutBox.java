@@ -20,6 +20,7 @@ public class AboutBox extends JDialog {
     
     private AboutBox() {
         initMacOs();
+        initIcon();
     }
     
     public static AboutBox getSharedInstance() {
@@ -78,9 +79,21 @@ public class AboutBox extends JDialog {
     private void makeMacUi() {
         // http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/XHIGWindows/chapter_17_section_5.html#//apple_ref/doc/uid/20000961-TPXREF17
         
+        // Mac OS font defaults.
         Font applicationNameFont = new Font("Lucida Grande", Font.BOLD, 14);
         Font versionFont = new Font("Lucida Grande", Font.PLAIN, 10);
         Font copyrightFont = new Font("Lucida Grande", Font.PLAIN, 10);
+        
+        // FIXME: code to get the right fonts for GNOME probably looks like this, but even Java 6 doesn't seem to get the right starting font.
+        if (false) {
+            final float PANGO_SCALE_SMALL = (1.0f / 1.2f);
+            final float PANGO_SCALE_XX_LARGE = (1.2f * 1.2f * 1.2f);
+            final Font gnomeBaseFont = UIManager.getFont("TextArea.font");
+            final float baseSize = gnomeBaseFont.getSize2D();
+            applicationNameFont = gnomeBaseFont.deriveFont(baseSize * PANGO_SCALE_XX_LARGE).deriveFont(Font.BOLD);
+            versionFont = gnomeBaseFont.deriveFont(baseSize * PANGO_SCALE_SMALL);
+            copyrightFont = gnomeBaseFont.deriveFont(baseSize * PANGO_SCALE_SMALL);
+        }
         
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(8, 12, 20, 12));
@@ -167,5 +180,25 @@ public class AboutBox extends JDialog {
                 return;
             }
         }
+    }
+    
+    private void initIcon() {
+        if (icon != null) {
+            return;
+        }
+        
+        String frameIconFilename = System.getProperty("org.jessies.frameIcon");
+        if (frameIconFilename != null) {
+            setImage(frameIconFilename);
+        }
+    }
+    
+    public static void main(String[] args) {
+        GuiUtilities.initLookAndFeel();
+        AboutBox aboutBox = AboutBox.getSharedInstance();
+        aboutBox.setApplicationName("Demonstration");
+        aboutBox.setVersion("1.00", "374");
+        aboutBox.addCopyright("Copyright (C) 2006, Elliott Hughes");
+        aboutBox.setVisible(true);
     }
 }
