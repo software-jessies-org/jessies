@@ -2,6 +2,7 @@ package e.gui;
 
 import e.ptextarea.*;
 import e.util.*;
+import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -21,16 +22,17 @@ public class DebugMenu {
     }
     
     private static void showTextWindow(String title, String content) {
-        // FIXME: fixed font?
-        PTextArea textArea = new PTextArea();
+        PTextArea textArea = new PTextArea(40, 80);
+        textArea.setFont(new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 10));
         textArea.setText(content);
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setBorder(null);
         
-        // FIXME: use a better default size. 80x40?
         JFrame frame = new JFrame(title);
         frame.setContentPane(scrollPane);
+        frame.pack();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
     
