@@ -38,3 +38,25 @@ Items to be done for PTextArea:
     }
 
   that's not the width of the line, and never has been. so presumably we've only ever wrapped lines with tabs right when they've been very much longer than the width of the window. (because then we'll measure them properly, and thus wrap them correctly, despite being mistaken about how necessary it was to do so.)
+
+* [RFE] something i read suggested that you can get Xcode to wrap in such a way that it starts drawing wrapped lines at the level of the previous line's indent. so:
+
+  |----------------window width--------------|
+  class C {
+    void f() {
+      if (a) {
+        // this is a long comment up to the---
+  ------wrap mark. the editor indents the-----
+  ------wrapped line. i reckon this would-----
+  ------stop me from writing multi-line-------
+  ------C++-style comments and implying a-----
+  ------wrap width that isn't necessarily-----
+  ------what the reader's using.
+        g();
+      }
+    }
+  }
+
+  (only you'll have to imagine that the runs of '-' are our current wrap indicator.)
+
+  this may be another case of misunderstanding into something better than what was meant, but that sounds like an interesting idea.
