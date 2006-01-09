@@ -95,7 +95,6 @@ elsif test(?f, terminfo_DST) == false
 end
 
 options = []
-options.push("-Dorg.jessies.terminator.frameIcon=#{terminator_home}/lib/terminator-128.png")
 # Ruby knows the mapping from signal number to signal name, but Java doesn't
 # and POSIX doesn't either. So pass the information along to Java in a way
 # that won't leak through to our children.
@@ -105,7 +104,7 @@ Signal.list().each() {
 }
 
 invoker = Java.new("Terminator", "terminator/Terminator")
-invoker.dock_icon = "#{terminator_home}/lib/terminator.icns"
+invoker.set_icons("#{terminator_home}/lib/terminator.icns", "#{terminator_home}/lib/terminator-128.png")
 invoker.add_library_path_entries([ pty_path ])
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
 invoker.launcher = launcher
