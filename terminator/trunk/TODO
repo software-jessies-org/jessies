@@ -134,3 +134,8 @@
 
 * On Mac OS, we should probably do what Terminal does to subvert keystroke
   logging (http://www.cocoadev.com/index.pl?SecureKeyboardEntry).
+
+* On Mac OS, if you resize a Terminator window, it flashes white as it
+  seemingly fills the background before we do. if you force the LAF to be
+  Metal, it works. so it's something to do with the Aqua LAF. it's not fixed
+  by calling setOpaque(true) in JTerminalPane's constructor.
