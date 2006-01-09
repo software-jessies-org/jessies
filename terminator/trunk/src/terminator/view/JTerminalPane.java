@@ -136,8 +136,6 @@ public class JTerminalPane extends JPanel {
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setViewport(viewport);
 		
-		fixScrollBarForMacOs(scrollPane);
-		
 		add(scrollPane, BorderLayout.CENTER);
 		GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
 		
@@ -199,34 +197,6 @@ public class JTerminalPane extends JPanel {
 	
 	public JTextBuffer getTextPane() {
 		return textPane;
-	}
-	
-	/**
-	 * Mac OS' grow box intrudes in the lower right corner of every window.
-	 * In our case, with a scroll bar hard against the right edge of the
-	 * window, that means our down scroll arrow gets covered.
-	 */
-	private void fixScrollBarForMacOs(JScrollPane scrollPane) {
-		if (GuiUtilities.isMacOs() == false) {
-			return;
-		}
-		
-		// Make a JPanel the same size as the grow box.
-		final int size = (int) scrollPane.getVerticalScrollBar().getMinimumSize().getWidth();
-		JPanel growBoxPanel = new JPanel();
-		Dimension growBoxSize = new Dimension(size, size);
-		growBoxPanel.setPreferredSize(growBoxSize);
-		
-		// Stick the scroll pane's scroll bar in a new panel with
-		// our fake grow box at the bottom, so the real grow box
-		// can sit on top of it.
-		JPanel sidePanel = new JPanel(new BorderLayout());
-		sidePanel.add(scrollPane.getVerticalScrollBar(), BorderLayout.CENTER);
-		sidePanel.add(growBoxPanel, BorderLayout.SOUTH);
-		
-		// Put our scroll bar plus spacer panel against the edge of
-		// the window.
-		add(sidePanel, BorderLayout.EAST);
 	}
 	
 	/** Starts the process listening once all the user interface stuff is set up. */
