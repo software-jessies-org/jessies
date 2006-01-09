@@ -12,6 +12,8 @@ import javax.swing.event.*;
 import terminator.view.*;
 
 public class TerminatorFrame extends JFrame {
+	private static final Image FRAME_ICON = new ImageIcon(System.getProperty("org.jessies.frameIcon")).getImage();
+	
 	private Dimension terminalSize;
 	private JTabbedPane tabbedPane;
 	
@@ -84,27 +86,12 @@ public class TerminatorFrame extends JFrame {
 		setTitle(title.toString());
 	}
 	
-	/**
-	 * An icon to use for each frame, if the terminator shell script suggested one.
-	 */
-	private static final Image FRAME_ICON;
-	static {
-		String iconFile = System.getProperty("org.jessies.terminator.frameIcon");
-		FRAME_ICON = (iconFile != null) ? new ImageIcon(iconFile).getImage() : null;
-	}
-	
-	private void initIcon() {
-		if (FRAME_ICON != null) {
-			setIconImage(FRAME_ICON);
-		}
-	}
-	
 	private void initFrame() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		if (GuiUtilities.isMacOs() == false) {
 			setBackground(Options.getSharedInstance().getColor("background"));
 		}
-		initIcon();
+		setIconImage(FRAME_ICON);
 		
 		if (Options.getSharedInstance().shouldUseMenuBar()) {
 			setJMenuBar(new TerminatorMenuBar());
