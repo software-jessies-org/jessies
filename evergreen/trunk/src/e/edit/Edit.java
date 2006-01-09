@@ -20,10 +20,9 @@ import e.forms.*;
 import e.gui.*;
 import e.util.*;
 
-public class Edit implements com.apple.eawt.ApplicationListener {
+public class Edit {
     private static Edit instance;
     
-    private com.apple.eawt.Application application;
     private JFrame frame;
     private JTabbedPane tabbedPane;
     private TagsPanel tagsPanel;
@@ -447,41 +446,7 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     }
     
     public void initWindowIcon() {
-        ImageIcon icon = new ImageIcon(getResourceFilename("icon.gif"));
-        frame.setIconImage(icon.getImage());
-    }
-    
-    public void handleAbout(com.apple.eawt.ApplicationEvent e) {
-        showAlert("", "<html><b>Edit (see ChangeLog for author and version information)</b><p>Copyright (C) 2004-2006 Free Software Foundation, Inc.<p>This is free software; see the file COPYING for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
-        if (e != null) {
-            e.setHandled(true);
-        }
-    }
-    
-    public void handleOpenApplication(com.apple.eawt.ApplicationEvent e) {
-        Log.warn("handleOpenApplication");
-    }
-    
-    public void handleReOpenApplication(com.apple.eawt.ApplicationEvent e) {
-        Log.warn("handleReOpenApplication");
-    }
-    
-    public void handleOpenDocument(com.apple.eawt.ApplicationEvent e) {
-        Log.warn("handleOpenDocument");
-    }
-    public void handleOpenFile(com.apple.eawt.ApplicationEvent e) {
-        Log.warn("handleOpenFile");
-    }
-    
-    public void handlePreferences(com.apple.eawt.ApplicationEvent e) {
-        Log.warn("handlePreferences");
-    }
-    
-    public void handlePrintDocument(com.apple.eawt.ApplicationEvent e) {
-        Log.warn("handlePrintDocument");
-    }
-    public void handlePrintFile(com.apple.eawt.ApplicationEvent e) {
-        Log.warn("handlePrintFile");
+        frame.setIconImage(new ImageIcon(System.getProperty("org.jessies.frameIcon")).getImage());
     }
     
     /**
@@ -744,13 +709,31 @@ public class Edit implements com.apple.eawt.ApplicationListener {
     
     private Edit() {
     }
-
+    
+    private void initMacOs() {
+        if (GuiUtilities.isMacOs() == false) {
+            return;
+        }
+        com.apple.eawt.Application.getApplication().addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
+            public void handleQuit(com.apple.eawt.ApplicationEvent e) {
+                Edit.this.handleQuit(e);
+            }
+        });
+    }
+    
+    private void initAboutBox() {
+        AboutBox aboutBox = AboutBox.getSharedInstance();
+        aboutBox.setApplicationName("Edit");
+        aboutBox.addCopyright("Copyright (C) 2004-2006 Free Software Foundation, Inc.");
+        aboutBox.addCopyright("All Rights Reserved.");
+    }
+    
     private void init() {
         long start = System.currentTimeMillis();
         
-        application = new com.apple.eawt.Application();
-        application.addApplicationListener(this);
-
+        initMacOs();
+        initAboutBox();
+        
         frame = new JFrame("Edit");
         frame.setJMenuBar(new EditMenuBar());
         
