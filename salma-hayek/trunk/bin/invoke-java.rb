@@ -20,13 +20,13 @@ end
 
 class Java
   attr_accessor(:dock_name)
-  attr_accessor(:dock_icon)
   attr_accessor(:launcher)
   attr_accessor(:log_filename)
 
   def initialize(name, class_name)
     @dock_name = name
     @dock_icon = ""
+    @png_icon = ""
     @class_name = class_name
     @launcher = "java"
     @log_filename = ""
@@ -54,7 +54,12 @@ class Java
   def add_extra_java_arguments(new_java_arguments)
     @extra_java_arguments.concat(new_java_arguments)
   end
-
+  
+  def set_icons(dock_icon, png_icon)
+    @dock_icon = dock_icon
+    @png_icon = png_icon
+  end
+  
   def init_default_heap_size()
     # Default heap size.
     @heap_size = "1g"
@@ -143,6 +148,7 @@ class Java
       args << "-Xdock:name=#{@dock_name}"
       args << "-Xdock:icon=#{@dock_icon}"
     end
+    args << "-Dorg.jessies.frameIcon=#{@png_icon}"
     args.concat(@extra_java_arguments)
     args << @class_name
     args.concat(extra_app_arguments)
