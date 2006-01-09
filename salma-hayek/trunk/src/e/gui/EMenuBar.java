@@ -2,6 +2,7 @@ package e.gui;
 
 import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -38,6 +39,61 @@ public class EMenuBar extends JMenuBar {
         return super.add(menu);
     }
     
+    /**
+     * Overridden here to check whether the Action (rather than the JMenuItem) is enabled.
+     * Overridden in JMenuBar to check all the child menus.
+     */
+    @Override
+    protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+        boolean haveLocalBinding = super.processKeyBinding(ks, e, condition, pressed);
+        if (haveLocalBinding) {
+            return true;
+        }
+        MenuElement[] subElements = getSubElements();
+        for (MenuElement subElement : getSubElements()) {
+            if (processBindingForKeyStrokeRecursive(subElement, ks, e, condition, pressed)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean processBindingForKeyStrokeRecursive(MenuElement element, KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+        if (element == null) {
+            return false;
+        }
+        
+        Component c = element.getComponent();
+        if (c != null && c instanceof JMenuItem && processJMenuItemKeyBinding((JMenuItem) c, ks, e, condition, pressed)) {
+            return true;
+        }
+        
+        for(MenuElement subElement : element.getSubElements()) {
+            if (processBindingForKeyStrokeRecursive(subElement, ks, e, condition, pressed)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private static boolean processJMenuItemKeyBinding(JMenuItem item, KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+        InputMap map = item.getInputMap(condition);
+        ActionMap am = item.getActionMap();
+        if (map == null || am == null) {
+            return false;
+        }
+        Object binding = map.get(ks);
+        if (binding == null) {
+            return false;
+        }
+        Action action = am.get(binding);
+        // This is the key change: we check Action.isEnabled rather than JMenuItem.isEnabled.
+        if (action == null || action.isEnabled() == false) {
+            return false;
+        }
+        return SwingUtilities.notifyAction(action, ks, e, item, e.getModifiers());
+    }
+    
     private static class MenuItemStateUpdater implements MenuListener {
         private static final MenuListener INSTANCE = new MenuItemStateUpdater();
         
@@ -61,7 +117,7 @@ public class EMenuBar extends JMenuBar {
                 } else {
                     JMenuItem menuItem = (JMenuItem) elements[i];
                     Action action = menuItem.getAction();
-                    if (action == null) {
+                    if (action == null && menuItem instanceof JMenu == false) {
                         Log.warn("Actionless menu item found: " + menuItem);
                     } else {
                         menuItem.setEnabled(action.isEnabled());
@@ -75,7 +131,7 @@ public class EMenuBar extends JMenuBar {
             for (int i = 0; i < elements.length; i++) {
                 JMenuItem menuItem = (JMenuItem) elements[i];
                 Action action = menuItem.getAction();
-                if (action == null) {
+                if (action == null && menuItem instanceof JMenu == false) {
                     Log.warn("Actionless popup menu item found: " + menuItem);
                 } else {
                     menuItem.setEnabled(action.isEnabled());
