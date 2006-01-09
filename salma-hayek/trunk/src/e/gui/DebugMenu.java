@@ -15,6 +15,17 @@ public class DebugMenu {
         JMenu menu = new JMenu("Debug");
         menu.add(new ShowEnvironmentAction());
         menu.add(new ShowSystemPropertiesAction());
+        menu.addSeparator();
+        menu.add(makeChangeLafMenu());
+        return menu;
+    }
+    
+    private static JMenu makeChangeLafMenu() {
+        JMenu menu = new JMenu("Look And Feel");
+        UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
+        for (UIManager.LookAndFeelInfo laf : lafs) {
+            menu.add(new ChangeLookAndFeelAction(laf.getName(), laf.getClassName()));
+        }
         return menu;
     }
     
@@ -83,6 +94,30 @@ public class DebugMenu {
                 result.put(key, StringUtilities.escapeForJava(properties.getProperty(key)));
             }
             return result;
+        }
+    }
+    
+    private static class ChangeLookAndFeelAction extends AbstractAction {
+        private String lafClassName;
+        
+        public ChangeLookAndFeelAction(String name, String lafClassName) {
+            super(name);
+            this.lafClassName = lafClassName;
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            changeLookAndFeel();
+        }
+        
+        private void changeLookAndFeel() {
+            try {
+                UIManager.setLookAndFeel(lafClassName);
+                for (Frame frame : Frame.getFrames()) {
+                    SwingUtilities.updateComponentTreeUI(frame);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }
