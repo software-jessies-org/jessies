@@ -134,3 +134,10 @@
 
 * On Mac OS, we should probably do what Terminal does to subvert keystroke
   logging (http://www.cocoadev.com/index.pl?SecureKeyboardEntry).
+
+* On Mac OS, we shouldn't pass through environment variables such as
+  APP_ICON_<pid>, APP_NAME_<pid>, DEBUGGING_TERMINATOR, JAVA_MAIN_CLASS_<pid>,
+  TERMINATOR_HOME. If we're started from Terminal, we might also want to
+  suppress TERM_PROGRAM and TERM_PROGRAM_VERSION, though this shouldn't be
+  common usage. I'm not sure about the correct behavior as regards
+  SECURITYSESSIONID.
