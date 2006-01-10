@@ -4,6 +4,7 @@ import e.util.Log;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.lang.management.*;
 import java.util.*;
 
 /**
@@ -94,6 +95,20 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             reportedHang = true;
             String stackTrace = stackTraceToString(eventDispatchThread.getStackTrace());
             Log.warn("(hang #" + ++hangCount + ") event dispatch thread stuck processing event for " +  timeSoFar() + " ms:" + stackTrace);
+            checkForDeadlock();
+        }
+        
+        private void checkForDeadlock() {
+            ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+            long[] threadIds = threadBean.findMonitorDeadlockedThreads();
+            if (threadIds == null) {
+                return;
+            }
+            Log.warn("deadlock detected involving the following threads:");
+            ThreadInfo[] threadInfos = threadBean.getThreadInfo(threadIds, Integer.MAX_VALUE);
+            for (ThreadInfo info : threadInfos) {
+                Log.warn("Thread #" + info.getThreadId() + " " + info.getThreadName() + " (" + info.getThreadState() + ") waiting on " + info.getLockName() + " held by " + info.getLockOwnerName() + stackTraceToString(info.getStackTrace()));
+            }
         }
         
         private String stackTraceToString(StackTraceElement[] stackTrace) {
