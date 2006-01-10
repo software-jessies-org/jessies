@@ -22,7 +22,18 @@ end
 DISPLAY = ENV["DISPLAY"]
 server_port_file = "#{log_directory}/.terminator-server-port#{DISPLAY}"
 
-if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
+def tryInAppServer(server_port_file)
+  if ENV["DEBUGGING_TERMINATOR"]
+    return
+  end
+  if test(?f, server_port_file) == false
+    return
+  end
+  # If anything's changed, we don't want to connect to the existing process.
+  # This approximation to the right test is close enough to cope with install-everything.sh's nightly re-installation.
+  if FileUtils.uptodate?(server_port_file, [__FILE__]) == false
+    return
+  end
   command = ARGV.join("\0")
   # See if there's already a Terminator running that can open us a new window.
   # This lets us emulate the Mac OS behavior when clicking on the Dock icon
@@ -47,6 +58,8 @@ if ENV["DEBUGGING_TERMINATOR"] == nil && test(?f, server_port_file)
     # fall through...
   end
 end
+
+tryInAppServer(server_port_file)
 
 pty_path = "#{terminator_home}/.generated/native/all/pty/#{target_os()}"
 
