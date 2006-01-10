@@ -26,16 +26,17 @@ def tryInAppServer(server_port_file)
   if ENV["DEBUGGING_TERMINATOR"]
     return
   end
-  # What we'd *like* to do here is to start a new process if anything's changed.
-  # This is just an approximation but it's close enough for install-everything.sh users.
+  # We should start a new Terminator if the client (this script) is new than
+  # the server (the currently-running Terminator). Checking just the
+  # modification time of just the script is only an approximation, but it's
+  # close enough for users who'll install all the files at once anyway.
   if FileUtils.uptodate?(server_port_file, [__FILE__]) == false
     return
   end
-  command = ARGV.join("\0")
-  # This stops an existing terminal's options being changed under it
-  # and stops arbitrary commands being executed by anyone who can work out
-  # the socket and protocol.
-  if command.empty?() == false
+  # We only support the simple "new shell" case. Allowing the execution of
+  # arbitrary commands would be a security hole. This is, as explained below,
+  # simply a performance optimization.
+  if ARGV.empty?() == false
     return
   end
   # See if there's already a Terminator running that can open us a new window.
@@ -53,7 +54,7 @@ def tryInAppServer(server_port_file)
     
     require "net/telnet"
     telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port, 'Telnetmode' => false)
-    telnet.puts("newTerminal #{command}")
+    telnet.puts("newShell")
     print(telnet.readlines().join(""))
     telnet.close()
     exit(0)
