@@ -91,6 +91,8 @@ public class EMenuBar extends JMenuBar {
         if (action == null || action.isEnabled() == false) {
             return false;
         }
+        // SwingUtilities.notifyAction checks whether the sender is enabled.
+        item.setEnabled(true);
         return SwingUtilities.notifyAction(action, ks, e, item, e.getModifiers());
     }
     
