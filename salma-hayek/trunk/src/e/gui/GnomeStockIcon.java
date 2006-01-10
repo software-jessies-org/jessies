@@ -34,6 +34,17 @@ public class GnomeStockIcon {
     }
     
     /**
+     * Sets the button's icon to the given GNOME stock icon, assuming
+     * it's available.
+     */
+    public static void useStockIcon(JButton button, String name) {
+        Icon icon = getStockIcon(name, Size.GTK_ICON_SIZE_BUTTON);
+        if (icon != null) {
+            button.setIcon(icon);
+        }
+    }
+    
+    /**
      * Returns an Icon for one of the GNOME stock icons. If the icon is not
      * available for any reason, you'll get null. (Not using the GTK LAF is
      * one reason why.)
