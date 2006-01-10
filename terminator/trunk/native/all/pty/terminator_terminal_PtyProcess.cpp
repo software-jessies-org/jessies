@@ -18,7 +18,9 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef __APPLE__ // sysctl.h doesn't exist on Cygwin.
 #include <sys/sysctl.h>
+#endif
 #include <sys/wait.h>
 
 #include <deque>
