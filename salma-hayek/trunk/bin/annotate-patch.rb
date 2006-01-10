@@ -113,6 +113,7 @@ def annotate_patch()
     plus_tags = tags_for_file($1)
     minus_tags = tags_for_file($1)
    end
+   next # SCM displays nicer-looking patches if we elide these lines.
   elsif line =~ /^\+\+\+ (\S+)\s/
    if test(?r, $1)
     plus_tags = tags_for_file($1)
