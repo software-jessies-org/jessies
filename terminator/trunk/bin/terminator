@@ -26,15 +26,18 @@ def tryInAppServer(server_port_file)
   if ENV["DEBUGGING_TERMINATOR"]
     return
   end
-  if test(?f, server_port_file) == false
-    return
-  end
-  # If anything's changed, we don't want to connect to the existing process.
-  # This approximation to the right test is close enough to cope with install-everything.sh's nightly re-installation.
+  # What we'd *like* to do here is to start a new process if anything's changed.
+  # This is just an approximation but it's close enough for install-everything.sh users.
   if FileUtils.uptodate?(server_port_file, [__FILE__]) == false
     return
   end
   command = ARGV.join("\0")
+  # This stops an existing terminal's options being changed under it
+  # and stops arbitrary commands being executed by anyone who can work out
+  # the socket and protocol.
+  if command.empty?() == false
+    return
+  end
   # See if there's already a Terminator running that can open us a new window.
   # This lets us emulate the Mac OS behavior when clicking on the Dock icon
   # on Linux (from gnome-panel or whatever). In particular, using this trick
