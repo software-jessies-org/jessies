@@ -82,15 +82,7 @@ for PROJECT in $PROJECTS; do
     fi
 done
 
-# Although /proc/mounts is Linux-specific, it doesn't hang when one of the mounts is
-# currently unavailable.
-cat /proc/mounts | perl -ne '
-if (m@^/dev/\w+ (/home/\w+) @) {
-    system("echo rm -f $1/.terminal-logs/.terminator-server-port | bash -x");
-}'
-# If you've left Edit running overnight (as I sometimes do), you won't expect the first file
-# you edit in the morning from Terminator to spawn a new Edit.
-#rm -f ~/.e.edit.Edit/edit-server-port
+# Now we're root, we have a useful opportunity to get the terminfo installed system-wide.
 tic terminator/lib/terminfo/terminator.tic
 
 # Put links to each of our shell scripts in /usr/local/bin.
