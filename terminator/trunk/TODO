@@ -103,6 +103,15 @@
 * On Mac OS, Safari-style tabs would be much better than the usual Aqua ones
   for our purposes. They take up significantly less space, and don't require
   a border. We'd have to implement them ourselves, though.
+  There are two choices: we could use a UI delegate (there are a couple of
+  nice examples at http://blog.elevenworks.com/?p=5), or we could implement
+  our own component. The former is easier, but the latter is perhaps the
+  better idea. Other than improving appearance (and taking less space), it
+  would be good to offer more sensible behavior when the combined width of
+  the tab labels exceeds the window width (Safari, like most systems' tool
+  bars, adds a ">>" button to show a menu of the other tabs), and we could
+  offer arbitrary components in tab "ears" ahead of Java 6 (so we could
+  show that there's output occurring on a background tab, say).
 
 * If the user tries to close a window with a still-running process, and we
   can see that it's not a childless shell, we should ask for confirmation.
