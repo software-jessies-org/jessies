@@ -60,3 +60,8 @@ Items to be done for PTextArea:
   (only you'll have to imagine that the runs of '-' are our current wrap indicator.)
 
   this may be another case of misunderstanding into something better than what was meant, but that sounds like an interesting idea.
+
+General stuff:
+
+* Here's a really cool auto-update system (for Cocoa) that it would be nice to imitate: 
+  http://www.andymatuschak.org/articles/2006/01/09/introducing-sparkle-easy-self-updates-for-all
