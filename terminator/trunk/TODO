@@ -112,6 +112,13 @@
   bars, adds a ">>" button to show a menu of the other tabs), and we could
   offer arbitrary components in tab "ears" ahead of Java 6 (so we could
   show that there's output occurring on a background tab, say).
+  I just noticed that Safari's tab abbreviation is intelligent in that it
+  won't repeat any prefix that appears on another tab. I haven't fully
+  characterized the behavior, but it certainly works pretty well. Of course,
+  we're a lot less likely to have tab titles containing separate words.
+  I wonder if -- in the absence of any way to get bash to interpret its $PS1
+  escapes so we can put them in the window title -- it's worth writing our
+  own program to set the window title?
 
 * If the user tries to close a window with a still-running process, and we
   can see that it's not a childless shell, we should ask for confirmation.
