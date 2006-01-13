@@ -115,7 +115,6 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
     }
     
     private Component createToolBar() {
-        JToolBar p = new JToolBar();
         JButton launchButton = new JButton("Start");
         launchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -157,13 +156,15 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
         });
         stepOutButton.setEnabled(false);
         
-        p.add(launchButton);
-        p.add(suspendButton);
-        p.add(stepButton);
-        p.add(stepOverButton);
-        p.add(stepOutButton);
+        JToolBar toolBar = new JToolBar();
+        toolBar.setFloatable(false);
+        toolBar.add(launchButton);
+        toolBar.add(suspendButton);
+        toolBar.add(stepButton);
+        toolBar.add(stepOverButton);
+        toolBar.add(stepOutButton);
         stepButtons = Arrays.asList(new JButton[] { stepButton, stepOverButton, stepOutButton });
-        return p;
+        return toolBar;
     }
     
     public void setStatusText(String text) {
