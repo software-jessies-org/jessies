@@ -125,6 +125,10 @@ public class TerminalControl {
 		return automaticNewline;
 	}
 	
+	/**
+	 * Invoked both on construction to set the defaults and by the "Reset"
+	 * action in the UI.
+	 */
 	public void reset() {
 		setAutomaticNewline(false);
 		invokeCharacterSet(0);
@@ -132,6 +136,9 @@ public class TerminalControl {
 		designateCharacterSet(1, '0');
 		designateCharacterSet(2, 'B');
 		designateCharacterSet(3, 'B');
+		if (listener != null) {
+			listener.setStyle(StyledText.getDefaultStyle());
+		}
 	}
 	
 	public void designateCharacterSet(int index, char set) {
