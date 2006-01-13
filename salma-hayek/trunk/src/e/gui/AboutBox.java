@@ -74,6 +74,10 @@ public class AboutBox extends JDialog {
     private void makeUi() {
         // FIXME: add GNOME and Win32 implementations.
         makeMacUi();
+        if (GuiUtilities.isMacOs() == false) {
+            // GNOME and Win32 applications give their about boxes titles.
+            setTitle("About " + applicationName);
+        }
     }
     
     private void makeMacUi() {
