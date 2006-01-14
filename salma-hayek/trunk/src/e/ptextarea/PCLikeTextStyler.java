@@ -11,6 +11,10 @@ import e.util.*;
  * multi-line comment structures, quoted strings, and how to find keywords in
  * what's left over.
  * 
+ * FIXME: we need to be able to turn off C-style comments for many of our subclasses.
+ * FIXME: it would be nice to support arbitrary multiline comment styles, such as HTML's "<!--" and "-->". (That's probably the only other one worth worrying about.)
+ * FIXME: we need support for back-quoted expressions in various languages.
+ * 
  * @author Phil Norman
  */
 public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PTextListener {
@@ -48,8 +52,13 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     private void initStyleApplicator() {
         addKeywordsTo(keywords);
         if (keywords.size() > 0) {
-            textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords));
+            textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords, getKeywordRegularExpression()));
         }
+    }
+    
+    // This is parameterized so that we can recognize the GNU make keyword "filter-out".
+    protected String getKeywordRegularExpression() {
+        return "\\b(\\w+)\\b";
     }
     
     private void initCommentCache() {
@@ -110,7 +119,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                     } else {
                         i++;
                     }
-                } else if (ch == '"' || ch == '\'') {
+                } else if (isQuote(ch)) {
                     if (lastStart < i) {
                         builder.addStyledSegment(i, PStyle.NORMAL);
                     }
@@ -224,7 +233,10 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         return comment;
     }
     
-    /** Returns true iff the given char is a quote of some sort. */
+    /**
+     * Returns true iff the given character is a quote of some sort.
+     * It's safe to override this and reduce the number of quote characters, but increasing the number is untested.
+     */
     public boolean isQuote(char ch) {
         return (ch == '\'' || ch == '\"');
     }
