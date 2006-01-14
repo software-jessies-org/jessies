@@ -66,6 +66,11 @@ public class PRubyTextStyler extends PCLikeTextStyler {
         return false;
     }
     
+    @Override
+    public boolean isQuote(char ch) {
+        return (ch == '\'' || ch == '\"' || ch == '`');
+    }
+    
     public void addKeywordsTo(Collection<String> collection) {
         collection.addAll(Arrays.asList(KEYWORDS));
     }

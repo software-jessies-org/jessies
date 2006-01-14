@@ -11,8 +11,7 @@ import e.util.*;
  * multi-line comment structures, quoted strings, and how to find keywords in
  * what's left over.
  * 
- * FIXME: it would be nice to support arbitrary multiline comment styles, such as HTML's "<!--" and "-->". (That's probably the only other one worth worrying about.)
- * FIXME: we need support for back-quoted expressions in various languages.
+ * FIXME: it would be nice to support arbitrary multiline comment styles, such as HTML's "<!--" and "-->". (That's probably the only other one worth worrying about. Perl and Ruby have various multiline quoting mechanisms, but they're a lesser priority than having an HTML styler.)
  * 
  * @author Phil Norman
  */
@@ -239,7 +238,8 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     
     /**
      * Returns true iff the given character is a quote of some sort.
-     * It's safe to override this and reduce the number of quote characters, but increasing the number is untested.
+     * It's safe to override this and increase or reduce the number of quote characters.
+     * The makefile styler removes single quotes, for example, and the scripting language stylers add backquote.
      */
     public boolean isQuote(char ch) {
         return (ch == '\'' || ch == '\"');
