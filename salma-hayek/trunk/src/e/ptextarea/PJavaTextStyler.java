@@ -86,6 +86,7 @@ public class PJavaTextStyler extends PAbstractLanguageStyler {
     }
     
     private void addSegments(PAbstractLanguageStyler.TextSegmentListBuilder builder, String string, int start, int end, int maxChars) {
+        boolean isCharacterLiteral = (maxChars == 1);
         boolean segmentIsValid = true;
         int charCount = 0;
         // The increment step is done inside the loop.
@@ -107,7 +108,7 @@ public class PJavaTextStyler extends PAbstractLanguageStyler {
                                 break;
                             }
                         }
-                    } else if (isBasicEscapeCharacter(string.charAt(i + 1))) {
+                    } else if (isBasicEscapeCharacter(isCharacterLiteral, string.charAt(i + 1))) {
                         increment = 2;
                     } else if (string.charAt(i + 1) == 'u') {
                         // From section 3.3 (Unicode Escapes) of the JLS.
@@ -158,10 +159,15 @@ public class PJavaTextStyler extends PAbstractLanguageStyler {
         return escapeHex.matches("[\\\\]u000[AaDd]") || escapeHex.matches(matchingQuoteUnicode);
     }
     
-    private boolean isBasicEscapeCharacter(char ch) {
+    private boolean isBasicEscapeCharacter(boolean isCharacterLiteral, char ch) {
         // From section 3.10.6 (Escape Sequences for Character and String Literals) of the JLS.
         switch (ch) {
         case 'b':  // Backspace
+            // \b is vanishingly rare in Java. It's far more likely you're writing a regular expression and mean \\b.
+            // Every single use of \b in the JDK is as a character literal. Likewise in all our source.
+            // I've wasted enough time on this particular mistake over the years, so let's assume that \b in a string literal is an error.
+            // FIXME: if we ever have complaints about this, add a tool tip explaining why we show \b in a string literal as an error, rather than blindly accepting it.
+            return isCharacterLiteral;
         case 't':  // Tab
         case 'n':  // Linefeed
         case 'f':  // Form feed
