@@ -7,7 +7,7 @@ import java.util.*;
  * 
  * @author Phil Norman
  */
-public class PCTextStyler extends PCLikeTextStyler {
+public class PCTextStyler extends PAbstractLanguageStyler {
     private static final String[] KEYWORDS = new String[] {
         "auto",
         "break",

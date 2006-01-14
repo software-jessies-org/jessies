@@ -2,7 +2,7 @@ package e.ptextarea;
 
 import java.util.*;
 
-public class PBashTextStyler extends PCLikeTextStyler {
+public class PBashTextStyler extends PAbstractLanguageStyler {
     private static final String[] KEYWORDS = new String[] {
         // "Compound Commands", bash man page.
         "case",

@@ -7,7 +7,7 @@ import java.util.*;
  * 
  * @author Phil Norman
  */
-public class PJavaTextStyler extends PCLikeTextStyler {
+public class PJavaTextStyler extends PAbstractLanguageStyler {
     private static final String[] KEYWORDS = new String[] {
         // JLS3, section 3.9: "Keywords"
         "abstract",
@@ -77,7 +77,7 @@ public class PJavaTextStyler extends PCLikeTextStyler {
      * string format and introducing error segment types where appropriate.
      */
     @Override
-    public void addStringSegment(PCLikeTextStyler.TextSegmentListBuilder builder, String line, int start, int end) {
+    public void addStringSegment(PAbstractLanguageStyler.TextSegmentListBuilder builder, String line, int start, int end) {
         if (line.charAt(start) == '\'') {
             addSegments(builder, line, start, end, 1);
         } else {
@@ -85,7 +85,7 @@ public class PJavaTextStyler extends PCLikeTextStyler {
         }
     }
     
-    private void addSegments(PCLikeTextStyler.TextSegmentListBuilder builder, String string, int start, int end, int maxChars) {
+    private void addSegments(PAbstractLanguageStyler.TextSegmentListBuilder builder, String string, int start, int end, int maxChars) {
         boolean segmentIsValid = true;
         int charCount = 0;
         // The increment step is done inside the loop.

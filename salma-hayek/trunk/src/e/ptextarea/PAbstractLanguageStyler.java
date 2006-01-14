@@ -5,22 +5,26 @@ import java.util.regex.*;
 import e.util.*;
 
 /**
- * A PCLikeTextStyler does the main work for the C, C++ and Java stylers.  The
- * various subclasses (supporting languages such as C++ and Java) configure
- * functionality implemented here.  This class understands the single- and
- * multi-line comment structures, quoted strings, and how to find keywords in
- * what's left over.
+ * A PAbstractLanguageStyler does the main work for most of the various
+ * computer language's stylers. Subclasses configure functionality implemented
+ * here via overriding.
+ * 
+ * This class understands the shell (hash), C (slash star), and C++ (double
+ * slash) comment structures. It also understands quoting (configurable to use
+ * any set of single-character quote characters such as single and double quote
+ * or backquote. It also understands how to find keywords in what's left over,
+ * given a fixed set of keywords.
  * 
  * FIXME: it would be nice to support arbitrary multiline comment styles, such as HTML's "<!--" and "-->". (That's probably the only other one worth worrying about. Perl and Ruby have various multiline quoting mechanisms, but they're a lesser priority than having an HTML styler.)
  * 
  * @author Phil Norman
  */
-public abstract class PCLikeTextStyler extends PAbstractTextStyler {
+public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
     private HashSet<String> keywords = new HashSet<String>();
     private int lastGoodLine;
     private BitSet commentCache;
     
-    public PCLikeTextStyler(PTextArea textArea) {
+    public PAbstractLanguageStyler(PTextArea textArea) {
         super(textArea);
         initCommentCache();
         initStyleApplicator();

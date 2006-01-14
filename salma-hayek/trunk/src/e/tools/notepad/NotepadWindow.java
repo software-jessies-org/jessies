@@ -55,7 +55,7 @@ public class NotepadWindow extends JFrame {
         // FIXME: I notice that most users of PTextListener are slightly
         // inconvenienced by the fact that there are three separate methods.
         // Only some of the internal PTextArea classes actually make use of
-        // this. (Is PCLikeTextStyler's behavior in face of
+        // this. (Is PAbstractLanguageStyler's behavior in face of
         // textCompletelyReplaced correct? It seems to do too little.)
         textArea.getTextBuffer().addTextListener(new PTextListener() {
             public void textCompletelyReplaced(PTextEvent e) {

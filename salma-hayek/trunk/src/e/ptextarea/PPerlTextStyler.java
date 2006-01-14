@@ -2,7 +2,7 @@ package e.ptextarea;
 
 import java.util.*;
 
-public class PPerlTextStyler extends PCLikeTextStyler {
+public class PPerlTextStyler extends PAbstractLanguageStyler {
     private static final String[] KEYWORDS = new String[] {
         // Find/Replaced into shape from the latest revision of "keywords.pl",
         // found at http://public.activestate.com/cgi-bin/perlbrowse?file=keywords.pl&rev=

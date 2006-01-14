@@ -2,7 +2,7 @@ package e.ptextarea;
 
 import java.util.*;
 
-public class PMakefileTextStyler extends PCLikeTextStyler {
+public class PMakefileTextStyler extends PAbstractLanguageStyler {
     // http://www.gnu.org/software/make/manual/html_mono/make.html.gz "Index of Functions, Variables, & Directives":
     private static final String[] KEYWORDS = new String[] {
         "addprefix",

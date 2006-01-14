@@ -2,7 +2,7 @@ package e.ptextarea;
 
 import java.util.*;
 
-public class PRubyTextStyler extends PCLikeTextStyler {
+public class PRubyTextStyler extends PAbstractLanguageStyler {
     // http://www.rubycentral.com/book/language.html table 18.3 "Reserved Words":
     private static final String[] KEYWORDS = new String[] {
         "__FILE__",
