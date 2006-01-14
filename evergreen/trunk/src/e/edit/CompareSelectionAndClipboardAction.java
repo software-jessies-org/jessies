@@ -22,7 +22,7 @@ import e.util.*;
  * 
  * 2. Suppose you're comparing code where someone's changed an identifier or
  *    a magic number, and there are bogus differences where all you need is a
- *    parameter. Would something like replaceAll("\b(\\d+|0x[0-9a-fA-F]+)\b",
+ *    parameter. Would something like replaceAll("\\b(\\d+|0x[0-9a-fA-F]+)\\b",
  *    "123") to replace numeric literals with one constant -- and similar for
  *    string literals and identifiers -- be helpful?
  */
