@@ -15,7 +15,7 @@ import e.util.*;
  * 
  * @author Phil Norman
  */
-public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PTextListener {
+public abstract class PCLikeTextStyler extends PAbstractTextStyler {
     private HashSet<String> keywords = new HashSet<String>();
     private int lastGoodLine;
     private BitSet commentCache;
@@ -24,7 +24,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         super(textArea);
         initCommentCache();
         initStyleApplicator();
-        textArea.getTextBuffer().addTextListener(this);
+        initTextListener();
         textArea.setTextStyler(this);
     }
     
@@ -57,6 +57,22 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
         if (keywords.size() > 0) {
             textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords, getKeywordRegularExpression()));
         }
+    }
+    
+    private void initTextListener() {
+        textArea.getTextBuffer().addTextListener(new PTextListener() {
+            public void textCompletelyReplaced(PTextEvent event) {
+                initCommentCache();
+            }
+            
+            public void textInserted(PTextEvent event) {
+                dirtyFromOffset(event);
+            }
+            
+            public void textRemoved(PTextEvent event) {
+                dirtyFromOffset(event);
+            }
+        });
     }
     
     // This is parameterized so that we can recognize the GNU make keyword "filter-out".
@@ -244,14 +260,6 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     protected boolean isQuote(char ch) {
         return (ch == '\'' || ch == '\"');
     }
-
-    public void textInserted(PTextEvent event) {
-        dirtyFromOffset(event);
-    }
-    
-    public void textRemoved(PTextEvent event) {
-        dirtyFromOffset(event);
-    }
     
     private void dirtyFromOffset(PTextEvent event) {
         if (textArea.isLineWrappingInvalid()) {
@@ -279,10 +287,6 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     
     private boolean hasCommentMarker(String text) {
         return text.contains("/*") || text.contains("*/");
-    }
-    
-    public void textCompletelyReplaced(PTextEvent event) {
-        initCommentCache();
     }
     
     protected class TextSegmentListBuilder {
