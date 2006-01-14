@@ -14,9 +14,14 @@
 #   unnecessarily difficult to switch if you need to test with a newer or
 #   older version. Also, since the OS probably installed the symbolic
 #   links in /usr/bin, they're prone to being overwritten without your
-#   direct consent.
-# * Using aliases has the same problem, and is also specific to your particular
-#   shell, so isn't usefully inherited by subprocesses.
+#   direct consent. Other applications may (reasonably) assume that
+#   the links haven't been meddled with. It makes it more likely that you're
+#   testing with an unusual (and unsupported) configuration; if you rely on
+#   the modified symbolic link to function, you won't necessarily recognize
+#   this until someone tries to run your program on their standard system.
+# * Using aliases requires an alias for each program, and is also specific to
+#   your particular shell, so isn't usefully inherited by subprocesses which
+#   can make testing more confusing.
 # * Using $JAVA_HOME -- as was common practice in Java 1.1 days -- requires
 #   everyone to abide by the (deprecated) convention. Because you're probably
 #   still running the tools from $PATH regardless of any $JAVA_HOME setting,
