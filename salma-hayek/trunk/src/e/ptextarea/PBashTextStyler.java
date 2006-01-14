@@ -81,22 +81,22 @@ public class PBashTextStyler extends PCLikeTextStyler {
     }
     
     @Override
-    public boolean supportShellComments() {
+    protected boolean supportShellComments() {
         return true;
     }
     
     @Override
-    public boolean supportDoubleSlashComments() {
+    protected boolean supportDoubleSlashComments() {
         return false;
     }
     
     @Override
-    public boolean supportSlashStarComments() {
+    protected boolean supportSlashStarComments() {
         return false;
     }
     
     @Override
-    public boolean isQuote(char ch) {
+    protected boolean isQuote(char ch) {
         return (ch == '\'' || ch == '\"' || ch == '`');
     }
     

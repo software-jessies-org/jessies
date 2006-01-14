@@ -31,17 +31,17 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
     /**
      * Returns true if the styler should comment to end of line on seeing '#'.
      */
-    public abstract boolean supportShellComments();
+    protected abstract boolean supportShellComments();
     
     /**
      * Returns true if the styler should comment to end of line on seeing '//'.
      */
-    public abstract boolean supportDoubleSlashComments();
+    protected abstract boolean supportDoubleSlashComments();
     
     /**
      * Returns true if the style should count text in a C-like comment (such as this) as comment.
      */
-    public abstract boolean supportSlashStarComments();
+    protected abstract boolean supportSlashStarComments();
     
     /**
      * Adds a text segment of type String to the given segment list.  Override
@@ -241,7 +241,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
      * It's safe to override this and increase or reduce the number of quote characters.
      * The makefile styler removes single quotes, for example, and the scripting language stylers add backquote.
      */
-    public boolean isQuote(char ch) {
+    protected boolean isQuote(char ch) {
         return (ch == '\'' || ch == '\"');
     }
 

@@ -95,17 +95,17 @@ public class PCPPTextStyler extends PCLikeTextStyler {
     }
     
     @Override
-    public boolean supportShellComments() {
+    protected boolean supportShellComments() {
         return false;
     }
     
     @Override
-    public boolean supportDoubleSlashComments() {
+    protected boolean supportDoubleSlashComments() {
         return true;
     }
     
     @Override
-    public boolean supportSlashStarComments() {
+    protected boolean supportSlashStarComments() {
         return true;
     }
     
