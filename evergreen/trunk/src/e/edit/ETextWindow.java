@@ -50,6 +50,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     public static final String BASH = "Bash";
     public static final String C_PLUS_PLUS = "C++";
     public static final String JAVA = "Java";
+    public static final String MAKE = "Make";
     public static final String RUBY = "Ruby";
     public static final String PERL = "Perl";
     
@@ -366,6 +367,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             fileType = PERL;
         } else if (filename.endsWith(".rb")) {
             fileType = RUBY;
+        } else if (filename.equals("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
+            fileType = MAKE;
         } else {
             fileType = UNKNOWN;
         }
@@ -388,6 +391,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             text.setTextStyler(new PPerlTextStyler(text));
         } else if (fileType == BASH) {
             text.setTextStyler(new PBashTextStyler(text));
+        } else if (fileType == MAKE) {
+            text.setTextStyler(new PMakefileTextStyler(text));
         } else {
             // Plain text.
             text.setWrapStyleWord(true);
