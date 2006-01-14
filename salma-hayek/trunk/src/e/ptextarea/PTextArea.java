@@ -69,6 +69,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         this.indenter = new PDefaultIndenter(this);
         
         addStyleApplicator(new UnprintableCharacterStyleApplicator(this));
+        addStyleApplicator(new HyperlinkStyleApplicator(this));
         lines.addLineListener(this);
         revalidateLineWrappings();
         
