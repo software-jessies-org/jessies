@@ -80,11 +80,18 @@ public class PBashTextStyler extends PCLikeTextStyler {
         super(textArea);
     }
     
+    @Override
     public boolean supportShellComments() {
         return true;
     }
     
+    @Override
     public boolean supportDoubleSlashComments() {
+        return false;
+    }
+    
+    @Override
+    public boolean supportSlashStarComments() {
         return false;
     }
     

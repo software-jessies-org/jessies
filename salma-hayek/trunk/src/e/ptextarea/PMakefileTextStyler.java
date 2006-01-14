@@ -73,6 +73,11 @@ public class PMakefileTextStyler extends PCLikeTextStyler {
     }
     
     @Override
+    public boolean supportSlashStarComments() {
+        return false;
+    }
+    
+    @Override
     public boolean isQuote(char ch) {
         return (ch == '\"');
     }

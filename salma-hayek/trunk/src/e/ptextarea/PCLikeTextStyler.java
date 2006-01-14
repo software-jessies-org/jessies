@@ -11,7 +11,6 @@ import e.util.*;
  * multi-line comment structures, quoted strings, and how to find keywords in
  * what's left over.
  * 
- * FIXME: we need to be able to turn off C-style comments for many of our subclasses.
  * FIXME: it would be nice to support arbitrary multiline comment styles, such as HTML's "<!--" and "-->". (That's probably the only other one worth worrying about.)
  * FIXME: we need support for back-quoted expressions in various languages.
  * 
@@ -39,6 +38,11 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
      * Returns true if the styler should comment to end of line on seeing '//'.
      */
     public abstract boolean supportDoubleSlashComments();
+    
+    /**
+     * Returns true if the style should count text in a C-like comment (such as this) as comment.
+     */
+    public abstract boolean supportSlashStarComments();
     
     /**
      * Adds a text segment of type String to the given segment list.  Override
@@ -99,7 +103,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                     lastStart = i;
                 } else if (ch == '/') {
                     if (i < line.length() - 1) {
-                        if (line.charAt(i + 1) == '*') {
+                        if (supportSlashStarComments() && line.charAt(i + 1) == '*') {
                             comment = true;
                             if (lastStart < i) {
                                 builder.addStyledSegment(i, PStyle.NORMAL);
@@ -206,7 +210,7 @@ public abstract class PCLikeTextStyler extends PAbstractTextStyler implements PT
                         if (escaped == false && isQuote(thisChar)) {
                             lastQuote = thisChar;
                         }
-                        if (previous == '/' && thisChar == '*') {
+                        if (supportSlashStarComments() && previous == '/' && thisChar == '*') {
                             comment = true;
                             index = i + 1;
                             break;

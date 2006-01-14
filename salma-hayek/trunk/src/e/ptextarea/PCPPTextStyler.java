@@ -94,11 +94,18 @@ public class PCPPTextStyler extends PCLikeTextStyler {
         textArea.addStyleApplicatorFirst(new PreprocessorStyleApplicator(textArea, isObjective));
     }
     
+    @Override
     public boolean supportShellComments() {
         return false;
     }
-
+    
+    @Override
     public boolean supportDoubleSlashComments() {
+        return true;
+    }
+    
+    @Override
+    public boolean supportSlashStarComments() {
         return true;
     }
     

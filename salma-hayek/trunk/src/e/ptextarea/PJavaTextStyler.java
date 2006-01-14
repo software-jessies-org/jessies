@@ -76,6 +76,7 @@ public class PJavaTextStyler extends PCLikeTextStyler {
      * Overrides the default string segment addition, performing validation on the
      * string format and introducing error segment types where appropriate.
      */
+    @Override
     public void addStringSegment(PCLikeTextStyler.TextSegmentListBuilder builder, String line, int start, int end) {
         if (line.charAt(start) == '\'') {
             addSegments(builder, line, start, end, 1);
@@ -182,12 +183,19 @@ public class PJavaTextStyler extends PCLikeTextStyler {
     private boolean isValidHexDigit(char ch) {
         return ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'));
     }
-
+    
+    @Override
     public boolean supportShellComments() {
         return false;
     }
-
+    
+    @Override
     public boolean supportDoubleSlashComments() {
+        return true;
+    }
+    
+    @Override
+    public boolean supportSlashStarComments() {
         return true;
     }
     

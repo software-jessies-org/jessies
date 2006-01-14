@@ -61,6 +61,11 @@ public class PRubyTextStyler extends PCLikeTextStyler {
         return false;
     }
     
+    @Override
+    public boolean supportSlashStarComments() {
+        return false;
+    }
+    
     public void addKeywordsTo(Collection<String> collection) {
         collection.addAll(Arrays.asList(KEYWORDS));
     }

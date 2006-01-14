@@ -46,11 +46,18 @@ public class PCTextStyler extends PCLikeTextStyler {
         super(textArea);
     }
     
+    @Override
     public boolean supportShellComments() {
         return false;
     }
-
+    
+    @Override
     public boolean supportDoubleSlashComments() {
+        return true;
+    }
+    
+    @Override
+    public boolean supportSlashStarComments() {
         return true;
     }
     
