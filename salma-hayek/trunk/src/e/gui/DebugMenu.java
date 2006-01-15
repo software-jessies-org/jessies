@@ -17,6 +17,7 @@ public class DebugMenu {
         menu.add(new ShowSystemPropertiesAction());
         menu.addSeparator();
         menu.add(makeChangeLafMenu());
+        menu.add(new ListFramesAction());
         return menu;
     }
     
@@ -36,7 +37,11 @@ public class DebugMenu {
         PTextArea textArea = new PTextArea(40, 80);
         textArea.setFont(new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 10));
         textArea.setText(content);
-        JScrollPane scrollPane = new JScrollPane(textArea);
+        showScrollableContentWindow(title, textArea);
+    }
+    
+    private static void showScrollableContentWindow(String title, JComponent content) {
+        JScrollPane scrollPane = new JScrollPane(content);
         scrollPane.setBorder(null);
         
         JFrame frame = new JFrame(title);
@@ -118,6 +123,25 @@ public class DebugMenu {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }
+    }
+    
+    private static class ListFramesAction extends AbstractAction {
+        public ListFramesAction() {
+            super("List Frames");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            // FIXME: a table would be much nicer.
+            showTextWindow("Frames", getFramesAsString());
+        }
+        
+        private String getFramesAsString() {
+            StringBuilder builder = new StringBuilder();
+            for (Frame frame : Frame.getFrames()) {
+                builder.append(frame.toString() + "\n");
+            }
+            return builder.toString();
         }
     }
 }
