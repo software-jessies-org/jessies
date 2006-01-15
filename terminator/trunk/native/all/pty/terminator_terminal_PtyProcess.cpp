@@ -150,9 +150,9 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
     }
 }
 
-jstring terminator_terminal_PtyProcess::listProcessesUsingTty() {
+jstring terminator_terminal_PtyProcess::nativeListProcessesUsingTty() {
 #ifndef __APPLE__
-    return newStringUtf8("listProcessesUsingTty only supported on Mac OS");
+    return newStringUtf8("");
 #else
     // Which tty?
     struct stat sb;
@@ -177,13 +177,13 @@ jstring terminator_terminal_PtyProcess::listProcessesUsingTty() {
         throw unix_exception("stat(mib, " + toString(sizeof(mib)/sizeof(int)) + ", &buffer[0], &byteCount, NULL, 0) failed");
     }
     
-    // Collect the process names.
+    // Collect the process names and ids.
     std::deque<std::string> processNames;
     int count = byteCount / sizeof(kinfo_proc);
     kinfo_proc* kp = (kinfo_proc*) &buffer[0];
     for (int i = 0; i < count; ++i) {
-        // FIXME: sort on "kp->kp_proc.p_pid"?
-        processNames.push_back(kp->kp_proc.p_comm);
+        // FIXME: can we easily sort these into "ps -Helf" order?
+        processNames.push_back(std::string(kp->kp_proc.p_comm) + "(" + toString(kp->kp_proc.p_pid) + ")");
         ++kp;
     }
     

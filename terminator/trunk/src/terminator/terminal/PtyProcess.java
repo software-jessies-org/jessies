@@ -113,6 +113,10 @@ public class PtyProcess {
         return outStream;
     }
     
+    public int getProcessId() {
+        return processId;
+    }
+    
     private void startProcess(final String[] command, final FileDescriptor descriptor) throws Exception {
         invoke(new Callable<Exception>() {
             public Exception call() {
@@ -152,6 +156,14 @@ public class PtyProcess {
         }
     }
     
+    public String listProcessesUsingTty() {
+        try {
+            return nativeListProcessesUsingTty();
+        } catch (IOException ex) {
+            return ""; // FIXME: return the exception message?
+        }
+    }
+    
     private native void nativeStartProcess(String[] command, FileDescriptor descriptor) throws IOException;
     private native void nativeWaitFor() throws IOException;
     public native void destroy() throws IOException;
@@ -161,5 +173,5 @@ public class PtyProcess {
     
     public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
     
-    private native String listProcessesUsingTty() throws IOException;
+    private native String nativeListProcessesUsingTty() throws IOException;
 }

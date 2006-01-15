@@ -495,4 +495,8 @@ public class TerminalControl {
 	public LogWriter getLogWriter() {
 		return logWriter;
 	}
+	
+	public PtyProcess getPtyProcess() {
+		return ptyProcess;
+	}
 }
