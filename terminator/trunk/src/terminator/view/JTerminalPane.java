@@ -22,7 +22,7 @@ public class JTerminalPane extends JPanel {
 	private JScrollPane scrollPane;
 	private VisualBellViewport viewport;
 	private String name;
-	private boolean errorExitHolding;
+	private boolean wasCreatedAsNewShell;
 	private Dimension currentSizeInChars;
 	private JAsynchronousProgressIndicator outputSpinner;
 	private Action[] menuAndKeyActions = new Action[] {
@@ -51,10 +51,10 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	private JTerminalPane(String name, List<String> command, boolean errorExitHolding) {
+	private JTerminalPane(String name, List<String> command, boolean wasCreatedAsNewShell) {
 		super(new BorderLayout());
 		this.name = name;
-		this.errorExitHolding = errorExitHolding;
+		this.wasCreatedAsNewShell = wasCreatedAsNewShell;
 		init(command);
 	}
 	
@@ -72,8 +72,7 @@ public class JTerminalPane extends JPanel {
 		command.add("-c");
 		command.add(originalCommand);
 		
-		boolean errorExitHolding = true;
-		return new JTerminalPane(name, command, errorExitHolding);
+		return new JTerminalPane(name, command, false);
 	}
 	
 	/**
@@ -91,10 +90,7 @@ public class JTerminalPane extends JPanel {
 			String user = System.getProperty("user.name");
 			name = user + "@localhost";
 		}
-		// The user will already have seen any failure in a shell window.
-		// bash (and probably other shells) return as their own exit status that of the last command executed.
-		boolean errorExitHolding = false;
-		return new JTerminalPane(name, getShellCommand(), errorExitHolding);
+		return new JTerminalPane(name, getShellCommand(), true);
 	}
 	
 	private static ArrayList<String> getShellCommand() {
@@ -208,6 +204,10 @@ public class JTerminalPane extends JPanel {
 		control.reset();
 	}
 	
+	public TerminalControl getControl() {
+		return control;
+	}
+	
 	public LogWriter getLogWriter() {
 		return control.getLogWriter();
 	}
@@ -217,7 +217,9 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public boolean shouldHoldOnExit(int status) {
-		return status != 0 && errorExitHolding;
+		// bash (and probably other shells) return as their own exit status that of the last command executed.
+		// The user will already have seen any failure in a shell window.
+		return status != 0 && wasCreatedAsNewShell;
 	}
 	
 	public void setName(String name) {
@@ -547,6 +549,40 @@ public class JTerminalPane extends JPanel {
 	
 	public void destroyProcess() {
 		control.destroyProcess();
+	}
+	
+	/**
+	 * Closes the terminal pane after checking with the user.
+	 * Returns false if the user canceled the close, true otherwise.
+	 */
+	public boolean doCheckedCloseAction() {
+		boolean shouldAskUser = true;
+		
+		final PtyProcess ptyProcess = control.getPtyProcess();
+		final int directChildProcessId = ptyProcess.getProcessId();
+		final String processesUsingTty = ptyProcess.listProcessesUsingTty();
+		
+		// If the only thing still running is the shell we started, don't bother the user.
+		// FIXME: ideally, PtyProcess would give us a List<ProcessInfo>, but that opens a whole can of JNI worms. Hence the following hack.
+		final String[] processList = processesUsingTty.split(", ");
+		if (wasCreatedAsNewShell && processList.length == 1 && processList[0].matches("^.*\\(" + directChildProcessId + "\\)$")) {
+			shouldAskUser = false;
+		}
+		
+		// If there's nothing still running, don't bother the user.
+		if (processesUsingTty.length() == 0) {
+			shouldAskUser = false;
+		}
+		
+		if (shouldAskUser) {
+			boolean reallyClose = SimpleDialog.askQuestion(getTerminatorFrame(), "Terminator", "<html><b>Close Terminal?</b><p>Closing this terminal may terminate the following processes: " + processesUsingTty, "Terminate");
+			if (reallyClose == false) {
+				return false;
+			}
+		}
+		
+		doCloseAction();
+		return true;
 	}
 	
 	public void doCloseAction() {

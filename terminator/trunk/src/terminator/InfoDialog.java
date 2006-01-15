@@ -13,6 +13,7 @@ public class InfoDialog {
     private ETextField title;
     private ETextField dimensions;
     private ETextField logFilename;
+    private ETextField processes;
     private JCheckBox suspendLogging;
     private JTerminalPane terminal;
     
@@ -20,6 +21,7 @@ public class InfoDialog {
         this.title = new TitleField();
         this.dimensions = new UneditableField();
         this.logFilename = new UneditableField();
+        this.processes = new UneditableField();
         this.suspendLogging = makeSuspendLoggingCheckBox();
     }
     
@@ -67,6 +69,7 @@ public class InfoDialog {
         LogWriter logWriter = terminal.getLogWriter();
         logFilename.setText(logWriter.getInfo());
         suspendLogging.setSelected(logWriter.isSuspended());
+        processes.setText(terminal.getControl().getPtyProcess().listProcessesUsingTty());
         
         JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, terminal);
         
@@ -76,6 +79,7 @@ public class InfoDialog {
         formPanel.addRow("Dimensions:", dimensions);
         formPanel.addRow("Log Filename:", logFilename);
         formPanel.addRow("", suspendLogging);
+        formPanel.addRow("Processes:", processes);
         form.getFormDialog().setRememberBounds(false);
         form.showNonModal();
     }

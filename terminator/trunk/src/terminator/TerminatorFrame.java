@@ -87,7 +87,7 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	private void initFrame() {
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		if (GuiUtilities.isMacOs() == false) {
 			setBackground(Options.getSharedInstance().getColor("background"));
 		}
@@ -102,6 +102,20 @@ public class TerminatorFrame extends JFrame {
 					terminal.destroyProcess();
 				}
 				Terminator.getSharedInstance().frameClosed(TerminatorFrame.this);
+			}
+			
+			public void windowClosing(WindowEvent event) {
+				// We can't iterate over "terminals" directly because we'll get ConcurrentModificationException if doCheckedCloseAction tries to remove the terminal from the list.
+				ArrayList<JTerminalPane> copyOfTerminals = new ArrayList<JTerminalPane>(terminals);
+				for (JTerminalPane terminal : copyOfTerminals) {
+					if (tabbedPane != null) {
+						tabbedPane.setSelectedComponent(terminal);
+					}
+					if (terminal.doCheckedCloseAction() == false) {
+						// If the user hit "Cancel" for one terminal, cancel the close for all other terminals in the same window.
+						return;
+					}
+				}
 			}
 		});
 		initTerminals();
