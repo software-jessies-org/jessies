@@ -4,8 +4,10 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.Timer;
 
 /**
  * A "Debug" menu for any Java application.
@@ -17,7 +19,9 @@ public class DebugMenu {
         menu.add(new ShowSystemPropertiesAction());
         menu.addSeparator();
         menu.add(makeChangeLafMenu());
+        menu.addSeparator();
         menu.add(new ListFramesAction());
+        menu.add(new ListTimersAction());
         return menu;
     }
     
@@ -152,6 +156,25 @@ public class DebugMenu {
                 }
             }
             return builder.toString();
+        }
+    }
+    
+    private static class ListTimersAction extends AbstractAction {
+        public ListTimersAction() {
+            super("List Timers");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            showTextWindow("Timers", getTimersAsString());
+        }
+        
+        private String getTimersAsString() {
+            StringBuilder result = new StringBuilder();
+            List<Timer> timers = TimerUtilities.getQueuedSwingTimers();
+            for (Timer timer : timers) {
+                result.append(TimerUtilities.toString(timer));
+            }
+            return result.toString();
         }
     }
 }
