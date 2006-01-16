@@ -54,7 +54,7 @@ public class HungAwtExit {
                 (javax.swing.Timer) firstTimerField.get(sharedInstance);
             while (nextTimer != null) {
                 ++extantTimers;
-                System.err.println(nextTimer);
+                System.err.println(nextTimer + " " + nextTimer.getDelay() + "ms " + (nextTimer.isRepeats() ? "repeating" : "one-shot"));
                 showActionListeners(nextTimer.getActionListeners());
 
                 nextTimer = (javax.swing.Timer) nextTimerField.get(nextTimer);
