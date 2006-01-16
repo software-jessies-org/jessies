@@ -137,9 +137,19 @@ public class DebugMenu {
         }
         
         private String getFramesAsString() {
+            Frame[] frames = Frame.getFrames();
             StringBuilder builder = new StringBuilder();
-            for (Frame frame : Frame.getFrames()) {
-                builder.append(frame.toString() + "\n");
+            builder.append("Displayable:\n");
+            for (Frame frame : frames) {
+                if (frame.isDisplayable()) {
+                    builder.append(frame.toString() + "\n");
+                }
+            }
+            builder.append("\nNon-displayable:\n");
+            for (Frame frame : frames) {
+                if (frame.isDisplayable() == false) {
+                    builder.append(frame.toString() + "\n");
+                }
             }
             return builder.toString();
         }
