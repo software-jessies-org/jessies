@@ -93,6 +93,7 @@ public class KnowAll extends JFrame {
         advisors.add(new CurrencyAdvisor());
         advisors.add(new IsbnAdvisor());
         advisors.add(new NumberAdvisor());
+        advisors.add(new TimeAdvisor());
         advisors.add(new UkPostCodeAdvisor());
         // FIXME: don't hard-code this:
         advisors.add(new ScriptAdvisor("MAC address", "\\b((\\p{XDigit}{2}[.:-]){5}\\p{XDigit}{2})\\b", "dev_passwd $1"));
