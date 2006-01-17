@@ -120,11 +120,7 @@
   escapes so we can put them in the window title -- it's worth writing our
   own program to set the window title?
 
-* If the user tries to close a window with a still-running process, and we
-  can see that it's not a childless shell, we should ask for confirmation.
-  On Linux, we can get what we need via /proc. On Mac OS, we already have
-  the JNI. martind claims that Cygwin implements a Linux-like /proc.
-  car makes an argument for not having window-modal confirmation like Terminal
+* car makes an argument for not having window-modal confirmation like Terminal
   does: "Where Terminal gets it wrong, though, is that it blocks input to the
   terminal while it's asking me to confirm.  Canceling the shutdown so
   that I can hit ^:wq and then starting the shutdown again is a pain".
@@ -147,7 +143,9 @@
   the existing configuration problems worse, though.
 
 * On Mac OS, we should probably do what Terminal does to subvert keystroke
-  logging (http://www.cocoadev.com/index.pl?SecureKeyboardEntry).
+  logging (http://www.cocoadev.com/index.pl?SecureKeyboardEntry). There's
+  also a good post on the alluded-to problems Apple warns about:
+  http://rentzsch.com/macosx/terminalSecureKeyboardEntry
 
 * On Mac OS, if you resize a Terminator window, it flashes white as it
   seemingly fills the background before we do. if you force the LAF to be
