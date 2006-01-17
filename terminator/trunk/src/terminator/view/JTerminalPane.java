@@ -218,8 +218,8 @@ public class JTerminalPane extends JPanel {
 	
 	public boolean shouldHoldOnExit(int status) {
 		// bash (and probably other shells) return as their own exit status that of the last command executed.
-		// The user will already have seen any failure in a shell window.
-		return status != 0 && wasCreatedAsNewShell;
+		// The user will already have seen any failure in a shell window, so we ignore them.
+		return (wasCreatedAsNewShell == false) && (status != 0);
 	}
 	
 	public void setName(String name) {
@@ -562,10 +562,10 @@ public class JTerminalPane extends JPanel {
 		final int directChildProcessId = ptyProcess.getProcessId();
 		final String processesUsingTty = ptyProcess.listProcessesUsingTty();
 		
-		// If the only thing still running is the shell we started, don't bother the user.
+		// If the only thing still running is the command we started, don't bother the user.
 		// FIXME: ideally, PtyProcess would give us a List<ProcessInfo>, but that opens a whole can of JNI worms. Hence the following hack.
 		final String[] processList = processesUsingTty.split(", ");
-		if (wasCreatedAsNewShell && processList.length == 1 && processList[0].matches("^.*\\(" + directChildProcessId + "\\)$")) {
+		if (processList.length == 1 && processList[0].matches("^.*\\(" + directChildProcessId + "\\)$")) {
 			shouldAskUser = false;
 		}
 		
