@@ -59,7 +59,7 @@ mkdir -p /usr/local/www.jessies.org/ && \
 cd /usr/local/www.jessies.org/ || die "making install directory"
 
 # Download and extract the latest nightly builds.
-PROJECTS="salma-hayek edit scm terminator"
+PROJECTS="salma-hayek edit KnowAll scm terminator"
 BROKEN_PROJECTS=""
 WGET_OPTIONS="-C off"
 if ! wget --no-cache 2>&1 | grep unrecogni[sz]ed > /dev/null
@@ -70,19 +70,12 @@ for PROJECT in $PROJECTS; do
     wget $WGET_OPTIONS -N http://software.jessies.org/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
-    if ! make -C $PROJECT
-    then
-        TARGET_OS=`./salma-hayek/bin/target-os.rb`
-        if wget $WGET_OPTIONS -N http://software.jessies.org/$PROJECT/$PROJECT-$TARGET_OS.tgz
-        then
-            tar --no-same-owner -zxf $PROJECT-$TARGET_OS.tgz || die "extracting $PROJECT-$TARGET_OS"
-        else
-            BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
-        fi
+    if ! make -C $PROJECT ; then
+        BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
     fi
 done
 
-# Now we're root, we have a useful opportunity to get the terminfo installed system-wide.
+# This script runs as root, so we have an opportunity to get Terminator's terminfo installed system-wide.
 tic terminator/lib/terminfo/terminator.tic
 
 # Put links to each of our shell scripts in /usr/local/bin.
