@@ -44,7 +44,9 @@ public class TimeAdvisor implements Advisor {
             // FIXME: this output only really makes sense for times > 1s.
             result.add(originalForm + " = " + TimeUtilities.durationToIsoString(milliseconds));
         }
-        suggestionsBox.addSuggestion(new Suggestion("Time", StringUtilities.join(result, "<br>")));
+        if (result.isEmpty() == false) {
+            suggestionsBox.addSuggestion(new Suggestion("Time", StringUtilities.join(result, "<br>")));
+        }
     }
     
     private TimeUnit parseTimeUnit(String s) {
