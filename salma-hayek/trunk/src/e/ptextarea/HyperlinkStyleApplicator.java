@@ -12,12 +12,14 @@ import java.util.regex.*;
  * 
  * Examples:
  *   http://www.google.com
+ *   http://www.google.com/
  *   http://www.gnu.org/software/make/manual/html_mono/make.html
  *   http://cvs.gnome.org/viewcvs/gtk%2B/gtk/gtkstock.h?view=markup
+ *   <a href="http://www.google.com">Google</a>
  */
 class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
     public HyperlinkStyleApplicator(PTextArea textArea) {
-        super(textArea, "\\b(https?://[^\\s]+)\\b", PStyle.HYPERLINK);
+        super(textArea, "\\b(https?://[^ \t\"\n]+)", PStyle.HYPERLINK);
     }
     
     @Override
