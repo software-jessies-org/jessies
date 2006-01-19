@@ -29,7 +29,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private boolean selectionEndIsAnchor;  // Otherwise, selection start is anchor.
     
     private PLineList lines;
-    private List<SplitLine> splitLines;  // TODO - Write a split buffer-style List implementation.
+    // TODO: experiment with java.util.ArrayDeque in Java 6.
+    private List<SplitLine> splitLines;
     
     // We cache the FontMetrics for readability rather than performance.
     private FontMetrics metrics;
@@ -47,13 +48,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private int rowCount;
     private int columnCount;
     
-    private boolean wordWrap;
-    
     private boolean editable;
+    private boolean wordWrap;
+    private boolean linkingActive;
     
     private PIndenter indenter;
     private PTextAreaSpellingChecker spellingChecker;
     private EPopupMenu popupMenu;
+    private PMouseHandler mouseHandler;
     
     public PTextArea() {
         this(0, 0);
@@ -63,6 +65,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.editable = true;
+        this.linkingActive = false;
         this.wordWrap = false;
         this.lines = new PLineList(new PTextBuffer());
         this.selection = new SelectionHighlight(this, 0, 0);
@@ -88,10 +91,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     private void initListeners() {
+        this.mouseHandler = new PMouseHandler(this);
         addComponentListener(new Rewrapper(this));
         addCaretListener(new PMatchingBracketHighlighter(this));
         addKeyListener(new PKeyHandler(this));
-        PMouseHandler mouseHandler = new PMouseHandler(this);
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
         initFocusListening();
@@ -247,6 +250,20 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         } finally {
             getLock().relinquishWriteLock();
         }
+    }
+    
+    /** Only for use by class PKeyHandler. */
+    void setLinkingActive(boolean newState) {
+        if (linkingActive != newState) {
+            this.linkingActive = newState;
+            mouseHandler.updateCursorAndToolTip();
+            repaint();
+        }
+    }
+    
+    /** Only for use by class PMouseHandler. */
+    boolean isLinkingActive() {
+        return linkingActive;
     }
     
     /**
@@ -954,7 +971,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             while (it.hasNext()) {
                 PLineSegment segment = it.next();
                 paintCharOffset = segment.getEnd();
-                applyColor(graphics, segment.getStyle().getColor());
+                applyStyle(graphics, segment.getStyle());
                 segment.paint(graphics, x, baseline);
                 if (segment.getOffset() == caretOffset && segment.isNewline() == false) {
                     paintCaret(graphics, x, baseline);
@@ -1013,8 +1030,17 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         //System.err.println("Highlights painted in " + (System.currentTimeMillis() - startTime) + "ms");
     }
     
-    private void applyColor(Graphics2D graphics, Color color) {
-        graphics.setColor(isEnabled() ? color : Color.GRAY);
+    private void applyStyle(Graphics2D g, PStyle style) {
+        Color color = style.getColor();
+        if (isLinkingActive() == false && style == PStyle.HYPERLINK) {
+            // If a link is inactive, render it differently. Ideally, we'd know what kind of text surrounds us. That way, an inactive link in a comment would be green rather than black.
+            color = PStyle.NORMAL.getColor();
+        }
+        applyColor(g, color);
+    }
+    
+    private void applyColor(Graphics2D g, Color color) {
+        g.setColor(isEnabled() ? color : Color.GRAY);
     }
     
     private void paintCaret(Graphics2D graphics, int x, int y) {
@@ -1256,7 +1282,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         width = Math.max(width, MIN_WIDTH);  // Ensure we're at least a sensible width.
         if (line.getWidth() <= width) {
             // The whole line fits.
-            splitLines.add(index, new SplitLine(lineIndex, 0, line.getContents().length()));
+            splitLines.add(index, new SplitLine(lines, lineIndex, 0, line.getContents().length()));
         } else {
             // The line's too long, so break it into SplitLines.
             int x = 0;
@@ -1279,13 +1305,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                             }
                         }
                     }
-                    splitLines.add(index++, new SplitLine(lineIndex, lastSplitOffset, i - lastSplitOffset));
+                    splitLines.add(index++, new SplitLine(lines, lineIndex, lastSplitOffset, i - lastSplitOffset));
                     lastSplitOffset = i;
                     x = addCharWidth(0, ch);
                 }
             }
             if (x > 0) {
-                splitLines.add(index++, new SplitLine(lineIndex, lastSplitOffset, chars.length() - lastSplitOffset));
+                splitLines.add(index++, new SplitLine(lines, lineIndex, lastSplitOffset, chars.length() - lastSplitOffset));
             }
         }
         return (splitLines.size() - initialSplitLineCount);
@@ -1548,63 +1574,5 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private void initPopupMenu() {
         popupMenu =  new EPopupMenu(this);
         popupMenu.addMenuItemProvider(new ExternalSearchItemProvider(this));
-    }
-    
-    //
-    // Nested classes below this point...
-    //
-    
-    public class SplitLine {
-        private int lineIndex;
-        private int offset;
-        private int length;
-        
-        public SplitLine(int lineIndex, int offset, int length) {
-            this.lineIndex = lineIndex;
-            this.offset = offset;
-            this.length = length;
-        }
-        
-        public int getLineIndex() {
-            return lineIndex;
-        }
-        
-        public int getOffset() {
-            return offset;
-        }
-        
-        public int getLength() {
-            return length;
-        }
-        
-        public void setLineIndex(int lineIndex) {
-            this.lineIndex = lineIndex;
-        }
-        
-        public void setOffset(int offset) {
-            this.offset = offset;
-        }
-        
-        public void setLength(int length) {
-            this.length = length;
-        }
-        
-        public int getTextIndex() {
-            return lines.getLine(lineIndex).getStart() + offset;
-        }
-        
-        public boolean containsIndex(int charIndex) {
-            int startIndex = getTextIndex();
-            return (charIndex >= startIndex) && (charIndex < startIndex + length);
-        }
-        
-        public CharSequence getContents() {
-            CharSequence parent = lines.getLine(lineIndex).getContents();
-            int end = offset + length;
-            if (length > 0 && parent.charAt(end - 1) == '\n') {
-                end -= 1;
-            }
-            return parent.subSequence(offset, end);
-        }
     }
 }

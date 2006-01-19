@@ -8,7 +8,7 @@ public class PWrappedSegmentIterator implements Iterator<PLineSegment> {
     private int nextSplitLineIndex;
     private CachedSegmentIterator logicalIterator;
     private PLineSegment currentSegment;
-    private PTextArea.SplitLine currentLine;
+    private SplitLine currentLine;
     
     public PWrappedSegmentIterator(PTextArea textArea, int charOffset) {
         this.textArea = textArea;

@@ -23,7 +23,7 @@ import e.util.*;
  * FIXME: we should find out if there are MS Windows/GNOME equivalents of the
  * Mac OS key bindings files.
  */
-public class PKeyHandler extends KeyAdapter {
+public class PKeyHandler implements KeyListener {
     private PTextArea textArea;
     private UpDownMovementHandler movementHandler = new UpDownMovementHandler();
     
@@ -32,9 +32,9 @@ public class PKeyHandler extends KeyAdapter {
         textArea.addCaretListener(movementHandler);
     }
     
-    public void keyPressed(KeyEvent event) {
-        if (event.isControlDown() && event.isShiftDown()) {
-            switch (event.getKeyCode()) {
+    public void keyPressed(KeyEvent e) {
+        if (e.isControlDown() && e.isShiftDown()) {
+            switch (e.getKeyCode()) {
             case KeyEvent.VK_T:
                 textArea.printLineInfo();
                 return;
@@ -46,15 +46,33 @@ public class PKeyHandler extends KeyAdapter {
                 return;
             }
         }
-        if (handleInvisibleKeyPressed(event)) {
-            event.consume();
+        trackControlKey(e);
+        if (handleInvisibleKeyPressed(e)) {
+            e.consume();
         }
     }
     
-    public void keyTyped(KeyEvent event) {
-        if (isInsertableCharacter(event) && textArea.isEditable()) {
-            insertCharacter(event.getKeyChar());
-            event.consume();
+    public void keyTyped(KeyEvent e) {
+        if (isInsertableCharacter(e) && textArea.isEditable()) {
+            insertCharacter(e.getKeyChar());
+            e.consume();
+        }
+    }
+    
+    public void keyReleased(KeyEvent e) {
+        trackControlKey(e);
+    }
+    
+    /**
+     * Activates any links in the text as long as the control key is down.
+     * This is our current resolution of the conflict between the desire
+     * for easy following of URLs on the one hand and easy editing of text
+     * containing URLs on the other. Since we're primarily a text editing
+     * component, we lean in favor of editing.
+     */
+    private void trackControlKey(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            textArea.setLinkingActive(e.getID() == KeyEvent.KEY_PRESSED);
         }
     }
     

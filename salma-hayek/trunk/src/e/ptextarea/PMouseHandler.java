@@ -9,12 +9,14 @@ import javax.swing.event.*;
 public class PMouseHandler implements MouseInputListener {
     private PTextArea textArea;
     private PDragHandler dragHandler;
+    private Point lastKnownPosition;
     
     public PMouseHandler(PTextArea textArea) {
         this.textArea = textArea;
     }
     
     public void mousePressed(MouseEvent e) {
+        trackMousePosition(e);
         if (e.isPopupTrigger()) {
             return;
         }
@@ -28,7 +30,7 @@ public class PMouseHandler implements MouseInputListener {
         handleHyperlinks(e);
         if (e.isConsumed() == false) {
             dragHandler = getDragHandlerForClick(e);
-            dragHandler.makeInitialSelection(getOffsetAtMouse(e));
+            dragHandler.makeInitialSelection(getOffsetAtMouse());
         }
     }
     
@@ -42,53 +44,68 @@ public class PMouseHandler implements MouseInputListener {
         }
     }
     
-    private int getOffsetAtMouse(MouseEvent event) {
-        PCoordinates nearestChar = textArea.getNearestCoordinates(event.getPoint());
+    private int getOffsetAtMouse() {
+        PCoordinates nearestChar = textArea.getNearestCoordinates(lastKnownPosition);
         return textArea.getTextIndex(nearestChar);
     }
     
-    public void mouseReleased(MouseEvent event) {
+    public void mouseReleased(MouseEvent e) {
+        trackMousePosition(e);
         dragHandler = null;
     }
     
-    public void mouseClicked(MouseEvent event) {
+    public void mouseClicked(MouseEvent e) {
+        trackMousePosition(e);
         // No explicit action.
     }
     
-    public void mouseDragged(MouseEvent event) {
+    public void mouseDragged(MouseEvent e) {
+        trackMousePosition(e);
         if (dragHandler != null) {
-            int newOffset = getOffsetAtMouse(event);
+            int newOffset = getOffsetAtMouse();
             dragHandler.mouseDragged(newOffset);
             textArea.ensureVisibilityOfOffset(Math.min(Math.max(0, newOffset), textArea.getTextBuffer().length()));
         }
     }
     
-    public void mouseMoved(MouseEvent event) {
-        updateCursorAndToolTip(event.getPoint());
+    public void mouseMoved(MouseEvent e) {
+        trackMousePosition(e);
+        updateCursorAndToolTip();
     }
     
-    public void mouseEntered(MouseEvent event) {
-        updateCursorAndToolTip(event.getPoint());
+    public void mouseEntered(MouseEvent e) {
+        trackMousePosition(e);
+        updateCursorAndToolTip();
     }
     
-    public void mouseExited(MouseEvent event) {
-        updateCursorAndToolTip(event.getPoint());
+    public void mouseExited(MouseEvent e) {
+        trackMousePosition(e);
+        updateCursorAndToolTip();
     }
     
-    private void updateCursorAndToolTip(Point p) {
+    private void trackMousePosition(MouseEvent e) {
+        lastKnownPosition = e.getPoint();
+    }
+    
+    public void updateCursorAndToolTip() {
         Cursor newCursor = null;
         String newToolTip = null;
-        PLineSegment segment = textArea.getLineSegmentAtLocation(p);
-        if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
-            newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-            newToolTip = PTextSegment.class.cast(segment).getToolTip();
+        if (textArea.isLinkingActive()) {
+            PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
+            if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
+                newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+                newToolTip = PTextSegment.class.cast(segment).getToolTip();
+            }
         }
         textArea.setCursor(newCursor);
         textArea.setToolTipText(newToolTip);
     }
     
     private void handleHyperlinks(MouseEvent e) {
-        PLineSegment segment = textArea.getLineSegmentAtLocation(e.getPoint());
+        if (textArea.isLinkingActive() == false) {
+            return;
+        }
+        PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
         if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
             PTextSegment.class.cast(segment).linkClicked();
             e.consume();
