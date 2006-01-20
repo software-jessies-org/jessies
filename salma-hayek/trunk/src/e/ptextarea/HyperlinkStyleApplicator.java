@@ -16,10 +16,18 @@ import java.util.regex.*;
  *   http://www.gnu.org/software/make/manual/html_mono/make.html
  *   http://cvs.gnome.org/viewcvs/gtk%2B/gtk/gtkstock.h?view=markup
  *   <a href="http://www.google.com">Google</a>
+ *   "http://www.google.com"
+ *   (http://www.google.com)
+ *   <http://www.google.com>
+ *   http://www.google.com, http://www.google.com.
  */
 class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
+    // This character class and the regular expression below are based on the BNF in RFC 1738.
+    // Obviously, compromises have been made to fit the grammar into a regular expression.
+    private static final String SEARCH_CHARS = "[/A-Za-z0-9;:@&=%!*'(),$_.+-]";
+    
     public HyperlinkStyleApplicator(PTextArea textArea) {
-        super(textArea, "\\b(https?://[^ \t\"\n]+)", PStyle.HYPERLINK);
+        super(textArea, "\\b(https?://[A-Za-z0-9.:-]+[A-Za-z0-9](/"+SEARCH_CHARS+"*(\\?"+SEARCH_CHARS+"*)?)?)", PStyle.HYPERLINK);
     }
     
     @Override
