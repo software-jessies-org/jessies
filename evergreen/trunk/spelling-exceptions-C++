@@ -152,8 +152,10 @@ ptrdiff
 # Standard types from section 7.18 of ISO+IEC+9899-1999.
 uintptr
 # Standard headers
+fstream
 iomanip
 iostream
 sstream
 stddef
+stdexcept
 typeinfo
