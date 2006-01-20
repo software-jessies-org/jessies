@@ -226,8 +226,13 @@ private:
      */
     static void closeUnusedFiles() {
         // man sysconf says "it gives a guaranteed value, and more might actually be supported".
-        // So this may not work all the time, though it's likely to work most of the time.
-        // FIXME: on Linux, a better solution might use the contents of /proc/self/fd/, though you'd need two passes to avoid the opendir(3) file descriptor.
+        // Sun 4843136 refers to this technique as a "stress test for the OS", pointing out that a system may have a high, or no, limit.
+        // Sun 4413680 claims that the equivalent code in the JVM before 1.4.0_03 was a performance problem on Solaris.
+        // So this may not work all the time, though it's likely to work most of the time and hasn't caused *us* any trouble to date.
+        // FIXME: on Cygwin, Linux, and Solaris, a better solution might use the contents of /proc/self/fd/, though you'd need two passes to avoid the opendir(3) file descriptor, or you could use the non-POSIX dirfd(3). On Mac OS, there's /dev/fd/ (which Linux seems to link to /proc/self/fd/, but which on Solaris appears to be something quite different).
+        // FIXME: Solaris offers closefrom(3), though none of our other platforms appears to.
+        // Solaris' implementation of closefrom(3) (http://cvs.opensolaris.org/source/xref/on/usr/src/lib/libc/port/gen/closefrom.c) is roughly this. It seems to use the F_GETFD fcntl(3) to check whether an fd is valid before calling close(3), but that seems just be to reduce its temporary memory requirements. strace(1) on Linux says it still costs us a system call.
+        // BSD offers fcntl(F_CLOSEM) but none of our platforms appears to.
         int maxNumberOfFiles = sysconf(_SC_OPEN_MAX);
         for (int fd = STDERR_FILENO + 1; fd < maxNumberOfFiles; ++fd) {
             close(fd);
