@@ -151,12 +151,58 @@ stdout
 ptrdiff
 # Standard types from section 7.18 of ISO+IEC+9899-1999.
 uintptr
-# Standard headers
+# Standard headers from table 11 of ISO+IEC+14882-1998.
+algorithm
+bitset
+complex
+deque
+exception
 fstream
+functional
 iomanip
+ios
 iosfwd
 iostream
+istream
+iterator
+limits
+list
+locale
+map
+memory
+new
+numeric
+ostream
+queue
+set
 sstream
-stddef
+stack
 stdexcept
+streambuf
+string
+strstream
 typeinfo
+utility
+valarray
+vector
+# Standard headers from table 12 of ISO+IEC+14882-1998.
+cassert
+cctype
+cerrno
+cfloat
+ciso646
+climits
+clocale
+cmath
+csetjmp
+csignal
+cstdarg
+cstddef
+cstdio
+cstdlib
+cstring
+ctime
+cwchar
+cwctype
+# Standard headers from C which are still in common use in C++.
+stddef
