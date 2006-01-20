@@ -273,9 +273,11 @@ public class Options {
 		addDefault(SCROLL_KEY, Boolean.TRUE, "Scroll to bottom on key press?");
 		addDefault(SCROLL_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output?");
 		
-		if (GuiUtilities.isMacOs()) {
+		if (GuiUtilities.isMacOs() || GuiUtilities.isWindows()) {
 			// Mac users don't get a choice about this, though if they're insane they can override this in their resources.
 			// FIXME: don't allow this to be overridden on Mac OS.
+			// Win32 users are accustomed to every window having a menu bar.
+			// I'm still psyching myself up for the inevitable battle on Unix.
 			options.put(USE_MENU_BAR, Boolean.TRUE);
 		} else {
 			addDefault(USE_MENU_BAR, Boolean.FALSE, "Use a menu bar?");
