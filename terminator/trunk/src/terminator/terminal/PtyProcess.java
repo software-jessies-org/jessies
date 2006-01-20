@@ -158,53 +158,12 @@ public class PtyProcess {
     }
     
     public String listProcessesUsingTty() {
-        if (GuiUtilities.isMacOs()) {
-            return listProcessesUsingTtyOnMacOs();
-        } else if (FileUtilities.findOnPath("lsof") != null) {
-            return listProcessesUsingTtyWithLsof();
-        }
-        return "";
-    }
-    
-    private String listProcessesUsingTtyOnMacOs() {
         try {
             return nativeListProcessesUsingTty();
         } catch (IOException ex) {
-            return ""; // FIXME: return the exception message?
-        }
-    }
-    
-    private String listProcessesUsingTtyWithLsof() {
-        // Linux doesn't support the sysctl(3) parameters we use on Mac OS.
-        // lsof(1) takes 350ms on my Linux box right now, which is poor but just about acceptable (and 10x faster than lsof(1) on Mac OS).
-        // This Java post-processing takes effectively no time, so there isn't obviously anything we can do.
-        // Something like this is 10x faster still, but won't work for setuid processes:
-        // ls -l /proc/*/fd/2 | perl -ne 'm|/proc/(\d+)/fd/2 -> /dev/pts/27| && system "ps --no-heading -o ucmd $1"'
-        // If we used something like that, but extracted the process name from /proc/<pid>/stat, we would work on Cygwin too.
-        // There's no obvious C interface we could from our JNI.
-        
-        // So, for now, call lsof(1).
-        String[] command = new String[] { "lsof", "-w", "-Fc", slavePtyName };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, command, lines, errors);
-        if (status != 0 || errors.isEmpty() == false || (lines.size() % 2) != 0) {
+            Log.warn("listProcessesUsingTty failed.", ex);
             return "";
         }
-        
-        // And post-process its output, which looks like this:
-        // $ lsof -w -Fc /dev/pts/27
-        // p11974
-        // cbash
-        // p11991
-        // cvim
-        ArrayList<String> processes = new ArrayList<String>();
-        for (int i = 0; i < lines.size(); i += 2) {
-            String pidLine = lines.get(i);
-            String nameLine = lines.get(i + 1);
-            processes.add(nameLine.substring(1) + "(" + pidLine.substring(1) + ")");
-        }
-        return StringUtilities.join(processes, ", ");
     }
     
     private native void nativeStartProcess(String[] command, FileDescriptor descriptor) throws IOException;
