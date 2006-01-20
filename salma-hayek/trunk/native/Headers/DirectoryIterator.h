@@ -27,41 +27,47 @@ public:
 
 struct DirectoryIterator {
 private:
-  DIR* handle;
-  bool eof;
-  DirectoryEntry entry;
+  std::string m_directoryName;
+  DIR* m_handle;
+  bool m_eof;
+  DirectoryEntry m_entry;
   
 private:
   void readOneEntry() {
-    const dirent* cStyleEntry = readdir(handle);
+    errno = 0;
+    const dirent* cStyleEntry = readdir(m_handle);
     if (cStyleEntry != 0) {
-      entry = cStyleEntry;
+      m_entry = cStyleEntry;
       return;
     }
-    eof = true;
+    m_eof = true;
     if (errno != 0) {
-      throw unix_exception(std::string("readdir(") + toString(handle) + ")");
+      throw unix_exception(std::string("readdir(\"") + m_directoryName + "\" " + toString(m_handle) + ")");
     }
   }
   
 public:
-  DirectoryIterator(const char* directoryName)
-  : handle(opendir(directoryName)), eof(false) {
-    if (handle == 0) {
-      throw unix_exception(std::string("opendir(") + directoryName + ")");
+  DirectoryIterator(const std::string& directoryName)
+  : m_directoryName(directoryName)
+  , m_handle(opendir(directoryName.c_str()))
+  , m_eof(false)
+  {
+    if (m_handle == 0) {
+      throw unix_exception(std::string("opendir(\"") + m_directoryName + "\")");
     }
     readOneEntry();
   }
+  
   ~DirectoryIterator() {
-    closedir(handle);
+    closedir(m_handle);
   }
   
   bool isValid() const {
-    return eof == false;
+    return m_eof == false;
   }
   
   const DirectoryEntry* operator->() const {
-    return &entry;
+    return &m_entry;
   }
   
   DirectoryIterator& operator++() {
