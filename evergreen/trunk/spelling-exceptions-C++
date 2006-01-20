@@ -154,6 +154,7 @@ uintptr
 # Standard headers
 fstream
 iomanip
+iosfwd
 iostream
 sstream
 stddef
