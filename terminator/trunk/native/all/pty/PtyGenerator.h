@@ -219,6 +219,9 @@ private:
         // It's always confusing when programs behave differently during debugging!
         unsetenv("TERM_PROGRAM");
         unsetenv("TERM_PROGRAM_VERSION");
+#else
+        // Similarly, GNOME's Terminal sets this.
+        unsetenv("COLORTERM");
 #endif
     }
     
