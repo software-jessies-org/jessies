@@ -1,6 +1,7 @@
 #ifndef PTY_GENERATOR_H_included
 #define PTY_GENERATOR_H_included
 
+#include "DirectoryIterator.h"
 #include "toString.h"
 #include "unix_exception.h"
 
@@ -18,6 +19,7 @@
 #include <sys/stropts.h>
 #endif
 
+#include <deque>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -220,22 +222,42 @@ private:
 #endif
     }
     
-    /*
+    /**
      * This allows the terminator-server-port socket to close when terminator quits
      * while a child is still running.
+     * 
+     * It also ensures that child processes don't have file descriptors for
+     * files the Java VM has open (it typically has many).
      */
     static void closeUnusedFiles() {
-        // man sysconf says "it gives a guaranteed value, and more might actually be supported".
+        // A common idiom for closing the parent's file descriptors in a child is to close all possible file descriptors.
         // Sun 4843136 refers to this technique as a "stress test for the OS", pointing out that a system may have a high, or no, limit.
         // Sun 4413680 claims that the equivalent code in the JVM before 1.4.0_03 was a performance problem on Solaris.
-        // So this may not work all the time, though it's likely to work most of the time and hasn't caused *us* any trouble to date.
-        // FIXME: on Cygwin, Linux, and Solaris, a better solution might use the contents of /proc/self/fd/, though you'd need two passes to avoid the opendir(3) file descriptor, or you could use the non-POSIX dirfd(3). On Mac OS, there's /dev/fd/ (which Linux seems to link to /proc/self/fd/, but which on Solaris appears to be something quite different).
-        // FIXME: Solaris offers closefrom(3), though none of our other platforms appears to.
-        // Solaris' implementation of closefrom(3) (http://cvs.opensolaris.org/source/xref/on/usr/src/lib/libc/port/gen/closefrom.c) is roughly this. It seems to use the F_GETFD fcntl(3) to check whether an fd is valid before calling close(3), but that seems just be to reduce its temporary memory requirements. strace(1) on Linux says it still costs us a system call.
+        // Solaris offers closefrom(3), though none of our other platforms appears to.
         // BSD offers fcntl(F_CLOSEM) but none of our platforms appears to.
-        int maxNumberOfFiles = sysconf(_SC_OPEN_MAX);
-        for (int fd = STDERR_FILENO + 1; fd < maxNumberOfFiles; ++fd) {
-            close(fd);
+        
+        // On Cygwin, Linux, and Solaris, a better solution iterates over "/proc/self/fd/".
+        std::string fdDirectory("/proc/self/fd");
+#ifdef __APPLE__
+        // On Mac OS, there's "/dev/fd/" (which Linux seems to link to "/proc/self/fd/", but which on Solaris appears to be something quite different).
+        fdDirectory = "/dev/fd";
+#endif
+        
+        // There's no portable way to get the opendir(3) file descriptor, so we use two passes.
+        // Pass 1: collect the fds to close.
+        typedef std::deque<int> FdList;
+        FdList fds;
+        for (DirectoryIterator it(fdDirectory); it.isValid(); ++it) {
+            int fd = strtoul(it->getName().c_str(), NULL, 10);
+            if (fd > STDERR_FILENO) {
+                fds.push_back(fd);
+            }
+        }
+        
+        // Pass 2: close the fds.
+        for (FdList::const_iterator it = fds.begin(); it != fds.end(); ++it) {
+            // The close of the opendir(3) file descriptor will fail, but we ignore that.
+            close(*it);
         }
     }
 };
