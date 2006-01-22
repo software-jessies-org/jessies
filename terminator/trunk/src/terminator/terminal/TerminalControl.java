@@ -160,6 +160,13 @@ public class TerminalControl {
 	
 	private void handleProcessTermination() {
 		processIsRunning = false;
+
+		// If the JNI side failed to start, ptyProcess can be null.
+		// In that case, we'll already have reported the error.
+		if (ptyProcess == null) {
+			return;
+		}
+
 		try {
 			ptyProcess.waitFor();
 		} catch (Exception ex) {
