@@ -551,38 +551,43 @@ public class JTerminalPane extends JPanel {
 		control.destroyProcess();
 	}
 	
+	private boolean shouldClose() {
+		final PtyProcess ptyProcess = control.getPtyProcess();
+		if (ptyProcess == null) {
+			// This can happen if the JNI side failed to start.
+			// There's no reason not to close such a terminal.
+			return true;
+		}
+
+		final int directChildProcessId = ptyProcess.getProcessId();
+		final String processesUsingTty = ptyProcess.listProcessesUsingTty();
+
+		if (processesUsingTty.length() == 0) {
+			// There's nothing still running, so just close.
+			return true;
+		}
+
+		// Check if the only thing still running is the command we started.
+		// FIXME: ideally, PtyProcess would give us a List<ProcessInfo>, but that opens a whole can of JNI worms. Hence the following hack.
+		final String[] processList = processesUsingTty.split(", ");
+		if (processList.length == 1 && processList[0].matches("^.*\\(" + directChildProcessId + "\\)$")) {
+			return true;
+		}
+
+		boolean reallyClose = SimpleDialog.askQuestion(getTerminatorFrame(), "Terminator", "<html><b>Close Terminal?</b><p>Closing this terminal may terminate the following processes: " + processesUsingTty, "Terminate");
+		return reallyClose;
+	}
+
 	/**
 	 * Closes the terminal pane after checking with the user.
 	 * Returns false if the user canceled the close, true otherwise.
 	 */
 	public boolean doCheckedCloseAction() {
-		boolean shouldAskUser = true;
-		
-		final PtyProcess ptyProcess = control.getPtyProcess();
-		final int directChildProcessId = ptyProcess.getProcessId();
-		final String processesUsingTty = ptyProcess.listProcessesUsingTty();
-		
-		// If the only thing still running is the command we started, don't bother the user.
-		// FIXME: ideally, PtyProcess would give us a List<ProcessInfo>, but that opens a whole can of JNI worms. Hence the following hack.
-		final String[] processList = processesUsingTty.split(", ");
-		if (processList.length == 1 && processList[0].matches("^.*\\(" + directChildProcessId + "\\)$")) {
-			shouldAskUser = false;
+		if (shouldClose()) {
+			doCloseAction();
+			return true;
 		}
-		
-		// If there's nothing still running, don't bother the user.
-		if (processesUsingTty.length() == 0) {
-			shouldAskUser = false;
-		}
-		
-		if (shouldAskUser) {
-			boolean reallyClose = SimpleDialog.askQuestion(getTerminatorFrame(), "Terminator", "<html><b>Close Terminal?</b><p>Closing this terminal may terminate the following processes: " + processesUsingTty, "Terminate");
-			if (reallyClose == false) {
-				return false;
-			}
-		}
-		
-		doCloseAction();
-		return true;
+		return false;
 	}
 	
 	public void doCloseAction() {
