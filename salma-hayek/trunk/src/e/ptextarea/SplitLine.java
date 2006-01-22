@@ -1,13 +1,13 @@
 package e.ptextarea;
 
 class SplitLine {
-    private PLineList lines;
+    private PTextArea textArea;
     private int lineIndex;
     private int offset;
     private int length;
     
-    public SplitLine(PLineList lines, int lineIndex, int offset, int length) {
-        this.lines = lines;
+    public SplitLine(PTextArea textArea, int lineIndex, int offset, int length) {
+        this.textArea = textArea;
         this.lineIndex = lineIndex;
         this.offset = offset;
         this.length = length;
@@ -38,7 +38,7 @@ class SplitLine {
     }
     
     public int getTextIndex() {
-        return lines.getLine(lineIndex).getStart() + offset;
+        return textArea.getLineList().getLine(lineIndex).getStart() + offset;
     }
     
     public boolean containsIndex(int charIndex) {
@@ -47,7 +47,7 @@ class SplitLine {
     }
     
     public CharSequence getContents() {
-        CharSequence parent = lines.getLine(lineIndex).getContents();
+        CharSequence parent = textArea.getLineList().getLine(lineIndex).getContents();
         int end = offset + length;
         if (length > 0 && parent.charAt(end - 1) == '\n') {
             end -= 1;

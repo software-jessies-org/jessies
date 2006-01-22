@@ -1282,7 +1282,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         width = Math.max(width, MIN_WIDTH);  // Ensure we're at least a sensible width.
         if (line.getWidth() <= width) {
             // The whole line fits.
-            splitLines.add(index, new SplitLine(lines, lineIndex, 0, line.getContents().length()));
+            splitLines.add(index, new SplitLine(this, lineIndex, 0, line.getContents().length()));
         } else {
             // The line's too long, so break it into SplitLines.
             int x = 0;
@@ -1305,13 +1305,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                             }
                         }
                     }
-                    splitLines.add(index++, new SplitLine(lines, lineIndex, lastSplitOffset, i - lastSplitOffset));
+                    splitLines.add(index++, new SplitLine(this, lineIndex, lastSplitOffset, i - lastSplitOffset));
                     lastSplitOffset = i;
                     x = addCharWidth(0, ch);
                 }
             }
             if (x > 0) {
-                splitLines.add(index++, new SplitLine(lines, lineIndex, lastSplitOffset, chars.length() - lastSplitOffset));
+                splitLines.add(index++, new SplitLine(this, lineIndex, lastSplitOffset, chars.length() - lastSplitOffset));
             }
         }
         return (splitLines.size() - initialSplitLineCount);
