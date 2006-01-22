@@ -141,19 +141,33 @@ HEADER_EXTENSIONS += wxi
 EXTRA_INCLUDE_PATH += $(SALMA_HAYEK)/native/Headers
 
 CFLAGS += -std=c99
-PIC_FLAG.$(TARGET_OS) = -fPIC
-# Cygwin's g++ says:
+
+# A rather unconvincing and error-laden post from a guy who works on the JVM
+# suggests that the JVM may have trouble generating stack traces through native
+# code without these flags:
+# http://weblogs.java.net/blog/kellyohair/archive/2006/01/compilation_of.html
+C_AND_CXX_FLAGS += -fno-omit-frame-pointer -fno-strict-aliasing
+
+# Insist on position-independent code.
+# We do nothing on Cygwin because its g++ fails with:
 # warning: -fPIC ignored for target (all code is position independent)
-# And warnings are errors.
+PIC_FLAG.$(TARGET_OS) = -fPIC
 PIC_FLAG.Cygwin =
 C_AND_CXX_FLAGS += $(PIC_FLAG.$(TARGET_OS))
+
+# Include debugging information.
 C_AND_CXX_FLAGS += -g
+
 # Maximum warnings...
-C_AND_CXX_FLAGS += -W -Wall -Werror
+C_AND_CXX_FLAGS += -W -Wall -Wshadow -Wunreachable-code
 OBJC_AND_OBJCXX_FLAGS += -Wno-protocol -Wundeclared-selector
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
 PURE_C_AND_CXX_FLAGS += -pedantic
+
+# Treat warnings as errors.
+C_AND_CXX_FLAGS += -Werror
+
 CPPFLAGS += $(foreach DIRECTORY,$(EXTRA_INCLUDE_PATH),-I$(DIRECTORY))
 
 # Exposes ptsname on libc22 per the Linux man page but causes this on Mac OS X:

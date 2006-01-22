@@ -46,9 +46,6 @@ static void showSuggestionsForWord(NSString* word) {
 }
 
 static void ispellLoop() {
-    // Each thread needs its own pool, and we don't get one for free.
-    ScopedAutoReleasePool pool;
-    
     std::ostream& os(std::cout);
     os << "@(#) International Ispell 3.1.20 (but really NSSpellChecker)" << std::endl;
     while (true) {
@@ -83,6 +80,8 @@ static void ispellLoop() {
 @implementation Ispell
 - (void) ispellRunLoop:(id) unusedParameter {
     (void) unusedParameter;
+    // Each thread needs its own pool, and we don't get one for free.
+    ScopedAutoReleasePool pool;
     ispellLoop();
 }
 @end
