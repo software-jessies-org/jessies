@@ -191,10 +191,7 @@ public class GuiUtilities {
     
     public static void initLookAndFeel() {
         try {
-            String lafClassName = Parameters.getParameter("laf.className");
-            if (lafClassName == null) {
-                lafClassName = UIManager.getSystemLookAndFeelClassName();
-            }
+            String lafClassName = UIManager.getSystemLookAndFeelClassName();
             
             // FIXME: when we move to 1.6, remove this completely. The GTK LAF is okay there.
             if (lafClassName.contains("GTK") && System.getProperty("java.vm.version").startsWith("1.5.")) {
