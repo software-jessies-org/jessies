@@ -57,7 +57,6 @@ options.push("-Djava.awt.Window.locationByPlatform=true")
 options.push("-DpreferencesDirectory=#{cygpath(debugger_preferences_directory)}")
 
 invoker = Java.new("Debugger", "e/util/Launcher")
-invoker.set_icons("#{project_root}/lib/debugger.icns", "#{project_root}/lib/debugger-128.png")
 invoker.log_filename = log_filename
 invoker.add_extra_java_arguments(options)
 invoker.invoke([ "Debugger", "#{debugger_class_name}Launchable" ])
