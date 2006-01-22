@@ -19,6 +19,7 @@ public class DebugMenu {
         menu.add(new ShowSystemPropertiesAction());
         menu.addSeparator();
         menu.add(makeChangeLafMenu());
+        menu.add(new ShowUiDefaultsAction());
         menu.addSeparator();
         menu.add(new ListFramesAction());
         menu.add(new ListTimersAction());
@@ -173,6 +174,31 @@ public class DebugMenu {
             List<Timer> timers = TimerUtilities.getQueuedSwingTimers();
             for (Timer timer : timers) {
                 result.append(TimerUtilities.toString(timer));
+            }
+            return result.toString();
+        }
+    }
+    
+    private static class ShowUiDefaultsAction extends AbstractAction {
+        public ShowUiDefaultsAction() {
+            super("Show UI Defaults");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            showTextWindow(UIManager.getLookAndFeel().getName() + " UI Defaults", getUiDefaultsAsString());
+        }
+        
+        private String getUiDefaultsAsString() {
+            ArrayList<String> list = new ArrayList<String>();
+            UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+            for (Enumeration e = defaults.keys(); e.hasMoreElements();) {
+                Object key = e.nextElement();
+                list.add(key + "=" + defaults.get(key) + "\n");
+            }
+            Collections.sort(list, String.CASE_INSENSITIVE_ORDER);
+            StringBuilder result = new StringBuilder();
+            for (String line : list) {
+                result.append(line);
             }
             return result.toString();
         }
