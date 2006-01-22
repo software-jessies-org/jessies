@@ -8,5 +8,4 @@ salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
 require "#{salma_hayek}/bin/invoke-java.rb"
 
 invoker = Java.new("Dictionary", "e/tools/dict/DictionaryBrowser")
-invoker.set_icons("/Applications/Dictionary.app/Contents/Resources/Dictionary.icns", "")
 invoker.invoke()

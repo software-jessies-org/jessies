@@ -41,6 +41,8 @@ class Java
     init_default_heap_size()
     init_default_class_path()
     @library_path = []
+    
+    set_icons(name)
   end
 
   def add_class_path_entries(new_entries)
@@ -55,9 +57,15 @@ class Java
     @extra_java_arguments.concat(new_java_arguments)
   end
   
-  def set_icons(dock_icon, png_icon)
-    @dock_icon = dock_icon
-    @png_icon = png_icon
+  def set_icons(name)
+    dock_icon = "#{@project_root}/lib/#{name}.icns"
+    if Pathname.new(dock_icon).exist?
+      @dock_icon = dock_icon
+    end
+    png_icon = "#{@project_root}/lib/#{name}-128.png"
+    if Pathname.new(png_icon).exist?
+      @png_icon = png_icon
+    end
   end
   
   def init_default_heap_size()

@@ -8,5 +8,4 @@ salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
 require "#{salma_hayek}/bin/invoke-java.rb"
 
 invoker = Java.new("FatBits", "e/tools/FatBits")
-invoker.set_icons("/Developer/Applications/Graphics Tools/Pixie.app/Contents/Resources/Big.icns", "")
 invoker.invoke()
