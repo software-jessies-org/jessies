@@ -120,7 +120,6 @@ Signal.list().each() {
 }
 
 invoker = Java.new("Terminator", "terminator/Terminator")
-invoker.set_icons("#{terminator_home}/lib/terminator.icns", "#{terminator_home}/lib/terminator-128.png")
 invoker.add_library_path_entries([ pty_path ])
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
 invoker.launcher = launcher
