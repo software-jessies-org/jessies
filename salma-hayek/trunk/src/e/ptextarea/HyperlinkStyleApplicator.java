@@ -23,7 +23,8 @@ import java.util.regex.*;
  */
 class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
     // This character class and the regular expression below are based on the BNF in RFC 1738.
-    // Obviously, compromises have been made to fit the grammar into a regular expression.
+    // Compromises have been made to fit the grammar into a fairly readable regular expression.
+    // If we needed to, I think we could write an exact regular expression.
     private static final String SEARCH_CHARS = "[/A-Za-z0-9;:@&=%!*'(),$_.+-]";
     
     public HyperlinkStyleApplicator(PTextArea textArea) {
