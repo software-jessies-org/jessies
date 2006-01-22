@@ -140,8 +140,6 @@ HEADER_EXTENSIONS += wxi
 
 EXTRA_INCLUDE_PATH += $(SALMA_HAYEK)/native/Headers
 
-CFLAGS += -std=c99
-
 # A rather unconvincing and error-laden post from a guy who works on the JVM
 # suggests that the JVM may have trouble generating stack traces through native
 # code without these flags:
