@@ -1,3 +1,4 @@
+
 package e.gui;
 
 import e.util.*;
@@ -17,11 +18,19 @@ public class WebLinkAction extends AbstractAction {
         this.url = url;
     }
     
+    public WebLinkAction(String name, File file) {
+        this(name, urlFromFile(file));
+    }
+    
     public void actionPerformed(ActionEvent e) {
         try {
             BrowserLauncher.openURL(url);
         } catch (IOException ex) {
             SimpleDialog.showDetails(null, (String) getValue(NAME), ex);
         }
+    }
+    
+    private static String urlFromFile(File file) {
+        return file.toURI().toString();
     }
 }

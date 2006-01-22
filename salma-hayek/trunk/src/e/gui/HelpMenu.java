@@ -32,6 +32,12 @@ public class HelpMenu {
         //menu.add(new PlaceholderAction(applicationName + " Help"));
         //menu.addSeparator();
         
+        final String logFilename = System.getProperty("e.util.Log.filename");
+        if (logFilename != null) {
+            menu.add(new WebLinkAction("Show Log Messages", new File(logFilename)));
+            menu.addSeparator();
+        }
+        
         if (websiteUrl != null) {
             menu.add(new WebLinkAction("Go To Website", websiteUrl));
         }
