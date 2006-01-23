@@ -199,14 +199,28 @@ public class GuiUtilities {
             }
             
             UIManager.setLookAndFeel(lafClassName);
+            
+            // Tweak Sun's "Metal" cross-platform LAF.
             if (lafClassName.contains("Metal")) {
                 Object font = UIManager.get("Table.font");
                 UIManager.put("Menu.font", font);
                 UIManager.put("MenuItem.font", font);
             }
+            
+            // Tweak Apple's "Aqua" Mac OS LAF.
+            if (lafClassName.contains("Aqua")) {
+                // Apple's UI delegate has over-tight borders. (Apple 4417784.) Work-around by Werner Randelshofer.
+                UIManager.put("OptionPane.border", makeEmptyBorderResource(15-3, 24-3, 20-3, 24-3));
+                UIManager.put("OptionPane.messageAreaBorder", makeEmptyBorderResource(0, 0, 0, 0));
+                UIManager.put("OptionPane.buttonAreaBorder", makeEmptyBorderResource(16-3, 0, 0, 0));
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    
+    private static javax.swing.border.Border makeEmptyBorderResource(int top, int left, int bottom, int right) {
+        return new javax.swing.plaf.BorderUIResource.EmptyBorderUIResource(top, left, bottom, right);
     }
     
     /**
