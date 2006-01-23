@@ -136,6 +136,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     // 3. had some way to get the line numbers of matches so we can tell the bird view (it might even be better than the current system if we can give them all at once as an int[])
     public void findAllMatches(String regularExpression) {
         removeAllMatches();
+        currentRegularExpression = regularExpression;
         
         // Do we have something to search for?
         if (regularExpression == null || regularExpression.length() == 0) {
@@ -148,8 +149,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
         if (content == null) {
             return;
         }
-        
-        currentRegularExpression = regularExpression;
         
         // Compile the regular expression.
         Pattern pattern;
