@@ -1,12 +1,12 @@
 package terminator.view.highlight;
 
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.regex.*;
 import javax.swing.*;
-import e.util.*;
-
 import terminator.*;
 import terminator.model.*;
 import terminator.view.*;
@@ -213,7 +213,7 @@ public class HyperlinkHighlighter implements Highlighter {
 				public void processExited(int status) {
 					if (status != 0) {
 						SwingUtilities.getWindowAncestor(view).toFront();
-						JOptionPane.showMessageDialog(view, "Process '" + command + "' exited with status " + status + ".", "Terminator", JOptionPane.WARNING_MESSAGE);
+						SimpleDialog.showAlert(view, "Terminator", "Process '" + command + "' exited with status " + status + ".");
 					}
 				}
 			};
