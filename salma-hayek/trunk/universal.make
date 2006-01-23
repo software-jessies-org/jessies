@@ -157,7 +157,9 @@ C_AND_CXX_FLAGS += $(PIC_FLAG.$(TARGET_OS))
 C_AND_CXX_FLAGS += -g
 
 # Maximum warnings...
-C_AND_CXX_FLAGS += -W -Wall -Wshadow -Wunreachable-code
+C_AND_CXX_FLAGS += -W -Wall -Wshadow
+# As long as people are using GCC 3, we can't turn this on because <string> is broken.
+#C_AND_CXX_FLAGS += -Wunreachable-code
 OBJC_AND_OBJCXX_FLAGS += -Wno-protocol -Wundeclared-selector
 # ... but assume that C++ will eventually subsume C99.
 CXXFLAGS += -Wno-long-long
