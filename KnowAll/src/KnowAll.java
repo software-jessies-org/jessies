@@ -30,9 +30,10 @@ import javax.swing.event.*;
 import javax.swing.text.html.*;
 
 public class KnowAll extends JFrame {
+    private JComponent fixedContent;
     private JTextPane textPane = new JTextPane();
     private JLabel statusBar = new JLabel(" ");
-
+    
     private ArrayList<Advisor> advisors = new ArrayList<Advisor>();
 
     private ClipboardMonitor clipboardMonitor;
@@ -40,6 +41,7 @@ public class KnowAll extends JFrame {
     public KnowAll() {
         super("KnowAll");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLocationByPlatform(true);
         initAdvisors();
         initTextPane();
         initUi();
@@ -67,11 +69,22 @@ public class KnowAll extends JFrame {
         HTMLEditorKit editorKit = (HTMLEditorKit) textPane.getEditorKit();
         StyleSheet styleSheet = editorKit.getStyleSheet();
         styleSheet.removeStyle("body");
-        styleSheet.addRule("body { font-family: Arial,Helvetica,sans-serif }");
+        styleSheet.addRule("body { font-family: Lucida Grande,Arial,Helvetica,sans-serif }");
         styleSheet.addRule("body { font-size: 10 }");
     }
-
+    
+    private void initFixedContent() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        // FIXME: don't hard-code these.
+        panel.add(new WorldClock("America/Los_Angeles"));
+        panel.add(new WorldClock("Europe/London"));
+        fixedContent = panel;
+    }
+    
     private void initUi() {
+        initFixedContent();
+        getContentPane().add(fixedContent, BorderLayout.NORTH);
         getContentPane().add(new JScrollPane(textPane), BorderLayout.CENTER);
         getContentPane().add(statusBar, BorderLayout.SOUTH);
         setSize(300, 500);
