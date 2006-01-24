@@ -140,6 +140,8 @@ HEADER_EXTENSIONS += wxi
 
 EXTRA_INCLUDE_PATH += $(SALMA_HAYEK)/native/Headers
 
+CFLAGS += -std=c99
+
 # A rather unconvincing and error-laden post from a guy who works on the JVM
 # suggests that the JVM may have trouble generating stack traces through native
 # code without these flags:
@@ -222,8 +224,6 @@ JNI_LIBRARY_EXTENSION.Darwin = jnilib
 # The default $(LD) doesn't know about -dynamiclib on Darwin.
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
 LD = $(CXX)
-# The default $(CC) used by $(LINK.o) doesn't know about the Darwin equivalent of -lstdc++.
-CC = $(CXX)
 
 # Note that our Solaris build assumes GCC rather than Sun's compiler.
 # GCC's -shared option, which we use on Linux, exists, but produces link
