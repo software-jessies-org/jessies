@@ -247,6 +247,15 @@ public class ETextWindow extends EWindow implements PTextListener {
         return Pattern.compile("(#ifndef|" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ")").matcher(content).find();
     }
     
+    private void highlightMergeConflicts() {
+        // FIXME: this works for BitKeeper, but is it right for Subversion too?
+        final String MERGE_CONFLICT_REGULAR_EXPRESSION = "(<{7} .*|>{7})";
+        if (Pattern.compile(MERGE_CONFLICT_REGULAR_EXPRESSION).matcher(text.getTextBuffer()).find()) {
+            System.err.println("found evidence of merge conflicts");
+            FindAction.INSTANCE.findInText(this, MERGE_CONFLICT_REGULAR_EXPRESSION);
+        }
+    }
+    
     private HashSet<String> getSpellingExceptionsForLanguage(String language) {
         HashSet<String> exceptions = SPELLING_EXCEPTIONS_MAP.get(language);
         if (exceptions == null) {
@@ -315,6 +324,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             
             configureForGuessedFileType();
             updateWatermarkAndTitleBar();
+            highlightMergeConflicts();
             text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
             text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
