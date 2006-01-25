@@ -6,6 +6,7 @@ ifndef
 undef
 # Common non-standard identifiers.
 init
+mutex
 # POSIX.1 describes these as "in common usage", suggesting _SYSIII as a feature test macro.
 uint
 ulong
@@ -21,8 +22,10 @@ npos
 ostream
 ostringstream
 rbegin
+rdbuf
 setfill
 setw
+sputc
 sstream
 streambuf
 substr
