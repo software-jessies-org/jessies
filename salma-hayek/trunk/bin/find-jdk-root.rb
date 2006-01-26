@@ -44,6 +44,7 @@ def find_jdk_root()
   require "#{@salma_hayek}/bin/target-os.rb"
   
   # Find java(1) on the path.
+  # `/bin/bash -c "type -p java"` would be an alternative.
   java_on_path=`/usr/bin/which java`.chomp()
   
   # Neophyte users are likely to be using whatever's in /usr/bin, and that's
