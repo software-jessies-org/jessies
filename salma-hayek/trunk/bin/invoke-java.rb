@@ -156,7 +156,7 @@ class Java
       args << "-Xdock:name=#{@dock_name}"
       args << "-Xdock:icon=#{@dock_icon}"
     end
-    args << "-Dorg.jessies.frameIcon=#{@png_icon}"
+    args << "-Dorg.jessies.frameIcon=#{cygpath(@png_icon)}"
     args.concat(@extra_java_arguments)
     args << @class_name
     args.concat(extra_app_arguments)
