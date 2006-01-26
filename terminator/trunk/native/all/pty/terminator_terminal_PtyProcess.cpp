@@ -204,7 +204,8 @@ static bool processHasFileOpen(const std::string& pid, const std::string& filena
     std::string fdDirectoryName = std::string("/proc/") + pid + "/fd/";
     try {
         std::vector<char> buf;
-        buf.resize(filename.length());
+        // If the link points to a longer name, we'll be able to read more than filename.length() bytes.
+        buf.resize(filename.length() + 1);
         
         for (DirectoryIterator it(fdDirectoryName); it.isValid(); ++it) {
             int status = ::readlink((fdDirectoryName + it->getName()).c_str(), &buf[0], buf.size());
