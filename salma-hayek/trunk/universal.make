@@ -381,6 +381,11 @@ JAVA_FLAGS += -target 1.5
 # This should also weed out any attempt to use a Java older than 1.4.
 JAVA_FLAGS += -source 1.5
 
+# javac(1) warns if you build source containing characters unrepresentable
+# in your locale. Although we all use UTF-8 locales, we can't guarantee that
+# everyone else does, so let the compiler know that our source is in UTF-8.
+JAVA_FLAGS += -encoding UTF-8
+
 define BUILD_JAVA
   @echo Recompiling the world... && \
   $(RM) -r classes && \
