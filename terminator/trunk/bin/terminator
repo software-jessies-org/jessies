@@ -82,6 +82,11 @@ else
 end
 ENV["TERMINFO"] = terminfo
 
+# rubyw.exe quits if it can't write its "Insecure would writable dir" warnings to $stderr
+# every time it uses system() or back quote.
+if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
+  $stderr = File.open("/dev/null", "w")
+end
 # `/usr/bin/which tic` would be an alternative.
 tic_binary = `/bin/bash -c "type -p tic"`.chomp()
 terminfo_SRC = "#{terminator_home}/lib/terminfo/terminator.tic"
