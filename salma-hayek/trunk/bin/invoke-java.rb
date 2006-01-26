@@ -125,6 +125,8 @@ class Java
     # Experience suggests that various startup files are likely to reset the PATH in terminator shells.
     newPathComponents.concat(getExtraPathComponents())
     newPathComponents.concat(originalPathComponents)
+    # Find cygwin1.dll.
+    newPathComponents << "/bin"
     # uniq() seems to do The Right Thing with unsorted duplicates:
     # removing the later ones, preserving order.
     # @salma_hayek may be the same as @project_root, particular with installed versions.
