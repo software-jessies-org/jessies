@@ -189,10 +189,7 @@ Configuration
   good as Apple's. And I guess the right direction to go in is one that moves
   us away from .Xdefaults and .Xresources except as an initial land grab.
 
-* Shouldn't log while in alternate buffer mode. martind thinks logging is
-  useful when looking at log files, to see when someone's used vim(1). My
-  background with xwsh(1) makes me think we shouldn't even show the scroll bar
-  in alternate buffer mode. Maybe we should ask you up-front, when you first
+* Maybe we should ask you up-front, when you first
   use Terminator, which of the great terminal emulators you think is the one
   true emulator: xwsh or xterm? The former group get pretty much the current
   set of defaults, and the latter get a more black-on-white style.
@@ -282,6 +279,16 @@ RFEs
   terminal while it's asking me to confirm.  Canceling the shutdown so
   that I can hit ^:wq and then starting the shutdown again is a pain".
 
+* car: what's the point of showing me the log filename in
+  the Info dialog?  I've needed to find out the log filename twice so far
+  (aside, I vote to keep the scrollbars and logging active while I'm
+  running vi) and in both instances I immediately copied and pasted the
+  filename somewhere else to open the log.
+  I'm unlikely to want the log filename for any reason other than that I
+  want it opened right now.  Terminator could open it for me at my request --
+  using whatever you're throwing the links at (in my case, open) would
+  be highly satisfactory.
+
 Tab-related
 -----------
 
@@ -327,3 +334,6 @@ Tab-related
   window (rather than having to cycle through them). Most other multi-tab
   terminals use alt-1, alt-2, and so on. Anyone with more than 10 terminal
   tabs in a window is crazy!
+  car adds: "I used such a feature quite a lot with Tora, flipping between
+  Oracle sessions, it proved most convenient.  Screen does this too, but I use
+  cycling more there, and use screen less and less these days."
