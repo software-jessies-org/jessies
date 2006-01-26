@@ -206,8 +206,9 @@ instead of from the icon until you work out what's wrong.
 If you do that, use ruby.exe rather than rubyw.exe.
 rubyw.exe is a version of Ruby linked with the --subsystem windows instead of
 --subsystem console.
-This subsystem throws away the standard I/O streams but it does mean that you don't get
-a spurious window.
+rubyw.exe quits with no visible error if it tries to do standard I/O.
+One reason why it might do this is a world-writable directory on the PATH, as explained
+<a href="../salma-hayek/cygwin-setup.html">here</a>.
 Any console output from the Java, as opposed to the start-up script, is recorded in a file in
 <tt>~/.terminal-logs/</tt> along with a file containing a log of each tab's output.
 
