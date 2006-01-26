@@ -44,6 +44,9 @@ public class VisualBellViewport extends JViewport {
     }
     
     private void paintBell(Graphics g) {
+        if (Options.getSharedInstance().isVisualBell() == false) {
+            return;
+        }
         Color foreground = Options.getSharedInstance().getColor("foreground");
         if (Options.getSharedInstance().isFancyBell()) {
             // On decent hardware, we can produce a really tasteful effect

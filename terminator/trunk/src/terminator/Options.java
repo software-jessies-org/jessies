@@ -37,6 +37,7 @@ public class Options {
 	private static final String BLOCK_CURSOR = "blockCursor";
 	private static final String CURSOR_BLINK = "cursorBlink";
 	private static final String FANCY_BELL = "fancyBell";
+	private static final String VISUAL_BELL = "visualBell";
 	private static final String FONT_NAME = "fontName";
 	private static final String FONT_SIZE = "fontSize";
 	private static final String INITIAL_COLUMN_COUNT = "initialColumnCount";
@@ -114,6 +115,13 @@ public class Options {
 	 */
 	public boolean isFancyBell() {
 		return booleanResource(FANCY_BELL);
+	}
+	
+	/**
+	 * Whether to do nothing when asked to flash.
+	 */
+	public boolean isVisualBell() {
+		return booleanResource(VISUAL_BELL);
 	}
 	
 	/**
@@ -264,6 +272,7 @@ public class Options {
 		addDefault(BLOCK_CURSOR, Boolean.FALSE, "Use block cursor?");
 		addDefault(CURSOR_BLINK, Boolean.TRUE, "Blink cursor?");
 		addDefault(FANCY_BELL, Boolean.TRUE, "High-quality rendering of the visual bell?");
+		addDefault(VISUAL_BELL, Boolean.TRUE, "Visual bell (as opposed to no bell)?");
 		addDefault(FONT_NAME, makePrototypeFont(GuiUtilities.getMonospacedFontName()), "Font family");
 		addDefault(FONT_SIZE, Integer.valueOf(12), "Font size (points)");
 		addDefault(INITIAL_COLUMN_COUNT, Integer.valueOf(80), "New terminal width");
