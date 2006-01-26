@@ -1,34 +1,34 @@
-* Our sideways-scrolling performance is weak when we have long lines. We don't
-  take the clip rectangle into account to try to avoid work, and ask
-  Graphics.drawString to render really long lines. On Mac OS, at least, this
-  isn't a very good idea; even with a monospaced font, it seems to assume
-  you've done the clipping yourself. [This seems mainly to be a problem for
-  VNC users, not real people.]
+Bugs
+----
 
-* Feedback on other tabs when there's been output you haven't seen yet? I'm
-  thinking of something like a Mac OS asynchronous progress indicator in the
-  tab ears of non-visible tabs. One turn per line of unseen output? That gives
-  you both a Boolean "is there anything I haven't seen?" plus an open-ended
-  way of showing further progress. Remember how much more useful Mail's dock
-  badge count is than Outlook's Boolean.
+* If the text changes under the selection, the selection should be cleared.
 
-* Shouldn't log while in alternate buffer mode. martind thinks logging is
-  useful when looking at log files, to see when someone's used vim(1). My
-  background with xwsh(1) makes me think we shouldn't even show the scroll bar
-  in alternate buffer mode. Maybe we should ask you up-front, when you first
-  use Terminator, which of the great terminal emulators you think is the one
-  true emulator: xwsh or xterm? The former group get pretty much the current
-  set of defaults, and the latter get a more black-on-white style.
+  1. run vim on some file larger than a screen's worth.
+  2. select a few lines in the middle.
+  3. scroll with C-e and C-y.
 
-* Phil suggested "add ability to view more than one terminal at a time, in a
-  split pane, or in a 2d-tiled layout". I'm not entirely convinced, but can
-  see an argument that the tab/window distinction shouldn't be so fixed. Why
-  can't I make a tab into a window, or vice versa? What would the UI be,
-  especially for turning a window into a tab? Apple's Terminal has a weird (to
-  my mind) feature that lets you split a single terminal so you have two views
-  into the same terminal. So you can be looking at one part of the scrollback
-  while working at the bottom (one presumes). I've no idea what this is for,
-  but felt I should mention it.
+  notice also that the selection *is* cleared if you scroll an empty line
+  into the selection.
+
+  Another demonstration of the problem is selecting some text in vi(1),
+  then quitting. We switch out of alternate buffer mode, but don't clear
+  the selection highlight.
+
+  There are many bugs involving the highlight updating. (First reported
+  on software@ on 2004-11-02.)
+
+* car: Terminator's "select words" (aka double-click) and "select lines" (aka
+  triple-click) modes are forgotten when I move the end of the selection.  In
+  most other apps, it seems, if I double-click and drag, I want the selected
+  area increment or decrement by whole words.  Ditto when I'm selecting lines.
+  Terminator, as soon as I move the end of the selected text, drops back to
+  character increments.
+
+* FIXME: car reported various emulation/terminfo problems in a mail thread I
+  don't have to hand.
+
+Configuration
+-------------
 
 * Should allow the user to specify a log filename per tab, on the command line.
   Mail chrisa@bluearc.com when this is done, because he wants to use it.
@@ -40,10 +40,60 @@
   good as Apple's. And I guess the right direction to go in is one that moves
   us away from .Xdefaults and .Xresources except as an initial land grab.
 
+* Shouldn't log while in alternate buffer mode. martind thinks logging is
+  useful when looking at log files, to see when someone's used vim(1). My
+  background with xwsh(1) makes me think we shouldn't even show the scroll bar
+  in alternate buffer mode. Maybe we should ask you up-front, when you first
+  use Terminator, which of the great terminal emulators you think is the one
+  true emulator: xwsh or xterm? The former group get pretty much the current
+  set of defaults, and the latter get a more black-on-white style.
+
+* car: "Lack of any obvious preferences/ configuration mechanism (font's
+  too big)". "--help" tells you about the resources, but (a) that's not
+  available from within Terminator, and (b) that's not exactly friendly.
+
+* car: "Not so long ago, when I was a SuSE/konsole user, and even back when I
+  was a student using xwsh, I'd have a few different default sets, for
+  different tasks, like tailing log files or ftping the output of xfig
+  over to the AIX box I was writing my troff on.  It'd be cool to have
+  terminator recognize the title of my window (set by me opening a "New
+  Command") and say "hey, dude's tailing query.log again, best drop the
+  font size to 8 points and the terminal width to 132 characters."  You'd
+  only have to recognize it once, when the window is created, and that way
+  you could even have your different defaults for different shells, if you
+  were that way inclined.  Doesn't sound like rocket science, but then
+  again it does sound a bit "green courier on black."  PuTTY does allow
+  you to do the same thing, in a roundabout way." Several people I know use
+  terminals in this kind of way, with (effectively) per-title settings.
+  Personally, the only interest I've ever had for it was in distinguishing
+  local and remote windows. I can't think how to do any of this without making
+  the existing configuration problems worse, though.
+
+Security
+--------
+
+* On Mac OS, we should probably do what Terminal does to subvert keystroke
+  logging (http://www.cocoadev.com/index.pl?SecureKeyboardEntry). There's
+  also a good post on the alluded-to problems Apple warns about:
+  http://rentzsch.com/macosx/terminalSecureKeyboardEntry
+
+Performance
+-----------
+
+* Our sideways-scrolling performance is weak when we have long lines. We don't
+  take the clip rectangle into account to try to avoid work, and ask
+  Graphics.drawString to render really long lines. On Mac OS, at least, this
+  isn't a very good idea; even with a monospaced font, it seems to assume
+  you've done the clipping yourself. [This seems mainly to be a problem for
+  VNC users, not real people.]
+
 * Rewrite the hyper-link code to be less eager. [It's already rewritten to be
   less eager in the sense that I meant when I wrote this, but I wonder if the
   user shouldn't have to explicitly ask us to look for possible links? That
   might also give us scope for offering various selection-related actions.]
+
+RFEs
+----
 
 * Our double-click selection may be pretty clever in situations where xterm
   and rxvt aren't, but it doesn't work as well in situations they're good at:
@@ -61,9 +111,8 @@
 
 * The actions available on Mac OS should all be available on Linux, even if
   they aren't on the pop-up menu. menuAndKeyActions might want a keyActions
-  sibling. If we fixed the menu bar to work on Linux, is there a way to have
-  it present (for key handling) but invisible? That would be the nicest
-  solution to this problem.
+  sibling. Is there a way to have the menu bar present (for key handling) but
+  invisible? That would keep the 1970s crowd happy.
 
 * the absence of system wide C-`/C-~ functionality would make cycling through
   windows even more useful on Linux, so maybe we should support alt-` and
@@ -73,32 +122,26 @@
   In voluminous output, indication of clustering of matches could be
   helpful to me."
 
-* car: "Lack of any obvious preferences/ configuration mechanism (font's
-  too big)". "--help" tells you about the resources, but (a) that's not
-  available from within Terminator, and (b) that's not exactly friendly.
-
 * car: on Mac OS, at least, open(1) is perhaps a better idea than $EDITOR.
   "start" on Win32?
 
-* If the text changes under the selection, i think the selection should be
-  cleared.
-
-  1. run vim on some file larger than a screen's worth.
-  2. select a few lines in the middle.
-  3. scroll with C-e and C-y.
-
-  notice also that the selection *is* cleared if you scroll an empty line
-  into the selection.
-
-  Another demonstration of the problem is selecting some text in vi(1),
-  then quitting. We switch out of alternate buffer mode, but don't clear
-  the selection highlight.
-
-  There are many bugs involving the highlight updating. (First reported
-  on software@ on 2004-11-02.)
-
 * There are some interesting features and bugs mentioned on the Konsole
   ChangeLog page: http://konsole.kde.org/changelog.php
+
+* car makes an argument for not having window-modal confirmation like Terminal
+  does: "Where Terminal gets it wrong, though, is that it blocks input to the
+  terminal while it's asking me to confirm.  Canceling the shutdown so
+  that I can hit ^:wq and then starting the shutdown again is a pain".
+
+Tab-related
+-----------
+
+* Feedback on other tabs when there's been output you haven't seen yet? I'm
+  thinking of something like a Mac OS asynchronous progress indicator in the
+  tab ears of non-visible tabs. One turn per line of unseen output? That gives
+  you both a Boolean "is there anything I haven't seen?" plus an open-ended
+  way of showing further progress. Remember how much more useful Mail's dock
+  badge count is than Outlook's Boolean.
 
 * On Mac OS, Safari-style tabs would be much better than the usual Aqua ones
   for our purposes. They take up significantly less space, and don't require
@@ -120,33 +163,6 @@
   escapes so we can put them in the window title -- it's worth writing our
   own program to set the window title?
 
-* car makes an argument for not having window-modal confirmation like Terminal
-  does: "Where Terminal gets it wrong, though, is that it blocks input to the
-  terminal while it's asking me to confirm.  Canceling the shutdown so
-  that I can hit ^:wq and then starting the shutdown again is a pain".
-
-* car: "Not so long ago, when I was a SuSE/konsole user, and even back when I
-  was a student using xwsh, I'd have a few different default sets, for
-  different tasks, like tailing log files or ftping the output of xfig
-  over to the AIX box I was writing my troff on.  It'd be cool to have
-  terminator recognize the title of my window (set by me opening a "New
-  Command") and say "hey, dude's tailing query.log again, best drop the
-  font size to 8 points and the terminal width to 132 characters."  You'd
-  only have to recognize it once, when the window is created, and that way
-  you could even have your different defaults for different shells, if you
-  were that way inclined.  Doesn't sound like rocket science, but then
-  again it does sound a bit "green courier on black."  PuTTY does allow
-  you to do the same thing, in a roundabout way." Several people I know use
-  terminals in this kind of way, with (effectively) per-title settings.
-  Personally, the only interest I've ever had for it was in distinguishing
-  local and remote windows. I can't think how to do any of this without making
-  the existing configuration problems worse, though.
-
-* On Mac OS, we should probably do what Terminal does to subvert keystroke
-  logging (http://www.cocoadev.com/index.pl?SecureKeyboardEntry). There's
-  also a good post on the alluded-to problems Apple warns about:
-  http://rentzsch.com/macosx/terminalSecureKeyboardEntry
-
 * On Mac OS, if you resize a Terminator window, it flashes white as it
   seemingly fills the background before we do. if you force the LAF to be
   Metal, it works. so it's something to do with the Aqua LAF. it's not fixed
@@ -158,9 +174,7 @@
   writing our own JTabbedPane UI delegate that's more like Safari's, and
   doesn't rely on transparency.)
 
-* car: Terminator's "select words" (aka double-click) and "select lines" (aka
-  triple-click) modes are forgotten when I move the end of the selection.  In
-  most other apps, it seems, if I double-click and drag, I want the selected
-  area increment or decrement by whole words.  Ditto when I'm selecting lines.
-  Terminator, as soon as I move the end of the selected text, drops back to
-  character increments.
+* It might be useful to add a way to move directly to a tab in the current
+  window (rather than having to cycle through them). Most other multi-tab
+  terminals use alt-1, alt-2, and so on. Anyone with more than 10 terminal
+  tabs in a window is crazy!
