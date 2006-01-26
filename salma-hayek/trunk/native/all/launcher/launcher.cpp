@@ -62,13 +62,13 @@ public:
     }
     std::sort(versions.begin(), versions.end());
     if (versions.empty()) {
-      throw UsageError("please install JRE");
+      throw UsageError("please install a JRE or JDK");
     }
     std::string version = versions.back();
     std::string jvmRegistryPath = std::string(jreRegistryPath) + "/" + version + "/RuntimeLib";
     std::ifstream is(jvmRegistryPath.c_str());
     if (is.bad()) {
-      throw UsageError("couldn't open " + jvmRegistryPath);
+      throw UsageError("couldn't open \"" + jvmRegistryPath + "\"");
     }
     std::ostringstream jvmLibraryPath;
     jvmLibraryPath << is.rdbuf();
@@ -77,7 +77,7 @@ public:
   
   std::string findWin32JvmLibrary() const {
     std::ostringstream os;
-    os << "couldn't find jvm.dll - please set $JAVA_HOME or install a JRE";
+    os << "couldn't find jvm.dll - please set $JAVA_HOME or install a JRE or JDK";
     os << "error messages were:";
     os << std::endl;
     try {
@@ -132,7 +132,7 @@ private:
     void* sharedLibraryHandle = dlopen(sharedLibraryFilename, RTLD_LAZY);
     if (sharedLibraryHandle == 0) {
       std::ostringstream os;
-      os << "dlopen(" << sharedLibraryFilename << ") failed with " << dlerror();
+      os << "dlopen(\"" << sharedLibraryFilename << "\") failed with " << dlerror();
       throw UsageError(os.str());
     }
     // Work around:
@@ -140,7 +140,7 @@ private:
     CreateJavaVM createJavaVM = reinterpret_cast<CreateJavaVM> (reinterpret_cast<long> (dlsym(sharedLibraryHandle, "JNI_CreateJavaVM")));
     if (createJavaVM == 0) {
       std::ostringstream os;
-      os << "dlsym(" << sharedLibraryFilename << ", JNI_CreateJavaVM) failed with " << dlerror();
+      os << "dlsym(\"" << sharedLibraryFilename << "\", JNI_CreateJavaVM) failed with " << dlerror();
       throw UsageError(os.str());
     }
     return createJavaVM;
@@ -150,7 +150,7 @@ private:
     jclass javaClass = env->FindClass(className.c_str());
     if (javaClass == 0) {
       std::ostringstream os;
-      os << "FindClass(" << className << ") failed";
+      os << "FindClass(\"" << className << "\") failed";
       throw UsageError(os.str());
     }
     return javaClass;
@@ -159,7 +159,7 @@ private:
   jmethodID findMainMethod(jclass mainClass) {
     jmethodID method = env->GetStaticMethodID(mainClass, "main", "([Ljava/lang/String;)V");
     if (method == 0) {
-      throw UsageError("GetStaticMethodID(main) failed");
+      throw UsageError("GetStaticMethodID(\"main\") failed");
     }
     return method;
   }
@@ -168,7 +168,7 @@ private:
     jstring javaString = env->NewStringUTF(nativeString);
     if (javaString == 0) {
       std::ostringstream os;
-      os << "NewStringUTF(" << nativeString << ") failed";
+      os << "NewStringUTF(\"" << nativeString << "\") failed";
       throw UsageError(os.str());
     }
     return javaString;
