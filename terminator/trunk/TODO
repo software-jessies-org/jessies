@@ -24,8 +24,157 @@ Bugs
   Terminator, as soon as I move the end of the selected text, drops back to
   character increments.
 
-* FIXME: car reported various emulation/terminfo problems in a mail thread I
-  don't have to hand.
+* car: notes on the following bugs:
+  I've been having problems with vi, bash, tcsh, long lines.  All hosts
+  used have up to date copies of terminator.tic in the appropriate
+  system-wide location.  You can assume that I've checked all of these
+  on a local OS X box, a remote Debian box (jessies.org,) a remote
+  Solaris 8 box, a remote Solaris 10 box and a remote FreeBSD 6.0 box
+  and that any platform not mentioned did not display the bug.  You can
+  also assume that other terminal emulators I've used (xterm, PuTTY,
+  Terminal) have not shown these bugs to my memory, but I've made only
+  a cursory effort to verify this.  Logged in over ssh to remote
+  hosts.  I'm reporting these because they're interfering with my
+  work.
+
+* car: "Problem 1"
+  First, deleting a line from vi.  This is demonstrable on remote
+  Solaris 8 and 10 machines, and remote FreeBSD 6.0.
+
+  Open terminator.tic, scroll so that no long lines are visible (to
+  prevent confusion with what is potentially a different bug,) cursor
+  in this example is on the third from bottom line:
+
+  http://www-users.york.ac.uk/~car7/terminator/vi%20dd%200.png
+
+  Type 'dd' to delete the current line.  Instead of the current line
+  disappearing and lines below shifting up one, the whole screen shifts
+  up one line:
+
+  http://www-users.york.ac.uk/~car7/terminator/vi%20dd%201.png
+
+  Type 'u' to undo 'dd'.  Old line is reinserted where it was removed,
+  lines below shuffle down.  But lines above cursor position are still
+  displaced:
+
+  http://www-users.york.ac.uk/~car7/terminator/vi%20dd%202.png
+
+  Use Ctrl-l to redraw, display is as it should be:
+
+  http://www-users.york.ac.uk/~car7/terminator/vi%20dd%203.png
+
+  enh's notes:
+
+  looks like it could be the "cud" and "cuu" sequences, but
+  remove those from the terminfo and the behavior's still wrong.
+
+  'dd' on the middle line (from 'M') of bkmakeall with Solaris vi:
+
+  2005-12-28T14:24:24.378-0800 Terminator: Processing escape sequence "[1M"
+  2005-12-28T14:24:24.378-0800 Terminator: Processing escape sequence "[18B"
+  2005-12-28T14:24:24.378-0800 Terminator: Processing escape sequence "[K"
+  2005-12-28T14:24:24.378-0800 Terminator: Processing escape sequence "[18A"
+  2005-12-28T14:24:24.379-0800 Terminator: Processing line "mail_raw_log="
+  2005-12-28T14:24:24.379-0800 Terminator: Processing special char "CR"
+
+  with Linux vim:
+
+  2005-12-28T14:30:58.438-0800 Terminator: Processing escape sequence "[?25l"
+  2005-12-28T14:30:58.438-0800 Terminator: Processing escape sequence "[20;39r"
+  2005-12-28T14:30:58.438-0800 Terminator: Processing escape sequence "[39;1H"
+  2005-12-28T14:30:58.438-0800 Terminator: Processing escape sequence "[1;40r"
+  2005-12-28T14:30:58.439-0800 Terminator: Processing escape sequence "[39;1H"
+  2005-12-28T14:30:58.439-0800 Terminator: Processing escape sequence "[40;1H"
+  2005-12-28T14:30:58.439-0800 Terminator: Processing escape sequence "[K"
+  2005-12-28T14:30:58.439-0800 Terminator: Processing escape sequence "[40;63H"
+  2005-12-28T14:30:58.439-0800 Terminator: Processing escape sequence "[10C"
+  2005-12-28T14:30:58.440-0800 Terminator: Processing escape sequence "]2;bkmakeall + (~/Projects/misc/tools/scripts) - VIM\u0007"
+  2005-12-28T14:30:58.449-0800 Terminator: Processing escape sequence "[20;1H"
+  2005-12-28T14:30:58.449-0800 Terminator: Processing escape sequence "[?25h"
+  2005-12-28T14:30:58.449-0800 Terminator: Processing special char "CR"
+  2005-12-28T14:30:58.449-0800 Terminator: Processing special char "LF"
+  2005-12-28T14:30:58.449-0800 Terminator: Processing line "mail_raw_log="
+  2005-12-28T14:30:58.450-0800 Terminator: Processing line "19,1"
+  2005-12-28T14:30:58.450-0800 Terminator: Processing line "Top"
+
+* car: "Problem 2"
+  On remote Solaris 8 and 10 boxes, vi has trouble with wrapping long
+  lines.  Shown here are the same file, opened in vi:
+
+  http://www-users.york.ac.uk/~car7/terminator/vi%20terminator.tic.png
+
+  And the same file opened with head:
+
+  http://www-users.york.ac.uk/~car7/terminator/head%20terminator.tic.png
+
+  enh's notes:
+  this one's weird; it really does look like Solaris vi is going
+  out of its way to do the wrong thing with all those extra CR LF sequences.
+
+  solaris:
+
+  2005-12-28T15:13:52.434-0800 Terminator: Processing line "#{ Sample crontab"
+  2005-12-28T15:13:52.434-0800 Terminator: Processing special char "CR"
+  2005-12-28T15:13:52.434-0800 Terminator: Processing special char "LF"
+  2005-12-28T15:13:52.434-0800 Terminator: Processing line "05 02 * * * for r in misc docs marlin stingray; do cd \$HOME/work/\$r; ../misc/t"
+  2005-12-28T15:13:52.434-0800 Terminator: Processing special char "CR"
+  2005-12-28T15:13:52.434-0800 Terminator: Processing special char "LF"
+  2005-12-28T15:13:52.434-0800 Terminator: Processing special char "CR"
+  2005-12-28T15:13:52.434-0800 Terminator: Processing special char "LF"
+  2005-12-28T15:13:52.435-0800 Terminator: Processing line "ools/scripts/bkmakeall; done"
+  2005-12-28T15:13:52.435-0800 Terminator: Processing special char "CR"
+  2005-12-28T15:13:52.435-0800 Terminator: Processing special char "LF"
+  2005-12-28T15:13:52.435-0800 Terminator: Processing line "#}"
+
+  linux:
+
+  2005-12-28T15:15:12.252-0800 Terminator: Processing line "#{ Sample crontab"
+  2005-12-28T15:15:12.252-0800 Terminator: Processing special char "CR"
+  2005-12-28T15:15:12.252-0800 Terminator: Processing special char "LF"
+  2005-12-28T15:15:12.252-0800 Terminator: Processing line "05 02 * * * for r in misc docs marlin stingray; do cd \$HOME/work/\$r; ../misc/t"
+  2005-12-28T15:15:12.253-0800 Terminator: Processing line "ools/scripts/bkmakeall; done"
+  2005-12-28T15:15:12.253-0800 Terminator: Processing special char "CR"
+  2005-12-28T15:15:12.253-0800 Terminator: Processing special char "LF"
+  2005-12-28T15:15:12.260-0800 Terminator: Processing line "#}"
+
+* car: "Problem 3"
+  Another vi redraw problem, this time when scrolling.  Ctrl-f and Ctrl-
+  b do not  demonstrate this problem.  Again, using vi on remote
+  Solaris 8, Solaris 10, FreeBSD 6.0.  Open random file with
+  indentation.  Scroll up and down with the cursor in column zero, all
+  is well.  Scroll up and down with the cursor in column 7, random bits
+  of text to the left of the cursor don't get drawn.  When I say
+  "random" I do pretty much mean it.  I can't see any rhyme or reason.
+  It's not like text to the right of the cursor is always safe, or that
+  the same bits of text disappear.  There's no pattern that I can see,
+  though that doesn't mean that there isn't a pattern there:
+
+  http://www-users.york.ac.uk/~car7/terminator/vi%20pre%20C-l.png
+
+  Hitting Ctrl-l redraws and everything looks just dandy:
+
+  http://www-users.york.ac.uk/~car7/terminator/vi%20post%20C-l.png
+
+  Moving the input cursor left to right over the missing text causes it
+  to be redrawn.  Right to left does not.
+
+  enh's notes:
+  i couldn't reproduce this, either with a '\t'-indented file or
+  a ' '-indented file. more information needed. (i don't doubt there is a
+  problem, because i remember seeing something like it in the short time i
+  ran Solaris at home.)
+
+* car: "Problem 5"
+  Finally, scrolling through tcsh command history on any platform
+  tested can result in text being mistakenly drawn at the bottom of the
+  screen.  Just start tcsh, type one command, scroll up until you get
+  bell for no more, down until you get bell for no more, repeat and lo:
+
+  http://www-users.york.ac.uk/~car7/terminator/tcsh%20command%20history.png
+
+  enh's notes:
+  we've already agreed that this can't be reproduced as described. i've
+  learned nothing further.
 
 Configuration
 -------------
