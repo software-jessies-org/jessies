@@ -7,6 +7,8 @@ class OsExaminer
     
     def initialize
         # Cache the result of invoking uname(1) and mangling its output.
+        # uname is only in /bin on Linux and only /usr/bin on Mac OS X.
+        # It's already on the PATH everywhere but on Cygwin.
         @os_name = `PATH=$PATH:/bin:/usr/bin uname`.chomp().sub(/CYGWIN.*/, "Cygwin")
     end
     
