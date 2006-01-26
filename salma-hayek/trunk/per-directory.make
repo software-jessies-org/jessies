@@ -61,7 +61,7 @@ JNI_LIBRARY = $(GENERATED_DIRECTORY)/$(JNI_LIBRARY_PREFIX)$(BASE_NAME).$(JNI_LIB
 
 # $(foreach) generates a space-separated list even where the elements either side are empty strings.
 # $(strip) removes spurious spaces.
-JNI_SOURCE = $(strip $(foreach SOURCE,$(SOURCES),$(if $(findstring _,$(SOURCE)),$(SOURCE))))
+JNI_SOURCE = $(strip $(foreach SOURCE,$(SOURCES),$(if $(wildcard src/$(subst _,/,$(basename $(notdir $(SOURCE)))).java),$(SOURCE))))
 JNI_BASE_NAME = $(basename $(notdir $(JNI_SOURCE)))
 GENERATED_JNI_DIRECTORY = $(GENERATED_DIRECTORY)/jni
 GENERATED_JNI_HEADER = $(GENERATED_JNI_DIRECTORY)/$(JNI_BASE_NAME).h

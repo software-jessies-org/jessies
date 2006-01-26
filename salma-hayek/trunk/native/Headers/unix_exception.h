@@ -6,9 +6,7 @@
 
 class unix_exception : public std::runtime_error {
 public:
-  unix_exception(const std::string& message)
-  : std::runtime_error(message + (errno ? ": (" + toString(errno) + ")" : "")) {
-  }
+  unix_exception(const std::string& message);
 };
 
 #endif
