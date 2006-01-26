@@ -56,9 +56,12 @@ public:
     std::vector<std::string> versions;
     for (DirectoryIterator it(jreRegistryPath); it.isValid(); ++ it) {
       std::string version = it->getName();
-      if (version != "CurrentVersion") {
-        versions.push_back(version);
+      if (version.empty() || version[0] != '1') {
+        // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
+        // FIXME: why aren't we using "CurrentVersion"?
+        continue;
       }
+      versions.push_back(version);
     }
     std::sort(versions.begin(), versions.end());
     if (versions.empty()) {
