@@ -10,7 +10,7 @@ def cygpath(filenameOrPath)
   if filenameOrPath == ""
     return ""
   end
-  args = [ "cygpath", "--windows" ]
+  args = [ "/bin/cygpath", "--windows" ]
   if filenameOrPath =~ /:/
     args.push("--path")
   end

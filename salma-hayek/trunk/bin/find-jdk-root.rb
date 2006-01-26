@@ -38,8 +38,13 @@
 def find_jdk_root()
   require "pathname.rb"
   
+  # Cope with symbolic links to this script.
+  @project_root = Pathname.new("#{$0}/..").realpath().dirname()
+  @salma_hayek = Pathname.new("#{@project_root}/../salma-hayek").realpath()
+  require "#{@salma_hayek}/bin/target-os.rb"
+  
   # Find java(1) on the path.
-  java_on_path=`which java`.chomp()
+  java_on_path=`/usr/bin/which java`.chomp()
   
   # Neophyte users are likely to be using whatever's in /usr/bin, and that's
   # likely to be a link to where there's a JDK or JRE installation. So we need
@@ -53,7 +58,7 @@ def find_jdk_root()
   # directory that contains bin/ and include/ and so on.
   jdk_root=java_bin.dirname()
   
-  if `uname`.chomp() == "Darwin"
+  if target_os() == "Darwin"
     # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
     # that contains a JDK-like directory structure of links to the files in
     # the Apple tree.

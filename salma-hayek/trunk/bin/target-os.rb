@@ -7,7 +7,7 @@ class OsExaminer
     
     def initialize
         # Cache the result of invoking uname(1) and mangling its output.
-        @os_name = `uname`.chomp().sub(/CYGWIN.*/, "Cygwin")
+        @os_name = `PATH=$PATH:/bin:/usr/bin uname`.chomp().sub(/CYGWIN.*/, "Cygwin")
     end
     
     def os_name
