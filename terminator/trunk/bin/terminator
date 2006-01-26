@@ -82,6 +82,7 @@ else
 end
 ENV["TERMINFO"] = terminfo
 
+# `/usr/bin/which tic` would be an alternative.
 tic_binary = `/bin/bash -c "type -p tic"`.chomp()
 terminfo_SRC = "#{terminator_home}/lib/terminfo/terminator.tic"
 terminfo_DST = "#{terminfo}/t/terminator"
