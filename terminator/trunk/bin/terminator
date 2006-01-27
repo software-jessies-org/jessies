@@ -94,7 +94,7 @@ terminfo_DST = "#{terminfo}/t/terminator"
 if test(?e, terminfo_DST) == false
   system("mkdir -p #{terminfo_DST} && rmdir #{terminfo_DST}")
 end
-if tic_binary != ""
+if tic_binary != nil
   tic_command = [ tic_binary ]
   if target_os() != "Linux"
     # Debian testing/unstable's tic(1) is currently broken, and won't write an output file if asked to be verbose. All you'll get is this on stderr:
