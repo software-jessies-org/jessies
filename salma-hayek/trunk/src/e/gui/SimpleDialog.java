@@ -10,6 +10,7 @@ import javax.swing.*;
 public class SimpleDialog {
     /**
      * CSS for Mac OS to get Mac-like dialog text.
+     * FIXME: GNOME uses different fonts and sizes, but I don't know how to get them.
      */
     private static final String MAC_CSS = "<head><style type=\"text/css\">b { font: 13pt \"Lucida Grande\" } p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style></head>";
     
