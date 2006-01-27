@@ -1,27 +1,40 @@
 #!/usr/bin/ruby -w
 
+require "fileutils.rb"
+require "pathname.rb"
+
 def die(message)
     $stderr.puts(message)
     exit(1)
 end
 
+def usage()
+    die("usage: make-mac-os-app.rb <project_name> <salma-hayek-path> (with filenames one per line on stdin)")
+end
+
 if ARGV.length() != 2
-    # example: make-mac-os-app.rb Terminator /Users/elliotth/Projects/salma-hayek
-    die("usage: make-mac-os-app.rb <project_name> <salma-hayek-path>")
+    usage()
 end
 
 if `uname`.chomp() != "Darwin"
     die("#{$0}: this script will only work on Mac OS X")
 end
 
+# Get our command line arguments.
 project_name = ARGV.shift()
 salma_hayek = ARGV.shift()
+# Then read stdin (otherwise Ruby will treat ARGV as a list of filenames to read from).
+make_installer_file_list = readlines().map() { |line| line.chomp() }
+
+if make_installer_file_list.empty?()
+    usage()
+end
+
 puts("Building .app bundle for #{project_name}...")
 
-require "fileutils.rb"
-
 # Make a temporary directory to work in.
-tmp_dir = "/tmp/make-mac-os-app.#$$"
+tmp_dir = ".generated/native/Darwin/#{project_name}"
+FileUtils.rm_rf(tmp_dir)
 FileUtils.mkdir_p(tmp_dir)
 
 # Make a skeleton .app bundle.
@@ -88,11 +101,23 @@ def copy_required_directories(src, dst)
         system("cp #{src}/*.jar #{dst}")
     end
 end
-copy_required_directories("../#{project_name}", "#{app_dir}/Resources/#{project_name}")
+
+# FIXME: if we could get the make rules to give us all the salma-hayek MAKE_INSTALLER_FILE_LIST, we could junk this.
 copy_required_directories(salma_hayek, "#{app_dir}/Resources/salma-hayek")
 
+# Copy this project's individual files.
+project_resource_directory = "#{app_dir}/Resources/#{project_name}"
+FileUtils.mkdir_p(project_resource_directory)
+make_installer_file_list.each() {
+    |src|
+    src_pathname = Pathname.new(src)
+    dst_dirname = "#{project_resource_directory}/#{src_pathname.dirname()}"
+    FileUtils.mkdir_p(dst_dirname)
+    system("cp \'#{src_pathname}\' #{dst_dirname}")
+}
+
 # Apple doesn't let you give a path to a .icns file, so we have to move it into position.
-system("ln -s #{app_dir}/Resources/#{project_name}/lib/#{project_name}.icns #{app_dir}/Resources/")
+system("ln -s #{project_name}/lib/#{project_name}.icns #{app_dir}/Resources/")
 
 # Make a bogus start-up script.
 script_name = "#{app_dir}/MacOS/#{project_name}"
