@@ -42,10 +42,10 @@ def find_jdk_root()
   @project_root = Pathname.new("#{$0}/..").realpath().dirname()
   @salma_hayek = Pathname.new("#{@project_root}/../salma-hayek").realpath()
   require "#{@salma_hayek}/bin/target-os.rb"
+  require "#{@salma_hayek}/bin/which.rb"
   
   # Find java(1) on the path.
-  # `/bin/bash -c "type -p java"` would be an alternative.
-  java_on_path=`/usr/bin/which java`.chomp()
+  java_on_path=which("java")
   
   # Neophyte users are likely to be using whatever's in /usr/bin, and that's
   # likely to be a link to where there's a JDK or JRE installation. So we need

@@ -6,10 +6,14 @@ class OsExaminer
     include Singleton
     
     def initialize
-        # Cache the result of invoking uname(1) and mangling its output.
-        # uname is only in /bin on Linux and only /usr/bin on Mac OS X.
-        # It's already on the PATH everywhere but on Cygwin.
-        @os_name = `PATH=$PATH:/bin:/usr/bin uname`.chomp().sub(/CYGWIN.*/, "Cygwin")
+        require "rbconfig.rb"
+        # Avoid calling the console-subsystem uname(1) program on Cygwin.
+        @os_name = Config::CONFIG["target_os"]
+        # Remove the version number from darwin8.0.
+        @os_name.sub!(/[\d.]+/, "")
+        # Conform to uname conventions.
+        @os_name.capitalize!()
+        @os_name.sub!("Solaris", "SunOS")
     end
     
     def os_name
