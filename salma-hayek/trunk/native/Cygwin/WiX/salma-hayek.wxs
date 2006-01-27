@@ -15,7 +15,8 @@
         LongName='software.jessies.org'>
           <Directory Id='product' Name='Name'
           LongName='salma-hayek'>
-            <Component Id='StandardTextFiles'>
+            <Component Id='StandardTextFiles'
+            Guid='b7318e10-8ef9-11da-a72b-0800200c9a66'>
               <File Id='COPYING' Name='COPYING.txt'
               src='COPYING' />
             </Component><?include component-definitions.wxi ?>
