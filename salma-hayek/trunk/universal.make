@@ -304,7 +304,13 @@ GENERATED_FILES += classes
 GENERATED_FILES += .generated
 GENERATED_FILES += $(PROJECT_NAME).jar
 
-export REVISION := $(shell svn info | perl -ne 'm/^Revision: (\d+)/ && print("$$1\n")')
+getRevision = $(shell cd $(1) && svn info | perl -ne 'm/^Revision: (\d+)/ && print("$$1\n")')
+# By not immediately evaluating this, we stop install-everything.sh from warning:
+# svn: '.' is not a working copy
+VERSION_STRING = 1.$(call getRevision,$(SALMA_HAYEK)).$(call getRevision,$(PROJECT_ROOT))
+
+# "sudo apt-get install uuid" gets you a suitable program on Debian.
+makeGuid = $(shell uuid)
 
 # ----------------------------------------------------------------------------
 # Choose a Java compiler.
@@ -497,7 +503,7 @@ www-dist: ChangeLog.html
 
 # FIXME: the "native" target should depend on this on Mac OS X.
 $(PROJECT_NAME).dmg: build
-	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK)
+	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK) $(VERSION_STRING)
 
 # FIXME: This should be the Mac OS X native-dist target.
 .PHONY: app-dist
@@ -602,16 +608,12 @@ NATIVE_NAME_FOR_INSTALLER := '$(subst /,\,$(call convertToNativeFilenames,$(INST
 
 # Use make -n install-commands to tell you what to copy and paste.
 # Doing "make install" is too slow for experimentation.
-.PHONY: install-commands
-install-commands:
-	# This (and double clicking) doesn't usually work if we're already installed.
-	msiexec /i $(NATIVE_NAME_FOR_INSTALLER) /l'*'v .generated/install.log
-	# Notepad because the log is in UCS-2.
-	notepad .generated/install.log
-	# This doesn't work if we're not already installed and doesn't fix deleted shortcuts if we are.
-	msiexec /i $(NATIVE_NAME_FOR_INSTALLER) /l'*'v .generated/install.log REINSTALL=ALL REINSTALLMODE=vomus
-	# This is terminator's GUID, which wants pulling out of the .wxs,
-	# which wants to use more $(env) parameters (or equivalent).
-	msiexec /x '{79086527-df6c-4454-8997-26b349605f51}'
+.PHONY: install
+install:
+	msiexec /i $(NATIVE_NAME_FOR_INSTALLER)
+
+.PHONY: remove
+remove:
+	msiexec /x $(NATIVE_NAME_FOR_INSTALLER)
 
 endif

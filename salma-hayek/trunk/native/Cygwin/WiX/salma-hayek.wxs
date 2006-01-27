@@ -2,7 +2,7 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
   <Module Id='salma_hayek'
   Guid='d7665d40-3540-11da-8cd6-0800200c9a66' Language='1033'
-  Version='1.0.$(env.REVISION)'>
+  Version='$(env.VERSION_STRING)'>
     <Package Id='d7665d40-3540-11da-8cd6-0800200c9a66'
     Manufacturer='software.jessies.org' Compressed='yes' />
     <Directory Id='TARGETDIR' Name='SourceDir'>

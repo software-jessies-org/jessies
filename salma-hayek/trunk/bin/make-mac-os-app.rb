@@ -9,10 +9,10 @@ def die(message)
 end
 
 def usage()
-    die("usage: make-mac-os-app.rb <project_name> <salma-hayek-path> (with filenames one per line on stdin)")
+    die("usage: make-mac-os-app.rb <project_name> <salma-hayek-path> <version_string> (with filenames one per line on stdin)")
 end
 
-if ARGV.length() != 2
+if ARGV.length() != 3
     usage()
 end
 
@@ -23,6 +23,7 @@ end
 # Get our command line arguments.
 project_name = ARGV.shift()
 salma_hayek = ARGV.shift()
+version_string = ARGV.shift()
 # Then read stdin (otherwise Ruby will treat ARGV as a list of filenames to read from).
 make_installer_file_list = readlines().map() { |line| line.chomp() }
 
@@ -64,7 +65,7 @@ File.open("#{app_dir}/Info.plist", "w") {
   <key>CFBundleSignature</key>
   <string>????</string>
   <key>CFBundleGetInfoString</key>
-  <string>#{project_name} 1.0.#{ENV["REVISION"]}</string>
+  <string>#{project_name} #{version_string}</string>
  </dict>
 </plist>
 EOS
