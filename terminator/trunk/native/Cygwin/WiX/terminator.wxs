@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
-  <Product Id='79086527-df6c-4454-8997-26b349605f51'
+  <Product Id='ffddee20-8f07-11da-9011-00111123337e'
   Name='Terminator' Language='1033'
   UpgradeCode='978872f0-7b6b-11da-a72b-0800200c9a66'
   Version='1.0.$(env.REVISION)'
