@@ -58,7 +58,7 @@ public:
       std::string version = it->getName();
       if (version.empty() || version[0] != '1') {
         // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
-        // FIXME: why aren't we using "CurrentVersion"?
+        // "CurrentVersion" didn't get updated when I installed JDK-1.5.0_06 (or the two prior versions by the look of it)..
         continue;
       }
       versions.push_back(version);
