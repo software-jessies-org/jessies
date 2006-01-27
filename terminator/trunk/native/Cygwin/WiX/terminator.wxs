@@ -8,6 +8,7 @@ Version='1.0.$(env.REVISION)' Manufacturer='software.jessies.org'>
 <Property Id="ARPCONTACT">software@jessies.org</Property>
 <Property Id="ARPURLINFOABOUT"> http://software.jessies.org/terminator/</Property>
 <Property Id="ARPPRODUCTICON" Value='terminator.ico' />
+<Property Id='ALLUSERS' Value='2' />
 
 <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
 
