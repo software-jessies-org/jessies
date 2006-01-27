@@ -9,6 +9,7 @@ salma_hayek = Pathname.new("#{terminator_home}/../salma-hayek").realpath()
 
 require "#{salma_hayek}/bin/target-os.rb"
 require "#{salma_hayek}/bin/invoke-java.rb"
+require "#{salma_hayek}/bin/which.rb"
 
 HOME = ENV["HOME"]
 
@@ -87,8 +88,7 @@ ENV["TERMINFO"] = terminfo
 if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
   $stderr = File.open("/dev/null", "w")
 end
-# `/usr/bin/which tic` would be an alternative.
-tic_binary = `/bin/bash -c "type -p tic"`.chomp()
+tic_binary = which("tic")
 terminfo_SRC = "#{terminator_home}/lib/terminfo/terminator.tic"
 terminfo_DST = "#{terminfo}/t/terminator"
 if test(?e, terminfo_DST) == false
