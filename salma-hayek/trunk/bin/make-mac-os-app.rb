@@ -50,6 +50,8 @@ File.open("#{app_dir}/Info.plist", "w") {
   <string>APPL</string>
   <key>CFBundleSignature</key>
   <string>????</string>
+  <key>CFBundleGetInfoString</key>
+  <string>#{project_name} 1.0.#{ENV["REVISION"]}</string>
  </dict>
 </plist>
 EOS
