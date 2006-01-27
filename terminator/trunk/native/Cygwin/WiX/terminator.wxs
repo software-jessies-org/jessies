@@ -25,7 +25,8 @@
         LongName='software.jessies.org'>
           <Directory Id='product' Name='Name'
           LongName='terminator'>
-            <Component Id='StandardFiles'>
+            <Component Id='StandardFiles'
+            Guid='cef57b50-8eff-11da-a72b-0800200c9a66'>
               <File Id='README' Name='README.txt' DiskId='1'
               src='README' />
               <File Id='COPYING' Name='COPYING.txt' DiskId='1'
@@ -39,7 +40,8 @@
         </Directory>
       </Directory>
       <Directory Id='DesktopFolder' Name='Desktop' />
-      <Component Id='RubyShortcut'>
+      <Component Id='RubyShortcut'
+      Guid='c0199e40-8eff-11da-a72b-0800200c9a66'>
         <Registry Id='RegistryKey' Root='HKCU'
         Key='Software\software.jessies.org\terminator'
         Name='ShortcutTarget' Action='write' Type='string'
