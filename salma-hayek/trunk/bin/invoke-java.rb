@@ -83,15 +83,21 @@ class Java
       @class_path << "#{@salma_hayek}/AppleJavaExtensions.jar"
 
       require "#{@salma_hayek}/bin/find-jdk-root.rb"
-      jdk_root=find_jdk_root()
+      jdk_root = find_jdk_root()
   
-      # This doesn't exist on Mac OS X but the classes are on the boot class
-      # path anyway.
+      # "tools.jar" doesn't exist on Mac OS X but the classes are on the boot
+      # class path anyway.
       # There's a bug against Java 6 to add these classes to its boot class
       # path too.
-      tools_jar="#{jdk_root}/lib/tools.jar"
-      if Pathname.new(tools_jar).exist?
-        @class_path << tools_jar
+      # On Win32 it's likely that users don't have a JDK on their path, in
+      # which case they probably aren't interested in running anything that
+      # wouldn't work without "tools.jar", so we cope with not having found
+      # a JDK.
+      if jdk_root != nil
+        tools_jar = "#{jdk_root}/lib/tools.jar"
+        if Pathname.new(tools_jar).exist?
+          @class_path << tools_jar
+        end
       end
     end
 

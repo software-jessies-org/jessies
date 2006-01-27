@@ -45,25 +45,35 @@ def find_jdk_root()
   require "#{@salma_hayek}/bin/which.rb"
   
   # Find java(1) on the path.
-  java_on_path=which("java")
+  java_on_path = which("java")
+  
+  # On Win32 it's likely that no Java is on the user's path.
+  # Our "launcher.exe" uses the registry, so although returning nil here
+  # would be a problem for our build scripts, it won't be a problem if you
+  # just want to run our stuff. (There's a slight exception in that
+  # "invoke-java.rb" uses this to find the JDK "tools.jar", but someone
+  # with a JDK installed probably also has a JDK on their path.)
+  if java_on_path == nil
+    return nil
+  end
   
   # Neophyte users are likely to be using whatever's in /usr/bin, and that's
   # likely to be a link to where there's a JDK or JRE installation. So we need
   # to follow the links to the actual installation.
-  java_in_actual_location=Pathname.new(java_on_path).realpath()
+  java_in_actual_location = Pathname.new(java_on_path).realpath()
   
   # Assume we're in the JDK/JRE bin/ directory.
-  java_bin=java_in_actual_location.dirname()
+  java_bin = java_in_actual_location.dirname()
   
   # Assume the directory above the bin/ directory is the "home" directory; the
   # directory that contains bin/ and include/ and so on.
-  jdk_root=java_bin.dirname()
+  jdk_root = java_bin.dirname()
   
   if target_os() == "Darwin"
     # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
     # that contains a JDK-like directory structure of links to the files in
     # the Apple tree.
-    jdk_root="#{jdk_root}/Home"
+    jdk_root = "#{jdk_root}/Home"
   end
   
   return jdk_root
