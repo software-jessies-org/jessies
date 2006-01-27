@@ -7,11 +7,12 @@
   Manufacturer='software.jessies.org'>
     <Package Id='????????-????-????-????-????????????'
     Compressed='yes' InstallerVersion='150' />
+    <Property Id='ALLUSERS' Value='2' />
     <Property Id="ARPCONTACT">software@jessies.org</Property>
+    <Property Id='ARPNOMODIFY' Value='1' />
+    <Property Id="ARPPRODUCTICON" Value='terminator.ico' />
     <Property Id="ARPURLINFOABOUT">
     http://software.jessies.org/terminator/</Property>
-    <Property Id="ARPPRODUCTICON" Value='terminator.ico' />
-    <Property Id='ALLUSERS' Value='2' />
     <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
     <Property Id='RUBYW'>
       <DirectorySearch Id='RUBYW.dir' Path='\cygwin\bin' Depth='0'>
