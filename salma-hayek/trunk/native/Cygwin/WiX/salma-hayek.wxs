@@ -5,9 +5,6 @@
   Version='1.0.$(env.REVISION)'>
     <Package Id='d7665d40-3540-11da-8cd6-0800200c9a66'
     Manufacturer='software.jessies.org' Compressed='yes' />
-    <Property Id="ARPCONTACT">software@jessies.org</Property>
-    <Property Id="ARPURLINFOABOUT">
-    http://software.jessies.org/salma-hayek/</Property>
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='Name'
       LongName='Program Files'>
