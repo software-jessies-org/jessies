@@ -16,6 +16,9 @@ $stdin.each() {
   directoryPath = pathComponents.join("/")
   directoryPathToFileNames[directoryPath].push(fileName)
 }
+numberOfDirectories = directoryPathToFileNames.length()
+# "sudo apt-get install uuid" gets you a suitable program on Debian
+guids = `uuid -n #{numberOfDirectories}`.split("\n")
 puts("<Include>")
 directoryNumber = 0
 fileNumber = 0
@@ -27,7 +30,8 @@ directoryPathToFileNames.each_pair() {
     puts("<Directory Id='directory#{directoryNumber}' Name='name#{directoryNumber}' LongName='#{directoryName}'>")
     directoryNumber += 1
   }
-  puts("<Component Id='component#{directoryNumber}'>")
+  guid = guids.pop()
+  puts("<Component Id='component#{directoryNumber}' Guid='#{guid}'>")
   fileNames.each() {
     |fileName|
     filePathComponents = pathComponents + [fileName]
