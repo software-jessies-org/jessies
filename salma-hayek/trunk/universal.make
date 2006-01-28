@@ -26,8 +26,6 @@
 # Ensure we're running a suitable version of make(1).
 # ----------------------------------------------------------------------------
 
-# It would be nice if this could be included in the boilerplate but $(MAKEFILE_LIST)
-# is only available in make-3.80 and, without that, we can't include the boilerplate.
 REQUIRED_MAKE_VERSION = 3.81
 REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
 EARLIER_MAKE_VERSION = $(firstword $(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))
