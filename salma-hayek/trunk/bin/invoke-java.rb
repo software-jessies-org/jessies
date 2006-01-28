@@ -3,19 +3,39 @@
 require "fileutils.rb"
 require "pathname.rb"
 
-def cygpath(filenameOrPath)
+# Takes a POSIX pathname and turns it into a Win32 pathname if we're on Win32.
+# Returns the original pathname on any other OS.
+def cygpath(pathname)
   if target_os() != "Cygwin"
-    return filenameOrPath
+    return pathname
   end
-  if filenameOrPath == ""
-    return ""
-  end
-  args = [ "/bin/cygpath", "--windows" ]
-  if filenameOrPath =~ /:/
-    args.push("--path")
-  end
-  args.push('"' + filenameOrPath + '"')
-  return `#{args.join(" ")}`.chomp
+  
+  # We know we're on Win32, and we're assuming we have Cygwin.
+  # If we run cygpath(1) from a non-console Win32 application, we'll cause
+  # console windows to flash up, which is distracting and ugly. So we invoke
+  # the Cygwin functions directly from the DLL.
+  require "Win32API"
+  path_list_buf_size = Win32API.new("cygwin1.dll", "cygwin_posix_to_win32_path_list_buf_size", [ 'p' ], 'i')
+  to_win32_path = Win32API.new("cygwin1.dll", "cygwin_conv_to_full_win32_path", [ 'p', 'p' ], 'v')
+  
+  # Create a large enough buffer for the conversion.
+  buf_size = path_list_buf_size.Call(pathname)
+  buf = "\0" * buf_size
+  
+  # Do the conversion and tidy up the result (in case the suggested buffer
+  # size was too large).
+  to_win32_path.Call(pathname, buf)
+  buf.delete!("\0")
+  return buf
+end
+
+# Takes a list of POSIX pathnames and returns a string suitable for use
+# as the OS' PATH environment variable.
+def pathnames_to_path(pathnames)
+  native_pathnames = pathnames.uniq().map() { |pathname| cygpath(pathname) }
+  # Cygwin's ruby's File::PATH_SEPARATOR is ':', but the Win32 JVM wants ';'.
+  path_separator = (target_os() == "Cygwin") ? ";" : ":"
+  return native_pathnames.join(path_separator)
 end
 
 class Java
@@ -143,16 +163,9 @@ class Java
     args = [ @launcher ]
     # Set the class path directly with a system property rather than -cp so
     # that our custom Win32 launcher doesn't have to convert between the two
-    # forms.
-    # cygpath's argument is a cygwin filename or path, so it should have a cygwin
-    # path separator - which is colon, not the Windows native semicolon.
-    # cygpath returns a native path - for the benefit of the non-cygwin JVM - but it
-    # doesn't take one.
-    # Cygwin's ruby's File::PATH_SEPARATOR is colon.
-    # This is (now, if it hasn't always been) the only caller which takes advantage of
-    # the --path conditional in cygpath.
-    args << "-Djava.class.path=#{cygpath(@class_path.uniq().join(":"))}"
-    args << "-Djava.library.path=#{cygpath(@library_path.uniq().join(":"))}"
+    # forms. (Sun's Win32 JVM expects ';'-separated paths.)
+    args << "-Djava.class.path=#{pathnames_to_path(@class_path)}"
+    args << "-Djava.library.path=#{pathnames_to_path(@library_path)}"
     applicationEnvironmentName = @dock_name.upcase()
     logging = ENV["DEBUGGING_#{applicationEnvironmentName}"] == nil && @log_filename != ""
     if logging
