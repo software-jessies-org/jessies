@@ -21,6 +21,7 @@ import java.util.regex.*;
  *   <http://www.google.com>
  *   http://www.google.com, http://www.google.com.
  *   http://www.google.com/~user/
+ *   http://www.google.com/~user/page.html#target
  */
 class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
     // This character class and the regular expression below are based on the BNF in RFC 1738.
@@ -29,7 +30,7 @@ class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
     private static final String SEARCH_CHARS = "[/A-Za-z0-9;:@&=%!*'(),$_.+-]";
     
     public HyperlinkStyleApplicator(PTextArea textArea) {
-        super(textArea, "\\b(https?://[A-Za-z0-9.:-]+[A-Za-z0-9](/~?"+SEARCH_CHARS+"*(\\?"+SEARCH_CHARS+"*)?)?)", PStyle.HYPERLINK);
+        super(textArea, "\\b(https?://[A-Za-z0-9.:-]+[A-Za-z0-9](/~?"+SEARCH_CHARS+"*(\\?"+SEARCH_CHARS+"*)?)?(\\#"+SEARCH_CHARS+"+)?)", PStyle.HYPERLINK);
     }
     
     @Override
