@@ -91,7 +91,7 @@ public class KnowAll extends JFrame {
     }
 
     private void initClipboardMonitor() {
-        clipboardMonitor = new ClipboardMonitor(new ClipboardListener() {
+        clipboardMonitor = new ClipboardMonitor(this, new ClipboardListener() {
             public void clipboardContentsChangedTo(String contents) {
                 try {
                     searchFor(contents);

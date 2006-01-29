@@ -19,6 +19,7 @@
  * 
  */
 
+import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.net.*;
@@ -26,7 +27,6 @@ import java.text.*;
 import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
-import javax.swing.Timer;
 
 /**
  * Shows the time in a particular time zones.
@@ -63,11 +63,11 @@ public class WorldClock extends JPanel {
         label.setBorder(new javax.swing.border.EmptyBorder(0, 2, 0, 0));
         
         updateTime();
-        new Timer(1000, new ActionListener() {
+        new RepeatingComponentTimer(this, 1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 updateTime();
             }
-        }).start();
+        });
     }
     
     @Override
