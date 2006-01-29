@@ -19,22 +19,20 @@
 
  */
 
+import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
-import javax.swing.*;
 
 public class ClipboardMonitor {
     private String oldContent = "";
 
-    public ClipboardMonitor(final ClipboardListener listener) {
-        Timer timer = new Timer(500, new ActionListener() {
+    public ClipboardMonitor(final Component c, final ClipboardListener listener) {
+        RepeatingComponentTimer timer = new RepeatingComponentTimer(c, 500, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 checkClipboard(listener);
             }
         });
-        timer.setRepeats(true);
-        timer.start();
     }
 
     public void checkClipboard(final ClipboardListener listener) {
