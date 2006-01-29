@@ -21,7 +21,7 @@ import javax.swing.Timer;
  */
 public class FatBits extends JFrame {
     private Robot robot;
-    private Timer timer;
+    private RepeatingComponentTimer timer;
     private ScaledImagePanel scaledImagePanel;
     private int scaleFactor;
     
@@ -36,7 +36,7 @@ public class FatBits extends JFrame {
     
     public FatBits() {
         super("FatBits");
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         try {
             robot = new Robot();
         } catch (AWTException ex) {
@@ -46,8 +46,7 @@ public class FatBits extends JFrame {
         setSize(new Dimension(250, 300));
         setContentPane(makeUi());
         setJMenuBar(new FatBitsMenuBar());
-        timer = new Timer(50, new MouseTracker());
-        timer.start();
+        timer = new RepeatingComponentTimer(this, 50, new MouseTracker());
     }
     
     private JComponent makeUi() {
