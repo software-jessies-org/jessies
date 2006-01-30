@@ -305,7 +305,7 @@ GENERATED_FILES += $(PROJECT_NAME).jar
 getRevision = $(shell cd $(1) && svn info | perl -ne 'm/^Revision: (\d+)/ && print("$$1\n")')
 # By not immediately evaluating this, we stop install-everything.sh from warning:
 # svn: '.' is not a working copy
-VERSION_STRING = 1.$(call getRevision,$(SALMA_HAYEK)).$(call getRevision,$(PROJECT_ROOT))
+VERSION_STRING = 1.$(call getRevision,$(PROJECT_ROOT)).$(call getRevision,$(SALMA_HAYEK))
 
 # "sudo apt-get install uuid" gets you a suitable program on Debian.
 makeGuid = $(shell uuid)
