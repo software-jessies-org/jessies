@@ -32,8 +32,10 @@ public class HelpMenu {
         //menu.add(new PlaceholderAction(applicationName + " Help"));
         //menu.addSeparator();
         
+        // Other than on Win32, we can offer to open our log file, if we have one.
+        // On Win32, another program can't open the log file while we've got it open for writing.
         final String logFilename = System.getProperty("e.util.Log.filename");
-        if (logFilename != null) {
+        if (logFilename != null && GuiUtilities.isWindows() == false) {
             menu.add(new WebLinkAction("Show Log Messages", new File(logFilename)));
             menu.addSeparator();
         }
