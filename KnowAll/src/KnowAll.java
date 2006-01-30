@@ -108,6 +108,7 @@ public class KnowAll extends JFrame {
         advisors.add(new NumberAdvisor());
         advisors.add(new TimeAdvisor());
         advisors.add(new UkPostCodeAdvisor());
+        advisors.add(new PackageTrackingAdvisor());
         // FIXME: don't hard-code this:
         advisors.add(new ScriptAdvisor("MAC address", "\\b((\\p{XDigit}{2}[.:-]){5}\\p{XDigit}{2})\\b", "dev_passwd $1"));
     }
@@ -129,7 +130,11 @@ public class KnowAll extends JFrame {
         text += "<hr noshade>";
         SuggestionsBox suggestionsBox = new SuggestionsBox();
         for (Advisor advisor : advisors) {
-            advisor.advise(suggestionsBox, input);
+            try {
+                advisor.advise(suggestionsBox, input);
+            } catch (Exception ex) {
+                Log.warn("Internal error in advisor " + advisor, ex);
+            }
         }
         // FIXME: sort the results alphabetically by heading?
         String lastHeading = "";
