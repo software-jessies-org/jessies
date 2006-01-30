@@ -94,6 +94,8 @@ public class ProcessUtilities {
                 public void run() {
                     try {
                         p.getOutputStream().close();
+                        p.getInputStream().close();
+                        p.getErrorStream().close();
                         int status = p.waitFor();
                         if (listener != null) {
                             listener.processExited(status);
