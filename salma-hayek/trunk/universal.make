@@ -493,6 +493,7 @@ www-dist: ChangeLog.html
 	cp -f ChangeLog.html $(DIST_DIRECTORY)/ && \
 	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_DIRECTORY)/ ; fi
 
+.PHONY: .generated/build-revision.txt
 .generated/build-revision.txt:
 	mkdir -p $(@D) && \
 	$(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK) > $@
