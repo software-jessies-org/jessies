@@ -52,7 +52,7 @@ public:
   
   static std::string readFile(const std::string& path) {
     std::ifstream is(path.c_str());
-    if (is.bad()) {
+    if (is.good() == false) {
       throw UsageError("couldn't open \"" + path + "\"");
     }
     std::ostringstream contents;
