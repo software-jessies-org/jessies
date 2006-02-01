@@ -37,19 +37,6 @@ private:
   std::string jvmDirectory;
   
 public:
-  std::string findJvmLibraryUsingJavaHome() const {
-    const char* javaHome = getenv("JAVA_HOME");
-    if (javaHome == 0) {
-      throw UsageError("please set $JAVA_HOME");
-    }
-    std::string pathToJre(javaHome);
-    pathToJre.append("/jre");
-    if (access(pathToJre.c_str(), X_OK) != 0) {
-      pathToJre = javaHome;
-    }
-    return pathToJre + "/bin/" + jvmDirectory + "/jvm.dll";
-  }
-  
   static std::string readFile(const std::string& path) {
     std::ifstream is(path.c_str());
     if (is.good() == false) {
@@ -92,24 +79,19 @@ public:
   }
   
   std::string findJvmLibraryUsingJdkRegistry() const {
-    // From the look of my registry, this key points to the latest (or most recently installed?) update.
+    // This key may point to the latest or most recently installed update.
+    // It might point to the first one that's installed though.
+    // If so, we'll need to pick the most recent version ourselves as we do with the JRE above.
     std::string javaHome = readRegistryFile("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.5/JavaHome");
     return javaHome + "/jre/bin/client/jvm.dll";
   }
   
   std::string findWin32JvmLibrary() const {
     std::ostringstream os;
-    os << "Couldn't find jvm.dll - please set $JAVA_HOME or install a JRE or JDK.";
+    os << "Couldn't find jvm.dll - please install a JRE or JDK.";
     os << std::endl;
     os << "Error messages were:";
     os << std::endl;
-    try {
-      return findJvmLibraryUsingJavaHome();
-    } catch (const std::exception& ex) {
-      os << "  ";
-      os << ex.what();
-      os << std::endl;
-    }
     try {
       return findJvmLibraryUsingJdkRegistry();
     } catch (const std::exception& ex) {
