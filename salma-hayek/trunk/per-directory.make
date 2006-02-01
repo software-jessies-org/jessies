@@ -206,7 +206,7 @@ $(WIX_COMPONENT_REFERENCES): $(WIX_COMPONENT_DEFINITIONS) $(MAKEFILE_LIST)
 
 $(WIX_OBJECTS): $(WIX_COMPONENT_REFERENCES) $(WIX_COMPONENT_DEFINITIONS)
 
-$(WIX_OBJECTS): %.wixobj: %.wxs
+$(WIX_OBJECTS): %.wixobj: %.wxs .generated/build-revision.txt
 	PRODUCT_GUID=$(makeGuid) VERSION_STRING=$(VERSION_STRING) $(CANDLE) -nologo -out $(call convertToNativeFilenames,$@ $<)
 
 $(WIX_MODULE): %.msm: $(WIX_OBJECTS)

@@ -302,9 +302,9 @@ GENERATED_FILES += classes
 GENERATED_FILES += .generated
 GENERATED_FILES += $(PROJECT_NAME).jar
 
-# By not immediately evaluating this, we stop install-everything.sh from warning:
+# By not building and immediately evaluating this, we stop install-everything.sh from warning:
 # svn: '.' is not a working copy
-VERSION_STRING = $(shell $(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK))
+VERSION_STRING = $(shell tail -1 .generated/build-revision.txt)
 
 # "sudo apt-get install uuid" gets you a suitable program on Debian.
 makeGuid = $(shell uuid)
@@ -493,13 +493,17 @@ www-dist: ChangeLog.html
 	cp -f ChangeLog.html $(DIST_DIRECTORY)/ && \
 	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_DIRECTORY)/ ; fi
 
+.generated/build-revision.txt:
+	mkdir -p $(@D) && \
+	$(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK) > $@
+
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS, package it as a ".dmg", and copy
 # it to the web server.
 # ----------------------------------------------------------------------------
 
 # FIXME: the "native" target should depend on this on Mac OS X.
-$(PROJECT_NAME).dmg: build
+$(PROJECT_NAME).dmg: build .generated/build-revision.txt
 	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK) $(VERSION_STRING)
 
 # FIXME: This should be the Mac OS X native-dist target.
@@ -566,7 +570,7 @@ ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS = $(filter-out $(INSTALLER_PATTERN),$(ALL_N
 # FIXME: This wants turning into a script and collapsing with the semi-duplicate in make-mac-os-app.rb.
 # FIXME: The WiX installer needs a deinstallation file list too (there isn't currently a good place
 # to put this comment but I know I won't forget it here).
-MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) -name .svn -prune -o -type f -print
+MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt -name .svn -prune -o -type f -print
 
 # %.msm files aren't stand-alone installers
 INSTALLER_BINARY = $(filter %.msi,$(ALL_NATIVE_TARGETS))
