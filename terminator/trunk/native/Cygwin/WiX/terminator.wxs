@@ -19,6 +19,7 @@
         <FileSearch Id='RUBYW.file' Name='rubyw.exe' />
       </DirectorySearch>
     </Property>
+    <Condition Message="Cygwin and Cygwin Ruby must be installed"><![CDATA[RUBYW]]></Condition>
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='Name'
       LongName='Program Files'>
