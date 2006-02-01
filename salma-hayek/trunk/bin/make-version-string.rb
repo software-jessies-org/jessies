@@ -13,7 +13,11 @@
 # conveniently arranged.
 
 def getSubversionVersion(directory)
-  IO.popen("svnversion #{directory}") {
+  command = "svnversion #{directory}"
+  if `uname -n`.chomp() == "mdorey"
+    command = "ssh duezer svnversion #{directory.sub(/^\/cygdrive\/f\//, "/home/martind/")}"
+  end
+  IO.popen(command) {
     |pipe|
     return pipe.readline()
   }
