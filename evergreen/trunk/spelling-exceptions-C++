@@ -23,7 +23,11 @@ ostream
 ostringstream
 rbegin
 rdbuf
+resetiosflags
+setbase
 setfill
+setiosflags
+setprecision
 setw
 sputc
 sstream
