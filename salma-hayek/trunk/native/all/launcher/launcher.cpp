@@ -80,8 +80,7 @@ public:
   
   std::string findJvmLibraryUsingJdkRegistry() const {
     // This key may point to the latest or most recently installed update.
-    // It might point to the first one that's installed though.
-    // If so, we'll need to pick the most recent version ourselves as we do with the JRE above.
+    // It does seem to change when newer updates are installed.
     std::string javaHome = readRegistryFile("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.5/JavaHome");
     return javaHome + "/jre/bin/client/jvm.dll";
   }
