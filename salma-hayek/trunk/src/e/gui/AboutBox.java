@@ -3,6 +3,7 @@ package e.gui;
 import com.apple.eawt.*;
 import e.util.*;
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -15,12 +16,16 @@ public class AboutBox extends JDialog {
     
     private ImageIcon icon;
     private String applicationName;
-    private String version;
+    private ArrayList<String> versionLines = new ArrayList<String>();
     private ArrayList<String> copyrightLines = new ArrayList<String>();
+    
+    private String projectRevision = "unknown";
+    private String libraryRevision = "unknown";
     
     private AboutBox() {
         initMacOs();
         initIcon();
+        findBuildRevisionFile();
     }
     
     public static AboutBox getSharedInstance() {
@@ -48,11 +53,8 @@ public class AboutBox extends JDialog {
         }
     }
     
-    public void setVersion(String version, String build) {
-        this.version = version;
-        if (build != null) {
-            version += " (" + build + ")";
-        }
+    public void addVersion(String version) {
+        versionLines.add(version);
     }
     
     /**
@@ -114,8 +116,10 @@ public class AboutBox extends JDialog {
         addLabel(panel, applicationNameFont, applicationName);
         panel.add(Box.createRigidArea(spacerSize));
         
-        if (version != null) {
+        for (String version : versionLines) {
             addLabel(panel, versionFont, version);
+        }
+        if (versionLines.size() > 0) {
             panel.add(Box.createRigidArea(spacerSize));
         }
         
@@ -197,11 +201,43 @@ public class AboutBox extends JDialog {
         }
     }
     
+    /**
+     * "universal.make" arranges to write build information to a file that
+     * should be included in any distribution. This method tries to find such
+     * a file, and pass it to parseBuildRevisionFile.
+     */
+    private void findBuildRevisionFile() {
+        for (String directory : System.getProperty("java.class.path").split(File.pathSeparator)) {
+            File file = new File(directory + File.separator + ".." + File.separator + ".generated" + File.separator + "build-revision.txt");
+            if (file.exists()) {
+                parseBuildRevisionFile(file);
+                return;
+            }
+        }
+    }
+    
+    /**
+     * Extracts information from the make-generated "build-revision.txt" and
+     * turns it into version information for our about box. It's ugly, but it's
+     * automated and honest.
+     */
+    private void parseBuildRevisionFile(File file) {
+        String[] content = StringUtilities.readLinesFromFile(file.toString());
+        String buildDate = content[0];
+        projectRevision = content[1];
+        libraryRevision = content[2];
+        addVersion("Revision " + projectRevision + " (" + libraryRevision + ")");
+        addVersion("Built " + buildDate);
+    }
+    
+    public String getBugReportSubject() {
+        return applicationName + "%20%28" + projectRevision + "%2f" + libraryRevision + "%29%20bug";
+    }
+    
     public static void main(String[] args) {
         GuiUtilities.initLookAndFeel();
         AboutBox aboutBox = AboutBox.getSharedInstance();
         aboutBox.setApplicationName("Demonstration");
-        aboutBox.setVersion("1.00", "374");
         aboutBox.addCopyright("Copyright (C) 2006, Elliott Hughes");
         aboutBox.setVisible(true);
     }

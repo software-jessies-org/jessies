@@ -53,7 +53,7 @@ public class HelpMenu {
         }
         menu.add(new PlaceholderAction("View Bugs List"));
         // FIXME: anyone else using HelpMenu is going to want some control over this. "bk sendbug" and Safari's "Report Bugs to Apple..." are both good role models.
-        menu.add(new WebLinkAction("Report a Bug", "mailto:software@jessies.org?subject=" + applicationName + "%20bug"));
+        menu.add(new WebLinkAction("Report a Bug", "mailto:software@jessies.org?subject=" + AboutBox.getSharedInstance().getBugReportSubject()));
         
         if (GuiUtilities.isMacOs() == false) {
             // GNOME and Win32 users expect a link to the application's about box on the help menu.
