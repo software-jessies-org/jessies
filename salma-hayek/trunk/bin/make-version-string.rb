@@ -1,5 +1,17 @@
 #!/usr/bin/ruby -w
 
+# Despite its name, this script generates "build-revision.txt".
+
+# Win32's installer's broken idea of "version number" forces us to have a
+# version number of the form "a.b.c", and also forces us to ensure that
+# a <= 255, b <= 255, and c <= 65535. If we don't, upgrading (replacing an
+# old version with a new version) won't work. See here for the depressing
+# details:
+# http://msdn.microsoft.com/library/default.asp?url=/library/en-us/msi/setup/productversion.asp
+# This script takes advantage of the fact that we have enough bits (8+8+16=32)
+# to encode our project and salma hayek revision numbers, even if they're not
+# conveniently arranged.
+
 def getSubversionVersion(directory)
   IO.popen("svnversion #{directory}") {
     |pipe|
