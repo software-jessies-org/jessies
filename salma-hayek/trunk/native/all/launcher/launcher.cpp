@@ -50,8 +50,27 @@ public:
     return pathToJre + "/bin/" + jvmDirectory + "/jvm.dll";
   }
   
+  static std::string readFile(const std::string& path) {
+    std::ifstream is(path.c_str());
+    if (is.bad()) {
+      throw UsageError("couldn't open \"" + path + "\"");
+    }
+    std::ostringstream contents;
+    contents << is.rdbuf();
+    return contents.str();
+  }
+  
+  static std::string readRegistryFile(const std::string& path) {
+    std::string contents = readFile(path);
+    // Cygwin's representation of REG_SZ keys seems to include the null terminator.
+    if (contents.empty() == false && contents[contents.size() - 1] == '\0') {
+      return contents.substr(0, contents.size() - 1);
+    }
+    return contents;
+  }
+  
   // What should we do if this points to "client" when we want "server"?
-  std::string findJvmLibraryUsingRegistry() const {
+  std::string findJvmLibraryUsingJreRegistry() const {
     const char* jreRegistryPath = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment";
     std::vector<std::string> versions;
     for (DirectoryIterator it(jreRegistryPath); it.isValid(); ++ it) {
@@ -65,23 +84,24 @@ public:
     }
     std::sort(versions.begin(), versions.end());
     if (versions.empty()) {
-      throw UsageError("please install a JRE or JDK");
+      throw UsageError("no JRE installed");
     }
     std::string version = versions.back();
     std::string jvmRegistryPath = std::string(jreRegistryPath) + "/" + version + "/RuntimeLib";
-    std::ifstream is(jvmRegistryPath.c_str());
-    if (is.bad()) {
-      throw UsageError("couldn't open \"" + jvmRegistryPath + "\"");
-    }
-    std::ostringstream jvmLibraryPath;
-    jvmLibraryPath << is.rdbuf();
-    return jvmLibraryPath.str();
+    return readRegistryFile(jvmRegistryPath);
+  }
+  
+  std::string findJvmLibraryUsingJdkRegistry() const {
+    // From the look of my registry, this key points to the latest (or most recently installed?) update.
+    std::string javaHome = readRegistryFile("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.5/JavaHome");
+    return javaHome + "/jre/bin/client/jvm.dll";
   }
   
   std::string findWin32JvmLibrary() const {
     std::ostringstream os;
-    os << "couldn't find jvm.dll - please set $JAVA_HOME or install a JRE or JDK";
-    os << "error messages were:";
+    os << "Couldn't find jvm.dll - please set $JAVA_HOME or install a JRE or JDK.";
+    os << std::endl;
+    os << "Error messages were:";
     os << std::endl;
     try {
       return findJvmLibraryUsingJavaHome();
@@ -91,7 +111,14 @@ public:
       os << std::endl;
     }
     try {
-      return findJvmLibraryUsingRegistry();
+      return findJvmLibraryUsingJdkRegistry();
+    } catch (const std::exception& ex) {
+      os << "  ";
+      os << ex.what();
+      os << std::endl;
+    }
+    try {
+      return findJvmLibraryUsingJreRegistry();
     } catch (const std::exception& ex) {
       os << "  ";
       os << ex.what();
