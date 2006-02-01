@@ -268,7 +268,7 @@ PROJECT_ROOT = $(CURDIR)
 
 PROJECT_NAME = $(notdir $(PROJECT_ROOT))
 
-SCRIPT_PATH=$(SALMA_HAYEK)/bin
+SCRIPT_PATH = $(SALMA_HAYEK)/bin
 
 # By default, distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST=software@jessies.org
@@ -302,10 +302,9 @@ GENERATED_FILES += classes
 GENERATED_FILES += .generated
 GENERATED_FILES += $(PROJECT_NAME).jar
 
-getRevision = $(shell cd $(1) && svn info | perl -ne 'm/^Revision: (\d+)/ && print("$$1\n")')
 # By not immediately evaluating this, we stop install-everything.sh from warning:
 # svn: '.' is not a working copy
-VERSION_STRING = 1.$(call getRevision,$(PROJECT_ROOT)).$(call getRevision,$(SALMA_HAYEK))
+VERSION_STRING = $(shell $(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK))
 
 # "sudo apt-get install uuid" gets you a suitable program on Debian.
 makeGuid = $(shell uuid)
