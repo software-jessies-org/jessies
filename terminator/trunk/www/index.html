@@ -262,7 +262,7 @@ make: *** virtual memory exhausted.  Stop.
 
 <p>(Why did we choose Cygwin? NT's built-in POSIX subsystem won't let you launch Win32 applications or interact with the network, so that wasn't an option. Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which we use to support window resizing, not to mention containing a port of one of the most widely used ssh programs.)
 
-<p>On Cygwin, the launcher will find an appropriate jvm.dll using the Registry.  It should use the most recent JDK version you have installed or the most recent JRE version if there's no JDK installed.
+<p>On Cygwin, the launcher will find an appropriate jvm.dll using the Registry.  It should use the most recent version of JDK 1.5 you have installed or the most recent JRE version if there's no JDK installed.
 
 <p>To build the Windows installer, you need Microsoft's open source Windows installer compiler, <a href="http://sourceforge.net/projects/wix/">WiX</a>, installed, currently in /tmp/wix until a maintainer thinks of a better way to locate it.
 
