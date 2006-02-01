@@ -1,12 +1,13 @@
 #!/usr/bin/ruby -w
 
 def getSubversionVersion(directory)
-  Dir.chdir(directory)
-  IO.popen("svn info") {
+  IO.popen("svnversion #{directory}") {
     |pipe|
     while pipe.gets()
       line = $_
-      if line.match(/^Revision: (\d+)/)
+      # The second number, if there are two, is the more up-to-date.
+      # (In Subversion's model, commit doesn't necessarily require update.)
+      if line.match(/^(?:\d+:)?(\d+)/)
         return $1.to_i()
       end
     end
