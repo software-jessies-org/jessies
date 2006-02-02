@@ -12,8 +12,6 @@ import javax.swing.event.*;
 import terminator.view.*;
 
 public class TerminatorFrame extends JFrame {
-	private static final Image FRAME_ICON = new ImageIcon(System.getProperty("org.jessies.frameIcon")).getImage();
-	
 	private Dimension terminalSize;
 	private JTabbedPane tabbedPane;
 	
@@ -91,7 +89,7 @@ public class TerminatorFrame extends JFrame {
 		if (GuiUtilities.isMacOs() == false) {
 			setBackground(Options.getSharedInstance().getColor("background"));
 		}
-		setIconImage(FRAME_ICON);
+		JFrameUtilities.setFrameIcon(this);
 		
 		if (Options.getSharedInstance().shouldUseMenuBar()) {
 			setJMenuBar(new TerminatorMenuBar());
@@ -300,11 +298,12 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	/**
-	 * Implements closeTerminalPane.
+	 * Removes the given terminal when there's more than one terminal in the frame.
 	 */
 	private void closeTab(JTerminalPane victim) {
 		tabbedPane.remove(victim);
 		if (tabbedPane.getTabCount() == 0) {
+			// FIXME: how can we ever get here?
 			closeWindow();
 		} else if (tabbedPane.getTabCount() == 1) {
 			switchToSinglePane();
@@ -322,7 +321,7 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	/**
-	 * Implements closeTerminalPane.
+	 * Closes the frame after the last terminal has been removed.
 	 */
 	private void closeWindow() {
 		setVisible(false);
