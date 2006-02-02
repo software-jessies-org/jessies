@@ -252,7 +252,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         }
     }
     
-    /** Only for use by class PKeyHandler. */
+    /** Only for use by classes PKeyHandler and PMouseHandler. */
     void setLinkingActive(boolean newState) {
         if (linkingActive != newState) {
             this.linkingActive = newState;
@@ -263,7 +263,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     /** Only for use by class PMouseHandler. */
     boolean isLinkingActive() {
-        return linkingActive;
+        return isFocusOwner() && linkingActive;
     }
     
     /**
