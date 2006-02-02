@@ -1,4 +1,14 @@
 #!/usr/bin/ruby -w
+
+require "fileutils.rb"
+require "pathname.rb"
+
+# Cope with symbolic links to this script.
+project_root = Pathname.new("#{__FILE__}/..").realpath().dirname()
+salma_hayek = Pathname.new("#{project_root}/../salma-hayek").realpath()
+
+require "#{salma_hayek}/bin/uuid.rb"
+
 if ARGV[0] == "--diskId"
   diskIdTag = "DiskId='1'"
 else
@@ -17,8 +27,6 @@ $stdin.each() {
   directoryPathToFileNames[directoryPath].push(fileName)
 }
 numberOfDirectories = directoryPathToFileNames.length()
-# "sudo apt-get install uuid" gets you a suitable program on Debian
-guids = `uuid -n #{numberOfDirectories}`.split("\n")
 puts("<Include>")
 directoryNumber = 0
 fileNumber = 0
@@ -30,7 +38,7 @@ directoryPathToFileNames.each_pair() {
     puts("<Directory Id='directory#{directoryNumber}' Name='name#{directoryNumber}' LongName='#{directoryName}'>")
     directoryNumber += 1
   }
-  guid = guids.pop()
+  guid = uuid()
   puts("<Component Id='component#{directoryNumber}' Guid='#{guid}'>")
   fileNames.each() {
     |fileName|
