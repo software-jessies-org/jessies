@@ -56,7 +56,9 @@ SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTOR
 # Work out what we're going to generate.
 # ----------------------------------------------------------------------------
 
-TARGET_OS_SCRIPT = $(SALMA_HAYEK)/bin/target-os.rb
+SCRIPT_PATH = $(SALMA_HAYEK)/bin
+
+TARGET_OS_SCRIPT = $(SCRIPT_PATH)/target-os.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(TARGET_OS_SCRIPT)
 TARGET_OS := $(shell $(TARGET_OS_SCRIPT))
 
@@ -102,7 +104,7 @@ findMakeFriendlyEquivalentName.$(TARGET_OS) = $(1)
 findMakeFriendlyEquivalentName.Cygwin = $(shell cygpath --mixed --short-name '$(1)')
 findMakeFriendlyEquivalentName = $(findMakeFriendlyEquivalentName.$(TARGET_OS))
 
-JDK_ROOT_SCRIPT = $(SALMA_HAYEK)/bin/find-jdk-root.rb
+JDK_ROOT_SCRIPT = $(SCRIPT_PATH)/find-jdk-root.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JDK_ROOT_SCRIPT)
 JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell $(JDK_ROOT_SCRIPT)))
 
@@ -110,7 +112,7 @@ JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell $(JDK_ROOT_SCRIPT)))
 # We use our own replacement for javah(1).
 # ----------------------------------------------------------------------------
 
-JAVAHPP = $(SALMA_HAYEK)/bin/javahpp.rb
+JAVAHPP = $(SCRIPT_PATH)/javahpp.rb
 
 # ----------------------------------------------------------------------------
 # Find the source.
@@ -268,8 +270,6 @@ PROJECT_ROOT = $(CURDIR)
 
 PROJECT_NAME = $(notdir $(PROJECT_ROOT))
 
-SCRIPT_PATH = $(SALMA_HAYEK)/bin
-
 # By default, distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST=software@jessies.org
 # The html files are copied into the parent directory.
@@ -307,7 +307,7 @@ GENERATED_FILES += $(PROJECT_NAME).jar
 VERSION_STRING = $(shell tail -1 .generated/build-revision.txt)
 
 # "sudo apt-get install uuid" gets you a suitable program on Debian.
-makeGuid = $(shell $(SALMA_HAYEK)/bin/uuid.rb)
+makeGuid = $(shell $(SCRIPT_PATH)/uuid.rb)
 
 # ----------------------------------------------------------------------------
 # Choose a Java compiler.
