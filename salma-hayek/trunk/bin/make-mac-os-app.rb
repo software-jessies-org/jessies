@@ -12,6 +12,11 @@ def usage()
     die("usage: make-mac-os-app.rb <project_name> <salma-hayek-path> <version_string> (with filenames one per line on stdin)")
 end
 
+# humanize("terminator") => "Terminator"
+def humanize(name)
+    return name.sub(/^(.)/) { |s| s.upcase() }
+end
+
 if ARGV.length() != 3
     usage()
 end
@@ -31,7 +36,9 @@ if make_installer_file_list.empty?()
     usage()
 end
 
-puts("Building .app bundle for #{project_name}...")
+human_project_name = humanize(project_name)
+
+puts("Building .app bundle for #{human_project_name}...")
 
 # Make a temporary directory to work in.
 tmp_dir = ".generated/native/Darwin/#{project_name}"
@@ -39,7 +46,7 @@ FileUtils.rm_rf(tmp_dir)
 FileUtils.mkdir_p(tmp_dir)
 
 # Make a skeleton .app bundle.
-app_dir = "#{tmp_dir}/#{project_name}.app/Contents"
+app_dir = "#{tmp_dir}/#{human_project_name}.app/Contents"
 FileUtils.mkdir_p("#{app_dir}/MacOS")
 FileUtils.mkdir_p("#{app_dir}/Resources")
 system("echo -n 'APPL????' > #{app_dir}/PkgInfo")
@@ -57,15 +64,15 @@ File.open("#{app_dir}/Info.plist", "w") {
   <key>CFBundleIconFile</key>
   <string>#{project_name}.icns</string>
   <key>CFBundleIdentifier</key>
-  <string>org.jessies.#{project_name}</string>
+  <string>org.jessies.#{human_project_name}</string>
   <key>CFBundleName</key>
-  <string>#{project_name}</string>
+  <string>#{human_project_name}</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleSignature</key>
   <string>????</string>
   <key>CFBundleGetInfoString</key>
-  <string>#{project_name} #{version_string}</string>
+  <string>#{human_project_name} #{version_string}</string>
  </dict>
 </plist>
 EOS
@@ -137,6 +144,6 @@ system("chmod a+x #{script_name}")
 
 # Make a Mac OS .dmg file.
 system("rm -f #{project_name}.dmg")
-system("hdiutil create -fs HFS+ -volname #{project_name} -srcfolder #{tmp_dir} #{project_name}.dmg")
+system("hdiutil create -fs HFS+ -volname #{human_project_name} -srcfolder #{tmp_dir} #{project_name}.dmg")
 
 exit(0)
