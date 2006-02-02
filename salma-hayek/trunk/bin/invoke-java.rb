@@ -82,7 +82,7 @@ class Java
     if Pathname.new(dock_icon).exist?
       @dock_icon = dock_icon
     end
-    png_icon = "#{@project_root}/lib/#{name}-128.png"
+    png_icon = "#{@project_root}/lib/#{name.downcase()}-128.png"
     if Pathname.new(png_icon).exist?
       @png_icon = png_icon
     end
