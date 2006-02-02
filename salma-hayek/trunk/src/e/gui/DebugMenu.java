@@ -38,25 +38,6 @@ public class DebugMenu {
     private DebugMenu() {
     }
     
-    private static void showTextWindow(String title, String content) {
-        PTextArea textArea = new PTextArea(40, 80);
-        textArea.setFont(new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 10));
-        textArea.setText(content);
-        showScrollableContentWindow(title, textArea);
-    }
-    
-    private static void showScrollableContentWindow(String title, JComponent content) {
-        JScrollPane scrollPane = new JScrollPane(content);
-        scrollPane.setBorder(null);
-        
-        JFrame frame = new JFrame(title);
-        frame.setContentPane(scrollPane);
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
-    
     private static String sortedStringOfMap(Map<String, String> hash) {
         StringBuilder builder = new StringBuilder();
         String[] keys = hash.keySet().toArray(new String[hash.size()]);
@@ -73,7 +54,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            showTextWindow("Environment", getEnvironmentAsString());
+            JFrameUtilities.showTextWindow("Environment", getEnvironmentAsString());
         }
         
         private String getEnvironmentAsString() {
@@ -88,7 +69,7 @@ public class DebugMenu {
         
         public void actionPerformed(ActionEvent e) {
             // FIXME: we can edit the system properties; should we expose this?
-            showTextWindow("System Properties", getSystemPropertiesAsString());
+            JFrameUtilities.showTextWindow("System Properties", getSystemPropertiesAsString());
         }
         
         private String getSystemPropertiesAsString() {
@@ -138,7 +119,7 @@ public class DebugMenu {
         
         public void actionPerformed(ActionEvent e) {
             // FIXME: a table would be much nicer.
-            showTextWindow("Frames", getFramesAsString());
+            JFrameUtilities.showTextWindow("Frames", getFramesAsString());
         }
         
         private String getFramesAsString() {
@@ -166,7 +147,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            showTextWindow("Timers", getTimersAsString());
+            JFrameUtilities.showTextWindow("Timers", getTimersAsString());
         }
         
         private String getTimersAsString() {
@@ -185,7 +166,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            showTextWindow(UIManager.getLookAndFeel().getName() + " UI Defaults", getUiDefaultsAsString());
+            JFrameUtilities.showTextWindow(UIManager.getLookAndFeel().getName() + " UI Defaults", getUiDefaultsAsString());
         }
         
         private String getUiDefaultsAsString() {

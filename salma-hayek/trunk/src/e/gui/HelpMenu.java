@@ -32,11 +32,9 @@ public class HelpMenu {
         //menu.add(new PlaceholderAction(applicationName + " Help"));
         //menu.addSeparator();
         
-        // Other than on Win32, we can offer to open our log file, if we have one.
-        // On Win32, another program can't open the log file while we've got it open for writing.
         final String logFilename = System.getProperty("e.util.Log.filename");
-        if (logFilename != null && GuiUtilities.isWindows() == false) {
-            menu.add(new WebLinkAction("Show Log Messages", new File(logFilename)));
+        if (logFilename != null) {
+            menu.add(new ShowLogAction(logFilename));
             menu.addSeparator();
         }
         
@@ -79,6 +77,23 @@ public class HelpMenu {
         
         public void actionPerformed(ActionEvent e) {
             AboutBox.getSharedInstance().setVisible(true);
+        }
+    }
+    
+    private class ShowLogAction extends AbstractAction {
+        private String filename;
+        
+        public ShowLogAction(String filename) {
+            this.filename = filename;
+            putValue(NAME, "Show Log Messages");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            // We used to use WebLinkAction with a file: URL so that the user's default text viewer would be used.
+            // Sadly, on Win32, another process can't open the log file while we've got it open for writing.
+            
+            // FIXME: if we had some kind of file alteration monitor, we could update as the log gets written to.
+            JFrameUtilities.showTextWindow(applicationName + " Log", StringUtilities.readFile(filename));
         }
     }
 }
