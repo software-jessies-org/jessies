@@ -62,7 +62,7 @@ public:
     std::vector<std::string> versions;
     for (DirectoryIterator it(jreRegistryPath); it.isValid(); ++ it) {
       std::string version = it->getName();
-      if (version.empty() || version[0] != '1') {
+      if (version.empty() || version < "1.5" || version >= "1.6") {
         // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
         // "CurrentVersion" didn't get updated when I installed JDK-1.5.0_06 (or the two prior versions by the look of it)..
         continue;
@@ -87,7 +87,7 @@ public:
   
   std::string findWin32JvmLibrary() const {
     std::ostringstream os;
-    os << "Couldn't find jvm.dll - please install a JRE or JDK.";
+    os << "Couldn't find jvm.dll - please install a 1.5 JRE or JDK.";
     os << std::endl;
     os << "Error messages were:";
     os << std::endl;
