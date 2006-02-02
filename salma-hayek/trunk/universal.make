@@ -307,7 +307,7 @@ GENERATED_FILES += $(PROJECT_NAME).jar
 VERSION_STRING = $(shell tail -1 .generated/build-revision.txt)
 
 # "sudo apt-get install uuid" gets you a suitable program on Debian.
-makeGuid = $(shell uuid)
+makeGuid = $(shell $(SALMA_HAYEK)/bin/uuid.rb)
 
 # ----------------------------------------------------------------------------
 # Choose a Java compiler.
