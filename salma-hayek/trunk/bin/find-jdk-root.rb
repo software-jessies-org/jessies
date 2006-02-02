@@ -44,15 +44,27 @@ def find_jdk_root()
   require "#{@salma_hayek}/bin/target-os.rb"
   require "#{@salma_hayek}/bin/which.rb"
   
+  # On Windows it's likely that the only Java on the user's path is an ancient
+  # Microsoft Java in C:\WINNT\SYSTEM32.
+  # This is unfortunately true even if the user has a properly installed JDK.
+  if target_os() == "Cygwin"
+    # This returns a native path, but universal.make already copes with that.
+    registryKeyFile = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.5/JavaHome"
+    if File.exists?(registryKeyFile)
+      contents = File.open(registryKeyFile).read();
+      # Cygwin's representation of REG_SZ keys contains the null terminator.
+      return contents.chomp("\0")
+    end
+  end
+  
   # Find java(1) on the path.
   java_on_path = which("java")
   
-  # On Win32 it's likely that no Java is on the user's path.
-  # Our "launcher.exe" uses the registry, so although returning nil here
-  # would be a problem for our build scripts, it won't be a problem if you
-  # just want to run our stuff. (There's a slight exception in that
-  # "invoke-java.rb" uses this to find the JDK "tools.jar", but someone
-  # with a JDK installed probably also has a JDK on their path.)
+  # Our Windows "launcher.exe" uses the registry to find a JRE, so although
+  # returning nil or an unsuitable Java here would be a problem for our build
+  # system, it won't necessarily stop you running our stuff.
+  # "invoke-java.rb" uses this script to find the JDK "tools.jar", but we cope
+  # with installed JDKs which are not on the path, above.
   if java_on_path == nil
     return nil
   end

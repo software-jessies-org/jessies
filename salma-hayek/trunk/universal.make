@@ -77,7 +77,7 @@ convertToNativeFilenames.$(TARGET_OS) = $(1)
 convertToNativeFilenames.Cygwin = $(if $(1),$(shell cygpath --mixed $(1)))
 convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 
-searchPath = $(shell which $(1))
+searchPath = $(shell which $(1) 2> /dev/null)
 makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(1)))
 
 SPACE = $(subst :, ,:)
@@ -317,7 +317,7 @@ JAVA_COMPILER ?= javac
 
 ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))$(call searchPath,$(JAVA_COMPILER))" ""
   REQUESTED_JAVA_COMPILER := $(JAVA_COMPILER)
-  JAVA_COMPILER = $(REQUESTED_JAVA_COMPILER)
+  JAVA_COMPILER = $(JDK_ROOT)/bin/$(REQUESTED_JAVA_COMPILER)
   ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
     JAVA_COMPILER = $(error Unable to find $(REQUESTED_JAVA_COMPILER))
   endif
