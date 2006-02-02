@@ -14,8 +14,13 @@
 
 def getSubversionVersion(directory)
   command = "svnversion #{directory}"
-  if `uname -n`.chomp() == "mdorey"
-    command = "ssh duezer svnversion #{directory.sub(/^\/cygdrive\/f\//, "/home/martind/")}"
+  if `uname` =~ /CYGWIN/
+    # svnversion is insanely slow on Cygwin using a samba share.
+    # FIXME: we should probably have some sort of environment variables along the lines of "org.jessies.build.host.Linux" for this kind of thing. Especially if/when we finally get round to automating the distributions.
+    linux_build_host = "duezer"
+    directory = directory.sub(/^\/cygdrive\/[a-z]\//, "/home/#{`whoami`.chomp()}/")
+    command = "ssh #{linux_build_host} svnversion #{directory}"
+    $stderr.puts(command) # In case ssh(1) prompts for a password.
   end
   IO.popen(command) {
     |pipe|
