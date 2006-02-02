@@ -446,7 +446,7 @@ public class Edit {
     }
     
     public void initWindowIcon() {
-        frame.setIconImage(new ImageIcon(System.getProperty("org.jessies.frameIcon")).getImage());
+        JFrameUtilities.setFrameIcon(frame);
     }
     
     /**
