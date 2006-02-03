@@ -32,9 +32,9 @@ public class TagReader {
         Process p = Runtime.getRuntime().exec(new String[] {
             "ctags",
             "--c++-types=+p", "-n", "--fields=+a", "-u",
-            "--regex-java=/( static )/\1/S/",
-            "--regex-c++=/( static )/\1/S/",
-            "--regex-java=/( abstract )/\1/A/",
+            "--regex-java=/(\\bstatic\\b)/\1/S/",
+            "--regex-c++=/(\\bstatic\\b)/\1/S/",
+            "--regex-java=/(\\babstract\\b)/\1/A/",
             "-f", tagsFile.getAbsolutePath(),
             file.getAbsolutePath()
         });
