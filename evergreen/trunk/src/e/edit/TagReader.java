@@ -176,18 +176,6 @@ public class TagReader {
             this.type = TagType.fromChar(tagType);
         }
         
-        public String describeVisibility() {
-            if (context.contains("access:public")) {
-                return "+";
-            } else if (context.contains("access:private")) {
-                return "-";
-            } else if (context.contains("access:protected")) {
-                return "#";
-            } else {
-                return "?";
-            }
-        }
-        
         public static final Color PUBLIC = Color.GREEN.darker();
         public static final Color PROTECTED = Color.ORANGE;
         public static final Color PRIVATE = new Color(255, 140, 140);
@@ -304,6 +292,13 @@ public class TagReader {
                 case 'p': return 'P'; // Prototype, not package.
                 default: return type;
             }
+        }
+        
+        public Color visibilityColor() {
+            if (isStatic && containingClass.length() == 0) {
+                return PRIVATE;
+            }
+            return super.visibilityColor();
         }
     }
     
