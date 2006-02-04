@@ -125,10 +125,13 @@ public class SpellingChecker {
             return;
         }
         
-        knownBad.remove(word);
-        knownGood.add(word);
+        // knownBad and knownGood only contain lowercase words.
+        String setWord = word.toLowerCase();
+        knownBad.remove(setWord);
+        knownGood.add(setWord);
         
         // Send the word to ispell to insert into the personal dictionary.
+        // FIXME: we pass it through with its original case, but if it's not all lowercase, ispell(1) takes that to mean that it should only accept that capitalization. This may not be the right choice.
         out.println("*" + word);
         out.flush();
     }
