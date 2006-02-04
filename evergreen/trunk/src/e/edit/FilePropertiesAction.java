@@ -20,6 +20,7 @@ public class FilePropertiesAction extends ETextAction {
     private JTextField endOfLineStringField = new JTextField("", 40);
     private JTextField indentStringField = new JTextField("", 40);
     private JTextField charsetStringField = new JTextField("", 40);
+    private JLabel fileTypeField = new JLabel(" ");
     
     public FilePropertiesAction() {
         super(ACTION_NAME);
@@ -49,11 +50,14 @@ public class FilePropertiesAction extends ETextAction {
             //System.out.println(charset + " = " + Charset.forName(charset).displayName());
         }
         
+        fileTypeField.setText(window.getFileType());
+        
         FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "File Properties");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);
         formPanel.addRow("Character Encoding:", charsetStringField);
+        formPanel.addRow("File Type:", fileTypeField);
         boolean okay = form.show("Apply");
         
         if (okay == false) {
