@@ -46,7 +46,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
     private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f);
     
-    public static final String UNKNOWN = "Unknown";
+    public static final String PLAIN_TEXT = "Plain Text";
     public static final String BASH = "Bash";
     public static final String C_PLUS_PLUS = "C++";
     public static final String JAVA = "Java";
@@ -54,7 +54,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     public static final String RUBY = "Ruby";
     public static final String PERL = "Perl";
     
-    private String fileType = UNKNOWN;
+    private String fileType = PLAIN_TEXT;
     
     private static final HashMap<String, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<String, HashSet<String>>();
 
@@ -350,7 +350,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         // suggestive content. It's hard to see that there's ever any excuse
         // for having the wrong filename extension.
         initFileTypeByName();
-        if (fileType == UNKNOWN) {
+        if (fileType == PLAIN_TEXT) {
             initFileTypeByContent();
         }
     }
@@ -365,7 +365,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         } else if (isPerlContent(content)) {
             fileType = PERL;
         } else {
-            fileType = UNKNOWN;
+            fileType = PLAIN_TEXT;
         }
     }
     private void initFileTypeByName() {
@@ -380,7 +380,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         } else if (filename.equals("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
             fileType = MAKE;
         } else {
-            fileType = UNKNOWN;
+            fileType = PLAIN_TEXT;
         }
     }
     
