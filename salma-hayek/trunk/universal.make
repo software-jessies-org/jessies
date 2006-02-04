@@ -472,6 +472,7 @@ ChangeLog:
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM))
 
 # This is only designed to be run on jessies.org itself.
+# It's run by a custom post-commit hook to generate a new source download for each revision.
 .PHONY: source-dist
 source-dist: ../$(SOURCE_DIST_FILE)
 	mkdir -p $(DIST_DIRECTORY) && \
