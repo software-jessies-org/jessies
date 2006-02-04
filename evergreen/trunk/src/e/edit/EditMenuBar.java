@@ -165,6 +165,8 @@ public class EditMenuBar extends EMenuBar {
         JMenu menu = new JMenu("Window");
         menu.add(new CycleWindowsAction(1));
         menu.add(new CycleWindowsAction(-1));
+        menu.add(new JSeparator());
+        menu.add(new ExpandWindowAction());
         return menu;
     }
     
