@@ -171,7 +171,14 @@ public class FindInFilesDialog {
             int newPercentage = (doneFileCount * 100) / totalFileCount;
             if (newPercentage != percentage) {
                 percentage = newPercentage;
-                setStatus("Searching... " + percentage + "%", false);
+                String status = makeStatusString() + " (" + percentage + "%)";
+                setStatus(status, false);
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        matchTreeModel.reload();
+                        matchView.expandAll();
+                    }
+                });
             }
         }
         
@@ -266,14 +273,18 @@ public class FindInFilesDialog {
                 return;
             }
             
+            setStatus(makeStatusString(), false);
+            
+            matchView.expandAll();
+        }
+        
+        private String makeStatusString() {
             String status = matchingFileCount + " / " + StringUtilities.pluralize(totalFileCount, "file", "files");
             if (workspace.getIndexedFileCount() != totalFileCount) {
                 status += " (from " + workspace.getIndexedFileCount() + ")";
             }
             status += " match.";
-            setStatus(status, false);
-            
-            matchView.expandAll();
+            return status;
         }
     }
     
@@ -349,7 +360,7 @@ public class FindInFilesDialog {
     }
     
     public class MatchTreeCellRenderer extends DefaultTreeCellRenderer {
-        Font defaultFont = null;
+        private Font defaultFont = null;
         
         public MatchTreeCellRenderer() {
             setClosedIcon(null);
