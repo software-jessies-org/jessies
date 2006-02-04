@@ -273,6 +273,11 @@ public class TagReader {
                 // A constructor in a namespace.
                 this.type = TagType.CONSTRUCTOR;
             }
+            
+            // FIXME: pure virtual member functions should be marked "abstract" too.
+            if (this.type == TagType.PROTOTYPE) {
+                this.isAbstract = true;
+            }
         }
         
         /**
