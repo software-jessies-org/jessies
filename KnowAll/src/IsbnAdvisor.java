@@ -35,7 +35,8 @@ public class IsbnAdvisor implements Advisor {
     public void advise(SuggestionsBox suggestionsBox, String text) {
         Matcher matcher = PATTERN.matcher(text);
         while (matcher.find()) {
-            suggestionsBox.addSuggestion(new Suggestion("ISBN", "<a href=\"http://www.isbn.nu/" + matcher.group(1).replaceAll("-", "") + "\">" + matcher.group(1) + "</a>"));
+            String isbn = matcher.group(1).replaceAll("-", "").replaceAll(" ", "");
+            suggestionsBox.addSuggestion(new Suggestion("ISBN", "<a href=\"http://www.isbn.nu/" + isbn + "\">" + matcher.group(1) + "</a>"));
         }
     }
 }
