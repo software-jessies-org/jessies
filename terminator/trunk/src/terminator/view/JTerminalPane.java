@@ -36,8 +36,6 @@ public class JTerminalPane extends JPanel {
 		new TerminatorMenuBar.FindAction(),
 		new TerminatorMenuBar.FindNextAction(),
 		new TerminatorMenuBar.FindPreviousAction(),
-		new TerminatorMenuBar.FindNextLinkAction(),
-		new TerminatorMenuBar.FindPreviousLinkAction(),
 		null,
 		new TerminatorMenuBar.ClearScrollbackAction(),
 		null,
@@ -225,8 +223,6 @@ public class JTerminalPane extends JPanel {
 	public void setName(String name) {
 		this.name = name;
 		getTerminatorFrame().terminalNameChanged(this);
-		HyperlinkHighlighter linker = (HyperlinkHighlighter) textPane.getHighlighterOfClass(HyperlinkHighlighter.class);
-		linker.setDirectory(name);
 	}
 	
 	public Dimension getOptimalViewSize() {

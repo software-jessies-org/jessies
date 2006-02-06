@@ -90,7 +90,6 @@ public class JTextBuffer extends JComponent implements FocusListener {
 				setCursor(cursor);
 			}
 		});
-		addHighlighter(new HyperlinkHighlighter());
 		addHighlighter(new FindHighlighter());
 		becomeDropTarget();
 		cursorBlinker = new CursorBlinker(this);
