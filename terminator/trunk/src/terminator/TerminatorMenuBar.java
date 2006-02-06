@@ -65,9 +65,6 @@ public class TerminatorMenuBar extends EMenuBar {
 		menu.add(new FindNextAction());
 		menu.add(new FindPreviousAction());
 		
-		menu.addSeparator();
-		menu.add(new FindNextLinkAction());
-		menu.add(new FindPreviousLinkAction());
 		return menu;
 	}
 	
@@ -423,18 +420,6 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 	}
 	
-	public static class FindNextLinkAction extends AbstractPaneAction {
-		public FindNextLinkAction() {
-			super("Find Next Link");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedKeyStroke("G"));
-		}
-		
-		@Override
-		protected void performPaneAction(JTerminalPane terminalPane) {
-			terminalPane.getTextPane().findNext(HyperlinkHighlighter.class);
-		}
-	}
-	
 	public static class FindPreviousAction extends BindableAction {
 		public FindPreviousAction() {
 			super("Find Previous");
@@ -443,18 +428,6 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		public void performOn(JTerminalPane terminalPane) {
 			terminalPane.getTextPane().findPrevious(FindHighlighter.class);
-		}
-	}
-	
-	public static class FindPreviousLinkAction extends AbstractPaneAction {
-		public FindPreviousLinkAction() {
-			super("Find Previous Link");
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedKeyStroke("D"));
-		}
-		
-		@Override
-		protected void performPaneAction(JTerminalPane terminalPane) {
-			terminalPane.getTextPane().findPrevious(HyperlinkHighlighter.class);
 		}
 	}
 	
