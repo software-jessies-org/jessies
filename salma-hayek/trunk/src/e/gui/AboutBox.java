@@ -11,7 +11,7 @@ import javax.swing.border.*;
 /**
  * A simple "about box".
  */
-public class AboutBox extends JDialog {
+public class AboutBox {
     private static final AboutBox INSTANCE = new AboutBox();
     
     private ImageIcon icon;
@@ -66,23 +66,35 @@ public class AboutBox extends JDialog {
         copyrightLines.add(copyright.replaceAll("\\([Cc]\\)", "\u00a9"));
     }
     
-    public void setVisible(boolean visible) {
-        if (visible == true) {
-            makeUi();
+    private Frame findSuitableOwner() {
+        if (GuiUtilities.isMacOs()) {
+            // On Mac OS, we're supposed to be in the center of the display.
+            return null;
         }
-        super.setVisible(visible);
+        // Find an owner for the about box so we inherit the frame icon and get a sensible relative position.
+        Frame owner = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner());
+        if (owner == null) {
+            Frame[] frames = Frame.getFrames();
+            if (frames.length > 0) {
+                owner = frames[0];
+            }
+        }
+        return owner;
     }
     
-    private void makeUi() {
-        // FIXME: add GNOME and Win32 implementations.
-        makeMacUi();
+    public void show() {
+        JDialog dialog = new JDialog(findSuitableOwner());
+        makeUi(dialog);
+        dialog.setVisible(true);
+    }
+    
+    private void makeUi(JDialog dialog) {
         if (GuiUtilities.isMacOs() == false) {
             // GNOME and Win32 applications give their about boxes titles.
-            setTitle("About " + applicationName);
+            dialog.setTitle("About " + applicationName);
         }
-    }
-    
-    private void makeMacUi() {
+        
+        // FIXME: add GNOME and Win32 implementations.
         // http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/XHIGWindows/chapter_17_section_5.html#//apple_ref/doc/uid/20000961-TPXREF17
         
         // Mac OS font defaults.
@@ -127,19 +139,19 @@ public class AboutBox extends JDialog {
             addLabel(panel, copyrightFont, copyright);
         }
         
-        setContentPane(panel);
+        dialog.setContentPane(panel);
         
         // Set an appropriate size.
-        pack();
+        dialog.pack();
         // Disable the "maximize" button.
-        setMaximumSize(getPreferredSize());
-        setMinimumSize(getPreferredSize());
+        dialog.setMaximumSize(dialog.getPreferredSize());
+        dialog.setMinimumSize(dialog.getPreferredSize());
         // Stop resizing.
-        setResizable(false);
+        dialog.setResizable(false);
         
         // Center on the display.
         // FIXME: use the visual center.
-        setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(dialog.getOwner());
     }
     
     private static void addLabel(JPanel panel, Icon icon) {
@@ -170,7 +182,7 @@ public class AboutBox extends JDialog {
     private void initMacOsAboutMenu() {
         Application.getApplication().addApplicationListener(new ApplicationAdapter() {
             public void handleAbout(ApplicationEvent e) {
-                AboutBox.getSharedInstance().setVisible(true);
+                AboutBox.getSharedInstance().show();
                 e.setHandled(true);
             }
         });
@@ -239,6 +251,6 @@ public class AboutBox extends JDialog {
         AboutBox aboutBox = AboutBox.getSharedInstance();
         aboutBox.setApplicationName("Demonstration");
         aboutBox.addCopyright("Copyright (C) 2006, Elliott Hughes");
-        aboutBox.setVisible(true);
+        aboutBox.show();
     }
 }

@@ -76,7 +76,7 @@ public class HelpMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            AboutBox.getSharedInstance().setVisible(true);
+            AboutBox.getSharedInstance().show();
         }
     }
     
