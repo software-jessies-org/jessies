@@ -456,7 +456,8 @@ build.java: $(SOURCE_FILES)
 
 .PHONY: clean
 clean:
-	@find . -name "*.bak" | xargs $(RM) -r $(GENERATED_FILES)
+	@$(RM) -r $(GENERATED_FILES) && \
+	find . -name "*.bak" | xargs $(RM)
 
 .PHONY: native-clean
 native-clean:

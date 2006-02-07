@@ -231,6 +231,7 @@ missing-prerequisites.$(BASE_NAME):
 # in the same directory.
 # Using cp for the benefit of Windows native compilers which don't
 # understand "symlinks".
+# FIXME: Copies of files which no longer exist must be removed.
 $(SOURCE_LINKS) $(HEADER_LINKS): $(GENERATED_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
 	mkdir -p $(dir $@) && \
 	$(RM) $@ && \
