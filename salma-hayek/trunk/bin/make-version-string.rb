@@ -14,13 +14,18 @@
 
 def getSubversionVersion(directory)
   command = "svnversion #{directory}"
-  if `uname` =~ /CYGWIN/
-    # svnversion is insanely slow on Cygwin using a samba share.
-    # FIXME: we should probably have some sort of environment variables along the lines of "org.jessies.build.host.Linux" for this kind of thing. Especially if/when we finally get round to automating the distributions.
-    linux_build_host = "duezer"
-    directory = directory.sub(/^\/cygdrive\/[a-z]\//, "/home/#{`whoami`.chomp()}/")
-    command = "ssh #{linux_build_host} svnversion #{directory}"
-    $stderr.puts(command) # In case ssh(1) prompts for a password.
+  # svnversion is insanely slow on Cygwin using a samba share.
+  if `uname` =~ /CYGWIN/ && directory.match(/^\/cygdrive\/([a-z])\/(.*)/)
+    drive = $1.upcase()
+    pathWithinMappedDrive = $2
+    user = `whoami`.chomp()
+    # OK           F:        \\duezer\martind          Microsoft Windows Network
+    if `net use`.match(/^OK\s+#{drive}:\s+\\\\(\w+)\\#{user}\s+/)
+      file_host = $1
+      # We assume that the drive is mapped to the user's home directory.
+      command = "ssh #{file_host} svnversion /home/#{user}/#{pathWithinMappedDrive}"
+      $stderr.puts(command) # In case ssh(1) prompts for a password.
+    end
   end
   IO.popen(command) {
     |pipe|
