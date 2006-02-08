@@ -21,9 +21,9 @@ def getSubversionVersion(directory)
     user = `whoami`.chomp()
     # OK           F:        \\duezer\martind          Microsoft Windows Network
     if `net use`.match(/^OK\s+#{drive}:\s+\\\\(\w+)\\#{user}\s+/)
-      file_host = $1
+      fileHost = $1
       # We assume that the drive is mapped to the user's home directory.
-      command = "ssh #{file_host} svnversion /home/#{user}/#{pathWithinMappedDrive}"
+      command = "ssh #{fileHost} svnversion /home/#{user}/#{pathWithinMappedDrive}"
       $stderr.puts(command) # In case ssh(1) prompts for a password.
     end
   end
