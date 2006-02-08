@@ -19,8 +19,12 @@ def getSubversionVersion(directory)
     drive = $1.upcase()
     pathWithinMappedDrive = $2
     user = `whoami`.chomp()
+    # "net use" tells us what machine to ssh to. martind saw one line:
     # OK           F:        \\duezer\martind          Microsoft Windows Network
-    if `net use`.match(/^OK\s+#{drive}:\s+\\\\(\w+)\\#{user}\s+/)
+    # elliotth saw two lines:
+    # OK           U:        \\bertha.us.dev.bluearc.com\elliotth
+    #                                                  Microsoft Windows Network
+    if `net use`.match(/^OK\s+#{drive}:\s+\\\\(\S+)\\#{user}\b/)
       fileHost = $1
       # We assume that the drive is mapped to the user's home directory.
       command = "ssh #{fileHost} svnversion /home/#{user}/#{pathWithinMappedDrive}"
