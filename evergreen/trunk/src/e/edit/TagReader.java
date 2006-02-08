@@ -161,12 +161,15 @@ public class TagReader {
         public String toolTip;
         public boolean isStatic;
         public boolean isAbstract;
+        public boolean isPrototype;
         
         public Tag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
             this.identifier = identifier;
             this.lineNumber = lineNumber;
             this.context = context;
             this.containingClass = containingClass;
+            
+            this.isPrototype = (TagType.fromChar(tagType) == TagType.PROTOTYPE);
             
             // Recognize constructors. Using the same name as the containing
             // class is a pattern common to most languages.
@@ -274,8 +277,8 @@ public class TagReader {
                 this.type = TagType.CONSTRUCTOR;
             }
             
-            // FIXME: pure virtual member functions should be marked "abstract" too.
-            if (this.type == TagType.PROTOTYPE) {
+            // Mark prototypes as "abstract" so they're rendered differently.
+            if (this.isPrototype) {
                 this.isAbstract = true;
             }
         }
