@@ -215,7 +215,8 @@ static bool processHasFileOpen(const std::string& pid, const std::string& filena
         }
     } catch (unix_exception& ex) {
         // We expect not to be able to see all users' processes' fds.
-        if (errno != EACCES) {
+        // We also expect that some processes might have exited between us seeing their directory and scanning it.
+        if (ex.getErrno() != EACCES && ex.getErrno() != ENOENT) {
             std::cerr << "processHasFileOpen error: " << ex.what() << std::endl;
         }
     }
