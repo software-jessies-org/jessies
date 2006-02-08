@@ -245,3 +245,4 @@ $(SOURCE_LINKS) $(HEADER_LINKS): $(GENERATED_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
 # conservatively assume that if a header files changes, we have to recompile
 # everything.
 $(OBJECTS): $(HEADER_LINKS) $(HEADERS) $(MAKEFILE_LIST)
+$(OBJECTS): $(wildcard $(SALMA_HAYEK)/native/Headers/*)
