@@ -27,10 +27,7 @@ def getSubversionVersion(directory)
       $stderr.puts(command) # In case ssh(1) prompts for a password.
     end
   end
-  IO.popen(command) {
-    |pipe|
-    return pipe.readline()
-  }
+  return `#{command}`.chomp()
 end
 
 def extractVersionNumber(versionString)
