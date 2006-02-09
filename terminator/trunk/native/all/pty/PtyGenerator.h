@@ -60,13 +60,13 @@ public:
         return fds;
     }
     
-    pid_t forkAndExec(char * const *cmd) {
+    pid_t forkAndExec(char * const *cmd, const char* workingDirectory) {
         pid_t pid = fork();
         if (pid < 0) {
             return -1;
         } else if (pid == 0) {
             try {
-                runChild(cmd, *this);  // Should never return.
+                runChild(cmd, workingDirectory, *this);  // Should never return.
             } catch (const std::exception& ex) {
                 std::cerr << ex.what() << std::endl;
             }
@@ -147,7 +147,12 @@ private:
         }
     };
     
-    static void runChild(char * const *cmd, PtyGenerator& ptyGenerator) {
+    static void runChild(char * const *cmd, const char* workingDirectory, PtyGenerator& ptyGenerator) {
+        if (workingDirectory != 0) {
+            if (chdir(workingDirectory) < 0) {
+                throw child_exception("chdir(\"" + toString(workingDirectory) + "\")");
+            }
+        }
         if (setsid() < 0) {
             throw child_exception("setsid()");
         }

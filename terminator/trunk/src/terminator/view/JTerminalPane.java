@@ -49,18 +49,18 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Creates a new terminal with the given name, running the given command.
 	 */
-	private JTerminalPane(String name, List<String> command, boolean wasCreatedAsNewShell) {
+	private JTerminalPane(String name, String workingDirectory, List<String> command, boolean wasCreatedAsNewShell) {
 		super(new BorderLayout());
 		this.name = name;
 		this.wasCreatedAsNewShell = wasCreatedAsNewShell;
-		init(command);
+		init(command, workingDirectory);
 	}
 	
 	/**
 	 * Creates a new terminal running the given command, with the given
 	 * name. If 'name' is null, we use the command as the the name.
 	 */
-	public static JTerminalPane newCommandWithName(String originalCommand, String name) {
+	public static JTerminalPane newCommandWithName(String originalCommand, String name, String workingDirectory) {
 		if (name == null) {
 			name = originalCommand;
 		}
@@ -70,25 +70,25 @@ public class JTerminalPane extends JPanel {
 		command.add("-c");
 		command.add(originalCommand);
 		
-		return new JTerminalPane(name, command, false);
+		return new JTerminalPane(name, workingDirectory, command, false);
 	}
 	
 	/**
 	 * Creates a new terminal running the user's shell.
 	 */
 	public static JTerminalPane newShell() {
-		return newShellWithName(null);
+		return newShellWithName(null, null);
 	}
 	
 	/**
 	 * Creates a new terminal running the user's shell with the given name.
 	 */
-	public static JTerminalPane newShellWithName(String name) {
+	public static JTerminalPane newShellWithName(String name, String workingDirectory) {
 		if (name == null) {
 			String user = System.getProperty("user.name");
 			name = user + "@localhost";
 		}
-		return new JTerminalPane(name, getShellCommand(), true);
+		return new JTerminalPane(name, workingDirectory, getShellCommand(), true);
 	}
 	
 	private static ArrayList<String> getShellCommand() {
@@ -109,7 +109,7 @@ public class JTerminalPane extends JPanel {
 		return viewport.getSize();
 	}
 	
-	private void init(List<String> command) {
+	private void init(List<String> command, String workingDirectory) {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
 		
@@ -137,7 +137,7 @@ public class JTerminalPane extends JPanel {
 		try {
 			control = new TerminalControl(this, textPane.getModel());
 			textPane.setTerminalControl(control);
-			control.initProcess(command.toArray(new String[command.size()]));
+			control.initProcess(command.toArray(new String[command.size()]), workingDirectory);
 			initSizeMonitoring();
 		} catch (final Throwable th) {
 			Log.warn("Couldn't initialize terminal", th);
