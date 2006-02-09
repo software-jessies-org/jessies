@@ -149,6 +149,9 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
             didDumpCore = true;
         }
     }
+    
+    // We now have no further use for the fd connecting us to the (exited) child.
+    close(fd.get());
 }
 
 #ifdef __APPLE__
