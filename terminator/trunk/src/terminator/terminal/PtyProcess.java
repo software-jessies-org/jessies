@@ -90,10 +90,10 @@ public class PtyProcess {
         return signalDescription;
     }
     
-    public PtyProcess(String[] command) throws Exception {
+    public PtyProcess(String[] command, String workingDirectory) throws Exception {
         ensureLibraryLoaded();
         FileDescriptor descriptor = new FileDescriptor();
-        startProcess(command, descriptor);
+        startProcess(command, workingDirectory, descriptor);
         if (processId == -1) {
             throw new IOException("Could not start process \"" + command + "\".");
         }
@@ -118,11 +118,11 @@ public class PtyProcess {
         return processId;
     }
     
-    private void startProcess(final String[] command, final FileDescriptor descriptor) throws Exception {
+    private void startProcess(final String[] command, final String workingDirectory, final FileDescriptor descriptor) throws Exception {
         invoke(new Callable<Exception>() {
             public Exception call() {
                 try {
-                    nativeStartProcess(command, descriptor);
+                    nativeStartProcess(command, workingDirectory, descriptor);
                     return null;
                 } catch (Exception ex) {
                     return ex;
@@ -166,7 +166,7 @@ public class PtyProcess {
         }
     }
     
-    private native void nativeStartProcess(String[] command, FileDescriptor descriptor) throws IOException;
+    private native void nativeStartProcess(String[] command, String workingDirectory, FileDescriptor descriptor) throws IOException;
     private native void nativeWaitFor() throws IOException;
     public native void destroy() throws IOException;
     

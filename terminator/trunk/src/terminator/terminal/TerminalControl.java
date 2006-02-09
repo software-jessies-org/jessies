@@ -65,9 +65,9 @@ public class TerminalControl {
 		this.listener = listener;
 	}
 	
-	public void initProcess(String[] command) throws Throwable {
+	public void initProcess(String[] command, String workingDirectory) throws Throwable {
 		this.logWriter = new LogWriter(command);
-		this.ptyProcess = new PtyProcess(command);
+		this.ptyProcess = new PtyProcess(command, workingDirectory);
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), "UTF-8");
 		this.out = ptyProcess.getOutputStream();
 	}

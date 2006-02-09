@@ -56,13 +56,20 @@ struct Argv : std::vector<char*> {
     }
 };
 
-void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jobject descriptor) {
+void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jstring javaWorkingDirectory, jobject descriptor) {
     PtyGenerator ptyGenerator;
     int masterFd = ptyGenerator.openMaster();
     
     JavaStringArrayToStringArray arguments(m_env, command);
     Argv argv(arguments);
-    processId = ptyGenerator.forkAndExec(&argv[0]);
+    // Owns the memory for the lifetime of workingDirectory.
+    std::string workingDirectoryChars;
+    const char* workingDirectory = 0;
+    if (javaWorkingDirectory != 0) {
+        workingDirectoryChars = JniString(m_env, javaWorkingDirectory).str();
+        workingDirectory = workingDirectoryChars.c_str();
+    }
+    processId = ptyGenerator.forkAndExec(&argv[0], workingDirectory);
     
     slavePtyName = newStringUtf8(ptyGenerator.getSlavePtyName());
     
