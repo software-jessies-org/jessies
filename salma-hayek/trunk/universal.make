@@ -443,13 +443,16 @@ define closeLocalVariableScope
   $(call forEachLocalVariable,unsetLocalVariable)
 endef
 
+BUILD_TARGETS += build.$(findstring java,$(SOURCE_FILES))
+BUILD_TARGETS += $(if $(wildcard .svn),.generated/build-revision.txt)
+
 # ----------------------------------------------------------------------------
 # Variables above this point,
 # rules below...
 # ----------------------------------------------------------------------------
 
 .PHONY: build
-build: build.$(findstring java,$(SOURCE_FILES))
+build: $(BUILD_TARGETS)
 
 .PHONY: build.
 build.:;
