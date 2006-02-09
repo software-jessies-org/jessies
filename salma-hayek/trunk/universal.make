@@ -592,13 +592,13 @@ native: $(ALL_NATIVE_TARGETS)
 
 # make native-dist a silent no-op where there's nothing for it to do for the
 # benefit of a simple, uniform nightly build script.
+.PHONY: native-dist
 ifeq "$(INSTALLER_BINARY)" ""
 
 native-dist:;
 
 else
 
-.PHONY: native-dist
 native-dist: $(INSTALLER_BINARY)
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
