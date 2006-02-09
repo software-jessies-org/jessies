@@ -450,9 +450,17 @@ endef
 .PHONY: build
 build: build.java
 
+ifeq "$(SOURCE_FILES)" ""
+
+build.java:;
+
+else
+
 .PHONY: build.java
 build.java: $(SOURCE_FILES)
 	$(BUILD_JAVA)
+
+endif
 
 .PHONY: clean
 clean:
