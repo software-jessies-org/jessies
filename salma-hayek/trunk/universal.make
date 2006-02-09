@@ -492,7 +492,7 @@ $(PROJECT_NAME).jar: build.java
 # The ChangeLog is generated too!
 ../$(SOURCE_DIST_FILE): ChangeLog .generated/build-revision.txt
 	cd .. && \
-	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_NAME)/* .generated/build-revision.txt
+	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_NAME)/* $(PROJECT_NAME)/.generated/build-revision.txt
 
 # This is only designed to be run on jessies.org itself.
 .PHONY: www-dist
