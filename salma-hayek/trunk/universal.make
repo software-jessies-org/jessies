@@ -488,6 +488,8 @@ $(PROJECT_NAME).jar: build.java
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
+# Including a generated file in a source distribution?
+# The ChangeLog is generated too!
 ../$(SOURCE_DIST_FILE): ChangeLog .generated/build-revision.txt
 	cd .. && \
 	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_NAME)/* .generated/build-revision.txt
