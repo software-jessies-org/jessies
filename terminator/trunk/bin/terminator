@@ -44,6 +44,10 @@ def tryInAppServer(server_port_file)
   # We only support the simple "new shell" case. Allowing the execution of
   # arbitrary commands would be a security hole. This is, as explained below,
   # simply a performance optimization.
+  # This also stops existing terminals from having their options changed when
+  # someone starts a new terminal.
+  # It should also mean that my "runtitan" commands always block, like an xterm
+  # would, rather than sometimes exiting immediately.
   if ARGV.empty?() == false
     return
   end
