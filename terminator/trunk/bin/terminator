@@ -11,10 +11,17 @@ require "#{salma_hayek}/bin/target-os.rb"
 require "#{salma_hayek}/bin/invoke-java.rb"
 require "#{salma_hayek}/bin/which.rb"
 
-HOME = ENV["HOME"]
+# Change to the user's home directory so that regardless of where we're
+# started from, our children start in the user's home directory. This is
+# not traditional terminal behavior, but gnome-terminal works like this,
+# and it seems to make more sense for terminal applications that support
+# more than one terminal per instance. (In particular, it's strange and
+# annoying if the directory a new shell starts in depends on the directory
+# we started Terminator from.)
+Dir.chdir()
 
 # Make sure we have a directory for the terminal logs.
-log_directory = "#{HOME}/.terminal-logs"
+log_directory = "#{ENV['HOME']}/.terminal-logs"
 if test(?d, log_directory) == false
   Dir.mkdir(log_directory)
   system("chmod og-rx #{log_directory}")
@@ -79,7 +86,7 @@ end
 if test(?w, "/usr/share/terminfo")
   terminfo = "/usr/share/terminfo"
 else
-  terminfo = "#{HOME}/.terminfo"
+  terminfo = "#{ENV['HOME']}/.terminfo"
 end
 ENV["TERMINFO"] = terminfo
 
