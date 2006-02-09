@@ -120,7 +120,7 @@ public class ShellCommand {
      * systems, the SHELL environment variable is queried. If this isn't set,
      * a default of /bin/sh is used.
      */
-    private String[] makeCommandLine(String command) {
+    public static String[] makeCommandLine(String command) {
         if (GuiUtilities.isWindows()) {
             return new String[] { "cmd", "/c", command };
         } else {

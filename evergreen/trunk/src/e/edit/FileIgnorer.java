@@ -29,21 +29,25 @@ public class FileIgnorer {
     }
     
     private static String getUninterestingDirectoryPattern(File rootDirectory) {
-        // Add the default ignored directory patterns.
         ArrayList<String> patterns = new ArrayList<String>();
+        
+        // Start with the default ignored directory patterns.
+        // autotools directories:
         patterns.add("\\.deps");
+        patterns.add("autom4te.cache");
+        // SCM directories:
         patterns.add("\\.svn");
         patterns.add("BitKeeper");
         patterns.add("CVS");
         patterns.add("SCCS");
         
-        // Run the site-local script if we find it.
+        // Try to run the site-local script.
+        // FIXME: check that we handle the case where the script doesn't exist.
+        // FIXME: move ShellCommand.makeCommandLine into ProcessUtilities when we have a better name.
         final String scriptName = "echo-local-non-source-directory-pattern";
-        if (FileUtilities.findOnPath(scriptName) != null) {
-            String[] command = new String[] { scriptName };
-            ArrayList<String> errors = new ArrayList<String>();
-            ProcessUtilities.backQuote(rootDirectory, command, patterns, errors);
-        }
+        String[] command = ShellCommand.makeCommandLine(scriptName);
+        ArrayList<String> errors = new ArrayList<String>();
+        ProcessUtilities.backQuote(rootDirectory, command, patterns, errors);
         
         // Make a regular expression.
         return StringUtilities.join(patterns, "|");
