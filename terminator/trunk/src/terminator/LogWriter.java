@@ -55,6 +55,14 @@ public class LogWriter {
 		}
 	}
 	
+	public void close() {
+		try {
+			stream.close();
+		} catch (Throwable th) {
+			Log.warn("Exception occurred closing log stream \"" + info + "\".", th);
+		}
+	}
+	
 	public String getInfo() {
 		return info;
 	}
@@ -64,7 +72,7 @@ public class LogWriter {
 			try {
 				stream.flush();
 			} catch (Throwable th) {
-				Log.warn("Exception occurred flushing the log stream.", th);
+				Log.warn("Exception occurred flushing log stream \"" + info + "\".", th);
 			}
 			suspended = newState;
 		}
