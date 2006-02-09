@@ -1,6 +1,7 @@
 # You may use:
 #   make
 #   make clean
+#   make installer
 #   make native
 #   make native-clean
 #   make native-dist
@@ -583,7 +584,10 @@ $(PROJECT_ROOT)/.generated/native/Cygwin/WiX/Cygwin/component-definitions.wxi: $
 
 .PHONY: native
 # Needs to be after ALL_NATIVE_TARGETS is defined.
-native: $(ALL_NATIVE_TARGETS)
+native: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
+
+.PHONY: installer
+installer: $(ALL_NATIVE_TARGETS)
 
 # make native-dist a silent no-op where there's nothing for it to do for the
 # benefit of a simple, uniform nightly build script.
