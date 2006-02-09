@@ -578,20 +578,12 @@ ALL_NATIVE_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SU
 
 INSTALLER_PATTERN = %.msi %.msm
 ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS = $(filter-out $(INSTALLER_PATTERN),$(ALL_NATIVE_TARGETS))
-# FIXME: This wants turning into a script and collapsing with the semi-duplicate in make-mac-os-app.rb.
-# FIXME: The WiX installer needs a deinstallation file list too (there isn't currently a good place
-# to put this comment but I know I won't forget it here).
 MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt -name .svn -prune -o -type f -print
 
 # %.msm files aren't stand-alone installers
 INSTALLER_BINARY = $(filter %.msi,$(ALL_NATIVE_TARGETS))
 
-# TODO: The installer needs to be sure the Java is built but building Java
-# on Windows into a Samba directory isn't working for me at the moment.
-# Building on Cygwin is slow enough that it will be distressing, for the
-# makefile maintainer, to keep rebuilding this unnecessarily.
-# It shouldn't be impractical to notice that no .java file has changed and none
-# have been added or removed.
+# HACK: The installer needs to be sure the Java is built.
 $(PROJECT_ROOT)/.generated/native/Cygwin/WiX/Cygwin/component-definitions.wxi: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) build.java
 
 .PHONY: native
