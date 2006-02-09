@@ -276,7 +276,7 @@ DIST_SSH_USER_AND_HOST=software@jessies.org
 DIST_DIRECTORY=/home/software/downloads/$(PROJECT_NAME)
 
 $(takeProfileSample)
-SOURCE_FILES := $(shell find $(PROJECT_ROOT)/src -type f -name "*.java")
+SOURCE_FILES := $(if $(wildcard $(PROJECT_ROOT)/src),$(shell find $(PROJECT_ROOT)/src -type f -name "*.java"))
 $(takeProfileSample)
 SOURCE_DIST_FILE = $(PROJECT_NAME).tgz
 
@@ -448,19 +448,14 @@ endef
 # ----------------------------------------------------------------------------
 
 .PHONY: build
-build: build.java
+build: build.$(findstring java,$(SOURCE_FILES))
 
-ifeq "$(SOURCE_FILES)" ""
-
-build.java:;
-
-else
+.PHONY: build.
+build.:;
 
 .PHONY: build.java
 build.java: $(SOURCE_FILES)
 	$(BUILD_JAVA)
-
-endif
 
 .PHONY: clean
 clean:
@@ -593,17 +588,15 @@ native: $(ALL_NATIVE_TARGETS)
 # make native-dist a silent no-op where there's nothing for it to do for the
 # benefit of a simple, uniform nightly build script.
 .PHONY: native-dist
-ifeq "$(INSTALLER_BINARY)" ""
+native-dist: dist.$(findstring native,$(INSTALLER_BINARY))
 
-native-dist:;
+.PHONY: dist.
+dist.:;
 
-else
-
-native-dist: $(INSTALLER_BINARY)
+.PHONY: dist.native
+dist.native: $(INSTALLER_BINARY)
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
-
-endif
 
 ifeq "$(TARGET_OS)" "Cygwin"
 
