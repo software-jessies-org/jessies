@@ -377,7 +377,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             fileType = PERL;
         } else if (filename.endsWith(".rb")) {
             fileType = RUBY;
-        } else if (filename.equals("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
+        } else if (filename.endsWith("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
             fileType = MAKE;
         } else {
             fileType = PLAIN_TEXT;
