@@ -488,9 +488,9 @@ $(PROJECT_NAME).jar: build.java
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
-../$(SOURCE_DIST_FILE): ChangeLog
+../$(SOURCE_DIST_FILE): ChangeLog .generated/build-revision.txt
 	cd .. && \
-	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_NAME)/*
+	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_NAME)/* .generated/build-revision.txt
 
 # This is only designed to be run on jessies.org itself.
 .PHONY: www-dist
