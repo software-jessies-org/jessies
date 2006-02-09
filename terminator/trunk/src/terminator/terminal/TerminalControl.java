@@ -184,6 +184,7 @@ public class TerminalControl {
 		}
 		// If it wasn't a pane close that caused us to get here, close
 		// the pane.
+		// FIXME: Wouldn't processHasBeenDestroyed be a better name?
 		if (processIsBeingDestroyed == false) {
 			pane.doCloseAction();
 		}
