@@ -112,7 +112,7 @@ public class OpenQuicklyDialog {
             showMatches();
             matchList.setEnabled(true);
             source.setEnabled(true);
-            filenameField.requestFocus();
+            filenameField.requestFocusInWindow();
             source = null;
         }
     }
