@@ -11,8 +11,9 @@ import java.io.*;
 public class TerminatorServer {
     public void newShell(PrintWriter out, String line) {
         try {
+            String workingDirectory = line.substring("newShell ".length());
             // We don't accept any arguments over the network, because that could easily be a security hole.
-            Terminator.getSharedInstance().parseCommandLine(new String[0], out, out);
+            Terminator.getSharedInstance().parseCommandLine(new String[] { "--working-directory", workingDirectory }, out, out);
         } catch (Exception ex) {
             ex.printStackTrace(out);
         }
