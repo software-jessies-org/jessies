@@ -150,7 +150,7 @@ private:
     static void runChild(char * const *cmd, const char* workingDirectory, PtyGenerator& ptyGenerator) {
         if (workingDirectory != 0) {
             if (chdir(workingDirectory) < 0) {
-                throw child_exception("chdir(\"" + toString(workingDirectory) + "\")");
+                throw child_exception(std::string() + "chdir(\"" + workingDirectory + "\")");
             }
         }
         if (setsid() < 0) {
