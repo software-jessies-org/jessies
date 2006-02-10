@@ -506,7 +506,7 @@ www-dist: ChangeLog.html
 
 .PHONY: .generated/build-revision.txt
 .generated/build-revision.txt:
-	mkdir -p $(@D) && \
+	@mkdir -p $(@D) && \
 	$(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK) > $@
 
 # ----------------------------------------------------------------------------
