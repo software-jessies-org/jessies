@@ -205,20 +205,26 @@ public class FindInFilesDialog {
                             }
                             final int matchCount = matches.size();
                             if (matchCount > 0) {
-                                DefaultMutableTreeNode pathNode = getPathNode(candidate);
-                                MatchingFile matchingFile = new MatchingFile(file, candidate, matchCount, pattern);
-                                DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
-                                for (String line : matches) {
-                                    fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file, pattern)));
+                                synchronized (matchView) {
+                                    DefaultMutableTreeNode pathNode = getPathNode(candidate);
+                                    MatchingFile matchingFile = new MatchingFile(file, candidate, matchCount, pattern);
+                                    DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
+                                    for (String line : matches) {
+                                        fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file, pattern)));
+                                    }
+                                    pathNode.add(fileNode);
+                                    matchTreeModel.nodesWereInserted(pathNode, new int[] { pathNode.getIndex(fileNode) });
+                                    ++matchingFileCount;
+                                    
+                                    // Make sure the new node gets expanded.
+                                    publish(fileNode);
                                 }
-                                pathNode.add(fileNode);
-                                ++matchingFileCount;
-                                // Make sure the new node gets expanded.
-                                publish(fileNode);
                             }
                         } else {
-                            DefaultMutableTreeNode pathNode = getPathNode(candidate);
-                            pathNode.add(new DefaultMutableTreeNode(new MatchingFile(file, candidate)));
+                            synchronized (matchView) {
+                                DefaultMutableTreeNode pathNode = getPathNode(candidate);
+                                pathNode.add(new DefaultMutableTreeNode(new MatchingFile(file, candidate)));
+                            }
                         }
                     } catch (FileNotFoundException ex) {
                         ex = ex; // Not our problem.
@@ -246,26 +252,29 @@ public class FindInFilesDialog {
             String pathSoFar = "";
             DefaultMutableTreeNode parentNode = matchRoot;
             DefaultMutableTreeNode node = matchRoot;
-            for (int i = 0; i < pathElements.length - 1; ++i) {
-                pathSoFar += pathElements[i] + File.separator;
-                node = pathMap.get(pathSoFar);
-                if (node == null) {
-                    node = new DefaultMutableTreeNode(pathElements[i] + File.separator);
-                    parentNode.add(node);
-                    pathMap.put(pathSoFar, node);
+            synchronized (matchView) {
+                for (int i = 0; i < pathElements.length - 1; ++i) {
+                    pathSoFar += pathElements[i] + File.separator;
+                    node = pathMap.get(pathSoFar);
+                    if (node == null) {
+                        node = new DefaultMutableTreeNode(pathElements[i] + File.separator);
+                        parentNode.add(node);
+                        matchTreeModel.nodesWereInserted(parentNode, new int[] { parentNode.getIndex(node) });
+                        pathMap.put(pathSoFar, node);
+                    }
+                    parentNode = node;
                 }
-                parentNode = node;
             }
             return node;
         }
         
         @Override
         protected void process(DefaultMutableTreeNode... treeNodes) {
-            for (DefaultMutableTreeNode node : treeNodes) {
-                // Tell the model that a node has changed, and expand it.
-                // I've no idea why new nodes default to being collapsed.
-                matchTreeModel.reload(node);
-                matchView.expandOrCollapsePath(node.getPath(), true);
+            synchronized (matchView) {
+                for (DefaultMutableTreeNode node : treeNodes) {
+                    // I've no idea why new nodes default to being collapsed.
+                    matchView.expandOrCollapsePath(node.getPath(), true);
+                }
             }
         }
         
