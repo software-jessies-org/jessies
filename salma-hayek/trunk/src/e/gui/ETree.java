@@ -13,22 +13,27 @@ public class ETree extends JTree {
 
     /** Expands all the nodes in this tree. */
     public void expandAll() {
-        doExpansion(new TreePath(getModel().getRoot()), true);
+        expandOrCollapsePath(new TreePath(getModel().getRoot()), true);
     }
 
     /** Collapses all the nodes in this tree. */
     public void collapseAll() {
-        doExpansion(new TreePath(getModel().getRoot()), false);
+        expandOrCollapsePath(new TreePath(getModel().getRoot()), false);
     }
-
+    
+    /** Expands or collapses all nodes beneath the given path represented as an array of nodes. */
+    public void expandOrCollapsePath(TreeNode[] nodes, boolean expand) {
+        expandOrCollapsePath(new TreePath(nodes), expand);
+    }
+    
     /** Expands or collapses all nodes beneath the given path. */
-    private void doExpansion(TreePath parent, boolean expand) {
+    private void expandOrCollapsePath(TreePath parent, boolean expand) {
         TreeNode node = (TreeNode) parent.getLastPathComponent();
         if (node.getChildCount() >= 0) {
             for (Enumeration e = node.children(); e.hasMoreElements(); ) {
                 TreeNode n = (TreeNode) e.nextElement();
                 TreePath path = parent.pathByAddingChild(n);
-                doExpansion(path, expand);
+                expandOrCollapsePath(path, expand);
             }
         }
         if (expand) {
