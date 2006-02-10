@@ -71,7 +71,14 @@ for PROJECT in $PROJECTS; do
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
     tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
     if ! make -C $PROJECT ; then
-        BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
+        # A number of people, on a number of both recent and previous occasions have had one-off failures.
+        # The goal here is to leave them with a working installation at the expense of a messy build mail.
+        # I suspect the reason a second, manual attempt has worked, however, is that it's being run from
+        # a subtly different environment.
+        # So I suspect that this won't work.
+        if ! make -C $PROJECT ; then
+            BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
+        fi
     fi
 done
 
