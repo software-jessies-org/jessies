@@ -130,7 +130,7 @@ public class FindInFilesDialog {
             StringBuilder result = new StringBuilder(file.getName());
             if (matchCount != 0) {
                 result.append(" (");
-                result.append(StringUtilities.pluralize(matchCount, "match", " matches"));
+                result.append(StringUtilities.pluralize(matchCount, "matching line", "matching lines"));
                 if (containsDefinition) {
                     result.append(" including definition");
                 }
@@ -173,12 +173,6 @@ public class FindInFilesDialog {
                 percentage = newPercentage;
                 String status = makeStatusString() + " (" + percentage + "%)";
                 setStatus(status, false);
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        matchTreeModel.reload();
-                        matchView.expandAll();
-                    }
-                });
             }
         }
         
@@ -219,6 +213,8 @@ public class FindInFilesDialog {
                                 }
                                 pathNode.add(fileNode);
                                 ++matchingFileCount;
+                                // Make sure the new node gets expanded.
+                                publish(fileNode);
                             }
                         } else {
                             DefaultMutableTreeNode pathNode = getPathNode(candidate);
@@ -264,6 +260,16 @@ public class FindInFilesDialog {
         }
         
         @Override
+        protected void process(DefaultMutableTreeNode... treeNodes) {
+            for (DefaultMutableTreeNode node : treeNodes) {
+                // Tell the model that a node has changed, and expand it.
+                // I've no idea why new nodes default to being collapsed.
+                matchTreeModel.reload(node);
+                matchView.expandOrCollapsePath(node.getPath(), true);
+            }
+        }
+        
+        @Override
         protected void done() {
             synchronized (FindInFilesDialog.this) {
                 worker = null;
@@ -274,8 +280,6 @@ public class FindInFilesDialog {
             }
             
             setStatus(makeStatusString(), false);
-            
-            matchView.expandAll();
         }
         
         private String makeStatusString() {
@@ -337,11 +341,18 @@ public class FindInFilesDialog {
 
         matchTreeModel = new DefaultTreeModel(null);
         matchView = new ETree(matchTreeModel);
+
         matchView.setRootVisible(false);
         matchView.setShowsRootHandles(true);
         matchView.putClientProperty("JTree.lineStyle", "None");
         
+        // Set a custom cell renderer, and tell the tree that all cells have the same height to improve performance.
         matchView.setCellRenderer(new MatchTreeCellRenderer());
+        TreeCellRenderer renderer = matchView.getCellRenderer();
+        JComponent rendererComponent = (JComponent) renderer.getTreeCellRendererComponent(matchView, new DefaultMutableTreeNode("Hello"), true, true, true, 0, true);
+        matchView.setRowHeight(rendererComponent.getPreferredSize().height);
+        matchView.setLargeModel(true);
+        
         matchView.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) matchView.getLastSelectedPathComponent();
