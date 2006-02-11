@@ -41,7 +41,7 @@ public class TerminalControl {
 	private TextBuffer listener;
 	private PtyProcess ptyProcess;
 	private boolean processIsRunning = true;
-	private boolean processIsBeingDestroyed = false;
+	private boolean processHasBeenDestroyed = false;
 	private InputStreamReader in;
 	private OutputStream out;
 	
@@ -76,7 +76,7 @@ public class TerminalControl {
 		if (processIsRunning) {
 			try {
 				ptyProcess.destroy();
-				processIsBeingDestroyed = true;
+				processHasBeenDestroyed = true;
 			} catch (IOException ex) {
 				Log.warn("Failed to destroy process.", ex);
 			}
@@ -184,8 +184,7 @@ public class TerminalControl {
 		}
 		// If it wasn't a pane close that caused us to get here, close
 		// the pane.
-		// FIXME: Wouldn't processHasBeenDestroyed be a better name?
-		if (processIsBeingDestroyed == false) {
+		if (processHasBeenDestroyed == false) {
 			pane.doCloseAction();
 		}
 	}
