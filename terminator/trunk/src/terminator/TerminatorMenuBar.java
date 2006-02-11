@@ -115,11 +115,15 @@ public class TerminatorMenuBar extends EMenuBar {
 	}
 	
 	private static KeyStroke makeKeyStroke(String key) {
-		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, false);
+		return makeShiftedOrUnshiftedKeyStroke(key, false);
 	}
 	
 	private static KeyStroke makeShiftedKeyStroke(String key) {
-		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, true);
+		return makeShiftedOrUnshiftedKeyStroke(key, true);
+	}
+	
+	private static KeyStroke makeShiftedOrUnshiftedKeyStroke(String key, boolean shifted) {
+		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, shifted);
 	}
 	
 	private static Component getFocusedComponent() {
@@ -518,12 +522,9 @@ public class TerminatorMenuBar extends EMenuBar {
 	public static class NextTabAction extends AbstractTabAction {
 		public NextTabAction() {
 			super("Select Next Tab");
-			if (GuiUtilities.isMacOs()) {
-				// Sun bug 6350813 prevents this from looking right on Mac OS, but at least it's the same keystroke as Safari.
-				putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("CLOSE_BRACKET", true));
-			} else {
-				putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("PAGE_DOWN"));
-			}
+			// Sun bug 6350813 prevents the keystroke from being looking right on Mac OS, but it's the same keystroke as Safari even if it doesn't look like it.
+			// On other OSes, use the unshifted keystroke for convenience.
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedOrUnshiftedKeyStroke("CLOSE_BRACKET", GuiUtilities.isMacOs()));
 		}
 		
 		@Override
@@ -535,12 +536,9 @@ public class TerminatorMenuBar extends EMenuBar {
 	public static class PreviousTabAction extends AbstractTabAction {
 		public PreviousTabAction() {
 			super("Select Previous Tab");
-			if (GuiUtilities.isMacOs()) {
-				// Sun bug 6350813 prevents this from looking right on Mac OS, but at least it's the same keystroke as Safari.
-				putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("OPEN_BRACKET", true));
-			} else {
-				putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("PAGE_UP"));
-			}
+			// Sun bug 6350813 prevents the keystroke from being looking right on Mac OS, but it's the same keystroke as Safari even if it doesn't look like it.
+			// On other OSes, use the unshifted keystroke for convenience.
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedOrUnshiftedKeyStroke("OPEN_BRACKET", GuiUtilities.isMacOs()));
 		}
 		
 		@Override
