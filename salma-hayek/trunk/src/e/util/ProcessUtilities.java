@@ -152,6 +152,40 @@ public class ProcessUtilities {
         }
     }
     
+    /**
+     * Returns a String[] suitable as argument to Runtime.exec or
+     * ProcessBuilder's constructor. The arguments ask the system's default
+     * command interpreter to interpret and run the given command.
+     * 
+     * The details of all this are obviously OS-specific, but it should be
+     * suitable for executing user input in a manner that's unsurprising to
+     * the user.
+     * 
+     * On Win32, cmd.exe is used as a command interpreter.
+     * 
+     * On other operating systems (assumed to be Unixes), the SHELL environment
+     * variable is queried. If this isn't set, a default of /bin/sh is used,
+     * though it probably won't work unless that happens to be bash(1).
+     */
+    public static String[] makeShellCommandArray(String command) {
+        if (GuiUtilities.isWindows()) {
+            return new String[] { "cmd", "/c", command };
+        } else {
+            // Try to put the command in its own process group, so it's easier
+            // to kill it and its children.
+            File setSidBinary = FileUtilities.findOnPath("setsid");
+            if (setSidBinary != null) {
+                command = setSidBinary.toString() + " " + command;
+            }
+            
+            String shell = System.getenv("SHELL");
+            if (shell == null) {
+                shell = "/bin/sh";
+            }
+            return new String[] { shell, "--login", "-c", command };
+        }
+    }
+    
     /** The HUP (hang up) signal. */
     public static final int SIGHUP = 1;
     
