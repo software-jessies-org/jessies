@@ -35,7 +35,7 @@ public class ShellCommand {
     }
     
     private ProcessBuilder makeProcessBuilder() {
-        ProcessBuilder processBuilder = new ProcessBuilder(makeCommandLine(command));
+        ProcessBuilder processBuilder = new ProcessBuilder(ProcessUtilities.makeShellCommandArray(command));
         processBuilder.directory(FileUtilities.fileFromString(context));
         Map<String, String> environment = processBuilder.environment();
         environment.put("EDIT_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
@@ -110,32 +110,6 @@ public class ShellCommand {
                 }
             });
             EventQueue.invokeLater(completionRunnable);
-        }
-    }
-    
-    /**
-     * Returns the arguments to exec to invoke a command interpreter to run the
-     * given command. The details of this are obviously OS-specific. Under
-     * Windows, cmd.exe is used as a command interpreter. Under other operating
-     * systems, the SHELL environment variable is queried. If this isn't set,
-     * a default of /bin/sh is used.
-     */
-    public static String[] makeCommandLine(String command) {
-        if (GuiUtilities.isWindows()) {
-            return new String[] { "cmd", "/c", command };
-        } else {
-            // Try to put the command in its own process group, so it's easier
-            // to kill it and its children.
-            File setSidBinary = FileUtilities.findOnPath("setsid");
-            if (setSidBinary != null) {
-                command = setSidBinary.toString() + " " + command;
-            }
-            
-            String shell = System.getenv("SHELL");
-            if (shell == null) {
-                shell = "/bin/sh";
-            }
-            return new String[] { shell, "--login", "-c", command };
         }
     }
     
