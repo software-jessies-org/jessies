@@ -42,10 +42,8 @@ public class FileIgnorer {
         patterns.add("SCCS");
         
         // Try to run the site-local script.
-        // FIXME: check that we handle the case where the script doesn't exist.
-        // FIXME: move ShellCommand.makeCommandLine into ProcessUtilities when we have a better name.
         final String scriptName = "echo-local-non-source-directory-pattern";
-        String[] command = ShellCommand.makeCommandLine(scriptName);
+        String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
         ArrayList<String> errors = new ArrayList<String>();
         ProcessUtilities.backQuote(rootDirectory, command, patterns, errors);
         
