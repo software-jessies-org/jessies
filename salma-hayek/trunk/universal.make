@@ -208,8 +208,11 @@ endef
 # just claiming the availability of a thread-safe allocator).
 LDFLAGS.Linux += -pthread
 
-# launcher needs this on Linux
+# launcher needs this on Linux.
 LDFLAGS.Linux += -ldl
+
+# Linux utilities that use Xlib need this.
+LDFLAGS.Linux += -lX11
 
 LDFLAGS += $(LDFLAGS.$(TARGET_OS))
 

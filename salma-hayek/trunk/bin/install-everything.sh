@@ -21,15 +21,17 @@ fi
 # which usually eventually require a reboot to get the system properly working again.
 # By installing the packages one at a time, we ensure that packages which can't be
 # installed don't stop those which can.
-installMissingExecutable() {
-    # We could scrape the output of dpkg --status but -x is easy and robust under eg i18n.
-    if [[ ! -x $1 ]]
+installMissingPackages() {
+    # We could scrape the output of dpkg --status but -f is easy and robust under eg i18n.
+    filename=$1
+    shift
+    if [[ ! -f $filename ]]
     then
         # We don't care what version gets installed, so use -t to encourage apt-get to pick
         # an old version which is, we might guess, less likely to cause a libc update.
         # I haven't seen a case where this worked yet but it seems not to be harmful.
         # One day, we'll have a proper installer and all this dubious cruft can go.
-        apt-get -y install -t stable $2
+        echo apt-get -y install -t stable $*
     fi
 }
 
@@ -37,14 +39,15 @@ installMissingExecutable() {
 if test -f /etc/debian_version ; then
     apt-get update
     # Some of these are needed to build our stuff, some to run it, and some are "optional" to take best advantage of our features.
-    installMissingExecutable /usr/bin/ctags-exuberant exuberant-ctags
-    installMissingExecutable /usr/bin/g++ g++
-    installMissingExecutable /usr/bin/make make
-    installMissingExecutable /usr/bin/ri ri
-    installMissingExecutable /usr/bin/ruby ruby
-    installMissingExecutable /usr/bin/svn subversion
+    installMissingPackages /usr/bin/ctags-exuberant exuberant-ctags
+    installMissingPackages /usr/bin/g++ g++
+    installMissingPackages /usr/bin/make make
+    installMissingPackages /usr/bin/ri ri
+    installMissingPackages /usr/bin/ruby ruby
+    installMissingPackages /usr/bin/svn subversion
+    installMissingPackages /usr/include/X11/Xlib.h x-dev libx11-dev
     # You definitely want ispell(1) installed. Choosing a language is difficult, because a lot of people are parochial. So only install international English ispell if they haven't already installed ispell. (Last time I looked, whichever dictionary you install last becomes the default.)
-    installMissingExecutable /usr/bin/ispell iamerican
+    installMissingPackages /usr/bin/ispell iamerican
     # It's important to have a non-free JDK, because the free ones aren't finished.
     # We build this package ourselves, so it's unlikely to be updated often and to cause spurious libc updates.
     apt-get -y install sun-j2sdk1.5
