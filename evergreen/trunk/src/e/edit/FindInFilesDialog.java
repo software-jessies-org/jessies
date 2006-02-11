@@ -215,7 +215,6 @@ public class FindInFilesDialog {
                                     pathNode.add(fileNode);
                                     matchTreeModel.nodesWereInserted(pathNode, new int[] { pathNode.getIndex(fileNode) });
                                     ++matchingFileCount;
-                                    
                                     // Make sure the new node gets expanded.
                                     publish(fileNode);
                                 }
@@ -224,6 +223,8 @@ public class FindInFilesDialog {
                             synchronized (matchView) {
                                 DefaultMutableTreeNode pathNode = getPathNode(candidate);
                                 pathNode.add(new DefaultMutableTreeNode(new MatchingFile(file, candidate)));
+                                // Make sure the new node gets expanded.
+                                publish(pathNode);
                             }
                         }
                     } catch (FileNotFoundException ex) {
