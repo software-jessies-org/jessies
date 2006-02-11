@@ -212,6 +212,7 @@ LDFLAGS.Linux += -pthread
 LDFLAGS.Linux += -ldl
 
 # Linux utilities that use Xlib need this.
+LDFLAGS.Linux += -L/usr/X11R6/lib
 LDFLAGS.Linux += -lX11
 
 LDFLAGS += $(LDFLAGS.$(TARGET_OS))
