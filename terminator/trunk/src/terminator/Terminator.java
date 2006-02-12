@@ -125,10 +125,6 @@ public class Terminator {
 		}
 	}
 	
-	public JFrame getSuitableParentFrameForForms() {
-		return frames.getFrame();
-	}
-	
 	private List<JTerminalPane> getInitialTerminals() {
 		ArrayList<JTerminalPane> result = new ArrayList<JTerminalPane>();
 		String name = null;
