@@ -136,6 +136,7 @@ public class TerminatorFrame extends JFrame {
 		initSizeMonitoring();
 		
 		WindowMenu.getSharedInstance().addWindow(this);
+		GuiUtilities.finishGnomeStartup();
 	}
 	
 	private void initTerminals() {

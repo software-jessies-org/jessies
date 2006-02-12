@@ -21,7 +21,7 @@ end
 DISPLAY = ENV["DISPLAY"]
 server_port_file = "#{log_directory}/.terminator-server-port#{DISPLAY}"
 
-def tryInAppServer(server_port_file)
+def tryInAppServer(salma_hayek, server_port_file)
   if ENV["DEBUGGING_TERMINATOR"]
     return
   end
@@ -65,13 +65,20 @@ def tryInAppServer(server_port_file)
     telnet.puts("newShell #{workingDirectory}")
     print(telnet.readlines().join(""))
     telnet.close()
-    exit(0)
   rescue
-    # fall through...
+    # We probably failed, so return and start a new process.
+    return
   end
+
+  # Job done, so finish any GNOME startup notification and exit.
+  desktop_startup_id = ENV['DESKTOP_STARTUP_ID']
+  if desktop_startup_id != nil
+    system("#{salma_hayek}/.generated/Linux/bin/finish-gnome-startup", desktop_startup_id)
+  end
+  exit(0)
 end
 
-tryInAppServer(server_port_file)
+tryInAppServer(salma_hayek, server_port_file)
 
 launcher = "java"
 if target_os() == "Cygwin"
