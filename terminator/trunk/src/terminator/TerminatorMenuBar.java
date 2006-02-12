@@ -269,10 +269,10 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 	}
 	
-	private static JTerminalPane runCommand(JFrame frame) {
+	private static JTerminalPane runCommand() {
 		JTextField commandField = new JTextField(40);
 		
-		JFrame parent = (frame != null) ? frame : Terminator.getSharedInstance().getSuitableParentFrameForForms();
+		JFrame parent = getFocusedTerminatorFrame();
 		FormBuilder form = new FormBuilder(parent, "Run Command");
 		FormPanel formPanel = form.getFormPanel();
 		formPanel.addRow("Command:", commandField);
@@ -292,7 +292,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminalPane = runCommand(null);
+			JTerminalPane terminalPane = runCommand();
 			if (terminalPane != null) {
 				Terminator.getSharedInstance().openFrame(terminalPane);
 			}
@@ -307,7 +307,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		@Override
 		protected void performFrameAction(TerminatorFrame frame) {
-			JTerminalPane terminalPane = runCommand(frame);
+			JTerminalPane terminalPane = runCommand();
 			if (terminalPane != null) {
 				frame.addTab(terminalPane);
 			}
