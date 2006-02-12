@@ -15,11 +15,11 @@ public class TerminatorFrame extends JFrame {
 	private Dimension terminalSize;
 	private JTabbedPane tabbedPane;
 	
-	private ArrayList<JTerminalPane> terminals = new ArrayList<JTerminalPane>();
+	private ArrayList<JTerminalPane> terminals;
 	
 	public TerminatorFrame(List<JTerminalPane> initialTerminalPanes) {
 		super("Terminator");
-		terminals.addAll(initialTerminalPanes);
+		terminals = new ArrayList<JTerminalPane>(initialTerminalPanes);
 		initFrame();
 		initFocus();
 		for (JTerminalPane terminal : terminals) {
