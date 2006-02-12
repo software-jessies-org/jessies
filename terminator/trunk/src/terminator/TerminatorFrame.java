@@ -94,14 +94,17 @@ public class TerminatorFrame extends JFrame {
 		if (Options.getSharedInstance().shouldUseMenuBar()) {
 			setJMenuBar(new TerminatorMenuBar());
 		}
+		Terminator.getSharedInstance().getFrames().addFrame(this);
 		addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosed(WindowEvent event) {
 				for (JTerminalPane terminal : terminals) {
 					terminal.destroyProcess();
 				}
-				Terminator.getSharedInstance().frameClosed(TerminatorFrame.this);
+				Terminator.getSharedInstance().getFrames().removeFrame(TerminatorFrame.this);
 			}
 			
+			@Override
 			public void windowClosing(WindowEvent event) {
 				// We can't iterate over "terminals" directly because we'll get ConcurrentModificationException if doCheckedCloseAction tries to remove the terminal from the list.
 				ArrayList<JTerminalPane> copyOfTerminals = new ArrayList<JTerminalPane>(terminals);
@@ -114,6 +117,16 @@ public class TerminatorFrame extends JFrame {
 						return;
 					}
 				}
+			}
+			
+			@Override
+			public void windowIconified(WindowEvent event) {
+				Terminator.getSharedInstance().getFrames().frameStateChanged();
+			}
+			
+			@Override
+			public void windowDeiconified(WindowEvent event) {
+				Terminator.getSharedInstance().getFrames().frameStateChanged();
 			}
 		});
 		initTerminals();

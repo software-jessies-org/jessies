@@ -97,13 +97,12 @@ public class Terminator {
 		}
 	}
 	
-	public void frameClosed(TerminatorFrame frame) {
-		frames.remove(frame);
+	public Frames getFrames() {
+		return frames;
 	}
 	
 	public void openFrame(JTerminalPane terminalPane) {
-		TerminatorFrame frame = new TerminatorFrame(Collections.singletonList(terminalPane));
-		frames.add(frame);
+		new TerminatorFrame(Collections.singletonList(terminalPane));
 	}
 	
 	/**
@@ -112,8 +111,7 @@ public class Terminator {
 	private void initUi() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				TerminatorFrame frame = new TerminatorFrame(getInitialTerminals());
-				frames.add(frame);
+				new TerminatorFrame(getInitialTerminals());
 			}
 		});
 	}

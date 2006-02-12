@@ -23,20 +23,31 @@ public class Frames implements Iterable<TerminatorFrame> {
         }
     }
     
-    public void add(TerminatorFrame frame) {
+    public void addFrame(TerminatorFrame frame) {
         list.add(frame);
         if (GuiUtilities.isMacOs()) {
-            // Make the hidden frame invisible so that Mac OS won't give it the
-            // focus if the user hits C-` or C-~.
-            hiddenFrame.setVisible(false);
+            // Make the hidden frame invisible so that Mac OS won't give it the focus if the user hits C-` or C-~.
+            frameStateChanged();
         }
     }
     
-    public void remove(TerminatorFrame frame) {
-        if (GuiUtilities.isMacOs() && size() == 1) {
-            hiddenFrame.setVisible(true);
+    public void removeFrame(TerminatorFrame frame) {
+        if (GuiUtilities.isMacOs()) {
+            frameStateChanged();
         }
         list.remove(frame);
+    }
+    
+    public void frameStateChanged() {
+        if (GuiUtilities.isMacOs()) {
+            for (TerminatorFrame frame : list) {
+                if (frame.isShowing() && (frame.getExtendedState() & TerminatorFrame.ICONIFIED) == 0) {
+                    hiddenFrame.setVisible(false);
+                    return;
+                }
+            }
+            hiddenFrame.setVisible(true);
+        }
     }
     
     public TerminatorFrame get(int i) {
