@@ -73,11 +73,9 @@ end
 
 tryInAppServer(server_port_file)
 
-pty_path = "#{terminator_home}/.generated/native/all/pty/#{target_os()}"
-
 launcher = "java"
 if target_os() == "Cygwin"
-  launcher = "#{salma_hayek}/.generated/native/all/launcher/#{target_os()}/launcher"
+  launcher = "#{salma_hayek}/.generated/#{target_os()}/launcher"
   if ENV["DEBUGGING_TERMINATOR"] == nil
     launcher = "#{launcher}w"
   end
@@ -133,7 +131,6 @@ Signal.list().each() {
 }
 
 invoker = Java.new("Terminator", "terminator/Terminator")
-invoker.add_library_path_entries([ pty_path ])
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
 invoker.launcher = launcher
 invoker.add_extra_java_arguments(options)
