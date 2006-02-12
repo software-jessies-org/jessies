@@ -78,7 +78,7 @@ public class TerminalControl {
 				ptyProcess.destroy();
 				processHasBeenDestroyed = true;
 			} catch (IOException ex) {
-				Log.warn("Failed to destroy process.", ex);
+				Log.warn("Failed to destroy process", ex);
 			}
 		}
 	}
@@ -103,10 +103,14 @@ public class TerminalControl {
 				char[] buffer = new char[INPUT_BUFFER_SIZE];
 				int readCount;
 				while ((readCount = in.read(buffer, 0, buffer.length)) != -1) {
-					processBuffer(buffer, readCount);
+					try {
+						processBuffer(buffer, readCount);
+					} catch (Throwable th) {
+						Log.warn("Problem processing child output", th);
+					}
 				}
-			} catch (IOException ex) {
-				Log.warn("Problem reading process output", ex);
+			} catch (Throwable th) {
+				Log.warn("Problem reading child output", th);
 			} finally {
 				handleProcessTermination();
 			}
