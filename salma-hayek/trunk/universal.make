@@ -605,7 +605,7 @@ installer: $(ALL_NATIVE_TARGETS)
 # make native-dist a silent no-op where there's nothing for it to do for the
 # benefit of a simple, uniform nightly build script.
 .PHONY: native-dist
-native-dist: dist.$(findstring native,$(INSTALLER_BINARY))
+native-dist: dist.$(if $(INSTALLER_BINARY),native)
 
 .PHONY: dist.
 dist.:;
