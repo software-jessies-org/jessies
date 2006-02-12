@@ -212,6 +212,9 @@ LDFLAGS.Linux += -pthread
 LDFLAGS.Linux += -ldl
 
 # Linux utilities that use Xlib need this.
+# Debian (unlike Ubuntu) doesn't have the X11 libraries on its default path.
+# At the moment, Ubuntu's /usr/X11R6/lib64 is a link to /usr/X11R6/lib so
+# this doesn't do any harm, though it may in future.
 LDFLAGS.Linux += -L/usr/X11R6/lib
 LDFLAGS.Linux += -lX11
 
