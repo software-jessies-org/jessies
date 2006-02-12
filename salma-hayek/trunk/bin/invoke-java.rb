@@ -156,23 +156,37 @@ class Java
   
   def invoke(extra_app_arguments = [])
     args = [ @launcher ]
+
     # Set the class path directly with a system property rather than -cp so
     # that our custom Win32 launcher doesn't have to convert between the two
     # forms. (Sun's Win32 JVM expects ';'-separated paths.)
     args << "-Djava.class.path=#{pathnames_to_path(@class_path)}"
     args << "-Djava.library.path=#{pathnames_to_path(@library_path)}"
+
+    # Pass any GNOME startup notification id through as a system property.
+    # That way it isn't accidentally inherited by the JVM's children.
+    desktop_startup_id = ENV['DESKTOP_STARTUP_ID']
+    if desktop_startup_id != nil
+      ENV['DESKTOP_STARTUP_ID'] = nil
+      args << "-Dgnome.DESKTOP_STARTUP_ID=#{desktop_startup_id}"
+    end
+
     applicationEnvironmentName = @dock_name.upcase()
     logging = ENV["DEBUGGING_#{applicationEnvironmentName}"] == nil && @log_filename != ""
     if logging
       File.new(@log_filename, "w").close() # Like touch(1).
       args << "-De.util.Log.filename=#{cygpath(@log_filename)}"
     end
+
     args << "-Xmx#{@heap_size}"
+
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@dock_name}"
       args << "-Xdock:icon=#{@dock_icon}"
     end
+
     args << "-Dorg.jessies.frameIcon=#{cygpath(@png_icon)}"
+
     args.concat(@extra_java_arguments)
     args << @class_name
     args.concat(extra_app_arguments)
