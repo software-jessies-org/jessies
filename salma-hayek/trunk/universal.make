@@ -195,7 +195,7 @@ COMPILE.mm = $(COMPILE.cpp) $(OBJC_AND_OBJCXX_FLAGS)
 # You end up with a variable called OBJECTS.copyLocalVariable, containing a $(error),
 # being evaluated by the call to copyLocalVariable at the end of the next scope.
 define defineObjectsPerLanguage
-  OBJECTS.$(1) = $(patsubst $(SOURCE_DIRECTORY)/%.$(1),$(GENERATED_DIRECTORY)/%.$(OBJECT_EXTENSION.$(1)),$(filter %.$(1),$(SOURCES)))
+  OBJECTS.$(1) = $(patsubst $(SOURCE_DIRECTORY)/%.$(1),$(COMPILATION_DIRECTORY)/%.$(OBJECT_EXTENSION.$(1)),$(filter %.$(1),$(SOURCES)))
   # The Perl script needs help if we're going to have variable variable names.
   LOCAL_VARIABLES += OBJECTS.$(1)
 endef
@@ -597,6 +597,7 @@ $(PROJECT_ROOT)/.generated/native/Cygwin/WiX/Cygwin/component-definitions.wxi: $
 .PHONY: native
 # Needs to be after ALL_NATIVE_TARGETS is defined.
 native: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
+build: native
 
 .PHONY: installer
 installer: $(ALL_NATIVE_TARGETS)

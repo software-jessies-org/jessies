@@ -36,20 +36,21 @@ HEADERS := $(call findCode,$(HEADER_EXTENSIONS))
 # Locate the common intermediate files.
 # ----------------------------------------------------------------------------
 
-GENERATED_DIRECTORY = $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_ROOT)/.generated/%/$(TARGET_OS),$(SOURCE_DIRECTORY))
+COMPILATION_DIRECTORY = $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_ROOT)/.generated/%/$(TARGET_OS),$(SOURCE_DIRECTORY))
+TARGET_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)
 
 $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(eval $(call defineObjectsPerLanguage,$(EXTENSION))))
 OBJECTS = $(strip $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(OBJECTS.$(EXTENSION))))
-SOURCE_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(SOURCES))
-HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(GENERATED_DIRECTORY)/%,$(HEADERS))
+SOURCE_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(COMPILATION_DIRECTORY)/%,$(SOURCES))
+HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(COMPILATION_DIRECTORY)/%,$(HEADERS))
 
 # ----------------------------------------------------------------------------
 # Locate the executables.
 # ----------------------------------------------------------------------------
 
-EXECUTABLES += $(GENERATED_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
+EXECUTABLES += $(TARGET_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
 
-EXECUTABLES.Cygwin += $(GENERATED_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
+EXECUTABLES.Cygwin += $(TARGET_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
 
 EXECUTABLES += $(EXECUTABLES.$(TARGET_OS))
 
@@ -57,22 +58,21 @@ EXECUTABLES += $(EXECUTABLES.$(TARGET_OS))
 # Locate the JNI library and its intermediate files.
 # ----------------------------------------------------------------------------
 
-JNI_LIBRARY = $(GENERATED_DIRECTORY)/$(JNI_LIBRARY_PREFIX)$(BASE_NAME).$(JNI_LIBRARY_EXTENSION)
+JNI_LIBRARY = $(TARGET_DIRECTORY)/$(JNI_LIBRARY_PREFIX)$(BASE_NAME).$(JNI_LIBRARY_EXTENSION)
 
 # $(foreach) generates a space-separated list even where the elements either side are empty strings.
 # $(strip) removes spurious spaces.
 JNI_SOURCE = $(strip $(foreach SOURCE,$(SOURCES),$(if $(wildcard src/$(subst _,/,$(basename $(notdir $(SOURCE)))).java),$(SOURCE))))
 JNI_BASE_NAME = $(basename $(notdir $(JNI_SOURCE)))
-GENERATED_JNI_DIRECTORY = $(GENERATED_DIRECTORY)/jni
-GENERATED_JNI_HEADER = $(GENERATED_JNI_DIRECTORY)/$(JNI_BASE_NAME).h
-COMPILED_JNI_HEADER = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).h
-JNI_OBJECT = $(GENERATED_DIRECTORY)/$(JNI_BASE_NAME).o
+NEW_JNI_HEADER = $(COMPILATION_DIRECTORY)/new/$(JNI_BASE_NAME).h
+JNI_HEADER = $(COMPILATION_DIRECTORY)/$(JNI_BASE_NAME).h
+JNI_OBJECT = $(COMPILATION_DIRECTORY)/$(JNI_BASE_NAME).o
 JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 JNI_CLASS_FILE = classes/$(subst .,/,$(JNI_CLASS_NAME)).class
 
 define JAVAHPP_RULE
-$(JAVAHPP) -classpath classes $(JNI_CLASS_NAME) > $(GENERATED_JNI_HEADER) && \
-{ cmp -s $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER) || cp $(GENERATED_JNI_HEADER) $(COMPILED_JNI_HEADER); }
+$(JAVAHPP) -classpath classes $(JNI_CLASS_NAME) > $(NEW_JNI_HEADER) && \
+{ cmp -s $(NEW_JNI_HEADER) $(JNI_HEADER) || cp $(NEW_JNI_HEADER) $(JNI_HEADER); }
 endef
 
 # ----------------------------------------------------------------------------
@@ -102,11 +102,11 @@ MISSING_PREREQUISITES += $(MISSING_PRIVATE_FRAMEWORKS)
 
 WIX_SOURCE = $(filter %.wxs,$(SOURCES))
 WIX_BASE_NAME = $(basename $(notdir $(WIX_SOURCE)))
-WIX_COMPONENT_DEFINITIONS = $(GENERATED_DIRECTORY)/component-definitions.wxi
-WIX_COMPONENT_REFERENCES = $(GENERATED_DIRECTORY)/component-references.wxi
-WIX_OBJECTS = $(GENERATED_DIRECTORY)/$(WIX_BASE_NAME).wixobj
-WIX_INSTALLER = $(GENERATED_DIRECTORY)/$(WIX_BASE_NAME).msi
-WIX_MODULE = $(GENERATED_DIRECTORY)/$(WIX_BASE_NAME).msm
+WIX_COMPONENT_DEFINITIONS = $(COMPILATION_DIRECTORY)/component-definitions.wxi
+WIX_COMPONENT_REFERENCES = $(COMPILATION_DIRECTORY)/component-references.wxi
+WIX_OBJECTS = $(COMPILATION_DIRECTORY)/$(WIX_BASE_NAME).wixobj
+WIX_INSTALLER = $(TARGET_DIRECTORY)/$(WIX_BASE_NAME).msi
+WIX_MODULE = $(TARGET_DIRECTORY)/$(WIX_BASE_NAME).msm
 WIX_TARGET := $(if $(WIX_SOURCE),$(if $(shell grep "Product Id" $(WIX_SOURCE)),INSTALLER,MODULE))
 
 # ----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ endef
 $(EXECUTABLES.Cygwin): LOCAL_LDFLAGS += -Wl,--subsystem,windows
 $(EXECUTABLES): LDFLAGS := $(LOCAL_LDFLAGS)
 $(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
-$(GENERATED_JNI_HEADER): RULE := $(JAVAHPP_RULE)
+$(NEW_JNI_HEADER): RULE := $(JAVAHPP_RULE)
 ifeq "$(WIX_TARGET)" "INSTALLER"
 $(WIX_COMPONENT_DEFINITIONS): FILE_LIST_TO_WXI_FLAGS := --diskId
 endif
@@ -149,17 +149,11 @@ missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 # ----------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------
-# Select the default targets.
-# ----------------------------------------------------------------------------
-
-.PHONY: build
-build: $(DEFAULT_TARGETS)
-
-# ----------------------------------------------------------------------------
 # Our linked targets.
 # ----------------------------------------------------------------------------
 
 $(EXECUTABLES) $(JNI_LIBRARY): $(OBJECTS)
+	mkdir -p $(@D) && \
 	$(LD) $^ -o $@ $(LDFLAGS)
 
 # ----------------------------------------------------------------------------
@@ -171,15 +165,15 @@ ifneq "$(JNI_SOURCE)" ""
 $(JNI_CLASS_FILE): $(SOURCE_FILES)
 	$(BUILD_JAVA)
 
-$(GENERATED_JNI_HEADER): $(JNI_CLASS_FILE) $(JAVAHPP) $(SALMA_HAYEK)/classes/e/tools/JavaHpp.class
+$(NEW_JNI_HEADER): $(JNI_CLASS_FILE) $(JAVAHPP) $(SALMA_HAYEK)/classes/e/tools/JavaHpp.class
 	@echo Generating JNI header... && \
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	$(RULE)
 
-$(JNI_OBJECT): $(COMPILED_JNI_HEADER)
-build: $(GENERATED_JNI_HEADER)
-$(COMPILED_JNI_HEADER): | $(GENERATED_JNI_HEADER);
+$(JNI_OBJECT): $(JNI_HEADER)
+build: $(NEW_JNI_HEADER)
+$(JNI_HEADER): | $(NEW_JNI_HEADER);
 
 endif
 
@@ -196,6 +190,9 @@ $(OBJECTS.mm): %.o: %.mm
 # ----------------------------------------------------------------------------
 # WiX
 # ----------------------------------------------------------------------------
+
+ifneq "$(WIX_SOURCE)" ""
+
 # universal.make adds more dependencies - only it knows $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS).
 $(WIX_COMPONENT_DEFINITIONS): $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
 	$(MAKE_INSTALLER_FILE_LIST) | $(FILE_LIST_TO_WXI) $(FILE_LIST_TO_WXI_FLAGS) > $@
@@ -215,6 +212,8 @@ $(WIX_MODULE): %.msm: $(WIX_OBJECTS)
 $(WIX_INSTALLER): %.msi: $(WIX_OBJECTS)
 	$(RULE)
 
+endif
+
 # ----------------------------------------------------------------------------
 # What to do if something we need isn't installed but we want to continue building everything else.
 # ----------------------------------------------------------------------------
@@ -232,8 +231,8 @@ missing-prerequisites.$(BASE_NAME):
 # Using cp for the benefit of Windows native compilers which don't
 # understand "symlinks".
 # FIXME: Copies of files which no longer exist must be removed.
-$(SOURCE_LINKS) $(HEADER_LINKS): $(GENERATED_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
-	mkdir -p $(dir $@) && \
+$(SOURCE_LINKS) $(HEADER_LINKS): $(COMPILATION_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
+	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	cp $< $@
 

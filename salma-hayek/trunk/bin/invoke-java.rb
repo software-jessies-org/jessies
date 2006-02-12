@@ -60,17 +60,15 @@ class Java
 
     init_default_heap_size()
     init_default_class_path()
-    @library_path = []
+    # FIXME: This was the last change I got round to making - and the one that made me realize
+    # that we should use a bin most of the time - to distinguish from this, lib, case.
+    @library_path = [ "#{@project_root}/.generated/#{target_os()}" ]
     
     set_icons(name)
   end
 
   def add_class_path_entries(new_entries)
     @class_path.concat(new_entries)
-  end
-  
-  def add_library_path_entries(new_entries)
-    @library_path.concat(new_entries)
   end
   
   def add_extra_java_arguments(new_java_arguments)
@@ -127,8 +125,7 @@ class Java
   
   def getExtraPathComponents()
     subProjectRoots = [ @project_root, @salma_hayek ]
-    # Premature: the make code to build the per-target common bin directory doesn't exist yet.
-    executableSubDirectories = [ "bin", ".generated/#{target_os()}/bin" ]
+    executableSubDirectories = [ "bin", ".generated/#{target_os()}" ]
     extraPathComponents = []
     subProjectRoots.each() {
       |subProjectRoot|

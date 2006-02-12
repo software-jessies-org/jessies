@@ -90,11 +90,8 @@ def copy_required_directories(src, dst)
     FileUtils.mkdir_p("#{dst}/classes")
     system("cp -r #{src}/classes #{dst}")
     
-    # .generated/ contains symbolic links to all the native source (which "-type f" ignores), contains object files, generated JNI header files, and generated make files. None of which we need to distribute, and which add up for some projects.
-    FileUtils.mkdir_p("#{dst}/.generated")
-    # FIXME: this flattens out the .generated/ subtree, which means we can no longer find the files. martind is going to improve the make rules to separate the generated products from the byproducts.
-    #system("find .generated/ -not -name '*.o' -not -name '*.h' -not -name '*.make' -type f -print0 | xargs -0 -J % cp -r % #{dst}/.generated")
-    system("cp -r #{src}/.generated #{dst}")
+    FileUtils.mkdir_p("#{dst}/.generated/Darwin")
+    system("cp -r #{src}/.generated/Darwin #{dst}/.generated")
     
     # lib/ contains support files that we have to assume we need.
     if FileTest.directory?("#{src}/lib")
