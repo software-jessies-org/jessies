@@ -75,7 +75,7 @@ tryInAppServer(server_port_file)
 
 launcher = "java"
 if target_os() == "Cygwin"
-  launcher = "#{salma_hayek}/.generated/#{target_os()}/launcher"
+  launcher = "#{salma_hayek}/.generated/#{target_os()}/bin/launcher"
   if ENV["DEBUGGING_TERMINATOR"] == nil
     launcher = "#{launcher}w"
   end
