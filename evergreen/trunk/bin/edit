@@ -14,7 +14,6 @@ HOME = ENV["HOME"]
 ENV["EDIT_HOME"] = project_root
 
 TARGET_OS = target_os()
-ENV["PATH"] = "#{salma_hayek}/.generated/native/all/setsid/#{TARGET_OS}:#{salma_hayek}/.generated/native/#{TARGET_OS}/BringProcessToFront/#{TARGET_OS}:#{ENV["PATH"]}"
 
 edit_class_name = "e.edit.Edit"
 
