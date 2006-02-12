@@ -60,9 +60,7 @@ class Java
 
     init_default_heap_size()
     init_default_class_path()
-    # FIXME: This was the last change I got round to making - and the one that made me realize
-    # that we should use a bin most of the time - to distinguish from this, lib, case.
-    @library_path = [ "#{@project_root}/.generated/#{target_os()}" ]
+    @library_path = [ "#{@project_root}/.generated/#{target_os()}/lib" ]
     
     set_icons(name)
   end
@@ -125,7 +123,7 @@ class Java
   
   def getExtraPathComponents()
     subProjectRoots = [ @project_root, @salma_hayek ]
-    executableSubDirectories = [ "bin", ".generated/#{target_os()}" ]
+    executableSubDirectories = [ "bin", ".generated/#{target_os()}/bin" ]
     extraPathComponents = []
     subProjectRoots.each() {
       |subProjectRoot|

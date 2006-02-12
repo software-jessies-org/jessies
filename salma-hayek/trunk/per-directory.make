@@ -37,7 +37,8 @@ HEADERS := $(call findCode,$(HEADER_EXTENSIONS))
 # ----------------------------------------------------------------------------
 
 COMPILATION_DIRECTORY = $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_ROOT)/.generated/%/$(TARGET_OS),$(SOURCE_DIRECTORY))
-TARGET_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)
+BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/bin
+LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/lib
 
 $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(eval $(call defineObjectsPerLanguage,$(EXTENSION))))
 OBJECTS = $(strip $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(OBJECTS.$(EXTENSION))))
@@ -48,9 +49,9 @@ HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(COMPILATION_DIRECTORY)/%,$(HEA
 # Locate the executables.
 # ----------------------------------------------------------------------------
 
-EXECUTABLES += $(TARGET_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
+EXECUTABLES += $(BIN_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
 
-EXECUTABLES.Cygwin += $(TARGET_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
+EXECUTABLES.Cygwin += $(BIN_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
 
 EXECUTABLES += $(EXECUTABLES.$(TARGET_OS))
 
@@ -58,7 +59,7 @@ EXECUTABLES += $(EXECUTABLES.$(TARGET_OS))
 # Locate the JNI library and its intermediate files.
 # ----------------------------------------------------------------------------
 
-JNI_LIBRARY = $(TARGET_DIRECTORY)/$(JNI_LIBRARY_PREFIX)$(BASE_NAME).$(JNI_LIBRARY_EXTENSION)
+JNI_LIBRARY = $(LIB_DIRECTORY)/$(JNI_LIBRARY_PREFIX)$(BASE_NAME).$(JNI_LIBRARY_EXTENSION)
 
 # $(foreach) generates a space-separated list even where the elements either side are empty strings.
 # $(strip) removes spurious spaces.
@@ -105,8 +106,8 @@ WIX_BASE_NAME = $(basename $(notdir $(WIX_SOURCE)))
 WIX_COMPONENT_DEFINITIONS = $(COMPILATION_DIRECTORY)/component-definitions.wxi
 WIX_COMPONENT_REFERENCES = $(COMPILATION_DIRECTORY)/component-references.wxi
 WIX_OBJECTS = $(COMPILATION_DIRECTORY)/$(WIX_BASE_NAME).wixobj
-WIX_INSTALLER = $(TARGET_DIRECTORY)/$(WIX_BASE_NAME).msi
-WIX_MODULE = $(TARGET_DIRECTORY)/$(WIX_BASE_NAME).msm
+WIX_INSTALLER = $(BIN_DIRECTORY)/$(WIX_BASE_NAME).msi
+WIX_MODULE = $(COMPILATION_DIRECTORY)/$(WIX_BASE_NAME).msm
 WIX_TARGET := $(if $(WIX_SOURCE),$(if $(shell grep "Product Id" $(WIX_SOURCE)),INSTALLER,MODULE))
 
 # ----------------------------------------------------------------------------
