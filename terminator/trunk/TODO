@@ -289,6 +289,15 @@ RFEs
   using whatever you're throwing the links at (in my case, open) would
   be highly satisfactory.
 
+* Before using Terminator, I used rxvt, so I'd have done the same as Phil and
+  used rxvt's terminfo.  I was recently looking at the state of rxvt, before
+  submitting a Debian bug.  It's pretty moribund, as far as releasing is concerned.
+  rxvt's terminfo is quite different in some versions to the version Phil copied.
+  gnome-terminal (which has relatively clear source) emulates xterm.  Terminal.app
+  emulates xterm-color.  We can't be xterm because we don't have auto-margin
+  but we could work better if you set TERM=xterm.  When we go through the
+  terminfo, we should abandon rxvt compatibility and switch to xterm.
+
 Tab-related
 -----------
 
