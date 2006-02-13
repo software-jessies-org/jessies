@@ -165,8 +165,9 @@ class Java
 
     # Pass any GNOME startup notification id through as a system property.
     # That way it isn't accidentally inherited by the JVM's children.
+    # We test for the empty string because GDK doesn't unset the variable, it sets it to the empty string, presumably for portability reasons.
     desktop_startup_id = ENV['DESKTOP_STARTUP_ID']
-    if desktop_startup_id != nil
+    if desktop_startup_id != nil && desktop_startup_id.length() > 0
       ENV['DESKTOP_STARTUP_ID'] = nil
       args << "-Dgnome.DESKTOP_STARTUP_ID=#{desktop_startup_id}"
     end
