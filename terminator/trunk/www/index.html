@@ -54,26 +54,12 @@ reflowing of text when you change the window size, and we decided we preferred t
 we don't have the resources to support two implementations, so reflowing isn't an option; it's
 gone from the code.)
 
-<li><p><strong>Hyperlinks</strong> - Terminator will recognize the names of files, or
-grep-like addresses consisting of a filename and line number, and automatically
-turn the text into a link that will open the file in your configured editor. So <tt>grep -n</tt> output,
-or <tt>svn update</tt> output, for example, becomes clickable.
-<p>Terminator can also jump to the next/previous link, which is great for quickly scanning
-voluminous build output.
-<p>A screenshot of Terminator automatically providing links to <tt>grep(1)</tt> matches:
-<p align="center"><img src="mac-os-grep.png" alt="mac-os-grep.png">
-<p>This works by reading your current directory from the window title, so
-you'll need something like this in your <tt>bash(1)</tt> start-up scripts:
-<pre>
-if [ "$TERM" == "terminator" ]
-then
-  export PROMPT_COMMAND='echo -ne "\e]2;`pwd`\a"'
-fi
-</pre>
+<li><p><strong>Safe Quit</strong> - Terminator knows when you still have processes running, and brings up a dialog rather than just letting those processes die.
+<p align="center"><img src="linux-top.png" alt="linux-top.png">
 
 <li><p><strong>Multiple Tabs</strong> - Like tabbed browsing, only with terminals.
 
-<li><p><strong>Number reinterpretation</strong> - Terminator will recognize numbers
+<li><p><strong>Number Reinterpretation</strong> - Terminator will recognize numbers
 in a variety of bases as the current selection, and add informational menu items to the
 pop-up menu showing the same number in other bases. No more <tt>man ascii</tt> or resorting
 to <tt>bc(1)</tt>.
