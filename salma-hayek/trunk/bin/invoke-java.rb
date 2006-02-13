@@ -63,6 +63,33 @@ class Java
     @library_path = [ "#{@project_root}/.generated/#{target_os()}/lib" ]
     
     set_icons(name)
+
+    require "#{@salma_hayek}/bin/find-jdk-root.rb"
+    @jdk_root = find_jdk_root()
+    check_java_version()
+  end
+
+  def check_java_version()
+    # Do we have a good enough version of Java?
+    # FIXME: there's similar but different (taking the audience into account) code in "ensure-suitable-mac-os-version.rb" that should be merged with this.
+    actual_java_version = `java -fullversion 2>&1`.chomp()
+    actual_java_version.match(/java full version "(.*)"/)
+    actual_java_version = $1
+    if actual_java_version.match(/^1\.[5-9]\.0/) == nil
+      informational_alert("#{@dock_name} requires a newer version of Java.", "This application requires at least Java 5, but your #{`which java`.chomp()} claims to be #{actual_java_version} instead.\n\nPlease upgrade.")
+      exit(1)
+    end
+  end
+
+  def informational_alert(caption, message)
+    # FIXME: there's very similar code for Mac OS in "ensure-suitable-mac-os-version.rb" that should be merged with this, perhaps by putting a fake "zenity" script for Mac OS on the path and making sure the path is set up before we get here.
+    command = [ "zenity" ]
+    command << "--title=#{@dock_name}"
+    command << "--window-icon=#{@png_icon}"
+    command << "--error"
+    command << "--text"
+    command << "#{caption}\n\n#{message}"
+    system(*command)
   end
 
   def add_class_path_entries(new_entries)
@@ -98,9 +125,6 @@ class Java
     if target_os() != "Darwin"
       @class_path << "#{@salma_hayek}/AppleJavaExtensions.jar"
 
-      require "#{@salma_hayek}/bin/find-jdk-root.rb"
-      jdk_root = find_jdk_root()
-  
       # "tools.jar" doesn't exist on Mac OS X but the classes are on the boot
       # class path anyway.
       # There's a bug against Java 6 to add these classes to its boot class
@@ -109,8 +133,8 @@ class Java
       # which case they probably aren't interested in running anything that
       # wouldn't work without "tools.jar", so we cope with not having found
       # a JDK.
-      if jdk_root != nil
-        tools_jar = "#{jdk_root}/lib/tools.jar"
+      if @jdk_root != nil
+        tools_jar = "#{@jdk_root}/lib/tools.jar"
         if Pathname.new(tools_jar).exist?
           @class_path << tools_jar
         end
