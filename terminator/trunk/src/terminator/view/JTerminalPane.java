@@ -351,8 +351,12 @@ public class JTerminalPane extends JPanel {
 			// mangling them into ^? and ^M.
 			// That's useful on those rare but annoying occasions where Backspace and
 			// Enter aren't working and it's how other terminals behave.
-			if (e.getModifiers() != 0) {
+			if (e.isControlDown() && ch < ' ') {
 				return String.valueOf(ch);
+			}
+			// Work around Sun bug 6320676.
+			if (e.isControlDown() && ch >= 'a' && ch <= 'z') {
+				return String.valueOf((char) (ch - '`'));
 			}
 			if (ch == Ascii.LF) {
 				return String.valueOf(Ascii.CR);
