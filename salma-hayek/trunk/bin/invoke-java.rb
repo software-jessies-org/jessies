@@ -58,15 +58,15 @@ class Java
 
     @extra_java_arguments = []
 
+    require "#{@salma_hayek}/bin/find-jdk-root.rb"
+    @jdk_root = find_jdk_root()
+    check_java_version()
+
     init_default_heap_size()
     init_default_class_path()
     @library_path = [ "#{@project_root}/.generated/#{target_os()}/lib" ]
     
     set_icons(name)
-
-    require "#{@salma_hayek}/bin/find-jdk-root.rb"
-    @jdk_root = find_jdk_root()
-    check_java_version()
   end
 
   def check_java_version()
