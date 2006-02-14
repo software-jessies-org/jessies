@@ -56,12 +56,14 @@ public class LogWriter {
 	}
 	
 	public void close() {
-		try {
-			suspended = true;
-			stream.close();
-			stream = null;
-		} catch (Throwable th) {
-			Log.warn("Exception occurred closing log stream \"" + info + "\".", th);
+		if (stream != null) {
+			try {
+				suspended = true;
+				stream.close();
+				stream = null;
+			} catch (Throwable th) {
+				Log.warn("Exception occurred closing log stream \"" + info + "\".", th);
+			}
 		}
 	}
 	
