@@ -222,25 +222,10 @@ want to rerun the JRE installer and choose a Custom installation so that you get
 LucidaTypewriterRegular.ttf installed, otherwise you'll end up with Courier and being
 unable to distinguish l and 1.
 
-<p>For the JNI part, you'll need g++ and a very recent GNU make.
-<a href="ftp://alpha.gnu.org/gnu/make/">GNU make 3.81 betas</a> work.
-The make 3.80 which comes with Mac OS X 10.4.2 isn't good enough.
-The make which comes with Cygwin 1.5.18-1 isn't good enough.
-Debian unstable's make source (apt-get source make) compiles and runs on Mac OS X and Cygwin.
-We have binaries for
-<a href="../3rdParty/make-3.81beta4-15534-cygwin-i686">make-3.81beta4-15534-cygwin-i686</a>,
-<a href="../3rdParty/make-3.80-9-darwin-ppc">make-3.80-9-darwin-ppc</a>
-(no-one's reported any problems when using this build),
-and <a href="../3rdParty/make-3.81beta3-solaris-amd64">make-3.81beta3-solaris-amd64</a>.
+<p>You'll need a very recent GNU make to build the source.
+The makefile will tell you what to do when you try to build with an old version.
 
-<p>This:
-<pre>
-make: *** virtual memory exhausted.  Stop.
-</pre>
-<p>... or this sort of nonsensical error message are typical symptoms that your make isn't good enough:
-<pre>
-../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setsid (with value "! -prune") was referred to in scope setsid.  Stop.
-</pre>
+<p>For the JNI part, you'll need g++.
 
 <h3>Win32</h3>
 
