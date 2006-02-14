@@ -32,7 +32,7 @@ REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
 EARLIER_MAKE_VERSION = $(firstword $(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))
 ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     $(warning This makefile requires at least version $(REQUIRED_MAKE_VERSION) of GNU make, but you're using $(REAL_MAKE_VERSION))
-    $(warning The 3.81beta4 is good and can be found at ftp://alpha.gnu.org/gnu/make/.)
+    $(warning 3.81beta4 is good and can be found at ftp://alpha.gnu.org/gnu/make/.)
     $(warning The normal symptoms are similar to:)
     $(warning make: *** virtual memory exhausted.  Stop.)
     $(warning ../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setsid (with value "! -prune") was referred to in scope setsid.  Stop.)
@@ -73,7 +73,7 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
         $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-15534-cygwin-i686)
     endif
     ifeq "$(TARGET_OS)" "Darwin"
-        $(warning The make 3.80 which comes with Mac OS X 10.4.2 isn't good enough.)
+        $(warning The make which comes with Mac OS X 10.4.2 isn't good enough.)
         $(warning Try http://software.jessies.org/3rdParty/make-3.80-9-darwin-ppc)
     endif
     ifeq "$(TARGET_OS)" "Linux"
