@@ -5,7 +5,7 @@ require "pathname.rb"
 
 # Takes a POSIX pathname and turns it into a Win32 pathname if we're on Win32.
 # Returns the original pathname on any other OS.
-def cygpath(pathname)
+def convert_to_jvm_compatible_pathname(pathname)
   if target_os() != "Cygwin"
     return pathname
   end
@@ -32,7 +32,7 @@ end
 # Takes a list of POSIX pathnames and returns a string suitable for use
 # as the OS' PATH environment variable.
 def pathnames_to_path(pathnames)
-  native_pathnames = pathnames.uniq().map() { |pathname| cygpath(pathname) }
+  native_pathnames = pathnames.uniq().map() { |pathname| convert_to_jvm_compatible_pathname(pathname) }
   # Cygwin's ruby's File::PATH_SEPARATOR is ':', but the Win32 JVM wants ';'.
   path_separator = (target_os() == "Cygwin") ? ";" : ":"
   return native_pathnames.join(path_separator)
@@ -96,8 +96,16 @@ class Java
     @class_path.concat(new_entries)
   end
   
-  def add_extra_java_arguments(new_java_arguments)
-    @extra_java_arguments.concat(new_java_arguments)
+  def add_property(name, value)
+    @extra_java_arguments.push("-D#{name}=#{value}")
+  end
+  
+  def add_pathname_property(propertyName, pathname)
+    add_property(propertyName, convert_to_jvm_compatible_pathname(pathname))
+  end
+  
+  def add_pathnames_property(propertyName, pathnames)
+    add_property(propertyName, pathnames_to_path(pathnames))
   end
   
   def set_icons(name)
@@ -184,8 +192,8 @@ class Java
     # Set the class path directly with a system property rather than -cp so
     # that our custom Win32 launcher doesn't have to convert between the two
     # forms. (Sun's Win32 JVM expects ';'-separated paths.)
-    args << "-Djava.class.path=#{pathnames_to_path(@class_path)}"
-    args << "-Djava.library.path=#{pathnames_to_path(@library_path)}"
+    add_pathnames_property("java.class.path", @class_path)
+    add_pathnames_property("java.library.path", @library_path)
 
     # Pass any GNOME startup notification id through as a system property.
     # That way it isn't accidentally inherited by the JVM's children.
@@ -193,14 +201,14 @@ class Java
     desktop_startup_id = ENV['DESKTOP_STARTUP_ID']
     if desktop_startup_id != nil && desktop_startup_id.length() > 0
       ENV['DESKTOP_STARTUP_ID'] = nil
-      args << "-Dgnome.DESKTOP_STARTUP_ID=#{desktop_startup_id}"
+      add_property("gnome.DESKTOP_STARTUP_ID", desktop_startup_id)
     end
 
     applicationEnvironmentName = @dock_name.upcase()
     logging = ENV["DEBUGGING_#{applicationEnvironmentName}"] == nil && @log_filename != ""
     if logging
       File.new(@log_filename, "w").close() # Like touch(1).
-      args << "-De.util.Log.filename=#{cygpath(@log_filename)}"
+      add_pathname_property("e.util.Log.filename", @log_filename)
     end
 
     args << "-Xmx#{@heap_size}"
@@ -210,7 +218,7 @@ class Java
       args << "-Xdock:icon=#{@dock_icon}"
     end
 
-    args << "-Dorg.jessies.frameIcon=#{cygpath(@png_icon)}"
+    add_pathname_property("org.jessies.frameIcon", @png_icon)
 
     args.concat(@extra_java_arguments)
     args << @class_name
