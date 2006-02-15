@@ -66,6 +66,7 @@ public class Options {
 			if (description != null) {
 				out.println("\n# " + description);
 			}
+			// FIXME: values are no longer all strings, so we need to do some translation to forms we accept as input.
 			out.println("Terminator*" + key + ": " + options.get(key));
 		}
 	}
