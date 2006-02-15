@@ -13,8 +13,13 @@ public class GuiUtilities {
     }
     
     static {
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("swing.aatext", "true");
+        if (isMacOs()) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+        }
+        if (isWindows() == false) {
+            // FIXME: what system does this make a difference on?
+            System.setProperty("swing.aatext", "true");
+        }
         System.setProperty("swing.boldMetal", "false");
     }
     
