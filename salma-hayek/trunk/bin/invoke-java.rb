@@ -188,9 +188,12 @@ class Java
   def invoke(extra_app_arguments = [])
     args = [ @launcher ]
     
-    # Backquoting anything causes a flickering window on startup for Terminator on Windows.
+    # Back-quoting anything causes a flickering window on startup for Terminator on Windows.
     # The salma-hayek Java launcher already contains a version check.
-    if launcher == "java"
+    # The version check often "gets stuck" on Cygwin when running javahpp.
+    # Process Explorer says there are just two Ruby processes left running:
+    # the child we're back-quoting has already quit.
+    if target_os() != "Cygwin"
       check_java_version()
     end
     
