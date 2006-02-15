@@ -128,21 +128,20 @@ elsif test(?f, terminfo_DST) == false
   system("cp #{terminator_home}/lib/terminfo/terminator #{terminfo_DST}")
 end
 
-options = []
+invoker = Java.new("Terminator", "terminator/Terminator")
+invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
+invoker.launcher = launcher
+# On Win32 we can't access $HOME from our JVM, for some reason.
+# The "user.home" system property won't necessarily point to the same directory.
+# We arranged above for $HOME/.terminal-logs/ to be available, so we need to stick to it.
+invoker.add_pathname_property("org.jessies.terminator.logDirectory", log_directory)
+
 # Ruby knows the mapping from signal number to signal name, but Java doesn't
 # and POSIX doesn't either. So pass the information along to Java in a way
 # that won't leak through to our children.
 Signal.list().each() {
   | signal_name, signal_number |
-  options.push("-Dorg.jessies.terminator.signal.#{signal_number}=SIG#{signal_name}")
+  invoker.add_property("org.jessies.terminator.signal.#{signal_number}", "SIG#{signal_name}")
 }
-# On Win32 we can't access $HOME from our JVM, for some reason.
-# The "user.home" system property won't necessarily point to the same directory.
-# We arranged above for $HOME/.terminal-logs/ to be available, so we need to stick to it.
-options.push("-Dorg.jessies.terminator.logDirectory=#{cygpath(log_directory)}")
 
-invoker = Java.new("Terminator", "terminator/Terminator")
-invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
-invoker.launcher = launcher
-invoker.add_extra_java_arguments(options)
 invoker.invoke()
