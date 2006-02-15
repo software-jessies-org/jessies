@@ -33,12 +33,12 @@ public class LogWriter {
 	private void initLogging(String prefix) throws IOException {
 		prefix = java.net.URLEncoder.encode(prefix, "UTF-8");
 		String timestamp = dateFormatter.format(new Date());
-		String logsDirectoryName = System.getProperty("user.home") + File.separator + ".terminal-logs" + File.separator;
+		String logsDirectoryName = System.getProperty("org.jessies.terminator.logDirectory");
 		File logsDirectory = new File(logsDirectoryName);
 		if (logsDirectory.exists()) {
-			String filename = logsDirectoryName + prefix + '-' + timestamp + ".txt";
-			this.info = filename;
-			this.stream = new BufferedWriter(new FileWriter(filename));
+			File logFile = new File(logsDirectory, prefix + '-' + timestamp + ".txt");
+			this.info = logFile.toString();
+			this.stream = new BufferedWriter(new FileWriter(logFile));
 		} else {
 			this.info = "(" + logsDirectoryName + " does not exist)";
 		}

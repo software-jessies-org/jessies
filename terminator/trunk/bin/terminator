@@ -136,6 +136,10 @@ Signal.list().each() {
   | signal_name, signal_number |
   options.push("-Dorg.jessies.terminator.signal.#{signal_number}=SIG#{signal_name}")
 }
+# On Win32 we can't access $HOME from our JVM, for some reason.
+# The "user.home" system property won't necessarily point to the same directory.
+# We arranged above for $HOME/.terminal-logs/ to be available, so we need to stick to it.
+options.push("-Dorg.jessies.terminator.logDirectory=#{cygpath(log_directory)}")
 
 invoker = Java.new("Terminator", "terminator/Terminator")
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
