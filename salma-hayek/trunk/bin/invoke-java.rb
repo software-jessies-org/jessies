@@ -60,7 +60,6 @@ class Java
 
     require "#{@salma_hayek}/bin/find-jdk-root.rb"
     @jdk_root = find_jdk_root()
-    check_java_version()
 
     init_default_heap_size()
     init_default_class_path()
@@ -188,7 +187,13 @@ class Java
   
   def invoke(extra_app_arguments = [])
     args = [ @launcher ]
-
+    
+    # Backquoting anything causes a flickering window on startup for Terminator on Windows.
+    # The salma-hayek Java launcher already contains a version check.
+    if launcher == "java"
+      check_java_version()
+    end
+    
     # Set the class path directly with a system property rather than -cp so
     # that our custom Win32 launcher doesn't have to convert between the two
     # forms. (Sun's Win32 JVM expects ';'-separated paths.)
