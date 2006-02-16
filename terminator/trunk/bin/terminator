@@ -25,7 +25,7 @@ def tryInAppServer(salma_hayek, server_port_file)
   if ENV["DEBUGGING_TERMINATOR"]
     return
   end
-  # We should start a new Terminator if the client (this script) is new than
+  # We should start a new Terminator if the client (this script) is newer than
   # the server (the currently-running Terminator). Checking just the
   # modification time of just the script is only an approximation, but it's
   # close enough for users who'll install all the files at once anyway.
@@ -95,8 +95,8 @@ else
 end
 ENV["TERMINFO"] = terminfo
 
-# rubyw.exe quits if it can't write its "Insecure would writable dir" warnings to $stderr
-# every time it uses system() or back quote.
+# rubyw.exe quits if it can't write its "Insecure world writable dir" warnings
+# to $stderr every time it uses Kernel.system or Kernel.`.
 if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
   $stderr = File.open("/dev/null", "w")
 end
