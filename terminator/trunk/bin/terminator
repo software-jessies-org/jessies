@@ -15,7 +15,7 @@ require "#{salma_hayek}/bin/which.rb"
 log_directory = "#{ENV['HOME']}/.terminal-logs"
 if test(?d, log_directory) == false
   Dir.mkdir(log_directory)
-  system("chmod og-rx #{log_directory}")
+  system("chmod", "og-rx", log_directory)
 end
 
 DISPLAY = ENV["DISPLAY"]
@@ -100,6 +100,7 @@ ENV["TERMINFO"] = terminfo
 if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
   $stderr = File.open("/dev/null", "w")
 end
+
 tic_binary = which("tic")
 terminfo_SRC = "#{terminator_home}/lib/terminfo/terminator.tic"
 terminfo_DST = "#{terminfo}/t/terminator"
@@ -119,13 +120,7 @@ if tic_binary != nil
   tic_command << terminfo_SRC
   system(*tic_command)
 elsif test(?f, terminfo_DST) == false
-  # If you see an error like this:
-  # cp: /usr/local/bin/../lib/terminfo/terminator: No such file or directory
-  # It's because we haven't been able to find the ${terminator_home} directory.
-  # This is probably because you're running an old version of Ruby without
-  # the symlink-following class.
-  # See the "require" statements above.
-  system("cp #{terminator_home}/lib/terminfo/terminator #{terminfo_DST}")
+  system("cp", "#{terminator_home}/lib/terminfo/terminator", terminfo_DST)
 end
 
 invoker = Java.new("Terminator", "terminator/Terminator")
