@@ -41,7 +41,6 @@ public class KnowAll extends JFrame {
     public KnowAll() {
         super("KnowAll");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setLocationByPlatform(true);
         initAdvisors();
         initTextPane();
         initUi();
