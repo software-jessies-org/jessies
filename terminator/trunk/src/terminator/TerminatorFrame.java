@@ -131,7 +131,6 @@ public class TerminatorFrame extends JFrame {
 		});
 		initTerminals();
 		pack();
-		setLocationByPlatform(true);
 		setVisible(true);
 		initSizeMonitoring();
 		
