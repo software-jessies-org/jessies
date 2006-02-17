@@ -224,10 +224,16 @@ class Java
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@dock_name}"
       args << "-Xdock:icon=#{@dock_icon}"
+      add_property("apple.laf.useScreenMenuBar", "true")
     end
 
     add_pathname_property("org.jessies.frameIcon", @png_icon)
-
+    
+    # Work around Sun bug 6274341.
+    add_property("java.awt.Window.locationByPlatform", "true")
+    # Work around the Metal LAF's ugliness. Not needed in Java 6?
+    add_property("swing.boldMetal", "false")
+    
     args.concat(@extra_java_arguments)
     args << @class_name
     args.concat(extra_app_arguments)

@@ -28,7 +28,6 @@ public class JFrameUtilities {
         frame.setContentPane(scrollPane);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationByPlatform(true);
         frame.setVisible(true);
     }
     

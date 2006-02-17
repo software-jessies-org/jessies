@@ -14,7 +14,6 @@ public class Xv extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         fillWithContent(filename);
-        setLocationByPlatform(true);
         setVisible(true);
     }
     

@@ -12,17 +12,6 @@ public class GuiUtilities {
         e.debug.EventDispatchThreadHangMonitor.initMonitoring();
     }
     
-    static {
-        if (isMacOs()) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-        }
-        if (isWindows() == false) {
-            // FIXME: what system does this make a difference on?
-            System.setProperty("swing.aatext", "true");
-        }
-        System.setProperty("swing.boldMetal", "false");
-    }
-    
     private GuiUtilities() { /* Not instantiable. */ }
     
     /**

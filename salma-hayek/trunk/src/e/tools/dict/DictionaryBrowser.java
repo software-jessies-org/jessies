@@ -15,7 +15,6 @@ public class DictionaryBrowser extends JFrame {
         super("Dictionary");
         setContentPane(makeUI());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setLocationByPlatform(true);
         setSize(new Dimension(640, 480));
     }
     

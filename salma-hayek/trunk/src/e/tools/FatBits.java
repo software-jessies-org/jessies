@@ -42,7 +42,6 @@ public class FatBits extends JFrame {
         } catch (AWTException ex) {
             Log.warn("failed to create a Robot", ex);
         }
-        setLocationByPlatform(true);
         setSize(new Dimension(250, 300));
         setContentPane(makeUi());
         setJMenuBar(new FatBitsMenuBar());
