@@ -32,9 +32,9 @@ class ExternalSearchItemProvider implements MenuItemProvider {
         }
         
         public void actionPerformed(ActionEvent e) {
-            String nsPerformServicePath = FileUtilities.getSalmaHayekFile("/generated/native/Darwin/NSPerformService/Darwin/NSPerformService").toString();
+            // Our "NSPerformService" helper needs to be on the path.
             String searchTerm = textArea.getSelectedText().trim();
-            ProcessUtilities.spawn(null, new String[] { nsPerformServicePath, "Spotlight", searchTerm });
+            ProcessUtilities.spawn(null, new String[] { "NSPerformService", "Spotlight", searchTerm });
         }
     }
     

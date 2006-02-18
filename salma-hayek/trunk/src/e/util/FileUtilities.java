@@ -181,7 +181,10 @@ public class FileUtilities {
         }
     }
     
-    /** Returns an array with an item for each semicolon-separated element of the path. */
+    /**
+     * Returns an array with an item for each semicolon-separated element of the path.
+     * FIXME: the use of ";" is bogus.
+     */
     public static String[] getArrayOfPathElements(String path) {
         return path.split(";");
     }
@@ -282,18 +285,6 @@ public class FileUtilities {
             result.append(Integer.toHexString(b & 0xf));
         }
         return result.toString();
-    }
-    
-    /**
-     * Returns a file found relative to the root of the salma-hayek
-     * installation. This will break if FileUtilities moves package, if the
-     * classes directory moves from the root of salma-hayek, or if the
-     * salma-hayek classes for an application aren't actually in a copy of
-     * the salma-hayek directory structure.
-     */
-    public static File getSalmaHayekFile(String pathFromSalmaHayekRoot) {
-        String salmaHayekRoot = new File(FileUtilities.class.getResource("../..").getPath()).getParent();
-        return fileFromParentAndString(salmaHayekRoot, pathFromSalmaHayekRoot);
     }
     
     public static File findOnPath(String executableName) {

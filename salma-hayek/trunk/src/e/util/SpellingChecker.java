@@ -30,18 +30,9 @@ public class SpellingChecker {
         if (GuiUtilities.isMacOs()) {
             // On Mac OS, we want to use the system's spelling checker, so try
             // our NSSpell utility (which gives Apple's code an ispell-like
-            // interface) first. We try to find it relative to this class'
-            // location. This will break if the "classes" directory is moved
-            // away from the "native" directory, or if the "native" directory's
-            // contents are re-arranged.
-            
-            // Why commit such a potentially fragile hack? Well, the breakage
-            // will be easy to spot, and unlikely, and in the meantime it
-            // means we can offer system spelling checking on Mac OS with
-            // no installation necessary.
-            
-            String nsspellPath = FileUtilities.getSalmaHayekFile("/.generated/Darwin/bin/NSSpell").toString();
-            found = connectTo(new String[] { nsspellPath });
+            // interface) first. We assume it's on the path. Our start-up
+            // scripts ensure this.
+            found = connectTo(new String[] { "NSSpell" });
         }
         
         if (found == false) {
