@@ -15,8 +15,8 @@ import terminator.view.highlight.*;
  */
 public class TerminatorMenuBar extends EMenuBar {
 	private Action[] customWindowMenuItems = new Action[] {
-		new NextTabAction(),
-		new PreviousTabAction()
+		new CycleTabAction(1),
+		new CycleTabAction(-1)
 	};
 	
 	public TerminatorMenuBar() {
@@ -524,31 +524,20 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 	}
 	
-	public static class NextTabAction extends AbstractTabAction {
-		public NextTabAction() {
-			super("Select Next Tab");
+	public static class CycleTabAction extends AbstractTabAction {
+		private int delta;
+		
+		public CycleTabAction(int delta) {
+			super(delta < 0 ? "Select Previous Tab" : "Select Next Tab");
+			this.delta = delta;
 			// Sun bug 6350813 prevents the keystroke from being looking right on Mac OS, but it's the same keystroke as Safari even if it doesn't look like it.
 			// On other OSes, use the unshifted keystroke for convenience.
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedOrUnshiftedKeyStroke("CLOSE_BRACKET", GuiUtilities.isMacOs()));
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedOrUnshiftedKeyStroke(delta < 0 ? "OPEN_BRACKET" : "CLOSE_BRACKET", GuiUtilities.isMacOs()));
 		}
 		
 		@Override
 		protected void performFrameAction(TerminatorFrame frame) {
-			frame.switchToNextTab();
-		}
-	}
-	
-	public static class PreviousTabAction extends AbstractTabAction {
-		public PreviousTabAction() {
-			super("Select Previous Tab");
-			// Sun bug 6350813 prevents the keystroke from being looking right on Mac OS, but it's the same keystroke as Safari even if it doesn't look like it.
-			// On other OSes, use the unshifted keystroke for convenience.
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedOrUnshiftedKeyStroke("OPEN_BRACKET", GuiUtilities.isMacOs()));
-		}
-		
-		@Override
-		protected void performFrameAction(TerminatorFrame frame) {
-			frame.switchToPreviousTab();
+			frame.cycleTab(delta);
 		}
 	}
 }
