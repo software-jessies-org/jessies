@@ -39,8 +39,8 @@ public class JTerminalPane extends JPanel {
 		null,
 		new TerminatorMenuBar.ClearScrollbackAction(),
 		null,
-		new TerminatorMenuBar.NextTabAction(),
-		new TerminatorMenuBar.PreviousTabAction(),
+		new TerminatorMenuBar.CycleTabAction(1),
+		new TerminatorMenuBar.CycleTabAction(-1),
 		null,
 		new TerminatorMenuBar.ShowInfoAction(),
 		new TerminatorMenuBar.ResetAction()
@@ -372,12 +372,15 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		public void keyTyped(KeyEvent event) {
-			if (TerminatorMenuBar.isKeyboardEquivalent(event) == false) {
-				String utf8 = getUtf8ForKeyEvent(event);
-				control.sendUtf8String(utf8);
-				textPane.userIsTyping();
-				scroll();
+			if (TerminatorMenuBar.isKeyboardEquivalent(event) || doKeyboardTabSwitch(event)) {
+				event.consume();
+				return;
 			}
+			
+			String utf8 = getUtf8ForKeyEvent(event);
+			control.sendUtf8String(utf8);
+			textPane.userIsTyping();
+			scroll();
 			event.consume();
 		}
 		
@@ -402,6 +405,15 @@ public class JTerminalPane extends JPanel {
 			} else {
 				return false;
 			}
+		}
+		
+		private boolean doKeyboardTabSwitch(KeyEvent event) {
+			if (event.getKeyChar() == '\t' && event.isControlDown()) {
+				TerminatorFrame frame = (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, scrollPane);
+				frame.cycleTab(event.isShiftDown() ? -1 : 1);
+				return true;
+			}
+			return false;
 		}
 		
 		/**

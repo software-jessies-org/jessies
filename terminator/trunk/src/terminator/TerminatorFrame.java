@@ -280,15 +280,9 @@ public class TerminatorFrame extends JFrame {
 		Terminator.getSharedInstance().openFrame(escapee);
 	}
 	
-	public void switchToNextTab() {
+	public void cycleTab(int delta) {
 		if (tabbedPane != null) {
-			setSelectedTab(tabbedPane.getSelectedIndex() + 1);
-		}
-	}
-	
-	public void switchToPreviousTab() {
-		if (tabbedPane != null) {
-			setSelectedTab(tabbedPane.getSelectedIndex() - 1);
+			setSelectedTab(tabbedPane.getSelectedIndex() + delta);
 		}
 	}
 	
