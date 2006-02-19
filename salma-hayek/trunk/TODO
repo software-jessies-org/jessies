@@ -61,6 +61,8 @@ Items to be done for PTextArea:
 
   this may be another case of misunderstanding into something better than what was meant, but that sounds like an interesting idea.
 
+* Python and HTML/XML highlighting and indenting.
+
 General stuff:
 
 * Here's a really cool auto-update system (for Cocoa) that it would be nice to imitate: 
