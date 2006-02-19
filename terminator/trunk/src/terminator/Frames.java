@@ -17,7 +17,9 @@ public class Frames implements Iterable<TerminatorFrame> {
     
     public Frames() {
         if (GuiUtilities.isMacOs()) {
-            hiddenFrame = new JFrame("Mac OS implementation detail");
+            String name = "Mac OS Hidden Frame";
+            hiddenFrame = new JFrame(name);
+            hiddenFrame.setName(name);
             hiddenFrame.setJMenuBar(new TerminatorMenuBar());
             hiddenFrame.setUndecorated(true);
         }
@@ -32,10 +34,10 @@ public class Frames implements Iterable<TerminatorFrame> {
     }
     
     public void removeFrame(TerminatorFrame frame) {
+        list.remove(frame);
         if (GuiUtilities.isMacOs()) {
             frameStateChanged();
         }
-        list.remove(frame);
     }
     
     public void frameStateChanged() {
@@ -67,6 +69,16 @@ public class Frames implements Iterable<TerminatorFrame> {
      */
     public Iterator<TerminatorFrame> iterator() {
         return list.iterator();
+    }
+    
+    /**
+     * Allows convenient cloning of the underlying list.
+     * You might think you could use our iterator() with Collections.list(), but you'd be wrong, because it uses Enumeration instead.
+     */
+    public ArrayList<TerminatorFrame> toArrayList() {
+        ArrayList<TerminatorFrame> result = new ArrayList<TerminatorFrame>();
+        result.addAll(list);
+        return result;
     }
     
     /**
