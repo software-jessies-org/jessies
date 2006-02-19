@@ -9,7 +9,7 @@ def die(message)
 end
 
 def usage()
-    die("usage: make-mac-os-app.rb <project_name> <salma-hayek-path> <version_string> (with filenames one per line on stdin)")
+    die("usage: make-mac-os-app.rb <project_name> <salma-hayek-path> (with filenames one per line on stdin)")
 end
 
 # humanize("terminator") => "Terminator"
@@ -17,7 +17,7 @@ def humanize(name)
     return name.sub(/^(.)/) { |s| s.upcase() }
 end
 
-if ARGV.length() != 3
+if ARGV.length() != 2
     usage()
 end
 
@@ -28,7 +28,6 @@ end
 # Get our command line arguments.
 project_name = ARGV.shift()
 salma_hayek = ARGV.shift()
-version_string = ARGV.shift()
 # Then read stdin (otherwise Ruby will treat ARGV as a list of filenames to read from).
 make_installer_file_list = readlines().map() { |line| line.chomp() }
 
@@ -71,8 +70,6 @@ File.open("#{app_dir}/Info.plist", "w") {
   <string>APPL</string>
   <key>CFBundleSignature</key>
   <string>????</string>
-  <key>CFBundleGetInfoString</key>
-  <string>#{human_project_name} #{version_string}</string>
  </dict>
 </plist>
 EOS

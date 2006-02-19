@@ -546,7 +546,7 @@ www-dist: ChangeLog.html
 
 # FIXME: the "native" target should depend on this on Mac OS X.
 $(PROJECT_NAME).dmg: build .generated/build-revision.txt
-	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK) $(VERSION_STRING)
+	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK)
 
 # FIXME: This should be the Mac OS X native-dist target.
 .PHONY: app-dist
