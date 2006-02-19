@@ -17,6 +17,8 @@ public class TerminatorFrame extends JFrame {
 	
 	private ArrayList<JTerminalPane> terminals;
 	
+	private Timer terminalSizeTimer;
+	
 	public TerminatorFrame(List<JTerminalPane> initialTerminalPanes) {
 		super("Terminator");
 		terminals = new ArrayList<JTerminalPane>(initialTerminalPanes);
@@ -85,7 +87,7 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	private void initFrame() {
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // Misnomer: we add our own WindowListener.
 		if (GuiUtilities.isMacOs() == false) {
 			setBackground(Options.getSharedInstance().getColor("background"));
 		}
@@ -97,26 +99,8 @@ public class TerminatorFrame extends JFrame {
 		Terminator.getSharedInstance().getFrames().addFrame(this);
 		addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosed(WindowEvent event) {
-				for (JTerminalPane terminal : terminals) {
-					terminal.destroyProcess();
-				}
-				Terminator.getSharedInstance().getFrames().removeFrame(TerminatorFrame.this);
-			}
-			
-			@Override
 			public void windowClosing(WindowEvent event) {
-				// We can't iterate over "terminals" directly because we'll get ConcurrentModificationException if doCheckedCloseAction tries to remove the terminal from the list.
-				ArrayList<JTerminalPane> copyOfTerminals = new ArrayList<JTerminalPane>(terminals);
-				for (JTerminalPane terminal : copyOfTerminals) {
-					if (tabbedPane != null) {
-						tabbedPane.setSelectedComponent(terminal);
-					}
-					if (terminal.doCheckedCloseAction() == false) {
-						// If the user hit "Cancel" for one terminal, cancel the close for all other terminals in the same window.
-						return;
-					}
-				}
+				handleWindowCloseRequestFromUser();
 			}
 			
 			@Override
@@ -234,7 +218,6 @@ public class TerminatorFrame extends JFrame {
 		public void stateChanged(ChangeEvent e) {
 			final Component selected = tabbedPane.getSelectedComponent();
 			if (selected != null) {
-				// I dislike the invokeLater, but it's sadly necessary.
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						selected.requestFocus();
@@ -300,7 +283,7 @@ public class TerminatorFrame extends JFrame {
 		if (tabbedPane != null) {
 			closeTab(victim);
 		} else {
-			closeWindow();
+			setVisible(false);
 		}
 	}
 	
@@ -311,7 +294,7 @@ public class TerminatorFrame extends JFrame {
 		tabbedPane.remove(victim);
 		if (tabbedPane.getTabCount() == 0) {
 			// FIXME: how can we ever get here?
-			closeWindow();
+			setVisible(false);
 		} else if (tabbedPane.getTabCount() == 1) {
 			switchToSinglePane();
 		} else {
@@ -327,16 +310,36 @@ public class TerminatorFrame extends JFrame {
 		}
 	}
 	
-	/**
-	 * Closes the frame after the last terminal has been removed.
-	 */
-	private void closeWindow() {
-		setVisible(false);
-		dispose();
+	public void handleWindowCloseRequestFromUser() {
+		// We can't iterate over "terminals" directly because we're causing terminals to close and be removed from the list.
+		ArrayList<JTerminalPane> copyOfTerminals = new ArrayList<JTerminalPane>(terminals);
+		for (JTerminalPane terminal : copyOfTerminals) {
+			if (tabbedPane != null) {
+				tabbedPane.setSelectedComponent(terminal);
+			}
+			if (terminal.doCheckedCloseAction() == false) {
+				// If the user hit "Cancel" for one terminal, cancel the close for all other terminals in the same window.
+				return;
+			}
+		}
 	}
 	
-	private Timer terminalSizeTimer = null;
-
+	/**
+	 * Tidies up after the frame has been hidden.
+	 * We can't use a ComponentListener because that's invoked on the EDT, as is handleQuit, which relies on us tidying up while it goes.
+	 */
+	@Override
+	public void setVisible(boolean newState) {
+		super.setVisible(newState);
+		if (newState == false) {
+			for (JTerminalPane terminal : terminals) {
+				terminal.destroyProcess();
+			}
+			dispose();
+			Terminator.getSharedInstance().getFrames().removeFrame(this);
+		}
+	}
+	
 	public void setTerminalSize(Dimension size) {
 		this.terminalSize = size;
 		updateFrameTitle();
