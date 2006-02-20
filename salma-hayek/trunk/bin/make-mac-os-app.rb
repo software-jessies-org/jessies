@@ -136,8 +136,4 @@ File.open(script_name, "w") {
 }
 system("chmod a+x #{script_name}")
 
-# Make a Mac OS .dmg file.
-system("rm -f #{project_name}.dmg")
-system("hdiutil create -fs HFS+ -volname #{human_project_name} -srcfolder #{tmp_dir} #{project_name}.dmg")
-
 exit(0)

@@ -544,9 +544,15 @@ www-dist: ChangeLog.html
 # it to the web server.
 # ----------------------------------------------------------------------------
 
-# FIXME: the "native" target should depend on this on Mac OS X.
-$(PROJECT_NAME).dmg: build .generated/build-revision.txt
+.PHONY: $(PROJECT_NAME).app
+$(PROJECT_NAME).app: build .generated/build-revision.txt
 	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK)
+
+# FIXME: the "native" target should depend on this on Mac OS X.
+$(PROJECT_NAME).dmg: $(PROJECT_NAME).app
+	@$(RM) $@ && \
+	echo -n "Creating disk image..." && \
+	hdiutil create -fs HFS+ -volname `perl -w -e "print ucfirst(\"$(PROJECT_NAME)\");"` -srcfolder $(PROJECT_ROOT)/.generated/native/Darwin/$(PROJECT_NAME) $(PROJECT_NAME).dmg
 
 # FIXME: This should be the Mac OS X native-dist target.
 .PHONY: app-dist
