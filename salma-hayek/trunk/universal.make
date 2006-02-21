@@ -74,7 +74,7 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     endif
     ifeq "$(TARGET_OS)" "Darwin"
         $(warning The make which comes with Mac OS X 10.4.2 isn't good enough.)
-        $(warning Try http://software.jessies.org/3rdParty/make-3.80-9-darwin-ppc)
+        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-darwin-ppc)
     endif
     ifeq "$(TARGET_OS)" "Linux"
         $(warning Debian unstable has a new enough make if you do sudo apt-get install make.)
