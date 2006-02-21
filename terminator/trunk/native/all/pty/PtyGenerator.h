@@ -25,7 +25,7 @@
 #include <string>
 
 class PtyGenerator {
-    std::string ptyName;
+    std::string slavePtyName;
     int masterFd;
     
 public:
@@ -36,25 +36,34 @@ public:
     }
     
     std::string getSlavePtyName() {
-        return ptyName;
+        return slavePtyName;
     }
     
     int openMaster() {
-        masterFd = ptym_open(ptyName);
+        masterFd = posix_openpt(O_RDWR | O_NOCTTY);
+        if (masterFd == -1) {
+            throw unix_exception("posix_openpt(O_RDWR | O_NOCTTY) failed");
+        }
+        
+        const char* name = ptsname(masterFd);
+        if (name == 0) {
+            throw unix_exception("ptsname(" + toString(masterFd) + ") failed");
+        }
+        slavePtyName = name;
+        
+        if (grantpt(masterFd) != 0) {
+            throw unix_exception("grantpt(\"" + slavePtyName + "\") failed");
+        }
+        if (unlockpt(masterFd) != 0) {
+            throw unix_exception("unlockpt(\"" + slavePtyName + "\") failed");
+        }
         return masterFd;
     }
     
     int openSlaveAndCloseMaster() {
-        struct group* grptr = getgrnam("tty");
-        gid_t gid = (grptr != NULL) ? grptr->gr_gid : gid_t(-1);
-        
-        const char *cName = ptyName.c_str();
-        chown(cName, getuid(), gid);
-        chmod(cName, S_IRUSR | S_IWUSR | S_IWGRP);
-        
-        int fds = open(cName, O_RDWR | O_NOCTTY);
+        int fds = open(slavePtyName.c_str(), O_RDWR | O_NOCTTY);
         if (fds < 0) {
-            throw unix_exception("open(" + toString(cName) + ", O_RDWR | O_NOCTTY) failed");
+            throw unix_exception("open(\"" + slavePtyName + "\", O_RDWR | O_NOCTTY) failed");
         }
         close(masterFd);
         return fds;
@@ -77,58 +86,6 @@ public:
     }
     
 private:
-    int search_for_pty(std::string& pts_name) {
-        for (char* ptr1 = "pqrstuvwxyzPQRST"; *ptr1 != 0; ++ptr1) {
-            for (char* ptr2 = "0123456789abcdef"; *ptr2 != 0; ++ptr2) {
-                pts_name = "/dev/pty";
-                pts_name.append(1, *ptr1);
-                pts_name.append(1, *ptr2);
-                
-                /* try to open master */
-                int fdm = open(pts_name.c_str(), O_RDWR);
-                if (fdm < 0) {
-                    if (errno == ENOENT) {
-                        /* Different from EIO. */
-                        throw std::runtime_error("Out of pseudo-terminal devices");
-                    } else {
-                        /* Try next pty device. */
-                        continue;
-                    }
-                }
-                
-                /* Return name of slave. */
-                pts_name = "/dev/tty";
-                pts_name.append(1, *ptr1);
-                pts_name.append(1, *ptr2);
-                
-                /* Return fd of master. */
-                return fdm;
-            }
-        }
-        throw std::runtime_error("Out of pseudo-terminal devices");
-    }
-    
-    int ptym_open(std::string& pts_name) {
-        int ptmx_fd = open("/dev/ptmx", O_RDWR);
-        if (ptmx_fd < 0) {
-            return search_for_pty(pts_name);
-        }
-        
-        const char* name = ptsname(ptmx_fd);
-        if (name == 0) {
-            throw unix_exception("ptsname(" + toString(ptmx_fd) + ") failed");
-        }
-        pts_name = name;
-        
-        if (grantpt(ptmx_fd) != 0) {
-            throw unix_exception("grantpt(" + toString(name) + ") failed");
-        }
-        if (unlockpt(ptmx_fd) != 0) {
-            throw unix_exception("unlockpt(" + toString(name) + ") failed");
-        }
-        return ptmx_fd;
-    }
-    
     class child_exception : public unix_exception {
     public:
         child_exception(const std::string& message)
