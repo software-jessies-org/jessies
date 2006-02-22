@@ -225,6 +225,13 @@ private:
             close(*it);
         }
     }
+    
+#ifdef __CYGWIN__
+    // Cygwin doesn't currently have posix_openpt(3).
+    int posix_openpt(int flags) {
+        return open("/dev/ptmx", flags);
+    }
+#endif
 };
 
 #endif
