@@ -164,7 +164,8 @@ public class JTerminalPane extends JPanel {
 		class SizeMonitor extends ComponentAdapter {
 			@Override
 			public void componentShown(ComponentEvent event) {
-				currentSizeInChars = textPane.getVisibleSizeInCharacters();
+				currentSizeInChars = new Dimension(80, 24);
+				componentResized(event);
 			}
 			
 			@Override
