@@ -64,6 +64,15 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		view.setAutoscrolls(true);
 	}
 	
+	public void textChanged(Location start, Location end) {
+		if (highlight != null) {
+			if ((highlight.getStart().compareTo(end) < 0) && (highlight.getEnd().compareTo(start) > 0)) {
+				view.removeHighlightsFrom(this, 0);
+				highlight = null;
+			}
+		}
+	}
+	
 	public void mousePressed(MouseEvent event) {
 		if (SwingUtilities.isLeftMouseButton(event) == false || event.isPopupTrigger()) {
 			return;
