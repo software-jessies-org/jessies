@@ -30,6 +30,7 @@ public class JTextBuffer extends JComponent implements FocusListener {
 	private boolean blinkOn = true;
 	private CursorBlinker cursorBlinker;
 	private HashMap<Class, Highlighter> highlighters = new HashMap<Class, Highlighter>();
+	private SelectionHighlighter selectionHighlighter;
 	
 	/**
 	* The highlights present in each line.  The highlights for a line are stored at the index in
@@ -93,7 +94,11 @@ public class JTextBuffer extends JComponent implements FocusListener {
 		addHighlighter(new FindHighlighter());
 		becomeDropTarget();
 		cursorBlinker = new CursorBlinker(this);
-		new SelectionHighlighter(this);
+		selectionHighlighter = new SelectionHighlighter(this);
+	}
+	
+	public SelectionHighlighter getSelectionHighlighter() {
+		return selectionHighlighter;
 	}
 	
 	public void userIsTyping() {

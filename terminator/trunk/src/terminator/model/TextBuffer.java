@@ -297,6 +297,7 @@ public class TextBuffer {
 	
 	public void linesChangedFrom(int firstLineChanged) {
 		this.firstLineChanged = Math.min(this.firstLineChanged, firstLineChanged);
+		view.getSelectionHighlighter().textChanged(new Location(firstLineChanged, 0), new Location(getLineCount() + 1, 0));
 	}
 	
 	public Dimension getCurrentSizeInChars() {
