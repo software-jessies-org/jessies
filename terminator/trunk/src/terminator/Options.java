@@ -285,10 +285,10 @@ public class Options {
 		
 		if (GuiUtilities.isMacOs() || GuiUtilities.isWindows() || GuiUtilities.isGtk()) {
 			// GNOME, Mac, and Win32 users are accustomed to every window having a menu bar.
-			// FIXME: I'm still psyching myself up for the inevitable battle of removing this option.
 			options.put(USE_MENU_BAR, Boolean.TRUE);
 		} else {
-			addDefault(USE_MENU_BAR, Boolean.FALSE, "Use a menu bar?");
+			// FIXME: I'm still psyching myself up for the inevitable battle of removing this option.
+			addDefault(USE_MENU_BAR, Boolean.TRUE, "Use a menu bar?");
 		}
 	}
 	
