@@ -44,6 +44,10 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
     // Have we already dumped a stack trace for the current event dispatch?
     private boolean reportedHang = false;
     
+    // Prevents us complaining about hangs during start-up, which are probably
+    // the JVM vendor's fault.
+    private boolean haveShownSomeComponent = false;
+    
     // Help distinguish multiple hangs in the log, and match start and end too.
     private int hangCount = 0;
     
@@ -81,7 +85,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                 // event that gets dispatched.
                 return;
             }
-            if (timeSoFar() > UNREASONABLE_DISPATCH_DURATION_MS) {
+            if (haveShownSomeComponent && timeSoFar() > UNREASONABLE_DISPATCH_DURATION_MS) {
                 reportHang();
             }
         }
@@ -152,6 +156,9 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         preDispatchEvent();
         super.dispatchEvent(event);
         postDispatchEvent();
+        if (haveShownSomeComponent == false && event instanceof ComponentEvent && event.getID() == ComponentEvent.COMPONENT_SHOWN) {
+            haveShownSomeComponent = true;
+        }
     }
     
     /**
