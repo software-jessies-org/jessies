@@ -140,7 +140,10 @@ void terminator_terminal_PtyProcess::destroy() {
 void terminator_terminal_PtyProcess::nativeWaitFor() {
     pid_t pid = processId.get();
     int status;
+    errno = 0;
     pid_t result = waitpid(pid, &status, 0);
+    std::cout << "waitpid(" << pid << ")" << " result=" << result << " status=" << (void*) status << " errno=" << errno << std::endl;
+    
     if (result < 0) {
         throw unix_exception("waitpid(" + toString(pid) + ", &status, 0) failed");
     }
