@@ -33,6 +33,7 @@ public class Terminator {
 		
 		Application.getApplication().setEnabledPreferencesMenu(true);
 		Application.getApplication().addApplicationListener(new ApplicationAdapter() {
+			@Override
 			public void handleReOpenApplication(ApplicationEvent e) {
 				if (frames.isEmpty()) {
 					openFrame(JTerminalPane.newShell());
@@ -40,11 +41,19 @@ public class Terminator {
 				e.setHandled(true);
 			}
 			
+			@Override
+			public void handleOpenFile(ApplicationEvent e) {
+				SimpleDialog.showAlert(null, "open file", e.toString());
+				Log.warn("open file " + e.toString());
+			}
+			
+			@Override
 			public void handlePreferences(ApplicationEvent e) {
 				Options.getSharedInstance().showPreferencesDialog();
 				e.setHandled(true);
 			}
 			
+			@Override
 			public void handleQuit(ApplicationEvent e) {
 				// We can't iterate over "frames" directly because we're causing frames to close and be removed from the list.
 				for (TerminatorFrame frame : frames.toArrayList()) {
