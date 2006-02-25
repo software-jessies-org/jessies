@@ -166,6 +166,11 @@ public class PtyProcess {
         }
     }
     
+    @Override
+    public String toString() {
+        return "PtyProcess[processId=" + processId + ",fd=" + fd + ",pty=\"" + slavePtyName + "\",didDumpCore=" + didDumpCore + ",didExitNormally=" + didExitNormally + ",wasSignaled=" + wasSignaled + ",exitValue=" + exitValue + "]";
+    }
+    
     private native void nativeStartProcess(String[] command, String workingDirectory, FileDescriptor descriptor) throws IOException;
     private native void nativeWaitFor() throws IOException;
     public native void destroy() throws IOException;

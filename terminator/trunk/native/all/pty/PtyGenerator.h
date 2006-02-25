@@ -60,15 +60,6 @@ public:
         return masterFd;
     }
     
-    int openSlaveAndCloseMaster() {
-        int fds = open(slavePtyName.c_str(), O_RDWR | O_NOCTTY);
-        if (fds < 0) {
-            throw unix_exception("open(\"" + slavePtyName + "\", O_RDWR | O_NOCTTY) failed");
-        }
-        close(masterFd);
-        return fds;
-    }
-    
     pid_t forkAndExec(char * const *cmd, const char* workingDirectory) {
         pid_t pid = fork();
         if (pid < 0) {
@@ -104,21 +95,34 @@ private:
         }
     };
     
+    int openSlaveAndCloseMaster() {
+        int slaveFd = open(slavePtyName.c_str(), O_RDWR | O_NOCTTY);
+        if (slaveFd == -1) {
+            throw unix_exception("open(\"" + slavePtyName + "\", O_RDWR | O_NOCTTY) failed");
+        }
+        close(masterFd);
+        return slaveFd;
+    }
+    
     static void runChild(char * const *cmd, const char* workingDirectory, PtyGenerator& ptyGenerator) {
+        closeFileDescriptors();
+        
         if (workingDirectory != 0) {
-            if (chdir(workingDirectory) < 0) {
+            if (chdir(workingDirectory) == -1) {
                 throw child_exception(std::string() + "chdir(\"" + workingDirectory + "\")");
             }
         }
-        if (setsid() < 0) {
+        
+        // A process relinquishes its controlling terminal when it creates a new session with the setsid(2) function.
+        if (setsid() == -1) {
             throw child_exception("setsid()");
         }
-
+        
         int childFd = ptyGenerator.openSlaveAndCloseMaster();
 
 #if defined(TIOCSCTTY)
-        /* Give up the controlling terminal. */
-        if (ioctl(childFd, TIOCSCTTY, 0) < 0) {
+        // The controlling terminal for a session is allocated by the session leader by issuing the TIOCSCTTY ioctl.
+        if (ioctl(childFd, TIOCSCTTY, 0) == -1) {
             throw child_exception_via_pipe(childFd, "ioctl(" + toString(childFd) + ", TIOCSCTTY, 0)");
         }
 #endif
@@ -129,7 +133,7 @@ private:
         ioctl(childFd, I_PUSH, "ldterm");
         ioctl(childFd, I_PUSH, "ttcompat");
 #endif
-
+        
         /* Slave becomes stdin/stdout/stderr of child. */
         if (childFd != STDIN_FILENO && dup2(childFd, STDIN_FILENO) != STDIN_FILENO) {
             throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDIN_FILENO)");
@@ -143,7 +147,6 @@ private:
         if (childFd > STDERR_FILENO) {
             close(childFd);
         }
-        closeUnusedFiles();
         fixEnvironment();
         
         /*
@@ -194,7 +197,7 @@ private:
      * It also ensures that child processes don't have file descriptors for
      * files the Java VM has open (it typically has many).
      */
-    static void closeUnusedFiles() {
+    static void closeFileDescriptors() {
         // A common idiom for closing the parent's file descriptors in a child is to close all possible file descriptors.
         // Sun 4843136 refers to this technique as a "stress test for the OS", pointing out that a system may have a high, or no, limit.
         // Sun 4413680 claims that the equivalent code in the JVM before 1.4.0_03 was a performance problem on Solaris.
@@ -214,9 +217,7 @@ private:
         FdList fds;
         for (DirectoryIterator it(fdDirectory); it.isValid(); ++it) {
             int fd = strtoul(it->getName().c_str(), NULL, 10);
-            if (fd > STDERR_FILENO) {
-                fds.push_back(fd);
-            }
+            fds.push_back(fd);
         }
         
         // Pass 2: close the fds.

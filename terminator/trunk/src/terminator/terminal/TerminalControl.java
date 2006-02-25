@@ -109,6 +109,7 @@ public class TerminalControl {
 						Log.warn("Problem processing child output", th);
 					}
 				}
+				Log.warn("Read returned " + readCount);
 			} catch (Throwable th) {
 				Log.warn("Problem reading child output", th);
 			} finally {
@@ -176,6 +177,7 @@ public class TerminalControl {
 		} catch (Exception ex) {
 			Log.warn("Problem waiting for process", ex);
 		}
+		Log.warn("waitFor returned on " + ptyProcess);
 		if (ptyProcess.didExitNormally()) {
 			int status = ptyProcess.getExitStatus();
 			if (pane.shouldHoldOnExit(status)) {
