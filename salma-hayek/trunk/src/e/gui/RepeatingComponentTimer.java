@@ -47,6 +47,10 @@ public class RepeatingComponentTimer {
         }
     }
     
+    public boolean isRunning() {
+        return timer.isRunning();
+    }
+    
     public void start() {
         timer.start();
     }

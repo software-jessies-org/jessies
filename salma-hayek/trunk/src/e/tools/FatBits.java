@@ -210,6 +210,19 @@ public class FatBits extends JFrame {
         private Image image;
         private boolean showGrid;
         
+        public ScaledImagePanel() {
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (timer.isRunning() == false) {
+                        BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+                        paintImage(image.getGraphics());
+                        updateCenterColor(image.getRGB(e.getX(), e.getY()));
+                    }
+                }
+            });
+        }
+        
         public void setImage(Image image) {
             this.image = image;
             repaint();
@@ -224,11 +237,14 @@ public class FatBits extends JFrame {
             repaint();
         }
         
+        @Override
         public void paintComponent(Graphics g) {
-            int xOrigin = xOrigin();
-            int yOrigin = yOrigin();
-            g.drawImage(image, xOrigin, yOrigin, null);
-            paintGridLines(g, xOrigin, yOrigin);
+            paintImage(g);
+            paintGridLines(g, xOrigin(), yOrigin());
+        }
+        
+        private void paintImage(Graphics g) {
+            g.drawImage(image, xOrigin(), yOrigin(), null);
         }
         
         private void paintGridLines(Graphics g, int xOrigin, int yOrigin) {
