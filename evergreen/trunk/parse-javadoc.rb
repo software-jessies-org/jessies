@@ -127,10 +127,18 @@ end
 
 if ARGV.length() == 0
     puts("Usage: parse-javadoc.rb <java-doc-directories>... > javadoc-summary.txt")
-    puts("")
+    
+    puts()
     puts("Probable JavaDoc locations on this machine:")
     locations = `locate allclasses-noframe.html | grep -v "^/Previous Systems/"`
-    puts(locations.gsub(/allclasses-noframe\.html/, ""))
+    locations.gsub!(/allclasses-noframe\.html/, "")
+    puts(locations)
+    
+    puts()
+    puts("As a command to paste in:")
+    arguments = []
+    locations.split("\n").map() { |location| arguments << "\"#{location}\""}
+    puts("time #$0 #{arguments.join(' ')} > javadoc-summary.txt")
     exit(1)
 end
 
