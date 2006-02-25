@@ -129,7 +129,7 @@ if ARGV.length() == 0
     puts("Usage: parse-javadoc.rb <java-doc-directories>... > javadoc-summary.txt")
     puts("")
     puts("Probable JavaDoc locations on this machine:")
-    locations = `locate allclasses-noframe.html`
+    locations = `locate allclasses-noframe.html | grep -v "^/Previous Systems/"`
     puts(locations.gsub(/allclasses-noframe\.html/, ""))
     exit(1)
 end
