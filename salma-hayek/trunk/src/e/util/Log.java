@@ -58,7 +58,10 @@ public class Log {
     }
 
     private static void showJavaVersion() {
-        warn("Java " + System.getProperty("java.version") + ".");
+        String vmVersion = System.getProperty("java.vm.version");
+        String runtimeVersion = System.getProperty("java.runtime.version");
+        String fullVersion = vmVersion.equals(runtimeVersion) ? vmVersion : ("VM " + vmVersion + ", runtime " + runtimeVersion);
+        warn("Java " + System.getProperty("java.version") + " (" + fullVersion + ").");
     }
 
     private static void showOsVersion() {
