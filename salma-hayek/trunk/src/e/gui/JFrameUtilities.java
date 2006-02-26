@@ -12,6 +12,35 @@ public class JFrameUtilities {
         frame.setIconImage(FRAME_ICON);
     }
     
+    /**
+     * Invoke this after calling pack but before setVisible.
+     * The window's location and size will be adjusted to fit the display.
+     */
+    public static void constrainToScreen(Window window) {
+        // Query the display information.
+        Rectangle displayBounds = window.getGraphicsConfiguration().getBounds();
+        Insets insets = window.getToolkit().getScreenInsets(window.getGraphicsConfiguration());
+        
+        // Query the window information.
+        Point newLocation = window.getLocation();
+        Dimension newSize = window.getSize();
+        
+        // Make sure the window's top left corner is on-screen.
+        newLocation.x = Math.max(displayBounds.x + insets.left, newLocation.x);
+        newLocation.y = Math.max(displayBounds.y + insets.top, newLocation.y);
+        
+        // Make sure the window's bottom right corner is on-screen.
+        if (newLocation.x + newSize.width > displayBounds.x + displayBounds.width - insets.right) {
+            newSize.width = (displayBounds.x + displayBounds.width - insets.right) - newLocation.x;
+        }
+        if (newLocation.y + newSize.height > displayBounds.y + displayBounds.height - insets.bottom) {
+            newSize.height = (displayBounds.y + displayBounds.height - insets.bottom) - newLocation.y;
+        }
+        
+        window.setLocation(newLocation);
+        window.setSize(newSize);
+    }
+    
     public static void showTextWindow(String title, String content) {
         PTextArea textArea = new PTextArea(40, 80);
         textArea.setFont(new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 10));
