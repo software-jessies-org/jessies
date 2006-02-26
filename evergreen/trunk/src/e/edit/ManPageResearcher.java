@@ -22,10 +22,9 @@ public class ManPageResearcher implements WorkspaceResearcher {
         
         /*
          * Should really do something equivalent to this:
-         * locate man/man | grep "man[23]$" | xargs find | perl -ne 'if (m/\/([^\/.]*)\..*$/) { print "$1\n"; }' | sort | wc -l
-         *
-         * Probably starting by looking in /etc/manpath.config instead of using locate.
-         * But why write a hundred lines of Java when a single line of shell will do?
+         * locate man/man | grep -v "^/Previous Systems/" | grep "man[23]$" |  tr '\n' '\0' | xargs -0 find | perl -ne 'if (m/\/([^\/.]*)\..*$/) { print "$1\n"; }' | sort -u
+         * 
+         * What to do on systems without locate(1), or where the database hasn't been generated?
          * 
          * For now, we'll assume that we have a file listing all the interesting man pages.
          * This has the advantage that you can remove any entries that annoy you.
