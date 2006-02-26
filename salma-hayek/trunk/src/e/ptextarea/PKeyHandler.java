@@ -46,7 +46,6 @@ public class PKeyHandler implements KeyListener {
                 return;
             }
         }
-        trackControlKey(e);
         if (handleInvisibleKeyPressed(e)) {
             e.consume();
         }
@@ -60,20 +59,6 @@ public class PKeyHandler implements KeyListener {
     }
     
     public void keyReleased(KeyEvent e) {
-        trackControlKey(e);
-    }
-    
-    /**
-     * Activates any links in the text as long as the control key is down.
-     * This is our current resolution of the conflict between the desire
-     * for easy following of URLs on the one hand and easy editing of text
-     * containing URLs on the other. Since we're primarily a text editing
-     * component, we lean in favor of editing.
-     */
-    private void trackControlKey(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-            textArea.setLinkingActive(e.getID() == KeyEvent.KEY_PRESSED);
-        }
     }
     
     private boolean isInsertableCharacter(KeyEvent e) {

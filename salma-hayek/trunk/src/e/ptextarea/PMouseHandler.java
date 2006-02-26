@@ -85,9 +85,6 @@ public class PMouseHandler implements MouseInputListener {
     
     private void trackMouse(MouseEvent e) {
         lastKnownPosition = e.getPoint();
-        if (textArea.isFocusOwner()) {
-            textArea.setLinkingActive(e.isControlDown());
-        }
     }
     
     public void updateCursorAndToolTip() {
@@ -95,21 +92,14 @@ public class PMouseHandler implements MouseInputListener {
         String newToolTip = null;
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
         if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
-            if (textArea.isLinkingActive()) {
-                newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-                newToolTip = PTextSegment.class.cast(segment).getToolTip();
-            } else {
-                newToolTip = "Hold down the control key to activate this link";
-            }
+            newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+            newToolTip = PTextSegment.class.cast(segment).getToolTip();
         }
         textArea.setCursor(newCursor);
         textArea.setToolTipText(newToolTip);
     }
     
     private void handleHyperlinks(MouseEvent e) {
-        if (textArea.isLinkingActive() == false) {
-            return;
-        }
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
         if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
             PTextSegment.class.cast(segment).linkClicked();

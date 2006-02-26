@@ -50,7 +50,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     private boolean editable;
     private boolean wordWrap;
-    private boolean linkingActive;
     
     private PIndenter indenter;
     private PTextAreaSpellingChecker spellingChecker;
@@ -65,7 +64,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.editable = true;
-        this.linkingActive = false;
         this.wordWrap = false;
         this.lines = new PLineList(new PTextBuffer());
         this.selection = new SelectionHighlight(this, 0, 0);
@@ -250,20 +248,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         } finally {
             getLock().relinquishWriteLock();
         }
-    }
-    
-    /** Only for use by classes PKeyHandler and PMouseHandler. */
-    void setLinkingActive(boolean newState) {
-        if (linkingActive != newState) {
-            this.linkingActive = newState;
-            mouseHandler.updateCursorAndToolTip();
-            repaint();
-        }
-    }
-    
-    /** Only for use by class PMouseHandler. */
-    boolean isLinkingActive() {
-        return isFocusOwner() && linkingActive;
     }
     
     /**
@@ -1032,10 +1016,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     private void applyStyle(Graphics2D g, PStyle style) {
         Color color = style.getColor();
-        if (isLinkingActive() == false && style == PStyle.HYPERLINK) {
-            // If a link is inactive, render it differently. Ideally, we'd know what kind of text surrounds us. That way, an inactive link in a comment would be green rather than black.
-            color = PStyle.NORMAL.getColor();
-        }
         applyColor(g, color);
     }
     
