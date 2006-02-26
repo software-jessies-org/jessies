@@ -1,6 +1,23 @@
 #!/usr/bin/ruby -w
 
 # ----------------------------------------------------------------------------
+# Initialize defaults.
+# ----------------------------------------------------------------------------
+target = ""
+
+# ----------------------------------------------------------------------------
+# Parse command line.
+# ----------------------------------------------------------------------------
+if ARGV.length() == 1
+  target = ARGV.shift()
+end
+
+if ARGV.length() != 0
+  $stderr.puts("usage: #$0 <target>")
+  exit(1)
+end
+
+# ----------------------------------------------------------------------------
 # Find Subversion projects.
 # ----------------------------------------------------------------------------
 svn_projects = []
@@ -21,10 +38,25 @@ svn_projects.insert(0, salma_hayek)
 # ----------------------------------------------------------------------------
 # Update and build the Subversion projects.
 # ----------------------------------------------------------------------------
+failed_builds = []
 svn_projects.each() {
   |svn_project|
   svn_project =~ /.*\/([^\/]+)\/$/
   project_name = $1
   print("-- Updating and Building \"#{project_name}\"\n")
-  system("source ~/.bashrc ; cd #{svn_project} ; svn update && make")
+  system("source ~/.bashrc ; cd #{svn_project} ; svn update && make #{target}")
+  if $? != 0
+    failed_builds << project_name
+  end
 }
+
+# ----------------------------------------------------------------------------
+# Output a quick summary of how things went.
+# ----------------------------------------------------------------------------
+puts()
+if failed_builds.length() > 0
+  puts("Failed builds: #{failed_builds.join(' ')}")
+else
+  puts("Everything built OK")
+end
+exit(0)
