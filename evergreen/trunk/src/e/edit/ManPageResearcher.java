@@ -61,7 +61,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         if (link.startsWith("man:")) {
             String page = link.substring(4);
             try {
-                new ShellCommand("man -a " + page + " | col -b").runCommand();
+                new ShellCommand("man -S 2:3 " + page + " | col -b").runCommand();
             } catch (Throwable th) {
                 Edit.getInstance().showAlert("Man Page", "Can't run man(1) (" + th.getMessage() + ").");
             }
