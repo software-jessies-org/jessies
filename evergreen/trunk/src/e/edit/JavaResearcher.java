@@ -56,7 +56,7 @@ public class JavaResearcher implements WorkspaceResearcher {
             }
         }
         
-        initUniqueWords();
+        uniqueWords = extractUniqueWords(uniqueIdentifiers.iterator());
         
         long timeTaken = System.currentTimeMillis() - start;
         Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + timeTaken + "ms.");
@@ -65,14 +65,16 @@ public class JavaResearcher implements WorkspaceResearcher {
     /**
      * Extracts all the unique words from the identifiers in the JDK.
      */
-    private synchronized static void initUniqueWords() {
-        uniqueWords = new TreeSet<String>();
-        for (String identifier : uniqueIdentifiers) {
+    public synchronized static TreeSet<String> extractUniqueWords(Iterator<String> iterator) {
+        TreeSet<String> result = new TreeSet<String>();
+        while (iterator.hasNext()) {
+            String identifier = iterator.next();
             String[] words = identifier.replace('_', ' ').replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase().split(" ");
             for (String word : words) {
-                uniqueWords.add(word);
+                result.add(word);
             }
         }
+        return result;
     }
     
     /**
