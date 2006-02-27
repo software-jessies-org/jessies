@@ -7,25 +7,32 @@ import e.util.*;
 
 public class FileIgnorer {
     /** Extensions of files that shouldn't be indexed. */
-    private String[] ignoredExtensions;
+    private static String[] ignoredExtensions;
     
     /** Names of directories that shouldn't be entered when indexing. */
     private Pattern uninterestingDirectoryNames;
     
     public FileIgnorer(String rootDirectoryPath) {
         File rootDirectory = FileUtilities.fileFromString(rootDirectoryPath);
-        ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
         uninterestingDirectoryNames = Pattern.compile(getUninterestingDirectoryPattern(rootDirectory));
     }
     
     public boolean isIgnored(File file) {
-        if (file.isHidden() || file.getName().startsWith(".") || file.getName().endsWith("~")) {
+        String filename = file.toString();
+        if (file.isHidden() || filename.startsWith(".") || filename.endsWith("~")) {
             return true;
         }
         if (file.isDirectory()) {
             return isIgnoredDirectory(file);
         }
-        return FileUtilities.nameEndsWithOneOf(file, ignoredExtensions);
+        return isIgnoredExtension(filename);
+    }
+    
+    public static boolean isIgnoredExtension(String filename) {
+        if (ignoredExtensions == null) {
+            ignoredExtensions = FileUtilities.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
+        }
+        return FileUtilities.nameEndsWithOneOf(filename, ignoredExtensions);
     }
     
     private static String getUninterestingDirectoryPattern(File rootDirectory) {

@@ -62,14 +62,25 @@ public class EErrorsWindow extends EWindow {
         /**
          * Matches addresses (such as "filename.ext:line:col:line:col").
          * 
-         * We could also insist that there are more than 2 characters,
-         * and that an address can't end in a /. But this seems to work
-         * pretty nicely.
+         * We avoid matching the " or ' before a filename.
+         * We insist that an interesting extension has between 1 and 4 characters, and contains only alphabetic characters.
+         * (There's an additional check later that the extension isn't known to be uninteresting, such as ".o" or ".class".)
          */
-        private static final String ADDRESS_PATTERN = "(?:^| |\")([^ :\"]+(?:Makefile|\\w+\\.\\w+)([\\d:]+)?)";
+        private static final String ADDRESS_PATTERN = "(?:^| |\"|')([^ :\"']+(?:Makefile|\\w+\\.[A-Za-z]{1,4}\\b)([\\d:]+)?)";
         
         public ErrorLinkStyler(PTextArea textArea) {
             super(textArea, ADDRESS_PATTERN, PStyle.HYPERLINK);
+        }
+        
+        @Override
+        public boolean isAcceptableMatch(CharSequence line, Matcher matcher) {
+            String match = matcher.group(1);
+            
+            if (FileIgnorer.isIgnoredExtension(match)) {
+                return false;
+            }
+            
+            return true;
         }
         
         @Override
@@ -98,29 +109,43 @@ public class EErrorsWindow extends EWindow {
                 tail = address.substring(colonIndex);
             }
             
+            if (name.startsWith("/") || name.startsWith("~")) {
+                open(address);
+                return;
+            }
+            
             Matcher matcher = JAVA_STACK_TRACE_PATTERN.matcher(address);
             if (matcher.matches()) {
-                String dottedClassName = matcher.group(1);
-                List<String> candidates = JavaDoc.findSourceFilenames(dottedClassName);
-                if (candidates.size() == 1) {
-                    name = candidates.get(0);
-                }
-                tail = matcher.group(2);
-                if (name != null) {
-                    open(name + tail);
-                }
-            } else if (name.startsWith("/") || name.startsWith("~")) {
-                open(address);
+                handleJavaStackTraceMatch(matcher);
             } else {
-                // Try to resolve the non-canonical name.
-                String currentDirectory = workspace.getRootDirectory();
-                String errors = textArea.getText();
-                matcher = MAKE_ENTERING_DIRECTORY_PATTERN.matcher(errors);
-                while (matcher.find() && matcher.start() < offset) {
-                    currentDirectory = matcher.group(1);
-                }
-                open(currentDirectory + File.separator + name + tail);
+                handleNonCanonicalFilename(name, tail);
             }
+        }
+        
+        private void handleJavaStackTraceMatch(Matcher matcher) {
+            String dottedClassName = matcher.group(1);
+            String colonAddress = matcher.group(2);
+            
+            List<String> candidates = JavaDoc.findSourceFilenames(dottedClassName);
+            if (candidates.size() != 1) {
+                // FIXME: if there's any reason why this should ever occur in real life, we could offer a dialog so the user can disambiguate.
+                Edit.getInstance().showAlert("Errors Window", "The class name \"" + dottedClassName + "\" is ambiguous.");
+                return;
+            }
+            
+            String fullFilename = candidates.get(0);
+            open(fullFilename + colonAddress);
+        }
+        
+        private void handleNonCanonicalFilename(String name, String tail) {
+            // Try to resolve the non-canonical filename by finding the last-known directory.
+            String currentDirectory = workspace.getRootDirectory();
+            String errors = textArea.getText();
+            Matcher matcher = MAKE_ENTERING_DIRECTORY_PATTERN.matcher(errors);
+            while (matcher.find() && matcher.start() < offset) {
+                currentDirectory = matcher.group(1);
+            }
+            open(currentDirectory + File.separator + name + tail);
         }
         
         private void open(String address) {
