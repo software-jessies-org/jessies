@@ -31,11 +31,12 @@ REQUIRED_MAKE_VERSION = 3.81
 REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
 EARLIER_MAKE_VERSION = $(firstword $(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))
 ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
-    $(warning This makefile requires at least version $(REQUIRED_MAKE_VERSION) of GNU make, but you're using $(REAL_MAKE_VERSION))
+    $(warning This makefile assumes at least GNU make $(REQUIRED_MAKE_VERSION), but you're using $(REAL_MAKE_VERSION))
     $(warning 3.81beta4 is good and can be found at ftp://alpha.gnu.org/gnu/make/.)
-    $(warning The normal symptoms are similar to:)
+    $(warning Possible failures include:)
     $(warning make: *** virtual memory exhausted.  Stop.)
     $(warning ../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setsid (with value "! -prune") was referred to in scope setsid.  Stop.)
+    $(warning You may also experience slow builds as make needlessly builds some targets twice.)
 endif
 
 # ----------------------------------------------------------------------------
@@ -70,17 +71,16 @@ TARGET_OS := $(shell $(TARGET_OS_SCRIPT))
 ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     ifeq "$(TARGET_OS)" "Cygwin"
         $(warning The make which comes with Cygwin 1.5.18-1 isn't good enough.)
-        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-15534-cygwin-i686)
+        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-15534-cygwin-i686 instead.)
     endif
     ifeq "$(TARGET_OS)" "Darwin"
-        $(warning The make which comes with Mac OS X 10.4.2 isn't good enough.)
-        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-darwin-ppc)
+        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-darwin-ppc instead.)
     endif
     ifeq "$(TARGET_OS)" "Linux"
         $(warning Debian unstable has a new enough make if you do sudo apt-get install make.)
     endif
     ifeq "$(TARGET_OS)" "Solaris"
-        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta3-solaris-amd64)
+        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta3-solaris-amd64 instead.)
     endif
 # The blank line separates any duplicate warning, which 3.80 seems fond of generating.
     $(warning )
