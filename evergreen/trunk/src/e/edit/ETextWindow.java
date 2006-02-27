@@ -70,6 +70,10 @@ public class ETextWindow extends EWindow implements PTextListener {
         if (language == JAVA) {
             JavaResearcher.addJavaWordsTo(result);
         }
+        // The ManPageResearcher knows all the words used in identifiers that have man pages.
+        if (language == C_PLUS_PLUS) {
+            ManPageResearcher.addManPageWordsTo(result);
+        }
         
         // And there may be a file of extra spelling exceptions for this language.
         String exceptionsFileName = Edit.getInstance().getResourceFilename("spelling-exceptions-" + language);

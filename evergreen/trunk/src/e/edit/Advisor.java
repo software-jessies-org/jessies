@@ -43,7 +43,7 @@ public class Advisor extends JPanel {
         new Thread(new Runnable() {
             public void run() {
                 addResearcher(JavaResearcher.getSharedInstance());
-                addResearcher(new ManPageResearcher());
+                addResearcher(ManPageResearcher.getSharedInstance());
                 addResearcher(new NumberResearcher());
                 addResearcher(new RubyDocumentationResearcher());
             }
