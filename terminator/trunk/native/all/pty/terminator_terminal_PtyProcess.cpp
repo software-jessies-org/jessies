@@ -139,15 +139,21 @@ void terminator_terminal_PtyProcess::destroy() {
 
 void terminator_terminal_PtyProcess::nativeWaitFor() {
     pid_t pid = processId.get();
-    int status;
-    errno = 0;
-    pid_t result = waitpid(pid, &status, 0);
-    std::cout << "waitpid(" << pid << ")" << " result=" << result << " status=" << (void*) status << " errno=" << errno << std::endl;
     
-    if (result < 0) {
+    // Loop until waitpid(2) returns a status or a real error.
+    int status = 0;
+    errno = 0;
+    pid_t result;
+    do {
+        result = waitpid(pid, &status, 0);
+    } while (result == -1 && errno == EINTR);
+    
+    // Did something really go wrong?
+    if (result == -1) {
         throw unix_exception("waitpid(" + toString(pid) + ", &status, 0) failed");
     }
     
+    // Tell our Java peer how the process died.
     if (WIFEXITED(status)) {
         exitValue = WEXITSTATUS(status);
         didExitNormally = true;
