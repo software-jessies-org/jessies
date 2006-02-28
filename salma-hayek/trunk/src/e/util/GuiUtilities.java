@@ -14,6 +14,8 @@ public class GuiUtilities {
     
     private GuiUtilities() { /* Not instantiable. */ }
     
+    private static int defaultKeyStrokeModifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    
     /**
      * An invisible cursor, useful if you want to hide the cursor when the
      * user is typing.
@@ -89,17 +91,26 @@ public class GuiUtilities {
     }
     
     /**
+     * Used to override the system's default keyboard equivalent modifier.
+     * Useful in a terminal emulator on a platform where the default is Control (and probably nowhere else).
+     */
+    public static void setDefaultKeyStrokeModifier(int modifier) {
+        defaultKeyStrokeModifier = modifier;
+    }
+    
+    public static int getDefaultKeyStrokeModifier() {
+        return defaultKeyStrokeModifier;
+    }
+    
+    /**
      * Returns a KeyStroke suitable for passing to putValue(Action.ACCELERATOR_KEY) to
      * set up a keyboard equivalent for an Action.
      */
     public static KeyStroke makeKeyStroke(final String key, final boolean shifted) {
-        return makeKeyStrokeForModifier(Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), key, shifted);
+        return makeKeyStrokeForModifier(defaultKeyStrokeModifier, key, shifted);
     }
     
-    /**
-     * A more general form of makeKeyStroke needed by Terminator on Linux to use Alt instead of Ctrl.
-     */
-    public static KeyStroke makeKeyStrokeForModifier(final int modifier, final String key, final boolean shifted) {
+    private static KeyStroke makeKeyStrokeForModifier(final int modifier, final String key, final boolean shifted) {
         int modifiers = modifier;
         if (shifted) modifiers |= InputEvent.SHIFT_MASK;
         String keycodeName = "VK_" + key;
