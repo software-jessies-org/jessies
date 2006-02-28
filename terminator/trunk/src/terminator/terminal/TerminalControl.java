@@ -176,6 +176,9 @@ public class TerminalControl {
 			ptyProcess.waitFor();
 		} catch (Exception ex) {
 			Log.warn("Problem waiting for process", ex);
+			String exceptionDetails = StringUtilities.stackTraceFromThrowable(ex).replaceAll("\n", "\n\r");
+			announceConnectionLost(exceptionDetails + "[Problem waiting for process.]");
+			return;
 		}
 		Log.warn("waitFor returned on " + ptyProcess);
 		if (ptyProcess.didExitNormally()) {
