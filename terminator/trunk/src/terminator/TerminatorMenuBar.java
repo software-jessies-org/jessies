@@ -96,34 +96,20 @@ public class TerminatorMenuBar extends EMenuBar {
 	}
 	
 	/**
-	 * On the Mac, the Command key (called 'meta' by Java) is always
-	 * used for keyboard equivalents. On other systems, Control tends to
-	 * be used, but in the special case of terminal emulators this
-	 * conflicts with the ability to type control characters. The
-	 * traditional work-around has always been to use Alt, which --
-	 * conveniently for Mac users -- is in the same place on a PC
-	 * keyboard as Command on a Mac keyboard.
-	 */
-	private static final int KEYBOARD_EQUIVALENT_MODIFIER = GuiUtilities.isMacOs() ? KeyEvent.META_MASK : KeyEvent.ALT_MASK;
-	
-	/**
 	 * Tests whether the given event corresponds to a keyboard
 	 * equivalent.
 	 */
 	public static boolean isKeyboardEquivalent(KeyEvent event) {
-		return ((event.getModifiers() & KEYBOARD_EQUIVALENT_MODIFIER) == KEYBOARD_EQUIVALENT_MODIFIER);
+		final int modifier = GuiUtilities.getDefaultKeyStrokeModifier();
+		return ((event.getModifiers() & modifier) == modifier);
 	}
 	
 	private static KeyStroke makeKeyStroke(String key) {
-		return makeShiftedOrUnshiftedKeyStroke(key, false);
+		return GuiUtilities.makeKeyStroke(key, false);
 	}
 	
 	private static KeyStroke makeShiftedKeyStroke(String key) {
-		return makeShiftedOrUnshiftedKeyStroke(key, true);
-	}
-	
-	private static KeyStroke makeShiftedOrUnshiftedKeyStroke(String key, boolean shifted) {
-		return GuiUtilities.makeKeyStrokeForModifier(KEYBOARD_EQUIVALENT_MODIFIER, key, shifted);
+		return GuiUtilities.makeKeyStroke(key, true);
 	}
 	
 	private static Component getFocusedComponent() {
@@ -532,7 +518,7 @@ public class TerminatorMenuBar extends EMenuBar {
 			this.delta = delta;
 			// Sun bug 6350813 prevents the keystroke from being looking right on Mac OS, but it's the same keystroke as Safari even if it doesn't look like it.
 			// On other OSes, use the unshifted keystroke for convenience.
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeShiftedOrUnshiftedKeyStroke(delta < 0 ? "OPEN_BRACKET" : "CLOSE_BRACKET", GuiUtilities.isMacOs()));
+			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke(delta < 0 ? "OPEN_BRACKET" : "CLOSE_BRACKET", GuiUtilities.isMacOs()));
 		}
 		
 		@Override
