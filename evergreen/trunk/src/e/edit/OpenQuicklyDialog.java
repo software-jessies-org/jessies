@@ -103,6 +103,7 @@ public class OpenQuicklyDialog {
             setStatus(true, " ");
             switchToFakeList();
             workspace.updateFileList(this);
+            filenameField.requestFocusInWindow();
         }
         
         /**
@@ -112,7 +113,6 @@ public class OpenQuicklyDialog {
             showMatches();
             matchList.setEnabled(true);
             source.setEnabled(true);
-            filenameField.requestFocusInWindow();
             source = null;
         }
     }
