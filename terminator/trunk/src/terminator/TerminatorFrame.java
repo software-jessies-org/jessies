@@ -99,6 +99,11 @@ public class TerminatorFrame extends JFrame {
 		Terminator.getSharedInstance().getFrames().addFrame(this);
 		addWindowListener(new WindowAdapter() {
 			@Override
+			public void windowOpened(WindowEvent event) {
+				Terminator.getSharedInstance().getFrames().frameStateChanged();
+			}
+			
+			@Override
 			public void windowClosing(WindowEvent event) {
 				handleWindowCloseRequestFromUser();
 			}
