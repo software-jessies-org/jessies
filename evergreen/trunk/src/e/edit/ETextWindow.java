@@ -248,6 +248,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         // We should also probably recognize plain C (since C_PLUS_PLUS in Edit means C/C++/Objective-C/Objective-C++):
         // powerpc-darwin8.0/dl.h:1:/* -*- C -*-
         // FIXME: emacs mode strings should be handled separately, and override content-based file type determination.
+        // FIXME: gEdit's "modelines" plug-in http://cvs.gnome.org/viewcvs/gedit/plugins/modelines/ details emacs(1), kate(1), and vim(1) mode lines.
         return Pattern.compile("(#ifndef|" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ")").matcher(content).find();
     }
     
