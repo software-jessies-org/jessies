@@ -58,7 +58,7 @@ struct Argv : std::vector<char*> {
 
 void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jstring javaWorkingDirectory, jobject descriptor) {
     PtyGenerator ptyGenerator;
-    int masterFd = ptyGenerator.openMaster();
+    fd = ptyGenerator.openMaster();
     
     JavaStringArrayToStringArray arguments(m_env, command);
     Argv argv(arguments);
@@ -73,7 +73,6 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, js
     
     slavePtyName = newStringUtf8(ptyGenerator.getSlavePtyName());
     
-    fd = masterFd;
 #ifdef __CYGWIN__
     (void) descriptor;
 #else
@@ -89,7 +88,7 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, js
      * I didn't want to compromise the Linux or Mac OS X builds for the
      * sake of an experimental Cygwin build.
      */
-    JniField<jint>(m_env, descriptor, "fd", "I") = masterFd;
+    JniField<jint>(m_env, descriptor, "fd", "I") = fd.get();
 #endif
 }
 

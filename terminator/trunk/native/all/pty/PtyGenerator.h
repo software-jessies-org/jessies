@@ -105,8 +105,6 @@ private:
     }
     
     static void runChild(char * const *cmd, const char* workingDirectory, PtyGenerator& ptyGenerator) {
-        closeFileDescriptors();
-        
         if (workingDirectory != 0) {
             if (chdir(workingDirectory) == -1) {
                 throw child_exception(std::string() + "chdir(\"" + workingDirectory + "\")");
@@ -144,9 +142,7 @@ private:
         if (childFd != STDERR_FILENO && dup2(childFd, STDERR_FILENO) != STDERR_FILENO) {
             throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDERR_FILENO)");
         }
-        if (childFd > STDERR_FILENO) {
-            close(childFd);
-        }
+        closeFileDescriptors();
         fixEnvironment();
         
         /*
@@ -217,7 +213,9 @@ private:
         FdList fds;
         for (DirectoryIterator it(fdDirectory); it.isValid(); ++it) {
             int fd = strtoul(it->getName().c_str(), NULL, 10);
-            fds.push_back(fd);
+            if (fd > STDERR_FILENO) {
+                fds.push_back(fd);
+            }
         }
         
         // Pass 2: close the fds.
