@@ -94,8 +94,13 @@ public class InfoDialog {
         dimensions.setText(size.width + " x " + size.height);
         
         PtyProcess ptyProcess = terminal.getControl().getPtyProcess();
-        ptyFilename.setText(ptyProcess.getPtyName());
-        processes.setText(ptyProcess.listProcessesUsingTty());
+        if (ptyProcess != null) {
+            ptyFilename.setText(ptyProcess.getPtyName());
+            processes.setText(ptyProcess.listProcessesUsingTty());
+        } else {
+            ptyFilename.setText("(no pseudo-terminal allocated)");
+            processes.setText("");
+        }
         
         LogWriter logWriter = terminal.getLogWriter();
         logFilename.setText(logWriter.getInfo());
