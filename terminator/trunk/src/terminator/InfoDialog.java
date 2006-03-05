@@ -5,6 +5,7 @@ import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import terminator.terminal.*;
 import terminator.view.*;
 
 public class InfoDialog {
@@ -14,6 +15,7 @@ public class InfoDialog {
     private ETextField dimensions;
     private ETextField processes;
     private ETextField logFilename;
+    private ETextField ptyFilename;
     private JCheckBox suspendLogging;
     private JTerminalPane terminal;
     
@@ -22,6 +24,7 @@ public class InfoDialog {
         this.dimensions = new UneditableField();
         this.processes = new UneditableField();
         this.logFilename = new UneditableField();
+        this.ptyFilename = new UneditableField();
         this.suspendLogging = makeSuspendLoggingCheckBox();
     }
     
@@ -67,26 +70,35 @@ public class InfoDialog {
     }
     
     public void showInfoDialogFor(JTerminalPane terminal) {
-        this.terminal = terminal;
-        
-        title.setText(terminal.getName());
-        Dimension size = terminal.getTextPane().getVisibleSizeInCharacters();
-        dimensions.setText(size.width + " x " + size.height);
-        LogWriter logWriter = terminal.getLogWriter();
-        logFilename.setText(logWriter.getInfo());
-        suspendLogging.setSelected(logWriter.isSuspended());
-        processes.setText(terminal.getControl().getPtyProcess().listProcessesUsingTty());
+        updateFieldValuesFor(terminal);
         
         JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, terminal);
-        
         FormBuilder form = new FormBuilder(frame, "Info");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Title:", title);
         formPanel.addRow("Dimensions:", dimensions);
+        formPanel.addRow("Pseudo-Terminal:", ptyFilename);
         formPanel.addRow("Processes:", processes);
         formPanel.addRow("Log Filename:", logFilename);
         formPanel.addRow("", suspendLogging);
         form.getFormDialog().setRememberBounds(false);
         form.showNonModal();
+    }
+    
+    private void updateFieldValuesFor(JTerminalPane terminal) {
+        this.terminal = terminal;
+        
+        title.setText(terminal.getName());
+        
+        Dimension size = terminal.getTextPane().getVisibleSizeInCharacters();
+        dimensions.setText(size.width + " x " + size.height);
+        
+        PtyProcess ptyProcess = terminal.getControl().getPtyProcess();
+        ptyFilename.setText(ptyProcess.getPtyName());
+        processes.setText(ptyProcess.listProcessesUsingTty());
+        
+        LogWriter logWriter = terminal.getLogWriter();
+        logFilename.setText(logWriter.getInfo());
+        suspendLogging.setSelected(logWriter.isSuspended());
     }
 }
