@@ -72,6 +72,10 @@ public class PtyProcess {
         return exitValue;
     }
     
+    public String getPtyName() {
+        return slavePtyName;
+    }
+    
     public String getSignalDescription() {
         if (wasSignaled() == false) {
             throw new IllegalStateException("Process was not signaled.");
