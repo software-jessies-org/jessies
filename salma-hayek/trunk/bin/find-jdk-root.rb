@@ -38,11 +38,10 @@
 def find_jdk_root()
   require "pathname.rb"
   
-  # Cope with symbolic links to this script.
-  @project_root = Pathname.new("#{$0}/..").realpath().dirname()
-  @salma_hayek = Pathname.new("#{@project_root}/../salma-hayek").realpath()
-  require "#{@salma_hayek}/bin/target-os.rb"
-  require "#{@salma_hayek}/bin/which.rb"
+  # Load helper libraries, coping with symbolic links to this script.
+  bin = Pathname.new(__FILE__).realpath().dirname()
+  require "#{bin}/target-os.rb"
+  require "#{bin}/which.rb"
   
   # On Windows it's likely that the only Java on the user's path is an ancient
   # Microsoft Java in C:\WINNT\SYSTEM32.
