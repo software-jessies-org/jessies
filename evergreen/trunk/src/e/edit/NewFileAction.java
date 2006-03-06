@@ -41,8 +41,8 @@ public class NewFileAction extends ETextAction {
 
     private boolean createNewFile(String filename) {
         Edit edit = Edit.getInstance();
+        File newFile = FileUtilities.fileFromString(filename);
         try {
-            File newFile = FileUtilities.fileFromString(filename);
             if (newFile.isAbsolute() == false) {
                 // A new file, if no absolute path is specified, should be
                 // created relative to the root of the current workspace.
@@ -61,12 +61,12 @@ public class NewFileAction extends ETextAction {
                 edit.getCurrentWorkspace().updateFileList(null);
                 fillWithInitialContents(newFile);
             } else {
-                edit.showAlert(ACTION_NAME, "File '" + filename + "' already exists.");
+                edit.showAlert(ACTION_NAME, "File '" + newFile + "' already exists.");
             }
-            edit.openFile(filename);
+            edit.openFile(newFile.toString());
             return true;
         } catch (IOException ex) {
-            edit.showAlert(ACTION_NAME, "Failed to create file '" + filename + "' (" + ex.getMessage() + ").");
+            edit.showAlert(ACTION_NAME, "Failed to create file '" + newFile + "' (" + ex.getMessage() + ").");
             return false;
         }
     }
