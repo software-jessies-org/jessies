@@ -19,6 +19,8 @@ public class TerminatorFrame extends JFrame {
 	
 	private Timer terminalSizeTimer;
 	
+	private final Color originalBackground = getBackground();
+	
 	public TerminatorFrame(List<JTerminalPane> initialTerminalPanes) {
 		super("Terminator");
 		terminals = new ArrayList<JTerminalPane>(initialTerminalPanes);
@@ -88,9 +90,7 @@ public class TerminatorFrame extends JFrame {
 	
 	private void initFrame() {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // Misnomer: we add our own WindowListener.
-		if (GuiUtilities.isMacOs() == false) {
-			setBackground(Options.getSharedInstance().getColor("background"));
-		}
+		
 		JFrameUtilities.setFrameIcon(this);
 		
 		if (Options.getSharedInstance().shouldUseMenuBar()) {
@@ -128,10 +128,12 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	private void initTerminals() {
-		if (terminals.size() == 1) {
-			initSingleTerminal();
-		} else {
-			initTabbedTerminals();
+		// We always have one terminal...
+		switchToSinglePane();
+		
+		// And sometimes we have more...
+		for (int i = 1; i < terminals.size(); ++i) {
+			addPaneToUI(terminals.get(i));
 		}
 	}
 	
@@ -142,12 +144,6 @@ public class TerminatorFrame extends JFrame {
 		terminals.get(0).requestFocus();
 	}
 	
-	private void initSingleTerminal() {
-		JTerminalPane terminalPane = terminals.get(0);
-		setContentPane(terminalPane);
-		setTitle(terminalPane.getName());
-	}
-	
 	/**
 	 * Switches to a tabbed-pane UI where we can have one tab per terminal.
 	 */
@@ -155,6 +151,8 @@ public class TerminatorFrame extends JFrame {
 		if (tabbedPane != null) {
 			return;
 		}
+		
+		setBackground(originalBackground);
 		
 		JComponent oldContentPane = (JComponent) getContentPane();
 		Dimension initialSize = oldContentPane.getSize();
@@ -200,6 +198,8 @@ public class TerminatorFrame extends JFrame {
 	 * Switches to a simple UI where we can have only one terminal.
 	 */
 	private void switchToSinglePane() {
+		setBackground(Options.getSharedInstance().getColor("background"));
+		
 		JTerminalPane soleSurvivor = terminals.get(0);
 		Dimension initialSize = soleSurvivor.getSize();
 		
@@ -244,14 +244,6 @@ public class TerminatorFrame extends JFrame {
 		size.height += (initialSize.height - finalSize.height);
 		size.width += (initialSize.width - finalSize.width);
 		setSize(size);
-	}
-	
-	private void initTabbedTerminals() {
-		switchToTabbedPane();
-		for (int i = 0; i < terminals.size(); ++i) {
-			JTerminalPane terminalPane = terminals.get(i);
-			addPaneToUI(terminalPane);
-		}
 	}
 	
 	public int getTerminalPaneCount() {
