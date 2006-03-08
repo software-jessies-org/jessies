@@ -29,8 +29,15 @@ public class PMouseHandler implements MouseInputListener {
         }
         handleHyperlinks(e);
         if (e.isConsumed() == false) {
-            dragHandler = getDragHandlerForClick(e);
-            dragHandler.makeInitialSelection(getOffsetAtMouse());
+            int newOffset = getOffsetAtMouse();
+            if (e.isShiftDown()) {
+                // A shift-click extends the selection but doesn't begin a drag.
+                textArea.changeUnanchoredSelectionExtreme(newOffset);
+            } else {
+                // Any other kind of click sets the selection and may begin a drag.
+                dragHandler = getDragHandlerForClick(e);
+                dragHandler.makeInitialSelection(newOffset);
+            }
         }
     }
     
