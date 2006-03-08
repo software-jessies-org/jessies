@@ -56,7 +56,7 @@ struct Argv : std::vector<char*> {
     }
 };
 
-void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jstring javaWorkingDirectory, jobject descriptor) {
+void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jstring javaWorkingDirectory) {
     PtyGenerator ptyGenerator;
     fd = ptyGenerator.openMaster();
     
@@ -72,32 +72,16 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, js
     processId = ptyGenerator.forkAndExec(&argv[0], workingDirectory);
     
     slavePtyName = newStringUtf8(ptyGenerator.getSlavePtyName());
-    
-#ifdef __CYGWIN__
-    (void) descriptor;
-#else
-    /**
-     * This doesn't have the desired effect on Win32,
-     * where a "long handle" field which contains a Win32 native handle
-     * (contrary to one mention of _open_osfhandle in conjunction with
-     * JNI on the interweb).
-     * The Win32-compatible back-ends below should work OK on other
-     * POSIX implementations.
-     * I've been bitten before by not calling read/write in appropriate
-     * EINTR loops or similar.
-     * I didn't want to compromise the Linux or Mac OS X builds for the
-     * sake of an experimental Cygwin build.
-     */
-    JniField<jint>(m_env, descriptor, "fd", "I") = fd.get();
-#endif
 }
 
-// The back-end for a Win32-compatible InputStream.
-// This absolutely needs to be native code on cygwin because cygwin's syscalls implement the pseudo-terminal behavior.
 jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arrayOffset, jint desiredLength) {
     std::vector<jbyte> temporary(desiredLength);
-    ssize_t bytesTransferred = read(fd.get(), &temporary[0], desiredLength);
-    if (bytesTransferred < 0) {
+    ssize_t bytesTransferred;
+    do {
+        bytesTransferred = ::read(fd.get(), &temporary[0], desiredLength);
+    } while (bytesTransferred == -1 && errno == EINTR);
+    
+    if (bytesTransferred == -1) {
         throw unix_exception("read(" + toString(fd.get()) + ", &array[" + toString(arrayOffset) +"], " + toString(desiredLength) + ") failed");
     }
     if (bytesTransferred == 0) {
@@ -107,13 +91,16 @@ jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arr
     return bytesTransferred;
 }
 
-// The back-end for a Win32-compatible OutputStream.
-// This absolutely needs to be native code on cygwin because cygwin's syscalls implement the pseudo-terminal behavior.
-void terminator_terminal_PtyProcess::nativeWrite(jint source) {
-    char temporary = source;
-    ssize_t bytesTransferred = write(fd.get(), &temporary, 1);
+void terminator_terminal_PtyProcess::nativeWrite(jbyteArray bytes, jint arrayOffset, jint byteCount) {
+    std::vector<jbyte> buffer(byteCount);
+    m_env->GetByteArrayRegion(bytes, arrayOffset, byteCount, &buffer[0]);
+    ssize_t bytesTransferred;
+    do {
+        bytesTransferred = ::write(fd.get(), &buffer[0], byteCount);
+    } while (bytesTransferred == -1 && errno == EINTR);
+    
     if (bytesTransferred <= 0) {
-        throw unix_exception("write(" + toString(fd.get()) + ", &array[0], 1) failed");
+        throw unix_exception("write(" + toString(fd.get()) + ", &buffer[0], " + toString(byteCount) + ") failed");
     }
 }
 

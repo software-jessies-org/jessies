@@ -9,12 +9,15 @@ import java.util.concurrent.*;
 
 public class PtyProcess {
     private class PtyInputStream extends InputStream {
-        // InputStream compels us to implement the single byte version.
+        /**
+         * Although we don't want to invoke this method, it's abstract in InputStream, so we have to implement it.
+         */
         @Override
         public int read() throws IOException {
             byte[] b = new byte[1];
             return read(b, 0, 1);
         }
+        
         /**
          * If we don't implement this variant, the default implementation
          * won't return to TerminalControl until INPUT_BUFFER_SIZE bytes
@@ -29,8 +32,14 @@ public class PtyProcess {
     
     private class PtyOutputStream extends OutputStream {
         @Override
-        public void write(int source) throws IOException {
-            nativeWrite(source);
+        public void write(int b) throws IOException {
+            byte[] bytes = new byte[] { (byte) b };
+            nativeWrite(bytes, 0, 1);
+        }
+        
+        @Override
+        public void write(byte[] bytes, int arrayOffset, int byteCount) throws IOException {
+            nativeWrite(bytes, arrayOffset, byteCount);
         }
     }
     
@@ -96,18 +105,12 @@ public class PtyProcess {
     
     public PtyProcess(String[] command, String workingDirectory) throws Exception {
         ensureLibraryLoaded();
-        FileDescriptor descriptor = new FileDescriptor();
-        startProcess(command, workingDirectory, descriptor);
+        startProcess(command, workingDirectory);
         if (processId == -1) {
             throw new IOException("Could not start process \"" + command + "\".");
         }
-        if (descriptor.valid()) {
-            inStream = new FileInputStream(descriptor);
-            outStream = new FileOutputStream(descriptor);
-        } else {
-            inStream = new PtyInputStream();
-            outStream = new PtyOutputStream();
-        }
+        inStream = new PtyInputStream();
+        outStream = new PtyOutputStream();
     }
     
     public InputStream getInputStream() {
@@ -122,11 +125,11 @@ public class PtyProcess {
         return processId;
     }
     
-    private void startProcess(final String[] command, final String workingDirectory, final FileDescriptor descriptor) throws Exception {
+    private void startProcess(final String[] command, final String workingDirectory) throws Exception {
         invoke(new Callable<Exception>() {
             public Exception call() {
                 try {
-                    nativeStartProcess(command, workingDirectory, descriptor);
+                    nativeStartProcess(command, workingDirectory);
                     return null;
                 } catch (Exception ex) {
                     return ex;
@@ -175,12 +178,12 @@ public class PtyProcess {
         return "PtyProcess[processId=" + processId + ",fd=" + fd + ",pty=\"" + slavePtyName + "\",didDumpCore=" + didDumpCore + ",didExitNormally=" + didExitNormally + ",wasSignaled=" + wasSignaled + ",exitValue=" + exitValue + "]";
     }
     
-    private native void nativeStartProcess(String[] command, String workingDirectory, FileDescriptor descriptor) throws IOException;
+    private native void nativeStartProcess(String[] command, String workingDirectory) throws IOException;
     private native void nativeWaitFor() throws IOException;
     public native void destroy() throws IOException;
     
     private native int nativeRead(byte[] destination, int arrayOffset, int desiredLength) throws IOException;
-    private native void nativeWrite(int source) throws IOException;
+    private native void nativeWrite(byte[] bytes, int arrayOffset, int byteCount) throws IOException;
     
     public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
     
