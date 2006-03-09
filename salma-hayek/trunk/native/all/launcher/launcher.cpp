@@ -20,6 +20,8 @@
 #include <unistd.h>
 #include <vector>
 
+static std::string DESIRED_JVM_VERSION = "1.5";
+
 struct UsageError : std::runtime_error {
   UsageError(const std::string& description)
   : std::runtime_error(description) {
@@ -40,7 +42,7 @@ public:
   static std::string readFile(const std::string& path) {
     std::ifstream is(path.c_str());
     if (is.good() == false) {
-      throw UsageError("couldn't open \"" + path + "\"");
+      throw UsageError("Couldn't open \"" + path + "\".");
     }
     std::ostringstream contents;
     contents << is.rdbuf();
@@ -62,7 +64,7 @@ public:
     std::vector<std::string> versions;
     for (DirectoryIterator it(jreRegistryPath); it.isValid(); ++ it) {
       std::string version = it->getName();
-      if (version.empty() || version < "1.5" || version >= "1.6") {
+      if (version.empty() || version < DESIRED_JVM_VERSION) {
         // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
         // "CurrentVersion" didn't get updated when I installed JDK-1.5.0_06 (or the two prior versions by the look of it)..
         continue;
@@ -71,7 +73,7 @@ public:
     }
     std::sort(versions.begin(), versions.end());
     if (versions.empty()) {
-      throw UsageError("no JRE installed");
+      throw UsageError("No suitable JRE installed.");
     }
     std::string version = versions.back();
     std::string jvmRegistryPath = std::string(jreRegistryPath) + "/" + version + "/RuntimeLib";
@@ -81,13 +83,13 @@ public:
   std::string findJvmLibraryUsingJdkRegistry() const {
     // This key may point to the latest or most recently installed update.
     // It does seem to change when newer updates are installed.
-    std::string javaHome = readRegistryFile("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.5/JavaHome");
+    std::string javaHome = readRegistryFile("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/" + DESIRED_JVM_VERSION + "/JavaHome");
     return javaHome + "/jre/bin/client/jvm.dll";
   }
   
   std::string findWin32JvmLibrary() const {
     std::ostringstream os;
-    os << "Couldn't find jvm.dll - please install a 1.5 JRE or JDK.";
+    os << "Couldn't find jvm.dll - please install a " << DESIRED_JVM_VERSION << " JRE or JDK.";
     os << std::endl;
     os << "Error messages were:";
     os << std::endl;
@@ -143,7 +145,7 @@ private:
     void* sharedLibraryHandle = dlopen(sharedLibraryFilename, RTLD_LAZY);
     if (sharedLibraryHandle == 0) {
       std::ostringstream os;
-      os << "dlopen(\"" << sharedLibraryFilename << "\") failed with " << dlerror();
+      os << "dlopen(\"" << sharedLibraryFilename << "\") failed with " << dlerror() << ".";
       throw UsageError(os.str());
     }
     // Work around:
@@ -151,7 +153,7 @@ private:
     CreateJavaVM createJavaVM = reinterpret_cast<CreateJavaVM> (reinterpret_cast<long> (dlsym(sharedLibraryHandle, "JNI_CreateJavaVM")));
     if (createJavaVM == 0) {
       std::ostringstream os;
-      os << "dlsym(\"" << sharedLibraryFilename << "\", JNI_CreateJavaVM) failed with " << dlerror();
+      os << "dlsym(\"" << sharedLibraryFilename << "\", JNI_CreateJavaVM) failed with " << dlerror() << ".";
       throw UsageError(os.str());
     }
     return createJavaVM;
@@ -161,7 +163,7 @@ private:
     jclass javaClass = env->FindClass(className.c_str());
     if (javaClass == 0) {
       std::ostringstream os;
-      os << "FindClass(\"" << className << "\") failed";
+      os << "FindClass(\"" << className << "\") failed.";
       throw UsageError(os.str());
     }
     return javaClass;
@@ -170,7 +172,7 @@ private:
   jmethodID findMainMethod(jclass mainClass) {
     jmethodID method = env->GetStaticMethodID(mainClass, "main", "([Ljava/lang/String;)V");
     if (method == 0) {
-      throw UsageError("GetStaticMethodID(\"main\") failed");
+      throw UsageError("GetStaticMethodID(\"main\") failed.");
     }
     return method;
   }
@@ -179,7 +181,7 @@ private:
     jstring javaString = env->NewStringUTF(nativeString);
     if (javaString == 0) {
       std::ostringstream os;
-      os << "NewStringUTF(\"" << nativeString << "\") failed";
+      os << "NewStringUTF(\"" << nativeString << "\") failed.";
       throw UsageError(os.str());
     }
     return javaString;
@@ -191,7 +193,7 @@ private:
     jobjectArray javaArguments = env->NewObjectArray(nativeArguments.size(), jstringClass, defaultArgument);
     if (javaArguments == 0) {
       std::ostringstream os;
-      os << "NewObjectArray(" << nativeArguments.size() << ") failed";
+      os << "NewObjectArray(" << nativeArguments.size() << ") failed.";
       throw UsageError(os.str());
     }
     for (size_t index = 0; index != nativeArguments.size(); ++ index) {
@@ -222,7 +224,7 @@ public:
     int result = createJavaVM(&vm, reinterpret_cast<void**>(&env), &javaVMInitArgs);
     if (result < 0) {
       std::ostringstream os;
-      os << "JNI_CreateJavaVM(" << javaVMOptions.size() << " options) failed with " << result;
+      os << "JNI_CreateJavaVM(" << javaVMOptions.size() << " options) failed with " << result << ".";
       throw UsageError(os.str());
     }
   }
@@ -278,7 +280,7 @@ public:
       ++ it;
     }
     if (it == end) {
-      throw UsageError("no class specified");
+      throw UsageError("No class specified.");
     }
     className = *it;
     ++ it;
@@ -316,12 +318,13 @@ int main(int, char** argv) {
     javaInvocation.invokeMain(parser.getClassName(), parser.getMainArguments());
   } catch (const UsageError& usageError) {
     std::ostringstream os;
-    os << usageError.what() << std::endl;
-    os << "Usage: " << programName << " -options class [args...]" << std::endl;
-    os << "where options are Java Virtual Machine options or:" << std::endl;
-    os << "  -client";
+    os << "Error: " << usageError.what() << std::endl;
     os << std::endl;
-    os << "  -server ... to select a JVM";
+    os << "Usage: " << programName << " [options] class [args...]" << std::endl;
+    os << "where options are " << DESIRED_JVM_VERSION << " Java Virtual Machine options or:" << std::endl;
+    // FIXME: what exactly do we mean by "Java Virtual Machine" options if we then have to mention "-client" and "-server", both of which are listed as options by java(1)?
+    os << "  -client" << std::endl;
+    os << "  -server ... to select a JVM" << std::endl;
     os << std::endl;
     os << "Command line was:";
     os << std::endl;
