@@ -32,7 +32,6 @@ REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
 EARLIER_MAKE_VERSION = $(firstword $(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))
 ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     $(warning This makefile assumes at least GNU make $(REQUIRED_MAKE_VERSION), but you're using $(REAL_MAKE_VERSION))
-    $(warning You may experience slow builds as make needlessly builds some targets twice.)
     $(warning )
     $(warning If you don't have build errors, you can ignore these warnings.)
     $(warning If you do have build errors, they are probably not make-related.)
