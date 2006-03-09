@@ -32,11 +32,13 @@ REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
 EARLIER_MAKE_VERSION = $(firstword $(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))
 ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     $(warning This makefile assumes at least GNU make $(REQUIRED_MAKE_VERSION), but you're using $(REAL_MAKE_VERSION))
-    $(warning 3.81beta4 is good and can be found at ftp://alpha.gnu.org/gnu/make/.)
-    $(warning Possible failures include:)
+    $(warning You may experience slow builds as make needlessly builds some targets twice.)
+    $(warning )
+    $(warning If you don't have build errors, you can ignore these warnings.)
+    $(warning If you do have build errors, they are probably not make-related.)
+    $(warning Exceptions include errors like:)
     $(warning make: *** virtual memory exhausted.  Stop.)
     $(warning ../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setsid (with value "! -prune") was referred to in scope setsid.  Stop.)
-    $(warning You may also experience slow builds as make needlessly builds some targets twice.)
 endif
 
 # ----------------------------------------------------------------------------
@@ -77,7 +79,9 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
         $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-darwin-ppc instead.)
     endif
     ifeq "$(TARGET_OS)" "Linux"
-        $(warning Debian unstable has a new enough make if you do sudo apt-get install make.)
+        $(warning Debian testing/unstable has a new enough make if you do sudo apt-get install make.)
+        $(warning Ubunutu "Dapper Drake" has a new enough make.)
+        $(warning If you need to build from source, go to ftp://alpha.gnu.org/gnu/make/.)
     endif
     ifeq "$(TARGET_OS)" "Solaris"
         $(warning Try http://software.jessies.org/3rdParty/make-3.81beta3-solaris-amd64 instead.)
