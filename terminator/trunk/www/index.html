@@ -89,7 +89,7 @@ now surpassed Terminal in several areas.
 
 <p>For Mac OS 10.4, there's <a href="terminator.dmg">terminator.dmg</a> which contains an application that you can simply drag and drop to install.
 
-<p>For Win32, there's <a href="terminator-Cygwin.msi">a Win32 installer</a> which requires that you've already installed Cygwin, including Ruby, yourself but is otherwise complete. (As of 2006-01-01, this build isn't automatically updated. That should be fixed shortly.)
+<p>For Win32, there's <a href="terminator-Cygwin.msi">a Win32 installer</a> which requires that you've already installed Cygwin, including Ruby, yourself but is otherwise complete and leaves you with a Terminator icon on your desktop. (As of 2006-01-01, this build isn't automatically updated. That should be fixed shortly.)
 
 <p>Otherwise, see <a href="#building-from-source">Building from source</a> on this page.
 
@@ -235,7 +235,7 @@ The makefile will tell you what to do when you try to build with an old version.
 
 <p>On Cygwin, the launcher will find an appropriate jvm.dll using the Registry.  It should use the most sensible version of the JDK you have installed or the most sensible version of the JRE if there's no JDK installed.
 
-<p>To build the Windows installer, you need Microsoft's open source Windows installer compiler, <a href="http://sourceforge.net/projects/wix/">WiX</a>, installed, currently in /tmp/wix until a maintainer thinks of a better way to locate it.
+<p>To build the Windows installer, you need Microsoft's open source Windows installer compiler, <a href="http://sourceforge.net/projects/wix/">WiX</a>, installed and on your path.
 
 <p>If you see this error when building terminator for Cygwin:
 <pre>
