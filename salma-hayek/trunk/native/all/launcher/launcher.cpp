@@ -321,10 +321,12 @@ int main(int, char** argv) {
     os << "Error: " << usageError.what() << std::endl;
     os << std::endl;
     os << "Usage: " << programName << " [options] class [args...]" << std::endl;
-    os << "where options are " << DESIRED_JVM_VERSION << " Java Virtual Machine options or:" << std::endl;
-    // FIXME: what exactly do we mean by "Java Virtual Machine" options if we then have to mention "-client" and "-server", both of which are listed as options by java(1)?
-    os << "  -client" << std::endl;
-    os << "  -server ... to select a JVM" << std::endl;
+    os << "where options are:" << std::endl;
+    os << "  -client - use client VM" << std::endl;
+    os << "  -server - use server VM" << std::endl;
+    os << "  -D<name>=<value> - set a system property" << std::endl;
+    os << "  -verbose[:class|gc|jni] - enable verbose output" << std::endl;
+    os << "or JVM " << DESIRED_JVM_VERSION << " -X options." << std::endl;
     os << std::endl;
     os << "Command line was:";
     os << std::endl;
