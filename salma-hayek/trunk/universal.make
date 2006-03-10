@@ -205,6 +205,7 @@ CPPFLAGS += $(foreach DIRECTORY,$(EXTRA_INCLUDE_PATH),-I$(DIRECTORY))
 CPPFLAGS.Linux += -D_XOPEN_SOURCE=600
 CPPFLAGS += $(CPPFLAGS.$(TARGET_OS))
 
+C_AND_CXX_FLAGS += $(C_AND_CXX_FLAGS.$(TARGET_OS))
 CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
 
@@ -289,6 +290,15 @@ endif
 JNI_LIBRARY_LDFLAGS += $(JNI_LIBRARY_LDFLAGS.$(TARGET_OS))
 JNI_LIBRARY_PREFIX = $(JNI_LIBRARY_PREFIX.$(TARGET_OS))
 JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
+
+# ----------------------------------------------------------------------------
+# Extra flags to always build Universal Binaries on Mac OS.
+# http://developer.apple.com/documentation/Porting/Conceptual/PortingUnix/compiling/chapter_4_section_3.html
+# ----------------------------------------------------------------------------
+
+universal_binary_flags := -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
+C_AND_CXX_FLAGS.Darwin += $(universal_binary_flags)
+LDFLAGS.Darwin += $(universal_binary_flags)
 
 # ----------------------------------------------------------------------------
 # Work out what native code, if any, we need to build.
