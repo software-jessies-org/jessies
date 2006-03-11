@@ -58,6 +58,10 @@ public class FormPanel extends JPanel {
         componentConstraints.gridwidth = GridBagConstraints.REMAINDER;
         componentConstraints.insets = new Insets(componentSpacing, componentSpacing, 0, componentSpacing);
         componentConstraints.weightx = 1.0;
+        if (component instanceof JCheckBox) {
+            // FIXME: we should have a better mechanism for component-specific spacing.
+            componentConstraints.insets.top = 4;
+        }
         if (component instanceof JScrollPane) {
             /*
              * A scrollable component in a form can likely make use
