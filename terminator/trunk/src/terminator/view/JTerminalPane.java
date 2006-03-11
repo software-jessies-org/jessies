@@ -118,17 +118,16 @@ public class JTerminalPane extends JPanel {
 		EPopupMenu popupMenu = new EPopupMenu(textPane);
 		popupMenu.addMenuItemProvider(new TerminatorMenuItemProvider());
 		
-		JComponent view = new BorderPanel(textPane);
-		
 		viewport = new VisualBellViewport();
 		viewport.setBackground(textPane.getBackground());
-		viewport.setView(view);
+		viewport.setView(textPane);
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setBorder(null);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setViewport(viewport);
+		scrollPane.setViewportBorder(new javax.swing.border.LineBorder(Options.getSharedInstance().getColor("background"), Options.getSharedInstance().getInternalBorder()));
 		
 		add(scrollPane, BorderLayout.CENTER);
 		GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());

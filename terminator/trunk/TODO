@@ -266,6 +266,7 @@ RFEs
   does: "Where Terminal gets it wrong, though, is that it blocks input to the
   terminal while it's asking me to confirm.  Canceling the shutdown so
   that I can hit ^:wq and then starting the shutdown again is a pain".
+  The extended AWT modality API in Java 6 should let us address this.
 
 * car: what's the point of showing me the log filename in
   the Info dialog?  I've needed to find out the log filename twice so far
@@ -322,8 +323,8 @@ Tab-related
   by calling setOpaque(true) in JTerminalPane's constructor. (It looks as if
   the problem is that ComponentUI.update fills a component with the background
   color, and our JPanel's background color -- thanks to Mac OS' JTabbedPane --
-  has to be the SystemColor for a panel. We could possibly work around this
-  for the single-terminal case, but the only real solution is going to be
+  has to be the SystemColor for a panel. We work around this
+  for the single-terminal case, but the real solution is going to be
   writing our own JTabbedPane UI delegate that's more like Safari's, and
   doesn't rely on transparency.)
 
