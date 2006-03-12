@@ -55,6 +55,7 @@ public class FormDialog {
     private JButton extraButton;
     
     private JDialog dialog;
+    private Frame owner;
     
     private boolean doNotRememberBounds = false;
     
@@ -91,9 +92,20 @@ public class FormDialog {
         return wasAccepted;
     }
 
-    FormDialog(Frame owner, String title, FormPanel formPanel) {
-        this.dialog = new JDialog(owner, title);
+    FormDialog(Frame ownerFrame, String title, FormPanel formPanel) {
+        // We keep the original owner so the user can pass null to center a dialog and/or state that they don't have a specific parent...
+        this.owner = ownerFrame;
+        // ...but a null parent on Mac OS would cause the menu bar to disappear.
+        if (GuiUtilities.isMacOs() && owner == null) {
+            Frame[] frames = Frame.getFrames();
+            if (frames.length > 0) {
+                ownerFrame = frames[0];
+            }
+        }
+        
+        this.dialog = new JDialog(ownerFrame, title);
         this.formPanel = formPanel;
+        
         initAlwaysOnTopMonitoring();
     }
     
@@ -103,6 +115,10 @@ public class FormDialog {
     // this doesn't appear to apply to owned dialogs. I'm not sure if this is
     // a documentation bug or an implementation bug.
     private void initAlwaysOnTopMonitoring() {
+        if (owner == null) {
+            return;
+        }
+        
         copyOwnerAlwaysOnTopState();
         dialog.getOwner().addPropertyChangeListener("alwaysOnTop", new PropertyChangeListener() {
             // One of the Java tutorial's example PropertyChangeListeners says
@@ -115,7 +131,7 @@ public class FormDialog {
     }
     
     private void copyOwnerAlwaysOnTopState() {
-        dialog.setAlwaysOnTop(dialog.getOwner().isAlwaysOnTop());
+        dialog.setAlwaysOnTop(owner.isAlwaysOnTop());
     }
     
     private void configureDialog() {
@@ -138,7 +154,7 @@ public class FormDialog {
         
         // Set sensible defaults for size and location.
         dialog.pack();
-        dialog.setLocationRelativeTo(dialog.getOwner());
+        dialog.setLocationRelativeTo(owner);
         
         // But if we've shown this dialog before, put it back where it last was.
         restorePreviousSize();
