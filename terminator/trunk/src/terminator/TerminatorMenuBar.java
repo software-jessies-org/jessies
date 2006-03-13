@@ -258,13 +258,7 @@ public class TerminatorMenuBar extends EMenuBar {
 	private static JTerminalPane runCommand() {
 		JTextField commandField = new JTextField(40);
 		
-		JFrame parent = getFocusedTerminatorFrame();
-		if (GuiUtilities.isMacOs() && parent == null) {
-			// A null parent on Mac OS would cause the menu bar to disappear.
-			// FIXME: the form should probably appear centered on the display.
-			parent = Terminator.getSharedInstance().getFrames().getFrame();
-		}
-		FormBuilder form = new FormBuilder(parent, "Run Command");
+		FormBuilder form = new FormBuilder(getFocusedTerminatorFrame(), "Run Command");
 		FormPanel formPanel = form.getFormPanel();
 		formPanel.addRow("Command:", commandField);
 		form.getFormDialog().setRememberBounds(false);
