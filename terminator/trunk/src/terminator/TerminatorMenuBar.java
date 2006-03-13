@@ -45,12 +45,6 @@ public class TerminatorMenuBar extends EMenuBar {
 		menu.add(new ShowInfoAction());
 		menu.add(new ResetAction());
 		
-		/*
-		if (GuiUtilities.isMacOs() == false) {
-			menu.addSeparator();
-			menu.add(new ExitAction());
-		}
-		*/
 		return menu;
 	}
 	
@@ -65,6 +59,11 @@ public class TerminatorMenuBar extends EMenuBar {
 		menu.add(new FindNextAction());
 		menu.add(new FindPreviousAction());
 		
+		if (GuiUtilities.isMacOs() == false) {
+			menu.addSeparator();
+			menu.add(new PreferencesAction());
+		}
+
 		return menu;
 	}
 	
@@ -518,6 +517,17 @@ public class TerminatorMenuBar extends EMenuBar {
 		@Override
 		protected void performFrameAction(TerminatorFrame frame) {
 			frame.cycleTab(delta);
+		}
+	}
+
+	public static class PreferencesAction extends AbstractAction {
+		public PreferencesAction() {
+			super("Preferences...");
+			GnomeStockIcon.useStockIcon(this, "gtk-preferences");
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			Options.getSharedInstance().showPreferencesDialog();
 		}
 	}
 }
