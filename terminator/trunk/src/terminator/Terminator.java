@@ -154,14 +154,13 @@ public class Terminator {
 		return result;
 	}
 
-	public void showUsage(PrintWriter out) {
-		out.println("Usage: terminator [--help | --version] [-xrm <resource-string>]... [[-n <name>] [--working-directory <directory>] [<command>]]...");
-		out.println();
-		out.println("Current resource settings:");
-		Options.getSharedInstance().showOptions(out);
-		out.println();
-		out.println("Terminator will read your .Xdefaults and .Xresources files, and use");
-		out.println("resources of class Rxvt, Terminator or XTerm.");
+	private static void showUsage(Appendable out) throws IOException {
+		out.append("Usage: terminator [--help | --version] [-xrm <resource-string>]... [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
+		out.append("\n");
+		out.append("Current resource settings:\n");
+		Options.getSharedInstance().showOptions(out, true);
+		out.append("\n");
+		out.append("Terminator will read your .Xdefaults and .Xresources files, and use resources of class Rxvt, Terminator or XTerm.\n");
 	}
 	
 	public static void main(final String[] arguments) {

@@ -33,6 +33,8 @@ import javax.swing.*;
 public class Options {
 	private static final Options INSTANCE = new Options();
 	
+	private static final String TERMINATOR_SETTINGS_FILENAME = ".terminator-settings";
+	
 	private static final String ANTI_ALIAS = "antiAlias";
 	private static final String BLOCK_CURSOR = "blockCursor";
 	private static final String CURSOR_BLINK = "cursorBlink";
@@ -50,24 +52,38 @@ public class Options {
 	
 	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt|Terminator)(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
+	// Mutable at any time.
 	private HashMap<String, Object> options = new HashMap<String, Object>();
+	// Immutable after initialization.
+	private HashMap<String, Object> defaults = new HashMap<String, Object>();
 	private HashMap<String, String> descriptions = new HashMap<String, String>();
+	
 	private HashMap<String, Color> rgbColors = null;
 	
 	public static Options getSharedInstance() {
 		return INSTANCE;
 	}
 	
-	public void showOptions(PrintWriter out) {
+	public void showOptions(Appendable out, boolean showEvenIfDefault) throws IOException {
 		String[] keys = options.keySet().toArray(new String[options.size()]);
 		Arrays.sort(keys);
 		for (String key : keys) {
+			Object value = options.get(key);
+			
+			if (value.equals(defaults.get(key))) {
+				continue;
+			}
+			
 			String description = descriptions.get(key);
 			if (description != null) {
-				out.println("\n# " + description);
+				out.append("\n# " + description + "\n");
 			}
-			// FIXME: values are no longer all strings, so we need to do some translation to forms we accept as input.
-			out.println("Terminator*" + key + ": " + options.get(key));
+			if (value instanceof Color) {
+				value = String.format("#%06x", Color.class.cast(value).getRGB() & 0xffffff);
+			} else if (value instanceof Font) {
+				value = Font.class.cast(value).getFamily();
+			}
+			out.append("Terminator*" + key + ": " + value + "\n");
 		}
 	}
 	
@@ -218,7 +234,7 @@ public class Options {
 		readOptionsFrom(".Xdefaults");
 		readOptionsFrom(".Xresources");
 		readAppleTerminalOptions();
-		// FIXME: read options from our own private stash, which we can safely rewrite.
+		readOptionsFrom(TERMINATOR_SETTINGS_FILENAME);
 		aliasColorBD();
 	}
 	
@@ -257,6 +273,7 @@ public class Options {
 	}
 	
 	private void addDefault(String name, Object value, String description) {
+		defaults.put(name, value);
 		options.put(name, value);
 		descriptions.put(name, description);
 	}
@@ -278,7 +295,7 @@ public class Options {
 		addDefault(FONT_SIZE, Integer.valueOf(12), "Font size (points)");
 		addDefault(INITIAL_COLUMN_COUNT, Integer.valueOf(80), "New terminal width");
 		addDefault(INITIAL_ROW_COUNT, Integer.valueOf(24), "New terminal height");
-		addDefault(INTERNAL_BORDER, Integer.valueOf(2), "Terminal border width");
+		addDefault(INTERNAL_BORDER, Integer.valueOf(2), "Border (pixels)");
 		addDefault(LOGIN_SHELL, Boolean.TRUE, "Start child process with a '-l' argument?");
 		addDefault(SCROLL_KEY, Boolean.TRUE, "Scroll to bottom on key press?");
 		addDefault(SCROLL_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output?");
@@ -286,6 +303,7 @@ public class Options {
 		if (GuiUtilities.isMacOs() || GuiUtilities.isWindows() || GuiUtilities.isGtk()) {
 			// GNOME, Mac, and Win32 users are accustomed to every window having a menu bar.
 			options.put(USE_MENU_BAR, Boolean.TRUE);
+			defaults.put(USE_MENU_BAR, Boolean.TRUE);
 		} else {
 			// FIXME: I'm still psyching myself up for the inevitable battle of removing this option.
 			addDefault(USE_MENU_BAR, Boolean.TRUE, "Use a menu bar?");
@@ -293,7 +311,6 @@ public class Options {
 	}
 	
 	public void showPreferencesDialog() {
-		// FIXME: the info dialog keeps the Terminator menu bar; is that because we give it an owner?
 		FormBuilder form = new FormBuilder(null, "Preferences");
 		FormPanel formPanel = form.getFormPanel();
 		
@@ -320,8 +337,20 @@ public class Options {
 			}
 		}
 		
+		form.getFormDialog().setAcceptRunnable(new Runnable() {
+			public void run() {
+				PrintWriter out = null;
+				try {
+					out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(getHomeFile(TERMINATOR_SETTINGS_FILENAME)), "UTF-8"));
+					showOptions(out, false);
+				} catch (IOException ex) {
+					SimpleDialog.showDetails(null, "Couldn't save preferences.", ex);
+				} finally {
+					FileUtilities.close(out);
+				}
+			}
+		});
 		form.showNonModal();
-		// FIXME: write options to our own private stash.
 	}
 	
 	private class BooleanPreferenceAction extends AbstractAction {
@@ -520,8 +549,12 @@ public class Options {
 		return Integer.parseInt(line.substring(offset, offset + 3).trim());
 	}
 	
+	private File getHomeFile(String filename) {
+		return new File(System.getProperty("user.home"), filename);
+	}
+	
 	private void readOptionsFrom(String filename) {
-		File file = new File(System.getProperty("user.home"), filename);
+		File file = getHomeFile(filename);
 		if (file.exists() == false) {
 			return;
 		}
