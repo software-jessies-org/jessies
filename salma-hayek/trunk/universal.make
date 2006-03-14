@@ -223,7 +223,7 @@ COMPILE.mm = $(COMPILE.cpp) $(OBJC_AND_OBJCXX_FLAGS)
 # being evaluated by the call to copyLocalVariable at the end of the next scope.
 define defineObjectsPerLanguage
   OBJECTS.$(1) = $(patsubst $(SOURCE_DIRECTORY)/%.$(1),$(COMPILATION_DIRECTORY)/%.$(OBJECT_EXTENSION.$(1)),$(filter %.$(1),$(SOURCES)))
-  # The Perl script needs help if we're going to have variable variable names.
+  # The Ruby script needs help if we're going to have variable variable names.
   LOCAL_VARIABLES += OBJECTS.$(1)
 endef
 
@@ -585,7 +585,7 @@ echo.%:
 # Rules for making makefiles.
 # ----------------------------------------------------------------------------
 
-# The $$1 here is a Perl variable, not a make one.
+# The $$1 here is a Ruby variable, not a make one.
 .generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
 	@mkdir -p $(@D) && \
 	ruby -w -ne '($$_.match(/^\s*(\S+)\s*[:+]?=/) || $$_.match(/^\s*define\s*(\S+)/)) && puts("LOCAL_VARIABLES += #{$$1}")' $< | sort -u > $@
