@@ -588,7 +588,7 @@ echo.%:
 # The $$1 here is a Perl variable, not a make one.
 .generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
 	@mkdir -p $(@D) && \
-	perl -w -ne '(m/^\s*(\S+)\s*[:+]?=/ || m/^\s*define\s*(\S+)/) && print("LOCAL_VARIABLES += $$1\n")' $< | sort -u > $@
+	ruby -w -ne '($$_.match(/^\s*(\S+)\s*[:+]?=/) || $$_.match(/^\s*define\s*(\S+)/)) && puts("LOCAL_VARIABLES += #{$$1}")' $< | sort -u > $@
 
 # Several of the rules include $(MAKEFILE_LIST) in their prerequisites.
 # All of the .o files, for example, depend on the makefiles.

@@ -200,7 +200,7 @@ $(WIX_COMPONENT_DEFINITIONS): $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
 
 # This silliness is probably sufficient (as well as sadly necessary).
 $(WIX_COMPONENT_REFERENCES): $(WIX_COMPONENT_DEFINITIONS) $(MAKEFILE_LIST)
-	perl -ne 'm/Include/ && print; m/<Component (Id='\''component\d+'\'')/ && print("<ComponentRef $$1 />\n")' < $< > $@
+	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@
 
 $(WIX_OBJECTS): $(WIX_COMPONENT_REFERENCES) $(WIX_COMPONENT_DEFINITIONS)
 
