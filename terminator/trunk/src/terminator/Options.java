@@ -561,7 +561,7 @@ public class Options {
 		try {
 			readOptionsFrom(file);
 		} catch (Exception ex) {
-			Log.warn("Problem reading options from " + filename, ex);
+			Log.warn("Problem reading options from \"" + filename + "\"", ex);
 		}
 	}
 	
