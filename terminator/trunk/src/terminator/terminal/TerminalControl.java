@@ -93,7 +93,7 @@ public class TerminalControl {
 			return;
 		}
 		
-		thread = new Thread(new TerminalRunnable(), "Terminal connection listener");
+		thread = new Thread(new TerminalRunnable(), "Process " + ptyProcess.getProcessId() + "(" + ptyProcess.getPtyName() + ") Listener");
 		thread.start();
 	}
 	
