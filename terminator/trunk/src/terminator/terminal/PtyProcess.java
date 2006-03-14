@@ -168,7 +168,7 @@ public class PtyProcess {
         try {
             return nativeListProcessesUsingTty();
         } catch (IOException ex) {
-            Log.warn("listProcessesUsingTty failed.", ex);
+            Log.warn("listProcessesUsingTty failed on " + toString() + ".", ex);
             return "";
         }
     }

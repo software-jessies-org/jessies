@@ -78,7 +78,7 @@ public class TerminalControl {
 				ptyProcess.destroy();
 				processHasBeenDestroyed = true;
 			} catch (IOException ex) {
-				Log.warn("Failed to destroy process", ex);
+				Log.warn("Failed to destroy process " + ptyProcess, ex);
 			}
 		}
 	}
@@ -106,12 +106,12 @@ public class TerminalControl {
 					try {
 						processBuffer(buffer, readCount);
 					} catch (Throwable th) {
-						Log.warn("Problem processing child output", th);
+						Log.warn("Problem processing output from " + ptyProcess, th);
 					}
 				}
-				Log.warn("Read returned " + readCount);
+				Log.warn("Read returned " + readCount + " from " + ptyProcess);
 			} catch (Throwable th) {
-				Log.warn("Problem reading child output", th);
+				Log.warn("Problem reading output from " + ptyProcess, th);
 			} finally {
 				handleProcessTermination();
 			}
@@ -175,7 +175,7 @@ public class TerminalControl {
 		try {
 			ptyProcess.waitFor();
 		} catch (Exception ex) {
-			Log.warn("Problem waiting for process", ex);
+			Log.warn("Problem waiting for " + ptyProcess, ex);
 			String exceptionDetails = StringUtilities.stackTraceFromThrowable(ex).replaceAll("\n", "\n\r");
 			announceConnectionLost(exceptionDetails + "[Problem waiting for process.]");
 			return;
@@ -246,7 +246,7 @@ public class TerminalControl {
 				}
 			});
 		} catch (Exception ex) {
-			Log.warn("Couldn't flush terminal actions", ex);
+			Log.warn("Couldn't flush terminal actions for " + ptyProcess, ex);
 		}
 	}
 	
@@ -505,7 +505,7 @@ public class TerminalControl {
 	}
 	
 	private void reportFailedSend(String kind, String value, Exception ex) {
-		Log.warn("Couldn't send " + kind + " \"" + StringUtilities.escapeForJava(value) + "\"", ex);
+		Log.warn("Couldn't send " + kind + " \"" + StringUtilities.escapeForJava(value) + "\" to " + ptyProcess, ex);
 	}
 	
 	public LogWriter getLogWriter() {

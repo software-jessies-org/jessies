@@ -174,8 +174,10 @@ public class JTerminalPane extends JPanel {
 					try {
 						control.sizeChanged(size, textPane.getVisibleSize());
 						getTerminatorFrame().setTerminalSize(size);
-					} catch (IOException ex) {
-						Log.warn("Failed to notify process of size change", ex);
+					} catch (Exception ex) {
+						if (control != null) {
+							Log.warn("Failed to notify " + control.getPtyProcess() + " of size change", ex);
+						}
 					}
 					currentSizeInChars = size;
 				}
