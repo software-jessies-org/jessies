@@ -23,6 +23,7 @@ public class DebugMenu {
         menu.addSeparator();
         menu.add(new ListFramesAction());
         menu.add(new ListTimersAction());
+        // FIXME: an action to turn on debugging of hung AWT exits. All frames or just the parent frame? Just the parent is probably the more obvious (given that new frames could be created afterwards).
         return menu;
     }
     
