@@ -1,16 +1,17 @@
 package terminator.view;
 
+import e.gui.*;
 import java.awt.event.*;
 import javax.swing.*;
 import terminator.*;
 
 public class CursorBlinker implements ActionListener {
-	private Timer timer;
+	private RepeatingComponentTimer timer;
 	private JTextBuffer text;
 	
 	public CursorBlinker(JTextBuffer text) {
 		this.text = text;
-		this.timer = new Timer(500, this);
+		this.timer = new RepeatingComponentTimer(text, 500, this);
 	}
 	
 	public void start() {

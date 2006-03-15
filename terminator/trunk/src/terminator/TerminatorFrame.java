@@ -29,7 +29,6 @@ public class TerminatorFrame extends JFrame {
 		for (JTerminalPane terminal : terminals) {
 			terminal.start();
 		}
-		e.debug.HungAwtExit.explain(this);
 	}
 	
 	/**
