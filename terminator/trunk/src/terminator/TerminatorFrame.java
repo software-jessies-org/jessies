@@ -301,7 +301,14 @@ public class TerminatorFrame extends JFrame {
 			// component on the tab.
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					tabbedPane.getSelectedComponent().requestFocus();
+					if (tabbedPane == null) {
+						return;
+					}
+					Component terminal = tabbedPane.getSelectedComponent();
+					if (terminal == null) {
+						return;
+					}
+					terminal.requestFocus();
 				}
 			});
 		}
