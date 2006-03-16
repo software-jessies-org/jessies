@@ -69,8 +69,11 @@ public class FormPanel extends JPanel {
              */
             componentConstraints.weighty = 1.0;
         }
-        componentConstraints.anchor = GridBagConstraints.CENTER;
-        componentConstraints.fill = GridBagConstraints.BOTH;
+        componentConstraints.anchor = GridBagConstraints.LINE_START;
+        if (component instanceof JButton == false) {
+            // Buttons shouldn't be stretched, but everything else may as well use all available space?
+            componentConstraints.fill = GridBagConstraints.BOTH;
+        }
         add(component, componentConstraints);
 
         nextRow++;
