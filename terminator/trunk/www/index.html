@@ -160,31 +160,6 @@ java.awt.datatransfer.UnsupportedFlavorException: Unicode String
 </pre>
 <p>This is caused by a bug in old versions of the X11 VNC server. On Debian, you should remove the <tt>vncserver</tt> package and install the <tt>vnc4server</tt> package, and run <tt>vnc4server</tt> (it takes the same arguments as <tt>vncserver</tt>)&nbsp;&mdash; just upgrading your existing <tt>vncserver</tt> package will not help. Switching package will also a fix a bunch of other problems you may or may not have noticed with VNC.
 
-<h3>X11-style resources</h3>
-
-<p>Terminator will look in <tt>~/.Xdefaults</tt> and <tt>~/.Xresources</tt> (in
-that order, with the last-read setting overriding any earlier settings) for X11
-resources of class <tt>XTerm</tt>, <tt>Rxvt</tt>, or <tt>Terminator</tt>. This
-means that by default it will pick up the other programs' settings, but you can
-have different settings for Terminator if you wish.
-
-<p>Use <tt>terminator --help</tt> to see all the options, their explanations,
-and their values.
-
-<p>Terminator should use the same colors you usually see in <tt>xterm(1)</tt>
-or <tt>rxvt(1)</tt>. In order to resolve color names to RGB values, Terminator
-will read the file <tt>/usr/X11R6/lib/X11/rgb.txt</tt> if it exists. Without
-this file, Terminator only understands colors in the form #rrggbb.
-
-<p>If you don't have any colors configured, Terminator will use built-in
-defaults similar to SGI's <tt>xwsh(1)</tt>.
-
-<p>Terminator uses the same names for fonts as Java. This is why we use
-different resources from XTerm to specify a font, and won't even try to
-translate X11's so-called "logical font descriptions". Set
-<tt>Terminator*fontName</tt> to a font name understood by Java, and use
-<tt>Terminator*fontSize</tt> to choose the font's point size.
-
 <h3>Running on Windows</h3>
 
 <p>If you're having trouble starting terminator, you may want to try running it from bash
