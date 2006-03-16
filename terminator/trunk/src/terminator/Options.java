@@ -62,7 +62,7 @@ public class Options {
 		for (String key : keys) {
 			Object value = options.get(key);
 			
-			if (value.equals(defaults.get(key))) {
+			if (value.equals(defaults.get(key)) && showEvenIfDefault == false) {
 				continue;
 			}
 			
