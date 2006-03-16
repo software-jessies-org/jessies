@@ -16,19 +16,11 @@ import javax.swing.*;
  * available.
  * 
  * There's a grand tradition amongst Unix terminal emulators of pretending
- * to be xterm, and we aren't any different. We go one step further by
- * pretending to be an X11 application and reading .Xdefaults and .Xresources.
- * Strictly, most X11 applications won't do this, but rxvt does, rather than
- * using the bloated library routines.
- * 
- * We don't pass .Xdefaults and .Xresources through m4, as X11 does, but I've
- * not seen that used since people had monochrome as well as color displays and
- * needed different settings on each. We do understand X11's idiosyncratic
- * comment style, and that should be enough for most resource files seen in
- * the real world.
+ * to be XTerm, but that didn't work out well for us, because we're too
+ * different.
  * 
  * All settings should have a default, so that users can use "--help" to see
- * every available option.
+ * every available option, and edit them in the preferences dialog.
  */
 public class Options {
 	private static final Options INSTANCE = new Options();
@@ -50,7 +42,7 @@ public class Options {
 	private static final String SCROLL_TTY_OUTPUT = "scrollTtyOutput";
 	private static final String USE_MENU_BAR = "useMenuBar";
 	
-	private final Pattern resourcePattern = Pattern.compile("(?:(?:XTerm|Rxvt|Terminator)(?:\\*|\\.))?(\\S+):\\s*(.+)");
+	private final Pattern resourcePattern = Pattern.compile("(?:Terminator(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
 	// Mutable at any time.
 	private HashMap<String, Object> options = new HashMap<String, Object>();
@@ -79,12 +71,16 @@ public class Options {
 				out.append("\n# " + description + "\n");
 			}
 			if (value instanceof Color) {
-				value = String.format("#%06x", Color.class.cast(value).getRGB() & 0xffffff);
+				value = colorToString((Color) value);
 			} else if (value instanceof Font) {
 				value = Font.class.cast(value).getFamily();
 			}
 			out.append("Terminator*" + key + ": " + value + "\n");
 		}
+	}
+	
+	private static String colorToString(Color color) {
+		return String.format("#%06x", color.getRGB() & 0xffffff);
 	}
 	
 	/**
@@ -231,27 +227,8 @@ public class Options {
 	private Options() {
 		initDefaults();
 		initDefaultColors();
-		readOptionsFrom(".Xdefaults");
-		readOptionsFrom(".Xresources");
-		readAppleTerminalOptions();
 		readOptionsFrom(TERMINATOR_SETTINGS_FILENAME);
 		aliasColorBD();
-	}
-	
-	private void readAppleTerminalOptions() {
-		// FIXME: read Mac OS Terminal.app settings if running on Mac OS.
-		// We can't parse the XML ourselves because Apple switched to binary plists in 10.4.
-		// `defaults read com.apple.Terminal NSFixedPitchFont` == "Monaco\n"
-		// Obvious:
-		//   NSFixedPitchFont (Monaco)
-		//   NSFixedPitchFontSize (12)
-		//   FontAntialiasing (NO)
-		//   Columns (80)
-		//   BlinkCursor (YES)
-		//   CursorShape (1="underline"; we don't support vertical bar, so anything else should be "block")
-		// Less obvious:
-		//   ShellExitAction (1)
-		//   TextColors (0.905 0.905 0.905 0.000 0.000 0.270 1.000 1.000 1.000 1.000 1.000 1.000 0.000 0.000 0.270 0.905 0.905 0.905 0.111 0.167 1.000 0.333 1.000 0.333)
 	}
 	
 	/**
@@ -316,6 +293,7 @@ public class Options {
 		
 		String[] keys = options.keySet().toArray(new String[options.size()]);
 		Arrays.sort(keys);
+		ArrayList<ColorPreference> colorPreferences = new ArrayList<ColorPreference>();
 		for (String key : keys) {
 			String description = descriptions.get(key);
 			if (description != null) {
@@ -327,14 +305,22 @@ public class Options {
 				} else if (value instanceof Font) {
 					formPanel.addRow(description + ":", new FontPreferenceAction(key).makeUi());
 				} else if (value instanceof Color) {
-					// Ignore colors.
-					// FIXME: there are some colors we should probably handle; the ones with names.
+					if (description.startsWith("Color ")) {
+						// Ignore the numbered colors. No-one should be modifying those.
+					} else {
+						colorPreferences.add(new ColorPreference(description, key));
+					}
 				} else {
 					// FIXME: we should probably handle String.
-					// FIXME: the Final Solution should use a HashMap<Class, ActionAndUi>.
+					// FIXME: the Final Solution should use a HashMap<Class, XPreference>.
+					// FIXME: the preference classes should be based on a base class extracted from ColorPreference, rather than the older Action scheme.
 					continue;
 				}
 			}
+		}
+		
+		for (ColorPreference colorPreference : colorPreferences) {
+			formPanel.addRow(colorPreference.getDescription() + ":", colorPreference.makeUi());
 		}
 		
 		form.getFormDialog().setAcceptRunnable(new Runnable() {
@@ -399,6 +385,37 @@ public class Options {
 			comboBox.addActionListener(this);
 			// FIXME: add a custom renderer so you can see the fonts.
 			return comboBox;
+		}
+	}
+	
+	private class ColorPreference {
+		private String description;
+		private String key;
+		
+		public ColorPreference(String description, String key) {
+			this.description = description;
+			this.key = key;
+		}
+		
+		public String getDescription() {
+			return description;
+		}
+		
+		public JComponent makeUi() {
+			final ColorSwatchIcon icon = new ColorSwatchIcon(getColor(key), new Dimension(60, 20));
+			final JButton button = new JButton(icon);
+			button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Color newColor = JColorChooser.showDialog(button, "Colors", getColor(key));
+					if (newColor != null) {
+						options.put(key, newColor);
+						icon.setColor(newColor);
+						Terminator.getSharedInstance().repaintUi();
+					}
+				}
+			});
+			button.putClientProperty("JButton.buttonType", "toolbar");
+			return button;
 		}
 	}
 	
@@ -472,7 +489,6 @@ public class Options {
 		addDefault("colorBD", colorFromString("#ffffff"), "Bold color"); // white
 		addDefault("cursorColor", colorFromString("#00ff00"), "Cursor color"); // green
 		addDefault("foreground", colorFromString("#e7e7e7"), "Foreground"); // off-white
-		addDefault("linkColor", colorFromString("#00ffff"), "Link color"); // cyan
 		addDefault("selectionColor", colorFromString("#1c2bff"), "Selection color"); // light blue
 	}
 	
@@ -583,9 +599,7 @@ public class Options {
 			String value = matcher.group(2);
 			Object currentValue = options.get(key);
 			if (currentValue == null) {
-				// Silently ignore resources we don't recognize.
-				// FIXME: we should probably distinguish between XTerm or RXvt resources (where this is expected) and Terminator resources, where this shouldn't happen.
-				return;
+				throw new RuntimeException("Attempt to set unknown resource \"" + key + "\"");
 			}
 			Class currentClass = currentValue.getClass();
 			if (currentClass == Boolean.class) {
@@ -597,7 +611,7 @@ public class Options {
 			} else if (currentClass == Color.class) {
 				options.put(key, colorFromString(value));
 			} else {
-				throw new RuntimeException("Resource '" + key + "' had default value " + currentValue + " of class " + currentClass);
+				throw new RuntimeException("Resource \"" + key + "\" had default value " + currentValue + " of class " + currentClass);
 			}
 		}
 	}
