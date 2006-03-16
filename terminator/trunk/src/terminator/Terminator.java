@@ -160,7 +160,7 @@ public class Terminator {
 		out.append("Current resource settings:\n");
 		Options.getSharedInstance().showOptions(out, true);
 		out.append("\n");
-		out.append("Terminator will read your .Xdefaults and .Xresources files, and use resources of class Rxvt, Terminator or XTerm.\n");
+		out.append("Terminator only uses resources of class Terminator and only from the command line, not from your .Xdefaults and .Xresources files.\n");
 	}
 	
 	public static void main(final String[] arguments) {
