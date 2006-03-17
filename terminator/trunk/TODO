@@ -210,11 +210,6 @@ Performance
   you've done the clipping yourself. [This seems mainly to be a problem for
   VNC users, not real people.]
 
-* Rewrite the hyper-link code to be less eager. [It's already rewritten to be
-  less eager in the sense that I meant when I wrote this, but I wonder if the
-  user shouldn't have to explicitly ask us to look for possible links? That
-  might also give us scope for offering various selection-related actions.]
-
 RFEs
 ----
 
@@ -244,9 +239,6 @@ RFEs
 * car: "edit-style marking of the matches, notches next to the slider?
   In voluminous output, indication of clustering of matches could be
   helpful to me."
-
-* car: on Mac OS, at least, open(1) is perhaps a better idea than $EDITOR.
-  "start" on Win32?
 
 * There are some interesting features and bugs mentioned on the Konsole
   ChangeLog page: http://konsole.kde.org/changelog.php
