@@ -414,6 +414,10 @@ public class Options {
 					}
 				}
 			});
+			// Remove the over-wide horizontal margins most LAFs use. They're trying to give text some breathing room, but we have no text.
+			Insets margin = button.getMargin();
+			margin.left = margin.right = margin.top = margin.bottom;
+			button.setMargin(margin);
 			button.putClientProperty("JButton.buttonType", "toolbar");
 			return button;
 		}
