@@ -155,7 +155,7 @@ public class Terminator {
 	}
 
 	private static void showUsage(Appendable out) throws IOException {
-		out.append("Usage: terminator [--help | --version] [-xrm <resource-string>]... [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
+		out.append("Usage: terminator [--help] [-xrm <resource-string>]... [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
 		out.append("\n");
 		out.append("Current resource settings:\n");
 		Options.getSharedInstance().showOptions(out, true);
