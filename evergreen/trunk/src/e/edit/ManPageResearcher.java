@@ -60,7 +60,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         Log.warn("Learned of " + knownManPages.size() + " man pages in " + duration + "ms.");
     }
     
-    public synchronized static void addManPageWordsTo(Set<String> set) {
+    public void addManPageWordsTo(Set<String> set) {
         set.addAll(uniqueWords);
     }
     

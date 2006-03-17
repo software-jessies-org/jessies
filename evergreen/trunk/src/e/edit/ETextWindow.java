@@ -72,7 +72,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         // The ManPageResearcher knows all the words used in identifiers that have man pages.
         if (language == C_PLUS_PLUS) {
-            ManPageResearcher.addManPageWordsTo(result);
+            ManPageResearcher.getSharedInstance().addManPageWordsTo(result);
         }
         
         // And there may be a file of extra spelling exceptions for this language.
