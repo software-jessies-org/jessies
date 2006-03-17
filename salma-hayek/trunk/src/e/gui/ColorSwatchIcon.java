@@ -28,6 +28,6 @@ public final class ColorSwatchIcon extends DrawnIcon {
         g.setColor(color);
         g.fillRect(x, y, getIconWidth(), getIconHeight());
         g.setColor(borderColor);
-        g.drawRect(x, y, getIconWidth(), getIconHeight());
+        g.drawRect(x, y, getIconWidth() - 1, getIconHeight() - 1);
     }
 }
