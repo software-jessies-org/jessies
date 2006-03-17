@@ -40,7 +40,7 @@ public class TerminalControl {
 	private JTerminalPane pane;
 	private TextBuffer listener;
 	private PtyProcess ptyProcess;
-	private boolean processIsRunning = true;
+	private boolean processIsRunning;
 	private boolean processHasBeenDestroyed = false;
 	private InputStreamReader in;
 	private OutputStream out;
@@ -68,6 +68,7 @@ public class TerminalControl {
 	public void initProcess(String[] command, String workingDirectory) throws Throwable {
 		this.logWriter = new LogWriter(command);
 		this.ptyProcess = new PtyProcess(command, workingDirectory);
+		this.processIsRunning = true;
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), "UTF-8");
 		this.out = ptyProcess.getOutputStream();
 	}
@@ -93,6 +94,11 @@ public class TerminalControl {
 			return;
 		}
 		
+		if (ptyProcess == null) {
+			// If the PtyProcess couldn't start, there's no point carrying on.
+			return;
+		}
+
 		thread = new Thread(new TerminalRunnable(), "Process " + ptyProcess.getProcessId() + "(" + ptyProcess.getPtyName() + ") Listener");
 		thread.start();
 	}
