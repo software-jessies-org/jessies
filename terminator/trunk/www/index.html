@@ -26,6 +26,10 @@ Terminal.app on Mac OS X and PuTTY on MS&nbsp;Windows.</strong>
 <li><p><strong>Automatic Logging</strong> - Complete logs are automatically generated of all your
 terminal sessions.
 
+<li><p><strong>Drag &amp; Drop</strong> - Text and URLs, and even files from
+Finder/Nautilus/Windows Explorer can be dropped on Terminator to be inserted
+as text, with automatic quoting of filenames containing shell metacharacters.
+
 <li><p><strong>Find</strong> - Terminator provides you with a find function so you can
 search for text and regular expressions within your terminal (including the scrollback),
 highlighting them all, in the style of <tt>less(1)</tt>, and offering quick movement to the
@@ -36,13 +40,9 @@ output in a great stream of output, this is a really great way to make it blindi
 when it appears.
 <p>A screenshot of Terminator on Mac OS X, after running 'man bash', and doing a find for
 '(?i)shell':
-<p align="center" ><img src="mac-os-man-bash-find.png" alt="mac-os-man-bash-find.png">
+<p align="center" ><img src="mac-os-man-bash-find.png" alt="The Find dialog on Mac OS">
 <p>Despite the evidence that a pager is running, this is Terminator doing the
 highlighting&nbsp;&mdash; one of the authors uses <tt>cat(1)</tt> as his pager.
-
-<li><p><strong>Drop Target</strong> - Text and URLs, and even files from
-Finder/Nautilus/Windows Explorer can be dropped on Terminator to be inserted
-as text, with automatic quoting of filenames containing shell metacharacters.
 
 <li><p><strong>Freedom</strong> - Terminator is released under the GPL.
 
@@ -54,10 +54,8 @@ reflowing of text when you change the window size, and we decided we preferred t
 we don't have the resources to support two implementations, so reflowing isn't an option; it's
 gone from the code.)
 
-<li><p><strong>Safe Quit</strong> - Terminator knows when you still have processes running, and brings up a dialog rather than just letting those processes die.
-<p align="center"><img src="linux-top.png" alt="linux-top.png">
-
 <li><p><strong>Multiple Tabs</strong> - Like tabbed browsing, only with terminals.
+<p align="center" ><img src="win32-tabs.png" alt="Multiple tabs on Win32">
 
 <li><p><strong>Number Reinterpretation</strong> - Terminator will recognize numbers
 in a variety of bases as the current selection, and add informational menu items to the
@@ -72,13 +70,16 @@ tab characters into strings of spaces, which is very annoying if you then try to
 a section of text from your terminal into a text editor.  Terminator handles tabs properly,
 remembering where the tabs are and copy/pasting them as tab characters.
 
+<li><p><strong>Safe Quit</strong> - Terminator knows when you still have processes running, and brings up a dialog rather than just letting those processes die.
+<p align="center"><img src="linux-top.png" alt="top(1) running on Linux">
+
 <li><p><strong>UTF-8</strong> - Terminator won't mangle your favorite accented characters, and it copes well with languages such as Greek where there's a mix of normal and wide glyphs:
-<p align="center"><img src="mac-os-greek.png" alt="mac-os-greek.png">
+<p align="center"><img src="mac-os-greek.png" alt="Greek on Mac OS">
 <p>The text is Markus Kuhn's <a href="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-demo.txt">UTF-8-demo.txt</a> if you want to see what a mess Terminal.app makes of it. (Terminal.app beats us on Thai, but we're better at Cyrillic, Greek, and Japanese.) The non-default settings in the screenshot were achieved thus:
 <blockquote><tt>terminator -xrm fontName:Monaco -xrm fontSize:13 -xrm antiAlias:true -xrm foreground:black -xrm background:white -xrm selectionColor:\#b4d5fe</tt></blockquote>
 <p>One side-effect of proper support for variable-width glyphs is that you're not restricted to fixed-width fonts in Terminator, even if the only language you're using is English. GNU readline might get confused about the line length, though.
 <p>Here's a more convincingly terminal-like example of fixed-width English and variable-width Japanese; output from javac(1):
-<p align="center"><img src="javac-jp-monaco.png" alt="javac-jp-monaco.png">
+<p align="center"><img src="javac-jp-monaco.png" alt="Japanese javac(1) output on Mac OS">
 </ul>
 
 <p>We think Terminator is the clear choice for the discerning terminal user. Though originally written
