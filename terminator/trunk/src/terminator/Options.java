@@ -299,11 +299,11 @@ public class Options {
 			if (description != null) {
 				Object value = options.get(key);
 				if (value instanceof Boolean) {
-					formPanel.addRow("", new BooleanPreferenceAction(key).makeUi());
+					formPanel.addRow("", new BooleanPreference(key).makeUi());
 				} else if (value instanceof Integer) {
-					formPanel.addRow(description + ":", new IntegerPreferenceAction(key).makeUi());
+					formPanel.addRow(description + ":", new IntegerPreference(key).makeUi());
 				} else if (value instanceof Font) {
-					formPanel.addRow(description + ":", new FontPreferenceAction(key).makeUi());
+					formPanel.addRow(description + ":", new FontPreference(key).makeUi());
 				} else if (value instanceof Color) {
 					if (description.startsWith("Color ")) {
 						// Ignore the numbered colors. No-one should be modifying those.
@@ -339,50 +339,46 @@ public class Options {
 		form.showNonModal();
 	}
 	
-	private class BooleanPreferenceAction extends AbstractAction {
+	private class BooleanPreference {
 		private String key;
 		
-		public BooleanPreferenceAction(String key) {
+		public BooleanPreference(String key) {
 			this.key = key;
-			putValue(NAME, descriptions.get(key));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox checkBox = JCheckBox.class.cast(e.getSource());
-			options.put(key, checkBox.isSelected());
-			Terminator.getSharedInstance().repaintUi();
 		}
 		
 		public JComponent makeUi() {
-			JCheckBox checkBox = new JCheckBox(this);
-			checkBox.setSelected(Boolean.class.cast(options.get(key)).booleanValue());
+			final JCheckBox checkBox = new JCheckBox(descriptions.get(key), (Boolean) options.get(key));
+			checkBox.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					options.put(key, checkBox.isSelected());
+					Terminator.getSharedInstance().repaintUi();
+				}
+			});
 			return checkBox;
 		}
 	}
 	
-	private class FontPreferenceAction extends AbstractAction {
+	private class FontPreference {
 		private String key;
 		
-		public FontPreferenceAction(String key) {
+		public FontPreference(String key) {
 			this.key = key;
-			putValue(NAME, descriptions.get(key));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			JComboBox comboBox = JComboBox.class.cast(e.getSource());
-			options.put(key, makePrototypeFont(comboBox.getSelectedItem().toString()));
-			Terminator.getSharedInstance().repaintUi();
 		}
 		
 		public JComponent makeUi() {
-			JComboBox comboBox = new JComboBox();
+			final JComboBox comboBox = new JComboBox();
 			// FIXME: filter out unsuitable fonts. "Zapf Dingbats", for example.
 			// FIXME: pull fixed fonts to the top of the list?
 			for (String name : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
 				comboBox.addItem(name);
 			}
 			comboBox.setSelectedItem(Font.class.cast(options.get(key)).getFamily());
-			comboBox.addActionListener(this);
+			comboBox.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					options.put(key, makePrototypeFont(comboBox.getSelectedItem().toString()));
+					Terminator.getSharedInstance().repaintUi();
+				}
+			});
 			// FIXME: add a custom renderer so you can see the fonts.
 			return comboBox;
 		}
@@ -423,36 +419,29 @@ public class Options {
 		}
 	}
 	
-	private class IntegerPreferenceAction extends AbstractAction {
+	private class IntegerPreference {
 		private String key;
 		
-		public IntegerPreferenceAction(String key) {
+		public IntegerPreference(String key) {
 			this.key = key;
-			putValue(NAME, descriptions.get(key));
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			JTextField textField = JTextField.class.cast(e.getSource());
-			boolean okay = false;
-			try {
-				String text = textField.getText();
-				int newValue = Integer.parseInt(text);
-				// FIXME: really, an integer preference should have an explicit range.
-				if (newValue > 0) {
-					options.put(key, newValue);
-					Terminator.getSharedInstance().repaintUi();
-					okay = true;
-				}
-			} catch (NumberFormatException ex) {
-			}
-			textField.setForeground(okay ? UIManager.getColor("TextField.foreground") : Color.RED);
 		}
 		
 		public JComponent makeUi() {
 			final ETextField textField = new ETextField(options.get(key).toString()) {
 				@Override
 				public void textChanged() {
-					actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+					boolean okay = false;
+					try {
+						int newValue = Integer.parseInt(getText());
+						// FIXME: really, an integer preference should have an explicit range.
+						if (newValue > 0) {
+							options.put(key, newValue);
+							Terminator.getSharedInstance().repaintUi();
+							okay = true;
+						}
+					} catch (NumberFormatException ex) {
+					}
+					setForeground(okay ? UIManager.getColor("TextField.foreground") : Color.RED);
 				}
 			};
 			return textField;
