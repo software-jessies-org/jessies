@@ -372,15 +372,34 @@ public class Options {
 			for (String name : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
 				comboBox.addItem(name);
 			}
-			comboBox.setSelectedItem(Font.class.cast(options.get(key)).getFamily());
+			Font currentFont = (Font) options.get(key);
+			comboBox.setSelectedItem(currentFont.getFamily());
+			updateComboBoxFont(comboBox);
 			comboBox.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					options.put(key, makePrototypeFont(comboBox.getSelectedItem().toString()));
+					updateComboBoxFont(comboBox);
 					Terminator.getSharedInstance().repaintUi();
 				}
 			});
-			// FIXME: add a custom renderer so you can see the fonts.
+			// updateComboBoxFont sets the combo box font so that when you choose a font you can see a preview.
+			// The alternatives in the pop-up menu, though, should either use their own fonts (which has a habit of causing performance problems) or the default combo box pop-up font. This renderer ensures the latter.
+			comboBox.setRenderer(new DefaultListCellRenderer() {
+				@Override
+				public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+					Component result = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+					if (index != -1) {
+						result.setFont(UIManager.getFont("List.font"));
+					}
+					return result;
+				}
+			});
 			return comboBox;
+		}
+		
+		private void updateComboBoxFont(JComboBox comboBox) {
+			Font prototypeFont = (Font) options.get(key);
+			comboBox.setFont(prototypeFont.deriveFont(comboBox.getFont().getSize2D()));
 		}
 	}
 	
