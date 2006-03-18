@@ -729,7 +729,7 @@ public class Edit {
     }
     
     private void init() {
-        long start = System.currentTimeMillis();
+        final long startTimeMillis = System.currentTimeMillis();
         
         initMacOs();
         initAboutBox();
@@ -767,10 +767,20 @@ public class Edit {
         
         openRememberedWorkspaces();
         
+        frame.setVisible(true);
+        Log.warn("Frame visible after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
+        
+        splitPane.setDividerLocation(0.8);
+        splitPane.setResizeWeight(0.8);
+        
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 openRememberedFiles();
                 initializing = false;
+                
+                Log.warn("All remembered files opened after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
+                
+                startScanningWorkspaces();
                 
                 // If we didn't create any workspaces, give the user some help...
                 if (tabbedPane.getTabCount() == 0) {
@@ -778,15 +788,6 @@ public class Edit {
                 }
             }
         });
-        
-        frame.setVisible(true);
-        splitPane.setDividerLocation(0.8);
-        splitPane.setResizeWeight(0.8);
-        
-        long end = System.currentTimeMillis();
-        Log.warn("Ready to use after " + (end - start) + " ms!");
-        
-        startScanningWorkspaces();
     }
 
     private void startScanningWorkspaces() {
