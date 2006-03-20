@@ -165,13 +165,13 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
      * Stores the time at which we started processing the current event.
      */
     private synchronized void preDispatchEvent() {
-        if (eventDispatchThread == null) {
-            // I don't know of any API for getting the event dispatch thread,
-            // but we can assume that it's the current thread if we're in the
-            // middle of dispatching an AWT event...
-            eventDispatchThread = Thread.currentThread();
-        }
-        
+        // I don't know of any API for getting the event dispatch thread,
+        // but we can assume that it's the current thread if we're in the
+        // middle of dispatching an AWT event...
+        // Alexander Potochkin points out that we can't cache this because
+        // the EDT can die and be replaced by a new EDT if there's an uncaught
+        // exception.
+        eventDispatchThread = Thread.currentThread();
         reportedHang = false;
         startedLastEventDispatchAt = System.currentTimeMillis();
     }
