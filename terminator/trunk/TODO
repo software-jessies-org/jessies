@@ -268,6 +268,17 @@ RFEs
   but we could work better if you set TERM=xterm.  When we go through the
   terminfo, we should abandon rxvt compatibility and switch to xterm.
 
+* Try socat and write up the experience for the benefit of the users
+  who've wanted to use Terminator with directly attached serial devices.
+
+* Write a front-end for lrzsz which turns its frame-by-frame progress reports
+  into something as concise and useful as HyperTerminal's.
+  Our bring-up guys want to know if new hardware is dropping
+  packets, how long the transfer's going to take and whether the transfer rate is
+  what it should be.
+  Graphing transfers and errors against time should give them more useful
+  information than they get from HyperTerminal (without drowning them).
+
 Tab-related
 -----------
 
