@@ -165,11 +165,14 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
      */
     @Override
     protected void dispatchEvent(AWTEvent event) {
-        preDispatchEvent();
-        super.dispatchEvent(event);
-        postDispatchEvent();
-        if (haveShownSomeComponent == false && event instanceof ComponentEvent && event.getID() == ComponentEvent.COMPONENT_SHOWN) {
-            haveShownSomeComponent = true;
+        try {
+            preDispatchEvent();
+            super.dispatchEvent(event);
+        } finally {
+            postDispatchEvent();
+            if (haveShownSomeComponent == false && event instanceof ComponentEvent && event.getID() == ComponentEvent.COMPONENT_SHOWN) {
+                haveShownSomeComponent = true;
+            }
         }
     }
     
@@ -245,7 +248,9 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                         final JFrame frame = new JFrame();
                         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         frame.setLocationRelativeTo(null);
-                        if (arg.equals("focus")) {
+                        if (arg.equals("exception")) {
+                            runExceptionTest(frame);
+                        } else if (arg.equals("focus")) {
                             runFocusTest(frame);
                         } else if (arg.equals("modal")) {
                             runModalTest(frame);
@@ -258,6 +263,19 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                     }
                 }
             });
+        }
+        
+        // If we don't do our post-dispatch activity in a finally block, we'll
+        // report bogus hangs.
+        private static void runExceptionTest(final JFrame frame) {
+            JButton button = new JButton("Throw Exception");
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    // This shouldn't cause us to report a hang.
+                    throw new RuntimeException("Nobody expects the Spanish Inquisition!");
+                }
+            });
+            frame.add(button);
         }
         
         // Alexander Potochkin supplied this demonstration of nested calls to
