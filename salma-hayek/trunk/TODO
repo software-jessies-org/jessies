@@ -63,6 +63,11 @@ Items to be done for PTextArea:
 
 * Python and HTML/XML highlighting and indenting.
 
+* Pipe functionality: modal dialog. Brought up by C-|.
+  Command: text field with history
+  Input:  none / selection / all text
+  Output: discard / replace selection / replace all text / new window / after selection / after all / to clipboard
+
 General stuff:
 
 * Here's a really cool auto-update system (for Cocoa) that it would be nice to imitate: 
