@@ -328,12 +328,20 @@ public class FormDialog {
         }
     }
     
-    private void acceptDialog() {
+    /**
+     * Invoked when the user chooses the dialog's "accept" action.
+     * May be invoked programmatically to dismiss the dialog as if accepted.
+     */
+    public void acceptDialog() {
         acceptRunnable.run();
         processUserChoice(true);
     }
-
-    private void cancelDialog() {
+    
+    /**
+     * Invoked when the user chooses the dialog's "cancel" action.
+     * May be invoked programmatically to dismiss the dialog as if canceled.
+     */
+    public void cancelDialog() {
         cancelRunnable.run();
         processUserChoice(false);
     }
