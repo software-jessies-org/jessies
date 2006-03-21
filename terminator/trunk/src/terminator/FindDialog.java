@@ -13,6 +13,7 @@ import terminator.view.highlight.*;
 public class FindDialog {
     private static final FindDialog INSTANCE = new FindDialog();
     
+    private FormDialog formDialog;
     private JTextField findField;
     private JLabel findStatus = new JLabel(" ");
     private JTextBuffer textToFindIn;
@@ -44,7 +45,12 @@ public class FindDialog {
         }
     }
     
-    public void showFindDialogFor(final JTerminalPane terminalPane) {
+    public synchronized void showFindDialogFor(final JTerminalPane terminalPane) {
+        if (formDialog != null) {
+            formDialog.acceptDialog();
+            formDialog = null;
+        }
+        
         this.textToFindIn = terminalPane.getTextPane();
         initFindField(terminalPane);
         
@@ -60,8 +66,8 @@ public class FindDialog {
             }
         });
         
-        FormDialog dialog = form.getFormDialog();
-        dialog.setAcceptRunnable(new Runnable() {
+        formDialog = form.getFormDialog();
+        formDialog.setAcceptRunnable(new Runnable() {
             public void run() {
                 // If the user brought up the dialog, typed a regular
                 // expression, and hit return before the typing timeout went
@@ -72,14 +78,16 @@ public class FindDialog {
                 // it suggests it would mostly be unwanted. But maybe there's
                 // some better pattern we just haven't found yet.
                 find();
+                formDialog = null;
             }
         });
-        dialog.setCancelRunnable(new Runnable() {
+        formDialog.setCancelRunnable(new Runnable() {
             public void run() {
                 getFindHighlighter().forgetPattern(textToFindIn);
+                formDialog = null;
             }
         });
-        dialog.setRememberBounds(false);
+        formDialog.setRememberBounds(false);
         form.showNonModal();
         
         findField.selectAll();
