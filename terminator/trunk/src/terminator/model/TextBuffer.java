@@ -582,7 +582,10 @@ public class TextBuffer {
 	
 	/** Moves the cursor vertically by the number of characters in yDiff, negative for up, positive for down. */
 	public void moveCursorVertically(int yDiff) {
-		cursorPosition = new Location(cursorPosition.getLineIndex() + yDiff, cursorPosition.getCharOffset());
+		int y = cursorPosition.getLineIndex() + yDiff;
+		y = Math.max(getFirstDisplayLine(), y);
+		y = Math.min(y, textLines.size() - 1);
+		cursorPosition = new Location(y, cursorPosition.getCharOffset());
 	}
 
 	/** Sets the first and last lines to scroll.  If both are -1, make the entire screen scroll. */
