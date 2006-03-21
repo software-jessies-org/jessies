@@ -253,8 +253,10 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		public void keyPressed(KeyEvent event) {
+			// Support keyboard equivalents when the user's been stupid enough to turn the menu off.
 			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
-				if (Options.getSharedInstance().shouldUseMenuBar() == false) {
+				JFrame frame = getTerminatorFrame();
+				if (frame != null && frame.getJMenuBar() == null) {
 					handleKeyboardEquivalent(event);
 				}
 				return;
