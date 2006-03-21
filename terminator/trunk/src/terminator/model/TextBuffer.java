@@ -339,7 +339,7 @@ public class TextBuffer {
 	}
 	
 	public void moveToLine(int index) {
-		if (index >= (getFirstDisplayLine() + lastScrollLineIndex)) {
+		if (index > getFirstDisplayLine() + lastScrollLineIndex) {
 			insertLine(index);
 		} else {
 			cursorPosition = new Location(index, cursorPosition.getCharOffset());
