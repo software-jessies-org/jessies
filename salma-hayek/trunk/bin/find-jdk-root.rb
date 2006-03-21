@@ -1,14 +1,22 @@
 #!/usr/bin/ruby -w
 
-# If javah(1) provided a way to ask for a list of the directories that need to
-# be on the native compiler's include path, we wouldn't need this script. But
-# it doesn't, so we need a way to find the current JDK's include/ directory.
+# What this script does
+# ---------------------
 #
-# Rather than make this script overly-specific to that particular directory,
+# If javah(1) provided a way to ask for a list of the directories that need to
+# be on the native compiler's include path, we wouldn't have needed this
+# script. But it doesn't, so we needed a way to find the current JDK's
+# include/ directory. As it happened, this script was also useful for finding
+# such things as java(1) or "rt.jar".
+#
+# That's why, rather than make this script specific to the include/ directory,
 # we output the path to the top-level directory of the JDK installation.
 #
+# How we choose a Java installation
+# ---------------------------------
+#
 # There are many popular ways of choosing a particular Java installation, and
-# they all have problems:
+# they all have problems. The bad:
 #
 # * Using symbolic links requires a link for each program and makes it
 #   unnecessarily difficult to switch if you need to test with a newer or
@@ -27,6 +35,8 @@
 #   still running the tools from $PATH regardless of any $JAVA_HOME setting,
 #   it's easy to miss when this is set wrong. Using out-of-date header files,
 #   for example, isn't always going to be easy to spot.
+#
+# The best:
 #
 # * Using $PATH is slightly awkward to switch versions (unless you're happy to
 #   just keep prepending), but doesn't require you to know about every utility,

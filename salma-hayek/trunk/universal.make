@@ -8,9 +8,6 @@
 #   make source-dist
 #   make www-dist
 
-# You can set:
-#   JAVA_COMPILER to "gcjx", "javac", or a binary of your choice.
-
 # Your calling Makefile:
 #   must include ../salma-hayek/universal.make
 
@@ -357,88 +354,57 @@ makeGuid = $(shell $(SCRIPT_PATH)/uuid.rb)
 # Choose a Java compiler.
 # ----------------------------------------------------------------------------
 
-JAVA_COMPILER ?= javac
-
-ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))$(call searchPath,$(JAVA_COMPILER))" ""
-  REQUESTED_JAVA_COMPILER := $(JAVA_COMPILER)
-  JAVA_COMPILER = $(JDK_ROOT)/bin/$(REQUESTED_JAVA_COMPILER)
-  ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
-    JAVA_COMPILER = $(error Unable to find $(REQUESTED_JAVA_COMPILER))
-  endif
+JAVA_COMPILER = $(JDK_ROOT)/bin/javac
+ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
+  JAVA_COMPILER = $(error Unable to find $(JAVA_COMPILER) --- do you only have a JRE installed?)
 endif
-
-# Make the compiler's leafname available for simple javac/gcjx tests.
-COMPILER_TYPE = $(notdir $(JAVA_COMPILER))
-
-# ----------------------------------------------------------------------------
-# Find the boot classes.
-# Note: we only look for rt.jar; someday we might need to find the other jars.
-# ----------------------------------------------------------------------------
-
-# Traditional Java location:
-RT_JAR=$(JDK_ROOT)/jre/lib/rt.jar
-ifeq "$(wildcard $(RT_JAR))" ""
-  # Apple:
-  RT_JAR=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
-  ifeq "$(wildcard $(RT_JAR))" ""
-    # Fall back to searching:
-    RT_JAR=$(firstword $(shell locate /rt.jar))
-  endif
-endif
-
-# ----------------------------------------------------------------------------
-# Set up the bootclasspath.
-# ----------------------------------------------------------------------------
-BOOT_CLASS_PATH.gcjx += $(RT_JAR)
-BOOT_CLASS_PATH += $(BOOT_CLASS_PATH.$(COMPILER_TYPE))
 
 # ----------------------------------------------------------------------------
 # Set up the classpath.
+# TODO: Consider whether we could defer to invoke-java.rb to run the compiler
+# and so lose this duplication.
 # ----------------------------------------------------------------------------
 CLASS_PATH += $(SALMA_HAYEK)/classes
 CLASS_PATH += $(SALMA_HAYEK)/AppleJavaExtensions.jar
 CLASS_PATH += $(SALMA_HAYEK)/swing-worker.jar
+
+# "tools.jar" doesn't exist on Mac OS (the classes are automatically available).
+# Java 6 will do likewise for the other platforms, at which point this can be removed.
 TOOLS_JAR := $(wildcard $(JDK_ROOT)/lib/tools.jar)
 CLASS_PATH += $(TOOLS_JAR)
-CLASS_PATH += $(CLASS_PATH.$(COMPILER_TYPE))
+
+JAVAC_FLAGS += $(addprefix -classpath ,$(call makeNativePath,$(CLASS_PATH)))
 
 # ----------------------------------------------------------------------------
-# Sort out the flags our chosen compiler needs.
+# Set default javac flags.
 # ----------------------------------------------------------------------------
 
-JAVA_FLAGS += $(JAVA_FLAGS.$(COMPILER_TYPE))
-# TODO: Consider whether we could defer to invoke-java.rb to run the compiler
-# and so lose this duplication.
-JAVA_FLAGS += $(addprefix -bootclasspath ,$(call makeNativePath,$(BOOT_CLASS_PATH)))
-JAVA_FLAGS += $(addprefix -classpath ,$(call makeNativePath,$(CLASS_PATH)))
-JAVA_FLAGS += -d classes/
-JAVA_FLAGS += -sourcepath src/
-JAVA_FLAGS += -deprecation
-JAVA_FLAGS += -g
+JAVAC_FLAGS += -d classes/
+JAVAC_FLAGS += -sourcepath src/
+JAVAC_FLAGS += -g
 
-JAVA_FLAGS.gcjx += -pedantic -verbose -fverify # -error -- reinstate later!
-
-JAVA_FLAGS.javac += -Xlint -Xlint:-serial
+# Turn on warnings.
+JAVAC_FLAGS += -deprecation
+JAVAC_FLAGS += -Xlint -Xlint:-serial
 
 # We should also ensure that we build class files that can be used on
-# Mac OS, regardless of where we build.
-JAVA_FLAGS += -target 1.5
+# the current Java release, regardless of where we build.
+JAVAC_FLAGS += -target 1.5
 
-# While while we're at it, it's probably worth refusing to compile source
-# using 1.5 features as long as we have one platform that's not ready.
-# This should also weed out any attempt to use a Java older than 1.4.
-JAVA_FLAGS += -source 1.5
+# Ensure we give a clear error if the user attempts to use anything older
+# than Java 5.
+JAVAC_FLAGS += -source 1.5
 
 # javac(1) warns if you build source containing characters unrepresentable
 # in your locale. Although we all use UTF-8 locales, we can't guarantee that
 # everyone else does, so let the compiler know that our source is in UTF-8.
-JAVA_FLAGS += -encoding UTF-8
+JAVAC_FLAGS += -encoding UTF-8
 
 define BUILD_JAVA
   @echo Recompiling the world... && \
   $(RM) -r classes && \
   mkdir -p classes && \
-  $(JAVA_COMPILER) $(JAVA_FLAGS) $(call convertToNativeFilenames,$(SOURCE_FILES))
+  $(JAVA_COMPILER) $(JAVAC_FLAGS) $(call convertToNativeFilenames,$(SOURCE_FILES))
 endef
 
 # ----------------------------------------------------------------------------
