@@ -35,7 +35,7 @@ public abstract class PTextAction extends AbstractAction {
         if (boundTextArea != null) {
             return boundTextArea;
         }
-        Component component = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        Component component = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
         if (component instanceof PTextArea) {
             return (PTextArea) component;
         }
