@@ -384,10 +384,10 @@ public class Options {
 			});
 			// updateComboBoxFont sets the combo box font so that when you choose a font you can see a preview.
 			// The alternatives in the pop-up menu, though, should either use their own fonts (which has a habit of causing performance problems) or the default combo box pop-up font. This renderer ensures the latter.
-			comboBox.setRenderer(new DefaultListCellRenderer() {
-				@Override
+			final ListCellRenderer defaultRenderer = comboBox.getRenderer();
+			comboBox.setRenderer(new ListCellRenderer() {
 				public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-					Component result = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+					Component result = defaultRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 					if (index != -1) {
 						result.setFont(UIManager.getFont("List.font"));
 					}
