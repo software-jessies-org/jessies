@@ -611,7 +611,7 @@ public class Options {
 			String value = matcher.group(2);
 			Object currentValue = options.get(key);
 			if (currentValue == null) {
-				throw new RuntimeException("Attempt to set unknown resource \"" + key + "\"");
+				throw new RuntimeException("Attempt to set unknown resource \"" + key + "\" - terminator --help lists the supported resources");
 			}
 			Class currentClass = currentValue.getClass();
 			if (currentClass == Boolean.class) {
