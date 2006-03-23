@@ -73,14 +73,32 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         
         public void checkForHang() {
             if (timeSoFar() > UNREASONABLE_DISPATCH_DURATION_MS) {
-                reportHang();
+                examineHang();
             }
         }
         
-        private void reportHang() {
+        // We can't use StackTraceElement.equals because that insists on checking the filename and line number.
+        // That would be version-specific.
+        private static boolean stackTraceElementIs(StackTraceElement e, String className, String methodName, boolean isNative) {
+            return e.getClassName().equals(className) && e.getMethodName().equals(methodName) && e.isNativeMethod() == isNative;
+        }
+        
+        // Checks whether the given stack looks like it's waiting for another event.
+        // This relies on JDK implementation details.
+        private boolean isWaitingForNextEvent(StackTraceElement[] currentStack) {
+            return stackTraceElementIs(currentStack[0], "java.lang.Object", "wait", true) && stackTraceElementIs(currentStack[1], "java.lang.Object", "wait", false) && stackTraceElementIs(currentStack[2], "java.awt.EventQueue", "getNextEvent", false);
+        }
+        
+        private void examineHang() {
             StackTraceElement[] currentStack = eventDispatchThread.getStackTrace();
             if (stacksEqual(lastReportedStack, currentStack)) {
                 // Don't keep reporting the same hang every time the timer goes off.
+                return;
+            }
+            
+            if (isWaitingForNextEvent(currentStack)) {
+                // Don't be fooled by a modal dialog if it's waiting for its next event.
+                // As long as the modal dialog's event pump doesn't get stuck, it's okay for the outer pump to be suspended.
                 return;
             }
             
@@ -252,8 +270,10 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                             runExceptionTest(frame);
                         } else if (arg.equals("focus")) {
                             runFocusTest(frame);
-                        } else if (arg.equals("modal")) {
-                            runModalTest(frame);
+                        } else if (arg.equals("modal-hang")) {
+                            runModalTest(frame, true);
+                        } else if (arg.equals("modal-no-hang")) {
+                            runModalTest(frame, false);
                         } else {
                             System.err.println("unknown regression test '" + arg + "'");
                             System.exit(1);
@@ -304,17 +324,22 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         
         // Alexander Potochkin supplied this demonstration of the problems
         // of dealing with modal dialogs.
-        private static void runModalTest(final JFrame frame) {
+        private static void runModalTest(final JFrame frame, final boolean shouldSleep) {
+            System.out.println(shouldSleep ? "Expect hangs!" : "There should be no hangs...");
             JButton button = new JButton("Show Modal Dialog");
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    sleep(2500); // This is easy.
+                    if (shouldSleep) {
+                        sleep(2500); // This is easy.
+                    }
                     JDialog dialog = new JDialog(frame, "Modal dialog", true);
                     dialog.add(new JLabel("Close me!"));
                     dialog.pack();
                     dialog.setLocation(frame.getX() - 100,  frame.getY());
                     dialog.setVisible(true);
-                    sleep(2500); // If you don't distinguish different stack traces, you won't report this.
+                    if (shouldSleep) {
+                        sleep(2500); // If you don't distinguish different stack traces, you won't report this.
+                    }
                 }
             });
             frame.add(button);
