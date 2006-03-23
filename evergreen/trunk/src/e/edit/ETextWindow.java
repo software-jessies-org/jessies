@@ -53,6 +53,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     public static final String MAKE = "Make";
     public static final String RUBY = "Ruby";
     public static final String PERL = "Perl";
+    public static final String PYTHON = "Python";
     
     private String fileType = PLAIN_TEXT;
     
@@ -216,14 +217,19 @@ public class ETextWindow extends EWindow implements PTextListener {
         return Pattern.compile("^#![^\\n]*" + interpreter).matcher(content).find();
     }
     
-    /** Tests whether the 'content' looks like a Unix shell script, of the Ruby variety. */
+    /** Tests whether the 'content' looks like a Unix script, of the Ruby variety. */
     private static boolean isRubyContent(CharSequence content) {
         return isInterpretedContent(content, "ruby");
     }
     
-    /** Tests whether the 'content' looks like a Unix shell script, of the Perl variety. */
+    /** Tests whether the 'content' looks like a Unix script, of the Perl variety. */
     private static boolean isPerlContent(CharSequence content) {
         return isInterpretedContent(content, "perl");
+    }
+    
+    /** Tests whether the 'content' looks like a Unix script, of the Python variety. */
+    private static boolean isPythonContent(CharSequence content) {
+        return isInterpretedContent(content, "python");
     }
     
     private static boolean isBashContent(CharSequence content) {
@@ -369,6 +375,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             fileType = C_PLUS_PLUS;
         } else if (isPerlContent(content)) {
             fileType = PERL;
+        } else if (isPythonContent(content)) {
+            fileType = PYTHON;
         } else {
             fileType = PLAIN_TEXT;
         }
@@ -380,6 +388,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             fileType = C_PLUS_PLUS;
         } else if (filename.endsWith(".pl") || filename.endsWith(".pm")) {
             fileType = PERL;
+        } else if (filename.endsWith(".py")) {
+            fileType = PYTHON;
         } else if (filename.endsWith(".rb")) {
             fileType = RUBY;
         } else if (filename.endsWith("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
@@ -404,6 +414,9 @@ public class ETextWindow extends EWindow implements PTextListener {
         } else if (fileType == PERL) {
             text.setIndenter(new PPerlIndenter(text));
             text.setTextStyler(new PPerlTextStyler(text));
+        } else if (fileType == PYTHON) {
+            //text.setIndenter(new PPythonIndenter(text));
+            text.setTextStyler(new PPythonTextStyler(text));
         } else if (fileType == BASH) {
             text.setTextStyler(new PBashTextStyler(text));
         } else if (fileType == MAKE) {
