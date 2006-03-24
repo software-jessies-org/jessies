@@ -52,7 +52,6 @@ public class Log {
     }
 
     private static void showStartUpMessage() {
-        warn("Application started.");
         showJavaVersion();
         showOsVersion();
     }

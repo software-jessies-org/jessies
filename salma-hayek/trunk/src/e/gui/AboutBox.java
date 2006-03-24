@@ -243,8 +243,14 @@ public class AboutBox {
         String buildDate = content[0];
         projectRevision = content[1];
         libraryRevision = content[2];
-        addVersion("Revision " + projectRevision + " (" + libraryRevision + ")");
-        addVersion("Built " + buildDate);
+        String[] info = new String[] {
+            "Revision " + projectRevision + " (" + libraryRevision + ")",
+            "Built " + buildDate,
+        };
+        for (String line : info) {
+            addVersion(line);
+            Log.warn(line);
+        }
     }
     
     public String getBugReportSubject() {
