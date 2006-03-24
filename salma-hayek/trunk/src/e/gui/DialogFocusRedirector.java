@@ -13,7 +13,7 @@ public class DialogFocusRedirector {
     }
     
     public void redirectFocus() {
-        originalFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        originalFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
         Component[] components = ui.getComponents();
         giveFocusToFirstTextComponentIn(components);
     }
