@@ -41,14 +41,21 @@ public class JFrameUtilities {
         window.setSize(newSize);
     }
     
-    public static void showTextWindow(String title, String content) {
+    public static JFrame showTextWindow(String title, String content) {
+        JFrame frame = makeTextWindow(title, content);
+        frame.setVisible(true);
+        return frame;
+    }
+    
+    public static JFrame makeTextWindow(String title, String content) {
         PTextArea textArea = new PTextArea(40, 80);
         textArea.setFont(new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 10));
         textArea.setText(content);
-        showScrollableContentWindow(title, textArea);
+        textArea.setEditable(false);
+        return makeScrollableContentWindow(title, textArea);
     }
     
-    public static void showScrollableContentWindow(String title, JComponent content) {
+    public static JFrame makeScrollableContentWindow(String title, JComponent content) {
         JScrollPane scrollPane = new JScrollPane(content);
         scrollPane.setBorder(null);
         
@@ -57,7 +64,7 @@ public class JFrameUtilities {
         frame.setContentPane(scrollPane);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setVisible(true);
+        return frame;
     }
     
     private JFrameUtilities() {
