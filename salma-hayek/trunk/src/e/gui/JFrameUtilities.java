@@ -41,18 +41,19 @@ public class JFrameUtilities {
         window.setSize(newSize);
     }
     
-    public static JFrame showTextWindow(String title, String content) {
-        JFrame frame = makeTextWindow(title, content);
+    public static JFrame showTextWindow(Component parent, String title, String content) {
+        JFrame frame = makeScrollableContentWindow(title, makeTextArea(content));
+        frame.setLocationRelativeTo(parent);
         frame.setVisible(true);
         return frame;
     }
     
-    public static JFrame makeTextWindow(String title, String content) {
+    public static PTextArea makeTextArea(String content) {
         PTextArea textArea = new PTextArea(40, 80);
         textArea.setFont(new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 10));
         textArea.setText(content);
         textArea.setEditable(false);
-        return makeScrollableContentWindow(title, textArea);
+        return textArea;
     }
     
     public static JFrame makeScrollableContentWindow(String title, JComponent content) {

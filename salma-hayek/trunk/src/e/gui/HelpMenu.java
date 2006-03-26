@@ -93,7 +93,7 @@ public class HelpMenu {
             // Sadly, on Win32, another process can't open the log file while we've got it open for writing.
             
             // FIXME: if we had some kind of file alteration monitor, we could update as the log gets written to.
-            JFrameUtilities.showTextWindow(applicationName + " Log", StringUtilities.readFile(filename));
+            JFrameUtilities.showTextWindow(null, applicationName + " Log", StringUtilities.readFile(filename));
         }
     }
 }

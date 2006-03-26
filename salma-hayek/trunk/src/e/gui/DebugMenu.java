@@ -55,7 +55,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            JFrameUtilities.showTextWindow("Environment", getEnvironmentAsString());
+            JFrameUtilities.showTextWindow(null, "Environment", getEnvironmentAsString());
         }
         
         private String getEnvironmentAsString() {
@@ -70,7 +70,7 @@ public class DebugMenu {
         
         public void actionPerformed(ActionEvent e) {
             // FIXME: we can edit the system properties; should we expose this?
-            JFrameUtilities.showTextWindow("System Properties", getSystemPropertiesAsString());
+            JFrameUtilities.showTextWindow(null, "System Properties", getSystemPropertiesAsString());
         }
         
         private String getSystemPropertiesAsString() {
@@ -120,7 +120,7 @@ public class DebugMenu {
         
         public void actionPerformed(ActionEvent e) {
             // FIXME: a table would be much nicer.
-            JFrameUtilities.showTextWindow("Frames", getFramesAsString());
+            JFrameUtilities.showTextWindow(null, "Frames", getFramesAsString());
         }
         
         private String getFramesAsString() {
@@ -148,7 +148,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            JFrameUtilities.showTextWindow("Timers", getTimersAsString());
+            JFrameUtilities.showTextWindow(null, "Timers", getTimersAsString());
         }
         
         private String getTimersAsString() {
@@ -167,7 +167,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            JFrameUtilities.showTextWindow(UIManager.getLookAndFeel().getName() + " UI Defaults", getUiDefaultsAsString());
+            JFrameUtilities.showTextWindow(null, UIManager.getLookAndFeel().getName() + " UI Defaults", getUiDefaultsAsString());
         }
         
         private String getUiDefaultsAsString() {
