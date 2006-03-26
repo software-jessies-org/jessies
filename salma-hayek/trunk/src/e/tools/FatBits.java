@@ -295,13 +295,18 @@ public class FatBits extends JFrame {
     
     private class FatBitsMenuBar extends JMenuBar {
         private FatBitsMenuBar() {
+            add(makeEditMenu());
             add(makeImageMenu());
+        }
+        
+        private JMenu makeEditMenu() {
+            JMenu menu = new JMenu("Edit");
+            menu.add(new CopyImageAction());
+            return menu;
         }
         
         private JMenu makeImageMenu() {
             JMenu menu = new JMenu("Image");
-            menu.add(new CopyImageAction());
-            menu.add(new JSeparator());
             menu.add(new MouseMotionAction("Left", -1, 0));
             menu.add(new MouseMotionAction("Right", +1, 0));
             menu.add(new MouseMotionAction("Up", 0, -1));
