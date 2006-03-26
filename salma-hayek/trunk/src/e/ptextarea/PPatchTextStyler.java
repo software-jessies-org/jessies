@@ -19,7 +19,10 @@ public class PPatchTextStyler extends PAbstractTextStyler {
         List<PLineSegment> result = new ArrayList<PLineSegment>();
         String lineText = textArea.getLineText(line);
         PStyle style = PStyle.NORMAL;
-        if (lineText.startsWith("+")) {
+        if (lineText.startsWith("#")) {
+            // Per patch(1): "lines beginning with # ... are considered to be comments".
+            style = PStyle.COMMENT;
+        } else if (lineText.startsWith("+")) {
             style = PStyle.PATCH_PLUS;
         } else if (lineText.startsWith("-")) {
             style = PStyle.PATCH_MINUS;
