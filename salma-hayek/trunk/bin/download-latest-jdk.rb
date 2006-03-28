@@ -8,7 +8,7 @@ require "open-uri"
 class JdkInstaller
  def initialize()
   # Where to look locally for already-installed JDKs.
-  @local_jdks_directory = "/usr/local/jdk/"
+  @local_jdks_directory = "/usr/java/"
 
   # Where to look on the internet for available JDKs.
   @sun_site = "http://download.java.net"
