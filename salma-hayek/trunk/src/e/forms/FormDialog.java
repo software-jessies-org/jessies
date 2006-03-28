@@ -366,7 +366,7 @@ public class FormDialog {
         });
         // FIXME: we could probably support a wider range of common GNOME verbs, at least in English (which is all we support anyway).
         if (actionLabel.equals("Close")) {
-            GnomeStockIcon.useStockIcon(actionButton, "gtk-cancel");
+            GnomeStockIcon.useStockIcon(actionButton, "gtk-close");
             if (GuiUtilities.isGtk()) {
                 actionButton.setMnemonic(KeyEvent.VK_C);
             }
