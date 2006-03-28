@@ -105,10 +105,7 @@ public class AboutBox {
         if (GuiUtilities.isWindows()) {
             // I don't think this is quite the right font, but it seems to be as close as we can get with the Win32 LAF.
             applicationNameFont = versionFont = copyrightFont = UIManager.getFont("MenuItem.font");
-        }
-        
-        // FIXME: code to get the right fonts for GNOME probably looks like this, but even Java 6 doesn't seem to get the right starting font.
-        if (false) {
+        } else if (GuiUtilities.isGtk()) {
             final float PANGO_SCALE_SMALL = (1.0f / 1.2f);
             final float PANGO_SCALE_XX_LARGE = (1.2f * 1.2f * 1.2f);
             final Font gnomeBaseFont = UIManager.getFont("TextArea.font");
