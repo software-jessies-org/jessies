@@ -64,7 +64,7 @@ SCRIPT_PATH = $(SALMA_HAYEK)/bin
 
 TARGET_OS_SCRIPT = $(SCRIPT_PATH)/target-os.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(TARGET_OS_SCRIPT)
-TARGET_OS := $(shell $(TARGET_OS_SCRIPT))
+TARGET_OS := $(shell ruby $(TARGET_OS_SCRIPT))
 
 ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     ifeq "$(TARGET_OS)" "Cygwin"
@@ -130,7 +130,7 @@ findMakeFriendlyEquivalentName = $(findMakeFriendlyEquivalentName.$(TARGET_OS))
 
 JDK_ROOT_SCRIPT = $(SCRIPT_PATH)/find-jdk-root.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JDK_ROOT_SCRIPT)
-JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell $(JDK_ROOT_SCRIPT)))
+JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell ruby $(JDK_ROOT_SCRIPT)))
 
 # ----------------------------------------------------------------------------
 # We use our own replacement for javah(1).
@@ -481,7 +481,7 @@ native-clean:
 
 ChangeLog.html: ChangeLog
 	$(RM) $@ && \
-	$(SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
+	ruby $(SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
 
 .PHONY: ChangeLog
 ChangeLog:
@@ -516,7 +516,7 @@ www-dist: ChangeLog.html
 .PHONY: .generated/build-revision.txt
 .generated/build-revision.txt:
 	@mkdir -p $(@D) && \
-	$(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK) > $@
+	ruby $(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK) > $@
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS, package it as a ".dmg", and copy
