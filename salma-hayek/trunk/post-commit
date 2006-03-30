@@ -6,7 +6,7 @@
 
 # You can test this script without checking in bogus revisions with, for example:
 # umask 0002
-# /home/software/checked-out/salma-hayek/post-commit /home/software/svnroot/salma-hayek 1237
+# /home/software/svnroot/terminator/hooks/post-commit "" 1013
 
 # ------------------------------------------------------------------------
 
@@ -30,12 +30,13 @@ require 'cgi'
 require 'pathname'
 
 # __FILE__ may be relative to the current directory which we're about to change.
-script_path=Pathname.new(__FILE__).realpath.dirname
+script_path=Pathname.new(__FILE__).realpath().dirname()
 $: << script_path
 
 # We can work out the repository name because we're <path>/<name>/hooks/post-commit
 # We could also work this out from the spurious repository_path argument.
-repository_name=Pathname.new(__FILE__).parent().parent().basename()
+repository_path=Pathname.new(__FILE__).parent().parent()
+repository_name=repository_path.basename()
 
 require 'escaping.rb'
 require 'patch-to-html-email.rb'
@@ -44,7 +45,7 @@ require 'patch-to-html-email.rb'
 Dir.chdir("/tmp")
 
 # What revision in what repository?
-repository_path = ARGV.shift()
+ARGV.shift() # throw away the spurious repository_path argument
 rev = ARGV.shift()
 
 # Get the overview information.
