@@ -89,7 +89,7 @@ sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes
 # Fix the permissions on any new log file created by Subversion's Berkeley db because bdb creates a new file,
 # obeying umask, rather than copying the mode of the current log file.
 # Although the setgid directory means that the file's group is "software", that doesn't help its permissions.
-system("find #{repository_path}/db -name \"log.*\" '!' -perm -g+w | xargs --no-run-if-empty chmod g+w")
+system("find #{repository_path}/db -name \"log.*\" '!' -perm -g+w | xargs chmod g+w")
 
 # Update the checked-out copy which, in salma-hayek, includes this post-commit trigger.
 
