@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/local/bin/ruby -w
 
 # A Subversion post-commit hook. Edit the configurable stuff below, and
 # copy into your repository's hooks/ directory as "post-commit". Don't
