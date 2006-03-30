@@ -1,4 +1,5 @@
 #!/usr/local/bin/ruby -w
+# crank.org.uk has a non-standard Ruby installation - you may want to change the above line to #!/usr/bin/ruby -w
 
 # A Subversion post-commit hook. Edit the configurable stuff below, and
 # copy into your repository's hooks/ directory as "post-commit". Don't
