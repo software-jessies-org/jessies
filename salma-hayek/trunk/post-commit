@@ -6,7 +6,7 @@
 
 # You can test this script without checking in bogus revisions with, for example:
 # umask 0002
-# /home/software/svnroot/salma-hayek/hooks/post-commit /home/software/svnroot/salma-hayek 1237
+# /home/software/checked-out/salma-hayek/post-commit /home/software/svnroot/salma-hayek 1237
 
 # ------------------------------------------------------------------------
 
@@ -17,12 +17,11 @@ mail_domain="jessies.org" # Assumes all authors (and the to_address) share a dom
 to_address="software@#{mail_domain}"
 reply_to_address=to_address # Use "nil" to reply to author.
 
-svnlook="/usr/bin/svnlook"
+svnlook="svnlook"
 
-if `whoami` =~ /^(elliotth|martind)$/
+if ENV["LOGNAME"] =~ /^(elliotth|martind)$/
   to_address=$1
   reply_to_address=nil
-  svnlook="svnlook"
 end
 
 # ------------------------------------------------------------------------
