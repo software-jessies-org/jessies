@@ -1,5 +1,6 @@
 #!/usr/local/bin/ruby -w
-# crank.org.uk has a non-standard Ruby installation - you may want to change the above line to #!/usr/bin/ruby -w
+ENV["PATH"]="/usr/local/bin:/opt/csw/bin:/opt/SUNWspro/bin:/usr/bin:/usr/sfw/bin:/usr/openwin/bin:/usr/ccs/bin"
+# The previous two lines are quite specific to the particular host we're using.
 
 # A Subversion post-commit hook. Edit the configurable stuff below, and
 # copy into your repository's hooks/ directory as "post-commit". Don't
