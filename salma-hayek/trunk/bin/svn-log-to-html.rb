@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby -w
 
 # Reads the output of "svn log" and produces a reasonable HTML rendition.
 

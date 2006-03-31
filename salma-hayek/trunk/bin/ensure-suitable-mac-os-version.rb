@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby -w
 
 # Reports (via its status code on exit) whether we're running on a suitable
 # Mac OS installation.

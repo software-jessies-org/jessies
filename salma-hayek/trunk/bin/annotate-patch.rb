@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby -w
 
 # NAME
 #   annotate-patch.rb - add scope names to patch hunks

@@ -481,7 +481,7 @@ native-clean:
 
 ChangeLog.html: ChangeLog
 	$(RM) $@ && \
-	ruby $(SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
+	$(SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
 
 .PHONY: ChangeLog
 ChangeLog:
@@ -516,7 +516,7 @@ www-dist: ChangeLog.html
 .PHONY: .generated/build-revision.txt
 .generated/build-revision.txt:
 	@mkdir -p $(@D) && \
-	ruby $(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK) > $@
+	$(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK) > $@
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS, package it as a ".dmg", and copy
