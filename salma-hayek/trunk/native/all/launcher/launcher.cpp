@@ -20,8 +20,6 @@
 #include <unistd.h>
 #include <vector>
 
-static std::string DESIRED_JVM_VERSION = "1.5";
-
 struct UsageError : std::runtime_error {
   UsageError(const std::string& description)
   : std::runtime_error(description) {
@@ -58,45 +56,50 @@ public:
     return contents;
   }
   
-  // What should we do if this points to "client" when we want "server"?
-  std::string findJvmLibraryUsingJreRegistry() const {
-    const char* jreRegistryPath = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment";
+  std::string chooseVersionFromRegistry(const std::string& registryPath) const {
     std::vector<std::string> versions;
-    for (DirectoryIterator it(jreRegistryPath); it.isValid(); ++ it) {
+    for (DirectoryIterator it(registryPath); it.isValid(); ++ it) {
       std::string version = it->getName();
       if (version.empty() || isdigit(version[0]) == false) {
         // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
         // "CurrentVersion" didn't get updated when I installed JDK-1.5.0_06 (or the two prior versions by the look of it)..
         continue;
       }
-      // This code prefers 1.6 to 1.5, even if DESIRED_JVM_VERSION is 1.5.
-      // 1.5 is a requirement, not a desire.
-      // Once the FIXME in findJvmLibraryUsingJdkRegistry is fixed, we should rename DESIRED_JVM_VERSION.
-      if (version < DESIRED_JVM_VERSION) {
+      if (version < "1.5") {
         continue;
+      }
+      if (version >= "1.6") {
+        // Uncomment the next line to prevent usage of 1.6.
+        //continue;
       }
       versions.push_back(version);
     }
     std::sort(versions.begin(), versions.end());
     if (versions.empty()) {
-      throw UsageError("No suitable JRE installed.");
+      throw UsageError("No suitable Java found under \"" + registryPath + "\".");
     }
     std::string version = versions.back();
+    return version;
+  }
+  
+  std::string findJvmLibraryUsingJreRegistry() const {
+    const char* jreRegistryPath = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment";
+    std::string version = chooseVersionFromRegistry(jreRegistryPath);
+    // What should we do if this points to "client" when we want "server"?
     std::string jvmRegistryPath = std::string(jreRegistryPath) + "/" + version + "/RuntimeLib";
     return readRegistryFile(jvmRegistryPath);
   }
   
   std::string findJvmLibraryUsingJdkRegistry() const {
-    // This key may point to the latest or most recently installed update.
-    // It does seem to change when newer updates are installed.
-    // FIXME: Unlike the code for searching the JRE registry keys, this doesn't cope with only having newer major versions.
-    std::string javaHome = readRegistryFile("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/" + DESIRED_JVM_VERSION + "/JavaHome");
+    const char* jdkRegistryPath = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit";
+    std::string version = chooseVersionFromRegistry(jdkRegistryPath);
+    std::string javaHome = readRegistryFile(std::string(jdkRegistryPath) + "/" + version + "/JavaHome");
     return javaHome + "/jre/bin/client/jvm.dll";
   }
   
   std::string findWin32JvmLibrary() const {
     std::ostringstream os;
-    os << "Couldn't find jvm.dll - please install a " << DESIRED_JVM_VERSION << " JRE or JDK.";
+    os << "Couldn't find jvm.dll - please install a 1.5 or newer JRE or JDK.";
     os << std::endl;
     os << "Error messages were:";
     os << std::endl;
@@ -333,7 +336,8 @@ int main(int, char** argv) {
     os << "  -server - use server VM" << std::endl;
     os << "  -D<name>=<value> - set a system property" << std::endl;
     os << "  -verbose[:class|gc|jni] - enable verbose output" << std::endl;
-    os << "or JVM " << DESIRED_JVM_VERSION << " -X options." << std::endl;
+    // FIXME: If we know which version of JVM we've selected here, we could say so.
+    os << "or JVM 1.5 or newer -X options." << std::endl;
     os << std::endl;
     os << "Command line was:";
     os << std::endl;
