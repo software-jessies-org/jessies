@@ -229,13 +229,11 @@ missing-prerequisites.$(BASE_NAME):
 
 # This way, we can use compilation rules which assume everything's
 # in the same directory.
-# Using cp for the benefit of Windows native compilers which don't
-# understand "symlinks".
 # FIXME: Copies of files which no longer exist must be removed.
 $(SOURCE_LINKS) $(HEADER_LINKS): $(COMPILATION_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	cp $< $@
+	$(SYMLINK.$(TARGET_OS)) $< $@
 
 # ----------------------------------------------------------------------------
 # Dependencies.

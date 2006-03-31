@@ -118,6 +118,11 @@ SPACE = $(subst :, ,:)
 #takeProfileSample = $(eval $(shell date --iso=s 1>&2))
 takeProfileSample =
 
+SYMLINK.$(TARGET_OS) = ln -s
+# Use cp for the benefit of Windows native compilers which don't
+# understand "symlinks".
+SYMLINK.Cygwin = cp
+
 # ----------------------------------------------------------------------------
 # Locate Java.
 # ----------------------------------------------------------------------------
