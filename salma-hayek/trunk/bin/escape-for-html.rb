@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/ruby -w
 require 'cgi'
 while gets
     puts(CGI.escapeHTML($_))

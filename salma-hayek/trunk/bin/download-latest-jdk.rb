@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/ruby -w
 
 # FIXME: support official 1.5.0 builds.
 # FIXME: support Java 6 source releases.

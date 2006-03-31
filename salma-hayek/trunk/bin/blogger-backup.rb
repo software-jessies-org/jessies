@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/ruby -w
 
 if ARGV.length() != 1
   print("usage: blogger-backup.rb <blog-name>\n")

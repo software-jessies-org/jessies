@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/ruby -w
 
 # Despite its name, this script generates "build-revision.txt".
 

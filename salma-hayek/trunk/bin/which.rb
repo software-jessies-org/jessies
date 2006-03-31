@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/ruby -w
 
 # Looks for the first occurrence of program within path.
 # Returns nil if not found.

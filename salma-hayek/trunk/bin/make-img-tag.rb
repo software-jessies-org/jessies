@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/ruby -w
 if ARGV.length() == 0
     print("Usage: #$0 <filename...>\n")
     exit(1)
