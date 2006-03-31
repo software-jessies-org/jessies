@@ -346,7 +346,13 @@ int main(int, char** argv) {
     os << std::endl;
     std::cerr << os.str();
 #ifdef __CYGWIN__
-    MessageBox(GetActiveWindow(), os.str().c_str(), "Launcher", MB_OK);
+    std::string message = "Please copy this message to the clipboard with Ctrl-C and mail it to software@jessies.org.";
+    message += "\n";
+    message += "(Windows won't let you select the text but Ctrl-C works anyway.)";
+    message += "\n";
+    message += "\n";
+    message += os.str();
+    MessageBox(GetActiveWindow(), message.c_str(), "Launcher", MB_OK);
 #endif
     return 1;
   }
