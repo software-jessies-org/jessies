@@ -17,8 +17,11 @@
     <Property Id="ARPURLINFOABOUT">
     http://software.jessies.org/terminator/</Property>
     <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
+    <Property Id='CYGWIN'>
+      <RegistrySearch Id='RUBYW.dir' Root="HKLM" Key='Software\Cygnus Solutions\Cygwin\mounts v2\/' Name='native' Type='directory' />
+    </Property>
     <Property Id='RUBYW'>
-      <DirectorySearch Id='RUBYW.dir' Path='\cygwin\bin' Depth='0'>
+      <DirectorySearch Id='RUBYW.dir' Path='[CYGWIN]\bin' Depth='0'>
         <FileSearch Id='RUBYW.file' Name='rubyw.exe' />
       </DirectorySearch>
     </Property>
