@@ -64,9 +64,15 @@ public:
     std::vector<std::string> versions;
     for (DirectoryIterator it(jreRegistryPath); it.isValid(); ++ it) {
       std::string version = it->getName();
-      if (version.empty() || version < DESIRED_JVM_VERSION) {
+      if (version.empty() || isdigit(version[0]) == false) {
         // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
         // "CurrentVersion" didn't get updated when I installed JDK-1.5.0_06 (or the two prior versions by the look of it)..
+        continue;
+      }
+      // This code prefers 1.6 to 1.5, even if DESIRED_JVM_VERSION is 1.5.
+      // 1.5 is a requirement, not a desire.
+      // Once the FIXME in findJvmLibraryUsingJdkRegistry is fixed, we should rename DESIRED_JVM_VERSION.
+      if (version < DESIRED_JVM_VERSION) {
         continue;
       }
       versions.push_back(version);
@@ -83,6 +89,7 @@ public:
   std::string findJvmLibraryUsingJdkRegistry() const {
     // This key may point to the latest or most recently installed update.
     // It does seem to change when newer updates are installed.
+    // FIXME: Unlike the code for searching the JRE registry keys, this doesn't cope with only having newer major versions.
     std::string javaHome = readRegistryFile("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/" + DESIRED_JVM_VERSION + "/JavaHome");
     return javaHome + "/jre/bin/client/jvm.dll";
   }
