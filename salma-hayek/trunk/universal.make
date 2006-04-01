@@ -69,7 +69,7 @@ TARGET_OS := $(shell ruby $(TARGET_OS_SCRIPT))
 ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     ifeq "$(TARGET_OS)" "Cygwin"
         $(warning The make which comes with Cygwin 1.5.18-1 isn't good enough.)
-        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-15534-cygwin-i686 instead.)
+        $(warning Try http://software.jessies.org/3rdParty/make-3.81-cygwin instead.)
     endif
     ifeq "$(TARGET_OS)" "Darwin"
         $(warning Try our pre-built universal http://software.jessies.org/3rdParty/make-3.81-darwin instead.)
@@ -77,10 +77,10 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     ifeq "$(TARGET_OS)" "Linux"
         $(warning Debian testing/unstable has a new enough make if you do sudo apt-get install make.)
         $(warning Ubunutu "Dapper Drake" has a new enough make.)
-        $(warning If you need to build from source, go to ftp://ftp.gnu.org/gnu/make/make-3.81.tar.gz.)
+        $(warning Or try http://software.jessies.org/3rdParty/make-3.81-linux.)
     endif
     ifeq "$(TARGET_OS)" "Solaris"
-        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta3-solaris-amd64 instead.)
+        $(warning Try http://software.jessies.org/3rdParty/make-3.81rc2-solaris-i386 instead.)
     endif
 # The blank line separates any duplicate warning, which 3.80 seems fond of generating.
     $(warning )
