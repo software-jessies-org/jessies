@@ -72,12 +72,12 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
         $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-15534-cygwin-i686 instead.)
     endif
     ifeq "$(TARGET_OS)" "Darwin"
-        $(warning Try http://software.jessies.org/3rdParty/make-3.81beta4-darwin-ppc instead.)
+        $(warning Try our pre-built universal http://software.jessies.org/3rdParty/make-3.81-darwin instead.)
     endif
     ifeq "$(TARGET_OS)" "Linux"
         $(warning Debian testing/unstable has a new enough make if you do sudo apt-get install make.)
         $(warning Ubunutu "Dapper Drake" has a new enough make.)
-        $(warning If you need to build from source, go to ftp://alpha.gnu.org/gnu/make/.)
+        $(warning If you need to build from source, go to ftp://ftp.gnu.org/gnu/make/make-3.81.tar.gz.)
     endif
     ifeq "$(TARGET_OS)" "Solaris"
         $(warning Try http://software.jessies.org/3rdParty/make-3.81beta3-solaris-amd64 instead.)
