@@ -4,7 +4,7 @@
 
 #include "DirectoryIterator.h"
 #include "join.h"
-#include "setup_win_environ.h"
+#include "synchronizeWindowsEnvironment.h"
 
 #include <jni.h>
 
@@ -316,7 +316,7 @@ public:
 };
 
 int main(int, char** argv) {
-  setup_win_environ();
+  synchronizeWindowsEnvironment();
   const char* programName = *argv;
   ++ argv;
   NativeArguments launcherArguments;
