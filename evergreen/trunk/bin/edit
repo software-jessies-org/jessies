@@ -74,6 +74,5 @@ end
 
 invoker = Java.new("Edit", "e/util/Launcher")
 invoker.log_filename = "/tmp/edit.log.#$$"
-invoker.add_property("java.awt.Window.locationByPlatform", "true")
 invoker.add_pathname_property("preferencesDirectory", edit_preferences_directory)
 invoker.invoke([ "Edit", "#{edit_class_name}Launchable" ])
