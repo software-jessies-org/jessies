@@ -103,6 +103,7 @@ public class KnowAll extends JFrame {
 
     private void initAdvisors() {
         advisors.add(new CurrencyAdvisor());
+        advisors.add(new ImperialAdvisor());
         advisors.add(new IsbnAdvisor());
         advisors.add(new NumberAdvisor());
         advisors.add(new TimeAdvisor());
