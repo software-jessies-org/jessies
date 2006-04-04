@@ -10,8 +10,11 @@ class OsExaminer
         # Avoid calling the console-subsystem uname(1) program on Cygwin.
         # (Calling a console subsystem program from a desktop shortcut causes a console window to appear briefly.)
         # We've also seen Cygwin's uname report both "CYGWIN_NT-5.0" and "CYGWIN_NT-5.1".
-        if Config::CONFIG["target_os"] == "cygwin"
+        target_os = Config::CONFIG["target_os"]
+        if target_os == "cygwin"
           @os_name = "Cygwin"
+        elsif target_os == "mswin32"
+          @os_name = "Windows"
         else
           @os_name = `uname`.chomp()
         end
