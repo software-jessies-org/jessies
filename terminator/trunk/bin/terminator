@@ -4,7 +4,7 @@ require "fileutils.rb"
 require "pathname.rb"
 
 # Cope with symbolic links to this script.
-terminator_home = Pathname.new("#{__FILE__}/..").realpath().dirname()
+terminator_home = Pathname.new(__FILE__).realpath().dirname().dirname()
 salma_hayek = Pathname.new("#{terminator_home}/../salma-hayek").realpath()
 
 require "#{salma_hayek}/bin/target-os.rb"
