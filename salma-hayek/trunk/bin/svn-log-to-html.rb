@@ -1,10 +1,12 @@
 #!/usr/bin/ruby -w
-
 # Reads the output of "svn log" and produces a reasonable HTML rendition.
 
-$: << "#{File.dirname(__FILE__)}/.."
+# Cope with symbolic links to this script.
+require "pathname.rb"
+salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
 
-require 'escaping.rb'
+require "#{salma_hayek}/escaping.rb"
+
 puts("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">")
 puts("<html>")
 puts("<head>")
