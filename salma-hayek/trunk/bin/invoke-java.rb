@@ -1,6 +1,5 @@
 #!/usr/bin/ruby -w
 
-require "fileutils.rb"
 require "pathname.rb"
 
 # Takes a POSIX pathname and turns it into a Win32 pathname if we're on Win32.
