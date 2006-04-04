@@ -32,9 +32,12 @@ end
 # as the OS' PATH environment variable.
 def pathnames_to_path(pathnames)
   native_pathnames = pathnames.uniq().map() { |pathname| convert_to_jvm_compatible_pathname(pathname) }
+  jvm_path_separator = File::PATH_SEPARATOR
   # Cygwin's ruby's File::PATH_SEPARATOR is ':', but the Win32 JVM wants ';'.
-  path_separator = (target_os() == "Cygwin") ? ";" : ":"
-  return native_pathnames.join(path_separator)
+  if target_os() == "Cygwin"
+    jvm_path_separator = ";"
+  end
+  return native_pathnames.join(jvm_path_separator)
 end
 
 class Java
@@ -170,7 +173,7 @@ class Java
   
   def subvertPath()
     # When run from Cygwin, we need to use colon as the PATH separator, rather than the native semi-colon.
-    originalPathComponents = ENV["PATH"].split(":")
+    originalPathComponents = ENV["PATH"].split(File::PATH_SEPARATOR)
     newPathComponents = []
     # Put our setsid(1) ahead of any pre-installed one, for the potential benefit of edit.
     # Experience suggests that various startup files are likely to reset the PATH in terminator shells.
@@ -181,7 +184,7 @@ class Java
     # uniq() seems to do The Right Thing with unsorted duplicates:
     # removing the later ones, preserving order.
     # @salma_hayek may be the same as @project_root, particular with installed versions.
-    ENV["PATH"] = newPathComponents.uniq().join(":")
+    ENV["PATH"] = newPathComponents.uniq().join(File::PATH_SEPARATOR)
   end
   
   def invoke(extra_app_arguments = [])
