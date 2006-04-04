@@ -53,7 +53,7 @@ class Java
 
     # Cope with symbolic links to this script.
     @project_root = Pathname.new("#{$0}/..").realpath().dirname()
-    @salma_hayek = Pathname.new("#{__FILE__}/..").realpath().dirname()
+    @salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
     require "#{@salma_hayek}/bin/target-os.rb"
 
     @extra_java_arguments = []

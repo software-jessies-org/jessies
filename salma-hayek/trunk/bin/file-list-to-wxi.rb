@@ -4,7 +4,7 @@ require "fileutils.rb"
 require "pathname.rb"
 
 # Cope with symbolic links to this script.
-project_root = Pathname.new("#{__FILE__}/..").realpath().dirname()
+project_root = Pathname.new(__FILE__).realpath().dirname().dirname()
 salma_hayek = Pathname.new("#{project_root}/../salma-hayek").realpath()
 
 require "#{salma_hayek}/bin/uuid.rb"
