@@ -172,7 +172,7 @@ class Java
   end
   
   def subvertPath()
-    # When run from Cygwin, we need to use colon as the PATH separator, rather than the native semi-colon.
+    # File::PATH_SEPARATOR is the right choice here for Cygwin (":") and native Windows Ruby (";").
     originalPathComponents = ENV["PATH"].split(File::PATH_SEPARATOR)
     newPathComponents = []
     # Put our setsid(1) ahead of any pre-installed one, for the potential benefit of edit.
