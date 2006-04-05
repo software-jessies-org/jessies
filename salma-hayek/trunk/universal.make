@@ -499,8 +499,7 @@ ChangeLog:
 .PHONY: source-dist
 source-dist: ../$(SOURCE_DIST_FILE)
 	mkdir -p $(DIST_DIRECTORY) && \
-	$(RM) $(DIST_DIRECTORY)/$(SOURCE_DIST_FILE) && \
-	cp $< $(DIST_DIRECTORY)/
+	mv $< $(DIST_DIRECTORY)/
 
 $(PROJECT_NAME).jar: build.java
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
@@ -516,7 +515,7 @@ $(PROJECT_NAME).jar: build.java
 .PHONY: www-dist
 www-dist: ChangeLog.html
 	mkdir -p $(DIST_DIRECTORY) && \
-	cp -f ChangeLog.html $(DIST_DIRECTORY)/ && \
+	mv ChangeLog.html $(DIST_DIRECTORY)/ && \
 	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_DIRECTORY)/ ; fi
 
 .PHONY: .generated/build-revision.txt
