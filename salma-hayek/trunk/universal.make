@@ -315,6 +315,7 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 PROJECT_ROOT = $(CURDIR)
 
 PROJECT_NAME = $(notdir $(PROJECT_ROOT))
+HUMANIZED_PROJECT_NAME := $(shell $(SCRIPT_PATH)/humanize.rb $(PROJECT_NAME))
 
 # By default, distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST=software@jessies.org
@@ -559,7 +560,7 @@ echo.%:
 # The $$1 here is a Ruby variable, not a make one.
 .generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
 	@mkdir -p $(@D) && \
-	ruby -w -ne '($$_.match(/^\s*(\S+)\s*[:+]?=/) || $$_.match(/^\s*define\s*(\S+)/)) && puts("LOCAL_VARIABLES += #{$$1}")' $< | sort -u > $@
+	ruby -w -ne '($$_.match(/^ *(\S+)\s*[:+]?=/) || $$_.match(/^\s*define\s*(\S+)/)) && puts("LOCAL_VARIABLES += #{$$1}")' $< | sort -u > $@
 
 # Several of the rules include $(MAKEFILE_LIST) in their prerequisites.
 # All of the .o files, for example, depend on the makefiles.
