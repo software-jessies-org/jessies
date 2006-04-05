@@ -1,8 +1,21 @@
 #!/bin/bash
 # FIXME: rewrite this in Ruby! (The fact that Ruby isn't installed by default on Solaris or Ubuntu points to one possible advantage to keeping this in sh, or at least in having a bootstrap stage that installs Ruby.  A proper packaging system will let us specify a dependency on Ruby, so we shouldn't feel constrained.)
 
+LOG=/tmp/install-everything.log
+exec 3>&1
+exec &> $LOG
+
+restore_stdio() {
+    exec 1>&3
+    exec 2>&3
+}
+
 die() {
+    restore_stdio
     echo $*
+    echo
+    echo Log was:
+    cat $LOG
     exit 1
 }
 
@@ -105,5 +118,9 @@ if [ "$BROKEN_PROJECTS" != "" ]
 then
     die "failed to build $BROKEN_PROJECTS"
 fi
-echo "All done!"
+
+restore_stdio
+echo "Success!"
+HOSTNAME=`hostname`
+echo "(A complete log is in /net/$HOSTNAME/$LOG.)"
 exit 0
