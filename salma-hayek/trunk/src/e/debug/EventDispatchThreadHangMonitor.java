@@ -24,6 +24,9 @@ import javax.swing.*;
  * GUI to be unresponsive.
  * 
  * @author Elliott Hughes <enh@jessies.org>
+ * 
+ * Advice, bug fixes, and test cases from Alexander Potochkin and
+ * Oleg Sukhodolsky.
  */
 public final class EventDispatchThreadHangMonitor extends EventQueue {
     private static final EventQueue INSTANCE = new EventDispatchThreadHangMonitor();
@@ -59,9 +62,8 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         // I don't know of any API for getting the event dispatch thread,
         // but we can assume that it's the current thread if we're in the
         // middle of dispatching an AWT event...
-        // Alexander Potochkin points out that we can't cache this because
-        // the EDT can die and be replaced by a new EDT if there's an uncaught
-        // exception.        
+        // We can't cache this because the EDT can die and be replaced by a
+        // new EDT if there's an uncaught exception.        
         private final Thread eventDispatchThread = Thread.currentThread();
         
         // The time in milliseconds at which we noted this dispatch.
@@ -298,8 +300,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             frame.add(button);
         }
         
-        // Alexander Potochkin supplied this demonstration of nested calls to
-        // dispatchEvent caused by SequencedEvent.
+        // A demonstration of nested calls to dispatchEvent caused by SequencedEvent.
         private static void runFocusTest(final JFrame frame) {
             final JDialog dialog = new JDialog(frame, "Non-Modal Dialog");
             dialog.add(new JLabel("Close me!"));
@@ -322,8 +323,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             frame.add(button);
         }
         
-        // Alexander Potochkin supplied this demonstration of the problems
-        // of dealing with modal dialogs.
+        // A demonstration of the problems of dealing with modal dialogs.
         private static void runModalTest(final JFrame frame, final boolean shouldSleep) {
             System.out.println(shouldSleep ? "Expect hangs!" : "There should be no hangs...");
             JButton button = new JButton("Show Modal Dialog");
