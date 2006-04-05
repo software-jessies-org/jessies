@@ -1,21 +1,21 @@
 <?xml version='1.0'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
   <Product Id='$(env.PRODUCT_GUID)'
-  Name='Terminator $(env.VERSION_STRING)' Language='1033'
-  UpgradeCode='978872f0-7b6b-11da-a72b-0800200c9a66'
+  Name='$(env.HUMANIZED_PROJECT_NAME) $(env.VERSION_STRING)' Language='1033'
+  UpgradeCode='$(env.UPGRADE_GUID)'
   Version='$(env.VERSION_STRING)'
   Manufacturer='software.jessies.org'>
     <Package Id='????????-????-????-????-????????????'
     Compressed='yes' InstallerVersion='150' />
-    <Upgrade Id='978872f0-7b6b-11da-a72b-0800200c9a66'>
+    <Upgrade Id='$(env.UPGRADE_GUID)'>
     <UpgradeVersion Maximum='$(env.VERSION_STRING)' />
     </Upgrade>
     <Property Id='ALLUSERS' Value='2' />
     <Property Id="ARPCONTACT">software@jessies.org</Property>
     <Property Id='ARPNOMODIFY' Value='1' />
-    <Property Id="ARPPRODUCTICON" Value='terminator.ico' />
+    <Property Id="ARPPRODUCTICON" Value='$(env.PROJECT_NAME).ico' />
     <Property Id="ARPURLINFOABOUT">
-    http://software.jessies.org/terminator/</Property>
+    http://software.jessies.org/$(env.PROJECT_NAME)/</Property>
     <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
     <Property Id='CYGWIN'>
       <RegistrySearch Id='RUBYW.dir' Root="HKLM" Key='Software\Cygnus Solutions\Cygwin\mounts v2\/' Name='native' Type='directory' />
@@ -32,9 +32,9 @@
         <Directory Id='company' Name='Name'
         LongName='software.jessies.org'>
           <Directory Id='product' Name='Name'
-          LongName='terminator'>
+          LongName='$(env.PROJECT_NAME)'>
             <Component Id='StandardFiles'
-            Guid='cef57b50-8eff-11da-a72b-0800200c9a66'>
+            Guid='$(env.STANDARD_FILES_GUID)'>
               <File Id='README' Name='README.txt' DiskId='1'
               src='README' />
               <File Id='COPYING' Name='COPYING.txt' DiskId='1'
@@ -49,18 +49,18 @@
       </Directory>
       <Directory Id='DesktopFolder' Name='Desktop' />
       <Component Id='RubyShortcut'
-      Guid='c0199e40-8eff-11da-a72b-0800200c9a66'>
+      Guid='$(env.SHORTCUT_GUID)'>
         <Registry Id='RegistryKey' Root='HKCU'
-        Key='Software\software.jessies.org\terminator'
+        Key='Software\software.jessies.org\$(env.PROJECT_NAME)'
         Name='ShortcutTarget' Action='write' Type='string'
         Value='[RUBYW]' KeyPath='yes' />
         <Shortcut Id='DesktopShortcutId' Directory='DesktopFolder'
-        Name='Name' LongName='terminator' Target='[RUBYW]'
-        Arguments='bin/terminator' WorkingDirectory='product'
-        Icon='terminator.ico' />
+        Name='Name' LongName='$(env.PROJECT_NAME)' Target='[RUBYW]'
+        Arguments='bin/$(env.PROJECT_NAME)' WorkingDirectory='product'
+        Icon='$(env.PROJECT_NAME).ico' />
       </Component>
     </Directory>
-    <Feature Id='product' Title='terminator' Level='1'>
+    <Feature Id='product' Title='$(env.PROJECT_NAME)' Level='1'>
       <ComponentRef Id='StandardFiles' />
       <ComponentRef Id='RubyShortcut' />
       <MergeRef Id='salma_hayek.d7665d40-3540-11da-8cd6-0800200c9a66' /><?include component-references.wxi ?>
@@ -68,7 +68,7 @@
     <InstallExecuteSequence>
       <RemoveExistingProducts After='InstallInitialize' />
     </InstallExecuteSequence>
-    <Icon Id='terminator.ico'
-    src='native/Cygwin/WiX/terminator.ico' />
+    <Icon Id='$(env.PROJECT_NAME).ico'
+    src='native/Cygwin/WiX/$(env.PROJECT_NAME).ico' />
   </Product>
 </Wix>
