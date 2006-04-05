@@ -72,7 +72,7 @@ fi
 for PROJECT in $PROJECTS; do
     wget $WGET_OPTIONS -N http://software.jessies.org/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
     rm -rf $PROJECT || die "removing old copy of $PROJECT"
-    tar --no-same-owner -zxf $PROJECT.tgz || die "extracting $PROJECT"
+    tar --no-same-owner -zxf $PROJECT.tgz || { mv $PROJECT.tgz corrupt-$PROJECT.tgz; die "extracting corrupt-$PROJECT.tgz"; }
     if ! make -C $PROJECT ; then
         # A number of people, on a number of both recent and previous occasions have had one-off failures.
         # The goal here is to leave them with a working installation at the expense of a messy build mail.
