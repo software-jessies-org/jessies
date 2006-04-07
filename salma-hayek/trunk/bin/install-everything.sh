@@ -122,5 +122,5 @@ fi
 restore_stdio
 echo "Success!"
 HOSTNAME=`hostname`
-echo "(A complete log is in /net/$HOSTNAME/$LOG.)"
+echo "(A complete log is in /net/$HOSTNAME$LOG.)"
 exit 0
