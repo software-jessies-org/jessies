@@ -409,12 +409,22 @@ public class Edit {
     public void removeCurrentWorkspace() {
         Workspace workspace = getCurrentWorkspace();
         if (workspace == null) {
+            showAlert("Edit", "<html><b>Remove Workspace</b><p>There's no workspace selected.");
             return;
         }
         if (getWorkspaces().length == 1) {
-            showAlert("Edit", "Cannot remove the last workspace.");
+            showAlert("Edit", "<html><b>Remove Workspace</b><p>The last workspace cannot be removed.");
             return;
         }
+        String question = "<html><b>Remove Workspace</b><p>Do you really want to remove the workspace \"" + workspace.getTitle() + "\"?";
+        if (workspace.isEmpty() == false) {
+            question += " Open windows will be moved to the next best workspace.";
+        }
+        boolean remove = askQuestion("Edit", question, "Remove");
+        if (remove == false) {
+            return;
+        }
+        
         tabbedPane.remove(workspace);
         fireTabbedPaneTabCountChange();
         workspace.moveFilesToBestWorkspaces();
@@ -754,6 +764,20 @@ public class Edit {
             public void stateChanged(ChangeEvent e) {
                 Edit.getInstance().getTagsPanel().ensureTagsAreHidden();
                 getCurrentWorkspace().restoreFocusToRememberedTextWindow();
+            }
+        });
+        EPopupMenu tabMenu = new EPopupMenu(tabbedPane);
+        tabMenu.addMenuItemProvider(new MenuItemProvider() {
+            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+                // If the user clicked on some part of the tabbed pane that isn't actually a tab, we're not interested.
+                int tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
+                if (tabIndex == -1) {
+                    return;
+                }
+                
+                actions.add(new RescanWorkspaceAction());
+                actions.add(null);
+                actions.add(new RemoveWorkspaceAction());
             }
         });
         
