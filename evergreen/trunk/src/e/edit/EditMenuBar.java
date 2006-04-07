@@ -153,6 +153,8 @@ public class EditMenuBar extends EMenuBar {
     
     private JMenu makeWorkspaceMenu() {
         JMenu menu = new JMenu("Workspace");
+        menu.add(new RescanWorkspaceAction());
+        menu.add(new JSeparator());
         menu.add(new AddWorkspaceAction());
         menu.add(new RemoveWorkspaceAction());
         menu.add(new JSeparator());

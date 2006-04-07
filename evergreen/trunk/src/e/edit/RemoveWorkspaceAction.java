@@ -3,11 +3,8 @@ package e.edit;
 import java.awt.event.*;
 import javax.swing.*;
 
-/**
- * FIXME: Should open a dialog where the user can specify which workspace to remove?
- */
 public class RemoveWorkspaceAction extends AbstractAction {
-    public static final String ACTION_NAME = "Remove Current Workspace";
+    public static final String ACTION_NAME = "Remove Workspace";
     
     public RemoveWorkspaceAction() {
         super(ACTION_NAME);
