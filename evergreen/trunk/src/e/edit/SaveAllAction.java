@@ -18,7 +18,7 @@ public class SaveAllAction extends AbstractAction {
         for (Workspace workspace : Edit.getInstance().getWorkspaces()) {
             if (workspace.saveAll() == false) {
                 if (interactive) {
-                    Edit.getInstance().showAlert(ACTION_NAME, "Unable to save everything on workspace '" + workspace.getTitle() + "'.");
+                    Edit.getInstance().showAlert("Couldn't save all", "Unable to save everything on workspace '" + workspace.getTitle() + "'.");
                 }
                 return;
             }

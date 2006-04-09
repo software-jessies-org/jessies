@@ -341,7 +341,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             getTitleBar().repaint();
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
-            Edit.getInstance().showAlert("Open", "Couldn't open file '" + FileUtilities.getUserFriendlyName(file) + "' (" + th.getMessage() + ")");
+            Edit.getInstance().showAlert("Couldn't open file \"" + FileUtilities.getUserFriendlyName(file) + "\"", th.getMessage());
             throw new RuntimeException("can't open " + FileUtilities.getUserFriendlyName(file));
         }
     }
@@ -473,14 +473,14 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     public void revertToSaved() {
         if (file.exists() == false) {
-            Edit.getInstance().showAlert("Revert to Saved", "'" + getFilename() + "' does not exist.");
+            Edit.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" does not exist.");
             return;
         }
         if (isDirty() == false && file.exists() && isOutOfDateWithRespectToDisk() == false) {
-            Edit.getInstance().showAlert("Revert to Saved", "'" + getFilename() + "' is the same on disk as in the editor.");
+            Edit.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" is the same on disk as in the editor.");
             return;
         }
-        if (showPatchAndAskForConfirmation("Revert to Saved", "Revert to on-disk version of '" + file.getName() + "'? (Equivalent to applying the following patch.)", true)) {
+        if (showPatchAndAskForConfirmation("Revert to saved?", "Revert to on-disk version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true)) {
             uncheckedRevertToSaved();
         }
     }
@@ -504,7 +504,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     public void closeWindow() {
         if (isDirty()) {
-            if (showPatchAndAskForConfirmation("Discard", "Discard changes to '" + file.getName() + "'? (Equivalent to applying the following patch.)", true) == false) {
+            if (showPatchAndAskForConfirmation("Discard changes?", "Discard changes to \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true) == false) {
                 return;
             }
         }
@@ -588,7 +588,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         if (counterpartFilename != null) {
             Edit.getInstance().openFile(getContext() + File.separator + counterpartFilename);
         } else {
-            Edit.getInstance().showAlert("Switch To Counterpart", "File '" + filename + "' has no counterpart.");
+            Edit.getInstance().showAlert("Can't switch to counterpart", "File \"" + filename + "\" has no counterpart.");
         }
     }
 
@@ -760,7 +760,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     /** Saves the text. Returns true if the file was saved okay. */
     public boolean save() {
         if (file.exists() && isOutOfDateWithRespectToDisk()) {
-            if (showPatchAndAskForConfirmation("Overwrite", "Overwrite the currently saved version of '" + file.getName() + "'? (Equivalent to applying the following patch.)", false) == false) {
+            if (showPatchAndAskForConfirmation("Overwrite existing file?", "Overwrite the currently saved version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", false) == false) {
                 return false;
             }
         }
@@ -774,7 +774,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             try {
                 writeToFile(backupFile);
             } catch (Exception ex) {
-                edit.showAlert("Save", "File '" + this.filename + "' wasn't saved! Couldn't create backup file.");
+                edit.showAlert("Couldn't save \"" + this.filename + "\"", "Couldn't create backup file.");
                 return false;
             }
         }
@@ -796,7 +796,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             return true;
         } catch (Exception ex) {
             edit.showStatus("");
-            edit.showAlert("Save", "Couldn't save file '" + filename + "' (" + ex.getMessage() + ").");
+            edit.showAlert("Couldn't save file \"" + filename + "\"", ex.getMessage());
             Log.warn("Problem saving \"" + filename + "\"", ex);
         }
         return false;
@@ -807,7 +807,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         try {
             File newFile = FileUtilities.fileFromString(newFilename);
             if (newFile.exists()) {
-                boolean replace = Edit.getInstance().askQuestion("Save As", "An item named '" + newFilename + "' already exists in this location. Do you want to replace it with the one you are saving?", "Replace");
+                boolean replace = Edit.getInstance().askQuestion("Overwrite existing file?", "An item named \"" + newFilename + "\" already exists in this location. Do you want to replace it with the one you are saving?", "Replace");
                 if (replace == false) {
                     return false;
                 }
@@ -815,7 +815,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             writeToFile(newFile);
             return true;
         } catch (Exception ex) {
-            Edit.getInstance().showAlert("Save As", "Couldn't save file '" + newFilename + "' (" + ex.getMessage() + ").");
+            Edit.getInstance().showAlert("Couldn't save file \"" + newFilename + "\"", ex.getMessage());
             Log.warn("Problem saving as \"" + newFilename + "\"", ex);
         }
         return false;

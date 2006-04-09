@@ -129,7 +129,7 @@ public class Edit {
             }
             ProcessUtilities.spawn(null, new String[] { openCommand, FileUtilities.parseUserFriendlyName(filename) });
         } catch (Exception ex) {
-            showAlert("Run", "Couldn't open '" + filename + "' with an external application (" + ex.getMessage() + ")");
+            showAlert("Couldn't open \"" + filename + "\"", "The external application failed to start: " + ex.getMessage() + ".");
         }
     }
     
@@ -155,7 +155,7 @@ public class Edit {
             return openFileNonInteractively(file);
         } catch (Exception ex) {
             Log.warn("Problem opening file \"" + file.filename + "\"", ex);
-            showAlert("Open", ex.getMessage());
+            showAlert("Couldn't open \"" + file.filename + "\"", ex.getMessage());
             return null;
         }
     }
@@ -374,7 +374,7 @@ public class Edit {
     public Workspace createWorkspace(String name, String root) {
         boolean noNonEmptyWorkspaceOfThisNameExists = removeWorkspaceByName(name);
         if (noNonEmptyWorkspaceOfThisNameExists == false) {
-            showAlert("Edit", "A non-empty workspace of the name '" + name + "' already exists.");
+            showAlert("Couldn't create workspace", "A non-empty workspace with the name \"" + name + "\" already exists.");
             return null;
         }
         Workspace workspace = new Workspace(name, root);
@@ -409,18 +409,18 @@ public class Edit {
     public void removeCurrentWorkspace() {
         Workspace workspace = getCurrentWorkspace();
         if (workspace == null) {
-            showAlert("Edit", "<html><b>Remove Workspace</b><p>There's no workspace selected.");
+            showAlert("Couldn't remove workspace", "There's no workspace selected.");
             return;
         }
         if (getWorkspaces().length == 1) {
-            showAlert("Edit", "<html><b>Remove Workspace</b><p>The last workspace cannot be removed.");
+            showAlert("Couldn't remove workspace", "The last workspace cannot be removed.");
             return;
         }
-        String question = "<html><b>Remove Workspace</b><p>Do you really want to remove the workspace \"" + workspace.getTitle() + "\"?";
+        String question = "Do you really want to remove the workspace \"" + workspace.getTitle() + "\"?";
         if (workspace.isEmpty() == false) {
             question += " Open windows will be moved to the next best workspace.";
         }
-        boolean remove = askQuestion("Edit", question, "Remove");
+        boolean remove = askQuestion("Remove workspace?", question, "Remove");
         if (remove == false) {
             return;
         }
@@ -480,7 +480,7 @@ public class Edit {
         }
         
         if (isSafeToQuit == false) {
-            showAlert("Edit", "There are unsaved files. Please deal with them and try again.");
+            showAlert("You have files with unsaved changes", "There are unsaved files. Please deal with them and try again.");
             return;
         }
         
@@ -808,7 +808,7 @@ public class Edit {
                 
                 // If we didn't create any workspaces, give the user some help...
                 if (tabbedPane.getTabCount() == 0) {
-                    showAlert("Welcome!", "<html><b>Welcome to Edit!</b><p>This looks like the first time you've used Edit. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
+                    showAlert("Welcome to Edit!", "This looks like the first time you've used Edit. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
                 }
             }
         });

@@ -129,7 +129,7 @@ public class EErrorsWindow extends EWindow {
             List<String> candidates = JavaDoc.findSourceFilenames(dottedClassName);
             if (candidates.size() != 1) {
                 // FIXME: if there's any reason why this should ever occur in real life, we could offer a dialog so the user can disambiguate.
-                Edit.getInstance().showAlert("Errors Window", "The class name \"" + dottedClassName + "\" is ambiguous.");
+                Edit.getInstance().showAlert("Can't find matching class", "The class name \"" + dottedClassName + "\" is ambiguous.");
                 return;
             }
             

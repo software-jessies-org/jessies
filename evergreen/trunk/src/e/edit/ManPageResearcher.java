@@ -88,7 +88,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
             try {
                 new ShellCommand("man -S 2:3 " + page + " | col -b").runCommand();
             } catch (Throwable th) {
-                Edit.getInstance().showAlert("Man Page", "Can't run man(1) (" + th.getMessage() + ").");
+                Edit.getInstance().showAlert("Couldn't show manual page", "There was a problem running man(1): " + th.getMessage() + ".");
             }
             return true;
         }
