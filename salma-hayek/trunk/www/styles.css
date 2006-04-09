@@ -10,3 +10,18 @@ h2 {
 pre {
     margin-left:40px;
 }
+
+div.leftcol {
+  float: left;
+}
+div.rightcol {
+  float: right;
+}
+div.footer {
+  width: 100%;
+  clear: both;
+  color: #888888;
+  padding-top: 2em;
+  padding-bottom: 2em;
+  font-size: 75%;
+}
