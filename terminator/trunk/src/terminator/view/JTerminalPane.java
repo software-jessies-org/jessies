@@ -590,7 +590,7 @@ public class JTerminalPane extends JPanel {
 			return true;
 		}
 
-		boolean reallyClose = SimpleDialog.askQuestion(getTerminatorFrame(), "Terminator", "<html><b>Close Terminal?</b><p>Closing this terminal may terminate the following processes: " + processesUsingTty, "Terminate");
+		boolean reallyClose = SimpleDialog.askQuestion(getTerminatorFrame(), "Close Terminal?", "Closing this terminal may terminate the following processes: " + processesUsingTty, "Close");
 		return reallyClose;
 	}
 
