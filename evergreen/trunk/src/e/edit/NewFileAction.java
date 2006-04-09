@@ -50,7 +50,7 @@ public class NewFileAction extends ETextAction {
             }
             File directory = newFile.getParentFile();
             if (directory.exists() == false) {
-                boolean createDirectory = edit.askQuestion("New File", "The directory '" + directory + "' doesn't exist. Edit can either create the directory for you, or you can go back and re-type the filename.", "Create");
+                boolean createDirectory = edit.askQuestion("Create directory?", "The directory '" + directory + "' doesn't exist. Edit can either create the directory for you, or you can go back and re-type the filename.", "Create");
                 if (createDirectory == false) {
                     return false;
                 }
@@ -61,12 +61,12 @@ public class NewFileAction extends ETextAction {
                 edit.getCurrentWorkspace().updateFileList(null);
                 fillWithInitialContents(newFile);
             } else {
-                edit.showAlert(ACTION_NAME, "File '" + newFile + "' already exists.");
+                edit.showAlert("Couldn't create new file", "File \"" + newFile + "\" already exists.");
             }
             edit.openFile(newFile.toString());
             return true;
         } catch (IOException ex) {
-            edit.showAlert(ACTION_NAME, "Failed to create file '" + newFile + "' (" + ex.getMessage() + ").");
+            edit.showAlert("Couldn't create new file", "Failed to create file \"" + newFile + "\": " + ex.getMessage() + ".");
             return false;
         }
     }
@@ -86,7 +86,7 @@ public class NewFileAction extends ETextAction {
             content += "#endif\n";
             String result = StringUtilities.writeFile(file, content);
             if (result != null) {
-                Edit.getInstance().showAlert(ACTION_NAME, "Failed to fill '" + file + "' with initial content (" + result + ").");
+                Edit.getInstance().showAlert("Couldn't fill new file", "There was a problem filling \"" + file + "\" with initial content: " + result + ".");
             }
         }
     }

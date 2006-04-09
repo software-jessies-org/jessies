@@ -37,7 +37,7 @@ public class AddWorkspaceAction extends AbstractAction {
             
             String message = FileUtilities.checkDirectoryExistence(filenameChooserField.getPathname());
             if (message != null) {
-                Edit.getInstance().showAlert(ACTION_NAME, message);
+                Edit.getInstance().showAlert(message, "The name you supply must exist, and must be a directory.");
             } else {
                 Workspace workspace = Edit.getInstance().createWorkspace(nameField.getText(), filenameChooserField.getPathname());
                 workspace.updateFileList(null);

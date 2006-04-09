@@ -137,11 +137,11 @@ public class Workspace extends JPanel {
      */
     public boolean isFileListUnsuitableFor(String purpose) {
         if (fileList == null) {
-            Edit.getInstance().showAlert(purpose, "The list of files for " + getTitle() + " is not yet available.");
+            Edit.getInstance().showAlert("Can't " + purpose, "The list of files for " + getTitle() + " is not yet available.");
             return true;
         }
         if (fileList.isEmpty()) {
-            Edit.getInstance().showAlert(purpose, "The list of files for " + getTitle() + " is empty.");
+            Edit.getInstance().showAlert("Can't " + purpose, "The list of files for " + getTitle() + " is empty.");
             return true;
         }
         return false;

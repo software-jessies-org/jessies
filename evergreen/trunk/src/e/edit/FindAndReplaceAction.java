@@ -136,7 +136,7 @@ public class FindAndReplaceAction extends ETextAction {
             }
             return true;
         } catch (Exception ex) {
-            Edit.getInstance().showAlert(ACTION_NAME, "Couldn't perform the replacements (" + ex.getMessage() + ").");
+            Edit.getInstance().showAlert("Couldn't replace", "There was a problem performing the replacements: " + ex.getMessage() + ".");
             return false;
         }
     }

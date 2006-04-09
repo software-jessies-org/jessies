@@ -25,12 +25,12 @@ public class BuildAction extends ETextAction {
 
     private void buildProject(ETextWindow text) {
         if (building) {
-            Edit.getInstance().showAlert(ACTION_NAME, "A target is already being built. Please wait for the build to complete.");
+            Edit.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
             return;
         }
         
         Workspace workspace = Edit.getInstance().getCurrentWorkspace();
-        boolean shouldContinue = workspace.prepareForAction("Build", "Save before building?");
+        boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
         if (shouldContinue == false) {
             return;
         }
@@ -42,14 +42,14 @@ public class BuildAction extends ETextAction {
             try {
                 context = workspace.getCanonicalRootDirectory();
             } catch (IOException ex) {
-                Edit.getInstance().showAlert(ACTION_NAME, "It's not possible to build this project because the workspace root could not be found (" + ex.getMessage() + ").");
+                Edit.getInstance().showAlert("Workspace root not found", "It's not possible to build this project because the workspace root could not be found (" + ex.getMessage() + ").");
                 return;
             }
         }
         
         String makefileName = findMakefile(context);
         if (makefileName == null) {
-            Edit.getInstance().showAlert(ACTION_NAME, "It's not possible to build this project because neither a Makefile for make(1) nor a build.xml for Ant could be found.");
+            Edit.getInstance().showAlert("Build instructions not found", "It's not possible to build this project because neither a Makefile for make(1) nor a build.xml for Ant could be found.");
             return;
         }
         
@@ -89,7 +89,7 @@ public class BuildAction extends ETextAction {
             });
             shellCommand.runCommand();
         } catch (IOException ex) {
-            Edit.getInstance().showAlert(ACTION_NAME, "Can't start task (" + ex.getMessage() + ").");
+            Edit.getInstance().showAlert("Unable to invoke build tool", "Can't start task (" + ex.getMessage() + ").");
             Log.warn("Couldn't start \"" + command + "\"", ex);
         }
     }

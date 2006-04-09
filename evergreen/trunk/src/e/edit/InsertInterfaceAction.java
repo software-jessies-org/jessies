@@ -54,13 +54,13 @@ public class InsertInterfaceAction extends ETextAction {
             prefix += "new " + className + "(";
         }
         if (className == null) {
-            Edit.getInstance().showAlert(ACTION_NAME, "Couldn't work out what interface you're referring to.");
+            Edit.getInstance().showAlert("Couldn't insert interface", "It wasn't possible to work out what interface you're referring to.");
             return;
         }
         
         Class[] classes = JavaDoc.getClasses(className);
         if (classes.length != 1) {
-            Edit.getInstance().showAlert(ACTION_NAME, "The class name \"" + className + "\" matches " + classes.length + " classes.");
+            Edit.getInstance().showAlert("Couldn't insert interface", "The class name \"" + className + "\" must be unique, but matches " + classes.length + " classes.");
             return;
         }
         
