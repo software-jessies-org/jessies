@@ -3,6 +3,7 @@ package e.gui;
 import com.apple.eawt.*;
 import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
@@ -42,9 +43,11 @@ public class AboutBox {
     
     public void setImage(String filename) {
         this.icon = new ImageIcon(filename);
+        
+        // Apple's HIG says scale to 64x64. I'm not sure there's any advice for the other platforms.
+        this.icon = new ImageIcon(ImageUtilities.scale(icon.getImage(), 64, 64, ImageUtilities.InterpolationHint.BICUBIC));
+        
         if (GuiUtilities.isMacOs()) {
-            // FIXME: 64x64 is the Mac OS standard, but we should support whatever GNOME does too.
-            this.icon = new ImageIcon(ImageUtilities.scale(icon.getImage(), 64, 64, ImageUtilities.InterpolationHint.BICUBIC));
             // Apple's HIG says that these dialog icons should be the application icon.
             UIManager.put("OptionPane.errorIcon", icon);
             UIManager.put("OptionPane.informationIcon", icon);
@@ -88,7 +91,7 @@ public class AboutBox {
         dialog.setVisible(true);
     }
     
-    private void makeUi(JDialog dialog) {
+    private void makeUi(final JDialog dialog) {
         if (GuiUtilities.isMacOs() == false) {
             // GNOME and Win32 applications give their about boxes titles.
             dialog.setTitle("About " + applicationName);
@@ -115,8 +118,13 @@ public class AboutBox {
             copyrightFont = gnomeBaseFont.deriveFont(baseSize * PANGO_SCALE_SMALL);
         }
         
+        int bottomBorder = 20;
+        if (GuiUtilities.isGtk()) {
+            bottomBorder = 12;
+        }
+        
         JPanel panel = new JPanel();
-        panel.setBorder(new EmptyBorder(8, 12, 20, 12));
+        panel.setBorder(new EmptyBorder(8, 12, bottomBorder, 12));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
         Dimension spacerSize = new Dimension(1, 8);
@@ -139,6 +147,27 @@ public class AboutBox {
         
         for (String copyright : copyrightLines) {
             addLabel(panel, copyrightFont, copyright);
+        }
+        
+        if (GuiUtilities.isGtk()) {
+            JButton closeButton = new JButton("Close");
+            GnomeStockIcon.useStockIcon(closeButton, "gtk-close");
+            closeButton.setMnemonic(KeyEvent.VK_C);
+            closeButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    dialog.setVisible(false);
+                }
+            });
+            JButton creditsButton = new JButton("Credits");
+            creditsButton.setEnabled(false);
+            creditsButton.setMnemonic(KeyEvent.VK_R);
+            
+            JPanel buttonPanel = new JPanel(new BorderLayout());
+            buttonPanel.add(creditsButton, BorderLayout.WEST);
+            buttonPanel.add(closeButton, BorderLayout.EAST);
+            
+            panel.add(Box.createRigidArea(spacerSize));
+            panel.add(buttonPanel);
         }
         
         dialog.setContentPane(panel);
