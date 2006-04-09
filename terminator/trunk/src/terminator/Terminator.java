@@ -43,7 +43,7 @@ public class Terminator {
 			
 			@Override
 			public void handleOpenFile(ApplicationEvent e) {
-				SimpleDialog.showAlert(null, "open file", e.toString());
+				SimpleDialog.showAlert(null, "Received 'open file' AppleEvent", e.toString());
 				Log.warn("open file " + e.toString());
 			}
 			
