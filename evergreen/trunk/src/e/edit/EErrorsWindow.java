@@ -42,7 +42,7 @@ public class EErrorsWindow extends EWindow {
         super("+Errors");
         this.workspace = workspace;
         initTextArea();
-        JScrollPane scrollPane = new JScrollPane(textArea);
+        JScrollPane scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
     }
