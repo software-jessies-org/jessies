@@ -84,6 +84,16 @@ public class SimpleDialog {
      * http://developer.gnome.org/projects/gup/hig/2.0/windows-alert.html
      */
     private static String makeDialogText(String title, String message) {
+        // On Mac OS, the primary text should end in punctuation.
+        if (GuiUtilities.isMacOs()) {
+            if (title.endsWith(".") == false && title.endsWith("?") == false) {
+                title += ".";
+            }
+        }
+        // On GNOME, the primary text shouldn't end with ".".
+        if (GuiUtilities.isGtk() && title.endsWith(".")) {
+            title = title.substring(0, title.length() - 1);
+        }
         return "<html><b>" + title + "</b><p>" + message;
     }
     
