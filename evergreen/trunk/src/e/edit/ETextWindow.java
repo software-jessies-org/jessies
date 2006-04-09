@@ -101,7 +101,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         
         this.watermarkViewPort = new WatermarkViewPort();
         watermarkViewPort.setView(text);
-        JScrollPane scrollPane = new JScrollPane();
+        JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setViewport(watermarkViewPort);
         
         initFocusListener();
