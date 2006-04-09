@@ -68,6 +68,8 @@ Items to be done for PTextArea:
   Input:  none / selection / all text
   Output: discard / replace selection / replace all text / new window / after selection / after all / to clipboard
 
+* Replace e.util.Log with java.util.logging code.
+
 General stuff:
 
 * Here's a really cool auto-update system (for Cocoa) that it would be nice to imitate: 
