@@ -23,6 +23,7 @@ fi
 # directory layout and the like that you will need to change if you change
 # this line.
 svn_user_and_host=$1@jessies.org
+software_user_and_host=software@jessies.org
 project_name=$2
 
 projects_dir=~/Projects
@@ -62,6 +63,11 @@ echo "Creating the checked-out copy in /home/software..."
 ssh $svn_user_and_host svn co file:///home/software/svnroot/$project_name /home/software/checked-out/$project_name
 echo "Making the initial import..."
 svn import $project_name svn+ssh://$svn_user_and_host/home/software/svnroot/$project_name -m "New project, $project_name."
+
+echo "Fixing permissions on the server..."
+ssh $software_user_and_host chown -R software /home/software/svnroot
+ssh $software_user_and_host chmod -R g+w
+
 echo "Checking back out..."
 svn co svn+ssh://$svn_user_and_host/home/software/svnroot/$project_name $projects_dir/$project_name
 cd $projects_dir/$project_name
