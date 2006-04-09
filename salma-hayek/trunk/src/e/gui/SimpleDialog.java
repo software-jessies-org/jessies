@@ -74,7 +74,17 @@ public class SimpleDialog {
      * Wraps JOptionPane.showMessageDialog using breakLongMessageLines to improve readability.
      */
     public static void showAlert(Component owner, String title, String message) {
-        JOptionPane.showMessageDialog(owner, breakLongMessageLines(message), title, JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(owner, breakLongMessageLines(makeDialogText(title, message)), "", JOptionPane.WARNING_MESSAGE);
+    }
+    
+    /**
+     * Apple and GNOME both say that alert dialogs should have no title, and that -- using the GNOME terminology -- the primary text should be bold and separated from (but in the same area as) the secondary text.
+     * 
+     * http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/XHIGWindows/chapter_17_section_6.html
+     * http://developer.gnome.org/projects/gup/hig/2.0/windows-alert.html
+     */
+    private static String makeDialogText(String title, String message) {
+        return "<html><b>" + title + "</b><p>" + message;
     }
     
     /**
@@ -108,13 +118,13 @@ public class SimpleDialog {
     
     public static boolean askQuestion(Component owner, String title, String message, String continueText) {
         Object[] options = { continueText, "Cancel" };
-        int option = JOptionPane.showOptionDialog(owner, breakLongMessageLines(message), title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        int option = JOptionPane.showOptionDialog(owner, breakLongMessageLines(makeDialogText(title, message)), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         return (option == JOptionPane.YES_OPTION);
     }
     
     public static String askQuestion(Component owner, String title, String message, String continueTextYes, String continueTextNo) {
         Object[] options = { continueTextYes, continueTextNo, "Cancel" };
-        int option = JOptionPane.showOptionDialog(owner, breakLongMessageLines(message), title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        int option = JOptionPane.showOptionDialog(owner, breakLongMessageLines(makeDialogText(title, message)), "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         if (option == JOptionPane.YES_OPTION) {
             return continueTextYes;
         } else if (option == JOptionPane.NO_OPTION) {
