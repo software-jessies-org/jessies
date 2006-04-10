@@ -1,5 +1,6 @@
 package e.tools;
 
+import com.apple.eawt.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -63,25 +64,19 @@ public class FatBits extends JFrame {
     }
     
     private JPanel makeInfoPanel() {
-        CircularButton infoButton = new CircularButton();
-        infoButton.setActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                FormBuilder form = new FormBuilder(FatBits.this, "FatBits Preferences");
-                FormPanel formPanel = form.getFormPanel();
-                formPanel.addRow("Scale:", scaleSlider);
-                formPanel.addRow("", showGridCheckBox);
-                formPanel.addRow("", keepOnTopCheckBox);
-                form.showNonModal();
-                // also: [x] refresh only when mouse moves
-                //       [ ] show mouse hot-spot
-                // alternative grid colors?
-            }
-        });
         JPanel result = new JPanel(new BorderLayout(8, 0));
         result.setBorder(makeInfoPanelBorder());
         result.add(colorLabel, BorderLayout.WEST);
         result.add(positionLabel, BorderLayout.CENTER);
-        result.add(infoButton, BorderLayout.EAST);
+        if (GuiUtilities.isGtk()) {
+            JButton infoButton = new JButton(new PreferencesAction());
+            infoButton.setText("");
+            result.add(infoButton, BorderLayout.EAST);
+        } else {
+            CircularButton infoButton = new CircularButton();
+            infoButton.setActionListener(new PreferencesAction());
+            result.add(infoButton, BorderLayout.EAST);
+        }
         return result;
     }
     
@@ -293,15 +288,49 @@ public class FatBits extends JFrame {
         }
     }
     
+    private void showPreferencesDialog() {
+        FormBuilder form = new FormBuilder(this, "FatBits Preferences");
+        FormPanel formPanel = form.getFormPanel();
+        formPanel.addRow("Scale:", scaleSlider);
+        formPanel.addRow("", showGridCheckBox);
+        formPanel.addRow("", keepOnTopCheckBox);
+        form.showNonModal();
+        // also: [x] refresh only when mouse moves
+        //       [ ] show mouse hot-spot
+        // alternative grid colors?
+    }
+    
     private class FatBitsMenuBar extends JMenuBar {
         private FatBitsMenuBar() {
+            if (GuiUtilities.isMacOs() == false) {
+                add(makeFileMenu());
+            }
             add(makeEditMenu());
             add(makeImageMenu());
+        }
+        
+        private JMenu makeFileMenu() {
+            JMenu menu = new JMenu("File");
+            menu.add(new QuitAction());
+            return menu;
         }
         
         private JMenu makeEditMenu() {
             JMenu menu = new JMenu("Edit");
             menu.add(new CopyImageAction());
+            
+            if (GuiUtilities.isMacOs()) {
+                Application.getApplication().setEnabledPreferencesMenu(true);
+                Application.getApplication().addApplicationListener(new ApplicationAdapter() {
+                    @Override
+                    public void handlePreferences(ApplicationEvent e) {
+                        showPreferencesDialog();
+                        e.setHandled(true);
+                    }
+                });
+            } else {
+                menu.add(new PreferencesAction());
+            }
             return menu;
         }
         
@@ -331,6 +360,29 @@ public class FatBits extends JFrame {
         public void actionPerformed(ActionEvent e) {
             Point p = getPointerLocation();
             robot.mouseMove(p.x + dx, p.y + dy);
+        }
+    }
+    
+    private class QuitAction extends AbstractAction {
+        private QuitAction() {
+            super("Quit");
+            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("Q", false));
+            GnomeStockIcon.useStockIcon(this, "gtk-quit");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            System.exit(0); // FIXME
+        }
+    }
+    
+    private class PreferencesAction extends AbstractAction {
+        private PreferencesAction() {
+            super("Preferences");
+            GnomeStockIcon.useStockIcon(this, "gtk-preferences");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            showPreferencesDialog();
         }
     }
     
