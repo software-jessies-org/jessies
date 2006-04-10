@@ -530,7 +530,7 @@ www-dist: ChangeLog.html
 
 .PHONY: $(PROJECT_NAME).app
 $(PROJECT_NAME).app: build .generated/build-revision.txt
-	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/make-mac-os-app.rb $(PROJECT_NAME) $(SALMA_HAYEK)
+	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/package-for-distribution.rb $(PROJECT_NAME) $(SALMA_HAYEK)
 
 # FIXME: the "native" target should depend on this on Mac OS X.
 $(PROJECT_NAME).dmg: $(PROJECT_NAME).app
