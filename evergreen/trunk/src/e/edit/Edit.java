@@ -400,14 +400,17 @@ public class Edit {
         return true;
     }
     
+    public void removeWorkspace(int index) {
+        removeWorkspace(getWorkspaces()[index]);
+    }
+    
     public void moveFilesToBestWorkspaces() {
         for (Workspace workspace : getWorkspaces()) {
             workspace.moveFilesToBestWorkspaces();
         }
     }
     
-    public void removeCurrentWorkspace() {
-        Workspace workspace = getCurrentWorkspace();
+    private void removeWorkspace(Workspace workspace) {
         if (workspace == null) {
             showAlert("Couldn't remove workspace", "There's no workspace selected.");
             return;
@@ -428,6 +431,10 @@ public class Edit {
         tabbedPane.remove(workspace);
         fireTabbedPaneTabCountChange();
         workspace.moveFilesToBestWorkspaces();
+    }
+    
+    public void removeCurrentWorkspace() {
+        removeWorkspace(getCurrentWorkspace());
     }
     
     /**
@@ -775,9 +782,9 @@ public class Edit {
                     return;
                 }
                 
-                actions.add(new RescanWorkspaceAction());
+                actions.add(new RescanWorkspaceAction(tabIndex));
                 actions.add(null);
-                actions.add(new RemoveWorkspaceAction());
+                actions.add(new RemoveWorkspaceAction(tabIndex));
             }
         });
         
