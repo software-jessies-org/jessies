@@ -67,7 +67,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         private final Thread eventDispatchThread = Thread.currentThread();
         
         // The time in milliseconds at which we noted this dispatch.
-        private final long startTimeMillis = System.currentTimeMillis();
+        private long lastDispatchTimeMillis = System.currentTimeMillis();
         
         public DispatchInfo() {
             // All initialization is done by the field initializers.
@@ -93,14 +93,16 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         
         private void examineHang() {
             StackTraceElement[] currentStack = eventDispatchThread.getStackTrace();
-            if (stacksEqual(lastReportedStack, currentStack)) {
-                // Don't keep reporting the same hang every time the timer goes off.
-                return;
-            }
             
             if (isWaitingForNextEvent(currentStack)) {
                 // Don't be fooled by a modal dialog if it's waiting for its next event.
                 // As long as the modal dialog's event pump doesn't get stuck, it's okay for the outer pump to be suspended.
+                lastDispatchTimeMillis = System.currentTimeMillis();
+                return;
+            }
+            
+            if (stacksEqual(lastReportedStack, currentStack)) {
+                // Don't keep reporting the same hang every time the timer goes off.
                 return;
             }
             
@@ -130,7 +132,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
          * Returns how long this dispatch has been going on (in milliseconds).
          */
         private long timeSoFar() {
-            return (System.currentTimeMillis() - startTimeMillis);
+            return (System.currentTimeMillis() - lastDispatchTimeMillis);
         }
         
         public void dispose() {
