@@ -9,14 +9,23 @@ public class OpenMakefileAction extends ETextAction {
         super(ACTION_NAME);
     }
     
-    public void actionPerformed(ActionEvent e) {
+    private String getSearchDirectory() {
         ETextWindow window = getFocusedTextWindow();
-        if (window == null) {
-            return;
+        if (window != null) {
+            return window.getContext();
+        } else {
+            Workspace workspace = Edit.getInstance().getCurrentWorkspace();
+            return (workspace == null) ? null : workspace.getRootDirectory();
         }
-        String makefileName = BuildAction.findMakefile(window.getContext());
-        if (makefileName != null) {
-            Edit.getInstance().openFile(makefileName);
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+        String searchDirectory = getSearchDirectory();
+        if (searchDirectory != null) {
+            String makefileName = BuildAction.findMakefile(searchDirectory);
+            if (makefileName != null) {
+                Edit.getInstance().openFile(makefileName);
+            }
         }
     }
 }
