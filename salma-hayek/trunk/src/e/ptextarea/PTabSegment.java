@@ -80,7 +80,7 @@ public class PTabSegment extends PAbstractSegment {
         
         // Draw traditional tab-stop marks at each tab stop.
         final int tabWidth = tabWidth(metrics);
-        for (int tabStopX = xStop; tabStopX > x; tabStopX -= tabWidth) {
+        for (int tabStopX = xStop; tabStopX > (x + MIN_TAB_WIDTH_IN_PIXELS); tabStopX -= tabWidth) {
             paintArrow(g, metrics, tabStopX, yMiddle, yBaseline);
         }
     }
