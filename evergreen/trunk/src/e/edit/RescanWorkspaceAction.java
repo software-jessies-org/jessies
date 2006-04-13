@@ -5,24 +5,22 @@ import javax.swing.*;
 
 public class RescanWorkspaceAction extends AbstractAction {
     public static final String ACTION_NAME = "Rescan Files";
-    private int workspaceIndex = -1;
     
-    public RescanWorkspaceAction() {
+    private Workspace boundWorkspace;
+    
+    // Rescan the given workspace.
+    public RescanWorkspaceAction(Workspace workspace) {
         super(ACTION_NAME);
+        this.boundWorkspace = workspace;
     }
     
-    public RescanWorkspaceAction(int workspaceIndex) {
-        super(ACTION_NAME);
-        this.workspaceIndex = workspaceIndex;
+    // Rescan the current workspace at the time the action is performed.
+    public RescanWorkspaceAction() {
+        this(null);
     }
     
     public void actionPerformed(ActionEvent e) {
-        System.err.println("Event source: " + e.getSource());
-        Edit edit = Edit.getInstance();
-        if (workspaceIndex == -1) {
-            edit.getCurrentWorkspace().updateFileList(null);
-        } else {
-            edit.getWorkspaces()[workspaceIndex].updateFileList(null);
-        }
+        Workspace workspace = (boundWorkspace != null) ? boundWorkspace : Edit.getInstance().getCurrentWorkspace();
+        workspace.updateFileList(null);
     }
 }
