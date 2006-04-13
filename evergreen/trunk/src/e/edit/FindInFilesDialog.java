@@ -118,7 +118,7 @@ public class FindInFilesDialog {
         }
         
         public void open() {
-            EWindow window = Edit.getInstance().openFile(workspace.getRootDirectory() + name);
+            EWindow window = Edit.getInstance().openFile(workspace.prependRootDirectory(name));
             if (window instanceof ETextWindow && pattern != null) {
                 ETextWindow textWindow = (ETextWindow) window;
                 FindAction.INSTANCE.findInText(textWindow, PatternUtilities.toString(pattern));
