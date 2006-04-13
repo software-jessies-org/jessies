@@ -248,7 +248,7 @@ public class Workspace extends JPanel {
             window = addViewer(newWindow, address, y);
             int prefixCharsToSkip = getRootDirectory().length();
             String pathWithinWorkspace = filename.substring(prefixCharsToSkip);
-            if (fileList.indexOf(pathWithinWorkspace) == -1) {
+            if (fileList != null && fileList.indexOf(pathWithinWorkspace) == -1) {
                 updateFileList(null);
             }
         } catch (Exception ex) {
