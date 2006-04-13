@@ -813,8 +813,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 }
             }
             writeToFile(newFile);
-            Edit edit = Edit.getInstance();
-            edit.openFile(newFile.getAbsolutePath());
+            Edit.getInstance().openFile(newFile.getAbsolutePath());
             return true;
         } catch (Exception ex) {
             Edit.getInstance().showAlert("Couldn't save file \"" + newFilename + "\"", ex.getMessage());
