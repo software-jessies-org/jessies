@@ -538,7 +538,15 @@ $(PROJECT_NAME).dmg: $(PROJECT_NAME).app
 	echo -n "Creating disk image..." && \
 	hdiutil create -fs HFS+ -volname `perl -w -e "print ucfirst(\"$(PROJECT_NAME)\");"` -srcfolder $(PROJECT_ROOT)/.generated/native/Darwin/$(PROJECT_NAME) $(PROJECT_NAME).dmg
 
+# FIXME: the "native" target should depend on this on Linux.
+$(PROJECT_NAME).deb: $(PROJECT_NAME).app
+	@$(RM) $@ && \
+	echo -n "Creating .deb package..." && \
+	dpkg-deb --build $(PROJECT_ROOT)/.generated/native/Linux/$(PROJECT_NAME) $(PROJECT_NAME).deb && \
+	dpkg-deb --info $(PROJECT_NAME).deb # && dpkg-deb --contents $(PROJECT_NAME).deb
+
 # FIXME: This should be the Mac OS X native-dist target.
+# FIXME: There should be a corresponding Linux target for the ".deb" file.
 .PHONY: app-dist
 app-dist: $(PROJECT_NAME).dmg
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
