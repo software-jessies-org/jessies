@@ -58,7 +58,6 @@ public class NewFileAction extends ETextAction {
             }
             boolean created = newFile.createNewFile();
             if (created) {
-                edit.getCurrentWorkspace().updateFileList(null);
                 fillWithInitialContents(newFile);
             } else {
                 edit.showAlert("Couldn't create new file", "File \"" + newFile + "\" already exists.");
