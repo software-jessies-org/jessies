@@ -170,7 +170,7 @@ public class JavaDoc {
         List<String> result = new ArrayList<String>();
         for (Workspace workspace : Edit.getInstance().getWorkspaces()) {
             for (String leafName : workspace.getListOfFilesMatching(suffix)) {
-                result.add(workspace.getRootDirectory() + File.separator + leafName);
+                result.add(workspace.getRootDirectory() + leafName);
             }
         }
         return result;

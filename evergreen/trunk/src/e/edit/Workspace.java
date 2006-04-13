@@ -117,6 +117,7 @@ public class Workspace extends JPanel {
     /**
      * Returns the normal, friendly form rather than the OS-canonical one.
      * See also getCanonicalRootDirectory.
+     * Ends with File.separator.
      */
     public String getRootDirectory() {
         return rootDirectory;
