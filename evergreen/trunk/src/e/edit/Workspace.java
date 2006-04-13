@@ -124,6 +124,14 @@ public class Workspace extends JPanel {
     }
     
     /**
+     * Returns an absolute path in user-friendly form.
+     * This avoids any File.separator confusion.
+     */
+    public String prependRootDirectory(String workspaceRelativeFilename) {
+        return rootDirectory + workspaceRelativeFilename;
+    }
+    
+    /**
      * Returns the OS-canonical form rather than the normal, friendly one.
      * See also getRootDirectory.
      */
