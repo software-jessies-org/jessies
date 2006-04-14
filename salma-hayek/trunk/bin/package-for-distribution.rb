@@ -177,6 +177,11 @@ else
         # http://www.debian.org/doc/debian-policy/ch-binary.html suggests YYYYMMDD
         control.puts("Version: 777")
 
+        # Our use of the architecture field is a bit bogus.
+        # For one thing, we don't necessarily have any native code. (Though in practice only amd64 and i386 Linux will have suitable JVMs available.)
+        # Also, what matters is not the target platform's architecture but the target JVM's architecture.
+        # If you're on i386, that's going to be an i386 JVM, but if you're on amd64 you may well be running the i386 JVM because it has a client compiler.
+        # It's unfortunate that we can't build amd64 binaries on i386 or vice versa.
         deb_arch = `dpkg-architecture -qDEB_HOST_ARCH`.chomp()
         control.puts("Architecture: #{deb_arch}")
 
