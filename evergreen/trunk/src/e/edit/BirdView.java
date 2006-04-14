@@ -80,9 +80,11 @@ public class BirdView extends JComponent {
     public int viewToModel(int y) {
         Rectangle usableArea = getUsableArea();
         double scaleFactor = getLineScaleFactor(usableArea);
-        int lineIndex = (int) ((y - usableArea.y) / scaleFactor);
-        lineIndex = Math.max(0, Math.min(lineIndex, textWindow.getText().getLineCount() - 1));
-        return lineIndex;
+        int wrappedLineIndex = (int) ((y - usableArea.y) / scaleFactor);
+        ETextArea textArea = textWindow.getText();
+        wrappedLineIndex = Math.max(0, Math.min(wrappedLineIndex, textArea.getSplitLineCount() - 1));
+        int charIndex = textArea.getTextIndex(new PCoordinates(wrappedLineIndex, 0));
+        return textArea.getLineOfOffset(charIndex);
     }
     
     private void findNearestMatchingLineTo(int exactLine) {
@@ -156,7 +158,8 @@ public class BirdView extends JComponent {
                     color = Color.RED;
                 }
                 g.setColor(color);
-                int y = usableArea.y + (int) ((double) i * scaleFactor);
+                int wrappedIndex = textWindow.getText().getSplitLineIndex(i);
+                int y = usableArea.y + (int) ((double) wrappedIndex * scaleFactor);
                 g.drawLine(usableArea.x, y, usableArea.width, y);
             }
         }
@@ -165,7 +168,7 @@ public class BirdView extends JComponent {
     public double getLineScaleFactor(Rectangle usableArea) {
         // The '-1' in the following line is to force the last line of the file to be right at the bottom of
         // the bird view.  Otherwise the marker for the final line seems to be too high in short files.
-        return ((double) usableArea.height) / (textWindow.getText().getLineCount() - 1);
+        return ((double) usableArea.height) / (textWindow.getText().getSplitLineCount() - 1);
     }
 
     public synchronized void addMatchingLine(int lineNumber) {
