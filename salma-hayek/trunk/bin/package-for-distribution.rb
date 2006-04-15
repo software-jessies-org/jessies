@@ -115,6 +115,14 @@ def copy_required_directories(src, dst)
     end
 end
 
+def linux_link_sources(glob, unwanted_prefix)
+    return Dir.glob(glob).map() {
+        |current_pathname|
+        # Remove tmp_dir from the front so we create currently dangling links to where the files will end up at install-time.
+        current_pathname.slice(unwanted_prefix.length(), current_pathname.length() - unwanted_prefix.length())
+    }
+end
+
 # FIXME: if we could get the make rules to give us all the salma-hayek MAKE_INSTALLER_FILE_LIST, we could junk this.
 copy_required_directories(salma_hayek, "#{resources_dir}/salma-hayek")
 
@@ -189,24 +197,31 @@ else
         control.puts("Description: software.jessies.org's #{project_name}")
     }
 
-    # 2. copy any lib/*.desktop files into /usr/share/applications/
+    # Make symbolic links in /usr/share/applications/ for any lib/*.desktop files.
     usr_share_applications = "#{tmp_dir}/usr/share/applications"
     FileUtils.mkdir_p(usr_share_applications)
-
+    FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/lib/*.desktop", tmp_dir), usr_share_applications)
+    
     # 3. copy any compiled files corresponding to lib/*.tic files into the correct location (which is where?)
     #    helium:~$ cat /etc/terminfo/README
     #    This directory is for system-local terminfo descriptions.  By default,
     #    ncurses will search this directory first, then /lib/terminfo, then
     #    /usr/share/terminfo.
 
-    # 4. install the start-up script(s) from the project's bin/ to /usr/bin/.
-    # FIXME: do we copy, symlink or hard link? see if Debian have any guidelines.
+    # Install the start-up script(s) from the project's bin/ to /usr/bin/.
     usr_bin = "#{tmp_dir}/usr/bin"
     FileUtils.mkdir_p(usr_bin)
+    FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/bin/*", tmp_dir), usr_bin)
+    
+    # The files will be installed with the permissions they had when packaged.
+    # You're not allowed to create packages with setuid or setgid files.
+    # Guard against the case of setgid directories.
+    # Ignore setuid because it's likely to be a real mistake that needs investigating.
+    system("chmod -R g-s #{tmp_dir}")
 
     # The files will be installed with the uid and gid values they had when packaged.
     # It's traditional to install as root, so everything should be owned by root when packaging.
-    # FIXME: this makes life inconvenient when we come to rebuild and gets in the way of automated rebuilds on machines where you need a password to sudo. a postinst script would avoid the disadvantages. Google suggests there's some precedent for this.
+    # FIXME: uncommenting the next line makes life inconvenient when we come to rebuild, and gets in the way of automated rebuilds on machines where you need a password to sudo. a postinst script would avoid the disadvantages. Google suggests there's some precedent for this.
     #system("sudo chown -R root:root #{tmp_dir}")
 end
 
