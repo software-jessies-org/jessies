@@ -11,11 +11,11 @@ public abstract class ETextAction extends AbstractAction {
     
     public abstract void actionPerformed(ActionEvent e);
 
-    public Component getFocusedComponent() {
+    public static Component getFocusedComponent() {
         return KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
     }
     
-    public ETextArea getTextArea() {
+    public static ETextArea getTextArea() {
         Component focusedComponent = getFocusedComponent();
         if (focusedComponent instanceof ETextArea) {
             return (ETextArea) focusedComponent;
@@ -23,7 +23,7 @@ public abstract class ETextAction extends AbstractAction {
         return (ETextArea) SwingUtilities.getAncestorOfClass(ETextArea.class, focusedComponent);
     }
     
-    public ETextWindow getFocusedTextWindow() {
+    public static ETextWindow getFocusedTextWindow() {
         Component focusedComponent = getFocusedComponent();
         if (focusedComponent instanceof ETextArea == false) {
             return null;
