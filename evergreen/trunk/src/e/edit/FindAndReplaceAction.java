@@ -52,7 +52,7 @@ public class FindAndReplaceAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        currentTextArea = getTextArea();
+        currentTextArea = getFocusedTextArea();
         if (currentTextArea == null) {
             return;
         }

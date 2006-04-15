@@ -66,7 +66,7 @@ public class InsertInterfaceAction extends ETextAction {
         
         String source = prefix + sourceCodeForClass(classes[0]);
         //System.out.println("source=" + e.util.StringUtilities.escapeForJava(source));
-        getTextArea().pasteAndReIndent(source);
+        getFocusedTextArea().pasteAndReIndent(source);
     }
     
     /**

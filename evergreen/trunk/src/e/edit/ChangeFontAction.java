@@ -82,7 +82,9 @@ public abstract class ChangeFontAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextArea text = getTextArea();
-        text.setFont(getFont());
+        ETextArea textArea = getFocusedTextArea();
+        if (textArea != null) {
+            textArea.setFont(getFont());
+        }
     }
 }
