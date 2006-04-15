@@ -1555,4 +1555,28 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         popupMenu =  new EPopupMenu(this);
         popupMenu.addMenuItemProvider(new ExternalSearchItemProvider(this));
     }
+    
+    /**
+     * Selects the given line, and ensures that the selection is visible.
+     * For this method, intended to be directly connected to the UI, line numbers are 1-based.
+     */
+    public void goToLine(int line) {
+        // Humans number lines from 1, the rest of PTextArea from 0.
+        --line;
+        final int start = getLineStartOffset(line);
+        final int end = getLineEndOffsetBeforeTerminator(line);
+        centerOnNewSelection(start, end);
+    }
+    
+    /**
+     * Changes the selection, and centers the selection on the display.
+     */
+    public void centerOnNewSelection(final int start, final int end) {
+        // Center first, to avoid flicker because PTextArea.select may
+        // have caused some scrolling to ensure that the selection is
+        // visible, but probably won't have to scrolled such that our
+        // offset is centered.
+        centerOffsetInDisplay(start);
+        select(start, end);
+    }
 }
