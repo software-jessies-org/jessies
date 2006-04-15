@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
+import e.gui.*;
 import e.util.*;
 
 import terminator.*;
@@ -31,6 +32,8 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	private CursorBlinker cursorBlinker;
 	private HashMap<Class, Highlighter> highlighters = new HashMap<Class, Highlighter>();
 	private SelectionHighlighter selectionHighlighter;
+	private BirdView birdView;
+	private FindBirdsEye birdsEye;
 	
 	/**
 	* The highlights present in each line.  The highlights for a line are stored at the index in
@@ -96,6 +99,15 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		becomeDropTarget();
 		cursorBlinker = new CursorBlinker(this);
 		selectionHighlighter = new SelectionHighlighter(this);
+		birdsEye = new FindBirdsEye(this);
+	}
+	
+	public BirdsEye getBirdsEye() {
+		return birdsEye;
+	}
+	
+	public void setBirdView(BirdView birdView) {
+		this.birdView = birdView;
 	}
 	
 	public SelectionHighlighter getSelectionHighlighter() {
@@ -365,7 +377,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		return new Location(lineIndex, charOffset);
 	}
 	
-	private Rectangle modelToView(Location charCoords) {
+	public Rectangle modelToView(Location charCoords) {
 		// We can be asked the view rectangle of locations that are past the bottom of the text in various circumstances. Examples:
 		// 1. If the user sweeps a selection too far.
 		// 2. If the user starts a new shell, types "man bash", and then clears the history; we move the cursor, and want to know the old cursor location to remove the cursor from, even though there's no longer any text there.
@@ -443,12 +455,16 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			// we're removing N lines.
 			for (int i = (lineHighlights.size() - 1); i >= firstLineIndex; i--) {
 				lineHighlights.remove(i);
+				birdView.removeMatchingLine(i);
 			}
 			repaintFromLine(firstLineIndex);
 		}
 	}
 	
 	public void removeHighlightsFrom(Highlighter highlighter, int firstLineIndex) {
+		if (highlighter instanceof FindHighlighter) {
+			birdView.clearMatchingLines();
+		}
 		for (int i = firstLineIndex; i < lineHighlights.size(); i++) {
 			ArrayList<Highlight> list = lineHighlights.get(i);
 			if (list != null) {
@@ -465,6 +481,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	}
 	
 	public void addHighlight(Highlight highlight) {
+		if (highlight.getHighlighter() instanceof FindHighlighter) {
+			birdView.addMatchingLine(highlight.getStart().getLineIndex());
+		}
 		for (int i = highlight.getStart().getLineIndex(); i <= highlight.getEnd().getLineIndex(); i++) {
 			addHighlightAtLine(highlight, i);
 		}
@@ -512,6 +531,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			Highlight match = firstHighlightOfClass(highlights, highlighterClass);
 			if (match != null) {
 				scrollTo(i, match.getStart().getCharOffset(), match.getEnd().getCharOffset());
+				birdsEye.setCurrentLineIndex(i);
 				return;
 			}
 		}

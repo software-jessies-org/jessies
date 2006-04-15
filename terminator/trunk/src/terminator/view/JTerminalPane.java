@@ -129,7 +129,11 @@ public class JTerminalPane extends JPanel {
 		scrollPane.setViewport(viewport);
 		scrollPane.setViewportBorder(new javax.swing.border.LineBorder(Options.getSharedInstance().getColor("background"), Options.getSharedInstance().getInternalBorder()));
 		
+		BirdView birdView = new BirdView(textPane.getBirdsEye(), scrollPane.getVerticalScrollBar());
+		textPane.setBirdView(birdView);
+		
 		add(scrollPane, BorderLayout.CENTER);
+//		add(birdView, BorderLayout.EAST);
 		GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
 		
 		textPane.sizeChanged();
