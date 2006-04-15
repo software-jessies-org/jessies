@@ -184,7 +184,9 @@ else
         # FIXME: get our version number.
         # http://www.debian.org/doc/debian-policy/ch-binary.html suggests YYYYMMDD
         control.puts("Version: 777")
-
+        
+        control.puts("Priority: optional")
+        
         # Our use of the architecture field is a bit bogus.
         # For one thing, we don't necessarily have any native code. (Though in practice only amd64 and i386 Linux will have suitable JVMs available.)
         # Also, what matters is not the target platform's architecture but the target JVM's architecture.
@@ -192,7 +194,9 @@ else
         # It's unfortunate that we can't build amd64 binaries on i386 or vice versa.
         deb_arch = `dpkg-architecture -qDEB_HOST_ARCH`.chomp()
         control.puts("Architecture: #{deb_arch}")
-
+        
+        control.puts("Depends: ruby (>= 1.8)")
+        
         control.puts("Maintainer: software.jessies.org <software@jessies.org>")
         control.puts("Description: software.jessies.org's #{project_name}")
     }
@@ -213,16 +217,18 @@ else
     FileUtils.mkdir_p(usr_bin)
     FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/bin/*", tmp_dir), usr_bin)
     
+    # Fix permissions.
     # The files will be installed with the permissions they had when packaged.
-    # You're not allowed to create packages with setuid or setgid files.
-    # Guard against the case of setgid directories.
-    # Ignore setuid because it's likely to be a real mistake that needs investigating.
+    # 1. You're not allowed to create packages with setuid or setgid files.
+    #    Guard against the case of setgid directories.
+    #    (Ignore setuid because it's likely to be a real mistake that needs investigating.)
     system("chmod -R g-s #{tmp_dir}")
-
+    # 2. You're not supposed (it's a warning rather than an error) to create packages with contents writable by users other than root.
+    system("chmod -R og-w #{tmp_dir}")
+    
     # The files will be installed with the uid and gid values they had when packaged.
     # It's traditional to install as root, so everything should be owned by root when packaging.
-    # FIXME: uncommenting the next line makes life inconvenient when we come to rebuild, and gets in the way of automated rebuilds on machines where you need a password to sudo. a postinst script would avoid the disadvantages. Google suggests there's some precedent for this.
-    #system("sudo chown -R root:root #{tmp_dir}")
+    # It seems that the right way to do this is to run dpkg-deb(1) from fakeroot(1), which we do in "universal.make".
 end
 
 exit(0)

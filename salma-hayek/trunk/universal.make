@@ -542,7 +542,7 @@ $(PROJECT_NAME).dmg: $(PROJECT_NAME).app
 $(PROJECT_NAME).deb: $(PROJECT_NAME).app
 	@$(RM) $@ && \
 	echo -n "Creating .deb package..." && \
-	dpkg-deb --build $(PROJECT_ROOT)/.generated/native/Linux/$(PROJECT_NAME) $(PROJECT_NAME).deb && \
+	fakeroot dpkg-deb --build $(PROJECT_ROOT)/.generated/native/Linux/$(PROJECT_NAME) $(PROJECT_NAME).deb && \
 	dpkg-deb --info $(PROJECT_NAME).deb # && dpkg-deb --contents $(PROJECT_NAME).deb
 
 # FIXME: This should be the Mac OS X native-dist target.
