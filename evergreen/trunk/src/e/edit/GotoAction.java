@@ -10,7 +10,7 @@ The ETextArea action to open a 'goto' dialog.
 public class GotoAction extends ETextAction implements MinibufferUser {
     private static final String ACTION_NAME = "Go to Line...";
     
-    public ETextWindow currentTextWindow;
+    public ETextArea currentTextArea;
     public int initialCaretPosition;
     
     public GotoAction() {
@@ -20,13 +20,9 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     }
     
     public void actionPerformed(ActionEvent e) {
-        currentTextWindow = getFocusedTextWindow();
-        if (currentTextWindow == null) {
-            return;
-        }
+        currentTextArea = getTextArea();
         // FIXME - selection
-        initialCaretPosition = currentTextWindow.getText().getSelectionStart();
-        
+        initialCaretPosition = currentTextArea.getSelectionStart();
         Edit.getInstance().showMinibuffer(this);
     }
     
@@ -39,9 +35,8 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     }
     
     public String getInitialValue() {
-        ETextArea textArea = currentTextWindow.getText();
         // FIXME - selection
-        int lineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
+        int lineNumber = 1 + currentTextArea.getLineOfOffset(currentTextArea.getSelectionStart());
         return Integer.toString(lineNumber);
     }
     
@@ -53,7 +48,7 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     public boolean isValid(String value) {
         try {
             int line = Integer.parseInt(value);
-            return line < currentTextWindow.getText().getLineCount();
+            return line < currentTextArea.getLineCount();
         } catch (NumberFormatException ex) {
             return false;
         }
@@ -62,8 +57,8 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     public void valueChangedTo(String value) {
         try {
             int line = Integer.parseInt(value);
-            if (line < currentTextWindow.getText().getLineCount()) {
-                currentTextWindow.goToLine(line);
+            if (line < currentTextArea.getLineCount()) {
+                currentTextArea.goToLine(line);
             }
         } catch (NumberFormatException ex) {
             ex = ex; // Do nothing.
@@ -77,11 +72,11 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     
     public boolean wasAccepted(String value) {
         int line = Integer.parseInt(value);
-        currentTextWindow.goToLine(line);
+        currentTextArea.goToLine(line);
         return true;
     }
     
     public void wasCanceled() {
-        currentTextWindow.getText().setCaretPosition(initialCaretPosition);
+        currentTextArea.setCaretPosition(initialCaretPosition);
     }
 }

@@ -105,7 +105,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         scrollPane.setViewport(watermarkViewPort);
         
         initFocusListener();
-        this.birdView = new BirdView(this, scrollPane.getVerticalScrollBar());
+        this.birdView = new BirdView((PTextArea) text, scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
         
@@ -613,26 +613,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         return fileType;
     }
     
-    public void goToLine(int line) {
-        // Humans number lines from 1, JTextComponent from 0.
-        line--;
-        final int start = text.getLineStartOffset(line);
-        final int end = text.getLineEndOffsetBeforeTerminator(line);
-        centerOnNewSelection(start, end);
-    }
-    
-    /**
-     * Changes the selection, and centers the selection on the display.
-     */
-    private void centerOnNewSelection(final int start, final int end) {
-        // Center first, to avoid flicker because PTextArea.select may
-        // have caused some scrolling to ensure that the selection is
-        // visible, but probably won't have to scrolled such that our
-        // offset is centered.
-        text.centerOffsetInDisplay(start);
-        text.select(start, end);
-    }
-    
     public int getCurrentLineNumber() {
         // Humans number lines from 1, JTextComponent from 0.
         // FIXME - work with non-empty selections
@@ -724,7 +704,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 ex = ex;
             }
         }
-        centerOnNewSelection(offset, endOffset);
+        text.centerOnNewSelection(offset, endOffset);
     }
     
     /**

@@ -102,7 +102,7 @@ public class TagsUpdater {
                 }
                 followCaretChanges = false;
                 TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
-                getTextWindow().goToLine(tag.lineNumber);
+                getTextArea().goToLine(tag.lineNumber);
             }
         });
         tree.setFont(UIManager.getFont("TableHeader.font"));
