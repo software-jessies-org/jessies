@@ -20,10 +20,10 @@ public class BuildAction extends ETextAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        buildProject(getFocusedTextWindow());
+        buildProject();
     }
 
-    private void buildProject(ETextWindow text) {
+    private void buildProject() {
         if (building) {
             Edit.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
             return;
@@ -35,21 +35,8 @@ public class BuildAction extends ETextAction {
             return;
         }
         
-        String context;
-        if (text != null) {
-            context = text.getContext();
-        } else {
-            try {
-                context = workspace.getCanonicalRootDirectory();
-            } catch (IOException ex) {
-                Edit.getInstance().showAlert("Workspace root not found", "It's not possible to build this project because the workspace root could not be found (" + ex.getMessage() + ").");
-                return;
-            }
-        }
-        
-        String makefileName = findMakefile(context);
+        String makefileName = findMakefile();
         if (makefileName == null) {
-            Edit.getInstance().showAlert("Build instructions not found", "It's not possible to build this project because neither a Makefile for make(1) nor a build.xml for Ant could be found.");
             return;
         }
         
@@ -60,10 +47,33 @@ public class BuildAction extends ETextAction {
         invokeBuildTool(workspace, makefileName, command);
     }
     
-    public static String findMakefile(String startDirectory) {
+    private static String getMakefileSearchStartDirectory() {
+        String startDirectory;
+        ETextWindow focusedTextWindow = getFocusedTextWindow();
+        if (focusedTextWindow != null) {
+            return focusedTextWindow.getContext();
+        } else {
+            try {
+                return Edit.getInstance().getCurrentWorkspace().getCanonicalRootDirectory();
+            } catch (IOException ex) {
+                Edit.getInstance().showAlert("Workspace root not found", "It's not possible to find the build instructions for this project because the workspace root could not be found (" + ex.getMessage() + ").");
+                return null;
+            }
+        }
+    }
+    
+    public static String findMakefile() {
+        String startDirectory = getMakefileSearchStartDirectory();
+        if (startDirectory == null) {
+            return null;
+        }
+        
         String makefileName = FileUtilities.findFileByNameSearchingUpFrom("Makefile", startDirectory);
         if (makefileName == null) {
             makefileName = FileUtilities.findFileByNameSearchingUpFrom("build.xml", startDirectory);
+        }
+        if (makefileName == null) {
+            Edit.getInstance().showAlert("Build instructions not found", "Neither a Makefile for make(1) nor a build.xml for Ant could be found.");
         }
         return makefileName;
     }
