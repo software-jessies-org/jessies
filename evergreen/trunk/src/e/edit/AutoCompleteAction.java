@@ -19,7 +19,7 @@ public class AutoCompleteAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextArea textArea = getTextArea();
+        ETextArea textArea = getFocusedTextArea();
         if (textArea != null) {
             offerCompletions(textArea);
         }

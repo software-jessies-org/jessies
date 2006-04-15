@@ -17,7 +17,7 @@ public class CorrectIndentationAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        PTextArea textArea = getTextArea();
+        PTextArea textArea = getFocusedTextArea();
         int position = textArea.getSelectionStart();
         if (position == textArea.getSelectionEnd()) {
             int desiredLineIndex = textArea.getLineOfOffset(position) + 1;

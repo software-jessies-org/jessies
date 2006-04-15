@@ -105,7 +105,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         scrollPane.setViewport(watermarkViewPort);
         
         initFocusListener();
-        this.birdView = new BirdView((PTextArea) text, scrollPane.getVerticalScrollBar());
+        this.birdView = new BirdView(text, scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
         

@@ -15,7 +15,7 @@ public abstract class ETextAction extends AbstractAction {
         return KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
     }
     
-    public static ETextArea getTextArea() {
+    public static ETextArea getFocusedTextArea() {
         Component focusedComponent = getFocusedComponent();
         if (focusedComponent instanceof ETextArea) {
             return (ETextArea) focusedComponent;
@@ -34,6 +34,6 @@ public abstract class ETextAction extends AbstractAction {
     }
     
     public String getSelectedText() {
-        return (getTextArea() != null) ? getTextArea().getSelectedText() : "";
+        return (getFocusedTextArea() != null) ? getFocusedTextArea().getSelectedText() : "";
     }
 }
