@@ -31,15 +31,14 @@ public class FindAndReplaceAction extends ETextAction {
         GnomeStockIcon.useStockIcon(this, "gtk-find-and-replace");
     }
     
-    private ETextWindow textWindow;
-    private ETextArea text;
+    private ETextArea currentTextArea;
 
     private boolean isSelectionMeantAsScope() {
-        return text.getSelectedText().contains("\n");
+        return currentTextArea.getSelectedText().contains("\n");
     }
     
     private void initPatternField() {
-        String selection = text.getSelectedText();
+        String selection = currentTextArea.getSelectedText();
         if (selection.length() > 0 && isSelectionMeantAsScope() == false) {
             // Only update the fields if the pattern should change; that way
             // we won't lose the user's replacement from the last time they
@@ -53,11 +52,10 @@ public class FindAndReplaceAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        textWindow = getFocusedTextWindow();
-        if (textWindow == null) {
+        currentTextArea = getTextArea();
+        if (currentTextArea == null) {
             return;
         }
-        text = textWindow.getText();
 
         initPatternField();
         
@@ -71,7 +69,7 @@ public class FindAndReplaceAction extends ETextAction {
                 }
             }
         });
-        Font textFont = text.getFont();
+        Font textFont = currentTextArea.getFont();
         matchList.setFont(textFont);
         matchList.setCellRenderer(new DisplayableMatchRenderer());
         
@@ -115,24 +113,23 @@ public class FindAndReplaceAction extends ETextAction {
             }
         }
         
-        textWindow = null;
-        text = null;
+        currentTextArea = null;
     }
 
     public boolean doReplacementsInText() {
         try {
             if (isSelectionMeantAsScope()) {
                 // There's a suitable selection, so only replace in that.
-                int selectionStart = text.getSelectionStart();
-                String newText = makeReplacedText(text.getSelectedText());
-                text.replaceSelection(newText);
-                text.select(selectionStart, selectionStart + newText.length());
+                int selectionStart = currentTextArea.getSelectionStart();
+                String newText = makeReplacedText(currentTextArea.getSelectedText());
+                currentTextArea.replaceSelection(newText);
+                currentTextArea.select(selectionStart, selectionStart + newText.length());
             } else {
                 // There's no suitable selection, so do the whole text.
                 // FIXME - can we try to maintain the selection?
-                int caretPosition = text.getUnanchoredSelectionExtreme();
-                text.setText(makeReplacedText(text.getText()));
-                text.setCaretPosition(caretPosition);
+                int caretPosition = currentTextArea.getUnanchoredSelectionExtreme();
+                currentTextArea.setText(makeReplacedText(currentTextArea.getText()));
+                currentTextArea.setCaretPosition(caretPosition);
             }
             return true;
         } catch (Exception ex) {
@@ -180,7 +177,7 @@ public class FindAndReplaceAction extends ETextAction {
         }
 
         public void doubleClick() {
-            textWindow.goToLine(lineNumber);
+            currentTextArea.goToLine(lineNumber);
         }
         
         public String getToolTipText() {
@@ -291,7 +288,7 @@ public class FindAndReplaceAction extends ETextAction {
 
             try {
                 Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-                String[] lines = text.getText().split("\n");
+                String[] lines = currentTextArea.getText().split("\n");
                 int lineStartOffset = 0; // Track our position in the text.
                 int matchCount = 0;
                 String line;
@@ -305,12 +302,12 @@ public class FindAndReplaceAction extends ETextAction {
                         }
                         if (isSelectionMeantAsScope()) {
                             // Matches before the selection don't count.
-                            if (lineStartOffset + matcher.start() < text.getSelectionStart()) {
+                            if (lineStartOffset + matcher.start() < currentTextArea.getSelectionStart()) {
                                 continue;
                             }
                             // If we're past the end of the selection, we can
                             // stop.
-                            if (lineStartOffset + matcher.end() > text.getSelectionEnd()) {
+                            if (lineStartOffset + matcher.end() > currentTextArea.getSelectionEnd()) {
                                 break;
                             }
                         }

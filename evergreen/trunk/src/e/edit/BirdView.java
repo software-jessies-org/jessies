@@ -22,7 +22,7 @@ import e.util.*;
  * A mark on the line with the caret will be highlighted in the caret color.
  */
 public class BirdView extends JComponent {
-    private ETextWindow textWindow;
+    private PTextArea textArea;
     private JScrollBar scrollBar;
 
     private Method method;
@@ -32,8 +32,8 @@ public class BirdView extends JComponent {
     private int currentLineInTextArea;
     private int nearestLineToMouseInBirdView = -1;
 
-    public BirdView(ETextWindow textWindow, JScrollBar scrollBar) {
-        this.textWindow = textWindow;
+    public BirdView(PTextArea textArea, JScrollBar scrollBar) {
+        this.textArea = textArea;
         this.scrollBar = scrollBar;
         try {
             method = BasicScrollBarUI.class.getDeclaredMethod("getTrackBounds", new Class[] {});
@@ -48,10 +48,10 @@ public class BirdView extends JComponent {
     private void initCaretListener() {
         PCaretListener listener = new PCaretListener() {
             public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
-                currentLineInTextArea = textWindow.getText().getLineOfOffset(selectionStart);
+                currentLineInTextArea = textArea.getLineOfOffset(selectionStart);
             }
         };
-        textWindow.getText().addCaretListener(listener);
+        textArea.addCaretListener(listener);
     }
     
     private void initMouseListener() {
@@ -59,7 +59,7 @@ public class BirdView extends JComponent {
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e) && nearestLineToMouseInBirdView != -1) {
                     // Humans and goToLine() number lines from 1.
-                    textWindow.goToLine(nearestLineToMouseInBirdView + 1);
+                    textArea.goToLine(nearestLineToMouseInBirdView + 1);
                 }
             }
             
@@ -81,7 +81,6 @@ public class BirdView extends JComponent {
         Rectangle usableArea = getUsableArea();
         double scaleFactor = getLineScaleFactor(usableArea);
         int wrappedLineIndex = (int) ((y - usableArea.y) / scaleFactor);
-        ETextArea textArea = textWindow.getText();
         wrappedLineIndex = Math.max(0, Math.min(wrappedLineIndex, textArea.getSplitLineCount() - 1));
         int charIndex = textArea.getTextIndex(new PCoordinates(wrappedLineIndex, 0));
         return textArea.getLineOfOffset(charIndex);
@@ -158,7 +157,7 @@ public class BirdView extends JComponent {
                     color = Color.RED;
                 }
                 g.setColor(color);
-                int wrappedIndex = textWindow.getText().getSplitLineIndex(i);
+                int wrappedIndex = textArea.getSplitLineIndex(i);
                 int y = usableArea.y + (int) ((double) wrappedIndex * scaleFactor);
                 g.drawLine(usableArea.x, y, usableArea.width, y);
             }
@@ -168,7 +167,7 @@ public class BirdView extends JComponent {
     public double getLineScaleFactor(Rectangle usableArea) {
         // The '-1' in the following line is to force the last line of the file to be right at the bottom of
         // the bird view.  Otherwise the marker for the final line seems to be too high in short files.
-        return ((double) usableArea.height) / (textWindow.getText().getSplitLineCount() - 1);
+        return ((double) usableArea.height) / (textArea.getSplitLineCount() - 1);
     }
 
     public synchronized void addMatchingLine(int lineNumber) {
