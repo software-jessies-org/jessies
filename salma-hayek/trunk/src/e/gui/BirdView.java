@@ -88,7 +88,7 @@ public class BirdView extends JComponent {
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(4, Integer.MAX_VALUE);
+        return new Dimension(4, 0);
     }
     
     public Rectangle getUsableArea() {
