@@ -1,6 +1,6 @@
 package e.debug;
 
-import e.util.Log;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -63,7 +63,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         // but we can assume that it's the current thread if we're in the
         // middle of dispatching an AWT event...
         // We can't cache this because the EDT can die and be replaced by a
-        // new EDT if there's an uncaught exception.        
+        // new EDT if there's an uncaught exception.
         private final Thread eventDispatchThread = Thread.currentThread();
         
         // The last time in milliseconds at which we saw a dispatch on the above thread.
@@ -108,7 +108,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             hangNumber = getNewHangNumber();
             String stackTrace = stackTraceToString(currentStack);
             lastReportedStack = currentStack;
-            Log.warn("(hang #" + hangNumber + ") event dispatch thread stuck processing event for " +  timeSoFar() + " ms:" + stackTrace);
+            Log.warn("(hang #" + hangNumber + ") event dispatch thread stuck processing event for " + timeSoFar() + " ms:" + stackTrace);
             checkForDeadlock();
         }
         
@@ -257,7 +257,8 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         // information when dealing with modal dialogs. Maybe we should
         // reinstate that, but search from the other end of the stack?
         for (StackTraceElement stackTraceElement : stackTrace) {
-            result.append("\n    " + stackTraceElement);
+            String indentation = StringUtilities.nCopies(4, ' ');
+            result.append("\n" + indentation + stackTraceElement);
         }
         return result.toString();
     }
@@ -349,7 +350,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                     final JLabel label = new JLabel(" ");
                     dialog.add(label);
                     dialog.pack();
-                    dialog.setLocation(frame.getX() - 100,  frame.getY());
+                    dialog.setLocation(frame.getX() - 100, frame.getY());
                     
                     // Make sure the new event pump has some work to do, each unit of which is insufficient to cause a hang.
                     new Thread(new Runnable() {
