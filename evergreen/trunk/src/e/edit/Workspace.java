@@ -163,6 +163,9 @@ public class Workspace extends JPanel {
         Pattern pattern = PatternUtilities.smartCaseCompile(regularExpression);
         ArrayList<String> result = new ArrayList<String>();
         List<String> allFiles = fileList;
+        if (allFiles == null) {
+            return result;
+        }
         for (String candidate : allFiles) {
             Matcher matcher = pattern.matcher(candidate);
             if (matcher.find()) {
