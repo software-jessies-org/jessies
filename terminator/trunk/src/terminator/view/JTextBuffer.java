@@ -449,6 +449,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	public void removeHighlightsFrom(int firstLineIndex) {
 		if (firstLineIndex == 0) {
 			lineHighlights.clear();
+			birdView.clearMatchingLines();
 			repaint();
 		} else {
 			// We use a backwards loop because going forwards results in N array copies if
