@@ -226,7 +226,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             justFinishedDispatch.dispose();
             
             // The other dispatches, which have been waiting, need to be credited extra time.
-            // We do this rather simplisticly by pretending they've just been redispatched.
+            // We do this rather simplistically by pretending they've just been redispatched.
             Thread currentEventDispatchThread = Thread.currentThread();
             for (DispatchInfo dispatchInfo : dispatches) {
                 if (dispatchInfo.eventDispatchThread == currentEventDispatchThread) {
