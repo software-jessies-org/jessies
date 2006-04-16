@@ -258,7 +258,7 @@ public class Workspace extends JPanel {
         return window;
     }
     
-    private EWindow addViewer(EWindow viewer, final String address, final int y) {
+    private EWindow addViewer(final EWindow viewer, final String address, final int y) {
         leftColumn.addComponent(viewer, y);
         if (address != null) {
             final ETextWindow textWindow = (ETextWindow) viewer;
@@ -268,7 +268,22 @@ public class Workspace extends JPanel {
                 }
             });
         }
-        viewer.requestFocus();
+        if (GuiUtilities.isMacOs()) {
+            // There's a bug in MacOSX's handling of 'return' presses from dialogs, causing
+            // a return character to be propagated to the component with focus, as well as
+            // performing the dialog's action.  This is an ugly hack to get around this,
+            // basically forcing those irritating return characters into the errors window,
+            // where I care far less about them.  It's not pretty, but this bug has been
+            // winding me up for ages, so I feel somewhat vindicated.
+            errorsWindow.requestFocus();
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    viewer.requestFocus();
+                }
+            });
+        } else {
+            viewer.requestFocus();
+        }
         return viewer;
     }
     
