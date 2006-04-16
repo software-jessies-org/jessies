@@ -53,6 +53,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	private JTextBuffer view;
 	private Highlight highlight;
 	private Location startLocation;
+	private DragHandler dragHandler;
 	
 	/** Creates a SelectionHighlighter for selecting text in the given view, and adds us as mouse listeners to that view. */
 	public SelectionHighlighter(JTextBuffer view) {
@@ -80,7 +81,12 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		
 		// Shift-click should move one end of the selection.
 		if (event.isShiftDown() && startLocation != null) {
-			selectToPointOf(event);
+			Location newEndLocation = view.viewToModel(event.getPoint());
+			dragHandler = new SingleClickDragHandler();
+			// The following line does nothing, but we should call makeInitialSelection to
+			// protect against future changes in implementation.
+			dragHandler.makeInitialSelection(startLocation);
+			dragHandler.mouseDragged(newEndLocation);
 			return;
 		}
 		
@@ -92,12 +98,8 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		if (loc.getLineIndex() >= view.getModel().getLineCount()) {
 			return;
 		}
-		
-		if (event.getClickCount() == 2) {
-			selectWord(loc);
-		} else if (event.getClickCount() == 3) {
-			selectLine(loc);
-		}
+		dragHandler = getDragHandlerForClick(event);
+		dragHandler.makeInitialSelection(loc);
 	}
 	
 	public void mouseClicked(MouseEvent event) {
@@ -107,51 +109,109 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	}
 	
 	public void mouseReleased(MouseEvent event) {
-		if (SwingUtilities.isLeftMouseButton(event)) {
-			selectionChanged();
-		}
+		dragHandler = null;
 	}
 	
 	public void mouseDragged(MouseEvent event) {
-		if (SwingUtilities.isLeftMouseButton(event) && startLocation != null) {
-			selectToPointOf(event);
+		if (SwingUtilities.isLeftMouseButton(event) && (dragHandler != null)) {
+			Location loc = view.viewToModel(event.getPoint());
+			dragHandler.mouseDragged(loc);
+			view.scrollRectToVisible(new Rectangle(event.getX(), event.getY(), 10, 10));
 		}
 	}
 	
-	public void mouseMoved(MouseEvent event) {
+	private DragHandler getDragHandlerForClick(MouseEvent e) {
+		if (e.getClickCount() == 1) {
+			return new SingleClickDragHandler();
+		} else if (e.getClickCount() == 2) {
+			return new DoubleClickDragHandler();
+		} else {
+			return new TripleClickDragHandler();
+		}
 	}
 	
-	public void mouseEntered(MouseEvent event) {
+	public void mouseMoved(MouseEvent event) { }
+	
+	public void mouseEntered(MouseEvent event) { }
+	
+	public void mouseExited(MouseEvent event) { }
+	
+	public interface DragHandler {
+		public void makeInitialSelection(Location pressedLocation);
+		public void mouseDragged(Location newLocation);
 	}
 	
-	public void mouseExited(MouseEvent event) {
+	public class SingleClickDragHandler implements DragHandler {
+		public void makeInitialSelection(Location pressedLocation) { }
+		
+		public void mouseDragged(Location newLocation) {
+			setHighlight(min(startLocation, newLocation), max(startLocation, newLocation));
+		}
 	}
 	
-	public boolean isWordChar(char ch) {
-		// Space marks the end of a word by any reasonable definition.
-		// Bracket characters usually mark the end of what you're interested in.
-		// Likewise quote characters.
-		return " <>(){}[]`'\"".indexOf(ch) == -1;
-	}
-	
-	public void selectWord(Location location) {
-		final int lineNumber= location.getLineIndex();
-		String line = view.getModel().getTextLine(lineNumber).getString();
-		if (location.getCharOffset() >= line.length()) {
-			return;
+	public class DoubleClickDragHandler implements DragHandler {
+		public void makeInitialSelection(Location pressedLocation) {
+			setHighlight(getWordStart(pressedLocation), getWordEnd(pressedLocation));
 		}
 		
-		int start = location.getCharOffset();
-		int end = start;
-		while (start > 0 && isWordChar(line.charAt(start - 1))) {
-			--start;
+		public void mouseDragged(Location newLocation) {
+			Location start = min(startLocation, newLocation);
+			Location end = max(startLocation, newLocation);
+			setHighlight(getWordStart(start), getWordEnd(end));
 		}
-		while (end < line.length() && isWordChar(line.charAt(end))) {
-			++end;
+		
+		private Location getWordStart(Location location) {
+			final int lineNumber = location.getLineIndex();
+			String line = view.getModel().getTextLine(lineNumber).getString();
+			if (location.getCharOffset() >= line.length()) {
+				return location;
+			}
+			
+			int start = location.getCharOffset();
+			while (start > 0 && isWordChar(line.charAt(start - 1))) {
+				--start;
+			}
+			return new Location(lineNumber, start);
 		}
-		startLocation = new Location(lineNumber, start);
-		setHighlight(startLocation, new Location(lineNumber, end));
-		selectionChanged();
+		
+		private Location getWordEnd(Location location) {
+			final int lineNumber = location.getLineIndex();
+			String line = view.getModel().getTextLine(lineNumber).getString();
+			if (location.getCharOffset() >= line.length()) {
+				return location;
+			}
+			
+			int end = location.getCharOffset();
+			while (end < line.length() && isWordChar(line.charAt(end))) {
+				++end;
+			}
+			return new Location(lineNumber, end);
+		}
+		
+		private boolean isWordChar(char ch) {
+			// Space marks the end of a word by any reasonable definition.
+			// Bracket characters usually mark the end of what you're interested in.
+			// Likewise quote characters.
+			return " <>(){}[]`'\"".indexOf(ch) == -1;
+		}
+	}
+	
+	public class TripleClickDragHandler implements DragHandler {
+		public void makeInitialSelection(Location pressedLocation) {
+			selectLines(pressedLocation, pressedLocation);
+		}
+		
+		public void mouseDragged(Location newLocation) {
+			Location start = min(startLocation, newLocation);
+			Location end = max(startLocation, newLocation);
+			selectLines(start, end);
+		}
+		
+		private void selectLines(Location start, Location end) {
+			start = new Location(start.getLineIndex(), 0);
+			end = new Location(end.getLineIndex() + 1, 0);
+			setHighlight(start, end);
+		}
 	}
 	
 	private void clearSelection() {
@@ -163,17 +223,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	public void selectAll() {
 		Location start = new Location(0, 0);
 		Location end = new Location(view.getModel().getLineCount(), 0);
-		startLocation = start;
 		setHighlight(start, end);
-		selectionChanged();
-	}
-	
-	private void selectLine(Location location) {
-		Location start = new Location(location.getLineIndex(), 0);
-		Location end = new Location(location.getLineIndex() + 1, 0);
-		startLocation = start;
-		setHighlight(start, end);
-		selectionChanged();
 	}
 	
 	/**
@@ -230,21 +280,8 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		clearSelection();
 	}
 	
-	/**
-	 * Changes the end of the selection to be the point pointed to by the
-	 * given MouseEvent.
-	 */
-	private void selectToPointOf(MouseEvent event) {
-		view.removeHighlightsFrom(this, 0);
-		Location endLocation = view.viewToModel(event.getPoint());
-		if (endLocation.equals(startLocation)) {
-			return;
-		}
-		setHighlight(min(startLocation, endLocation), max(startLocation, endLocation));
-		view.scrollRectToVisible(new Rectangle(event.getX(), event.getY(), 10, 10));
-	}
-	
 	private void setHighlight(Location start, Location end) {
+		view.removeHighlightsFrom(this, 0);
 		TextLine startLine = view.getModel().getTextLine(start.getLineIndex());
 		start = new Location(start.getLineIndex(), startLine.getEffectiveCharStartOffset(start.getCharOffset()));
 		// Cope with selections off the bottom of the screen.
@@ -254,6 +291,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		}
 		highlight = new Highlight(this, start, end, style);
 		view.addHighlight(highlight);
+		selectionChanged();
 	}
 
 	// Highlighter methods.

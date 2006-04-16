@@ -5,13 +5,6 @@ Bugs
   the text changes are above the selection, the selection is still changed
   even if the selection contents were not changed.
 
-* car: Terminator's "select words" (aka double-click) and "select lines" (aka
-  triple-click) modes are forgotten when I move the end of the selection.  In
-  most other apps, it seems, if I double-click and drag, I want the selected
-  area increment or decrement by whole words.  Ditto when I'm selecting lines.
-  Terminator, as soon as I move the end of the selected text, drops back to
-  character increments.
-
 * car: notes on the following bugs:
   I've been having problems with vi, bash, tcsh, long lines.  All hosts
   used have up to date copies of terminator.tic in the appropriate
