@@ -388,7 +388,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			line = model.getTextLine(charCoords.getLineIndex()).getString();
 		}
 		
-		final int offset = charCoords.getCharOffset();
+		final int offset = Math.max(0, charCoords.getCharOffset());
 		final int desiredLength = offset + 1;
 		if (line.length() < desiredLength) {
 			final int charactersOfPaddingRequired = desiredLength - line.length();
