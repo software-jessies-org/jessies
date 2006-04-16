@@ -88,6 +88,8 @@ public class BirdView extends JComponent {
     }
 
     public Dimension getPreferredSize() {
+        // We care about our width, but want to take our height from our corresponding text component.
+        // This assumes we'll be layed out by the same layout manager, but it seems like that must always be the case anyway.
         return new Dimension(4, 0);
     }
     
