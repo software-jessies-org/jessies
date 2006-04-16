@@ -66,7 +66,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         // new EDT if there's an uncaught exception.        
         private final Thread eventDispatchThread = Thread.currentThread();
         
-        // The time in milliseconds at which we noted this dispatch.
+        // The last time in milliseconds at which we saw a dispatch on the above thread.
         private long lastDispatchTimeMillis = System.currentTimeMillis();
         
         public DispatchInfo() {
@@ -97,7 +97,6 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             if (isWaitingForNextEvent(currentStack)) {
                 // Don't be fooled by a modal dialog if it's waiting for its next event.
                 // As long as the modal dialog's event pump doesn't get stuck, it's okay for the outer pump to be suspended.
-                lastDispatchTimeMillis = System.currentTimeMillis();
                 return;
             }
             
@@ -167,9 +166,9 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                     // event that gets dispatched.
                     return;
                 }
-                for (DispatchInfo dispatch : dispatches) {
-                    dispatch.checkForHang();
-                }
+                // Only the most recent dispatch can be hung; nested dispatches
+                // by their nature cause the outer dispatch pump to be suspended.
+                dispatches.getLast().checkForHang();
             }
         }
     }
@@ -222,8 +221,18 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
      */
     private synchronized void postDispatchEvent() {
         synchronized (dispatches) {
-            DispatchInfo dispatchInfo = dispatches.removeLast();
-            dispatchInfo.dispose();
+            // We've finished the most nested dispatch, and don't need it any longer.
+            DispatchInfo justFinishedDispatch = dispatches.removeLast();
+            justFinishedDispatch.dispose();
+            
+            // The other dispatches, which have been waiting, need to be credited extra time.
+            // We do this rather simplisticly by pretending they've just been redispatched.
+            Thread currentEventDispatchThread = Thread.currentThread();
+            for (DispatchInfo dispatchInfo : dispatches) {
+                if (dispatchInfo.eventDispatchThread == currentEventDispatchThread) {
+                    dispatchInfo.lastDispatchTimeMillis = System.currentTimeMillis();
+                }
+            }
         }
         debug("post");
     }
@@ -335,10 +344,29 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                         sleep(2500); // This is easy.
                     }
                     JDialog dialog = new JDialog(frame, "Modal dialog", true);
-                    dialog.add(new JLabel("Close me!"));
+                    dialog.setLayout(new FlowLayout());
+                    dialog.add(new JLabel("Close this dialog!"));
+                    final JLabel label = new JLabel(" ");
+                    dialog.add(label);
                     dialog.pack();
                     dialog.setLocation(frame.getX() - 100,  frame.getY());
+                    
+                    // Make sure the new event pump has some work to do, each unit of which is insufficient to cause a hang.
+                    new Thread(new Runnable() {
+                        public void run() {
+                            for (int i = 0; i <= 100000; ++i) {
+                                final int value = i;
+                                EventQueue.invokeLater(new Runnable() {
+                                    public void run() {
+                                        label.setText(Integer.toString(value));
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
+                    
                     dialog.setVisible(true);
+                    
                     if (shouldSleep) {
                         sleep(2500); // If you don't distinguish different stack traces, you won't report this.
                     }
