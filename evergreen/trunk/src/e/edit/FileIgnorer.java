@@ -43,6 +43,7 @@ public class FileIgnorer {
         patterns.add("\\.deps");
         patterns.add("autom4te.cache");
         // SCM directories:
+        patterns.add("\\.bzr");
         patterns.add("\\.svn");
         patterns.add("BitKeeper");
         patterns.add("CVS");
