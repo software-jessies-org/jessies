@@ -1,0 +1,22 @@
+#!/usr/bin/ruby -w
+
+# usage: apt-suggest <pattern>
+# outputs available package names matching the given pattern.
+
+require "fileutils.rb"
+
+list_dir = "/var/lib/apt/lists/"
+
+cache_file = "/tmp/apt-suggest-cache.txt"
+
+if FileUtils.uptodate?(cache_file, Dir.entries(list_dir))
+  puts("Using cached package information...")
+else
+  list_size = `du -hs #{list_dir} | cut -f 1`.chomp()
+  puts("Examining #{list_size} of package information. This may take a while...")
+  system("grep --no-filename --no-messages '^Package:' #{list_dir}/* > #{cache_file}")
+end
+
+package_count = `wc -l #{cache_file} | cut -d ' ' -f 1`.chomp()
+puts("#{package_count} packages known.")
+system("grep -i \'#{ARGV[0]}\' #{cache_file} | sort -u")
