@@ -26,6 +26,8 @@ public class NewFileAction extends ETextAction {
         ETextWindow window = getFocusedTextWindow();
         if (window != null) {
             filenameField.setPathname(window.getContext());
+        } else {
+            filenameField.setPathname(Edit.getInstance().getCurrentWorkspace().getRootDirectory());
         }
 
         do {
