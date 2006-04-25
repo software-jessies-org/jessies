@@ -69,23 +69,24 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
       telnet.close()
     end
     if method == "fifo"
-      serverfifo = $2
+      serverFifo = $2
       pid = Process.pid
       system("mkfifo #{log_directory}/#{pid}.in")
       system("chmod 600 #{log_directory}/#{pid}.in")
       system("mkfifo #{log_directory}/#{pid}.out")
       system("chmod 600 #{log_directory}/#{pid}.out")
-      file = File.open("#{serverfifo}", "w")
-      file.puts "#{pid}\n"
-      file.flush
-      file.close
-      editInput = File.open("#{log_directory}/#{pid}.in", "w")
-      editInput.puts("newShell #{workingDirectory}")
-      editInput.flush
-      editOutput = File.open("#{log_directory}/#{pid}.out", "r")
-      print(editOutput.readlines().join(""))
-      editInput.close
-      editOutput.close
+      File.open("#{serverFifo}", "w") {
+        |f|
+        f.puts("#{pid}\n")
+      }
+      File.open("#{log_directory}/#{pid}.in", "w") {
+        |f|
+        f.puts("newShell #{workingDirectory}")
+      }
+      File.open("#{log_directory}/#{pid}.out", "r") {
+        |f|
+        print(f.readlines().join(""))
+      }
       system("rm -f #{log_directory}/#{pid}.in #{log_directory}/#{pid}.out")
     end
   rescue
