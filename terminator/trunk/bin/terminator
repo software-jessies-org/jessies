@@ -70,7 +70,7 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
     end
     if method == "fifo"
       serverFifo = $2
-      pid = Process.pid
+      pid = Process.pid()
       system("mkfifo #{log_directory}/#{pid}.in")
       system("chmod 600 #{log_directory}/#{pid}.in")
       system("mkfifo #{log_directory}/#{pid}.out")
