@@ -55,6 +55,7 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
   begin
     File.open(server_port_file) { |f| f.read() =~ /^(socket|fifo):(.+)$/ }
     method = $1
+    command = "newShell #{workingDirectory}"
     if method == "socket"
       $2 =~ /^(.+):(\d+)$/
       # Some machines have more than one host name.
@@ -64,31 +65,32 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
       port = $2.to_i()
       require "net/telnet"
       telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port, 'Telnetmode' => false)
-      telnet.puts("newShell #{workingDirectory}")
+      telnet.puts(command)
       print(telnet.readlines().join(""))
       telnet.close()
     end
     if method == "fifo"
+      fifoDirectory = log_directory
       serverFifo = $2
       pid = Process.pid()
-      system("mkfifo #{log_directory}/#{pid}.in")
-      system("chmod 600 #{log_directory}/#{pid}.in")
-      system("mkfifo #{log_directory}/#{pid}.out")
-      system("chmod 600 #{log_directory}/#{pid}.out")
+      system("mkfifo #{fifoDirectory}/#{pid}.in")
+      system("chmod 600 #{fifoDirectory}/#{pid}.in")
+      system("mkfifo #{fifoDirectory}/#{pid}.out")
+      system("chmod 600 #{fifoDirectory}/#{pid}.out")
       File.open("#{serverFifo}", "w") {
         |f|
         f.puts("#{pid}\n")
       }
-      File.open("#{log_directory}/#{pid}.in", "w") {
+      File.open("#{fifoDirectory}/#{pid}.in", "w") {
         |f|
-        f.puts("newShell #{workingDirectory}")
+        f.puts(command)
       }
-      File.open("#{log_directory}/#{pid}.out", "r") {
+      File.open("#{fifoDirectory}/#{pid}.out", "r") {
         |f|
         print(f.readlines().join(""))
       }
-      system("rm -f #{log_directory}/#{pid}.in")
-      system("rm -f #{log_directory}/#{pid}.out")
+      system("rm -f #{fifoDirectory}/#{pid}.in")
+      system("rm -f #{fifoDirectory}/#{pid}.out")
     end
   rescue
     # We probably failed, so return and start a new process.
