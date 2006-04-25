@@ -57,10 +57,13 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
     method = $1
     if method == "socket"
       $2 =~ /^(.+):(\d+)$/
+      # Some machines have more than one host name.
+      # Fortunately, if host isn't the same machine as localhost, the connection
+      # below is unlikely to work.
       host = $1
       port = $2.to_i()
       require "net/telnet"
-      telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
+      telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port, 'Telnetmode' => false)
       telnet.puts("newShell #{workingDirectory}")
       print(telnet.readlines().join(""))
       telnet.close()
