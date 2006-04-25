@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/sw/bin/ruby -w
 
 require "fileutils.rb"
 require "pathname.rb"
@@ -19,15 +19,39 @@ edit_class_name = "e.edit.Edit"
 
 def openFileOnEditServer(edit_preferences_directory, filename, shouldBlock)
   begin
-    File.open("#{edit_preferences_directory}/edit-server-port") { |f| f.read() =~ /^(.+):(\d+)$/ }
-    host = $1
-    port = $2.to_i()
-    require "net/telnet"
-    telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
-    telnet.puts("#{shouldBlock ? 'openAndBlock' : 'open'} #{filename}\r")
-    print(telnet.readlines().join(""))
-    telnet.close()
-    return true
+    File.open("#{edit_preferences_directory}/edit-server-port") { |f| f.read() =~ /^(socket|fifo):(.+)$/ }
+    method = $1
+    if method == "socket"
+      $2 =~ /^(.+):(\d+)$/
+      host = $1
+      port = $2.to_i()
+      require "net/telnet"
+      telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
+      telnet.puts("#{shouldBlock ? 'openAndBlock' : 'open'} #{filename}\r")
+      print(telnet.readlines().join(""))
+      telnet.close()
+      return true
+    end
+    if method == "fifo"
+      serverfifo = $2
+      pid = Process.pid
+      system("mkfifo #{edit_preferences_directory}/#{pid}.in")
+      system("chmod 600 #{edit_preferences_directory}/#{pid}.in")
+      system("mkfifo #{edit_preferences_directory}/#{pid}.out")
+      system("chmod 600 #{edit_preferences_directory}/#{pid}.out")
+      file = File.open("#{serverfifo}", "w")
+      file.puts "#{pid}\n"
+      file.close
+      editInput = File.open("#{edit_preferences_directory}/#{pid}.in", "w")
+      editInput.puts("#{shouldBlock ? 'openAndBlock' : 'open'} #{filename}\r")
+      editInput.flush
+      editOutput = File.open("#{edit_preferences_directory}/#{pid}.out", "r")
+      print(editOutput.readlines().join(""))
+      editInput.close
+      editOutput.close
+      system("rm -f #{edit_preferences_directory}/#{pid}.in #{edit_preferences_directory}/#{pid}.out")
+      return true
+    end
   rescue
     return false
   end
@@ -72,7 +96,15 @@ if filename != nil
   ARGV.push(filename)
 end
 
+# Try to create a FIFO which Edit can use for its InAppServer.  If this fails, it'll fall back
+# to the socket method.
+system("mkfifo #{edit_preferences_directory}/server-fifo")
+# And let's make sure we're the only person who can access it, too.
+system("chmod 600 #{edit_preferences_directory}/server-fifo")
+
 invoker = Java.new("Edit", "e/util/Launcher")
 invoker.log_filename = "/tmp/edit.log.#$$"
 invoker.add_pathname_property("preferencesDirectory", edit_preferences_directory)
 invoker.invoke([ "Edit", "#{edit_class_name}Launchable" ])
+
+system("rm -f #{edit_preferences_directory}/server-fifo")
