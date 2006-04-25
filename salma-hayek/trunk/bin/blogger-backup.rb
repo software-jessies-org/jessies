@@ -16,7 +16,16 @@ blog_content.split("\n").each() {
   if line =~ /"(#{blog_uri}(\d+_\d+_\d+_\S+_archive\.html))"/
     next_archive_uri=$1
     next_filename=$2
-    print("Downloading #{next_archive_uri}...\n")
+    print(" page #{next_archive_uri}...\n")
     system("curl --silent --show-error -o #{next_filename} #{next_archive_uri}")
+    File.new(next_filename).read().split("<").each() {
+      |line|
+      if line =~ /="(http:\/\/photos\d+\.blogger\.com\/[^"]+\/([^\/"]+\.(png|jpg)))"/
+        image_uri = $1
+        image_filename = $2
+        print("      image #{image_uri}...\n")
+        system("curl --silent --show-error -o #{image_filename} #{image_uri}")
+      end
+    }
   end
 }
