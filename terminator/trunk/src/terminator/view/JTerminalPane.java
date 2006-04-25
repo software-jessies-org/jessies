@@ -363,8 +363,12 @@ public class JTerminalPane extends JPanel {
 				return String.valueOf(ch);
 			}
 			// Work around Sun bug 6320676.
-			if (e.isControlDown() && ch >= 'a' && ch <= 'z') {
-				return String.valueOf((char) (ch - '`'));
+			if (e.isControlDown()) {
+				if (ch >= 'a' && ch <= 'z') {
+					return String.valueOf((char) (ch - '`'));
+				} else if (ch == '[' || ch == ']') {
+					return String.valueOf((char) (ch - '@'));
+				}
 			}
 			if (ch == Ascii.LF) {
 				return String.valueOf(Ascii.CR);
