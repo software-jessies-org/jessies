@@ -40,7 +40,9 @@ public final class InAppServer {
         }
         
         try {
-            Thread serverThread = new Thread(new ConnectionAccepter(FileUtilities.fileFromString(portFilename)), fullName);
+            File portFile = FileUtilities.fileFromString(portFilename);
+            File serverFifoFile = new File(portFile.getParentFile(), "server-fifo");
+            Thread serverThread = new Thread(new ConnectionAccepter(serverFifoFile, portFile), fullName);
             // If there are no other threads left, the InApp server shouldn't keep us alive.
             serverThread.setDaemon(true);
             serverThread.start();
@@ -99,46 +101,52 @@ public final class InAppServer {
     }
     
     private class ConnectionAccepter implements Runnable {
-        private ServerSocket socket;
+        private IPC.ConnectionListener listener;
         
-        private ConnectionAccepter(File portFile) throws IOException {
-            this.socket = new ServerSocket();
-            socket.bind(null);
-            writeHostAndPortToFile(portFile);
+        private ConnectionAccepter(File serverFifo, File portFile) throws IOException {
+            try {
+                if (serverFifo != null) {
+                    listener = new IPC.FifoConnectionListener(serverFifo);
+                    StringUtilities.writeFile(portFile, "fifo:" + serverFifo.getPath() + "\n");
+                }
+            } catch (IOException ex) {
+                Log.warn("Failed to use FIFO for InAppServer: falling back to server socket.", ex);
+                ServerSocket socket = new ServerSocket();
+                socket.bind(null);
+                this.listener = new IPC.SocketConnectionListener(socket);
+                writeHostAndPortToFile(socket, portFile);
+            }
         }
         
-        private void writeHostAndPortToFile(File portFile) {
+        private void writeHostAndPortToFile(ServerSocket socket, File portFile) {
             String host = socket.getInetAddress().getHostName();
             int port = socket.getLocalPort();
             // The motivation for the Log.warn would be better satisfied by Bug 38.
             Log.warn("echo " + host + ":" + port + " > " + portFile);
-            StringUtilities.writeFile(portFile, host + ":" + port + "\n");
+            StringUtilities.writeFile(portFile, "socket:" + host + ":" + port + "\n");
         }
         
         public void run() {
-            acceptConnections();
-        }
-        
-        private void acceptConnections() {
-            for (;;) {
-                try {
+            try {
+                while (true) {
+                    IPC.Connection connection = listener.accept();
                     String handlerName = Thread.currentThread().getName() + "-Handler-" + Thread.activeCount();
-                    new Thread(new ClientHandler(socket.accept()), handlerName).start();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                    new Thread(new ClientHandler(connection), handlerName).start();
                 }
+            } catch (IOException ex) {
+                Log.warn("Connection listener has had to shut down.", ex);
             }
         }
     }
     
     private final class ClientHandler implements Runnable {
-        private Socket client;
+        private IPC.Connection connection;
         
         private BufferedReader in;
         private PrintWriter out;
         
-        private ClientHandler(Socket client) {
-            this.client = client;
+        private ClientHandler(IPC.Connection connection) {
+            this.connection = connection;
         }
         
         public void run() {
@@ -147,8 +155,8 @@ public final class InAppServer {
         
         private void handleClient() {
             try {
-                this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                this.out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
+                this.in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                this.out = new PrintWriter(new OutputStreamWriter(connection.getOutputStream()));
                 handleRequest();
                 out.flush();
                 out.close();
@@ -156,16 +164,12 @@ public final class InAppServer {
             } catch (Exception ex) {
                 ex.printStackTrace();
             } finally {
-                closeClientSocket();
+                closeClientConnection();
             }
         }
         
-        private void closeClientSocket() {
-            try {
-                client.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+        private void closeClientConnection() {
+            connection.close();
         }
         
         private void handleRequest() throws IOException {
