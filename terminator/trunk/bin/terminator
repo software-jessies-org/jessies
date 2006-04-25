@@ -87,7 +87,8 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
         |f|
         print(f.readlines().join(""))
       }
-      system("rm -f #{log_directory}/#{pid}.in #{log_directory}/#{pid}.out")
+      system("rm -f #{log_directory}/#{pid}.in")
+      system("rm -f #{log_directory}/#{pid}.out")
     end
   rescue
     # We probably failed, so return and start a new process.
