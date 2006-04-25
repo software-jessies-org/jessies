@@ -170,4 +170,5 @@ system("chmod 600 #{log_directory}/server-fifo")
 
 invoker.invoke()
 
-system("rm -f #{log_directory}/server-fifo #{log_directory}/.terminator-server-port")
+system("rm -f #{log_directory}/server-fifo")
+system("rm -f #{log_directory}/.terminator-server-port")
