@@ -78,16 +78,16 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
       system("mkfifo #{fifoDirectory}/#{pid}.out")
       system("chmod 600 #{fifoDirectory}/#{pid}.out")
       File.open("#{serverFifo}", "w") {
-        |f|
-        f.puts("#{pid}\n")
+        |file|
+        file.puts("#{pid}\n")
       }
       File.open("#{fifoDirectory}/#{pid}.in", "w") {
-        |f|
-        f.puts(command)
+        |file|
+        file.puts(command)
       }
       File.open("#{fifoDirectory}/#{pid}.out", "r") {
-        |f|
-        print(f.readlines().join(""))
+        |file|
+        print(file.readlines().join(""))
       }
       system("rm -f #{fifoDirectory}/#{pid}.in")
       system("rm -f #{fifoDirectory}/#{pid}.out")
