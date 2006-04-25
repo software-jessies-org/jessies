@@ -21,7 +21,7 @@ end
 DISPLAY = ENV["DISPLAY"]
 server_port_file = "#{log_directory}/.terminator-server-port#{DISPLAY}"
 
-def tryInAppServer(salma_hayek, server_port_file)
+def tryInAppServer(log_directory, salma_hayek, server_port_file)
   if ENV["DEBUGGING_TERMINATOR"]
     return
   end
@@ -53,18 +53,38 @@ def tryInAppServer(salma_hayek, server_port_file)
   # we can open a new window quicker than xterm(1), from the user's point of
   # view.
   begin
-    File.open(server_port_file) { |f| f.read() =~ /^(.+):(\d+)$/ }
-    # Some machines have more than one host name.
-    # Fortunately, if host isn't the same machine as localhost, the connection
-    # below is unlikely to work.
-    host = $1
-    port = $2.to_i()
-    
-    require "net/telnet"
-    telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port, 'Telnetmode' => false)
-    telnet.puts("newShell #{workingDirectory}")
-    print(telnet.readlines().join(""))
-    telnet.close()
+    File.open(server_port_file) { |f| f.read() =~ /^(socket|fifo):(.+)$/ }
+    method = $1
+    if method == "socket"
+      $2 =~ /^(.+):(\d+)$/
+      host = $1
+      port = $2.to_i()
+      require "net/telnet"
+      telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
+      telnet.puts("newShell #{workingDirectory}")
+      print(telnet.readlines().join(""))
+      telnet.close()
+    end
+    if method == "fifo"
+      serverfifo = $2
+      pid = Process.pid
+      system("mkfifo #{log_directory}/#{pid}.in")
+      system("chmod 600 #{log_directory}/#{pid}.in")
+      system("mkfifo #{log_directory}/#{pid}.out")
+      system("chmod 600 #{log_directory}/#{pid}.out")
+      file = File.open("#{serverfifo}", "w")
+      file.puts "#{pid}\n"
+      file.flush
+      file.close
+      editInput = File.open("#{log_directory}/#{pid}.in", "w")
+      editInput.puts("newShell #{workingDirectory}")
+      editInput.flush
+      editOutput = File.open("#{log_directory}/#{pid}.out", "r")
+      print(editOutput.readlines().join(""))
+      editInput.close
+      editOutput.close
+      system("rm -f #{log_directory}/#{pid}.in #{log_directory}/#{pid}.out")
+    end
   rescue
     # We probably failed, so return and start a new process.
     return
@@ -78,7 +98,7 @@ def tryInAppServer(salma_hayek, server_port_file)
   exit(0)
 end
 
-tryInAppServer(salma_hayek, server_port_file)
+tryInAppServer(log_directory, salma_hayek, server_port_file)
 
 launcher = "java"
 if target_os() == "Cygwin"
@@ -139,4 +159,12 @@ Signal.list().each() {
   invoker.add_property("org.jessies.terminator.signal.#{signal_number}", "SIG#{signal_name}")
 }
 
+# Try to create a FIFO which Terminator can use for its InAppServer.  If this fails, it'll fall back
+# to the socket method.
+system("mkfifo #{log_directory}/server-fifo")
+# And let's make sure we're the only person who can access it, too.
+system("chmod 600 #{log_directory}/server-fifo")
+
 invoker.invoke()
+
+system("rm -f #{log_directory}/server-fifo #{log_directory}/.terminator-server-port #{log_directory}/*.in #{log_directory}/*.out")
