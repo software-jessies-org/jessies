@@ -1,4 +1,4 @@
-#!/sw/bin/ruby -w
+#!/usr/bin/ruby -w
 
 require "fileutils.rb"
 require "pathname.rb"
