@@ -29,14 +29,14 @@ public class BuildAction extends ETextAction {
             return;
         }
         
-        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
-        boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
-        if (shouldContinue == false) {
+        String makefileName = findMakefile();
+        if (makefileName == null) {
             return;
         }
         
-        String makefileName = findMakefile();
-        if (makefileName == null) {
+        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
+        boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
+        if (shouldContinue == false) {
             return;
         }
         
