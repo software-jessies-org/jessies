@@ -51,10 +51,15 @@ def tryInAppServer(salma_hayek, serverPortPathname)
   # view.
   begin
     client = InAppClient.new(serverPortPathname)
-    # FIXME: A better comment for this difference with Edit shouldn't be hard.
-    # Some machines have more than one host name.
-    # Fortunately, if host isn't the same machine as localhost, the connection
-    # below is unlikely to work.
+    # If you use Terminator on two machines, you don't want new terminals
+    # to appear arbitrarily on one of them.
+    # (If you call the edit script on two machines, by contrast, you are likely
+    # to want the files to be opened on just one machine.)
+    # We could name the serverPortPathname after the host except
+    # that some hosts have more than one name and more than one IP address.
+    # If the host running Terminator isn't the same as localhost,
+    # then we are unlikely to be able to make a connection
+    # and should fall back to the unoptimized code path.
     client.overrideHost("localhost")
     client.sendCommand("newShell #{workingDirectory}")
   rescue
