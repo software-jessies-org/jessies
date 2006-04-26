@@ -19,6 +19,7 @@ if test(?d, log_directory) == false
 end
 
 def tryInAppServer(salma_hayek, serverPortPathname)
+  # InAppClient's constructor stops anyone else from reading the .secret file.
   client = InAppClient.new(serverPortPathname)
   if ENV["DEBUGGING_TERMINATOR"]
     return
