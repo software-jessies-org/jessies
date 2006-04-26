@@ -18,10 +18,7 @@ if test(?d, log_directory) == false
   system("chmod", "og-rx", log_directory)
 end
 
-DISPLAY = ENV["DISPLAY"]
-server_port_file = "#{log_directory}/.terminator-server-port#{DISPLAY}"
-
-def tryInAppServer(log_directory, salma_hayek, server_port_file)
+def tryInAppServer(salma_hayek, serverPortPathname)
   if ENV["DEBUGGING_TERMINATOR"]
     return
   end
@@ -29,7 +26,7 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
   # the server (the currently-running Terminator). Checking just the
   # modification time of just the script is only an approximation, but it's
   # close enough for users who'll install all the files at once anyway.
-  if FileUtils.uptodate?(server_port_file, [__FILE__]) == false
+  if FileUtils.uptodate?(serverPortPathname, [__FILE__]) == false
     return
   end
   # We only support the simple "new shell" case. Allowing the execution of
@@ -53,45 +50,13 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
   # we can open a new window quicker than xterm(1), from the user's point of
   # view.
   begin
-    File.open(server_port_file) { |f| f.read() =~ /^(socket|fifo):(.+)$/ }
-    method = $1
-    command = "newShell #{workingDirectory}"
-    if method == "socket"
-      $2 =~ /^(.+):(\d+)$/
-      # Some machines have more than one host name.
-      # Fortunately, if host isn't the same machine as localhost, the connection
-      # below is unlikely to work.
-      host = $1
-      port = $2.to_i()
-      require "net/telnet"
-      telnet = Net::Telnet.new('Host' => 'localhost', 'Port' => port, 'Telnetmode' => false)
-      telnet.puts(command)
-      print(telnet.readlines().join(""))
-      telnet.close()
-    end
-    if method == "fifo"
-      fifoDirectory = log_directory
-      serverFifo = $2
-      pid = Process.pid()
-      system("mkfifo #{fifoDirectory}/#{pid}.in")
-      system("chmod 600 #{fifoDirectory}/#{pid}.in")
-      system("mkfifo #{fifoDirectory}/#{pid}.out")
-      system("chmod 600 #{fifoDirectory}/#{pid}.out")
-      File.open("#{serverFifo}", "w") {
-        |file|
-        file.puts("#{pid}\n")
-      }
-      File.open("#{fifoDirectory}/#{pid}.in", "w") {
-        |file|
-        file.puts(command)
-      }
-      File.open("#{fifoDirectory}/#{pid}.out", "r") {
-        |file|
-        print(file.readlines().join(""))
-      }
-      system("rm -f #{fifoDirectory}/#{pid}.in")
-      system("rm -f #{fifoDirectory}/#{pid}.out")
-    end
+    client = InAppClient.new(serverPortPathname)
+    # FIXME: A better comment for this difference with Edit shouldn't be hard.
+    # Some machines have more than one host name.
+    # Fortunately, if host isn't the same machine as localhost, the connection
+    # below is unlikely to work.
+    client.overrideHost("localhost")
+    client.sendCommand("newShell #{workingDirectory}")
   rescue
     # We probably failed, so return and start a new process.
     return
@@ -105,7 +70,9 @@ def tryInAppServer(log_directory, salma_hayek, server_port_file)
   exit(0)
 end
 
-tryInAppServer(log_directory, salma_hayek, server_port_file)
+DISPLAY = ENV["DISPLAY"]
+serverPortPathname = Pathname.new("#{log_directory}/.terminator-server-port#{DISPLAY}")
+tryInAppServer(salma_hayek, serverPortPathname)
 
 launcher = "java"
 if target_os() == "Cygwin"
@@ -166,13 +133,4 @@ Signal.list().each() {
   invoker.add_property("org.jessies.terminator.signal.#{signal_number}", "SIG#{signal_name}")
 }
 
-# Try to create a FIFO which Terminator can use for its InAppServer.  If this fails, it'll fall back
-# to the socket method.
-system("mkfifo #{log_directory}/server-fifo")
-# And let's make sure we're the only person who can access it, too.
-system("chmod 600 #{log_directory}/server-fifo")
-
 invoker.invoke()
-
-system("rm -f #{log_directory}/server-fifo")
-system("rm -f #{log_directory}/.terminator-server-port")
