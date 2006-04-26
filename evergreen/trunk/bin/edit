@@ -17,17 +17,6 @@ TARGET_OS = target_os()
 
 edit_class_name = "e.edit.Edit"
 
-def openFileOnEditServer(edit_preferences_directory, filename, shouldBlock)
-  begin
-    serverPortPathname = Pathname.new(edit_preferences_directory) + "edit-server-port"
-    client = InAppClient.new(serverPortPathname)
-    client.sendCommand("#{shouldBlock ? 'openAndBlock' : 'open'} #{filename}")
-    return true
-  rescue
-    return false
-  end
-end
-
 shouldBlock = false
 if ARGV[0] == "--block"
   ARGV.shift
@@ -58,8 +47,11 @@ if FileTest.exists?("#{edit_preferences_directory}/edit.properties") == false
   puts("Edit: Away you go!")
 end
 
+serverPortPathname = Pathname.new(edit_preferences_directory) + "edit-server-port"
+# InAppClient's constructor stops anyone else from reading the .secret file.
+client = InAppClient.new(serverPortPathname)
 filename = ARGV[0]
-if filename != nil && openFileOnEditServer(edit_preferences_directory, File.expand_path(filename), shouldBlock)
+if filename != nil && client.trySendCommand("#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}")
   exit(0)
 end
 
