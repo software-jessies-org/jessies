@@ -19,6 +19,7 @@ if test(?d, log_directory) == false
 end
 
 def tryInAppServer(salma_hayek, serverPortPathname)
+  client = InAppClient.new(serverPortPathname)
   if ENV["DEBUGGING_TERMINATOR"]
     return
   end
@@ -49,21 +50,18 @@ def tryInAppServer(salma_hayek, serverPortPathname)
   # on Linux (from gnome-panel or whatever). In particular, using this trick
   # we can open a new window quicker than xterm(1), from the user's point of
   # view.
-  begin
-    client = InAppClient.new(serverPortPathname)
-    # If you use Terminator on two machines, you don't want new terminals
-    # to appear arbitrarily on one of them.
-    # (If you call the edit script on two machines, by contrast, you are likely
-    # to want the files to be opened on just one machine.)
-    # We could name the serverPortPathname after the host except
-    # that some hosts have more than one name and more than one IP address.
-    # If the host running Terminator isn't the same as localhost,
-    # then we are unlikely to be able to make a connection
-    # and should fall back to the unoptimized code path.
-    client.overrideHost("localhost")
-    client.sendCommand("newShell #{workingDirectory}")
-  rescue
-    # We probably failed, so return and start a new process.
+  
+  # If you use Terminator on two machines, you don't want new terminals
+  # to appear arbitrarily on one of them.
+  # (If you call the edit script on two machines, by contrast, you are likely
+  # to want the files to be opened on just one machine.)
+  # We could name the serverPortPathname after the host except
+  # that some hosts have more than one name and more than one IP address.
+  # If the host running Terminator isn't the same as localhost,
+  # then we are unlikely to be able to make a connection
+  # and should fall back to the unoptimized code path.
+  client.overrideHost("localhost")
+  if client.trySendCommand("newShell #{workingDirectory}") == false
     return
   end
 
