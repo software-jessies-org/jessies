@@ -42,24 +42,33 @@ end
 
 class InAppClient
   def initialize(serverPortPathname)
-    File.open(serverPortPathname) { |f| f.read() =~ /^(.+):(\d+)$/ }
-    @host = $1
-    @port = $2.to_i()
-    secretPathname = serverPortPathname.dirname() + ".secret"
-    @secret = secretPathname.open() { |file| file.read() }
+    @serverPortPathname = serverPortPathname
+    @secretPathname = serverPortPathname.dirname() + ".secret"
+    if @secretPathname.exist?() == false
+      @secretPathname.open("w")
+    end
+    @secretPathname.chmod(0600)
+    @host = nil
   end
   
   def overrideHost(host)
     @host = host
   end
   
-  def sendCommand(command)
+  def trySendCommand(command)
+    File.open(@serverPortPathname) { |f| f.read() =~ /^(.+):(\d+)$/ }
+    host = @host != nil ? @host : $1
+    port = $2.to_i()
+    secret = @secretPathname.open() { |file| file.read() }
     require "net/telnet"
-    telnet = Net::Telnet.new('Host' => @host, 'Port' => @port, 'Telnetmode' => false)
-    telnet.puts(@secret)
+    telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
+    telnet.puts(secret)
     telnet.puts(command)
     print(telnet.readlines().join(""))
     telnet.close()
+    return true
+  rescue
+    return false
   end
 end
 
