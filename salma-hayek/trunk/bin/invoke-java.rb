@@ -40,6 +40,29 @@ def pathnames_to_path(pathnames)
   return native_pathnames.join(jvm_path_separator)
 end
 
+class InAppClient
+  def initialize(serverPortPathname)
+    File.open(serverPortPathname) { |f| f.read() =~ /^(.+):(\d+)$/ }
+    @host = $1
+    @port = $2.to_i()
+    secretPathname = serverPortPathname.dirname() + ".secret"
+    @secret = secretPathname.open() { |file| file.read() }
+  end
+  
+  def overrideHost(host)
+    @host = host
+  end
+  
+  def sendCommand(command)
+    require "net/telnet"
+    telnet = Net::Telnet.new('Host' => @host, 'Port' => @port, 'Telnetmode' => false)
+    telnet.puts(@secret)
+    telnet.puts(command)
+    print(telnet.readlines().join(""))
+    telnet.close()
+  end
+end
+
 class Java
   attr_accessor(:dock_name)
   attr_accessor(:launcher)

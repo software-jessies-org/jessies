@@ -3,6 +3,7 @@ package e.util;
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
+import java.security.*;
 import java.util.*;
 
 /**
@@ -16,6 +17,9 @@ import java.util.*;
  */
 public final class InAppServer {
     private String fullName;
+    private File secretFile;
+    private SecureRandom secureRandom = new SecureRandom();
+    private String secret;
     
     // I think that having a generic constructor provides all the safety we
     // can get from generics, and that keeping the type information here would
@@ -41,14 +45,21 @@ public final class InAppServer {
         
         try {
             File portFile = FileUtilities.fileFromString(portFilename);
-            File serverFifoFile = new File(portFile.getParentFile(), "server-fifo");
-            Thread serverThread = new Thread(new ConnectionAccepter(serverFifoFile, portFile), fullName);
+            secretFile = new File(portFile.getParentFile(), ".secret");
+            Thread serverThread = new Thread(new ConnectionAccepter(portFile), fullName);
             // If there are no other threads left, the InApp server shouldn't keep us alive.
             serverThread.setDaemon(true);
             serverThread.start();
         } catch (Throwable th) {
             Log.warn("Couldn't start " + fullName, th);
         }
+        writeNewSecret();
+    }
+    
+    private void writeNewSecret() {
+        long secretValue = secureRandom.nextLong();
+        secret = new Long(secretValue).toString();
+        StringUtilities.writeFile(secretFile, secret);
     }
     
     public boolean handleCommand(String line, PrintWriter out) {
@@ -101,52 +112,46 @@ public final class InAppServer {
     }
     
     private class ConnectionAccepter implements Runnable {
-        private IPC.ConnectionListener listener;
+        private ServerSocket socket;
         
-        private ConnectionAccepter(File serverFifo, File portFile) throws IOException {
-            try {
-                if (serverFifo != null) {
-                    listener = new IPC.FifoConnectionListener(serverFifo);
-                    StringUtilities.writeFile(portFile, "fifo:" + serverFifo.getPath() + "\n");
-                }
-            } catch (IOException ex) {
-                Log.warn("Failed to use FIFO for InAppServer: falling back to server socket.", ex);
-                ServerSocket socket = new ServerSocket();
-                socket.bind(null);
-                this.listener = new IPC.SocketConnectionListener(socket);
-                writeHostAndPortToFile(socket, portFile);
-            }
+        private ConnectionAccepter(File portFile) throws IOException {
+            this.socket = new ServerSocket();
+            socket.bind(null);
+            writeHostAndPortToFile(portFile);
         }
         
-        private void writeHostAndPortToFile(ServerSocket socket, File portFile) {
+        private void writeHostAndPortToFile(File portFile) {
             String host = socket.getInetAddress().getHostName();
             int port = socket.getLocalPort();
             // The motivation for the Log.warn would be better satisfied by Bug 38.
             Log.warn("echo " + host + ":" + port + " > " + portFile);
-            StringUtilities.writeFile(portFile, "socket:" + host + ":" + port + "\n");
+            StringUtilities.writeFile(portFile, host + ":" + port + "\n");
         }
         
         public void run() {
-            try {
-                while (true) {
-                    IPC.Connection connection = listener.accept();
+            acceptConnections();
+        }
+        
+        private void acceptConnections() {
+            for (;;) {
+                try {
                     String handlerName = Thread.currentThread().getName() + "-Handler-" + Thread.activeCount();
-                    new Thread(new ClientHandler(connection), handlerName).start();
+                    new Thread(new ClientHandler(socket.accept()), handlerName).start();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            } catch (IOException ex) {
-                Log.warn("Connection listener has had to shut down.", ex);
             }
         }
     }
     
     private final class ClientHandler implements Runnable {
-        private IPC.Connection connection;
+        private Socket client;
         
         private BufferedReader in;
         private PrintWriter out;
         
-        private ClientHandler(IPC.Connection connection) {
-            this.connection = connection;
+        private ClientHandler(Socket client) {
+            this.client = client;
         }
         
         public void run() {
@@ -155,8 +160,11 @@ public final class InAppServer {
         
         private void handleClient() {
             try {
-                this.in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                this.out = new PrintWriter(new OutputStreamWriter(connection.getOutputStream()));
+                this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                this.out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
+                if (authenticateClient() == false) {
+                    return;
+                }
                 handleRequest();
                 out.flush();
                 out.close();
@@ -164,14 +172,28 @@ public final class InAppServer {
             } catch (Exception ex) {
                 ex.printStackTrace();
             } finally {
-                closeClientConnection();
+                closeClientSocket();
             }
         }
         
-        private void closeClientConnection() {
-            connection.close();
+        private void closeClientSocket() {
+            try {
+                client.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
         
+        private boolean authenticateClient() throws IOException {
+            String line = in.readLine();
+            if (line == null || line.equals(secret) == false) {
+                Log.warn(Thread.currentThread().getName() + ": failed authentication attempt with \"" + line + "\"");
+                return false;
+            }
+            writeNewSecret();
+            return true;
+        }
+            
         private void handleRequest() throws IOException {
             String line = in.readLine();
             if (line == null || line.length() == 0) {
