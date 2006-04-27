@@ -118,7 +118,7 @@ install_terminfo_in(compiled_terminfo, "#{user_terminfo}/74/")
 if test(?w, "/usr/share/terminfo")
   # We know what kind of system we're on, so we can put the file in the right place and not look clueless.
   prefix = (target_os() == "Darwin") ? "74" : "t"
-  install_terminfo_in(compiled_terminfo, "/usr/share/terminfo/#{prefix}")
+  install_terminfo_in(compiled_terminfo, "/usr/share/terminfo/#{prefix}/")
 end
 
 # FIXME: this should go into universal.make as a rule for ".tic" files.
