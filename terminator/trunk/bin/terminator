@@ -93,9 +93,9 @@ if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
 end
 
 def install_terminfo_in(original_file, directory)
-  terminfo_file = "#{directory}terminator"
+  terminfo_file = directory + "terminator"
   if FileUtils.uptodate?(original_file, [terminfo_file])
-    if test(?e, terminfo_file) == false
+    if terminfo_file.exist?() == false
       FileUtils.mkdir_p(directory)
     end
     FileUtils.cp(original_file, terminfo_file, :preserve => true)
@@ -103,22 +103,31 @@ def install_terminfo_in(original_file, directory)
 end
 
 # Make sure our terminfo is available.
+# FIXME: tic(1) puts stuff in /etc/terminfo for me.
+# Elliott's considered this and has a reason for choosing this directory instead.
+# The reason deserves a code comment.
+# Blastwave's ncurses library will be looking in /opt/csw/share/terminfo.
+# Is that just hard cheese?
+# There's a comment in package-for-distribution.rb which suggests that this
+# section may want to become a separate script, called from here and there.
+system_wide_terminfo = Pathname.new("/usr/share/terminfo")
 compiled_terminfo = "#{terminator_home}/lib/terminfo/terminator"
 # Use the user-defined terminfo directory, or their ~/.terminfo otherwise.
-# We write here even if we can write to /usr/share/terminfo/ in case they can access their home directory from other machines where they can't install system-wide.
-user_terminfo = ENV['TERMINFO']
-if user_terminfo == nil
-  user_terminfo = "#{ENV['HOME']}/.terminfo"
+# We write here even if we can write to #{system_wide_terminfo} in case they can access their home directory from other machines where they can't install system-wide.
+potential_user_terminfo = ENV['TERMINFO']
+if potential_user_terminfo == nil
+  potential_user_terminfo = "#{ENV['HOME']}/.terminfo"
 end
+user_terminfo = Pathname.new(potential_user_terminfo)
 # Mac OS won't look where every other OS looks; presumably a %x instead of a %c somewhere.
-# I think they fixed it at some point, but it seems broken in 10.4, and /usr/share/terminfo/ only contains %x directories.
+# I think they fixed it at some point, but it seems broken in 10.4, and #{system_wide_terminfo} only contains %x directories.
 # We always write both possibilities under ~/.terminfo or $TERMINFO for the benefit of people who use Mac OS and other Unixes.
-install_terminfo_in(compiled_terminfo, "#{user_terminfo}/t/")
-install_terminfo_in(compiled_terminfo, "#{user_terminfo}/74/")
-if test(?w, "/usr/share/terminfo")
+install_terminfo_in(compiled_terminfo, user_terminfo + "t")
+install_terminfo_in(compiled_terminfo, user_terminfo + "74")
+if system_wide_terminfo.writable?()
   # We know what kind of system we're on, so we can put the file in the right place and not look clueless.
   prefix = (target_os() == "Darwin") ? "74" : "t"
-  install_terminfo_in(compiled_terminfo, "/usr/share/terminfo/#{prefix}/")
+  install_terminfo_in(compiled_terminfo, system_wide_terminfo + prefix)
 end
 
 # FIXME: this should go into universal.make as a rule for ".tic" files.
