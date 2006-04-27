@@ -284,8 +284,6 @@ public class JTerminalPane extends JPanel {
 			int keyCode = event.getKeyCode();
 			// If the key press wll generate a keyTyped event, you must NOT handle it here.
 			switch (keyCode) {
-				case KeyEvent.VK_ESCAPE: return Ascii.ESC + "";
-				
 				case KeyEvent.VK_HOME: return Ascii.ESC + "[1~";
 				case KeyEvent.VK_END: return Ascii.ESC + "[4~";
 				
