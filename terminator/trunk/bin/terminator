@@ -93,14 +93,13 @@ if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
 end
 
 def install_terminfo_in(original_file, directory)
-  # FIXME: don't use system.
   # FIXME: if original_file is newer than terminfo_file, we should replace it anyway.
   terminfo_file = "#{directory}terminator"
   if test(?e, terminfo_file) == false
-    system("mkdir", "-p", directory)
+    FileUtils.mkdir_p(directory)
   end
   if test(?f, terminfo_file) == false
-    system("cp", original_file, terminfo_file)
+    FileUtils.cp(original_file, terminfo_file)
   end
 end
 
