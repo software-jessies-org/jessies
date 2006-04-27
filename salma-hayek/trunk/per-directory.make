@@ -141,7 +141,7 @@ ifeq "$(WIX_TARGET)" "INSTALLER"
 $(WIX_COMPONENT_DEFINITIONS): FILE_LIST_TO_WXI_FLAGS := --diskId
 endif
 # We mustn't := evaluate $@ and $<
-$(WIX_INSTALLER) $(WIX_MODULE): RULE = $(LIGHT) -nologo -out $(call convertToNativeFilenames,$@ $(filter %.wixobj,$^))
+$(WIX_INSTALLER) $(WIX_MODULE): RULE = light -nologo -out $(call convertToNativeFilenames,$@ $(filter %.wixobj,$^))
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
 # ----------------------------------------------------------------------------
@@ -212,7 +212,7 @@ $(WIX_OBJECTS): %.wixobj: %.wxs .generated/build-revision.txt
 	STANDARD_FILES_GUID=$(makeGuid) \
 	UPGRADE_GUID=$(UPGRADE_GUID) \
 	VERSION_STRING=$(VERSION_STRING) \
-	$(CANDLE) -nologo -out $(call convertToNativeFilenames,$@ $<)
+	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
 
 $(WIX_MODULE): %.msm: $(WIX_OBJECTS)
 	$(RULE)

@@ -417,11 +417,8 @@ endef
 # Find WiX
 # ----------------------------------------------------------------------------
 
-# There doesn't seem to be a standard installation home for this tool.
-# Have the shell search for it on the PATH.
-WIX_PATH =
-CANDLE = $(WIX_PATH)candle
-LIGHT = $(WIX_PATH)light
+# We get the shell to find candle and light on the path but we mention
+# file-list-to-wxi in a prerequisite and so must know its exact location.
 FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
 
 # ----------------------------------------------------------------------------
