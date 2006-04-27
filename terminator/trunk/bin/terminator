@@ -86,40 +86,59 @@ if target_os() == "Cygwin"
   end
 end
 
-if test(?w, "/usr/share/terminfo")
-  terminfo = "/usr/share/terminfo"
-else
-  terminfo = "#{ENV['HOME']}/.terminfo"
-end
-ENV["TERMINFO"] = terminfo
-
 # rubyw.exe quits if it can't write its "Insecure world writable dir" warnings
 # to $stderr every time it uses Kernel.system or Kernel.`.
 if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
   $stderr = File.open("/dev/null", "w")
 end
 
-tic_binary = which("tic")
-terminfo_SRC = "#{terminator_home}/lib/terminfo/terminator.tic"
-terminfo_DST = "#{terminfo}/t/terminator"
-if test(?e, terminfo_DST) == false
-  system("mkdir -p #{terminfo_DST} && rmdir #{terminfo_DST}")
-end
-if tic_binary != nil
-  tic_command = [ tic_binary ]
-  if target_os() != "Linux"
-    # Debian testing/unstable's tic(1) is currently broken, and won't write an output file if asked to be verbose. All you'll get is this on stderr:
-    # "/home/elliotth/Projects/terminator/lib/terminfo/terminator.tic", line 8, 'terminator' /usr/bin/tic: symbol lookup error: /usr/bin/tic: undefined symbol: _tracef
-    tic_command << "-v10"
+def install_terminfo_in(original_file, directory)
+  # FIXME: don't use system.
+  # FIXME: if original_file is newer than terminfo_file, we should replace it anyway.
+  terminfo_file = "#{directory}terminator"
+  if test(?e, terminfo_file) == false
+    system("mkdir", "-p", directory)
   end
-  if target_os() != "SunOS"
-    tic_command << "-o#{terminfo}"
+  if test(?f, terminfo_file) == false
+    system("cp", original_file, terminfo_file)
   end
-  tic_command << terminfo_SRC
-  system(*tic_command)
-elsif test(?f, terminfo_DST) == false
-  system("cp", "#{terminator_home}/lib/terminfo/terminator", terminfo_DST)
 end
+
+# Make sure our terminfo is available.
+compiled_terminfo = "#{terminator_home}/lib/terminfo/terminator"
+# Use the user-defined terminfo directory, or their ~/.terminfo otherwise.
+# We write here even if we can write to /usr/share/terminfo/ in case they can access their home directory from other machines where they can't install system-wide.
+user_terminfo = ENV['TERMINFO']
+if user_terminfo == nil
+  user_terminfo = "#{ENV['HOME']}/.terminfo"
+end
+# Mac OS won't look where every other OS looks; presumably a %x instead of a %c somewhere.
+# I think they fixed it at some point, but it seems broken in 10.4, and /usr/share/terminfo/ only contains %x directories.
+# We always write both possibilities under ~/.terminfo or $TERMINFO for the benefit of people who use Mac OS and other Unixes.
+install_terminfo_in(compiled_terminfo, "#{user_terminfo}/t/")
+install_terminfo_in(compiled_terminfo, "#{user_terminfo}/74/")
+if test(?w, "/usr/share/terminfo")
+  # We know what kind of system we're on, so we can put the file in the right place and not look clueless.
+  prefix = (target_os() == "Darwin") ? "74" : "t"
+  install_terminfo_in(compiled_terminfo, "/usr/share/terminfo/#{prefix}")
+end
+
+# FIXME: this should go into universal.make as a rule for ".tic" files.
+#tic_binary = which("tic")
+#if tic_binary != nil
+#  tic_command = [ tic_binary ]
+#  if target_os() != "Linux"
+#    # Debian testing/unstable's tic(1) is currently broken, and won't write an output file if asked to be verbose. All you'll get is this on stderr:
+#    # "/home/elliotth/Projects/terminator/lib/terminfo/terminator.tic", line 8, 'terminator' /usr/bin/tic: symbol lookup error: /usr/bin/tic: undefined symbol: _tracef
+#    tic_command << "-v10"
+#  end
+#  if target_os() != "SunOS"
+#    tic_command << "-o#{terminfo}"
+#  end
+#  terminfo_SRC = "#{terminator_home}/lib/terminfo/terminator.tic"
+#  tic_command << terminfo_SRC
+#  system(*tic_command)
+#end
 
 invoker = Java.new("Terminator", "terminator/Terminator")
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
