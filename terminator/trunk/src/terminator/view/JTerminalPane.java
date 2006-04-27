@@ -384,6 +384,11 @@ public class JTerminalPane extends JPanel {
 			}
 		}
 		
+		/**
+		 * Handling keyTyped instead of doing everything via keyPressed and keyReleased wins us:
+		 * Alt-keypad character composition (but only on Windows?)
+		 * auto-repeat (presumably)
+		 */
 		public void keyTyped(KeyEvent event) {
 			if (TerminatorMenuBar.isKeyboardEquivalent(event) || doKeyboardTabSwitch(event)) {
 				event.consume();
