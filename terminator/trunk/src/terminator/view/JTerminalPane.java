@@ -273,6 +273,9 @@ public class JTerminalPane extends JPanel {
 			
 			String sequence = getEscapeSequenceForKeyCode(event);
 			if (sequence != null) {
+				if (sequence.length() == 1) {
+					Log.warn("You've probably violated the constraint about handling keyTyped events in keyPressed with your handling of " + event);
+				}
 				control.sendUtf8String(sequence);
 				textPane.userIsTyping();
 				scroll();
