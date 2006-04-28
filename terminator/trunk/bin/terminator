@@ -104,7 +104,8 @@ end
 
 # terminfo installation...
 
-compiled_terminfo = "#{terminator_home}/lib/terminfo/terminator"
+# We deliberately omit the intermediate directory.
+compiled_terminfo = "#{terminator_home}/.generated/terminfo/terminator"
 
 # Make sure our terminfo is available system-wide, if possible.
 
