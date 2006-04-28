@@ -183,6 +183,12 @@ which can be cured thus:
 chmod o-w /usr/local/bin
 </pre>
 
+<p>As of 1.5.19, Cygwin's less(1) is still using a termcap-based ncurses library.
+If less(1) (and hence man(1)) say "WARNING: terminal is not fully functional", try:
+<pre>
+infocmp -C >> ~/.termcap
+</pre>
+
 <a name="building-from-source">
 <h2>Building from source</h2>
 </a>
