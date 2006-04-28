@@ -685,28 +685,36 @@ installer: $(ALL_PER_DIRECTORY_TARGETS) $(INSTALLER)
 # make native-dist a silent no-op where there's nothing for it to do for the
 # benefit of a simple, uniform nightly build script.
 .PHONY: native-dist
-native-dist: dist.$(if $(STANDALONE_INSTALLER),native)
+native-dist: $(if $(STANDALONE_INSTALLER),upload.$(STANDALONE_INSTALLER))
 
-.PHONY: dist.
-dist.:;
-
-.PHONY: dist.native
-dist.native: $(STANDALONE_INSTALLER)
+.PHONY: upload.%
+upload.$(STANDALONE_INSTALLER): upload.%: %
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F)
 
 .PHONY: install
-install: $(if $(STANDALONE_INSTALLER),install$(suffix $(STANDALONE_INSTALLER)))
+install: run-installer$(suffix $(STANDALONE_INSTALLER))
 
 .PHONY: remove
-remove: $(if $(STANDALONE_INSTALLER),remove(suffix $(STANDALONE_INSTALLER)))
+remove: run-remover$(suffix $(STANDALONE_INSTALLER))
 
-# Use make -n install to tell you what to copy and paste.
-# Doing "make install" is too slow for experimentation.
-.PHONY: install.msi
-install.msi: $(STANDALONE_INSTALLER)
+.PHONY: run-installer
+run-installer:;
+.PHONY: run-remover
+run-remover:;
+
+# If we make this target dependent on $(STANDALONE_INSTALLER), it keeps
+# rebuilding it, which takes ages.
+.PHONY: run-installer.msi
+run-installer.msi:
 	msiexec /i $(NATIVE_NAME_FOR_INSTALLER)
 
-.PHONY: remove.msi
-remove.msi: $(STANDALONE_INSTALLER)
+# This only works if this is precisely the same version that was installed.
+# We can't uninstall by GUID because the GUID you give to the uninstaller is
+# one of the GUIDs that we have to change each time we build in order for Windows
+# to realize that we're building a replacement version.
+# We could search the Registry for the installed GUID but it's indexed by GUID
+# rather than name.
+.PHONY: run-remover.msi
+run-remover.msi:
 	msiexec /x $(NATIVE_NAME_FOR_INSTALLER)
