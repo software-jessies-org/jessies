@@ -457,6 +457,9 @@ endef
 
 BUILD_TARGETS += build.$(findstring java,$(SOURCE_FILES))
 BUILD_TARGETS += $(if $(wildcard .svn),.generated/build-revision.txt)
+TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
+COMPILED_TERMINFO = $(patsubst %.tic,%,$(TIC_SOURCE))
+BUILD_TARGETS += $(COMPILED_TERMINFO)
 
 # ----------------------------------------------------------------------------
 # Variables above this point,
@@ -519,6 +522,13 @@ www-dist: ChangeLog.html
 .generated/build-revision.txt:
 	@mkdir -p $(@D) && \
 	ruby $(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK) > $@
+
+# Old versions of SunOS tic don't support the -o argument but do support redirecting
+# the output to $TERMINFO.
+# I'd like to use -v10 but am stymied by http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=365120
+%: %.tic
+	TERMINFO=.generated tic -v1 $< && \
+	cp .generated/`ruby -e 'puts("$(@F)"[0,1])'`/$(@F) $@
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory for Mac OS, package it as a ".dmg", and copy
