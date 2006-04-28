@@ -42,7 +42,7 @@
             </Component>
             <Merge Id='salma_hayek.d7665d40-3540-11da-8cd6-0800200c9a66'
             Language='1033'
-            src='../salma-hayek/.generated/native/Cygwin/WiX/Cygwin/salma-hayek.msm'
+            src='../salma-hayek/.generated/WiX/salma-hayek.msm'
             DiskId='1' /><?include component-definitions.wxi ?>
             </Directory>
         </Directory>
@@ -69,6 +69,6 @@
       <RemoveExistingProducts After='InstallInitialize' />
     </InstallExecuteSequence>
     <Icon Id='$(env.PROJECT_NAME).ico'
-    src='native/Cygwin/WiX/$(env.PROJECT_NAME).ico' />
+    src='lib/$(env.PROJECT_NAME).ico' />
   </Product>
 </Wix>

@@ -1,8 +1,10 @@
 # You may use:
 #   make
 #   make clean
-#   make installer
 #   make native
+#   make installer
+#   make install
+#   make remove
 #   make native-clean
 #   make native-dist
 #   make source-dist
@@ -122,6 +124,12 @@ SYMLINK.$(TARGET_OS) = ln -s
 # Use cp for the benefit of Windows native compilers which don't
 # understand "symlinks".
 SYMLINK.Cygwin = cp
+
+define COPY_RULE
+	mkdir -p $(@D) && \
+	$(RM) $@ && \
+	$(SYMLINK.$(TARGET_OS)) $< $@
+endef
 
 # ----------------------------------------------------------------------------
 # Locate Java.
@@ -317,6 +325,9 @@ PROJECT_ROOT = $(CURDIR)
 PROJECT_NAME = $(notdir $(PROJECT_ROOT))
 HUMANIZED_PROJECT_NAME := $(shell $(SCRIPT_PATH)/humanize.rb $(PROJECT_NAME))
 
+BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/bin
+LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/lib
+
 # By default, distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST=software@jessies.org
 # The html files are copied into the parent directory.
@@ -414,12 +425,33 @@ define BUILD_JAVA
 endef
 
 # ----------------------------------------------------------------------------
-# Find WiX
+# Installer variables
 # ----------------------------------------------------------------------------
 
 # We get the shell to find candle and light on the path but we mention
 # file-list-to-wxi in a prerequisite and so must know its exact location.
 FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
+
+WIX_COMPILATION_DIRECTORY = .generated/WiX
+
+WIX_TARGET.$(PROJECT_NAME) = $(BIN_DIRECTORY)/$(PROJECT_NAME).msi
+WIX_TARGET.salma-hayek = $(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).msm
+WIX_TARGET = $(WIX_TARGET.$(PROJECT_NAME))
+
+INSTALLER.Cygwin = $(WIX_TARGET)
+
+INSTALLER.Darwin = $(PROJECT_NAME).dmg
+
+# We assume Linux means Debian.
+INSTALLER.Linux = $(PROJECT_NAME).deb
+
+INSTALLER = $(INSTALLER.$(TARGET_OS))
+
+# %.msm files are merged into %.msi installers.
+STANDALONE_INSTALLER = $(filter-out %.msm,$(INSTALLER))
+
+# Among its many breakages, msiexec is more restrictive about slashes than Win32.
+NATIVE_NAME_FOR_INSTALLER := '$(subst /,\,$(call convertToNativeFilenames,$(STANDALONE_INSTALLER)))'
 
 # ----------------------------------------------------------------------------
 # Prevent us from using per-directory.make's local variables in universal.make
@@ -533,33 +565,51 @@ www-dist: ChangeLog.html
 	cp .generated/`ruby -e 'puts("$(@F)"[0,1])'`/$(@F) $@
 
 # ----------------------------------------------------------------------------
-# How to build a .app directory for Mac OS, package it as a ".dmg", and copy
-# it to the web server.
+# How to build a .app directory and package it into an installer file.
 # ----------------------------------------------------------------------------
 
 .PHONY: $(PROJECT_NAME).app
 $(PROJECT_NAME).app: build .generated/build-revision.txt
 	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/package-for-distribution.rb $(PROJECT_NAME) $(SALMA_HAYEK)
 
-# FIXME: the "native" target should depend on this on Mac OS X.
 $(PROJECT_NAME).dmg: $(PROJECT_NAME).app
 	@$(RM) $@ && \
 	echo -n "Creating disk image..." && \
 	hdiutil create -fs HFS+ -volname `perl -w -e "print ucfirst(\"$(PROJECT_NAME)\");"` -srcfolder $(PROJECT_ROOT)/.generated/native/Darwin/$(PROJECT_NAME) $(PROJECT_NAME).dmg
 
-# FIXME: the "native" target should depend on this on Linux.
 $(PROJECT_NAME).deb: $(PROJECT_NAME).app
 	@$(RM) $@ && \
 	echo -n "Creating .deb package..." && \
 	fakeroot dpkg-deb --build $(PROJECT_ROOT)/.generated/native/Linux/$(PROJECT_NAME) $(PROJECT_NAME).deb && \
 	dpkg-deb --info $(PROJECT_NAME).deb # && dpkg-deb --contents $(PROJECT_NAME).deb
 
-# FIXME: This should be the Mac OS X native-dist target.
-# FIXME: There should be a corresponding Linux target for the ".deb" file.
-.PHONY: app-dist
-app-dist: $(PROJECT_NAME).dmg
-	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
-	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/
+# ----------------------------------------------------------------------------
+# WiX
+# ----------------------------------------------------------------------------
+
+# Later we add more dependencies when we know $(ALL_PER_DIRECTORY_TARGETS).
+%/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
+	$(MAKE_INSTALLER_FILE_LIST) | $(FILE_LIST_TO_WXI) $(if $(filter %.msi,$(WIX_TARGET)),--diskId) > $@
+
+# This silliness is probably sufficient (as well as sadly necessary).
+%/component-references.wxi: %/component-definitions.wxi $(MAKEFILE_LIST)
+	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@
+
+%.wixobj: %.wxs .generated/build-revision.txt $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
+	HUMANIZED_PROJECT_NAME=$(HUMANIZED_PROJECT_NAME) \
+	PRODUCT_GUID=$(makeGuid) \
+	PROJECT_NAME=$(PROJECT_NAME) \
+	SHORTCUT_GUID=$(makeGuid) \
+	STANDARD_FILES_GUID=$(makeGuid) \
+	UPGRADE_GUID=$(UPGRADE_GUID) \
+	VERSION_STRING=$(VERSION_STRING) \
+	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
+
+$(WIX_TARGET): $(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).wixobj
+	light -nologo -out $(call convertToNativeFilenames,$@ $<)
+
+$(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/$(if $(filter %.msi,$(WIX_TARGET)),installer,module).wxs
+	$(COPY_RULE)
 
 # ----------------------------------------------------------------------------
 # Rules for debugging.
@@ -611,53 +661,49 @@ DUMMY := $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR
 BASE_NAME = (rules)
 $(takeProfileSample)
 
-# Needs to be after we've included per-directory.make.
-ALL_NATIVE_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
+# Defined here because this can only be correctly evaluated after we've included per-directory.make...
+ALL_PER_DIRECTORY_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
 
-INSTALLER_PATTERN = %.msi %.msm
-ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS = $(filter-out $(INSTALLER_PATTERN),$(ALL_NATIVE_TARGETS))
-MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt -name .svn -prune -o -type f -print
+# ... and this depends on the above variable.
+MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_PER_DIRECTORY_TARGETS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt -name .svn -prune -o -type f -print
 
-# %.msm files aren't stand-alone installers
-INSTALLER_BINARY = $(filter %.msi,$(ALL_NATIVE_TARGETS))
-
-# HACK: The installer needs to be sure the Java is built.
-$(PROJECT_ROOT)/.generated/native/Cygwin/WiX/Cygwin/component-definitions.wxi: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS) build.java
+# The installer uses find(1) to discover what to include - so it must be built last.
+# Depending on the PHONY build.java may cause the Java to be built more than
+# once unless make orders the jobs to avoid that.
+$(WIX_COMPILATION_DIRECTORY)/component-definitions.wxi: $(ALL_PER_DIRECTORY_TARGETS) build.java
 
 .PHONY: native
-# Needs to be after ALL_NATIVE_TARGETS is defined.
-native: $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS)
+native: $(ALL_PER_DIRECTORY_TARGETS)
 build: native
 
 .PHONY: installer
-installer: $(ALL_NATIVE_TARGETS)
+installer: $(ALL_PER_DIRECTORY_TARGETS) $(INSTALLER)
 
 # make native-dist a silent no-op where there's nothing for it to do for the
 # benefit of a simple, uniform nightly build script.
 .PHONY: native-dist
-native-dist: dist.$(if $(INSTALLER_BINARY),native)
+native-dist: dist.$(if $(STANDALONE_INSTALLER),native)
 
 .PHONY: dist.
 dist.:;
 
 .PHONY: dist.native
-dist.native: $(INSTALLER_BINARY)
+dist.native: $(STANDALONE_INSTALLER)
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
-	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(PROJECT_NAME)-$(TARGET_OS)$(suffix $<)
+	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F)
 
-ifeq "$(TARGET_OS)" "Cygwin"
-
-# Among its many breakages, msiexec is more restrictive about slashes than Win32.
-NATIVE_NAME_FOR_INSTALLER := '$(subst /,\,$(call convertToNativeFilenames,$(INSTALLER_BINARY)))'
-
-# Use make -n install-commands to tell you what to copy and paste.
-# Doing "make install" is too slow for experimentation.
 .PHONY: install
-install:
-	msiexec /i $(NATIVE_NAME_FOR_INSTALLER)
+install: $(if $(STANDALONE_INSTALLER),install$(suffix $(STANDALONE_INSTALLER)))
 
 .PHONY: remove
-remove:
-	msiexec /x $(NATIVE_NAME_FOR_INSTALLER)
+remove: $(if $(STANDALONE_INSTALLER),remove(suffix $(STANDALONE_INSTALLER)))
 
-endif
+# Use make -n install to tell you what to copy and paste.
+# Doing "make install" is too slow for experimentation.
+.PHONY: install.msi
+install.msi: $(STANDALONE_INSTALLER)
+	msiexec /i $(NATIVE_NAME_FOR_INSTALLER)
+
+.PHONY: remove.msi
+remove.msi: $(STANDALONE_INSTALLER)
+	msiexec /x $(NATIVE_NAME_FOR_INSTALLER)

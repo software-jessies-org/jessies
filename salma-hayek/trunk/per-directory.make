@@ -37,8 +37,6 @@ HEADERS := $(call findCode,$(HEADER_EXTENSIONS))
 # ----------------------------------------------------------------------------
 
 COMPILATION_DIRECTORY = $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_ROOT)/.generated/%/$(TARGET_OS),$(SOURCE_DIRECTORY))
-BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/bin
-LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/lib
 
 $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(eval $(call defineObjectsPerLanguage,$(EXTENSION))))
 OBJECTS = $(strip $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(OBJECTS.$(EXTENSION))))
@@ -98,25 +96,11 @@ MISSING_PRIVATE_FRAMEWORKS := $(filter-out $(wildcard $(PRIVATE_FRAMEWORKS_USED)
 MISSING_PREREQUISITES += $(MISSING_PRIVATE_FRAMEWORKS)
 
 # ----------------------------------------------------------------------------
-# The WiX installer and intermediate files.
-# ----------------------------------------------------------------------------
-
-WIX_SOURCE = $(filter %.wxs,$(SOURCES))
-WIX_BASE_NAME = $(basename $(notdir $(WIX_SOURCE)))
-WIX_COMPONENT_DEFINITIONS = $(COMPILATION_DIRECTORY)/component-definitions.wxi
-WIX_COMPONENT_REFERENCES = $(COMPILATION_DIRECTORY)/component-references.wxi
-WIX_OBJECTS = $(COMPILATION_DIRECTORY)/$(WIX_BASE_NAME).wixobj
-WIX_INSTALLER = $(BIN_DIRECTORY)/$(WIX_BASE_NAME).msi
-WIX_MODULE = $(COMPILATION_DIRECTORY)/$(WIX_BASE_NAME).msm
-WIX_TARGET := $(if $(WIX_SOURCE),$(if $(shell grep "Product Id" $(WIX_SOURCE)),INSTALLER,MODULE))
-
-# ----------------------------------------------------------------------------
 # Decide on the default target.
 # ----------------------------------------------------------------------------
 
 DESIRED_TARGETS =
 DESIRED_TARGETS += $(if $(JNI_SOURCE),$(JNI_LIBRARY))
-DESIRED_TARGETS += $(if $(WIX_TARGET),$(WIX_$(WIX_TARGET)))
 DESIRED_TARGETS := $(if $(strip $(DESIRED_TARGETS)),$(DESIRED_TARGETS),$(EXECUTABLES))
 DEFAULT_TARGETS = $(if $(strip $(MISSING_PREREQUISITES)),missing-prerequisites.$(BASE_NAME),$(DESIRED_TARGETS))
 
@@ -137,11 +121,6 @@ $(EXECUTABLES.Cygwin): LOCAL_LDFLAGS += -Wl,--subsystem,windows
 $(EXECUTABLES): LDFLAGS := $(LOCAL_LDFLAGS)
 $(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
 $(NEW_JNI_HEADER): RULE := $(JAVAHPP_RULE)
-ifeq "$(WIX_TARGET)" "INSTALLER"
-$(WIX_COMPONENT_DEFINITIONS): FILE_LIST_TO_WXI_FLAGS := --diskId
-endif
-# We mustn't := evaluate $@ and $<
-$(WIX_INSTALLER) $(WIX_MODULE): RULE = light -nologo -out $(call convertToNativeFilenames,$@ $(filter %.wixobj,$^))
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
 # ----------------------------------------------------------------------------
@@ -189,40 +168,6 @@ $(OBJECTS.mm): %.o: %.mm
 	$(COMPILE.mm) $(OUTPUT_OPTION) $<
 
 # ----------------------------------------------------------------------------
-# WiX
-# ----------------------------------------------------------------------------
-
-ifneq "$(WIX_SOURCE)" ""
-
-# universal.make adds more dependencies - only it knows $(ALL_NATIVE_TARGETS_EXCEPT_INSTALLERS).
-$(WIX_COMPONENT_DEFINITIONS): $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
-	$(MAKE_INSTALLER_FILE_LIST) | $(FILE_LIST_TO_WXI) $(FILE_LIST_TO_WXI_FLAGS) > $@
-
-# This silliness is probably sufficient (as well as sadly necessary).
-$(WIX_COMPONENT_REFERENCES): $(WIX_COMPONENT_DEFINITIONS) $(MAKEFILE_LIST)
-	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@
-
-$(WIX_OBJECTS): $(WIX_COMPONENT_REFERENCES) $(WIX_COMPONENT_DEFINITIONS)
-
-$(WIX_OBJECTS): %.wixobj: %.wxs .generated/build-revision.txt
-	HUMANIZED_PROJECT_NAME=$(HUMANIZED_PROJECT_NAME) \
-	PRODUCT_GUID=$(makeGuid) \
-	PROJECT_NAME=$(PROJECT_NAME) \
-	SHORTCUT_GUID=$(makeGuid) \
-	STANDARD_FILES_GUID=$(makeGuid) \
-	UPGRADE_GUID=$(UPGRADE_GUID) \
-	VERSION_STRING=$(VERSION_STRING) \
-	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
-
-$(WIX_MODULE): %.msm: $(WIX_OBJECTS)
-	$(RULE)
-
-$(WIX_INSTALLER): %.msi: $(WIX_OBJECTS)
-	$(RULE)
-
-endif
-
-# ----------------------------------------------------------------------------
 # What to do if something we need isn't installed but we want to continue building everything else.
 # ----------------------------------------------------------------------------
 
@@ -238,9 +183,7 @@ missing-prerequisites.$(BASE_NAME):
 # in the same directory.
 # FIXME: Copies of files which no longer exist must be removed.
 $(SOURCE_LINKS) $(HEADER_LINKS): $(COMPILATION_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
-	mkdir -p $(@D) && \
-	$(RM) $@ && \
-	$(SYMLINK.$(TARGET_OS)) $< $@
+	$(COPY_RULE)
 
 # ----------------------------------------------------------------------------
 # Dependencies.
