@@ -526,6 +526,8 @@ www-dist: ChangeLog.html
 # Old versions of SunOS tic don't support the -o argument but do support redirecting
 # the output to $TERMINFO.
 # I'd like to use -v10 but am stymied by http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=365120
+# Running tic fails with this error on my Cygwin-1.5.19 installation:
+# "The procedure entry point _nc_trim_sgr0 could not be located in the dynamic link library cygncurses-8.dll"
 %: %.tic
 	TERMINFO=.generated tic -v1 $< && \
 	cp .generated/`ruby -e 'puts("$(@F)"[0,1])'`/$(@F) $@
