@@ -490,7 +490,8 @@ endef
 BUILD_TARGETS += build.$(findstring java,$(SOURCE_FILES))
 BUILD_TARGETS += $(if $(wildcard .svn),.generated/build-revision.txt)
 TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
-COMPILED_TERMINFO = $(patsubst %.tic,%,$(TIC_SOURCE))
+# We deliberately omit the intermediate directory.
+COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
 BUILD_TARGETS += $(COMPILED_TERMINFO)
 
 # ----------------------------------------------------------------------------
@@ -558,11 +559,13 @@ www-dist: ChangeLog.html
 # Old versions of SunOS tic don't support the -o argument but do support redirecting
 # the output to $TERMINFO.
 # I'd like to use -v10 but am stymied by http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=365120
-# Running tic fails with this error on my Cygwin-1.5.19 installation:
-# "The procedure entry point _nc_trim_sgr0 could not be located in the dynamic link library cygncurses-8.dll"
-%: %.tic
-	TERMINFO=.generated tic -v1 $< && \
-	cp .generated/`ruby -e 'puts("$(@F)"[0,1])'`/$(@F) $@
+# With the cp, we both avoid having to cope with Mac OS's broken ncurses library,
+# which thinks that terminator's terminfo belongs in 74/ rather than t/,
+# and avoid having to work out the first letter of the terminal name.
+.generated/terminfo/%: lib/terminfo/%.tic
+	mkdir -p $(@D) && \
+	TERMINFO=$(@D) tic -v1 $< && \
+	cp $(@D)/*/$(@F) $@
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory and package it into an installer file.
@@ -665,7 +668,7 @@ $(takeProfileSample)
 ALL_PER_DIRECTORY_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
 
 # ... and this depends on the above variable.
-MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_PER_DIRECTORY_TARGETS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt -name .svn -prune -o -type f -print
+MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_PER_DIRECTORY_TARGETS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt $(COMPILED_TERMINFO) -name .svn -prune -o -type f -print
 
 # The installer uses find(1) to discover what to include - so it must be built last.
 # Depending on the PHONY build.java may cause the Java to be built more than
