@@ -135,23 +135,6 @@ end
 install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "t"))
 install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "74"))
 
-# FIXME: this should go into universal.make as a rule for ".tic" files.
-#tic_binary = which("tic")
-#if tic_binary != nil
-#  tic_command = [ tic_binary ]
-#  if target_os() != "Linux"
-#    # Debian testing/unstable's tic(1) is currently broken, and won't write an output file if asked to be verbose. All you'll get is this on stderr:
-#    # "/home/elliotth/Projects/terminator/lib/terminfo/terminator.tic", line 8, 'terminator' /usr/bin/tic: symbol lookup error: /usr/bin/tic: undefined symbol: _tracef
-#    tic_command << "-v10"
-#  end
-#  if target_os() != "SunOS"
-#    tic_command << "-o#{terminfo}"
-#  end
-#  terminfo_SRC = "#{terminator_home}/lib/terminfo/terminator.tic"
-#  tic_command << terminfo_SRC
-#  system(*tic_command)
-#end
-
 invoker = Java.new("Terminator", "terminator/Terminator")
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
 invoker.launcher = launcher
