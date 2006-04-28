@@ -108,11 +108,9 @@ compiled_terminfo = "#{terminator_home}/lib/terminfo/terminator"
 
 # Make sure our terminfo is available system-wide, if possible.
 
-# Debian's /etc/terminfo/README says:
-#  This directory is for system-local terminfo descriptions.  By default,
-#  ncurses will search this directory first, then /lib/terminfo, then
-#  /usr/share/terminfo.
-# Debian's packaging guidelines say we should use /usr/share/terminfo/; /etc/terminfo/ is for local administrators.
+# tic(1) might put terminfo into /etc/terminfo/ but the FHS (and hence Debian) says:
+# "/etc: Host-specific system configuration"
+# /usr/share/terminfo/ is where the FHS says terminfo should be (though Debian puts architecture-specific terminfo in /lib/terminfo/).
 # Mac OS doesn't have /etc/terminfo/.
 # FIXME: if we ever offer a Solaris package, Blastwave's ncurses library looks in /opt/csw/share/terminfo/.
 # FIXME: since our ".deb" file will be the right place to install system-wide on Debian-based systems, and Mac OS users won't be able to write outside their home directory, we should probably stop trying to install system-wide from here when we're building ".deb" packages.
