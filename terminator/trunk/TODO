@@ -320,3 +320,19 @@ Tab-related
   car adds: "I used such a feature quite a lot with Tora, flipping between
   Oracle sessions, it proved most convenient.  Screen does this too, but I use
   cycling more there, and use screen less and less these days."
+
+Installers
+-------
+
+Native Ruby on Windows.  We require Ruby 1.9's pathname.rb to fix:
+
+c:/ruby/lib/ruby/1.8/pathname.rb:341:in `lstat': Invalid argument - /C:/Documents and Settings/martind/f:/software.jessies.org/salma-hayek/bin/fatbits (Errno::EINVAL)
+
+You have to uncheck the rubygems option in the installer or unset the
+RUBYOPT native environment variable that it sets to fix:
+
+ruby: no such file to load -- ubygems (LoadError)
+
+We would have to install the Ruby scripts as .rb (which would break
+anywhere we call them programmatically unless we rename them
+everywhere) or set up shortcuts like we do for terminator.
