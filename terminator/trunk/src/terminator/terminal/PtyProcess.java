@@ -175,7 +175,18 @@ public class PtyProcess {
     
     @Override
     public String toString() {
-        return "PtyProcess[processId=" + processId + ",fd=" + fd + ",pty=\"" + slavePtyName + "\",didDumpCore=" + didDumpCore + ",didExitNormally=" + didExitNormally + ",wasSignaled=" + wasSignaled + ",exitValue=" + exitValue + "]";
+        String result = "PtyProcess[processId=" + processId + ",fd=" + fd + ",pty=\"" + slavePtyName + "\"";
+        if (didExitNormally) {
+            result += ",didExitNormally,exitValue=" + exitValue;
+        }
+        if (wasSignaled) {
+            result += ",wasSignaled,signal=" + exitValue;
+        }
+        if (didDumpCore) {
+            result += ",didDumpCore";
+        }
+        result += "]";
+        return result;
     }
     
     private native void nativeStartProcess(String[] command, String workingDirectory) throws IOException;

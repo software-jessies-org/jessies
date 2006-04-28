@@ -71,6 +71,7 @@ public class TerminalControl {
 		this.processIsRunning = true;
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), "UTF-8");
 		this.out = ptyProcess.getOutputStream();
+		Log.warn("Created " + ptyProcess);
 	}
 	
 	public void destroyProcess() {
@@ -115,7 +116,7 @@ public class TerminalControl {
 						Log.warn("Problem processing output from " + ptyProcess, th);
 					}
 				}
-				Log.warn("Read returned " + readCount + " from " + ptyProcess);
+				Log.warn("read returned " + readCount + " from " + ptyProcess);
 			} catch (Throwable th) {
 				Log.warn("Problem reading output from " + ptyProcess, th);
 			} finally {
