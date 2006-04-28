@@ -280,7 +280,9 @@ public class AboutBox {
     }
     
     public String getBugReportSubject() {
-        return applicationName + "%20%28" + projectRevision + "%2f" + libraryRevision + "%29%20bug";
+        String systemDetails = System.getProperty("java.vm.version") + "/" + System.getProperty("os.name") + "/" + System.getProperty("os.arch");
+        String subject = applicationName + " bug (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
+        return StringUtilities.urlEncode(subject).replaceAll("\\+", "%20");
     }
     
     public static void main(String[] args) {
