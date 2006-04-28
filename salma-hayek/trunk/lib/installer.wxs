@@ -1,0 +1,74 @@
+<?xml version='1.0'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
+  <Product Id='$(env.PRODUCT_GUID)'
+  Name='$(env.HUMANIZED_PROJECT_NAME) $(env.VERSION_STRING)' Language='1033'
+  UpgradeCode='$(env.UPGRADE_GUID)'
+  Version='$(env.VERSION_STRING)'
+  Manufacturer='software.jessies.org'>
+    <Package Id='????????-????-????-????-????????????'
+    Compressed='yes' InstallerVersion='150' />
+    <Upgrade Id='$(env.UPGRADE_GUID)'>
+    <UpgradeVersion Maximum='$(env.VERSION_STRING)' />
+    </Upgrade>
+    <Property Id='ALLUSERS' Value='2' />
+    <Property Id="ARPCONTACT">software@jessies.org</Property>
+    <Property Id='ARPNOMODIFY' Value='1' />
+    <Property Id="ARPPRODUCTICON" Value='$(env.PROJECT_NAME).ico' />
+    <Property Id="ARPURLINFOABOUT">
+    http://software.jessies.org/$(env.PROJECT_NAME)/</Property>
+    <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
+    <Property Id='CYGWIN'>
+      <RegistrySearch Id='RUBYW.dir' Root="HKLM" Key='Software\Cygnus Solutions\Cygwin\mounts v2\/' Name='native' Type='directory' />
+    </Property>
+    <Property Id='RUBYW'>
+      <DirectorySearch Id='RUBYW.dir' Path='[CYGWIN]\bin' Depth='0'>
+        <FileSearch Id='RUBYW.file' Name='rubyw.exe' />
+      </DirectorySearch>
+    </Property>
+    <Condition Message="Cygwin and Cygwin Ruby must be installed"><![CDATA[RUBYW]]></Condition>
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder' Name='Name'
+      LongName='Program Files'>
+        <Directory Id='company' Name='Name'
+        LongName='software.jessies.org'>
+          <Directory Id='product' Name='Name'
+          LongName='$(env.PROJECT_NAME)'>
+            <Component Id='StandardFiles'
+            Guid='$(env.STANDARD_FILES_GUID)'>
+              <File Id='README' Name='README.txt' DiskId='1'
+              src='README' />
+              <File Id='COPYING' Name='COPYING.txt' DiskId='1'
+              src='COPYING' />
+            </Component>
+            <Merge Id='salma_hayek.d7665d40-3540-11da-8cd6-0800200c9a66'
+            Language='1033'
+            src='../salma-hayek/.generated/native/Cygwin/WiX/Cygwin/salma-hayek.msm'
+            DiskId='1' /><?include component-definitions.wxi ?>
+            </Directory>
+        </Directory>
+      </Directory>
+      <Directory Id='DesktopFolder' Name='Desktop' />
+      <Component Id='RubyShortcut'
+      Guid='$(env.SHORTCUT_GUID)'>
+        <Registry Id='RegistryKey' Root='HKCU'
+        Key='Software\software.jessies.org\$(env.PROJECT_NAME)'
+        Name='ShortcutTarget' Action='write' Type='string'
+        Value='[RUBYW]' KeyPath='yes' />
+        <Shortcut Id='DesktopShortcutId' Directory='DesktopFolder'
+        Name='Name' LongName='$(env.PROJECT_NAME)' Target='[RUBYW]'
+        Arguments='bin/$(env.PROJECT_NAME)' WorkingDirectory='product'
+        Icon='$(env.PROJECT_NAME).ico' />
+      </Component>
+    </Directory>
+    <Feature Id='product' Title='$(env.PROJECT_NAME)' Level='1'>
+      <ComponentRef Id='StandardFiles' />
+      <ComponentRef Id='RubyShortcut' />
+      <MergeRef Id='salma_hayek.d7665d40-3540-11da-8cd6-0800200c9a66' /><?include component-references.wxi ?>
+      </Feature>
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After='InstallInitialize' />
+    </InstallExecuteSequence>
+    <Icon Id='$(env.PROJECT_NAME).ico'
+    src='native/Cygwin/WiX/$(env.PROJECT_NAME).ico' />
+  </Product>
+</Wix>
