@@ -274,7 +274,7 @@ public class JTerminalPane extends JPanel {
 			String sequence = getEscapeSequenceForKeyCode(event);
 			if (sequence != null) {
 				if (sequence.length() == 1) {
-					Log.warn("You've probably violated the constraint about handling keyTyped events in keyPressed with your handling of " + event);
+					Log.warn("The constraint about not handling keys that generate KEY_TYPED events in keyPressed was probably violated when handling " + event);
 				}
 				control.sendUtf8String(sequence);
 				textPane.userIsTyping();
@@ -285,7 +285,7 @@ public class JTerminalPane extends JPanel {
 
 		private String getEscapeSequenceForKeyCode(KeyEvent event) {
 			int keyCode = event.getKeyCode();
-			// If the key press wll generate a keyTyped event, you must NOT handle it here.
+			// If this event will be followed by a KEY_TYPED event (that is, has a corresponding Unicode character), you must NOT handle it here.
 			switch (keyCode) {
 				case KeyEvent.VK_HOME: return Ascii.ESC + "[1~";
 				case KeyEvent.VK_END: return Ascii.ESC + "[4~";
@@ -385,9 +385,8 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		/**
-		 * Handling keyTyped instead of doing everything via keyPressed and keyReleased wins us:
-		 * Alt-keypad character composition (but only on Windows?)
-		 * auto-repeat (presumably)
+		 * Handling keyTyped instead of doing everything via keyPressed and keyReleased lets us rely on Sun's translation of key presses to characters.
+		 * This includes alt-keypad character composition on Windows.
 		 */
 		public void keyTyped(KeyEvent event) {
 			if (TerminatorMenuBar.isKeyboardEquivalent(event) || doKeyboardTabSwitch(event)) {
