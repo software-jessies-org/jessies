@@ -114,10 +114,10 @@ compiled_terminfo = "#{terminator_home}/lib/terminfo/terminator"
 #  /usr/share/terminfo.
 # Debian's packaging guidelines say we should use /usr/share/terminfo/; /etc/terminfo/ is for local administrators.
 # Mac OS doesn't have /etc/terminfo/.
-# FIXME: if we ever offer a Solaris package, Blastwave's ncurses library looks in /opt/csw/share/terminfo.
+# FIXME: if we ever offer a Solaris package, Blastwave's ncurses library looks in /opt/csw/share/terminfo/.
 # FIXME: since our ".deb" file will be the right place to install system-wide on Debian-based systems, and Mac OS users won't be able to write outside their home directory, we should probably stop trying to install system-wide from here when we're building ".deb" packages.
-system_wide_terminfo = Pathname.new("/usr/share/terminfo")
-if system_wide_terminfo.writable?()
+system_wide_terminfo = "/usr/share/terminfo/"
+if File.writable?(system_wide_terminfo)
   # We know what kind of system we're on, so we can put the file in the right place and not look clueless.
   prefix = (target_os() == "Darwin") ? "74" : "t"
   install_terminfo_in(compiled_terminfo, File.join(system_wide_terminfo, prefix))
