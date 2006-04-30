@@ -95,24 +95,22 @@ def copy_required_directories(src, dst)
     # classes/ contains only stuff we need, if you ignore the fact that not every application uses every class.
     # FIXME: there's the question of whether we should be using JAR files for our classes, which I still have to look into.
     FileUtils.mkdir_p("#{dst}/classes")
-    system("cp -r #{src}/classes #{dst}")
+    FileUtils.cp_r("#{src}/classes", dst)
     
     # .generated/`uname` contains any native stuff we need.
     FileUtils.mkdir_p("#{dst}/.generated/#{target_os()}")
-    system("cp -r #{src}/.generated/#{target_os()} #{dst}/.generated")
+    FileUtils.cp_r("#{src}/.generated/#{target_os()}", "#{dst}/.generated")
     
     # lib/ contains support files that we have to assume we need.
     if FileTest.directory?("#{src}/lib")
         FileUtils.mkdir_p("#{dst}/lib")
-        system("cp -r #{src}/lib #{dst}")
+        # FIXME: this copies the ".svn" directories too, which we don't want.
+        FileUtils.cp_r("#{src}/lib", dst)
     end
     
     # Copy JAR files, if there are any.
-    # FIXME: we should move these into a subdirectory of the project root. lib/? or a separate jars/?
-    if Dir.glob("#{src}/*.jar").length() > 0
-        # Let the shell worry about quoting.
-        system("cp #{src}/*.jar #{dst}")
-    end
+    # FIXME: we should move these into a subdirectory of the project root. lib/ or lib/jars/, maybe.
+    FileUtils.cp(Dir.glob("#{src}/*.jar"), dst)
 end
 
 def linux_link_sources(glob, unwanted_prefix)
@@ -134,7 +132,7 @@ make_installer_file_list.each() {
     src_pathname = Pathname.new(src)
     dst_dirname = "#{project_resource_directory}/#{src_pathname.dirname()}"
     FileUtils.mkdir_p(dst_dirname)
-    system("cp \'#{src_pathname}\' #{dst_dirname}")
+    FileUtils.cp(src_pathname, dst_dirname)
 }
 
 if target_os() == "Darwin"
@@ -158,7 +156,7 @@ if target_os() == "Darwin"
 else
     # Make sure we have the tools we require.
     # FIXME: it would be nice if we could reliably test whether we need to do this.
-    system("sudo apt-get install build-essential")
+    system("sudo apt-get install build-essential fakeroot")
 
     Dir.mkdir("#{tmp_dir}/DEBIAN")
     # What to put in DEBIAN/control: http://www.debian.org/doc/debian-policy/ch-controlfields.html
@@ -198,6 +196,8 @@ else
         control.puts("Depends: ruby (>= 1.8)")
         
         control.puts("Maintainer: software.jessies.org <software@jessies.org>")
+        
+        # FIXME: if you're using apt-get(1), this isn't very important because you won't get to see it. When gdebi(1) comes, though, this will be what users see at the same time as the "Install" button, so we ought to improve it.
         control.puts("Description: software.jessies.org's #{project_name}")
     }
 
@@ -206,12 +206,22 @@ else
     FileUtils.mkdir_p(usr_share_applications)
     FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/lib/*.desktop", tmp_dir), usr_share_applications)
     
-    # 3. copy any compiled files corresponding to lib/*.tic files into the correct location (which is where?)
-    #    helium:~$ cat /etc/terminfo/README
-    #    This directory is for system-local terminfo descriptions.  By default,
-    #    ncurses will search this directory first, then /lib/terminfo, then
-    #    /usr/share/terminfo.
-
+    # Copy any compiled terminfo files under /usr/share/terminfo/.
+    usr_share_terminfo = "#{tmp_dir}/usr/share/terminfo"
+    FileUtils.mkdir_p(usr_share_terminfo)
+    terminfo_files = []
+    FileUtils.cd(".generated/terminfo") {
+        |dir|
+        terminfo_files << Dir.glob("?/*")
+    }
+    terminfo_files.each() {
+        |terminfo_file|
+        $stderr.puts(terminfo_file)
+        FileUtils.mkdir_p("#{usr_share_terminfo}/#{terminfo_file}")
+        FileUtils.rmdir("#{usr_share_terminfo}/#{terminfo_file}")
+        FileUtils.cp(".generated/terminfo/#{terminfo_file}", "#{usr_share_terminfo}/#{terminfo_file}")
+    }
+    
     # Install the start-up script(s) from the project's bin/ to /usr/bin/.
     usr_bin = "#{tmp_dir}/usr/bin"
     FileUtils.mkdir_p(usr_bin)
