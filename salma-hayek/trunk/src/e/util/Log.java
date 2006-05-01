@@ -68,10 +68,7 @@ public class Log {
         String osVersion = System.getProperty("os.version");
         String osArch = System.getProperty("os.arch");
         final int processorCount = Runtime.getRuntime().availableProcessors();
-        if (processorCount > 0) {
-            osArch += " x" + processorCount;
-        }
-        warn(osName + " " + osVersion + " (" + osArch + ").");
+        warn(osName + " " + osVersion + " (" + osArch + " x" + processorCount + ").");
     }
 
     public static void warn(String message) {
