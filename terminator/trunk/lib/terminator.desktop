@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Terminator
+Type=Application
+Exec=/usr/bin/terminator
+Icon=/usr/share/software.jessies.org/terminator/Resources/terminator/lib/terminator-128.png
+Terminal=false
+Categories=GNOME;Application;Utility;TerminalEmulator;
+StartupNotify=true
