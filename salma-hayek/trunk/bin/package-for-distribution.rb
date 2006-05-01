@@ -201,10 +201,11 @@ else
         control.puts("Description: software.jessies.org's #{project_name}")
     }
 
-    # Make symbolic links in /usr/share/applications/ for any lib/*.desktop files.
+    # Copy any ".desktop" files into /usr/share/applications/.
+    # GNOME ignores symbolic links.
     usr_share_applications = "#{tmp_dir}/usr/share/applications"
     FileUtils.mkdir_p(usr_share_applications)
-    FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/lib/*.desktop", tmp_dir), usr_share_applications)
+    FileUtils.cp(Dir.glob("#{project_resource_directory}/lib/*.desktop"), usr_share_applications)
     
     # Copy any compiled terminfo files under /usr/share/terminfo/.
     usr_share_terminfo = "#{tmp_dir}/usr/share/terminfo"
