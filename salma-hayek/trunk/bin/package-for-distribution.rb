@@ -104,8 +104,9 @@ def copy_required_directories(src, dst)
     # lib/ contains support files that we have to assume we need.
     if FileTest.directory?("#{src}/lib")
         FileUtils.mkdir_p("#{dst}/lib")
-        # FIXME: this copies the ".svn" directories too, which we don't want.
         FileUtils.cp_r("#{src}/lib", dst)
+        # It also contains Subversion control directories, which we don't want.
+        system("find #{dst}/lib/ -name .svn -print0 | xargs -0 #{replace_option} rm -rf %")
     end
     
     # Copy JAR files, if there are any.
@@ -217,7 +218,6 @@ else
     }
     terminfo_files.each() {
         |terminfo_file|
-        $stderr.puts(terminfo_file)
         FileUtils.mkdir_p("#{usr_share_terminfo}/#{terminfo_file}")
         FileUtils.rmdir("#{usr_share_terminfo}/#{terminfo_file}")
         FileUtils.cp(".generated/terminfo/#{terminfo_file}", "#{usr_share_terminfo}/#{terminfo_file}")
