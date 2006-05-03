@@ -274,7 +274,11 @@ public class JTerminalPane extends JPanel {
 			String sequence = getEscapeSequenceForKeyCode(event);
 			if (sequence != null) {
 				if (sequence.length() == 1) {
-					Log.warn("The constraint about not handling keys that generate KEY_TYPED events in keyPressed was probably violated when handling " + event);
+					char ch = sequence.charAt(0);
+					// We don't always get a KEY_TYPED event for the escape key, so sometimes we have to handle it in keyPressed.
+					if (ch != Ascii.ESC) {
+						Log.warn("The constraint about not handling keys that generate KEY_TYPED events in keyPressed was probably violated when handling " + event);
+					}
 				}
 				control.sendUtf8String(sequence);
 				textPane.userIsTyping();
