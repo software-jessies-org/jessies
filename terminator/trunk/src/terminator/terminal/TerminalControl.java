@@ -32,7 +32,7 @@ public class TerminalControl {
 	 */
 	private static final int INPUT_BUFFER_SIZE = 8 * 1024;
 	
-	private static final ExecutorService writerExecutor = ThreadUtilities.newSingleThreadExecutor("UTF-8 Writer");
+	private static final ExecutorService writerExecutor = ThreadUtilities.newSingleThreadExecutor("Terminal Writer");
 	
 	private static BufferedReader stepModeReader;
 	
@@ -42,6 +42,8 @@ public class TerminalControl {
 	private PtyProcess ptyProcess;
 	private boolean processIsRunning;
 	private boolean processHasBeenDestroyed = false;
+	// Andrew Giddings wanted Cp1252 for interoperability with his Psion.
+	private String charsetName = "UTF-8";
 	private InputStreamReader in;
 	private OutputStream out;
 	
@@ -69,7 +71,7 @@ public class TerminalControl {
 		this.logWriter = new LogWriter(command);
 		this.ptyProcess = new PtyProcess(command, workingDirectory);
 		this.processIsRunning = true;
-		this.in = new InputStreamReader(ptyProcess.getInputStream(), "UTF-8");
+		this.in = new InputStreamReader(ptyProcess.getInputStream(), charsetName);
 		this.out = ptyProcess.getOutputStream();
 		Log.warn("Created " + ptyProcess);
 	}
@@ -501,7 +503,7 @@ public class TerminalControl {
 			public void run() {
 				try {
 					if (processIsRunning) {
-						out.write(s.getBytes("UTF-8"));
+						out.write(s.getBytes(charsetName));
 						out.flush();
 					}
 				} catch (IOException ex) {
