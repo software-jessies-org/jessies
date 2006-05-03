@@ -30,12 +30,12 @@ public class PatchListCellRenderer extends EListCellRenderer {
         String line = (String) value;
         if (line.startsWith("+")) {
             setForeground(Color.BLUE);
-            if (line.startsWith("+++")) {
+            if (line.startsWith("+++ ")) {
                 setBackground(TRIPLE_PLUS_BACKGROUND);
             }
         } else if (line.startsWith("-")) {
             setForeground(Color.RED);
-            if (line.startsWith("---")) {
+            if (line.startsWith("--- ")) {
                 setBackground(TRIPLE_MINUS_BACKGROUND);
             }
         } else if (line.startsWith("@@ ")) {
