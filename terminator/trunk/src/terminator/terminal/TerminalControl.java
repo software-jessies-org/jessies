@@ -32,8 +32,6 @@ public class TerminalControl {
 	 */
 	private static final int INPUT_BUFFER_SIZE = 8 * 1024;
 	
-	private final ExecutorService writerExecutor = ThreadUtilities.newSingleThreadExecutor("Terminal Writer");
-	
 	private static BufferedReader stepModeReader;
 	
 	private Thread thread;
@@ -46,6 +44,7 @@ public class TerminalControl {
 	private String charsetName = "UTF-8";
 	private InputStreamReader in;
 	private OutputStream out;
+	private ExecutorService writerExecutor;
 	
 	private int characterSet;
 	private char[] g = new char[4];
@@ -67,12 +66,17 @@ public class TerminalControl {
 		this.listener = listener;
 	}
 	
+	private String makeThreadName(String role) {
+		return "Process " + ptyProcess.getProcessId() + "(" + ptyProcess.getPtyName() + ") " + role;
+	}
+	
 	public void initProcess(String[] command, String workingDirectory) throws Throwable {
 		this.logWriter = new LogWriter(command);
 		this.ptyProcess = new PtyProcess(command, workingDirectory);
 		this.processIsRunning = true;
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), charsetName);
 		this.out = ptyProcess.getOutputStream();
+		writerExecutor = ThreadUtilities.newSingleThreadExecutor(makeThreadName("Writer"));
 		Log.warn("Created " + ptyProcess);
 	}
 	
@@ -102,7 +106,7 @@ public class TerminalControl {
 			return;
 		}
 
-		thread = new Thread(new TerminalRunnable(), "Process " + ptyProcess.getProcessId() + "(" + ptyProcess.getPtyName() + ") Listener");
+		thread = new Thread(new TerminalRunnable(), makeThreadName("Reader"));
 		thread.start();
 	}
 	
