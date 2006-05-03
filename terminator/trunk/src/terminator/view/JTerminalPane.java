@@ -287,6 +287,10 @@ public class JTerminalPane extends JPanel {
 			int keyCode = event.getKeyCode();
 			// If this event will be followed by a KEY_TYPED event (that is, has a corresponding Unicode character), you must NOT handle it here.
 			switch (keyCode) {
+				case KeyEvent.VK_ESCAPE:
+					// Annoyingly, Linux sends a KEY_TYPED event for the escape key; Mac OS doesn't.
+					return GuiUtilities.isMacOs() ? String.valueOf(Ascii.ESC) : null;
+				
 				case KeyEvent.VK_HOME: return Ascii.ESC + "[1~";
 				case KeyEvent.VK_END: return Ascii.ESC + "[4~";
 				
@@ -424,6 +428,8 @@ public class JTerminalPane extends JPanel {
 			}
 		}
 		
+		// Emulate Firefox's control-tab/control-shift-tab behavior.
+		// FIXME: currently broken.
 		private boolean doKeyboardTabSwitch(KeyEvent event) {
 			if (event.getKeyChar() == '\t' && event.isControlDown()) {
 				TerminatorFrame frame = (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, scrollPane);
