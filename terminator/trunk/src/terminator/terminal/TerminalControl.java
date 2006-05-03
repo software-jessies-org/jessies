@@ -32,7 +32,7 @@ public class TerminalControl {
 	 */
 	private static final int INPUT_BUFFER_SIZE = 8 * 1024;
 	
-	private static final ExecutorService writerExecutor = ThreadUtilities.newSingleThreadExecutor("Terminal Writer");
+	private final ExecutorService writerExecutor = ThreadUtilities.newSingleThreadExecutor("Terminal Writer");
 	
 	private static BufferedReader stepModeReader;
 	
