@@ -257,17 +257,17 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		public void keyPressed(KeyEvent event) {
+			if (doKeyboardScroll(event) || doKeyboardTabSwitch(event)) {
+				event.consume();
+				return;
+			}
+			
 			// Support keyboard equivalents when the user's been stupid enough to turn the menu off.
 			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
 				JFrame frame = getTerminatorFrame();
 				if (frame != null && frame.getJMenuBar() == null) {
 					handleKeyboardEquivalent(event);
 				}
-				return;
-			}
-			
-			if (doKeyboardScroll(event)) {
-				event.consume();
 				return;
 			}
 			
@@ -364,6 +364,10 @@ public class JTerminalPane extends JPanel {
 		// Handle key presses which generate keyTyped events.
 		private String getUtf8ForKeyEvent(KeyEvent e) {
 			char ch = e.getKeyChar();
+			if (e.isControlDown() && ch == '\t') {
+				// doKeyboardTabSwitch already handled this.
+				return null;
+			}
 			// This modifier test lets Ctrl-H and Ctrl-J generate ^H and ^J instead of
 			// mangling them into ^? and ^M.
 			// That's useful on those rare but annoying occasions where Backspace and
@@ -400,16 +404,18 @@ public class JTerminalPane extends JPanel {
 		 * This includes alt-keypad character composition on Windows.
 		 */
 		public void keyTyped(KeyEvent event) {
-			if (TerminatorMenuBar.isKeyboardEquivalent(event) || doKeyboardTabSwitch(event)) {
+			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
 				event.consume();
 				return;
 			}
 			
 			String utf8 = getUtf8ForKeyEvent(event);
-			control.sendUtf8String(utf8);
-			textPane.userIsTyping();
-			scroll();
-			event.consume();
+			if (utf8 != null) {
+				control.sendUtf8String(utf8);
+				textPane.userIsTyping();
+				scroll();
+				event.consume();
+			}
 		}
 		
 		private boolean doKeyboardScroll(KeyEvent event) {
@@ -435,13 +441,18 @@ public class JTerminalPane extends JPanel {
 			}
 		}
 		
-		// Emulate Firefox's control-tab/control-shift-tab behavior.
-		// FIXME: currently broken.
 		private boolean doKeyboardTabSwitch(KeyEvent event) {
-			if (event.getKeyChar() == '\t' && event.isControlDown()) {
-				TerminatorFrame frame = (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, scrollPane);
-				frame.cycleTab(event.isShiftDown() ? -1 : 1);
+			if (event.getKeyCode() == KeyEvent.VK_TAB && event.isControlDown()) {
+				// Emulates Firefox's control-tab/control-shift-tab cycle-tab behavior.
+				getTerminatorFrame().cycleTab(event.isShiftDown() ? -1 : 1);
 				return true;
+			} else if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
+				// Emulates gnome-terminal's alt-<number> jump-to-tab behavior, or an analog of Terminal.app's command-<number> jump-to-window behavior.
+				char ch = event.getKeyChar();
+				if (ch >= '1' && ch <= '9') {
+					getTerminatorFrame().setSelectedTabIndex(ch - '1');
+					return true;
+				}
 			}
 			return false;
 		}
