@@ -313,14 +313,6 @@ Tab-related
   writing our own JTabbedPane UI delegate that's more like Safari's, and
   doesn't rely on transparency.)
 
-* It might be useful to add a way to move directly to a tab in the current
-  window (rather than having to cycle through them). Most other multi-tab
-  terminals use alt-1, alt-2, and so on. Anyone with more than 10 terminal
-  tabs in a window is crazy!
-  car adds: "I used such a feature quite a lot with Tora, flipping between
-  Oracle sessions, it proved most convenient.  Screen does this too, but I use
-  cycling more there, and use screen less and less these days."
-
 Installers
 -------
 
