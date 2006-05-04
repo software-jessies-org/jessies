@@ -56,20 +56,37 @@ struct Argv : std::vector<char*> {
     }
 };
 
+static void waitUntilFdWritable(int fd) {
+    int rc;
+    do {
+        fd_set fds;
+        FD_ZERO(&fds);
+        FD_SET(fd, &fds);
+        rc = ::select(fd + 1, 0, &fds, 0, 0);
+    } while (rc == -1 && errno == EINTR);
+    if (rc != 1) {
+        throw unix_exception("select(" + toString(fd) + ", ...) failed");
+    }
+}
+
 void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jstring javaWorkingDirectory) {
     PtyGenerator ptyGenerator;
     fd = ptyGenerator.openMaster();
     
     JavaStringArrayToStringArray arguments(m_env, command);
     Argv argv(arguments);
-    // Owns the memory for the lifetime of workingDirectory.
-    std::string workingDirectoryChars;
+    std::string workingDirectoryChars; // Owns the memory for the lifetime of workingDirectory.
     const char* workingDirectory = 0;
     if (javaWorkingDirectory != 0) {
         workingDirectoryChars = JniString(m_env, javaWorkingDirectory).str();
         workingDirectory = workingDirectoryChars.c_str();
     }
     processId = ptyGenerator.forkAndExec(&argv[0], workingDirectory);
+    
+    // On Linux, the TIOCSWINSZ ioctl blocks if the pty has not yet been opened by the child.
+    // On Mac OS, it silently does nothing, meaning that when the child does open the pty, TIOCGWINSZ reports the wrong size.
+    // We work around this by explicitly blocking the parent until the child has opened the pty (which we can recognize by the fact that a write would no longer block).
+    waitUntilFdWritable(fd.get());
     
     slavePtyName = newStringUtf8(ptyGenerator.getSlavePtyName());
 }
