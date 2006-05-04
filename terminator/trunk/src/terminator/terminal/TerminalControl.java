@@ -67,7 +67,7 @@ public class TerminalControl {
 	}
 	
 	private String makeThreadName(String role) {
-		return "Process " + ptyProcess.getProcessId() + "(" + ptyProcess.getPtyName() + ") " + role;
+		return "Process " + ptyProcess.getProcessId() + " (" + ptyProcess.getPtyName() + ") " + role;
 	}
 	
 	public void initProcess(String[] command, String workingDirectory) throws Throwable {
