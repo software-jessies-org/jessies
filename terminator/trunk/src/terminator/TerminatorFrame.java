@@ -262,13 +262,16 @@ public class TerminatorFrame extends JFrame {
 	
 	public void cycleTab(int delta) {
 		if (tabbedPane != null) {
-			setSelectedTab(tabbedPane.getSelectedIndex() + delta);
+			int tabCount = tabbedPane.getTabCount();
+			tabbedPane.setSelectedIndex((tabbedPane.getSelectedIndex() + delta + tabCount) % tabCount);
 		}
 	}
 	
-	private void setSelectedTab(int index) {
+	public void setSelectedTabIndex(int index) {
 		int tabCount = tabbedPane.getTabCount();
-		tabbedPane.setSelectedIndex((index + tabCount) % tabCount);
+		if (index < tabCount) {
+			tabbedPane.setSelectedIndex(index);
+		}
 	}
 
 	/**
