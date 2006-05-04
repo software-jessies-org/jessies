@@ -373,9 +373,12 @@ public class JTerminalPane extends JPanel {
 			}
 			// Work around Sun bug 6320676.
 			if (e.isControlDown()) {
+				// Control characters are usually typed unshifted, for convenience...
 				if (ch >= 'a' && ch <= 'z') {
 					return String.valueOf((char) (ch - '`'));
-				} else if (ch == '[' || ch == ']') {
+				}
+				// ...but the complete range is really from ^@ (ASCII NUL) to ^_ (ASCII US).
+				if (ch >= '@' && ch <= '_') {
 					return String.valueOf((char) (ch - '@'));
 				}
 			}
