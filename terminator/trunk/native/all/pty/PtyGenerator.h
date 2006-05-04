@@ -163,8 +163,11 @@ private:
     static void fixEnvironment() {
         // Tell the world which terminfo entry to use.
         putenv("TERM=terminator");
+        // According to Thomas Dickey in the XTERM FAQ, some applications that don't use ncurses may need the environment variable $COLORTERM set to realize that they're on a color terminal.
+        // Most of the other Unix terminals set it.
+        putenv("COLORTERM=terminator");
         
-        // X11 terminal emulators set this.
+        // X11 terminal emulators set this, but we can't reasonably do so, even on X11.
         // http://elliotth.blogspot.com/2005/12/why-terminator-doesnt-support-windowid.html
         unsetenv("WINDOWID");
         
@@ -180,9 +183,6 @@ private:
         // It's always confusing when programs behave differently during debugging!
         unsetenv("TERM_PROGRAM");
         unsetenv("TERM_PROGRAM_VERSION");
-#else
-        // Similarly, GNOME's Terminal sets this.
-        unsetenv("COLORTERM");
 #endif
     }
     
