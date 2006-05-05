@@ -272,6 +272,12 @@ RFEs
   Graphing transfers and errors against time should give them more useful
   information than they get from HyperTerminal (without drowning them).
 
+* Simon Pamies [s.pamies@banality.de] isn't the only user to have suggested
+  some way of saving a file which can be loaded to start a new Terminator window
+  with several New Command Tabs, each with its own bgcolor and name.
+  Colored backgrounds to distinguish different sorts of window, in particular,
+  seems popular.
+
 Tab-related
 -----------
 
