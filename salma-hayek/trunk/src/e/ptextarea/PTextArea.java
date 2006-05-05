@@ -550,11 +550,17 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         runWithoutMovingTheVisibleArea(new Runnable() {
             public void run() {
                 PTextArea.super.setFont(font);
-                cacheFontMetrics();
-                boolean isFixedFont = GuiUtilities.isFontFixedWidth(font);
-                showRightHandMarginAt(isFixedFont ? 80 : NO_MARGIN);
-                //FIXME: setTabSize(isFixedFont ? 8 : 2);
-                revalidateLineWrappings();
+                getLock().getWriteLock();
+                try {
+                    cacheFontMetrics();
+                    boolean isFixedFont = GuiUtilities.isFontFixedWidth(font);
+                    showRightHandMarginAt(isFixedFont ? 80 : NO_MARGIN);
+                    //FIXME: setTabSize(isFixedFont ? 8 : 2);
+                    lines.invalidateWidths();
+                    revalidateLineWrappings();
+                } finally {
+                    getLock().relinquishWriteLock();
+                }
             }
         });
         repaint();

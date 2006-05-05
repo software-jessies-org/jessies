@@ -225,6 +225,12 @@ public class PLineList implements PTextListener {
         lastValidLineIndex = lines.size() - 1;
     }
     
+    public void invalidateWidths() {
+        for (int i = 0; i < lines.size(); ++i) {
+            lines.get(i).setWidthInvalid();
+        }
+    }
+    
     /**
      * A PLineList.Line holds information about the location and length of a particular line of
      * text.  It also contains information about how wide this line is when its text is rendered.
