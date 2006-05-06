@@ -668,7 +668,7 @@ $(takeProfileSample)
 ALL_PER_DIRECTORY_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
 
 # ... and this depends on the above variable.
-MAKE_INSTALLER_FILE_LIST = find $(wildcard classes doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_PER_DIRECTORY_TARGETS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt $(COMPILED_TERMINFO) -name .svn -prune -o -type f -print
+MAKE_INSTALLER_FILE_LIST = find $(wildcard doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_PER_DIRECTORY_TARGETS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt $(COMPILED_TERMINFO) -name .svn -prune -o -type f -print
 
 # The installer uses find(1) to discover what to include - so it must be built last.
 # Depending on the PHONY build.java may cause the Java to be built more than

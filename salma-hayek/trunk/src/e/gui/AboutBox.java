@@ -251,7 +251,8 @@ public class AboutBox {
      */
     private void findBuildRevisionFile() {
         for (String directory : System.getProperty("java.class.path").split(File.pathSeparator)) {
-            File file = new File(directory + File.separator + ".." + File.separator + ".generated" + File.separator + "build-revision.txt");
+            File classPathEntry = new File(directory);
+            File file = new File(classPathEntry.getParent(), ".generated" + File.separator + "build-revision.txt");
             if (file.exists()) {
                 parseBuildRevisionFile(file);
                 return;

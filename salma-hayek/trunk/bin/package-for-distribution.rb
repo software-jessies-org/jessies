@@ -92,11 +92,6 @@ def copy_required_directories(src, dst)
     replace_option = target_os() == "Linux" ? "--replace=%" : "-J %"
     system("find #{src}/bin -name .svn -prune -or -type f -print0 | xargs -0 #{replace_option} cp -r % #{dst}/bin")
     
-    # classes/ contains only stuff we need, if you ignore the fact that not every application uses every class.
-    # FIXME: there's the question of whether we should be using JAR files for our classes, which I still have to look into.
-    FileUtils.mkdir_p("#{dst}/classes")
-    FileUtils.cp_r("#{src}/classes", dst)
-    
     # .generated/`uname` contains any native stuff we need.
     FileUtils.mkdir_p("#{dst}/.generated/#{target_os()}")
     FileUtils.cp_r("#{src}/.generated/#{target_os()}", "#{dst}/.generated")
@@ -136,12 +131,16 @@ make_installer_file_list.each() {
     FileUtils.cp(src_pathname, dst_dirname)
 }
 
+# Generate a single JAR file containing both the project's unique classes and all the classes from the salma-hayek library.
+# Unscientific experiments suggest that uncompressed (-0) JAR files give us faster start-up times, and improving start-up time is why we're using a JAR file.
+system("jar", "c0f", "#{project_resource_directory}/classes.jar", "-C", "classes/", ".", "-C", "#{salma_hayek}/classes/", ".")
+
 if target_os() == "Darwin"
-    # Apple doesn't let you give a path to a .icns file, so we have to move it into position.
-    system("ln -s #{project_name}/lib/#{project_name}.icns #{app_dir}/Resources/")
+    # Apple doesn't let you give a path to a .icns file, and doesn't seem to always follow symbolic links, so we have to copy it into position.
+    FileUtils.cp("#{resources_dir}/#{project_name}/lib/#{project_name}.icns", "#{app_dir}/Resources/")
 
     # Make a bogus start-up script.
-    script_name = "#{app_dir}/MacOS/#{project_name}"
+    script_name = "#{app_dir}/MacOS/#{human_project_name}"
     File.open(script_name, "w") {
         |file|
         file.puts("#!/bin/bash")
@@ -199,7 +198,7 @@ else
         control.puts("Maintainer: software.jessies.org <software@jessies.org>")
         
         # FIXME: if you're using apt-get(1), this isn't very important because you won't get to see it. When gdebi(1) comes, though, this will be what users see at the same time as the "Install" button, so we ought to improve it.
-        control.puts("Description: software.jessies.org's #{project_name}")
+        control.puts("Description: software.jessies.org's #{human_project_name}")
     }
 
     # Copy any ".desktop" files into /usr/share/applications/.
@@ -227,19 +226,21 @@ else
     usr_bin = "#{tmp_dir}/usr/bin"
     FileUtils.mkdir_p(usr_bin)
     FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/bin/*", tmp_dir), usr_bin)
-    
-    # Fix permissions.
-    # The files will be installed with the permissions they had when packaged.
-    # 1. You're not allowed to create packages with setuid or setgid files.
-    #    Guard against the case of setgid directories.
-    #    (Ignore setuid because it's likely to be a real mistake that needs investigating.)
-    system("chmod -R g-s #{tmp_dir}")
-    # 2. You're not supposed (it's a warning rather than an error) to create packages with contents writable by users other than root.
-    system("chmod -R og-w #{tmp_dir}")
-    
-    # The files will be installed with the uid and gid values they had when packaged.
-    # It's traditional to install as root, so everything should be owned by root when packaging.
-    # It seems that the right way to do this is to run dpkg-deb(1) from fakeroot(1), which we do in "universal.make".
 end
+
+# Fix permissions.
+# The files will be installed with the permissions they had when packaged.
+# 1. You're not allowed to create .deb packages with setuid or setgid files or directories.
+#    Mac OS won't let you copy such files or directories out of the .dmg.
+#    Guard against the case of setgid directories.
+#    (Ignore setuid because it's likely to be a real mistake that needs investigating.)
+system("chmod -R g-s #{tmp_dir}")
+# 2. You're not supposed (it's a warning rather than an error) to create packages with contents writable by users other than root.
+system("chmod -R og-w #{tmp_dir}")
+
+# The files in a .deb will be installed with the uid and gid values they had when packaged.
+# It's traditional to install as root, so everything should be owned by root when packaging.
+# It seems that the right way to do this is to run dpkg-deb(1) from fakeroot(1), which we do in "universal.make".
+# On Mac OS, the files get the uid and gid values of the user that installs the application.
 
 exit(0)

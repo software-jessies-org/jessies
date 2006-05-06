@@ -142,7 +142,7 @@ class Java
   end
   
   def set_icons(name)
-    dock_icon = "#{@project_root}/lib/#{name}.icns"
+    dock_icon = "#{@project_root}/lib/#{name.downcase()}.icns"
     if Pathname.new(dock_icon).exist?
       @dock_icon = dock_icon
     end
@@ -161,7 +161,9 @@ class Java
   end
 
   def init_default_class_path()
-    @class_path = [ "#{@project_root}/classes", "#{@salma_hayek}/classes" ]
+    # Users need the classes.jar, but developers need the two directories.
+    # This speeds things up for the users at the expense to the developers of the time it takes the JVM to check for the non-existent classes.jar, which shouldn't be a problem.
+    @class_path = [ "#{@project_root}/classes.jar", "#{@project_root}/classes", "#{@salma_hayek}/classes" ]
 
     if target_os() != "Darwin"
       @class_path << "#{@salma_hayek}/AppleJavaExtensions.jar"
