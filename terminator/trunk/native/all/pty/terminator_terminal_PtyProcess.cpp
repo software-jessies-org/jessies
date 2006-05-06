@@ -83,9 +83,11 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, js
     }
     processId = ptyGenerator.forkAndExec(&argv[0], workingDirectory);
     
-    // On Linux, the TIOCSWINSZ ioctl blocks if the pty has not yet been opened by the child.
+    // On Linux, the TIOCSWINSZ ioctl sets the size of the pty (without blocking) even if it hasn't been opened by the child yet.
     // On Mac OS, it silently does nothing, meaning that when the child does open the pty, TIOCGWINSZ reports the wrong size.
-    // We work around this by explicitly blocking the parent until the child has opened the pty (which we can recognize by the fact that a write would no longer block).
+    // We work around this by explicitly blocking the parent until the child has opened the pty.
+    // We can recognize on Mac OS by the fact that a write would no longer block.
+    // (The fd is writable on Linux even before the child has opened the pty.)
     waitUntilFdWritable(fd.get());
     
     slavePtyName = newStringUtf8(ptyGenerator.getSlavePtyName());
