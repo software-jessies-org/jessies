@@ -157,36 +157,10 @@ public class TerminatorFrame extends JFrame {
 		JComponent oldContentPane = (JComponent) getContentPane();
 		Dimension initialSize = oldContentPane.getSize();
 		
-		tabbedPane = new JTabbedPane();
-		tabbedPane.addChangeListener(new TerminalFocuser());
-		ComponentUtilities.disableFocusTraversal(tabbedPane);
-		
-		EPopupMenu tabMenu = new EPopupMenu(tabbedPane);
-		tabMenu.addMenuItemProvider(new MenuItemProvider() {
-			public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
-				// If the user clicked on some part of the tabbed pane that isn't actually a tab, we're not interested.
-				int tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
-				if (tabIndex == -1) {
-					return;
-				}
-				
-				actions.add(new TerminatorMenuBar.NewTabAction());
-				actions.add(new TerminatorMenuBar.DetachTabAction());
-				actions.add(null);
-				actions.add(new TerminatorMenuBar.CloseAction());
-			}
-		});
-		
-		// The tabs themselves (the components with the labels)
-		// shouldn't be able to get the focus. If they can, clicking
-		// on an already-selected tab takes focus away from the
-		// associated terminal, which is annoying.
-		tabbedPane.setFocusable(false);
-		
+		tabbedPane = new TerminatorTabbedPane();
 		if (oldContentPane instanceof JTerminalPane) {
 			addPaneToUI((JTerminalPane) oldContentPane);
 		}
-		
 		setContentPane(tabbedPane);
 		validate();
 		
@@ -216,23 +190,6 @@ public class TerminatorFrame extends JFrame {
 		updateFrameTitle();
 	}
 	
-	/**
-	 * Ensures that when we change tab, we give focus to that terminal.
-	 */
-	private class TerminalFocuser implements ChangeListener {
-		public void stateChanged(ChangeEvent e) {
-			final Component selected = tabbedPane.getSelectedComponent();
-			if (selected != null) {
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						selected.requestFocus();
-					}
-				});
-			}
-			updateFrameTitle();
-		}
-	}
-
 	/**
 	 * Increases the size of the frame based on the amount of space taken
 	 * away from the terminal to insert the tabbed pane. The end result

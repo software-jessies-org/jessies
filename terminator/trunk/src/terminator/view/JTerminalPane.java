@@ -649,7 +649,7 @@ public class JTerminalPane extends JPanel {
 		getTerminatorFrame().closeTerminalPane(this);
 	}
 	
-	private TerminatorFrame getTerminatorFrame() {
+	public TerminatorFrame getTerminatorFrame() {
 		return (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, this);
 	}
 	
