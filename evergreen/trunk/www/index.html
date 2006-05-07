@@ -1,13 +1,13 @@
 <html>
 <head>
-<title>Edit</title>
+<title>Evergreen</title>
 <link rel="stylesheet" type="text/css" href="/salma-hayek/styles.css" />
 </head>
 <body>
 
-<h1>Edit</h1>
+<h1>Evergreen</h1>
 
-<p><strong>Edit is a GPL development environment that tries to be lightweight
+<p><strong>Evergreen (formerly "Edit") is a GPL development environment that tries to be lightweight
 and language-agnostic yet functional.</strong>
 
 <h2>Why another editor?</h2>
@@ -15,7 +15,7 @@ and language-agnostic yet functional.</strong>
 <p>You can be forgiven for wondering why anyone would write another editor.
 There are plenty out there. Surely one fits?
 
-<p>Edit started as a project to reimplement Rob Pike's
+<p>Evergreen started as a project to reimplement Rob Pike's
 <a href="http://plan9.bell-labs.com/sys/doc/acme/acme.html">acme</a>
 editor in Java, so I could use it on Unix and Windows. (I'd got used
 to it at university, using Plan 9.) Eventually, my editor diverged and
@@ -23,21 +23,21 @@ today probably represents my personality quite closely; in particular,
 if the computer <i>can</i> do something, it <i>must</i>. I certainly
 shouldn't have to.
 
-<h2>What's so great about Edit?</h2>
+<h2>What's so great about Evergreen?</h2>
 
 <h3>Ubiquitous regular expressions</h3>
 
 <p>Programmers know regular expressions. And yet their graphical tools
-don't use make much use of them. Edit does. Anywhere it's asking you to
+don't use make much use of them. Evergreen does. Anywhere it's asking you to
 type something, it's probably expecting a regular expression: full Perl/Java
 regular expressions in find, in find/replace, in find in files (as you'd
 expect), but also in the open dialog.
 
 <h3>The best open dialog</h3>
 
-<p>Edit indexes your project, so you don't have to remember where files
+<p>Evergreen indexes your project, so you don't have to remember where files
 are. Or what case your co-worker used ("Hyperlink" or "HyperLink"?). Just
-a substring or regular expression that matches what you want. Edit updates
+a substring or regular expression that matches what you want. Evergreen updates
 a list of the matching files as you type (like iTunes):
 
 <div align="center">
@@ -49,9 +49,9 @@ a list of the matching files as you type (like iTunes):
 <h3>The best find</h3>
 
 <p>You have a fast computer, yet the 'find' function in other editors
-doesn't take advantage of that fact. Edit, like <tt>less(1)</tt>, highlights
+doesn't take advantage of that fact. Evergreen, like <tt>less(1)</tt>, highlights
 all the matches.
-Better still, Edit does so as you type, lets you move backwards as easily as
+Better still, Evergreen does so as you type, lets you move backwards as easily as
 forwards through the matches, and shows you next to the scroll bar where the
 other matches are:
 
@@ -61,7 +61,7 @@ other matches are:
 
 <h3>The best spelling checking</h3>
 
-<p>Not only does Edit check your spelling as you type, it understands
+<p>Not only does Evergreen check your spelling as you type, it understands
 CamelCase words aren't single-word spelling mistakes but compounds of
 correctly spelled words. In this example, the identifiers have been checked
 too:
@@ -72,7 +72,7 @@ too:
 
 <h3>The best <tt>ctags</tt> support</h3>
 
-<p>Edit uses <a href="http://ctags.sourceforge.net/">Exuberant ctags</a>
+<p>Evergreen uses <a href="http://ctags.sourceforge.net/">Exuberant ctags</a>
 (if installed) to understand the structure of your file. You
 can click on a tag to go to that point in the file, and the tag
 corresponding to the current caret position is always highlighted.
@@ -110,27 +110,29 @@ something more like the output from <tt>diff&nbsp;-u</tt>.)
 
 <h3>Other features</h3>
 
-<p>You can work on multiple projects at once, with each "workspace" getting its
+<p><b>Workspaces</b> You can work on multiple projects at once, with each "workspace" getting its
 own tab in the overall UI.
 
-<p>Each document has a watermark, used to show you if you're looking at a
+<p><b>Watermarks</b> Each document has a watermark, used to show you if you're looking at a
 read-only file, or a file that has been updated on disk since it was last read
 in.
 
-<p>If you choose a potentially destructive action such as "Revert to Saved",
+<p><b>Building</b> Evergreen defers to make(1) or ant(1) to actually build your project, and will search upward from the directory containing the focused file looking for a makefile.
+
+<p><b>Patches</b> If you choose a potentially destructive action such as "Revert to Saved",
 you're shown a colored patch and given a chance to change your mind. (Not only
 that, it's a useful way to see how a machine-generated file is changing as
 you work on the generator. Just keep running the script and reverting to the
 latest version of the generated file.)
-
-<p>Coloring and intelligent indentation of C++, Java, Perl, and Ruby.
 
 <p>"Compare Selection and Clipboard..." shows you a patch comparing the
 currently-selected text and the text on the clipboard. This is useful when
 you're looking at two seemingly duplicate chunks of code and want to know
 what, if any, differences there are between the two.
 
-<p>We gave up on <code>JTextPane</code> because of its poor performance, and
+<p><b>Language awareness</b> Coloring and intelligent indentation of C++, Java, Perl, and Ruby.
+
+<p><b>Custom text component</b> We gave up on <code>JTextPane</code> because of its poor performance, and
 we gave up on <code>JTextArea</code> because of its poor functionality. Unlike
 many other editors with their own text components, ours was explicitly designed
 to be useful elsewhere. It's interface is broadly similar to
@@ -150,11 +152,11 @@ but you'll also need a copy of the library to go with it (<a href="../salma-haye
 
 <p>(If you have access to my home directory, run <tt>sudo ~elliotth/Projects/salma-hayek/install-everything.sh</tt>, and make sure that <tt>/usr/local/bin</tt> is high up your path.)
 
-<h2>Notes on using Edit</h2>
+<h2>Notes on using Evergreen</h2>
 
 <p>Workspaces are important. You probably want one for each project you're working on. If a workspace looks like a project (i.e. has a Makefile or is under revision control), the files will be indexed. So you probably want the root of your workspaces to be the directories with the top-level makefiles.
 
-<p>Learn to live with Edit's idea of code formatting. If you find this hard to swallow, read <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=74230">Ken Arnold's thoughts on coding style</a> first. What you gain from accepting Edit's style (which shouldn't be a problem for Java programmers, because it's pretty much expecting that in all the C family) is that Edit will do the formatting for you. Even correcting stuff you paste in.
+<p>Learn to live with Evergreen's idea of code formatting. If you find this hard to swallow, read <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=74230">Ken Arnold's thoughts on coding style</a> first. What you gain from accepting Evergreen's style (which shouldn't be a problem for Java programmers, because it's pretty much expecting that in all the C family) is that Evergreen will do the formatting for you. Even correcting stuff you paste in.
 
 <!--#include virtual="/salma-hayek/footer.html" -->
 </body>
