@@ -83,52 +83,15 @@ end
 resources_dir = "#{app_dir}/Resources"
 FileUtils.mkdir_p(resources_dir)
 
-# Copy in the required bin/, classes/ and .generated/ directories.
-# Unfortunately, the start-up scripts tend to go looking for salma-hayek, so we can't just have Resources/bin and Resources/classes; we have to keep the multi-directory structure, at least for now.
-def copy_required_directories(src, dst)
-    # bin/ is under revision control, so avoid the .svn directories.
-    # FIXME: this assumes bin/ contains no subdirectories, which is currently true.
-    FileUtils.mkdir_p("#{dst}/bin")
-    replace_option = target_os() == "Linux" ? "--replace=%" : "-J %"
-    system("find #{src}/bin -name .svn -prune -or -type f -print0 | xargs -0 #{replace_option} cp -r % #{dst}/bin")
-    
-    # .generated/`uname` contains any native stuff we need.
-    FileUtils.mkdir_p("#{dst}/.generated/#{target_os()}")
-    FileUtils.cp_r("#{src}/.generated/#{target_os()}", "#{dst}/.generated")
-    
-    # lib/ contains support files that we have to assume we need.
-    if FileTest.directory?("#{src}/lib")
-        FileUtils.mkdir_p("#{dst}/lib")
-        FileUtils.cp_r("#{src}/lib", dst)
-        # It also contains Subversion control directories, which we don't want.
-        system("find #{dst}/lib/ -name .svn -print0 | xargs -0 #{replace_option} rm -rf %")
-    end
-    
-    # Copy JAR files, if there are any.
-    # FIXME: we should move these into a subdirectory of the project root. lib/ or lib/jars/, maybe.
-    FileUtils.cp(Dir.glob("#{src}/*.jar"), dst)
-end
-
-def linux_link_sources(glob, unwanted_prefix)
-    return Dir.glob(glob).map() {
-        |current_pathname|
-        # Remove tmp_dir from the front so we create currently dangling links to where the files will end up at install-time.
-        current_pathname.slice(unwanted_prefix.length(), current_pathname.length() - unwanted_prefix.length())
-    }
-end
-
-# FIXME: if we could get the make rules to give us all the salma-hayek MAKE_INSTALLER_FILE_LIST, we could junk this.
-copy_required_directories(salma_hayek, "#{resources_dir}/salma-hayek")
-
 # Copy this project's individual files.
 project_resource_directory = "#{resources_dir}/#{project_name}"
 FileUtils.mkdir_p(project_resource_directory)
 make_installer_file_list.each() {
     |src|
     src_pathname = Pathname.new(src)
-    dst_dirname = "#{project_resource_directory}/#{src_pathname.dirname()}"
+    dst_dirname = "#{resources_dir}/#{src_pathname.dirname()}"
     FileUtils.mkdir_p(dst_dirname)
-    FileUtils.cp(src_pathname, dst_dirname)
+    FileUtils.cp("../" + src_pathname, dst_dirname)
 }
 
 # Generate a single JAR file containing both the project's unique classes and all the classes from the salma-hayek library.

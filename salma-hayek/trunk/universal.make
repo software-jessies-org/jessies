@@ -571,9 +571,14 @@ www-dist: ChangeLog.html
 # How to build a .app directory and package it into an installer file.
 # ----------------------------------------------------------------------------
 
+.PHONY: installer-file-list
+installer-file-list:
+	@$(MAKE_INSTALLER_FILE_LIST) | ruby -w -pe '$$_.sub!(/^/, "$(PROJECT_NAME)/")'
+
+# Unfortunately, the start-up scripts tend to go looking for salma-hayek, so we can't just have Resources/bin etc; we have to keep the multi-directory structure, at least for now.
 .PHONY: $(PROJECT_NAME).app
 $(PROJECT_NAME).app: build .generated/build-revision.txt
-	@$(MAKE_INSTALLER_FILE_LIST) | $(SCRIPT_PATH)/package-for-distribution.rb $(PROJECT_NAME) $(SALMA_HAYEK)
+	@{ $(MAKE) --no-print-directory installer-file-list; $(MAKE) --no-print-directory -C $(SALMA_HAYEK) installer-file-list; } | $(SCRIPT_PATH)/package-for-distribution.rb $(PROJECT_NAME) $(SALMA_HAYEK)
 
 $(PROJECT_NAME).dmg: $(PROJECT_NAME).app
 	@$(RM) $@ && \
@@ -668,6 +673,7 @@ $(takeProfileSample)
 ALL_PER_DIRECTORY_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
 
 # ... and this depends on the above variable.
+# FIXME: we should move .jar files into a subdirectory of the project root. lib/ or lib/jars/, maybe.
 MAKE_INSTALLER_FILE_LIST = find $(wildcard doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_PER_DIRECTORY_TARGETS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt $(COMPILED_TERMINFO) -name .svn -prune -o -type f -print
 
 # The installer uses find(1) to discover what to include - so it must be built last.
