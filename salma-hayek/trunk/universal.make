@@ -323,7 +323,7 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 PROJECT_ROOT = $(CURDIR)
 
 PROJECT_NAME = $(notdir $(PROJECT_ROOT))
-HUMANIZED_PROJECT_NAME := $(shell $(SCRIPT_PATH)/humanize.rb $(PROJECT_NAME))
+HUMANIZED_PROJECT_NAME := $(shell ruby $(SCRIPT_PATH)/humanize.rb $(PROJECT_NAME))
 
 BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/bin
 LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/lib
