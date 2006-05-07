@@ -31,7 +31,7 @@ public class Edit {
     private Minibuffer minibuffer;
     private JPanel statusArea;
     
-    /** Extensions that shouldn't be opened by Edit. */
+    /** Extensions that we shouldn't open. */
     private String[] externalApplicationExtensions;
     
     /** The global find history for all FindDialog instances. */
@@ -70,7 +70,7 @@ public class Edit {
         return instance;
     }
     
-    /** Returns the frame Edit is using for its main window. */
+    /** Returns the frame we're using for the main window. */
     public Frame getFrame() {
         return (Frame) frame;
     }
@@ -236,7 +236,7 @@ public class Edit {
         
         // Refuse to open directories.
         if (FileUtilities.fileFromString(filename).isDirectory()) {
-            throw new RuntimeException("Edit can't edit directories, which is what '" + filename + "' is.");
+            throw new RuntimeException("It's not possible to edit directories, which is what '" + filename + "' is.");
         }
         
         // Limit ourselves (rather arbitrarily) to files under half a gigabyte. That's quite a strain on us, at present.
@@ -244,7 +244,7 @@ public class Edit {
         final int MB = 1024 * KB;
         long fileLength = FileUtilities.fileFromString(filename).length();
         if (fileLength > 512 * MB) {
-            throw new RuntimeException("Edit can't really handle files as large as '" + filename + "', which is " + fileLength + " bytes long. This file will not be opened.");
+            throw new RuntimeException("The file '" + filename + "', which is " + fileLength + " bytes long is too large. This file will not be opened.");
         }
         
         // Find which workspace this file is on/should be on, and make it visible.
@@ -459,8 +459,8 @@ public class Edit {
     }
     
     /**
-     * Attempts to quit Edit. All the workspaces are asked if it's safe for them to be
-     * closed. Only if all workspaces agree that it's safe will Edit actually quit.
+     * Attempts to quit. All the workspaces are asked if it's safe for them to be
+     * closed. Only if all workspaces agree that it's safe will we actually quit.
      */
     public void handleQuit(com.apple.eawt.ApplicationEvent e) {
         boolean isSafeToQuit = true;
@@ -732,7 +732,7 @@ public class Edit {
     
     private void initAboutBox() {
         AboutBox aboutBox = AboutBox.getSharedInstance();
-        aboutBox.setApplicationName("Edit");
+        aboutBox.setApplicationName("Evergreen");
         aboutBox.addCopyright("Copyright (C) 2004-2006 Free Software Foundation, Inc.");
         aboutBox.addCopyright("All Rights Reserved.");
     }
@@ -743,7 +743,7 @@ public class Edit {
         initMacOs();
         initAboutBox();
         
-        frame = new JFrame("Edit");
+        frame = new JFrame("Evergreen");
         frame.setJMenuBar(new EditMenuBar());
         
         initPreferences();
@@ -808,7 +808,7 @@ public class Edit {
                 
                 // If we didn't create any workspaces, give the user some help...
                 if (tabbedPane.getTabCount() == 0) {
-                    showAlert("Welcome to Edit!", "This looks like the first time you've used Edit. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
+                    showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
                 }
             }
         });

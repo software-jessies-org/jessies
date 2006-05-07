@@ -36,7 +36,7 @@ tellp
 wstring
 # Standard functions from table 99 "Standard Functions" of ISO+IEC+14882-2003.
 # We include all the functions from the table so it's easier to see (by counting) if we're missing any from future standards.
-# If a function is considered too dangerous to use, include it, but comment it out. Preferably with a reason or preferred alternative (a future version of Edit may make use of this information).
+# If a function is considered too dangerous to use, include it, but comment it out. Preferably with a reason or preferred alternative (a future version of Evergreen may make use of this information).
 abort
 abs
 acos
