@@ -133,7 +133,10 @@ make_installer_file_list.each() {
 
 # Generate a single JAR file containing both the project's unique classes and all the classes from the salma-hayek library.
 # Unscientific experiments suggest that uncompressed (-0) JAR files give us faster start-up times, and improving start-up time is why we're using a JAR file.
-system("jar", "c0f", "#{project_resource_directory}/classes.jar", "-C", "classes/", ".", "-C", "#{salma_hayek}/classes/", ".")
+# We have to do this in two stages to avoid a "java.util.zip.ZipException: duplicate entry:" error from jar(1) for cases where both trees share a package prefix.
+jar_filename = "#{project_resource_directory}/classes.jar"
+system("jar", "c0f", jar_filename, "-C", "classes/", ".")
+system("jar", "u0f", jar_filename, "-C", "#{salma_hayek}/classes/", ".")
 
 if target_os() == "Darwin"
     # Apple doesn't let you give a path to a .icns file, and doesn't seem to always follow symbolic links, so we have to copy it into position.
