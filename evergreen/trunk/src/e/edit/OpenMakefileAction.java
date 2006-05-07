@@ -12,7 +12,7 @@ public class OpenMakefileAction extends ETextAction {
     public void actionPerformed(ActionEvent e) {
         String makefileName = BuildAction.findMakefile();
         if (makefileName != null) {
-            Edit.getInstance().openFile(makefileName);
+            Evergreen.getInstance().openFile(makefileName);
         }
     }
 }

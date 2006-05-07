@@ -46,7 +46,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
          * This has the advantage that you can remove any entries that annoy you.
          */
         
-        String[] manPages = StringUtilities.readLinesFromFile(Edit.getInstance().getResourceFilename("manpages"));
+        String[] manPages = StringUtilities.readLinesFromFile(Evergreen.getInstance().getResourceFilename("manpages"));
         uniqueIdentifiers = new TreeSet<String>();
         for (String manPage : manPages) {
             knownManPages.add(manPage);
@@ -88,7 +88,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
             try {
                 new ShellCommand("man -S 2:3 " + page + " | col -b").runCommand();
             } catch (Throwable th) {
-                Edit.getInstance().showAlert("Couldn't show manual page", "There was a problem running man(1): " + th.getMessage() + ".");
+                Evergreen.getInstance().showAlert("Couldn't show manual page", "There was a problem running man(1): " + th.getMessage() + ".");
             }
             return true;
         }

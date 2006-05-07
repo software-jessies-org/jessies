@@ -20,7 +20,7 @@ public class RescanWorkspaceAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Workspace workspace = (boundWorkspace != null) ? boundWorkspace : Edit.getInstance().getCurrentWorkspace();
+        Workspace workspace = (boundWorkspace != null) ? boundWorkspace : Evergreen.getInstance().getCurrentWorkspace();
         workspace.updateFileList(null);
     }
 }

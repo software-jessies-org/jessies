@@ -30,6 +30,6 @@ public class CycleWorkspacesAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Edit.getInstance().cycleWorkspaces(indexDelta);
+        Evergreen.getInstance().cycleWorkspaces(indexDelta);
     }
 }

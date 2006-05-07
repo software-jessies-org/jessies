@@ -168,7 +168,7 @@ public class JavaDoc {
     public static List<String> findSourceFilenames(String dottedClassName) {
         String suffix = "\\b" + dottedClassName.replace('.', File.separatorChar) + "\\.java$";
         List<String> result = new ArrayList<String>();
-        for (Workspace workspace : Edit.getInstance().getWorkspaces()) {
+        for (Workspace workspace : Evergreen.getInstance().getWorkspaces()) {
             for (String leafName : workspace.getListOfFilesMatching(suffix)) {
                 result.add(workspace.prependRootDirectory(leafName));
             }

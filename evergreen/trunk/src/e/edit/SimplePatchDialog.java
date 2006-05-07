@@ -93,7 +93,7 @@ public class SimplePatchDialog {
     }
     
     public static void showPatchBetween(String title, String fromName, String fromContent, String toName, String toContent) {
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), title);
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), title);
         form.getFormPanel().addRow("Differences:", makeScrollablePatchView(fromName, fromContent, toName, toContent));
         form.showNonModal();
     }

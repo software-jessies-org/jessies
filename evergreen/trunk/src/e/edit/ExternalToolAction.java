@@ -70,7 +70,7 @@ public class ExternalToolAction extends ETextAction {
         }
         
         if (checkEverythingSaved) {
-            boolean shouldContinue = Edit.getInstance().getCurrentWorkspace().prepareForAction("Save before running external tool?", "Some files are currently modified but not saved.");
+            boolean shouldContinue = Evergreen.getInstance().getCurrentWorkspace().prepareForAction("Save before running external tool?", "Some files are currently modified but not saved.");
             if (shouldContinue == false) {
                 return;
             }
@@ -111,7 +111,7 @@ public class ExternalToolAction extends ETextAction {
             commandField = new JTextField(shellCommand.getCommand(), 40);
             contextField = new JTextField(shellCommand.getContext(), 40);
         }
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), (String) getValue(Action.NAME));
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), (String) getValue(Action.NAME));
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Command:", commandField);
         formPanel.addRow("Directory:", contextField);
@@ -127,7 +127,7 @@ public class ExternalToolAction extends ETextAction {
         try {
             shellCommand.runCommand();
         } catch (IOException ex) {
-            Edit.getInstance().showAlert("Couldn't start task", "There was a problem starting the command \"" + shellCommand.getCommand() + "\": " + ex.getMessage() + ".");
+            Evergreen.getInstance().showAlert("Couldn't start task", "There was a problem starting the command \"" + shellCommand.getCommand() + "\": " + ex.getMessage() + ".");
         }
     }
 }

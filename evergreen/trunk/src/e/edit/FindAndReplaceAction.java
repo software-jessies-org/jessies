@@ -87,7 +87,7 @@ public class FindAndReplaceAction extends ETextAction {
         ListSelectionModel selectionModel = matchList.getSelectionModel();
         replacementsList.setSelectionModel(selectionModel);
         
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Find/Replace");
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find/Replace");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Find:", patternField);
         formPanel.addRow("Replace With:", replacementField);
@@ -133,7 +133,7 @@ public class FindAndReplaceAction extends ETextAction {
             }
             return true;
         } catch (Exception ex) {
-            Edit.getInstance().showAlert("Couldn't replace", "There was a problem performing the replacements: " + ex.getMessage() + ".");
+            Evergreen.getInstance().showAlert("Couldn't replace", "There was a problem performing the replacements: " + ex.getMessage() + ".");
             return false;
         }
     }

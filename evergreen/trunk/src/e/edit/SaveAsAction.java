@@ -14,7 +14,7 @@ public class SaveAsAction extends ETextAction {
     
     public void actionPerformed(ActionEvent e) {
         ETextWindow window = getFocusedTextWindow();
-        String filename = Edit.getInstance().getCurrentWorkspace().showSaveAsDialog();
+        String filename = Evergreen.getInstance().getCurrentWorkspace().showSaveAsDialog();
         if (filename != null) {
             window.saveAs(filename);
         }

@@ -34,16 +34,16 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         // Welcome to the wonderful world of OOP, featuring nested-if polymorphism.
         if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
             String tip = "Open " + e.getDescription();
-            Edit.getInstance().showStatus(tip);
+            Evergreen.getInstance().showStatus(tip);
             textPane.setToolTipText(tip);
         } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
-            Edit.getInstance().showStatus("");
+            Evergreen.getInstance().showStatus("");
             textPane.setToolTipText(null);
         } else if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e instanceof HTMLFrameHyperlinkEvent) {
                 ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
             } else {
-                Edit.getInstance().getAdvisor().linkClicked(e.getDescription());
+                Evergreen.getInstance().getAdvisor().linkClicked(e.getDescription());
             }
         }
     }

@@ -25,7 +25,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         new KeyboardFocusMonitor() {
             public void focusChanged(Component oldOwner, Component newOwner) {
                 if (newOwner instanceof EWindow && newOwner instanceof ETextWindow == false) {
-                    Edit.getInstance().getTagsPanel().ensureTagsAreHidden();
+                    Evergreen.getInstance().getTagsPanel().ensureTagsAreHidden();
                 }
             }
         };
@@ -77,7 +77,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         
         // And there may be a file of extra spelling exceptions for this language.
-        String exceptionsFileName = Edit.getInstance().getResourceFilename("spelling-exceptions-" + language);
+        String exceptionsFileName = Evergreen.getInstance().getResourceFilename("spelling-exceptions-" + language);
         if (FileUtilities.exists(exceptionsFileName)) {
             for (String exception : StringUtilities.readLinesFromFile(exceptionsFileName)) {
                 if (exception.startsWith("#")) {
@@ -341,7 +341,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             getTitleBar().repaint();
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
-            Edit.getInstance().showAlert("Couldn't open file \"" + FileUtilities.getUserFriendlyName(file) + "\"", th.getMessage());
+            Evergreen.getInstance().showAlert("Couldn't open file \"" + FileUtilities.getUserFriendlyName(file) + "\"", th.getMessage());
             throw new RuntimeException("can't open " + FileUtilities.getUserFriendlyName(file));
         }
     }
@@ -435,7 +435,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         int originalCaretPosition = text.getSelectionStart();
         fillWithContent();
         text.setCaretPosition(originalCaretPosition);
-        Edit.getInstance().showStatus("Reverted to saved version of " + filename);
+        Evergreen.getInstance().showStatus("Reverted to saved version of " + filename);
     }
     
     private boolean showPatchAndAskForConfirmation(String verb, String question, boolean fromDiskToMemory) {
@@ -464,7 +464,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         
         String title = verb;
         String buttonLabel = verb;
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), title);
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), title);
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("", new JLabel(question));
         formPanel.addRow("Patch:", patchView);
@@ -473,11 +473,11 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     public void revertToSaved() {
         if (file.exists() == false) {
-            Edit.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" does not exist.");
+            Evergreen.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" does not exist.");
             return;
         }
         if (isDirty() == false && file.exists() && isOutOfDateWithRespectToDisk() == false) {
-            Edit.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" is the same on disk as in the editor.");
+            Evergreen.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" is the same on disk as in the editor.");
             return;
         }
         if (showPatchAndAskForConfirmation("Revert to saved?", "Revert to on-disk version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true)) {
@@ -494,7 +494,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             findResultsUpdater.stop();
             findResultsUpdater = null;
         }
-        Edit.getInstance().showStatus("Closed " + filename);
+        Evergreen.getInstance().showStatus("Closed " + filename);
         getWorkspace().unregisterTextComponent(getText());
         // FIXME: what else needs doing to ensure that we give back memory?
     }
@@ -508,7 +508,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 return;
             }
         }
-        Edit.getInstance().getTagsPanel().ensureTagsAreHidden();
+        Evergreen.getInstance().getTagsPanel().ensureTagsAreHidden();
         super.closeWindow();
     }
     
@@ -586,9 +586,9 @@ public class ETextWindow extends EWindow implements PTextListener {
     public void switchToCounterpart() {
         String counterpartFilename = getCounterpartFilename();
         if (counterpartFilename != null) {
-            Edit.getInstance().openFile(getContext() + File.separator + counterpartFilename);
+            Evergreen.getInstance().openFile(getContext() + File.separator + counterpartFilename);
         } else {
-            Edit.getInstance().showAlert("Can't switch to counterpart", "File \"" + filename + "\" has no counterpart.");
+            Evergreen.getInstance().showAlert("Can't switch to counterpart", "File \"" + filename + "\" has no counterpart.");
         }
     }
 
@@ -745,7 +745,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             }
         }
         
-        Edit edit = Edit.getInstance();
+        Evergreen editor = Evergreen.getInstance();
         
         // Try to save a backup copy first. Ideally, we should do this from
         // a timer and always have a recent backup around.
@@ -754,19 +754,19 @@ public class ETextWindow extends EWindow implements PTextListener {
             try {
                 writeToFile(backupFile);
             } catch (Exception ex) {
-                edit.showAlert("Couldn't save \"" + this.filename + "\"", "Couldn't create backup file.");
+                editor.showAlert("Couldn't save \"" + this.filename + "\"", "Couldn't create backup file.");
                 return false;
             }
         }
         
         try {
-            edit.showStatus("Saving " + filename + "...");
+            editor.showStatus("Saving " + filename + "...");
             // The file may be a symbolic link on a CIFS server.
             // In this case, it's important that we write into the original file rather than creating a new one.
             writeToFile(file);
             text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
-            edit.showStatus("Saved " + filename);
+            editor.showStatus("Saved " + filename);
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
             configureForGuessedFileType();
@@ -775,8 +775,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             SaveMonitor.getInstance().fireSaveListeners();
             return true;
         } catch (Exception ex) {
-            edit.showStatus("");
-            edit.showAlert("Couldn't save file \"" + filename + "\"", ex.getMessage());
+            editor.showStatus("");
+            editor.showAlert("Couldn't save file \"" + filename + "\"", ex.getMessage());
             Log.warn("Problem saving \"" + filename + "\"", ex);
         }
         return false;
@@ -787,16 +787,16 @@ public class ETextWindow extends EWindow implements PTextListener {
         try {
             File newFile = FileUtilities.fileFromString(newFilename);
             if (newFile.exists()) {
-                boolean replace = Edit.getInstance().askQuestion("Overwrite existing file?", "An item named \"" + newFilename + "\" already exists in this location. Do you want to replace it with the one you are saving?", "Replace");
+                boolean replace = Evergreen.getInstance().askQuestion("Overwrite existing file?", "An item named \"" + newFilename + "\" already exists in this location. Do you want to replace it with the one you are saving?", "Replace");
                 if (replace == false) {
                     return false;
                 }
             }
             writeToFile(newFile);
-            Edit.getInstance().openFile(newFile.getAbsolutePath());
+            Evergreen.getInstance().openFile(newFile.getAbsolutePath());
             return true;
         } catch (Exception ex) {
-            Edit.getInstance().showAlert("Couldn't save file \"" + newFilename + "\"", ex.getMessage());
+            Evergreen.getInstance().showAlert("Couldn't save file \"" + newFilename + "\"", ex.getMessage());
             Log.warn("Problem saving as \"" + newFilename + "\"", ex);
         }
         return false;

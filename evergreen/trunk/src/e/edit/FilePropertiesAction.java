@@ -52,7 +52,7 @@ public class FilePropertiesAction extends ETextAction {
         
         fileTypeField.setText(window.getFileType());
         
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "File Properties");
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "File Properties");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);

@@ -16,6 +16,6 @@ public class OpenAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Edit.getInstance().getCurrentWorkspace().showOpenDialog();
+        Evergreen.getInstance().getCurrentWorkspace().showOpenDialog();
     }
 }

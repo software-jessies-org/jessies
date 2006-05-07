@@ -19,9 +19,9 @@ public class OpenQuicklyAction extends ETextAction {
         String filename = getSelectedText();
         if (filename.startsWith("~") || filename.startsWith("/")) {
             // If we have an absolute name, we can go straight there.
-            Edit.getInstance().openFile(filename);
+            Evergreen.getInstance().openFile(filename);
         } else {
-            Edit.getInstance().getCurrentWorkspace().showOpenQuicklyDialog(StringUtilities.regularExpressionFromLiteral(filename));
+            Evergreen.getInstance().getCurrentWorkspace().showOpenQuicklyDialog(StringUtilities.regularExpressionFromLiteral(filename));
         }
     }
 }

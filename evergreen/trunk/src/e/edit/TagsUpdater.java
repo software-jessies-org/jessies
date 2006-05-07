@@ -145,7 +145,7 @@ public class TagsUpdater {
     }
     
     public void showTags() {
-        Edit.getInstance().getTagsPanel().setTagsTree(uiPanel);
+        Evergreen.getInstance().getTagsPanel().setTagsTree(uiPanel);
     }
     
     /**
@@ -202,7 +202,7 @@ public class TagsUpdater {
         public TreeModelBuilder() {
             progressTimer = new Timer(500, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Edit.getInstance().getTagsPanel().showProgressBar();
+                    Evergreen.getInstance().getTagsPanel().showProgressBar();
                 }
             });
             progressTimer.setRepeats(false);
@@ -258,7 +258,7 @@ public class TagsUpdater {
         }
         
         public void taggingFailed(Exception ex) {
-            Edit.getInstance().getTagsPanel().showError("Is Exuberant ctags installed and on your path? There was an error reading the tags: " + ex.getMessage());
+            Evergreen.getInstance().getTagsPanel().showError("Is Exuberant ctags installed and on your path? There was an error reading the tags: " + ex.getMessage());
         }
         
         public void scanTags() {
@@ -281,7 +281,7 @@ public class TagsUpdater {
                 tagsDigest = newDigest;
                 temporaryFile.delete();
             } catch (Exception ex) {
-                Edit.getInstance().getTagsPanel().showError("Couldn't make tags: " + ex.getMessage());
+                Evergreen.getInstance().getTagsPanel().showError("Couldn't make tags: " + ex.getMessage());
                 Log.warn("Couldn't make tags", ex);
             }
         }

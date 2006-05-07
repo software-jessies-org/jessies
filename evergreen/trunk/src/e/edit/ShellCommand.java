@@ -30,7 +30,7 @@ public class ShellCommand {
         setCommand(command);
         setFilename("");
         setLineNumber(0);
-        setWorkspace(Edit.getInstance().getCurrentWorkspace());
+        setWorkspace(Evergreen.getInstance().getCurrentWorkspace());
         setContext(System.getProperty("java.io.tmpdir"));
     }
     
@@ -50,7 +50,7 @@ public class ShellCommand {
 
         EventQueue.invokeLater(launchRunnable);
         
-        Edit.getInstance().showStatus("Started task '" + command + "'");
+        Evergreen.getInstance().showStatus("Started task '" + command + "'");
         
         startMonitoringStream(process.getInputStream());
         startMonitoringStream(process.getErrorStream());
@@ -106,7 +106,7 @@ public class ShellCommand {
                     }
                     footer.add("-------------------------------------------------------------------------");
                     workspace.getErrorsWindow().append(footer.toArray(new String[footer.size()]));
-                    Edit.getInstance().showStatus("Task '" + command + "' finished");
+                    Evergreen.getInstance().showStatus("Task '" + command + "' finished");
                 }
             });
             EventQueue.invokeLater(completionRunnable);
