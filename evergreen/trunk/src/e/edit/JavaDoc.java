@@ -32,7 +32,7 @@ public class JavaDoc {
         Log.warn("Collecting JavaDoc...");
         
         /**
-        * Find all the packages that are on Edit's classpath. All classes in these packages can
+        * Find all the packages that are on our classpath. All classes in these packages can
         * be loaded by the system classloader without any help.
         */
         for (Package p : Package.getPackages()) {

@@ -4,7 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- * An Edit user is expected to use Open Quickly, so this is only
+ * The user is expected to use Open Quickly, so this is only
  * here for emergencies. That's why, for example, there's no
  * keyboard equivalent.
  */

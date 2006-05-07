@@ -21,7 +21,7 @@ public class CycleWindowsAction extends ETextAction {
         // ctrl-F6, depending on what kind of window you think we're cycling
         // through. They don't specify any key for "Previous Window".
         // You know what (shift-)alt-tab does, and (shift-)ctrl-tab is used
-        // to cycle between tabs (which are workspaces in Edit).
+        // to cycle between tabs (which are workspaces here).
         
         // GNOME doesn't appear to support keyboard traversal in either
         // direction, presumably because they don't support any kind of MDI

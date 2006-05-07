@@ -169,7 +169,7 @@ public class Advisor extends JPanel {
                 return;
             }
         }
-        // Hand it on to Edit to work out what to do with it.
+        // Hand it on to the file-opening code to work out what to do with it.
         Edit.getInstance().openFile(link);
     }
 }

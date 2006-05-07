@@ -13,7 +13,7 @@ import e.util.*;
  * <font color="red">Note that you have you call addComponent and not add. I don't know why I
  * didn't override add and invoke super.add at the critical point; this seems like a serious design
  * error that someone should check out and fix. As things stand, accidentally invoking add will
- * cause a whole can of Whoop Ass to be spilt in Edit's lap.</font>
+ * cause a whole can of Whoop Ass to be spilt in our lap.</font>
  * 
  * @author Elliott Hughes <enh@acm.org>
  */

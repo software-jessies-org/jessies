@@ -251,7 +251,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         // hydrogen:/usr/lib/ruby/1.8$ grep -n -- '-\*-' *
         // getoptlong.rb:1:#                                                         -*- Ruby -*-
         // yaml.rb:1:# -*- mode: ruby; ruby-indent-level: 4; tab-width: 4 -*- vim: sw=4 ts=4
-        // We should also probably recognize plain C (since C_PLUS_PLUS in Edit means C/C++/Objective-C/Objective-C++):
+        // We should also probably recognize plain C (since our C_PLUS_PLUS means C/C++/Objective-C/Objective-C++):
         // powerpc-darwin8.0/dl.h:1:/* -*- C -*-
         // FIXME: emacs mode strings should be handled separately, and override content-based file type determination.
         // FIXME: gEdit's "modelines" plug-in http://cvs.gnome.org/viewcvs/gedit/plugins/modelines/ details emacs(1), kate(1), and vim(1) mode lines.
