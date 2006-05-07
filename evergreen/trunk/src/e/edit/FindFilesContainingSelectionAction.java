@@ -53,16 +53,13 @@ public class FindFilesContainingSelectionAction extends ETextAction {
         }
         
         String directory = textWindow.getContext();
-        System.err.println(directory);
         
         // Strip the workspace root.
         String possiblePrefix = Evergreen.getInstance().getCurrentWorkspace().getRootDirectory();
         if (directory.startsWith(possiblePrefix)) {
             directory = directory.substring(possiblePrefix.length());
-            System.err.println(directory);
             if (directory.startsWith(File.separator)) {
                 directory = directory.substring(1);
-                System.err.println(directory);
             }
         }
         
