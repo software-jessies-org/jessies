@@ -592,7 +592,7 @@ $(PROJECT_NAME).deb: $(PROJECT_NAME).app
 
 # Later we add more dependencies when we know $(ALL_PER_DIRECTORY_TARGETS).
 %/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
-	$(MAKE_INSTALLER_FILE_LIST) | $(FILE_LIST_TO_WXI) $(if $(filter %.msi,$(WIX_TARGET)),--diskId) > $@
+	{ find classes -type f -print; $(MAKE_INSTALLER_FILE_LIST); } | $(FILE_LIST_TO_WXI) $(if $(filter %.msi,$(WIX_TARGET)),--diskId) > $@
 
 # This silliness is probably sufficient (as well as sadly necessary).
 %/component-references.wxi: %/component-definitions.wxi $(MAKEFILE_LIST)

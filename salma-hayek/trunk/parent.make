@@ -4,7 +4,7 @@
 
 SUBDIRS += salma-hayek
 
-SUBDIRS += edit
+SUBDIRS += Evergreen
 SUBDIRS += KnowAll
 SUBDIRS += scm
 SUBDIRS += terminator

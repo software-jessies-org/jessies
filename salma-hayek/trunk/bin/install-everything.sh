@@ -75,7 +75,7 @@ mkdir -p /usr/local/www.jessies.org/ && \
 cd /usr/local/www.jessies.org/ || die "making install directory"
 
 # Download and extract the latest nightly builds.
-PROJECTS="salma-hayek edit KnowAll scm terminator"
+PROJECTS="salma-hayek Evergreen KnowAll scm terminator"
 BROKEN_PROJECTS=""
 WGET_OPTIONS="-C off"
 if ! wget --no-cache 2>&1 | grep unrecogni[sz]ed > /dev/null
