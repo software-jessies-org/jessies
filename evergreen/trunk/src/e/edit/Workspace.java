@@ -74,7 +74,7 @@ public class Workspace extends JPanel {
             FileIgnorer fileIgnorer = new FileIgnorer(getRootDirectory());
             ArrayList<String> result = new ArrayList<String>();
             scanDirectory(getRootDirectory(), fileIgnorer, result);
-            Edit.getInstance().showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
+            Evergreen.getInstance().showStatus("Scan of '" + getRootDirectory() + "' complete (" + result.size() + " files)");
             
             Log.warn("Scan of " + getRootDirectory() + " took " + (System.currentTimeMillis() - start) + "ms; found " + result.size() + " files.");
             return result;
@@ -146,11 +146,11 @@ public class Workspace extends JPanel {
      */
     public boolean isFileListUnsuitableFor(String purpose) {
         if (fileList == null) {
-            Edit.getInstance().showAlert("Can't " + purpose, "The list of files for " + getTitle() + " is not yet available.");
+            Evergreen.getInstance().showAlert("Can't " + purpose, "The list of files for " + getTitle() + " is not yet available.");
             return true;
         }
         if (fileList.isEmpty()) {
-            Edit.getInstance().showAlert("Can't " + purpose, "The list of files for " + getTitle() + " is empty.");
+            Evergreen.getInstance().showAlert("Can't " + purpose, "The list of files for " + getTitle() + " is empty.");
             return true;
         }
         return false;
@@ -235,15 +235,15 @@ public class Workspace extends JPanel {
     }
     
     public void registerTextComponent(PTextArea textComponent) {
-        Edit.getInstance().getAdvisor().registerTextComponent(textComponent);
+        Evergreen.getInstance().getAdvisor().registerTextComponent(textComponent);
     }
     
     public void unregisterTextComponent(PTextArea textComponent) {
-        Edit.getInstance().getAdvisor().unregisterTextComponent(textComponent);
+        Evergreen.getInstance().getAdvisor().unregisterTextComponent(textComponent);
     }
     
     public EWindow addViewerForFile(final String filename, final String address, final int y) {
-        Edit.getInstance().showStatus("Opening " + filename + "...");
+        Evergreen.getInstance().showStatus("Opening " + filename + "...");
         EWindow window = null;
         try {
             ETextWindow newWindow = new ETextWindow(filename);
@@ -259,7 +259,7 @@ public class Workspace extends JPanel {
         } catch (Exception ex) {
             Log.warn("Exception while opening file", ex);
         }
-        Edit.getInstance().showStatus("Opened " + filename);
+        Evergreen.getInstance().showStatus("Opened " + filename);
         return window;
     }
     
@@ -305,7 +305,7 @@ public class Workspace extends JPanel {
     public boolean prepareForAction(String activity, String unsavedDataPrompt) {
         ETextWindow[] dirtyWindows = getDirtyTextWindows();
         if (dirtyWindows.length > 0) {
-            String choice = Edit.getInstance().askQuestion(activity, unsavedDataPrompt, "Save All", "Don't Save");
+            String choice = Evergreen.getInstance().askQuestion(activity, unsavedDataPrompt, "Save All", "Don't Save");
             if (choice.equals("Cancel")) {
                 return false;
             }
@@ -373,19 +373,19 @@ public class Workspace extends JPanel {
     
     public void showOpenDialog() {
         if (openDialog == null) {
-            openDialog = EFileDialog.makeOpenDialog(Edit.getInstance().getFrame(), getRootDirectory());
+            openDialog = EFileDialog.makeOpenDialog(Evergreen.getInstance().getFrame(), getRootDirectory());
         }
         openDialog.show();
         String name = openDialog.getFile();
         if (name != null) {
-            Edit.getInstance().openFile(name);
+            Evergreen.getInstance().openFile(name);
         }
     }
 
     /** Returns the chosen save-as name, or null. */
     public String showSaveAsDialog() {
         if (saveAsDialog == null) {
-            saveAsDialog = EFileDialog.makeSaveDialog(Edit.getInstance().getFrame(), getRootDirectory());
+            saveAsDialog = EFileDialog.makeSaveDialog(Evergreen.getInstance().getFrame(), getRootDirectory());
         }
         saveAsDialog.show();
         return saveAsDialog.getFile();
@@ -398,7 +398,7 @@ public class Workspace extends JPanel {
     
     public void moveFilesToBestWorkspaces() {
         for (ETextWindow textWindow : leftColumn.getTextWindows()) {
-            Workspace bestWorkspace = Edit.getInstance().getBestWorkspaceForFilename(textWindow.getFilename());
+            Workspace bestWorkspace = Evergreen.getInstance().getBestWorkspaceForFilename(textWindow.getFilename());
             if (bestWorkspace != this) {
                 bestWorkspace.takeWindow(textWindow);
             }

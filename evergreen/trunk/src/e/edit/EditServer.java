@@ -7,10 +7,10 @@ import java.io.*;
 import e.util.*;
 
 public final class EditServer {
-    private Edit edit;
+    private Evergreen editor;
     
-    public EditServer(Edit edit) {
-        this.edit = edit;
+    public EditServer(Evergreen editor) {
+        this.editor = editor;
     }
     
     public void open(PrintWriter out, String line) {
@@ -24,7 +24,7 @@ public final class EditServer {
     }
     
     public void rememberState() {
-        edit.rememberState();
+        editor.rememberState();
     }
     
     public void saveAll() {
@@ -53,11 +53,11 @@ public final class EditServer {
         
         public void run() {
             try {
-                this.window = edit.openFileNonInteractively(filename);
+                this.window = editor.openFileNonInteractively(filename);
                 if (GuiUtilities.isMacOs()) {
                     ProcessUtilities.spawn(null, new String[] { FileUtilities.findOnPath("BringProcessToFront").toString() });
                 } else {
-                    edit.getFrame().toFront();
+                    editor.getFrame().toFront();
                 }
                 out.println("File '" + filename + "' opened OK.");
             } catch (Exception ex) {

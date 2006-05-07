@@ -7,8 +7,8 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 
-public class EditMenuBar extends EMenuBar {
-    public EditMenuBar() {
+public class EvergreenMenuBar extends EMenuBar {
+    public EvergreenMenuBar() {
         add(makeFileMenu());
         add(makeEditMenu());
         add(makeFindMenu());
@@ -27,7 +27,7 @@ public class EditMenuBar extends EMenuBar {
         }
         
         public void actionPerformed(ActionEvent e) {
-            Edit.getInstance().handleQuit(null);
+            Evergreen.getInstance().handleQuit(null);
         }
     }
     
@@ -173,9 +173,9 @@ public class EditMenuBar extends EMenuBar {
     }
     
     private JMenu makeHelpMenu() {
-        HelpMenu helpMenu = new HelpMenu("Edit");
-        helpMenu.setWebsite("http://software.jessies.org/edit/");
-        helpMenu.setChangeLog("http://software.jessies.org/edit/ChangeLog.html");
+        HelpMenu helpMenu = new HelpMenu("Evergreen");
+        helpMenu.setWebsite("http://software.jessies.org/Evergreen/");
+        helpMenu.setChangeLog("http://software.jessies.org/Evergreen/ChangeLog.html");
         return helpMenu.makeJMenu();
     }
 }

@@ -23,7 +23,7 @@ public class GotoAction extends ETextAction implements MinibufferUser {
         currentTextArea = getFocusedTextArea();
         // FIXME - selection
         initialCaretPosition = currentTextArea.getSelectionStart();
-        Edit.getInstance().showMinibuffer(this);
+        Evergreen.getInstance().showMinibuffer(this);
     }
     
     //

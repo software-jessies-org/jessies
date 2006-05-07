@@ -23,7 +23,7 @@ public class AddWorkspaceAction extends AbstractAction {
         FilenameChooserField filenameChooserField = new FilenameChooserField(JFileChooser.DIRECTORIES_ONLY);
         filenameChooserField.setCompanionNameField(nameField);
         
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Add Workspace");
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Add Workspace");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Root Directory:", filenameChooserField);
         formPanel.addRow("Name:", nameField);
@@ -37,9 +37,9 @@ public class AddWorkspaceAction extends AbstractAction {
             
             String message = FileUtilities.checkDirectoryExistence(filenameChooserField.getPathname());
             if (message != null) {
-                Edit.getInstance().showAlert(message, "The name you supply must exist, and must be a directory.");
+                Evergreen.getInstance().showAlert(message, "The name you supply must exist, and must be a directory.");
             } else {
-                Workspace workspace = Edit.getInstance().createWorkspace(nameField.getText(), filenameChooserField.getPathname());
+                Workspace workspace = Evergreen.getInstance().createWorkspace(nameField.getText(), filenameChooserField.getPathname());
                 workspace.updateFileList(null);
                 finished = true;
             }

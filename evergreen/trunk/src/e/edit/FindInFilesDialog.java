@@ -46,7 +46,7 @@ public class FindInFilesDialog {
         }
         
         public void open() {
-            EWindow window = Edit.getInstance().openFile(file.toString());
+            EWindow window = Evergreen.getInstance().openFile(file.toString());
             if (window instanceof ETextWindow) {
                 ETextWindow textWindow = (ETextWindow) window;
                 FindAction.INSTANCE.findInText(textWindow, PatternUtilities.toString(pattern));
@@ -118,7 +118,7 @@ public class FindInFilesDialog {
         }
         
         public void open() {
-            EWindow window = Edit.getInstance().openFile(workspace.prependRootDirectory(name));
+            EWindow window = Evergreen.getInstance().openFile(workspace.prependRootDirectory(name));
             if (window instanceof ETextWindow && pattern != null) {
                 ETextWindow textWindow = (ETextWindow) window;
                 FindAction.INSTANCE.findInText(textWindow, PatternUtilities.toString(pattern));
@@ -468,7 +468,7 @@ public class FindInFilesDialog {
         };
         saveMonitor.addSaveListener(saveListener);
         
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Find in Files");
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find in Files");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Files Containing:", regexField);
         formPanel.addRow("Whose Names Match:", filenameRegexField);

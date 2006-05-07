@@ -20,7 +20,7 @@ public class RemoveWorkspaceAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Workspace workspace = (boundWorkspace != null) ? boundWorkspace : Edit.getInstance().getCurrentWorkspace();
-        Edit.getInstance().removeWorkspace(workspace);
+        Workspace workspace = (boundWorkspace != null) ? boundWorkspace : Evergreen.getInstance().getCurrentWorkspace();
+        Evergreen.getInstance().removeWorkspace(workspace);
     }
 }

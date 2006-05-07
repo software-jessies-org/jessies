@@ -3,7 +3,7 @@ package e.edit;
 import e.util.*;
 import java.util.*;
 
-public class EditLaunchable implements Launchable {
+public class EvergreenLaunchable implements Launchable {
     private List<String> arguments;
     
     public void parseCommandLine(List<String> arguments) {
@@ -11,9 +11,9 @@ public class EditLaunchable implements Launchable {
     }
     
     public void startGui() {
-        Edit edit = Edit.getInstance();
+        Evergreen editor = Evergreen.getInstance();
         for (String argument : arguments) {
-            edit.openFile(argument);
+            editor.openFile(argument);
         }
     }
 }

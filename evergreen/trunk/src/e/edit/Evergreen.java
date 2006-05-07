@@ -20,8 +20,8 @@ import e.forms.*;
 import e.gui.*;
 import e.util.*;
 
-public class Edit {
-    private static Edit instance;
+public class Evergreen {
+    private static Evergreen instance;
     
     private JFrame frame;
     private JTabbedPane tabbedPane;
@@ -62,9 +62,9 @@ public class Edit {
     private JPanel progressBarAndKillButton = new JPanel(new BorderLayout(4, 0));
     private Process process;
     
-    public static synchronized Edit getInstance() {
+    public static synchronized Evergreen getInstance() {
         if (instance == null) {
-            instance = new Edit();
+            instance = new Evergreen();
             instance.init();
         }
         return instance;
@@ -282,7 +282,7 @@ public class Edit {
      * the desired Workspace's canonical name rather than its friendly name.
      * This would send it to the wrong Workspace.
      * FIXME: Consistency probably demands that this be called from
-     * FileUtilities.getUserFriendlyName rather than Edit.openFile.
+     * FileUtilities.getUserFriendlyName rather than openFile.
      */
     public String normalizeWorkspacePrefix(String filename) {
         for (Workspace workspace : getWorkspaces()) {
@@ -716,7 +716,7 @@ public class Edit {
         minibuffer.activate(minibufferUser);
     }
     
-    private Edit() {
+    private Evergreen() {
     }
     
     private void initMacOs() {
@@ -725,7 +725,7 @@ public class Edit {
         }
         com.apple.eawt.Application.getApplication().addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
             public void handleQuit(com.apple.eawt.ApplicationEvent e) {
-                Edit.this.handleQuit(e);
+                Evergreen.this.handleQuit(e);
             }
         });
     }
@@ -744,7 +744,7 @@ public class Edit {
         initAboutBox();
         
         frame = new JFrame("Evergreen");
-        frame.setJMenuBar(new EditMenuBar());
+        frame.setJMenuBar(new EvergreenMenuBar());
         
         initPreferences();
         FormDialog.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
@@ -761,7 +761,7 @@ public class Edit {
         tabbedPane = new JTabbedPane(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                Edit.getInstance().getTagsPanel().ensureTagsAreHidden();
+                Evergreen.getInstance().getTagsPanel().ensureTagsAreHidden();
                 getCurrentWorkspace().restoreFocusToRememberedTextWindow();
             }
         });

@@ -32,7 +32,7 @@ public class InsertInterfaceAction extends ETextAction {
     }
     
     private void pasteSourceCode() {
-        String text = Edit.getInstance().getAdvisor().getLookupString();
+        String text = Evergreen.getInstance().getAdvisor().getLookupString();
         
         String className = null;
         String prefix = "";
@@ -54,13 +54,13 @@ public class InsertInterfaceAction extends ETextAction {
             prefix += "new " + className + "(";
         }
         if (className == null) {
-            Edit.getInstance().showAlert("Couldn't insert interface", "It wasn't possible to work out what interface you're referring to.");
+            Evergreen.getInstance().showAlert("Couldn't insert interface", "It wasn't possible to work out what interface you're referring to.");
             return;
         }
         
         Class[] classes = JavaDoc.getClasses(className);
         if (classes.length != 1) {
-            Edit.getInstance().showAlert("Couldn't insert interface", "The class name \"" + className + "\" must be unique, but matches " + classes.length + " classes.");
+            Evergreen.getInstance().showAlert("Couldn't insert interface", "The class name \"" + className + "\" must be unique, but matches " + classes.length + " classes.");
             return;
         }
         

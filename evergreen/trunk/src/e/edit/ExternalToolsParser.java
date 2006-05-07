@@ -6,9 +6,9 @@ import e.util.*;
 
 Parses the external tool descriptions in the system properties, invoking
 the appropriate abstract method when a tool is parsed. You need to subclass
-and implement these methods. Examples are in EditMenuBar (which puts everything
-on the Tools menu) and ETextWindow, which puts just the context-sensitive
-actions on its popup menu.
+and implement these methods. Examples are in EvergreenMenuBar (which puts
+everything on the Tools menu) and ETextWindow, which puts just the
+context-sensitive actions on its popup menu.
 
 Note that you have to invoke the 'parse' method because typical usage relies
 on a final variable in the scope that the anonymous subclass is defined, and

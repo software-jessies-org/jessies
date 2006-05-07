@@ -25,7 +25,7 @@ public class BuildAction extends ETextAction {
 
     private void buildProject() {
         if (building) {
-            Edit.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
+            Evergreen.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
             return;
         }
         
@@ -34,7 +34,7 @@ public class BuildAction extends ETextAction {
             return;
         }
         
-        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
+        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
         if (shouldContinue == false) {
             return;
@@ -54,9 +54,9 @@ public class BuildAction extends ETextAction {
             return focusedTextWindow.getContext();
         } else {
             try {
-                return Edit.getInstance().getCurrentWorkspace().getCanonicalRootDirectory();
+                return Evergreen.getInstance().getCurrentWorkspace().getCanonicalRootDirectory();
             } catch (IOException ex) {
-                Edit.getInstance().showAlert("Workspace root not found", "It's not possible to find the build instructions for this project because the workspace root could not be found (" + ex.getMessage() + ").");
+                Evergreen.getInstance().showAlert("Workspace root not found", "It's not possible to find the build instructions for this project because the workspace root could not be found (" + ex.getMessage() + ").");
                 return null;
             }
         }
@@ -73,7 +73,7 @@ public class BuildAction extends ETextAction {
             makefileName = FileUtilities.findFileByNameSearchingUpFrom("build.xml", startDirectory);
         }
         if (makefileName == null) {
-            Edit.getInstance().showAlert("Build instructions not found", "Neither a Makefile for make(1) nor a build.xml for Ant could be found.");
+            Evergreen.getInstance().showAlert("Build instructions not found", "Neither a Makefile for make(1) nor a build.xml for Ant could be found.");
         }
         return makefileName;
     }
@@ -88,18 +88,18 @@ public class BuildAction extends ETextAction {
             shellCommand.setLaunchRunnable(new Runnable() {
                 public void run() {
                     building = true;
-                    Edit.getInstance().showProgressBar(shellCommand.getProcess());
+                    Evergreen.getInstance().showProgressBar(shellCommand.getProcess());
                 }
             });
             shellCommand.setCompletionRunnable(new Runnable() {
                 public void run() {
-                    Edit.getInstance().hideProgressBar();
+                    Evergreen.getInstance().hideProgressBar();
                     building = false;
                 }
             });
             shellCommand.runCommand();
         } catch (IOException ex) {
-            Edit.getInstance().showAlert("Unable to invoke build tool", "Can't start task (" + ex.getMessage() + ").");
+            Evergreen.getInstance().showAlert("Unable to invoke build tool", "Can't start task (" + ex.getMessage() + ").");
             Log.warn("Couldn't start \"" + command + "\"", ex);
         }
     }

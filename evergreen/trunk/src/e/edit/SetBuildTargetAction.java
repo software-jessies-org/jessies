@@ -14,11 +14,11 @@ public class SetBuildTargetAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
+        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
 
         buildTargetField.setText(workspace.getBuildTarget());
         
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), workspace.getTitle() + " Build Target");
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), workspace.getTitle() + " Build Target");
         form.getFormPanel().addRow("Build Target:", buildTargetField);
         boolean okay = form.show("Apply");
         

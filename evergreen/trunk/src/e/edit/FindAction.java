@@ -22,7 +22,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
         super(ACTION_NAME);
         putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("F", false));
         GnomeStockIcon.useStockIcon(this, "gtk-find");
-        regularExpressionHistory = new StringHistory(Edit.getInstance().getPreferenceFilename("e.edit.FindAction-history"));
+        regularExpressionHistory = new StringHistory(Evergreen.getInstance().getPreferenceFilename("e.edit.FindAction-history"));
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -35,7 +35,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
         // find mini-buffer is already up fails, and causes "Find Next" and
         // "Find Previous" to also fail.
         currentTextWindow = newCurrentTextWindow;
-        Edit.getInstance().showMinibuffer(this);
+        Evergreen.getInstance().showMinibuffer(this);
     }
     
     //
@@ -155,7 +155,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
         try {
             pattern = PatternUtilities.smartCaseCompile(regularExpression);
         } catch (PatternSyntaxException patternSyntaxException) {
-            Edit.getInstance().showStatus(patternSyntaxException.getDescription());
+            Evergreen.getInstance().showStatus(patternSyntaxException.getDescription());
             return;
         }
         
@@ -167,6 +167,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
             textArea.addHighlight(new PFind.MatchHighlight(textArea, matcher.start(), matcher.end()));
             matchCount++;
         }
-        Edit.getInstance().showStatus("Found " + StringUtilities.pluralize(matchCount, "match", "matches") + " for \"" + regularExpression + "\"");
+        Evergreen.getInstance().showStatus("Found " + StringUtilities.pluralize(matchCount, "match", "matches") + " for \"" + regularExpression + "\"");
     }
 }

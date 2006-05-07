@@ -65,7 +65,7 @@ public class OpenQuicklyDialog {
                 if (e.getClickCount() == 2) {
                     int index = matchList.locationToIndex(e.getPoint());
                     String filename = (String) matchList.getModel().getElementAt(index);
-                    Edit.getInstance().openFile(workspace.prependRootDirectory(filename));
+                    Evergreen.getInstance().openFile(workspace.prependRootDirectory(filename));
                     
                     // Wrestle focus back from the file we've just opened.
                     SwingUtilities.getWindowAncestor(matchList).toFront();
@@ -137,7 +137,7 @@ public class OpenQuicklyDialog {
         
         initMatchList();
         
-        FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "Open Quickly");
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Open Quickly");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Names Containing:", filenameField);
         formPanel.addRow("Matches:", new JScrollPane(matchList));
@@ -161,7 +161,7 @@ public class OpenQuicklyDialog {
         ListModel list = matchList.getModel();
         for (int index : matchList.getSelectedIndices()) {
             String filename = (String) list.getElementAt(index);
-            Edit.getInstance().openFile(workspace.prependRootDirectory(filename));
+            Evergreen.getInstance().openFile(workspace.prependRootDirectory(filename));
         }
     }
 }

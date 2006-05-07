@@ -15,7 +15,7 @@ ENV["EDIT_HOME"] = project_root
 
 TARGET_OS = target_os()
 
-edit_class_name = "e.edit.Edit"
+edit_class_name = "e.edit.Evergreen"
 
 shouldBlock = false
 if ARGV[0] == "--block"
@@ -29,16 +29,16 @@ if ARGV[0] =~ /^\+(\d+)$/
   ARGV[0] = "#{ARGV[0]}:#$1"
 end
 
-edit_preferences_directory = "#{HOME}/.#{edit_class_name}"
+edit_preferences_directory = "#{HOME}/.e.edit.Edit"
 if target_os() == "Darwin"
   # Darwin is what Mac OS X calls itself.
-  edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/#{edit_class_name}"
+  edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/e.edit.Edit"
 end
 
 if FileTest.directory?(edit_preferences_directory) == false
   puts("Evergreen: Couldn't find preferences directory '#{edit_preferences_directory}.")
   puts("Evergreen: Creating preferences directory '#{edit_preferences_directory}'.")
-  Dir.mkdir(edit_preferences_directory)
+  FileUtils.mkdir_p(edit_preferences_directory)
 end
 if FileTest.exists?("#{edit_preferences_directory}/edit.properties") == false
   puts("Evergreen: Copying default preferences.")
@@ -59,7 +59,7 @@ if filename != nil
   ARGV.push(filename)
 end
 
-invoker = Java.new("Edit", "e/util/Launcher")
+invoker = Java.new("Evergreen", "e/util/Launcher")
 invoker.log_filename = "/tmp/edit.log.#$$"
 invoker.add_pathname_property("preferencesDirectory", edit_preferences_directory)
-invoker.invoke([ "Edit", "#{edit_class_name}Launchable" ])
+invoker.invoke([ "Evergreen", "#{edit_class_name}Launchable" ])

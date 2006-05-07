@@ -16,7 +16,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
+        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         // FindInFilesDialog.showDialog will make this check, but not before
         // guessDirectoryToSearchIn has already failed.
         if (workspace.isFileListUnsuitableFor("Find in Files")) {
@@ -47,7 +47,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
         // automatically restricting the search to a specific directory.
         // Note that "" actually means "use whatever's already in the
         // field" rather than "nothing".
-        Workspace workspace = Edit.getInstance().getCurrentWorkspace();
+        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         if (workspace.getIndexedFileCount() < 1000) {
             return "";
         }
@@ -56,7 +56,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
         System.err.println(directory);
         
         // Strip the workspace root.
-        String possiblePrefix = Edit.getInstance().getCurrentWorkspace().getRootDirectory();
+        String possiblePrefix = Evergreen.getInstance().getCurrentWorkspace().getRootDirectory();
         if (directory.startsWith(possiblePrefix)) {
             directory = directory.substring(possiblePrefix.length());
             System.err.println(directory);

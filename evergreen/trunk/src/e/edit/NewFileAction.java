@@ -27,11 +27,11 @@ public class NewFileAction extends ETextAction {
         if (window != null) {
             filenameField.setPathname(window.getContext());
         } else {
-            filenameField.setPathname(Edit.getInstance().getCurrentWorkspace().getRootDirectory());
+            filenameField.setPathname(Evergreen.getInstance().getCurrentWorkspace().getRootDirectory());
         }
 
         do {
-            FormBuilder form = new FormBuilder(Edit.getInstance().getFrame(), "New File");
+            FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "New File");
             form.getFormPanel().addRow("Filename:", filenameField);
             boolean okay = form.show("Create");
             
@@ -42,17 +42,17 @@ public class NewFileAction extends ETextAction {
     }
 
     private boolean createNewFile(String filename) {
-        Edit edit = Edit.getInstance();
+        Evergreen editor = Evergreen.getInstance();
         File newFile = FileUtilities.fileFromString(filename);
         try {
             if (newFile.isAbsolute() == false) {
                 // A new file, if no absolute path is specified, should be
                 // created relative to the root of the current workspace.
-                newFile = FileUtilities.fileFromParentAndString(edit.getCurrentWorkspace().getCanonicalRootDirectory(), filename);
+                newFile = FileUtilities.fileFromParentAndString(editor.getCurrentWorkspace().getCanonicalRootDirectory(), filename);
             }
             File directory = newFile.getParentFile();
             if (directory.exists() == false) {
-                boolean createDirectory = edit.askQuestion("Create directory?", "The directory '" + directory + "' doesn't exist. We can either create the directory for you, or you can go back and re-type the filename.", "Create");
+                boolean createDirectory = editor.askQuestion("Create directory?", "The directory '" + directory + "' doesn't exist. We can either create the directory for you, or you can go back and re-type the filename.", "Create");
                 if (createDirectory == false) {
                     return false;
                 }
@@ -62,12 +62,12 @@ public class NewFileAction extends ETextAction {
             if (created) {
                 fillWithInitialContents(newFile);
             } else {
-                edit.showAlert("Couldn't create new file", "File \"" + newFile + "\" already exists.");
+                editor.showAlert("Couldn't create new file", "File \"" + newFile + "\" already exists.");
             }
-            edit.openFile(newFile.toString());
+            editor.openFile(newFile.toString());
             return true;
         } catch (IOException ex) {
-            edit.showAlert("Couldn't create new file", "Failed to create file \"" + newFile + "\": " + ex.getMessage() + ".");
+            editor.showAlert("Couldn't create new file", "Failed to create file \"" + newFile + "\": " + ex.getMessage() + ".");
             return false;
         }
     }
@@ -87,7 +87,7 @@ public class NewFileAction extends ETextAction {
             content += "#endif\n";
             String result = StringUtilities.writeFile(file, content);
             if (result != null) {
-                Edit.getInstance().showAlert("Couldn't fill new file", "There was a problem filling \"" + file + "\" with initial content: " + result + ".");
+                Evergreen.getInstance().showAlert("Couldn't fill new file", "There was a problem filling \"" + file + "\" with initial content: " + result + ".");
             }
         }
     }
