@@ -1,17 +1,5 @@
 #!/usr/bin/ruby -w
 
-# Despite its name, this script generates "build-revision.txt".
-
-# Win32's installer's broken idea of "version number" forces us to have a
-# version number of the form "a.b.c", and also forces us to ensure that
-# a <= 255, b <= 255, and c <= 65535. If we don't, upgrading (replacing an
-# old version with a new version) won't work. See here for the depressing
-# details:
-# http://msdn.microsoft.com/library/default.asp?url=/library/en-us/msi/setup/productversion.asp
-# This script takes advantage of the fact that we have enough bits (8+8+16=32)
-# to encode our project and salma hayek revision numbers, even if they're not
-# conveniently arranged.
-
 def getSubversionVersion(directory)
   command = "svnversion #{directory}"
   # svnversion is insanely slow on Cygwin using a samba share.
@@ -43,34 +31,52 @@ def extractVersionNumber(versionString)
   return nil
 end
 
-project_root = ARGV.shift()
-salma_hayek = ARGV.shift()
+# Win32's installer's broken idea of "version number" forces us to have a
+# version number of the form "a.b.c", and also forces us to ensure that
+# a <= 255, b <= 255, and c <= 65535. If we don't, upgrading (replacing an
+# old version with a new version) won't work. See here for the depressing
+# details:
+# http://msdn.microsoft.com/library/default.asp?url=/library/en-us/msi/setup/productversion.asp
+# This script takes advantage of the fact that we have enough bits (8+8+16=32)
+# to encode our project and salma hayek revision numbers, even if they're not
+# conveniently arranged.
+def mungeVersionStrings(projectVersionString, salmaHayekVersionString)
+  fields = []
+  # The third field is called the build version or the update version and has a maximum value of 65,535.
+  fieldSize = 64 * 1024
+  # We try to separate the project_root and salma_hayek versions into different fields.
+  unifiedVersion = extractVersionNumber(projectVersionString) * fieldSize + extractVersionNumber(salmaHayekVersionString)
+  remainder = unifiedVersion
+  field = remainder % fieldSize
+  remainder /= fieldSize
+  fields.push(field)
+  # The second field is the minor version and has a maximum value of 255.
+  fieldSize = 256
+  field = remainder % fieldSize
+  remainder /= fieldSize
+  fields.push(field)
+  # The first field is the major version and has a maximum value of 255.
+  fieldSize = 256
+  field = remainder % fieldSize
+  remainder /= fieldSize
+  fields.push(field)
+  return fields.reverse().join(".")
+end
 
-require "time.rb"
-puts(Time.now().iso8601())
-projectVersionString = getSubversionVersion(project_root)
-puts(projectVersionString)
-salmaHayekVersionString = getSubversionVersion(salma_hayek)
-puts(salmaHayekVersionString)
+def makeVersionString(projectRootDirectory, salmaHayekRootDirectory)
+  return mungeVersionStrings(getSubversionVersion(projectRootDirectory), getSubversionVersion(salmaHayekRootDirectory))
+end
 
-fields = []
-# The third field is called the build version or the update version and has a maximum value of 65,535.
-fieldSize = 64 * 1024
-# We try to separate the project_root and salma_hayek versions into different fields.
-unifiedVersion = extractVersionNumber(projectVersionString) * fieldSize + extractVersionNumber(salmaHayekVersionString)
-remainder = unifiedVersion
-field = remainder % fieldSize
-remainder /= fieldSize
-fields.push(field)
-# The second field is the minor version and has a maximum value of 255.
-fieldSize = 256
-field = remainder % fieldSize
-remainder /= fieldSize
-fields.push(field)
-# The first field is the major version and has a maximum value of 255.
-fieldSize = 256
-field = remainder % fieldSize
-remainder /= fieldSize
-fields.push(field)
-
-puts(fields.reverse.join("."))
+# Despite its name, run as a script, this generates the contents for "build-revision.txt".
+if __FILE__ == $0
+  projectRootDirectory = ARGV.shift()
+  salmaHayekDirectory = ARGV.shift()
+  projectVersionString = getSubversionVersion(projectRootDirectory)
+  salmaHayekVersionString = getSubversionVersion(salmaHayekDirectory)
+  
+  require "time.rb"
+  puts(Time.now().iso8601())
+  puts(projectVersionString)
+  puts(salmaHayekVersionString)
+  puts(mungeVersionStrings(projectVersionString, salmaHayekVersionString))
+end

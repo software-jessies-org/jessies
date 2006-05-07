@@ -39,6 +39,14 @@ EOS
     }
 end
 
+def linux_link_sources(glob, unwanted_prefix)
+    return Dir.glob(glob).map() {
+        |current_pathname|
+        # Remove tmp_dir from the front so we create currently dangling links to where the files will end up at install-time.
+        current_pathname.slice(unwanted_prefix.length(), current_pathname.length() - unwanted_prefix.length())
+    }
+end
+
 if ARGV.length() != 2
     usage()
 end
@@ -144,10 +152,11 @@ else
         # Description (mandatory)
 
         control.puts("Package: #{project_name}")
-
-        # FIXME: get our version number.
-        # http://www.debian.org/doc/debian-policy/ch-binary.html suggests YYYYMMDD
-        control.puts("Version: 777")
+        
+        # Use the same artificial version number as we use for the ".msi" installer.
+        require "#{salma_hayek}/bin/make-version-string.rb"
+        version = makeVersionString(".", salma_hayek)
+        control.puts("Version: #{version}")
         
         control.puts("Priority: optional")
         
