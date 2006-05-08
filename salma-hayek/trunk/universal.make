@@ -576,9 +576,11 @@ installer-file-list:
 	@$(MAKE_INSTALLER_FILE_LIST) | ruby -w -pe '$$_.sub!(/^/, "$(PROJECT_NAME)/")'
 
 # Unfortunately, the start-up scripts tend to go looking for salma-hayek, so we can't just have Resources/bin etc; we have to keep the multi-directory structure, at least for now.
+# This isn't recursing into a sub-tree, so we don't want it to recurse if passed -n
+# but passing it -k (implicitly, in MAKEFLAGS) is probably right.
 .PHONY: $(PROJECT_NAME).app
 $(PROJECT_NAME).app: build .generated/build-revision.txt
-	@{ $(MAKE) --no-print-directory installer-file-list; $(MAKE) --no-print-directory -C $(SALMA_HAYEK) installer-file-list; } | $(SCRIPT_PATH)/package-for-distribution.rb $(PROJECT_NAME) $(SALMA_HAYEK)
+	@{ make --no-print-directory installer-file-list; make --no-print-directory -C $(SALMA_HAYEK) installer-file-list; } | $(SCRIPT_PATH)/package-for-distribution.rb $(PROJECT_NAME) $(SALMA_HAYEK)
 
 $(PROJECT_NAME).dmg: $(PROJECT_NAME).app
 	@$(RM) $@ && \
