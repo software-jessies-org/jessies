@@ -207,7 +207,6 @@ public class AboutBox {
             return;
         }
         initMacOsAboutMenu();
-        initMacOsIcon();
     }
     
     private void initMacOsAboutMenu() {
@@ -217,20 +216,6 @@ public class AboutBox {
                 e.setHandled(true);
             }
         });
-    }
-    
-    private void initMacOsIcon() {
-        // FIXME: we need to look for the icon in a way that will work on Linux too.
-        Map<String, String> env = System.getenv();
-        for (String key : env.keySet()) {
-            if (key.startsWith("APP_ICON_")) {
-                String icnsFilename = env.get(key);
-                // FIXME: if we had a .icns reader for ImageIO, we wouldn't need to mess around like this.
-                String pngFilename = icnsFilename.replaceAll("\\.icns$", "-128.png");
-                setImage(pngFilename);
-                return;
-            }
-        }
     }
     
     private void initIcon() {
