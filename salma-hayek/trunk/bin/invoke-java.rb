@@ -142,7 +142,7 @@ class Java
   end
   
   def set_icons(name)
-    dock_icon = "#{@project_root}/lib/#{name.downcase()}.icns"
+    dock_icon = "#{@project_root}/lib/#{name}.icns"
     if Pathname.new(dock_icon).exist?
       @dock_icon = dock_icon
     end

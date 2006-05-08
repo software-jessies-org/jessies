@@ -585,7 +585,7 @@ $(PROJECT_NAME).app: build .generated/build-revision.txt
 $(PROJECT_NAME).dmg: $(PROJECT_NAME).app
 	@$(RM) $@ && \
 	echo -n "Creating disk image..." && \
-	hdiutil create -fs HFS+ -volname `perl -w -e "print ucfirst(\"$(PROJECT_NAME)\");"` -srcfolder $(PROJECT_ROOT)/.generated/native/Darwin/$(PROJECT_NAME) $(PROJECT_NAME).dmg
+	hdiutil create -fs UFS -volname `perl -w -e "print ucfirst(\"$(PROJECT_NAME)\");"` -srcfolder $(PROJECT_ROOT)/.generated/native/Darwin/$(PROJECT_NAME) $(PROJECT_NAME).dmg
 
 $(PROJECT_NAME).deb: $(PROJECT_NAME).app
 	@$(RM) $@ && \
