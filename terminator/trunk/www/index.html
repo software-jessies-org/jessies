@@ -55,7 +55,7 @@ we don't have the resources to support two implementations, so reflowing isn't a
 gone from the code.)
 
 <li><p><strong>Multiple Tabs</strong> - Like tabbed browsing, only with terminals.
-<p align="center" ><img src="win32-tabs.png" alt="Multiple tabs on Win32">
+<p align="center" ><img src="win32-tabs.png" alt="Multiple tabs on Windows">
 
 <li><p><strong>Number Reinterpretation</strong> - Terminator will recognize numbers
 in a variety of bases as the current selection, and add informational menu items to the
@@ -90,7 +90,11 @@ now surpassed Terminal in several areas.
 
 <p>For Mac OS 10.4, there's <a href="terminator.dmg">terminator.dmg</a> which contains a universal binary application that you can simply drag and drop to install.
 
-<p>For Win32, there's <a href="terminator.msi">a Win32 installer</a> which requires that you've already installed Cygwin, including Ruby, yourself but is otherwise complete and leaves you with a Terminator icon on your desktop. (As of 2006-01-01, this build isn't automatically updated. That should be fixed shortly.)
+<p>For Windows, there's <a href="terminator.msi">a Windows installer</a> which requires that you've already installed Cygwin, including Ruby, yourself but is otherwise complete and leaves you with a Terminator icon on your desktop. (As of 2006-01-01, this build isn't automatically updated. That should be fixed shortly.)
+
+<p>We have more information about <a href="/salma-hayek/cygwin-setup.html">setting up Cygwin</a>.
+
+<p>(Why did we choose Cygwin? NT's built-in POSIX subsystem won't let you launch native Windows applications or interact with the network, so that wasn't an option. Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which we use to support window resizing, not to mention containing a port of one of the most widely used ssh programs.)
 
 <p>Otherwise, see <a href="#building-from-source">Building from source</a> on this page.
 
@@ -209,13 +213,7 @@ The makefile will tell you what to do when you try to build with an old version.
 
 <p>For the JNI part, you'll need g++.
 
-<h3>Win32</h3>
-
-<p>On Windows, you will need Cygwin. We have more information about <a href="/salma-hayek/cygwin-setup.html">setting up Cygwin</a>.
-
-<p>(Why did we choose Cygwin? NT's built-in POSIX subsystem won't let you launch Win32 applications or interact with the network, so that wasn't an option. Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which we use to support window resizing, not to mention containing a port of one of the most widely used ssh programs.)
-
-<p>On Cygwin, the launcher will find an appropriate jvm.dll using the Registry.  It should use the most sensible version of the JDK you have installed or the most sensible version of the JRE if there's no JDK installed.
+<h3>Windows</h3>
 
 <p>To build the Windows installer, you need Microsoft's open source Windows installer compiler, <a href="http://sourceforge.net/projects/wix/">WiX</a>, installed and on your path.
 
@@ -236,7 +234,7 @@ regsvr32 "C:\Program Files\Microsoft Platform SDK\Bin\MergeMod.Dll"
 
 <p>The original idea of having a suitably hackable terminal emulator with which to experiment with advanced features came from Elliott Hughes. Not being married with children, he now takes care of most of the development.
 
-<p>Martin Dorey was responsible for the Cygwin port; we wrote more about <a href="http://elliotth.blogspot.com/2005/08/porting-jni-code-to-win32-with-cygwin.html">Porting JNI code Win32 with Cygwin</a> and <a href="http://elliotth.blogspot.com/2005/08/javaiofiledescriptor-on-win32.html">java.io.FileDescriptor on Win32</a>.
+<p>Martin Dorey was responsible for the Cygwin port; we wrote more about <a href="http://elliotth.blogspot.com/2005/08/porting-jni-code-to-win32-with-cygwin.html">Porting JNI code to Win32 with Cygwin</a> and <a href="http://elliotth.blogspot.com/2005/08/javaiofiledescriptor-on-win32.html">java.io.FileDescriptor on Win32</a>.
 
 <p>Phil wrote the code that took us from nothing to a more-or-less usable replacement for <tt>rxvt</tt> on his own between 2004-04-21 and 2004-05-28. Given that he was on holiday for a week during this time, that made roughly a month of development time.
 
