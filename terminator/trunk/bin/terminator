@@ -136,6 +136,28 @@ end
 install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "t"))
 install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "74"))
 
+def selectShellIfNoDefault()
+  if ENV.include?("SHELL")
+    return
+  end
+  # cygwin.bat runs bash --login -i, which behaves differently from bash started as /bin/sh.
+  # In particular, tab completion is disabled in this "posix" mode if "vi" line editing is requested.
+  # Everyone(?) else probably has SHELL=/bin/bash already in the environment.
+  candidateShells = []
+  candidateShells << "/bin/bash"
+  # Has there ever been a Unix without a /bin/sh?
+  candidateShells << "/bin/sh"
+  candidateShells.each() {
+    |candidateShell|
+    if File.executable?(candidateShell)
+      ENV["SHELL"] = candidateShell
+      return
+    end
+  }
+end
+
+selectShellIfNoDefault()
+
 invoker = Java.new("Terminator", "terminator/Terminator")
 invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
 invoker.launcher = launcher
