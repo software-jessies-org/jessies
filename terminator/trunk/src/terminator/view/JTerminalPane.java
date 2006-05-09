@@ -94,10 +94,6 @@ public class JTerminalPane extends JPanel {
 	private static ArrayList<String> getShellCommand() {
 		ArrayList<String> command = new ArrayList<String>();
 		String shell = System.getenv("SHELL");
-		if (shell == null) {
-			// Has there ever been a Unix without a /bin/sh?
-			shell = "/bin/sh";
-		}
 		command.add(shell);
 		if (Options.getSharedInstance().isLoginShell()) {
 			command.add("-l");
