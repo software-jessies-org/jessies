@@ -47,6 +47,25 @@ def linux_link_sources(glob, unwanted_prefix)
     }
 end
 
+def extract_package_description_from_html(human_project_name)
+    # If you're using apt-get(1), the description isn't very important because you won't get to see it.
+    # Anyone using gdebi(1), though, will see this at the same time as the "Install" button, so it's worth a little effort.
+    
+    # First the generic:
+    description = "software.jessies.org's #{human_project_name}"
+    
+    # Then the first paragraph pulled from our HTML:
+    html_filename = "./www/index.html"
+    if File.exist?(html_filename)
+        html = IO.readlines(html_filename).join("").gsub("\n", " ")
+        if html =~ /<p><strong>(.*?)<\/strong>/
+            description << "\n " << $1.gsub("&nbsp;", " ")
+        end
+    end
+    
+    return description
+end
+
 if ARGV.length() != 2
     usage()
 end
@@ -169,11 +188,8 @@ else
         control.puts("Architecture: #{deb_arch}")
         
         control.puts("Depends: ruby (>= 1.8)")
-        
         control.puts("Maintainer: software.jessies.org <software@jessies.org>")
-        
-        # FIXME: if you're using apt-get(1), this isn't very important because you won't get to see it. When gdebi(1) comes, though, this will be what users see at the same time as the "Install" button, so we ought to improve it.
-        control.puts("Description: software.jessies.org's #{human_project_name}")
+        control.puts("Description: #{extract_package_description_from_html(human_project_name)}")
     }
 
     # Copy any ".desktop" files into /usr/share/applications/.
