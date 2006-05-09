@@ -44,7 +44,7 @@ svn_projects.each() {
   svn_project =~ /.*\/([^\/]+)\/$/
   project_name = $1
   print("-- Updating and Building \"#{project_name}\"\n")
-  system("source ~/.bashrc ; cd #{svn_project} ; svn diff ; svn update && make #{target}")
+  system("source ~/.bashrc ; cd #{svn_project} ; svn status ; svn diff ; svn update && make #{target}")
   if $? != 0
     failed_builds << project_name
   end
