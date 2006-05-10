@@ -705,10 +705,8 @@ native-dist: $(if $(STANDALONE_INSTALLER),upload.$(STANDALONE_INSTALLER))
 # For WiX, we need the salma-hayek installer during the nightly build.
 native-dist: $(filter %.msm,$(INSTALLER))
 
-# make native-dist a silent no-op where there's nothing for it to do for the
-# benefit of a simple, uniform nightly build script.
-native-dist:
-	@exit 0
+# For non-WiX platforms, we still need the default salma-hayek build during the nightly build.
+native-dist: default
 
 .PHONY: upload.%
 upload.$(STANDALONE_INSTALLER): upload.%: %
