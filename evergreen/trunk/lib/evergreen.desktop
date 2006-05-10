@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Evergreen
+Comment=Programmer's Editor
+Type=Application
+Exec=evergreen
+Icon=/usr/share/software.jessies.org/Evergreen/Resources/Evergreen/lib/evergreen-128.png
+Terminal=false
+Categories=GNOME;Application;Development;
+StartupNotify=true
