@@ -38,7 +38,8 @@ svn_projects.each() {
   # You can't always foresee at the time you write a script that it will be run from cron.
   # So it should be the cron job's responsibility to set up the environment.
   # "echo script-name | bash --login" achieves that.
-  system("source ~/.bashrc ; cd #{svn_project} ; svn status ; svn diff ; svn update && make #{targets.join(" ")}")
+  Dir.chdir(svn_project)
+  system("source ~/.bashrc ; svn status ; svn diff ; svn update && make #{targets.join(" ")}")
   if $? != 0
     failed_builds << project_name
   end
