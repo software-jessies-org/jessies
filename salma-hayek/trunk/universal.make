@@ -689,12 +689,15 @@ MAKE_INSTALLER_FILE_LIST = find $(wildcard doc bin lib) $(patsubst $(PROJECT_ROO
 # once unless make orders the jobs to avoid that.
 $(WIX_COMPILATION_DIRECTORY)/component-definitions.wxi: $(ALL_PER_DIRECTORY_TARGETS) build.java
 
+# Presumably we need a similar dependency for non-WiX installers, which need the per-directory targets slightly later but still before the installer.
+$(PROJECT_NAME).app: $(ALL_PER_DIRECTORY_TARGETS)
+
 .PHONY: native
 native: $(ALL_PER_DIRECTORY_TARGETS)
 build: native
 
 .PHONY: installer
-installer: $(ALL_PER_DIRECTORY_TARGETS) $(INSTALLER)
+installer: $(INSTALLER)
 
 .PHONY: native-dist
 native-dist: $(if $(STANDALONE_INSTALLER),upload.$(STANDALONE_INSTALLER))
