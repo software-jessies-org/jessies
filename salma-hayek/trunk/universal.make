@@ -698,7 +698,7 @@ installer: $(ALL_PER_DIRECTORY_TARGETS) $(INSTALLER)
 # make native-dist a silent no-op where there's nothing for it to do for the
 # benefit of a simple, uniform nightly build script.
 .PHONY: native-dist
-native-dist: $(if $(STANDALONE_INSTALLER),upload.$(STANDALONE_INSTALLER))
+native-dist: installer $(if $(STANDALONE_INSTALLER),upload.$(STANDALONE_INSTALLER))
 
 .PHONY: upload.%
 upload.$(STANDALONE_INSTALLER): upload.%: %
