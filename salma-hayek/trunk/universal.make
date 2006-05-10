@@ -447,8 +447,9 @@ INSTALLER.Linux = $(BIN_DIRECTORY)/$(PROJECT_NAME).deb
 
 INSTALLER = $(INSTALLER.$(TARGET_OS))
 
-# %.msm files are merged into %.msi installers.
-STANDALONE_INSTALLER = $(filter-out %.msm,$(INSTALLER))
+STANDALONE_INSTALLER.$(PROJECT_NAME) = $(INSTALLER)
+STANDALONE_INSTALLER.salma-hayek =
+STANDALONE_INSTALLER = $(STANDALONE_INSTALLER.$(PROJECT_NAME))
 
 # Among its many breakages, msiexec is more restrictive about slashes than Win32.
 NATIVE_NAME_FOR_INSTALLER := '$(subst /,\,$(call convertToNativeFilenames,$(STANDALONE_INSTALLER)))'
@@ -695,10 +696,16 @@ build: native
 .PHONY: installer
 installer: $(ALL_PER_DIRECTORY_TARGETS) $(INSTALLER)
 
+.PHONY: native-dist
+native-dist: $(if $(STANDALONE_INSTALLER),upload.$(STANDALONE_INSTALLER))
+
+# For WiX, we need the salma-hayek installer during the nightly build.
+native-dist: $(filter %.msm,$(INSTALLER))
+
 # make native-dist a silent no-op where there's nothing for it to do for the
 # benefit of a simple, uniform nightly build script.
-.PHONY: native-dist
-native-dist: installer $(if $(STANDALONE_INSTALLER),upload.$(STANDALONE_INSTALLER))
+native-dist:
+	@exit 0
 
 .PHONY: upload.%
 upload.$(STANDALONE_INSTALLER): upload.%: %
