@@ -9,6 +9,8 @@ targets = ARGV
 # Find Subversion projects.
 # ----------------------------------------------------------------------------
 svn_projects = []
+# FIXME: I want to pass in the root directory, ~/Projects here, as the first argument, so that I can
+# avoid duplicating it and so I can hide the nightly builds somewhere I won't trip over them.
 Dir.glob("#{ENV['HOME']}/Projects/*/.svn").each() {
   |svn_directory|
   svn_directory =~ /^(.*\/)\.svn$/
@@ -32,6 +34,10 @@ svn_projects.each() {
   svn_project =~ /.*\/([^\/]+)\/$/
   project_name = $1
   print("-- Updating and Building \"#{project_name}\"\n")
+  # FIXME: This all-on-one line style is unmaintainable.
+  # You can't always foresee at the time you write a script that it will be run from cron.
+  # So it should be the cron job's responsibility to set up the environment.
+  # "echo script-name | bash --login" achieves that.
   system("source ~/.bashrc ; cd #{svn_project} ; svn status ; svn diff ; svn update && make #{targets.join(" ")}")
   if $? != 0
     failed_builds << project_name
