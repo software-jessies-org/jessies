@@ -451,7 +451,7 @@ public class Evergreen {
     }
     
     public String getResourceFilename(String leafName) {
-        return System.getenv("EDIT_HOME") + File.separatorChar + leafName;
+        return System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "data" + File.separator + leafName;
     }
     
     public void initWindowIcon() {

@@ -46,7 +46,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
          * This has the advantage that you can remove any entries that annoy you.
          */
 
-        String filename = Evergreen.getInstance().getResourceFilename("manpages");
+        String filename = Evergreen.getInstance().getResourceFilename("man-summary.txt");
         String[] manPages;
         if (FileUtilities.exists(filename)) {
             manPages = StringUtilities.readLinesFromFile(filename);
