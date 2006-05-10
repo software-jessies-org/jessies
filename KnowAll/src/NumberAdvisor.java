@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, Elliott Hughes.
+    Copyright (C) 2004-2006, Elliott Hughes.
 
     This file is part of KnowAll.
 
@@ -46,24 +46,36 @@ public class NumberAdvisor implements Advisor {
             int radix = matcher.group(1) != null ? 16 : 10;
             String number = matcher.group(2);
             if (radix == 10 && containsAnyOf(number, "abcdefABCDEF")) {
-                continue;
+                // Ignore implicit hex here, but see later.
+            } else {
+                suggest(suggestionsBox, number, radix);
             }
-            long value = Long.parseLong(number, radix);
-            if (value < 10) {
-                continue;
+            // Try implicit hex if it looks like a 32-bit number.
+            if (radix == 10 && number.length() == 8) {
+                suggest(suggestionsBox, number, 16);
             }
-            String lhs = radixToPrefix(radix) + number;
-            String suggestion = "<tt>" + lhs + " = ";
-            for (int i = 0; i < BASES.length; ++i) {
-                if (BASES[i] != radix) {
-                    suggestion += " " + radixToPrefix(BASES[i]) + Long.toString(value, BASES[i]);
-                }
-            }
-            suggestion += " " + toAscii(value) + "</tt>";
-            suggestionsBox.addSuggestion(new Suggestion("Number", suggestion));
         }
     }
-
+    
+    private void suggest(SuggestionsBox suggestionsBox, String number, int radix) {
+        long value = Long.parseLong(number, radix);
+        if (value < 10) {
+            return;
+        }
+        String lhs = radixToPrefix(radix) + number;
+        String suggestion = "<tt>" + lhs + "<br>";
+        for (int i = 0; i < BASES.length; ++i) {
+            if (BASES[i] != radix) {
+                suggestion += "&nbsp;= " + radixToPrefix(BASES[i]) + Long.toString(value, BASES[i]) + "<br>";
+            }
+        }
+        if (radix == 16) {
+            suggestion += "&nbsp;= IP " + toIpAddress(value) + "<br>";
+        }
+        suggestion += "&nbsp;= " + toAscii(value) + "</tt>";
+        suggestionsBox.addSuggestion(new Suggestion("Number", suggestion));
+    }
+    
     private boolean containsAnyOf(String s, String characters) {
         for (int i = 0; i < s.length(); ++i) {
             if (characters.indexOf(s.charAt(i)) != -1) {
@@ -72,7 +84,11 @@ public class NumberAdvisor implements Advisor {
         }
         return false;
     }
-
+    
+    private String toIpAddress(long number) {
+        return Long.toString((number & 0xff000000) >> 24) + "." + Long.toString((number & 0x00ff0000) >> 16) + "."  + Long.toString((number & 0x0000ff00) >> 8) + "." + Long.toString((number & 0x000000ff));
+    }
+    
     public String toAscii(long number) {
         StringBuffer result = new StringBuffer("\"</tt>");
         int byteCount = ((number >> 32) != 0) ? 8 : 4;
