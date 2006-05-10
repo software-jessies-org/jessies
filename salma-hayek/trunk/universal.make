@@ -453,6 +453,9 @@ STANDALONE_INSTALLER = $(filter-out %.msm,$(INSTALLER))
 # Among its many breakages, msiexec is more restrictive about slashes than Win32.
 NATIVE_NAME_FOR_INSTALLER := '$(subst /,\,$(call convertToNativeFilenames,$(STANDALONE_INSTALLER)))'
 
+# We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.
+PACKAGING_DIRECTORY = $(PROJECT_ROOT)/.generated/native/$(TARGET_OS)/$(PROJECT_NAME)
+
 # ----------------------------------------------------------------------------
 # Prevent us from using per-directory.make's local variables in universal.make
 # make doesn't support variable scoping, so this requires some cunning.
@@ -582,16 +585,18 @@ installer-file-list:
 $(PROJECT_NAME).app: build .generated/build-revision.txt
 	@{ make --no-print-directory installer-file-list; make --no-print-directory -C $(SALMA_HAYEK) installer-file-list; } | $(SCRIPT_PATH)/package-for-distribution.rb $(PROJECT_NAME) $(SALMA_HAYEK)
 
-$(PROJECT_NAME).dmg: $(PROJECT_NAME).app
-	@$(RM) $@ && \
+$(INSTALLER.Darwin): $(PROJECT_NAME).app
+	@mkdir -p $(@D) && \
+	$(RM) $@ && \
 	echo -n "Creating disk image..." && \
-	hdiutil create -fs UFS -volname `perl -w -e "print ucfirst(\"$(PROJECT_NAME)\");"` -srcfolder $(PROJECT_ROOT)/.generated/native/Darwin/$(PROJECT_NAME) $(PROJECT_NAME).dmg
+	hdiutil create -fs UFS -volname `perl -w -e "print ucfirst(\"$(PROJECT_NAME)\");"` -srcfolder $(PACKAGING_DIRECTORY) $@
 
-$(PROJECT_NAME).deb: $(PROJECT_NAME).app
-	@$(RM) $@ && \
+$(INSTALLER.Linux): $(PROJECT_NAME).app
+	@mkdir -p $(@D) && \
+	$(RM) $@ && \
 	echo -n "Creating .deb package..." && \
-	fakeroot dpkg-deb --build $(PROJECT_ROOT)/.generated/native/Linux/$(PROJECT_NAME) $(PROJECT_NAME).deb && \
-	dpkg-deb --info $(PROJECT_NAME).deb # && dpkg-deb --contents $(PROJECT_NAME).deb
+	fakeroot dpkg-deb --build $(PACKAGING_DIRECTORY) $@ && \
+	dpkg-deb --info $@ # && dpkg-deb --contents $@
 
 # ----------------------------------------------------------------------------
 # WiX
