@@ -32,10 +32,16 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     private synchronized static void readJavaDocSummary() {
         long start = System.currentTimeMillis();
-        Log.warn("Reading JavaDoc summary...");
         
-        javaDocSummary = StringUtilities.readLinesFromFile(Evergreen.getInstance().getResourceFilename("javadoc-summary.txt"));
+        String filename = Evergreen.getInstance().getResourceFilename("javadoc-summary.txt");
+        Log.warn("Reading JavaDoc summary from \"" + filename + "\"...");
+        if (FileUtilities.exists(filename)) {
+            javaDocSummary = StringUtilities.readLinesFromFile(filename);
+        } else {
+            javaDocSummary = new String[0];
+        }
         
+        Log.warn("Scanning JavaDoc summary...");
         Pattern identifierPattern = Pattern.compile("^[MCFEA]:(\\S+?)(\\(|\t).*$");
         uniqueIdentifiers = new TreeSet<String>();
         
@@ -55,6 +61,7 @@ public class JavaResearcher implements WorkspaceResearcher {
                 }
             }
         }
+        Log.warn("Extracting unique words from JavaDoc summary...");
         
         uniqueWords = extractUniqueWords(uniqueIdentifiers.iterator());
         
