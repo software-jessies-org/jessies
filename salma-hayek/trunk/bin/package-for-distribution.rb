@@ -151,6 +151,40 @@ else
     # FIXME: it would be nice if we could reliably test whether we need to do this.
     system("sudo apt-get install build-essential fakeroot")
 
+    # Copy any ".desktop" files into /usr/share/applications/.
+    # GNOME ignores symbolic links.
+    usr_share_applications = "#{tmp_dir}/usr/share/applications"
+    FileUtils.mkdir_p(usr_share_applications)
+    FileUtils.cp(Dir.glob("#{project_resource_directory}/lib/*.desktop"), usr_share_applications)
+    
+    # Copy any compiled terminfo files under /usr/share/terminfo/.
+    generated_terminfo_root = ".generated/terminfo/"
+    if File.exists?(generated_terminfo_root)
+        usr_share_terminfo = "#{tmp_dir}/usr/share/terminfo"
+        FileUtils.mkdir_p(usr_share_terminfo)
+        terminfo_files = []
+        FileUtils.cd(generated_terminfo_root) {
+            |dir|
+            terminfo_files << Dir.glob("?/*")
+        }
+        terminfo_files.each() {
+            |terminfo_file|
+            FileUtils.mkdir_p("#{usr_share_terminfo}/#{terminfo_file}")
+            FileUtils.rmdir("#{usr_share_terminfo}/#{terminfo_file}")
+            FileUtils.cp(File.join(generated_terminfo_root, terminfo_file), "#{usr_share_terminfo}/#{terminfo_file}")
+        }
+    end
+    
+    # Install the start-up script(s) from the project's bin/ to /usr/bin/.
+    usr_bin = "#{tmp_dir}/usr/bin"
+    FileUtils.mkdir_p(usr_bin)
+    FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/bin/*", tmp_dir), usr_bin)
+    
+    # gdebi(1) understands that if there's no Installed-Size the size is unknown.
+    # apt-get(1) thinks it implies that the installed size is zero bytes.
+    # Either way, the user's better off if we declare our installed size because nothing tries to guess from the size of the package.
+    installed_size = `du -sk #{tmp_dir}`.split()[0]
+
     Dir.mkdir("#{tmp_dir}/DEBIAN")
     # What to put in DEBIAN/control: http://www.debian.org/doc/debian-policy/ch-controlfields.html
     # The DEBIAN/control file contains the most vital (and version-dependent) information about a binary package.
@@ -188,38 +222,10 @@ else
         control.puts("Architecture: #{deb_arch}")
         
         control.puts("Depends: ruby (>= 1.8)")
+        control.puts("Installed-Size: #{installed_size}")
         control.puts("Maintainer: software.jessies.org <software@jessies.org>")
         control.puts("Description: #{extract_package_description_from_html(human_project_name)}")
     }
-
-    # Copy any ".desktop" files into /usr/share/applications/.
-    # GNOME ignores symbolic links.
-    usr_share_applications = "#{tmp_dir}/usr/share/applications"
-    FileUtils.mkdir_p(usr_share_applications)
-    FileUtils.cp(Dir.glob("#{project_resource_directory}/lib/*.desktop"), usr_share_applications)
-    
-    # Copy any compiled terminfo files under /usr/share/terminfo/.
-    generated_terminfo_root = ".generated/terminfo/"
-    if File.exists?(generated_terminfo_root)
-        usr_share_terminfo = "#{tmp_dir}/usr/share/terminfo"
-        FileUtils.mkdir_p(usr_share_terminfo)
-        terminfo_files = []
-        FileUtils.cd(generated_terminfo_root) {
-            |dir|
-            terminfo_files << Dir.glob("?/*")
-        }
-        terminfo_files.each() {
-            |terminfo_file|
-            FileUtils.mkdir_p("#{usr_share_terminfo}/#{terminfo_file}")
-            FileUtils.rmdir("#{usr_share_terminfo}/#{terminfo_file}")
-            FileUtils.cp(File.join(generated_terminfo_root, terminfo_file), "#{usr_share_terminfo}/#{terminfo_file}")
-        }
-    end
-    
-    # Install the start-up script(s) from the project's bin/ to /usr/bin/.
-    usr_bin = "#{tmp_dir}/usr/bin"
-    FileUtils.mkdir_p(usr_bin)
-    FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/bin/*", tmp_dir), usr_bin)
 end
 
 # Fix permissions.
