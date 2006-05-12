@@ -98,13 +98,18 @@ sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes
 updateResult=`{ cd #{script_path}/../#{repository_name} && svn update && make www-dist source-dist; } 2>&1`
 if $? != 0
     begin
-        fd = open("|mail -s 'the post-commit update and dist failed' #{to_address}", "w")
-        fd.print("\n")
-        fd.print(updateResult)
+        sendmail="/usr/sbin/sendmail"
+        
+        open("|#{sendmail} #{to_address}", "w") {
+            |fd|
+            fd.puts("To: #{to_address}")
+            fd.puts("Subject: the post-commit update and dist failed")
+            fd.puts("\n")
+            fd.puts(updateResult)
+        }
     rescue
         exit(1)
     end
-    fd.close
 end
 
 # We're done.
