@@ -46,7 +46,22 @@ def formatChanges(changes)
   return body
 end
 
+def sanitizeChanges(changes)
+  # I don't think there's any source in the jessies code with more than the 2778 lines of ectags/c.c.
+  # man-summary only has 4152 lines but it's uselessly boring to scroll through in an email.
+  # The 533 lines of TerminatorMenuBar.java seems a more likely maximum for source that's likely to appear at once,
+  # but we can conservatively set the limit higher.
+  # Evergreen refused to load files larger than a megabyte at some stage (the limit's half a gig now).
+  if changes.length() > 1000 || changes.join("\n").length() > 1024 * 1024
+    patchHeader = changes.slice(0, 3)
+    errorMessage = "(truncated due to fear of email breakage - this patch was too large to be a plausible manual change)"
+    return patchHeader << errorMessage
+  end
+  return changes
+end
+
 def outputFormattedChanges(asciiArt, changes)
+  changes = sanitizeChanges(changes)
   body = ""
   if asciiArt
     body << "<tt>"
