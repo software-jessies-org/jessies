@@ -392,6 +392,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             fileType = PYTHON;
         } else if (filename.endsWith(".rb")) {
             fileType = RUBY;
+        } else if (filename.endsWith(".sh") || filename.endsWith("bash.bashrc") || filename.endsWith("bash.logout") || filename.endsWith(".bash_profile") || filename.endsWith(".bashrc") || filename.endsWith(".bash_logout")) {
+            fileType = BASH;
         } else if (filename.endsWith("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
             fileType = MAKE;
         } else {
