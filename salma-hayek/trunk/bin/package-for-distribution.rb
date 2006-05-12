@@ -188,6 +188,10 @@ else
     Dir.mkdir("#{tmp_dir}/DEBIAN")
     # What to put in DEBIAN/control: http://www.debian.org/doc/debian-policy/ch-controlfields.html
     # The DEBIAN/control file contains the most vital (and version-dependent) information about a binary package.
+    debian_package_name = project_name.downcase()
+    if debian_package_name !~ /^[a-z][a-z0-9+.-]+$/
+        die("Package name \"#{debian_package_name}\" is invalid.")
+    end
     File.open("#{tmp_dir}/DEBIAN/control", "w") {
         |control|
         # The fields in this file are:
@@ -204,7 +208,7 @@ else
         # Maintainer (mandatory)
         # Description (mandatory)
 
-        control.puts("Package: #{project_name}")
+        control.puts("Package: #{debian_package_name}")
         
         # Use the same artificial version number as we use for the ".msi" installer.
         require "#{salma_hayek}/bin/make-version-string.rb"
