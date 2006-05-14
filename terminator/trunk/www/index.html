@@ -190,6 +190,11 @@ If less(1) (and hence man(1)) say "WARNING: terminal is not fully functional", t
 infocmp -C >> ~/.termcap
 </pre>
 
+<p>If you have the JRE installed (rather than the JDK), then you may
+want to rerun the JRE installer and choose a Custom installation so that you get
+LucidaTypewriterRegular.ttf installed, otherwise you'll end up with Courier and being
+unable to distinguish l and 1.
+
 <a name="building-from-source">
 <h2>Building from source</h2>
 </a>
@@ -200,10 +205,7 @@ and you'll also need the source to the library it uses (<a href="../salma-hayek/
 <p>Terminator is written almost entirely in Java with a small bit of JNI
 which runs a process connected to a pseudo-terminal. You will need
 Java 1.5. A JRE is sufficient to run Terminator but you'll need a JDK
-to build Terminator. If you only have the JRE installed, then you may
-want to rerun the JRE installer and choose a Custom installation so that you get
-LucidaTypewriterRegular.ttf installed, otherwise you'll end up with Courier and being
-unable to distinguish l and 1.
+to build Terminator.
 
 <p>You'll need a very recent GNU make to build the source.
 The makefile will tell you what to do when you try to build with an old version.
