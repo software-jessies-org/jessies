@@ -42,8 +42,8 @@ if FileTest.directory?(edit_preferences_directory) == false
 end
 if FileTest.exists?("#{edit_preferences_directory}/edit.properties") == false
   puts("Evergreen: Copying default preferences.")
-  FileUtils.cp("#{project_root}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
-  FileUtils.cp("#{project_root}/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
+  FileUtils.cp("#{project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
+  FileUtils.cp("#{project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
   puts("Evergreen: Away you go!")
 end
 
