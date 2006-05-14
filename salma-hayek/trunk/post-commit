@@ -98,6 +98,7 @@ sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes
 updateResult=`{ cd #{script_path}/../#{repository_name} && svn update && make www-dist source-dist; } 2>&1`
 if $? != 0
     begin
+        # Consider using http://www.opengroup.org/onlinepubs/007908799/xcu/mailx.html if sendmail causes a problem.
         sendmail="/usr/sbin/sendmail"
         
         open("|#{sendmail} #{to_address}", "w") {
