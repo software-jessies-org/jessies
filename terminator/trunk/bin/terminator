@@ -149,6 +149,7 @@ def selectShellIfNoDefault()
   candidateShells << "/bin/sh"
   candidateShells.each() {
     |candidateShell|
+    # We can't do this test in the Java on Cygwin.
     if File.executable?(candidateShell)
       ENV["SHELL"] = candidateShell
       return

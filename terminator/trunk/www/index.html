@@ -16,7 +16,7 @@
 yet found elsewhere, suitable to replace xterm, rxvt, xwsh and friends on X11 systems,
 Terminal.app on Mac OS X and PuTTY on MS&nbsp;Windows.</strong>
 
-<p>Terminator will run on any modern POSIX system with Java 5 or later and a C++ compiler.
+<p>Terminator will run on any modern POSIX system with Java 5 or later.
 
 <h2>Features</h2>
 
@@ -62,8 +62,9 @@ in a variety of bases as the current selection, and add informational menu items
 pop-up menu showing the same number in other bases. No more <tt>man ascii</tt> or resorting
 to <tt>bc(1)</tt>.
 
-<li><p><strong>Portability</strong> - Written in a combination of Java and POSIX C++, Terminator
-should compile out of the box on most modern desktop operating systems.
+<li><p><strong>Portability</strong> - Written mostly in Java, with a small POSIX C++ part (for pseudo-terminal support)
+and a Ruby invocation script,
+Terminator should compile out of the box on most modern desktop operating systems.
 
 <li><p><strong>Proper Tab Character Handling</strong> - Most terminal emulators will translate
 tab characters into strings of spaces, which is very annoying if you then try to copy/paste
@@ -202,15 +203,12 @@ unable to distinguish l and 1.
 <p>There's a source distribution (<a href="terminator.tgz">terminator.tgz</a>),
 and you'll also need the source to the library it uses (<a href="../salma-hayek/salma-hayek.tgz">salma-hayek.tgz</a>).
 
-<p>Terminator is written almost entirely in Java with a small bit of JNI
-which runs a process connected to a pseudo-terminal. You will need
-Java 1.5. A JRE is sufficient to run Terminator but you'll need a JDK
-to build Terminator.
+<p>While a JRE is enough to run our projects, you will need a Java 1.5 JDK to build them.
 
 <p>You'll need a very recent GNU make to build the source.
 The makefile will tell you what to do when you try to build with an old version.
 
-<p>For the JNI part, you'll need g++.
+<p>For the C++ parts, you'll need g++.
 
 <h3>Mac OS X</h3>
 
