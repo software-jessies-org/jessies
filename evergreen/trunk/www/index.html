@@ -139,24 +139,38 @@ to be useful elsewhere. It's interface is broadly similar to
 <code>JTextArea</code> so it's easy to use in your own programs if you get
 used to any of the great functionality.
 
-<h2>How do I install it?</h2>
+<h2>Downloads</h2>
 
-<p>Good question. The distribution is here (<a href="Evergreen.tgz">Evergreen.tgz</a>),
-but you'll also need a copy of the library to go with it (<a href="../salma-hayek/salma-hayek.tgz">salma-hayek.tgz</a>).
+<p>For Ubuntu and other Debian-based Linux distributions, there's <a href="evergreen.deb">evergreen.deb</a> which will add Evergreen to your GNOME applications menu. (For command-line or non-GNOME users, there's /usr/bin/evergreen.)
 
-<p>If you're on Debian, you should apt-get install the packages listed in "install-everything.sh" (until we make a .deb).
+<p>For Windows, there's <a href="Evergreen.msi">a Windows installer</a> which requires that you've already installed Cygwin, including Ruby, yourself but is otherwise complete and leaves you with an Evergreen icon on your desktop.
+
+<p>We have more information about <a href="/salma-hayek/cygwin-setup.html">setting up Cygwin</a>.
+
+<p>(Why did we choose Cygwin?
+It may well be that there's no good reason for Evergreen to require Cygwin.
+There's a good reason for <a href="../terminator/">Terminator</a> to use Cygwin and Evergreen shares much of its installation and invocation infrastructure with Terminator.)
 
 <p>If you don't have Exuberant ctags as the first "ctags" on your path, you'll see an error like "Is Exuberant ctags installed and on your path? There was an error reading the tags: The tags file didn't have a valid header.". Users of Mac OS and Solaris can get our pre-built binaries of <a href="../3rdParty/ctags-5.5.4-darwin-ppc">ctags-5.5.4-darwin-ppc</a> or <a href="../3rdParty/ctags-5.5.4-solaris-amd64">ctags-5.5.4-solaris-amd64</a>, or can build their own.
 
-<p>The <a href="ChangeLog.html">ChangeLog</a> is available separately.
+<p>Otherwise, see <a href="#building-from-source">Building from source</a> on this page.
 
-<p>(If you have access to my home directory, run <tt>sudo ~elliotth/Projects/salma-hayek/install-everything.sh</tt>, and make sure that <tt>/usr/local/bin</tt> is high up your path.)
+<p>The <a href="ChangeLog.html">ChangeLog</a> is available separately.
 
 <h2>Notes on using Evergreen</h2>
 
 <p>Workspaces are important. You probably want one for each project you're working on. If a workspace looks like a project (i.e. has a Makefile or is under revision control), the files will be indexed. So you probably want the root of your workspaces to be the directories with the top-level makefiles.
 
 <p>Learn to live with Evergreen's idea of code formatting. If you find this hard to swallow, read <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=74230">Ken Arnold's thoughts on coding style</a> first. What you gain from accepting Evergreen's style (which shouldn't be a problem for Java programmers, because it's pretty much expecting that in all the C family) is that Evergreen will do the formatting for you. Even correcting stuff you paste in.
+
+<a name="building-from-source">
+<h2>Building from source</h2>
+</a>
+
+<p>There's a source distribution (<a href="Evergreen.tgz">Evergreen.tgz</a>),
+and you'll also need the source to the library it uses (<a href="../salma-hayek/salma-hayek.tgz">salma-hayek.tgz</a>).
+
+<p>The <a href="../salma-hayek/index.html#building-from-source">hints for building</a> are the same for all our projects.
 
 <!--#include virtual="/salma-hayek/footer.html" -->
 </body>
