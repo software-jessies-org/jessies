@@ -47,7 +47,7 @@ public class TagsPanel extends JPanel {
         setVisibleComponent(emptyPanel);
     }
     
-    public void setVisibleComponent(Component c) {
+    private void setVisibleComponent(Component c) {
         removeAll();
         add(c, BorderLayout.CENTER);
         c.invalidate();

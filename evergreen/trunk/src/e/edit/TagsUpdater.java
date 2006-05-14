@@ -192,6 +192,7 @@ public class TagsUpdater {
     
     public class TreeModelBuilder extends SwingWorker<TreeModel, TagReader.Tag> implements TagReader.TagListener {
         private boolean tagsHaveChanged;
+        private boolean successful;
         private long startTime;
         private Timer progressTimer;
         
@@ -210,6 +211,7 @@ public class TagsUpdater {
         
         @Override
         protected TreeModel doInBackground() {
+            successful = true;
             root = new BranchNode("root");
             treeModel = new DefaultTreeModel(root);
             branches.clear();
@@ -258,6 +260,7 @@ public class TagsUpdater {
         }
         
         public void taggingFailed(Exception ex) {
+            successful = false;
             Evergreen.getInstance().getTagsPanel().showError("Is Exuberant ctags installed and on your path? There was an error reading the tags: " + ex.getMessage());
         }
         
@@ -289,9 +292,11 @@ public class TagsUpdater {
         @Override
         protected void done() {
             progressTimer.stop();
-            showTags();
-            if (tagsHaveChanged) {
-                setTreeModel(treeModel);
+            if (successful) {
+                showTags();
+                if (tagsHaveChanged) {
+                    setTreeModel(treeModel);
+                }
             }
             long endTime = System.currentTimeMillis();
             double duration = ((double) (endTime - startTime)) / 1000.0;
