@@ -112,7 +112,9 @@ see terminator --help for the syntax.
 
 <h3>Terminfo/Curses</h3>
 
-<p>Terminator has its own terminfo file.  This will be installed in your home
+<p>Terminator has its own terminfo file.
+(This is regrettably necessary because of Terminator's unconventional approach to handling wide lines with a horizontal scrollbar rather than by wrapping them.)
+This will be installed in your home
 directory unless Terminator is able to write to the system-wide
 terminfo directory. This will only be the case if you run Terminator as root.
 
