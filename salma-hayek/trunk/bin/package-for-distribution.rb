@@ -66,6 +66,12 @@ def extract_package_description_from_html(human_project_name)
     return description
 end
 
+def maybe_copy_file(src, dst)
+    if File.exist?(src)
+        FileUtils.cp(src, dst)
+    end
+end
+
 if ARGV.length() != 2
     usage()
 end
@@ -151,6 +157,20 @@ else
     # FIXME: it would be nice if we could reliably test whether we need to do this.
     system("sudo apt-get install build-essential fakeroot")
 
+    # Create and check the validity of our packge name.
+    debian_package_name = project_name.downcase()
+    if debian_package_name !~ /^[a-z][a-z0-9+.-]+$/
+        die("Package name \"#{debian_package_name}\" is invalid.")
+    end
+    
+    # Copy our documentation into /usr/share/doc/.
+    # Leave out the HTML because that's accessed on the web from the program itself.
+    doc_root = "#{tmp_dir}/usr/share/doc/#{debian_package_name}"
+    FileUtils.mkdir_p(doc_root)
+    maybe_copy_file("COPYING", "#{doc_root}/copyright")
+    maybe_copy_file("README", doc_root)
+    maybe_copy_file("TODO", doc_root)
+
     # Copy any ".desktop" files into /usr/share/applications/.
     # GNOME ignores symbolic links.
     usr_share_applications = "#{tmp_dir}/usr/share/applications"
@@ -188,10 +208,6 @@ else
     Dir.mkdir("#{tmp_dir}/DEBIAN")
     # What to put in DEBIAN/control: http://www.debian.org/doc/debian-policy/ch-controlfields.html
     # The DEBIAN/control file contains the most vital (and version-dependent) information about a binary package.
-    debian_package_name = project_name.downcase()
-    if debian_package_name !~ /^[a-z][a-z0-9+.-]+$/
-        die("Package name \"#{debian_package_name}\" is invalid.")
-    end
     File.open("#{tmp_dir}/DEBIAN/control", "w") {
         |control|
         # The fields in this file are:
