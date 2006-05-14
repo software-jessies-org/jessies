@@ -142,8 +142,11 @@ if target_os() == "Darwin"
     script_name = "#{app_dir}/MacOS/#{human_project_name}"
     File.open(script_name, "w") {
         |file|
-        file.puts("#!/bin/bash")
-        file.puts("cd # So user.dir is ~/ rather than the directory containing this script.")
+        file.puts("#!/bin/bash -l")
+        file.puts("# We started Bash as a login shell so that our application has access to the user's expected path.")
+        file.puts("# Finder seems to start applications in /.")
+        file.puts("# Most users will be more comfortable in their home directory. This is especially true of Terminator.")
+        file.puts("cd")
 
         file.puts("# Apple hasn't yet released a 1.5.0 that makes itself the default. When they do, we can remove this.")
         file.puts("export PATH=/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Commands/:$PATH")
