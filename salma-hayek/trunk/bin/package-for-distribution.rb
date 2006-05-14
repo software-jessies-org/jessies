@@ -152,6 +152,12 @@ if target_os() == "Darwin"
         file.puts("\"$resources/salma-hayek/bin/ensure-suitable-mac-os-version.rb\" && exec \"$resources/#{project_name}/bin/#{human_project_name.downcase()}\"")
     }
     system("chmod a+x #{script_name}")
+
+    # Copy our documentation.
+    doc_root = tmp_dir
+    maybe_copy_file("COPYING", "#{doc_root}/COPYING.txt")
+    maybe_copy_file("README", "#{doc_root}/README.txt")
+    maybe_copy_file("TODO", "#{doc_root}/TODO.txt")
 else
     # Make sure we have the tools we require.
     # FIXME: it would be nice if we could reliably test whether we need to do this.
