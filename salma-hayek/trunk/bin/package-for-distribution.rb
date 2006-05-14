@@ -59,7 +59,7 @@ def extract_package_description_from_html(human_project_name)
     if File.exist?(html_filename)
         html = IO.readlines(html_filename).join("").gsub("\n", " ")
         if html =~ /<p><strong>(.*?)<\/strong>/
-            description << "\n " << $1.gsub("&nbsp;", " ").gsub("&mdash;", "--")
+            description << "\n " << $1.gsub("&nbsp;", " ")
         end
     end
     
