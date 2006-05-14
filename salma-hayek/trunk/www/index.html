@@ -63,6 +63,37 @@ that none of them requires more than a single "include" line. That's it!
 
 <p>The <a href="ChangeLog.html">salma-hayek ChangeLog</a> is available separately.
 
+<a name="building-from-source">
+<h2>Building from source</h2>
+</a>
+
+<p>While a JRE is enough to run our projects, you will need a Java 1.5 JDK to build them.
+
+<p>You'll need a very recent GNU make to build the source.
+The makefile will tell you what to do when you try to build with an old version.
+
+<p>For the C++ parts, you'll need g++.
+
+<h3>Mac OS X</h3>
+
+<p>You need Xcode 2.2.1 or later.
+There are various bugs and limitations with older versions that aren't worth working around when it's a free upgrade that's generally beneficial to development work anyway.
+
+<h3>Windows</h3>
+
+<p>To build the Windows installer, you need Microsoft's open source Windows installer compiler, <a href="http://sourceforge.net/projects/wix/">WiX</a>, installed and on your path.
+
+<p>If you see this error when building on Cygwin:
+<pre>
+light.exe : error LGHT0001 : COM object with CLSID {F94985D5-29F9-4743-9805-99BC3F35B678} is either not valid or not registered.
+</pre>
+you also need MergeMod.dll to be installed and registered.
+This appears to be part of the free <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=A55B6B43-E24F-4EA3-A93E-40C0EC4F68E5&displaylang=en">Microsoft Windows Platform SDK</a> among other things.
+This is how you register the COM object, according to <a href="http://support.microsoft.com/kb/329214/EN-US/">the instructions</a>, once it's installed:
+<pre>
+regsvr32 "C:\Program Files\Microsoft Platform SDK\Bin\MergeMod.Dll"
+</pre>
+
 <!--#include virtual="/salma-hayek/footer.html" -->
 </body>
 </html>
