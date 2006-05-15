@@ -272,11 +272,18 @@ RFEs
   Graphing transfers and errors against time should give them more useful
   information than they get from HyperTerminal (without drowning them).
 
+  Many people on the net (and our own Ed) recommend "minicom";
+  http://alioth.debian.org/projects/minicom/.
+
 * Simon Pamies [s.pamies@banality.de] isn't the only user to have suggested
   some way of saving a file which can be loaded to start a new Terminator window
   with several New Command Tabs, each with its own bgcolor and name.
   Colored backgrounds to distinguish different sorts of window, in particular,
   seems popular.
+
+* Andy Bushell [andrew.bushell@imperial.ac.uk] suggests an "anti-idle" feature
+  that writes ASCII NUL on the connection at a fixed interval to stop sshd (say)
+  from closing the connection.
 
 Tab-related
 -----------
@@ -320,17 +327,18 @@ Tab-related
   doesn't rely on transparency.)
 
 Installers
--------
+----------
 
-Native Ruby on Windows.  We require Ruby 1.9's pathname.rb to fix:
+* Problems with native (non-Cygwin) Ruby on Windows.
+  We only require Ruby 1.9's pathname.rb (which can be copied over the 1.8 file) to fix:
 
-c:/ruby/lib/ruby/1.8/pathname.rb:341:in `lstat': Invalid argument - /C:/Documents and Settings/martind/f:/software.jessies.org/salma-hayek/bin/fatbits (Errno::EINVAL)
+    c:/ruby/lib/ruby/1.8/pathname.rb:341:in `lstat': Invalid argument - /C:/Documents and Settings/martind/f:/software.jessies.org/salma-hayek/bin/fatbits (Errno::EINVAL)
 
-You have to uncheck the rubygems option in the installer or unset the
-RUBYOPT native environment variable that it sets to fix:
+  You have to uncheck the rubygems option in the installer or unset the
+  RUBYOPT native environment variable that it sets to fix:
 
-ruby: no such file to load -- ubygems (LoadError)
+    ruby: no such file to load -- ubygems (LoadError)
 
-We would have to install the Ruby scripts as .rb (which would break
-anywhere we call them programmatically unless we rename them
-everywhere) or set up shortcuts like we do for terminator.
+  We would have to install the Ruby scripts as .rb (which would break
+  anywhere we call them programmatically unless we rename them
+  everywhere) or set up shortcuts like we do for terminator.
