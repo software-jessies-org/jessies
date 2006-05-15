@@ -25,3 +25,14 @@ div.footer {
   padding-bottom: 2em;
   font-size: 75%;
 }
+
+table.header {
+  border: 1px solid #8cacbb;
+  background-color: #dee7ec;
+  font-size: smaller;
+}
+table.header>tr>td {
+  border: 1px #8cacbb;
+  border-style: none dotted none dotted;
+  text-align: center;
+}
