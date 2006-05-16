@@ -5,6 +5,7 @@ import e.gui.*;
 import e.util.*;
 import java.awt.EventQueue;
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -78,7 +79,13 @@ public class Terminator {
 		if (display == null) {
 			display = "";
 		}
-		new InAppServer("Terminator", "~/.terminal-logs/.terminator-server-port" + display, TerminatorServer.class, new TerminatorServer());
+		InetAddress loopbackAddress = null;
+		try {
+			loopbackAddress = InetAddress.getByName(null);
+		} catch (UnknownHostException ex) {
+			Log.warn("Problem looking up the loopback address", ex);
+		}
+		new InAppServer("Terminator", "~/.terminal-logs/.terminator-server-port" + display, loopbackAddress, TerminatorServer.class, new TerminatorServer());
 	}
 	
 	// Returns whether we started the UI.
