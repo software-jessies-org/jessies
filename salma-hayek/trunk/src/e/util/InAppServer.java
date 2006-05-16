@@ -32,7 +32,7 @@ public final class InAppServer {
      * only methods declared by the interface (and its superinterfaces) will be
      * invocable.
      */
-    public <T> InAppServer(String name, String portFilename, Class<T> exportedInterface, T handler) {
+    public <T> InAppServer(String name, String portFilename, InetAddress inetAddress, Class<T> exportedInterface, T handler) {
         this.fullName = name + "Server";
         this.exportedInterface = exportedInterface;
         this.handler = handler;
@@ -46,7 +46,7 @@ public final class InAppServer {
         try {
             File portFile = FileUtilities.fileFromString(portFilename);
             secretFile = new File(portFile.getParentFile(), ".secret");
-            Thread serverThread = new Thread(new ConnectionAccepter(portFile), fullName);
+            Thread serverThread = new Thread(new ConnectionAccepter(portFile, inetAddress), fullName);
             // If there are no other threads left, the InApp server shouldn't keep us alive.
             serverThread.setDaemon(true);
             serverThread.start();
@@ -114,9 +114,9 @@ public final class InAppServer {
     private class ConnectionAccepter implements Runnable {
         private ServerSocket socket;
         
-        private ConnectionAccepter(File portFile) throws IOException {
+        private ConnectionAccepter(File portFile, InetAddress inetAddress) throws IOException {
             this.socket = new ServerSocket();
-            socket.bind(null);
+            socket.bind(new InetSocketAddress(inetAddress, 0));
             writeHostAndPortToFile(portFile);
         }
         
