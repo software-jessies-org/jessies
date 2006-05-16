@@ -1439,7 +1439,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         getLock().getReadLock();
         try {
             Transferable contents = clipboard.getContents(this);
-            DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
             String string = reformatPastedText((String) contents.getTransferData(DataFlavor.stringFlavor));
             pasteAndReIndent(string);
         } catch (Exception ex) {
