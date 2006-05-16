@@ -3,6 +3,7 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
@@ -755,7 +756,8 @@ public class Evergreen {
         initAdvisor();
         initStatusArea();
         
-        new InAppServer("EditServer", getPreferenceFilename("edit-server-port"), EditServer.class, new EditServer(this));
+        InetAddress wildcardAddress = null;
+        new InAppServer("EditServer", getPreferenceFilename("edit-server-port"), wildcardAddress, EditServer.class, new EditServer(this));
         
         UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
         tabbedPane = new JTabbedPane(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);
