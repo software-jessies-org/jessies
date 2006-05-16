@@ -160,7 +160,6 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	private void pasteClipboard(Clipboard clipboard) {
 		try {
 			Transferable contents = clipboard.getContents(this);
-			DataFlavor[] transferFlavors = contents.getTransferDataFlavors();
 			String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
 			terminalControl.sendUtf8String(string);
 		} catch (Exception ex) {
