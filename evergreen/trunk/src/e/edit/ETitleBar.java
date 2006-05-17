@@ -76,7 +76,7 @@ public class ETitleBar extends JPanel {
         setLayout(new BorderLayout());
         
         titleLabel = new JLabel(" ");
-        titleLabel.setFont(UIManager.getFont("TableHeader.font"));
+        titleLabel.setFont(UIManager.getFont(GuiUtilities.isWindows() ? "InternalFrame.titleFont" : "TableHeader.font"));
         titleLabel.setOpaque(false);
         
         add(titleLabel, BorderLayout.CENTER);
@@ -158,12 +158,17 @@ public class ETitleBar extends JPanel {
          * invoke apple.laf.AquaImageFactory's drawFrameTitleBackground method
          * rather than using these colors. We could use reflection to do the
          * same, but that seems unnecessarily fragile.
+         * 
+         * We set the title label foreground to affect the text, and the buttons'
+         * panel's foreground for the benefit of the buttons.
          */
         if (isActive) {
             setBackground(activeBackground);
+            buttonsPanel.setForeground(activeForeground);
             titleLabel.setForeground(activeForeground);
         } else {
             setBackground(inactiveBackground);
+            buttonsPanel.setForeground(inactiveForeground);
             titleLabel.setForeground(inactiveForeground);
         }
     }

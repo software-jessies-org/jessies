@@ -18,15 +18,11 @@ public class ECloseButton extends EButton implements ActionListener {
     }
 
     public Color getCrossColor() {
-        return window.isDirty() ? getDirtyCrossColor() : getCleanCrossColor();
+        return window.isDirty() ? getDirtyCrossColor() : getGlyphColor();
     }
 
     public Color getDirtyCrossColor() {
         return pressed ? DIRTY_COLOR.darker() : DIRTY_COLOR;
-    }
-
-    public Color getCleanCrossColor() {
-        return pressed ? Color.GRAY : Color.BLACK;
     }
 
     public void paintCross(Graphics g, int x, int y) {
