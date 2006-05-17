@@ -139,7 +139,11 @@ def sendHtmlEmail(from_address, to_address, reply_to_address, subject, preamble,
   begin
     fd = open("|#{sendmail} #{to_address}", "w")
     fd.print(header)
-    fd.print(body)
+    # The hope is that this would be bigger than anyone would read while being small enough
+    # to avoid hard mail size limits - so we get to see there was a problem - and small enough
+    # not to cause performance problems.
+    maximumMailSize = 2 * 1024 * 1024
+    fd.print(body.slice(0, maximumMailSize))
   rescue
     exit(1)
   end
