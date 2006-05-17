@@ -373,7 +373,7 @@ makeGuid = $(shell $(SCRIPT_PATH)/uuid.rb)
 
 JAVA_COMPILER = $(JDK_ROOT)/bin/javac
 ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
-  JAVA_COMPILER = $(error Unable to find $(JAVA_COMPILER) --- do you only have a JRE installed?)
+  JAVA_COMPILER := $(error Unable to find $(JAVA_COMPILER) --- do you only have a JRE installed?)
 endif
 
 # ----------------------------------------------------------------------------

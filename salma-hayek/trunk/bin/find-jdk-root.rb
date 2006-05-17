@@ -88,7 +88,16 @@ def find_jdk_root()
   
   # Assume the directory above the bin/ directory is the "home" directory; the
   # directory that contains bin/ and include/ and so on.
-  jdk_root = java_bin.dirname()
+  jre_root = java_bin.dirname()
+
+  jdk_root = jre_root
+  # Debian's Sun JDK package depends on the JRE package, which provides the java
+  # executable to the update-alternatives mechanism.
+  # If only the JRE's installed, it's OK for this script to return a value
+  # which points at an absent JDK.
+  if jre_root.basename().to_s() == "jre"
+    jdk_root = jre_root.dirname()
+  end
   
   if target_os() == "Darwin"
     # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
