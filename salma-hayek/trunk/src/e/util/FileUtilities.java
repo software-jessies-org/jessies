@@ -29,7 +29,7 @@ public class FileUtilities {
     public static String parseUserFriendlyName(String filename) {
         String result = filename;
         if (filename.startsWith("~/") || filename.equals("~")) {
-            result = System.getProperty("user.home");
+            result = getUserHomeDirectory();
             if (filename.length() > 1) {
                 result += File.separator + filename.substring(2);
             }
@@ -39,7 +39,7 @@ public class FileUtilities {
             Matcher matcher = pattern.matcher(filename);
             if (matcher.find()) {
                 String user = matcher.group(1);
-                File home = fileFromString(System.getProperty("user.home"));
+                File home = fileFromString(getUserHomeDirectory());
                 File otherHome = fileFromParentAndString(home.getParent(), user);
                 if (otherHome.exists() && otherHome.isDirectory()) {
                     result = otherHome.toString() + matcher.group(2);
@@ -61,7 +61,7 @@ public class FileUtilities {
         if (isDirectory && filename.endsWith(File.separator) == false) {
             filename += File.separatorChar;
         }
-        String home = System.getProperty("user.home");
+        String home = getUserHomeDirectory();
         if (filename.startsWith(home)) {
             return "~" + filename.substring(home.length());
         }
@@ -70,6 +70,19 @@ public class FileUtilities {
     
     public static String getUserFriendlyName(File file) {
         return getUserFriendlyName(file.getAbsolutePath());
+    }
+    
+    /**
+     * Returns the user's home directory. Assumes that on Cygwin a user
+     * who's set $HOME wants it to override Windows' notion of the home
+     * directory, which is what the "user.home" system property gets you.
+     */
+    public static String getUserHomeDirectory() {
+        String result = System.getenv("HOME");
+        if (result == null) {
+            result = System.getProperty("user.home");
+        }
+        return result;
     }
     
     /**
