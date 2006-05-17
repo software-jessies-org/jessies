@@ -15,10 +15,6 @@ public class ESwitchButton extends EButton implements ActionListener {
         paintGlyph(g, 5, 5);
     }
 
-    public Color getGlyphColor() {
-        return pressed ? Color.GRAY : Color.BLACK;
-    }
-
     public void paintGlyph(Graphics g, int x, int y) {
         final int d = 2;
         

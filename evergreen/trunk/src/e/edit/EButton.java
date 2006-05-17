@@ -55,4 +55,8 @@ public abstract class EButton extends JComponent implements ActionListener, Mous
     public Dimension getPreferredSize() {
         return new Dimension(20, 20);
     }
+    
+    public Color getGlyphColor() {
+        return pressed ? Color.GRAY : getParent().getForeground();
+    }
 }
