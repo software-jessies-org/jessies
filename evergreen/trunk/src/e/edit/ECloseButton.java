@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -10,6 +11,7 @@ public class ECloseButton extends EButton implements ActionListener {
     
     public ECloseButton(EWindow window) {
         this.window = window;
+        setToolTipText(GuiUtilities.isMacOs() ? "Close (\u2318W)" : "Close (Ctrl+W)");
     }
 
     public void paintComponent(Graphics g) {
