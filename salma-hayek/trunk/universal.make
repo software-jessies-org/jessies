@@ -443,7 +443,7 @@ INSTALLER.Cygwin = $(WIX_TARGET)
 INSTALLER.Darwin = $(BIN_DIRECTORY)/$(PROJECT_NAME).dmg
 
 # We assume Linux means Debian.
-INSTALLER.Linux = $(BIN_DIRECTORY)/$(PROJECT_NAME).deb
+INSTALLER.Linux = $(BIN_DIRECTORY)/org.jessies.$(PROJECT_NAME).deb
 
 INSTALLER = $(INSTALLER.$(TARGET_OS))
 

@@ -167,7 +167,7 @@ else
     system("sudo apt-get install build-essential fakeroot")
 
     # Create and check the validity of our packge name.
-    debian_package_name = project_name.downcase()
+    debian_package_name = "org.jessies." + project_name.downcase()
     if debian_package_name !~ /^[a-z][a-z0-9+.-]+$/
         die("Package name \"#{debian_package_name}\" is invalid.")
     end
