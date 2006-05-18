@@ -69,7 +69,11 @@ if test -f /etc/debian_version ; then
     # The first of the things we'll have to install to be able to build .deb installers.
     # This particular package is unlikely to cause libc updates.
     # The need for further packages will be removed by the Build-Depends line in the .deb's control file.
+    # Yeah, right.  We don't provide source packages.
     apt-get -y install build-essential
+    # The nightly Debian builds now depend on alien.
+    # I'm just abusing this script as a place to track the build dependencies.
+    apt-get -y install alien
     # When these are installed, we can get the users to switch to using them.
     # When the users are using them, we won't need much of the rest of this file.
     # (Though various parts of it would still be useful elsewhere.)
