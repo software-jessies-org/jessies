@@ -12,3 +12,4 @@ mkdir -p $DEB_DIRECTORY
 cd $DEB_DIRECTORY
 find ~/software.jessies.org/nightlies/ -name "*.deb" | xargs cp --target-directory=.
 dpkg-scanpackages . /dev/null | gzip -9 > Packages.gz
+scp Packages.gz software@jessies.org:~/downloads/debian/Packages.gz
