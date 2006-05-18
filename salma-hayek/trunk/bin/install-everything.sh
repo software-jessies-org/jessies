@@ -63,11 +63,17 @@ if test -f /etc/debian_version ; then
     installMissingPackages /usr/bin/ispell iamerican
     # It's important to have a non-free JDK, because the free ones aren't finished.
     # We build this package ourselves, so it's unlikely to be updated often and to cause spurious libc updates.
+    # FIXME: Debian sid now includes a Sun JDK called sun-java5-jdk.
+    # Most of our users are on sarge.
     apt-get -y install sun-j2sdk1.5
     # The first of the things we'll have to install to be able to build .deb installers.
     # This particular package is unlikely to cause libc updates.
     # The need for further packages will be removed by the Build-Depends line in the .deb's control file.
     apt-get -y install build-essential
+    # When these are installed, we can get the users to switch to using them.
+    # When the users are using them, we won't need much of the rest of this file.
+    # (Though various parts of it would still be useful elsewhere.)
+    apt-get -y install org.jessies.evergreen org.jessies.scm org.jessies.terminator
 fi
 
 # Create a directory in /usr/local for all our stuff.
