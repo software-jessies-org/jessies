@@ -434,25 +434,28 @@ FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
 
 WIX_COMPILATION_DIRECTORY = .generated/WiX
 
-WIX_TARGET.$(PROJECT_NAME) = $(BIN_DIRECTORY)/$(PROJECT_NAME).msi
-WIX_TARGET.salma-hayek = $(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).msm
-WIX_TARGET = $(WIX_TARGET.$(PROJECT_NAME))
+INSTALLER.wix.$(PROJECT_NAME) = $(BIN_DIRECTORY)/$(PROJECT_NAME).msi
+INSTALLER.wix.salma-hayek = $(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).msm
+INSTALLER.wix = $(INSTALLER.wix.$(PROJECT_NAME))
+INSTALLERS.Cygwin += $(INSTALLER.wix)
 
-INSTALLER.Cygwin = $(WIX_TARGET)
+INSTALLER.dmg += $(BIN_DIRECTORY)/$(PROJECT_NAME).dmg
+INSTALLERS.Darwin += $(INSTALLER.dmg)
 
-INSTALLER.Darwin = $(BIN_DIRECTORY)/$(PROJECT_NAME).dmg
+INSTALLER.deb += $(BIN_DIRECTORY)/org.jessies.$(PROJECT_NAME).deb
+INSTALLERS.Linux += $(INSTALLER.deb)
+# alien festoons the name with suffixes.
+INSTALLER.rpm += $(BIN_DIRECTORY)/org.jessies.$(PROJECT_NAME)-$(VERSION_STRING)-2.i386.rpm
+INSTALLERS.Linux += $(INSTALLER.rpm)
 
-# We assume Linux means Debian.
-INSTALLER.Linux = $(BIN_DIRECTORY)/org.jessies.$(PROJECT_NAME).deb
+INSTALLERS = $(INSTALLERS.$(TARGET_OS))
 
-INSTALLER = $(INSTALLER.$(TARGET_OS))
-
-STANDALONE_INSTALLER.$(PROJECT_NAME) = $(INSTALLER)
-STANDALONE_INSTALLER.salma-hayek =
-STANDALONE_INSTALLER = $(STANDALONE_INSTALLER.$(PROJECT_NAME))
+STANDALONE_INSTALLERS.$(PROJECT_NAME) = $(INSTALLERS)
+STANDALONE_INSTALLERS.salma-hayek =
+STANDALONE_INSTALLERS = $(STANDALONE_INSTALLERS.$(PROJECT_NAME))
 
 # Among its many breakages, msiexec is more restrictive about slashes than Win32.
-NATIVE_NAME_FOR_INSTALLER := '$(subst /,\,$(call convertToNativeFilenames,$(STANDALONE_INSTALLER)))'
+NATIVE_NAME_FOR_INSTALLERS := '$(subst /,\,$(call convertToNativeFilenames,$(STANDALONE_INSTALLERS)))'
 
 # We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.
 PACKAGING_DIRECTORY = $(PROJECT_ROOT)/.generated/native/$(TARGET_OS)/$(PROJECT_NAME)
@@ -586,18 +589,25 @@ installer-file-list:
 $(PROJECT_NAME).app: build .generated/build-revision.txt
 	@{ make --no-print-directory installer-file-list; make --no-print-directory -C $(SALMA_HAYEK) installer-file-list; } | $(SCRIPT_PATH)/package-for-distribution.rb $(PROJECT_NAME) $(SALMA_HAYEK)
 
-$(INSTALLER.Darwin): $(PROJECT_NAME).app
+$(INSTALLER.dmg): $(PROJECT_NAME).app
 	@mkdir -p $(@D) && \
 	$(RM) $@ && \
 	echo -n "Creating disk image..." && \
 	hdiutil create -fs UFS -volname `perl -w -e "print ucfirst(\"$(PROJECT_NAME)\");"` -srcfolder $(PACKAGING_DIRECTORY) $@
 
-$(INSTALLER.Linux): $(PROJECT_NAME).app
+$(INSTALLER.deb): $(PROJECT_NAME).app
 	@mkdir -p $(@D) && \
 	$(RM) $@ && \
 	echo -n "Creating .deb package..." && \
 	fakeroot dpkg-deb --build $(PACKAGING_DIRECTORY) $@ && \
 	dpkg-deb --info $@ # && dpkg-deb --contents $@
+
+$(INSTALLER.rpm): $(INSTALLER.deb)
+	@mkdir -p $(@D) && \
+	$(RM) $@ && \
+	echo -n "Creating .rpm package..." && \
+	cd $(@D) && \
+	fakeroot alien --to-rpm $<
 
 # ----------------------------------------------------------------------------
 # WiX
@@ -605,7 +615,7 @@ $(INSTALLER.Linux): $(PROJECT_NAME).app
 
 # Later we add more dependencies when we know $(ALL_PER_DIRECTORY_TARGETS).
 %/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
-	{ find classes -type f -print; $(MAKE_INSTALLER_FILE_LIST); } | $(FILE_LIST_TO_WXI) $(if $(filter %.msi,$(WIX_TARGET)),--diskId) > $@
+	{ find classes -type f -print; $(MAKE_INSTALLER_FILE_LIST); } | $(FILE_LIST_TO_WXI) $(if $(filter %.msi,$(INSTALLER.wix)),--diskId) > $@
 
 # This silliness is probably sufficient (as well as sadly necessary).
 %/component-references.wxi: %/component-definitions.wxi $(MAKEFILE_LIST)
@@ -621,10 +631,10 @@ $(INSTALLER.Linux): $(PROJECT_NAME).app
 	VERSION_STRING=$(VERSION_STRING) \
 	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
 
-$(WIX_TARGET): $(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).wixobj
+$(INSTALLER.wix): $(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).wixobj
 	light -nologo -out $(call convertToNativeFilenames,$@ $<)
 
-$(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/$(if $(filter %.msi,$(WIX_TARGET)),installer,module).wxs
+$(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/$(if $(filter %.msi,$(INSTALLER.wix)),installer,module).wxs
 	$(COPY_RULE)
 
 # ----------------------------------------------------------------------------
@@ -697,38 +707,38 @@ native: $(ALL_PER_DIRECTORY_TARGETS)
 build: native
 
 .PHONY: installer
-installer: $(INSTALLER)
+installer: $(INSTALLERS)
 
 .PHONY: native-dist
-native-dist: $(if $(STANDALONE_INSTALLER),upload.$(STANDALONE_INSTALLER))
+native-dist: $(addprefix upload.,$(STANDALONE_INSTALLERS))
 
 # For WiX, we need the salma-hayek installer during the nightly build.
-native-dist: $(filter %.msm,$(INSTALLER))
+native-dist: $(filter %.msm,$(INSTALLERS))
 
 # For non-WiX platforms, we still need the default salma-hayek build during the nightly build.
 native-dist: build
 
 .PHONY: upload.%
-upload.$(STANDALONE_INSTALLER): upload.%: %
+$(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F)
 
 .PHONY: install
-install: run-installer$(suffix $(STANDALONE_INSTALLER))
+install: $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS)))
 
 .PHONY: remove
-remove: run-remover$(suffix $(STANDALONE_INSTALLER))
+remove: $(addprefix run-remover,$(suffix $(STANDALONE_INSTALLERS)))
 
 .PHONY: run-installer
 run-installer:;
 .PHONY: run-remover
 run-remover:;
 
-# If we make this target dependent on $(STANDALONE_INSTALLER), it keeps
+# If we make this target dependent on $(STANDALONE_INSTALLERS), it keeps
 # rebuilding it, which takes ages.
 .PHONY: run-installer.msi
 run-installer.msi:
-	msiexec /i $(NATIVE_NAME_FOR_INSTALLER)
+	msiexec /i $(NATIVE_NAME_FOR_INSTALLERS)
 
 # This only works if this is precisely the same version that was installed.
 # We can't uninstall by GUID because the GUID you give to the uninstaller is
@@ -738,4 +748,4 @@ run-installer.msi:
 # rather than name.
 .PHONY: run-remover.msi
 run-remover.msi:
-	msiexec /x $(NATIVE_NAME_FOR_INSTALLER)
+	msiexec /x $(NATIVE_NAME_FOR_INSTALLERS)
