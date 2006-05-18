@@ -322,8 +322,9 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 
 PROJECT_ROOT = $(CURDIR)
 
-PROJECT_NAME = $(notdir $(PROJECT_ROOT))
-HUMANIZED_PROJECT_NAME := $(shell ruby $(SCRIPT_PATH)/humanize.rb $(PROJECT_NAME))
+PROJECT_DIRECTORY_BASE_NAME = $(notdir $(PROJECT_ROOT))
+HUMAN_PROJECT_NAME ?= $(PROJECT_DIRECTORY_BASE_NAME)
+MACHINE_PROJECT_NAME := $(shell ruby -e 'puts("$(HUMAN_PROJECT_NAME)".downcase())')
 
 BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/bin
 LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/lib
@@ -331,12 +332,12 @@ LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/lib
 # By default, distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST=software@jessies.org
 # The html files are copied into the parent directory.
-DIST_DIRECTORY=/home/software/downloads/$(PROJECT_NAME)
+DIST_DIRECTORY=/home/software/downloads/$(MACHINE_PROJECT_NAME)
 
 $(takeProfileSample)
 SOURCE_FILES := $(if $(wildcard $(PROJECT_ROOT)/src),$(shell find $(PROJECT_ROOT)/src -type f -name "*.java"))
 $(takeProfileSample)
-SOURCE_DIST_FILE = $(PROJECT_NAME).tgz
+SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tgz
 
 REVISION_CONTROL_SYSTEM += $(if $(wildcard .svn),svn)
 REVISION_CONTROL_SYSTEM += $(if $(wildcard CVS),cvs)
@@ -358,7 +359,7 @@ GENERATED_FILES += ChangeLog
 GENERATED_FILES += ChangeLog.html
 GENERATED_FILES += classes
 GENERATED_FILES += .generated
-GENERATED_FILES += $(PROJECT_NAME).jar
+GENERATED_FILES += $(MACHINE_PROJECT_NAME).jar
 
 # By not building and immediately evaluating this, we stop install-everything.sh from warning:
 # svn: '.' is not a working copy
@@ -434,31 +435,31 @@ FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
 
 WIX_COMPILATION_DIRECTORY = .generated/WiX
 
-INSTALLER.wix.$(PROJECT_NAME) = $(BIN_DIRECTORY)/$(PROJECT_NAME).msi
-INSTALLER.wix.salma-hayek = $(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).msm
-INSTALLER.wix = $(INSTALLER.wix.$(PROJECT_NAME))
+INSTALLER.wix.$(MACHINE_PROJECT_NAME) = $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).msi
+INSTALLER.wix.salma-hayek = $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).msm
+INSTALLER.wix = $(INSTALLER.wix.$(MACHINE_PROJECT_NAME))
 INSTALLERS.Cygwin += $(INSTALLER.wix)
 
-INSTALLER.dmg += $(BIN_DIRECTORY)/$(PROJECT_NAME).dmg
+INSTALLER.dmg += $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).dmg
 INSTALLERS.Darwin += $(INSTALLER.dmg)
 
-INSTALLER.deb += $(BIN_DIRECTORY)/org.jessies.$(PROJECT_NAME).deb
+INSTALLER.deb += $(BIN_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).deb
 INSTALLERS.Linux += $(INSTALLER.deb)
 # alien festoons the name with suffixes.
-INSTALLER.rpm += $(BIN_DIRECTORY)/org.jessies.$(PROJECT_NAME)-$(VERSION_STRING)-2.i386.rpm
+INSTALLER.rpm += $(BIN_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME)-$(VERSION_STRING)-2.i386.rpm
 INSTALLERS.Linux += $(INSTALLER.rpm)
 
 INSTALLERS = $(INSTALLERS.$(TARGET_OS))
 
-STANDALONE_INSTALLERS.$(PROJECT_NAME) = $(INSTALLERS)
+STANDALONE_INSTALLERS.$(MACHINE_PROJECT_NAME) = $(INSTALLERS)
 STANDALONE_INSTALLERS.salma-hayek =
-STANDALONE_INSTALLERS = $(STANDALONE_INSTALLERS.$(PROJECT_NAME))
+STANDALONE_INSTALLERS = $(STANDALONE_INSTALLERS.$(MACHINE_PROJECT_NAME))
 
 # Among its many breakages, msiexec is more restrictive about slashes than Win32.
 NATIVE_NAME_FOR_INSTALLERS := '$(subst /,\,$(call convertToNativeFilenames,$(STANDALONE_INSTALLERS)))'
 
 # We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.
-PACKAGING_DIRECTORY = $(PROJECT_ROOT)/.generated/native/$(TARGET_OS)/$(PROJECT_NAME)
+PACKAGING_DIRECTORY = $(PROJECT_ROOT)/.generated/native/$(TARGET_OS)/$(MACHINE_PROJECT_NAME)
 
 # ----------------------------------------------------------------------------
 # Prevent us from using per-directory.make's local variables in universal.make
@@ -541,7 +542,7 @@ source-dist: ../$(SOURCE_DIST_FILE)
 	mkdir -p $(DIST_DIRECTORY) && \
 	mv $< $(DIST_DIRECTORY)/
 
-$(PROJECT_NAME).jar: build.java
+$(MACHINE_PROJECT_NAME).jar: build.java
 	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
@@ -549,7 +550,7 @@ $(PROJECT_NAME).jar: build.java
 # The ChangeLog is generated too!
 ../$(SOURCE_DIST_FILE): ChangeLog .generated/build-revision.txt
 	cd .. && \
-	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_NAME)/* $(PROJECT_NAME)/.generated/build-revision.txt
+	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_DIRECTORY_BASE_NAME)/* $(PROJECT_DIRECTORY_BASE_NAME)/.generated/build-revision.txt
 
 # This is only designed to be run on jessies.org itself.
 .PHONY: www-dist
@@ -580,22 +581,22 @@ www-dist: ChangeLog.html
 
 .PHONY: installer-file-list
 installer-file-list:
-	@$(MAKE_INSTALLER_FILE_LIST) | ruby -w -pe '$$_.sub!(/^/, "$(PROJECT_NAME)/")'
+	@$(MAKE_INSTALLER_FILE_LIST) | ruby -w -pe '$$_.sub!(/^/, "$(PROJECT_DIRECTORY_BASE_NAME)/")'
 
 # Unfortunately, the start-up scripts tend to go looking for salma-hayek, so we can't just have Resources/bin etc; we have to keep the multi-directory structure, at least for now.
 # This isn't recursing into a sub-tree, so we don't want it to recurse if passed -n
 # but passing it -k (implicitly, in MAKEFLAGS) is probably right.
-.PHONY: $(PROJECT_NAME).app
-$(PROJECT_NAME).app: build .generated/build-revision.txt
-	@{ make --no-print-directory installer-file-list; make --no-print-directory -C $(SALMA_HAYEK) installer-file-list; } | $(SCRIPT_PATH)/package-for-distribution.rb $(PROJECT_NAME) $(SALMA_HAYEK)
+.PHONY: $(MACHINE_PROJECT_NAME).app
+$(MACHINE_PROJECT_NAME).app: build .generated/build-revision.txt
+	@{ make --no-print-directory installer-file-list; make --no-print-directory -C $(SALMA_HAYEK) installer-file-list; } | $(SCRIPT_PATH)/package-for-distribution.rb $(HUMAN_PROJECT_NAME) $(MACHINE_PROJECT_NAME) $(SALMA_HAYEK)
 
-$(INSTALLER.dmg): $(PROJECT_NAME).app
+$(INSTALLER.dmg): $(MACHINE_PROJECT_NAME).app
 	@mkdir -p $(@D) && \
 	$(RM) $@ && \
 	echo -n "Creating disk image..." && \
-	hdiutil create -fs UFS -volname `perl -w -e "print ucfirst(\"$(PROJECT_NAME)\");"` -srcfolder $(PACKAGING_DIRECTORY) $@
+	hdiutil create -fs UFS -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
 
-$(INSTALLER.deb): $(PROJECT_NAME).app
+$(INSTALLER.deb): $(MACHINE_PROJECT_NAME).app
 	@mkdir -p $(@D) && \
 	$(RM) $@ && \
 	echo -n "Creating .deb package..." && \
@@ -622,19 +623,19 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@
 
 %.wixobj: %.wxs .generated/build-revision.txt $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
-	HUMANIZED_PROJECT_NAME=$(HUMANIZED_PROJECT_NAME) \
+	HUMAN_PROJECT_NAME=$(HUMAN_PROJECT_NAME) \
+	MACHINE_PROJECT_NAME=$(MACHINE_PROJECT_NAME) \
 	PRODUCT_GUID=$(makeGuid) \
-	PROJECT_NAME=$(PROJECT_NAME) \
 	SHORTCUT_GUID=$(makeGuid) \
 	STANDARD_FILES_GUID=$(makeGuid) \
 	UPGRADE_GUID=$(UPGRADE_GUID) \
 	VERSION_STRING=$(VERSION_STRING) \
 	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
 
-$(INSTALLER.wix): $(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).wixobj
+$(INSTALLER.wix): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj
 	light -nologo -out $(call convertToNativeFilenames,$@ $<)
 
-$(WIX_COMPILATION_DIRECTORY)/$(PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/$(if $(filter %.msi,$(INSTALLER.wix)),installer,module).wxs
+$(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/$(if $(filter %.msi,$(INSTALLER.wix)),installer,module).wxs
 	$(COPY_RULE)
 
 # ----------------------------------------------------------------------------
@@ -700,7 +701,7 @@ MAKE_INSTALLER_FILE_LIST = find $(wildcard doc bin lib) $(patsubst $(PROJECT_ROO
 $(WIX_COMPILATION_DIRECTORY)/component-definitions.wxi: $(ALL_PER_DIRECTORY_TARGETS) build.java
 
 # Presumably we need a similar dependency for non-WiX installers, which need the per-directory targets slightly later but still before the installer.
-$(PROJECT_NAME).app: $(ALL_PER_DIRECTORY_TARGETS)
+$(MACHINE_PROJECT_NAME).app: $(ALL_PER_DIRECTORY_TARGETS)
 
 .PHONY: native
 native: $(ALL_PER_DIRECTORY_TARGETS)

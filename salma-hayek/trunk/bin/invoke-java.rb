@@ -142,10 +142,12 @@ class Java
   end
   
   def set_icons(name)
+    # FIXME: Is this really human_project_name?
     dock_icon = "#{@project_root}/lib/#{name}.icns"
     if Pathname.new(dock_icon).exist?
       @dock_icon = dock_icon
     end
+    # FIXME: Is this really machine_project_name?
     png_icon = "#{@project_root}/lib/#{name.downcase()}-128.png"
     if Pathname.new(png_icon).exist?
       @png_icon = png_icon

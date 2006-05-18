@@ -9,10 +9,10 @@ def die(message)
 end
 
 def usage()
-    die("usage: #{$0} <project_name> <salma-hayek-path> (with filenames one per line on stdin)")
+    die("usage: #{$0} <human_project_name> <machine_project_name> <salma-hayek-path> (with filenames one per line on stdin)")
 end
 
-def make_info_plist(app_dir, project_name, human_project_name)
+def make_info_plist(app_dir, machine_project_name, human_project_name)
     # Create a minimal "Info.plist".
     File.open("#{app_dir}/Info.plist", "w") {
         |file|
@@ -24,7 +24,7 @@ def make_info_plist(app_dir, project_name, human_project_name)
 <plist version="1.0">
  <dict>
   <key>CFBundleIconFile</key>
-  <string>#{project_name}.icns</string>
+  <string>#{human_project_name}.icns</string>
   <key>CFBundleIdentifier</key>
   <string>org.jessies.#{human_project_name}</string>
   <key>CFBundleName</key>
@@ -72,15 +72,15 @@ def maybe_copy_file(src, dst)
     end
 end
 
-if ARGV.length() != 2
+if ARGV.length() != 3
     usage()
 end
 
 # Get our command line arguments.
-project_name = ARGV.shift()
+human_project_name = ARGV.shift()
+machine_project_name = ARGV.shift()
 salma_hayek = ARGV.shift()
 
-require "#{salma_hayek}/bin/humanize.rb"
 require "#{salma_hayek}/bin/target-os.rb"
 
 if target_os() != "Linux" && target_os() != "Darwin"
@@ -94,30 +94,28 @@ if make_installer_file_list.empty?()
     usage()
 end
 
-human_project_name = humanize(project_name)
-
 puts("Building #{target_os() == 'Darwin' ? '.app bundle' : '.deb package'} for #{human_project_name}...")
 
 # Make a temporary directory to work in.
-tmp_dir = ".generated/native/#{target_os()}/#{project_name}"
+tmp_dir = ".generated/native/#{target_os()}/#{machine_project_name}"
 FileUtils.rm_rf(tmp_dir)
 FileUtils.mkdir_p(tmp_dir)
 
 if target_os() == "Linux"
-    app_dir = "#{tmp_dir}/usr/share/software.jessies.org/#{project_name}"
+    app_dir = "#{tmp_dir}/usr/share/software.jessies.org/#{machine_project_name}"
     FileUtils.mkdir_p(app_dir)
 else
     # Make a skeleton .app bundle.
     app_dir = "#{tmp_dir}/#{human_project_name}.app/Contents"
     FileUtils.mkdir_p("#{app_dir}/MacOS")
     system("echo -n 'APPL????' > #{app_dir}/PkgInfo")
-    make_info_plist(app_dir, project_name, human_project_name)
+    make_info_plist(app_dir, machine_project_name, human_project_name)
 end
 resources_dir = "#{app_dir}/Resources"
 FileUtils.mkdir_p(resources_dir)
 
 # Copy this project's individual files.
-project_resource_directory = "#{resources_dir}/#{project_name}"
+project_resource_directory = "#{resources_dir}/#{machine_project_name}"
 FileUtils.mkdir_p(project_resource_directory)
 make_installer_file_list.each() {
     |src|
@@ -136,7 +134,7 @@ system("jar", "u0f", jar_filename, "-C", "#{salma_hayek}/classes/", ".")
 
 if target_os() == "Darwin"
     # Apple doesn't let you give a path to a .icns file, and doesn't seem to always follow symbolic links, so we have to copy it into position.
-    FileUtils.cp("#{resources_dir}/#{project_name}/lib/#{project_name}.icns", "#{app_dir}/Resources/")
+    FileUtils.cp("#{resources_dir}/#{machine_project_name}/lib/#{human_project_name}.icns", "#{app_dir}/Resources/")
 
     # Make a bogus start-up script.
     script_name = "#{app_dir}/MacOS/#{human_project_name}"
@@ -152,7 +150,7 @@ if target_os() == "Darwin"
         file.puts("export PATH=/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Commands/:$PATH")
 
         file.puts("resources=`dirname \"$0\"`/../Resources")
-        file.puts("\"$resources/salma-hayek/bin/ensure-suitable-mac-os-version.rb\" && exec \"$resources/#{project_name}/bin/#{human_project_name.downcase()}\"")
+        file.puts("\"$resources/salma-hayek/bin/ensure-suitable-mac-os-version.rb\" && exec \"$resources/#{machine_project_name}/bin/#{machine_project_name}\"")
     }
     system("chmod a+x #{script_name}")
 
@@ -166,8 +164,8 @@ else
     # FIXME: it would be nice if we could reliably test whether we need to do this.
     system("sudo apt-get install build-essential fakeroot")
 
-    # Create and check the validity of our packge name.
-    debian_package_name = "org.jessies." + project_name.downcase()
+    # Create and check the validity of our package name.
+    debian_package_name = "org.jessies." + machine_project_name
     if debian_package_name !~ /^[a-z][a-z0-9+.-]+$/
         die("Package name \"#{debian_package_name}\" is invalid.")
     end
