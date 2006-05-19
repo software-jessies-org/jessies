@@ -606,9 +606,9 @@ public class TextBuffer {
 		checkInvariant();
 	}
 
-	/** Scrolls the display down by one line. */
-	public void scrollDisplayDown() {
-		int removeIndex = getFirstDisplayLine() + firstScrollLineIndex;
+	/** Delete one line, moving everything below up and inserting a blank line at the bottom. */
+	public void deleteLine() {
+		int removeIndex = cursorPosition.getLineIndex();
 		int addIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
 		textLines.add(addIndex, new TextLine());
 		textLines.remove(removeIndex);
