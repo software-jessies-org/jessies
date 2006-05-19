@@ -43,7 +43,7 @@ public class CSIEscapeAction implements TerminalAction {
 			case 'K': return killLineContents(listener, midSequence);
 			case 'J': return killLines(listener, midSequence);
 			case 'L': return insertLines(listener, midSequence);
-			case 'M': return scrollDisplayUp(listener, midSequence);
+			case 'M': return deleteLines(listener, midSequence);
 			case 'P': return deleteCharacters(listener, midSequence);
 			case 'g': return clearTabs(listener, midSequence);
 			case 'h': return setMode(listener, midSequence, true);
@@ -71,10 +71,10 @@ public class CSIEscapeAction implements TerminalAction {
 		}
 	}
 	
-	public boolean scrollDisplayUp(TextBuffer listener, String seq) {
+	public boolean deleteLines(TextBuffer listener, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
 		for (int i = 0; i < count; i++) {
-			listener.scrollDisplayDown();
+			listener.deleteLine();
 		}
 		return true;
 	}
