@@ -20,12 +20,12 @@ public:
     }
     
 private:
-    int gnuCompatibleStrerror(int (*strerror_r)(int, char*, size_t), int errorNumber, char* messageBuffer, size_t bufferSize) {
-        return strerror_r(errorNumber, messageBuffer, bufferSize);
+    int gnuCompatibleStrerror(int (*strerror_r_fn)(int, char*, size_t), int errorNumber, char* messageBuffer, size_t bufferSize) {
+        return strerror_r_fn(errorNumber, messageBuffer, bufferSize);
     }
     
-    int gnuCompatibleStrerror(char* (*strerror_r)(int, char*, size_t), int errorNumber, char* messageBuffer, size_t bufferSize) {
-        const char* intermediateBuffer = strerror_r(errorNumber, messageBuffer, bufferSize);
+    int gnuCompatibleStrerror(char* (*strerror_r_fn)(int, char*, size_t), int errorNumber, char* messageBuffer, size_t bufferSize) {
+        const char* intermediateBuffer = strerror_r_fn(errorNumber, messageBuffer, bufferSize);
         // strncpy doesn't support copying over oneself.
         if (intermediateBuffer != messageBuffer) {
             strncpy(messageBuffer, intermediateBuffer, bufferSize);

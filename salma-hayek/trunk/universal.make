@@ -213,6 +213,8 @@ CPPFLAGS += $(foreach DIRECTORY,$(EXTRA_INCLUDE_PATH),-I$(DIRECTORY))
 # /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MacMemory.h:1587: error: 'bzero' was not declared in this scope
 # The 600 figure is from /usr/include/features.h.
 CPPFLAGS.Linux += -D_XOPEN_SOURCE=600
+# strerror_r isn't POSIX.  On gooch, it requires this.
+CPPFLAGS.Linux += -D_BSD_SOURCE
 CPPFLAGS += $(CPPFLAGS.$(TARGET_OS))
 
 C_AND_CXX_FLAGS += $(C_AND_CXX_FLAGS.$(TARGET_OS))
