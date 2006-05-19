@@ -726,6 +726,14 @@ $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F)
 
+# I like the idea of keeping several versions on the server but we're going to have a hard time
+# linking to the one we expect people to use unless we create a symlink.
+upload.$(INSTALLER.rpm): symlink-latest.rpm
+.PHONY: symlink-latest.rpm
+symlink-latest.rpm: $(INSTALLER.rpm)
+	ssh $(DIST_SSH_USER_AND_HOST) $(RM) org.jessies.$(MACHINE_PROJECT_NAME).rpm '&&' \
+	ln -s $(notdir $(INSTALLER.rpm)) $(DIST_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).rpm
+
 .PHONY: install
 install: $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS)))
 
