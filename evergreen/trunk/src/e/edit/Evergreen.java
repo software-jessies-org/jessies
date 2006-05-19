@@ -612,6 +612,7 @@ public class Evergreen {
             // ...and then rename it to the file we want, to protect against
             // losing all our state on failure.
             File realFile = FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml"));
+            // FIXME: You can't rename over an existing file in Windows-semantics file systems (but it's nice and atomic in Unix).
             FileUtilities.fileFromString(filename).renameTo(realFile);
         } catch (Exception ex) {
             Log.warn("Problem writing saved state", ex);
