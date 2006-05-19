@@ -733,7 +733,7 @@ $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 upload.$(INSTALLER.rpm): symlink-latest.rpm
 .PHONY: symlink-latest.rpm
 symlink-latest.rpm: $(INSTALLER.rpm)
-	ssh $(DIST_SSH_USER_AND_HOST) $(RM) org.jessies.$(MACHINE_PROJECT_NAME).rpm '&&' \
+	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).rpm '&&' \
 	ln -s $(notdir $(INSTALLER.rpm)) $(DIST_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).rpm '&&' \
 	find $(DIST_DIRECTORY) -name '"*.rpm"' -mtime 7 '|' xargs $(RM)
 
