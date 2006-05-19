@@ -160,10 +160,6 @@ if target_os() == "Darwin"
     maybe_copy_file("README", "#{doc_root}/README.txt")
     maybe_copy_file("TODO", "#{doc_root}/TODO.txt")
 else
-    # Make sure we have the tools we require.
-    # FIXME: it would be nice if we could reliably test whether we need to do this.
-    system("sudo apt-get install build-essential fakeroot")
-
     # Create and check the validity of our package name.
     debian_package_name = "org.jessies." + machine_project_name
     if debian_package_name !~ /^[a-z][a-z0-9+.-]+$/

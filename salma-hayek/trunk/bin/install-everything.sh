@@ -30,50 +30,9 @@ if ! test -w . ; then
   die "cannot write to /usr/local - this script needs to be run as root"
 fi
 
-# The motivation to make the installation conditional was to stop spurious libc updates
-# which usually eventually require a reboot to get the system properly working again.
-# By installing the packages one at a time, we ensure that packages which can't be
-# installed don't stop those which can.
-installMissingPackages() {
-    # We could scrape the output of dpkg --status but -f is easy and robust under eg i18n.
-    filename=$1
-    shift
-    if [[ ! -f $filename ]]
-    then
-        # We don't care what version gets installed, so use -t to encourage apt-get to pick
-        # an old version which is, we might guess, less likely to cause a libc update.
-        # I haven't seen a case where this worked yet but it seems not to be harmful.
-        # One day, we'll have a proper installer and all this dubious cruft can go.
-        echo apt-get -y install -t stable $*
-    fi
-}
-
 # Install various packages we need.
 if test -f /etc/debian_version ; then
     apt-get update
-    # Some of these are needed to build our stuff, some to run it, and some are "optional" to take best advantage of our features.
-    installMissingPackages /usr/bin/ctags-exuberant exuberant-ctags
-    installMissingPackages /usr/bin/g++ g++
-    installMissingPackages /usr/bin/make make
-    installMissingPackages /usr/bin/ri ri
-    installMissingPackages /usr/bin/ruby ruby
-    installMissingPackages /usr/bin/svn subversion
-    installMissingPackages /usr/include/X11/Xlib.h x-dev libx11-dev
-    # You definitely want ispell(1) installed. Choosing a language is difficult, because a lot of people are parochial. So only install international English ispell if they haven't already installed ispell. (Last time I looked, whichever dictionary you install last becomes the default.)
-    installMissingPackages /usr/bin/ispell iamerican
-    # It's important to have a non-free JDK, because the free ones aren't finished.
-    # We build this package ourselves, so it's unlikely to be updated often and to cause spurious libc updates.
-    # FIXME: Debian sid now includes a Sun JDK called sun-java5-jdk.
-    # Most of our users are on sarge.
-    apt-get -y install sun-j2sdk1.5
-    # The first of the things we'll have to install to be able to build .deb installers.
-    # This particular package is unlikely to cause libc updates.
-    # The need for further packages will be removed by the Build-Depends line in the .deb's control file.
-    # Yeah, right.  We don't provide source packages.
-    apt-get -y install build-essential
-    # The nightly Debian builds now depend on alien.
-    # I'm just abusing this script as a place to track the build dependencies.
-    apt-get -y install alien
     # When these are installed, we can get the users to switch to using them.
     # When the users are using them, we won't need much of the rest of this file.
     # (Though various parts of it would still be useful elsewhere.)
@@ -85,25 +44,26 @@ mkdir -p /usr/local/www.jessies.org/ && \
 cd /usr/local/www.jessies.org/ || die "making install directory"
 
 # Download and extract the latest nightly builds.
-PROJECTS="salma-hayek Evergreen KnowAll scm terminator"
+MACHINE_PROJECT_NAMES="salma-hayek evergreen knowall scm terminator"
 BROKEN_PROJECTS=""
 WGET_OPTIONS="-C off"
 if ! wget --no-cache 2>&1 | grep unrecogni[sz]ed > /dev/null
 then
     WGET_OPTIONS="--no-cache"
 fi
-for PROJECT in $PROJECTS; do
-    wget $WGET_OPTIONS -N http://software.jessies.org/$PROJECT/$PROJECT.tgz || die "downloading $PROJECT"
-    rm -rf $PROJECT || die "removing old copy of $PROJECT"
-    tar --no-same-owner -zxf $PROJECT.tgz || { mv $PROJECT.tgz corrupt-$PROJECT.tgz; die "extracting corrupt-$PROJECT.tgz"; }
-    if ! make -C $PROJECT ; then
+for MACHINE_PROJECT_NAME in $MACHINE_PROJECT_NAMES; do
+    wget $WGET_OPTIONS -N http://software.jessies.org/$MACHINE_PROJECT_NAME/$MACHINE_PROJECT_NAME.tgz || die "downloading $MACHINE_PROJECT_NAME"
+    PROJECT_DIRECTORY_BASE_NAME=`tar -ztf $MACHINE_PROJECT_NAME.tgz | head -1 | cut -f1 -d/`
+    rm -rf $PROJECT_DIRECTORY_BASE_NAME || die "removing old copy of $PROJECT_DIRECTORY_BASE_NAME"
+    tar --no-same-owner -zxf $MACHINE_PROJECT_NAME.tgz || { mv $MACHINE_PROJECT_NAME.tgz corrupt-$MACHINE_PROJECT_NAME.tgz; die "extracting corrupt-$MACHINE_PROJECT_NAME.tgz"; }
+    if ! make -C $PROJECT_DIRECTORY_BASE_NAME ; then
         # A number of people, on a number of both recent and previous occasions have had one-off failures.
         # The goal here is to leave them with a working installation at the expense of a messy build mail.
         # I suspect the reason a second, manual attempt has worked, however, is that it's being run from
         # a subtly different environment.
         # So I suspect that this won't work.
-        if ! make -C $PROJECT ; then
-            BROKEN_PROJECTS="$PROJECT $BROKEN_PROJECTS"
+        if ! make -C $PROJECT_DIRECTORY_BASE_NAME ; then
+            BROKEN_PROJECTS="$MACHINE_PROJECT_NAME $BROKEN_PROJECTS"
         fi
     fi
 done
@@ -120,6 +80,8 @@ do
 done
 
 if test -f /etc/debian_version ; then
+    # FIXME: We don't meet the Debian Policy's command line requirements for an x-terminal-emulator.
+    # FIXME: This belongs in terminator.deb.
     update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/local/bin/terminator 50
     update-alternatives --auto x-terminal-emulator
 fi
