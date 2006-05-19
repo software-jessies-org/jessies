@@ -166,9 +166,11 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
     if (WIFSIGNALED(status)) {
         exitValue = WTERMSIG(status);
         wasSignaled = true;
+#ifdef WCOREDUMP // WCOREDUMP is not POSIX.  The Linux man page recommends this #ifdef.
         if (WCOREDUMP(status)) {
             didDumpCore = true;
         }
+#endif
     }
     
     // We now have no further use for the fd connecting us to the (exited) child.
