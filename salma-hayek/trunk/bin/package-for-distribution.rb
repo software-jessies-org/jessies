@@ -234,7 +234,7 @@ else
         control.puts("Package: #{debian_package_name}")
         
         # Use the same artificial version number as we use for the ".msi" installer.
-        require "#{salma_hayek}/bin/make-version-string.rb"
+        require "#{salma_hayek}/bin/make-version-file.rb"
         version = makeVersionString(".", salma_hayek)
         control.puts("Version: #{version}")
         

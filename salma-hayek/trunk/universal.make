@@ -361,11 +361,13 @@ GENERATED_FILES += classes
 GENERATED_FILES += .generated
 GENERATED_FILES += $(MACHINE_PROJECT_NAME).jar
 
-# By not building and immediately evaluating this, we stop install-everything.sh from warning:
+MAKE_VERSION_FILE_COMMAND = ruby $(SCRIPT_PATH)/make-version-file.rb $(PROJECT_ROOT) $(SALMA_HAYEK)
+# By immediately evaluating this, we cause install-everything.sh (or other building-from-source) to warn:
 # svn: '.' is not a working copy
-VERSION_STRING = $(shell tail -1 .generated/build-revision.txt)
-
-# "sudo apt-get install uuid" gets you a suitable program on Debian.
+# Now we use the version string in the name of the .rpm target, it gets evaluated even if we use = instead of :=.
+VERSION_STRING := $(shell $(MAKE_VERSION_FILE_COMMAND) | tail -1)
+# If you ever need a Debian equivalent of this Windows-specific script:
+# sudo apt-get install uuid
 makeGuid = $(shell $(SCRIPT_PATH)/uuid.rb)
 
 # ----------------------------------------------------------------------------
@@ -562,7 +564,7 @@ www-dist: ChangeLog.html
 .PHONY: .generated/build-revision.txt
 .generated/build-revision.txt:
 	@mkdir -p $(@D) && \
-	ruby $(SCRIPT_PATH)/make-version-string.rb $(PROJECT_ROOT) $(SALMA_HAYEK) > $@
+	$(MAKE_VERSION_FILE_COMMAND) > $@
 
 # Old versions of SunOS tic don't support the -o argument but do support redirecting
 # the output to $TERMINFO.
