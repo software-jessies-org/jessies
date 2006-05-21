@@ -80,6 +80,12 @@ public class ETable extends JTable {
             c.setForeground(UIManager.getColor("Table.selectionForeground"));
         }
         
+        // The Java 6 GTK LAF JCheckBox doesn't paint its background by default.
+        // Sun 5043225 says this is the intended behavior, though presumably not when it's being used as a table cell renderer.
+        if (GuiUtilities.isGtk() && c instanceof JCheckBox) {
+            JCheckBox.class.cast(c).setOpaque(true);
+        }
+        
         if (c instanceof JComponent) {
             initToolTip(JComponent.class.cast(c), row, column);
         }
