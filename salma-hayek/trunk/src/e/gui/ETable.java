@@ -37,8 +37,9 @@ public class ETable extends JTable {
     protected void paintEmptyRows(Graphics g) {
         final int rowCount = getRowCount();
         final Rectangle clip = g.getClipBounds();
-        if (rowCount * rowHeight < clip.height) {
-            for (int i = rowCount; i <= clip.height/rowHeight; ++i) {
+        final int height = clip.y + clip.height;
+        if (rowCount * rowHeight < height) {
+            for (int i = rowCount; i <= height/rowHeight; ++i) {
                 g.setColor(colorForRow(i));
                 g.fillRect(clip.x, i * rowHeight, clip.width, rowHeight);
             }
