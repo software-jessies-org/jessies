@@ -97,9 +97,13 @@ public class ETable extends JTable {
      * Returns the appropriate background color for the given row.
      */
     protected Color colorForRow(int row) {
-        return (row % 2 == 0) ? GuiUtilities.ALTERNATE_ROW_COLOR : getBackground();
+        return (row % 2 == 0) ? alternateRowColor() : getBackground();
     }
-
+    
+    private Color alternateRowColor() {
+        return GuiUtilities.isGtk() ? Color.WHITE : GuiUtilities.ALTERNATE_ROW_COLOR;
+    }
+    
     /**
      * Shades alternate rows in different colors.
      */

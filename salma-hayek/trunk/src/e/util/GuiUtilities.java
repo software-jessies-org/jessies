@@ -33,10 +33,12 @@ public class GuiUtilities {
     public static final Color SELECTED_ROW_COLOR = new Color(0.24f, 0.50f, 0.87f);
     
     static {
-        UIManager.put("List.selectionBackground", SELECTED_ROW_COLOR);
-        UIManager.put("List.selectionForeground", Color.WHITE);
-        UIManager.put("Table.selectionBackground", SELECTED_ROW_COLOR);
-        UIManager.put("Table.selectionForeground", Color.WHITE);
+        if (GuiUtilities.isMacOs()) {
+            UIManager.put("List.selectionBackground", SELECTED_ROW_COLOR);
+            UIManager.put("List.selectionForeground", Color.WHITE);
+            UIManager.put("Table.selectionBackground", SELECTED_ROW_COLOR);
+            UIManager.put("Table.selectionForeground", Color.WHITE);
+        }
     }
     
     // Used by isFontFixedWidth.
