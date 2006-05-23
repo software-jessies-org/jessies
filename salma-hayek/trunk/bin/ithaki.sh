@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Add this to /etc/apt/sources.list:
-# deb http://software.jessies.org/debian/ ./
-# And do this if you want to avoid the authentication prompt on first installation:
-# wget -O - http://software.jessies.org/debian/software.jessies.org.gpg | sudo apt-key add -
-
 # BlueArc's local copy of the archive:
 DEB_DIRECTORY=/u/u154/software.jessies.org/
 # deb http://deb/software.jessies.org/ ./
