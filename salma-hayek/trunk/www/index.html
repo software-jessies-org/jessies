@@ -64,9 +64,18 @@ that none of them requires more than a single "include" line. That's it!
 
 <p>The <a href="ChangeLog.html">salma-hayek ChangeLog</a> is available separately.
 
-<a name="building-from-source">
+<p>Debian packages for some of our projects are available.  Pasting this is how we might install them all:
+
+<p><tt>sudo bash &lt;&lt;EOF
+<br>echo deb <a href="../debian/">http://software.jessies.org/debian/</a> ./ >> /etc/apt/sources.list
+<br>wget -O - <a href="../debian/software.jessies.org.gpg">http://software.jessies.org/debian/software.jessies.org.gpg</a> | sudo apt-key add -
+<br>aptitude update
+<br>aptitude install ~norg.jessies.
+<br>EOF
+</tt>
+
+<a name="building-from-source"></a>
 <h2>Building from source</h2>
-</a>
 
 <h3>All Platforms</h3>
 
@@ -96,7 +105,7 @@ The makefile will tell you what to do if you try to build with an old version.
 light.exe : error LGHT0001 : COM object with CLSID {F94985D5-29F9-4743-9805-99BC3F35B678} is either not valid or not registered.
 </pre>
 you also need MergeMod.dll to be installed and registered.
-This appears to be part of the free <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=A55B6B43-E24F-4EA3-A93E-40C0EC4F68E5&displaylang=en">Microsoft Windows Platform SDK</a> among other things.
+This appears to be part of the free <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=A55B6B43-E24F-4EA3-A93E-40C0EC4F68E5&amp;displaylang=en">Microsoft Windows Platform SDK</a> among other things.
 This is how you register the COM object, according to <a href="http://support.microsoft.com/kb/329214/EN-US/">the instructions</a>, once it's installed:
 <pre>
 regsvr32 "C:\Program Files\Microsoft Platform SDK\Bin\MergeMod.Dll"
