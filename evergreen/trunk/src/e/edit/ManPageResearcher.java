@@ -10,10 +10,9 @@ import e.util.*;
  * Offers man page entries corresponding to selected words.
  */
 public class ManPageResearcher implements WorkspaceResearcher {
-    /** Keep the names of all the known man pages. */
-    private static Set<String> knownManPages;
+    /** Our manual is a mapping from section names to sets of page names. */
+    private static Map<String, Set<String>> manual;
     
-    private static TreeSet<String> uniqueIdentifiers;
     private static TreeSet<String> uniqueWords;
     
     private static ManPageResearcher INSTANCE = new ManPageResearcher();
@@ -22,7 +21,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
     }
     
     public synchronized static ManPageResearcher getSharedInstance() {
-        if (knownManPages == null) {
+        if (manual == null) {
             init();
         }
         return INSTANCE;
@@ -34,11 +33,10 @@ public class ManPageResearcher implements WorkspaceResearcher {
     private static void init() {
         final long startTime = System.currentTimeMillis();
         
-        knownManPages = new HashSet<String>();
-        uniqueIdentifiers = new TreeSet<String>();
+        manual = new HashMap<String, Set<String>>();
+        TreeSet<String> uniqueIdentifiers = new TreeSet<String>();
         
-        HashSet<String> sections = new HashSet<String>();
-        
+        int pageCount = 0;
         Pattern manPagePattern = Pattern.compile("^(.*)\\.([23][a-z]*)(\\.gz)?$");
         for (File manPath : findManPageDirectories()) {
             String[] manPages = manPath.list();
@@ -47,27 +45,29 @@ public class ManPageResearcher implements WorkspaceResearcher {
                 Matcher matcher = manPagePattern.matcher(manPage);
                 if (matcher.matches()) {
                     String stub = matcher.group(1);
-                    String section = matcher.group(2);
-                    if (section.endsWith("pm") || section.endsWith("tcl") || section.endsWith("ssl")) {
+                    String sectionName = matcher.group(2);
+                    if (sectionName.endsWith("pm") || sectionName.endsWith("tcl") || sectionName.endsWith("ssl")) {
                         continue;
                     }
-                    sections.add(section);
-                    // FIXME: keep track which section each page came from.
-                    knownManPages.add(stub);
+                    Set<String> section = manual.get(sectionName);
+                    if (section == null) {
+                        section = new HashSet<String>();
+                        manual.put(sectionName, section);
+                    }
+                    section.add(stub);
                     uniqueIdentifiers.add(stub);
+                    ++pageCount;
                 } else {
                     Log.warn("unexpected man page \"" + manPage + "\"");
                 }
             }
         }
         
-        System.out.println(sections);
-        
         // FIXME: this turns "posix_openpt" into two words, so the spelling checker will accept "openpt" alone, rather than just in the identifier "posix_openpt" as intended. Maybe we should check blessed identifiers as a whole before we try break them into words, and then supply the spelling checker with the unique identifiers we bless, rather than just the list of words? (At the same time, passing all the words works well for Java source.)
         uniqueWords = JavaResearcher.extractUniqueWords(uniqueIdentifiers.iterator());
         
         final long duration = System.currentTimeMillis() - startTime;
-        Log.warn("Learned of " + knownManPages.size() + " man pages in " + duration + "ms.");
+        Log.warn("Learned of " + pageCount + " man pages in " + duration + "ms.");
     }
     
     private static List<File> findManPageDirectories() {
@@ -98,8 +98,11 @@ public class ManPageResearcher implements WorkspaceResearcher {
      * the empty string (not null) if it has nothing to say.
      */
     public String research(PTextArea text, String string) {
-        if (knownManPages.contains(string)) {
-            return "Manual page for <a href=\"man:" + string + "\">" + string + "</a>";
+        for (String sectionName : manual.keySet()) {
+            Set<String> section = manual.get(sectionName);
+            if (section.contains(string)) {
+                return "Manual page for <a href=\"man:" + string + "\">" + string + "(" + sectionName + ")</a>";
+            }
         }
         return "";
     }
