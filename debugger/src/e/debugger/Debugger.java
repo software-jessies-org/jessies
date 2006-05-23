@@ -62,7 +62,7 @@ public class Debugger extends JComponent implements DebuggerCommandHandler, Loca
         splitPane.setRightComponent(createTabbedPane());
         add(splitPane, BorderLayout.CENTER);
         add(statusBar = new EStatusBar(), BorderLayout.SOUTH);
-        new InAppServer("DebuggerServer", System.getProperty("preferencesDirectory") + File.separator + "/debugger-server-port", DebuggerCommandHandler.class, this);
+        new InAppServer("DebuggerServer", System.getProperty("preferencesDirectory") + File.separator + "/debugger-server-port", null, DebuggerCommandHandler.class, this);
     }
     
     private Component createTabbedPane() {
