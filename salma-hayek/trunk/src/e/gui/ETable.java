@@ -24,20 +24,25 @@ public class ETable extends JTable {
     private static final Color MAC_UNFOCUSED_SELECTED_VERTICAL_LINE_COLOR = new Color(0xacacac);
     
     public ETable() {
-        if (GuiUtilities.isMacOs()) {
-            // Work-around for Apple 4352937.
-            JLabel.class.cast(getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.LEADING);
-            
-            // Use an iTunes-style grid.
-            setShowHorizontalLines(false);
-            setShowVerticalLines(true);
-        }
+        // Although it's the JTable default, most systems' tables don't draw a grid by default.
+        // Worse, it's not easy (or possible?) for us to take over grid painting ourselves for those LAFs (Metal, for example) that do paint grids.
+        // The Aqua and GTK LAFs ignore the grid settings anyway, so this causes no change there.
+        setShowGrid(false);
         
         // Tighten the cells up, and enable the manual painting of the vertical grid lines.
         setIntercellSpacing(new Dimension());
         
         // Table column re-ordering is too badly implemented to enable.
         getTableHeader().setReorderingAllowed(false);
+        
+        if (GuiUtilities.isMacOs()) {
+            // Work-around for Apple 4352937.
+            JLabel.class.cast(getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.LEADING);
+            
+            // Use an iTunes-style vertical-only "grid".
+            setShowHorizontalLines(false);
+            setShowVerticalLines(true);
+        }
     }
 
     /**
@@ -136,10 +141,16 @@ public class ETable extends JTable {
                 jc.setOpaque(true);
             }
             
-            // Native Mac OS doesn't draw a border on the selected cell; it draws a horizontal line under the whole row.
-            // It also draws a vertical line separating each column.
-            if (GuiUtilities.isMacOs() && isEditing() == false) {
-                fixMacOsCellRendererBorder(jc, selected, focused);
+            if (getCellSelectionEnabled() == false && isEditing() == false) {
+                if (GuiUtilities.isMacOs()) {
+                    // Native Mac OS doesn't draw a border on the selected cell.
+                    // It does however draw a horizontal line under the whole row, and a vertical line separating each column.
+                    fixMacOsCellRendererBorder(jc, selected, focused);
+                } else {
+                    // FIXME: doesn't Windows have row-wide selection focus?
+                    // Hide the cell focus.
+                    jc.setBorder(null);
+                }
             }
             
             initToolTip(jc, row, column);
