@@ -9,7 +9,7 @@ def die(message)
 end
 
 def usage()
-    die("usage: #{$0} <human_project_name> <machine_project_name> <salma-hayek-path> (with filenames one per line on stdin)")
+    die("usage: #{$0} <human_project_name> <machine_project_name> <salma-hayek-path>")
 end
 
 def make_info_plist(app_dir, machine_project_name, human_project_name)
@@ -87,13 +87,6 @@ if target_os() != "Linux" && target_os() != "Darwin"
     die("#{$0}: this script will only work on Linux or Mac OS X; you're running on '#{target_os()}'.")
 end
 
-# Then read stdin (otherwise Ruby will treat ARGV as a list of filenames to read from).
-make_installer_file_list = readlines().map() { |line| line.chomp() }
-
-if make_installer_file_list.empty?()
-    usage()
-end
-
 puts("Building #{target_os() == 'Darwin' ? '.app bundle' : '.deb package'} for #{human_project_name}...")
 
 # Make a temporary directory to work in.
@@ -114,16 +107,26 @@ end
 resources_dir = "#{app_dir}/Resources"
 FileUtils.mkdir_p(resources_dir)
 
+def copy_files_for_installation(src_root_directory, dst_root_directory)
+    src_root_pathname = Pathname.new(src_root_directory)
+    dst_root_pathname = Pathname.new(dst_root_directory)
+    open("| make --no-print-directory -C #{src_root_directory} installer-file-list").each_line() {
+        |line|
+        filename = line.chomp()
+        src_pathname = src_root_pathname + filename
+        dst_pathname = dst_root_pathname + filename
+        dst_dirname = dst_pathname.dirname()
+        #puts("about to copy #{src_pathname} to #{dst_pathname}")
+        FileUtils.mkdir_p(dst_dirname)
+        FileUtils.cp(src_pathname, dst_pathname)
+    }
+end
+
 # Copy this project's individual files.
 project_resource_directory = "#{resources_dir}/#{machine_project_name}"
-FileUtils.mkdir_p(project_resource_directory)
-make_installer_file_list.each() {
-    |src|
-    src_pathname = Pathname.new(src)
-    dst_dirname = "#{resources_dir}/#{src_pathname.dirname()}"
-    FileUtils.mkdir_p(dst_dirname)
-    FileUtils.cp("../" + src_pathname, dst_dirname)
-}
+copy_files_for_installation(".", project_resource_directory)
+# Copy the files we'll install from salma-hayek.
+copy_files_for_installation(salma_hayek, "#{resources_dir}/salma-hayek")
 
 # Generate a single JAR file containing both the project's unique classes and all the classes from the salma-hayek library.
 # Unscientific experiments suggest that uncompressed (-0) JAR files give us faster start-up times, and improving start-up time is why we're using a JAR file.
