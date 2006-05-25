@@ -6,6 +6,10 @@
 # apt-get's output is routinely splattered with incomprehensible errors.
 apt-get update &> /dev/null
 
+# aptitude likes to remove packages which it thinks were installed automatically and which are no longer used by other packages.
+# Sometimes people have come to rely on those packages.
+# apt-get insists on confirmation of your willingness to install unauthenticated packages, even on upgrade.
+# aptitude will happily install unauthenticated packages (at the moment).
 apt-get -y install org.jessies.{evergreen,scm,terminator}
 
 # FIXME: We don't meet the Debian Policy's command line requirements for an x-terminal-emulator.
