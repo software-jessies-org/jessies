@@ -114,7 +114,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                 char ch = line.charAt(i);
                 // Only recognize # comments if they're at the start of the line or the preceding character was whitespace.
                 // This stops us mistaking "$#" in Perl or # characters in Ruby regular expressions for comments, for example.
-                if (supportShellComments() && ch == '#' && (i == 0 || " \t".indexOf(line.charAt(i - 1)) != -1)) {
+                if (supportShellComments() && ch == '#' && (i == 0 || Character.isWhitespace(line.charAt(i - 1)))) {
                     comment = true;
                     if (lastStart < i) {
                         builder.addStyledSegment(i, PStyle.NORMAL);
