@@ -1,6 +1,7 @@
 package e.gui;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -192,6 +193,25 @@ public class ETable extends JTable {
             toolTipText = getValueAt(row, column).toString();
         }
         c.setToolTipText(toolTipText);
+    }
+    
+    /**
+     * Places tool tips over the cell they correspond to. MS Outlook does this, and it works rather well.
+     * Swing will automatically override our suggested location if it would cause the tool tip to go off the display.
+     */
+    @Override
+    public Point getToolTipLocation(MouseEvent e) {
+        // After a tool tip has been displayed for a cell that has a tool tip, cells without tool tips will show an empty tool tip until the tool tip mode times out (or the table has a global default tool tip).
+        // (ToolTipManager.checkForTipChange considers a non-null result from getToolTipText *or* a non-null result from getToolTipLocation as implying that the tool tip should be displayed. This seems like a bug, but that's the way it is.)
+        if (getToolTipText(e) == null) {
+            return null;
+        }
+        final int row = rowAtPoint(e.getPoint());
+        final int column = columnAtPoint(e.getPoint());
+        if (row == -1 || column == -1) {
+            return null;
+        }
+        return getCellRect(row, column, false).getLocation();
     }
     
     /**
