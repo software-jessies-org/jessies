@@ -68,9 +68,9 @@ that none of them requires more than a single "include" line. That's it!
 
 <p><tt>sudo bash &lt;&lt;EOF
 <br>echo deb <a href="../debian/">http://software.jessies.org/debian/</a> ./ >> /etc/apt/sources.list
-<br>wget -O - <a href="../debian/software.jessies.org.gpg">http://software.jessies.org/debian/software.jessies.org.gpg</a> | sudo apt-key add -
-<br>aptitude update
 <br>EOF
+<br>wget -O - <a href="../debian/software.jessies.org.gpg">http://software.jessies.org/debian/software.jessies.org.gpg</a> | sudo apt-key add -
+<br>sudo aptitude update
 <br>sudo aptitude install ~norg.jessies.
 </tt>
 
