@@ -74,8 +74,8 @@ public class FormDialog {
      */
     public void showNonModal() {
         this.actionLabel = "Close";
-        configureDialog();
         dialog.setModal(false);
+        configureDialog();
         dialog.setVisible(true);
     }
     
@@ -86,8 +86,8 @@ public class FormDialog {
      */
     public boolean show(String actionLabel) {
         this.actionLabel = actionLabel;
-        configureDialog();
         dialog.setModal(true);
+        configureDialog();
         dialog.setVisible(true);
         return wasAccepted;
     }
