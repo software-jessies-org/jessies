@@ -123,7 +123,7 @@ public class BirdView extends JComponent {
     }
 
     public void paintComponent(Graphics g) {
-        g.setColor(SystemColor.control); //UIManager.getColor("Scrollbar.track"));
+        g.setColor(UIManager.getColor("Panel.background"));
         g.fillRect(0, 0, getWidth(), getHeight());
 
         updateCursor();
