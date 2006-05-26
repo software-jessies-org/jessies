@@ -482,7 +482,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             Evergreen.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" is the same on disk as in the editor.");
             return;
         }
-        if (showPatchAndAskForConfirmation("Revert", "Revert to on-disk version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true)) {
+        if (showPatchAndAskForConfirmation("Revert to saved", "Revert to on-disk version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true)) {
             uncheckedRevertToSaved();
         }
     }
@@ -506,7 +506,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     public void closeWindow() {
         if (isDirty()) {
-            if (showPatchAndAskForConfirmation("Discard", "Discard changes to \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true) == false) {
+            if (showPatchAndAskForConfirmation("Discard changes", "Discard changes to \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true) == false) {
                 return;
             }
         }
@@ -742,7 +742,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     /** Saves the text. Returns true if the file was saved okay. */
     public boolean save() {
         if (file.exists() && isOutOfDateWithRespectToDisk()) {
-            if (showPatchAndAskForConfirmation("Overwrite", "Overwrite the currently saved version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", false) == false) {
+            if (showPatchAndAskForConfirmation("Overwrite file", "Overwrite the currently saved version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", false) == false) {
                 return false;
             }
         }
