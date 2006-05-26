@@ -532,6 +532,8 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			if (match != null) {
 				scrollTo(i, match.getStart().getCharOffset(), match.getEnd().getCharOffset());
 				birdsEye.setCurrentLineIndex(i);
+				// Highlight the new match in the bird view as well as in the text itself.
+				birdView.repaint();
 				return;
 			}
 		}
