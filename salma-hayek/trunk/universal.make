@@ -74,15 +74,12 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
         $(warning Try http://software.jessies.org/3rdParty/make-3.81-cygwin instead.)
     endif
     ifeq "$(TARGET_OS)" "Darwin"
-        $(warning Try our pre-built universal http://software.jessies.org/3rdParty/make-3.81-darwin instead.)
+        $(warning Try our pre-built http://software.jessies.org/3rdParty/make-3.81-darwin-universal instead.)
     endif
     ifeq "$(TARGET_OS)" "Linux"
         $(warning Debian testing/unstable has a new enough make if you do sudo apt-get install make.)
         $(warning Ubunutu "Dapper Drake" has a new enough make.)
         $(warning Or try http://software.jessies.org/3rdParty/make-3.81-linux.)
-    endif
-    ifeq "$(TARGET_OS)" "Solaris"
-        $(warning Try http://software.jessies.org/3rdParty/make-3.81rc2-solaris-i386 instead.)
     endif
 # The blank line separates any duplicate warning, which 3.80 seems fond of generating.
     $(warning )
