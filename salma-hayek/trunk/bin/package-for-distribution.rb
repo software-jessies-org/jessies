@@ -47,6 +47,16 @@ def linux_link_sources(glob, unwanted_prefix)
     }
 end
 
+# Returns a copy of s wrapped to the given width using the given separator.
+def wrap(s, width, separator)
+    i = s.rindex(/\s/, width)
+    if s.length() < width || i == nil
+        return s
+    else
+        return s[0, i] + separator + wrap(s[i + 1 .. -1], width, separator)
+    end
+end
+
 def extract_package_description_from_html(human_project_name)
     # If you're using apt-get(1), the description isn't very important because you won't get to see it.
     # Anyone using gdebi(1), though, will see this at the same time as the "Install" button, so it's worth a little effort.
@@ -59,7 +69,8 @@ def extract_package_description_from_html(human_project_name)
     if File.exist?(html_filename)
         html = IO.readlines(html_filename).join("").gsub("\n", " ")
         if html =~ /<p><strong>(.*?)<\/strong>/
-            description << "\n " << $1.gsub("&nbsp;", " ")
+            first_paragraph = $1.gsub("&nbsp;", " ")
+            description << "\n " << wrap(first_paragraph, 76, "\n ")
         end
     end
     
