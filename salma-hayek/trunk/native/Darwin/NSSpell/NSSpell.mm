@@ -4,6 +4,19 @@
 #import "ScopedAutoReleasePool.h"
 
 /**
+ * Ensures that all users of NSSpellChecker check for the case where it returns nil.
+ * We deliberately output the error on stdout rather than stderr because this program is meant to be run in a pipe, and stdout is more likely to be seen by the user.
+ */
+static NSSpellChecker* sharedSpellingChecker() {
+    NSSpellChecker* checker = [NSSpellChecker sharedSpellChecker];
+    if (checker == nil) {
+        std::cout << "[NSSpellChecker sharedSpellChecker] returned nil." << std::endl;
+        exit(2);
+    }
+    return checker;
+}
+
+/**
  * Allows NSString to be output like std::string or a const char*.
  */
 static std::ostream& operator<<(std::ostream& os, NSString* rhs) {
@@ -16,7 +29,7 @@ static std::ostream& operator<<(std::ostream& os, NSString* rhs) {
  */
 static bool isCorrect(NSString* word) {
     ScopedAutoReleasePool pool;
-    NSRange range = [[NSSpellChecker sharedSpellChecker] checkSpellingOfString:word startingAt:0];
+    NSRange range = [sharedSpellingChecker() checkSpellingOfString:word startingAt:0];
     // We only check the NSRange's length field because the location field appears to be set to an uninitialized value for incorrectly-spelled words.
     return (range.length == 0);
 }
@@ -28,7 +41,7 @@ static void showSuggestionsForWord(NSString* word) {
     ScopedAutoReleasePool pool;
     std::ostream& os = std::cout;
     
-    NSArray* guesses = [[NSSpellChecker sharedSpellChecker] guessesForWord:word];
+    NSArray* guesses = [sharedSpellingChecker() guessesForWord:word];
     if ([guesses count] == 0) {
         os << "# " << word << " 0" << std::endl;
         return;
@@ -89,6 +102,10 @@ static void ispellLoop() {
 int main(int /*argc*/, char* /*argv*/[]) {
     ScopedAutoReleasePool pool;
     
+    // Initialize NSApplication before detaching our worker thread.
+    // Otherwise NSSpellChecker sharedSpellChecker will return nil.
+    [NSApplication sharedApplication];
+    
     // Pretend to be ispell in a new thread, so we can enter the normal event
     // loop and prevent Spin Control from mistakenly diagnosing us as a hung
     // GUI application.
@@ -97,5 +114,5 @@ int main(int /*argc*/, char* /*argv*/[]) {
     Ispell* ispell = [[Ispell alloc] init];
     [NSThread detachNewThreadSelector:@selector(ispellRunLoop:) toTarget:ispell withObject:nil];
     
-    [[NSApplication sharedApplication] run];
+    [NSApp run];
 }
