@@ -81,6 +81,9 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
         $(warning Ubunutu "Dapper Drake" has a new enough make.)
         $(warning Or try http://software.jessies.org/3rdParty/make-3.81-linux.)
     endif
+    ifeq "$(TARGET_OS)" "Solaris"
+        $(warning Try installing the Blastwave "gmake" package.)
+    endif
 # The blank line separates any duplicate warning, which 3.80 seems fond of generating.
     $(warning )
 endif
