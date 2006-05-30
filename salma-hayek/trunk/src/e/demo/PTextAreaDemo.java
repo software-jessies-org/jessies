@@ -20,7 +20,7 @@ public class PTextAreaDemo {
             public void run() {
                 PTextArea area = new PTextArea();
                 area.setText(new String(getFileText(file)));
-                area.setBorder(new EmptyBorder(100, 75, 50, 30));
+                area.setBorder(new EmptyBorder(4, 4, 4, 4));
                 PTextStyler styler = getTextStyler(file, area);
                 if (styler != null) {
                     area.setTextStyler(styler);
@@ -46,6 +46,8 @@ public class PTextAreaDemo {
                 return new PCTextStyler(textArea);
             } else if (extension.equals("java")) {
                 return new PJavaTextStyler(textArea);
+            } else if (extension.equals("py")) {
+                return new PPythonTextStyler(textArea);
             }
         }
         return null;
