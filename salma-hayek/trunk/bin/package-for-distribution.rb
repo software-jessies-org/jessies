@@ -221,8 +221,15 @@ else
     # apt-get(1) thinks it implies that the installed size is zero bytes.
     # Either way, the user's better off if we declare our installed size because nothing tries to guess from the size of the package.
     installed_size = `du -sk #{tmp_dir}`.split()[0]
-
+    
+    # Make the directory for the package metadata.
     Dir.mkdir("#{tmp_dir}/DEBIAN")
+    
+    # Write the MD5 checksums for the benefit of debsums(1).
+    # Hopefully these checksums will be more widely used in future.
+    md5sums = `cd #{tmp_dir} && find . -type f -printf '%P\\0' | xargs -r0 md5sum`
+    File.new("#{tmp_dir}/DEBIAN/md5sums", "w").write(md5sums)
+    
     # What to put in DEBIAN/control: http://www.debian.org/doc/debian-policy/ch-controlfields.html
     # The DEBIAN/control file contains the most vital (and version-dependent) information about a binary package.
     File.open("#{tmp_dir}/DEBIAN/control", "w") {
