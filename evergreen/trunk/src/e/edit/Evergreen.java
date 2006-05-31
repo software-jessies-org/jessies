@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.*; 
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
@@ -466,11 +466,17 @@ public class Evergreen {
     public void handleQuit(com.apple.eawt.ApplicationEvent e) {
         boolean isSafeToQuit = true;
         boolean onMacOS = (e != null);
+        
+        ArrayList<String> dirtyFileNames = new ArrayList<String>();
+        ArrayList<Workspace> dirtyWorkspaces = new ArrayList<Workspace>();
         for (Workspace workspace : getWorkspaces()) {
-            if (workspace.getDirtyTextWindows().length != 0) {
+            ETextWindow[] dirtyWindows = workspace.getDirtyTextWindows();
+            for (ETextWindow dirtyWindow : dirtyWindows) {
+                dirtyFileNames.add(dirtyWindow.getFilename());
+            }
+            if (dirtyWindows.length != 0) {
                 isSafeToQuit = false;
-                // Ensure that the workspace in question is visible.
-                tabbedPane.setSelectedComponent(workspace);
+                dirtyWorkspaces.add(workspace);
             }
         }
         
@@ -480,7 +486,11 @@ public class Evergreen {
         }
         
         if (isSafeToQuit == false) {
-            showAlert("You have files with unsaved changes", "There are unsaved files. Please deal with them and try again.");
+            if (dirtyWorkspaces.size() == 1) {
+                // Ensure that the workspace in question is visible.
+                tabbedPane.setSelectedComponent(dirtyWorkspaces.get(0));
+            }
+            showAlert("You have files with unsaved changes", "There are unsaved files:<p>" + StringUtilities.join(dirtyFileNames, "<br>") + "<p>Please deal with them and try again.");
             return;
         }
         
