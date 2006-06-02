@@ -21,10 +21,12 @@ import javax.swing.Timer;
 public class RepeatingComponentTimer {
     private Component component;
     private Timer timer;
+    private boolean armed;
     
     public RepeatingComponentTimer(Component component, int msDelay, ActionListener listener) {
         this.component = component;
         this.timer = new Timer(msDelay, listener);
+        this.armed = false;
         initHierarchyListener();
         changeTimerState();
     }
@@ -40,10 +42,10 @@ public class RepeatingComponentTimer {
     }
     
     private void changeTimerState() {
-        if (component.isDisplayable()) {
-            start();
+        if (component.isDisplayable() && armed) {
+            timer.start();
         } else {
-            stop();
+            timer.stop();
         }
     }
     
@@ -52,10 +54,12 @@ public class RepeatingComponentTimer {
     }
     
     public void start() {
-        timer.start();
+        armed = true;
+        changeTimerState();
     }
     
     public void stop() {
-        timer.stop();
+        armed = false;
+        changeTimerState();
     }
 }
