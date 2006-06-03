@@ -28,20 +28,20 @@ public class RepeatingComponentTimer {
         this.timer = new Timer(msDelay, listener);
         this.armed = false;
         initHierarchyListener();
-        changeTimerState();
+        normalizeTimerState();
     }
     
     private void initHierarchyListener() {
         component.addHierarchyListener(new HierarchyListener() {
             public void hierarchyChanged(HierarchyEvent e) {
                 if ((e.getChangeFlags() & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0) {
-                    changeTimerState();
+                    normalizeTimerState();
                 }
             }
         });
     }
     
-    private void changeTimerState() {
+    private void normalizeTimerState() {
         if (component.isDisplayable() && armed) {
             timer.start();
         } else {
@@ -49,17 +49,18 @@ public class RepeatingComponentTimer {
         }
     }
     
+    // The timer won't be running if the component isn't displayable.
     public boolean isRunning() {
         return timer.isRunning();
     }
     
     public void start() {
         armed = true;
-        changeTimerState();
+        normalizeTimerState();
     }
     
     public void stop() {
         armed = false;
-        changeTimerState();
+        normalizeTimerState();
     }
 }
