@@ -25,6 +25,7 @@ class OsExaminer
     end
 end
 
+# Commonly returns one of "Cygwin", "Darwin", "Linux", or "Windows".
 def target_os()
     return OsExaminer.instance().os_name()
 end
