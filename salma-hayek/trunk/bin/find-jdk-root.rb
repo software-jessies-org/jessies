@@ -4,13 +4,18 @@
 # ---------------------
 #
 # If javah(1) provided a way to ask for a list of the directories that need to
-# be on the native compiler's include path, we wouldn't have needed this
+# be on the native compiler's include path, we might not have written this
 # script. But it doesn't, so we needed a way to find the current JDK's
-# include/ directory. As it happened, this script was also useful for finding
-# such things as java(1) or "rt.jar".
+# include/ directory.
+#
+# As it happened, this script was also useful for finding such things as
+# java(1) and "rt.jar".
 #
 # That's why, rather than make this script specific to the include/ directory,
 # we output the path to the top-level directory of the JDK installation.
+#
+# Note, though, that when *running* rather than building our software, this
+# script is not invoked. See "invoke-java.rb" for that case.
 #
 # How we choose a Java installation
 # ---------------------------------
@@ -21,7 +26,7 @@
 # * Using symbolic links requires a link for each program and makes it
 #   unnecessarily difficult to switch if you need to test with a newer or
 #   older version. Also, since the OS probably installed the symbolic
-#   links in /usr/bin, they're prone to being overwritten without your
+#   links in /usr/bin/, they're prone to being overwritten without your
 #   direct consent. Other applications may (reasonably) assume that
 #   the links haven't been meddled with. It makes it more likely that you're
 #   testing with an unusual (and unsupported) configuration; if you rely on
@@ -41,9 +46,36 @@
 # * Using $PATH is slightly awkward to switch versions (unless you're happy to
 #   just keep prepending), but doesn't require you to know about every utility,
 #   is understood by subprocesses, and is the default convention that everyone
-#   uses anyway. This is Sun's recommended way of working and until they make
-#   Java 5 the default, this is Apple's recommended way of using the Java 5
-#   previews.
+#   uses anyway. This is Sun's (and Apple's) recommended way of working with
+#   multiple versions.
+#
+# This is complicated somewhat when we're actually just looking for a JRE to
+# run our stuff. While it's perfectly reasonable to expect developers to
+# fiddle with $PATH to explicitly choose a JDK, it's less reasonable to expect
+# users to know or care about any of this.
+#
+# There are several other common methods for end-users:
+#
+# * If you use JNLP, you can specify exactly your requirements, including
+#   such things as "1.5 or later". This isn't an option for us, and I don't
+#   think anyone's ever implemented it to choose between different vendors'
+#   JVMs anyway; just between different versions of a single vendor's JVM.
+# * On Debian-based systems, update-java-alternatives(1) fiddles the symbolic
+#   links in /usr/bin/ to point to the various components of the selected Java
+#   implementation. This has the disadvantage of applying to all applications
+#   on the system (and most of the disadvantages of symbolic links).
+# * On Debian-based systems, there's a seemingly independent scheme using a
+#   configuration file /etc/jvm and shell scripts in /usr/share/java-common/.
+#   This is flawed because although it lets you override the default for
+#   your application, it doesn't let you do so in terms of version
+#   requirements; you have to say exactly which JVM you want, making it no
+#   better than just looking for your desired JVM in the right place. (The
+#   configuration file doesn't even necessarily tell you which JVMs are
+#   installed: it just lists some JVMs any of which may or may not be
+#   available.)
+#
+# Writing our own launcher wouldn't solve this problem; it would just shunt
+# it from Ruby to C++.
 
 def find_jdk_root()
   require "pathname.rb"

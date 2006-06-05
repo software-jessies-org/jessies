@@ -102,14 +102,43 @@ class Java
     set_icons(name)
   end
 
+  def get_java_version(java_executable)
+    java_version = `#{java_executable} -fullversion 2>&1`.chomp()
+    java_version.match(/java full version "(.*)"/)
+    java_version = $1
+    return java_version
+  end
+
+  def is_java_new_enough(java_version)
+    return (java_version.match(/^1\.[5-9]\.0/) != nil)
+  end
+
+  # This doesn't seem like a good idea to add to target-os.rb because:
+  # * lsb_release isn't necessarily available on old Linux installations.
+  # * It's probably overly specific for most needs, differentiating ebtween (say) RedHat, RedHat AS, Fedora Core, et cetera.
+  # * It's not specific enough for other needs, failing here (for example) to make it clear that you need Ubuntu 6.06 for Sun's JRE package to be available.
+  # I think this will only be a stop-gap solution.
+  def linux_distribution()
+    `lsb_release -i` =~ /^Distributor ID:\t(.*)$/
+    return $1
+  end
+
   def check_java_version()
-    # Do we have a good enough version of Java?
-    # FIXME: there's similar but different (taking the audience into account) code in "ensure-suitable-mac-os-version.rb" that should be merged with this.
-    actual_java_version = `java -fullversion 2>&1`.chomp()
-    actual_java_version.match(/java full version "(.*)"/)
-    actual_java_version = $1
-    if actual_java_version.match(/^1\.[5-9]\.0/) == nil
-      informational_alert("#{@dock_name} requires a newer version of Java.", "This application requires at least Java 5, but your #{`which java`.chomp()} claims to be #{actual_java_version} instead.\n\nPlease upgrade.")
+    actual_java_version = get_java_version(@launcher)
+    if is_java_new_enough(actual_java_version) == false
+      suggestion = "Please upgrade."
+      # FIXME: support other Linux distributions too.
+      if linux_distribution() == "Ubuntu"
+        sun_java = "/usr/lib/jvm/java-1.5.0-sun/bin/java"
+        if File.exist?(sun_java)
+          # The user's installed Sun's JRE but hasn't run update-java-alternatives(1).
+          @launcher = sun_java
+          return
+        else
+          suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, check "Show unsupported applications", type "sun java" in the search field, and install "Sun Java 5.0 Runtime".'
+        end
+      end
+      informational_alert("#{@dock_name} requires a newer version of Java.", "This application requires at least Java 5, but your #{`which java`.chomp()} claims to be #{actual_java_version} instead.\n\n#{suggestion}")
       exit(1)
     end
   end
@@ -224,8 +253,6 @@ class Java
   end
   
   def invoke(extra_app_arguments = [])
-    args = [ @launcher ]
-    
     # Back-quoting anything causes a flickering window on startup for Terminator on Windows.
     # The salma-hayek Java launcher already contains a version check.
     # The version check often "gets stuck" on Cygwin when running javahpp.
@@ -234,7 +261,10 @@ class Java
     if target_os() != "Cygwin"
       check_java_version()
     end
-    
+
+    # check_java_version may alter @launcher.
+    args = [ @launcher ]
+
     # Set the class path directly with a system property rather than -cp so
     # that our custom Win32 launcher doesn't have to convert between the two
     # forms. (Sun's Win32 JVM expects ';'-separated paths.)
