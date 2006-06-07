@@ -113,30 +113,22 @@ class Java
     return (java_version.match(/^1\.[5-9]\.0/) != nil)
   end
 
-  # This doesn't seem like a good idea to add to target-os.rb because:
-  # * lsb_release isn't necessarily available on old Linux installations.
-  # * It's probably overly specific for most needs, differentiating ebtween (say) RedHat, RedHat AS, Fedora Core, et cetera.
-  # * It's not specific enough for other needs, failing here (for example) to make it clear that you need Ubuntu 6.06 for Sun's JRE package to be available.
-  # I think this will only be a stop-gap solution.
-  def linux_distribution()
-    `lsb_release -i` =~ /^Distributor ID:\t(.*)$/
-    return $1
-  end
-
   def check_java_version()
     actual_java_version = get_java_version(@launcher)
     if is_java_new_enough(actual_java_version) == false
+      # The "java" on the path was no good.
+      # Can we salvage the situation by finding a suitable JVM?
+      sun_java = "/usr/lib/jvm/java-1.5.0-sun/bin/java"
+      if File.exist?(sun_java)
+        # The user's installed Sun's JRE but hasn't run update-java-alternatives(1).
+        @launcher = sun_java
+        return
+      end
+
+      # We didn't find a suitable JVM, so we'll just have to tell the user.
       suggestion = "Please upgrade."
-      # FIXME: support other Linux distributions too.
-      if linux_distribution() == "Ubuntu"
-        sun_java = "/usr/lib/jvm/java-1.5.0-sun/bin/java"
-        if File.exist?(sun_java)
-          # The user's installed Sun's JRE but hasn't run update-java-alternatives(1).
-          @launcher = sun_java
-          return
-        else
-          suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, check "Show unsupported applications", type "sun java" in the search field, and install "Sun Java 5.0 Runtime".'
-        end
+      if File.exist?("/usr/bin/gnome-app-install")
+        suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, check "Show unsupported applications", type "sun java" in the search field, and install "Sun Java 5.0 Runtime".'
       end
       informational_alert("#{@dock_name} requires a newer version of Java.", "This application requires at least Java 5, but your #{`which java`.chomp()} claims to be #{actual_java_version} instead.\n\n#{suggestion}")
       exit(1)
