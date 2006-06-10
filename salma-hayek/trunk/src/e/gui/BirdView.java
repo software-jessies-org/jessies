@@ -123,7 +123,15 @@ public class BirdView extends JComponent {
     }
 
     public void paintComponent(Graphics g) {
-        g.setColor(UIManager.getColor("Panel.background"));
+        if (GuiUtilities.isMacOs()) {
+            // Mac OS' Panel.background describes itself as "apple.laf.CColorPaintUIResource[r=200,g=200,b=200]".
+            // Unfortunately, this doesn't appear to be a color meant for use by normal Java code, and is presumably a tag for native code.
+            // For Java's purposes, it appears to be transparent paint.
+            // The "control" SystemColor does behave reasonably, though, so we use that.
+            g.setColor(SystemColor.control);
+        } else {
+            g.setColor(UIManager.getColor("Panel.background"));
+        }
         g.fillRect(0, 0, getWidth(), getHeight());
 
         updateCursor();
