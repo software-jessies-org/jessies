@@ -25,7 +25,7 @@
         <FileSearch Id='RUBYW.file' Name='rubyw.exe' />
       </DirectorySearch>
     </Property>
-    <Condition Message="Cygwin and Cygwin Ruby must be installed"><![CDATA[RUBYW]]></Condition>
+    <Condition Message="Cygwin and Cygwin Ruby must be installed"><![CDATA[CYGWIN AND RUBYW]]></Condition>
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='Name'
       LongName='Program Files'>
@@ -44,7 +44,14 @@
             Language='1033'
             src='../salma-hayek/.generated/WiX/salma-hayek.msm'
             DiskId='1' /><?include component-definitions.wxi ?>
+            <Directory Id='bin' Name='Name'
+            LongName='bin'>
+              <Component Id='Path'
+              Guid='$(env.PATH_GUID)'>
+                <Environment Id='UpdatePath' Name='PATH' Action='create' System='yes' Part='last' Value='[bin]' />
+              </Component>
             </Directory>
+          </Directory>
         </Directory>
       </Directory>
       <Directory Id='DesktopFolder' Name='Desktop' />
@@ -63,6 +70,7 @@
     <Feature Id='product' Title='$(env.HUMAN_PROJECT_NAME)' Level='1'>
       <ComponentRef Id='StandardFiles' />
       <ComponentRef Id='RubyShortcut' />
+      <ComponentRef Id='Path' />
       <MergeRef Id='salma_hayek.d7665d40-3540-11da-8cd6-0800200c9a66' /><?include component-references.wxi ?>
       </Feature>
     <InstallExecuteSequence>

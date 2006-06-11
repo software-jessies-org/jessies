@@ -629,6 +629,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 %.wixobj: %.wxs .generated/build-revision.txt $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
 	HUMAN_PROJECT_NAME=$(HUMAN_PROJECT_NAME) \
 	MACHINE_PROJECT_NAME=$(MACHINE_PROJECT_NAME) \
+	PATH_GUID=$(makeGuid) \
 	PRODUCT_GUID=$(makeGuid) \
 	SHORTCUT_GUID=$(makeGuid) \
 	STANDARD_FILES_GUID=$(makeGuid) \
