@@ -2,7 +2,9 @@ require "pathname.rb"
 salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
 require "#{salma_hayek}/bin/target-os.rb"
 
-if target_os() == "Darwin"
+if defined?(show_alert)
+    # Allow this library to be multiply included without warning.
+elsif target_os() == "Darwin"
     
     def show_alert(title, message)
         # AppleScript's "display alert" isn't available before 10.4.
@@ -22,9 +24,9 @@ elsif target_os() == "Linux"
     
     def show_alert(caption, message)
         command = [ "zenity" ]
-        command << "--title=#{@dock_name}"
-        command << "--window-icon=#{@png_icon}"
-        command << "--error"
+        # The GNOME HIG suggests that dialog titles should be empty, but zenity(1) doesn't currently ensure this.
+        command << "--title="
+        command << "--info"
         command << "--text"
         command << "#{caption}\n\n#{message}"
         system(*command)
