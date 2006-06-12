@@ -26,7 +26,8 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
         int normalStart = 0;
         int offset = segment.getOffset();
         while (matcher.find()) {
-            if (isAcceptableMatch(line, matcher)) {
+            // We need exactly 2 groups, but we accept more in case the user has used extra groups without making them non-capturing.
+            if (matcher.groupCount() >= 2 && isAcceptableMatch(line, matcher)) {
                 final int matchStart = matcher.start(1);
                 final int matchEnd = matcher.end(1);
                 if (matchStart > normalStart) {

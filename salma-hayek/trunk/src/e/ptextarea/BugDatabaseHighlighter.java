@@ -28,12 +28,36 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         
         // Sun Java bugs.
         highlightBug(textArea, "\\b(([4-6]\\d{6}))\\b", "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=%s");
-        
-        // RFCs.
+        // RFCs; not strictly bugs, but often referenced in comments.
         highlightBug(textArea, "(?i)\\b(rfc\\s*(\\d{3,4}))\\b", "http://ftp.rfc-editor.org/in-notes/rfc%s");
         
-        // BlueArc's internal bug database.
-        highlightBug(textArea, "\\b(D([1-2]\\d{4}))\\b", "http://woggle/%s");
+        // Try to run the site-local script.
+        // The format is "^<pattern-to-match>\t<link-template>$" where the pattern's groups are as above.
+        // For example, this uses only Bash, keeps the two parts distinct, and avoids escaping issues:
+        //
+        // #!/bin/bash
+        // echo -nE "\b(D([1-2]\d{4}))\b" ; echo -ne "\t" ; echo -E "http://woggle/%s"
+        //
+        final String scriptName = "echo-local-bug-database-patterns";
+        String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
+        ArrayList<String> lines = new ArrayList<String>();
+        ProcessUtilities.backQuote(null, command, lines, new ArrayList<String>());
+        for (String line : lines) {
+            System.out.println(line);
+            line = line.trim();
+            if (line.length() == 0 || line.startsWith("#")) {
+                // Ignore comments.
+                continue;
+            }
+            int tabIndex = line.indexOf('\t');
+            if (tabIndex == -1) {
+                Log.warn("BugDatabaseHighlighter didn't understand line \"" + line + "\"; no tab found.");
+                continue;
+            }
+            String pattern = line.substring(0, tabIndex);
+            String template = line.substring(tabIndex + 1);
+            highlightBug(textArea, pattern, template);
+        }
     }
     
     private static void highlightBug(PTextArea textArea, String regularExpression, String urlTemplate) {
