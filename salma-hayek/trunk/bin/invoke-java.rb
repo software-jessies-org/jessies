@@ -88,11 +88,14 @@ class Java
     # Cope with symbolic links to this script.
     @project_root = Pathname.new("#{$0}/..").realpath().dirname()
     @salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
+    
+    # Load salma-hayek libraries.
     require "#{@salma_hayek}/bin/target-os.rb"
-
+    require "#{@salma_hayek}/bin/show-alert.rb"
+    require "#{@salma_hayek}/bin/find-jdk-root.rb"
+    
     @extra_java_arguments = []
 
-    require "#{@salma_hayek}/bin/find-jdk-root.rb"
     @jdk_root = find_jdk_root()
 
     init_default_heap_size()
@@ -130,20 +133,9 @@ class Java
       if File.exist?("/usr/bin/gnome-app-install")
         suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, check "Show unsupported applications", type "sun java" in the search field, and install "Sun Java 5.0 Runtime".'
       end
-      informational_alert("#{@dock_name} requires a newer version of Java.", "This application requires at least Java 5, but your #{`which java`.chomp()} claims to be #{actual_java_version} instead.\n\n#{suggestion}")
+      show_alert("#{@dock_name} requires a newer version of Java.", "This application requires at least Java 5, but your #{`which java`.chomp()} claims to be #{actual_java_version} instead.\n\n#{suggestion}")
       exit(1)
     end
-  end
-
-  def informational_alert(caption, message)
-    # FIXME: there's very similar code for Mac OS in "ensure-suitable-mac-os-version.rb" that should be merged with this, perhaps by putting a fake "zenity" script for Mac OS on the path and making sure the path is set up before we get here.
-    command = [ "zenity" ]
-    command << "--title=#{@dock_name}"
-    command << "--window-icon=#{@png_icon}"
-    command << "--error"
-    command << "--text"
-    command << "#{caption}\n\n#{message}"
-    system(*command)
   end
 
   def add_class_path_entries(new_entries)
