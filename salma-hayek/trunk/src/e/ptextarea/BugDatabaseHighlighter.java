@@ -43,7 +43,6 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         ArrayList<String> lines = new ArrayList<String>();
         ProcessUtilities.backQuote(null, command, lines, new ArrayList<String>());
         for (String line : lines) {
-            System.out.println(line);
             line = line.trim();
             if (line.length() == 0 || line.startsWith("#")) {
                 // Ignore comments.
