@@ -47,6 +47,7 @@ public class FatBits extends JFrame {
         setContentPane(makeUi());
         setJMenuBar(new FatBitsMenuBar());
         timer = new RepeatingComponentTimer(this, 50, new MouseTracker());
+        timer.start();
     }
     
     private JComponent makeUi() {
