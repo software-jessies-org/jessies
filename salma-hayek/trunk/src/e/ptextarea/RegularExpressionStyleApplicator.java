@@ -1,6 +1,7 @@
 package e.ptextarea;
 
 import e.gui.*;
+import e.util.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.regex.*;
@@ -26,8 +27,11 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
         int normalStart = 0;
         int offset = segment.getOffset();
         while (matcher.find()) {
-            // We need exactly 2 groups, but we accept more in case the user has used extra groups without making them non-capturing.
-            if (matcher.groupCount() >= 2 && isAcceptableMatch(line, matcher)) {
+            if (isAcceptableMatch(line, matcher)) {
+                // We need exactly one group, but we accept more in case the user has used extra groups without making them non-capturing.
+                if (matcher.groupCount() < 1) {
+                    Log.warn("RegularExpressionStyleApplicator for \"" + pattern + "\" disabled because it has no capturing group.");
+                }
                 final int matchStart = matcher.start(1);
                 final int matchEnd = matcher.end(1);
                 if (matchStart > normalStart) {
