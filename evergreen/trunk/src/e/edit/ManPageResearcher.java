@@ -37,7 +37,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         TreeSet<String> uniqueIdentifiers = new TreeSet<String>();
         
         int pageCount = 0;
-        Pattern manPagePattern = Pattern.compile("^(.*)\\.([23][a-z]*)(\\.gz)?$");
+        Pattern manPagePattern = Pattern.compile("^(.*)\\.([23][A-Za-z]*)(\\.gz)?$");
         for (File manPath : findManPageDirectories()) {
             String[] manPages = manPath.list();
             if (manPages == null) manPages = new String[0];
