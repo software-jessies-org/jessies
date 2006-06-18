@@ -428,6 +428,7 @@ public class Evergreen {
         tabbedPane.remove(workspace);
         fireTabbedPaneTabCountChange();
         workspace.moveFilesToBestWorkspaces();
+        workspace.dispose();
     }
     
     /**
