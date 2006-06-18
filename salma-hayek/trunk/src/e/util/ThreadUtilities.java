@@ -4,22 +4,21 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 public class ThreadUtilities {
-    
     /**
      * Prevents instantiation.
      */
-    private ThreadUtilities() { }
+    private ThreadUtilities() {
+    }
     
     /**
      * Returns an Executor that uses a single worker thread, just like
-     * {@link Executors#newSingleThreadExecutor}. The worker thread's name is
-     * poolName-thread-N, where N is the sequence number of the thread created
-     * by this Executor's thread factory.
+     * {@link Executors#newSingleThreadExecutor}. The worker thread
+     * will have the given name.
      */
-    public static ExecutorService newSingleThreadExecutor(final String poolName) {
+    public static ExecutorService newSingleThreadExecutor(final String threadName) {
         return Executors.newSingleThreadExecutor(new DaemonThreadFactory() {
             public String newThreadName() {
-                return poolName;
+                return threadName;
             }
         });
     }
