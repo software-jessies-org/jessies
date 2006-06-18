@@ -297,24 +297,7 @@ public class Workspace extends JPanel {
                 }
             });
         }
-        if (GuiUtilities.isMacOs()) {
-            // Phil claimed "there's a bug in Mac OS' handling of 'return' presses from dialogs, causing
-            // a return character to be propagated to the component with focus, as well as
-            // performing the dialog's action.  This is an ugly hack to get around this,
-            // basically forcing those irritating return characters into the errors window,
-            // where I care far less about them.  It's not pretty, but this bug has been
-            // winding me up for ages, so I feel somewhat vindicated."
-            // I only rarely saw that on my dual G5, but it's 100% repeatable running Java 6 on Windows 2000 (I haven't tried Java 5).
-            // My assumption at this point is that it's not a Java bug: it's our code that's broken somewhere.
-            errorsWindow.requestFocus();
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    viewer.requestFocus();
-                }
-            });
-        } else {
-            viewer.requestFocus();
-        }
+        viewer.requestFocus();
         return viewer;
     }
     
