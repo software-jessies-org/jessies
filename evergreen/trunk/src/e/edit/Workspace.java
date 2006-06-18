@@ -6,6 +6,7 @@ import e.util.*;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
@@ -28,24 +29,48 @@ public class Workspace extends JPanel {
     
     private ETextWindow rememberedTextWindow;
     
+    private FileAlterationMonitor fileAlterationMonitor;
+    private ExecutorService fileListUpdateExecutorService;
+    
     public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
         this.title = title;
         this.rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
         this.buildTarget = "";
+        initFileAlterationMonitor();
         add(makeUI(), BorderLayout.CENTER);
+    }
+    
+    private void initFileAlterationMonitor() {
+        // We have one thread to check for last-modified time changes...
+        this.fileAlterationMonitor = new FileAlterationMonitor(rootDirectory);
+        // And another thread to update our list of files...
+        this.fileListUpdateExecutorService = ThreadUtilities.newSingleThreadExecutor("File List Updater for " + rootDirectory);
+        
+        fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
+            public void fileTouched(String pathname) {
+                updateFileList(null);
+            }
+        });
+        
+        fileAlterationMonitor.addPathname(rootDirectory);
+    }
+    
+    public void dispose() {
+        fileAlterationMonitor.dispose();
     }
     
     /**
      * Fills the file list. It can take some time to scan for files, so we do
-     * the job in the background.
+     * the job in the background. New requests that arrive while a scan is
+     * already in progress will be queued behind the in-progress scan.
      */
-    public void updateFileList(ChangeListener listener) {
+    public synchronized void updateFileList(ChangeListener listener) {
         FileListUpdater fileListUpdater = new FileListUpdater(listener);
-        fileListUpdater.execute();
+        fileListUpdateExecutorService.execute(fileListUpdater);
     }
     
-    public class FileListUpdater extends SwingWorker<ArrayList<String>, Object> {
+    private class FileListUpdater extends SwingWorker<ArrayList<String>, Object> {
         private ChangeListener listener;
         
         public FileListUpdater(ChangeListener listener) {
@@ -57,8 +82,8 @@ public class Workspace extends JPanel {
         protected ArrayList<String> doInBackground() {
             ArrayList<String> newFileList = scanWorkspaceForFiles();
             // Many file systems will have returned the files not in
-            // alphabetical order, so we sort them ourselves here so
-            // that users of the list can assume it's in order.
+            // alphabetical order, so we sort them ourselves here.
+            // Users of the list can then assume it's in order.
             Collections.sort(newFileList, String.CASE_INSENSITIVE_ORDER);
             fileList = newFileList;
             return fileList;
@@ -206,7 +231,6 @@ public class Workspace extends JPanel {
     }
     
     public EWindow findWindowByName(String name) {
-        //FIXME: if the file's not already open, we need to find it and open it.
         return leftColumn.findWindowByName(name);
     }
     
