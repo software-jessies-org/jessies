@@ -46,7 +46,7 @@ public class FileIgnorer {
         patterns.add("\\.bzr");
         patterns.add("\\.hg");
         patterns.add("\\.svn");
-        patterns.add("BitKeeper");
+        patterns.add("BitKeeper"); patterns.add("RESYNC");
         patterns.add("CVS");
         patterns.add("SCCS");
         
