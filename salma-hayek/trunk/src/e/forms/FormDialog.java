@@ -333,8 +333,8 @@ public class FormDialog {
      * May be invoked programmatically to dismiss the dialog as if accepted.
      */
     public void acceptDialog() {
-        acceptRunnable.run();
         processUserChoice(true);
+        EventQueue.invokeLater(acceptRunnable);
     }
     
     /**
@@ -342,8 +342,8 @@ public class FormDialog {
      * May be invoked programmatically to dismiss the dialog as if canceled.
      */
     public void cancelDialog() {
-        cancelRunnable.run();
         processUserChoice(false);
+        EventQueue.invokeLater(cancelRunnable);
     }
 
     private void processUserChoice(boolean isAcceptance) {
