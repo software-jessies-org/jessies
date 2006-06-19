@@ -246,13 +246,17 @@ public class Workspace extends JPanel {
     /** Returns the EWindow corresponding to the given file. If the file's open, shows the given address. */
     public EWindow findIfAlreadyOpen(String filename, String address) {
         /* Check we don't already have this open as a file or directory. */
-        EWindow window = findWindowByName(filename);
+        final EWindow window = findWindowByName(filename);
         if (window != null) {
             leftColumn.setSelectedWindow(window);
             window.ensureSufficientlyVisible();
             ETextWindow textWindow = (ETextWindow) window;
             textWindow.jumpToAddress(address);
-            window.requestFocus();
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    window.requestFocus();
+                }
+            });
             return window;
         }
         return null;
@@ -297,7 +301,11 @@ public class Workspace extends JPanel {
                 }
             });
         }
-        viewer.requestFocus();
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                viewer.requestFocus();
+            }
+        });
         return viewer;
     }
     
