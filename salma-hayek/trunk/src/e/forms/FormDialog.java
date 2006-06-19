@@ -490,6 +490,8 @@ public class FormDialog {
     /**
      * Sets an optional runnable that will be run if this dialog is accepted,
      * just before the dialog is removed from the display.
+     * 
+     * Any intended focus changes should be performed via invokeLater.
      */
     public void setAcceptRunnable(Runnable runnable) {
         this.acceptRunnable = runnable;
@@ -498,6 +500,8 @@ public class FormDialog {
     /**
      * Sets an optional runnable that will be run if this dialog is canceled,
      * just before the dialog is removed from the display.
+     * 
+     * Any intended focus changes should be performed via invokeLater.
      */
     public void setCancelRunnable(Runnable runnable) {
         this.cancelRunnable = runnable;
