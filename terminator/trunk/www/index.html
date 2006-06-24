@@ -115,21 +115,41 @@ now surpassed Terminal in several areas.
 window manager like lwm. Now you can use the same terminal emulator everywhere!
 
 <p>By default, Terminator will start the shell specified by the SHELL environment variable.
-You can start other programs, even in multiple tabs, from the command line -
-see terminator --help for the syntax.
+You can start other programs, even in multiple tabs, from the command line&nbsp;&mdash; see <tt>terminator --help</tt> for the syntax.
 
 <h3>Terminfo/Curses</h3>
 
-<p>Terminator has its own terminfo file.
-(This is regrettably necessary because of Terminator's unconventional approach to handling wide lines with a horizontal scrollbar rather than by wrapping them.)
-This will be installed in your home
-directory unless Terminator is able to write to the system-wide
-terminfo directory. This will only be the case if you run Terminator as root.
+<p>Terminator has its own terminfo file. (This is regrettably necessary because of Terminator's unconventional approach to handling wide lines with a horizontal scrollbar rather than by wrapping them.)
+The file will be installed in <tt>~/.terminfo</tt> unless you used an installer that runs as root and can write to the system-wide terminfo directory (currently just the Linux installer).
+
+<p>If you run Terminator itself as root and the terminfo file has not been installed in the system-wide terminfo directory, it will be installed at that point.
+
+<p>If the terminfo file isn't available, the most common warnings you'll see are this one from programs such as <tt>less(1)</tt>:
+<pre>
+WARNING: terminal is not fully functional
+-  (press RETURN)
+</pre>
+and this one, from <tt>vim(1)</tt>:
+<pre>
+E558: Terminal entry not found in terminfo
+'terminator' not known. Available builtin terminals are:
+    builtin_riscos
+    builtin_amiga
+    builtin_beos-ansi
+    builtin_ansi
+    builtin_pcansi
+    builtin_win32
+    builtin_vt320
+    builtin_vt52
+    builtin_xterm
+    builtin_iris-ansi
+    builtin_debug
+    builtin_dumb
+defaulting to 'ansi'
+</pre>
 
 <h4>Logging in as other users/root</h4>
-<p>If the terminfo file is only installed in your home directory then you
-will see "terminal is not fully functional" problems when using <tt>su(1)</tt>
-to switch to another user (although <tt>sudo(1)</tt> will work fine).
+<p>If the terminfo file is not installed in the system-wide location then other users (and you if you use <tt>su(1)</tt> to switch to another user) will have problems. Using <tt>sudo(1)</tt> to run a command as another user will work in many cases, because it doesn't alter <tt>$HOME</tt> by default.
 
 <p>For best results, on computers where you'll be logged in as root at times,
 we recommend you install the terminfo file for Terminator in
@@ -138,27 +158,21 @@ Terminator once as root. From then on, you can run Terminator as your normal
 user, and use <tt>su(1)</tt> to become root.
 
 <h4>Logging in to remote systems</h4>
-<p>You will also need to ensure that any machines you'll be remotely logging
-in to also have a copy of the terminfo file installed. If you share a home
-directory on the local and remote machine, you'll have no trouble. Likewise if
-someone has run Terminator as root on the remote machine.
+<p>You will also need to ensure that any machines you'll be remotely logging in to also have a copy of the terminfo file installed. If you share a home directory on the local and remote machine, everything will just work. Likewise if someone has already run Terminator as root on the remote machine.
 
-<p>(Note that if you're running Terminator on a remote machine, it probably
-won't be able to open a window. Nonetheless, it will get far enough to set up
-the terminfo file. Running Terminator on a remote machine as a matter of course
-is usually a mistake. You should run Terminator locally and log in remotely.)
+<p>(Note that if you try to run Terminator on a remote machine, it probably won't get as far as opening a window. Nonetheless, it will get far enough to set up the terminfo file. Note also that running Terminator on a remote machine as a matter of course is usually a mistake, and will be much slower than running Terminator on your local machine and simply logging in to the remote machine from within Terminator.)
 
-<p>If you're not able to run Terminator as root, you can copy
-the terminfo file to <tt>~/.terminfo/t/terminator</tt> on the remote
-machine (you'll need to <tt>mkdir -p ~/.terminfo/t</tt> if the directories
-don't already exist). This is enough on most GNU-based systems, such as Linux;
-if you still have problems (if 'vi' complains that the terminal is not fully
-functional), add the following lines to <tt>~/.profile</tt> file on the remote
-machine:
+<p>If you're not able to run Terminator as root, you can simply run Terminator as yourself on the remote machine.
+
+<p>If you can't easily install Terminator on the remote machine, you only need to copy the terminfo file to <tt>~/.terminfo/t/terminator</tt> (you'll need to <tt>mkdir -p ~/.terminfo/t</tt> if the directories don't already exist).
+
+<p>On Linux or Mac OS, and most other ncurses-based systems, this is all you need to do. If you still have problems like the ones shown at the start of this section, add the following lines to <tt>~/.profile</tt> file on the remote machine:
 <pre>
 export TERMINFO=~/.terminfo
 export TERM=$TERM
 </pre>
+
+<p>See "Running on Windows" below for a note about Cygwin.
 
 <p>FreeBSD systems don't come with the necessary terminfo support installed by
 default.  It's apparently a snap to install the
@@ -175,12 +189,11 @@ java.awt.datatransfer.UnsupportedFlavorException: Unicode String
 
 <h3>Running on Windows</h3>
 
-<p>If you're having trouble starting Terminator, you may want to try running it from bash
+<p>If you're having trouble starting Terminator, you may want to try running it from Bash
 instead of from the desktop shortcut until you work out what's wrong.
-Running it manually will use ruby.exe rather than the rubyw.exe used by the shortcut.
-rubyw.exe is a version of Ruby linked with the --subsystem windows instead of
---subsystem console.
-rubyw.exe quits with no visible error if it tries to do standard I/O.
+Running it manually will use <tt>ruby.exe</tt> rather than the <tt>rubyw.exe</tt> used by the shortcut.
+<tt>rubyw.exe</tt> is a version of Ruby linked with <tt>--subsystem windows</tt> instead of <tt>--subsystem console</tt>.
+<tt>rubyw.exe</tt> quits with no visible error if it tries to do standard I/O.
 One reason why it might do this is a world-writable directory on the PATH, as explained
 <a href="../salma-hayek/cygwin-setup.html">here</a>.
 Any console output from the Java, as opposed to the start-up script, is recorded in a file in
