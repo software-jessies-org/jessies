@@ -63,7 +63,9 @@ public:
       std::string version = it->getName();
       if (version.empty() || isdigit(version[0]) == false) {
         // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
-        // "CurrentVersion" didn't get updated when I installed JDK-1.5.0_06 (or the two prior versions by the look of it)..
+        // The registry keys and Sun's installer's behavior regarding them is documented at:
+        // http://java.sun.com/j2se/1.5.0/runtime_windows.html
+        // The first claim on that page (that "CurrentVersion" is the highest-numbered version ever installed) appears to be the true claim.
         continue;
       }
       if (version < "1.5") {
