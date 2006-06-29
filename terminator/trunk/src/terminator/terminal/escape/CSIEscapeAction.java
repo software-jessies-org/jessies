@@ -32,26 +32,55 @@ public class CSIEscapeAction implements TerminalAction {
 		char lastChar = sequence.charAt(sequence.length() - 1);
 		String midSequence = sequence.substring(1, sequence.length() - 1);
 		switch (lastChar) {
-			case 'A': return moveCursor(listener, midSequence, 0, -1);
-			case 'B': return moveCursor(listener, midSequence, 0, 1);
-			case 'C': return moveCursor(listener, midSequence, 1, 0);
-			case 'c': return deviceAttributesRequest(listener, midSequence);
-			case 'D': return moveCursor(listener, midSequence, -1, 0);
-			case 'd': return moveCursorRowTo(listener, midSequence);
-			case 'G': case '`': return moveCursorColumnTo(listener, midSequence);
-			case 'f': case 'H': return moveCursorTo(listener, midSequence);
-			case 'K': return killLineContents(listener, midSequence);
-			case 'J': return killLines(listener, midSequence);
-			case 'L': return insertLines(listener, midSequence);
-			case 'M': return deleteLines(listener, midSequence);
-			case 'P': return deleteCharacters(listener, midSequence);
-			case 'g': return clearTabs(listener, midSequence);
-			case 'h': return setMode(listener, midSequence, true);
-			case 'l': return setMode(listener, midSequence, false);
-			case 'm': return processFontEscape(listener, midSequence);
-			case 'n': return processDeviceStatusReport(listener, midSequence);
-			case 'r': return setScrollScreen(listener, midSequence);
-			default: return false;
+		case 'A':
+			return moveCursor(listener, midSequence, 0, -1);
+		case 'B':
+			return moveCursor(listener, midSequence, 0, 1);
+		case 'C':
+			return moveCursor(listener, midSequence, 1, 0);
+		case 'c':
+			return deviceAttributesRequest(listener, midSequence);
+		case 'D':
+			return moveCursor(listener, midSequence, -1, 0);
+		case 'd':
+			return moveCursorRowTo(listener, midSequence);
+		case 'G':
+		case '`':
+			return moveCursorColumnTo(listener, midSequence);
+		case 'f':
+		case 'H':
+			return moveCursorTo(listener, midSequence);
+		case 'K':
+			return killLineContents(listener, midSequence);
+		case 'J':
+			return killLines(listener, midSequence);
+		case 'L':
+			return insertLines(listener, midSequence);
+		case 'M':
+			return deleteLines(listener, midSequence);
+		case 'P':
+			return deleteCharacters(listener, midSequence);
+		case 'g':
+			return clearTabs(listener, midSequence);
+		case 'h':
+			return setDecPrivateMode(listener, midSequence, true);
+		case 'l':
+			return setDecPrivateMode(listener, midSequence, false);
+		case 'm':
+			return processFontEscape(listener, midSequence);
+		case 'n':
+			return processDeviceStatusReport(listener, midSequence);
+		case 'r':
+			if (midSequence.startsWith("?")) {
+				return restoreDecPrivateModes(listener, midSequence);
+			} else {
+				return setScrollingRegion(listener, midSequence);
+			}
+		case 's':
+			return saveDecPrivateModes(listener, midSequence);
+		default:
+			Log.warn("unknown CSI sequence " + sequence);
+			return false;
 		}
 	}
 	
@@ -85,7 +114,7 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	private boolean setMode(TextBuffer listener, String seq, boolean value) {
+	private boolean setDecPrivateMode(TextBuffer listener, String seq, boolean value) {
 		boolean isPrivateMode = seq.startsWith("?");
 		String[] modes = (isPrivateMode ? seq.substring(1) : seq).split(";");
 		for (String modeString : modes) {
@@ -117,12 +146,22 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean setScrollScreen(TextBuffer listener, String seq) {
+	public boolean restoreDecPrivateModes(TextBuffer listener, String seq) {
+		Log.warn("Restore DEC private mode values not implemented (CSI " + seq + ")");
+		return false;
+	}
+	
+	public boolean saveDecPrivateModes(TextBuffer listener, String seq) {
+		Log.warn("Save DEC private mode values not implemented (CSI " + seq + ")");
+		return false;
+	}
+	
+	public boolean setScrollingRegion(TextBuffer listener, String seq) {
 		int index = seq.indexOf(';');
 		if (index == -1) {
-			listener.setScrollScreen(-1, -1);
+			listener.setScrollingRegion(-1, -1);
 		} else {
-			listener.setScrollScreen(Integer.parseInt(seq.substring(0, index)), Integer.parseInt(seq.substring(index + 1)));
+			listener.setScrollingRegion(Integer.parseInt(seq.substring(0, index)), Integer.parseInt(seq.substring(index + 1)));
 		}
 		return true;
 	}

@@ -589,7 +589,7 @@ public class TextBuffer {
 	}
 
 	/** Sets the first and last lines to scroll.  If both are -1, make the entire screen scroll. */
-	public void setScrollScreen(int firstLine, int lastLine) {
+	public void setScrollingRegion(int firstLine, int lastLine) {
 		firstScrollLineIndex = ((firstLine == -1) ? 1 : firstLine) - 1;
 		lastScrollLineIndex = ((lastLine == -1) ? height : lastLine) - 1;
 	}
