@@ -168,11 +168,15 @@ public class CSIEscapeAction implements TerminalAction {
 	
 	public boolean deviceAttributesRequest(TextBuffer listener, String seq) {
 		if (seq.equals("") || seq.equals("0")) {
-			control.sendUtf8String(Ascii.ESC + "[?1;0c");
+			sendDeviceAttributes(control);
 			return true;
 		} else {
 			return false;
 		}
+	}
+	
+	public static void sendDeviceAttributes(TerminalControl control) {
+		control.sendUtf8String(Ascii.ESC + "[?1;0c");
 	}
 	
 	public boolean deleteCharacters(TextBuffer listener, String seq) {

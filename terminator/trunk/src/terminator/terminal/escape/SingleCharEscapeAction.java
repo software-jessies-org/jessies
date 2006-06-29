@@ -46,8 +46,9 @@ public class SingleCharEscapeAction implements TerminalAction {
 			case 'M':  // Move cursor up one line, scrolling if it reaches the top of scroll region.  Opposite of NL.
 				listener.scrollDisplayUp();
 				break;
-			case 'Z':  // rxvt: Print ESCZ_ANSWER
-				unsupported("Print ESCZ_ANSWER");
+			case 'Z':
+				// An obsolete form of ESC [ c (send device attributes).
+				CSIEscapeAction.sendDeviceAttributes(control);
 				break;
 			case 'c':  // Power on (full reset).
 				listener.fullReset();
