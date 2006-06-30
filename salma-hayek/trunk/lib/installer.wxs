@@ -48,6 +48,7 @@
             LongName='bin'>
               <Component Id='Path'
               Guid='$(env.PATH_GUID)'>
+                <CreateFolder />
                 <Environment Id='UpdatePath' Name='PATH' Action='create' System='yes' Part='last' Value='[bin]' />
               </Component>
             </Directory>
