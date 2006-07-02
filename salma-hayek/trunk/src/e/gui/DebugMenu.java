@@ -23,6 +23,8 @@ public class DebugMenu {
         menu.addSeparator();
         menu.add(new ListFramesAction());
         menu.add(new ListTimersAction());
+        menu.addSeparator();
+        menu.add(new HeapViewAction());
         // FIXME: an action to turn on debugging of hung AWT exits. All frames or just the parent frame? Just the parent is probably the more obvious (given that new frames could be created afterwards).
         return menu;
     }
@@ -183,6 +185,22 @@ public class DebugMenu {
                 result.append(line);
             }
             return result.toString();
+        }
+    }
+    
+    private static class HeapViewAction extends AbstractAction {
+        public HeapViewAction() {
+            super("Show Heap Usage");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            JFrame frame = new JFrame("Heap Usage");
+            JFrameUtilities.setFrameIcon(frame);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setContentPane(new HeapView());
+            frame.setSize(new Dimension(400, 200));
+            frame.setResizable(false);
+            frame.setVisible(true);
         }
     }
 }
