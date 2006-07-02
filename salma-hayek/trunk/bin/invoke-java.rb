@@ -121,9 +121,26 @@ class Java
     if is_java_new_enough(actual_java_version) == false
       # The "java" on the path was no good.
       # Can we salvage the situation by finding a suitable JVM?
+
+      # This works for Linux distributions using Sun's RPM, and for Solaris.
+      globs = [ "/usr/java/jdk1.6.0*", "/usr/java/jre1.6.0*", "/usr/java/jdk1.5.0*", "/usr/java/jre1.5.0*" ]
+      globs.each() {
+        |glob|
+        java_directories = Dir.glob(glob).sort().reverse()
+        java_directories.each() {
+          |java_directory|
+          bin_java = File.join(java_directory, "bin", "java")
+          if File.exist?(bin_java)
+            @launcher = bin_java
+            return
+          end
+        }
+      }
+
+      # This works for Linux distributions using the Debian package for Sun's JVM where the user hasn't run update-java-alternatives(1).
+      # (If they have configured Sun's JVM as their default, we won't have had to grovel about for a suitable JVM.)
       sun_java = "/usr/lib/jvm/java-1.5.0-sun/bin/java"
       if File.exist?(sun_java)
-        # The user's installed Sun's JRE but hasn't run update-java-alternatives(1).
         @launcher = sun_java
         return
       end
