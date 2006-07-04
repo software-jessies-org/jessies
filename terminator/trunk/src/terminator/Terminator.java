@@ -188,6 +188,10 @@ public class Terminator {
 					}
 					
 					GuiUtilities.initLookAndFeel();
+					
+					// On Mac OS, tab panes use a lot of space. This makes them slightly less greedy.
+					UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
+					
 					PrintWriter outWriter = new PrintWriter(System.out);
 					PrintWriter errWriter = new PrintWriter(System.err);
 					Terminator.getSharedInstance().parseOriginalCommandLine(arguments, outWriter, errWriter);
