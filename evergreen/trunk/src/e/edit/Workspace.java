@@ -34,14 +34,19 @@ public class Workspace extends JPanel {
     
     public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
-        this.title = title;
-        this.rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
+        setTitle(title);
+        setRootDirectory(rootDirectory);
         this.buildTarget = "";
-        initFileAlterationMonitor();
         add(makeUI(), BorderLayout.CENTER);
     }
     
     private void initFileAlterationMonitor() {
+        // Get rid of any existing file alteration monitor.
+        if (fileAlterationMonitor != null) {
+            fileAlterationMonitor.dispose();
+            fileAlterationMonitor = null;
+        }
+        
         // We have one thread to check for last-modified time changes...
         this.fileAlterationMonitor = new FileAlterationMonitor(rootDirectory);
         // And another thread to update our list of files...
@@ -139,6 +144,11 @@ public class Workspace extends JPanel {
         return title;
     }
     
+    public void setTitle(String title) {
+        this.title = title;
+        leftColumn.updateTabForWorkspace();
+    }
+    
     /**
      * Returns the normal, friendly form rather than the OS-canonical one.
      * See also getCanonicalRootDirectory.
@@ -146,6 +156,11 @@ public class Workspace extends JPanel {
      */
     public String getRootDirectory() {
         return rootDirectory;
+    }
+    
+    public void setRootDirectory(String rootDirectory) {
+        this.rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
+        initFileAlterationMonitor();
     }
     
     /**
