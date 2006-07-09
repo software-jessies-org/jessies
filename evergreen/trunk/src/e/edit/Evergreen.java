@@ -791,6 +791,7 @@ public class Evergreen {
                 Workspace workspace = (Workspace) tabbedPane.getComponentAt(tabIndex);
                 actions.add(new RescanWorkspaceAction(workspace));
                 actions.add(null);
+                actions.add(new EditWorkspaceAction(workspace));
                 actions.add(new RemoveWorkspaceAction(workspace));
             }
         });

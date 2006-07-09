@@ -156,6 +156,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new RescanWorkspaceAction());
         menu.add(new JSeparator());
         menu.add(new AddWorkspaceAction());
+        menu.add(new EditWorkspaceAction());
         menu.add(new RemoveWorkspaceAction());
         menu.add(new JSeparator());
         menu.add(new CycleWorkspacesAction(1));
