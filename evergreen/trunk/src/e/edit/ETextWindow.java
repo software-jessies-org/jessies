@@ -104,6 +104,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setViewport(watermarkViewPort);
         
+        initCaretListener();
         initFocusListener();
         this.birdView = new BirdView(new PTextAreaBirdsEye(text), scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
@@ -132,6 +133,36 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     private void initBugDatabaseLinks() {
         BugDatabaseHighlighter.highlightBugs(text);
+    }
+    
+    private void initCaretListener() {
+        text.addCaretListener(new PCaretListener() {
+            public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
+                String message = "";
+                if (selectionStart != selectionEnd) {
+                    // Describe the selected range.
+                    final int startLineNumber = 1 + text.getLineOfOffset(selectionStart);
+                    final int endLineNumber = 1 + text.getLineOfOffset(selectionEnd);
+                    if (startLineNumber == endLineNumber) {
+                        final int endLineStartOffset = text.getLineStartOffset(endLineNumber - 1);
+                        message = "Selected " + addressFromOffset(selectionStart, "line ", " columns ") + "-" + (1 + emacsDistance(text.getTextBuffer(), selectionEnd, endLineStartOffset));
+                    } else {
+                        message = "Selected from line " + startLineNumber + " to " + endLineNumber;
+                    }
+                } else {
+                    // Describe the location of the caret.
+                    message = "At " + addressFromOffset(selectionStart, "line ", ", column ");
+                }
+                
+                // If we have a non-empty selection, say how big it is.
+                final int selectionCharacterCount = selectionEnd - selectionStart;
+                if (selectionCharacterCount > 0) {
+                    message += " (" + StringUtilities.pluralize(selectionCharacterCount, "character", "characters") + ")";
+                }
+                
+                Evergreen.getInstance().showStatus(message);
+            }
+        });
     }
     
     private void initFindResultsUpdater() {
@@ -170,19 +201,19 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     /** Returns the grep-style ":<line>:<column>" address for the caret position. */
     public String getAddress() {
-        String result = addressFromOffset(text.getSelectionStart());
+        String result = addressFromOffset(text.getSelectionStart(), ":", ":");
         if (text.hasSelection()) {
             // emacs end offsets seem to include the character following.
-            result += addressFromOffset(text.getSelectionEnd() - 1);
+            result += addressFromOffset(text.getSelectionEnd() - 1, ":", ":");
         }
         return result;
     }
     
-    private String addressFromOffset(int offset) {
+    private String addressFromOffset(final int offset, final String linePrefix, final String columnPrefix) {
         int lineNumber = 1 + text.getLineOfOffset(offset);
         int lineStart = text.getLineStartOffset(lineNumber - 1);
         int columnNumber = 1 + emacsDistance(text.getTextBuffer(), offset, lineStart);
-        return ":" + lineNumber + ":" + columnNumber;
+        return linePrefix + lineNumber + columnPrefix + columnNumber;
     }
     
     public void requestFocus() {
