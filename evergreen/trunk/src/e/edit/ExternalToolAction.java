@@ -79,7 +79,11 @@ public class ExternalToolAction extends ETextAction {
         }
         runCommand(shellCommand);
     }
-
+    
+    public boolean isEnabled() {
+        return (needsFile == false || getFocusedTextWindow() != null);
+    }
+    
     public boolean isContextSensitive() {
         return needsFile || command.contains("EDIT_");
     }
