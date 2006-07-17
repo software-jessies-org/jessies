@@ -8,9 +8,3 @@ indent.string=
 
 files.uninterestingExtensions=.a;.aux;.bak;.bin;.class;.d;.elf;.exe;.jar;.lib;.log;.map;.o;.obj;.orig;.swp;.texshop;.toc
 files.externalApplicationExtensions=.icns;.jpeg;.jpg;.mov;.mp3;.mpeg;.mpg;.pdf;.png;.tiff
-
-tools.0.name=Shell Window
-?Linux:tools.0.command=terminator --working-directory $EDIT_CURRENT_DIRECTORY&
-?Mac OS X:tools.0.command=open -a Terminal $EDIT_CURRENT_DIRECTORY
-?Windows:tools.0.command=start /D%EDIT_CURRENT_DIRECTORY% cmd
-tools.0.keyboardEquivalent=S

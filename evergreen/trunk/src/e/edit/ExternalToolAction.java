@@ -1,64 +1,51 @@
 package e.edit;
 
+import e.forms.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 
-import e.forms.*;
-
 public class ExternalToolAction extends ETextAction {
-    private enum ToolType {
-        NO_INPUT_AND_NO_OUTPUT,
-        INPUT_ONLY,
-        OUTPUT_ONLY,
-        INPUT_AND_OUTPUT;
-    }
-    
-    private String commandPattern;
-    private ToolType type;
+    private String command;
+    private ToolInputDisposition inputDisposition;
+    private ToolOutputDisposition outputDisposition;
     private boolean checkEverythingSaved;
     private boolean needsFile;
     private boolean requestConfirmation;
+    
     private JTextField commandField;
     private JTextField contextField;
     
     /**
      * Creates a new tool action.
      */
-    public ExternalToolAction(String name, String commandPattern) {
+    public ExternalToolAction(String name, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition, String command) {
         super(name);
-        setCommandPattern(commandPattern);
+        this.inputDisposition = inputDisposition;
+        this.outputDisposition = outputDisposition;
+        this.command = command;
         this.checkEverythingSaved = false;
         this.requestConfirmation = false;
         this.needsFile = false;
     }
     
-    private void setCommandPattern(String newPattern) {
-        this.type = ToolType.NO_INPUT_AND_NO_OUTPUT;
-        if (newPattern.startsWith("<")) {
-            this.type = ToolType.OUTPUT_ONLY;
-            this.needsFile = true;
-            newPattern = newPattern.substring(1);
-        } else if (newPattern.startsWith(">")) {
-            this.type = ToolType.INPUT_ONLY;
-            this.needsFile = true;
-            newPattern = newPattern.substring(1);
-        } else if (newPattern.startsWith("|")) {
-            this.type = ToolType.INPUT_AND_OUTPUT;
-            this.needsFile = true;
-            newPattern = newPattern.substring(1);
-        }
-        this.commandPattern = newPattern;
-    }
-    
+    /**
+     * Sets whether or not the user will be asked to confirm the running of this command. Defaults to false.
+     */
     public void setRequestsConfirmation(boolean newState) {
         this.requestConfirmation = newState;
     }
     
+    /**
+     * Sets whether or not this command will only run with a file selected. Defaults to false.
+     */
     public void setNeedsFile(boolean newState) {
         this.needsFile = newState;
     }
     
+    /**
+     * Sets whether or not this command will warn the user if there are unsaved files in the workspace before running. Defaults to false.
+     */
     public void setChecksEverythingSaved(boolean newState) {
         this.checkEverythingSaved = newState;
     }
@@ -76,10 +63,9 @@ public class ExternalToolAction extends ETextAction {
             }
         }
         
-        ShellCommand shellCommand = new ShellCommand(commandPattern);
+        ShellCommand shellCommand = new ShellCommand(command, inputDisposition, outputDisposition);
         if (textWindow != null) {
-            shellCommand.setFilename(textWindow.getFilename());
-            shellCommand.setLineNumber(textWindow.getCurrentLineNumber());
+            shellCommand.setTextWindow(textWindow);
             shellCommand.setWorkspace(textWindow.getWorkspace());
             shellCommand.setContext(textWindow.getContext());
             shellCommand.setCompletionRunnable(new Runnable() {
@@ -95,7 +81,7 @@ public class ExternalToolAction extends ETextAction {
     }
 
     public boolean isContextSensitive() {
-        return commandPattern.contains("EDIT_");
+        return needsFile || command.contains("EDIT_");
     }
 
     private void runCommand(ShellCommand shellCommand) {
