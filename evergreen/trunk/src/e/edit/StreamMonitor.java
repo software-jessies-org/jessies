@@ -6,8 +6,7 @@ import org.jdesktop.swingworker.SwingWorker;
 
 /**
  * Forwards lines of output from the given BufferedReader to the ShellCommand's
- * Workspace's errors window. Also informs the ShellCommand when the stream
- * closes.
+ * "process" method. Also informs the ShellCommand when the stream closes.
  */
 public class StreamMonitor extends SwingWorker<Object, String> {
     private BufferedReader stream;
@@ -36,6 +35,6 @@ public class StreamMonitor extends SwingWorker<Object, String> {
     
     @Override
     protected void process(String... lines) {
-        task.getWorkspace().getErrorsWindow().append(lines);
+        task.process(lines);
     }
 }

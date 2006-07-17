@@ -117,7 +117,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         if (link.startsWith("man:")) {
             String page = link.substring(4);
             try {
-                new ShellCommand("man -S 2:3 " + page + " | col -b").runCommand();
+                new ShellCommand("man -S 2:3 " + page + " | col -b", ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW).runCommand();
             } catch (Throwable th) {
                 Evergreen.getInstance().showAlert("Couldn't show manual page", "There was a problem running man(1): " + th.getMessage() + ".");
             }

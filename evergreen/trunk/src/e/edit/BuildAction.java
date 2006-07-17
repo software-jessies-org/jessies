@@ -82,7 +82,7 @@ public class BuildAction extends ETextAction {
         String makefileDirectoryName = makefileName.substring(0, makefileName.lastIndexOf(File.separatorChar));
         command = addTarget(workspace, command);
         try {
-            final ShellCommand shellCommand = new ShellCommand(command);
+            final ShellCommand shellCommand = new ShellCommand(command, ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW);
             shellCommand.setWorkspace(workspace);
             shellCommand.setContext(makefileDirectoryName);
             shellCommand.setLaunchRunnable(new Runnable() {

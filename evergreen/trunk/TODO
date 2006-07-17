@@ -22,10 +22,6 @@ We should keep track of 'recent files' on a per-workspace basis. We
 should also use scm's ability to find what's modified in a repository (once
 it gains this ability) to be able to offer a list of modified files too.
 
-If we open (via the system open dialog or our 'vi' script) a file that
-isn't in the workspace file list but is under the workspace root, it should
-be added to the list.
-
 Thinking about the literal string/regular expression problem I just
 fixed with FindFilesContainingSelectionAction, we should have a text
 field capable of automatically coloring invalid regular expressions
@@ -183,6 +179,9 @@ auto-saving
     Canonicalization of filenames has provided a certainly adequate
     and probably superior solution to that part of the problem.
 
+    The real problem with the create-write-rename approach is that it
+    doesn't work on Win32.
+
 [ ] The code for correcting indentation could be smarter. It doesn't do
     well with any of the things mentioned below.
     
@@ -252,8 +251,6 @@ auto-saving
     directory for each type).
     
 [ ] Need to be able to go quickly from a #include to a header file.
-
-[ ] wily-style access to |, > and < commands?
 
 [ ] Handle out-of-date files better
 

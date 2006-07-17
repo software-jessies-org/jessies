@@ -1,5 +1,8 @@
 package e.edit;
 
+import e.forms.*;
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -10,16 +13,11 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import org.w3c.dom.*;
-
-import e.forms.*;
-import e.gui.*;
-import e.util.*;
 
 public class Evergreen {
     private static Evergreen instance;
@@ -753,13 +751,13 @@ public class Evergreen {
     private void init() {
         final long startTimeMillis = System.currentTimeMillis();
         
+        initPreferences();
         initMacOs();
         initAboutBox();
         
         frame = new JFrame("Evergreen");
         frame.setJMenuBar(new EvergreenMenuBar());
         
-        initPreferences();
         FormDialog.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
         
         readSavedState();
