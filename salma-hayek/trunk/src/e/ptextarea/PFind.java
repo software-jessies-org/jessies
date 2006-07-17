@@ -101,7 +101,7 @@ public class PFind {
         }
         
         private void updateFindResults() {
-            int matchCount = textArea.findAllMatches(findField.getText());
+            int matchCount = textArea.findAllMatches(findField.getText(), null);
             findStatus.setText("Matches: " + matchCount);
         }
     }

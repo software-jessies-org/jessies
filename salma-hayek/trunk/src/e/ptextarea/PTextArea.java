@@ -1504,11 +1504,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     /**
      * Highlights all matches of the given regular expression.
+     * The given BirdView (which can be null) will be updated to correspond to the new matches.
      */
-    public int findAllMatches(String regularExpression) {
+    public int findAllMatches(String regularExpression, BirdView birdView) {
         getLock().getWriteLock();
         try {
             removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
+            if (birdView != null) {
+                birdView.clearMatchingLines();
+            }
             
             // Anything to search for?
             if (regularExpression == null || regularExpression.length() == 0) {
@@ -1519,6 +1523,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             int matchCount = 0;
             Matcher matcher = PatternUtilities.smartCaseCompile(regularExpression).matcher(getTextBuffer());
             while (matcher.find()) {
+                if (birdView != null) {
+                    birdView.addMatchingLine(getLineOfOffset(matcher.end()));
+                }
                 addHighlight(new PFind.MatchHighlight(this, matcher.start(), matcher.end()));
                 ++matchCount;
             }
