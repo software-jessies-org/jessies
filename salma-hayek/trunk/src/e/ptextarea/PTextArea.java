@@ -1341,9 +1341,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     /**
-     * Replaces the entire contents of this text area with the given string.
+     * Replaces the entire contents of this text area with the given CharSequence.
      */
-    public void setText(String newText) {
+    public void setText(CharSequence newText) {
         getTextBuffer().replace(new SelectionSetter(), 0, getTextBuffer().length(), newText, new SelectionSetter(0));
     }
     
