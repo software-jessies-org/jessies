@@ -130,43 +130,15 @@ public class FindAction extends ETextAction implements MinibufferUser {
         currentTextWindow.getBirdView().clearMatchingLines();
     }
     
-    // FIXME: this could defer to PTextArea.findAllMatches if we:
-    // 1. caught the PatternSyntaxException here
-    // 2. used the match count returned by PTextArea
-    // 3. had some way to get the line numbers of matches so we can tell the bird view (it might even be better than the current system if we can give them all at once as an int[])
     public void findAllMatches(String regularExpression) {
-        removeAllMatches();
         currentRegularExpression = regularExpression;
-        
-        // Do we have something to search for?
-        if (regularExpression == null || regularExpression.length() == 0) {
-            return;
-        }
-        
-        // Do we have something to search in?
         ETextArea textArea = currentTextWindow.getText();
-        String content = textArea.getText();
-        if (content == null) {
-            return;
-        }
-        
-        // Compile the regular expression.
-        Pattern pattern;
         try {
-            pattern = PatternUtilities.smartCaseCompile(regularExpression);
+            int matchCount = textArea.findAllMatches(regularExpression, currentTextWindow.getBirdView());
+            Evergreen.getInstance().showStatus("Found " + StringUtilities.pluralize(matchCount, "match", "matches") + " for \"" + regularExpression + "\"");
         } catch (PatternSyntaxException patternSyntaxException) {
             Evergreen.getInstance().showStatus(patternSyntaxException.getDescription());
             return;
         }
-        
-        // Find all the matches.
-        int matchCount = 0;
-        Matcher matcher = pattern.matcher(content);
-        while (matcher.find()) {
-            currentTextWindow.getBirdView().addMatchingLine(textArea.getLineOfOffset(matcher.end()));
-            textArea.addHighlight(new PFind.MatchHighlight(textArea, matcher.start(), matcher.end()));
-            matchCount++;
-        }
-        Evergreen.getInstance().showStatus("Found " + StringUtilities.pluralize(matchCount, "match", "matches") + " for \"" + regularExpression + "\"");
     }
 }
