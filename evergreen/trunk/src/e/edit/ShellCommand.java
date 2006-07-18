@@ -1,8 +1,10 @@
 package e.edit;
 
+import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
-import java.awt.EventQueue;
+import java.awt.*;
+import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
 
@@ -131,14 +133,13 @@ public class ShellCommand {
         case CREATE_NEW_DOCUMENT:
             Log.warn("CREATE_NEW_DOCUMENT not yet implemented.");
             break;
-        case DIALOG:
-            Log.warn("DIALOG not yet implemented.");
-            break;
         case DISCARD:
             break;
         case ERRORS_WINDOW:
             getWorkspace().getErrorsWindow().append(lines);
             break;
+        case CLIPBOARD:
+        case DIALOG:
         case INSERT:
         case REPLACE:
             for (String line : lines) {
@@ -158,9 +159,18 @@ public class ShellCommand {
         ArrayList<String> errorsWindowFooter = new ArrayList<String>();
         
         switch (outputDisposition) {
+        case CLIPBOARD:
+            StringSelection selection = new StringSelection(capturedOutput.toString());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+            break;
         case CREATE_NEW_DOCUMENT:
+            Log.warn("CREATE_NEW_DOCUMENT not yet implemented.");
+            break;
         case DIALOG:
+            JFrameUtilities.showTextWindow(Evergreen.getInstance().getFrame(), "Subprocess Output", capturedOutput.toString());
+            break;
         case DISCARD:
+            break;
         case ERRORS_WINDOW:
             // We dealt with the sub-process output as we went along.
             errorsWindowFooter.add("-------------------------------------------------------------------------");
