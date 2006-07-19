@@ -58,7 +58,7 @@ public class GnomeStockIcon {
         
         Icon icon = null;
         try {
-            Class gtkStockIconClass = Class.forName("com.sun.java.swing.plaf.gtk.GTKStyle$GTKStockIcon");
+            Class<?> gtkStockIconClass = Class.forName("com.sun.java.swing.plaf.gtk.GTKStyle$GTKStockIcon");
             java.lang.reflect.Constructor constructor = gtkStockIconClass.getDeclaredConstructor(String.class, int.class);
             constructor.setAccessible(true);
             icon = (Icon) constructor.newInstance(name, size.ordinal());
