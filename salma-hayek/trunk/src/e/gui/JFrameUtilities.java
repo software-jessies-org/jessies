@@ -59,10 +59,13 @@ public class JFrameUtilities {
     public static JFrame makeScrollableContentWindow(String title, JComponent content) {
         JScrollPane scrollPane = new JScrollPane(content);
         scrollPane.setBorder(null);
-        
+        return makeSimpleWindow(title, scrollPane);
+    }
+    
+    public static JFrame makeSimpleWindow(String title, JComponent content) {
         JFrame frame = new JFrame(title);
         setFrameIcon(frame);
-        frame.setContentPane(scrollPane);
+        frame.setContentPane(content);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         return frame;
