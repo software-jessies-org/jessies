@@ -224,7 +224,6 @@ public class Workspace extends JPanel {
     
     public JComponent makeUI() {
         leftColumn.setErrorsWindow(errorsWindow);
-        registerTextComponent(errorsWindow.getText());
         return leftColumn;
     }
     
@@ -277,20 +276,11 @@ public class Workspace extends JPanel {
         return null;
     }
     
-    public void registerTextComponent(PTextArea textComponent) {
-        Evergreen.getInstance().getAdvisor().registerTextComponent(textComponent);
-    }
-    
-    public void unregisterTextComponent(PTextArea textComponent) {
-        Evergreen.getInstance().getAdvisor().unregisterTextComponent(textComponent);
-    }
-    
     public EWindow addViewerForFile(final String filename, final String address, final int y) {
         Evergreen.getInstance().showStatus("Opening " + filename + "...");
         EWindow window = null;
         try {
             ETextWindow newWindow = new ETextWindow(filename);
-            registerTextComponent(newWindow.getText());
             window = addViewer(newWindow, address, y);
             if (filename.startsWith(getRootDirectory())) {
                 int prefixCharsToSkip = getRootDirectory().length();

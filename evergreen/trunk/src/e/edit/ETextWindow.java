@@ -528,7 +528,6 @@ public class ETextWindow extends EWindow implements PTextListener {
             findResultsUpdater = null;
         }
         Evergreen.getInstance().showStatus("Closed " + filename);
-        getWorkspace().unregisterTextComponent(getText());
         // FIXME: what else needs doing to ensure that we give back memory?
     }
     

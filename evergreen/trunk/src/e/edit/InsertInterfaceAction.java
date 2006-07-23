@@ -32,7 +32,7 @@ public class InsertInterfaceAction extends ETextAction {
     }
     
     private void pasteSourceCode() {
-        String text = Evergreen.getInstance().getAdvisor().getLookupString();
+        String text = Advisor.getInstance().getLookupString();
         
         String className = null;
         String prefix = "";

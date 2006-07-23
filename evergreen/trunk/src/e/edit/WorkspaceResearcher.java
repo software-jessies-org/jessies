@@ -2,13 +2,12 @@ package e.edit;
 
 public interface WorkspaceResearcher {
     /**
-    * Look for something in a PTextArea. Returns an HTML string
-    * containing information about what it found. Should return
+    * Returns an HTML string containing information about "string". Returns
     * the empty string (not null) if it has nothing to say. The string passed
     * to the researcher is the selection, if there is one, or the line up to the
     * caret otherwise.
     */
-    public String research(e.ptextarea.PTextArea component, String string);
+    public String research(String string);
     
     /**
     * Invoked before research -- if we're researching an ETextWindow -- to

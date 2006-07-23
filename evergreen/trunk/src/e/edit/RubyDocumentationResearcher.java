@@ -5,12 +5,7 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {
-    /**
-     * Look for something in a JTextComponent. Returns an HTML string
-     * containing information about what it found. Should return
-     * the empty string (not null) if it has nothing to say.
-     */
-    public String research(PTextArea text, String string) {
+    public String research(String string) {
         String ri = getRi();
         if (ri == null) {
             return "";
@@ -43,7 +38,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
     /** Handles our non-standard "ri:" scheme. */
     public boolean handleLink(String link) {
         if (link.startsWith("ri:")) {
-            Evergreen.getInstance().getAdvisor().research(link.substring(3));
+            research(link.substring(3));
             return true;
         }
         return false;
