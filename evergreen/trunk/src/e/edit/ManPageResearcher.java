@@ -92,12 +92,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         set.addAll(uniqueWords);
     }
     
-    /**
-     * Look for something in a JTextComponent. Returns an HTML string
-     * containing information about what it found. Should return
-     * the empty string (not null) if it has nothing to say.
-     */
-    public String research(PTextArea text, String string) {
+    public String research(String string) {
         for (String sectionName : manual.keySet()) {
             Set<String> section = manual.get(sectionName);
             if (section.contains(string)) {

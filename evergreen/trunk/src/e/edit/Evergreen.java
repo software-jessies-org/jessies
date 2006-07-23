@@ -25,7 +25,6 @@ public class Evergreen {
     private JFrame frame;
     private JTabbedPane tabbedPane;
     private TagsPanel tagsPanel;
-    private Advisor advisor;
     private EStatusBar statusLine;
     private Minibuffer minibuffer;
     private JPanel statusArea;
@@ -80,10 +79,6 @@ public class Evergreen {
     
     public TagsPanel getTagsPanel() {
         return tagsPanel;
-    }
-
-    public Advisor getAdvisor() {
-        return advisor;
     }
 
     public void showStatus(String status) {
@@ -665,10 +660,6 @@ public class Evergreen {
         tagsPanel = new TagsPanel();
     }
     
-    public void initAdvisor() {
-        advisor = new Advisor();
-    }
-    
     public void initPreferences() {
         Parameters.readPropertiesFile(getPreferenceFilename("edit.properties"));
     }
@@ -763,7 +754,6 @@ public class Evergreen {
         readSavedState();
         initWindow();
         initTagsPanel();
-        initAdvisor();
         initStatusArea();
         
         InetAddress wildcardAddress = null;
@@ -794,7 +784,7 @@ public class Evergreen {
             }
         });
         
-        JSplitPane tagsAndAdvisorSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, tagsPanel, advisor);
+        JSplitPane tagsAndAdvisorSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, tagsPanel, Advisor.getInstance());
         tagsAndAdvisorSplitPane.setDividerLocation(0.8);
         tagsAndAdvisorSplitPane.setResizeWeight(0.8);
         

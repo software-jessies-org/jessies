@@ -43,7 +43,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             if (e instanceof HTMLFrameHyperlinkEvent) {
                 ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
             } else {
-                Evergreen.getInstance().getAdvisor().linkClicked(e.getDescription());
+                Advisor.getInstance().linkClicked(e.getDescription());
             }
         }
     }

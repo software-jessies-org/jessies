@@ -442,7 +442,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         return textWindow.isJava();
     }
     
-    public String research(PTextArea textArea, String string) {
+    public String research(String string) {
         if (string.startsWith("import ")) {
             return makePackageResult(string);
         } else {

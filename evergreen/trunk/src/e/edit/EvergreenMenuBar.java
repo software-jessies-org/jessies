@@ -127,6 +127,9 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new JSeparator());
         menu.add(new KillErrorsAction());
         
+        menu.add(new JSeparator());
+        menu.add(new ShowDocumentationAction());
+        
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
             public void addItem(ExternalToolAction action) {
                 menu.add(action);
