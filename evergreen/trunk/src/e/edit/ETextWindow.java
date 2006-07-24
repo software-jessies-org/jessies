@@ -69,7 +69,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         
         // The JavaResearcher knows all the words used in JDK identifiers.
         if (language == JAVA) {
-            JavaResearcher.addJavaWordsTo(result);
+            JavaResearcher.getSharedInstance().addJavaWordsTo(result);
         }
         // The ManPageResearcher knows all the words used in identifiers that have man pages.
         if (language == C_PLUS_PLUS) {

@@ -11,7 +11,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     public AdvisorHtmlPane() {
         initTextPane();
         setLayout(new BorderLayout());
-        add(new JScrollPane(textPane), BorderLayout.CENTER);
+        add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
     }
     
     private void initTextPane() {
