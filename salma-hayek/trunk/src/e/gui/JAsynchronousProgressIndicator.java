@@ -33,11 +33,10 @@ public class JAsynchronousProgressIndicator extends JComponent {
         initBars();
         initColors();
         initTimer();
+        setOpaque(false);
     }
     
     public void paintComponent(Graphics g) {
-        g.setColor(getBackground());
-        g.fillRect(0, 0, getWidth(), getHeight());
         if (isDisplayedWhenStopped || timer.isRunning()) {
             paintBars((Graphics2D) g);
         }
