@@ -271,8 +271,8 @@ public class JTerminalPane extends JPanel {
 			if (sequence != null) {
 				if (sequence.length() == 1) {
 					char ch = sequence.charAt(0);
-					// We don't always get a KEY_TYPED event for the escape key, so sometimes we have to handle it in keyPressed.
-					if (ch != Ascii.ESC) {
+					// We don't get a KEY_TYPED event for the escape key or keypad enter on Mac OS, where we have to handle it in keyPressed.
+					if (ch != Ascii.ESC && ch != Ascii.CR) {
 						Log.warn("The constraint about not handling keys that generate KEY_TYPED events in keyPressed was probably violated when handling " + event);
 					}
 				}
@@ -288,8 +288,11 @@ public class JTerminalPane extends JPanel {
 			// If this event will be followed by a KEY_TYPED event (that is, has a corresponding Unicode character), you must NOT handle it here.
 			switch (keyCode) {
 				case KeyEvent.VK_ESCAPE:
-					// Annoyingly, Linux sends a KEY_TYPED event for the escape key; Mac OS doesn't.
+					// Annoyingly, while Linux sends a KEY_TYPED event for the escape key, Mac OS doesn't.
 					return GuiUtilities.isMacOs() ? String.valueOf(Ascii.ESC) : null;
+				case KeyEvent.VK_ENTER:
+					// Annoyingly, while Linux sends a KEY_TYPED event for the keypad enter, Mac OS doesn't.
+					return (GuiUtilities.isMacOs() && event.getKeyLocation() == KeyEvent.KEY_LOCATION_NUMPAD) ? String.valueOf(Ascii.CR) : null;
 				
 				case KeyEvent.VK_HOME: return Ascii.ESC + "[1~";
 				case KeyEvent.VK_END: return Ascii.ESC + "[4~";
