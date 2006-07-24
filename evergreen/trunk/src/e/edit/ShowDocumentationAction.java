@@ -20,6 +20,6 @@ public class ShowDocumentationAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Advisor.getInstance().research(Advisor.getInstance().getLookupString());
+        Advisor.getInstance().showDocumentation();
     }
 }

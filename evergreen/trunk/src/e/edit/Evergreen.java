@@ -784,11 +784,7 @@ public class Evergreen {
             }
         });
         
-        JSplitPane tagsAndAdvisorSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, tagsPanel, Advisor.getInstance());
-        tagsAndAdvisorSplitPane.setDividerLocation(0.8);
-        tagsAndAdvisorSplitPane.setResizeWeight(0.8);
-        
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabbedPane, tagsAndAdvisorSplitPane);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabbedPane, tagsPanel);
         frame.getContentPane().add(splitPane, BorderLayout.CENTER);
         frame.getContentPane().add(statusArea, BorderLayout.SOUTH);
         

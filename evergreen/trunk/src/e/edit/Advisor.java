@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import e.ptextarea.*;
+import e.gui.*;
 import e.util.*;
 
 public class Advisor extends JPanel {
@@ -16,6 +17,8 @@ public class Advisor extends JPanel {
     
     /** The advice window. */
     private AdvisorHtmlPane advicePane = new AdvisorHtmlPane();
+    
+    private JFrame frame;
     
     public static synchronized Advisor getInstance() {
         if (instance == null) {
@@ -46,6 +49,24 @@ public class Advisor extends JPanel {
                 addResearcher(new RubyDocumentationResearcher());
             }
         }).start();
+    }
+    
+    private synchronized JFrame getFrame() {
+        if (frame == null) {
+            // FIXME: should have at least status line/progress indicator and back button. Perhaps as part of AdvisorHtmlPane rather than here?
+            frame = JFrameUtilities.makeSimpleWindow("Evergreen Documentation Browser", advicePane);
+            frame.setSize(new Dimension(400, 500));
+        }
+        return frame;
+    }
+    
+    public synchronized void showDocumentation() {
+        showDocumentation(getLookupString());
+    }
+    
+    public synchronized void showDocumentation(String word) {
+        getFrame().setVisible(true);
+        research(word);
     }
     
     public String getLookupString() {
@@ -102,10 +123,6 @@ public class Advisor extends JPanel {
                 ++lineCount;
             }
         }
-        if (lineCount > 100) {
-            result = "(Too much output.)";
-        }
-
         advicePane.setText(result);
     }
     
