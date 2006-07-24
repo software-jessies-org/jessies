@@ -109,15 +109,52 @@ public class ManPageResearcher implements WorkspaceResearcher {
     
     /** Handles our non-standard "man:" scheme. */
     public boolean handleLink(String link) {
-        if (link.startsWith("man:")) {
+        // We don't just test for the "man:" prefix because we're going to send the rest directly to a shell, so we don't want any nasty surprises.
+        if (link.matches("^man:[A-Za-z0-9]+$")) {
             String page = link.substring(4);
-            try {
-                new ShellCommand("man -S 2:3 " + page + " | col -b", ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW).runCommand();
-            } catch (Throwable th) {
-                Evergreen.getInstance().showAlert("Couldn't show manual page", "There was a problem running man(1): " + th.getMessage() + ".");
+            
+            // If we're on a system without rman(1), at least display something.
+            String command = "man -S 2:3 " + page + " | col -b";
+            
+            String polyglotMan = findPolyglotMan();
+            if (polyglotMan != null) {
+                ArrayList<String> lines = new ArrayList<String>();
+                ArrayList<String> errors = new ArrayList<String>();
+                int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray("man -S 2:3 -w " + page), lines, errors);
+                String filename = lines.get(0);
+                // FIXME: we should use %s.%s (or %s(%s) or whatever) to include section numbers, and then understand when we're given such man: links.
+                command = (filename.endsWith(".gz") ? "gunzip -c " : "cat ") + filename + " | rman -r 'man:%s' -S -f HTML";
             }
+            
+            ArrayList<String> lines = new ArrayList<String>();
+            ArrayList<String> errors = new ArrayList<String>();
+            int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, errors);
+            
+            String result = StringUtilities.join(lines, "\n");
+            
+            // Remove the table of contents at the end.
+            result = result.replaceAll("(?s)<hr><p>.*?</ul>", "");
+            // Remove the links to the table of contents.
+            result = result.replaceAll("<a name='sect\\d+' href='#toc\\d+'>((.|\n)*?)</a>", "$1");
+            result = result.replace("<a href='#toc'>Table of Contents</a><p>", "");
+            
+            Advisor.getInstance().showDocumentation(result);
             return true;
         }
         return false;
+    }
+    
+    private String findPolyglotMan() {
+        // "rman" is called "PolyglotMan" these days, and found at http://polyglotman.sourceforge.net/ but it retains its old name for the binary.
+        // Debian Linux with the "rman" package has a binary in /usr/bin.
+        // Mac OS with Xcode 2.3 or later installed has a binary in Xcode's plug-ins tree.
+        // Mac OS with X11 installed has an older version in /usr/X11R6/bin.
+        String[] possibilities = new String[] { "/usr/bin/rman", "/Library/Application Support/Apple/Developer Tools/Plug-ins/DocViewerPlugIn.xcplugin/Contents/Resources/rman", "/usr/X11R6/bin/rman" };
+        for (String possibility : possibilities) {
+            if (FileUtilities.exists(possibility)) {
+                return possibility;
+            }
+        }
+        return null;
     }
 }
