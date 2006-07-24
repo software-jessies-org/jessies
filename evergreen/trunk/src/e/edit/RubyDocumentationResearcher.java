@@ -47,7 +47,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
     /** Handles our non-standard "ri:" scheme. */
     public boolean handleLink(String link) {
         if (link.startsWith("ri:")) {
-            Advisor.getInstance().showDocumentation(link.substring(3));
+            Advisor.getInstance().showDocumentation(research(link.substring(3)));
             return true;
         }
         return false;

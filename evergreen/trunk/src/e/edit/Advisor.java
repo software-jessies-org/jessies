@@ -61,12 +61,15 @@ public class Advisor extends JPanel {
     }
     
     public synchronized void showDocumentation() {
-        showDocumentation(getLookupString());
+        getFrame().setVisible(true);
+        research(getLookupString());
     }
     
-    public synchronized void showDocumentation(String word) {
-        getFrame().setVisible(true);
-        research(word);
+    public synchronized void showDocumentation(String content) {
+        if (content.startsWith("<html>") == false) {
+            content = "<html><head><title></title></head><body bgcolor=#FFFFFF>" + content + "</body></html>";
+        }
+        advicePane.setText(content);
     }
     
     public String getLookupString() {
@@ -104,7 +107,7 @@ public class Advisor extends JPanel {
         }
         
         ETextWindow textWindow = ETextAction.getFocusedTextWindow();
-        StringBuilder newText = new StringBuilder("<html><head><title></title></head><body bgcolor=#FFFFFF>");
+        StringBuilder newText = new StringBuilder();
         for (WorkspaceResearcher researcher : researchers) {
             if (textWindow == null || researcher.isSuitable(textWindow)) {
                 String result = researcher.research(text);
@@ -113,17 +116,7 @@ public class Advisor extends JPanel {
                 }
             }
         }
-        newText.append("</body></html>");
-        String result = newText.toString();
-
-        // Deliberately ignore the advisors if they're just babbling.
-        int lineCount = 0;
-        for (int i = 0; i < result.length(); ++i) {
-            if (result.charAt(i) == '\n') {
-                ++lineCount;
-            }
-        }
-        advicePane.setText(result);
+        showDocumentation(newText.toString());
     }
     
     private void addResearcher(WorkspaceResearcher researcher) {
