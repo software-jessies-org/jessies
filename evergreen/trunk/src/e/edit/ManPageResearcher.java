@@ -10,18 +10,15 @@ import e.util.*;
  * Offers man page entries corresponding to selected words.
  */
 public class ManPageResearcher implements WorkspaceResearcher {
-    /** Our manual is a mapping from section names to sets of page names. */
-    private static Map<String, Set<String>> manual;
-    
     private static TreeSet<String> uniqueWords;
     
-    private static ManPageResearcher INSTANCE = new ManPageResearcher();
+    private static final ManPageResearcher INSTANCE = new ManPageResearcher();
     
     private ManPageResearcher() {
     }
     
     public synchronized static ManPageResearcher getSharedInstance() {
-        if (manual == null) {
+        if (uniqueWords == null) {
             init();
         }
         return INSTANCE;
@@ -33,7 +30,6 @@ public class ManPageResearcher implements WorkspaceResearcher {
     private static void init() {
         final long startTime = System.currentTimeMillis();
         
-        manual = new HashMap<String, Set<String>>();
         TreeSet<String> uniqueIdentifiers = new TreeSet<String>();
         
         int pageCount = 0;
@@ -49,12 +45,6 @@ public class ManPageResearcher implements WorkspaceResearcher {
                     if (sectionName.endsWith("pm") || sectionName.endsWith("tcl") || sectionName.endsWith("ssl")) {
                         continue;
                     }
-                    Set<String> section = manual.get(sectionName);
-                    if (section == null) {
-                        section = new HashSet<String>();
-                        manual.put(sectionName, section);
-                    }
-                    section.add(stub);
                     uniqueIdentifiers.add(stub);
                     ++pageCount;
                 } else {
