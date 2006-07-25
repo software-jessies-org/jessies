@@ -93,13 +93,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
     }
     
     public String research(String string) {
-        for (String sectionName : manual.keySet()) {
-            Set<String> section = manual.get(sectionName);
-            if (section.contains(string)) {
-                return "Manual page for <a href=\"man:" + string + "\">" + string + "(" + sectionName + ")</a>";
-            }
-        }
-        return "";
+        return formatManPage(string, "2:3");
     }
     
     /** Returns true for C files, because only C programmers care about man pages. */
@@ -107,39 +101,49 @@ public class ManPageResearcher implements WorkspaceResearcher {
         return textWindow.isCPlusPlus();
     }
     
-    /** Handles our non-standard "man:" scheme. */
-    public boolean handleLink(String link) {
-        // We don't just test for the "man:" prefix because we're going to send the rest directly to a shell, so we don't want any nasty surprises.
-        if (link.matches("^man:[A-Za-z0-9]+$")) {
-            String page = link.substring(4);
-            
-            // If we're on a system without rman(1), at least display something.
-            String command = "man -S 2:3 " + page + " | col -b";
-            
-            String polyglotMan = findPolyglotMan();
-            if (polyglotMan != null) {
-                ArrayList<String> lines = new ArrayList<String>();
-                ArrayList<String> errors = new ArrayList<String>();
-                int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray("man -S 2:3 -w " + page), lines, errors);
-                String filename = lines.get(0);
-                // FIXME: we should use %s.%s (or %s(%s) or whatever) to include section numbers, and then understand when we're given such man: links.
-                command = (filename.endsWith(".gz") ? "gunzip -c " : "cat ") + filename + " | rman -r 'man:%s' -S -f HTML";
-            }
-            
+    private String formatManPage(String page, String section) {
+        // If we're on a system without rman(1), at least display something.
+        String command = "man -S " + section + " " + page + " | col -b";
+        
+        String polyglotMan = findPolyglotMan();
+        if (polyglotMan != null) {
             ArrayList<String> lines = new ArrayList<String>();
             ArrayList<String> errors = new ArrayList<String>();
-            int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, errors);
-            
-            String result = StringUtilities.join(lines, "\n");
-            
-            // Remove the table of contents at the end.
-            result = result.replaceAll("(?s)<hr><p>.*?</ul>", "");
-            // Remove the links to the table of contents.
-            result = result.replaceAll("<a name='sect\\d+' href='#toc\\d+'>((.|\n)*?)</a>", "$1");
-            result = result.replace("<a href='#toc'>Table of Contents</a><p>", "");
-            
-            Advisor.getInstance().showDocumentation(result);
-            return true;
+            int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray("man -S " + section + " -w " + page), lines, errors);
+            String filename = lines.get(0);
+            if (FileUtilities.exists(filename) == false) {
+                return "";
+            }
+            command = (filename.endsWith(".gz") ? "gunzip -c " : "cat ") + filename + " | rman -r 'man:%s(%s)' -S -f HTML";
+        }
+        
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, errors);
+        
+        String result = StringUtilities.join(lines, "\n");
+        
+        // Remove the table of contents at the end.
+        result = result.replaceAll("(?s)<hr><p>.*?</ul>", "");
+        // Remove the links to the table of contents.
+        result = result.replaceAll("<a name='sect\\d+' href='#toc\\d+'>((.|\n)*?)</a>", "$1");
+        result = result.replace("<a href='#toc'>Table of Contents</a><p>", "");
+        
+        return result;
+    }
+    
+    /** Handles our non-IETF (but freedesktop.org-recommended) "man:" URI scheme. */
+    public boolean handleLink(String link) {
+        // We don't just test for the "man:" prefix because we're going to send the rest directly to a shell, so we don't want any nasty surprises.
+        Matcher matcher = Pattern.compile("^man:([A-Za-z0-9]+)\\((\\d+)\\)$").matcher(link);
+        if (matcher.matches()) {
+            String page = matcher.group(1);
+            String section = matcher.group(2);
+            String manPage = formatManPage(page, section);
+            if (manPage.length() > 0) {
+                Advisor.getInstance().showDocumentation(manPage);
+                return true;
+            }
         }
         return false;
     }
