@@ -24,6 +24,9 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
             result = result.replaceAll("\\b(([A-Za-z0-9_?]+(#|::|\\.))?([A-Za-z0-9_?]+)+)(, |$)", "<a href=\"ri:$1\">$1</a>$5");
         }
         
+        // At the top of an individual method's page, link to the defining class.
+        result = result.replaceAll("<b>(\\w+)(::|#)(.+?)</b>", "<b><a href=\"ri:$1\">$1</a>$2$3</b>");
+        
         // FIXME: we should link up stuff like "Includes:", "Class methods:", and "Instance methods:". See Array for an example of all three.
         
         return (result.contains("<error>") ? "" : result);
