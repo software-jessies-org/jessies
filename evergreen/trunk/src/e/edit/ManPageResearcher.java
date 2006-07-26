@@ -113,8 +113,8 @@ public class ManPageResearcher implements WorkspaceResearcher {
         
         String result = StringUtilities.join(lines, "\n");
         
-        // Remove the table of contents at the end.
-        result = result.replaceAll("(?s)<hr><p>.*?</ul>", "");
+        // Remove the table of contents at the end. There may be nested lists because subsection are included.
+        result = result.replaceAll("(?s)<hr><p>.*</ul>", "");
         // Remove the links to the table of contents.
         result = result.replaceAll("<a name='sect\\d+' href='#toc\\d+'>((.|\n)*?)</a>", "$1");
         result = result.replace("<a href='#toc'>Table of Contents</a><p>", "");
