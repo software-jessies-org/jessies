@@ -85,16 +85,14 @@ public:
     return version;
   }
   
-  std::string findJvmLibraryUsingJreRegistry() const {
-    const char* jreRegistryPath = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment";
+  std::string findJvmLibraryUsingJreRegistry(const char* jreRegistryPath) const {
     std::string version = chooseVersionFromRegistry(jreRegistryPath);
     // What should we do if this points to "client" when we want "server"?
     std::string jvmRegistryPath = std::string(jreRegistryPath) + "/" + version + "/RuntimeLib";
     return readRegistryFile(jvmRegistryPath);
   }
   
-  std::string findJvmLibraryUsingJdkRegistry() const {
-    const char* jdkRegistryPath = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit";
+  std::string findJvmLibraryUsingJdkRegistry(const char* jdkRegistryPath) const {
     std::string version = chooseVersionFromRegistry(jdkRegistryPath);
     std::string javaHome = readRegistryFile(std::string(jdkRegistryPath) + "/" + version + "/JavaHome");
     return javaHome + "/jre/bin/client/jvm.dll";
@@ -107,14 +105,32 @@ public:
     os << "Error messages were:";
     os << std::endl;
     try {
-      return findJvmLibraryUsingJdkRegistry();
+      return findJvmLibraryUsingJdkRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit");
     } catch (const std::exception& ex) {
       os << "  ";
       os << ex.what();
       os << std::endl;
     }
     try {
-      return findJvmLibraryUsingJreRegistry();
+      return findJvmLibraryUsingJreRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment");
+    } catch (const std::exception& ex) {
+      os << "  ";
+      os << ex.what();
+      os << std::endl;
+    }
+    try {
+      // My Sun JDK key says:
+      // "JavaHome"="C:\\Program Files\\Java\\jdk1.5.0_06"
+      // Jesse Kriss's IBM JDK has an appended "jre" component:
+      // "JavaHome"="C:\\Program Files\\IBM\\Java50\\jre"
+      return findJvmLibraryUsingJdkRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/IBM/Java Development Kit");
+    } catch (const std::exception& ex) {
+      os << "  ";
+      os << ex.what();
+      os << std::endl;
+    }
+    try {
+      return findJvmLibraryUsingJreRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/IBM/Java2 Runtime Environment");
     } catch (const std::exception& ex) {
       os << "  ";
       os << ex.what();
