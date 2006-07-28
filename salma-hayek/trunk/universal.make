@@ -339,7 +339,7 @@ DIST_DIRECTORY=/home/software/downloads/$(MACHINE_PROJECT_NAME)
 $(takeProfileSample)
 SOURCE_FILES := $(if $(wildcard $(PROJECT_ROOT)/src),$(shell find $(PROJECT_ROOT)/src -type f -name "*.java"))
 $(takeProfileSample)
-SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tgz
+SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
 
 REVISION_CONTROL_SYSTEM += $(if $(wildcard .svn),svn)
 REVISION_CONTROL_SYSTEM += $(if $(wildcard CVS),cvs)
