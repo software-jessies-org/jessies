@@ -39,7 +39,9 @@ public class HelpMenu {
         }
         
         if (websiteUrl != null) {
-            menu.add(new WebLinkAction("Go To " + applicationName + " Website", websiteUrl));
+            WebLinkAction helpAction = new WebLinkAction("Go To " + applicationName + " Website", websiteUrl);
+            GnomeStockIcon.useStockIcon(helpAction, "gtk-help");
+            menu.add(helpAction);
         }
         if (changeLogUrl != null) {
             menu.add(new WebLinkAction("View " + applicationName + " Change Log", changeLogUrl));
