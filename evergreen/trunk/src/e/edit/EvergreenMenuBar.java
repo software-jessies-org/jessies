@@ -16,6 +16,7 @@ public class EvergreenMenuBar extends EMenuBar {
         add(makeScmMenu());
         add(makeWorkspaceMenu());
         add(makeToolsMenu());
+        add(makeDocumentationMenu());
         add(makeWindowMenu());
         add(makeHelpMenu());
     }
@@ -127,9 +128,6 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new JSeparator());
         menu.add(new KillErrorsAction());
         
-        menu.add(new JSeparator());
-        menu.add(new ShowDocumentationAction());
-        
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
             public void addItem(ExternalToolAction action) {
                 menu.add(action);
@@ -145,6 +143,22 @@ public class EvergreenMenuBar extends EMenuBar {
         };
         toolsParser.parse();
         return menu;
+    }
+    
+    private JMenu makeDocumentationMenu() {
+        JMenu menu = new JMenu("Documentation");
+        menu.add(new ShowDocumentationAction());
+        
+        menu.add(new JSeparator());
+        menu.add(makeLocalOrRemoteLink("GNU C Library Documentation", "/usr/share/doc/glibc-doc/html/index.html", "http://www.gnu.org/software/libc/manual/html_node/index.html"));
+        menu.add(makeLocalOrRemoteLink("STL Documentation", "/usr/share/doc/stl-manual/html/index.html", "http://www.sgi.com/tech/stl/"));
+        
+        return menu;
+    }
+    
+    private WebLinkAction makeLocalOrRemoteLink(String name, String localFilename, String remoteUrl) {
+        String url = FileUtilities.exists(localFilename) ? "file://" + localFilename : remoteUrl;
+        return new WebLinkAction(name, url);
     }
     
     private JMenu makeScmMenu() {
