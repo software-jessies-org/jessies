@@ -39,10 +39,10 @@ public class HelpMenu {
         }
         
         if (websiteUrl != null) {
-            menu.add(new WebLinkAction("Go To Website", websiteUrl));
+            menu.add(new WebLinkAction("Go To " + applicationName + " Website", websiteUrl));
         }
         if (changeLogUrl != null) {
-            menu.add(new WebLinkAction("View Change Log", changeLogUrl));
+            menu.add(new WebLinkAction("View " + applicationName + " Change Log", changeLogUrl));
         }
         
         // We don't support this yet, because we've got nothing to point it to.
@@ -64,7 +64,7 @@ public class HelpMenu {
     private class AboutBoxAction extends AbstractAction {
         private AboutBoxAction() {
             String name = "About";
-            if (GuiUtilities.isWindows()) {
+            if (GuiUtilities.isMacOs() == false) {
                 name += " " + applicationName;
             }
             putValue(NAME, name);
