@@ -97,6 +97,8 @@ public class ManPageResearcher implements WorkspaceResearcher {
         
         String polyglotMan = findPolyglotMan();
         if (polyglotMan != null) {
+            polyglotMan = "'" + polyglotMan + "' -f HTML -r 'man:%s(%s)'";
+            
             ArrayList<String> lines = new ArrayList<String>();
             ArrayList<String> errors = new ArrayList<String>();
             int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray("man -S " + section + " -w " + page), lines, errors);
@@ -104,7 +106,13 @@ public class ManPageResearcher implements WorkspaceResearcher {
             if (FileUtilities.exists(filename) == false) {
                 return "";
             }
-            command = (filename.endsWith(".gz") ? "gunzip -c " : "cat ") + filename + " | rman -r 'man:%s(%s)' -S -f HTML";
+            if (GuiUtilities.isMacOs()) {
+                // On Mac OS, the ancient version of rman(1) only seems to work with pre-formatted pages, and then only if you let it guess.
+                command = "nroff -man '" + filename + "' | " + polyglotMan;
+            } else {
+                // On Linux, modern rman(1) works best with man page source, and then only if you explicitly tell it that's what it's got.
+                command = (filename.endsWith(".gz") ? "gunzip -c" : "cat") + " '" + filename + "' | " + polyglotMan + " -S ";
+            }
         }
         
         ArrayList<String> lines = new ArrayList<String>();
@@ -113,11 +121,14 @@ public class ManPageResearcher implements WorkspaceResearcher {
         
         String result = StringUtilities.join(lines, "\n");
         
+        // There are case differences between 3.0.9 on Mac OS and 3.2 on Linux.
+        // There are also difference in the quote character used: ' on Linux and " on Mac OS.
+        
         // Remove the table of contents at the end. There may be nested lists because subsection are included.
-        result = result.replaceAll("(?s)<hr><p>.*</ul>", "");
+        result = result.replaceAll("(?si)<hr><p>.*</ul>", "");
         // Remove the links to the table of contents.
-        result = result.replaceAll("<a name='sect\\d+' href='#toc\\d+'>((.|\n)*?)</a>", "$1");
-        result = result.replace("<a href='#toc'>Table of Contents</a><p>", "");
+        result = result.replaceAll("(?i)<a name=['\"]sect\\d+['\"] href=['\"]#toc\\d+['\"]>((.|\n)*?)</a>", "$1");
+        result = result.replaceAll("(?i)<a href=['\"]#toc['\"]>Table of Contents</a><p>", "");
         
         return result;
     }
