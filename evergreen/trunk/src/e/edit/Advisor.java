@@ -61,6 +61,7 @@ public class Advisor extends JPanel {
     }
     
     public synchronized void showDocumentation() {
+        advicePane.setText("");
         getFrame().setVisible(true);
         research(getLookupString());
     }
@@ -101,11 +102,6 @@ public class Advisor extends JPanel {
     }
     
     public void research(String text) {
-        // If there's nothing to look at, don't wake the researchers.
-        if (text.length() == 0) {
-            return;
-        }
-        
         ETextWindow textWindow = ETextAction.getFocusedTextWindow();
         StringBuilder newText = new StringBuilder();
         for (WorkspaceResearcher researcher : researchers) {
@@ -116,6 +112,11 @@ public class Advisor extends JPanel {
                 }
             }
         }
+        
+        if (newText.length() == 0) {
+            newText.append("No documentation found for \"" + text + "\".");
+        }
+        
         showDocumentation(newText.toString());
     }
     
