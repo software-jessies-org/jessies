@@ -102,10 +102,15 @@ public class ManPageResearcher implements WorkspaceResearcher {
             ArrayList<String> lines = new ArrayList<String>();
             ArrayList<String> errors = new ArrayList<String>();
             int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray("man -S " + section + " -w " + page), lines, errors);
+            if (status != 0) {
+                return "";
+            }
+            
             String filename = lines.get(0);
             if (FileUtilities.exists(filename) == false) {
                 return "";
             }
+            
             if (GuiUtilities.isMacOs()) {
                 // On Mac OS, the ancient version of rman(1) only seems to work with pre-formatted pages, and then only if you let it guess.
                 command = "nroff -man '" + filename + "' | " + polyglotMan;
