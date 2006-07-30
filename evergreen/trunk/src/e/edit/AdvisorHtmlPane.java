@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.gui.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -7,11 +8,14 @@ import javax.swing.text.html.*;
 
 public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     private JTextPane textPane;
+    private EStatusBar statusBar;
     
     public AdvisorHtmlPane() {
+        statusBar = new EStatusBar();
         initTextPane();
         setLayout(new BorderLayout());
         add(new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
+        add(statusBar, BorderLayout.SOUTH);
     }
     
     private void initTextPane() {
@@ -33,12 +37,9 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     public void hyperlinkUpdate(HyperlinkEvent e) {
         // Welcome to the wonderful world of OOP, featuring nested-if polymorphism.
         if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-            String tip = "Open " + e.getDescription();
-            Evergreen.getInstance().showStatus(tip);
-            textPane.setToolTipText(tip);
+            statusBar.setText("Open " + e.getDescription());
         } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
-            Evergreen.getInstance().showStatus("");
-            textPane.setToolTipText(null);
+            statusBar.clearStatusBar();
         } else if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e instanceof HTMLFrameHyperlinkEvent) {
                 ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
