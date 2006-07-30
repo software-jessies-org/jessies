@@ -22,6 +22,8 @@ public interface WorkspaceResearcher {
      * "ri:"; this method is invoked when such a link is clicked on to see if
      * this researcher knows how to handle such links. Return true if you've
      * handled the link, and it won't be passed to further researchers.
+     * 
+     * This method is not invoked from the event dispatch thread.
      */
     public boolean handleLink(String link);
 }
