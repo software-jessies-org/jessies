@@ -32,7 +32,16 @@ public class InsertInterfaceAction extends ETextAction {
     }
     
     private void pasteSourceCode() {
-        String text = Advisor.getInstance().getLookupString();
+        // Get the line up to the caret.
+        ETextArea textArea = ETextAction.getFocusedTextArea();
+        if (textArea == null) {
+            Evergreen.getInstance().showAlert("Couldn't insert interface", "It wasn't possible to work out what file you're referring to.");
+            return;
+        }
+        int dot = textArea.getSelectionStart();
+        int lineNumber = textArea.getLineOfOffset(dot);
+        int lineStart = textArea.getLineStartOffset(lineNumber);
+        String text = textArea.getTextBuffer().subSequence(lineStart, dot).toString();
         
         String className = null;
         String prefix = "";
