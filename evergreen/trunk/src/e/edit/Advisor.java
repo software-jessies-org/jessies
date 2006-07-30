@@ -64,7 +64,7 @@ public class Advisor extends JPanel {
     public synchronized void showDocumentation() {
         advicePane.setText("");
         getFrame().setVisible(true);
-        research(getLookupString());
+        research(getSearchTerm());
     }
     
     private class ResearchRunner extends SwingWorker<String, Object> {
@@ -113,32 +113,25 @@ public class Advisor extends JPanel {
         advicePane.setText(content);
     }
     
-    public String getLookupString() {
+    private String getSearchTerm() {
         ETextArea textArea = ETextAction.getFocusedTextArea();
         if (textArea == null) {
             return "";
         }
         
-        // We give the researchers the selection, if there is one.
-        // If there isn't, we give them the current line up to the caret.
-        String string = textArea.getSelectedText();
-        if (string == null) {
-            string = "";
-        }
-        if (string.length() == 0) {
-            int dot = textArea.getSelectionStart();
-            int lineNumber = textArea.getLineOfOffset(dot);
-            int lineStart = textArea.getLineStartOffset(lineNumber);
-            string = textArea.getTextBuffer().subSequence(lineStart, dot).toString();
+        // We use the selection, if there is one.
+        String selection = textArea.getSelectedText();
+        if (selection.length() > 0) {
+            return selection.trim();
         }
         
-        // If the user's selected more than a line, don't tell the researchers.
-        if (string.matches(".*\n.*\n")) {
-            return "";
-        }
-        
-        // Remove whitespace, because no researcher is going to tell us anything about whitespace.
-        return string.trim();
+        // Otherwise, we use the word at the caret.
+        CharSequence chars = textArea.getTextBuffer();
+        int caretPosition = textArea.getSelectionStart();
+        String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
+        int start = PWordUtilities.getWordStart(chars, caretPosition, stopChars);
+        int end = PWordUtilities.getWordEnd(chars, caretPosition, stopChars);
+        return chars.subSequence(start, end).toString();
     }
     
     public void research(String text) {
