@@ -106,10 +106,11 @@ public class Advisor extends JPanel {
         }
     }
     
-    public synchronized void showDocumentation(String content) {
+    public void showDocumentation(String content) {
         if (content.startsWith("<html>") == false) {
             content = "<html><head><title></title></head><body bgcolor=#FFFFFF>" + content + "</body></html>";
         }
+        // JEditorPane.setText is thread-safe.
         advicePane.setText(content);
     }
     
@@ -143,13 +144,27 @@ public class Advisor extends JPanel {
     }
     
     public void linkClicked(String link) {
-        // Offer the link to each researcher.
-        for (WorkspaceResearcher researcher : researchers) {
-            if (researcher.handleLink(link)) {
-                return;
-            }
+        new LinkClickRunner(link).execute();
+    }
+    
+    private class LinkClickRunner extends SwingWorker<Object, Object> {
+        private String link;
+        
+        private LinkClickRunner(String link) {
+            this.link = link;
         }
-        // Hand it on to the file-opening code to work out what to do with it.
-        Evergreen.getInstance().openFile(link);
+        
+        @Override
+        protected Object doInBackground() {
+            // Offer the link to each researcher.
+            for (WorkspaceResearcher researcher : researchers) {
+                if (researcher.handleLink(link)) {
+                    return null;
+                }
+            }
+            // Hand it on to the file-opening code to work out what to do with it.
+            Evergreen.getInstance().openFile(link);
+            return null;
+        }
     }
 }
