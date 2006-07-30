@@ -78,7 +78,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     }
     
     public void valueChangedTo(String value) {
-        findAllMatches(value);
+        findAllMatches(value, true);
     }
     
     /**
@@ -113,12 +113,12 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     public void findInText(ETextWindow textWindow, String regularExpression) {
         currentTextWindow = textWindow;
-        findAllMatches(regularExpression);
+        findAllMatches(regularExpression, true);
     }
     
     public void repeatLastFind(ETextWindow textWindow) {
         currentTextWindow = textWindow;
-        findAllMatches(currentRegularExpression);
+        findAllMatches(currentRegularExpression, false);
     }
     
     //
@@ -130,12 +130,14 @@ public class FindAction extends ETextAction implements MinibufferUser {
         currentTextWindow.getBirdView().clearMatchingLines();
     }
     
-    public void findAllMatches(String regularExpression) {
+    public void findAllMatches(String regularExpression, boolean updateStatusBar) {
         currentRegularExpression = regularExpression;
         ETextArea textArea = currentTextWindow.getText();
         try {
             int matchCount = textArea.findAllMatches(regularExpression, currentTextWindow.getBirdView());
-            Evergreen.getInstance().showStatus("Found " + StringUtilities.pluralize(matchCount, "match", "matches") + " for \"" + regularExpression + "\"");
+            if (updateStatusBar) {
+                Evergreen.getInstance().showStatus("Found " + StringUtilities.pluralize(matchCount, "match", "matches") + " for \"" + regularExpression + "\"");
+            }
         } catch (PatternSyntaxException patternSyntaxException) {
             Evergreen.getInstance().showStatus(patternSyntaxException.getDescription());
             return;
