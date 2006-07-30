@@ -149,17 +149,20 @@ public class ETextWindow extends EWindow implements PTextListener {
                     } else {
                         message = "Selected from line " + startLineNumber + " to " + endLineNumber;
                     }
+                    
+                    // Describe the size of the selection.
+                    message += " (";
+                    message += StringUtilities.pluralize(selectionEnd - selectionStart, "character", "characters");
+                    // FIXME: if we report this, we look right if the user's selected whole lines; if we add one, we look right if the user's selected partial lines. It would be nice to give a natural answer in both cases, but for now we go with whole lines because if the user's counting lines, that's more likely to be what they're interested in.
+                    final int lineCount = endLineNumber - startLineNumber;
+                    if (lineCount > 1) {
+                        message += " on " + lineCount + " lines";
+                    }
+                    message += ")";
                 } else {
                     // Describe the location of the caret.
                     message = "At " + addressFromOffset(selectionStart, "line ", ", column ");
                 }
-                
-                // If we have a non-empty selection, say how big it is.
-                final int selectionCharacterCount = selectionEnd - selectionStart;
-                if (selectionCharacterCount > 0) {
-                    message += " (" + StringUtilities.pluralize(selectionCharacterCount, "character", "characters") + ")";
-                }
-                
                 Evergreen.getInstance().showStatus(message);
             }
         });
