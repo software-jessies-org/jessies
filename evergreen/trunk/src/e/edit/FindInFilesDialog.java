@@ -145,6 +145,7 @@ public class FindInFilesDialog {
         private DefaultMutableTreeNode matchRoot;
         private String regex;
         private String fileRegex;
+        private String errorMessage;
         
         private HashMap<String, DefaultMutableTreeNode> pathMap = new HashMap<String, DefaultMutableTreeNode>();
         
@@ -241,7 +242,7 @@ public class FindInFilesDialog {
                 long endTime = System.currentTimeMillis();
                 Log.warn("Search for '" + regex + "' in files matching '" + fileRegex + "' took " + (endTime - startTime) + " ms.");
             } catch (PatternSyntaxException ex) {
-                setStatus(ex.getDescription(), true);
+                errorMessage = ex.getDescription();
             } catch (Exception ex) {
                 Log.warn("Problem searching files for ", ex);
             }
@@ -289,7 +290,11 @@ public class FindInFilesDialog {
                 return;
             }
             
-            setStatus(makeStatusString(), false);
+            if (errorMessage != null) {
+                setStatus(errorMessage, true);
+            } else {
+                setStatus(makeStatusString(), false);
+            }
         }
         
         private String makeStatusString() {
