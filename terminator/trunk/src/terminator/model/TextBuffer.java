@@ -485,10 +485,12 @@ public class TextBuffer {
 		TextLine textLine = getTextLine(cursorPosition.getLineIndex());
 		int startOffset = cursorPosition.getCharOffset();
 		int tabLength = nextTabLocation - startOffset;
-		if (insertMode) {
+		// We want to insert our special tabbing characters (see getTabString) when inserting a tab or outputting one at the end of a line, so that text copied from the output of (say) cat(1) will be pasted with tabs preserved.
+		boolean endOfLine = (startOffset == textLine.length());
+		if (insertMode || endOfLine) {
 			textLine.insertTabAt(startOffset, tabLength, currentStyle);
 		} else {
-			textLine.writeTabAt(startOffset, tabLength, currentStyle);
+			// Emacs, source of all bloat, uses \t\b\t sequences around tab stops (in lines with no \t characters) if you hold down right arrow. The call to textAdded below moves the cursor, which is all we're supposed to do.
 		}
 		textAdded(tabLength);
 	}
