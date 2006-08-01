@@ -23,10 +23,21 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         textPane.setEditable(false);
         textPane.setContentType("text/html");
         textPane.addHyperlinkListener(this);
+        
         HTMLEditorKit editorKit = (HTMLEditorKit) textPane.getEditorKit();
         StyleSheet styleSheet = editorKit.getStyleSheet();
+        
+        Font bodyFont = ChangeFontAction.getConfiguredFont();
         styleSheet.removeStyle("body");
-        styleSheet.addRule("body { font-family: \"Lucida Grande\", Arial, Helvetica, sans-serif }");
+        String body = "body { font-family: \"" + bodyFont.getFamily() + "\", sans-serif; font-size: " + bodyFont.getSize() + "pt; margin: 0px 2px 0px 2px; }";
+        styleSheet.addRule(body);
+        //System.err.println(body);
+        
+        Font preFont = ChangeFontAction.getConfiguredFixedFont();
+        styleSheet.removeStyle("pre");
+        String pre = "pre { font-family: \"" + preFont.getFamily() + "\", monospace; font-size: " + preFont.getSize() + "pt; background-color: #eeeeff; border-style: solid; border-width: thin; border-color: #bbbbff; padding: 5px 5px 5px 5px; }";
+        styleSheet.addRule(pre);
+        //System.err.println(pre);
     }
     
     public void setText(String text) {
