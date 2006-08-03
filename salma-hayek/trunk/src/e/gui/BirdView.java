@@ -40,6 +40,21 @@ public class BirdView extends JComponent {
             Log.warn("Couldn't get access to getTrackBounds", ex);
         }
         initMouseListener();
+        initScrollBarMotionListener();
+    }
+    
+    private void initScrollBarMotionListener() {
+        scrollBar.getModel().addChangeListener(new ChangeListener() {
+            private int lastScrollRange;
+            
+            public void stateChanged(ChangeEvent event) {
+                int newScrollRange = scrollBar.getModel().getMaximum();
+                if (newScrollRange != lastScrollRange) {
+                    repaint();
+                    lastScrollRange = newScrollRange;
+                }
+            }
+        });
     }
     
     private void initMouseListener() {
