@@ -29,7 +29,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         
         Font bodyFont = ChangeFontAction.getConfiguredFont();
         styleSheet.removeStyle("body");
-        String body = "body { font-family: \"" + bodyFont.getFamily() + "\", sans-serif; font-size: " + bodyFont.getSize() + "pt; margin: 0px 2px 0px 2px; }";
+        String body = "body { font-family: \"" + bodyFont.getFamily() + "\", sans-serif; font-size: " + bodyFont.getSize() + "pt; margin: 0px 2px 20px 2px; }";
         styleSheet.addRule(body);
         //System.err.println(body);
         
