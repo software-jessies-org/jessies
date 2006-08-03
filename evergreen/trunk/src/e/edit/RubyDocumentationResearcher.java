@@ -6,7 +6,7 @@ import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {
     public String research(String string) {
-        String ri = getRi();
+        String ri = Advisor.findToolOnPath("ri");
         if (ri == null) {
             return "";
         }
@@ -30,16 +30,6 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         // FIXME: we should link up stuff like "Includes:", "Class methods:", and "Instance methods:". See Array for an example of all three.
         
         return (result.contains("<error>") ? "" : result);
-    }
-    
-    private String getRi() {
-        ArrayList<String> availableRis = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, new String[] { "which", "ri" }, availableRis, errors);
-        if (status != 0 || availableRis.size() == 0) {
-            return null;
-        }
-        return availableRis.get(0);
     }
     
     /** Returns true for Ruby files. */

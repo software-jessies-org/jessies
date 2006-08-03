@@ -48,6 +48,7 @@ public class Advisor extends JPanel {
                 addResearcher(ManPageResearcher.getSharedInstance());
                 addResearcher(new NumberResearcher());
                 addResearcher(new RubyDocumentationResearcher());
+                addResearcher(new PerlDocumentationResearcher());
             }
         }).start();
     }
@@ -172,5 +173,15 @@ public class Advisor extends JPanel {
             Evergreen.getInstance().openFile(link);
             return null;
         }
+    }
+    
+    public static String findToolOnPath(String tool) {
+        ArrayList<String> availableTools = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(null, new String[] { "which", tool }, availableTools, errors);
+        if (status != 0 || availableTools.size() == 0) {
+            return null;
+        }
+        return availableTools.get(0);
     }
 }
