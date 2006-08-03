@@ -80,11 +80,13 @@ public class Advisor extends JPanel {
         @Override
         protected String doInBackground() {
             StringBuilder newText = new StringBuilder();
-            for (WorkspaceResearcher researcher : researchers) {
-                if (textWindow == null || researcher.isSuitable(textWindow)) {
-                    String result = researcher.research(searchTerm);
-                    if (result != null && result.length() > 0) {
-                        newText.append(result);
+            synchronized (researchers) {
+                for (WorkspaceResearcher researcher : researchers) {
+                    if (textWindow == null || researcher.isSuitable(textWindow)) {
+                        String result = researcher.research(searchTerm);
+                        if (result != null && result.length() > 0) {
+                            newText.append(result);
+                        }
                     }
                 }
             }
@@ -140,7 +142,9 @@ public class Advisor extends JPanel {
     }
     
     private void addResearcher(WorkspaceResearcher researcher) {
-        researchers.add(researcher);
+        synchronized (researchers) {
+            researchers.add(researcher);
+        }
     }
     
     public void linkClicked(String link) {
@@ -157,9 +161,11 @@ public class Advisor extends JPanel {
         @Override
         protected Object doInBackground() {
             // Offer the link to each researcher.
-            for (WorkspaceResearcher researcher : researchers) {
-                if (researcher.handleLink(link)) {
-                    return null;
+            synchronized (researchers) {
+                for (WorkspaceResearcher researcher : researchers) {
+                    if (researcher.handleLink(link)) {
+                        return null;
+                    }
                 }
             }
             // Hand it on to the file-opening code to work out what to do with it.
