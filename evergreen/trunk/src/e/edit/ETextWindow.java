@@ -631,6 +631,10 @@ public class ETextWindow extends EWindow implements PTextListener {
         return (fileType == C_PLUS_PLUS);
     }
     
+    public boolean isPerl() {
+        return (fileType == PERL);
+    }
+    
     public boolean isJava() {
         return (fileType == JAVA);
     }
