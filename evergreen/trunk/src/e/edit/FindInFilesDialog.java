@@ -473,7 +473,7 @@ public class FindInFilesDialog {
         };
         saveMonitor.addSaveListener(saveListener);
         
-        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find in Files");
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find in Files in " + workspace.getTitle());
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Files Containing:", regexField);
         formPanel.addRow("Whose Names Match:", filenameRegexField);
