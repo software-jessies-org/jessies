@@ -13,6 +13,21 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(null, new String[] { "ruby", ri, "-T", "-f", "html", string }, lines, errors);
+        
+        String className = string;
+        String lastLine = "";
+        for (int i = 0; i < lines.size(); ++i) {
+            String line = lines.get(i);
+            if (lastLine.equals("<h2>Includes:</h2>")) {
+                // FIXME: we should link up the "Includes:" lines too. See Array for an example that also has class and instance methods.
+            } else if (lastLine.equals("<h2>Class methods:</h2>")) {
+                lines.set(i, rewriteMethodListAsLinks(line, className + "::"));
+            } else if (lastLine.equals("<h2>Instance methods:</h2>")) {
+                lines.set(i, rewriteMethodListAsLinks(line, className + "#"));
+            }
+            lastLine = line;
+        }
+        
         String result = StringUtilities.join(lines, "\n");
         
         // Rewrite references such as IO#puts as links to ri:IO#puts, not forgetting more complicated examples such as Zlib::GzipWriter#puts.
@@ -27,9 +42,15 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         // At the top of an individual method's page, link to the defining class.
         result = result.replaceAll("<b>(\\w+)(::|#)(.+?)</b>", "<b><a href=\"ri:$1\">$1</a>$2$3</b>");
         
-        // FIXME: we should link up stuff like "Includes:", "Class methods:", and "Instance methods:". See Array for an example of all three.
-        
         return (result.contains("<error>") ? "" : result);
+    }
+    
+    private String rewriteMethodListAsLinks(String line, String prefix) {
+        String[] methods = line.replaceAll("<p>$", "").split(", ");
+        for (int i = 0; i < methods.length; ++i) {
+            methods[i] = ("<a href=\"ri:" + prefix + methods[i] + "\">" + methods[i] + "</a>");
+        }
+        return StringUtilities.join(methods, ", ");
     }
     
     /** Returns true for Ruby files. */
