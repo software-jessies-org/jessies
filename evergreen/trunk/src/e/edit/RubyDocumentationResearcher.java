@@ -19,7 +19,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         for (int i = 0; i < lines.size(); ++i) {
             String line = lines.get(i);
             if (lastLine.equals("<h2>Includes:</h2>")) {
-                // FIXME: we should link up the "Includes:" lines too. See Array for an example that also has class and instance methods.
+                lines.set(i, rewriteIncludeListAsLinks(line));
             } else if (lastLine.equals("<h2>Class methods:</h2>")) {
                 lines.set(i, rewriteMethodListAsLinks(line, className + "::"));
             } else if (lastLine.equals("<h2>Instance methods:</h2>")) {
@@ -46,11 +46,31 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
     }
     
     private String rewriteMethodListAsLinks(String line, String prefix) {
+        // Example: "[], new<p>"
         String[] methods = line.replaceAll("<p>$", "").split(", ");
         for (int i = 0; i < methods.length; ++i) {
             methods[i] = ("<a href=\"ri:" + prefix + methods[i] + "\">" + methods[i] + "</a>");
         }
         return StringUtilities.join(methods, ", ");
+    }
+    
+    private String rewriteIncludeListAsLinks(String line) {
+        // Example: "Comparable(&lt;, &lt;=, ==, &gt;, &gt;=, between?), Enumerable(all?, any?, collect, detect, each_cons, each_slice, each_with_index, entries, enum_cons, enum_slice, enum_with_index, find, find_all, grep, include?, inject, map, max, member?, min, partition, reject, select, sort, sort_by, to_a, to_set, zip)<p>"
+        String result = "";
+        String[] modules = line.replaceAll("<p>$", "").split("\\), ");
+        for (String module : modules) {
+            int openParenthesisIndex = module.indexOf('(');
+            String moduleName = module.substring(0, openParenthesisIndex);
+            String[] methods = module.substring(openParenthesisIndex + 1).split(", ");
+            for (int i = 0; i < methods.length; ++i) {
+                methods[i] = ("<a href=\"ri:" + moduleName + "#" + methods[i] + "\">" + methods[i] + "</a>");
+            }
+            if (result.length() > 0) {
+                result += "\n<p>";
+            }
+            result += "<a href=\"ri:" + moduleName + "\">" + moduleName + "</a> methods:<blockquote>" + StringUtilities.join(methods, ", ") + "</blockquote>";
+        }
+        return result;
     }
     
     /** Returns true for Ruby files. */
