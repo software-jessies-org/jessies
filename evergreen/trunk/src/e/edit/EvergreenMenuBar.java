@@ -113,7 +113,10 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new ProportionalFontAction());
         menu.add(new FixedFontAction());
         menu.add(new AppropriateFontAction());
-
+        
+        menu.add(new JSeparator());
+        menu.add(new ShowCounterpartAction());
+        
         menu.add(new JSeparator());
         menu.add(new FilePropertiesAction());
         return menu;
