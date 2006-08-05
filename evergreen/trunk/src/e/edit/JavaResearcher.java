@@ -351,18 +351,31 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
         s.append("<br>");
         s.append(makeClassLink(c, true, true));
-        if (c.isInterface() == false && c != Object.class && c.getSuperclass() != Object.class) {
+        
+        // Show superclasses.
+        Class superclass = c.getSuperclass();
+        if (superclass != null && c.isInterface() == false) {
             s.append("<br>extends ");
-            s.append(makeClassLink(c.getSuperclass(), false, true));
+            int depth = 0;
+            for (; superclass != null; superclass = superclass.getSuperclass()) {
+                s.append("<br>");
+                s.append(StringUtilities.nCopies(++depth, "&nbsp;"));
+                s.append(makeClassLink(superclass, false, true));
+            }
         }
+        
+        // Show all implemented interfaces.
         Class[] interfaces = c.getInterfaces();
         if (interfaces.length > 0) {
             s.append("<br>implements ");
             s.append(NEWLINE);
             s.append(makeClassLinks(interfaces, false, NEWLINE, true));
         }
+        
+        // Show all interface/superinterface methods.
         if (c.isInterface()) {
-            s.append(makeMethodLinks(c.getDeclaredMethods()));
+            s.append("<br><br>interface methods ");
+            s.append(makeMethodLinks(c.getMethods()));
         }
         return s.toString();
     }
