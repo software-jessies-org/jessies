@@ -349,6 +349,12 @@ public class Evergreen {
         tabbedPane.setSelectedIndex(newIndex);
     }
     
+    public void goToWorkspaceByIndex(int workspaceIndex) {
+        if (workspaceIndex >= 0 && workspaceIndex < tabbedPane.getTabCount()) {
+            tabbedPane.setSelectedIndex(workspaceIndex);
+        }
+    }
+    
     private void addWorkspace(final Workspace workspace) {
         String name = workspace.getTitle();
         tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), getWorkspaceIndexInTabbedPane(name));
@@ -760,29 +766,7 @@ public class Evergreen {
         new InAppServer("EditServer", getPreferenceFilename("edit-server-port"), wildcardAddress, EditServer.class, new EditServer(this));
         
         UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
-        tabbedPane = new JTabbedPane(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);
-        tabbedPane.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                Evergreen.getInstance().getTagsPanel().ensureTagsAreHidden();
-                getCurrentWorkspace().restoreFocusToRememberedTextWindow();
-            }
-        });
-        EPopupMenu tabMenu = new EPopupMenu(tabbedPane);
-        tabMenu.addMenuItemProvider(new MenuItemProvider() {
-            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
-                // If the user clicked on some part of the tabbed pane that isn't actually a tab, we're not interested.
-                int tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
-                if (tabIndex == -1) {
-                    return;
-                }
-                
-                Workspace workspace = (Workspace) tabbedPane.getComponentAt(tabIndex);
-                actions.add(new RescanWorkspaceAction(workspace));
-                actions.add(null);
-                actions.add(new EditWorkspaceAction(workspace));
-                actions.add(new RemoveWorkspaceAction(workspace));
-            }
-        });
+        tabbedPane = new EvergreenTabbedPane();
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabbedPane, tagsPanel);
         frame.getContentPane().add(splitPane, BorderLayout.CENTER);

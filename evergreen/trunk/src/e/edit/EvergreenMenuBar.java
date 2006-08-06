@@ -199,4 +199,17 @@ public class EvergreenMenuBar extends EMenuBar {
         helpMenu.setChangeLog("http://software.jessies.org/Evergreen/ChangeLog.html");
         return helpMenu.makeJMenu();
     }
+    
+    @Override
+    protected boolean processKeyBinding(KeyStroke ks, KeyEvent event, int condition, boolean pressed) {
+        int modifier = KeyEvent.ALT_MASK;
+        if ((event.getModifiers() & modifier) == modifier) {
+            char ch = event.getKeyChar();
+            if (ch >= '1' && ch <= '9') {
+                Evergreen.getInstance().goToWorkspaceByIndex(ch - '1');
+                return true;
+            }
+        }
+        return super.processKeyBinding(ks, event, condition, pressed);
+    }
 }
