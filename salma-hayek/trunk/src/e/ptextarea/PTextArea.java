@@ -1551,6 +1551,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         }
     }
     
+    public int getFindMatchCount() {
+        return highlights.countHighlightsOfType(PFind.MatchHighlight.HIGHLIGHTER_NAME);
+    }
+    
     /**
      * Override this to update the find results just in time when the user
      * tries to move to the next or previous match.

@@ -5,6 +5,11 @@ import java.util.*;
 public class PHighlightManager {
     private Map<String, HighlightSet> highlighterSets = new LinkedHashMap<String, HighlightSet>();
     
+    public synchronized int countHighlightsOfType(String highlighterName) {
+        HighlightSet set = highlighterSets.get(highlighterName);
+        return (set != null) ? set.size() : 0;
+    }
+    
     public synchronized void add(PHighlight highlight) {
         String highlighterName = highlight.getHighlighterName();
         if (highlighterSets.containsKey(highlighterName) == false) {
@@ -53,6 +58,10 @@ public class PHighlightManager {
         
         public void remove(PHighlight highlight) {
             highlights.remove(new Wrapper(highlight));
+        }
+        
+        public int size() {
+            return highlights.size();
         }
         
         public PHighlight getHighlightAfter(int offset) {
