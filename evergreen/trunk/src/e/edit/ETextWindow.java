@@ -195,6 +195,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             public void focusGained(FocusEvent e) {
                 rememberWeHadFocusLast();
                 updateWatermarkAndTitleBar();
+                updateStatusLine();
             }
             
             public void focusLost(FocusEvent e) {
