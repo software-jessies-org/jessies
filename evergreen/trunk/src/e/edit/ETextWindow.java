@@ -135,35 +135,48 @@ public class ETextWindow extends EWindow implements PTextListener {
         BugDatabaseHighlighter.highlightBugs(text);
     }
     
+    public void updateStatusLine() {
+        final int selectionStart = text.getSelectionStart();
+        final int selectionEnd = text.getSelectionEnd();
+        String message = "";
+        if (selectionStart != selectionEnd) {
+            // Describe the selected range.
+            final int startLineNumber = 1 + text.getLineOfOffset(selectionStart);
+            final int endLineNumber = 1 + text.getLineOfOffset(selectionEnd);
+            if (startLineNumber == endLineNumber) {
+                final int endLineStartOffset = text.getLineStartOffset(endLineNumber - 1);
+                message = "Selected " + addressFromOffset(selectionStart, "line ", " columns ") + "-" + (1 + emacsDistance(text.getTextBuffer(), selectionEnd, endLineStartOffset));
+            } else {
+                message = "Selected from line " + startLineNumber + " to " + endLineNumber;
+            }
+            
+            // Describe the size of the selection.
+            message += " (";
+            message += StringUtilities.pluralize(selectionEnd - selectionStart, "character", "characters");
+            // FIXME: if we report this, we look right if the user's selected whole lines; if we add one, we look right if the user's selected partial lines. It would be nice to give a natural answer in both cases, but for now we go with whole lines because if the user's counting lines, that's more likely to be what they're interested in.
+            final int lineCount = endLineNumber - startLineNumber;
+            if (lineCount > 1) {
+                message += " on " + lineCount + " lines";
+            }
+            message += ")";
+        } else {
+            // Describe the location of the caret.
+            message = "At " + addressFromOffset(selectionStart, "line ", ", column ");
+        }
+        
+        // If there are any current find matches, show how many.
+        final int matchCount = text.getFindMatchCount();
+        if (matchCount > 0) {
+            message += "; " + StringUtilities.pluralize(matchCount, "match", "matches");
+        }
+        
+        Evergreen.getInstance().showStatus(message);
+    }
+    
     private void initCaretListener() {
         text.addCaretListener(new PCaretListener() {
             public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
-                String message = "";
-                if (selectionStart != selectionEnd) {
-                    // Describe the selected range.
-                    final int startLineNumber = 1 + text.getLineOfOffset(selectionStart);
-                    final int endLineNumber = 1 + text.getLineOfOffset(selectionEnd);
-                    if (startLineNumber == endLineNumber) {
-                        final int endLineStartOffset = text.getLineStartOffset(endLineNumber - 1);
-                        message = "Selected " + addressFromOffset(selectionStart, "line ", " columns ") + "-" + (1 + emacsDistance(text.getTextBuffer(), selectionEnd, endLineStartOffset));
-                    } else {
-                        message = "Selected from line " + startLineNumber + " to " + endLineNumber;
-                    }
-                    
-                    // Describe the size of the selection.
-                    message += " (";
-                    message += StringUtilities.pluralize(selectionEnd - selectionStart, "character", "characters");
-                    // FIXME: if we report this, we look right if the user's selected whole lines; if we add one, we look right if the user's selected partial lines. It would be nice to give a natural answer in both cases, but for now we go with whole lines because if the user's counting lines, that's more likely to be what they're interested in.
-                    final int lineCount = endLineNumber - startLineNumber;
-                    if (lineCount > 1) {
-                        message += " on " + lineCount + " lines";
-                    }
-                    message += ")";
-                } else {
-                    // Describe the location of the caret.
-                    message = "At " + addressFromOffset(selectionStart, "line ", ", column ");
-                }
-                Evergreen.getInstance().showStatus(message);
+                updateStatusLine();
             }
         });
     }
