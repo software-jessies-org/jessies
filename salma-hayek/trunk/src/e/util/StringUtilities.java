@@ -260,9 +260,16 @@ public class StringUtilities {
      * Returns a string consisting of 'count' copies of 'ch'.
      */
     public static String nCopies(int count, char ch) {
-        StringBuilder builder = new StringBuilder(count);
+        return nCopies(count, Character.toString(ch));
+    }
+    
+    /**
+     * Returns a string consisting of 'count' copies of 's'.
+     */
+    public static String nCopies(int count, String s) {
+        StringBuilder builder = new StringBuilder(s.length() * count);
         for (int i = 0; i < count; ++i) {
-            builder.append(ch);
+            builder.append(s);
         }
         return builder.toString();
     }
