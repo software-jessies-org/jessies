@@ -53,6 +53,7 @@ public class Evergreen {
     private List<InitialFile> initialFiles;
     
     private ArrayList<Element> initialWorkspaces;
+    private Workspace initialWorkspace;
     
     private JPanel statusLineAndProgressContainer = new JPanel(new BorderLayout());
     
@@ -544,6 +545,7 @@ public class Evergreen {
                 openFile(file);
             }
             showStatus((initialFiles.size() == 0) ? "No files to open" : "Finished opening files");
+            initialFiles = null;
         }
     }
     
@@ -552,8 +554,12 @@ public class Evergreen {
         Log.warn("Opening remembered workspaces...");
         if (initialWorkspaces != null) {
             for (Element info : initialWorkspaces) {
-                addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"));
+                Workspace workspace = addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"));
+                if (info.hasAttribute("selected")) {
+                    initialWorkspace = workspace;
+                }
             }
+            initialWorkspaces = null;
             return;
         }
     }
@@ -629,11 +635,11 @@ public class Evergreen {
         }
     }
     
-    public void addWorkspace(String name, String root, String buildTarget) {
+    private Workspace addWorkspace(String name, String root, String buildTarget) {
         Log.warn("Opening workspace '" + name + "' with root '" + root + "'");
         Workspace workspace = createWorkspace(name, root);
         if (workspace == null) {
-            return;
+            return null;
         }
         
         workspace.setBuildTarget(buildTarget);
@@ -646,6 +652,7 @@ public class Evergreen {
             tabbedPane.setForegroundAt(which, Color.RED);
             tabbedPane.setToolTipTextAt(which, root + " isn't a directory.");
         }
+        return workspace;
     }
     
     public void initWindowListener() {
@@ -789,9 +796,12 @@ public class Evergreen {
                 
                 startScanningWorkspaces();
                 
-                // If we didn't create any workspaces, give the user some help...
                 if (tabbedPane.getTabCount() == 0) {
+                    // If we didn't create any workspaces, give the user some help...
                     showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
+                } else if (initialWorkspace != null) {
+                    tabbedPane.setSelectedComponent(initialWorkspace);
+                    initialWorkspace = null;
                 }
             }
         });

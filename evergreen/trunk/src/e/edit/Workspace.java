@@ -455,6 +455,9 @@ public class Workspace extends JPanel {
         workspace.setAttribute("name", getTitle());
         workspace.setAttribute("root", getRootDirectory());
         workspace.setAttribute("buildTarget", getBuildTarget());
+        if (Evergreen.getInstance().getCurrentWorkspace() == this) {
+            workspace.setAttribute("selected", "true");
+        }
         for (ETextWindow textWindow : leftColumn.getTextWindows()) {
             org.w3c.dom.Element file = document.createElement("file");
             workspace.appendChild(file);
