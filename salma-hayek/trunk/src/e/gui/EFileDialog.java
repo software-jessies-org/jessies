@@ -80,6 +80,19 @@ public class EFileDialog {
     }
     
     /**
+     * Sets the selected file for this file dialog window to be the
+     * specified file. This file becomes the default file if it is set
+     * before the file dialog window is first shown.
+     */
+    public void setFile(File file) {
+        if (awtFileDialog != null) {
+            awtFileDialog.setFile(file.toString());
+        } else {
+            swingFileDialog.setSelectedFile(file);
+        }
+    }
+    
+    /**
      * Decides whether we should use AWT or Swing for our open dialog.
      * At the moment, we use the native dialogs on Mac OS and Windows,
      * because they're both great, but we avoid the Motif dialog we're
