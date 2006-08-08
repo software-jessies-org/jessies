@@ -33,19 +33,36 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
     }
     
     /**
-     * Returns true if the styler should comment to end of line on seeing '#'.
-     */
-    protected abstract boolean supportShellComments();
-    
-    /**
-     * Returns true if the styler should comment to end of line on seeing '//'.
-     */
-    protected abstract boolean supportDoubleSlashComments();
-    
-    /**
      * Returns true if the style should count text in a C-like comment (such as this) as comment.
      */
     protected abstract boolean supportSlashStarComments();
+    
+    /**
+     * Returns the text that introduces comment-to-EOL ("//" in the C family, "#" in the script family, and "--" in various "European" languages) if there's such a thing, null otherwise.
+     */
+    protected boolean isCommentToEndOfLineStart(String line, int atIndex) {
+        return false;
+    }
+    
+    // This is parameterized so that we can recognize the GNU make keyword "filter-out".
+    protected String getKeywordRegularExpression() {
+        return "\\b(\\w+)\\b";
+    }
+    
+    /**
+     * Returns true iff the given character is a quote of some sort.
+     * It's safe to override this and increase or reduce the number of quote characters.
+     * The makefile styler removes single quotes, for example, and the scripting language stylers add backquote.
+     */
+    protected boolean isQuote(char ch) {
+        return (ch == '\'' || ch == '\"');
+    }
+    
+    protected static final boolean isShellComment(String line, int i) {
+        // Only recognize # comments if they're at the start of the line or the preceding character was whitespace.
+        // This stops us mistaking "$#" in Perl or # characters in Ruby regular expressions for comments, for example.
+        return line.charAt(i) == '#' && (i == 0 || Character.isWhitespace(line.charAt(i - 1)));
+    }
     
     /**
      * Adds a text segment of type String to the given segment list.  Override
@@ -79,11 +96,6 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         });
     }
     
-    // This is parameterized so that we can recognize the GNU make keyword "filter-out".
-    protected String getKeywordRegularExpression() {
-        return "\\b(\\w+)\\b";
-    }
-    
     private void initCommentCache() {
         lastGoodLine = 0;
         commentCache = new BitSet();
@@ -111,10 +123,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                 lastStart = commentEndIndex;
                 comment = false;
             } else {
-                char ch = line.charAt(i);
-                // Only recognize # comments if they're at the start of the line or the preceding character was whitespace.
-                // This stops us mistaking "$#" in Perl or # characters in Ruby regular expressions for comments, for example.
-                if (supportShellComments() && ch == '#' && (i == 0 || Character.isWhitespace(line.charAt(i - 1)))) {
+                if (isCommentToEndOfLineStart(line, i)) {
                     comment = true;
                     if (lastStart < i) {
                         builder.addStyledSegment(i, PStyle.NORMAL);
@@ -122,7 +131,11 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                     builder.addStyledSegment(line.length(), PStyle.COMMENT);
                     i = line.length();
                     lastStart = i;
-                } else if (ch == '/') {
+                    break;
+                }
+                
+                char ch = line.charAt(i);
+                if (ch == '/') {
                     if (i < line.length() - 1) {
                         if (supportSlashStarComments() && line.charAt(i + 1) == '*') {
                             comment = true;
@@ -131,13 +144,6 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                             }
                             lastStart = i;
                             i += 2;
-                        } else if (supportDoubleSlashComments() && line.charAt(i + 1) == '/') {
-                            if (lastStart < i) {
-                                builder.addStyledSegment(i, PStyle.NORMAL);
-                            }
-                            builder.addStyledSegment(line.length(), PStyle.COMMENT);
-                            i = line.length();
-                            lastStart = i;
                         } else {
                             i++;
                         }
@@ -256,15 +262,6 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
             }
         }
         return comment;
-    }
-    
-    /**
-     * Returns true iff the given character is a quote of some sort.
-     * It's safe to override this and increase or reduce the number of quote characters.
-     * The makefile styler removes single quotes, for example, and the scripting language stylers add backquote.
-     */
-    protected boolean isQuote(char ch) {
-        return (ch == '\'' || ch == '\"');
     }
     
     private void dirtyFromOffset(PTextEvent event) {

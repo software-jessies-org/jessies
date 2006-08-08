@@ -52,13 +52,8 @@ public class PRubyTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
-    protected boolean supportShellComments() {
-        return true;
-    }
-
-    @Override
-    protected boolean supportDoubleSlashComments() {
-        return false;
+    protected boolean isCommentToEndOfLineStart(String line, int atIndex) {
+        return isShellComment(line, atIndex);
     }
     
     @Override

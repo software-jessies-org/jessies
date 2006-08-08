@@ -47,13 +47,8 @@ public class PCTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
-    protected boolean supportShellComments() {
-        return false;
-    }
-    
-    @Override
-    protected boolean supportDoubleSlashComments() {
-        return true;
+    protected boolean isCommentToEndOfLineStart(String line, int atIndex) {
+        return line.startsWith("//", atIndex);
     }
     
     @Override
