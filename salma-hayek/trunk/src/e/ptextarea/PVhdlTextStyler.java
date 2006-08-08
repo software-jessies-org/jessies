@@ -110,7 +110,7 @@ public class PVhdlTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
-    protected boolean isCommentToEndOfLineStart(String line, int atIndex) {
+    protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
         return line.startsWith("--", atIndex);
     }
     

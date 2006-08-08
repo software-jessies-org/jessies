@@ -41,7 +41,7 @@ public class PPythonTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
-    protected boolean isCommentToEndOfLineStart(String line, int atIndex) {
+    protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
         return isShellComment(line, atIndex);
     }
     

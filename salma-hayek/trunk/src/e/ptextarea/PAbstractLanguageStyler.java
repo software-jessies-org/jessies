@@ -40,7 +40,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
     /**
      * Returns the text that introduces comment-to-EOL ("//" in the C family, "#" in the script family, and "--" in various "European" languages) if there's such a thing, null otherwise.
      */
-    protected boolean isCommentToEndOfLineStart(String line, int atIndex) {
+    protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
         return false;
     }
     
@@ -123,7 +123,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                 lastStart = commentEndIndex;
                 comment = false;
             } else {
-                if (isCommentToEndOfLineStart(line, i)) {
+                if (isStartOfCommentToEndOfLine(line, i)) {
                     comment = true;
                     if (lastStart < i) {
                         builder.addStyledSegment(i, PStyle.NORMAL);

@@ -260,7 +260,7 @@ public class PPerlTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
-    protected boolean isCommentToEndOfLineStart(String line, int atIndex) {
+    protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
         return isShellComment(line, atIndex);
     }
     
