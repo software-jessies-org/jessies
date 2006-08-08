@@ -54,6 +54,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     public static final String RUBY = "Ruby";
     public static final String PERL = "Perl";
     public static final String PYTHON = "Python";
+    public static final String VHDL = "VHDL";
     
     private String fileType = PLAIN_TEXT;
     
@@ -444,6 +445,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             fileType = BASH;
         } else if (filename.endsWith("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
             fileType = MAKE;
+        } else if (filename.endsWith(".vhd")) {
+            fileType = VHDL;
         } else {
             fileType = PLAIN_TEXT;
         }
@@ -471,6 +474,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             text.setTextStyler(new PBashTextStyler(text));
         } else if (fileType == MAKE) {
             text.setTextStyler(new PMakefileTextStyler(text));
+        } else if (fileType == VHDL) {
+            text.setTextStyler(new PVhdlTextStyler(text));
         } else {
             // Plain text.
             text.setWrapStyleWord(true);
