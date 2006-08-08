@@ -12,4 +12,8 @@ public abstract class PAbstractTextStyler implements PTextStyler {
     }
     
     public abstract List<PLineSegment> getTextSegments(int line);
+    
+    public boolean keywordsAreCaseSensitive() {
+        return true;
+    }
 }

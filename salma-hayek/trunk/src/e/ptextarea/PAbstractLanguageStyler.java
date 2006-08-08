@@ -20,7 +20,6 @@ import e.util.*;
  * @author Phil Norman
  */
 public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
-    private HashSet<String> keywords = new HashSet<String>();
     private int lastGoodLine;
     private BitSet commentCache;
     
@@ -74,6 +73,12 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
     }
     
     private void initStyleApplicator() {
+        Set<String> keywords;
+        if (keywordsAreCaseSensitive()) {
+            keywords = new HashSet<String>();
+        } else {
+            keywords = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        }
         addKeywordsTo(keywords);
         if (keywords.size() > 0) {
             textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords, getKeywordRegularExpression()));

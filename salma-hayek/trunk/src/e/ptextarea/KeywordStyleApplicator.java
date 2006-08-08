@@ -7,9 +7,9 @@ import java.util.regex.*;
  * Recognizes keywords within NORMAL text segments and styles them KEYWORD.
  */
 public class KeywordStyleApplicator extends RegularExpressionStyleApplicator {
-    private HashSet<String> keywords;
+    private Set<String> keywords;
     
-    public KeywordStyleApplicator(PTextArea textArea, HashSet<String> keywords, String keywordRegularExpression) {
+    public KeywordStyleApplicator(PTextArea textArea, Set<String> keywords, String keywordRegularExpression) {
         super(textArea, keywordRegularExpression, PStyle.KEYWORD);
         this.keywords = keywords;
     }

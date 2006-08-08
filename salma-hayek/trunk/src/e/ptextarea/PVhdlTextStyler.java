@@ -127,4 +127,9 @@ public class PVhdlTextStyler extends PAbstractLanguageStyler {
     public void addKeywordsTo(Collection<String> collection) {
         collection.addAll(Arrays.asList(KEYWORDS));
     }
+    
+    @Override
+    public boolean keywordsAreCaseSensitive() {
+        return false;
+    }
 }
