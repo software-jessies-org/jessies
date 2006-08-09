@@ -52,7 +52,7 @@ public class EvergreenTabbedPane extends JTabbedPane {
         if (numberKey > 9) {
             // No keyboard I've ever seen has number keys above 9.
             // Extending the current scheme to "0" (and "-" and "="?) is more work than it's probably worth.
-            // Apple keyboards have function keys up to F16 if we were to use those instead; the only current casualty would be our use of F1 for documentation.
+            // Apple keyboards have function keys up to F16 if we were to use those instead, but Mac OS uses many of them from F9 up anyway.
             return null;
         }
         String primaryModifier = "Alt+";
