@@ -38,6 +38,9 @@ public class ETextWindow extends EWindow implements PTextListener {
     private BirdView birdView;
     private TagsUpdater tagsUpdater;
     
+    // Each text window has its own current regular expression for finds, which may be null if there's no currently active search in that window.
+    private String currentRegularExpression;
+    
     // Used to display a watermark to indicate such things as a read-only file.
     private WatermarkViewPort watermarkViewPort;
     // Used to update the watermark without creating and destroying an excessive number of threads.
@@ -165,10 +168,10 @@ public class ETextWindow extends EWindow implements PTextListener {
             message = "At " + addressFromOffset(selectionStart, "line ", ", column ");
         }
         
-        // If there are any current find matches, show how many.
-        final int matchCount = text.getFindMatchCount();
-        if (matchCount > 0) {
-            message += "; " + StringUtilities.pluralize(matchCount, "match", "matches");
+        // Show the number of find matches.
+        if (currentRegularExpression != null) {
+            final int matchCount = text.getFindMatchCount();
+            message += "; " + StringUtilities.pluralize(matchCount, "match", "matches") + " for \"" + currentRegularExpression + "\"";
         }
         
         Evergreen.getInstance().showStatus(message);
@@ -887,5 +890,12 @@ public class ETextWindow extends EWindow implements PTextListener {
     public int compareTo(Object other) {
         return getTitle().compareTo(((EWindow) other).getTitle());
     }
+    
+    public void setCurrentRegularExpression(String regularExpression) {
+        this.currentRegularExpression = regularExpression;
+    }
+    
+    public String getCurrentRegularExpression() {
+        return currentRegularExpression;
+    }
 }
-
