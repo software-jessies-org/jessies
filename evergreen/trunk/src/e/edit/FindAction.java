@@ -14,8 +14,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     public ETextWindow currentTextWindow;
     
-    public String currentRegularExpression;
-    
     private StringHistory regularExpressionHistory;
     
     private FindAction() {
@@ -54,11 +52,12 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     public String getInitialValue() {
         ETextArea textArea = currentTextWindow.getText();
-        initialSelectionStart = textArea.getSelectionStart();
-        initialSelectionEnd = textArea.getSelectionEnd();
+        this.initialSelectionStart = textArea.getSelectionStart();
+        this.initialSelectionEnd = textArea.getSelectionEnd();
         String selectedText = textArea.getSelectedText();
         if (selectedText.length() == 0) {
-            return currentRegularExpression;
+            String currentRegularExpression = currentTextWindow.getCurrentRegularExpression();
+            return (currentRegularExpression != null) ? currentRegularExpression : "";
         }
         return "(?-i)" + StringUtilities.regularExpressionFromLiteral(selectedText);
     }
@@ -103,7 +102,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     public void wasCanceled() {
         removeAllMatches();
-        currentRegularExpression = null;
+        currentTextWindow.setCurrentRegularExpression(null);
         currentTextWindow.getText().select(initialSelectionStart, initialSelectionEnd);
     }
     
@@ -118,7 +117,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     public void repeatLastFind(ETextWindow textWindow) {
         currentTextWindow = textWindow;
-        findAllMatches(currentRegularExpression);
+        findAllMatches(currentTextWindow.getCurrentRegularExpression());
     }
     
     //
@@ -131,7 +130,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     }
     
     private void findAllMatches(String regularExpression) {
-        currentRegularExpression = regularExpression;
+        currentTextWindow.setCurrentRegularExpression(regularExpression);
         ETextArea textArea = currentTextWindow.getText();
         try {
             textArea.findAllMatches(regularExpression, currentTextWindow.getBirdView());
