@@ -30,8 +30,6 @@ public class BirdView extends JComponent {
     
     private int nearestLineToMouseInBirdView = -1;
     
-    private static final int MAX_HIGHLIGHT_DISTANCE = 5;
-
     public BirdView(BirdsEye birdsEye, JScrollBar scrollBar) {
         this.birdsEye = birdsEye;
         this.scrollBar = scrollBar;
@@ -92,8 +90,11 @@ public class BirdView extends JComponent {
     
     private void findNearestMatchingLineTo(int exactLine) {
         nearestLineToMouseInBirdView = -1;
-        int maxDistanceLines = Math.max(1, (int) (MAX_HIGHLIGHT_DISTANCE / getLineScaleFactor(getUsableArea())));
-        for (int distance = 0; distance < maxDistanceLines; ++distance) {
+        double pixelsPerLine = getLineScaleFactor(getUsableArea());
+        int maxDistanceInPixels = 10;
+        int maxDistanceInLines = Math.min((int) (maxDistanceInPixels / pixelsPerLine), birdsEye.getVisibleLineCount());
+        // We want to go round this loop at least once - hence <=.
+        for (int distance = 0; distance <= maxDistanceInLines; ++distance) {
             if (setNearestLineIfMatching(exactLine + distance) || setNearestLineIfMatching(exactLine - distance)) {
                 return;
             }
