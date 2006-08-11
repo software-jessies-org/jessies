@@ -29,7 +29,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         // Sun Java bugs.
         highlightBug(textArea, "\\b(([4-6]\\d{6}))\\b", "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=%s");
         // RFCs; not strictly bugs, but often referenced in comments.
-        highlightBug(textArea, "(?i)\\b(rfc\\s*(\\d{3,4}))\\b", "http://ftp.rfc-editor.org/in-notes/rfc%s");
+        highlightBug(textArea, "(?i)\\b(rfc\\s*(\\d{3,4}))\\b", "http://tools.ietf.org/html/rfc%s");
         
         // Try to run the site-local script.
         // The format is "^<pattern-to-match>\t<link-template>$" where the pattern's groups are as above.
