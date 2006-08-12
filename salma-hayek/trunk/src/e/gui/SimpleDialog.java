@@ -127,14 +127,12 @@ public class SimpleDialog {
     }
     
     public static boolean askQuestion(Component owner, String title, String message, String continueText) {
-        Object[] options = { continueText, "Cancel" };
-        int option = JOptionPane.showOptionDialog(owner, breakLongMessageLines(makeDialogText(title, message)), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        int option = askQuestionHelper(owner, title, message, new Object[] { continueText, "Cancel" });
         return (option == JOptionPane.YES_OPTION);
     }
     
     public static String askQuestion(Component owner, String title, String message, String continueTextYes, String continueTextNo) {
-        Object[] options = { continueTextYes, continueTextNo, "Cancel" };
-        int option = JOptionPane.showOptionDialog(owner, breakLongMessageLines(makeDialogText(title, message)), "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        int option = askQuestionHelper(owner, title, message, new Object[] { continueTextYes, continueTextNo, "Cancel" });
         if (option == JOptionPane.YES_OPTION) {
             return continueTextYes;
         } else if (option == JOptionPane.NO_OPTION) {
@@ -142,6 +140,35 @@ public class SimpleDialog {
         } else {
             return "Cancel";
         }
+    }
+    
+    /**
+     * The beginnings of a work-around for Sun bug 6372048.
+     */
+    private static int askQuestionHelper(Component owner, String title, String message, Object[] options) {
+        JOptionPane pane = new JOptionPane(breakLongMessageLines(makeDialogText(title, message)), JOptionPane.QUESTION_MESSAGE, (options.length == 3) ? JOptionPane.YES_NO_CANCEL_OPTION : JOptionPane.YES_NO_OPTION);
+        pane.setOptions(options);
+        pane.setInitialValue(options[0]);
+        JDialog dialog = pane.createDialog(owner, title);
+        
+        // FIXME: requires Java 6. We may need to let the user choose other modalities.
+        //dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
+        
+        dialog.setVisible(true);
+        
+        Object selectedValue = pane.getValue();
+        if (selectedValue == null) {
+            return JOptionPane.CLOSED_OPTION;
+        }
+        if (selectedValue instanceof Integer) {
+            return ((Integer) selectedValue).intValue();
+        }
+        for (int i = 0; i < options.length; ++i) {
+            if (options[i].equals(selectedValue)) {
+                return i;
+            }
+        }
+        return JOptionPane.CLOSED_OPTION;
     }
     
     /**
