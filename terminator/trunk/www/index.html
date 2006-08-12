@@ -148,6 +148,8 @@ E558: Terminal entry not found in terminfo
 defaulting to 'ansi'
 </pre>
 
+<p>If you think you have the correct terminfo available but you're still having problems, the next thing to check is that you're actually using Terminator's terminfo. For example, if your problem is with your shell, check that <tt>echo $TERM</tt> says "terminator", and if your problem is with Vim, check that <tt>:se term</tt> says "term=terminator". (Although Terminator sets the TERM environment variable for you, it may be being overridden by your shell's profile, say, and it won't necessarily be correctly transferred if you log in to a remote machine, so it's always worth checking.)
+
 <h4>Logging in as other users/root</h4>
 <p>If the terminfo file is not installed in the system-wide location then other users (and you if you use <tt>su(1)</tt> to switch to another user) will have problems. Using <tt>sudo(1)</tt> to run a command as another user will work in many cases, because it doesn't alter <tt>$HOME</tt> by default.
 
