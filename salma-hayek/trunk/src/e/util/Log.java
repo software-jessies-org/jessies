@@ -27,7 +27,13 @@ public class Log {
         }
     }
     
-    private static String applicationName = "unknown";
+    private static String applicationName;
+    static {
+        applicationName = System.getProperty("e.util.Log.applicationName");
+        if (applicationName == null) {
+            applicationName = "unknown";
+        }
+    }
     
     private static PrintWriter out = new PrintWriter(System.err, true);
     static {

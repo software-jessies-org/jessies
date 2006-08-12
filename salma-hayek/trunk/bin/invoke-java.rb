@@ -287,6 +287,8 @@ class Java
       File.new(@log_filename, "w").close() # Like touch(1).
       add_pathname_property("e.util.Log.filename", @log_filename)
     end
+    
+    add_property("e.util.Log.applicationName", @dock_name)
 
     args << "-Xmx#{@heap_size}"
 
