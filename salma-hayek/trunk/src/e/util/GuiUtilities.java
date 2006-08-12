@@ -12,7 +12,11 @@ public class GuiUtilities {
         e.debug.EventDispatchThreadHangMonitor.initMonitoring();
     }
     
-    private GuiUtilities() { /* Not instantiable. */ }
+    /**
+     * Prevents instantiation.
+     */
+    private GuiUtilities() {
+    }
     
     private static int defaultKeyStrokeModifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     
