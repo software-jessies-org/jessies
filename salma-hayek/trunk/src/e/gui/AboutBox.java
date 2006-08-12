@@ -266,7 +266,7 @@ public class AboutBox {
     }
     
     public String getBugReportSubject() {
-        String systemDetails = System.getProperty("java.vm.version") + "/" + System.getProperty("os.name") + "/" + System.getProperty("os.arch");
+        String systemDetails = Log.getSystemDetailsForBugReport();
         String subject = applicationName + " bug (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
         return StringUtilities.urlEncode(subject).replaceAll("\\+", "%20");
     }

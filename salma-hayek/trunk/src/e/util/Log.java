@@ -52,25 +52,30 @@ public class Log {
     }
 
     private static void showStartUpMessage() {
-        showJavaVersion();
-        showOsVersion();
+        warn(getJavaVersion());
+        warn(getOsVersion());
     }
 
-    private static void showJavaVersion() {
+    private static String getJavaVersion() {
         String vmVersion = System.getProperty("java.vm.version");
         String runtimeVersion = System.getProperty("java.runtime.version");
         String fullVersion = vmVersion.equals(runtimeVersion) ? vmVersion : ("VM " + vmVersion + ", runtime " + runtimeVersion);
-        warn("Java " + System.getProperty("java.version") + " (" + fullVersion + ").");
+        return "Java " + System.getProperty("java.version") + " (" + fullVersion + ")";
     }
 
-    private static void showOsVersion() {
+    private static String getOsVersion() {
         String osName = System.getProperty("os.name");
         String osVersion = System.getProperty("os.version");
         String osArch = System.getProperty("os.arch");
         final int processorCount = Runtime.getRuntime().availableProcessors();
-        warn(osName + " " + osVersion + " (" + osArch + " x" + processorCount + ").");
+        return osName + " " + osVersion + "/" + osArch + " x" + processorCount;
     }
-
+    
+    public static String getSystemDetailsForBugReport() {
+        String systemDetails = System.getProperty("java.vm.version") + "/" + getOsVersion();
+        return systemDetails;
+    }
+    
     public static void warn(String message) {
         warn(message, null);
     }
