@@ -303,21 +303,19 @@ public class JavaResearcher implements WorkspaceResearcher {
         return s.toString();
     }
     
+    private static class MethodNameComparator implements Comparator<Method> {
+        public int compare(Method lhs, Method rhs) {
+            return lhs.getName().compareTo(rhs.getName());
+        }
+    }
+    
     public String makeMethodLinks(Method[] methods) {
+        Arrays.sort(methods, new MethodNameComparator());
         ArrayList<String> list = new ArrayList<String>();
         for (Method method : methods) {
             list.add(makeMethodLink(method));
         }
-        return joinAfterSorting(list);
-    }
-    
-    public static String joinAfterSorting(List<String> list) {
-        Collections.sort(list);
-        StringBuilder s = new StringBuilder();
-        for (int i = 0; i < list.size(); i++) {
-            s.append(list.get(i));
-        }
-        return s.toString();
+        return StringUtilities.join(list, "");
     }
     
     public String makeFieldLink(Field f) {
