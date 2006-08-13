@@ -55,6 +55,9 @@ public class JavaHpp {
         out.println(": m_env(env)");
         out.println(", m_instance(instance)");
         for (Field field : instanceFields) {
+            if (field.getType().isArray()) {
+                throw new RuntimeException("array fields such as '" + field.getName() + "' are not supported");
+            }
             out.println(", " + field.getName() + "(env, instance, \"" + field.getName() + "\", \"" + encodedTypeNameFor(field.getType()) + "\")");
         }
         out.println("{");
