@@ -1,6 +1,7 @@
 package e.tools;
 
 import e.io.*;
+import e.util.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
@@ -27,7 +28,7 @@ public class JavaHpp {
     }
     
     public void processClass(IndentedSourceWriter out, String className) throws Exception {
-        String includeGuardName = className.replace('.', '_') + "_included";
+        String includeGuardName = jniMangle(className) + "_included";
         out.println("#ifndef " + includeGuardName);
         out.println("#define " + includeGuardName);
         
@@ -39,7 +40,7 @@ public class JavaHpp {
         List<Method> nativeMethods = extractNativeMethods(klass.getDeclaredMethods());
         List<Field> instanceFields = extractInstanceFields(klass.getDeclaredFields());
         
-        String proxyClassName = className.replace('.', '_');
+        String proxyClassName = jniMangle(className);
         out.println("class " + proxyClassName + " {");
         out.println("private:");
         out.println("JNIEnv* m_env;");
@@ -66,7 +67,7 @@ public class JavaHpp {
                 }
                 proxyMethodArguments.append(jniTypeNameFor(parameterType));
             }
-            out.println(jniTypeNameFor(method.getReturnType()) + " " + method.getName() + "(" + proxyMethodArguments + ");");
+            out.println(jniTypeNameFor(method.getReturnType()) + " " + jniMangle(method.getName()) + "(" + proxyMethodArguments + ");");
         }
         out.println("};");
         
@@ -74,8 +75,8 @@ public class JavaHpp {
         
         // Output JNI global C functions.
         for (Method method : nativeMethods) {
-            String jniMangledClassName = klass.getCanonicalName().replace('.', '_') + "_";
-            String jniMangledName = "Java_" + jniMangledClassName + method.getName();
+            String jniMangledClassName = jniMangle(klass.getCanonicalName()) + "_";
+            String jniMangledName = "Java_" + jniMangledClassName + jniMangle(method.getName());
             String jniReturnType = jniTypeNameFor(method.getReturnType());
             String parameters = "JNIEnv* env, jobject instance";
             String arguments = "";
@@ -92,7 +93,7 @@ public class JavaHpp {
             out.println("extern \"C\" JNIEXPORT " + jniReturnType + " JNICALL " + jniMangledName + "(" + parameters + ") {");
             out.println("try {");
             out.println(proxyClassName + " proxy(env, instance);");
-            String proxyMethodCall = "proxy." + method.getName() + "(" + arguments + ")";
+            String proxyMethodCall = "proxy." + jniMangle(method.getName()) + "(" + arguments + ")";
             if (method.getReturnType() == Void.TYPE) {
                 out.println(proxyMethodCall + ";");
             } else {
@@ -220,6 +221,33 @@ public class JavaHpp {
             name = name.replaceFirst("^(.*)/([^/]+)$", "$1\\$$2");
         }
         return name;
+    }
+    
+    private static String jniMangle(String s) {
+        // See http://java.sun.com/j2se/1.5.0/docs/guide/jni/spec/design.html#wp615 for the full rules.
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < s.length(); ++i) {
+            char ch = s.charAt(i);
+            if (ch == '.') {
+                result.append("_");
+            } else if (ch == '_') {
+                result.append("_1");
+            } else if (ch == ';') {
+                result.append("_2");
+            } else if (ch == '[') {
+                result.append("_3");
+            } else if (isValidJniIdentifierCharacter(ch) == false) {
+                result.append("_0");
+                StringUtilities.appendUnicodeHex(result, ch);
+            } else {
+                result.append(ch);
+            }
+        }
+        return result.toString();
+    }
+    
+    private static boolean isValidJniIdentifierCharacter(char ch) {
+        return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9');
     }
     
     public static void main(String[] arguments) throws Exception {

@@ -62,13 +62,18 @@ public class StringUtilities {
         }
     }
     
-    /** Used by the appendUnicodeEscape to pad Unicode escapes to four digits. */
+    /** Used by the appendUnicodeHex to pad Unicode escapes to four digits. */
     private static final char[] ZEROES = { '0', '0', '0' };
     
-    /** Appends the Unicode escape sequence for 'c' to 'result'. */
-    private static void appendUnicodeEscape(StringBuilder result, char c) {
+    /** Appends the Java Unicode escape sequence for 'ch' to 'result' ("\u23cf", say). */
+    private static void appendUnicodeEscape(StringBuilder result, char ch) {
         result.append("\\u");
-        String digits = Integer.toString((int) c, 16);
+        appendUnicodeHex(result, ch);
+    }
+    
+    /** Appends the 4 hex digits for the char 'ch' to 'result' ("23cf", say). */
+    public static void appendUnicodeHex(StringBuilder result, char ch) {
+        String digits = Integer.toString((int) ch, 16);
         result.append(ZEROES, 0, 4 - digits.length());
         result.append(digits);
     }
