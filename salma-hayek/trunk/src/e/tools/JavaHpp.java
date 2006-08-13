@@ -77,6 +77,12 @@ public class JavaHpp {
         for (Method method : nativeMethods) {
             String jniMangledClassName = jniMangle(klass.getCanonicalName()) + "_";
             String jniMangledName = "Java_" + jniMangledClassName + jniMangle(method.getName());
+            if (isOverloaded(method, nativeMethods)) {
+                jniMangledName += "__";
+                for (Class parameterType : method.getParameterTypes()) {
+                    jniMangledName += jniMangle(encodedTypeNameFor(parameterType));
+                }
+            }
             String jniReturnType = jniTypeNameFor(method.getReturnType());
             String parameters = "JNIEnv* env, jobject instance";
             String arguments = "";
@@ -109,6 +115,16 @@ public class JavaHpp {
         }
         
         out.println("#endif // " + includeGuardName);
+    }
+    
+    private static boolean isOverloaded(Method originalMethod, List<Method> methods) {
+        String methodName = originalMethod.getName();
+        for (Method method : methods) {
+            if (method.equals(originalMethod) == false && method.getName().equals(methodName)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private String chooseExceptionClassName(Method method) {
@@ -184,9 +200,8 @@ public class JavaHpp {
     
     public static String encodedTypeNameFor(Class type) {
         if (type.isArray()) {
-            throw new RuntimeException("FIXME: array types unimplemented");
-        }
-        if (type == boolean.class) {
+            return "[" + encodedTypeNameFor(type.getComponentType());
+        } else if (type == boolean.class) {
             return "Z";
         } else if (type == byte.class) {
             return "B";
@@ -236,6 +251,8 @@ public class JavaHpp {
                 result.append("_2");
             } else if (ch == '[') {
                 result.append("_3");
+            } else if (ch == '/') {
+                result.append("_");
             } else if (isValidJniIdentifierCharacter(ch) == false) {
                 result.append("_0");
                 StringUtilities.appendUnicodeHex(result, ch);
