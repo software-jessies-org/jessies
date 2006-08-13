@@ -327,7 +327,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     public String makeMethodLink(Method m) {
         String parameters = makeClassLinks(m.getParameterTypes(), false, COMMA, false);
         String returnType = makeClassLink(m.getReturnType(), false, false);
-        String result = "<br>" + m.getName() + "(" + parameters + ") => " + returnType;
+        String result = "<br>" + returnType + " " + m.getName() + "(" + parameters + ")";
         Class[] exceptions = m.getExceptionTypes();
         if (exceptions.length > 0) {
             result += " throws " + makeClassLinks(exceptions, true, NEWLINE, false);
