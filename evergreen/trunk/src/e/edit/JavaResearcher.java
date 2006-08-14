@@ -8,7 +8,8 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class JavaResearcher implements WorkspaceResearcher {
-    private static final String NEWLINE = "<br>&nbsp;&nbsp;&nbsp;&nbsp;";
+    private static final String INDENT = "&nbsp;&nbsp;&nbsp;&nbsp;";
+    private static final String NEWLINE = "<br>" + INDENT;
     private static final String COMMA = ",&nbsp;";
     
     /** A regular expression matching 'new' expressions. */
@@ -109,6 +110,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     */
     private String makeResult(String text) {
         // Does it look like the user wants help with a constructor?
+        // FIXME: this is currently broken because "research" isn't passed enough text to recognize this situation.
         boolean listConstructors = false;
         Matcher newMatcher = NEW_PATTERN.matcher(text);
         if (newMatcher.find()) {
@@ -117,7 +119,9 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
         
         // How about a class method or class field?
-        boolean listMembers = false;
+        boolean listMembers = true;
+        
+        // FIXME: this is currently broken because "research" isn't passed enough text to recognize this situation.
         Pattern accessPattern = Pattern.compile("(?x) (\\S+) \\.$");
         Matcher accessMatcher = accessPattern.matcher(text);
         if (accessMatcher.find()) {
@@ -125,6 +129,7 @@ public class JavaResearcher implements WorkspaceResearcher {
             text = accessMatcher.group(1);
         }
         
+        // FIXME: this is currently broken because "research" isn't passed enough text to recognize this situation.
         boolean listClasses = (listConstructors == false) && text.matches("^.*\\b[A-Z]\\S*$");
         
         if (listConstructors == false && listMembers == false && listClasses == false) {
@@ -303,14 +308,14 @@ public class JavaResearcher implements WorkspaceResearcher {
         return s.toString();
     }
     
-    private static class MethodNameComparator implements Comparator<Method> {
-        public int compare(Method lhs, Method rhs) {
+    private static class MemberNameComparator implements Comparator<Member> {
+        public int compare(Member lhs, Member rhs) {
             return lhs.getName().compareTo(rhs.getName());
         }
     }
     
     public String makeMethodLinks(Method[] methods) {
-        Arrays.sort(methods, new MethodNameComparator());
+        Arrays.sort(methods, new MemberNameComparator());
         ArrayList<String> list = new ArrayList<String>();
         for (Method method : methods) {
             list.add(makeMethodLink(method));
@@ -319,13 +324,13 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     public String makeFieldLink(Field f) {
-        return "<br>" + makeClassLink(f.getType(), false, false) + " " + f.getName();
+        return NEWLINE + makeClassLink(f.getType(), false, false) + " " + f.getName();
     }
     
     public String makeMethodLink(Method m) {
         String parameters = makeClassLinks(m.getParameterTypes(), false, COMMA, false);
         String returnType = makeClassLink(m.getReturnType(), false, false);
-        String result = "<br>" + returnType + " " + m.getName() + "(" + parameters + ")";
+        String result = NEWLINE + returnType + " " + m.getName() + "(" + parameters + ")";
         Class[] exceptions = m.getExceptionTypes();
         if (exceptions.length > 0) {
             result += " throws " + makeClassLinks(exceptions, true, NEWLINE, false);
@@ -356,8 +361,8 @@ public class JavaResearcher implements WorkspaceResearcher {
             s.append("<br>extends ");
             int depth = 0;
             for (; superclass != null; superclass = superclass.getSuperclass()) {
-                s.append("<br>");
-                s.append(StringUtilities.nCopies(++depth, "&nbsp;"));
+                s.append(NEWLINE);
+                s.append(StringUtilities.nCopies(depth++, INDENT));
                 s.append(makeClassLink(superclass, false, true));
             }
         }
@@ -408,10 +413,26 @@ public class JavaResearcher implements WorkspaceResearcher {
      * Lists all non-private fields and non-private static methods of a class.
      */
     public String listMembers(Class c) {
-        StringBuilder s = new StringBuilder("<br>");
-        appendAfterSorting(s, collectFields(c));
-        s.append("<br>");
-        appendAfterSorting(s, collectStaticMethods(c));
+        StringBuilder s = new StringBuilder();
+        
+        List<Field> fields = collectNonPrivateFields(c);
+        Collections.sort(fields, new MemberNameComparator());
+        if (fields.size() > 0) {
+            s.append("<br><br>fields");
+            for (Field field : fields) {
+                s.append(makeFieldLink(field));
+            }
+        }
+        
+        List<Method> methods = collectStaticMethods(c);
+        Collections.sort(methods, new MemberNameComparator());
+        if (methods.size() > 0) {
+            s.append("<br><br>static methods");
+            for (Method method : methods) {
+                s.append(makeMethodLink(method));
+            }
+        }
+        
         return s.toString();
     }
     
@@ -423,22 +444,22 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
     }
     
-    private List<String> collectFields(Class c) {
-        ArrayList<String> result = new ArrayList<String>();
+    private List<Field> collectNonPrivateFields(Class c) {
+        ArrayList<Field> result = new ArrayList<Field>();
         for (Field field : c.getFields()) {
             if (Modifier.isPrivate(field.getModifiers()) == false) {
-                result.add(makeFieldLink(field));
+                result.add(field);
             }
         }
         return result;
     }
     
-    private List<String> collectStaticMethods(Class c) {
-        ArrayList<String> result = new ArrayList<String>();
+    private List<Method> collectStaticMethods(Class c) {
+        ArrayList<Method> result = new ArrayList<Method>();
         for (Method method : c.getMethods()) {
             int modifiers = method.getModifiers();
             if (Modifier.isPrivate(modifiers) == false && Modifier.isStatic(modifiers)) {
-                result.add(makeMethodLink(method));
+                result.add(method);
             }
         }
         return result;
