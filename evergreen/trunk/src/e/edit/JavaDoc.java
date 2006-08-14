@@ -253,7 +253,7 @@ public class JavaDoc {
         if (showPackage) {
             String packageIndexUri = uri.substring(0, uri.lastIndexOf("/")) + "/package-summary.html";
             link.append(formatAnchor(packageIndexUri, packageName));
-            link.append("<br>");
+            link.append("&nbsp;");
         }
         link.append(formatAnchor(uri, className));
         return link.toString();
