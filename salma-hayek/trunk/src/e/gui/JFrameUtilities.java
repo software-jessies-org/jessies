@@ -3,6 +3,7 @@ package e.gui;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 public class JFrameUtilities {
@@ -63,11 +64,25 @@ public class JFrameUtilities {
     }
     
     public static JFrame makeSimpleWindow(String title, JComponent content) {
-        JFrame frame = new JFrame(title);
+        final JFrame frame = new JFrame(title);
         setFrameIcon(frame);
         frame.setContentPane(content);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        // Mac OS uses command-W to close a window using the keyboard. Unlike Linux and Windows' alt-f4, though, this isn't done by the window manager.
+        if (GuiUtilities.isMacOs()) {
+            KeyStroke commandW = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_MASK, false);
+            final String CLOSE_ACTION = "e.gui.JFrameUtilities.CloseWindowIfCommandWPressed";
+            frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(commandW, CLOSE_ACTION);
+            frame.getRootPane().getActionMap().put(CLOSE_ACTION, new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    frame.setVisible(false);
+                    frame.dispose();
+                }
+            });
+        }
+        
         return frame;
     }
     
