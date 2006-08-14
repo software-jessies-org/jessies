@@ -20,8 +20,9 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     
     private void initTextPane() {
         this.textPane = new JTextPane();
-        textPane.setEditable(false);
         textPane.setContentType("text/html");
+        textPane.setDragEnabled(false);
+        textPane.setEditable(false);
         textPane.addHyperlinkListener(this);
         
         HTMLEditorKit editorKit = (HTMLEditorKit) textPane.getEditorKit();
