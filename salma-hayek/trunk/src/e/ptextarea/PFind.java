@@ -10,14 +10,14 @@ import java.util.List;
 import javax.swing.*;
 
 public class PFind {
+    public static final Color MATCH_COLOR = new Color(255, 255, 0, 128);
+    
     /**
      * Used to mark the matches in the text as if they'd been gone over with a highlighter pen. We use
      * full yellow with half-alpha so you can see the selection through, as a dirty smudge, just like a real
      * highlighter pen might do.
      */
     public static class MatchHighlight extends PColoredHighlight {
-        private static final Color MATCH_COLOR = new Color(255, 255, 0, 128);
-        
         public static final String HIGHLIGHTER_NAME = "MatchHighlight";
         
         public MatchHighlight(PTextArea textArea, int startIndex, int endIndex) {
@@ -34,7 +34,6 @@ public class PFind {
      */
     public static class FindAction extends PTextAction {
         private JTextField findField = new JTextField(40);
-        private JLabel findStatus = new JLabel(" ");
         private PTextArea textArea;
         
         private List<PTextAction> actions = new ArrayList<PTextAction>();
@@ -71,38 +70,16 @@ public class PFind {
         }
         
         private void showFindDialog() {
-            Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, textArea);
-            
-            FormBuilder form = new FormBuilder(frame, "Find");
-            FormPanel formPanel = form.getFormPanel();
-            formPanel.addRow("Find:", findField);
-            formPanel.setStatusBar(findStatus);
-            formPanel.setTypingTimeoutActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        findField.setForeground(UIManager.getColor("TextField.foreground"));
-                        updateFindResults();
-                    } catch (java.util.regex.PatternSyntaxException ex) {
-                        findField.setForeground(Color.RED);
-                        findStatus.setText(ex.getDescription());
-                    }
+            AbstractFindDialog findDialog = new AbstractFindDialog() {
+                public int updateFindResults(String regularExpression) {
+                    return textArea.findAllMatches(regularExpression, null);
                 }
-            });
-            form.getFormDialog().setCancelRunnable(new Runnable() {
-                public void run() {
+                
+                public void clearFindResults() {
                     textArea.removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
                 }
-            });
-            form.showNonModal();
-            
-            findField.selectAll();
-            findField.requestFocus();
-            findStatus.setText(" ");
-        }
-        
-        private void updateFindResults() {
-            int matchCount = textArea.findAllMatches(findField.getText(), null);
-            findStatus.setText("Matches: " + matchCount);
+            };
+            findDialog.showFindDialog(textArea, findField);
         }
     }
 }
