@@ -49,34 +49,24 @@ public class ETextWindow extends EWindow implements PTextListener {
     private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
     private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f);
     
-    public static final String PLAIN_TEXT = "Plain Text";
-    public static final String BASH = "Bash";
-    public static final String C_PLUS_PLUS = "C++";
-    public static final String JAVA = "Java";
-    public static final String MAKE = "Make";
-    public static final String RUBY = "Ruby";
-    public static final String PERL = "Perl";
-    public static final String PYTHON = "Python";
-    public static final String VHDL = "VHDL";
+    private FileType fileType = FileType.PLAIN_TEXT;
     
-    private String fileType = PLAIN_TEXT;
-    
-    private static final HashMap<String, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<String, HashSet<String>>();
+    private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
 
     private Timer findResultsUpdater;
     
-    private HashSet<String> initSpellingExceptionsFor(String language) {
+    private HashSet<String> initSpellingExceptionsFor(FileType language) {
         HashSet<String> result = new HashSet<String>();
         
         // The text styler knows all the language's keywords.
         text.getTextStyler().addKeywordsTo(result);
         
         // The JavaResearcher knows all the words used in JDK identifiers.
-        if (language == JAVA) {
+        if (language == FileType.JAVA) {
             JavaResearcher.getSharedInstance().addJavaWordsTo(result);
         }
         // The ManPageResearcher knows all the words used in identifiers that have man pages.
-        if (language == C_PLUS_PLUS) {
+        if (language == FileType.C_PLUS_PLUS) {
             ManPageResearcher.getSharedInstance().addManPageWordsTo(result);
         }
         
@@ -319,7 +309,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
     }
     
-    private HashSet<String> getSpellingExceptionsForLanguage(String language) {
+    private HashSet<String> getSpellingExceptionsForLanguage(FileType language) {
         HashSet<String> exceptions = SPELLING_EXCEPTIONS_MAP.get(language);
         if (exceptions == null) {
             exceptions = initSpellingExceptionsFor(language);
@@ -413,71 +403,71 @@ public class ETextWindow extends EWindow implements PTextListener {
         // suggestive content. It's hard to see that there's ever any excuse
         // for having the wrong filename extension.
         initFileTypeByName();
-        if (fileType == PLAIN_TEXT) {
+        if (fileType == FileType.PLAIN_TEXT) {
             initFileTypeByContent();
         }
     }
     private void initFileTypeByContent() {
         CharSequence content  = text.getTextBuffer();
         if (isRubyContent(content)) {
-            fileType = RUBY;
+            fileType = FileType.RUBY;
         } else if (isBashContent(content)) {
-            fileType = BASH;
+            fileType = FileType.BASH;
         } else if (isCPlusPlusContent(content)) {
-            fileType = C_PLUS_PLUS;
+            fileType = FileType.C_PLUS_PLUS;
         } else if (isPerlContent(content)) {
-            fileType = PERL;
+            fileType = FileType.PERL;
         } else if (isPythonContent(content)) {
-            fileType = PYTHON;
+            fileType = FileType.PYTHON;
         } else {
-            fileType = PLAIN_TEXT;
+            fileType = FileType.PLAIN_TEXT;
         }
     }
     private void initFileTypeByName() {
         if (filename.endsWith(".java")) {
-            fileType = JAVA;
+            fileType = FileType.JAVA;
         } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || filename.endsWith(".strings")) {
-            fileType = C_PLUS_PLUS;
+            fileType = FileType.C_PLUS_PLUS;
         } else if (filename.endsWith(".pl") || filename.endsWith(".pm")) {
-            fileType = PERL;
+            fileType = FileType.PERL;
         } else if (filename.endsWith(".py")) {
-            fileType = PYTHON;
+            fileType = FileType.PYTHON;
         } else if (filename.endsWith(".rb")) {
-            fileType = RUBY;
+            fileType = FileType.RUBY;
         } else if (filename.endsWith(".sh") || filename.endsWith("bash.bashrc") || filename.endsWith("bash.logout") || filename.endsWith(".bash_profile") || filename.endsWith(".bashrc") || filename.endsWith(".bash_logout")) {
-            fileType = BASH;
+            fileType = FileType.BASH;
         } else if (filename.endsWith("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
-            fileType = MAKE;
+            fileType = FileType.MAKE;
         } else if (filename.endsWith(".vhd")) {
-            fileType = VHDL;
+            fileType = FileType.VHDL;
         } else {
-            fileType = PLAIN_TEXT;
+            fileType = FileType.PLAIN_TEXT;
         }
     }
     
     private void configureForGuessedFileType() {
-        String originalFileType = fileType;
+        FileType originalFileType = fileType;
         initFileType();
-        if (fileType == JAVA) {
+        if (fileType == FileType.JAVA) {
             text.setIndenter(new PJavaIndenter(text));
             text.setTextStyler(new PJavaTextStyler(text));
-        } else if (fileType == RUBY) {
+        } else if (fileType == FileType.RUBY) {
             text.setIndenter(new PRubyIndenter(text));
             text.setTextStyler(new PRubyTextStyler(text));
-        } else if (fileType == C_PLUS_PLUS) {
+        } else if (fileType == FileType.C_PLUS_PLUS) {
             text.setIndenter(new PCppIndenter(text));
             text.setTextStyler(new PCPPTextStyler(text, filename.matches(".*\\.(m|mm)$")));
-        } else if (fileType == PERL) {
+        } else if (fileType == FileType.PERL) {
             text.setIndenter(new PPerlIndenter(text));
             text.setTextStyler(new PPerlTextStyler(text));
-        } else if (fileType == PYTHON) {
+        } else if (fileType == FileType.PYTHON) {
             //text.setIndenter(new PPythonIndenter(text));
             text.setTextStyler(new PPythonTextStyler(text));
-        } else if (fileType == BASH) {
+        } else if (fileType == FileType.BASH) {
             text.setTextStyler(new PBashTextStyler(text));
-        } else if (fileType == MAKE) {
+        } else if (fileType == FileType.MAKE) {
             text.setTextStyler(new PMakefileTextStyler(text));
-        } else if (fileType == VHDL) {
+        } else if (fileType == FileType.VHDL) {
             text.setTextStyler(new PVhdlTextStyler(text));
         } else {
             // Plain text.
@@ -649,28 +639,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
     }
 
-    public boolean isCPlusPlus() {
-        return (fileType == C_PLUS_PLUS);
-    }
-    
-    public boolean isPerl() {
-        return (fileType == PERL);
-    }
-    
-    public boolean isJava() {
-        return (fileType == JAVA);
-    }
-    
-    public boolean isRuby() {
-        return (fileType == RUBY);
-    }
-    
-    /**
-     * FIXME: this should be replaced with a proper system of Mode,
-     * incorporating Indenter and all the other stuff currently done
-     * by asking isRuby and isJava et cetera.
-     */
-    public String getFileType() {
+    public FileType getFileType() {
         return fileType;
     }
     
@@ -874,7 +843,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      * so we silently fix their files.
      */
     private void ensureBufferEndsInNewline() {
-        if (isCPlusPlus() || isJava()) {
+        if (fileType == FileType.C_PLUS_PLUS || fileType == FileType.JAVA) {
             PTextBuffer buffer = text.getTextBuffer();
             if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '\n') {
                 // '\n' is always correct; the buffer will translate if needed.

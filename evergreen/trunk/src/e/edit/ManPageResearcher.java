@@ -88,7 +88,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
     
     /** Returns true for C files, because only C programmers care about man pages. */
     public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.isCPlusPlus();
+        return textWindow.getFileType() == FileType.C_PLUS_PLUS;
     }
     
     private String formatManPage(String page, String section) {
