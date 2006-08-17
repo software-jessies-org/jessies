@@ -50,7 +50,7 @@ public class FilePropertiesAction extends ETextAction {
             //System.out.println(charset + " = " + Charset.forName(charset).displayName());
         }
         
-        fileTypeField.setText(window.getFileType());
+        fileTypeField.setText(window.getFileType().getName());
         
         FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "File Properties");
         FormPanel formPanel = form.getFormPanel();

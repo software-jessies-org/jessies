@@ -27,7 +27,7 @@ public class PerlDocumentationResearcher implements WorkspaceResearcher {
     
     /** Returns true for Perl files. */
     public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.isPerl();
+        return textWindow.getFileType() == FileType.PERL;
     }
     
     /** Handles our non-standard "perldoc:" scheme. */

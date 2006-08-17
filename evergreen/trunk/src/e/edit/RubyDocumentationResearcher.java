@@ -75,7 +75,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
     
     /** Returns true for Ruby files. */
     public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.isRuby();
+        return textWindow.getFileType() == FileType.RUBY;
     }
     
     /** Handles our non-standard "ri:" scheme. */

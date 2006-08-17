@@ -471,7 +471,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     /** Returns true for Java files. */
     public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.isJava();
+        return textWindow.getFileType() == FileType.JAVA;
     }
     
     public String research(String string) {

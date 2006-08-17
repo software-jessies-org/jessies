@@ -24,7 +24,7 @@ public class InsertInterfaceAction extends ETextAction {
     
     public boolean isEnabled() {
         ETextWindow textWindow = getFocusedTextWindow();
-        return (textWindow != null && textWindow.isJava());
+        return (textWindow != null && textWindow.getFileType() == FileType.JAVA);
     }
     
     public void actionPerformed(ActionEvent e) {

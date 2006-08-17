@@ -10,10 +10,10 @@ public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
     private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface|namespace):([^\t]+).*");    
     private TagListener listener;
-    private String fileType;
+    private FileType fileType;
     private String digest;
 
-    public TagReader(File file, String fileType, TagListener tagListener) {
+    public TagReader(File file, FileType fileType, TagListener tagListener) {
         this.listener = tagListener;
         this.fileType = fileType;
         
@@ -118,13 +118,13 @@ public class TagReader {
         //Log.warn(context + " => " + containingClass);
         
         TagReader.Tag tag = null;
-        if (fileType == ETextWindow.JAVA) {
+        if (fileType == FileType.JAVA) {
             tag = new JavaTag(identifier, lineNumber, type, context, containingClass);
-        } else if (fileType == ETextWindow.C_PLUS_PLUS) {
+        } else if (fileType == FileType.C_PLUS_PLUS) {
             tag = new CTag(identifier, lineNumber, type, context, containingClass);
-        } else if (fileType == ETextWindow.PERL) {
+        } else if (fileType == FileType.PERL) {
             tag = new PerlTag(identifier, lineNumber, type, context, containingClass);
-        } else if (fileType == ETextWindow.RUBY) {
+        } else if (fileType == FileType.RUBY) {
             tag = new RubyTag(identifier, lineNumber, type, context, containingClass);
         } else {
             tag = new TagReader.Tag(identifier, lineNumber, type, context, containingClass);
