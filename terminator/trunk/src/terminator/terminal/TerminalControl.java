@@ -358,7 +358,10 @@ public class TerminalControl {
 			terminalActions.add(new PlainTextAction(line));
 		}
 		
-		pane.getOutputSpinner().animateOneFrame();
+		if (pane.isShowing() == false) {
+			pane.getOutputSpinner().setVisible(true);
+			pane.getOutputSpinner().animateOneFrame();
+		}
 	}
 	
 	public synchronized void processSpecialCharacter(final char ch) {
