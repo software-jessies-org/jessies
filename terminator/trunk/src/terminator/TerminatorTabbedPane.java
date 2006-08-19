@@ -95,6 +95,23 @@ public class TerminatorTabbedPane extends JTabbedPane {
         super.setTitleAt(index, title);
     }
     
+    @Override
+    protected void fireStateChanged() {
+        super.fireStateChanged();
+        updateSpinnerVisibilities();
+    }
+    
+    /**
+     * Hides the selected tab's spinner.
+     */
+    private synchronized void updateSpinnerVisibilities() {
+        int index = getSelectedIndex();
+        if (index != -1) {
+            JTerminalPane visibleTerminal = (JTerminalPane) getComponentAt(index);
+            visibleTerminal.getOutputSpinner().setVisible(false);
+        }
+    }
+    
     private static class TerminatorTabComponent extends JPanel {
         private JLabel label;
         
@@ -105,6 +122,7 @@ public class TerminatorTabbedPane extends JTabbedPane {
             label.setOpaque(false);
             setOpaque(false);
             
+            ((BorderLayout) getLayout()).setHgap(4);
             add(label, BorderLayout.CENTER);
             add(terminalPane.getOutputSpinner(), BorderLayout.EAST);
         }
