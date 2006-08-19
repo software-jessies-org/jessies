@@ -10,6 +10,9 @@ import javax.swing.event.*;
 import terminator.view.*;
 
 public class TerminatorTabbedPane extends JTabbedPane {
+    // We make use of Java 6's custom tab ear components if available, but we still want to work on Java 5 until Java 6 is widespread.
+    public static boolean haveConfigurableTabs = true;
+    
     public TerminatorTabbedPane() {
         // We want to provide custom tool tips.
         ToolTipManager.sharedInstance().registerComponent(this);
@@ -61,6 +64,55 @@ public class TerminatorTabbedPane extends JTabbedPane {
         return super.getToolTipText(event);
     }
     
+    @Override
+    public void addTab(String name, Component c) {
+        super.addTab(name, c);
+        
+        if (haveConfigurableTabs == false) {
+            return;
+        }
+        int newIndex = getTabCount() - 1;
+        Component tabEar = new TerminatorTabComponent((JTerminalPane) c);
+        // FIXME: Java 6 => setTabComponentAt(newIndex, tabEar);
+        try {
+            JTabbedPane.class.getMethod("setTabComponentAt", int.class, Component.class).invoke(this, newIndex, tabEar);
+        } catch (Exception ex) {
+            haveConfigurableTabs = false;
+        }
+    }
+    
+    @Override
+    public void setTitleAt(int index, String title) {
+        if (haveConfigurableTabs) {
+            try {
+                // FIXME: Java 6 => c = (TerminatorTabComponent) getTabComponentAt(index);
+                TerminatorTabComponent c = (TerminatorTabComponent) JTabbedPane.class.getMethod("getTabComponentAt", int.class).invoke(this, index);
+                c.setTitle(title);
+            } catch (Exception ex) {
+                haveConfigurableTabs = false;
+            }
+        }
+        super.setTitleAt(index, title);
+    }
+    
+    private static class TerminatorTabComponent extends JPanel {
+        private JLabel label;
+        
+        private TerminatorTabComponent(JTerminalPane terminalPane) {
+            super(new BorderLayout());
+            this.label = new JLabel(terminalPane.getName());
+            
+            label.setOpaque(false);
+            setOpaque(false);
+            
+            add(label, BorderLayout.CENTER);
+            add(terminalPane.getOutputSpinner(), BorderLayout.EAST);
+        }
+        
+        public void setTitle(String title) {
+            label.setText(title);
+        }
+    }
     
     /**
      * Ensures that when we change tab, we give focus to that terminal.

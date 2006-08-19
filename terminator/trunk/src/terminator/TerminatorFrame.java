@@ -339,9 +339,6 @@ public class TerminatorFrame extends JFrame {
 	
 	private void addPaneToUI(JTerminalPane newPane) {
 		switchToTabbedPane();
-		// FIXME: in 6.0, Sun 4499556 "Use arbitrary (J)Components as
-		// JTabbedPane tab labels" is fixed, so we can improve this to
-		// add newPane.getOutputSpinner() using setTabComponentAt.
 		tabbedPane.addTab(newPane.getName(), newPane);
 	}
 }
