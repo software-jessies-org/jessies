@@ -71,7 +71,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
         
         // And there may be a file of extra spelling exceptions for this language.
-        String exceptionsFileName = Evergreen.getInstance().getResourceFilename("spelling-exceptions-" + language);
+        String exceptionsFileName = Evergreen.getInstance().getResourceFilename("spelling-exceptions-" + language.getName());
         if (FileUtilities.exists(exceptionsFileName)) {
             for (String exception : StringUtilities.readLinesFromFile(exceptionsFileName)) {
                 if (exception.startsWith("#")) {
