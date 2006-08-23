@@ -48,13 +48,18 @@ class JdkInstaller
    system("wget --no-verbose --output-document=/tmp/#{jdk_filename} #{jdk_url}")
 
    # This lets us run the installer from cron, by accepting the license for us.
-   system("sed 's/^more <<\"EOF\"$/cat <<\"EOF\"/;s/^ *read reply leftover$/reply=YES/' < /tmp/#{jdk_filename} > /tmp/#{jdk_filename}-auto.bin")
+   original_installer = "/tmp/#{jdk_filename}"
+   modified_installer = "/tmp/#{jdk_filename}-auto.bin"
+   system("sed 's/^more <<\"EOF\"$/cat <<\"EOF\"/;s/^ *read reply leftover$/reply=YES/' < #{original_installer} > #{modified_installer}")
 
    # Run the installer.
-   system("cd #{@local_jdks_directory} && bash /tmp/#{jdk_filename}-auto.bin")
+   system("cd #{@local_jdks_directory} && bash #{modified_installer} && rm #{modified_installer} && rm #{original_installer}")
 
    # Give this build a unique name, so we can install as many as we like.
    system("cd #{@local_jdks_directory} && mv jdk1.6.0 jdk1.6.0#{jdk_build_number}")
+
+   # Extract the supplied class library source.
+   system("cd #{@local_jdks_directory}/jdk1.6.0#{jdk_build_number} && mkdir src && cd src && jar xf ../src.zip && rm ../src.zip")
 
    install_changes_html(jdk_build_number)
   end
