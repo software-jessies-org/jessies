@@ -229,10 +229,6 @@ RFEs
   windows even more useful on Linux, so maybe we should support alt-` and
   alt-~ there?
 
-* car: "edit-style marking of the matches, notches next to the slider?
-  In voluminous output, indication of clustering of matches could be
-  helpful to me."
-
 * There are some interesting features and bugs mentioned on the Konsole
   ChangeLog page: http://konsole.kde.org/changelog.php
 
@@ -287,13 +283,6 @@ RFEs
 
 Tab-related
 -----------
-
-* Feedback on other tabs when there's been output you haven't seen yet? I'm
-  thinking of something like a Mac OS asynchronous progress indicator in the
-  tab ears of non-visible tabs. One turn per line of unseen output? That gives
-  you both a Boolean "is there anything I haven't seen?" plus an open-ended
-  way of showing further progress. Remember how much more useful Mail's dock
-  badge count is than Outlook's Boolean.
 
 * On Mac OS, Safari-style tabs would be much better than the usual Aqua ones
   for our purposes. They take up significantly less space, and don't require
