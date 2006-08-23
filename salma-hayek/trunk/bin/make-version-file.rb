@@ -28,7 +28,10 @@ def extractVersionNumber(versionString)
   if versionString.match(/^(?:\d+:)?(\d+)/)
     return $1.to_i()
   end
-  return nil
+  # In a directory not under Subversion control, svnversion(1) says "exported".
+  # This happens if you're using Bazaar, say, or nothing, or if you're building from a source tarball.
+  # Returning 0 as the version number lets us build without warnings.
+  return 0
 end
 
 # Win32's installer's broken idea of "version number" forces us to have a
