@@ -271,6 +271,12 @@ RFEs
   that writes ASCII NUL on the connection at a fixed interval to stop sshd (say)
   from closing the connection.
 
+* Stuart Bell suggests that if the terminal is a non-integer multiple of the
+  line height, "spare" space should be at the bottom of the terminal. This
+  would mean that clear(1) in such a situation would not leave a partial line
+  visible at the top (which isn't inarguably wrong, but is ugly, and he at
+  least thought it was a bug).
+
 Tab-related
 -----------
 
