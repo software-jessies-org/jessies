@@ -207,7 +207,18 @@ public class GuiUtilities {
             ProcessUtilities.spawn(null, new String[] { "finish-gnome-startup", DESKTOP_STARTUP_ID });
         }
     }
-
+    
+    public static void selectFileInFileViewer(String fullPathname) {
+        // FIXME: add GNOME support, if possible.
+        // FIXME: make into an action that also supplies an appropriate name for the action on the current platform.
+        if (GuiUtilities.isMacOs()) {
+            ProcessUtilities.spawn(null, new String[] { "/usr/bin/osascript", "-e", "tell application \"Finder\" to select \"" + fullPathname + "\" as POSIX file", "-e", "tell application \"Finder\" to activate" });
+        } else if (GuiUtilities.isWindows()) {
+            // See "Windows Explorer Command-Line Options", http://support.microsoft.com/default.aspx?scid=kb;EN-US;q152457
+            ProcessUtilities.spawn(null, new String[] { "Explorer", "/select," + fullPathname });
+        }
+    }
+    
     public static void initLookAndFeel() {
         try {
             // Work around Sun bug 6389282 which prevents Java 6 applications that would use the GTK LAF from displaying on remote X11 displays.
