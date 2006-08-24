@@ -2,6 +2,7 @@ package terminator;
 
 import e.forms.*;
 import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -69,7 +70,7 @@ public class InfoDialog {
         return INSTANCE;
     }
     
-    public void showInfoDialogFor(JTerminalPane terminal) {
+    public void showInfoDialogFor(final JTerminalPane terminal) {
         updateFieldValuesFor(terminal);
         
         JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, terminal);
@@ -80,6 +81,16 @@ public class InfoDialog {
         formPanel.addRow("Pseudo-Terminal:", ptyFilename);
         formPanel.addRow("Processes:", processes);
         formPanel.addRow("Log Filename:", logFilename);
+        if (GuiUtilities.isMacOs() || GuiUtilities.isWindows()) {
+            JButton showInFinderButton = new JButton(GuiUtilities.isMacOs() ? "Show in Finder" : "Show in Explorer");
+            showInFinderButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    terminal.getLogWriter().flush();
+                    GuiUtilities.selectFileInFileViewer(logFilename.getText());
+                }
+            });
+            formPanel.addRow("", showInFinderButton);
+        }
         formPanel.addRow("", suspendLogging);
         form.getFormDialog().setRememberBounds(false);
         form.showNonModal();

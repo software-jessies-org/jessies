@@ -55,6 +55,16 @@ public class LogWriter {
 		}
 	}
 	
+	public void flush() {
+		try {
+			if (stream != null) {
+				stream.flush();
+			}
+		} catch (Throwable th) {
+			Log.warn("Exception occurred flushing log stream \"" + info + "\".", th);
+		}
+	}
+	
 	public void close() {
 		if (stream != null) {
 			try {
