@@ -238,16 +238,6 @@ RFEs
   that I can hit ^:wq and then starting the shutdown again is a pain".
   The extended AWT modality API in Java 6 should let us address this.
 
-* car: what's the point of showing me the log filename in
-  the Info dialog?  I've needed to find out the log filename twice so far
-  (aside, I vote to keep the scrollbars and logging active while I'm
-  running vi) and in both instances I immediately copied and pasted the
-  filename somewhere else to open the log.
-  I'm unlikely to want the log filename for any reason other than that I
-  want it opened right now.  Terminator could open it for me at my request --
-  using whatever you're throwing the links at (in my case, open) would
-  be highly satisfactory.
-
 * Before using Terminator, I used rxvt, so I'd have done the same as Phil and
   used rxvt's terminfo.  I was recently looking at the state of rxvt, before
   submitting a Debian bug.  It's pretty moribund, as far as releasing is concerned.
