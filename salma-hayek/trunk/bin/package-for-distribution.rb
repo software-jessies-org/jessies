@@ -121,8 +121,8 @@ FileUtils.mkdir_p(resources_dir)
 def copy_files_for_installation(src_root_directory, dst_root_directory)
     src_root_pathname = Pathname.new(src_root_directory)
     dst_root_pathname = Pathname.new(dst_root_directory)
-    # We should consider using ENV["MAKE"] here to cope with, for example, gmake.
-    open("| make --no-print-directory -C #{src_root_directory} installer-file-list").each_line() {
+    make = ENV["MAKE"]
+    open("| #{make} --no-print-directory -C #{src_root_directory} installer-file-list").each_line() {
         |line|
         filename = line.chomp()
         src_pathname = src_root_pathname + filename
