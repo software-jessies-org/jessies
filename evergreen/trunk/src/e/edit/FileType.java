@@ -5,6 +5,7 @@ import java.util.regex.*;
 
 public enum FileType {
     PLAIN_TEXT("Plain Text"),
+    ASSEMBLER("Assembler"),
     BASH("Bash"),
     C_PLUS_PLUS("C++"),
     JAVA("Java"),
@@ -56,6 +57,8 @@ public enum FileType {
             return FileType.PYTHON;
         } else if (filename.endsWith(".rb")) {
             return FileType.RUBY;
+        } else if (filename.endsWith(".s") || filename.endsWith(".S")) {
+            return FileType.ASSEMBLER;
         } else if (filename.endsWith(".sh") || filename.endsWith("bash.bashrc") || filename.endsWith("bash.logout") || filename.endsWith(".bash_profile") || filename.endsWith(".bashrc") || filename.endsWith(".bash_logout")) {
             return FileType.BASH;
         } else if (filename.endsWith("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
