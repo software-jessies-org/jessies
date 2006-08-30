@@ -353,6 +353,8 @@ public class ETextWindow extends EWindow implements PTextListener {
         } else if (fileType == FileType.PYTHON) {
             //text.setIndenter(new PPythonIndenter(text));
             text.setTextStyler(new PPythonTextStyler(text));
+        } else if (fileType == FileType.ASSEMBLER) {
+            text.setTextStyler(new PAssemblerTextStyler(text));
         } else if (fileType == FileType.BASH) {
             text.setTextStyler(new PBashTextStyler(text));
         } else if (fileType == FileType.MAKE) {
