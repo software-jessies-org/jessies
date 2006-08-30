@@ -43,7 +43,10 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         return false;
     }
     
-    // This is parameterized so that we can recognize the GNU make keyword "filter-out".
+    /**
+     * This is parameterized so that we can recognize the GNU Make keyword "filter-out", and various strange GNU Assembler directives.
+     * The value of the first capturing group will be tested to ensure that it's a member of the styler's keyword set.
+     */
     protected String getKeywordRegularExpression() {
         return "\\b(\\w+)\\b";
     }
