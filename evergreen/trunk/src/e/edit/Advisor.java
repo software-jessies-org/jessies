@@ -31,33 +31,34 @@ public class Advisor extends JPanel {
     private Advisor() {
         setLayout(new BorderLayout());
         add(advicePane, BorderLayout.CENTER);
-        //FIXME
+        
+        // FIXME: is this what we want, or do we want a main menu item that brings up a dialog? The latter might be more direct for most practical uses.
         /*
         final JTextField textField = new JTextField();
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // If we select the text, the researchers will be invoked.
-                textField.selectAll();
+                research(textField.getText());
             }
         });
-        add(textField, BorderLayout.SOUTH);
+        add(textField, BorderLayout.NORTH);
         */
+        
         new Thread(new Runnable() {
             public void run() {
                 addResearcher(JavaResearcher.getSharedInstance());
                 addResearcher(ManPageResearcher.getSharedInstance());
                 addResearcher(new NumberResearcher());
-                addResearcher(new RubyDocumentationResearcher());
                 addResearcher(new PerlDocumentationResearcher());
+                addResearcher(new RubyDocumentationResearcher());
+                addResearcher(new StlDocumentationResearcher());
             }
         }).start();
     }
     
     private synchronized JFrame getFrame() {
         if (frame == null) {
-            // FIXME: should have at least status line/progress indicator and back button. Perhaps as part of AdvisorHtmlPane rather than here?
-            frame = JFrameUtilities.makeSimpleWindow("Evergreen Documentation Browser", advicePane);
-            frame.setSize(new Dimension(400, 500));
+            frame = JFrameUtilities.makeSimpleWindow("Evergreen Documentation Browser", this);
+            frame.setSize(new Dimension(600, 500));
         }
         return frame;
     }
@@ -161,6 +162,11 @@ public class Advisor extends JPanel {
         
         @Override
         protected Object doInBackground() {
+            // Special-case URLs.
+            if (link.startsWith("http:") || link.startsWith("file:")) {
+                advicePane.setPage(link);
+                return null;
+            }
             // Offer the link to each researcher.
             synchronized (researchers) {
                 for (WorkspaceResearcher researcher : researchers) {

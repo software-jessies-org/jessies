@@ -50,21 +50,30 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     }
     
     public void setText(String text) {
+        textPane.setContentType("text/html");
         textPane.setText(text);
         textPane.setCaretPosition(0);
+    }
+    
+    public void setPage(String url) {
+        try {
+            textPane.setPage(url);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
     
     public void hyperlinkUpdate(HyperlinkEvent e) {
         // Welcome to the wonderful world of OOP, featuring nested-if polymorphism.
         if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-            statusBar.setText("Open " + e.getDescription());
+            statusBar.setText("Open " + e.getURL().toString());
         } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
             statusBar.clearStatusBar();
         } else if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e instanceof HTMLFrameHyperlinkEvent) {
                 ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
             } else {
-                Advisor.getInstance().linkClicked(e.getDescription());
+                Advisor.getInstance().linkClicked(e.getURL().toString());
             }
         }
     }
