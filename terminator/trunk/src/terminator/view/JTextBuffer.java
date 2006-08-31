@@ -337,7 +337,6 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		redrawCursorPosition();
 		cursorPosition = newCursorPosition;
 		redrawCursorPosition();
-		scrollHorizontallyToShowCursor();
 	}
 	
 	/** Sets whether the cursor should be displayed. */
