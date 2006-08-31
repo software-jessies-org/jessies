@@ -233,12 +233,15 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		redoHighlightsFrom(Math.min(oldSizeInChars.height, newSizeInChars.height));
 	}
 	
-	public void scrollToBottom() {
+	public void scrollToBottomButNotHorizontally() {
 		JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
 		
 		BoundedRangeModel verticalModel = pane.getVerticalScrollBar().getModel();
 		verticalModel.setValue(verticalModel.getMaximum() - verticalModel.getExtent());
-		
+	}
+	
+	public void scrollToBottom() {
+		scrollToBottomButNotHorizontally();
 		scrollHorizontallyToShowCursor();
 	}
 	
@@ -308,7 +311,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	 */
 	public void scrollOnTtyOutput(boolean wereAtBottom) {
 		if (wereAtBottom || Options.getSharedInstance().isScrollTtyOutput()) {
-			scrollToBottom();
+			scrollToBottomButNotHorizontally();
 		}
 	}
 	
