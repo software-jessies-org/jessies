@@ -579,6 +579,7 @@ public class TextBuffer {
 			TextLine lineAbove = getTextLine(--lineIndex);
 			charOffset += lineAbove.length();
 		}
+		charOffset = Math.min(charOffset, width - 1);
 		cursorPosition = new Location(lineIndex, charOffset);
 	}
 	
