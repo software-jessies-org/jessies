@@ -9,11 +9,11 @@ import terminator.terminal.*;
 import terminator.view.*;
 
 /**
-A TextBuffer represents all the text associated with a single connection.  It maintains a list of
-TextLine objects, one for each line.
-
-@author Phil Norman
-*/
+ * A TextBuffer represents all the text associated with a single connection.  It maintains a list of
+ * TextLine objects, one for each line.
+ * 
+ * @author Phil Norman
+ */
 
 public class TextBuffer {
 	private JTextBuffer view;
@@ -66,7 +66,7 @@ public class TextBuffer {
 			setStyle(savedStyle);
 		}
 	}
-
+	
 	public void checkInvariant() {
 		int highestStartLineIndex = -1;
 		for (int lineNumber = 0; lineNumber <= lastValidStartIndex; ++ lineNumber) {
@@ -94,7 +94,7 @@ public class TextBuffer {
 		// first of those lines. Ideally we should keep all pertinent
 		// lines. Unfortunately, I can't see how we'd know.
 		ArrayList<TextLine> retainedLines = new ArrayList<TextLine>(textLines.subList(cursorPosition.getLineIndex(), textLines.size()));
-
+		
 		// Revert to just the right number of empty lines to fill the
 		// current window size.
 		// Using a new ArrayList ensures we free space without risking
@@ -125,7 +125,7 @@ public class TextBuffer {
 		view.repaint();
 		checkInvariant();
 	}
-
+	
 	public void sizeChanged(Dimension sizeInChars) {
 		setSize(sizeInChars.width, sizeInChars.height);
 		cursorPosition = getLocationWithinBounds(cursorPosition);
@@ -176,7 +176,7 @@ public class TextBuffer {
 	public boolean usingAlternateBuffer() {
 		return (savedScreen != null);
 	}
-
+	
 	public void setTabAtCursor() {
 		int newPos = cursorPosition.getCharOffset();
 		for (int i = 0; i < tabPositions.size(); i++) {
@@ -222,10 +222,10 @@ public class TextBuffer {
 	}
 	
 	/**
-	* Returns a Location describing the line and offset at which the given char index exists.
-	* If the index is actually larger than the screen area, returns a 'fake' location to the right
-	* of the end of the last line.
-	*/
+	 * Returns a Location describing the line and offset at which the given char index exists.
+	 * If the index is actually larger than the screen area, returns a 'fake' location to the right
+	 * of the end of the last line.
+	 */
 	public Location getLocationFromCharIndex(int charIndex) {
 		int lowLine = 0;
 		int low = 0;
@@ -345,11 +345,11 @@ public class TextBuffer {
 			cursorPosition = new Location(index, cursorPosition.getCharOffset());
 		}
 	}
-
+	
 	public void insertLine(int index) {
 		insertLine(index, new TextLine());
 	}
-
+	
 	public void insertLine(int index, TextLine lineToInsert) {
 		// Use a private copy of the first display line throughout this method to avoid mutation
 		// caused by textLines.add()/textLines.remove().
@@ -399,7 +399,7 @@ public class TextBuffer {
 		}
 		return textLines.get(index);
 	}
-
+	
 	public void setSize(int width, int height) {
 		this.width = width;
 		lineIsDirty(0);
@@ -429,7 +429,7 @@ public class TextBuffer {
 	public void setInsertMode(boolean insertMode) {
 		this.insertMode = insertMode;
 	}
-
+	
 	/**
 	 * Process the characters in the given line. The string is composed of
 	 * normal printable characters, escape sequences having been extracted
@@ -439,10 +439,10 @@ public class TextBuffer {
 		String line = view.getTerminalControl().translate(untranslatedLine);
 		TextLine textLine = getTextLine(cursorPosition.getLineIndex());
 		if (insertMode) {
-//			Log.warn("Inserting text \"" + line + "\" at " + cursorPosition + ".");
+			//Log.warn("Inserting text \"" + line + "\" at " + cursorPosition + ".");
 			textLine.insertTextAt(cursorPosition.getCharOffset(), line, currentStyle);
 		} else {
-//			Log.warn("Writing text \"" + line + "\" at " + cursorPosition + ".");
+			//Log.warn("Writing text \"" + line + "\" at " + cursorPosition + ".");
 			textLine.writeTextAt(cursorPosition.getCharOffset(), line, currentStyle);
 		}
 		textAdded(line.length());
@@ -456,7 +456,7 @@ public class TextBuffer {
 		linesChangedFrom(cursorPosition.getLineIndex());
 		moveCursorHorizontally(length);
 	}
-
+	
 	public void processSpecialCharacter(char ch) {
 		switch (ch) {
 		case Ascii.CR:
@@ -526,7 +526,7 @@ public class TextBuffer {
 		lineIsDirty(cursorPosition.getLineIndex() + 1);  // cursorPosition.y's line still has a valid *start* index.
 		linesChangedFrom(cursorPosition.getLineIndex());
 	}
-
+	
 	/** Erases from either the top or the cursor line, to either the bottom or the cursor line. */
 	public void killVertically(boolean fromTop, boolean toBottom) {
 		int start = fromTop ? getFirstDisplayLine() : cursorPosition.getLineIndex();
@@ -542,33 +542,31 @@ public class TextBuffer {
 	}
 	
 	/**
-	* Sets the position of the cursor to the given x and y coordinates, counted from 1,1 at the top-left corner.
-	* If either x or y is -1, that coordinate is left unchanged.
-	*/
+	 * Sets the position of the cursor to the given x and y coordinates, counted from 1,1 at the top-left corner.
+	 * If either x or y is -1, that coordinate is left unchanged.
+	 */
 	public void setCursorPosition(int x, int y) {
 		// Although the cursor positions are supposed to be measured
 		// from (1,1), there's nothing to stop a badly-behaved program
 		// from sending (0,0). ASUS routers do this (they're rubbish).
 		
-		if (x == -1) {
-			x = cursorPosition.getCharOffset();
-		} else {
+		int charOffset = cursorPosition.getCharOffset();
+		if (x != -1) {
 			// Translate from 1-based coordinates to 0-based.
-			x = Math.max(0, x - 1);
-			x = Math.min(x, width - 1);
+			charOffset = Math.max(0, x - 1);
+			charOffset = Math.min(charOffset, width - 1);
 		}
 		
-		if (y == -1) {
-			y = cursorPosition.getLineIndex();
-		} else {
+		int lineIndex = cursorPosition.getLineIndex();
+		if (y != -1) {
 			// Translate from 1-based coordinates to 0-based.
-			y = Math.max(0, y - 1);
-			y = Math.min(y, height - 1);
+			int lineOffsetFromStartOfDisplay = Math.max(0, y - 1);
+			lineOffsetFromStartOfDisplay = Math.min(lineOffsetFromStartOfDisplay, height - 1);
 			// Although the escape sequence was in terms of a line on the display, we need to take the lines above the display into account.
-			y = getFirstDisplayLine() + y;
+			lineIndex = getFirstDisplayLine() + lineOffsetFromStartOfDisplay;
 		}
 		
-		cursorPosition = new Location(y, x);
+		cursorPosition = new Location(lineIndex, charOffset);
 	}
 	
 	/** Moves the cursor horizontally by the number of characters in xDiff, negative for left, positive for right. */
@@ -591,13 +589,13 @@ public class TextBuffer {
 		y = Math.min(y, textLines.size() - 1);
 		cursorPosition = new Location(y, cursorPosition.getCharOffset());
 	}
-
+	
 	/** Sets the first and last lines to scroll.  If both are -1, make the entire screen scroll. */
 	public void setScrollingRegion(int firstLine, int lastLine) {
 		firstScrollLineIndex = ((firstLine == -1) ? 1 : firstLine) - 1;
 		lastScrollLineIndex = ((lastLine == -1) ? height : lastLine) - 1;
 	}
-
+	
 	/** Scrolls the display up by one line. */
 	public void scrollDisplayUp() {
 		int addIndex = getFirstDisplayLine() + firstScrollLineIndex;
@@ -609,7 +607,7 @@ public class TextBuffer {
 		view.repaint();
 		checkInvariant();
 	}
-
+	
 	/** Delete one line, moving everything below up and inserting a blank line at the bottom. */
 	public void deleteLine() {
 		int removeIndex = cursorPosition.getLineIndex();
