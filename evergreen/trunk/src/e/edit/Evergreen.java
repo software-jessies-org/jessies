@@ -173,11 +173,18 @@ public class Evergreen {
     public EWindow openFileNonInteractively(InitialFile file) {
         String filename = file.filename;
         
-        // Special case for URIs.
-        if (filename.matches("^[a-z]+://.*")) {
-            showDocument(filename);
-            return null;
+        // Special case for URIs. We don't insist on matching two slashes because Java has a habit of turning a File into something like "file:/usr/bin/bash".
+        if (filename.matches("[a-z]+:/.*")) {
+            if (filename.startsWith("file:") && filename.matches("file:/.*\\.html") == false) {
+                // We open non-HTML file: references ourselves.
+                filename = filename.substring(5);
+            } else {
+                // Everything else is the platform's problem.
+                showDocument(filename);
+                return null;
+            }
         }
+        
         // Special case for files to open in external applications.
         if (isFileForExternalApplication(filename)) {
             openFileWithExternalApplication(filename);

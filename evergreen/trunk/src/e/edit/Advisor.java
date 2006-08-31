@@ -162,8 +162,9 @@ public class Advisor extends JPanel {
         
         @Override
         protected Object doInBackground() {
-            // Special-case URLs.
-            if (link.startsWith("http:") || link.startsWith("file:")) {
+            // Anything off the web or local HTML should be displayed in the documentation browser, rather than handed off to the platform's web browser.
+            // Non-HTML files, though, need to be handed off so they're opened for editing.
+            if (link.startsWith("http:") || link.matches("file:.*\\.html")) {
                 advicePane.setPage(link);
                 return null;
             }
