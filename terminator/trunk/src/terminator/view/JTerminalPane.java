@@ -463,7 +463,17 @@ public class JTerminalPane extends JPanel {
 		 */
 		public void scroll() {
 			if (Options.getSharedInstance().isScrollKey()) {
-				textPane.scrollToBottom();
+				// Give the corresponding output time to come out and so move the cursor, to which we'll scroll.
+				// If your remote-echoing device is more than 100ms away and doesn't automatically wrap at the
+				// terminal width, the automatic horizontal scrolling as you type will be one character behind.
+				// That's less of a problem than it might seem because we scroll by half a window width when possible.
+				javax.swing.Timer scrollToBottomDelayTimer = new javax.swing.Timer(100, new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						textPane.scrollToBottom();
+					}
+				});
+				scrollToBottomDelayTimer.setRepeats(false);
+				scrollToBottomDelayTimer.start();
 			}
 		}
 	}
