@@ -579,7 +579,8 @@ public class TextBuffer {
 			TextLine lineAbove = getTextLine(--lineIndex);
 			charOffset += lineAbove.length();
 		}
-		charOffset = Math.min(charOffset, width - 1);
+		// Constraining charOffset here stops line editing working properly on Titan serial consoles.
+		//charOffset = Math.min(charOffset, width - 1);
 		cursorPosition = new Location(lineIndex, charOffset);
 	}
 	
