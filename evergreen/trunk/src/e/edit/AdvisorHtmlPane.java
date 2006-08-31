@@ -32,6 +32,8 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         textPane.addHyperlinkListener(this);
         
         ComponentUtilities.initKeyBinding(textPane, new FindAction(textPane));
+        ComponentUtilities.initKeyBinding(textPane, new FindAgainAction(textPane, true));
+        ComponentUtilities.initKeyBinding(textPane, new FindAgainAction(textPane, false));
         
         HTMLEditorKit editorKit = (HTMLEditorKit) textPane.getEditorKit();
         StyleSheet styleSheet = editorKit.getStyleSheet();
@@ -141,6 +143,22 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
                 }
             }
             return matchCount;
+        }
+    }
+    
+    public static class FindAgainAction extends AbstractAction {
+        private JTextPane textPane;
+        private boolean next;
+        
+        public FindAgainAction(JTextPane textPane, boolean next) {
+            super(next ? "Find Next" : "Find Previous");
+            this.textPane = textPane;
+            this.next = next;
+            putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke(next ? "G" : "D", false));
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            JTextComponentUtilities.findNextHighlight(textPane, next ? Position.Bias.Forward : Position.Bias.Backward, FIND_HIGHLIGHT_PAINTER);
         }
     }
 }
