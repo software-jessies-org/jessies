@@ -244,8 +244,8 @@ public class JavaDoc {
         return  "<a style=\"text-decoration: none\" href=\"" + uri + "\" alt=\"" + uri + "\">" + text + "</a>";
     }
     
-    public static String formatAsSourceLink(String uri) {
-        return "[" + formatAnchor(uri, "src") + "]";
+    public static String formatAsSourceLink(String filename) {
+        return "[" + formatAnchor("file://" + filename, "src") + "]";
     }
     
     public static String formatAsDocLink(String uri, String className, String packageName, boolean showPackage) {
