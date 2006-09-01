@@ -45,7 +45,7 @@ public final class InAppServer {
         
         try {
             File portFile = FileUtilities.fileFromString(portFilename);
-            secretFile = new File(portFile.getParentFile(), ".secret");
+            secretFile = new File(portFile.getPath() + ".secret");
             Thread serverThread = new Thread(new ConnectionAccepter(portFile, inetAddress), fullName);
             // If there are no other threads left, the InApp server shouldn't keep us alive.
             serverThread.setDaemon(true);

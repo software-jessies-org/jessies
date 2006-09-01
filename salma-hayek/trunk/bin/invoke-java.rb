@@ -43,7 +43,7 @@ end
 class InAppClient
   def initialize(serverPortPathname)
     @serverPortPathname = serverPortPathname
-    @secretPathname = serverPortPathname.dirname() + ".secret"
+    @secretPathname = Pathname.new(serverPortPathname.to_s() + ".secret")
     if @secretPathname.exist?() == false
       @secretPathname.open("w")
     end
