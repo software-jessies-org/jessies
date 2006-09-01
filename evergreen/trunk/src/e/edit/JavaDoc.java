@@ -61,15 +61,24 @@ public class JavaDoc {
         }
         classLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
         
-        // Note the locations of JavaDoc HTML files.
-        javaDocLocations.addAll(Arrays.asList(FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.doc", ""))));
+        // Note the user-configured JavaDoc locations.
+        String configuredLocations = Parameters.getParameter("java.advisor.doc", null);
+        if (configuredLocations != null) {
+            javaDocLocations.addAll(Arrays.asList(FileUtilities.getArrayOfPathElements(configuredLocations)));
+        }
         
-        // On Mac OS, we may have the documentation installed in a well-known place.
-        // FIXME: this should be CurrentJDK rather than 1.5.0, but 1.5.0 isn't the default on Mac OS yet.
-        String macOsJavaDocDir = "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/";
-        if (FileUtilities.exists(macOsJavaDocDir)) {
-            javaDocLocations.add("file://" + macOsJavaDocDir + "doc/api/");
-            javaDocLocations.add("file://" + macOsJavaDocDir + "appledoc/api/");
+        // On some systems we may have the documentation installed in a well-known place.
+        String[] wellKnownJavaDocDirectories = {
+            // Mac OS X.
+            "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/doc/api",
+            "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/appledoc/api",
+            // Debian-based Linux.
+            "/usr/share/doc/sun-java5-jdk/html/api",
+        };
+        for (String wellKnownJavaDocDirectory : wellKnownJavaDocDirectories) {
+            if (FileUtilities.exists(wellKnownJavaDocDirectory)) {
+                javaDocLocations.add(wellKnownJavaDocDirectory);
+            }
         }
         
         // In an emergency, fall back to Sun's copy on the web.
@@ -208,16 +217,18 @@ public class JavaDoc {
             s.append(".html");
             
             String candidate = s.toString();
-            if (FileUtilities.nameStartsWithOneOf(candidate, FileUtilities.getArrayOfPathElements(Parameters.getParameter("url.prefixes", "")))) {
+            if (candidate.matches("(http|https)://.*")) {
                 if (urlExists(candidate)) {
                     String link = formatAsDocLink(candidate, className, pkg, showPkg);
                     docLinks.put(className + "." + pkg + String.valueOf(showPkg), link);
                     return link;
                 }
-            } else if (FileUtilities.fileFromString(candidate).exists()) {
-                String link = formatAsDocLink(candidate, className, pkg, showPkg);
-                docLinks.put(className + "." + pkg + String.valueOf(showPkg), link);
-                return link;
+            } else {
+                if (FileUtilities.fileFromString(candidate).exists()) {
+                    String link = formatAsDocLink("file://" + candidate, className, pkg, showPkg);
+                    docLinks.put(className + "." + pkg + String.valueOf(showPkg), link);
+                    return link;
+                }
             }
         }
         
@@ -227,15 +238,17 @@ public class JavaDoc {
         return link;
     }
     
-    /** Returns true if the given url points to an accessible resource, false otherwise. */
+    /**
+     * Returns true if the given url points to an accessible resource, false otherwise.
+     * FIXME: we *really* ought to cache successes (at least).
+     */
     public static boolean urlExists(String urlString) {
         try {
-            URL url = new URL(urlString);
-            url.getContent();
-            return true;
+            HttpURLConnection connection = (HttpURLConnection) (new URL(urlString)).openConnection();
+            connection.setRequestMethod("HEAD");
+            return (connection.getResponseCode() == HttpURLConnection.HTTP_OK);
         } catch (Exception ex) {
             /* Didn't find what we're looking for. */
-            // FIXME: is there a better way to do URL.exists()?
             return false;
         }
     }
