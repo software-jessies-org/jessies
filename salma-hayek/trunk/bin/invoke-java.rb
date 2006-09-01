@@ -64,9 +64,18 @@ class InAppClient
     telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
     telnet.puts(secret)
     telnet.puts(command)
-    print(telnet.readlines().join(""))
+    serverOutput = telnet.readlines()
+    success = true
+    if serverOutput.length() > 0 && serverOutput[0].match(/^Authentication (OK|failed)$/)
+      if $1 == "OK"
+        serverOutput.shift()
+      else
+        success = false
+      end
+    end
+    print(serverOutput.join(""))
     telnet.close()
-    return true
+    return success
   rescue
     return false
   end
