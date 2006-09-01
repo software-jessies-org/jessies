@@ -297,6 +297,12 @@ class Java
       args << "-Xdock:icon=#{@dock_icon}"
       add_property("apple.laf.useScreenMenuBar", "true")
     end
+    
+    # These only-needed-with-Java5 extra arguments are things I've found useful in the past.
+    # They'll help me google if I need them again.
+    #args << "-Xdebug"
+    #args << "-Xrunjdwp:transport=dt_socket,server=y,suspend=n"
+    #args << "-Xrunhprof:file=dump.hprof,format=b"
 
     add_pathname_property("org.jessies.frameIcon", @png_icon)
     
