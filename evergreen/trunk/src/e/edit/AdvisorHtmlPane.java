@@ -3,6 +3,7 @@ package e.edit;
 import e.gui.*;
 import e.util.*;
 import java.awt.*;
+import java.net.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
@@ -58,17 +59,30 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         }
     }
     
+    /**
+     * Gets the "best" information from a HyperlinkEvent.
+     * If you're dealing with a Sun-supported scheme, getURL is best.
+     * If you're not (because you have one of our custom schemes for RubyDoc, say), you have to use getDescription.
+     */
+    private static String stringFromHyperlinkEvent(HyperlinkEvent e) {
+        URL url = e.getURL();
+        if (url != null) {
+            return url.toString();
+        }
+        return e.getDescription();
+    }
+    
     public void hyperlinkUpdate(HyperlinkEvent e) {
         // Welcome to the wonderful world of OOP, featuring nested-if polymorphism.
         if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-            statusBar.setText("Open " + e.getURL().toString());
+            statusBar.setText("Open " + stringFromHyperlinkEvent(e));
         } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
             statusBar.clearStatusBar();
         } else if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e instanceof HTMLFrameHyperlinkEvent) {
                 ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
             } else {
-                Advisor.getInstance().linkClicked(e.getURL().toString());
+                Advisor.getInstance().linkClicked(stringFromHyperlinkEvent(e));
             }
         }
     }
