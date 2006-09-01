@@ -162,10 +162,9 @@ public final class InAppServer {
             try {
                 this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 this.out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
-                if (authenticateClient() == false) {
-                    return;
+                if (authenticateClient()) {
+                    handleRequest();
                 }
-                handleRequest();
                 out.flush();
                 out.close();
                 in.close();
@@ -188,9 +187,11 @@ public final class InAppServer {
             String line = in.readLine();
             if (line == null || line.equals(secret) == false) {
                 Log.warn(Thread.currentThread().getName() + ": failed authentication attempt with \"" + line + "\"");
+                out.println("Authentication failed");
                 return false;
             }
             writeNewSecret();
+            out.println("Authentication OK");
             return true;
         }
             
