@@ -1,10 +1,20 @@
 package e.gui;
 
+import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.text.*;
+import javax.swing.text.html.*;
 
 public class JTextComponentUtilities {
+    private static final DefaultHighlighter.DefaultHighlightPainter FIND_HIGHLIGHT_PAINTER = new DefaultHighlighter.DefaultHighlightPainter(e.ptextarea.PFind.MATCH_COLOR);
+    
+    private JTextComponentUtilities() {
+        // This class cannot be instantiated.
+    }
+    
     public static void goToSelection(final JTextComponent textComponent, final int startOffset, final int endOffset) {
         if (EventQueue.isDispatchThread()) {
             doGoToSelection(textComponent, startOffset, endOffset);
@@ -51,10 +61,9 @@ public class JTextComponentUtilities {
     
     public static void removeAllHighlightsUsingPainter(final JTextComponent textComponent, final Highlighter.HighlightPainter painter) {
         Highlighter highlighter = textComponent.getHighlighter();
-        Highlighter.Highlight[] highlights = highlighter.getHighlights();
-        for (int i = 0; i < highlights.length; i++) {
-            if (highlights[i].getPainter() == painter) {
-                highlighter.removeHighlight(highlights[i]);
+        for (Highlighter.Highlight highlight : highlighter.getHighlights()) {
+            if (highlight.getPainter() == painter) {
+                highlighter.removeHighlight(highlight);
             }
         }
     }
@@ -86,7 +95,90 @@ public class JTextComponentUtilities {
         }
     }
     
-    private JTextComponentUtilities() {
-        // This class cannot be instantiated.
+    /**
+     * Makes C-F bring up a regular-expression find dialog that highlights all matches, like Firefox.
+     * C-D and C-G are "Find Next" and "Find Previous" respectively.
+     * 
+     * FIXME: currently only works when the document is an instance of HTMLDocument.
+     */
+    public static void addFindFunctionalityTo(JTextPane textPane) {
+        ComponentUtilities.initKeyBinding(textPane, new JTextComponentUtilities.FindAction(textPane));
+        ComponentUtilities.initKeyBinding(textPane, new JTextComponentUtilities.FindAgainAction(textPane, true));
+        ComponentUtilities.initKeyBinding(textPane, new JTextComponentUtilities.FindAgainAction(textPane, false));
+    }
+    
+    public static class FindAction extends AbstractAction {
+        private JTextPane textPane;
+        private JTextField findField = new JTextField(40);
+        
+        public FindAction(JTextPane textPane) {
+            super("Find...");
+            this.textPane = textPane;
+            putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("F", false));
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            String selection = textPane.getSelectedText();
+            if (selection != null && selection.length() > 0) {
+                findField.setText(StringUtilities.regularExpressionFromLiteral(selection));
+            }
+            
+            AbstractFindDialog findDialog = new AbstractFindDialog() {
+                public int updateFindResults(String regularExpression) {
+                    return findAllMatches(regularExpression);
+                }
+                
+                public void clearFindResults() {
+                    findAllMatches(null);
+                }
+            };
+            findDialog.showFindDialog(textPane, findField);
+        }
+        
+        public int findAllMatches(String regularExpression) {
+            JTextComponentUtilities.removeAllHighlightsUsingPainter(textPane, FIND_HIGHLIGHT_PAINTER);
+            
+            if (regularExpression == null || regularExpression.length() == 0) {
+                return 0;
+            }
+            
+            String content = textPane.getText();
+            if (content == null) {
+                return 0;
+            }
+            
+            Pattern pattern = PatternUtilities.smartCaseCompile(regularExpression);
+            int matchCount = 0;
+            Highlighter highlighter = textPane.getHighlighter();
+            HTMLDocument document = (HTMLDocument) textPane.getDocument();
+            for (HTMLDocument.Iterator it = document.getIterator(HTML.Tag.CONTENT); it.isValid(); it.next()) {
+                try {
+                    String fragment = document.getText(it.getStartOffset(), it.getEndOffset() - it.getStartOffset());
+                    Matcher matcher = pattern.matcher(fragment);
+                    while (matcher.find()) {
+                        highlighter.addHighlight(it.getStartOffset() + matcher.start(), it.getStartOffset() + matcher.end(), FIND_HIGHLIGHT_PAINTER);
+                        ++matchCount;
+                    }
+                } catch (BadLocationException ex) {
+                }
+            }
+            return matchCount;
+        }
+    }
+    
+    public static class FindAgainAction extends AbstractAction {
+        private JTextPane textPane;
+        private boolean next;
+        
+        public FindAgainAction(JTextPane textPane, boolean next) {
+            super(next ? "Find Next" : "Find Previous");
+            this.textPane = textPane;
+            this.next = next;
+            putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke(next ? "G" : "D", false));
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            JTextComponentUtilities.findNextHighlight(textPane, next ? Position.Bias.Forward : Position.Bias.Backward, FIND_HIGHLIGHT_PAINTER);
+        }
     }
 }
