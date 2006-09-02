@@ -132,11 +132,22 @@ public class Advisor extends JPanel {
         
         // Otherwise, we use the word at the caret.
         CharSequence chars = textArea.getTextBuffer();
+        String stopChars = chooseStopChars();
         int caretPosition = textArea.getSelectionStart();
-        String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
         int start = PWordUtilities.getWordStart(chars, caretPosition, stopChars);
         int end = PWordUtilities.getWordEnd(chars, caretPosition, stopChars);
         return chars.subSequence(start, end).toString();
+    }
+    
+    private static String chooseStopChars() {
+        FileType fileType = ETextAction.getFocusedTextWindow().getFileType();
+        String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
+        if (fileType == FileType.C_PLUS_PLUS) {
+            // "::" is useful in C++, so remove it from the stop list.
+            // An alternative would be to stop insisting on the "std::" prefix for STL lookups, but that would introduce ambiguity: std::string versus string(3), for example.
+            stopChars = stopChars.replace(":", "");
+        }
+        return stopChars;
     }
     
     public void research(String text) {
