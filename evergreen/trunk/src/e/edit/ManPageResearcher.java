@@ -126,14 +126,21 @@ public class ManPageResearcher implements WorkspaceResearcher {
         
         String result = StringUtilities.join(lines, "\n");
         
-        // There are case differences between 3.0.9 on Mac OS and 3.2 on Linux.
-        // There are also difference in the quote character used: ' on Linux and " on Mac OS.
-        
-        // Remove the table of contents at the end. There may be nested lists because subsection are included.
-        result = result.replaceAll("(?si)<hr><p>.*</ul>", "");
-        // Remove the links to the table of contents.
-        result = result.replaceAll("(?i)<a name=['\"]sect\\d+['\"] href=['\"]#toc\\d+['\"]>((.|\n)*?)</a>", "$1");
-        result = result.replaceAll("(?i)<a href=['\"]#toc['\"]>Table of Contents</a><p>", "");
+        if (polyglotMan != null) {
+            // Tidy up the PolyglotMan (rman) output.
+            
+            // There are case differences between 3.0.9 on Mac OS and 3.2 on Linux.
+            // There's also a difference in the quote character used: ' on Linux and " on Mac OS.
+            
+            // Remove the table of contents at the end. There may be nested lists because subsection are included.
+            result = result.replaceAll("(?si)<hr><p>.*</ul>", "");
+            // Remove the links to the table of contents.
+            result = result.replaceAll("(?i)<a name=['\"]sect\\d+['\"] href=['\"]#toc\\d+['\"]>((.|\n)*?)</a>", "$1");
+            result = result.replaceAll("(?i)<a href=['\"]#toc['\"]>Table of Contents</a><p>", "");
+        } else {
+            result = "\n\n(You can get a nicely-formatted hyperlinked man page by installing PolyglotMan, also known as rman. You can get the source from http://polyglotman.sourceforge.net/ if you can't find it prepackaged for your platform.)\n\n\n" + result;
+            result = result.replaceAll("\n", "<br>\n");
+        }
         
         return result;
     }
