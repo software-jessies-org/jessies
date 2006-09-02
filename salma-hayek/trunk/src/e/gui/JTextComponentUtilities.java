@@ -115,6 +115,9 @@ public class JTextComponentUtilities {
             super("Find...");
             this.textPane = textPane;
             putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("F", false));
+            // Make C-D and C-G work even while our text field has the focus.
+            ComponentUtilities.initKeyBinding(findField, new JTextComponentUtilities.FindAgainAction(textPane, true));
+            ComponentUtilities.initKeyBinding(findField, new JTextComponentUtilities.FindAgainAction(textPane, false));
         }
         
         public void actionPerformed(ActionEvent e) {
