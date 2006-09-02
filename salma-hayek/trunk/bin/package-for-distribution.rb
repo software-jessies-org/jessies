@@ -266,7 +266,19 @@ else
         deb_arch = `dpkg-architecture -qDEB_HOST_ARCH`.chomp()
         control.puts("Architecture: #{deb_arch}")
         
-        control.puts("Depends: ruby (>= 1.8)")
+        # You won't be able to start any of our programs without Ruby 1.8 or later.
+        depends = "ruby (>= 1.8)"
+        
+        # Some programs, like Evergreen, work much better if other tools are available.
+        # If a project has a file listing extra dependencies (one per line), add them.
+        # Note that we deliberately don't use "Recommends" because people installing at the command-line won't follow your advice, and people installing from a GUI probably won't even see it.
+        extra_depends_filename = "#{project_resource_directory}/lib/DEBIAN-control-Depends.txt"
+        if File.exists?(extra_depends_filename)
+            extra_depends = IO.readlines(extra_depends_filename).join(", ").gsub("\n", "")
+            depends << ", " << extra_depends
+        end
+        
+        control.puts("Depends: #{depends}")
         control.puts("Installed-Size: #{installed_size}")
         control.puts("Maintainer: software.jessies.org <software@jessies.org>")
         control.puts("Description: #{extract_package_description_from_html(human_project_name)}")
