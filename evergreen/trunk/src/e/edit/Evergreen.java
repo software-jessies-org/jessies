@@ -178,6 +178,11 @@ public class Evergreen {
             if (filename.startsWith("file:") && filename.matches("file:/.*\\.html") == false) {
                 // We open non-HTML file: references ourselves.
                 filename = filename.substring(5);
+                // Removing leading slashes is tricky, because file URLs aren't as consistent as http ones.
+                // There's one common case we have to fix, though, where "file://" has been prepended to a path starting with "~".
+                if (filename.startsWith("//~")) {
+                    filename = filename.substring(2);
+                }
             } else {
                 // Everything else is the platform's problem.
                 showDocument(filename);
