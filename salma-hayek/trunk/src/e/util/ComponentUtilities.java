@@ -25,5 +25,19 @@ public class ComponentUtilities {
         component.getInputMap().put(keyStroke, name);
     }
     
+    /**
+     * Scrolls the given component by its unit or block increment in the given direction (actually a scale factor, so use +1 or -1).
+     * Useful for implementing behavior like in Apple's Mail where page up/page down in the list cause scrolling in the text.
+     */
+    public static void scroll(JComponent c, boolean byBlock, int direction) {
+        JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, c);
+        JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
+        int increment = byBlock ? scrollBar.getBlockIncrement(direction) : scrollBar.getUnitIncrement(direction);
+        int newValue = scrollBar.getValue() + direction * increment;
+        newValue = Math.min(newValue, scrollBar.getMaximum());
+        newValue = Math.max(newValue, scrollBar.getMinimum());
+        scrollBar.setValue(newValue);
+    }
+    
     private ComponentUtilities() { /* Not instantiable. */ }
 }
