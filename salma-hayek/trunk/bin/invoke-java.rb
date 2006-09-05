@@ -335,6 +335,6 @@ end
 
 if __FILE__ == $0
   # Just an example.
-  invoker = Java.new("e/util/Launcher")
+  invoker = Java.new("Launcher", "e/util/Launcher")
   invoker.invoke()
 end
