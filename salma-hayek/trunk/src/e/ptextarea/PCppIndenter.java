@@ -15,11 +15,6 @@ public class PCppIndenter extends PSimpleIndenter {
     }
     
     @Override
-    protected String stripComments(String line) {
-        return stripMultiLineComments(stripDoubleSlashComment(line));
-    }
-    
-    @Override
     protected boolean isLabel(String activePartOfLine) {
         return isCppAccessSpecifier(activePartOfLine) || isSwitchLabel(activePartOfLine);
     }

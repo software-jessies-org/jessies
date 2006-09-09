@@ -15,8 +15,6 @@ Items to be done for PTextArea:
     String code;
   }
 
-  CommentUtilities.stripDoubleSlashComment
-
 * Improve PNewlineInserter:
 
   (1) int fn(|P0 a0) {

@@ -5,10 +5,6 @@ public class PJavaIndenter extends PSimpleIndenter {
         super(textArea);
     }
     
-    protected String stripComments(String line) {
-        return stripMultiLineComments(stripDoubleSlashComment(line));
-    }
-
     protected boolean isLabel(String activePartOfLine) {
         return isSwitchLabel(activePartOfLine);
     }

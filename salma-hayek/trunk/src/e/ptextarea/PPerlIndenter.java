@@ -5,10 +5,6 @@ public class PPerlIndenter extends PSimpleIndenter {
         super(textArea);
     }
     
-    protected String stripComments(String line) {
-        return stripHashComment(line);
-    }
-
     protected boolean isLabel(String activePartOfLine) {
         return false;
     }
