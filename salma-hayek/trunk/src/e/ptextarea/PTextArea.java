@@ -283,9 +283,19 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         // another thread has the read lock and is waiting for this thread.
     }
     
+    /**
+     * Avoids NullPointerExceptions when we try to use the splitLines before they're available.
+     * I think the only way we can fix this properly is to remember what we've been asked to do, and do it as soon as we're able.
+     * Hence the name.
+     * 
+     * FIXME: lose this and do the right thing instead..
+     */
+    private boolean weAreTooBrokenToWaitUntilWeAreAbleToCarryThisOut() {
+        return (isLineWrappingInvalid() || isShowing() == false);
+    }
+    
     public void centerOffsetInDisplay(int offset) {
-        if (isShowing() == false) {
-            // Avoid problems if splitLines == null.
+        if (weAreTooBrokenToWaitUntilWeAreAbleToCarryThisOut()) {
             return;
         }
         
@@ -303,7 +313,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     public void ensureVisibilityOfOffset(int offset) {
-        if (isLineWrappingInvalid() || isShowing() == false) {
+        if (weAreTooBrokenToWaitUntilWeAreAbleToCarryThisOut()) {
             return;
         }
         
