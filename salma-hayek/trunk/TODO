@@ -31,14 +31,6 @@ Items to be done for PTextArea:
        
   (2) Exclude comments etc from the code which finds the mismatched brackets whose partners should be inserted.
 
-* [2005-06-18 16:11:10 PDT] Wrapping of lines with tabs is broken in PTextArea:
-
-    private void setLineWidth(PLineList.Line line) {
-        line.setWidth(metrics.stringWidth(line.getContents().toString()));
-    }
-
-  that's not the width of the line, and never has been. so presumably we've only ever wrapped lines with tabs right when they've been very much longer than the width of the window. (because then we'll measure them properly, and thus wrap them correctly, despite being mistaken about how necessary it was to do so.)
-
 * [RFE] something i read suggested that you can get Xcode to wrap in such a way that it starts drawing wrapped lines at the level of the previous line's indent. so:
 
   |----------------window width--------------|
@@ -60,6 +52,8 @@ Items to be done for PTextArea:
   (only you'll have to imagine that the runs of '-' are our current wrap indicator.)
 
   this may be another case of misunderstanding into something better than what was meant, but that sounds like an interesting idea.
+
+  Kate and BBEdit do this. i haven't seen BBEdit, but Kate's implementation looks *really* ugly. imagining how it might work with our rendering of wrapped lines, though, i think it would be pretty neat.
 
 * Python and HTML/XML highlighting and indenting.
 

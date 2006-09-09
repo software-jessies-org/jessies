@@ -736,6 +736,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      * specified line.
      * FIXME - delete once all this is sorted out properly.
      * FIXME - this is moved straight out of PAbstractTextStyler.  It needs major work.
+     * 
+     * FIXME: when should you call getLineSegments, and when should you call getLineSegmentsForSplitLine?
      */
     private final List<PLineSegment> getLineSegmentsForSplitLine(SplitLine splitLine) {
         int lineIndex = splitLine.getLineIndex();
@@ -766,6 +768,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         return result;
     }
     
+    // FIXME: when should you call getLineSegments, and when should you call getLineSegmentsForSplitLine?
     public List<PLineSegment> getLineSegments(int lineIndex) {
         getLock().getReadLock();
         try {
@@ -1098,7 +1101,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         for (int i = 0; i < event.getLength(); i++) {
             PLineList.Line line = lines.getLine(event.getLineIndex() + i);
             setLineWidth(line);
-            int splitIndex = getSplitLineIndex(event.getLineIndex());
+            int splitIndex = getSplitLineIndex(event.getLineIndex()); // FIXME: shouldn't this be "+ i" too?
             if (i == 0) {
                 minLine = splitIndex;
             }
@@ -1313,8 +1316,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     private int addCharWidth(int x, char ch) {
+        // FIXME: this is a hack, and doesn't generalize to arbitrary PTextSegments for which getViewText and getCharSequence (that is, the model text) return different strings. I tried to rewrite the wrapping code to use getLineSegments. setLineWidth is easy, but addSplitLines is pretty difficult because you need to keep track of the two strings and the correspondence between offsets in them, or rewrite it completely to work on the text segments itself. This code has been known broken since at least 2005-06, so another special case is better than nothing.
         if (ch == '\t') {
             return x + PTabSegment.SINGLE_TAB.getDisplayWidth(metrics, x);
+        } else if (ch < ' ' || ch == '\u007f') {
+            // FIXME: we could cache these, since there are so few.
+            StringBuilder chars = new StringBuilder(6);
+            StringUtilities.appendUnicodeEscape(chars, ch);
+            return x + metrics.stringWidth(chars.toString());
         } else if (ch < MAX_CACHED_CHAR) {
             return x + widthCache[(int) ch];
         } else {
@@ -1323,15 +1332,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     private void setLineWidth(PLineList.Line line) {
-        // FIXME: this is a work-around; an earlier version of this method
-        // used stringWidth, which didn't work for tabs. This implementation
-        // works for tabs (thanks to the hack in addCharWidth), but doesn't
-        // work, for example, for unprintable characters. In general, we need
-        // to work on List<PLineSegment> --- the current implementation is
-        // insufficient to support segments that are rendered other than by
-        // simply invoking drawString on the model text. (Yes, we could
-        // continue to add hacks to addCharWidth, but that's obviously wrong,
-        // and broken in face of user-supplied StyleApplicators.)
         CharSequence chars = line.getContents();
         int width = 0;
         for (int i = 0; i < chars.length(); ++i) {
