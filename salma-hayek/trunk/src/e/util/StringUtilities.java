@@ -66,7 +66,7 @@ public class StringUtilities {
     private static final char[] ZEROES = { '0', '0', '0' };
     
     /** Appends the Java Unicode escape sequence for 'ch' to 'result' ("\u23cf", say). */
-    private static void appendUnicodeEscape(StringBuilder result, char ch) {
+    public static void appendUnicodeEscape(StringBuilder result, char ch) {
         result.append("\\u");
         appendUnicodeHex(result, ch);
     }
