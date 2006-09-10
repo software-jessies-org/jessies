@@ -122,7 +122,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         // in a fixed font reverting to a proportional font each time I save.
         CharSequence content = text.getTextBuffer();
         text.setFont(ChangeFontAction.getAppropriateFontForContent(content));
-        text.getIndenter().setIndentationPropertyBasedOnContent(content);
+        text.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
     }
     
     private void initBugDatabaseLinks() {
@@ -354,12 +354,16 @@ public class ETextWindow extends EWindow implements PTextListener {
             //text.setIndenter(new PPythonIndenter(text));
             text.setTextStyler(new PPythonTextStyler(text));
         } else if (fileType == FileType.ASSEMBLER) {
+            //text.setIndenter(new PAssemblerIndenter(text));
             text.setTextStyler(new PAssemblerTextStyler(text));
         } else if (fileType == FileType.BASH) {
+            //text.setIndenter(new PBashIndenter(text));
             text.setTextStyler(new PBashTextStyler(text));
         } else if (fileType == FileType.MAKE) {
+            //text.setIndenter(new PMakefileIndenter(text));
             text.setTextStyler(new PMakefileTextStyler(text));
         } else if (fileType == FileType.VHDL) {
+            //text.setIndenter(new PVhdlIndenter(text));
             text.setTextStyler(new PVhdlTextStyler(text));
         } else {
             // Plain text.
