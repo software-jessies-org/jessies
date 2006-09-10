@@ -48,7 +48,7 @@ public class PNewlineInserter {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");
-                textArea.getIndenter().fixIndentationAt(startPosition);
+                textArea.getIndenter().fixIndentationOnLine(textArea.getLineOfOffset(startPosition));
                 textArea.getIndenter().fixIndentation();
             }
         } finally {

@@ -2,7 +2,7 @@ package e.ptextarea;
 
 import java.util.regex.*;
 
-public class PRubyIndenter extends PIndenter {
+public class PRubyIndenter extends PSimpleIndenter {
     private Pattern increasersPattern = Pattern.compile("^begin\\b|^case\\b|^catch\\b|^class\\b|^def\\b|^else\\b|^elsif\\b|^ensure\\b|^for\\b|^if\\b|^module\\b|^rescue\\b|^when\\b|^while\\b|^unless\\b|^until\\b|\\{$");
     
     public PRubyIndenter(PTextArea textArea) {

@@ -1,132 +1,70 @@
 package e.ptextarea;
 
+import e.util.*;
+
+/**
+ * Implements the core functionality of any real indenter, which is to look at the line in question, split it into indentation and content, work out the new 
+ */
 public abstract class PSimpleIndenter extends PIndenter {
     public PSimpleIndenter(PTextArea textArea) {
         super(textArea);
     }
     
-    @Override
-    public boolean isElectric(char c) {
-        if (c == '#' && shouldMoveHashToColumnZero()) {
-            return true;
+    public final void fixIndentationOnLine(int lineIndex) {
+        String originalIndentation = getCurrentIndentationOfLine(lineIndex);
+        String replacementIndentation = getIndentation(lineIndex);
+        String originalLine = textArea.getLineText(lineIndex);
+        String replacementLine = replacementIndentation + StringUtilities.trimTrailingWhitespace(originalLine.substring(originalIndentation.length()));
+        //Log.warn("originalIndentation=@" + originalIndentation + "@; replacementIndentation=@" + replacementIndentation + "@");
+        if (replacementLine.equals(originalLine)) {
+            return;
         }
-        if (c == ':' && shouldMoveLabels()) {
-            return true;
-        }
-        if (isBlockEnd(c)) {
-            return true;
-        }
-        return false;
-    }
-    
-    public boolean isBlockBegin(char lastChar) {
-        return PBracketUtilities.isOpenBracket(lastChar);
-    }
-    
-    public boolean isBlockEnd(char firstChar) {
-        return PBracketUtilities.isCloseBracket(firstChar);
-    }
-    
-    public boolean isBlockBegin(String activePartOfLine) {
-        if (activePartOfLine.length() == 0) {
-            return false;
-        }
-        char lastChar = activePartOfLine.charAt(activePartOfLine.length() - 1);
-        return isBlockBegin(lastChar);
-    }
-    
-    public boolean isBlockEnd(String activePartOfLine) {
-        if (activePartOfLine.length() == 0) {
-            return false;
-        }
-        char firstChar = activePartOfLine.charAt(0);
-        return isBlockEnd(firstChar);
-    }
-    
-    public boolean isSwitchLabel(String activePartOfLine) {
-        return activePartOfLine.matches("(case\\b.*|default\\s*):");
+        int lineStartOffset = textArea.getLineStartOffset(lineIndex);
+        int charsInserted = replacementIndentation.length() - originalIndentation.length();
+        int desiredStartOffset = adjustOffsetAfterInsertion(textArea.getSelectionStart(), lineStartOffset, originalIndentation, replacementIndentation);
+        int desiredEndOffset = adjustOffsetAfterInsertion(textArea.getSelectionEnd(), lineStartOffset, originalIndentation, replacementIndentation);
+        int trimOffset = lineStartOffset + replacementLine.length();
+        int charsTrimmed = originalLine.length() - (replacementLine.length() - charsInserted);
+        desiredStartOffset = adjustOffsetAfterDeletion(desiredStartOffset, trimOffset, charsTrimmed);
+        desiredEndOffset = adjustOffsetAfterDeletion(desiredEndOffset, trimOffset, charsTrimmed);
+        textArea.replaceRange(replacementLine, lineStartOffset, lineStartOffset + originalLine.length());
+        textArea.select(desiredStartOffset, desiredEndOffset);
     }
     
     /**
-     * Lines that start with a closing brace or end with a opening brace or a colon tell us
-     * definitively what the indentation for the next line should be.
-     * Going back this far keeps us tidy in the face of various multi-line comment styles,
-     * multi-line C++ output operator expressions and C++ preprocessor commands.
+     * Returns the indentation which should be used for the given line number.
+     * Override this in your subclass to define your indenter's policy.
+     * 
+     * Copied into a subclass, this example code would implement a copying indenter that simply repeats the indentation of the line above.
+     * KDE offers something like this with shift-return.
+     * We could usefully do likewise, or offer it as an alternative to the default (non-indenting) indenter for languages that we recognize but don't have a proper indenter for.
+     * We'd probably have to change our backspace behavior to stop at a newline, but I've long thought we should do that anyway.
+     * 
+     * protected String getIndentation(int lineNumber) {
+     *     final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(lineNumber);
+     *     return (previousNonBlankLineNumber == -1) ? "" : getCurrentIndentationOfLine(previousNonBlankLineNumber);
+     *  }
      */
-    public boolean isDefinitive(String rawLine) {
-        String trimmedLine = rawLine.trim();
-        return isBlockBegin(trimmedLine) || isBlockEnd(trimmedLine) || isLabel(trimmedLine);
+    protected abstract String getIndentation(int lineNumber);
+    
+    private static int adjustOffsetAfterInsertion(int offsetToAdjust, int lineStartOffset, String originalIndentation, String replacementIndentation) {
+        if (offsetToAdjust < lineStartOffset) {
+            return offsetToAdjust;
+        } else if (offsetToAdjust > lineStartOffset + originalIndentation.length()) {
+            int charsInserted = replacementIndentation.length() - originalIndentation.length();
+            return offsetToAdjust + charsInserted;
+        } else {
+            return lineStartOffset + replacementIndentation.length();
+        }
     }
     
-    public int getPreviousDefinitiveLineNumber(int startLineNumber) {
-        for (int lineIndex = startLineNumber - 1; lineIndex >= 0; --lineIndex) {
-            String line = textArea.getLineText(lineIndex);
-            if (isDefinitive(line)) {
-                return lineIndex;
-            }
+    private static int adjustOffsetAfterDeletion(int offsetToAdjust, int offsetOfDeletion, int charsDeleted) {
+        if (offsetToAdjust < offsetOfDeletion) {
+            return offsetToAdjust;
+        } else if (offsetToAdjust > offsetOfDeletion + charsDeleted) {
+            return offsetToAdjust - charsDeleted;
+        } else {
+            return offsetOfDeletion;
         }
-        return -1;
     }
-    
-    private String getActivePartOfLine(int lineIndex) {
-        StringBuilder activePartOfLine = new StringBuilder();
-        for (PLineSegment segment : textArea.getLineSegments(lineIndex)) {
-            PStyle style = segment.getStyle();
-            if (style == PStyle.NORMAL || style == PStyle.KEYWORD || style == PStyle.PREPROCESSOR) {
-                activePartOfLine.append(segment.getCharSequence());
-            }
-        }
-        return activePartOfLine.toString().trim();
-    }
-    
-    @Override
-    public String getIndentation(int lineIndex) {
-        String activePartOfLine = getActivePartOfLine(lineIndex);
-        
-        if (shouldMoveHashToColumnZero() && activePartOfLine.startsWith("#")) {
-            return "";
-        }
-        
-        String indentation = "";
-        int previousDefinitive = getPreviousDefinitiveLineNumber(lineIndex);
-        if (previousDefinitive != -1) {
-            indentation = getCurrentIndentationOfLine(previousDefinitive);
-            
-            String activePartOfPrevious = getActivePartOfLine(previousDefinitive);
-            if (isBlockBegin(activePartOfPrevious) || isLabel(activePartOfPrevious)) {
-                indentation = increaseIndentation(indentation);
-            }
-        }
-        
-        if (isBlockEnd(activePartOfLine) || isLabel(activePartOfLine)) {
-            indentation = decreaseIndentation(indentation);
-        }
-        
-        // Recognize doc comments, and help out with the ASCII art.
-        if (lineIndex > 0 && shouldContinueDocComments()) {
-            String previousLine = textArea.getLineText(lineIndex - 1).trim();
-            if (previousLine.endsWith("*/")) {
-                // Whatever the previous line looks like, if it ends with
-                // a close of comment, we're not in a comment, and should
-                // do nothing.
-            } else if (previousLine.matches("/\\*{1,2}") || previousLine.startsWith("* ") || previousLine.equals("*")) {
-                // We're in a doc comment.
-                // FIXME: this is broken now activePartOfLine doesn't include comments.
-                if (activePartOfLine.startsWith("*/")) {
-                    // We already have the JavaDoc ASCII art, and just need to
-                    // indent it one space.
-                    indentation += " ";
-                } else {
-                    indentation += " * ";
-                }
-            }
-        }
-        
-        return indentation;
-    }
-    
-    protected abstract boolean isLabel(String activePartOfLine);
-    protected abstract boolean shouldMoveHashToColumnZero();
-    protected abstract boolean shouldMoveLabels();
-    protected abstract boolean shouldContinueDocComments();
 }

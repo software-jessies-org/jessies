@@ -1,6 +1,6 @@
 package e.ptextarea;
 
-public class PPerlIndenter extends PSimpleIndenter {
+public class PPerlIndenter extends PCFamilyIndenter {
     public PPerlIndenter(PTextArea textArea) {
         super(textArea);
     }
