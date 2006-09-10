@@ -67,4 +67,25 @@ public abstract class PSimpleIndenter extends PIndenter {
             return offsetOfDeletion;
         }
     }
+    
+    protected final String increaseIndentation(String original) {
+        return original + textArea.getIndentationString();
+    }
+    
+    protected final String decreaseIndentation(String original) {
+        String delta = textArea.getIndentationString();
+        if (original.endsWith(delta)) {
+            return original.substring(0, original.length() - delta.length());
+        }
+        return original;
+    }
+    
+    protected final int getPreviousNonBlankLineNumber(int startLineNumber) {
+        for (int lineNumber = startLineNumber - 1; lineNumber >= 0; --lineNumber) {
+            if (textArea.getLineText(lineNumber).trim().length() != 0) {
+                return lineNumber;
+            }
+        }
+        return -1;
+    }
 }

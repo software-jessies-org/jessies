@@ -4,7 +4,7 @@ import e.util.*;
 import java.util.regex.*;
 
 /**
- * Defines the interface provided by every indenter, and provides utilities for subclasses.
+ * Defines the interface provided by every indenter.
  */
 public abstract class PIndenter {
     private static final Pattern INDENTATION_PATTERN = Pattern.compile("(^[ \\t]*(?:\\*(?: |$))?).*$");
@@ -17,8 +17,8 @@ public abstract class PIndenter {
     
     /**
      * Returns true if c is an 'electric' character, which is Emacs terminology
-     * for a character that causes the indenter to be notified when you
-     * type it. Typically, this signifies the end of a block.
+     * for a character that causes the line's indentation to be fixed when
+     * typed. Typically, this signifies the end of a block.
      */
     public abstract boolean isElectric(char c);
     
@@ -26,6 +26,11 @@ public abstract class PIndenter {
      * Replaces the given line with a correctly-indented version.
      */
     public abstract void fixIndentationOnLine(int lineIndex);
+    
+    // FIXME: this is a hack for the benefit of PNewlineInserter, which does its own indentation fixing, rather than deferring to the indenter.
+    public boolean isInNeedOfClosingSemicolon(String line) {
+        return false;
+    }
     
     /**
      * Returns a copy of just the leading part of the given line.
@@ -41,10 +46,6 @@ public abstract class PIndenter {
         } else {
             throw new IllegalArgumentException("line number " + lineNumber + " \"" + line + "\" has impossible indentation");
         }
-    }
-    
-    public boolean isInNeedOfClosingSemicolon(String line) {
-        return false;
     }
     
     /**
@@ -64,26 +65,5 @@ public abstract class PIndenter {
         for (int lineIndex = startLine; lineIndex <= finishLine; ++lineIndex) {
             fixIndentationOnLine(lineIndex);
         }
-    }
-    
-    protected final String increaseIndentation(String original) {
-        return original + textArea.getIndentationString();
-    }
-    
-    protected final String decreaseIndentation(String original) {
-        String delta = textArea.getIndentationString();
-        if (original.endsWith(delta)) {
-            return original.substring(0, original.length() - delta.length());
-        }
-        return original;
-    }
-    
-    protected final int getPreviousNonBlankLineNumber(int startLineNumber) {
-        for (int lineNumber = startLineNumber - 1; lineNumber >= 0; lineNumber--) {
-            if (textArea.getLineText(lineNumber).trim().length() != 0) {
-                return lineNumber;
-            }
-        }
-        return -1;
     }
 }
