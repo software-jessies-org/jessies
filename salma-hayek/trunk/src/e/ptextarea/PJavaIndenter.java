@@ -5,16 +5,22 @@ public class PJavaIndenter extends PSimpleIndenter {
         super(textArea);
     }
     
+    @Override
     protected boolean isLabel(String activePartOfLine) {
         return isSwitchLabel(activePartOfLine);
     }
     
+    @Override
     protected boolean shouldMoveHashToColumnZero() {
         return false;
     }
+    
+    @Override
     protected boolean shouldMoveLabels() {
         return true;
     }
+    
+    @Override
     protected boolean shouldContinueDocComments() {
         return true;
     }

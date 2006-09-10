@@ -23,10 +23,12 @@ public class PCppIndenter extends PSimpleIndenter {
     protected boolean shouldMoveHashToColumnZero() {
         return true;
     }
+    
     @Override
     protected boolean shouldMoveLabels() {
         return true;
     }
+    
     @Override
     protected boolean shouldContinueDocComments() {
         return true;

@@ -2,6 +2,9 @@ package e.ptextarea;
 
 import java.util.*;
 
+/**
+ * Filters an Iterator<PLineSegment> skipping any segments with a different style from the first segment returned by the iterator.
+ */
 public class PSameStyleSegmentIterator implements Iterator<PLineSegment> {
     private Iterator<PLineSegment> source;
     private PLineSegment nextSegment = null;
