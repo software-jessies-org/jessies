@@ -83,7 +83,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
     }
     
     @Override
-    public String getIndentation(int lineIndex) {
+    public String calculateNewIndentation(int lineIndex) {
         String activePartOfLine = getActivePartOfLine(lineIndex);
         
         if (shouldMoveHashToColumnZero() && activePartOfLine.startsWith("#")) {

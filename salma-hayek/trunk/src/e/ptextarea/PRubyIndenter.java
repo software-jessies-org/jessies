@@ -14,7 +14,7 @@ public class PRubyIndenter extends PSimpleIndenter {
         return "defn}".indexOf(c) != -1;
     }
     
-    public String getIndentation(int lineNumber) {
+    public String calculateNewIndentation(int lineNumber) {
         int previousNonBlank = getPreviousNonBlankLineNumber(lineNumber);
         if (previousNonBlank == -1) {
             return "";

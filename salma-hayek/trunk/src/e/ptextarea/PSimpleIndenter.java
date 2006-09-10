@@ -12,7 +12,7 @@ public abstract class PSimpleIndenter extends PIndenter {
     
     public final void fixIndentationOnLine(int lineIndex) {
         String originalIndentation = getCurrentIndentationOfLine(lineIndex);
-        String replacementIndentation = getIndentation(lineIndex);
+        String replacementIndentation = calculateNewIndentation(lineIndex);
         String originalLine = textArea.getLineText(lineIndex);
         String replacementLine = replacementIndentation + StringUtilities.trimTrailingWhitespace(originalLine.substring(originalIndentation.length()));
         //Log.warn("originalIndentation=@" + originalIndentation + "@; replacementIndentation=@" + replacementIndentation + "@");
@@ -40,12 +40,12 @@ public abstract class PSimpleIndenter extends PIndenter {
      * We could usefully do likewise, or offer it as an alternative to the default (non-indenting) indenter for languages that we recognize but don't have a proper indenter for.
      * We'd probably have to change our backspace behavior to stop at a newline, but I've long thought we should do that anyway.
      * 
-     * protected String getIndentation(int lineNumber) {
+     * protected String calculateNewIndentation(int lineNumber) {
      *     final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(lineNumber);
      *     return (previousNonBlankLineNumber == -1) ? "" : getCurrentIndentationOfLine(previousNonBlankLineNumber);
      *  }
      */
-    protected abstract String getIndentation(int lineNumber);
+    protected abstract String calculateNewIndentation(int lineNumber);
     
     private static int adjustOffsetAfterInsertion(int offsetToAdjust, int lineStartOffset, String originalIndentation, String replacementIndentation) {
         if (offsetToAdjust < lineStartOffset) {
