@@ -1,5 +1,7 @@
 package e.ptextarea;
 
+import java.util.*;
+
 /**
  * Implements indentation for members of the C family, parameterized to cater for their differences.
  */
@@ -16,18 +18,10 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         if (c == ':' && shouldMoveLabels()) {
             return true;
         }
-        if (isBlockEnd(c)) {
+        if (PBracketUtilities.isCloseBracket(c)) {
             return true;
         }
         return false;
-    }
-    
-    public boolean isBlockBegin(char lastChar) {
-        return PBracketUtilities.isOpenBracket(lastChar);
-    }
-    
-    public boolean isBlockEnd(char firstChar) {
-        return PBracketUtilities.isCloseBracket(firstChar);
     }
     
     public boolean isBlockBegin(String activePartOfLine) {
@@ -35,7 +29,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             return false;
         }
         char lastChar = activePartOfLine.charAt(activePartOfLine.length() - 1);
-        return isBlockBegin(lastChar);
+        return PBracketUtilities.isOpenBracket(lastChar);
     }
     
     public boolean isBlockEnd(String activePartOfLine) {
@@ -43,7 +37,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             return false;
         }
         char firstChar = activePartOfLine.charAt(0);
-        return isBlockEnd(firstChar);
+        return PBracketUtilities.isCloseBracket(firstChar);
     }
     
     public boolean isSwitchLabel(String activePartOfLine) {
@@ -106,30 +100,26 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         
         // Recognize doc comments, and help out with the ASCII art.
-        if (lineIndex > 0 && shouldContinueDocComments()) {
-            String previousLine = textArea.getLineText(lineIndex - 1).trim();
-            if (previousLine.endsWith("*/")) {
-                // Whatever the previous line looks like, if it ends with
-                // a close of comment, we're not in a comment, and should
-                // do nothing.
-            } else if (previousLine.matches("/\\*{1,2}") || previousLine.startsWith("* ") || previousLine.equals("*")) {
-                // We're in a doc comment.
-                // FIXME: this is broken now activePartOfLine doesn't include comments.
-                if (activePartOfLine.startsWith("*/")) {
-                    // We already have the JavaDoc ASCII art, and just need to
-                    // indent it one space.
-                    indentation += " ";
-                } else {
-                    indentation += " * ";
+        if (lineIndex > 0) {
+            List<PLineSegment> segments = textArea.getLineSegments(lineIndex);
+            if (segments.size() > 0) {
+                PLineSegment lastSegment = segments.get(segments.size() - 1);
+                if (lastSegment.getStyle() == PStyle.COMMENT) {
+                    String commentText = lastSegment.getCharSequence().toString().trim();
+                    if (commentText.startsWith("//") == false && commentText.endsWith("*/") == false) {
+                        // We must be in a block comment. Assume it's JavaDoc style, and add a leading *.
+                        indentation += " * ";
+                    } else if (commentText.startsWith("*/")) {
+                        // Add a space to line the * in */ up with the * in /*, like JavaDoc comments.
+                        indentation += " ";
+                    }
                 }
             }
         }
-        
         return indentation;
     }
     
     protected abstract boolean isLabel(String activePartOfLine);
     protected abstract boolean shouldMoveHashToColumnZero();
     protected abstract boolean shouldMoveLabels();
-    protected abstract boolean shouldContinueDocComments();
 }

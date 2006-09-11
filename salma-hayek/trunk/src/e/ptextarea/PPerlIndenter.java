@@ -19,9 +19,4 @@ public class PPerlIndenter extends PCFamilyIndenter {
     protected boolean shouldMoveLabels() {
         return false;
     }
-    
-    @Override
-    protected boolean shouldContinueDocComments() {
-        return false;
-    }
 }

@@ -19,9 +19,4 @@ public class PJavaIndenter extends PCFamilyIndenter {
     protected boolean shouldMoveLabels() {
         return true;
     }
-    
-    @Override
-    protected boolean shouldContinueDocComments() {
-        return true;
-    }
 }
