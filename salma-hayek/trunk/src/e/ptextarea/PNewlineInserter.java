@@ -48,7 +48,7 @@ public class PNewlineInserter {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");
-                textArea.getIndenter().fixIndentationOnLine(textArea.getLineOfOffset(startPosition));
+                textArea.getIndenter().fixIndentationOnLine(startLineIndex);
                 textArea.getIndenter().fixIndentation();
             }
         } finally {
@@ -57,7 +57,7 @@ public class PNewlineInserter {
     }
     
     // TODO: Doesn't belong here.
-    public static String getCommonEnding(String left, String right) {
+    private static String getCommonEnding(String left, String right) {
         StringBuilder ending = new StringBuilder();
         for (int i = 0; i < left.length() && i < right.length(); ++i) {
             char leftChar = left.charAt(left.length() - 1 - i);
@@ -110,7 +110,7 @@ public class PNewlineInserter {
         return true;
     }
     
-    public void insertMatchingCloseComment() {
+    private void insertMatchingCloseComment() {
         final int position = textArea.getSelectionStart();
         String line = getLineTextAtOffset(position);
         String whitespace = getIndentationOfLineAtOffset(position);
