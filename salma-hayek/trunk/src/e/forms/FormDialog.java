@@ -56,6 +56,7 @@ public class FormDialog {
     
     private JDialog dialog;
     private Frame owner;
+    private boolean doNotSetLocationRelativeToOwner;
     
     private boolean doNotRememberBounds = false;
     
@@ -93,20 +94,25 @@ public class FormDialog {
     }
 
     FormDialog(Frame ownerFrame, String title, FormPanel formPanel) {
-        // We keep the original owner so the user can pass null to center a dialog and/or state that they don't have a specific parent...
-        this.owner = ownerFrame;
-        // ...but a null parent on Mac OS would cause the menu bar to disappear.
-        if (GuiUtilities.isMacOs() && owner == null) {
-            Frame[] frames = Frame.getFrames();
-            if (frames.length > 0) {
-                ownerFrame = frames[0];
-            }
-        }
+        initOwner(ownerFrame);
         
         this.dialog = new JDialog(ownerFrame, title);
         this.formPanel = formPanel;
         
         initAlwaysOnTopMonitoring();
+    }
+    
+    private void initOwner(Frame f) {
+        // The user can pass null to center a dialog and/or state that they don't have a specific parent...
+        this.doNotSetLocationRelativeToOwner = (f == null);
+        if (GuiUtilities.isMacOs() && f == null) {
+            // ... but a null parent on Mac OS would cause the menu bar to disappear.
+            Frame[] frames = Frame.getFrames();
+            if (frames.length > 0) {
+                f = frames[0];
+            }
+        }
+        this.owner = f;
     }
     
     // A dialog that doesn't track its owner's always-on-top state risks being
@@ -154,7 +160,7 @@ public class FormDialog {
         
         // Set sensible defaults for size and location.
         dialog.pack();
-        dialog.setLocationRelativeTo(owner);
+        dialog.setLocationRelativeTo(doNotSetLocationRelativeToOwner ? null : owner);
         
         // But if we've shown this dialog before, put it back where it last was.
         restorePreviousSize();
