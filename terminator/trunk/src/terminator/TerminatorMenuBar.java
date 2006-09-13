@@ -509,9 +509,27 @@ public class TerminatorMenuBar extends EMenuBar {
 		public CycleTabAction(int delta) {
 			super(delta < 0 ? "Select Previous Tab" : "Select Next Tab");
 			this.delta = delta;
-			// Sun bug 6350813 prevents the keystroke from being looking right on Mac OS, but it's the same keystroke as Safari even if it doesn't look like it.
-			// On other OSes, use the unshifted keystroke for convenience.
-			putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke(delta < 0 ? "OPEN_BRACKET" : "CLOSE_BRACKET", GuiUtilities.isMacOs()));
+			
+			// The choice of keystrokes has gone back and forth a lot.
+			
+			// Originally, Phil wanted alt left/right, but his implementation didn't work, and we needed a proper Action we could put on the "Window" menu for Mac OS.
+			// I wanted command { and command }, like Safari.
+			// Sun bug 6350813 prevents us from doing that directly, but we tried command-shift [ and command-shift ].
+			// Elias Naur explained that not only does that look wrong (even though it feels right on English keyboards), it doesn't work at all on Danish keyboards.
+			
+			// Ed did a quick survey and reported that Camino uses command-option left/right; Safari uses command {/}, while other programs (Adium, for example) use command left/right.
+			// konsole uses control-shift left/right, and gnome-terminal uses control page up/page down.
+			// Firefox, uses control tab/control-shift tab, presumably because it had already used alt left/right for back/forward.
+			
+			// We already support the Firefox keys elsewhere, but control-shift tab isn't well known, and is quite uncomfortable.
+			// The left and right arrow keys are likely to be reasonably accessible on all keyboards, have some precedence, and don't require the uncomfortable use of multiple modifier keys.
+			
+			// Alt left/right (which is what this will be except on Mac OS) is actually a combination we ought to report to our clients.
+			// We've never implemented modifier key reporting, though, so we'll worry about that when someone actually complains.
+			
+			// If anyone complains about the removal of the Safari keys, we could add them back in doKeyboardTabSwitch.
+			
+			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(delta < 0 ? "LEFT" : "RIGHT"));
 		}
 		
 		@Override
