@@ -522,7 +522,7 @@ public class TerminatorMenuBar extends EMenuBar {
 			// Firefox, uses control tab/control-shift tab, presumably because it had already used alt left/right for back/forward.
 			
 			// We already support the Firefox keys elsewhere, but control-shift tab isn't well known, and is quite uncomfortable.
-			// The left and right arrow keys are likely to be reasonably accessible on all keyboards, have some precedence, and don't require the uncomfortable use of multiple modifier keys.
+			// There is some precedent for the left and right arrow keys, they are likely to be reasonably accessible on all keyboards, and they don't require the uncomfortable use of multiple modifier keys.
 			
 			// Alt left/right (which is what this will be except on Mac OS) is actually a combination we ought to report to our clients.
 			// We've never implemented modifier key reporting, though, so we'll worry about that when someone actually complains.
