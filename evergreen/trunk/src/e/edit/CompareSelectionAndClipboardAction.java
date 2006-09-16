@@ -39,8 +39,7 @@ public class CompareSelectionAndClipboardAction extends ETextAction {
             return;
         }
         
-        ETextArea text = window.getText();
-        String selection = text.getSelectedText();
+        String selection = window.getTextArea().getSelectedText();
         String clipboard = getClipboardText();
         
         // Avoid diff(1) warnings about "No newline at end of file".

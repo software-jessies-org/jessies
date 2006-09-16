@@ -40,7 +40,7 @@ public class EWindow extends JComponent {
         return false;
     }
     
-    public ETextArea getText() {
+    public ETextArea getTextArea() {
         return null;
     }
     

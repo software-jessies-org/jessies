@@ -33,13 +33,13 @@ public class FilePropertiesAction extends ETextAction {
             return;
         }
         
-        ETextArea text = window.getText();
-        PTextBuffer buffer = text.getTextBuffer();
+        ETextArea textArea = window.getTextArea();
+        PTextBuffer buffer = textArea.getTextBuffer();
         String endOfLineString = (String) buffer.getProperty(PTextBuffer.LINE_ENDING_PROPERTY);
         String initialEndOfLine = StringUtilities.escapeForJava(endOfLineString);
         endOfLineStringField.setText(initialEndOfLine);
         
-        String indentationString = text.getIndentationString();
+        String indentationString = textArea.getIndentationString();
         String initialIndentationString = StringUtilities.escapeForJava(indentationString);
         indentStringField.setText(initialIndentationString);
         

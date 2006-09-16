@@ -34,7 +34,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     protected String filename;
     protected File file;
     private long lastModifiedTime;
-    protected ETextArea text;
+    protected ETextArea textArea;
     private BirdView birdView;
     private TagsUpdater tagsUpdater;
     
@@ -56,7 +56,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         HashSet<String> result = new HashSet<String>();
         
         // The text styler knows all the language's keywords.
-        text.getTextStyler().addKeywordsTo(result);
+        textArea.getTextStyler().addKeywordsTo(result);
         
         // The JavaResearcher knows all the words used in JDK identifiers.
         if (language == FileType.JAVA) {
@@ -85,19 +85,19 @@ public class ETextWindow extends EWindow implements PTextListener {
         super(filename);
         this.filename = filename;
         this.file = FileUtilities.fileFromString(filename);
-        this.text = new ETextArea();
-        text.getTextBuffer().addTextListener(this);
+        this.textArea = new ETextArea();
+        textArea.getTextBuffer().addTextListener(this);
         initBugDatabaseLinks();
         initTextAreaPopupMenu();
         
         this.watermarkViewPort = new WatermarkViewPort();
-        watermarkViewPort.setView(text);
+        watermarkViewPort.setView(textArea);
         JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setViewport(watermarkViewPort);
         
         initCaretListener();
         initFocusListener();
-        this.birdView = new BirdView(new PTextAreaBirdsEye(text), scrollPane.getVerticalScrollBar());
+        this.birdView = new BirdView(new PTextAreaBirdsEye(textArea), scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
         
@@ -117,26 +117,26 @@ public class ETextWindow extends EWindow implements PTextListener {
         // Phil's been bitten by the indentation string reverting while editing
         // TSV files, and I've been repeatedly bitten by a file I want to see
         // in a fixed font reverting to a proportional font each time I save.
-        CharSequence content = text.getTextBuffer();
-        text.setFont(ChangeFontAction.getAppropriateFontForContent(content));
-        text.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
+        CharSequence content = textArea.getTextBuffer();
+        textArea.setFont(ChangeFontAction.getAppropriateFontForContent(content));
+        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
     }
     
     private void initBugDatabaseLinks() {
-        BugDatabaseHighlighter.highlightBugs(text);
+        BugDatabaseHighlighter.highlightBugs(textArea);
     }
     
     public void updateStatusLine() {
-        final int selectionStart = text.getSelectionStart();
-        final int selectionEnd = text.getSelectionEnd();
+        final int selectionStart = textArea.getSelectionStart();
+        final int selectionEnd = textArea.getSelectionEnd();
         String message = "";
         if (selectionStart != selectionEnd) {
             // Describe the selected range.
-            final int startLineNumber = 1 + text.getLineOfOffset(selectionStart);
-            final int endLineNumber = 1 + text.getLineOfOffset(selectionEnd);
+            final int startLineNumber = 1 + textArea.getLineOfOffset(selectionStart);
+            final int endLineNumber = 1 + textArea.getLineOfOffset(selectionEnd);
             if (startLineNumber == endLineNumber) {
-                final int endLineStartOffset = text.getLineStartOffset(endLineNumber - 1);
-                message = "Selected " + addressFromOffset(selectionStart, "line ", " columns ") + "-" + (1 + emacsDistance(text.getTextBuffer(), selectionEnd, endLineStartOffset));
+                final int endLineStartOffset = textArea.getLineStartOffset(endLineNumber - 1);
+                message = "Selected " + addressFromOffset(selectionStart, "line ", " columns ") + "-" + (1 + emacsDistance(textArea.getTextBuffer(), selectionEnd, endLineStartOffset));
             } else {
                 message = "Selected from line " + startLineNumber + " to " + endLineNumber;
             }
@@ -157,7 +157,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         
         // Show the number of find matches.
         if (currentRegularExpression != null) {
-            final int matchCount = text.getFindMatchCount();
+            final int matchCount = textArea.getFindMatchCount();
             message += "; " + StringUtilities.pluralize(matchCount, "match", "matches") + " for \"" + currentRegularExpression + "\"";
         }
         
@@ -165,7 +165,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     private void initCaretListener() {
-        text.addCaretListener(new PCaretListener() {
+        textArea.addCaretListener(new PCaretListener() {
             public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
                 updateStatusLine();
             }
@@ -175,14 +175,14 @@ public class ETextWindow extends EWindow implements PTextListener {
     private void initFindResultsUpdater() {
         findResultsUpdater = new Timer(150, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                text.updateFindResults();
+                textArea.updateFindResults();
             }
         });
         findResultsUpdater.setRepeats(false);
     }
 
     private void initFocusListener() {
-        text.addFocusListener(new FocusListener() {
+        textArea.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
                 rememberWeHadFocusLast();
                 updateWatermarkAndTitleBar();
@@ -209,23 +209,23 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     /** Returns the grep-style ":<line>:<column>" address for the caret position. */
     public String getAddress() {
-        String result = addressFromOffset(text.getSelectionStart(), ":", ":");
-        if (text.hasSelection()) {
+        String result = addressFromOffset(textArea.getSelectionStart(), ":", ":");
+        if (textArea.hasSelection()) {
             // emacs end offsets seem to include the character following.
-            result += addressFromOffset(text.getSelectionEnd() - 1, ":", ":");
+            result += addressFromOffset(textArea.getSelectionEnd() - 1, ":", ":");
         }
         return result;
     }
     
     private String addressFromOffset(final int offset, final String linePrefix, final String columnPrefix) {
-        int lineNumber = 1 + text.getLineOfOffset(offset);
-        int lineStart = text.getLineStartOffset(lineNumber - 1);
-        int columnNumber = 1 + emacsDistance(text.getTextBuffer(), offset, lineStart);
+        int lineNumber = 1 + textArea.getLineOfOffset(offset);
+        int lineStart = textArea.getLineStartOffset(lineNumber - 1);
+        int columnNumber = 1 + emacsDistance(textArea.getTextBuffer(), offset, lineStart);
         return linePrefix + lineNumber + columnPrefix + columnNumber;
     }
     
     public void requestFocus() {
-        text.requestFocus();
+        textArea.requestFocus();
     }
     
     //
@@ -247,7 +247,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     private void highlightMergeConflicts() {
         // FIXME: this works for BitKeeper, but is it right for Subversion too?
         final String MERGE_CONFLICT_REGULAR_EXPRESSION = "(<{7} .*|>{7})";
-        if (Pattern.compile(MERGE_CONFLICT_REGULAR_EXPRESSION).matcher(text.getTextBuffer()).find()) {
+        if (Pattern.compile(MERGE_CONFLICT_REGULAR_EXPRESSION).matcher(textArea.getTextBuffer()).find()) {
             System.err.println("found evidence of merge conflicts");
             FindAction.INSTANCE.findInText(this, MERGE_CONFLICT_REGULAR_EXPRESSION);
         }
@@ -265,7 +265,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      * Attaches an appropriate set of spelling exceptions to our document.
      */
     private void initSpellingExceptionsForDocument() {
-        text.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, getSpellingExceptionsForLanguage(fileType));
+        textArea.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, getSpellingExceptionsForLanguage(fileType));
     }
     
     public void updateWatermarkAndTitleBar() {
@@ -317,13 +317,13 @@ public class ETextWindow extends EWindow implements PTextListener {
     private void fillWithContent() {
         try {
             lastModifiedTime = file.lastModified();
-            text.getTextBuffer().readFromFile(file);
+            textArea.getTextBuffer().readFromFile(file);
             
             reconfigureForGuessedFileType();
             updateWatermarkAndTitleBar();
             highlightMergeConflicts();
-            text.getTextBuffer().getUndoBuffer().resetUndoBuffer();
-            text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
+            textArea.getTextBuffer().getUndoBuffer().resetUndoBuffer();
+            textArea.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
@@ -334,37 +334,37 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     private void reconfigureForGuessedFileType() {
         FileType originalFileType = fileType;
-        fileType = FileType.guessFileType(filename, text.getTextBuffer());
+        fileType = FileType.guessFileType(filename, textArea.getTextBuffer());
         if (fileType == FileType.JAVA) {
-            text.setIndenter(new PJavaIndenter(text));
-            text.setTextStyler(new PJavaTextStyler(text));
+            textArea.setIndenter(new PJavaIndenter(textArea));
+            textArea.setTextStyler(new PJavaTextStyler(textArea));
         } else if (fileType == FileType.RUBY) {
-            text.setIndenter(new PRubyIndenter(text));
-            text.setTextStyler(new PRubyTextStyler(text));
+            textArea.setIndenter(new PRubyIndenter(textArea));
+            textArea.setTextStyler(new PRubyTextStyler(textArea));
         } else if (fileType == FileType.C_PLUS_PLUS) {
-            text.setIndenter(new PCppIndenter(text));
-            text.setTextStyler(new PCPPTextStyler(text, filename.matches(".*\\.(m|mm)$")));
+            textArea.setIndenter(new PCppIndenter(textArea));
+            textArea.setTextStyler(new PCPPTextStyler(textArea, filename.matches(".*\\.(m|mm)$")));
         } else if (fileType == FileType.PERL) {
-            text.setIndenter(new PPerlIndenter(text));
-            text.setTextStyler(new PPerlTextStyler(text));
+            textArea.setIndenter(new PPerlIndenter(textArea));
+            textArea.setTextStyler(new PPerlTextStyler(textArea));
         } else if (fileType == FileType.PYTHON) {
-            //text.setIndenter(new PPythonIndenter(text));
-            text.setTextStyler(new PPythonTextStyler(text));
+            //textArea.setIndenter(new PPythonIndenter(textArea));
+            textArea.setTextStyler(new PPythonTextStyler(textArea));
         } else if (fileType == FileType.ASSEMBLER) {
-            //text.setIndenter(new PAssemblerIndenter(text));
-            text.setTextStyler(new PAssemblerTextStyler(text));
+            //textArea.setIndenter(new PAssemblerIndenter(textArea));
+            textArea.setTextStyler(new PAssemblerTextStyler(textArea));
         } else if (fileType == FileType.BASH) {
-            //text.setIndenter(new PBashIndenter(text));
-            text.setTextStyler(new PBashTextStyler(text));
+            //textArea.setIndenter(new PBashIndenter(textArea));
+            textArea.setTextStyler(new PBashTextStyler(textArea));
         } else if (fileType == FileType.MAKE) {
-            //text.setIndenter(new PMakefileIndenter(text));
-            text.setTextStyler(new PMakefileTextStyler(text));
+            //textArea.setIndenter(new PMakefileIndenter(textArea));
+            textArea.setTextStyler(new PMakefileTextStyler(textArea));
         } else if (fileType == FileType.VHDL) {
-            //text.setIndenter(new PVhdlIndenter(text));
-            text.setTextStyler(new PVhdlTextStyler(text));
+            //textArea.setIndenter(new PVhdlIndenter(textArea));
+            textArea.setTextStyler(new PVhdlTextStyler(textArea));
         } else {
             // Plain text.
-            text.setWrapStyleWord(true);
+            textArea.setWrapStyleWord(true);
         }
         if (fileType != originalFileType) {
             initSpellingExceptionsForDocument();
@@ -373,9 +373,9 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     private void uncheckedRevertToSaved() {
         // FIXME - work with non-empty selection
-        int originalCaretPosition = text.getSelectionStart();
+        int originalCaretPosition = textArea.getSelectionStart();
         fillWithContent();
-        text.setCaretPosition(originalCaretPosition);
+        textArea.setCaretPosition(originalCaretPosition);
         Evergreen.getInstance().showStatus("Reverted to saved version of " + filename);
     }
     
@@ -393,7 +393,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             diskContent = "";
             diskLabel = "(couldn't read file)";
         }
-        String memoryContent = text.getTextBuffer().toString();
+        String memoryContent = textArea.getTextBuffer().toString();
         
         String fromLabel = fromDiskToMemory ? diskLabel : memoryLabel;
         String toLabel = fromDiskToMemory ? memoryLabel : diskLabel;
@@ -426,10 +426,12 @@ public class ETextWindow extends EWindow implements PTextListener {
         }
     }
     
-    public ETextArea getText() {
-        return text;
+    @Override
+    public ETextArea getTextArea() {
+        return textArea;
     }
     
+    @Override
     public void windowWillClose() {
         if (findResultsUpdater != null) {
             findResultsUpdater.stop();
@@ -442,6 +444,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     /**
      * Closes this text window if the text isn't dirty.
      */
+    @Override
     public void closeWindow() {
         if (isDirty()) {
             if (showPatchAndAskForConfirmation("Discard Changes", "Discard changes to \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true) == false) {
@@ -453,7 +456,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void initTextAreaPopupMenu() {
-        text.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
+        textArea.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
             public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
                 actions.add(new OpenQuicklyAction());
                 actions.add(new FindFilesContainingSelectionAction());
@@ -536,8 +539,9 @@ public class ETextWindow extends EWindow implements PTextListener {
         return fileType;
     }
     
+    @Override
     public boolean isDirty() {
-        return ! text.getTextBuffer().getUndoBuffer().isClean();
+        return (textArea.getTextBuffer().getUndoBuffer().isClean() == false);
     }
     
     public void textBecameDirty() {
@@ -583,14 +587,14 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void jumpToAddress(String address) {
-        CharSequence chars = text.getTextBuffer();
+        CharSequence chars = textArea.getTextBuffer();
         StringTokenizer st = new StringTokenizer(address, ":");
         if (st.hasMoreTokens() == false) {
             return;
         }
         int line = Integer.parseInt(st.nextToken()) - 1;
-        int offset = text.getLineStartOffset(line);
-        int maxOffset = text.getLineEndOffsetBeforeTerminator(line);
+        int offset = textArea.getLineStartOffset(line);
+        int maxOffset = textArea.getLineEndOffsetBeforeTerminator(line);
         if (st.hasMoreTokens()) {
             try {
                 offset = emacsWalk(chars, offset, Integer.parseInt(st.nextToken()));
@@ -608,7 +612,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         
         if (st.hasMoreTokens()) {
             try {
-                endOffset = text.getLineStartOffset(Integer.parseInt(st.nextToken()) - 1);
+                endOffset = textArea.getLineStartOffset(Integer.parseInt(st.nextToken()) - 1);
             } catch (NumberFormatException ex) {
                 ex = ex;
             }
@@ -621,7 +625,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 ex = ex;
             }
         }
-        text.centerOnNewSelection(offset, endOffset);
+        textArea.centerOnNewSelection(offset, endOffset);
     }
     
     /**
@@ -641,7 +645,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         // If the on-disk content is the same as what we have in memory, then
         // the fact that the time stamp is different isn't significant.
         try {
-            String currentContentInMemory = getText().getText();
+            String currentContentInMemory = textArea.getText();
             String currentContentOnDisk = StringUtilities.readFile(file);
             if (currentContentInMemory.equals(currentContentOnDisk)) {
                 lastModifiedTime = file.lastModified();
@@ -681,7 +685,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             // The file may be a symbolic link on a CIFS server.
             // In this case, it's important that we write into the original file rather than creating a new one.
             writeToFile(file);
-            text.getTextBuffer().getUndoBuffer().setCurrentStateClean();
+            textArea.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
             editor.showStatus("Saved " + filename);
             backupFile.delete();
@@ -721,7 +725,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     private void writeToFile(File file) {
         ensureBufferEndsInNewline();
-        text.getTextBuffer().writeToFile(file);
+        textArea.getTextBuffer().writeToFile(file);
     }
     
     /**
@@ -731,10 +735,10 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     private void ensureBufferEndsInNewline() {
         if (fileType == FileType.C_PLUS_PLUS || fileType == FileType.JAVA) {
-            PTextBuffer buffer = text.getTextBuffer();
+            PTextBuffer buffer = textArea.getTextBuffer();
             if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '\n') {
                 // '\n' is always correct; the buffer will translate if needed.
-                text.append("\n");
+                textArea.append("\n");
             }
         }
     }
