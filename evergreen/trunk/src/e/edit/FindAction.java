@@ -51,7 +51,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     }
     
     public String getInitialValue() {
-        ETextArea textArea = currentTextWindow.getText();
+        ETextArea textArea = currentTextWindow.getTextArea();
         this.initialSelectionStart = textArea.getSelectionStart();
         this.initialSelectionEnd = textArea.getSelectionEnd();
         String selectedText = textArea.getSelectedText();
@@ -86,11 +86,11 @@ public class FindAction extends ETextAction implements MinibufferUser {
      */
     public boolean interpretSpecialKeystroke(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_D) {
-            currentTextWindow.getText().findPrevious();
+            currentTextWindow.getTextArea().findPrevious();
             return true;
         }
         if (e.getKeyCode() == KeyEvent.VK_G) {
-            currentTextWindow.getText().findNext();
+            currentTextWindow.getTextArea().findNext();
             return true;
         }
         return false;
@@ -103,7 +103,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     public void wasCanceled() {
         removeAllMatches();
         currentTextWindow.setCurrentRegularExpression(null);
-        currentTextWindow.getText().select(initialSelectionStart, initialSelectionEnd);
+        currentTextWindow.getTextArea().select(initialSelectionStart, initialSelectionEnd);
     }
     
     //
@@ -125,13 +125,13 @@ public class FindAction extends ETextAction implements MinibufferUser {
     //
     
     public void removeAllMatches() {
-        currentTextWindow.getText().removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
+        currentTextWindow.getTextArea().removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
         currentTextWindow.getBirdView().clearMatchingLines();
     }
     
     private void findAllMatches(String regularExpression) {
         currentTextWindow.setCurrentRegularExpression(regularExpression);
-        ETextArea textArea = currentTextWindow.getText();
+        ETextArea textArea = currentTextWindow.getTextArea();
         try {
             textArea.findAllMatches(regularExpression, currentTextWindow.getBirdView());
             currentTextWindow.updateStatusLine();

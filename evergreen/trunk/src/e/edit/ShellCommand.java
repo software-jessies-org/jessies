@@ -53,7 +53,7 @@ public class ShellCommand {
             
             // Humans number lines from 1, text components from 0.
             // FIXME: we should pass full selection information.
-            PTextArea textArea = textWindow.getText();
+            PTextArea textArea = textWindow.getTextArea();
             final int currentLineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
             environment.put("EDIT_CURRENT_LINE_NUMBER", Integer.toString(currentLineNumber));
         }
@@ -108,15 +108,15 @@ public class ShellCommand {
     private CharSequence chooseStandardInputData() {
         CharSequence result = null;
         if (textWindow != null) {
-            PTextArea text = textWindow.getText();
+            PTextArea textArea = textWindow.getTextArea();
             switch (inputDisposition) {
             case NO_INPUT:
                 break;
             case SELECTION_OR_DOCUMENT:
-                result = text.hasSelection() ? text.getSelectedText() : text.getTextBuffer();
+                result = textArea.hasSelection() ? textArea.getSelectedText() : textArea.getTextBuffer();
                 break;
             case DOCUMENT:
-                result = text.getTextBuffer();
+                result = textArea.getTextBuffer();
                 break;
             }
         }
@@ -181,14 +181,14 @@ public class ShellCommand {
             errorsWindowFooter.add("-------------------------------------------------------------------------");
             break;
         case INSERT:
-            textWindow.getText().insert(capturedOutput);
+            textWindow.getTextArea().insert(capturedOutput);
             break;
         case REPLACE:
-            PTextArea text = textWindow.getText();
-            if (text.hasSelection()) {
-                text.replaceSelection(capturedOutput);
+            PTextArea textArea = textWindow.getTextArea();
+            if (textArea.hasSelection()) {
+                textArea.replaceSelection(capturedOutput);
             } else {
-                text.setText(capturedOutput);
+                textArea.setText(capturedOutput);
             }
             break;
         }

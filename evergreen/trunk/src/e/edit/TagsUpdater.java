@@ -130,7 +130,7 @@ public class TagsUpdater {
     }
     
     public ETextArea getTextArea() {
-        return getTextWindow().getText();
+        return getTextWindow().getTextArea();
     }
     
     public void updateTags() {

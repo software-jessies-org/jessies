@@ -51,7 +51,7 @@ public class FindInFilesDialog {
                 ETextWindow textWindow = (ETextWindow) window;
                 FindAction.INSTANCE.findInText(textWindow, PatternUtilities.toString(pattern));
                 final int lineNumber = Integer.parseInt(line.substring(1, line.indexOf(':', 1)));
-                textWindow.getText().goToLine(lineNumber);
+                textWindow.getTextArea().goToLine(lineNumber);
             }
         }
         
@@ -122,7 +122,7 @@ public class FindInFilesDialog {
             if (window instanceof ETextWindow && pattern != null) {
                 ETextWindow textWindow = (ETextWindow) window;
                 FindAction.INSTANCE.findInText(textWindow, PatternUtilities.toString(pattern));
-                textWindow.getText().findNext();
+                textWindow.getTextArea().findNext();
             }
         }
         
