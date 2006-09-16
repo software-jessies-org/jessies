@@ -46,9 +46,6 @@ public class ETextWindow extends EWindow implements PTextListener {
     // Used to update the watermark without creating and destroying an excessive number of threads.
     private static final ExecutorService watermarkUpdateExecutor = ThreadUtilities.newSingleThreadExecutor("Watermark Updater");
     
-    private static final Color FOCUSED_SELECTION_COLOR = new Color(0.70f, 0.83f, 1.00f);
-    private static final Color UNFOCUSED_SELECTION_COLOR = new Color(0.83f, 0.83f, 0.83f);
-    
     private FileType fileType = FileType.PLAIN_TEXT;
     
     private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
@@ -539,12 +536,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         return fileType;
     }
     
-    public int getCurrentLineNumber() {
-        // Humans number lines from 1, JTextComponent from 0.
-        // FIXME - work with non-empty selections
-        return 1 + text.getLineOfOffset(text.getSelectionStart());
-    }
-    
     public boolean isDirty() {
         return ! text.getTextBuffer().getUndoBuffer().isClean();
     }
@@ -567,7 +558,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      * other characters to be a single cell). So we, who use characters throughout, need to
      * translate emacs offsets into real offsets.
      */
-    private int emacsWalk(CharSequence chars, int offset, int howFar) {
+    private static int emacsWalk(CharSequence chars, int offset, int howFar) {
         while (--howFar > 0) {
             char c = chars.charAt(offset);
             if (c == '\t') howFar -= 7;
@@ -581,7 +572,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      * in emacs' corrupted tabs-are-eight-spaces-and-not-characters-in-their-own-right
      * terms. Damn that program to hell.
      */
-    private int emacsDistance(CharSequence chars, int pureCaretOffset, int lineStart) {
+    private static int emacsDistance(CharSequence chars, int pureCaretOffset, int lineStart) {
         int result = 0;
         for (int offset = lineStart; offset < pureCaretOffset; offset++) {
             char c = chars.charAt(offset);
