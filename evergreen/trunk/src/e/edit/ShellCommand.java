@@ -50,7 +50,12 @@ public class ShellCommand {
         environment.put("EDIT_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(getWorkspace().getRootDirectory()));
         if (textWindow != null) {
             environment.put("EDIT_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(textWindow.getFilename()));
-            environment.put("EDIT_CURRENT_LINE_NUMBER", Integer.toString(textWindow.getCurrentLineNumber()));
+            
+            // Humans number lines from 1, text components from 0.
+            // FIXME: we should pass full selection information.
+            PTextArea textArea = textWindow.getText();
+            final int currentLineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
+            environment.put("EDIT_CURRENT_LINE_NUMBER", Integer.toString(currentLineNumber));
         }
         return processBuilder;
     }
