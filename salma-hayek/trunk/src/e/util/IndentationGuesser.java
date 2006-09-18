@@ -18,7 +18,7 @@ public class IndentationGuesser {
         String fileContents = chars.toString();
 
         String previousIndent = "";
-        Bag indentations = new Bag();
+        Bag<String> indentations = new Bag<String>();
         String emergencyAlternative = Parameters.getParameter("indent.string", "    ");
         String[] lines = fileContents.split("\n");
         for (String line : lines) {
@@ -48,7 +48,7 @@ public class IndentationGuesser {
             //System.out.println(" - no line just containing an indented brace?");
             return emergencyAlternative;
         } else {
-            return (String) indentations.commonestItem();
+            return indentations.commonestItem();
         }
     }
     
