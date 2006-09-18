@@ -951,6 +951,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             //StopWatch watch = new StopWatch();
             generateLineWrappings();
             Graphics2D graphics = (Graphics2D) oldGraphics;
+            
+            // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give it to them.
+            Map map = (Map) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
+            if (map != null) {
+                graphics.addRenderingHints(map);
+            }
+            
             Rectangle bounds = graphics.getClipBounds();
             int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds);
             graphics.setColor(getBackground());
