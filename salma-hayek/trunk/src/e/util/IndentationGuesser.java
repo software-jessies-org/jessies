@@ -1,5 +1,6 @@
 package e.util;
 
+import java.util.*;
 import java.util.regex.*;
 
 /**
@@ -10,45 +11,81 @@ public class IndentationGuesser {
     private static final Pattern INDENTATION_PATTERN_1 = Pattern.compile("^(\\s+)[A-Za-z].*$");
     private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^(\\s*)[{}]$");
     
+    private static class LineIterator implements Iterator<CharSequence> {
+        private CharSequence chars;
+        private int length;
+        
+        private int start;
+        private int end;
+        
+        public LineIterator(CharSequence chars) {
+            this.chars = chars;
+            this.length = chars.length();
+            this.start = this.end = 0;
+        }
+        
+        public boolean hasNext() {
+            return (start < length);
+        }
+        
+        public CharSequence next() {
+            while (end < length && chars.charAt(end) != '\n') {
+                ++end;
+            }
+            CharSequence result = chars.subSequence(start, end);
+            start = end + 1;
+            end = start;
+            return result;
+        }
+        
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+    
     /**
      * Returns the best guess at the indentation in use in the given content.
      */
     public static String guessIndentationFromFile(CharSequence chars) {
-        // FIXME: we shouldn't force our callers to pay for this!
-        String fileContents = chars.toString();
-
-        String previousIndent = "";
-        Bag<String> indentations = new Bag<String>();
-        String emergencyAlternative = Parameters.getParameter("indent.string", "    ");
-        String[] lines = fileContents.split("\n");
-        for (String line : lines) {
-            Matcher matcher = INDENTATION_PATTERN_1.matcher(line);
-            if (matcher.matches()) {
-                String indent = matcher.group(1);
-                if (indent.length() < emergencyAlternative.length()) {
-                    emergencyAlternative = indent;
+        //e.ptextarea.StopWatch watch = new e.ptextarea.StopWatch();
+        try {
+            String previousIndent = "";
+            Bag<String> indentations = new Bag<String>();
+            String emergencyAlternative = Parameters.getParameter("indent.string", "    ");
+            
+            LineIterator it = new LineIterator(chars);
+            while (it.hasNext()) {
+                CharSequence line = it.next();
+                Matcher matcher = INDENTATION_PATTERN_1.matcher(line);
+                if (matcher.matches()) {
+                    String indent = matcher.group(1);
+                    if (indent.length() < emergencyAlternative.length()) {
+                        emergencyAlternative = indent;
+                    }
+                    previousIndent = indent;
                 }
-                previousIndent = indent;
-            }
-            matcher = INDENTATION_PATTERN_2.matcher(line);
-            if (matcher.matches()) {
-                String indent = matcher.group(1);
-                if (indent.length() > previousIndent.length()) {
-                    String difference = indent.substring(previousIndent.length());
-                    indentations.add(difference);
-                } else if (indent.length() < previousIndent.length()) {
-                    String difference = previousIndent.substring(indent.length());
-                    indentations.add(difference);
+                matcher = INDENTATION_PATTERN_2.matcher(line);
+                if (matcher.matches()) {
+                    String indent = matcher.group(1);
+                    if (indent.length() > previousIndent.length()) {
+                        String difference = indent.substring(previousIndent.length());
+                        indentations.add(difference);
+                    } else if (indent.length() < previousIndent.length()) {
+                        String difference = previousIndent.substring(indent.length());
+                        indentations.add(difference);
+                    }
+                    previousIndent = indent;
                 }
-                previousIndent = indent;
             }
-        }
-        //System.out.println("indentations=" + indentations);
-        if (indentations.isEmpty()) {
-            //System.out.println(" - no line just containing an indented brace?");
-            return emergencyAlternative;
-        } else {
-            return indentations.commonestItem();
+            //System.out.println("indentations=" + indentations);
+            if (indentations.isEmpty()) {
+                //System.out.println(" - no line just containing an indented brace?");
+                return emergencyAlternative;
+            } else {
+                return indentations.commonestItem();
+            }
+        } finally {
+            //watch.print("indentation guessing");
         }
     }
     
