@@ -14,7 +14,7 @@ import org.jdesktop.swingworker.SwingWorker;
 public class Advisor extends JPanel {
     private static Advisor instance;
     
-    private ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
+    private ArrayList<WorkspaceResearcher> researchers;
     
     /** The advice window. */
     private AdvisorHtmlPane advicePane = new AdvisorHtmlPane();
@@ -32,27 +32,28 @@ public class Advisor extends JPanel {
         setLayout(new BorderLayout());
         add(advicePane, BorderLayout.CENTER);
         
-        // FIXME: is this what we want, or do we want a main menu item that brings up a dialog? The latter might be more direct for most practical uses.
         /*
         final JTextField textField = new JTextField();
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                research(textField.getText());
+                linkClicked(textField.getText());
             }
         });
         add(textField, BorderLayout.NORTH);
         */
-        
-        new Thread(new Runnable() {
-            public void run() {
-                addResearcher(JavaResearcher.getSharedInstance());
-                addResearcher(ManPageResearcher.getSharedInstance());
-                addResearcher(new NumberResearcher());
-                addResearcher(new PerlDocumentationResearcher());
-                addResearcher(new RubyDocumentationResearcher());
-                addResearcher(new StlDocumentationResearcher());
-            }
-        }).start();
+    }
+    
+    private synchronized ArrayList<WorkspaceResearcher> getResearchers() {
+        if (researchers == null) {
+            researchers = new ArrayList<WorkspaceResearcher>();
+            researchers.add(JavaResearcher.getSharedInstance());
+            researchers.add(ManPageResearcher.getSharedInstance());
+            researchers.add(new NumberResearcher());
+            researchers.add(new PerlDocumentationResearcher());
+            researchers.add(new RubyDocumentationResearcher());
+            researchers.add(new StlDocumentationResearcher());
+        }
+        return researchers;
     }
     
     private synchronized JFrame getFrame() {
@@ -82,13 +83,11 @@ public class Advisor extends JPanel {
         @Override
         protected String doInBackground() {
             StringBuilder newText = new StringBuilder();
-            synchronized (researchers) {
-                for (WorkspaceResearcher researcher : researchers) {
-                    if (textWindow == null || researcher.isSuitable(textWindow)) {
-                        String result = researcher.research(searchTerm);
-                        if (result != null && result.length() > 0) {
-                            newText.append(result);
-                        }
+            for (WorkspaceResearcher researcher : getResearchers()) {
+                if (textWindow == null || researcher.isSuitable(textWindow)) {
+                    String result = researcher.research(searchTerm);
+                    if (result != null && result.length() > 0) {
+                        newText.append(result);
                     }
                 }
             }
@@ -154,12 +153,6 @@ public class Advisor extends JPanel {
         new ResearchRunner(text).execute();
     }
     
-    private void addResearcher(WorkspaceResearcher researcher) {
-        synchronized (researchers) {
-            researchers.add(researcher);
-        }
-    }
-    
     public void linkClicked(String link) {
         new LinkClickRunner(link).execute();
     }
@@ -180,11 +173,9 @@ public class Advisor extends JPanel {
                 return null;
             }
             // Offer the link to each researcher.
-            synchronized (researchers) {
-                for (WorkspaceResearcher researcher : researchers) {
-                    if (researcher.handleLink(link)) {
-                        return null;
-                    }
+            for (WorkspaceResearcher researcher : getResearchers()) {
+                if (researcher.handleLink(link)) {
+                    return null;
                 }
             }
             // Hand it on to the file-opening code to work out what to do with it.
