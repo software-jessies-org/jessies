@@ -204,10 +204,14 @@ public class TerminalControl {
 			announceConnectionLost("\n\r[Process killed by " + ptyProcess.getSignalDescription() + ".]");
 			return;
 		}
-		// If it wasn't a pane close that caused us to get here, close
-		// the pane.
+
+		// If it wasn't a pane close that caused us to get here, close the pane.
 		if (processHasBeenDestroyed == false) {
-			pane.doCloseAction();
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					pane.doCloseAction();
+				}
+			});
 		}
 	}
 	
