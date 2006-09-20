@@ -49,15 +49,20 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
      * definitively what the indentation for the next line should be.
      * Going back this far keeps us tidy in the face of various multi-line comment styles,
      * multi-line C++ output operator expressions and C++ preprocessor commands.
-     * */
-    public boolean isDefinitive(String rawLine) {
-        String trimmedLine = rawLine.trim();
-        return isBlockBegin(trimmedLine) || isBlockEnd(trimmedLine) || isLabel(trimmedLine);
+     * 
+     * FIXME: more realistically, this tells us the minimum indentation. For example:
+     *     { // This counts as "definitive"
+     *         os << text
+     *             // This line should start here, because it's a continuation of the previous line.
+     *         // But this is where we'd assume it starts, because we have too much faith in "definitive" lines.
+     */
+    private boolean isDefinitive(String activePartOfLine) {
+        return isBlockBegin(activePartOfLine) || isBlockEnd(activePartOfLine) || isLabel(activePartOfLine);
     }
     
     public int getPreviousDefinitiveLineNumber(int startLineNumber) {
         for (int lineIndex = startLineNumber - 1; lineIndex >= 0; --lineIndex) {
-            String line = textArea.getLineText(lineIndex);
+            String line = getActivePartOfLine(lineIndex);
             if (isDefinitive(line)) {
                 return lineIndex;
             }
@@ -100,6 +105,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
                         indentation += " * ";
                     } else if (commentText.startsWith("*/")) {
                         // Add a space to line the * in */ up with the * in /*, like JavaDoc comments.
+                        // FIXME: this is only correct if we're in a JavaDoc comment block. we should check for evidence.
                         indentation += " ";
                     }
                 }
