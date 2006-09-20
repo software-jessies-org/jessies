@@ -21,7 +21,7 @@ public class PRubyIndenter extends PSimpleIndenter {
         }
         
         String indentation = getCurrentIndentationOfLine(previousNonBlank);
-        String trimmedPrevious = textArea.getLineText(previousNonBlank).trim();
+        String trimmedPrevious = getActivePartOfLine(previousNonBlank);
         
         // Add a 'shiftwidth' after lines beginning with keywords that imply an increase in indentation.
         boolean haveIncreasedIndentation = false;
@@ -42,7 +42,7 @@ public class PRubyIndenter extends PSimpleIndenter {
         }
         
         // Subtract a 'shiftwidth' on end, else and, elsif, when and '}'.
-        String trimmedLine = textArea.getLineText(lineNumber).trim();
+        String trimmedLine = getActivePartOfLine(lineNumber);
         if (trimmedLine.matches("end\\b|else\\b|elsif\\b.*|when\\b.*|ensure\\b|rescue\\b.*|}")) {
 //            System.err.println("found a decreaser");
             indentation = decreaseIndentation(indentation);

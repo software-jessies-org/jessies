@@ -65,17 +65,6 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         return -1;
     }
     
-    private String getActivePartOfLine(int lineIndex) {
-        StringBuilder activePartOfLine = new StringBuilder();
-        for (PLineSegment segment : textArea.getLineSegments(lineIndex)) {
-            PStyle style = segment.getStyle();
-            if (style == PStyle.NORMAL || style == PStyle.KEYWORD || style == PStyle.PREPROCESSOR) {
-                activePartOfLine.append(segment.getCharSequence());
-            }
-        }
-        return activePartOfLine.toString().trim();
-    }
-    
     @Override
     public String calculateNewIndentation(int lineIndex) {
         String activePartOfLine = getActivePartOfLine(lineIndex);

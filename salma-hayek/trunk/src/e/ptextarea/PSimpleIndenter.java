@@ -88,4 +88,15 @@ public abstract class PSimpleIndenter extends PIndenter {
         }
         return -1;
     }
+    
+    protected final String getActivePartOfLine(int lineIndex) {
+        StringBuilder activePartOfLine = new StringBuilder();
+        for (PLineSegment segment : textArea.getLineSegments(lineIndex)) {
+            PStyle style = segment.getStyle();
+            if (style == PStyle.NORMAL || style == PStyle.KEYWORD || style == PStyle.PREPROCESSOR) {
+                activePartOfLine.append(segment.getCharSequence());
+            }
+        }
+        return activePartOfLine.toString().trim();
+    }
 }
