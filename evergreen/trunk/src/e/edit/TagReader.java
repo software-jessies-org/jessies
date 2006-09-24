@@ -31,10 +31,9 @@ public class TagReader {
         tagsFile.deleteOnExit();
         Process p = Runtime.getRuntime().exec(new String[] {
             "ctags",
-            "--c++-types=+p", "-n", "--fields=+a", "-u",
+            "--c++-types=+p", "-n", "--fields=+am", "-u",
             "--regex-java=/(\\bstatic\\b)/\1/S/",
             "--regex-c++=/(\\bstatic\\b)/\1/S/",
-            "--regex-java=/(\\babstract\\b)/\1/A/",
             "-f", tagsFile.getAbsolutePath(),
             file.getAbsolutePath()
         });
@@ -83,7 +82,6 @@ public class TagReader {
      * If the next tag seen has the same line number, it will be marked as static.
      */
     private int staticTagLineNumber = 0;
-    private int abstractTagLineNumber = 0;
     
     private void processTagLine(String line) {
         // The format is: <identifier>\t<filename>\t<line>;"\t<tag type>[\t<context>]
@@ -108,9 +106,6 @@ public class TagReader {
         if (type == 'S') {
             staticTagLineNumber = lineNumber;
             return;
-        } else if (type == 'A') {
-            abstractTagLineNumber = lineNumber;
-            return;
         }
         
         Matcher classMatcher = CLASS_PATTERN.matcher(context);
@@ -132,8 +127,6 @@ public class TagReader {
         
         tag.isStatic = (lineNumber == staticTagLineNumber | tag.isStatic);
         staticTagLineNumber = 0;
-        tag.isAbstract = (lineNumber == abstractTagLineNumber | tag.isAbstract);
-        abstractTagLineNumber = 0;
         
         listener.tagFound(tag);
     }
@@ -169,6 +162,7 @@ public class TagReader {
             this.context = context;
             this.containingClass = containingClass;
             
+            this.isAbstract = context.contains("implementation:abstract");
             this.isPrototype = (TagType.fromChar(tagType) == TagType.PROTOTYPE);
             
             // Recognize constructors. Using the same name as the containing
@@ -230,7 +224,11 @@ public class TagReader {
                 { TagType.PACKAGE }, { TagType.FIELD }, { TagType.CONSTRUCTOR },
                 { TagType.METHOD }, { TagType.CLASS }, { TagType.INTERFACE }
             };
-            this.isAbstract = (type == TagType.INTERFACE);
+            
+            // Mark interfaces as "abstract" so they're rendered differently.
+            if (type == TagType.INTERFACE) {
+                this.isAbstract = true;
+            }
             
             if (containingClass.endsWith("." + identifier)) {
                 // An inner class constructor.
