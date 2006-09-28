@@ -263,6 +263,11 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 			return;
 		}
 		String newContents = getTabbedString();
+		if (newContents.length() == 0) {
+			// Copying the empty string to the clipboard is bizarre, and caused one user trouble (because we didn't cope with zero-length pastes).
+			// FIXME: It's likely that the better fix is to ensure that highlight is null in the case where it would be zero-length.
+			return;
+		}
 		StringSelection selection = new StringSelection(newContents);
 		clipboard.setContents(selection, this);
 	}
