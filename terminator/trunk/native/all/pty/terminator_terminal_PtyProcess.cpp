@@ -111,8 +111,18 @@ jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arr
 }
 
 void terminator_terminal_PtyProcess::nativeWrite(jbyteArray bytes, jint arrayOffset, jint byteCount) {
+    // On Cygwin, attempting a zero-byte write causes the JVM to crash with an EXCEPTION_ACCESS_VIOLATION in a "cygwin1.dll" stack frame.
+    // So let's make sure we never do that.
+    if (byteCount == 0) {
+        return;
+    }
+    
     std::vector<jbyte> buffer(byteCount);
     m_env->GetByteArrayRegion(bytes, arrayOffset, byteCount, &buffer[0]);
+    if (m_env->ExceptionCheck()) {
+        return;
+    }
+    
     ssize_t bytesTransferred;
     do {
         bytesTransferred = ::write(fd.get(), &buffer[0], byteCount);
