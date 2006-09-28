@@ -326,9 +326,16 @@ class Java
     args.concat(ARGV)
     #$stderr.puts(args)
     subvertPath()
-    failed = system(*args) == false
-    if failed && logging
-      puts(File.new(@log_filename).readlines())
+    if logging
+      failed = system(*args) == false
+      if failed
+        puts(File.new(@log_filename).readlines())
+      end
+    else
+      # Using exec() rather than system() works around a Cygwin problem seen most of the time when running javahpp on Cygwin 1.5.21.
+      # I may have seen this less frequently on previous versions too.
+      # The symptom, as reported by procexp, is that the forked ruby process (the child) doesn't die.
+      exec(*args)
     end
   end
 end
