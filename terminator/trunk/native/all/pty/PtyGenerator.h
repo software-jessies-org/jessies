@@ -69,7 +69,7 @@ public:
             try {
                 runChild(cmd, workingDirectory, *this);  // Should never return.
             } catch (const std::exception& ex) {
-                std::cerr << ex.what() << std::endl;
+                fprintf(stderr, "%s\n", ex.what());
             }
             exit(1); // We're only exit()ing the child, not the VM.
         } else {
