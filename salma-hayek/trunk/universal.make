@@ -409,7 +409,7 @@ JAVAC_FLAGS += -g
 
 # Turn on warnings.
 JAVAC_FLAGS += -deprecation
-JAVAC_FLAGS += -Xlint -Xlint:-serial
+JAVAC_FLAGS += -Xlint:all -Xlint:-serial
 
 # We should also ensure that we build class files that can be used on
 # the current Java release, regardless of where we build.
