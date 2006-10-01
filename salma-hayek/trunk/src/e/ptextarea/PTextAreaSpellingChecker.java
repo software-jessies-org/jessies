@@ -317,7 +317,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         public UnderlineHighlight(PTextArea textArea, int startIndex, int endIndex) {
             super(textArea, startIndex, endIndex, COLOR);
         }
-    
+        
         protected boolean paintsToEndOfLine() {
             return false;
         }
@@ -356,15 +356,20 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             }
         }
         
-        private void paintWavyHorizontalLine(Graphics g, int x1, int x2, int y) {
-            int x = Math.min(x1, x2);
-            int end = Math.max(x1, x2);
+        private void paintWavyHorizontalLine(Graphics2D g, int x1, int x2, int y) {
+            Object originalHint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            final int startX = Math.min(x1, x2);
+            final int endX = Math.max(x1, x2);
+            final int baselineY = y - 1;
             int yOff = 1;
-            while (x < end) {
-                g.drawLine(x, y + yOff, Math.min(end, x + 2), y - yOff);
-                x += 2;
+            for (int x = startX; x < endX; x += 2) {
+                g.drawLine(x, baselineY + yOff, Math.min(endX, x + 2), baselineY - yOff);
                 yOff = -yOff;
             }
+            
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, originalHint);
         }
     }
 }
