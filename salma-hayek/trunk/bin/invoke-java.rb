@@ -293,8 +293,12 @@ class Java
     applicationEnvironmentName = @dock_name.upcase()
     logging = ENV["DEBUGGING_#{applicationEnvironmentName}"] == nil && @log_filename != ""
     if logging
-      File.new(@log_filename, "w").close() # Like touch(1).
-      add_pathname_property("e.util.Log.filename", @log_filename)
+      begin
+        File.new(@log_filename, "w").close() # Like touch(1).
+        add_pathname_property("e.util.Log.filename", @log_filename)
+      rescue SystemCallError
+        # Inability to create the log file is not fatal.
+      end
     end
     
     add_property("e.util.Log.applicationName", @dock_name)
