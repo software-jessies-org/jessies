@@ -7,10 +7,9 @@ import java.text.*;
 import java.util.*;
 
 /**
- * Logs terminal output to a file in ~/.terminal-logs. Logging can be
- * temporarily suspended. If the terminal logs directory does not exist
- * or we can't open the log file for some other reason, logging is
- * automatically suspended, and can't be un-suspended.
+ * Logs terminal output to a file.
+ * Logging can be temporarily suspended.
+ * If the terminal logs directory does not exist or we can't open the log file for some other reason, logging is automatically suspended, and can't be un-suspended.
  */
 public class LogWriter {
 	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HHmmssZ");
@@ -37,8 +36,12 @@ public class LogWriter {
 		File logsDirectory = new File(logsDirectoryName);
 		if (logsDirectory.exists()) {
 			File logFile = new File(logsDirectory, prefix + '-' + timestamp + ".txt");
-			this.info = logFile.toString();
-			this.stream = new BufferedWriter(new FileWriter(logFile));
+			try{
+				this.info = logFile.toString();
+				this.stream = new BufferedWriter(new FileWriter(logFile));
+			} catch (IOException ex) {
+				this.info = "(" + logsDirectoryName + " is not writable)";
+			}
 		} else {
 			this.info = "(" + logsDirectoryName + " does not exist)";
 		}

@@ -85,7 +85,7 @@ public class Terminator {
 		} catch (UnknownHostException ex) {
 			Log.warn("Problem looking up the loopback address", ex);
 		}
-		new InAppServer("Terminator", "~/.terminal-logs/.terminator-server-port" + display, loopbackAddress, TerminatorServer.class, new TerminatorServer());
+		new InAppServer("Terminator", System.getProperty("org.jessies.terminator.serverPortFileStem") + display, loopbackAddress, TerminatorServer.class, new TerminatorServer());
 	}
 	
 	// Returns whether we started the UI.
