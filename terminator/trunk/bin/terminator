@@ -11,12 +11,30 @@ require "#{salma_hayek}/bin/target-os.rb"
 require "#{salma_hayek}/bin/invoke-java.rb"
 require "#{salma_hayek}/bin/which.rb"
 
-# Make sure we have a directory for the terminal logs.
-log_directory = "#{ENV['HOME']}/.terminal-logs"
-if test(?d, log_directory) == false
-  Dir.mkdir(log_directory)
-  system("chmod", "og-rx", log_directory)
+def make_directory(pathname, make_safe)
+  begin
+    if test(?d, pathname) == false
+      FileUtils.rm_f(pathname)
+      Dir.mkdir(pathname)
+    end
+    if make_safe
+      if File.stat(pathname).mode != 0700
+        FileUtils.chmod(0700, pathname)
+      end
+    end
+  rescue SystemCallError
+    # FIXME: if the directory exists but is known to be unsafe, or we fail to make it safe, we should at least warn the user.
+  end
 end
+
+# Make sure we have a directory for Terminator's private files and another for the logs.
+dot_directory = "#{ENV['HOME']}/.terminator"
+log_directory = File.join(dot_directory, "logs")
+make_directory(dot_directory, true)
+make_directory(log_directory, false)
+
+# FIXME: we should move "~/.terminator-settings" into dot_directory.
+# FIXME: we should specify the terminator-settings pathname as a system property.
 
 def tryInAppServer(salma_hayek, serverPortPathname)
   # InAppClient's constructor stops anyone else from reading the .secret file.
@@ -73,9 +91,8 @@ def tryInAppServer(salma_hayek, serverPortPathname)
   exit(0)
 end
 
-DISPLAY = ENV["DISPLAY"]
-serverPortPathname = Pathname.new("#{log_directory}/.terminator-server-port#{DISPLAY}")
-tryInAppServer(salma_hayek, serverPortPathname)
+server_port_file_stem = File.join(dot_directory, "terminator-server-port")
+tryInAppServer(salma_hayek, "#{server_port_file_stem}#{ENV['DISPLAY']}")
 
 launcher = "java"
 if target_os() == "Cygwin"
@@ -159,12 +176,13 @@ end
 selectShellIfNoDefault()
 
 invoker = Java.new("Terminator", "terminator/Terminator")
-invoker.log_filename = "#{log_directory}/terminator.log.#{$$}"
+invoker.log_filename = "#{log_directory}/terminator-#{$$}.log"
 invoker.launcher = launcher
 # The "user.home" system property won't necessarily point at $HOME.
 # We arranged above for $HOME/.terminal-logs/ to be available, so we need to stick to it.
 # (We didn't used to be able to getenv("HOME") from Java on Cygwin.)
 invoker.add_pathname_property("org.jessies.terminator.logDirectory", log_directory)
+invoker.add_pathname_property("org.jessies.terminator.serverPortFileStem", server_port_file_stem)
 
 # Ruby knows the mapping from signal number to signal name, but Java doesn't
 # and POSIX doesn't either. So pass the information along to Java in a way
