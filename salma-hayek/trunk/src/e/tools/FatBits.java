@@ -27,6 +27,7 @@ public class FatBits extends JFrame {
     private int scaleFactor;
     
     private JSlider scaleSlider;
+    private JCheckBox showCrosshairCheckBox;
     private JCheckBox showGridCheckBox;
     private JCheckBox keepOnTopCheckBox;
     
@@ -56,6 +57,7 @@ public class FatBits extends JFrame {
         initPositionLabel();
         initScaledImagePanel();
         initScaleSlider();
+        initShowCrosshairCheckBox();
         initShowGridCheckBox();
         
         JPanel result = new JPanel(new BorderLayout());
@@ -134,6 +136,16 @@ public class FatBits extends JFrame {
         colorSwatch.setColor(new Color(argb));
     }
     
+    private void initShowCrosshairCheckBox() {
+        this.showCrosshairCheckBox = new JCheckBox("Show crosshair");
+        showCrosshairCheckBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                scaledImagePanel.setShowCrosshair(showCrosshairCheckBox.isSelected());
+            }
+        });
+        showCrosshairCheckBox.setSelected(true);
+    }
+    
     private void initShowGridCheckBox() {
         this.showGridCheckBox = new JCheckBox("Show grid");
         showGridCheckBox.addItemListener(new ItemListener() {
@@ -204,6 +216,7 @@ public class FatBits extends JFrame {
     
     private class ScaledImagePanel extends JComponent {
         private Image image;
+        private boolean showCrosshair;
         private boolean showGrid;
         
         public ScaledImagePanel() {
@@ -228,6 +241,11 @@ public class FatBits extends JFrame {
             return image;
         }
         
+        public void setShowCrosshair(boolean showCrosshair) {
+            this.showCrosshair = showCrosshair;
+            repaint();
+        }
+        
         public void setShowGrid(boolean showGrid) {
             this.showGrid = showGrid;
             repaint();
@@ -237,10 +255,20 @@ public class FatBits extends JFrame {
         public void paintComponent(Graphics g) {
             paintImage(g);
             paintGridLines(g, xOrigin(), yOrigin());
+            paintCrosshair(g);
         }
         
         private void paintImage(Graphics g) {
             g.drawImage(image, xOrigin(), yOrigin(), null);
+        }
+        
+        private void paintCrosshair(Graphics g) {
+            if (showCrosshair == false) {
+                return;
+            }
+            g.setColor(showGrid ? Color.RED : Color.BLACK);
+            g.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
+            g.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
         }
         
         private void paintGridLines(Graphics g, int xOrigin, int yOrigin) {
@@ -293,6 +321,7 @@ public class FatBits extends JFrame {
         FormBuilder form = new FormBuilder(this, "FatBits Preferences");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Scale:", scaleSlider);
+        formPanel.addRow("", showCrosshairCheckBox);
         formPanel.addRow("", showGridCheckBox);
         formPanel.addRow("", keepOnTopCheckBox);
         form.showNonModal();
