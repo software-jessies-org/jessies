@@ -91,22 +91,8 @@ public class FileSearcher {
                 return false;
             }
             
-            // FIXME: we should merge this code and the similar (but better) code in PTextBuffer...
-            CharBuffer chars = null;
-            try {
-                CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-                chars = decoder.decode(byteBuffer);
-            } catch (Exception unused) {
-                byteBuffer.rewind();
-                try {
-                    CharsetDecoder decoder = Charset.forName("ISO-8859-1").newDecoder();
-                    chars = decoder.decode(byteBuffer);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-            //CharSequence chars = new AsciiCharSequence(byteBuffer, 0, byteCount);
-            
+            ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
+            CharBuffer chars = decoder.getCharBuffer();
             searchCharBuffer(chars, matches);
         } finally {
             if (fileChannel != null) {

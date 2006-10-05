@@ -45,11 +45,6 @@ public class PTextBuffer implements CharSequence {
     public static final String INDENTATION_PROPERTY = "IndentationProperty";
     public static final String LINE_ENDING_PROPERTY = "LineEndingProperty";
     
-    // Names for standard Java charsets.
-    private static final String UTF8_CHARSET = "UTF-8";
-    private static final String UTF16BE_CHARSET = "UTF-16BE";
-    private static final String UTF16LE_CHARSET = "UTF-16LE";
-    
     private static final int MIN_BUFFER_EXTENSION = 100;
     private static final int MAX_GAP_SIZE = 1024 * 2;
     
@@ -77,7 +72,7 @@ public class PTextBuffer implements CharSequence {
     }
     
     private void initDefaultProperties() {
-        putProperty(CHARSET_PROPERTY, UTF8_CHARSET);
+        putProperty(CHARSET_PROPERTY, "UTF-8");
         putProperty(LINE_ENDING_PROPERTY, "\n");
     }
     
@@ -160,9 +155,10 @@ public class PTextBuffer implements CharSequence {
             dataInputStream.readFully(byteBuffer.array());
             
             // Turn the raw bytes into a char[].
-            CharBuffer charBuffer = decodeByteBuffer(byteBuffer, byteCount);
-            char[] chars = extractCharArray(charBuffer);
+            ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
+            char[] chars = decoder.getCharArray();
             chars = fixLineEndings(chars);
+            putProperty(CHARSET_PROPERTY, decoder.getEncodingName());
             
             setText(chars);
         } catch (IOException ex) {
@@ -171,81 +167,6 @@ public class PTextBuffer implements CharSequence {
             getLock().relinquishWriteLock();
             FileUtilities.close(dataInputStream);
         }
-    }
-    
-    private CharBuffer decodeByteBuffer(ByteBuffer byteBuffer, long byteCount) {
-        // Assume UTF-8, but check for a UTF-16 BOM.
-        String charsetName = UTF8_CHARSET;
-        if (byteCount > 1) {
-            int possibleBom = byteBuffer.getShort(0) & 0xffff;
-            if (possibleBom == 0xfeff) {
-                charsetName = UTF16BE_CHARSET;
-            } else if (possibleBom == 0xfffe) {
-                charsetName = UTF16LE_CHARSET;
-            }
-        }
-        
-        try {
-            return attemptDecoding(byteBuffer, charsetName);
-        } catch (Exception unused) {
-            // Try again with the most popular parochial format (in my part of
-            // the world). The various parochial formats will almost certainly
-            // decode without error (in the sense that they'll accept pretty
-            // much any byte sequence), but the result may be gibberish. I
-            // think this is the best we can do, programmatically, though it's
-            // quite tempting to just let attemptDecoding throw an exception
-            // and encourage people to recode non-UTF files.
-            byteBuffer.rewind();
-            try {
-                return attemptDecoding(byteBuffer, "ISO-8859-1");
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-    }
-    
-    private CharBuffer attemptDecoding(ByteBuffer byteBuffer, String charsetName) throws CharacterCodingException {
-        CharsetDecoder decoder = makeReportingCharsetDecoder(charsetName);
-        CharBuffer charBuffer = decoder.decode(byteBuffer);
-        putProperty(CHARSET_PROPERTY, charsetName);
-        return charBuffer;
-    }
-    
-    private static CharsetDecoder makeReportingCharsetDecoder(String charsetName) {
-        // CharsetDecoder is reporting by default.
-        return Charset.forName(charsetName).newDecoder();
-    }
-    
-    private static CharsetEncoder makeReportingCharsetEncoder(String charsetName) {
-        // CharsetEncoder is reporting by default.
-        return Charset.forName(charsetName).newEncoder();
-    }
-    
-    private static char[] extractCharArray(CharBuffer charBuffer) {
-        // See if we need to copy the characters into a new char[].
-        if (charBuffer.hasArray() == false || charBuffer.isReadOnly()) {
-            char[] chars = new char[charBuffer.length()];
-            for (int i = 0; i < chars.length; ++i) {
-                chars[i] = charBuffer.charAt(i);
-            }
-            return chars;
-        }
-        
-        // We may be able to use the buffer's char[] directly.
-        char[] chars = charBuffer.array();
-        
-        // The 1.5 UTF-8 decoder leaves us with a directly usable char[],
-        // but the UTF-16 decoders don't because they swallow the
-        // BOM, so in those cases we need to re-copy the relevant portion.
-        // We could fix that by skipping the BOM when we read it in,
-        // but I'd rather have this safety net. UTF-8 is the expected
-        // format anyway, and this won't harm UTF-8 performance.
-        if (chars.length != charBuffer.length()) {
-            char[] newChars = new char[charBuffer.length()];
-            System.arraycopy(chars, charBuffer.arrayOffset(), newChars, 0, newChars.length);
-            chars = newChars;
-        }
-        return chars;
     }
     
     private char[] fixLineEndings(char[] chars) {
@@ -314,6 +235,11 @@ public class PTextBuffer implements CharSequence {
             // and to highlight them, perhaps as Find matches.
             Log.warn("Failed to encode buffer in charset " + charsetName, ex);
         }
+    }
+    
+    private static CharsetEncoder makeReportingCharsetEncoder(String charsetName) {
+        // CharsetEncoder is reporting by default.
+        return Charset.forName(charsetName).newEncoder();
     }
     
     private void writeToStream(OutputStreamWriter outputStreamWriter) {
