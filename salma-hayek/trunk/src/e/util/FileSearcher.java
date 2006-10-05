@@ -3,6 +3,7 @@ package e.util;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
+import java.nio.charset.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -89,8 +90,24 @@ public class FileSearcher {
             if (isBinaryByteBuffer(byteBuffer, byteCount)) {
                 return false;
             }
-            CharSequence charSequence = new AsciiCharSequence(byteBuffer, 0, byteCount);
-            searchCharBuffer(charSequence, matches);
+            
+            // FIXME: we should merge this code and the similar (but better) code in PTextBuffer...
+            CharBuffer chars = null;
+            try {
+                CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+                chars = decoder.decode(byteBuffer);
+            } catch (Exception unused) {
+                byteBuffer.rewind();
+                try {
+                    CharsetDecoder decoder = Charset.forName("ISO-8859-1").newDecoder();
+                    chars = decoder.decode(byteBuffer);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            //CharSequence chars = new AsciiCharSequence(byteBuffer, 0, byteCount);
+            
+            searchCharBuffer(chars, matches);
         } finally {
             if (fileChannel != null) {
                 fileChannel.close();
