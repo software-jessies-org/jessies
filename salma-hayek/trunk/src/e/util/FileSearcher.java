@@ -2,8 +2,6 @@ package e.util;
 
 import java.io.*;
 import java.nio.*;
-import java.nio.channels.*;
-import java.nio.charset.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -50,58 +48,21 @@ public class FileSearcher {
         }
     }
     
-    private boolean isBinaryByteBuffer(ByteBuffer byteBuffer, final int byteCount) {
-        // Check we haven't accidentally come across a binary file.
-        final int end = Math.min(byteCount, 16);
-        for (int i = 0; i < end; i++) {
-            if (byteBuffer.get(i) == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     /**
      * Search for occurrences of the input pattern in the given file.
      * Returns false if unable to search; true otherwise.
      */
     public boolean searchFile(File file, Collection<String> matches) throws IOException {
         int byteCount = (int) file.length();
+        ByteBuffer byteBuffer = ByteBufferUtilities.readFile(file);
         
-        DataInputStream dataInputStream = null;
-        FileChannel fileChannel = null;
-        ByteBuffer byteBuffer = null;
-        
-        try {
-            FileInputStream fileInputStream = new FileInputStream(file);
-            
-            // FIXME: we should measure where the best cut-off point is.
-            if (byteCount <= 4096) {
-                // Read the whole file in.
-                dataInputStream = new DataInputStream(fileInputStream);
-                byteBuffer = ByteBuffer.wrap(new byte[byteCount]);
-                dataInputStream.readFully(byteBuffer.array());
-            } else {
-                // Map the file into memory.
-                fileChannel = fileInputStream.getChannel();
-                byteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, byteCount);
-            }
-            
-            if (isBinaryByteBuffer(byteBuffer, byteCount)) {
-                return false;
-            }
-            
-            ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
-            CharBuffer chars = decoder.getCharBuffer();
-            searchCharBuffer(chars, matches);
-        } finally {
-            if (fileChannel != null) {
-                fileChannel.close();
-            }
-            if (dataInputStream != null) {
-                dataInputStream.close();
-            }
+        if (ByteBufferUtilities.isBinaryByteBuffer(byteBuffer, byteCount)) {
+            return false;
         }
+        
+        ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
+        CharBuffer chars = decoder.getCharBuffer();
+        searchCharBuffer(chars, matches);
         return true;
     }
 }

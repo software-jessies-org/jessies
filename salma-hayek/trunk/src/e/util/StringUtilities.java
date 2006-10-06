@@ -1,42 +1,34 @@
 package e.util;
 
 import java.io.*;
+import java.nio.*;
 import java.util.*;
 
 public class StringUtilities {
     /** Reads all the lines from the named file into a string array. Throws a RuntimeException on failure. */
     public static String[] readLinesFromFile(String filename) {
-        ArrayList<String> result = new ArrayList<String>();
-        LineNumberReader in = null;
-        try {
-            File file = FileUtilities.fileFromString(filename);
-            in = new LineNumberReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-            String line;
-            while ((line = in.readLine()) != null) {
-                result.add(line);
-            }
-            return result.toArray(new String[result.size()]);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        } finally {
-            FileUtilities.close(in);
-        }
+        return readFile(filename).split("\n");
     }
     
     /** Reads the entire contents of the named file into a String. Throws a RuntimeException on failure. */
     public static String readFile(String filename) {
-        StringBuilder result = new StringBuilder();
-        String[] lines = readLinesFromFile(filename);
-        for (String line : lines) {
-            result.append(line);
-            result.append('\n');
-        }
-        return result.toString();
+        return readFile(FileUtilities.fileFromString(filename));
     }
     
     /** Reads the entire contents of the given File into a String. Throws a RuntimeException on failure. */
     public static String readFile(File file) {
-        return readFile(file.toString());
+        try {
+            int byteCount = (int) file.length();
+            ByteBuffer byteBuffer = ByteBufferUtilities.readFile(file);
+            if (ByteBufferUtilities.isBinaryByteBuffer(byteBuffer, byteCount)) {
+                throw new RuntimeException("binary file");
+            }
+            ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
+            // FIXME: we could save some copying if we could return a CharSequence.
+            return new String(decoder.getCharArray());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
     /** Writes the given String to the given File. Returns the text of the exception message on failure, null on success. */

@@ -3,6 +3,9 @@ package e.util;
 import java.nio.*;
 import java.nio.charset.*;
 
+/**
+ * Translates a ByteBuffer into a CharBuffer or char[], trying to guess the character encoding from the content.
+ */
 public class ByteBufferDecoder {
     private ByteBuffer byteBuffer;
     private long byteCount;
@@ -16,6 +19,9 @@ public class ByteBufferDecoder {
         this.byteCount = byteCount;
     }
     
+    /**
+     * Returns a CharBuffer (which implements CharSequence) containing the characters found in the ByteBuffer.
+     */
     public CharBuffer getCharBuffer() {
         if (charBuffer == null) {
             charBuffer = decodeByteBuffer();
@@ -23,6 +29,9 @@ public class ByteBufferDecoder {
         return charBuffer;
     }
     
+    /**
+     * Returns a char[] containing the characters found in the ByteBuffer.
+     */
     public char[] getCharArray() {
         if (charArray == null) {
             if (charBuffer == null) {
@@ -33,6 +42,9 @@ public class ByteBufferDecoder {
         return charArray;
     }
     
+    /**
+     * Returns the character encoding assumed when decoding the ByteBuffer.
+     */
     public String getEncodingName() {
         if (encoding == null) {
             getCharBuffer();
