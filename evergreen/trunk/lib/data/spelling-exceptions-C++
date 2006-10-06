@@ -327,3 +327,5 @@ strtof
 strtold
 strtoll
 strtoull
+# C99's 6.4.2.2 "Predefined identifiers" offers "__func__", but our spelling checker splits words at punctuation, so we have to accept "func" everywhere or nowhere.
+func
