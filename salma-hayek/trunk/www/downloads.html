@@ -1,0 +1,30 @@
+<h2>Downloads</h2>
+
+<h3>All Platforms</h3>
+<p>If no pre-built <!--#echo var="HUMAN_NAME" --> package is available for your platform, see <a href="#building-from-source">Building from source</a> on this page.
+
+<p>The <a href="ChangeLog.html"><!--#echo var="HUMAN_NAME" --> ChangeLog</a> is available separately.
+
+<h3>Linux (x86)</h3>
+<p>For Ubuntu and other Debian-based Linux distributions, there's <a href="org.jessies.evergreen.deb">org.jessies.evergreen.deb</a> which will add <!--#echo var="HUMAN_NAME" --> to your GNOME applications menu. (For command-line or non-GNOME users, there's /usr/bin/<!--#echo var="SHORT_DIST_NAME"-->.)
+
+<p>For Fedora and other RPM-based Linux distributions, there's <a href="<!--#echo var="LONG_DIST_NAME"-->.rpm"><!--#echo var="LONG_DIST_NAME"-->.rpm</a>, which is equivalent to the Debian package.
+
+<h3>Mac OS</h3>
+<p>For Mac OS 10.4, there's <a href="<!--#echo var="SHORT_DIST_NAME"-->.dmg"><!--#echo var="SHORT_DIST_NAME"-->.dmg</a> which contains a universal binary application that you can simply drag and drop to install.
+
+<h3>MS&nbsp;Windows</h3>
+<p>For Windows, there's a Windows installer <a href="<!--#echo var="SHORT_DIST_NAME"-->.msi"><!--#echo var="SHORT_DIST_NAME"--></a> which requires that you've already installed Cygwin, including Ruby, yourself but is otherwise complete and leaves you with an icon on your desktop.
+
+<p>We have more information about <a href="/salma-hayek/cygwin-setup.html">setting up Cygwin</a>.
+
+<p>(Why did we choose Cygwin? Mainly for Terminator's benefit. NT's built-in POSIX subsystem won't let you launch native Windows applications or interact with the network, so that wasn't an option. Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which we use to support window resizing, not to mention containing a port of one of the most widely used ssh programs.)
+
+<a name="building-from-source">
+<h2>Building from source</h2>
+</a>
+
+<p>There's a source distribution (<a href="<!--#echo var="SHORT_DIST_NAME"-->.tar.gz"><!--#echo var="SHORT_DIST_NAME"-->.tar.gz</a>),
+and you'll also need the source to the library it uses (<a href="../salma-hayek/salma-hayek.tar.gz">salma-hayek.tar.gz</a>).
+
+<p>The <a href="../salma-hayek/index.html#building-from-source">hints for building</a> are the same for all our projects.
