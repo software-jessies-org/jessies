@@ -8,15 +8,33 @@
 <h1>Cygwin Setup</h1>
 
 <h2>What is Cygwin?</h2>
-<p>Cygwin is a Linux-like environment for MS Windows. You can read more about it on the <a href="http://www.cygwin.com">Cygwin home page</a>, but this page assumes you know what it is and want it. If you're a Unix user and you're stuck with a Win32 box, you probably do. It's quite a remarkable hack.
+<p>Cygwin is a Linux-like environment for MS Windows. You can read more about it on the <a href="http://www.cygwin.com">Cygwin home page</a>, but this page assumes you know what it is and have already decided that you want it. If you're a Unix user and you're stuck with a Win32 box, you probably do. It's quite a remarkable hack.
 
 <h2>Installation</h2>
-<p>Run the initial installer <a href="http://www.cygwin.com/setup.exe">setup.exe</a> and hit Next. Answer "Install from Internet" and hit Next. Answer "c:\cygwin", "All Users", "Unix / binary", and hit Next. I don't think the local package directory matters, so just hit Next. Hit Next again. Choose a nearby server and hit Next.
+<p>Download the <a href="http://www.cygwin.com/setup.exe">Cygwin setup.exe</a> (and keep it for later, because you'll want it to update your installation too). Run it now, and hit Next. Answer "Install from Internet" and hit Next. Answer "c:\cygwin", "All Users", "Unix / binary", and hit Next. I don't think the local package directory matters, so just hit Next. Hit Next again. Choose a nearby server and hit Next.
 
-<h3>Approximating apt-get(1)</h3>
-<p>You'll now be asked to select packages. The interface is a nightmare along the lines of dselect(1), and not scriptable in any way. This section assumes that you'd rather have something along the lines of apt-get(1).
+<h3>Basic packages</h3>
+<p>You'll now be asked to select packages. The interface is a nightmare along the lines of a mouse-driven dselect(1), and not scriptable in any way. Most people seem to have trouble guessing how to use it, so read the next few paragraphs before you start clicking.
 
-<p>For our purposes we only need two packages over the default. Click the "View" button until the label next to it says "Full". This flattens out the list of packages and makes it easier to peruse. Click once on each of the weird circular icons on the lines with "python" and "wget". (The weird circular icons cycle between various of Skip, available version numbers, Keep, Uninstall, Reinstall and Source, depending on what's available and already installed. You want the first version number offered.) Hit Next. When the main part of the installation completes, allow the installer to create a desktop shortcut.
+<p>Click the "View" button until the label next to it says "Full". This flattens out the list of packages and makes it easier to peruse. Click once on each of the weird circular icons on the lines with packages you want. (The weird circular icons cycle between various of Skip, available version numbers, Keep, Uninstall, Reinstall and Source, depending on what's available and already installed. You want the first version number offered. If you accidentally click past it, keep clicking until it cycles round again.)
+
+<p>You might want to install the following packages:
+<pre>
+perl
+python
+ruby       # run Perl, Python, or Ruby scripts
+vim        # edit stuff locally
+inetutils  # telnet(1)
+openssh    # SSH (client and server, though the server's not so great)
+</pre>
+
+<p>When you've selected all the packages you want, hit Next. When the main part of the installation completes, allow the installer to create a desktop shortcut.
+
+<p>Cygwin is now installed.
+
+<p>(In future, assuming you only want to update the packages already on your system, rather than adding new ones, you can simply start the installer and keep hitting "Next" without any other interaction. It remembers what you've already told it.)
+
+<h2>Configuration</h2>
 
 <p>Double-click on the Cygwin icon on your desktop. You'll get a message like this which, as it says, you can ignore:
 <pre>
@@ -31,41 +49,15 @@ This message is only displayed once (unless you recreate /etc/group)
 and can be safely ignored.
 </pre>
 
-<p>Now install cyg-apt(1), a useful imitation of apt-get(1) which sadly isn't itself packaged:
-<pre>
-wget <a href="http://www.lilypond.org/~janneke/software/cyg-apt">http://www.lilypond.org/~janneke/software/cyg-apt</a>
-chmod a+rx cyg-apt
-mv cyg-apt /bin
-cyg-apt setup
-cyg-apt update
-</pre>
-
 <h3>A better command prompt</h3>
-<p>The Cygwin icon on your desktop starts Microsoft's command prompt window, albeit with bash(1) inside. You can do better than that, though. There's a port of rxvt(1) that doesn't require X11.
-<pre>
-cyg-apt install rxvt
-</pre>
-<p>Right-click on the desktop, select New, Shortcut and paste the following into the presented field:
+<p>The Cygwin icon on your desktop starts Microsoft's command prompt window, albeit with bash(1) inside. You can do better than that, though. There's a port of rxvt(1) that doesn't require X11, which you can install with the Cygwin <tt>setup.exe</tt>, or you can install <a href="http://software.jessies.org/terminator/">Terminator</a>.
+
+<p>Terminator will automatically install an icon on the desktop. If instead you choose rxvt(1), you'll have to make your own icon. To do so, right-click on the desktop, select New, Shortcut and paste the following into the presented field:
 <pre>c:\cygwin\bin\rxvt.exe -fn Terminal -scrollBar_right -bg blue4 -fg white -ls --savedLines 9999
 </pre>
 <p>Miss off the background and foreground colors if you prefer dark-on-light, but you will want to use the Terminal font to avoid the default font.
 
-<p>Drag the icon to the Quick Launch tool bar (next to the "Start" button) to save having to minimize all your windows to find the icon on the desktop.
-
-<h3>Other useful packages</h3>
-<p>You might want to install the following packages:
-<pre>
-cyg-apt install perl ruby # run Perl or Ruby scripts
-cyg-apt install vim       # edit stuff locally
-cyg-apt install inetutils # telnet(1)
-cyg-apt install openssh   # SSH (client and server)
-</pre>
-<p>If you don't know the name of the package you want, try something like:
-<pre>
-cyg-apt search inet
-</pre>
-
-<h2>Configuration</h2>
+<p>Drag the Terminator or rxvt(1) icon (whichever you prefer) to the Quick Launch tool bar (next to the "Start" button) to save having to minimize all your windows to find the icon on the desktop.
 
 <h3>Home directory</h3>
 
