@@ -7,7 +7,12 @@ import java.util.*;
 public class StringUtilities {
     /** Reads all the lines from the named file into a string array. Throws a RuntimeException on failure. */
     public static String[] readLinesFromFile(String filename) {
-        return readFile(filename).split("\n");
+        String contents = readFile(filename);
+        // The empty file clearly contains no lines but Java's split (unlike Ruby's) would give us a singleton array containing the empty string.
+        if (contents.length() == 0) {
+            return new String[0];
+        }
+        return contents.split("\n");
     }
     
     /** Reads the entire contents of the named file into a String. Throws a RuntimeException on failure. */
