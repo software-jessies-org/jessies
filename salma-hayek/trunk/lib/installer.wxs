@@ -57,7 +57,7 @@
       </Directory>
       <Directory Id='DesktopFolder' Name='Desktop' />
       <Component Id='RubyShortcut'
-      Guid='$(env.SHORTCUT_GUID)'>
+      Guid='$(env.SHORTCUT_HKCU_GUID)'>
         <Registry Id='RegistryKey' Root='HKCU'
         Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)'
         Name='ShortcutTarget' Action='write' Type='string'
