@@ -288,7 +288,7 @@ JNI_LIBRARY_PREFIX.Linux = lib
 JNI_LIBRARY_EXTENSION.Linux = so
 
 EXTRA_INCLUDE_PATH.Cygwin += $(JDK_ROOT)/include/win32
-JNI_LIBRARY_LDFLAGS.Cygwin += -shared -Wl,--add-stdcall-alias -Wl,--image-base,0x68000000
+JNI_LIBRARY_LDFLAGS.Cygwin += -shared -Wl,--add-stdcall-alias -Wl,--enable-auto-image-base
 JNI_LIBRARY_PREFIX.Cygwin =
 JNI_LIBRARY_EXTENSION.Cygwin = dll
 
