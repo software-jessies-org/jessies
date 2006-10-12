@@ -197,6 +197,13 @@ public class TerminatorFrame extends JFrame {
 	 * grows.
 	 */
 	private void fixTerminalSizesAfterAddingOrRemovingTabbedPane(Dimension initialSize, Dimension finalSize) {
+		// GNOME's current default window manager automatically ignores setSize if the window is maximized.
+		// Windows doesn't, and that causes us to resize a maximized window to be larger than the display, which is obviously unwanted.
+		// This early exit fixes Windows' behavior and doesn't hurt Linux.
+		if ((getExtendedState() & MAXIMIZED_BOTH) == MAXIMIZED_BOTH) {
+			return;
+		}
+		
 		Dimension size = getSize();
 		size.height += (initialSize.height - finalSize.height);
 		size.width += (initialSize.width - finalSize.width);
