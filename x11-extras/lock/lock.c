@@ -6,6 +6,7 @@
 
 #ifdef linux
 #include <fcntl.h>
+#include <sys/ioctl.h>
 #include <sys/vt.h>
 #endif
 
@@ -28,6 +29,7 @@ int
 main(int argc, char *argv[]) {
     XEvent ev;
     
+    (void) argc;
     argv0 = argv[0];
     
     /* Open a connection to the X server. */
@@ -62,7 +64,7 @@ main(int argc, char *argv[]) {
         int fd = open("/dev/console", O_RDWR);
         if (fd != -1) {
             ioctl(fd, VT_LOCKSWITCH, 0);
-//            close(fd);
+            /*close(fd);*/
         }
         fprintf(stderr, "/dev/console = %i\n", fd);
     }
