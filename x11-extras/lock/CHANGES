@@ -1,0 +1,24 @@
+Change Log for "lock"
+
+1998-10-09	enh	Basel
+
+	Now disables virtual terminals on Linux.
+
+1998-10-04	enh	Basel
+
+	Now locks as many screens as you have.
+
+1998-02-05	enh	Basel
+
+	Now names its window "lock" so that other programs can tell when
+	the display's locked. See the code in clock.
+
+1997-10-06	enh	Basel
+
+	Ignores non-alphanumeric "characters", so that pressing Ctrl to
+	stop the screen blanking no longer inserts a character. Hides
+	the pointer.
+
+1997-10-03	enh	Basel
+
+	Created.

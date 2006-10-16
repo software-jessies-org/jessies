@@ -1,0 +1,6 @@
+# Example keys file.
+# Key names come from <X11/keysymdef.h> (remove the XK_ prefix).
+F13	gnome-terminal
+Alt-Tab	window -circup
+Shift-Alt-ISO_Left_Tab	window -circdown
+Super-f	firefox

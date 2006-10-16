@@ -1,0 +1,13 @@
+
+To compile menu, type:
+
+	xmkmf
+	make
+
+you should have a "menu" binary in the current directory.
+
+Menu reads a .menu file from its current directory to decide what to
+make available. I've provided my .menu file as an example.
+
+	- Elliott Hughes, 1999-05-28
+

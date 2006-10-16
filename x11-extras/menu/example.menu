@@ -1,0 +1,7 @@
+stromboli	exec 9term -font lucidasanstypewriter-12
+pinatubo	exec rsh -l enh pinatubo.ch.genedata.com 'DISPLAY=stromboli:0 /u/enh/bin/mips/9term -font lucidasans-12'
+krakatoa	exec rsh -l enh krakatoa.ch.genedata.com 'DISPLAY=stromboli:0 /u/enh/bin/mips/9term -font lucidasans-12'
+Netscape	Netscape
+Mail	exec rsh -l enh pinatubo.ch.genedata.com 'DISPLAY=stromboli:0 /u/enh/bin/mips/9term -font lucidasans-12 -e /u/enh/bin/mips/mail'
+News	exec rsh -l enh pinatubo.ch.genedata.com 'DISPLAY=stromboli:0 REPLYTO=elliott.hughes@genedata.com xterm -e /sys/util/bin/tin'
+Lock	exec lock

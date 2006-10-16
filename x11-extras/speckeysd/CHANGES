@@ -1,0 +1,35 @@
+Change Log for "speckeysd"
+
+2006-10-12	elliotth	San Jose
+
+	Various fixes suggested by Tuncer Ayaz, Adam Sampson, and Anselm R. Garbe:
+
+	* Fix build by adding missing #includes for waitpid(2).
+
+	* Follow advice on execl(3) man page of casting sentinel to (char*); GCC catches this error.
+
+	* Wait for children as they die, rather than next time we start a child.
+
+	* Remove useless header file.
+
+	* Add error reporting if we fail to grab a key.
+
+	* Support Mod1, Mod2, Mod3, Mod4, and the alternative names "Alt" and "Super".
+
+	* Use XKeycodeToKeysym instead of XLookupString to work better with non-US keyboards.
+
+2003-07-16	elliotth	Bracknell
+
+	Fixes Imakefile to not claim to have a man page.
+
+2003-07-12	martind	Bracknell
+
+	Leave at most one zombie child.
+
+2003-07-03	martind	Bracknell
+
+	Adds support for modifier keys.
+
+1997-07-20	enh	Basel
+
+	Created.

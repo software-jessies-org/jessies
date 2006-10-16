@@ -1,0 +1,19 @@
+
+To compile lock, type:
+
+	xmkmf
+	make
+
+you should have a "lock" binary in the current directory.
+
+You may get an error at the link stage complaining about
+an undefined reference to the function `crypt' in password.o:
+this probably means you're running a recent free Unix. for
+some reason, these split the crypt function out of libc and
+into its own library, libcrypt. Either correct the generated
+makefile by adding -lcrypt to the libraries to be linked
+against or -- this is probably the easier option -- reissue
+the failed command, but add -lcrypt to the end.
+
+	- Elliott Hughes, 1999-05-28
+

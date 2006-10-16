@@ -1,0 +1,15 @@
+
+INCLUDES = -I$(TOP)
+DEPLIBS = $(DEPXMULIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(XMULIB) $(XLIB)
+
+SRCS1 = window.c
+OBJS1 = window.o
+
+SRCS2 = wselect.c
+OBJS2 = wselect.o
+
+PROGRAMS=window wselect
+
+ComplexProgramTarget_1(window,$(LOCAL_LIBRARIES),)
+ComplexProgramTarget_2(wselect,$(LOCAL_LIBRARIES),)
