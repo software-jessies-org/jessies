@@ -15,8 +15,8 @@
 
 /* ARGSUSED */
 static void
-reap(int s)
-{
+reap(int s) {
+    (void) s;
     signal(SIGCHLD, reap);
     wait(0);
 }
@@ -36,6 +36,7 @@ main(int argc, char *argv[])
      * See what we're expected to do. We can either terminate a session or
      * wait for one to be terminated.
      */
+    (void) argv;
     switch (argc) {
     case 1:    /* Terminate the current session. */
         terminate = True;

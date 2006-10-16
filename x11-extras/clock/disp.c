@@ -86,6 +86,7 @@ mappingnotify(XEvent * ev) {
 
 static void
 enter(XEvent * ev) {
+    (void) ev;
     update_display_string();
     XMoveResizeWindow(dpy, window,
         sinister ? 0 : display_width-window_width, 0,
@@ -94,6 +95,7 @@ enter(XEvent * ev) {
 
 static void
 leave(XEvent * ev) {
+    (void) ev;
     XMoveResizeWindow(dpy, window,
         sinister ? 0 : display_width-2, 0, 2, 2);
 }
@@ -116,7 +118,7 @@ do_command(XEvent * ev) {
         close(ConnectionNumber(dpy));
         switch (fork()) {
         case 0:
-            execl(sh, sh, "-c", command[button], 0);
+            execl(sh, sh, "-c", command[button], (char*) NULL);
             fprintf(stderr, "%s: can't exec \"%s -c %s\"\n", argv0, sh,
                 command[button]);
             exit(EXIT_FAILURE);
@@ -158,7 +160,7 @@ pipe_command(char * command) {
             dup2(fds[1], 1);
             dup2(1, 2);
             
-            execl(sh, sh, "-c", command, 0);
+            execl(sh, sh, "-c", command, (char*) NULL);
             fprintf(stderr, "%s: can't exec \"%s -c %s\"\n", argv0, sh,
                 command);
             exit(EXIT_FAILURE);

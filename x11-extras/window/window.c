@@ -148,20 +148,21 @@ ResizeWindow(char **argv) {
 
 static void    
 ListWindows(char **argv) {
-    Window    *kids;
-    int    i;
-    unsigned    nkids;
+    Window* kids;
+    unsigned i;
+    unsigned nkids;
 
+    (void) argv;
     nkids = listwindows(DefaultRootWindow(dpy), &kids);
 
-    for(i = 0; i < nkids; i++) {
-        Window    *kids2;
-        unsigned    nkids2;
-        int    i2;
+    for (i = 0; i < nkids; i++) {
+        Window* kids2;
+        unsigned nkids2;
+	unsigned i2;
 
         nkids2 = listwindows(kids[i], &kids2);
 
-        for(i2 = 0; i2 < nkids2; i2++) {
+        for (i2 = 0; i2 < nkids2; i2++) {
             XWindowAttributes attr;
 
             XGetWindowAttributes(dpy, kids2[i2], &attr);
@@ -180,7 +181,7 @@ ListWindows(char **argv) {
 static void
 getWindowProperty(Window window, char * name, Bool delete) {
     Atom prop;
-    Atom type, realType;
+    Atom realType;
     unsigned long n;
     unsigned long extra;
     int format;
@@ -221,7 +222,7 @@ SetProperty(char ** argv) {
     }
     
     XChangeProperty(dpy, wind(argv[0]), prop, XA_STRING, 8,
-        PropModeReplace, value, strlen(value));
+        PropModeReplace, (unsigned char*) value, strlen(value));
 }
 
 static void
@@ -233,6 +234,7 @@ static void
 GetFocusWindow(char ** argv) {
     Window focusReturn;
     int revertToReturn;
+    (void) argv;
     XGetInputFocus(dpy, &focusReturn, &revertToReturn);
     printwindowname(focusReturn);
 }
@@ -243,6 +245,8 @@ GetSelection(char ** argv) {
     Atom dataProperty;
     XEvent ev;
     
+    (void) argv;
+
     /* Create an unmapped invisible window. */
     window = XCreateWindow(dpy, DefaultRootWindow(dpy), 0, 0, 1, 1, 0,
         CopyFromParent, InputOnly, CopyFromParent, 0, 0);
@@ -262,16 +266,19 @@ GetSelection(char ** argv) {
 
 static void
 DeleteSelection(char ** argv) {
+    (void) argv;
     XSetSelectionOwner(dpy, XA_PRIMARY, None, CurrentTime);
 }
 
 static void
 CirculateUp(char ** argv) {
+    (void) argv;
     XCirculateSubwindowsUp(dpy, DefaultRootWindow(dpy));
 }
 
 static void
 CirculateDown(char ** argv) {
+    (void) argv;
     XCirculateSubwindowsDown(dpy, DefaultRootWindow(dpy));
 }
 
@@ -299,15 +306,16 @@ static ReasonDesc reasons[] =
 
 static int
 handler(Display *disp, XErrorEvent *err) {
+    (void) disp;
     fprintf(stderr, "%s: no window with id %#x\n", argv0, (int) err->resourceid);
     exit(EXIT_FAILURE);
 }
 
 static void
-usage(void) {
+usage() {
     ReasonDesc * p;
 
-    fprintf(stderr, "usage:\n", argv0);
+    fprintf(stderr, "%s: usage:\n", argv0);
     for (p = reasons; p < reasons + sizeof reasons/sizeof reasons[0]; p++) {
         fprintf(stderr, "%s %s %s\n", argv0, p->name, p->usage);
     }

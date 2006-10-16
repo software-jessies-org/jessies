@@ -10,7 +10,6 @@ struct Disp {
 };
 
 static void updateTime();
-static char * pipe_command(char *);
 static void execute(MenuItem *);
 
 static void nullEvent(XEvent *);
@@ -63,7 +62,7 @@ updateTime() {
 static void
 expose(XEvent * ev) {
     int width;
-    int x, y;
+    int x;
     MenuItem * item;
     
     /* Only handle the last in a group of Expose events. */
@@ -105,6 +104,7 @@ expose(XEvent * ev) {
 
 static void
 nullEvent(XEvent * ev) {
+    (void) ev;
     /* Ensure that the clock is redrawn. */
     expose(0);
 }
@@ -149,6 +149,7 @@ buttonPress(XEvent * ev) {
 
 static void
 buttonRelease(XEvent * ev) {
+    (void) ev;
     if (selected != 0) {
         execute(selected);
         selected = 0;
@@ -163,10 +164,12 @@ mappingnotify(XEvent * ev) {
 
 static void
 enter(XEvent * ev) {
+    (void) ev;
 }
 
 static void
 leave(XEvent * ev) {
+    (void) ev;
     selected = 0;
     expose(0);
 }
@@ -188,7 +191,7 @@ execute(MenuItem * item) {
         close(ConnectionNumber(dpy));
         switch (fork()) {
         case 0:
-            execl(sh, sh, "-c", item->command, 0);
+            execl(sh, sh, "-c", item->command, (char*) NULL);
             fprintf(stderr, "%s: can't exec \"%s -c %s\"\n", argv0, sh,
                 item->command);
             exit(EXIT_FAILURE);
@@ -206,71 +209,7 @@ execute(MenuItem * item) {
     }
 }
 
-static char *
-pipe_command(char * command) {
-    static char * sh;
-    int fds[2];
-    char * string;
-    
-    if (sh == 0) {
-        sh = getenv("SHELL");
-        if (sh == 0) sh = "/bin/sh";
-    }
-    
-    if (pipe(fds) == -1)
-        return "Execution failed";
-    
-    switch (fork()) {
-    case 0:    /* Child. */
-        close(ConnectionNumber(dpy));
-        switch (fork()) {
-        case 0:
-            close(0);
-            close(fds[0]);
-            dup2(fds[1], 1);
-            dup2(1, 2);
-            
-            execl(sh, sh, "-c", command, 0);
-            fprintf(stderr, "%s: can't exec \"%s -c %s\"\n", argv0, sh,
-                command);
-            exit(EXIT_FAILURE);
-        case -1:
-            fprintf(stderr, "%s: couldn't fork\n", argv0);
-            exit(EXIT_FAILURE);
-        default:
-            exit(EXIT_SUCCESS);
-        }
-    case -1:    /* Error. */
-        fprintf(stderr, "%s: couldn't fork\n", argv0);
-        break;
-    default: {
-        /* Read from the pipe. */
-        char buf[BUFSIZ];
-        int n;
-        
-        close(fds[1]);
-        
-        while ((n = read(fds[0], buf, BUFSIZ)) > 0) {
-            int valid = 0;
-            char * p = buf;
-
-            /* How many of the characters do we want? */
-            while (*p++ >= ' ') valid++;
-            
-            string = (char *) malloc(valid + 1);
-            if (string != 0)
-                strncpy(string, buf, valid);
-            else
-                string = "Out of memory";
-        }
-        
-        wait(0);
-        }
-    }
-    
-    return string;
-}
-
 static void
 visibilitynotify(XEvent * ev) {
+    (void) ev;
 }
