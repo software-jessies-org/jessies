@@ -1,0 +1,9 @@
+INCLUDES = -I$(TOP)
+DEPLIBS = $(DEPXLIB)
+LOCAL_LIBRARIES = $(XLIB)
+
+HEADERS = menu.h
+SRCS = menu.c disp.c error.c resource.c
+OBJS = ${SRCS:.c=.o}
+
+ComplexProgramTarget(menu)

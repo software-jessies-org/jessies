@@ -1,0 +1,9 @@
+INCLUDES = -I$(TOP)
+DEPLIBS = $(DEPXLIB)
+LOCAL_LIBRARIES = $(XLIB)
+
+HEADERS = clock.h
+SRCS = clock.c disp.c error.c resource.c
+OBJS = ${SRCS:.c=.o}
+
+ComplexProgramTarget(clock)

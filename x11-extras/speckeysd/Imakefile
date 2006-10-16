@@ -1,0 +1,9 @@
+INCLUDES = -I$(TOP)
+DEPLIBS = $(DEPXLIB)
+LOCAL_LIBRARIES = $(XLIB)
+
+HEADERS = speckeys.h
+SRCS = speckeysd.c
+OBJS = ${SRCS:.c=.o}
+
+ComplexProgramTargetNoMan(speckeysd)
