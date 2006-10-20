@@ -25,6 +25,7 @@ while gets()
         author = $2
         date = $3
         line_count = $4.to_i()
+        puts("<a name=\"#{revision}\">")
         puts("<p><font size=\"+1\">#{date} / #{author} / revision #{revision}</font></p>")
         puts("<blockquote>")
         gets()
@@ -32,6 +33,7 @@ while gets()
             puts(escapeTextLineToHtml(gets()))
         }
         puts("</blockquote>")
+        puts("</a>")
         puts("<hr noshade>")
     end
 end
