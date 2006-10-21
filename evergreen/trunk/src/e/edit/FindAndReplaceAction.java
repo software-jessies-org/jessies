@@ -240,7 +240,7 @@ public class FindAndReplaceAction extends ETextAction {
                     i += insert.length() - 1;
                 }
             }
-            String result = "<html>" + buffer.toString();
+            String result = "<html><body>" + buffer.toString();
             return result;
         }
     }

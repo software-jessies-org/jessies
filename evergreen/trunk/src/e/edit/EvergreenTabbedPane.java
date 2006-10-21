@@ -56,7 +56,7 @@ public class EvergreenTabbedPane extends JTabbedPane {
             return null;
         }
         String primaryModifier = "Alt+";
-        return "<html>Use " + primaryModifier + numberKey + " to switch to this tab.";
+        return "<html><body>Use " + primaryModifier + numberKey + " to switch to this tab.";
     }
     
     // Just overriding getToolTipTextAt is insufficient because the default implementation of getToolTipText doesn't call it.
