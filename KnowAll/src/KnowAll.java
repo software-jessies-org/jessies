@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002-2005, Elliott Hughes.
+    Copyright (C) 2002-2006, Elliott Hughes.
 
     This file is part of KnowAll.
 
@@ -119,7 +119,7 @@ public class KnowAll extends JFrame {
             if (input.charAt(i) == '\n') ++lines;
         }
         lines = Math.max(1, lines);
-        String text = "<html>";
+        String text = "<html><body>";
         text += StringUtilities.pluralize(input.length(), "character", "characters") + " on " + StringUtilities.pluralize(lines, " line", " lines") + ".";
         text += "<br><hr noshade>";
         text += "<tt>";
