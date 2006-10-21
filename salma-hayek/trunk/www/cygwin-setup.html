@@ -84,12 +84,21 @@ chmod o-w /cygdrive/c
 </pre>
 <p>Of course, this still leaves every binary on your system world-writable. Strangely, Ruby's happy to run world-writable binaries, as long as the directory they're in isn't world-writable.
 
+<h2>Hints &amp; Tips</h2>
+
 <h3>Cygwin's setup log</h3>
 <p>If you update your Cygwin installation frequently, sometimes things will break or just change in a way you're not expecting, and you'll find yourself wondering what version you were running on a particular day. Matt Wilkie offers this tip to see the dates on which you installed the various versions you've used:
 <pre>
 grep -e 'Installing .*cygwin-[0-9].*\.bz2' /var/log/setup.log
 </pre>
 <p>The log contains details of all the packages you've installed, in case you're interested in something other than the base.
+
+<h3>Easier package installation with cyg-apt(1)</h3>
+<p>If you find yourself making heavy use of Cygwin, and you're used to Debian-based Linux distributions, you might want to check out cyg-apt(1). Sadly, there's no Cygwin package for it, so you'll have to download it yourself, and you'll have to install the "python" and "wget" packages first.
+
+<p>Once you've run <tt>cyg-apt setup</tt>, you'll have something approximating apt-get(1). "update" and "install" work as you'd expect, and "cyg-apt search" is like "apt-cache search".
+
+<p>There's also "cyg-apt upgrade", but it's not as useful as its analog on Linux: Windows doesn't let you update files while they're in use, meaning cyg-apt(1) can't update itself or its dependencies. You're better off using Cygwin's setup.exe to update your installation.
 
 <!--#include virtual="/salma-hayek/footer.html" -->
 </body>
