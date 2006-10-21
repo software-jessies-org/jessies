@@ -51,7 +51,7 @@ public class TerminatorTabbedPane extends JTabbedPane {
     public String getToolTipTextAt(int index) {
         String primaryModifier = GuiUtilities.isMacOs() ? "\u2318" : "Alt+";
         String control = GuiUtilities.isMacOs() ? "\u2303" : "Ctrl+";
-        return "<html>Use " + primaryModifier + (index + 1) + " to switch to this tab.<br>Use " + control + "Tab to cycle through the tabs.";
+        return "<html><body>Use " + primaryModifier + (index + 1) + " to switch to this tab.<br>Use " + control + "Tab to cycle through the tabs.";
     }
     
     // Just overriding getToolTipTextAt is insufficient because the default implementation of getToolTipText doesn't call it.
