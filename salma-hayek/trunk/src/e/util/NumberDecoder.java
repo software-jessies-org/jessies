@@ -130,7 +130,7 @@ public class NumberDecoder {
             return "";
         }
         List<String> strings = toStrings();
-        StringBuilder result = new StringBuilder("<html>");
+        StringBuilder result = new StringBuilder("<html><body>");
         for (String string : strings) {
             result.append(string);
             result.append("<br/>\n");

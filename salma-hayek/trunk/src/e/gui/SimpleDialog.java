@@ -43,7 +43,8 @@ public class SimpleDialog {
         for (int i = 0; i < brokenMessage.length(); ++i) {
             if (brokenMessage.charAt(i) == '\n' || (html && brokenMessage.charAt(i) == '<')) {
                 // An explicit newline is taken as a manual split.
-                // Similarly, an HTML tag is assumed to be "<p>" or "<br>".
+                // Similarly, an HTML tag is assumed to be "<body>", "<p>", or "<br>", all of which can be considered manual line breaks.
+                // FIXME: work better with tags such as "<b>" or "<i>".
                 chunkLength = 0;
             } else {
                 chunkLength++;
@@ -94,7 +95,7 @@ public class SimpleDialog {
         if (GuiUtilities.isGtk() && title.endsWith(".")) {
             title = title.substring(0, title.length() - 1);
         }
-        return "<html><b>" + title + "</b><p>" + message;
+        return "<html><body><b>" + title + "</b><p>" + message;
     }
     
     /**
