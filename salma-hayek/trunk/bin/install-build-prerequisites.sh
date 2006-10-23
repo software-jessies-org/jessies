@@ -34,7 +34,7 @@ PACKAGES="$PACKAGES ruby"
 # We use subversion commands during building.
 PACKAGES="$PACKAGES subversion"
 
-# The history is murky but I think these were required for finish-gnome-startup.
+# Required for "gnome-startup", or anything else that uses X11 directly.
 PACKAGES="$PACKAGES x-dev"
 PACKAGES="$PACKAGES libx11-dev"
 

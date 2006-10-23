@@ -1,6 +1,10 @@
+#include <deque>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <X11/Xlib.h>
+
+#include "join.h"
 
 // Finishes the GNOME startup sessions whose ids are given on the command line.
 // Based on the function gdk_notify_startup_complete from:
@@ -73,14 +77,46 @@ static void broadcast_xmessage(const std::string& message) {
     XDestroyWindow(xdisplay.display, xwindow);
 }
 
-void finish_startup(const std::string& startup_id) {
+static std::string invent_startup_id() {
+    char hostname[256];
+    if (gethostname(hostname, sizeof(hostname)) != 0) {
+        strcpy(hostname, "localhost");
+    }
+    
+    std::ostringstream oss;
+    oss << hostname << getpid() << "_TIME" << time(0);
+    return oss.str();
+}
+
+static void start_startup(const std::string& name) {
+    std::string startup_id = invent_startup_id();
+    XDisplay xdisplay;
+    std::ostringstream oss;
+    oss << "new: ID=" << escape_for_xmessage(startup_id) << " SCREEN=" << DefaultScreenOfDisplay(xdisplay.display) << " NAME=" << escape_for_xmessage(name);
+    broadcast_xmessage(oss.str());
+    std::cout << startup_id << std::endl;
+}
+
+static void finish_startup(const std::string& startup_id) {
     broadcast_xmessage("remove: ID=" + escape_for_xmessage(startup_id));
 }
 
 int main(int, char* args[]) {
     ++args;
-    while (*args != 0) {
-        finish_startup(*args++);
+    if (*args != 0 && std::string("start") == *args) {
+        std::deque<std::string> words;
+        while (*++args != 0) {
+            words.push_back(*args);
+        }
+        std::string name = join(" ", words);
+        start_startup(name);
+    } else if (*args != 0 && std::string("stop") == *args) {
+        while (*++args != 0) {
+            finish_startup(*args);
+        }
+    } else  {
+        std::cerr << "usage: gnome-startup [start <name>|stop]" << std::endl;
+        exit(EXIT_FAILURE);
     }
     exit(EXIT_SUCCESS);
 }

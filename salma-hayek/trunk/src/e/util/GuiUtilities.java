@@ -204,7 +204,7 @@ public class GuiUtilities {
         String DESKTOP_STARTUP_ID = System.getProperty("gnome.DESKTOP_STARTUP_ID");
         if (DESKTOP_STARTUP_ID != null) {
             System.clearProperty("gnome.DESKTOP_STARTUP_ID");
-            ProcessUtilities.spawn(null, new String[] { "finish-gnome-startup", DESKTOP_STARTUP_ID });
+            ProcessUtilities.spawn(null, new String[] { "gnome-startup", "stop", DESKTOP_STARTUP_ID });
         }
     }
     
