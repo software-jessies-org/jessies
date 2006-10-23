@@ -91,4 +91,10 @@ public class IndentationGuesser {
     
     private IndentationGuesser() {
     }
+    
+    public static void main(String[] args) {
+        for (String filename : args) {
+            System.out.println(filename + ": \"" + guessIndentationFromFile(StringUtilities.readFile(filename)) + "\"");
+        }
+    }
 }
