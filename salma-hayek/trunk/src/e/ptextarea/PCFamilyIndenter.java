@@ -94,23 +94,25 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         
         // Recognize doc comments, and help out with the ASCII art.
+        /*
         if (lineIndex > 0) {
             List<PLineSegment> segments = textArea.getLineSegments(lineIndex);
             if (segments.size() > 0) {
                 PLineSegment lastSegment = segments.get(segments.size() - 1);
                 if (lastSegment.getStyle() == PStyle.COMMENT) {
                     String commentText = lastSegment.getCharSequence().toString().trim();
-                    if (commentText.startsWith("//") == false && commentText.endsWith("*/") == false) {
+                    if (commentText.startsWith("//") == false && commentText.endsWith("*" + "/") == false) {
                         // We must be in a block comment. Assume it's JavaDoc style, and add a leading *.
                         indentation += " * ";
-                    } else if (commentText.startsWith("*/")) {
-                        // Add a space to line the * in */ up with the * in /*, like JavaDoc comments.
+                    } else if (commentText.startsWith("*" + "/")) {
+                        // Add a space to line the * in * / up with the * in / *, like JavaDoc comments.
                         // FIXME: this is only correct if we're in a JavaDoc comment block. we should check for evidence.
                         indentation += " ";
                     }
                 }
             }
         }
+        */
         return indentation;
     }
     
