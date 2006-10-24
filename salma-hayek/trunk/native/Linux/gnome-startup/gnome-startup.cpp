@@ -115,7 +115,7 @@ int main(int, char* args[]) {
             finish_startup(*args);
         }
     } else  {
-        std::cerr << "usage: gnome-startup [start <name>|stop]" << std::endl;
+        std::cerr << "usage: gnome-startup [start <name>|stop <id>...]" << std::endl;
         exit(EXIT_FAILURE);
     }
     exit(EXIT_SUCCESS);
