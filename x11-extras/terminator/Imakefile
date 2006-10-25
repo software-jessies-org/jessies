@@ -1,11 +1,11 @@
 #
-# Imakefile for terminator
+# Imakefile for x11-reaper
 #
        INCLUDES = -I$(TOP)
         DEPLIBS = $(DEPXLIB)
 LOCAL_LIBRARIES = $(XLIB)
         DEFINES = -DSHAPE
-           SRCS = terminator.c
+           SRCS = x11-reaper.c
            OBJS = ${SRCS:.c=.o}
 
-ComplexProgramTarget(terminator)
+ComplexProgramTargetNoMan(x11-reaper)
