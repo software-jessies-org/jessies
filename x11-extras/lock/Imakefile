@@ -10,4 +10,4 @@ HEADERS = lock.h
 SRCS = lock.c error.c disp.c password.c resource.c
 OBJS = ${SRCS:.c=.o}
 
-ComplexProgramTarget(lock)
+ComplexProgramTargetNoMan(lock)

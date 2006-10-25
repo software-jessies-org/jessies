@@ -174,7 +174,7 @@ TCLIBDIR = /usr/lib
 
            CXXLIB = -lstdc++
 
-    CXXDEBUGFLAGS = -O2 -fno-strict-aliasing
+    CXXDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
 CXXDEPENDINCLUDES =
  CXXEXTRA_DEFINES =
 CXXEXTRA_INCLUDES =
@@ -310,7 +310,7 @@ MODLDCOMBINEFLAGS = -r
 
       PROJECTROOT = /usr/X11R6
 
-      CDEBUGFLAGS = -O2 -fno-strict-aliasing
+      CDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
         CCOPTIONS =
 
       ALLINCLUDES = $(INCLUDES) $(EXTRA_INCLUDES) $(TOP_INCLUDES) $(INSTALLED_INCLUDES) $(STD_INCLUDES)

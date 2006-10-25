@@ -174,7 +174,7 @@ TCLIBDIR = /usr/lib
 
            CXXLIB = -lstdc++
 
-    CXXDEBUGFLAGS = -O2 -fno-strict-aliasing
+    CXXDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
 CXXDEPENDINCLUDES =
  CXXEXTRA_DEFINES =
 CXXEXTRA_INCLUDES =
@@ -310,7 +310,7 @@ MODLDCOMBINEFLAGS = -r
 
       PROJECTROOT = /usr/X11R6
 
-      CDEBUGFLAGS = -O2 -fno-strict-aliasing
+      CDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
         CCOPTIONS =
 
       ALLINCLUDES = $(INCLUDES) $(EXTRA_INCLUDES) $(TOP_INCLUDES) $(INSTALLED_INCLUDES) $(STD_INCLUDES)
@@ -1079,32 +1079,6 @@ install:: menu
 		(set -x; $(MKDIRHIER) $(DESTDIR)$(BINDIR)); \
 	fi
 	$(INSTALL) $(INSTALLFLAGS) $(INSTPGMFLAGS)  menu $(DESTDIR)$(BINDIR)/menu
-
-all:: menu.$(MANNEWSUFFIX)
-
-menu.$(MANNEWSUFFIX): menu.$(MANSRCSUFFIX)
-	$(RM) $@
-	if test -z "$(PREPROCESSMANPAGES)" ; then \
-	   cd `dirname menu` && \
-	   $(LN) `basename menu.$(MANSRCSUFFIX)` `basename $@`; \
-	else \
-	      	     $(RAWCPP)  $(MANDEFS) $(EXTRAMANDEFS) \
-	     < menu.$(MANSRCSUFFIX) | sed -e '/^#  *[0-9][0-9]*  *.*$$/d' 			-e '/^#line  *[0-9][0-9]*  *.*$$/d' 			-e '/^[ 	]*XCOMM$$/s/XCOMM/#/' 			-e '/^[ 	]*XCOMM[^a-zA-Z0-9_]/s/XCOMM/#/' 			-e '/^[ 	]*XHASH/s/XHASH/#/' 			-e '/\@\@$$/s/\@\@$$/\\/' >$@; \
-	fi
-
-cleandir::
-	$(RM) menu.$(MANNEWSUFFIX)
-
-install.man:: menu.$(MANNEWSUFFIX)
-	@if [ -d $(DESTDIR)$(MANDIR) ]; then \
-		set +x; \
-	else \
-		if [ -h $(DESTDIR)$(MANDIR) ]; then \
-			(set -x; rm -f $(DESTDIR)$(MANDIR)); \
-		fi; \
-		(set -x; $(MKDIRHIER) $(DESTDIR)$(MANDIR)); \
-	fi
-	$(INSTALL) $(INSTALLFLAGS) $(INSTMANFLAGS) menu.$(MANNEWSUFFIX) $(DESTDIR)$(MANDIR)/menu.$(MANSUFFIX)
 
 depend::
 	$(DEPEND) $(DEPENDFLAGS) -- $(ALLDEFINES) $(DEPEND_DEFINES) -- $(SRCS)

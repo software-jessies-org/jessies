@@ -174,7 +174,7 @@ TCLIBDIR = /usr/lib
 
            CXXLIB = -lstdc++
 
-    CXXDEBUGFLAGS = -O2 -fno-strict-aliasing
+    CXXDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
 CXXDEPENDINCLUDES =
  CXXEXTRA_DEFINES =
 CXXEXTRA_INCLUDES =
@@ -310,7 +310,7 @@ MODLDCOMBINEFLAGS = -r
 
       PROJECTROOT = /usr/X11R6
 
-      CDEBUGFLAGS = -O2 -fno-strict-aliasing
+      CDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
         CCOPTIONS =
 
       ALLINCLUDES = $(INCLUDES) $(EXTRA_INCLUDES) $(TOP_INCLUDES) $(INSTALLED_INCLUDES) $(STD_INCLUDES)
@@ -1053,9 +1053,11 @@ CXXPROJECT_DEFINES =
 # ----------------------------------------------------------------------
 # start of Imakefile
 
+CRYPT_LIBRARIES = -lcrypt
+
 INCLUDES = -I$(TOP)
 DEPLIBS = $(DEPXLIB)
-LOCAL_LIBRARIES = $(XLIB)
+LOCAL_LIBRARIES = $(XLIB) $(CRYPT_LIBRARIES)
 
 HEADERS = lock.h
 SRCS = lock.c error.c disp.c password.c resource.c
@@ -1079,32 +1081,6 @@ install:: lock
 		(set -x; $(MKDIRHIER) $(DESTDIR)$(BINDIR)); \
 	fi
 	$(INSTALL) $(INSTALLFLAGS) $(INSTPGMFLAGS)  lock $(DESTDIR)$(BINDIR)/lock
-
-all:: lock.$(MANNEWSUFFIX)
-
-lock.$(MANNEWSUFFIX): lock.$(MANSRCSUFFIX)
-	$(RM) $@
-	if test -z "$(PREPROCESSMANPAGES)" ; then \
-	   cd `dirname lock` && \
-	   $(LN) `basename lock.$(MANSRCSUFFIX)` `basename $@`; \
-	else \
-	      	     $(RAWCPP)  $(MANDEFS) $(EXTRAMANDEFS) \
-	     < lock.$(MANSRCSUFFIX) | sed -e '/^#  *[0-9][0-9]*  *.*$$/d' 			-e '/^#line  *[0-9][0-9]*  *.*$$/d' 			-e '/^[ 	]*XCOMM$$/s/XCOMM/#/' 			-e '/^[ 	]*XCOMM[^a-zA-Z0-9_]/s/XCOMM/#/' 			-e '/^[ 	]*XHASH/s/XHASH/#/' 			-e '/\@\@$$/s/\@\@$$/\\/' >$@; \
-	fi
-
-cleandir::
-	$(RM) lock.$(MANNEWSUFFIX)
-
-install.man:: lock.$(MANNEWSUFFIX)
-	@if [ -d $(DESTDIR)$(MANDIR) ]; then \
-		set +x; \
-	else \
-		if [ -h $(DESTDIR)$(MANDIR) ]; then \
-			(set -x; rm -f $(DESTDIR)$(MANDIR)); \
-		fi; \
-		(set -x; $(MKDIRHIER) $(DESTDIR)$(MANDIR)); \
-	fi
-	$(INSTALL) $(INSTALLFLAGS) $(INSTMANFLAGS) lock.$(MANNEWSUFFIX) $(DESTDIR)$(MANDIR)/lock.$(MANSUFFIX)
 
 depend::
 	$(DEPEND) $(DEPENDFLAGS) -- $(ALLDEFINES) $(DEPEND_DEFINES) -- $(SRCS)
