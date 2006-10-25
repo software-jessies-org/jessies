@@ -99,10 +99,10 @@ printwindowname(Window w) {
     unsigned long    extra;
 
     /*
-         *      This rather unpleasant hack is necessary because xwsh uses
-         *      COMPOUND_TEXT rather than STRING for its WM_NAME property,
-         *      and anonymous xwsh windows are annoying.
-         */
+     *      This rather unpleasant hack is necessary because xwsh uses
+     *      COMPOUND_TEXT rather than STRING for its WM_NAME property,
+     *      and anonymous xwsh windows are annoying.
+     */
     if(Success == XGetWindowProperty(dpy, w, XA_WM_NAME, 0L, 100L, False, AnyPropertyType,
             &actual_type, &format, &n, &extra, &name) && name != 0)
         printf("%#x\t%s\n", (unsigned)w, (char*)name);
