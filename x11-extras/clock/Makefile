@@ -174,7 +174,7 @@ TCLIBDIR = /usr/lib
 
            CXXLIB = -lstdc++
 
-    CXXDEBUGFLAGS = -O2 -fno-strict-aliasing
+    CXXDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
 CXXDEPENDINCLUDES =
  CXXEXTRA_DEFINES =
 CXXEXTRA_INCLUDES =
@@ -310,7 +310,7 @@ MODLDCOMBINEFLAGS = -r
 
       PROJECTROOT = /usr/X11R6
 
-      CDEBUGFLAGS = -O2 -fno-strict-aliasing
+      CDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
         CCOPTIONS =
 
       ALLINCLUDES = $(INCLUDES) $(EXTRA_INCLUDES) $(TOP_INCLUDES) $(INSTALLED_INCLUDES) $(STD_INCLUDES)
@@ -1079,32 +1079,6 @@ install:: clock
 		(set -x; $(MKDIRHIER) $(DESTDIR)$(BINDIR)); \
 	fi
 	$(INSTALL) $(INSTALLFLAGS) $(INSTPGMFLAGS)  clock $(DESTDIR)$(BINDIR)/clock
-
-all:: clock.$(MANNEWSUFFIX)
-
-clock.$(MANNEWSUFFIX): clock.$(MANSRCSUFFIX)
-	$(RM) $@
-	if test -z "$(PREPROCESSMANPAGES)" ; then \
-	   cd `dirname clock` && \
-	   $(LN) `basename clock.$(MANSRCSUFFIX)` `basename $@`; \
-	else \
-	      	     $(RAWCPP)  $(MANDEFS) $(EXTRAMANDEFS) \
-	     < clock.$(MANSRCSUFFIX) | sed -e '/^#  *[0-9][0-9]*  *.*$$/d' 			-e '/^#line  *[0-9][0-9]*  *.*$$/d' 			-e '/^[ 	]*XCOMM$$/s/XCOMM/#/' 			-e '/^[ 	]*XCOMM[^a-zA-Z0-9_]/s/XCOMM/#/' 			-e '/^[ 	]*XHASH/s/XHASH/#/' 			-e '/\@\@$$/s/\@\@$$/\\/' >$@; \
-	fi
-
-cleandir::
-	$(RM) clock.$(MANNEWSUFFIX)
-
-install.man:: clock.$(MANNEWSUFFIX)
-	@if [ -d $(DESTDIR)$(MANDIR) ]; then \
-		set +x; \
-	else \
-		if [ -h $(DESTDIR)$(MANDIR) ]; then \
-			(set -x; rm -f $(DESTDIR)$(MANDIR)); \
-		fi; \
-		(set -x; $(MKDIRHIER) $(DESTDIR)$(MANDIR)); \
-	fi
-	$(INSTALL) $(INSTALLFLAGS) $(INSTMANFLAGS) clock.$(MANNEWSUFFIX) $(DESTDIR)$(MANDIR)/clock.$(MANSUFFIX)
 
 depend::
 	$(DEPEND) $(DEPENDFLAGS) -- $(ALLDEFINES) $(DEPEND_DEFINES) -- $(SRCS)

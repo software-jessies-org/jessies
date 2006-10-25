@@ -24,6 +24,7 @@ main(int argc, char *argv[]) {
     XGCValues gv;
     XSetWindowAttributes attr;
     
+    (void) argc;
     argv0 = argv[0];
     
     /* Open a connection to the X server. */

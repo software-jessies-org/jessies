@@ -2,7 +2,7 @@
 # $Xorg: imake.c,v 1.6 2001/02/09 02:03:15 xorgcvs Exp $
 
 # ----------------------------------------------------------------------
-# Makefile generated from "Imake.tmpl" and </tmp/IIf.LK1hmo>
+# Makefile generated from "Imake.tmpl" and </tmp/IIf.xt6WTl>
 # $Xorg: Imake.tmpl,v 1.4 2000/08/17 19:41:46 cpqbld Exp $
 # $XdotOrg: xc/config/cf/Imake.tmpl,v 1.6 2004/07/28 03:24:29 gisburn Exp $
 #
@@ -174,7 +174,7 @@ TCLIBDIR = /usr/lib
 
            CXXLIB = -lstdc++
 
-    CXXDEBUGFLAGS = -O2 -fno-strict-aliasing
+    CXXDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
 CXXDEPENDINCLUDES =
  CXXEXTRA_DEFINES =
 CXXEXTRA_INCLUDES =
@@ -310,7 +310,7 @@ MODLDCOMBINEFLAGS = -r
 
       PROJECTROOT = /usr/X11R6
 
-      CDEBUGFLAGS = -O2 -fno-strict-aliasing
+      CDEBUGFLAGS = -O2 -W -Wall -pedantic -fno-strict-aliasing
         CCOPTIONS =
 
       ALLINCLUDES = $(INCLUDES) $(EXTRA_INCLUDES) $(TOP_INCLUDES) $(INSTALLED_INCLUDES) $(STD_INCLUDES)
