@@ -8,7 +8,7 @@
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 
-#define USED(x)
+#define USED(x) (void) x
 #define MASK (ButtonPressMask|ButtonReleaseMask)
 
 static char    *argv0;
@@ -18,6 +18,60 @@ exits(char *p)
 {
     fprintf(stderr, "%s: %s\n", argv0, p);
     exit(EXIT_FAILURE);
+}
+
+/* Taken from http://mail.gnome.org/archives/wm-spec-list/2001-August/msg00082.html */
+static Window TryChildren(Display* dpy, Window win, Atom WM_STATE) {
+    Window root, parent;
+    Window *children;
+    unsigned int nchildren;
+    unsigned int i;
+    Atom type = None;
+    int format;
+    unsigned long nitems, after;
+    unsigned char *data;
+    Window inf = 0;
+    
+    if (!XQueryTree(dpy, win, &root, &parent, &children, &nchildren)) {
+        return 0;
+    }
+    for (i = 0; !inf && (i < nchildren); i++) {
+        XGetWindowProperty(dpy, children[i], WM_STATE, 0, 0, False, AnyPropertyType, &type, &format, &nitems, &after, &data);
+        if (type) {
+            inf = children[i];
+        }
+    }
+    for (i = 0; !inf && (i < nchildren); i++) {
+        inf = TryChildren(dpy, children[i], WM_STATE);
+    }
+    if (children) {
+        XFree((char *)children);
+    }
+    return inf;
+}
+
+/* Taken from http://mail.gnome.org/archives/wm-spec-list/2001-August/msg00082.html */
+static Window XmuClientWindow(Display* dpy, Window win) {
+    Atom wm_state;
+    Atom type = None;
+    int format;
+    unsigned long nitems, after;
+    unsigned char *data;
+    Window inf;
+    
+    wm_state = XInternAtom (dpy, "WM_STATE", True);
+    if (!wm_state) {
+        return win;
+    }
+    XGetWindowProperty (dpy, win, wm_state, 0, 0, False, AnyPropertyType, &type, &format, &nitems, &after, &data);
+    if (type) {
+        return win;
+    }
+    inf = TryChildren(dpy, win, wm_state);
+    if (!inf) {
+        inf = win;
+    }
+    return inf;
 }
 
 static Window
