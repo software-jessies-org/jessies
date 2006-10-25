@@ -2,7 +2,7 @@
 # $Xorg: imake.c,v 1.6 2001/02/09 02:03:15 xorgcvs Exp $
 
 # ----------------------------------------------------------------------
-# Makefile generated from "Imake.tmpl" and </tmp/IIf.fi3KIZ>
+# Makefile generated from "Imake.tmpl" and </tmp/IIf.LK1hmo>
 # $Xorg: Imake.tmpl,v 1.4 2000/08/17 19:41:46 cpqbld Exp $
 # $XdotOrg: xc/config/cf/Imake.tmpl,v 1.6 2004/07/28 03:24:29 gisburn Exp $
 #
@@ -1054,24 +1054,24 @@ CXXPROJECT_DEFINES =
 # start of Imakefile
 
 #
-# Imakefile for terminator
+# Imakefile for x11-reaper
 #
        INCLUDES = -I$(TOP)
         DEPLIBS = $(DEPXLIB)
 LOCAL_LIBRARIES = $(XLIB)
         DEFINES = -DSHAPE
-           SRCS = terminator.c
+           SRCS = x11-reaper.c
            OBJS = ${SRCS:.c=.o}
 
-        PROGRAM = terminator
+        PROGRAM = x11-reaper
 
-all:: terminator
+all:: x11-reaper
 
-terminator: $(OBJS) $(DEPLIBS)
+x11-reaper: $(OBJS) $(DEPLIBS)
 	$(RM) $@
 	$(CCLINK) -o $@ $(LDOPTIONS) $(OBJS) $(LOCAL_LIBRARIES) $(LDLIBS)  $(EXTRA_LOAD_FLAGS)
 
-install:: terminator
+install:: x11-reaper
 	@if [ -d $(DESTDIR)$(BINDIR) ]; then \
 		set +x; \
 	else \
@@ -1080,33 +1080,7 @@ install:: terminator
 		fi; \
 		(set -x; $(MKDIRHIER) $(DESTDIR)$(BINDIR)); \
 	fi
-	$(INSTALL) $(INSTALLFLAGS) $(INSTPGMFLAGS)  terminator $(DESTDIR)$(BINDIR)/terminator
-
-all:: terminator.$(MANNEWSUFFIX)
-
-terminator.$(MANNEWSUFFIX): terminator.$(MANSRCSUFFIX)
-	$(RM) $@
-	if test -z "$(PREPROCESSMANPAGES)" ; then \
-	   cd `dirname terminator` && \
-	   $(LN) `basename terminator.$(MANSRCSUFFIX)` `basename $@`; \
-	else \
-	      	     $(RAWCPP)  $(MANDEFS) $(EXTRAMANDEFS) \
-	     < terminator.$(MANSRCSUFFIX) | sed -e '/^#  *[0-9][0-9]*  *.*$$/d' 			-e '/^#line  *[0-9][0-9]*  *.*$$/d' 			-e '/^[ 	]*XCOMM$$/s/XCOMM/#/' 			-e '/^[ 	]*XCOMM[^a-zA-Z0-9_]/s/XCOMM/#/' 			-e '/^[ 	]*XHASH/s/XHASH/#/' 			-e '/\@\@$$/s/\@\@$$/\\/' >$@; \
-	fi
-
-cleandir::
-	$(RM) terminator.$(MANNEWSUFFIX)
-
-install.man:: terminator.$(MANNEWSUFFIX)
-	@if [ -d $(DESTDIR)$(MANDIR) ]; then \
-		set +x; \
-	else \
-		if [ -h $(DESTDIR)$(MANDIR) ]; then \
-			(set -x; rm -f $(DESTDIR)$(MANDIR)); \
-		fi; \
-		(set -x; $(MKDIRHIER) $(DESTDIR)$(MANDIR)); \
-	fi
-	$(INSTALL) $(INSTALLFLAGS) $(INSTMANFLAGS) terminator.$(MANNEWSUFFIX) $(DESTDIR)$(MANDIR)/terminator.$(MANSUFFIX)
+	$(INSTALL) $(INSTALLFLAGS) $(INSTPGMFLAGS)  x11-reaper $(DESTDIR)$(BINDIR)/x11-reaper
 
 depend::
 	$(DEPEND) $(DEPENDFLAGS) -- $(ALLDEFINES) $(DEPEND_DEFINES) -- $(SRCS)
@@ -1117,7 +1091,7 @@ lint1:
 	$(LINT) $(LINTFLAGS) $(FILE) $(LINTLIBS)
 
 cleandir::
-	$(RM) terminator
+	$(RM) x11-reaper
 
 # ----------------------------------------------------------------------
 # common rules for all Makefiles - do not edit
