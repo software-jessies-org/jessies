@@ -45,7 +45,7 @@ main(int argc, char *argv[])
         terminate = False;
         break;
     default:
-        fprintf(stderr, "syntax: terminate [daemon]\n");
+        fprintf(stderr, "syntax: %s [daemon]\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -54,7 +54,7 @@ main(int argc, char *argv[])
      */
     dpy = XOpenDisplay("");
     if (dpy == 0) {
-        fprintf(stderr, "terminator: can't connect to X server.\n");
+        fprintf(stderr, "%s: can't connect to X server.\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -70,7 +70,7 @@ main(int argc, char *argv[])
      */
     enh_terminator = XInternAtom(dpy, "_ENH_TERMINATOR", terminate);
     if (enh_terminator == None) {
-        fprintf(stderr, "terminator: can't internalize atom.\n");
+        fprintf(stderr, "%s: can't internalize atom.\n", argv[0]);
         return EXIT_FAILURE;
     }
 
