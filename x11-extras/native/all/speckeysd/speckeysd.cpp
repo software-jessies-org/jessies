@@ -32,7 +32,8 @@ int screen_count;
 char* argv0;
 
 const char* attempting_to_grab = 0;
-int report_key_grab_error(Display* d, XErrorEvent* e) {
+
+int report_key_grab_error(Display* /*d*/, XErrorEvent* e) {
     const char* reason = "unknown reason";
     if (e->error_code == BadAccess) {
         reason = "the key/button combination is already in use by another client";
@@ -41,29 +42,22 @@ int report_key_grab_error(Display* d, XErrorEvent* e) {
     } else if (e->error_code == BadWindow) {
         reason = "the root window we passed to XGrabKey was incorrect";
     }
-    (void) d;
     fprintf(stderr, "%s: couldn't grab key \"%s\": %s (X error code %i)\n", argv0, attempting_to_grab, reason, e->error_code);
     return 0;
 }
 
-void
-reap_zombies()
-{
+static void reap_zombies() {
     int status;
     while (waitpid(-1, &status, WNOHANG) > 0);
 }
 
-void
-sigchld_handler()
-{
+static void sigchld_handler(int /*signal_number*/) {
     reap_zombies();
     /* Reinstall this signal handler ready for the next child. */
     signal(SIGCHLD, sigchld_handler);
 }
 
-void
-shell(const char* command)
-{
+static void shell(const char* command) {
     char* sh = getenv("SHELL");
     if (sh == 0) {
         sh = "/bin/sh";
@@ -81,16 +75,12 @@ shell(const char* command)
     }
 }
 
-void
-panic(const char* s)
-{
+static void panic(const char* s) {
     fprintf(stderr, "%s: %s\n", argv0, s);
     exit(EXIT_FAILURE);
 }
 
-unsigned int
-parse_modifiers(char* name, const char* full_spec)
-{
+unsigned int parse_modifiers(char* name, const char* full_spec) {
     char* separator = strchr(name, '-');
     unsigned int modifiers = 0;
     if (separator != NULL) {
@@ -115,16 +105,10 @@ parse_modifiers(char* name, const char* full_spec)
     return modifiers;
 }
 
-void
-add_hot_key(const char* keyname, const char* command)
-{
+static void add_hot_key(const char* keyname, const char* command) {
     char* copy = strdup(keyname);
-    int screen;
-    HotKey* new_key;
-    char* unmodified;
+    char* unmodified = strrchr(copy, '-');
     unsigned int modifiers = 0;
-    
-    unmodified = strrchr(copy, '-');
     if (unmodified == NULL) {
         unmodified = copy;
     } else {
@@ -133,7 +117,7 @@ add_hot_key(const char* keyname, const char* command)
         modifiers = parse_modifiers(copy, keyname);
     }
     
-    new_key = (HotKey*) malloc(sizeof(HotKey));
+    HotKey* new_key = new HotKey;
     new_key->keysym = XStringToKeysym(unmodified);
     new_key->modifiers = modifiers;
     new_key->command = strdup(command);
@@ -143,7 +127,7 @@ add_hot_key(const char* keyname, const char* command)
     XSynchronize(dpy, True);
     attempting_to_grab = keyname;
     XSetErrorHandler(report_key_grab_error);
-    for (screen = 0; screen < screen_count; ++screen) {
+    for (int screen = 0; screen < screen_count; ++screen) {
         Window root = RootWindow(dpy, screen);
         XGrabKey(dpy, XKeysymToKeycode(dpy, new_key->keysym), modifiers, root, False, GrabModeAsync, GrabModeAsync);
     }
@@ -152,18 +136,14 @@ add_hot_key(const char* keyname, const char* command)
     free(copy);
 }
 
-void
-read_hot_key_file(const char* fname)
-{
-    FILE* fp;
-    char buf[BUFSIZ];
-    
-    fp = fopen(fname, "r");
+static void read_hot_key_file(const char* fname) {
+    FILE* fp = fopen(fname, "r");
     if (fp == NULL) {
         fprintf(stderr, "%s: couldn't read \"%s\"\n", argv0, fname);
         return;
     }
     
+    char buf[BUFSIZ];
     while (fgets(buf, BUFSIZ, fp) != NULL) {
         char* tab = strchr(buf, '\t');
         if (*buf == '#' || tab == NULL) {
@@ -176,9 +156,7 @@ read_hot_key_file(const char* fname)
     fclose(fp);
 }
 
-void
-keypress(XEvent* ev0)
-{
+static void keypress(XEvent* ev0) {
     XKeyEvent* ev = (XKeyEvent*) ev0;
     KeySym keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
     
@@ -191,11 +169,7 @@ keypress(XEvent* ev0)
     }
 }
 
-int
-main(int argc, char* argv[])
-{
-    XEvent ev;
-    
+int main(int argc, char* argv[]) {
     argv0 = argv[0];
     
     /* Open a connection to the X server. */
@@ -225,6 +199,7 @@ main(int argc, char* argv[])
     
     /* The main event loop. */
     for (;;) {
+        XEvent ev;
         XNextEvent(dpy, &ev);
         switch (ev.type) {
         case KeyPress:
