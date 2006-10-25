@@ -51,22 +51,22 @@ editing <tt>lock.h</tt> and recompiling.
 <p>On Linux systems, <tt>lock</tt> disables virtual consoles
 while running. 
 
-<h2>terminator - Simple X Session Manager</h2>
+<h2>x11-reaper - Simple X Session Manager</h2>
 
-<p>Syntax: <tt>terminator [daemon]</tt></p>
+<p>Syntax: <tt>x11-reaper [daemon]</tt></p>
 
-<p><tt>terminator</tt> is an imitation of two programs that are
+<p><tt>x11-reaper</tt> is an imitation of two programs that are
 part of Silicon Graphics' IRIX operating system,
 <tt>reaper(1)</tt> and <tt>endsession(1)</tt>.
 
-<p>The idea is to run <tt>terminator</tt> as the last program
+<p>The idea is to run <tt>x11-reaper</tt> as the last program
 in your Xinitrc or .xsession, making it the program upon which
 the session hangs.  It places a property on the root window,
 and waits for it to be altered.  When the property is altered,
-the daemon <i>terminator</i> terminates, causing the X11 login
+the daemon <i>x11-reaper</i> terminates, causing the X11 login
 session to end.
 
-<p>If run without an argument, <tt>terminator</tt> behaves as
+<p>If run without an argument, <tt>x11-reaper</tt> behaves as
 <tt>endsession(1)</tt>, ending the login session. If run with
 an argument (say "daemon") then it behaves as
 <tt>reaper(1)</tt>, waiting for the session to end.
@@ -74,8 +74,8 @@ an argument (say "daemon") then it behaves as
 <p>In your .xsession (if you're a user installing this just for
 yourself) or your Xinitrc (if you're an administrator
 installing this for all users) ensure that the last line is
-something like <tt>terminator daemon</tt>.  When you want to
-log out, run <tt>terminator</tt> (from the command line or from
+something like <tt>x11-reaper daemon</tt>.  When you want to
+log out, run <tt>x11-reaper</tt> (from the command line or from
 an on-screen menu or whatever). That's all there is to it!
 
 <p>[If you find these instructions too terse, then you probably
