@@ -1,3 +1,5 @@
+include ../salma-hayek/universal.make
+
 X11_TARGETS += clock lock menu speckeysd window x11-reaper
 
 .PHONY: x11
@@ -8,8 +10,8 @@ x11:
 makefiles:
 	@for target in $(X11_TARGETS) ; do cd $$target ; xmkmf ; cd .. ; done
 
-clean:
-	@for target in $(X11_TARGETS) ; do make -C $$target clean ; done
+#clean:
+#	@for target in $(X11_TARGETS) ; do make -C $$target clean ; done
 
 %: force
 	@$(MAKE) -f ../salma-hayek/universal.make $@
