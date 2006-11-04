@@ -34,7 +34,7 @@ public class FilePropertiesAction extends ETextAction {
         }
         
         ETextArea textArea = window.getTextArea();
-        PTextBuffer buffer = textArea.getTextBuffer();
+        final PTextBuffer buffer = textArea.getTextBuffer();
         String endOfLineString = (String) buffer.getProperty(PTextBuffer.LINE_ENDING_PROPERTY);
         String initialEndOfLine = StringUtilities.escapeForJava(endOfLineString);
         endOfLineStringField.setText(initialEndOfLine);
@@ -43,12 +43,9 @@ public class FilePropertiesAction extends ETextAction {
         String initialIndentationString = StringUtilities.escapeForJava(indentationString);
         indentStringField.setText(initialIndentationString);
         
-        charsetStringField.setText((String) buffer.getProperty(PTextBuffer.CHARSET_PROPERTY));
-        
-        SortedMap<String, Charset> charsets = Charset.availableCharsets();
-        for (String charset : charsets.keySet()) {
-            //System.out.println(charset + " = " + Charset.forName(charset).displayName());
-        }
+        // FIXME: if you add a charset here, you'll probably have to modify ByteBufferDecoder so we can read the resulting file back in.
+        final JComboBox charsetCombo = new JComboBox(new Object[] { "UTF-8", "ISO-8859-1", "UTF-16BE", "UTF-16LE" });
+        charsetCombo.setSelectedItem(buffer.getProperty(PTextBuffer.CHARSET_PROPERTY));
         
         fileTypeField.setText(window.getFileType().getName());
         
@@ -56,19 +53,24 @@ public class FilePropertiesAction extends ETextAction {
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);
-        formPanel.addRow("Character Encoding:", charsetStringField);
-        formPanel.addRow("File Type:", fileTypeField);
-        boolean okay = form.show("Apply");
+        formPanel.addRow("Character Encoding:", charsetCombo);
+        formPanel.addRow("File Type:", fileTypeField); // FIXME: ideally, we'd let the user override this, too.
         
-        if (okay == false) {
-            return;
-        }
-        
-        String newEndOfLine = StringUtilities.unescapeJava(endOfLineStringField.getText());
-        buffer.putProperty(PTextBuffer.LINE_ENDING_PROPERTY, newEndOfLine);
-        String newIndentationString = StringUtilities.unescapeJava(indentStringField.getText());
-        buffer.putProperty(PTextBuffer.INDENTATION_PROPERTY, newIndentationString);
-        String newCharsetName = charsetStringField.getText();
-        buffer.attemptEncoding(newCharsetName);
+        form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
+            public Boolean call() {
+                String newCharsetName = (String) charsetCombo.getSelectedItem();
+                boolean encodingOkay = buffer.attemptEncoding(newCharsetName);
+                if (encodingOkay == false) {
+                    Evergreen.getInstance().showAlert("Can't encode file with encoding", "The " + newCharsetName + " encoding is not capable of representing all characters found in this file.");
+                    return Boolean.FALSE;
+                }
+                String newEndOfLine = StringUtilities.unescapeJava(endOfLineStringField.getText());
+                buffer.putProperty(PTextBuffer.LINE_ENDING_PROPERTY, newEndOfLine);
+                String newIndentationString = StringUtilities.unescapeJava(indentStringField.getText());
+                buffer.putProperty(PTextBuffer.INDENTATION_PROPERTY, newIndentationString);
+                return Boolean.TRUE;
+            }
+        });
+        form.show("Apply");
     }
 }
