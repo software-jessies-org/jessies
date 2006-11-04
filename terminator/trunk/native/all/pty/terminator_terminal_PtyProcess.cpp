@@ -260,18 +260,13 @@ static bool processHasFileOpen(const std::string& pid, const std::string& filena
 }
 
 std::string getProcessName(const std::string& pid) {
-    // "/proc/self/stat" looks something like this on Linux:
-    // 27933 (cat) R 19066 27933 19066 34864 27933 8388608 130 0 0 0 0 0 0 0 16 0 1 0 447453066 2809856 110 4294967295 134512640 134527732 3218535600 3977853053 2097734 0 4 536870912 0 0 0 0 17 1 0 0
-    // And like this on Cygwin:
-    // 1804 (cat) R 1752 1804 1752 0 -1 0 374 374 0 0 15 0 15 0 8 0 0 0 784431493 958464 377 345
-    // FIXME: Solaris doesn't support "/proc/self/stat", but I don't have a machine to test Solaris-specific code on.
-    std::fstream fin((std::string("/proc/") + pid + "/stat").c_str(), std::ios::in);
-    std::string dummyPid, processName("(unknown)");
-    fin >> dummyPid; fin >> processName;
-    if (processName.length() > 2) {
-        // Strip the parentheses off the process name.
-        processName = processName.substr(1, processName.length() - 2);
-    }
+    // We used to use "/proc/<pid>/stat", but stopped because Linux truncates the process name there to 15 characters.
+    // "/proc/<pid>/cmdline" seems to contain a process' full name.
+    // The only thing to be careful of is that the file contains a NUL byte between each argument.
+    // std::string will preserve them until they cause trouble higher up, so we remove them here.
+    std::fstream fin((std::string("/proc/") + pid + "/cmdline").c_str(), std::ios::in);
+    std::string processName("(unknown)");
+    getline(fin, processName, '\0');
     return processName;
 }
 
@@ -287,6 +282,14 @@ void listProcessesUsingTty(std::deque<std::string>& processNames, std::string tt
 #endif
 
 jstring terminator_terminal_PtyProcess::nativeListProcessesUsingTty() {
+    // Say a childless Bash dies with a signal. We'll keep the window open, but the pty is free for reuse.
+    // If the user opens another window (reusing the now-free pty) and then does "Show Info" in the original window, they'll see the new window's processes.
+    // Guard against this by refusing to list processes if our file descriptor for the original pty is no longer open.
+    errno = 0;
+    if (fcntl(fd.get(), F_GETFD) == -1 && errno == EBADF) {
+        return newStringUtf8("(pty closed)");
+    }
+    
     std::deque<std::string> processNames;
     std::string ttyFilename(JniString(m_env, slavePtyName.get()).str());
     
