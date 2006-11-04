@@ -149,12 +149,12 @@ public class FindAndReplaceAction extends ETextAction {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             
-            // If there were captured groups, set the tooltip. (If not, avoid setting an empty
-            // tooltip, because that's not the same as no tooltip, and looks rather silly.)
+            // If there were captured groups, set the tool tip.
+            // (If not, avoid setting an empty tool tip, because that's not the same as no tool tip, and looks rather silly.)
             FindAndReplaceAction.DisplayableMatch match = (FindAndReplaceAction.DisplayableMatch) value;
-            String tooltip = match.getToolTipText();
-            if (tooltip.length() > 0) {
-                setToolTipText(tooltip);
+            String toolTip = match.getToolTipText();
+            if (toolTip.length() > 0) {
+                setToolTipText(toolTip);
             }
             
             return this;
