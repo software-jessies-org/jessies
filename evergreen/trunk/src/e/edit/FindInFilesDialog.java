@@ -490,7 +490,7 @@ public class FindInFilesDialog {
                 saveMonitor.removeSaveListener(saveListener);
             }
         };
-        form.getFormDialog().setAcceptRunnable(runnable);
+        form.getFormDialog().setAcceptCallable(Executors.callable(runnable, Boolean.TRUE));
         form.getFormDialog().setCancelRunnable(runnable);
         form.showNonModal();
     }
