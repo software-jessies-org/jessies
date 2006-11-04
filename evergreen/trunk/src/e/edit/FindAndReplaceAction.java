@@ -103,16 +103,12 @@ public class FindAndReplaceAction extends ETextAction {
         // We keep going around the loop of show-dialog/process-text until:
         // (a) the user cancels the dialog.
         // (b) we make it all through the text performing replacements.
-        boolean finished = false;
-        while (!finished) {
-            boolean shouldReplace = form.show("Replace");
-            if (shouldReplace == false) {
-                finished = true;
-            } else {
-                finished = doReplacementsInText();
+        form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
+            public Boolean call() {
+                return doReplacementsInText();
             }
-        }
-        
+        });
+        form.show("Replace");
         currentTextArea = null;
     }
 
