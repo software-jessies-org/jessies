@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.util.*;
+import java.util.concurrent.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.*;
@@ -45,7 +46,13 @@ public class FormDialog {
     
     private DialogFocusRedirector dialogFocusRedirector;
     
-    private Runnable acceptRunnable = new NoOpRunnable();
+    // Our default accept callable just returns true, allowing the dialog to close.
+    private Callable<Boolean> acceptCallable = new Callable<Boolean>() {
+        public Boolean call() {
+            return Boolean.TRUE;
+        }
+    };
+    
     private Runnable cancelRunnable = new NoOpRunnable();
     
     private FormPanel formPanel;
@@ -339,8 +346,14 @@ public class FormDialog {
      * May be invoked programmatically to dismiss the dialog as if accepted.
      */
     public void acceptDialog() {
-        processUserChoice(true);
-        EventQueue.invokeLater(acceptRunnable);
+        try {
+            Boolean okay = acceptCallable.call();
+            if (okay == Boolean.TRUE) {
+                processUserChoice(true);
+            }
+        } catch (Exception ex) {
+            Log.warn("Accept callable for dialog \"" + dialog.getTitle() + "\" threw an exception", ex);
+        }
     }
     
     /**
@@ -353,6 +366,7 @@ public class FormDialog {
     }
 
     private void processUserChoice(boolean isAcceptance) {
+        restoreFocus();
         textChangeTimer.stop();
         if (doNotRememberBounds == false) {
             dialogGeometries.put(dialog.getTitle(), dialog.getBounds());
@@ -360,7 +374,9 @@ public class FormDialog {
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
         dialog.dispose();
-        
+    }
+    
+    private void restoreFocus() {
         // We want to restore focus to whichever component had it before we were shown, but we mustn't pass on focus until later because we may be here in response to a KeyEvent (such as the user hitting Return to accept the dialog), and it would be wrong for the original focus owner to process that event.
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -494,13 +510,15 @@ public class FormDialog {
     }
     
     /**
-     * Sets an optional runnable that will be run if this dialog is accepted,
+     * Sets an optional Callable that will be run if this dialog is accepted,
      * just before the dialog is removed from the display.
      * 
      * Any intended focus changes should be performed via invokeLater.
+     * 
+     * Return Boolean.TRUE from your Callable to allow the "accept"; Boolean.FALSE to leave the dialog up.
      */
-    public void setAcceptRunnable(Runnable runnable) {
-        this.acceptRunnable = runnable;
+    public void setAcceptCallable(Callable<Boolean> callable) {
+        this.acceptCallable = callable;
     }
     
     /**
