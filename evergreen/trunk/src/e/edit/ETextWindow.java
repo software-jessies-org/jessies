@@ -660,13 +660,20 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     /** Saves the text. Returns true if the file was saved okay. */
     public boolean save() {
+        Evergreen editor = Evergreen.getInstance();
+        
+        PTextBuffer buffer = textArea.getTextBuffer();
+        String charsetName = (String) buffer.getProperty(PTextBuffer.CHARSET_PROPERTY);
+        if (buffer.attemptEncoding(charsetName) == false) {
+            Evergreen.getInstance().showAlert("Can't encode file with encoding", "The " + charsetName + " encoding is not capable of representing all characters found in this file. You can change the file's encoding in the File Properties dialog, available from the View menu.");
+            return false;
+        }
+        
         if (file.exists() && isOutOfDateWithRespectToDisk()) {
             if (showPatchAndAskForConfirmation("Overwrite", "Overwrite the currently saved version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", false) == false) {
                 return false;
             }
         }
-        
-        Evergreen editor = Evergreen.getInstance();
         
         // Try to save a backup copy first. Ideally, we should do this from
         // a timer and always have a recent backup around.
@@ -685,7 +692,7 @@ public class ETextWindow extends EWindow implements PTextListener {
             // The file may be a symbolic link on a CIFS server.
             // In this case, it's important that we write into the original file rather than creating a new one.
             writeToFile(file);
-            textArea.getTextBuffer().getUndoBuffer().setCurrentStateClean();
+            buffer.getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
             editor.showStatus("Saved " + filename);
             backupFile.delete();
