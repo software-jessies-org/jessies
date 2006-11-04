@@ -323,14 +323,16 @@ public class Options {
 			formPanel.addRow(colorPreference.getDescription() + ":", colorPreference.makeUi());
 		}
 		
-		form.getFormDialog().setAcceptRunnable(new Runnable() {
-			public void run() {
+		form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
+			public Boolean call() {
 				PrintWriter out = null;
 				try {
 					out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(getHomeFile(TERMINATOR_SETTINGS_FILENAME)), "UTF-8"));
 					showOptions(out, false);
+					return Boolean.TRUE;
 				} catch (IOException ex) {
 					SimpleDialog.showDetails(null, "Couldn't save preferences.", ex);
+					return Boolean.FALSE;
 				} finally {
 					FileUtilities.close(out);
 				}

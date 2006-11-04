@@ -67,8 +67,8 @@ public class FindDialog {
         });
         
         formDialog = form.getFormDialog();
-        formDialog.setAcceptRunnable(new Runnable() {
-            public void run() {
+        formDialog.setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
+            public Boolean call() {
                 // If the user brought up the dialog, typed a regular
                 // expression, and hit return before the typing timeout went
                 // off, we need to find. Unfortunately, we don't know if we
@@ -79,6 +79,7 @@ public class FindDialog {
                 // some better pattern we just haven't found yet.
                 find();
                 formDialog = null;
+                return Boolean.TRUE;
             }
         });
         formDialog.setCancelRunnable(new Runnable() {
