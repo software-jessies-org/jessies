@@ -333,8 +333,15 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     private void reconfigureForGuessedFileType() {
+        reconfigureForFileType(FileType.guessFileType(filename, textArea.getTextBuffer()));
+    }
+    
+    public void reconfigureForFileType(FileType newFileType) {
         FileType originalFileType = fileType;
-        fileType = FileType.guessFileType(filename, textArea.getTextBuffer());
+        fileType = newFileType;
+        textArea.setWrapStyleWord(false);
+        // Not all the FileTypes have an indenter but they all have a styler.
+        textArea.setIndenter(new PDefaultIndenter(textArea));
         if (fileType == FileType.JAVA) {
             textArea.setIndenter(new PJavaIndenter(textArea));
             textArea.setTextStyler(new PJavaTextStyler(textArea));
@@ -365,6 +372,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         } else {
             // Plain text.
             textArea.setWrapStyleWord(true);
+            textArea.setTextStyler(new PPlainTextStyler(textArea));
         }
         if (fileType != originalFileType) {
             initSpellingExceptionsForDocument();
