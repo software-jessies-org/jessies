@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.util.*;
+import java.util.*;
 import java.util.regex.*;
 
 public enum FileType {
@@ -23,6 +24,23 @@ public enum FileType {
     
     public String getName() {
         return name;
+    }
+    
+    public static Set<String> getAllFileTypeNames() {
+        TreeSet<String> allFileTypeNames = new TreeSet<String>();
+        for (FileType fileType : EnumSet.allOf(FileType.class)) {
+            allFileTypeNames.add(fileType.getName());
+        }
+        return allFileTypeNames;
+    }
+    
+    public static FileType fromName(String name) {
+        for (FileType fileType : EnumSet.allOf(FileType.class)) {
+            if (fileType.getName().equals(name)) {
+                return fileType;
+            }
+        }
+        throw new IllegalArgumentException("\"" + name + "\" doesn't denote a FileType");
     }
     
     /**

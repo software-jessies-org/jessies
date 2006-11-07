@@ -19,8 +19,6 @@ public class FilePropertiesAction extends ETextAction {
     
     private JTextField endOfLineStringField = new JTextField("", 40);
     private JTextField indentStringField = new JTextField("", 40);
-    private JTextField charsetStringField = new JTextField("", 40);
-    private JLabel fileTypeField = new JLabel(" ");
     
     public FilePropertiesAction() {
         super(ACTION_NAME);
@@ -28,7 +26,7 @@ public class FilePropertiesAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextWindow window = getFocusedTextWindow();
+        final ETextWindow window = getFocusedTextWindow();
         if (window == null) {
             return;
         }
@@ -47,14 +45,15 @@ public class FilePropertiesAction extends ETextAction {
         final JComboBox charsetCombo = new JComboBox(new Object[] { "UTF-8", "ISO-8859-1", "UTF-16BE", "UTF-16LE" });
         charsetCombo.setSelectedItem(buffer.getProperty(PTextBuffer.CHARSET_PROPERTY));
         
-        fileTypeField.setText(window.getFileType().getName());
+        final JComboBox fileTypeCombo = new JComboBox(new Vector<String>(FileType.getAllFileTypeNames()));
+        fileTypeCombo.setSelectedItem(window.getFileType().getName());
         
         FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "File Properties");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);
         formPanel.addRow("Character Encoding:", charsetCombo);
-        formPanel.addRow("File Type:", fileTypeField); // FIXME: ideally, we'd let the user override this, too.
+        formPanel.addRow("File Type:", fileTypeCombo);
         
         form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
             public Boolean call() {
@@ -68,6 +67,8 @@ public class FilePropertiesAction extends ETextAction {
                 buffer.putProperty(PTextBuffer.LINE_ENDING_PROPERTY, newEndOfLine);
                 String newIndentationString = StringUtilities.unescapeJava(indentStringField.getText());
                 buffer.putProperty(PTextBuffer.INDENTATION_PROPERTY, newIndentationString);
+                String newFileTypeName = (String) fileTypeCombo.getSelectedItem();
+                window.reconfigureForFileType(FileType.fromName(newFileTypeName));
                 return Boolean.TRUE;
             }
         });
