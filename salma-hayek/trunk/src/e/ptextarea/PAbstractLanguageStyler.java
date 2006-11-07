@@ -276,14 +276,13 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         if (textArea.isLineWrappingInvalid()) {
             return;
         }
-        CharSequence seq = textArea.getTextBuffer();
-        StringBuilder buf = new StringBuilder();
-        String prefix = seq.subSequence(Math.max(0, event.getOffset() - 2), event.getOffset()).toString();
+        CharSequence entireText = textArea.getTextBuffer();
+        String prefix = entireText.subSequence(Math.max(0, event.getOffset() - 2), event.getOffset()).toString();
         int endIndex = event.getOffset();
         if (event.isInsert()) {
             endIndex += event.getLength();
         }
-        String suffix = seq.subSequence(endIndex, Math.min(endIndex + 1, seq.length())).toString();
+        String suffix = entireText.subSequence(endIndex, Math.min(endIndex + 1, entireText.length())).toString();
         String withMiddleText = prefix + event.getCharacters() + suffix;
         String withoutMiddleText = prefix + suffix;
         if (hasCommentMarker(withMiddleText) || hasCommentMarker(withoutMiddleText) || hasNewline(event.getCharacters())) {
