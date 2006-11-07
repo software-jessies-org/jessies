@@ -459,7 +459,7 @@ public class Evergreen {
     }
     
     public void createWorkspaceForCurrentDirectory() {
-        String currentDirectory = Parameters.getParameter("user.dir");
+        String currentDirectory = System.getProperty("user.dir");
         String workspaceName = currentDirectory.substring(currentDirectory.lastIndexOf(File.separatorChar) + 1);
         createWorkspace(workspaceName, currentDirectory);
     }
