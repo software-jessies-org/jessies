@@ -46,7 +46,7 @@ public class PPythonTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
-    protected boolean supportSlashStarComments() {
+    protected boolean supportMultiLineComments() {
         return false;
     }
     

@@ -196,7 +196,7 @@ public class PJavaTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
-    protected boolean supportSlashStarComments() {
+    protected boolean supportMultiLineComments() {
         return true;
     }
     

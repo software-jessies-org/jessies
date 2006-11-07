@@ -32,9 +32,10 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
     }
     
     /**
-     * Returns true if the style should count text in a C-like comment (such as this) as comment.
+     * Returns true if the style includes multi-line comments.
+     * The multiLineCommentStart and multiLineCommentEnd methods are then used to get the actual delimiters used.
      */
-    protected abstract boolean supportSlashStarComments();
+    protected abstract boolean supportMultiLineComments();
     
     protected String multiLineCommentStart() {
         return "/*";
@@ -150,7 +151,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                     break;
                 }
                 
-                if (supportSlashStarComments() && line.startsWith(multiLineCommentStart(), i)) {
+                if (supportMultiLineComments() && line.startsWith(multiLineCommentStart(), i)) {
                     comment = true;
                     if (lastStart < i) {
                         builder.addStyledSegment(i, PStyle.NORMAL);
@@ -244,7 +245,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                         if (escaped == false && isQuote(thisChar)) {
                             lastQuote = thisChar;
                         }
-                        if (supportSlashStarComments() && line.startsWith(multiLineCommentStart(), i)) {
+                        if (supportMultiLineComments() && line.startsWith(multiLineCommentStart(), i)) {
                             comment = true;
                             i += multiLineCommentStart().length();
                         } else if (isStartOfCommentToEndOfLine(line, i)) {
@@ -276,7 +277,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         }
         
         boolean startsOrEndsMultiLineComment = false;
-        if (supportSlashStarComments()) {
+        if (supportMultiLineComments()) {
             int HORIZON = Math.max(multiLineCommentStart().length(), multiLineCommentEnd().length());
             CharSequence entireText = textArea.getTextBuffer();
             String prefix = entireText.subSequence(Math.max(0, event.getOffset() - HORIZON), event.getOffset()).toString();
