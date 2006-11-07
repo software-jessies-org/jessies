@@ -36,6 +36,14 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
      */
     protected abstract boolean supportSlashStarComments();
     
+    protected String multiLineCommentStart() {
+        return "/*";
+    }
+    
+    protected String multiLineCommentEnd() {
+        return "*/";
+    }
+    
     /**
      * Returns the text that introduces comment-to-EOL ("//" in the C family, "#" in the script family, and "--" in various "European" languages) if there's such a thing, null otherwise.
      */
@@ -120,11 +128,11 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         int lastStart = 0;
         for (int i = 0; i < line.length(); ) {
             if (comment) {
-                int commentEndIndex = line.indexOf("*/", i);
+                int commentEndIndex = line.indexOf(multiLineCommentEnd(), i);
                 if (commentEndIndex == -1) {
                     commentEndIndex = line.length();
                 } else {
-                    commentEndIndex += 2;
+                    commentEndIndex += multiLineCommentEnd().length();
                 }
                 builder.addStyledSegment(commentEndIndex, PStyle.COMMENT);
                 i = commentEndIndex;
@@ -142,23 +150,14 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                     break;
                 }
                 
-                char ch = line.charAt(i);
-                if (ch == '/') {
-                    if (i < line.length() - 1) {
-                        if (supportSlashStarComments() && line.charAt(i + 1) == '*') {
-                            comment = true;
-                            if (lastStart < i) {
-                                builder.addStyledSegment(i, PStyle.NORMAL);
-                            }
-                            lastStart = i;
-                            i += 2;
-                        } else {
-                            i++;
-                        }
-                    } else {
-                        i++;
+                if (supportSlashStarComments() && line.startsWith(multiLineCommentStart(), i)) {
+                    comment = true;
+                    if (lastStart < i) {
+                        builder.addStyledSegment(i, PStyle.NORMAL);
                     }
-                } else if (isQuote(ch)) {
+                    lastStart = i;
+                    i += multiLineCommentStart().length();
+                } else if (isQuote(line.charAt(i))) {
                     if (lastStart < i) {
                         builder.addStyledSegment(i, PStyle.NORMAL);
                     }
@@ -228,7 +227,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         while (true) {
             if (comment) {
                 // Commented - comments eat strings.
-                int endIndex = line.indexOf("*/", index);
+                int endIndex = line.indexOf(multiLineCommentEnd(), index);
                 if (endIndex == -1) {
                     break;
                 }
@@ -245,11 +244,10 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                         if (escaped == false && isQuote(thisChar)) {
                             lastQuote = thisChar;
                         }
-                        if (supportSlashStarComments() && previous == '/' && thisChar == '*') {
+                        if (supportSlashStarComments() && line.startsWith(multiLineCommentStart(), i)) {
                             comment = true;
-                            index = i + 1;
-                            break;
-                        } else if (previous == '/' && thisChar == '/') {
+                            i += multiLineCommentStart().length();
+                        } else if (isStartOfCommentToEndOfLine(line, i)) {
                             break;
                         }
                     } else {
@@ -276,16 +274,23 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         if (textArea.isLineWrappingInvalid()) {
             return;
         }
-        CharSequence entireText = textArea.getTextBuffer();
-        String prefix = entireText.subSequence(Math.max(0, event.getOffset() - 2), event.getOffset()).toString();
-        int endIndex = event.getOffset();
-        if (event.isInsert()) {
-            endIndex += event.getLength();
+        
+        boolean startsOrEndsMultiLineComment = false;
+        if (supportSlashStarComments()) {
+            int HORIZON = Math.max(multiLineCommentStart().length(), multiLineCommentEnd().length());
+            CharSequence entireText = textArea.getTextBuffer();
+            String prefix = entireText.subSequence(Math.max(0, event.getOffset() - HORIZON), event.getOffset()).toString();
+            int endIndex = event.getOffset();
+            if (event.isInsert()) {
+                endIndex += event.getLength();
+            }
+            String suffix = entireText.subSequence(endIndex, Math.min(endIndex + HORIZON, entireText.length())).toString();
+            String withMiddleText = prefix + event.getCharacters() + suffix;
+            String withoutMiddleText = prefix + suffix;
+            startsOrEndsMultiLineComment = hasCommentMarker(withMiddleText) || hasCommentMarker(withoutMiddleText);
         }
-        String suffix = entireText.subSequence(endIndex, Math.min(endIndex + 1, entireText.length())).toString();
-        String withMiddleText = prefix + event.getCharacters() + suffix;
-        String withoutMiddleText = prefix + suffix;
-        if (hasCommentMarker(withMiddleText) || hasCommentMarker(withoutMiddleText) || hasNewline(event.getCharacters())) {
+        
+        if (hasNewline(event.getCharacters()) || startsOrEndsMultiLineComment) {
             lastGoodLine = Math.min(lastGoodLine, textArea.getLineList().getLineIndex(event.getOffset()));
             textArea.repaintFromLine(textArea.getSplitLineIndex(lastGoodLine));
         }
@@ -296,7 +301,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
     }
     
     private boolean hasCommentMarker(String text) {
-        return text.contains("/*") || text.contains("*/");
+        return text.contains(multiLineCommentStart()) || text.contains(multiLineCommentEnd());
     }
     
     protected class TextSegmentListBuilder {

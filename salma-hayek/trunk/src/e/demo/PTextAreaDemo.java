@@ -48,6 +48,8 @@ public class PTextAreaDemo {
                 return new PJavaTextStyler(textArea);
             } else if (extension.equals("py")) {
                 return new PPythonTextStyler(textArea);
+            } else if (extension.equals("html") || extension.equals("xml")) {
+                return new PXmlTextStyler(textArea);
             }
         }
         return null;
