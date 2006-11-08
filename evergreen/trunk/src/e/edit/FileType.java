@@ -14,7 +14,8 @@ public enum FileType {
     RUBY("Ruby"),
     PERL("Perl"),
     PYTHON("Python"),
-    VHDL("VHDL");
+    VHDL("VHDL"),
+    XML("XML");
     
     private final String name;
     
@@ -83,6 +84,8 @@ public enum FileType {
             return FileType.MAKE;
         } else if (filename.endsWith(".vhd")) {
             return FileType.VHDL;
+        } else if (filename.endsWith(".xml") || filename.endsWith(".html") || filename.endsWith(".shtml") || filename.endsWith(".plist") || filename.endsWith(".vm")) {
+            return FileType.XML;
         } else {
             return FileType.PLAIN_TEXT;
         }
