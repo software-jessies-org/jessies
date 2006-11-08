@@ -84,7 +84,7 @@ public enum FileType {
             return FileType.MAKE;
         } else if (filename.endsWith(".vhd")) {
             return FileType.VHDL;
-        } else if (filename.endsWith(".xml") || filename.endsWith(".html") || filename.endsWith(".shtml") || filename.endsWith(".plist") || filename.endsWith(".vm")) {
+        } else if (filename.endsWith(".xml") || filename.endsWith(".html") || filename.endsWith(".shtml") || filename.endsWith(".plist") || filename.endsWith(".vm") || filename.endsWith(".wxs")) {
             return FileType.XML;
         } else {
             return FileType.PLAIN_TEXT;
