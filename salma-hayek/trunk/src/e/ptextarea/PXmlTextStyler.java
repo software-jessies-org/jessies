@@ -8,6 +8,10 @@ import java.util.*;
 public class PXmlTextStyler extends PAbstractLanguageStyler {
     public PXmlTextStyler(PTextArea textArea) {
         super(textArea);
+        // We add the tag-recognizing applicator first so that the standard hyperlink applicator doesn't interfere with it.
+        textArea.addStyleApplicatorFirst(new RegularExpressionStyleApplicator(textArea, "(<.*?>)", PStyle.KEYWORD));
+        // FIXME: we probably need code similar to what we have in the Java styler to recognize bad/unclosed entities.
+        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "(&.*?;)", PStyle.KEYWORD));
     }
     
     @Override
