@@ -369,6 +369,9 @@ public class ETextWindow extends EWindow implements PTextListener {
         } else if (fileType == FileType.VHDL) {
             //textArea.setIndenter(new PVhdlIndenter(textArea));
             textArea.setTextStyler(new PVhdlTextStyler(textArea));
+        } else if (fileType == FileType.XML) {
+            //textArea.setIndenter(new PXmlIndenter(textArea));
+            textArea.setTextStyler(new PXmlTextStyler(textArea));
         } else {
             // Plain text.
             textArea.setWrapStyleWord(true);
