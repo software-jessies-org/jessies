@@ -135,6 +135,20 @@ public class TerminalControl {
 		this.characterSet = index;
 	}
 	
+	/**
+	 * Ensures that ^N and ^O are handled at the proper time.
+	 * If we just call invokeCharacterSet they jump any pending text in the terminalActions queue.
+	 * Before this fix, "echo hello ^N world" would all appear in character set 1.
+	 */
+	public void invokeCharacterSetLater(final int index) {
+		flushLineBuffer();
+		terminalActions.add(new TerminalAction() {
+			public void perform(TextBuffer listener) {
+				invokeCharacterSet(index);
+			}
+		});
+	}
+	
 	public void setAutomaticNewline(boolean automatic) {
 		this.automaticNewline = automatic;
 	}
@@ -306,9 +320,9 @@ public class TerminalControl {
 			doStep();
 			processSpecialCharacter(ch);
 		} else if (ch == Ascii.SO) {
-			invokeCharacterSet(1);
+			invokeCharacterSetLater(1);
 		} else if (ch == Ascii.SI) {
-			invokeCharacterSet(0);
+			invokeCharacterSetLater(0);
 		} else if (ch == Ascii.BEL) {
 			pane.flash();
 		} else if (ch == Ascii.NUL) {
