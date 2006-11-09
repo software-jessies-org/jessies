@@ -4,6 +4,10 @@ import e.util.*;
 import terminator.model.*;
 import terminator.terminal.*;
 
+/**
+ * Recognizes escape sequences consisting of ASCII ESC followed by a single character.
+ * Note that most of these are mainly of historical interest, even though some of them look similar to more common sequences.
+ */
 public class SingleCharEscapeAction implements TerminalAction {
 	private TerminalControl control;
 	private char escChar;
@@ -53,12 +57,17 @@ public class SingleCharEscapeAction implements TerminalAction {
 			case 'c':  // Power on (full reset).
 				listener.fullReset();
 				break;
+				
+			// Change character set.
+			// Note that these are different to the related ^N and ^O sequences, which select character sets 1 and 0 and are handled elsewhere.
+			// These sequences ("^[n" and "^[o") are even less common than their relatives.
 			case 'n':
 				control.invokeCharacterSet(2);
 				break;
 			case 'o':
 				control.invokeCharacterSet(3);
 				break;
+				
 			case '|':
 			case '}':
 			case '~':
