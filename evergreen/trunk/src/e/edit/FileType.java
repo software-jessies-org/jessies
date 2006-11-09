@@ -84,7 +84,7 @@ public enum FileType {
             return FileType.MAKE;
         } else if (filename.endsWith(".vhd")) {
             return FileType.VHDL;
-        } else if (filename.endsWith(".xml") || filename.endsWith(".html") || filename.endsWith(".shtml") || filename.endsWith(".plist") || filename.endsWith(".vm") || filename.endsWith(".wxs")) {
+        } else if (filename.endsWith(".xml") || filename.endsWith(".html") || filename.endsWith(".shtml") || filename.endsWith(".vm")) {
             return FileType.XML;
         } else {
             return FileType.PLAIN_TEXT;
@@ -102,6 +102,8 @@ public enum FileType {
             return FileType.PERL;
         } else if (isPythonContent(content)) {
             return FileType.PYTHON;
+        } else if (isXmlContent(content)) {
+            return FileType.XML;
         } else {
             return FileType.PLAIN_TEXT;
         }
@@ -159,5 +161,10 @@ public enum FileType {
         // FIXME: emacs mode strings should be handled separately, and override content-based file type determination.
         // FIXME: gEdit's "modelines" plug-in http://cvs.gnome.org/viewcvs/gedit/plugins/modelines/ details emacs(1), kate(1), and vim(1) mode lines.
         return Pattern.compile("(#ifndef|" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ")").matcher(content).find();
+    }
+    
+    /** Tests whether the 'content' looks like XML. */
+    private static boolean isXmlContent(CharSequence content) {
+        return Pattern.compile("(?i)^<\\?xml").matcher(content).find();
     }
 }
