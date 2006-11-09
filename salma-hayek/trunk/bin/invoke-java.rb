@@ -266,8 +266,7 @@ class Java
     # Back-quoting anything causes a flickering window on startup for Terminator on Windows.
     # The salma-hayek Java launcher already contains a version check.
     # The version check often "gets stuck" on Cygwin when running javahpp.
-    # Process Explorer says there are just two Ruby processes left running:
-    # the child we're back-quoting has already quit.
+    # Process Explorer says there are just two Ruby processes left running: the child we're back-quoting has already quit.
     if target_os() != "Cygwin"
       check_java_version()
     end
@@ -280,7 +279,16 @@ class Java
     # forms. (Sun's Win32 JVM expects ';'-separated paths.)
     add_pathnames_property("java.class.path", @class_path)
     add_pathnames_property("java.library.path", @library_path)
-
+    
+    # Fix the path so that our support binaries are on it.
+    subvertPath()
+    
+    # Since we're often started from the command line or from other programs, set up startup notification ourselves if it looks like we should.
+    if ENV['DISPLAY'] != nil && ENV['DESKTOP_STARTUP_ID'] == nil
+      id=`gnome-startup start Starting #{@dock_name}`.chomp()
+      ENV['DESKTOP_STARTUP_ID'] = id
+    end
+    
     # Pass any GNOME startup notification id through as a system property.
     # That way it isn't accidentally inherited by the JVM's children.
     # We test for the empty string because GDK doesn't unset the variable, it sets it to the empty string, presumably for portability reasons.
@@ -329,7 +337,6 @@ class Java
     args.concat(extra_app_arguments)
     args.concat(ARGV)
     #$stderr.puts(args)
-    subvertPath()
     if logging
       failed = system(*args) == false
       if failed
