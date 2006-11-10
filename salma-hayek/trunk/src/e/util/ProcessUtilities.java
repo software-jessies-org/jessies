@@ -87,10 +87,9 @@ public class ProcessUtilities {
      * listener may be null.
      */
     public static void spawn(final File directory, final String[] command, final ProcessListener listener) {
-        System.err.println("Spawning '" + StringUtilities.join(command, " ") + "'.");
         try {
             final Process p = Runtime.getRuntime().exec(command, null, directory);
-            new Thread("Process Spawn: " + command[0]) {
+            new Thread("Process Spawn: " + shellQuotedFormOf(Arrays.asList(command))) {
                 public void run() {
                     try {
                         p.getOutputStream().close();
