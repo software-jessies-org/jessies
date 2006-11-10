@@ -40,7 +40,7 @@ public class ProcessUtilities {
                 public void run() {
                     readLinesFromStream(errorLineListener, p.getErrorStream());
                 }
-            }, "Process Back-Quote: " + command[0]).start();
+            }, "Process Back-Quote: " + shellQuotedFormOf(Arrays.asList(command))).start();
             return p.waitFor();
         } catch (Exception ex) {
             ex.printStackTrace();
