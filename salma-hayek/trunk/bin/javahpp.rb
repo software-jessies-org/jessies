@@ -6,4 +6,5 @@ salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
 require "#{salma_hayek}/bin/invoke-java.rb"
 
 invoker = Java.new("JavaHpp", "e/tools/JavaHpp")
+invoker.initiate_startup_notification = false
 invoker.invoke()

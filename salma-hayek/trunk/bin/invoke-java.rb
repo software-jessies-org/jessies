@@ -85,7 +85,8 @@ class Java
   attr_accessor(:dock_name)
   attr_accessor(:launcher)
   attr_accessor(:log_filename)
-
+  attr_accessor(:initiate_startup_notification)
+  
   def initialize(name, class_name)
     @dock_name = name
     @dock_icon = ""
@@ -93,6 +94,7 @@ class Java
     @class_name = class_name
     @launcher = "java"
     @log_filename = ""
+    @initiate_startup_notification = true
 
     # Cope with symbolic links to this script.
     @project_root = Pathname.new("#{$0}/..").realpath().dirname()
@@ -284,7 +286,7 @@ class Java
     subvertPath()
     
     # Since we're often started from the command line or from other programs, set up startup notification ourselves if it looks like we should.
-    if ENV['DISPLAY'] != nil && ENV['DESKTOP_STARTUP_ID'] == nil
+    if @initiate_startup_notification && ENV['DISPLAY'] != nil && ENV['DESKTOP_STARTUP_ID'] == nil
       id=`gnome-startup start Starting #{@dock_name}`.chomp()
       ENV['DESKTOP_STARTUP_ID'] = id
     end
