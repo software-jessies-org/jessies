@@ -448,7 +448,9 @@ public class FatBits extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 GuiUtilities.initLookAndFeel();
-                new FatBits().setVisible(true);
+                FatBits fatBits = new FatBits();
+                fatBits.setVisible(true);
+                GuiUtilities.finishGnomeStartup();
             }
         });
     }
