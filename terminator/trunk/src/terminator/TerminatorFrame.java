@@ -348,4 +348,16 @@ public class TerminatorFrame extends JFrame {
 		switchToTabbedPane();
 		tabbedPane.addTab(newPane.getName(), newPane);
 	}
+	
+	public void optionsDidChange() {
+		// Replace the menu bar, working around Sun bug 4949810.
+		JMenuBar menuBar = new TerminatorMenuBar();
+		setJMenuBar(menuBar);
+		menuBar.revalidate();
+		
+		for (JTerminalPane terminal : terminals) {
+			terminal.optionsDidChange();
+		}
+		repaint();
+	}
 }

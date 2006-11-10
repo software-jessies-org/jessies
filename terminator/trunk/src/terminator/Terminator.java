@@ -128,9 +128,20 @@ public class Terminator {
 	/**
 	 * Invoked by the preferences dialog whenever an option is changed.
 	 */
-	public void repaintUi() {
+	public void optionsDidChange() {
+		// On the Mac, the Command key (called 'meta' by Java) is always used for keyboard equivalents.
+		// On other systems, Control tends to be used, but in the special case of terminal emulators this conflicts with the ability to type control characters.
+		// The traditional work-around has always been to use Alt, which -- conveniently for Mac users -- is in the same place on a PC keyboard as Command on a Mac keyboard.
+		// Things are complicated if we want to support emacs(1), which uses the alt key as meta.
+		// Things are complicated in a different direction if we want to support input methods that use alt.
+		// At the moment, we assume that Linux users who want characters not on their keyboard will switch keyboard mapping dynamically (which works fine).
+		// We can avoid the question on Mac OS for now because disabling input methods doesn't currently work properly, and we don't get the key events anyway.
+		if (GuiUtilities.isMacOs() == false) {
+			GuiUtilities.setDefaultKeyStrokeModifier(Options.getSharedInstance().shouldUseAltKeyAsMeta() ? java.awt.event.KeyEvent.SHIFT_MASK | java.awt.event.KeyEvent.CTRL_MASK : java.awt.event.KeyEvent.ALT_MASK);
+		}
+		
 		for (int i = 0; i < frames.size(); ++i) {
-			frames.get(i).repaint();
+			frames.get(i).optionsDidChange();
 		}
 	}
 	
@@ -174,22 +185,10 @@ public class Terminator {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					/**
-					 * On the Mac, the Command key (called 'meta' by Java) is always
-					 * used for keyboard equivalents. On other systems, Control tends to
-					 * be used, but in the special case of terminal emulators this
-					 * conflicts with the ability to type control characters. The
-					 * traditional work-around has always been to use Alt, which --
-					 * conveniently for Mac users -- is in the same place on a PC
-					 * keyboard as Command on a Mac keyboard.
-					 */
-					if (GuiUtilities.isMacOs() == false) {
-						GuiUtilities.setDefaultKeyStrokeModifier(java.awt.event.KeyEvent.ALT_MASK);
-					}
-					
 					GuiUtilities.initLookAndFeel();
+					Terminator.getSharedInstance().optionsDidChange();
 					
-					// On Mac OS, tab panes use a lot of space. This makes them slightly less greedy.
+					// On Mac OS, tabbed panes use a lot of space. This makes them slightly less greedy.
 					UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
 					
 					PrintWriter outWriter = new PrintWriter(System.out);

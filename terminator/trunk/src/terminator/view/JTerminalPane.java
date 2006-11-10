@@ -105,9 +105,17 @@ public class JTerminalPane extends JPanel {
 		return viewport.getSize();
 	}
 	
+	public void optionsDidChange() {
+		if (Options.getSharedInstance().shouldUseAltKeyAsMeta()) {
+			// If we want to handle key events when alt is down, we need to turn off input methods.
+			textPane.enableInputMethods(false);
+		}
+	}
+	
 	private void init(List<String> command, String workingDirectory) {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
+		optionsDidChange();
 		
 		initOutputSpinner();
 		
@@ -363,6 +371,10 @@ public class JTerminalPane extends JPanel {
 		// Handle key presses which generate keyTyped events.
 		private String getUtf8ForKeyEvent(KeyEvent e) {
 			char ch = e.getKeyChar();
+			// Interpret the alt key as meta if that's what the user asked for. 
+			if (Options.getSharedInstance().shouldUseAltKeyAsMeta() && e.isAltDown()) {
+				return Ascii.ESC + String.valueOf(e.getKeyChar());
+			}
 			if (e.isControlDown() && ch == '\t') {
 				// doKeyboardTabSwitch already handled this.
 				return null;

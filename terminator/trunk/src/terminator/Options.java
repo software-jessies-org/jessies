@@ -40,6 +40,7 @@ public class Options {
 	private static final String LOGIN_SHELL = "loginShell";
 	private static final String SCROLL_KEY = "scrollKey";
 	private static final String SCROLL_TTY_OUTPUT = "scrollTtyOutput";
+	private static final String USE_ALT_AS_META = "useAltAsMeta";
 	private static final String USE_MENU_BAR = "useMenuBar";
 	
 	private final Pattern resourcePattern = Pattern.compile("(?:Terminator(?:\\*|\\.))?(\\S+):\\s*(.+)");
@@ -149,6 +150,15 @@ public class Options {
 	 */
 	public boolean shouldUseMenuBar() {
 		return booleanResource(USE_MENU_BAR);
+	}
+	
+	/**
+	 * Whether or not the alt key should be meta.
+	 * If true, you can't use alt as part of your system's input method.
+	 * If false, you can't comfortably use emacs(1).
+	 */
+	public boolean shouldUseAltKeyAsMeta() {
+		return booleanResource(USE_ALT_AS_META);
 	}
 	
 	public int getInternalBorder() {
@@ -276,6 +286,7 @@ public class Options {
 		addDefault(LOGIN_SHELL, Boolean.TRUE, "Start child process with a '-l' argument?");
 		addDefault(SCROLL_KEY, Boolean.TRUE, "Scroll to bottom on key press?");
 		addDefault(SCROLL_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output?");
+		addDefault(USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key?");
 		
 		if (GuiUtilities.isMacOs() || GuiUtilities.isWindows() || GuiUtilities.isGtk()) {
 			// GNOME, Mac, and Win32 users are accustomed to every window having a menu bar.
@@ -353,7 +364,7 @@ public class Options {
 			checkBox.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					options.put(key, checkBox.isSelected());
-					Terminator.getSharedInstance().repaintUi();
+					Terminator.getSharedInstance().optionsDidChange();
 				}
 			});
 			return checkBox;
@@ -381,7 +392,7 @@ public class Options {
 				public void actionPerformed(ActionEvent e) {
 					options.put(key, makePrototypeFont(comboBox.getSelectedItem().toString()));
 					updateComboBoxFont(comboBox);
-					Terminator.getSharedInstance().repaintUi();
+					Terminator.getSharedInstance().optionsDidChange();
 				}
 			});
 			// updateComboBoxFont sets the combo box font so that when you choose a font you can see a preview.
@@ -427,7 +438,7 @@ public class Options {
 					if (newColor != null) {
 						options.put(key, newColor);
 						icon.setColor(newColor);
-						Terminator.getSharedInstance().repaintUi();
+						Terminator.getSharedInstance().optionsDidChange();
 					}
 				}
 			});
@@ -457,7 +468,7 @@ public class Options {
 						// FIXME: really, an integer preference should have an explicit range.
 						if (newValue > 0) {
 							options.put(key, newValue);
-							Terminator.getSharedInstance().repaintUi();
+							Terminator.getSharedInstance().optionsDidChange();
 							okay = true;
 						}
 					} catch (NumberFormatException ex) {
