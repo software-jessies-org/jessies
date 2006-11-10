@@ -246,6 +246,8 @@ public class GuiUtilities {
                 UIManager.put("OptionPane.border", makeEmptyBorderResource(15-3, 24-3, 20-3, 24-3));
                 UIManager.put("OptionPane.messageAreaBorder", makeEmptyBorderResource(0, 0, 0, 0));
                 UIManager.put("OptionPane.buttonAreaBorder", makeEmptyBorderResource(16-3, 0, 0, 0));
+                // On Mac OS, standard tabbed panes use way too much space. This makes them slightly less greedy.
+                UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
