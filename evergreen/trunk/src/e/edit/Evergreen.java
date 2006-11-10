@@ -784,7 +784,6 @@ public class Evergreen {
         InetAddress wildcardAddress = null;
         new InAppServer("EditServer", getPreferenceFilename("edit-server-port"), wildcardAddress, EditServer.class, new EditServer(this));
         
-        UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
         tabbedPane = new EvergreenTabbedPane();
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabbedPane, tagsPanel);
