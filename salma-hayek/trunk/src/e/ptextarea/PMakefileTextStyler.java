@@ -3,7 +3,9 @@ package e.ptextarea;
 import java.util.*;
 
 public class PMakefileTextStyler extends PAbstractLanguageStyler {
-    // http://www.gnu.org/software/make/manual/html_mono/make.html "Index of Functions, Variables, & Directives":
+    // See http://www.gnu.org/software/make/manual/html_mono/make.html "Index of Functions, Variables, & Directives".
+    // Regenerate with:
+    // wget -q -O - http://www.gnu.org/software/make/manual/html_node/Name-Index.html | ruby -ne '$_.match(/<code>([a-z][^A-Z]*)<\/code>/) && puts("\"#$1\",")' | sort -u | grep -Ev '^"make(file)?",'
     private static final String[] KEYWORDS = new String[] {
         "abspath",
         "addprefix",
