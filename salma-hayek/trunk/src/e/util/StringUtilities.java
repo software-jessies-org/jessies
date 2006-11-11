@@ -252,6 +252,54 @@ public class StringUtilities {
         return false;
     }
     
+    /**
+     * See java.lang.String.indexOf.
+     */
+    public static int indexOf(CharSequence haystack, CharSequence needle, int fromIndex) {
+        // This code is the same as that implementing String and StringBuilder's indexOf, only CharSequence rather than char[].
+        // We preserve the full generality, but don't use it.
+        // The only changes below this block of declarations is to use charAt rather than [].
+        final CharSequence source = haystack;
+        final CharSequence target = needle;
+        final int sourceOffset = 0;
+        final int targetOffset = 0;
+        final int sourceCount = haystack.length();
+        final int targetCount = needle.length();
+        
+        if (fromIndex >= sourceCount) {
+            return (targetCount == 0 ? sourceCount : -1);
+        }
+        if (fromIndex < 0) {
+            fromIndex = 0;
+        }
+        if (targetCount == 0) {
+            return fromIndex;
+        }
+        
+        char first = target.charAt(targetOffset);
+        int max = sourceOffset + (sourceCount - targetCount);
+        
+        for (int i = sourceOffset + fromIndex; i <= max; i++) {
+            /* Look for first character. */
+            if (source.charAt(i) != first) {
+                while (++i <= max && source.charAt(i) != first);
+            }
+            
+            /* Found first character, now look at the rest of v2 */
+            if (i <= max) {
+                int j = i + 1;
+                int end = j + targetCount - 1;
+                for (int k = targetOffset + 1; j < end && source.charAt(j) == target.charAt(k); j++, k++);
+                
+                if (j == end) {
+                    /* Found whole string. */
+                    return i - sourceOffset;
+                }
+            }
+        }
+        return -1;
+    }
+    
     public static String stackTraceFromThrowable(Throwable throwable) {
         StringWriter stringWriter = new StringWriter();
         throwable.printStackTrace(new PrintWriter(stringWriter));

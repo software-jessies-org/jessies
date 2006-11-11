@@ -1,5 +1,6 @@
 package e.ptextarea;
 
+import e.util.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -44,7 +45,7 @@ public class PNewlineInserter {
                 return;
             }
             
-            if (Pattern.matches("[ \t]*/\\*{1,2}", lineToTheLeft)) {
+            if (isUnclosedComment(chars, startPosition, lineToTheLeft)) {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");
@@ -54,6 +55,23 @@ public class PNewlineInserter {
         } finally {
             textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();
         }
+    }
+    
+    private boolean isUnclosedComment(CharSequence entireDocument, int insertionPosition, CharSequence lineToTheLeft) {
+        if (Pattern.matches("[ \t]*/\\*{1,2}", lineToTheLeft)) {
+            // We're on a line that starts a block comment, but is it unclosed?
+            int nextOpenComment = StringUtilities.indexOf(entireDocument, "/*", insertionPosition);
+            int nextCloseComment = StringUtilities.indexOf(entireDocument, "*/", insertionPosition);
+            if (nextCloseComment == -1) {
+                // If there are no close comments after this point, this one we're looking at must be unclosed.
+                return true;
+            }
+            if (nextOpenComment != -1 && nextOpenComment < nextCloseComment) {
+                // If there's an open comment after this point, and no intervening close comment, the one we're looking at must be unclosed.
+                return true;
+            }
+        }
+        return false;
     }
     
     // TODO: Doesn't belong here.
