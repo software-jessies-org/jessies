@@ -610,6 +610,7 @@ public class Evergreen {
         }
         frame.setLocation(initialLocation);
         frame.setSize(initialSize);
+        JFrameUtilities.constrainToScreen(frame);
     }
     
     private synchronized void writeSavedState() {
