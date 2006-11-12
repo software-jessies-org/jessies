@@ -37,16 +37,16 @@ public class StringUtilities {
     }
     
     /** Writes the given String to the given File. Returns the text of the exception message on failure, null on success. */
-    public static String writeFile(File file, String content) {
+    public static String writeFile(File file, CharSequence content) {
         return writeFile(file, content, false);
     }
     
     /** Appends the given String to the given File. Returns the text of the exception message on failure, null on success. */
-    public static String appendToFile(File file, String content) {
+    public static String appendToFile(File file, CharSequence content) {
         return writeFile(file, content, true);
     }
     
-    private static String writeFile(File file, String content, boolean append) {
+    private static String writeFile(File file, CharSequence content, boolean append) {
         PrintWriter out = null;
         try {
             out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file, append), "UTF-8"));
@@ -76,7 +76,7 @@ public class StringUtilities {
     }
     
     /** Turns a string into a printable Java string literal (minus the quotes). So a tab is converted to "\t", et cetera. */
-    public static String escapeForJava(String s) {
+    public static String escapeForJava(CharSequence s) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
@@ -125,7 +125,7 @@ public class StringUtilities {
     }
     
     /** Converts a string into a regular expression matching exactly that string. */
-    public static String regularExpressionFromLiteral(String literal) {
+    public static String regularExpressionFromLiteral(CharSequence literal) {
         StringBuilder result = new StringBuilder();
         final String REGEXP_META_CHARACTERS = "|[().\\^$?+*{";
         for (int i = 0; i < literal.length(); i++) {
@@ -151,7 +151,7 @@ public class StringUtilities {
      * both s1 and s2. If the strings start with different characters,
      * the result is 0.
      */
-    public static int lengthOfCommonPrefix(String s1, String s2) {
+    public static int lengthOfCommonPrefix(CharSequence s1, CharSequence s2) {
         int i = 0;
         for (; i < s1.length() && i < s2.length(); i++) {
             if (s1.charAt(i) != s2.charAt(i)) {
@@ -164,9 +164,9 @@ public class StringUtilities {
     /**
      * Joins the strings in 'strings' with 'separator' between each.
      */
-    public static String join(String[] strings, String separator) {
+    public static String join(CharSequence[] strings, CharSequence separator) {
         StringBuilder result = new StringBuilder();
-        for (String string : strings) {
+        for (CharSequence string : strings) {
             if (result.length() > 0) {
                 result.append(separator);
             }
@@ -178,7 +178,7 @@ public class StringUtilities {
     /**
      * Joins the strings in 'strings' with 'separator' between each.
      */
-    public static String join(List strings, String separator) {
+    public static String join(List strings, CharSequence separator) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < strings.size(); ++i) {
             if (i > 0) {
@@ -316,7 +316,7 @@ public class StringUtilities {
     /**
      * Returns a string consisting of 'count' copies of 's'.
      */
-    public static String nCopies(int count, String s) {
+    public static String nCopies(int count, CharSequence s) {
         StringBuilder builder = new StringBuilder(s.length() * count);
         for (int i = 0; i < count; ++i) {
             builder.append(s);
@@ -324,7 +324,7 @@ public class StringUtilities {
         return builder.toString();
     }
     
-    public static String pluralize(int value, String singularForm, String pluralForm) {
+    public static String pluralize(int value, CharSequence singularForm, CharSequence pluralForm) {
         return Integer.toString(value) + " " + (value == 1 ? singularForm : pluralForm);
     }
     
