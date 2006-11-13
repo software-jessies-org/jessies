@@ -14,13 +14,13 @@ public class StopWatch {
     }
     
     private void updateLastTime() {
-        lastTime = System.currentTimeMillis();
+        lastTime = System.nanoTime();
     }
     
     public void print(String reason) {
-        long durationMillis = System.currentTimeMillis() - lastTime;
-        if (durationMillis > 10) {
-            System.err.println(prefix + reason + " took " + durationMillis + "ms");
+        long durationNanos = System.nanoTime() - lastTime;
+        if (durationNanos > 10000) {
+            System.err.println(prefix + reason + " took " + durationNanos + "ns");
         }
         updateLastTime();
     }
