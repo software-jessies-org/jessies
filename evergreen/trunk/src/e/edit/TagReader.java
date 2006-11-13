@@ -1,10 +1,11 @@
 package e.edit;
 
+import e.ptextarea.FileType;
+import e.util.*;
 import java.awt.Color;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
-import e.util.*;
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
