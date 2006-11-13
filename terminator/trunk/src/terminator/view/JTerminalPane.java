@@ -386,7 +386,7 @@ public class JTerminalPane extends JPanel {
 			if (e.isControlDown() && ch < ' ') {
 				return String.valueOf(ch);
 			}
-			// Work around Sun bug 6320676.
+			// Work around Sun bug 6320676, and provide support for various terminal eccentricities.
 			if (e.isControlDown()) {
 				// Control characters are usually typed unshifted, for convenience...
 				if (ch >= 'a' && ch <= 'z') {
@@ -395,6 +395,15 @@ public class JTerminalPane extends JPanel {
 				// ...but the complete range is really from ^@ (ASCII NUL) to ^_ (ASCII US).
 				if (ch >= '@' && ch <= '_') {
 					return String.valueOf((char) (ch - '@'));
+				}
+				// There are two special cases that correspond to ASCII NUL.
+				// Control-' ' is important for emacs(1).
+				if (ch == ' ' || ch == '`') {
+					return "\u0000";
+				}
+				// And one last special case: control-/ is ^_ (ASCII US).
+				if (ch == '/') {
+					return String.valueOf(Ascii.US);
 				}
 			}
 			if (ch == Ascii.LF) {
