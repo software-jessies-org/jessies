@@ -1,26 +1,41 @@
 package e.edit;
 
+import e.ptextarea.*;
 import e.util.*;
 import java.util.*;
 import java.util.regex.*;
 
 public enum FileType {
-    PLAIN_TEXT("Plain Text"),
-    ASSEMBLER("Assembler"),
-    BASH("Bash"),
-    C_PLUS_PLUS("C++"),
-    JAVA("Java"),
-    MAKE("Make"),
-    RUBY("Ruby"),
-    PERL("Perl"),
-    PYTHON("Python"),
-    VHDL("VHDL"),
-    XML("XML");
+    PLAIN_TEXT  ("Plain Text", PDefaultIndenter.class,   PPlainTextStyler.class),
+    ASSEMBLER   ("Assembler",  PDefaultIndenter.class,   PAssemblerTextStyler.class),
+    BASH        ("Bash",       PDefaultIndenter.class,   PBashTextStyler.class),
+    C_PLUS_PLUS ("C++",        PCppIndenter.class,       PCPPTextStyler.class),
+    JAVA        ("Java",       PJavaIndenter.class,      PJavaTextStyler.class),
+    MAKE        ("Make",       PDefaultIndenter.class,   PMakefileTextStyler.class),
+    RUBY        ("Ruby",       PRubyIndenter.class,      PRubyTextStyler.class),
+    PERL        ("Perl",       PPerlIndenter.class,      PPerlTextStyler.class),
+    PYTHON      ("Python",     PDefaultIndenter.class,   PPythonTextStyler.class),
+    VHDL        ("VHDL",       PDefaultIndenter.class,   PVhdlTextStyler.class),
+    XML         ("XML",        PDefaultIndenter.class,   PXmlTextStyler.class);
     
     private final String name;
+    private final Class<? extends PIndenter> indenterClass;
+    private final Class<? extends PTextStyler> stylerClass;
     
-    private FileType(String name) {
+    private FileType(String name, Class<? extends PIndenter> indenterClass, Class<? extends PTextStyler> stylerClass) {
         this.name = name;
+        this.indenterClass = indenterClass;
+        this.stylerClass = stylerClass;
+    }
+    
+    public void configureTextArea(PTextArea textArea) {
+        textArea.setWrapStyleWord(this == FileType.PLAIN_TEXT);
+        try {
+            textArea.setIndenter(indenterClass.getConstructor(PTextArea.class).newInstance(textArea));
+            textArea.setTextStyler(stylerClass.getConstructor(PTextArea.class).newInstance(textArea));
+        } catch (Exception ex) {
+            throw new RuntimeException("configureTextArea failed", ex);
+        }
     }
     
     public String getName() {
