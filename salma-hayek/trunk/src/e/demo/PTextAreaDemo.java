@@ -41,6 +41,8 @@ public class PTextAreaDemo {
         
         FileType fileType = FileType.guessFileType(filename, content);
         fileType.configureTextArea(textArea);
+        System.err.println("indenter=" + textArea.getIndenter());
+        System.err.println("styler=" + textArea.getTextStyler());
         
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
         
