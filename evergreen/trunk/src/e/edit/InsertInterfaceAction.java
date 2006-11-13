@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.ptextarea.FileType;
 import java.awt.event.*;
 import java.lang.reflect.*;
 import java.util.regex.*;
