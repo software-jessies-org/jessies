@@ -1,58 +1,56 @@
 package e.demo;
 
+import e.ptextarea.*;
+import e.util.*;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import e.ptextarea.*;
-
 public class PTextAreaDemo {
-    private PTextAreaDemo() { }
-    
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Syntax: PTextAreaDemo <filename>");
-            System.exit(1);
-        }
-        final File file = new File(args[0]);
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                PTextArea area = new PTextArea();
-                area.setText(new String(getFileText(file)));
-                area.setBorder(new EmptyBorder(4, 4, 4, 4));
-                PTextStyler styler = getTextStyler(file, area);
-                if (styler != null) {
-                    area.setTextStyler(styler);
-                }
-                JFrame frame = new JFrame("PTextArea Test: " + file.getPath());
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                JScrollPane scroller = new JScrollPane(area);
-                frame.getContentPane().add(scroller);
-                frame.setSize(new Dimension(600, 600));
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            }
-        });
+    private PTextAreaDemo() {
     }
     
-    private static PTextStyler getTextStyler(File file, PTextArea textArea) {
-        String name = file.getName();
-        if (name.indexOf('.') != -1) {
-            String extension = name.substring(name.lastIndexOf('.') + 1);
-            if (extension.equals("cpp") || extension.equals("h")) {
-                return new PCPPTextStyler(textArea, false);
-            } else if (extension.equals("c")) {
-                return new PCTextStyler(textArea);
-            } else if (extension.equals("java")) {
-                return new PJavaTextStyler(textArea);
-            } else if (extension.equals("py")) {
-                return new PPythonTextStyler(textArea);
-            } else if (extension.equals("html") || extension.equals("xml")) {
-                return new PXmlTextStyler(textArea);
-            }
+    public static void main(String[] args) {
+        if (args.length < 1) {
+            System.err.println("Syntax: PTextAreaDemo <filename...>");
+            System.exit(1);
         }
-        return null;
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                GuiUtilities.initLookAndFeel();
+            }
+        });
+        
+        for (final String filename : args) {
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    makeTextViewer(filename);
+                }
+            });
+        }
+    }
+    
+    private static void makeTextViewer(String filename) {
+        PTextArea textArea = new PTextArea();
+        textArea.setBorder(new EmptyBorder(4, 4, 4, 4));
+        
+        final File file = new File(filename);
+        textArea.getTextBuffer().readFromFile(file);
+        CharSequence content = textArea.getTextBuffer();
+        
+        FileType fileType = FileType.guessFileType(filename, content);
+        fileType.configureTextArea(textArea);
+        
+        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
+        
+        JFrame frame = new JFrame(file.getPath() + " - PTextAreaDemo");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        JScrollPane scroller = new JScrollPane(textArea);
+        frame.getContentPane().add(scroller);
+        frame.setSize(new Dimension(600, 600));
+        frame.setLocationByPlatform(true);
+        frame.setVisible(true);
     }
     
     private static char[] getFileText(File file) {
