@@ -28,11 +28,22 @@ public class JFrameUtilities {
         Point newLocation = window.getLocation();
         Dimension newSize = window.getSize();
         
-        // Make sure the window's top left corner is on-screen.
+        // Make sure the window's bottom right corner is no further down and right than the bound.
+        // Do this by moving the top left corner, keeping the size the same.
+        if (newLocation.x + newSize.width > bottomRightBound.x) {
+            newLocation.x = bottomRightBound.x - newSize.width;
+        }
+        if (newLocation.y + newSize.height > bottomRightBound.y) {
+            newLocation.y = bottomRightBound.y - newSize.height;
+        }
+        
+        // Make sure the window's top left corner is no further up and left than the bound.
+        // If the size is non-negative, this is now sufficient to ensure that it is on-screen.
         newLocation.x = Math.max(topLeftBound.x, newLocation.x);
         newLocation.y = Math.max(topLeftBound.y, newLocation.y);
         
-        // Make sure the window's bottom right corner is on-screen.
+        // This may have moved the bottom right corner of the window off-screen again.
+        // If so, we now know the window's too big for the screen, so shrink it to fit.
         if (newLocation.x + newSize.width > bottomRightBound.x) {
             newSize.width = bottomRightBound.x - newLocation.x;
         }
