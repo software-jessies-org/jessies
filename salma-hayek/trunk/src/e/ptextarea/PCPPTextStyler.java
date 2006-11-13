@@ -87,11 +87,10 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
         "xor_eq",
     };
     
-    public PCPPTextStyler(PTextArea textArea, boolean isObjective) {
+    public PCPPTextStyler(PTextArea textArea) {
         super(textArea);
-        // "#else" is PREPROCESSOR, but "else" is KEYWORD, so we need to look
-        // for preprocessor directives first.
-        textArea.addStyleApplicatorFirst(new PreprocessorStyleApplicator(textArea, isObjective));
+        // "#else" is PREPROCESSOR, but "else" is KEYWORD, so we need to look for preprocessor directives first.
+        textArea.addStyleApplicatorFirst(new PreprocessorStyleApplicator(textArea, false));
     }
     
     @Override
