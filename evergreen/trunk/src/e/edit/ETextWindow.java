@@ -337,49 +337,13 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void reconfigureForFileType(FileType newFileType) {
-        FileType originalFileType = fileType;
+        if (newFileType == fileType) {
+            return;
+        }
+        
         fileType = newFileType;
-        textArea.setWrapStyleWord(false);
-        // Not all the FileTypes have an indenter but they all have a styler.
-        textArea.setIndenter(new PDefaultIndenter(textArea));
-        if (fileType == FileType.JAVA) {
-            textArea.setIndenter(new PJavaIndenter(textArea));
-            textArea.setTextStyler(new PJavaTextStyler(textArea));
-        } else if (fileType == FileType.RUBY) {
-            textArea.setIndenter(new PRubyIndenter(textArea));
-            textArea.setTextStyler(new PRubyTextStyler(textArea));
-        } else if (fileType == FileType.C_PLUS_PLUS) {
-            textArea.setIndenter(new PCppIndenter(textArea));
-            textArea.setTextStyler(new PCPPTextStyler(textArea, filename.matches(".*\\.(m|mm)$")));
-        } else if (fileType == FileType.PERL) {
-            textArea.setIndenter(new PPerlIndenter(textArea));
-            textArea.setTextStyler(new PPerlTextStyler(textArea));
-        } else if (fileType == FileType.PYTHON) {
-            //textArea.setIndenter(new PPythonIndenter(textArea));
-            textArea.setTextStyler(new PPythonTextStyler(textArea));
-        } else if (fileType == FileType.ASSEMBLER) {
-            //textArea.setIndenter(new PAssemblerIndenter(textArea));
-            textArea.setTextStyler(new PAssemblerTextStyler(textArea));
-        } else if (fileType == FileType.BASH) {
-            //textArea.setIndenter(new PBashIndenter(textArea));
-            textArea.setTextStyler(new PBashTextStyler(textArea));
-        } else if (fileType == FileType.MAKE) {
-            //textArea.setIndenter(new PMakefileIndenter(textArea));
-            textArea.setTextStyler(new PMakefileTextStyler(textArea));
-        } else if (fileType == FileType.VHDL) {
-            //textArea.setIndenter(new PVhdlIndenter(textArea));
-            textArea.setTextStyler(new PVhdlTextStyler(textArea));
-        } else if (fileType == FileType.XML) {
-            //textArea.setIndenter(new PXmlIndenter(textArea));
-            textArea.setTextStyler(new PXmlTextStyler(textArea));
-        } else {
-            // Plain text.
-            textArea.setWrapStyleWord(true);
-            textArea.setTextStyler(new PPlainTextStyler(textArea));
-        }
-        if (fileType != originalFileType) {
-            initSpellingExceptionsForDocument();
-        }
+        fileType.configureTextArea(textArea);
+        initSpellingExceptionsForDocument();
     }
     
     private void uncheckedRevertToSaved() {
