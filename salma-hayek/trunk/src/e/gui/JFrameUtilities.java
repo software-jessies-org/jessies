@@ -21,21 +21,23 @@ public class JFrameUtilities {
         // Query the display information.
         Rectangle displayBounds = window.getGraphicsConfiguration().getBounds();
         Insets insets = window.getToolkit().getScreenInsets(window.getGraphicsConfiguration());
+        Point topLeftBound = new Point(displayBounds.x + insets.left, displayBounds.y + insets.top);
+        Point bottomRightBound = new Point(displayBounds.x + displayBounds.width - insets.right, displayBounds.y + displayBounds.height - insets.bottom);
         
         // Query the window information.
         Point newLocation = window.getLocation();
         Dimension newSize = window.getSize();
         
         // Make sure the window's top left corner is on-screen.
-        newLocation.x = Math.max(displayBounds.x + insets.left, newLocation.x);
-        newLocation.y = Math.max(displayBounds.y + insets.top, newLocation.y);
+        newLocation.x = Math.max(topLeftBound.x, newLocation.x);
+        newLocation.y = Math.max(topLeftBound.y, newLocation.y);
         
         // Make sure the window's bottom right corner is on-screen.
-        if (newLocation.x + newSize.width > displayBounds.x + displayBounds.width - insets.right) {
-            newSize.width = (displayBounds.x + displayBounds.width - insets.right) - newLocation.x;
+        if (newLocation.x + newSize.width > bottomRightBound.x) {
+            newSize.width = bottomRightBound.x - newLocation.x;
         }
-        if (newLocation.y + newSize.height > displayBounds.y + displayBounds.height - insets.bottom) {
-            newSize.height = (displayBounds.y + displayBounds.height - insets.bottom) - newLocation.y;
+        if (newLocation.y + newSize.height > bottomRightBound.y) {
+            newSize.height = bottomRightBound.y - newLocation.y;
         }
         
         window.setLocation(newLocation);
