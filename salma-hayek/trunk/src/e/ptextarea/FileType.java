@@ -7,7 +7,7 @@ import java.util.regex.*;
 public enum FileType {
     PLAIN_TEXT  ("Plain Text", PNoOpIndenter.class,      PPlainTextStyler.class),
     ASSEMBLER   ("Assembler",  PNoOpIndenter.class,      PAssemblerTextStyler.class),
-    BASH        ("Bash",       PNoOpIndenter.class,      PBashTextStyler.class),
+    BASH        ("Bash",       PBashIndenter.class,      PBashTextStyler.class),
     C_PLUS_PLUS ("C++",        PCppIndenter.class,       PCPPTextStyler.class),
     JAVA        ("Java",       PJavaIndenter.class,      PJavaTextStyler.class),
     MAKE        ("Make",       PNoOpIndenter.class,      PMakefileTextStyler.class),
