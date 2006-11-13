@@ -15,7 +15,7 @@ import e.util.*;
  * or backquote. It also understands how to find keywords in what's left over,
  * given a fixed set of keywords.
  * 
- * FIXME: it would be nice to support arbitrary multiline comment styles, such as HTML's "<!--" and "-->". (That's probably the only other one worth worrying about. Perl and Ruby have various multiline quoting mechanisms, but they're a lesser priority than having an HTML styler.)
+ * FIXME: Perl and Ruby have various multiline quoting mechanisms that we don't support.
  * 
  * @author Phil Norman
  */
