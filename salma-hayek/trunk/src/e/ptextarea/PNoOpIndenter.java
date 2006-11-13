@@ -1,11 +1,11 @@
 package e.ptextarea;
 
 /**
- * The default indenter does no indenting.
+ * The no-op indenter does no indenting.
  * Used for plain text, and languages we don't know about.
  */
-public class PDefaultIndenter extends PIndenter {
-    public PDefaultIndenter(PTextArea textArea) {
+public class PNoOpIndenter extends PIndenter {
+    public PNoOpIndenter(PTextArea textArea) {
         super(textArea);
     }
     

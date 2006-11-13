@@ -5,17 +5,17 @@ import java.util.*;
 import java.util.regex.*;
 
 public enum FileType {
-    PLAIN_TEXT  ("Plain Text", PDefaultIndenter.class,   PPlainTextStyler.class),
-    ASSEMBLER   ("Assembler",  PDefaultIndenter.class,   PAssemblerTextStyler.class),
-    BASH        ("Bash",       PDefaultIndenter.class,   PBashTextStyler.class),
+    PLAIN_TEXT  ("Plain Text", PNoOpIndenter.class,      PPlainTextStyler.class),
+    ASSEMBLER   ("Assembler",  PNoOpIndenter.class,      PAssemblerTextStyler.class),
+    BASH        ("Bash",       PNoOpIndenter.class,      PBashTextStyler.class),
     C_PLUS_PLUS ("C++",        PCppIndenter.class,       PCPPTextStyler.class),
     JAVA        ("Java",       PJavaIndenter.class,      PJavaTextStyler.class),
-    MAKE        ("Make",       PDefaultIndenter.class,   PMakefileTextStyler.class),
+    MAKE        ("Make",       PNoOpIndenter.class,      PMakefileTextStyler.class),
     RUBY        ("Ruby",       PRubyIndenter.class,      PRubyTextStyler.class),
     PERL        ("Perl",       PPerlIndenter.class,      PPerlTextStyler.class),
-    PYTHON      ("Python",     PDefaultIndenter.class,   PPythonTextStyler.class),
-    VHDL        ("VHDL",       PDefaultIndenter.class,   PVhdlTextStyler.class),
-    XML         ("XML",        PDefaultIndenter.class,   PXmlTextStyler.class);
+    PYTHON      ("Python",     PNoOpIndenter.class,      PPythonTextStyler.class),
+    VHDL        ("VHDL",       PNoOpIndenter.class,      PVhdlTextStyler.class),
+    XML         ("XML",        PNoOpIndenter.class,      PXmlTextStyler.class);
     
     private final String name;
     private final Class<? extends PIndenter> indenterClass;

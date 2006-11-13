@@ -67,7 +67,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         this.wordWrap = false;
         this.lines = new PLineList(new PTextBuffer());
         this.selection = new SelectionHighlight(this, 0, 0);
-        this.indenter = new PDefaultIndenter(this);
+        this.indenter = new PNoOpIndenter(this);
         
         addStyleApplicator(new UnprintableCharacterStyleApplicator(this));
         addStyleApplicator(new HyperlinkStyleApplicator(this));
@@ -1028,7 +1028,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     private void paintHighlights(Graphics2D graphics, int minLine, int maxLine) {
-        long startTime = System.currentTimeMillis();
+        //StopWatch stopWatch = new StopWatch()
         int minChar = getSplitLine(minLine).getTextIndex();
         SplitLine max = getSplitLine(maxLine);
         int maxChar = max.getTextIndex() + max.getLength();
@@ -1037,7 +1037,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         for (PHighlight highlight : highlightList) {
             highlight.paint(graphics);
         }
-        //System.err.println("Highlights painted in " + (System.currentTimeMillis() - startTime) + "ms");
+        //stopWatch.print("Highlight painting");
     }
     
     private void applyStyle(Graphics2D g, PStyle style) {
