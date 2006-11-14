@@ -12,6 +12,7 @@ public enum FileType {
     JAVA        ("Java",       PJavaIndenter.class,      PJavaTextStyler.class),
     MAKE        ("Make",       PNoOpIndenter.class,      PMakefileTextStyler.class),
     RUBY        ("Ruby",       PRubyIndenter.class,      PRubyTextStyler.class),
+    PATCH       ("Patch",      PNoOpIndenter.class,      PPatchTextStyler.class),
     PERL        ("Perl",       PPerlIndenter.class,      PPerlTextStyler.class),
     PYTHON      ("Python",     PNoOpIndenter.class,      PPythonTextStyler.class),
     VHDL        ("VHDL",       PNoOpIndenter.class,      PVhdlTextStyler.class),
@@ -84,6 +85,8 @@ public enum FileType {
             return FileType.JAVA;
         } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || filename.endsWith(".strings")) {
             return FileType.C_PLUS_PLUS;
+        } else if (filename.endsWith(".patch") || filename.endsWith(".diff")) {
+            return FileType.PATCH;
         } else if (filename.endsWith(".pl") || filename.endsWith(".pm")) {
             return FileType.PERL;
         } else if (filename.endsWith(".py")) {
@@ -112,6 +115,8 @@ public enum FileType {
             return FileType.BASH;
         } else if (isCPlusPlusContent(content)) {
             return FileType.C_PLUS_PLUS;
+        } else if (isPatchContent(content)) {
+            return FileType.PATCH;
         } else if (isPerlContent(content)) {
             return FileType.PERL;
         } else if (isPythonContent(content)) {
@@ -175,6 +180,10 @@ public enum FileType {
         // FIXME: emacs mode strings should be handled separately, and override content-based file type determination.
         // FIXME: gEdit's "modelines" plug-in http://cvs.gnome.org/viewcvs/gedit/plugins/modelines/ details emacs(1), kate(1), and vim(1) mode lines.
         return Pattern.compile("(#ifndef|" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ")").matcher(content).find();
+    }
+    
+    private static boolean isPatchContent(CharSequence content) {
+        return Pattern.compile("^--- .*\n\\+\\+\\+ ").matcher(content).find();
     }
     
     /** Tests whether the 'content' looks like XML. */
