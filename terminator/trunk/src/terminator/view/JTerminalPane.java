@@ -10,6 +10,7 @@ import javax.swing.*;
 import e.gui.*;
 import e.util.*;
 import terminator.*;
+import terminator.model.*;
 import terminator.terminal.*;
 import terminator.view.highlight.*;
 
@@ -240,6 +241,50 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	private class KeyHandler implements KeyListener {
+		private javax.swing.Timer waitForCorrespondingOutputTimer;
+		private Location cursorPositionAfterOutput;
+		private javax.swing.Timer scrollToBottomDelayTimer;
+		
+		public KeyHandler() {
+			// If your remote-echoing device is more than roundTripMilliseconds away and doesn't automatically wrap at the
+			// terminal width, the automatic horizontal scrolling as you type won't work.
+			// If you raise the time-out, the automatic horizontal scrolling becomes less responsive.
+			int roundTripMilliseconds = 200;
+			
+			// Give the corresponding output time to come out and so move the cursor, to which we'll scroll...
+			waitForCorrespondingOutputTimer = new javax.swing.Timer(roundTripMilliseconds, new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					cursorPositionAfterOutput = textPane.getCursorPosition();
+					scrollToBottomDelayTimer.start();
+				}
+			});
+			waitForCorrespondingOutputTimer.setRepeats(false);
+			
+			// ... providing that it doesn't move again for a while.
+			scrollToBottomDelayTimer = new javax.swing.Timer(100, new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// If the cursor is now in a different position, we conclude that the previous output was coincidental to user's
+					// key press.
+					// (What we'd really like to check is whether there's been any more output.
+					// Checking the cursor position is just an approximation.)
+					// This has the slightly unfortunate effect that, if the user is holding a key down,
+					// we won't scroll until they let go.
+					// The benefit is that we won't leave the window scrolled by half a width if the output goes
+					// briefly off-screen just after a user's key press.
+					if (cursorPositionAfterOutput != textPane.getCursorPosition()) {
+						return;
+					}
+					textPane.scrollToBottom();
+				}
+			});
+			scrollToBottomDelayTimer.setRepeats(false);
+			
+			// This automatic scrolling has caused minor trouble a lot of times.
+			// Here's some test code which you wouldn't want to cause scrolling but which used to, all the time,
+			// and now doesn't.
+			// ruby -e 'while true; $stdout.write("X" * 90); $stdout.flush(); sleep(0.05); puts(); end'
+		}
+		
 		/**
 		 * On Mac OS, we have the screen menu bar to take care of
 		 * all the keyboard equivalents. Elsewhere, we have to detect
@@ -484,17 +529,9 @@ public class JTerminalPane extends JPanel {
 		 */
 		public void scroll() {
 			if (Options.getSharedInstance().isScrollKey()) {
-				// Give the corresponding output time to come out and so move the cursor, to which we'll scroll.
-				// If your remote-echoing device is more than 100ms away and doesn't automatically wrap at the
-				// terminal width, the automatic horizontal scrolling as you type will be one character behind.
-				// That's less of a problem than it might seem because we scroll by half a window width when possible.
-				javax.swing.Timer scrollToBottomDelayTimer = new javax.swing.Timer(100, new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						textPane.scrollToBottom();
-					}
-				});
-				scrollToBottomDelayTimer.setRepeats(false);
-				scrollToBottomDelayTimer.start();
+				waitForCorrespondingOutputTimer.stop();
+				scrollToBottomDelayTimer.stop();
+				waitForCorrespondingOutputTimer.start();
 			}
 		}
 	}
