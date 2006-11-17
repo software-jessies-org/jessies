@@ -325,10 +325,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         replaceSelection(getIndentationString());
     }
     
-    public void insertNewline() {
-        new PNewlineInserter(this).insertNewline();
-    }
-    
     /**
      * Returns the indenter responsible for auto-indent (and other aspects of
      * indentation correction) in this text area.

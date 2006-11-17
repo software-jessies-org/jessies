@@ -168,7 +168,7 @@ public class PKeyHandler implements KeyListener {
         if (ch == '\t') {
             textArea.insertTab();
         } else if (ch == '\n') {
-            textArea.insertNewline();
+            new PNewlineInserter(textArea).insertNewline();
         } else {
             CharSequence content = new CharArrayCharSequence(new char[] { ch });
             if (textArea.getIndenter().isElectric(ch)) {
