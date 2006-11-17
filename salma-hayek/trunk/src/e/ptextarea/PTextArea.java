@@ -321,10 +321,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
     }
     
-    public void insertTab() {
-        replaceSelection(getIndentationString());
-    }
-    
     /**
      * Returns the indenter responsible for auto-indent (and other aspects of
      * indentation correction) in this text area.

@@ -53,7 +53,7 @@ public class PKeyHandler implements KeyListener {
     
     public void keyTyped(KeyEvent e) {
         if (isInsertableCharacter(e) && textArea.isEditable()) {
-            insertCharacter(e.getKeyChar());
+            insertCharacter(e.getKeyChar()); // Only the char is usable in these events anyway.
             e.consume();
         }
     }
@@ -80,14 +80,18 @@ public class PKeyHandler implements KeyListener {
         }
         
         char ch = e.getKeyChar();
-        return (ch != KeyEvent.CHAR_UNDEFINED && (ch == '\n' || ch == '\t' || ch >= ' ') && ch != Ascii.DEL);
+        return (ch != KeyEvent.CHAR_UNDEFINED && ch >= ' ' && ch != Ascii.DEL);
     }
     
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
         boolean byWord = GuiUtilities.isMacOs() ? event.isAltDown() : event.isControlDown();
         boolean extendingSelection = event.isShiftDown();
         int key = event.getKeyCode();
-        if (isStartOfTextKey(event)) {
+        if (key == KeyEvent.VK_TAB) {
+            textArea.replaceSelection(event.isShiftDown() ? "\t" : textArea.getIndentationString());
+        } else if (key == KeyEvent.VK_ENTER) {
+            new PNewlineInserter(textArea).insertNewline();
+        } else if (isStartOfTextKey(event)) {
             moveCaret(extendingSelection, 0);
         } else if (isEndOfTextKey(event)) {
             moveCaret(extendingSelection, textArea.getTextBuffer().length());
@@ -165,23 +169,17 @@ public class PKeyHandler implements KeyListener {
     }
     
     private void insertCharacter(char ch) {
-        if (ch == '\t') {
-            textArea.insertTab();
-        } else if (ch == '\n') {
-            new PNewlineInserter(textArea).insertNewline();
-        } else {
-            CharSequence content = new CharArrayCharSequence(new char[] { ch });
-            if (textArea.getIndenter().isElectric(ch)) {
-                textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
-                try {
-                    textArea.replaceSelection(content);
-                    textArea.getIndenter().fixIndentation();
-                } finally {
-                    textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();
-                }
-            } else {
+        CharSequence content = new CharArrayCharSequence(new char[] { ch });
+        if (textArea.getIndenter().isElectric(ch)) {
+            textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
+            try {
                 textArea.replaceSelection(content);
+                textArea.getIndenter().fixIndentation();
+            } finally {
+                textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();
             }
+        } else {
+            textArea.replaceSelection(content);
         }
     }
     
