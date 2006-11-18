@@ -25,7 +25,9 @@ public class PGenericIndenter extends PSimpleIndenter {
     public PGenericIndenter(PTextArea textArea, String indentAfterRegEx, String indentRegEx, String unindentRegEx, String electricCharacters) {
         super(textArea);
         this.indentAfterPattern = Pattern.compile(indentAfterRegEx);
-        this.indentPattern = Pattern.compile(indentRegEx);
+        if (indentRegEx != null) {
+            this.indentPattern = Pattern.compile(indentRegEx);
+        }
         this.unindentPattern = Pattern.compile(unindentRegEx);
         this.electricCharacters = electricCharacters;
     }
@@ -41,11 +43,11 @@ public class PGenericIndenter extends PSimpleIndenter {
         }
         
         String indentation = getCurrentIndentationOfLine(previousNonBlank);
-        String thisLineText = textArea.getLineText(lineNumber);
+        String thisLineText = getActivePartOfLine(lineNumber);
         
-        if (indentAfterPattern.matcher(textArea.getLineText(previousNonBlank)).find()) {
+        if (indentAfterPattern.matcher(getActivePartOfLine(previousNonBlank)).find()) {
             indentation = increaseIndentation(indentation);
-        } else if (indentPattern.matcher(thisLineText).find()) {
+        } else if (indentPattern != null && indentPattern.matcher(thisLineText).find()) {
             indentation = increaseIndentation(indentation);
         }
         

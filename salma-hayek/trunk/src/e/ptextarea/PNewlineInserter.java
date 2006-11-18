@@ -31,7 +31,7 @@ public class PNewlineInserter {
         return true;
     }
     
-    public void insertNewline() {
+    public void insertNewline(boolean fixIndentation) {
         textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
         try {
             final int startPosition = textArea.getSelectionStart();
@@ -49,8 +49,12 @@ public class PNewlineInserter {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");
-                textArea.getIndenter().fixIndentationOnLine(startLineIndex);
-                textArea.getIndenter().fixIndentation();
+                if (fixIndentation) {
+                    textArea.getIndenter().fixIndentationOnLine(startLineIndex);
+                    textArea.getIndenter().fixIndentation();
+                } else {
+                    new PCopyingIndenter(textArea).fixIndentation();
+                }
             }
         } finally {
             textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();

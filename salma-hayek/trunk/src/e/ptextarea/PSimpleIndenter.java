@@ -34,16 +34,6 @@ public abstract class PSimpleIndenter extends PIndenter {
     /**
      * Returns the indentation which should be used for the given line number.
      * Override this in your subclass to define your indenter's policy.
-     * 
-     * Copied into a subclass, this example code would implement a copying indenter that simply repeats the indentation of the line above.
-     * KDE offers something like this with shift-return.
-     * We could usefully do likewise, or offer it as an alternative to the default (non-indenting) indenter for languages that we recognize but don't have a proper indenter for.
-     * We'd probably have to change our backspace behavior to stop at a newline, but I've long thought we should do that anyway.
-     * 
-     * protected String calculateNewIndentation(int lineNumber) {
-     *     final int previousNonBlankLineNumber = getPreviousNonBlankLineNumber(lineNumber);
-     *     return (previousNonBlankLineNumber == -1) ? "" : getCurrentIndentationOfLine(previousNonBlankLineNumber);
-     *  }
      */
     protected abstract String calculateNewIndentation(int lineNumber);
     

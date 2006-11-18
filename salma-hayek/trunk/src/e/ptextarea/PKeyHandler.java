@@ -95,7 +95,7 @@ public class PKeyHandler implements KeyListener {
             }
             textArea.replaceSelection(event.isShiftDown() ? "\t" : textArea.getIndentationString());
         } else if (key == KeyEvent.VK_ENTER) {
-            new PNewlineInserter(textArea).insertNewline();
+            new PNewlineInserter(textArea).insertNewline(event.isShiftDown() == false);
         } else if (isStartOfTextKey(event)) {
             moveCaret(extendingSelection, 0);
         } else if (isEndOfTextKey(event)) {
