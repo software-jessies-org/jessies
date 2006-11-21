@@ -35,12 +35,14 @@ public class ProcessUtilities {
         try {
             final Process p = Runtime.getRuntime().exec(command, null, directory);
             p.getOutputStream().close();
-            readLinesFromStream(outputLineListener, p.getInputStream());
-            new Thread(new Runnable() {
+            Thread errorReaderThread = new Thread(new Runnable() {
                 public void run() {
                     readLinesFromStream(errorLineListener, p.getErrorStream());
                 }
-            }, "Process Back-Quote: " + shellQuotedFormOf(Arrays.asList(command))).start();
+            }, "Process Back-Quote: " + shellQuotedFormOf(Arrays.asList(command)));
+            errorReaderThread.start();
+            readLinesFromStream(outputLineListener, p.getInputStream());
+            errorReaderThread.join();
             return p.waitFor();
         } catch (Exception ex) {
             ex.printStackTrace();
