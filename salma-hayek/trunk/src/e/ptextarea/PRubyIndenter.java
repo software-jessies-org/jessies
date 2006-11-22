@@ -7,7 +7,7 @@ public class PRubyIndenter extends PGenericIndenter {
     
     private static final String INDENT = null;
     
-    private static final String UNINDENT = "\\b(end|else|elsif|when|ensure|rescue)\\b|(<!\\{[^\\{]*)}";
+    private static final String UNINDENT = "\\b(end|else|elsif|when|ensure|rescue)\\b|^[^{]*}";
     
     /* The final characters in "end", "else", "elsif", "when", "ensure", "rescue" and "}". */
     private static final String ELECTRICS = "defn}";
