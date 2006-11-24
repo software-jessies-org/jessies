@@ -76,13 +76,18 @@ public class FormPanel extends JPanel {
      * Recursively add the JTextComponent children of the given component to our textComponents collection.
      */
     private void addTextComponentChildren(Component component) {
+        addTextComponent(component);
         if (component instanceof Container) {
             for (Component child : ((Container) component).getComponents()) {
-                if (child instanceof JTextComponent) {
-                    textComponents.add((JTextComponent) child);
-                }
+                addTextComponent(child);
                 addTextComponentChildren(child);
             }
+        }
+    }
+    
+    private void addTextComponent(Component component) {
+        if (component instanceof JTextComponent) {
+            textComponents.add((JTextComponent) component);
         }
     }
     
