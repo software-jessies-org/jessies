@@ -91,7 +91,7 @@ public class FindAndReplaceAction extends ETextAction {
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Find:", patternField);
         formPanel.addRow("Replace With:", replacementField);
-        formPanel.addRow("", statusLabel);
+        formPanel.addRow("", PatternUtilities.addRegularExpressionHelpToComponent(statusLabel));
         formPanel.addRow("Matches:", matchPane);
         formPanel.addRow("Replacements:", replacementsPane);
         formPanel.setTypingTimeoutActionListener(new ActionListener() {
@@ -111,7 +111,7 @@ public class FindAndReplaceAction extends ETextAction {
         form.show("Replace");
         currentTextArea = null;
     }
-
+    
     public boolean doReplacementsInText() {
         try {
             if (isSelectionMeantAsScope()) {

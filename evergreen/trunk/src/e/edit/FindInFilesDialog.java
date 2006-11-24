@@ -477,8 +477,8 @@ public class FindInFilesDialog {
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Files Containing:", regexField);
         formPanel.addRow("Whose Names Match:", filenameRegexField);
+        formPanel.addRow("", PatternUtilities.addRegularExpressionHelpToComponent(status));
         formPanel.addRow("Matches:", new JScrollPane(matchView));
-        formPanel.setStatusBar(status);
         formPanel.setTypingTimeoutActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showMatches();
