@@ -3,6 +3,8 @@ package e.util;
 import java.util.regex.*;
 
 public final class PatternUtilities {
+    public static final String DOCUMENTATION_URL = "http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html";
+    
     /**
      * Compiles the given regular expression into a Pattern that may or may
      * not be case-sensitive, depending on the regular expression. If the
@@ -57,6 +59,21 @@ public final class PatternUtilities {
         if ((flags & flag) != 0) {
             result.append(c);
         }
+    }
+    
+    /**
+     * Most users don't know everything there is to know about regular expressions, so it's nice to offer them a link to the documentation.
+     * A convenient place to do this is the status bar.
+     * It's a bad idea to not have a status bar for a dialog that takes a regular expression, because you need somewhere to report syntax errors.
+     * For very small dialogs with a single field, though, it might make sense to have the help next to the field.
+     */
+    public static javax.swing.JPanel addRegularExpressionHelpToComponent(java.awt.Component component) {
+        // Use a shorter title if it looks like we're trying to save space by fitting next to a field rather than in a status line.
+        String label = (component instanceof javax.swing.JTextField) ? "Help" : "Regular Expression Help";
+        javax.swing.JPanel result = new javax.swing.JPanel(new java.awt.BorderLayout());
+        result.add(component, java.awt.BorderLayout.CENTER);
+        result.add(new e.gui.JHyperlinkButton(label, DOCUMENTATION_URL), java.awt.BorderLayout.EAST);
+        return result;
     }
     
     private PatternUtilities() {

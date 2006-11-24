@@ -27,19 +27,12 @@ public class FormPanel extends JPanel {
     }
     
     /**
-     * Adds a row consisting of a label and a corresponding text component.
-     * Text components are automatically listened to for changes; see
-     * setTypingTimeoutAction.
-     */
-    public void addRow(String text, JTextComponent component) {
-        textComponents.add(component);
-        addRow(text, (Component) component);
-    }
-    
-    /**
      * Adds a row consisting of a label and a corresponding component.
      */
     public void addRow(String text, Component component) {
+        // Text components are automatically listened to for changes; see setTypingTimeoutAction.
+        addTextComponentChildren(component);
+        
         JLabel label = new JLabel(text);
         label.setLabelFor(component);
 
@@ -78,7 +71,21 @@ public class FormPanel extends JPanel {
 
         nextRow++;
     }
-
+    
+    /**
+     * Recursively add the JTextComponent children of the given component to our textComponents collection.
+     */
+    private void addTextComponentChildren(Component component) {
+        if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                if (child instanceof JTextComponent) {
+                    textComponents.add((JTextComponent) child);
+                }
+                addTextComponentChildren(child);
+            }
+        }
+    }
+    
     /**
      * Sets the status bar that any dialog using this panel
      * should include. Using this in preference to adding
