@@ -17,6 +17,7 @@ public class AboutBox {
     
     private ImageIcon icon;
     private String applicationName;
+    private String contactAddress;
     private ArrayList<String> versionLines = new ArrayList<String>();
     private ArrayList<String> copyrightLines = new ArrayList<String>();
     
@@ -35,6 +36,10 @@ public class AboutBox {
     
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
+    }
+    
+    public void setContactAddress(String contactAddress) {
+        this.contactAddress = contactAddress;
     }
     
     public boolean isConfigured() {
@@ -138,6 +143,11 @@ public class AboutBox {
         addLabel(panel, applicationNameFont, applicationName);
         panel.add(Box.createRigidArea(spacerSize));
         
+        if (contactAddress != null) {
+            addLabel(panel, new JHyperlinkButton(contactAddress, "mailto:" + contactAddress));
+            panel.add(Box.createRigidArea(spacerSize));
+        }
+        
         for (String version : versionLines) {
             addLabel(panel, versionFont, version);
         }
@@ -197,7 +207,7 @@ public class AboutBox {
         addLabel(panel, label);
     }
     
-    private static void addLabel(JPanel panel, JLabel label) {
+    private static void addLabel(JPanel panel, JComponent label) {
         label.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         panel.add(label);
     }

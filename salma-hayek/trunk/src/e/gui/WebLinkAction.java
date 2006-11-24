@@ -1,4 +1,3 @@
-
 package e.gui;
 
 import e.util.*;
@@ -16,6 +15,9 @@ public class WebLinkAction extends AbstractAction {
     public WebLinkAction(String name, String url) {
         super(name);
         this.url = url;
+        
+        // Offer the url to anything that wants a tool tip for this action.
+        putValue(SHORT_DESCRIPTION, url);
     }
     
     public WebLinkAction(String name, File file) {
