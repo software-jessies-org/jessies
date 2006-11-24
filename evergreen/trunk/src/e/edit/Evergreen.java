@@ -765,6 +765,7 @@ public class Evergreen {
     private void initAboutBox() {
         AboutBox aboutBox = AboutBox.getSharedInstance();
         aboutBox.setApplicationName("Evergreen");
+        aboutBox.setContactAddress("software@jessies.org");
         aboutBox.addCopyright("Copyright (C) 2004-2006 Free Software Foundation, Inc.");
         aboutBox.addCopyright("All Rights Reserved.");
     }
