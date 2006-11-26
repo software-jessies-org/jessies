@@ -152,16 +152,36 @@ public class EvergreenMenuBar extends EMenuBar {
         JMenu menu = new JMenu("Documentation");
         menu.add(new ShowDocumentationAction());
         
+        // UI guidelines.
+        menu.add(new JSeparator());
+        menu.add(makeLocalOrRemoteLink("Apple Human Interface Guidelines", null, "http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html"));
+        menu.add(makeLocalOrRemoteLink("GNOME Human Interface Guidelines", null, "http://developer.gnome.org/projects/gup/hig/2.0/"));
+        
+        // C/C++.
         menu.add(new JSeparator());
         menu.add(makeLocalOrRemoteLink("GNU C Library Documentation", "/usr/share/doc/glibc-doc/html/index.html", "http://www.gnu.org/software/libc/manual/html_node/index.html"));
-        menu.add(makeLocalOrRemoteLink("Regular Expression Documentation", "/usr/share/doc/sun-java5-jdk/html/api/java/util/regex/Pattern.html", PatternUtilities.DOCUMENTATION_URL));
         menu.add(makeLocalOrRemoteLink("STL Documentation", "/usr/share/doc/stl-manual/html/index.html", "http://www.sgi.com/tech/stl/"));
+        
+        // Java.
+        menu.add(new JSeparator());
+        menu.add(makeLocalOrRemoteLink("Java Language Specification, 3e", null, "http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html"));
+        menu.add(makeLocalOrRemoteLink("Java Tutorial", null, "http://java.sun.com/docs/books/tutorial/"));
+        menu.add(makeLocalOrRemoteLink("Java VM Specification, 2e", null, "http://java.sun.com/docs/books/vmspec/2nd-edition/html/VMSpecTOC.doc.html"));
+        
+        // Tools.
+        menu.add(new JSeparator());
+        menu.add(makeLocalOrRemoteLink("GNU Make Manual", null, "http://www.gnu.org/software/make/manual/make.html"));
+        
+        // General.
+        menu.add(new JSeparator());
+        // FIXME: some day it would be nice to have our own regular expression quick reference.
+        menu.add(makeLocalOrRemoteLink("Regular Expression Documentation", "/usr/share/doc/sun-java5-jdk/html/api/java/util/regex/Pattern.html", PatternUtilities.DOCUMENTATION_URL));
         
         return menu;
     }
     
     private WebLinkAction makeLocalOrRemoteLink(String name, String localFilename, String remoteUrl) {
-        String url = FileUtilities.exists(localFilename) ? "file://" + localFilename : remoteUrl;
+        String url = (localFilename != null && FileUtilities.exists(localFilename)) ? "file://" + localFilename : remoteUrl;
         return new WebLinkAction(name, url);
     }
     
