@@ -276,9 +276,6 @@ class Java
     # check_java_version may alter @launcher.
     args = [ @launcher ]
 
-    # Set the class path directly with a system property rather than -cp so
-    # that our custom Win32 launcher doesn't have to convert between the two
-    # forms. (Sun's Win32 JVM expects ';'-separated paths.)
     add_pathnames_property("java.class.path", @class_path)
     add_pathnames_property("java.library.path", @library_path)
     
