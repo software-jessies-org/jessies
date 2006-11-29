@@ -54,8 +54,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		ComponentUtilities.disableFocusTraversal(this);
 		setOpaque(true);
 		setFont(options.getFont());
-		setForeground(options.getColor("foreground"));
-		setBackground(options.getColor("background"));
+		optionsDidChange();
 		addFocusListener(this);
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent event) {
@@ -100,6 +99,16 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		cursorBlinker = new CursorBlinker(this);
 		selectionHighlighter = new SelectionHighlighter(this);
 		birdsEye = new FindBirdsEye(this);
+	}
+	
+	public void optionsDidChange() {
+		Options options = Options.getSharedInstance();
+		if (options.shouldUseAltKeyAsMeta()) {
+			// If we want to handle key events when alt is down, we need to turn off input methods.
+			enableInputMethods(false);
+		}
+		setForeground(options.getColor("foreground"));
+		setBackground(options.getColor("background"));
 	}
 	
 	public BirdsEye getBirdsEye() {
@@ -708,7 +717,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 					graphics.fill(cursorRect);
 					// Redraw the character in the
 					// background color.
-					graphics.setColor(Options.getSharedInstance().getColor("background"));
+					graphics.setColor(getBackground());
 					graphics.drawString(characterUnderCursor, cursorRect.x, baseline);
 				}
 			} else {

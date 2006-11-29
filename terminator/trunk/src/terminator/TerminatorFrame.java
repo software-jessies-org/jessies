@@ -350,6 +350,8 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	public void optionsDidChange() {
+		setBackground(Options.getSharedInstance().getColor("background"));
+		
 		// Replace the menu bar, working around Sun bug 4949810.
 		JMenuBar menuBar = new TerminatorMenuBar();
 		setJMenuBar(menuBar);
