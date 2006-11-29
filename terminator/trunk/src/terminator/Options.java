@@ -543,7 +543,10 @@ public class Options {
 	 */
 	private String findRgbDotTxt() {
 		String[] possibleRgbDotTxtLocations = {
-			"/usr/X11R6/lib/X11/rgb.txt", // Linux, Mac OS with X11 installed.
+			"/etc/X11/rgb.txt", // Debian/Ubuntu.
+			"/usr/share/X11/rgb.txt", // Xorg Debian.
+			"/usr/lib/X11/rgb.txt", // Xorg Ubuntu.
+			"/usr/X11R6/lib/X11/rgb.txt", // XFree86 Linux, Mac OS with X11 installed.
 			"/usr/share/emacs/21.2/etc/rgb.txt", // Mac OS without X11 installed.
 		};
 		for (String possibleLocation : possibleRgbDotTxtLocations) {
