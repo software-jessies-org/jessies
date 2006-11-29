@@ -79,7 +79,7 @@ remembering where the tabs are and copy/pasting them as tab characters.
 <li><p><strong>UTF-8</strong> - Terminator won't mangle your favorite accented characters, and it copes well with languages such as Greek where there's a mix of normal and wide glyphs:
 <p align="center"><img src="mac-os-greek.png" alt="Greek on Mac OS">
 <p>The text is Markus Kuhn's <a href="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-demo.txt">UTF-8-demo.txt</a> if you want to see what a mess Terminal.app makes of it. (Terminal.app beats us on Thai, but we're better at Cyrillic, Greek, and Japanese.) The non-default settings in the screenshot were achieved thus:
-<blockquote><tt>terminator -xrm fontName:Monaco -xrm fontSize:13 -xrm antiAlias:true -xrm foreground:black -xrm background:white -xrm selectionColor:\#b4d5fe</tt></blockquote>
+<blockquote><tt>terminator -xrm fontName:Monaco -xrm fontSize:13 -xrm antiAlias:true -xrm foreground:\#000000 -xrm background:\#ffffff -xrm selectionColor:\#b4d5fe</tt></blockquote>
 <p>One side-effect of proper support for variable-width glyphs is that you're not restricted to fixed-width fonts in Terminator, even if the only language you're using is English. GNU readline might get confused about the line length, though.
 <p>Here's a more convincingly terminal-like example of fixed-width English and variable-width Japanese; output from javac(1):
 <p align="center"><img src="javac-jp-monaco.png" alt="Japanese javac(1) output on Mac OS">
