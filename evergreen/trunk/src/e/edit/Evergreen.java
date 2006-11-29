@@ -501,7 +501,12 @@ public class Evergreen {
         if (isSafeToQuit == false) {
             if (dirtyWorkspaces.size() == 1) {
                 // Ensure that the workspace in question is visible.
-                tabbedPane.setSelectedComponent(dirtyWorkspaces.get(0));
+                Workspace firstDirtyWorkspace = dirtyWorkspaces.get(0);
+                tabbedPane.setSelectedComponent(firstDirtyWorkspace);
+                // Ensure that at least the first dirty window is maximally visible.
+                ETextWindow firstDirtyWindow = firstDirtyWorkspace.getDirtyTextWindows()[0];
+                firstDirtyWindow.expand();
+                firstDirtyWindow.requestFocusInWindow();
             }
             showAlert("You have files with unsaved changes", "There are unsaved files:<p>" + StringUtilities.join(dirtyFileNames, "<br>") + "<p>Please deal with them and try again.");
             return;
