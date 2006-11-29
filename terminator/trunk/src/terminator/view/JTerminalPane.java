@@ -107,16 +107,16 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public void optionsDidChange() {
-		if (Options.getSharedInstance().shouldUseAltKeyAsMeta()) {
-			// If we want to handle key events when alt is down, we need to turn off input methods.
-			textPane.enableInputMethods(false);
-		}
+		textPane.optionsDidChange();
+		viewport.setBackground(textPane.getBackground());
+		scrollPane.setViewportBorder(new javax.swing.border.LineBorder(textPane.getBackground(), Options.getSharedInstance().getInternalBorder()));
+		scrollPane.invalidate();
+		validate();
 	}
 	
 	private void init(List<String> command, String workingDirectory) {
 		textPane = new JTextBuffer();
 		textPane.addKeyListener(new KeyHandler());
-		optionsDidChange();
 		
 		initOutputSpinner();
 		
@@ -124,7 +124,6 @@ public class JTerminalPane extends JPanel {
 		popupMenu.addMenuItemProvider(new TerminatorMenuItemProvider());
 		
 		viewport = new VisualBellViewport();
-		viewport.setBackground(textPane.getBackground());
 		viewport.setView(textPane);
 		
 		scrollPane = new JScrollPane();
@@ -132,7 +131,8 @@ public class JTerminalPane extends JPanel {
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setViewport(viewport);
-		scrollPane.setViewportBorder(new javax.swing.border.LineBorder(Options.getSharedInstance().getColor("background"), Options.getSharedInstance().getInternalBorder()));
+		
+		optionsDidChange();
 		
 		BirdView birdView = new BirdView(textPane.getBirdsEye(), scrollPane.getVerticalScrollBar());
 		textPane.setBirdView(birdView);
