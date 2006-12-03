@@ -39,6 +39,9 @@ class JdkInstaller
  end
 
  def install_jdk(jdk_url, jdk_filename, jdk_build_number)
+  if FileTest.directory?(@local_jdks_directory) == false
+   die("You need to create the #{@local_jdks_directory} directory before you can use this script.")
+  end
   if FileTest.directory?("#{@local_jdks_directory}/jdk1.6.0#{jdk_build_number}")
    if @should_be_quiet == false
     $stderr.puts("You already have the latest JDK build installed (1.6.0#{jdk_build_number})")
@@ -59,7 +62,7 @@ class JdkInstaller
    system("cd #{@local_jdks_directory} && mv jdk1.6.0 jdk1.6.0#{jdk_build_number}")
 
    # Extract the supplied class library source.
-   system("cd #{@local_jdks_directory}/jdk1.6.0#{jdk_build_number} && mkdir src && cd src && jar xf ../src.zip && rm ../src.zip")
+   system("cd #{@local_jdks_directory}/jdk1.6.0#{jdk_build_number} && mkdir src && cd src && ../bin/jar xf ../src.zip && rm ../src.zip")
 
    install_changes_html(jdk_build_number)
   end
