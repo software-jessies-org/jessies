@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 
-# FIXME: support official 1.5.0 builds.
-# FIXME: support Java 6 source releases.
+# FIXME: support official builds. (hard because you have to accept a license on the web page.)
+# FIXME: support source releases. (obsoleted?)
 
 require "open-uri"
 
@@ -12,9 +12,11 @@ class JdkInstaller
 
   # Where to look on the internet for available JDKs.
   @sun_site = "http://download.java.net"
-  @sun_binaries_url = "#{@sun_site}/jdk6/binaries/"
+  @sun_binaries_url = "#{@sun_site}/jdk7/binaries/"
   @sun_changes_url = "https://mustang.dev.java.net/servlets/ProjectDocumentList?folderID=2855"
   
+  @jdk_version = "jdk1.7.0"
+
   @should_be_quiet = false
  end
 
@@ -42,12 +44,12 @@ class JdkInstaller
   if FileTest.directory?(@local_jdks_directory) == false
    die("You need to create the #{@local_jdks_directory} directory before you can use this script.")
   end
-  if FileTest.directory?("#{@local_jdks_directory}/jdk1.6.0#{jdk_build_number}")
+  if FileTest.directory?("#{@local_jdks_directory}/#{@jdk_version}#{jdk_build_number}")
    if @should_be_quiet == false
-    $stderr.puts("You already have the latest JDK build installed (1.6.0#{jdk_build_number})")
+    $stderr.puts("You already have the latest JDK build installed (1.7.0#{jdk_build_number})")
    end
   else
-   $stderr.puts("Downloading JDK 1.6.0#{jdk_build_number}...")
+   $stderr.puts("Downloading JDK 1.7.0#{jdk_build_number}...")
    system("wget --no-verbose --output-document=/tmp/#{jdk_filename} #{jdk_url}")
 
    # This lets us run the installer from cron, by accepting the license for us.
@@ -59,30 +61,20 @@ class JdkInstaller
    system("cd #{@local_jdks_directory} && bash #{modified_installer} && rm #{modified_installer} && rm #{original_installer}")
 
    # Give this build a unique name, so we can install as many as we like.
-   system("cd #{@local_jdks_directory} && mv jdk1.6.0 jdk1.6.0#{jdk_build_number}")
+   system("cd #{@local_jdks_directory} && mv #{@jdk_version} #{@jdk_version}#{jdk_build_number}")
 
    # Extract the supplied class library source.
-   system("cd #{@local_jdks_directory}/jdk1.6.0#{jdk_build_number} && mkdir src && cd src && ../bin/jar xf ../src.zip && rm ../src.zip")
+   system("cd #{@local_jdks_directory}/#{@jdk_version}#{jdk_build_number} && mkdir src && cd src && ../bin/jar xf ../src.zip && rm ../src.zip")
 
    install_changes_html(jdk_build_number)
   end
  end
 
  def install_changes_html(jdk_build_number)
-  $stderr.puts("Looking for list of changes on web...")
-  url = nil
-  `wget --no-verbose --output-document=/tmp/jdk-changes-$$.html --no-check-certificate #{@sun_changes_url} && grep -- '#{jdk_build_number}\.html"' /tmp/jdk-changes-$$.html`.split("\n").each() {
-   |line|
-   if line =~ /href="(.*#{jdk_build_number}\.html)"/
-    url = $1
-    if url =~ /^\//
-     url = "https://mustang.dev.java.net#{url}"
-    end
-   end
-  }
+  url = "http://download.java.net/jdk7/changes/jdk7#{jdk_build_number}.html"
   if url != nil
    $stderr.puts("Downloading #{url}...")
-   system("wget --no-verbose --output-document=#{@local_jdks_directory}/jdk1.6.0#{jdk_build_number}/changes.html --no-check-certificate #{url}")
+   system("wget --no-verbose --output-document=#{@local_jdks_directory}/#{@jdk_version}#{jdk_build_number}/changes.html --no-check-certificate #{url}")
   end
  end
 
@@ -91,7 +83,7 @@ class JdkInstaller
    |f|
    f.each_line() {
     |line|
-    if line =~ /href="(.*(jdk-6.*(-b\d+).*\.(?:bin|exe|sh)).*)"/
+    if line =~ /href="(.*(jdk-7.*(-b\d+).*\.(?:bin|exe|sh)).*)"/
      jdk_url = $1
      jdk_filename = $2
      jdk_build_number = $3
