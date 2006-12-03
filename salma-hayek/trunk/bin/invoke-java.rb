@@ -117,9 +117,13 @@ class Java
   end
 
   def get_java_version(java_executable)
-    java_version = `#{java_executable} -fullversion 2>&1`.chomp()
-    java_version.match(/java full version "(.*)"/)
-    java_version = $1
+    # We might like to use -fullversion, but Debian's gij-wrapper Perl script only understands -version. I think for our purposes here, "-version" is accurate enough.
+    java_version = `#{java_executable} -version 2>&1`.chomp()
+    # If we appear to have found a JVM, extract just the version number.
+    # Otherwise, If we return exactly what the executable said, that might give the user some clue as to what went wrong.
+    if java_version.match(/java version "(.*)"/) != nil
+      java_version = $1
+    end
     return java_version
   end
 
