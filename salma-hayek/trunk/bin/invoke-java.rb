@@ -138,7 +138,7 @@ class Java
       # Can we salvage the situation by finding a suitable JVM?
 
       # This works for Linux distributions using Sun's RPM, and for Solaris.
-      globs = [ "/usr/java/jdk1.6.0*", "/usr/java/jre1.6.0*", "/usr/java/jdk1.5.0*", "/usr/java/jre1.5.0*" ]
+      globs = [  "/usr/java/jdk1.7.0*", "/usr/java/jre1.7.0*", "/usr/java/jdk1.6.0*", "/usr/java/jre1.6.0*", "/usr/java/jdk1.5.0*", "/usr/java/jre1.5.0*" ]
       globs.each() {
         |glob|
         java_directories = Dir.glob(glob).sort().reverse()
