@@ -87,14 +87,14 @@ public class PKeyHandler implements KeyListener {
         boolean byWord = GuiUtilities.isMacOs() ? event.isAltDown() : event.isControlDown();
         boolean extendingSelection = event.isShiftDown();
         int key = event.getKeyCode();
-        if (key == KeyEvent.VK_TAB) {
+        if (textArea.isEditable() && key == KeyEvent.VK_TAB) {
             if ((event.getModifiers() & ~KeyEvent.SHIFT_MASK) != 0) {
                 // If any modifiers (other than shift, which is meaningful to us) are down, pass on this event.
                 // Pretty much every modifier+tab combination is used by some system, and we should keep out of the way.
                 return false;
             }
             textArea.replaceSelection(event.isShiftDown() ? "\t" : textArea.getIndentationString());
-        } else if (key == KeyEvent.VK_ENTER) {
+        } else if (textArea.isEditable() && key == KeyEvent.VK_ENTER) {
             new PNewlineInserter(textArea).insertNewline(event.isShiftDown() == false);
         } else if (isStartOfTextKey(event)) {
             moveCaret(extendingSelection, 0);
