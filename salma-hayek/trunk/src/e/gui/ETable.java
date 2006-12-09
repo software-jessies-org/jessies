@@ -163,6 +163,7 @@ public class ETable extends JTable {
             }
             
             initToolTip(jc, row, column);
+            c.setEnabled(this.isEnabled());
         }
         
         return c;
