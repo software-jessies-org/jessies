@@ -38,7 +38,9 @@ public class EListCellRenderer extends DefaultListCellRenderer {
             setBackground(UIManager.getColor("List.selectionBackground"));
             setForeground(UIManager.getColor("List.selectionForeground"));
         }
-
+        
+        setEnabled(list.isEnabled());
+        
         return this;
     }
 }
