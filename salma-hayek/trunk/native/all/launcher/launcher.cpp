@@ -3,6 +3,7 @@
 #endif
 
 #include "DirectoryIterator.h"
+#include "JniError.h"
 #include "join.h"
 #include "synchronizeWindowsEnvironment.h"
 
@@ -189,10 +190,20 @@ private:
   }
   
   jclass findClass(const std::string& className) {
-    jclass javaClass = env->FindClass(className.c_str());
+    // Internally, the JVM tends to use '/'-separated class names.
+    // Externally, '.'-separated class names are more common.
+    // '.' is never valid in a class name, so we can unambiguously translate.
+    std::string canonicalName(className);
+    for (std::string::iterator it = canonicalName.begin(), end = canonicalName.end(); it != end; ++it) {
+      if (*it == '.') {
+        *it = '/';
+      }
+    }
+    
+    jclass javaClass = env->FindClass(canonicalName.c_str());
     if (javaClass == 0) {
       std::ostringstream os;
-      os << "FindClass(\"" << className << "\") failed.";
+      os << "FindClass(\"" << canonicalName << "\") failed.";
       throw UsageError(os.str());
     }
     return javaClass;
@@ -253,7 +264,11 @@ public:
     int result = createJavaVM(&vm, reinterpret_cast<void**>(&env), &javaVMInitArgs);
     if (result < 0) {
       std::ostringstream os;
-      os << "JNI_CreateJavaVM(" << javaVMOptions.size() << " options) failed with " << result << ".";
+      os << "JNI_CreateJavaVM(options=[";
+      for (size_t i = 0; i < javaVMOptions.size(); ++i) {
+        os << (i > 0 ? ", " : "") << '"' << javaVMOptions[i].optionString << '"';
+      }
+      os << "]) failed with " << JniError(result) << ".";
       throw UsageError(os.str());
     }
   }
@@ -298,24 +313,28 @@ public:
     NativeArguments::const_iterator it = launcherArguments.begin();
     NativeArguments::const_iterator end = launcherArguments.end();
     while (it != end && beginsWith(*it, "-")) {
-      std::string option = *it;
-      if (option == "-client") {
+      std::string option = *it++;
+      if (option == "-cp" || option == "-classpath") {
+        if (it == end) {
+          throw UsageError(option + " requires an argument.");
+        }
+        // Translate to a form the JVM understands.
+        std::string classPath = *it++;
+        jvmArguments.push_back("-Djava.class.path=" + classPath);
+      } else if (option == "-client") {
         jvmLocation.setClientClass();
       } else if (option == "-server") {
         jvmLocation.setServerClass();
       } else {
         jvmArguments.push_back(option);
       }
-      ++ it;
     }
     if (it == end) {
       throw UsageError("No class specified.");
     }
-    className = *it;
-    ++ it;
+    className = *it++;
     while (it != end) {
-      mainArguments.push_back(*it);
-      ++ it;
+      mainArguments.push_back(*it++);
     }
   }
   
@@ -354,10 +373,11 @@ int main(int, char** argv) {
     os << "where options are:" << std::endl;
     os << "  -client - use client VM" << std::endl;
     os << "  -server - use server VM" << std::endl;
+    os << "  -cp <path> | -classpath <path> - set the class search path" << std::endl;
     os << "  -D<name>=<value> - set a system property" << std::endl;
     os << "  -verbose[:class|gc|jni] - enable verbose output" << std::endl;
     // FIXME: If we know which version of JVM we've selected here, we could say so.
-    os << "or JVM 1.5 or newer -X options." << std::endl;
+    os << "or any option implemented internally by the chosen JVM." << std::endl;
     os << std::endl;
     os << "Command line was:";
     os << std::endl;
