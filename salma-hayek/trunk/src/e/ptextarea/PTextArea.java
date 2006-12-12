@@ -25,6 +25,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.93f, 0.93f, 0.93f);
     private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.97f, 0.97f, 0.97f);
     
+    // Used to get help us match the native UI when we're disabled.
+    private static final JLabel disabledLabel;
+    static {
+        disabledLabel = new JLabel("x");
+        disabledLabel.setEnabled(false);
+    }
+    
     private SelectionHighlight selection;
     private boolean selectionEndIsAnchor;  // Otherwise, selection start is anchor.
     
@@ -951,52 +958,75 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             }
             
             Rectangle bounds = graphics.getClipBounds();
-            int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds);
-            graphics.setColor(getBackground());
-            graphics.setFont(getFont());
+            
+            // Paint the background, if need be.
+            boolean disabledGtk = (isEnabled() == false && GuiUtilities.isGtk());
             if (isOpaque()) {
+                int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds);
+                graphics.setColor(getBackground());
+                if (disabledGtk) {
+                    graphics.setColor(disabledLabel.getBackground());
+                }
                 graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
             }
+            
+            // Work out which lines we need to paint.
             Insets insets = getInsets();
             int minLine = (bounds.y - insets.top) / metrics.getHeight();
             int maxLine = (bounds.y - insets.top + bounds.height) / metrics.getHeight();
             minLine = Math.max(0, Math.min(splitLines.size() - 1, minLine));
             maxLine = Math.max(0, Math.min(splitLines.size() - 1, maxLine));
             
-            int baseline = getBaseline(minLine);
+            // Paint the highlights on those lines.
             paintHighlights(graphics, minLine, maxLine);
-            int paintCharOffset = getSplitLine(minLine).getTextIndex();
-            int x = insets.left;
-            int line = minLine;
-            int caretOffset = hasSelection() ? -1 : getSelectionStart();
-            Iterator<PLineSegment> it = getWrappedSegmentIterator(paintCharOffset);
-            while (it.hasNext()) {
-                PLineSegment segment = it.next();
-                paintCharOffset = segment.getEnd();
-                applyStyle(graphics, segment.getStyle());
-                segment.paint(graphics, x, baseline);
-                if (segment.getOffset() == caretOffset && segment.isNewline() == false) {
-                    paintCaret(graphics, x, baseline);
-                } else if (segment.getOffset() <= caretOffset && segment.getEnd() > caretOffset) {
-                    int caretX = x + segment.getDisplayWidth(metrics, x, caretOffset - segment.getOffset());
-                    paintCaret(graphics, caretX, baseline);
-                }
-                x += segment.getDisplayWidth(metrics, x);
-                if (segment.isNewline()) {
-                    x = insets.left;
-                    baseline += metrics.getHeight();
-                    line++;
-                    if (line > maxLine) {
-                        break;
-                    }
-                }
-            }
-            if (caretOffset == paintCharOffset) {
-                paintCaret(graphics, x, baseline);
+            
+            // Paint the text.
+            graphics.setFont(getFont());
+            int startX = insets.left;
+            int startY = getBaseline(minLine);
+            if (disabledGtk) {
+                // The GNOME "Clearlooks" and Ubuntu "Human" themes both render text in a "shadowed" style when the component is disabled.
+                paintTextLines(graphics, minLine, maxLine, startX + 1, startY + 1, Color.WHITE);
+                paintTextLines(graphics, minLine, maxLine, startX, startY, SystemColor.textInactiveText);
+            } else {
+                paintTextLines(graphics, minLine, maxLine, startX, startY, isEnabled() ? null : SystemColor.textInactiveText);
             }
             //watch.print("Repaint");
         } finally {
             getLock().relinquishReadLock();
+        }
+    }
+    
+    private void paintTextLines(Graphics2D g, int minLine, int maxLine, int startX, int startY, Color overrideColor) {
+        int baseline = startY;
+        int paintCharOffset = getSplitLine(minLine).getTextIndex();
+        int x = startX;
+        int line = minLine;
+        int caretOffset = hasSelection() ? -1 : getSelectionStart();
+        Iterator<PLineSegment> it = getWrappedSegmentIterator(paintCharOffset);
+        while (it.hasNext()) {
+            PLineSegment segment = it.next();
+            paintCharOffset = segment.getEnd();
+            g.setColor(overrideColor != null ? overrideColor : segment.getStyle().getColor());
+            segment.paint(g, x, baseline);
+            if (segment.getOffset() == caretOffset && segment.isNewline() == false) {
+                paintCaret(g, x, baseline);
+            } else if (segment.getOffset() <= caretOffset && segment.getEnd() > caretOffset) {
+                int caretX = x + segment.getDisplayWidth(metrics, x, caretOffset - segment.getOffset());
+                paintCaret(g, caretX, baseline);
+            }
+            x += segment.getDisplayWidth(metrics, x);
+            if (segment.isNewline()) {
+                x = startX;
+                baseline += metrics.getHeight();
+                line++;
+                if (line > maxLine) {
+                    break;
+                }
+            }
+        }
+        if (caretOffset == paintCharOffset) {
+            paintCaret(g, x, baseline);
         }
     }
     
@@ -1020,6 +1050,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     private void paintHighlights(Graphics2D graphics, int minLine, int maxLine) {
+        if (isEnabled() == false) {
+            // A disabled component shouldn't render highlights (especially not the selection).
+            return;
+        }
         //StopWatch stopWatch = new StopWatch()
         int minChar = getSplitLine(minLine).getTextIndex();
         SplitLine max = getSplitLine(maxLine);
@@ -1032,22 +1066,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         //stopWatch.print("Highlight painting");
     }
     
-    private void applyStyle(Graphics2D g, PStyle style) {
-        Color color = style.getColor();
-        applyColor(g, color);
-    }
-    
-    private void applyColor(Graphics2D g, Color color) {
-        g.setColor(isEnabled() ? color : Color.GRAY);
-    }
-    
     private void paintCaret(Graphics2D graphics, int x, int y) {
-        if (isFocusOwner() == false) {
-            // An unfocused component shouldn't render a caret. There should
-            // be at most one caret on the display.
+        if (isFocusOwner() == false || isEnabled() == false) {
+            // An unfocused component shouldn't render a caret. There should be at most one caret on the display.
+            // A disabled component shouldn't render a caret either.
             return;
         }
-        applyColor(graphics, Color.RED);
+        graphics.setColor(Color.RED);
         int yTop = y - metrics.getMaxAscent();
         int yBottom = y + metrics.getMaxDescent() - 1;
         graphics.drawLine(x, yTop + 1, x, yBottom - 1);
