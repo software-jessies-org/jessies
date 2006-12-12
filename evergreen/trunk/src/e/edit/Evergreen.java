@@ -648,6 +648,8 @@ public class Evergreen {
             File realFile = FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml"));
             if (GuiUtilities.isWindows()) {
                 // You can't rename over an existing file in Windows-semantics file systems (but it's nice and atomic in Unix).
+                // You could be saving to a Window-semantics file system from Unix and you could be saving to a Unix-semantics
+                // file system from Windows, so the GuiUtilities.isWindows test is just an approximation.
                 // FIXME: it would be better to capture the XML in a string and pass the string to an atomic variant of StringUtilities.writeFile.
                 realFile.delete();
             }
