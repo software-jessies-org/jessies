@@ -987,9 +987,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             if (disabledGtk) {
                 // The GNOME "Clearlooks" and Ubuntu "Human" themes both render text in a "shadowed" style when the component is disabled.
                 paintTextLines(graphics, minLine, maxLine, startX + 1, startY + 1, Color.WHITE);
-                paintTextLines(graphics, minLine, maxLine, startX, startY, SystemColor.textInactiveText);
+                paintTextLines(graphics, minLine, maxLine, startX, startY, UIManager.getColor("EditorPane.inactiveForeground"));
             } else {
-                paintTextLines(graphics, minLine, maxLine, startX, startY, isEnabled() ? null : SystemColor.textInactiveText);
+                paintTextLines(graphics, minLine, maxLine, startX, startY, isEnabled() ? null : UIManager.getColor("EditorPane.inactiveForeground"));
             }
             //watch.print("Repaint");
         } finally {
