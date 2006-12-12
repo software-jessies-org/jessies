@@ -651,7 +651,9 @@ public class Evergreen {
                 // FIXME: it would be better to capture the XML in a string and pass the string to an atomic variant of StringUtilities.writeFile.
                 realFile.delete();
             }
-            FileUtilities.fileFromString(filename).renameTo(realFile);
+            if (FileUtilities.fileFromString(filename).renameTo(realFile) == false) {
+                Log.warn("Failed to rename " + filename + " to " + realFile);
+            }
         } catch (Exception ex) {
             Log.warn("Problem writing saved state", ex);
         }
