@@ -770,8 +770,8 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			// isBold will always return true, and getting the WEIGHT attribute will give you WEIGHT_BOLD.
 			// So we don't know how to test for a bold font.
 			
-			// Worse, if we actually get a bold font, it doesn't necessarily have compatible metrics.
-			// ProggySquare (http://www.proggyfonts.com/) is an example.
+			// Worse, if we actually get a bold font, it doesn't necessarily have metrics compatible with the plain variant.
+			// ProggySquare (http://www.proggyfonts.com/) is an example: the bold variant is significantly wider.
 			
 			// The old-fashioned "overstrike" method of faking bold doesn't look too bad, and it works in these awkward cases.
 			graphics.drawString(text.getText(), x + 1, y);
