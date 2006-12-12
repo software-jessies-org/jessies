@@ -637,28 +637,46 @@ public class Evergreen {
                 workspace.serializeAsXml(document, root);
             }
             
-            // Write the XML to a new file...
-            String filename = getPreferenceFilename("saved-state.xml2");
+            // Create the XML content...
+            StringWriter content = new StringWriter();
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.transform(new DOMSource(document), new StreamResult(new FileOutputStream(filename)));
-
-            // ...and then rename it to the file we want, to protect against
-            // losing all our state on failure.
-            File realFile = FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml"));
-            if (GuiUtilities.isWindows()) {
-                // You can't rename over an existing file in Windows-semantics file systems (but it's nice and atomic in Unix).
-                // You could be saving to a Window-semantics file system from Unix and you could be saving to a Unix-semantics
-                // file system from Windows, so the GuiUtilities.isWindows test is just an approximation.
-                // FIXME: it would be better to capture the XML in a string and pass the string to an atomic variant of StringUtilities.writeFile.
-                realFile.delete();
-            }
-            if (FileUtilities.fileFromString(filename).renameTo(realFile) == false) {
-                Log.warn("Failed to rename " + filename + " to " + realFile);
+            transformer.transform(new DOMSource(document), new StreamResult(content));
+            
+            // And then carefully write it to disk.
+            File file = FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml"));
+            if (writeAtomicallyTo(file, content.toString()) == false) {
+                Log.warn("\"" + file + "\" content should have been:\n" + content.toString());
             }
         } catch (Exception ex) {
             Log.warn("Problem writing saved state", ex);
         }
+    }
+    
+    private static boolean writeAtomicallyTo(File file, CharSequence chars) {
+        // We save to a new file first, to reduce our chances of corrupting the real file, or at least increase our chances of having one intact copy.
+        File backupFile = new File(file.toString() + ".bak");
+        try {
+            StringUtilities.writeFile(backupFile, chars);
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        // Now we write to the intended destination.
+        // If the destination was a symbolic link on a CIFS server, it's important to write to the original file rather than creating a new one.
+        
+        // CIFS also causes problems if we try renaming the backup file to the intended file.
+        // For one thing, the destination must not exist, but removing the destination would make it harder to be atomic.
+        // Also, the source must not be open, which is not easy to guarantee in Java, and often not the case as soon as you'd like.
+        try {
+            StringUtilities.writeFile(file, chars);
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        // Everything went well so far, so delete the backup file (ignoring failures) and return success.
+        backupFile.delete();
+        return true;
     }
     
     private Workspace addWorkspace(String name, String root, String buildTarget) {
