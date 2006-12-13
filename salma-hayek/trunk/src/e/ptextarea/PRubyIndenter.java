@@ -9,8 +9,12 @@ public class PRubyIndenter extends PGenericIndenter {
     
     private static final String UNINDENT = "\\b(end|else|elsif|when|ensure|rescue)\\b|^[^{]*}";
     
-    /* The final characters in "end", "else", "elsif", "when", "ensure", "rescue" and "}". */
-    private static final String ELECTRICS = "defn}";
+    /**
+     * The final characters in "end", "else", "elsif", "when", "ensure", "rescue" and "}".
+     * Plus "s", for when you turn an "if" into an "elsif".
+     * Is indenting Ruby efficient enough that we can just do it on every change?
+     */
+    private static final String ELECTRICS = "defns}";
     
     public PRubyIndenter(PTextArea textArea) {
         super(textArea, INDENT_AFTER, INDENT, UNINDENT, ELECTRICS);
