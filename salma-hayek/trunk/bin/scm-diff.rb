@@ -3,13 +3,17 @@
 require 'pathname'
 
 def getDiffTool(dir)
-  if (dir + ".svn").directory?
-    return "svn diff"
-  elsif (dir + "CVS").directory?
+  if (dir + ".bzr").directory?()
+    return "bzr diff"
+  elsif (dir + "CVS").directory?()
     return "cvs diff -u"
+  elsif (dir + ".hg").directory?()
+    return "hg diff"
+  elsif (dir + ".svn").directory?()
+    return "svn diff"
   else
-    while dir.root? == false
-      if (dir + "BitKeeper").directory?
+    while dir.root?() == false
+      if (dir + "BitKeeper").directory?()
         return "bk diffs -u"
       end
       dir = dir.dirname()
