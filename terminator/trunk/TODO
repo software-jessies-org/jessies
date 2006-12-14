@@ -319,10 +319,7 @@ Installers
 
     c:/ruby/lib/ruby/1.8/pathname.rb:341:in `lstat': Invalid argument - /C:/Documents and Settings/martind/f:/software.jessies.org/salma-hayek/bin/fatbits (Errno::EINVAL)
 
-  You have to uncheck the rubygems option in the installer or unset the
-  RUBYOPT native environment variable that it sets to fix:
-
-    ruby: no such file to load -- ubygems (LoadError)
+  There is also the "ubygems" problem, now documented in the Terminator web page.
 
   We would have to install the Ruby scripts as .rb (which would break
   anywhere we call them programmatically unless we rename them
