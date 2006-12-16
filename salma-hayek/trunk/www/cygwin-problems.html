@@ -1,0 +1,59 @@
+<html>
+<head>
+<title>Cygwin Problems</title>
+<link rel="stylesheet" type="text/css" href="/salma-hayek/styles.css" />
+</head>
+<body>
+
+<h1>Cygwin Problems</h1>
+
+<h2>The installer claims I need to install Cygwin but I already did!</h2>
+
+<p>When you install Cygwin, it stores its location in the registry.
+Unfortunately, it has to use a different registry key depending on whether you install for the current user or all users.
+We haven't yet worked out how to explain this to Microsoft's WiX installer compiler, so for now the work-around is to install Cygwin for all users.
+We hope to fix this by moving the check to run-time (and check both registry keys), which should help people who don't have permission to install for all users.
+
+<h2>Double-clicking on the shortcut icon does nothing</h2>
+
+<p>If you're having trouble starting one of our programs, you may want to try running it from a Cygwin Bash prompt
+instead of from the desktop shortcut icon until you work out what's wrong.
+Running it manually will use <tt>ruby.exe</tt> rather than the <tt>rubyw.exe</tt> used by the shortcut.
+<tt>rubyw.exe</tt> is a version of Ruby linked with <tt>--subsystem windows</tt> instead of <tt>--subsystem console</tt>.
+<tt>rubyw.exe</tt> quits with no visible error if it tries to do standard I/O.
+One reason why Ruby might try to write to the standard error stream is if it wants to warn about <a href="../salma-hayek/cygwin-setup.html">world-writable directories on the PATH</a>.
+
+<p>Any console output from our applications (as opposed to the start-up scripts or their interpreters) is recorded in a file.
+For Terminator, these are stored in <tt>~/.terminal-logs/</tt> along with a file containing a log of each tab's output.
+Evergreen's output is logged in your temporary directory.
+SCM's output is not currently logged.
+
+<h2>Installing Windows Ruby breaks Cygwin Ruby</h2>
+
+<p>Another problem we've seen a few times relates to the native Windows port of Ruby.
+We don't work with the current stable version, 1.8, because its "pathname.rb" library is broken for Windows paths.
+Ruby 1.9 fixes this, but is unlikely to be officially released before 2007-12.
+In the meantime we require the Cygwin port of Ruby.
+
+<p>If at any time you install the native Windows Ruby, its installer sets the Windows environment variable RUBYOPT to "-rubygems".
+(You can tell it not to do this, but it doesn't make it clear that the default option will break other Ruby interpreters.)
+Cygwin's Ruby doesn't include RubyGems (it isn't part of the standard Ruby distribution), which causes it to fail to start with:
+<pre>
+ruby: no such file to load -- ubygems (LoadError)
+</pre>
+
+<p>The fix we've been recommending is to delete the Windows RUBYOPT environment variable.
+An alternative is to install RubyGems for your Cygwin Ruby.
+Another alternative is to put an empty "ubygems.rb" file somewhere on your Cygwin Ruby's library search path.
+
+<h2>Why do we use Cygwin?</h2>
+
+<p>The main reason for using Cygwin is that one of our projects, Terminator, requires it.
+NT's built-in POSIX subsystem won't let you launch native Windows applications or interact with the network, so that wasn't an option.
+Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which we use to support terminal resizing, not to mention containing a port of one of the most widely used ssh programs.
+
+<p>Cygwin is also convenient for us in that it lets us use the same start-up scripts that we use on Linux and Mac OS.
+
+<!--#include virtual="/salma-hayek/footer.html" -->
+</body>
+</html>
