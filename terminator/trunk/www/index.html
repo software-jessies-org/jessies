@@ -159,14 +159,18 @@ export TERMINFO=~/.terminfo
 export TERM=$TERM
 </pre>
 
-<p>See "Running on Windows" below for a note about Cygwin.
+<p>As of 1.5.19, Cygwin's less(1) is still using a termcap-based ncurses library.
+If less(1) (and hence man(1)) say "WARNING: terminal is not fully functional", try:
+<pre>
+infocmp -C >> ~/.termcap
+</pre>
 
 <p>FreeBSD systems don't come with the necessary terminfo support installed by
 default.  It's apparently a snap to install the
 <a href="http://www.freebsd.org/cgi/url.cgi?ports/devel/ncurses/pkg-descr">devel/ncurses</a>
 package from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports and Packages Collection</a>.
 
-<h3>Pasting in VNC</h3>
+<h3>Pasting in old versions of VNC</h3>
 
 <p>If you're using an old version of VNC, you may experience problems pasting into Terminator, accompanied by the following exception:
 <pre>
@@ -174,46 +178,7 @@ java.awt.datatransfer.UnsupportedFlavorException: Unicode String
 </pre>
 <p>This is caused by a bug in old versions of the X11 VNC server. On Debian, you should remove the <tt>vncserver</tt> package and install the <tt>vnc4server</tt> package, and run <tt>vnc4server</tt> (it takes the same arguments as <tt>vncserver</tt>)&nbsp;&mdash; just upgrading your existing <tt>vncserver</tt> package will not help. Switching package will also a fix a bunch of other problems you may or may not have noticed with VNC.
 
-<h3>Running on Windows</h3>
-
-<p>If you're having trouble starting Terminator, you may want to try running it from Bash
-instead of from the desktop shortcut until you work out what's wrong.
-Running it manually will use <tt>ruby.exe</tt> rather than the <tt>rubyw.exe</tt> used by the shortcut.
-<tt>rubyw.exe</tt> is a version of Ruby linked with <tt>--subsystem windows</tt> instead of <tt>--subsystem console</tt>.
-<tt>rubyw.exe</tt> quits with no visible error if it tries to do standard I/O.
-One reason why it might do this is a world-writable directory on the PATH, as explained
-<a href="../salma-hayek/cygwin-setup.html">here</a>.
-Any console output from the Java, as opposed to the start-up script, is recorded in a file in
-<tt>~/.terminal-logs/</tt> along with a file containing a log of each tab's output.
-
-<p>You may see warnings from Ruby like this:
-<pre>
-terminator:25: warning: Insecure world writable dir /usr/local/bin, mode 040777
-</pre>
-which can be cured thus:
-<pre>
-chmod o-w /usr/local/bin
-</pre>
-
-<p>Another problem we've seen a few times relates to the native Windows port
-of Ruby.  We don't work with the current stable version (call us when 1.9 is
-released and we'll have another try).  At the moment, then, we require the Cygwin
-port of Ruby.  Our situation is, however, slightly worse than that.  If you've installed
-the native Windows port, its installer will have set the Windows environment variable
-RUBOPT to "rubygems".  This affects the Cygwin Ruby too, causing it to fail to start
-with:
-<pre>
-ruby: no such file to load -- ubygems (LoadError)
-</pre>
-
-<p>The fix we've been recommending is to delete the Windows RUBYOPT environment
-variable.
-
-<p>As of 1.5.19, Cygwin's less(1) is still using a termcap-based ncurses library.
-If less(1) (and hence man(1)) say "WARNING: terminal is not fully functional", try:
-<pre>
-infocmp -C >> ~/.termcap
-</pre>
+<h3>Fonts on Windows</h3>
 
 <p>If you have the JRE installed (rather than the JDK), then you may
 want to rerun the JRE installer and choose a Custom installation so that you get
