@@ -962,12 +962,17 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             // Paint the background, if need be.
             boolean disabledGtk = (isEnabled() == false && GuiUtilities.isGtk());
             if (isOpaque()) {
-                int whiteBackgroundWidth = paintRightHandMargin(graphics, bounds);
-                graphics.setColor(getBackground());
+                int paintableBackgroundWidth;
                 if (disabledGtk) {
+                    // The whole background should appear disabled.
+                    paintableBackgroundWidth = bounds.width;
                     graphics.setColor(disabledLabel.getBackground());
+                } else {
+                    // Only paint that part of the background that isn't part of the right-hand margin.
+                    paintableBackgroundWidth = paintRightHandMargin(graphics, bounds);
+                    graphics.setColor(getBackground());
                 }
-                graphics.fillRect(bounds.x, bounds.y, whiteBackgroundWidth, bounds.height);
+                graphics.fillRect(bounds.x, bounds.y, paintableBackgroundWidth, bounds.height);
             }
             
             // Work out which lines we need to paint.
