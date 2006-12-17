@@ -1,14 +1,29 @@
 body {
-    margin:20px 80px 100px;
+  margin:0px;
+  margin-bottom:100px;
 }
 h1 {
-    margin-left:-40px;
+  position:relative;
+  left:20px;
+  margin-top:40px;
 }
 h2 {
-    margin-left:-40px;
+  position:relative;
+  left:30px;
+}
+h3 {
+  position:relative;
+  left:40px;
 }
 pre {
-    margin-left:40px;
+  position:relative;
+  left:60px;
+  width:80%;
+}
+p {
+  position:relative;
+  left:50px;
+  width:80%;
 }
 
 div.leftcol {
@@ -26,16 +41,14 @@ div.footer {
   font-size: 75%;
 }
 
-table.header {
-  margin-top:-20px;
-  margin-left: -80px;
-  margin-bottom:20px;
-  border: 1px solid #8cacbb;
-  border-style: none solid solid none;
+div.colored-box {
   background-color: #dee7ec;
+}
+
+table.header {
+  border-style:none;
   font-family: sans-serif;
   font-size: smaller;
-  padding-right: 25%;
 }
 table.header th {
   padding:10px;
