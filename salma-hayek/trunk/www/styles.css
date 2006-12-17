@@ -27,12 +27,23 @@ div.footer {
 }
 
 table.header {
+  margin-top:-20px;
+  margin-left: -80px;
+  margin-bottom:20px;
   border: 1px solid #8cacbb;
+  border-style: none solid solid none;
   background-color: #dee7ec;
+  font-family: sans-serif;
   font-size: smaller;
+  padding-right: 25%;
 }
-table.header>tr>td {
-  border: 1px #8cacbb;
-  border-style: none dotted none dotted;
+table.header th {
+  padding:10px;
+  border-right: 3px solid #8cacbb;
+  text-align: center;
+}
+table.header td {
+  padding:10px;
+  border-right: 1px dotted #8cacbb;
   text-align: center;
 }
