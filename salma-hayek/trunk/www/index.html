@@ -113,9 +113,9 @@ The makefile will tell you what to do if you try to build with an old version.
 <pre>
 light.exe : error LGHT0001 : COM object with CLSID {F94985D5-29F9-4743-9805-99BC3F35B678} is either not valid or not registered.
 </pre>
-you also need MergeMod.dll to be installed and registered.
-This appears to be part of the free <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=A55B6B43-E24F-4EA3-A93E-40C0EC4F68E5&amp;displaylang=en">Microsoft Windows Platform SDK</a> among other things.
-This is how you register the COM object, according to <a href="http://support.microsoft.com/kb/329214/EN-US/">the instructions</a>, once it's installed:
+<p>you also need MergeMod.dll to be installed and registered.
+If you don't have it, it's part of the free <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en">Microsoft Windows Platform SDK</a>.
+You also have to manually register the COM object once the Microsoft Platform SDK is installed (<a href="http://support.microsoft.com/kb/329214/EN-US/">full details</a>):
 <pre>
 regsvr32 "C:\Program Files\Microsoft Platform SDK\Bin\MergeMod.Dll"
 </pre>
