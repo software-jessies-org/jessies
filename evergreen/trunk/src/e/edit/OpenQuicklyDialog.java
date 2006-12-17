@@ -66,6 +66,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
                     
                     // Wrestle focus back from the file we've just opened.
                     SwingUtilities.getWindowAncestor(matchList).toFront();
+                    filenameField.requestFocus();
                 }
             }
         });
