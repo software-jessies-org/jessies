@@ -30,6 +30,9 @@ p {
   width:80%;
 }
 
+/* All this relative positioning seems to confuse lists. The bullets are still displayed at the 'margin' rather than at the 'position'. So just hide bullets as a work-around. */
+ul { list-style-type:none; }
+
 div.leftcol {
   float: left;
 }
