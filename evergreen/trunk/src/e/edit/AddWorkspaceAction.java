@@ -33,8 +33,7 @@ public class AddWorkspaceAction extends AbstractAction {
             if (message != null) {
                 Evergreen.getInstance().showAlert(message, "The pathname you supply must exist, and must be a directory.");
             } else {
-                Workspace workspace = Evergreen.getInstance().createWorkspace(nameField.getText(), filenameChooserField.getPathname());
-                workspace.updateFileList(null);
+                Evergreen.getInstance().createWorkspace(nameField.getText(), filenameChooserField.getPathname());
                 return;
             }
         }
