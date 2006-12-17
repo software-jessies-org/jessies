@@ -19,7 +19,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
         Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         // FindInFilesDialog.showDialog will make this check, but not before
         // guessDirectoryToSearchIn has already failed.
-        if (workspace.isFileListUnsuitableFor("Find in Files")) {
+        if (workspace.getFileList().isFileListUnsuitableFor("Find in Files")) {
             return;
         }
         
@@ -48,7 +48,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
         // Note that "" actually means "use whatever's already in the
         // field" rather than "nothing".
         Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
-        if (workspace.getIndexedFileCount() < 1000) {
+        if (workspace.getFileList().getIndexedFileCount() < 1000) {
             return "";
         }
         

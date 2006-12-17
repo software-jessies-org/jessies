@@ -158,7 +158,7 @@ public class FindInFilesDialog {
             this.matchRoot = new DefaultMutableTreeNode();
             this.regex = regexField.getText();
             this.fileRegex = filenameRegexField.getText();
-            this.fileList = workspace.getListOfFilesMatching(fileRegex);
+            this.fileList = workspace.getFileList().getListOfFilesMatching(fileRegex);
             
             this.doneFileCount = 0;
             this.matchingFileCount = 0;
@@ -299,8 +299,8 @@ public class FindInFilesDialog {
         
         private String makeStatusString() {
             String status = matchingFileCount + " / " + StringUtilities.pluralize(totalFileCount, "file", "files");
-            if (workspace.getIndexedFileCount() != totalFileCount) {
-                status += " (from " + workspace.getIndexedFileCount() + ")";
+            if (workspace.getFileList().getIndexedFileCount() != totalFileCount) {
+                status += " (from " + workspace.getFileList().getIndexedFileCount() + ")";
             }
             status += " match.";
             return status;
@@ -452,7 +452,7 @@ public class FindInFilesDialog {
     }
     
     public void showDialog() {
-        if (workspace.isFileListUnsuitableFor("Find in Files")) {
+        if (workspace.getFileList().isFileListUnsuitableFor("Find in Files")) {
             return;
         }
         

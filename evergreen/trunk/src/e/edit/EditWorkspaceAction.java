@@ -44,7 +44,6 @@ public class EditWorkspaceAction extends AbstractAction {
             } else {
                 workspace.setTitle(nameField.getText());
                 workspace.setRootDirectory(filenameChooserField.getPathname());
-                workspace.updateFileList(null);
                 return;
             }
         }

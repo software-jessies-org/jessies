@@ -38,11 +38,11 @@ public class OpenQuicklyDialog {
     
         this.model = new DefaultListModel();
         try {
-            List fileList = workspace.getListOfFilesMatching(regex);
+            List fileList = workspace.getFileList().getListOfFilesMatching(regex);
             for (int i = 0; i < fileList.size(); i++) {
                 model.addElement(fileList.get(i));
             }
-            final int totalFileCount = workspace.getIndexedFileCount();
+            final int totalFileCount = workspace.getFileList().getIndexedFileCount();
             setStatus(true, fileList.size() + " / " + StringUtilities.pluralize(totalFileCount, "file", "files") + " match.");
         } catch (PatternSyntaxException ex) {
             setStatus(false, ex.getDescription());
@@ -102,7 +102,7 @@ public class OpenQuicklyDialog {
             matchList.setEnabled(false);
             setStatus(true, " ");
             switchToFakeList();
-            workspace.updateFileList(this);
+            workspace.getFileList().updateFileList(this);
             filenameField.requestFocusInWindow();
         }
         
@@ -131,7 +131,7 @@ public class OpenQuicklyDialog {
     }
     
     public void showDialog() {
-        if (workspace.isFileListUnsuitableFor("Open Quickly")) {
+        if (workspace.getFileList().isFileListUnsuitableFor("Open Quickly")) {
             return;
         }
         

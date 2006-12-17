@@ -838,8 +838,6 @@ public class Evergreen {
                 
                 Log.warn("All remembered files opened after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
                 
-                startScanningWorkspaces();
-                
                 if (tabbedPane.getTabCount() == 0) {
                     // If we didn't create any workspaces, give the user some help...
                     showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
@@ -849,11 +847,5 @@ public class Evergreen {
                 }
             }
         });
-    }
-
-    private void startScanningWorkspaces() {
-        for (Workspace workspace : getWorkspaces()) {
-            workspace.updateFileList(null);
-        }
     }
 }
