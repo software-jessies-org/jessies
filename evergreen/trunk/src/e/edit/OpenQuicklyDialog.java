@@ -19,10 +19,11 @@ import e.util.*;
  * double-click individual entries to open them, or hit Return if
  * there's just the one.
  */
-public class OpenQuicklyDialog {
+public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     private JTextField filenameField = new JTextField(40);
     private JList matchList;
     private JLabel status = new JLabel(" ");
+    private JButton rescanButton;
     
     private DefaultListModel model;
     
@@ -55,10 +56,6 @@ public class OpenQuicklyDialog {
     }
     
     public void initMatchList() {
-        if (matchList != null) {
-            return;
-        }
-
         matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -77,6 +74,11 @@ public class OpenQuicklyDialog {
     
     public OpenQuicklyDialog(Workspace workspace) {
         this.workspace = workspace;
+        
+        initMatchList();
+        initRescanButton();
+        
+        workspace.getFileList().addFileListListener(this);
     }
 
     /**
@@ -86,34 +88,27 @@ public class OpenQuicklyDialog {
         filenameField.setText(filenamePattern);
     }
     
-    class RescanAction extends AbstractAction implements ChangeListener {
-        private JButton source;
-        
+    private class RescanAction extends AbstractAction {
         public RescanAction() {
             super("Rescan");
         }
         
-        /**
-         * Hides any previous results and starts the rescan.
-         */
         public void actionPerformed(ActionEvent e) {
-            source = (JButton) e.getSource();
-            source.setEnabled(false);
+            workspace.getFileList().updateFileList();
+        }
+    }
+    
+    public void fileListStateChanged(boolean isNowValid) {
+        if (isNowValid) {
+            showMatches();
+            matchList.setEnabled(true);
+            rescanButton.setEnabled(true);
+        } else {
+            rescanButton.setEnabled(false);
             matchList.setEnabled(false);
             setStatus(true, " ");
             switchToFakeList();
-            workspace.getFileList().updateFileList(this);
             filenameField.requestFocusInWindow();
-        }
-        
-        /**
-         * Searches again when the file list has finished being updated.
-         */
-        public void stateChanged(ChangeEvent e) {
-            showMatches();
-            matchList.setEnabled(true);
-            source.setEnabled(true);
-            source = null;
         }
     }
     
@@ -126,19 +121,12 @@ public class OpenQuicklyDialog {
         matchList.setModel(model);
     }
     
-    public JButton makeRescanButton() {
-        JButton rescanButton = new JButton(new RescanAction());
+    public void initRescanButton() {
+        rescanButton = new JButton(new RescanAction());
         GnomeStockIcon.useStockIcon(rescanButton, "gtk-refresh");
-        return rescanButton;
     }
     
     public void showDialog() {
-        if (workspace.getFileList().isFileListUnsuitableFor("Open Quickly")) {
-            return;
-        }
-        
-        initMatchList();
-        
         FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Open Quickly");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Names Containing:", filenameField);
@@ -149,7 +137,7 @@ public class OpenQuicklyDialog {
                 showMatches();
             }
         });
-        form.getFormDialog().setExtraButton(makeRescanButton());
+        form.getFormDialog().setExtraButton(rescanButton);
         boolean okay = form.show("Open");
         
         if (okay == false) {

@@ -16,8 +16,19 @@ public class WorkspaceFileList {
     private String fileAlterationMonitorRoot;
     private ExecutorService fileListUpdateExecutorService;
     
+    private ArrayList<Listener> listeners = new ArrayList<Listener>();
+    
     public WorkspaceFileList(Workspace workspace) {
         this.workspace = workspace;
+    }
+    
+    public void addFileListListener(Listener l) {
+        listeners.add(l);
+        fireListeners(fileList != null);
+    }
+    
+    public void removeFileListListener(Listener l) {
+        listeners.remove(l);
     }
     
     public void dispose() {
@@ -27,6 +38,7 @@ public class WorkspaceFileList {
     /**
      * Returns the number of indexed files for this workspace.
      */
+    @Deprecated
     public int getIndexedFileCount() {
         return fileList.size();
     }
@@ -47,13 +59,9 @@ public class WorkspaceFileList {
      * the job in the background. New requests that arrive while a scan is
      * already in progress will be queued behind the in-progress scan.
      */
-    public synchronized void updateFileList(ChangeListener listener) {
-        FileListUpdater fileListUpdater = new FileListUpdater(listener);
-        fileListUpdateExecutorService.execute(fileListUpdater);
-    }
-    
     public synchronized void updateFileList() {
-        updateFileList(null);
+        FileListUpdater fileListUpdater = new FileListUpdater();
+        fileListUpdateExecutorService.execute(fileListUpdater);
     }
     
     /**
@@ -61,6 +69,7 @@ public class WorkspaceFileList {
      * It's usually unavailable if the workspace hasn't been scanned yet.
      * The user will be shown an appropriate warning in case of unsuitability.
      */
+    @Deprecated
     public boolean isFileListUnsuitableFor(String purpose) {
         if (fileList == null) {
             Evergreen.getInstance().showAlert("Can't " + purpose, "The list of files for " + workspace.getTitle() + " is not yet available.");
@@ -116,10 +125,8 @@ public class WorkspaceFileList {
     }
     
     private class FileListUpdater extends SwingWorker<ArrayList<String>, Object> {
-        private ChangeListener listener;
-        
-        public FileListUpdater(ChangeListener listener) {
-            this.listener = listener;
+        public FileListUpdater() {
+            fireListeners(false);
             fileList = null;
         }
         
@@ -174,16 +181,18 @@ public class WorkspaceFileList {
         
         @Override
         public void done() {
-            if (listener != null) {
-                listener.stateChanged(null);
-            }
+            fireListeners(true);
+        }
+    }
+    
+    private void fireListeners(boolean isNowValid) {
+        for (Listener l : listeners) {
+            l.fileListStateChanged(isNowValid);
         }
     }
     
     public interface Listener {
-        /** Invoked when the list is about to be updated. */
-        public void listWillUpdate();
-        /** Invoked when the list has finished being updated. */
-        public void listDidUpdate();
+        /** Invoked when the file list state changes. */
+        public void fileListStateChanged(boolean isNowValid);
     }
 }
