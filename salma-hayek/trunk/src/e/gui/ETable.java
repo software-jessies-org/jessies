@@ -75,7 +75,7 @@ public class ETable extends JTable {
         final int height = clip.y + clip.height;
         if (rowCount * rowHeight < height) {
             for (int i = rowCount; i <= height/rowHeight; ++i) {
-                g.setColor(colorForRow(i));
+                g.setColor(GuiUtilities.backgroundColorForRow(i));
                 g.fillRect(clip.x, i * rowHeight, clip.width, rowHeight);
             }
             
@@ -106,17 +106,6 @@ public class ETable extends JTable {
         }
         return false;
     }
-
-    /**
-     * Returns the appropriate background color for the given row.
-     */
-    protected Color colorForRow(int row) {
-        return (row % 2 == 0) ? alternateRowColor() : getBackground();
-    }
-    
-    private Color alternateRowColor() {
-        return GuiUtilities.isGtk() ? Color.WHITE : GuiUtilities.ALTERNATE_ROW_COLOR;
-    }
     
     /**
      * Shades alternate rows in different colors.
@@ -137,7 +126,7 @@ public class ETable extends JTable {
             }
         } else {
             // Outside of selected rows, we want to alternate the background color.
-            c.setBackground(colorForRow(row));
+            c.setBackground(GuiUtilities.backgroundColorForRow(row));
             c.setForeground(UIManager.getColor("Table.foreground"));
         }
         

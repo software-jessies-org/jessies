@@ -31,8 +31,8 @@ public class EListCellRenderer extends DefaultListCellRenderer {
         }
         
         // Optionally use the line-printer paper trick of alternating row color.
-        if (alternateLineColor && !isSelected && index % 2 == 0) {
-            setBackground(GuiUtilities.ALTERNATE_ROW_COLOR);
+        if (alternateLineColor && !isSelected) {
+            setBackground(GuiUtilities.backgroundColorForRow(index));
         }
         if (isSelected) {
             setBackground(UIManager.getColor("List.selectionBackground"));

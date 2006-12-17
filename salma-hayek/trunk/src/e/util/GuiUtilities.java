@@ -26,24 +26,7 @@ public class GuiUtilities {
      */
     public static final Cursor INVISIBLE_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR), new Point(0, 0), "invisible");
     
-    /**
-     * The background color for alternate rows in lists and tables.
-     */
-    public static final Color ALTERNATE_ROW_COLOR = new Color(0.92f, 0.95f, 0.99f);
-    
-    /**
-     * The background color for selected rows in lists and tables.
-     */
-    public static final Color SELECTED_ROW_COLOR = new Color(0.24f, 0.50f, 0.87f);
-    
-    static {
-        if (GuiUtilities.isMacOs()) {
-            UIManager.put("List.selectionBackground", SELECTED_ROW_COLOR);
-            UIManager.put("List.selectionForeground", Color.WHITE);
-            UIManager.put("Table.selectionBackground", SELECTED_ROW_COLOR);
-            UIManager.put("Table.selectionForeground", Color.WHITE);
-        }
-    }
+    private static final Color MAC_OS_ALTERNATE_ROW_COLOR = new Color(0.92f, 0.95f, 0.99f);
     
     // Used by isFontFixedWidth.
     private static final java.awt.font.FontRenderContext DEFAULT_FONT_RENDER_CONTEXT = new java.awt.font.FontRenderContext(null, false, false);
@@ -200,6 +183,18 @@ public class GuiUtilities {
         return min;
     }
     
+    /**
+     * Returns the appropriate background color for the given row index.
+     */
+    public static Color backgroundColorForRow(int row) {
+        if (isGtk()) {
+            return (row % 2 == 0) ? Color.WHITE : UIManager.getColor("Table.background");
+        } else if (isMacOs()) {
+            return (row % 2 == 0) ? Color.WHITE : MAC_OS_ALTERNATE_ROW_COLOR;
+        }
+        return UIManager.getColor("Table.background");
+    }
+    
     public static void finishGnomeStartup() {
         String DESKTOP_STARTUP_ID = System.getProperty("gnome.DESKTOP_STARTUP_ID");
         if (DESKTOP_STARTUP_ID != null) {
@@ -248,6 +243,19 @@ public class GuiUtilities {
                 UIManager.put("OptionPane.buttonAreaBorder", makeEmptyBorderResource(16-3, 0, 0, 0));
                 // On Mac OS, standard tabbed panes use way too much space. This makes them slightly less greedy.
                 UIManager.put("TabbedPane.useSmallLayout", Boolean.TRUE);
+                // Apple's LAF uses the wrong background color for selected rows in lists and tables.
+                Color MAC_OS_SELECTED_ROW_COLOR = new Color(0.24f, 0.50f, 0.87f);
+                UIManager.put("List.selectionBackground", MAC_OS_SELECTED_ROW_COLOR);
+                UIManager.put("List.selectionForeground", Color.WHITE);
+                UIManager.put("Table.selectionBackground", MAC_OS_SELECTED_ROW_COLOR);
+                UIManager.put("Table.selectionForeground", Color.WHITE);
+            }
+            
+            if (lafClassName.contains("GTK")) {
+                // We try to imitate the modern alternating table background effect, but get no help from the GTK LAF as yet.
+                // In the meantime, this actually corresponds to Ubuntu's "Human" theme.
+                // If we get complaints from users of other themes, we might want to try to find the closest color already known to UIManager.
+                UIManager.put("Table.background", new Color(0xf5f2ed));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
