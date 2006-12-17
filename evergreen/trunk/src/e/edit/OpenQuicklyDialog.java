@@ -127,7 +127,9 @@ public class OpenQuicklyDialog {
     }
     
     public JButton makeRescanButton() {
-        return new JButton(new RescanAction());
+        JButton rescanButton = new JButton(new RescanAction());
+        GnomeStockIcon.useStockIcon(rescanButton, "gtk-refresh");
+        return rescanButton;
     }
     
     public void showDialog() {
