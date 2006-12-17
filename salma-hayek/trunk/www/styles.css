@@ -33,11 +33,10 @@ div.rightcol {
   float: right;
 }
 div.footer {
-  width: 100%;
+  width: 80%;
   clear: both;
   color: #888888;
-  padding-top: 2em;
-  padding-bottom: 2em;
+  padding: 2em;
   font-size: 75%;
 }
 
