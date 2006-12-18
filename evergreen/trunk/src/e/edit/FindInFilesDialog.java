@@ -16,7 +16,7 @@ import e.util.*;
 import java.util.List;
 import org.jdesktop.swingworker.SwingWorker;
 
-public class FindInFilesDialog {
+public class FindInFilesDialog implements WorkspaceFileList.Listener {
     private JTextField regexField = new JTextField(40);
     private JTextField filenameRegexField = new JTextField(40);
     private JLabel status = new JLabel(" ");
@@ -299,8 +299,9 @@ public class FindInFilesDialog {
         
         private String makeStatusString() {
             String status = matchingFileCount + " / " + StringUtilities.pluralize(totalFileCount, "file", "files");
-            if (workspace.getFileList().getIndexedFileCount() != totalFileCount) {
-                status += " (from " + workspace.getFileList().getIndexedFileCount() + ")";
+            int indexedFileCount = workspace.getFileList().getIndexedFileCount();
+            if (indexedFileCount != -1 && indexedFileCount != totalFileCount) {
+                status += " (from " + indexedFileCount + ")";
             }
             status += " match.";
             return status;
@@ -350,10 +351,6 @@ public class FindInFilesDialog {
     }
     
     public void initMatchList() {
-        if (matchView != null) {
-            return;
-        }
-
         matchTreeModel = new DefaultTreeModel(null);
         matchView = new ETree(matchTreeModel);
 
@@ -383,6 +380,22 @@ public class FindInFilesDialog {
                 }
             }
         });
+    }
+    
+    public void fileListStateChanged(boolean isNowValid) {
+        if (isNowValid) {
+            showMatches();
+            matchView.setEnabled(true);
+        } else {
+            switchToFakeTree();
+            matchView.setEnabled(false);
+        }
+    }
+    
+    private void switchToFakeTree() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        root.add(new DefaultMutableTreeNode("Rescan in progress..."));
+        matchTreeModel.setRoot(root);
     }
     
     public class MatchTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -419,6 +432,9 @@ public class FindInFilesDialog {
             } else {
                 c.setForeground(Color.GRAY);
             }
+            
+            c.setEnabled(tree.isEnabled());
+            
             return c;
         }
     }
@@ -434,6 +450,10 @@ public class FindInFilesDialog {
     
     public FindInFilesDialog(Workspace workspace) {
         this.workspace = workspace;
+        
+        initMatchList();
+        
+        workspace.getFileList().addFileListListener(this);
     }
 
     /**
@@ -452,12 +472,6 @@ public class FindInFilesDialog {
     }
     
     public void showDialog() {
-        if (workspace.getFileList().isFileListUnsuitableFor("Find in Files")) {
-            return;
-        }
-        
-        initMatchList();
-        
         // Register for notifications of files saved while our dialog is up.
         final SaveMonitor saveMonitor = SaveMonitor.getInstance();
         final SaveMonitor.Listener saveListener = new SaveMonitor.Listener() {

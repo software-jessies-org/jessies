@@ -17,15 +17,9 @@ public class FindFilesContainingSelectionAction extends ETextAction {
     
     public void actionPerformed(ActionEvent e) {
         Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
-        // FindInFilesDialog.showDialog will make this check, but not before
-        // guessDirectoryToSearchIn has already failed.
-        if (workspace.getFileList().isFileListUnsuitableFor("Find in Files")) {
-            return;
-        }
         
+        // Get the selection, stripping trailing newlines.
         String selection = getSelectedText();
-        
-        // Remove trailing newlines.
         selection = selection.replaceAll("\n$", "");
         
         // Only use the selection as a pattern if there are no embedded newlines.
@@ -43,12 +37,11 @@ public class FindFilesContainingSelectionAction extends ETextAction {
             return "";
         }
         
-        // If there aren't many files in the workspace, don't bother
-        // automatically restricting the search to a specific directory.
-        // Note that "" actually means "use whatever's already in the
-        // field" rather than "nothing".
+        // If there aren't many files in the workspace, don't bother automatically restricting the search to a specific directory.
+        // Note that "" actually means "use whatever's already in the field" rather than "nothing".
         Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
-        if (workspace.getFileList().getIndexedFileCount() < 1000) {
+        int indexedFileCount = workspace.getFileList().getIndexedFileCount();
+        if (indexedFileCount != -1 && indexedFileCount < 1000) {
             return "";
         }
         

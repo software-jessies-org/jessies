@@ -43,8 +43,10 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
             for (int i = 0; i < fileList.size(); i++) {
                 model.addElement(fileList.get(i));
             }
-            final int totalFileCount = workspace.getFileList().getIndexedFileCount();
-            setStatus(true, fileList.size() + " / " + StringUtilities.pluralize(totalFileCount, "file", "files") + " match.");
+            final int indexedFileCount = workspace.getFileList().getIndexedFileCount();
+            if (indexedFileCount != -1) {
+                setStatus(true, fileList.size() + " / " + StringUtilities.pluralize(indexedFileCount, "file", "files") + " match.");
+            }
         } catch (PatternSyntaxException ex) {
             setStatus(false, ex.getDescription());
         }
