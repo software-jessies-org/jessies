@@ -36,15 +36,16 @@ public class WorkspaceFileList {
     }
     
     /**
-     * Returns the number of indexed files for this workspace.
+     * Returns the number of indexed files for this workspace, or -1 if no list is currently available.
      */
-    @Deprecated
     public int getIndexedFileCount() {
-        return fileList.size();
+        List<String> list = fileList;
+        return (list != null) ? list.size() : -1;
     }
     
     public void ensureInFileList(String pathWithinWorkspace) {
-        if (fileList != null && fileList.indexOf(pathWithinWorkspace) == -1) {
+        List<String> list = fileList;
+        if (list != null && list.indexOf(pathWithinWorkspace) == -1) {
             updateFileList();
         }
     }
@@ -62,24 +63,6 @@ public class WorkspaceFileList {
     public synchronized void updateFileList() {
         FileListUpdater fileListUpdater = new FileListUpdater();
         fileListUpdateExecutorService.execute(fileListUpdater);
-    }
-    
-    /**
-     * Checks whether the file list is available, and if so, if it's non-empty.
-     * It's usually unavailable if the workspace hasn't been scanned yet.
-     * The user will be shown an appropriate warning in case of unsuitability.
-     */
-    @Deprecated
-    public boolean isFileListUnsuitableFor(String purpose) {
-        if (fileList == null) {
-            Evergreen.getInstance().showAlert("Can't " + purpose, "The list of files for " + workspace.getTitle() + " is not yet available.");
-            return true;
-        }
-        if (fileList.isEmpty()) {
-            Evergreen.getInstance().showAlert("Can't " + purpose, "The list of files for " + workspace.getTitle() + " is empty.");
-            return true;
-        }
-        return false;
     }
     
     /**
@@ -192,7 +175,10 @@ public class WorkspaceFileList {
     }
     
     public interface Listener {
-        /** Invoked when the file list state changes. */
+        /**
+         * Invoked to notify listeners of the file list state.
+         * Calls do not necessarily imply a change of state since the last notification.
+         */
         public void fileListStateChanged(boolean isNowValid);
     }
 }
