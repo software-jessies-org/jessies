@@ -34,6 +34,7 @@ public class Options {
 	private static final String VISUAL_BELL = "visualBell";
 	private static final String FONT_NAME = "fontName";
 	private static final String FONT_SIZE = "fontSize";
+	private static final String HIDE_MOUSE_WHEN_TYPING = "hideMouseWhenTyping";
 	private static final String INITIAL_COLUMN_COUNT = "initialColumnCount";
 	private static final String INITIAL_ROW_COUNT = "initialRowCount";
 	private static final String INTERNAL_BORDER = "internalBorder";
@@ -161,6 +162,10 @@ public class Options {
 		return booleanResource(USE_ALT_AS_META);
 	}
 	
+	public boolean shouldHideMouseWhenTyping() {
+		return booleanResource(HIDE_MOUSE_WHEN_TYPING);
+	}
+	
 	public int getInternalBorder() {
 		return integerResource(INTERNAL_BORDER);
 	}
@@ -280,6 +285,7 @@ public class Options {
 		addDefault(VISUAL_BELL, Boolean.TRUE, "Visual bell (as opposed to no bell)?");
 		addDefault(FONT_NAME, makePrototypeFont(GuiUtilities.getMonospacedFontName()), "Font family");
 		addDefault(FONT_SIZE, Integer.valueOf(12), "Font size (points)");
+		addDefault(HIDE_MOUSE_WHEN_TYPING, Boolean.TRUE, "Hide mouse when typing");
 		addDefault(INITIAL_COLUMN_COUNT, Integer.valueOf(80), "New terminal width");
 		addDefault(INITIAL_ROW_COUNT, Integer.valueOf(24), "New terminal height");
 		addDefault(INTERNAL_BORDER, Integer.valueOf(2), "Border (pixels)");
