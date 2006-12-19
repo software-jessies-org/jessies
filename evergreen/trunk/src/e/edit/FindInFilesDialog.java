@@ -23,11 +23,13 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     private ETree matchView;
     private DefaultTreeModel matchTreeModel;
     
+    /** Which workspace is this "Find in Files" for? */
     private Workspace workspace;
     
-    private FileFinder worker;
-    private static final ExecutorService fileFinderExecutor = ThreadUtilities.newSingleThreadExecutor("Find in Files");
+    /** Each workspace gets its own independent file-finding thread. */
+    private Thread fileFinderThread;
     
+    /** We share these between all workspaces, to make it harder to accidentally launch a denial-of-service attack against ourselves. */
     private static final ExecutorService definitionFinderExecutor = ThreadUtilities.newFixedThreadPool(8, "Find Definitions");
     
     public interface ClickableTreeItem {
@@ -186,7 +188,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 String root = workspace.getRootDirectory();
                 long startTime = System.currentTimeMillis();
                 for (doneFileCount = 0; doneFileCount < fileList.size(); ++doneFileCount) {
-                    if (isCancelled()) {
+                    if (Thread.currentThread().isInterrupted() || isCancelled()) {
                         return null;
                     }
                     try {
@@ -282,10 +284,6 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         
         @Override
         protected void done() {
-            synchronized (FindInFilesDialog.this) {
-                worker = null;
-            }
-            
             if (isCancelled()) {
                 return;
             }
@@ -342,12 +340,16 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     public synchronized void showMatches() {
-        if (worker != null) {
-            worker.cancel(true);
+        if (matchView.isShowing() == false) {
+            // There's no point doing a search if the user can't see the results.
+            return;
         }
-        
-        worker = new FileFinder();
-        fileFinderExecutor.submit(worker);
+        if (fileFinderThread != null) {
+            // There's no point finishing a search if we're starting another.
+            fileFinderThread.interrupt();
+        }
+        fileFinderThread = new Thread(new FileFinder(), "Find in Files for " + workspace.getTitle());
+        fileFinderThread.start();
     }
     
     public void initMatchList() {
