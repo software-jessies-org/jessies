@@ -126,7 +126,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	public void userIsTyping() {
 		blinkOn = true;
 		redrawCursorPosition();
-		setCursor(GuiUtilities.INVISIBLE_CURSOR);
+		if (Options.getSharedInstance().shouldHideMouseWhenTyping()) {
+			setCursor(GuiUtilities.INVISIBLE_CURSOR);
+		}
 	}
 	
 	private void becomeDropTarget() {
