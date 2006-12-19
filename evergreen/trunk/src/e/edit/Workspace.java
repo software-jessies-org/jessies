@@ -18,6 +18,8 @@ public class Workspace extends JPanel {
     private String buildTarget;
     
     private OpenQuicklyDialog openQuicklyDialog;
+    private FindInFilesDialog findInFilesDialog;
+    
     private EFileDialog openDialog;
     private EFileDialog saveAsDialog;
     
@@ -222,8 +224,10 @@ public class Workspace extends JPanel {
      * a bad idea anyway. Either you've got a better suggestion than what the
      * user last typed, or you should leave things as they are.
      */
-    public void showFindInFilesDialog(String pattern, String filenamePattern) {
-        FindInFilesDialog findInFilesDialog = new FindInFilesDialog(this);
+    public synchronized void showFindInFilesDialog(String pattern, String filenamePattern) {
+        if (findInFilesDialog == null) {
+            findInFilesDialog = new FindInFilesDialog(this);
+        }
         if (pattern != null && pattern.length() > 0) {
             findInFilesDialog.setPattern(pattern);
         }
