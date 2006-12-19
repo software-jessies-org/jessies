@@ -13,8 +13,10 @@ public class PXmlTextStyler extends PAbstractLanguageStyler {
         // FIXME: we don't cope with tags split across multiple lines because our styling works on a per-line basis; we'd need to remember state like we do for multi-line comments.
         textArea.addStyleApplicatorFirst(new RegularExpressionStyleApplicator(textArea, "(<.*?>)", PStyle.KEYWORD));
         
-        // FIXME: we probably need code similar to what we have in the Java styler to recognize bad/unclosed entities.
-        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "(&.*?;)", PStyle.KEYWORD));
+        // Recognize lexically plausible entities (though we don't actually check that they're known entities in any particular DTD).
+        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "(&[A-Za-z#0-9]+;)", PStyle.KEYWORD));
+        // And mark implausible entities as errors.
+        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "(&[A-Za-z#0-9]*.*[A-Za-z#0-9]*;?)", PStyle.ERROR));
     }
     
     @Override
