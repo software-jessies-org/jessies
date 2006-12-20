@@ -32,6 +32,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     /** We share these between all workspaces, to make it harder to accidentally launch a denial-of-service attack against ourselves. */
     private static final ExecutorService definitionFinderExecutor = ThreadUtilities.newFixedThreadPool(8, "Find Definitions");
     
+    /** Holds all the UI. The actual "dialog" is in here! */
+    private FormBuilder form;
+    
     public interface ClickableTreeItem {
         public void open();
     }
@@ -454,10 +457,37 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         this.workspace = workspace;
         
         initMatchList();
+        initForm();
+        initSaveMonitor();
         
         workspace.getFileList().addFileListListener(this);
     }
-
+    
+    private void initForm() {
+        this.form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find in Files in " + workspace.getTitle());
+        FormPanel formPanel = form.getFormPanel();
+        formPanel.addRow("Files Containing:", regexField);
+        formPanel.addRow("Whose Names Match:", filenameRegexField);
+        formPanel.addRow("", PatternUtilities.addRegularExpressionHelpToComponent(status));
+        formPanel.addRow("Matches:", new JScrollPane(matchView));
+        formPanel.setTypingTimeoutActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showMatches();
+            }
+        });
+    }
+    
+    private void initSaveMonitor() {
+        // Register for notifications of files saved while our dialog is up, so we can update the matches.
+        final SaveMonitor.Listener saveListener = new SaveMonitor.Listener() {
+            public void fileSaved() {
+                // FIXME: Ideally, we'd be a bit more intelligent about this than re-searching the whole tree.
+                showMatches();
+            }
+        };
+        SaveMonitor.getInstance().addSaveListener(saveListener);
+    }
+    
     /**
      * Sets the contents of the text field.
      * The value null causes the pattern to stay as it was.
@@ -473,41 +503,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         filenameRegexField.setText(pattern);
     }
     
-    public void showDialog() {
-        // Register for notifications of files saved while our dialog is up.
-        final SaveMonitor saveMonitor = SaveMonitor.getInstance();
-        final SaveMonitor.Listener saveListener = new SaveMonitor.Listener() {
-            /**
-             * Update the matches if a file is saved. Ideally, we'd be a bit
-             * more intelligent about this. I'd like to see a new UI that
-             * doesn't build a tree and present it all at once; I'd like to
-             * see matches as they're found.
-             */
-            public void fileSaved() {
-                showMatches();
-            }
-        };
-        saveMonitor.addSaveListener(saveListener);
-        
-        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find in Files in " + workspace.getTitle());
-        FormPanel formPanel = form.getFormPanel();
-        formPanel.addRow("Files Containing:", regexField);
-        formPanel.addRow("Whose Names Match:", filenameRegexField);
-        formPanel.addRow("", PatternUtilities.addRegularExpressionHelpToComponent(status));
-        formPanel.addRow("Matches:", new JScrollPane(matchView));
-        formPanel.setTypingTimeoutActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showMatches();
-            }
-        });
-        // Remove our save listener when the dialog is dismissed.
-        Runnable runnable = new Runnable() {
-            public void run() {
-                saveMonitor.removeSaveListener(saveListener);
-            }
-        };
-        form.getFormDialog().setAcceptCallable(Executors.callable(runnable, Boolean.TRUE));
-        form.getFormDialog().setCancelRunnable(runnable);
+    public synchronized void showDialog() {
         form.showNonModal();
     }
 }
