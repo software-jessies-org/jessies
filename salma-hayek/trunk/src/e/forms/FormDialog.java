@@ -81,6 +81,12 @@ public class FormDialog {
      * Shows a non-modal dialog with a Close button.
      */
     public void showNonModal() {
+        // With a non-modal dialog, there's the possibility that the user just lost track of us.
+        if (dialog.isShowing()) {
+            dialog.toFront();
+            return;
+        }
+        
         this.actionLabel = "Close";
         dialog.setModal(false);
         configureDialog();
