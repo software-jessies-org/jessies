@@ -14,8 +14,7 @@ public class DialogFocusRedirector {
     
     public void redirectFocus() {
         originalFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
-        Component[] components = ui.getComponents();
-        giveFocusToFirstTextComponentIn(components);
+        giveFocusToFirstTextComponent();
     }
     
     public void restoreFocus() {
@@ -28,7 +27,12 @@ public class DialogFocusRedirector {
         return (c instanceof ETextField || c instanceof JTextField);
     }
     
-    public boolean giveFocusToFirstTextComponentIn(Component[] components) {
+    private boolean giveFocusToFirstTextComponent() {
+        Component[] components = ui.getComponents();
+        return giveFocusToFirstTextComponentIn(components);
+    }
+    
+    private boolean giveFocusToFirstTextComponentIn(Component[] components) {
         for (Component component : components) {
             if (isWorthGivingFocusTo(component)) {
                 component.requestFocus();
