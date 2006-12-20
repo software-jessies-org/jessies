@@ -106,7 +106,7 @@ public class FormPanel extends JPanel {
     }
     
     ArrayList<JTextComponent> getTextComponents() {
-        return this.textComponents;
+        return new ArrayList<JTextComponent>(textComponents);
     }
     
     public void setTypingTimeoutActionListener(ActionListener listener) {
