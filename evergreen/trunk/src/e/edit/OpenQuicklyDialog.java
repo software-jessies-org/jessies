@@ -27,7 +27,11 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     
     private DefaultListModel model;
     
+    /** Which workspace is this "Open Quickly" for? */
     private Workspace workspace;
+    
+    /** Holds all the UI. The actual "dialog" is in here! */
+    private FormBuilder form;
     
     private void setStatus(boolean good, String text) {
         status.setForeground(good ? Color.BLACK : Color.RED);
@@ -57,18 +61,29 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         matchList.setSelectedIndex(0);
     }
     
+    private void openFileAtIndex(int index) {
+        String filename = (String) matchList.getModel().getElementAt(index);
+        Evergreen.getInstance().openFile(workspace.prependRootDirectory(filename));
+        
+        // Now we've opened a new file, that's where focus should go when we're dismissed.
+        form.getFormDialog().setShouldRestoreFocus(false);
+        
+        // Wrestle focus back from the file we've just opened.
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                SwingUtilities.getWindowAncestor(matchList).toFront();
+                filenameField.requestFocus();
+            }
+        });
+    }
+    
     public void initMatchList() {
         matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = matchList.locationToIndex(e.getPoint());
-                    String filename = (String) matchList.getModel().getElementAt(index);
-                    Evergreen.getInstance().openFile(workspace.prependRootDirectory(filename));
-                    
-                    // Wrestle focus back from the file we've just opened.
-                    SwingUtilities.getWindowAncestor(matchList).toFront();
-                    filenameField.requestFocus();
+                    openFileAtIndex(index);
                 }
             }
         });
@@ -77,13 +92,34 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     
     public OpenQuicklyDialog(Workspace workspace) {
         this.workspace = workspace;
+        this.rescanButton = RescanWorkspaceAction.makeRescanButton(workspace);
         
         initMatchList();
-        initRescanButton();
+        initForm();
         
         workspace.getFileList().addFileListListener(this);
     }
-
+    
+    private void initForm() {
+        this.form = new FormBuilder(Evergreen.getInstance().getFrame(), "Open Quickly");
+        FormPanel formPanel = form.getFormPanel();
+        formPanel.addRow("Names Containing:", filenameField);
+        formPanel.addRow("Matches:", new JScrollPane(matchList));
+        formPanel.setStatusBar(status);
+        formPanel.setTypingTimeoutActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showMatches();
+            }
+        });
+        form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
+            public Boolean call() {
+                openSelectedFilesFromList();
+                return true;
+            }
+        });
+        form.getFormDialog().setExtraButton(rescanButton);
+    }
+    
     /**
      * Sets the contents of the text field.
      */
@@ -124,37 +160,15 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         matchList.setModel(model);
     }
     
-    public void initRescanButton() {
-        rescanButton = new JButton(new RescanAction());
-        GnomeStockIcon.useStockIcon(rescanButton, "gtk-refresh");
-    }
-    
     public void showDialog() {
-        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Open Quickly");
-        FormPanel formPanel = form.getFormPanel();
-        formPanel.addRow("Names Containing:", filenameField);
-        formPanel.addRow("Matches:", new JScrollPane(matchList));
-        formPanel.setStatusBar(status);
-        formPanel.setTypingTimeoutActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showMatches();
-            }
-        });
-        form.getFormDialog().setExtraButton(rescanButton);
-        boolean okay = form.show("Open");
-        
-        if (okay == false) {
-            return;
-        }
-        
-        openSelectedFilesFromList();
+        form.getFormDialog().setShouldRestoreFocus(true);
+        form.getFormDialog().showNonModal("Open");
     }
     
     public void openSelectedFilesFromList() {
         ListModel list = matchList.getModel();
         for (int index : matchList.getSelectedIndices()) {
-            String filename = (String) list.getElementAt(index);
-            Evergreen.getInstance().openFile(workspace.prependRootDirectory(filename));
+            openFileAtIndex(index);
         }
     }
 }

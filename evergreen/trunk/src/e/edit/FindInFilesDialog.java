@@ -21,6 +21,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     private JTextField filenameRegexField = new JTextField(40);
     private JLabel status = new JLabel(" ");
     private ETree matchView;
+    private JButton rescanButton;
+    
     private DefaultTreeModel matchTreeModel;
     
     /** Which workspace is this "Find in Files" for? */
@@ -455,6 +457,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     
     public FindInFilesDialog(Workspace workspace) {
         this.workspace = workspace;
+        this.rescanButton = RescanWorkspaceAction.makeRescanButton(workspace);
         
         initMatchList();
         initForm();
@@ -475,6 +478,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 showMatches();
             }
         });
+        form.getFormDialog().setExtraButton(rescanButton);
     }
     
     private void initSaveMonitor() {
