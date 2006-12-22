@@ -45,6 +45,7 @@ public class FormDialog {
     private boolean wasAccepted;
     
     private DialogFocusRedirector dialogFocusRedirector;
+    private boolean shouldRestoreFocus = true;
     
     // Our default accept callable just returns true, allowing the dialog to close.
     private Callable<Boolean> acceptCallable = new Callable<Boolean>() {
@@ -81,13 +82,21 @@ public class FormDialog {
      * Shows a non-modal dialog with a Close button.
      */
     public void showNonModal() {
+        showNonModal("Close");
+    }
+    
+    /**
+     * Shows a non-modal dialog with a default button label of your choosing.
+     * You'll need to use setAcceptCallable to attach an action to the button.
+     */
+    public void showNonModal(String actionLabel) {
         // With a non-modal dialog, there's the possibility that the user just lost track of us.
         if (dialog.isShowing()) {
             dialog.toFront();
             return;
         }
         
-        this.actionLabel = "Close";
+        this.actionLabel = actionLabel;
         dialog.setModal(false);
         configureDialog();
         dialog.setVisible(true);
@@ -378,6 +387,9 @@ public class FormDialog {
     }
     
     private void restoreFocus() {
+        if (shouldRestoreFocus == false) {
+            return;
+        }
         // We want to restore focus to whichever component had it before we were shown, but we mustn't pass on focus until later because we may be here in response to a KeyEvent (such as the user hitting Return to accept the dialog), and it would be wrong for the original focus owner to process that event.
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -538,5 +550,13 @@ public class FormDialog {
     
     public void setRememberBounds(boolean rememberBounds) {
         this.doNotRememberBounds = !rememberBounds;
+    }
+    
+    /**
+     * Enable or disable the automatic focus restoration.
+     * Useful if your dialog has deliberately caused a change of focus, as with an open dialog, say.
+     */
+    public void setShouldRestoreFocus(boolean shouldRestoreFocus) {
+        this.shouldRestoreFocus = shouldRestoreFocus;
     }
 }
