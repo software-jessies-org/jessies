@@ -14,9 +14,15 @@ public class PXmlTextStyler extends PAbstractLanguageStyler {
         textArea.addStyleApplicatorFirst(new RegularExpressionStyleApplicator(textArea, "(<.*?>)", PStyle.KEYWORD));
         
         // Recognize lexically plausible entities (though we don't actually check that they're known entities in any particular DTD).
-        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "(&[A-Za-z#0-9]+;)", PStyle.KEYWORD));
+        // See http://www.w3.org/TR/REC-xml/ for more detail.
+        String hexEscape = "(#[xX]\\p{XDigit}+)";
+        String decimalEscape = "(#\\d+)";
+        String escape = "(" + hexEscape + "|" + decimalEscape + ")";
+        String entityName = "([\\p{L}[\\p{N}]]*)";
+        String entityTail = "(" + escape + "|" + entityName + ")" + ";"; // "Everything after the &".
+        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "(&" + entityTail + ")", PStyle.KEYWORD));
         // And mark implausible entities as errors.
-        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "(&[A-Za-z#0-9]*.*[A-Za-z#0-9]*;?)", PStyle.ERROR));
+        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "(&(?!" + entityTail + ")\\S*)", PStyle.ERROR));
     }
     
     @Override
