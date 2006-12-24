@@ -270,7 +270,7 @@ public class Evergreen {
     
     /** Returns an array of all the workspaces. */
     public Workspace[] getWorkspaces() {
-        Workspace[] result = new Workspace[tabbedPane.getTabCount()];
+        Workspace[] result = new Workspace[tabbedPane != null ? tabbedPane.getTabCount() : 0];
         for (int i = 0; i < result.length; ++i) {
             result[i] = (Workspace) tabbedPane.getComponentAt(i);
         }
