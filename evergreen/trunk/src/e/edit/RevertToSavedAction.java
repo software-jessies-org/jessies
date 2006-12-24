@@ -14,6 +14,11 @@ public class RevertToSavedAction extends ETextAction {
         GnomeStockIcon.useStockIcon(this, "gtk-revert-to-saved");
     }
     
+    public boolean isEnabled() {
+        ETextWindow textWindow = getFocusedTextWindow();
+        return (textWindow != null && textWindow.canRevertToSaved());
+    }
+    
     public void actionPerformed(ActionEvent e) {
         ETextWindow window = getFocusedTextWindow();
         if (window == null) {
