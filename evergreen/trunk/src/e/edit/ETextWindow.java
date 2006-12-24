@@ -387,6 +387,10 @@ public class ETextWindow extends EWindow implements PTextListener {
         return form.show(buttonLabel);
     }
     
+    public boolean canRevertToSaved() {
+        return file.exists() && (isDirty() || isOutOfDateWithRespectToDisk());
+    }
+    
     public void revertToSaved() {
         if (file.exists() == false) {
             Evergreen.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" does not exist.");
