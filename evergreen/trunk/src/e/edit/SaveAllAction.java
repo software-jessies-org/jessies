@@ -10,6 +10,15 @@ public class SaveAllAction extends AbstractAction {
         super(ACTION_NAME);
     }
     
+    public boolean isEnabled() {
+        for (Workspace workspace : Evergreen.getInstance().getWorkspaces()) {
+            if (workspace.getDirtyTextWindows().length > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void actionPerformed(ActionEvent e) {
         saveAll(true);
     }
