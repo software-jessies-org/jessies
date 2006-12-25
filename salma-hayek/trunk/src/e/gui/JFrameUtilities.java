@@ -77,7 +77,7 @@ public class JFrameUtilities {
     }
     
     public static JFrame makeSimpleWindow(String title, JComponent content) {
-        final JFrame frame = new JFrame(title);
+        JFrame frame = new JFrame(title);
         setFrameIcon(frame);
         frame.setContentPane(content);
         frame.pack();
@@ -86,17 +86,25 @@ public class JFrameUtilities {
         // Mac OS uses command-W to close a window using the keyboard. Unlike Linux and Windows' alt-f4, though, this isn't done by the window manager.
         if (GuiUtilities.isMacOs()) {
             KeyStroke commandW = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_MASK, false);
-            final String CLOSE_ACTION = "e.gui.JFrameUtilities.CloseWindowIfCommandWPressed";
-            frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(commandW, CLOSE_ACTION);
-            frame.getRootPane().getActionMap().put(CLOSE_ACTION, new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    frame.setVisible(false);
-                    frame.dispose();
-                }
-            });
+            closeOnKeyStroke(frame, commandW);
         }
         
         return frame;
+    }
+    
+    private static final Action CLOSE_ACTION = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            Window window = SwingUtilities.getWindowAncestor((Component) e.getSource());
+            // Dispatch an event so it's as if the window's close button was clicked.
+            // The client has to set up the right behavior for that case.
+            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+        }
+    };
+    
+    public static void closeOnKeyStroke(JFrame frame, KeyStroke keyStroke) {
+        final String CLOSE_ACTION_NAME = "e.gui.JFrameUtilities.CloseFrameOnKeyStroke";
+        frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, CLOSE_ACTION_NAME);
+        frame.getRootPane().getActionMap().put(CLOSE_ACTION_NAME, CLOSE_ACTION);
     }
     
     private JFrameUtilities() {
