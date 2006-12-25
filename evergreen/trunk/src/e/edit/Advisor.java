@@ -60,6 +60,7 @@ public class Advisor extends JPanel {
         if (frame == null) {
             frame = JFrameUtilities.makeSimpleWindow("Evergreen Documentation Browser", this);
             frame.setSize(new Dimension(600, 500));
+            JFrameUtilities.closeOnKeyStroke(frame, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false));
         }
         return frame;
     }
