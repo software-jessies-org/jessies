@@ -29,6 +29,9 @@ public class JAsynchronousProgressIndicator extends JComponent {
     private int currentBar = 0;
     private boolean isDisplayedWhenStopped = false;
     
+    private int currentValue = 0;
+    private int maxValue = 0;
+    
     public JAsynchronousProgressIndicator() {
         initBars();
         initColors();
@@ -36,14 +39,40 @@ public class JAsynchronousProgressIndicator extends JComponent {
         setOpaque(false);
     }
     
-    public void paintComponent(Graphics g) {
+    public void paintComponent(Graphics oldGraphics) {
+        Graphics2D g = (Graphics2D) oldGraphics;
         if (isDisplayedWhenStopped || timer.isRunning()) {
-            paintBars((Graphics2D) g);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            if (maxValue != 0) {
+                paintPie(g);
+            } else {
+                paintBars(g);
+            }
         }
     }
     
+    private void paintPie(Graphics2D g) {
+        int width = getWidth() - 1;
+        int height = getHeight() - 1;
+        
+        int x = width/2 - DIAMETER/2;
+        int y = height/2 - DIAMETER/2;
+        
+        g.setColor(UIManager.getColor("TabbedPane.shadow"));
+        
+        // The documentation for drawArc and fillArc implies that they both cover an area (width+1, height+1).
+        // With anti-aliasing off, I think they're right. With it on, I'm not convinced.
+        // We'd be mad to turn anti-aliasing off when drawing arcs, so fudge things by using thick lines.
+        // It's not pixel-perfect, but it's close enough for the casual observer.
+        int degreesToFill = (int) (-360.0 * ((double) currentValue / (double) maxValue));
+        g.fillArc(x, y, DIAMETER, DIAMETER, 90, degreesToFill);
+        Stroke originalStroke = g.getStroke();
+        g.setStroke(new BasicStroke(1.5f));
+        g.drawArc(x, y, DIAMETER, DIAMETER, 90, -360);
+        g.setStroke(originalStroke);
+    }
+    
     private void paintBars(Graphics2D g) {
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.transform(AffineTransform.getTranslateInstance(getWidth() / 2, getHeight() /2));
         for (int i = 0; i < bars.length; ++i) {
             g.setColor(colors[(currentBar + i) % colors.length]);
@@ -66,6 +95,7 @@ public class JAsynchronousProgressIndicator extends JComponent {
     
     public void stopAnimation() {
         timer.stop();
+        currentValue = maxValue = 0;
         repaint();
     }
     
@@ -83,6 +113,12 @@ public class JAsynchronousProgressIndicator extends JComponent {
             isDisplayedWhenStopped = newState;
             repaint();
         }
+    }
+    
+    public void setProgress(int newCurrentValue, int newMaxValue) {
+        this.currentValue = newCurrentValue;
+        this.maxValue = newMaxValue;
+        repaint();
     }
     
     private synchronized static void initColors() {
@@ -134,7 +170,7 @@ public class JAsynchronousProgressIndicator extends JComponent {
     }
     
     public Dimension getPreferredSize() {
-        return new Dimension(DIAMETER + 2, DIAMETER);
+        return new Dimension(DIAMETER + 2, DIAMETER + 2);
     }
     
     public static void main(String[] args) {
