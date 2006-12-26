@@ -115,6 +115,10 @@ public class JAsynchronousProgressIndicator extends JComponent {
         }
     }
     
+    /**
+     * Switches from the usual spinning "indeterminate" animation to a "determinate" pie chart style.
+     * To revert to the "indeterminate" style, call either setProgress(0, 0) or stopAnimation.
+     */
     public void setProgress(int newCurrentValue, int newMaxValue) {
         this.currentValue = newCurrentValue;
         this.maxValue = newMaxValue;
