@@ -64,12 +64,16 @@ public class JAsynchronousProgressIndicator extends JComponent {
         // With anti-aliasing off, I think they're right. With it on, I'm not convinced.
         // We'd be mad to turn anti-aliasing off when drawing arcs, so fudge things by using thick lines.
         // It's not pixel-perfect, but it's close enough for the casual observer.
-        int degreesToFill = (int) (-360.0 * ((double) currentValue / (double) maxValue));
+        int degreesToFill = degreesFilledBy(currentValue, maxValue);
         g.fillArc(x, y, DIAMETER, DIAMETER, 90, degreesToFill);
         Stroke originalStroke = g.getStroke();
         g.setStroke(new BasicStroke(1.5f));
         g.drawArc(x, y, DIAMETER, DIAMETER, 90, -360);
         g.setStroke(originalStroke);
+    }
+    
+    private static int degreesFilledBy(int current, int max) {
+        return (int) (-360.0 * ((double) current / (double) max));
     }
     
     private void paintBars(Graphics2D g) {
@@ -120,9 +124,16 @@ public class JAsynchronousProgressIndicator extends JComponent {
      * To revert to the "indeterminate" style, call either setProgress(0, 0) or stopAnimation.
      */
     public void setProgress(int newCurrentValue, int newMaxValue) {
+        final int oldCurrentValue = currentValue;
+        final int oldMaxValue = maxValue;
+        
         this.currentValue = newCurrentValue;
         this.maxValue = newMaxValue;
-        repaint();
+        
+        // If the change can have caused a visible change on the display, repaint.
+        if (maxValue == 0 || degreesFilledBy(oldCurrentValue, oldMaxValue) != degreesFilledBy(currentValue, maxValue)) {
+            repaint();
+        }
     }
     
     private synchronized static void initColors() {
