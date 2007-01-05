@@ -56,6 +56,9 @@ public class StopIcon extends DrawnIcon {
         // Although we've told the button not to paint the border, if we don't
         // remove the border, it will still influence the button's margin.
         button.setBorder(null);
+        // Not only do we not want to have the focus painted, we really don't want the focus at all.
+        // Typically, a user hitting "stop" wants to go back to what they were doing, not start working with the stop button.
+        button.setFocusable(false);
         return button;
     }
     
