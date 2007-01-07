@@ -463,7 +463,7 @@ INSTALLERS.Linux += $(INSTALLER.deb)
 # alien festoons the name with suffixes (and, as always, we have to let make know what it's going to generate).
 # I looked at the source and it just has a big switch to select the output architecture.
 # In particular, it doesn't do anything clever with the output of rpm --showrc.
-ALIEN_ARCH = $(patsubst amd64,x64_64,$(DEB_HOST_ARCH))
+ALIEN_ARCH = $(patsubst amd64,x86_64,$(DEB_HOST_ARCH))
 INSTALLER.rpm += $(BIN_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME)-$(VERSION_STRING)-2.$(ALIEN_ARCH).rpm
 INSTALLERS.Linux += $(INSTALLER.rpm)
 
