@@ -9,7 +9,7 @@ used only while debugging.
 No new file formats. We can't keep just inventing random formats
 left, right and center. Any file we write (for our own purposes) should
 use an existing well-known format. It's not acceptable to use
-one of Edit's existing formats; they should be considered deprecated.
+one of Evergreen's existing formats; they should be considered deprecated.
 
 Never use "new File"; use FileUtilities.fileFromString instead; this
 also understands ~/HACKING and ~elliotth/HACKING.
