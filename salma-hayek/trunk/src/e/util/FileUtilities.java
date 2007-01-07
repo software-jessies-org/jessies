@@ -1,6 +1,7 @@
 package e.util;
 
 import java.io.*;
+import java.nio.channels.*;
 import java.security.*;
 import java.util.*;
 import java.util.regex.*;
@@ -339,6 +340,25 @@ public class FileUtilities {
         return TimeUtilities.toIsoString(new Date(file.lastModified()));
     }
     
+    public static void copyFile(File source, File destination) {
+        try {
+            // From http://java.sun.com/developer/JDCTechTips/2002/tt0507.html.
+            FileInputStream fileInputStream = new FileInputStream(source);
+            FileOutputStream fileOutputStream = new FileOutputStream(destination);
+            FileChannel fileInputChannel = fileInputStream.getChannel();
+            FileChannel fileOutputChannel = fileOutputStream.getChannel();
+            
+            fileInputChannel.transferTo(0, fileInputChannel.size(), fileOutputChannel);
+            
+            fileInputChannel.close();
+            fileOutputChannel.close();
+            fileInputStream.close();
+            fileOutputStream.close();
+        } catch (IOException ex) {
+            throw new RuntimeException("Couldn't copy " + source + " to " + destination + ": " + ex.getMessage());
+        }
+    }
+
     public static void main(String[] arguments) {
         for (String filename : arguments) {
             System.err.println(parseUserFriendlyName(filename));
