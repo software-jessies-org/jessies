@@ -439,7 +439,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		@Override
 		protected void performPaneAction(JTerminalPane terminalPane) {
-			terminalPane.getTextPane().scrollToBottom();
+			terminalPane.getTextPane().scrollToEnd();
 		}
 	}
 	
