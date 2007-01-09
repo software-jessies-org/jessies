@@ -243,7 +243,7 @@ public class JTerminalPane extends JPanel {
 	private class KeyHandler implements KeyListener {
 		private javax.swing.Timer waitForCorrespondingOutputTimer;
 		private Location cursorPositionAfterOutput;
-		private javax.swing.Timer scrollToBottomDelayTimer;
+		private javax.swing.Timer waitForCursorStabilityTimer;
 		
 		public KeyHandler() {
 			// If your remote-echoing device is more than roundTripMilliseconds away and doesn't automatically wrap at the
@@ -255,13 +255,13 @@ public class JTerminalPane extends JPanel {
 			waitForCorrespondingOutputTimer = new javax.swing.Timer(roundTripMilliseconds, new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					cursorPositionAfterOutput = textPane.getCursorPosition();
-					scrollToBottomDelayTimer.start();
+					waitForCursorStabilityTimer.start();
 				}
 			});
 			waitForCorrespondingOutputTimer.setRepeats(false);
 			
 			// ... providing that it doesn't move again for a while.
-			scrollToBottomDelayTimer = new javax.swing.Timer(100, new ActionListener() {
+			waitForCursorStabilityTimer = new javax.swing.Timer(100, new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					// If the cursor is now in a different position, we conclude that the previous output was coincidental to user's
 					// key press.
@@ -274,10 +274,10 @@ public class JTerminalPane extends JPanel {
 					if (cursorPositionAfterOutput != textPane.getCursorPosition()) {
 						return;
 					}
-					textPane.scrollToBottom();
+					textPane.scrollHorizontallyToShowCursor();
 				}
 			});
-			scrollToBottomDelayTimer.setRepeats(false);
+			waitForCursorStabilityTimer.setRepeats(false);
 			
 			// This automatic scrolling has caused minor trouble a lot of times.
 			// Here's some test code which you wouldn't want to cause scrolling but which used to, all the time,
@@ -490,7 +490,7 @@ public class JTerminalPane extends JPanel {
 						textPane.scrollToTop();
 						return true;
 					case KeyEvent.VK_END:
-						textPane.scrollToBottom();
+						textPane.scrollToEnd();
 						return true;
 					case KeyEvent.VK_PAGE_UP:
 						pageUp();
@@ -529,8 +529,9 @@ public class JTerminalPane extends JPanel {
 		 */
 		public void scroll() {
 			if (Options.getSharedInstance().isScrollKey()) {
+				textPane.scrollToBottomButNotHorizontally();
 				waitForCorrespondingOutputTimer.stop();
-				scrollToBottomDelayTimer.stop();
+				waitForCursorStabilityTimer.stop();
 				waitForCorrespondingOutputTimer.start();
 			}
 		}
