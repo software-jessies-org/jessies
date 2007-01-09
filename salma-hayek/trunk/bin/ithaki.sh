@@ -8,10 +8,27 @@ DEB_DIRECTORY=/u/u154/software.jessies.org/
 # "deb" is a DNS alias for a machine in the local domain running apache on which the following command has been run:
 # sudo ln -s $DEB_DIRECTORY /var/www/software.jessies.org
 
+# When I built on wide, once, it upgraded my work areas to Subversion 1.4.
+# Wide is amd64, which is only supported in etch, which only has svn 1.4.
+# ithaki runs stable, which is currently sarge, which only has svn 1.1.
+
+# This was my solution:
+
+# /net/ithaki/usr/local/bin/svn now contains:
+# #!/bin/bash
+# LD_LIBRARY_PATH=/net/duezer/usr/lib:$LD_LIBRARY_PATH exec /net/duezer/usr/bin/svn "$@"
+
+# /net/ithaki/usr/local/bin/svnversion now contains:
+# #!/bin/bash
+# LD_LIBRARY_PATH=/net/duezer/usr/lib:$LD_LIBRARY_PATH exec /net/duezer/usr/bin/svnversion "$@"
+
+# Now all my svn updates on ithaki terminate with "Killed by signal 15" (SIGTERM) but seem to work.
+
 mkdir -p $DEB_DIRECTORY
 cd $DEB_DIRECTORY
 # Remove any .debs with obsolete names.
-rm *.deb
+# FIXME: But don't do this yet, so the amd64 .debs that I created remain there, even though I'm not building them regularly.
+#rm *.deb
 
 # Run the latest version of the nightly build script, rather than the version from yesterday.
 # This has the advantage that the update won't overwrite the running script - which Ruby doesn't like.
@@ -20,8 +37,9 @@ $NIGHTLY_BUILD_SCRIPT clean native-dist
 # We have to copy the i386 .debs before we clean, before we build the amd64 .debs,
 # because we use the same directories for the intermediate binary files.
 find ~martind/software.jessies.org/nightlies/ -name "*.deb" | xargs cp --target-directory=.
-echo $NIGHTLY_BUILD_SCRIPT clean native-dist | ssh wide bash --login
-find ~martind/software.jessies.org/nightlies/ -name "*.deb" | xargs cp --target-directory=.
+# FIXME: Don't do this because libx11-dev is broken on wide and I don't really want to leave duezer:/usr/include/X11 mounted on wide:/usr/include/X11 which is what I did before.
+#echo $NIGHTLY_BUILD_SCRIPT clean native-dist | ssh wide bash --login
+#find ~martind/software.jessies.org/nightlies/ -name "*.deb" | xargs cp --target-directory=.
 
 # If we don't have a Packages file (as well as Packages.gz) we get:
 # Failed to fetch http://deb/software.jessies.org/./Release  Unable to find expected entry  Packages in Meta-index file (malformed Release file?)
