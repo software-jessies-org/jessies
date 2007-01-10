@@ -17,9 +17,9 @@ public abstract class AbstractFindDialog {
         final JLabel findStatus = new JLabel(" ");
         
         FormBuilder form = new FormBuilder(frame, "Find");
+        form.setStatusBar(findStatus);
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Find:", PatternUtilities.addRegularExpressionHelpToComponent(findField));
-        formPanel.setStatusBar(findStatus);
         formPanel.setTypingTimeoutActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
