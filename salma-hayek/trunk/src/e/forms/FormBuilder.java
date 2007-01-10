@@ -1,6 +1,7 @@
 package e.forms;
 
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * Creates and shows form dialogs. A form dialog is a simple collection of
@@ -14,6 +15,7 @@ import java.awt.*;
 public class FormBuilder {
     FormPanel formPanel;
     FormDialog formDialog;
+    JComponent statusBar;
     
     /**
      * Gets ready to show a form with a given name as a child of the
@@ -21,7 +23,7 @@ public class FormBuilder {
      */
     public FormBuilder(Frame parent, String title) {
         this.formPanel = new FormPanel();
-        this.formDialog = new FormDialog(parent, title, formPanel);
+        this.formDialog = new FormDialog(this, parent, title);
     }
     
     /**
@@ -39,6 +41,14 @@ public class FormBuilder {
      */
     public FormPanel getFormPanel() {
         return formPanel;
+    }
+    
+    /**
+     * Sets the status bar for this form.
+     * Using this in preference to adding a row to the panel gives us a chance to lay out the status bar in the most appropriate manner.
+     */
+    public void setStatusBar(JComponent component) {
+        this.statusBar = component;
     }
     
     /**

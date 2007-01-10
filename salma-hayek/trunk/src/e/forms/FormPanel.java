@@ -15,8 +15,6 @@ public class FormPanel extends JPanel {
 
     private int componentSpacing;
 
-    private JComponent statusBar;
-    
     private ActionListener typingTimeoutActionListener = NoOpAction.INSTANCE;
     
     private ArrayList<JTextComponent> textComponents = new ArrayList<JTextComponent>();
@@ -89,20 +87,6 @@ public class FormPanel extends JPanel {
         if (component instanceof JTextComponent) {
             textComponents.add((JTextComponent) component);
         }
-    }
-    
-    /**
-     * Sets the status bar that any dialog using this panel
-     * should include. Using this in preference to adding
-     * a row will give us a chance to lay out the status bar
-     * in a more appropriate manner.
-     */
-    public void setStatusBar(JComponent component) {
-        this.statusBar = component;
-    }
-
-    JComponent getStatusBar() {
-        return this.statusBar;
     }
     
     ArrayList<JTextComponent> getTextComponents() {

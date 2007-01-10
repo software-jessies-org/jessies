@@ -56,7 +56,7 @@ public class FormDialog {
     
     private Runnable cancelRunnable = new NoOpRunnable();
     
-    private FormPanel formPanel;
+    private FormBuilder builder;
     
     private String actionLabel;
     
@@ -115,11 +115,11 @@ public class FormDialog {
         return wasAccepted;
     }
 
-    FormDialog(Frame ownerFrame, String title, FormPanel formPanel) {
+    FormDialog(FormBuilder builder, Frame ownerFrame, String title) {
         initOwner(ownerFrame);
         
+        this.builder = builder;
         this.dialog = new JDialog(ownerFrame, title);
-        this.formPanel = formPanel;
         
         initAlwaysOnTopMonitoring();
     }
@@ -165,18 +165,17 @@ public class FormDialog {
     private void configureDialog() {
         dialog.setResizable(true);
         
-        JComponent statusBar = formPanel.getStatusBar();
-        if (extraButton != null && statusBar != null) {
-            // It looks bad if we have a status bar and an
-            // extra button together in the row of buttons.
-            formPanel.addRow("", statusBar);
-            statusBar = null;
+        FormPanel formPanel = builder.getFormPanel();
+        if (extraButton != null && builder.statusBar != null) {
+            // It looks bad if we have a status bar and an extra button together in the row of buttons.
+            formPanel.addRow("", builder.statusBar);
+            builder.statusBar = null;
         }
         
         JPanel internalContentPane = new JPanel(new BorderLayout(componentSpacing, componentSpacing));
         internalContentPane.setBorder(BorderFactory.createEmptyBorder(componentSpacing, componentSpacing, componentSpacing, componentSpacing));
         internalContentPane.add(formPanel, BorderLayout.CENTER);
-        internalContentPane.add(makeButtonPanel(dialog.getRootPane(), actionLabel, statusBar), BorderLayout.SOUTH);
+        internalContentPane.add(makeButtonPanel(dialog.getRootPane(), actionLabel, builder.statusBar), BorderLayout.SOUTH);
         
         dialog.setContentPane(internalContentPane);
         
@@ -272,7 +271,7 @@ public class FormDialog {
      * Adds listeners to all the text fields.
      */
     private void addTextFieldListeners() {
-        this.listenedToTextFields = formPanel.getTextComponents();
+        this.listenedToTextFields = builder.getFormPanel().getTextComponents();
         for (JTextComponent field : listenedToTextFields) {
             field.getDocument().addDocumentListener(documentListener);
         }
@@ -290,7 +289,7 @@ public class FormDialog {
         initKeyboardCloseBehavior();
     }
 
-    private void initFocus(Container formPanel) {
+    private void initFocus(FormPanel formPanel) {
         dialogFocusRedirector = new DialogFocusRedirector(formPanel);
         dialogFocusRedirector.redirectFocus();
     }
