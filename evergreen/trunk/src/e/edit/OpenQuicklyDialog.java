@@ -102,10 +102,10 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     
     private void initForm() {
         this.form = new FormBuilder(Evergreen.getInstance().getFrame(), "Open Quickly");
+        form.setStatusBar(status);
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Names Containing:", filenameField);
         formPanel.addRow("Matches:", new JScrollPane(matchList));
-        formPanel.setStatusBar(status);
         formPanel.setTypingTimeoutActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showMatches();
