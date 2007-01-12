@@ -43,6 +43,8 @@ public class ThreadUtilities {
             // other than a daemon. I don't see why an idle worker thread
             // should be able to prevent the VM from exiting.
             thread.setDaemon(true);
+            // Avoiding inheriting the high priority of the event dispatch thread.
+            thread.setPriority(Thread.NORM_PRIORITY);
             return thread;
         }
     }
