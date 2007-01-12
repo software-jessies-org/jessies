@@ -32,9 +32,7 @@ dot_directory = "#{ENV['HOME']}/.terminator"
 log_directory = File.join(dot_directory, "logs")
 make_directory(dot_directory, true)
 make_directory(log_directory, false)
-
-# FIXME: we should move "~/.terminator-settings" into dot_directory.
-# FIXME: we should specify the terminator-settings pathname as a system property.
+options_pathname = File.join(dot_directory, "options")
 
 def tryInAppServer(salma_hayek, serverPortPathname)
   # InAppClient's constructor stops anyone else from reading the .secret file.
@@ -183,6 +181,7 @@ invoker.launcher = launcher
 # (We didn't used to be able to getenv("HOME") from Java on Cygwin.)
 invoker.add_pathname_property("org.jessies.terminator.logDirectory", log_directory)
 invoker.add_pathname_property("org.jessies.terminator.serverPortFileStem", server_port_file_stem)
+invoker.add_pathname_property("org.jessies.terminator.optionsFile", options_pathname)
 
 # Ruby knows the mapping from signal number to signal name, but Java doesn't
 # and POSIX doesn't either. So pass the information along to Java in a way

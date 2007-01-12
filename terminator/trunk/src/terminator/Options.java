@@ -25,8 +25,6 @@ import javax.swing.*;
 public class Options {
 	private static final Options INSTANCE = new Options();
 	
-	private static final String TERMINATOR_SETTINGS_FILENAME = ".terminator-settings";
-	
 	private static final String ANTI_ALIAS = "antiAlias";
 	private static final String BLOCK_CURSOR = "blockCursor";
 	private static final String CURSOR_BLINK = "cursorBlink";
@@ -242,7 +240,7 @@ public class Options {
 	private Options() {
 		initDefaults();
 		initDefaultColors();
-		readOptionsFrom(TERMINATOR_SETTINGS_FILENAME);
+		readStoredOptions();
 		aliasColorBD();
 	}
 	
@@ -344,7 +342,7 @@ public class Options {
 			public Boolean call() {
 				PrintWriter out = null;
 				try {
-					out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(getHomeFile(TERMINATOR_SETTINGS_FILENAME)), "UTF-8"));
+					out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(getOptionsFile()), "UTF-8"));
 					showOptions(out, false);
 					return Boolean.TRUE;
 				} catch (IOException ex) {
@@ -599,30 +597,30 @@ public class Options {
 		return Integer.parseInt(line.substring(offset, offset + 3).trim());
 	}
 	
-	private File getHomeFile(String filename) {
-		return new File(System.getProperty("user.home"), filename);
+	private File getOptionsFile() {
+		return FileUtilities.fileFromString(System.getProperty("org.jessies.terminator.optionsFile"));
 	}
 	
-	private void readOptionsFrom(String filename) {
-		File file = getHomeFile(filename);
+	private void readStoredOptions() {
+		readOptionsFrom(FileUtilities.fileFromString("~/.terminator-settings")); // FIXME: remove this after a while, when everyone's been switched to the new location.
+		readOptionsFrom(getOptionsFile());
+	}
+	
+	private void readOptionsFrom(File file) {
 		if (file.exists() == false) {
 			return;
 		}
 		try {
-			readOptionsFrom(file);
-		} catch (Exception ex) {
-			Log.warn("Problem reading options from \"" + filename + "\"", ex);
-		}
-	}
-	
-	private void readOptionsFrom(File file) {
-		String[] lines = StringUtilities.readLinesFromFile(file.toString());
-		for (String line : lines) {
-			line = line.trim();
-			if (line.length() == 0 || line.startsWith("!")) {
-				continue;
+			String[] lines = StringUtilities.readLinesFromFile(file.toString());
+			for (String line : lines) {
+				line = line.trim();
+				if (line.length() == 0 || line.startsWith("!")) {
+					continue;
+				}
+				processResourceString(line);
 			}
-			processResourceString(line);
+		} catch (Exception ex) {
+			Log.warn("Problem reading options from \"" + file + "\"", ex);
 		}
 	}
 	
