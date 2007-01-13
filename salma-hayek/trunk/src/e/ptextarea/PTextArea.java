@@ -45,7 +45,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     private PHighlightManager highlights = new PHighlightManager();
     private PTextStyler textStyler = new PPlainTextStyler(this);
-    private List<StyleApplicator> styleApplicators = new ArrayList<StyleApplicator>();
+    private List<StyleApplicator> styleApplicators;
     private TabStyleApplicator tabStyleApplicator = new TabStyleApplicator(this);
     
     private int rightHandMarginColumn = NO_MARGIN;
@@ -76,8 +76,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         this.selection = new SelectionHighlight(this, 0, 0);
         this.indenter = new PNoOpIndenter(this);
         
-        addStyleApplicator(new UnprintableCharacterStyleApplicator(this));
-        addStyleApplicator(new HyperlinkStyleApplicator(this));
+        initStyleApplicators();
         lines.addLineListener(this);
         revalidateLineWrappings();
         
@@ -161,6 +160,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     public PTextStyler getTextStyler() {
         return textStyler;
+    }
+    
+    private void initStyleApplicators() {
+        styleApplicators = new ArrayList<StyleApplicator>();
+        addStyleApplicator(new UnprintableCharacterStyleApplicator(this));
+        addStyleApplicator(new HyperlinkStyleApplicator(this));
+        if (textStyler instanceof PAbstractLanguageStyler) {
+            ((PAbstractLanguageStyler) textStyler).initStyleApplicator();
+        }
     }
     
     public void addStyleApplicator(StyleApplicator styleApplicator) {
@@ -551,6 +559,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     public void setTextStyler(PTextStyler textStyler) {
         this.textStyler = textStyler;
+        initStyleApplicators();
         clearSegmentCache();
         repaint();
     }
