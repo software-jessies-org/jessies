@@ -340,20 +340,29 @@ public class Options {
 		
 		form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
 			public Boolean call() {
-				PrintWriter out = null;
-				try {
-					out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(getOptionsFile()), "UTF-8"));
-					showOptions(out, false);
-					return Boolean.TRUE;
-				} catch (IOException ex) {
-					SimpleDialog.showDetails(null, "Couldn't save preferences.", ex);
-					return Boolean.FALSE;
-				} finally {
-					FileUtilities.close(out);
+				File optionsFile = getOptionsFile();
+				boolean saved = writeOptionsTo(optionsFile);
+				if (saved == false) {
+					SimpleDialog.showAlert(null, "Couldn't save preferences.", "There was a problem writing preferences to \"" + optionsFile + "\".");
 				}
+				return saved;
 			}
 		});
 		form.showNonModal();
+	}
+	
+	private boolean writeOptionsTo(File file) {
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+			showOptions(out, false);
+			return true;
+		} catch (IOException ex) {
+			Log.warn("Problem writing options to \"" + file + "\"", ex);
+			return false;
+		} finally {
+			FileUtilities.close(out);
+		}
 	}
 	
 	private class BooleanPreference {
@@ -602,8 +611,24 @@ public class Options {
 	}
 	
 	private void readStoredOptions() {
-		readOptionsFrom(FileUtilities.fileFromString("~/.terminator-settings")); // FIXME: remove this after a while, when everyone's been switched to the new location.
-		readOptionsFrom(getOptionsFile());
+		File optionsFile = getOptionsFile();
+		
+		// Cope with old-style stored options.
+		// Added on 2007-01-14, so it had better be a long time from then before you remove this!
+		File oldFile = FileUtilities.fileFromString("~/.terminator-settings");
+		if (oldFile.exists()) {
+			// Read the options from the old file...
+			readOptionsFrom(oldFile);
+			// ...write them out in the new style...
+			boolean saved = writeOptionsTo(optionsFile);
+			// ...and then remove the old file if that was successful.
+			if (saved) {
+				oldFile.delete();
+			}
+		}
+		
+		// Cope with new-style stored options.
+		readOptionsFrom(optionsFile);
 	}
 	
 	private void readOptionsFrom(File file) {
