@@ -115,9 +115,11 @@ public class WorkspaceFileList {
         
         @Override
         protected ArrayList<String> doInBackground() {
+            // Don't hog the CPU while we're still getting started.
+            Evergreen.getInstance().awaitInitialization();
+            
             ArrayList<String> newFileList = scanWorkspaceForFiles();
-            // Many file systems will have returned the files not in
-            // alphabetical order, so we sort them ourselves here.
+            // Many file systems will have returned the files not in alphabetical order, so we sort them ourselves here.
             // Users of the list can then assume it's in order.
             Collections.sort(newFileList, String.CASE_INSENSITIVE_ORDER);
             fileList = newFileList;

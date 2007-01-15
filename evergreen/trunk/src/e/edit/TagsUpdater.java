@@ -15,6 +15,7 @@ import e.util.*;
 
 public class TagsUpdater {
     private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Tags Updater");
+    private static int latestSerialNumber = 0;
     private ETree tree;
     private JPanel uiPanel;
     private ETextWindow textWindow;
@@ -134,7 +135,8 @@ public class TagsUpdater {
     }
     
     public void updateTags() {
-        executorService.execute(new TreeModelBuilder());
+        int serialNumber = ++latestSerialNumber;
+        executorService.execute(new TreeModelBuilder(serialNumber));
     }
     
     public void setTreeModel(TreeModel treeModel) {
@@ -191,8 +193,9 @@ public class TagsUpdater {
     }
     
     public class TreeModelBuilder extends SwingWorker<TreeModel, TagReader.Tag> implements TagReader.TagListener {
+        private int serialNumber;
         private boolean tagsHaveChanged;
-        private boolean successful;
+        private boolean successful = true;
         private long startTime;
         private Timer progressTimer;
         
@@ -200,23 +203,29 @@ public class TagsUpdater {
         private DefaultTreeModel treeModel;
         private Map<String, DefaultMutableTreeNode> branches = new HashMap<String, DefaultMutableTreeNode>();
         
-        public TreeModelBuilder() {
+        public TreeModelBuilder(int serialNumber) {
+            this.serialNumber = serialNumber;
+        }
+        
+        @Override
+        protected TreeModel doInBackground() {
+            // Don't waste time during start-up, and don't waste time if we're already out of date before we start.
+            Evergreen.getInstance().awaitInitialization();
+            if (serialNumber != latestSerialNumber) {
+                return null;
+            }
+            
+            root = new BranchNode("root");
+            treeModel = new DefaultTreeModel(root);
+            branches.clear();
+            branches.put("", root);
+            startTime = System.currentTimeMillis();
             progressTimer = new Timer(500, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Evergreen.getInstance().getTagsPanel().showProgressBar();
                 }
             });
             progressTimer.setRepeats(false);
-        }
-        
-        @Override
-        protected TreeModel doInBackground() {
-            successful = true;
-            root = new BranchNode("root");
-            treeModel = new DefaultTreeModel(root);
-            branches.clear();
-            branches.put("", root);
-            startTime = System.currentTimeMillis();
             progressTimer.start();
             scanTags();
             return treeModel;
@@ -291,10 +300,12 @@ public class TagsUpdater {
         
         @Override
         protected void done() {
-            progressTimer.stop();
+            if (progressTimer != null) {
+                progressTimer.stop();
+            }
             if (successful) {
                 showTags();
-                if (tagsHaveChanged) {
+                if (tagsHaveChanged && serialNumber == latestSerialNumber) {
                     setTreeModel(treeModel);
                 }
             }
