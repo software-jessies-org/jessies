@@ -9,6 +9,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*; 
 import java.util.List;
+import java.util.concurrent.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -35,8 +36,8 @@ public class Evergreen {
     /** The global find history for all FindDialog instances. */
     private EHistoryComboBoxModel findHistory = new ChronologicalComboBoxModel();
     
-    /** Tests false once we're fully started. */
-    private boolean initializing = true;
+    /** Whether we're fully started. */
+    private CountDownLatch startSignal = new CountDownLatch(1);
     
     private class InitialFile {
         String filename;
@@ -524,7 +525,7 @@ public class Evergreen {
      * time we start, we start more or less where we left off.
      */
     public void rememberState() {
-        if (initializing) {
+        if (startSignal.getCount() != 0) {
             // If we haven't finished initializing, we may not have
             // read all the state in, so writing it back out could
             // actually throw state away. We don't want to do that.
@@ -797,6 +798,13 @@ public class Evergreen {
         aboutBox.addCopyright("All Rights Reserved.");
     }
     
+    public void awaitInitialization() {
+        try {
+            startSignal.await();
+        } catch (InterruptedException ex) {
+        }
+    }
+    
     private void init() {
         final long startTimeMillis = System.currentTimeMillis();
         
@@ -835,7 +843,6 @@ public class Evergreen {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 openRememberedFiles();
-                initializing = false;
                 
                 Log.warn("All remembered files opened after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
                 
@@ -846,6 +853,24 @@ public class Evergreen {
                     tabbedPane.setSelectedComponent(initialWorkspace);
                     initialWorkspace = null;
                 }
+                
+                Thread fileListUpdaterStarterThread = new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            // What I really want to say is "wait until the event queue is empty and everything's caught up".
+                            // I haven't yet found out how to do that, and the fact that using EventQueue.invokeLater here doesn't achieve the desired effect makes me think that what I want might not be that simple anyway.
+                            // But "on my machine", sleeping here for 2s is time enough for the display to catch up, but doesn't adversely affect overall start-up time.
+                            // FIXME: We need to find out what we're really waiting for, and how to wait for it.
+                            Thread.sleep(2000);
+                        } catch (InterruptedException ex) {
+                        }
+                        
+                        Log.warn("Workers free to start after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
+                        startSignal.countDown();
+                    }
+                });
+                fileListUpdaterStarterThread.setPriority(Thread.MIN_PRIORITY);
+                fileListUpdaterStarterThread.start();
             }
         });
     }
