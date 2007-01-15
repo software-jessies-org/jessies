@@ -826,6 +826,7 @@ public class Evergreen {
         openRememberedWorkspaces();
         
         frame.setVisible(true);
+        GuiUtilities.finishGnomeStartup();
         Log.warn("Frame visible after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
         
         splitPane.setDividerLocation(0.8);
