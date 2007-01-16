@@ -257,7 +257,9 @@ public class Evergreen {
         
         // Find which workspace this file is on/should be on, and make it visible.
         Workspace workspace = getBestWorkspaceForFilename(filename);
-        tabbedPane.setSelectedComponent(workspace);
+        if (startSignal.getCount() == 0) {
+            tabbedPane.setSelectedComponent(workspace);
+        }
         
         // If the user already has this file open, we shouldn't open it again.
         EWindow alreadyOpenWindow = workspace.findIfAlreadyOpen(filename, address);
@@ -840,6 +842,11 @@ public class Evergreen {
         splitPane.setDividerLocation(0.8);
         splitPane.setResizeWeight(0.8);
         
+        if (initialWorkspace != null) {
+            tabbedPane.setSelectedComponent(initialWorkspace);
+            initialWorkspace = null;
+        }
+        
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 openRememberedFiles();
@@ -849,9 +856,6 @@ public class Evergreen {
                 if (tabbedPane.getTabCount() == 0) {
                     // If we didn't create any workspaces, give the user some help...
                     showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
-                } else if (initialWorkspace != null) {
-                    tabbedPane.setSelectedComponent(initialWorkspace);
-                    initialWorkspace = null;
                 }
                 
                 Thread fileListUpdaterStarterThread = new Thread(new Runnable() {
