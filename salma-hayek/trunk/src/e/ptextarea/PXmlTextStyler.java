@@ -8,6 +8,11 @@ import java.util.*;
 public class PXmlTextStyler extends PAbstractLanguageStyler {
     public PXmlTextStyler(PTextArea textArea) {
         super(textArea);
+    }
+    
+    @Override
+    public void initStyleApplicators() {
+        super.initStyleApplicators();
         
         // We add the tag-recognizing applicator first so that the standard hyperlink applicator doesn't interfere with it.
         // FIXME: we don't cope with tags split across multiple lines because our styling works on a per-line basis; we'd need to remember state like we do for multi-line comments.

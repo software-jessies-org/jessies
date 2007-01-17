@@ -167,7 +167,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         addStyleApplicator(new UnprintableCharacterStyleApplicator(this));
         addStyleApplicator(new HyperlinkStyleApplicator(this));
         if (textStyler instanceof PAbstractLanguageStyler) {
-            ((PAbstractLanguageStyler) textStyler).initStyleApplicator();
+            ((PAbstractLanguageStyler) textStyler).initStyleApplicators();
         }
     }
     

@@ -118,6 +118,11 @@ public class PAssemblerTextStyler extends PAbstractLanguageStyler {
     
     public PAssemblerTextStyler(PTextArea textArea) {
         super(textArea);
+    }
+    
+    @Override
+    public void initStyleApplicators() {
+        super.initStyleApplicators();
         textArea.addStyleApplicatorFirst(new PreprocessorStyleApplicator(textArea, false));
     }
     

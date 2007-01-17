@@ -89,6 +89,11 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
     
     public PCPPTextStyler(PTextArea textArea) {
         super(textArea);
+    }
+    
+    @Override
+    public void initStyleApplicators() {
+        super.initStyleApplicators();
         // "#else" is PREPROCESSOR, but "else" is KEYWORD, so we need to look for preprocessor directives first.
         textArea.addStyleApplicatorFirst(new PreprocessorStyleApplicator(textArea, false));
     }
