@@ -83,7 +83,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         builder.addStyledSegment(end, PStyle.STRING);
     }
     
-    public void initStyleApplicator() {
+    public void initStyleApplicators() {
         Set<String> keywords;
         if (keywordsAreCaseSensitive()) {
             keywords = new HashSet<String>();
