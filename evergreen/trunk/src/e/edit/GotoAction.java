@@ -48,20 +48,15 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     public boolean isValid(String value) {
         try {
             int line = Integer.parseInt(value);
-            return line < currentTextArea.getLineCount();
+            return (line > 0 && line <= currentTextArea.getLineCount());
         } catch (NumberFormatException ex) {
             return false;
         }
     }
     
     public void valueChangedTo(String value) {
-        try {
-            int line = Integer.parseInt(value);
-            if (line < currentTextArea.getLineCount()) {
-                currentTextArea.goToLine(line);
-            }
-        } catch (NumberFormatException ex) {
-            ex = ex; // Do nothing.
+        if (isValid(value)) {
+            currentTextArea.goToLine(Integer.parseInt(value));
         }
     }
     
@@ -71,8 +66,7 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     }
     
     public boolean wasAccepted(String value) {
-        int line = Integer.parseInt(value);
-        currentTextArea.goToLine(line);
+        valueChangedTo(value);
         return true;
     }
     
