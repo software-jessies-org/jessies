@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <termios.h>
 #include <unistd.h>
 
 #if defined(__sun__)
@@ -127,13 +128,23 @@ private:
 #endif
 
 #if defined(__sun__)
-        /* This seems to be necessary on Solaris to make STREAMS behave. */
+        // This seems to be necessary on Solaris to make STREAMS behave.
         ioctl(childFd, I_PUSH, "ptem");
         ioctl(childFd, I_PUSH, "ldterm");
         ioctl(childFd, I_PUSH, "ttcompat");
 #endif
         
-        /* Slave becomes stdin/stdout/stderr of child. */
+        // Humans don't need XON/XOFF flow control of output, and it only serves to confuse those who accidentally hit ^S or ^Q, so turn it off.
+        termios terminalAttributes;
+        if (tcgetattr(childFd, &terminalAttributes) != 0) {
+            throw child_exception_via_pipe(childFd, "tcgetattr(" + toString(childFd) + ", &terminalAttributes)");
+        }
+        terminalAttributes.c_iflag &= ~IXON;
+        if (tcsetattr(childFd, TCSANOW, &terminalAttributes) != 0) {
+            throw child_exception_via_pipe(childFd, "tcsetattr(" + toString(childFd) + ", TCSANOW, &terminalAttributes) with IXON cleared");
+        }
+        
+        // Slave becomes stdin/stdout/stderr of child.
         if (childFd != STDIN_FILENO && dup2(childFd, STDIN_FILENO) != STDIN_FILENO) {
             throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDIN_FILENO)");
         }
