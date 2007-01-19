@@ -112,7 +112,7 @@ public class EPopupMenu {
         }
         
         private void handle(MouseEvent e) {
-            if (e.isConsumed() == false && e.isPopupTrigger()) {
+            if (componentWithMenu.isEnabled() && e.isConsumed() == false && e.isPopupTrigger()) {
                 requestFocusOnComponentWithMenu();
                 showPopupMenuLater(e);
             }
