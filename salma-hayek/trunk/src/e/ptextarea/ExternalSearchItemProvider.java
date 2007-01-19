@@ -14,11 +14,6 @@ class ExternalSearchItemProvider implements MenuItemProvider {
     }
     
     public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
-        // All these menu items require a non-empty selection.
-        if (textArea.getSelectedText().trim().length() == 0) {
-            return;
-        }
-        
         if (GuiUtilities.isMacOs()) {
             actions.add(new SearchInSpotlightAction());
         }
@@ -26,7 +21,18 @@ class ExternalSearchItemProvider implements MenuItemProvider {
         actions.add(new LookUpInDictionaryAction());
     }
     
-    private class SearchInSpotlightAction extends AbstractAction {
+    private abstract class ExternalSearchAction extends AbstractAction {
+        public ExternalSearchAction(String name) {
+            super(name);
+        }
+        
+        // It only makes sense to search for a non-empty selection.
+        public boolean isEnabled() {
+            return (textArea.getSelectionStart() != textArea.getSelectionEnd());
+        }
+    }
+    
+    private class SearchInSpotlightAction extends ExternalSearchAction {
         public SearchInSpotlightAction() {
             super("Search in Spotlight");
         }
@@ -38,7 +44,7 @@ class ExternalSearchItemProvider implements MenuItemProvider {
         }
     }
     
-    private class SearchInGoogleAction extends AbstractAction {
+    private class SearchInGoogleAction extends ExternalSearchAction {
         public SearchInGoogleAction() {
             super("Search in Google");
         }
@@ -53,7 +59,7 @@ class ExternalSearchItemProvider implements MenuItemProvider {
         }
     }
     
-    private class LookUpInDictionaryAction extends AbstractAction {
+    private class LookUpInDictionaryAction extends ExternalSearchAction {
         public LookUpInDictionaryAction() {
             super("Look Up in Dictionary");
         }
