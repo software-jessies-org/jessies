@@ -71,6 +71,8 @@ tab characters into strings of spaces, which is very annoying if you then try to
 a section of text from your terminal into a text editor.  Terminator handles tabs properly,
 remembering where the tabs are and copy/pasting them as tab characters.
 
+<li><p><strong>Fewer Gotchas</strong> - Terminator disables XON/XOFF flow control by default, so you won't be caught out by a seemingly "hung" terminals from accidentally typing ^S and not knowing to type ^Q. (Anyone who actually does want this can use <tt>stty ixon</tt> in their login script.)
+
 <li><p><strong>Safe Quit</strong> - Terminator knows when you still have processes running, and brings up a dialog rather than just letting those processes die.
 <p align="center"><img src="linux-top.png" alt="top(1) running on Linux">
 
@@ -94,8 +96,8 @@ now surpassed Terminal in several areas.
 
 <h2>Running</h2>
 
-<p>Terminator will run fine on Mac OS, Windows, KDE, GNOME, or even an old-style X11
-window manager like lwm. Now you can use the same terminal emulator everywhere!
+<p>Terminator will run fine on Mac OS, Windows, and Linux (using KDE, GNOME, or even an old-style X11
+window manager like lwm). Now you can use the same terminal emulator everywhere!
 
 <p>By default, Terminator will start the shell specified by the SHELL environment variable.
 You can start other programs, even in multiple tabs, from the command line&nbsp;&mdash; see <tt>terminator --help</tt> for the syntax.
