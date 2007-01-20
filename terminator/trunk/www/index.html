@@ -71,7 +71,7 @@ tab characters into strings of spaces, which is very annoying if you then try to
 a section of text from your terminal into a text editor.  Terminator handles tabs properly,
 remembering where the tabs are and copy/pasting them as tab characters.
 
-<li><p><strong>Fewer Gotchas</strong> - Terminator disables XON/XOFF flow control by default, so you won't be caught out by a seemingly "hung" terminals from accidentally typing ^S and not knowing to type ^Q. (Anyone who actually does want this can use <tt>stty ixon</tt> in their login script.)
+<li><p><strong>Fewer Gotchas</strong> - Terminator automatically turns off XON/XOFF flow control for terminal output. Being able to pause output by typing ^S and resume it by typing ^Q was probably useful in 1975 on a 300 baud terminal, but these days it mainly leads to confusion when it's accidentally typed by someone who doesn't know about this functionality or doesn't realize they've activated it. Turning off XON/XOFF allows Bash and Emacs, amongst others, to make use of these keystrokes. (A user who wants the XON/XOFF behavior, perhaps because they're talking to the PDP-11 in their garage, can use <tt>stty ixon</tt> in their login script to re-enable it.)
 
 <li><p><strong>Safe Quit</strong> - Terminator knows when you still have processes running, and brings up a dialog rather than just letting those processes die.
 <p align="center"><img src="linux-top.png" alt="top(1) running on Linux">
