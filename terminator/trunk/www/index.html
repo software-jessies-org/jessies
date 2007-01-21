@@ -66,6 +66,8 @@ to <tt>bc(1)</tt>.
 and a Ruby invocation script,
 Terminator should compile out of the box on most modern desktop operating systems.
 
+<p>Pre-built packages are available for Linux, Mac OS, and MS Windows.
+
 <li><p><strong>Proper Tab Character Handling</strong> - Most terminal emulators will translate
 tab characters into strings of spaces, which is very annoying if you then try to copy/paste
 a section of text from your terminal into a text editor.  Terminator handles tabs properly,
@@ -73,7 +75,7 @@ remembering where the tabs are and copy/pasting them as tab characters.
 
 <li><p><strong>Unlimited Scrollback</strong> - Terminator won't throw away output when it scroll off the top of the screen, nor when it reaches any arbitrary limit. You decide when to clear the scrollback, and even if you do, you can still  find the text in the log (unless you turned that off too).
 
-<li><p><string>Intelligent Vertical Scrolling</strong> - Terminator won't keep jumping to the bottom on output if you've deliberately scrolled back to look at the history, but if you scroll back to the bottom again, it will resume auto-scrolling. This gives you the best of both worlds without having to choose up-front via some configuration mechanism.
+<li><p><strong>Intelligent Vertical Scrolling</strong> - Terminator won't keep jumping to the bottom on output if you've deliberately scrolled back to look at the history, but if you scroll back to the bottom again, it will resume auto-scrolling. This gives you the best of both worlds without having to choose up-front via some configuration mechanism.
 
 <li><p><strong>Fewer Gotchas</strong> - Terminator automatically turns off XON/XOFF flow control for terminal output. Being able to pause output by typing ^S and resume it by typing ^Q is much less useful given unlimited scrollback and intelligent vertical scrolling, and mainly leads to confusion when it's accidentally typed by someone who doesn't know about this functionality (or doesn't realize they've activated it). Turning off XON/XOFF allows Bash and Emacs, amongst others, to make use of these keystrokes. (A user who wants the XON/XOFF behavior, perhaps because they like to pause the output from commands like <tt>top(1)</tt>, can use <tt>stty ixon</tt> in their login script to re-enable it. Sadly, we can't just visibly indicate when ^S has stopped output, and provide help in re-starting output, because there's no way to read this aspect of tty state.)
 
