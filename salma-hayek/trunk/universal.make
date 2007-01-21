@@ -333,10 +333,23 @@ MACHINE_PROJECT_NAME := $(shell ruby -e 'puts("$(HUMAN_PROJECT_NAME)".downcase()
 BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/bin
 LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/lib
 
-# By default, distributions end up under http://software.jessies.org/
-DIST_SSH_USER_AND_HOST=software@jessies.org
-# The html files are copied into the parent directory.
-DIST_DIRECTORY=/home/software/downloads/$(MACHINE_PROJECT_NAME)
+# Distributions end up under http://software.jessies.org/
+DIST_SSH_USER_AND_HOST = software@jessies.org
+# Different file types end up in different directories.
+# Note the use of the prerequisite's extension rather than that of the target, which is always phony.
+DIST_SUBDIRECTORY_FOR_PREREQUISITE = $(DIST_SUBDIRECTORY$(suffix $<))
+DIST_DIRECTORY = /home/software/downloads/$(if $(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(error sub-directory not specified for extension "$(suffix $<)"))
+# The html files are copied, with rsync, from www/ into this directory.
+DIST_SUBDIRECTORY.html = $(MACHINE_PROJECT_NAME)
+# The SOURCE_DIST ends up here - FIXME: it's binary, so you might want it somewhere else.
+# $(suffix)'s definition means we need .gz here not .tar.gz.
+DIST_SUBDIRECTORY.gz = $(MACHINE_PROJECT_NAME)
+# Debian's mirrors are in a top-level directory called debian.
+# I thought there might be some tool dependency on that.
+DIST_SUBDIRECTORY.deb = debian
+DIST_SUBDIRECTORY.dmg = mac
+DIST_SUBDIRECTORY.msi = windows
+DIST_SUBDIRECTORY.rpm = redhat
 
 $(takeProfileSample)
 SOURCE_FILES := $(if $(wildcard $(PROJECT_ROOT)/src),$(shell find $(PROJECT_ROOT)/src -type f -name "*.java"))
