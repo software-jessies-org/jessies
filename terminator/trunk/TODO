@@ -277,6 +277,11 @@ RFEs
   visible at the top (which isn't inarguably wrong, but is ugly, and he at
   least thought it was a bug).
 
+* If there were any great demand for reinstatement of ixon, we could freeze our
+  output.  We'd want to provide some visual indication of what we'd done and
+  how to undo it.  We can't provide such an indication if we implement this in terms
+  of ixon, because we can't read the ixon state from the tty driver.
+
 Tab-related
 -----------
 
