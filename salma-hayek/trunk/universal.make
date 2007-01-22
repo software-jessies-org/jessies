@@ -474,9 +474,7 @@ TARGET_ARCHITECTURE = $(HOST_ARCHITECTURE)
 TARGET_ARCHITECTURE := $(if $(filter i486 i586 i686,$(TARGET_ARCHITECTURE)),i386,$(TARGET_ARCHITECTURE))
 
 # Create different .deb filenames for different target architectures so they can coexist.
-# FIXME: Looking at Debian's own servers, I see we're supposed to use stem_version_architecture.deb, much like alien.
-# That would need changes to the uploading support and the symbolic linking on the software.jessies.org server.
-INSTALLER.deb += $(BIN_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).$(TARGET_ARCHITECTURE).deb
+INSTALLER.deb += $(BIN_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME)_$(VERSION_STRING)_$(TARGET_ARCHITECTURE).deb
 INSTALLERS.Linux += $(INSTALLER.deb)
 # alien festoons the name with suffixes (and, as always, we have to let make know what it's going to generate).
 # I looked at the source and it just has a big switch to select the output architecture.
@@ -762,12 +760,12 @@ $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 
 # I like the idea of keeping several versions on the server but we're going to have a hard time
 # linking to the one we expect people to use unless we create a symlink.
-upload.$(INSTALLER.rpm): symlink-latest.rpm
-.PHONY: symlink-latest.rpm
-symlink-latest.rpm: $(INSTALLER.rpm)
-	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).rpm '&&' \
-	ln -s $(notdir $(INSTALLER.rpm)) $(DIST_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).rpm '&&' \
-	find $(DIST_DIRECTORY) -name '"*.rpm"' -mtime +7 '|' xargs $(RM)
+$(addprefix upload.,$(INSTALLERS.Linux)): upload.%: symlink-latest.%
+.PHONY: symlink-latest.%
+$(addprefix symlink-latest.,$(INSTALLERS.Linux)): symlink-latest.%: %
+	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).$(TARGET_ARCHITECTURE)$(suffix $<) '&&' \
+	ln -s $(<F) $(DIST_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).$(TARGET_ARCHITECTURE)$(suffix $<) '&&' \
+	find $(DIST_DIRECTORY) -name '"*$(suffix $<)"' -mtime +7 '|' xargs $(RM)
 
 .PHONY: install
 install: $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS)))
