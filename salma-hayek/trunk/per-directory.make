@@ -36,7 +36,7 @@ HEADERS := $(call findCode,$(HEADER_EXTENSIONS))
 # Locate the common intermediate files.
 # ----------------------------------------------------------------------------
 
-COMPILATION_DIRECTORY = $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_ROOT)/.generated/%/$(TARGET_OS),$(SOURCE_DIRECTORY))
+COMPILATION_DIRECTORY = $(patsubst $(PROJECT_ROOT)/%,$(PROJECT_ROOT)/.generated/%/$(TARGET_DIRECTORY),$(SOURCE_DIRECTORY))
 
 $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(eval $(call defineObjectsPerLanguage,$(EXTENSION))))
 OBJECTS = $(strip $(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(OBJECTS.$(EXTENSION))))

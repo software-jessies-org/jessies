@@ -101,7 +101,7 @@ end
 puts("Building #{target_os() == 'Darwin' ? '.app bundle' : '.deb package'} for #{human_project_name}...")
 
 # Make a temporary directory to work in.
-tmp_dir = ".generated/native/#{target_os()}/#{machine_project_name}"
+tmp_dir = ".generated/native/#{target_directory()}/#{machine_project_name}"
 FileUtils.rm_rf(tmp_dir)
 FileUtils.mkdir_p(tmp_dir)
 
