@@ -96,8 +96,8 @@ public class FindDialog {
         findStatus.setText(" ");
     }
     
-    private FindHighlighter getFindHighlighter() {
-        return (FindHighlighter) textToFindIn.getHighlighterOfClass(FindHighlighter.class);
+    public FindHighlighter getFindHighlighter() {
+        return textToFindIn.getHighlighterOfClass(FindHighlighter.class);
     }
     
     private void find() {

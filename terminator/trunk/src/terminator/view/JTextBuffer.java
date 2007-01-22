@@ -30,7 +30,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	private boolean displayCursor = true;
 	private boolean blinkOn = true;
 	private CursorBlinker cursorBlinker;
-	private HashMap<Class, Highlighter> highlighters = new HashMap<Class, Highlighter>();
+	private HashMap<Class<? extends Highlighter>, Highlighter> highlighters = new HashMap<Class<? extends Highlighter>, Highlighter>();
 	private SelectionHighlighter selectionHighlighter;
 	private BirdView birdView;
 	private FindBirdsEye birdsEye;
@@ -430,8 +430,8 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	 * Adds a highlighter. Highlighters are referred to by class, so it's
 	 * a bad idea to have more than one of the same class.
 	 */
-	public void addHighlighter(Highlighter highlighter) {
-		Class kind = highlighter.getClass();
+	public <T extends Highlighter> void addHighlighter(T highlighter) {
+		Class<? extends Highlighter> kind = highlighter.getClass();
 		if (highlighters.get(kind) != null) {
 			throw new IllegalArgumentException("duplicate " + kind);
 		}
@@ -441,8 +441,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	/**
 	 * Returns the highlighter of the given class.
 	 */
-	public Highlighter getHighlighterOfClass(Class kind) {
-		return highlighters.get(kind);
+	@SuppressWarnings("unchecked") // FIXME: can we give highlighters the correct type and avoid this?
+	public <T extends Highlighter> T getHighlighterOfClass(Class<T> kind) {
+		return (T) highlighters.get(kind);
 	}
 	
 	public Collection<Highlighter> getHighlighters() {

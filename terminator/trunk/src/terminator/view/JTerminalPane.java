@@ -538,7 +538,7 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public SelectionHighlighter getSelectionHighlighter() {
-		return (SelectionHighlighter) textPane.getHighlighterOfClass(SelectionHighlighter.class);
+		return textPane.getHighlighterOfClass(SelectionHighlighter.class);
 	}
 	
 	public void selectAll() {
