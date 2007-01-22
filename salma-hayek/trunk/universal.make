@@ -66,7 +66,11 @@ SCRIPT_PATH = $(SALMA_HAYEK)/bin
 
 TARGET_OS_SCRIPT = $(SCRIPT_PATH)/target-os.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(TARGET_OS_SCRIPT)
-TARGET_OS := $(shell ruby $(TARGET_OS_SCRIPT))
+TARGET_OS_SCRIPT_OUTPUT := $(shell ruby $(TARGET_OS_SCRIPT))
+TARGET_OS = $(word 1,$(TARGET_OS_SCRIPT_OUTPUT))
+# (TARGET_ARCH has a special meaning to the built-in compilation rules.)
+TARGET_ARCHITECTURE = $(word 2,$(TARGET_OS_SCRIPT_OUTPUT))
+TARGET_DIRECTORY = $(word 3,$(TARGET_OS_SCRIPT_OUTPUT))
 
 ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     ifeq "$(TARGET_OS)" "Cygwin"
@@ -330,8 +334,8 @@ PROJECT_DIRECTORY_BASE_NAME = $(notdir $(PROJECT_ROOT))
 HUMAN_PROJECT_NAME ?= $(PROJECT_DIRECTORY_BASE_NAME)
 MACHINE_PROJECT_NAME := $(shell ruby -e 'puts("$(HUMAN_PROJECT_NAME)".downcase())')
 
-BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/bin
-LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_OS)/lib
+BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_DIRECTORY)/bin
+LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_DIRECTORY)/lib
 
 # Distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST = software@jessies.org
@@ -462,17 +466,6 @@ INSTALLERS.Cygwin += $(INSTALLER.wix)
 INSTALLER.dmg += $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).dmg
 INSTALLERS.Darwin += $(INSTALLER.dmg)
 
-HOST_ARCHITECTURE := $(shell arch)
-# (TARGET_ARCH has a special meaning to the built-in compilation rules.)
-TARGET_ARCHITECTURE = $(HOST_ARCHITECTURE)
-# We can't run dpkg-architecture -qDEB_HOST_ARCH to do this canonicalization
-# because make evaluates $(INSTALLER.deb) even on non-Debian platforms,
-# when considering the rule for making .deb from .app.
-# I foresee us shortly wanting to refine the rules to use different directories
-# for the different architectures' binaries.
-# At that point, we'll want this canonicalization on Cygwin anyway.
-TARGET_ARCHITECTURE := $(if $(filter i486 i586 i686,$(TARGET_ARCHITECTURE)),i386,$(TARGET_ARCHITECTURE))
-
 # Create different .deb filenames for different target architectures so they can coexist.
 INSTALLER.deb += $(BIN_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME)_$(VERSION_STRING)_$(TARGET_ARCHITECTURE).deb
 INSTALLERS.Linux += $(INSTALLER.deb)
@@ -493,7 +486,7 @@ STANDALONE_INSTALLERS = $(STANDALONE_INSTALLERS.$(MACHINE_PROJECT_NAME))
 NATIVE_NAME_FOR_INSTALLERS := '$(subst /,\,$(call convertToNativeFilenames,$(STANDALONE_INSTALLERS)))'
 
 # We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.
-PACKAGING_DIRECTORY = $(PROJECT_ROOT)/.generated/native/$(TARGET_OS)/$(MACHINE_PROJECT_NAME)
+PACKAGING_DIRECTORY = $(PROJECT_ROOT)/.generated/native/$(TARGET_DIRECTORY)/$(MACHINE_PROJECT_NAME)
 
 # ----------------------------------------------------------------------------
 # Prevent us from using per-directory.make's local variables in universal.make
