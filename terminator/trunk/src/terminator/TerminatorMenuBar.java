@@ -58,6 +58,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		menu.add(new FindAction());
 		menu.add(new FindNextAction());
 		menu.add(new FindPreviousAction());
+		menu.add(new CancelFindAction());
 		
 		if (GuiUtilities.isMacOs() == false) {
 			menu.addSeparator();
@@ -416,6 +417,18 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		public void performOn(JTerminalPane terminalPane) {
 			terminalPane.getTextPane().findPrevious(FindHighlighter.class);
+		}
+	}
+	
+	public static class CancelFindAction extends AbstractPaneAction {
+		public CancelFindAction() {
+			super("Cancel Find");
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			JTextBuffer textBuffer = terminalPane.getTextPane();
+			textBuffer.getHighlighterOfClass(FindHighlighter.class).forgetPattern(textBuffer);
 		}
 	}
 	
