@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>Ubuntu Setup</title>
+<link rel="stylesheet" type="text/css" href="/salma-hayek/styles.css">
+</head>
+<body>
+
+<h1>Ubuntu Setup</h1>
+
+<h2>What is Ubuntu?</h2>
+<p>Ubuntu is a Debian-based GNU/Linux distribution. You can read more about it on the <a href="http://www.ubuntu.com">Ubuntu home page</a>, but this page assumes you know what it is and have already decided that you want it. If you're looking for a Linux that mostly "just works", keeps relatively up-to-date (with a regular new release every six months), and is relatively free of breakage, Ubuntu is a great choice.
+
+<h2>Installation</h2>
+<p>Install Ubuntu 6.10 from the live CD. The rest of this document, unless 
+
+<h3>Development packages</h3>
+<p>Ubuntu is primarily aimed at users, and is missing many of the packages developers take for granted.
+<pre>
+# For remote use via SSH:
+sudo apt-get -y install openssh-server
+
+# For version control:
+sudo apt-get -y install bzr cvs mercurial subversion
+
+# For general development:
+sudo apt-get -y install build-essential make ruby ri g++
+# For X11 development:
+sudo apt-get -y install x-dev libx11-dev
+# For building yacc parsers:
+sudo apt-get -y install bison
+# For building Python programs that have C extensions:
+sudo apt-get -y install python-dev
+
+# For editing and spelling checking:
+sudo apt-get -y install exuberant-ctags iamerican
+
+# For capturing/analyzing network traces:
+sudo apt-get -y wireshark
+
+# For C/POSIX man pages:
+sudo apt-get -y install manpages-dev glibc-doc
+</pre>
+
+<h3>Enable "universe"</h3>
+<p>There are plenty of useful packages in the "universe" repository, which isn't available unless you edit <tt>/etc/apt/sources.list</tt> and remove the # from the beginning of each line containing the word "universe".
+
+<p>After you do this, run:
+<pre>
+sudo apt-get update
+</pre>
+
+<h2>Configuration</h2>
+
+<h3>NVidia binary X.Org driver</h3>
+<p>Sadly, for NVidia graphics cards, the open-source drivers aren't nearly as good as the binary ones. If you can make do with integrated graphics, Intel have fully open-source drivers for their integrated graphics, which is something we should try to support. If not, then philosophically there's nothing to choose between ATi and NVidia, but NVidia's binary Linux drivers have traditionally been less flaky than ATi's.
+
+<p>So, if you're using an NVidia graphics card, choose "Add/Remove..." from the "Applications" menu, and type "nvidia" in the search field. Check "NVidia binary X.Org driver" and click "OK". The package's description tells you to run <tt>sudo nvidia-glx-config enable</tt> but that's never worked for me. I think they mean:
+<pre>sudo nvidia-xconfig</pre>
+
+<p>After that, you'll have to restart the X11 server with control-alt-backspace. You'll know if it's worked because you'll see a full-screen NVidia logo as the server starts. You'll also now be able to run <tt>nvidia-settings</tt> from the shell to start a nifty little utility that shows you lots of information about your card, including its core temperature and what kinds of connections it currently has to what kinds of displays.
+
+<h3>Turning the display off with DPMS</h3>
+<p>It's surprisingly awkward to set this up correctly. "System" > "Preferences" > "Screensaver" and "System" > "Preferences" > "Power Management" both have a hand in making things work. I had to uncheck "Activate screensaver when session is idle" in the screensaver preferences, and move the "Set session as idle after" slider to one minute, and finally set the "Put display to sleep when computer is inactive for" slider in the power management preferences to one minute less than the time I want the display to turn off after.
+
+<p>(The two times are additive. You can't "set session as idle after" less than 1 minute, and you can't set "put display to sleep when computer is inactive for" less than "set session as idle after", so although you can share the time out differently from how I've described above, I think that's the easiest to manage. Though it's still bizarre and awkward.)
+
+<h3>Further X.org configuration</h3>
+<p>If you want to get rid of the obnoxious NVidia advertisment every time you start Xorg, add this to the NVidia <tt>Section "Device"</tt> part of <tt>/etc/X11/xorg.conf</tt>:
+<pre>
+ Option "NoLogo" "true"
+</pre>
+<p>While you're there, I recommend removing the <tt>Subsection "Display"</tt> entries, because in these days of monitors and cards that can negotiate their capabilities, those sections seem mostly to serve to prevent you from being able to automatically use displays whose native resolutions aren't listed, such as Apple's 30" Cinema Display.
+
+<!--#include virtual="/salma-hayek/footer.html" -->
+</body>
+</html>
