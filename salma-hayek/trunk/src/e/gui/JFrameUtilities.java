@@ -4,10 +4,22 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.imageio.*;
 import javax.swing.*;
 
 public class JFrameUtilities {
-    private static final Image FRAME_ICON = new ImageIcon(System.getProperty("org.jessies.frameIcon")).getImage();
+    private static final Image FRAME_ICON;
+    static {
+        // Load the icon so that failures don't jeopardize users of this class; you don't want to hang in <clinit>!
+        Image image = null;
+        try {
+            image = ImageIO.read(FileUtilities.fileFromString(System.getProperty("org.jessies.frameIcon")));
+        } catch (Throwable th) {
+            th.printStackTrace();
+        } finally {
+            FRAME_ICON = image;
+        }
+    }
     
     public static void setFrameIcon(JFrame frame) {
         frame.setIconImage(FRAME_ICON);
