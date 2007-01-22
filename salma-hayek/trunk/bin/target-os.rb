@@ -41,7 +41,8 @@ def target_architecture()
     if target_os() == "Darwin"
         return "universal"
     end
-    return OsExaminer.instance().arch().sub(/i[456]86/, "i386")
+    # http://alioth.debian.org/docman/view.php/30192/21/debian-amd64-howto.html#id250846 says AMD64 is to i386 as x86_64 is to x86.
+    return OsExaminer.instance().arch().sub(/i[456]86/, "i386").sub(/x86_64/, "amd64")
 end
 
 def target_directory()
