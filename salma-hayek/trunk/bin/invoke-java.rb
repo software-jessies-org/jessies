@@ -111,7 +111,7 @@ class Java
 
     init_default_heap_size()
     init_default_class_path()
-    @library_path = [ "#{@project_root}/.generated/#{target_os()}/lib" ]
+    @library_path = [ "#{@project_root}/.generated/#{target_directory()}/lib" ]
     
     set_icons(name)
   end
@@ -237,7 +237,7 @@ class Java
   
   def getExtraPathComponents()
     subProjectRoots = [ @project_root, @salma_hayek ]
-    executableSubDirectories = [ "bin", ".generated/#{target_os()}/bin" ]
+    executableSubDirectories = [ "bin", ".generated/#{target_directory()}/bin" ]
     extraPathComponents = []
     subProjectRoots.each() {
       |subProjectRoot|
