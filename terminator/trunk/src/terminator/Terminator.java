@@ -76,17 +76,13 @@ public class Terminator {
 	}
 	
 	private void startTerminatorServer() {
-		String display = System.getenv("DISPLAY");
-		if (display == null) {
-			display = "";
-		}
 		InetAddress loopbackAddress = null;
 		try {
 			loopbackAddress = InetAddress.getByName(null);
 		} catch (UnknownHostException ex) {
 			Log.warn("Problem looking up the loopback address", ex);
 		}
-		new InAppServer("Terminator", System.getProperty("org.jessies.terminator.serverPortFileStem") + display, loopbackAddress, TerminatorServer.class, new TerminatorServer());
+		new InAppServer("Terminator", System.getProperty("org.jessies.terminator.serverPortFileName"), loopbackAddress, TerminatorServer.class, new TerminatorServer());
 	}
 	
 	// Returns whether we started the UI.
