@@ -90,7 +90,10 @@ def tryInAppServer(salma_hayek, serverPortPathname)
 end
 
 server_port_file_stem = File.join(dot_directory, "terminator-server-port")
-tryInAppServer(salma_hayek, "#{server_port_file_stem}#{ENV['DISPLAY']}")
+# Colons have a special meaning on Windows file systems.
+display = ENV["DISPLAY"].gsub(/:/, "_")
+server_port_file_name = "#{server_port_file_stem}#{display}"
+tryInAppServer(salma_hayek, server_port_file_name)
 
 launcher = "java"
 if target_os() == "Cygwin"
@@ -180,7 +183,7 @@ invoker.launcher = launcher
 # We arranged above for $HOME/.terminal-logs/ to be available, so we need to stick to it.
 # (We didn't used to be able to getenv("HOME") from Java on Cygwin.)
 invoker.add_pathname_property("org.jessies.terminator.logDirectory", log_directory)
-invoker.add_pathname_property("org.jessies.terminator.serverPortFileStem", server_port_file_stem)
+invoker.add_pathname_property("org.jessies.terminator.serverPortFileName", server_port_file_name)
 invoker.add_pathname_property("org.jessies.terminator.optionsFile", options_pathname)
 
 # Ruby knows the mapping from signal number to signal name, but Java doesn't
