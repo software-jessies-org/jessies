@@ -91,7 +91,12 @@ end
 
 server_port_file_stem = File.join(dot_directory, "terminator-server-port")
 # Colons have a special meaning on Windows file systems.
-display = ENV["DISPLAY"].gsub(/:/, "_")
+display = ENV["DISPLAY"]
+if display == nil
+  display = ""
+else
+  display.gsub!(/:/, "_")
+end
 server_port_file_name = "#{server_port_file_stem}#{display}"
 tryInAppServer(salma_hayek, server_port_file_name)
 
