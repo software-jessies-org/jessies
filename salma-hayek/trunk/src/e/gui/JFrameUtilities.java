@@ -85,7 +85,7 @@ public class JFrameUtilities {
     public static JFrame makeScrollableContentWindow(String title, JComponent content) {
         JScrollPane scrollPane = new JScrollPane(content);
         scrollPane.setBorder(null);
-        JComponent windowContent = content;
+        JComponent windowContent = scrollPane;
         
         // On Mac OS, the "grow box" used to resize the window takes up space *inside* the window, so we need to move out of its way.
         // See http://elliotth.blogspot.com/2004/07/dodging-macs-grow-box-in-java.html.
