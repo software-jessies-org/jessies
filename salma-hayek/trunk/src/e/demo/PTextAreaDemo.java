@@ -1,5 +1,6 @@
 package e.demo;
 
+import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
@@ -46,10 +47,7 @@ public class PTextAreaDemo {
         
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
         
-        JFrame frame = new JFrame(file.getPath() + " - PTextAreaDemo");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        JScrollPane scroller = new JScrollPane(textArea);
-        frame.getContentPane().add(scroller);
+        JFrame frame = JFrameUtilities.makeScrollableContentWindow(file.getPath() + " - PTextAreaDemo", textArea);
         frame.setSize(new Dimension(600, 600));
         frame.setLocationByPlatform(true);
         frame.setVisible(true);
