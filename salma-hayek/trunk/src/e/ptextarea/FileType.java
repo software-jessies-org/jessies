@@ -13,7 +13,9 @@ public enum FileType {
     MAKE        ("Make",       PNoOpIndenter.class,      PMakefileTextStyler.class),
     RUBY        ("Ruby",       PRubyIndenter.class,      PRubyTextStyler.class),
     PATCH       ("Patch",      PNoOpIndenter.class,      PPatchTextStyler.class),
+    PBASIC      ("PBASIC",     PNoOpIndenter.class,      PPBasicTextStyler.class),
     PERL        ("Perl",       PPerlIndenter.class,      PPerlTextStyler.class),
+    PHP         ("PHP",        PNoOpIndenter.class,      PPhpTextStyler.class),
     PYTHON      ("Python",     PNoOpIndenter.class,      PPythonTextStyler.class),
     VHDL        ("VHDL",       PNoOpIndenter.class,      PVhdlTextStyler.class),
     XML         ("XML",        PNoOpIndenter.class,      PXmlTextStyler.class);
@@ -83,10 +85,14 @@ public enum FileType {
     private static FileType guessFileTypeByName(String filename) {
         if (filename.endsWith(".java")) {
             return FileType.JAVA;
+        } else if (filename.endsWith(".bs1") || filename.endsWith(".bs2") ||filename.endsWith(".bse") ||filename.endsWith(".bsx") ||filename.endsWith(".bsp") ||filename.endsWith(".bpe") ||filename.endsWith(".bpx")) {
+            return FileType.PBASIC;
         } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || filename.endsWith(".strings")) {
             return FileType.C_PLUS_PLUS;
         } else if (filename.endsWith(".patch") || filename.endsWith(".diff")) {
             return FileType.PATCH;
+        } else if (filename.endsWith(".php")) {
+            return FileType.PHP;
         } else if (filename.endsWith(".pl") || filename.endsWith(".pm")) {
             return FileType.PERL;
         } else if (filename.endsWith(".py")) {
