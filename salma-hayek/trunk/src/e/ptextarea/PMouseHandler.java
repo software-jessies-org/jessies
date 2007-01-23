@@ -27,7 +27,6 @@ public class PMouseHandler implements MouseInputListener {
                 return;
             }
         }
-        handleHyperlinks(e);
         if (e.isConsumed() == false) {
             int newOffset = getOffsetAtMouse();
             if (e.isShiftDown()) {
@@ -63,7 +62,7 @@ public class PMouseHandler implements MouseInputListener {
     
     public void mouseClicked(MouseEvent e) {
         trackMouse(e);
-        // No explicit action.
+        handleHyperlinks(e);
     }
     
     public void mouseDragged(MouseEvent e) {
