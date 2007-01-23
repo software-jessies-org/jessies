@@ -482,7 +482,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     public String getCounterpartFilename() {
         // Work out what the counterpart would be called.
-        String basename = file.getName().replaceAll("\\..*$", "");
+        String basename = file.getName().replaceAll("\\.[^.]+$", "");
         
         String parent = file.getParent();
         if (filename.endsWith(".cpp") || filename.endsWith(".cc") || filename.endsWith(".c")) {
