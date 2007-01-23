@@ -84,7 +84,7 @@ def tryInAppServer(salma_hayek, serverPortPathname)
   # Job done, so finish any GNOME startup notification and exit.
   desktop_startup_id = ENV['DESKTOP_STARTUP_ID']
   if desktop_startup_id != nil
-    system("#{salma_hayek}/.generated/Linux/bin/finish-gnome-startup", desktop_startup_id)
+    system("#{salma_hayek}/.generated/#{target_directory()}/bin/gnome-startup", "stop", desktop_startup_id)
   end
   exit(0)
 end
