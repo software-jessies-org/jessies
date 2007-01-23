@@ -81,9 +81,7 @@ public class PPhpTextStyler extends PAbstractLanguageStyler {
     
     @Override
     protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
-        // FIXME: why doesn't this work here, when it works fine for assembler, C++, and Java?
-        //return line.startsWith("//'", atIndex);
-        return (line.length() - atIndex >= 2) && line.charAt(atIndex) == '/' && line.charAt(atIndex) == '/';
+        return line.startsWith("//", atIndex);
     }
     
     @Override
