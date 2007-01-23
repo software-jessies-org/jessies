@@ -467,14 +467,23 @@ INSTALLER.dmg += $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).dmg
 INSTALLERS.Darwin += $(INSTALLER.dmg)
 
 # Create different .deb filenames for different target architectures so they can coexist.
-INSTALLER.deb += $(BIN_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME)_$(VERSION_STRING)_$(TARGET_ARCHITECTURE).deb
+makeLinuxInstallerName.deb = org.jessies.$(MACHINE_PROJECT_NAME)_$(1)_$(TARGET_ARCHITECTURE).deb
+INSTALLER.deb += $(BIN_DIRECTORY)/$(call makeLinuxInstallerName.deb,$(VERSION_STRING))
 INSTALLERS.Linux += $(INSTALLER.deb)
+
 # alien festoons the name with suffixes (and, as always, we have to let make know what it's going to generate).
 # I looked at the source and it just has a big switch to select the output architecture.
 # In particular, it doesn't do anything clever with the output of rpm --showrc.
-ALIEN_ARCHITECTURE = $(patsubst amd64,x86_64,$(TARGET_ARCHITECTURE))
-INSTALLER.rpm += $(BIN_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME)-$(VERSION_STRING)-2.$(ALIEN_ARCHITECTURE).rpm
+makeLinuxInstallerName.rpm = org.jessies.$(MACHINE_PROJECT_NAME)-$(1)-2.$(patsubst amd64,x86_64,$(TARGET_ARCHITECTURE)).rpm
+INSTALLER.rpm += $(BIN_DIRECTORY)/$(call makeLinuxInstallerName.rpm,$(VERSION_STRING))
 INSTALLERS.Linux += $(INSTALLER.rpm)
+
+# When $< is "org.jessies.evergreen-4.31.1934-2.x86_64.rpm", we want "org.jessies.evergreen.x86_64.rpm".
+# When $< is "org.jessies.evergreen_4.31.1934_amd64.deb", we want "org.jessies.evergreen.amd64.deb".
+# I wonder if we shouldn't say "latest" somewhere in the name.
+# It would be easy to do that were it not for the odd "-2" part that alien adds to the name.
+# When I upload, perhaps I should get rid of that.
+LATEST_LINUX_INSTALLER_LINK = $(subst --2.,.,$(subst __,.,$(call makeLinuxInstallerName$(suffix $<),)))
 
 INSTALLERS = $(INSTALLERS.$(TARGET_OS))
 
@@ -756,9 +765,9 @@ $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 $(addprefix upload.,$(INSTALLERS.Linux)): upload.%: symlink-latest.%
 .PHONY: symlink-latest.%
 $(addprefix symlink-latest.,$(INSTALLERS.Linux)): symlink-latest.%: %
-	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).$(TARGET_ARCHITECTURE)$(suffix $<) '&&' \
-	ln -s $(<F) $(DIST_DIRECTORY)/org.jessies.$(MACHINE_PROJECT_NAME).$(TARGET_ARCHITECTURE)$(suffix $<) '&&' \
-	find $(DIST_DIRECTORY) -name '"*$(suffix $<)"' -mtime +7 '|' xargs $(RM)
+	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_LINUX_INSTALLER_LINK) '&&' \
+	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_LINUX_INSTALLER_LINK) '&&' \
+	find $(DIST_DIRECTORY) -name '"$(call makeLinuxInstallerName$(suffix $<),*)"' -mtime +7 '|' xargs $(RM)
 
 .PHONY: install
 install: $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS)))
