@@ -71,9 +71,9 @@ In a nutshell, we generate a C++ class corresponding to the Java class, and auto
 
 <p>Debian packages for some of our projects are available.  Pasting this is how you might install them all, though be aware of the security implications:
 <pre>sudo bash &lt;&lt;EOF
-echo deb <a href="../debian/">http://software.jessies.org/downloads/debian/</a> ./ >> /etc/apt/sources.list
+echo deb <a href="../downloads/debian/">http://software.jessies.org/downloads/debian/</a> ./ >> /etc/apt/sources.list
 EOF
-wget -O - <a href="../debian/software.jessies.org.gpg">http://software.jessies.org/downloads/debian/software.jessies.org.gpg</a> | sudo apt-key add -
+wget -O - <a href="../downloads/debian/software.jessies.org.gpg">http://software.jessies.org/downloads/debian/software.jessies.org.gpg</a> | sudo apt-key add -
 sudo aptitude update
 sudo aptitude install ~norg.jessies.
 </pre>
