@@ -36,7 +36,6 @@ public class PPhpTextStyler extends PAbstractLanguageStyler {
         "exception",
         "exit",
         "extends",
-        "extends",
         "__FILE__",
         "final",
         "for",
@@ -80,8 +79,14 @@ public class PPhpTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
+    protected String getKeywordRegularExpression() {
+        // PHP variables begin with a $, and for any keyword k, $k is a valid identifier.
+        return "\\b(?<!\\$)([A-Za-z_]+)\\b";
+    }
+    
+    @Override
     protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
-        return line.startsWith("//", atIndex);
+        return line.startsWith("//", atIndex) || isShellComment(line, atIndex);
     }
     
     @Override
@@ -101,7 +106,7 @@ public class PPhpTextStyler extends PAbstractLanguageStyler {
     
     @Override
     protected boolean isQuote(char ch) {
-        return (ch == '\'' || ch == '\"');
+        return (ch == '\'' || ch == '\"' || ch == '`');
     }
     
     public void addKeywordsTo(Collection<String> collection) {
