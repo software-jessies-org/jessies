@@ -88,11 +88,15 @@ static std::string invent_startup_id() {
     return oss.str();
 }
 
-static void start_startup(const std::string& name) {
+static void start_startup(const std::string& icon_filename, const std::string& name) {
     std::string startup_id = invent_startup_id();
     XDisplay xdisplay;
     std::ostringstream oss;
-    oss << "new: ID=" << escape_for_xmessage(startup_id) << " SCREEN=" << DefaultScreenOfDisplay(xdisplay.display) << " NAME=" << escape_for_xmessage(name);
+    oss << "new:";
+    oss << " ID=" << escape_for_xmessage(startup_id);
+    oss << " SCREEN=" << DefaultScreenOfDisplay(xdisplay.display);
+    oss << " NAME=" << escape_for_xmessage(name);
+    oss << " ICON=" << icon_filename;
     broadcast_xmessage(oss.str());
     std::cout << startup_id << std::endl;
 }
@@ -101,22 +105,26 @@ static void finish_startup(const std::string& startup_id) {
     broadcast_xmessage("remove: ID=" + escape_for_xmessage(startup_id));
 }
 
-int main(int, char* args[]) {
-    ++args;
-    if (*args != 0 && std::string("start") == *args) {
-        std::deque<std::string> words;
-        while (*++args != 0) {
-            words.push_back(*args);
+static void show_usage_and_exit() {
+    std::cerr << "usage: gnome-startup [start <icon-filename> <text...>|stop <id>...]" << std::endl;
+    exit(EXIT_FAILURE);
+}
+
+int main(int argc, char* argv[]) {
+    typedef std::deque<std::string> ArgList;
+    ArgList args(&argv[1], argv + argc);
+    if (args.size() >= 3 && args.front() == "start") {
+        args.pop_front(); // "start"
+        std::string icon_filename = args.front(); args.pop_front();
+        std::string name = join(" ", args);
+        start_startup(icon_filename, name);
+    } else if (args.size() >= 2 && args.front() == "stop") {
+        args.pop_front(); // "stop"
+        for (ArgList::iterator it = args.begin(); it != args.end(); ++it) {
+            finish_startup(*it);
         }
-        std::string name = join(" ", words);
-        start_startup(name);
-    } else if (*args != 0 && std::string("stop") == *args) {
-        while (*++args != 0) {
-            finish_startup(*args);
-        }
-    } else  {
-        std::cerr << "usage: gnome-startup [start <name>|stop <id>...]" << std::endl;
-        exit(EXIT_FAILURE);
+    } else {
+        show_usage_and_exit();
     }
     exit(EXIT_SUCCESS);
 }

@@ -288,7 +288,7 @@ class Java
     
     # Since we're often started from the command line or from other programs, set up startup notification ourselves if it looks like we should.
     if @initiate_startup_notification && ENV['DISPLAY'] != nil && ENV['DESKTOP_STARTUP_ID'] == nil && target_os() == "Linux"
-      id=`gnome-startup start Starting #{@dock_name}`.chomp()
+      id=`gnome-startup start #{@png_icon} Starting #{@dock_name}`.chomp()
       ENV['DESKTOP_STARTUP_ID'] = id
     end
     
