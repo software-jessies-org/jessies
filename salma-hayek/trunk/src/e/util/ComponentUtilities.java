@@ -1,6 +1,7 @@
 package e.util;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -23,6 +24,25 @@ public class ComponentUtilities {
         KeyStroke keyStroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
         component.getActionMap().put(name, action);
         component.getInputMap().put(keyStroke, name);
+    }
+    
+    /**
+     * Fixes the page up/down to work on another component from the one with the keyboard focus.
+     * This lets you offer convenient keyboard navigation like in Apple's Mail, where the arrow keys move through the inbox while the page keys move through the selected message.
+     */
+    public static void divertPageScrollingFromTo(final JComponent focusedComponent, final JComponent componentToPageScroll) {
+        focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("PAGE_UP"), "pagePatchUp");
+        focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pagePatchDown");
+        focusedComponent.getActionMap().put("pagePatchUp", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                ComponentUtilities.scroll(componentToPageScroll, true, -1);
+            }
+        });
+        focusedComponent.getActionMap().put("pagePatchDown", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                ComponentUtilities.scroll(componentToPageScroll, true, 1);
+            }
+        });
     }
     
     /**
