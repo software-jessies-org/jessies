@@ -5,29 +5,91 @@ import java.util.*;
 import java.util.regex.*;
 
 public enum FileType {
-    PLAIN_TEXT  ("Plain Text", PNoOpIndenter.class,      PPlainTextStyler.class),
-    ASSEMBLER   ("Assembler",  PNoOpIndenter.class,      PAssemblerTextStyler.class),
-    BASH        ("Bash",       PBashIndenter.class,      PBashTextStyler.class),
-    C_PLUS_PLUS ("C++",        PCppIndenter.class,       PCPPTextStyler.class),
-    JAVA        ("Java",       PJavaIndenter.class,      PJavaTextStyler.class),
-    MAKE        ("Make",       PNoOpIndenter.class,      PMakefileTextStyler.class),
-    RUBY        ("Ruby",       PRubyIndenter.class,      PRubyTextStyler.class),
-    PATCH       ("Patch",      PNoOpIndenter.class,      PPatchTextStyler.class),
-    PBASIC      ("PBASIC",     PNoOpIndenter.class,      PPBasicTextStyler.class),
-    PERL        ("Perl",       PPerlIndenter.class,      PPerlTextStyler.class),
-    PHP         ("PHP",        PNoOpIndenter.class,      PPhpTextStyler.class),
-    PYTHON      ("Python",     PNoOpIndenter.class,      PPythonTextStyler.class),
-    VHDL        ("VHDL",       PNoOpIndenter.class,      PVhdlTextStyler.class),
-    XML         ("XML",        PNoOpIndenter.class,      PXmlTextStyler.class);
+    PLAIN_TEXT  ("Plain Text",
+                 PNoOpIndenter.class,
+                 PPlainTextStyler.class,
+                 new String[] { ".txt" }),
+    
+    ASSEMBLER   ("Assembler",
+                 PNoOpIndenter.class,
+                 PAssemblerTextStyler.class,
+                 new String[] { ".s", ".S" }),
+    
+    BASH        ("Bash",
+                 PBashIndenter.class,
+                 PBashTextStyler.class,
+                 new String[] { ".sh", "bash.bashrc", "bash.logout", ".bash_profile", ".bashrc", ".bash_logout" }),
+    
+    C_PLUS_PLUS ("C++",
+                 PCppIndenter.class,
+                 PCPPTextStyler.class,
+                 new String[] { ".cpp", ".hpp", ".c", ".h", ".m", ".mm", ".hh", ".cc", ".strings" }),
+    
+    JAVA        ("Java",
+                 PJavaIndenter.class,
+                 PJavaTextStyler.class,
+                 new String[] { ".java" }),
+    
+    JAVA_SCRIPT ("JavaScript",
+                 PNoOpIndenter.class,
+                 PJavaScriptTextStyler.class,
+                 new String[] { ".js" }),
+    
+    MAKE        ("Make",
+                 PNoOpIndenter.class,
+                 PMakefileTextStyler.class,
+                 new String[] { "Makefile", "GNUmakefile", "makefile", ".make" }),
+    
+    RUBY        ("Ruby",
+                 PRubyIndenter.class,
+                 PRubyTextStyler.class,
+                 new String[] { ".rb" }),
+    
+    PATCH       ("Patch",
+                 PNoOpIndenter.class,
+                 PPatchTextStyler.class,
+                 new String[] { ".diff", ".patch" }),
+    
+    PBASIC      ("PBASIC",
+                 PNoOpIndenter.class,
+                 PPBasicTextStyler.class,
+                 new String[] { ".bs1", ".bs2", ".bse", ".bsx", ".bsp", ".bpe", ".bpx" }),
+    
+    PERL        ("Perl",
+                 PPerlIndenter.class,
+                 PPerlTextStyler.class,
+                 new String[] { ".pl", ".pm" }),
+    
+    PHP         ("PHP",
+                 PNoOpIndenter.class,
+                 PPhpTextStyler.class,
+                 new String[] { ".php" }),
+    
+    PYTHON      ("Python",
+                 PNoOpIndenter.class,
+                 PPythonTextStyler.class,
+                 new String[] { ".py" }),
+    
+    VHDL        ("VHDL",
+                 PNoOpIndenter.class,
+                 PVhdlTextStyler.class,
+                 new String[] { ".vhd" }),
+    
+    XML         ("XML",
+                 PNoOpIndenter.class,
+                 PXmlTextStyler.class,
+                 new String[] { ".xml", ".html", ".shtml", ".vm" });
     
     private final String name;
     private final Class<? extends PIndenter> indenterClass;
     private final Class<? extends PTextStyler> stylerClass;
+    private final String[] extensions;
     
-    private FileType(String name, Class<? extends PIndenter> indenterClass, Class<? extends PTextStyler> stylerClass) {
+    private FileType(String name, Class<? extends PIndenter> indenterClass, Class<? extends PTextStyler> stylerClass, String[] extensions) {
         this.name = name;
         this.indenterClass = indenterClass;
         this.stylerClass = stylerClass;
+        this.extensions = extensions;
     }
     
     public void configureTextArea(PTextArea textArea) {
@@ -82,36 +144,18 @@ public enum FileType {
         return fileType;
     }
     
+    /**
+     * Guesses the type from the given filename by checking the FileTypes' registered extensions.
+     */
     private static FileType guessFileTypeByName(String filename) {
-        if (filename.endsWith(".java")) {
-            return FileType.JAVA;
-        } else if (filename.endsWith(".bs1") || filename.endsWith(".bs2") ||filename.endsWith(".bse") ||filename.endsWith(".bsx") ||filename.endsWith(".bsp") ||filename.endsWith(".bpe") ||filename.endsWith(".bpx")) {
-            return FileType.PBASIC;
-        } else if (filename.endsWith(".cpp") || filename.endsWith(".hpp") || filename.endsWith(".c") || filename.endsWith(".h") || filename.endsWith(".m") || filename.endsWith(".mm") || filename.endsWith(".hh") || filename.endsWith(".cc") || filename.endsWith(".strings")) {
-            return FileType.C_PLUS_PLUS;
-        } else if (filename.endsWith(".patch") || filename.endsWith(".diff")) {
-            return FileType.PATCH;
-        } else if (filename.endsWith(".php")) {
-            return FileType.PHP;
-        } else if (filename.endsWith(".pl") || filename.endsWith(".pm")) {
-            return FileType.PERL;
-        } else if (filename.endsWith(".py")) {
-            return FileType.PYTHON;
-        } else if (filename.endsWith(".rb")) {
-            return FileType.RUBY;
-        } else if (filename.endsWith(".s") || filename.endsWith(".S")) {
-            return FileType.ASSEMBLER;
-        } else if (filename.endsWith(".sh") || filename.endsWith("bash.bashrc") || filename.endsWith("bash.logout") || filename.endsWith(".bash_profile") || filename.endsWith(".bashrc") || filename.endsWith(".bash_logout")) {
-            return FileType.BASH;
-        } else if (filename.endsWith("Makefile") || filename.endsWith("GNUmakefile") || filename.endsWith("makefile") || filename.endsWith(".make")) {
-            return FileType.MAKE;
-        } else if (filename.endsWith(".vhd")) {
-            return FileType.VHDL;
-        } else if (filename.endsWith(".xml") || filename.endsWith(".html") || filename.endsWith(".shtml") || filename.endsWith(".vm")) {
-            return FileType.XML;
-        } else {
-            return FileType.PLAIN_TEXT;
+        for (FileType type : EnumSet.allOf(FileType.class)) {
+            for (String extension : type.extensions) {
+                if (filename.endsWith(extension)) {
+                    return type;
+                }
+            }
         }
+        return FileType.PLAIN_TEXT;
     }
     
     private static FileType guessFileTypeByContent(CharSequence content) {
