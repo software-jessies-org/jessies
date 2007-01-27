@@ -87,7 +87,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         this.file = FileUtilities.fileFromString(filename);
         this.textArea = new ETextArea();
         textArea.getTextBuffer().addTextListener(this);
-        initBugDatabaseLinks();
         initTextAreaPopupMenu();
         
         this.watermarkViewPort = new WatermarkViewPort();
@@ -120,10 +119,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         CharSequence content = textArea.getTextBuffer();
         textArea.setFont(ChangeFontAction.getAppropriateFontForContent(content));
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
-    }
-    
-    private void initBugDatabaseLinks() {
-        BugDatabaseHighlighter.highlightBugs(textArea);
     }
     
     public void updateStatusLine() {
@@ -343,6 +338,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         
         fileType = newFileType;
         fileType.configureTextArea(textArea);
+        BugDatabaseHighlighter.highlightBugs(textArea);
         initSpellingExceptionsForDocument();
     }
     
