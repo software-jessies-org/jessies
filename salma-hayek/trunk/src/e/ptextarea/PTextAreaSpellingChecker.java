@@ -168,7 +168,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
 
     public Collection listMisspellings() {
         TreeSet<String> result = new TreeSet<String>();
-        for (PHighlight highlight : component.getHighlights(HIGHLIGHTER_NAME)) {
+        for (PHighlight highlight : component.getNamedHighlights(HIGHLIGHTER_NAME)) {
             final int start = highlight.getStartIndex();
             final int end = highlight.getEndIndex();
             String misspelling = component.getTextBuffer().subSequence(start, end).toString();
@@ -182,7 +182,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         if (toIndex - fromIndex > 20) {
             return Range.NULL_RANGE;
         }
-        List<PHighlight> highlights = component.getHighlights(HIGHLIGHTER_NAME, fromIndex, toIndex);
+        List<PHighlight> highlights = component.getNamedHighlightsOverlapping(HIGHLIGHTER_NAME, fromIndex, toIndex);
         if (highlights.size() > 0) {
             return new Range(highlights.get(0).getStartIndex(), highlights.get(0).getEndIndex());
         } else {
