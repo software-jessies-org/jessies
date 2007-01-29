@@ -3,7 +3,7 @@
 require "pathname"
 
 script_path = Pathname.new(__FILE__).realpath().dirname()
-$: << script_path.dirname()
+$: << script_path.dirname().to_s()
 
 require "patch-to-html-email.rb"
 
