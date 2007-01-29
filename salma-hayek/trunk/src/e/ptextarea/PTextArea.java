@@ -602,14 +602,17 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         }
     }
     
-    public List<PHighlight> getHighlights(String highlightManager) {
-        return getHighlights(highlightManager, 0, getTextBuffer().length());
+    public List<PHighlight> getNamedHighlights(String highlighterName) {
+        return getNamedHighlightsOverlapping(highlighterName, 0, getTextBuffer().length() + 1);
     }
     
-    public List<PHighlight> getHighlights(String highlightManager, int startOffset, int endOffset) {
+    /**
+     * Returns all highlights matching highlighterName overlapping the range [beginOffset, endOffset).
+     */
+    public List<PHighlight> getNamedHighlightsOverlapping(String highlighterName, int beginOffset, int endOffset) {
         getLock().getReadLock();
         try {
-            return highlights.getHighlights(highlightManager, startOffset, endOffset);
+            return highlights.getNamedHighlightsOverlapping(highlighterName, beginOffset, endOffset);
         } finally {
             getLock().relinquishReadLock();
         }
@@ -629,13 +632,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     public void removeHighlights(String highlightManager) {
-        removeHighlights(highlightManager, 0, getTextBuffer().length());
+        removeHighlights(highlightManager, 0, getTextBuffer().length() + 1);
     }
     
-    public void removeHighlights(String highlighterName, int startOffset, int endOffset) {
+    /**
+     * Removes highlights matching "highlighterName" in the range [beginOffset, endOffset).
+     */
+    public void removeHighlights(String highlighterName, int beginOffset, int endOffset) {
         getLock().getWriteLock();
         try {
-            List<PHighlight> removeList = highlights.getHighlights(highlighterName, startOffset, endOffset);
+            List<PHighlight> removeList = highlights.getNamedHighlightsOverlapping(highlighterName, beginOffset, endOffset);
             for (PHighlight highlight : removeList) {
                 highlights.remove(highlight);
                 highlight.detachAnchors();
@@ -1073,7 +1079,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         SplitLine max = getSplitLine(maxLine);
         int maxChar = max.getTextIndex() + max.getLength();
         selection.paint(graphics);
-        List<PHighlight> highlightList = highlights.getHighlights(minChar, maxChar);
+        List<PHighlight> highlightList = highlights.getHighlightsOverlapping(minChar, maxChar);
         for (PHighlight highlight : highlightList) {
             highlight.paint(graphics);
         }

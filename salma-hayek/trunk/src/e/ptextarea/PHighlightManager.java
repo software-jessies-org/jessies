@@ -25,71 +25,75 @@ public class PHighlightManager {
         }
     }
     
-    public synchronized List<PHighlight> getHighlights(int startOffset, int endOffset) {
+    /**
+     * Returns all highlighters overlapping the range [beginOffset, endOffset).
+     */
+    public synchronized List<PHighlight> getHighlightsOverlapping(int beginOffset, int endOffset) {
         List<PHighlight> result = new ArrayList<PHighlight>();
         for (String highlighter : highlighterSets.keySet()) {
-            result.addAll(getHighlights(highlighter, startOffset, endOffset));
+            result.addAll(getNamedHighlightsOverlapping(highlighter, beginOffset, endOffset));
         }
         return result;
     }
     
-    public synchronized List<PHighlight> getHighlights(String highlighter, int startOffset, int endOffset) {
-        if (highlighterSets.containsKey(highlighter)) {
-            return highlighterSets.get(highlighter).getHighlights(startOffset, endOffset);
+    /**
+     * Returns all highlighters matching highlighterName overlapping the range [beginOffset, endOffset).
+     */
+    public synchronized List<PHighlight> getNamedHighlightsOverlapping(String highlighterName, int beginOffset, int endOffset) {
+        HighlightSet set = highlighterSets.get(highlighterName);
+        if (set != null) {
+            return set.getHighlightsOverlapping(beginOffset, endOffset);
         } else {
             return Collections.emptyList();
         }
     }
     
-    public synchronized PHighlight getNextOrPreviousHighlight(String highlighter, boolean next, int offset) {
-        if (highlighterSets.containsKey(highlighter) == false) {
+    public synchronized PHighlight getNextOrPreviousHighlight(String highlighterName, boolean next, int offset) {
+        HighlightSet set = highlighterSets.get(highlighterName);
+        if (set == null) {
             return null;
         }
-        HighlightSet set = highlighterSets.get(highlighter);
         return next ? set.getHighlightAfter(offset) : set.getHighlightBefore(offset);
     }
     
     private static class HighlightSet {
         private TreeSet<Wrapper> highlights = new TreeSet<Wrapper>();
         
-        public void add(PHighlight highlight) {
+        private void add(PHighlight highlight) {
             highlights.add(new Wrapper(highlight));
         }
         
-        public void remove(PHighlight highlight) {
+        private void remove(PHighlight highlight) {
             highlights.remove(new Wrapper(highlight));
         }
         
-        public int size() {
+        private int size() {
             return highlights.size();
         }
         
-        public PHighlight getHighlightAfter(int offset) {
+        private PHighlight getHighlightAfter(int offset) {
             SortedSet<Wrapper> after = highlights.tailSet(new ProbeWrapper(offset));
             return (after.size() == 0) ? null : after.first().get();
         }
         
-        public PHighlight getHighlightBefore(int offset) {
+        private PHighlight getHighlightBefore(int offset) {
             SortedSet<Wrapper> before = highlights.headSet(new ProbeWrapper(offset));
             return (before.size() == 0) ? null : before.last().get();
         }
         
-        public List<PHighlight> getHighlights(int startOffset, int endOffset) {
-            
-            // The 'firstItem' is to be the lowest-indexed highlight wrapper which overlaps the range.
-            // We must check the last item of those highlights which start before startOffset to determine
-            // if it ends past startOffset.
-            Wrapper firstItem = new ProbeWrapper(startOffset);
+        private List<PHighlight> getHighlightsOverlapping(int beginOffset, int endOffset) {
+            // The 'firstItem' is to be the lowest-indexed highlight wrapper which *overlaps* the range.
+            // We must check highlights which start before beginOffset to determine if they end past beginOffset.
+            Wrapper firstItem = new ProbeWrapper(beginOffset);
             SortedSet<Wrapper> highlightsBeforeStart = highlights.headSet(firstItem);
             if (highlightsBeforeStart.size() > 0) {
                 Wrapper lastBefore = highlightsBeforeStart.last();
-                if (lastBefore.get().getEndIndex() > startOffset) {
+                if (lastBefore.get().getEndIndex() > beginOffset) {
                     firstItem = lastBefore;
                 }
             }
             
-            // Now we have the start, and the end too, so we can simply grab the subset between
-            // these two extremes (inclusive of firstItem) and return as a list.
+            // Now we have the start, and the end too, so we can simply grab the subset between these two extremes (inclusive of firstItem) and return as a list.
             SortedSet<Wrapper> highlightsInRange = highlights.subSet(firstItem, new ProbeWrapper(endOffset));
             List<PHighlight> result = new ArrayList<PHighlight>(highlightsInRange.size());
             for (Wrapper wrapper : highlightsInRange) {
@@ -99,23 +103,10 @@ public class PHighlightManager {
         }
     }
     
-    private static class ProbeWrapper extends Wrapper {
-        private int fixedOffset;
-        
-        public ProbeWrapper(int fixedOffset) {
-            super(null);
-            this.fixedOffset = fixedOffset;
-        }
-        
-        public int getOffset() {
-            return fixedOffset;
-        }
-    }
-    
     private static class Wrapper implements Comparable<Wrapper> {
         private PHighlight highlight;
         
-        public Wrapper(PHighlight highlight) {
+        private Wrapper(PHighlight highlight) {
             this.highlight = highlight;
         }
         
@@ -127,12 +118,26 @@ public class PHighlightManager {
             return getOffset() - other.getOffset();
         }
         
-        public int getOffset() {
+        protected int getOffset() {
             return highlight.getStartIndex();
         }
         
-        public PHighlight get() {
+        private PHighlight get() {
             return highlight;
+        }
+    }
+    
+    private static class ProbeWrapper extends Wrapper {
+        private int fixedOffset;
+        
+        private ProbeWrapper(int fixedOffset) {
+            super(null);
+            this.fixedOffset = fixedOffset;
+        }
+        
+        @Override
+        protected int getOffset() {
+            return fixedOffset;
         }
     }
 }
