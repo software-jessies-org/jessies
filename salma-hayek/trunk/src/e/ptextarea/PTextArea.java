@@ -1075,11 +1075,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             return;
         }
         //StopWatch stopWatch = new StopWatch()
-        int minChar = getSplitLine(minLine).getTextIndex();
+        int beginOffset = getSplitLine(minLine).getTextIndex();
         SplitLine max = getSplitLine(maxLine);
-        int maxChar = max.getTextIndex() + max.getLength();
+        int endOffset = max.getTextIndex() + max.getLength();
         selection.paint(graphics);
-        List<PHighlight> highlightList = highlights.getHighlightsOverlapping(minChar, maxChar);
+        List<PHighlight> highlightList = highlights.getHighlightsOverlapping(beginOffset, endOffset);
         for (PHighlight highlight : highlightList) {
             highlight.paint(graphics);
         }
