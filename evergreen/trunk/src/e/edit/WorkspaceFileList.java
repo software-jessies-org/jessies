@@ -152,14 +152,15 @@ public class WorkspaceFileList {
                 if (fileIgnorer.isIgnored(file)) {
                     continue;
                 }
+                if (FileUtilities.isSymbolicLink(file)) {
+                    continue;
+                }
                 String filename = file.toString();
                 if (file.isDirectory()) {
                     scanDirectory(filename, fileIgnorer, result);
                 } else {
-                    if (FileUtilities.isSymbolicLink(file) == false) {
-                        int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()).length();
-                        result.add(filename.substring(prefixCharsToSkip));
-                    }
+                    int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()).length();
+                    result.add(filename.substring(prefixCharsToSkip));
                 }
             }
         }
