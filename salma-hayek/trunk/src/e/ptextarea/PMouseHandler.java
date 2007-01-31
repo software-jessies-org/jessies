@@ -106,6 +106,10 @@ public class PMouseHandler implements MouseInputListener {
     }
     
     private void handleHyperlinks(MouseEvent e) {
+        if (SwingUtilities.isLeftMouseButton(e) == false) {
+            // You can only follow a link with a left-click. Middle clicks are for pasting, and right clicks are for menus.
+            return;
+        }
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
         if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
             PTextSegment.class.cast(segment).linkClicked();
