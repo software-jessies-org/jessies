@@ -442,7 +442,7 @@ JAVAC_FLAGS += -source 1.5
 JAVAC_FLAGS += -encoding UTF-8
 
 define BUILD_JAVA
-  @echo Recompiling the world... && \
+  @echo "Compiling Java source..." && \
   $(RM) -r classes && \
   mkdir -p classes && \
   $(JAVA_COMPILER) $(JAVAC_FLAGS) $(call convertToNativeFilenames,$(SOURCE_FILES))
@@ -627,20 +627,20 @@ $(MACHINE_PROJECT_NAME).app: build .generated/build-revision.txt
 $(INSTALLER.dmg): $(MACHINE_PROJECT_NAME).app
 	@mkdir -p $(@D) && \
 	$(RM) $@ && \
-	echo -n "Creating disk image..." && \
+	echo -n "Creating Mac OS .dmg disk image..." && \
 	hdiutil create -fs UFS -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
 
 $(INSTALLER.deb): $(MACHINE_PROJECT_NAME).app
 	@mkdir -p $(@D) && \
 	$(RM) $@ && \
-	echo -n "Creating .deb package..." && \
+	echo "Creating GNU/Linux .deb package..." && \
 	fakeroot dpkg-deb --build $(PACKAGING_DIRECTORY) $@ && \
 	dpkg-deb --info $@ # && dpkg-deb --contents $@
 
 $(INSTALLER.rpm): $(INSTALLER.deb)
 	@mkdir -p $(@D) && \
 	$(RM) $@ && \
-	echo -n "Creating .rpm package..." && \
+	echo -n "Creating GNU/Linux .rpm package... " && \
 	cd $(@D) && \
 	fakeroot alien --to-rpm $<
 
