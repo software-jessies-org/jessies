@@ -24,17 +24,17 @@ public class SelectionHighlight extends PHighlight {
         return (getStartIndex() == getEndIndex());
     }
     
-    public void paint(Graphics2D graphics, PCoordinates start, PCoordinates end) {
+    @Override
+    protected void paintHighlight(Graphics2D graphics, PCoordinates start, PCoordinates end, Insets insets, int lineHeight, int firstLineIndex, int lastLineIndex) {
         if (isEmpty()) {
             return;
         }
+        
         Point startPt = textArea.getViewCoordinates(start);
         Point endPt = textArea.getViewCoordinates(end);
         Color oldColor = graphics.getColor();
-        Insets insets = textArea.getInsets();
-        int y = textArea.getLineTop(start.getLineIndex());
-        int lineHeight = textArea.getLineHeight();
-        for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
+        int y = textArea.getLineTop(firstLineIndex);
+        for (int i = firstLineIndex; i <= lastLineIndex; ++i) {
             int xStart = (i == start.getLineIndex()) ? startPt.x : insets.left;
             int xEnd = (i == end.getLineIndex()) ? endPt.x : textArea.getWidth() - insets.right;
             if (xStart == xEnd) {
@@ -47,7 +47,7 @@ public class SelectionHighlight extends PHighlight {
                 continue;
             }
             graphics.setColor(textArea.isFocusOwner() ? FOCUSED_SELECTION_COLOR : UNFOCUSED_SELECTION_COLOR);
-            paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
+            graphics.fill(new Rectangle(xStart, y, xEnd - xStart, lineHeight));
             int yBottom = y + lineHeight - 1;
             if (textArea.isFocusOwner()) {
                 graphics.setColor(FOCUSED_SELECTION_BOUNDARY_COLOR);
@@ -99,14 +99,12 @@ public class SelectionHighlight extends PHighlight {
         graphics.setColor(oldColor);
     }
     
-    public void paintRectangleContents(Graphics2D graphics, Rectangle rectangle) {
-        graphics.fill(rectangle);
-    }
-    
+    @Override
     public String toString() {
         return "SelectionHighlight[" + id + ": " + getStartIndex() + ", " + getEndIndex() + "]";
     }
     
+    @Override
     public String getHighlighterName() {
         return "Selection";
     }

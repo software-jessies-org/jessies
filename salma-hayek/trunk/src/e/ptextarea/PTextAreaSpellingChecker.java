@@ -322,7 +322,8 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             return false;
         }
         
-        public void paintRectangleContents(Graphics2D g, Rectangle r) {
+        @Override
+        protected void paintRectangleContents(Graphics2D g, Rectangle r) {
             if (DASHED) {
                 paintDashedLine(g, r);
             } else {

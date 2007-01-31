@@ -55,14 +55,25 @@ public abstract class PHighlight {
     public void paint(Graphics2D graphics) {
         PCoordinates start = textArea.getCoordinates(getStartIndex());
         PCoordinates end = textArea.getCoordinates(getEndIndex());
-        paint(graphics, start, end);
+        
+        // Work out which lines the highlight actually needs to bother to paint.
+        // If you select a million-line document, for example, the selection highlight should only paint the visible lines.
+        final int lineHeight = textArea.getLineHeight();
+        Rectangle bounds = graphics.getClipBounds();
+        Insets insets = textArea.getInsets();
+        final int minVisibleLine = (bounds.y - insets.top) / lineHeight;
+        final int maxVisibleLine = (bounds.y - insets.top + bounds.height) / lineHeight;
+        final int firstLineIndex = Math.max(minVisibleLine, start.getLineIndex());
+        final int lastLineIndex = Math.min(maxVisibleLine, end.getLineIndex());
+        
+        paintHighlight(graphics, start, end, insets, lineHeight, firstLineIndex, lastLineIndex);
     }
     
     /**
-     * Override this method to specify how the highlight may be painted.  The painting
-     * must occur within the FontMetrics of any given character.
+     * Override this method to specify how the highlight may be painted.
+     * The painting must occur within the FontMetrics of any given character.
      */
-    public abstract void paint(Graphics2D graphics, PCoordinates start, PCoordinates end);
+    protected abstract void paintHighlight(Graphics2D graphics, PCoordinates start, PCoordinates end, Insets insets, int lineHeight, int firstLineIndex, int lastLineIndex);
     
     /**
      * Override this at the lowest level possible in order to provide the name of the
