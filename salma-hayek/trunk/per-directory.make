@@ -133,6 +133,7 @@ missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 # ----------------------------------------------------------------------------
 
 $(EXECUTABLES) $(JNI_LIBRARY): $(OBJECTS)
+	@echo Linking $(notdir $@)...
 	mkdir -p $(@D) && \
 	$(LD) $^ -o $@ $(LDFLAGS)
 
