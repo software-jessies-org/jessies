@@ -7,6 +7,9 @@ while line = gets()
   # When nested, we get the make level in square brackets.
   if line.match(/^make(\[\d+\])?: \*\*\*/)
     $stderr.puts(lines)
+    while line = gets()
+      $stderr.puts(line)
+    end
     break
   end
   progressLine = nil

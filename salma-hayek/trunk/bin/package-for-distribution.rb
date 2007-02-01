@@ -99,6 +99,7 @@ if target_os() != "Linux" && target_os() != "Darwin"
 end
 
 puts("Building #{target_os() == 'Darwin' ? '.app bundle' : '.deb package'} for #{human_project_name}...")
+$stdout.flush()
 
 # Make a temporary directory to work in.
 tmp_dir = ".generated/native/#{target_directory()}/#{machine_project_name}"
@@ -122,7 +123,7 @@ def copy_files_for_installation(src_root_directory, dst_root_directory)
     src_root_pathname = Pathname.new(src_root_directory)
     dst_root_pathname = Pathname.new(dst_root_directory)
     make = ENV["MAKE"]
-    open("| #{make} --no-print-directory -C #{src_root_directory} installer-file-list").each_line() {
+    open("| #{make} --no-print-directory -C #{src_root_directory} -f ../salma-hayek/universal.make installer-file-list").each_line() {
         |line|
         filename = line.chomp()
         src_pathname = src_root_pathname + filename
