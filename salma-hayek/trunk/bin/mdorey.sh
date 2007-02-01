@@ -23,7 +23,7 @@
 # It can be done but it's not worth the effort.
 
 # The resulting cron job is actually longer than the non-comment part of this file:
-# 20 09 * * * echo "~/Projects/salma-hayek/bin/mdorey.sh" | bash --login
+# 20 09 * * * cat /Projects/salma-hayek/bin/mdorey.sh | bash --login
 
 ~/Projects/salma-hayek/bin/nightly-build.rb clean
 ~/Projects/salma-hayek/bin/nightly-build.rb native-dist
