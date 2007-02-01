@@ -312,8 +312,8 @@ PROJECT_DIRECTORY_BASE_NAME = $(notdir $(PROJECT_ROOT))
 HUMAN_PROJECT_NAME ?= $(PROJECT_DIRECTORY_BASE_NAME)
 MACHINE_PROJECT_NAME := $(shell ruby -e 'puts("$(HUMAN_PROJECT_NAME)".downcase())')
 
-BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_DIRECTORY)/bin
-LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_DIRECTORY)/lib
+BIN_DIRECTORY = .generated/$(TARGET_DIRECTORY)/bin
+LIB_DIRECTORY = .generated/$(TARGET_DIRECTORY)/lib
 
 # Distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST = software@jessies.org
@@ -334,7 +334,7 @@ DIST_SUBDIRECTORY.msi = windows
 DIST_SUBDIRECTORY.rpm = redhat
 
 $(takeProfileSample)
-JAVA_SOURCE_FILES := $(if $(wildcard $(PROJECT_ROOT)/src),$(shell find $(PROJECT_ROOT)/src -type f -name "*.java"))
+JAVA_SOURCE_FILES := $(if $(wildcard src),$(shell find src -type f -name "*.java"))
 $(takeProfileSample)
 SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
 
@@ -360,7 +360,7 @@ GENERATED_FILES += classes
 GENERATED_FILES += .generated
 GENERATED_FILES += $(MACHINE_PROJECT_NAME).jar
 
-MAKE_VERSION_FILE_COMMAND = ruby $(SCRIPT_PATH)/make-version-file.rb $(PROJECT_ROOT) $(SALMA_HAYEK)
+MAKE_VERSION_FILE_COMMAND = ruby $(SCRIPT_PATH)/make-version-file.rb . $(SALMA_HAYEK)
 # By immediately evaluating this, we cause install-everything.sh (or other building-from-source) to warn:
 # svn: '.' is not a working copy
 # Now we use the version string in the name of the .rpm target, it gets evaluated even if we use = instead of :=.
@@ -475,7 +475,7 @@ STANDALONE_INSTALLERS = $(STANDALONE_INSTALLERS.$(MACHINE_PROJECT_NAME))
 NATIVE_NAME_FOR_INSTALLERS := '$(subst /,\,$(call convertToNativeFilenames,$(STANDALONE_INSTALLERS)))'
 
 # We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.
-PACKAGING_DIRECTORY = $(PROJECT_ROOT)/.generated/native/$(TARGET_DIRECTORY)/$(MACHINE_PROJECT_NAME)
+PACKAGING_DIRECTORY = .generated/native/$(TARGET_DIRECTORY)/$(MACHINE_PROJECT_NAME)
 
 # ----------------------------------------------------------------------------
 # Prevent us from using per-directory.make's local variables in universal.make
@@ -625,7 +625,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	cd $(@D) && \
-	fakeroot alien --to-rpm $<
+	fakeroot alien --to-rpm $(CURDIR)/$<
 
 # ----------------------------------------------------------------------------
 # WiX
