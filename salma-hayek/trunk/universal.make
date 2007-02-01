@@ -30,6 +30,13 @@ endif
 .DELETE_ON_ERROR:
 
 # ----------------------------------------------------------------------------
+# Locate salma-hayek.
+# ----------------------------------------------------------------------------
+
+MOST_RECENT_MAKEFILE_DIRECTORY = $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
+SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTORY))
+
+# ----------------------------------------------------------------------------
 # Work out what we're going to generate.
 # ----------------------------------------------------------------------------
 
