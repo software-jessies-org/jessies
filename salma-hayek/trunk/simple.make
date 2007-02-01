@@ -38,7 +38,6 @@ endif
 
 MOST_RECENT_MAKEFILE_DIRECTORY = $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
 SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTORY))
-export SALMA_HAYEK
 
 # make does special things when running commands including the magic string $(MAKE),
 # including clearing -n from $(MAKEFLAGS), so we snarf it here.
