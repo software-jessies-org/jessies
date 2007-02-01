@@ -142,6 +142,21 @@ public class WorkspaceFileList {
             return result;
         }
         
+        private boolean isSymbolicLinkWithinWorkspace(File file) {
+            if (FileUtilities.isSymbolicLink(file) == false) {
+                return false;
+            }
+            try {
+                String canonicalFileName = file.getCanonicalFile().toString();
+                String canonicalWorkspaceRootDirectory = workspace.getCanonicalRootDirectory();
+                return canonicalFileName.startsWith(canonicalWorkspaceRootDirectory);
+            } catch (IOException ex) {
+                // (If we can't find the root directory of the workspace, then what are we scanning?)
+                // If we can't find the target of a symbolic link, then we can't very well edit it.
+                return true;
+            }
+        }
+        
         private void scanDirectory(String directory, FileIgnorer fileIgnorer, ArrayList<String> result) {
             File dir = FileUtilities.fileFromString(directory);
             File[] files = dir.listFiles();
@@ -152,7 +167,7 @@ public class WorkspaceFileList {
                 if (fileIgnorer.isIgnored(file)) {
                     continue;
                 }
-                if (FileUtilities.isSymbolicLink(file)) {
+                if (isSymbolicLinkWithinWorkspace(file)) {
                     continue;
                 }
                 String filename = file.toString();
