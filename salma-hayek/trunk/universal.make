@@ -633,6 +633,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@
 
 %.wixobj: %.wxs .generated/build-revision.txt $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
+	@echo Compiling $(notdir $<)...
 	HUMAN_PROJECT_NAME=$(HUMAN_PROJECT_NAME) \
 	MACHINE_PROJECT_NAME=$(MACHINE_PROJECT_NAME) \
 	PATH_GUID=$(makeGuid) \
@@ -645,6 +646,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
 
 $(INSTALLER.wix): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj
+	@echo Linking $(notdir $@)...
 	light -nologo -out $(call convertToNativeFilenames,$@ $<)
 
 $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/$(if $(filter %.msi,$(INSTALLER.wix)),installer,module).wxs
