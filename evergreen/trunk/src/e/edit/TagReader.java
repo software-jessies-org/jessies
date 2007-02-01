@@ -18,12 +18,16 @@ public class TagReader {
         this.listener = tagListener;
         this.fileType = fileType;
         
+        File tagsFile = null;
         try {
-            File tagsFile = createTagsFileFor(file);
+            tagsFile = createTagsFileFor(file);
             readTagsFile(tagsFile);
-            tagsFile.delete();
         } catch (Exception ex) {
             listener.taggingFailed(ex);
+        } finally {
+            if (tagsFile != null) {
+                tagsFile.delete();
+            }
         }
     }
     
