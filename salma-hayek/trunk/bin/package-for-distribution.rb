@@ -98,7 +98,7 @@ if target_os() != "Linux" && target_os() != "Darwin"
     die("#{$0}: this script will only work on Linux or Mac OS X; you're running on '#{target_os()}'.")
 end
 
-puts("Building #{target_os() == 'Darwin' ? '.app bundle' : '.deb package'} for #{human_project_name}...")
+puts("Building #{target_os() == 'Darwin' ? '.app bundle' : 'Debian file system tree'} for #{human_project_name}...")
 $stdout.flush()
 
 # Make a temporary directory to work in.
