@@ -2,4 +2,4 @@
 # to know which program to upgrade.
 UPGRADE_GUID = cdf05ed6-e1f8-11da-ae3f-00111123337e
 
-include ../salma-hayek/universal.make
+include ../salma-hayek/simple.make
