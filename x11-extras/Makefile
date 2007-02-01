@@ -1,4 +1,4 @@
-include ../salma-hayek/universal.make
+include ../salma-hayek/simple.make
 
 X11_TARGETS += clock lock menu speckeysd window x11-reaper
 
@@ -14,5 +14,5 @@ makefiles:
 #	@for target in $(X11_TARGETS) ; do make -C $$target clean ; done
 
 %: force
-	@$(MAKE) -f ../salma-hayek/universal.make $@
+	@$(MAKE) -f ../salma-hayek/simple.make $@
 force: ;
