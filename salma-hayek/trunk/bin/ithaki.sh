@@ -32,7 +32,8 @@ rm *.deb
 # Run the latest version of the nightly build script, rather than the version from yesterday.
 # This has the advantage that the update won't overwrite the running script - which Ruby doesn't like.
 NIGHTLY_BUILD_SCRIPT=~martind/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
-$NIGHTLY_BUILD_SCRIPT clean native-dist
+$NIGHTLY_BUILD_SCRIPT clean
+$NIGHTLY_BUILD_SCRIPT native-dist
 echo $NIGHTLY_BUILD_SCRIPT native-dist | ssh wide bash --login
 find ~martind/software.jessies.org/nightlies/ -name "*.deb" | xargs cp --target-directory=.
 
