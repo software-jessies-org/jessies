@@ -21,6 +21,7 @@ while line = gets()
   else
     next
   end
+  # TODO: Stamping each line with the time since invocation would be a neat way of quantifying which is the most expensive part of the build.
   puts(progressLine)
   $stdout.flush()
   lines = []
