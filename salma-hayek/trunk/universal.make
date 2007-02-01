@@ -742,6 +742,7 @@ native-dist: build
 
 .PHONY: upload.%
 $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
+	echo Uploading $(notdir $*)...
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F)
 
@@ -750,6 +751,7 @@ $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 $(addprefix upload.,$(INSTALLERS.Linux)): upload.%: symlink-latest.%
 .PHONY: symlink-latest.%
 $(addprefix symlink-latest.,$(INSTALLERS.Linux)): symlink-latest.%: %
+	echo Symlinking the latest $(notdir $*)...
 	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_LINUX_INSTALLER_LINK) '&&' \
 	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_LINUX_INSTALLER_LINK) '&&' \
 	find $(DIST_DIRECTORY) -name '"$(call makeLinuxInstallerName$(suffix $<),*)"' -mtime +7 '|' xargs $(RM)
