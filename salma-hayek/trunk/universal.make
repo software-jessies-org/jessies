@@ -1,24 +1,3 @@
-# You may use:
-#   make
-#   make clean
-#   make native
-#   make installer
-#   make install
-#   make remove
-#   make native-clean
-#   make native-dist
-#   make source-dist
-#   make www-dist
-
-# Your calling Makefile:
-#   must include ../salma-hayek/universal.make
-
-#   must have any extra rules after the include
-#   must set any variables before the include
-#     (Variables used on either side of the colon in rules are evaluated on
-#      the first pass. By the time you get to the other side of the include,
-#      you're too late to override them.)
-
 # Use "VARIABLE ?= default" to assign a values iff the variable hasn't already
 # been set.
 
@@ -49,14 +28,6 @@ endif
 
 .DEFAULT:
 .DELETE_ON_ERROR:
-.SECONDARY:
-
-# ----------------------------------------------------------------------------
-# Locate salma-hayek.
-# ----------------------------------------------------------------------------
-
-MOST_RECENT_MAKEFILE_DIRECTORY = $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
-SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTORY))
 
 # ----------------------------------------------------------------------------
 # Work out what we're going to generate.
@@ -356,7 +327,7 @@ DIST_SUBDIRECTORY.msi = windows
 DIST_SUBDIRECTORY.rpm = redhat
 
 $(takeProfileSample)
-SOURCE_FILES := $(if $(wildcard $(PROJECT_ROOT)/src),$(shell find $(PROJECT_ROOT)/src -type f -name "*.java"))
+JAVA_SOURCE_FILES := $(if $(wildcard $(PROJECT_ROOT)/src),$(shell find $(PROJECT_ROOT)/src -type f -name "*.java"))
 $(takeProfileSample)
 SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
 
@@ -441,11 +412,13 @@ JAVAC_FLAGS += -source 1.5
 # everyone else does, so let the compiler know that our source is in UTF-8.
 JAVAC_FLAGS += -encoding UTF-8
 
+# It's not helpful to list all the Java source files.
 define BUILD_JAVA
-  @echo "Compiling Java source..." && \
+  @echo "Compiling Java source..."
   $(RM) -r classes && \
-  mkdir -p classes && \
-  $(JAVA_COMPILER) $(JAVAC_FLAGS) $(call convertToNativeFilenames,$(SOURCE_FILES))
+  mkdir -p classes
+  @echo '$(JAVA_COMPILER) $(JAVAC_FLAGS) $$(JAVA_SOURCE_FILES)'
+  @$(JAVA_COMPILER) $(JAVAC_FLAGS) $(call convertToNativeFilenames,$(JAVA_SOURCE_FILES))
 endef
 
 # ----------------------------------------------------------------------------
@@ -531,7 +504,7 @@ define closeLocalVariableScope
   $(call forEachLocalVariable,unsetLocalVariable)
 endef
 
-BUILD_TARGETS += build.$(findstring java,$(SOURCE_FILES))
+BUILD_TARGETS += build.$(findstring java,$(JAVA_SOURCE_FILES))
 BUILD_TARGETS += $(if $(wildcard .svn),.generated/build-revision.txt)
 TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
 # We deliberately omit the intermediate directory.
@@ -539,8 +512,10 @@ COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SO
 BUILD_TARGETS += $(COMPILED_TERMINFO)
 
 # ----------------------------------------------------------------------------
-# Variables above this point,
-# rules below...
+# Variables above this point, rules below.
+# Variables used on either side of the colon in rules are evaluated on the first pass,
+# so you can't override them after the rule has been seen, even if they don't appear
+# in any overt immediate evaluations (like := assignments).
 # ----------------------------------------------------------------------------
 
 .PHONY: build
@@ -550,17 +525,17 @@ build: $(BUILD_TARGETS)
 build.:;
 
 .PHONY: build.java
-build.java: $(SOURCE_FILES)
+build.java: $(JAVA_SOURCE_FILES)
 	$(BUILD_JAVA)
 
 .PHONY: clean
 clean:
-	@$(RM) -r $(GENERATED_FILES) && \
+	$(RM) -r $(GENERATED_FILES) && \
 	find . -name "*.bak" | xargs $(RM)
 
 .PHONY: native-clean
 native-clean:
-	@$(RM) -r .generated/native
+	$(RM) -r .generated/native
 
 ChangeLog.html: ChangeLog
 	$(RM) $@ && \
@@ -579,7 +554,7 @@ source-dist: ../$(SOURCE_DIST_FILE)
 	mv $< $(DIST_DIRECTORY)/
 
 $(MACHINE_PROJECT_NAME).jar: build.java
-	@$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
+	$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
 # Including a generated file in a source distribution?
@@ -597,7 +572,7 @@ www-dist: ChangeLog.html
 
 .PHONY: .generated/build-revision.txt
 .generated/build-revision.txt:
-	@mkdir -p $(@D) && \
+	mkdir -p $(@D) && \
 	$(MAKE_VERSION_FILE_COMMAND) > $@
 
 # Old versions of SunOS tic don't support the -o argument but do support redirecting
@@ -615,6 +590,7 @@ www-dist: ChangeLog.html
 # How to build a .app directory and package it into an installer file.
 # ----------------------------------------------------------------------------
 
+# The output of this make invocation is captured and processed, so we mustn't echo it.
 .PHONY: installer-file-list
 installer-file-list:
 	@$(MAKE_INSTALLER_FILE_LIST)
@@ -622,25 +598,25 @@ installer-file-list:
 # Unfortunately, the start-up scripts tend to go looking for salma-hayek, so we can't just have Resources/bin etc; we have to keep the multi-directory structure, at least for now.
 .PHONY: $(MACHINE_PROJECT_NAME).app
 $(MACHINE_PROJECT_NAME).app: build .generated/build-revision.txt
-	@$(SCRIPT_PATH)/package-for-distribution.rb $(HUMAN_PROJECT_NAME) $(MACHINE_PROJECT_NAME) $(SALMA_HAYEK)
+	$(SCRIPT_PATH)/package-for-distribution.rb $(HUMAN_PROJECT_NAME) $(MACHINE_PROJECT_NAME) $(SALMA_HAYEK)
 
 $(INSTALLER.dmg): $(MACHINE_PROJECT_NAME).app
-	@mkdir -p $(@D) && \
+	@echo "Creating Mac OS .dmg disk image..."
+	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	echo -n "Creating Mac OS .dmg disk image..." && \
 	hdiutil create -fs UFS -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
 
 $(INSTALLER.deb): $(MACHINE_PROJECT_NAME).app
-	@mkdir -p $(@D) && \
+	@echo "Creating GNU/Linux .deb package..."
+	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	echo "Creating GNU/Linux .deb package..." && \
 	fakeroot dpkg-deb --build $(PACKAGING_DIRECTORY) $@ && \
 	dpkg-deb --info $@ # && dpkg-deb --contents $@
 
 $(INSTALLER.rpm): $(INSTALLER.deb)
-	@mkdir -p $(@D) && \
+	@echo "Creating GNU/Linux .rpm package..."
+	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	echo -n "Creating GNU/Linux .rpm package... " && \
 	cd $(@D) && \
 	fakeroot alien --to-rpm $<
 
@@ -688,7 +664,7 @@ echo.%:
 
 # The $$1 here is a Ruby variable, not a make one.
 .generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
-	@mkdir -p $(@D) && \
+	mkdir -p $(@D) && \
 	ruby -w -ne '($$_.match(/^ *(\S+)\s*[:+]?=/) || $$_.match(/^\s*define\s*(\S+)/)) && puts("LOCAL_VARIABLES += #{$$1}")' $< | sort -u > $@
 
 # Several of the rules include $(MAKEFILE_LIST) in their prerequisites.
@@ -701,7 +677,7 @@ echo.%:
 # This empty makefile fragment will save us having to remember to use a
 # different variable in place of MAKEFILE_LIST.
 .generated/recompilation-trigger.make: $(SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS)
-	@mkdir -p $(@D) && \
+	mkdir -p $(@D) && \
 	touch $@
 
 -include .generated/recompilation-trigger.make

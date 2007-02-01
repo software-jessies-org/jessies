@@ -146,7 +146,7 @@ $(JNI_CLASS_FILE): $(SOURCE_FILES)
 	$(BUILD_JAVA)
 
 $(NEW_JNI_HEADER): $(JNI_CLASS_FILE) $(JAVAHPP) $(SALMA_HAYEK)/classes/e/tools/JavaHpp.class
-	@echo "Generating JNI header..." && \
+	@echo "Generating JNI header..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	$(RULE)
