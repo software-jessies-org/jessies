@@ -183,19 +183,11 @@ public class Options {
 	}
 	
 	private int integerResource(String name) {
-		return Integer.parseInt(stringResource(name));
-	}
-	
-	private String stringResource(String name) {
-		return options.get(name).toString();
+		return (Integer) options.get(name);
 	}
 	
 	private boolean booleanResource(String name) {
-		return parseBoolean(stringResource(name));
-	}
-	
-	private boolean parseBoolean(String s) {
-		return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on");
+		return (Boolean) options.get(name);
 	}
 	
 	/**
@@ -355,6 +347,7 @@ public class Options {
 		PrintWriter out = null;
 		try {
 			out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+			out.println("# This file is written automatically by Terminator's preferences dialog.");
 			showOptions(out, false);
 			return true;
 		} catch (IOException ex) {
