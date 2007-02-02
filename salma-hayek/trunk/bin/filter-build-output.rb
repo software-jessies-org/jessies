@@ -5,7 +5,7 @@ while line = gets()
   line = line.chomp()
   lines << line
   # When nested, we get the make level in square brackets.
-  if line.match(/^make(\[\d+\])?: \*\*\*/)
+  if line.match(/^g?make(\[\d+\])?: \*\*\*/)
     $stderr.puts(lines)
     while line = gets()
       $stderr.puts(line)
