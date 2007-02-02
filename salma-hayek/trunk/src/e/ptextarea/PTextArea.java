@@ -37,6 +37,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     private PLineList lines;
     // TODO: experiment with java.util.ArrayDeque in Java 6.
+    // But ArrayDeque wouldn't help bulk operations in the middle.
     private List<SplitLine> splitLines;
     
     // We cache the FontMetrics for readability rather than performance.
@@ -1123,13 +1124,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             return;
         }
         clearSegmentCacheFrom(event.getLineIndex());
-        int splitIndex = getSplitLineIndex(event.getLineIndex());
-        for (int i = 0; i < event.getLength(); i++) {
-            removeSplitLines(splitIndex);
-        }
+        int beginSplitIndex = getSplitLineIndex(event.getLineIndex());
+        int endSplitIndex = getSplitLineIndex(event.getLineIndex() + event.getLength());
+        removeSplitLines(beginSplitIndex, endSplitIndex);
         changeLineIndices(event.getLineIndex() + event.getLength(), -event.getLength());
         updateHeight();
-        repaintFromLine(splitIndex);
+        repaintFromLine(beginSplitIndex);
     }
     
     public void linesCompletelyReplaced(PLineEvent event) {
@@ -1155,13 +1155,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         for (int i = 0; i < event.getLength(); i++) {
             PLineList.Line line = lines.getLine(event.getLineIndex() + i);
             setLineWidth(line);
-            int splitIndex = getSplitLineIndex(event.getLineIndex()); // FIXME: shouldn't this be "+ i" too?
+            int beginSplitIndex = getSplitLineIndex(event.getLineIndex()); // FIXME: shouldn't this be "+ i" too?
+            int endSplitIndex = getSplitLineIndex(event.getLineIndex() + 1);
             if (i == 0) {
-                minLine = splitIndex;
+                minLine = beginSplitIndex;
             }
-            int removedCount = removeSplitLines(splitIndex);
+            int removedCount = removeSplitLines(beginSplitIndex, endSplitIndex);
             lineCountChange -= removedCount;
-            int addedCount = addSplitLines(event.getLineIndex(), splitIndex);
+            int addedCount = addSplitLines(event.getLineIndex(), beginSplitIndex);
             lineCountChange += addedCount;
             visibleLineCount += addedCount;
         }
@@ -1249,15 +1250,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         setPreferredSize(size);
     }
     
-    private int removeSplitLines(int splitIndex) {
-        int lineIndex = getSplitLine(splitIndex).getLineIndex();
-        int removedLineCount = 0;
-        while (splitIndex < splitLines.size() && getSplitLine(splitIndex).getLineIndex() == lineIndex) {
-            SplitLine line = getSplitLine(splitIndex);
-            splitLines.remove(splitIndex);
-            removedLineCount++;
-        }
-        return removedLineCount;
+    private int removeSplitLines(int beginSplitIndex, int endSplitIndex) {
+        splitLines.subList(beginSplitIndex, endSplitIndex).clear();
+        return endSplitIndex - beginSplitIndex;
     }
     
     public int getSplitLineIndex(int lineIndex) {
