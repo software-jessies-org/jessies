@@ -116,7 +116,7 @@ end
 
 def install_terminfo_in(original_file, directory)
   terminfo_file = File.join(directory, "terminator")
-  if FileUtils.uptodate?(original_file, [terminfo_file])
+  if FileUtils.uptodate?(original_file, [terminfo_file]) == false
     if File.exist?(terminfo_file) == false
       FileUtils.mkdir_p(directory)
     end
