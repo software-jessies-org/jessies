@@ -116,7 +116,14 @@ end
 
 def install_terminfo_in(original_file, directory)
   terminfo_file = File.join(directory, "terminator")
-  if FileUtils.uptodate?(terminfo_file, [original_file]) == false
+  # uptodate? doesn't return true unless the file specified by the first argument is strictly newer
+  # than all the files specified by the second argument.
+  # We copy preserving the timestamp, so we can compare compilation dates rather than a compilation date with an install date.
+  # This means the target file is never strictly newer, so we have to do the comparison backwards if we're to avoid spurious copies.
+  if FileUtils.uptodate?(original_file, [terminfo_file])
+    if ENV["DEBUGGING_TERMINATOR"]
+      puts("installing #{terminfo_file}")
+    end
     if File.exist?(terminfo_file) == false
       FileUtils.mkdir_p(directory)
     end
