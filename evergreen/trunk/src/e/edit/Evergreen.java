@@ -39,22 +39,35 @@ public class Evergreen {
     /** Whether we're fully started. */
     private CountDownLatch startSignal = new CountDownLatch(1);
     
-    private class InitialFile {
-        String filename;
+    private static class InitialWorkspace {
+        Element xmlWorkspace;
+        private List<InitialFile> initialFiles = new ArrayList<InitialFile>();
+        
+        private InitialWorkspace(Element xmlWorkspace) {
+            this.xmlWorkspace = xmlWorkspace;
+        }
+        
+        private void addInitialFile(String name, int y) {
+            initialFiles.add(new InitialFile(name, y));
+        }
+    }
+    
+    public static class InitialFile {
+        String filename; // strictly, filename(:address)?
         int y;
+        
         private InitialFile(String filename, int y) {
             this.filename = filename;
             this.y = y;
         }
+        
         private InitialFile(String filename) {
             this(filename, -1);
         }
     }
     
-    private List<InitialFile> initialFiles;
-    
-    private ArrayList<Element> initialWorkspaces;
-    private Workspace initialWorkspace;
+    private ArrayList<InitialWorkspace> initialWorkspaces;
+    private Workspace initiallyVisibleWorkspace;
     
     private JPanel statusLineAndProgressContainer = new JPanel(new BorderLayout());
     
@@ -146,7 +159,7 @@ public class Evergreen {
         return filename;
     }
     
-    private EWindow openFile(InitialFile file) {
+    public EWindow openFile(InitialFile file) {
         try {
             return openFileNonInteractively(file);
         } catch (Exception ex) {
@@ -557,26 +570,15 @@ public class Evergreen {
         return getPreferenceFilename("open-workspace-list");
     }
     
-    /** Opens all the files listed in the file we remembered them to last time we quit. */
-    public void openRememberedFiles() {
-        showStatus("Opening remembered files...");
-        if (initialFiles != null) {
-            for (InitialFile file : initialFiles) {
-                openFile(file);
-            }
-            showStatus((initialFiles.size() == 0) ? "No files to open" : "Finished opening files");
-            initialFiles = null;
-        }
-    }
-    
     /** Opens all the workspaces listed in the file we remembered them to last time we quit. */
     public void openRememberedWorkspaces() {
         Log.warn("Opening remembered workspaces...");
         if (initialWorkspaces != null) {
-            for (Element info : initialWorkspaces) {
-                Workspace workspace = addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"));
+            for (InitialWorkspace initialWorkspace : initialWorkspaces) {
+                Element info = initialWorkspace.xmlWorkspace;
+                Workspace workspace = addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"), initialWorkspace.initialFiles);
                 if (info.hasAttribute("selected")) {
-                    initialWorkspace = workspace;
+                    initiallyVisibleWorkspace = workspace;
                 }
             }
             initialWorkspaces = null;
@@ -597,18 +599,15 @@ public class Evergreen {
             initialSize.width = Integer.parseInt(root.getAttribute("width"));
             initialSize.height = Integer.parseInt(root.getAttribute("height"));
             
-            initialWorkspaces = new ArrayList<Element>();
-            initialFiles = new ArrayList<InitialFile>();
-            for (Node workspace = root.getFirstChild(); workspace != null; workspace = workspace.getNextSibling()) {
-                if (workspace instanceof Element) {
-                    initialWorkspaces.add((Element) workspace);
-                    for (Node file = workspace.getFirstChild(); file != null; file = file.getNextSibling()) {
+            this.initialWorkspaces = new ArrayList<InitialWorkspace>();
+            for (Node xmlWorkspace = root.getFirstChild(); xmlWorkspace != null; xmlWorkspace = xmlWorkspace.getNextSibling()) {
+                if (xmlWorkspace instanceof Element) {
+                    InitialWorkspace workspace = new InitialWorkspace((Element) xmlWorkspace);
+                    initialWorkspaces.add(workspace);
+                    for (Node file = xmlWorkspace.getFirstChild(); file != null; file = file.getNextSibling()) {
                         if (file instanceof Element) {
                             Element fileElement = (Element) file;
-                            // FIXME: this is only needed until everyone's saved state has been upgraded.
-                            int y = fileElement.hasAttribute("y") ? Integer.parseInt(fileElement.getAttribute("y")) : -1;
-                            InitialFile initialFile = new InitialFile(fileElement.getAttribute("name"), y);
-                            initialFiles.add(initialFile);
+                            workspace.addInitialFile(fileElement.getAttribute("name"), Integer.parseInt(fileElement.getAttribute("y")));
                         }
                     }
                 }
@@ -682,7 +681,7 @@ public class Evergreen {
         return true;
     }
     
-    private Workspace addWorkspace(String name, String root, String buildTarget) {
+    private Workspace addWorkspace(String name, String root, String buildTarget, List<InitialFile> initialFiles) {
         Log.warn("Opening workspace '" + name + "' with root '" + root + "'");
         Workspace workspace = createWorkspace(name, root);
         if (workspace == null) {
@@ -690,6 +689,7 @@ public class Evergreen {
         }
         
         workspace.setBuildTarget(buildTarget);
+        workspace.setInitialFiles(initialFiles);
         File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
         int which = tabbedPane.indexOfComponent(workspace);
         if (rootDirectory.exists() == false) {
@@ -807,12 +807,30 @@ public class Evergreen {
         }
     }
     
+    private void initRememberedFilesOpener() {
+        ChangeListener initialFileOpener = new ChangeListener() {
+            public void stateChanged(final ChangeEvent e) {
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        System.err.println(e);
+                        getCurrentWorkspace().openRememberedFiles();
+                    }
+                });
+            }
+        };
+        tabbedPane.addChangeListener(initialFileOpener);
+        // Bring the listener up to speed with the current situation.
+        // We couldn't add the listener in advance, because we want the tabbed pane on the display before we start listening.
+        initialFileOpener.stateChanged(null);
+    }
+    
     private void init() {
         final long startTimeMillis = System.currentTimeMillis();
         
         initPreferences();
         initMacOs();
         initAboutBox();
+        JavaResearcher.initOnBackgroundThread();
         
         frame = new JFrame("Evergreen");
         frame.setJMenuBar(new EvergreenMenuBar());
@@ -835,24 +853,22 @@ public class Evergreen {
         
         openRememberedWorkspaces();
         
+        if (initiallyVisibleWorkspace != null) {
+            tabbedPane.setSelectedComponent(initiallyVisibleWorkspace);
+            initiallyVisibleWorkspace = null;
+        }
+        
         frame.setVisible(true);
         GuiUtilities.finishGnomeStartup();
         Log.warn("Frame visible after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
         
+        // These things want to be done after the frame is visible.
         splitPane.setDividerLocation(0.8);
         splitPane.setResizeWeight(0.8);
-        
-        if (initialWorkspace != null) {
-            tabbedPane.setSelectedComponent(initialWorkspace);
-            initialWorkspace = null;
-        }
+        initRememberedFilesOpener();
         
         EventQueue.invokeLater(new Runnable() {
             public void run() {
-                openRememberedFiles();
-                
-                Log.warn("All remembered files opened after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
-                
                 if (tabbedPane.getTabCount() == 0) {
                     // If we didn't create any workspaces, give the user some help...
                     showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
@@ -863,8 +879,8 @@ public class Evergreen {
                         try {
                             // What I really want to say is "wait until the event queue is empty and everything's caught up".
                             // I haven't yet found out how to do that, and the fact that using EventQueue.invokeLater here doesn't achieve the desired effect makes me think that what I want might not be that simple anyway.
-                            // But "on my machine", sleeping here for 2s is time enough for the display to catch up, but doesn't adversely affect overall start-up time.
-                            // FIXME: We need to find out what we're really waiting for, and how to wait for it.
+                            // Seemingly, though, if we run at MIN_PRIORITY, we don't get much of a look-in until the EDT is idle anyway.
+                            // Hans Muller's got code to wait for the event queue to clear: https://appframework.dev.java.net/source/browse/appframework/trunk/AppFramework/src/application/Application.java?rev=36&view=auto&content-type=text/vnd.viewcvs-markup
                             Thread.sleep(2000);
                         } catch (InterruptedException ex) {
                         }

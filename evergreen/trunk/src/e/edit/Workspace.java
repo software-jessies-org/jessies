@@ -4,6 +4,7 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -26,6 +27,8 @@ public class Workspace extends JPanel {
     private WorkspaceFileList fileList;
     
     private ETextWindow rememberedTextWindow;
+    
+    private List<Evergreen.InitialFile> initialFiles;
     
     public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
@@ -50,7 +53,24 @@ public class Workspace extends JPanel {
     
     public void setTitle(String title) {
         this.title = title;
-        leftColumn.updateTabForWorkspace();
+        updateTabForWorkspace();
+    }
+    
+    /**
+     * Updates the title of the tab in the JTabbedPane that corresponds to the Workspace that this
+     * EColumn represents (if you can follow that). Invoked when the column has a component added
+     * or removed.
+     */
+    public void updateTabForWorkspace() {
+        JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
+        if (tabbedPane != null) {
+            String title = getTitle();
+            int windowCount = leftColumn.getTextWindows().length + getInitialFileCount();
+            if (windowCount > 0) {
+                title += " (" + windowCount + ")";
+            }
+            tabbedPane.setTitleAt(tabbedPane.indexOfComponent(this), title);
+        }
     }
     
     /**
@@ -324,6 +344,36 @@ public class Workspace extends JPanel {
             workspace.appendChild(file);
             file.setAttribute("name", textWindow.getFilename() + textWindow.getAddress());
             file.setAttribute("y", Integer.toString(textWindow.getY()));
+        }
+        synchronized (initialFiles) {
+            for (Evergreen.InitialFile initialFile : initialFiles) {
+                org.w3c.dom.Element file = document.createElement("file");
+                workspace.appendChild(file);
+                file.setAttribute("name", initialFile.filename);
+                file.setAttribute("y", Integer.toString(initialFile.y));
+            }
+        }
+    }
+    
+    public void setInitialFiles(List<Evergreen.InitialFile> initialFiles) {
+        this.initialFiles = initialFiles;
+        updateTabForWorkspace();
+    }
+    
+    public int getInitialFileCount() {
+        synchronized (initialFiles) {
+            return initialFiles.size();
+        }
+    }
+    
+    /** Opens all the files listed in the file we remembered them to last time we quit. */
+    public void openRememberedFiles() {
+        synchronized (initialFiles) {
+            for (Evergreen.InitialFile file : initialFiles) {
+                Evergreen.getInstance().openFile(file);
+            }
+            initialFiles.clear();
+            updateTabForWorkspace();
         }
     }
 }
