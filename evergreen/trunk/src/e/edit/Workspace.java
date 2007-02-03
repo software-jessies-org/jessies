@@ -28,7 +28,7 @@ public class Workspace extends JPanel {
     
     private ETextWindow rememberedTextWindow;
     
-    private List<Evergreen.InitialFile> initialFiles;
+    private List<Evergreen.InitialFile> initialFiles = Collections.emptyList();
     
     public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
@@ -339,19 +339,19 @@ public class Workspace extends JPanel {
         if (Evergreen.getInstance().getCurrentWorkspace() == this) {
             workspace.setAttribute("selected", "true");
         }
+        // Remember any files that were actually shown.
         for (ETextWindow textWindow : leftColumn.getTextWindows()) {
             org.w3c.dom.Element file = document.createElement("file");
             workspace.appendChild(file);
             file.setAttribute("name", textWindow.getFilename() + textWindow.getAddress());
             file.setAttribute("y", Integer.toString(textWindow.getY()));
         }
-        synchronized (initialFiles) {
-            for (Evergreen.InitialFile initialFile : initialFiles) {
-                org.w3c.dom.Element file = document.createElement("file");
-                workspace.appendChild(file);
-                file.setAttribute("name", initialFile.filename);
-                file.setAttribute("y", Integer.toString(initialFile.y));
-            }
+        // Remember any files that would have been shown, had this workspace ever been shown.
+        for (Evergreen.InitialFile initialFile : initialFiles) {
+            org.w3c.dom.Element file = document.createElement("file");
+            workspace.appendChild(file);
+            file.setAttribute("name", initialFile.filename);
+            file.setAttribute("y", Integer.toString(initialFile.y));
         }
     }
     
