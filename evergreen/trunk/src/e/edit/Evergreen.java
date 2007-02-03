@@ -812,7 +812,6 @@ public class Evergreen {
             public void stateChanged(final ChangeEvent e) {
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
-                        System.err.println(e);
                         getCurrentWorkspace().openRememberedFiles();
                     }
                 });
