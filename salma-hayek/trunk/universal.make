@@ -633,10 +633,12 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 
 # Later we add more dependencies when we know $(ALL_PER_DIRECTORY_TARGETS).
 %/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
+	mkdir -p $(@D) && \
 	{ find classes -type f -print; $(MAKE_INSTALLER_FILE_LIST); } | $(FILE_LIST_TO_WXI) $(if $(filter %.msi,$(INSTALLER.wix)),--diskId) > $@
 
 # This silliness is probably sufficient (as well as sadly necessary).
 %/component-references.wxi: %/component-definitions.wxi $(MAKEFILE_LIST)
+	mkdir -p $(@D) && \
 	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@
 
 %.wixobj: %.wxs .generated/build-revision.txt $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
