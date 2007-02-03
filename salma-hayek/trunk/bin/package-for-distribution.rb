@@ -94,11 +94,18 @@ salma_hayek = ARGV.shift()
 
 require "#{salma_hayek}/bin/target-os.rb"
 
-if target_os() != "Linux" && target_os() != "Darwin"
-    die("#{$0}: this script will only work on Linux or Mac OS X; you're running on '#{target_os()}'.")
+native_name_for_bundle = nil
+if target_os() == "Darwin"
+    native_name_for_bundle = ".app bundle"
+elsif target_os() == "Linux"
+    native_name_for_bundle = "Debian file system tree"
+elsif target_os() == "Cygwin"
+    native_name_for_bundle = "installation tree"
+else
+    die("#{$0}: this script isn't designed to work on '#{target_os()}'.")
 end
 
-puts("Building #{target_os() == 'Darwin' ? '.app bundle' : 'Debian file system tree'} for #{human_project_name}...")
+puts("Building #{native_name_for_bundle} for #{human_project_name}...")
 $stdout.flush()
 
 # Make a temporary directory to work in.
@@ -109,12 +116,14 @@ FileUtils.mkdir_p(tmp_dir)
 if target_os() == "Linux"
     app_dir = "#{tmp_dir}/usr/share/software.jessies.org/#{machine_project_name}"
     FileUtils.mkdir_p(app_dir)
-else
+elsif target_os() == "Darwin"
     # Make a skeleton .app bundle.
     app_dir = "#{tmp_dir}/#{human_project_name}.app/Contents"
     FileUtils.mkdir_p("#{app_dir}/MacOS")
     system("echo -n 'APPL????' > #{app_dir}/PkgInfo")
     make_info_plist(app_dir, machine_project_name, human_project_name)
+elsif target_os() == "Cygwin"
+    app_dir = "#{tmp_dir}"
 end
 resources_dir = "#{app_dir}/Resources"
 FileUtils.mkdir_p(resources_dir)
@@ -175,7 +184,7 @@ if target_os() == "Darwin"
     maybe_copy_file("COPYING", "#{doc_root}/COPYING.txt")
     maybe_copy_file("README", "#{doc_root}/README.txt")
     maybe_copy_file("TODO", "#{doc_root}/TODO.txt")
-else
+elsif target_os() == "Linux"
     # Create and check the validity of our package name.
     debian_package_name = "org.jessies." + machine_project_name
     if debian_package_name !~ /^[a-z][a-z0-9+.-]+$/
