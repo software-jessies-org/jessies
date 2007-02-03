@@ -24,8 +24,7 @@ public class EColumn extends JSplitPane {
     private TextsPanel bottomPanel = new TextsPanel();
     
     /**
-     * Creates a new empty column. We use a null LayoutManager, because
-     * we're going to do the layout ourselves.
+     * Creates a new empty column.
      */
     public EColumn() {
         super(JSplitPane.VERTICAL_SPLIT, true);
@@ -45,30 +44,12 @@ public class EColumn extends JSplitPane {
     
     public void addComponent(EWindow c, int y) {
         bottomPanel.addComponent(c, y);
-        updateTabForWorkspace();
+        getWorkspace().updateTabForWorkspace();
     }
     
     public void removeComponent(EWindow c, boolean mustReassignFocus) {
         bottomPanel.removeComponent(c, mustReassignFocus);
-        updateTabForWorkspace();
-    }
-    
-    /**
-     * Updates the title of the tab in the JTabbedPane that corresponds to the Workspace that this
-     * EColumn represents (if you can follow that). Invoked when the column has a component added
-     * or removed.
-     */
-    public void updateTabForWorkspace() {
-        Workspace workspace = getWorkspace();
-        JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
-        if (workspace != null && tabbedPane != null) {
-            String title = workspace.getTitle();
-            int windowCount = getTextWindows().length;
-            if (windowCount > 0) {
-                title += " (" + windowCount + ")";
-            }
-            tabbedPane.setTitleAt(tabbedPane.indexOfComponent(workspace), title);
-        }
+        getWorkspace().updateTabForWorkspace();
     }
     
     private Workspace getWorkspace() {
@@ -109,6 +90,7 @@ public class EColumn extends JSplitPane {
     
     private class TextsPanel extends JPanel {
         private TextsPanel() {
+            // We use a null LayoutManager, because we're going to do the layout ourselves.
             setLayout(null);
             addListeners();
         }
@@ -194,10 +176,11 @@ public class EColumn extends JSplitPane {
                     addComponentHeuristically(c);
                 } else {
                     add(c);
+                    c.setBounds(0, y, getWidth(), getHeight() - y);
                     moveTo(c, y);
                 }
             } catch (StackOverflowError ex) {
-                Log.warn("the total height of the title bars is too large for the parent window", ex);
+                Log.warn("the total height of the title bars is too large for the parent window"); // Don't show the stack trace because it's *very* long, and uninformative.
             }
             addListenersTo(c);
         }
