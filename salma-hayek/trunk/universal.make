@@ -632,7 +632,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 # ----------------------------------------------------------------------------
 
 # Later we add more dependencies when we know $(ALL_PER_DIRECTORY_TARGETS).
-%/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI)
+%/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI) $(BUILD_TARGETS)
 	mkdir -p $(@D) && \
 	{ find classes -type f -print; $(MAKE_INSTALLER_FILE_LIST); } | $(FILE_LIST_TO_WXI) $(if $(filter %.msi,$(INSTALLER.wix)),--diskId) > $@
 
@@ -641,7 +641,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	mkdir -p $(@D) && \
 	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@
 
-%.wixobj: %.wxs .generated/build-revision.txt $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
+%.wixobj: %.wxs $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
 	@echo Compiling $(notdir $<)...
 	HUMAN_PROJECT_NAME=$(HUMAN_PROJECT_NAME) \
 	MACHINE_PROJECT_NAME=$(MACHINE_PROJECT_NAME) \
@@ -654,7 +654,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	VERSION_STRING=$(VERSION_STRING) \
 	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
 
-$(INSTALLER.wix): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj
+$(INSTALLER.wix): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj $(BUILD_TARGETS)
 	@echo Linking $(notdir $@)...
 	light -nologo -out $(call convertToNativeFilenames,$@ $<)
 
@@ -721,7 +721,7 @@ MAKE_INSTALLER_FILE_LIST = find $(wildcard doc bin lib) $(patsubst $(PROJECT_ROO
 # The installer uses find(1) to discover what to include - so it must be built last.
 # Depending on the PHONY build.java may cause the Java to be built more than
 # once unless make orders the jobs to avoid that.
-$(WIX_COMPILATION_DIRECTORY)/component-definitions.wxi: $(ALL_PER_DIRECTORY_TARGETS) build.java
+$(WIX_COMPILATION_DIRECTORY)/component-definitions.wxi: $(ALL_PER_DIRECTORY_TARGETS)
 
 # Presumably we need a similar dependency for non-WiX installers, which need the per-directory targets slightly later but still before the installer.
 $(MACHINE_PROJECT_NAME).app: $(ALL_PER_DIRECTORY_TARGETS)
