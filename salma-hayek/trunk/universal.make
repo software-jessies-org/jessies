@@ -438,9 +438,7 @@ FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
 
 WIX_COMPILATION_DIRECTORY = .generated/WiX
 
-INSTALLER.wix.$(MACHINE_PROJECT_NAME) = $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).msi
-INSTALLER.wix.salma-hayek = $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).msm
-INSTALLER.wix = $(INSTALLER.wix.$(MACHINE_PROJECT_NAME))
+INSTALLER.wix = $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).msi
 INSTALLERS.Cygwin += $(INSTALLER.wix)
 
 INSTALLER.dmg += $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).dmg
@@ -632,9 +630,9 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 # ----------------------------------------------------------------------------
 
 # Later we add more dependencies when we know $(ALL_PER_DIRECTORY_TARGETS).
-%/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI) $(BUILD_TARGETS)
+%/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI) $(MACHINE_PROJECT_NAME).app
 	mkdir -p $(@D) && \
-	{ find classes -type f -print; $(MAKE_INSTALLER_FILE_LIST); } | $(FILE_LIST_TO_WXI) $(if $(filter %.msi,$(INSTALLER.wix)),--diskId) > $@
+	( cd $(PACKAGING_DIRECTORY) && find . -type f -print ) | cut -c3- | $(FILE_LIST_TO_WXI) --diskId > $@
 
 # This silliness is probably sufficient (as well as sadly necessary).
 %/component-references.wxi: %/component-definitions.wxi $(MAKEFILE_LIST)
@@ -656,9 +654,9 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 
 $(INSTALLER.wix): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj $(BUILD_TARGETS)
 	@echo Linking $(notdir $@)...
-	light -nologo -out $(call convertToNativeFilenames,$@ $<)
+	cd $(PACKAGING_DIRECTORY) && light -nologo -out $(call convertToNativeFilenames,$(CURDIR)/$@ $(CURDIR)/$<)
 
-$(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/$(if $(filter %.msi,$(INSTALLER.wix)),installer,module).wxs
+$(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/installer.wxs
 	$(COPY_RULE)
 
 # ----------------------------------------------------------------------------
@@ -716,6 +714,7 @@ ALL_PER_DIRECTORY_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notd
 
 # ... and this depends on the above variable.
 # FIXME: we should move .jar files into a subdirectory of the project root. lib/ or lib/jars/, maybe.
+# FIXME: we shouldn't use find(1) to find files that we are naming explicitly - if they don't exist we'd want an error.
 MAKE_INSTALLER_FILE_LIST = find $(wildcard doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_PER_DIRECTORY_TARGETS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt $(COMPILED_TERMINFO) -name .svn -prune -o -type f -print
 
 # The installer uses find(1) to discover what to include - so it must be built last.
@@ -736,10 +735,7 @@ installer: $(INSTALLERS)
 .PHONY: native-dist
 native-dist: $(addprefix upload.,$(STANDALONE_INSTALLERS))
 
-# For WiX, we need the salma-hayek installer during the nightly build.
-native-dist: $(filter %.msm,$(INSTALLERS))
-
-# For non-WiX platforms, we still need the default salma-hayek build during the nightly build.
+# We still need the default salma-hayek build during the nightly build.
 native-dist: build
 
 .PHONY: upload.%
