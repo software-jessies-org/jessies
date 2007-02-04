@@ -26,6 +26,7 @@ $stdin.each() {
 numberOfDirectories = directoryPathToFileNames.length()
 puts("<Include>")
 directoryNumber = 0
+componentNumber = 0
 fileNumber = 0
 directoryPathToFileNames.each_pair() {
   |directoryPath, fileNames|
@@ -36,7 +37,8 @@ directoryPathToFileNames.each_pair() {
     directoryNumber += 1
   }
   guid = uuid()
-  puts("<Component Id='component#{directoryNumber}' Guid='#{guid}'>")
+  puts("<Component Id='component#{componentNumber}' Guid='#{guid}'>")
+  componentNumber += 1
   fileNames.each() {
     |fileName|
     filePathComponents = pathComponents + [fileName]
