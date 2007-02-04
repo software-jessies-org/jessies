@@ -92,6 +92,7 @@ human_project_name = ARGV.shift()
 machine_project_name = ARGV.shift()
 salma_hayek = ARGV.shift()
 
+require "#{salma_hayek}/bin/invoke-java.rb"
 require "#{salma_hayek}/bin/target-os.rb"
 
 native_name_for_bundle = nil
@@ -103,6 +104,17 @@ elsif target_os() == "Cygwin"
     native_name_for_bundle = "installation tree"
 else
     die("#{$0}: this script isn't designed to work on '#{target_os()}'.")
+end
+
+def spawnWithoutShell(argValues)
+    puts(argValues.join(" "))
+    $stdout.flush()
+    if Kernel.system(*argValues) == false
+        raise Exception.new("system() failed")
+    end
+    if $? != 0
+        raise Exception.new("exit status was #{$?}")
+    end
 end
 
 puts("Building #{native_name_for_bundle} for #{human_project_name}...")
@@ -153,9 +165,16 @@ copy_files_for_installation(salma_hayek, "#{resources_dir}/salma-hayek")
 # Generate a single JAR file containing both the project's unique classes and all the classes from the salma-hayek library.
 # Unscientific experiments suggest that uncompressed (-0) JAR files give us faster start-up times, and improving start-up time is why we're using a JAR file.
 # We have to do this in two stages to avoid a "java.util.zip.ZipException: duplicate entry:" error from jar(1) for cases where both trees share a package prefix.
-jar_filename = "#{project_resource_directory}/classes.jar"
-system("jar", "c0f", jar_filename, "-C", "classes/", ".")
-system("jar", "u0f", jar_filename, "-C", "#{salma_hayek}/classes/", ".")
+
+# Use an absolute path so we can chdir first.
+jar_filename = Pathname.new("#{project_resource_directory}").realpath() + "classes.jar"
+# Using chdir rather than jar -C saves converting more pathnames to JVM-compatible format.
+Dir.chdir("classes/") {
+    spawnWithoutShell(["jar", "c0f", convert_to_jvm_compatible_pathname(jar_filename), "."])
+}
+Dir.chdir("#{salma_hayek}/classes/") {
+    spawnWithoutShell(["jar", "u0f", convert_to_jvm_compatible_pathname(jar_filename), "."])
+}
 
 if target_os() == "Darwin"
     # Apple doesn't let you give a path to a .icns file, and doesn't seem to always follow symbolic links, so we have to copy it into position.
@@ -178,13 +197,15 @@ if target_os() == "Darwin"
         file.puts("\"$resources/salma-hayek/bin/ensure-suitable-mac-os-version.rb\" && exec \"$resources/#{machine_project_name}/bin/#{machine_project_name}\"")
     }
     system("chmod a+x #{script_name}")
-
+end
+if target_os() == "Darwin" || target_os() == "Cygwin"
     # Copy our documentation.
     doc_root = tmp_dir
     maybe_copy_file("COPYING", "#{doc_root}/COPYING.txt")
     maybe_copy_file("README", "#{doc_root}/README.txt")
     maybe_copy_file("TODO", "#{doc_root}/TODO.txt")
-elsif target_os() == "Linux"
+end
+if target_os() == "Linux"
     # Create and check the validity of our package name.
     debian_package_name = "org.jessies." + machine_project_name
     if debian_package_name !~ /^[a-z][a-z0-9+.-]+$/
