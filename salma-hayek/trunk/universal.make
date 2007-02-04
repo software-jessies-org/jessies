@@ -632,7 +632,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 # Later we add more dependencies when we know $(ALL_PER_DIRECTORY_TARGETS).
 %/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI) $(MACHINE_PROJECT_NAME).app
 	mkdir -p $(@D) && \
-	( cd $(PACKAGING_DIRECTORY) && find . -type f -print ) | cut -c3- | $(FILE_LIST_TO_WXI) --diskId > $@
+	( cd $(PACKAGING_DIRECTORY) && find . -type f -print ) | cut -c3- | $(FILE_LIST_TO_WXI) > $@
 
 # This silliness is probably sufficient (as well as sadly necessary).
 %/component-references.wxi: %/component-definitions.wxi $(MAKEFILE_LIST)
