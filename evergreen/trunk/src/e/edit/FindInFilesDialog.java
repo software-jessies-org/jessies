@@ -323,7 +323,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
         
         public void run() {
-            new TagReader(file, null, this);
+            new TagReader(file, null, null, this);
         }
         
         public void tagFound(TagReader.Tag tag) {

@@ -13,15 +13,17 @@ public class TagReader {
     private TagListener listener;
     private FileType fileType;
     private String digest;
-
-    public TagReader(File file, FileType fileType, TagListener tagListener) {
+    
+    public TagReader(File file, FileType fileType, String oldDigest, TagListener tagListener) {
         this.listener = tagListener;
         this.fileType = fileType;
         
         File tagsFile = null;
         try {
             tagsFile = createTagsFileFor(file);
-            readTagsFile(tagsFile);
+            if (oldDigest == null || oldDigest.equals(digest) == false) {
+                readTagsFile(tagsFile);
+            }
         } catch (Exception ex) {
             listener.taggingFailed(ex);
         } finally {
@@ -32,17 +34,24 @@ public class TagReader {
     }
     
     private File createTagsFileFor(File file) throws InterruptedException, IOException {
-        File tagsFile = File.createTempFile("e.util.TagReader-tags-", ".tags");
+        File tagsFile = File.createTempFile("e.edit.TagReader-tags-", ".tags");
         tagsFile.deleteOnExit();
-        Process p = Runtime.getRuntime().exec(new String[] {
+        
+        ArrayList<String> errors = new ArrayList<String>();
+        ProcessUtilities.backQuote(tagsFile.getParentFile(), new String[] {
             "ctags",
             "--c++-types=+p", "-n", "--fields=+am", "-u",
             "--regex-java=/(\\bstatic\\b)/\1/S/",
             "--regex-c++=/(\\bstatic\\b)/\1/S/",
             "-f", tagsFile.getAbsolutePath(),
             file.getAbsolutePath()
-        });
-        p.waitFor();
+        }, errors, errors);
+        // We're not actually expecting anything on stdout or stderr from ctags.
+        // All the more reason to output anything it has to say!
+        for (String error : errors) {
+            Log.warn("ctags: " + error);
+        }
+        
         digest = FileUtilities.md5(tagsFile);
         return tagsFile;
     }

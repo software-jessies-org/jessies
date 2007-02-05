@@ -275,23 +275,19 @@ public class TagsUpdater {
         
         public void scanTags() {
             try {
-                /*
-                 * It's important to use the same suffix as the original
-                 * file, because that's how ctags guesses the file's type,
-                 * and hence which parser to use.
-                 * Ctags writes the name of the file into its output, so use the
-                 * same file each time so that md5 hashes can be compared.
-                 */
+                // Ctags writes the name of the file into its output, so we need to use the same file each time so that md5 hashes can be compared.
                 if (temporaryFile == null) {
-                    temporaryFile = File.createTempFile("edit-", getFilenameSuffix());
+                    // It's important to use the same suffix as the original file, because that's how ctags guesses the file's type, and hence which parser to use.
+                    temporaryFile = File.createTempFile("e.edit.TagsUpdater-", getFilenameSuffix());
                     temporaryFile.deleteOnExit();
                 }
                 getTextArea().getTextBuffer().writeToFile(temporaryFile);
-                TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), this);
+                TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), tagsDigest, this);
                 String newDigest = tagReader.getTagsDigest();
-                tagsHaveChanged = (newDigest != null) && ! newDigest.equals(tagsDigest);
+                tagsHaveChanged = (newDigest != null) && (newDigest.equals(tagsDigest) == false);
                 tagsDigest = newDigest;
-                temporaryFile.delete();
+                // See the comment above for why we don't delete our temporary files, except on exit.
+                //temporaryFile.delete();
             } catch (Exception ex) {
                 Evergreen.getInstance().getTagsPanel().showError("Couldn't make tags: " + ex.getMessage());
                 Log.warn("Couldn't make tags", ex);
@@ -309,8 +305,8 @@ public class TagsUpdater {
                     setTreeModel(treeModel);
                 }
             }
-            long endTime = System.currentTimeMillis();
-            double duration = ((double) (endTime - startTime)) / 1000.0;
+            //long endTime = System.currentTimeMillis();
+            //double duration = ((double) (endTime - startTime)) / 1000.0;
             //Log.warn("Time taken reading tags: " + duration + "s");
         }
     }
