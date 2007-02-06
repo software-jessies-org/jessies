@@ -146,11 +146,18 @@ def copy_files_for_installation(src_root_directory, dst_root_directory)
     make = ENV["MAKE"]
     open("| #{make} --no-print-directory -C #{src_root_directory} -f ../salma-hayek/universal.make installer-file-list").each_line() {
         |line|
-        filename = line.chomp()
+        # Sometimes universal.make outputs the commands to generate local-variables.make.
+        if line.match(/^Including (.+)\.\.\.$/) == nil
+            puts(line)
+            $stdout.flush()
+            next
+        end
+        filename = $1
         src_pathname = src_root_pathname + filename
         dst_pathname = dst_root_pathname + filename
         dst_dirname = dst_pathname.dirname()
-        #puts("about to copy #{src_pathname} to #{dst_pathname}")
+        puts("about to copy #{src_pathname} to #{dst_pathname}")
+        $stdout.flush()
         FileUtils.mkdir_p(dst_dirname)
         FileUtils.cp(src_pathname, dst_pathname)
     }

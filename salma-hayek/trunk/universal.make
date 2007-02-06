@@ -713,9 +713,20 @@ $(takeProfileSample)
 ALL_PER_DIRECTORY_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
 
 # ... and this depends on the above variable.
+FILES_TO_INSTALL += $(ALL_PER_DIRECTORY_TARGETS)
+FILES_TO_INSTALL += .generated/build-revision.txt
+FILES_TO_INSTALL += $(COMPILED_TERMINFO)
+SUBDIRECTORIES_TO_INSTALL += bin
+SUBDIRECTORIES_TO_INSTALL += doc
+SUBDIRECTORIES_TO_INSTALL += lib
 # FIXME: we should move .jar files into a subdirectory of the project root. lib/ or lib/jars/, maybe.
-# FIXME: we shouldn't use find(1) to find files that we are naming explicitly - if they don't exist we'd want an error.
-MAKE_INSTALLER_FILE_LIST = find $(wildcard doc bin lib) $(patsubst $(PROJECT_ROOT)/%,%,$(ALL_PER_DIRECTORY_TARGETS) $(filter $(PROJECT_ROOT)/%.jar,$(CLASS_PATH))) .generated/build-revision.txt $(COMPILED_TERMINFO) -name .svn -prune -o -type f -print
+SUBDIRECTORIES_TO_INSTALL += *.jar
+define MAKE_INSTALLER_FILE_LIST
+  { \
+    $(foreach file,$(FILES_TO_INSTALL),echo $(file) &&) \
+    find $(wildcard $(SUBDIRECTORIES_TO_INSTALL)) -name .svn -prune -o -type f -print; \
+  } | ruby -ne 'chomp!(); puts("Including #{$$_}...")'
+endef
 
 # The installer uses find(1) to discover what to include - so it must be built last.
 # Depending on the PHONY build.java may cause the Java to be built more than
