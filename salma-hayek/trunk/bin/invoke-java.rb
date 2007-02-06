@@ -217,10 +217,7 @@ class Java
     jars.merge(Dir.glob("#{@salma_hayek}/lib/jars/*.jar"))
     jars.merge(Dir.glob("#{@project_root}/lib/jars/*.jar"))
     
-    if target_os() == "Darwin"
-      # On Mac OS, we have the real com.apple classes, so we don't want the stubs.
-      jars = jars - "#{@salma_hayek}/lib/jars/AppleJavaExtensions.jar"
-    else
+    if target_os() != "Darwin"
       # It's sometimes useful to have classes from "tools.jar".
       # It doesn't exist on Mac OS X but the classes are on the boot class path anyway.
       # On Win32 it's likely that users don't have a JDK on their path, in
