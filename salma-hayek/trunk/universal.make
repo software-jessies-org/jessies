@@ -384,8 +384,8 @@ endif
 # and so lose this duplication.
 # ----------------------------------------------------------------------------
 CLASS_PATH += $(SALMA_HAYEK)/classes
-CLASS_PATH += $(SALMA_HAYEK)/AppleJavaExtensions.jar
-CLASS_PATH += $(SALMA_HAYEK)/swing-worker.jar
+CLASS_PATH += $(wildcard $(SALMA_HAYEK)/lib/jars/*.jar)
+CLASS_PATH += $(wildcard $(PROJECT_ROOT)/lib/jars/*.jar)
 
 # "tools.jar" doesn't exist on Mac OS (the classes are automatically available).
 # Java 6 will do likewise for the other platforms, at which point this can be removed.
@@ -719,8 +719,6 @@ FILES_TO_INSTALL += $(COMPILED_TERMINFO)
 SUBDIRECTORIES_TO_INSTALL += bin
 SUBDIRECTORIES_TO_INSTALL += doc
 SUBDIRECTORIES_TO_INSTALL += lib
-# FIXME: we should move .jar files into a subdirectory of the project root. lib/ or lib/jars/, maybe.
-SUBDIRECTORIES_TO_INSTALL += *.jar
 define MAKE_INSTALLER_FILE_LIST
   { \
     $(foreach file,$(FILES_TO_INSTALL),echo $(file) &&) \
