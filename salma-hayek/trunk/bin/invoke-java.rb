@@ -1,6 +1,7 @@
 #!/usr/bin/ruby -w
 
 require "pathname.rb"
+require "set.rb"
 
 # Takes a POSIX pathname and turns it into a Win32 pathname if we're on Win32.
 # Returns the original pathname on any other OS.
@@ -211,28 +212,30 @@ class Java
     # Users need the classes.jar, but developers need the two directories.
     # This speeds things up for the users at the expense to the developers of the time it takes the JVM to check for the non-existent classes.jar, which shouldn't be a problem.
     @class_path = [ "#{@project_root}/classes.jar", "#{@project_root}/classes", "#{@salma_hayek}/classes" ]
-
-    if target_os() != "Darwin"
-      @class_path << "#{@salma_hayek}/AppleJavaExtensions.jar"
-
-      # "tools.jar" doesn't exist on Mac OS X but the classes are on the boot
-      # class path anyway.
-      # There's a bug against Java 6 to add these classes to its boot class
-      # path too.
+    
+    jars = Set.new()
+    jars.merge(Dir.glob("#{@salma_hayek}/lib/jars/*.jar"))
+    jars.merge(Dir.glob("#{@project_root}/lib/jars/*.jar"))
+    
+    if target_os() == "Darwin"
+      # On Mac OS, we have the real com.apple classes, so we don't want the stubs.
+      jars = jars - "#{@salma_hayek}/lib/jars/AppleJavaExtensions.jar"
+    else
+      # It's sometimes useful to have classes from "tools.jar".
+      # It doesn't exist on Mac OS X but the classes are on the boot class path anyway.
       # On Win32 it's likely that users don't have a JDK on their path, in
       # which case they probably aren't interested in running anything that
       # wouldn't work without "tools.jar", so we cope with not having found
       # a JDK.
       if @jdk_root != nil
         tools_jar = "#{@jdk_root}/lib/tools.jar"
-        if Pathname.new(tools_jar).exist?
+        if Pathname.new(tools_jar).exist?()
           @class_path << tools_jar
         end
       end
     end
-
-    # Until Java 6, we need the back-ported SwingWorker.
-    @class_path << "#{@salma_hayek}/swing-worker.jar"
+    
+    @class_path.concat(jars.to_a())
   end
   
   def getExtraPathComponents()
