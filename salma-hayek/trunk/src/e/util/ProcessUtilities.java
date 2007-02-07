@@ -186,7 +186,6 @@ public class ProcessUtilities {
         result.add("--login");
         result.add("-c");
         result.add(command);
-        System.err.println(StringUtilities.join(result, " "));
         return result.toArray(new String[result.size()]);
     }
     
