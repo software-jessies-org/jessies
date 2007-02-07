@@ -18,6 +18,9 @@ def convert_to_jvm_compatible_pathname(pathname)
   path_list_buf_size = Win32API.new("cygwin1.dll", "cygwin_posix_to_win32_path_list_buf_size", [ 'p' ], 'i')
   to_win32_path = Win32API.new("cygwin1.dll", "cygwin_conv_to_full_win32_path", [ 'p', 'p' ], 'v')
   
+  # Create a mutable copy, which seems to be required by the DLL calls.
+  pathname = pathname.dup()
+  
   # Create a large enough buffer for the conversion.
   buf_size = path_list_buf_size.Call(pathname)
   buf = "\0" * buf_size
