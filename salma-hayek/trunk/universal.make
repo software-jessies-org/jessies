@@ -653,8 +653,9 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
 
 $(INSTALLER.wix): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj $(BUILD_TARGETS)
-	@echo Linking $(notdir $@)...
-	cd $(PACKAGING_DIRECTORY) && light -nologo -out $(call convertToNativeFilenames,$(CURDIR)/$@ $(CURDIR)/$<)
+	@echo Creating Windows installer...
+	cd $(PACKAGING_DIRECTORY) && \
+	light -nologo -out $(call convertToNativeFilenames,$(CURDIR)/$@ $(CURDIR)/$<)
 
 $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/installer.wxs
 	$(COPY_RULE)
@@ -773,6 +774,18 @@ remove: $(addprefix run-remover,$(suffix $(STANDALONE_INSTALLERS)))
 run-installer:;
 .PHONY: run-remover
 run-remover:;
+
+.PHONY: run-installer.deb
+run-installer.deb:
+	sudo dpkg -i $(INSTALLER.deb)
+
+.PHONY: run-installer.rpm
+run-installer.rpm:
+	@echo Installing the .rpm might be possible with sudo rpm -i $(INSTALLER.rpm) but that would be a bad idea on a Debian box...
+
+.PHONY: run-installer.dmg
+run-installer.dmg:
+	@echo Installing the .dmg involves copying $(INSTALLER.dmg) somewhere...
 
 # If we make this target dependent on $(STANDALONE_INSTALLERS), it keeps
 # rebuilding it, which takes ages.
