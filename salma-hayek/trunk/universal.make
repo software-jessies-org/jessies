@@ -785,7 +785,7 @@ run-installer.rpm:
 
 .PHONY: run-installer.dmg
 run-installer.dmg:
-	@echo Installing the .dmg involves copying $(INSTALLER.dmg) somewhere...
+	open -a DiskImageMounter $(INSTALLER.dmg)
 
 # If we make this target dependent on $(STANDALONE_INSTALLERS), it keeps
 # rebuilding it, which takes ages.
