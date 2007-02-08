@@ -17,7 +17,7 @@ public class AboutBox {
     
     private ImageIcon icon;
     private String applicationName;
-    private String contactAddress;
+    private String webSiteAddress;
     private ArrayList<String> versionLines = new ArrayList<String>();
     private ArrayList<String> copyrightLines = new ArrayList<String>();
     
@@ -38,8 +38,8 @@ public class AboutBox {
         this.applicationName = applicationName;
     }
     
-    public void setContactAddress(String contactAddress) {
-        this.contactAddress = contactAddress;
+    public void setWebSiteAddress(String webSiteAddress) {
+        this.webSiteAddress = webSiteAddress;
     }
     
     public boolean isConfigured() {
@@ -123,6 +123,8 @@ public class AboutBox {
             copyrightFont = gnomeBaseFont.deriveFont(baseSize * PANGO_SCALE_SMALL);
         }
         
+        Font linkFont = versionFont;
+        
         int bottomBorder = 20;
         if (GuiUtilities.isGtk()) {
             bottomBorder = 12;
@@ -134,20 +136,18 @@ public class AboutBox {
         
         Dimension spacerSize = new Dimension(1, 8);
         
+        // The application icon comes first...
         if (icon != null) {
             addLabel(panel, new JLabel(icon));
             panel.add(Box.createRigidArea(spacerSize));
             panel.add(Box.createRigidArea(spacerSize));
         }
         
+        // Then the application name...
         addLabel(panel, applicationNameFont, applicationName);
         panel.add(Box.createRigidArea(spacerSize));
         
-        if (contactAddress != null) {
-            addLabel(panel, new JHyperlinkButton(contactAddress, "mailto:" + contactAddress));
-            panel.add(Box.createRigidArea(spacerSize));
-        }
-        
+        // Then version information...
         for (String version : versionLines) {
             addLabel(panel, versionFont, version);
         }
@@ -155,10 +155,18 @@ public class AboutBox {
             panel.add(Box.createRigidArea(spacerSize));
         }
         
+        // Then copyright information...
         for (String copyright : copyrightLines) {
             addLabel(panel, copyrightFont, copyright);
         }
         
+        // Then any hyperlink...
+        if (webSiteAddress != null) {
+            panel.add(Box.createRigidArea(spacerSize));
+            addLabel(panel, new JHyperlinkButton(webSiteAddress, webSiteAddress));
+        }
+        
+        // And finally, for the GTK LAF, buttons...
         if (GuiUtilities.isGtk()) {
             JButton closeButton = new JButton("Close");
             GnomeStockIcon.useStockIcon(closeButton, "gtk-close");
@@ -284,7 +292,8 @@ public class AboutBox {
     public static void main(String[] args) {
         GuiUtilities.initLookAndFeel();
         AboutBox aboutBox = AboutBox.getSharedInstance();
-        aboutBox.setApplicationName("Demonstration");
+        aboutBox.setApplicationName("AboutBox");
+        aboutBox.setWebSiteAddress("http://software.jessies.org/");
         aboutBox.addCopyright("Copyright (C) 2006, Elliott Hughes");
         aboutBox.show();
     }

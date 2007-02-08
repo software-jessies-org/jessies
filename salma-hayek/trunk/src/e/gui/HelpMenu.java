@@ -10,15 +10,10 @@ import javax.swing.*;
  */
 public class HelpMenu {
     private String applicationName;
-    private String websiteUrl;
     private String changeLogUrl;
     
     public HelpMenu(String applicationName) {
         this.applicationName = applicationName;
-    }
-    
-    public void setWebsite(String url) {
-        this.websiteUrl = url;
     }
     
     public void setChangeLog(String url) {
@@ -38,11 +33,6 @@ public class HelpMenu {
             menu.addSeparator();
         }
         
-        if (websiteUrl != null) {
-            WebLinkAction helpAction = new WebLinkAction("Go To " + applicationName + " Website", websiteUrl);
-            GnomeStockIcon.useStockIcon(helpAction, "gtk-help");
-            menu.add(helpAction);
-        }
         if (changeLogUrl != null) {
             menu.add(new WebLinkAction("View " + applicationName + " Change Log", changeLogUrl));
         }
