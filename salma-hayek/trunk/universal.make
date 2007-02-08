@@ -438,30 +438,33 @@ FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
 
 WIX_COMPILATION_DIRECTORY = .generated/WiX
 
-INSTALLER.msi = $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).msi
+makeInstallerName.msi = $(MACHINE_PROJECT_NAME)-$(1).msi
+INSTALLER.msi += $(BIN_DIRECTORY)/$(call makeInstallerName.msi,$(VERSION_STRING))
 INSTALLERS.Cygwin += $(INSTALLER.msi)
 
-INSTALLER.dmg += $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).dmg
+makeInstallerName.dmg = $(MACHINE_PROJECT_NAME)-$(1).dmg
+INSTALLER.dmg += $(BIN_DIRECTORY)/$(call makeInstallerName.dmg,$(VERSION_STRING))
 INSTALLERS.Darwin += $(INSTALLER.dmg)
 
 # Create different .deb filenames for different target architectures so they can coexist.
-makeLinuxInstallerName.deb = org.jessies.$(MACHINE_PROJECT_NAME)_$(1)_$(TARGET_ARCHITECTURE).deb
-INSTALLER.deb += $(BIN_DIRECTORY)/$(call makeLinuxInstallerName.deb,$(VERSION_STRING))
+makeInstallerName.deb = org.jessies.$(MACHINE_PROJECT_NAME)_$(1)_$(TARGET_ARCHITECTURE).deb
+INSTALLER.deb += $(BIN_DIRECTORY)/$(call makeInstallerName.deb,$(VERSION_STRING))
 INSTALLERS.Linux += $(INSTALLER.deb)
 
 # alien festoons the name with suffixes (and, as always, we have to let make know what it's going to generate).
 # I looked at the source and it just has a big switch to select the output architecture.
 # In particular, it doesn't do anything clever with the output of rpm --showrc.
-makeLinuxInstallerName.rpm = org.jessies.$(MACHINE_PROJECT_NAME)-$(1)-2.$(patsubst amd64,x86_64,$(TARGET_ARCHITECTURE)).rpm
-INSTALLER.rpm += $(BIN_DIRECTORY)/$(call makeLinuxInstallerName.rpm,$(VERSION_STRING))
+makeInstallerName.rpm = org.jessies.$(MACHINE_PROJECT_NAME)-$(1)-2.$(patsubst amd64,x86_64,$(TARGET_ARCHITECTURE)).rpm
+INSTALLER.rpm += $(BIN_DIRECTORY)/$(call makeInstallerName.rpm,$(VERSION_STRING))
 INSTALLERS.Linux += $(INSTALLER.rpm)
 
 # When $< is "org.jessies.evergreen-4.31.1934-2.x86_64.rpm", we want "org.jessies.evergreen.x86_64.rpm".
 # When $< is "org.jessies.evergreen_4.31.1934_amd64.deb", we want "org.jessies.evergreen.amd64.deb".
+# When $< is "evergreen-4.31.1934.msi", we want "evergreen.msi".
 # I wonder if we shouldn't say "latest" somewhere in the name.
 # It would be easy to do that were it not for the odd "-2" part that alien adds to the name.
 # When I upload, perhaps I should get rid of that.
-LATEST_LINUX_INSTALLER_LINK = $(subst --2.,.,$(subst __,.,$(call makeLinuxInstallerName$(suffix $<),)))
+LATEST_INSTALLER_LINK = $(subst --2.,.,$(subst __,.,$(subst -.,.,$(call makeInstallerName$(suffix $<),))))
 
 INSTALLERS = $(INSTALLERS.$(TARGET_OS))
 
@@ -756,13 +759,13 @@ $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 
 # I like the idea of keeping several versions on the server but we're going to have a hard time
 # linking to the one we expect people to use unless we create a symlink.
-$(addprefix upload.,$(INSTALLERS.Linux)): upload.%: symlink-latest.%
+$(addprefix upload.,$(INSTALLERS)): upload.%: symlink-latest.%
 .PHONY: symlink-latest.%
-$(addprefix symlink-latest.,$(INSTALLERS.Linux)): symlink-latest.%: %
+$(addprefix symlink-latest.,$(INSTALLERS)): symlink-latest.%: %
 	echo Symlinking the latest $(notdir $*)...
-	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_LINUX_INSTALLER_LINK) '&&' \
-	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_LINUX_INSTALLER_LINK) '&&' \
-	find $(DIST_DIRECTORY) -name '"$(call makeLinuxInstallerName$(suffix $<),*)"' -mtime +7 '|' xargs $(RM)
+	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
+	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
+	find $(DIST_DIRECTORY) -name '"$(call makeInstallerName$(suffix $<),*)"' -mtime +7 '|' xargs $(RM)
 
 .PHONY: install
 install: $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS)))
