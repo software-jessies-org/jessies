@@ -438,8 +438,8 @@ FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
 
 WIX_COMPILATION_DIRECTORY = .generated/WiX
 
-INSTALLER.wix = $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).msi
-INSTALLERS.Cygwin += $(INSTALLER.wix)
+INSTALLER.msi = $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).msi
+INSTALLERS.Cygwin += $(INSTALLER.msi)
 
 INSTALLER.dmg += $(BIN_DIRECTORY)/$(MACHINE_PROJECT_NAME).dmg
 INSTALLERS.Darwin += $(INSTALLER.dmg)
@@ -652,7 +652,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	VERSION_STRING=$(VERSION_STRING) \
 	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
 
-$(INSTALLER.wix): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj $(BUILD_TARGETS)
+$(INSTALLER.msi): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj $(BUILD_TARGETS)
 	@echo Creating Windows installer...
 	cd $(PACKAGING_DIRECTORY) && \
 	light -nologo -out $(call convertToNativeFilenames,$(CURDIR)/$@ $(CURDIR)/$<)
