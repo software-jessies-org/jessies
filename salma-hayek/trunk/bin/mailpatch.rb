@@ -12,7 +12,7 @@ if from_address == ""
   from_address = `whoami`.chomp()
 end
 to_address = from_address
-reply_to_address = to_address # Use "nil" to reply to author.
+reply_to_address = nil
 subject = "patch"
 preamble = ""
 changes = ARGF.readlines()
