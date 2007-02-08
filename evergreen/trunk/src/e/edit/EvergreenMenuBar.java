@@ -216,7 +216,6 @@ public class EvergreenMenuBar extends EMenuBar {
     
     private JMenu makeHelpMenu() {
         HelpMenu helpMenu = new HelpMenu("Evergreen");
-        helpMenu.setWebsite("http://software.jessies.org/Evergreen/");
         helpMenu.setChangeLog("http://software.jessies.org/Evergreen/ChangeLog.html");
         return helpMenu.makeJMenu();
     }
