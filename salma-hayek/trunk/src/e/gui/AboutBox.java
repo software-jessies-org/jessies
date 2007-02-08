@@ -109,10 +109,11 @@ public class AboutBox {
         Font applicationNameFont = new Font("Lucida Grande", Font.BOLD, 14);
         Font versionFont = new Font("Lucida Grande", Font.PLAIN, 10);
         Font copyrightFont = new Font("Lucida Grande", Font.PLAIN, 10);
+        Font linkFont = versionFont;
         
         if (GuiUtilities.isWindows()) {
             // I don't think this is quite the right font, but it seems to be as close as we can get with the Win32 LAF.
-            applicationNameFont = versionFont = copyrightFont = UIManager.getFont("MenuItem.font");
+            applicationNameFont = versionFont = copyrightFont = linkFont = UIManager.getFont("MenuItem.font");
         } else if (GuiUtilities.isGtk()) {
             final float PANGO_SCALE_SMALL = (1.0f / 1.2f);
             final float PANGO_SCALE_XX_LARGE = (1.2f * 1.2f * 1.2f);
@@ -121,9 +122,8 @@ public class AboutBox {
             applicationNameFont = gnomeBaseFont.deriveFont(baseSize * PANGO_SCALE_XX_LARGE).deriveFont(Font.BOLD);
             versionFont = gnomeBaseFont.deriveFont(baseSize * PANGO_SCALE_SMALL);
             copyrightFont = gnomeBaseFont.deriveFont(baseSize * PANGO_SCALE_SMALL);
+            linkFont = gnomeBaseFont;
         }
-        
-        Font linkFont = versionFont;
         
         int bottomBorder = 20;
         if (GuiUtilities.isGtk()) {
@@ -163,7 +163,7 @@ public class AboutBox {
         // Then any hyperlink...
         if (webSiteAddress != null) {
             panel.add(Box.createRigidArea(spacerSize));
-            addLabel(panel, new JHyperlinkButton(webSiteAddress, webSiteAddress));
+            addLabel(panel, new JHyperlinkButton(webSiteAddress, webSiteAddress, linkFont));
         }
         
         // And finally, for the GTK LAF, buttons...
