@@ -42,6 +42,7 @@ SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTOR
 # make does special things when running commands including the magic string $(MAKE),
 # including clearing -n from $(MAKEFLAGS), so we snarf it here.
 DRY_RUNNING := $(filter n,$(MAKEFLAGS))
+SHOULD_FILTER_OUTPUT = $(strip $(filter echo.%,$(MAKECMDGOALS)) $(DRY_RUNNING))
 
 # This mad dance seems to be necessary to allow any target to recurse without listing them all here
 # (bear in mind that you can ask to build a bunch of .o files if you like)
@@ -57,4 +58,4 @@ default: recurse
 # We just don't want to be running make here but that's what everyone expects to type.
 .PHONY: recurse
 recurse:
-	$(if $(DRY_RUNNING),,@)$(MAKE) $(if $(DRY_RUNNING),-n) $(MAKECMDGOALS) -f $(SALMA_HAYEK)/universal.make $(if $(DRY_RUNNING),,2>&1 | ruby $(SALMA_HAYEK)/bin/filter-build-output.rb)
+	$(if $(DRY_RUNNING),,@)$(MAKE) $(if $(DRY_RUNNING),-n) $(MAKECMDGOALS) -f $(SALMA_HAYEK)/universal.make $(if $(SHOULD_FILTER_OUTPUT),,2>&1 | ruby $(SALMA_HAYEK)/bin/filter-build-output.rb)
