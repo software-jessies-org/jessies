@@ -767,13 +767,10 @@ $(addprefix symlink-latest.,$(INSTALLERS.Linux)): symlink-latest.%: %
 .PHONY: install
 install: $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS)))
 
+$(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS))): $(STANDALONE_INSTALLERS)
+
 .PHONY: remove
 remove: $(addprefix run-remover,$(suffix $(STANDALONE_INSTALLERS)))
-
-.PHONY: run-installer
-run-installer:;
-.PHONY: run-remover
-run-remover:;
 
 .PHONY: run-installer.deb
 run-installer.deb:
@@ -787,8 +784,6 @@ run-installer.rpm:
 run-installer.dmg:
 	open -a DiskImageMounter $(INSTALLER.dmg)
 
-# If we make this target dependent on $(STANDALONE_INSTALLERS), it keeps
-# rebuilding it, which takes ages.
 .PHONY: run-installer.msi
 run-installer.msi:
 	msiexec /i $(NATIVE_NAME_FOR_INSTALLERS)
