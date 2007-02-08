@@ -17,13 +17,12 @@ ENV["PATH"]="/usr/local/bin:/opt/csw/bin:/opt/SUNWspro/bin:/usr/bin:/usr/sfw/bin
 mail_domain="jessies.org" # Assumes all authors (and the to_address) share a domain.
 
 to_address="software@#{mail_domain}"
-reply_to_address=to_address # Use "nil" to reply to author.
+reply_to_address=nil
 
 svnlook="svnlook"
 
 if ENV["LOGNAME"] =~ /^(elliotth|martind)$/
   to_address=$1
-  reply_to_address=nil
 end
 
 # ------------------------------------------------------------------------
