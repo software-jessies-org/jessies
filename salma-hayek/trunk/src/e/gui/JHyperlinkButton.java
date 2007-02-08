@@ -13,12 +13,19 @@ public class JHyperlinkButton extends JPanel implements ActionListener {
     private String url;
     
     public JHyperlinkButton(String text, String targetUrl) {
+        this(text, targetUrl, null);
+    }
+    
+    public JHyperlinkButton(String text, String targetUrl, Font font) {
         // We're a panel with a FlowLayout rather than being a JButton directly.
         // This lets us be added to arbitrary layouts without expanding our active area past the width of our text.
         super(new FlowLayout());
         this.url = targetUrl;
         this.button = new JButton("<html><body><u>" + text + "</u>");
         configureButton();
+        if (font != null) {
+            button.setFont(font);
+        }
         add(button);
     }
     
