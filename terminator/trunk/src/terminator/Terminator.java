@@ -70,7 +70,7 @@ public class Terminator {
 	private void initAboutBox() {
 		AboutBox aboutBox = AboutBox.getSharedInstance();
 		aboutBox.setApplicationName("Terminator");
-		aboutBox.setContactAddress("software@jessies.org");
+		aboutBox.setWebSiteAddress("http://software.jessies.org/terminator/");
 		aboutBox.addCopyright("Copyright (C) 2004-2007 Free Software Foundation, Inc.");
 		aboutBox.addCopyright("All Rights Reserved.");
 	}
