@@ -80,8 +80,6 @@ public class ETable extends JTable {
             }
             
             // Mac OS' Aqua LAF never draws vertical grid lines, so we have to draw them ourselves.
-            // FIXME: as long as fixMacOsCellRendererBorder is disabled, this needs to be disabled too.
-            /*
             if (GuiUtilities.isMacOs() && getShowVerticalLines()) {
                 g.setColor(MAC_UNFOCUSED_UNSELECTED_VERTICAL_LINE_COLOR);
                 TableColumnModel columnModel = getColumnModel();
@@ -92,7 +90,6 @@ public class ETable extends JTable {
                     g.drawLine(x - 1, rowCount * rowHeight, x - 1, height);
                 }
             }
-            */
         }
     }
     
@@ -144,9 +141,7 @@ public class ETable extends JTable {
             
             if (getCellSelectionEnabled() == false && isEditing() == false) {
                 if (GuiUtilities.isMacOs()) {
-                    // Native Mac OS doesn't draw a border on the selected cell.
-                    // It does however draw a horizontal line under the whole row, and a vertical line separating each column.
-                    fixMacOsCellRendererBorder(jc, selected, focused);
+                    jc.setBorder(new AquaTableCellBorder(selected, focused, getShowVerticalLines()));
                 } else {
                     // FIXME: doesn't Windows have row-wide selection focus?
                     // Hide the cell focus.
@@ -161,33 +156,57 @@ public class ETable extends JTable {
         return c;
     }
     
-    private void fixMacOsCellRendererBorder(JComponent renderer, boolean selected, boolean focused) {
-        // FIXME: the Aqua LAF doesn't like having its borders change size. We probably need a custom border that keeps the 1, 1, 1, 1 insets but paints itself appropriately. For now, let's just disable this rather than suffer the rendering problems and wobbling of cells as you select them.
-        /*
-        Border border;
-        border = renderer.getBorder();
-        System.err.println(border.getBorderInsets(renderer));
+    /**
+     * Native Mac OS doesn't draw a border on the selected cell, but it does various things that we can emulate with a custom cell border.
+     */
+    private static class AquaTableCellBorder extends AbstractBorder {
+        private boolean selected;
+        private boolean focused;
+        private boolean verticalLines;
         
-        if (selected) {
-            border = BorderFactory.createMatteBorder(0, 0, 1, 0, focused ? MAC_FOCUSED_SELECTED_CELL_HORIZONTAL_LINE_COLOR : MAC_UNFOCUSED_SELECTED_CELL_HORIZONTAL_LINE_COLOR);
-        } else {
-            border = BorderFactory.createEmptyBorder(0, 0, 1, 0);
+        public AquaTableCellBorder(boolean selected, boolean focused, boolean verticalLines) {
+            this.selected = selected;
+            this.focused = focused;
+            this.verticalLines = verticalLines;
         }
         
-        // Mac OS' Aqua LAF never draws vertical grid lines, so we have to draw them ourselves.
-        if (getShowVerticalLines()) {
-            Color verticalLineColor;
-            if (focused) {
-                verticalLineColor = selected ? MAC_FOCUSED_SELECTED_VERTICAL_LINE_COLOR : MAC_FOCUSED_UNSELECTED_VERTICAL_LINE_COLOR;
-            } else {
-                verticalLineColor = selected ? MAC_UNFOCUSED_SELECTED_VERTICAL_LINE_COLOR : MAC_UNFOCUSED_UNSELECTED_VERTICAL_LINE_COLOR;
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            // Native tables draw a horizontal line under the whole selected row.
+            if (selected) {
+                g.setColor(focused ? MAC_FOCUSED_SELECTED_CELL_HORIZONTAL_LINE_COLOR : MAC_UNFOCUSED_SELECTED_CELL_HORIZONTAL_LINE_COLOR);
+                g.drawLine(x, y + height - 1, x + width, y + height - 1);
             }
-            Border verticalBorder = BorderFactory.createMatteBorder(0, 0, 0, 1, verticalLineColor);
-            border = BorderFactory.createCompoundBorder(border, verticalBorder);
+            
+            // Mac OS' Aqua LAF never draws vertical grid lines, so we have to draw them ourselves.
+            if (verticalLines) {
+                if (focused) {
+                    g.setColor(selected ? MAC_FOCUSED_SELECTED_VERTICAL_LINE_COLOR : MAC_FOCUSED_UNSELECTED_VERTICAL_LINE_COLOR);
+                } else {
+                    g.setColor(selected ? MAC_UNFOCUSED_SELECTED_VERTICAL_LINE_COLOR : MAC_UNFOCUSED_UNSELECTED_VERTICAL_LINE_COLOR);
+                }
+                g.drawLine(x + width - 1, y, x + width - 1, y + height);
+            }
         }
         
-        renderer.setBorder(border);
-        */
+        @Override
+        public Insets getBorderInsets(Component c) {
+            // Defer to getBorderInsets(Component c, Insets insets)...
+            Insets result = new Insets(0, 0, 0, 0);
+            return getBorderInsets(c, result);
+        }
+        
+        @Override
+        public Insets getBorderInsets(Component c, Insets insets) {
+            // FIXME: the whole reason this class exists is because Apple's LAF doesn't like insets other than these, so this might be fragile if they update the LAF.
+            insets.left = insets.top = insets.right = insets.bottom = 1;
+            return insets;
+        }
+        
+        @Override
+        public boolean isBorderOpaque() {
+            return true;
+        }
     }
     
     /**
