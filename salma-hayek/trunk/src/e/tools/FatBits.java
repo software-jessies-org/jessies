@@ -52,6 +52,9 @@ public class FatBits extends JFrame {
     }
     
     private JComponent makeUi() {
+        initAboutBox();
+        initMacOsEventHandlers();
+        
         initColorLabel();
         initKeepOnTopCheckBox();
         initPositionLabel();
@@ -64,6 +67,34 @@ public class FatBits extends JFrame {
         result.add(scaledImagePanel, BorderLayout.CENTER);
         result.add(makeInfoPanel(), BorderLayout.SOUTH);
         return result;
+    }
+    
+    private void initAboutBox() {
+        AboutBox aboutBox = AboutBox.getSharedInstance();
+        aboutBox.setApplicationName("FatBits");
+        aboutBox.setWebSiteAddress("http://software.jessies.org/salma-hayek/");
+        aboutBox.addCopyright("Copyright (C) 2005-2007 Free Software Foundation, Inc.");
+        aboutBox.addCopyright("All Rights Reserved.");
+    }
+    
+    private void initMacOsEventHandlers() {
+        if (GuiUtilities.isMacOs() == false) {
+            return;
+        }
+        
+        Application.getApplication().setEnabledPreferencesMenu(true);
+        Application.getApplication().addApplicationListener(new ApplicationAdapter() {
+            @Override
+            public void handlePreferences(ApplicationEvent e) {
+                showPreferencesDialog();
+                e.setHandled(true);
+            }
+            
+            @Override
+            public void handleQuit(ApplicationEvent e) {
+                e.setHandled(true);
+            }
+        });
     }
     
     private JPanel makeInfoPanel() {
@@ -337,6 +368,7 @@ public class FatBits extends JFrame {
             }
             add(makeEditMenu());
             add(makeImageMenu());
+            add(makeHelpMenu());
         }
         
         private JMenu makeFileMenu() {
@@ -348,17 +380,7 @@ public class FatBits extends JFrame {
         private JMenu makeEditMenu() {
             JMenu menu = new JMenu("Edit");
             menu.add(new CopyImageAction());
-            
-            if (GuiUtilities.isMacOs()) {
-                Application.getApplication().setEnabledPreferencesMenu(true);
-                Application.getApplication().addApplicationListener(new ApplicationAdapter() {
-                    @Override
-                    public void handlePreferences(ApplicationEvent e) {
-                        showPreferencesDialog();
-                        e.setHandled(true);
-                    }
-                });
-            } else {
+            if (GuiUtilities.isMacOs() == false) {
                 menu.add(new PreferencesAction());
             }
             return menu;
@@ -373,6 +395,11 @@ public class FatBits extends JFrame {
             menu.add(new JSeparator());
             menu.add(new JCheckBoxMenuItem(new LockImageAction()));
             return menu;
+        }
+        
+        private JMenu makeHelpMenu() {
+            HelpMenu helpMenu = new HelpMenu("FatBits");
+            return helpMenu.makeJMenu();
         }
     }
     
