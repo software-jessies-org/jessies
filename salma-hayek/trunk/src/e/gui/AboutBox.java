@@ -93,6 +93,7 @@ public class AboutBox {
     public void show() {
         JDialog dialog = new JDialog(findSuitableOwner());
         makeUi(dialog);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
     }
     
