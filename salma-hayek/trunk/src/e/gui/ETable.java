@@ -80,6 +80,8 @@ public class ETable extends JTable {
             }
             
             // Mac OS' Aqua LAF never draws vertical grid lines, so we have to draw them ourselves.
+            // FIXME: as long as fixMacOsCellRendererBorder is disabled, this needs to be disabled too.
+            /*
             if (GuiUtilities.isMacOs() && getShowVerticalLines()) {
                 g.setColor(MAC_UNFOCUSED_UNSELECTED_VERTICAL_LINE_COLOR);
                 TableColumnModel columnModel = getColumnModel();
@@ -90,6 +92,7 @@ public class ETable extends JTable {
                     g.drawLine(x - 1, rowCount * rowHeight, x - 1, height);
                 }
             }
+            */
         }
     }
     
@@ -159,7 +162,12 @@ public class ETable extends JTable {
     }
     
     private void fixMacOsCellRendererBorder(JComponent renderer, boolean selected, boolean focused) {
+        // FIXME: the Aqua LAF doesn't like having its borders change size. We probably need a custom border that keeps the 1, 1, 1, 1 insets but paints itself appropriately. For now, let's just disable this rather than suffer the rendering problems and wobbling of cells as you select them.
+        /*
         Border border;
+        border = renderer.getBorder();
+        System.err.println(border.getBorderInsets(renderer));
+        
         if (selected) {
             border = BorderFactory.createMatteBorder(0, 0, 1, 0, focused ? MAC_FOCUSED_SELECTED_CELL_HORIZONTAL_LINE_COLOR : MAC_UNFOCUSED_SELECTED_CELL_HORIZONTAL_LINE_COLOR);
         } else {
@@ -179,6 +187,7 @@ public class ETable extends JTable {
         }
         
         renderer.setBorder(border);
+        */
     }
     
     /**
