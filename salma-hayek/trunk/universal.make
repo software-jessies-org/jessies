@@ -439,24 +439,24 @@ FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
 WIX_COMPILATION_DIRECTORY = .generated/WiX
 
 makeInstallerName.msi = $(MACHINE_PROJECT_NAME)-$(1).msi
-INSTALLER.msi += $(BIN_DIRECTORY)/$(call makeInstallerName.msi,$(VERSION_STRING))
-INSTALLERS.Cygwin += $(INSTALLER.msi)
+INSTALLER_EXTENSIONS += msi
+INSTALLER_EXTENSIONS.Cygwin += msi
 
 makeInstallerName.dmg = $(MACHINE_PROJECT_NAME)-$(1).dmg
-INSTALLER.dmg += $(BIN_DIRECTORY)/$(call makeInstallerName.dmg,$(VERSION_STRING))
-INSTALLERS.Darwin += $(INSTALLER.dmg)
+INSTALLER_EXTENSIONS += dmg
+INSTALLER_EXTENSIONS.Darwin += dmg
 
 # Create different .deb filenames for different target architectures so they can coexist.
 makeInstallerName.deb = org.jessies.$(MACHINE_PROJECT_NAME)_$(1)_$(TARGET_ARCHITECTURE).deb
-INSTALLER.deb += $(BIN_DIRECTORY)/$(call makeInstallerName.deb,$(VERSION_STRING))
-INSTALLERS.Linux += $(INSTALLER.deb)
+INSTALLER_EXTENSIONS += deb
+INSTALLER_EXTENSIONS.Linux += deb
 
 # alien festoons the name with suffixes (and, as always, we have to let make know what it's going to generate).
 # I looked at the source and it just has a big switch to select the output architecture.
 # In particular, it doesn't do anything clever with the output of rpm --showrc.
 makeInstallerName.rpm = org.jessies.$(MACHINE_PROJECT_NAME)-$(1)-2.$(patsubst amd64,x86_64,$(TARGET_ARCHITECTURE)).rpm
-INSTALLER.rpm += $(BIN_DIRECTORY)/$(call makeInstallerName.rpm,$(VERSION_STRING))
-INSTALLERS.Linux += $(INSTALLER.rpm)
+INSTALLER_EXTENSIONS += rpm
+INSTALLER_EXTENSIONS.Linux += rpm
 
 # When $< is "org.jessies.evergreen-4.31.1934-2.x86_64.rpm", we want "org.jessies.evergreen.x86_64.rpm".
 # When $< is "org.jessies.evergreen_4.31.1934_amd64.deb", we want "org.jessies.evergreen.amd64.deb".
@@ -466,6 +466,11 @@ INSTALLERS.Linux += $(INSTALLER.rpm)
 # When I upload, perhaps I should get rid of that.
 LATEST_INSTALLER_LINK = $(subst --2.,.,$(subst __,.,$(subst -.,.,$(call makeInstallerName$(suffix $<),))))
 
+define defineInstallerPath
+  INSTALLER.$(1) = $$(BIN_DIRECTORY)/$$(call makeInstallerName.$(1),$$(VERSION_STRING))
+endef
+$(foreach extension,$(INSTALLER_EXTENSIONS),$(eval $(call defineInstallerPath,$(extension))))
+INSTALLERS.$(TARGET_OS) = $(foreach extension,$(INSTALLER_EXTENSIONS.$(TARGET_OS)),$(INSTALLER.$(extension)))
 INSTALLERS = $(INSTALLERS.$(TARGET_OS))
 
 STANDALONE_INSTALLERS.$(MACHINE_PROJECT_NAME) = $(INSTALLERS)
