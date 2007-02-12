@@ -46,32 +46,64 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
   return sharedLibraryHandle;
 }
 
+static std::string readFile(const std::string& path) {
+  std::ifstream is(path.c_str());
+  if (is.good() == false) {
+    throw UsageError("Couldn't open \"" + path + "\".");
+  }
+  std::ostringstream contents;
+  contents << is.rdbuf();
+  return contents.str();
+}
+
+static std::string readRegistryFile(const std::string& path) {
+  std::string contents = readFile(path);
+  // Cygwin's representation of REG_SZ keys seems to include the null terminator.
+  if (contents.empty() == false && contents[contents.size() - 1] == '\0') {
+    return contents.substr(0, contents.size() - 1);
+  }
+  return contents;
+}
+
+struct JvmRegistryKey {
+public:
+  typedef JvmRegistryKey self;
+  
+private:
+  std::string version;
+  std::string registryPath;
+  std::string pathSuffix;
+  
+public:
+  JvmRegistryKey(const std::string& registryRoot, const std::string& version0, const char* registrySuffix, const char* pathSuffix0)
+  : version(version0), registryPath(registryRoot + "/" + version + "/" + registrySuffix), pathSuffix(pathSuffix0) {
+  }
+  
+  std::string readJvmLocation() const {
+    return readRegistryFile(registryPath) + pathSuffix;
+  }
+  
+  bool operator<(const self& rhs) const {
+    return version < rhs.version;
+  }
+  
+  void dumpTo(std::ostream& os) const {
+    os << registryPath;
+  }
+  friend std::ostream& operator<<(std::ostream& os, const self& rhs) {
+    rhs.dumpTo(os);
+    return os;
+  }
+};
+
 struct JvmLocation {
 private:
   std::string jvmDirectory;
   
 public:
-  static std::string readFile(const std::string& path) {
-    std::ifstream is(path.c_str());
-    if (is.good() == false) {
-      throw UsageError("Couldn't open \"" + path + "\".");
-    }
-    std::ostringstream contents;
-    contents << is.rdbuf();
-    return contents.str();
-  }
+  typedef std::vector<JvmRegistryKey> JvmRegistryKeys;
   
-  static std::string readRegistryFile(const std::string& path) {
-    std::string contents = readFile(path);
-    // Cygwin's representation of REG_SZ keys seems to include the null terminator.
-    if (contents.empty() == false && contents[contents.size() - 1] == '\0') {
-      return contents.substr(0, contents.size() - 1);
-    }
-    return contents;
-  }
-  
-  std::string chooseVersionFromRegistry(const std::string& registryPath) const {
-    std::vector<std::string> versions;
+  void findVersionsInRegistry(JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* registrySuffix, const char* pathSuffix) const {
     for (DirectoryIterator it(registryPath); it.isValid(); ++ it) {
       std::string version = it->getName();
       if (version.empty() || isdigit(version[0]) == false) {
@@ -88,27 +120,53 @@ public:
         // Uncomment the next line to prevent usage of 1.6.
         //continue;
       }
-      versions.push_back(version);
+      JvmRegistryKey jvmRegistryKey(registryPath, version, registrySuffix, pathSuffix);
+      jvmRegistryKeys.push_back(jvmRegistryKey);
     }
-    std::sort(versions.begin(), versions.end());
-    if (versions.empty()) {
-      throw UsageError("No suitable Java found under \"" + registryPath + "\".");
-    }
-    std::string version = versions.back();
-    return version;
   }
   
-  std::string findJvmLibraryUsingJreRegistry(const char* jreRegistryPath) const {
-    std::string version = chooseVersionFromRegistry(jreRegistryPath);
-    // What should we do if this points to "client" when we want "server"?
-    std::string jvmRegistryPath = std::string(jreRegistryPath) + "/" + version + "/RuntimeLib";
-    return readRegistryFile(jvmRegistryPath);
+  void findVersionsInRegistry(std::ostream& os, JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* registrySuffix, const char* pathSuffix) const {
+    os << "Looking for registered JVMs under \"";
+    os << registryPath;
+    os << "\" [";
+    os << std::endl;
+    try {
+      findVersionsInRegistry(jvmRegistryKeys, registryPath, registrySuffix, pathSuffix);
+    } catch (const std::exception& ex) {
+      os << ex.what();
+      os << std::endl;
+    }
+    os << "]";
+    os << std::endl;
   }
   
-  std::string findJvmLibraryUsingJdkRegistry(const char* jdkRegistryPath) const {
-    std::string version = chooseVersionFromRegistry(jdkRegistryPath);
-    std::string javaHome = readRegistryFile(std::string(jdkRegistryPath) + "/" + version + "/JavaHome");
-    return javaHome + "/jre/bin/client/jvm.dll";
+  SharedLibraryHandle openJvmLibraryUsingRegistry(const char* javaVendor, const char* jdkName, const char* jreName) const {
+    const std::string registryPrefix = std::string("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/") + javaVendor + "/";
+    const std::string jreRegistryPath = registryPrefix + jreName;
+    const std::string jdkRegistryPath = registryPrefix + jdkName;
+    std::ostringstream os;
+    JvmRegistryKeys jvmRegistryKeys;
+    findVersionsInRegistry(os, jvmRegistryKeys, jreRegistryPath, "RuntimeLib", "");
+    findVersionsInRegistry(os, jvmRegistryKeys, jdkRegistryPath, "JavaHome", "/jre/bin/client/jvm.dll");
+    std::sort(jvmRegistryKeys.begin(), jvmRegistryKeys.end());
+    while (jvmRegistryKeys.empty() == false) {
+      JvmRegistryKey jvmRegistryKey = jvmRegistryKeys.back();
+      jvmRegistryKeys.pop_back();
+      os << "Trying \"";
+      os << jvmRegistryKey;
+      os << "\" [";
+      os << std::endl;
+      try {
+        std::string jvmLocation = jvmRegistryKey.readJvmLocation();
+        return openSharedLibrary(jvmLocation);
+      } catch (const std::exception& ex) {
+        os << ex.what();
+        os << std::endl;
+      }
+      os << "]";
+      os << std::endl;
+    }
+    throw UsageError(os.str());
   }
   
   // Once we've successfully opened a shared library, I think we're committed to trying to use it
@@ -121,16 +179,8 @@ public:
     os << "Error messages were:";
     os << std::endl;
     try {
-      return openSharedLibrary(findJvmLibraryUsingJdkRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit"));
+      return openJvmLibraryUsingRegistry("JavaSoft", "Java Development Kit", "Java Runtime Environment");
     } catch (const std::exception& ex) {
-      os << "  ";
-      os << ex.what();
-      os << std::endl;
-    }
-    try {
-      return openSharedLibrary(findJvmLibraryUsingJreRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment"));
-    } catch (const std::exception& ex) {
-      os << "  ";
       os << ex.what();
       os << std::endl;
     }
@@ -139,16 +189,8 @@ public:
       // "JavaHome"="C:\\Program Files\\Java\\jdk1.5.0_06"
       // Jesse Kriss's IBM JDK has an appended "jre" component:
       // "JavaHome"="C:\\Program Files\\IBM\\Java50\\jre"
-      return openSharedLibrary(findJvmLibraryUsingJdkRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/IBM/Java Development Kit"));
+      return openJvmLibraryUsingRegistry("IBM", "Java Development Kit", "Java2 Runtime Environment");
     } catch (const std::exception& ex) {
-      os << "  ";
-      os << ex.what();
-      os << std::endl;
-    }
-    try {
-      return openSharedLibrary(findJvmLibraryUsingJreRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/IBM/Java2 Runtime Environment"));
-    } catch (const std::exception& ex) {
-      os << "  ";
       os << ex.what();
       os << std::endl;
     }
