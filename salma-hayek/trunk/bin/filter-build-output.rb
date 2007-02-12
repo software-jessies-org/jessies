@@ -4,8 +4,11 @@ sawError = false
 while line = gets()
   line = line.chomp()
   lines << line
-  # When nested, we get the make level in square brackets.
-  if line.match(/^g?make(\[\d+\])?: \*\*\*/)
+  # We need to match:
+  # universal.make:378: *** Unable to find /bin/javac --- do you only have a JRE installed?.  Stop.
+  # make: *** [recurse] Error 2
+  # gmake[2]: *** [recurse] Error 2
+  if line.match(/\*\*\*/)
     $stderr.puts(lines)
     while line = gets()
       $stderr.puts(line)
