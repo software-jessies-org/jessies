@@ -34,6 +34,18 @@ extern "C" {
   typedef jint JNICALL (*CreateJavaVM)(JavaVM**, void**, void*);
 }
 
+typedef void* SharedLibraryHandle;
+
+SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) {
+  void* sharedLibraryHandle = dlopen(sharedLibraryFilename.c_str(), RTLD_LAZY);
+  if (sharedLibraryHandle == 0) {
+    std::ostringstream os;
+    os << "dlopen(\"" << sharedLibraryFilename << "\") failed with " << dlerror() << ".";
+    throw UsageError(os.str());
+  }
+  return sharedLibraryHandle;
+}
+
 struct JvmLocation {
 private:
   std::string jvmDirectory;
@@ -99,21 +111,24 @@ public:
     return javaHome + "/jre/bin/client/jvm.dll";
   }
   
-  std::string findWin32JvmLibrary() const {
+  // Once we've successfully opened a shared library, I think we're committed to trying to use it
+  // or else who knows what it's DLL entry point has done.
+  // Until we've successfully opened it, though, we can keep trying alternatives.
+  SharedLibraryHandle openWin32JvmLibrary() const {
     std::ostringstream os;
     os << "Couldn't find jvm.dll - please install a 1.5 or newer JRE or JDK.";
     os << std::endl;
     os << "Error messages were:";
     os << std::endl;
     try {
-      return findJvmLibraryUsingJdkRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit");
+      return openSharedLibrary(findJvmLibraryUsingJdkRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit"));
     } catch (const std::exception& ex) {
       os << "  ";
       os << ex.what();
       os << std::endl;
     }
     try {
-      return findJvmLibraryUsingJreRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment");
+      return openSharedLibrary(findJvmLibraryUsingJreRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment"));
     } catch (const std::exception& ex) {
       os << "  ";
       os << ex.what();
@@ -124,14 +139,14 @@ public:
       // "JavaHome"="C:\\Program Files\\Java\\jdk1.5.0_06"
       // Jesse Kriss's IBM JDK has an appended "jre" component:
       // "JavaHome"="C:\\Program Files\\IBM\\Java50\\jre"
-      return findJvmLibraryUsingJdkRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/IBM/Java Development Kit");
+      return openSharedLibrary(findJvmLibraryUsingJdkRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/IBM/Java Development Kit"));
     } catch (const std::exception& ex) {
       os << "  ";
       os << ex.what();
       os << std::endl;
     }
     try {
-      return findJvmLibraryUsingJreRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/IBM/Java2 Runtime Environment");
+      return openSharedLibrary(findJvmLibraryUsingJreRegistry("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/IBM/Java2 Runtime Environment"));
     } catch (const std::exception& ex) {
       os << "  ";
       os << ex.what();
@@ -140,16 +155,16 @@ public:
     throw UsageError(os.str());
   }
   
-  std::string findJvmLibraryFilename() const {
+  SharedLibraryHandle openJvmLibrary() const {
 #if defined(__CYGWIN__)
-    return findWin32JvmLibrary();
+    return openWin32JvmLibrary();
 #else
     // This only works on Linux if LD_LIBRARY_PATH is already set up to include something like:
     // "$JAVA_HOME/jre/lib/$ARCH/" + jvmDirectory
     // "$JAVA_HOME/jre/lib/$ARCH"
     // "$JAVA_HOME/jre/../lib/$ARCH"
     // Where $ARCH is "i386" rather than `arch`.
-    return "libjvm.so";
+    return openSharedLibrary("libjvm.so");
 #endif
   }
   
@@ -171,19 +186,14 @@ private:
   JNIEnv* env;
   
 private:
-  static CreateJavaVM findCreateJavaVM(const char* sharedLibraryFilename) {
-    void* sharedLibraryHandle = dlopen(sharedLibraryFilename, RTLD_LAZY);
-    if (sharedLibraryHandle == 0) {
-      std::ostringstream os;
-      os << "dlopen(\"" << sharedLibraryFilename << "\") failed with " << dlerror() << ".";
-      throw UsageError(os.str());
-    }
+  static CreateJavaVM findCreateJavaVM(SharedLibraryHandle sharedLibraryHandle) {
     // Work around:
     // warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object
     CreateJavaVM createJavaVM = reinterpret_cast<CreateJavaVM> (reinterpret_cast<long> (dlsym(sharedLibraryHandle, "JNI_CreateJavaVM")));
     if (createJavaVM == 0) {
       std::ostringstream os;
-      os << "dlsym(\"" << sharedLibraryFilename << "\", JNI_CreateJavaVM) failed with " << dlerror() << ".";
+      // Hopefully our caller will report something more useful than the shared library handle.
+      os << "dlsym(" << sharedLibraryHandle << ", JNI_CreateJavaVM) failed with " << dlerror() << ".";
       throw UsageError(os.str());
     }
     return createJavaVM;
@@ -245,8 +255,8 @@ private:
   }
   
 public:
-  JavaInvocation(const std::string& jvmLibraryFilename, const NativeArguments& jvmArguments) {
-    CreateJavaVM createJavaVM = findCreateJavaVM(jvmLibraryFilename.c_str());
+  JavaInvocation(SharedLibraryHandle jvmLibraryHandle, const NativeArguments& jvmArguments) {
+    CreateJavaVM createJavaVM = findCreateJavaVM(jvmLibraryHandle);
     
     typedef std::vector<JavaVMOption> JavaVMOptions; // Required to be contiguous.
     JavaVMOptions javaVMOptions(jvmArguments.size());
@@ -338,8 +348,8 @@ public:
     }
   }
   
-  std::string getJvmLibraryFilename() const {
-    return jvmLocation.findJvmLibraryFilename();
+  SharedLibraryHandle openJvmLibrary() const {
+    return jvmLocation.openJvmLibrary();
   }
   NativeArguments getJvmArguments() const {
     return jvmArguments;
@@ -363,7 +373,7 @@ int main(int, char** argv) {
   }
   try {
     LauncherArgumentParser parser(launcherArguments);
-    JavaInvocation javaInvocation(parser.getJvmLibraryFilename(), parser.getJvmArguments());
+    JavaInvocation javaInvocation(parser.openJvmLibrary(), parser.getJvmArguments());
     javaInvocation.invokeMain(parser.getClassName(), parser.getMainArguments());
   } catch (const UsageError& usageError) {
     std::ostringstream os;
