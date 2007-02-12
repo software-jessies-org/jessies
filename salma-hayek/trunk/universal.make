@@ -756,18 +756,27 @@ native-dist: $(addprefix upload.,$(STANDALONE_INSTALLERS))
 # We still need the default salma-hayek build during the nightly build.
 native-dist: build
 
+# I'm deliberately downloading the previous version of the installer and overwriting the version you've just built.
+# This is so that, when we regenerate the Packages file, we don't change md5sums.
+# If you want to upload a new installer, you're going to have to check-in first (or change this rule or manually delete the old one).
 .PHONY: upload.%
 $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
-	echo Uploading $(notdir $*)...
+	@echo Uploading $(<F)...
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
-	scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F)
+	if scp $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F) $<; \
+	then \
+		echo $(<F) was already on the server - it should not be overwritten once its md5sums are in a Debian Packages file. && \
+		exit 1; \
+	else \
+		scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F); \
+	fi
 
 # I like the idea of keeping several versions on the server but we're going to have a hard time
 # linking to the one we expect people to use unless we create a symlink.
 $(addprefix upload.,$(INSTALLERS)): upload.%: symlink-latest.%
 .PHONY: symlink-latest.%
 $(addprefix symlink-latest.,$(INSTALLERS)): symlink-latest.%: %
-	echo Symlinking the latest $(notdir $*)...
+	@echo Symlinking the latest $(<F)...
 	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	find $(DIST_DIRECTORY) -name '"$(call makeInstallerName$(suffix $<),*)"' -mtime +7 '|' xargs $(RM)
