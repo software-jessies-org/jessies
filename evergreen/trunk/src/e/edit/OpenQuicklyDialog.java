@@ -1,5 +1,8 @@
 package e.edit;
 
+import e.forms.*;
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -7,9 +10,7 @@ import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import e.forms.*;
-import e.gui.*;
-import e.util.*;
+import org.jdesktop.swingworker.SwingWorker;
 
 /**
  * Improves on Apple Project Builder's "Open Quickly",
@@ -25,8 +26,6 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     private JLabel status = new JLabel(" ");
     private JButton rescanButton;
     
-    private DefaultListModel model;
-    
     /** Which workspace is this "Open Quickly" for? */
     private Workspace workspace;
     
@@ -38,27 +37,48 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         status.setText(text);
     }
     
-    public synchronized void showMatches() {
-        String regex = filenameField.getText();
-    
-        this.model = new DefaultListModel();
-        try {
-            List fileList = workspace.getFileList().getListOfFilesMatching(regex);
-            for (int i = 0; i < fileList.size(); i++) {
-                model.addElement(fileList.get(i));
-            }
-            final int indexedFileCount = workspace.getFileList().getIndexedFileCount();
-            if (indexedFileCount != -1) {
-                setStatus(true, fileList.size() + " / " + StringUtilities.pluralize(indexedFileCount, "file", "files") + " match.");
-            }
-        } catch (PatternSyntaxException ex) {
-            setStatus(false, ex.getDescription());
-        }
-        matchList.setModel(model);
+    private class MatchFinder extends SwingWorker<Object, Object> {
+        private String regularExpression;
+        private DefaultListModel model;
+        private boolean statusGood;
+        private String statusText;
         
-        // If we don't set the selected index, the user won't be able to cycle the focus into the list with the Tab key.
-        // This also means the user can just hit Return if there's only one match.
-        matchList.setSelectedIndex(0);
+        private MatchFinder(String regularExpression) {
+            this.regularExpression = regularExpression;
+        }
+        
+        @Override
+        protected Object doInBackground() {
+            model = new DefaultListModel();
+            statusGood = true;
+            try {
+                List fileList = workspace.getFileList().getListOfFilesMatching(regularExpression);
+                for (int i = 0; i < fileList.size(); i++) {
+                    model.addElement(fileList.get(i));
+                }
+                final int indexedFileCount = workspace.getFileList().getIndexedFileCount();
+                if (indexedFileCount != -1) {
+                    statusText = fileList.size() + " / " + StringUtilities.pluralize(indexedFileCount, "file", "files") + " match.";
+                }
+            } catch (PatternSyntaxException ex) {
+                statusGood = false;
+                statusText = ex.getDescription();
+            }
+            return null;
+        }
+        
+        @Override
+        public void done() {
+            setStatus(statusGood, statusText);
+            matchList.setModel(model);
+            // If we don't set the selected index, the user won't be able to cycle the focus into the list with the Tab key.
+            // This also means the user can just hit Return if there's only one match.
+            matchList.setSelectedIndex(0);
+        }
+    }
+    
+    public synchronized void showMatches() {
+        new MatchFinder(filenameField.getText()).execute();
     }
     
     private void openFileAtIndex(int index) {
@@ -155,7 +175,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
      * Responsible for providing some visual feedback that we're rescanning.
      */
     private synchronized void switchToFakeList() {
-        model = new DefaultListModel();
+        DefaultListModel model = new DefaultListModel();
         model.addElement("Rescan in progress...");
         matchList.setModel(model);
     }
