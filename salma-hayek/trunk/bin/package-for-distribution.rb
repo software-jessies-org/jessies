@@ -196,7 +196,11 @@ if target_os() == "Darwin"
         file.puts("# Finder seems to start applications in /.")
         file.puts("# Most users will be more comfortable in their home directory. This is especially true of Terminator.")
         file.puts("cd")
-
+        
+        file.puts("# Applications started with a double-click have useless (to us) arguments specifying")
+        file.puts("# process serial number.  Strip leading examples of such before they interfere.")
+        file.puts("while [[ \"${1:0:5}\" = \"-psn_\" ]]; do shift; done")
+        
         file.puts("# Apple hasn't yet released a 1.5.0 that makes itself the default. When they do, we can remove this.")
         file.puts("export PATH=/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Commands/:$PATH")
 
