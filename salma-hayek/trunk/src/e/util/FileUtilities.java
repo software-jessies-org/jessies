@@ -302,9 +302,14 @@ public class FileUtilities {
     }
     
     public static File findOnPath(String executableName) {
-        if (GuiUtilities.isWindows()) {
-            executableName += ".exe";
+        File result = findOnPath0(executableName);
+        if (result == null && GuiUtilities.isWindows()) {
+            result = findOnPath0(executableName + ".exe");
         }
+        return result;
+    }
+    
+    private static File findOnPath0(String executableName) {
         String path = System.getenv("PATH");
         String[] directories = path.split(File.pathSeparator);
         for (String directory : directories) {
