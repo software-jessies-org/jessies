@@ -201,7 +201,7 @@ if target_os() == "Darwin"
         file.puts("export PATH=/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Commands/:$PATH")
 
         file.puts("resources=`dirname \"$0\"`/../Resources")
-        file.puts("\"$resources/salma-hayek/bin/ensure-suitable-mac-os-version.rb\" && exec \"$resources/#{machine_project_name}/bin/#{machine_project_name}\"")
+        file.puts("\"$resources/salma-hayek/bin/ensure-suitable-mac-os-version.rb\" && exec \"$resources/#{machine_project_name}/bin/#{machine_project_name}\" \"$@\"")
     }
     system("chmod a+x #{script_name}")
 end
