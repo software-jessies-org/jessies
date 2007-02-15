@@ -81,6 +81,15 @@ public class PBashTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
+    protected String getKeywordRegularExpression() {
+        // The usual \w+ is insufficient, because Bash doesn't use as much punctuation as most languages.
+        // make-source and command-list, for example, are each interpreted as a single word.
+        // GtkSourceView and Vim both get both examples wrong, considering "source" and "command" to be keywords.
+        // We accept anything that isn't a Bash meta-character, which seems hard to fool in practice.
+        return "\\b(([^ \t<>;&|])+)\\b";
+    }
+    
+    @Override
     protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
         return isShellComment(line, atIndex);
     }
