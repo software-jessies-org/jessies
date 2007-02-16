@@ -72,15 +72,15 @@ public:
 private:
   std::string version;
   std::string registryPath;
-  std::string pathSuffix;
+  std::string pathFromJavaHomeToJvm;
   
 public:
-  JvmRegistryKey(const std::string& registryRoot, const std::string& version0, const char* registrySuffix, const char* pathSuffix0)
-  : version(version0), registryPath(registryRoot + "/" + version + "/" + registrySuffix), pathSuffix(pathSuffix0) {
+  JvmRegistryKey(const std::string& registryRoot, const std::string& version0, const std::string& pathFromJavaHomeToJvm0)
+  : version(version0), registryPath(registryRoot + "/" + version + "/JavaHome"), pathFromJavaHomeToJvm(pathFromJavaHomeToJvm0) {
   }
   
   std::string readJvmLocation() const {
-    return readRegistryFile(registryPath) + pathSuffix;
+    return readRegistryFile(registryPath) + pathFromJavaHomeToJvm;
   }
   
   bool operator<(const self& rhs) const {
@@ -103,7 +103,7 @@ private:
 public:
   typedef std::vector<JvmRegistryKey> JvmRegistryKeys;
   
-  void findVersionsInRegistry(JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* registrySuffix, const char* pathSuffix) const {
+  void findVersionsInRegistry(JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* pathFromJavaHomeToJre) const {
     for (DirectoryIterator it(registryPath); it.isValid(); ++ it) {
       std::string version = it->getName();
       if (version.empty() || isdigit(version[0]) == false) {
@@ -120,18 +120,23 @@ public:
         // Uncomment the next line to prevent usage of 1.6.
         //continue;
       }
-      JvmRegistryKey jvmRegistryKey(registryPath, version, registrySuffix, pathSuffix);
+      std::string pathFromJavaHomeToJvm;
+      pathFromJavaHomeToJvm += pathFromJavaHomeToJre;
+      pathFromJavaHomeToJvm += "/bin/";
+      pathFromJavaHomeToJvm += jvmDirectory;
+      pathFromJavaHomeToJvm += "/jvm.dll";
+      JvmRegistryKey jvmRegistryKey(registryPath, version, pathFromJavaHomeToJvm);
       jvmRegistryKeys.push_back(jvmRegistryKey);
     }
   }
   
-  void findVersionsInRegistry(std::ostream& os, JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* registrySuffix, const char* pathSuffix) const {
+  void findVersionsInRegistry(std::ostream& os, JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* pathFromJavaHomeToJre) const {
     os << "Looking for registered JVMs under \"";
     os << registryPath;
     os << "\" [";
     os << std::endl;
     try {
-      findVersionsInRegistry(jvmRegistryKeys, registryPath, registrySuffix, pathSuffix);
+      findVersionsInRegistry(jvmRegistryKeys, registryPath, pathFromJavaHomeToJre);
     } catch (const std::exception& ex) {
       os << ex.what();
       os << std::endl;
@@ -146,8 +151,8 @@ public:
     const std::string jdkRegistryPath = registryPrefix + jdkName;
     std::ostringstream os;
     JvmRegistryKeys jvmRegistryKeys;
-    findVersionsInRegistry(os, jvmRegistryKeys, jreRegistryPath, "RuntimeLib", "");
-    findVersionsInRegistry(os, jvmRegistryKeys, jdkRegistryPath, "JavaHome", "/jre/bin/client/jvm.dll");
+    findVersionsInRegistry(os, jvmRegistryKeys, jreRegistryPath, "");
+    findVersionsInRegistry(os, jvmRegistryKeys, jdkRegistryPath, "/jre");
     std::sort(jvmRegistryKeys.begin(), jvmRegistryKeys.end());
     while (jvmRegistryKeys.empty() == false) {
       JvmRegistryKey jvmRegistryKey = jvmRegistryKeys.back();
