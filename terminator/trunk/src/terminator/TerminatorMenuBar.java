@@ -532,8 +532,9 @@ public class TerminatorMenuBar extends EMenuBar {
 			// Ed did a quick survey and reported that Camino uses command-option left/right; Safari uses command {/}, while other programs (Adium, for example) use command left/right.
 			// konsole uses control-shift left/right, and gnome-terminal uses control page up/page down.
 			// Firefox, uses control tab/control-shift tab, presumably because it had already used alt left/right for back/forward.
+			// Firefox also supports control page up/page down.
 			
-			// We already support the Firefox keys elsewhere, but control-shift tab isn't well known, and is quite uncomfortable.
+			// We already support the control-tab sequences in doKeyboardTabSwitch, but control-shift tab isn't well known, and is quite uncomfortable.
 			// There is some precedent for the left and right arrow keys, they are likely to be reasonably accessible on all keyboards, and they don't require the uncomfortable use of multiple modifier keys.
 			
 			// Alt left/right (which is what this will be except on Mac OS) is actually a combination we ought to report to our clients.
