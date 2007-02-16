@@ -506,11 +506,22 @@ public class JTerminalPane extends JPanel {
 			}
 		}
 		
+		/**
+		 * Although we only advertise one pair of keystrokes on the menu, we actually support a variety of methods for changing tab.
+		 * The idea is that someone who subconsciously uses some other major application's keystrokes won't ever have to learn ours.
+		 */
 		private boolean doKeyboardTabSwitch(KeyEvent event) {
-			if (event.getKeyCode() == KeyEvent.VK_TAB && event.isControlDown()) {
-				// Emulates Firefox's control-tab/control-shift-tab cycle-tab behavior.
-				getTerminatorFrame().cycleTab(event.isShiftDown() ? -1 : 1);
-				return true;
+			if (event.isControlDown()) {
+				if (event.getKeyCode() == KeyEvent.VK_TAB) {
+					// Emulates Firefox's control-tab/control-shift-tab cycle-tab behavior.
+					getTerminatorFrame().cycleTab(event.isShiftDown() ? -1 : 1);
+					return true;
+				} else if (event.getKeyCode() == KeyEvent.VK_PAGE_UP || event.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
+					// Emulates gnome-terminal and Firefox's control-page up/down cycle-tab behavior.
+					// Strictly, we're supposed to send an escape sequence for these strokes, but I don't know of anything that uses them.
+					getTerminatorFrame().cycleTab(event.getKeyCode() == KeyEvent.VK_PAGE_UP ? -1 : 1);
+					return true;
+				}
 			} else if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
 				// Emulates gnome-terminal's alt-<number> jump-to-tab behavior, or an analog of Terminal.app's command-<number> jump-to-window behavior.
 				char ch = event.getKeyChar();
