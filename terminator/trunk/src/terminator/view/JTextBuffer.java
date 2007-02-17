@@ -52,8 +52,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		Options options = Options.getSharedInstance();
 		model = new TextBuffer(this, options.getInitialColumnCount(), options.getInitialRowCount());
 		ComponentUtilities.disableFocusTraversal(this);
-		setOpaque(true);
+		setBorder(new javax.swing.border.EmptyBorder(1, 4, 4, 4));
 		setFont(options.getFont());
+		setOpaque(true);
 		optionsDidChange();
 		addFocusListener(this);
 		addMouseListener(new MouseAdapter() {
@@ -216,6 +217,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	 */
 	public Dimension getVisibleSizeInCharacters() {
 		Dimension result = getVisibleSize();
+		Insets insets = getInsets();
+		result.width -= (insets.left + insets.right);
+		result.height -= (insets.top + insets.bottom);
 		Dimension character = getCharUnitSize();
 		result.width /= character.width;
 		result.height /= character.height;
@@ -372,7 +376,8 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	}
 	
 	public Location viewToModel(Point point) {
-		int lineIndex = point.y / getCharUnitSize().height;
+		Insets insets = getInsets();
+		int lineIndex = (point.y - insets.top) / getCharUnitSize().height;
 		int charOffset = 0;
 		// If the line index is off the top or bottom, we leave charOffset = 0.  This gives us nicer
 		// selection functionality.
@@ -383,7 +388,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		} else {
 			char[] chars = model.getTextLine(lineIndex).getString().toCharArray();
 			if (chars.length > 0) {
-				charOffset = GuiUtilities.getCharOffset(getFontMetrics(getFont()), 0, point.x, chars);
+				charOffset = GuiUtilities.getCharOffset(getFontMetrics(getFont()), 0, point.x - insets.left, chars);
 			}
 		}
 		return new Location(lineIndex, charOffset);
@@ -409,18 +414,20 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		String characterAtLocation = line.substring(offset, offset + 1);
 		String lineBeforeOffset = line.substring(0, offset);
 		FontMetrics fontMetrics = getFontMetrics(getFont());
-		final int x = fontMetrics.stringWidth(lineBeforeOffset);
+		Insets insets = getInsets();
+		final int x = insets.left + fontMetrics.stringWidth(lineBeforeOffset);
 		final int width = fontMetrics.stringWidth(characterAtLocation);
 		final int height = getCharUnitSize().height;
-		final int y = charCoords.getLineIndex() * height;
+		final int y = insets.top + charCoords.getLineIndex() * height;
 		return new Rectangle(x, y, width, height);
 	}
 	
 	public Dimension getOptimalViewSize() {
 		Dimension character = getCharUnitSize();
+		Insets insets = getInsets();
 		// FIXME: really, we need to track the maximum pixel width.
-		final int width = model.getMaxLineWidth() * character.width;
-		final int height = model.getLineCount() * character.height;
+		final int width = insets.left + model.getMaxLineWidth() * character.width + insets.right;
+		final int height = insets.top + model.getLineCount() * character.height + insets.bottom;
 		return new Dimension(width, height);
 	}
 	
@@ -658,8 +665,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		Rectangle rect = graphics.getClipBounds();
 		graphics.setColor(getBackground());
 		graphics.fill(rect);
-		int firstTextLine = rect.y / metrics.getHeight();
-		int lastTextLine = (rect.y + rect.height + metrics.getHeight() - 1) / metrics.getHeight();
+		Insets insets = getInsets();
+		int firstTextLine = (rect.y - insets.top) / metrics.getHeight();
+		int lastTextLine = (rect.y - insets.top + rect.height + metrics.getHeight() - 1) / metrics.getHeight();
 		lastTextLine = Math.min(lastTextLine, model.getLineCount() - 1);
 		int lineNotToDraw = model.usingAlternateBuffer() ? model.getFirstDisplayLine() - 1 : -1;
 		for (int i = firstTextLine; i <= lastTextLine; i++) {
@@ -667,8 +675,8 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 				continue;
 			}
 			boolean drawCursor = (shouldShowCursor() && i == cursorPosition.getLineIndex());
-			int x = 0;
-			int baseline = metrics.getHeight() * (i + 1) - metrics.getMaxDescent();
+			int x = insets.left;
+			int baseline = insets.top + metrics.getHeight() * (i + 1) - metrics.getMaxDescent();
 			int startOffset = 0;
 			Iterator it = getLineStyledText(i).iterator();
 			while (it.hasNext()) {

@@ -109,7 +109,6 @@ public class JTerminalPane extends JPanel {
 	public void optionsDidChange() {
 		textPane.optionsDidChange();
 		viewport.setBackground(textPane.getBackground());
-		scrollPane.setViewportBorder(new javax.swing.border.LineBorder(textPane.getBackground(), Options.getSharedInstance().getInternalBorder()));
 		scrollPane.invalidate();
 		validate();
 	}
