@@ -35,7 +35,6 @@ public class Options {
 	private static final String HIDE_MOUSE_WHEN_TYPING = "hideMouseWhenTyping";
 	private static final String INITIAL_COLUMN_COUNT = "initialColumnCount";
 	private static final String INITIAL_ROW_COUNT = "initialRowCount";
-	private static final String INTERNAL_BORDER = "internalBorder";
 	private static final String LOGIN_SHELL = "loginShell";
 	private static final String SCROLL_KEY = "scrollKey";
 	private static final String SCROLL_TTY_OUTPUT = "scrollTtyOutput";
@@ -164,10 +163,6 @@ public class Options {
 		return booleanResource(HIDE_MOUSE_WHEN_TYPING);
 	}
 	
-	public int getInternalBorder() {
-		return integerResource(INTERNAL_BORDER);
-	}
-	
 	/**
 	 * How many rows a new window should have.
 	 */
@@ -278,7 +273,6 @@ public class Options {
 		addDefault(HIDE_MOUSE_WHEN_TYPING, Boolean.TRUE, "Hide mouse when typing");
 		addDefault(INITIAL_COLUMN_COUNT, Integer.valueOf(80), "New terminal width");
 		addDefault(INITIAL_ROW_COUNT, Integer.valueOf(24), "New terminal height");
-		addDefault(INTERNAL_BORDER, Integer.valueOf(2), "Border (pixels)");
 		addDefault(LOGIN_SHELL, Boolean.TRUE, "Start child process with a '-l' argument?");
 		addDefault(SCROLL_KEY, Boolean.TRUE, "Scroll to bottom on key press?");
 		addDefault(SCROLL_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output?");
