@@ -20,7 +20,7 @@ public abstract class AbstractFindDialog {
         form.setStatusBar(findStatus);
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Find:", PatternUtilities.addRegularExpressionHelpToComponent(findField));
-        formPanel.setTypingTimeoutActionListener(new ActionListener() {
+        form.setTypingTimeoutActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     findField.setForeground(UIManager.getColor("TextField.foreground"));

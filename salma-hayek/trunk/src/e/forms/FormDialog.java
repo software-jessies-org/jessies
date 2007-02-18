@@ -1,17 +1,17 @@
 package e.forms;
 
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.*;
 import javax.swing.text.*;
-
-import e.gui.*;
-import e.util.*;
 
 /**
  * Implements simple dialogs. You provide the content (using FormPanel),
@@ -165,16 +165,26 @@ public class FormDialog {
     private void configureDialog() {
         dialog.setResizable(true);
         
-        FormPanel formPanel = builder.getFormPanel();
-        if (extraButton != null && builder.statusBar != null) {
+        // If we've got multiple tabs to display, we need a JTabbedPane.
+        // Otherwise we'll take the one and only FormPanel.
+        JComponent centerpiece = null;
+        List<FormPanel> formPanels = builder.getFormPanels();
+        if (formPanels.size() > 1) {
+            centerpiece = makeTabbedPaneForFormPanels(formPanels);
+        } else {
+            centerpiece = formPanels.get(0);
+            centerpiece.setBorder(BorderFactory.createEmptyBorder(0, 0, componentSpacing, 0));
+        }
+        
+        if (formPanels.size() == 1 && extraButton != null && builder.statusBar != null) {
             // It looks bad if we have a status bar and an extra button together in the row of buttons.
-            formPanel.addRow("", builder.statusBar);
+            formPanels.get(0).addRow("", builder.statusBar);
             builder.statusBar = null;
         }
         
-        JPanel internalContentPane = new JPanel(new BorderLayout(componentSpacing, componentSpacing));
+        JPanel internalContentPane = new JPanel(new BorderLayout());
         internalContentPane.setBorder(BorderFactory.createEmptyBorder(componentSpacing, componentSpacing, componentSpacing, componentSpacing));
-        internalContentPane.add(formPanel, BorderLayout.CENTER);
+        internalContentPane.add(centerpiece, BorderLayout.CENTER);
         internalContentPane.add(makeButtonPanel(dialog.getRootPane(), actionLabel, builder.statusBar), BorderLayout.SOUTH);
         
         dialog.setContentPane(internalContentPane);
@@ -187,13 +197,45 @@ public class FormDialog {
         restorePreviousSize();
         
         initCloseBehavior();
-        initFocus(formPanel);
+        initFocus(formPanels.get(0));
         
         // Support for "as-you-type" interfaces that update whenever the user pauses in their typing.
-        ActionListener listener = formPanel.getTypingTimeoutActionListener();
+        ActionListener listener = builder.typingTimeoutActionListener;
         initComponentListener(listener);
         initTextChangeTimer(listener);
-        initDocumentListener(formPanel);
+        initDocumentListener();
+    }
+    
+    private JTabbedPane makeTabbedPaneForFormPanels(List<FormPanel> formPanels) {
+        JTabbedPane tabbedPane = new JTabbedPane();
+        for (int i = 0; i < formPanels.size(); ++i) {
+            tabbedPane.add(builder.tabTitles[i], formPanels.get(i));
+        }
+        
+        if (GuiUtilities.isMacOs()) {
+            for (FormPanel child : formPanels) {
+                fixTabbedPaneChildrenForMacOs(child);
+            }
+        }
+        
+        return tabbedPane;
+    }
+    
+    /**
+     * Mac OS tabbed panes' interiors have a darker background than normal panels.
+     * For this to show through, the children need to be non-opaque (that is, transparent).
+     */
+    private static void fixTabbedPaneChildrenForMacOs(Component component) {
+        // JTextField won't paint its background unless it's opaque, but everything else should be non-opaque.
+        if (component instanceof JComponent && component instanceof JTextField == false) {
+            ((JComponent) component).setOpaque(false);
+        }
+        // Recurse for any children.
+        if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                fixTabbedPaneChildrenForMacOs(child);
+            }
+        }
     }
     
     /**
@@ -219,7 +261,7 @@ public class FormDialog {
     /**
      * Restarts our timer whenever the user types.
      */
-    private void initDocumentListener(FormPanel formPanel) {
+    private void initDocumentListener() {
         // Ensure we have a listener...
         if (documentListener == null) {
             this.documentListener = new DocumentListener() {
@@ -271,7 +313,12 @@ public class FormDialog {
      * Adds listeners to all the text fields.
      */
     private void addTextFieldListeners() {
-        this.listenedToTextFields = builder.getFormPanel().getTextComponents();
+        // Collect up all the text fields on all the panels.
+        listenedToTextFields = new ArrayList<JTextComponent>();
+        for (FormPanel formPanel : builder.getFormPanels()) {
+            listenedToTextFields.addAll(formPanel.getTextComponents());
+        }
+        // Add listeners.
         for (JTextComponent field : listenedToTextFields) {
             field.getDocument().addDocumentListener(documentListener);
         }
@@ -442,8 +489,6 @@ public class FormDialog {
     
     private JPanel makeButtonPanel(JButton actionButton, JButton cancelButton, JComponent statusBar) {
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(0, componentSpacing, componentSpacing, componentSpacing));
-        //panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
         if (GuiUtilities.isWindows()) {

@@ -1,6 +1,10 @@
 package e.forms;
 
+import e.gui.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
 import javax.swing.*;
 
 /**
@@ -13,17 +17,43 @@ import javax.swing.*;
  * text fields. See FormPanel and FormDialog for more customization details.
  */
 public class FormBuilder {
-    FormPanel formPanel;
-    FormDialog formDialog;
+    private static final String[] DEFAULT_UI = { "<default-anonymous-panel>" };
+    
+    private FormPanel[] formPanels;
+    private FormDialog formDialog;
+    
+    // FormDialog wants read access to this, but there's no need for it to be publicly available.
+    String[] tabTitles;
+    // FormDialog wants read/write access to this, but it shouldn't be publicly available.
     JComponent statusBar;
+    // FormDialog wants read access to this, but there's no need for it to be publicly available.
+    ActionListener typingTimeoutActionListener = NoOpAction.INSTANCE;
     
     /**
-     * Gets ready to show a form with a given name as a child of the
-     * given Frame.
+     * Gets ready to show a form with a given name as a child of the given Frame.
+     * This form does not contain multiple tabs.
      */
     public FormBuilder(Frame parent, String title) {
-        this.formPanel = new FormPanel();
+        this(parent, title, DEFAULT_UI);
+    }
+    
+    /**
+     * Gets ready to show a form with a given name as a child of the given Frame.
+     * This form contains as many tabs as you supply tab titles.
+     * You should use getFormPanels to access the tabs' form panels; indexes correspond to the supplied tab titles.
+     */
+    public FormBuilder(Frame parent, String title, String[] tabTitles) {
+        this.tabTitles = tabTitles;
+        this.formPanels = makeFormPanels();
         this.formDialog = new FormDialog(this, parent, title);
+    }
+    
+    private FormPanel[] makeFormPanels() {
+        FormPanel[] result = new FormPanel[tabTitles.length];
+        for (int i = 0; i < result.length; ++i) {
+            result[i] = new FormPanel();
+        }
+        return result;
     }
     
     /**
@@ -35,12 +65,28 @@ public class FormBuilder {
     }
     
     /**
+     * Returns the underlying FormPanels; use this to add content to your
+     * multi-tab form. Keep hold of the components you give to the FormPanel so that
+     * you can read values back from them when the dialog has been accepted.
+     */
+    public List<FormPanel> getFormPanels() {
+        return new ArrayList<FormPanel>(Arrays.asList(formPanels));
+    }
+    
+    /**
      * Returns the underlying FormPanel; use this to add content to your
      * form. Keep hold of the components you give to the FormPanel so that
      * you can read values back from them when the dialog has been accepted.
      */
     public FormPanel getFormPanel() {
-        return formPanel;
+        if (formPanels.length != 1) {
+            throw new IllegalArgumentException("this form has " + formPanels.length + " panels");
+        }
+        return formPanels[0];
+    }
+    
+    public void setTypingTimeoutActionListener(ActionListener listener) {
+        this.typingTimeoutActionListener = listener;
     }
     
     /**

@@ -15,8 +15,6 @@ public class FormPanel extends JPanel {
 
     private int componentSpacing;
 
-    private ActionListener typingTimeoutActionListener = NoOpAction.INSTANCE;
-    
     private ArrayList<JTextComponent> textComponents = new ArrayList<JTextComponent>();
     
     FormPanel() {
@@ -91,13 +89,5 @@ public class FormPanel extends JPanel {
     
     ArrayList<JTextComponent> getTextComponents() {
         return new ArrayList<JTextComponent>(textComponents);
-    }
-    
-    public void setTypingTimeoutActionListener(ActionListener listener) {
-        this.typingTimeoutActionListener = listener;
-    }
-    
-    ActionListener getTypingTimeoutActionListener() {
-        return this.typingTimeoutActionListener;
     }
 }
