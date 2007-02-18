@@ -220,10 +220,10 @@ RFEs
   a mailer or whatever, and preserve the formatting. Presumably we can put
   HTML data on the clipboard? [See elliotth's blog for details.]
 
-* The actions available on Mac OS should all be available on Linux, even if
-  they aren't on the pop-up menu. menuAndKeyActions might want a keyActions
-  sibling. Is there a way to have the menu bar present (for key handling) but
-  invisible? That would keep the 1970s crowd happy.
+* We should remove the "no menu bar" option. I still think it's best to
+  pretend that it's Java 6's fault rather than ours (the only users who
+  can avoid the menu bar currently are Linux users running Java 5). It's
+  not worth a fight, but there is a bunch of cruft it will be nice to drop.
 
 * the absence of system wide C-`/C-~ functionality would make cycling through
   windows even more useful on Linux, so maybe we should support alt-` and
@@ -281,6 +281,17 @@ RFEs
   output.  We'd want to provide some visual indication of what we'd done and
   how to undo it.  We can't provide such an indication if we implement this in terms
   of ixon, because we can't read the ixon state from the tty driver.
+
+* 2006-11-02, car said: the list of processes thrown up is handy, although
+  apparently edit counts as "ruby" ;)  I know why, but there might be other
+  situations where I didn't know what a process was doing, or couldn't
+  remember what was backgrounded, and it seems to me that that's the
+  point of this functionality.  The amount of information displayed on
+  that warning is right, I'm just wondering if it would be much work to
+  make each processes clickable, and show some more information?  A
+  plain dialog with a representation of the tree of processes rooted at
+  the process clicked?  Or the full commandline of the process?  Throw
+  it at Activity Monitor?  :)
 
 Tab-related
 -----------
