@@ -473,7 +473,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         formPanel.addRow("Whose Names Match:", filenameRegexField);
         formPanel.addRow("", PatternUtilities.addRegularExpressionHelpToComponent(status));
         formPanel.addRow("Matches:", new JScrollPane(matchView));
-        formPanel.setTypingTimeoutActionListener(new ActionListener() {
+        form.setTypingTimeoutActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showMatches();
             }
