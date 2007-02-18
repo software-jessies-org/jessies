@@ -178,6 +178,7 @@ public class AboutBox {
                 }
             });
             JButton creditsButton = new JButton("Credits");
+            GnomeStockIcon.useStockIcon(creditsButton, "gtk-about");
             creditsButton.setEnabled(false);
             creditsButton.setMnemonic(KeyEvent.VK_R);
             
