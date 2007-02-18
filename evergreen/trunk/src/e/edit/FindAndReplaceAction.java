@@ -88,17 +88,17 @@ public class FindAndReplaceAction extends ETextAction {
         replacementsList.setSelectionModel(selectionModel);
         
         FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find/Replace");
+        form.setTypingTimeoutActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showMatches();
+            }
+        });
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Find:", patternField);
         formPanel.addRow("Replace With:", replacementField);
         formPanel.addRow("", PatternUtilities.addRegularExpressionHelpToComponent(statusLabel));
         formPanel.addRow("Matches:", matchPane);
         formPanel.addRow("Replacements:", replacementsPane);
-        formPanel.setTypingTimeoutActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showMatches();
-            }
-        });
         
         // We keep going around the loop of show-dialog/process-text until:
         // (a) the user cancels the dialog.
