@@ -288,8 +288,8 @@ public class Options {
 		}
 	}
 	
-	public void showPreferencesDialog() {
-		FormBuilder form = new FormBuilder(null, "Preferences", new String[] { "General", "Colors" });
+	public void showPreferencesDialog(Frame parent) {
+		FormBuilder form = new FormBuilder(parent, "Preferences", new String[] { "General", "Colors" });
 		List<FormPanel> formPanels = form.getFormPanels();
 		FormPanel generalPanel = formPanels.get(0);
 		FormPanel colorsPanel = formPanels.get(1);
@@ -331,6 +331,7 @@ public class Options {
 				return saved;
 			}
 		});
+		form.getFormDialog().setRememberBounds(false);
 		form.showNonModal();
 	}
 	

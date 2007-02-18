@@ -550,15 +550,17 @@ public class TerminatorMenuBar extends EMenuBar {
 			frame.cycleTab(delta);
 		}
 	}
-
-	public static class PreferencesAction extends AbstractAction {
+	
+	public static class PreferencesAction extends AbstractPaneAction {
 		public PreferencesAction() {
 			super("Preferences...");
 			GnomeStockIcon.useStockIcon(this, "gtk-preferences");
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-			Options.getSharedInstance().showPreferencesDialog();
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, terminalPane);
+			Options.getSharedInstance().showPreferencesDialog(frame);
 		}
 	}
 }
