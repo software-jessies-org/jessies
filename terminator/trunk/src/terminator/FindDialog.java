@@ -58,13 +58,13 @@ public class FindDialog {
         
         FormBuilder form = new FormBuilder(frame, "Find");
         form.setStatusBar(findStatus);
-        FormPanel formPanel = form.getFormPanel();
-        formPanel.addRow("Find:", PatternUtilities.addRegularExpressionHelpToComponent(findField));
-        formPanel.setTypingTimeoutActionListener(new ActionListener() {
+        form.setTypingTimeoutActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 find();
             }
         });
+        FormPanel formPanel = form.getFormPanel();
+        formPanel.addRow("Find:", PatternUtilities.addRegularExpressionHelpToComponent(findField));
         
         formDialog = form.getFormDialog();
         formDialog.setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {

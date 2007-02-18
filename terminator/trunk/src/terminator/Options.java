@@ -289,27 +289,28 @@ public class Options {
 	}
 	
 	public void showPreferencesDialog() {
-		FormBuilder form = new FormBuilder(null, "Preferences");
-		FormPanel formPanel = form.getFormPanel();
+		FormBuilder form = new FormBuilder(null, "Preferences", new String[] { "General", "Colors" });
+		List<FormPanel> formPanels = form.getFormPanels();
+		FormPanel generalPanel = formPanels.get(0);
+		FormPanel colorsPanel = formPanels.get(1);
 		
 		String[] keys = options.keySet().toArray(new String[options.size()]);
 		Arrays.sort(keys);
-		ArrayList<ColorPreference> colorPreferences = new ArrayList<ColorPreference>();
 		for (String key : keys) {
 			String description = descriptions.get(key);
 			if (description != null) {
 				Object value = options.get(key);
 				if (value instanceof Boolean) {
-					formPanel.addRow("", new BooleanPreference(key).makeUi());
+					generalPanel.addRow("", new BooleanPreference(key).makeUi());
 				} else if (value instanceof Integer) {
-					formPanel.addRow(description + ":", new IntegerPreference(key).makeUi());
+					generalPanel.addRow(description + ":", new IntegerPreference(key).makeUi());
 				} else if (value instanceof Font) {
-					formPanel.addRow(description + ":", new FontPreference(key).makeUi());
+					generalPanel.addRow(description + ":", new FontPreference(key).makeUi());
 				} else if (value instanceof Color) {
 					if (description.startsWith("Color ")) {
 						// Ignore the numbered colors. No-one should be modifying those.
 					} else {
-						colorPreferences.add(new ColorPreference(description, key));
+						colorsPanel.addRow(description + ":", new ColorPreference(key).makeUi());
 					}
 				} else {
 					// FIXME: we should probably handle String.
@@ -318,10 +319,6 @@ public class Options {
 					continue;
 				}
 			}
-		}
-		
-		for (ColorPreference colorPreference : colorPreferences) {
-			formPanel.addRow(colorPreference.getDescription() + ":", colorPreference.makeUi());
 		}
 		
 		form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
@@ -417,16 +414,10 @@ public class Options {
 	}
 	
 	private class ColorPreference {
-		private String description;
 		private String key;
 		
-		public ColorPreference(String description, String key) {
-			this.description = description;
+		public ColorPreference(String key) {
 			this.key = key;
-		}
-		
-		public String getDescription() {
-			return description;
 		}
 		
 		public JComponent makeUi() {
@@ -510,11 +501,11 @@ public class Options {
 		// There are xterm-16color and rxvt-16color variants, but I've not seen them used, and don't know of anything that would take advantage of the extra colors (which would require a significantly more complicated terminfo, and support for extra sequences).
 		
 		// Defaults reminiscent of SGI's xwsh(1).
-		addDefault("background", colorFromString("#000045"), "Background"); // dark blue
-		addDefault("colorBD", colorFromString("#ffffff"), "Bold color"); // white
+		addDefault("background", colorFromString("#000045"), "Background color"); // dark blue
+		addDefault("colorBD", colorFromString("#ffffff"), "Bold text color"); // white
 		addDefault("cursorColor", colorFromString("#00ff00"), "Cursor color"); // green
-		addDefault("foreground", colorFromString("#e7e7e7"), "Foreground"); // off-white
-		addDefault("selectionColor", colorFromString("#1c2bff"), "Selection color"); // light blue
+		addDefault("foreground", colorFromString("#e7e7e7"), "Text foreground color"); // off-white
+		addDefault("selectionColor", colorFromString("#1c2bff"), "Selection background color"); // light blue
 	}
 	
 	/**
