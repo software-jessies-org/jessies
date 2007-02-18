@@ -50,7 +50,7 @@ public class Terminator {
 			
 			@Override
 			public void handlePreferences(ApplicationEvent e) {
-				Options.getSharedInstance().showPreferencesDialog();
+				Options.getSharedInstance().showPreferencesDialog(null);
 				e.setHandled(true);
 			}
 			
