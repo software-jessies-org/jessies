@@ -17,7 +17,10 @@ public class Frames implements Iterable<TerminatorFrame> {
     private JFrame hiddenFrame; // Mac OS X only.
     
     public Frames() {
-        if (GuiUtilities.isMacOs()) {
+    }
+    
+    private synchronized void initHiddenFrame() {
+        if (hiddenFrame == null) {
             String name = "Mac OS Hidden Frame";
             hiddenFrame = new JFrame(name);
             hiddenFrame.setName(name);
@@ -26,6 +29,11 @@ public class Frames implements Iterable<TerminatorFrame> {
             // Move the window off-screen so that when we're forced to setVisible(true) it doesn't actually disturb the user.
             hiddenFrame.setLocation(new java.awt.Point(-100, -100));
         }
+    }
+    
+    private JFrame getHiddenFrame() {
+        initHiddenFrame();
+        return hiddenFrame;
     }
     
     public void addFrame(TerminatorFrame frame) {
@@ -47,11 +55,11 @@ public class Frames implements Iterable<TerminatorFrame> {
         if (GuiUtilities.isMacOs()) {
             for (TerminatorFrame frame : list) {
                 if (frame.isShowing() && (frame.getExtendedState() & TerminatorFrame.ICONIFIED) == 0) {
-                    hiddenFrame.setVisible(false);
+                    getHiddenFrame().setVisible(false);
                     return;
                 }
             }
-            hiddenFrame.setVisible(true);
+            getHiddenFrame().setVisible(true);
         }
     }
     
@@ -93,6 +101,6 @@ public class Frames implements Iterable<TerminatorFrame> {
         if (list.isEmpty() == false) {
             return list.get(0);
         }
-        return hiddenFrame;
+        return getHiddenFrame();
     }
 }
