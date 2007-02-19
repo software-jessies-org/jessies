@@ -25,7 +25,6 @@ public class TerminatorMenuBar extends EMenuBar {
 		add(makeScrollbackMenu());
 		add(WindowMenu.getSharedInstance().makeJMenu(customWindowMenuItems));
 		add(makeHelpMenu());
-		add(DebugMenu.makeJMenu());
 	}
 	
 	private JMenu makeFileMenu() {
