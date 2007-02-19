@@ -118,7 +118,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		return (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, getFocusedComponent());
 	}
 	
-	private static TerminatorFrame getFocusedTerminatorFrame() {
+	public static TerminatorFrame getFocusedTerminatorFrame() {
 		return (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, getFocusedComponent());
 	}
 	
@@ -253,21 +253,6 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 	}
 	
-	private static JTerminalPane runCommand() {
-		JTextField commandField = new JTextField(40);
-		
-		FormBuilder form = new FormBuilder(getFocusedTerminatorFrame(), "Run Command");
-		FormPanel formPanel = form.getFormPanel();
-		formPanel.addRow("Command:", commandField);
-		form.getFormDialog().setRememberBounds(false);
-		
-		boolean shouldRun = form.show("Run");
-		if (shouldRun == false) {
-			return null;
-		}
-		return JTerminalPane.newCommandWithName(commandField.getText(), null, null);
-	}
-	
 	public static class NewCommandAction extends AbstractAction {
 		public NewCommandAction() {
 			super("New Command...");
@@ -275,7 +260,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			JTerminalPane terminalPane = runCommand();
+			JTerminalPane terminalPane = new CommandDialog().askForCommandToRun();
 			if (terminalPane != null) {
 				Terminator.getSharedInstance().openFrame(terminalPane);
 			}
@@ -290,7 +275,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		@Override
 		protected void performFrameAction(TerminatorFrame frame) {
-			JTerminalPane terminalPane = runCommand();
+			JTerminalPane terminalPane = new CommandDialog().askForCommandToRun();
 			if (terminalPane != null) {
 				frame.addTab(terminalPane);
 			}
