@@ -117,28 +117,51 @@ public class DebugMenu {
     
     private static class ListFramesAction extends AbstractAction {
         public ListFramesAction() {
-            super("List Frames");
+            super("List Frames/Windows");
         }
         
         public void actionPerformed(ActionEvent e) {
             // FIXME: a table would be much nicer.
-            JFrameUtilities.showTextWindow(null, "Frames", getFramesAsString());
+            // FIXME: a "Refresh" button would be very useful.
+            JFrameUtilities.showTextWindow(null, "Frames/Windows", getFramesAsString());
         }
         
         private String getFramesAsString() {
-            Frame[] frames = Frame.getFrames();
+            // What do Frame and Window and Dialog have in common? Container.
+            ArrayList<Container> cs = new ArrayList<Container>();
+            cs.addAll(Arrays.asList(Frame.getFrames()));
+            
+            // Add Java 6's collection of windows/dialogs, without yet requiring Java 6. Equivalent to:
+            //cs.addAll(Arrays.asList(Window.getWindows()));
+            boolean haveWindows = true;
+            try {
+                java.lang.reflect.Method getWindowsMethod = Window.class.getDeclaredMethod("getWindows", new Class[] {});
+                cs.addAll(Arrays.asList((Window[]) getWindowsMethod.invoke(null, null)));
+            } catch (Exception ex) {
+                // Ignore. Likely we're on Java 5, where this functionality doesn't exist.
+                haveWindows = false;
+            }
+            
+            int nonDisplayableCount = 0;
             StringBuilder builder = new StringBuilder();
-            builder.append("Displayable:\n");
-            for (Frame frame : frames) {
-                if (frame.isDisplayable()) {
-                    builder.append(frame.toString() + "\n");
+            builder.append("Displayable\n===========");
+            for (Component c : cs) {
+                if (c.isDisplayable()) {
+                    builder.append("\n" + c.toString() + "\n");
+                } else {
+                    ++nonDisplayableCount;
                 }
             }
-            builder.append("\nNon-displayable:\n");
-            for (Frame frame : frames) {
-                if (frame.isDisplayable() == false) {
-                    builder.append(frame.toString() + "\n");
+            if (nonDisplayableCount > 0) {
+                builder.append("\nNon-displayable\n===============");
+                for (Component c : cs) {
+                    if (c.isDisplayable() == false) {
+                        builder.append("\n" + c.toString() + "\n");
+                    }
                 }
+            }
+            if (haveWindows == false) {
+                builder.append("\n(Upgrade to Java 6 to get the windows too.)");
             }
             return builder.toString();
         }
