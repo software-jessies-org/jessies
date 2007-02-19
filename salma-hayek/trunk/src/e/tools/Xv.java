@@ -48,7 +48,6 @@ public class Xv extends JFrame {
     }
     
     public static void main(String[] arguments) throws IOException {
-        Log.setApplicationName("Xv");
         GuiUtilities.initLookAndFeel();
         GuiUtilities.finishGnomeStartup();
         for (String argument : arguments) {
