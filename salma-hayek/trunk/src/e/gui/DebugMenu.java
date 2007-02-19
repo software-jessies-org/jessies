@@ -57,7 +57,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            JFrameUtilities.showTextWindow(null, "Environment", getEnvironmentAsString());
+            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Environment", getEnvironmentAsString());
         }
         
         private String getEnvironmentAsString() {
@@ -72,7 +72,7 @@ public class DebugMenu {
         
         public void actionPerformed(ActionEvent e) {
             // FIXME: we can edit the system properties; should we expose this?
-            JFrameUtilities.showTextWindow(null, "System Properties", getSystemPropertiesAsString());
+            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " System Properties", getSystemPropertiesAsString());
         }
         
         private String getSystemPropertiesAsString() {
@@ -123,7 +123,7 @@ public class DebugMenu {
         public void actionPerformed(ActionEvent e) {
             // FIXME: a table would be much nicer.
             // FIXME: a "Refresh" button would be very useful.
-            JFrameUtilities.showTextWindow(null, "Frames/Windows", getFramesAsString());
+            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Frames/Windows", getFramesAsString());
         }
         
         private String getFramesAsString() {
@@ -173,7 +173,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            JFrameUtilities.showTextWindow(null, "Timers", getTimersAsString());
+            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Timers", getTimersAsString());
         }
         
         private String getTimersAsString() {
@@ -195,7 +195,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            JFrameUtilities.showTextWindow(null, UIManager.getLookAndFeel().getName() + " UI Defaults", getUiDefaultsAsString());
+            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " " + UIManager.getLookAndFeel().getName() + " UI Defaults", getUiDefaultsAsString());
         }
         
         private String getUiDefaultsAsString() {
@@ -233,7 +233,7 @@ public class DebugMenu {
             ui.add(controlPanel, BorderLayout.NORTH);
             ui.add(new HeapView(), BorderLayout.CENTER);
             
-            JFrame frame = new JFrame("Heap Usage");
+            JFrame frame = new JFrame(Log.getApplicationName() + " Heap Usage");
             JFrameUtilities.setFrameIcon(frame);
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.setContentPane(ui);
