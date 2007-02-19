@@ -53,7 +53,6 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		model = new TextBuffer(this, options.getInitialColumnCount(), options.getInitialRowCount());
 		ComponentUtilities.disableFocusTraversal(this);
 		setBorder(new javax.swing.border.EmptyBorder(1, 4, 4, 4));
-		setFont(options.getFont());
 		setOpaque(true);
 		optionsDidChange();
 		addFocusListener(this);
@@ -108,8 +107,12 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			// If we want to handle key events when alt is down, we need to turn off input methods.
 			enableInputMethods(false);
 		}
-		setForeground(options.getColor("foreground"));
+		
 		setBackground(options.getColor("background"));
+		setForeground(options.getColor("foreground"));
+		
+		setFont(options.getFont());
+		sizeChanged();
 	}
 	
 	public BirdsEye getBirdsEye() {
