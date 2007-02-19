@@ -136,7 +136,7 @@ public class DebugMenu {
             boolean haveWindows = true;
             try {
                 java.lang.reflect.Method getWindowsMethod = Window.class.getDeclaredMethod("getWindows", new Class[] {});
-                cs.addAll(Arrays.asList((Window[]) getWindowsMethod.invoke(null, null)));
+                cs.addAll(Arrays.asList((Window[]) getWindowsMethod.invoke(null, (Object[]) null)));
             } catch (Exception ex) {
                 // Ignore. Likely we're on Java 5, where this functionality doesn't exist.
                 haveWindows = false;
