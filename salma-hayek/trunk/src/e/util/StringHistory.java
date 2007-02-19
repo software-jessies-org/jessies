@@ -10,18 +10,16 @@ import java.util.*;
  */
 public class StringHistory {
     private String filename;
-    private ArrayList<String> history = new ArrayList<String>();
+    private ArrayList<String> history;
     
     public StringHistory() {
         this(null);
     }
     
     public StringHistory(String filename) {
-        try {
-            readHistoryFile();
-        } catch (IOException ex) {
-            Log.warn("Failed to read history file from '" + filename + "'.");
-        }
+        this.filename = filename;
+        this.history = new ArrayList<String>();
+        readHistoryFile();
     }
     
     public int size() {
@@ -40,7 +38,7 @@ public class StringHistory {
         if (string.length() == 0) {
             return;
         }
-        history.remove(string);  // Avoid duplication.
+        history.remove(string); // Avoid duplicates.
         history.add(string);
         writeToHistoryFile(string);
     }
@@ -52,30 +50,25 @@ public class StringHistory {
         }
     }
     
-    public void readHistoryFile() throws IOException {
-        history = new ArrayList<String>();
-        if (filename == null) {
-            return;
-        }
-        
+    private void readHistoryFile() {
         try {
-            if (FileUtilities.exists(filename)) {
+            if (filename != null && FileUtilities.exists(filename)) {
                 String[] lines = StringUtilities.readLinesFromFile(filename);
                 history.addAll(Arrays.asList(lines));
             }
         } catch (Exception ex) {
-            Log.warn("Error reading history '" + filename + "'.", ex);
+            Log.warn("Error reading history from file \"" + filename + "\".", ex);
         }
     }
     
-    public void writeToHistoryFile(String string) {
+    private void writeToHistoryFile(String string) {
         if (filename == null) {
             return;
         }
         
         String error = StringUtilities.appendToFile(FileUtilities.fileFromString(filename), string + "\n");
         if (error != null) {
-            Log.warn("Failed to append string \"" + string + "\" to history file '" + filename + "' (" + error + ").");
+            Log.warn("Failed to append string \"" + string + "\" to history file \"" + filename + "\" (" + error + ").");
         }
     }
 }
