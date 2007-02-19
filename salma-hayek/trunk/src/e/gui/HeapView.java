@@ -32,8 +32,6 @@ import javax.swing.*;
  * 
  * FIXME: a meaningful grid might be useful.
  * FIXME: it would be nice to be able to point to any line in the graph and see what the heap size/utilization was at that time. (and maybe how many seconds ago that was.)
- * FIXME: it's not obvious that clicking causes garbage collection.
- * FIXME: there's no feedback on press to suggest that clicking does anything.
  * FIXME: the colors are ugly.
  * FIXME: we shouldn't forget all our data on resize.
  * 
@@ -178,29 +176,18 @@ public class HeapView extends JComponent {
     private BufferedImage gridOverlayImage;
     
     public HeapView() {
-        // Configure structures needed for rendering drop shadow.
         format = new MessageFormat("{0,number,0.0}/{1,number,0.0} MiB");
         heapSizeText = "";
-        // Enable mouse events. This is the equivalent to adding a mouse
-        // listener.
-        enableEvents(AWTEvent.MOUSE_EVENT_MASK);
         updateUI();
-    }
-    
-    /**
-     * Overridden to return true, GCComponent paints in its entire bounds in
-     * an opaque manner.
-     */
-    public boolean isOpaque() {
-        return true;
     }
     
     /**
      * Updates the look and feel for this component.
      */
+    @Override
     public void updateUI() {
-        // Set the font to correspond to that of a JLabel.
-        setFont(new JLabel().getFont());
+        setFont(UIManager.getFont("Label.font"));
+        setOpaque(true);
         revalidate();
         repaint();
     }
@@ -249,21 +236,6 @@ public class HeapView extends JComponent {
     private void updateTextWidth() {
         String maxString = format.format(new Object[] { new Float(999.9f), new Float(999.9f) });
         maxTextWidth = getFontMetrics(getFont()).stringWidth(maxString) + 4;
-    }
-
-    /**
-     * Processes a mouse event.
-     *
-     * @param e the MouseEvent
-     */
-    protected void processMouseEvent(MouseEvent e) {
-        super.processMouseEvent(e);
-        if (!e.isConsumed()) {
-            if (e.getID() == MouseEvent.MOUSE_CLICKED && SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1) {
-                // Trigger a gc
-                System.gc();
-            }
-        }
     }
 
     /**
