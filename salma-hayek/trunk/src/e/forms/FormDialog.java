@@ -116,15 +116,15 @@ public class FormDialog {
     }
 
     FormDialog(FormBuilder builder, Frame ownerFrame, String title) {
-        initOwner(ownerFrame);
+        this.owner = initOwner(ownerFrame);
         
         this.builder = builder;
-        this.dialog = new JDialog(ownerFrame, title);
+        this.dialog = new JDialog(owner, title);
         
         initAlwaysOnTopMonitoring();
     }
     
-    private void initOwner(Frame f) {
+    private Frame initOwner(Frame f) {
         // The user can pass null to center a dialog and/or state that they don't have a specific parent...
         this.doNotSetLocationRelativeToOwner = (f == null);
         if (GuiUtilities.isMacOs() && f == null) {
@@ -134,7 +134,7 @@ public class FormDialog {
                 f = frames[0];
             }
         }
-        this.owner = f;
+        return f;
     }
     
     // A dialog that doesn't track its owner's always-on-top state risks being
