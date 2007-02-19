@@ -14,7 +14,7 @@ import javax.swing.Timer;
  */
 public class DebugMenu {
     public static JMenu makeJMenu() {
-        JMenu menu = new JMenu("Debug");
+        JMenu menu = new JMenu("Debugging Tools");
         menu.add(new ShowEnvironmentAction());
         menu.add(new ShowSystemPropertiesAction());
         menu.addSeparator();
