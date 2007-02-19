@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.text.*;
+import java.util.Map;
 import javax.swing.*;
 
 /**
@@ -15,6 +16,9 @@ import javax.swing.*;
  * 
  * I removed the blurry text because it just made the text harder to read, and
  * created 300 KiB/s of garbage on Mac OS.
+ * 
+ * I honored the user's desktop anti-aliasing settings, so the text doesn't
+ * look terrible.
  * 
  * I removed the pop-up menu because it looked terrible and didn't offer
  * anything useful.
@@ -276,28 +280,34 @@ public class HeapView extends JComponent {
     /**
      * Paints the component.
      */
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D)g;
+    protected void paintComponent(Graphics oldGraphics) {
+        Graphics2D g = (Graphics2D) oldGraphics;
+        // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give it to them.
+        Map map = (Map) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
+        if (map != null) {
+            g.addRenderingHints(map);
+        }
+        
         int width = getWidth();
         int height = getHeight();
         if (width - BORDER_W > 0 && height - BORDER_H > 0) {
             startTimerIfNecessary();
             updateCacheIfNecessary(width, height);
-            paintCachedBackground(g2, width, height);
+            paintCachedBackground(g, width, height);
             g.translate(1, 2);
             int innerW = width - BORDER_W;
             int innerH = height - BORDER_H;
             if (heapGrowTimer != null) {
                 // Render the heap growing animation.
-                Composite lastComposite = ((Graphics2D)g).getComposite();
+                Composite lastComposite = g.getComposite();
                 float percent = 1f - heapGrowTimer.getPercent();
-                ((Graphics2D)g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, percent));
+                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, percent));
                 g.drawImage(heapGrowTimer.image, 0, 0, null);
-                ((Graphics2D)g).setComposite(lastComposite);
+                g.setComposite(lastComposite);
             }
-            paintTicks(g2, innerW, innerH);
+            paintTicks(g, innerW, innerH);
             // FIXME(enh): if the grid weren't meaningless, it might be worth drawing.
-            //g2.drawImage(getGridOverlayImage(), 0, 0, null);
+            //g.drawImage(getGridOverlayImage(), 0, 0, null);
             paintText(g, innerW, innerH);
             g.translate(-1, -2);
         } else {
@@ -347,14 +357,10 @@ public class HeapView extends JComponent {
      */
     private void paintText(Graphics g, int w, int h) {
         g.setFont(getFont());
-        String text = getHeapSizeText();
+        String text = heapSizeText;
         FontMetrics fm = g.getFontMetrics();
         int textWidth = fm.stringWidth(text);
         g.drawString(text, 8, h - fm.getAscent());
-    }
-    
-    private String getHeapSizeText() {
-        return heapSizeText;
     }
     
     /**
