@@ -182,6 +182,9 @@ public class DebugMenu {
             for (Timer timer : timers) {
                 result.append(TimerUtilities.toString(timer));
             }
+            if (timers.size() == 0) {
+                result.append("(No timers.)");
+            }
             return result.toString();
         }
     }
