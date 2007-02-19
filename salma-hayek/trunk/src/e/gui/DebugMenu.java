@@ -220,12 +220,26 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
+            JButton gcButton = new JButton("System.gc()");
+            gcButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    System.gc();
+                }
+            });
+            JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 2));
+            controlPanel.add(gcButton);
+            
+            JPanel ui = new JPanel(new BorderLayout());
+            ui.add(controlPanel, BorderLayout.NORTH);
+            ui.add(new HeapView(), BorderLayout.CENTER);
+            
             JFrame frame = new JFrame("Heap Usage");
             JFrameUtilities.setFrameIcon(frame);
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.setContentPane(new HeapView());
+            frame.setContentPane(ui);
             frame.setSize(new Dimension(400, 200));
             frame.setResizable(false);
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         }
     }
