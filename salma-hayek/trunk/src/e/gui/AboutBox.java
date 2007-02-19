@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -47,17 +48,19 @@ public class AboutBox {
     }
     
     public void setImage(String filename) {
-        this.icon = new ImageIcon(filename);
-        
-        // Apple's HIG says scale to 64x64. I'm not sure there's any advice for the other platforms.
-        this.icon = new ImageIcon(ImageUtilities.scale(icon.getImage(), 64, 64, ImageUtilities.InterpolationHint.BICUBIC));
-        
-        if (GuiUtilities.isMacOs()) {
-            // Apple's HIG says that these dialog icons should be the application icon.
-            UIManager.put("OptionPane.errorIcon", icon);
-            UIManager.put("OptionPane.informationIcon", icon);
-            UIManager.put("OptionPane.questionIcon", icon);
-            UIManager.put("OptionPane.warningIcon", icon);
+        try {
+            // Apple's HIG says scale to 64x64. I'm not sure there's any advice for the other platforms.
+            this.icon = new ImageIcon(ImageUtilities.scale(ImageIO.read(FileUtilities.fileFromString(filename)), 64, 64, ImageUtilities.InterpolationHint.BICUBIC));
+            
+            if (GuiUtilities.isMacOs()) {
+                // Apple's HIG says that these dialog icons should be the application icon.
+                UIManager.put("OptionPane.errorIcon", icon);
+                UIManager.put("OptionPane.informationIcon", icon);
+                UIManager.put("OptionPane.questionIcon", icon);
+                UIManager.put("OptionPane.warningIcon", icon);
+            }
+        } catch (Exception ex) {
+            // We can live without an icon.
         }
     }
     
@@ -203,10 +206,6 @@ public class AboutBox {
         // Center on the display.
         // FIXME: use the visual center.
         dialog.setLocationRelativeTo(dialog.getOwner());
-    }
-    
-    private static void addLabel(JPanel panel, Icon icon) {
-        addLabel(panel, new JLabel(icon));
     }
     
     private static void addLabel(JPanel panel, Font font, String text) {
