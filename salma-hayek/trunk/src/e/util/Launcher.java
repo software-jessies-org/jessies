@@ -21,7 +21,6 @@ public class Launcher {
         for (int i = 2; i < arguments.length; ++i) {
             appArguments.add(arguments[i]);
         }
-        Log.setApplicationName(appName);
         GuiUtilities.initLookAndFeel();
         app.parseCommandLine(appArguments);
         java.awt.EventQueue.invokeLater(new Runnable() {

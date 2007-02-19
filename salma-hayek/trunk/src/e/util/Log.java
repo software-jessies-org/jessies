@@ -51,15 +51,18 @@ public class Log {
             Log.warn("Couldn't redirect logging to \"" + logFilename + "\"", th);
         }
     }
-
-    public static void setApplicationName(String name) {
-        applicationName = name;
-        showStartUpMessage();
-    }
-
-    private static void showStartUpMessage() {
+    
+    static {
         warn(getJavaVersion());
         warn(getOsVersion());
+    }
+    
+    public static String getApplicationName() {
+        return applicationName;
+    }
+    
+    public static void setApplicationName(String name) {
+        applicationName = name;
     }
 
     private static String getJavaVersion() {

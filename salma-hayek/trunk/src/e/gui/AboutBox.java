@@ -16,7 +16,7 @@ public class AboutBox {
     private static final AboutBox INSTANCE = new AboutBox();
     
     private ImageIcon icon;
-    private String applicationName;
+    private String applicationName = Log.getApplicationName();
     private String webSiteAddress;
     private ArrayList<String> versionLines = new ArrayList<String>();
     private ArrayList<String> copyrightLines = new ArrayList<String>();
