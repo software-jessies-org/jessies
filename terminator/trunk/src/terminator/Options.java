@@ -51,6 +51,9 @@ public class Options {
 	
 	private HashMap<String, Color> rgbColors = null;
 	
+	// Non-null if the preferences dialog is currently showing.
+	private FormBuilder form;
+	
 	public static Options getSharedInstance() {
 		return INSTANCE;
 	}
@@ -288,8 +291,19 @@ public class Options {
 		}
 	}
 	
-	public void showPreferencesDialog(Frame parent) {
-		FormBuilder form = new FormBuilder(parent, "Preferences", new String[] { "General", "Colors" });
+	public synchronized void showPreferencesDialog(Frame parent) {
+		// We can't keep reusing a form that we create just once, because you can't change the owner of an existing JDialog.
+		// But we don't want to pop up another dialog if one's already up, so defer to the last one if it's still up.
+		if (form != null) {
+			for (FormPanel panel : form.getFormPanels()) {
+				if (panel.isShowing()) {
+					((JDialog) SwingUtilities.getAncestorOfClass(JDialog.class, panel)).toFront();
+					return;
+				}
+			}
+		}
+		
+		this.form = new FormBuilder(parent, "Preferences", new String[] { "General", "Colors" });
 		List<FormPanel> formPanels = form.getFormPanels();
 		FormPanel generalPanel = formPanels.get(0);
 		FormPanel colorsPanel = formPanels.get(1);
@@ -327,6 +341,8 @@ public class Options {
 				boolean saved = writeOptionsTo(optionsFile);
 				if (saved == false) {
 					SimpleDialog.showAlert(null, "Couldn't save preferences.", "There was a problem writing preferences to \"" + optionsFile + "\".");
+				} else {
+					form = null;
 				}
 				return saved;
 			}
