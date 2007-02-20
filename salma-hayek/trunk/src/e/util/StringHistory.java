@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * A file-backed historical list of strings.
+ * A duplicate-free list of strings, optionally persisted to disk.
  * 
  * @author Phil Norman
  */
@@ -12,10 +12,16 @@ public class StringHistory {
     private String filename;
     private ArrayList<String> history;
     
+    /**
+     * Creates a new empty history that will not be written to disk.
+     */
     public StringHistory() {
         this(null);
     }
     
+    /**
+     * Creates a new history that starts with any history already on disk, and which writes changes out to disk as the occur.
+     */
     public StringHistory(String filename) {
         this.filename = filename;
         this.history = new ArrayList<String>();
