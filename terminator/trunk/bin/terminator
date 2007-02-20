@@ -192,8 +192,9 @@ invoker = Java.new("Terminator", "terminator/Terminator")
 invoker.log_filename = "#{log_directory}/terminator-#{$$}.log"
 invoker.launcher = launcher
 # The "user.home" system property won't necessarily point at $HOME.
-# We arranged above for $HOME/.terminal-logs/ to be available, so we need to stick to it.
+# We arranged above for a log directory to be available, so we need to stick to it.
 # (We didn't used to be able to getenv("HOME") from Java on Cygwin.)
+invoker.add_pathname_property("org.jessies.terminator.dotDirectory", dot_directory)
 invoker.add_pathname_property("org.jessies.terminator.logDirectory", log_directory)
 invoker.add_pathname_property("org.jessies.terminator.serverPortFileName", server_port_file_name)
 invoker.add_pathname_property("org.jessies.terminator.optionsFile", options_pathname)
