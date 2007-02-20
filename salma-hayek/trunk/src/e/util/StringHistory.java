@@ -2,9 +2,11 @@ package e.util;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 
 /**
  * A duplicate-free list of strings, optionally persisted to disk.
+ * Strings at low-numbered indexes are older than those at high-numbered indexes.
  * 
  * @author Phil Norman
  */
@@ -54,6 +56,23 @@ public class StringHistory {
         if (filename != null) {
             FileUtilities.fileFromString(filename).delete();
         }
+    }
+    
+    /**
+     * Returns a list of all the strings in this history that match the given regular expression.
+     * The strings are returned oldest first.
+     * It's easy for a caller to sort the result, but it wouldn't be easy for the caller to infer the chronological ordering.
+     */
+    public List<String> getStringsMatching(String regularExpression) {
+        Pattern pattern = PatternUtilities.smartCaseCompile(regularExpression);
+        ArrayList<String> result = new ArrayList<String>();
+        for (String candidate : history) {
+            Matcher matcher = pattern.matcher(candidate);
+            if (matcher.find()) {
+                result.add(candidate);
+            }
+        }
+        return result;
     }
     
     private void readHistoryFile() {
