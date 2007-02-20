@@ -83,7 +83,7 @@ public class CircularButton extends JComponent {
     protected void paintGlyph(Graphics2D g) {
         String label = "i";
         final FontMetrics metrics = g.getFontMetrics();
-        final int x = (getWidth() - metrics.stringWidth(label)) / 2;
+        final int x = (int) (((double) getWidth() - metrics.getStringBounds(label, g).getWidth()) / 2.0);
         final int y = getHeight() / 2 + metrics.getAscent() / 2;
         g.setColor(Color.WHITE);
         g.drawString(label, x, y);
