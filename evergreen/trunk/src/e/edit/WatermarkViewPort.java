@@ -58,7 +58,7 @@ public class WatermarkViewPort extends JViewport {
     public void paintWatermark(final Graphics g) {
         FontMetrics fm = g.getFontMetrics();
         final int watermarkHeight = (int) (1.2 * fm.getHeight());
-        final int watermarkWidth = (int) (1.1 * fm.stringWidth(watermark));
+        final int watermarkWidth = (int) (1.1 * fm.getStringBounds(watermark, g).getWidth());
         Rectangle clip = g.getClipBounds();
         g.setColor(getForeground());
         for (int x = clip.x - (clip.x % watermarkWidth); x < clip.x + clip.width; x += watermarkWidth) {
