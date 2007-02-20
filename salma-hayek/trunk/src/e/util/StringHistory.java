@@ -46,9 +46,10 @@ public class StringHistory {
         if (string.length() == 0) {
             return;
         }
-        history.remove(string); // Avoid duplicates.
+        // Avoid duplicates by removing any old entry first.
+        history.remove(string);
         history.add(string);
-        writeToHistoryFile(string);
+        writeHistoryFile();
     }
     
     public void clear() {
@@ -78,22 +79,23 @@ public class StringHistory {
     private void readHistoryFile() {
         try {
             if (filename != null && FileUtilities.exists(filename)) {
-                String[] lines = StringUtilities.readLinesFromFile(filename);
-                history.addAll(Arrays.asList(lines));
+                for (String line : StringUtilities.readLinesFromFile(filename)) {
+                    history.add(line);
+                }
             }
         } catch (Exception ex) {
             Log.warn("Error reading history from file \"" + filename + "\".", ex);
         }
     }
     
-    private void writeToHistoryFile(String string) {
+    private void writeHistoryFile() {
         if (filename == null) {
             return;
         }
         
-        String error = StringUtilities.appendToFile(FileUtilities.fileFromString(filename), string + "\n");
+        String error = StringUtilities.writeFile(FileUtilities.fileFromString(filename), StringUtilities.join(history, "\n"));
         if (error != null) {
-            Log.warn("Failed to append string \"" + string + "\" to history file \"" + filename + "\" (" + error + ").");
+            Log.warn("Failed to write history to file \"" + filename + "\" (" + error + ").");
         }
     }
 }
