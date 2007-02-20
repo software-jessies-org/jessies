@@ -27,14 +27,27 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		private boolean focused = true;
 		
 		private SelectionStyle() {
-			super(Options.getSharedInstance().getColor("foreground"), Options.getSharedInstance().getColor("selectionColor"), null, null, false);
+			super(null, null, null, null, false);
 		}
 		
+		@Override
 		public Color getBackground() {
-			if (focused) {
-				return super.getBackground();
-			}
-			return unfocusedSelectionColor;
+			return (focused ? Options.getSharedInstance().getColor("selectionColor") : unfocusedSelectionColor);
+		}
+		
+		@Override
+		public Color getForeground() {
+			return Options.getSharedInstance().getColor("foreground");
+		}
+		
+		@Override
+		public boolean hasBackground() {
+			return true;
+		}
+		
+		@Override
+		public boolean hasForeground() {
+			return true;
 		}
 		
 		public void focusGained(FocusEvent e) {
