@@ -52,7 +52,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
             model = new DefaultListModel();
             statusGood = true;
             try {
-                List fileList = workspace.getFileList().getListOfFilesMatching(regularExpression);
+                List<String> fileList = workspace.getFileList().getListOfFilesMatching(regularExpression);
                 for (int i = 0; i < fileList.size(); i++) {
                     model.addElement(fileList.get(i));
                 }
