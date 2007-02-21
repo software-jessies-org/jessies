@@ -65,6 +65,19 @@ public class CommandDialog {
             }
         });
         historyList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "accept-command");
+        
+        // If the user hits delete while the list has the focus, remove the selected items.
+        historyList.getActionMap().put("remove-entry", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                synchronized (history) {
+                    for (Object item : historyList.getSelectedValues()) {
+                        history.remove((String) item);
+                    }
+                }
+                showMatches();
+            }
+        });
+        historyList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "remove-entry");
     }
     
     private void showMatches() {
@@ -86,7 +99,10 @@ public class CommandDialog {
             model = new DefaultListModel();
             statusGood = true;
             try {
-                List<String> unsortedMatches = history.getStringsMatching(regularExpression);
+                List<String> unsortedMatches;
+                synchronized (history) {
+                    unsortedMatches = history.getStringsMatching(regularExpression);
+                }
                 String[] matches = unsortedMatches.toArray(new String[unsortedMatches.size()]);
                 Arrays.sort(matches);
                 for (String match : matches) {
@@ -115,7 +131,9 @@ public class CommandDialog {
             return null;
         }
         String command = commandField.getText().trim();
-        history.add(command);
+        synchronized (history) {
+            history.add(command);
+        }
         return JTerminalPane.newCommandWithName(command, null, null);
     }
     
