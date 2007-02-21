@@ -243,7 +243,6 @@ public class ETextWindow extends EWindow implements PTextListener {
         // FIXME: this works for BitKeeper, but is it right for Subversion too?
         final String MERGE_CONFLICT_REGULAR_EXPRESSION = "(<{7} .*|>{7})";
         if (Pattern.compile(MERGE_CONFLICT_REGULAR_EXPRESSION).matcher(textArea.getTextBuffer()).find()) {
-            System.err.println("found evidence of merge conflicts");
             FindAction.INSTANCE.findInText(this, MERGE_CONFLICT_REGULAR_EXPRESSION);
         }
     }
