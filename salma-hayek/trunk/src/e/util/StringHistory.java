@@ -52,6 +52,11 @@ public class StringHistory {
         writeHistoryFile();
     }
     
+    public void remove(String string) {
+        history.remove(string);
+        writeHistoryFile();
+    }
+    
     public void clear() {
         history = new ArrayList<String>();
         if (filename != null) {
