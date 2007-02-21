@@ -123,7 +123,7 @@ public class JavaDoc {
     * Learns the names of all the packages in a jar file.
     */
     public static void addPackagesInJarFile(File jarFile) {
-        System.err.println("Scanning " + jarFile);
+        Log.warn("Scanning " + jarFile);
         try {
             JarFile jar = new JarFile(jarFile);
             for (Enumeration e = jar.entries(); e.hasMoreElements(); ) {
@@ -137,7 +137,7 @@ public class JavaDoc {
                 }
                 if (entry.isDirectory() && packageNames.contains(name) == false) {
                     packageNames.add(name);
-                    System.err.println("Found package " + name);
+                    Log.warn("Found package " + name);
                 } else {
                     // Some jar files seem to have only files in them, and no directory entries.
                     int i = entry.getName().lastIndexOf("/");
@@ -145,7 +145,7 @@ public class JavaDoc {
                         String pkg = name.substring(0, i).replace('/', '.');
                         if (packageNames.contains(pkg) == false) {
                             packageNames.add(pkg);
-                            System.err.println("Found package " + pkg);
+                            Log.warn("Found package " + pkg);
                         }
                     }
                 }
@@ -153,7 +153,7 @@ public class JavaDoc {
         } catch (IOException ex) {
             Log.warn("Problem scanning " + jarFile, ex);
         }
-        System.err.println("Finished scanning " + jarFile);
+        Log.warn("Finished scanning " + jarFile);
     }
     
     /**

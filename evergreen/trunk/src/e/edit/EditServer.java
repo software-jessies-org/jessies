@@ -76,7 +76,6 @@ public final class EditServer {
             window.addHierarchyListener(new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {
                     if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && window.isShowing() == false) {
-                        System.out.println(window + " closed");
                         synchronized (lock) {
                             lock.notify();
                         }

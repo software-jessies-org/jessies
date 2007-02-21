@@ -547,7 +547,7 @@ public class Evergreen {
             return;
         }
 
-        SpellingChecker.dumpKnownBadWordsTo(System.out);
+        //SpellingChecker.dumpKnownBadWordsTo(System.out);
         FormDialog.writeGeometriesTo(getDialogGeometriesPreferenceFilename());
         
         writeSavedState();

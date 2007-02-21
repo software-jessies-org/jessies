@@ -38,13 +38,11 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         styleSheet.removeStyle("body");
         String body = "body { font-family: \"" + bodyFont.getFamily() + "\", sans-serif; font-size: " + bodyFont.getSize() + "pt; margin: 0px 2px 20px 2px; }";
         styleSheet.addRule(body);
-        //System.err.println(body);
         
         Font preFont = ChangeFontAction.getConfiguredFixedFont();
         styleSheet.removeStyle("pre");
         String pre = "pre { font-family: \"" + preFont.getFamily() + "\", monospace; font-size: " + preFont.getSize() + "pt; background-color: #eeeeff; border-style: solid; border-width: thin; border-color: #bbbbff; padding: 5px 5px 5px 5px; }";
         styleSheet.addRule(pre);
-        //System.err.println(pre);
     }
     
     private static class ScrollAction extends AbstractAction {
