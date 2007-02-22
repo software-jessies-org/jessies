@@ -49,7 +49,7 @@ and can be safely ignored.
 <p>The Cygwin icon on your desktop starts Microsoft's command prompt window, albeit with bash(1) inside. You can do better than that, though. There's a port of rxvt(1) that doesn't require X11, which you can install with the Cygwin <tt>setup.exe</tt>, or you can install <a href="http://software.jessies.org/terminator/">Terminator</a>.
 
 <p>Terminator will automatically install an icon on the desktop. If instead you choose rxvt(1), you'll have to make your own icon. To do so, right-click on the desktop, select New, Shortcut and paste the following into the presented field:
-<pre>c:\cygwin\bin\rxvt.exe -fn Terminal -scrollBar_right -bg blue4 -fg white -ls --savedLines 9999
+<pre>c:\cygwin\bin\rxvt.exe -fn Terminal -scrollBar_right -bg blue4 -fg white -ls --saveLines 9999
 </pre>
 <p>Miss off the background and foreground colors if you prefer dark-on-light, but you will want to use the Terminal font to avoid the default font.
 
