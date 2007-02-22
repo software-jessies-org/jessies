@@ -158,7 +158,7 @@ public class PMouseHandler implements MouseInputListener {
             // 3. we'll have dealt with braces at the ends of lines by now, so
             // a double-click after the end of the line should select the whole
             // line. I don't know of any platform whose native behavior this is,
-            // but it's how acme used to work, and hence wily, and hence Edit,
+            // but it's how acme used to work, and hence wily, and hence Evergreen,
             // and I'm really used to it.
             PTextBuffer textBuffer = textArea.getTextBuffer();
             if (pressedOffset < textBuffer.length() && textBuffer.charAt(pressedOffset) == '\n') {

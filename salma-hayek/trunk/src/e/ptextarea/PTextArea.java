@@ -291,7 +291,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      */
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
         // Firefox doesn't clear its selection when someone else claims the
-        // X11 selection and I imagine it could be quite annoying in Edit.
+        // X11 selection and I imagine it could be quite annoying in Evergreen.
         // So deliberately do nothing.
         
         // If we already have the read lock and ask for the write lock in
