@@ -66,7 +66,7 @@ and can be safely ignored.
 <pre>
 warning: Insecure world writable dir /usr/local/bin, mode 040777
 </pre>
-The directory and exact mode may differ, but you'll need to <tt>chmod o-w</tt> the directory in question. Here's the minimal set of changes I needed to make to keep Ruby quiet:
+<p>The directory and exact mode may differ, but you'll need to <tt>chmod o-w</tt> the directory in question. Here's the minimal set of changes I needed to make to keep Ruby quiet:
 <pre>
 chmod o-w /usr/local/bin
 chmod o-w /usr/local
