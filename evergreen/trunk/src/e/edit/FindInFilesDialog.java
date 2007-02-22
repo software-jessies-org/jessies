@@ -250,6 +250,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 Log.warn("Search for '" + regex + "' in files matching '" + fileRegex + "' took " + (endTime - startTime) + " ms.");
             } catch (PatternSyntaxException ex) {
                 errorMessage = ex.getDescription();
+                //Log.warn("Problem searching files for '" + ex.getPattern() + "'", ex);
             } catch (Exception ex) {
                 Log.warn("Problem searching files for ", ex);
             }
@@ -257,7 +258,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
         
         private DefaultMutableTreeNode getPathNode(String pathname) {
-            String[] pathElements = pathname.split(File.separator);
+            String[] pathElements = pathname.split(Pattern.quote(File.separator));
             String pathSoFar = "";
             DefaultMutableTreeNode parentNode = matchRoot;
             DefaultMutableTreeNode node = matchRoot;
