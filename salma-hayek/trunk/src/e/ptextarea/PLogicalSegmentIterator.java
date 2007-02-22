@@ -15,16 +15,10 @@ public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
     public PLogicalSegmentIterator(PTextArea textArea, int offsetContainedByFirstSegment) {
         this.textArea = textArea;
         lineIndex = textArea.getLineOfOffset(offsetContainedByFirstSegment);
-        List<PLineSegment> segments = textArea.getLineSegments(lineIndex);
-        for (int i = 0; i < segments.size(); ++i) {
-            if (segments.get(i).getEnd() > offsetContainedByFirstSegment) {
-                segmentBuffer.addAll(segments.subList(i, segments.size()));
-                break;
-            }
+        ensureSegmentBufferIsNotEmpty();
+        while (segmentBuffer.isEmpty() == false && segmentBuffer.get(0).getEnd() <= offsetContainedByFirstSegment) {
+            segmentBuffer.remove(0);
         }
-        int offset = textArea.getLineEndOffsetBeforeTerminator(lineIndex);
-        segmentBuffer.add(new PNewlineSegment(textArea, offset, offset + 1, PNewlineSegment.HARD_NEWLINE));
-        lineIndex++;
     }
     
     public boolean hasNext() {
@@ -37,7 +31,9 @@ public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
                 segmentBuffer.addLast(segment);
             }
             int newlineOffset = textArea.getLineEndOffsetBeforeTerminator(lineIndex);
-            segmentBuffer.addLast(new PNewlineSegment(textArea, newlineOffset, newlineOffset + 1, PNewlineSegment.HARD_NEWLINE));
+            if (newlineOffset < textArea.getTextBuffer().length()) {
+                segmentBuffer.addLast(new PNewlineSegment(textArea, newlineOffset, newlineOffset + 1, PNewlineSegment.HARD_NEWLINE));
+            }
             lineIndex++;
         }
     }
