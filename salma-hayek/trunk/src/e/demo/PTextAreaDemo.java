@@ -5,6 +5,7 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.io.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -47,10 +48,39 @@ public class PTextAreaDemo {
         
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
         
+        iterateOverSegments(textArea);
+        //System.err.println("indenter changed lines=" + countLinesChangedByIndenter(textArea));
+        
         JFrame frame = JFrameUtilities.makeScrollableContentWindow(file.getPath() + " - PTextAreaDemo", textArea);
         frame.setSize(new Dimension(600, 600));
         frame.setLocationByPlatform(true);
         frame.setVisible(true);
+    }
+    
+    private static void iterateOverSegments(PTextArea textArea) {
+        Iterator<PLineSegment> segments = textArea.getLogicalSegmentIterator(0);
+        int segmentCount = 0;
+        while (segments.hasNext()) {
+            PLineSegment segment = segments.next();
+            ++ segmentCount;
+            String segmentDump = segment.toString();
+            //System.err.println("segment=" + segmentDump);
+        }
+        System.err.println("segmentCount=" + segmentCount);
+    }
+    
+    private static int countLinesChangedByIndenter(PTextArea textArea) {
+        int changedLines = 0;
+        for (int lineNumber = 0; lineNumber != textArea.getLineCount(); ++ lineNumber) {
+            PIndenter indenter = textArea.getIndenter();
+            String previousIndentation = indenter.getCurrentIndentationOfLine(lineNumber);
+            indenter.fixIndentationOnLine(lineNumber);
+            String newIndentation = indenter.getCurrentIndentationOfLine(lineNumber);
+            if (newIndentation.equals(previousIndentation) == false) {
+                ++ changedLines;
+            }
+        }
+        return changedLines;
     }
     
     private static char[] getFileText(File file) {
