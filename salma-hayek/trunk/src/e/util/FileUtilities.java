@@ -29,7 +29,7 @@ public class FileUtilities {
      */
     public static String parseUserFriendlyName(String filename) {
         String result = filename;
-        if (filename.startsWith("~/") || filename.equals("~")) {
+        if (filename.startsWith("~" + File.separator) || filename.equals("~")) {
             result = getUserHomeDirectory();
             if (filename.length() > 1) {
                 result += File.separator + filename.substring(2);
