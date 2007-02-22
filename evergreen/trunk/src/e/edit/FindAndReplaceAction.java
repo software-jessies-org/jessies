@@ -162,6 +162,9 @@ public class FindAndReplaceAction extends ETextAction {
     }
 
     public class DisplayableMatch {
+        private static final String RED_ON = "<font color=red>";
+        private static final String BLUE_ON = "<font color=blue>";
+        
         private String html;
         private String toolTip;
         private int lineNumber;
@@ -199,10 +202,14 @@ public class FindAndReplaceAction extends ETextAction {
             return html;
         }
 
-        private static final String RED_ON = "<font color=red>";
-        private static final String BLUE_ON = "<font color=blue>";
-
         public String colorize(String line, String regularExpression, String replacement) {
+            // Work around the Swing misfeature where empty labels have zero height by ensuring that we always have something (even if it's invisible) in our labels.
+            if (replacement == null && line.length() == 0) {
+                line = " ";
+            } else if (replacement != null && replacement.length() == 0) {
+                replacement = " ";
+            }
+            
             String colorOn = BLUE_ON;
             if (replacement == null) {
                 regularExpression = "(" + regularExpression + ")";
