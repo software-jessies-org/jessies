@@ -1,4 +1,4 @@
-TODO list for Edit
+TODO list for Evergreen
 
 Add a field to "Add Workspace" so you can specify a build host. Any build
 commands are then prefixed with "ssh build-host ". Probably also need a way
@@ -13,9 +13,9 @@ Title bar text:
 Sort windows alphabetically?
 
 Subversion ignores the following by default; maybe we should hard-code
-something similar in Edit? I'd like to remove more of edit.properties,
+something similar in Evergreen? I'd like to remove more of edit.properties,
 and at least only have it contain differences from some sensible default
-state, rather than be strictly necessary for a working Edit.
+state, rather than be strictly necessary for a working Evergreen.
 # global-ignores = *.o *.lo *.la #*# .*.rej *.rej .*~ *~ .#* .DS_Store
 
 We should keep track of 'recent files' on a per-workspace basis. We
@@ -68,7 +68,7 @@ let us always show the user-friendly forms.
     (~/Projects/rarely-used-project/, say).
 
 [ ] as a matter of interest, i accidentally opened 40 files on one workspace
-    yesterday. (i don't have a tall enough display for 40 titlebars.) Edit
+    yesterday. (i don't have a tall enough display for 40 titlebars.) Evergreen
     didn't behave particularly gracefully, but it didn't spaz out in a
     damaging way. i think we should refuse to open files on a workspace if
     it's full.
@@ -158,7 +158,7 @@ auto-saving
     [ ] I'd be interested in making caseChangesLikeThis count
         as word breaks. (Xcode 1.5 does this with control + arrow keys.)
 
-[ ] I'd really like to have Edit format javadoc-style comments for me,
+[ ] I'd really like to have Evergreen format javadoc-style comments for me,
     making sure they're no more than 72 characters wide and have *s in
     the right places and so forth.
 
@@ -224,7 +224,7 @@ auto-saving
     http://bk-emacs.bkbits.net/
 
 [ ] grep " *" * in a directory with a reasonable amount of stuff in it.
-    Watch Edit have some kind of spazzy fit. how can we cure this? Pike's
+    Watch Evergreen have some kind of spazzy fit. how can we cure this? Pike's
     sam (and acme?) would redirect a command's output to a file, then show
     the first n lines of that file, giving you the option to see more.
     maybe we shouldn't auto-scroll? maybe we should block until the user
