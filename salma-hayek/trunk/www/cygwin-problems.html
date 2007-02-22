@@ -3,13 +3,6 @@
 
 <h1>Cygwin Problems</h1>
 
-<h2>The installer claims I need to install Cygwin but I already did!</h2>
-
-<p>When you install Cygwin, it stores its location in the registry.
-Unfortunately, it has to use a different registry key depending on whether you install for the current user or all users.
-We haven't yet worked out how to explain this to Microsoft's WiX installer compiler, so for now the work-around is to install Cygwin for all users.
-We hope to fix this by moving the check to run-time (and check both registry keys), which should help people who don't have permission to install for all users.
-
 <h2>Double-clicking on the shortcut icon does nothing</h2>
 
 <p>If you're having trouble starting one of our programs, you may want to try running it from a Cygwin Bash prompt
