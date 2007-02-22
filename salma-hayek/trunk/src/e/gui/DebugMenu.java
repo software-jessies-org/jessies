@@ -15,6 +15,8 @@ import javax.swing.Timer;
 public class DebugMenu {
     public static JMenu makeJMenu() {
         JMenu menu = new JMenu("Debugging Tools");
+        menu.add(new ShowLogAction());
+        menu.addSeparator();
         menu.add(new ShowEnvironmentAction());
         menu.add(new ShowSystemPropertiesAction());
         menu.addSeparator();
@@ -49,6 +51,26 @@ public class DebugMenu {
             builder.append(key + "=" + hash.get(key) + "\n");
         }
         return builder.toString();
+    }
+    
+    private static class ShowLogAction extends AbstractAction {
+        private final String logFilename = System.getProperty("e.util.Log.filename");
+        
+        public ShowLogAction() {
+            putValue(NAME, "Show Debugging Messages");
+        }
+        
+        public boolean isEnabled() {
+            return (logFilename != null);
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            // We used to use WebLinkAction with a file: URL so that the user's default text viewer would be used.
+            // Sadly, on Win32, another process can't open the log file while we've got it open for writing.
+            
+            // FIXME: we could use the file alteration monitor to update as the log gets written to. Or at least have a refresh button.
+            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Debugging Messages", StringUtilities.readFile(logFilename));
+        }
     }
     
     private static class ShowEnvironmentAction extends AbstractAction {

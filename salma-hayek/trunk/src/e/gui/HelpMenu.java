@@ -27,12 +27,6 @@ public class HelpMenu {
         //menu.add(new PlaceholderAction(applicationName + " Help"));
         //menu.addSeparator();
         
-        final String logFilename = System.getProperty("e.util.Log.filename");
-        if (logFilename != null) {
-            menu.add(new ShowLogAction(logFilename));
-            menu.addSeparator();
-        }
-        
         if (changeLogUrl != null) {
             menu.add(new WebLinkAction("View " + applicationName + " Change Log", changeLogUrl));
             menu.addSeparator();
@@ -69,23 +63,6 @@ public class HelpMenu {
         
         public void actionPerformed(ActionEvent e) {
             AboutBox.getSharedInstance().show();
-        }
-    }
-    
-    private class ShowLogAction extends AbstractAction {
-        private String filename;
-        
-        public ShowLogAction(String filename) {
-            this.filename = filename;
-            putValue(NAME, "Show Log Messages");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            // We used to use WebLinkAction with a file: URL so that the user's default text viewer would be used.
-            // Sadly, on Win32, another process can't open the log file while we've got it open for writing.
-            
-            // FIXME: if we had some kind of file alteration monitor, we could update as the log gets written to.
-            JFrameUtilities.showTextWindow(null, applicationName + " Log", StringUtilities.readFile(filename));
         }
     }
 }
