@@ -89,13 +89,17 @@ def find_jdk_root()
   # Microsoft Java in C:\WINNT\SYSTEM32.
   # This is unfortunately true even if the user has a properly installed JDK.
   if target_os() == "Cygwin"
-    # This returns a native path, but universal.make already copes with that.
-    registryKeyFile = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.5/JavaHome"
-    if File.exists?(registryKeyFile)
-      contents = File.open(registryKeyFile).read();
-      # Cygwin's representation of REG_SZ keys contains the null terminator.
-      return contents.chomp("\0")
-    end
+    acceptableMajorVersions = [6, 5]
+    acceptableMajorVersions.each() {
+      |majorVersion|
+      # This returns a native path, but universal.make already copes with that.
+      registryKeyFile = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.#{majorVersion}/JavaHome"
+      if File.exists?(registryKeyFile)
+        contents = File.open(registryKeyFile).read();
+        # Cygwin's representation of REG_SZ keys contains the null terminator.
+        return contents.chomp("\0")
+      end
+    }
   end
   
   # Find java(1) on the path.
