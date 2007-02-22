@@ -129,7 +129,6 @@ public class SpellingChecker {
     
     public static synchronized void dumpKnownBadWordsTo(PrintStream out) {
         // Get a sorted list of the known bad words.
-        Iterator it = knownBad.iterator();
         ArrayList<String> words = new ArrayList<String>();
         for (String word : knownBad) {
             words.add(word);
@@ -221,8 +220,7 @@ public class SpellingChecker {
         }
         List<String> suggestions = new ArrayList<String>();
         fillCollectionWithSuggestions(response, suggestions);
-        for (Iterator i = suggestions.iterator(); i.hasNext(); ) {
-            String suggestion = (String) i.next();
+        for (String suggestion : suggestions) {
             if (suggestion.equalsIgnoreCase(word)) {
                 return true;
             }
