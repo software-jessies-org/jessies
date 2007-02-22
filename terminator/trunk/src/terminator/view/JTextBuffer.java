@@ -462,9 +462,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	
 	private void redoHighlightsFrom(int firstLineIndex) {
 		removeHighlightsFrom(firstLineIndex);
-		Iterator it = getHighlighters().iterator();
-		while (it.hasNext()) {
-			Highlighter highlighter = (Highlighter) it.next();
+		for (Highlighter highlighter : getHighlighters()) {
 			highlighter.addHighlights(this, firstLineIndex);
 		}
 	}
