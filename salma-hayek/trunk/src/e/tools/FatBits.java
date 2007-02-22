@@ -397,7 +397,7 @@ public class FatBits extends JFrame {
         }
         
         private JMenu makeHelpMenu() {
-            HelpMenu helpMenu = new HelpMenu("FatBits");
+            HelpMenu helpMenu = new HelpMenu();
             return helpMenu.makeJMenu();
         }
     }
