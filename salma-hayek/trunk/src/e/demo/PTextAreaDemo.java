@@ -82,22 +82,4 @@ public class PTextAreaDemo {
         }
         return changedLines;
     }
-    
-    private static char[] getFileText(File file) {
-        try {
-            CharArrayWriter chars = new CharArrayWriter();
-            PrintWriter writer = new PrintWriter(chars);
-            BufferedReader in = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = in.readLine()) != null) {
-                writer.println(line);
-            }
-            in.close();
-            writer.close();
-            return chars.toCharArray();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return new char[0];
-        }
-    }
 }
