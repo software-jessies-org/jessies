@@ -6,8 +6,8 @@
  * toFront doesn't work on an application that isn't the one the user's
  * interacting with. Normally this is fine, if not preferable, but it's awkward
  * for a Java program that wants to be brought to the front via indirect user
- * request. For example, without this, it's impossible for the "edit" script
- * to bring Edit to the front on Mac OS.
+ * request. For example, without this, it's impossible for the "evergreen" script
+ * to bring Evergreen to the front on Mac OS.
  * 
  * (This file is Objective C++ simply so that the make rules add
  * "-framework Cocoa", which will drag in Carbon for us.)

@@ -232,7 +232,7 @@ public class FileUtilities {
      * 
      * Really, the best way to make this kind of test is to see how many
      * bad runes we get if we interpret it as UTF-8. But that's harder,
-     * and I don't actually Edit any non-ASCII files with Edit, so it
+     * and I don't actually edit any non-ASCII files with Evergreen, so it
      * can wait.
      */
     public static boolean isTextFile(File file) {

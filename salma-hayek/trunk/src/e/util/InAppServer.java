@@ -12,7 +12,7 @@ import java.util.*;
  * an interface listing available commands, and provide an object that
  * implements that interface to do the work, and you're off!
  * 
- * Edit uses this so you can open files from the shell, and Terminator uses it
+ * Evergreen uses this so you can open files from the shell, and Terminator uses it
  * so that successive invocations don't need to start a new VM.
  */
 public final class InAppServer {
