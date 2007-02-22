@@ -9,11 +9,9 @@ import javax.swing.*;
  * A "Help" menu for a GUI application.
  */
 public class HelpMenu {
-    private String applicationName;
     private String changeLogUrl;
     
-    public HelpMenu(String applicationName) {
-        this.applicationName = applicationName;
+    public HelpMenu() {
     }
     
     public void setChangeLog(String url) {
@@ -24,11 +22,11 @@ public class HelpMenu {
         JMenu menu = new JMenu("Help");
         
         // We don't support this yet, because we've got nothing to point it to.
-        //menu.add(new PlaceholderAction(applicationName + " Help"));
+        //menu.add(new PlaceholderAction(Log.getApplicationName() + " Help"));
         //menu.addSeparator();
         
         if (changeLogUrl != null) {
-            menu.add(new WebLinkAction("View " + applicationName + " Change Log", changeLogUrl));
+            menu.add(new WebLinkAction("View " + Log.getApplicationName() + " Change Log", changeLogUrl));
             menu.addSeparator();
         }
         
@@ -51,7 +49,7 @@ public class HelpMenu {
         private AboutBoxAction() {
             String name = "About";
             if (GuiUtilities.isMacOs() == false) {
-                name += " " + applicationName;
+                name += " " + Log.getApplicationName();
             }
             putValue(NAME, name);
             GnomeStockIcon.useStockIcon(this, "gtk-about");
