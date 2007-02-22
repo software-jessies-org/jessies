@@ -227,7 +227,7 @@ public class Evergreen {
             // grep(1) matches along the lines of "file.cpp:123:void something()"
             // where the end of the address and the beginning of the actual line
             // are run together. We keep regressing on this behavior!
-            Pattern addressPattern = Pattern.compile("^((?:[A-Z]:\\\\){0,1}.+?)((:\\d+)*)(:|:?$)");
+            Pattern addressPattern = Pattern.compile("^((?:[A-Za-z]:\\\\){0,1}.+?)((:\\d+)*)(:|:?$)");
             Matcher addressMatcher = addressPattern.matcher(filename);
             if (addressMatcher.find()) {
                 address = addressMatcher.group(2);
