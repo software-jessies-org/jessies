@@ -17,7 +17,8 @@ public class PMouseHandler implements MouseInputListener {
     
     public void mousePressed(MouseEvent e) {
         trackMouse(e);
-        if (e.isPopupTrigger()) {
+        if (SwingUtilities.isRightMouseButton(e)) {
+            // It's the mouseReleased event that's returns true for e.isPopupTrigger() on Windows, so we can't check that here.
             return;
         }
         if (e.getClickCount() == 1) {
