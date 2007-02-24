@@ -88,7 +88,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	}
 	
 	public void mousePressed(MouseEvent event) {
-		if (SwingUtilities.isLeftMouseButton(event) == false || event.isPopupTrigger()) {
+		if (e.isConsumed() || SwingUtilities.isLeftMouseButton(event) == false || event.isPopupTrigger()) {
 			return;
 		}
 		
