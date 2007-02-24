@@ -17,18 +17,24 @@ public class PMouseHandler implements MouseInputListener {
     
     public void mousePressed(MouseEvent e) {
         trackMouse(e);
-        if (SwingUtilities.isRightMouseButton(e)) {
-            // It's the mouseReleased event that's returns true for e.isPopupTrigger() on Windows, so we can't check that here.
+        
+        // Ignore events that don't concern us.
+        if (e.isConsumed() || SwingUtilities.isRightMouseButton(e) || e.isPopupTrigger()) {
             return;
         }
+        
         if (e.getClickCount() == 1) {
             textArea.requestFocus();
-            if (SwingUtilities.isMiddleMouseButton(e)) {
-                textArea.pasteSystemSelection();
-                return;
-            }
         }
-        if (e.isConsumed() == false) {
+        
+        // Handle middle-button paste.
+        if (SwingUtilities.isMiddleMouseButton(e) && e.getClickCount() == 1) {
+            textArea.pasteSystemSelection();
+            return;
+        }
+        
+        // Handle left-button caret movement and selection.
+        if (SwingUtilities.isLeftMouseButton(e)) {
             int newOffset = getOffsetAtMouse();
             if (e.isShiftDown()) {
                 // A shift-click extends the selection but doesn't begin a drag.
