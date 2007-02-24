@@ -87,14 +87,14 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		}
 	}
 	
-	public void mousePressed(MouseEvent event) {
-		if (e.isConsumed() || SwingUtilities.isLeftMouseButton(event) == false || event.isPopupTrigger()) {
+	public void mousePressed(MouseEvent e) {
+		if (e.isConsumed() || SwingUtilities.isLeftMouseButton(e) == false || e.isPopupTrigger()) {
 			return;
 		}
 		
 		// Shift-click should move one end of the selection.
-		if (event.isShiftDown() && startLocation != null) {
-			Location newEndLocation = view.viewToModel(event.getPoint());
+		if (e.isShiftDown() && startLocation != null) {
+			Location newEndLocation = view.viewToModel(e.getPoint());
 			dragHandler = new SingleClickDragHandler();
 			// The following line does nothing, but we should call makeInitialSelection to
 			// protect against future changes in implementation.
@@ -103,7 +103,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 			return;
 		}
 		
-		Location loc = view.viewToModel(event.getPoint());
+		Location loc = view.viewToModel(e.getPoint());
 		view.removeHighlightsFrom(this, 0);
 		highlight = null;
 		startLocation = loc;
@@ -111,7 +111,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		if (loc.getLineIndex() >= view.getModel().getLineCount()) {
 			return;
 		}
-		dragHandler = getDragHandlerForClick(event);
+		dragHandler = getDragHandlerForClick(e);
 		dragHandler.makeInitialSelection(loc);
 	}
 	
