@@ -256,9 +256,34 @@ public class GuiUtilities {
                 // In the meantime, this actually corresponds to Ubuntu's "Human" theme.
                 // If we get complaints from users of other themes, we might want to try to find the closest color already known to UIManager.
                 UIManager.put("Table.background", new Color(0xf5f2ed));
+                fixWmClass();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+    
+    /**
+     * Overrides AWT's default guess of what to use as our windows' WM_CLASS.
+     * 
+     * AWT's XToolkit guesses a WM_CLASS for us based on the bottom-most class name in the stack trace of the thread that causes its construction.
+     * For those of our application that launch from e.util.Launcher, that means they all get the WM_CLASS "e-util-Launcher".
+     * Even those that don't, get a fully-qualified name such as "e-tools-FatBits" or "terminator-Terminator".
+     * These names aren't usually very important unless you're doing some ugly application-specific hacking in your window manager.
+     * Sadly, though, they show through in certain cases:
+     * 1. When space gets too tight for GNOME's panel to have an icon for each window, it starts collapsing them by application, and uses WM_CLASS as the application name.
+     * 2.If you use the GNOME/the Java Desktop System's Alt-PrtScr screenshot tool, its default filename is "Screenshot-<WM_CLASS>".
+     * There are probably more examples, but these are enough to warrant a solution.
+     * Given that we know what our application calls itself, we can use reflection to override AWT's default guess.
+     */
+    private static void fixWmClass() {
+        try {
+            Toolkit xToolkit = Toolkit.getDefaultToolkit();
+            java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
+            awtAppClassNameField.setAccessible(true);
+            awtAppClassNameField.set(xToolkit, Log.getApplicationName());
+        } catch (Throwable th) {
+            Log.warn("Failed to fix WM_CLASS for " + Log.getApplicationName() + " windows.", th);
         }
     }
     
