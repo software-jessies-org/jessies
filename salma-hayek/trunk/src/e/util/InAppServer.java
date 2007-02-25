@@ -39,7 +39,7 @@ public final class InAppServer {
         
         // In the absence of authentication, we shouldn't risk starting a server as root.
         if (System.getProperty("user.name").equals("root")) {
-            Log.warn("Refusing to start unauthenticated server '" + fullName + "' as root!");
+            Log.warn("InAppServer: refusing to start unauthenticated server '" + fullName + "' as root!");
             return;
         }
         
@@ -51,7 +51,7 @@ public final class InAppServer {
             serverThread.setDaemon(true);
             serverThread.start();
         } catch (Throwable th) {
-            Log.warn("Couldn't start " + fullName, th);
+            Log.warn("InAppServer: couldn't start \"" + fullName + "\".", th);
         }
         writeNewSecret();
     }
@@ -77,9 +77,8 @@ public final class InAppServer {
         } catch (NoSuchMethodException nsmex) {
             out.println(fullName + ": didn't understand request \"" + line + "\".");
         } catch (Exception ex) {
-            ex.printStackTrace();
-            String s = fullName + ": request denied \"" + line + "\" (" + ex.toString() + ").";
-            out.println(s);
+            Log.warn(fullName + ": exception thrown while handling command \"" + line + "\".", ex);
+            out.println(fullName + ": request denied \"" + line + "\" (" + ex.toString() + ").");
         } finally {
             out.flush();
             out.close();
@@ -135,10 +134,10 @@ public final class InAppServer {
         private void acceptConnections() {
             for (;;) {
                 try {
-                    String handlerName = Thread.currentThread().getName() + "-Handler-" + Thread.activeCount();
+                    String handlerName = fullName + "-Handler-" + Thread.activeCount();
                     new Thread(new ClientHandler(socket.accept()), handlerName).start();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    Log.warn(fullName + ": exception accepting connection.", ex);
                 }
             }
         }
@@ -169,7 +168,7 @@ public final class InAppServer {
                 out.close();
                 in.close();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                Log.warn(Thread.currentThread().getName() + ": failure handling client request.", ex);
             } finally {
                 closeClientSocket();
             }
@@ -179,14 +178,14 @@ public final class InAppServer {
             try {
                 client.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                Log.warn(Thread.currentThread().getName() + ": failed to close client socket.", ex);
             }
         }
         
         private boolean authenticateClient() throws IOException {
             String line = in.readLine();
             if (line == null || line.equals(secret) == false) {
-                Log.warn(Thread.currentThread().getName() + ": failed authentication attempt with \"" + line + "\"");
+                Log.warn(Thread.currentThread().getName() + ": failed authentication attempt with \"" + line + "\".");
                 out.println("Authentication failed");
                 return false;
             }
@@ -198,11 +197,11 @@ public final class InAppServer {
         private void handleRequest() throws IOException {
             String line = in.readLine();
             if (line == null || line.length() == 0) {
-                Log.warn(Thread.currentThread().getName() + ": ignoring empty request");
+                Log.warn(Thread.currentThread().getName() + ": ignoring empty request.");
                 return;
             }
             if (handleCommand(line, out) == false) {
-                out.println(Thread.currentThread().getName() + ": didn't understand request \"" + line + "\"");
+                out.println(Thread.currentThread().getName() + ": didn't understand request \"" + line + "\".");
             }
         }
     }

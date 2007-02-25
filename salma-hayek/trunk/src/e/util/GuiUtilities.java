@@ -259,7 +259,7 @@ public class GuiUtilities {
                 fixWmClass();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.warn("Problem setting up GUI defaults.", ex);
         }
     }
     

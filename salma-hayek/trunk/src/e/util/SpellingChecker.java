@@ -188,7 +188,7 @@ public class SpellingChecker {
         } catch (IOException ex) {
             // What do we know, other than we failed to get an answer?
             // Should we stop talking to ispell?
-            ex.printStackTrace();
+            Log.warn("ispell: I/O error.", ex);
             return false;
         }
     }

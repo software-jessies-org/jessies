@@ -25,8 +25,8 @@ public class JTextComponentUtilities {
                         doGoToSelection(textComponent, startOffset, endOffset);
                     }
                 });
-            } catch (Throwable ex) {
-                ex.printStackTrace();
+            } catch (Throwable th) {
+                Log.warn("Failure in goToSelection.", th);
             }
         }
     }
@@ -55,7 +55,7 @@ public class JTextComponentUtilities {
             y = Math.min(y, textComponent.getHeight() - height);
             viewport.setViewPosition(new Point(0, y));
         } catch (javax.swing.text.BadLocationException ex) {
-            ex.printStackTrace();
+            Log.warn("Failure in ensureVisibilityOfOffset.", ex);
         }
     }
     

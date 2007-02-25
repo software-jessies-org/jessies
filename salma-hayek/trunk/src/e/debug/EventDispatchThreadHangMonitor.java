@@ -382,7 +382,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                 Thread.sleep(ms);
                 System.out.println("Finished sleeping...");
             } catch (Exception ex) {
-                ex.printStackTrace();
+                Log.warn("Sleep interrupted!", ex);
             }
         }
     }
