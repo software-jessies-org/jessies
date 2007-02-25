@@ -317,8 +317,7 @@ public class PTextBuffer implements CharSequence {
                     System.arraycopy(text, textPosition, result, copyCount, result.length - copyCount);
                 }
             } catch (ArrayIndexOutOfBoundsException ex) {
-                System.err.println("Requested get text from " + start + ", length " + charCount + "; size is " + length());
-                ex.printStackTrace();
+                Log.warn("Requested get text from " + start + ", length " + charCount + "; size is " + length() +".", ex);
             }
             return new CharArrayCharSequence(result);
         } finally {

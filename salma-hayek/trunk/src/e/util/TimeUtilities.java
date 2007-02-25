@@ -77,21 +77,22 @@ public class TimeUtilities {
     }
 
     public static void main(String[] arguments) {
+        java.io.PrintStream out = System.out;
         Date startDate = new Date();
         long start = System.currentTimeMillis();
-        System.out.println(currentIsoString());
+        out.println(currentIsoString());
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(out);
         }
         Date endDate = new Date();
         long end = System.currentTimeMillis();
-        System.out.println(currentIsoString());
-        System.out.println(durationToIsoString(end - start));
-        System.out.println(durationToIsoString(millisecondsBetween(startDate, endDate)));
+        out.println(currentIsoString());
+        out.println(durationToIsoString(end - start));
+        out.println(durationToIsoString(millisecondsBetween(startDate, endDate)));
         for (String argument : arguments) {
-            System.out.println(durationToIsoString(Long.parseLong(argument)));
+            out.println(durationToIsoString(Long.parseLong(argument)));
         }
     }
 }

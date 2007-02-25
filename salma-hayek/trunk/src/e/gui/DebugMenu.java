@@ -132,7 +132,7 @@ public class DebugMenu {
                     SwingUtilities.updateComponentTreeUI(frame);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                SimpleDialog.showDetails(null, "Failed to change LAF", ex);
             }
         }
     }

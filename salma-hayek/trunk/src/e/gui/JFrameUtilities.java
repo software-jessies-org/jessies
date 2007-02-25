@@ -11,11 +11,12 @@ public class JFrameUtilities {
     private static final Image FRAME_ICON;
     static {
         // Load the icon so that failures don't jeopardize users of this class; you don't want to hang in <clinit>!
+        String filename = System.getProperty("org.jessies.frameIcon");
         Image image = null;
         try {
-            image = ImageIO.read(FileUtilities.fileFromString(System.getProperty("org.jessies.frameIcon")));
+            image = ImageIO.read(FileUtilities.fileFromString(filename));
         } catch (Throwable th) {
-            th.printStackTrace();
+            Log.warn("Failed to load icon \"" + filename + "\".", th);
         } finally {
             FRAME_ICON = image;
         }

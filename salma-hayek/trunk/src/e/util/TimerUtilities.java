@@ -25,7 +25,7 @@ public class TimerUtilities {
                 nextTimer = (Timer) nextTimerField.get(nextTimer);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.warn("Failed to get queued Swing timers.", ex);
         }
         return result;
     }
