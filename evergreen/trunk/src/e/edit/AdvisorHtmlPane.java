@@ -92,7 +92,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         try {
             textPane.setPage(url);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.warn("Exception thrown in setPage.", ex);
         }
     }
     
