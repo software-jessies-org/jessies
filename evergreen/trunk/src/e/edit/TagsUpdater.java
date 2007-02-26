@@ -205,6 +205,7 @@ public class TagsUpdater {
     
     public class TreeModelBuilder extends SwingWorker<TreeModel, TagReader.Tag> implements TagReader.TagListener {
         private int serialNumber;
+        private String newDigest;
         private boolean tagsHaveChanged;
         private boolean successful = true;
         private long startTime;
@@ -294,9 +295,7 @@ public class TagsUpdater {
                 }
                 getTextArea().getTextBuffer().writeToFile(temporaryFile);
                 TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), tagsDigest, this);
-                String newDigest = tagReader.getTagsDigest();
-                tagsHaveChanged = (newDigest != null) && (newDigest.equals(tagsDigest) == false);
-                tagsDigest = newDigest;
+                newDigest = tagReader.getTagsDigest();
                 // See the comment above for why we don't delete our temporary files, except on exit.
                 //temporaryFile.delete();
             } catch (Exception ex) {
@@ -312,8 +311,10 @@ public class TagsUpdater {
             }
             if (successful) {
                 showTags();
+                boolean tagsHaveChanged = (newDigest != null) && (newDigest.equals(tagsDigest) == false);
                 if (tagsHaveChanged && serialNumber == latestSerialNumber) {
                     setTreeModel(treeModel);
+                    tagsDigest = newDigest;
                 }
             }
             //long endTime = System.currentTimeMillis();
