@@ -100,10 +100,9 @@ public class ETextWindow extends EWindow implements PTextListener {
         add(scrollPane, BorderLayout.CENTER);
         add(birdView, BorderLayout.EAST);
         
+        this.tagsUpdater = new TagsUpdater(this);
         fillWithContent();
         initUserConfigurableDefaults();
-        
-        tagsUpdater = new TagsUpdater(this);
         initFindResultsUpdater();
     }
     
@@ -346,6 +345,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         int originalCaretPosition = textArea.getSelectionStart();
         fillWithContent();
         textArea.setCaretPosition(originalCaretPosition);
+        tagsUpdater.updateTags();
         Evergreen.getInstance().showStatus("Reverted to saved version of " + filename);
     }
     
