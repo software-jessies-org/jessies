@@ -247,11 +247,17 @@ LDFLAGS += $(LDFLAGS.$(TARGET_OS))
 # Extra compiler and (mainly) linker flags for building JNI.
 # ----------------------------------------------------------------------------
 
-JNI_LIBRARY_LDFLAGS += $(LDFLAGS)
+# Tradition has it this way.
+SHARED_LIBRARY_PREFIX.$(TARGET_OS) = lib
+SHARED_LIBRARY_EXTENSION.$(TARGET_OS) = so
 
-JNI_LIBRARY_LDFLAGS.Darwin += -dynamiclib -framework JavaVM
-JNI_LIBRARY_PREFIX.Darwin = lib
+JNI_LIBRARY_EXTENSION.$(TARGET_OS) = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
+
+SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib
+JNI_LIBRARY_LDFLAGS.Darwin += -framework JavaVM
 JNI_LIBRARY_EXTENSION.Darwin = jnilib
+# Is there a convention for the shared library extension on Mac OS?
+#SHARED_LIBRARY_EXTENSION.Darwin =
 # The default $(LD) doesn't know about -dynamiclib on Darwin.
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
 LD = $(CXX)
@@ -260,19 +266,18 @@ LD = $(CXX)
 # GCC's -shared option, which we use on Linux, exists, but produces link
 # errors. -G, as used in Sun's tutorial examples with their own compiler works.
 EXTRA_INCLUDE_PATH.SunOS += $(JDK_ROOT)/include/solaris
-JNI_LIBRARY_LDFLAGS.SunOS += -G
-JNI_LIBRARY_PREFIX.SunOS = lib
-JNI_LIBRARY_EXTENSION.SunOS = so
+SHARED_LIBRARY_LDFLAGS.SunOS += -G
 
 EXTRA_INCLUDE_PATH.Linux += $(JDK_ROOT)/include/linux
-JNI_LIBRARY_LDFLAGS.Linux += -shared
-JNI_LIBRARY_PREFIX.Linux = lib
-JNI_LIBRARY_EXTENSION.Linux = so
+SHARED_LIBRARY_LDFLAGS.Linux += -shared
 
 EXTRA_INCLUDE_PATH.Cygwin += $(JDK_ROOT)/include/win32
-JNI_LIBRARY_LDFLAGS.Cygwin += -shared -Wl,--add-stdcall-alias -Wl,--enable-auto-image-base
-JNI_LIBRARY_PREFIX.Cygwin =
-JNI_LIBRARY_EXTENSION.Cygwin = dll
+SHARED_LIBRARY_LDFLAGS.Cygwin += -shared
+# Do we want stdcall aliases for even non-JNI shared libraries?
+SHARED_LIBRARY_LDFLAGS.Cygwin += -Wl,--add-stdcall-alias
+SHARED_LIBRARY_LDFLAGS.Cygwin += -Wl,--enable-auto-image-base
+SHARED_LIBRARY_PREFIX.Cygwin =
+SHARED_LIBRARY_EXTENSION.Cygwin = dll
 
 EXTRA_INCLUDE_PATH += $(JDK_ROOT)/include
 EXTRA_INCLUDE_PATH += $(EXTRA_INCLUDE_PATH.$(TARGET_OS))
@@ -283,8 +288,11 @@ ifneq "$(NON_EXISTENT_INCLUDE_DIRECTORIES)" ""
   $(warning Could not find $(NON_EXISTENT_INCLUDE_DIRECTORIES) - perhaps the first java on your PATH isn't in a JDK)
 endif
 
-JNI_LIBRARY_LDFLAGS += $(JNI_LIBRARY_LDFLAGS.$(TARGET_OS))
-JNI_LIBRARY_PREFIX = $(JNI_LIBRARY_PREFIX.$(TARGET_OS))
+SHARED_LIBRARY_LDFLAGS = $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
+SHARED_LIBRARY_PREFIX = $(SHARED_LIBRARY_PREFIX.$(TARGET_OS))
+SHARED_LIBRARY_EXTENSION = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
+
+JNI_LIBRARY_LDFLAGS = $(JNI_LIBRARY_LDFLAGS.$(TARGET_OS))
 JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------

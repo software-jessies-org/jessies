@@ -13,8 +13,6 @@
 
 LOCAL_LDFLAGS := $(LDFLAGS)
 MISSING_PREREQUISITES :=
-EXECUTABLES :=
-EXECUTABLES.Cygwin :=
 
 # ----------------------------------------------------------------------------
 # Choose the basename(1) for the target
@@ -47,17 +45,17 @@ HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(COMPILATION_DIRECTORY)/%,$(HEA
 # Locate the executables.
 # ----------------------------------------------------------------------------
 
-EXECUTABLES += $(BIN_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
+EXECUTABLES.Cygwin =
+
+EXECUTABLES.$(TARGET_OS) = $(BIN_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
 
 EXECUTABLES.Cygwin += $(BIN_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
 
-EXECUTABLES += $(EXECUTABLES.$(TARGET_OS))
+EXECUTABLES = $(EXECUTABLES.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
 # Locate the JNI library and its intermediate files.
 # ----------------------------------------------------------------------------
-
-JNI_LIBRARY = $(LIB_DIRECTORY)/$(JNI_LIBRARY_PREFIX)$(BASE_NAME).$(JNI_LIBRARY_EXTENSION)
 
 # $(foreach) generates a space-separated list even where the elements either side are empty strings.
 # $(strip) removes spurious spaces.
@@ -69,10 +67,27 @@ JNI_OBJECT = $(COMPILATION_DIRECTORY)/$(JNI_BASE_NAME).o
 JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 JNI_CLASS_FILE = classes/$(subst .,/,$(JNI_CLASS_NAME)).class
 
+BUILDING_JNI = $(JNI_SOURCE)
+LOCAL_LDFLAGS += $(if $(BUILDING_JNI),$(JNI_LIBRARY_LDFLAGS))
+
 define JAVAHPP_RULE
 $(JAVAHPP) -classpath classes $(JNI_CLASS_NAME) > $(NEW_JNI_HEADER) && \
 { cmp -s $(NEW_JNI_HEADER) $(JNI_HEADER) || cp $(NEW_JNI_HEADER) $(JNI_HEADER); }
 endef
+
+# ----------------------------------------------------------------------------
+# Build shared libraries.
+# ----------------------------------------------------------------------------
+
+LOCAL_SHARED_LIBRARY_EXTENSION = $(if $(BUILDING_JNI),$(JNI_LIBRARY_EXTENSION),$(SHARED_LIBRARY_EXTENSION))
+POTENTIAL_SHARED_LIBRARY = $(LIB_DIRECTORY)/$(patsubst liblib%,lib%,$(SHARED_LIBRARY_PREFIX)$(BASE_NAME)).$(LOCAL_SHARED_LIBRARY_EXTENSION)
+
+BUILDING_SHARED_LIBRARY =
+BUILDING_SHARED_LIBRARY += $(filter lib%,$(notdir $(SOURCE_DIRECTORY)))
+BUILDING_SHARED_LIBRARY += $(BUILDING_JNI)
+
+LOCAL_LDFLAGS += $(if $(strip $(BUILDING_SHARED_LIBRARY)),$(SHARED_LIBRARY_LDFLAGS))
+SHARED_LIBRARY = $(if $(strip $(BUILDING_SHARED_LIBRARY)),$(POTENTIAL_SHARED_LIBRARY))
 
 # ----------------------------------------------------------------------------
 # Add Cocoa frameworks if we're building Objective-C/C++.
@@ -99,9 +114,7 @@ MISSING_PREREQUISITES += $(MISSING_PRIVATE_FRAMEWORKS)
 # Decide on the default target.
 # ----------------------------------------------------------------------------
 
-DESIRED_TARGETS =
-DESIRED_TARGETS += $(if $(JNI_SOURCE),$(JNI_LIBRARY))
-DESIRED_TARGETS := $(if $(strip $(DESIRED_TARGETS)),$(DESIRED_TARGETS),$(EXECUTABLES))
+DESIRED_TARGETS = $(if $(strip $(SHARED_LIBRARY)),$(SHARED_LIBRARY),$(EXECUTABLES))
 DEFAULT_TARGETS = $(if $(strip $(MISSING_PREREQUISITES)),missing-prerequisites.$(BASE_NAME),$(DESIRED_TARGETS))
 
 define MISSING_PREREQUISITES_RULE
@@ -118,8 +131,7 @@ endef
 # ----------------------------------------------------------------------------
 
 $(EXECUTABLES.Cygwin): LOCAL_LDFLAGS += -Wl,--subsystem,windows
-$(EXECUTABLES): LDFLAGS := $(LOCAL_LDFLAGS)
-$(JNI_LIBRARY): LDFLAGS := $(JNI_LIBRARY_LDFLAGS)
+$(EXECUTABLES) $(SHARED_LIBRARY): LDFLAGS := $(LOCAL_LDFLAGS)
 $(NEW_JNI_HEADER): RULE := $(JAVAHPP_RULE)
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
@@ -132,7 +144,7 @@ missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 # Our linked targets.
 # ----------------------------------------------------------------------------
 
-$(EXECUTABLES) $(JNI_LIBRARY): $(OBJECTS)
+$(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
 	@echo Linking $(notdir $@)...
 	mkdir -p $(@D) && \
 	$(LD) $^ -o $@ $(LDFLAGS)
