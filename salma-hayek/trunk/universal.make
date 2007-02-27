@@ -256,8 +256,9 @@ JNI_LIBRARY_EXTENSION.$(TARGET_OS) = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
 SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib
 JNI_LIBRARY_LDFLAGS.Darwin += -framework JavaVM
 JNI_LIBRARY_EXTENSION.Darwin = jnilib
-# Is there a convention for the shared library extension on Mac OS?
-#SHARED_LIBRARY_EXTENSION.Darwin =
+# http://developer.apple.com/documentation/Porting/Conceptual/PortingUnix/compiling/chapter_4_section_9.html
+# "By default, the names of dynamic libraries in Mac OS X end in .dylib instead of .so."
+SHARED_LIBRARY_EXTENSION.Darwin = dylib
 # The default $(LD) doesn't know about -dynamiclib on Darwin.
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
 LD = $(CXX)
