@@ -156,9 +156,9 @@ public class HeapView extends JComponent {
     private HeapGrowTimer heapGrowTimer;
     
     /**
-     * Current text being displayed.
+     * Updated with the current heap usage every time we refresh the graph.
      */
-    private String heapSizeText;
+    private JLabel currentHeapUsageLabel;
 
     /**
      * Image containing gradient for ticks.
@@ -170,9 +170,9 @@ public class HeapView extends JComponent {
      */
     private BufferedImage gridOverlayImage;
     
-    public HeapView() {
-        format = new MessageFormat("{0,number,0.0}/{1,number,0.0} MiB");
-        heapSizeText = "";
+    public HeapView(JLabel currentHeapUsageLabel) {
+        this.currentHeapUsageLabel = currentHeapUsageLabel;
+        this.format = new MessageFormat("{0,number,0.0}/{1,number,0.0} MiB");
         updateUI();
     }
     
@@ -257,7 +257,6 @@ public class HeapView extends JComponent {
             paintTicks(g, innerW, innerH);
             // FIXME(enh): if the grid weren't meaningless, it might be worth drawing.
             //g.drawImage(getGridOverlayImage(), 0, 0, null);
-            paintText(g, innerW, innerH);
             g.translate(-1, -2);
         } else {
             stopTimerIfNecessary();
@@ -301,14 +300,6 @@ public class HeapView extends JComponent {
         }
     }
 
-    /**
-     * Renders the text.
-     */
-    private void paintText(Graphics g, int w, int h) {
-        g.setFont(getFont());
-        g.drawString(heapSizeText, 8, h - g.getFontMetrics().getAscent());
-    }
-    
     /**
      * Paints the grid on top of the ticks.
      */
@@ -518,9 +509,9 @@ public class HeapView extends JComponent {
             if (graphIndex == 0) {
                 graphFilled = true;
             }
-            heapSizeText = format.format(
-                    new Object[] { new Double((double)used / 1024 / 1024),
-                                   new Double((double)total / 1024 / 1024) });
+            if (currentHeapUsageLabel != null) {
+                currentHeapUsageLabel.setText(format.format(new Object[] { new Double((double) used / 1024 / 1024), new Double((double) total / 1024 / 1024) }));
+            }
         }
         repaint();
     }

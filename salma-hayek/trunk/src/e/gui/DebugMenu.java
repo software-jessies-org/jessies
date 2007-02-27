@@ -248,12 +248,15 @@ public class DebugMenu {
                     System.gc();
                 }
             });
+            JLabel currentHeapUsageLabel = new JLabel(" ");
             JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 2));
             controlPanel.add(gcButton);
+            controlPanel.add(Box.createHorizontalStrut(10));
+            controlPanel.add(currentHeapUsageLabel);
             
             JPanel ui = new JPanel(new BorderLayout());
             ui.add(controlPanel, BorderLayout.NORTH);
-            ui.add(new HeapView(), BorderLayout.CENTER);
+            ui.add(new HeapView(currentHeapUsageLabel), BorderLayout.CENTER);
             
             JFrame frame = new JFrame(Log.getApplicationName() + " Heap Usage");
             JFrameUtilities.setFrameIcon(frame);
