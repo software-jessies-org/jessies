@@ -35,10 +35,10 @@ public class HelpMenu {
         menu.add(new WebLinkAction("Report a Bug", "mailto:software@jessies.org?subject=" + AboutBox.getSharedInstance().getBugReportSubject()));
         // We don't support this yet, because we've got nothing to point it to.
         menu.add(new PlaceholderAction("View Bugs List"));
-        menu.addSeparator();
         
         if (GuiUtilities.isMacOs() == false) {
             // GNOME and Win32 users expect a link to the application's about box on the help menu.
+            menu.addSeparator();
             menu.add(new AboutBoxAction());
         }
         
