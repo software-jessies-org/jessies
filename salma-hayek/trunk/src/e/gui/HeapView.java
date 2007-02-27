@@ -156,11 +156,6 @@ public class HeapView extends JComponent {
     private HeapGrowTimer heapGrowTimer;
     
     /**
-     * Max width needed to display 999.9/999.9MB. Used to calculate preferred size.
-     */
-    private int maxTextWidth;
-    
-    /**
      * Current text being displayed.
      */
     private String heapSizeText;
@@ -191,16 +186,6 @@ public class HeapView extends JComponent {
         revalidate();
         repaint();
     }
-
-    /**
-     * Sets the font used to display the heap size.
-     *
-     * @param font the font used to display the heap size
-     */
-    public void setFont(Font font) {
-        super.setFont(font);
-        updateTextWidth();
-    }
     
     /**
      * Returns the minimum size.
@@ -227,15 +212,7 @@ public class HeapView extends JComponent {
     }
     
     private Dimension getPreferredSize0() {
-        return new Dimension(maxTextWidth + 8, getFontMetrics(getFont()).getHeight() + 8);
-    }
-
-    /**
-     * Recalculates the width needed to display the heap size string.
-     */
-    private void updateTextWidth() {
-        String maxString = format.format(new Object[] { new Float(999.9f), new Float(999.9f) });
-        maxTextWidth = getFontMetrics(getFont()).stringWidth(maxString) + 4;
+        return new Dimension(100, getFontMetrics(getFont()).getHeight() + 8);
     }
 
     /**
@@ -329,10 +306,7 @@ public class HeapView extends JComponent {
      */
     private void paintText(Graphics g, int w, int h) {
         g.setFont(getFont());
-        String text = heapSizeText;
-        FontMetrics fm = g.getFontMetrics();
-        int textWidth = fm.stringWidth(text);
-        g.drawString(text, 8, h - fm.getAscent());
+        g.drawString(heapSizeText, 8, h - g.getFontMetrics().getAscent());
     }
     
     /**
