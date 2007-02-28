@@ -12,6 +12,11 @@
 #CC = cc
 #CFLAGS = -fullwarn -g -DSHAPE
 
+# Uncomment these for Solaris Sun Studio, choose your architecture.
+#CC = cc
+#CFLAGS = -Xa -fast -xarch=v8a
+#CFLAGS = -Xa -fast -xarch=386
+
 DEFINES = 
 
 # Bennett Todd (bet@lehman.com) says this helped him compile on
@@ -19,7 +24,7 @@ DEFINES =
 #DEFINES = -D_POSIX_C_SOURCE=2
 
 # Add any strange libraries your system needs here.
-LDFLAGS = -lXext -lX11 -lICE -SM
+LDFLAGS = -lXext -lX11 -lICE -lSM
 
 # -----------------------------------------------------------------------------
 
