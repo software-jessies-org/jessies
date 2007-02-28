@@ -17,7 +17,7 @@ public abstract class ChangeFontAction extends ETextAction {
     }
     
     public static Font getConfiguredFixedFont() {
-        return new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
+        return getConfiguredFont("fixedFont", GuiUtilities.getMonospacedFontName(), 12);
     }
     
     public static Font getConfiguredFont(String parameterPrefix, String defaultFontName, int defaultFontSize) {
