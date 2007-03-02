@@ -238,7 +238,8 @@ private:
     }
     
 #ifdef __CYGWIN__
-    // Cygwin doesn't currently have posix_openpt(3).
+    // Before 2006-07-18, Cygwin didn't have posix_openpt(3).
+    // I'm not sure which release that first went into.
     int posix_openpt(int flags) {
         return open("/dev/ptmx", flags);
     }
