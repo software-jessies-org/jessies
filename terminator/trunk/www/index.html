@@ -137,6 +137,17 @@ defaulting to 'ansi'
 
 <p>If you think you have the correct terminfo available but you're still having problems, the next thing to check is that you're actually using Terminator's terminfo. For example, if your problem is with your shell, check that <tt>echo $TERM</tt> says "terminator", and if your problem is with Vim, check that <tt>:se term</tt> says "term=terminator". (Although Terminator sets the TERM environment variable for you, it may be being overridden by your shell's profile, say, and it won't necessarily be correctly transferred if you log in to a remote machine, so it's always worth checking.)
 
+<p>Cygwin's less(1) still uses a termcap-based ncurses library.
+If less(1) (and hence man(1)) say "WARNING: terminal is not fully functional", try:
+<pre>
+infocmp -C >> ~/.termcap
+</pre>
+
+<p>FreeBSD systems don't come with the necessary terminfo support installed by
+default.  It's apparently a snap to install the
+<a href="http://www.freebsd.org/cgi/url.cgi?ports/devel/ncurses/pkg-descr">devel/ncurses</a>
+package from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports and Packages Collection</a>.
+
 <h4>Logging in as other users/root</h4>
 <p>If the terminfo file is not installed in the system-wide location then other users (and you if you use <tt>su(1)</tt> to switch to another user) will have problems. Using <tt>sudo(1)</tt> to run a command as another user will work in many cases, because it doesn't alter <tt>$HOME</tt> by default.
 
@@ -160,17 +171,6 @@ user, and use <tt>su(1)</tt> to become root.
 export TERMINFO=~/.terminfo
 export TERM=$TERM
 </pre>
-
-<p>As of 1.5.19, Cygwin's less(1) is still using a termcap-based ncurses library.
-If less(1) (and hence man(1)) say "WARNING: terminal is not fully functional", try:
-<pre>
-infocmp -C >> ~/.termcap
-</pre>
-
-<p>FreeBSD systems don't come with the necessary terminfo support installed by
-default.  It's apparently a snap to install the
-<a href="http://www.freebsd.org/cgi/url.cgi?ports/devel/ncurses/pkg-descr">devel/ncurses</a>
-package from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports and Packages Collection</a>.
 
 <h3>Pasting in old versions of VNC</h3>
 

@@ -247,6 +247,10 @@ RFEs
   but we could work better if you set TERM=xterm.  When we go through the
   terminfo, we should abandon rxvt compatibility and switch to xterm.
 
+  If we got this sorted out, then we could submit our termcap to Cygwin
+  and so side-step cgf's reluctance to use terminfo, stated here:
+  http://www.cygwin.com/ml/cygwin/2000-05/msg01012.html
+
 * Try socat and write up the experience for the benefit of the users
   who've wanted to use Terminator with directly attached serial devices.
 
