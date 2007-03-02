@@ -25,6 +25,7 @@ public class Evergreen {
     
     private JFrame frame;
     private JTabbedPane tabbedPane;
+    private JSplitPane splitPane;
     private TagsPanel tagsPanel;
     private EStatusBar statusLine;
     private Minibuffer minibuffer;
@@ -38,6 +39,57 @@ public class Evergreen {
     
     /** Whether we're fully started. */
     private CountDownLatch startSignal = new CountDownLatch(1);
+    
+    private InitialState initialState = new InitialState();
+    
+    private class InitialState {
+        private ArrayList<InitialWorkspace> initialWorkspaces = new ArrayList<InitialWorkspace>();
+        private Point initialLocation = new Point(0, 0);
+        private Dimension initialSize = new Dimension(800, 730);
+        private boolean showTagsPanel;
+        private int splitPaneDividerLocation = -1;
+        
+        /**
+         * Opens all the workspaces listed in the file we remembered them to last time we quit.
+         * Also makes the last-visible workspace visible again.
+         */
+        private void openRememberedWorkspaces() {
+            Log.warn("Opening remembered workspaces...");
+            if (initialWorkspaces == null) {
+                return;
+            }
+            
+            Workspace initiallyVisibleWorkspace = null;
+            for (InitialWorkspace initialWorkspace : initialState.initialWorkspaces) {
+                Element info = initialWorkspace.xmlWorkspace;
+                Workspace workspace = addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"), initialWorkspace.initialFiles);
+                if (info.hasAttribute("selected")) {
+                    initiallyVisibleWorkspace = workspace;
+                }
+            }
+            initialWorkspaces = null;
+            
+            if (initiallyVisibleWorkspace != null) {
+                tabbedPane.setSelectedComponent(initiallyVisibleWorkspace);
+            }
+        }
+        
+        /** Shows or hides the tags panel and sets the divider location, as it was last time we quit. */
+        private void configureTagsPanel() {
+            if (showTagsPanel) {
+                if (splitPaneDividerLocation >= 0) {
+                    splitPane.setDividerLocation(splitPaneDividerLocation);
+                } else {
+                    // Defaults.
+                    splitPane.setDividerLocation(0.8);
+                    splitPane.setResizeWeight(0.8);
+                }
+            } else {
+                ShowHideTagsAction.setTagsPanelVisibility(false);
+                ShowHideTagsAction.oldDividerLocation = splitPaneDividerLocation;
+            }
+        }
+    }
     
     private static class InitialWorkspace {
         Element xmlWorkspace;
@@ -66,9 +118,6 @@ public class Evergreen {
         }
     }
     
-    private ArrayList<InitialWorkspace> initialWorkspaces;
-    private Workspace initiallyVisibleWorkspace;
-    
     private JPanel statusLineAndProgressContainer = new JPanel(new BorderLayout());
     
     private JProgressBar progressBar = new JProgressBar();
@@ -95,7 +144,11 @@ public class Evergreen {
     public TagsPanel getTagsPanel() {
         return tagsPanel;
     }
-
+    
+    public JSplitPane getSplitPane() {
+        return splitPane;
+    }
+    
     public void showStatus(String status) {
         statusLine.setText(status);
     }
@@ -570,40 +623,29 @@ public class Evergreen {
         return getPreferenceFilename("open-workspace-list");
     }
     
-    /** Opens all the workspaces listed in the file we remembered them to last time we quit. */
-    public void openRememberedWorkspaces() {
-        Log.warn("Opening remembered workspaces...");
-        if (initialWorkspaces != null) {
-            for (InitialWorkspace initialWorkspace : initialWorkspaces) {
-                Element info = initialWorkspace.xmlWorkspace;
-                Workspace workspace = addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"), initialWorkspace.initialFiles);
-                if (info.hasAttribute("selected")) {
-                    initiallyVisibleWorkspace = workspace;
-                }
-            }
-            initialWorkspaces = null;
-            return;
-        }
-    }
-    
     private void readSavedState() {
-        Point initialLocation = new Point(0, 0);
-        Dimension initialSize = new Dimension(800, 730);
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml")));
             
             Element root = document.getDocumentElement();
-            initialLocation.x = Integer.parseInt(root.getAttribute("x"));
-            initialLocation.y = Integer.parseInt(root.getAttribute("y"));
-            initialSize.width = Integer.parseInt(root.getAttribute("width"));
-            initialSize.height = Integer.parseInt(root.getAttribute("height"));
+            initialState.initialLocation.x = Integer.parseInt(root.getAttribute("x"));
+            initialState.initialLocation.y = Integer.parseInt(root.getAttribute("y"));
+            initialState.initialSize.width = Integer.parseInt(root.getAttribute("width"));
+            initialState.initialSize.height = Integer.parseInt(root.getAttribute("height"));
             
-            this.initialWorkspaces = new ArrayList<InitialWorkspace>();
+            initialState.showTagsPanel = true;
+            if (root.hasAttribute("showTagsPanel")) {
+                initialState.showTagsPanel = Boolean.parseBoolean(root.getAttribute("showTagsPanel"));
+                if (root.hasAttribute("splitPaneDividerLocation")) {
+                    initialState.splitPaneDividerLocation = Integer.parseInt(root.getAttribute("splitPaneDividerLocation"));
+                }
+            }
+            
             for (Node xmlWorkspace = root.getFirstChild(); xmlWorkspace != null; xmlWorkspace = xmlWorkspace.getNextSibling()) {
                 if (xmlWorkspace instanceof Element) {
                     InitialWorkspace workspace = new InitialWorkspace((Element) xmlWorkspace);
-                    initialWorkspaces.add(workspace);
+                    initialState.initialWorkspaces.add(workspace);
                     for (Node file = xmlWorkspace.getFirstChild(); file != null; file = file.getNextSibling()) {
                         if (file instanceof Element) {
                             Element fileElement = (Element) file;
@@ -615,8 +657,8 @@ public class Evergreen {
         } catch (Exception ex) {
             Log.warn("Problem reading saved state", ex);
         }
-        frame.setLocation(initialLocation);
-        frame.setSize(initialSize);
+        frame.setLocation(initialState.initialLocation);
+        frame.setSize(initialState.initialSize);
         JFrameUtilities.constrainToScreen(frame);
     }
     
@@ -634,6 +676,9 @@ public class Evergreen {
             Dimension size = frame.getSize();
             root.setAttribute("width", Integer.toString((int) size.getWidth()));
             root.setAttribute("height", Integer.toString((int) size.getHeight()));
+            
+            root.setAttribute("showTagsPanel", Boolean.toString(tagsPanel.isVisible()));
+            root.setAttribute("splitPaneDividerLocation", Integer.toString(tagsPanel.isVisible() ? splitPane.getDividerLocation() : ShowHideTagsAction.oldDividerLocation));
             
             for (Workspace workspace : getWorkspaces()) {
                 workspace.serializeAsXml(document, root);
@@ -712,6 +757,7 @@ public class Evergreen {
     }
     
     public void initWindow() {
+        frame = new JFrame("Evergreen");
         initWindowIcon();
         initWindowListener();
     }
@@ -829,40 +875,30 @@ public class Evergreen {
         initMacOs();
         initAboutBox();
         JavaResearcher.initOnBackgroundThread();
-        
-        frame = new JFrame("Evergreen");
-        frame.setJMenuBar(new EvergreenMenuBar());
-        
         FormDialog.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
-        
-        readSavedState();
         initWindow();
         initTagsPanel();
+        tabbedPane = new EvergreenTabbedPane();
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabbedPane, tagsPanel);
         initStatusArea();
+        readSavedState();
         
         InetAddress wildcardAddress = null;
         new InAppServer("EditServer", getPreferenceFilename("edit-server-port"), wildcardAddress, EditServer.class, new EditServer(this));
         
-        tabbedPane = new EvergreenTabbedPane();
-        
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabbedPane, tagsPanel);
         frame.getContentPane().add(splitPane, BorderLayout.CENTER);
         frame.getContentPane().add(statusArea, BorderLayout.SOUTH);
+        frame.setJMenuBar(new EvergreenMenuBar());
         
-        openRememberedWorkspaces();
-        
-        if (initiallyVisibleWorkspace != null) {
-            tabbedPane.setSelectedComponent(initiallyVisibleWorkspace);
-            initiallyVisibleWorkspace = null;
-        }
+        initialState.openRememberedWorkspaces();
         
         frame.setVisible(true);
         GuiUtilities.finishGnomeStartup();
         Log.warn("Frame visible after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
         
-        // These things want to be done after the frame is visible.
-        splitPane.setDividerLocation(0.8);
-        splitPane.setResizeWeight(0.8);
+        // These things want to be done after the frame is visible...
+        
+        initialState.configureTagsPanel();
         initRememberedFilesOpener();
         
         EventQueue.invokeLater(new Runnable() {
