@@ -16,7 +16,9 @@ public class ShowHideTagsAction extends AbstractAction {
     
     public ShowHideTagsAction() {
         super(ACTION_NAME);
-        putValue(SELECTED_KEY, Evergreen.getInstance().getTagsPanel().isVisible());
+        // FIXME: SELECTED_KEY only works on Java 6.
+        // Using the string's value means that we can compile on Java 5, but we don't select the check box on Java 5.
+        putValue("SwingSelectedKey", Evergreen.getInstance().getTagsPanel().isVisible());
     }
     
     public void actionPerformed(ActionEvent e) {
