@@ -118,8 +118,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new ShowCounterpartAction());
         
         menu.add(new JSeparator());
-        // FIXME: this is right on GNOME, but on Mac OS we should have a normal menu item whose text toggles between "Show Tags" and "Hide Tags".
-        menu.add(new JCheckBoxMenuItem(new ShowHideTagsAction()));
+        menu.add(ShowHideTagsAction.makeMenuItem());
         
         menu.add(new JSeparator());
         menu.add(new FilePropertiesAction());
