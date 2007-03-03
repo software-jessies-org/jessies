@@ -25,6 +25,7 @@ public class ShowHideTagsAction extends AbstractAction {
                 updateName(areTagsVisible());
             } else {
                 menuItem = new JCheckBoxMenuItem(new ShowHideTagsAction());
+                menuItem.setText(SHOW_ACTION_NAME);
             }
         }
         return menuItem;
