@@ -32,8 +32,8 @@ if [ -d $projects_dir/$project_name ]; then
     echo "Project '$project_name' already exists!"
     exit 1
 fi
-if [ ! -f $projects_dir/edit/COPYING ]; then
-    echo "Couldn't find a copy of the GPL!"
+if [ ! -f $projects_dir/Evergreen/COPYING ]; then
+    echo "Couldn't find a copy of the GPL! (Don't you have a checked-out copy of Evergreen?)"
     exit 1
 fi
 
