@@ -684,10 +684,14 @@ public class Evergreen {
                 workspace.serializeAsXml(document, root);
             }
             
-            // Create the XML content...
-            StringWriter content = new StringWriter();
+            // Set up a Transformer to produce indented XML output.
+            // (java.util.prefs.XmlSupport explained how to get indentation to work.)
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "4");
+            
+            // Create the XML content...
+            StringWriter content = new StringWriter();
             transformer.transform(new DOMSource(document), new StreamResult(content));
             
             // And then carefully write it to disk.
