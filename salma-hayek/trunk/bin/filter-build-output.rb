@@ -8,7 +8,12 @@ while line = gets()
   # universal.make:378: *** Unable to find /bin/javac --- do you only have a JRE installed?.  Stop.
   # make: *** [recurse] Error 2
   # gmake[2]: *** [recurse] Error 2
-  if line.match(/\*\*\*/)
+  
+  # We also want to see javac(1) warnings:
+  # src/Test.java:174: warning: [deprecation] toURL() in java.io.File has been deprecated
+  #     URL url = f.toURL();
+  #                ^
+  if line.match(/\*\*\*/) || line.match(/warning: /)
     $stderr.puts(lines)
     while line = gets()
       $stderr.puts(line)
