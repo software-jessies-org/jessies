@@ -99,22 +99,24 @@ public class Evergreen {
             this.xmlWorkspace = xmlWorkspace;
         }
         
-        private void addInitialFile(String name, int y) {
-            initialFiles.add(new InitialFile(name, y));
+        private void addInitialFile(String name, int y, boolean lastFocused) {
+            initialFiles.add(new InitialFile(name, y, lastFocused));
         }
     }
     
     public static class InitialFile {
         String filename; // strictly, filename(:address)?
         int y;
+        boolean lastFocused;
         
-        private InitialFile(String filename, int y) {
+        private InitialFile(String filename, int y, boolean lastFocused) {
             this.filename = filename;
             this.y = y;
+            this.lastFocused = lastFocused;
         }
         
         private InitialFile(String filename) {
-            this(filename, -1);
+            this(filename, -1, false);
         }
     }
     
@@ -649,7 +651,7 @@ public class Evergreen {
                     for (Node file = xmlWorkspace.getFirstChild(); file != null; file = file.getNextSibling()) {
                         if (file instanceof Element) {
                             Element fileElement = (Element) file;
-                            workspace.addInitialFile(fileElement.getAttribute("name"), Integer.parseInt(fileElement.getAttribute("y")));
+                            workspace.addInitialFile(fileElement.getAttribute("name"), Integer.parseInt(fileElement.getAttribute("y")), fileElement.hasAttribute("lastFocused"));
                         }
                     }
                 }

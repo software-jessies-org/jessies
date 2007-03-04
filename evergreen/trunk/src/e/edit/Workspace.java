@@ -345,6 +345,9 @@ public class Workspace extends JPanel {
             workspace.appendChild(file);
             file.setAttribute("name", textWindow.getFilename() + textWindow.getAddress());
             file.setAttribute("y", Integer.toString(textWindow.getY()));
+            if (textWindow == rememberedTextWindow) {
+                file.setAttribute("lastFocused", "true");
+            }
         }
         // Remember any files that would have been shown, had this workspace ever been shown.
         for (Evergreen.InitialFile initialFile : initialFiles) {
@@ -352,6 +355,9 @@ public class Workspace extends JPanel {
             workspace.appendChild(file);
             file.setAttribute("name", initialFile.filename);
             file.setAttribute("y", Integer.toString(initialFile.y));
+            if (initialFile.lastFocused) {
+                file.setAttribute("lastFocused", "true");
+            }
         }
     }
     
@@ -370,10 +376,14 @@ public class Workspace extends JPanel {
     public void openRememberedFiles() {
         synchronized (initialFiles) {
             for (Evergreen.InitialFile file : initialFiles) {
-                Evergreen.getInstance().openFile(file);
+                ETextWindow fileWindow = (ETextWindow) Evergreen.getInstance().openFile(file);
+                if (file.lastFocused) {
+                    rememberedTextWindow = fileWindow;
+                }
             }
             initialFiles.clear();
             updateTabForWorkspace();
+            restoreFocusToRememberedTextWindow();
         }
     }
 }
