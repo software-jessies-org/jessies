@@ -685,7 +685,6 @@ public class Evergreen {
             }
             
             // Set up a Transformer to produce indented XML output.
-            // (java.util.prefs.XmlSupport explained how to get indentation to work.)
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "4");
