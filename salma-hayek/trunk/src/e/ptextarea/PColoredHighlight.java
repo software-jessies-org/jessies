@@ -49,19 +49,19 @@ public abstract class PColoredHighlight extends PHighlight {
     }
     
     @Override
-    protected void paintHighlight(Graphics2D graphics, PCoordinates start, PCoordinates end, Insets insets, int lineHeight, int firstLineIndex, int lastLineIndex) {
+    protected void paintHighlight(Graphics2D g, PCoordinates start, PCoordinates end, Insets insets, int lineHeight, int firstLineIndex, int lastLineIndex) {
         Point startPt = textArea.getViewCoordinates(start);
         Point endPt = textArea.getViewCoordinates(end);
-        Color oldColor = graphics.getColor();
-        graphics.setColor(color);
+        Color oldColor = g.getColor();
+        g.setColor(color);
         int y = textArea.getLineTop(start.getLineIndex());
         for (int i = firstLineIndex; i <= lastLineIndex; ++i) {
             int xStart = (i == start.getLineIndex()) ? startPt.x : insets.left;
             int xEnd = (i == end.getLineIndex()) ? endPt.x : getRightHandLineLimit(i);
-            paintRectangleContents(graphics, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
+            paintRectangleContents(g, new Rectangle(xStart, y, xEnd - xStart, lineHeight));
             y += lineHeight;
         }
-        graphics.setColor(oldColor);
+        g.setColor(oldColor);
     }
     
     /**

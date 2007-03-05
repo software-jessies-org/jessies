@@ -70,5 +70,5 @@ public interface PLineSegment {
     /**
      * Paints the text into the given location.
      */
-    public void paint(Graphics2D graphics, int x, int yBaseline);
+    public void paint(Graphics2D g, int x, int yBaseline);
 }

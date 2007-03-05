@@ -25,14 +25,14 @@ public class SelectionHighlight extends PHighlight {
     }
     
     @Override
-    protected void paintHighlight(Graphics2D graphics, PCoordinates start, PCoordinates end, Insets insets, int lineHeight, int firstLineIndex, int lastLineIndex) {
+    protected void paintHighlight(Graphics2D g, PCoordinates start, PCoordinates end, Insets insets, int lineHeight, int firstLineIndex, int lastLineIndex) {
         if (isEmpty()) {
             return;
         }
         
         Point startPt = textArea.getViewCoordinates(start);
         Point endPt = textArea.getViewCoordinates(end);
-        Color oldColor = graphics.getColor();
+        Color oldColor = g.getColor();
         int y = textArea.getLineTop(firstLineIndex);
         for (int i = firstLineIndex; i <= lastLineIndex; ++i) {
             int xStart = (i == start.getLineIndex()) ? startPt.x : insets.left;
@@ -46,11 +46,11 @@ public class SelectionHighlight extends PHighlight {
                 // component highlights like this.
                 continue;
             }
-            graphics.setColor(textArea.isFocusOwner() ? FOCUSED_SELECTION_COLOR : UNFOCUSED_SELECTION_COLOR);
-            graphics.fill(new Rectangle(xStart, y, xEnd - xStart, lineHeight));
+            g.setColor(textArea.isFocusOwner() ? FOCUSED_SELECTION_COLOR : UNFOCUSED_SELECTION_COLOR);
+            g.fill(new Rectangle(xStart, y, xEnd - xStart, lineHeight));
             int yBottom = y + lineHeight - 1;
             if (textArea.isFocusOwner()) {
-                graphics.setColor(FOCUSED_SELECTION_BOUNDARY_COLOR);
+                g.setColor(FOCUSED_SELECTION_BOUNDARY_COLOR);
                 // Draw this shape at the top of the selection (C will be
                 // zero-length for a single-line selection):
                 //        _____________________
@@ -59,15 +59,15 @@ public class SelectionHighlight extends PHighlight {
                 if (i == start.getLineIndex()) {
                     if (xStart > 0) {
                         // B
-                        graphics.drawLine(xStart, y, xStart, yBottom);
+                        g.drawLine(xStart, y, xStart, yBottom);
                     }
                     // A
-                    graphics.drawLine(xStart, y, xEnd, y);
+                    g.drawLine(xStart, y, xEnd, y);
                 } else if (i == start.getLineIndex() + 1) {
                     final int Bx = Math.min(xEnd, startPt.x);
                     if (Bx > insets.left) {
                         // C
-                        graphics.drawLine(insets.left, y, Bx, y);
+                        g.drawLine(insets.left, y, Bx, y);
                     }
                 }
                 
@@ -79,24 +79,24 @@ public class SelectionHighlight extends PHighlight {
                 if (i == end.getLineIndex()) {
                     if (xEnd < textArea.getWidth() - insets.right) {
                         // D
-                        graphics.drawLine(xEnd, y, xEnd, yBottom);
+                        g.drawLine(xEnd, y, xEnd, yBottom);
                     }
                     // F
-                    graphics.drawLine(xStart, yBottom, xEnd, yBottom);
+                    g.drawLine(xStart, yBottom, xEnd, yBottom);
                 } else if (i == end.getLineIndex() - 1) {
                     // E
-                    graphics.drawLine(Math.max(endPt.x, xStart), yBottom, xEnd, yBottom);
+                    g.drawLine(Math.max(endPt.x, xStart), yBottom, xEnd, yBottom);
                 }
                 
                 // Draw vertical lines at the left and right edges of the
                 // selection; we only really need these if we have non-zero
                 // margins, but they're important then.
-                graphics.drawLine(xStart, y, xStart, yBottom);
-                graphics.drawLine(xEnd, y, xEnd, yBottom);
+                g.drawLine(xStart, y, xStart, yBottom);
+                g.drawLine(xEnd, y, xEnd, yBottom);
             }
             y += lineHeight;
         }
-        graphics.setColor(oldColor);
+        g.setColor(oldColor);
     }
     
     @Override
