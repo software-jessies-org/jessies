@@ -12,6 +12,7 @@ import javax.swing.*;
  * In addition, we show the UI defaults for all installed LAFs, to make it
  * easier to check that a default you want to use exists in the other LAFs,
  * or to make it easier to compare values.
+ * (That feature is why this isn't yet completely obsoleted by DebugMenu.)
  */
 public class ShowUiDefaults {
     private ShowUiDefaults() {
@@ -28,7 +29,7 @@ public class ShowUiDefaults {
         try {
             UIManager.setLookAndFeel(laf.getClassName());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(System.err); // The whole point of this class is to produce console output, so this is okay.
             return;
         }
         
