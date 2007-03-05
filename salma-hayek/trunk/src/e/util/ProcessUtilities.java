@@ -45,8 +45,7 @@ public class ProcessUtilities {
             errorReaderThread.join();
             return p.waitFor();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            errorLineListener.processLine(ex.getMessage());
+            feedExceptionToLineListener(errorLineListener, ex);
             return 1;
         }
     }
@@ -89,9 +88,10 @@ public class ProcessUtilities {
      * listener may be null.
      */
     public static void spawn(final File directory, final String[] command, final ProcessListener listener) {
+        final String quotedCommand = shellQuotedFormOf(Arrays.asList(command));
         try {
             final Process p = Runtime.getRuntime().exec(command, null, directory);
-            new Thread("Process Spawn: " + shellQuotedFormOf(Arrays.asList(command))) {
+            new Thread("Process Spawn: " + quotedCommand) {
                 public void run() {
                     try {
                         p.getOutputStream().close();
@@ -102,12 +102,12 @@ public class ProcessUtilities {
                             listener.processExited(status);
                         }
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        Log.warn("Problem waiting for command to finish: " + quotedCommand, ex);
                     }
                 }
             }.start();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.warn("Failed to spawn command: " + quotedCommand, ex);
         }
     }
 
@@ -125,17 +125,23 @@ public class ProcessUtilities {
             }
             in.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            listener.processLine(ex.getMessage());
+            feedExceptionToLineListener(listener, ex);
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
-                    listener.processLine(ex.getMessage());
+                    feedExceptionToLineListener(listener, ex);
                 }
             }
+        }
+    }
+    
+    private static void feedExceptionToLineListener(LineListener listener, Exception ex) {
+        listener.processLine(ex.getMessage());
+        String stackTrace = StringUtilities.stackTraceFromThrowable(ex);
+        for (String line : stackTrace.split("\n")) {
+            listener.processLine(line);
         }
     }
     

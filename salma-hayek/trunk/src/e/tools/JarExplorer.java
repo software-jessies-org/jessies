@@ -44,7 +44,7 @@ public class JarExplorer extends JFrame {
         try {
             initFromJarFile();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            SimpleDialog.showDetails(null, "Problem reading JAR file.", ex);
         }
 
         setContentPane(makeUi());

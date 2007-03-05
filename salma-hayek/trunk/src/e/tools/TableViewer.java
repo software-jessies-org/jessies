@@ -71,15 +71,11 @@ public class TableViewer extends JFrame {
         column.setPreferredWidth(width + 4);
     }
     
-    public static void main(String[] arguments) {
-        try {
-            GuiUtilities.initLookAndFeel();
-            for (String argument : arguments) {
-                TableViewer tableViewer = new TableViewer(argument);
-                tableViewer.setVisible(true);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+    public static void main(String[] arguments) throws Exception {
+        GuiUtilities.initLookAndFeel();
+        for (String argument : arguments) {
+            TableViewer tableViewer = new TableViewer(argument);
+            tableViewer.setVisible(true);
         }
     }
 }
