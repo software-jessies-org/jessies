@@ -1,15 +1,20 @@
 Use international English spelling.
 
-Use 4-space 'tabs' and K&R (Sun Java) indentation. (That is, follow
-the rest of the code.)
+Use 4-space 'tabs' and K&R (Sun Java) indentation. (That is, follow the rest of the code.)
 
-Use the Log class instead of System.err/System.out; those should be
-used only while debugging.
+Use the Log class instead of System.err/System.out; those should be used only while debugging.
+On Windows, writing to either can cause the application to hang.
+Remember that printStackTrace() implicitly writes to System.err, and use Log or SimpleDialog instead.
 
-No new file formats. We can't keep just inventing random formats
-left, right and center. Any file we write (for our own purposes) should
-use an existing well-known format. It's not acceptable to use
-one of Evergreen's existing formats; they should be considered deprecated.
+No new file formats; we can't keep just inventing random formats left, right and center.
+Any file we write (for our own purposes) should use an existing well-known format.
+XML may be more work than it ought to be, but it's probably the right choice.
 
-Never use "new File"; use FileUtilities.fileFromString instead; this
-also understands ~/HACKING and ~elliotth/HACKING.
+Never use "new File"; use FileUtilities.fileFromString instead; this also understands ~/HACKING and ~elliotth/HACKING.
+
+Cast away Graphics as soon as you can and use "Graphics2D g" instead.
+We've been using "oldGraphics" for Graphics instances passed to us.
+
+Avoid FontMetrics.stringWidth because it doesn't work for anti-aliased text.
+Don't just sum character widths yourself either (as we currently do all over the place) because that's not necessarily correct.
+You need to measure the whole string you're going to paint.
