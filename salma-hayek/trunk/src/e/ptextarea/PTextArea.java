@@ -965,15 +965,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         try {
             //StopWatch watch = new StopWatch();
             generateLineWrappings();
-            Graphics2D graphics = (Graphics2D) oldGraphics;
+            Graphics2D g = (Graphics2D) oldGraphics;
             
             // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give it to them.
             Map map = (Map) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
             if (map != null) {
-                graphics.addRenderingHints(map);
+                g.addRenderingHints(map);
             }
             
-            Rectangle bounds = graphics.getClipBounds();
+            Rectangle bounds = g.getClipBounds();
             
             // Paint the background, if need be.
             boolean disabledGtk = (isEnabled() == false && GuiUtilities.isGtk());
@@ -982,13 +982,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                 if (disabledGtk) {
                     // The whole background should appear disabled.
                     paintableBackgroundWidth = bounds.width;
-                    graphics.setColor(disabledLabel.getBackground());
+                    g.setColor(disabledLabel.getBackground());
                 } else {
                     // Only paint that part of the background that isn't part of the right-hand margin.
-                    paintableBackgroundWidth = paintRightHandMargin(graphics, bounds);
-                    graphics.setColor(getBackground());
+                    paintableBackgroundWidth = paintRightHandMargin(g, bounds);
+                    g.setColor(getBackground());
                 }
-                graphics.fillRect(bounds.x, bounds.y, paintableBackgroundWidth, bounds.height);
+                g.fillRect(bounds.x, bounds.y, paintableBackgroundWidth, bounds.height);
             }
             
             // Work out which lines we need to paint.
@@ -999,18 +999,18 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             maxLine = Math.max(0, Math.min(splitLines.size() - 1, maxLine));
             
             // Paint the highlights on those lines.
-            paintHighlights(graphics, minLine, maxLine);
+            paintHighlights(g, minLine, maxLine);
             
             // Paint the text.
-            graphics.setFont(getFont());
+            g.setFont(getFont());
             int startX = insets.left;
             int startY = getBaseline(minLine);
             if (disabledGtk) {
                 // The GNOME "Clearlooks" and Ubuntu "Human" themes both render text in a "shadowed" style when the component is disabled.
-                paintTextLines(graphics, minLine, maxLine, startX + 1, startY + 1, Color.WHITE);
-                paintTextLines(graphics, minLine, maxLine, startX, startY, UIManager.getColor("EditorPane.inactiveForeground"));
+                paintTextLines(g, minLine, maxLine, startX + 1, startY + 1, Color.WHITE);
+                paintTextLines(g, minLine, maxLine, startX, startY, UIManager.getColor("EditorPane.inactiveForeground"));
             } else {
-                paintTextLines(graphics, minLine, maxLine, startX, startY, isEnabled() ? null : UIManager.getColor("EditorPane.inactiveForeground"));
+                paintTextLines(g, minLine, maxLine, startX, startY, isEnabled() ? null : UIManager.getColor("EditorPane.inactiveForeground"));
             }
             //watch.print("Repaint");
         } finally {
@@ -1057,20 +1057,20 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      * Using this in paintComponent lets us avoid unnecessary flicker caused
      * by filling the area twice.
      */
-    private int paintRightHandMargin(Graphics2D graphics, Rectangle bounds) {
+    private int paintRightHandMargin(Graphics2D g, Rectangle bounds) {
         int whiteBackgroundWidth = bounds.width;
         if (rightHandMarginColumn != NO_MARGIN) {
             int offset = metrics.stringWidth("n") * rightHandMarginColumn + getInsets().left;
-            graphics.setColor(MARGIN_BOUNDARY_COLOR);
-            graphics.drawLine(offset, bounds.y, offset, bounds.y + bounds.height);
-            graphics.setColor(MARGIN_OUTSIDE_COLOR);
-            graphics.fillRect(offset + 1, bounds.y, bounds.x + bounds.width - offset - 1, bounds.height);
+            g.setColor(MARGIN_BOUNDARY_COLOR);
+            g.drawLine(offset, bounds.y, offset, bounds.y + bounds.height);
+            g.setColor(MARGIN_OUTSIDE_COLOR);
+            g.fillRect(offset + 1, bounds.y, bounds.x + bounds.width - offset - 1, bounds.height);
             whiteBackgroundWidth = (offset - bounds.x);
         }
         return whiteBackgroundWidth;
     }
     
-    private void paintHighlights(Graphics2D graphics, int minLine, int maxLine) {
+    private void paintHighlights(Graphics2D g, int minLine, int maxLine) {
         if (isEnabled() == false) {
             // A disabled component shouldn't render highlights (especially not the selection).
             return;
@@ -1079,28 +1079,28 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         int beginOffset = getSplitLine(minLine).getTextIndex();
         SplitLine max = getSplitLine(maxLine);
         int endOffset = max.getTextIndex() + max.getLength();
-        selection.paint(graphics);
+        selection.paint(g);
         List<PHighlight> highlightList = highlights.getHighlightsOverlapping(beginOffset, endOffset);
         for (PHighlight highlight : highlightList) {
-            highlight.paint(graphics);
+            highlight.paint(g);
         }
         //stopWatch.print("Highlight painting");
     }
     
-    private void paintCaret(Graphics2D graphics, int x, int y) {
+    private void paintCaret(Graphics2D g, int x, int y) {
         if (isFocusOwner() == false || isEnabled() == false) {
             // An unfocused component shouldn't render a caret. There should be at most one caret on the display.
             // A disabled component shouldn't render a caret either.
             return;
         }
-        graphics.setColor(Color.RED);
+        g.setColor(Color.RED);
         int yTop = y - metrics.getMaxAscent();
         int yBottom = y + metrics.getMaxDescent() - 1;
-        graphics.drawLine(x, yTop + 1, x, yBottom - 1);
-        graphics.drawLine(x, yTop + 1, x + 1, yTop);
-        graphics.drawLine(x, yTop + 1, x - 1, yTop);
-        graphics.drawLine(x, yBottom - 1, x + 1, yBottom);
-        graphics.drawLine(x, yBottom - 1, x - 1, yBottom);
+        g.drawLine(x, yTop + 1, x, yBottom - 1);
+        g.drawLine(x, yTop + 1, x + 1, yTop);
+        g.drawLine(x, yTop + 1, x - 1, yTop);
+        g.drawLine(x, yBottom - 1, x + 1, yBottom);
+        g.drawLine(x, yBottom - 1, x - 1, yBottom);
     }
 
     public void linesAdded(PLineEvent event) {

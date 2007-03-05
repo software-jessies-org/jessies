@@ -49,19 +49,19 @@ public class PNewlineSegment extends PAbstractSegment {
     }
     
     @Override
-    public void paint(Graphics2D graphics, int x, int yBaseline) {
+    public void paint(Graphics2D g, int x, int yBaseline) {
         if (newlineType == WRAPPED) {
-            paintWrapMark(graphics, x, yBaseline);
+            paintWrapMark(g, x, yBaseline);
         }
     }
     
-    private void paintWrapMark(Graphics2D graphics, int x, int y) {
-        graphics.setColor(Color.BLACK);
-        Stroke oldStroke = graphics.getStroke();
-        graphics.setStroke(WRAP_STROKE);
-        int yMiddle = y - graphics.getFontMetrics().getMaxAscent() / 2;
-        graphics.drawLine(x, yMiddle, textArea.getWidth() - textArea.getInsets().right, yMiddle);
-        graphics.setStroke(oldStroke);
+    private void paintWrapMark(Graphics2D g, int x, int y) {
+        g.setColor(Color.BLACK);
+        Stroke oldStroke = g.getStroke();
+        g.setStroke(WRAP_STROKE);
+        int yMiddle = y - g.getFontMetrics().getMaxAscent() / 2;
+        g.drawLine(x, yMiddle, textArea.getWidth() - textArea.getInsets().right, yMiddle);
+        g.setStroke(oldStroke);
     }
     
     @Override

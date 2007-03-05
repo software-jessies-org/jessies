@@ -65,7 +65,7 @@ public abstract class PAbstractSegment implements PLineSegment {
     
     public abstract int getCharOffset(FontMetrics metrics, int startX, int x);
     
-    public abstract void paint(Graphics2D graphics, int x, int yBaseline);
+    public abstract void paint(Graphics2D g, int x, int yBaseline);
     
     public String toString() {
         return "PAbstractSegment[" + style + ",start=" + start + ",end=" + end + ",\"" + getViewText() + "\"]";
