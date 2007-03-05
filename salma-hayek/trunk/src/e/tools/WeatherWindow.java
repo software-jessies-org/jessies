@@ -29,11 +29,23 @@ public class WeatherWindow extends JFrame {
     }
     
     private JComponent makeUi() {
+        // "http://www.bbc.co.uk/weather/5day.shtml?world=4079" // Basel, CH.
+        ArrayList<DayForecast> forecast = collectForecastFor("http://www.bbc.co.uk/weather/5day.shtml?world=0306"); // San Jose, CA, US.
+        JPanel result = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 8));
+        result.setBackground(BACKGROUND_COLOR);
+        for (DayForecast day : forecast) {
+            result.add(day);
+        }
+        return result;
+    }
+    
+    private ArrayList<DayForecast> collectForecastFor(String location) {
+        ArrayList<DayForecast> forecast = new ArrayList<DayForecast>();
+        
         String content;
         BufferedReader in = null;
         try {
-            URL url = new URL("http://www.bbc.co.uk/weather/5day.shtml?id=1808");
-            in = new BufferedReader(new InputStreamReader(url.openStream()));
+            in = new BufferedReader(new InputStreamReader(new URL(location).openStream()));
             StringBuilder buffer = new StringBuilder();
             String line;
             while ((line = in.readLine()) != null) {
@@ -42,14 +54,11 @@ public class WeatherWindow extends JFrame {
             }
             content = buffer.toString();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Log.warn("Failed to read forecast.", ex);
             return null;
         } finally {
             FileUtilities.close(in);
         }
-        System.out.println(content);
-        
-        ArrayList<DayForecast> forecast = new ArrayList<DayForecast>();
         
         Pattern cityNamePattern = Pattern.compile("^\\s+<title>BBC.* Forecast in .* for (\\S+),");
         Pattern dayNamePattern = Pattern.compile("class=\"weatherday\".*strong>(\\S+)<br");
@@ -72,33 +81,18 @@ public class WeatherWindow extends JFrame {
             } else if ((matcher = nightTemperaturePattern.matcher(line)).find()) {
                 int nightTemperatureC = Integer.parseInt(matcher.group(1));
                 DayForecast dayForecast = new DayForecast(dayName, imageUrl, dayTemperatureC, nightTemperatureC);
-                System.out.println(dayForecast);
                 forecast.add(dayForecast);
             }
         }
         
-        /*
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, new String[] { "/Users/elliotth/bbc-forecast.rb" }, lines, errors);
-        
-        for (String line : lines) {
-            Matcher matcher = Pattern.compile("(\\S+)\t(\\S+)\t(\\d+)\t(\\d+)").matcher(line);
-            if (matcher.matches()) {
-                String day = matcher.group(1);
-                String imageUrl = matcher.group(2);
-                int dayTemperatureC = Integer.parseInt(matcher.group(3));
-                int nightTemperatureC = Integer.parseInt(matcher.group(4));
-                forecast.add(new DayForecast(day, imageUrl, dayTemperatureC, nightTemperatureC));
+        if (forecast.size() != 5) {
+            System.out.println(content);
+            for (DayForecast dayForecast : forecast) {
+                System.out.println(dayForecast);
             }
         }
-        */
         
-        JPanel result = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 8));
-        for (DayForecast day : forecast) {
-            result.add(day);
-        }
-        return result;
+        return forecast;
     }
     
     private static class DayForecast extends JPanel {
@@ -109,13 +103,14 @@ public class WeatherWindow extends JFrame {
         
         public DayForecast(String day, String imageUrl, int dayTemperatureC, int nightTemperatureC) {
             super(new BorderLayout());
+            setBackground(BACKGROUND_COLOR);
             this.day = day;
             try {
                 BufferedImage image = ImageIO.read(new URL(imageUrl));
                 BufferedImage scaledImage = new AffineTransformOp(AffineTransform.getScaleInstance(0.5, 0.5), AffineTransformOp.TYPE_BILINEAR).filter(image, null);
                 this.icon = new ImageIcon(scaledImage);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                Log.warn("Failed to read image \"" + imageUrl + "\".", ex);
             }
             this.dayTemperatureC = dayTemperatureC;
             this.nightTemperatureC = nightTemperatureC;
