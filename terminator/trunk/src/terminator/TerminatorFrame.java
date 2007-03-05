@@ -93,9 +93,6 @@ public class TerminatorFrame extends JFrame {
 		
 		JFrameUtilities.setFrameIcon(this);
 		
-		if (Options.getSharedInstance().shouldUseMenuBar()) {
-			setJMenuBar(new TerminatorMenuBar());
-		}
 		Terminator.getSharedInstance().getFrames().addFrame(this);
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -120,6 +117,7 @@ public class TerminatorFrame extends JFrame {
 		});
 		initTerminals();
 		pack();
+		optionsDidChange();
 		setVisible(true);
 		initSizeMonitoring();
 		
@@ -350,12 +348,15 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	public void optionsDidChange() {
-		setBackground(Options.getSharedInstance().getColor("background"));
+		setBackground(terminals.size() > 1 ? originalBackground : Options.getSharedInstance().getColor("background"));
 		
-		// Replace the menu bar, working around Sun bug 4949810.
-		JMenuBar menuBar = new TerminatorMenuBar();
-		setJMenuBar(menuBar);
-		menuBar.revalidate();
+		if (Options.getSharedInstance().shouldUseMenuBar() && getJMenuBar() == null) {
+			// Add a menu bar.
+			JMenuBar menuBar = new TerminatorMenuBar();
+			setJMenuBar(menuBar);
+			// Work around Sun bug 4949810.
+			menuBar.revalidate();
+		}
 		
 		for (JTerminalPane terminal : terminals) {
 			terminal.optionsDidChange();
