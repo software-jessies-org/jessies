@@ -15,6 +15,42 @@ import java.util.regex.*;
  *   RFCs: RFC2229.
  */
 public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
+    private static final ArrayList<SiteLocalScriptEntry> siteLocalScriptEntries = new ArrayList<SiteLocalScriptEntry>();
+    private static class SiteLocalScriptEntry {
+        String patternToMatch;
+        String linkTemplate;
+    }
+    static {
+        // Try to run the site-local script.
+        // This is too expensive and unpredictable to do every time we configure a PTextArea, especially because we'll be on the EDT.
+        // The script's output format is "^<pattern-to-match>\t<link-template>$" where the pattern's groups are as described in highlightBugs.
+        // For example, this uses only Bash, keeps the two parts distinct, and avoids escaping issues:
+        //
+        // #!/bin/bash
+        // echo -nE "\b(D([1-2]\d{4}))\b" ; echo -ne "\t" ; echo -E "http://woggle/%s"
+        //
+        final String scriptName = "echo-local-bug-database-patterns";
+        ArrayList<String> siteLocalScriptLines = new ArrayList<String>();
+        String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
+        ProcessUtilities.backQuote(null, command, siteLocalScriptLines, new ArrayList<String>());
+        for (String line : siteLocalScriptLines) {
+            line = line.trim();
+            if (line.length() == 0 || line.startsWith("#")) {
+                // Ignore comments.
+                continue;
+            }
+            int tabIndex = line.indexOf('\t');
+            if (tabIndex == -1) {
+                Log.warn("BugDatabaseHighlighter didn't understand line \"" + line + "\"; no tab found. Skipping that line.");
+                continue;
+            }
+            SiteLocalScriptEntry entry = new SiteLocalScriptEntry();
+            entry.patternToMatch = line.substring(0, tabIndex);
+            entry.linkTemplate = line.substring(tabIndex + 1);
+            siteLocalScriptEntries.add(entry);
+        }
+    }
+    
     private String urlTemplate;
     
     private BugDatabaseHighlighter(PTextArea textArea, String regularExpression, String urlTemplate) {
@@ -30,32 +66,9 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         highlightBug(textArea, "\\b(([4-6]\\d{6}))\\b", "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=%s");
         // RFCs; not strictly bugs, but often referenced in comments.
         highlightBug(textArea, "(?i)\\b(rfc\\s*(\\d{3,4}))\\b", "http://tools.ietf.org/html/rfc%s");
-        
-        // Try to run the site-local script.
-        // The format is "^<pattern-to-match>\t<link-template>$" where the pattern's groups are as above.
-        // For example, this uses only Bash, keeps the two parts distinct, and avoids escaping issues:
-        //
-        // #!/bin/bash
-        // echo -nE "\b(D([1-2]\d{4}))\b" ; echo -ne "\t" ; echo -E "http://woggle/%s"
-        //
-        final String scriptName = "echo-local-bug-database-patterns";
-        String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
-        ArrayList<String> lines = new ArrayList<String>();
-        ProcessUtilities.backQuote(null, command, lines, new ArrayList<String>());
-        for (String line : lines) {
-            line = line.trim();
-            if (line.length() == 0 || line.startsWith("#")) {
-                // Ignore comments.
-                continue;
-            }
-            int tabIndex = line.indexOf('\t');
-            if (tabIndex == -1) {
-                Log.warn("BugDatabaseHighlighter didn't understand line \"" + line + "\"; no tab found.");
-                continue;
-            }
-            String pattern = line.substring(0, tabIndex);
-            String template = line.substring(tabIndex + 1);
-            highlightBug(textArea, pattern, template);
+        // Site-local bug database links.
+        for (SiteLocalScriptEntry entry : siteLocalScriptEntries) {
+            highlightBug(textArea, entry.patternToMatch, entry.linkTemplate);
         }
     }
     
