@@ -294,7 +294,8 @@ public class TagsUpdater {
                     temporaryFile.deleteOnExit();
                 }
                 getTextArea().getTextBuffer().writeToFile(temporaryFile);
-                TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), tagsDigest, this);
+                String charsetName = (String) getTextArea().getTextBuffer().getProperty(PTextBuffer.CHARSET_PROPERTY);
+                TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), charsetName, tagsDigest, this);
                 newDigest = tagReader.getTagsDigest();
                 // See the comment above for why we don't delete our temporary files, except on exit.
                 //temporaryFile.delete();
