@@ -9,14 +9,17 @@ import java.util.regex.*;
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
-    private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface|namespace):([^\t]+).*");    
+    private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface|namespace):([^\t]+).*");
+    
     private TagListener listener;
     private FileType fileType;
+    private String charsetName;
     private String digest;
     
-    public TagReader(File file, FileType fileType, String oldDigest, TagListener tagListener) {
+    public TagReader(File file, FileType fileType, String charsetName, String oldDigest, TagListener tagListener) {
         this.listener = tagListener;
         this.fileType = fileType;
+        this.charsetName = charsetName;
         
         File tagsFile = null;
         try {
@@ -63,7 +66,7 @@ public class TagReader {
     private void readTagsFile(File tagsFile) throws IOException {
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(tagsFile)));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(tagsFile), charsetName));
             String line;
             boolean foundValidHeader = false;
             while ((line = reader.readLine()) != null && line.startsWith("!_TAG_")) {

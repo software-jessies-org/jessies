@@ -324,7 +324,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
         
         public void run() {
-            new TagReader(file, null, null, this);
+            // FIXME: obviously not all files are really UTF-8.
+            new TagReader(file, null, "UTF-8", null, this);
         }
         
         public void tagFound(TagReader.Tag tag) {
