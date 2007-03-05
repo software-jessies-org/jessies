@@ -150,7 +150,7 @@ public class TerminatorFrame extends JFrame {
 			return;
 		}
 		
-		setBackground(originalBackground);
+		updateBackground();
 		
 		JComponent oldContentPane = (JComponent) getContentPane();
 		Dimension initialSize = oldContentPane.getSize();
@@ -170,7 +170,7 @@ public class TerminatorFrame extends JFrame {
 	 * Switches to a simple UI where we can have only one terminal.
 	 */
 	private void switchToSinglePane() {
-		setBackground(Options.getSharedInstance().getColor("background"));
+		updateBackground();
 		
 		JTerminalPane soleSurvivor = terminals.get(0);
 		Dimension initialSize = soleSurvivor.getSize();
@@ -347,8 +347,17 @@ public class TerminatorFrame extends JFrame {
 		tabbedPane.addTab(newPane.getName(), newPane);
 	}
 	
-	public void optionsDidChange() {
+	/**
+	 * Gives the frame the same background color as the terminal to improve appearance during resizes.
+	 * We don't do this when showing multiple tabs because Mac OS' tabbed pane is partially transparent.
+	 * Even on GNOME and Windows it would look odd because the tabbed pane is the outermost component, and the new space ought to belong to it, and share its color.
+	 */
+	private void updateBackground() {
 		setBackground(terminals.size() > 1 ? originalBackground : Options.getSharedInstance().getColor("background"));
+	}
+	
+	public void optionsDidChange() {
+		updateBackground();
 		
 		if (Options.getSharedInstance().shouldUseMenuBar() && getJMenuBar() == null) {
 			// Add a menu bar.
