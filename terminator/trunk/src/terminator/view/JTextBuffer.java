@@ -657,15 +657,15 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	}
 	
 	public void paintComponent(Graphics oldGraphics) {
-		Graphics2D graphics = (Graphics2D) oldGraphics;
+		Graphics2D g = (Graphics2D) oldGraphics;
 		
-		Object antiAliasHint = graphics.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
-		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, Options.getSharedInstance().isAntiAliased() ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		Object antiAliasHint = g.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, Options.getSharedInstance().isAntiAliased() ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		
 		FontMetrics metrics = getFontMetrics(getFont());
-		Rectangle rect = graphics.getClipBounds();
-		graphics.setColor(getBackground());
-		graphics.fill(rect);
+		Rectangle rect = g.getClipBounds();
+		g.setColor(getBackground());
+		g.fill(rect);
 		Insets insets = getInsets();
 		int firstTextLine = (rect.y - insets.top) / metrics.getHeight();
 		int lastTextLine = (rect.y - insets.top + rect.height + metrics.getHeight() - 1) / metrics.getHeight();
@@ -682,11 +682,11 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			Iterator it = getLineStyledText(i).iterator();
 			while (it.hasNext()) {
 				StyledText chunk = (StyledText) it.next();
-				x += paintStyledText(graphics, chunk, x, baseline);
+				x += paintStyledText(g, chunk, x, baseline);
 				String chunkText = chunk.getText();
 				if (drawCursor && cursorPosition.charOffsetInRange(startOffset, startOffset + chunkText.length())) {
 					final int charOffsetUnderCursor = cursorPosition.getCharOffset() - startOffset;
-					paintCursor(graphics, metrics, chunkText.substring(charOffsetUnderCursor, charOffsetUnderCursor + 1), baseline);
+					paintCursor(g, metrics, chunkText.substring(charOffsetUnderCursor, charOffsetUnderCursor + 1), baseline);
 					drawCursor = false;
 				}
 				startOffset += chunkText.length();
@@ -694,10 +694,10 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			if (drawCursor) {
 				// A cursor at the end of the line is in a
 				// position past the end of the text.
-				paintCursor(graphics, metrics, "", baseline);
+				paintCursor(g, metrics, "", baseline);
 			}
 		}
-		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasHint);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasHint);
 	}
 	
 	public List<StyledText> getLineStyledText(int line) {
@@ -714,8 +714,8 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	 * The cursor may actually be invisible because it's blinking and in
 	 * the 'off' state.
 	 */
-	private void paintCursor(Graphics2D graphics, FontMetrics metrics, String characterUnderCursor, int baseline) {
-		graphics.setColor(getCursorColor());
+	private void paintCursor(Graphics2D g, FontMetrics metrics, String characterUnderCursor, int baseline) {
+		g.setColor(getCursorColor());
 		Rectangle cursorRect = modelToView(cursorPosition);
 		final int bottomY = cursorRect.y + cursorRect.height - 1;
 		if (hasFocus) {
@@ -726,16 +726,16 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 				// Block.
 				if (cursorIsVisible) {
 					// Paint over the character underneath.
-					graphics.fill(cursorRect);
+					g.fill(cursorRect);
 					// Redraw the character in the
 					// background color.
-					graphics.setColor(getBackground());
-					graphics.drawString(characterUnderCursor, cursorRect.x, baseline);
+					g.setColor(getBackground());
+					g.drawString(characterUnderCursor, cursorRect.x, baseline);
 				}
 			} else {
 				// Underline.
 				if (cursorIsVisible) {
-					graphics.drawLine(cursorRect.x, bottomY, cursorRect.x + cursorRect.width - 1, bottomY);
+					g.drawLine(cursorRect.x, bottomY, cursorRect.x + cursorRect.width - 1, bottomY);
 				}
 			}
 		} else {
@@ -744,14 +744,14 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			// of what shape they're using for the focused cursor.
 			// It's not obvious what else they could do that would
 			// look better.
-			graphics.drawRect(cursorRect.x, cursorRect.y, cursorRect.width - 1, cursorRect.height - 1);
+			g.drawRect(cursorRect.x, cursorRect.y, cursorRect.width - 1, cursorRect.height - 1);
 		}
 	}
 	
 	/**
 	 * Paints the text. Returns how many pixels wide the text was.
 	 */
-	private int paintStyledText(Graphics2D graphics, StyledText text, int x, int y) {
+	private int paintStyledText(Graphics2D g, StyledText text, int x, int y) {
 		FontMetrics metrics = getFontMetrics(getFont());
 		Style style = text.getStyle();
 		Color foreground = style.getForeground();
@@ -764,17 +764,17 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		}
 		
 		int textWidth = metrics.stringWidth(text.getText());
-		graphics.setColor(background);
+		g.setColor(background);
 		// Special continueToEnd flag used for drawing the backgrounds of Highlights which extend
 		// over the end of lines.  Used for multi-line selection.
 		int backgroundWidth = text.continueToEnd() ? (getSize().width - x) : textWidth;
-		graphics.fillRect(x, y - metrics.getMaxAscent() - metrics.getLeading(), backgroundWidth, metrics.getHeight());
+		g.fillRect(x, y - metrics.getMaxAscent() - metrics.getLeading(), backgroundWidth, metrics.getHeight());
 		if (style.isUnderlined()) {
-			graphics.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 128));
-			graphics.drawLine(x, y + 1, x + textWidth, y + 1);
+			g.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 128));
+			g.drawLine(x, y + 1, x + textWidth, y + 1);
 		}
-		graphics.setColor(foreground);
-		graphics.drawString(text.getText(), x, y);
+		g.setColor(foreground);
+		g.drawString(text.getText(), x, y);
 		if (style.isBold()) {
 			// A font doesn't necessarily have a bold.
 			// Mac OS X's "Monaco" font is an example.
@@ -786,7 +786,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			// ProggySquare (http://www.proggyfonts.com/) is an example: the bold variant is significantly wider.
 			
 			// The old-fashioned "overstrike" method of faking bold doesn't look too bad, and it works in these awkward cases.
-			graphics.drawString(text.getText(), x + 1, y);
+			g.drawString(text.getText(), x + 1, y);
 		}
 		return textWidth;
 	}
