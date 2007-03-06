@@ -274,6 +274,11 @@ public class CSIEscapeAction implements TerminalAction {
 			case 1:
 				isBold = true;
 				break;
+			case 2:
+				// ECMA-048 says "faint, decreased intensity or second colour".
+				// gnome-terminal implements this as grey.
+				// xterm does nothing.
+				break;
 			case 4:
 				isUnderlined = true;
 				break;
@@ -283,7 +288,16 @@ public class CSIEscapeAction implements TerminalAction {
 			case 7:
 				isReverseVideo = true;
 				break;
+			case 21:
+				// The xwsh man page suggests this should disable bold.
+				// ECMA-048 says it turns on double-underlining.
+				// xterm does nothing.
+				// gnome-terminal treats this the same as 22.
+				break;
 			case 22:
+				// ECMA-048 says "normal colour or normal intensity (neither bold nor faint)".
+				// xterm clears the bold flag.
+				// gnome-terminal clears the bold and half-intensity flags.
 				isBold = false;
 				break;
 			case 24:
