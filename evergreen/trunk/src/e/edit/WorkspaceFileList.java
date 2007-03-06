@@ -131,14 +131,14 @@ public class WorkspaceFileList {
          */
         private ArrayList<String> scanWorkspaceForFiles() {
             Log.warn("Scanning " + workspace.getRootDirectory() + " for interesting files.");
-            long start = System.currentTimeMillis();
+            final long t0 = System.nanoTime();
             
             FileIgnorer fileIgnorer = new FileIgnorer(workspace.getRootDirectory());
             ArrayList<String> result = new ArrayList<String>();
             scanDirectory(workspace.getRootDirectory(), fileIgnorer, result);
             Evergreen.getInstance().showStatus("Scan of '" + workspace.getRootDirectory() + "' complete (" + result.size() + " files)");
             
-            Log.warn("Scan of " + workspace.getRootDirectory() + " took " + (System.currentTimeMillis() - start) + "ms; found " + result.size() + " files.");
+            Log.warn("Scan of " + workspace.getRootDirectory() + " took " + TimeUtilities.nsToString(System.nanoTime() - t0) + "; found " + result.size() + " files.");
             return result;
         }
         

@@ -874,7 +874,7 @@ public class Evergreen {
     }
     
     private void init() {
-        final long startTimeMillis = System.currentTimeMillis();
+        final long t0 = System.nanoTime();
         
         initPreferences();
         initMacOs();
@@ -899,7 +899,7 @@ public class Evergreen {
         
         frame.setVisible(true);
         GuiUtilities.finishGnomeStartup();
-        Log.warn("Frame visible after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
+        Log.warn("Frame visible after " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
         
         // These things want to be done after the frame is visible...
         
@@ -924,7 +924,7 @@ public class Evergreen {
                         } catch (InterruptedException ex) {
                         }
                         
-                        Log.warn("Workers free to start after " + (System.currentTimeMillis() - startTimeMillis) + " ms.");
+                        Log.warn("Workers free to start after " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
                         startSignal.countDown();
                     }
                 });
