@@ -30,19 +30,19 @@ public class TimeAdvisor implements Advisor {
     private String commandTemplate;
     
     public TimeAdvisor() {
-        this.pattern = Pattern.compile("(?i)\\b(\\d+)\\s*(ns|us|ms|s|sec|secs|seconds)\\b");
+        this.pattern = Pattern.compile("(?i)\\b(\\d+(?:\\.\\d+)?)\\s*(ns|us|ms|s|sec|secs|seconds)\\b");
     }
     
     public void advise(SuggestionsBox suggestionsBox, String text) {
         ArrayList<String> result = new ArrayList<String>();
         final Matcher matcher = pattern.matcher(text);
         while (matcher.find()) {
-            final long count = Long.parseLong(matcher.group(1));
+            final double count = Double.parseDouble(matcher.group(1));
             final TimeUnit unit = parseTimeUnit(matcher.group(2));
             final String originalForm = matcher.group(1) + " " + matcher.group(2);
-            final long milliseconds = TimeUnit.MILLISECONDS.convert(count, unit);
+            final long nanoseconds = (long)(count * TimeUnit.NANOSECONDS.convert(1, unit));
             // FIXME: this output only really makes sense for times > 1s.
-            result.add(originalForm + " = " + TimeUtilities.durationToIsoString(milliseconds));
+            result.add(originalForm + " = " + TimeUtilities.nsToString(nanoseconds));
         }
         if (result.isEmpty() == false) {
             suggestionsBox.addSuggestion(new Suggestion("Time", StringUtilities.join(result, "<br>")));
