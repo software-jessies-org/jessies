@@ -33,6 +33,7 @@ public class ClipboardMonitor {
                 checkClipboard(listener);
             }
         });
+        timer.start();
     }
 
     public void checkClipboard(final ClipboardListener listener) {
