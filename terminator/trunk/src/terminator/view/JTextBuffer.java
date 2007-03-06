@@ -52,7 +52,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		Options options = Options.getSharedInstance();
 		model = new TextBuffer(this, options.getInitialColumnCount(), options.getInitialRowCount());
 		ComponentUtilities.disableFocusTraversal(this);
-		setBorder(new javax.swing.border.EmptyBorder(1, 4, 4, 4));
+		setBorder(BorderFactory.createEmptyBorder(1, 4, 4, 4));
 		setOpaque(true);
 		optionsDidChange();
 		addFocusListener(this);
