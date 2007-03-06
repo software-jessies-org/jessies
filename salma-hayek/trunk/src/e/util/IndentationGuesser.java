@@ -8,6 +8,8 @@ import java.util.regex.*;
  * "single tab", et cetera) in use.
  */
 public class IndentationGuesser {
+    private static final Stopwatch stopwatch = Stopwatch.get("IndentationGuesser.guessIndentationFromFile");
+    
     private static final Pattern INDENTATION_PATTERN_1 = Pattern.compile("^(\\s+)[A-Za-z].*$");
     private static final Pattern INDENTATION_PATTERN_2 = Pattern.compile("^(\\s*)[{}]$");
     
@@ -47,7 +49,7 @@ public class IndentationGuesser {
      * Returns the best guess at the indentation in use in the given content.
      */
     public static String guessIndentationFromFile(CharSequence chars) {
-        //e.ptextarea.StopWatch watch = new e.ptextarea.StopWatch();
+        Stopwatch.Timer timer = stopwatch.start();
         try {
             String previousIndent = "";
             Bag<String> indentations = new Bag<String>();
@@ -85,7 +87,7 @@ public class IndentationGuesser {
                 return indentations.commonestItem();
             }
         } finally {
-            //watch.print("indentation guessing");
+            timer.stop();
         }
     }
     

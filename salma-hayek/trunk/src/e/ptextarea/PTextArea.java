@@ -17,6 +17,8 @@ import e.util.*;
  * @author Phil Norman
  */
 public class PTextArea extends JComponent implements PLineListener, Scrollable, ClipboardOwner {
+    private static final Stopwatch paintStopwatch = Stopwatch.get("PTextArea.paintComponent");
+    
     private static final int MIN_WIDTH = 50;
     private static final int MAX_CACHED_CHAR = 128;
     
@@ -962,8 +964,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     public void paintComponent(Graphics oldGraphics) {
         getLock().getReadLock();
+        Stopwatch.Timer timer = paintStopwatch.start();
         try {
-            //StopWatch watch = new StopWatch();
             generateLineWrappings();
             Graphics2D g = (Graphics2D) oldGraphics;
             
@@ -1012,9 +1014,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             } else {
                 paintTextLines(g, minLine, maxLine, startX, startY, isEnabled() ? null : UIManager.getColor("EditorPane.inactiveForeground"));
             }
-            //watch.print("Repaint");
         } finally {
             getLock().relinquishReadLock();
+            timer.stop();
         }
     }
     
