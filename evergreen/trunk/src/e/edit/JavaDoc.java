@@ -28,7 +28,7 @@ public class JavaDoc {
     private static URLClassLoader classLoader;
     
     static {
-        long start = System.currentTimeMillis();
+        final long t0 = System.nanoTime();
         Log.warn("Collecting JavaDoc...");
         
         /**
@@ -87,8 +87,7 @@ public class JavaDoc {
         }
         
         int totalPkgs = packageNames.size();
-        long timeTaken = System.currentTimeMillis() - start;
-        Log.warn(totalPkgs + " packages total (" + systemPkgs + " system classpath, " + (totalPkgs - systemPkgs) + " advisor.classpath) in " + timeTaken + "ms.");
+        Log.warn(totalPkgs + " packages total (" + systemPkgs + " system classpath, " + (totalPkgs - systemPkgs) + " advisor.classpath) in " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
     }
     
     /**

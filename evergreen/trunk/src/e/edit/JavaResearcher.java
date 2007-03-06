@@ -47,7 +47,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     private synchronized static void readJavaDocSummary() {
-        long start = System.currentTimeMillis();
+        final long t0 = System.nanoTime();
         
         String filename = Evergreen.getInstance().getResourceFilename("javadoc-summary.txt");
         Log.warn("Reading JavaDoc summary from \"" + filename + "\"...");
@@ -81,8 +81,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         
         uniqueWords = extractUniqueWords(uniqueIdentifiers.iterator());
         
-        long timeTaken = System.currentTimeMillis() - start;
-        Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + timeTaken + "ms.");
+        Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
     }
     
     /**
