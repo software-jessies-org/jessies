@@ -32,10 +32,9 @@ public class TimeUtilities {
     }
 
     /**
-     * Returns the ISO 8601-format String corresponding to the
-     * given duration (measured in milliseconds).
+     * Returns the ISO 8601-format String corresponding to the given duration (measured in milliseconds).
      */
-    public static String durationToIsoString(long duration) {
+    public static String msToIsoString(long duration) {
         long milliseconds = duration % 1000;
         duration /= 1000;
         long seconds = duration % 60;
@@ -61,7 +60,55 @@ public class TimeUtilities {
         result.append('S');
         return result.toString();
     }
-
+    
+    /**
+     * Returns a string representation of the given number of nanoseconds.
+     */
+    public static String nsToString(long ns) {
+        if (ns < 1000L) {
+            return Long.toString(ns) + " ns";
+        } else if (ns < 1000000L) {
+            return Long.toString(ns/1000L) + " us";
+        } else if (ns < 1000000000L) {
+            return Long.toString(ns/1000000L) + " ms";
+        } else if (ns < 60000000000L) {
+            // FIXME: use double arithmetic for this special case, and show a couple of decimal places?
+            return Long.toString(ns/1000000000L) + " s";
+        } else {
+            long duration = ns;
+            long nanoseconds = duration % 1000;
+            duration /= 1000;
+            long microseconds = duration % 1000;
+            duration /= 1000;
+            long milliseconds = duration % 1000;
+            duration /= 1000;
+            long seconds = duration % 60;
+            duration /= 60;
+            long minutes = duration % 60;
+            duration /= 60;
+            long hours = duration % 24;
+            duration /= 24;
+            long days = duration;
+            
+            StringBuilder result = new StringBuilder();
+            if (days != 0) {
+                result.append(days);
+                result.append('d');
+            }
+            if (result.length() > 1 || hours != 0) {
+                result.append(hours);
+                result.append('h');
+            }
+            if (result.length() > 1 || minutes != 0) {
+                result.append(minutes);
+                result.append('m');
+            }
+            result.append(seconds);
+            result.append('s');
+            return result.toString();
+        }
+    }
+    
     /**
      * Returns the number of milliseconds between the given Dates.
      */
@@ -89,10 +136,10 @@ public class TimeUtilities {
         Date endDate = new Date();
         long end = System.currentTimeMillis();
         out.println(currentIsoString());
-        out.println(durationToIsoString(end - start));
-        out.println(durationToIsoString(millisecondsBetween(startDate, endDate)));
+        out.println(msToIsoString(end - start));
+        out.println(msToIsoString(millisecondsBetween(startDate, endDate)));
         for (String argument : arguments) {
-            out.println(durationToIsoString(Long.parseLong(argument)));
+            out.println(msToIsoString(Long.parseLong(argument)));
         }
     }
 }

@@ -25,6 +25,7 @@ public class DebugMenu {
         menu.addSeparator();
         menu.add(new ListFramesAction());
         menu.add(new ListTimersAction());
+        menu.add(new ShowStopwatchesAction());
         menu.addSeparator();
         menu.add(new HeapViewAction());
         // FIXME: an action to turn on debugging of hung AWT exits. All frames or just the parent frame? Just the parent is probably the more obvious (given that new frames could be created afterwards).
@@ -208,6 +209,16 @@ public class DebugMenu {
                 result.append("(No timers.)");
             }
             return result.toString();
+        }
+    }
+    
+    private static class ShowStopwatchesAction extends AbstractAction {
+        public ShowStopwatchesAction() {
+            super("Show Stopwatches");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Stopwatches", Stopwatch.toStringAll());
         }
     }
     

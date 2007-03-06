@@ -93,7 +93,7 @@ public abstract class Rewriter {
         Rewriter rewriter = new Rewriter("(\\d+)\\s*ms") {
             public String replacement() {
                 long milliseconds = Long.parseLong(group(1));
-                return TimeUtilities.durationToIsoString(milliseconds);
+                return TimeUtilities.msToIsoString(milliseconds);
             }
         };
         result = rewriter.rewrite("232341243 ms");
