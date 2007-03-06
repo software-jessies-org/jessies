@@ -58,7 +58,7 @@ public class TagsPanel extends JPanel {
     public void showError(String error) {
         JLabel label = new JLabel("<html><body>" + error);
         label.setBackground(UIManager.getColor("Tree.background"));
-        label.setBorder(new javax.swing.border.EmptyBorder(4, 4, 4, 4));
+        label.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         label.setOpaque(true);
         setVisibleComponent(label);
     }
