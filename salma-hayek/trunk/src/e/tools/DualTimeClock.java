@@ -90,7 +90,7 @@ public class DualTimeClock extends JWindow implements ActionListener {
     private JComponent makeContentPane() {
         initLabelsAndIcons();
         JComponent content = new JPanel(new BorderLayout());
-        content.setBorder(new javax.swing.border.EmptyBorder(2, 2, 2, 2));
+        content.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         content.add(left, BorderLayout.WEST);
         content.add(new JLabel("  "), BorderLayout.CENTER);
         content.add(right, BorderLayout.EAST);

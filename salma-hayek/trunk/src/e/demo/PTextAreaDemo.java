@@ -7,7 +7,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.border.*;
 
 public class PTextAreaDemo {
     private PTextAreaDemo() {
@@ -35,7 +34,7 @@ public class PTextAreaDemo {
     
     private static void makeTextViewer(String filename) {
         PTextArea textArea = new PTextArea();
-        textArea.setBorder(new EmptyBorder(4, 4, 4, 4));
+        textArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         
         final File file = new File(filename);
         textArea.getTextBuffer().readFromFile(file);
