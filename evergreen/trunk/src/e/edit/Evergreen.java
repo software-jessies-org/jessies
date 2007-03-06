@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.regex.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
@@ -782,19 +781,19 @@ public class Evergreen {
         statusLineAndProgressContainer.add(statusLine, BorderLayout.CENTER);
         
         statusArea = new JPanel(new BorderLayout());
-        statusArea.setBorder(new EmptyBorder(2, 2, 2, 2));
+        statusArea.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         statusArea.add(statusLineAndProgressContainer, BorderLayout.NORTH);
         statusArea.add(minibuffer, BorderLayout.SOUTH);
         
         // Add some padding so that the tall and fixed-height Mac OS progress
         // bar doesn't cause the status line to jiggle when it appears, and so
         // that on Linux the progress bar doesn't allow itself to look squashed.
-        statusLine.setBorder(new EmptyBorder(2, 0, 2, 0));
+        statusLine.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
         if (GuiUtilities.isMacOs()) {
             // Make room on Mac OS so that our components don't intrude on the
             // area reserved for the grow box (and cause flicker as they fight
             // about who gets drawn on top).
-            statusLineAndProgressContainer.setBorder(new EmptyBorder(0, 0, 0, 20));
+            statusLineAndProgressContainer.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
         }
         
         progressBarAndKillButton.add(progressBar, BorderLayout.CENTER);
