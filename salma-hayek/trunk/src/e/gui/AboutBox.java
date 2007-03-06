@@ -8,7 +8,6 @@ import java.io.*;
 import java.util.*;
 import javax.imageio.*;
 import javax.swing.*;
-import javax.swing.border.*;
 
 /**
  * A simple "about box".
@@ -135,7 +134,7 @@ public class AboutBox {
         }
         
         JPanel panel = new JPanel();
-        panel.setBorder(new EmptyBorder(8, 12, bottomBorder, 12));
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 12, bottomBorder, 12));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
         Dimension spacerSize = new Dimension(1, 8);

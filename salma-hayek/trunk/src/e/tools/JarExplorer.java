@@ -113,7 +113,7 @@ public class JarExplorer extends JFrame {
         JScrollPane entriesScroller = new JScrollPane(list);
         JPanel entriesPanel = new JPanel(new BorderLayout());
         entriesPanel.add(entriesScroller, BorderLayout.CENTER);
-        entriesPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
+        entriesPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         entriesPanel.add(checkBoxPanel, BorderLayout.NORTH);
         
         summaryTextArea = makeTextArea();

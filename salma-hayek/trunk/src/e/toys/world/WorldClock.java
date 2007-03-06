@@ -6,7 +6,6 @@ import java.net.*;
 import java.util.*;
 import java.text.*;
 import javax.swing.*;
-import javax.swing.border.*;
 
 /**
  * Shows a world map.
@@ -107,7 +106,7 @@ public class WorldClock extends JFrame implements LocationListener {
         JComponent content = new JPanel(new BorderLayout());
         mapView = new GreenwichMapView();
         mapView.setLocationListener(this);
-        content.setBorder(new EmptyBorder(0, 0, 10, 0));
+        content.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         content.add(mapView, BorderLayout.CENTER);
         content.add(makeControls(), BorderLayout.SOUTH);
         return content;

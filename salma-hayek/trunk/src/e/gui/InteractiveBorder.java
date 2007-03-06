@@ -44,7 +44,7 @@ public abstract class InteractiveBorder extends EmptyBorder implements MouseInpu
      */
     public void attachTo(JComponent c) {
         this.component = c;
-        c.setBorder(new CompoundBorder(c.getBorder(),  this));
+        c.setBorder(BorderFactory.createCompoundBorder(c.getBorder(),  this));
         c.addMouseListener(this);
         c.addMouseMotionListener(this);
     }

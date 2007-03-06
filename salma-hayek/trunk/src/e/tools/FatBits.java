@@ -7,7 +7,6 @@ import java.awt.geom.*;
 import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 import e.forms.*;
 import e.gui.*;
@@ -113,13 +112,13 @@ public class FatBits extends JFrame {
         return result;
     }
     
-    private Border makeInfoPanelBorder() {
+    private javax.swing.border.Border makeInfoPanelBorder() {
         int rightInset = 4;
         // Make room for the grow box on Mac OS.
         if (GuiUtilities.isMacOs()) {
             rightInset += new JScrollBar().getPreferredSize().width;
         }
-        return new EmptyBorder(4, 4, 4, rightInset);
+        return BorderFactory.createEmptyBorder(4, 4, 4, rightInset);
     }
     
     private void initScaledImagePanel() {
