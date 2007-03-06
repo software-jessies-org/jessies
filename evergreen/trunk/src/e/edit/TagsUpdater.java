@@ -15,6 +15,8 @@ import e.util.*;
 
 public class TagsUpdater {
     private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Tags Updater");
+    private static final Stopwatch tagsUpdaterStopwatch = Stopwatch.get("TagsUpdater");
+    
     private static int latestSerialNumber = 0;
     private ETree tree;
     private JPanel uiPanel;
@@ -208,7 +210,7 @@ public class TagsUpdater {
         private String newDigest;
         private boolean tagsHaveChanged;
         private boolean successful = true;
-        private long startTime;
+        private Stopwatch.Timer stopwatchTimer;
         private Timer progressTimer;
         
         private DefaultMutableTreeNode root;
@@ -227,11 +229,11 @@ public class TagsUpdater {
                 return null;
             }
             
+            stopwatchTimer = tagsUpdaterStopwatch.start();
             root = new BranchNode("root");
             treeModel = new DefaultTreeModel(root);
             branches.clear();
             branches.put("", root);
-            startTime = System.currentTimeMillis();
             progressTimer = new Timer(500, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Evergreen.getInstance().getTagsPanel().showProgressBar();
@@ -318,9 +320,9 @@ public class TagsUpdater {
                     tagsDigest = newDigest;
                 }
             }
-            //long endTime = System.currentTimeMillis();
-            //double duration = ((double) (endTime - startTime)) / 1000.0;
-            //Log.warn("Time taken reading tags: " + duration + "s");
+            if (stopwatchTimer != null) {
+                stopwatchTimer.stop();
+            }
         }
     }
     
