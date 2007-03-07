@@ -1,6 +1,6 @@
 package e.ptextarea;
 
-
+import e.util.*;
 import java.lang.ref.*;
 import java.util.*;
 import javax.swing.*;
@@ -85,9 +85,10 @@ public class PAnchorSet implements PTextListener {
     }
     
     public synchronized void dumpAnchorIndices() {
+        Log.warn("Dumping anchor indices:");
         for (int i = 0; i < anchors.size(); i++) {
             PAnchor anchor = get(i);
-            System.err.println("  Anchor " + i + ": " + anchor);
+            Log.warn("  Anchor " + i + ": " + anchor);
         }
     }
     

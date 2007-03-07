@@ -24,10 +24,11 @@ public class PLineList implements PTextListener {
         generateLines();
     }
     
-    public void printLineInfo() {
+    public void logLineInfo() {
+        Log.warn("Dumping PLineList line info:");
         for (int i = 0; i < lines.size(); i++) {
             Line line = lines.get(i);
-            System.err.println(i + ": start " + line.getStart() + ", length " + line.getLength() + ", end " + (line.getStart() + line.getLength()) + ", width " + line.getWidth());
+            Log.warn(i + ": start " + line.getStart() + ", length " + line.getLength() + ", end " + (line.getStart() + line.getLength()) + ", width " + line.getWidth());
         }
     }
     
