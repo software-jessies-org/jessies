@@ -36,10 +36,10 @@ public class PKeyHandler implements KeyListener {
         if (e.isControlDown() && e.isShiftDown()) {
             switch (e.getKeyCode()) {
             case KeyEvent.VK_T:
-                textArea.printLineInfo();
+                textArea.logLineInfo();
                 return;
             case KeyEvent.VK_L:
-                textArea.getLineList().printLineInfo();
+                textArea.getLineList().logLineInfo();
                 return;
             case KeyEvent.VK_R:
                 textArea.repaint();
@@ -127,7 +127,7 @@ public class PKeyHandler implements KeyListener {
         } else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
             movementHandler.handleMovementKeys(event);
         } else if (GuiUtilities.isMacOs() && key == KeyEvent.VK_D && event.isControlDown() && event.isMetaDown()) {
-            // doesn't work because Mac OS is swallowing the key event.
+            // FIXME: doesn't work because Mac OS is swallowing the key event.
             showDictionaryDefinition();
         } else {
             return false;
@@ -136,9 +136,7 @@ public class PKeyHandler implements KeyListener {
     }
     
     private void showDictionaryDefinition() {
-        System.out.println("showDictionaryDefinition");
         if (textArea.hasSelection()) {
-            System.out.println("showDictionaryDefinition " + textArea.getSelectedText());
             ProcessUtilities.spawn(null, new String[] { "open", "dict:///" + textArea.getSelectedText() });
         }
     }

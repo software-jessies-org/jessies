@@ -1288,10 +1288,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         return splitIndex;
     }
     
-    public void printLineInfo() {
+    public void logLineInfo() {
+        Log.warn("Dumping PTextArea SplitLine info:");
         for (int i = 0; i < splitLines.size(); i++) {
             SplitLine line = getSplitLine(i);
-            System.err.println("SplitLine " + i + ": line " + line.getLineIndex() + ", offset " + line.getOffset() + ", length " + line.getLength());
+            Log.warn("SplitLine " + i + ": line " + line.getLineIndex() + ", offset " + line.getOffset() + ", length " + line.getLength());
         }
     }
     

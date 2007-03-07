@@ -528,25 +528,23 @@ public class PTextBuffer implements CharSequence {
         
         public void startCompoundEdit() {
             ++compoundingDepth;
-            //System.out.println("started compound edit");
         }
         
-        public void dump() {
+        private void dumpUndoList() {
+            Log.warn("Dumping PTextBuffer undo list:");
             int i = 0;
             for (Doable edit : undoList) {
-                System.out.println(i++ + ": " + edit);
+                Log.warn(i++ + ": " + edit);
             }
         }
         
         public void finishCompoundEdit() {
             if (compoundingDepth == 0) {
-                dump();
+                dumpUndoList();
                 throw new IllegalStateException("can't finish a compound edit when there isn't one active");
             }
             --compoundingDepth;
             ++compoundId;
-            //System.out.println("finished compound edit");
-            //dump();
         }
         
         public void setCurrentStateClean() {
@@ -588,7 +586,6 @@ public class PTextBuffer implements CharSequence {
                     do {
                         --undoPosition;
                         doable = undoList.get(undoPosition);
-                        //System.out.println("undo: " + doable);
                         doable.undo();
                     } while (compoundContinuesAt(doable, undoPosition - 1));
                 } finally {
@@ -606,7 +603,6 @@ public class PTextBuffer implements CharSequence {
                     do {
                         doable = undoList.get(undoPosition);
                         ++undoPosition;
-                        //System.out.println("redo: " + doable);
                         doable.redo();
                     } while (compoundContinuesAt(doable, undoPosition));
                 } finally {
