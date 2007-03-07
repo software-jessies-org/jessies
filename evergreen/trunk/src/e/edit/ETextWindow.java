@@ -240,9 +240,9 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     private void highlightMergeConflicts() {
         // All (?) merge conflicts use these markers:
-        final String MERGE_CONFLICT_REGULAR_EXPRESSION = "^(<{7}|>{7})";
+        final String MERGE_CONFLICT_REGULAR_EXPRESSION = "(?m)^(<{7}|>{7})";
         // And once we're convinced we're looking at a file with merge conflicts, we can accept a more lenient set of dividers:
-        final String ALL_MERGE_CONFLICT_DIVIDERS_REGULAR_EXPRESSION = "^(<{7}( .*)?|>{7}|\\|{7}|={7})";
+        final String ALL_MERGE_CONFLICT_DIVIDERS_REGULAR_EXPRESSION = "(?m)^(<{7}( .*)?|>{7}|\\|{7}|={7})";
         if (Pattern.compile(MERGE_CONFLICT_REGULAR_EXPRESSION).matcher(textArea.getTextBuffer()).find()) {
             FindAction.INSTANCE.findInText(this, ALL_MERGE_CONFLICT_DIVIDERS_REGULAR_EXPRESSION);
         }
