@@ -371,8 +371,10 @@ public class JTerminalPane extends JPanel {
 				case KeyEvent.VK_F2:
 				case KeyEvent.VK_F3:
 				case KeyEvent.VK_F4:
+					// F1-F4 are special cases whose sequences don't look anything like the other F-keys.
+					return Ascii.ESC + "O" + "PQRS".charAt(keyCode - KeyEvent.VK_F1);
 				case KeyEvent.VK_F5:
-					return functionKeySequence(11, keyCode, KeyEvent.VK_F1);
+					return functionKeySequence(15, keyCode, KeyEvent.VK_F5);
 				case KeyEvent.VK_F6:
 				case KeyEvent.VK_F7:
 				case KeyEvent.VK_F8:
