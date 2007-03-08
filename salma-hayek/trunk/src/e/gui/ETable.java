@@ -48,7 +48,8 @@ public class ETable extends JTable {
         // Enable Java 6's row sorting by default, without yet requiring Java 6.
         try {
             java.lang.reflect.Method setAutoCreateRowSorterMethod = JTable.class.getDeclaredMethod("setAutoCreateRowSorter", new Class[] { boolean.class });
-            setAutoCreateRowSorterMethod.invoke(this, true);
+            // FIXME: this isn't safe unless callers are updated to take into account the possible view/model row index mismatches. (The selection indexes are in terms of the view, not the model.)
+            //setAutoCreateRowSorterMethod.invoke(this, true);
         } catch (Exception ex) {
             // Ignore. Likely we're on Java 5, where this functionality doesn't exist.
         }
