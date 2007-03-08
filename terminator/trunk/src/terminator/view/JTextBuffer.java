@@ -536,9 +536,9 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			}
 			lineHighlights.set(lineIndex, new ArrayList<Highlight>());
 		}
-		ArrayList<Highlight> line = lineHighlights.get(lineIndex);
-		if (line.indexOf(highlight) == -1) {
-			line.add(highlight);
+		ArrayList<Highlight> highlightsOnThisLine = lineHighlights.get(lineIndex);
+		if (highlightsOnThisLine.contains(highlight) == false) {
+			highlightsOnThisLine.add(highlight);
 		}
 	}
 	
