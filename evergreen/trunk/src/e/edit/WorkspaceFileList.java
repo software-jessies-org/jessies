@@ -45,7 +45,7 @@ public class WorkspaceFileList {
     
     public void ensureInFileList(String pathWithinWorkspace) {
         List<String> list = fileList;
-        if (list != null && list.indexOf(pathWithinWorkspace) == -1) {
+        if (list != null && list.contains(pathWithinWorkspace) == false) {
             updateFileList();
         }
     }
