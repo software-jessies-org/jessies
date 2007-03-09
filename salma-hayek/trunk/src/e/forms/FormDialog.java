@@ -212,9 +212,9 @@ public class FormDialog {
             tabbedPane.add(builder.tabTitles[i], formPanels.get(i));
         }
         
-        if (GuiUtilities.isMacOs()) {
+        if (GuiUtilities.isMacOs() || GuiUtilities.isWindows()) {
             for (FormPanel child : formPanels) {
-                fixTabbedPaneChildrenForMacOs(child);
+                fixOpacityOfTabbedPaneChildren(child);
             }
         }
         
@@ -223,9 +223,10 @@ public class FormDialog {
     
     /**
      * Mac OS tabbed panes' interiors have a darker background than normal panels.
-     * For this to show through, the children need to be non-opaque (that is, transparent).
+     * Windows XP tabbed panes' interiors have a lighter (gradient) background than normal panels.
+     * For either of these effects to show through, the children need to be non-opaque (that is, transparent).
      */
-    private static void fixTabbedPaneChildrenForMacOs(Component component) {
+    private static void fixOpacityOfTabbedPaneChildren(Component component) {
         // JTextField won't paint its background unless it's opaque, but everything else should be non-opaque.
         if (component instanceof JComponent && component instanceof JTextField == false) {
             ((JComponent) component).setOpaque(false);
@@ -233,7 +234,7 @@ public class FormDialog {
         // Recurse for any children.
         if (component instanceof Container) {
             for (Component child : ((Container) component).getComponents()) {
-                fixTabbedPaneChildrenForMacOs(child);
+                fixOpacityOfTabbedPaneChildren(child);
             }
         }
     }
