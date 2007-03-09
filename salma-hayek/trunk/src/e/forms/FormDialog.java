@@ -209,7 +209,12 @@ public class FormDialog {
     private JTabbedPane makeTabbedPaneForFormPanels(List<FormPanel> formPanels) {
         JTabbedPane tabbedPane = new JTabbedPane();
         for (int i = 0; i < formPanels.size(); ++i) {
-            tabbedPane.add(builder.tabTitles[i], formPanels.get(i));
+            // Give each panel a border to push it away from the side of the tabbed pane.
+            // We usual spacing will end up between the outside of the tabbed pane and the edge of the window/button panel.
+            FormPanel panel = formPanels.get(i);
+            panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 16, 10));
+            
+            tabbedPane.add(builder.tabTitles[i], panel);
         }
         
         if (GuiUtilities.isMacOs() || GuiUtilities.isWindows()) {
