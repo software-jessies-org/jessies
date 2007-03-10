@@ -14,8 +14,7 @@ public class PtyProcess {
          */
         @Override
         public int read() throws IOException {
-            byte[] b = new byte[1];
-            return read(b, 0, 1);
+            throw new UnsupportedOperationException();
         }
         
         /**
