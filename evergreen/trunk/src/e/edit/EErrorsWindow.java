@@ -196,6 +196,8 @@ public class EErrorsWindow extends EWindow {
                 actions.add(new OpenQuicklyAction());
                 actions.add(new FindFilesContainingSelectionAction());
                 actions.add(null);
+                actions.add(new CheckInChangesAction());
+                actions.add(null);
                 actions.add(new KillErrorsAction());
             }
         });

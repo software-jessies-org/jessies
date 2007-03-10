@@ -1,11 +1,12 @@
 package e.edit;
 
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import e.util.*;
 
 /**
  * A column containing views.
@@ -29,6 +30,19 @@ public class EColumn extends JSplitPane {
     public EColumn() {
         super(JSplitPane.VERTICAL_SPLIT, true);
         setBottomComponent(bottomPanel);
+        initPopUpMenu();
+    }
+    
+    private void initPopUpMenu() {
+        EPopupMenu backgroundMenu = new EPopupMenu(bottomPanel);
+        backgroundMenu.addMenuItemProvider(new MenuItemProvider() {
+            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+                actions.add(new OpenQuicklyAction());
+                actions.add(new FindFilesContainingSelectionAction());
+                actions.add(null);
+                actions.add(new CheckInChangesAction());
+            }
+        });
     }
     
     public void setErrorsWindow(EErrorsWindow errorsWindow) {
