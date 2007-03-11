@@ -94,19 +94,24 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, js
 }
 
 jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arrayOffset, jint desiredLength) {
-    std::vector<jbyte> temporary(desiredLength);
+    // If this copies, we've wasted a little performance, copying 8 KiB of data we're about to overwrite.
+    // If, as it should, it gives us access to the actual byte[], we've saved doing the copy back into Java space that SetByteArrayRegion forces on us.
+    jbyte* buffer = m_env->GetByteArrayElements(destination, NULL);
+    
     ssize_t bytesTransferred;
     do {
-        bytesTransferred = ::read(fd.get(), &temporary[0], desiredLength);
+        bytesTransferred = ::read(fd.get(), &buffer[arrayOffset], desiredLength);
     } while (bytesTransferred == -1 && errno == EINTR);
     
+    // Free and copy back, if necessary.
+    m_env->ReleaseByteArrayElements(destination, buffer, 0);
+    
     if (bytesTransferred == -1) {
-        throw unix_exception("read(" + toString(fd.get()) + ", &array[" + toString(arrayOffset) +"], " + toString(desiredLength) + ") failed");
+        throw unix_exception("read(" + toString(fd.get()) + ", &buffer[" + toString(arrayOffset) +"], " + toString(desiredLength) + ") failed");
     }
     if (bytesTransferred == 0) {
         return -1;
     }
-    m_env->SetByteArrayRegion(destination, arrayOffset, bytesTransferred, &temporary[0]);
     return bytesTransferred;
 }
 
@@ -117,19 +122,20 @@ void terminator_terminal_PtyProcess::nativeWrite(jbyteArray bytes, jint arrayOff
         return;
     }
     
-    std::vector<jbyte> buffer(byteCount);
-    m_env->GetByteArrayRegion(bytes, arrayOffset, byteCount, &buffer[0]);
-    if (m_env->ExceptionCheck()) {
-        return;
-    }
+    // We can't lose here. Either we get a direct pointer to the byte[] or the JVM does the copy down that GetByteArrayRegion would do anyway.
+    // Note that this method isn't critical to performance anyway. It's only native code because it has to be for Cygwin and is convenient elsewhere.
+    jbyte* buffer = m_env->GetByteArrayElements(bytes, NULL);
     
     ssize_t bytesTransferred;
     do {
-        bytesTransferred = ::write(fd.get(), &buffer[0], byteCount);
+        bytesTransferred = ::write(fd.get(), &buffer[arrayOffset], byteCount);
     } while (bytesTransferred == -1 && errno == EINTR);
     
+    // Free our copy, if necessary. Tell the JVM that even if it copied the byte[] down, it shouldn't ever bother copying it back up.
+    m_env->ReleaseByteArrayElements(bytes, buffer, JNI_ABORT);
+    
     if (bytesTransferred <= 0) {
-        throw unix_exception("write(" + toString(fd.get()) + ", &buffer[0], " + toString(byteCount) + ") failed");
+        throw unix_exception("write(" + toString(fd.get()) + ", &buffer[" + toString(arrayOffset) + "], " + toString(byteCount) + ") failed");
     }
 }
 
