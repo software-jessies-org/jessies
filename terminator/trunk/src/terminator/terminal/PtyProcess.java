@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 public class PtyProcess {
     private class PtyInputStream extends InputStream {
         /**
-         * Although we don't want to invoke this method, it's abstract in InputStream, so we have to implement it.
+         * Although we don't want to invoke this inefficient method, it's abstract in InputStream, so we have to "implement" it.
          */
         @Override
         public int read() throws IOException {
@@ -30,10 +30,12 @@ public class PtyProcess {
     }
     
     private class PtyOutputStream extends OutputStream {
+        /**
+         * Although we don't want to invoke this inefficient method, it's abstract in OutputStream, so we have to "implement" it.
+         */
         @Override
         public void write(int b) throws IOException {
-            byte[] bytes = new byte[] { (byte) b };
-            nativeWrite(bytes, 0, 1);
+            throw new UnsupportedOperationException();
         }
         
         @Override
