@@ -64,7 +64,6 @@ public class LogWriter {
 	public void flush() {
 		try {
 			if (writer != null) {
-				System.out.println("flush");
 				writer.flush();
 			}
 		} catch (Throwable th) {
