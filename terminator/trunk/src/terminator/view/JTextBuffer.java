@@ -23,7 +23,9 @@ A JTextBuffer provides the visible display of the virtual terminal.
 
 public class JTextBuffer extends JComponent implements FocusListener, Scrollable {
 	private static final boolean MAC_OS = GuiUtilities.isMacOs();
-
+	
+	private static final Stopwatch paintStyledTextStopwatch = Stopwatch.get("paintStyledText");
+	
 	private TextBuffer model;
 	private Location cursorPosition = new Location(0, 0);
 	private boolean hasFocus = false;
@@ -752,43 +754,50 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	 * Paints the text. Returns how many pixels wide the text was.
 	 */
 	private int paintStyledText(Graphics2D g, StyledText text, int x, int y) {
-		FontMetrics metrics = getFontMetrics(getFont());
-		Style style = text.getStyle();
-		Color foreground = style.getForeground();
-		Color background = style.getBackground();
-		
-		if (style.isReverseVideo()) {
-			Color oldForeground = foreground;
-			foreground = background;
-			background = oldForeground;
-		}
-		
-		int textWidth = metrics.stringWidth(text.getText());
-		g.setColor(background);
-		// Special continueToEnd flag used for drawing the backgrounds of Highlights which extend
-		// over the end of lines.  Used for multi-line selection.
-		int backgroundWidth = text.continueToEnd() ? (getSize().width - x) : textWidth;
-		g.fillRect(x, y - metrics.getMaxAscent() - metrics.getLeading(), backgroundWidth, metrics.getHeight());
-		if (style.isUnderlined()) {
-			g.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 128));
-			g.drawLine(x, y + 1, x + textWidth, y + 1);
-		}
-		g.setColor(foreground);
-		g.drawString(text.getText(), x, y);
-		if (style.isBold()) {
-			// A font doesn't necessarily have a bold.
-			// Mac OS X's "Monaco" font is an example.
-			// The trouble is, you can't tell from the Font you get back from deriveFont.
-			// isBold will always return true, and getting the WEIGHT attribute will give you WEIGHT_BOLD.
-			// So we don't know how to test for a bold font.
+		Stopwatch.Timer timer = paintStyledTextStopwatch.start();
+		try {
+			FontMetrics metrics = getFontMetrics(getFont());
+			Style style = text.getStyle();
+			Color foreground = style.getForeground();
+			Color background = style.getBackground();
 			
-			// Worse, if we actually get a bold font, it doesn't necessarily have metrics compatible with the plain variant.
-			// ProggySquare (http://www.proggyfonts.com/) is an example: the bold variant is significantly wider.
+			if (style.isReverseVideo()) {
+				Color oldForeground = foreground;
+				foreground = background;
+				background = oldForeground;
+			}
 			
-			// The old-fashioned "overstrike" method of faking bold doesn't look too bad, and it works in these awkward cases.
-			g.drawString(text.getText(), x + 1, y);
+			int textWidth = metrics.stringWidth(text.getText());
+			if (background.equals(getBackground()) == false) {
+				g.setColor(background);
+				// Special continueToEnd flag used for drawing the backgrounds of Highlights which extend over the end of lines.
+				// Used for multi-line selection.
+				int backgroundWidth = text.continueToEnd() ? (getSize().width - x) : textWidth;
+				g.fillRect(x, y - metrics.getMaxAscent() - metrics.getLeading(), backgroundWidth, metrics.getHeight());
+			}
+			if (style.isUnderlined()) {
+				g.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 128));
+				g.drawLine(x, y + 1, x + textWidth, y + 1);
+			}
+			g.setColor(foreground);
+			g.drawString(text.getText(), x, y);
+			if (style.isBold()) {
+				// A font doesn't necessarily have a bold.
+				// Mac OS X's "Monaco" font is an example.
+				// The trouble is, you can't tell from the Font you get back from deriveFont.
+				// isBold will always return true, and getting the WEIGHT attribute will give you WEIGHT_BOLD.
+				// So we don't know how to test for a bold font.
+				
+				// Worse, if we actually get a bold font, it doesn't necessarily have metrics compatible with the plain variant.
+				// ProggySquare (http://www.proggyfonts.com/) is an example: the bold variant is significantly wider.
+				
+				// The old-fashioned "overstrike" method of faking bold doesn't look too bad, and it works in these awkward cases.
+				g.drawString(text.getText(), x + 1, y);
+			}
+			return textWidth;
+		} finally {
+			timer.stop();
 		}
-		return textWidth;
 	}
 	
 	public boolean hasFocus() {
