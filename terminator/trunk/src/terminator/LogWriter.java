@@ -2,9 +2,11 @@ package terminator;
 
 import e.gui.*;
 import e.util.*;
+import java.awt.event.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import javax.swing.Timer;
 
 /**
  * Logs terminal output to a file.
@@ -15,8 +17,9 @@ public class LogWriter {
 	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HHmmssZ");
 	
 	private String info = "(not logging)";
-	private BufferedWriter stream;
-	private boolean suspended;
+	private Writer writer;
+	private Writer suspendedWriter;
+	private Timer flushTimer;
 	
 	public LogWriter(String[] command) {
 		try {
@@ -24,8 +27,6 @@ public class LogWriter {
 			initLogging(prefix);
 		} catch (Throwable th) {
 			SimpleDialog.showDetails(null, "Couldn't Open Log File", th);
-		} finally {
-			this.suspended = (stream == null);
 		}
 	}
 	
@@ -36,9 +37,15 @@ public class LogWriter {
 		File logsDirectory = new File(logsDirectoryName);
 		if (logsDirectory.exists()) {
 			File logFile = new File(logsDirectory, prefix + '-' + timestamp + ".txt");
-			try{
+			try {
 				this.info = logFile.toString();
-				this.stream = new BufferedWriter(new FileWriter(logFile));
+				this.writer = new BufferedWriter(new FileWriter(logFile));
+				this.flushTimer = new Timer(1000, new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						flush();
+					}
+				});
+				flushTimer.setRepeats(false);
 			} catch (IOException ex) {
 				this.info = "(" + logsDirectoryName + " is not writable)";
 			}
@@ -47,35 +54,38 @@ public class LogWriter {
 		}
 	}
 	
-	public void append(char ch) throws IOException {
-		if (suspended) {
-			return;
-		}
-		
-		stream.write(ch);
-		if (ch == '\n') {
-			stream.flush();
+	public void append(char[] chars, int charCount, boolean sawNewline) throws IOException {
+		writer.write(chars, 0, charCount);
+		if (sawNewline) {
+			flushTimer.restart();
 		}
 	}
 	
 	public void flush() {
 		try {
-			if (stream != null) {
-				stream.flush();
+			if (writer != null) {
+				System.out.println("flush");
+				writer.flush();
 			}
 		} catch (Throwable th) {
-			Log.warn("Exception occurred flushing log stream \"" + info + "\".", th);
+			Log.warn("Exception occurred flushing log writer \"" + info + "\".", th);
 		}
 	}
 	
 	public void close() {
-		if (stream != null) {
+		if (writer != null) {
 			try {
-				suspended = true;
-				stream.close();
-				stream = null;
+				if (writer != null) {
+					writer.close();
+					writer = null;
+				}
+				if (suspendedWriter != null) {
+					suspendedWriter.close();
+					suspendedWriter = null;
+				}
+				writer = NullWriter.INSTANCE;
 			} catch (Throwable th) {
-				Log.warn("Exception occurred closing log stream \"" + info + "\".", th);
+				Log.warn("Exception occurred closing log writer \"" + info + "\".", th);
 			}
 		}
 	}
@@ -84,18 +94,38 @@ public class LogWriter {
 		return info;
 	}
 	
-	public void setSuspended(boolean newState) {
-		if (stream != null) {
-			try {
-				stream.flush();
-			} catch (Throwable th) {
-				Log.warn("Exception occurred flushing log stream \"" + info + "\".", th);
-			}
-			suspended = newState;
+	public void setSuspended(boolean suspended) {
+		flush();
+		if (suspended && suspendedWriter == null) {
+			suspendedWriter = writer;
+			writer = NullWriter.INSTANCE;
+		}
+		if (suspended == false && suspendedWriter != null) {
+			writer = suspendedWriter;
+			suspendedWriter = null;
 		}
 	}
 	
 	public boolean isSuspended() {
-		return suspended;
+		return (suspendedWriter != null);
+	}
+	
+	public static class NullWriter extends Writer {
+		public static final Writer INSTANCE = new NullWriter();
+		
+		private NullWriter() {
+		}
+		
+		public void close() {
+		}
+		
+		public void flush() {
+		}
+		
+		public void write(int c) {
+		}
+		
+		public void write(char[] buffer, int offset, int byteCount) {
+		}
 	}
 }

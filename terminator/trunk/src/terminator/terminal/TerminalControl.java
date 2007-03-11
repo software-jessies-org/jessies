@@ -256,9 +256,15 @@ public class TerminalControl {
 	}
 	
 	private synchronized void processBuffer(char[] buffer, int size) throws IOException {
-		for (int i = 0; i < size; i++) {
-			processChar(buffer[i]);
+		boolean sawNewline = false;
+		for (int i = 0; i < size; ++i) {
+			char ch = buffer[i];
+			if (ch == '\n') {
+				sawNewline = true;
+			}
+			processChar(ch);
 		}
+		logWriter.append(buffer, size, sawNewline);
 		flushLineBuffer();
 		flushTerminalActions();
 	}
@@ -299,7 +305,6 @@ public class TerminalControl {
 			}
 		}
 		
-		logWriter.append(ch);
 		if (ch == Ascii.ESC) {
 			flushLineBuffer();
 			// If the old escape sequence is interrupted; we start a new one.
