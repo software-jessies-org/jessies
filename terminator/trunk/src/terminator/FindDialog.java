@@ -102,6 +102,13 @@ public class FindDialog {
     
     private void find() {
         String regularExpression = findField.getText();
+        
+        // Don't waste time re-finding all the current matches.
+        if (regularExpression.equals(getFindHighlighter().getRegularExpression())) {
+            return;
+        }
+        
+        // Check that we can actually compile the new regular expression.
         Pattern pattern = null;
         if (regularExpression.length() > 0) {
             try {
@@ -113,7 +120,8 @@ public class FindDialog {
             }
         }
         
-        getFindHighlighter().setPattern(textToFindIn, pattern, findStatus);
+        // Hand it over to the find highlighter, which does the real work.
+        getFindHighlighter().setPattern(textToFindIn, regularExpression, pattern, findStatus);
     }
     
     private void setStatus(String text, boolean isError) {
