@@ -227,7 +227,10 @@ RFEs
 
 * the absence of system wide C-`/C-~ functionality would make cycling through
   windows even more useful on Linux, so maybe we should support alt-` and
-  alt-~ there?
+  alt-~ there? The obvious problem with this is that on Linux it's likely that
+  you have several different Terminator processes, and you'd want to cycle
+  through all the Terminator windows regardless of process. This is probably
+  best done by the window manager.
 
 * There are some interesting features and bugs mentioned on the Konsole
   ChangeLog page: http://konsole.kde.org/changelog.php
@@ -236,7 +239,8 @@ RFEs
   does: "Where Terminal gets it wrong, though, is that it blocks input to the
   terminal while it's asking me to confirm.  Canceling the shutdown so
   that I can hit ^:wq and then starting the shutdown again is a pain".
-  The extended AWT modality API in Java 6 should let us address this.
+  The extended AWT modality API in Java 6 should let us address this, though
+  it's not easy to use while we have to maintain compatibility with Java 5.
 
 * Before using Terminator, I used rxvt, so I'd have done the same as Phil and
   used rxvt's terminfo.  I was recently looking at the state of rxvt, before
@@ -251,19 +255,25 @@ RFEs
   and so side-step cgf's reluctance to use terminfo, stated here:
   http://www.cygwin.com/ml/cygwin/2000-05/msg01012.html
 
-* Try socat and write up the experience for the benefit of the users
-  who've wanted to use Terminator with directly attached serial devices.
+* Try socat(1) (http://www.dest-unreach.org/socat/) and write up the experience
+  for the benefit of the users who've wanted to use Terminator with directly
+  attached serial devices. (The ability to stick GNU readline between you and
+  the serial port sounds pretty nice, if you think how awful most serial
+  devices' consoles are.)
 
-* Write a front-end for lrzsz which turns its frame-by-frame progress reports
-  into something as concise and useful as HyperTerminal's.
-  Our bring-up guys want to know if new hardware is dropping
-  packets, how long the transfer's going to take and whether the transfer rate is
-  what it should be.
+* Write a front-end for lrzsz(1) (http://www.ohse.de/uwe/software/lrzsz.html)
+  which turns its frame-by-frame progress reports into something as concise and
+  useful as HyperTerminal's.
+  Our bring-up guys want to know if new hardware is dropping packets, how long
+  the transfer's going to take and whether the transfer rate is what it should
+  be.
   Graphing transfers and errors against time should give them more useful
   information than they get from HyperTerminal (without drowning them).
 
-  Many people on the net (and our own Ed) recommend "minicom";
-  http://alioth.debian.org/projects/minicom/.
+* Many people on the net (and our own Ed) recommend "minicom";
+  http://alioth.debian.org/projects/minicom/. elliotth, on the other hand,
+  wishes he'd been aware of socat(1) when he last had cause to use minicom.
+  Worst. Program. Ever.
 
 * Simon Pamies [s.pamies@banality.de] isn't the only user to have suggested
   some way of saving a file which can be loaded to start a new Terminator window
@@ -296,6 +306,23 @@ RFEs
   plain dialog with a representation of the tree of processes rooted at
   the process clicked?  Or the full commandline of the process?  Throw
   it at Activity Monitor?  :)
+
+* Transparency. I've looked in to doing it on Windows, and it's not realistic
+  until there's support in Java. People have tried JNI and no-one claims to
+  have it working well enough that I think we could use it.
+  Linux users will start to have compositing X11 servers soon; we'll see how
+  that goes.
+  There are two approaches on Mac OS, each with their own advantages and
+  disadvantages. It's very costly in terms of performance.
+
+* Mouse events. I only know of Vim and Midnight Commander that actually use
+  this stuff. Midnight Commander has hard-coded checks for various terminal
+  emulators and no way for the user to override it, so even if we did support
+  the same XTerm sequences, mc(1) wouldn't use them.
+  I don't know about Vim; going on past experience, it probably has a
+  hard-coded list but a setting for the user to override it with.
+  The only program I'd be likely to use mouse support in would be whiptail(1),
+  but it doesn't have mouse support at all.
 
 Tab-related
 -----------
