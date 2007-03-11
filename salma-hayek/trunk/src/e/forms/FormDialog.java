@@ -217,10 +217,8 @@ public class FormDialog {
             tabbedPane.add(builder.tabTitles[i], panel);
         }
         
-        if (GuiUtilities.isMacOs() || GuiUtilities.isWindows()) {
-            for (FormPanel child : formPanels) {
-                fixOpacityOfTabbedPaneChildren(child);
-            }
+        for (FormPanel child : formPanels) {
+            fixOpacityOfTabbedPaneChildren(child);
         }
         
         return tabbedPane;
@@ -229,11 +227,14 @@ public class FormDialog {
     /**
      * Mac OS tabbed panes' interiors have a darker background than normal panels.
      * Windows XP tabbed panes' interiors have a lighter (gradient) background than normal panels.
-     * For either of these effects to show through, the children need to be non-opaque (that is, transparent).
+     * Sun's Metal tabbed panes' interiors use the tab ear color rather than the color of normal panels.
+     * It may be possible (I don't know) for some GTK+ themes to use a similar effect.
+     * For any of these effects to show through, the children need to be non-opaque (that is, transparent).
      */
     private static void fixOpacityOfTabbedPaneChildren(Component component) {
-        // JTextField won't paint its background unless it's opaque, but everything else should be non-opaque.
-        if (component instanceof JComponent && component instanceof JTextField == false) {
+        // JTextField won't paint its background unless it's opaque, but almost everything else should be non-opaque.
+        // The JButton documentation says not to make a JButton non-opaque.
+        if (component instanceof JComponent && component instanceof JTextField == false && component instanceof JButton == false) {
             ((JComponent) component).setOpaque(false);
         }
         // Recurse for any children.
