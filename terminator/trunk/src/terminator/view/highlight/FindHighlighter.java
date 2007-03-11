@@ -20,6 +20,7 @@ public class FindHighlighter implements Highlighter {
 	private final Style style = new Style(Color.black, Color.yellow, null, null, false);
 
 	private Pattern pattern;
+	private String regularExpression;
 	
 	public String getName() {
 		return "Find Highlighter";
@@ -34,13 +35,14 @@ public class FindHighlighter implements Highlighter {
 	 * 
 	 * Returns the current number of matches.
 	 */
-	public void setPattern(final JTextBuffer view, Pattern newPattern, final JLabel statusLine) {
+	public void setPattern(final JTextBuffer view, String regularExpression, Pattern newPattern, final JLabel statusLine) {
 		forgetPattern(view);
 		if (newPattern == null) {
 			return;
 		}
 		
 		this.pattern = newPattern;
+		this.regularExpression = regularExpression;
 		executorService.execute(new SwingWorker<Object, Object>() {
 			private int matchCount;
 			
@@ -60,6 +62,11 @@ public class FindHighlighter implements Highlighter {
 	public void forgetPattern(JTextBuffer view) {
 		view.removeHighlightsFrom(this, 0);
 		this.pattern = null;
+		this.regularExpression = null;
+	}
+	
+	public String getRegularExpression() {
+		return regularExpression;
 	}
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
