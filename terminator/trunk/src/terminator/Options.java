@@ -5,6 +5,8 @@ import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
+import java.awt.image.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -23,8 +25,6 @@ import javax.swing.*;
  * every available option, and edit them in the preferences dialog.
  */
 public class Options {
-	private static final Options INSTANCE = new Options();
-	
 	private static final String ANTI_ALIAS = "antiAlias";
 	private static final String BLOCK_CURSOR = "blockCursor";
 	private static final String CURSOR_BLINK = "cursorBlink";
@@ -42,6 +42,13 @@ public class Options {
 	private static final String USE_MENU_BAR = "useMenuBar";
 	
 	private final Pattern resourcePattern = Pattern.compile("(?:Terminator(?:\\*|\\.))?(\\S+):\\s*(.+)");
+	
+	private static final Color VERY_DARK_BLUE = new Color(0x000045);
+	private static final Color OFF_WHITE = new Color(0xe7e7e7);
+	private static final Color SELECTION_BLUE = new Color(0x1c2bff);
+	private static final Color LIGHT_BLUE = new Color(0.70f, 0.83f, 1.00f);
+	
+	private static final Options INSTANCE = new Options();
 	
 	// Mutable at any time.
 	private HashMap<String, Object> options = new HashMap<String, Object>();
@@ -307,6 +314,7 @@ public class Options {
 		List<FormPanel> formPanels = form.getFormPanels();
 		FormPanel generalPanel = formPanels.get(0);
 		FormPanel colorsPanel = formPanels.get(1);
+		Map<String, ColorPreference> colorPreferences = new HashMap<String, ColorPreference>();
 		
 		String[] keys = options.keySet().toArray(new String[options.size()]);
 		Arrays.sort(keys);
@@ -324,7 +332,9 @@ public class Options {
 					if (description.startsWith("Color ")) {
 						// Ignore the numbered colors. No-one should be modifying those.
 					} else {
-						colorsPanel.addRow(description + ":", new ColorPreference(key).makeUi());
+						ColorPreference colorPreference = new ColorPreference(key);
+						colorPreferences.put(key, colorPreference);
+						colorsPanel.addRow(description + ":", colorPreference.makeUi());
 					}
 				} else {
 					// FIXME: we should probably handle String.
@@ -334,6 +344,12 @@ public class Options {
 				}
 			}
 		}
+		
+		// Offer various preset color combinations.
+		colorsPanel.addRow("Presets:", makePresetButton(colorPreferences, "  Terminator  ", VERY_DARK_BLUE, OFF_WHITE, Color.WHITE, Color.GREEN, SELECTION_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "Black on White", Color.WHITE, Color.BLACK, Color.BLACK, Color.BLACK, LIGHT_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, Color.GREEN, Color.GREEN, Color.GREEN, SELECTION_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, Color.WHITE, Color.WHITE, Color.WHITE, SELECTION_BLUE));
 		
 		form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
 			public Boolean call() {
@@ -349,6 +365,51 @@ public class Options {
 		});
 		form.getFormDialog().setRememberBounds(false);
 		form.showNonModal();
+	}
+	
+	private BufferedImage makeEmptyPresetButtonImageToFit(String name) {
+		// This seems ugly and awkward, but I can't think of a simpler way to get a suitably-sized BufferedImage to work with, without hard-coding dimensions.
+		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = image.createGraphics();
+		g.setFont(getFont());
+		FontMetrics metrics = g.getFontMetrics();
+		final int height = (int) ((double) metrics.getHeight() * 1.4);
+		final int width = (int) (metrics.getStringBounds(name, g).getWidth() * 1.2);
+		g.dispose();
+		return new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	}
+	
+	private BufferedImage makePresetButtonImage(String name, Color background, Color foreground) {
+		// Make a representative image for the button.
+		BufferedImage image = makeEmptyPresetButtonImageToFit(name);
+		Graphics2D g = image.createGraphics();
+		g.setFont(getFont());
+		g.setColor(background);
+		g.fillRect(0, 0, image.getWidth(), image.getHeight());
+		g.setColor(background.darker());
+		g.drawRect(0, 0, image.getWidth() - 1, image.getHeight() - 1);
+		g.setColor(foreground);
+		Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(name, g);
+		final int x = (image.getWidth() - (int) stringBounds.getWidth()) / 2;
+		int y = (image.getHeight() - (int) stringBounds.getHeight()) / 2 + g.getFontMetrics().getAscent();
+		y = (int) ((double) y / 1.1);
+		g.drawString(name, x, y);
+		g.dispose();
+		return image;
+	}
+	
+	private JComponent makePresetButton(final Map<String, ColorPreference> colorPreferences, String name, final Color background, final Color foreground, final Color bold, final Color cursor, final Color selection) {
+		JButton button = new JButton(new ImageIcon(makePresetButtonImage(name, background, foreground)));
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				colorPreferences.get("background").updatePreference(background);
+				colorPreferences.get("foreground").updatePreference(foreground);
+				colorPreferences.get("colorBD").updatePreference(bold);
+				colorPreferences.get("cursorColor").updatePreference(cursor);
+				colorPreferences.get("selectionColor").updatePreference(selection);
+			}
+		});
+		return button;
 	}
 	
 	private boolean writeOptionsTo(File file) {
@@ -432,21 +493,21 @@ public class Options {
 	
 	private class ColorPreference {
 		private String key;
+		private ColorSwatchIcon icon;
+		private JButton button;
 		
 		public ColorPreference(String key) {
 			this.key = key;
+			this.icon = new ColorSwatchIcon(getColor(key), new Dimension(60, 20));
 		}
 		
 		public JComponent makeUi() {
-			final ColorSwatchIcon icon = new ColorSwatchIcon(getColor(key), new Dimension(60, 20));
-			final JButton button = new JButton(icon);
+			this.button = new JButton(icon);
 			button.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					Color newColor = JColorChooser.showDialog(button, "Colors", getColor(key));
 					if (newColor != null) {
-						options.put(key, newColor);
-						icon.setColor(newColor);
-						Terminator.getSharedInstance().optionsDidChange();
+						updatePreference(newColor);
 					}
 				}
 			});
@@ -456,6 +517,13 @@ public class Options {
 			button.setMargin(margin);
 			button.putClientProperty("JButton.buttonType", "toolbar");
 			return button;
+		}
+		
+		public void updatePreference(Color newColor) {
+			options.put(key, newColor);
+			icon.setColor(newColor);
+			button.repaint();
+			Terminator.getSharedInstance().optionsDidChange();
 		}
 	}
 	
@@ -518,11 +586,11 @@ public class Options {
 		// There are xterm-16color and rxvt-16color variants, but I've not seen them used, and don't know of anything that would take advantage of the extra colors (which would require a significantly more complicated terminfo, and support for extra sequences).
 		
 		// Defaults reminiscent of SGI's xwsh(1).
-		addDefault("background", colorFromString("#000045"), "Background color"); // dark blue
-		addDefault("colorBD", colorFromString("#ffffff"), "Bold text color"); // white
-		addDefault("cursorColor", colorFromString("#00ff00"), "Cursor color"); // green
-		addDefault("foreground", colorFromString("#e7e7e7"), "Text foreground color"); // off-white
-		addDefault("selectionColor", colorFromString("#1c2bff"), "Selection background color"); // light blue
+		addDefault("background", VERY_DARK_BLUE, "Background color");
+		addDefault("colorBD", Color.WHITE, "Bold text color");
+		addDefault("cursorColor", Color.GREEN, "Cursor color");
+		addDefault("foreground", OFF_WHITE, "Text foreground color");
+		addDefault("selectionColor", SELECTION_BLUE, "Selection background color");
 	}
 	
 	/**
@@ -565,7 +633,7 @@ public class Options {
 		return null;
 	}
 	
-	private void readRGBFile(String rgbDotTxtFilename) {
+	private void readRgbFile(String rgbDotTxtFilename) {
 		rgbColors = new HashMap<String, Color>();
 		String[] lines = StringUtilities.readLinesFromFile(rgbDotTxtFilename);
 		for (String line : lines) {
@@ -589,7 +657,7 @@ public class Options {
 				return null;
 			}
 			try {
-				readRGBFile(filename);
+				readRgbFile(filename);
 			} catch (Exception ex) {
 				Log.warn("Problem reading colors from \"" + filename + "\"", ex);
 			}
@@ -634,7 +702,7 @@ public class Options {
 			String[] lines = StringUtilities.readLinesFromFile(file.toString());
 			for (String line : lines) {
 				line = line.trim();
-				if (line.length() == 0 || line.startsWith("!")) {
+				if (line.length() == 0 || line.startsWith("#")) {
 					continue;
 				}
 				processResourceString(line);

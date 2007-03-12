@@ -5,6 +5,10 @@ Bugs
   the text changes are above the selection, the selection is still changed
   even if the selection contents were not changed.
 
+* If you double-click or triple-click select, and then shift-click to extend
+  the selection, our behavior is undesirable. I wouldn't like to swear I know
+  exactly what the right behavior is, but ours is without question wrong.
+
 * car: notes on the following bugs:
   I've been having problems with vi, bash, tcsh, long lines.  All hosts
   used have up to date copies of terminator.tic in the appropriate
@@ -162,11 +166,6 @@ Configuration
 
 * Should allow the user to specify a log filename per tab, on the command line.
   Mail chrisa@bluearc.com when this is done, because he wants to use it.
-
-* Maybe we should ask you up-front, when you first
-  use Terminator, which of the great terminal emulators you think is the one
-  true emulator: xwsh or xterm? The former group get pretty much the current
-  set of defaults, and the latter get a more black-on-white style.
 
 * car: "Not so long ago, when I was a SuSE/konsole user, and even back when I
   was a student using xwsh, I'd have a few different default sets, for
