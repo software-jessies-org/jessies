@@ -13,7 +13,7 @@ blog_content=`curl --silent --show-error #{blog_uri}`
 
 blog_content.split("\n").each() {
   |line|
-  if line =~ /"(#{blog_uri}(\d+_\d+_\d+_\S+_archive\.html))"/
+  if line =~ /"(#{blog_uri}(\d+_\d+_\d+_archive\.html))"/
     next_archive_uri=$1
     next_filename=$2
     print(" page #{next_archive_uri}...\n")
