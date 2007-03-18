@@ -38,15 +38,16 @@ public class JavaHpp {
         
         Class klass = Class.forName(className, false, new URLClassLoader(classpath.toArray(new URL[0])));
         List<Method> nativeMethods = extractNativeMethods(klass.getDeclaredMethods());
-        List<Field> instanceFields = extractInstanceFields(klass.getDeclaredFields());
+        Field[] fields = klass.getDeclaredFields();
         
         String proxyClassName = jniMangle(className);
         out.println("class " + proxyClassName + " {");
         out.println("private:");
         out.println("JNIEnv* m_env;");
         out.println("jobject m_instance;");
-        for (Field field : instanceFields) {
-            out.println("JniField<" + jniTypeNameFor(field.getType()) + "> " + field.getName() + ";");
+        for (Field field : fields) {
+            boolean isStatic = ((field.getModifiers() & Modifier.STATIC) != 0);
+            out.println("JniField<" + jniTypeNameFor(field.getType()) + ", " + isStatic + "> " + field.getName() + ";");
         }
         emit_newStringUtf8(out);
         
@@ -54,7 +55,7 @@ public class JavaHpp {
         out.println(proxyClassName + "(JNIEnv* env, jobject instance)");
         out.println(": m_env(env)");
         out.println(", m_instance(instance)");
-        for (Field field : instanceFields) {
+        for (Field field : fields) {
             if (field.getType().isArray()) {
                 throw new RuntimeException("array fields such as '" + field.getName() + "' are not supported");
             }
@@ -148,19 +149,6 @@ public class JavaHpp {
             }
         }
         return nativeMethods;
-    }
-    
-    private List<Field> extractInstanceFields(Field[] fields) {
-        List<Field> instanceFields = new ArrayList<Field>();
-        for (Field field : fields) {
-            if ((field.getModifiers() & Modifier.STATIC) != 0) {
-                // JniField.h doesn't support static fields, though there's no
-                // reason why we couldn't write JniStaticField if we needed it.
-                continue;
-            }
-            instanceFields.add(field);
-        }
-        return instanceFields;
     }
     
     private void emit_translateToJavaException(IndentedSourceWriter out) {
