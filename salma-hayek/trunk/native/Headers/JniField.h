@@ -62,66 +62,21 @@ private:
     }
 };
 
-template <> void JniField<jstring>::set(const jstring& rhs) {
-    m_env->SetObjectField(m_instance, getFieldID(), rhs);
-}
-template <> void JniField<jobject>::set(const jobject& rhs) {
-    m_env->SetObjectField(m_instance, getFieldID(), rhs);
-}
-template <> void JniField<jboolean>::set(const jboolean& rhs) {
-    m_env->SetBooleanField(m_instance, getFieldID(), rhs);
-}
-template <> void JniField<jbyte>::set(const jbyte& rhs) {
-    m_env->SetByteField(m_instance, getFieldID(), rhs);
-}
-template <> void JniField<jchar>::set(const jchar& rhs) {
-    m_env->SetCharField(m_instance, getFieldID(), rhs);
-}
-template <> void JniField<jshort>::set(const jshort& rhs) {
-    m_env->SetShortField(m_instance, getFieldID(), rhs);
-}
-template <> void JniField<jint>::set(const jint& rhs) {
-    m_env->SetIntField(m_instance, getFieldID(), rhs);
-}
-template <> void JniField<jlong>::set(const jlong& rhs) {
-    m_env->SetLongField(m_instance, getFieldID(), rhs);
-}
-template <> void JniField<jfloat>::set(const jfloat& rhs) {
-    m_env->SetFloatField(m_instance, getFieldID(), rhs);
-}
-template <> void JniField<jdouble>::set(const jdouble& rhs) {
-    m_env->SetDoubleField(m_instance, getFieldID(), rhs);
-}
+#define org_jessies_JniField_ACCESSORS(TYPE, FUNCTION_NAME_FRAGMENT) \
+    template <> void JniField<TYPE>::set(const TYPE& rhs) { m_env->Set ## FUNCTION_NAME_FRAGMENT ## Field(m_instance, getFieldID(), rhs); } \
+    template <> void JniField<TYPE>::get(TYPE& result) const { result = (TYPE) m_env->Get ## FUNCTION_NAME_FRAGMENT ## Field(m_instance, getFieldID()); }
 
-template <> void JniField<jstring>::get(jstring& result) const {
-    result = (jstring) m_env->GetObjectField(m_instance, getFieldID());
-}
-template <> void JniField<jobject>::get(jobject& result) const {
-    result = m_env->GetObjectField(m_instance, getFieldID());
-}
-template <> void JniField<jboolean>::get(jboolean& result) const {
-    result = m_env->GetBooleanField(m_instance, getFieldID());
-}
-template <> void JniField<jbyte>::get(jbyte& result) const {
-    result = m_env->GetByteField(m_instance, getFieldID());
-}
-template <> void JniField<jchar>::get(jchar& result) const {
-    result = m_env->GetCharField(m_instance, getFieldID());
-}
-template <> void JniField<jshort>::get(jshort& result) const {
-    result = m_env->GetShortField(m_instance, getFieldID());
-}
-template <> void JniField<jint>::get(jint& result) const {
-    result = m_env->GetIntField(m_instance, getFieldID());
-}
-template <> void JniField<jlong>::get(jlong& result) const {
-    result = m_env->GetLongField(m_instance, getFieldID());
-}
-template <> void JniField<jfloat>::get(jfloat& result) const {
-    result = m_env->GetFloatField(m_instance, getFieldID());
-}
-template <> void JniField<jdouble>::get(jdouble& result) const {
-    result = m_env->GetDoubleField(m_instance, getFieldID());
-}
+org_jessies_JniField_ACCESSORS(jstring, Object)
+org_jessies_JniField_ACCESSORS(jobject, Object)
+org_jessies_JniField_ACCESSORS(jboolean, Boolean)
+org_jessies_JniField_ACCESSORS(jbyte, Byte)
+org_jessies_JniField_ACCESSORS(jchar, Char)
+org_jessies_JniField_ACCESSORS(jshort, Short)
+org_jessies_JniField_ACCESSORS(jint, Int)
+org_jessies_JniField_ACCESSORS(jlong, Long)
+org_jessies_JniField_ACCESSORS(jfloat, Float)
+org_jessies_JniField_ACCESSORS(jdouble, Double)
+
+#undef org_jessies_JniField_ACCESSORS
 
 #endif
