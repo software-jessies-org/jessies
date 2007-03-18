@@ -9,9 +9,9 @@
 /**
  * Hides the details of accessing Java fields via JNI.
  */
-template <typename NativeT>
+template <typename NativeT, bool isStatic>
 class JniField {
-    typedef JniField<NativeT> Self;
+    typedef JniField<NativeT, isStatic> Self;
     
     JNIEnv* m_env;
     jobject m_instance;
@@ -19,8 +19,7 @@ class JniField {
     const char* m_fieldSignature;
     
 public:
-    // Creates a proxy for an instance field.
-    // FIXME: should be able to proxy static fields.
+    // Creates a proxy for a field.
     JniField(JNIEnv* env, jobject instance, const char* name, const char* signature)
     : m_env(env)
     , m_instance(instance)
@@ -45,14 +44,9 @@ private:
     void set(const NativeT&);
     
     jfieldID getFieldID() const {
-        // It's not a valid optimization to cache field ids in face of class
-        // unloading. We could keep a global reference to the class to prevent
-        // it being unloaded, but that seems unfriendly.
-        
-        // The JNI specification suggests that GetObjectClass can't fail.
-        // http://java.sun.com/j2se/1.5.0/docs/guide/jni/spec/functions.html
-        jclass objectClass = m_env->GetObjectClass(m_instance);
-        jfieldID result = m_env->GetFieldID(objectClass, m_fieldName, m_fieldSignature);
+        // It's not a valid optimization to cache field ids in face of class unloading.
+        // We could keep a global reference to the class to prevent it being unloaded, but that seems unfriendly.
+        jfieldID result = isStatic ? m_env->GetStaticFieldID(getObjectClass(), m_fieldName, m_fieldSignature) : m_env->GetFieldID(getObjectClass(), m_fieldName, m_fieldSignature);
         if (result == 0) {
             std::ostringstream message;
             message << "couldn't find field " << m_fieldName << " (" << m_fieldSignature << ")";
@@ -60,11 +54,26 @@ private:
         }
         return result;
     }
+    
+    jclass getObjectClass() const {
+        // The JNI specification (http://java.sun.com/j2se/1.5.0/docs/guide/jni/spec/functions.html) suggests that GetObjectClass can't fail, so we don't need to check for exceptions.
+        return m_env->GetObjectClass(m_instance);
+    }
 };
 
 #define org_jessies_JniField_ACCESSORS(TYPE, FUNCTION_NAME_FRAGMENT) \
-    template <> void JniField<TYPE>::set(const TYPE& rhs) { m_env->Set ## FUNCTION_NAME_FRAGMENT ## Field(m_instance, getFieldID(), rhs); } \
-    template <> void JniField<TYPE>::get(TYPE& result) const { result = (TYPE) m_env->Get ## FUNCTION_NAME_FRAGMENT ## Field(m_instance, getFieldID()); }
+    template <> void JniField<TYPE, true>::set(const TYPE& rhs) { \
+        m_env->SetStatic ## FUNCTION_NAME_FRAGMENT ## Field(getObjectClass(), getFieldID(), rhs); \
+    } \
+    template <> void JniField<TYPE, false>::set(const TYPE& rhs) { \
+        m_env->Set ## FUNCTION_NAME_FRAGMENT ## Field(m_instance, getFieldID(), rhs); \
+    } \
+    template <> void JniField<TYPE, true>::get(TYPE& result) const { \
+        result = (TYPE) m_env->GetStatic ## FUNCTION_NAME_FRAGMENT ## Field(getObjectClass(), getFieldID()); \
+    } \
+    template <> void JniField<TYPE, false>::get(TYPE& result) const { \
+        result = (TYPE) m_env->Get ## FUNCTION_NAME_FRAGMENT ## Field(m_instance, getFieldID()); \
+    }
 
 org_jessies_JniField_ACCESSORS(jstring, Object)
 org_jessies_JniField_ACCESSORS(jobject, Object)
