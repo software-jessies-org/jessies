@@ -218,6 +218,7 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
+            // FIXME: really, we want a table. It would be good to be able to reset a stopwatch too.
             JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Stopwatches", Stopwatch.toStringAll());
         }
     }
@@ -259,9 +260,16 @@ public class DebugMenu {
                     System.gc();
                 }
             });
+            JButton histogramButton = new JButton("Histogram");
+            histogramButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Heap Histogram", getHeapHistogram());
+                }
+            });
             JLabel currentHeapUsageLabel = new JLabel(" ");
             JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 2));
             controlPanel.add(gcButton);
+            controlPanel.add(histogramButton);
             controlPanel.add(Box.createHorizontalStrut(10));
             controlPanel.add(currentHeapUsageLabel);
             
@@ -277,6 +285,15 @@ public class DebugMenu {
             frame.setResizable(false);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+        }
+        
+        public String getHeapHistogram() {
+            String[] command = new String[] {
+                "jmap", "-histo:live", Integer.toString(ProcessUtilities.getVmProcessId())
+            };
+            ArrayList<String> lines = new ArrayList<String>();
+            ProcessUtilities.backQuote(null, command, lines, lines);
+            return StringUtilities.join(lines, "\n");
         }
     }
 }
