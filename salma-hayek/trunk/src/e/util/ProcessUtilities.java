@@ -163,12 +163,24 @@ public class ProcessUtilities {
      */
     public static int getVmProcessId() {
         try {
-            // FIXME: what about Mac OS?
-            // We can't use StringUtilities.readFile because most files in /proc (including this one) report their length as 0.
-            BufferedReader in = new BufferedReader(new FileReader("/proc/self/stat"));
-            String content = in.readLine();
-            in.close();
-            return Integer.parseInt(content.substring(0, content.indexOf(' ')));
+            if (GuiUtilities.isMacOs()) {
+                // This only works if we were started with -Xdock, but that's true for our applications, and I don't have a better solution.
+                Map<String, String> env = System.getenv();
+                for (String key : env.keySet()) {
+                    if (key.startsWith("APP_NAME_")) {
+                        System.err.println(key);
+                        System.err.println(key.substring(9));
+                        return Integer.parseInt(key.substring(9));
+                    }
+                }
+                return -1;
+            } else {
+                // We can't use StringUtilities.readFile because most files in /proc (including this one) report their length as 0.
+                BufferedReader in = new BufferedReader(new FileReader("/proc/self/stat"));
+                String content = in.readLine();
+                in.close();
+                return Integer.parseInt(content.substring(0, content.indexOf(' ')));
+            }
         } catch (Exception ex) {
             return -1;
         }
