@@ -351,6 +351,7 @@ public class Options {
 		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, Color.GREEN, Color.GREEN, Color.GREEN, SELECTION_BLUE));
 		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, Color.WHITE, Color.WHITE, Color.WHITE, SELECTION_BLUE));
 		
+		// Save the preferences if the user hits "Save".
 		form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
 			public Boolean call() {
 				File optionsFile = getOptionsFile();
@@ -363,8 +364,18 @@ public class Options {
 				return saved;
 			}
 		});
+		
+		// Restore the preferences if the user hits "Cancel".
+		final HashMap<String, Object> initialOptions = new HashMap<String, Object>(options);
+		form.getFormDialog().setCancelRunnable(new Runnable() {
+			public void run() {
+				options = initialOptions;
+				Terminator.getSharedInstance().optionsDidChange();
+			}
+		});
+		
 		form.getFormDialog().setRememberBounds(false);
-		form.showNonModal();
+		form.show("Save");
 	}
 	
 	private BufferedImage makeEmptyPresetButtonImageToFit(String name) {
