@@ -130,6 +130,9 @@ public class JTerminalPane extends JPanel {
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setViewport(viewport);
+		if (GuiUtilities.isMacOs()) {
+			scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, new FakeScrollBar());
+		}
 		
 		optionsDidChange();
 		
@@ -157,6 +160,34 @@ public class JTerminalPane extends JPanel {
 			}).start();
 		}
 	}
+	
+	// On Mac OS there's an ugly hole between the horizontal scroll bar and the grow box.
+	// Fill that hole with what looks like an empty horizontal scroll bar track.
+	// I don't know how to get a JScrollBar to do the rendering for us, so for now here's a work-around.
+	// FIXME: this is broken if Apple change the scroll bar appearance or the user has a high-DPI display.
+	// Ideally, I'd have liked to have the bird view to the inside of the vertical scroll bar, encroaching on the terminal's space.
+	private class FakeScrollBar extends JComponent {
+		private Color[] colors;
+		public Color[] getColors() {
+			if (colors == null) {
+				int[] pixelColors = new int[] { 0xd4d4d4, 0xd9d9d9, 0xdedede, 0xe5e5e5, 0xe9e9e9, 0xefefef, 0xf3f3f3, 0xf7f7f7, 0xfafafa, 0xfcfcfc, 0xfdfdfd, 0xfdfdfd, 0xfbfbfb, 0xf8f8f8, 0xf5f5f5 };
+				colors = new Color[pixelColors.length];
+				for (int i = 0; i < pixelColors.length; ++i) {
+					colors[i] = new Color(pixelColors[i]);
+				}
+			}
+			return colors;
+		}
+		public void paintComponent(Graphics oldGraphics) {
+			Graphics2D g = (Graphics2D) oldGraphics;
+			int x = 0;
+			for (Color color : getColors()) {
+				g.setColor(color);
+				g.drawLine(0, x, getWidth(), x);
+				++x;
+			}
+		}
+	};
 	
 	private void initOutputSpinner() {
 		outputSpinner = new JAsynchronousProgressIndicator();
