@@ -146,14 +146,29 @@ public class ProcessUtilities {
     }
     
     /**
-     * Returns the process id of the given process, or -1 if we couldn't
-     * work it out.
+     * Returns the process id of the given process, or -1 if we couldn't work it out.
      */
     public static int getProcessId(Process process) {
         try {
             Field pidField = process.getClass().getDeclaredField("pid");
             pidField.setAccessible(true);
             return pidField.getInt(process);
+        } catch (Exception ex) {
+            return -1;
+        }
+    }
+    
+    /**
+     * Returns the process id of the current JVM, or -1 if we couldn't work it out.
+     */
+    public static int getVmProcessId() {
+        try {
+            // FIXME: what about Mac OS?
+            // We can't use StringUtilities.readFile because most files in /proc (including this one) report their length as 0.
+            BufferedReader in = new BufferedReader(new FileReader("/proc/self/stat"));
+            String content = in.readLine();
+            in.close();
+            return Integer.parseInt(content.substring(0, content.indexOf(' ')));
         } catch (Exception ex) {
             return -1;
         }
