@@ -171,7 +171,7 @@ public class Terminator {
 		out.append("Usage: terminator [--help] [-xrm <resource-string>]... [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
 		out.append("\n");
 		out.append("Current resource settings:\n");
-		Options.getSharedInstance().showOptions(out, true);
+		Options.getSharedInstance().writeOptions(out, true);
 		out.append("\n");
 		out.append("Terminator only uses resources of class Terminator and only from the command line, not from your .Xdefaults and .Xresources files.\n");
 	}

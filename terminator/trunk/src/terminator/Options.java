@@ -65,7 +65,7 @@ public class Options {
 		return INSTANCE;
 	}
 	
-	public void showOptions(Appendable out, boolean showEvenIfDefault) throws IOException {
+	public void writeOptions(Appendable out, boolean showEvenIfDefault) throws IOException {
 		String[] keys = options.keySet().toArray(new String[options.size()]);
 		Arrays.sort(keys);
 		for (String key : keys) {
@@ -417,7 +417,7 @@ public class Options {
 		try {
 			out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 			out.println("# This file is written automatically by Terminator's preferences dialog.");
-			showOptions(out, false);
+			writeOptions(out, false);
 			return true;
 		} catch (IOException ex) {
 			Log.warn("Problem writing options to \"" + file + "\"", ex);
