@@ -266,6 +266,7 @@ public class DebugMenu {
                     JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Heap Histogram", getHeapHistogram());
                 }
             });
+            histogramButton.setEnabled(System.getProperty("java.version").startsWith("1.5") == false);
             JLabel currentHeapUsageLabel = new JLabel(" ");
             JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 2));
             controlPanel.add(gcButton);
