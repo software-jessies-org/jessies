@@ -172,15 +172,14 @@ public class AboutBox {
         // And finally, for the GTK LAF, buttons...
         if (GuiUtilities.isGtk()) {
             JButton closeButton = new JButton("Close");
-            GnomeStockIcon.useStockIcon(closeButton, "gtk-close");
-            closeButton.setMnemonic(KeyEvent.VK_C);
+            GnomeStockIcon.configureButton(closeButton);
             closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     dialog.setVisible(false);
                 }
             });
             JButton creditsButton = new JButton("Credits");
-            GnomeStockIcon.useStockIcon(creditsButton, "gtk-about");
+            GnomeStockIcon.configureButton(creditsButton);
             creditsButton.setEnabled(false);
             creditsButton.setMnemonic(KeyEvent.VK_R);
             

@@ -422,7 +422,7 @@ public class FatBits extends JFrame {
         private QuitAction() {
             super("Quit");
             putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("Q", false));
-            GnomeStockIcon.useStockIcon(this, "gtk-quit");
+            GnomeStockIcon.configureAction(this);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -432,8 +432,8 @@ public class FatBits extends JFrame {
     
     private class PreferencesAction extends AbstractAction {
         private PreferencesAction() {
-            super("Preferences");
-            GnomeStockIcon.useStockIcon(this, "gtk-preferences");
+            super("Preferences...");
+            GnomeStockIcon.configureAction(this);
         }
         
         public void actionPerformed(ActionEvent e) {
