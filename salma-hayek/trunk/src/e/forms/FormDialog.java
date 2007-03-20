@@ -458,24 +458,19 @@ public class FormDialog {
                 acceptDialog();
             }
         });
-        // FIXME: we could probably support a wider range of common GNOME verbs, at least in English (which is all we support anyway).
-        if (actionLabel.equals("Close")) {
-            GnomeStockIcon.useStockIcon(actionButton, "gtk-close");
-            if (GuiUtilities.isGtk()) {
-                actionButton.setMnemonic(KeyEvent.VK_C);
-            }
-        }
+        GnomeStockIcon.configureButton(actionButton);
         rootPane.setDefaultButton(actionButton);
         
         JButton cancelButton = null;
         if (dialog.isModal()) {
             cancelButton = new JButton("Cancel");
             cancelButton.addActionListener(closeAction);
-            GnomeStockIcon.useStockIcon(cancelButton, "gtk-cancel");
-            if (GuiUtilities.isGtk()) {
-                cancelButton.setMnemonic(KeyEvent.VK_C);
-            }
+            GnomeStockIcon.configureButton(cancelButton);
             tieButtonSizes(actionButton, cancelButton);
+        }
+        
+        if (extraButton != null) {
+            GnomeStockIcon.configureButton(extraButton);
         }
         return makeButtonPanel(actionButton, cancelButton, statusBar);
     }
