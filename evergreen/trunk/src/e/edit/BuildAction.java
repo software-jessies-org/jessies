@@ -9,12 +9,10 @@ import java.io.*;
 The ETextArea build-project action. Works for either Ant or make.
 */
 public class BuildAction extends ETextAction {
-    private static final String ACTION_NAME = "Build Project";
-    
     private boolean building = false;
 
     public BuildAction() {
-        super(ACTION_NAME);
+        super("Build Project");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("B", false));
         GnomeStockIcon.useStockIcon(this, "gtk-execute");
     }

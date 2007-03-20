@@ -3,10 +3,8 @@ package e.edit;
 import java.awt.event.*;
 
 public class OpenMakefileAction extends ETextAction {
-    public static final String ACTION_NAME = "Open Makefile";
-    
     public OpenMakefileAction() {
-        super(ACTION_NAME);
+        super("Open Makefile");
     }
     
     public void actionPerformed(ActionEvent e) {

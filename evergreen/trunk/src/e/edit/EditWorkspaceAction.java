@@ -7,13 +7,11 @@ import e.gui.*;
 import e.util.*;
 
 public class EditWorkspaceAction extends AbstractAction {
-    public static final String ACTION_NAME = "Edit Workspace...";
-    
     private Workspace boundWorkspace;
     
     // Edit the given workspace.
     public EditWorkspaceAction(Workspace workspace) {
-        super(ACTION_NAME);
+        super("Edit Workspace...");
         this.boundWorkspace = workspace;
     }
     

@@ -16,10 +16,8 @@ import java.util.regex.*;
  *   setRunnable(new Runnable(|
  */
 public class InsertInterfaceAction extends ETextAction {
-    public static final String ACTION_NAME = "Insert Java Interface";
-    
     public InsertInterfaceAction() {
-        super(ACTION_NAME);
+        super("Insert Java Interface");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("I", true));
     }
     

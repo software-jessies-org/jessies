@@ -9,15 +9,13 @@ import e.gui.*;
 import e.util.*;
 
 /**
-An action for the operation of creating and opening a new file.
-*/
+ * An action for the operation of creating and opening a new file.
+ */
 public class NewFileAction extends ETextAction {
-    private static final String ACTION_NAME = "New File...";
-    
-    private static FilenameChooserField filenameField = new FilenameChooserField(JFileChooser.FILES_AND_DIRECTORIES);
+    private static final FilenameChooserField filenameField = new FilenameChooserField(JFileChooser.FILES_AND_DIRECTORIES);
     
     public NewFileAction() {
-        super(ACTION_NAME);
+        super("New File...");
         putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("N", false));
         GnomeStockIcon.useStockIcon(this, "gtk-new");
     }

@@ -9,12 +9,10 @@ import javax.swing.*;
  * Offers completions for the word before the caret.
  */
 public class AutoCompleteAction extends ETextAction {
-    public static final String ACTION_NAME = "Complete";
-    
     private JWindow completionsWindow;
     
     public AutoCompleteAction() {
-        super(ACTION_NAME);
+        super("Complete");
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_MASK));
     }
     

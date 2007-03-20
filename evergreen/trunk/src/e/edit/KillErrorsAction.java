@@ -4,10 +4,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class KillErrorsAction extends AbstractAction {
-    public static final String ACTION_NAME = "Clear Errors";
-    
     public KillErrorsAction() {
-        super(ACTION_NAME);
+        super("Clear Errors");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("K", false));
     }
     

@@ -4,13 +4,11 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class RemoveWorkspaceAction extends AbstractAction {
-    public static final String ACTION_NAME = "Remove Workspace";
-    
     private Workspace boundWorkspace;
     
     // Remove the given workspace.
     public RemoveWorkspaceAction(Workspace workspace) {
-        super(ACTION_NAME);
+        super("Remove Workspace");
         this.boundWorkspace = workspace;
     }
     

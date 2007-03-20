@@ -8,10 +8,8 @@ import java.awt.event.*;
  * The ETextArea action that automatically corrects the current line's indentation.
  */
 public class CorrectIndentationAction extends ETextAction {
-    public static final String ACTION_NAME = "Correct Indentation";
-
     public CorrectIndentationAction() {
-        super(ACTION_NAME);
+        super("Correct Indentation");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("I", false));
         GnomeStockIcon.useStockIcon(this, "gtk-indent");
     }

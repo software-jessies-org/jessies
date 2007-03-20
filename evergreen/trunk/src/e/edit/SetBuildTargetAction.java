@@ -5,12 +5,10 @@ import javax.swing.*;
 import e.forms.*;
 
 public class SetBuildTargetAction extends ETextAction {
-    public static final String ACTION_NAME = "Set Build Target...";
-    
     private JTextField buildTargetField = new JTextField("", 40);
     
     public SetBuildTargetAction() {
-        super(ACTION_NAME);
+        super("Set Build Target...");
     }
     
     public void actionPerformed(ActionEvent e) {

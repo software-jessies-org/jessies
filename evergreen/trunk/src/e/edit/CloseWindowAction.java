@@ -8,12 +8,10 @@ import javax.swing.*;
 The ETextArea close window action.
 */
 public class CloseWindowAction extends ETextAction {
-    public static final String ACTION_NAME = "Close";
-
     public CloseWindowAction() {
-        super(ACTION_NAME);
+        super("Close");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("W", false));
-        GnomeStockIcon.useStockIcon(this, "gtk-close");
+        GnomeStockIcon.configureAction(this);
     }
 
     public void actionPerformed(ActionEvent e) {

@@ -27,10 +27,8 @@ import e.util.*;
  *    string literals and identifiers -- be helpful?
  */
 public class CompareSelectionAndClipboardAction extends ETextAction {
-    public static final String ACTION_NAME = "Compare Selection and Clipboard...";
-    
     public CompareSelectionAndClipboardAction() {
-        super(ACTION_NAME);
+        super("Compare Selection and Clipboard...");
     }
     
     public void actionPerformed(ActionEvent e) {
