@@ -14,8 +14,6 @@ import org.jdesktop.swingworker.SwingWorker;
  * The ETextArea action to open a find and replace dialog.
  */
 public class FindAndReplaceAction extends ETextAction {
-    private static final String ACTION_NAME = "Find/Replace...";
-    
     private JTextField patternField = new JTextField(40);
     private JTextField replacementField = new JTextField(40);
     private JLabel statusLabel = new JLabel(" ");
@@ -26,7 +24,7 @@ public class FindAndReplaceAction extends ETextAction {
     private static final ExecutorService matchFinderExecutor = ThreadUtilities.newSingleThreadExecutor("Find and Replace");
     
     public FindAndReplaceAction() {
-        super(ACTION_NAME);
+        super("Find/Replace...");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("R", false));
         GnomeStockIcon.useStockIcon(this, "gtk-find-and-replace");
     }

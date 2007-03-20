@@ -15,13 +15,11 @@ import javax.swing.*;
  * encoding.
  */
 public class FilePropertiesAction extends ETextAction {
-    public static final String ACTION_NAME = "File Properties...";
-    
     private JTextField endOfLineStringField = new JTextField("", 40);
     private JTextField indentStringField = new JTextField("", 40);
     
     public FilePropertiesAction() {
-        super(ACTION_NAME);
+        super("File Properties...");
         GnomeStockIcon.useStockIcon(this, "gtk-info");
     }
     

@@ -4,10 +4,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class SaveAllAction extends AbstractAction {
-    private static final String ACTION_NAME = "Save All";
-    
     public SaveAllAction() {
-        super(ACTION_NAME);
+        super("Save All");
     }
     
     public boolean isEnabled() {

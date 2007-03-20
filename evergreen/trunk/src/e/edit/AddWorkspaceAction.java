@@ -11,10 +11,8 @@ import e.util.*;
  * which will then be created.
  */
 public class AddWorkspaceAction extends AbstractAction {
-    private static final String ACTION_NAME = "Add Workspace...";
-    
     public AddWorkspaceAction() {
-        super(ACTION_NAME);
+        super("Add Workspace...");
     }
     
     public void actionPerformed(ActionEvent e) {

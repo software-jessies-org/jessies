@@ -9,10 +9,8 @@ import javax.swing.*;
  * keyboard equivalent.
  */
 public class OpenAction extends AbstractAction {
-    public static final String ACTION_NAME = "Open...";
-    
     public OpenAction() {
-        super(ACTION_NAME);
+        super("Open...");
     }
     
     public void actionPerformed(ActionEvent e) {

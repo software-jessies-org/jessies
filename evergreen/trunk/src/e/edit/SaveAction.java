@@ -3,16 +3,11 @@ package e.edit;
 import e.gui.*;
 import java.awt.event.*;
 
-/**
-The ETextArea save action.
-*/
 public class SaveAction extends ETextAction {
-    public static final String ACTION_NAME = "Save";
-
     public SaveAction() {
-        super(ACTION_NAME);
+        super("Save");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("S", false));
-        GnomeStockIcon.useStockIcon(this, "gtk-save");
+        GnomeStockIcon.configureAction(this);
     }
     
     public void actionPerformed(ActionEvent e) {

@@ -8,18 +8,15 @@ import java.awt.event.*;
 import java.util.regex.*;
 
 public class FindAction extends ETextAction implements MinibufferUser {
-    public static final String ACTION_NAME = "Find...";
-    
     public static final FindAction INSTANCE = new FindAction();
     
-    public ETextWindow currentTextWindow;
-    
+    private ETextWindow currentTextWindow;
     private StringHistory regularExpressionHistory;
     
     private FindAction() {
-        super(ACTION_NAME);
+        super("Find...");
         putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("F", false));
-        GnomeStockIcon.useStockIcon(this, "gtk-find");
+        GnomeStockIcon.configureAction(this);
         regularExpressionHistory = new StringHistory(Evergreen.getInstance().getPreferenceFilename("e.edit.FindAction-history"));
     }
     
