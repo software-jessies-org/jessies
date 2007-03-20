@@ -286,7 +286,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		public CloseAction() {
 			super("Close");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("W"));
-			GnomeStockIcon.useStockIcon(this, "gtk-close");
+			GnomeStockIcon.configureAction(this);
 		}
 		
 		@Override
@@ -309,7 +309,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		public ShowInfoAction() {
 			super("Show Info");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("I"));
-			GnomeStockIcon.useStockIcon(this, "gtk-info");
+			GnomeStockIcon.configureAction(this);
 		}
 		
 		@Override
@@ -322,7 +322,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		public CopyAction() {
 			super("Copy");
 			putValue(ACCELERATOR_KEY, makeKeyStroke("C"));
-			GnomeStockIcon.useStockIcon(this, "gtk-copy");
+			GnomeStockIcon.configureAction(this);
 		}
 		
 		@Override
@@ -335,7 +335,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		public PasteAction() {
 			super("Paste");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("V"));
-			GnomeStockIcon.useStockIcon(this, "gtk-paste");
+			GnomeStockIcon.configureAction(this);
 		}
 		
 		@Override
@@ -348,7 +348,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		public SelectAllAction() {
 			super("Select All");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("A"));
-			GnomeStockIcon.useStockIcon(this, "gtk-select-all");
+			GnomeStockIcon.configureAction(this);
 		}
 		
 		@Override
@@ -372,7 +372,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		public FindAction() {
 			super("Find...");
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("F"));
-			GnomeStockIcon.useStockIcon(this, "gtk-find");
+			GnomeStockIcon.configureAction(this);
 		}
 		
 		@Override
@@ -538,7 +538,7 @@ public class TerminatorMenuBar extends EMenuBar {
 	public static class PreferencesAction extends AbstractPaneAction {
 		public PreferencesAction() {
 			super("Preferences...");
-			GnomeStockIcon.useStockIcon(this, "gtk-preferences");
+			GnomeStockIcon.configureAction(this);
 		}
 		
 		@Override
