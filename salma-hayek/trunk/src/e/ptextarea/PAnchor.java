@@ -39,7 +39,7 @@ public class PAnchor implements Comparable<PAnchor> {
         return (index == ((PAnchor) obj).index);
     }
     
-    @Override
+    //@Override // FIXME: Java 5's javac(1) is broken.
     public final int compareTo(PAnchor other) {
         return (index - other.index);
     }
