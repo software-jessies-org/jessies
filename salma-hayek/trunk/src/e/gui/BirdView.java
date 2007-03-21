@@ -30,6 +30,8 @@ public class BirdView extends JComponent {
     
     private int nearestLineToMouseInBirdView = -1;
     
+    private boolean isAdjusting = false;
+    
     public BirdView(BirdsEye birdsEye, JScrollBar scrollBar) {
         this.birdsEye = birdsEye;
         this.scrollBar = scrollBar;
@@ -192,16 +194,35 @@ public class BirdView extends JComponent {
 
     public synchronized void addMatchingLine(int lineNumber) {
         matchingLines.set(lineNumber);
-        repaint();
+        maybeRepaint();
     }
     
     public synchronized void removeMatchingLine(int lineNumber) {
         matchingLines.set(lineNumber, false);
-        repaint();
+        maybeRepaint();
     }
 
     public synchronized void clearMatchingLines() {
         matchingLines = new BitSet();
-        repaint();
+        maybeRepaint();
+    }
+    
+    public boolean getValueIsAdjusting() {
+        return isAdjusting;
+    }
+    
+    public void setValueIsAdjusting(boolean isAdjusting) {
+        if (isAdjusting != this.isAdjusting) {
+            this.isAdjusting = isAdjusting;
+            if (isAdjusting == false) {
+                repaint();
+            }
+        }
+    }
+    
+    private void maybeRepaint() {
+        if (isAdjusting == false) {
+            repaint();
+        }
     }
 }
