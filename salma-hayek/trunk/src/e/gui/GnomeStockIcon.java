@@ -41,7 +41,7 @@ public class GnomeStockIcon {
         }
         Icon buttonIcon = getStockIcon(name, Size.GTK_ICON_SIZE_BUTTON);
         if (buttonIcon != null) {
-            action.putValue(Action.LARGE_ICON_KEY, buttonIcon);
+            action.putValue(/*Action.*/LARGE_ICON_KEY, buttonIcon);
         }
     }
     
