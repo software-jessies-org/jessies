@@ -71,13 +71,18 @@ public class FindHighlighter implements Highlighter {
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
 	public int addHighlights(JTextBuffer view, int firstLineIndex) {
-		TextBuffer model = view.getModel();
-		int count = 0;
-		for (int i = firstLineIndex; i < model.getLineCount(); i++) {
-			String line = model.getTextLine(i).getString();
-			count += addHighlightsOnLine(view, i, line);
+		view.getBirdView().setValueIsAdjusting(true);
+		try {
+			TextBuffer model = view.getModel();
+			int count = 0;
+			for (int i = firstLineIndex; i < model.getLineCount(); i++) {
+				String line = model.getTextLine(i).getString();
+				count += addHighlightsOnLine(view, i, line);
+			}
+			return count;
+		} finally {
+			view.getBirdView().setValueIsAdjusting(false);
 		}
-		return count;
 	}
 	
 	private int addHighlightsOnLine(JTextBuffer view, int lineIndex, String text) {

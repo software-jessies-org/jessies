@@ -475,13 +475,17 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			birdView.clearMatchingLines();
 			repaint();
 		} else {
-			// We use a backwards loop because going forwards results in N array copies if
-			// we're removing N lines.
-			for (int i = (lineHighlights.size() - 1); i >= firstLineIndex; i--) {
-				lineHighlights.remove(i);
-				birdView.removeMatchingLine(i);
+			birdView.setValueIsAdjusting(true);
+			try {
+				// We use a backwards loop because going forwards results in N array copies if we're removing N lines.
+				for (int i = (lineHighlights.size() - 1); i >= firstLineIndex; --i) {
+					lineHighlights.remove(i);
+					birdView.removeMatchingLine(i);
+				}
+				repaintFromLine(firstLineIndex);
+			} finally {
+				birdView.setValueIsAdjusting(false);
 			}
-			repaintFromLine(firstLineIndex);
 		}
 	}
 	
@@ -502,6 +506,10 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 				}
 			}
 		}
+	}
+	
+	public BirdView getBirdView() {
+		return birdView;
 	}
 	
 	public void addHighlight(Highlight highlight) {
