@@ -1560,17 +1560,28 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     public int findAllMatches(String regularExpression, BirdView birdView) {
         getLock().getWriteLock();
         try {
-            removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
-            if (birdView != null) {
-                birdView.clearMatchingLines();
-            }
-            
-            // Anything to search for?
-            if (regularExpression == null || regularExpression.length() == 0) {
-                return 0;
-            }
-            
-            // Find all the matches.
+            return findAllMatchesWithWriteLockAlreadyHeld(regularExpression, birdView);
+        } finally {
+            getLock().relinquishWriteLock();
+        }
+    }
+    
+    private int findAllMatchesWithWriteLockAlreadyHeld(String regularExpression, BirdView birdView) {
+        removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
+        if (birdView != null) {
+            birdView.clearMatchingLines();
+        }
+        
+        // Anything to search for?
+        if (regularExpression == null || regularExpression.length() == 0) {
+            return 0;
+        }
+        
+        // Find all the matches.
+        if (birdView != null) {
+            birdView.setValueIsAdjusting(true);
+        }
+        try {
             int matchCount = 0;
             Matcher matcher = PatternUtilities.smartCaseCompile(regularExpression).matcher(getTextBuffer());
             while (matcher.find()) {
@@ -1582,7 +1593,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             }
             return matchCount;
         } finally {
-            getLock().relinquishWriteLock();
+            if (birdView != null) {
+                birdView.setValueIsAdjusting(false);
+            }
         }
     }
     
