@@ -29,24 +29,22 @@ public class PAnchor implements Comparable<PAnchor> {
         this.index = index;
     }
     
-    /**
-     * Notification that this anchor has been destroyed, because the character it indexes
-     * has been deleted.
-     */
-    public void delete() { }
-    
+    @Override
     public int hashCode() {
         return super.hashCode();
     }
     
+    @Override
     public final boolean equals(Object obj) {
         return (index == ((PAnchor) obj).index);
     }
     
+    @Override
     public final int compareTo(PAnchor other) {
         return (index - other.index);
     }
     
+    @Override
     public String toString() {
         return "PAnchor[index=" + index + "]";
     }

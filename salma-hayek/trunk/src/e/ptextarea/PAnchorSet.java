@@ -6,20 +6,11 @@ import java.util.*;
 import javax.swing.*;
 
 /**
- * A PAnchorSet contains a sorted list of anchors, referred to weakly so they automatically
- * die when no one holds a reference to them.
- *
- * The methods within this class have to be very careful to ensure they correctly deal
- * with the fact that objects referred to by weak references can go away at any time.
- * 
- * Consider forcing this listener to be the first one called by the PText's event dispatching
- * code.  Other code also listening to text events might assume that its PAnchors are already
- * properly updated.
- * 
- * @author Phil Norman
+ * Contains all the PAnchor instances related to a given text buffer.
+ * Responsible for ensuring that their offsets are updated when the text changes.
  */
-
 public class PAnchorSet implements PTextListener {
+    // This list is sorted so we can binarySearch it.
     private ArrayList<PAnchor> anchors = new ArrayList<PAnchor>();
     
     public synchronized void add(PAnchor anchor) {
@@ -113,9 +104,6 @@ public class PAnchorSet implements PTextListener {
         for (int i = 0; i < removeCount; i++) {
             anchorsToRemove.add(anchors.remove(firstAnchorIndex));
         }
-        for (PAnchor anchor : anchorsToRemove) {
-            anchor.delete();
-        }
         // We must recalculate the first anchor index, because the one we calculated
         // before could be wrong if an anchor's deletion caused the deletion of another.
         int start = getFirstAnchorIndex(event.getOffset());
@@ -130,12 +118,6 @@ public class PAnchorSet implements PTextListener {
     }
     
     public synchronized void clear() {
-        for (int i = 0; i < anchors.size(); i++) {
-            PAnchor anchor = get(i);
-            if (anchor != null) {
-                anchor.delete();
-            }
-        }
         anchors.clear();
     }
 }
