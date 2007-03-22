@@ -443,10 +443,10 @@ int main(int, char** argv) {
     os << std::endl;
     std::cerr << os.str();
 #ifdef __CYGWIN__
-    std::string message = "Please copy this message to the clipboard with Ctrl-C and mail it to software@jessies.org.";
+    std::string message = "If you don't have Java installed, please download and install JDK 6 from http://java.sun.com/javase/downloads/ and try again.\n";
     message += "\n";
-    message += "(Windows won't let you select the text but Ctrl-C works anyway.)";
-    message += "\n";
+    message += "Otherwise, please copy this message to the clipboard with Ctrl-C and mail it to software@jessies.org.\n";
+    message += "(Windows won't let you select the text but Ctrl-C works anyway.)\n";
     message += "\n";
     message += os.str();
     MessageBox(GetActiveWindow(), message.c_str(), "Launcher", MB_OK);
