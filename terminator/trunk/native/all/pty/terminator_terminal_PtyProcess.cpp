@@ -130,12 +130,24 @@ void terminator_terminal_PtyProcess::nativeWrite(jbyteArray bytes, jint arrayOff
         return;
     }
     
-    ssize_t bytesTransferred;
-    do {
-        bytesTransferred = ::write(fd.get(), &buffer[0], byteCount);
-    } while (bytesTransferred == -1 && errno == EINTR);
+    // POSIX (http://www.opengroup.org/onlinepubs/000095399/functions/write.html) says:
+    // 1. we can be interrupted before any bytes are written (n == -1, errno == EINTR).
+    // 2. we can be interrupted after some bytes are written (n < requested n).
+    size_t offset = 0;
+    size_t remainingByteCount = byteCount;
+    while (remainingByteCount > 0) {
+        ssize_t n = ::write(fd.get(), &buffer[offset], remainingByteCount);
+        if (n == -1 && errno != EINTR) {
+            // This write failed, and not because we were interrupted before writing anything. Give up.
+            break;
+        }
+        if (n > 0) {
+            offset += n;
+            remainingByteCount -= n;
+        }
+    }
     
-    if (bytesTransferred <= 0) {
+    if (remainingByteCount != 0) {
         throw unix_exception("write(" + toString(fd.get()) + ", &buffer[" + toString(arrayOffset) + "], " + toString(byteCount) + ") failed");
     }
 }
