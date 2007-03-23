@@ -103,31 +103,31 @@ private:
 public:
   typedef std::vector<JvmRegistryKey> JvmRegistryKeys;
   
-  void findVersionsInRegistry(JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* pathFromJavaHomeToJre) const {
-    for (DirectoryIterator it(registryPath); it.isValid(); ++ it) {
-      std::string version = it->getName();
-      if (version.empty() || isdigit(version[0]) == false) {
-        // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
-        // The registry keys and Sun's installer's behavior regarding them is documented at:
-        // http://java.sun.com/j2se/1.5.0/runtime_windows.html
-        // The first claim on that page (that "CurrentVersion" is the highest-numbered version ever installed) appears to be the true claim.
-        continue;
-      }
-      if (version < "1.5") {
-        continue;
-      }
-      if (version >= "1.6") {
-        // Uncomment the next line to prevent usage of 1.6.
-        //continue;
-      }
-      std::string pathFromJavaHomeToJvm;
-      pathFromJavaHomeToJvm += pathFromJavaHomeToJre;
-      pathFromJavaHomeToJvm += "/bin/";
-      pathFromJavaHomeToJvm += jvmDirectory;
-      pathFromJavaHomeToJvm += "/jvm.dll";
-      JvmRegistryKey jvmRegistryKey(registryPath, version, pathFromJavaHomeToJvm);
-      jvmRegistryKeys.push_back(jvmRegistryKey);
+  bool isUnreasonableVersion(std::ostream& os, const std::string& version) const {
+    if (version.empty() || isdigit(version[0]) == false) {
+      // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
+      // The registry keys and Sun's installer's behavior regarding them is documented at:
+      // http://java.sun.com/j2se/1.5.0/runtime_windows.html
+      // The first claim on that page (that "CurrentVersion" is the highest-numbered version ever installed) appears to be the true claim.
+      os << "\"";
+      os << version;
+      os << "\" is not a number";
+      os << std::endl;
+      return true;
     }
+    if (version < "1.5") {
+      os << version;
+      os << " is too old";
+      os << std::endl;
+      return true;
+    }
+    if (version >= "1.7") {
+      os << version;
+      os << " is too new";
+      os << std::endl;
+      return true;
+    }
+    return false;
   }
   
   void findVersionsInRegistry(std::ostream& os, JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* pathFromJavaHomeToJre) const {
@@ -136,7 +136,19 @@ public:
     os << "\" [";
     os << std::endl;
     try {
-      findVersionsInRegistry(jvmRegistryKeys, registryPath, pathFromJavaHomeToJre);
+      for (DirectoryIterator it(registryPath); it.isValid(); ++ it) {
+        std::string version = it->getName();
+        if (isUnreasonableVersion(os, version)) {
+          continue;
+        }
+        std::string pathFromJavaHomeToJvm;
+        pathFromJavaHomeToJvm += pathFromJavaHomeToJre;
+        pathFromJavaHomeToJvm += "/bin/";
+        pathFromJavaHomeToJvm += jvmDirectory;
+        pathFromJavaHomeToJvm += "/jvm.dll";
+        JvmRegistryKey jvmRegistryKey(registryPath, version, pathFromJavaHomeToJvm);
+        jvmRegistryKeys.push_back(jvmRegistryKey);
+      }
     } catch (const std::exception& ex) {
       os << ex.what();
       os << std::endl;
