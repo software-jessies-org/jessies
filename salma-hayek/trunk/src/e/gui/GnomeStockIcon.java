@@ -163,15 +163,12 @@ public class GnomeStockIcon {
             return null;
         }
         
-        Icon icon = null;
-        try {
-            Class<?> gtkStockIconClass = Class.forName("com.sun.java.swing.plaf.gtk.GTKStyle$GTKStockIcon");
-            java.lang.reflect.Constructor constructor = gtkStockIconClass.getDeclaredConstructor(String.class, int.class);
-            constructor.setAccessible(true);
-            icon = (Icon) constructor.newInstance(name, size.ordinal());
-        } catch (Exception ex) {
-            // Sorry! No icon for you!
+        String lazyDesktopPropertyName = "gtk.icon." + name + '.' + size.ordinal() + '.' + "ltr";
+        Image image = (Image) Toolkit.getDefaultToolkit().getDesktopProperty(lazyDesktopPropertyName);
+        if (image != null) {
+            return new ImageIcon(image);
         }
-        return icon;
+        
+        return null;
     }
 }
