@@ -122,13 +122,14 @@ public class GnomeStockIcon {
         }
     }
     
+    // Java 6 shipped with a bug that means disabled icons aren't right for their theme.
+    // FIXME: work out how to set the disabled icon on an Action, so we can fix our disabled menu items' icons.
     private static void workAroundLafBugs(JButton button) {
         // FIXME: there seems to be a bug with the GTK LAF that means when the button is disabled, we see the icon and "...", and only when it's enabled do we see "Commit". This is a work-around.
         // Note that the code below for the disabled icon relies on this (the call to getPreferredSize forces the image to be loaded).
         button.setPreferredSize(button.getPreferredSize());
         
-        // FIXME: Java 6 looks like it will ship with a bug that means disabled icons aren't right for their theme.
-        // This workaround is close enough (but not exact) for the Ubuntu 6.10 "Human" theme.
+        // This workaround seems close enough (but not exact) for the Ubuntu 6.10 "Human" theme.
         Icon icon = button.getIcon();
         Image image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics g = image.getGraphics();
