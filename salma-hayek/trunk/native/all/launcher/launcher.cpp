@@ -121,12 +121,6 @@ public:
       os << std::endl;
       return true;
     }
-    if (version >= "1.7") {
-      os << version;
-      os << " is too new";
-      os << std::endl;
-      return true;
-    }
     return false;
   }
   
