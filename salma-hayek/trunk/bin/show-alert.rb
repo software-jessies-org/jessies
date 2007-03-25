@@ -14,7 +14,7 @@ else
             command = [ "NSRunAlertPanel", title, message ]
             system(*command)
         elsif target_os() == "Linux"
-            text = "#{caption}\n\n#{message}"
+            text = "#{title}\n\n#{message}"
             reported_okay = false
             # FIXME: this assumes that a KDE user doesn't have the GNOME zenity(1) installed. Which is probably true.
             if File.exist?("/usr/bin/zenity")
@@ -37,7 +37,7 @@ else
             end
         elsif target_os() == "Cygwin" || target_os() == "Windows"
                 require "Win32API"
-                Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, message, caption, 0)
+                Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, message, title, 0)
         end
     end
 end
