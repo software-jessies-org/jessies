@@ -272,6 +272,21 @@ class Java
   end
   
   def invoke(extra_app_arguments = [])
+    begin
+      invoke0(extra_app_arguments)
+    rescue Exception => e
+      # Based on the idea in http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/21530
+      # FIXME: really, we want this to guard the whole of each startup script. For the simple ones, this is a good approximation.
+      prefix = "\tat "
+      message = "An error occurred while starting #{@dock_name}:\n"
+      message << "\n"
+      message << "Exception #{e.class}: #{e.message}\n"
+      message << "#{prefix}" << e.backtrace.join("\n#{prefix}")
+      show_alert("Unhandled exception", message)
+    end
+  end
+  
+  def invoke0(extra_app_arguments)
     # Back-quoting anything causes a flickering window on startup for Terminator on Windows.
     # The salma-hayek Java launcher already contains a version check.
     # The version check often "gets stuck" on Cygwin when running javahpp.
