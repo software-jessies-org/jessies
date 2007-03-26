@@ -258,7 +258,10 @@ RFEs
   for the benefit of the users who've wanted to use Terminator with directly
   attached serial devices. (The ability to stick GNU readline between you and
   the serial port sounds pretty nice, if you think how awful most serial
-  devices' consoles are.)
+  devices' consoles are.) Many people on the net (and our own Ed) recommend
+  "minicom" (http://alioth.debian.org/projects/minicom/). elliotth has used
+  both and hated minicom's 1980s hierarchical menu interface, but liked socat's
+  simplicity.
 
 * Write a front-end for lrzsz(1) (http://www.ohse.de/uwe/software/lrzsz.html)
   which turns its frame-by-frame progress reports into something as concise and
@@ -268,11 +271,6 @@ RFEs
   be.
   Graphing transfers and errors against time should give them more useful
   information than they get from HyperTerminal (without drowning them).
-
-* Many people on the net (and our own Ed) recommend "minicom";
-  http://alioth.debian.org/projects/minicom/. elliotth, on the other hand,
-  wishes he'd been aware of socat(1) when he last had cause to use minicom.
-  Worst. Program. Ever.
 
 * Simon Pamies [s.pamies@banality.de] isn't the only user to have suggested
   some way of saving a file which can be loaded to start a new Terminator window
@@ -322,6 +320,11 @@ RFEs
   hard-coded list but a setting for the user to override it with.
   The only program I'd be likely to use mouse support in would be whiptail(1),
   but it doesn't have mouse support at all.
+
+* Ability to restart a command that terminates. If I get kicked off a TELNET
+  session in Bash, I can hit up-arrow return. If, though, I'd devoted a tab
+  to telnet(1), I have to create a new tab. It might be nice to add a little
+  "Run Again" button to the terminal when its process exits.
 
 Tab-related
 -----------
