@@ -103,9 +103,11 @@ public class CommandDialog {
                 synchronized (history) {
                     unsortedMatches = history.getStringsMatching(regularExpression);
                 }
-                String[] matches = unsortedMatches.toArray(new String[unsortedMatches.size()]);
-                Arrays.sort(matches);
-                for (String match : matches) {
+                // Usually, we sort matches to make it easier to switch to "eyeball grep" when the list is small.
+                // Chris argues that this is effectively a command-line history, and is more useful in chronological order.
+                //String[] matches = unsortedMatches.toArray(new String[unsortedMatches.size()]);
+                //Arrays.sort(matches);
+                for (String match : unsortedMatches) {
                     model.addElement(match);
                 }
             } catch (PatternSyntaxException ex) {
