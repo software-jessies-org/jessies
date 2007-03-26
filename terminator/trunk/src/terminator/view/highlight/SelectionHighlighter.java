@@ -1,10 +1,10 @@
 package terminator.view.highlight;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import javax.swing.*;
-
 import terminator.*;
 import terminator.model.*;
 import terminator.view.*;
@@ -253,7 +253,11 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	public void copyToSystemSelection() {
 		Clipboard systemSelection = view.getToolkit().getSystemSelection();
 		if (systemSelection != null) {
-			copyToClipboard(systemSelection);
+			systemSelection.setContents(new LazyStringSelection() {
+				public String reallyGetText() {
+					return getTabbedString();
+				}
+			}, this);
 		}
 	}
 	
