@@ -274,7 +274,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private void copyToSystemSelection() {
         Clipboard systemSelection = getToolkit().getSystemSelection();
         if (systemSelection != null) {
-            copyToClipboard(systemSelection);
+            systemSelection.setContents(new LazyStringSelection() {
+                public String reallyGetText() {
+                    return getSelectedText();
+                }
+            }, this);
         }
     }
     

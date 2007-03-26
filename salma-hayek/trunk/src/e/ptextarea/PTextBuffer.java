@@ -300,6 +300,13 @@ public class PTextBuffer implements CharSequence {
      * If not, use the CharSequence interface instead.
      */
     private CharSequence copyChars(int start, int charCount) {
+        return new CharArrayCharSequence(copyCharArray(start, charCount));
+    }
+    
+    /**
+     * Like copyChars for users who need a char[] and want to avoid an extra copy.
+     */
+    private char[] copyCharArray(int start, int charCount) {
         getLock().getReadLock();
         try {
             if (start < 0 || charCount < 0 || start + charCount > length()) {
@@ -319,7 +326,7 @@ public class PTextBuffer implements CharSequence {
             } catch (ArrayIndexOutOfBoundsException ex) {
                 Log.warn("Requested get text from " + start + ", length " + charCount + "; size is " + length() +".", ex);
             }
-            return new CharArrayCharSequence(result);
+            return result;
         } finally {
             getLock().relinquishReadLock();
         }
@@ -477,7 +484,7 @@ public class PTextBuffer implements CharSequence {
         }
         
         public String toString() {
-            return new StringBuilder(copyChars(start, end - start)).toString();
+            return new String(copyCharArray(start, end - start));
         }
     }
     
