@@ -46,12 +46,18 @@ public class CommandDialog {
         historyList = new JList();
         historyList.setCellRenderer(new EListCellRenderer(true));
         
-        // If the user double-clicks on a historical command, run it without further ado.
+        // Handle single and double clicks on the history list.
         historyList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int index = historyList.locationToIndex(e.getPoint());
-                    commandField.setText((String) historyList.getModel().getElementAt(index));
+                int index = historyList.locationToIndex(e.getPoint());
+                String selectedCommand = (String) historyList.getModel().getElementAt(index);
+                if (e.getClickCount() == 1) {
+                    // If the user single-clicks on a historical command, offer the command in the text field, for further refinement.
+                    commandField.setText(selectedCommand);
+                    commandField.requestFocusInWindow();
+                } else if (e.getClickCount() == 2) {
+                    // If the user double-clicks on a historical command, run it without further ado.
+                    commandField.setText(selectedCommand);
                     form.getFormDialog().acceptDialog();
                 }
             }
