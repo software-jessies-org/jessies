@@ -135,6 +135,7 @@ public class CommandDialog {
             // 1. it's cheaper (we could work round this if we cared, though).
             // 2. it makes the cursor keys correspond to their behavior in the shell's history, where up moves backwards in time.
             historyList.setSelectedIndex(model.getSize() - 1);
+            historyList.ensureIndexIsVisible(historyList.getSelectedIndex());
         }
     }
     
