@@ -237,19 +237,28 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
+			newShell();
+		}
+		
+		public static void newShell() {
 			Terminator.getSharedInstance().openFrame(JTerminalPane.newShell());
 		}
 	}
 	
-	public static class NewTabAction extends AbstractFrameAction {
+	public static class NewTabAction extends AbstractAction {
 		public NewTabAction() {
 			super("New Shell Tab");
 			putValue(ACCELERATOR_KEY, makeKeyStroke("T"));
 		}
 		
-		@Override
-		protected void performFrameAction(TerminatorFrame frame) {
-			frame.addTab(JTerminalPane.newShell());
+		public void actionPerformed(ActionEvent e) {
+			TerminatorFrame frame = getFocusedTerminatorFrame();
+			if (frame != null) {
+				frame.addTab(JTerminalPane.newShell());
+			} else {
+				// There's no existing frame, so interpret "New Shell Tab..." as "New Shell...".
+				NewShellAction.newShell();
+			}
 		}
 	}
 	
@@ -260,6 +269,10 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
+			newCommand();
+		}
+		
+		public static void newCommand() {
 			JTerminalPane terminalPane = new CommandDialog().askForCommandToRun();
 			if (terminalPane != null) {
 				Terminator.getSharedInstance().openFrame(terminalPane);
@@ -267,17 +280,22 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 	}
 	
-	public static class NewCommandTabAction extends AbstractFrameAction {
+	public static class NewCommandTabAction extends AbstractAction {
 		public NewCommandTabAction() {
 			super("New Command Tab...");
 			putValue(ACCELERATOR_KEY, makeShiftedKeyStroke("T"));
 		}
 		
-		@Override
-		protected void performFrameAction(TerminatorFrame frame) {
-			JTerminalPane terminalPane = new CommandDialog().askForCommandToRun();
-			if (terminalPane != null) {
-				frame.addTab(terminalPane);
+		public void actionPerformed(ActionEvent e) {
+			TerminatorFrame frame = getFocusedTerminatorFrame();
+			if (frame != null) {
+				JTerminalPane terminalPane = new CommandDialog().askForCommandToRun();
+				if (terminalPane != null) {
+					frame.addTab(terminalPane);
+				}
+			} else {
+				// There's no existing frame, so interpret "New Command Tab..." as "New Command...".
+				NewCommandAction.newCommand();
 			}
 		}
 	}
