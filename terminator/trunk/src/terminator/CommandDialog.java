@@ -123,7 +123,12 @@ public class CommandDialog {
             commandField.setForeground(statusGood ? UIManager.getColor("TextField.foreground") : Color.RED);
             historyList.setModel(model);
             // If we don't set the selected index, the user won't be able to cycle the focus into the list with the Tab key.
-            historyList.setSelectedIndex(0);
+            // In other applications/dialogs, we set the selected index to 0.
+            // Chris Reece makes the argument that if we did that, we'd want to reverse the order of the list entries to have most recent first.
+            // He suggests two advantages to leaving the list oldest-first and selecting the last item:
+            // 1. it's cheaper (we could work round this if we cared, though).
+            // 2. it makes the cursor keys correspond to their behavior in the shell's history, where up moves backwards in time.
+            historyList.setSelectedIndex(model.getSize() - 1);
         }
     }
     
