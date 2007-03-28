@@ -16,7 +16,7 @@
 
 <!-- ---------------------------------------------------- -->
 
-<h3>How can I set the window/tab title from the shell?</h3>
+<h2>How can I set the window/tab title from the shell?</h2>
 <p>Assuming you're using Bash, you need a function like this in your <tt>~/.bash_profile</tt>:
 <pre>
     setWindowTitle() {
@@ -48,7 +48,7 @@ fi
 
 <!-- ---------------------------------------------------- -->
 
-<h3>Why am I having problems with terminfo/curses?</h3>
+<h2>Why am I having problems with terminfo/curses?</h2>
 
 <p>Terminator has its own terminfo file. This is regrettably necessary because of Terminator's unconventional approach to handling wide lines with a horizontal scrollbar rather than by wrapping them. The file will be installed under <tt>~/.terminfo</tt> the first time you run Terminator. If you used an installer that runs as root and can write to the system-wide terminfo directory (currently just the Linux installer), the terminfo file will be installed system-wide at install time.
 
@@ -80,25 +80,25 @@ defaulting to 'ansi'
 
 <p>If you think you have the correct terminfo available but you're still having problems, the next thing to check is that you're actually <i>using</i> Terminator's terminfo. For example, if your problem is with your shell, check that <tt>echo $TERM</tt> says "terminator", and if your problem is with Vim, check that <tt>:se term</tt> says "term=terminator". (Although Terminator sets the TERM environment variable for you, it may be being overridden by your shell's profile, say, and it won't necessarily be correctly transferred if you log in to a remote machine, so it's always worth checking.)
 
-<h4>Cygwin</h4>
+<h3>Cygwin</h3>
 <p>Cygwin's less(1) still uses a termcap-based ncurses library.
 If less(1) (and hence man(1)) say "WARNING: terminal is not fully functional", try:
 <pre>
 infocmp -C >> ~/.termcap
 </pre>
 
-<h4>FreeBSD</h4>
+<h3>FreeBSD</h3>
 <p>FreeBSD systems don't come with the necessary terminfo support installed by
 default.  It's apparently a snap to install the
 <a href="http://www.freebsd.org/cgi/url.cgi?ports/devel/ncurses/pkg-descr">devel/ncurses</a>
 package from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports and Packages Collection</a>.
 
-<h4>Logging in as other users/root</h4>
+<h3>Logging in as other users/root</h3>
 <p>If the terminfo file is not installed in the system-wide location then other users (and you yourself, if you use <tt>su(1)</tt> to switch to another user) will have problems. Using <tt>sudo(1)</tt> to run a command as another user will work in many cases, because it doesn't alter <tt>$HOME</tt> by default.
 
 <p>For best results, on computers where you'll be logged in as root at times, we recommend you install the terminfo file for Terminator in <tt>/usr/share/terminfo</tt>. The easiest way to do this is to simply run Terminator once as root. From then on, you can run Terminator as your normal user, and use <tt>su(1)</tt> to become root.
 
-<h4>Logging in to remote systems</h4>
+<h3>Logging in to remote systems</h3>
 <p>You will also need to ensure that any machines you'll be remotely logging in to also have a copy of the terminfo file installed. If you use the same home directory on the local and remote machines, everything will just work. Likewise if someone has already run Terminator as root on the remote machine.
 
 <p>(Note that if you try to run Terminator on a remote machine, it probably won't get as far as opening a window. Nonetheless, it will get far enough to set up the terminfo file. Note also that running Terminator on a remote machine as a matter of course is usually a mistake, and will be <i>much</i> slower than running Terminator on your local machine and simply logging in to the remote machine from within Terminator using ssh(1) or whatever.)
