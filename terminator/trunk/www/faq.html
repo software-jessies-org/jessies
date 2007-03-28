@@ -16,6 +16,38 @@
 
 <!-- ---------------------------------------------------- -->
 
+<h3>How can I set the window/tab title from the shell?</h3>
+<p>Assuming you're using Bash, you need a function like this in your <tt>~/.bash_profile</tt>:
+<pre>
+    setWindowTitle() {
+        echo -ne "\e]2;$*\a"
+    }
+</pre>
+<p>You can call this with any argument to set the window's title to that string. If the terminal running this is in a tab, the tab's title will be changed; a window with multiple tabs takes its title from the current tab.
+
+<p>This function will work for XTerm and most other terminal emulators too. One place it won't work is the Linux text console. For that reason, I recommend surrounding all the code in this FAQ section with something like this:
+<pre>
+if [ "$TERM" == "terminator" ]
+then
+    # window-title stuff here.
+fi
+</pre>
+
+<p>If you have a prompt something like this:
+<pre>
+    export PS1="\[\033[33m\]\h:\w\$ \[\033[0m\]"
+</pre>
+<p>You might want to achieve a similar effect in your title bar. Annoyingly, those \h and \w escapes (hostname without domain name and directory with $HOME rewritten as ~, respectively) only work in the PS1 environment variable. Luckily, Bash offers you an alternative way to achieve the same effect without the cost of running external programs (a common work-around):
+<pre>
+    updateWindowTitle() {
+        setWindowTitle "${HOSTNAME%%.*}:${PWD/$HOME/~}"
+    }
+    PROMPT_COMMAND=updateWindowTitle
+</pre>
+<p>Read the Bash manual page for full details of PS1, PROMPT_COMMAND, or the advanced forms of substitution.
+
+<!-- ---------------------------------------------------- -->
+
 <h3>Why am I having problems with terminfo/curses?</h3>
 
 <p>Terminator has its own terminfo file. This is regrettably necessary because of Terminator's unconventional approach to handling wide lines with a horizontal scrollbar rather than by wrapping them. The file will be installed under <tt>~/.terminfo</tt> the first time you run Terminator. If you used an installer that runs as root and can write to the system-wide terminfo directory (currently just the Linux installer), the terminfo file will be installed system-wide at install time.
