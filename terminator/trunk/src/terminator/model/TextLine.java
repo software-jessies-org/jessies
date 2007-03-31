@@ -173,7 +173,7 @@ public class TextLine {
 	/** Writes text at the given position, overwriting anything underneath. */
 	public void writeTextAt(int offset, String newText, short style) {
 		ensureOffsetIsOK(offset);
-		if (offset + newText.length() < styles.length) {
+		if (offset + newText.length() < text.length()) {
 			text = text.substring(0, offset) + newText + text.substring(offset + newText.length());
 			Arrays.fill(styles, offset, offset + newText.length(), style);
 		} else {
@@ -187,7 +187,7 @@ public class TextLine {
 			throw new IllegalArgumentException("Negative offset " + offset);
 		}
 		if (offset >= text.length()) {
-			appendPadding(offset - styles.length);
+			appendPadding(offset - text.length());
 		}
 	}
 	
@@ -195,7 +195,11 @@ public class TextLine {
 		char[] pad = new char[count];
 		Arrays.fill(pad, ' ');
 		text += new String(pad);
-		styles = insertStyleDataInto(styles.length, count, StyledText.getDefaultStyle());
+		styles = appendStyleData(count, StyledText.getDefaultStyle());
+	}
+	
+	private short[] appendStyleData(int count, short value) {
+		return insertStyleDataInto(styles.length, count, value);
 	}
 	
 	private short[] overwriteStyleData(int offset, int count, short value) {
