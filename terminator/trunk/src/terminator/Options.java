@@ -35,7 +35,6 @@ public class Options {
 	private static final String HIDE_MOUSE_WHEN_TYPING = "hideMouseWhenTyping";
 	private static final String INITIAL_COLUMN_COUNT = "initialColumnCount";
 	private static final String INITIAL_ROW_COUNT = "initialRowCount";
-	private static final String LOGIN_SHELL = "loginShell";
 	private static final String SCROLL_KEY = "scrollKey";
 	private static final String SCROLL_TTY_OUTPUT = "scrollTtyOutput";
 	private static final String USE_ALT_AS_META = "useAltAsMeta";
@@ -90,13 +89,6 @@ public class Options {
 	
 	private static String colorToString(Color color) {
 		return String.format("#%06x", color.getRGB() & 0xffffff);
-	}
-	
-	/**
-	 * Whether or not the shells we start should be login shells.
-	 */
-	public boolean isLoginShell() {
-		return booleanResource(LOGIN_SHELL);
 	}
 	
 	/**
@@ -283,7 +275,6 @@ public class Options {
 		addDefault(HIDE_MOUSE_WHEN_TYPING, Boolean.TRUE, "Hide mouse when typing");
 		addDefault(INITIAL_COLUMN_COUNT, Integer.valueOf(80), "New terminal width");
 		addDefault(INITIAL_ROW_COUNT, Integer.valueOf(24), "New terminal height");
-		addDefault(LOGIN_SHELL, Boolean.TRUE, "Start child process with a '-l' argument?");
 		addDefault(SCROLL_KEY, Boolean.TRUE, "Scroll to bottom on key press?");
 		addDefault(SCROLL_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output?");
 		addDefault(USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key?");

@@ -93,12 +93,12 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	private static ArrayList<String> getShellCommand() {
+		// We always start a login shell.
+		// This used to be an option, but it wasn't very useful and it caused confusion.
+		// It's also hard to explain the difference without assuming a detailed knowledge of the particular shell.
 		ArrayList<String> command = new ArrayList<String>();
-		String shell = System.getenv("SHELL");
-		command.add(shell);
-		if (Options.getSharedInstance().isLoginShell()) {
-			command.add("-l");
-		}
+		command.add(System.getenv("SHELL"));
+		command.add("-l");
 		return command;
 	}
 	
