@@ -138,7 +138,7 @@ public class TextLine {
 		}
 		endIndex = Math.min(endIndex, text.length());
 		text = text.substring(0, startIndex) + text.substring(endIndex);
-		styles = removeShortsFrom(startIndex, endIndex);
+		styles = removeStyleDataFrom(startIndex, endIndex);
 	}
 	
 	public void insertTabAt(int offset, int tabLength, short style) {
@@ -166,7 +166,7 @@ public class TextLine {
 	/** Inserts text at the given position, moving anything already there further to the right. */
 	public void insertTextAt(int offset, String newText, short style) {
 		ensureOffsetIsOK(offset);
-		styles = insertShortsInto(offset, newText.length(), style);
+		styles = insertStyleDataInto(offset, newText.length(), style);
 		text = text.substring(0, offset) + newText + text.substring(offset);
 	}
 	
@@ -178,7 +178,7 @@ public class TextLine {
 			Arrays.fill(styles, offset, offset + newText.length(), style);
 		} else {
 			text = text.substring(0, offset) + newText;
-			styles = extendWithShorts(offset, newText.length(), style);
+			styles = extendWithStyleData(offset, newText.length(), style);
 		}
 	}
 
@@ -195,17 +195,17 @@ public class TextLine {
 		char[] pad = new char[count];
 		Arrays.fill(pad, ' ');
 		text += new String(pad);
-		styles = insertShortsInto(styles.length, count, StyledText.getDefaultStyle());
+		styles = insertStyleDataInto(styles.length, count, StyledText.getDefaultStyle());
 	}
 	
-	private short[] extendWithShorts(int offset, int count, short value) {
+	private short[] extendWithStyleData(int offset, int count, short value) {
 		short[] result = new short[offset + count];
 		System.arraycopy(styles, 0, result, 0, offset);
 		Arrays.fill(result, offset, offset + count, value);
 		return result;
 	}
 	
-	private short[] insertShortsInto(int offset, int count, short value) {
+	private short[] insertStyleDataInto(int offset, int count, short value) {
 		short[] result = new short[styles.length + count];
 		System.arraycopy(styles, 0, result, 0, offset);
 		Arrays.fill(result, offset, offset + count, value);
@@ -213,7 +213,7 @@ public class TextLine {
 		return result;
 	}
 	
-	private short[] removeShortsFrom(int startIndex, int endIndex) {
+	private short[] removeStyleDataFrom(int startIndex, int endIndex) {
 		short[] result = new short[styles.length - (endIndex - startIndex)];
 		System.arraycopy(styles, 0, result, 0, startIndex);
 		System.arraycopy(styles, endIndex, result, startIndex, styles.length - endIndex);
