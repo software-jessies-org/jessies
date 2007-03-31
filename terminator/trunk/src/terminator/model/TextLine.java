@@ -178,7 +178,7 @@ public class TextLine {
 			Arrays.fill(styles, offset, offset + newText.length(), style);
 		} else {
 			text = text.substring(0, offset) + newText;
-			styles = extendWithStyleData(offset, newText.length(), style);
+			styles = overwriteStyleData(offset, newText.length(), style);
 		}
 	}
 
@@ -198,7 +198,7 @@ public class TextLine {
 		styles = insertStyleDataInto(styles.length, count, StyledText.getDefaultStyle());
 	}
 	
-	private short[] extendWithStyleData(int offset, int count, short value) {
+	private short[] overwriteStyleData(int offset, int count, short value) {
 		short[] result = new short[offset + count];
 		System.arraycopy(styles, 0, result, 0, offset);
 		Arrays.fill(result, offset, offset + count, value);
