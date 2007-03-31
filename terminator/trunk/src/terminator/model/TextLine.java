@@ -138,7 +138,7 @@ public class TextLine {
 		}
 		endIndex = Math.min(endIndex, text.length());
 		text = text.substring(0, startIndex) + text.substring(endIndex);
-		styles = trim(styles, startIndex, endIndex);
+		styles = removeShortsFrom(styles, startIndex, endIndex);
 	}
 	
 	public void insertTabAt(int offset, int tabLength, short style) {
@@ -204,7 +204,7 @@ public class TextLine {
 		Arrays.fill(result, offset, offset + count, value);
 		return result;
 	}
-
+	
 	private short[] insertShortsInto(short[] shorts, int offset, int count, short value) {
 		short[] result = new short[shorts.length + count];
 		System.arraycopy(shorts, 0, result, 0, offset);
@@ -213,7 +213,7 @@ public class TextLine {
 		return result;
 	}
 	
-	private short[] trim(short[] shorts, int startIndex, int endIndex) {
+	private short[] removeShortsFrom(short[] shorts, int startIndex, int endIndex) {
 		short[] result = new short[shorts.length - (endIndex - startIndex)];
 		System.arraycopy(shorts, 0, result, 0, startIndex);
 		System.arraycopy(shorts, endIndex, result, startIndex, shorts.length - endIndex);
