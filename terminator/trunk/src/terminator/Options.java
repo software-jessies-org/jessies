@@ -43,7 +43,8 @@ public class Options {
 	private final Pattern resourcePattern = Pattern.compile("(?:Terminator(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
 	private static final Color VERY_DARK_BLUE = new Color(0x000045);
-	private static final Color OFF_WHITE = new Color(0xe7e7e7);
+	private static final Color NEAR_BLACK = new Color(0x181818);
+	private static final Color NEAR_WHITE = new Color(0xeeeeee);
 	private static final Color SELECTION_BLUE = new Color(0x1c2bff);
 	private static final Color LIGHT_BLUE = new Color(0.70f, 0.83f, 1.00f);
 	
@@ -230,7 +231,7 @@ public class Options {
 		initDefaults();
 		initDefaultColors();
 		readStoredOptions();
-		aliasColorBD();
+		updateColorBD();
 	}
 	
 	/**
@@ -337,10 +338,11 @@ public class Options {
 		}
 		
 		// Offer various preset color combinations.
-		colorsPanel.addRow("Presets:", makePresetButton(colorPreferences, "  Terminator  ", VERY_DARK_BLUE, OFF_WHITE, Color.WHITE, Color.GREEN, SELECTION_BLUE));
-		colorsPanel.addRow("", makePresetButton(colorPreferences, "Black on White", Color.WHITE, Color.BLACK, Color.BLACK, Color.BLACK, LIGHT_BLUE));
-		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, Color.GREEN, Color.GREEN, Color.GREEN, SELECTION_BLUE));
-		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, Color.WHITE, Color.WHITE, Color.WHITE, SELECTION_BLUE));
+		// Note that these get fossilized into the user's preferences; updating values here doesn't affect users who've already clicked the button.
+		colorsPanel.addRow("Presets:", makePresetButton(colorPreferences, "  Terminator  ", VERY_DARK_BLUE, NEAR_WHITE, Color.GREEN, SELECTION_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "Black on White", Color.WHITE, NEAR_BLACK, Color.BLUE, LIGHT_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, Color.GREEN, Color.GREEN, SELECTION_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, SELECTION_BLUE));
 		
 		// Save the preferences if the user hits "Save".
 		form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
@@ -385,6 +387,7 @@ public class Options {
 		// Make a representative image for the button.
 		BufferedImage image = makeEmptyPresetButtonImageToFit(name);
 		Graphics2D g = image.createGraphics();
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, isAntiAliased() ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		g.setFont(getFont());
 		g.setColor(background);
 		g.fillRect(0, 0, image.getWidth(), image.getHeight());
@@ -400,15 +403,16 @@ public class Options {
 		return image;
 	}
 	
-	private JComponent makePresetButton(final Map<String, ColorPreference> colorPreferences, String name, final Color background, final Color foreground, final Color bold, final Color cursor, final Color selection) {
+	private JComponent makePresetButton(final Map<String, ColorPreference> colorPreferences, String name, final Color background, final Color foreground, final Color cursor, final Color selection) {
+		// FIXME: we need to update the button image when the user changes the anti-aliasing preference.
 		JButton button = new JButton(new ImageIcon(makePresetButtonImage(name, background, foreground)));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				colorPreferences.get("background").updatePreference(background);
 				colorPreferences.get("foreground").updatePreference(foreground);
-				colorPreferences.get("colorBD").updatePreference(bold);
 				colorPreferences.get("cursorColor").updatePreference(cursor);
 				colorPreferences.get("selectionColor").updatePreference(selection);
+				updateColorBD();
 			}
 		});
 		return button;
@@ -525,6 +529,7 @@ public class Options {
 			options.put(key, newColor);
 			icon.setColor(newColor);
 			button.repaint();
+			updateColorBD();
 			Terminator.getSharedInstance().optionsDidChange();
 		}
 	}
@@ -589,30 +594,51 @@ public class Options {
 		
 		// Defaults reminiscent of SGI's xwsh(1).
 		addDefault("background", VERY_DARK_BLUE, "Background color");
-		addDefault("colorBD", Color.WHITE, "Bold text color");
 		addDefault("cursorColor", Color.GREEN, "Cursor color");
-		addDefault("foreground", OFF_WHITE, "Text foreground color");
+		addDefault("foreground", NEAR_WHITE, "Text foreground color");
 		addDefault("selectionColor", SELECTION_BLUE, "Selection background color");
+		// This will be overridden with an appropriate value.
+		defaults.put("colorBD", Color.BLACK);
+		options.put("colorBD", Color.BLACK);
 	}
 	
 	/**
-	 * Tries to get a good bold foreground color. If the user has set their
-	 * own, or they haven't set their own foreground, we don't need to do
-	 * anything. Otherwise, we look through the normal (low intensity)
-	 * colors to see if we can find a match. If we do, take the appropriate
-	 * bold (high intensity) color for the bold foreground color.
+	 * Tries to get a good bold foreground color.
 	 */
-	private void aliasColorBD() {
-		if (getColor("colorBD") != null || getColor("foreground") == null) {
-			return;
-		}
+	private void updateColorBD() {
 		Color foreground = getColor("foreground");
+		Color colorBD = null;
+		
+		// If the color is one of the "standard" colors, use the usual bold variant.
 		for (int i = 0; i < 8; ++i) {
 			Color color = getColor("color" + i);
 			if (foreground.equals(color)) {
-				options.put("colorBD", options.get("color" + (i + 8)));
-				return;
+				colorBD = getColor("color" + (i + 8));
+				break;
 			}
+		}
+		
+		// If that didn't work, try to invent a suitable color.
+		if (colorBD == null) {
+			// The typical use of colorBD is to turn off-white into pure white or off-black.
+			// One approach might be to use the NTSC or HDTV luminance formula, but it's not obvious that they generalize to other colors.
+			// Adjusting each component individually if it's close to full-on or full-off is simple and seems like it might generalize.
+			colorBD = new Color(adjustForBD(foreground.getRed()), adjustForBD(foreground.getGreen()), adjustForBD(foreground.getBlue()));
+		}
+		
+		options.put("colorBD", colorBD);
+	}
+	
+	private static int adjustForBD(int component) {
+		// These limits are somewhat arbitrary "round" hex numbers.
+		// 0x11 would be too close to the LCD "blacker than black".
+		// The default XTerm normal-intensity and bold blacks differ by 0x30.
+		if (component < 0x33) {
+			return 0x00;
+		} else if (component > 0xcc) {
+			return 0xff;
+		} else {
+			return component;
 		}
 	}
 	
