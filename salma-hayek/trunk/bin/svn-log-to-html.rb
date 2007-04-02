@@ -10,7 +10,7 @@ require "#{salma_hayek}/escaping.rb"
 puts("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">")
 puts("<html>")
 puts("<head>")
-puts("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">")
+puts("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">")
 puts("<title>ChangeLog</title>")
 puts("<style type=\"text/css\">");
 puts("  html, body {");
