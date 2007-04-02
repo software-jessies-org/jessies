@@ -4,7 +4,6 @@ require 'cgi'
 
 def escapeTextLineToHtml(line)
     $_ = CGI.escapeHTML(line.chomp())
-    return "#{$_}<br/>\n"
     
     # Embolden filenames:
     $_.gsub!(/^([^[:space:]\/]\S*): /, "<b>\\1</b>: ")
