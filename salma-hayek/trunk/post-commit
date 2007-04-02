@@ -1,6 +1,6 @@
-#!/usr/local/bin/ruby -w
+#!/usr/bin/ruby -w
 ENV["PATH"]="/usr/local/bin:/opt/csw/bin:/opt/SUNWspro/bin:/usr/bin:/usr/sfw/bin:/usr/openwin/bin:/usr/ccs/bin"
-# The previous two lines are quite specific to the particular host we're using.
+# The previous line is quite specific to the particular host we're using and it may well be obsolete.
 
 # A Subversion post-commit hook. Edit the configurable stuff below, and
 # copy into your repository's hooks/ directory as "post-commit". Don't
@@ -50,11 +50,9 @@ ARGV.shift() # throw away the spurious repository_path argument
 rev = ARGV.shift()
 
 # Get the overview information.
-# Despite storing everything as UTF-8, svn(1) insists that your LC_CTYPE is
-# set to request UTF-8 if you want it to refrain from mangling text such
-# as 宮部みゆき or 火車!
-# FIXME: This locale isn't yet installed on crank but I think Chris is persuadable:
-#ENV["LC_CTYPE"] = "en_US.UTF-8"
+# svn(1) stores everything as UTF-8 but translates it on output according to LC_CTYPE.
+# This appears not to be set by default on jessies.org in the environment in which this job runs.
+ENV["LC_CTYPE"] = "en_US.UTF-8"
 info=`#{svnlook} info #{repository_path} -r #{rev}`
 info_lines=info.split("\n")
 author=info_lines.shift
