@@ -914,16 +914,21 @@ public class Evergreen {
                 
                 Thread fileListUpdaterStarterThread = new Thread(new Runnable() {
                     public void run() {
+                        final long t1 = System.nanoTime();
                         try {
                             // What I really want to say is "wait until the event queue is empty and everything's caught up".
                             // I haven't yet found out how to do that, and the fact that using EventQueue.invokeLater here doesn't achieve the desired effect makes me think that what I want might not be that simple anyway.
                             // Seemingly, though, if we run at MIN_PRIORITY, we don't get much of a look-in until the EDT is idle anyway.
                             // Hans Muller's got code to wait for the event queue to clear: https://appframework.dev.java.net/source/browse/appframework/trunk/AppFramework/src/application/Application.java?rev=36&view=auto&content-type=text/vnd.viewcvs-markup
-                            Thread.sleep(2000);
+                            // Until that's available as GPL/LGPL, or as part of the JDK, here's a simpler alternative that's good enough for our purposes here.
+                            EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+                            while (queue.peekEvent() != null) {
+                                Thread.sleep(100);
+                            }
                         } catch (InterruptedException ex) {
                         }
                         
-                        Log.warn("Workers free to start after " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
+                        Log.warn("Workers free to start after " + TimeUtilities.nsToString(System.nanoTime() - t0) + " (slept for " + TimeUtilities.nsToString(System.nanoTime() - t1) + ").");
                         startSignal.countDown();
                     }
                 });
