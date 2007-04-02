@@ -19,8 +19,6 @@ mail_domain="jessies.org" # Assumes all authors (and the to_address) share a dom
 to_address="software@#{mail_domain}"
 reply_to_address=nil
 
-svnlook="svnlook"
-
 if ENV["LOGNAME"] =~ /^(elliotth|martind)$/
   to_address=$1
 end
@@ -53,7 +51,7 @@ rev = ARGV.shift()
 # svn(1) stores everything as UTF-8 but translates it on output according to LC_CTYPE.
 # This appears not to be set by default on jessies.org in the environment in which this job runs.
 ENV["LC_CTYPE"] = "en_US.UTF-8"
-info=`#{svnlook} info #{repository_path} -r #{rev}`
+info=`svnlook info #{repository_path} -r #{rev}`
 info_lines=info.split("\n")
 author=info_lines.shift
 date=info_lines.shift
@@ -82,7 +80,7 @@ body << "</p></div>\n"
 # Get and output the patch.
 # We'd like to | #{script_path}/bin/annotate-patch.rb
 # But that requires that the correct version of the file is available as trunk/filename
-changes=`#{svnlook} diff #{repository_path} -r #{rev}`
+changes=`svnlook diff #{repository_path} -r #{rev}`
 changes.gsub!(/\r/, "") # In case we're running on MS Windows.
 
 sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes.split("\n"))
