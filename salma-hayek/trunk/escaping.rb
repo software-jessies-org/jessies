@@ -21,7 +21,9 @@ def escapeTextLineToHtml(line)
         "<tt>  #{text.gsub(' ', '&nbsp;')} </tt>"
     }
     
-    # Turn URLs into links:
+    # Turn URLs into links.  This regex is very loose, but other implementation I've seen have been too tight, or incorrect.
+    # We could do to revisit this, perhaps using the BNF here as a source:
+    # http://www.w3.org/Addressing/URL/url-spec.txt
     $_.gsub!(/(http:\/\/\S+)/, "<a href=\"\\1\">\\1</a>")
     
     # Make slight typographical improvements:
