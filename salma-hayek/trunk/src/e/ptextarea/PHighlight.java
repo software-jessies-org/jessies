@@ -90,10 +90,12 @@ public abstract class PHighlight {
             super(index);
         }
         
+        @Override
         public void delete() {
             PHighlight.this.delete();
         }
         
+        @Override
         public String toString() {
             return "HighlightAnchor[" + getIndex() + ", " + PHighlight.this + "]";
         }
