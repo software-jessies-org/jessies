@@ -104,6 +104,15 @@ public class PAnchorSet implements PTextListener {
         for (int i = 0; i < removeCount; i++) {
             anchorsToRemove.add(anchors.remove(firstAnchorIndex));
         }
+        // Note that the sub-class of PAnchor in PHighlight relies upon this delete
+        // call in order to properly destroy itself when one of its extremes is
+        // removed.  If you delete this code, some highlights (notably 'find'
+        // highlights) will turn into phantom highlights if you kill one end, such
+        // that one extreme of the highlight will drift when changes are made to
+        // the preceding text, and the other will be stably attached.
+        for (PAnchor anchor : anchorsToRemove) {
+            anchor.delete();
+        }
         // We must recalculate the first anchor index, because the one we calculated
         // before could be wrong if an anchor's deletion caused the deletion of another.
         int start = getFirstAnchorIndex(event.getOffset());
@@ -118,6 +127,12 @@ public class PAnchorSet implements PTextListener {
     }
     
     public synchronized void clear() {
+        for (int i = 0; i < anchors.size(); i++) {
+            PAnchor anchor = get(i);
+            if (anchor != null) {
+                anchor.delete();
+            }
+        }
         anchors.clear();
     }
 }

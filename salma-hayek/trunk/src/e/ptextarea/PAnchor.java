@@ -29,6 +29,13 @@ public class PAnchor implements Comparable<PAnchor> {
         this.index = index;
     }
     
+    /**
+     * Notification that this anchor has been destroyed, because the character it indexes
+     * has been deleted.  This is used by the PAnchor sub-class in PHighlight to ensure that
+     * the entire highlight is destroyed if one of its anchors goes away.
+     */
+    public void delete() { }
+    
     @Override
     public int hashCode() {
         return super.hashCode();
