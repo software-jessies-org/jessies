@@ -8,10 +8,11 @@ import javax.swing.table.*;
 import e.util.*;
 
 /**
- * A better-looking table than JTable. In particular, on Mac OS this looks
- * more like a Cocoa table than the default Aqua LAF manages.
- *
- * @author Elliott Hughes
+ * A better-looking table than JTable.
+ * In particular, on Mac OS this looks more like a Cocoa table than the default Aqua LAF manages.
+ * Likewise Linux and the GTK+ LAF.
+ * We also fill the entirety of any enclosing JScrollPane by default.
+ * Tool tips are automatically provided for truncated cells.
  */
 public class ETable extends JTable {
     private static final Color MAC_FOCUSED_SELECTED_CELL_HORIZONTAL_LINE_COLOR = new Color(0x7daaea);
