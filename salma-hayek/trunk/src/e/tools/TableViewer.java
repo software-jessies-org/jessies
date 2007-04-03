@@ -26,9 +26,7 @@ public class TableViewer extends JFrame {
     }
     
     public void initTable(String filename) throws IOException {
-        table = new ETable();
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        DefaultTableModel model = new DefaultTableModel();
         InputStream inputStream = System.in;
         if (filename.equals("-") == false) {
             inputStream = new FileInputStream(FileUtilities.fileFromString(filename));
@@ -42,7 +40,10 @@ public class TableViewer extends JFrame {
             }
             model.addRow(fields);
         }
-        Log.warn("rows:"+model.getRowCount()+ ",columns:"+model.getColumnCount());
+        Log.warn("rows:"+model.getRowCount()+ ", columns:"+model.getColumnCount());
+        table = new ETable();
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setModel(model);
         for (int i = 0; i < model.getColumnCount(); i++) {
             packColumn(i);
         }

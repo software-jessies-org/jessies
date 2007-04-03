@@ -24,6 +24,10 @@ public class ETable extends JTable {
     private static final Color MAC_UNFOCUSED_UNSELECTED_VERTICAL_LINE_COLOR = new Color(0xd9d9d9);
     private static final Color MAC_UNFOCUSED_SELECTED_VERTICAL_LINE_COLOR = new Color(0xacacac);
     
+    /**
+     * Creates a table with a default data model.
+     * Callers should use setModel after construction to provide their own model; JTable's convenience constructors are not provided.
+     */
     public ETable() {
         // Although it's the JTable default, most systems' tables don't draw a grid by default.
         // Worse, it's not easy (or possible?) for us to take over grid painting ourselves for those LAFs (Metal, for example) that do paint grids.
