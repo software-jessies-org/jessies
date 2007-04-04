@@ -241,7 +241,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             this.selectionEndIsAnchor = selectionEndIsAnchor;
             SelectionHighlight oldSelection = selection;
             selection = new SelectionHighlight(this, start, end);
-            copyToSystemSelection();
+            if (start != end) {
+                copyToSystemSelection();
+            }
             oldSelection.detachAnchors();
             if (oldSelection.isEmpty() != selection.isEmpty()) {
                 repaintHighlight(selection.isEmpty() ? oldSelection : selection);
