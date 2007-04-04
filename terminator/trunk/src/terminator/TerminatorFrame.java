@@ -116,9 +116,11 @@ public class TerminatorFrame extends JFrame {
 			}
 		});
 		initTerminals();
-		pack();
 		optionsDidChange();
+		
+		pack();
 		setVisible(true);
+		
 		initSizeMonitoring();
 		
 		WindowMenu.getSharedInstance().addWindow(this);
