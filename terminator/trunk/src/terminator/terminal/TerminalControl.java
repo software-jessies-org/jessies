@@ -12,13 +12,18 @@ import terminator.view.*;
 import terminator.terminal.escape.*;
 
 /**
-Terminal stream control object - manages the interface between the rest of the Java code and the
-low-level terminal protocol.
-
-@author Phil Norman
-@author Elliott Hughes
-*/
+ * Ties together the subprocess reader thread, the subprocess writer thread,
+ * and the thread that processes the subprocess' output.
+ * Some basic processing is done here.
+ */
 public class TerminalControl {
+	// Andrew Giddings wanted "windows-1252" for his Psion.
+	private static final String CHARSET_NAME = "UTF-8";
+	
+	// This should be around your system's pipe size.
+	// Too much larger and you'll waste time copying unused char[].
+	// Too much smaller and you'll waste time making excessive system calls reading just part of what's available.
+	// FIXME: add a JNI call to return PIPE_BUF? (It's not strictly required to be the value we're looking for, but it probably is.)
 	private static final int INPUT_BUFFER_SIZE = 8192;
 	
 	private static final boolean DEBUG = false;
@@ -33,8 +38,6 @@ public class TerminalControl {
 	private boolean processIsRunning;
 	private boolean processHasBeenDestroyed = false;
 	
-	// Andrew Giddings wanted Cp1252 for interoperability with his Psion.
-	private String charsetName = "UTF-8";
 	private InputStreamReader in;
 	private OutputStream out;
 	
@@ -83,7 +86,7 @@ public class TerminalControl {
 		this.logWriter = new LogWriter(command);
 		this.ptyProcess = new PtyProcess(command, workingDirectory);
 		this.processIsRunning = true;
-		this.in = new InputStreamReader(ptyProcess.getInputStream(), charsetName);
+		this.in = new InputStreamReader(ptyProcess.getInputStream(), CHARSET_NAME);
 		this.out = ptyProcess.getOutputStream();
 		writerExecutor = ThreadUtilities.newSingleThreadExecutor(makeThreadName("Writer"));
 		Log.warn("Created " + ptyProcess);
@@ -560,7 +563,7 @@ public class TerminalControl {
 			public void run() {
 				try {
 					if (processIsRunning) {
-						out.write(s.getBytes(charsetName));
+						out.write(s.getBytes(CHARSET_NAME));
 						out.flush();
 					}
 				} catch (IOException ex) {
