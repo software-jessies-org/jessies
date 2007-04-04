@@ -57,6 +57,8 @@ public class TerminalControl {
 	private EscapeParser escapeParser;
 	
 	// Input data yet to be processed.
+	// There's currently no limit to the amount we'll queue, because I assume some other part of the system will impose one.
+	// Using a queue of depth 1 should restore the old "read one, process one" behavior.
 	private LinkedBlockingQueue<Chars> inputQueue = new LinkedBlockingQueue<Chars>();
 	// A unit of input data.
 	// This helps us put a char[] in a collection, and saves us paying to resize the char[] in the usual case where the char[] isn't full.
