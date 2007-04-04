@@ -80,10 +80,6 @@ public class TerminalControl {
 		this.listener = listener;
 	}
 	
-	private String makeThreadName(String role) {
-		return "Process " + ptyProcess.getProcessId() + " (" + ptyProcess.getPtyName() + ") " + role;
-	}
-	
 	public void initProcess(String[] command, String workingDirectory) throws Throwable {
 		this.logWriter = new LogWriter(command);
 		this.ptyProcess = new PtyProcess(command, workingDirectory);
@@ -120,13 +116,19 @@ public class TerminalControl {
 			return;
 		}
 		
-		readerThread = new Thread(new ReaderRunnable(), makeThreadName("Reader"));
-		readerThread.setDaemon(true);
-		readerThread.start();
-		
-		parserThread = new Thread(new ParserRunnable(), makeThreadName("Parser"));
-		parserThread.setDaemon(true);
-		parserThread.start();
+		readerThread = startThread("Reader", new ReaderRunnable());
+		parserThread = startThread("Parser", new ParserRunnable());
+	}
+	
+	private Thread startThread(String name, Runnable runnable) {
+		Thread thread = new Thread(runnable, makeThreadName(name));
+		thread.setDaemon(true);
+		thread.start();
+		return thread;
+	}
+	
+	private String makeThreadName(String role) {
+		return "Process " + ptyProcess.getProcessId() + " (" + ptyProcess.getPtyName() + ") " + role;
 	}
 	
 	private class ReaderRunnable implements Runnable {
@@ -135,9 +137,8 @@ public class TerminalControl {
 				while (true) {
 					char[] chars = new char[INPUT_BUFFER_SIZE];
 					int readCount = in.read(chars, 0, chars.length);
-					if (readCount != -1) {
-						inputQueue.put(new Chars(chars, readCount));
-					} else {
+					inputQueue.put(new Chars(chars, readCount));
+					if (readCount == -1) {
 						Log.warn("read returned -1 from " + ptyProcess);
 						return; // This isn't going to fix itself!
 					}
@@ -145,6 +146,7 @@ public class TerminalControl {
 			} catch (Throwable th) {
 				Log.warn("Problem reading output from " + ptyProcess, th);
 			} finally {
+				inputQueue.add(new Chars(null, -1));
 				handleProcessTermination();
 			}
 		}
@@ -155,6 +157,9 @@ public class TerminalControl {
 			while (true) {
 				try {
 					Chars chars = inputQueue.take();
+					if (chars.charCount == -1) {
+						return; // End of input.
+					}
 					processBuffer(chars.chars, chars.charCount);
 				} catch (Throwable th) {
 					Log.warn("Problem processing output from " + ptyProcess, th);
@@ -258,6 +263,12 @@ public class TerminalControl {
 					pane.doCloseAction();
 				}
 			});
+		}
+		
+		// readerThread and parserThread will have shut themselves down by now.
+		// We need to handle the writer ExecutorService ourselves.
+		if (writerExecutor != null) {
+			writerExecutor.shutdownNow();
 		}
 	}
 	
