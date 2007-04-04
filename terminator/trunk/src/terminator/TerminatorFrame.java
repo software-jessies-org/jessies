@@ -207,6 +207,18 @@ public class TerminatorFrame extends JFrame {
 		Dimension size = getSize();
 		size.height += (initialSize.height - finalSize.height);
 		size.width += (initialSize.width - finalSize.width);
+		
+		// We dealt above with the case where the window is maximized, but we also have to deal with the case where the window is simply very tall.
+		// GNOME and Mac OS will correctly constrain the window for us, but on Windows we have to try to do it ourselves.
+		if (GuiUtilities.isWindows()) {
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+			final int availableVerticalScreenSpace = screenSize.height - screenInsets.top - screenInsets.bottom;
+			if (getLocation().y + size.height > availableVerticalScreenSpace) {
+				size.height = availableVerticalScreenSpace - getLocation().y;
+			}
+		}
+		
 		setSize(size);
 	}
 	
