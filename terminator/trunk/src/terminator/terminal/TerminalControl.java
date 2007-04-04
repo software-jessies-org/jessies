@@ -1,11 +1,11 @@
 package terminator.terminal;
 
+import e.util.*;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import javax.swing.*;
-import e.util.*;
 import terminator.*;
 import terminator.model.*;
 import terminator.view.*;
@@ -18,33 +18,29 @@ low-level terminal protocol.
 @author Phil Norman
 @author Elliott Hughes
 */
-
 public class TerminalControl {
+	private static final int INPUT_BUFFER_SIZE = 8192;
+	
 	private static final boolean DEBUG = false;
 	private static final boolean DEBUG_STEP_MODE = false;
 	private static final boolean SHOW_ASCII_RENDITION = false;
 	
-	/**
-	 * On Mac OS, this seems to be an optimal size; any smaller and we end
-	 * up doing more reads from programs that produce a lot of output, but
-	 * going larger doesn't reduce the number. Maybe this corresponds to
-	 * the stdio buffer size or something?
-	 */
-	private static final int INPUT_BUFFER_SIZE = 8 * 1024;
-	
 	private static BufferedReader stepModeReader;
 	
-	private Thread thread;
 	private JTerminalPane pane;
 	private TextBuffer listener;
 	private PtyProcess ptyProcess;
 	private boolean processIsRunning;
 	private boolean processHasBeenDestroyed = false;
+	
 	// Andrew Giddings wanted Cp1252 for interoperability with his Psion.
 	private String charsetName = "UTF-8";
 	private InputStreamReader in;
 	private OutputStream out;
+	
 	private ExecutorService writerExecutor;
+	private Thread readerThread;
+	private Thread parserThread;
 	
 	private int characterSet;
 	private char[] g = new char[4];
@@ -56,6 +52,19 @@ public class TerminalControl {
 	private StringBuilder lineBuffer = new StringBuilder();
 	
 	private EscapeParser escapeParser;
+	
+	// Input data yet to be processed.
+	private LinkedBlockingQueue<Chars> inputQueue = new LinkedBlockingQueue<Chars>();
+	// A unit of input data.
+	// This helps us put a char[] in a collection, and saves us paying to resize the char[] in the usual case where the char[] isn't full.
+	private static class Chars {
+		private char[] chars;
+		private int charCount;
+		private Chars(char[] chars, int charCount) {
+			this.chars = chars;
+			this.charCount = charCount;
+		}
+	}
 	
 	// Buffer of TerminalActions to perform.
 	private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
@@ -96,7 +105,7 @@ public class TerminalControl {
 	 * invoked when all the user interface stuff is set up.
 	 */
 	public void start() {
-		if (thread != null) {
+		if (readerThread != null) {
 			// Detaching a tab causes start to be invoked again, but we shouldn't do anything.
 			return;
 		}
@@ -105,28 +114,46 @@ public class TerminalControl {
 			// If the PtyProcess couldn't start, there's no point carrying on.
 			return;
 		}
-
-		thread = new Thread(new TerminalRunnable(), makeThreadName("Reader"));
-		thread.start();
+		
+		readerThread = new Thread(new ReaderRunnable(), makeThreadName("Reader"));
+		readerThread.setDaemon(true);
+		readerThread.start();
+		
+		parserThread = new Thread(new ParserRunnable(), makeThreadName("Parser"));
+		parserThread.setDaemon(true);
+		parserThread.start();
 	}
 	
-	private class TerminalRunnable implements Runnable {
+	private class ReaderRunnable implements Runnable {
 		public void run() {
 			try {
-				char[] buffer = new char[INPUT_BUFFER_SIZE];
-				int readCount;
-				while ((readCount = in.read(buffer, 0, buffer.length)) != -1) {
-					try {
-						processBuffer(buffer, readCount);
-					} catch (Throwable th) {
-						Log.warn("Problem processing output from " + ptyProcess, th);
+				while (true) {
+					char[] chars = new char[INPUT_BUFFER_SIZE];
+					int readCount = in.read(chars, 0, chars.length);
+					if (readCount != -1) {
+						inputQueue.put(new Chars(chars, readCount));
+					} else {
+						Log.warn("read returned -1 from " + ptyProcess);
+						return; // This isn't going to fix itself!
 					}
 				}
-				Log.warn("read returned " + readCount + " from " + ptyProcess);
 			} catch (Throwable th) {
 				Log.warn("Problem reading output from " + ptyProcess, th);
 			} finally {
 				handleProcessTermination();
+			}
+		}
+	}
+	
+	private class ParserRunnable implements Runnable {
+		public void run() {
+			while (true) {
+				try {
+					Chars chars = inputQueue.take();
+					processBuffer(chars.chars, chars.charCount);
+				} catch (Throwable th) {
+					Log.warn("Problem processing output from " + ptyProcess, th);
+				}
 			}
 		}
 	}
