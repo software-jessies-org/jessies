@@ -36,14 +36,6 @@ public abstract class PHighlight {
     }
     
     /**
-     * Removes this highlight from the PTextArea.  This method is called when one or other
-     * of the end points of the highlight is destroyed.
-     */
-    public void delete() {
-        textArea.removeHighlight(this);
-    }
-    
-    /**
      * Detaches the anchors marking the bounds of this highlight from the PTextArea.
      * This *must* be called in order that the highlight is properly cleared up.
      */
@@ -85,14 +77,14 @@ public abstract class PHighlight {
         return "PHighlight[start=" + getStartIndex() + ",end=" + getEndIndex() + "]";
     }
 
-    private class HighlightAnchor extends PAnchor {
+    public class HighlightAnchor extends PAnchor {
         public HighlightAnchor(int index) {
             super(index);
         }
         
         @Override
-        public void delete() {
-            PHighlight.this.delete();
+        public void anchorDestroyed() {
+            textArea.removeHighlight(PHighlight.this);
         }
         
         @Override
