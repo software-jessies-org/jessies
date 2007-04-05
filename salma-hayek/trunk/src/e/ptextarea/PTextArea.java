@@ -675,10 +675,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         }
     }
     
-    public PAnchorSet getAnchorSet() {
-        return getTextBuffer().getAnchorSet();
-    }
-    
     public PLineList getLineList() {
         return lines;
     }
