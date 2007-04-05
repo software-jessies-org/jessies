@@ -17,6 +17,20 @@ public class PAnchorSet implements PTextListener {
         anchors.add(getFirstAnchorIndex(anchor.getIndex()), anchor);
     }
     
+    /**
+     * Bulk remove.
+     * Assumes you're trying to remove "most" of the anchors, perhaps when canceling a find.
+     */
+    public synchronized void removeAll(Collection<PAnchor> deadAnchors) {
+        // Sun 6529800: as of Java 7, this is significantly quicker than ArrayList.removeAll.
+        // Sun's fix for that bug could perform even better than simple work-around, so if you're reading this in 2009 or later, think about removing this code.
+        for (int i = anchors.size() - 1; i >= 0; --i) {
+            if (deadAnchors.contains(anchors.get(i))) {
+                anchors.remove(i);
+            }
+        }
+    }
+    
     public synchronized void remove(PAnchor anchor) {
         int start = getFirstAnchorIndex(anchor.getIndex());
         for (int i = start; i < anchors.size(); i++) {

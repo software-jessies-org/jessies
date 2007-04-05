@@ -1,7 +1,7 @@
 package e.ptextarea;
 
-
 import java.awt.*;
+import java.util.*;
 
 /**
  * A PHighlight is an anchored region of text which is specially painted by PTextArea.
@@ -37,13 +37,22 @@ public abstract class PHighlight {
     }
     
     /**
-     * Detaches the anchors marking the bounds of this highlight from the PTextArea.
-     * This *must* be called in order that the highlight is properly cleared up.
+     * Removes the anchors marking the bounds of this highlight from the PAnchorSet.
+     * Use this if you only have one highlight to remove, otherwise see addAnchorsTo.
      */
-    public void detachAnchors() {
+    void detachAnchors() {
         PAnchorSet anchorSet = textArea.getTextBuffer().getAnchorSet();
         anchorSet.remove(start);
         anchorSet.remove(end);
+    }
+    
+    /**
+     * Adds the anchors marking the bounds of this highlight to a collection so they can be bulk-removed from the PAnchorSet.
+     * Use this if you have many highlights to remove, otherwise see detachAnchors.
+     */
+    void addAnchorsTo(Collection<PAnchor> anchors) {
+        anchors.add(start);
+        anchors.add(end);
     }
     
     public void paint(Graphics2D g) {

@@ -650,10 +650,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         getLock().getWriteLock();
         try {
             List<PHighlight> removeList = highlights.getNamedHighlightsOverlapping(highlighterName, beginOffset, endOffset);
+            TreeSet<PAnchor> deadAnchors = new TreeSet<PAnchor>();
             for (PHighlight highlight : removeList) {
+                highlight.addAnchorsTo(deadAnchors);
                 highlights.remove(highlight);
-                highlight.detachAnchors();
             }
+            getTextBuffer().getAnchorSet().removeAll(deadAnchors);
             if (removeList.size() == 1) {
                 repaintHighlight(removeList.get(0));
             } else if (removeList.size() > 1) {
