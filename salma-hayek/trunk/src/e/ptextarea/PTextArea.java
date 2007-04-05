@@ -241,9 +241,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             this.selectionEndIsAnchor = selectionEndIsAnchor;
             SelectionHighlight oldSelection = selection;
             selection = new SelectionHighlight(this, start, end);
-            if (start != end) {
-                copyToSystemSelection();
-            }
+            updateSystemSelection();
             oldSelection.detachAnchors();
             if (oldSelection.isEmpty() != selection.isEmpty()) {
                 repaintHighlight(selection.isEmpty() ? oldSelection : selection);
@@ -273,7 +271,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      * Copies the selected text to X11's selection.
      * Does nothing on other platforms.
      */
-    private void copyToSystemSelection() {
+    private void updateSystemSelection() {
+        if (hasSelection() == false) {
+            // Almost all X11 applications leave the selection alone in this case.
+            return;
+        }
         Clipboard systemSelection = getToolkit().getSystemSelection();
         if (systemSelection != null) {
             systemSelection.setContents(new LazyStringSelection() {
