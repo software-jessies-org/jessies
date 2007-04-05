@@ -48,6 +48,24 @@ fi
 
 <!-- ---------------------------------------------------- -->
 
+<h2>How can I set the window/tab title from Vim?</h2>
+
+<p>Add the line <tt>set title</tt> to your .vimrc and Vim will put the filename and some other information in the title bar.
+
+<!-- ---------------------------------------------------- -->
+
+<h2>Why doesn't Bash always notice when the window changes size?</h2>
+
+<p>If you don't care why this happens, just ensure that <tt>shopt | grep checkwinsize</tt> says that this option is on. If it's not, add <tt>shopt -s checkwinsize</tt> to your login script.
+
+<p>If you care why, keep reading...
+
+<p>Terminal emulators only indirectly tell their children when the window size changes. Really, they're just concerned with telling the kernel that the window size changed. This is done with an ioctl(2) system call. The kernel updates its information about the pseudo terminal and sends a SIGWINCH ("WINdow [size] CHange") signal to the process group that has the terminal. Applications can install a signal handler for this signal to update their own idea of the terminal size, and possibly redraw themselves.
+
+<p>In the olden days, this all worked fine. With the invention of shells with job control, though, shells started putting each pipeline in its own process group. (Note that from the shell grammar point of view, a pipeline may just be a simple command with no actual piping.) So the kernel sends the SIGWINCH to the foreground process group, as it always has, but now the shell is oblivious to this because it's in a different process group. Luckily, there's an ioctl(2) to read the window size, and if checkwinsize is set, Bash uses this to ask the kernel about the current window size whenever it regains control of the terminal.
+
+<!-- ---------------------------------------------------- -->
+
 <h2>Why am I having problems with terminfo/curses?</h2>
 
 <p>Terminator has its own terminfo file. This is regrettably necessary because of Terminator's unconventional approach to handling wide lines with a horizontal scrollbar rather than by wrapping them. The file will be installed under <tt>~/.terminfo</tt> the first time you run Terminator. If you used an installer that runs as root and can write to the system-wide terminfo directory (currently just the Linux installer), the terminfo file will be installed system-wide at install time.
