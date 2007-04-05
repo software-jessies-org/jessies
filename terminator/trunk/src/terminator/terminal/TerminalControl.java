@@ -310,6 +310,11 @@ public class TerminalControl {
 		logWriter.append(buffer, size, sawNewline);
 		flushLineBuffer();
 		flushTerminalActions();
+		
+		if (pane.isShowing() == false) {
+			pane.getOutputSpinner().setVisible(true);
+			pane.getOutputSpinner().animateOneFrame();
+		}
 	}
 	
 	private synchronized void flushTerminalActions() {
@@ -415,19 +420,18 @@ public class TerminalControl {
 	}
 	
 	private synchronized void flushLineBuffer() {
+		if (lineBuffer.length() == 0) {
+			// Nothing to flush!
+			return;
+		}
+		
 		final String line = lineBuffer.toString();
 		lineBuffer = new StringBuilder();
 		
-		// Conform to the stated claim that the listener's always called in the AWT dispatch thread.
-		if (line.length() > 0) {
-			doStep();
-			terminalActions.add(new PlainTextAction(line));
-		}
+		doStep();
 		
-		if (pane.isShowing() == false) {
-			pane.getOutputSpinner().setVisible(true);
-			pane.getOutputSpinner().animateOneFrame();
-		}
+		// Conform to the stated claim that the listener's always called in the AWT dispatch thread.
+		terminalActions.add(new PlainTextAction(line));
 	}
 	
 	public synchronized void processSpecialCharacter(final char ch) {
