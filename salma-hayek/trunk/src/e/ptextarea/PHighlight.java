@@ -23,8 +23,9 @@ public abstract class PHighlight {
         }
         start = new HighlightAnchor(startIndex);
         end = new HighlightAnchor(endIndex);
-        textArea.getAnchorSet().add(start);
-        textArea.getAnchorSet().add(end);
+        PAnchorSet anchorSet = textArea.getTextBuffer().getAnchorSet();
+        anchorSet.add(start);
+        anchorSet.add(end);
     }
     
     public int getStartIndex() {
@@ -40,8 +41,9 @@ public abstract class PHighlight {
      * This *must* be called in order that the highlight is properly cleared up.
      */
     public void detachAnchors() {
-        textArea.getAnchorSet().remove(start);
-        textArea.getAnchorSet().remove(end);
+        PAnchorSet anchorSet = textArea.getTextBuffer().getAnchorSet();
+        anchorSet.remove(start);
+        anchorSet.remove(end);
     }
     
     public void paint(Graphics2D g) {
