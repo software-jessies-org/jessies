@@ -266,10 +266,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	}
 	
 	/**
-	 * Copies the selected text to X11's selection (behaving like X terminals)
-	 * and Windows's clipboard (behaving like PuTTY).
-	 * Does nothing on Mac OS X (meaning that the menu showing "info"
-	 * about the selection presumably doesn't work there)..
+	 * Copies the selected text to X11's selection (like XTerm and friends) or Windows's clipboard (like PuTTY).
 	 */
 	private void selectionChanged() {
 		if (e.util.GuiUtilities.isWindows()) {
