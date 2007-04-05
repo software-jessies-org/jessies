@@ -636,7 +636,9 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		private void addInfoItems(Collection<Action> actions) {
-			String selectedText = getSelectedText();
+			// Mac OS doesn't have an X11-like system-wide selection, so we just grab our own selected text directly.
+			// Windows can be treated like either here because we're deliberately making it pretend to be retarded, to be like PuTTY.
+			String selectedText = GuiUtilities.isMacOs() ? getSelectionHighlighter().getTabbedString() : getSystemSelection();
 			addSelectionInfoItems(actions, selectedText);
 			addNumberInfoItems(actions, selectedText);
 		}
@@ -691,7 +693,7 @@ public class JTerminalPane extends JPanel {
 		}
 	}
 	
-	private String getSelectedText() {
+	private String getSystemSelection() {
 		String result = "";
 		try {
 			Clipboard selection = getToolkit().getSystemSelection();
