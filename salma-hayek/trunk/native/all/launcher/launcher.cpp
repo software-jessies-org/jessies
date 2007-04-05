@@ -121,6 +121,13 @@ public:
       os << std::endl;
       return true;
     }
+    static const char* endLimit = getenv("ORG_JESSIES_LAUNCHER_JVM_LIMIT");
+    if (endLimit != 0 && version >= endLimit) {
+      os << version;
+      os << " is too new";
+      os << std::endl;
+      return true;
+    }
     return false;
   }
   
