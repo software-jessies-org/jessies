@@ -30,12 +30,26 @@ public class PAnchorSet implements PTextListener {
         }
     }
     
+    /**
+     * Used as an argument to binarySearch.
+     */
+    private static class UnownedAnchor extends PAnchor {
+        public UnownedAnchor(int index) {
+            super(index);
+        }
+        
+        // We don't add this to the anchor set, so it's never removed, so no-one needs to be notified of anything.
+        @Override
+        public void anchorDestroyed() {
+        }
+    }
+    
     // Returns the first position where an anchor for the textIndex could be inserted
     // without violating the ordering.
     // This is what the STL calls "lower_bound".
     private int getFirstAnchorIndex(int textIndex) {
 //        checkLinearity();    // Comment this out to improve speed, but remove warnings when our state goes wrong.
-        int index = Collections.binarySearch(anchors, new PAnchor(textIndex));
+        int index = Collections.binarySearch(anchors, new UnownedAnchor(textIndex));
         if (index < 0) {
             return -index - 1;
         } else {
@@ -111,7 +125,7 @@ public class PAnchorSet implements PTextListener {
         // that one extreme of the highlight will drift when changes are made to
         // the preceding text, and the other will be stably attached.
         for (PAnchor anchor : anchorsToRemove) {
-            anchor.delete();
+            anchor.anchorDestroyed();
         }
         // We must recalculate the first anchor index, because the one we calculated
         // before could be wrong if an anchor's deletion caused the deletion of another.
@@ -130,7 +144,7 @@ public class PAnchorSet implements PTextListener {
         for (int i = 0; i < anchors.size(); i++) {
             PAnchor anchor = get(i);
             if (anchor != null) {
-                anchor.delete();
+                anchor.anchorDestroyed();
             }
         }
         anchors.clear();

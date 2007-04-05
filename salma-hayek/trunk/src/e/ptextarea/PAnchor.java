@@ -12,7 +12,7 @@ package e.ptextarea;
  * @author Phil Norman
  */
 
-public class PAnchor implements Comparable<PAnchor> {
+public abstract class PAnchor implements Comparable<PAnchor> {
     private int index;
     
     public PAnchor(int index) {
@@ -34,7 +34,7 @@ public class PAnchor implements Comparable<PAnchor> {
      * has been deleted.  This is used by the PAnchor sub-class in PHighlight to ensure that
      * the entire highlight is destroyed if one of its anchors goes away.
      */
-    public void delete() { }
+    public abstract void anchorDestroyed();
     
     @Override
     public int hashCode() {
