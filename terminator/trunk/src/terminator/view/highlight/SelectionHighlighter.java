@@ -250,7 +250,11 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	 * Copies the selected text to X11's selection.
 	 * Does nothing on other platforms.
 	 */
-	public void copyToSystemSelection() {
+	public void updateSystemSelection() {
+		if (highlight == null) {
+			// Almost all X11 applications leave the selection alone in this case.
+			return;
+		}
 		Clipboard systemSelection = view.getToolkit().getSystemSelection();
 		if (systemSelection != null) {
 			systemSelection.setContents(new LazyStringSelection() {
@@ -271,7 +275,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		if (e.util.GuiUtilities.isWindows()) {
 			copyToSystemClipboard();
 		} else {
-			copyToSystemSelection();
+			updateSystemSelection();
 		}
 	}
 	
