@@ -27,6 +27,7 @@ public class JAsynchronousProgressIndicator extends JComponent {
     private static Color[] colors;
     private Timer timer;
     private int currentBar = 0;
+    private boolean painted = true;
     private boolean isDisplayedWhenStopped = false;
     
     private int currentValue = 0;
@@ -41,7 +42,7 @@ public class JAsynchronousProgressIndicator extends JComponent {
     
     public void paintComponent(Graphics oldGraphics) {
         Graphics2D g = (Graphics2D) oldGraphics;
-        if (isDisplayedWhenStopped || timer.isRunning()) {
+        if (painted && (isDisplayedWhenStopped || timer.isRunning())) {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             if (maxValue != 0) {
                 paintPie(g);
@@ -115,6 +116,16 @@ public class JAsynchronousProgressIndicator extends JComponent {
     public void setDisplayedWhenStopped(boolean newState) {
         if (isDisplayedWhenStopped != newState) {
             isDisplayedWhenStopped = newState;
+            repaint();
+        }
+    }
+    
+    /**
+     * Sometimes the resizing caused by setVisible is annoying, and you'd just like the component not to paint itself.
+     */
+    public void setPainted(boolean newState) {
+        if (painted != newState) {
+            painted = newState;
             repaint();
         }
     }
