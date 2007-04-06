@@ -388,8 +388,8 @@ public class TerminalControl {
 			lineBuffer.append(ch);
 		}
 	}
-
-	private class PlainTextAction implements TerminalAction {
+	
+	private static class PlainTextAction implements TerminalAction {
 		private String line;
 		
 		private PlainTextAction(String line) {
