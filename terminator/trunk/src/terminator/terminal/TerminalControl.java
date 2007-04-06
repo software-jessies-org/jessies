@@ -312,7 +312,7 @@ public class TerminalControl {
 		flushTerminalActions();
 		
 		if (pane.isShowing() == false) {
-			pane.getOutputSpinner().setVisible(true);
+			pane.getOutputSpinner().setPainted(true);
 			pane.getOutputSpinner().animateOneFrame();
 		}
 	}
