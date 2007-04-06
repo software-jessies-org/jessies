@@ -108,7 +108,7 @@ public class TerminatorTabbedPane extends JTabbedPane {
         int index = getSelectedIndex();
         if (index != -1) {
             JTerminalPane visibleTerminal = (JTerminalPane) getComponentAt(index);
-            visibleTerminal.getOutputSpinner().setVisible(false);
+            visibleTerminal.getOutputSpinner().setPainted(false);
         }
     }
     
