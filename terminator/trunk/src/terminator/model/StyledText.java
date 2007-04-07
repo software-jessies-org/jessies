@@ -55,11 +55,11 @@ public class StyledText {
 		return style;
 	}
 	
-	public static Color getForegroundColor(int style) {
+	private static Color getForegroundColor(int style) {
 		return getColor(style, getForeground(style), isBold(style), true);
 	}
 	
-	public static Color getBackgroundColor(int style) {
+	private static Color getBackgroundColor(int style) {
 		return getColor(style, getBackground(style), false, false);  // Background is never considered to be bold.
 	}
 	
