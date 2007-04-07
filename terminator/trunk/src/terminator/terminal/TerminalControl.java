@@ -325,7 +325,7 @@ public class TerminalControl {
 		final TerminalAction[] actions = terminalActions.toArray(new TerminalAction[terminalActions.size()]);
 		terminalActions.clear();
 		try {
-			EventQueue.invokeAndWait(new Runnable() {
+			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					listener.processActions(actions);
 				}
