@@ -96,6 +96,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 				setCursor(cursor);
 			}
 		});
+		addMouseWheelListener(HorizontalScrollWheelListener.INSTANCE);
 		addHighlighter(new FindHighlighter());
 		becomeDropTarget();
 		cursorBlinker = new CursorBlinker(this);
@@ -842,7 +843,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		if (orientation == SwingConstants.VERTICAL) {
 			return visibleRectangle.height / 10;
 		} else {
-			return visibleRectangle.width / 10;
+			return 3 * getCharUnitSize().width;
 		}
 	}
 	
