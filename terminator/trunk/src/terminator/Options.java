@@ -321,13 +321,9 @@ public class Options {
 				} else if (value instanceof Font) {
 					generalPanel.addRow(description + ":", new FontPreference(key).makeUi());
 				} else if (value instanceof Color) {
-					if (description.startsWith("Color ")) {
-						// Ignore the numbered colors. No-one should be modifying those.
-					} else {
-						ColorPreference colorPreference = new ColorPreference(key);
-						colorPreferences.put(key, colorPreference);
-						colorsPanel.addRow(description + ":", colorPreference.makeUi());
-					}
+					ColorPreference colorPreference = new ColorPreference(key);
+					colorPreferences.put(key, colorPreference);
+					colorsPanel.addRow(description + ":", colorPreference.makeUi());
 				} else {
 					// FIXME: we should probably handle String.
 					// FIXME: the Final Solution should use a HashMap<Class, XPreference>.
@@ -571,27 +567,6 @@ public class Options {
 	 * blue, magenta, cyan, and white).
 	 */
 	private void initDefaultColors() {
-		// Normal intensity colors 0-7.
-		addDefault("color0", colorFromString("#000000"), "Color 0: black");
-		addDefault("color1", colorFromString("#cd0000"), "Color 1: red3");
-		addDefault("color2", colorFromString("#00cd00"), "Color 2: green3");
-		addDefault("color3", colorFromString("#cdcd00"), "Color 3: yellow3");
-		addDefault("color4", colorFromString("#0000ee"), "Color 4: blue2");
-		addDefault("color5", colorFromString("#cd00cd"), "Color 5: magenta3");
-		addDefault("color6", colorFromString("#00cdcd"), "Color 6: cyan3");
-		addDefault("color7", colorFromString("#e5e5e5"), "Color 7: grey90");
-		
-		// Bold variants of colors 0-7.
-		// There are xterm-16color and rxvt-16color variants, but I've not seen them used, and don't know of anything that would take advantage of the extra colors (which would require a significantly more complicated terminfo, and support for extra sequences).
-		addDefault("color8", colorFromString("#7f7f7f"), "Color 8: gray50");
-		addDefault("color9", colorFromString("#ff0000"), "Color 9: red");
-		addDefault("color10", colorFromString("#00ff00"), "Color 10: green");
-		addDefault("color11", colorFromString("#ffff00"), "Color 11: yellow");
-		addDefault("color12", colorFromString("#5c5cff"), "Color 12: rgb:5c/5c/ff");
-		addDefault("color13", colorFromString("#ff00ff"), "Color 13: magenta");
-		addDefault("color14", colorFromString("#00ffff"), "Color 14: cyan");
-		addDefault("color15", colorFromString("#ffffff"), "Color 15: white");
-		
 		// Defaults reminiscent of SGI's xwsh(1).
 		addDefault("background", VERY_DARK_BLUE, "Background color");
 		addDefault("cursorColor", Color.GREEN, "Cursor color");
@@ -611,9 +586,9 @@ public class Options {
 		
 		// If the color is one of the "standard" colors, use the usual bold variant.
 		for (int i = 0; i < 8; ++i) {
-			Color color = getColor("color" + i);
+			Color color = AnsiColor.byIndex(i);
 			if (foreground.equals(color)) {
-				colorBD = getColor("color" + (i + 8));
+				colorBD = AnsiColor.byIndex(i + 8);
 				break;
 			}
 		}

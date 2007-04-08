@@ -66,19 +66,18 @@ public class StyledText {
 	private static Color getColor(int style, int colorIndex, boolean isBold, boolean isForeground) {
 		boolean hasSpecifiedColor = (isForeground ? hasForeground(style) : hasBackground(style));
 		Color result = null;
-		Options options = Options.getSharedInstance();
 		if (isBold && isForeground) {
 			if (hasSpecifiedColor == false && isForeground) {
-				result = options.getColor("colorBD");
+				result = Options.getSharedInstance().getColor("colorBD");
 			} else if (colorIndex < 8) {
-				result = options.getColor("color" + (colorIndex + 8));
+				result = AnsiColor.byIndex(colorIndex + 8);
 			}
 		}
 		if (result == null && hasSpecifiedColor == false) {
-			result = options.getColor(isForeground ? "foreground" : "background");
+			result = Options.getSharedInstance().getColor(isForeground ? "foreground" : "background");
 		}
 		if (result == null) {
-			result = options.getColor("color" + colorIndex);
+			result = AnsiColor.byIndex(colorIndex);
 		}
 		return result;
 	}
