@@ -147,22 +147,11 @@ public class TextLine {
 		insertTextAt(offset, getTabString(tabLength), style);
 	}
 	
-	public void writeTabAt(int offset, int tabLength, short style) {
-		writeTextAt(offset, getTabString(tabLength), style);
-		// If we've partially overwritten an existing tab, replace the first TAB_CONTINUE
-		// character of the existing tab with a TAB_START, so we end up with two tabs,
-		// the second slightly shorter than it was, rather than one long tab.
-		int indexAfterTab = offset + tabLength;
-		if (text.length() > indexAfterTab && text.charAt(indexAfterTab) == TAB_CONTINUE) {
-			text = text.substring(0, indexAfterTab) + TAB_START + text.substring(indexAfterTab + 1);
-		}
-	}
-	
 	private static String getTabString(int tabLength) {
-		char[] spaces = new char[tabLength];
-		spaces[0] = TAB_START;
-		Arrays.fill(spaces, 1, spaces.length, TAB_CONTINUE);
-		return new String(spaces);
+		char[] tab = new char[tabLength];
+		tab[0] = TAB_START;
+		Arrays.fill(tab, 1, tab.length, TAB_CONTINUE);
+		return new String(tab);
 	}
 	
 	/** Inserts text at the given position, moving anything already there further to the right. */
