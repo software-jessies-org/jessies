@@ -257,18 +257,6 @@ public class TextBuffer {
 		return getStartIndex(lastIndex) + getLineLength(lastIndex);
 	}
 	
-	public CharSequence getCharSequence() {
-		return getCharSequence(0, length());
-	}
-	
-	public CharSequence getCharSequence(Location start, Location end) {
-		return getCharSequence(getCharIndexFromLocation(start), getCharIndexFromLocation(end));
-	}
-	
-	public CharSequence getCharSequence(int startIndex, int endIndex) {
-		return new Sequence(startIndex, endIndex);
-	}
-	
 	private void lineIsDirty(int dirtyLineIndex) {
 		lastValidStartIndex = Math.min(lastValidStartIndex, dirtyLineIndex + 1);
 	}
@@ -623,51 +611,5 @@ public class TextBuffer {
 	public void setWindowTitle(String newWindowTitle) {
 		JTerminalPane terminalPane = (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, view);
 		terminalPane.setName(newWindowTitle);
-	}
-	
-	public class Sequence implements CharSequence {
-		private int start;
-		private int end;
-		
-		public Sequence(int start, int end) {
-			this.start = start;
-			this.end = end;
-		}
-		
-		public char charAt(int index) {
-			Location loc = getLocationFromCharIndex(start + index);
-			String line = getTextLine(loc.getLineIndex()).getString();
-			if (line.length() > loc.getCharOffset()) {
-				return line.charAt(loc.getCharOffset());
-			} else {
-				return '\n';  // The only case of a character indexable but not appearing in the string.
-			}
-		}
-		
-		public int length() {
-			return end - start;
-		}
-		
-		public CharSequence subSequence(int subStart, int subEnd) {
-			return new Sequence(start + subStart, start + subEnd);
-		}
-		
-		public String toString() {
-			StringBuilder buf = new StringBuilder(length());
-			Location loc = getLocationFromCharIndex(start);
-			int charsLeft = end - start;
-			while (charsLeft > 0) {
-				TextLine line = getTextLine(loc.getLineIndex());
-				String str = line.getString() + '\n';
-				str = str.substring(loc.getCharOffset());
-				if (charsLeft < str.length()) {
-					str = str.substring(0, charsLeft);
-				}
-				buf.append(str);
-				charsLeft -= str.length();
-				loc = new Location(loc.getLineIndex() + 1, 0);
-			}
-			return buf.toString();
-		}
 	}
 }
