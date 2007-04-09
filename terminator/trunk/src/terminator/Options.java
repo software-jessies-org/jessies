@@ -338,7 +338,7 @@ public class Options {
 		colorsPanel.addRow("Presets:", makePresetButton(colorPreferences, "  Terminator  ", VERY_DARK_BLUE, NEAR_WHITE, Color.GREEN, SELECTION_BLUE));
 		colorsPanel.addRow("", makePresetButton(colorPreferences, "Black on White", Color.WHITE, NEAR_BLACK, Color.BLUE, LIGHT_BLUE));
 		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, Color.GREEN, Color.GREEN, SELECTION_BLUE));
-		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, SELECTION_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, Color.DARK_GRAY));
 		
 		// Save the preferences if the user hits "Save".
 		form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
