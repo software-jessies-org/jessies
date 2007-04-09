@@ -120,7 +120,7 @@ public class SolarProjector {
                     widths[(yDots - 1) - ilat] = (short) (ilon == 0 ? 1 : ilon);
                 } else {
                     double m = ((double) (ilon - lilon)) / (ilat - lilat);
-                    for (int i = lilat; i != ilat; i += sign(ilat - lilat)) {
+                    for (int i = lilat; i != ilat; i += Math.signum(ilat - lilat)) {
                         int xt = lilon + (int) Math.floor((m * (i - lilat)) + 0.5);
                         widths[(yDots - 1) - i] = (short) (xt == 0 ? 1 : xt);
                     }
@@ -284,10 +284,6 @@ public class SolarProjector {
      */
     private double jtime(Calendar c) {
         return (jdate(c) - 0.5) + ((long) c.get(Calendar.SECOND) + 60L * (c.get(Calendar.MINUTE) + 60L * c.get(Calendar.HOUR_OF_DAY))) / 86400.0;
-    }
-    
-    private static int sign(double x) {
-        return (x < 0) ? -1 : (x > 0 ? 1 : 0);
     }
     
     private static double fixangle(double a) {
