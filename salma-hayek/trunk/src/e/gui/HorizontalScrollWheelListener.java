@@ -32,8 +32,13 @@ public class HorizontalScrollWheelListener implements MouseWheelListener {
             
             int direction = Integer.signum(e.getWheelRotation());
             if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-                //BasicScrollBarUI.scrollByUnits(scrollBar, direction, units, limitScroll);
-                invokeBasicScrollBarUIMethod("scrollByUnits", new Class[] { JScrollBar.class, int.class, int.class, boolean.class }, scrollBar, direction, Math.abs(e.getUnitsToScroll()), (Math.abs(e.getWheelRotation()) == 1));
+                // Java 5: BasicScrollBarUI.scrollByUnits(scrollBar, direction, units);
+                // Java 6: BasicScrollBarUI.scrollByUnits(scrollBar, direction, units, limitScroll);
+                if (System.getProperty("java.vm.version").startsWith("1.5.")) {
+                    invokeBasicScrollBarUIMethod("scrollByUnits", new Class[] { JScrollBar.class, int.class, int.class }, scrollBar, direction, Math.abs(e.getUnitsToScroll()));
+                } else {
+                    invokeBasicScrollBarUIMethod("scrollByUnits", new Class[] { JScrollBar.class, int.class, int.class, boolean.class }, scrollBar, direction, Math.abs(e.getUnitsToScroll()), (Math.abs(e.getWheelRotation()) == 1));
+                }
             } else if (e.getScrollType() == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
                 //BasicScrollBarUI.scrollByBlock(scrollBar, direction);
                 invokeBasicScrollBarUIMethod("scrollByBlock", new Class[] { JScrollBar.class, int.class }, scrollBar, direction);
