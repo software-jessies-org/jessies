@@ -1,10 +1,10 @@
 #!/usr/bin/ruby -w
 
-require "fileutils.rb"
-require "pathname.rb"
-
 class Terminator
     def initialize()
+        require "fileutils.rb"
+        require "pathname.rb"
+        
         # Cope with symbolic links to this script.
         @terminator_home = Pathname.new(__FILE__).realpath().dirname().dirname()
         @salma_hayek = Pathname.new("#{@terminator_home}/../salma-hayek").realpath()
@@ -213,5 +213,4 @@ class Terminator
     end
 end
 
-terminator = Terminator.new()
-terminator.launch()
+Terminator.new().launch()
