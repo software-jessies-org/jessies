@@ -25,5 +25,5 @@
 # The resulting cron job is actually longer than the non-comment part of this file:
 # 20 09 * * * cat /Projects/salma-hayek/bin/mdorey.sh | bash --login
 
-~/Projects/salma-hayek/bin/nightly-build.rb ~martind/Projects/ clean
-~/Projects/salma-hayek/bin/nightly-build.rb ~martind/Projects/ native-dist
+/Projects/salma-hayek/bin/nightly-build.rb /Projects/ clean
+/Projects/salma-hayek/bin/nightly-build.rb /Projects/ native-dist
