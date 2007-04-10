@@ -1,65 +1,77 @@
 #!/usr/bin/ruby -w
 
-require "fileutils.rb"
-require "pathname.rb"
-
-# Cope with symbolic links to this script.
-project_root = Pathname.new(__FILE__).realpath().dirname().dirname()
-salma_hayek = Pathname.new("#{project_root}/../salma-hayek").realpath()
-require "#{salma_hayek}/bin/target-os.rb"
-require "#{salma_hayek}/bin/invoke-java.rb"
-
-HOME = ENV["HOME"]
-
-ENV["EDIT_HOME"] = project_root
-
-TARGET_OS = target_os()
-
-edit_class_name = "e.edit.Evergreen"
-
-shouldBlock = false
-if ARGV[0] == "--block"
-  ARGV.shift
-  shouldBlock = true
+class Evergreen
+    def initialize()
+        require "fileutils.rb"
+        require "pathname.rb"
+        
+        # Cope with symbolic links to this script.
+        @project_root = Pathname.new(__FILE__).realpath().dirname().dirname()
+        @salma_hayek = Pathname.new("#{@project_root}/../salma-hayek").realpath()
+        require "#{@salma_hayek}/bin/invoke-java.rb"
+        require "#{@salma_hayek}/bin/target-os.rb"
+        require "#{@salma_hayek}/bin/show-alert.rb"
+    end
+    
+    def launch()
+        begin
+            launch0()
+        rescue Exception => e
+            show_uncaught_exception(e)
+        end
+    end
+    
+    def launch0()
+        home = ENV["HOME"]
+        
+        ENV["EDIT_HOME"] = @project_root
+        
+        shouldBlock = false
+        if ARGV[0] == "--block"
+            ARGV.shift()
+            shouldBlock = true
+        end
+        
+        # Translate vi line number specifications.
+        if ARGV[0] =~ /^\+(\d+)$/
+            ARGV.shift()
+            ARGV[0] = "#{ARGV[0]}:#$1"
+        end
+        
+        edit_preferences_directory = "#{home}/.e.edit.Edit"
+        if target_os() == "Darwin"
+            edit_preferences_directory = "#{home}/Library/Preferences/e.edit.Edit"
+        end
+        
+        if FileTest.directory?(edit_preferences_directory) == false
+            puts("Evergreen: Couldn't find preferences directory '#{edit_preferences_directory}.")
+            puts("Evergreen: Creating preferences directory '#{edit_preferences_directory}'.")
+            FileUtils.mkdir_p(edit_preferences_directory)
+        end
+        if FileTest.exists?("#{edit_preferences_directory}/edit.properties") == false
+            puts("Evergreen: Copying default preferences.")
+            FileUtils.cp("#{@project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
+            FileUtils.cp("#{@project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
+            puts("Evergreen: Away you go!")
+        end
+        
+        serverPortPathname = Pathname.new(edit_preferences_directory) + "edit-server-port"
+        # InAppClient's constructor stops anyone else from reading the .secret file.
+        client = InAppClient.new(serverPortPathname)
+        filename = ARGV[0]
+        if filename != nil && client.trySendCommand("#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}")
+            exit(0)
+        end
+        
+        if filename != nil
+            ARGV.push(filename)
+        end
+        
+        invoker = Java.new("Evergreen", "e/util/Launcher")
+        invoker.log_filename = "/tmp/edit.log.#$$"
+        invoker.add_pathname_property("preferencesDirectory", edit_preferences_directory)
+        invoker.invoke([ "Evergreen", "e.edit.EvergreenLaunchable" ])
+    end
 end
 
-# Translate vi/gvim line number specifications.
-if ARGV[0] =~ /^\+(\d+)$/
-  ARGV.shift
-  ARGV[0] = "#{ARGV[0]}:#$1"
-end
-
-edit_preferences_directory = "#{HOME}/.e.edit.Edit"
-if target_os() == "Darwin"
-  # Darwin is what Mac OS X calls itself.
-  edit_preferences_directory = "#{ENV["HOME"]}/Library/Preferences/e.edit.Edit"
-end
-
-if FileTest.directory?(edit_preferences_directory) == false
-  puts("Evergreen: Couldn't find preferences directory '#{edit_preferences_directory}.")
-  puts("Evergreen: Creating preferences directory '#{edit_preferences_directory}'.")
-  FileUtils.mkdir_p(edit_preferences_directory)
-end
-if FileTest.exists?("#{edit_preferences_directory}/edit.properties") == false
-  puts("Evergreen: Copying default preferences.")
-  FileUtils.cp("#{project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
-  FileUtils.cp("#{project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
-  puts("Evergreen: Away you go!")
-end
-
-serverPortPathname = Pathname.new(edit_preferences_directory) + "edit-server-port"
-# InAppClient's constructor stops anyone else from reading the .secret file.
-client = InAppClient.new(serverPortPathname)
-filename = ARGV[0]
-if filename != nil && client.trySendCommand("#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}")
-  exit(0)
-end
-
-if filename != nil
-  ARGV.push(filename)
-end
-
-invoker = Java.new("Evergreen", "e/util/Launcher")
-invoker.log_filename = "/tmp/edit.log.#$$"
-invoker.add_pathname_property("preferencesDirectory", edit_preferences_directory)
-invoker.invoke([ "Evergreen", "#{edit_class_name}Launchable" ])
+Evergreen.new().launch()
