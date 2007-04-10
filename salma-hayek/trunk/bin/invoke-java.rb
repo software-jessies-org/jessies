@@ -275,14 +275,7 @@ class Java
     begin
       invoke0(extra_app_arguments)
     rescue Exception => e
-      # Based on the idea in http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/21530
-      # FIXME: really, we want this to guard the whole of each startup script. For the simple ones, this is a good approximation.
-      prefix = "\tat "
-      message = "An error occurred while starting #{@dock_name}:\n"
-      message << "\n"
-      message << "Exception #{e.class}: #{e.message}\n"
-      message << "#{prefix}" << e.backtrace.join("\n#{prefix}")
-      show_alert("Unhandled exception", message)
+      show_uncaught_exception(e)
     end
   end
   
