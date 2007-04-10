@@ -3,208 +3,215 @@
 require "fileutils.rb"
 require "pathname.rb"
 
-# Cope with symbolic links to this script.
-terminator_home = Pathname.new(__FILE__).realpath().dirname().dirname()
-salma_hayek = Pathname.new("#{terminator_home}/../salma-hayek").realpath()
-
-require "#{salma_hayek}/bin/target-os.rb"
-require "#{salma_hayek}/bin/invoke-java.rb"
-require "#{salma_hayek}/bin/which.rb"
-
-def make_directory(pathname, make_safe)
-  begin
-    if test(?d, pathname) == false
-      FileUtils.rm_f(pathname)
-      Dir.mkdir(pathname)
+class Terminator
+    def initialize()
+        # Cope with symbolic links to this script.
+        @terminator_home = Pathname.new(__FILE__).realpath().dirname().dirname()
+        @salma_hayek = Pathname.new("#{@terminator_home}/../salma-hayek").realpath()
+        
+        require "#{@salma_hayek}/bin/invoke-java.rb"
+        require "#{@salma_hayek}/bin/show-alert.rb"
+        require "#{@salma_hayek}/bin/target-os.rb"
+        require "#{@salma_hayek}/bin/which.rb"
     end
-    if make_safe
-      if File.stat(pathname).mode != 0700
-        FileUtils.chmod(0700, pathname)
-      end
+    
+    def launch()
+        begin
+            launch0()
+        rescue Exception => e
+            show_uncaught_exception(e)
+        end
     end
-  rescue SystemCallError
-    # FIXME: if the directory exists but is known to be unsafe, or we fail to make it safe, we should at least warn the user.
-  end
-end
-
-# Make sure we have a directory for Terminator's private files and another for the logs.
-dot_directory = "#{ENV['HOME']}/.terminator"
-log_directory = File.join(dot_directory, "logs")
-make_directory(dot_directory, true)
-make_directory(log_directory, false)
-options_pathname = File.join(dot_directory, "options")
-
-def tryInAppServer(salma_hayek, serverPortPathname)
-  # InAppClient's constructor stops anyone else from reading the .secret file.
-  client = InAppClient.new(serverPortPathname)
-  if ENV["DEBUGGING_TERMINATOR"]
-    return
-  end
-  # We should start a new Terminator if the client (this script) is newer than
-  # the server (the currently-running Terminator). Checking just the
-  # modification time of just the script is only an approximation, but it's
-  # close enough for users who'll install all the files at once anyway.
-  if FileUtils.uptodate?(serverPortPathname, [__FILE__]) == false
-    return
-  end
-  # We only support the simple "new shell" case. Allowing the execution of
-  # arbitrary commands would be a security hole. This is, as explained below,
-  # simply a performance optimization.
-  # This also stops existing terminals from having their options changed when
-  # someone starts a new terminal.
-  # It should also mean that my "runtitan" commands always block, like an xterm
-  # would, rather than sometimes exiting immediately.
-  workingDirectory = Dir.getwd()
-  if ARGV.empty?() == false && ARGV[0] == "--working-directory"
-    ARGV.shift()
-    workingDirectory = ARGV.shift()
-  end
-  if ARGV.empty?() == false
-    return
-  end
-  # See if there's already a Terminator running that can open us a new window.
-  # This lets us emulate the Mac OS behavior when clicking on the Dock icon
-  # on Linux (from gnome-panel or whatever). In particular, using this trick
-  # we can open a new window quicker than xterm(1), from the user's point of
-  # view.
-  
-  # If you use Terminator on two machines, you don't want new terminals
-  # to appear arbitrarily on one of them.
-  # (If you call the evergreen script on two machines, by contrast, you are likely
-  # to want the files to be opened on just one machine.)
-  # Terminator's InAppServer only listens on the loopback address.
-  # If the host running Terminator isn't the same as localhost,
-  # then we are unlikely to be able to make a connection
-  # and should fall back to the unoptimized code path.
-  client.overrideHost("localhost")
-  if client.trySendCommand("newShell #{workingDirectory}") == false
-    return
-  end
-
-  # Job done, so finish any GNOME startup notification and exit.
-  # We need to do this here because the normal-case code when the existing Terminator opens a new window won't have the right DESKTOP_STARTUP_ID.
-  desktop_startup_id = ENV['DESKTOP_STARTUP_ID']
-  if desktop_startup_id != nil
-    system("#{salma_hayek}/.generated/#{target_directory()}/bin/gnome-startup", "stop", desktop_startup_id)
-  end
-  exit(0)
-end
-
-server_port_file_stem = File.join(dot_directory, "terminator-server-port")
-# Colons have a special meaning on Windows file systems.
-display = ENV["DISPLAY"]
-display_suffix = ""
-if display != nil
-  display_suffix = display.gsub(/:/, "_")
-end
-server_port_file_name = "#{server_port_file_stem}#{display_suffix}"
-tryInAppServer(salma_hayek, server_port_file_name)
-
-launcher = "java"
-if target_os() == "Cygwin"
-  launcher = "#{salma_hayek}/.generated/#{target_directory()}/bin/launcher"
-  if ENV["DEBUGGING_TERMINATOR"] == nil
-    launcher = "#{launcher}w"
-  end
-end
-
-# rubyw.exe quits if it can't write its "Insecure world writable dir" warnings
-# to $stderr every time it uses Kernel.system or Kernel.`.
-if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
-  $stderr = File.open("/dev/null", "w")
-end
-
-def install_terminfo_in(original_file, directory)
-  terminfo_file = File.join(directory, "terminator")
-  # uptodate? doesn't return true unless the file specified by the first argument is strictly newer
-  # than all the files specified by the second argument.
-  # We copy preserving the timestamp, so we can compare compilation dates rather than a compilation date with an install date.
-  # This means the target file is never strictly newer, so we have to do the comparison backwards if we're to avoid spurious copies.
-  if FileUtils.uptodate?(original_file, [terminfo_file])
-    if ENV["DEBUGGING_TERMINATOR"]
-      puts("installing #{terminfo_file}")
+    
+    def launch0()
+        # Make sure we have a directory for Terminator's private files and another for the logs.
+        dot_directory = "#{ENV['HOME']}/.terminator"
+        log_directory = File.join(dot_directory, "logs")
+        make_directory(dot_directory, true)
+        make_directory(log_directory, false)
+        options_pathname = File.join(dot_directory, "options")
+        
+        server_port_file_stem = File.join(dot_directory, "terminator-server-port")
+        # Colons have a special meaning on Windows file systems.
+        display = ENV["DISPLAY"]
+        display_suffix = ""
+        if display != nil
+            display_suffix = display.gsub(/:/, "_")
+        end
+        server_port_file_name = "#{server_port_file_stem}#{display_suffix}"
+        tryInAppServer(server_port_file_name)
+        
+        launcher = "java"
+        if target_os() == "Cygwin"
+            launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/launcher"
+            if ENV["DEBUGGING_TERMINATOR"] == nil
+                launcher = "#{launcher}w"
+            end
+        end
+        
+        # rubyw.exe quits if it can't write its "Insecure world writable dir" warnings
+        # to $stderr every time it uses Kernel.system or Kernel.`.
+        if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
+            $stderr = File.open("/dev/null", "w")
+        end
+        
+        # terminfo installation...
+        
+        # We deliberately omit the intermediate directory.
+        compiled_terminfo = "#{@terminator_home}/.generated/terminfo/terminator"
+        
+        # Make sure our terminfo is available system-wide, if possible.
+        
+        # tic(1) might put terminfo into /etc/terminfo/ but the FHS (and hence Debian) says:
+        # "/etc: Host-specific system configuration"
+        # /usr/share/terminfo/ is where the FHS says terminfo should be (though Debian puts architecture-specific terminfo in /lib/terminfo/).
+        # Mac OS doesn't have /etc/terminfo/.
+        # FIXME: if we ever offer a Solaris package, Blastwave's ncurses library looks in /opt/csw/share/terminfo/.
+        # FIXME: since our ".deb" file will be the right place to install system-wide on Debian-based systems, and Mac OS users won't be able to write outside their home directory, we should probably stop trying to install system-wide from here when we're building ".deb" packages.
+        system_wide_terminfo = "/usr/share/terminfo/"
+        if File.writable?(system_wide_terminfo)
+            # We know what kind of system we're on, so we can put the file in the right place and not look clueless.
+            prefix = (target_os() == "Darwin") ? "74" : "t"
+            install_terminfo_in(compiled_terminfo, File.join(system_wide_terminfo, prefix))
+        end
+        
+        # Make sure our terminfo is available for the current user.
+        
+        # Use the user-defined terminfo directory, or their ~/.terminfo otherwise.
+        # We write here even if we can write to #{system_wide_terminfo} in case they can access their home directory from other machines where they can't install system-wide.
+        user_terminfo_root = ENV['TERMINFO']
+        if user_terminfo_root == nil
+            user_terminfo_root = "#{ENV['HOME']}/.terminfo"
+        end
+        # Mac OS won't look where every other OS looks; presumably a %x instead of a %c somewhere.
+        # I think they fixed it at some point, but it seems broken in 10.4 where /usr/share/terminfo/ only contains %x directories.
+        # We always write both possibilities under ~/.terminfo or $TERMINFO for the benefit of people who use Mac OS and other Unixes.
+        install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "t"))
+        install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "74"))
+        
+        selectShellIfNoDefault()
+        
+        invoker = Java.new("Terminator", "terminator/Terminator")
+        invoker.log_filename = "#{log_directory}/terminator-#{$$}.log"
+        invoker.launcher = launcher
+        # The "user.home" system property won't necessarily point at $HOME.
+        # We arranged above for a log directory to be available, so we need to stick to it.
+        # (We didn't used to be able to getenv("HOME") from Java on Cygwin.)
+        invoker.add_pathname_property("org.jessies.terminator.dotDirectory", dot_directory)
+        invoker.add_pathname_property("org.jessies.terminator.logDirectory", log_directory)
+        invoker.add_pathname_property("org.jessies.terminator.serverPortFileName", server_port_file_name)
+        invoker.add_pathname_property("org.jessies.terminator.optionsFile", options_pathname)
+        
+        # Ruby knows the mapping from signal number to signal name, but Java doesn't and POSIX doesn't either.
+        # So pass the information along to Java in a way that won't leak through to our children.
+        Signal.list().each() {
+            | signal_name, signal_number |
+            invoker.add_property("org.jessies.terminator.signal.#{signal_number}", "SIG#{signal_name}")
+        }
+        
+        invoker.invoke()
     end
-    if File.exist?(terminfo_file) == false
-      FileUtils.mkdir_p(directory)
+    
+    def make_directory(pathname, make_safe)
+        begin
+            if test(?d, pathname) == false
+                FileUtils.rm_f(pathname)
+                Dir.mkdir(pathname)
+            end
+            if make_safe
+                if File.stat(pathname).mode != 0700
+                    FileUtils.chmod(0700, pathname)
+                end
+            end
+        rescue SystemCallError
+            # FIXME: if the directory exists but is known to be unsafe, or we fail to make it safe, we should at least warn the user.
+        end
     end
-    FileUtils.cp(original_file, terminfo_file, :preserve => true)
-  end
-end
-
-# terminfo installation...
-
-# We deliberately omit the intermediate directory.
-compiled_terminfo = "#{terminator_home}/.generated/terminfo/terminator"
-
-# Make sure our terminfo is available system-wide, if possible.
-
-# tic(1) might put terminfo into /etc/terminfo/ but the FHS (and hence Debian) says:
-# "/etc: Host-specific system configuration"
-# /usr/share/terminfo/ is where the FHS says terminfo should be (though Debian puts architecture-specific terminfo in /lib/terminfo/).
-# Mac OS doesn't have /etc/terminfo/.
-# FIXME: if we ever offer a Solaris package, Blastwave's ncurses library looks in /opt/csw/share/terminfo/.
-# FIXME: since our ".deb" file will be the right place to install system-wide on Debian-based systems, and Mac OS users won't be able to write outside their home directory, we should probably stop trying to install system-wide from here when we're building ".deb" packages.
-system_wide_terminfo = "/usr/share/terminfo/"
-if File.writable?(system_wide_terminfo)
-  # We know what kind of system we're on, so we can put the file in the right place and not look clueless.
-  prefix = (target_os() == "Darwin") ? "74" : "t"
-  install_terminfo_in(compiled_terminfo, File.join(system_wide_terminfo, prefix))
-end
-
-# Make sure our terminfo is available for the current user.
-
-# Use the user-defined terminfo directory, or their ~/.terminfo otherwise.
-# We write here even if we can write to #{system_wide_terminfo} in case they can access their home directory from other machines where they can't install system-wide.
-user_terminfo_root = ENV['TERMINFO']
-if user_terminfo_root == nil
-  user_terminfo_root = "#{ENV['HOME']}/.terminfo"
-end
-# Mac OS won't look where every other OS looks; presumably a %x instead of a %c somewhere.
-# I think they fixed it at some point, but it seems broken in 10.4 where /usr/share/terminfo/ only contains %x directories.
-# We always write both possibilities under ~/.terminfo or $TERMINFO for the benefit of people who use Mac OS and other Unixes.
-install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "t"))
-install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "74"))
-
-def selectShellIfNoDefault()
-  if ENV.include?("SHELL")
-    return
-  end
-  # cygwin.bat runs bash --login -i, which behaves differently from bash started as /bin/sh.
-  # In particular, tab completion is disabled in this "posix" mode if "vi" line editing is requested.
-  # Everyone(?) else probably has SHELL=/bin/bash already in the environment.
-  candidateShells = []
-  candidateShells << "/bin/bash"
-  # Has there ever been a Unix without a /bin/sh?
-  candidateShells << "/bin/sh"
-  candidateShells.each() {
-    |candidateShell|
-    # We can't do this test in the Java on Cygwin.
-    if File.executable?(candidateShell)
-      ENV["SHELL"] = candidateShell
-      return
+    
+    def tryInAppServer(serverPortPathname)
+        # InAppClient's constructor stops anyone else from reading the .secret file.
+        client = InAppClient.new(serverPortPathname)
+        if ENV["DEBUGGING_TERMINATOR"]
+            return
+        end
+        # We should start a new Terminator if the client (this script) is newer than the server (the currently-running Terminator).
+        # Checking just the modification time of just the script is only an approximation, but it's close enough for users who'll install all the files at once anyway.
+        if FileUtils.uptodate?(serverPortPathname, [__FILE__]) == false
+            return
+        end
+        # We only support the simple "new shell" case.
+        # Allowing the execution of arbitrary commands would be a security hole.
+        # This is, as explained below, simply a performance optimization.
+        # It also stops existing terminals from having their options changed when someone starts a new terminal.
+        # It should also mean that my "runtitan" commands always block, like an xterm would, rather than sometimes exiting immediately.
+        workingDirectory = Dir.getwd()
+        if ARGV.empty?() == false && ARGV[0] == "--working-directory"
+            ARGV.shift()
+            workingDirectory = ARGV.shift()
+        end
+        if ARGV.empty?() == false
+            return
+        end
+        # See if there's already a Terminator running that can open us a new window.
+        # This lets us emulate the Mac OS behavior when clicking on the Dock icon on Linux (from gnome-panel or whatever).
+        # In particular, using this trick we can open a new window quicker than xterm(1), from the user's point of view.
+        
+        # If you use Terminator on two machines, you don't want new terminals to appear arbitrarily on one of them.
+        # (If you call the evergreen script on two machines, by contrast, you are likely to want the files to be opened on just one machine.)
+        # Terminator's InAppServer only listens on the loopback address.
+        # If the host running Terminator isn't the same as localhost, then we are unlikely to be able to make a connection and should fall back to the unoptimized code path.
+        client.overrideHost("localhost")
+        if client.trySendCommand("newShell #{workingDirectory}") == false
+            return
+        end
+        
+        # Job done, so finish any GNOME startup notification and exit.
+        # We need to do this here because the normal-case code when the existing Terminator opens a new window won't have the right DESKTOP_STARTUP_ID.
+        desktop_startup_id = ENV['DESKTOP_STARTUP_ID']
+        if desktop_startup_id != nil
+            system("#{@salma_hayek}/.generated/#{target_directory()}/bin/gnome-startup", "stop", desktop_startup_id)
+        end
+        exit(0)
     end
-  }
+    
+    def install_terminfo_in(original_file, directory)
+        terminfo_file = File.join(directory, "terminator")
+        # uptodate? doesn't return true unless the file specified by the first argument is strictly newer
+        # than all the files specified by the second argument.
+        # We copy preserving the timestamp, so we can compare compilation dates rather than a compilation date with an install date.
+        # This means the target file is never strictly newer, so we have to do the comparison backwards if we're to avoid spurious copies.
+        if FileUtils.uptodate?(original_file, [terminfo_file])
+            if ENV["DEBUGGING_TERMINATOR"]
+                puts("installing #{terminfo_file}")
+            end
+            if File.exist?(terminfo_file) == false
+                FileUtils.mkdir_p(directory)
+            end
+            FileUtils.cp(original_file, terminfo_file, :preserve => true)
+        end
+    end
+    
+    def selectShellIfNoDefault()
+        if ENV.include?("SHELL")
+            return
+        end
+        # cygwin.bat runs bash --login -i, which behaves differently from bash started as /bin/sh.
+        # In particular, tab completion is disabled in this "posix" mode if "vi" line editing is requested.
+        # Everyone(?) else probably has SHELL=/bin/bash already in the environment.
+        candidateShells = []
+        candidateShells << "/bin/bash"
+        # Has there ever been a Unix without a /bin/sh?
+        candidateShells << "/bin/sh"
+        candidateShells.each() {
+            |candidateShell|
+            # We can't do this test in the Java on Cygwin.
+            if File.executable?(candidateShell)
+                ENV["SHELL"] = candidateShell
+                return
+            end
+        }
+    end
 end
 
-selectShellIfNoDefault()
-
-invoker = Java.new("Terminator", "terminator/Terminator")
-invoker.log_filename = "#{log_directory}/terminator-#{$$}.log"
-invoker.launcher = launcher
-# The "user.home" system property won't necessarily point at $HOME.
-# We arranged above for a log directory to be available, so we need to stick to it.
-# (We didn't used to be able to getenv("HOME") from Java on Cygwin.)
-invoker.add_pathname_property("org.jessies.terminator.dotDirectory", dot_directory)
-invoker.add_pathname_property("org.jessies.terminator.logDirectory", log_directory)
-invoker.add_pathname_property("org.jessies.terminator.serverPortFileName", server_port_file_name)
-invoker.add_pathname_property("org.jessies.terminator.optionsFile", options_pathname)
-
-# Ruby knows the mapping from signal number to signal name, but Java doesn't
-# and POSIX doesn't either. So pass the information along to Java in a way
-# that won't leak through to our children.
-Signal.list().each() {
-  | signal_name, signal_number |
-  invoker.add_property("org.jessies.terminator.signal.#{signal_number}", "SIG#{signal_name}")
-}
-
-invoker.invoke()
+terminator = Terminator.new()
+terminator.launch()
