@@ -63,6 +63,7 @@ class Evergreen
             exit(0)
         end
         
+        # FIXME: this isn't right if shouldBlock is true. We either need to pass the "shouldBlock" on to the Java side, or we need to wait until it's started up and "trySendCommand" again.
         if filename != nil
             ARGV.push(filename)
         end
