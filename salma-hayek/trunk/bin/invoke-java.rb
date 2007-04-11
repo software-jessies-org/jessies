@@ -275,7 +275,7 @@ class Java
     begin
       invoke0(extra_app_arguments)
     rescue Exception => e
-      show_uncaught_exception(e)
+      show_uncaught_exception(@dock_name, e)
     end
   end
   

@@ -43,10 +43,10 @@ else
     
     # Use this to rescue the whole of each startup script.
     # For the simple ones, the code already in "invoke-java.rb" gives you a good approximation for free.
-    def show_uncaught_exception(e)
+    def show_uncaught_exception(app_name, e)
         # Based on the idea in http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/21530
         prefix = "\tat "
-        message = "An error occurred while starting #{@dock_name}:\n"
+        message = "An error occurred while starting #{app_name}:\n"
         message << "\n"
         message << "Exception #{e.class}: #{e.message}\n"
         message << "#{prefix}" << e.backtrace.join("\n#{prefix}")
