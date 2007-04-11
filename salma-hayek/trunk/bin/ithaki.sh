@@ -32,10 +32,11 @@ rm *.deb
 # Run the latest version of the nightly build script, rather than the version from yesterday.
 # This has the advantage that the update won't overwrite the running script - which Ruby doesn't like.
 NIGHTLY_BUILD_SCRIPT=~martind/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
-$NIGHTLY_BUILD_SCRIPT ~martind/software.jessies.org/nightlies/ clean
-echo $NIGHTLY_BUILD_SCRIPT ~martind/software.jessies.org/nightlies/ native-dist | ssh wide bash --login
-$NIGHTLY_BUILD_SCRIPT ~martind/software.jessies.org/nightlies/ native-dist
-find ~martind/software.jessies.org/nightlies/ -name "*.deb" | xargs cp --target-directory=.
+NIGHTLY_BUILD_TREE=~martind/software.jessies.org/nightlies/
+$NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
+echo $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE native-dist | ssh wide bash --login
+$NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE native-dist
+find $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
 
 # If we don't have a Packages file (as well as Packages.gz) we get:
 # Failed to fetch http://deb/software.jessies.org/./Release  Unable to find expected entry  Packages in Meta-index file (malformed Release file?)
