@@ -171,7 +171,7 @@ class Terminator
         if desktop_startup_id != nil
             system("#{@salma_hayek}/.generated/#{target_directory()}/bin/gnome-startup", "stop", desktop_startup_id)
         end
-        exit(0)
+        exit!(0)
     end
     
     def install_terminfo_in(original_file, directory)
