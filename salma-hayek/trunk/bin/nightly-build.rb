@@ -3,7 +3,7 @@
 # Typical usage (in the builder's crontab):
 # echo nightly-build.rb ~/Projects clean native-dist | bash --login
 
-require "Pathname.rb"
+require "pathname.rb"
 
 # ----------------------------------------------------------------------------
 # Parse command line.
