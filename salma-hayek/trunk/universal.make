@@ -63,8 +63,8 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
         $(warning Ubunutu "Dapper Drake" has a new enough make.)
         $(warning Or try http://software.jessies.org/3rdParty/make-3.81-linux.)
     endif
-    ifeq "$(TARGET_OS)" "Solaris"
-        $(warning Try installing the Blastwave "gmake" package.)
+    ifeq "$(TARGET_OS)" "SunOS"
+        $(warning Try installing GNU make from Blastwave, with pkg-get -i gmake.)
     endif
 # The blank line separates any duplicate warning, which 3.80 seems fond of generating.
     $(warning )
@@ -807,7 +807,7 @@ run-installer.rpm:
 	@echo Installing the .rpm might be possible with sudo rpm -i $(INSTALLER.rpm) but that would be a bad idea on a Debian box...
 
 .PHONY: run-installer.dmg
-run-installer.dmg:
+run-installer.dmg: $(INSTALLER.dmg)
 	open -a DiskImageMounter $(INSTALLER.dmg)
 
 .PHONY: run-installer.msi
