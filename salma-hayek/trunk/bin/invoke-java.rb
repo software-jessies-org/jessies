@@ -170,7 +170,7 @@ class Java
         suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, show "All available applications", type "sun java" in the search field, and install "Sun Java 5.0 Runtime".'
       end
       show_alert("#{@dock_name} requires a newer version of Java.", "This application requires at least Java 5, but your #{`which java`.chomp()} claims to be #{actual_java_version} instead.\n\n#{suggestion}")
-      exit(1)
+      exit!(1)
     end
   end
 
