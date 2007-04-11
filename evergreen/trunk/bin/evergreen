@@ -17,7 +17,7 @@ class Evergreen
         begin
             launch0()
         rescue Exception => e
-            show_uncaught_exception(e)
+            show_uncaught_exception("Evergreen", e)
         end
     end
     
