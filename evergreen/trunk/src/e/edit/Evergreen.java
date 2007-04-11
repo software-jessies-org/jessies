@@ -61,7 +61,7 @@ public class Evergreen {
             Workspace initiallyVisibleWorkspace = null;
             for (InitialWorkspace initialWorkspace : initialState.initialWorkspaces) {
                 Element info = initialWorkspace.xmlWorkspace;
-                Workspace workspace = addWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"), initialWorkspace.initialFiles);
+                Workspace workspace = openWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"), initialWorkspace.initialFiles);
                 if (info.hasAttribute("selected")) {
                     initiallyVisibleWorkspace = workspace;
                 }
@@ -438,7 +438,7 @@ public class Evergreen {
         }
     }
     
-    private void addWorkspace(final Workspace workspace) {
+    private void addWorkspaceToTabbedPane(final Workspace workspace) {
         String name = workspace.getTitle();
         tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), getWorkspaceIndexInTabbedPane(name));
         tabbedPane.setSelectedComponent(workspace);
@@ -461,7 +461,7 @@ public class Evergreen {
             return null;
         }
         Workspace workspace = new Workspace(name, root);
-        addWorkspace(workspace);
+        addWorkspaceToTabbedPane(workspace);
         moveFilesToBestWorkspaces();
         return workspace;
     }
@@ -730,7 +730,7 @@ public class Evergreen {
         return true;
     }
     
-    private Workspace addWorkspace(String name, String root, String buildTarget, List<InitialFile> initialFiles) {
+    private Workspace openWorkspace(String name, String root, String buildTarget, List<InitialFile> initialFiles) {
         Log.warn("Opening workspace '" + name + "' with root '" + root + "'");
         Workspace workspace = createWorkspace(name, root);
         if (workspace == null) {
