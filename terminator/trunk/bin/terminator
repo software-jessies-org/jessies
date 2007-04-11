@@ -19,7 +19,7 @@ class Terminator
         begin
             launch0()
         rescue Exception => e
-            show_uncaught_exception(e)
+            show_uncaught_exception("Terminator", e)
         end
     end
     
