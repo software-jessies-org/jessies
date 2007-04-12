@@ -65,7 +65,7 @@ end
 def extract_package_description_from_html()
     description = ""
     
-    # Pull the first paragraph pulled from our HTML:
+    # The first paragraph pulled from our HTML:
     html_filename = "./www/index.html"
     if File.exist?(html_filename)
         html = IO.readlines(html_filename).join("").gsub("\n", " ")
@@ -416,7 +416,7 @@ if target_os() == "SunOS"
         #prototype.puts("i postinstall")
     }
     user_run_as = `/usr/xpg4/bin/id -un`.chomp()
-    group_run_as = `/usr/xpg4/bin/id -un`.chomp()
+    group_run_as = `/usr/xpg4/bin/id -gn`.chomp()
     system("(cd #{tmp_dir}/root && pkgproto .) | sed 's/ #{user_run_as} #{group_run_as}$/ root bin/' | sed 's%none usr%none /usr%'>> #{tmp_dir}/prototype")
 end
 
