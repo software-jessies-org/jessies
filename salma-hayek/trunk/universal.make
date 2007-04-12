@@ -813,11 +813,11 @@ $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS))): $(STANDALONE_INST
 remove: $(addprefix run-remover,$(suffix $(STANDALONE_INSTALLERS)))
 
 .PHONY: run-installer.pkg
-run-installer.pkg:
+run-installer.pkg: $(INSTALLER.pkg)
 	echo all | sudo /usr/sbin/pkgadd -G -d $(INSTALLER.pkg)
 
 .PHONY: run-installer.deb
-run-installer.deb:
+run-installer.deb: $(INSTALLER.deb)
 	sudo dpkg -i $(INSTALLER.deb)
 
 .PHONY: run-installer.rpm
