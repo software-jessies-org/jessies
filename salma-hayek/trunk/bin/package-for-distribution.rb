@@ -57,22 +57,35 @@ def wrap(s, width, separator)
     end
 end
 
-def extract_package_description_from_html(human_project_name)
-    # If you're using apt-get(1), the description isn't very important because you won't get to see it.
-    # Anyone using gdebi(1), though, will see this at the same time as the "Install" button, so it's worth a little effort.
-    
-    # First the generic:
+def generate_generic_package_description(human_project_name)
     description = "software.jessies.org's #{human_project_name}"
+    return description
+end
+
+def extract_package_description_from_html()
+    description = ""
     
-    # Then the first paragraph pulled from our HTML:
+    # Pull the first paragraph pulled from our HTML:
     html_filename = "./www/index.html"
     if File.exist?(html_filename)
         html = IO.readlines(html_filename).join("").gsub("\n", " ")
         if html =~ /<p><strong>(.*?)<\/strong>/
-            first_paragraph = $1.gsub("&nbsp;", " ")
-            description << "\n " << wrap(first_paragraph, 76, "\n ")
+            description << $1.gsub("&nbsp;", " ")
         end
     end
+    
+    return description
+end
+
+def generate_debian_package_description(human_project_name)
+    # If you're using apt-get(1), the description isn't very important because you won't get to see it.
+    # Anyone using gdebi(1), though, will see this at the same time as the "Install" button, so it's worth a little effort.
+    
+    # First the generic:
+    description = generate_generic_package_description(human_project_name)
+    
+    # Then the first paragraph pulled from our HTML:
+    description << "\n " << wrap(extract_package_description_from_html(), 76, "\n ")
     
     return description
 end
@@ -100,6 +113,8 @@ if target_os() == "Darwin"
     native_name_for_bundle = ".app bundle"
 elsif target_os() == "Linux"
     native_name_for_bundle = "Debian file system tree"
+elsif target_os() == "SunOS"
+    native_name_for_bundle = "SunOS package tree"
 elsif target_os() == "Cygwin"
     native_name_for_bundle = "installation tree"
 else
@@ -127,6 +142,9 @@ FileUtils.mkdir_p(tmp_dir)
 
 if target_os() == "Linux"
     app_dir = "#{tmp_dir}/usr/share/software.jessies.org/#{machine_project_name}"
+    FileUtils.mkdir_p(app_dir)
+elsif target_os() == "SunOS"
+    app_dir = "#{tmp_dir}/root/usr/share/software.jessies.org/#{machine_project_name}"
     FileUtils.mkdir_p(app_dir)
 elsif target_os() == "Darwin"
     # Make a skeleton .app bundle.
@@ -230,7 +248,7 @@ if target_os() == "Linux"
     maybe_copy_file("COPYING", "#{doc_root}/copyright")
     maybe_copy_file("README", doc_root)
     maybe_copy_file("TODO", doc_root)
-
+    
     # Copy any ".desktop" files into /usr/share/applications/.
     # GNOME ignores symbolic links.
     usr_share_applications = "#{tmp_dir}/usr/share/applications"
@@ -290,7 +308,7 @@ if target_os() == "Linux"
         # Installed-Size
         # Maintainer (mandatory)
         # Description (mandatory)
-
+        
         control.puts("Package: #{debian_package_name}")
         
         # Use the same artificial version number as we use for the ".msi" installer.
@@ -323,8 +341,83 @@ if target_os() == "Linux"
         control.puts("Depends: #{depends}")
         control.puts("Installed-Size: #{installed_size}")
         control.puts("Maintainer: software.jessies.org <software@jessies.org>")
-        control.puts("Description: #{extract_package_description_from_html(human_project_name)}")
+        control.puts("Description: #{generate_debian_package_description(human_project_name)}")
     }
+end
+if target_os() == "SunOS"
+    # Create and check the validity of our package name.
+    sunos_package_name = "SJO" + machine_project_name
+    if sunos_package_name !~ /^[A-Za-z0-9][A-Za-z0-9\-+]+$/
+        die("Package name \"#{sunos_package_name}\" is invalid.")
+    end
+    
+    # Copy our documentation into /usr/share/doc/.
+    # Leave out the HTML because that's accessed on the web from the program itself.
+    doc_root = "#{tmp_dir}/root/usr/share/doc/#{sunos_package_name}"
+    FileUtils.mkdir_p(doc_root)
+    maybe_copy_file("COPYING", "#{doc_root}/copyright")
+    maybe_copy_file("README", doc_root)
+    maybe_copy_file("TODO", doc_root)
+    
+    # Copy any ".desktop" files into /usr/share/applications/.
+    # GNOME ignores symbolic links.
+    usr_share_applications = "#{tmp_dir}/root/usr/share/applications"
+    FileUtils.mkdir_p(usr_share_applications)
+    FileUtils.cp(Dir.glob("#{project_resource_directory}/lib/*.desktop"), usr_share_applications)
+    
+    # Copy any compiled terminfo files under /usr/share/terminfo/.
+    generated_terminfo_root = ".generated/terminfo/"
+    if File.exists?(generated_terminfo_root)
+        usr_share_terminfo = "#{tmp_dir}/root/usr/share/lib/terminfo"
+        FileUtils.mkdir_p(usr_share_terminfo)
+        terminfo_files = []
+        FileUtils.cd(generated_terminfo_root) {
+            |dir|
+            terminfo_files << Dir.glob("?/*")
+        }
+        terminfo_files.each() {
+            |terminfo_file|
+            FileUtils.mkdir_p("#{usr_share_terminfo}/#{terminfo_file}")
+            FileUtils.rmdir("#{usr_share_terminfo}/#{terminfo_file}")
+            FileUtils.cp(File.join(generated_terminfo_root, terminfo_file), "#{usr_share_terminfo}/#{terminfo_file}")
+        }
+    end
+    
+    # Install the start-up script(s) from the project's bin/ to /usr/bin/.
+    usr_bin = "#{tmp_dir}/root/usr/bin"
+    FileUtils.mkdir_p(usr_bin)
+    FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/bin/*", "#{tmp_dir}/root"), usr_bin)
+    
+    File.open("#{tmp_dir}/pkginfo", "w") {
+        |pkginfo|
+        
+        pkginfo.puts("PKG=#{sunos_package_name}")
+        pkginfo.puts("NAME=#{human_project_name} - #{generate_generic_package_description(human_project_name)}")
+        pkginfo.puts("DESC=#{extract_package_description_from_html()}")
+        
+        # Use the same artificial version number as we use for the ".msi" installer.
+        require "#{salma_hayek}/bin/make-version-file.rb"
+        version = makeVersionString(".", salma_hayek)
+        pkginfo.puts("VERSION=#{version}")
+        
+        pkginfo.puts("CATEGORY=application")
+        pkginfo.puts("VENDOR=http://software.jessies.org/")
+        pkginfo.puts("EMAIL=software@jessies.org")
+    }
+    
+    maybe_copy_file("COPYING", "#{tmp_dir}/copyright")
+    
+    File.open("#{tmp_dir}/prototype", "w") {
+        |prototype|
+        
+        prototype.puts("i pkginfo")
+        prototype.puts("i copyright")
+        #prototype.puts("i preinstall")
+        #prototype.puts("i postinstall")
+    }
+    user_run_as = `/usr/xpg4/bin/id -un`.chomp()
+    group_run_as = `/usr/xpg4/bin/id -un`.chomp()
+    system("(cd #{tmp_dir}/root && pkgproto .) | sed 's/ #{user_run_as} #{group_run_as}$/ root bin/' | sed 's%none usr%none /usr%'>> #{tmp_dir}/prototype")
 end
 
 # Fix permissions.
