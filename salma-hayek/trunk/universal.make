@@ -340,6 +340,7 @@ DIST_SUBDIRECTORY.gz = $(MACHINE_PROJECT_NAME)
 DIST_SUBDIRECTORY.deb = debian
 DIST_SUBDIRECTORY.dmg = mac
 DIST_SUBDIRECTORY.msi = windows
+DIST_SUBDIRECTORY.pkg = sunos
 DIST_SUBDIRECTORY.rpm = redhat
 
 $(takeProfileSample)
@@ -454,6 +455,11 @@ INSTALLER_EXTENSIONS.Cygwin += msi
 makeInstallerName.dmg = $(MACHINE_PROJECT_NAME)-$(1).dmg
 INSTALLER_EXTENSIONS += dmg
 INSTALLER_EXTENSIONS.Darwin += dmg
+
+# Create different .pkg filenames for different target architectures so they can coexist.
+makeInstallerName.pkg = SJO$(MACHINE_PROJECT_NAME)_$(1)_$(TARGET_ARCHITECTURE).pkg
+INSTALLER_EXTENSIONS += pkg
+INSTALLER_EXTENSIONS.SunOS += pkg
 
 # Create different .deb filenames for different target architectures so they can coexist.
 makeInstallerName.deb = org.jessies.$(MACHINE_PROJECT_NAME)_$(1)_$(TARGET_ARCHITECTURE).deb
@@ -628,6 +634,14 @@ $(INSTALLER.dmg): $(MACHINE_PROJECT_NAME).app
 	$(RM) $@ && \
 	hdiutil create -fs UFS -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
 
+$(INSTALLER.pkg): $(MACHINE_PROJECT_NAME).app
+	@echo "Creating package stream..."
+	mkdir -p $(@D) && \
+	$(RM) $@  && \
+	pkgmk -o -d $(@D) -f $(PACKAGING_DIRECTORY)/prototype -r $(PACKAGING_DIRECTORY)/root/ && \
+	pkgtrans -s $(@D) $(@F) SJO$(MACHINE_PROJECT_NAME) && \
+	pkginfo -l -d $@
+
 $(INSTALLER.deb): $(MACHINE_PROJECT_NAME).app
 	@echo "Creating GNU/Linux .deb package..."
 	mkdir -p $(@D) && \
@@ -797,6 +811,10 @@ $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS))): $(STANDALONE_INST
 
 .PHONY: remove
 remove: $(addprefix run-remover,$(suffix $(STANDALONE_INSTALLERS)))
+
+.PHONY: run-installer.pkg
+run-installer.pkg:
+	echo all | sudo /usr/sbin/pkgadd -G -d $(INSTALLER.pkg)
 
 .PHONY: run-installer.deb
 run-installer.deb:
