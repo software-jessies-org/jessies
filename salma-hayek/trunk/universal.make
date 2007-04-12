@@ -785,7 +785,7 @@ $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 $(addprefix upload.,$(INSTALLERS)): upload.%: symlink-latest.%
 .PHONY: symlink-latest.%
 $(addprefix symlink-latest.,$(INSTALLERS)): symlink-latest.%: %
-	@echo Symlinking the latest $(<F)...
+	@echo Symlinking the latest $(LATEST_INSTALLER_LINK)...
 	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	find $(DIST_DIRECTORY) -name '"$(call makeInstallerName$(suffix $<),*)"' -mtime +7 '|' xargs $(RM)
