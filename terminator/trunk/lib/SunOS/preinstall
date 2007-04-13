@@ -1,0 +1,46 @@
+#!/bin/sh
+
+FATPATH=${PATH}
+PATH=/usr/bin:/usr/ccs/bin:/usr/ucb:/bin
+
+SAFEPATH=${PATH}
+
+for F in ${PKG_INSTALL_ROOT}/etc/default/login ${PKG_INSTALL_ROOT}/etc/default/su
+do
+	. ${F}
+	if [ ! -z "${PATH}" ]
+	then
+		FATPATH=${FATPATH}:${PATH}
+	fi
+	if [ ! -z "${SUPATH}" ]
+	then
+		FATPATH=${FATPATH}:${SUPATH}
+	fi
+done
+
+PATH=${SAFEPATH}
+FATPATH=${FATPATH}:/opt/csw/bin:/usr/sfw/bin:${PATH}
+
+if [ ! -x ${PKG_INSTALL_ROOT}/usr/bin/ruby ]
+then
+	echo "Can't find /usr/bin/ruby..."
+	IFS=':'
+	for D in ${FATPATH}
+	do
+		if [ -x ${PKG_INSTALL_ROOT}/${D}/ruby ]
+		then
+			RUBY=${D}/ruby
+			break
+		fi
+	done
+
+	if [ -z "${RUBY}" ]
+	then
+		echo "Couldn't find suitable ruby interpreter."
+		exit 1
+	else
+		echo "Linking ${RUBY} to /usr/bin/ruby"
+		ln -s ${RUBY} ${PKG_INSTALL_ROOT}/usr/bin/ruby
+	fi
+fi
+
