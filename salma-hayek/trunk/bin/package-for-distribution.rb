@@ -412,8 +412,16 @@ if target_os() == "SunOS"
         
         prototype.puts("i pkginfo")
         prototype.puts("i copyright")
-        #prototype.puts("i preinstall")
-        #prototype.puts("i postinstall")
+        install_scripts = []
+        FileUtils.cd("#{project_resource_directory}/lib/SunOS/") {
+            |dir|
+            install_scripts = Dir.glob("{pre,post}{install,remove}")
+        }
+        install_scripts.each() {
+            |install_script|
+            FileUtils.cp("#{project_resource_directory}/lib/SunOS/#{install_script}", "#{tmp_dir}/#{install_script}")
+            prototype.puts("i #{install_script}")
+        }
     }
     user_run_as = `/usr/xpg4/bin/id -un`.chomp()
     group_run_as = `/usr/xpg4/bin/id -gn`.chomp()
