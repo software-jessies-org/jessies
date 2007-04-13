@@ -813,11 +813,11 @@ $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS))): $(STANDALONE_INST
 remove: $(addprefix run-remover,$(suffix $(STANDALONE_INSTALLERS)))
 
 .PHONY: run-installer.pkg
-run-installer.pkg: $(INSTALLER.pkg)
+run-installer.pkg:
 	echo all | sudo /usr/sbin/pkgadd -G -d $(INSTALLER.pkg)
 
 .PHONY: run-installer.deb
-run-installer.deb: $(INSTALLER.deb)
+run-installer.deb:
 	sudo dpkg -i $(INSTALLER.deb)
 
 .PHONY: run-installer.rpm
@@ -825,7 +825,7 @@ run-installer.rpm:
 	@echo Installing the .rpm might be possible with sudo rpm -i $(INSTALLER.rpm) but that would be a bad idea on a Debian box...
 
 .PHONY: run-installer.dmg
-run-installer.dmg: $(INSTALLER.dmg)
+run-installer.dmg:
 	open -a DiskImageMounter $(INSTALLER.dmg)
 
 .PHONY: run-installer.msi
