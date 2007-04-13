@@ -1,0 +1,32 @@
+#!/bin/sh
+
+FATPATH=${PATH}
+PATH=/usr/bin:/usr/ccs/bin:/usr/ucb:/bin
+
+SAFEPATH=${PATH}
+
+for F in ${PKG_INSTALL_ROOT}/etc/default/login ${PKG_INSTALL_ROOT}/etc/default/su
+do
+	. ${F}
+	if [ ! -z "${PATH}" ]
+	then
+		FATPATH=${FATPATH}:${PATH}
+	fi
+	if [ ! -z "${SUPATH}" ]
+	then
+		FATPATH=${FATPATH}:${SUPATH}
+	fi
+done
+
+PATH=${SAFEPATH}
+FATPATH=${FATPATH}:/opt/csw/bin:/usr/sfw/bin:${PATH}
+
+IFS=':'
+for D in ${FATPATH}
+do
+	if [ -x ${PKG_INSTALL_ROOT}/${D}/tic ]
+	then
+		${PKG_INSTALL_ROOT}/${D}/tic ${PKG_INSTALL_ROOT}/usr/share/software.jessies.org/terminator/Resources/terminator/lib/terminfo/terminator.tic > /dev/null 2>&1
+	fi
+done
+
