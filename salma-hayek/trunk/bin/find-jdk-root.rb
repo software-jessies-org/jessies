@@ -89,7 +89,7 @@ def find_jdk_root()
   require "#{bin}/target-os.rb"
   require "#{bin}/which.rb"
   
-  # On Windows it's likely that the only thing on the user's path is an ancient Microsoft java(1) in C:\WINNT\SYSTEM32.
+  # On Windows, it's likely that the only Java-related executables on the user's path are %WINDIR%\SYSTEM32\{java,javaw,javaws}.exe.
   # This is unfortunately true even if the user has a properly installed JDK.
   if target_os() == "Cygwin"
     acceptableMajorVersions = [6, 5]
