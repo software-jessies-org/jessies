@@ -89,8 +89,7 @@ def find_jdk_root()
   require "#{bin}/target-os.rb"
   require "#{bin}/which.rb"
   
-  # On Windows it's likely that the only Java on the user's path is an ancient
-  # Microsoft Java in C:\WINNT\SYSTEM32.
+  # On Windows it's likely that the only thing on the user's path is an ancient Microsoft java(1) in C:\WINNT\SYSTEM32.
   # This is unfortunately true even if the user has a properly installed JDK.
   if target_os() == "Cygwin"
     acceptableMajorVersions = [6, 5]
@@ -106,38 +105,26 @@ def find_jdk_root()
     }
   end
   
-  # Find java(1) on the path.
-  java_on_path = which("java")
+  # Find javac(1) on the path.
+  # We used to look for java(1) instead, but that fails in the case where the user has both JRE and JDK installed, with the former coming first on their path.
+  javac_on_path = which("javac")
   
-  # Our Windows "launcher.exe" uses the registry to find a JRE, so although
-  # returning nil or an unsuitable Java here would be a problem for our build
-  # system, it won't necessarily stop you running our stuff.
-  # "invoke-java.rb" uses this script to find the JDK "tools.jar", but we cope
-  # with installed JDKs which are not on the path, above.
-  if java_on_path == nil
+  # Our Windows "launcher.exe" uses the registry to find a JRE.
+  # Returning nil or an unsuitable Java here prevents you from building, but doesn't affect your ability to *run* our applications.
+  if javac_on_path == nil
     return nil
   end
   
-  # Neophyte users are likely to be using whatever's in /usr/bin, and that's
-  # likely to be a link to where there's a JDK or JRE installation. So we need
-  # to follow the links to the actual installation.
-  java_in_actual_location = Pathname.new(java_on_path).realpath()
+  # Neophyte users are likely to be using whatever's in /usr/bin, and that's likely to be a link to where there's a JDK or JRE installation.
+  # Systems using /etc/alternatives are especially likely to be set up this way.
+  # We need to follow the links to the actual installation, because it's the support files we're really looking for.
+  javac_in_actual_location = Pathname.new(javac_on_path).realpath()
   
   # Assume we're in the JDK/JRE bin/ directory.
-  java_bin = java_in_actual_location.dirname()
+  jdk_bin = javac_in_actual_location.dirname()
   
-  # Assume the directory above the bin/ directory is the "home" directory; the
-  # directory that contains bin/ and include/ and so on.
-  jre_root = java_bin.dirname()
-
-  jdk_root = jre_root
-  # Debian's Sun JDK package depends on the JRE package, which provides the java
-  # executable to the update-alternatives mechanism.
-  # If only the JRE's installed, it's OK for this script to return a value
-  # which points at an absent JDK.
-  if jre_root.basename().to_s() == "jre"
-    jdk_root = jre_root.dirname()
-  end
+  # Assume the directory above the bin/ directory is the "home" directory; the directory that contains bin/ and include/ and so on.
+  jdk_root = jdk_bin.dirname()
   
   if target_os() == "Darwin"
     # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
