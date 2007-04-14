@@ -107,11 +107,8 @@ class Java
     # Load salma-hayek libraries.
     require "#{@salma_hayek}/bin/target-os.rb"
     require "#{@salma_hayek}/bin/show-alert.rb"
-    require "#{@salma_hayek}/bin/find-jdk-root.rb"
     
     @extra_java_arguments = []
-
-    @jdk_root = find_jdk_root()
 
     init_default_heap_size()
     init_default_class_path()
@@ -227,8 +224,10 @@ class Java
       # which case they probably aren't interested in running anything that
       # wouldn't work without "tools.jar", so we cope with not having found
       # a JDK.
-      if @jdk_root != nil
-        tools_jar = "#{@jdk_root}/lib/tools.jar"
+      require "#{@salma_hayek}/bin/find-jdk-root.rb"
+      jdk_root = find_jdk_root()
+      if jdk_root != nil
+        tools_jar = "#{jdk_root}/lib/tools.jar"
         if Pathname.new(tools_jar).exist?()
           @class_path << tools_jar
         end

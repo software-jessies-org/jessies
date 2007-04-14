@@ -3,19 +3,25 @@
 # What this script does
 # ---------------------
 #
+# This script is used by the build process to find a JDK.
 # If javah(1) provided a way to ask for a list of the directories that need to
 # be on the native compiler's include path, we might not have written this
 # script. But it doesn't, so we needed a way to find the current JDK's
 # include/ directory.
 #
-# As it happened, this script was also useful for finding such things as
-# java(1) and "rt.jar".
+# We use a completely different method (in "invoke-java.rb") to find the
+# java(1) launcher, and yet another method (in "launcher.cpp") to find a
+# JVM DLL on Windows.
 #
+# The idea is that the build process should be fairly controlled and you
+# should know what you're building with, but if you're just trying to run
+# one of our applications, we should do our darnedest to run the first best
+# JVM we find. This script takes care of the building side of things. See
+# "invoke-java.rb" for the running side of things.
+#
+# "invoke-java.rb" does make passing use of this script to find "tools.jar".
 # That's why, rather than make this script specific to the include/ directory,
 # we output the path to the top-level directory of the JDK installation.
-#
-# Note, though, that when *running* rather than building our software, this
-# script is not invoked. See "invoke-java.rb" for that case.
 #
 # How we choose a Java installation
 # ---------------------------------
@@ -74,8 +80,6 @@
 #   installed: it just lists some JVMs any of which may or may not be
 #   available.)
 #
-# Writing our own launcher wouldn't solve this problem; it would just shunt
-# it from Ruby to C++.
 
 def find_jdk_root()
   require "pathname.rb"
