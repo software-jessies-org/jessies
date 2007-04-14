@@ -137,9 +137,14 @@ class Java
     if is_java_new_enough(actual_java_version) == false
       # The "java" on the path was no good.
       # Can we salvage the situation by finding a suitable JVM?
-
-      # This works for Linux distributions using Sun's RPM, and for Solaris.
-      globs = [  "/usr/java/jdk1.7.0*", "/usr/java/jre1.7.0*", "/usr/java/jdk1.6.0*", "/usr/java/jre1.6.0*", "/usr/java/jdk1.5.0*", "/usr/java/jre1.5.0*" ]
+      
+      if target_os() == "Darwin"
+        # At the moment, only Apple's Java 5 is suitable for running our applications.
+        globs = [ "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home" ]
+      else
+        # This works for Linux distributions using Sun's RPM, and for Solaris.
+        globs = [  "/usr/java/jdk1.7.0*", "/usr/java/jre1.7.0*", "/usr/java/jdk1.6.0*", "/usr/java/jre1.6.0*", "/usr/java/jdk1.5.0*", "/usr/java/jre1.5.0*" ]
+      end
       globs.each() {
         |glob|
         java_directories = Dir.glob(glob).sort().reverse()
