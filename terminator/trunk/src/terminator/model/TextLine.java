@@ -19,6 +19,12 @@ public class TextLine {
 	private int lineStartIndex;
 	
 	// The characters on this line.
+	// An immutable String may seem like an odd choice, but we've tried StringBuilder too.
+	// In terms of space, StringBuilder helps a little, saving on useless String fields (such as the cached hashCode), but we pay extra for each blank line (where the cost is a whole new StringBuilder rather than just sharing the JVM's single empty-string instance), and we pay for unused space in the underlying char[]s.
+	// In terms of time, StringBuilder hurts a little, because we need to convert to a String for our callers (especially rendering), and young lines don't change much and old lines never change.
+	// In terms of code, there's nothing in it; the StringBuilder delete and insert methods are arguably more readable, but that only affects a handful of lines.
+	// All in all, then, String is actually the best choice in our current environment.
+	// (If we switched rendering over to AttributedCharacterIterator or something else that didn't require a String, that might change the balance.)
 	private String text;
 	
 	// The styles to be applied to the characters on this line.
