@@ -42,7 +42,7 @@ public class Options {
 	
 	private final Pattern resourcePattern = Pattern.compile("(?:Terminator(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
-	private static final Color LIGHT_BLUE = new Color(0.70f, 0.83f, 1.00f);
+	private static final Color LIGHT_BLUE = new Color(0xb3d4ff);
 	private static final Color NEAR_BLACK = new Color(0x181818);
 	private static final Color NEAR_GREEN = new Color(0x72ff00);
 	private static final Color NEAR_WHITE = new Color(0xeeeeee);
