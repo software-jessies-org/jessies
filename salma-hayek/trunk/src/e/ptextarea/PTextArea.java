@@ -16,22 +16,10 @@ import e.util.*;
  * @author Phil Norman
  */
 public class PTextArea extends JComponent implements PLineListener, Scrollable, ClipboardOwner {
-    private static final Stopwatch paintStopwatch = Stopwatch.get("PTextArea.paintComponent");
-    
     private static final int MIN_WIDTH = 50;
     private static final int MAX_CACHED_CHAR = 128;
     
     public static final int NO_MARGIN = -1;
-    
-    private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.93f, 0.93f, 0.93f);
-    private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.97f, 0.97f, 0.97f);
-    
-    // Used to get help us match the native UI when we're disabled.
-    private static final JLabel disabledLabel;
-    static {
-        disabledLabel = new JLabel("x");
-        disabledLabel.setEnabled(false);
-    }
     
     private SelectionHighlight selection;
     private boolean selectionEndIsAnchor;  // Otherwise, selection start is anchor.
@@ -195,6 +183,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         } finally {
             getLock().relinquishReadLock();
         }
+    }
+    
+    PHighlightManager getHighlightManager() {
+        return highlights;
+    }
+    
+    SelectionHighlight getSelection() {
+        return selection;
     }
     
     public int getSelectionStart() {
@@ -565,6 +561,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      */
     public void showRightHandMarginAt(int rightHandMarginColumn) {
         this.rightHandMarginColumn = rightHandMarginColumn;
+    }
+    
+    /**
+     * Returns the column number at which the margin is drawn.
+     * Test against the constant NO_MARGIN to see if no margin is being drawn.
+     */
+    public int getRightHandMarginColumn() {
+        return rightHandMarginColumn;
     }
     
     public void setTextStyler(PTextStyler textStyler) {
@@ -963,151 +967,20 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         return metrics.getHeight();
     }
     
-    private int getBaseline(int lineIndex) {
+    public int getBaseline(int lineIndex) {
         return lineIndex * metrics.getHeight() + metrics.getMaxAscent() + getInsets().top;
     }
     
     public void paintComponent(Graphics oldGraphics) {
         getLock().getReadLock();
-        Stopwatch.Timer timer = paintStopwatch.start();
         try {
             generateLineWrappings();
-            Graphics2D g = (Graphics2D) oldGraphics;
             
-            // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give it to them.
-            Map map = (Map) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
-            if (map != null) {
-                g.addRenderingHints(map);
-            }
-            
-            Rectangle bounds = g.getClipBounds();
-            
-            // Paint the background, if need be.
-            boolean disabledGtk = (isEnabled() == false && GuiUtilities.isGtk());
-            if (isOpaque()) {
-                int paintableBackgroundWidth;
-                if (disabledGtk) {
-                    // The whole background should appear disabled.
-                    paintableBackgroundWidth = bounds.width;
-                    g.setColor(disabledLabel.getBackground());
-                } else {
-                    // Only paint that part of the background that isn't part of the right-hand margin.
-                    paintableBackgroundWidth = paintRightHandMargin(g, bounds);
-                    g.setColor(getBackground());
-                }
-                g.fillRect(bounds.x, bounds.y, paintableBackgroundWidth, bounds.height);
-            }
-            
-            // Work out which lines we need to paint.
-            Insets insets = getInsets();
-            int minLine = (bounds.y - insets.top) / metrics.getHeight();
-            int maxLine = (bounds.y - insets.top + bounds.height) / metrics.getHeight();
-            minLine = Math.max(0, Math.min(splitLines.size() - 1, minLine));
-            maxLine = Math.max(0, Math.min(splitLines.size() - 1, maxLine));
-            
-            // Paint the highlights on those lines.
-            paintHighlights(g, minLine, maxLine);
-            
-            // Paint the text.
-            g.setFont(getFont());
-            int startX = insets.left;
-            int startY = getBaseline(minLine);
-            if (disabledGtk) {
-                // The GNOME "Clearlooks" and Ubuntu "Human" themes both render text in a "shadowed" style when the component is disabled.
-                paintTextLines(g, minLine, maxLine, startX + 1, startY + 1, Color.WHITE);
-                paintTextLines(g, minLine, maxLine, startX, startY, UIManager.getColor("EditorPane.inactiveForeground"));
-            } else {
-                paintTextLines(g, minLine, maxLine, startX, startY, isEnabled() ? null : UIManager.getColor("EditorPane.inactiveForeground"));
-            }
+            PTextAreaRenderer renderer = new PTextAreaRenderer(this, (Graphics2D) oldGraphics, metrics);
+            renderer.render();
         } finally {
             getLock().relinquishReadLock();
-            timer.stop();
         }
-    }
-    
-    private void paintTextLines(Graphics2D g, int minLine, int maxLine, int startX, int startY, Color overrideColor) {
-        int baseline = startY;
-        int paintCharOffset = getSplitLine(minLine).getTextIndex();
-        int x = startX;
-        int line = minLine;
-        int caretOffset = hasSelection() ? -1 : getSelectionStart();
-        Iterator<PLineSegment> it = getWrappedSegmentIterator(paintCharOffset);
-        while (it.hasNext()) {
-            PLineSegment segment = it.next();
-            paintCharOffset = segment.getEnd();
-            g.setColor(overrideColor != null ? overrideColor : segment.getStyle().getColor());
-            segment.paint(g, x, baseline);
-            if (segment.getOffset() == caretOffset && segment.isNewline() == false) {
-                paintCaret(g, x, baseline);
-            } else if (segment.getOffset() <= caretOffset && segment.getEnd() > caretOffset) {
-                int caretX = x + segment.getDisplayWidth(metrics, x, caretOffset - segment.getOffset());
-                paintCaret(g, caretX, baseline);
-            }
-            x += segment.getDisplayWidth(metrics, x);
-            if (segment.isNewline()) {
-                x = startX;
-                baseline += metrics.getHeight();
-                line++;
-                if (line > maxLine) {
-                    break;
-                }
-            }
-        }
-        if (caretOffset == paintCharOffset) {
-            paintCaret(g, x, baseline);
-        }
-    }
-    
-    /**
-     * Draws the right-hand margin, and returns the width of the rectangle
-     * from bounds.x that should be filled with the non-margin background color.
-     * Using this in paintComponent lets us avoid unnecessary flicker caused
-     * by filling the area twice.
-     */
-    private int paintRightHandMargin(Graphics2D g, Rectangle bounds) {
-        int whiteBackgroundWidth = bounds.width;
-        if (rightHandMarginColumn != NO_MARGIN) {
-            int offset = metrics.stringWidth("n") * rightHandMarginColumn + getInsets().left;
-            g.setColor(MARGIN_BOUNDARY_COLOR);
-            g.drawLine(offset, bounds.y, offset, bounds.y + bounds.height);
-            g.setColor(MARGIN_OUTSIDE_COLOR);
-            g.fillRect(offset + 1, bounds.y, bounds.x + bounds.width - offset - 1, bounds.height);
-            whiteBackgroundWidth = (offset - bounds.x);
-        }
-        return whiteBackgroundWidth;
-    }
-    
-    private void paintHighlights(Graphics2D g, int minLine, int maxLine) {
-        if (isEnabled() == false) {
-            // A disabled component shouldn't render highlights (especially not the selection).
-            return;
-        }
-        //StopWatch stopWatch = new StopWatch()
-        int beginOffset = getSplitLine(minLine).getTextIndex();
-        SplitLine max = getSplitLine(maxLine);
-        int endOffset = max.getTextIndex() + max.getLength();
-        selection.paint(g);
-        List<PHighlight> highlightList = highlights.getHighlightsOverlapping(beginOffset, endOffset);
-        for (PHighlight highlight : highlightList) {
-            highlight.paint(g);
-        }
-        //stopWatch.print("Highlight painting");
-    }
-    
-    private void paintCaret(Graphics2D g, int x, int y) {
-        if (isFocusOwner() == false || isEnabled() == false) {
-            // An unfocused component shouldn't render a caret. There should be at most one caret on the display.
-            // A disabled component shouldn't render a caret either.
-            return;
-        }
-        g.setColor(Color.RED);
-        int yTop = y - metrics.getMaxAscent();
-        int yBottom = y + metrics.getMaxDescent() - 1;
-        g.drawLine(x, yTop + 1, x, yBottom - 1);
-        g.drawLine(x, yTop + 1, x + 1, yTop);
-        g.drawLine(x, yTop + 1, x - 1, yTop);
-        g.drawLine(x, yBottom - 1, x + 1, yBottom);
-        g.drawLine(x, yBottom - 1, x - 1, yBottom);
     }
 
     public void linesAdded(PLineEvent event) {
