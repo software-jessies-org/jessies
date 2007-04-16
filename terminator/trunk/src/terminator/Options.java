@@ -42,11 +42,12 @@ public class Options {
 	
 	private final Pattern resourcePattern = Pattern.compile("(?:Terminator(?:\\*|\\.))?(\\S+):\\s*(.+)");
 	
-	private static final Color VERY_DARK_BLUE = new Color(0x000045);
+	private static final Color LIGHT_BLUE = new Color(0.70f, 0.83f, 1.00f);
 	private static final Color NEAR_BLACK = new Color(0x181818);
+	private static final Color NEAR_GREEN = new Color(0x72ff00);
 	private static final Color NEAR_WHITE = new Color(0xeeeeee);
 	private static final Color SELECTION_BLUE = new Color(0x1c2bff);
-	private static final Color LIGHT_BLUE = new Color(0.70f, 0.83f, 1.00f);
+	private static final Color VERY_DARK_BLUE = new Color(0x000045);
 	
 	private static final Options INSTANCE = new Options();
 	
@@ -337,7 +338,7 @@ public class Options {
 		// Note that these get fossilized into the user's preferences; updating values here doesn't affect users who've already clicked the button.
 		colorsPanel.addRow("Presets:", makePresetButton(colorPreferences, "  Terminator  ", VERY_DARK_BLUE, NEAR_WHITE, Color.GREEN, SELECTION_BLUE));
 		colorsPanel.addRow("", makePresetButton(colorPreferences, "Black on White", Color.WHITE, NEAR_BLACK, Color.BLUE, LIGHT_BLUE));
-		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, Color.GREEN, Color.GREEN, SELECTION_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, NEAR_GREEN, Color.GREEN, SELECTION_BLUE));
 		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, Color.DARK_GRAY));
 		
 		// Save the preferences if the user hits "Save".
