@@ -56,7 +56,10 @@ public class PNewlineSegment extends PAbstractSegment {
     }
     
     private void paintWrapMark(Graphics2D g, int x, int y) {
-        g.setColor(Color.BLACK);
+        // Don't explicitly set a color (we used to always use black).
+        // That lets us preserve the "overrideColor" from paintTextLines, which means we render correctly when disabled under the GTK LAF (a drop-shadow effect).
+        // If we're rendering a wrapped comment or string literal, we now use the comment or string literal color.
+        // To my eye, that looks fine, unlike the way we were butchering the GTK disabled effect, which had been bothering me for months.
         Stroke oldStroke = g.getStroke();
         g.setStroke(WRAP_STROKE);
         int yMiddle = y - g.getFontMetrics().getMaxAscent() / 2;
