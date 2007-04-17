@@ -45,7 +45,10 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new SaveAsAction());
         menu.add(new SaveAllAction());
         menu.add(new RevertToSavedAction());
-
+        
+        menu.add(new JSeparator());
+        menu.add(new FilePropertiesAction());
+        
         if (GuiUtilities.isMacOs() == false) {
             menu.add(new JSeparator());
             menu.add(new JMenuItem(new ExitAction()));
@@ -120,14 +123,11 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new JSeparator());
         menu.add(ShowHideTagsAction.makeMenuItem());
         
-        menu.add(new JSeparator());
-        menu.add(new FilePropertiesAction());
         return menu;
     }
     
     private JMenu makeToolsMenu() {
         final JMenu menu = new JMenu("Tools");
-        menu.add(new BuildAction());
         menu.add(new SetBuildTargetAction());
         menu.add(new OpenMakefileAction());
         
@@ -197,6 +197,7 @@ public class EvergreenMenuBar extends EMenuBar {
     
     private JMenu makeWorkspaceMenu() {
         JMenu menu = new JMenu("Workspace");
+        menu.add(new BuildAction());
         menu.add(new RescanWorkspaceAction());
         menu.add(new JSeparator());
         menu.add(new AddWorkspaceAction());
