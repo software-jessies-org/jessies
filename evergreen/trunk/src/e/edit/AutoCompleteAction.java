@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
@@ -13,7 +14,13 @@ public class AutoCompleteAction extends ETextAction {
     
     public AutoCompleteAction() {
         super("Complete");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_MASK));
+        if (GuiUtilities.isMacOs()) {
+            // All Cocoa text components use this.
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_MASK));
+        } else {
+            // IDEA and Visual Studio both use this (and the window manager gets Alt Escape under GNOME).
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK));
+        }
     }
     
     public void actionPerformed(ActionEvent e) {
