@@ -87,6 +87,15 @@ public class AutoCompleteAction extends ETextAction {
                 }
             }
         });
+        completionsUi.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int index = completionsUi.locationToIndex(e.getPoint());
+                textArea.replaceRange((String) completionsUi.getModel().getElementAt(index), startPosition, endPosition);
+                hideCompletionsWindow();
+                textArea.requestFocus();
+                e.consume();
+            }
+        });
         if (noCompletions) {
             completionsUi.setForeground(Color.GRAY);
         }
