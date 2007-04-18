@@ -2,12 +2,11 @@ package e.edit;
 
 public interface WorkspaceResearcher {
     /**
-    * Returns an HTML string containing information about "string". Returns
-    * the empty string (not null) if it has nothing to say. The string passed
-    * to the researcher is the selection, if there is one, or the line up to the
-    * caret otherwise.
-    */
-    public String research(String string);
+     * Returns an HTML string containing information about "string".
+     * Returns the empty string (not null) if it has nothing to say.
+     * wordAtCaret is the selection, if there is one, or the word at the caret otherwise.
+     */
+    public String research(String wordAtCaret, ETextWindow textWindow);
     
     /**
     * Invoked before research -- if we're researching an ETextWindow -- to

@@ -5,7 +5,7 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {
-    public String research(String string) {
+    public String research(String string, ETextWindow textWindow) {
         String ri = Advisor.findToolOnPath("ri");
         if (ri == null) {
             return "";
@@ -81,7 +81,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
     /** Handles our non-standard "ri:" scheme. */
     public boolean handleLink(String link) {
         if (link.startsWith("ri:")) {
-            Advisor.getInstance().showDocumentation(research(link.substring(3)));
+            Advisor.getInstance().showDocumentation(research(link.substring(3), null));
             return true;
         }
         return false;

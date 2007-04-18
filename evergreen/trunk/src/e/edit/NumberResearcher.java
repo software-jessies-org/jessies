@@ -4,7 +4,7 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class NumberResearcher implements WorkspaceResearcher {
-    public String research(String string) {
+    public String research(String string, ETextWindow textWindow) {
         try {
             NumberDecoder numberDecoder = new NumberDecoder(string);
             return numberDecoder.toHtml();

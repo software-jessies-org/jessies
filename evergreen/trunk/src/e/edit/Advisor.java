@@ -68,7 +68,7 @@ public class Advisor extends JPanel {
     public synchronized void showDocumentation() {
         advicePane.setText("");
         getFrame().setVisible(true);
-        research(getSearchTerm());
+        startResearch(getSearchTerm());
     }
     
     private class ResearchRunner extends SwingWorker<String, Object> {
@@ -86,7 +86,7 @@ public class Advisor extends JPanel {
             StringBuilder newText = new StringBuilder();
             for (WorkspaceResearcher researcher : getResearchers()) {
                 if (textWindow == null || researcher.isSuitable(textWindow)) {
-                    String result = researcher.research(searchTerm);
+                    String result = researcher.research(searchTerm, textWindow);
                     if (result != null && result.length() > 0) {
                         newText.append(result);
                     }
@@ -150,7 +150,7 @@ public class Advisor extends JPanel {
         return stopChars;
     }
     
-    public void research(String text) {
+    private void startResearch(String text) {
         new ResearchRunner(text).execute();
     }
     

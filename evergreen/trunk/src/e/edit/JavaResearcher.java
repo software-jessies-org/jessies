@@ -12,8 +12,10 @@ public class JavaResearcher implements WorkspaceResearcher {
     private static final String NEWLINE = "<br>" + INDENT;
     private static final String COMMA = ",&nbsp;";
     
-    /** A regular expression matching 'new' expressions. */
-    private static final Pattern NEW_PATTERN = Pattern.compile("(?x) .* \\b new \\s+ (\\S+) \\s* \\($");
+    /** Matches 'new' expressions such as "new JSplitPane(". */
+    private static final Pattern NEW_PATTERN = Pattern.compile("(?x) .* \\b new \\s+ ([A-Za-z0-9_]+) \\s* \\($");
+    /** Matches field or static-method access expressions such as "JSplitPane.". */
+    private static final Pattern ACCESS_PATTERN = Pattern.compile("(?x) \\b ([A-Za-z0-9_]+) \\.$");
     
     private static String[] javaDocSummary;
     private static TreeSet<String> uniqueIdentifiers;
@@ -118,60 +120,92 @@ public class JavaResearcher implements WorkspaceResearcher {
         return result;
     }
     
-    /**
-    * Builds HTML containing useful information
-    * about the text around the caret.
-    */
-    private String makeResult(String text) {
+    private String makeResult(String wordAtCaretOrSelection, ETextWindow textWindow) {
+        ETextArea textArea = textWindow.getTextArea();
+        if (textArea.hasSelection()) {
+            return makeDefaultResult(wordAtCaretOrSelection);
+        }
+        
+        CharSequence chars = textArea.getTextBuffer();
+        int end = textArea.getSelectionStart();
+        int start = end;
+        while (start > 0) {
+            char ch = chars.charAt(start - 1);
+            if (ch == '\n') {
+                break;
+            }
+            --start;
+        }
+        CharSequence lineToCaret = chars.subSequence(start, end);
+        
         // Does it look like the user wants help with a constructor?
-        // FIXME: this is currently broken because "research" isn't passed enough text to recognize this situation.
-        boolean listConstructors = false;
-        Matcher newMatcher = NEW_PATTERN.matcher(text);
+        Matcher newMatcher = NEW_PATTERN.matcher(lineToCaret);
         if (newMatcher.find()) {
-            listConstructors = true;
-            text = newMatcher.group(1);
+            String className = newMatcher.group(1);
+            return new ClassDoc(className).getConstructorSummary();
         }
         
-        // How about a class method or class field?
-        boolean listMembers = true;
-        
-        // FIXME: this is currently broken because "research" isn't passed enough text to recognize this situation.
-        Pattern accessPattern = Pattern.compile("(?x) (\\S+) \\.$");
-        Matcher accessMatcher = accessPattern.matcher(text);
+        Matcher accessMatcher = ACCESS_PATTERN.matcher(lineToCaret);
         if (accessMatcher.find()) {
-            listMembers = true;
-            text = accessMatcher.group(1);
+            String className = accessMatcher.group(1);
+            return new ClassDoc(className).getStaticSummary();
         }
         
-        // FIXME: this is currently broken because "research" isn't passed enough text to recognize this situation.
-        boolean listClasses = (listConstructors == false) && text.matches("^.*\\b[A-Z]\\S*$");
+        return makeDefaultResult(wordAtCaretOrSelection);
+    }
+    
+    private String makeDefaultResult(String wordAtCaretOrSelection) {
+        if (wordAtCaretOrSelection.matches("^[A-Z][A-Za-z0-9_]*$")) {
+            return new ClassDoc(wordAtCaretOrSelection).getClassSummary();
+        } else if (wordAtCaretOrSelection.matches("^[a-z][A-Za-z0-9_]*$")) {
+            System.err.println(wordAtCaretOrSelection + " is probably a method; not yet implemented");
+            return listMethodsOrFields(wordAtCaretOrSelection);
+        }
+        return "";
+    }
+    
+    private class ClassDoc {
+        private String className;
+        private Class[] classes;
         
-        if (listConstructors == false && listMembers == false && listClasses == false) {
-            return makeInstanceMethodOrFieldResult(text);
+        private ClassDoc(String className) {
+            this.className = className;
+            this.classes = JavaDoc.getClasses(className);
         }
         
-        // At this point, 'text' should be a class name.
-        Class[] classes = JavaDoc.getClasses(text);
-        if (classes.length == 0) {
-            return "";
+        private String getClassSummary() {
+            return getSummary(true, false, false);
         }
-
-        StringBuilder result = new StringBuilder();
-        for (Class klass : classes) {
-            if (result.length() > 0) {
-                result.append("<br><br>");
-            }
-            if (listClasses) {
-                result.append(listClass(klass));
-            }
-            if (listConstructors) {
-                result.append(listConstructors(klass));
-            }
-            if (listMembers) {
-                result.append(listMembers(klass));
-            }
+        
+        private String getConstructorSummary() {
+            return getSummary(false, true, false);
         }
-        return result.toString();
+        
+        private String getStaticSummary() {
+            return getSummary(true, false, true);
+        }
+        
+        private String getSummary(boolean listClasses, boolean listConstructors, boolean listMembers) {
+            if (classes.length == 0) {
+                return "";
+            }
+            StringBuilder result = new StringBuilder();
+            for (Class klass : classes) {
+                if (result.length() > 0) {
+                    result.append("<br><br>");
+                }
+                if (listClasses) {
+                    result.append(listClass(klass));
+                }
+                if (listConstructors) {
+                    result.append(listConstructors(klass));
+                }
+                if (listMembers) {
+                    result.append(listMembers(klass));
+                }
+            }
+            return result.toString();
+        }
     }
     
     private String makePackageResult(String text) {
@@ -185,6 +219,8 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
     }
     
+    // FIXME: currently unused, but we should try to do something here.
+    /*
     private String makeInstanceMethodOrFieldResult(String text) {
         // FIXME: ideally, we'd find the name of the most recent method with unclosed parentheses.
         // So, in "doSomething(getThing(x), " we'd know that "doSomething" is interesting and "getThing" isn't.
@@ -197,6 +233,7 @@ public class JavaResearcher implements WorkspaceResearcher {
             return "";
         }
     }
+    */
     
     /**
      * Returns HTML linking to all the classes in the given package.
@@ -328,7 +365,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
     }
     
-    public String makeMethodLinks(Method[] methods) {
+    private String makeMethodLinks(Method[] methods) {
         Arrays.sort(methods, new MemberNameComparator());
         ArrayList<String> list = new ArrayList<String>();
         for (Method method : methods) {
@@ -337,11 +374,11 @@ public class JavaResearcher implements WorkspaceResearcher {
         return StringUtilities.join(list, "");
     }
     
-    public String makeFieldLink(Field f) {
+    private String makeFieldLink(Field f) {
         return NEWLINE + makeClassLink(f.getType(), false, false) + " " + f.getName();
     }
     
-    public String makeMethodLink(Method m) {
+    private String makeMethodLink(Method m) {
         String parameters = makeClassLinks(m.getParameterTypes(), false, COMMA, false);
         String returnType = makeClassLink(m.getReturnType(), false, false);
         String result = NEWLINE + returnType + " " + m.getName() + "(" + parameters + ")";
@@ -356,7 +393,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     * Lists the fully-qualified class name and all the modifiers,
     * the superclass name and all implemented interfaces.
     */
-    public String listClass(Class c) {
+    private String listClass(Class c) {
         StringBuilder s = new StringBuilder();
         int modifiers = c.getModifiers();
         if (c.isInterface()) {
@@ -398,7 +435,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     /** Lists the class name and all the constructors. */
-    public String listConstructors(Class c) {
+    private String listConstructors(Class c) {
         StringBuilder s = new StringBuilder();
         String classLink = makeClassLink(c, false, false);
         s.append(makeClassLink(c, true, true));
@@ -426,7 +463,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     /**
      * Lists all non-private fields and non-private static methods of a class.
      */
-    public String listMembers(Class c) {
+    private String listMembers(Class c) {
         StringBuilder s = new StringBuilder();
         
         List<Field> fields = collectNonPrivateFields(c);
@@ -448,14 +485,6 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
         
         return s.toString();
-    }
-    
-    /** Sorts the strings in the given List, then appends them to the StringBuilder. */
-    private void appendAfterSorting(StringBuilder stringBuffer, List<String> items) {
-        Collections.sort(items);
-        for (int i = 0; i < items.size(); i++) {
-            stringBuffer.append(items.get(i));
-        }
     }
     
     private List<Field> collectNonPrivateFields(Class c) {
@@ -488,11 +517,11 @@ public class JavaResearcher implements WorkspaceResearcher {
         return textWindow.getFileType() == FileType.JAVA;
     }
     
-    public String research(String string) {
+    public String research(String string, ETextWindow textWindow) {
         if (string.startsWith("import ")) {
             return makePackageResult(string);
         } else {
-            return makeResult(string);
+            return makeResult(string, textWindow);
         }
     }
     

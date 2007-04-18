@@ -81,7 +81,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         set.addAll(uniqueWords);
     }
     
-    public String research(String string) {
+    public String research(String string, ETextWindow textWindow) {
         return formatManPage(string, "2:3");
     }
     
