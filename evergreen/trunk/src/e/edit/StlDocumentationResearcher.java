@@ -55,7 +55,7 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
         set.addAll(uniqueWords);
     }
     
-    public String research(String string) {
+    public String research(String string, ETextWindow textWindow) {
         return getDocumentation(string);
     }
     

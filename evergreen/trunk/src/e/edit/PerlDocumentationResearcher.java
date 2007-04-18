@@ -5,7 +5,7 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class PerlDocumentationResearcher implements WorkspaceResearcher {
-    public String research(String string) {
+    public String research(String string, ETextWindow textWindow) {
         String perldoc = Advisor.findToolOnPath("perldoc");
         if (perldoc == null) {
             return "";
@@ -33,7 +33,7 @@ public class PerlDocumentationResearcher implements WorkspaceResearcher {
     /** Handles our non-standard "perldoc:" scheme. */
     public boolean handleLink(String link) {
         if (link.startsWith("perldoc:")) {
-            Advisor.getInstance().showDocumentation(research(link.substring(8)));
+            Advisor.getInstance().showDocumentation(research(link.substring(8), null));
             return true;
         }
         return false;
