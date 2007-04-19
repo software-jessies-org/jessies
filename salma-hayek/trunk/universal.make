@@ -814,7 +814,7 @@ remove: $(addprefix run-remover,$(suffix $(STANDALONE_INSTALLERS)))
 
 .PHONY: run-installer.pkg
 run-installer.pkg:
-	echo all | sudo /usr/sbin/pkgadd -G -d $(INSTALLER.pkg)
+	yes | sudo /usr/sbin/pkgadd -G -d $(INSTALLER.pkg) all
 
 .PHONY: run-installer.deb
 run-installer.deb:
