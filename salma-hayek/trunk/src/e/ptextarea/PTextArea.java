@@ -1025,10 +1025,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     public void linesChanged(PLineEvent event) {
+        clearSegmentCacheFrom(event.getLineIndex());
         if (isLineWrappingInvalid()) {
             return;
         }
-        clearSegmentCacheFrom(event.getLineIndex());
         int lineCountChange = 0;
         int minLine = Integer.MAX_VALUE;
         int visibleLineCount = 0;

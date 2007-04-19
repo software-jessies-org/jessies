@@ -1,0 +1,132 @@
+package e.testing;
+
+import java.io.*;
+import java.util.*;
+import javax.swing.*;
+
+import e.ptextarea.*;
+import e.util.*;
+
+/**
+ * A PIndenterTester tests the indentation engines used for the PTextArea.
+ * 
+ * @author Phil Norman
+ */
+
+public class PIndenterTester {
+    private String filename;
+    private PTextArea textArea = new PTextArea(400, 400);
+    private String originalContent;
+    
+    public PIndenterTester(String filename) {
+        this.filename = filename;
+        PTextBuffer buffer = textArea.getTextBuffer();
+        buffer.readFromFile(new File(filename));
+        originalContent = buffer.toString();
+        buffer.putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(originalContent));
+        FileType fileType = FileType.guessFileType(filename, originalContent);
+        fileType.configureTextArea(textArea);
+    }
+    
+    public int printDifferences(PrintWriter out) {
+        int result = 0;
+        ArrayList<String> baselineMismatch = new ArrayList<String>();
+        ArrayList<String> comparisonMismatch = new ArrayList<String>();
+        String newContent = textArea.getTextBuffer().toString();
+        System.err.println("Old length " + originalContent.length() + ", new length " + newContent.length());
+        TwoFileLineIterator iterator = new TwoFileLineIterator(originalContent, newContent);
+        while (iterator.iterateToNext()) {
+            if (iterator.areTheTwoLinesEqual()) {
+                if (baselineMismatch.size() != 0) {
+                    dumpMismatch(out, baselineMismatch, comparisonMismatch, iterator.getLineIndex() - baselineMismatch.size());
+                    result++;
+                    baselineMismatch.clear();
+                    comparisonMismatch.clear();
+                }
+            } else {
+                baselineMismatch.add(iterator.getBaseline());
+                comparisonMismatch.add(iterator.getComparison());
+            }
+        }
+        if (baselineMismatch.size() != 0) {
+            dumpMismatch(out, baselineMismatch, comparisonMismatch, iterator.getLineIndex() - baselineMismatch.size());
+            result++;
+        }
+        return result;
+    }
+    
+    public void dumpMismatch(PrintWriter out, List<String> baseline, List<String> comparison, int firstLineIndex) {
+        out.println("Mismatch from line " + firstLineIndex + " to " + (firstLineIndex + baseline.size() - 1) + " of file " + filename);
+        out.println("Original content:");
+        for (String line: baseline) {
+            out.println(line);
+        }
+        out.println("Re-intended content:");
+        for (String line: comparison) {
+            out.println(line);
+        }
+        out.println("End of mismatch.");
+    }
+    
+    static class TwoFileLineIterator {
+        private LineNumberReader baseline;
+        private LineNumberReader comparison;
+        private String currentBaseline;
+        private String currentComparison;
+        
+        public TwoFileLineIterator(String baselineString, String comparisonString) {
+            baseline = new LineNumberReader(new CharArrayReader(baselineString.toCharArray()));
+            comparison = new LineNumberReader(new CharArrayReader(comparisonString.toCharArray()));
+        }
+        
+        public int getLineIndex() {
+            return baseline.getLineNumber();
+        }
+        
+        public boolean iterateToNext() {
+            try {
+                currentBaseline = baseline.readLine();
+                currentComparison = comparison.readLine();
+            } catch (IOException ex) {
+                // IOExceptions are impossible really...
+                ex.printStackTrace();  // ...but prevent the compiler from warning.
+            }
+            return (currentBaseline != null) && (currentComparison != null);
+        }
+        
+        public boolean areTheTwoLinesEqual() {
+            return currentBaseline.equals(currentComparison);
+        }
+        
+        public String getBaseline() {
+            return currentBaseline;
+        }
+        
+        public String getComparison() {
+            return currentComparison;
+        }
+    }
+    
+    public void correctIndentation() {
+        int textLength = textArea.getTextBuffer().length();
+        textArea.getIndenter().fixIndentationBetween(0, textLength);
+        int newLength = textArea.getTextBuffer().length();
+    }
+    
+    public static void main(final String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (String filename: args) {
+                    PIndenterTester tester = new PIndenterTester(filename);
+                    tester.correctIndentation();
+                    PrintWriter out = new PrintWriter(System.out);
+                    int differencesFound = tester.printDifferences(out);
+                    out.flush();
+                    if (differencesFound == 0) {
+                        System.out.println("No differences found in file " + filename);
+                    }
+                }
+            }
+        });
+    }
+}
