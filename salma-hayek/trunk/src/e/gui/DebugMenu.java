@@ -150,36 +150,37 @@ public class DebugMenu {
         }
         
         private String getFramesAsString() {
-            // What do Frame and Window and Dialog have in common? Container.
-            ArrayList<Container> cs = new ArrayList<Container>();
-            cs.addAll(Arrays.asList(Frame.getFrames()));
+            // What do Dialog, Frame, and Window all have in common? Window.
+            ArrayList<Window> windows = new ArrayList<Window>();
             
-            // Add Java 6's collection of windows/dialogs, without yet requiring Java 6. Equivalent to:
-            //cs.addAll(Arrays.asList(Window.getWindows()));
+            // Add Java 6's collection of dialogs/frames/windows, without yet requiring Java 6. Equivalent to:
+            //windows.addAll(Arrays.asList(Window.getWindows()));
             boolean haveWindows = true;
             try {
-                java.lang.reflect.Method getWindowsMethod = Window.class.getDeclaredMethod("getWindows", new Class[] {});
-                cs.addAll(Arrays.asList((Window[]) getWindowsMethod.invoke(null, (Object[]) null)));
+                java.lang.reflect.Method getWindowsMethod = Window.class.getDeclaredMethod("getWindows", new Class[0]);
+                windows.addAll(Arrays.asList((Window[]) getWindowsMethod.invoke(null, (Object[]) null)));
             } catch (Exception ex) {
                 // Ignore. Likely we're on Java 5, where this functionality doesn't exist.
                 haveWindows = false;
+                // We can get the Frames, though. (Every Frame is a Window, so Java 6 users already have the these.)
+                windows.addAll(Arrays.asList(Frame.getFrames()));
             }
             
             int nonDisplayableCount = 0;
             StringBuilder builder = new StringBuilder();
             builder.append("Displayable\n===========");
-            for (Component c : cs) {
-                if (c.isDisplayable()) {
-                    builder.append("\n" + c.toString() + "\n");
+            for (Window window : windows) {
+                if (window.isDisplayable()) {
+                    builder.append("\n" + window.toString() + "\n");
                 } else {
                     ++nonDisplayableCount;
                 }
             }
             if (nonDisplayableCount > 0) {
                 builder.append("\nNon-displayable\n===============");
-                for (Component c : cs) {
-                    if (c.isDisplayable() == false) {
-                        builder.append("\n" + c.toString() + "\n");
+                for (Window window : windows) {
+                    if (window.isDisplayable() == false) {
+                        builder.append("\n" + window.toString() + "\n");
                     }
                 }
             }
