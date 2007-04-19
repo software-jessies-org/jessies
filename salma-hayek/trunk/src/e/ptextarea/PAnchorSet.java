@@ -155,12 +155,10 @@ public class PAnchorSet implements PTextListener {
     }
     
     public synchronized void clear() {
-        for (int i = 0; i < anchors.size(); i++) {
-            PAnchor anchor = get(i);
-            if (anchor != null) {
-                anchor.anchorDestroyed();
-            }
+        ArrayList<PAnchor> oldAnchors = anchors;
+        anchors = new ArrayList<PAnchor>();
+        for (PAnchor anchor : oldAnchors) {
+            anchor.anchorDestroyed();
         }
-        anchors.clear();
     }
 }
