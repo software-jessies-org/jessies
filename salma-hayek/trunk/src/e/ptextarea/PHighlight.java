@@ -38,6 +38,7 @@ public abstract class PHighlight {
     
     /**
      * Removes the anchors marking the bounds of this highlight from the PAnchorSet.
+     * Use this if you have only one highlight to remove, otherwise see the documentation for collectAnchors.
      */
     void detachAnchors() {
         PAnchorSet anchorSet = textArea.getTextBuffer().getAnchorSet();
@@ -46,10 +47,10 @@ public abstract class PHighlight {
     }
     
     /**
-     * Adds the anchors marking the bounds of this highlight to a collection so they can be bulk-removed from the PAnchorSet.
+     * Adds the anchors marking the bounds of this highlight to a collection so they can be bulk-removed from the PAnchorSet using removeAll.
      * Use this if you have many highlights to remove, otherwise see detachAnchors.
      */
-    void addAnchorsTo(Collection<PAnchor> anchors) {
+    void collectAnchors(Collection<PAnchor> anchors) {
         anchors.add(start);
         anchors.add(end);
     }
