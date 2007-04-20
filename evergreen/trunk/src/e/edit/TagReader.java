@@ -36,13 +36,23 @@ public class TagReader {
         }
     }
     
+    private String chooseCtagsBinary() {
+        // We don't cache this to give the user a chance to fix things while we're running.
+        for (String candidateCtags : new String[] { "exuberant-ctags", "ectags" }) {
+            if (FileUtilities.findOnPath(candidateCtags) != null) {
+                return candidateCtags;
+            }
+        }
+        return "ctags";
+    }
+    
     private File createTagsFileFor(File file) throws InterruptedException, IOException {
         File tagsFile = File.createTempFile("e.edit.TagReader-tags-", ".tags");
         tagsFile.deleteOnExit();
         
         ArrayList<String> errors = new ArrayList<String>();
         ProcessUtilities.backQuote(tagsFile.getParentFile(), new String[] {
-            "ctags",
+            chooseCtagsBinary(),
             "--c++-types=+p", "-n", "--fields=+am", "-u",
             "--regex-java=/(\\bstatic\\b)/\1/S/",
             "--regex-c++=/(\\bstatic\\b)/\1/S/",
