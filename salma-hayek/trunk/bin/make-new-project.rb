@@ -76,7 +76,7 @@ ChangeLog.html
 classes
 .generated
 $project_name.jar" .
-echo "Getting Subversion to commit that change..."
+echo "Getting Subversion to notice that change..."
 svn update
 echo "Prompting you to manually commit that change..."
 checkintool
