@@ -419,7 +419,7 @@ public class PTextBuffer implements CharSequence {
     /** Returns the character at the given index.  Part of the CharSequence interface. */
     public char charAt(int index) {
         if (index < 0 || index >= length()) {
-            throw new IndexOutOfBoundsException("index " + index + " not in range [0.." + length() + ")");
+            throw new IndexOutOfBoundsException("index " + index + " not in range [0.." + length() + "]");
         }
         return (index < gapPosition) ? text[index] : text[index + gapLength];
     }
