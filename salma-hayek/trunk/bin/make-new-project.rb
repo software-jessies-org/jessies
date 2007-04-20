@@ -66,7 +66,6 @@ svn import $project_name svn+ssh://$svn_user_and_host/home/software/svnroot/$pro
 
 echo "Fixing permissions on the server..."
 ssh $software_user_and_host chown -R software /home/software/svnroot
-ssh $software_user_and_host chmod -R g+w
 
 echo "Checking back out..."
 svn co svn+ssh://$svn_user_and_host/home/software/svnroot/$project_name $projects_dir/$project_name
