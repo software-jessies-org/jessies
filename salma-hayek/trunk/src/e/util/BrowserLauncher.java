@@ -386,7 +386,7 @@ public class BrowserLauncher {
 			case OTHER:
 			default:
 				browser = "";
-				for (String candidateBrowser : new String[] { "sensible-browser", "gnome-open" }) {
+				for (String candidateBrowser : new String[] { "gnome-open", "sensible-browser" }) {
 					if (FileUtilities.findOnPath(candidateBrowser) != null) {
 						browser = candidateBrowser;
 						break;
@@ -403,6 +403,16 @@ public class BrowserLauncher {
 	 * @throws IOException If the web browser could not be located or does not run
 	 */
 	public static void openURL(String url) throws IOException {
+		// FIXME: when we switch to Java 6, this whole class can be replaced with "Desktop.getDesktop().browse(new URI(url));"
+		try {
+			java.lang.reflect.Method Desktop_getDesktop_method = Class.forName("java.awt.Desktop").getDeclaredMethod("getDesktop", new Class[0]);
+			java.lang.reflect.Method Desktop_browse_method = Class.forName("java.awt.Desktop").getDeclaredMethod("browse", new Class[] { java.net.URI.class });
+			Object desktop = Desktop_getDesktop_method.invoke(null);
+			Desktop_browse_method.invoke(desktop, new java.net.URI(url));
+			return;
+		} catch (Throwable ex) {
+			ex = ex;
+		}
 		if (!loadedWithoutErrors) {
 			throw new IOException("Exception in finding browser: " + errorMessage);
 		}
