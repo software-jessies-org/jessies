@@ -78,8 +78,8 @@ classes
 $project_name.jar" .
 echo "Getting Subversion to notice that change..."
 svn update
-echo "Prompting you to manually commit that change..."
-checkintool
+echo "Getting Subversion to commit that change..."
+svn commit --message "Tell Subversion which files and directories to ignore."
 
 echo "Done!"
 exit 0
