@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# It's important that your server's svn(1) be a wrapper like this:
+# It's important that your server's svn(1) and svnadmin(1) be wrappers like this:
 # 
 # $ cat `type -p svn`
 # #!/bin/sh
@@ -32,7 +32,9 @@ if [ -d $projects_dir/$project_name ]; then
     echo "Project '$project_name' already exists!"
     exit 1
 fi
-if [ ! -f $projects_dir/Evergreen/COPYING ]; then
+# salma-hayek only has the LGPL.
+GPL=$projects_dir/Evergreen/COPYING
+if [ ! -f $GPL ]; then
     echo "Couldn't find a copy of the GPL! (Don't you have a checked-out copy of Evergreen?)"
     exit 1
 fi
@@ -52,7 +54,7 @@ include ../salma-hayek/universal.make
 EOF
 
 echo "Adding GPL..."
-cp $projects_dir/edit/COPYING $project_name/COPYING
+cp $GPL $project_name/COPYING
 
 echo "Creating a new Subversion repository..."
 ssh $svn_user_and_host svnadmin create /home/software/svnroot/$project_name
@@ -63,9 +65,6 @@ echo "Creating the checked-out copy in /home/software..."
 ssh $svn_user_and_host svn co file:///home/software/svnroot/$project_name /home/software/checked-out/$project_name
 echo "Making the initial import..."
 svn import $project_name svn+ssh://$svn_user_and_host/home/software/svnroot/$project_name -m "New project, $project_name."
-
-echo "Fixing permissions on the server..."
-ssh $software_user_and_host chown -R software /home/software/svnroot
 
 echo "Checking back out..."
 svn co svn+ssh://$svn_user_and_host/home/software/svnroot/$project_name $projects_dir/$project_name
