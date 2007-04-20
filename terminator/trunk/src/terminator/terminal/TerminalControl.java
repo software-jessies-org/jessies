@@ -43,7 +43,6 @@ public class TerminalControl {
 	
 	private ExecutorService writerExecutor;
 	private Thread readerThread;
-	private Thread parserThread;
 	
 	private int characterSet;
 	private char[] g = new char[4];
@@ -55,21 +54,6 @@ public class TerminalControl {
 	private StringBuilder lineBuffer = new StringBuilder();
 	
 	private EscapeParser escapeParser;
-	
-	// Input data yet to be processed.
-	// There's currently no limit to the amount we'll queue, because I assume some other part of the system will impose one.
-	// Using a queue of depth 1 should restore the old "read one, process one" behavior.
-	private LinkedBlockingQueue<Chars> inputQueue = new LinkedBlockingQueue<Chars>();
-	// A unit of input data.
-	// This helps us put a char[] in a collection, and saves us paying to resize the char[] in the usual case where the char[] isn't full.
-	private static class Chars {
-		private char[] chars;
-		private int charCount;
-		private Chars(char[] chars, int charCount) {
-			this.chars = chars;
-			this.charCount = charCount;
-		}
-	}
 	
 	// Buffer of TerminalActions to perform.
 	private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
@@ -117,7 +101,6 @@ public class TerminalControl {
 		}
 		
 		readerThread = startThread("Reader", new ReaderRunnable());
-		parserThread = startThread("Parser", new ParserRunnable());
 	}
 	
 	private Thread startThread(String name, Runnable runnable) {
@@ -137,33 +120,21 @@ public class TerminalControl {
 				while (true) {
 					char[] chars = new char[INPUT_BUFFER_SIZE];
 					int readCount = in.read(chars, 0, chars.length);
-					inputQueue.put(new Chars(chars, readCount));
 					if (readCount == -1) {
 						Log.warn("read returned -1 from " + ptyProcess);
 						return; // This isn't going to fix itself!
+					}
+					
+					try {
+						processBuffer(chars, readCount);
+					} catch (Throwable th) {
+						Log.warn("Problem processing output from " + ptyProcess, th);
 					}
 				}
 			} catch (Throwable th) {
 				Log.warn("Problem reading output from " + ptyProcess, th);
 			} finally {
-				inputQueue.add(new Chars(null, -1));
 				handleProcessTermination();
-			}
-		}
-	}
-	
-	private class ParserRunnable implements Runnable {
-		public void run() {
-			while (true) {
-				try {
-					Chars chars = inputQueue.take();
-					if (chars.charCount == -1) {
-						return; // End of input.
-					}
-					processBuffer(chars.chars, chars.charCount);
-				} catch (Throwable th) {
-					Log.warn("Problem processing output from " + ptyProcess, th);
-				}
 			}
 		}
 	}
@@ -265,7 +236,7 @@ public class TerminalControl {
 			});
 		}
 		
-		// readerThread and parserThread will have shut themselves down by now.
+		// The readerThread will have shut itself down by now.
 		// We need to handle the writer ExecutorService ourselves.
 		if (writerExecutor != null) {
 			writerExecutor.shutdownNow();
