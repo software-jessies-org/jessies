@@ -123,6 +123,11 @@ public class FindAndReplaceAction extends ETextAction {
                 // FIXME - can we try to maintain the selection?
                 int caretPosition = currentTextArea.getUnanchoredSelectionExtreme();
                 currentTextArea.setText(makeReplacedText(currentTextArea.getText()));
+                // If replacement has shortened the buffer, don't try and put the caret back beyond the end.
+                // FIXME - this is still wrong, it's just less wrong.
+                if (caretPosition > currentTextArea.getTextBuffer().length()) {
+                    caretPosition = currentTextArea.getTextBuffer().length();
+                }
                 currentTextArea.setCaretPosition(caretPosition);
             }
             return true;
