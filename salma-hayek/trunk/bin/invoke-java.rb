@@ -165,13 +165,20 @@ class Java
         @launcher = sun_java
         return
       end
-
+      
       # We didn't find a suitable JVM, so we'll just have to tell the user.
-      suggestion = "Please upgrade."
+      message_lines = []
+      launcher_path = `which #{@launcher}`.chomp()
+      suggestion = "http://java.sun.com/javase/downloads/ may link to a suitable JRE, if you can't use one provided by your OS vendor"
+      if launcher_path != ""
+        message_lines << "Your #{launcher_path} claims to be #{actual_java_version}."
+        suggestion = "Please upgrade."
+      end
       if File.exist?("/usr/bin/gnome-app-install")
         suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, show "All available applications", type "sun java" in the search field, and install "Sun Java 5.0 Runtime".'
       end
-      show_alert("#{@dock_name} requires a newer version of Java.", "This application requires at least Java 5, but your #{`which java`.chomp()} claims to be #{actual_java_version} instead.\n\n#{suggestion}")
+      message_lines << suggestion
+      show_alert("#{@dock_name} requires Java 5 or newer.", message_lines.join("\n\n"))
       exit!(1)
     end
   end
