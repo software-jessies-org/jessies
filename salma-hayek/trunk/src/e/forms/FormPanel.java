@@ -23,6 +23,13 @@ public class FormPanel extends JPanel {
     }
     
     /**
+     * Adds an invisible empty row, about the height of a normal row's descriptive text.
+     */
+    public void addEmptyRow() {
+        addRow(" ", new JLabel(""));
+    }
+    
+    /**
      * Adds a row consisting of a label and a corresponding component.
      */
     public void addRow(String text, Component component) {
