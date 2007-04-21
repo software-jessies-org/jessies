@@ -309,6 +309,14 @@ public class Options {
 		FormPanel colorsPanel = formPanels.get(1);
 		Map<String, ColorPreference> colorPreferences = new HashMap<String, ColorPreference>();
 		
+		// Offer various preset color combinations.
+		// Note that these get fossilized into the user's preferences; updating values here doesn't affect users who've already clicked the button.
+		colorsPanel.addRow("Presets:", makePresetButton(colorPreferences, "  Terminator  ", VERY_DARK_BLUE, NEAR_WHITE, Color.GREEN, SELECTION_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "Black on White", Color.WHITE, NEAR_BLACK, Color.BLUE, LIGHT_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, NEAR_GREEN, Color.GREEN, SELECTION_BLUE));
+		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, Color.DARK_GRAY));
+		colorsPanel.addEmptyRow();
+		
 		String[] keys = options.keySet().toArray(new String[options.size()]);
 		Arrays.sort(keys);
 		for (String key : keys) {
@@ -333,13 +341,6 @@ public class Options {
 				}
 			}
 		}
-		
-		// Offer various preset color combinations.
-		// Note that these get fossilized into the user's preferences; updating values here doesn't affect users who've already clicked the button.
-		colorsPanel.addRow("Presets:", makePresetButton(colorPreferences, "  Terminator  ", VERY_DARK_BLUE, NEAR_WHITE, Color.GREEN, SELECTION_BLUE));
-		colorsPanel.addRow("", makePresetButton(colorPreferences, "Black on White", Color.WHITE, NEAR_BLACK, Color.BLUE, LIGHT_BLUE));
-		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, NEAR_GREEN, Color.GREEN, SELECTION_BLUE));
-		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, Color.DARK_GRAY));
 		
 		// Save the preferences if the user hits "Save".
 		form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
@@ -569,11 +570,13 @@ public class Options {
 	 */
 	private void initDefaultColors() {
 		// Defaults reminiscent of SGI's xwsh(1).
-		addDefault("background", VERY_DARK_BLUE, "Background color");
-		addDefault("cursorColor", Color.GREEN, "Cursor color");
-		addDefault("foreground", NEAR_WHITE, "Text foreground color");
-		addDefault("selectionColor", SELECTION_BLUE, "Selection background color");
+		addDefault("background", VERY_DARK_BLUE, "Background");
+		addDefault("cursorColor", Color.GREEN, "Cursor");
+		addDefault("foreground", NEAR_WHITE, "Text foreground");
+		addDefault("selectionColor", SELECTION_BLUE, "Selection background");
+		
 		// This will be overridden with an appropriate value.
+		// It doesn't get a description, so it won't appear in the UI.
 		defaults.put("colorBD", Color.BLACK);
 		options.put("colorBD", Color.BLACK);
 	}
