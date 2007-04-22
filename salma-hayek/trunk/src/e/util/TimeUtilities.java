@@ -62,6 +62,13 @@ public class TimeUtilities {
     }
     
     /**
+     * Returns a string representation of the given number of milliseconds.
+     */
+    public static String msToString(long ms) {
+        return nsToString(ms * 1000000);
+    }
+    
+    /**
      * Returns a string representation of the given number of nanoseconds.
      */
     public static String nsToString(long ns) {

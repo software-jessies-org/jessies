@@ -136,7 +136,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         
         public void dispose() {
             if (lastReportedStack != null) {
-                Log.warn("(hang #" + hangNumber + ") event dispatch thread unstuck after " + timeSoFar() + " ms.");
+                Log.warn("(hang #" + hangNumber + ") event dispatch thread unstuck after " + TimeUtilities.msToString(timeSoFar()) + ".");
             }
         }
     }
