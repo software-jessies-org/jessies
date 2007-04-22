@@ -108,7 +108,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             hangNumber = getNewHangNumber();
             String stackTrace = stackTraceToString(currentStack);
             lastReportedStack = currentStack;
-            Log.warn("(hang #" + hangNumber + ") event dispatch thread stuck processing event for " + timeSoFar() + " ms:" + stackTrace);
+            Log.warn("(hang #" + hangNumber + ") event dispatch thread stuck processing event for " + timeSoFar() + " ms so far:" + stackTrace);
             checkForDeadlock();
         }
         
