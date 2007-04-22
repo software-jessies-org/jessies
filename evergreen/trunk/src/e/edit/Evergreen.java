@@ -363,15 +363,10 @@ public class Evergreen {
      */
     public String normalizeWorkspacePrefix(String filename) {
         for (Workspace workspace : getWorkspaces()) {
-            try {
-                String friendlyPrefix = workspace.getRootDirectory();
-                String canonicalPrefix = workspace.getCanonicalRootDirectory();
-                if (filename.startsWith(canonicalPrefix)) {
-                    return friendlyPrefix + filename.substring(canonicalPrefix.length());
-                }
-            } catch (IOException ex) {
-                /* Harmless. */
-                ex = ex;
+            String friendlyPrefix = workspace.getRootDirectory();
+            String canonicalPrefix = workspace.getCanonicalRootDirectory();
+            if (filename.startsWith(canonicalPrefix)) {
+                return friendlyPrefix + filename.substring(canonicalPrefix.length());
             }
         }
         return filename;

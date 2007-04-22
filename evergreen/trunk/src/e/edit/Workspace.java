@@ -16,6 +16,7 @@ public class Workspace extends JPanel {
 
     private String title;
     private String rootDirectory;
+    private String canonicalRootDirectory;
     private String buildTarget;
     
     private OpenQuicklyDialog openQuicklyDialog;
@@ -84,6 +85,11 @@ public class Workspace extends JPanel {
     
     public void setRootDirectory(String rootDirectory) {
         this.rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
+        try {
+            this.canonicalRootDirectory = FileUtilities.fileFromString(rootDirectory).getCanonicalPath() + File.separator;
+        } catch (IOException ex) {
+            Log.warn("Failed to cache canonical root directory for workspace \"" + title + "\" with new root \"" + rootDirectory + "\"", ex);
+        }
         fileList.rootDidChange();
     }
     
@@ -99,8 +105,10 @@ public class Workspace extends JPanel {
      * Returns the OS-canonical form rather than the normal, friendly one.
      * See also getRootDirectory.
      */
-    public String getCanonicalRootDirectory() throws IOException {
-        return FileUtilities.fileFromString(getRootDirectory()).getCanonicalPath() + File.separator;
+    public String getCanonicalRootDirectory() {
+        // We cache this because it's called when deciding on a workspace for a newly-opened file.
+        // We don't want the UI to lock up because an unrelated workspace's NFS mount is temporarily unresponsive.
+        return canonicalRootDirectory;
     }
     
     public JComponent makeUI() {

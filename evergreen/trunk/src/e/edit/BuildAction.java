@@ -51,12 +51,7 @@ public class BuildAction extends ETextAction {
         if (focusedTextWindow != null) {
             return focusedTextWindow.getContext();
         } else {
-            try {
-                return Evergreen.getInstance().getCurrentWorkspace().getCanonicalRootDirectory();
-            } catch (IOException ex) {
-                Evergreen.getInstance().showAlert("Workspace root not found", "It's not possible to find the build instructions for this project because the workspace root could not be found (" + ex.getMessage() + ").");
-                return null;
-            }
+            return Evergreen.getInstance().getCurrentWorkspace().getCanonicalRootDirectory();
         }
     }
     
