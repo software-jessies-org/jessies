@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.regex.*;
 
 /**
- * Uses ispell(1) to check spelling.
+ * Uses an ispell(1)-compatible back end to check spelling.
  */
 public class SpellingChecker {
     private static final SpellingChecker instance = new SpellingChecker();
@@ -25,19 +25,18 @@ public class SpellingChecker {
     
     /** Establishes the connection to ispell, if possible. */
     private SpellingChecker() {
-        boolean found = false;
-        
-        if (GuiUtilities.isMacOs()) {
-            // On Mac OS, we want to use the system's spelling checker, so try
-            // our NSSpell utility (which gives Apple's code an ispell-like
-            // interface) first. We assume it's on the path. Our start-up
-            // scripts ensure this.
-            found = connectTo(new String[] { "NSSpell" });
+        // On Mac OS, we want to use the system's spelling checker, so try our NSSpell utility (which gives Apple's code an ispell-like interface) first.
+        // Our start-up scripts ensure it's on our path if we're running on a Mac.
+        // Otherwise try aspell(1) -- also used by gedit(1) -- first, and fall back to good old ispell(1).
+        String[] backEnds = { "NSSpell", "aspell", "ispell" };
+        for (String backEnd : backEnds) {
+            if (FileUtilities.findOnPath(backEnd) != null) {
+                if (connectTo(new String[] { backEnd, "-a" })) {
+                    return;
+                }
+            }
         }
-        
-        if (found == false) {
-            connectTo(new String[] { "ispell", "-a" });
-        }
+        Log.warn("SpellingChecker: failed to find any back end. Please install aspell(1) or ispell(1).");
     }
     
     /** Attempts to connect to the given command-line spelling checker, which must be compatible with ispell's -a mode. */
@@ -49,7 +48,7 @@ public class SpellingChecker {
             
             String greeting = in.readLine();
             if (greeting.startsWith("@(#) International Ispell ")) {
-                Log.warn("Connected to " + execArguments[0] + " okay.");
+                Log.warn("SpellingChecker: connected to " + execArguments[0] + " okay.");
             } else {
                 throw new IOException("Garbled ispell response: " + greeting);
             }
@@ -57,7 +56,7 @@ public class SpellingChecker {
             out.flush();
             return true;
         } catch (IOException ex) {
-            Log.warn("Couldn't start " + execArguments[0] + " (" + ex.getMessage() + ") assuming it isn't installed.");
+            Log.warn("SpellingChecker: couldn't start " + execArguments[0] + " (" + ex.getMessage() + "), though it was on the path.");
             ispell = null;
             in = null;
             out = null;
@@ -181,14 +180,14 @@ public class SpellingChecker {
             }
             
             if (response.length() != 0) {
-                Log.warn("ispell: garbled response: '" + response + "'");
+                Log.warn("SpellingChecker: garbled response: '" + response + "'");
             }
             
             return misspelled;
         } catch (IOException ex) {
             // What do we know, other than we failed to get an answer?
             // Should we stop talking to ispell?
-            Log.warn("ispell: I/O error.", ex);
+            Log.warn("SpellingChecker: I/O error.", ex);
             return false;
         }
     }
