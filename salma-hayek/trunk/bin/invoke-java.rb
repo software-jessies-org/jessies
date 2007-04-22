@@ -169,6 +169,9 @@ class Java
       # We didn't find a suitable JVM, so we'll just have to tell the user.
       message_lines = []
       launcher_path = `which #{@launcher}`.chomp()
+      # http://www.java.com/en/download/ looks like a better choice if we want to keep it simple.
+      # The suggestion below offers a variety of downloads of JDKs and Java EE stuff which would
+      # be bewildering to the uninitiated.
       suggestion = "http://java.sun.com/javase/downloads/ may link to a suitable JRE, if you can't use one provided by your OS vendor"
       if launcher_path != ""
         message_lines << "Your #{launcher_path} claims to be #{actual_java_version}."
