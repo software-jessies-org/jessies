@@ -191,8 +191,12 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             super.dispatchEvent(event);
         } finally {
             postDispatchEvent();
-            if (haveShownSomeComponent == false && event instanceof ComponentEvent && event.getID() == ComponentEvent.COMPONENT_SHOWN) {
-                haveShownSomeComponent = true;
+            if (haveShownSomeComponent == false) {
+                boolean componentShown = event instanceof ComponentEvent && event.getID() == ComponentEvent.COMPONENT_SHOWN;
+                boolean windowOpened = event instanceof WindowEvent && event.getID() == WindowEvent.WINDOW_OPENED;
+                if (componentShown || windowOpened) {
+                    haveShownSomeComponent = true;
+                }
             }
         }
     }
@@ -268,12 +272,12 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
     }
     
     public static void main(String[] args) {
-        initMonitoring();
         Tests.main(args);
     }
     
     private static class Tests {
         public static void main(final String[] args) {
+            GuiUtilities.initLookAndFeel();
             java.awt.EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     for (String arg : args) {
@@ -337,7 +341,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         
         // A demonstration of the problems of dealing with modal dialogs.
         private static void runModalTest(final JFrame frame, final boolean shouldSleep) {
-            System.out.println(shouldSleep ? "Expect hangs!" : "There should be no hangs...");
+            Log.warn(shouldSleep ? "Expect hangs!" : "There should be no hangs...");
             JButton button = new JButton("Show Modal Dialog");
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -378,9 +382,9 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         
         private static void sleep(long ms) {
             try {
-                System.out.println("Sleeping for " + ms + " ms on " + Thread.currentThread() + "...");
+                Log.warn("Sleeping for " + ms + " ms on " + Thread.currentThread() + "...");
                 Thread.sleep(ms);
-                System.out.println("Finished sleeping...");
+                Log.warn("Finished sleeping...");
             } catch (Exception ex) {
                 Log.warn("Sleep interrupted!", ex);
             }
