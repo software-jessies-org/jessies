@@ -774,7 +774,7 @@ build: native
 installer: $(INSTALLERS)
 
 .PHONY: native-dist
-native-dist: $(addprefix upload.,$(STANDALONE_INSTALLERS))
+native-dist: $(addprefix symlink-latest.,$(STANDALONE_INSTALLERS))
 
 # We still need the default salma-hayek build during the nightly build.
 native-dist: build
@@ -796,9 +796,9 @@ $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 
 # I like the idea of keeping several versions on the server but we're going to have a hard time
 # linking to the one we expect people to use unless we create a symlink.
-$(addprefix upload.,$(INSTALLERS)): upload.%: symlink-latest.%
+$(addprefix symlink-latest.,$(STANDALONE_INSTALLERS)): symlink-latest.%: upload.%
 .PHONY: symlink-latest.%
-$(addprefix symlink-latest.,$(INSTALLERS)): symlink-latest.%: %
+$(addprefix symlink-latest.,$(STANDALONE_INSTALLERS)): symlink-latest.%: %
 	@echo Symlinking the latest $(LATEST_INSTALLER_LINK)...
 	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
