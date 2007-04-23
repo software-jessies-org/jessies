@@ -114,8 +114,6 @@ class Java
     init_default_class_path()
     # We don't know the JVM's architecture at this point.
     # We've seen a number of systems which run an i386 JVM on an amd64 kernel.
-    # If we add the wrong architecture to java.library.path, System.loadLibrary will fail with an exception like:
-    # "Can't load AMD 64-bit .so on a IA 32-bit platform"
     add_pathnames_property("org.jessies.libraryDirectories", Dir.glob("#{@project_root}/.generated/*_#{target_os()}/lib"))
     
     set_icons(name)
