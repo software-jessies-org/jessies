@@ -62,7 +62,7 @@ public class PtyProcess {
     
     private static synchronized void ensureLibraryLoaded() throws UnsatisfiedLinkError {
         if (libraryLoaded == false) {
-            System.loadLibrary("pty");
+            FileUtilities.loadNativeLibrary("pty");
             libraryLoaded = true;
         }
     }
