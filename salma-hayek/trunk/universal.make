@@ -488,12 +488,15 @@ $(foreach extension,$(INSTALLER_EXTENSIONS),$(eval $(call defineInstallerPath,$(
 INSTALLERS.$(TARGET_OS) = $(foreach extension,$(INSTALLER_EXTENSIONS.$(TARGET_OS)),$(INSTALLER.$(extension)))
 INSTALLERS = $(INSTALLERS.$(TARGET_OS))
 
-STANDALONE_INSTALLERS.$(MACHINE_PROJECT_NAME) = $(INSTALLERS)
-STANDALONE_INSTALLERS.salma-hayek =
-STANDALONE_INSTALLERS = $(STANDALONE_INSTALLERS.$(MACHINE_PROJECT_NAME))
+PUBLISHABLE_INSTALLERS.$(MACHINE_PROJECT_NAME) = $(INSTALLERS)
+# Simplicity causes us to have rules for making installers in salma-hayek but we don't want to invoke them
+# as prerequisites of the user-visible targets like native-dist.
+# Hence the distinction between INSTALLERS and PUBLISHABLE_INSTALLERS.
+PUBLISHABLE_INSTALLERS.salma-hayek =
+PUBLISHABLE_INSTALLERS = $(PUBLISHABLE_INSTALLERS.$(MACHINE_PROJECT_NAME))
 
 # Among its many breakages, msiexec is more restrictive about slashes than Win32.
-NATIVE_NAME_FOR_INSTALLERS := '$(subst /,\,$(call convertToNativeFilenames,$(STANDALONE_INSTALLERS)))'
+NATIVE_NAME_FOR_INSTALLERS := '$(subst /,\,$(call convertToNativeFilenames,$(PUBLISHABLE_INSTALLERS)))'
 
 # We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.
 PACKAGING_DIRECTORY = .generated/native/$(TARGET_DIRECTORY)/$(MACHINE_PROJECT_NAME)
@@ -774,7 +777,7 @@ build: native
 installer: $(INSTALLERS)
 
 .PHONY: native-dist
-native-dist: $(addprefix symlink-latest.,$(STANDALONE_INSTALLERS))
+native-dist: $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS))
 
 # We still need the default salma-hayek build during the nightly build.
 native-dist: build
@@ -783,7 +786,7 @@ native-dist: build
 # This is so that, when we regenerate the Packages file, we don't change md5sums.
 # If you want to upload a new installer, you're going to have to check-in first (or change this rule or manually delete the old one).
 .PHONY: upload.%
-$(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
+$(addprefix upload.,$(PUBLISHABLE_INSTALLERS)): upload.%: %
 	@echo Uploading $(<F)...
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	if scp $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F) $<; \
@@ -796,21 +799,21 @@ $(addprefix upload.,$(STANDALONE_INSTALLERS)): upload.%: %
 
 # I like the idea of keeping several versions on the server but we're going to have a hard time
 # linking to the one we expect people to use unless we create a symlink.
-$(addprefix symlink-latest.,$(STANDALONE_INSTALLERS)): symlink-latest.%: upload.%
+$(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: upload.%
 .PHONY: symlink-latest.%
-$(addprefix symlink-latest.,$(STANDALONE_INSTALLERS)): symlink-latest.%: %
+$(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 	@echo Symlinking the latest $(LATEST_INSTALLER_LINK)...
 	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	find $(DIST_DIRECTORY) -name '"$(call makeInstallerName$(suffix $<),*)"' -mtime +7 '|' xargs $(RM)
 
 .PHONY: install
-install: $(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS)))
+install: $(addprefix run-installer,$(suffix $(PUBLISHABLE_INSTALLERS)))
 
-$(addprefix run-installer,$(suffix $(STANDALONE_INSTALLERS))): $(STANDALONE_INSTALLERS)
+$(addprefix run-installer,$(suffix $(PUBLISHABLE_INSTALLERS))): $(PUBLISHABLE_INSTALLERS)
 
 .PHONY: remove
-remove: $(addprefix run-remover,$(suffix $(STANDALONE_INSTALLERS)))
+remove: $(addprefix run-remover,$(suffix $(PUBLISHABLE_INSTALLERS)))
 
 .PHONY: run-installer.pkg
 run-installer.pkg:
