@@ -112,7 +112,11 @@ class Java
 
     init_default_heap_size()
     init_default_class_path()
-    @library_path = [ "#{@project_root}/.generated/#{target_directory()}/lib" ]
+    # We don't know the JVM's architecture at this point.
+    # We've seen a number of systems which run an i386 JVM on an amd64 kernel.
+    # If we add the wrong architecture to java.library.path, System.loadLibrary will fail with an exception like:
+    # "Can't load AMD 64-bit .so on a IA 32-bit platform"
+    add_pathnames_property("org.jessies.libraryDirectories", Dir.glob("#{@project_root}/.generated/*_#{target_os()}/lib"))
     
     set_icons(name)
   end
@@ -306,7 +310,6 @@ class Java
     args = [ @launcher ]
 
     add_pathnames_property("java.class.path", @class_path)
-    add_pathnames_property("java.library.path", @library_path)
     
     # Fix the path so that our support binaries are on it.
     subvertPath()

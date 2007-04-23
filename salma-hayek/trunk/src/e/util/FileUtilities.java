@@ -364,6 +364,23 @@ public class FileUtilities {
         }
     }
 
+    public static void loadNativeLibrary(String libraryName) {
+        String fileName = System.mapLibraryName(libraryName);
+        String directories = System.getProperty("org.jessies.libraryDirectories");
+        for (String directory : directories.split(File.pathSeparator)) {
+            File candidatePath = new File(directory, fileName);
+            try {
+                System.load(candidatePath.getAbsolutePath());
+                return;
+            } catch (Throwable ex) {
+                // Perhaps we should collect ex.getMessage() for re-throwing later
+                // if we fail to load from all directories.
+                ex = ex;
+            }
+        }
+        throw new UnsatisfiedLinkError("Failed to load " + fileName + " from " + directories);
+    }
+    
     public static void main(String[] arguments) {
         for (String filename : arguments) {
             System.err.println(parseUserFriendlyName(filename));
