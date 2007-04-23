@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ "$1" = "" ]; then
+  echo "Usage: indenter <file to test>"
+fi
+exec java -cp `dirname $0`/../classes e.testing.PIndenterTester "$1"
+

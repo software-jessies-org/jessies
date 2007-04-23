@@ -1,0 +1,59 @@
+#!/bin/bash
+
+if [ "$1" = "-h" ]; then
+  echo "Usage: run_tests [<filter string>]"
+  echo "With no arguments, all tests are run."
+  echo "If a filter string is supplied, only data files with that"
+  echo "string in their filenames will run."
+  echo "To run only all indenter tests, use:"
+  echo "$ run_tests indent"
+  exit 1
+fi
+
+
+function do_run_script() {
+  local run_script="$1"
+  local file="$2"
+  grep -q '\*\*\*EXPECTED TO FAIL\*\*\*' $file
+  local expected_pass=$?
+
+  tmp_file=`mktemp`
+  $run_script $file >$tmp_file 2>&1
+  if [ "$?" = "0" ]; then
+    if [ "$expected_pass" = "1" ]; then
+      echo "PASS: $file"
+    else
+      echo "UNEXPECTED PASS: $file"
+    fi
+  else
+    if [ "$expected_pass" = "1" ]; then
+      echo "UNEXPECTED FAILURE: $file:"
+      echo "---- 8<----- Start of unexpected failure: $file"
+      cat $tmp_file
+      echo "---- 8<----- End of unexpected failure: $file"
+      echo
+    else
+      echo "EXPECTED FAIL: $file"
+    fi
+  fi
+
+  rm $tmp_file
+}
+
+
+tests_dir=`dirname $0`
+test_files=`ls $tests_dir/*_files/*`
+if [ ! "$?" = "0" ]; then
+  echo "No test files found."
+  exit 1
+fi
+
+for i in $test_files; do
+  run_script=`echo $i | sed -e 's/_files.*//'`
+  if [ -x $run_script ]; then
+    do_run_script $run_script $i
+  else
+    echo "Error running test $i: $run_script is not an executable file."
+  fi
+done
+
