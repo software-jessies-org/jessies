@@ -89,6 +89,13 @@ def find_jdk_root()
   require "#{bin}/target-os.rb"
   require "#{bin}/which.rb"
   
+  # Kees Jongenburger says this is the way things are done on Gentoo.
+  # It sounds like a per-user equivalent of /etc/alternatives.
+  is_gentoo = (which("java-config") != nil)
+  if is_gentoo
+    return `java-config --jdk-home`
+  end
+  
   # On Windows, it's likely that the only Java-related executables on the user's path are %WINDIR%\SYSTEM32\{java,javaw,javaws}.exe.
   # This is unfortunately true even if the user has a properly installed JDK.
   if target_os() == "Cygwin"
