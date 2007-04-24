@@ -247,7 +247,7 @@ public class TagsUpdater {
         
         public String getFilenameSuffix() {
             String suffix = ".txt";
-            String filename = getTextWindow().getFilename();
+            String filename = FileUtilities.fileFromString(getTextWindow().getFilename()).getName();
             int lastDot = filename.lastIndexOf('.');
             if (lastDot != -1) {
                 suffix = filename.substring(lastDot);
