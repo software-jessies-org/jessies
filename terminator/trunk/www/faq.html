@@ -133,6 +133,16 @@ export TERM=$TERM
 
 <!-- ---------------------------------------------------- -->
 
+<h2>Why am I having trouble with Emacs?</h2>
+
+<p>By default, Terminator uses the alt key for its keyboard equivalents for menu actions (except on Mac OS). If you want to use the alt key as Emacs' meta, you need to tell Terminator so in the preferences dialog. Then Terminator will use control+shift for its keyboard equivalents, and alt-key combinations will be passed through to the application.
+
+<h2>Why am I having trouble with Emacs on Mac OS?</h2>
+
+<p>Mac Emacs users can't use the alt key as Emacs' meta because bugs in Apple's Java VM mean that Terminator isn't given the correct key presses. In some cases (alt-e, alt-u, alt-i, and alt-n) we're not given any key press at all. We've raised Apple bug ID#5158674, and will have to wait for Apple to fix their JVM. Emacs works fine in Terminator on Linux, Solaris, and Windows, if that's an alternative for you.
+
+<!-- ---------------------------------------------------- -->
+
 <h2>Why can't I paste in VNC?</h2>
 
 <p>If you're using an old version of VNC, you may experience problems pasting into Terminator, with the following exception in the "Debugging Messages":
