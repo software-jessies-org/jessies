@@ -65,7 +65,6 @@ NEW_JNI_HEADER = $(COMPILATION_DIRECTORY)/new/$(JNI_BASE_NAME).h
 JNI_HEADER = $(COMPILATION_DIRECTORY)/$(JNI_BASE_NAME).h
 JNI_OBJECT = $(COMPILATION_DIRECTORY)/$(JNI_BASE_NAME).o
 JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
-JNI_CLASS_FILE = classes/$(subst .,/,$(JNI_CLASS_NAME)).class
 
 BUILDING_JNI = $(JNI_SOURCE)
 LOCAL_LDFLAGS += $(if $(BUILDING_JNI),$(JNI_LIBRARY_LDFLAGS))
@@ -155,10 +154,7 @@ $(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
 
 ifneq "$(JNI_SOURCE)" ""
 
-$(JNI_CLASS_FILE): $(JAVA_SOURCE_FILES)
-	$(BUILD_JAVA)
-
-$(NEW_JNI_HEADER): $(JNI_CLASS_FILE) $(JAVAHPP) $(SALMA_HAYEK)/classes/e/tools/JavaHpp.class
+$(NEW_JNI_HEADER): .generated/java.sentinel $(JAVAHPP) $(SALMA_HAYEK)/classes/e/tools/JavaHpp.class
 	@echo "Generating JNI header..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \

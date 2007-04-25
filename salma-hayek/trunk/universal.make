@@ -344,7 +344,9 @@ DIST_SUBDIRECTORY.pkg = sunos
 DIST_SUBDIRECTORY.rpm = redhat
 
 $(takeProfileSample)
+# Can we really imagine a project without src/?  I'm wondering whether the wildcard is necessary.
 JAVA_SOURCE_FILES := $(if $(wildcard src),$(shell find src -type f -name "*.java"))
+JAVA_DIRECTORY_PREREQUISITES := $(if $(strip $(wildcard src classes)),$(shell find $(wildcard src classes) -name .svn -prune -o -type d -print))
 $(takeProfileSample)
 SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
 
@@ -435,7 +437,8 @@ define BUILD_JAVA
   $(RM) -r classes && \
   mkdir -p classes
   @echo '$(JAVA_COMPILER) $(JAVAC_FLAGS) $$(JAVA_SOURCE_FILES)'
-  @$(JAVA_COMPILER) $(JAVAC_FLAGS) $(call convertToNativeFilenames,$(JAVA_SOURCE_FILES))
+  @$(JAVA_COMPILER) $(JAVAC_FLAGS) $(call convertToNativeFilenames,$(JAVA_SOURCE_FILES)) && \
+  touch $@
 endef
 
 # ----------------------------------------------------------------------------
@@ -535,7 +538,7 @@ define closeLocalVariableScope
   $(call forEachLocalVariable,unsetLocalVariable)
 endef
 
-BUILD_TARGETS += build.$(findstring java,$(JAVA_SOURCE_FILES))
+BUILD_TARGETS += $(if $(JAVA_SOURCE_FILES),.generated/java.sentinel)
 BUILD_TARGETS += $(if $(wildcard .svn),.generated/build-revision.txt)
 TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
 # We deliberately omit the intermediate directory.
@@ -552,11 +555,7 @@ BUILD_TARGETS += $(COMPILED_TERMINFO)
 .PHONY: build
 build: $(BUILD_TARGETS)
 
-.PHONY: build.
-build.:;
-
-.PHONY: build.java
-build.java: $(JAVA_SOURCE_FILES)
+.generated/java.sentinel: $(MAKEFILE_LIST) $(JAVA_SOURCE_FILES) $(JAVA_DIRECTORY_PREREQUISITES)
 	$(BUILD_JAVA)
 
 .PHONY: clean
@@ -584,7 +583,7 @@ source-dist: ../$(SOURCE_DIST_FILE)
 	mkdir -p $(DIST_DIRECTORY) && \
 	mv $< $(DIST_DIRECTORY)/
 
-$(MACHINE_PROJECT_NAME).jar: build.java
+$(MACHINE_PROJECT_NAME).jar: .generated/java.sentinel
 	$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
 	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
@@ -762,8 +761,6 @@ define MAKE_INSTALLER_FILE_LIST
 endef
 
 # The installer uses find(1) to discover what to include - so it must be built last.
-# Depending on the PHONY build.java may cause the Java to be built more than
-# once unless make orders the jobs to avoid that.
 $(WIX_COMPILATION_DIRECTORY)/component-definitions.wxi: $(ALL_PER_DIRECTORY_TARGETS)
 
 # Presumably we need a similar dependency for non-WiX installers, which need the per-directory targets slightly later but still before the installer.
