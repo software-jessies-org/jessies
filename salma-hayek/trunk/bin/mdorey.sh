@@ -27,5 +27,4 @@
 
 NIGHTLY_BUILD_SCRIPT=/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
 NIGHTLY_BUILD_TREE=/software.jessies.org/nightlies/
-$NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
-$NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE native-dist
+$NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean native-dist
