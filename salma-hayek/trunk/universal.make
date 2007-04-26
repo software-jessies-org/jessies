@@ -768,7 +768,7 @@ native: $(ALL_PER_DIRECTORY_TARGETS)
 build: native
 
 .PHONY: installer
-installer: $(INSTALLERS)
+installer: $(PUBLISHABLE_INSTALLERS)
 
 .PHONY: native-dist
 native-dist: $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS))
