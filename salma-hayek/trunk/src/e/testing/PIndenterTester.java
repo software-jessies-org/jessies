@@ -129,6 +129,9 @@ public class PIndenterTester {
                 }
                 if (args.length > 1) {
                     System.out.println("" + errorCounter + " differences found in all files");
+                } else if (args.length == 0) {
+                    System.err.println("Usage: indenter <files to test>");
+                    System.exit(1);
                 }
                 if (errorCounter > 0) {
                     System.exit(1);
