@@ -785,8 +785,7 @@ $(addprefix upload.,$(PUBLISHABLE_INSTALLERS)): upload.%: %
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY) && \
 	if scp $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F) $<; \
 	then \
-		echo $(<F) was already on the server - it should not be overwritten once its md5sums are in a Debian Packages file. && \
-		exit 1; \
+		echo Overwriting the local $(<F) with the copy of that version from the server - it should not be overwritten once its md5sums are in a Debian Packages file...; \
 	else \
 		scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F); \
 	fi
