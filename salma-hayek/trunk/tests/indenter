@@ -1,7 +1,10 @@
-#!/bin/bash
+#!/usr/bin/ruby -w
 
-if [ "$1" = "" ]; then
-  echo "Usage: indenter <file to test>"
-fi
-exec java -cp `dirname $0`/../classes e.testing.PIndenterTester "$1"
+# Cope with symbolic links to this script.
+require "pathname.rb"
+salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
+require "#{salma_hayek}/bin/invoke-java.rb"
 
+invoker = Java.new("PIndenterTester", "e/testing/PIndenterTester")
+invoker.initiate_startup_notification = false
+invoker.invoke()
