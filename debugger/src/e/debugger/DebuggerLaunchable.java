@@ -13,7 +13,7 @@ public class DebuggerLaunchable implements Launchable {
     public void parseCommandLine(List<String> arguments) {
         // FIXME
         System.setProperty("sourcepath", "/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home/src/;~/Projects/debugger/src/;/usr/java/jdk/src/");
-        System.setProperty("classpath", FileUtilities.parseUserFriendlyName("~/Projects/salma-hayek/classes/") + File.pathSeparator + FileUtilities.parseUserFriendlyName("~/Projects/debugger/classes/"));
+        System.setProperty("classpath", FileUtilities.parseUserFriendlyName("~/Projects/salma-hayek/.generated/classes/") + File.pathSeparator + FileUtilities.parseUserFriendlyName("~/Projects/debugger/.generated/classes/"));
         System.setProperty("main_class", "e.debugger.TestProgram");
     }
     
