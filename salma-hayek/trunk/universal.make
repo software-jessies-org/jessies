@@ -346,7 +346,7 @@ DIST_SUBDIRECTORY.rpm = redhat
 $(takeProfileSample)
 # Can we really imagine a project without src/?  I'm wondering whether the wildcard is necessary.
 JAVA_SOURCE_FILES := $(if $(wildcard src),$(shell find src -type f -name "*.java"))
-JAVA_DIRECTORY_PREREQUISITES := $(if $(strip $(wildcard src classes)),$(shell find $(wildcard src classes) -name .svn -prune -o -type d -print))
+JAVA_DIRECTORY_PREREQUISITES := . $(if $(strip $(wildcard src classes)),$(shell find $(wildcard src classes) -name .svn -prune -o -type d -print))
 $(takeProfileSample)
 SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
 
