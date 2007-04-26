@@ -346,7 +346,7 @@ DIST_SUBDIRECTORY.rpm = redhat
 $(takeProfileSample)
 # Can we really imagine a project without src/?  I'm wondering whether the wildcard is necessary.
 JAVA_SOURCE_FILES := $(if $(wildcard src),$(shell find src -type f -name "*.java"))
-JAVA_DIRECTORY_PREREQUISITES := . $(if $(strip $(wildcard src classes)),$(shell find $(wildcard src classes) -name .svn -prune -o -type d -print))
+JAVA_DIRECTORY_PREREQUISITES := .generated $(if $(strip $(wildcard src .generated/classes)),$(shell find $(wildcard src .generated/classes) -name .svn -prune -o -type d -print))
 $(takeProfileSample)
 SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
 
@@ -364,13 +364,9 @@ define GENERATE_CHANGE_LOG.cvs
   $(if $(shell which cvs2cl),cvs2cl,cvs2cl.pl) --hide-filenames
 endef
 
-CREATE_OR_UPDATE_JAR=cd $(2)/classes && jar $(1)f $(CURDIR)/$@ $(notdir $(wildcard $(2)/classes/*))
-
 GENERATED_FILES += ChangeLog
 GENERATED_FILES += ChangeLog.html
-GENERATED_FILES += classes
 GENERATED_FILES += .generated
-GENERATED_FILES += $(MACHINE_PROJECT_NAME).jar
 
 MAKE_VERSION_FILE_COMMAND = ruby $(SCRIPT_PATH)/make-version-file.rb . $(SALMA_HAYEK)
 # By immediately evaluating this, we cause install-everything.sh (or other building-from-source) to warn:
@@ -395,7 +391,7 @@ endif
 # TODO: Consider whether we could defer to invoke-java.rb to run the compiler
 # and so lose this duplication.
 # ----------------------------------------------------------------------------
-CLASS_PATH += $(SALMA_HAYEK)/classes
+CLASS_PATH += $(SALMA_HAYEK)/.generated/classes
 CLASS_PATH += $(wildcard $(SALMA_HAYEK)/lib/jars/*.jar)
 CLASS_PATH += $(wildcard $(PROJECT_ROOT)/lib/jars/*.jar)
 
@@ -410,7 +406,7 @@ JAVAC_FLAGS += $(addprefix -classpath ,$(call makeNativePath,$(CLASS_PATH)))
 # Set default javac flags.
 # ----------------------------------------------------------------------------
 
-JAVAC_FLAGS += -d classes/
+JAVAC_FLAGS += -d .generated/classes/
 JAVAC_FLAGS += -sourcepath src/
 JAVAC_FLAGS += -g
 
@@ -434,8 +430,8 @@ JAVAC_FLAGS += -encoding UTF-8
 # It's not helpful to list all the Java source files.
 define BUILD_JAVA
   @echo "Compiling Java source..."
-  $(RM) -r classes && \
-  mkdir -p classes
+  $(RM) -r .generated/classes && \
+  mkdir -p .generated/classes
   @echo '$(JAVA_COMPILER) $(JAVAC_FLAGS) $$(JAVA_SOURCE_FILES)'
   @$(JAVA_COMPILER) $(JAVAC_FLAGS) $(call convertToNativeFilenames,$(JAVA_SOURCE_FILES)) && \
   touch $@
@@ -582,10 +578,6 @@ ChangeLog:
 source-dist: ../$(SOURCE_DIST_FILE)
 	mkdir -p $(DIST_DIRECTORY) && \
 	mv $< $(DIST_DIRECTORY)/
-
-$(MACHINE_PROJECT_NAME).jar: .generated/java.sentinel
-	$(call CREATE_OR_UPDATE_JAR,c,$(CURDIR)) && \
-	$(call CREATE_OR_UPDATE_JAR,u,$(SALMA_HAYEK))
 
 # Including a generated file in a source distribution?
 # The ChangeLog is generated too!
