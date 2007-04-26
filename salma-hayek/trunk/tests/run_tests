@@ -10,6 +10,7 @@ if [ "$1" = "-h" ]; then
   exit 1
 fi
 
+status=0
 
 function do_run_script() {
   local run_script="$1"
@@ -32,6 +33,7 @@ function do_run_script() {
       cat $tmp_file
       echo "---- 8<----- End of unexpected failure: $file"
       echo
+      status=1
     else
       echo "EXPECTED FAIL: $file"
     fi
@@ -57,3 +59,4 @@ for i in $test_files; do
   fi
 done
 
+exit $status
