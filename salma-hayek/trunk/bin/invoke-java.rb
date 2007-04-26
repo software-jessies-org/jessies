@@ -228,7 +228,7 @@ class Java
   def init_default_class_path()
     # Users need the classes.jar, but developers need the two directories.
     # This speeds things up for the users at the expense to the developers of the time it takes the JVM to check for the non-existent classes.jar, which shouldn't be a problem.
-    @class_path = [ "#{@project_root}/classes.jar", "#{@project_root}/classes", "#{@salma_hayek}/classes" ]
+    @class_path = [ "#{@project_root}/.generated/classes.jar", "#{@project_root}/.generated/classes", "#{@salma_hayek}/.generated/classes" ]
     
     jars = Set.new()
     jars.merge(Dir.glob("#{@salma_hayek}/lib/jars/*.jar"))

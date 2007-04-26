@@ -192,12 +192,12 @@ copy_files_for_installation(salma_hayek, "#{resources_dir}/salma-hayek")
 # We have to do this in two stages to avoid a "java.util.zip.ZipException: duplicate entry:" error from jar(1) for cases where both trees share a package prefix.
 
 # Use an absolute path so we can chdir first.
-jar_filename = Pathname.new("#{project_resource_directory}").realpath() + "classes.jar"
+jar_filename = Pathname.new("#{project_resource_directory}").realpath() + ".generated" + "classes.jar"
 # Using chdir rather than jar -C saves converting more pathnames to JVM-compatible format.
-Dir.chdir("classes/") {
+Dir.chdir(".generated/classes/") {
     spawnWithoutShell(["jar", "c0f", convert_to_jvm_compatible_pathname(jar_filename), "."])
 }
-Dir.chdir("#{salma_hayek}/classes/") {
+Dir.chdir("#{salma_hayek}/.generated/classes/") {
     spawnWithoutShell(["jar", "u0f", convert_to_jvm_compatible_pathname(jar_filename), "."])
 }
 

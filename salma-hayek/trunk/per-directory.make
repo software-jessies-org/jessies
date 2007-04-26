@@ -70,7 +70,7 @@ BUILDING_JNI = $(JNI_SOURCE)
 LOCAL_LDFLAGS += $(if $(BUILDING_JNI),$(JNI_LIBRARY_LDFLAGS))
 
 define JAVAHPP_RULE
-$(JAVAHPP) -classpath classes $(JNI_CLASS_NAME) > $(NEW_JNI_HEADER) && \
+$(JAVAHPP) -classpath .generated/classes $(JNI_CLASS_NAME) > $(NEW_JNI_HEADER) && \
 { cmp -s $(NEW_JNI_HEADER) $(JNI_HEADER) || cp $(NEW_JNI_HEADER) $(JNI_HEADER); }
 endef
 
@@ -154,7 +154,7 @@ $(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
 
 ifneq "$(JNI_SOURCE)" ""
 
-$(NEW_JNI_HEADER): .generated/java.sentinel $(JAVAHPP) $(SALMA_HAYEK)/classes/e/tools/JavaHpp.class
+$(NEW_JNI_HEADER): .generated/java.sentinel $(JAVAHPP) $(SALMA_HAYEK)/.generated/classes/e/tools/JavaHpp.class
 	@echo "Generating JNI header..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
