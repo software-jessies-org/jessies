@@ -434,6 +434,7 @@ JAVAC_FLAGS += -encoding UTF-8
 # It's not helpful to list all the Java source files.
 define BUILD_JAVA
   @echo "Compiling Java source..."
+  $(RM) -r classes && \
   $(RM) -r .generated/classes && \
   mkdir -p .generated/classes
   @echo '$(JAVA_COMPILER) $(JAVAC_FLAGS) $$(JAVA_SOURCE_FILES)'
