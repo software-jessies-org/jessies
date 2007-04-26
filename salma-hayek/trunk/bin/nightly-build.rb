@@ -46,7 +46,11 @@ svn_projects.each() {
   else
     if (Pathname.new(svn_project) + "Makefile").exist?()
       print("-- Building \"#{project_name}\"\n")
-      system("make #{targets.join(" ")}")
+      commands = targets.map() {
+        |target|
+        "make #{target}"
+      }
+      system(commands.join(" && "))
       if $? != 0
         failed_builds << project_name
       end
