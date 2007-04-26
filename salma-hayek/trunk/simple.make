@@ -8,6 +8,7 @@
 #   make native-clean
 #   make native-dist
 #   make source-dist
+#   make test
 #   make www-dist
 
 # Your calling Makefile:

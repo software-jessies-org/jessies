@@ -837,3 +837,8 @@ run-installer.msi:
 .PHONY: run-remover.msi
 run-remover.msi:
 	msiexec /x $(NATIVE_NAME_FOR_INSTALLERS)
+
+.PHONY: test
+test:
+	@echo Testing...
+	./tests/run_tests

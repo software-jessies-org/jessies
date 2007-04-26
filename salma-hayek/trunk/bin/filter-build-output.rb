@@ -22,7 +22,7 @@ while line = gets()
   end
   progressLine = nil
   # Match Compiling, Generating etc.
-  if line.match(/^[A-Z][a-z]+ing .*\.\.\./)
+  if line.match(/^[A-Z][a-z]+ing\b.*\.\.\./)
     progressLine = line
   elsif line.match(/^(?:cc|g\+\+) .*?\/([^\/ ]+)$/)
     # I don't want to override the built-in rules for compilation and it's hard to hook them to do extra echoing.
