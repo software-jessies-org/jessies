@@ -51,11 +51,7 @@ public class CommandDialog {
             public void mouseClicked(MouseEvent e) {
                 int index = historyList.locationToIndex(e.getPoint());
                 String selectedCommand = (String) historyList.getModel().getElementAt(index);
-                if (e.getClickCount() == 1) {
-                    // If the user single-clicks on a historical command, offer the command in the text field, for further refinement.
-                    commandField.setText(selectedCommand);
-                    commandField.requestFocusInWindow();
-                } else if (e.getClickCount() == 2) {
+                if (e.getClickCount() == 2) {
                     // If the user double-clicks on a historical command, run it without further ado.
                     commandField.setText(selectedCommand);
                     form.getFormDialog().acceptDialog();
