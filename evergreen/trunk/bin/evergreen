@@ -60,7 +60,7 @@ class Evergreen
         client = InAppClient.new(serverPortPathname)
         filename = ARGV[0]
         if filename != nil && client.trySendCommand("#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}")
-            exit!(0)
+            exit(0)
         end
         
         # FIXME: this isn't right if shouldBlock is true. We either need to pass the "shouldBlock" on to the Java side, or we need to wait until it's started up and "trySendCommand" again.
