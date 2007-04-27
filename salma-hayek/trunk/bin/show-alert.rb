@@ -36,8 +36,8 @@ else
                 $stderr.puts(text)
             end
         elsif target_os() == "Cygwin" || target_os() == "Windows"
-                require "Win32API"
-                Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, message, title, 0)
+            require "Win32API"
+            Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, message, title, 0)
         end
     end
     
