@@ -288,14 +288,19 @@ class Java
   end
   
   def invoke(extra_app_arguments = [])
+    @extra_app_arguments = extra_app_arguments
+    launch(@dock_name)
+  end
+  
+  def launch(app_name)
     begin
-      invoke0(extra_app_arguments)
-    rescue Exception => e
-      show_uncaught_exception(@dock_name, e)
+      launch0()
+    rescue Exception => ex
+      show_uncaught_exception(app_name, ex)
     end
   end
   
-  def invoke0(extra_app_arguments)
+  def launch0()
     # Back-quoting anything causes a flickering window on startup for Terminator on Windows.
     # The salma-hayek Java launcher already contains a version check.
     # The version check often "gets stuck" on Cygwin when running javahpp.
@@ -363,7 +368,7 @@ class Java
     
     args.concat(@extra_java_arguments)
     args << @class_name
-    args.concat(extra_app_arguments)
+    args.concat(@extra_app_arguments)
     args.concat(ARGV)
     #$stderr.puts(args)
     if logging
