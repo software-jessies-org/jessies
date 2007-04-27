@@ -184,7 +184,7 @@ class Java
       end
       message_lines << suggestion
       show_alert("#{@dock_name} requires Java 5 or newer.", message_lines.join("\n\n"))
-      exit!(1)
+      exit(1)
     end
   end
 
