@@ -11,6 +11,8 @@ public class SpellingChecker {
     private static final SpellingChecker instance = new SpellingChecker();
     private static final boolean DEBUGGING = false;
     
+    private static final Stopwatch stopwatch = Stopwatch.get("SpellingChecker");
+    
     private static HashSet<String> knownGood = new HashSet<String>();
     private static HashSet<String> knownBad = new HashSet<String>();
     
@@ -48,7 +50,7 @@ public class SpellingChecker {
             
             String greeting = in.readLine();
             if (greeting.startsWith("@(#) International Ispell ")) {
-                Log.warn("SpellingChecker: connected to " + execArguments[0] + " okay.");
+                Log.warn("SpellingChecker: connected to " + execArguments[0] + " okay: " + greeting + ".");
             } else {
                 throw new IOException("Garbled ispell response: " + greeting);
             }
@@ -143,16 +145,17 @@ public class SpellingChecker {
     }
     
     private boolean isMisspelledWordAccordingToIspell(String word, Collection<String> returnSuggestions) {
-        // Send the word to ispell for checking.
-        String request = "^" + word;
-        debug(request);
-        out.println(request);
-        out.flush();
-        
-        // ispell's response will be one of:
-        // 1. a blank line (meaning "correctly spelled"),
-        // 2. lines beginning with [&?#] containing suggested corrections, followed by a blank line.
+        Stopwatch.Timer timer = stopwatch.start();
         try {
+            // Send the word to ispell for checking.
+            String request = "^" + word;
+            debug(request);
+            out.println(request);
+            out.flush();
+            
+            // ispell's response will be one of:
+            // 1. a blank line (meaning "correctly spelled"),
+            // 2. lines beginning with [&?#] containing suggested corrections, followed by a blank line.
             String response = in.readLine();
             
             // A blank line means "correctly spelled".
@@ -189,6 +192,8 @@ public class SpellingChecker {
             // Should we stop talking to ispell?
             Log.warn("SpellingChecker: I/O error.", ex);
             return false;
+        } finally {
+            timer.stop();
         }
     }
     
