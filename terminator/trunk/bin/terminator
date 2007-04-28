@@ -204,7 +204,10 @@ class Terminator
         # Everyone(?) else probably has SHELL=/bin/bash already in the environment.
         candidateShells = []
         candidateShells << "/bin/bash"
-        # Has there ever been a Unix without a /bin/sh?
+        # There couldn't be a Unix without /bin/sh, though POSIX doesn't mandate it.
+        # POSIX explicitly recommends rewriting your shell scripts at install-time by calling getconf(1) and sed(1).
+        # It doesn't mandate locations for them either.
+        # See http://www.opengroup.org/onlinepubs/009695399/utilities/sh.html.
         candidateShells << "/bin/sh"
         candidateShells.each() {
             |candidateShell|
