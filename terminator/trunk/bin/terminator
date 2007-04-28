@@ -16,11 +16,7 @@ class Terminator
     end
     
     def launch()
-        begin
-            launch0()
-        rescue Exception => e
-            show_uncaught_exception("Terminator", e)
-        end
+        report_exceptions("Terminator") { launch0() }
     end
     
     def launch0()
