@@ -303,11 +303,7 @@ class Java
   end
   
   def launch(app_name)
-    begin
-      launch0()
-    rescue Exception => ex
-      show_uncaught_exception(app_name, ex)
-    end
+    report_exceptions(app_name) { launch0() }
   end
   
   def launch0()

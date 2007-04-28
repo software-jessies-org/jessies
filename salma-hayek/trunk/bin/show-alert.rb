@@ -41,12 +41,11 @@ else
         end
     end
     
-    # Use this to rescue the whole of each startup script.
-    # For the simple ones, the code already in "invoke-java.rb" gives you a good approximation for free.
+    # Shows a dialog reporting that the exception "ex" was caught while starting application "app_name".
     def show_uncaught_exception(app_name, ex)
         # exit() throws a SystemExit exception.
         # We're only interested in unintentional exceptions here.
-        if ex.class == SystemExit
+        if ex.class() == SystemExit
             raise()
         end
         # Based on the idea in http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/21530
@@ -55,7 +54,16 @@ else
         message << "\n"
         message << "Exception #{ex.class}: #{ex.message}\n"
         message << "#{prefix}" << ex.backtrace.join("\n#{prefix}")
-        show_alert("Unhandled exception", message)
+        show_alert("Uncaught exception", message)
+    end
+    
+    # Use this to report exceptions thrown by the given block.
+    def report_exceptions(app_name, &block)
+        begin
+            block.call()
+        rescue Exception => e
+            show_uncaught_exception(app_name, e)
+        end
     end
 end
 
