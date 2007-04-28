@@ -18,7 +18,7 @@ public class FileIgnorer {
     }
     
     public boolean isIgnored(File file) {
-        String filename = file.toString();
+        String filename = file.getName();
         if (file.isHidden() || filename.startsWith(".") || filename.endsWith("~")) {
             return true;
         }
