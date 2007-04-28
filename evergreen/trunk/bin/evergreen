@@ -44,15 +44,11 @@ class Evergreen
         end
         
         if FileTest.directory?(edit_preferences_directory) == false
-            puts("Evergreen: Couldn't find preferences directory '#{edit_preferences_directory}.")
-            puts("Evergreen: Creating preferences directory '#{edit_preferences_directory}'.")
             FileUtils.mkdir_p(edit_preferences_directory)
         end
         if FileTest.exists?("#{edit_preferences_directory}/edit.properties") == false
-            puts("Evergreen: Copying default preferences.")
             FileUtils.cp("#{@project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
             FileUtils.cp("#{@project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
-            puts("Evergreen: Away you go!")
         end
         
         serverPortPathname = Pathname.new(edit_preferences_directory) + "edit-server-port"
