@@ -14,11 +14,7 @@ class Evergreen
     end
     
     def launch()
-        begin
-            launch0()
-        rescue Exception => e
-            show_uncaught_exception("Evergreen", e)
-        end
+        report_exceptions("Evergreen") { launch0() }
     end
     
     def launch0()
