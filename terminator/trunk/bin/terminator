@@ -113,18 +113,26 @@ class Terminator
     end
     
     def make_directory(pathname, make_safe)
+        directory_exists = false
+        directory_safe = ! make_safe
         begin
             if test(?d, pathname) == false
                 FileUtils.rm_f(pathname)
                 Dir.mkdir(pathname)
             end
+            directory_exists = true
             if make_safe
                 if File.stat(pathname).mode != 0700
                     FileUtils.chmod(0700, pathname)
                 end
             end
+            directory_safe = true
         rescue SystemCallError
-            # FIXME: if the directory exists but is known to be unsafe, or we fail to make it safe, we should at least warn the user.
+            if directory_exists == false
+                show_alert("Terminator had trouble starting.", "Terminator was unable to create the directory \"#{pathname}\".")
+            elsif directory_safe == false
+                show_alert("Terminator had trouble starting.", "Terminator was unable to change the permissions on \"#{pathname}\" to make it safe. Others may be able to read your logs or cause new terminals to open on your display.")
+            end
         end
     end
     
