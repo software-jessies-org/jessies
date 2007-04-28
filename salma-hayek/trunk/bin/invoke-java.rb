@@ -91,6 +91,16 @@ class Java
   attr_accessor(:log_filename)
   attr_accessor(:initiate_startup_notification)
   
+  #
+  # Command-line tools are probably best off with this trivial interface.
+  # It certainly removes boilerplate from your start-up script.
+  #
+  def Java.runCommandLineTool(className)
+    invoker = Java.new(className, className)
+    invoker.initiate_startup_notification = false
+    invoker.invoke()
+  end
+  
   def initialize(name, class_name)
     @dock_name = name
     @dock_icon = ""
