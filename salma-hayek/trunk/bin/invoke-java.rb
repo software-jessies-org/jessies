@@ -86,8 +86,6 @@ class InAppClient
 end
 
 class Java
-  attr_accessor(:dock_name)
-  attr_accessor(:launcher)
   attr_accessor(:log_filename)
   attr_accessor(:initiate_startup_notification)
   
@@ -106,7 +104,6 @@ class Java
     @dock_icon = ""
     @png_icon = ""
     @class_name = class_name
-    @launcher = "java"
     @log_filename = ""
     @initiate_startup_notification = true
 
@@ -127,6 +124,14 @@ class Java
     add_pathnames_property("org.jessies.libraryDirectories", Dir.glob("#{@project_root}/.generated/*_#{target_os()}/lib"))
     
     set_icons(name)
+    
+    @launcher = "java"
+    if target_os() == "Cygwin"
+      # We need to load jvm.dll from a Cygwin executable to get a reliable Cygwin JNI experience.
+      # The console subsystem version of this executable buys us nothing with Cygwin 1.5.21.
+      # This launcher doesn't use the same algorithm as Sun's for picking a jvm.dll.
+      @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/launcherw"
+    end
   end
 
   def get_java_version(java_executable)
@@ -307,9 +312,10 @@ class Java
   end
   
   def launch0()
-    # Back-quoting anything causes a flickering window on startup for Terminator on Windows.
+    # Back-quoting any console subsystem application causes a flickering window on startup for Terminator on Windows.
+    # (But we could use javaw -version.)
     # The salma-hayek Java launcher already contains a version check.
-    # The version check often "gets stuck" on Cygwin when running javahpp.
+    # The version check often used to "get stuck" on Cygwin when running javahpp.
     # Process Explorer says there are just two Ruby processes left running: the child we're back-quoting has already quit.
     if target_os() != "Cygwin"
       check_java_version()
