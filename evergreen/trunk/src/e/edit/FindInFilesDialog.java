@@ -186,7 +186,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         
         @Override
         protected DefaultMutableTreeNode doInBackground() {
-            Thread.currentThread().setName("Search for '" + regex + "' in files matching '" + fileRegex + "'");
+            Thread.currentThread().setName("Search for \"" + regex + "\" in files matching \"" + fileRegex + "\"");
             try {
                 Pattern pattern = PatternUtilities.smartCaseCompile(regex);
                 FileSearcher fileSearcher = new FileSearcher(pattern);
@@ -209,7 +209,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                             }
                             long t1 = System.currentTimeMillis();
                             if (t1 - t0 > 500) {
-                                Log.warn("Searching file \"" + file + "\" for '" + regex + "' took " + (t1 - t0) + "ms!");
+                                Log.warn("Searching file \"" + file + "\" for \"" + regex + "\" took " + (t1 - t0) + "ms!");
                             }
                             final int matchCount = matches.size();
                             if (matchCount > 0) {
@@ -247,12 +247,11 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                     }
                 }
                 long endTime = System.currentTimeMillis();
-                Log.warn("Search for '" + regex + "' in files matching '" + fileRegex + "' took " + (endTime - startTime) + " ms.");
+                Log.warn("Search for \"" + regex + "\" in files matching \"" + fileRegex + "\" took " + (endTime - startTime) + " ms.");
             } catch (PatternSyntaxException ex) {
                 errorMessage = ex.getDescription();
-                //Log.warn("Problem searching files for '" + ex.getPattern() + "'", ex);
             } catch (Exception ex) {
-                Log.warn("Problem searching files for ", ex);
+                Log.warn("Problem searching files for \"" + regex + "\".", ex);
             }
             return matchRoot;
         }
