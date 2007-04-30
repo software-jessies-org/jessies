@@ -27,6 +27,8 @@ public class DebugMenu {
         menu.add(new ShowSwingTimersAction());
         menu.add(new ShowStopwatchesAction());
         menu.addSeparator();
+        menu.add(new KeyEventTester());
+        menu.addSeparator();
         menu.add(new HeapViewAction());
         // FIXME: an action to turn on debugging of hung AWT exits. All frames or just the parent frame? Just the parent is probably the more obvious (given that new frames could be created afterwards).
         return menu;
@@ -298,4 +300,62 @@ public class DebugMenu {
             return StringUtilities.join(lines, "\n");
         }
     }
+    
+    private static class KeyEventTester extends AbstractAction {
+        public KeyEventTester() {
+            super("Key Event Tester");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            final PTextArea textArea = new PTextArea();
+            textArea.setEditable(false);
+            
+            final JTextField textField = new JTextField(20);
+            textField.addKeyListener(new KeyListener() {
+                private void append(KeyEvent e) {
+                    textArea.append(e.toString().replaceAll(" on javax.swing.JTextField\\[.*$", "") + "\n");
+                }
+                
+                public void keyTyped(KeyEvent e) {
+                    append(e);
+                }
+                
+                public void keyPressed(KeyEvent e) {
+                    append(e);
+                }
+                
+                public void keyReleased(KeyEvent e) {
+                    append(e);
+                }
+            });
+            
+            JButton clearButton = new JButton("Clear");
+            clearButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    textArea.setText("");
+                    textField.setText("");
+                    textField.requestFocusInWindow();
+                }
+            });
+            
+            JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 2));
+            controlPanel.add(clearButton);
+            controlPanel.add(Box.createHorizontalStrut(10));
+            controlPanel.add(textField);
+            
+            JPanel ui = new JPanel(new BorderLayout());
+            ui.add(controlPanel, BorderLayout.NORTH);
+            ui.add(new JScrollPane(textArea), BorderLayout.CENTER);
+            
+            JFrame frame = new JFrame("Key Event Tester");
+            JFrameUtilities.setFrameIcon(frame);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setContentPane(ui);
+            frame.setSize(new Dimension(700, 400));
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+            textField.requestFocusInWindow();
+        }
+    }
+    
 }
