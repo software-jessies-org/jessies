@@ -23,8 +23,8 @@ public class DebugMenu {
         menu.add(makeChangeLafMenu());
         menu.add(new ShowUiDefaultsAction());
         menu.addSeparator();
-        menu.add(new ListFramesAction());
-        menu.add(new ListTimersAction());
+        menu.add(new ShowFramesAction());
+        menu.add(new ShowSwingTimersAction());
         menu.add(new ShowStopwatchesAction());
         menu.addSeparator();
         menu.add(new HeapViewAction());
@@ -138,9 +138,9 @@ public class DebugMenu {
         }
     }
     
-    private static class ListFramesAction extends AbstractAction {
-        public ListFramesAction() {
-            super("List Frames/Windows");
+    private static class ShowFramesAction extends AbstractAction {
+        public ShowFramesAction() {
+            super("Show Frames/Windows");
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -191,13 +191,13 @@ public class DebugMenu {
         }
     }
     
-    private static class ListTimersAction extends AbstractAction {
-        public ListTimersAction() {
-            super("List Timers");
+    private static class ShowSwingTimersAction extends AbstractAction {
+        public ShowSwingTimersAction() {
+            super("Show Swing Timers");
         }
         
         public void actionPerformed(ActionEvent e) {
-            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Timers", getTimersAsString());
+            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Swing Timers", getTimersAsString());
         }
         
         private String getTimersAsString() {
@@ -207,7 +207,7 @@ public class DebugMenu {
                 result.append(TimerUtilities.toString(timer));
             }
             if (timers.size() == 0) {
-                result.append("(No timers.)");
+                result.append("(No Swing timers.)");
             }
             return result.toString();
         }
