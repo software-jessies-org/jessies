@@ -37,12 +37,6 @@ class Terminator
         server_port_file_name = "#{server_port_file_stem}#{display_suffix}"
         tryInAppServer(server_port_file_name)
         
-        # rubyw.exe quits if it can't write its "Insecure world writable dir" warnings
-        # to $stderr every time it uses Kernel.system or Kernel.`.
-        if target_os() == "Cygwin" && File.exists?("/proc/self/fd/2") == false
-            $stderr = File.open("/dev/null", "w")
-        end
-        
         # terminfo installation...
         
         # We deliberately omit the intermediate directory.
