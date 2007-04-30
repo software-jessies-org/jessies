@@ -114,14 +114,7 @@ public class GuiUtilities {
     }
     
     /**
-     * Returns the name of the system's best monospaced font. Linux and Solaris
-     * are fine (Lucida Sans Typewriter is their default for "Monospaced"), but
-     * Mac OS has an even nicer font available in Monaco, and some Win32 JRE
-     * installations use Courier (the version where '1' and 'l' look the same)
-     * because they don't include Lucida Sans Typewriter (see
-     * http://java.sun.com/j2se/1.5.0/docs/guide/intl/font.html), despite their
-     * claim that they include the Lucida fonts so that all JVMs have a
-     * portable set of attractive fonts available.
+     * Returns the name of the system's best monospaced font.
      */
     public synchronized static String getMonospacedFontName() {
         if (monospacedFontName == null) {
@@ -133,24 +126,30 @@ public class GuiUtilities {
     private static String monospacedFontName;
     
     private static String findMonospacedFontName() {
-        Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
-        Set<String> familyNames = new HashSet<String>();
-        for (Font font : fonts) {
-            familyNames.add(font.getFamily());
+        if (GuiUtilities.isMacOs()) {
+            // "Monaco" is the traditional monospaced font on Mac OS.
+            // "Lucida Sans Typewriter" will be available too.
+            // Either will cover as much of Unicode as "Monospaced" would.
+            // "Monospaced" would use "Courier New", which is unacceptable.
+            return "Monaco";
+        } else if (GuiUtilities.isWindows()) {
+            // If we're using a JDK, we'll have "Lucida Sans Typewriter" available.
+            // Not so if we've got a default JRE installation: http://java.sun.com/javase/6/docs/technotes/guides/intl/font.html
+            String lucidaSansTypewriter = "Lucida Sans Typewriter";
+            Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+            for (Font font : fonts) {
+                if (font.getFamily().equals(lucidaSansTypewriter)) {
+                    return lucidaSansTypewriter;
+                }
+            }
+            // On Windows, "Monospaced" uses "Courier New" for the latin range, so it's a choice of last resort.
+            // Far-east Asian users might disagree, but they seem to be a minority of our users.
+            return "Monospaced";
+        } else {
+            // We're on Linux or Solaris, where the logical font "Monospaced" uses "Lucida Sans Typewriter" for the latin range.
+            // Specifying "Monospaced" has the advantage of additionally getting us fallbacks for the other ranges.
+            return "Monospaced";
         }
-        // Monaco is probably only available on Mac OS.
-        String monaco = "Monaco";
-        if (familyNames.contains(monaco)) {
-            return monaco;
-        }
-        // Lucida Sans Typewriter should be on all Unixes, and all JDKs.
-        String lucidaSansTypewriter = "Lucida Sans Typewriter";
-        if (familyNames.contains(lucidaSansTypewriter)) {
-            return lucidaSansTypewriter;
-        }
-        // If we get here, we don't have a good answer, so let the JVM choose.
-        // It will probably go for Courier, but there's not much we can do.
-        return "Monospaced";
     }
     
     /**
