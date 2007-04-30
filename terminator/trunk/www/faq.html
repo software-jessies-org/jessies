@@ -15,11 +15,23 @@ For detailed information on working out which is your problem, and how to fix ei
 <h2>Where can I get a nice terminal font?</h2>
 <p>Terminator will try to choose a good fixed-width/monospaced font for you, but it can only choose from what you have installed.
 
-<p>On Mac OS, you already have the traditional (for Apple) Monaco and an alternative of Lucida Sans Typewriter.
+<p>On Mac OS, you already have the traditional (for Apple) "Monaco" and an alternative of "Lucida Sans Typewriter".
 
-<p>On Linux and Windows, if you have the JRE installed (rather than the JDK), then you may want to rerun the JRE installer and choose a "Custom" installation so that you get LucidaTypewriterRegular.ttf installed, otherwise on Windows you'll end up with Courier and being unable to distinguish the letter l from the number 1.
+<p>On Windows, if you have the JRE installed (rather than the JDK), then you may want to rerun the JRE installer and choose a "Custom" installation so that you get "Lucida Sans Typewriter" installed, otherwise on Windows you'll end up with "Courier New", and won't be able to distinguish the letter l from the number 1.
 
-<p>Many Windows users recommend <a href="http://www.proggyfonts.com/">proggy fonts</a>. You can also use these fonts on other operating systems, though in all cases you should download the TrueType version rather than the version specifically for your OS, because Terminator needs the TrueType version.
+<p>Many Windows users seem to like <a href="http://www.proggyfonts.com/">proggy fonts</a>. You can also use these fonts on other operating systems, though in all cases you should download the TrueType version rather than the version specifically for your OS, because Terminator needs the TrueType version.
+
+<!-- ---------------------------------------------------- -->
+
+<h2>Where can I get a nice terminal font for languages other than English?</h2>
+<p>On Mac OS, see "Where can I get a nice terminal font?".
+Both of our recommendations cover Latin-based European languages, Chinese, Cyrillic, Greek, Japanese, Korean, and Thai.
+
+<p>On Linux, Solaris, and Windows, you'll need to install the operating system's support files for the language or languages you're interested in to be sure that you have sufficient font coverage. The safest choice is then to tell Terminator to use the logical "Monospaced" font, which is actually just a collection of native fonts that attempts to cover most of Unicode.
+
+<p>The exact fonts used by "Monospaced" for the different ranges varies between operating systems. One problem with "Monospaced" on Windows is that the ASCII range will be covered with "Courier New" (Linux and Solaris users will get "Lucida Sans Typewriter"). See <a href="http://java.sun.com/javase/6/docs/technotes/guides/intl/fontconfig.html">Sun's fontconfig documentation</a> if you want to customize the choices.
+
+<p>(Note that Terminator currently doesn't cope well with far-east Asian languages, where glyphs tend to be wider than for European languages. Many terminal-based programs seem to have trouble too. If you'd like to help us improve Terminator's support for far-east Asian languages, please get in touch.)
 
 <!-- ---------------------------------------------------- -->
 
