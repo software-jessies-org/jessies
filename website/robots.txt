@@ -1,6 +1,3 @@
 User-agent: *
 Disallow: /3rdParty
-Disallow: /debian
-Disallow: /mac
-Disallow: /redhat
-Disallow: /windows
+Disallow: /downloads
