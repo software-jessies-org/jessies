@@ -1,3 +1,4 @@
 User-agent: *
 Disallow: /3rdParty
 Disallow: /downloads
+Disallow: /svn
