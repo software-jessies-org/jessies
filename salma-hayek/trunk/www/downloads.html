@@ -26,6 +26,16 @@
 <p>There's a source distribution (<a href="<!--#echo var="SHORT_DIST_NAME"-->.tar.gz"><!--#echo var="SHORT_DIST_NAME"-->.tar.gz</a>),
 and you'll also need the source to the library it uses (<a href="../salma-hayek/salma-hayek.tar.gz">salma-hayek.tar.gz</a>).
 
+<p>Anonymous read-only Subversion access is available with:
+<pre>
+mkdir software.jessies.org
+cd software.jessies.org
+svn checkout http://software.jessies.org/svn/<!--#echo var="SHORT_DIST_NAME"-->/trunk/ <!--#echo var="SHORT_DIST_NAME"-->
+svn checkout http://software.jessies.org/svn/salma-hayek/trunk/ salma-hayek
+# You may want to add something like this to your crontab:
+#00 23 * * * echo ~/software.jessies.org/salma-hayek/bin/nightly-build.rb ~/software.jessies.org clean build | bash --login
+</pre>
+
 <p>The <a href="../salma-hayek/index.html#building-from-source">hints for building</a> are the same for all our projects.
 
 <h2>Reporting Bugs</h2>
