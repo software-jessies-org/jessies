@@ -33,7 +33,7 @@ if [ -d $projects_dir/$project_name ]; then
     exit 1
 fi
 # salma-hayek only has the LGPL.
-GPL=$projects_dir/Evergreen/COPYING
+GPL=$projects_dir/evergreen/COPYING
 if [ ! -f $GPL ]; then
     echo "Couldn't find a copy of the GPL! (Don't you have a checked-out copy of Evergreen?)"
     exit 1
