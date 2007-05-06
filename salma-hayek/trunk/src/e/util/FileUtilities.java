@@ -323,6 +323,39 @@ public class FileUtilities {
     }
     
     /**
+     * Finds the given script inside the given bundle.
+     * 
+     * On OSes other than Mac OS, simply returns the given script name.
+     * The script will have to be on the user's path.
+     * 
+     * On Mac OS, users typically install things where they please.
+     * /Applications, ~/Applications, and ~/Desktop are popular, but we could be installed anywhere.
+     * We can also be moved after installation.
+     * So: we call an external utility to find out where the OS last saw our .app bundle.
+     */
+    public static String findScriptFromBundle(String scriptName, String bundleId) {
+        if (GuiUtilities.isMacOs()) {
+            ArrayList<String> bundleLocations = new ArrayList<String>();
+            String[] command = ProcessUtilities.makeShellCommandArray(FileUtilities.findOnPath("LSFindApplicationForInfo") + " " + bundleId);
+            int status = ProcessUtilities.backQuote(null, command, bundleLocations, new ArrayList<String>());
+            if (status == 0 && bundleLocations.size() == 1) {
+                // The app name isn't necessarily the lower-cased last element of the bundle id, but it happens to be at the moment.
+                // FIXME: an alternative here would be to try all globs of Resources/*/bin/.
+                String[] bundleIdComponents = bundleId.split("\\.");
+                String appName = bundleIdComponents[bundleIdComponents.length - 1].toLowerCase();
+                // Poke inside the bundle and return the full path to the script, if we find it.
+                String scriptLocation = bundleLocations.get(0) + "/Contents/Resources/" + appName + "/bin/" + scriptName;
+                if (FileUtilities.exists(scriptLocation)) {
+                    return scriptLocation;
+                }
+            }
+        }
+        // On non-Mac OS systems, we have to hope it's on the user's path.
+        // (Developers' Mac OS systems are likely to need this too, if they're not installing the .app bundles.)
+        return scriptName;
+    }
+    
+    /**
      * Creates a temporary file containing 'content' where the temporary file's
      * name begins with 'prefix'. Returns the name of the temporary file.
      * On error, a RuntimeException is thrown which will refer to the file
