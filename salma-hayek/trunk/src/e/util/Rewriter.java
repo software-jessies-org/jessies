@@ -18,6 +18,7 @@ import java.util.regex.*;
  * See the example 'main' for a sample of how to use this class.
  *
  * @author Elliott Hughes
+ * @author Roger Millington
  */
 public abstract class Rewriter {
     private Pattern pattern;
@@ -46,20 +47,25 @@ public abstract class Rewriter {
     public abstract String replacement();
 
     /**
-     * Returns the result of rewriting 'original' by invoking
-     * the method 'replacement' for each match of the regular
-     * expression supplied to the constructor.
+     * Returns the result of rewriting 'original' by invoking the method 'replacement' for each match of the regular expression supplied to the constructor.
      */
     public String rewrite(CharSequence original) {
+        return rewrite(original, new StringBuffer(original.length())).toString();
+    }
+    
+    /**
+     * Returns the result of appending the rewritten 'original' to 'destination'.
+     * We have to use StringBuffer rather than the more obvious and general Appendable because of Matcher's interface (Sun bug 5066679).
+     * Most users will prefer the single-argument rewrite, which supplies a temporary StringBuffer itself.
+     */
+    public StringBuffer rewrite(CharSequence original, StringBuffer destination) {
         this.matcher = pattern.matcher(original);
-        // We have to use StringBuffer because that's Matcher's API.
-        StringBuffer result = new StringBuffer(original.length());
         while (matcher.find()) {
-            matcher.appendReplacement(result, "");
-            result.append(replacement());
+            matcher.appendReplacement(destination, "");
+            destination.append(replacement());
         }
-        matcher.appendTail(result);
-        return result.toString();
+        matcher.appendTail(destination);
+        return destination;
     }
 
     public static void main(String[] arguments) {
