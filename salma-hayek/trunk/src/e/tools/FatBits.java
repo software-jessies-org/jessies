@@ -44,7 +44,7 @@ public class FatBits extends JFrame {
         } catch (AWTException ex) {
             Log.warn("failed to create a Robot", ex);
         }
-        setSize(new Dimension(250, 300));
+        setSize(new Dimension(280, 300));
         setContentPane(makeUi());
         setJMenuBar(new FatBitsMenuBar());
         timer = new RepeatingComponentTimer(this, 50, new MouseTracker());
