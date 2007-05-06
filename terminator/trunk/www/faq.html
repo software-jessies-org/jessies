@@ -172,9 +172,16 @@ java.awt.datatransfer.UnsupportedFlavorException: Unicode String
 
 <!-- ---------------------------------------------------- -->
 
-<h2>Why does Terminator flash and flicker when I delete at the beginning of a line?</h2>
+<h2>Why does Terminator sometimes flash/flicker the whole window?</h2>
 
-<p>On the Edit menu, under Preferences, you'Il find options for controlling the appearance "visual bell", including the ability to turn it off.
+<p>A lot of terminal-based programs (such as Bash and Vim) attempt to ring the terminal's bell to indicate that you're trying to do something impossible.
+Terminator implements an alternative, called "visual bell".
+The default rendering of the visual bell is to briefly flash the entire window a gentle shade of your normal background color.
+
+<p>If you find that the effect is too slow, try turning off the preference "High-quality rendering of the visual bell".
+This uses a cheaper (XOR) effect that doesn't look as nice, but which is more efficient for slow graphics hardware or network use such as VNC.
+
+<p>If you really just don't want any effect, you can turn off the preference "Visual bell (as opposed to no bell)", in which case Terminator will do nothing when an application tries to ring the bell.
 
 <!-- ---------------------------------------------------- -->
 
