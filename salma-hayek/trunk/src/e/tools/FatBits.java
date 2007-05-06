@@ -33,6 +33,7 @@ public class FatBits extends JFrame {
     private JLabel positionLabel;
     
     private JLabel colorLabel;
+    private JLabel colorSwatchLabel;
     private ColorSwatchIcon colorSwatch;
     
     public FatBits() {
@@ -96,29 +97,21 @@ public class FatBits extends JFrame {
     }
     
     private JPanel makeInfoPanel() {
-        JPanel result = new JPanel(new BorderLayout(8, 0));
-        result.setBorder(makeInfoPanelBorder());
-        result.add(colorLabel, BorderLayout.WEST);
-        result.add(positionLabel, BorderLayout.CENTER);
+        JPanel infoPanel = new JPanel(new BorderLayout(8, 0));
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        infoPanel.add(colorSwatchLabel, BorderLayout.WEST);
         if (GuiUtilities.isGtk()) {
             JButton infoButton = new JButton(new PreferencesAction());
             infoButton.setText("");
-            result.add(infoButton, BorderLayout.EAST);
-        } else {
-            CircularButton infoButton = new CircularButton();
-            infoButton.setActionListener(new PreferencesAction());
-            result.add(infoButton, BorderLayout.EAST);
+            infoPanel.add(infoButton, BorderLayout.EAST);
         }
-        return result;
-    }
-    
-    private javax.swing.border.Border makeInfoPanelBorder() {
-        int rightInset = 4;
-        // Make room for the grow box on Mac OS.
-        if (GuiUtilities.isMacOs()) {
-            rightInset += new JScrollBar().getPreferredSize().width;
-        }
-        return BorderFactory.createEmptyBorder(4, 4, 4, rightInset);
+        
+        JPanel textLines = new JPanel(new GridLayout(2,1));
+        textLines.add(colorLabel);
+        textLines.add(positionLabel);
+        
+        infoPanel.add(textLines, BorderLayout.CENTER);
+        return infoPanel;
     }
     
     private void initScaledImagePanel() {
@@ -135,7 +128,7 @@ public class FatBits extends JFrame {
             return false;
         }
         
-        positionLabel.setText("(" + p.x + "," + p.y + ")");
+        positionLabel.setText("X:" + p.x + " Y:" + p.y);
         
         Rectangle screenCaptureBounds = getScreenCaptureBounds(p);
         BufferedImage capturedImage = robot.createScreenCapture(screenCaptureBounds);
@@ -157,12 +150,14 @@ public class FatBits extends JFrame {
         colorLabel.setFont(new Font(GuiUtilities.getMonospacedFontName(), font.getStyle(), font.getSize()));
         int height = colorLabel.getPreferredSize().height - 2;
         this.colorSwatch = new ColorSwatchIcon(null, new Dimension(20, height));
-        colorLabel.setIcon(colorSwatch);
+        this.colorSwatchLabel = new JLabel(colorSwatch);
     }
     
     private void updateCenterColor(int argb) {
-        colorLabel.setText(String.format("%06x", argb & 0xffffff));
-        colorSwatch.setColor(new Color(argb));
+        Color color = new Color(argb);
+        colorLabel.setText(String.format("#%06x RGB:%d,%d,%d", argb & 0xffffff, color.getRed(), color.getGreen(), color.getBlue()));
+        colorSwatch.setColor(color);
+        colorSwatchLabel.repaint();
     }
     
     private void initShowCrosshairCheckBox() {
