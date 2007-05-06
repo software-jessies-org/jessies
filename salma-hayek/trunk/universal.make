@@ -436,10 +436,11 @@ define BUILD_JAVA
   @echo "Compiling Java source..."
   $(RM) -r classes && \
   $(RM) -r .generated/classes && \
-  mkdir -p .generated/classes
+  mkdir -p .generated/classes && \
+  touch $@.build-started
   @echo '$(JAVA_COMPILER) $(JAVAC_FLAGS) $$(JAVA_SOURCE_FILES)'
   @$(JAVA_COMPILER) $(JAVAC_FLAGS) $(call convertToNativeFilenames,$(JAVA_SOURCE_FILES)) && \
-  touch $@
+  mv $@.build-started $@
 endef
 
 # ----------------------------------------------------------------------------
