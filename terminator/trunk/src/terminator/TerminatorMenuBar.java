@@ -253,6 +253,16 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		public void actionPerformed(ActionEvent e) {
 			TerminatorFrame frame = getFocusedTerminatorFrame();
+			
+			// On Mac OS, if the user hits C-T multiple times in quick succession while we've got no window up, we end up here with no focused frame.
+			// Without this hack, that means that (on my machine) for three C-Ts, I get two in one new window and a third in a second new window.
+			// With this hack, the focus even seems to work itself out in the end.
+			// I don't know of any cleaner way to do this.
+			Frames frames = Terminator.getSharedInstance().getFrames();
+			if (frame == null && frames.isEmpty() == false) {
+				frame = (TerminatorFrame) frames.getFrame();
+			}
+			
 			if (frame != null) {
 				frame.addTab(JTerminalPane.newShell());
 			} else {
