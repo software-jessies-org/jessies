@@ -280,6 +280,11 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			return;
 		}
 		
+		// mutt(1) likes to leave the cursor one character off the right of the bottom line.
+		if (displayCursor == false) {
+			return;
+		}
+		
 		// FIXME: we don't necessarily have a horizontal position that
 		// corresponds to where the cursor is. This is probably a
 		// mistake that should be fixed.
