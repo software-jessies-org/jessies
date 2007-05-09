@@ -334,6 +334,11 @@ public class FileUtilities {
      * So: we call an external utility to find out where the OS last saw our .app bundle.
      */
     public static String findScriptFromBundle(String scriptName, String bundleId) {
+        // On non-Mac OS systems, we have to hope the script is on the user's path.
+        // (Developers on Mac OS are likely to want a script on their path to override any installed bundle too.)
+        if (FileUtilities.findOnPath(scriptName) != null) {
+            return scriptName;
+        }
         if (GuiUtilities.isMacOs()) {
             ArrayList<String> bundleLocations = new ArrayList<String>();
             String[] command = ProcessUtilities.makeShellCommandArray(FileUtilities.findOnPath("LSFindApplicationForInfo") + " " + bundleId);
@@ -350,8 +355,9 @@ public class FileUtilities {
                 }
             }
         }
-        // On non-Mac OS systems, we have to hope it's on the user's path.
-        // (Developers' Mac OS systems are likely to need this too, if they're not installing the .app bundles.)
+        // If we get this far, we've failed.
+        // Returning scriptName improves the chances that we'll provide a sensible error message.
+        // Alternatively, we could change all callers to check for null, and return null here.
         return scriptName;
     }
     
