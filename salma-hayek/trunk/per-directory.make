@@ -46,9 +46,8 @@ HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(COMPILATION_DIRECTORY)/%,$(HEA
 # ----------------------------------------------------------------------------
 
 EXECUTABLES = $(BIN_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
-WINDOWS_SUBSYSTEM_EXECUTABLES = $(BIN_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
 ifeq "$(TARGET_OS)" "Cygwin"
-EXECUTABLES += $(WINDOWS_SUBSYSTEM_EXECUTABLES)
+WINDOWS_SUBSYSTEM_EXECUTABLES = $(EXECUTABLES)
 endif
 
 # ----------------------------------------------------------------------------

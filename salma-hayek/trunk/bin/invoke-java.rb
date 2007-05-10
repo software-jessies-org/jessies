@@ -129,7 +129,7 @@ class Java
     if target_os() == "Cygwin"
       # We need to load jvm.dll from a Cygwin executable to get a reliable Cygwin JNI experience.
       # This launcher doesn't use the same algorithm as Sun's for picking a jvm.dll.
-      @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/launcherw"
+      @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/launcher"
     end
   end
 
