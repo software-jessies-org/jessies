@@ -98,7 +98,7 @@ public class JTerminalPane extends JPanel {
 		// It's also hard to explain the difference without assuming a detailed knowledge of the particular shell.
 		ArrayList<String> command = new ArrayList<String>();
 		command.add(System.getenv("SHELL"));
-		command.add("-l");
+		command.add("-l"); // The -l switch is supported by more shells than --login.
 		return command;
 	}
 	
