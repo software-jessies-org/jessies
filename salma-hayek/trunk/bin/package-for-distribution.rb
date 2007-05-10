@@ -188,17 +188,16 @@ copy_files_for_installation(".", project_resource_directory)
 copy_files_for_installation(salma_hayek, "#{resources_dir}/salma-hayek")
 
 # Generate a single JAR file containing both the project's unique classes and all the classes from the salma-hayek library.
-# Unscientific experiments suggest that uncompressed (-0) JAR files give us faster start-up times, and improving start-up time is why we're using a JAR file.
 # We have to do this in two stages to avoid a "java.util.zip.ZipException: duplicate entry:" error from jar(1) for cases where both trees share a package prefix.
 
 # Use an absolute path so we can chdir first.
 jar_filename = Pathname.new("#{project_resource_directory}").realpath() + ".generated" + "classes.jar"
 # Using chdir rather than jar -C saves converting more pathnames to JVM-compatible format.
 Dir.chdir(".generated/classes/") {
-    spawnWithoutShell(["jar", "c0f", convert_to_jvm_compatible_pathname(jar_filename), "."])
+    spawnWithoutShell(["jar", "cf", convert_to_jvm_compatible_pathname(jar_filename), "."])
 }
 Dir.chdir("#{salma_hayek}/.generated/classes/") {
-    spawnWithoutShell(["jar", "u0f", convert_to_jvm_compatible_pathname(jar_filename), "."])
+    spawnWithoutShell(["jar", "uf", convert_to_jvm_compatible_pathname(jar_filename), "."])
 }
 
 if target_os() == "Darwin"
