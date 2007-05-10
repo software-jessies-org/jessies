@@ -208,7 +208,7 @@ if target_os() == "Darwin"
     script_name = "#{app_dir}/MacOS/#{human_project_name}"
     File.open(script_name, "w") {
         |file|
-        file.puts("#!/bin/bash -l")
+        file.puts("#!/bin/bash --login")
         file.puts("# We started Bash as a login shell so that our application has access to the user's expected path.")
         file.puts("# Finder seems to start applications in /.")
         file.puts("# Most users will be more comfortable in their home directory. This is especially true of Terminator.")
