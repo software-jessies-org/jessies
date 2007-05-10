@@ -45,13 +45,11 @@ HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(COMPILATION_DIRECTORY)/%,$(HEA
 # Locate the executables.
 # ----------------------------------------------------------------------------
 
-EXECUTABLES.Cygwin =
-
-EXECUTABLES.$(TARGET_OS) = $(BIN_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
-
-EXECUTABLES.Cygwin += $(BIN_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
-
-EXECUTABLES = $(EXECUTABLES.$(TARGET_OS))
+EXECUTABLES = $(BIN_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
+WINDOWS_SUBSYSTEM_EXECUTABLES = $(BIN_DIRECTORY)/$(BASE_NAME)w$(EXE_SUFFIX)
+ifeq "$(TARGET_OS)" "Cygwin"
+EXECUTABLES += $(WINDOWS_SUBSYSTEM_EXECUTABLES)
+endif
 
 # ----------------------------------------------------------------------------
 # Locate the JNI library and its intermediate files.
@@ -129,7 +127,7 @@ endef
 # after other assignments.
 # ----------------------------------------------------------------------------
 
-$(EXECUTABLES.Cygwin): LOCAL_LDFLAGS += -Wl,--subsystem,windows
+$(WINDOWS_SUBSYSTEM_EXECUTABLES): LOCAL_LDFLAGS += -Wl,--subsystem,windows
 $(EXECUTABLES) $(SHARED_LIBRARY): LDFLAGS := $(LOCAL_LDFLAGS)
 $(NEW_JNI_HEADER): RULE := $(JAVAHPP_RULE)
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
