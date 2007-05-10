@@ -49,11 +49,11 @@
       </Directory>
       <Directory Id='DesktopFolder' Name='Desktop' />
       <Component Id='RubyShortcut_HKLM' Guid='$(env.SHORTCUT_HKLM_GUID)'>
-        <Registry Id='RegistryKey_HKLM' Root='HKMU' Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)' Name='ShortcutTarget' Action='write' Type='string' Value='[RUBYW_HKLM]' KeyPath='yes' />
+        <Registry Id='RegistryKey_HKLM' Root='HKCU' Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)' Name='ShortcutTarget' Action='write' Type='string' Value='[RUBYW_HKLM]' KeyPath='yes' />
         <Shortcut Id='DesktopShortcutId_HKLM' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[RUBYW_HKLM]' Arguments='bin/$(env.MACHINE_PROJECT_NAME)' WorkingDirectory='projectResources' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
       </Component>
       <Component Id='RubyShortcut_HKCU' Guid='$(env.SHORTCUT_HKCU_GUID)'>
-        <Registry Id='RegistryKey_HKCU' Root='HKMU' Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)' Name='ShortcutTarget' Action='write' Type='string' Value='[RUBYW_HKCU]' KeyPath='yes' />
+        <Registry Id='RegistryKey_HKCU' Root='HKCU' Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)' Name='ShortcutTarget' Action='write' Type='string' Value='[RUBYW_HKCU]' KeyPath='yes' />
         <Shortcut Id='DesktopShortcutId_HKCU' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[RUBYW_HKCU]' Arguments='bin/$(env.MACHINE_PROJECT_NAME)' WorkingDirectory='projectResources' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
       </Component>
     </Directory>
