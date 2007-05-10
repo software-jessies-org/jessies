@@ -46,9 +46,9 @@ HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(COMPILATION_DIRECTORY)/%,$(HEA
 # ----------------------------------------------------------------------------
 
 EXECUTABLES = $(BIN_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
-ifeq "$(TARGET_OS)" "Cygwin"
-WINDOWS_SUBSYSTEM_EXECUTABLES = $(EXECUTABLES)
-endif
+WINDOWS_SUBSYSTEM_EXECUTABLES.$(TARGET_OS) =
+WINDOWS_SUBSYSTEM_EXECUTABLES.Cygwin = $(EXECUTABLES)
+WINDOWS_SUBSYSTEM_EXECUTABLES = WINDOWS_SUBSYSTEM_EXECUTABLES.$(TARGET_OS)
 
 # ----------------------------------------------------------------------------
 # Locate the JNI library and its intermediate files.
