@@ -177,7 +177,9 @@ PIC_FLAG.Cygwin =
 C_AND_CXX_FLAGS += $(PIC_FLAG.$(TARGET_OS))
 
 # Include debugging information.
-C_AND_CXX_FLAGS += -g
+DEBUG_FLAG.$(TARGET_OS) = -g
+DEBUG_FLAG.Cygwin = -gdwarf-2
+C_AND_CXX_FLAGS += $(DEBUG_FLAG.$(TARGET_OS))
 
 # Maximum warnings...
 C_AND_CXX_FLAGS += -W -Wall -Wshadow
