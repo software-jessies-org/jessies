@@ -350,9 +350,10 @@ $(takeProfileSample)
 WILDCARD.src := $(wildcard src)
 WILDCARD.classes := $(wildcard .generated/classes)
 JAVA_SOURCE_FILES := $(if $(WILDCARD.src),$(shell find src -type f -name "*.java"))
-JAVA_DIRECTORY_PREREQUISITES := $(if $(strip $(WILDCARD.src) $(WILDCARD.classes)),$(shell find $(WILDCARD.src) $(WILDCARD.classes) -name .svn -prune -o -type d -print))
+JAVA_SOURCE_DIRECTORY_PREREQUISITES := $(if $(WILDCARD.src),$(shell find $(WILDCARD.src) -name .svn -prune -o -type d -print))
+JAVA_CLASSES_PREREQUISITES := $(if $(WILDCARD.classes),$(shell find $(WILDCARD.classes) -print))
 # If classes/ has been deleted, depending on its parent directory should get us rebuilt.
-JAVA_DIRECTORY_PREREQUISITES += $(if $(WILDCARD.classes),,.generated)
+JAVA_CLASSES_PREREQUISITES += $(if $(WILDCARD.classes),,.generated)
 $(takeProfileSample)
 SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
 
@@ -438,11 +439,10 @@ define BUILD_JAVA
   @echo "Compiling Java source..."
   $(RM) -r classes && \
   $(RM) -r .generated/classes && \
-  mkdir -p .generated/classes && \
-  touch $@.build-started
+  mkdir -p .generated/classes
   @echo '$(JAVA_COMPILER) $(JAVAC_FLAGS) $$(JAVA_SOURCE_FILES)'
   @$(JAVA_COMPILER) $(JAVAC_FLAGS) $(call convertToNativeFilenames,$(JAVA_SOURCE_FILES)) && \
-  mv $@.build-started $@
+  touch $@
 endef
 
 # ----------------------------------------------------------------------------
@@ -542,7 +542,7 @@ define closeLocalVariableScope
   $(call forEachLocalVariable,unsetLocalVariable)
 endef
 
-BUILD_TARGETS += $(if $(JAVA_SOURCE_FILES),.generated/java.sentinel)
+BUILD_TARGETS += $(if $(JAVA_SOURCE_FILES),.generated/java.build-finished)
 BUILD_TARGETS += $(if $(wildcard .svn),.generated/build-revision.txt)
 TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
 # We deliberately omit the intermediate directory.
@@ -559,7 +559,13 @@ BUILD_TARGETS += $(COMPILED_TERMINFO)
 .PHONY: build
 build: $(BUILD_TARGETS)
 
-.generated/java.sentinel: $(MAKEFILE_LIST) $(JAVA_SOURCE_FILES) $(JAVA_DIRECTORY_PREREQUISITES)
+# This sentinel tells us that we need to rebuild if the source changes during the compilation:
+# ie before the output files have been generated but (potentially) after the source files have been read.
+.generated/java.build-started: $(MAKEFILE_LIST) $(JAVA_SOURCE_FILES) $(JAVA_SOURCE_DIRECTORY_PREREQUISITES)
+	mkdir -p $(@D) && \
+	touch $@
+
+.generated/java.build-finished: .generated/java.build-started $(JAVA_CLASSES_PREREQUISITES)
 	$(BUILD_JAVA)
 
 .PHONY: clean
