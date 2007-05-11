@@ -151,7 +151,7 @@ $(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
 
 ifneq "$(JNI_SOURCE)" ""
 
-$(NEW_JNI_HEADER): .generated/java.sentinel $(JAVAHPP) $(SALMA_HAYEK)/.generated/classes/e/tools/JavaHpp.class
+$(NEW_JNI_HEADER): .generated/java.build-finished $(JAVAHPP) $(SALMA_HAYEK)/.generated/classes/e/tools/JavaHpp.class
 	@echo "Generating JNI header..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
