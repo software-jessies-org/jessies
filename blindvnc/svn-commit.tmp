@@ -1,0 +1,6 @@
+First import of blindvnc.  BlindVNC is a faceless implementation of a VNC server which is specifically intended to be used with x2vnc and its ilk.  It uses the Java robot to control mouse and keyboard.
+
+Note that some debugging of key-codes is required; only the mouse stuff works correctly at the moment.  This will follow.
+--This line, and those below, will be ignored--
+
+A    .

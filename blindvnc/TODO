@@ -1,0 +1,50 @@
+TODO file for BlindVNC
+
+Author: Phil Norman
+
+BlindVNC was originally hacked up in 2006, I think.  The purpose of the program is to implement a very simple, faceless VNC server.  No graphics are provided, just the ability of a client to control the mouse, keyboard and clipboard contents.  BlindVNC is intended to be used with the x2vnc program (or similar), which provides a system of using multiple computers, each with its own screen(s), with a single keyboard and mouse, by sending mouse move requests and keyboard events over VNC.  The client is generally a linux machine running X-Windows and x2vnc.
+
+I'd strongly suggest using VNC over an ssh tunnel.  BlindVNC does not support encryption.
+
+
+Things to do:
+
+* Put the thing under source control!  Hosted at jessies is probably the best option.
+
+* Currently, the keyboard map between my linux PC and Mac laptop is completely broken.  I need to implement some key-code translation to ensure that I always receive the correct key events for the host operation system.
+
+* Implement mouse-wheel support.
+
+* Implement VNC authentication.  It won't be terribly secure, but a simple password is better than nothing, particularly if we're on a multi-user machine.
+
+* Allow the server to run on a user-defined port.  The fixed port number of VNC will be a problem for people sharing a machine.
+
+* Allow the server to bind to a specific address (default: localhost).
+
+* Implement some way of automatically connecting to a known computer (when it can be found), and executing the magic suitable for setting up the VNC session (over an ssh tunnel).  This'd be useful for me at work, where I can plug in my laptop and have it automatically connect to my desktop machine.
+
+
+=== Possible future direction: re-implement x2vnc ===
+
+I could also re-implement x2vnc using Java robots, which would allow me to add the following features:
+
+* Showing an alpha-blended arrow on inactive (non-mouse-containing) displays, pointing at where the mouse is.
+
+* Multiple location setups (useful for laptops) with configuration of where each screen is in relation to other screens, much like Apple's multi-desktop positioning for single machines.
+
+
+
+Things done:
+
+---=== 2007-05-12 ===---
+
+* Added an options class to parse and store the command-line options.
+* Implemented mouse-wheel support (untested).
+
+
+---=== 2007-05-10 ===---
+
+* Split Monitor and Desktop out into separate classes.
+* Made an attempt at implementing clipboard sharing (not tested).
+* Added a key code translator class which I need to implement properly (it currently just logs the key codes received).
+* Moved the classes into the org.jessies.blindvnc package.
