@@ -1,9 +1,12 @@
 package terminator.view;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.util.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import terminator.Options;
 
 /**
@@ -79,7 +82,25 @@ public class VisualBellViewport extends JViewport {
         return (int)(0.4f * fore + 0.6f * back);
     }
     
+    /**
+     * Flashes the visual bell.
+     * This class has no other public API.
+     */
     public void flash() {
+        if (GuiUtilities.isMacOs()) {
+            // Mac OS has a system-wide "visual bell" that looks much better than ours.
+            // You can turn this on in the Universal Access preference pane, by checking "Flash the screen when an alert sound occurs".
+            // We can take advantage of Apple's hard work if the user has this turned on by "actually" ringing the bell.
+            // This doesn't change our "no noise pollution" policy, if you ignore the very unlikely race condition.
+            ArrayList<String> result = new ArrayList<String>();
+            ArrayList<String> errors = new ArrayList<String>();
+            int status = ProcessUtilities.backQuote(null, new String[] { "defaults", "-currentHost", "read", "Apple Global Domain", "com.apple.sound.beep.flash" }, result, errors);
+            if (status == 0 && errors.size() == 0 && result.size() == 1 && result.get(0).equals("1")) {
+                Toolkit.getDefaultToolkit().beep();
+                return;
+            }
+        }
+        
         setBellVisibility(true);
         timer.restart();
     }
