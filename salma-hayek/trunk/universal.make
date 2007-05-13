@@ -636,11 +636,13 @@ installer-file-list:
 $(MACHINE_PROJECT_NAME).app: build .generated/build-revision.txt
 	$(SCRIPT_PATH)/package-for-distribution.rb $(HUMAN_PROJECT_NAME) $(MACHINE_PROJECT_NAME) $(SALMA_HAYEK)
 
+# For a comparison of the major choices available at the time, see:
+# http://elliotth.blogspot.com/2007/05/choosing-best-disk-image-format-on-mac.html
 $(INSTALLER.dmg): $(MACHINE_PROJECT_NAME).app
 	@echo "Creating Mac OS .dmg disk image..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	hdiutil create -fs UFS -format UDBZ -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
+	hdiutil create -fs HFSX -format UDBZ -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
 
 $(INSTALLER.pkg): $(MACHINE_PROJECT_NAME).app
 	@echo "Creating package stream..."
