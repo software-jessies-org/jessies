@@ -8,9 +8,9 @@
 <p>About the silly name: I needed a name for a repository containing useful Java classes shared by several projects.
 I couldn't think of a <i>good</i> name, so I went for a nice name instead.
 
-<p>This page is incomplete, but should give you some idea of what's available.
-
 <h2><a name="features">Features</a></h2>
+
+<p>This list is very incomplete, but gives some idea of a few of the larger facilities on offer:
 
 <ul>
 <li><p><strong>PTextArea</strong> - One of the bigger things we offer is a high-performance text area.
@@ -55,13 +55,9 @@ C++ exceptions thrown in your JNI code are translated to Java exceptions.
 
 </ul>
 
-<h2>Download</h2>
+<h2>Using our Debian package repository</h2>
 
-<p>The source distribution is here (<a href="salma-hayek.tar.gz">salma-hayek.tar.gz</a>).
-
-<p>The <a href="ChangeLog.html">salma-hayek ChangeLog</a> is available separately.
-
-<p>Debian packages for some of our projects are available.
+<p>A Debian package repository is available for our packaged projects.
 Pasting this is how you might install them all, though you should think through the security implications before doing so:
 <pre>sudo bash &lt;&lt;EOF
 echo deb <a href="../downloads/debian/">http://software.jessies.org/downloads/debian/</a> ./ >> /etc/apt/sources.list
@@ -71,7 +67,16 @@ sudo aptitude update
 sudo aptitude install ~norg.jessies.
 </pre>
 
-<h2><a name="building-from-source">Building from source</a></h2>
+<p>If you're on Ubuntu, "Update Manager" will nag you almost daily because the packages represent our nightly builds, and we're constantly making improvements.
+You can change the frequency at which Ubuntu checks for updated packages by choosing "System" > "Administration" > "Software Sources" from the menu, clicking the "Updates" tab and using the combo box.
+Bear in mind that this also affects the frequency at which Ubuntu will check for updates to its own patches.
+We definitely <i>do not</i> recommend that you turn automatic updates off.
+
+<h2><a name="downloads">Downloads</a> / <a name="building-from-source">Building from source</a></h2>
+
+<p>The <a href="ChangeLog.html">salma-hayek ChangeLog</a> is available separately.
+
+<p>The source distribution is here (<a href="salma-hayek.tar.gz">salma-hayek.tar.gz</a>).
 
 <h3>All Platforms</h3>
 
