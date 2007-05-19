@@ -27,6 +27,8 @@ public class HelpMenu {
         
         if (changeLogUrl != null) {
             menu.add(new WebLinkAction("View " + Log.getApplicationName() + " Change Log", changeLogUrl));
+            // FIXME: this shouldn't be jessies-specific.
+            menu.add(new WebLinkAction("View " + Log.getApplicationName() + " FAQ", changeLogUrl.replaceAll("ChangeLog", "faq")));
             menu.addSeparator();
         }
         
