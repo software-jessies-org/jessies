@@ -126,24 +126,4 @@ Ken Arnold's <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=74230">t
 What you gain from accepting Evergreen's style (which shouldn't be a problem for most programmers) is that Evergreen will do most of the formatting for you.
 Even correcting stuff you paste in.
 
-<p>Evergreen listens on a socket for requests to open files.
-This lets you use the evergreen script to open files on your editing machine from elsewhere.
-Before accepting requests on the socket, Evergreen insists that a client authenticate itself.
-This uses a secret stored in ~/.e.edit.Edit/.secret.
-We create that file with permissions such that it should only be readable by your user account.
-For this to work, then, that path must point to the same file on both machines.
-Windows XP's firewall, in its default configuration, will pop up a warning and block Evergreen from accepting connections from other machines.
-If you don't want to use that facility from other machines, allowing XP to block the access would be a perfectly reasonable choice.
-It will still let you connect from the local machine, which is how the feature is normally used anyway.
-
-<p>If you don't have Exuberant ctags as "exuberant-ctags", "ectags", or the first "ctags" on your path, you'll see an error message something like "Is Exuberant ctags installed and on your path?
-There was an error reading the tags: The tags file didn't have a valid header.".
-Linux users should have no problem.
-Cygwin doesn't install any "ctags" by default, so you'll have to install Cygwin's package.
-Mac OS still ships with an old BSD "ctags", which you need to replace or override.
-You can get a pre-built Mac OS binary of <a href="../3rdParty/ctags-5.6-darwin-universal">ctags-5.6-darwin-universal</a>, or you can build your own.
-Either way, you'll want to make it executable and copy it somewhere on your path, renaming it to just "ctags".
-So something like <tt>sudo cp ctags-5.6-darwin-universal /usr/bin/ctags ; sudo chmod a+x /usr/bin/ctags</tt>, for example, assuming you're happy to lose the system-provided version.
-For Solaris users, Exuberant Ctags is available pre-packaged, via <a href="http://www.blastwave.org/">Blastwave</a>.
-
 <!--#include virtual="/salma-hayek/footer.html" -->
