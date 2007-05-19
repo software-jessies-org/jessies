@@ -19,7 +19,7 @@ For Terminator, these are stored in <tt>~/.terminal-logs/</tt> along with a file
 Evergreen's output is logged in your temporary directory.
 SCM's output is not currently logged.
 
-<h2>Installing Windows Ruby breaks Cygwin Ruby</h2>
+<h2>Installing Ruby for Windows breaks Ruby for Cygwin</h2>
 
 <p>Another problem we've seen a few times relates to the native Windows port of Ruby.
 We don't work with the current stable version, 1.8, because its "pathname.rb" library is broken for Windows paths.
@@ -44,5 +44,8 @@ NT's built-in POSIX subsystem won't let you launch native Windows applications o
 Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which we use to support terminal resizing, not to mention containing a port of one of the most widely used ssh programs.
 
 <p>Cygwin is also convenient for us in that it lets us use the same start-up scripts that we use on Linux and Mac OS.
+
+<p>In future, the other projects may be runnable without Cygwin, though probably not before there's a native (non-Cygwin) Ruby 1.9 available.
+Even then, if you're doing the kind of work on Windows that would make our tools (which are aimed squarely at programmers and sys admins), installing and learning Cygwin would probably be an excellent investment of your time.
 
 <!--#include virtual="/salma-hayek/footer.html" -->
