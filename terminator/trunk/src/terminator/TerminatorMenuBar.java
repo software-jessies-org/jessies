@@ -89,7 +89,6 @@ public class TerminatorMenuBar extends EMenuBar {
 	
 	private JMenu makeHelpMenu() {
 		HelpMenu helpMenu = new HelpMenu();
-		helpMenu.setWebsiteBase("http://software.jessies.org/terminator/");
 		return helpMenu.makeJMenu();
 	}
 	
