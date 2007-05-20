@@ -1,5 +1,7 @@
 <h2><a name="downloads">Downloads</a></h2>
 
+<!-- ---------------------------------------------------- -->
+
 <h3>Linux (x86 and x86_64) / Solaris (x86)</h3>
 <p>For Ubuntu and other Debian-based Linux distributions, there are <a href="/downloads/debian/<!--#echo var="LONG_DIST_NAME"-->.i386.deb">x86&nbsp;(i386)</a> and <a href="/downloads/debian/<!--#echo var="LONG_DIST_NAME"-->.amd64.deb">x86_64&nbsp;(amd64)</a> .deb packages which add <!--#echo var="HUMAN_NAME" --> to your GNOME applications menu. (For command-line or non-GNOME users, there's /usr/bin/<!--#echo var="SHORT_DIST_NAME"-->.)
 
@@ -7,26 +9,32 @@
 
 <p>For Solaris, there's <a href="/downloads/sunos/SJO<!--#echo var="SHORT_DIST_NAME"-->.i86pc.pkg">SJO<!--#echo var="SHORT_DIST_NAME"-->.i86pc.pkg</a> for installation with <a href="http://docs.sun.com/app/docs/doc/816-5166/6mbb1kqbm?a=view">pkgadd(1M)</a>, equivalent to the x86 .deb package.
 
+<!-- ---------------------------------------------------- -->
+
 <h3>Mac OS (Intel and PowerPC)</h3>
 <p>For Mac OS 10.4, there's <a href="/downloads/mac/<!--#echo var="SHORT_DIST_NAME"-->.dmg"><!--#echo var="SHORT_DIST_NAME"-->.dmg</a> which contains a universal binary application that you can simply drag and drop to install.
+
+<!-- ---------------------------------------------------- -->
 
 <h3>MS&nbsp;Windows</h3>
 <p>For Windows, there's a Windows installer, <a href="/downloads/windows/<!--#echo var="SHORT_DIST_NAME"-->.msi"><!--#echo var="SHORT_DIST_NAME"-->.msi</a>, which requires that you've already installed Cygwin, including Ruby, yourself but is otherwise complete and leaves you with an icon on your desktop.
 
 <p>We have more information about <a href="/salma-hayek/cygwin-setup.html">setting up Cygwin</a> if you're not already using it, and <a href="/salma-hayek/cygwin-problems.html">common Cygwin/Ruby problems</a>.
 
-<h3>Other Platforms/Architectures / Building from Source</h3>
-<p>If no pre-built <!--#echo var="HUMAN_NAME" --> package is available for your platform, or you just like building from source, there's a source distribution (<a href="<!--#echo var="SHORT_DIST_NAME"-->.tar.gz"><!--#echo var="SHORT_DIST_NAME"-->.tar.gz</a>).
-You'll also need the source to the library it uses (<a href="../salma-hayek/salma-hayek.tar.gz">salma-hayek.tar.gz</a>), and you'll need to unpack them such that you can switch from the project to salma-hayek with "cd ../salma-hayek" in the project's root.
+<!-- ---------------------------------------------------- -->
 
-<p>Anonymous read-only Subversion access is available with:
+<h3>Other Platforms/Architectures / Building from Source</h3>
+<p>If no pre-built package is available for your platform, or you just like building from source, anonymous read-only Subversion access is available.
 <pre>
-mkdir software.jessies.org
-cd software.jessies.org
+mkdir ~/software.jessies.org
+cd ~/software.jessies.org
 svn checkout http://software.jessies.org/svn/<!--#echo var="SHORT_DIST_NAME"-->/trunk/ <!--#echo var="SHORT_DIST_NAME"-->
 svn checkout http://software.jessies.org/svn/salma-hayek/trunk/ salma-hayek
 # You may want to add something like this to your crontab:
 #00 23 * * * echo ~/software.jessies.org/salma-hayek/bin/nightly-build.rb ~/software.jessies.org clean build | bash --login
 </pre>
+There's also <a href="<!--#echo var="SHORT_DIST_NAME"-->.tar.gz"><!--#echo var="SHORT_DIST_NAME"-->.tar.gz</a> but Subversion makes it easier for you to keep up to date, and makes it easier to submit patches.
 
-<p>The <a href="../salma-hayek/index.html#building-from-source">hints for building</a> are the same for all our projects.
+<p>The <a href="/salma-hayek/index.html#building-from-source">hints for building</a> are the same for all our projects.
+
+<!-- ---------------------------------------------------- -->
