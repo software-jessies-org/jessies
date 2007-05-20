@@ -65,7 +65,10 @@ fi
 </pre>
 <p>Read the Bash manual page for full details of PS1, PROMPT_COMMAND, or the advanced forms of substitution.
 
-<p>Cygwin's default /etc/profile includes an escape sequence in PS1 for setting the window title so, conversely, if you want to disable this behavior on Cygwin, you will need to override its definition of PS1.
+<h2>Why does my window/tab title keep changing in Cygwin?</h2>
+
+<p>Cygwin's default <tt>/etc/profile</tt> includes an escape sequence in PS1 that sets the window title.
+Bearing in mind the answer to the previous question, if you want to disable this behavior on Cygwin, you will need to override its definition of PS1.
 
 <!-- ---------------------------------------------------- -->
 
@@ -164,6 +167,26 @@ export TERM=$TERM
 <h2>Why am I having trouble with Emacs on Mac OS?</h2>
 
 <p>Mac Emacs users can't use the alt key as Emacs' meta because bugs in Apple's Java VM mean that Terminator isn't given the correct key presses. In some cases (alt-e, alt-u, alt-i, and alt-n) we're not given any key press at all. We've raised Apple bug ID#5158674, and will have to wait for Apple to fix their JVM. Emacs works fine in Terminator on Linux, Solaris, and Windows, if that's an alternative for you.
+
+<!-- ---------------------------------------------------- -->
+
+<h2>How do I change my default shell?</h2>
+
+<p>Terminator will always start the shell specified by the SHELL environment variable.
+(It will fall back to /bin/sh if the SHELL environment variable isn't set.)
+You could simply influence Terminator's environment, but the best solution is to tell your operating system which shell you'd like, and it will ensure that SHELL is set correctly for all applications, not just Terminator.
+See the documentation for your operating system for details on how to change your default shell.
+
+<!-- ---------------------------------------------------- -->
+
+<h2>How can I open a new window from the command line?</h2>
+
+<p>You can start other programs, even in multiple tabs, from the command line.
+See <tt>terminator --help</tt> for the syntax.
+Here's an example that opens a new window with two tabs:
+<pre>
+terminator -n "top's tab's title" top -n "another tab title" bash
+</pre>
 
 <!-- ---------------------------------------------------- -->
 
