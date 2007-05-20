@@ -38,6 +38,16 @@ public class AboutBox {
         this.applicationName = applicationName;
     }
     
+    public String getWebSiteAddress() {
+        return webSiteAddress;
+    }
+    
+    /**
+     * Sets the base URL for the application's website.
+     * The current requirements are:
+     * 1. that the address itself goes to some meaningful page about the application.
+     * 2. that there be a "ChangeLog.html" and a "faq.html" under this location.
+     */
     public void setWebSiteAddress(String webSiteAddress) {
         this.webSiteAddress = webSiteAddress;
     }
