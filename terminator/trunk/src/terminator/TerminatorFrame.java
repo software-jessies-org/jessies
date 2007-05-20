@@ -13,7 +13,7 @@ import terminator.view.*;
 
 public class TerminatorFrame extends JFrame {
 	private Dimension terminalSize;
-	private JTabbedPane tabbedPane;
+	private TerminatorTabbedPane tabbedPane;
 	
 	private ArrayList<JTerminalPane> terminals;
 	
@@ -359,6 +359,13 @@ public class TerminatorFrame extends JFrame {
 	private void addPaneToUI(JTerminalPane newPane) {
 		switchToTabbedPane();
 		tabbedPane.addTab(newPane.getName(), newPane);
+	}
+	
+	public void moveCurrentTab(int direction) {
+		if (tabbedPane != null) {
+			final int currentTabIndex = tabbedPane.getSelectedIndex();
+			tabbedPane.moveTab(currentTabIndex, currentTabIndex + direction);
+		}
 	}
 	
 	/**

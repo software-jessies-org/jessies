@@ -336,7 +336,7 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		public void keyPressed(KeyEvent event) {
-			if (doKeyboardScroll(event) || doKeyboardTabSwitch(event)) {
+			if (doKeyboardScroll(event) || doKeyboardTabAction(event)) {
 				event.consume();
 				return;
 			}
@@ -455,7 +455,7 @@ public class JTerminalPane extends JPanel {
 				return Ascii.ESC + String.valueOf(e.getKeyChar());
 			}
 			if (e.isControlDown() && ch == '\t') {
-				// doKeyboardTabSwitch already handled this.
+				// doKeyboardTabAction already handled this.
 				return null;
 			}
 			// This modifier test lets Ctrl-H and Ctrl-J generate ^H and ^J instead of
@@ -517,48 +517,52 @@ public class JTerminalPane extends JPanel {
 			}
 		}
 		
-		private boolean doKeyboardScroll(KeyEvent event) {
-			if (event.isShiftDown()) {
-				switch (event.getKeyCode()) {
-					case KeyEvent.VK_HOME:
-						textPane.scrollToTop();
-						return true;
-					case KeyEvent.VK_END:
-						textPane.scrollToEnd();
-						return true;
-					case KeyEvent.VK_PAGE_UP:
-						pageUp();
-						return true;
-					case KeyEvent.VK_PAGE_DOWN:
-						pageDown();
-						return true;
-					default:
-						return false;
+		private boolean doKeyboardScroll(KeyEvent e) {
+			final int keyCode = e.getKeyCode();
+			if (e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK) {
+				if (keyCode == KeyEvent.VK_HOME) {
+					textPane.scrollToTop();
+					return true;
+				} else if (keyCode == KeyEvent.VK_END) {
+					textPane.scrollToEnd();
+					return true;
+				} else if (keyCode == KeyEvent.VK_PAGE_UP) {
+					pageUp();
+					return true;
+				} else if (keyCode == KeyEvent.VK_PAGE_DOWN) {
+					pageDown();
+					return true;
 				}
-			} else {
-				return false;
 			}
+			return false;
 		}
 		
 		/**
 		 * Although we only advertise one pair of keystrokes on the menu, we actually support a variety of methods for changing tab.
 		 * The idea is that someone who subconsciously uses some other major application's keystrokes won't ever have to learn ours.
 		 */
-		private boolean doKeyboardTabSwitch(KeyEvent event) {
-			if (event.isControlDown()) {
-				if (event.getKeyCode() == KeyEvent.VK_TAB) {
-					// Emulates Firefox's control-tab/control-shift-tab cycle-tab behavior.
-					getTerminatorFrame().cycleTab(event.isShiftDown() ? -1 : 1);
-					return true;
-				} else if (event.getKeyCode() == KeyEvent.VK_PAGE_UP || event.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
-					// Emulates gnome-terminal and Firefox's control-page up/down cycle-tab behavior.
-					// Strictly, we're supposed to send an escape sequence for these strokes, but I don't know of anything that uses them.
-					getTerminatorFrame().cycleTab(event.getKeyCode() == KeyEvent.VK_PAGE_UP ? -1 : 1);
-					return true;
-				}
-			} else if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
+		private boolean doKeyboardTabAction(KeyEvent e) {
+			final int keyCode = e.getKeyCode();
+			if (e.isControlDown() && keyCode == KeyEvent.VK_TAB) {
+				// Emulates Firefox's control-tab/control-shift-tab cycle-tab behavior.
+				getTerminatorFrame().cycleTab(e.isShiftDown() ? -1 : 1);
+				return true;
+			} else if (e.isControlDown() && e.isShiftDown() == false && (keyCode == KeyEvent.VK_PAGE_UP || keyCode == KeyEvent.VK_PAGE_DOWN)) {
+				// Emulates gnome-terminal and Firefox's control-page up/down cycle-tab behavior.
+				// Strictly, we're supposed to send an escape sequence for these strokes, but I don't know of anything that uses them.
+				getTerminatorFrame().cycleTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : 1);
+				return true;
+			} else if (e.isControlDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_PAGE_UP || keyCode == KeyEvent.VK_PAGE_DOWN)) {
+				// Emulates gnome-terminal's control-shift page up/page down move-tab behavior.
+				getTerminatorFrame().moveCurrentTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : +1);
+				return true;
+			} else if (e.isControlDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)) {
+				// Emulates konsole's control-shift left/right move-tab behavior.
+				getTerminatorFrame().moveCurrentTab(keyCode == KeyEvent.VK_LEFT ? -1 : +1);
+				return true;
+			} else if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
 				// Emulates gnome-terminal's alt-<number> jump-to-tab behavior, or an analog of Terminal.app's command-<number> jump-to-window behavior.
-				char ch = event.getKeyChar();
+				char ch = e.getKeyChar();
 				if (ch >= '1' && ch <= '9') {
 					getTerminatorFrame().setSelectedTabIndex(ch - '1');
 					return true;

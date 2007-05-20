@@ -10,9 +10,6 @@ import javax.swing.event.*;
 import terminator.view.*;
 
 public class TerminatorTabbedPane extends JTabbedPane {
-    // We make use of Java 6's custom tab ear components if available, but we still want to work on Java 5 until Java 6 is widespread.
-    public static boolean haveConfigurableTabs = true;
-    
     public TerminatorTabbedPane() {
         // We want to provide custom tool tips.
         ToolTipManager.sharedInstance().registerComponent(this);
@@ -47,6 +44,42 @@ public class TerminatorTabbedPane extends JTabbedPane {
         });
     }
     
+    public void moveTab(int originalIndex, int newIndex) {
+        // Clamp movement to the ends (rather than wrapping round or going out of bounds).
+        newIndex = Math.max(0, newIndex);
+        newIndex = Math.min(newIndex, getTabCount() - 1);
+        if (newIndex == originalIndex) {
+            return;
+        }
+        
+        // Remember everything about the original tab.
+        final Color background = getBackgroundAt(originalIndex);
+        final Component component = getComponentAt(originalIndex);
+        final Icon disabledIcon = getDisabledIconAt(originalIndex);
+        final int displayedMnemonicIndex = getDisplayedMnemonicIndexAt(originalIndex);
+        final boolean enabled = isEnabledAt(originalIndex);
+        final Color foreground = getForegroundAt(originalIndex);
+        final Icon icon = getIconAt(originalIndex);
+        final int mnemonic = getMnemonicAt(originalIndex);
+        final String title = getTitleAt(originalIndex);
+        final String toolTip = getToolTipTextAt(originalIndex);
+        final Component tabComponent = getTabComponentAt_safe(originalIndex);
+        
+        // Remove the original tab and add a new one.
+        remove(originalIndex);
+        insertTab(title, icon, component, toolTip, newIndex);
+        setSelectedIndex(newIndex);
+        
+        // Configure the new tab to look like the old one.
+        setBackgroundAt(newIndex, background);
+        setDisabledIconAt(newIndex, disabledIcon);
+        setDisplayedMnemonicIndexAt(newIndex, displayedMnemonicIndex);
+        setEnabledAt(newIndex, enabled);
+        setForegroundAt(newIndex, foreground);
+        setMnemonicAt(newIndex, mnemonic);
+        setTabComponentAt_safe(newIndex, tabComponent);
+    }
+    
     @Override
     public String getToolTipTextAt(int index) {
         String primaryModifier = GuiUtilities.isMacOs() ? "\u2318" : "Alt+";
@@ -68,31 +101,37 @@ public class TerminatorTabbedPane extends JTabbedPane {
     public void addTab(String name, Component c) {
         super.addTab(name, c);
         
-        if (haveConfigurableTabs == false) {
-            return;
-        }
         int newIndex = getTabCount() - 1;
         Component tabEar = new TerminatorTabComponent((JTerminalPane) c);
-        // FIXME: Java 6 => setTabComponentAt(newIndex, tabEar);
-        try {
-            JTabbedPane.class.getMethod("setTabComponentAt", int.class, Component.class).invoke(this, newIndex, tabEar);
-        } catch (Exception ex) {
-            haveConfigurableTabs = false;
-        }
+        setTabComponentAt_safe(newIndex, tabEar);
     }
     
     @Override
     public void setTitleAt(int index, String title) {
-        if (haveConfigurableTabs) {
-            try {
-                // FIXME: Java 6 => c = (TerminatorTabComponent) getTabComponentAt(index);
-                TerminatorTabComponent c = (TerminatorTabComponent) JTabbedPane.class.getMethod("getTabComponentAt", int.class).invoke(this, index);
-                c.setTitle(title);
-            } catch (Exception ex) {
-                haveConfigurableTabs = false;
-            }
+        TerminatorTabComponent c = (TerminatorTabComponent) getTabComponentAt_safe(index);
+        if (c != null) {
+            c.setTitle(title);
         }
         super.setTitleAt(index, title);
+    }
+    
+    // We make use of Java 6's custom tab ear components if available, but we still want to work on Java 5 until Java 6 is widespread.
+    // FIXME: Java 6 getTabComponentAt
+    private Component getTabComponentAt_safe(int index) {
+        try {
+            return (Component) JTabbedPane.class.getMethod("getTabComponentAt", int.class).invoke(this, index);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+    
+    // We make use of Java 6's custom tab ear components if available, but we still want to work on Java 5 until Java 6 is widespread.
+    // FIXME: Java 6 => setTabComponentAt
+    private void setTabComponentAt_safe(int index, Component c) {
+        try {
+            JTabbedPane.class.getMethod("setTabComponentAt", int.class, Component.class).invoke(this, index, c);
+        } catch (Exception ex) {
+        }
     }
     
     @Override

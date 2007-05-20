@@ -15,7 +15,9 @@ import terminator.view.highlight.*;
  */
 public class TerminatorMenuBar extends EMenuBar {
 	private Action[] customWindowMenuItems = new Action[] {
-		new CycleTabAction(1),
+		new MoveTabAction(+1),
+		new MoveTabAction(-1),
+		new CycleTabAction(+1),
 		new CycleTabAction(-1)
 	};
 	
@@ -547,8 +549,8 @@ public class TerminatorMenuBar extends EMenuBar {
 			// Elias Naur explained that not only does that look wrong (even though it feels right on English keyboards), it doesn't work at all on Danish keyboards.
 			
 			// Ed did a quick survey and reported that Camino uses command-option left/right; Safari uses command {/}, while other programs (Adium, for example) use command left/right.
-			// konsole uses control-shift left/right, and gnome-terminal uses control page up/page down.
-			// Firefox, uses control tab/control-shift tab, presumably because it had already used alt left/right for back/forward.
+			// konsole uses shift left/right, and gnome-terminal uses control page up/page down.
+			// Firefox uses control tab/control-shift tab, presumably because it had already used alt left/right for back/forward.
 			// Firefox also supports control page up/page down.
 			
 			// We already support the control-tab sequences in doKeyboardTabSwitch, but control-shift tab isn't well known, and is quite uncomfortable.
@@ -565,6 +567,30 @@ public class TerminatorMenuBar extends EMenuBar {
 		@Override
 		protected void performFrameAction(TerminatorFrame frame) {
 			frame.cycleTab(delta);
+		}
+	}
+	
+	public static class MoveTabAction extends AbstractTabAction {
+		private int delta;
+		
+		public MoveTabAction(int delta) {
+			super(delta < 0 ? "Move Tab Left" : "Move Tab Right");
+			this.delta = delta;
+			
+			// Apple's Terminal doesn't yet support tabs.
+			// Firefox only supports drag and drop; there's no keyboard tab movement.
+			// gnome-terminal uses control-shift page up/page down.
+			// konsole uses control-shift left/right.
+			// We support those in our KeyEvent-handling code, but they're secret.
+			
+			// Our default, advertised, keystrokes are alt-shift left/right (command-shift left/right on Mac OS), by analogy to our next/previous tab keystrokes.
+			
+			putValue(ACCELERATOR_KEY, makeShiftedKeyStroke(delta < 0 ? "LEFT" : "RIGHT"));
+		}
+		
+		@Override
+		protected void performFrameAction(TerminatorFrame frame) {
+			frame.moveCurrentTab(delta);
 		}
 	}
 	
