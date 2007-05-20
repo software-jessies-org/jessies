@@ -10,6 +10,55 @@ import javax.swing.event.*;
 import terminator.view.*;
 
 public class TerminatorTabbedPane extends JTabbedPane {
+    private static final TabDragger TAB_DRAGGER = new TabDragger();
+    
+    /**
+     * Lets the user drag tabs to reorder them.
+     * The tabs are reordered live, as the user drags.
+     */
+    private static class TabDragger extends MouseAdapter {
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            TerminatorTabbedPane tabbedPane = (TerminatorTabbedPane) e.getSource();
+            tabbedPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            
+            final int oldIndex = tabbedPane.getSelectedIndex();
+            int newIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
+            if (newIndex != -1 && newIndex != oldIndex) {
+                // Hysteresis to prevent bad behavior when moving a small tab over a larger one (which would then be under the mouse, causing the opposite move).
+                // This is less unpleasant than using java.awt.Robot to move the pointer to a safe spot.
+                // (gnome-terminal sidesteps this problem by forcing all tabs to be the same width.)
+                javax.swing.plaf.TabbedPaneUI ui = tabbedPane.getUI();
+                Rectangle oldRectangle = ui.getTabBounds(tabbedPane, oldIndex);
+                Rectangle newRectangle = ui.getTabBounds(tabbedPane, newIndex);
+                if (oldIndex < newIndex) {
+                    // Moving left-to-right.
+                    if (e.getX() < newRectangle.x + newRectangle.width/2) {
+                        return;
+                    }
+                } else {
+                    // Moving right-to-left.
+                    if (e.getX() > newRectangle.x + newRectangle.width/2) {
+                        return;
+                    }
+                }
+                
+                // The move's okay.
+                tabbedPane.moveTab(oldIndex, newIndex);
+            }
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            resetMouseCursor(e);
+        }
+        
+        private void resetMouseCursor(MouseEvent e) {
+            TerminatorTabbedPane tabbedPane = (TerminatorTabbedPane) e.getSource();
+            tabbedPane.setCursor(Cursor.getDefaultCursor());
+        }
+    }
+    
     public TerminatorTabbedPane() {
         // We want to provide custom tool tips.
         ToolTipManager.sharedInstance().registerComponent(this);
@@ -19,11 +68,12 @@ public class TerminatorTabbedPane extends JTabbedPane {
         addChangeListener(new TerminalFocuser());
         ComponentUtilities.disableFocusTraversal(this);
         
-        // The tabs themselves (the components with the labels)
-        // shouldn't be able to get the focus. If they can, clicking
-        // on an already-selected tab takes focus away from the
-        // associated terminal, which is annoying.
+        // The tabs themselves (the components with the labels) shouldn't be able to get the focus.
+        // If they can, clicking on an already-selected tab takes focus away from the associated terminal, which is annoying.
         setFocusable(false);
+        
+        addMouseListener(TAB_DRAGGER);
+        addMouseMotionListener(TAB_DRAGGER);
     }
     
     private void initPopUpMenu() {
