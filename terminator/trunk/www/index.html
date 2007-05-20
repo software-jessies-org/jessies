@@ -40,9 +40,9 @@ Sadly, we don't have the resources to support two implementations, so reflowing 
 <li><p><strong>Number Reinterpretation</strong> - Terminator will recognize numbers in a variety of bases as the current selection, and add informational menu items to the pop-up menu showing the same number in other bases.
 No more <tt>man ascii</tt> or resorting to <tt>bc(1)</tt>.
 
-<li><p><strong>Portability</strong> - Written mostly in Java, with a small POSIX C++ part (for pseudo-terminal support) and a Ruby invocation script, Terminator should compile out of the box on most modern desktop operating systems.
+<li><p><strong>Portability</strong> - Written mostly in Java, with a small POSIX C++ part (for pseudo-terminal support) and a Ruby invocation script, Terminator should compile out of the box on most modern desktop operating systems. (Pre-built packages are available for most systems, so you don't need to worry about this!)
 
-<p>Pre-built packages are available for Linux, Mac&nbsp;OS, Solaris, and Windows.
+<p>Now you can use the same terminal emulator everywhere!
 
 <li><p><strong>Proper Tab Character Handling</strong> - Most terminal emulators will translate tab characters into strings of spaces, which is very annoying if you then try to copy/paste a section of text from your terminal into a text editor.
 Terminator handles tabs properly, remembering where the tabs are and copy/pasting them as tab characters.
@@ -84,17 +84,6 @@ Though originally written for Linux to make up for the fact that no Linux termin
 <!--#set var="SHORT_DIST_NAME" value="terminator" -->
 <!--#set var="LONG_DIST_NAME" value="org.jessies.terminator" -->
 <!--#include virtual="/salma-hayek/downloads.html" -->
-
-<h2>Running</h2>
-
-<p>Terminator will run fine on Mac&nbsp;OS, Windows, and Linux or Solaris (using KDE, GNOME, or even an old-style X11 window manager like lwm).
-Now you can use the same terminal emulator everywhere!
-
-<p>By default, Terminator will start the shell specified by the SHELL environment variable.
-You can start other programs, even in multiple tabs, from the command line.
-See <tt>terminator --help</tt> for the syntax.
-
-<p>The answers to some frequently asked questions are available in a <a href="faq.html">Terminator FAQ</a>.
 
 <h2>Authors</h2>
 
