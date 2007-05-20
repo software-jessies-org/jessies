@@ -10,8 +10,6 @@ public class EWindow extends JComponent {
     private ETitleBar titleBar;
     
     public EWindow(String name) {
-        setBackground(Color.WHITE);
-        setCursor(Cursor.getDefaultCursor());
         setLayout(new BorderLayout());
         addTitleBar(name);
         setOpaque(true);
