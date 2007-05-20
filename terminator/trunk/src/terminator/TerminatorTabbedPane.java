@@ -39,6 +39,9 @@ public class TerminatorTabbedPane extends JTabbedPane {
                 actions.add(new TerminatorMenuBar.NewTabAction());
                 actions.add(new TerminatorMenuBar.DetachTabAction());
                 actions.add(null);
+                actions.add(new TerminatorMenuBar.MoveTabAction(+1));
+                actions.add(new TerminatorMenuBar.MoveTabAction(-1));
+                actions.add(null);
                 actions.add(new TerminatorMenuBar.CloseAction());
             }
         });
