@@ -10,8 +10,12 @@ instead of from the desktop shortcut icon until you work out what's wrong.
 Running it manually will use <tt>ruby.exe</tt> rather than the <tt>rubyw.exe</tt> used by the shortcut.
 <tt>rubyw.exe</tt> is a version of Ruby linked with <tt>--subsystem windows</tt> instead of <tt>--subsystem console</tt>.
 <tt>rubyw.exe</tt> quits with no visible error if it tries to do standard I/O.
-One reason why Ruby might try to write to the standard error stream is if it wants to warn about <a href="../salma-hayek/cygwin-setup.html">world-writable directories on the PATH</a>.
-If the problem turns out to be anything other than that, please mail us a bug report including the output when you start the program from a Cygwin Bash prompt.
+
+<p>One reason why Ruby might try to write to the standard error stream is if it wants to warn about <a href="../salma-hayek/cygwin-setup.html">world-writable directories on the PATH</a>.
+<p>Another reason is the "ubygems" problem mentioned below.
+<p>Another reason is that you've actually got Cygwin gems installed, and one of the libraries that gets loaded causes Ruby to emit a warning; rubysspi-1.2.2, for example, is known to have a such a problem.
+
+<p>If the problem turns out to be something new, please mail us a bug report including the output when you start the program from a Cygwin Bash prompt.
 (The web page for the particular project you're trying to run should tell you the email address.)
 
 <p>Any console output from our applications (as opposed to the start-up scripts or their interpreters) is recorded in a file.
