@@ -284,7 +284,7 @@ public class TagsUpdater {
         
         public void taggingFailed(Exception ex) {
             successful = false;
-            Evergreen.getInstance().getTagsPanel().showError("<b>Is Exuberant ctags installed and on your path?</b><p>There was an error reading the tags: " + ex.getMessage());
+            Evergreen.getInstance().getTagsPanel().showError("<b>Is Exuberant Ctags installed and on your path?</b><p>There was an error reading the tags: " + ex.getMessage());
         }
         
         public void scanTags() {
