@@ -9,13 +9,20 @@ import javax.swing.*;
  * A "Help" menu for a GUI application.
  */
 public class HelpMenu {
-    private String changeLogUrl;
+    private String websiteBaseUrl;
     
     public HelpMenu() {
     }
     
-    public void setChangeLog(String url) {
-        this.changeLogUrl = url;
+    /**
+     * Sets the base URL for the application's website.
+     * The current requirements are that there be a "ChangeLog.html" and a "faq.html" at this location.
+     */
+    public void setWebsiteBase(String url) {
+        this.websiteBaseUrl = url;
+        if (websiteBaseUrl.endsWith("/") == false) {
+            websiteBaseUrl += "/";
+        }
     }
     
     public JMenu makeJMenu() {
@@ -25,10 +32,9 @@ public class HelpMenu {
         //menu.add(new PlaceholderAction(Log.getApplicationName() + " Help"));
         //menu.addSeparator();
         
-        if (changeLogUrl != null) {
-            menu.add(new WebLinkAction("View " + Log.getApplicationName() + " Change Log", changeLogUrl));
-            // FIXME: this shouldn't be jessies-specific.
-            menu.add(new WebLinkAction("View " + Log.getApplicationName() + " FAQ", changeLogUrl.replaceAll("ChangeLog", "faq")));
+        if (websiteBaseUrl != null) {
+            menu.add(new WebLinkAction("View " + Log.getApplicationName() + " Change Log", websiteBaseUrl + "ChangeLog.html"));
+            menu.add(new WebLinkAction("View " + Log.getApplicationName() + " FAQ", websiteBaseUrl + "faq.html"));
             menu.addSeparator();
         }
         
