@@ -151,10 +151,6 @@ public class PAnchorSet implements PTextListener {
     }
     
     public synchronized void textCompletelyReplaced(PTextEvent event) {
-        clear();
-    }
-    
-    public synchronized void clear() {
         ArrayList<PAnchor> oldAnchors = anchors;
         anchors = new ArrayList<PAnchor>();
         for (PAnchor anchor : oldAnchors) {
