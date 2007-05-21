@@ -93,6 +93,11 @@ public enum FileType {
     }
     
     public void configureTextArea(PTextArea textArea) {
+        if (textArea.getFileType() == this) {
+            return;
+        }
+        
+        textArea.setFileType(this);
         textArea.setWrapStyleWord(this == FileType.PLAIN_TEXT);
         try {
             textArea.setIndenter(indenterClass.getConstructor(PTextArea.class).newInstance(textArea));

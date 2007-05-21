@@ -11,7 +11,7 @@ import java.util.regex.*;
  * used as the range to be styled.
  */
 public class RegularExpressionStyleApplicator implements StyleApplicator {
-    private PTextArea textArea;
+    protected PTextArea textArea;
     private Pattern pattern;
     private PStyle style;
     

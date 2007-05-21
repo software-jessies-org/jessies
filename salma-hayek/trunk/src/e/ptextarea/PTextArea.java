@@ -48,6 +48,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private boolean editable;
     private boolean wordWrap;
     
+    private FileType fileType;
     private PIndenter indenter;
     private PTextAreaSpellingChecker spellingChecker;
     private EPopupMenu popupMenu;
@@ -62,6 +63,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         this.columnCount = columnCount;
         this.editable = true;
         this.wordWrap = false;
+        this.fileType = FileType.PLAIN_TEXT;
         this.lines = new PLineList(new PTextBuffer());
         this.selection = new SelectionHighlight(this, 0, 0);
         this.indenter = new PNoOpIndenter(this);
@@ -1537,5 +1539,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         // offset is centered.
         centerOffsetInDisplay(start);
         select(start, end);
+    }
+    
+    public FileType getFileType() {
+        return fileType;
+    }
+    
+    public void setFileType(FileType newFileType) {
+        fileType = newFileType;
     }
 }
