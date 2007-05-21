@@ -60,21 +60,6 @@ else
     # Use this to report exceptions thrown by the given block.
     def report_exceptions(app_name, &block)
         begin
-            require "pathname.rb"
-            salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
-            
-            require "#{salma_hayek}/bin/target-os.rb"
-            # rubyw.exe throws an exception if it can't write its "Insecure world writable dir" warnings
-            # to $stderr every time it uses Kernel.system or Kernel.`.
-            if target_os() == "Cygwin"
-                if File.exists?("/proc/self/fd/1") == false
-                    $stdout = File.open("/dev/null", "w")
-                end
-                if File.exists?("/proc/self/fd/2") == false
-                    $stderr = File.open("/dev/null", "w")
-                end
-            end
-            
             block.call()
         rescue Exception => e
             show_uncaught_exception(app_name, e)
