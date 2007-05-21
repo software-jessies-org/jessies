@@ -16,7 +16,7 @@ public class TerminatorTabbedPane extends JTabbedPane {
      * Lets the user drag tabs to reorder them.
      * The tabs are reordered live, as the user drags.
      */
-    private static class TabDragger extends MouseAdapter {
+    private static class TabDragger extends MouseAdapter implements MouseMotionListener {
         //@Override // FIXME: Java 5's javac(1) is broken.
         public void mouseDragged(MouseEvent e) {
             TerminatorTabbedPane tabbedPane = (TerminatorTabbedPane) e.getSource();
@@ -57,6 +57,9 @@ public class TerminatorTabbedPane extends JTabbedPane {
             TerminatorTabbedPane tabbedPane = (TerminatorTabbedPane) e.getSource();
             tabbedPane.setCursor(Cursor.getDefaultCursor());
         }
+        
+        // FIXME: Java 5's MouseAdapter doesn't cover MouseMotionListener.
+        public void mouseMoved(MouseEvent e) { }
     }
     
     public TerminatorTabbedPane() {
@@ -72,8 +75,11 @@ public class TerminatorTabbedPane extends JTabbedPane {
         // If they can, clicking on an already-selected tab takes focus away from the associated terminal, which is annoying.
         setFocusable(false);
         
-        addMouseListener(TAB_DRAGGER);
-        addMouseMotionListener(TAB_DRAGGER);
+        // Enable drag-to-order for the tab ears, but not on Mac OS where it doesn't work with the LAF.
+        if (GuiUtilities.isMacOs() == false) {
+            addMouseListener(TAB_DRAGGER);
+            addMouseMotionListener(TAB_DRAGGER);
+        }
     }
     
     private void initPopUpMenu() {
