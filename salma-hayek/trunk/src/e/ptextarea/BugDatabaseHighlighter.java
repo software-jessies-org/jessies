@@ -79,6 +79,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     @Override
     public boolean canApplyStylingTo(PStyle style) {
         // In plain text (and maybe HTML documents too), we'd like to link in NORMAL text.
+        // An alternative implementation would let the applicable PStyle be passed in to the BugDatabaseHighlighter constructor.
         FileType fileType = textArea.getFileType();
         if (fileType == FileType.PLAIN_TEXT || fileType == FileType.XML) {
             return (style == PStyle.NORMAL);
