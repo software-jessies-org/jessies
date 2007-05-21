@@ -46,8 +46,6 @@ public class ETextWindow extends EWindow implements PTextListener {
     // Used to update the watermark without creating and destroying an excessive number of threads.
     private static final ExecutorService watermarkUpdateExecutor = ThreadUtilities.newSingleThreadExecutor("Watermark Updater");
     
-    private FileType fileType = FileType.PLAIN_TEXT;
-    
     private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
 
     private Timer findResultsUpdater;
@@ -261,7 +259,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      * Attaches an appropriate set of spelling exceptions to our document.
      */
     private void initSpellingExceptionsForDocument() {
-        textArea.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, getSpellingExceptionsForLanguage(fileType));
+        textArea.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, getSpellingExceptionsForLanguage(getFileType()));
     }
     
     public void updateWatermarkAndTitleBar() {
@@ -333,12 +331,10 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void reconfigureForFileType(FileType newFileType) {
-        if (newFileType == fileType) {
+        if (newFileType == getFileType()) {
             return;
         }
-        
-        fileType = newFileType;
-        fileType.configureTextArea(textArea);
+        newFileType.configureTextArea(textArea);
         BugDatabaseHighlighter.highlightBugs(textArea);
         initSpellingExceptionsForDocument();
     }
@@ -513,7 +509,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
 
     public FileType getFileType() {
-        return fileType;
+        return textArea.getFileType();
     }
     
     @Override
@@ -718,6 +714,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      * so we silently fix their files.
      */
     private void ensureBufferEndsInNewline() {
+        FileType fileType = getFileType();
         if (fileType == FileType.C_PLUS_PLUS || fileType == FileType.JAVA) {
             PTextBuffer buffer = textArea.getTextBuffer();
             if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '\n') {
