@@ -78,7 +78,14 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     
     @Override
     public boolean canApplyStylingTo(PStyle style) {
-        return (style == PStyle.NORMAL || style == PStyle.COMMENT);
+        // In plain text (and maybe HTML documents too), we'd like to link in NORMAL text.
+        FileType fileType = textArea.getFileType();
+        if (fileType == FileType.PLAIN_TEXT || fileType == FileType.XML) {
+            return (style == PStyle.NORMAL);
+        }
+        
+        // In source, though, we should restrict ourselves to COMMENT text.
+        return (style == PStyle.COMMENT);
     }
     
     private String urlForMatcher(Matcher matcher) {
