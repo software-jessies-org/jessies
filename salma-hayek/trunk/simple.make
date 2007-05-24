@@ -1,5 +1,5 @@
 # You may use:
-#   make
+#   make build (the default target if none is specified)
 #   make clean
 #   make native
 #   make installer
