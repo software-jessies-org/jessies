@@ -3,13 +3,17 @@
 # Typical usage (in the builder's crontab):
 # echo nightly-build.rb ~/Projects clean native-dist | bash --login
 # echo nightly-build.rb ~/Projects | bash --login
+# echo nightly-build.rb | bash --login
 
 require "pathname.rb"
 
 # ----------------------------------------------------------------------------
 # Parse command line.
 # ----------------------------------------------------------------------------
-projects_root = ARGV.shift()
+projects_root = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
+if ARGV.empty?() == false
+  projects_root = ARGV.shift()
+end
 targets = ARGV
 if targets.empty?()
   # Elliott suggests cleaning by default in a nightly build.
