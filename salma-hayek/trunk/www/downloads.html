@@ -40,7 +40,7 @@ mkdir ~/jessies &amp;&amp; cd ~/jessies
 svn checkout http://software.jessies.org/svn/<!--#echo var="SHORT_DIST_NAME"-->/trunk/ <!--#echo var="SHORT_DIST_NAME"-->
 svn checkout http://software.jessies.org/svn/salma-hayek/trunk/ salma-hayek
 # You may want to add something like this to your crontab:
-#00 23 * * * echo ~/jessies/salma-hayek/bin/nightly-build.rb ~/jessies clean build | bash -l
+#00 23 * * * echo ~/jessies/salma-hayek/bin/nightly-build.rb | bash -l
 </pre>
 <p>There's also <a href="<!--#echo var="SHORT_DIST_NAME"-->.tar.gz"><!--#echo var="SHORT_DIST_NAME"-->.tar.gz</a> but Subversion makes it easier for you to keep up to date, and makes it easier to submit patches.
 
