@@ -2,6 +2,7 @@
 
 # Typical usage (in the builder's crontab):
 # echo nightly-build.rb ~/Projects clean native-dist | bash --login
+# echo nightly-build.rb ~/Projects | bash --login
 
 require "pathname.rb"
 
@@ -10,6 +11,12 @@ require "pathname.rb"
 # ----------------------------------------------------------------------------
 projects_root = ARGV.shift()
 targets = ARGV
+if targets.empty?()
+  # Elliott suggests cleaning by default in a nightly build.
+  targets << "clean"
+  # There is no well-known name for the default target.  lwm doesn't support "build".
+  targets << ""
+end
 
 # ----------------------------------------------------------------------------
 # Find all Subversion projects under "projects_root".
