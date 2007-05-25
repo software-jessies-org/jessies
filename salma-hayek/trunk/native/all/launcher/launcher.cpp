@@ -185,6 +185,8 @@ public:
         // That looks like the way of the future.
         // Windows looks for DLLs in the current directory (among other places).
         // Modern Cygwin's chdir doesn't change the Windows current directory.
+        // We need to put the current directory back afterwards otherwise we break javahpp
+        // and any other Java applications which care about the current directory.
         WindowsDirectoryChange windowsDirectoryChange(jreBin);
         std::string jvmLocation = jreBin + "\\" + jvmDirectory + "\\jvm.dll";
         return openSharedLibrary(jvmLocation);
