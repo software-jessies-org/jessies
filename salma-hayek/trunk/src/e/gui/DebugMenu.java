@@ -15,7 +15,7 @@ import javax.swing.Timer;
 public class DebugMenu {
     public static JMenu makeJMenu() {
         JMenu menu = new JMenu("Debugging Tools");
-        menu.add(new ShowLogAction());
+        menu.add(new ShowDebuggingMessagesAction());
         menu.addSeparator();
         menu.add(new ShowEnvironmentAction());
         menu.add(new ShowSystemPropertiesAction());
@@ -56,10 +56,10 @@ public class DebugMenu {
         return builder.toString();
     }
     
-    private static class ShowLogAction extends AbstractAction {
+    private static class ShowDebuggingMessagesAction extends AbstractAction {
         private final String logFilename = System.getProperty("e.util.Log.filename");
         
-        public ShowLogAction() {
+        public ShowDebuggingMessagesAction() {
             putValue(NAME, "Show Debugging Messages");
         }
         
@@ -69,10 +69,27 @@ public class DebugMenu {
         
         public void actionPerformed(ActionEvent e) {
             // We used to use WebLinkAction with a file: URL so that the user's default text viewer would be used.
-            // Sadly, on Win32, another process can't open the log file while we've got it open for writing.
+            // Sadly, on Win32, another process can't open the log file while we've got it open for writing, so we have to read it ourselves.
             
-            // FIXME: we could use the file alteration monitor to update as the log gets written to. Or at least have a refresh button.
-            JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Debugging Messages", StringUtilities.readFile(logFilename));
+            final PTextArea textArea = JFrameUtilities.makeTextArea("");
+            
+            // A refresh button saves the user a lot of hassle.
+            // (Automatically refreshing can be annoying if the log's changing while the user's trying to do something.)
+            JButton refreshButton = new JButton("Refresh");
+            refreshButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    textArea.getTextBuffer().readFromFile(FileUtilities.fileFromString(logFilename));
+                }
+            });
+            refreshButton.doClick(0);
+            
+            JPanel ui = new JPanel(new BorderLayout());
+            ui.add(makeButtonPanel(refreshButton), BorderLayout.NORTH);
+            ui.add(new JScrollPane(textArea), BorderLayout.CENTER);
+            
+            JFrame frame = JFrameUtilities.makeScrollableContentWindow(Log.getApplicationName() + " Debugging Messages", ui);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
         }
     }
     
@@ -271,14 +288,9 @@ public class DebugMenu {
             });
             histogramButton.setEnabled(System.getProperty("java.version").startsWith("1.5") == false);
             JLabel currentHeapUsageLabel = new JLabel(" ");
-            JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 2));
-            controlPanel.add(gcButton);
-            controlPanel.add(histogramButton);
-            controlPanel.add(Box.createHorizontalStrut(10));
-            controlPanel.add(currentHeapUsageLabel);
             
             JPanel ui = new JPanel(new BorderLayout());
-            ui.add(controlPanel, BorderLayout.NORTH);
+            ui.add(makeButtonPanel(gcButton, histogramButton, Box.createHorizontalStrut(10), currentHeapUsageLabel), BorderLayout.NORTH);
             ui.add(new HeapView(currentHeapUsageLabel), BorderLayout.CENTER);
             
             JFrame frame = new JFrame(Log.getApplicationName() + " Heap Usage");
@@ -338,13 +350,8 @@ public class DebugMenu {
                 }
             });
             
-            JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 2));
-            controlPanel.add(clearButton);
-            controlPanel.add(Box.createHorizontalStrut(10));
-            controlPanel.add(textField);
-            
             JPanel ui = new JPanel(new BorderLayout());
-            ui.add(controlPanel, BorderLayout.NORTH);
+            ui.add(makeButtonPanel(clearButton, Box.createHorizontalStrut(10), textField), BorderLayout.NORTH);
             ui.add(new JScrollPane(textArea), BorderLayout.CENTER);
             
             JFrame frame = new JFrame("Key Event Tester");
@@ -358,4 +365,11 @@ public class DebugMenu {
         }
     }
     
+    private static JPanel makeButtonPanel(Component... components) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 2));
+        for (Component c : components) {
+            panel.add(c);
+        }
+        return panel;
+    }
 }
