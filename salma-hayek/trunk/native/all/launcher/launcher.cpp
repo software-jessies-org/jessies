@@ -6,6 +6,7 @@
 #include "JniError.h"
 #include "join.h"
 #include "synchronizeWindowsEnvironment.h"
+#include "WindowsDirectoryChange.h"
 
 #include <jni.h>
 
@@ -72,15 +73,23 @@ public:
 private:
   std::string version;
   std::string registryPath;
-  std::string pathFromJavaHomeToJvm;
+  std::string pathFromJavaHomeToJre;
   
 public:
-  JvmRegistryKey(const std::string& registryRoot, const std::string& version0, const std::string& pathFromJavaHomeToJvm0)
-  : version(version0), registryPath(registryRoot + "/" + version + "/JavaHome"), pathFromJavaHomeToJvm(pathFromJavaHomeToJvm0) {
+  JvmRegistryKey(const std::string& registryRoot, const std::string& version0, const std::string& pathFromJavaHomeToJre0)
+  : version(version0), registryPath(registryRoot + "/" + version + "/JavaHome"), pathFromJavaHomeToJre(pathFromJavaHomeToJre0) {
   }
   
-  std::string readJvmLocation() const {
-    return readRegistryFile(registryPath) + pathFromJavaHomeToJvm;
+  std::string readJreBin() const {
+    // The path we get from the registry is a Windows path.
+    // We depend on this in WindowsDirectoryChange.
+    std::string javaHome = readRegistryFile(registryPath);
+    // It feels safer if we append the rest of the path in Windows format,
+    // though we got away for years with a Windows path containing forward slashes.
+    // (We have some reason to believe that the UTF-16 Win32 file API doesn't support interchangable slashes
+    // and we'd like Cygwin to be UTF-16 below so it could present UTF-8 above.)
+    std::string jreBin = javaHome + pathFromJavaHomeToJre + "\\bin\\";
+    return jreBin;
   }
   
   bool operator<(const self& rhs) const {
@@ -142,12 +151,7 @@ public:
         if (isUnreasonableVersion(os, version)) {
           continue;
         }
-        std::string pathFromJavaHomeToJvm;
-        pathFromJavaHomeToJvm += pathFromJavaHomeToJre;
-        pathFromJavaHomeToJvm += "/bin/";
-        pathFromJavaHomeToJvm += jvmDirectory;
-        pathFromJavaHomeToJvm += "/jvm.dll";
-        JvmRegistryKey jvmRegistryKey(registryPath, version, pathFromJavaHomeToJvm);
+        JvmRegistryKey jvmRegistryKey(registryPath, version, pathFromJavaHomeToJre);
         jvmRegistryKeys.push_back(jvmRegistryKey);
       }
     } catch (const std::exception& ex) {
@@ -165,7 +169,7 @@ public:
     std::ostringstream os;
     JvmRegistryKeys jvmRegistryKeys;
     findVersionsInRegistry(os, jvmRegistryKeys, jreRegistryPath, "");
-    findVersionsInRegistry(os, jvmRegistryKeys, jdkRegistryPath, "/jre");
+    findVersionsInRegistry(os, jvmRegistryKeys, jdkRegistryPath, "\\jre");
     std::sort(jvmRegistryKeys.begin(), jvmRegistryKeys.end());
     while (jvmRegistryKeys.empty() == false) {
       JvmRegistryKey jvmRegistryKey = jvmRegistryKeys.back();
@@ -175,7 +179,14 @@ public:
       os << "\" [";
       os << std::endl;
       try {
-        std::string jvmLocation = jvmRegistryKey.readJvmLocation();
+        std::string jreBin = jvmRegistryKey.readJreBin();
+        // JRE 6 distributes msvcr71.dll in the same directory as java.exe.
+        // At least one installation of Windows XP doesn't have this DLL in its %SystemDir%.
+        // That looks like the way of the future.
+        // Windows looks for DLLs in the current directory (among other places).
+        // Modern Cygwin's chdir doesn't change the Windows current directory.
+        WindowsDirectoryChange windowsDirectoryChange(jreBin);
+        std::string jvmLocation = jreBin + "\\" + jvmDirectory + "\\jvm.dll";
         return openSharedLibrary(jvmLocation);
       } catch (const std::exception& ex) {
         os << ex.what();
