@@ -83,13 +83,7 @@ public class DebugMenu {
             });
             refreshButton.doClick(0);
             
-            JPanel ui = new JPanel(new BorderLayout());
-            ui.add(makeButtonPanel(refreshButton), BorderLayout.NORTH);
-            ui.add(new JScrollPane(textArea), BorderLayout.CENTER);
-            
-            JFrame frame = JFrameUtilities.makeScrollableContentWindow(Log.getApplicationName() + " Debugging Messages", ui);
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
+            showFrameWithButtonPanel(Log.getApplicationName() + " Debugging Messages", makeButtonPanel(refreshButton), new JScrollPane(textArea), new Dimension(400, 200));
         }
     }
     
@@ -288,19 +282,10 @@ public class DebugMenu {
             });
             histogramButton.setEnabled(System.getProperty("java.version").startsWith("1.5") == false);
             JLabel currentHeapUsageLabel = new JLabel(" ");
+            JPanel buttonPanel = makeButtonPanel(gcButton, histogramButton, Box.createHorizontalStrut(10), currentHeapUsageLabel);
             
-            JPanel ui = new JPanel(new BorderLayout());
-            ui.add(makeButtonPanel(gcButton, histogramButton, Box.createHorizontalStrut(10), currentHeapUsageLabel), BorderLayout.NORTH);
-            ui.add(new HeapView(currentHeapUsageLabel), BorderLayout.CENTER);
-            
-            JFrame frame = new JFrame(Log.getApplicationName() + " Heap Usage");
-            JFrameUtilities.setFrameIcon(frame);
-            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.setContentPane(ui);
-            frame.setSize(new Dimension(400, 200));
+            JFrame frame = showFrameWithButtonPanel(Log.getApplicationName() + " Heap Usage", buttonPanel, new HeapView(currentHeapUsageLabel), new Dimension(400, 200));
             frame.setResizable(false);
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
         }
         
         public String getHeapHistogram() {
@@ -350,19 +335,24 @@ public class DebugMenu {
                 }
             });
             
-            JPanel ui = new JPanel(new BorderLayout());
-            ui.add(makeButtonPanel(clearButton, Box.createHorizontalStrut(10), textField), BorderLayout.NORTH);
-            ui.add(new JScrollPane(textArea), BorderLayout.CENTER);
-            
-            JFrame frame = new JFrame("Key Event Tester");
-            JFrameUtilities.setFrameIcon(frame);
-            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.setContentPane(ui);
-            frame.setSize(new Dimension(700, 400));
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
+            JFrame frame = showFrameWithButtonPanel("Key Event Tester", makeButtonPanel(clearButton, Box.createHorizontalStrut(10), textField), new JScrollPane(textArea), new Dimension(700, 400));
             textField.requestFocusInWindow();
         }
+    }
+    
+    private static JFrame showFrameWithButtonPanel(String title, Component buttonPanel, Component content, Dimension size) {
+        JPanel ui = new JPanel(new BorderLayout());
+        ui.add(buttonPanel, BorderLayout.NORTH);
+        ui.add(content, BorderLayout.CENTER);
+        
+        JFrame frame = new JFrame(title);
+        JFrameUtilities.setFrameIcon(frame);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setContentPane(ui);
+        frame.setSize(size);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        return frame;
     }
     
     private static JPanel makeButtonPanel(Component... components) {
