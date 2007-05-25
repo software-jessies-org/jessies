@@ -5,45 +5,17 @@
 
 <h2>Double-clicking on the shortcut icon does nothing</h2>
 
-<p>If you're having trouble starting one of our programs, you may want to try running it from a Cygwin Bash prompt
+<p>If you're having trouble starting one of our programs, please try running it from a Cygwin Bash prompt
 instead of from the desktop shortcut icon until you work out what's wrong.
-The Ruby interpreter that's invoked from the desktop shortcut has nothing connected to its standard I/O file handles.
-Writing to an invalid file handle in Ruby causes a Ruby exception to be thrown.
-The Ruby interpreter doesn't take any special measures to ensure that the unhandled exception message will get seen in this case.
+We have had several of these problems in the past.
 
-<p>One reason why Ruby might try to write to the standard error stream is if it wants to warn about <a href="../salma-hayek/cygwin-setup.html">world-writable directories on the PATH</a>.
-We install an exception handler which should catch this sort of error and report it with a dialog box.
-We also open the standard error stream, pointing it at /dev/null, if it's not already open.
-We can only do this once our code has started running but we know of two problems which can occur before that point:
-
-<p>One is the "ubygems" problem mentioned below.
-<p>Another reason is that you've actually got Cygwin gems installed, and one of the libraries that gets loaded causes Ruby to emit a warning; rubysspi-1.2.2, for example, is known to have a such a problem.
-
-<p>If the problem turns out to be something new, please mail us a bug report including the output when you start the program from a Cygwin Bash prompt.
+<p>Please mail us a bug report including the output when you start the program from a Cygwin Bash prompt.
 (The web page for the particular project you're trying to run should tell you the email address.)
 
 <p>Any console output from our applications (as opposed to the start-up scripts or their interpreters) is recorded in a file.
 For Terminator, these are stored in <tt>~/.terminator/logs/</tt> along with a file containing a log of each tab's output.
 Evergreen's output is logged in your temporary directory.
 SCM's output is not currently logged.
-
-<h2>Installing Ruby for Windows breaks Ruby for Cygwin</h2>
-
-<p>Another problem we've seen a few times relates to the native Windows port of Ruby.
-We don't work with the current stable version, 1.8, because its "pathname.rb" library is broken for Windows paths.
-Ruby 1.9 fixes this, but is unlikely to be officially released before 2007-12.
-In the meantime we require the Cygwin port of Ruby.
-
-<p>If at any time you install the native Windows Ruby, its installer sets the Windows environment variable RUBYOPT to "-rubygems".
-(You can tell it not to do this, but it doesn't make it clear that the default option will break other Ruby interpreters.)
-Cygwin's Ruby doesn't include RubyGems (it isn't part of the standard Ruby distribution), which causes it to fail to start with:
-<pre>
-ruby: no such file to load -- ubygems (LoadError)
-</pre>
-
-<p>The fix we've been recommending is to delete the Windows RUBYOPT environment variable.
-An alternative is to install RubyGems for your Cygwin Ruby.
-Another alternative is to put an empty "ubygems.rb" file somewhere on your Cygwin Ruby's library search path.
 
 <h2>Why do we use Cygwin?</h2>
 
