@@ -358,11 +358,12 @@ public:
     vm->DestroyJavaVM();
   }
   
-  void invokeMain(const std::string& className, const NativeArguments& nativeArguments) {
+  int invokeMain(const std::string& className, const NativeArguments& nativeArguments) {
     jclass javaClass = findClass(className);
     jmethodID javaMethod = findMainMethod(javaClass);
     jobjectArray javaArguments = convertArguments(nativeArguments);
     env->CallStaticVoidMethod(javaClass, javaMethod, javaArguments);
+    return (env->ExceptionOccurred() ? 1 : 0);
   }
 };
 
@@ -434,7 +435,7 @@ int main(int, char** argv) {
   try {
     LauncherArgumentParser parser(launcherArguments);
     JavaInvocation javaInvocation(parser.openJvmLibrary(), parser.getJvmArguments());
-    javaInvocation.invokeMain(parser.getClassName(), parser.getMainArguments());
+    return javaInvocation.invokeMain(parser.getClassName(), parser.getMainArguments());
   } catch (const UsageError& usageError) {
     std::ostringstream os;
     os << "Error: " << usageError.what() << std::endl;
