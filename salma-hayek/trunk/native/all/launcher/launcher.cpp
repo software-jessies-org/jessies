@@ -42,7 +42,7 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
   if (sharedLibraryHandle == 0) {
     std::ostringstream os;
     os << "dlopen(\"" << sharedLibraryFilename << "\") failed with " << dlerror() << ".";
-    throw UsageError(os.str());
+    throw std::runtime_error(os.str());
   }
   return sharedLibraryHandle;
 }
@@ -50,7 +50,7 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
 static std::string readFile(const std::string& path) {
   std::ifstream is(path.c_str());
   if (is.good() == false) {
-    throw UsageError("Couldn't open \"" + path + "\".");
+    throw std::runtime_error("Couldn't open \"" + path + "\".");
   }
   std::ostringstream contents;
   contents << is.rdbuf();
@@ -197,7 +197,7 @@ public:
       os << "]";
       os << std::endl;
     }
-    throw UsageError(os.str());
+    throw std::runtime_error(os.str());
   }
   
   // Once we've successfully opened a shared library, I think we're committed to trying to use it
@@ -225,7 +225,7 @@ public:
       os << ex.what();
       os << std::endl;
     }
-    throw UsageError(os.str());
+    throw std::runtime_error(os.str());
   }
   
   SharedLibraryHandle openJvmLibrary() const {
@@ -267,7 +267,7 @@ private:
       std::ostringstream os;
       // Hopefully our caller will report something more useful than the shared library handle.
       os << "dlsym(" << sharedLibraryHandle << ", JNI_CreateJavaVM) failed with " << dlerror() << ".";
-      throw UsageError(os.str());
+      throw std::runtime_error(os.str());
     }
     return createJavaVM;
   }
@@ -287,7 +287,7 @@ private:
     if (javaClass == 0) {
       std::ostringstream os;
       os << "FindClass(\"" << canonicalName << "\") failed.";
-      throw UsageError(os.str());
+      throw std::runtime_error(os.str());
     }
     return javaClass;
   }
@@ -295,7 +295,7 @@ private:
   jmethodID findMainMethod(jclass mainClass) {
     jmethodID method = env->GetStaticMethodID(mainClass, "main", "([Ljava/lang/String;)V");
     if (method == 0) {
-      throw UsageError("GetStaticMethodID(\"main\") failed.");
+      throw std::runtime_error("GetStaticMethodID(\"main\") failed.");
     }
     return method;
   }
@@ -305,7 +305,7 @@ private:
     if (javaString == 0) {
       std::ostringstream os;
       os << "NewStringUTF(\"" << nativeString << "\") failed.";
-      throw UsageError(os.str());
+      throw std::runtime_error(os.str());
     }
     return javaString;
   }
@@ -317,7 +317,7 @@ private:
     if (javaArguments == 0) {
       std::ostringstream os;
       os << "NewObjectArray(" << nativeArguments.size() << ") failed.";
-      throw UsageError(os.str());
+      throw std::runtime_error(os.str());
     }
     for (size_t index = 0; index != nativeArguments.size(); ++ index) {
       std::string nativeArgument = nativeArguments[index];
@@ -352,7 +352,7 @@ public:
         os << (i > 0 ? ", " : "") << '"' << javaVMOptions[i].optionString << '"';
       }
       os << "]) failed with " << JniError(result) << ".";
-      throw UsageError(os.str());
+      throw std::runtime_error(os.str());
     }
   }
   
@@ -449,9 +449,9 @@ int main(int, char** argv) {
     LauncherArgumentParser parser(launcherArguments);
     JavaInvocation javaInvocation(parser.openJvmLibrary(), parser.getJvmArguments());
     return javaInvocation.invokeMain(parser.getClassName(), parser.getMainArguments());
-  } catch (const UsageError& usageError) {
+  } catch (const std::exception& ex) {
     std::ostringstream os;
-    os << "Error: " << usageError.what() << std::endl;
+    os << "Error: " << ex.what() << std::endl;
     os << std::endl;
     os << "Usage: " << programName << " [options] class [args...]" << std::endl;
     os << "where options are:" << std::endl;
