@@ -42,6 +42,20 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
   if (sharedLibraryHandle == 0) {
     std::ostringstream os;
     os << "dlopen(\"" << sharedLibraryFilename << "\") failed with " << dlerror() << ".";
+    os << std::endl;
+    os << "If you can't otherwise explain why that call failed, consider whether all of the shared libraries";
+    os << " used by this shared library can be found.";
+    os << std::endl;
+    os << "This command's output may help:";
+    os << std::endl;
+    os << "objdump -p \"" << sharedLibraryFilename << "\" | grep DLL";
+    os << std::endl;
+    os << "If you have a test case, then we should try changing the code to do this:";
+    os << std::endl;
+    os << "SetErrorMode(GetErrorMode() & ~SEM_NOOPENFILEERRORBOX);";
+    os << std::endl;
+    os << "(We should probably restore the error mode afterwards.)";
+    os << std::endl;
     throw std::runtime_error(os.str());
   }
   return sharedLibraryHandle;
