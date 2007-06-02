@@ -12,8 +12,6 @@ import java.util.*;
  */
 
 public abstract class PHighlight {
-    private static final Object FAKE_MAP_VALUE = new Object();
-    
     protected PTextArea textArea;
     private PAnchor start;
     private PAnchor end;
@@ -53,8 +51,8 @@ public abstract class PHighlight {
      * Use this if you have many highlights to remove, otherwise see detachAnchors.
      */
     void collectAnchors(IdentityHashMap<PAnchor, Object> anchors) {
-        anchors.put(start, FAKE_MAP_VALUE);
-        anchors.put(end, FAKE_MAP_VALUE);
+        anchors.put(start, null);
+        anchors.put(end, null);
     }
     
     public void paint(Graphics2D g) {
