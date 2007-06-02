@@ -9,11 +9,11 @@ import javax.swing.*;
  * Contains all the PAnchor instances related to a given text buffer.
  * Responsible for ensuring that their offsets are updated when the text changes.
  */
-public class PAnchorSet implements PTextListener {
+class PAnchorSet implements PTextListener {
     // This list is sorted so we can binarySearch it.
     private ArrayList<PAnchor> anchors = new ArrayList<PAnchor>();
     
-    public synchronized void add(PAnchor anchor) {
+    synchronized void add(PAnchor anchor) {
         int index = getFirstAnchorIndex(anchor.getIndex());
         anchors.add(index, anchor);
     }
@@ -22,42 +22,19 @@ public class PAnchorSet implements PTextListener {
      * Bulk remove.
      * Assumes you're trying to remove "most" of the anchors, perhaps when canceling a find.
      */
-    public synchronized void removeAll(SortedSet<PAnchor> deadAnchors) {
-        // When we can use java 1.6, we should accept a NavigableSet and iterate
-        // backwards through it.  For now, we have to sort it backwards instead.
-        // Important note: we can't use normal collections 'contains' methods and
-        // the like, because they use '.equals' to check for equality.  Since we
-        // may have two anchors which are '.equal' to each other (ie they have the
-        // same index) but are not the same, we must use the '==' equality metric
-        // in order to get things right.
-//        Log.warn("Start of 'removeAll'");
-//        dumpAnchorIndices();
-        ArrayList<PAnchor> reverseDead = new ArrayList<PAnchor>(deadAnchors);
-        Collections.reverse(reverseDead);
-        // Uncomment and use the following line when we can accept a NavigableSet.
-        //Iterator<PAnchor> deadIterator = deadAnchors.descendingIterator();
-        Iterator<PAnchor> deadIterator = reverseDead.iterator();
-        PAnchor nextDeadAnchor = deadIterator.hasNext() ? deadIterator.next() : null;
-        for (int i = anchors.size() - 1; (i >= 0) && (nextDeadAnchor != null); --i) {
-            PAnchor anchor = anchors.get(i);
-            while (anchor.getIndex() < nextDeadAnchor.getIndex()) {
-                nextDeadAnchor = deadIterator.hasNext() ? deadIterator.next() : null;
-                if (nextDeadAnchor == null) {
-                    break;
-                }
-            }
-            if (nextDeadAnchor == null) {
-                break;
-            }
-            if (anchor == nextDeadAnchor) {
+    synchronized void removeAll(IdentityHashMap<PAnchor, Object> deadAnchors) {
+        // Sun 6529800: as of Java 7, this is significantly quicker than ArrayList.removeAll.
+        // Sun's fix for that bug could perform even better than simple work-around, so if you're reading this in 2009 or later, think about removing this code.
+        // Note that *identity* is important here.
+        // PAnchor.equals only checks the offset, but we could have multiple PAnchor instances in anchors with the same offset.
+        for (int i = anchors.size() - 1; i >= 0; --i) {
+            if (deadAnchors.containsKey(anchors.get(i))) {
                 anchors.remove(i);
             }
         }
-//        Log.warn("End of 'removeAll'");
-//        dumpAnchorIndices();
     }
     
-    public synchronized void remove(PAnchor anchor) {
+    synchronized void remove(PAnchor anchor) {
         int start = getFirstAnchorIndex(anchor.getIndex());
         for (int i = start; i < anchors.size(); i++) {
             if (anchor == anchors.get(i)) {
@@ -129,7 +106,7 @@ public class PAnchorSet implements PTextListener {
         }
     }
     
-    public synchronized void dumpAnchorIndices() {
+    private synchronized void dumpAnchorIndices() {
         Log.warn("Dumping anchor indices:");
         for (int i = 0; i < anchors.size(); i++) {
             PAnchor anchor = get(i);

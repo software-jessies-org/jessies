@@ -12,6 +12,8 @@ import java.util.*;
  */
 
 public abstract class PHighlight {
+    private static final Object FAKE_MAP_VALUE = new Object();
+    
     protected PTextArea textArea;
     private PAnchor start;
     private PAnchor end;
@@ -50,9 +52,9 @@ public abstract class PHighlight {
      * Adds the anchors marking the bounds of this highlight to a collection so they can be bulk-removed from the PAnchorSet using removeAll.
      * Use this if you have many highlights to remove, otherwise see detachAnchors.
      */
-    void collectAnchors(Collection<PAnchor> anchors) {
-        anchors.add(start);
-        anchors.add(end);
+    void collectAnchors(IdentityHashMap<PAnchor, Object> anchors) {
+        anchors.put(start, FAKE_MAP_VALUE);
+        anchors.put(end, FAKE_MAP_VALUE);
     }
     
     public void paint(Graphics2D g) {
