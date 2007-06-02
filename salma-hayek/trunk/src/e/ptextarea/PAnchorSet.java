@@ -131,15 +131,10 @@ class PAnchorSet implements PTextListener {
         int deletionLength = event.getLength();
         int firstAnchorIndex = getFirstAnchorIndex(event.getOffset());
         int removeCount = countAnchorsInRegion(firstAnchorIndex, event.getOffset(), deletionLength);
-        List<PAnchor> anchorsToRemove = new LinkedList<PAnchor>();
-        // This is very inefficient, being O(removeCount * (anchors.size() - firstAnchorIndex - deletionLength).
-        // It'd be better to do this in the following steps:
-        // 1: Copy the to-delete set of anchors into a new list.
-        // 2: Move all the elements in 'anchors' towards the start by removeCount positions.
-        // 3: Shorten anchors by removeCount.
-        for (int i = 0; i < removeCount; i++) {
-            anchorsToRemove.add(anchors.remove(firstAnchorIndex));
-        }
+        // Copy the to-be-removed PAnchor instances to safety, then remove them from "anchors".
+        List<PAnchor> unsafeAnchorsToRemove = anchors.subList(firstAnchorIndex, firstAnchorIndex + removeCount);
+        List<PAnchor> anchorsToRemove = new ArrayList<PAnchor>(unsafeAnchorsToRemove);
+        unsafeAnchorsToRemove.clear();
         // Note that the sub-class of PAnchor in PHighlight relies upon this delete
         // call in order to properly destroy itself when one of its extremes is
         // removed.  If you delete this code, some highlights (notably 'find'
