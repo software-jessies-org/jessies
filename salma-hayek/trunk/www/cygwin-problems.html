@@ -28,4 +28,10 @@ Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support whic
 <p>In future, the other projects may be runnable without Cygwin, though probably not before there's a native (non-Cygwin) Ruby 1.9 available.
 Even then, if you're programming or doing system administration on Windows, installing and learning Cygwin would probably be an excellent investment of your time.
 
+<h2>Why does ls(1) not show me Chinese characters?</h2>
+
+<p>All our projects are designed to work with UTF-8.  Cygwin itself isn't yet.  You can happily edit files containing UTF-8 text but any time you need to deal with a non-ASCII filename, you will have problems.  The Windows NT line uses UTF-16 internally but the older Windows line didn't support Unicode at all, so it would be difficult for Cygwin to use the UTF-16 interfaces without dropping support for Windows 95, 98 and ME.  That is indeed scheduled to happen.
+
+<p>In the meantime, Suzuki Hisao maintains <a href="http://www.okisoft.co.jp/esc/utf8-cygwin/">a web page</a> for his ambitious patch to add UTF-8 support to the current Cygwin source.  The Cygwin maintainers didn't like the approach he took.  If you try his version, please let us know how you get on.
+
 <!--#include virtual="/salma-hayek/footer.html" -->
