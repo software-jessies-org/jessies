@@ -68,17 +68,16 @@ class PAnchorSet implements PTextListener {
 //        checkLinearity();    // Comment this out to improve speed, but remove warnings when our state goes wrong.
         int index = Collections.binarySearch(anchors, new UnownedAnchor(textIndex));
         if (index < 0) {
-            return -index - 1;
-        } else {
-            while (index > 0) {
-                if (get(index - 1).getIndex() < textIndex) {
-                    break;
-                } else {
-                    index--;
-                }
-            }
-            return index;
+            index = -index - 1;
         }
+        while (index > 0) {
+            if (get(index - 1).getIndex() < textIndex) {
+                break;
+            } else {
+                index--;
+            }
+        }
+        return index;
     }
     
     private void checkLinearity() {
