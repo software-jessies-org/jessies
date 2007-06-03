@@ -38,12 +38,17 @@ public abstract class PAnchor implements Comparable<PAnchor> {
     
     @Override
     public int hashCode() {
-        return super.hashCode();
+        // FIXME: because this class is mutable, instances MUST NOT be stored long-term in hashes.
+        // FIXME: instances are hashed, so we (a) don't want to return a constant here because we want O(1) lookup, and (b) should investigate the performance of this implementation.
+        return index;
     }
     
     @Override
     public final boolean equals(Object obj) {
-        return (index == ((PAnchor) obj).index);
+        if (obj instanceof PAnchor) {
+            return (index == ((PAnchor) obj).index);
+        }
+        return false;
     }
     
     //@Override // FIXME: Java 5's javac(1) is broken.
