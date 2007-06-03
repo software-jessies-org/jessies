@@ -30,8 +30,16 @@ Even then, if you're programming or doing system administration on Windows, inst
 
 <h2>Why does ls(1) not show me Chinese characters?</h2>
 
-<p>All our projects are designed to work with UTF-8.  Cygwin itself isn't yet.  You can happily edit files containing UTF-8 text but any time you need to deal with a non-ASCII filename, you will have problems.  The Windows NT line uses UTF-16 internally but the older Windows line didn't support Unicode at all, so it would be difficult for Cygwin to use the UTF-16 interfaces without dropping support for Windows 95, 98 and ME.  That is indeed scheduled to happen.
+<p>All our projects are designed to work with UTF-8.
+Cygwin itself doesn't yet support UTF-8 filenames.
+You can happily edit UTF-8 files or view UTF-8 manual pages or whatever, but you will have problems if you need to deal with non-ASCII filenames.
 
-<p>In the meantime, Suzuki Hisao maintains <a href="http://www.okisoft.co.jp/esc/utf8-cygwin/">a web page</a> for his ambitious patch to add UTF-8 support to the current Cygwin source.  The Cygwin maintainers didn't like the approach he took.  If you try his version, please let us know how you get on.
+<p>The Windows NT/2000/2003/XP/Vista family use UTF-16 internally but the older Windows operating systems (such as Windows 95/98/ME) didn't support Unicode at all, so it would be difficult for Cygwin to use the UTF-16 interfaces without dropping support for the older operating systems.
+The next major version of Cygwin will not support the old operating systems, and hopefully we'll see UTF-8 filename support at that time.
+
+<p>In the meantime, Suzuki Hisao maintains an ambitious <a href="http://www.okisoft.co.jp/esc/utf8-cygwin/">UTF-8 patch for Cygwin</a>.
+(You can download a replacement DLL if you don't want to patch and rebuild yourself.)
+The Cygwin maintainers <a href="http://cygwin.com/ml/cygwin-patches/2006-q3/msg00014.html">didn't like the approach</a> he took.
+If you try his version, please let us know how you get on.
 
 <!--#include virtual="/salma-hayek/footer.html" -->
