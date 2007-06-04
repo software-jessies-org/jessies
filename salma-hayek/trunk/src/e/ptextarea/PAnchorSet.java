@@ -70,12 +70,8 @@ class PAnchorSet implements PTextListener {
         if (index < 0) {
             index = -index - 1;
         }
-        while (index > 0) {
-            if (get(index - 1).getIndex() < textIndex) {
-                break;
-            } else {
-                index--;
-            }
+        while (index > 0 && get(index - 1).getIndex() == textIndex) {
+            --index;
         }
         return index;
     }
