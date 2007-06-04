@@ -248,8 +248,12 @@ public class TagReader {
         public JavaTag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
             super(identifier, lineNumber, tagType, context, containingClass);
             typeSortOrder = new TagType[][] {
-                { TagType.PACKAGE }, { TagType.FIELD }, { TagType.CONSTRUCTOR },
-                { TagType.METHOD }, { TagType.CLASS }, { TagType.INTERFACE }
+                { TagType.PACKAGE },
+                { TagType.ENUM_CONSTANT },
+                { TagType.FIELD },
+                { TagType.CONSTRUCTOR },
+                { TagType.METHOD },
+                { TagType.CLASS, TagType.ENUM, TagType.INTERFACE }
             };
             
             // Mark interfaces as "abstract" so they're rendered differently.

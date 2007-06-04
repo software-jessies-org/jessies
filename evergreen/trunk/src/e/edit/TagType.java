@@ -18,7 +18,7 @@ public enum TagType {
     CONSTRUCTOR("constructor", TagShapes.CIRCLE, false, "{0}()"),
     DESTRUCTOR("destructor", TagShapes.CIRCLE, false, "{0}()"),
     ENUM("enum", TagShapes.CIRCLE, true, "{1} {0}"),
-    ENUMERATOR("enumerator", null, false, null),
+    ENUM_CONSTANT("enum constant", null, false, null),
     EXTERN("extern", null, false, "{1} {0}"),
     FIELD("field", TagShapes.TRIANGLE, false, null),
     INTERFACE("interface", TagShapes.CIRCLE, true, "{1} {0}"),
@@ -75,7 +75,7 @@ public enum TagType {
         case 'D':
             return DESTRUCTOR;
         case 'e':
-            return ENUMERATOR;
+            return ENUM_CONSTANT;
         case 'f':
             return FIELD;
         case 'g':
