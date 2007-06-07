@@ -39,8 +39,11 @@ extern "C" {
 typedef void* SharedLibraryHandle;
 
 SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) {
-  // TODO: Consider whether this would cause more problems than it would solve.
-  //WindowsDllErrorModeChange windowsDllErrorModeChange;
+  // Try to persuade Windows to pop-up a box complaining about unresolved symbols
+  // as we don't get anything more informative from dlerror than ENOENT.
+  // This could cause a problem if we try to load an amd64 DLL before going on to try to load an i386 DLL.
+  // At least it would be a overt problem rather than the silent failure we got when MSVCR71.DLL wasn't in the current directory and wasn't on the PATH.
+  WindowsDllErrorModeChange windowsDllErrorModeChange;
   void* sharedLibraryHandle = dlopen(sharedLibraryFilename.c_str(), RTLD_LAZY);
   if (sharedLibraryHandle == 0) {
     std::ostringstream os;
@@ -52,8 +55,6 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
     os << "This command's output may help:";
     os << std::endl;
     os << "objdump -p \"" << sharedLibraryFilename << "\" | grep DLL";
-    os << std::endl;
-    os << "There's a commented-out change in the source, flagged with TODO, that might help.";
     os << std::endl;
     throw std::runtime_error(os.str());
   }
