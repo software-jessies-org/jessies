@@ -9,8 +9,7 @@ private:
   
 public:
   WindowsDllErrorModeChange()
-  : previousErrorMode(GetErrorMode()) {
-    SetErrorMode(previousErrorMode & ~SEM_NOOPENFILEERRORBOX);
+  : previousErrorMode(SetErrorMode(0)) {
   }
   
   ~WindowsDllErrorModeChange() {
