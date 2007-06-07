@@ -1,3 +1,7 @@
+#ifdef __CYGWIN__
+#include <windows.h>
+#endif
+
 // Fix signature of unsetenv
 #define __DARWIN_UNIX03 1
 
