@@ -7,6 +7,7 @@
 #include "join.h"
 #include "synchronizeWindowsEnvironment.h"
 #include "WindowsDirectoryChange.h"
+#include "WindowsDllErrorModeChange.h"
 
 #include <jni.h>
 
@@ -38,6 +39,8 @@ extern "C" {
 typedef void* SharedLibraryHandle;
 
 SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) {
+  // TODO: Consider whether this would cause more problems than it would solve.
+  //WindowsDllErrorModeChange windowsDllErrorModeChange;
   void* sharedLibraryHandle = dlopen(sharedLibraryFilename.c_str(), RTLD_LAZY);
   if (sharedLibraryHandle == 0) {
     std::ostringstream os;
@@ -50,11 +53,7 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
     os << std::endl;
     os << "objdump -p \"" << sharedLibraryFilename << "\" | grep DLL";
     os << std::endl;
-    os << "If you have a test case, then we should try changing the code to do this:";
-    os << std::endl;
-    os << "SetErrorMode(GetErrorMode() & ~SEM_NOOPENFILEERRORBOX);";
-    os << std::endl;
-    os << "(We should probably restore the error mode afterwards.)";
+    os << "There's a commented-out change in the source, flagged with TODO, that might help.";
     os << std::endl;
     throw std::runtime_error(os.str());
   }
