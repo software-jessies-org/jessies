@@ -9,6 +9,7 @@
 
 #include "toString.h"
 #include "unix_exception.h"
+#include "WindowsDllErrorModeChange.h"
 
 void usage() {
     std::ostream& os = std::cerr;
@@ -57,6 +58,7 @@ int main(int, char** argValues) {
         usage();
     }
     const char* interpreter = *argValues;
+    WindowsDllErrorModeChange windowsDllErrorModeChange;
     execvp(interpreter, argValues);
     throw unix_exception(std::string("execvp(\"") + interpreter + "\", ...)");
 }
