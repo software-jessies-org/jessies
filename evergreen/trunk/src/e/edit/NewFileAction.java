@@ -74,7 +74,7 @@ public class NewFileAction extends ETextAction {
         String name = file.getName();
         if (name.endsWith(".h")) {
             // Turn "SomeClass.h" into "SOME_CLASS_H_included".
-            String safeName = name.replaceAll("([a-z])([A-Z])", "$1_$2").toUpperCase().replace('.', '_');
+            String safeName = name.replaceAll("([a-z])([A-Z])", "$1_$2").toUpperCase().replaceAll("[^A-Za-z0-9_]", "_");
             String macroName = safeName + "_included";
             
             String content = "#ifndef " + macroName + "\n";
