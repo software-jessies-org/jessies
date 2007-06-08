@@ -79,8 +79,7 @@ public class TimeUtilities {
         } else if (ns < 1000000000L) {
             return Long.toString(ns/1000000L) + " ms";
         } else if (ns < 60000000000L) {
-            // FIXME: use double arithmetic for this special case, and show a couple of decimal places?
-            return Long.toString(ns/1000000000L) + " s";
+            return String.format("%.2f", ((double) ns)/1000000000.0) + " s";
         } else {
             long duration = ns;
             long nanoseconds = duration % 1000;
