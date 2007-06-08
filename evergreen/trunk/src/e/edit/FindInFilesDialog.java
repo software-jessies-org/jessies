@@ -1,5 +1,8 @@
 package e.edit;
 
+import e.forms.*;
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -9,9 +12,6 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
-import e.forms.*;
-import e.gui.*;
-import e.util.*;
 
 import java.util.List;
 import org.jdesktop.swingworker.SwingWorker;
@@ -161,6 +161,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         private int totalFileCount;
         private int percentage;
         
+        private long startTimeMs;
+        private long endTimeMs;
+        
         public FileFinder() {
             this.matchRoot = new DefaultMutableTreeNode();
             this.regex = regexField.getText();
@@ -191,7 +194,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 Pattern pattern = PatternUtilities.smartCaseCompile(regex);
                 FileSearcher fileSearcher = new FileSearcher(pattern);
                 String root = workspace.getRootDirectory();
-                long startTime = System.currentTimeMillis();
+                startTimeMs = System.currentTimeMillis();
+                endTimeMs = 0;
                 for (doneFileCount = 0; doneFileCount < fileList.size(); ++doneFileCount) {
                     if (Thread.currentThread().isInterrupted() || isCancelled()) {
                         return null;
@@ -242,12 +246,12 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                     // Update our percentage-complete status, but only if we've
                     // taken enough time for the user to start caring, so we
                     // don't make quick searches unnecessarily slow.
-                    if (System.currentTimeMillis() - startTime > 300) {
+                    if (System.currentTimeMillis() - startTimeMs > 300) {
                         updateStatus();
                     }
                 }
-                long endTime = System.currentTimeMillis();
-                Log.warn("Search for \"" + regex + "\" in files matching \"" + fileRegex + "\" took " + (endTime - startTime) + " ms.");
+                endTimeMs = System.currentTimeMillis();
+                Log.warn("Search for \"" + regex + "\" in files matching \"" + fileRegex + "\" took " + (endTimeMs - startTimeMs) + " ms.");
             } catch (PatternSyntaxException ex) {
                 errorMessage = ex.getDescription();
             } catch (Exception ex) {
@@ -307,6 +311,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 status += " (from " + indexedFileCount + ")";
             }
             status += " match.";
+            if (endTimeMs != 0) {
+                status += " Took " + TimeUtilities.msToString(endTimeMs - startTimeMs) + ".";
+            }
             return status;
         }
     }
