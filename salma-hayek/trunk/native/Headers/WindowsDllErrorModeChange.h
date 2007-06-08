@@ -5,24 +5,24 @@
 
 struct WindowsDllErrorModeChange {
 private:
-  UINT previousErrorMode;
-  
+    UINT previousErrorMode;
+    
 public:
-  WindowsDllErrorModeChange()
-  : previousErrorMode(SetErrorMode(0)) {
-  }
-  
-  ~WindowsDllErrorModeChange() {
-    SetErrorMode(previousErrorMode);
-  }
+    WindowsDllErrorModeChange()
+    : previousErrorMode(SetErrorMode(0)) {
+    }
+    
+    ~WindowsDllErrorModeChange() {
+        SetErrorMode(previousErrorMode);
+    }
 };
 
 #else
 
 struct WindowsDllErrorModeChange {
-  // Stop the unused variable warning.
-  WindowsDllErrorModeChange() {
-  }
+    // Stop the unused variable warning.
+    WindowsDllErrorModeChange() {
+    }
 };
 
 #endif
