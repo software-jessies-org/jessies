@@ -14,7 +14,13 @@ public class ETextArea extends PTextArea {
     
     @Override
     public String reformatPastedText(String pastedText) {
-        return pastedText.replace('\u00a0', ' ');
+        // Turn non-breakable spaces into normal spaces.
+        // These are a problem if, for example, you paste a signature from JavaDoc.
+        pastedText = pastedText.replace('\u00a0', ' ');
+        // Turn old-style Mac line endings into something sensible.
+        // These are a problem if, for example, you paste example code from Apple's on-line documentation.
+        pastedText = pastedText.replaceAll("\r\n?", "\n");
+        return pastedText;
     }
     
     @Override
