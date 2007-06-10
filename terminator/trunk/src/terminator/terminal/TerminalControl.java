@@ -134,6 +134,9 @@ public class TerminalControl {
 			} catch (Throwable th) {
 				Log.warn("Problem reading output from " + ptyProcess, th);
 			} finally {
+				// FIXME: Our reader might throw an exception before the child has terminated.
+				// Do we really want to "handle process termination" then?
+				// We certainly don't want to be waiting indefinitely for the child in the SingleThreadExecutor's single thread.
 				handleProcessTermination();
 			}
 		}
@@ -207,6 +210,7 @@ public class TerminalControl {
 			return;
 		}
 
+		Log.warn("calling waitFor on " + ptyProcess);
 		try {
 			ptyProcess.waitFor();
 		} catch (Exception ex) {
@@ -238,6 +242,7 @@ public class TerminalControl {
 		
 		// The readerThread will have shut itself down by now.
 		// We need to handle the writer ExecutorService ourselves.
+		// FIXME: Surely we should be doing this even if the child was signaled etc?
 		if (writerExecutor != null) {
 			writerExecutor.shutdownNow();
 		}
