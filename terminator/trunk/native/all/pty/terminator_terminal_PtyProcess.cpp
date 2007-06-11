@@ -172,6 +172,13 @@ void terminator_terminal_PtyProcess::destroy() {
 }
 
 void terminator_terminal_PtyProcess::nativeWaitFor() {
+    // We now have no further use for the fd connecting us to the child,
+    // which has probably exited.
+    // Even if it hasn't, we're no longer reading its output, which may cause the child to block in the kernel,
+    // preventing it from terminating, even if root sends it SIGKILL.
+    // If we close the pipe before waiting, then we may let it finish and collect an exit status.
+    close(fd.get());
+    
     pid_t pid = processId.get();
     
     // Loop until waitpid(2) returns a status or a real error.
@@ -179,12 +186,20 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
     errno = 0;
     pid_t result;
     do {
-        result = waitpid(pid, &status, 0);
+        // Don't block indefinitely, even if the child is still running.
+        // At this point we've lost the ability to talk to it.
+        result = waitpid(pid, &status, WNOHANG);
     } while (result == -1 && errno == EINTR);
     
     // Did something really go wrong?
     if (result == -1) {
         throw unix_exception("waitpid(" + toString(pid) + ", &status, 0) failed");
+    }
+    
+    // We must check "result" to distinguish the case where the child is still running,
+    // from the case where the child exited normally.
+    if (result == 0) {
+        return;
     }
     
     // Tell our Java peer how the process died.
@@ -201,9 +216,6 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
         }
 #endif
     }
-    
-    // We now have no further use for the fd connecting us to the (exited) child.
-    close(fd.get());
 }
 
 #ifdef __APPLE__

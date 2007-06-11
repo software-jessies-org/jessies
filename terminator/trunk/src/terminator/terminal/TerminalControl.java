@@ -134,9 +134,8 @@ public class TerminalControl {
 			} catch (Throwable th) {
 				Log.warn("Problem reading output from " + ptyProcess, th);
 			} finally {
-				// FIXME: Our reader might throw an exception before the child has terminated.
-				// Do we really want to "handle process termination" then?
-				// We certainly don't want to be waiting indefinitely for the child in the SingleThreadExecutor's single thread.
+				// Our reader might throw an exception before the child has terminated.
+				// So "handleProcessTermination" is perhaps not the ideal name.
 				handleProcessTermination();
 			}
 		}
@@ -204,6 +203,12 @@ public class TerminalControl {
 	private void handleProcessTermination() {
 		processIsRunning = false;
 
+		// The readerThread will have shut itself down by now.
+		// We need to handle the writer ExecutorService ourselves.
+		if (writerExecutor != null) {
+			writerExecutor.shutdownNow();
+		}
+		
 		// If the JNI side failed to start, ptyProcess can be null.
 		// In that case, we'll already have reported the error.
 		if (ptyProcess == null) {
@@ -229,6 +234,9 @@ public class TerminalControl {
 		} else if (ptyProcess.wasSignaled()) {
 			announceConnectionLost("\n\r[Process killed by " + ptyProcess.getSignalDescription() + ".]");
 			return;
+		} else {
+			announceConnectionLost("\n\r[Lost contact with process.]");
+			return;
 		}
 
 		// If it wasn't a pane close that caused us to get here, close the pane.
@@ -238,13 +246,6 @@ public class TerminalControl {
 					pane.doCloseAction();
 				}
 			});
-		}
-		
-		// The readerThread will have shut itself down by now.
-		// We need to handle the writer ExecutorService ourselves.
-		// FIXME: Surely we should be doing this even if the child was signaled etc?
-		if (writerExecutor != null) {
-			writerExecutor.shutdownNow();
 		}
 	}
 	
