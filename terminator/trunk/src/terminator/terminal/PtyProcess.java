@@ -56,7 +56,7 @@ public class PtyProcess {
     private InputStream inStream;
     private OutputStream outStream;
     
-    private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Child Forker/Reaper");
+    private final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Child Forker/Reaper");
     
     private static boolean libraryLoaded = false;
     
@@ -150,6 +150,7 @@ public class PtyProcess {
                 }
             }
         });
+        executorService.shutdownNow();
     }
     
     /**
