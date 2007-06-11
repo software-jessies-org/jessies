@@ -188,7 +188,7 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
     do {
         // Don't block indefinitely, even if the child is still running.
         // At this point we've lost the ability to talk to it.
-        result = waitpid(pid, &status, WNOHANG);
+        result = waitpid(pid, &status, 0);
     } while (result == -1 && errno == EINTR);
     
     // Did something really go wrong?
