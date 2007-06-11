@@ -136,15 +136,17 @@ public class CommandDialog {
     }
     
     public JTerminalPane askForCommandToRun() {
-        boolean shouldRun = form.show("Run");
-        if (shouldRun == false) {
-            return null;
+        while (form.show("Run")) {
+            String command = commandField.getText().trim();
+            if (command.length() == 0) {
+                command = (String) historyList.getSelectedValue();
+            }
+            synchronized (history) {
+                history.add(command);
+            }
+            return JTerminalPane.newCommandWithName(command, null, null);
         }
-        String command = commandField.getText().trim();
-        synchronized (history) {
-            history.add(command);
-        }
-        return JTerminalPane.newCommandWithName(command, null, null);
+        return null;
     }
     
     private static String getHistoryFilename() {
