@@ -44,7 +44,7 @@ public class PtyProcess {
         }
     }
     
-    private int fd;
+    private int fd = -1;
     private int processId;
     private String slavePtyName;
     
