@@ -178,6 +178,7 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
     // preventing it from terminating, even if root sends it SIGKILL.
     // If we close the pipe before waiting, then we may let it finish and collect an exit status.
     close(fd.get());
+    fd = -1;
     
     pid_t pid = processId.get();
     
@@ -316,8 +317,7 @@ jstring terminator_terminal_PtyProcess::nativeListProcessesUsingTty() {
     // Say a childless Bash dies with a signal. We'll keep the window open, but the pty is free for reuse.
     // If the user opens another window (reusing the now-free pty) and then does "Show Info" in the original window, they'll see the new window's processes.
     // Guard against this by refusing to list processes if our file descriptor for the original pty is no longer open.
-    errno = 0;
-    if (fcntl(fd.get(), F_GETFD) == -1 && errno == EBADF) {
+    if (fd.get() == -1) {
         return newStringUtf8("(pty closed)");
     }
     
