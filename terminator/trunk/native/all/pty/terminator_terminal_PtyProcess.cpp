@@ -296,6 +296,7 @@ std::string getProcessName(const std::string& pid) {
     // "/proc/<pid>/cmdline" seems to contain a process' full name.
     // The only thing to be careful of is that the file contains a NUL byte between each argument.
     // std::string will preserve them until they cause trouble higher up, so we remove them here.
+    // Solaris 10 doesn't have /proc/<pid>/cmdline or, seemingly, anything as easy to parse.
     std::fstream fin((std::string("/proc/") + pid + "/cmdline").c_str(), std::ios::in);
     std::string processName("(unknown)");
     getline(fin, processName, '\0');
