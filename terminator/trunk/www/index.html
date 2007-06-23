@@ -73,8 +73,6 @@ Sadly, we can't just visibly indicate when ^S has stopped output, and provide he
 (On Mac OS, Terminal.app beats us on Thai, but we're better at Cyrillic, Greek, and Japanese.
 Results vary between platforms based on availability and suitability of fonts.)
 
-<p>The non-default settings in the screenshot were achieved thus:
-<blockquote><tt>terminator -xrm fontName:Monaco -xrm fontSize:13 -xrm antiAlias:true -xrm foreground:\#000000 -xrm background:\#ffffff -xrm selectionColor:\#b4d5fe</tt></blockquote>
 <p>One side-effect of proper support for variable-width glyphs is that you're not restricted to fixed-width fonts in Terminator, even if the only language you're using is English.
 GNU readline might get confused about the line length, though.
 <p>Here's a more convincingly terminal-like example of fixed-width English and variable-width Japanese; output from javac(1):
