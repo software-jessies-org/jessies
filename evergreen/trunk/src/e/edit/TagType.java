@@ -11,6 +11,23 @@ abstract class TagShapes {
     static final Shape CIRCLE = new java.awt.geom.Ellipse2D.Float(1, 1, 8, 8);
     static final Shape SQUARE = new Rectangle(1, 2, 7, 7);
     static final Shape TRIANGLE = new Polygon(new int[] { 0, 4, 8 }, new int[] { 8, 1, 8 }, 3);
+    static final Shape DIAMOND = new Polygon(new int[] { 0, 4, 8, 4 }, new int[] { 4, 0, 4, 8 }, 4);
+    static final Shape HASH = makeHash();
+    
+    private static Shape makeHash() {
+        GeneralPath path = new GeneralPath();
+        // Two horizontal strokes.
+        path.moveTo(1, 6);
+        path.lineTo(8, 6);
+        path.moveTo(1, 3);
+        path.lineTo(8,3);
+        // Two vertical strokes.
+        path.moveTo(3, 1);
+        path.lineTo(3, 8);
+        path.moveTo(6, 1);
+        path.lineTo(6, 8);
+        return path;
+    }
 }
 
 public enum TagType {
@@ -22,7 +39,7 @@ public enum TagType {
     EXTERN("extern", null, false, "{1} {0}"),
     FIELD("field", TagShapes.TRIANGLE, false, null),
     INTERFACE("interface", TagShapes.CIRCLE, true, "{1} {0}"),
-    MACRO("macro", null, false, null),
+    MACRO("macro", TagShapes.HASH, false, null),
     METHOD("method", TagShapes.SQUARE, false, "{0}()"),
     MODULE("module", null, true, "{1} {0}"),
     NAMESPACE("namespace", null, true, "{1} {0}"),
@@ -31,7 +48,7 @@ public enum TagType {
     STRUCT("struct", null, true, "{1} {0}"),
     TYPEDEF("typedef", null, false, "{1} {0}"),
     UNION("union", null, false, "{1} {0}"),
-    VARIABLE("variable", null, false, null),
+    VARIABLE("variable", TagShapes.TRIANGLE, false, null),
     
     UNKNOWN("unknown", null, false, null),
     ;
