@@ -78,11 +78,17 @@ public class TagsPanel extends JPanel {
                 g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                 g.setColor(tag.visibilityColor());
                 g.translate(x, y);
+                
                 Shape typeMarker = tag.type.getShape();
-                g.draw(typeMarker);
-                if (tag.isAbstract == false) {
-                    g.fill(typeMarker);
+                if (typeMarker != null) {
+                    g.draw(typeMarker);
+                    if (tag.isAbstract) {
+                        g.draw(typeMarker);
+                    } else {
+                        g.fill(typeMarker);
+                    }
                 }
+                
                 g.translate(-x, -y);
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
                 g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT);
@@ -108,10 +114,7 @@ public class TagsPanel extends JPanel {
                 }
                 setFont((tag.isStatic && tag.visibilityColor() != TagReader.Tag.PRIVATE) ? boldFont : tree.getFont());
                 setToolTipText(tag.toolTip);
-                Shape typeMarker = tag.type.getShape();
-                if (typeMarker != null) {
-                    setIcon(icon);
-                }
+                setIcon(icon);
             } else {
                 tag = null;
             }

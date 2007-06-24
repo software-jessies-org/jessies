@@ -152,7 +152,7 @@ public class TagReader {
             tag = new TagReader.Tag(identifier, lineNumber, type, context, containingClass);
         }
         
-        tag.isStatic = (lineNumber == staticTagLineNumber | tag.isStatic);
+        tag.isStatic = ((lineNumber == staticTagLineNumber) || tag.isStatic);
         staticTagLineNumber = 0;
         
         listener.tagFound(tag);
@@ -166,9 +166,9 @@ public class TagReader {
             { TagType.CONSTRUCTOR },
             { TagType.DESTRUCTOR },
             { TagType.PROTOTYPE, TagType.METHOD },
-            { TagType.FIELD },
+            { TagType.FIELD, TagType.VARIABLE },
             { TagType.ENUM },
-            { TagType.STRUCT },
+            { TagType.STRUCT, TagType.UNION },
             { TagType.TYPEDEF }
         };
         public String classSeparator = ".";
@@ -207,7 +207,7 @@ public class TagReader {
         public Color visibilityColor() {
             if (context.contains("access:public")) {
                 return PUBLIC;
-            } else if (context.contains("access:private")) {
+            } else if (context.contains("access:private") || context.contains("file:")) {
                 return PRIVATE;
             } else if (context.contains("access:protected")) {
                 return PROTECTED;
