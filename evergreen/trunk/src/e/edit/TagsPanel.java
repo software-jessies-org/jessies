@@ -69,8 +69,6 @@ public class TagsPanel extends JPanel {
     }
     
     public static class TagsTreeRenderer extends DefaultTreeCellRenderer {
-        private static Font boldFont = UIManager.getFont("TableHeader.font").deriveFont(Font.BOLD);
-        
         private final Icon icon = new DrawnIcon(new Dimension(10, 10)) {
             public void paintIcon(Component c, Graphics og, int x, int y) {
                 Graphics2D g = (Graphics2D) og;
@@ -112,7 +110,12 @@ public class TagsPanel extends JPanel {
                     // Some LAFs have selection backgrounds that are too dark for black and gray.
                     setForeground(tag.visibilityColor() == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
                 }
-                setFont((tag.isStatic && tag.visibilityColor() != TagReader.Tag.PRIVATE) ? boldFont : tree.getFont());
+                
+                Font font = ChangeFontAction.getConfiguredFont();
+                if (tag.isStatic && tag.visibilityColor() != TagReader.Tag.PRIVATE) {
+                    font = font.deriveFont(Font.BOLD);
+                }
+                setFont(font);
                 setToolTipText(tag.toolTip);
                 setIcon(icon);
             } else {
