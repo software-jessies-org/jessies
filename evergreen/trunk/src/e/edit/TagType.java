@@ -45,9 +45,9 @@ public enum TagType {
     NAMESPACE("namespace", null, true, "{1} {0}"),
     PACKAGE("package", null, false, "{1} {0}"),
     PROTOTYPE("prototype", TagShapes.SQUARE, false, "{0}() {1}"),
-    STRUCT("struct", null, true, "{1} {0}"),
+    STRUCT("struct", TagShapes.CIRCLE, true, "{1} {0}"),
     TYPEDEF("typedef", null, false, "{1} {0}"),
-    UNION("union", null, false, "{1} {0}"),
+    UNION("union", TagShapes.CIRCLE, false, "{1} {0}"),
     VARIABLE("variable", TagShapes.TRIANGLE, false, null),
     
     UNKNOWN("unknown", null, false, null),
