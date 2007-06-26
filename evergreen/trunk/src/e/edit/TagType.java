@@ -31,24 +31,24 @@ abstract class TagShapes {
 }
 
 public enum TagType {
-    CLASS("class", TagShapes.CIRCLE, true, "{1} {0}"),
-    CONSTRUCTOR("constructor", TagShapes.CIRCLE, false, "{0}()"),
-    DESTRUCTOR("destructor", TagShapes.CIRCLE, false, "{0}()"),
-    ENUM("enum", TagShapes.CIRCLE, true, "{1} {0}"),
-    ENUM_CONSTANT("enum constant", null, false, null),
-    EXTERN("extern", null, false, "{1} {0}"),
-    FIELD("field", TagShapes.TRIANGLE, false, null),
-    INTERFACE("interface", TagShapes.CIRCLE, true, "{1} {0}"),
-    MACRO("macro", TagShapes.HASH, false, null),
-    METHOD("method", TagShapes.SQUARE, false, "{0}()"),
-    MODULE("module", null, true, "{1} {0}"),
-    NAMESPACE("namespace", null, true, "{1} {0}"),
-    PACKAGE("package", null, false, "{1} {0}"),
-    PROTOTYPE("prototype", TagShapes.SQUARE, false, "{0}() {1}"),
-    STRUCT("struct", TagShapes.CIRCLE, true, "{1} {0}"),
-    TYPEDEF("typedef", null, false, "{1} {0}"),
-    UNION("union", TagShapes.CIRCLE, false, "{1} {0}"),
-    VARIABLE("variable", TagShapes.TRIANGLE, false, null),
+    CLASS("class", TagShapes.CIRCLE, true, "class %s"),
+    CONSTRUCTOR("constructor", TagShapes.CIRCLE, false, "%s()"),
+    DESTRUCTOR("destructor", TagShapes.CIRCLE, false, "%s()"),
+    ENUM("enum", TagShapes.CIRCLE, true, "enum %s"),
+    ENUM_CONSTANT("enum constant", null, false, "%s"),
+    EXTERN("extern", null, false, "extern %s"),
+    FIELD("field", TagShapes.TRIANGLE, false, "%s"),
+    INTERFACE("interface", TagShapes.CIRCLE, true, "interface %s"),
+    MACRO("macro", TagShapes.HASH, false, "%s"),
+    METHOD("method", TagShapes.SQUARE, false, "%s()"),
+    MODULE("module", null, true, "module %s"),
+    NAMESPACE("namespace", null, true, "namespace %s"),
+    PACKAGE("package", null, false, "package %s"),
+    PROTOTYPE("prototype", TagShapes.SQUARE, false, "%s() prototype"),
+    STRUCT("struct", TagShapes.CIRCLE, true, "struct %s"),
+    TYPEDEF("typedef", null, false, "typedef %s"),
+    UNION("union", TagShapes.CIRCLE, false, "union %s"),
+    VARIABLE("variable", TagShapes.TRIANGLE, false, "%s"),
     
     UNKNOWN("unknown", null, false, null),
     ;
@@ -56,13 +56,13 @@ public enum TagType {
     private final String name;
     private final Shape shape;
     private final boolean isContainer;
-    private final MessageFormat formatter;
+    private final String formatString;
     
     TagType(String name, Shape shape, boolean isContainer, String formatString) {
         this.name = name;
         this.shape = shape;
         this.isContainer = isContainer;
-        this.formatter = (formatString != null) ? new MessageFormat(formatString) : null;
+        this.formatString = formatString;
     }
     
     public Shape getShape() {
@@ -74,11 +74,7 @@ public enum TagType {
     }
     
     public String describe(String identifier) {
-        if (formatter != null) {
-            return formatter.format(new String[] { identifier, name });
-        } else {
-            return identifier;
-        }
+        return formatString.replaceAll("%s", identifier);
     }
     
     public static TagType fromChar(char typeChar) {
