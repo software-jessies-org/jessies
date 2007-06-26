@@ -100,11 +100,6 @@ public class HeapView extends JComponent {
     private static final Color BACKGROUND2_COLOR = new Color(0xEAE7D7);
 
     /**
-     * MessageFormat used to generate text.
-     */
-    private final MessageFormat format;
-    
-    /**
      * Data for the graph as a percentage of the heap used.
      */
     private float[] graph;
@@ -172,7 +167,6 @@ public class HeapView extends JComponent {
     
     public HeapView(JLabel currentHeapUsageLabel) {
         this.currentHeapUsageLabel = currentHeapUsageLabel;
-        this.format = new MessageFormat("{0,number,0.0}/{1,number,0.0} MiB");
         updateUI();
     }
     
@@ -510,7 +504,7 @@ public class HeapView extends JComponent {
                 graphFilled = true;
             }
             if (currentHeapUsageLabel != null) {
-                currentHeapUsageLabel.setText(format.format(new Object[] { new Double((double) used / 1024 / 1024), new Double((double) total / 1024 / 1024) }));
+                currentHeapUsageLabel.setText(String.format("%.1f/%.1f MiB", (double) used / 1024.0 / 1024.0, (double) total / 1024.0 / 1024.0));
             }
         }
         repaint();

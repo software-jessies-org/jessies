@@ -529,7 +529,7 @@ public class FormDialog {
     
     /**
      * Writes our dialog geometries to disk so we can preserve them across runs.
-     * The format isn't very human-readable, because I couldn't get MessageFormat to work.
+     * The format isn't very human-readable, but we're stuck with it now.
      */
     public static void writeGeometriesTo(String filename) {
         StringBuilder content = new StringBuilder();
