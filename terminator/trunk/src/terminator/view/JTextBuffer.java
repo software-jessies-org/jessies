@@ -420,7 +420,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 		final int desiredLength = offset + 1;
 		if (line.length() < desiredLength) {
 			final int charactersOfPaddingRequired = desiredLength - line.length();
-			line += StringUtilities.nCopies(charactersOfPaddingRequired, ' ');
+			line += StringUtilities.nCopies(charactersOfPaddingRequired, " ");
 		}
 		String characterAtLocation = line.substring(offset, offset + 1);
 		String lineBeforeOffset = line.substring(0, offset);
