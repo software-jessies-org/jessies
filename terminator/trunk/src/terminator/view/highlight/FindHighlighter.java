@@ -71,6 +71,9 @@ public class FindHighlighter implements Highlighter {
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
 	public int addHighlights(JTextBuffer view, int firstLineIndex) {
+		if (pattern == null) {
+			return 0;
+		}
 		view.getBirdView().setValueIsAdjusting(true);
 		try {
 			TextBuffer model = view.getModel();
@@ -86,9 +89,6 @@ public class FindHighlighter implements Highlighter {
 	}
 	
 	private int addHighlightsOnLine(JTextBuffer view, int lineIndex, String text) {
-		if (pattern == null) {
-			return 0;
-		}
 		int count = 0;
 		Matcher matcher = pattern.matcher(text);
 		while (matcher.find()) {
