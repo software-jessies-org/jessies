@@ -182,7 +182,7 @@ public class TextLine {
 		if (offset < 0) {
 			throw new IllegalArgumentException("Negative offset " + offset);
 		}
-		if (offset >= text.length()) {
+		if (offset > text.length()) {
 			appendPadding(offset - text.length());
 		}
 	}
