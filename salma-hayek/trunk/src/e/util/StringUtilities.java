@@ -310,13 +310,20 @@ public class StringUtilities {
      * Returns a string consisting of 'count' copies of 'ch'.
      */
     public static String nCopies(int count, char ch) {
-        return nCopies(count, Character.toString(ch));
+        String charAsString = Character.toString(ch);
+        if (count == 1) {
+            return charAsString;
+        }
+        return nCopies(count, charAsString);
     }
     
     /**
      * Returns a string consisting of 'count' copies of 's'.
      */
     public static String nCopies(int count, CharSequence s) {
+        if (count == 1) {
+            return s.toString();
+        }
         StringBuilder builder = new StringBuilder(s.length() * count);
         for (int i = 0; i < count; ++i) {
             builder.append(s);
@@ -341,5 +348,27 @@ public class StringUtilities {
             System.out.println("escaped="+escaped);
             System.out.println("unescaped="+unescapeJava(escaped));
         }
+        
+        Stopwatch op1Stopwatch = Stopwatch.get("nCopies(1, ' ')");
+        for (int i = 0; i < 1000000; ++i) {
+            Stopwatch.Timer timer = op1Stopwatch.start();
+            try {
+                nCopies(1, " ");
+            } finally {
+                timer.stop();
+            }
+        }
+        System.err.println(op1Stopwatch);
+        
+        Stopwatch op2Stopwatch = Stopwatch.get("nCopies(1, \" \")");
+        for (int i = 0; i < 1000000; ++i) {
+            Stopwatch.Timer timer = op2Stopwatch.start();
+            try {
+                nCopies(1, " ");
+            } finally {
+                timer.stop();
+            }
+        }
+        System.err.println(op2Stopwatch);
     }
 }
