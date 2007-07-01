@@ -56,7 +56,7 @@ public class TerminatorFrame extends JFrame {
 				if (lastSize == null || syntheticResize) {
 					return;
 				}
-				Dimension charSize = terminals.get(0).getTextPane().getCharUnitSize();
+				Dimension charSize = terminals.get(0).getTerminalView().getCharUnitSize();
 				Dimension suggestedSize = getSize();
 				Dimension newSize = new Dimension();
 				newSize.width = suggestedSize.width - (suggestedSize.width - lastSize.width) % charSize.width;

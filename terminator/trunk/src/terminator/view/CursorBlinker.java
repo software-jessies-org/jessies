@@ -7,11 +7,11 @@ import terminator.*;
 
 public class CursorBlinker implements ActionListener {
 	private RepeatingComponentTimer timer;
-	private JTextBuffer text;
+	private TerminalView view;
 	
-	public CursorBlinker(JTextBuffer text) {
-		this.text = text;
-		this.timer = new RepeatingComponentTimer(text, 500, this);
+	public CursorBlinker(TerminalView view) {
+		this.view = view;
+		this.timer = new RepeatingComponentTimer(view, 500, this);
 	}
 	
 	public void start() {
@@ -24,7 +24,7 @@ public class CursorBlinker implements ActionListener {
 	
 	public void actionPerformed(ActionEvent e) {
 		if (Options.getSharedInstance().shouldCursorBlink()) {
-			text.blinkCursor();
+			view.blinkCursor();
 		}
 	}
 }

@@ -16,7 +16,7 @@ public class FindDialog {
     private FormDialog formDialog;
     private JTextField findField;
     private JLabel findStatus = new JLabel(" ");
-    private JTextBuffer textToFindIn;
+    private TerminalView textToFindIn;
     private TerminatorMenuBar.BindableAction findNextAction;
     private TerminatorMenuBar.BindableAction findPreviousAction;
     
@@ -51,7 +51,7 @@ public class FindDialog {
             formDialog = null;
         }
         
-        this.textToFindIn = terminalPane.getTextPane();
+        this.textToFindIn = terminalPane.getTerminalView();
         initFindField(terminalPane);
         
         JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, terminalPane);

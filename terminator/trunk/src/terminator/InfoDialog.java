@@ -107,7 +107,7 @@ public class InfoDialog {
         
         title.setText(terminal.getName());
         
-        Dimension size = terminal.getTextPane().getVisibleSizeInCharacters();
+        Dimension size = terminal.getTerminalView().getVisibleSizeInCharacters();
         dimensions.setText(size.width + " x " + size.height);
         
         PtyProcess ptyProcess = terminal.getControl().getPtyProcess();

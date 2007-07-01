@@ -9,9 +9,9 @@ import e.util.*;
 import terminator.view.*;
 
 /**
- * Makes a JTextBuffer a drop target for strings and files. Strings are
- * inserted as if pasted; lists of files are inserted as space-separated
- * lists of their filenames.
+ * Makes a TerminalView a drop target for strings and files.
+ * Strings are inserted as if pasted.
+ * Lists of files are inserted as space-separated lists of their filenames.
  */
 public class TerminalDropTarget extends DropTargetAdapter {
 	private static DataFlavor uriListFlavor;
@@ -23,11 +23,11 @@ public class TerminalDropTarget extends DropTargetAdapter {
 		}
 	}
 	
-	private JTextBuffer textBuffer;
+	private TerminalView view;
 
-	public TerminalDropTarget(JTextBuffer textBuffer) {
-		this.textBuffer = textBuffer;
-		new DropTarget(textBuffer, this);
+	public TerminalDropTarget(TerminalView view) {
+		this.view = view;
+		new DropTarget(view, this);
 	}
 	
 	public void drop(DropTargetDropEvent e) {
@@ -51,7 +51,7 @@ public class TerminalDropTarget extends DropTargetAdapter {
 				return;
 			}
 			e.getDropTargetContext().dropComplete(true);
-			textBuffer.getTerminalControl().sendUtf8String(textToInsert);
+			view.getTerminalControl().sendUtf8String(textToInsert);
 		} catch (Exception ex) {
 			Log.warn("Drop failed.", ex);
 			e.rejectDrop();

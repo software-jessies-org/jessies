@@ -14,14 +14,7 @@ import terminator.model.*;
 import terminator.terminal.*;
 import terminator.view.highlight.*;
 
-/**
-A JTextBuffer provides the visible display of the virtual terminal.
-
-@author Phil Norman
-@author Elliott Hughes
-*/
-
-public class JTextBuffer extends JComponent implements FocusListener, Scrollable {
+public class TerminalView extends JComponent implements FocusListener, Scrollable {
 	private static final boolean MAC_OS = GuiUtilities.isMacOs();
 	
 	private static final Stopwatch paintStyledTextStopwatch = Stopwatch.get("paintStyledText");
@@ -50,7 +43,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 	*/
 	private ArrayList<ArrayList<Highlight>> lineHighlights = new ArrayList<ArrayList<Highlight>>();
 	
-	public JTextBuffer() {
+	public TerminalView() {
 		Options options = Options.getSharedInstance();
 		model = new TextBuffer(this, options.getInitialColumnCount(), options.getInitialRowCount());
 		ComponentUtilities.disableFocusTraversal(this);
@@ -69,7 +62,7 @@ public class JTextBuffer extends JComponent implements FocusListener, Scrollable
 			public void highlightClicked(MouseEvent event) {
 				List<Highlight> highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
 				for (Highlight highlight : highlights) {
-					highlight.getHighlighter().highlightClicked(JTextBuffer.this, highlight, getTabbedString(highlight), event);
+					highlight.getHighlighter().highlightClicked(TerminalView.this, highlight, getTabbedString(highlight), event);
 				}
 			}
 		});
