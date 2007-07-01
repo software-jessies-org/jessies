@@ -56,6 +56,8 @@ public class TerminalControl {
 	
 	// Buffer of TerminalActions to perform.
 	private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
+	// Semaphore to prevent us from overrunning the EDT.
+	private Semaphore flowControl = new Semaphore(30);
 	
 	public TerminalControl(JTerminalPane pane, TerminalModel model) {
 		reset();
@@ -300,14 +302,27 @@ public class TerminalControl {
 		
 		final TerminalAction[] actions = terminalActions.toArray(new TerminalAction[terminalActions.size()]);
 		terminalActions.clear();
+		
+		boolean didAcquire = false;
 		try {
+			flowControl.acquire();
+			didAcquire = true;
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					model.processActions(actions);
+					try {
+						model.processActions(actions);
+					} catch (Throwable th) {
+						Log.warn("Couldn't process terminal actions for " + ptyProcess, th);
+					} finally {
+						flowControl.release();
+					}
 				}
 			});
-		} catch (Exception ex) {
-			Log.warn("Couldn't flush terminal actions for " + ptyProcess, ex);
+		} catch (Throwable th) {
+			Log.warn("Couldn't flush terminal actions for " + ptyProcess, th);
+			if (didAcquire) {
+				flowControl.release();
+			}
 		}
 	}
 	
