@@ -410,12 +410,23 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		}
 		
 		final int offset = Math.max(0, charCoords.getCharOffset());
-		final int desiredLength = offset + 1;
-		if (line.length() < desiredLength) {
-			final int charactersOfPaddingRequired = desiredLength - line.length();
-			line += StringUtilities.nCopies(charactersOfPaddingRequired, " ");
+		
+		String characterAtLocation;
+		if (line.length() == offset) {
+			// A very common case is where the location is one past the end of the line.
+			// We don't need to add a single space if we're just going to  pull it off again.
+			// This might not seem like much, but it can be costly if you've got very long lines.
+			characterAtLocation = " ";
+		} else {
+			// Pad the line if we need to.
+			final int desiredLength = offset + 1;
+			if (line.length() < desiredLength) {
+				final int charactersOfPaddingRequired = desiredLength - line.length();
+				line += StringUtilities.nCopies(charactersOfPaddingRequired, " ");
+			}
+			characterAtLocation = line.substring(offset, offset + 1);
 		}
-		String characterAtLocation = line.substring(offset, offset + 1);
+		
 		String lineBeforeOffset = line.substring(0, offset);
 		FontMetrics fontMetrics = getFontMetrics(getFont());
 		Insets insets = getInsets();
@@ -701,8 +712,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 				startOffset += chunkText.length();
 			}
 			if (drawCursor) {
-				// A cursor at the end of the line is in a
-				// position past the end of the text.
+				// A cursor at the end of the line is in a position past the end of the text.
 				paintCursor(g, metrics, "", baseline);
 			}
 		}
@@ -710,7 +720,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	}
 	
 	public List<StyledText> getLineStyledText(int line) {
-		List<StyledText> result = model.getLineStyledText(line);
+		List<StyledText> result = model.getTextLine(line).getStyledTextSegments();
 		List<Highlight> highlights = getHighlightsForLine(line);
 		for (Highlight highlight : highlights) {
 			result = highlight.applyHighlight(result, new Location(line, 0));
