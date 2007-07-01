@@ -369,10 +369,6 @@ public class TerminalModel {
 		return width;
 	}
 	
-	public List<StyledText> getLineStyledText(int lineIndex) {
-		return getTextLine(lineIndex).getStyledTextSegments();
-	}
-	
 	public TextLine getTextLine(int index) {
 		if (index >= textLines.size()) {
 			Log.warn("TextLine requested for index " + index + ", size of buffer is " + textLines.size() + ".", new Exception("stack trace"));
