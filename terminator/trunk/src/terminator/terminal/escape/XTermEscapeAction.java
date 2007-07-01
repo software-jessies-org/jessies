@@ -43,10 +43,10 @@ public class XTermEscapeAction implements TerminalAction {
 	 *      39 = change default fg color
 	 *      49 = change default bg color
 	 */
-	public void perform(TextBuffer listener) {
+	public void perform(TerminalModel model) {
 		if (sequence.startsWith("2;") || sequence.startsWith("0;")) {
 			String newWindowTitle = sequence.substring(2);
-			listener.setWindowTitle(newWindowTitle);
+			model.setWindowTitle(newWindowTitle);
 		} else {
 			Log.warn("Unsupported XTerm escape sequence \"" + sequence + "\".");
 		}

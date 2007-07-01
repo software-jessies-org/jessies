@@ -8,14 +8,7 @@ import e.util.*;
 import terminator.terminal.*;
 import terminator.view.*;
 
-/**
- * A TextBuffer represents all the text associated with a single connection.  It maintains a list of
- * TextLine objects, one for each line.
- * 
- * @author Phil Norman
- */
-
-public class TextBuffer {
+public class TerminalModel {
 	private TerminalView view;
 	private int width;
 	private int height;
@@ -39,7 +32,7 @@ public class TextBuffer {
 	// Fields used for saving and restoring the 'real' screen while the alternate buffer is in use.
 	private TextLine[] savedScreen;
 	
-	public TextBuffer(TerminalView view, int width, int height) {
+	public TerminalModel(TerminalView view, int width, int height) {
 		this.view = view;
 		setSize(width, height);
 		cursorPosition = view.getCursorPosition();

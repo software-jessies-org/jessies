@@ -17,16 +17,16 @@ public class SingleCharEscapeAction implements TerminalAction {
 		this.escChar = escChar;
 	}
 
-	public void perform(TextBuffer listener) {
+	public void perform(TerminalModel model) {
 		switch (escChar) {
 			case '6':  // rxvt: scr_backindex
 				unsupported("scr_backindex");
 				break;
 			case '7':  // Save cursor.  rxvt saves position, current style, and charset.
-				listener.saveCursor();
+				model.saveCursor();
 				break;
 			case '8':  // Restore cursor.
-				listener.restoreCursor();
+				model.restoreCursor();
 				break;
 			case '9':  // rxvt: scr_forwardindex
 				unsupported("scr_forwardindex");
@@ -38,24 +38,24 @@ public class SingleCharEscapeAction implements TerminalAction {
 				unsupported("unset private mode PrivMode_aplKP (application keypad).");
 				break;
 			case 'D':  // Move the cursor down one line, scrolling if it reaches the bottom of scroll region.  Effectively NL.
-				listener.processSpecialCharacter('\n');
+				model.processSpecialCharacter('\n');
 				break;
 			case 'E':  // Move cursor to start of next line, scrolling if required.  Effectively CR,NL
-				listener.processSpecialCharacter('\r');
-				listener.processSpecialCharacter('\n');
+				model.processSpecialCharacter('\r');
+				model.processSpecialCharacter('\n');
 				break;
 			case 'H':  // rxvt: scr_set_tab(1)  Set a horizontal tab marker at the current cursor position.
-				listener.setTabAtCursor();
+				model.setTabAtCursor();
 				break;
 			case 'M':  // Move cursor up one line, scrolling if it reaches the top of scroll region.  Opposite of NL.
-				listener.scrollDisplayUp();
+				model.scrollDisplayUp();
 				break;
 			case 'Z':
 				// An obsolete form of ESC [ c (send device attributes).
 				CSIEscapeAction.sendDeviceAttributes(control);
 				break;
 			case 'c':  // Power on (full reset).
-				listener.fullReset();
+				model.fullReset();
 				break;
 				
 			// Change character set.

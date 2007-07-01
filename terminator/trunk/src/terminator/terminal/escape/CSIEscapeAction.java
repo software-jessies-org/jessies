@@ -22,77 +22,77 @@ public class CSIEscapeAction implements TerminalAction {
 		this.sequence = sequence;
 	}
 
-	public void perform(TextBuffer listener) {
-		if (processSequence(listener) == false) {
+	public void perform(TerminalModel model) {
+		if (processSequence(model) == false) {
 			Log.warn("Unimplemented escape sequence: \"" + sequence + "\"");
 		}
 	}
 	
-	private boolean processSequence(TextBuffer listener) {
+	private boolean processSequence(TerminalModel model) {
 		char lastChar = sequence.charAt(sequence.length() - 1);
 		String midSequence = sequence.substring(1, sequence.length() - 1);
 		switch (lastChar) {
 		case 'A':
-			return moveCursor(listener, midSequence, 0, -1);
+			return moveCursor(model, midSequence, 0, -1);
 		case 'B':
-			return moveCursor(listener, midSequence, 0, 1);
+			return moveCursor(model, midSequence, 0, 1);
 		case 'C':
-			return moveCursor(listener, midSequence, 1, 0);
+			return moveCursor(model, midSequence, 1, 0);
 		case 'c':
-			return deviceAttributesRequest(listener, midSequence);
+			return deviceAttributesRequest(model, midSequence);
 		case 'D':
-			return moveCursor(listener, midSequence, -1, 0);
+			return moveCursor(model, midSequence, -1, 0);
 		case 'd':
-			return moveCursorRowTo(listener, midSequence);
+			return moveCursorRowTo(model, midSequence);
 		case 'G':
 		case '`':
-			return moveCursorColumnTo(listener, midSequence);
+			return moveCursorColumnTo(model, midSequence);
 		case 'f':
 		case 'H':
-			return moveCursorTo(listener, midSequence);
+			return moveCursorTo(model, midSequence);
 		case 'K':
-			return killLineContents(listener, midSequence);
+			return killLineContents(model, midSequence);
 		case 'J':
-			return killLines(listener, midSequence);
+			return killLines(model, midSequence);
 		case 'L':
-			return insertLines(listener, midSequence);
+			return insertLines(model, midSequence);
 		case 'M':
-			return deleteLines(listener, midSequence);
+			return deleteLines(model, midSequence);
 		case 'P':
-			return deleteCharacters(listener, midSequence);
+			return deleteCharacters(model, midSequence);
 		case 'g':
-			return clearTabs(listener, midSequence);
+			return clearTabs(model, midSequence);
 		case 'h':
-			return setDecPrivateMode(listener, midSequence, true);
+			return setDecPrivateMode(model, midSequence, true);
 		case 'l':
-			return setDecPrivateMode(listener, midSequence, false);
+			return setDecPrivateMode(model, midSequence, false);
 		case 'm':
-			return processFontEscape(listener, midSequence);
+			return processFontEscape(model, midSequence);
 		case 'n':
-			return processDeviceStatusReport(listener, midSequence);
+			return processDeviceStatusReport(model, midSequence);
 		case 'r':
 			if (midSequence.startsWith("?")) {
-				return restoreDecPrivateModes(listener, midSequence);
+				return restoreDecPrivateModes(model, midSequence);
 			} else {
-				return setScrollingRegion(listener, midSequence);
+				return setScrollingRegion(model, midSequence);
 			}
 		case 's':
-			return saveDecPrivateModes(listener, midSequence);
+			return saveDecPrivateModes(model, midSequence);
 		default:
 			Log.warn("unknown CSI sequence " + sequence);
 			return false;
 		}
 	}
 	
-	public boolean clearTabs(TextBuffer listener, String seq) {
+	public boolean clearTabs(TerminalModel model, String seq) {
 		int clearType = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		if (clearType == 0) {
 			// Clear horizontal tab at current cursor position.
-			listener.removeTabAtCursor();
+			model.removeTabAtCursor();
 			return true;
 		} else if (clearType == 3) {
 			// Clear all horizontal tabs.
-			listener.removeAllTabs();
+			model.removeAllTabs();
 			return true;
 		} else {
 			Log.warn("Unknown clear tabs type: " + clearType);
@@ -100,21 +100,21 @@ public class CSIEscapeAction implements TerminalAction {
 		}
 	}
 	
-	public boolean deleteLines(TextBuffer listener, String seq) {
+	public boolean deleteLines(TerminalModel model, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
 		for (int i = 0; i < count; i++) {
-			listener.deleteLine();
+			model.deleteLine();
 		}
 		return true;
 	}
 	
-	public boolean insertLines(TextBuffer listener, String seq) {
+	public boolean insertLines(TerminalModel model, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
-		listener.insertLines(count);
+		model.insertLines(count);
 		return true;
 	}
 	
-	private boolean setDecPrivateMode(TextBuffer listener, String seq, boolean value) {
+	private boolean setDecPrivateMode(TerminalModel model, String seq, boolean value) {
 		boolean isPrivateMode = seq.startsWith("?");
 		String[] modes = (isPrivateMode ? seq.substring(1) : seq).split(";");
 		for (String modeString : modes) {
@@ -122,10 +122,10 @@ public class CSIEscapeAction implements TerminalAction {
 			if (isPrivateMode) {
 				switch (mode) {
 				case 25:
-					listener.setCursorVisible(value);
+					model.setCursorVisible(value);
 					break;
 				case 47:
-					listener.useAlternateBuffer(value);
+					model.useAlternateBuffer(value);
 					break;
 				default:
 					Log.warn("Unknown private mode " + mode + " in [" + seq + (value ? 'h' : 'l'));
@@ -133,7 +133,7 @@ public class CSIEscapeAction implements TerminalAction {
 			} else {
 				switch (mode) {
 				case 4:
-					listener.setInsertMode(value);
+					model.setInsertMode(value);
 					break;
 				case 20:
 					control.setAutomaticNewline(value);
@@ -146,27 +146,27 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean restoreDecPrivateModes(TextBuffer listener, String seq) {
+	public boolean restoreDecPrivateModes(TerminalModel model, String seq) {
 		Log.warn("Restore DEC private mode values not implemented (CSI " + seq + ")");
 		return false;
 	}
 	
-	public boolean saveDecPrivateModes(TextBuffer listener, String seq) {
+	public boolean saveDecPrivateModes(TerminalModel model, String seq) {
 		Log.warn("Save DEC private mode values not implemented (CSI " + seq + ")");
 		return false;
 	}
 	
-	public boolean setScrollingRegion(TextBuffer listener, String seq) {
+	public boolean setScrollingRegion(TerminalModel model, String seq) {
 		int index = seq.indexOf(';');
 		if (index == -1) {
-			listener.setScrollingRegion(-1, -1);
+			model.setScrollingRegion(-1, -1);
 		} else {
-			listener.setScrollingRegion(Integer.parseInt(seq.substring(0, index)), Integer.parseInt(seq.substring(index + 1)));
+			model.setScrollingRegion(Integer.parseInt(seq.substring(0, index)), Integer.parseInt(seq.substring(index + 1)));
 		}
 		return true;
 	}
 	
-	public boolean deviceAttributesRequest(TextBuffer listener, String seq) {
+	public boolean deviceAttributesRequest(TerminalModel model, String seq) {
 		if (seq.equals("") || seq.equals("0")) {
 			sendDeviceAttributes(control);
 			return true;
@@ -179,39 +179,39 @@ public class CSIEscapeAction implements TerminalAction {
 		control.sendUtf8String(Ascii.ESC + "[?1;0c");
 	}
 	
-	public boolean deleteCharacters(TextBuffer listener, String seq) {
+	public boolean deleteCharacters(TerminalModel model, String seq) {
 		int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
-		listener.deleteCharacters(count);
+		model.deleteCharacters(count);
 		return true;
 	}
 	
-	public boolean killLineContents(TextBuffer listener, String seq) {
+	public boolean killLineContents(TerminalModel model, String seq) {
 		int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		boolean fromStart = (type >= 1);
 		boolean toEnd = (type != 1);
-		listener.killHorizontally(fromStart, toEnd);
+		model.killHorizontally(fromStart, toEnd);
 		return true;
 	}
 	
-	public boolean killLines(TextBuffer listener, String seq) {
+	public boolean killLines(TerminalModel model, String seq) {
 		int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		boolean fromTop = (type >= 1);
 		boolean toBottom = (type != 1);
-		listener.killVertically(fromTop, toBottom);
+		model.killVertically(fromTop, toBottom);
 		return true;
 	}
 	
-	public boolean moveCursorRowTo(TextBuffer listener, String seq) {
-		listener.setCursorPosition(-1, Integer.parseInt(seq));
+	public boolean moveCursorRowTo(TerminalModel model, String seq) {
+		model.setCursorPosition(-1, Integer.parseInt(seq));
 		return true;
 	}
 	
-	public boolean moveCursorColumnTo(TextBuffer listener, String seq) {
-		listener.setCursorPosition(Integer.parseInt(seq), -1);
+	public boolean moveCursorColumnTo(TerminalModel model, String seq) {
+		model.setCursorPosition(Integer.parseInt(seq), -1);
 		return true;
 	}
 	
-	public boolean moveCursorTo(TextBuffer listener, String seq) {
+	public boolean moveCursorTo(TerminalModel model, String seq) {
 		int x = 1;
 		int y = 1;
 		int splitIndex = seq.indexOf(';');
@@ -219,29 +219,29 @@ public class CSIEscapeAction implements TerminalAction {
 			y = Integer.parseInt(seq.substring(0, splitIndex));
 			x = Integer.parseInt(seq.substring(splitIndex + 1));
 		}
-		listener.setCursorPosition(x, y);
+		model.setCursorPosition(x, y);
 		return true;
 	}
 	
-	public boolean moveCursor(TextBuffer listener, String countString, int xDirection, int yDirection) {
+	public boolean moveCursor(TerminalModel model, String countString, int xDirection, int yDirection) {
 		int count = (countString.length() == 0) ? 1 : Integer.parseInt(countString);
 		if (xDirection != 0) {
-			listener.moveCursorHorizontally(xDirection * count);
+			model.moveCursorHorizontally(xDirection * count);
 		}
 		if (yDirection != 0) {
-			listener.moveCursorVertically(yDirection * count);
+			model.moveCursorVertically(yDirection * count);
 		}
 		return true;
 	}
 	
-	private boolean processDeviceStatusReport(TextBuffer listener, String sequence) {
+	private boolean processDeviceStatusReport(TerminalModel model, String sequence) {
 		switch (Integer.parseInt(sequence)) {
 		case 5:
 			control.sendUtf8String(Ascii.ESC + "[0n");
 			return true;
 		case 6:
-			Location location = listener.getCursorPosition();
-			int row = location.getLineIndex() - listener.getFirstDisplayLine() + 1;
+			Location location = model.getCursorPosition();
+			int row = location.getLineIndex() - model.getFirstDisplayLine() + 1;
 			int column = location.getCharOffset() + 1;
 			control.sendUtf8String(Ascii.ESC + "[" + row + ";" + column + "R");
 			return true;
@@ -250,8 +250,8 @@ public class CSIEscapeAction implements TerminalAction {
 		}
 	}
 	
-	public boolean processFontEscape(TextBuffer listener, String sequence) {
-		int oldStyle = listener.getStyle();
+	public boolean processFontEscape(TerminalModel model, String sequence) {
+		int oldStyle = model.getStyle();
 		int foreground = StyledText.getForeground(oldStyle);
 		int background = StyledText.getBackground(oldStyle);
 		boolean isBold = StyledText.isBold(oldStyle);
@@ -346,7 +346,7 @@ public class CSIEscapeAction implements TerminalAction {
 				break;
 			}
 		}
-		listener.setStyle(StyledText.getStyle(foreground, hasForeground, background, hasBackground, isBold, isUnderlined, isReverseVideo));
+		model.setStyle(StyledText.getStyle(foreground, hasForeground, background, hasBackground, isBold, isUnderlined, isReverseVideo));
 		return true;
 	}
 }
