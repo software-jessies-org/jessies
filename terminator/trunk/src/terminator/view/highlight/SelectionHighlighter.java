@@ -338,7 +338,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	}
 	
 	private boolean isValidLocation(TerminalView view, Location location) {
-		TextBuffer model = view.getModel();
+		TerminalModel model = view.getModel();
 		if (location.getLineIndex() >= model.getLineCount()) {
 			return false;
 		}

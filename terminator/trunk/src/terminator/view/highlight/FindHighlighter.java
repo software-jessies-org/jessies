@@ -76,7 +76,7 @@ public class FindHighlighter implements Highlighter {
 		}
 		view.getBirdView().setValueIsAdjusting(true);
 		try {
-			TextBuffer model = view.getModel();
+			TerminalModel model = view.getModel();
 			int count = 0;
 			for (int i = firstLineIndex; i < model.getLineCount(); i++) {
 				String line = model.getTextLine(i).getString();

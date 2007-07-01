@@ -13,7 +13,7 @@ public class TwoCharEscapeAction implements TerminalAction {
 		this.sequence = sequence;
 	}
 
-	public void perform(TextBuffer listener) {
+	public void perform(TerminalModel model) {
 		switch (sequence.charAt(0)) {
 			case '#':  // rxvt: if second char == '8', scr_E().
 				unsupported();

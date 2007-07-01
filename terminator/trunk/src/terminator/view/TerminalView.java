@@ -19,7 +19,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	
 	private static final Stopwatch paintStyledTextStopwatch = Stopwatch.get("paintStyledText");
 	
-	private TextBuffer model;
+	private TerminalModel model;
 	private Location cursorPosition = new Location(0, 0);
 	private boolean hasFocus = false;
 	private boolean displayCursor = true;
@@ -45,7 +45,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	
 	public TerminalView() {
 		Options options = Options.getSharedInstance();
-		model = new TextBuffer(this, options.getInitialColumnCount(), options.getInitialRowCount());
+		this.model = new TerminalModel(this, options.getInitialColumnCount(), options.getInitialRowCount());
 		ComponentUtilities.disableFocusTraversal(this);
 		setBorder(BorderFactory.createEmptyBorder(1, 4, 4, 4));
 		setOpaque(true);
@@ -135,7 +135,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		new TerminalDropTarget(this);
 	}
 	
-	public TextBuffer getModel() {
+	public TerminalModel getModel() {
 		return model;
 	}
 	
@@ -225,7 +225,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		return result;
 	}
 	
-	// Methods used by TextBuffer in order to update the display.
+	// Methods used by TerminalModel in order to update the display.
 	
 	public void linesChangedFrom(int lineIndex) {
 		Point redrawTop = modelToView(new Location(lineIndex, 0)).getLocation();

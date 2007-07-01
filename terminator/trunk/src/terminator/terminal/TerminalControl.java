@@ -12,8 +12,7 @@ import terminator.view.*;
 import terminator.terminal.escape.*;
 
 /**
- * Ties together the subprocess reader thread, the subprocess writer thread,
- * and the thread that processes the subprocess' output.
+ * Ties together the subprocess reader thread, the subprocess writer thread, and the thread that processes the subprocess' output.
  * Some basic processing is done here.
  */
 public class TerminalControl {
@@ -33,7 +32,7 @@ public class TerminalControl {
 	private static BufferedReader stepModeReader;
 	
 	private JTerminalPane pane;
-	private TextBuffer listener;
+	private TerminalModel model;
 	private PtyProcess ptyProcess;
 	private boolean processIsRunning;
 	private boolean processHasBeenDestroyed = false;
@@ -58,10 +57,10 @@ public class TerminalControl {
 	// Buffer of TerminalActions to perform.
 	private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
 	
-	public TerminalControl(JTerminalPane pane, TextBuffer listener) {
+	public TerminalControl(JTerminalPane pane, TerminalModel model) {
 		reset();
 		this.pane = pane;
-		this.listener = listener;
+		this.model = model;
 	}
 	
 	public void initProcess(String[] command, String workingDirectory) throws Throwable {
@@ -153,7 +152,7 @@ public class TerminalControl {
 	public void invokeCharacterSetLater(final int index) {
 		flushLineBuffer();
 		terminalActions.add(new TerminalAction() {
-			public void perform(TextBuffer listener) {
+			public void perform(TerminalModel model) {
 				invokeCharacterSet(index);
 			}
 		});
@@ -178,8 +177,8 @@ public class TerminalControl {
 		designateCharacterSet(1, '0');
 		designateCharacterSet(2, 'B');
 		designateCharacterSet(3, 'B');
-		if (listener != null) {
-			listener.setStyle(StyledText.getDefaultStyle());
+		if (model != null) {
+			model.setStyle(StyledText.getDefaultStyle());
 		}
 	}
 	
@@ -262,15 +261,15 @@ public class TerminalControl {
 	/** Must be called in the AWT dispatcher thread. */
 	public void sizeChanged(final Dimension sizeInChars, final Dimension sizeInPixels) throws IOException {
 		TerminalAction sizeChangeAction = new TerminalAction() {
-			public void perform(TextBuffer listener) {
-				listener.sizeChanged(sizeInChars);
+			public void perform(TerminalModel model) {
+				model.sizeChanged(sizeInChars);
 			}
 			
 			public String toString() {
 				return "TerminalAction[Size change to " + sizeInChars + "]";
 			}
 		};
-		listener.processActions(new TerminalAction[] { sizeChangeAction });
+		model.processActions(new TerminalAction[] { sizeChangeAction });
 		// Notify the pty that the size has changed.
 		ptyProcess.sendResizeNotification(sizeInChars, sizeInPixels);
 	}
@@ -304,7 +303,7 @@ public class TerminalControl {
 		try {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					listener.processActions(actions);
+					model.processActions(actions);
 				}
 			});
 		} catch (Exception ex) {
@@ -373,11 +372,11 @@ public class TerminalControl {
 			this.line = line;
 		}
 		
-		public void perform(TextBuffer listener) {
+		public void perform(TerminalModel model) {
 			if (DEBUG) {
 				Log.warn("Processing line \"" + line + "\"");
 			}
-			listener.processLine(line);
+			model.processLine(line);
 		}
 		
 		public String toString() {
@@ -407,17 +406,17 @@ public class TerminalControl {
 		
 		doStep();
 		
-		// Conform to the stated claim that the listener's always called in the AWT dispatch thread.
+		// Conform to the stated claim that the model's always mutated in the AWT dispatch thread.
 		terminalActions.add(new PlainTextAction(line));
 	}
 	
 	public synchronized void processSpecialCharacter(final char ch) {
 		terminalActions.add(new TerminalAction() {
-			public void perform(TextBuffer listener) {
+			public void perform(TerminalModel model) {
 				if (DEBUG) {
 					Log.warn("Processing special char \"" + getCharDesc(ch) + "\"");
 				}
-				listener.processSpecialCharacter(ch);
+				model.processSpecialCharacter(ch);
 			}
 			
 			public String toString() {
