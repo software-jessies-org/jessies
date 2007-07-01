@@ -16,7 +16,7 @@ import terminator.view.*;
  */
 
 public class TextBuffer {
-	private JTextBuffer view;
+	private TerminalView view;
 	private int width;
 	private int height;
 	private ArrayList<TextLine> textLines = new ArrayList<TextLine>();
@@ -39,7 +39,7 @@ public class TextBuffer {
 	// Fields used for saving and restoring the 'real' screen while the alternate buffer is in use.
 	private TextLine[] savedScreen;
 	
-	public TextBuffer(JTextBuffer view, int width, int height) {
+	public TextBuffer(TerminalView view, int width, int height) {
 		this.view = view;
 		setSize(width, height);
 		cursorPosition = view.getCursorPosition();

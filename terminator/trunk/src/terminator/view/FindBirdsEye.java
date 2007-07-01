@@ -5,10 +5,10 @@ import e.gui.*;
 import terminator.model.*;
 
 public class FindBirdsEye implements BirdsEye {
-    private JTextBuffer view;
+    private TerminalView view;
     private int currentLineIndex = -1;
     
-    public FindBirdsEye(JTextBuffer view) {
+    public FindBirdsEye(TerminalView view) {
         this.view = view;
     }
     

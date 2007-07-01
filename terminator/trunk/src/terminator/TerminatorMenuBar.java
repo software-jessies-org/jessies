@@ -423,7 +423,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void performOn(JTerminalPane terminalPane) {
-			terminalPane.getTextPane().findNext(FindHighlighter.class);
+			terminalPane.getTerminalView().findNext(FindHighlighter.class);
 		}
 	}
 	
@@ -434,7 +434,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void performOn(JTerminalPane terminalPane) {
-			terminalPane.getTextPane().findPrevious(FindHighlighter.class);
+			terminalPane.getTerminalView().findPrevious(FindHighlighter.class);
 		}
 	}
 	
@@ -445,8 +445,8 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		@Override
 		protected void performPaneAction(JTerminalPane terminalPane) {
-			JTextBuffer textBuffer = terminalPane.getTextPane();
-			textBuffer.getHighlighterOfClass(FindHighlighter.class).forgetPattern(textBuffer);
+			TerminalView view = terminalPane.getTerminalView();
+			view.getHighlighterOfClass(FindHighlighter.class).forgetPattern(view);
 		}
 	}
 	
@@ -458,7 +458,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		@Override
 		protected void performPaneAction(JTerminalPane terminalPane) {
-			terminalPane.getTextPane().scrollToTop();
+			terminalPane.getTerminalView().scrollToTop();
 		}
 	}
 	
@@ -470,7 +470,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		@Override
 		protected void performPaneAction(JTerminalPane terminalPane) {
-			terminalPane.getTextPane().scrollToEnd();
+			terminalPane.getTerminalView().scrollToEnd();
 		}
 	}
 	
@@ -530,7 +530,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		@Override
 		protected void performPaneAction(JTerminalPane terminalPane) {
-			terminalPane.getTextPane().getModel().clearScrollBuffer();
+			terminalPane.getTerminalView().getModel().clearScrollBuffer();
 		}
 	}
 	

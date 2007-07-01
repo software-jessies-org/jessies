@@ -253,7 +253,7 @@ public class TerminalControl {
 		try {
 			final char[] buffer = message.toCharArray();
 			processBuffer(buffer, buffer.length);
-			pane.getTextPane().setCursorVisible(false);
+			pane.getTerminalView().setCursorVisible(false);
 		} catch (Exception ex) {
 			Log.warn("Couldn't say '" + message + "'", ex);
 		}

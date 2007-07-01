@@ -19,7 +19,7 @@ public class JTerminalPane extends JPanel {
 	private static final String ERASE_STRING = String.valueOf(GuiUtilities.isWindows() ? Ascii.BS : Ascii.DEL);
 	
 	private TerminalControl control;
-	private JTextBuffer textPane;
+	private TerminalView view;
 	private JScrollPane scrollPane;
 	private VisualBellViewport viewport;
 	private String name;
@@ -107,23 +107,23 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public void optionsDidChange() {
-		textPane.optionsDidChange();
-		viewport.setBackground(textPane.getBackground());
+		view.optionsDidChange();
+		viewport.setBackground(view.getBackground());
 		scrollPane.invalidate();
 		validate();
 	}
 	
 	private void init(List<String> command, String workingDirectory) {
-		textPane = new JTextBuffer();
-		textPane.addKeyListener(new KeyHandler());
+		view = new TerminalView();
+		view.addKeyListener(new KeyHandler());
 		
 		initOutputSpinner();
 		
-		EPopupMenu popupMenu = new EPopupMenu(textPane);
+		EPopupMenu popupMenu = new EPopupMenu(view);
 		popupMenu.addMenuItemProvider(new TerminatorMenuItemProvider());
 		
 		viewport = new VisualBellViewport();
-		viewport.setView(textPane);
+		viewport.setView(view);
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setBorder(null);
@@ -136,17 +136,17 @@ public class JTerminalPane extends JPanel {
 		
 		optionsDidChange();
 		
-		BirdView birdView = new BirdView(textPane.getBirdsEye(), scrollPane.getVerticalScrollBar());
-		textPane.setBirdView(birdView);
+		BirdView birdView = new BirdView(view.getBirdsEye(), scrollPane.getVerticalScrollBar());
+		view.setBirdView(birdView);
 		
 		add(scrollPane, BorderLayout.CENTER);
 		add(birdView, BorderLayout.EAST);
 		GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
 		
-		textPane.sizeChanged();
+		view.sizeChanged();
 		try {
-			control = new TerminalControl(this, textPane.getModel());
-			textPane.setTerminalControl(control);
+			control = new TerminalControl(this, view.getModel());
+			view.setTerminalControl(control);
 			control.initProcess(command.toArray(new String[command.size()]), workingDirectory);
 			initSizeMonitoring();
 		} catch (final Throwable th) {
@@ -208,10 +208,10 @@ public class JTerminalPane extends JPanel {
 			
 			@Override
 			public void componentResized(ComponentEvent event) {
-				Dimension size = textPane.getVisibleSizeInCharacters();
+				Dimension size = view.getVisibleSizeInCharacters();
 				if (size.equals(currentSizeInChars) == false) {
 					try {
-						control.sizeChanged(size, textPane.getVisibleSize());
+						control.sizeChanged(size, view.getVisibleSize());
 						getTerminatorFrame().setTerminalSize(size);
 					} catch (Exception ex) {
 						if (control != null) {
@@ -230,8 +230,8 @@ public class JTerminalPane extends JPanel {
 		addComponentListener(new SizeMonitor());
 	}
 	
-	public JTextBuffer getTextPane() {
-		return textPane;
+	public TerminalView getTerminalView() {
+		return view;
 	}
 	
 	/** Starts the process listening once all the user interface stuff is set up. */
@@ -267,7 +267,7 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public Dimension getOptimalViewSize() {
-		return textPane.getOptimalViewSize();
+		return view.getOptimalViewSize();
 	}
 	
 	private class KeyHandler implements KeyListener {
@@ -284,7 +284,7 @@ public class JTerminalPane extends JPanel {
 			// Give the corresponding output time to come out and so move the cursor, to which we'll scroll...
 			waitForCorrespondingOutputTimer = new javax.swing.Timer(roundTripMilliseconds, new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					cursorPositionAfterOutput = textPane.getCursorPosition();
+					cursorPositionAfterOutput = view.getCursorPosition();
 					waitForCursorStabilityTimer.start();
 				}
 			});
@@ -301,10 +301,10 @@ public class JTerminalPane extends JPanel {
 					// we won't scroll until they let go.
 					// The benefit is that we won't leave the window scrolled by half a width if the output goes
 					// briefly off-screen just after a user's key press.
-					if (cursorPositionAfterOutput != textPane.getCursorPosition()) {
+					if (cursorPositionAfterOutput != view.getCursorPosition()) {
 						return;
 					}
-					textPane.scrollHorizontallyToShowCursor();
+					view.scrollHorizontallyToShowCursor();
 				}
 			});
 			waitForCursorStabilityTimer.setRepeats(false);
@@ -360,7 +360,7 @@ public class JTerminalPane extends JPanel {
 					}
 				}
 				control.sendUtf8String(sequence);
-				textPane.userIsTyping();
+				view.userIsTyping();
 				scroll();
 				event.consume();
 			}
@@ -511,7 +511,7 @@ public class JTerminalPane extends JPanel {
 			String utf8 = getUtf8ForKeyEvent(event);
 			if (utf8 != null) {
 				control.sendUtf8String(utf8);
-				textPane.userIsTyping();
+				view.userIsTyping();
 				scroll();
 				event.consume();
 			}
@@ -521,10 +521,10 @@ public class JTerminalPane extends JPanel {
 			final int keyCode = e.getKeyCode();
 			if (e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK) {
 				if (keyCode == KeyEvent.VK_HOME) {
-					textPane.scrollToTop();
+					view.scrollToTop();
 					return true;
 				} else if (keyCode == KeyEvent.VK_END) {
-					textPane.scrollToEnd();
+					view.scrollToEnd();
 					return true;
 				} else if (keyCode == KeyEvent.VK_PAGE_UP) {
 					pageUp();
@@ -578,7 +578,7 @@ public class JTerminalPane extends JPanel {
 		 */
 		public void scroll() {
 			if (Options.getSharedInstance().isScrollKey()) {
-				textPane.scrollToBottomButNotHorizontally();
+				view.scrollToBottomButNotHorizontally();
 				waitForCorrespondingOutputTimer.stop();
 				waitForCursorStabilityTimer.stop();
 				waitForCorrespondingOutputTimer.start();
@@ -587,7 +587,7 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public SelectionHighlighter getSelectionHighlighter() {
-		return textPane.getHighlighterOfClass(SelectionHighlighter.class);
+		return view.getHighlighterOfClass(SelectionHighlighter.class);
 	}
 	
 	public void selectAll() {
@@ -630,7 +630,7 @@ public class JTerminalPane extends JPanel {
 	 * Hands focus to our text pane.
 	 */
 	public void requestFocus() {
-		textPane.requestFocus();
+		view.requestFocus();
 	}
 	
 	private class TerminatorMenuItemProvider implements MenuItemProvider {
@@ -716,7 +716,7 @@ public class JTerminalPane extends JPanel {
 		getSelectionHighlighter().copyToSystemClipboard();
 	}
 	public void doPasteAction() {
-		textPane.pasteSystemClipboard();
+		view.pasteSystemClipboard();
 	}
 	
 	public void destroyProcess() {
