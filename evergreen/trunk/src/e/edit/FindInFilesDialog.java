@@ -428,7 +428,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             // Unlike the foreground Color, the Font gets remembered, so we
             // need to manually revert it each time.
             if (defaultFont == null) {
-                defaultFont = c.getFont();
+                defaultFont = ChangeFontAction.getConfiguredFont();
             }
             c.setFont(defaultFont);
             
