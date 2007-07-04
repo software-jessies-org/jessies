@@ -19,6 +19,8 @@ public class FindAndReplaceAction extends ETextAction {
     private JLabel statusLabel = new JLabel(" ");
     private JList matchList;
     private JList replacementsList;
+    private JScrollPane matchPane;
+    private JScrollPane replacementsPane;
     
     private MatchFinder worker;
     private static final ExecutorService matchFinderExecutor = ThreadUtilities.newSingleThreadExecutor("Find and Replace");
@@ -27,6 +29,8 @@ public class FindAndReplaceAction extends ETextAction {
         super("Find/Replace...");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("R", false));
         GnomeStockIcon.useStockIcon(this, "gtk-find-and-replace");
+        
+        initLists();
     }
     
     private ETextArea currentTextArea;
@@ -49,15 +53,8 @@ public class FindAndReplaceAction extends ETextAction {
         }
     }
     
-    public void actionPerformed(ActionEvent e) {
-        currentTextArea = getFocusedTextArea();
-        if (currentTextArea == null) {
-            return;
-        }
-
-        initPatternField();
-        
-        matchList = new JList();
+    private void initLists() {
+        this.matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -67,17 +64,14 @@ public class FindAndReplaceAction extends ETextAction {
                 }
             }
         });
-        Font textFont = currentTextArea.getFont();
-        matchList.setFont(textFont);
         matchList.setCellRenderer(new DisplayableMatchRenderer());
         
-        replacementsList = new JList();
-        replacementsList.setFont(textFont);
+        this.replacementsList = new JList();
         replacementsList.setCellRenderer(new DisplayableMatchRenderer());
-
+        
         // Make both lists scrollable...
-        JScrollPane matchPane = new JScrollPane(matchList);
-        JScrollPane replacementsPane = new JScrollPane(replacementsList);
+        this.matchPane = new JScrollPane(matchList);
+        this.replacementsPane = new JScrollPane(replacementsList);
         // ...tie their scroll bars together...
         BoundedRangeModel scrollModel = matchPane.getVerticalScrollBar().getModel();
         replacementsPane.getVerticalScrollBar().setModel(scrollModel);
@@ -85,6 +79,21 @@ public class FindAndReplaceAction extends ETextAction {
         ListSelectionModel selectionModel = matchList.getSelectionModel();
         replacementsList.setSelectionModel(selectionModel);
         
+        ComponentUtilities.divertPageScrollingFromTo(patternField, matchList);
+        ComponentUtilities.divertPageScrollingFromTo(replacementField, matchList);
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+        currentTextArea = getFocusedTextArea();
+        if (currentTextArea == null) {
+            return;
+        }
+
+        initPatternField();
+        Font textFont = currentTextArea.getFont();
+        matchList.setFont(textFont);
+        replacementsList.setFont(textFont);
+
         FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find/Replace");
         form.setTypingTimeoutActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

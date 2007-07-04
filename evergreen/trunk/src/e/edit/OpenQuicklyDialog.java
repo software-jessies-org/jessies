@@ -108,6 +108,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
             }
         });
         matchList.setCellRenderer(new EListCellRenderer(true));
+        ComponentUtilities.divertPageScrollingFromTo(filenameField, matchList);
     }
     
     public OpenQuicklyDialog(Workspace workspace) {
