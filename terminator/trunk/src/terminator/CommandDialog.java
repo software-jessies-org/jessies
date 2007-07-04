@@ -80,6 +80,8 @@ public class CommandDialog {
             }
         });
         historyList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "remove-entry");
+        
+        ComponentUtilities.divertPageScrollingFromTo(commandField, historyList);
     }
     
     private void showMatches() {
