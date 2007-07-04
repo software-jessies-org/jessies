@@ -395,6 +395,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 }
             }
         });
+        
+        ComponentUtilities.divertPageScrollingFromTo(regexField, matchView);
+        ComponentUtilities.divertPageScrollingFromTo(filenameRegexField, matchView);
     }
     
     public void fileListStateChanged(boolean isNowValid) {
