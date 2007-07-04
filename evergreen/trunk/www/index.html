@@ -11,7 +11,7 @@
 
 <p>Evergreen started as a project to reimplement Rob Pike's <a href="http://plan9.bell-labs.com/sys/doc/acme.html">acme</a> editor in Java, so I could use it on Unix and Windows.
 (I'd got used to it at university, using Plan 9.)
-Eventually, my editor diverged and today probably represents my personality quite closely; in particular, if the computer <i>can</i> do something, it <i>must</i>.
+Eventually, my editor diverged and today probably represents my personality quite closely; in particular, if the computer <i>can</i> do the right thing, it <i>must</i>.
 I certainly shouldn't have to.
 
 <!--#include virtual="/salma-hayek/navigation.html" -->
@@ -28,9 +28,14 @@ Or what case your co-worker used ("Hyperlink" or "HyperLink"?).
 Just a substring or regular expression that matches what you want.
 Evergreen updates a list of the matching files as you type (like iTunes):
 
-<p align="center"><img src="open-quickly.png" width="620" height="322" alt="Open Quickly dialog">
+<p align="center"><img src="open-quickly.png" width="591" height="322" alt="Open Quickly dialog">
 
-<p>You can also search for files to open based on their content.
+<li><p><strong>Find in Files</strong> - You can also search for files to open based on their content.
+Evergreen shows a tree of matches, representing the directory hierarchy.
+Files containing definitions are marked as such.
+Search results are automatically updated if anything changes:
+
+<p align="center"><img src="find-in-files.png" width="723" height="502" alt="Find in Files dialog">
 
 <li><p><strong>Find</strong> - You have a fast computer, yet the 'find' function in other editors doesn't take advantage of that fact.
 Evergreen, like <tt>less(1)</tt>, highlights all the matches, whether you search with C-F or clicked on a match in the "Find in Files" dialog.
