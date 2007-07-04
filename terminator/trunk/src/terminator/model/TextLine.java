@@ -48,7 +48,7 @@ public class TextLine {
 		return (styles == null) ? StyledText.getDefaultStyle() : styles[index];
 	}
 	
-	public List<StyledText> getStyledTextSegments() {
+	public List<StyledText> getStyledTextSegments(int widthHintInChars) {
 		final int textLength = text.length();
 		if (textLength == 0) {
 			return Collections.emptyList();
@@ -57,12 +57,21 @@ public class TextLine {
 		ArrayList<StyledText> result = new ArrayList<StyledText>();
 		int startIndex = 0;
 		short startStyle = getStyleAt(0);
-		if (styles != null) {
+		boolean haveReasonToChop = (styles != null || string.length() > widthHintInChars);
+		if (haveReasonToChop) {
+			// If the line is very long, it helps the rendering code's manual clipping if we split it into more segments than necessary.
+			// Note: mod of a non-constant is too expensive, so we pay for a single decrement instead.
+			int charsLeftBeforeSplit = widthHintInChars;
 			for (int i = 1; i < textLength; ++i) {
-				if (styles[i] != startStyle) {
+				if ((styles != null && styles[i] != startStyle) || (--charsLeftBeforeSplit == 0)) {
 					result.add(new StyledText(string.substring(startIndex, i), startStyle));
 					startIndex = i;
-					startStyle = styles[i];
+					if (styles != null) {
+						startStyle = styles[i];
+					}
+					if (charsLeftBeforeSplit == 0) {
+						charsLeftBeforeSplit = widthHintInChars;
+					}
 				}
 			}
 		}
@@ -71,11 +80,9 @@ public class TextLine {
 	}
 	
 	/**
-	 * Returns the text of this line with spaces instead of tabs (or,
-	 * indeed, instead of the special representation we use internally).
+	 * Returns the text of this line with spaces instead of tabs (or, indeed, instead of the special representation we use internally).
 	 * 
-	 * This isn't called toString because you need to come here and think
-	 * about whether you want this method of getTabbedString instead.
+	 * This isn't called toString because you need to come here and think about whether you want this method or getTabbedString instead.
 	 */
 	public String getString() {
 		return text.replace(TAB_START, ' ').replace(TAB_CONTINUE, ' ');
