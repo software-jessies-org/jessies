@@ -17,6 +17,7 @@ import terminator.view.highlight.*;
 public class TerminalView extends JComponent implements FocusListener, Scrollable {
 	private static final boolean MAC_OS = GuiUtilities.isMacOs();
 	
+	private static final Stopwatch paintComponentStopwatch = Stopwatch.get("TerminalView.paintComponent");
 	private static final Stopwatch paintStyledTextStopwatch = Stopwatch.get("TerminalView.paintStyledText");
 	
 	private TerminalModel model;
@@ -677,54 +678,59 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	}
 	
 	public void paintComponent(Graphics oldGraphics) {
-		Graphics2D g = (Graphics2D) oldGraphics;
-		
-		Object antiAliasHint = g.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, Options.getSharedInstance().isAntiAliased() ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-		
-		FontMetrics metrics = getFontMetrics(getFont());
-		Dimension charUnitSize = getCharUnitSize();
-		
-		Rectangle rect = g.getClipBounds();
-		g.setColor(getBackground());
-		g.fill(rect);
-		
-		// We manually "clip" for performance, but we're quite loose about it.
-		// This avoids accidental pathological cases (hopefully) and doesn't seem to have any significant cost.
-		final int maxX = rect.x + rect.width;
-		final int widthHintInChars = maxX / charUnitSize.width * 2;
-		
-		Insets insets = getInsets();
-		int firstTextLine = (rect.y - insets.top) / charUnitSize.height;
-		int lastTextLine = (rect.y - insets.top + rect.height + charUnitSize.height - 1) / charUnitSize.height;
-		lastTextLine = Math.min(lastTextLine, model.getLineCount() - 1);
-		int lineNotToDraw = model.usingAlternateBuffer() ? model.getFirstDisplayLine() - 1 : -1;
-		for (int i = firstTextLine; i <= lastTextLine; i++) {
-			if (i == lineNotToDraw) {
-				continue;
-			}
-			boolean drawCursor = (shouldShowCursor() && i == cursorPosition.getLineIndex());
-			int x = insets.left;
-			int baseline = insets.top + charUnitSize.height * (i + 1) - metrics.getMaxDescent();
-			int startOffset = 0;
-			Iterator<StyledText> it = getLineStyledText(i, widthHintInChars).iterator();
-			while (it.hasNext() && x < maxX) {
-				StyledText chunk = it.next();
-				x += paintStyledText(g, metrics, chunk, x, baseline);
-				String chunkText = chunk.getText();
-				if (drawCursor && cursorPosition.charOffsetInRange(startOffset, startOffset + chunkText.length())) {
-					final int charOffsetUnderCursor = cursorPosition.getCharOffset() - startOffset;
-					paintCursor(g, metrics, chunkText.substring(charOffsetUnderCursor, charOffsetUnderCursor + 1), baseline);
-					drawCursor = false;
+		Stopwatch.Timer timer = paintComponentStopwatch.start();
+		try {
+			Graphics2D g = (Graphics2D) oldGraphics;
+			
+			Object antiAliasHint = g.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, Options.getSharedInstance().isAntiAliased() ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+			
+			FontMetrics metrics = getFontMetrics(getFont());
+			Dimension charUnitSize = getCharUnitSize();
+			
+			Rectangle rect = g.getClipBounds();
+			g.setColor(getBackground());
+			g.fill(rect);
+			
+			// We manually "clip" for performance, but we're quite loose about it.
+			// This avoids accidental pathological cases (hopefully) and doesn't seem to have any significant cost.
+			final int maxX = rect.x + rect.width;
+			final int widthHintInChars = maxX / charUnitSize.width * 2;
+			
+			Insets insets = getInsets();
+			int firstTextLine = (rect.y - insets.top) / charUnitSize.height;
+			int lastTextLine = (rect.y - insets.top + rect.height + charUnitSize.height - 1) / charUnitSize.height;
+			lastTextLine = Math.min(lastTextLine, model.getLineCount() - 1);
+			int lineNotToDraw = model.usingAlternateBuffer() ? model.getFirstDisplayLine() - 1 : -1;
+			for (int i = firstTextLine; i <= lastTextLine; i++) {
+				if (i == lineNotToDraw) {
+					continue;
 				}
-				startOffset += chunkText.length();
+				boolean drawCursor = (shouldShowCursor() && i == cursorPosition.getLineIndex());
+				int x = insets.left;
+				int baseline = insets.top + charUnitSize.height * (i + 1) - metrics.getMaxDescent();
+				int startOffset = 0;
+				Iterator<StyledText> it = getLineStyledText(i, widthHintInChars).iterator();
+				while (it.hasNext() && x < maxX) {
+					StyledText chunk = it.next();
+					x += paintStyledText(g, metrics, chunk, x, baseline);
+					String chunkText = chunk.getText();
+					if (drawCursor && cursorPosition.charOffsetInRange(startOffset, startOffset + chunkText.length())) {
+						final int charOffsetUnderCursor = cursorPosition.getCharOffset() - startOffset;
+						paintCursor(g, metrics, chunkText.substring(charOffsetUnderCursor, charOffsetUnderCursor + 1), baseline);
+						drawCursor = false;
+					}
+					startOffset += chunkText.length();
+				}
+				if (drawCursor) {
+					// A cursor at the end of the line is in a position past the end of the text.
+					paintCursor(g, metrics, "", baseline);
+				}
 			}
-			if (drawCursor) {
-				// A cursor at the end of the line is in a position past the end of the text.
-				paintCursor(g, metrics, "", baseline);
-			}
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasHint);
+		} finally {
+			timer.stop();
 		}
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasHint);
 	}
 	
 	private List<StyledText> getLineStyledText(int line, int widthHintInChars) {
