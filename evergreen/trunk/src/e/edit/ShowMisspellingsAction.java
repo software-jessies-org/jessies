@@ -20,6 +20,12 @@ public class ShowMisspellingsAction extends PTextAction {
     public void performOn(final PTextArea textArea) {
         String content = textArea.getText();
         Object[] misspelledWords = textArea.getSpellingChecker().listMisspellings().toArray();
+        
+        if (misspelledWords.length == 0) {
+            Evergreen.getInstance().showAlert("No misspellings", "There are no misspellings in the selected window.");
+            return;
+        }
+        
         String[] listItems = new String[misspelledWords.length];
         for (int i = 0; i < listItems.length; ++i) {
             String word = (String) misspelledWords[i];
