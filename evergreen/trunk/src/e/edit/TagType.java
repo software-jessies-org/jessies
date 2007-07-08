@@ -50,7 +50,7 @@ public enum TagType {
     UNION("union", TagShapes.CIRCLE, false, "union %s"),
     VARIABLE("variable", TagShapes.TRIANGLE, false, "%s"),
     
-    UNKNOWN("unknown", null, false, null),
+    UNKNOWN("unknown", null, false, "%s"),
     ;
     
     private final String name;
