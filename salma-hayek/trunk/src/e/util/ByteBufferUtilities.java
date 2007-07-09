@@ -15,9 +15,16 @@ public final class ByteBufferUtilities {
             FileInputStream fileInputStream = new FileInputStream(file);
             ByteBuffer byteBuffer = null;
             
-            // FIXME: we should measure where the best cut-off point is. Maybe always map and fall back to reading?
             int byteCount = (int) file.length();
-            if (byteCount <= 4096) {
+            
+            // Always read the whole file in rather than using memory mapping.
+            // Windows' file system semantics also mean that there's a period after a search finishes but before the buffer is actually unmapped where you can't write to the file (see Sun bug 6359560).
+            // Being unable to manually unmap causes no functional problems but hurts performance on Unix (see Sun bug 4724038).
+            // Testing in C (working on Ctags) shows that for typical source files (Linux 2.6.17 and JDK6), the performance benefit of mmap(2) is small anyway.
+            // Evergreen actually searches both of those source trees faster with readFully than with map.
+            // At the moment, then, there's no obvious situation where we should map the file.
+            final boolean shouldRead = true;
+            if (shouldRead) {
                 // Read the whole file in.
                 dataInputStream = new DataInputStream(fileInputStream);
                 byteBuffer = ByteBuffer.wrap(new byte[byteCount]);
