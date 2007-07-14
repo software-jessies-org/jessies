@@ -109,7 +109,7 @@ public class JavaHpp {
             } else {
                 out.println("return " + proxyMethodCall + ";");
             }
-            out.println("} catch (std::exception& ex) {");
+            out.println("} catch (const std::exception& ex) {");
             out.println("translateToJavaException(env, \"" + chooseExceptionClassName(method) + "\", ex);");
             if (method.getReturnType() != Void.TYPE) {
                 out.println("return " + jniTypeNameFor(method.getReturnType()) + "();");
