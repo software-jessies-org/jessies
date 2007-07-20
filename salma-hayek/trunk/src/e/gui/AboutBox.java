@@ -250,9 +250,9 @@ public class AboutBox {
             return;
         }
         
-        String frameIconFilename = System.getProperty("org.jessies.frameIcon");
-        if (frameIconFilename != null) {
-            setImage(frameIconFilename);
+        String aboutBoxIconFilename = System.getProperty("org.jessies.aboutBoxIcon");
+        if (aboutBoxIconFilename != null) {
+            setImage(aboutBoxIconFilename);
         }
     }
     

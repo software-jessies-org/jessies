@@ -103,6 +103,7 @@ class Java
     @dock_name = name
     @dock_icon = ""
     @png_icon = ""
+    @frame_icon = ""
     @class_name = class_name
     @log_filename = ""
     @initiate_startup_notification = true
@@ -221,13 +222,22 @@ class Java
   def set_icons(name)
     # FIXME: Is this really human_project_name?
     dock_icon = "#{@project_root}/lib/#{name}.icns"
-    if Pathname.new(dock_icon).exist?
+    if File.exist?(dock_icon)
       @dock_icon = dock_icon
     end
     # FIXME: Is this really machine_project_name?
     png_icon = "#{@project_root}/lib/#{name.downcase()}-128.png"
-    if Pathname.new(png_icon).exist?
+    if File.exist?(png_icon)
       @png_icon = png_icon
+    end
+    
+    frame_icon = "#{@project_root}/lib/#{name.downcase()}-32.png"
+    if File.exist?(frame_icon)
+      # We have a special small icon for title bar use, so use it.
+      @frame_icon = frame_icon
+    else
+      # Let the system scale down the big about box icon.
+      @frame_icon = @png_icon
     end
   end
   
@@ -330,7 +340,7 @@ class Java
     
     # Since we're often started from the command line or from other programs, set up startup notification ourselves if it looks like we should.
     if @initiate_startup_notification && ENV['DISPLAY'] != nil && ENV['DESKTOP_STARTUP_ID'] == nil && target_os() == "Linux"
-      id=`gnome-startup start #{@png_icon} Starting #{@dock_name}`.chomp()
+      id=`gnome-startup start #{@frame_icon} Starting #{@dock_name}`.chomp()
       ENV['DESKTOP_STARTUP_ID'] = id
     end
     
@@ -370,7 +380,8 @@ class Java
     #args << "-Xrunjdwp:transport=dt_socket,server=y,suspend=n"
     #args << "-Xrunhprof:file=dump.hprof,format=b"
 
-    add_pathname_property("org.jessies.frameIcon", @png_icon)
+    add_pathname_property("org.jessies.aboutBoxIcon", @png_icon)
+    add_pathname_property("org.jessies.frameIcon", @frame_icon)
     
     # Work around Sun bug 6274341.
     add_property("java.awt.Window.locationByPlatform", "true")
