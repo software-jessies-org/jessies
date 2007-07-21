@@ -269,7 +269,7 @@ class Java
       jdk_root = find_jdk_root()
       if jdk_root != nil
         tools_jar = "#{jdk_root}/lib/tools.jar"
-        if Pathname.new(tools_jar).exist?()
+        if File.exist?(tools_jar)
           @class_path << tools_jar
         end
       end
