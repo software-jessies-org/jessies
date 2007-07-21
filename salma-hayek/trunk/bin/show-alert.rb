@@ -16,6 +16,13 @@ else
         elsif target_os() == "Linux"
             text = "#{title}\n\n#{message}"
             reported_okay = false
+            
+            # Pango will fail to parse something like "undefined local variable or method `logging' for #<Java:0xb7c827bc>":
+            # (zenity:31203): Gtk-WARNING **: Failed to set text from markup due to error parsing markup: Unknown tag 'Java:0xb7c827bc' on line 6 char 1
+            # HTML-escaping the #<> part seems to fix it.
+            require "cgi"
+            text = CGI.escapeHTML(text)
+            
             # FIXME: this assumes that a KDE user doesn't have the GNOME zenity(1) installed. Which is probably true.
             if File.exist?("/usr/bin/zenity")
                 command = [ "zenity" ]
