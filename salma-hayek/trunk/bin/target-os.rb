@@ -5,7 +5,7 @@ require "singleton.rb"
 class OsExaminer
     include Singleton
     
-    def initialize
+    def initialize()
         require "rbconfig.rb"
         # Avoid calling the console-subsystem uname(1) program on Cygwin.
         # (Calling a console subsystem program from a desktop shortcut causes a console window to appear briefly.)
@@ -21,14 +21,25 @@ class OsExaminer
             @os_name = `uname`.chomp()
             @arch = `arch`.chomp()
         end
+        if target_os == "Darwin"
+            @arch = "universal"
+        else
+            # http://alioth.debian.org/docman/view.php/30192/21/debian-amd64-howto.html#id250846 says amd64 is to i386 as x86_64 is to x86.
+            @arch = @arch.sub(/i[456]86/, "i386").sub(/x86_64/, "amd64")
+        end
+        @target_directory = "#{@arch}_#{@os_name}"
     end
     
-    def os_name
+    def os_name()
         return @os_name
     end
     
-    def arch
+    def arch()
         return @arch
+    end
+    
+    def target_directory()
+        return @target_directory
     end
 end
 
@@ -38,15 +49,11 @@ def target_os()
 end
 
 def target_architecture()
-    if target_os() == "Darwin"
-        return "universal"
-    end
-    # http://alioth.debian.org/docman/view.php/30192/21/debian-amd64-howto.html#id250846 says AMD64 is to i386 as x86_64 is to x86.
-    return OsExaminer.instance().arch().sub(/i[456]86/, "i386").sub(/x86_64/, "amd64")
+    return OsExaminer.instance().arch()
 end
 
 def target_directory()
-    return "#{target_architecture()}_#{target_os()}"
+    return OsExaminer.instance().target_directory()
 end
 
 if __FILE__ == $0
