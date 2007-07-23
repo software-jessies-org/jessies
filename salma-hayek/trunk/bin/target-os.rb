@@ -10,18 +10,18 @@ class OsExaminer
         # Avoid calling the console-subsystem uname(1) program on Cygwin.
         # (Calling a console subsystem program from a desktop shortcut causes a console window to appear briefly.)
         # We've also seen Cygwin's uname report both "CYGWIN_NT-5.0" and "CYGWIN_NT-5.1".
-        target_os = Config::CONFIG["target_os"]
-        if target_os == "cygwin"
+        ruby_os_name = Config::CONFIG["target_os"]
+        if ruby_os_name == "cygwin"
             @os_name = "Cygwin"
             @arch = "i386"
-        elsif target_os == "mswin32"
+        elsif ruby_os_name == "mswin32"
             @os_name = "Windows"
             @arch = "i386"
         else
             @os_name = `uname`.chomp()
             @arch = `arch`.chomp()
         end
-        if target_os == "Darwin"
+        if os_name == "Darwin"
             @arch = "universal"
         else
             # http://alioth.debian.org/docman/view.php/30192/21/debian-amd64-howto.html#id250846 says amd64 is to i386 as x86_64 is to x86.
