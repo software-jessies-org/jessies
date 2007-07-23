@@ -59,5 +59,28 @@ public class ComponentUtilities {
         scrollBar.setValue(newValue);
     }
     
+    /**
+     * Ensures that all buttons are the same size, and that the chosen size is sufficient to contain the content of any.
+     * Most look and feels 
+     */
+    public static void tieButtonSizes(JButton... buttons) {
+        int maxWidth = 0;
+        int maxHeight = 0;
+        for (JButton button : buttons) {
+            Dimension buttonSize = button.getPreferredSize();
+            maxWidth = (int) Math.max(buttonSize.getWidth(), maxWidth);
+            maxHeight = (int) Math.max(buttonSize.getHeight(), maxHeight);
+        }
+        Dimension maxButtonSize = new Dimension(maxWidth, maxHeight);
+        System.err.println(maxButtonSize);
+        for (JButton button : buttons) {
+            // Seemingly, to get the GTK+ LAF to behave when there are buttons with and without icons, we need to set every size.
+            button.setPreferredSize(maxButtonSize);
+            button.setMinimumSize(maxButtonSize);
+            button.setMaximumSize(maxButtonSize);
+            button.setSize(maxButtonSize);
+        }
+    }
+    
     private ComponentUtilities() { /* Not instantiable. */ }
 }
