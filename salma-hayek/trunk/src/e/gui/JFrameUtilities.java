@@ -22,6 +22,8 @@ public class JFrameUtilities {
         }
     }
     
+    private static final KeyStroke ESC = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
+    
     public static void setFrameIcon(JFrame frame) {
         frame.setIconImage(FRAME_ICON);
     }
@@ -115,6 +117,8 @@ public class JFrameUtilities {
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
+        // Most systems let you close a dialog with Esc.
+        closeOnEsc(frame);
         // Mac OS uses command-W to close a window using the keyboard. Unlike Linux and Windows' alt-f4, though, this isn't done by the window manager.
         if (GuiUtilities.isMacOs()) {
             KeyStroke commandW = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_MASK, false);
@@ -133,10 +137,22 @@ public class JFrameUtilities {
         }
     };
     
+    public static void closeOnEsc(JDialog dialog) {
+        closeOnKeyStroke(dialog.getRootPane(), ESC);
+    }
+    
+    public static void closeOnEsc(JFrame frame) {
+        closeOnKeyStroke(frame.getRootPane(), ESC);
+    }
+    
     public static void closeOnKeyStroke(JFrame frame, KeyStroke keyStroke) {
+        closeOnKeyStroke(frame.getRootPane(), keyStroke);
+    }
+    
+    private static void closeOnKeyStroke(JRootPane rootPane, KeyStroke keyStroke) {
         final String CLOSE_ACTION_NAME = "e.gui.JFrameUtilities.CloseFrameOnKeyStroke";
-        frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, CLOSE_ACTION_NAME);
-        frame.getRootPane().getActionMap().put(CLOSE_ACTION_NAME, CLOSE_ACTION);
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, CLOSE_ACTION_NAME);
+        rootPane.getActionMap().put(CLOSE_ACTION_NAME, CLOSE_ACTION);
     }
     
     private JFrameUtilities() {
