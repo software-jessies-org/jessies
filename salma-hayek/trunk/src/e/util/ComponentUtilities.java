@@ -72,7 +72,6 @@ public class ComponentUtilities {
             maxHeight = (int) Math.max(buttonSize.getHeight(), maxHeight);
         }
         Dimension maxButtonSize = new Dimension(maxWidth, maxHeight);
-        System.err.println(maxButtonSize);
         for (JButton button : buttons) {
             // Seemingly, to get the GTK+ LAF to behave when there are buttons with and without icons, we need to set every size.
             button.setPreferredSize(maxButtonSize);
