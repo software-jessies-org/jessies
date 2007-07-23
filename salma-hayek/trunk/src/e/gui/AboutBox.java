@@ -181,6 +181,16 @@ public class AboutBox {
         
         // And finally, for the GTK LAF, buttons...
         if (GuiUtilities.isGtk()) {
+            JButton creditsButton = new JButton("Credits");
+            GnomeStockIcon.configureButton(creditsButton);
+            creditsButton.setEnabled(false);
+            creditsButton.setMnemonic(KeyEvent.VK_R);
+            
+            JButton licenseButton = new JButton("License");
+            GnomeStockIcon.configureButton(licenseButton);
+            licenseButton.setEnabled(false);
+            licenseButton.setMnemonic(KeyEvent.VK_L);
+            
             JButton closeButton = new JButton("Close");
             GnomeStockIcon.configureButton(closeButton);
             closeButton.addActionListener(new ActionListener() {
@@ -188,14 +198,16 @@ public class AboutBox {
                     dialog.setVisible(false);
                 }
             });
-            JButton creditsButton = new JButton("Credits");
-            GnomeStockIcon.configureButton(creditsButton);
-            creditsButton.setEnabled(false);
-            creditsButton.setMnemonic(KeyEvent.VK_R);
             
-            JPanel buttonPanel = new JPanel(new BorderLayout());
-            buttonPanel.add(creditsButton, BorderLayout.WEST);
-            buttonPanel.add(closeButton, BorderLayout.EAST);
+            ComponentUtilities.tieButtonSizes(creditsButton, licenseButton, closeButton);
+            
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+            buttonPanel.add(creditsButton);
+            buttonPanel.add(Box.createHorizontalGlue());
+            buttonPanel.add(licenseButton);
+            buttonPanel.add(Box.createHorizontalGlue());
+            buttonPanel.add(closeButton);
             
             panel.add(Box.createRigidArea(spacerSize));
             panel.add(buttonPanel);
