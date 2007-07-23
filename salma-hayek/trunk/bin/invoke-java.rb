@@ -88,6 +88,7 @@ end
 class Java
   attr_accessor(:log_filename)
   attr_accessor(:initiate_startup_notification)
+  attr_accessor(:class_name)
   
   #
   # Command-line tools are probably best off with this trivial interface.
