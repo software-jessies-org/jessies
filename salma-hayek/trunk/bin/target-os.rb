@@ -21,7 +21,7 @@ class OsExaminer
             @os_name = `uname`.chomp()
             @arch = `arch`.chomp()
         end
-        if os_name == "Darwin"
+        if @os_name == "Darwin"
             @arch = "universal"
         else
             # http://alioth.debian.org/docman/view.php/30192/21/debian-amd64-howto.html#id250846 says amd64 is to i386 as x86_64 is to x86.
