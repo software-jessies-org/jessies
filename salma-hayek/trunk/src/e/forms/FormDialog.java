@@ -466,27 +466,13 @@ public class FormDialog {
             cancelButton = new JButton("Cancel");
             cancelButton.addActionListener(closeAction);
             GnomeStockIcon.configureButton(cancelButton);
-            tieButtonSizes(actionButton, cancelButton);
+            ComponentUtilities.tieButtonSizes(actionButton, cancelButton);
         }
         
         if (extraButton != null) {
             GnomeStockIcon.configureButton(extraButton);
         }
         return makeButtonPanel(actionButton, cancelButton, statusBar);
-    }
-    
-    /**
-     * Ensures that both buttons are the same size, and that the chosen size
-     * is sufficient to contain the content of either.
-     */
-    private void tieButtonSizes(JButton actionButton, JButton cancelButton) {
-        Dimension cancelSize = cancelButton.getPreferredSize();
-        Dimension actionSize = actionButton.getPreferredSize();
-        final int width = (int) Math.max(actionSize.getWidth(), cancelSize.getWidth());
-        final int height = (int) Math.max(actionSize.getHeight(), cancelSize.getHeight());
-        Dimension buttonSize = new Dimension(width, height);
-        actionButton.setPreferredSize(buttonSize);
-        cancelButton.setPreferredSize(buttonSize);
     }
     
     private JPanel makeButtonPanel(JButton actionButton, JButton cancelButton, JComponent statusBar) {
