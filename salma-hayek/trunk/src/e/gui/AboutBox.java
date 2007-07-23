@@ -1,6 +1,7 @@
 package e.gui;
 
 import com.apple.eawt.*;
+import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -106,6 +107,7 @@ public class AboutBox {
         JDialog dialog = new JDialog(findSuitableOwner());
         makeUi(dialog);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        JFrameUtilities.closeOnEsc(dialog);
         dialog.setVisible(true);
     }
     
@@ -188,12 +190,10 @@ public class AboutBox {
             
             JButton licenseButton = new JButton("License");
             GnomeStockIcon.configureButton(licenseButton);
-            licenseButton.setEnabled(false);
             licenseButton.setMnemonic(KeyEvent.VK_L);
+            licenseButton.addActionListener(new ShowLicenseActionListener());
             
-            JButton closeButton = new JButton("Close");
-            GnomeStockIcon.configureButton(closeButton);
-            closeButton.addActionListener(new ActionListener() {
+            JButton closeButton = makeCloseButton(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     dialog.setVisible(false);
                 }
@@ -308,6 +308,49 @@ public class AboutBox {
         String systemDetails = Log.getSystemDetailsForBugReport();
         String subject = applicationName + " bug (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
         return StringUtilities.urlEncode(subject).replaceAll("\\+", "%20");
+    }
+    
+    private JButton makeCloseButton(ActionListener actionListener) {
+        JButton closeButton = new JButton("Close");
+        GnomeStockIcon.configureButton(closeButton);
+        closeButton.addActionListener(actionListener);
+        return closeButton;
+    }
+    
+    private class ShowLicenseActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            final JPanel panel = new JPanel(new BorderLayout());
+            panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+            
+            PTextArea textArea = new PTextArea(13, 40);
+            textArea.setEditable(false);
+            textArea.setText(applicationName + " is free software: you can redistribute it and/or modify\n" +
+                "it under the terms of the GNU General Public License as published by\n" +
+                "the Free Software Foundation; either version 2 of the License, or\n" +
+                "(at your option) any later version.\n" +
+                "\n" +
+                applicationName + " is distributed in the hope that it will be useful,\n" +
+                "but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+                "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" +
+                "GNU General Public License for more details.\n" +
+                "\n"+
+                "You should have received a copy of the GNU General Public License\n" +
+                "along with " + applicationName + "; If not, see <http://www.gnu.org/licenses/>.\n");
+            textArea.setWrapStyleWord(true);
+            
+            JButton closeButton = makeCloseButton(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    Frame owner = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, panel);
+                    owner.setVisible(false);
+                }
+            });
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 10));
+            buttonPanel.add(closeButton);
+            
+            panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+            JFrameUtilities.makeSimpleWindow("License", panel).setVisible(true);
+        }
     }
     
     public static void main(String[] args) {
