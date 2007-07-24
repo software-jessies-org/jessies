@@ -3,18 +3,16 @@ package e.util;
 import java.util.regex.*;
 
 public final class PatternUtilities {
-    public static final String DOCUMENTATION_URL = "http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html";
+    public static final String DOCUMENTATION_URL = "http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html";
     
     /**
-     * Compiles the given regular expression into a Pattern that may or may
-     * not be case-sensitive, depending on the regular expression. If the
-     * regular expression contains any capital letter, that is assumed to be
-     * meaningful, and the resulting Pattern is case-sensitive. If the whole
-     * regular expression is lower-case, the resulting Pattern is
-     * case-insensitive.
+     * Compiles the given regular expression into a Pattern that may or may not be case-sensitive, depending on the regular expression.
+     * If the regular expression contains any capital letter, that is assumed to be meaningful, and the resulting Pattern is case-sensitive.
+     * If the whole regular expression is lower-case, the resulting Pattern is case-insensitive.
      * 
-     * This is useful for implementing functionality like emacs/vim's "smart
-     * case", hence the name.
+     * This is useful for implementing functionality like emacs/vim's "smart case", hence the name.
+     * 
+     * By default, we enable (?m) on the assumption that it's more useful if ^ and $ match the start and end of each line rather than just the start and end of input.
      */
     public static Pattern smartCaseCompile(String regularExpression) {
         boolean caseInsensitive = true;
@@ -23,7 +21,11 @@ public final class PatternUtilities {
                 caseInsensitive = false;
             }
         }
-        return Pattern.compile(regularExpression, caseInsensitive ? Pattern.CASE_INSENSITIVE : 0);
+        int flags = Pattern.MULTILINE;
+        if (caseInsensitive) {
+            flags |= Pattern.CASE_INSENSITIVE;
+        }
+        return Pattern.compile(regularExpression, flags);
     }
     
     /**
