@@ -26,7 +26,7 @@ import e.util.*;
 // TODO: handle files other than .class files.
 //
 
-public class JarExplorer extends JFrame {
+public class JarExplorer extends MainFrame {
     private JCheckBox showLineNumberAndLocalVariableTables;
     private JCheckBox showVerboseDetail;
     private JList list;
@@ -48,10 +48,7 @@ public class JarExplorer extends JFrame {
         }
 
         setContentPane(makeUi());
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
     }
 
     private void initFromJarFile() throws IOException {
@@ -180,13 +177,14 @@ public class JarExplorer extends JFrame {
         return list.toArray(new String[list.size()]);
     }
 
-    public static void main(String[] filenames) {
-        for (final String filename : filenames) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    new JarExplorer(filename);
+    public static void main(final String[] filenames) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                GuiUtilities.initLookAndFeel();
+                for (final String filename : filenames) {
+                    new JarExplorer(filename).setVisible(true);
                 }
-            });
-        }
+            }
+        });
     }
 }

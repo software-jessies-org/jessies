@@ -1,28 +1,27 @@
 package e.tools;
 
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
-import e.util.*;
 
 /**
  * A stand-alone program to render an HTML file in a window. This is sometimes
  * a convenient thing to have, less overkill than IE or Mozilla, and less
  * round-about than mailing it to yourself to view in Outlook.
  */
-public class HtmlViewer extends JFrame {
+public class HtmlViewer extends MainFrame {
     private JTextPane textPane;
     
     public HtmlViewer(String text) {
         Log.setApplicationName("HtmlViewer");
         initTextPane();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setText(text);
         setTitle("HTML Viewer");
         getContentPane().add(new JScrollPane(textPane));
         setSize(new Dimension(640, 480));
-        setLocationRelativeTo(null);
     }
     
     public void initTextPane() {
@@ -60,8 +59,7 @@ public class HtmlViewer extends JFrame {
         GuiUtilities.initLookAndFeel();
         for (String argument : arguments) {
             String text = StringUtilities.readFile(argument);
-            HtmlViewer htmlViewer = new HtmlViewer(text);
-            htmlViewer.setVisible(true);
+            new HtmlViewer(text).setVisible(true);
         }
     }
 }

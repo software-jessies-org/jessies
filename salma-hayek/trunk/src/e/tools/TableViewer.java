@@ -1,28 +1,26 @@
 package e.tools;
 
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import e.gui.*;
-import e.util.*;
 
 /**
  * A stand-alone program to render a table in a window. This is sometimes
  * a convenient thing to have, and something no other tool I know of really
  * helps with.
  */
-public class TableViewer extends JFrame {
+public class TableViewer extends MainFrame {
     private JTable table;
     
     public TableViewer(String filename) throws IOException {
+        super("Table Viewer");
         Log.setApplicationName("TableViewer");
         initTable(filename);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Table Viewer");
         getContentPane().add(new JScrollPane(table));
         setSize(new Dimension(640, 480));
-        setLocationRelativeTo(null);
     }
     
     public void initTable(String filename) throws IOException {
@@ -75,8 +73,7 @@ public class TableViewer extends JFrame {
     public static void main(String[] arguments) throws Exception {
         GuiUtilities.initLookAndFeel();
         for (String argument : arguments) {
-            TableViewer tableViewer = new TableViewer(argument);
-            tableViewer.setVisible(true);
+            new TableViewer(argument).setVisible(true);
         }
     }
 }

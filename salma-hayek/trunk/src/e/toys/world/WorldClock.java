@@ -1,5 +1,6 @@
 package e.toys.world;
 
+import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
@@ -17,7 +18,7 @@ import javax.swing.*;
  * link to CIA world factbook.
  * show times, or remove "Clock" from the name?
  */
-public class WorldClock extends JFrame implements LocationListener {
+public class WorldClock extends MainFrame implements LocationListener {
     private static final DateFormat LOCAL = makeDateFormat();
     private static final DateFormat GB = makeDateFormat();
     static {
@@ -37,9 +38,6 @@ public class WorldClock extends JFrame implements LocationListener {
         super("World Clock");
         setContentPane(makeContentPane());
         pack();
-        centerFrameOnScreen();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
     }
     
     public void locationChanged(double latitude, double longitude) {
@@ -78,13 +76,6 @@ public class WorldClock extends JFrame implements LocationListener {
         return result;
     }
     
-    private void centerFrameOnScreen() {
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        final int x = (screen.width - getWidth()) / 2;
-        final int y = (screen.height - getHeight()) / 2;
-        setLocation(new Point(x, y));
-    }
-
     private JComponent makeControls() {
         JPanel controls = new JPanel(new BorderLayout());
         
@@ -117,6 +108,6 @@ public class WorldClock extends JFrame implements LocationListener {
     }
 
     public static void main(String[] args) {
-        new WorldClock();
+        new WorldClock().setVisible(true);
     }
 }

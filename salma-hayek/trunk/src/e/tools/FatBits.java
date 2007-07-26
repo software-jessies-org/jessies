@@ -19,7 +19,7 @@ import javax.swing.Timer;
  * useful for checking layout, graphics, and colors in your own programs and
  * those of others.
  */
-public class FatBits extends JFrame {
+public class FatBits extends MainFrame {
     private Robot robot;
     private RepeatingComponentTimer timer;
     private ScaledImagePanel scaledImagePanel;
@@ -38,7 +38,6 @@ public class FatBits extends JFrame {
     
     public FatBits() {
         super("FatBits");
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         try {
             robot = new Robot();
         } catch (AWTException ex) {
@@ -421,7 +420,7 @@ public class FatBits extends JFrame {
         }
         
         public void actionPerformed(ActionEvent e) {
-            System.exit(0); // FIXME
+            setVisible(false);
         }
     }
     
@@ -468,9 +467,7 @@ public class FatBits extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 GuiUtilities.initLookAndFeel();
-                FatBits fatBits = new FatBits();
-                fatBits.setVisible(true);
-                GuiUtilities.finishGnomeStartup();
+                new FatBits().setVisible(true);
             }
         });
     }
