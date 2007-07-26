@@ -201,7 +201,7 @@ public class JAsynchronousProgressIndicator extends JComponent {
     
     public static void main(String[] args) {
         // FIXME: we could auto-generate this kind of code via reflection.
-        JFrame f = new JFrame("JAsynchronousProgressIndicator test");
+        MainFrame f = new MainFrame("JAsynchronousProgressIndicator test");
         
         final JAsynchronousProgressIndicator asynchronousProgressIndicator = new JAsynchronousProgressIndicator();
         

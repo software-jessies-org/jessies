@@ -1,5 +1,6 @@
 package e.tools;
 
+import e.gui.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -230,9 +231,8 @@ public class JavaWidgetFactory extends JPanel {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 e.util.GuiUtilities.initLookAndFeel();
-                JFrame frame = new JFrame("Java Widget Factory");
+                MainFrame frame = new MainFrame("Java Widget Factory");
                 frame.setContentPane(new JavaWidgetFactory());
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 frame.pack();
                 frame.setVisible(true);
             }

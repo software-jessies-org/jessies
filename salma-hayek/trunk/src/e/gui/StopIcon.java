@@ -63,14 +63,13 @@ public class StopIcon extends DrawnIcon {
     }
     
     public static void main(String[] arguments) {
-        JFrame frame = new JFrame();
+        MainFrame frame = new MainFrame();
         frame.setLayout(new FlowLayout());
         frame.add(new JLabel(StopIcon.NORMAL));
         frame.add(new JLabel(StopIcon.PRESSED));
         frame.add(new JLabel(StopIcon.ROLLOVER));
         frame.add(makeStopButton());
         frame.pack();
-        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 }

@@ -335,7 +335,7 @@ public class DebugMenu {
                 }
             });
             
-            JFrame frame = showFrameWithButtonPanel("Key Event Tester", makeButtonPanel(clearButton, Box.createHorizontalStrut(10), textField), new JScrollPane(textArea), new Dimension(700, 400));
+            showFrameWithButtonPanel("Key Event Tester", makeButtonPanel(clearButton, Box.createHorizontalStrut(10), textField), new JScrollPane(textArea), new Dimension(700, 400));
             textField.requestFocusInWindow();
         }
     }
@@ -345,12 +345,9 @@ public class DebugMenu {
         ui.add(buttonPanel, BorderLayout.NORTH);
         ui.add(content, BorderLayout.CENTER);
         
-        JFrame frame = new JFrame(title);
-        JFrameUtilities.setFrameIcon(frame);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        JFrame frame = new MainFrame(title);
         frame.setContentPane(ui);
         frame.setSize(size);
-        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         return frame;
     }

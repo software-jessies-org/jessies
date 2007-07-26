@@ -1,5 +1,6 @@
 package e.tools;
 
+import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.geom.*;
@@ -11,7 +12,7 @@ import java.util.regex.*;
 import javax.imageio.*;
 import javax.swing.*;
 
-public class WeatherWindow extends JFrame {
+public class WeatherWindow extends MainFrame {
     private static final Color BACKGROUND_COLOR = new Color(0.3647f, 0.6941f, 0.8863f);
     private static final Font DAY_FONT = new Font("SansSerif", Font.BOLD, 12);
     private static final Font TEMPERATURE_FONT = new Font("SansSerif", Font.PLAIN, 10);
@@ -24,7 +25,6 @@ public class WeatherWindow extends JFrame {
         super("Weather");
         setBackground(BACKGROUND_COLOR);
         setContentPane(makeUi());
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         pack();
     }
     

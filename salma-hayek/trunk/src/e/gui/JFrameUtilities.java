@@ -111,11 +111,9 @@ public class JFrameUtilities {
     }
     
     public static JFrame makeSimpleWindow(String title, JComponent content) {
-        JFrame frame = new JFrame(title);
-        setFrameIcon(frame);
+        MainFrame frame = new MainFrame(title);
         frame.setContentPane(content);
         frame.pack();
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         // Most systems let you close a dialog with Esc.
         closeOnEsc(frame);

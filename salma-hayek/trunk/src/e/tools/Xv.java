@@ -1,5 +1,6 @@
 package e.tools;
 
+import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.image.*;
@@ -7,12 +8,10 @@ import java.io.*;
 import javax.imageio.*;
 import javax.swing.*;
 
-public class Xv extends JFrame {
+public class Xv extends MainFrame {
     
     public Xv(String filename) throws IOException {
         super(filename);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
         fillWithContent(filename);
         setVisible(true);
     }
@@ -49,7 +48,6 @@ public class Xv extends JFrame {
     
     public static void main(String[] arguments) throws IOException {
         GuiUtilities.initLookAndFeel();
-        GuiUtilities.finishGnomeStartup();
         for (String argument : arguments) {
             Xv xv = new Xv(argument);
         }

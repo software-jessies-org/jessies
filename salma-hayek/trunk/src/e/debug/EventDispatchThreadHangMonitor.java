@@ -1,5 +1,6 @@
 package e.debug;
 
+import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -281,9 +282,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             java.awt.EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     for (String arg : args) {
-                        final JFrame frame = new JFrame();
-                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                        frame.setLocationRelativeTo(null);
+                        final MainFrame frame = new MainFrame();
                         if (arg.equals("exception")) {
                             runExceptionTest(frame);
                         } else if (arg.equals("focus")) {
