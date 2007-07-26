@@ -345,23 +345,32 @@ DIST_SUBDIRECTORY.msi = windows
 DIST_SUBDIRECTORY.pkg = sunos
 DIST_SUBDIRECTORY.rpm = redhat
 
+REVISION_CONTROL_SYSTEM_DIRECTORIES += .hg
+REVISION_CONTROL_SYSTEM_DIRECTORIES += .svn
+REVISION_CONTROL_SYSTEM_DIRECTORIES += CVS
+REVISION_CONTROL_SYSTEM_DIRECTORIES += SCCS
+
+REVISION_CONTROL_SYSTEM_.hg = hg
+REVISION_CONTROL_SYSTEM_.svn = svn
+REVISION_CONTROL_SYSTEM_CVS = cvs
+REVISION_CONTROL_SYSTEM_SCCS = bk
+
+REVISION_CONTROL_SYSTEM_DIRECTORY := $(firstword $(wildcard $(REVISION_CONTROL_SYSTEM_DIRECTORIES)))
+REVISION_CONTROL_SYSTEM = $(if $(REVISION_CONTROL_SYSTEM_DIRECTORY),$(REVISION_CONTROL_SYSTEM_$(REVISION_CONTROL_SYSTEM_DIRECTORY)),unknown)
+
+FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY = $(if $(REVISION_CONTROL_SYSTEM_DIRECTORY),-name $(REVISION_CONTROL_SYSTEM_DIRECTORY) -prune -o)
+
 $(takeProfileSample)
 # Can we really imagine a project without src/?  I'm wondering whether the wildcard is necessary.
 WILDCARD.src := $(wildcard src)
 WILDCARD.classes := $(wildcard .generated/classes)
 JAVA_SOURCE_FILES := $(if $(WILDCARD.src),$(shell find src -type f -name "*.java"))
-JAVA_SOURCE_DIRECTORY_PREREQUISITES := $(if $(WILDCARD.src),$(shell find $(WILDCARD.src) -name .svn -prune -o -type d -print))
+JAVA_SOURCE_DIRECTORY_PREREQUISITES := $(if $(WILDCARD.src),$(shell find $(WILDCARD.src) $(FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY) -type d -print))
 JAVA_CLASSES_PREREQUISITES := $(if $(WILDCARD.classes),$(shell find $(WILDCARD.classes) -print))
 # If classes/ has been deleted, depending on its parent directory should get us rebuilt.
 JAVA_CLASSES_PREREQUISITES += $(if $(WILDCARD.classes),,.generated)
 $(takeProfileSample)
 SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
-
-REVISION_CONTROL_SYSTEM += $(if $(wildcard .svn),svn)
-REVISION_CONTROL_SYSTEM += $(if $(wildcard CVS),cvs)
-REVISION_CONTROL_SYSTEM += $(if $(wildcard SCCS),bk)
-REVISION_CONTROL_SYSTEM := $(strip $(REVISION_CONTROL_SYSTEM))
-REVISION_CONTROL_SYSTEM := $(if $(REVISION_CONTROL_SYSTEM),$(REVISION_CONTROL_SYSTEM),unknown)
 
 define GENERATE_CHANGE_LOG.svn
   svn log > ChangeLog
@@ -543,7 +552,7 @@ define closeLocalVariableScope
 endef
 
 BUILD_TARGETS += $(if $(JAVA_SOURCE_FILES),.generated/java.build-finished)
-BUILD_TARGETS += $(if $(wildcard .svn),.generated/build-revision.txt)
+BUILD_TARGETS += $(if $(REVISION_CONTROL_SYSTEM_DIRECTORY),.generated/build-revision.txt)
 TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
 # We deliberately omit the intermediate directory.
 COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
@@ -764,7 +773,7 @@ SUBDIRECTORIES_TO_INSTALL += lib
 define MAKE_INSTALLER_FILE_LIST
   { \
     $(foreach file,$(FILES_TO_INSTALL),echo $(file) &&) \
-    find $(wildcard $(SUBDIRECTORIES_TO_INSTALL)) -name .svn -prune -o -type f -print; \
+    find $(wildcard $(SUBDIRECTORIES_TO_INSTALL)) $(FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY) -type f -print; \
   } | ruby -ne 'chomp!(); puts("Including #{$$_}...")'
 endef
 
