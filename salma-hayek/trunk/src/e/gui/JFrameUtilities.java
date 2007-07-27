@@ -10,11 +10,15 @@ import javax.swing.*;
 public class JFrameUtilities {
     private static final Image FRAME_ICON;
     static {
-        // Load the icon so that failures don't jeopardize users of this class; you don't want to hang in <clinit>!
+        // Load the icon carefully so that failures don't jeopardize users of this class.
+        // You don't want to hang in <clinit>!
         String filename = System.getProperty("org.jessies.frameIcon");
         Image image = null;
         try {
-            image = ImageIO.read(FileUtilities.fileFromString(filename));
+            // Load the icon if it looks like a real attempt was made to specify one.
+            if (filename.length() > 0) {
+                image = ImageIO.read(FileUtilities.fileFromString(filename));
+            }
         } catch (Throwable th) {
             Log.warn("Failed to load icon \"" + filename + "\".", th);
         } finally {
