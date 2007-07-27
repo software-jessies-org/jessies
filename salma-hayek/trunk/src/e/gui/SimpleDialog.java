@@ -156,6 +156,7 @@ public class SimpleDialog {
         //dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
         
         dialog.setVisible(true);
+        dialog.dispose();
         
         Object selectedValue = pane.getValue();
         if (selectedValue == null) {
