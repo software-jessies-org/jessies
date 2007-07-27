@@ -1,5 +1,26 @@
 #!/usr/bin/ruby -w
 
+require 'pathname'
+
+#
+# Mercurial
+#
+
+def getMercurialVersion(directory)
+  return `hg parents | grep changeset:`
+end
+
+def extractMercurialVersionNumber(versionString)
+  if versionString.match(/^changeset:\s*(\d+):/)
+    return $1.to_i()
+  end
+  return 0
+end
+
+#
+# Subversion
+#
+
 def getSubversionVersion(directory)
   command = "svnversion #{directory}"
   # svnversion is insanely slow on Cygwin using a samba share.
@@ -22,7 +43,7 @@ def getSubversionVersion(directory)
   return `#{command}`.chomp()
 end
 
-def extractVersionNumber(versionString)
+def extractSubversionVersionNumber(versionString)
   # The second number, if there are two, is the more up-to-date.
   # (In Subversion's model, commit doesn't necessarily require update.)
   if versionString.match(/^(?:\d+:)?(\d+)/)
@@ -34,6 +55,19 @@ def extractVersionNumber(versionString)
   return 0
 end
 
+# --------------------------------------------------------------------------------------------------------
+
+def getWorkingCopyVersion(directory)
+  if (Pathname.new(directory) + ".hg").exist?()
+    return extractMercurialVersionNumber(getMercurialVersion(directory))
+  elsif (Pathname.new(directory) + ".svn").exist?()
+    return extractSubversionVersionNumber(getSubversionVersion(directory))
+  else
+    # An end-user building from source, maybe?
+    return 0
+  end
+end
+
 # Win32's installer's broken idea of "version number" forces us to have a
 # version number of the form "a.b.c", and also forces us to ensure that
 # a <= 255, b <= 255, and c <= 65535. If we don't, upgrading (replacing an
@@ -43,12 +77,12 @@ end
 # This script takes advantage of the fact that we have enough bits (8+8+16=32)
 # to encode our project and salma hayek revision numbers, even if they're not
 # conveniently arranged.
-def mungeVersionStrings(projectVersionString, salmaHayekVersionString)
+def mungeVersions(projectVersionNumber, salmaHayekVersionNumber)
   fields = []
   # The third field is called the build version or the update version and has a maximum value of 65,535.
   fieldSize = 64 * 1024
   # We try to separate the project_root and salma_hayek versions into different fields.
-  unifiedVersion = extractVersionNumber(projectVersionString) * fieldSize + extractVersionNumber(salmaHayekVersionString)
+  unifiedVersion = projectVersionNumber * fieldSize + salmaHayekVersionNumber
   remainder = unifiedVersion
   field = remainder % fieldSize
   remainder /= fieldSize
@@ -67,19 +101,23 @@ def mungeVersionStrings(projectVersionString, salmaHayekVersionString)
 end
 
 def makeVersionString(projectRootDirectory, salmaHayekRootDirectory)
-  return mungeVersionStrings(getSubversionVersion(projectRootDirectory), getSubversionVersion(salmaHayekRootDirectory))
+  return mungeVersions(getWorkingCopyVersion(projectRootDirectory), getWorkingCopyVersion(salmaHayekRootDirectory))
 end
 
 # Despite its name, run as a script, this generates the contents for "build-revision.txt".
 if __FILE__ == $0
+  if ARGV.length() != 2
+    $stderr.puts("usage: #{File.basename($0)} <project-root-dir> <salma-hayek-root-dir>")
+    exit(1)
+  end
   projectRootDirectory = ARGV.shift()
   salmaHayekDirectory = ARGV.shift()
-  projectVersionString = getSubversionVersion(projectRootDirectory)
-  salmaHayekVersionString = getSubversionVersion(salmaHayekDirectory)
+  projectVersion = getWorkingCopyVersion(projectRootDirectory)
+  salmaHayekVersion = getWorkingCopyVersion(salmaHayekDirectory)
   
   require "time.rb"
   puts(Time.now().iso8601())
-  puts(projectVersionString)
-  puts(salmaHayekVersionString)
-  puts(mungeVersionStrings(projectVersionString, salmaHayekVersionString))
+  puts(projectVersion)
+  puts(salmaHayekVersion)
+  puts(mungeVersions(projectVersion, salmaHayekVersion))
 end
