@@ -14,15 +14,33 @@ public class TimerUtilities {
             sharedInstanceMethod.setAccessible(true);
             Object sharedInstance = sharedInstanceMethod.invoke(null, new Object[0]);
             
-            Field firstTimerField = timerQueueClass.getDeclaredField("firstTimer");
-            firstTimerField.setAccessible(true);
-            Field nextTimerField = Timer.class.getDeclaredField("nextTimer");
-            nextTimerField.setAccessible(true);
-            
-            Timer nextTimer = (Timer) firstTimerField.get(sharedInstance);
-            while (nextTimer != null) {
-                result.add(nextTimer);
-                nextTimer = (Timer) nextTimerField.get(nextTimer);
+            try {
+                // Java 6 uses a C-style home-grown linked list!
+                Field firstTimerField = timerQueueClass.getDeclaredField("firstTimer");
+                firstTimerField.setAccessible(true);
+                Field nextTimerField = Timer.class.getDeclaredField("nextTimer");
+                nextTimerField.setAccessible(true);
+                
+                Timer nextTimer = (Timer) firstTimerField.get(sharedInstance);
+                while (nextTimer != null) {
+                    result.add(nextTimer);
+                    nextTimer = (Timer) nextTimerField.get(nextTimer);
+                }
+            } catch (NoSuchFieldException ex) {
+                // Java 7 uses a DelayQueue<DelayedTimer>.
+                Field queueField = timerQueueClass.getDeclaredField("queue");
+                queueField.setAccessible(true);
+                
+                java.util.concurrent.DelayQueue queue = (java.util.concurrent.DelayQueue) queueField.get(sharedInstance);
+                
+                Class<?> delayedTimerClass = Class.forName("javax.swing.TimerQueue$DelayedTimer");
+                Method getTimerMethod = delayedTimerClass.getDeclaredMethod("getTimer", new Class[0]);
+                getTimerMethod.setAccessible(true);
+                
+                for (Object queuedObject : queue) {
+                    Timer timer = (Timer) getTimerMethod.invoke(queuedObject, new Object[0]);
+                    result.add(timer);
+                }
             }
         } catch (Exception ex) {
             Log.warn("Failed to get queued Swing timers.", ex);
