@@ -104,9 +104,17 @@ public class AboutBox {
     }
     
     public void show() {
-        JDialog dialog = new JDialog(findSuitableOwner());
+        JDialog dialog = new JDialog(findSuitableOwner()) {
+            @Override
+            public void setVisible(boolean newVisibility) {
+                super.setVisible(newVisibility);
+                if (newVisibility == false) {
+                    dispose();
+                }
+            }
+        };
         makeUi(dialog);
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         JFrameUtilities.closeOnEsc(dialog);
         dialog.setVisible(true);
     }
