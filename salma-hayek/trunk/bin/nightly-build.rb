@@ -23,39 +23,67 @@ if targets.empty?()
 end
 
 # ----------------------------------------------------------------------------
-# Find all Subversion projects under "projects_root".
+# Find all revision-controlled projects under "projects_root".
 # ----------------------------------------------------------------------------
-svn_projects = []
+class Project
+  def initialize(directory)
+    @directory = directory
+  end
+  
+  def directory()
+    return @directory
+  end
+end
+
+class MercurialProject < Project
+  def update()
+    system("hg pull && hg update")
+  end
+end
+
+class SubversionProject < Project
+  def update()
+    system("svn status ; svn diff ; svn update")
+  end
+end
+
+projects = []
+
 Dir.glob("#{projects_root}/*/.svn").each() {
   |svn_directory|
   svn_directory =~ /^(.*\/)\.svn$/
-  svn_projects << $1
+  projects << SubversionProject.new($1)
 }
-svn_projects.uniq!()
+Dir.glob("#{projects_root}/*/.hg").each() {
+  |hg_directory|
+  hg_directory =~ /^(.*\/)\.hg$/
+  projects << MercurialProject.new($1)
+}
+projects.uniq!()
 
 # ----------------------------------------------------------------------------
 # Of the jessies.org projects, salma-hayek must come first. Performance anxiety.
 # ----------------------------------------------------------------------------
-salma_hayek = svn_projects.find() { |item| item.include?("/salma-hayek/") }
-svn_projects.delete(salma_hayek)
-svn_projects.insert(0, salma_hayek)
+salma_hayek = projects.find() { |item| item.directory().include?("/salma-hayek/") }
+projects.delete(salma_hayek)
+projects.insert(0, salma_hayek)
 
 # ----------------------------------------------------------------------------
-# Update and build the Subversion projects.
+# Update and build the projects.
 # ----------------------------------------------------------------------------
 failed_updates = []
 failed_builds = []
-svn_projects.each() {
-  |svn_project|
-  svn_project =~ /.*\/([^\/]+)\/$/
+projects.each() {
+  |project|
+  project.directory() =~ /.*\/([^\/]+)\/$/
   project_name = $1
   print("-- Updating \"#{project_name}\"\n")
-  Dir.chdir(svn_project)
-  system("svn status ; svn diff ; svn update")
+  Dir.chdir(project.directory())
+  project.update()
   if $? != 0
     failed_updates << project_name
   else
-    if (Pathname.new(svn_project) + "Makefile").exist?()
+    if (Pathname.new(project.directory()) + "Makefile").exist?()
       print("-- Building \"#{project_name}\"\n")
       commands = targets.map() {
         |target|
