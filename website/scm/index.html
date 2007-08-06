@@ -9,63 +9,9 @@
 
 <p><strong>SCM is a cross-platform GPL front-end to revision control systems, able to work with Bazaar, BitKeeper, CVS, Mercurial, and Subversion repositories.</strong>
 
-<p>Most revision control systems don't come with a standard GUI. CVS and Subversion, probably the two most widely-used systems, come with nothing.
-Bazaar, Git, and Mercurial have a really nice history viewers, but nothing much for checking in changes.
-BitKeeper has a decent history viewer and a good tool for checking in changes, but they're both idiosyncratic in design, look disgusting, and are missing little niceties like spelling checking for your comments.
+<p>SCM is currently unavailable. This is to ensure our compliance with new restrictions in the BitKeeper&nbsp;4 license. SCM will not return until six months after the last of us stops using BitKeeper.
 
-<p>There are a lot of third-party GUI tools, but they tend to be overly complicated to use, not particularly keen to fit in with how you were already working, only work with one revision control system, and don't offer much if anything over the command-line tools.
-
-<p>Some IDEs have good tools for checking in changes and sometimes viewing file history, but their abilities vary wildly, they're usually not cross-platform, and they rarely have any back ends more esoteric than CVS and Subversion.
-
-<!--#include virtual="/salma-hayek/navigation.html" -->
-
-<h2><a name="features">Features</a></h2>
-
-<p>SCM is the beginnings of the first good GUI front-end for revision control:
-
-<ul>
-<li><p><strong>Portable</strong> - SCM is portable across operating systems as well as revision control systems.
-Cygwin/Windows, Linux, Mac OS, and Solaris are all supported operating systems.
-Back ends exist for Bazaar, BitKeeper, CVS, Mercurial, and Subversion.
-I use it on both Linux and Mac OS, and I use it with most of the back-ends.
-
-<li><p><strong>RevisionTool</strong> - RevisionTool is used to examine a file's revision history.
-It's a local alternative to <i>cvsweb</i> and its relatives, similar to <tt>bk revtool</tt>.
-(Tools like <tt>bzr-gtk</tt>, <tt>gitk</tt>, and <tt>hgk</tt> are the best choice for the non-linear histories of distributed systems.
-Implementing something similar in SCM for better support of the distributed systems is a clear goal.
-Patches welcome!)
-
-<p>I think a lot of people underestimate the usefulness of a file's revision history.
-For me it's the main use of a repository.
-I've never wanted to compile an old version of the source, though that seems to be a folk belief about why revision control is useful.
-RevisionTool intends to make it easy to answer the interesting questions about your source.
-
-<p>Here's the annotated view.
-The list shows all the revisions of the file.
-The text area shows the check-in comment from the selected revision or revisions.
-The large scrollable area shows the file with the author and revision information to the left.
-Lines in blue are from the selected revision, and dotted horizontal rules separate adjacent lines from different revisions.
-(You can double-click on a line to go to the same line in the revision in which it was introduced.)
-<p align="center"><img src="RevisionTool-annotated.png" width="806" height="630" alt="Viewing annotations">
-
-<p>Here's the patch view, which is what you see if you select more than one revision in the list of revisions.
-(You can double-click on a line to go to the appropriate line in the annotated view of the revision in which it was introduced.)
-<p align="center"><img src="RevisionTool-patch.png" width="794" height="622" alt="Viewing patches">
-
-<li><p><strong>CheckInTool</strong> - CheckInTool is used to check in modifications.
-It replaces <tt>bzr/cvs/hg/svn commit</tt> or <tt>bk citool</tt>.
-Its main features are that it lets you check in an arbitrary subset of your modified/new files, it doesn't require a separate 'add' step for new files, it checks spelling in your check-in comments, and it shows you what you're about to commit.
-This is a great way to avoid accidentally checking in stuff you didn't mean to.
-<p align="center"><img src="CheckInTool.png" width="1007" height="486" alt="Committing changes">
-
-<li><p><strong>No Commitment</strong> - SCM never asks for commitment from you.
-It doesn't have any kind of set-up process: you can install it anywhere you like.
-It doesn't need to be taught about your repositories.
-It won't make any changes to your repositories other than the ones you explicitly ask it to make.
-It won't splatter junk all over your file system.
-If you don't like it, just stop using it.
-
-</ul>
+<p>We're sorry for the inconvenience. In the meantime, our guide to writing good check-in comments remains in its original form below...
 
 <h2>Writing check-in comments</h2>
 
@@ -157,7 +103,5 @@ The main reason for commenting a check-in is that it's often the only way to exp
 This is another reason to favor the "change set" style of commenting: someone looking at any file can trivially see the context of the change.
 
 <p>One final tip: the more likely it is that someone will need a piece of information to understand the code, the stronger the pressure to include that information in a code comment rather than a check-in comment.
-
-<!--#include virtual="/salma-hayek/downloads.html" -->
 
 <!--#include virtual="/salma-hayek/footer.html" -->
