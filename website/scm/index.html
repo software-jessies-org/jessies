@@ -1,0 +1,163 @@
+<!--#set var="PAGE_TITLE" value="SCM" -->
+<!--#set var="HUMAN_NAME" value="SCM" -->
+<!--#set var="SHORT_DIST_NAME" value="scm" -->
+<!--#set var="LONG_DIST_NAME" value="org.jessies.scm" -->
+
+<!--#include virtual="/salma-hayek/header.html" -->
+
+<h1>SCM</h1>
+
+<p><strong>SCM is a cross-platform GPL front-end to revision control systems, able to work with Bazaar, BitKeeper, CVS, Mercurial, and Subversion repositories.</strong>
+
+<p>Most revision control systems don't come with a standard GUI. CVS and Subversion, probably the two most widely-used systems, come with nothing.
+Bazaar, Git, and Mercurial have a really nice history viewers, but nothing much for checking in changes.
+BitKeeper has a decent history viewer and a good tool for checking in changes, but they're both idiosyncratic in design, look disgusting, and are missing little niceties like spelling checking for your comments.
+
+<p>There are a lot of third-party GUI tools, but they tend to be overly complicated to use, not particularly keen to fit in with how you were already working, only work with one revision control system, and don't offer much if anything over the command-line tools.
+
+<p>Some IDEs have good tools for checking in changes and sometimes viewing file history, but their abilities vary wildly, they're usually not cross-platform, and they rarely have any back ends more esoteric than CVS and Subversion.
+
+<!--#include virtual="/salma-hayek/navigation.html" -->
+
+<h2><a name="features">Features</a></h2>
+
+<p>SCM is the beginnings of the first good GUI front-end for revision control:
+
+<ul>
+<li><p><strong>Portable</strong> - SCM is portable across operating systems as well as revision control systems.
+Cygwin/Windows, Linux, Mac OS, and Solaris are all supported operating systems.
+Back ends exist for Bazaar, BitKeeper, CVS, Mercurial, and Subversion.
+I use it on both Linux and Mac OS, and I use it with most of the back-ends.
+
+<li><p><strong>RevisionTool</strong> - RevisionTool is used to examine a file's revision history.
+It's a local alternative to <i>cvsweb</i> and its relatives, similar to <tt>bk revtool</tt>.
+(Tools like <tt>bzr-gtk</tt>, <tt>gitk</tt>, and <tt>hgk</tt> are the best choice for the non-linear histories of distributed systems.
+Implementing something similar in SCM for better support of the distributed systems is a clear goal.
+Patches welcome!)
+
+<p>I think a lot of people underestimate the usefulness of a file's revision history.
+For me it's the main use of a repository.
+I've never wanted to compile an old version of the source, though that seems to be a folk belief about why revision control is useful.
+RevisionTool intends to make it easy to answer the interesting questions about your source.
+
+<p>Here's the annotated view.
+The list shows all the revisions of the file.
+The text area shows the check-in comment from the selected revision or revisions.
+The large scrollable area shows the file with the author and revision information to the left.
+Lines in blue are from the selected revision, and dotted horizontal rules separate adjacent lines from different revisions.
+(You can double-click on a line to go to the same line in the revision in which it was introduced.)
+<p align="center"><img src="RevisionTool-annotated.png" width="806" height="630" alt="Viewing annotations">
+
+<p>Here's the patch view, which is what you see if you select more than one revision in the list of revisions.
+(You can double-click on a line to go to the appropriate line in the annotated view of the revision in which it was introduced.)
+<p align="center"><img src="RevisionTool-patch.png" width="794" height="622" alt="Viewing patches">
+
+<li><p><strong>CheckInTool</strong> - CheckInTool is used to check in modifications.
+It replaces <tt>bzr/cvs/hg/svn commit</tt> or <tt>bk citool</tt>.
+Its main features are that it lets you check in an arbitrary subset of your modified/new files, it doesn't require a separate 'add' step for new files, it checks spelling in your check-in comments, and it shows you what you're about to commit.
+This is a great way to avoid accidentally checking in stuff you didn't mean to.
+<p align="center"><img src="CheckInTool.png" width="1007" height="486" alt="Committing changes">
+
+<li><p><strong>No Commitment</strong> - SCM never asks for commitment from you.
+It doesn't have any kind of set-up process: you can install it anywhere you like.
+It doesn't need to be taught about your repositories.
+It won't make any changes to your repositories other than the ones you explicitly ask it to make.
+It won't splatter junk all over your file system.
+If you don't like it, just stop using it.
+
+</ul>
+
+<h2>Writing check-in comments</h2>
+
+<p>When you start CheckInTool, it will tell you what to do next.
+The idea is that you check a file you want to commit, then type the comment corresponding to that file, then repeat for all the other files you want to include in the change set.
+
+<p>It turns out to often be convenient to group files.
+Rather than repeating a comment, just group the affected files together.
+The GNU style allows you to repeat a filename if you have more than one thing to say about it, but SCM doesn't really help you with that: you'll have to copy and paste the name yourself.
+Another common practice is to show related sub-changes and their relation by writing ellipses between chunks of the story.
+
+<p>Here's an example of the kind of comment SCM will naturally help you write:
+<blockquote><pre>
+src/e/scm/WaitCursor.java: making this a class full of static data and methods
+was stupid. To cope with nested tasks, change it to something you instantiate...
+
+src/e/scm/BlockingWorker.java:
+src/e/scm/PatchView.java:
+src/e/scm/RevisionWindow.java: ...and change all the callers. 
+</pre></blockquote>
+<p>You can write anything you like, of course, but you'll get less help.
+
+<p>The text area is 80 columns wide, but the text is only soft-wrapped.
+If you want line breaks, you'll have to type them yourself.
+Anywhere SCM shows you a comment, it will word-wrap for you, so hard line breaks shouldn't be necessary.
+
+<p>BitKeeper supports giving a different comment to each file in a change set, and yet another comment to the set as a whole.
+SCM doesn't support this.
+One reason is that other back ends don't.
+But more than that, experience suggests that this freedom isn't useful, and does cause problems.
+One common case is that people accidentally hide important details by pasting the same comment for most of the files, but editing one or more of the copies.
+This is very easily missed when you're reading the history.
+Another common case is where important detail is hidden in the change set comment, which isn't visible when you're looking at one file's history.
+In all cases, it's unnecessarily awkward to see the commentary on the change set as a whole.
+You could argue that this is a weakness of the tools, but I think it's a weakness of the idea itself.
+The dialog style of commenting works better, and fits the idea of a change set as a coherent group of changes.
+
+<p>In effect, SCM forces you to write only a change set comment, which it then applies to each file, and to the change set.
+
+<h2><a name="writing-good-check-in-comments">Writing <i>good</i> check-in comments</a></h2>
+
+<p>One reason check-in comments are useful is, as Chris Aston always says, it's a safe assumption that "I'm not cleverer today than I was yesterday".
+So if you see something that's wrong, or weird, it's worth trying to find out where it came from.
+And that's when you're dealing with your own code! It's even more important to do a bit of archaeology if you're working on someone else's code.
+
+<p>This helps guide us in writing good check-in comments.
+As you write, imagine someone who's left the company has already written the comment, and you're only reading it.
+Think about what you'd most like to see.
+
+<p>I explained above why you should comment the "change set", naming all the files touched, and the relationship between the individual files' changes.
+
+<p>Here's a checklist of things you should try to get into a habit of going through in your mind as you write a check-in comment:
+<ul>
+<li><p><b>Bug/defect number</b> - if you have a bug database, reference it.
+There's likely to be plenty of extra information/dialog in there that shouldn't go to waste.
+This is why SCM and Edit go out of their way to turn your bug/defect numbers into links.
+</li>
+
+<li><p><b>Other people involved</b> - if you go under a bus on your way home from work, who else would be worth talking to when it comes to this code?
+Especially useful if you're doing something as the result of a request without a formal defect number, or as the result of group consensus.
+</li>
+
+<li><p><b>Alternatives rejected</b> - we can see what you <i>did</i> implement, but it's often interesting to know why you didn't implement other alternatives.
+Often this is interesting enough to warrant code comments instead.
+Especially useful if you're replacing one implementation with another is why the old implementation was no longer suitable.
+</li>
+
+<li><p><b>Known limitations</b> - these should probably be FIXME or TODO comments in the code.
+</li>
+
+<li><p><b>Known performance impact</b> - if you measured the performance impact of your change, say so.
+Mention the tests and the results.
+</li>
+
+<li><p><b>Evidence to support "premature" optimization</b> - if you're introducing an optimization, point to a demonstration that it's useful, or details of the situations in which it's useful.
+This will discourage others from backing it out rather than fixing it when it's demonstrated to be incorrect.
+</li>
+
+<li><p><b>Text of build errors fixed</b> - if you're fixing a build error, include the exact error text to help later reviewers determine whether it's the most appropriate fix or understand your problem so that they don't re-introduce the build error.
+</li>
+</ul>
+
+<p>I won't insult you by reminding you that saying <i>what</i> you've done is never as useful as <i>why</i> you did it, though such comments can be useful if you accidentally add/change/remove code you didn't mean to touch.
+If it's not mentioned in the check-in comment, that lends credence to the belief that it was a mistake.
+
+<p>I also won't insult you by reminding you that duplication is bad in comments as well as code.
+Don't repeat yourself (except in mentioning bug/defect numbers, which should always appear in the check-in comment, and should often appear in the source too), and favor commenting the source.
+The main reason for commenting a check-in is that it's often the only way to express the commonality between changes made to different files.
+This is another reason to favor the "change set" style of commenting: someone looking at any file can trivially see the context of the change.
+
+<p>One final tip: the more likely it is that someone will need a piece of information to understand the code, the stronger the pressure to include that information in a code comment rather than a check-in comment.
+
+<!--#include virtual="/salma-hayek/downloads.html" -->
+
+<!--#include virtual="/salma-hayek/footer.html" -->
