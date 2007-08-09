@@ -19,14 +19,17 @@ class OsExaminer
             @arch = "i386"
         else
             @os_name = `uname`.chomp()
-            @arch = `arch`.chomp()
+            if @os_name == "Darwin"
+                @arch = "universal"
+            else
+                # On Linux, arch(1) is deprecated in favor of "uname -m" as of util-linux 2.13, which entered Debian unstable as of 2007-07-10.
+                # Mac OS works differently -- and hasn't deprecated arch(1) -- but that gets a special case anyway.
+                @arch = `uname -m`.chomp()
+                # http://alioth.debian.org/docman/view.php/30192/21/debian-amd64-howto.html#id250846 says amd64 is to i386 as x86_64 is to x86.
+                @arch = @arch.sub(/i[456]86/, "i386").sub(/x86_64/, "amd64")
+            end
         end
-        if @os_name == "Darwin"
-            @arch = "universal"
-        else
-            # http://alioth.debian.org/docman/view.php/30192/21/debian-amd64-howto.html#id250846 says amd64 is to i386 as x86_64 is to x86.
-            @arch = @arch.sub(/i[456]86/, "i386").sub(/x86_64/, "amd64")
-        end
+        
         @target_directory = "#{@arch}_#{@os_name}"
     end
     
