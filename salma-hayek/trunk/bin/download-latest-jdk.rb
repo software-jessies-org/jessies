@@ -32,7 +32,7 @@ class JdkInstaller
 
  # Get the architecture in Sun's nomenclature.
  def desired_arch()
-  desired_arch = `arch`.chomp()
+  desired_arch = `uname -m`.chomp()
   desired_arch.gsub!(/^i\d86$/, "i586")
   if desired_arch == "x86_64"
    desired_arch = "amd64"
