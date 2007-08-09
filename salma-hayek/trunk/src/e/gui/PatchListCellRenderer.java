@@ -28,7 +28,9 @@ public class PatchListCellRenderer extends EListCellRenderer {
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean isFocused) {
         super.getListCellRendererComponent(list, value, index, isSelected, isFocused);
         String line = (String) value;
-        if (line.startsWith("+")) {
+        if (isSelected) {
+            // Leave the colors alone so you can still see when a +++, ---, or @@ line is selected.
+        } else if (line.startsWith("+")) {
             setForeground(Color.BLUE);
             if (line.startsWith("+++ ")) {
                 setBackground(TRIPLE_PLUS_BACKGROUND);
