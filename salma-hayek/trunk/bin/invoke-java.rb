@@ -138,6 +138,11 @@ class Java
   def get_java_version(java_executable)
     # We might like to use -fullversion, but Debian's gij-wrapper Perl script only understands -version. I think for our purposes here, "-version" is accurate enough.
     java_version = `#{java_executable} -version 2>&1`.chomp()
+    # A Fedora Core 7 user reports that gij has started claiming 1.5.0, but seemingly still isn't up to the job ("Can't start up: not enough memory").
+    # Now we can't ignore gij for free, let's explicitly disregard it, on the assumption that OpenJDK will replace it before it's ready.
+    if java_version.match(/gij/) != nil
+      java_version = "gij! run away!"
+    end
     # If we appear to have found a JVM, extract just the version number.
     # Otherwise, If we return exactly what the executable said, that might give the user some clue as to what went wrong.
     if java_version.match(/java version "(.*)"/) != nil
