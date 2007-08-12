@@ -279,7 +279,7 @@ public class Options {
 		addDefault(INITIAL_ROW_COUNT, Integer.valueOf(24), "New terminal height");
 		addDefault(SCROLL_KEY, Boolean.TRUE, "Scroll to bottom on key press?");
 		addDefault(SCROLL_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output?");
-		addDefault(USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key?");
+		addDefault(USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key (for Emacs)?");
 		
 		if (GuiUtilities.isMacOs() || GuiUtilities.isWindows() || GuiUtilities.isGtk()) {
 			// GNOME, Mac, and Win32 users are accustomed to every window having a menu bar.
