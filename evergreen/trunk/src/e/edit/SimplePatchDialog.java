@@ -66,7 +66,7 @@ public class SimplePatchDialog {
             builder.append('\n');
         }
         
-        PTextArea textArea = new PTextArea();
+        PTextArea textArea = new PTextArea(10, 80);
         textArea.setEditable(false);
         textArea.setTextStyler(new PPatchTextStyler(textArea));
         textArea.setText(builder.toString());
