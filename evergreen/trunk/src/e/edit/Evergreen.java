@@ -45,7 +45,7 @@ public class Evergreen {
         private ArrayList<InitialWorkspace> initialWorkspaces = new ArrayList<InitialWorkspace>();
         private Point initialLocation = new Point(0, 0);
         private Dimension initialSize = new Dimension(800, 730);
-        private boolean showTagsPanel;
+        private boolean showTagsPanel = true;
         private int splitPaneDividerLocation = -1;
         
         /**
@@ -630,7 +630,6 @@ public class Evergreen {
             initialState.initialSize.width = Integer.parseInt(root.getAttribute("width"));
             initialState.initialSize.height = Integer.parseInt(root.getAttribute("height"));
             
-            initialState.showTagsPanel = true;
             if (root.hasAttribute("showTagsPanel")) {
                 initialState.showTagsPanel = Boolean.parseBoolean(root.getAttribute("showTagsPanel"));
                 if (root.hasAttribute("splitPaneDividerLocation")) {
@@ -898,13 +897,14 @@ public class Evergreen {
         // These things want to be done after the frame is visible...
         
         initialState.configureTagsPanel();
-        initRememberedFilesOpener();
         
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 if (tabbedPane.getTabCount() == 0) {
                     // If we didn't create any workspaces, give the user some help...
                     showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"Add Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
+                } else {
+                    initRememberedFilesOpener();
                 }
                 
                 Thread fileListUpdaterStarterThread = new Thread(new Runnable() {
