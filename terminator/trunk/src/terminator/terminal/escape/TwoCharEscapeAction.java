@@ -41,6 +41,18 @@ public class TwoCharEscapeAction implements TerminalAction {
 		}
 	}
 	
+	public String toString() {
+		StringBuffer result = new StringBuffer("TwoCharEscapeAction[");
+		int charSet = "()*+".indexOf(sequence.charAt(0));
+		if (charSet == -1) {
+			result.append("Unsupported");
+		} else {
+			result.append("Set char set to ").append(charSet);
+		}
+		result.append("]");
+		return result.toString();
+	}
+	
 	private void unsupported() {
 		Log.warn("Unsupported two-character escape \"" + sequence + "\".");
 	}

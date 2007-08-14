@@ -28,6 +28,39 @@ public class CSIEscapeAction implements TerminalAction {
 		}
 	}
 	
+	private String getSequenceType(char lastChar) {
+		switch (lastChar) {
+		case 'A': return "Cursor up";
+		case 'B': return "Cursor down";
+		case 'C': return "Cursor right";
+		case 'c': return "Device attributes request";
+		case 'D': return "Cursor left";
+		case 'd': return "Move cursor to row";
+		case 'G':
+		case '`': return "Move cursor column to";
+		case 'f':
+		case 'H': return "Move cursor to";
+		case 'K': return "Kill line contents";
+		case 'J': return "Kill lines";
+		case 'L': return "Insert lines";
+		case 'M': return "Delete lines";
+		case 'P': return "Delete characters";
+		case 'g': return "Clear tabs";
+		case 'h': return "Set DEC private mode";
+		case 'l': return "Clear DEC private mode";
+		case 'm': return "Set font, color, etc";
+		case 'n': return "Device status report";
+		case 'r': return "Restore DEC private modes or set scrolling region";
+		case 's': return "Save DEC private modes";
+		default: return "Unknown";
+		}
+	}
+	
+	public String toString() {
+		char lastChar = sequence.charAt(sequence.length() - 1);
+		return "CSIEscapeAction[" + getSequenceType(lastChar) + "]";
+	}
+	
 	private boolean processSequence(TerminalModel model) {
 		char lastChar = sequence.charAt(sequence.length() - 1);
 		String midSequence = sequence.substring(1, sequence.length() - 1);

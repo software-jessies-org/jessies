@@ -51,4 +51,13 @@ public class XTermEscapeAction implements TerminalAction {
 			Log.warn("Unsupported XTerm escape sequence \"" + sequence + "\".");
 		}
 	}
+	
+	public String toString() {
+		if (sequence.startsWith("2;") || sequence.startsWith("0;")) {
+			String newWindowTitle = sequence.substring(2);
+			return "XTermEscapeAction[New window title:\"" + newWindowTitle + "\"]";
+		} else {
+			return "XTermEscapeAction[Unsupported]";
+		}
+	}
 }
