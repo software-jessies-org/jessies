@@ -24,7 +24,7 @@ public class CSIEscapeAction implements TerminalAction {
 
 	public void perform(TerminalModel model) {
 		if (processSequence(model) == false) {
-			Log.warn("Unimplemented escape sequence: \"" + sequence + "\"");
+			Log.warn("Unimplemented escape sequence: \"" + StringUtilities.escapeForJava(sequence) + "\"");
 		}
 	}
 	
@@ -52,7 +52,7 @@ public class CSIEscapeAction implements TerminalAction {
 		case 'n': return "Device status report";
 		case 'r': return "Restore DEC private modes or set scrolling region";
 		case 's': return "Save DEC private modes";
-		default: return "Unknown";
+		default: return "Unknown:" + lastChar;
 		}
 	}
 	
@@ -112,7 +112,7 @@ public class CSIEscapeAction implements TerminalAction {
 		case 's':
 			return saveDecPrivateModes(model, midSequence);
 		default:
-			Log.warn("unknown CSI sequence " + sequence);
+			Log.warn("unknown CSI sequence " + StringUtilities.escapeForJava(sequence));
 			return false;
 		}
 	}
@@ -161,7 +161,7 @@ public class CSIEscapeAction implements TerminalAction {
 					model.useAlternateBuffer(value);
 					break;
 				default:
-					Log.warn("Unknown private mode " + mode + " in [" + seq + (value ? 'h' : 'l'));
+					Log.warn("Unknown private mode " + mode + " in [" + StringUtilities.escapeForJava(seq) + (value ? 'h' : 'l'));
 				}
 			} else {
 				switch (mode) {
@@ -172,7 +172,7 @@ public class CSIEscapeAction implements TerminalAction {
 					control.setAutomaticNewline(value);
 					break;
 				default:
-					Log.warn("Unknown mode " + mode + " in [" + seq + (value ? 'h' : 'l'));
+					Log.warn("Unknown mode " + mode + " in [" + StringUtilities.escapeForJava(seq) + (value ? 'h' : 'l'));
 				}
 			}
 		}
@@ -180,12 +180,12 @@ public class CSIEscapeAction implements TerminalAction {
 	}
 	
 	public boolean restoreDecPrivateModes(TerminalModel model, String seq) {
-		Log.warn("Restore DEC private mode values not implemented (CSI " + seq + ")");
+		Log.warn("Restore DEC private mode values not implemented (CSI " + StringUtilities.escapeForJava(seq) + ")");
 		return false;
 	}
 	
 	public boolean saveDecPrivateModes(TerminalModel model, String seq) {
-		Log.warn("Save DEC private mode values not implemented (CSI " + seq + ")");
+		Log.warn("Save DEC private mode values not implemented (CSI " + StringUtilities.escapeForJava(seq) + ")");
 		return false;
 	}
 	
@@ -375,7 +375,7 @@ public class CSIEscapeAction implements TerminalAction {
 				hasBackground = false;
 				break;
 			default:
-				Log.warn("Unknown attribute " + value + " in [" + sequence);
+				Log.warn("Unknown attribute " + value + " in [" + StringUtilities.escapeForJava(sequence));
 				break;
 			}
 		}
