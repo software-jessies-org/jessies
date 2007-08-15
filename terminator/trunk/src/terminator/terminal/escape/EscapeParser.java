@@ -47,7 +47,7 @@ public class EscapeParser {
 	}
 	
 	public TerminalAction getAction(TerminalControl terminalControl) {
-//		Log.warn("Getting action for ESC sequence \"" + sequence + "\"");
+		//Log.warn("Getting action for ESC sequence \"" + StringUtilities.escapeForJava(sequence) + "\"");
 		return (seqRecognizer == null) ? null : seqRecognizer.getTerminalAction(terminalControl, sequence);
 	}
 	

@@ -98,7 +98,7 @@ public class SingleCharEscapeAction implements TerminalAction {
 		case '|':
 		case '}':
 		case '~': return "Invoke G3, G2, G1 character sets as GR";
-		default: return "Unrecognized";
+		default: return "Unrecognized:" + escChar;
 		}
 	}
 	

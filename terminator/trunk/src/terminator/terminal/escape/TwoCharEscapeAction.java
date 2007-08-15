@@ -15,45 +15,36 @@ public class TwoCharEscapeAction implements TerminalAction {
 
 	public void perform(TerminalModel model) {
 		switch (sequence.charAt(0)) {
-			case '#':  // rxvt: if second char == '8', scr_E().
-				unsupported();
-				break;
 			case '(':
-				control.designateCharacterSet(0, sequence.charAt(1));
-				break;
 			case ')':
-				control.designateCharacterSet(1, sequence.charAt(1));
-				break;
 			case '*':
-				control.designateCharacterSet(2, sequence.charAt(1));
-				break;
 			case '+':
-				control.designateCharacterSet(3, sequence.charAt(1));
+				control.designateCharacterSet(getCharacterSetIndex(), getCharacterSet());
 				break;
+			case '#':  // rxvt: if second char == '8', scr_E().
 			case '$':  // rxvt: scr_charset_set(-2, second char).
-				unsupported();
-				break;
 			case '@':  // rxvt ignores this completely.
-				unsupported();
+				Log.warn("Unsupported two-character escape \"" + StringUtilities.escapeForJava(sequence) + "\".");
 				break;
 			default:
-				Log.warn("Unrecognized two-character escape \"" + sequence + "\".");
+				Log.warn("Unrecognized two-character escape \"" + StringUtilities.escapeForJava(sequence) + "\".");
 		}
+	}
+	
+	private int getCharacterSetIndex() {
+		return "()*+".indexOf(sequence.charAt(0));
+	}
+	
+	private char getCharacterSet() {
+		return sequence.charAt(1);
 	}
 	
 	public String toString() {
-		StringBuffer result = new StringBuffer("TwoCharEscapeAction[");
-		int charSet = "()*+".indexOf(sequence.charAt(0));
-		if (charSet == -1) {
-			result.append("Unsupported");
+		final int characterSetIndex = getCharacterSetIndex();
+		if (characterSetIndex != -1) {
+			return "TwoCharEscapeAction[Set character set at index " + characterSetIndex + " to " + getCharacterSet() + "]";
 		} else {
-			result.append("Set char set to ").append(charSet);
+			return "TwoCharEscapeAction[Unsupported:" + StringUtilities.escapeForJava(sequence) + "]";
 		}
-		result.append("]");
-		return result.toString();
-	}
-	
-	private void unsupported() {
-		Log.warn("Unsupported two-character escape \"" + sequence + "\".");
 	}
 }

@@ -5,20 +5,17 @@ import terminator.model.*;
 import terminator.terminal.*;
 
 /**
-An XTermEscapeAction performs the action associated with an XTerm-style escape sequence.
-XTerm escape sequences always start with a ']' character, followed by a number.  Optionally,
-following the number is a ';' character, which if present, denotes that following must be some
-string of characters terminated by a BEL (0x07) character.  We strip off the initial ']' and the
-BEL terminator, if present, in the constructor, since it contains no information.
-
-@author Phil Norman
-*/
-
+ * An XTermEscapeAction performs the action associated with an XTerm OSC (Operating System Command) escape sequence.
+ * XTerm escape sequences always start with a ']' character, followed by a number.
+ * An optional ';' follows, marking the start of a BEL-terminated string.
+ * We strip off the initial ']' and the BEL terminator, if present, in the constructor, since they contain no information.
+ * FIXME: this is probably a mistake if we're planning on outputting the sequence in toString, or if we ever support other OSCs.
+ */
 public class XTermEscapeAction implements TerminalAction {
 	private String sequence;
 	
 	public XTermEscapeAction(String sequence) {
-		// Trim off the terminating BEL character if present.
+		// Trim off the initial ']', and the terminating BEL character (if present).
 		if (sequence.charAt(sequence.length() - 1) == '\007') {
 			this.sequence = sequence.substring(1, sequence.length() - 1);
 		} else {
@@ -44,20 +41,26 @@ public class XTermEscapeAction implements TerminalAction {
 	 *      49 = change default bg color
 	 */
 	public void perform(TerminalModel model) {
-		if (sequence.startsWith("2;") || sequence.startsWith("0;")) {
-			String newWindowTitle = sequence.substring(2);
-			model.setWindowTitle(newWindowTitle);
+		if (isNewWindowTitle()) {
+			model.setWindowTitle(getNewWindowTitle());
 		} else {
-			Log.warn("Unsupported XTerm escape sequence \"" + sequence + "\".");
+			Log.warn("Unsupported XTerm escape sequence \"" + StringUtilities.escapeForJava(sequence) + "\".");
 		}
 	}
 	
+	private boolean isNewWindowTitle() {
+		return (sequence.startsWith("2;") || sequence.startsWith("0;"));
+	}
+	
+	private String getNewWindowTitle() {
+		return sequence.substring(2);
+	}
+	
 	public String toString() {
-		if (sequence.startsWith("2;") || sequence.startsWith("0;")) {
-			String newWindowTitle = sequence.substring(2);
-			return "XTermEscapeAction[New window title:\"" + newWindowTitle + "\"]";
+		if (isNewWindowTitle()) {
+			return "XTermEscapeAction[New window title:\"" + StringUtilities.escapeForJava(getNewWindowTitle()) + "\"]";
 		} else {
-			return "XTermEscapeAction[Unsupported]";
+			return "XTermEscapeAction[Unsupported:" + StringUtilities.escapeForJava(sequence) + "]";
 		}
 	}
 }
