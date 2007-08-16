@@ -52,6 +52,8 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
             model = new DefaultListModel();
             statusGood = true;
             try {
+                long startTimeMs = System.currentTimeMillis();
+                
                 List<String> fileList = workspace.getFileList().getListOfFilesMatching(regularExpression);
                 for (int i = 0; i < fileList.size(); i++) {
                     model.addElement(fileList.get(i));
@@ -60,6 +62,9 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
                 if (indexedFileCount != -1) {
                     statusText = fileList.size() + " / " + StringUtilities.pluralize(indexedFileCount, "file", "files") + " match.";
                 }
+                
+                long endTimeMs = System.currentTimeMillis();
+                Log.warn("Search for files matching \"" + regularExpression + "\" took " + (endTimeMs - startTimeMs) + " ms.");
             } catch (PatternSyntaxException ex) {
                 statusGood = false;
                 statusText = ex.getDescription();
