@@ -206,7 +206,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 }
                 executor.shutdown();
                 try {
-                    executor.awaitTermination(1, TimeUnit.HOURS);
+                    executor.awaitTermination(3600, TimeUnit.SECONDS);
                 } catch (InterruptedException ex) {
                     ex = ex; // Fine; we're still finished.
                 }
