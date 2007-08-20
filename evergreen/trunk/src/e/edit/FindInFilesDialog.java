@@ -8,6 +8,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -156,8 +157,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         
         private HashMap<String, DefaultMutableTreeNode> pathMap = new HashMap<String, DefaultMutableTreeNode>();
         
-        private int doneFileCount;
-        private int matchingFileCount;
+        private AtomicInteger doneFileCount;
+        private AtomicInteger matchingFileCount;
         private int totalFileCount;
         private int percentage;
         
@@ -170,8 +171,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             this.fileRegex = filenameRegexField.getText();
             this.fileList = workspace.getFileList().getListOfFilesMatching(fileRegex);
             
-            this.doneFileCount = 0;
-            this.matchingFileCount = 0;
+            this.doneFileCount = new AtomicInteger(0);
+            this.matchingFileCount = new AtomicInteger(0);
             this.totalFileCount = fileList.size();
             this.percentage = -1;
             
@@ -179,7 +180,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
         
         private void updateStatus() {
-            int newPercentage = (doneFileCount * 100) / totalFileCount;
+            int newPercentage = (doneFileCount.get() * 100) / totalFileCount;
             if (newPercentage != percentage) {
                 percentage = newPercentage;
                 String status = makeStatusString() + " (" + percentage + "%)";
@@ -190,66 +191,26 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         @Override
         protected DefaultMutableTreeNode doInBackground() {
             Thread.currentThread().setName("Search for \"" + regex + "\" in files matching \"" + fileRegex + "\"");
+            
+            startTimeMs = System.currentTimeMillis();
+            endTimeMs = 0;
+            
             try {
                 Pattern pattern = PatternUtilities.smartCaseCompile(regex);
-                FileSearcher fileSearcher = new FileSearcher(pattern);
                 String root = workspace.getRootDirectory();
-                startTimeMs = System.currentTimeMillis();
-                endTimeMs = 0;
-                for (doneFileCount = 0; doneFileCount < fileList.size(); ++doneFileCount) {
-                    if (Thread.currentThread().isInterrupted() || isCancelled()) {
-                        return null;
-                    }
-                    try {
-                        String candidate = fileList.get(doneFileCount);
-                        File file = FileUtilities.fileFromParentAndString(root, candidate);
-                        if (regex.length() != 0) {
-                            ArrayList<String> matches = new ArrayList<String>();
-                            long t0 = System.currentTimeMillis();
-                            boolean wasText = fileSearcher.searchFile(file, matches);
-                            if (wasText == false) {
-                                // FIXME: should we do the grep(1) thing of "binary file <x> matches"?
-                                continue;
-                            }
-                            long t1 = System.currentTimeMillis();
-                            if (t1 - t0 > 500) {
-                                Log.warn("Searching file \"" + file + "\" for \"" + regex + "\" took " + (t1 - t0) + "ms!");
-                            }
-                            final int matchCount = matches.size();
-                            if (matchCount > 0) {
-                                synchronized (matchView) {
-                                    DefaultMutableTreeNode pathNode = getPathNode(candidate);
-                                    MatchingFile matchingFile = new MatchingFile(file, candidate, matchCount, pattern);
-                                    DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
-                                    for (String line : matches) {
-                                        fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file, pattern)));
-                                    }
-                                    pathNode.add(fileNode);
-                                    matchTreeModel.nodesWereInserted(pathNode, new int[] { pathNode.getIndex(fileNode) });
-                                    ++matchingFileCount;
-                                    // Make sure the new node gets expanded.
-                                    publish(fileNode);
-                                }
-                            }
-                        } else {
-                            synchronized (matchView) {
-                                DefaultMutableTreeNode pathNode = getPathNode(candidate);
-                                pathNode.add(new DefaultMutableTreeNode(new MatchingFile(file, candidate)));
-                                // Make sure the new node gets expanded.
-                                publish(pathNode);
-                            }
-                        }
-                    } catch (FileNotFoundException ex) {
-                        ex = ex; // Not our problem.
-                    }
-                    
-                    // Update our percentage-complete status, but only if we've
-                    // taken enough time for the user to start caring, so we
-                    // don't make quick searches unnecessarily slow.
-                    if (System.currentTimeMillis() - startTimeMs > 300) {
-                        updateStatus();
-                    }
+                
+                final int threadCount = Runtime.getRuntime().availableProcessors() + 1;
+                ThreadPoolExecutor executor = (ThreadPoolExecutor) ThreadUtilities.newFixedThreadPool(threadCount, "find-in-files");
+                for (String candidate : fileList) {
+                    executor.execute(new FileSearchRunnable(root, candidate, pattern));
                 }
+                executor.shutdown();
+                try {
+                    executor.awaitTermination(1, TimeUnit.HOURS);
+                } catch (InterruptedException ex) {
+                    ex = ex; // Fine; we're still finished.
+                }
+                
                 endTimeMs = System.currentTimeMillis();
                 Log.warn("Search for \"" + regex + "\" in files matching \"" + fileRegex + "\" took " + (endTimeMs - startTimeMs) + " ms.");
             } catch (PatternSyntaxException ex) {
@@ -305,7 +266,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
         
         private String makeStatusString() {
-            String status = matchingFileCount + " / " + StringUtilities.pluralize(totalFileCount, "file", "files");
+            String status = matchingFileCount.get() + " / " + StringUtilities.pluralize(totalFileCount, "file", "files");
             int indexedFileCount = workspace.getFileList().getIndexedFileCount();
             if (indexedFileCount != -1 && indexedFileCount != totalFileCount) {
                 status += " (from " + indexedFileCount + ")";
@@ -315,6 +276,72 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 status += " Took " + TimeUtilities.msToString(endTimeMs - startTimeMs) + ".";
             }
             return status;
+        }
+        
+        private class FileSearchRunnable implements Runnable {
+            private String root;
+            private String candidate;
+            private Pattern pattern;
+            
+            private FileSearchRunnable(String root, String candidate, Pattern pattern) {
+                this.root = root;
+                this.candidate = candidate;
+                this.pattern = pattern;
+            }
+            
+            public void run() {
+                try {
+                    long t0 = System.currentTimeMillis();
+                    FileSearcher fileSearcher = new FileSearcher(pattern);
+                    File file = FileUtilities.fileFromParentAndString(root, candidate);
+                    
+                    // Update our percentage-complete status, but only if we've
+                    // taken enough time for the user to start caring, so we
+                    // don't make quick searches unnecessarily slow.
+                    doneFileCount.incrementAndGet();
+                    if (t0 - startTimeMs > 300) {
+                        updateStatus();
+                    }
+                    
+                    if (regex.length() != 0) {
+                        ArrayList<String> matches = new ArrayList<String>();
+                        boolean wasText = fileSearcher.searchFile(file, matches);
+                        if (wasText == false) {
+                            // FIXME: should we do the grep(1) thing of "binary file <x> matches"?
+                            return;
+                        }
+                        long t1 = System.currentTimeMillis();
+                        if (t1 - t0 > 500) {
+                            Log.warn("Searching file \"" + file + "\" for \"" + regex + "\" took " + (t1 - t0) + "ms!");
+                        }
+                        final int matchCount = matches.size();
+                        if (matchCount > 0) {
+                            synchronized (matchView) {
+                                DefaultMutableTreeNode pathNode = getPathNode(candidate);
+                                MatchingFile matchingFile = new MatchingFile(file, candidate, matchCount, pattern);
+                                DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(matchingFile);
+                                for (String line : matches) {
+                                    fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file, pattern)));
+                                }
+                                pathNode.add(fileNode);
+                                matchTreeModel.nodesWereInserted(pathNode, new int[] { pathNode.getIndex(fileNode) });
+                                matchingFileCount.incrementAndGet();
+                                // Make sure the new node gets expanded.
+                                publish(fileNode);
+                            }
+                        }
+                    } else {
+                        synchronized (matchView) {
+                            DefaultMutableTreeNode pathNode = getPathNode(candidate);
+                            pathNode.add(new DefaultMutableTreeNode(new MatchingFile(file, candidate)));
+                            // Make sure the new node gets expanded.
+                            publish(pathNode);
+                        }
+                    }
+                } catch (Throwable th) {
+                    Log.warn("FileSearchRunnable.call caught something", th);
+                }
+            }
         }
     }
     
