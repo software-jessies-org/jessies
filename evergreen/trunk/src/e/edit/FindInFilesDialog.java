@@ -346,6 +346,10 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                             publish(pathNode);
                         }
                     }
+                } catch (FileNotFoundException ex) {
+                    // This special case is worthwhile if your workspace's index is out of date.
+                    // A common case is when the index contains generated files that may be removed during a build.
+                    ex = ex;
                 } catch (Throwable th) {
                     Log.warn("FileSearchRunnable.call caught something", th);
                 }
