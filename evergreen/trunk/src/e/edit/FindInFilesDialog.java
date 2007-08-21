@@ -29,8 +29,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     /** Which workspace is this "Find in Files" for? */
     private Workspace workspace;
     
-    /** Each workspace gets its own independent file-finding thread. */
-    private Thread fileFinderThread;
+    /** How our worker threads know whether they're still relevant. */
+    private static final AtomicInteger currentSequenceNumber = new AtomicInteger(0);
     
     /** We share these between all workspaces, to make it harder to accidentally launch a denial-of-service attack against ourselves. */
     private static final ExecutorService definitionFinderExecutor = ThreadUtilities.newFixedThreadPool(8, "Find Definitions");
@@ -157,6 +157,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         
         private HashMap<String, DefaultMutableTreeNode> pathMap = new HashMap<String, DefaultMutableTreeNode>();
         
+        private int sequenceNumber;
+        
         private AtomicInteger doneFileCount;
         private AtomicInteger matchingFileCount;
         private int totalFileCount;
@@ -166,6 +168,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         private long endTimeMs;
         
         public FileFinder() {
+            this.sequenceNumber = currentSequenceNumber.incrementAndGet();
+            
             this.matchRoot = new DefaultMutableTreeNode();
             this.regex = regexField.getText();
             this.fileRegex = filenameRegexField.getText();
@@ -197,12 +201,11 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             
             try {
                 Pattern pattern = PatternUtilities.smartCaseCompile(regex);
-                String root = workspace.getRootDirectory();
                 
                 final int threadCount = Runtime.getRuntime().availableProcessors() + 1;
                 ThreadPoolExecutor executor = (ThreadPoolExecutor) ThreadUtilities.newFixedThreadPool(threadCount, "find-in-files");
                 for (String candidate : fileList) {
-                    executor.execute(new FileSearchRunnable(root, candidate, pattern));
+                    executor.execute(new FileSearchRunnable(candidate, pattern));
                 }
                 executor.shutdown();
                 try {
@@ -244,6 +247,10 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         
         @Override
         protected void process(DefaultMutableTreeNode... treeNodes) {
+            if (currentSequenceNumber.get() != sequenceNumber) {
+                return;
+            }
+            
             synchronized (matchView) {
                 for (DefaultMutableTreeNode node : treeNodes) {
                     // I've no idea why new nodes default to being collapsed.
@@ -254,7 +261,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         
         @Override
         protected void done() {
-            if (isCancelled()) {
+            if (currentSequenceNumber.get() != sequenceNumber) {
                 return;
             }
             
@@ -279,21 +286,22 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
         
         private class FileSearchRunnable implements Runnable {
-            private String root;
             private String candidate;
             private Pattern pattern;
             
-            private FileSearchRunnable(String root, String candidate, Pattern pattern) {
-                this.root = root;
+            private FileSearchRunnable(String candidate, Pattern pattern) {
                 this.candidate = candidate;
                 this.pattern = pattern;
             }
             
             public void run() {
+                if (currentSequenceNumber.get() != sequenceNumber) {
+                    return;
+                }
                 try {
                     long t0 = System.currentTimeMillis();
                     FileSearcher fileSearcher = new FileSearcher(pattern);
-                    File file = FileUtilities.fileFromParentAndString(root, candidate);
+                    File file = FileUtilities.fileFromParentAndString(workspace.getRootDirectory(), candidate);
                     
                     // Update our percentage-complete status, but only if we've
                     // taken enough time for the user to start caring, so we
@@ -384,12 +392,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             // There's no point doing a search if the user can't see the results.
             return;
         }
-        if (fileFinderThread != null) {
-            // There's no point finishing a search if we're starting another.
-            fileFinderThread.interrupt();
-        }
-        fileFinderThread = new Thread(new FileFinder(), "Find in Files for " + workspace.getTitle());
-        fileFinderThread.start();
+        new Thread(new FileFinder(), "Find in Files for " + workspace.getTitle()).start();
     }
     
     public void initMatchList() {
