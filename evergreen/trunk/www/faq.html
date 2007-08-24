@@ -42,14 +42,14 @@ So something like <tt>sudo cp ctags-5.6-darwin-universal /usr/bin/ctags ; sudo c
 <h2>Are there any secret configuration options?</h2>
 
 <p>Check out $HOME/.e.edit.Edit/edit.properties (or ~/Library/Preferences/e.edit.Edit/edit.properties on Mac OS). The most interesting choices are:
-<ul>
-<li><b>fixedFont.default</b> - set to true if you don't want Evergreen to guess on a per-file basis whether to use its proportional or fixed font, and to always use the fixed font instead. (Normally, the default choice is proportional, but the presence of attempts to manually line things up with whitespace are taken to imply that a fixed font should be used. )
-<li><b>font.name</b> - the name of the proportional font. Use Terminator's preferences dialog to see your choices.
-<li><b>font.size</b> - the point size of the proportional font.
-<li><b>fixedFont.name</b> - the name of the fixed font. Use Terminator's preferences dialog to see your choices.
-<li><b>fixedFont.size</b> - the point size of the fixed font.
-<li><b>indent.string</b> - the string to be used by the auto-indentation code to increase or decrease indentation. Evergreen tries to guess the file's indentation string (it uses the statistically most frequently-occurring indentation string, which works well even when files are inconsistent), but if you create a new file or edit a file that otherwise currently has no indentation, this is what Evergreen will fall back to.
-</ul>
+
+<p><b>fixedFont.default</b> - set to true if you don't want Evergreen to guess on a per-file basis whether to use its proportional or fixed font, and to always use the fixed font instead. (Normally, the default choice is proportional, but the presence of attempts to manually line things up with whitespace are taken to imply that a fixed font should be used. )
+<p><b>font.name</b> - the name of the proportional font. Use Terminator's preferences dialog to see your choices.
+<p><b>font.size</b> - the point size of the proportional font.
+<p><b>fixedFont.name</b> - the name of the fixed font. Use Terminator's preferences dialog to see your choices.
+<p><b>fixedFont.size</b> - the point size of the fixed font.
+<p><b>indent.string</b> - the string to be used by the auto-indentation code to increase or decrease indentation. Evergreen tries to guess the file's indentation string (it uses the statistically most frequently-occurring indentation string, which works well even when files are inconsistent), but if you create a new file or edit a file that otherwise currently has no indentation, this is what Evergreen will fall back to.
+
 <p>The intention is that all this will one day be replaced by a preferences dialog in the UI.
 
 <!--#include virtual="/salma-hayek/footer.html" -->
