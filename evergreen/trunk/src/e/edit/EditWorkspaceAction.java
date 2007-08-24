@@ -2,10 +2,10 @@ package e.edit;
 
 import java.awt.event.*;
 import javax.swing.*;
-import e.forms.*;
-import e.gui.*;
-import e.util.*;
 
+/**
+ * Opens a dialog where the user can modify the details of an existing workspace.
+ */
 public class EditWorkspaceAction extends AbstractAction {
     private Workspace boundWorkspace;
     
@@ -23,27 +23,13 @@ public class EditWorkspaceAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         Workspace workspace = (boundWorkspace != null) ? boundWorkspace : Evergreen.getInstance().getCurrentWorkspace();
         
-        JTextField nameField = new JTextField("", 40);
-        nameField.setText(workspace.getTitle());
+        WorkspaceProperties properties = new WorkspaceProperties();
+        properties.name = workspace.getTitle();
+        properties.rootDirectory = workspace.getRootDirectory();
         
-        FilenameChooserField filenameChooserField = new FilenameChooserField(JFileChooser.DIRECTORIES_ONLY);
-        filenameChooserField.setCompanionNameField(nameField);
-        filenameChooserField.setPathname(workspace.getRootDirectory());
-        
-        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Workspace Properties");
-        FormPanel formPanel = form.getFormPanel();
-        formPanel.addRow("Root Directory:", filenameChooserField);
-        formPanel.addRow("Name:", nameField);
-        
-        while (form.show("Apply")) {
-            String message = FileUtilities.checkDirectoryExistence(filenameChooserField.getPathname());
-            if (message != null) {
-                Evergreen.getInstance().showAlert(message, "The pathname you supply must exist, and must be a directory.");
-            } else {
-                workspace.setTitle(nameField.getText());
-                workspace.setRootDirectory(filenameChooserField.getPathname());
-                return;
-            }
+        if (properties.showWorkspacePropertiesDialog("Workspace Properties", "Apply") == true) {
+            workspace.setTitle(properties.name);
+            workspace.setRootDirectory(properties.rootDirectory);
         }
     }
 }
