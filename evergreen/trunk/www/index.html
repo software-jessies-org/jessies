@@ -21,7 +21,7 @@ I certainly shouldn't have to.
 <ul>
 <li><p><strong>Ubiquitous Regular Expressions</strong> - Programmers know regular expressions, and yet their graphical tools don't use make much use of them.
 Evergreen does.
-Anywhere it's asking you to type something, it's probably expecting a regular expression: full Perl/Java regular expressions in find, in find/replace, in find in files (as you'd expect), but also in the open dialog.
+Anywhere it's asking you to type something, it's probably expecting a regular expression: full Perl/Java regular expressions in find, in find/replace, in find in files (as you'd expect), but also in the open dialog. Evergreen uses "smart case" regular expressions, too, where an all-lowercase regular expression is assumed to be case-insensitive. You can use <tt>(?-i)</tt> and <tt>(?i)</tt> to explicitly turn case-sensitivity on and off.
 
 <li><p><strong>Open Files Quicker</strong> - Evergreen indexes your project, so you don't have to remember where files are.
 Or what case your co-worker used ("Hyperlink" or "HyperLink"?).
@@ -33,6 +33,7 @@ Evergreen updates a list of the matching files as you type (like iTunes):
 <li><p><strong>Find in Files</strong> - You can also search for files to open based on their content.
 Evergreen shows a tree of matches, representing the directory hierarchy.
 Files containing definitions are marked as such.
+Searching is done in parallel to take advantage of modern multi-core machines.
 Search results are automatically updated if anything changes:
 
 <p align="center"><img src="find-in-files.png" width="723" height="502" alt="Find in Files dialog">
