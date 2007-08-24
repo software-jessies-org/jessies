@@ -407,7 +407,7 @@ public class Evergreen {
         int index = 0;
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             String title = tabbedPane.getTitleAt(i);
-            if (name.compareTo(title) <= 0) {
+            if (name.compareToIgnoreCase(title) <= 0) {
                 break;
             }
             index++;
