@@ -13,15 +13,18 @@ import javax.swing.event.*;
 import org.jdesktop.swingworker.SwingWorker;
 
 /**
- * Improves on Apple Project Builder's "Open Quickly",
- * which just pops up a dialog where you type a name. We have
- * a list -- updated as you type in the filename field -- showing what
- * files match the regular expression you've typed. You can
- * double-click individual entries to open them, or hit Return if
- * there's just the one.
+ * Improves on Apple Project Builder's "Open Quickly", which just pops up a dialog where you type a name.
+ * We have a list -- updated as you type in the filename field -- showing what files match the regular expression you've typed.
+ * You can double-click individual entries to open them, or hit Return to open just the selected one(s).
+ * We also keep a history of recently-accepted search terms.
  */
 public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
-    private JTextField filenameField = new JTextField(40);
+    private EHistoryTextField filenameField = new EHistoryTextField() {
+        // FIXME: consider changing EHistoryTextField's constructor to take a trackChanges boolean that causes this behavior automatically.
+        @Override public String getText() {
+            return getCurrentText();
+        }
+    };
     private JList matchList;
     private JLabel status = new JLabel(" ");
     private JButton rescanButton;
@@ -140,6 +143,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         formPanel.addRow("Matches:", new JScrollPane(matchList));
         form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
             public Boolean call() {
+                filenameField.rememberCurrentItem();
                 openSelectedFilesFromList();
                 return true;
             }
