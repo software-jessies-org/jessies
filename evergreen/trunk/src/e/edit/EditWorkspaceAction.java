@@ -26,10 +26,12 @@ public class EditWorkspaceAction extends AbstractAction {
         WorkspaceProperties properties = new WorkspaceProperties();
         properties.name = workspace.getTitle();
         properties.rootDirectory = workspace.getRootDirectory();
+        properties.buildTarget = workspace.getBuildTarget();
         
         if (properties.showWorkspacePropertiesDialog("Workspace Properties", "Apply") == true) {
             workspace.setTitle(properties.name);
             workspace.setRootDirectory(properties.rootDirectory);
+            workspace.setBuildTarget(properties.buildTarget);
         }
     }
 }

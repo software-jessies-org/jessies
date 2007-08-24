@@ -15,6 +15,7 @@ public class AddWorkspaceAction extends AbstractAction {
         WorkspaceProperties properties = new WorkspaceProperties();
         properties.name = "";
         properties.rootDirectory = null;
+        properties.buildTarget = null;
         
         if (properties.showWorkspacePropertiesDialog("Add Workspace", "Add") == true) {
             Evergreen.getInstance().createWorkspace(properties.name, properties.rootDirectory);
