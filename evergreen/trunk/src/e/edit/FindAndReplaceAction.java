@@ -174,8 +174,10 @@ public class FindAndReplaceAction extends ETextAction {
     }
 
     public class DisplayableMatch {
+        private static final String HEADER = "<html><body>";
         private static final String RED_ON = "<font color=red>";
         private static final String BLUE_ON = "<font color=blue>";
+        private static final String COLOR_OFF = "</font>";
         
         private String html;
         private String toolTip;
@@ -215,13 +217,6 @@ public class FindAndReplaceAction extends ETextAction {
         }
 
         public String colorize(String line, String regularExpression, String replacement) {
-            // Work around the Swing misfeature where empty labels have zero height by ensuring that we always have something (even if it's invisible) in our labels.
-            if (replacement == null && line.length() == 0) {
-                line = " ";
-            } else if (replacement != null && replacement.length() == 0) {
-                replacement = " ";
-            }
-            
             String colorOn = BLUE_ON;
             if (replacement == null) {
                 regularExpression = "(" + regularExpression + ")";
@@ -248,14 +243,23 @@ public class FindAndReplaceAction extends ETextAction {
                 } else if (buffer.charAt(i) == '\u0000') {
                     insert = colorOn;
                 } else if (buffer.charAt(i) == '\u0001') {
-                    insert = "</font>";
+                    insert = COLOR_OFF;
                 }
                 if (insert != null) {
                     buffer.replace(i, i + 1, insert);
                     i += insert.length() - 1;
                 }
             }
-            String result = "<html><body>" + buffer.toString();
+            
+            String result = HEADER + buffer.toString();
+            
+            // Work around the Swing misfeature where empty labels have zero height by ensuring that we always have something (even if it's invisible) in our labels.
+            final int emptyMatchLength = (HEADER + RED_ON + COLOR_OFF).length();
+            final int emptyReplacementLength = (HEADER + BLUE_ON + COLOR_OFF).length();
+            if (result.length() == emptyMatchLength || result.length() == emptyReplacementLength) {
+                result += "&nbsp;";
+            }
+            
             return result;
         }
     }
