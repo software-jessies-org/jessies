@@ -134,8 +134,8 @@ public class Evergreen {
     }
     
     /** Returns the frame we're using for the main window. */
-    public Frame getFrame() {
-        return (Frame) frame;
+    public JFrame getFrame() {
+        return frame;
     }
     
     public EHistoryComboBoxModel getFindHistory() {

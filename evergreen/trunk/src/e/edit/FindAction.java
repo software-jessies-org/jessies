@@ -77,22 +77,6 @@ public class FindAction extends ETextAction implements MinibufferUser {
         findAllMatches(value);
     }
     
-    /**
-     * Interprets C-D and C-G as requests to jump to the previous and next highlighted
-     * matches, respectively.
-     */
-    public boolean interpretSpecialKeystroke(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_D) {
-            currentTextWindow.getTextArea().findPrevious();
-            return true;
-        }
-        if (e.getKeyCode() == KeyEvent.VK_G) {
-            currentTextWindow.getTextArea().findNext();
-            return true;
-        }
-        return false;
-    }
-    
     public boolean wasAccepted(String value) {
         return true;
     }
