@@ -33,6 +33,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
     /**
      * Returns true if the style includes multi-line comments.
      * The multiLineCommentStart and multiLineCommentEnd methods are then used to get the actual delimiters used.
+     * The defaults are for C-family multi-line comments.
      */
     protected abstract boolean supportMultiLineComments();
     
