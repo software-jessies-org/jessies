@@ -69,7 +69,19 @@ public class PRubyTextStyler extends PAbstractLanguageStyler {
     
     @Override
     protected boolean supportMultiLineComments() {
-        return false;
+        return true;
+    }
+    
+    @Override
+    protected String multiLineCommentStart() {
+        // FIXME: only true at the beginning of a line.
+        return "=begin";
+    }
+    
+    @Override
+    protected String multiLineCommentEnd() {
+        // FIXME: only true at the beginning of a line.
+        return "=end";
     }
     
     @Override

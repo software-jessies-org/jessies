@@ -95,16 +95,6 @@ public class PPhpTextStyler extends PAbstractLanguageStyler {
     }
     
     @Override
-    protected String multiLineCommentStart() {
-        return "/*";
-    }
-    
-    @Override
-    protected String multiLineCommentEnd() {
-        return "*/";
-    }
-    
-    @Override
     protected boolean isQuote(char ch) {
         return (ch == '\'' || ch == '\"' || ch == '`');
     }
