@@ -110,14 +110,13 @@ public class EMenuBar extends JMenuBar {
         }
         
         private void traverseMenu(JMenu menu) {
-            MenuElement[] elements = menu.getSubElements();
-            for (int i = 0; i < elements.length; i++) {
-                if (elements[i] instanceof JMenu) {
-                    traverseMenu((JMenu) elements[i]);
-                } else if (elements[i] instanceof JPopupMenu) {
-                    traverseMenu((JPopupMenu) elements[i]);
+            for (MenuElement element : menu.getSubElements()) {
+                if (element instanceof JMenu) {
+                    traverseMenu((JMenu) element);
+                } else if (element instanceof JPopupMenu) {
+                    traverseMenu((JPopupMenu) element);
                 } else {
-                    JMenuItem menuItem = (JMenuItem) elements[i];
+                    JMenuItem menuItem = (JMenuItem) element;
                     Action action = menuItem.getAction();
                     if (action == null) {
                         if (menuItem instanceof JMenu == false) {
@@ -131,9 +130,8 @@ public class EMenuBar extends JMenuBar {
         }
         
         private void traverseMenu(JPopupMenu menu) {
-            MenuElement[] elements = menu.getSubElements();
-            for (int i = 0; i < elements.length; i++) {
-                JMenuItem menuItem = (JMenuItem) elements[i];
+            for (MenuElement element : menu.getSubElements()) {
+                JMenuItem menuItem = (JMenuItem) element;
                 Action action = menuItem.getAction();
                 if (action == null) {
                     if (menuItem instanceof JMenu == false) {
@@ -141,6 +139,36 @@ public class EMenuBar extends JMenuBar {
                     }
                 } else {
                     menuItem.setEnabled(action.isEnabled());
+                }
+            }
+        }
+    }
+    
+    /**
+     * Searches for a menu item whose accelerator property is the given KeyStroke.
+     * The menu item's Action will be performed with a null ActionEvent, on the EDT.
+     */
+    public void performActionForKeyStroke(KeyStroke keyStroke) {
+        performActionForKeyStroke(keyStroke, this);
+    }
+    
+    private void performActionForKeyStroke(KeyStroke keyStroke, MenuElement menu) {
+        for (MenuElement element : menu.getSubElements()) {
+            if (element instanceof JMenu || element instanceof JPopupMenu) {
+                performActionForKeyStroke(keyStroke, element);
+            } else if (element instanceof JMenuItem) {
+                final JMenuItem menuItem = (JMenuItem) element;
+                final Action action = menuItem.getAction();
+                final KeyStroke menuItemKeyStroke = menuItem.getAccelerator();
+                if (action != null && menuItemKeyStroke != null && action.isEnabled()) {
+                    // We can't use KeyStroke.equals because that requires the pressed/released/typed state to match too, which won't (necessarily) on all platforms.
+                    if (keyStroke.getKeyChar() == menuItemKeyStroke.getKeyChar() && keyStroke.getKeyCode() == menuItemKeyStroke.getKeyCode() && keyStroke.getModifiers() == menuItemKeyStroke.getModifiers()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                action.actionPerformed(null);
+                            }
+                        });
+                    }
                 }
             }
         }
