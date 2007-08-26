@@ -79,31 +79,39 @@ public class Minibuffer extends JPanel implements FocusListener {
         });
         textField.addFocusListener(this);
         textField.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                boolean shouldHide = false;
+            public void keyReleased(final KeyEvent e) {
+                if (e.isConsumed()) {
+                    return;
+                }
                 if (e.getModifiers() == 0) {
-                    shouldHide = handleEnterAndEsc(e);
+                    boolean shouldHide = handleEnterAndEsc(e);
+                    if (shouldHide) {
+                        deactivate();
+                    }
                 } else if ((e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) {
-                    // This is horrid, but I don't think it's possible to do the right thing.
-                    // If you look at the API Component and JComponent provide, you'll
-                    // see that the likely candidates for injecting KeyEvents are protected,
-                    // and the Swing utility class (KeyboardManager) for handling this
-                    // kind of thing is likewise inaccessible. You can't just get the list of
-                    // KeyListener objects, because that's not how key bindings are handled.
-                    // You might think you could getActionForKeyStroke and fake up a
-                    // suitable KeyStroke using KeyStroke.getKeyStrokeForEvent, and you'd
-                    // be right, but you'd find that text actions work by getting the focused
-                    // component and invoking a method on that, and we the minibuffer are
-                    // focused, so that's not going to help forward the event, is it?
+                    final KeyStroke thisKeyStroke = KeyStroke.getKeyStrokeForEvent(e);
+                    KeyStroke currentMinibufferUserKeyStroke = (KeyStroke) ((AbstractAction) minibufferUser).getValue(AbstractAction.ACCELERATOR_KEY);
+                    if (currentMinibufferUserKeyStroke.getKeyCode() == thisKeyStroke.getKeyCode() && currentMinibufferUserKeyStroke.getKeyChar() == thisKeyStroke.getKeyChar() && currentMinibufferUserKeyStroke.getModifiers() == thisKeyStroke.getModifiers()) {
+                        // We're already showing, so there's nothing to do.
+                        // This may look like a premature optimization, but we actually receive the initial KeyEvent that caused us to show.
+                        // Not returning early would cause us to be canceled before we'd shown.
+                        e.consume();
+                        return;
+                    }
+                    
                     typingTimer.stop();
                     notifyMinibufferUserOfTyping();
-                    shouldHide = minibufferUser.interpretSpecialKeystroke(e);
-                    if (shouldHide) {
-                        addToHistory();
-                    }
-                }
-                if (shouldHide) {
+                    
+                    // FIXME: check first if the keystroke is actually bound to something and do nothing if it's not?
+                    addToHistory();
                     deactivate();
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            EvergreenMenuBar menuBar = (EvergreenMenuBar) Evergreen.getInstance().getFrame().getJMenuBar();
+                            menuBar.performActionForKeyStroke(thisKeyStroke);
+                        }
+                    });
                 }
             }
         });
@@ -120,13 +128,15 @@ public class Minibuffer extends JPanel implements FocusListener {
             e.consume();
             notifyMinibufferUserOfTyping();
             String text = textField.getText();
-            shouldHide = minibufferUser.isValid(text) && minibufferUser.wasAccepted(text);
+            shouldHide = (minibufferUser.isValid(text) && minibufferUser.wasAccepted(text));
             if (shouldHide) {
                 addToHistory();
             }
         } else if (keyCode == KeyEvent.VK_UP) {
+            e.consume();
             traverseHistory(-1);
         } else if (keyCode == KeyEvent.VK_DOWN) {
+            e.consume();
             traverseHistory(1);
         }
         return shouldHide;

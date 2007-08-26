@@ -18,7 +18,13 @@ public class GotoAction extends ETextAction implements MinibufferUser {
     }
     
     public void actionPerformed(ActionEvent e) {
-        currentTextArea = getFocusedTextArea();
+        // See FindAction.actionPerformed.
+        ETextWindow newCurrentTextWindow = getFocusedTextWindow();
+        if (newCurrentTextWindow == null) {
+            return;
+        }
+        
+        currentTextArea = newCurrentTextWindow.getTextArea();
         // FIXME - selection
         initialCaretPosition = currentTextArea.getSelectionStart();
         Evergreen.getInstance().showMinibuffer(this);
@@ -56,11 +62,6 @@ public class GotoAction extends ETextAction implements MinibufferUser {
         if (isValid(value)) {
             currentTextArea.goToLine(Integer.parseInt(value));
         }
-    }
-    
-    /** Returns false because we offer no actions, so the minibuffer should remain active. */
-    public boolean interpretSpecialKeystroke(KeyEvent e) {
-        return false;
     }
     
     public boolean wasAccepted(String value) {

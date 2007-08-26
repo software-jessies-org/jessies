@@ -40,16 +40,6 @@ public interface MinibufferUser {
     public void valueChangedTo(String value);
     
     /**
-     * Invoked if the user tries to invoke an action from the keyboard.
-     * Use the result of e.getKeyCode() to determine the action.
-     * Return true if the minibuffer should hide itself, false otherwise.
-     * Returning true is taken to mean that the text was accepted.
-     * (Minibuffer itself provides the user with the one true way of
-     * cancelling the operation - via escape.)
-     */
-    public boolean interpretSpecialKeystroke(KeyEvent e);
-
-    /**
      * Invoked if the user accepts the value in the minibuffer.
      * Return true to comply, false if you don't want to allow this value to be accepted.
      */
