@@ -79,7 +79,7 @@ public class Minibuffer extends JPanel implements FocusListener {
         });
         textField.addFocusListener(this);
         textField.addKeyListener(new KeyAdapter() {
-            public void keyReleased(final KeyEvent e) {
+            public void keyPressed(final KeyEvent e) {
                 if (e.isConsumed()) {
                     return;
                 }
@@ -89,23 +89,30 @@ public class Minibuffer extends JPanel implements FocusListener {
                         deactivate();
                     }
                 } else if ((e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) {
-                    final KeyStroke thisKeyStroke = KeyStroke.getKeyStrokeForEvent(e);
-                    KeyStroke currentMinibufferUserKeyStroke = (KeyStroke) ((AbstractAction) minibufferUser).getValue(AbstractAction.ACCELERATOR_KEY);
-                    if (currentMinibufferUserKeyStroke.getKeyCode() == thisKeyStroke.getKeyCode() && currentMinibufferUserKeyStroke.getKeyChar() == thisKeyStroke.getKeyChar() && currentMinibufferUserKeyStroke.getModifiers() == thisKeyStroke.getModifiers()) {
-                        // We're already showing, so there's nothing to do.
-                        // This may look like a premature optimization, but we actually receive the initial KeyEvent that caused us to show.
-                        // Not returning early would cause us to be canceled before we'd shown.
-                        e.consume();
-                        return;
-                    }
-                    
+                    // Ensure everything's up to date.
                     typingTimer.stop();
                     notifyMinibufferUserOfTyping();
                     
-                    // FIXME: check first if the keystroke is actually bound to something and do nothing if it's not?
+                    final KeyStroke thisKeyStroke = KeyStroke.getKeyStrokeForEvent(e);
+                    
+                    // Check whether the text field would like the keystroke.
+                    Object mapKey = textField.getInputMap().get(thisKeyStroke);
+                    if (mapKey != null) {
+                        Action action = textField.getActionMap().get(mapKey);
+                        if (action != null) {
+                            // Let the text field have it.
+                            return;
+                        }
+                    }
+                    
+                    // Ignore the initial press of alt/control/command.
+                    if (e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+                        return;
+                    }
+                    
+                    // Cancel the minibuffer and see if the menu bar has an action for us.
                     addToHistory();
                     deactivate();
-                    
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             EvergreenMenuBar menuBar = (EvergreenMenuBar) Evergreen.getInstance().getFrame().getJMenuBar();
