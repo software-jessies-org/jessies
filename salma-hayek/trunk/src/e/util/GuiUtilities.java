@@ -3,6 +3,7 @@ package e.util;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
+import java.lang.reflect.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -283,6 +284,43 @@ public class GuiUtilities {
             awtAppClassNameField.set(xToolkit, Log.getApplicationName());
         } catch (Throwable th) {
             Log.warn("Failed to fix WM_CLASS for " + Log.getApplicationName() + " windows.", th);
+        }
+    }
+    
+    /**
+     * Sets the opacity (1.0 => fully opaque, 0.0 => fully transparent) of the given Frame.
+     * http://elliotth.blogspot.com/2007/08/transparent-java-windows-on-x11.html
+     */
+    public static void setFrameAlpha(Frame frame, double alpha) {
+        try {
+            Field peerField = Component.class.getDeclaredField("peer");
+            peerField.setAccessible(true);
+            Object peer = peerField.get(frame);
+            
+            if (isMacOs()) {
+                Class<?> cWindowClass = Class.forName("apple.awt.CWindow");
+                if (cWindowClass.isInstance(peer)) {
+                    // ((apple.awt.CWindow) peer).setAlpha(alpha);
+                    Method setAlphaMethod = cWindowClass.getMethod("setAlpha", float.class);
+                    setAlphaMethod.invoke(peer, alpha);
+                }
+            } else {
+                // long windowId = peer.getWindow();
+                Class<?> xWindowPeerClass = Class.forName("sun.awt.X11.XWindowPeer");
+                Method getWindowMethod = xWindowPeerClass.getMethod("getWindow", new Class[0]);
+                long windowId = ((Long) getWindowMethod.invoke(peer, new Object[0])).longValue();
+                
+                long value = (int) (0xff * alpha) << 24;
+                // sun.awt.X11.XAtom.get("_NET_WM_WINDOW_OPACITY").setCard32Property(windowId, value);
+                Class<?> xAtomClass = Class.forName("sun.awt.X11.XAtom");
+                Method getMethod = xAtomClass.getMethod("get", String.class);
+                Method setCard32PropertyMethod = xAtomClass.getMethod("setCard32Property", long.class, long.class);
+                setCard32PropertyMethod.invoke(getMethod.invoke(null, "_NET_WM_WINDOW_OPACITY"), windowId, value);
+            }
+        } catch (Exception ex) {
+            // Boo hoo! No transparency for you!
+            ex.printStackTrace();
+            return;
         }
     }
     
