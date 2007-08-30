@@ -302,7 +302,7 @@ public class GuiUtilities {
                 if (cWindowClass.isInstance(peer)) {
                     // ((apple.awt.CWindow) peer).setAlpha(alpha);
                     Method setAlphaMethod = cWindowClass.getMethod("setAlpha", float.class);
-                    setAlphaMethod.invoke(peer, alpha);
+                    setAlphaMethod.invoke(peer, (float) alpha);
                 }
             } else {
                 // long windowId = peer.getWindow();
