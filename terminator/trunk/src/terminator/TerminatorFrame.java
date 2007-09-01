@@ -377,8 +377,19 @@ public class TerminatorFrame extends JFrame {
 		setBackground(terminals.size() > 1 ? originalBackground : Options.getSharedInstance().getColor("background"));
 	}
 	
+	@Override
+	public void addNotify() {
+		super.addNotify();
+		updateTransparency();
+	}
+	
+	private void updateTransparency() {
+		GuiUtilities.setFrameAlpha(this, Options.getSharedInstance().getAlpha());
+	}
+	
 	public void optionsDidChange() {
 		updateBackground();
+		updateTransparency();
 		
 		if (Options.getSharedInstance().shouldUseMenuBar() && getJMenuBar() == null) {
 			// Add a menu bar.

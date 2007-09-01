@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 /**
  * Reads in settings from the file system and makes them conveniently
@@ -25,6 +26,7 @@ import javax.swing.*;
  * every available option, and edit them in the preferences dialog.
  */
 public class Options {
+	private static final String ALPHA = "alpha";
 	private static final String ANTI_ALIAS = "antiAlias";
 	private static final String BLOCK_CURSOR = "blockCursor";
 	private static final String CURSOR_BLINK = "cursorBlink";
@@ -181,6 +183,14 @@ public class Options {
 		return integerResource(INITIAL_COLUMN_COUNT);
 	}
 	
+	public double getAlpha() {
+		return doubleResource(ALPHA);
+	}
+	
+	private double doubleResource(String name) {
+		return (Double) options.get(name);
+	}
+	
 	private int integerResource(String name) {
 		return (Integer) options.get(name);
 	}
@@ -267,6 +277,7 @@ public class Options {
 	 * Sets the defaults for non-color options.
 	 */
 	private void initDefaults() {
+		addDefault(ALPHA, Double.valueOf(1.0), "Terminal opacity");
 		addDefault(ANTI_ALIAS, Boolean.FALSE, "Anti-alias text?");
 		addDefault(BLOCK_CURSOR, Boolean.FALSE, "Use block cursor?");
 		addDefault(CURSOR_BLINK, Boolean.TRUE, "Blink cursor?");
@@ -315,7 +326,6 @@ public class Options {
 		colorsPanel.addRow("", makePresetButton(colorPreferences, "Black on White", Color.WHITE, NEAR_BLACK, Color.BLUE, LIGHT_BLUE));
 		colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, NEAR_GREEN, Color.GREEN, SELECTION_BLUE));
 		colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, Color.DARK_GRAY));
-		colorsPanel.addEmptyRow();
 		
 		String[] keys = options.keySet().toArray(new String[options.size()]);
 		Arrays.sort(keys);
@@ -333,6 +343,8 @@ public class Options {
 					ColorPreference colorPreference = new ColorPreference(key);
 					colorPreferences.put(key, colorPreference);
 					colorsPanel.addRow(description + ":", colorPreference.makeUi());
+				} else if (value instanceof Double) {
+					colorsPanel.addRow(description + ":", new DoublePreference(key).makeUi());
 				} else {
 					// FIXME: we should probably handle String.
 					// FIXME: the Final Solution should use a HashMap<Class, XPreference>.
@@ -447,6 +459,28 @@ public class Options {
 				}
 			});
 			return checkBox;
+		}
+	}
+	
+	private class DoublePreference {
+		private String key;
+		
+		public DoublePreference(String key) {
+			this.key = key;
+		}
+		
+		public JComponent makeUi() {
+			// FIXME: this isn't suitable for all possible double preferences, but it's fine for opacity.
+			final JSlider slider = new JSlider(0, 255);
+			slider.setValue((int) (255 * (Double) options.get(key)));
+			slider.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent e) {
+					options.put(key, ((double) slider.getValue())/256);
+					Terminator.getSharedInstance().optionsDidChange();
+				}
+			});
+			slider.setEnabled(GuiUtilities.isWindows() == false);
+			return slider;
 		}
 	}
 	
@@ -731,6 +765,8 @@ public class Options {
 			Class currentClass = currentValue.getClass();
 			if (currentClass == Boolean.class) {
 				options.put(key, Boolean.valueOf(value));
+			} else if (currentClass == Double.class) {
+				options.put(key, Double.valueOf(value));
 			} else if (currentClass == Font.class) {
 				options.put(key, makePrototypeFont(value));
 			} else if (currentClass == Integer.class) {
