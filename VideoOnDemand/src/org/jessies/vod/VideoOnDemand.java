@@ -89,7 +89,7 @@ public class VideoOnDemand extends JFrame {
     private void showCurrentTime() {
         try {
             int timeInSeconds = movie.getTime()/movie.getTimeScale();
-            System.out.println("Currently at time " + timeInSeconds + "s (" + TimeUtilities.durationToIsoString(timeInSeconds * 1000) + ").");
+            System.out.println("Currently at time " + timeInSeconds + "s (" + TimeUtilities.msToIsoString(timeInSeconds * 1000) + ").");
         } catch (QTException ex) {
             ex.printStackTrace();
         }
