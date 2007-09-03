@@ -162,7 +162,7 @@ class Java
       # Can we salvage the situation by finding a suitable JVM?
       
       if target_os() == "Darwin"
-        # At the moment, only Apple's Java 5 is suitable for running our applications.
+        # At the moment on Mac OS, only Java 5 is suitable for running our applications.
         globs = [ "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home" ]
       else
         # This works for Linux distributions using Sun's RPM, and for Solaris.
@@ -380,12 +380,6 @@ class Java
       add_property("apple.laf.useScreenMenuBar", "true")
     end
     
-    # These only-needed-with-Java5 extra arguments are things I've found useful in the past.
-    # They'll help me google if I need them again.
-    #args << "-Xdebug"
-    #args << "-Xrunjdwp:transport=dt_socket,server=y,suspend=n"
-    #args << "-Xrunhprof:file=dump.hprof,format=b"
-
     add_pathname_property("org.jessies.aboutBoxIcon", @png_icon)
     add_pathname_property("org.jessies.frameIcon", @frame_icon)
     add_pathname_property("org.jessies.projectRoot", @project_root)
