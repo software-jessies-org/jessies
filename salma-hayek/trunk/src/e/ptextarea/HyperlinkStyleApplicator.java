@@ -11,19 +11,19 @@ import java.util.regex.*;
  * Links to web sites from written-out URLs.
  * 
  * Examples:
- *   http://www.google.com
- *   http://www.google.com/
- *   http://www.gnu.org/software/make/manual/html_mono/make.html
- *   http://cvs.gnome.org/viewcvs/gtk%2B/gtk/gtkstock.h?view=markup
- *   <a href="http://www.google.com">Google</a>
- *   "http://www.google.com"
- *   (http://www.google.com)
- *   (http://www.google.com/)
- *   <http://www.google.com>
- *   http://www.google.com, http://www.google.com.
- *   http://www.google.com/, http://www.google.com/.
- *   http://www.google.com/~user/
- *   http://www.google.com/~user/page.html#target
+ *   http://software.jessies.org
+ *   http://software.jessies.org/
+ *   http://software.jessies.org/software/make/manual/html_mono/make.html
+ *   http://software.jessies.org/viewcvs/gtk%2B/gtk/gtkstock.h?view=markup
+ *   <a href="http://software.jessies.org">Software Jessies</a>
+ *   "http://software.jessies.org"
+ *   (http://software.jessies.org)
+ *   (http://software.jessies.org/)
+ *   <http://software.jessies.org>
+ *   http://software.jessies.org, http://software.jessies.org.
+ *   http://software.jessies.org/, http://software.jessies.org/.
+ *   http://software.jessies.org/~user/
+ *   http://software.jessies.org/~user/page.html#target
  */
 class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
     // This character class and the regular expression below are based on the BNF in RFC 1738.
