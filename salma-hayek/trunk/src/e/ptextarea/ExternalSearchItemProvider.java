@@ -14,16 +14,26 @@ class ExternalSearchItemProvider implements MenuItemProvider {
     }
     
     public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
-        if (GuiUtilities.isMacOs()) {
-            actions.add(new SearchInSpotlightAction());
-        }
-        actions.add(new SearchInGoogleAction());
-        actions.add(new LookUpInDictionaryAction());
+        actions.add(new ExternalSearchAction("Search in Google", "http://www.google.com/search?q=%s&ie=UTF-8&oe=UTF-8"));
+        actions.add(GuiUtilities.isMacOs() ? new MacDictionaryAction() : new ExternalSearchAction("Look Up in Dictionary", "http://www.answers.com/%s"));
+        actions.add(new ExternalSearchAction("Look Up in Wikipedia", "en.wikipedia.org/wiki/Special:Search?search=%s"));
     }
     
-    private abstract class ExternalSearchAction extends AbstractAction {
-        public ExternalSearchAction(String name) {
+    private class ExternalSearchAction extends AbstractAction {
+        private String urlTemplate;
+        
+        public ExternalSearchAction(String name, String urlTemplate) {
             super(name);
+            this.urlTemplate = urlTemplate;
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            try {
+                String encodedSelection = StringUtilities.urlEncode(textArea.getSelectedText().trim());
+                BrowserLauncher.openURL(new Formatter().format(urlTemplate, encodedSelection).toString());
+            } catch (Exception ex) {
+                Log.warn("Exception launching browser", ex);
+            }
         }
         
         // It only makes sense to search for a non-empty selection.
@@ -32,57 +42,23 @@ class ExternalSearchItemProvider implements MenuItemProvider {
         }
     }
     
-    private class SearchInSpotlightAction extends ExternalSearchAction {
-        public SearchInSpotlightAction() {
-            super("Search in Spotlight");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            // Our "NSPerformService" helper needs to be on the path.
-            String searchTerm = textArea.getSelectedText().trim();
-            ProcessUtilities.spawn(null, new String[] { "NSPerformService", "Spotlight", searchTerm });
-        }
-    }
-    
-    private class SearchInGoogleAction extends ExternalSearchAction {
-        public SearchInGoogleAction() {
-            super("Search in Google");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            try {
-                String encodedSelection = StringUtilities.urlEncode(textArea.getSelectedText().trim());
-                BrowserLauncher.openURL("http://www.google.com/search?q=" + encodedSelection + "&ie=UTF-8&oe=UTF-8");
-            } catch (Exception ex) {
-                Log.warn("Exception launching browser", ex);
-            }
-        }
-    }
-    
-    private class LookUpInDictionaryAction extends ExternalSearchAction {
-        public LookUpInDictionaryAction() {
+    private class MacDictionaryAction extends AbstractAction {
+        private MacDictionaryAction() {
             super("Look Up in Dictionary");
         }
         
         public void actionPerformed(ActionEvent e) {
+            // We need to rewrite spaces as "%20" for them to find their way to Dictionary.app unmolested.
+            // The usual url-encoded form ("+") doesn't work, for some reason.
+            String encodedSelection = textArea.getSelectedText().trim().replaceAll("\\s+", "%20");
+            // In Mac OS 10.4.10, a dict: URI that causes Dictionary.app to start doesn't actually cause the definition to be shown, so we need to ask twice.
+            // If we knew the dictionary was already open, we could avoid the flicker.
+            // But we may as well wait for Apple to fix the underlying problem.
             try {
-                // We need to rewrite spaces as "%20" for them to find their
-                // way to Dictionary.app unmolested. The usual url-encoded
-                // form ("+") doesn't work, for some reason.
-                String encodedSelection = textArea.getSelectedText().trim().replaceAll("\\s+", "%20");
-                if (GuiUtilities.isMacOs()) {
-                    // In Mac OS 10.4.1, a dict: URI that causes Dictionary.app to
-                    // start doesn't actually cause the definition to be shown, so
-                    // we need to ask twice. If we knew the dictionary was already
-                    // open, we could avoid the flicker. But we may as well wait
-                    // for Apple to fix the underlying problem.
-                    BrowserLauncher.openURL("dict:///");
-                    BrowserLauncher.openURL("dict:///" + encodedSelection);
-                } else {
-                    BrowserLauncher.openURL("http://www.answers.com/" + encodedSelection);
-                }
+                BrowserLauncher.openURL("dict:///");
+                BrowserLauncher.openURL("dict:///" + encodedSelection);
             } catch (Exception ex) {
-                Log.warn("Exception launching browser", ex);
+                Log.warn("Exception launching Dictionary.app", ex);
             }
         }
     }
