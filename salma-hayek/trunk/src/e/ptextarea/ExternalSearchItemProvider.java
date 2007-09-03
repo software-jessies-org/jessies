@@ -16,7 +16,7 @@ class ExternalSearchItemProvider implements MenuItemProvider {
     public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
         actions.add(new ExternalSearchAction("Search in Google", "http://www.google.com/search?q=%s&ie=UTF-8&oe=UTF-8"));
         actions.add(GuiUtilities.isMacOs() ? new MacDictionaryAction() : new ExternalSearchAction("Look Up in Dictionary", "http://www.answers.com/%s"));
-        actions.add(new ExternalSearchAction("Look Up in Wikipedia", "en.wikipedia.org/wiki/Special:Search?search=%s"));
+        actions.add(new ExternalSearchAction("Look Up in Wikipedia", "http://en.wikipedia.org/wiki/Special:Search?search=%s"));
     }
     
     private class ExternalSearchAction extends AbstractAction {
@@ -48,13 +48,14 @@ class ExternalSearchItemProvider implements MenuItemProvider {
         }
         
         public void actionPerformed(ActionEvent e) {
-            // We need to rewrite spaces as "%20" for them to find their way to Dictionary.app unmolested.
-            // The usual url-encoded form ("+") doesn't work, for some reason.
-            String encodedSelection = textArea.getSelectedText().trim().replaceAll("\\s+", "%20");
-            // In Mac OS 10.4.10, a dict: URI that causes Dictionary.app to start doesn't actually cause the definition to be shown, so we need to ask twice.
-            // If we knew the dictionary was already open, we could avoid the flicker.
-            // But we may as well wait for Apple to fix the underlying problem.
             try {
+                // We need to rewrite spaces as "%20" for them to find their way to Dictionary.app unmolested.
+                // The usual url-encoded form ("+") doesn't work, for some reason.
+                String encodedSelection = textArea.getSelectedText().trim().replaceAll("\\s+", "%20");
+                
+                // In Mac OS 10.4.10, a dict: URI that causes Dictionary.app to start doesn't actually cause the definition to be shown, so we need to ask twice.
+                // Dictionary.app doesn't optimize the case where it's asked to look up what it's already displaying.
+                // Checking whether Dictionary.app's already running and starting it if it isn't doesn't look any better, so just do the easiest thing.
                 BrowserLauncher.openURL("dict:///");
                 BrowserLauncher.openURL("dict:///" + encodedSelection);
             } catch (Exception ex) {
