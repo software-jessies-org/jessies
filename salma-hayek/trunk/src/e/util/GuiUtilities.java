@@ -296,6 +296,9 @@ public class GuiUtilities {
             Field peerField = Component.class.getDeclaredField("peer");
             peerField.setAccessible(true);
             Object peer = peerField.get(frame);
+            if (peer == null) {
+                return;
+            }
             
             if (isMacOs()) {
                 Class<?> cWindowClass = Class.forName("apple.awt.CWindow");
