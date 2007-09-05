@@ -133,8 +133,20 @@ class Java
       # This launcher doesn't use the same algorithm as Sun's for picking a jvm.dll.
       @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/launcher"
     end
+    if false && target_os() == "Darwin"
+      # For Sparkle to work, we need our [NSBundle mainBundle] to point to our .app bundle.
+      # For that to work, the executable that starts the JVM must be in the Contents/MacOS/ directory.
+      mac_os_launcher = "#{@project_root}/../../MacOS/launcher"
+      if File.exist?(mac_os_launcher)
+        @launcher = mac_os_launcher
+      else
+        # We're probably running from a developer's working copy.
+        # Better to run without Sparkle than not run at all.
+        @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/launcher"
+      end
+    end
   end
-
+  
   def get_java_version(java_executable)
     # We might like to use -fullversion, but Debian's gij-wrapper Perl script only understands -version. I think for our purposes here, "-version" is accurate enough.
     java_version = `#{java_executable} -version 2>&1`.chomp()
@@ -327,16 +339,13 @@ class Java
   end
   
   def launch0()
-    # Back-quoting any console subsystem application causes a flickering window on startup for Terminator on Windows.
-    # (But we could use javaw -version.)
-    # The salma-hayek Java launcher already contains a version check.
-    # The version check often used to "get stuck" on Cygwin when running javahpp.
-    # Process Explorer says there are just two Ruby processes left running: the child we're back-quoting has already quit.
-    if target_os() != "Cygwin"
+    # If we're using our own launcher, it'll worry about finding an appropriate JVM version and reporting errors.
+    # If we're using Sun's java(1), we need to do some pre-flight checks.
+    if @launcher =~ /java$/
       check_java_version()
     end
 
-    # check_java_version may alter @launcher.
+    # check_java_version may alter @launcher to get us something that works.
     args = [ @launcher ]
 
     add_pathnames_property("java.class.path", @class_path)
