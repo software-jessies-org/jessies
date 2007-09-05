@@ -91,7 +91,7 @@ static void* mac_startJvm(void* context) {
 
 static int mac_runJvm(NativeArguments& launcherArguments) {
     // Find the primordial pthread's stack size.
-    struct rlimit limit;
+    rlimit limit;
     int rc = getrlimit(RLIMIT_STACK, &limit);
     if (rc != 0) {
         throw unix_exception("getrlimit failed");
@@ -396,14 +396,14 @@ public:
     }
     
     void setAppVariableFromOption(const char* key, const std::string& option) {
-        const char* value = strchr(option.c_str(), '=');
-        if (value == 0) {
+        size_t offset = option.find('=');
+        if (offset == std::string::npos) {
             return;
         }
-        ++value;
+        std::string value = option.substr(offset + 1);
         std::ostringstream oss;
         oss << "APP_" << key << "_" << getpid();
-        setenv(oss.str().c_str(), value, 1);
+        setenv(oss.str().c_str(), value.c_str(), 1);
     }
     
     SharedLibraryHandle openJvmLibrary() const {
