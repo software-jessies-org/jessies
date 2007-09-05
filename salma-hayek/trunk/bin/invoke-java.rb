@@ -131,18 +131,18 @@ class Java
     if target_os() == "Cygwin"
       # We need to load jvm.dll from a Cygwin executable to get a reliable Cygwin JNI experience.
       # This launcher doesn't use the same algorithm as Sun's for picking a jvm.dll.
-      @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/launcher"
+      @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/java-launcher"
     end
     if false && target_os() == "Darwin"
       # For Sparkle to work, we need our [NSBundle mainBundle] to point to our .app bundle.
       # For that to work, the executable that starts the JVM must be in the Contents/MacOS/ directory.
-      mac_os_launcher = "#{@project_root}/../../MacOS/launcher"
+      mac_os_launcher = "#{@project_root}/../../MacOS/java-launcher"
       if File.exist?(mac_os_launcher)
         @launcher = mac_os_launcher
       else
         # We're probably running from a developer's working copy.
         # Better to run without Sparkle than not run at all.
-        @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/launcher"
+        @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/java-launcher"
       end
     end
   end
