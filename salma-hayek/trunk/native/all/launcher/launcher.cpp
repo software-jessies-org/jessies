@@ -43,7 +43,7 @@ extern "C" {
     typedef jint JNICALL (*CreateJavaVM)(JavaVM**, void**, void*);
 }
 
-static const char* ARGV0 = "<unknown>";
+static std::string ARGV0 = "<unknown>";
 
 #ifdef __APPLE__
 
@@ -611,7 +611,7 @@ int main(int, char* argv[]) {
     synchronizeWindowsEnvironment();
     
     NativeArguments launcherArguments;
-    ARGV0 = strdup(*argv++);
+    ARGV0 = *argv++;
     while (*argv != 0) {
         launcherArguments.push_back(*argv++);
     }
