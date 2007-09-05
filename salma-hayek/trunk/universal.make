@@ -305,7 +305,10 @@ JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
 
 universal_binary_flags = -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
 C_AND_CXX_FLAGS.Darwin += $(universal_binary_flags)
+C_AND_CXX_FLAGS.Darwin += -x objective-c++
 LDFLAGS.Darwin += $(universal_binary_flags)
+LDFLAGS.Darwin += -lobjc
+LDFLAGS.Darwin += -framework Cocoa
 
 # ----------------------------------------------------------------------------
 # Work out what native code, if any, we need to build.

@@ -1,4 +1,7 @@
-#import <AppKit/AppKit.h>
+#ifndef SCOPED_AUTO_RELEASE_POOL_H_included
+#define SCOPED_AUTO_RELEASE_POOL_H_included
+
+#include <AppKit/AppKit.h>
 
 /**
  * Creates and releases an NSAutoreleasePool in its scope. Having to manually
@@ -18,3 +21,5 @@ public:
 private:
     NSAutoreleasePool* m_pool;
 };
+
+#endif
