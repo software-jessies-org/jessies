@@ -233,7 +233,7 @@ endef
 # just claiming the availability of a thread-safe allocator).
 LDFLAGS.Linux += -pthread
 
-# launcher needs this on Linux.
+# java-launcher needs this on Linux.
 LDFLAGS.Linux += -ldl
 
 # Linux utilities that use Xlib need this.

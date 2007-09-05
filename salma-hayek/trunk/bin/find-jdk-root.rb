@@ -10,7 +10,7 @@
 # include/ directory.
 #
 # We use a completely different method (in "invoke-java.rb") to find the
-# java(1) launcher, and yet another method (in "launcher.cpp") to find a
+# java(1) launcher, and yet another method (in "java-launcher.cpp") to find a
 # JVM DLL on Windows.
 #
 # The idea is that the build process should be fairly controlled and you
@@ -116,7 +116,7 @@ def find_jdk_root()
   # We used to look for java(1) instead, but that fails in the case where the user has both JRE and JDK installed, with the former coming first on their path.
   javac_on_path = which("javac")
   
-  # Our Windows "launcher.exe" uses the registry to find a JRE.
+  # Our Windows "java-launcher.exe" uses the registry to find a JRE.
   # Returning nil or an unsuitable Java here prevents you from building, but doesn't affect your ability to *run* our applications.
   if javac_on_path == nil
     return nil
