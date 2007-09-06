@@ -307,6 +307,8 @@ public class GuiUtilities {
                     Method setAlphaMethod = cWindowClass.getMethod("setAlpha", float.class);
                     setAlphaMethod.invoke(peer, (float) alpha);
                 }
+            } else if (isWindows()) {
+                // FIXME: can we do this on Windows?
             } else {
                 // long windowId = peer.getWindow();
                 Class<?> xWindowPeerClass = Class.forName("sun.awt.X11.XWindowPeer");
