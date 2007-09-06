@@ -40,7 +40,7 @@ mkdir ~/jessies &amp;&amp; cd ~/jessies
 svn checkout http://software.jessies.org/svn/<!--#echo var="SHORT_DIST_NAME"-->/trunk/ <!--#echo var="SHORT_DIST_NAME"-->
 svn checkout http://software.jessies.org/svn/salma-hayek/trunk/ salma-hayek
 </pre>
-You may want to add something like this to your crontab to keep up to date automatically (assuming your computer's on at 23:00):
+<p>You may want to add something like this to your crontab to keep up to date automatically (assuming your computer's on at 23:00):
 <pre>
 00 23 * * * echo ~/jessies/salma-hayek/bin/nightly-build.rb | bash -l
 </pre>
