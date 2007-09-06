@@ -34,15 +34,17 @@
 <!-- ---------------------------------------------------- -->
 
 <h3>Building from Source</h3>
-<p>If no pre-built package is available for your platform, or you just like building from source, anonymous read-only Subversion access is available.
+<p>If no pre-built package is available for your platform, or you just like building from source, anonymous read-only Subversion access is available. Copy and paste these commands to get everything you need:
 <pre>
 mkdir ~/jessies &amp;&amp; cd ~/jessies
 svn checkout http://software.jessies.org/svn/<!--#echo var="SHORT_DIST_NAME"-->/trunk/ <!--#echo var="SHORT_DIST_NAME"-->
 svn checkout http://software.jessies.org/svn/salma-hayek/trunk/ salma-hayek
-# You may want to add something like this to your crontab:
-#00 23 * * * echo ~/jessies/salma-hayek/bin/nightly-build.rb | bash -l
 </pre>
-<p>There's also <a href="<!--#echo var="SHORT_DIST_NAME"-->.tar.gz"><!--#echo var="SHORT_DIST_NAME"-->.tar.gz</a> but Subversion makes it easier for you to keep up to date, and makes it easier to submit patches.
+You may want to add something like this to your crontab to keep up to date automatically (assuming your computer's on at 23:00):
+<pre>
+00 23 * * * echo ~/jessies/salma-hayek/bin/nightly-build.rb | bash -l
+</pre>
+<p>There's also <a href="<!--#echo var="SHORT_DIST_NAME"-->.tar.gz"><!--#echo var="SHORT_DIST_NAME"-->.tar.gz</a> but Subversion makes it easier for you to keep up to date, and makes it easier to submit patches. (Note that you need the salma-hayek .tar.gz to build any of our other .tar.gz distributions.)
 
 <p>The <a href="/salma-hayek/index.html#building-from-source">hints for building</a> are the same for all our projects.
 
