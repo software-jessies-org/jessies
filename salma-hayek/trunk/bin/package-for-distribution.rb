@@ -208,7 +208,7 @@ Dir.chdir("#{salma_hayek}/.generated/classes/") {
 
 if target_os() == "Darwin"
     # Apple doesn't let you give a path to a .icns file, and doesn't seem to always follow symbolic links, so we have to copy it into position.
-    FileUtils.cp("#{resources_dir}/#{machine_project_name}/lib/#{human_project_name}.icns", "#{app_dir}/Resources/")
+    FileUtils.cp("#{resources_dir}/#{machine_project_name}/lib/#{human_project_name}.icns", resources_dir)
 
     # Make a bogus start-up script.
     script_name = "#{app_dir}/MacOS/#{human_project_name}"
@@ -281,7 +281,11 @@ if target_os() == "Linux"
     # Install the start-up script(s) from the project's bin/ to /usr/bin/.
     usr_bin = "#{tmp_dir}/usr/bin"
     FileUtils.mkdir_p(usr_bin)
-    FileUtils.ln_s(linux_link_sources("#{project_resource_directory}/bin/*", tmp_dir), usr_bin)
+    # Debian wants relative links so users can relocate packages.
+    # See http://www.debian.org/doc/debian-policy/ch-files.html#s10.5 for details.
+    sources = linux_link_sources("#{project_resource_directory}/bin/*", tmp_dir)
+    sources = sources.map() { |source| source.sub(/^\/usr\//, "../") }
+    FileUtils.ln_s(sources, usr_bin)
     
     # gdebi(1) understands that if there's no Installed-Size the size is unknown.
     # apt-get(1) thinks it implies that the installed size is zero bytes.
