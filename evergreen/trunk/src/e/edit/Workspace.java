@@ -334,8 +334,8 @@ public class Workspace extends JPanel {
         return buildTarget;
     }
     
-    public void setBuildTarget(String buildTarget) {
-        this.buildTarget = buildTarget;
+    public void setBuildTarget(String newBuildTarget) {
+        this.buildTarget = (newBuildTarget != null) ? newBuildTarget : "";
     }
     
     public void serializeAsXml(org.w3c.dom.Document document, org.w3c.dom.Element workspaces) {
