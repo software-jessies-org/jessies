@@ -61,7 +61,11 @@ public class Evergreen {
             Workspace initiallyVisibleWorkspace = null;
             for (InitialWorkspace initialWorkspace : initialState.initialWorkspaces) {
                 Element info = initialWorkspace.xmlWorkspace;
-                Workspace workspace = openWorkspace(info.getAttribute("name"), info.getAttribute("root"), info.getAttribute("buildTarget"), initialWorkspace.initialFiles);
+                WorkspaceProperties properties = new WorkspaceProperties();
+                properties.name = info.getAttribute("name");
+                properties.rootDirectory = info.getAttribute("root");
+                properties.buildTarget = info.getAttribute("buildTarget");
+                Workspace workspace = openWorkspace(properties, initialWorkspace.initialFiles);
                 if (info.hasAttribute("selected")) {
                     initiallyVisibleWorkspace = workspace;
                 }
@@ -449,13 +453,14 @@ public class Evergreen {
         showStatus("Added workspace '" + name + "' (" + workspace.getRootDirectory() + ")");
     }
 
-    public Workspace createWorkspace(String name, String root) {
-        boolean noNonEmptyWorkspaceOfThisNameExists = removeWorkspaceByName(name);
+    public Workspace createWorkspace(WorkspaceProperties properties) {
+        boolean noNonEmptyWorkspaceOfThisNameExists = removeWorkspaceByName(properties.name);
         if (noNonEmptyWorkspaceOfThisNameExists == false) {
-            showAlert("Couldn't create workspace", "A non-empty workspace with the name \"" + name + "\" already exists.");
+            showAlert("Couldn't create workspace", "A non-empty workspace with the name \"" + properties.name + "\" already exists.");
             return null;
         }
-        Workspace workspace = new Workspace(name, root);
+        Workspace workspace = new Workspace(properties.name, properties.rootDirectory);
+        workspace.setBuildTarget(properties.buildTarget);
         addWorkspaceToTabbedPane(workspace);
         moveFilesToBestWorkspaces();
         return workspace;
@@ -525,8 +530,10 @@ public class Evergreen {
     
     public void createWorkspaceForCurrentDirectory() {
         String currentDirectory = System.getProperty("user.dir");
-        String workspaceName = currentDirectory.substring(currentDirectory.lastIndexOf(File.separatorChar) + 1);
-        createWorkspace(workspaceName, currentDirectory);
+        WorkspaceProperties properties = new WorkspaceProperties();
+        properties.name = currentDirectory.substring(currentDirectory.lastIndexOf(File.separatorChar) + 1);
+        properties.rootDirectory = currentDirectory;
+        createWorkspace(properties);
     }
     
     public String getResourceFilename(String leafName) {
@@ -724,23 +731,22 @@ public class Evergreen {
         return true;
     }
     
-    private Workspace openWorkspace(String name, String root, String buildTarget, List<InitialFile> initialFiles) {
-        Log.warn("Opening workspace '" + name + "' with root '" + root + "'");
-        Workspace workspace = createWorkspace(name, root);
+    private Workspace openWorkspace(WorkspaceProperties properties, List<InitialFile> initialFiles) {
+        Log.warn("Opening workspace '" + properties.name + "' with root '" + properties.rootDirectory + "'");
+        Workspace workspace = createWorkspace(properties);
         if (workspace == null) {
             return null;
         }
         
-        workspace.setBuildTarget(buildTarget);
         workspace.setInitialFiles(initialFiles);
         File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
         int which = tabbedPane.indexOfComponent(workspace);
         if (rootDirectory.exists() == false) {
             tabbedPane.setForegroundAt(which, Color.RED);
-            tabbedPane.setToolTipTextAt(which, root + " doesn't exist.");
+            tabbedPane.setToolTipTextAt(which, properties.rootDirectory + " doesn't exist.");
         } else if (rootDirectory.isDirectory() == false) {
             tabbedPane.setForegroundAt(which, Color.RED);
-            tabbedPane.setToolTipTextAt(which, root + " isn't a directory.");
+            tabbedPane.setToolTipTextAt(which, properties.rootDirectory + " isn't a directory.");
         }
         return workspace;
     }
