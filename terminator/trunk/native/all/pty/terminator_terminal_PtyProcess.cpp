@@ -94,6 +94,10 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, js
 }
 
 jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arrayOffset, jint desiredLength) {
+    if (fd.get() == -1) {
+        throw unix_exception("nativeRead called when fd == -1");
+    }
+    
     jbyte buffer[8192];
     if (desiredLength > jint(sizeof(buffer))) {
         throw std::runtime_error("can't read more than " + toString(sizeof(buffer)) + " bytes at once; desiredLength=" + toString(desiredLength));
@@ -116,6 +120,10 @@ jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arr
 }
 
 void terminator_terminal_PtyProcess::nativeWrite(jbyteArray bytes, jint arrayOffset, jint byteCount) {
+    if (fd.get() == -1) {
+        throw unix_exception("nativeWrite called when fd == -1");
+    }
+    
     // On Cygwin, attempting a zero-byte write causes the JVM to crash with an EXCEPTION_ACCESS_VIOLATION in a "cygwin1.dll" stack frame.
     // So let's make sure we never do that.
     if (byteCount == 0) {
@@ -153,6 +161,12 @@ void terminator_terminal_PtyProcess::nativeWrite(jbyteArray bytes, jint arrayOff
 }
 
 void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars, jobject sizeInPixels) {
+    if (fd.get() == -1) {
+        // We shouldn't read or write from a closed pty, but this will happen if the user resizes a window whose child has died.
+        // That could just be because they want to read the error message, or because they're fiddling with other tabs.
+        return;
+    }
+    
     struct winsize size;
     size.ws_col = JniField<jint, false>(m_env, sizeInChars, "width", "I").get();
     size.ws_row = JniField<jint, false>(m_env, sizeInChars, "height", "I").get();
