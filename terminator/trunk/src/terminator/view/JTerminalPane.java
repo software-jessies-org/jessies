@@ -109,6 +109,7 @@ public class JTerminalPane extends JPanel {
 	public void optionsDidChange() {
 		view.optionsDidChange();
 		viewport.setBackground(view.getBackground());
+		updateTerminalSize();
 		scrollPane.invalidate();
 		validate();
 	}
@@ -208,18 +209,7 @@ public class JTerminalPane extends JPanel {
 			
 			@Override
 			public void componentResized(ComponentEvent event) {
-				Dimension size = view.getVisibleSizeInCharacters();
-				if (size.equals(currentSizeInChars) == false) {
-					try {
-						control.sizeChanged(size, view.getVisibleSize());
-						getTerminatorFrame().setTerminalSize(size);
-					} catch (Exception ex) {
-						if (control != null) {
-							Log.warn("Failed to notify " + control.getPtyProcess() + " of size change", ex);
-						}
-					}
-					currentSizeInChars = size;
-				}
+				updateTerminalSize();
 			}
 		};
 		// It's a mistake to listen to the JScrollPane's viewport, as
@@ -228,6 +218,21 @@ public class JTerminalPane extends JPanel {
 		// the cursor back over already-output text if that chunk made
 		// the scrollbar appear.
 		addComponentListener(new SizeMonitor());
+	}
+	
+	private void updateTerminalSize() {
+		Dimension size = view.getVisibleSizeInCharacters();
+		if (size.equals(currentSizeInChars) == false) {
+			try {
+				control.sizeChanged(size, view.getVisibleSize());
+				getTerminatorFrame().setTerminalSize(size);
+			} catch (Exception ex) {
+				if (control != null) {
+					Log.warn("Failed to notify " + control.getPtyProcess() + " of size change", ex);
+				}
+			}
+			currentSizeInChars = size;
+		}
 	}
 	
 	public TerminalView getTerminalView() {
