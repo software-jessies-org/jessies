@@ -163,6 +163,17 @@ Bugs
   we've already agreed that this can't be reproduced as described. i've
   learned nothing further.
 
+* car: "when I have multiple rows of tabs on the XP LAF, should a top-row
+  tab's activity indicator overlap the highlight on the top of the tab below?"
+  I didn't realize this wouldn't be clipped. Nor did it occur to me that
+  non-front tabs have different dimensions than front tabs. It would be nice
+  to make the indicator more scalable, but at current DPIs, it's already about
+  as small as it can conveniently be. Unless anyone has a cunning plan (that's
+  practical and doesn't involve turnips), I think that's just something for
+  the to-do list, waiting for high-DPI displays. (Or we could just switch to
+  a binary activity indicator. I'm not really sure how useful the current
+  cleverer solution actually is.)
+
 Configuration
 -------------
 
