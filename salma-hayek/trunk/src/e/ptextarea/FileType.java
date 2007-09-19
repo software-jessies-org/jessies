@@ -25,6 +25,11 @@ public enum FileType {
                  PCPPTextStyler.class,
                  new String[] { ".cpp", ".hpp", ".c", ".h", ".m", ".mm", ".hh", ".cc", ".strings" }),
     
+    C_SHARP     ("C#",
+                 PJavaIndenter.class,
+                 PCSharpTextStyler.class,
+                 new String[] { ".cs" }),
+    
     JAVA        ("Java",
                  PJavaIndenter.class,
                  PJavaTextStyler.class,
