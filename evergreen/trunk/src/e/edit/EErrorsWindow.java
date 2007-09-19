@@ -66,7 +66,7 @@ public class EErrorsWindow extends EWindow {
          * We insist that an interesting extension has between 1 and 4 characters, and contains only alphabetic characters.
          * (There's an additional check later that the extension isn't known to be uninteresting, such as ".o" or ".class".)
          */
-        private static final String ADDRESS_PATTERN = "(?:^| |\"|')([^ :\"']+(?:Makefile|\\w+\\.[A-Za-z]{1,4}\\b)([\\d:]+)?)";
+        private static final String ADDRESS_PATTERN = "(?:^| |\"|')([^ :\"']+(?:Makefile|\\w+\\.[A-Za-z]{1,4}\\b)([\\d:]+|\\([\\d,]+\\))?)";
         
         public ErrorLinkStyler(PTextArea textArea) {
             super(textArea, ADDRESS_PATTERN, PStyle.HYPERLINK);
@@ -99,14 +99,22 @@ public class EErrorsWindow extends EWindow {
         }
         
         public void actionPerformed(ActionEvent e) {
-            // We're most useful in providing links to grep matches, so we
-            // need to avoid being confused by stuff like File.java:123.
+            // The link was probably a combination of filename and address within the file.
+            // Break that into the two components.
             String name = address;
             String tail ="";
             int colonIndex = name.indexOf(':');
             if (colonIndex != -1) {
+                // A traditional Unix error such as "src/Trousers.cpp:109:26: parse error".
                 name = name.substring(0, colonIndex);
                 tail = address.substring(colonIndex);
+            } else if (name.endsWith(")")) {
+                // Maybe a Microsoft-style error such as "src/Trousers.cs(109,26): error CS0103: The name `ferret' does not exist in the context of `Trousers'"?
+                int openParenthesisIndex = name.indexOf('(');
+                if (openParenthesisIndex != -1) {
+                    name = name.substring(0, openParenthesisIndex);
+                    tail = ":" + address.substring(openParenthesisIndex + 1, address.length() - 1).replace(',', ':');
+                }
             }
             
             if (name.startsWith("/") || name.startsWith("~")) {
