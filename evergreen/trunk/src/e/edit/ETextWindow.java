@@ -715,7 +715,7 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     private void ensureBufferEndsInNewline() {
         FileType fileType = getFileType();
-        if (fileType == FileType.C_PLUS_PLUS || fileType == FileType.JAVA) {
+        if (fileType == FileType.C_PLUS_PLUS || fileType == FileType.C_SHARP || fileType == FileType.JAVA) {
             PTextBuffer buffer = textArea.getTextBuffer();
             if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '\n') {
                 // '\n' is always correct; the buffer will translate if needed.
