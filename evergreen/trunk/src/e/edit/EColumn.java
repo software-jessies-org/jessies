@@ -21,7 +21,6 @@ import javax.swing.event.*;
 public class EColumn extends JSplitPane {
     private static final int MIN_HEIGHT = ETitleBar.TITLE_HEIGHT + 5;
     
-    private JSplitPane splitPane = new JSplitPane();
     private TextsPanel bottomPanel = new TextsPanel();
     
     /**
