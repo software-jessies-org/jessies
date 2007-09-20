@@ -34,15 +34,12 @@ openssh    # SSH (client and server, though the server's not so great)
 
 <p>Double-click on the Cygwin icon on your desktop. You'll get a message like this which, as it says, you can ignore:
 <pre>
-Your group name is currently "mkgroup_l_d". This indicates that not
-all domain users and groups are listed in the /etc/passwd and
-/etc/group files.
+Your group is currently "mkgroup".  This indicates that
+the /etc/group (and possibly /etc/passwd) files should be rebuilt.
 See the man pages for mkpasswd and mkgroup then, for example, run
-mkpasswd -l -d > /etc/passwd
-mkgroup  -l -d > /etc/group
-
-This message is only displayed once (unless you recreate /etc/group)
-and can be safely ignored.
+mkpasswd -l [-d] > /etc/passwd
+mkgroup  -l [-d] > /etc/group
+Note that the -d switch is necessary for domain users.
 </pre>
 
 <h3>A better command prompt</h3>
