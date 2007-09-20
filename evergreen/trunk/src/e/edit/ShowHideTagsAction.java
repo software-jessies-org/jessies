@@ -5,8 +5,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class ShowHideTagsAction extends AbstractAction {
-    private static final String SHOW_ACTION_NAME = "Show Tags";
-    private static final String HIDE_ACTION_NAME = "Hide Tags";
+    private static final String SHOW_ACTION_NAME = "Show Symbols Tree";
+    private static final String HIDE_ACTION_NAME = "Hide Symbols Tree";
     
     private static JMenuItem menuItem;
     

@@ -46,7 +46,7 @@ public class Evergreen {
         private Point initialLocation = new Point(0, 0);
         private Dimension initialSize = new Dimension(800, 730);
         private boolean showTagsPanel = true;
-        private int splitPaneDividerLocation = -1;
+        private int tagsPanelSplitPaneDividerLocation = -1;
         
         /**
          * Opens all the workspaces listed in the file we remembered them to last time we quit.
@@ -80,8 +80,8 @@ public class Evergreen {
         /** Shows or hides the tags panel and sets the divider location, as it was last time we quit. */
         private void configureTagsPanel() {
             if (showTagsPanel) {
-                if (splitPaneDividerLocation >= 0) {
-                    splitPane.setDividerLocation(splitPaneDividerLocation);
+                if (tagsPanelSplitPaneDividerLocation >= 0) {
+                    splitPane.setDividerLocation(tagsPanelSplitPaneDividerLocation);
                 } else {
                     // Defaults.
                     splitPane.setDividerLocation(0.8);
@@ -89,7 +89,7 @@ public class Evergreen {
                 }
             } else {
                 ShowHideTagsAction.setTagsPanelVisibility(false);
-                ShowHideTagsAction.oldDividerLocation = splitPaneDividerLocation;
+                ShowHideTagsAction.oldDividerLocation = tagsPanelSplitPaneDividerLocation;
             }
         }
     }
@@ -640,7 +640,7 @@ public class Evergreen {
             if (root.hasAttribute("showTagsPanel")) {
                 initialState.showTagsPanel = Boolean.parseBoolean(root.getAttribute("showTagsPanel"));
                 if (root.hasAttribute("splitPaneDividerLocation")) {
-                    initialState.splitPaneDividerLocation = Integer.parseInt(root.getAttribute("splitPaneDividerLocation"));
+                    initialState.tagsPanelSplitPaneDividerLocation = Integer.parseInt(root.getAttribute("splitPaneDividerLocation"));
                 }
             }
             

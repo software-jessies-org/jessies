@@ -387,7 +387,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
         
         public void taggingFailed(Exception ex) {
-            Log.warn("Failed to use tags to check for a definition.", ex);
+            Log.warn("Failed to use ctags(1) to check for a definition.", ex);
         }
     }
     
