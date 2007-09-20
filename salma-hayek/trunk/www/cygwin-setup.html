@@ -32,7 +32,7 @@ openssh    # SSH (client and server, though the server's not so great)
 
 <h2>Configuration</h2>
 
-<p>Double-click on the Cygwin icon on your desktop. You'll get a message like this which, as it says, you can ignore:
+<p>Double-click on the Cygwin icon on your desktop. You'll get a message like this:
 <pre>
 Your group is currently "mkgroup".  This indicates that
 the /etc/group (and possibly /etc/passwd) files should be rebuilt.
@@ -41,6 +41,7 @@ mkpasswd -l [-d] > /etc/passwd
 mkgroup  -l [-d] > /etc/group
 Note that the -d switch is necessary for domain users.
 </pre>
+<p>If you don't know otherwise then you should follow the suggestion.  After doing that, double-click on the Cygwin icon again to set up your home directory.  (If you don't then, for example, Terminator will fail to find your home directory and refuse to start.)
 
 <h3>A better command prompt</h3>
 <p>The Cygwin icon on your desktop starts Microsoft's command prompt window, albeit with bash(1) inside. You can do better than that, though. There's a port of rxvt(1) that doesn't require X11, which you can install with the Cygwin <tt>setup.exe</tt>, or you can install <a href="http://software.jessies.org/terminator/">Terminator</a>.
