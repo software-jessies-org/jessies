@@ -260,6 +260,16 @@ if target_os() == "Linux"
     FileUtils.mkdir_p(usr_share_applications)
     FileUtils.cp(Dir.glob("#{project_resource_directory}/lib/*.desktop"), usr_share_applications)
     
+    # Copy and compress any manual pages into /usr/share/man/.
+    # FIXME: we may want to support more than just section 1.
+    usr_share_man_man1 = "#{tmp_dir}/usr/share/man/man1"
+    FileUtils.mkdir_p(usr_share_man_man1)
+    FileUtils.cp(Dir.glob("man/1/*.1"), usr_share_man_man1)
+    Dir.glob("#{usr_share_man_man1}/*.1").each() {
+        |uncompressed_file|
+        system("gzip -9 #{uncompressed_file}")
+    }
+    
     # Copy any compiled terminfo files under /usr/share/terminfo/.
     generated_terminfo_root = ".generated/terminfo/"
     if File.exists?(generated_terminfo_root)
