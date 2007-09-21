@@ -604,7 +604,7 @@ public class Evergreen {
         }
 
         //SpellingChecker.dumpKnownBadWordsTo(System.out);
-        FormDialog.writeGeometriesTo(getDialogGeometriesPreferenceFilename());
+        JFrameUtilities.writeGeometriesTo(getDialogGeometriesPreferenceFilename());
         
         writeSavedState();
     }
@@ -879,7 +879,7 @@ public class Evergreen {
         initMacOs();
         initAboutBox();
         JavaResearcher.initOnBackgroundThread();
-        FormDialog.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
+        JFrameUtilities.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
         initWindow();
         initTagsPanel();
         tabbedPane = new EvergreenTabbedPane();
