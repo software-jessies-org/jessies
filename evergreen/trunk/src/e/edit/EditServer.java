@@ -59,7 +59,7 @@ public final class EditServer {
                 } else {
                     editor.getFrame().toFront();
                 }
-                out.println("File '" + filename + "' opened OK.");
+                out.println("File \"" + filename + "\" opened OK.");
             } catch (Exception ex) {
                 out.println(ex.getMessage());
                 ex.printStackTrace(out);
