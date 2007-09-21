@@ -69,7 +69,8 @@ public class ShellCommand {
 
         EventQueue.invokeLater(launchRunnable);
         
-        Evergreen.getInstance().showStatus("Started task '" + command + "'");
+        workspace.getErrorsWindow().showStatus("Started task '" + command + "'");
+        workspace.getErrorsWindow().taskDidStart();
         
         Thread standardInputPump = new Thread(new Runnable() {
             public void run() {
@@ -163,7 +164,7 @@ public class ShellCommand {
      * Invoked when the StreamMonitors finish, on the EDT.
      */
     private void processFinished(int exitStatus) {
-        Evergreen.getInstance().showStatus("Task '" + command + "' finished");
+        workspace.getErrorsWindow().showStatus("Task '" + command + "' finished");
         
         ArrayList<String> errorsWindowFooter = new ArrayList<String>();
         
@@ -202,6 +203,7 @@ public class ShellCommand {
             errorsWindowFooter.add("Task '" + command + "' failed with exit status " + exitStatus);
         }
         workspace.getErrorsWindow().append(errorsWindowFooter.toArray(new String[errorsWindowFooter.size()]));
+        workspace.getErrorsWindow().taskDidExit(exitStatus);
     }
     
     /**
