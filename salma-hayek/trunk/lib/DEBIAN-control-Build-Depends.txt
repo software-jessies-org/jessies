@@ -1,0 +1,10 @@
+alien
+fakeroot
+g++
+libx11-dev
+make (>= 3.81)
+mercurial
+ruby (>= 1.8)
+subversion
+sun-java6-jdk
+x-dev
