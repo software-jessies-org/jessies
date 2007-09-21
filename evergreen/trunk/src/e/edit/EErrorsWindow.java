@@ -27,7 +27,7 @@ import e.util.*;
  * build output only contains absolute names, and to not rely on this
  * code to do anything useful.
  */
-public class EErrorsWindow extends EWindow {
+public class EErrorsWindow extends JFrame {
     private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory `(.*)'$", Pattern.MULTILINE);
     
     /**
@@ -37,18 +37,32 @@ public class EErrorsWindow extends EWindow {
     
     private final Workspace workspace;
     private PTextArea textArea;
+    private EStatusBar statusBar;
+    private int currentBuildErrorCount;
     
     public EErrorsWindow(Workspace workspace) {
-        super("+Errors");
+        super("Build Output");
         this.workspace = workspace;
         initTextArea();
+        initStatusBar();
         JScrollPane scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
         add(scrollPane, BorderLayout.CENTER);
+        add(statusBar, BorderLayout.SOUTH);
+        pack();
+        JFrameUtilities.setFrameIcon(this);
+        setLocationRelativeTo(workspace);
+        JFrameUtilities.restoreBounds(this.getTitle(), this);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                JFrameUtilities.storeBounds(getTitle(), EErrorsWindow.this);
+            }
+        });
     }
     
     private void initTextArea() {
-        textArea = new PTextArea();
+        textArea = new PTextArea(20, 80);
         // Default to a fixed-pitch font in errors windows.
         textArea.setFont(ChangeFontAction.getConfiguredFixedFont());
         // But no margin, because all the text should be machine-generated.
@@ -57,7 +71,38 @@ public class EErrorsWindow extends EWindow {
         textArea.setWrapStyleWord(true);
         initTextAreaPopupMenu();
     }
-
+    
+    private void initStatusBar() {
+        statusBar = new EStatusBar();
+    }
+    
+    public void showStatus(String status) {
+        statusBar.setText(status);
+    }
+    
+    public void taskDidStart() {
+        EventQueue.invokeLater(new ClearRunnable());
+        currentBuildErrorCount = 0;
+    }
+    
+    public void taskDidExit(int exitStatus) {
+        if (exitStatus == 0 && currentBuildErrorCount == 0) {
+            Thread waitThenHide = new Thread(new Runnable() {
+                public void run() {
+                    // Add a short pause before hiding, so the user gets chance to see that everything went okay.
+                    try {
+                        Thread.sleep(500);
+                    } catch (Exception ex) {
+                    }
+                    // Now hide.
+                    // We invokeLater because append does, and we might need to catch up with pending output before hiding.
+                    EventQueue.invokeLater(new HideRunnable());
+                }
+            });
+            waitThenHide.start();
+        }
+    }
+    
     private class ErrorLinkStyler extends RegularExpressionStyleApplicator {
         /**
          * Matches addresses (such as "filename.ext:line:col:line:col").
@@ -173,6 +218,7 @@ public class EErrorsWindow extends EWindow {
         }
         
         public void run() {
+            setVisible(true);
             textArea.append(text);
         }
     }
@@ -185,12 +231,25 @@ public class EErrorsWindow extends EWindow {
         }
     }
     
+    private class HideRunnable implements Runnable {
+        public void run() {
+            setVisible(false);
+        }
+    }
+    
     public void append(String[] lines) {
+        for (String line : lines) {
+            // FIXME: this is a bit weak, but necessary as long as our builds always "exit 0". The FIXME in this file about treating stderr specially might be a better way forward if we have to keep a hack.
+            if (line.contains("***") || line.contains("warning:")) {
+                ++currentBuildErrorCount;
+            }
+        }
         EventQueue.invokeLater(new AppendRunnable(lines));
     }
     
     public void clear() {
         EventQueue.invokeLater(new ClearRunnable());
+        EventQueue.invokeLater(new HideRunnable());
     }
     
     public void resetAutoScroll() {
@@ -209,14 +268,5 @@ public class EErrorsWindow extends EWindow {
                 actions.add(new KillErrorsAction());
             }
         });
-    }
-    
-    /** Errors windows are never considered dirty because they're not worth preserving. */
-    public boolean isDirty() {
-        return false;
-    }
-    
-    public String getContext() {
-        return "";
     }
 }

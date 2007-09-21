@@ -37,7 +37,7 @@ public class Workspace extends JPanel {
         this.fileList = new WorkspaceFileList(this);
         setRootDirectory(rootDirectory);
         this.buildTarget = "";
-        add(makeUI(), BorderLayout.CENTER);
+        add(leftColumn, BorderLayout.CENTER);
     }
     
     public WorkspaceFileList getFileList() {
@@ -109,11 +109,6 @@ public class Workspace extends JPanel {
         // We cache this because it's called when deciding on a workspace for a newly-opened file.
         // We don't want the UI to lock up because an unrelated workspace's NFS mount is temporarily unresponsive.
         return canonicalRootDirectory;
-    }
-    
-    public JComponent makeUI() {
-        leftColumn.setErrorsWindow(errorsWindow);
-        return leftColumn;
     }
     
     /** Tests whether this workspace is empty. A workspace is still considered empty if all it contains is an errors window. */
