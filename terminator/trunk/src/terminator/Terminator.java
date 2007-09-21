@@ -168,6 +168,7 @@ public class Terminator {
 	}
 
 	private static void showUsage(Appendable out) throws IOException {
+		GuiUtilities.finishGnomeStartup();
 		out.append("Usage: terminator [--help] [-xrm <resource-string>]... [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
 		out.append("\n");
 		out.append("Current resource settings:\n");
