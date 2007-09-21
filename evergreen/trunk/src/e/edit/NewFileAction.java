@@ -50,7 +50,7 @@ public class NewFileAction extends ETextAction {
             }
             File directory = newFile.getParentFile();
             if (directory.exists() == false) {
-                boolean createDirectory = editor.askQuestion("Create directory?", "The directory '" + directory + "' doesn't exist. We can either create the directory for you, or you can go back and re-type the filename.", "Create");
+                boolean createDirectory = editor.askQuestion("Create directory?", "The directory \"" + directory + "\" doesn't exist. We can either create the directory for you, or you can go back and re-type the filename.", "Create");
                 if (createDirectory == false) {
                     return false;
                 }

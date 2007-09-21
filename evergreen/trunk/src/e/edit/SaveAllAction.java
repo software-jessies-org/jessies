@@ -25,7 +25,7 @@ public class SaveAllAction extends AbstractAction {
         for (Workspace workspace : Evergreen.getInstance().getWorkspaces()) {
             if (workspace.saveAll() == false) {
                 if (interactive) {
-                    Evergreen.getInstance().showAlert("Couldn't save all", "Unable to save everything on workspace '" + workspace.getTitle() + "'.");
+                    Evergreen.getInstance().showAlert("Couldn't save all", "Unable to save everything on workspace \"" + workspace.getTitle() + "\".");
                 }
                 return;
             }

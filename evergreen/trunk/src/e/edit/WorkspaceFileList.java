@@ -136,7 +136,7 @@ public class WorkspaceFileList {
             FileIgnorer fileIgnorer = new FileIgnorer(workspace.getRootDirectory());
             ArrayList<String> result = new ArrayList<String>();
             scanDirectory(workspace.getRootDirectory(), fileIgnorer, result);
-            Evergreen.getInstance().showStatus("Scan of '" + workspace.getRootDirectory() + "' complete (" + result.size() + " files)");
+            Evergreen.getInstance().showStatus("Scan of \"" + workspace.getRootDirectory() + "\" complete (" + result.size() + " files)");
             
             Log.warn("Scan of " + workspace.getRootDirectory() + " took " + TimeUtilities.nsToString(System.nanoTime() - t0) + "; found " + result.size() + " files.");
             return result;

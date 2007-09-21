@@ -293,11 +293,11 @@ public class Evergreen {
             }
         }
         
-        Log.warn("Opening '" + filename + "'" + (address.length() > 0 ? (" at '" + address + "'") : ""));
+        Log.warn("Opening \"" + filename + "\"" + (address.length() > 0 ? (" at \"" + address + "\"") : ""));
         
         // Give up if the file doesn't exist.
         if (FileUtilities.exists(filename) == false) {
-            throw new RuntimeException("File '" + filename + "' does not exist.");
+            throw new RuntimeException("File \"" + filename + "\" does not exist.");
         }
         
         try {
@@ -315,7 +315,7 @@ public class Evergreen {
         
         // Refuse to open directories.
         if (FileUtilities.fileFromString(filename).isDirectory()) {
-            throw new RuntimeException("It's not possible to edit directories, which is what '" + filename + "' is.");
+            throw new RuntimeException("It's not possible to edit directories, which is what \"" + filename + "\" is.");
         }
         
         // Limit ourselves (rather arbitrarily) to files under half a gigabyte. That's quite a strain on us, at present.
@@ -323,7 +323,7 @@ public class Evergreen {
         final int MB = 1024 * KB;
         long fileLength = FileUtilities.fileFromString(filename).length();
         if (fileLength > 512 * MB) {
-            throw new RuntimeException("The file '" + filename + "', which is " + fileLength + " bytes long is too large. This file will not be opened.");
+            throw new RuntimeException("The file \"" + filename + "\", which is " + fileLength + " bytes long is too large. This file will not be opened.");
         }
         
         // Find which workspace this file is on/should be on, and make it visible.
@@ -450,7 +450,7 @@ public class Evergreen {
         workspace.revalidate();
         frame.validate();
         
-        showStatus("Added workspace '" + name + "' (" + workspace.getRootDirectory() + ")");
+        showStatus("Added workspace \"" + name + "\" (" + workspace.getRootDirectory() + ")");
     }
 
     public Workspace createWorkspace(WorkspaceProperties properties) {
@@ -732,7 +732,7 @@ public class Evergreen {
     }
     
     private Workspace openWorkspace(WorkspaceProperties properties, List<InitialFile> initialFiles) {
-        Log.warn("Opening workspace '" + properties.name + "' with root '" + properties.rootDirectory + "'");
+        Log.warn("Opening workspace \"" + properties.name + "\" with root \"" + properties.rootDirectory + "\"");
         Workspace workspace = createWorkspace(properties);
         if (workspace == null) {
             return null;
