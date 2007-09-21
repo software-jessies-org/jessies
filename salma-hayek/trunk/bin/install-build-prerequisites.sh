@@ -2,23 +2,6 @@
 
 PACKAGES=""
 
-# FIXME: Shouldn't these be in Evergreen's Depends list?
-# They would go more accurately in Recommends but who installs all the recommended packages?
-PACKAGES="$PACKAGES exuberant-ctags"
-PACKAGES="$PACKAGES ri"
-
-# FIXME: CheckInTool makes use of the spell checking as well as Evergreen.
-# You definitely want ispell(1) installed. Choosing a language is difficult, because a lot of people are parochial.
-# Last time I looked, whichever dictionary you install last becomes the default.
-# So it would be bad to depend on iamerican.
-# But not *that* bad - all programmers speak American.
-PACKAGES="$PACKAGES iamerican"
-
-# It's important to have a non-free JRE, because the free ones aren't finished.
-# Debian sid now includes a Sun JRE called sun-java5-jre.
-# Most of our users are on sarge.
-PACKAGES="$PACKAGES sun-java5-jre"
-
 # The real build prerequisites are below.
 
 # We use various gcc-specific flags, though we don't depend on any non-standard features..
