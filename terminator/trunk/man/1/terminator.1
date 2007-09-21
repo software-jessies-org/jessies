@@ -1,0 +1,27 @@
+.TH TERMINATOR "1" "" "" "User Commands"
+.SH NAME
+terminator \- terminal emulator
+.SH SYNOPSIS
+terminator [[-n NAME] [--working-directory DIR] [COMMAND]]...
+.SH DESCRIPTION
+Each call to "terminator" creates a single window containing an arbitrary number of tabs.
+
+The script supports X11-like -xrm functionality, but it's deprecated because it interacts badly with the GUI preferences dialog. Currently, though, it's your only way to have custom per\-terminal settings. See your saved preferences in ~/.terminator/ for details of the supported "resources" (and note that they're not really X11 resources, and can't be set in any of the usual X11 ways).
+.SH EXAMPLES
+This command (all one line) opens one new window containing two tabs called "console 1" and "console 2".
+.nf
+.sp
+  terminator -n "console 1" "telnet 192.168.32.32 2001" \\
+             -n "console 2" "telnet 192.168.32.32 2002" &
+.sp
+.fi
+These two commands opens two new windows called "console 1" and "console 2".
+.nf
+.sp
+  terminator -n "console 1" "telnet 192.168.32.32 2001" &
+  terminator -n "console 2" "telnet 192.168.32.32 2002" &
+.sp
+.fi
+Note the use of & to background the startup script. Don't use this if you want to wait for the terminal(s) to be closed.
+.SH "REPORTING BUGS"
+Report bugs to <software@jessies.org>.
