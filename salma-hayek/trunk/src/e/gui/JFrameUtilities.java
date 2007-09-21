@@ -4,6 +4,7 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.imageio.*;
 import javax.swing.*;
 
@@ -27,6 +28,8 @@ public class JFrameUtilities {
     }
     
     private static final KeyStroke ESC = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
+    
+    private static HashMap<String, Rectangle> dialogGeometries = new HashMap<String, Rectangle>();
     
     public static void setFrameIcon(JFrame frame) {
         frame.setIconImage(FRAME_ICON);
@@ -155,6 +158,77 @@ public class JFrameUtilities {
         final String CLOSE_ACTION_NAME = "e.gui.JFrameUtilities.CloseFrameOnKeyStroke";
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, CLOSE_ACTION_NAME);
         rootPane.getActionMap().put(CLOSE_ACTION_NAME, CLOSE_ACTION);
+    }
+    
+    /**
+     * Writes our dialog geometries to disk so we can preserve them across runs.
+     * The format isn't very human-readable, but we're stuck with it now.
+     */
+    public static void writeGeometriesTo(String filename) {
+        StringBuilder content = new StringBuilder();
+        for (String name : dialogGeometries.keySet()) {
+            Rectangle bounds = dialogGeometries.get(name);
+            content.append(name + "\n");
+            content.append(bounds.x + "\n");
+            content.append(bounds.y + "\n");
+            content.append(bounds.width + "\n");
+            content.append(bounds.height + "\n");
+        }
+        StringUtilities.writeFile(new java.io.File(filename), content.toString());
+    }
+    
+    /**
+     * Reads stored dialog geometries back in from disk, so we can remember them across runs.
+     */
+    public static void readGeometriesFrom(String filename) {
+        if (new java.io.File(filename).exists() == false) {
+            return;
+        }
+        
+        String[] lines = StringUtilities.readLinesFromFile(filename);
+        try {
+            for (int i = 0; i < lines.length;) {
+                String name = lines[i++];
+                int x = Integer.parseInt(lines[i++]);
+                int y = Integer.parseInt(lines[i++]);
+                int width = Integer.parseInt(lines[i++]);
+                int height = Integer.parseInt(lines[i++]);
+                Rectangle bounds = new Rectangle(x, y, width, height);
+                dialogGeometries.put(name, bounds);
+            }
+        } catch (Exception ex) {
+            Log.warn("Failed to read geometries from '" + filename + "'", ex);
+        }
+    }
+    
+    /**
+     * Call this before setVisible to make the window/dialog corresponding to the given name appear in the position last known to storeBounds.
+     * It's a good idea to call setLocationRelativeTo first, as a default.
+     * You have to pass a name because Window doesn't have a title (even though its subclasses do).
+     * Feel free to treat "name" as a tag rather than literally the window title.
+     */
+    public static void restoreBounds(String name, Window window) {
+        Rectangle previousBounds = dialogGeometries.get(name);
+        if (previousBounds != null) {
+            Point newLocation = previousBounds.getLocation();
+            Dimension newSize = previousBounds.getSize();
+            
+            // Don't shrink the dialog below its "pack" size.
+            newSize.height = Math.max(newSize.height, window.getHeight());
+            newSize.width = Math.max(newSize.width, window.getWidth());
+            
+            window.setLocation(newLocation);
+            window.setSize(newSize);
+            
+            JFrameUtilities.constrainToScreen(window);
+        }
+    }
+    
+    /**
+     * Call this to record the fact that the window/dialog with the given name has moved.
+     */
+    public static void storeBounds(String name, Window window) {
+        dialogGeometries.put(name, window.getBounds());
     }
     
     private JFrameUtilities() {

@@ -32,8 +32,6 @@ import javax.swing.text.*;
 public class FormDialog {
     private static int componentSpacing = getComponentSpacing();
     
-    private static HashMap<String, Rectangle> dialogGeometries = new HashMap<String, Rectangle>();
-    
     private ArrayList<JTextComponent> listenedToTextFields;
     
     private DocumentListener documentListener;
@@ -389,20 +387,7 @@ public class FormDialog {
         if (doNotRememberBounds) {
             return;
         }
-        Rectangle previousBounds = dialogGeometries.get(dialog.getTitle());
-        if (previousBounds != null) {
-            Point newLocation = previousBounds.getLocation();
-            Dimension newSize = previousBounds.getSize();
-            
-            // Don't shrink the dialog below its "pack" size.
-            newSize.height = Math.max(newSize.height, dialog.getHeight());
-            newSize.width = Math.max(newSize.width, dialog.getWidth());
-            
-            dialog.setLocation(newLocation);
-            dialog.setSize(newSize);
-            
-            JFrameUtilities.constrainToScreen(dialog);
-        }
+        JFrameUtilities.restoreBounds(dialog.getTitle(), dialog);
     }
     
     /**
@@ -432,7 +417,7 @@ public class FormDialog {
     private void processUserChoice(boolean isAcceptance) {
         restoreFocus();
         if (doNotRememberBounds == false) {
-            dialogGeometries.put(dialog.getTitle(), dialog.getBounds());
+            JFrameUtilities.storeBounds(dialog.getTitle(), dialog);
         }
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
@@ -511,47 +496,6 @@ public class FormDialog {
         }
         
         return panel;
-    }
-    
-    /**
-     * Writes our dialog geometries to disk so we can preserve them across runs.
-     * The format isn't very human-readable, but we're stuck with it now.
-     */
-    public static void writeGeometriesTo(String filename) {
-        StringBuilder content = new StringBuilder();
-        for (String name : dialogGeometries.keySet()) {
-            Rectangle bounds = dialogGeometries.get(name);
-            content.append(name + "\n");
-            content.append(bounds.x + "\n");
-            content.append(bounds.y + "\n");
-            content.append(bounds.width + "\n");
-            content.append(bounds.height + "\n");
-        }
-        StringUtilities.writeFile(new java.io.File(filename), content.toString());
-    }
-    
-    /**
-     * Reads stored dialog geometries back in from disk, so we can remember them across runs.
-     */
-    public static void readGeometriesFrom(String filename) {
-        if (new java.io.File(filename).exists() == false) {
-            return;
-        }
-        
-        String[] lines = StringUtilities.readLinesFromFile(filename);
-        try {
-            for (int i = 0; i < lines.length;) {
-                String name = lines[i++];
-                int x = Integer.parseInt(lines[i++]);
-                int y = Integer.parseInt(lines[i++]);
-                int width = Integer.parseInt(lines[i++]);
-                int height = Integer.parseInt(lines[i++]);
-                Rectangle bounds = new Rectangle(x, y, width, height);
-                dialogGeometries.put(name, bounds);
-            }
-        } catch (Exception ex) {
-            Log.warn("Failed to read geometries from '" + filename + "'", ex);
-        }
     }
     
     /**
