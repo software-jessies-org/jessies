@@ -38,6 +38,17 @@ public class Workspace extends JPanel {
         setRootDirectory(rootDirectory);
         this.buildTarget = "";
         add(leftColumn, BorderLayout.CENTER);
+        leftColumn.addContainerListener(new ContainerListener() {
+            public void componentAdded(ContainerEvent e) {
+                componentCountChanged();
+            }
+            public void componentRemoved(ContainerEvent e) {
+                componentCountChanged();
+            }
+            private void componentCountChanged() {
+                updateTabForWorkspace();
+            }
+        });
     }
     
     public WorkspaceFileList getFileList() {
@@ -62,7 +73,7 @@ public class Workspace extends JPanel {
      * EColumn represents (if you can follow that). Invoked when the column has a component added
      * or removed.
      */
-    public void updateTabForWorkspace() {
+    private void updateTabForWorkspace() {
         JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
         if (tabbedPane != null) {
             String title = getTitle();

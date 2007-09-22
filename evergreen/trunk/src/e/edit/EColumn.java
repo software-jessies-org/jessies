@@ -68,6 +68,7 @@ public class EColumn extends JPanel {
     
     private void addListeners() {
         addComponentListener(new ComponentAdapter() {
+            @Override
             public void componentResized(ComponentEvent e) {
                 relayoutAfterResize();
             }
@@ -120,7 +121,6 @@ public class EColumn extends JPanel {
             getParent().repaint();
         }
         getParent().repaint();
-        getWorkspace().updateTabForWorkspace();
     }
     
     private class TitleBarMouseInputListener extends MouseInputAdapter {
@@ -156,7 +156,6 @@ public class EColumn extends JPanel {
             Log.warn("the total height of the title bars is too large for the parent window"); // Don't show the stack trace because it's *very* long, and uninformative.
         }
         addListenersTo(c);
-        getWorkspace().updateTabForWorkspace();
     }
     
     private void addComponentHeuristically(final EWindow c) {
