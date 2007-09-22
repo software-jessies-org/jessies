@@ -256,7 +256,7 @@ public class TerminalControl {
 			processBuffer(buffer, buffer.length);
 			pane.getTerminalView().setCursorVisible(false);
 		} catch (Exception ex) {
-			Log.warn("Couldn't say '" + message + "'", ex);
+			Log.warn("Couldn't say \"" + message + "\"", ex);
 		}
 	}
 	

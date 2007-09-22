@@ -169,7 +169,7 @@ private:
         signal(SIGCHLD, SIG_DFL);
         
         execvp(cmd[0], cmd);
-        throw unix_exception("Can't execute '" + toString(cmd[0]) + "'");
+        throw unix_exception("Can't execute \"" + toString(cmd[0]) + "\"");
     }
     
     static void fixEnvironment() {
