@@ -31,7 +31,7 @@ public class Parameters extends Properties {
         try {
             loadProperties(props, new BufferedReader(new FileReader(fileName)));
         } catch (Exception ex) {
-            Log.warn("Unable to read properties file '" + fileName + "'", ex);
+            Log.warn("Unable to read properties file \"" + fileName + "\"", ex);
             System.exit(1);
         }
         System.setProperties(props);

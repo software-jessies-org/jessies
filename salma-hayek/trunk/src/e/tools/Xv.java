@@ -29,7 +29,7 @@ public class Xv extends MainFrame {
             return;
         }
         
-        Log.warn("Opened '" + filename + "' (" + image.getWidth() + "x" + image.getHeight() + ").");
+        Log.warn("Opened \"" + filename + "\" (" + image.getWidth() + "x" + image.getHeight() + ").");
         
         setContentPane(new JScrollPane(new JLabel(new ImageIcon(image))));
         
