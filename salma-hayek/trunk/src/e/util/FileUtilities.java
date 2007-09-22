@@ -109,9 +109,9 @@ public class FileUtilities {
     public static String checkDirectoryExistence(String name) {
         File proposedDirectory = FileUtilities.fileFromString(name);
         if (proposedDirectory.exists() == false) {
-            return "Directory '" + name + "' does not exist.";
+            return "Directory \"" + name + "\" does not exist.";
         } else if (proposedDirectory.isDirectory() == false) {
-            return "The path '" + name + "' exists but does not refer to a directory.";
+            return "The path \"" + name + "\" exists but does not refer to a directory.";
         }
         return null;
     }
@@ -286,7 +286,7 @@ public class FileUtilities {
             digester.update(bytes);
             digest = digester.digest();
         } catch (Exception ex) {
-            Log.warn("Unable to compute MD5 digest of '" + file + "'.", ex);
+            Log.warn("Unable to compute MD5 digest of \"" + file + "\".", ex);
         }
         
         if (digest == null) {

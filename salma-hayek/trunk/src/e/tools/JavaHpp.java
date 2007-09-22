@@ -57,7 +57,7 @@ public class JavaHpp {
         out.println(", m_instance(instance)");
         for (Field field : fields) {
             if (field.getType().isArray()) {
-                throw new RuntimeException("array fields such as '" + field.getName() + "' are not supported");
+                throw new RuntimeException("array fields such as \"" + field.getName() + "\" are not supported");
             }
             out.println(", " + field.getName() + "(env, instance, \"" + field.getName() + "\", \"" + encodedTypeNameFor(field.getType()) + "\")");
         }
@@ -138,7 +138,7 @@ public class JavaHpp {
         } else if (exceptionTypes.length == 1) {
             return slashStyleClassName(exceptionTypes[0]);
         }
-        throw new RuntimeException("methods such as '" + method + "' with multiple exception types are not supported; please choose a single exception type or enhance JavaHpp to use an annotation to choose a wrapper exception for C++ exceptions");
+        throw new RuntimeException("methods such as \"" + method + "\" with multiple exception types are not supported; please choose a single exception type or enhance JavaHpp to use an annotation to choose a wrapper exception for C++ exceptions");
     }
     
     private List<Method> extractNativeMethods(Method[] methods) {

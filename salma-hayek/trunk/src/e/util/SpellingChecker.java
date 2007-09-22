@@ -160,7 +160,7 @@ public class SpellingChecker {
             
             // A blank line means "correctly spelled".
             if (response.length() == 0) {
-                debug("'" + word + "' response length == 0");
+                debug("\"" + word + "\" response length == 0");
                 return false;
             }
             
@@ -183,7 +183,7 @@ public class SpellingChecker {
             }
             
             if (response.length() != 0) {
-                Log.warn("SpellingChecker: garbled response: '" + response + "'");
+                Log.warn("SpellingChecker: garbled response: \"" + response + "\"");
             }
             
             return misspelled;

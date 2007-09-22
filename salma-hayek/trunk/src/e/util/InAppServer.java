@@ -39,7 +39,7 @@ public final class InAppServer {
         
         // In the absence of authentication, we shouldn't risk starting a server as root.
         if (System.getProperty("user.name").equals("root")) {
-            Log.warn("InAppServer: refusing to start unauthenticated server '" + fullName + "' as root!");
+            Log.warn("InAppServer: refusing to start unauthenticated server \"" + fullName + "\" as root!");
             return;
         }
         

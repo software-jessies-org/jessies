@@ -109,7 +109,7 @@ public class GuiUtilities {
             keycode = KeyEvent.class.getField(keycodeName).getInt(KeyEvent.class);
             return KeyStroke.getKeyStroke(keycode, modifiers);
         } catch (Exception ex) {
-            Log.warn("Couldn't find virtual keycode for '" + key + "'.", ex);
+            Log.warn("Couldn't find virtual keycode for \"" + key + "\".", ex);
         }
         return null;
     }

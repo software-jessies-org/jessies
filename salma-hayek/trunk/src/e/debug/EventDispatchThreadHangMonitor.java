@@ -292,7 +292,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                         } else if (arg.equals("modal-no-hang")) {
                             runModalTest(frame, false);
                         } else {
-                            System.err.println("unknown regression test '" + arg + "'");
+                            System.err.println("unknown regression test \"" + arg + "\"");
                             System.exit(1);
                         }
                         frame.pack();

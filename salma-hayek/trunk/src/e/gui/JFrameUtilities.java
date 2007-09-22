@@ -197,7 +197,7 @@ public class JFrameUtilities {
                 dialogGeometries.put(name, bounds);
             }
         } catch (Exception ex) {
-            Log.warn("Failed to read geometries from '" + filename + "'", ex);
+            Log.warn("Failed to read geometries from \"" + filename + "\"", ex);
         }
     }
     

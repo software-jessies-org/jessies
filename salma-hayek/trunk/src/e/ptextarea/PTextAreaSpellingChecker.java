@@ -279,7 +279,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             checkCount++;
             if (isException(word) == false && spellingChecker.isMisspelledWord(word)) {
                 misspellingCount++;
-                //System.err.println("Misspelled word '" + word + "'");
+                //System.err.println("Misspelled word \"" + word + "\"");
                 component.addHighlight(new UnderlineHighlight(component, start, finish));
             }
             
