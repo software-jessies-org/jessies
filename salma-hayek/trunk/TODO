@@ -1,4 +1,5 @@
-Items to be done for PTextArea:
+PTextArea
+---------
 
 * Compounding adjacent edits? Is there a behavior that we'd actually want? I usually find this more annoying than useful, even if it does save space.
 
@@ -62,7 +63,21 @@ Items to be done for PTextArea:
 
 * Replace e.util.Log with java.util.logging code.
 
-General stuff:
+General stuff
+-------------
 
 * Here's a really cool auto-update system (for Cocoa) that it would be nice to imitate: 
   http://www.andymatuschak.org/articles/2006/01/09/introducing-sparkle-easy-self-updates-for-all
+
+Installation
+------------
+
+* Several people have mentioned that it would be nice to have some kind of success message from the Windows installer. mad says WiX makes this difficult.
+
+* Several people have mentioned that they went looking for the Terminator icon (Windows users love Terminator!) in their Start menu, not on their desktop. mad says WiX makes this difficult.
+
+* Problems with native (non-Cygwin) Ruby on Windows. We only require Ruby 1.9's pathname.rb (which can be copied over the 1.8 file) to fix:
+
+    c:/ruby/lib/ruby/1.8/pathname.rb:341:in `lstat': Invalid argument - /C:/Documents and Settings/martind/f:/software.jessies.org/salma-hayek/bin/fatbits (Errno::EINVAL)
+
+  We would have to install the Ruby scripts as .rb (which would break anywhere we call them programmatically unless we rename them everywhere) or set up shortcuts like we do for terminator.
