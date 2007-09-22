@@ -1,0 +1,17 @@
+.TH EVERGREEN "1" "" "" "User Commands"
+.SH NAME
+evergreen \- programmer's development environment
+.SH SYNOPSIS
+evergreen [--block] FILE
+.SH DESCRIPTION
+Opens the given file in Evergreen.
+If Evergreen is already running, the file will be opened in that instance and the command will return immediately.
+Otherwise, a new Evergreen instance will start and the command will return when the user quits.
+
+You can supply addresses such as "file.cpp:12" in order to go straight to line 12 of "file.cpp".
+To facilitate the easy pasting of entire grep(1) matches collected via selection of the entire line, anything after the address is ignored.
+For this reason, it is not possible to open more than one file in one command.
+.SH "SEE ALSO"
+\&\fIedit-and-block\fR\|(1).
+.SH "REPORTING BUGS"
+Report bugs to <software@jessies.org>.
