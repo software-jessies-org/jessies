@@ -218,7 +218,10 @@ public class EErrorsWindow extends JFrame {
         }
         
         public void run() {
-            setVisible(true);
+            // This conditional stops the errors window from grabbing the focus every time it's updated.
+            if (isVisible() == false) {
+                setVisible(true);
+            }
             textArea.append(text);
         }
     }
