@@ -72,9 +72,9 @@ General stuff
 Installation
 ------------
 
-* Several people have mentioned that it would be nice to have some kind of success message from the Windows installer. mad says WiX makes this difficult.
+* Several people have mentioned that it would be nice to have some kind of success message from the Windows installer.
 
-* Several people have mentioned that they went looking for the Terminator icon (Windows users love Terminator!) in their Start menu, not on their desktop. mad says WiX makes this difficult.
+* Several people have mentioned that they went looking for the Terminator icon (Windows users love Terminator!) in their Start menu, not on their desktop.
 
 * Problems with native (non-Cygwin) Ruby on Windows. We only require Ruby 1.9's pathname.rb (which can be copied over the 1.8 file) to fix:
 
