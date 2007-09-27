@@ -379,6 +379,10 @@ define GENERATE_CHANGE_LOG.svn
   svn log > ChangeLog
 endef
 
+define GENERATE_CHANGE_LOG.hg
+  hg log > ChangeLog
+endef
+
 define GENERATE_CHANGE_LOG.cvs
   $(if $(shell which cvs2cl),cvs2cl,cvs2cl.pl) --hide-filenames
 endef
