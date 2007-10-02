@@ -77,11 +77,15 @@ public class FileUtilities {
      * Returns the user's home directory. Assumes that on Cygwin a user
      * who's set $HOME wants it to override Windows' notion of the home
      * directory, which is what the "user.home" system property gets you.
+     * Removes any trailing File.separators.
      */
     public static String getUserHomeDirectory() {
         String result = System.getenv("HOME");
         if (result == null) {
             result = System.getProperty("user.home");
+        }
+        if (result != null && result.endsWith(File.separator)) {
+            result = result.replaceAll(File.separator + "+$", "");
         }
         return result;
     }
