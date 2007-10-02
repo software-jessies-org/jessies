@@ -175,7 +175,10 @@ Bugs
   cleverer solution actually is.)
 
 * mad: We don't meet the Debian Policy's command line requirements for an x-terminal-emulator.
-  There's code in BlueArc's misc's install-everything.sh (which used to be in salma-hayek) to offer Terminator as an "alternative" implementation of x-terminal-emulator.
+  When we've fixed that, here's the code to offer ourselves:
+
+update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/terminator 50
+update-alternatives --auto x-terminal-emulator
 
 Configuration
 -------------
