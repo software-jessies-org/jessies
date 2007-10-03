@@ -41,6 +41,7 @@ SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTOR
 # ----------------------------------------------------------------------------
 
 SCRIPT_PATH = $(SALMA_HAYEK)/bin
+BUILD_SCRIPT_PATH = $(SALMA_HAYEK)/lib/build
 
 TARGET_OS_SCRIPT = $(SCRIPT_PATH)/target-os.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(TARGET_OS_SCRIPT)
@@ -391,14 +392,14 @@ GENERATED_FILES += ChangeLog
 GENERATED_FILES += ChangeLog.html
 GENERATED_FILES += .generated
 
-MAKE_VERSION_FILE_COMMAND = ruby $(SCRIPT_PATH)/make-version-file.rb . $(SALMA_HAYEK)
+MAKE_VERSION_FILE_COMMAND = ruby $(BUILD_SCRIPT_PATH)/make-version-file.rb . $(SALMA_HAYEK)
 # By immediately evaluating this, we cause install-everything.sh (or other building-from-source) to warn:
 # svn: '.' is not a working copy
 # Now we use the version string in the name of the .rpm target, it gets evaluated even if we use = instead of :=.
 VERSION_STRING := $(shell $(MAKE_VERSION_FILE_COMMAND) | tail -1)
 # If you ever need a Debian equivalent of this Windows-specific script:
 # sudo apt-get install uuid
-makeGuid = $(shell $(SCRIPT_PATH)/uuid.rb)
+makeGuid = $(shell $(BUILD_SCRIPT_PATH)/uuid.rb)
 
 # ----------------------------------------------------------------------------
 # Choose a Java compiler.
@@ -479,7 +480,7 @@ endef
 
 # We get the shell to find candle and light on the path but we mention
 # file-list-to-wxi in a prerequisite and so must know its exact location.
-FILE_LIST_TO_WXI = $(SCRIPT_PATH)/file-list-to-wxi.rb
+FILE_LIST_TO_WXI = $(BUILD_SCRIPT_PATH)/file-list-to-wxi.rb
 
 WIX_COMPILATION_DIRECTORY = .generated/WiX
 
@@ -607,7 +608,7 @@ native-clean:
 
 ChangeLog.html: ChangeLog
 	$(RM) $@ && \
-	ruby $(SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
+	ruby $(BUILD_SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
 
 .PHONY: ChangeLog
 ChangeLog:
@@ -662,7 +663,7 @@ installer-file-list:
 # Unfortunately, the start-up scripts tend to go looking for salma-hayek, so we can't just have Resources/bin etc; we have to keep the multi-directory structure, at least for now.
 .PHONY: $(MACHINE_PROJECT_NAME).app
 $(MACHINE_PROJECT_NAME).app: build .generated/build-revision.txt
-	$(SCRIPT_PATH)/package-for-distribution.rb $(HUMAN_PROJECT_NAME) $(MACHINE_PROJECT_NAME) $(SALMA_HAYEK)
+	$(BUILD_SCRIPT_PATH)/package-for-distribution.rb $(HUMAN_PROJECT_NAME) $(MACHINE_PROJECT_NAME) $(SALMA_HAYEK)
 
 # For a comparison of the major choices available at the time, see:
 # http://elliotth.blogspot.com/2007/05/choosing-best-disk-image-format-on-mac.html
