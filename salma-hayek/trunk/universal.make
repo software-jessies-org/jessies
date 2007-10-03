@@ -134,7 +134,7 @@ JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell ruby $(JDK_ROOT_SCRIPT
 # We use our own replacement for javah(1).
 # ----------------------------------------------------------------------------
 
-JAVAHPP = $(SCRIPT_PATH)/javahpp.rb
+JAVAHPP = $(SCRIPT_PATH)/javahpp
 
 # ----------------------------------------------------------------------------
 # Find the source.
