@@ -626,7 +626,7 @@ source-dist: ../$(SOURCE_DIST_FILE)
 # The ChangeLog is generated too!
 ../$(SOURCE_DIST_FILE): ChangeLog .generated/build-revision.txt
 	cd .. && \
-	tar -X $(SALMA_HAYEK)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_DIRECTORY_BASE_NAME)/* $(PROJECT_DIRECTORY_BASE_NAME)/.generated/build-revision.txt
+	tar -X $(BUILD_SCRIPT_PATH)/dist-exclude -zcf $(SOURCE_DIST_FILE) $(PROJECT_DIRECTORY_BASE_NAME)/* $(PROJECT_DIRECTORY_BASE_NAME)/.generated/build-revision.txt
 
 # This is only designed to be run on jessies.org itself.
 .PHONY: www-dist
