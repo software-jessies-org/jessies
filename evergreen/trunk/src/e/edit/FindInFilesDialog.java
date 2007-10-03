@@ -392,11 +392,10 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     public synchronized void showMatches() {
-        if (matchView.isShowing() == false) {
-            // There's no point doing a search if the user can't see the results.
-            return;
+        // Only bother if the user can see the results, and we're not currently rescanning the index.
+        if (matchView.isShowing() && workspace.getFileList().getIndexedFileCount() != -1) {
+            new Thread(new FileFinder(), "Find in Files for " + workspace.getTitle()).start();
         }
-        new Thread(new FileFinder(), "Find in Files for " + workspace.getTitle()).start();
     }
     
     public void initMatchList() {
