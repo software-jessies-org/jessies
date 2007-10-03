@@ -2,9 +2,9 @@
 
 # Cope with symbolic links to this script.
 require "pathname.rb"
-salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
+salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
 
-require "#{salma_hayek}/bin/uuid.rb"
+require "#{salma_hayek}/lib/build/uuid.rb"
 
 directoryPathToFileNames = Hash.new() {
   |hash, directoryPath|
