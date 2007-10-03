@@ -12,7 +12,6 @@ class Terminator
         require "#{@salma_hayek}/bin/invoke-java.rb"
         require "#{@salma_hayek}/bin/show-alert.rb"
         require "#{@salma_hayek}/bin/target-os.rb"
-        require "#{@salma_hayek}/bin/which.rb"
     end
     
     def launch()
