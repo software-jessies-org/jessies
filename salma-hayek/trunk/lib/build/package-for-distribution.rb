@@ -143,7 +143,7 @@ FileUtils.rm_rf(tmp_dir)
 FileUtils.mkdir_p(tmp_dir)
 
 # Most packaging systems need a constrained form of version number.
-require "#{salma_hayek}/bin/make-version-file.rb"
+require "#{salma_hayek}/lib/build/make-version-file.rb"
 compressed_version_number = makeVersionString(".", salma_hayek)
 
 if target_os() == "Linux"
