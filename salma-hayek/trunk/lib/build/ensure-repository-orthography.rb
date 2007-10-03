@@ -3,7 +3,7 @@
 # Cope with symbolic links to this script.
 require "pathname.rb"
 require "fileutils"
-salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
+salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
 evergreen = Pathname.new("#{salma_hayek}/../Evergreen").realpath()
 if evergreen.exist?() == false
     exit(0)
