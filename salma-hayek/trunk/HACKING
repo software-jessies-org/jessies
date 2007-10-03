@@ -3,7 +3,6 @@ Use international English spelling.
 Use 4-space 'tabs' and K&R (Sun Java) indentation. (That is, follow the rest of the code.)
 
 Use the Log class instead of System.err/System.out; those should be used only while debugging.
-On Windows, writing to either can cause the application to hang.
 Remember that printStackTrace() implicitly writes to System.err, and use Log or SimpleDialog instead.
 
 No new file formats; we can't keep just inventing random formats left, right and center.
