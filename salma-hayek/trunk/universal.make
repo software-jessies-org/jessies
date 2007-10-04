@@ -454,6 +454,7 @@ JAVAC_FLAGS += -encoding UTF-8
 # ----------------------------------------------------------------------------
 
 JAVAC_FLAGS.gcj += -Wall -Wdeprecated
+JAVAC_FLAGS.gcj += -Wno-indirect-static
 JAVAC_FLAGS.gcj += -Wno-serial
 JAVAC_FLAGS.gcj += -combine
 JAVAC_FLAGS.gcj += -encoding UTF-8
