@@ -1,7 +1,6 @@
 package e.edit;
 
 import java.awt.*;
-import java.awt.event.*;
 
 /**
  * The ETextArea action to change to the appropriate font for the content.

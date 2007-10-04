@@ -5,7 +5,6 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
-import javax.swing.event.*;
 import org.jdesktop.swingworker.SwingWorker;
 
 public class WorkspaceFileList {

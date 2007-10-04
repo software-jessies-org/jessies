@@ -5,7 +5,6 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
-import java.nio.charset.*;
 import java.util.*;
 import javax.swing.*;
 

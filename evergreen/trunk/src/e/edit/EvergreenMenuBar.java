@@ -1,11 +1,10 @@
 package e.edit;
 
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
 import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class EvergreenMenuBar extends EMenuBar {
     public EvergreenMenuBar() {

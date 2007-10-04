@@ -6,9 +6,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.concurrent.*;
 import javax.swing.*;
-import javax.swing.Timer;
 import org.jdesktop.swingworker.SwingWorker;
 
 public class Advisor extends JPanel {

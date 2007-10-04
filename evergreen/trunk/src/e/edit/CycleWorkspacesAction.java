@@ -2,7 +2,6 @@ package e.edit;
 
 import e.util.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Moves the focus a given number of workspaces forward or back.

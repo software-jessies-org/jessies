@@ -1,7 +1,5 @@
 package e.edit;
 
-import e.gui.*;
-import e.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 

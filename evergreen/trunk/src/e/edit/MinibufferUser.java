@@ -1,6 +1,5 @@
 package e.edit;
 
-import java.awt.event.*;
 import e.util.*;
 
 public interface MinibufferUser {
