@@ -3,7 +3,6 @@ package e.gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.text.*;
 import java.util.Map;
 import javax.swing.*;
 

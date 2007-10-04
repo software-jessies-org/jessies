@@ -3,7 +3,6 @@ package e.tools;
 import com.apple.eawt.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
@@ -11,8 +10,6 @@ import javax.swing.event.*;
 import e.forms.*;
 import e.gui.*;
 import e.util.*;
-
-import javax.swing.Timer;
 
 /**
  * A Java equivalent of Apple's Pixie.app magnifying glass utility. This is

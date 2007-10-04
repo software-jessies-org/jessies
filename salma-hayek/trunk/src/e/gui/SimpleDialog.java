@@ -4,7 +4,6 @@ import e.forms.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
-import java.io.*;
 import javax.swing.*;
 
 public class SimpleDialog {

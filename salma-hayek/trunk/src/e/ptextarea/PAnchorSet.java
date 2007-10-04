@@ -1,9 +1,7 @@
 package e.ptextarea;
 
 import e.util.*;
-import java.lang.ref.*;
 import java.util.*;
-import javax.swing.*;
 
 /**
  * Contains all the PAnchor instances related to a given text buffer.

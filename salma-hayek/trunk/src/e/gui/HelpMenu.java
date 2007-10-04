@@ -1,7 +1,6 @@
 package e.gui;
 
 import e.util.*;
-import java.io.*;
 import java.awt.event.*;
 import javax.swing.*;
 

@@ -3,7 +3,6 @@ package e.toys.world;
 import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.net.*;
 import java.util.*;
 import java.text.*;
 import javax.swing.*;
