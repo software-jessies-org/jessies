@@ -83,7 +83,7 @@ public class Terminator {
 	}
 	
 	// Returns whether we started the UI.
-	public boolean parseCommandLine(final String[] argumentArray, PrintWriter out, PrintWriter err) throws IOException {
+	public boolean parseCommandLine(final String[] argumentArray, PrintWriter out) throws IOException {
 		arguments = Options.getSharedInstance().parseCommandLine(argumentArray);
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
 			showUsage(out);
@@ -94,8 +94,8 @@ public class Terminator {
 		return false;
 	}
 
-	private void parseOriginalCommandLine(final String[] argumentArray, PrintWriter out, PrintWriter err) throws IOException {
-		if (parseCommandLine(argumentArray, out, err)) {
+	private void parseOriginalCommandLine(final String[] argumentArray, PrintWriter out) throws IOException {
+		if (parseCommandLine(argumentArray, out)) {
 			startTerminatorServer();
 		}
 	}
@@ -184,10 +184,8 @@ public class Terminator {
 					Terminator.getSharedInstance().optionsDidChange();
 					
 					PrintWriter outWriter = new PrintWriter(System.out);
-					PrintWriter errWriter = new PrintWriter(System.err);
-					Terminator.getSharedInstance().parseOriginalCommandLine(arguments, outWriter, errWriter);
+					Terminator.getSharedInstance().parseOriginalCommandLine(arguments, outWriter);
 					outWriter.flush();
-					errWriter.flush();
 				} catch (Throwable th) {
 					Log.warn("Couldn't start Terminator.", th);
 					System.exit(1);

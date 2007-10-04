@@ -333,7 +333,7 @@ public class TerminalControl {
 		return (ch != Ascii.BS && ch != Ascii.CR && ch != Ascii.VT);
 	}
 	
-	private synchronized void processChar(final char ch) throws IOException {
+	private synchronized void processChar(final char ch) {
 		// Enable this if you're having trouble working out what we're being asked to interpret.
 		if (SHOW_ASCII_RENDITION) {
 			if (ch >= ' ' || ch == '\n') {

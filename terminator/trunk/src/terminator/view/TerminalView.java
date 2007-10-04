@@ -15,8 +15,6 @@ import terminator.terminal.*;
 import terminator.view.highlight.*;
 
 public class TerminalView extends JComponent implements FocusListener, Scrollable {
-	private static final boolean MAC_OS = GuiUtilities.isMacOs();
-	
 	private static final Stopwatch paintComponentStopwatch = Stopwatch.get("TerminalView.paintComponent");
 	private static final Stopwatch paintStyledTextStopwatch = Stopwatch.get("TerminalView.paintStyledText");
 	
