@@ -8,8 +8,6 @@ import javax.swing.*;
  * A "Help" menu for a GUI application.
  */
 public class HelpMenu {
-    private String websiteBaseUrl;
-    
     public HelpMenu() {
     }
     

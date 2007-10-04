@@ -31,7 +31,6 @@ public class ProcessUtilities {
      * lines will appear after all the output lines.
      */
     public static int backQuote(final File directory, final String[] command, final LineListener outputLineListener, final LineListener errorLineListener) {
-        ArrayList result = new ArrayList();
         try {
             final Process p = Runtime.getRuntime().exec(command, null, directory);
             p.getOutputStream().close();

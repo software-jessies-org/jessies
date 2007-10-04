@@ -49,7 +49,6 @@ public class EMenuBar extends JMenuBar {
         if (haveLocalBinding) {
             return true;
         }
-        MenuElement[] subElements = getSubElements();
         for (MenuElement subElement : getSubElements()) {
             if (processBindingForKeyStrokeRecursive(subElement, ks, e, condition, pressed)) {
                 return true;
