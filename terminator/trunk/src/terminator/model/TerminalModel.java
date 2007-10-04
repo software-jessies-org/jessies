@@ -93,7 +93,6 @@ public class TerminalModel {
 		// expensive nulling-out of now-unused elements. The assumption
 		// being that we're most likely to be asked to clear the
 		// scrollback when it's insanely large.
-		Dimension oldSize = getCurrentSizeInChars();
 		textLines = new ArrayList<TextLine>();
 		setSize(width, view.getVisibleSizeInCharacters().height);
 		maxLineWidth = width;
@@ -426,7 +425,6 @@ public class TerminalModel {
 	
 	private void textAdded(int length) {
 		TextLine textLine = getTextLine(cursorPosition.getLineIndex());
-		int currentLine = cursorPosition.getLineIndex();
 		updateMaxLineWidth(textLine.length());
 		lineIsDirty(cursorPosition.getLineIndex() + 1);  // cursorPosition's line still has a valid *start* index.
 		linesChangedFrom(cursorPosition.getLineIndex());
@@ -439,7 +437,6 @@ public class TerminalModel {
 			cursorPosition = new Location(cursorPosition.getLineIndex(), 0);
 			return;
 		case Ascii.LF:
-			int lineIndex = cursorPosition.getLineIndex();
 			moveToLine(cursorPosition.getLineIndex() + 1);
 			return;
 		case Ascii.VT:
@@ -485,7 +482,6 @@ public class TerminalModel {
 	
 	public void deleteCharacters(int count) {
 		TextLine line = getTextLine(cursorPosition.getLineIndex());
-		int oldLineLength = line.length();
 		int start = cursorPosition.getCharOffset();
 		int end = start + count;
 		line.killText(start, end);

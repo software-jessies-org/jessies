@@ -29,7 +29,6 @@ public class TerminatorTabbedPane extends JTabbedPane {
                 // This is less unpleasant than using java.awt.Robot to move the pointer to a safe spot.
                 // (gnome-terminal sidesteps this problem by forcing all tabs to be the same width.)
                 javax.swing.plaf.TabbedPaneUI ui = tabbedPane.getUI();
-                Rectangle oldRectangle = ui.getTabBounds(tabbedPane, oldIndex);
                 Rectangle newRectangle = ui.getTabBounds(tabbedPane, newIndex);
                 if (oldIndex < newIndex) {
                     // Moving left-to-right.
