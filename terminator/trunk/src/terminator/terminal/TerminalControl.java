@@ -5,7 +5,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
-import javax.swing.*;
 import terminator.*;
 import terminator.model.*;
 import terminator.view.*;

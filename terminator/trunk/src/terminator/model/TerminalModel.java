@@ -2,7 +2,6 @@ package terminator.model;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 import javax.swing.*;
 import e.util.*;
 import terminator.terminal.*;
