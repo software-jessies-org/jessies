@@ -1,6 +1,5 @@
 package e.edit;
 
-import e.ptextarea.*;
 import e.util.*;
 
 public class NumberResearcher implements WorkspaceResearcher {

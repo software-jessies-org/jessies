@@ -2,7 +2,6 @@ package e.edit;
 
 import java.awt.*;
 import java.awt.geom.*;
-import java.text.*;
 
 // We're not allowed forward references in an enum's list of values, and the
 // list of values has to come first. We also can't statically import these

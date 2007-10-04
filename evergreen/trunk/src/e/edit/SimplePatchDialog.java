@@ -1,15 +1,11 @@
 package e.edit;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-
 import e.forms.*;
-import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
 
 public class SimplePatchDialog {
     /** Background color for the @@ lines. */

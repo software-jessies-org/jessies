@@ -1,8 +1,6 @@
 package e.edit;
 
 import java.awt.event.*;
-import java.lang.reflect.*;
-import java.util.regex.*;
 
 /**
  * Switches to the counterpart of the current file (for example, the .h file for a .cpp or vice versa).

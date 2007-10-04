@@ -5,11 +5,9 @@ import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import org.jdesktop.swingworker.SwingWorker;
 
 /**

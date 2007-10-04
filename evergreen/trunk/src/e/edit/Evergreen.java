@@ -1,6 +1,5 @@
 package e.edit;
 
-import e.forms.*;
 import e.gui.*;
 import e.util.*;
 import java.awt.*;

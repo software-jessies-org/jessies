@@ -1,6 +1,5 @@
 package e.edit;
 
-import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import e.ptextarea.*;

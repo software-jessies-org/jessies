@@ -1,14 +1,9 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-
-import e.forms.*;
-import e.gui.*;
-import e.util.*;
 
 /**
  * Shows a patch to turn the clipboard into the selection. Useful for confirming
