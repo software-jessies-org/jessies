@@ -2,7 +2,6 @@ package terminator.view;
 
 import e.gui.*;
 import java.awt.event.*;
-import javax.swing.*;
 import terminator.*;
 
 public class CursorBlinker implements ActionListener {

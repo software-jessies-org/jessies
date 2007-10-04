@@ -1,7 +1,6 @@
 package terminator;
 
 import e.util.*;
-import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 

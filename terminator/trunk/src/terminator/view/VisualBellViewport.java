@@ -3,7 +3,6 @@ package terminator.view;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;

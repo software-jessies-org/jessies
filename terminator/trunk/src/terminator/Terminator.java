@@ -8,7 +8,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.List;
-import javax.swing.*;
 import terminator.view.*;
 
 public class Terminator {

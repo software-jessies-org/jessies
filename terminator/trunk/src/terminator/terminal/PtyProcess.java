@@ -1,10 +1,8 @@
 package terminator.terminal;
 
-import e.gui.*;
 import e.util.*;
 import java.awt.Dimension;
 import java.io.*;
-import java.util.*;
 import java.util.concurrent.*;
 
 public class PtyProcess {

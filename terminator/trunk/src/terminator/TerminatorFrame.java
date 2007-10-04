@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.event.*;
 import terminator.view.*;
 
 public class TerminatorFrame extends JFrame {
