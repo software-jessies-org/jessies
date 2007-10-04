@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.regex.*;
-
 public class PRubyIndenter extends PGenericIndenter {
     private static final String INDENT_AFTER = "(^\\s*(begin|case|catch|class|def|do|else|elsif|ensure|for|if|module|rescue|when|while|unless|until)\\b(?!.*\\b(end)\\b)|\\{(?![^}]*})|\\b(do)\\b)";
     

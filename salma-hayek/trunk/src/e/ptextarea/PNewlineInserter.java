@@ -1,7 +1,6 @@
 package e.ptextarea;
 
 import e.util.*;
-import java.util.*;
 import java.util.regex.*;
 
 public class PNewlineInserter {
@@ -134,7 +133,6 @@ public class PNewlineInserter {
     
     private void insertMatchingCloseComment() {
         final int position = textArea.getSelectionStart();
-        String line = getLineTextAtOffset(position);
         String whitespace = getIndentationOfLineAtOffset(position);
         String prefix = "\n" + whitespace + " * ";
         String suffix = "\n" + whitespace + " */";

@@ -6,7 +6,6 @@ public class NumberDecoder {
     private long number;
     private int radix = 10;
     private boolean valid = false;
-    private String problem;
     
     public NumberDecoder(String string) {
         decode(string);

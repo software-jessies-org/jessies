@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.regex.*;
-
 public class PBashIndenter extends PGenericIndenter {
     private static final String INDENT_AFTER = "(\\{(?![^\\}]*\\})|\\b(then|elif|else)\\b(?!.*\\bfi\\b)|\\bdo\\b(?!.+\\b(done)\\b)|\\b(case)\\s+\\S+\\s+in\\b(?!.*\\besac\\b)|\\[\\[)";
     private static final String INDENT = "\\$\\{.*\\}";

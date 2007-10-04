@@ -1,7 +1,6 @@
 package e.ptextarea;
 
 import java.util.*;
-import java.util.regex.*;
 import e.util.*;
 
 /**

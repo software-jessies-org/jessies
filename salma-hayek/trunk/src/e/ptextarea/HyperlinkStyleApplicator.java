@@ -1,10 +1,6 @@
 package e.ptextarea;
 
 import e.gui.*;
-import e.util.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
 import java.util.regex.*;
 
 /**

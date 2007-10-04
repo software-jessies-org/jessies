@@ -1,8 +1,6 @@
 package e.forms;
 
-import e.gui.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;

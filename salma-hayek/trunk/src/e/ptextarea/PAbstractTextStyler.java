@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.util.List;
 
 public abstract class PAbstractTextStyler implements PTextStyler {
