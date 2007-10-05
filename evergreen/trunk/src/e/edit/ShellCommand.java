@@ -69,6 +69,12 @@ public class ShellCommand {
 
         EventQueue.invokeLater(launchRunnable);
         
+        // This causes ugly flickering if the window's already on the top of the stack, but it fixes the problem on small screens where your main window covers your build window and you don't remember/want to close the build window before you start editing.
+        // As usual, we can't use toFront because the GNOME morons (okay, well-intentioned fascists, but aren't fascists always well-intentioned in their own minds?) broke it for us, and Sun hasn't worked around the breakage.
+        // I don't know of any way to test whether we're already on top.
+        workspace.getErrorsWindow().setVisible(false);
+        workspace.getErrorsWindow().setVisible(true);
+        
         workspace.getErrorsWindow().showStatus("Started task \"" + command + "\"");
         workspace.getErrorsWindow().taskDidStart();
         
