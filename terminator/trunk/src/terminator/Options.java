@@ -387,7 +387,7 @@ public class Options {
 		Graphics2D g = image.createGraphics();
 		g.setFont(getFont());
 		FontMetrics metrics = g.getFontMetrics();
-		final int height = (int) ((double) metrics.getHeight() * 1.4);
+		final int height = (int) (1.4* metrics.getHeight());
 		final int width = (int) (metrics.getStringBounds(name, g).getWidth() * 1.2);
 		g.dispose();
 		return new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -407,7 +407,7 @@ public class Options {
 		Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(name, g);
 		final int x = (image.getWidth() - (int) stringBounds.getWidth()) / 2;
 		int y = (image.getHeight() - (int) stringBounds.getHeight()) / 2 + g.getFontMetrics().getAscent();
-		y = (int) ((double) y / 1.1);
+		y = (int) (y / 1.1);
 		g.drawString(name, x, y);
 		g.dispose();
 		return image;
@@ -762,7 +762,7 @@ public class Options {
 			if (currentValue == null) {
 				throw new RuntimeException("Attempt to set unknown resource \"" + key + "\" - terminator --help lists the supported resources");
 			}
-			Class currentClass = currentValue.getClass();
+			Class<?> currentClass = currentValue.getClass();
 			if (currentClass == Boolean.class) {
 				options.put(key, Boolean.valueOf(value));
 			} else if (currentClass == Double.class) {

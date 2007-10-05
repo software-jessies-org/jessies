@@ -37,11 +37,11 @@ public class TerminalDropTarget extends DropTargetAdapter {
 			if (e.isDataFlavorSupported(uriListFlavor)) {
 				// Sun 4899516: without support for text/uri-list, we can't accept files dropped from Nautilus on Linux.
 				e.acceptDrop(DnDConstants.ACTION_COPY);
-				List files = translateUriStringToFileList((String) transferable.getTransferData(uriListFlavor));
+				List<String> files = translateUriStringToFileList((String) transferable.getTransferData(uriListFlavor));
 				textToInsert = makeQuotedFilenameList(files);
 			} else if (e.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 				e.acceptDrop(DnDConstants.ACTION_COPY);
-				List files = (List) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+				List<?> files = (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 				textToInsert = makeQuotedFilenameList(files);
 			} else if (e.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 				e.acceptDrop(DnDConstants.ACTION_COPY);
@@ -58,7 +58,7 @@ public class TerminalDropTarget extends DropTargetAdapter {
 		}
 	}
 	
-	private String makeQuotedFilenameList(List files) {
+	private String makeQuotedFilenameList(List<? extends Object> files) {
 		StringBuilder result = new StringBuilder();
 		for (Object file : files) {
 			String filename = file.toString();
@@ -72,7 +72,7 @@ public class TerminalDropTarget extends DropTargetAdapter {
 	}
 	
 	// Sun 4899516: we need to translate a URI list (represented as a String) manually.
-	private List translateUriStringToFileList(String uriList) {
+	private List<String> translateUriStringToFileList(String uriList) {
 		ArrayList<String> result = new ArrayList<String>();
 		for (String uri : uriList.split("\r\n")) {
 			if (uri.startsWith("#")) {
