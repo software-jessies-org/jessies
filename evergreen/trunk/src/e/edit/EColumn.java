@@ -42,10 +42,6 @@ public class EColumn extends JPanel {
         window.requestFocus();
     }
     
-    private Workspace getWorkspace() {
-        return (Workspace) SwingUtilities.getAncestorOfClass(Workspace.class, this);
-    }
-    
     public ETextWindow[] getTextWindows() {
         ArrayList<ETextWindow> result = new ArrayList<ETextWindow>();
         for (Component c : getComponents()) {

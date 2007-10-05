@@ -90,7 +90,6 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             this.name = name;
             this.matchCount = matchCount;
             this.pattern = pattern;
-            this.containsDefinition = containsDefinition;
             if (pattern != null) {
                 definitionFinderExecutor.submit(new DefinitionFinder(file, pattern, this));
             }

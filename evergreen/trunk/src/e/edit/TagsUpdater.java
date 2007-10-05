@@ -208,7 +208,6 @@ public class TagsUpdater {
     public class TreeModelBuilder extends SwingWorker<TreeModel, TagReader.Tag> implements TagReader.TagListener {
         private int serialNumber;
         private String newDigest;
-        private boolean tagsHaveChanged;
         private boolean successful = true;
         private Stopwatch.Timer stopwatchTimer;
         private Timer progressTimer;
