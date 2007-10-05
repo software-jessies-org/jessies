@@ -505,9 +505,9 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		for (int i = firstLineIndex; i < lineHighlights.size(); i++) {
 			ArrayList<Highlight> list = lineHighlights.get(i);
 			if (list != null) {
-				Iterator it = list.iterator();
+				Iterator<Highlight> it = list.iterator();
 				while (it.hasNext()) {
-					Highlight highlight = (Highlight) it.next();
+					Highlight highlight = it.next();
 					if (highlight.getHighlighter() == highlighter) {
 						it.remove();
 						repaintHighlight(highlight);
@@ -566,7 +566,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	 * current line by 'direction', looking for a line with a find highlight.
 	 * When one is found, the cursor is moved there.
 	 */
-	private void findAgain(Class highlighterClass, int startLine, int endLine, int direction) {
+	private void findAgain(Class<? extends Highlighter> highlighterClass, int startLine, int endLine, int direction) {
 		for (int i = startLine; i != endLine; i += direction) {
 			List<Highlight> highlights = getHighlightsForLine(i);
 			Highlight match = firstHighlightOfClass(highlights, highlighterClass);
@@ -583,7 +583,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	/**
 	 * Tests whether any of the Highlight objects in the list is a FindHighlighter.
 	 */
-	private static Highlight firstHighlightOfClass(List<Highlight> highlights, Class highlighterClass) {
+	private static Highlight firstHighlightOfClass(List<Highlight> highlights, Class<? extends Highlighter> highlighterClass) {
 		for (Highlight highlight : highlights) {
 			if (highlight.getHighlighter().getClass() == highlighterClass) {
 				return highlight;
@@ -595,14 +595,14 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	/**
 	 * Scrolls the display down to the next highlight of the given class not currently on the display.
 	 */
-	public void findNext(Class highlighterClass) {
+	public void findNext(Class<? extends Highlighter> highlighterClass) {
 		findAgain(highlighterClass, getLastVisibleLine() + 1, getModel().getLineCount() + 1, 1);
 	}
 	
 	/**
 	 * Scrolls the display up to the next highlight of the given class not currently on the display.
 	 */
-	public void findPrevious(Class highlighterClass) {
+	public void findPrevious(Class<? extends Highlighter> highlighterClass) {
 		findAgain(highlighterClass, getFirstVisibleLine() - 1, -1, -1);
 	}
 	
@@ -715,14 +715,14 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 					String chunkText = chunk.getText();
 					if (drawCursor && cursorPosition.charOffsetInRange(startOffset, startOffset + chunkText.length())) {
 						final int charOffsetUnderCursor = cursorPosition.getCharOffset() - startOffset;
-						paintCursor(g, metrics, chunkText.substring(charOffsetUnderCursor, charOffsetUnderCursor + 1), baseline);
+						paintCursor(g, chunkText.substring(charOffsetUnderCursor, charOffsetUnderCursor + 1), baseline);
 						drawCursor = false;
 					}
 					startOffset += chunkText.length();
 				}
 				if (drawCursor) {
 					// A cursor at the end of the line is in a position past the end of the text.
-					paintCursor(g, metrics, "", baseline);
+					paintCursor(g, "", baseline);
 				}
 			}
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasHint);
@@ -745,7 +745,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	 * The cursor may actually be invisible because it's blinking and in
 	 * the 'off' state.
 	 */
-	private void paintCursor(Graphics2D g, FontMetrics metrics, String characterUnderCursor, int baseline) {
+	private void paintCursor(Graphics2D g, String characterUnderCursor, int baseline) {
 		g.setColor(getCursorColor());
 		Rectangle cursorRect = modelToView(cursorPosition);
 		final int bottomY = cursorRect.y + cursorRect.height - 1;

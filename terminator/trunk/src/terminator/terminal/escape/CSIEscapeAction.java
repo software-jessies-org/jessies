@@ -72,7 +72,7 @@ public class CSIEscapeAction implements TerminalAction {
 		case 'C':
 			return moveCursor(model, midSequence, 1, 0);
 		case 'c':
-			return deviceAttributesRequest(model, midSequence);
+			return deviceAttributesRequest(midSequence);
 		case 'D':
 			return moveCursor(model, midSequence, -1, 0);
 		case 'd':
@@ -105,12 +105,12 @@ public class CSIEscapeAction implements TerminalAction {
 			return processDeviceStatusReport(model, midSequence);
 		case 'r':
 			if (midSequence.startsWith("?")) {
-				return restoreDecPrivateModes(model, midSequence);
+				return restoreDecPrivateModes(midSequence);
 			} else {
 				return setScrollingRegion(model, midSequence);
 			}
 		case 's':
-			return saveDecPrivateModes(model, midSequence);
+			return saveDecPrivateModes(midSequence);
 		default:
 			Log.warn("unknown CSI sequence " + StringUtilities.escapeForJava(sequence));
 			return false;
@@ -179,12 +179,12 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean restoreDecPrivateModes(TerminalModel model, String seq) {
+	private boolean restoreDecPrivateModes(String seq) {
 		Log.warn("Restore DEC private mode values not implemented (CSI " + StringUtilities.escapeForJava(seq) + ")");
 		return false;
 	}
 	
-	public boolean saveDecPrivateModes(TerminalModel model, String seq) {
+	private boolean saveDecPrivateModes(String seq) {
 		Log.warn("Save DEC private mode values not implemented (CSI " + StringUtilities.escapeForJava(seq) + ")");
 		return false;
 	}
@@ -199,7 +199,7 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean deviceAttributesRequest(TerminalModel model, String seq) {
+	private boolean deviceAttributesRequest(String seq) {
 		if (seq.equals("") || seq.equals("0")) {
 			sendDeviceAttributes(control);
 			return true;
