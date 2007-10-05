@@ -46,7 +46,6 @@ public class BuildAction extends ETextAction {
     }
     
     private static String getMakefileSearchStartDirectory() {
-        String startDirectory;
         ETextWindow focusedTextWindow = getFocusedTextWindow();
         if (focusedTextWindow != null) {
             return focusedTextWindow.getContext();
