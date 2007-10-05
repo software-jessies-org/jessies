@@ -32,7 +32,7 @@ final class PTextAreaRenderer {
         Stopwatch.Timer timer = paintStopwatch.start();
         try {
             // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give it to them.
-            Map map = (Map) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
+            Map<?, ?> map = (Map<?, ?>) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
             if (map != null) {
                 g.addRenderingHints(map);
             }

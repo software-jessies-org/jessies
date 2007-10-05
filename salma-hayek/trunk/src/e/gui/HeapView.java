@@ -59,16 +59,6 @@ public class HeapView extends JComponent {
     private static final int BORDER_H = 4;
     
     /**
-     * Colors for the grid. This is alternating pairs for a linear gradient.
-     */
-    private static final Color[] GRID_COLORS = new Color[] {
-        new Color(0xE3DFCF), new Color(0xE7E4D3),
-        new Color(0xDAD7C6), new Color(0xDFDCCB),
-        new Color(0xD3CFBF), new Color(0xD7D3C3),
-        new Color(0xCECABA), new Color(0xD0CCBC)
-    };
-    
-    /**
      * Border color.
      */
     private static final Color BORDER1_COLOR = new Color(0xA6A295);
@@ -225,7 +215,7 @@ public class HeapView extends JComponent {
     protected void paintComponent(Graphics oldGraphics) {
         Graphics2D g = (Graphics2D) oldGraphics;
         // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give it to them.
-        Map map = (Map) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
+        Map<?, ?> map = (Map<?, ?>) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
         if (map != null) {
             g.addRenderingHints(map);
         }
@@ -235,7 +225,7 @@ public class HeapView extends JComponent {
         if (width - BORDER_W > 0 && height - BORDER_H > 0) {
             startTimerIfNecessary();
             updateCacheIfNecessary(width, height);
-            paintCachedBackground(g, width, height);
+            paintCachedBackground(g);
             g.translate(1, 2);
             int innerW = width - BORDER_W;
             int innerH = height - BORDER_H;
@@ -260,9 +250,6 @@ public class HeapView extends JComponent {
     }
     
     private void paintTicks(Graphics2D g, int width, int height) {
-        int numCells = GRID_COLORS.length / 2;
-        int cellSize = (height - numCells - 1) / numCells;
-        
         if (graphIndex > 0 || graphFilled) {
             int index = getGraphStartIndex();
             int x = 0;
@@ -275,14 +262,14 @@ public class HeapView extends JComponent {
                 min = Math.min(min, graph[index]);
                 index = (index + 1) % graph.length;
             }
-            int minHeight = (int)(min * (float)height);
+            int minHeight = (int)(min * height);
             if (minHeight > 0) {
                g.drawImage(tickGradientImage, x, height - minHeight, width, height,
                         x, height - minHeight, width, height, null);
             }
             index = getGraphStartIndex();
             do {
-                int tickHeight = (int)(graph[index] * (float)height);
+                int tickHeight = (int)(graph[index] * height);
                 if (tickHeight > minHeight) {
                     g.drawImage(tickGradientImage, x, height - tickHeight, x + 1, height - minHeight,
                             x, height - tickHeight, x + 1, height - minHeight, null);
@@ -293,50 +280,10 @@ public class HeapView extends JComponent {
         }
     }
 
-    /**
-     * Paints the grid on top of the ticks.
-     */
-    private void paintGridOverlay(Graphics2D g, int w, int h) {
-        int numCells = GRID_COLORS.length / 2;
-        int cellSize = (h - numCells - 1) / numCells;
-        int c1 = 0xD0CCBC;
-        int c2 = 0xEAE7D7;
-        g.setPaint(new GradientPaint(0, 0, new Color((c1 >> 16) & 0xFF, (c1 >> 8) & 0xFF, c1 & 0xFF, 0x30), 0, h, new Color((c2 >> 16) & 0xFF, (c2 >> 8) & 0xFF, c2 & 0xFF, 0x40)));
-        g.setColor(Color.GRAY);
-        for (int x = 0; x < w; x += cellSize + 1) {
-            g.fillRect(x, 0, 1, h);
-        }
-        for (int y = h - cellSize - 1; y >= 0; y -= (cellSize + 1)) {
-            g.fillRect(0, y, w, 1);
-        }
-    }
-
-    private void paintCachedBackground(Graphics2D g, int w, int h) {
+    private void paintCachedBackground(Graphics2D g) {
         if (bgImage != null) {
             g.drawImage(bgImage, 0, 0, null);
         }
-    }
-    
-    private void paintBackgroundTiles(Graphics2D g, int w, int h) {
-        g.translate(1, 2);
-        w -= BORDER_W;
-        h -= BORDER_H;
-        int numCells = GRID_COLORS.length / 2;
-        int cellSize = (h - numCells - 1) / numCells;
-        for (int i = 0; i < numCells; i++) {
-            int colorIndex = i;
-            int y = h - cellSize * (i + 1) - i;
-            int x = 1;
-            g.setPaint(new GradientPaint(0, y, GRID_COLORS[colorIndex * 2],
-                    0, y + cellSize - 1, GRID_COLORS[colorIndex * 2 + 1]));
-            while (x < w) {
-                int endX = Math.min(w, x + cellSize);
-                g.fillRect(x, y, endX - x, cellSize);
-                x = endX + 1;
-            }
-            y += cellSize + 1;
-        }
-        g.translate(-1, -2);
     }
     
     private void paintBackground(Graphics2D g, int w, int h) {
@@ -363,18 +310,6 @@ public class HeapView extends JComponent {
         }
     }
     
-    private Image getGridOverlayImage() {
-        if (gridOverlayImage == null) {
-            gridOverlayImage = new BufferedImage(
-                    getInnerWidth(), getInnerHeight(),
-                    BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = gridOverlayImage.createGraphics();
-            paintGridOverlay(g, getInnerWidth(), getInnerHeight());
-            g.dispose();
-        }
-        return gridOverlayImage;
-    }
-
     /**
      * Recreates the various state information needed for rendering.
      */
@@ -439,7 +374,7 @@ public class HeapView extends JComponent {
             updateTimer = null;
             lastTotal = 0;
             disposeImages();
-            cachedHeight = cachedHeight = -1;
+            cachedHeight = cachedWidth = -1;
             if (heapGrowTimer != null) {
                 heapGrowTimer.stop();
                 heapGrowTimer = null;
@@ -487,8 +422,7 @@ public class HeapView extends JComponent {
                 // Readjust the graph size based on the new max.
                 int index = getGraphStartIndex();
                 do {
-                    graph[index] = (float)(((double)graph[index] *
-                            (double)lastTotal) / (double)total);
+                    graph[index] = (float)(((double)graph[index] * (double)lastTotal) / (total));
                     index = (index + 1) % graph.length;
                 } while (index != graphIndex);
             }
@@ -503,7 +437,7 @@ public class HeapView extends JComponent {
                 graphFilled = true;
             }
             if (currentHeapUsageLabel != null) {
-                currentHeapUsageLabel.setText(String.format("%.1f/%.1f MiB", (double) used / 1024.0 / 1024.0, (double) total / 1024.0 / 1024.0));
+                currentHeapUsageLabel.setText(String.format("%.1f/%.1f MiB", used / 1024.0 / 1024.0, total / 1024.0 / 1024.0));
             }
         }
         repaint();
@@ -523,15 +457,6 @@ public class HeapView extends JComponent {
         }
     }
 
-    private int getInnerWidth() {
-        return getWidth() - BORDER_W;
-    }
-
-    private int getInnerHeight() {
-        return getHeight() - BORDER_H;
-    }
-
-    
     private final class ActionHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             update();

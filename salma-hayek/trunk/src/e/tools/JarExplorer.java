@@ -55,14 +55,13 @@ public class JarExplorer extends MainFrame {
         File file = new File(filename);
         ZipFile zipFile = new ZipFile(file);
 
-        final int totalEntryCount = zipFile.size();
         int entryCount = 0;
 
         ArrayList<String> entries = new ArrayList<String>();
-        Enumeration e = zipFile.entries();
+        Enumeration<? extends ZipEntry> e = zipFile.entries();
         while (e.hasMoreElements()) {
             ++entryCount;
-            ZipEntry entry = (ZipEntry) e.nextElement();
+            ZipEntry entry = e.nextElement();
             if (entry.isDirectory()) {
                 continue;
             }
@@ -169,7 +168,7 @@ public class JarExplorer extends MainFrame {
 
         ProcessUtilities.backQuote(null, makeArray(command), lines, errors);
 
-        List source = (errors.size() == 0) ? lines : errors;
+        List<String> source = (errors.size() == 0) ? lines : errors;
         return StringUtilities.join(source, "\n");
     }
 

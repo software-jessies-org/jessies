@@ -13,9 +13,9 @@ public class Launcher {
             System.err.println("Usage: java Launcher <human-readable app name> <fully-qualified Launchable class name> ARGUMENTS...");
             System.exit(1);
         }
-        String appName = arguments[0];
+        //String appName = arguments[0];
         String className = arguments[1];
-        Class appClass = Class.forName(className);
+        Class<?> appClass = Class.forName(className);
         final Launchable app = (Launchable) appClass.newInstance();
         ArrayList<String> appArguments = new ArrayList<String>();
         for (int i = 2; i < arguments.length; ++i) {

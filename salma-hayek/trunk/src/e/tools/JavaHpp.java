@@ -36,7 +36,7 @@ public class JavaHpp {
         out.println("#include <JniField.h>");
         out.println("#include <stdexcept>");
         
-        Class klass = Class.forName(className, false, new URLClassLoader(classpath.toArray(new URL[0])));
+        Class<?> klass = Class.forName(className, false, new URLClassLoader(classpath.toArray(new URL[0])));
         List<Method> nativeMethods = extractNativeMethods(klass.getDeclaredMethods());
         Field[] fields = klass.getDeclaredFields();
         
@@ -65,7 +65,7 @@ public class JavaHpp {
         out.println("}");
         for (Method method : nativeMethods) {
             StringBuilder proxyMethodArguments = new StringBuilder();
-            for (Class parameterType : method.getParameterTypes()) {
+            for (Class<?> parameterType : method.getParameterTypes()) {
                 if (proxyMethodArguments.length() > 0) {
                     proxyMethodArguments.append(", ");
                 }
@@ -83,7 +83,7 @@ public class JavaHpp {
             String jniMangledName = "Java_" + jniMangledClassName + jniMangle(method.getName());
             if (isOverloaded(method, nativeMethods)) {
                 jniMangledName += "__";
-                for (Class parameterType : method.getParameterTypes()) {
+                for (Class<?> parameterType : method.getParameterTypes()) {
                     jniMangledName += jniMangle(encodedTypeNameFor(parameterType));
                 }
             }
@@ -91,7 +91,7 @@ public class JavaHpp {
             String parameters = "JNIEnv* env, jobject instance";
             String arguments = "";
             int argCount = 0;
-            for (Class parameterType : method.getParameterTypes()) {
+            for (Class<?> parameterType : method.getParameterTypes()) {
                 parameters += ", " + jniTypeNameFor(parameterType) + " a" + argCount;
                 if (arguments.length() > 0) {
                     arguments += ", ";
@@ -132,7 +132,7 @@ public class JavaHpp {
     }
     
     private String chooseExceptionClassName(Method method) {
-        Class[] exceptionTypes = method.getExceptionTypes();
+        Class<?>[] exceptionTypes = method.getExceptionTypes();
         if (exceptionTypes.length == 0) {
             return "java/lang/RuntimeException";
         } else if (exceptionTypes.length == 1) {
@@ -166,7 +166,7 @@ public class JavaHpp {
         out.println("}");
     }
     
-    public static String jniTypeNameFor(Class type) {
+    public static String jniTypeNameFor(Class<?> type) {
         if (type.isPrimitive()) {
             if (type == void.class) {
                 return "void";
@@ -177,7 +177,7 @@ public class JavaHpp {
             // types for arrays of arrays. If we ever write our own C++ wrapper
             // for JNI arrays, this might have to change. (We don't need to
             // worry about void[] either, because there's no such thing.)
-            Class componentType = type.getComponentType();
+            Class<?> componentType = type.getComponentType();
             if (componentType.isPrimitive()) {
                 return "j" + componentType.toString() + "Array";
             }
@@ -189,7 +189,7 @@ public class JavaHpp {
         }
     }
     
-    public static String encodedTypeNameFor(Class type) {
+    public static String encodedTypeNameFor(Class<?> type) {
         if (type.isArray()) {
             return "[" + encodedTypeNameFor(type.getComponentType());
         } else if (type == boolean.class) {
@@ -219,7 +219,7 @@ public class JavaHpp {
      * Returns the name used by JNI to refer to a class, which isn't directly
      * available otherwise.
      */
-    public static String slashStyleClassName(Class c) {
+    public static String slashStyleClassName(Class<?> c) {
         String name = c.getCanonicalName().replace('.', '/');
         if (c.getEnclosingClass() != null) {
             // Replace the last '/' with a '$'. This isn't correct in general,
@@ -259,6 +259,6 @@ public class JavaHpp {
     }
     
     public static void main(String[] arguments) throws Exception {
-        JavaHpp javaHpp = new JavaHpp(arguments);
+        new JavaHpp(arguments);
     }
 }
