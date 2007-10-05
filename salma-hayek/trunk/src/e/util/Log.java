@@ -98,7 +98,7 @@ public class Log {
     }
     
     public static String inspect(Object o) {
-        Class c = o.getClass();
+        Class<?> c = o.getClass();
         
         if (c == String.class) {
             return "\"" + o.toString() + "\"";
@@ -137,8 +137,8 @@ public class Log {
     }
     
     public static String inspectArray(Object o) {
-        Class c = o.getClass();
-        Class itemClass = c.getComponentType();
+        Class<?> c = o.getClass();
+        Class<?> itemClass = c.getComponentType();
         StringBuilder result = new StringBuilder(itemClass.getName());
         result.append("[] = {");
         if (itemClass.isPrimitive()) {

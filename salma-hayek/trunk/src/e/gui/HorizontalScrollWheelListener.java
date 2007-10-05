@@ -49,7 +49,7 @@ public class HorizontalScrollWheelListener implements MouseWheelListener {
         }
     }
     
-    private void invokeBasicScrollBarUIMethod(String methodName, Class[] parameterTypes, Object... arguments) {
+    private void invokeBasicScrollBarUIMethod(String methodName, Class<?>[] parameterTypes, Object... arguments) {
         try {
             java.lang.reflect.Method method = javax.swing.plaf.basic.BasicScrollBarUI.class.getDeclaredMethod(methodName, parameterTypes);
             method.setAccessible(true);

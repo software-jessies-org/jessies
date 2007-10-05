@@ -35,7 +35,7 @@ public class ShowUiDefaults {
         
         ArrayList<String> list = new ArrayList<String>();
         UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-        for (Enumeration e = defaults.keys(); e.hasMoreElements();) {
+        for (Enumeration<Object> e = defaults.keys(); e.hasMoreElements();) {
             Object key = e.nextElement();
             list.add(laf.getName() + ":" + key + "=" + defaults.get(key));
         }

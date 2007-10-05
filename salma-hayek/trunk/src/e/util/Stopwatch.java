@@ -62,7 +62,7 @@ public class Stopwatch {
         if (sampleCount == 0) {
             result += " (no samples)";
         } else {
-            result += StringUtilities.pluralize(sampleCount, "sample", "samples") + ", " + nsToString(totalDuration_ns) + " total, " + nsToString(minDuration_ns) + ".." + nsToString(maxDuration_ns) + " (mean " + nsToString(totalDuration_ns/(long) sampleCount) + ")";
+            result += StringUtilities.pluralize(sampleCount, "sample", "samples") + ", " + nsToString(totalDuration_ns) + " total, " + nsToString(minDuration_ns) + ".." + nsToString(maxDuration_ns) + " (mean " + nsToString(totalDuration_ns/sampleCount) + ")";
         }
         return result;
     }

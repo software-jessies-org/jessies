@@ -24,7 +24,7 @@ public final class InAppServer {
     // I think that having a generic constructor provides all the safety we
     // can get from generics, and that keeping the type information here would
     // only add inconvenience because we'd need to make this a generic class.
-    private Class exportedInterface;
+    private Class<?> exportedInterface;
     private Object handler;
     
     /**
@@ -89,14 +89,14 @@ public final class InAppServer {
     private boolean invokeMethod(String line, PrintWriter out, Method method, String[] fields) throws IllegalAccessException, InvocationTargetException {
         ArrayList<Object> methodArguments = new ArrayList<Object>();
         
-        Class[] parameterTypes = method.getParameterTypes();
+        Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length == 2 && parameterTypes[0] == PrintWriter.class && parameterTypes[1] == String.class) {
             // FIXME: there must be a better way to say "I want to parse the line myself."
             methodArguments.add(out);
             methodArguments.add(line);
         } else {
             int nextField = 1;
-            for (Class parameterType : parameterTypes) {
+            for (Class<?> parameterType : parameterTypes) {
                 if (parameterType == PrintWriter.class) {
                     methodArguments.add(out);
                 } else if (parameterType == String.class) {
