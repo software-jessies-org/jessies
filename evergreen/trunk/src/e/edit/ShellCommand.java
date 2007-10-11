@@ -171,9 +171,6 @@ public class ShellCommand {
      */
     private void processFinished(int exitStatus) {
         workspace.getErrorsWindow().showStatus("Task \"" + command + "\" finished");
-        
-        ArrayList<String> errorsWindowFooter = new ArrayList<String>();
-        
         switch (outputDisposition) {
         case CLIPBOARD:
             StringSelection selection = new StringSelection(capturedOutput.toString());
@@ -189,7 +186,6 @@ public class ShellCommand {
             break;
         case ERRORS_WINDOW:
             // We dealt with the sub-process output as we went along.
-            errorsWindowFooter.add("-------------------------------------------------------------------------");
             break;
         case INSERT:
             textWindow.getTextArea().insert(capturedOutput);
@@ -206,9 +202,8 @@ public class ShellCommand {
         
         // A non-zero exit status is always potentially interesting.
         if (exitStatus != 0) {
-            errorsWindowFooter.add("Task \"" + command + "\" failed with exit status " + exitStatus);
+            workspace.getErrorsWindow().append(new String[] { "Task \"" + command + "\" failed with exit status " + exitStatus });
         }
-        workspace.getErrorsWindow().append(errorsWindowFooter.toArray(new String[errorsWindowFooter.size()]));
         workspace.getErrorsWindow().taskDidExit(exitStatus);
     }
     
