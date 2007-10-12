@@ -46,7 +46,7 @@ public class JavaDoc {
         /**
         * Find all the packages specified by the "java.advisor.classpath" property.
         */
-        String[] advisorClasspath = FileUtilities.getArrayOfPathElements(Parameters.getParameter("java.advisor.classpath", ""));
+        String[] advisorClasspath = FileIgnorer.getArrayOfPathElements(Parameters.getParameter("java.advisor.classpath", ""));
         ArrayList<URL> urls = new ArrayList<URL>();
         for (String classPathItem : advisorClasspath) {
             if (classPathItem.length() > 0) {
@@ -64,7 +64,7 @@ public class JavaDoc {
         // Note the user-configured JavaDoc locations.
         String configuredLocations = Parameters.getParameter("java.advisor.doc", null);
         if (configuredLocations != null) {
-            javaDocLocations.addAll(Arrays.asList(FileUtilities.getArrayOfPathElements(configuredLocations)));
+            javaDocLocations.addAll(Arrays.asList(FileIgnorer.getArrayOfPathElements(configuredLocations)));
         }
         
         // On some systems we may have the documentation installed in a well-known place.
