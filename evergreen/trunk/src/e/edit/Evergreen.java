@@ -179,7 +179,7 @@ public class Evergreen {
     
     private boolean isFileForExternalApplication(String filename) {
         if (externalApplicationExtensions == null) {
-            externalApplicationExtensions = FileIgnorer.getArrayOfPathElements(Parameters.getParameter("files.externalApplicationExtensions", ""));
+            externalApplicationExtensions = Parameters.getArrayOfSemicolonSeparatedElements("files.externalApplicationExtensions");
         }
         return FileIgnorer.nameEndsWithOneOf(filename, externalApplicationExtensions);
     }
