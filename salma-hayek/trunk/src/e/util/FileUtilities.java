@@ -200,36 +200,6 @@ public class FileUtilities {
     }
     
     /**
-     * Returns an array with an item for each semicolon-separated element of the path.
-     * FIXME: the use of ";" is bogus.
-     */
-    public static String[] getArrayOfPathElements(String path) {
-        return path.split(";");
-    }
-    
-    public static boolean nameEndsWithOneOf(File file, String[] extensions) {
-        return nameEndsWithOneOf(file.toString(), extensions);
-    }
-    
-    public static boolean nameEndsWithOneOf(String name, String[] extensions) {
-        for (String extension : extensions) {
-            if (name.endsWith(extension)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public static boolean nameStartsWithOneOf(String name, String[] prefixes) {
-        for (String prefix : prefixes) {
-            if (name.startsWith(prefix)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
      * Tests whether the given file contains ASCII text. This is done by
      * reading the first 512 bytes and ensuring that they are all
      * ASCII characters of the kind you'd expect to find in source files.
