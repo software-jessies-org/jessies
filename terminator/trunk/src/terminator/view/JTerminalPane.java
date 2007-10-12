@@ -57,6 +57,19 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	/**
+	 * For XTerm-like "-e" support.
+	 */
+	public static JTerminalPane newCommandWithArgV(String name, String workingDirectory, List<String> argV) {
+		if (argV.size() == 0) {
+			argV = getShellCommand();
+		}
+		if (name == null) {
+			name = argV.get(0);
+		}
+		return new JTerminalPane(name, workingDirectory, argV, false);
+	}
+	
+	/**
 	 * Creates a new terminal running the given command, with the given
 	 * name. If 'name' is null, we use the command as the the name.
 	 */
