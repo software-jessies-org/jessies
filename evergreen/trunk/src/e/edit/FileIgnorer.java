@@ -64,10 +64,12 @@ public class FileIgnorer {
         return uninterestingDirectoryNames.matcher(directory.getName()).matches();
     }
     
-    public static boolean nameEndsWithOneOf(File file, String[] extensions) {
-        return nameEndsWithOneOf(file.toString(), extensions);
-    }
-    
+    /**
+     * This looks stupid, but for Evergreen's purposes works faster than:
+     * 1. extracting the extension from each filename and using a set.
+     * 2. constructing a large pattern from the extensions and using Matcher.matches.
+     * The second alternative comes close with a few tricks, but doesn't seem worth the complexity.
+     */
     public static boolean nameEndsWithOneOf(String name, String[] extensions) {
         for (String extension : extensions) {
             if (name.endsWith(extension)) {
