@@ -145,13 +145,22 @@ public class Terminator {
 		String workingDirectory = null;
 		for (int i = 0; i < arguments.size(); ++i) {
 			String word = arguments.get(i);
-			if (word.equals("-n")) {
+			if (word.equals("-n") || word.equals("-T")) {
 				name = arguments.get(++i);
 				continue;
 			}
 			if (word.equals("--working-directory")) {
 				workingDirectory = arguments.get(++i);
 				continue;
+			}
+			if (word.equals("-e")) {
+				List<String> argV = arguments.subList(++i, arguments.size());
+				if (argV.isEmpty()) {
+					showUsage(System.err);
+					System.exit(1);
+				}
+				result.add(JTerminalPane.newCommandWithArgV(name, workingDirectory, argV));
+				break;
 			}
 			
 			// We can't hope to imitate the shell's parsing of a string, so pass it unmolested to the shell.
@@ -166,14 +175,18 @@ public class Terminator {
 		return result;
 	}
 
-	private static void showUsage(Appendable out) throws IOException {
-		GuiUtilities.finishGnomeStartup();
-		out.append("Usage: terminator [--help] [-xrm <resource-string>]... [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
-		out.append("\n");
-		out.append("Current resource settings:\n");
-		Options.getSharedInstance().writeOptions(out, true);
-		out.append("\n");
-		out.append("Terminator only uses resources of class Terminator and only from the command line, not from your .Xdefaults and .Xresources files.\n");
+	private static void showUsage(Appendable out) {
+		try {
+			GuiUtilities.finishGnomeStartup();
+			out.append("Usage: terminator [--help] [-xrm <resource-string>]... [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
+			out.append("\n");
+			out.append("Current resource settings:\n");
+			Options.getSharedInstance().writeOptions(out, true);
+			out.append("\n");
+			out.append("Terminator only uses resources of class Terminator and only from the command line, not from your .Xdefaults and .Xresources files.\n");
+		} catch (IOException ex) {
+			// Who cares?
+		}
 	}
 	
 	public static void main(final String[] arguments) {
