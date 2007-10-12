@@ -78,13 +78,16 @@ public class TerminalDropTarget extends DropTargetAdapter {
 			if (uri.startsWith("#")) {
 				continue;
 			}
-			try {
+			if (uri.startsWith("file:")) {
 				// If the URI represents a file, the filename is likely to be more useful at the shell.
-				result.add(new File(new URI(uri)).toString());
-			} catch (Exception ex) {
-				// If it's a non-file URI, leave it as it is.
-				result.add(uri);
+				try {
+					// Work around the fact that Apple (2007-10-11) supply "localhost" and Sun insist on no authority.
+					uri = new File(new URI(uri.replaceAll("^file://localhost/", "file:///"))).toString();
+				} catch (Exception ex) {
+					// If there's something File/URI didn't like about it, just fall through and use it as-is.
+				}
 			}
+			result.add(uri);
 		}
 		return result;
 	}
