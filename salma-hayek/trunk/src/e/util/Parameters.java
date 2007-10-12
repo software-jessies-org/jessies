@@ -126,4 +126,15 @@ public class Parameters extends Properties {
             return defaultValue;
         }
     }
+    
+    /**
+     * Returns an array with an item for each semicolon-separated element of the property.
+     */
+    public static String[] getArrayOfSemicolonSeparatedElements(String propertyName) {
+        String configuration = Parameters.getParameter(propertyName, null);
+        if (configuration == null || configuration.trim().length() == 0) {
+            return new String[0];
+        }
+        return configuration.split(";");
+    }
 }
