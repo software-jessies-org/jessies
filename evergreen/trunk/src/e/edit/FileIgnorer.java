@@ -30,7 +30,7 @@ public class FileIgnorer {
     
     public static boolean isIgnoredExtension(String filename) {
         if (ignoredExtensions == null) {
-            ignoredExtensions = FileIgnorer.getArrayOfPathElements(Parameters.getParameter("files.uninterestingExtensions", ""));
+            ignoredExtensions = Parameters.getArrayOfSemicolonSeparatedElements("files.uninterestingExtensions");
         }
         return FileIgnorer.nameEndsWithOneOf(filename, ignoredExtensions);
     }
@@ -62,15 +62,6 @@ public class FileIgnorer {
     
     public boolean isIgnoredDirectory(File directory) {
         return uninterestingDirectoryNames.matcher(directory.getName()).matches();
-    }
-    
-    
-    /**
-     * Returns an array with an item for each semicolon-separated element of the path.
-     * FIXME: the use of ";" is bogus.
-     */
-    public static String[] getArrayOfPathElements(String path) {
-        return path.split(";");
     }
     
     public static boolean nameEndsWithOneOf(File file, String[] extensions) {
