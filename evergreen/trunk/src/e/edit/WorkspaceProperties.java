@@ -3,6 +3,7 @@ package e.edit;
 import e.forms.*;
 import e.gui.*;
 import e.util.*;
+import java.io.*;
 import javax.swing.*;
 
 /**
@@ -37,10 +38,14 @@ public class WorkspaceProperties {
         formPanel.addRow("Build Target:", buildTargetField);
         
         while (form.show(buttonTitle)) {
-            String message = FileUtilities.checkDirectoryExistence(filenameChooserField.getPathname());
+            String pathname = filenameChooserField.getPathname();
+            // Protect Windows users against accidental use of '/', which will probably mostly work, but is likely to lead to confusion.
+            pathname = pathname.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            
+            String message = FileUtilities.checkDirectoryExistence(pathname);
             if (message == null) {
                 name = nameField.getText();
-                rootDirectory = filenameChooserField.getPathname();
+                rootDirectory = pathname;
                 buildTarget = buildTargetField.getText();
                 return true;
             }
