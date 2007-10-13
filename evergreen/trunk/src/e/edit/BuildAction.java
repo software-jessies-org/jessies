@@ -80,12 +80,10 @@ public class BuildAction extends ETextAction {
             shellCommand.setLaunchRunnable(new Runnable() {
                 public void run() {
                     building = true;
-                    Evergreen.getInstance().showProgressBar(shellCommand.getProcess());
                 }
             });
             shellCommand.setCompletionRunnable(new Runnable() {
                 public void run() {
-                    Evergreen.getInstance().hideProgressBar();
                     building = false;
                 }
             });

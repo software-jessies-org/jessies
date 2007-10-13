@@ -38,19 +38,27 @@ public class EErrorsWindow extends JFrame {
     private static final KillErrorsAction KILL_ERRORS_ACTION = new KillErrorsAction();
     
     private final Workspace workspace;
+    private JButton killButton;
     private PTextArea textArea;
     private EStatusBar statusBar;
     private int currentBuildErrorCount;
+    private Process process;
     
     public EErrorsWindow(Workspace workspace) {
         super("Build Output");
         this.workspace = workspace;
+        initKillButton();
         initTextArea();
         initStatusBar();
         JScrollPane scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
+        
+        JPanel bottomLine = new JPanel(new BorderLayout(4, 0));
+        bottomLine.add(killButton, BorderLayout.WEST);
+        bottomLine.add(statusBar, BorderLayout.CENTER);
+        
         add(scrollPane, BorderLayout.CENTER);
-        add(statusBar, BorderLayout.SOUTH);
+        add(bottomLine, BorderLayout.SOUTH);
         pack();
         JFrameUtilities.setFrameIcon(this);
         setLocationRelativeTo(workspace);
@@ -69,6 +77,15 @@ public class EErrorsWindow extends JFrame {
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), KILL_ERRORS_ACTION_NAME);
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put((KeyStroke) KILL_ERRORS_ACTION.getValue(Action.ACCELERATOR_KEY), KILL_ERRORS_ACTION_NAME);
         getRootPane().getActionMap().put(KILL_ERRORS_ACTION_NAME, KILL_ERRORS_ACTION);
+    }
+    
+    private void initKillButton() {
+        killButton = StopIcon.makeStopButton();
+        killButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ProcessUtilities.terminateProcess(process);
+            }
+        });
     }
     
     private void initTextArea() {
@@ -90,12 +107,16 @@ public class EErrorsWindow extends JFrame {
         statusBar.setText(status);
     }
     
-    public void taskDidStart() {
+    public void taskDidStart(Process process) {
         EventQueue.invokeLater(new ClearRunnable());
-        currentBuildErrorCount = 0;
+        this.currentBuildErrorCount = 0;
+        this.process = process;
+        killButton.setEnabled(true);
     }
     
     public void taskDidExit(int exitStatus) {
+        killButton.setEnabled(false);
+        this.process = null;
         if (exitStatus == 0 && currentBuildErrorCount == 0) {
             Thread waitThenHide = new Thread(new Runnable() {
                 public void run() {

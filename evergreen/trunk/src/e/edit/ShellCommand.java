@@ -76,7 +76,7 @@ public class ShellCommand {
         workspace.getErrorsWindow().setVisible(true);
         
         workspace.getErrorsWindow().showStatus("Started task \"" + command + "\"");
-        workspace.getErrorsWindow().taskDidStart();
+        workspace.getErrorsWindow().taskDidStart(process);
         
         Thread standardInputPump = new Thread(new Runnable() {
             public void run() {
