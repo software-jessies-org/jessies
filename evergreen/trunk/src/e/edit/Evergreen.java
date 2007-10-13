@@ -122,12 +122,6 @@ public class Evergreen {
         }
     }
     
-    private JPanel statusLineAndProgressContainer = new JPanel(new BorderLayout());
-    
-    private JProgressBar progressBar = new JProgressBar();
-    private JPanel progressBarAndKillButton = new JPanel(new BorderLayout(4, 0));
-    private Process process;
-    
     public static synchronized Evergreen getInstance() {
         if (instance == null) {
             instance = new Evergreen();
@@ -779,50 +773,10 @@ public class Evergreen {
         statusLine = new EStatusBar();
         minibuffer = new Minibuffer();
         
-        statusLineAndProgressContainer.add(statusLine, BorderLayout.CENTER);
-        
         statusArea = new JPanel(new BorderLayout());
-        statusArea.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        statusArea.add(statusLineAndProgressContainer, BorderLayout.NORTH);
+        statusArea.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+        statusArea.add(statusLine, BorderLayout.NORTH);
         statusArea.add(minibuffer, BorderLayout.SOUTH);
-        
-        // Add some padding so that the tall and fixed-height Mac OS progress
-        // bar doesn't cause the status line to jiggle when it appears, and so
-        // that on Linux the progress bar doesn't allow itself to look squashed.
-        statusLine.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
-        if (GuiUtilities.isMacOs()) {
-            // Make room on Mac OS so that our components don't intrude on the
-            // area reserved for the grow box (and cause flicker as they fight
-            // about who gets drawn on top).
-            statusLineAndProgressContainer.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
-        }
-        
-        progressBarAndKillButton.add(progressBar, BorderLayout.CENTER);
-        progressBarAndKillButton.add(makeKillButton(), BorderLayout.EAST);
-    }
-    
-    private JButton makeKillButton() {
-        JButton killButton = StopIcon.makeStopButton();
-        killButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ProcessUtilities.terminateProcess(process);
-            }
-        });
-        return killButton;
-    }
-    
-    public synchronized void showProgressBar(Process process) {
-        this.process = process;
-        progressBar.setIndeterminate(true);
-        statusLineAndProgressContainer.add(progressBarAndKillButton, BorderLayout.EAST);
-        statusLineAndProgressContainer.repaint();
-    }
-    
-    public synchronized void hideProgressBar() {
-        this.process = null;
-        statusLineAndProgressContainer.remove(progressBarAndKillButton);
-        progressBar.setIndeterminate(false);
-        statusLineAndProgressContainer.repaint();
     }
     
     public void showMinibuffer(MinibufferUser minibufferUser) {
