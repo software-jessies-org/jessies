@@ -42,7 +42,7 @@ SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTOR
 
 # make does special things when running commands including the magic string $(MAKE),
 # including clearing -n from $(MAKEFLAGS), so we snarf it here.
-DRY_RUNNING := $(filter n,$(MAKEFLAGS))
+DRY_RUNNING := $(findstring n,$(MAKEFLAGS))
 SHOULD_FILTER_OUTPUT = $(strip $(filter echo.%,$(MAKECMDGOALS)) $(DRY_RUNNING))
 
 # This mad dance seems to be necessary to allow any target to recurse without listing them all here
