@@ -273,7 +273,7 @@ public class EErrorsWindow extends JFrame {
     
     public void append(String[] lines) {
         for (String line : lines) {
-            // FIXME: this is a bit weak, but necessary as long as our builds always "exit 0". The FIXME in this file about treating stderr specially might be a better way forward if we have to keep a hack.
+            // FIXME: this is a bit weak, and no longer necessary for our builds. The FIXME in this file about treating stderr specially might be a better way forward if we want to keep a hack.
             if (line.contains("***") || line.contains("warning:")) {
                 ++currentBuildErrorCount;
             }
