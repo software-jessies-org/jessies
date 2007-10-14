@@ -43,6 +43,7 @@ end
 IO.popen("-") {
   |buildOutputIo|
   if buildOutputIo == nil
+    $stderr.reopen($stdout)
     exec(*ARGV)
   end
   filterBuildOutput(buildOutputIo)
