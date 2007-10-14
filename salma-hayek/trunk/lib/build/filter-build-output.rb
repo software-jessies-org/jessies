@@ -16,7 +16,7 @@ def filterBuildOutput(inputIo)
     #                ^
     if line.match(/\*\*\*/) || line.match(/warning: /)
       $stderr.puts(lines)
-      while line = gets()
+      while line = inputIo.gets()
         $stderr.puts(line)
       end
       break
