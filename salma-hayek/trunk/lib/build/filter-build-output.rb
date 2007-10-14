@@ -40,4 +40,10 @@ def filterBuildOutput(inputIo)
   end
 end
 
-filterBuildOutput($stdin)
+IO.popen("-") {
+  |buildOutputIo|
+  if buildOutputIo == nil
+    exec(*ARGV)
+  end
+  filterBuildOutput(buildOutputIo)
+}
