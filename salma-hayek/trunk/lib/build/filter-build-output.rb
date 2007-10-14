@@ -48,3 +48,6 @@ IO.popen("-") {
   end
   filterBuildOutput(buildOutputIo)
 }
+if $?.success?() != true
+  exit(1)
+end
