@@ -20,7 +20,7 @@ public class ChronologicalComboBoxModel extends EHistoryComboBoxModel {
         if (index < 0) {
             return "<invalid item>";
         }
-        Object result = ((ArrayList) model).get(index);
+        Object result = ((ArrayList<?>) model).get(index);
         return result;
     }
 }

@@ -178,7 +178,7 @@ public class StringUtilities {
     /**
      * Joins the strings in 'strings' with 'separator' between each.
      */
-    public static String join(List strings, CharSequence separator) {
+    public static String join(List<?> strings, CharSequence separator) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < strings.size(); ++i) {
             if (i > 0) {
