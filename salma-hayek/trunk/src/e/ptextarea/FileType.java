@@ -78,7 +78,7 @@ public enum FileType {
     TALC        ("Talc",
                  PJavaIndenter.class,
                  PTalcTextStyler.class,
-                 new String[] { ".talc", ".ta", ".tl", ".tc" }),
+                 new String[] { ".talc" }),
     
     VHDL        ("VHDL",
                  PNoOpIndenter.class,
