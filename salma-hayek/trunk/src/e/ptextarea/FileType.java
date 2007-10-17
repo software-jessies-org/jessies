@@ -75,6 +75,11 @@ public enum FileType {
                  PPythonTextStyler.class,
                  new String[] { ".py" }),
     
+    TALC        ("Talc",
+                 PJavaIndenter.class,
+                 PTalcTextStyler.class,
+                 new String[] { ".talc", ".ta", ".tl", ".tc" }),
+    
     VHDL        ("VHDL",
                  PNoOpIndenter.class,
                  PVhdlTextStyler.class,
@@ -169,9 +174,7 @@ public enum FileType {
     }
     
     private static FileType guessFileTypeByContent(CharSequence content) {
-        if (isRubyContent(content)) {
-            return FileType.RUBY;
-        } else if (isBashContent(content)) {
+        if (isBashContent(content)) {
             return FileType.BASH;
         } else if (isCPlusPlusContent(content)) {
             return FileType.C_PLUS_PLUS;
@@ -181,6 +184,10 @@ public enum FileType {
             return FileType.PERL;
         } else if (isPythonContent(content)) {
             return FileType.PYTHON;
+        } else if (isRubyContent(content)) {
+            return FileType.RUBY;
+        } else if (isInterpretedContent(content, "talc")) {
+            return FileType.TALC;
         } else if (isXmlContent(content)) {
             return FileType.XML;
         } else {
