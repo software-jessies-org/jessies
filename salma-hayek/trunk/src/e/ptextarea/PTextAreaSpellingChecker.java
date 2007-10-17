@@ -166,7 +166,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         component.removeHighlights(HIGHLIGHTER_NAME, fromIndex, toIndex);
     }
 
-    public Collection listMisspellings() {
+    public Collection<String> listMisspellings() {
         TreeSet<String> result = new TreeSet<String>();
         for (PHighlight highlight : component.getNamedHighlights(HIGHLIGHTER_NAME)) {
             final int start = highlight.getStartIndex();
@@ -208,7 +208,6 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
     }
     
     private void checkSpelling(PTextBuffer buffer, int fromIndex, int toIndex) {
-        long startTime = System.currentTimeMillis();
         int checkCount = 0;
         int misspellingCount = 0;
         
@@ -285,8 +284,6 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             
             start = finish;
         }
-        
-        //System.err.println("Took " + (System.currentTimeMillis() - startTime) + "ms to check " + fromIndex + ".." + toIndex + " words:" + checkCount + " misspellings:" + misspellingCount);
     }
     
     /**
@@ -294,7 +291,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
      * as a spelling exception in its language.
      */
     private boolean isException(String word) {
-        HashSet exceptions = HashSet.class.cast(component.getClientProperty(SPELLING_EXCEPTIONS_PROPERTY));
+        HashSet<?> exceptions = (HashSet<?>) component.getClientProperty(SPELLING_EXCEPTIONS_PROPERTY);
         if (exceptions == null) {
             return false;
         }
