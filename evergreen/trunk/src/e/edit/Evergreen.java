@@ -494,6 +494,7 @@ public class Evergreen {
             return;
         }
         String question = "Do you really want to remove the workspace \"" + workspace.getTitle() + "\"?";
+        question += " No files will be lost: everything will be left as it currently is on disk.";
         if (workspace.isEmpty() == false) {
             question += " Open windows will be moved to the next best workspace.";
         }
