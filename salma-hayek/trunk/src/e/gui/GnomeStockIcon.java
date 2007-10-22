@@ -75,6 +75,7 @@ public class GnomeStockIcon {
             nameMap.put("Find...", "gtk-find");
             nameMap.put("Go to Line...", "gtk-jump-to");
             nameMap.put("Help", "gtk-help");
+            nameMap.put("OK", "gtk-ok");
             nameMap.put("Open", "gtk-open");
             nameMap.put("Paste", "gtk-paste");
             nameMap.put("Preferences...", "gtk-preferences");
