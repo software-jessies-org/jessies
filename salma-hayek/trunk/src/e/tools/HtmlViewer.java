@@ -31,13 +31,20 @@ public class HtmlViewer extends MainFrame {
         
         textPane.addHyperlinkListener(new HyperlinkListener() {
             public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+                    textPane.setToolTipText(e.getURL().toString());
+                } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
+                    textPane.setToolTipText(null);
+                } else if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     if (e instanceof HTMLFrameHyperlinkEvent) {
                         ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
                     } else {
-                        Log.warn("can't yet follow links out of the document");
-                        System.exit(0);
-                        //Edit.showDocument(e.getURL().toString());
+                        String url = e.getURL().toString();
+                        try {
+                            BrowserLauncher.openURL(url);
+                        } catch (Throwable th) {
+                            SimpleDialog.showDetails(HtmlViewer.this, "Problem opening URL", th);
+                        }
                     }
                 }
             }
