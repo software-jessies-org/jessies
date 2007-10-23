@@ -321,10 +321,8 @@ public class GuiUtilities {
                 Method setCard32PropertyMethod = xAtomClass.getMethod("setCard32Property", long.class, long.class);
                 setCard32PropertyMethod.invoke(getMethod.invoke(null, "_NET_WM_WINDOW_OPACITY"), windowId, value);
             }
-        } catch (Exception ex) {
-            // Boo hoo! No transparency for you!
-            ex.printStackTrace();
-            return;
+        } catch (Throwable th) {
+            Log.warn("Failed to apply frame alpha.", th);
         }
     }
     
