@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
 
-public class HtmlPane extends JPanel {
+public class HtmlPane extends JPanel implements Scrollable {
     private JTextPane textPane;
     
     public HtmlPane() {
@@ -27,16 +27,7 @@ public class HtmlPane extends JPanel {
                 } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
                     textPane.setToolTipText(null);
                 } else if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    if (e instanceof HTMLFrameHyperlinkEvent) {
-                        ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
-                    } else {
-                        String url = e.getURL().toString();
-                        try {
-                            BrowserLauncher.openURL(url);
-                        } catch (Throwable th) {
-                            SimpleDialog.showDetails(null, "Problem opening URL", th);
-                        }
-                    }
+                    linkActivated(e);
                 }
             }
         });
@@ -48,8 +39,31 @@ public class HtmlPane extends JPanel {
         styleSheet.addRule("body { font-size: 10 }");
     }
     
+    private void linkActivated(HyperlinkEvent e) {
+        if (e instanceof HTMLFrameHyperlinkEvent) {
+            ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
+        } else {
+            String url = e.getURL().toString();
+            try {
+                BrowserLauncher.openURL(url);
+            } catch (Throwable th) {
+                SimpleDialog.showDetails(null, "Problem opening URL", th);
+            }
+        }
+    }
+    
     public void setText(String text) {
         textPane.setText(text);
         textPane.setCaretPosition(0);
     }
+    
+    // Delegate the Scrollable interface to textPane...
+    public Dimension getPreferredScrollableViewportSize() { return textPane.getPreferredScrollableViewportSize(); }
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) { return textPane.getScrollableUnitIncrement(visibleRect, orientation, direction); }
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) { return textPane.getScrollableBlockIncrement(visibleRect, orientation, direction); }
+    public boolean getScrollableTracksViewportHeight() { return textPane.getScrollableTracksViewportHeight(); }
+    // ...apart from this method.
+    // We return true here because we really don't want a horizontal scroll bar: we want to wrap the content to fit the container.
+    // FIXME: we might need to be clever here and detect cases where the content is simply too wide not to have a horizontal scroll bar.
+    public boolean getScrollableTracksViewportWidth() { return true; }
 }
