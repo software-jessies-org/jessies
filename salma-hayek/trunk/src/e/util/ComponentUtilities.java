@@ -29,10 +29,9 @@ public class ComponentUtilities {
     /**
      * Fixes the page up/down keys and home/end keys to work on another component from the one with the keyboard focus.
      * This lets you offer convenient keyboard navigation like in Apple's Mail, where the arrow keys move through the inbox while the page keys move through the selected message.
+     * Note that the home/end keys aren't redirected for text fields, on the assumption that they're needed for cursor movement.
      */
     public static void divertPageScrollingFromTo(final JComponent focusedComponent, final JComponent componentToPageScroll) {
-        focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("HOME"), "pagePatchToTop");
-        focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("END"), "pagePatchToBottom");
         focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("PAGE_UP"), "pagePatchUp");
         focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pagePatchDown");
         focusedComponent.getActionMap().put("pagePatchUp", new AbstractAction() {
@@ -45,16 +44,20 @@ public class ComponentUtilities {
                 ComponentUtilities.scroll(componentToPageScroll, true, 1);
             }
         });
-        focusedComponent.getActionMap().put("pagePatchToTop", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                ComponentUtilities.scrollToExtremity(componentToPageScroll, true);
-            }
-        });
-        focusedComponent.getActionMap().put("pagePatchToBottom", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                ComponentUtilities.scrollToExtremity(componentToPageScroll, false);
-            }
-        });
+        if (focusedComponent instanceof JTextField == false) {
+            focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("HOME"), "pagePatchToTop");
+            focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("END"), "pagePatchToBottom");
+            focusedComponent.getActionMap().put("pagePatchToTop", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    ComponentUtilities.scrollToExtremity(componentToPageScroll, true);
+                }
+            });
+            focusedComponent.getActionMap().put("pagePatchToBottom", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    ComponentUtilities.scrollToExtremity(componentToPageScroll, false);
+                }
+            });
+        }
     }
     
     /**
