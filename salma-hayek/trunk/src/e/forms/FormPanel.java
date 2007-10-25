@@ -15,7 +15,7 @@ public class FormPanel extends JPanel {
 
     private ArrayList<JTextComponent> textComponents = new ArrayList<JTextComponent>();
     
-    FormPanel() {
+    public FormPanel() {
         setLayout(new GridBagLayout());
         componentSpacing = FormDialog.getComponentSpacing();
     }
