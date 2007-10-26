@@ -318,6 +318,10 @@ public class AboutBox {
         return StringUtilities.urlEncode(subject).replaceAll("\\+", "%20");
     }
     
+    public String getIdentificationString() {
+        return applicationName + " (" + projectRevision + "/" + libraryRevision + "/" + Log.getSystemDetailsForBugReport() + ")";
+    }
+    
     private JButton makeCloseButton(ActionListener actionListener) {
         JButton closeButton = new JButton("Close");
         GnomeStockIcon.configureButton(closeButton);
