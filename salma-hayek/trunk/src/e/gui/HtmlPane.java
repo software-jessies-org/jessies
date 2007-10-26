@@ -18,8 +18,6 @@ public class HtmlPane extends JPanel implements Scrollable {
     public void initTextPane() {
         textPane = new JTextPane();
         textPane.setEditable(false);
-        textPane.setContentType("text/html");
-        
         textPane.addHyperlinkListener(new HyperlinkListener() {
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
@@ -31,12 +29,6 @@ public class HtmlPane extends JPanel implements Scrollable {
                 }
             }
         });
-        
-        HTMLEditorKit editorKit = (HTMLEditorKit) textPane.getEditorKit();
-        StyleSheet styleSheet = editorKit.getStyleSheet();
-        styleSheet.removeStyle("body");
-        styleSheet.addRule("body { font-family: Arial, Helvetica, sans-serif }");
-        styleSheet.addRule("body { font-size: 10 }");
     }
     
     private void linkActivated(HyperlinkEvent e) {
@@ -53,6 +45,24 @@ public class HtmlPane extends JPanel implements Scrollable {
     }
     
     public void setText(String text) {
+        textPane.setContentType("text/html");
+        
+        // Create a new document.
+        // This is (a) paranoia against unwanted heap retention and (b) a defense against persistence of styles.
+        textPane.setDocument(textPane.getEditorKit().createDefaultDocument());
+        
+        HTMLEditorKit editorKit = (HTMLEditorKit) textPane.getEditorKit();
+        
+        // Fix up the default style sheet to look like a normal text component.
+        // FIXME: should we do something with PRE text too?
+        StyleSheet styleSheet = editorKit.getStyleSheet();
+        Font bodyFont = UIManager.getFont("TextArea.font");
+        styleSheet.removeStyle("body");
+        styleSheet.addRule("body { font-family: \"" + bodyFont.getFamily() + "\", sans-serif; font-size: " + bodyFont.getSize() + "pt");
+        
+        // Work around "not a bug" bug 4233012.
+        textPane.getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
+        
         textPane.setText(text);
         textPane.setCaretPosition(0);
     }
