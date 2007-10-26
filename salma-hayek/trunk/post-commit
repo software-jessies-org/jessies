@@ -25,8 +25,8 @@ end
 
 # ------------------------------------------------------------------------
 
-require 'cgi'
-require 'pathname'
+require "cgi"
+require "pathname"
 
 # __FILE__ may be relative to the current directory which we're about to change.
 script_path=Pathname.new(__FILE__).realpath().dirname()
@@ -37,8 +37,8 @@ $: << script_path
 repository_path=Pathname.new(__FILE__).parent().parent()
 repository_name=repository_path.basename()
 
-require 'escaping.rb'
-require 'patch-to-html-email.rb'
+require "escaping.rb"
+require "patch-to-html-email.rb"
 
 # Subversion's commit-email.pl suggests that svnlook might create files.
 Dir.chdir("/tmp")
@@ -53,9 +53,9 @@ rev = ARGV.shift()
 ENV["LC_CTYPE"] = "en_US.UTF-8"
 info=`svnlook info #{repository_path} -r #{rev}`
 info_lines=info.split("\n")
-author=info_lines.shift
-date=info_lines.shift
-info_lines.shift
+author=info_lines.shift()
+date=info_lines.shift()
+info_lines.shift()
 comment=info_lines
 
 # Remove the localized date that follows the ISO date.
@@ -109,5 +109,5 @@ if $? != 0
     end
 end
 
-# We're done.
+# FIXME: What is the real reason for exit(0)?
 exit(0)
