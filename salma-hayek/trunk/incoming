@@ -24,8 +24,8 @@ end
 
 # ------------------------------------------------------------------------
 
-require 'cgi'
-require 'pathname'
+require "cgi"
+require "pathname"
 
 # __FILE__ may be relative to the current directory which we're about to change.
 script_path=Pathname.new(__FILE__).realpath().dirname()
@@ -36,8 +36,8 @@ $: << script_path
 repository_path=Pathname.new(__FILE__).parent().parent()
 repository_name=repository_path.basename()
 
-require 'escaping.rb'
-require 'patch-to-html-email.rb'
+require "escaping.rb"
+require "patch-to-html-email.rb"
 
 # Subversion's commit-email.pl suggests that svnlook might create files.
 Dir.chdir("/tmp")
@@ -54,21 +54,21 @@ hglog=`cd #{repository_path} && hg log -v -r #{hash}`
 comment=hglog.gsub(/^.*description:\s*/m, "")
 
 hgparents=`cd #{repository_path} && hg parents -r #{hash}`
-parent=hgparents.split("\n").shift.gsub(/^.*:\s*\d+:/, "")
+parent=hgparents.split("\n").shift().gsub(/^.*:\s*\d+:/, "")
 
 hgdiff=`cd #{repository_path} && hg diff -r #{parent} -r #{hash}`
 changes=hgdiff.gsub(/^diff\s+-r\s+[0-9a-f]+\s+-r\s+[0-9a-f]+.*$/, "")
 
 hglog_lines=hglog.split("\n")
-changeset=hglog_lines.shift.gsub(/^changeset:\s*/, "")
+changeset=hglog_lines.shift().gsub(/^changeset:\s*/, "")
 rev=changeset.gsub(/:.*$/, "")
 
-user=hglog_lines.shift;
+user=hglog_lines.shift()
 while user !~ /^user:/
-    user=hglog_lines.shift;
+    user=hglog_lines.shift()
 end
 user=user.gsub(/^user:\s*/, "")
-date=hglog_lines.shift.gsub(/^date:\s*/, "")
+date=hglog_lines.shift().gsub(/^date:\s*/, "")
 
 if user =~ /\S+@\S+\.\S+/
     from_address=user
@@ -119,5 +119,5 @@ if $? != 0
     end
 end
 
-# We're done.
+# FIXME: What is the real reason for exit(0)?
 exit(0)
