@@ -355,19 +355,8 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         }
         
         private void paintWavyHorizontalLine(Graphics2D g, int x1, int x2, int y) {
-            Object originalHint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            
-            final int startX = Math.min(x1, x2);
-            final int endX = Math.max(x1, x2);
-            final int baselineY = y - 1;
-            int yOff = 1;
-            for (int x = startX; x < endX; x += 2) {
-                g.drawLine(x, baselineY + yOff, Math.min(endX, x + 2), baselineY - yOff);
-                yOff = -yOff;
-            }
-            
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, originalHint);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            g.drawLine(x1, y, x2, y);
         }
     }
 }
