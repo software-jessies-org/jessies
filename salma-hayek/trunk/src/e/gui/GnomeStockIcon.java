@@ -72,6 +72,7 @@ public class GnomeStockIcon {
             nameMap.put("Copy", "gtk-copy");
             nameMap.put("Cut", "gtk-cut");
             nameMap.put("Credits", "gtk-about");
+            nameMap.put("Delete", "gtk-delete");
             nameMap.put("Find...", "gtk-find");
             nameMap.put("Go to Line...", "gtk-jump-to");
             nameMap.put("Help", "gtk-help");
