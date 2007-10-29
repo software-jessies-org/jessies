@@ -17,7 +17,7 @@ public class JFrameUtilities {
         Image image = null;
         try {
             // Load the icon if it looks like a real attempt was made to specify one.
-            if (filename.length() > 0) {
+            if (filename != null) {
                 image = ImageIO.read(FileUtilities.fileFromString(filename));
             }
         } catch (Throwable th) {
