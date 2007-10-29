@@ -390,7 +390,9 @@ class Java
     end
     
     add_pathname_property("org.jessies.aboutBoxIcon", @png_icon)
-    add_pathname_property("org.jessies.frameIcon", @frame_icon)
+    if @frame_icon != ""
+      add_pathname_property("org.jessies.frameIcon", @frame_icon)
+    end
     add_pathname_property("org.jessies.projectRoot", @project_root)
     
     # Work around Sun bug 6274341.
