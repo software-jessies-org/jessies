@@ -30,6 +30,11 @@ public enum FileType {
                  PCSharpTextStyler.class,
                  new String[] { ".cs" }),
     
+    EMAIL       ("Email",
+                 PNoOpIndenter.class,
+                 PEmailTextStyler.class,
+                 new String[] { ".email" }),
+    
     JAVA        ("Java",
                  PJavaIndenter.class,
                  PJavaTextStyler.class,
