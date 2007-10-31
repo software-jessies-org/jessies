@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import e.ptextarea.*;
 import e.gui.*;
 import e.util.*;
@@ -40,9 +41,13 @@ public class EErrorsWindow extends JFrame {
     private final Workspace workspace;
     private JButton killButton;
     private PTextArea textArea;
+    private JScrollPane scrollPane;
     private EStatusBar statusBar;
     private int currentBuildErrorCount;
     private Process process;
+    
+    private boolean shouldAutoScroll;
+    private ChangeListener autoScroller;
     
     public EErrorsWindow(Workspace workspace) {
         super("Build Output");
@@ -50,8 +55,7 @@ public class EErrorsWindow extends JFrame {
         initKillButton();
         initTextArea();
         initStatusBar();
-        JScrollPane scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
+        this.scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         
         JPanel bottomLine = new JPanel(new BorderLayout(4, 0));
         bottomLine.add(killButton, BorderLayout.WEST);
@@ -70,6 +74,8 @@ public class EErrorsWindow extends JFrame {
             }
         });
         initKeyboardEquivalents();
+        
+        enableAutoScroll();
     }
     
     private void initKeyboardEquivalents() {
@@ -242,9 +248,11 @@ public class EErrorsWindow extends JFrame {
     }
     
     private class AppendRunnable implements Runnable {
+        private boolean isStdErr;
         private String text;
         
-        public AppendRunnable(String[] lines) {
+        public AppendRunnable(boolean isStdErr, String[] lines) {
+            this.isStdErr = isStdErr;
             this.text = StringUtilities.join(lines, "\n") + "\n";
         }
         
@@ -254,6 +262,9 @@ public class EErrorsWindow extends JFrame {
                 setVisible(true);
             }
             textArea.append(text);
+            if (isStdErr) {
+                disableAutoScroll();
+            }
         }
     }
     
@@ -261,7 +272,7 @@ public class EErrorsWindow extends JFrame {
         public void run() {
             textArea.setText("");
             textArea.getTextBuffer().getUndoBuffer().resetUndoBuffer();
-            resetAutoScroll();
+            enableAutoScroll();
         }
     }
     
@@ -271,24 +282,34 @@ public class EErrorsWindow extends JFrame {
         }
     }
     
-    public void append(String[] lines) {
+    public void appendLines(boolean isStdErr, String[] lines) {
         for (String line : lines) {
             // FIXME: this is a bit weak, and no longer necessary for our builds. The FIXME in this file about treating stderr specially might be a better way forward if we want to keep a hack.
             if (line.contains("***") || line.contains("warning:")) {
                 ++currentBuildErrorCount;
             }
         }
-        EventQueue.invokeLater(new AppendRunnable(lines));
+        EventQueue.invokeLater(new AppendRunnable(isStdErr, lines));
     }
     
-    public void clear() {
+    public void clearErrors() {
         EventQueue.invokeLater(new ClearRunnable());
         EventQueue.invokeLater(new HideRunnable());
     }
     
-    public void resetAutoScroll() {
-        // FIXME: differentiate between stdout and stderr, and pause scrolling as soon as we see anything on stderr.
-        //linkFormatter.setAutoScroll(true);
+    public synchronized void enableAutoScroll() {
+        if (shouldAutoScroll == false) {
+            this.shouldAutoScroll = true;
+            this.autoScroller = GuiUtilities.keepMaximumShowing(scrollPane.getVerticalScrollBar());
+        }
+    }
+    
+    public synchronized void disableAutoScroll() {
+        if (shouldAutoScroll == true) {
+            this.shouldAutoScroll = false;
+            GuiUtilities.stopMaximumShowing(scrollPane.getVerticalScrollBar(), autoScroller);
+            this.autoScroller = null;
+        }
     }
     
     public void initTextAreaPopupMenu() {

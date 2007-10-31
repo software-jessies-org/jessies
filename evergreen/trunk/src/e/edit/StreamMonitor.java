@@ -11,10 +11,12 @@ import org.jdesktop.swingworker.SwingWorker;
 public class StreamMonitor extends SwingWorker<Object, String> {
     private BufferedReader stream;
     private ShellCommand task;
+    private boolean isStdErr;
     
-    public StreamMonitor(BufferedReader stream, ShellCommand task) {
+    public StreamMonitor(BufferedReader stream, ShellCommand task, boolean isStdErr) {
         this.stream = stream;
         this.task = task;
+        this.isStdErr = isStdErr;
     }
     
     @Override
@@ -35,6 +37,6 @@ public class StreamMonitor extends SwingWorker<Object, String> {
     
     @Override
     protected void process(String... lines) {
-        task.process(lines);
+        task.process(isStdErr, lines);
     }
 }
