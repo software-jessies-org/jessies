@@ -331,21 +331,21 @@ public class GuiUtilities {
     }
     
     /**
-     * Scrolls so that the maximum value of the the scroll bar is visible,
-     * even as the scroll bar's range changes, unless the user has manually
-     * grabbed the thumb to look at some part of the history, in which case
-     * we leave the scroll bar alone until it's next at the maximum value.
+     * Scrolls so that the maximum value of the the scroll bar is visible, even as the scroll bar's range changes.
+     * If the user manually grabs the thumb to look at some part of the history, we leave the scroll bar alone.
+     * When the user returns the scroll bar to the maximum value, auto-scrolling will start again.
+     * 
+     * Returns the added ChangeListener so that the caller can hand it back to stopMaximumShowing to disable the effect.
      */
-    public static final void keepMaximumShowing(final JScrollBar scrollBar) {
-        scrollBar.getModel().addChangeListener(new ChangeListener() {
+    public static final ChangeListener keepMaximumShowing(final JScrollBar scrollBar) {
+        ChangeListener changeListener = new ChangeListener() {
             private BoundedRangeModel model = scrollBar.getModel();
             private boolean wasAtMaximum;
             private int maximum;
             private int extent;
             private int value;
             
-            // If we had a decent name for this class, it would be in its own
-            // file!
+            // If we had a decent name for this class, it would be in its own file!
             {
                 updateValues();
                 wasAtMaximum = isAtMaximum();
@@ -379,6 +379,15 @@ public class GuiUtilities {
             private boolean isAtMaximum() {
                 return (value + extent == maximum);
             }
-        });
+        };
+        scrollBar.getModel().addChangeListener(changeListener);
+        return changeListener;
+    }
+    
+    /**
+     * See keepMaximumShowing.
+     */
+    public static final void stopMaximumShowing(final JScrollBar scrollBar, ChangeListener changeListener) {
+        scrollBar.getModel().removeChangeListener(changeListener);
     }
 }
