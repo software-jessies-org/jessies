@@ -2,6 +2,7 @@ package e.gui;
 
 import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
@@ -66,6 +67,10 @@ public class HtmlPane extends JPanel implements Scrollable {
         textPane.setText(text);
         textPane.setCaretPosition(0);
     }
+    
+    // Delegate key event listening to textPane.
+    public void addKeyListener(KeyListener l) { textPane.addKeyListener(l); }
+    public void removeKeyListener(KeyListener l) { textPane.removeKeyListener(l); }
     
     // Delegate the Scrollable interface to textPane...
     public Dimension getPreferredScrollableViewportSize() { return textPane.getPreferredScrollableViewportSize(); }
