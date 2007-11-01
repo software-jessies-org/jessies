@@ -367,7 +367,7 @@ FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY = $(if $(REVISION_CO
 $(takeProfileSample)
 # Can we really imagine a project without src/?  I'm wondering whether the wildcard is necessary.
 WILDCARD.src := $(wildcard src)
-WILDCARD.classes := $(wildcard .generated/classes)
+WILDCARD.classes := $(wildcard .generated/classes $(SALMA_HAYEK)/.generated/classes)
 JAVA_SOURCE_FILES := $(if $(WILDCARD.src),$(shell find src -type f -name "*.java"))
 JAVA_SOURCE_DIRECTORY_PREREQUISITES := $(if $(WILDCARD.src),$(shell find $(WILDCARD.src) $(FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY) -type d -print))
 JAVA_CLASSES_PREREQUISITES := $(if $(WILDCARD.classes),$(shell find $(WILDCARD.classes) -print))
