@@ -108,6 +108,8 @@ public class GnomeStockIcon {
             // FIXME: we should probably support more mnemonics, and factor this out into another map.
             if (buttonText.equals("Cancel") || buttonText.equals("Close")) {
                 button.setMnemonic(KeyEvent.VK_C);
+            } else if (buttonText.equals("OK")) {
+                button.setMnemonic(KeyEvent.VK_O);
             }
         }
     }
