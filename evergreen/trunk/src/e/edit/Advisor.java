@@ -28,6 +28,7 @@ public class Advisor extends JPanel {
     
     private Advisor() {
         setLayout(new BorderLayout());
+        add(advicePane.makeToolBar(), BorderLayout.NORTH);
         add(advicePane, BorderLayout.CENTER);
         
         /*
@@ -64,7 +65,7 @@ public class Advisor extends JPanel {
     }
     
     public synchronized void showDocumentation() {
-        advicePane.setText("");
+        advicePane.clearAdvice();
         getFrame().setVisible(true);
         startResearch(getSearchTerm());
     }
@@ -76,7 +77,7 @@ public class Advisor extends JPanel {
         private ResearchRunner(String searchTerm) {
             this.searchTerm = searchTerm;
             this.textWindow = ETextAction.getFocusedTextWindow();
-            advicePane.setText("Searching for documentation on \"" + searchTerm + "\"...");
+            advicePane.setTemporaryText("Searching for documentation on \"" + searchTerm + "\"...");
         }
         
         @Override
