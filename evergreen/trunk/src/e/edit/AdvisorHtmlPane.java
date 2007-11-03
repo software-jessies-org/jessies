@@ -134,11 +134,28 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         return toolBar;
     }
     
+    private static class BackIcon extends DrawnIcon {
+        private BackIcon() {
+            super(new Dimension(16, 16));
+        }
+        
+        public void paintIcon(Component c, Graphics oldGraphics, int x, int y) {
+            Graphics2D g = (Graphics2D) oldGraphics;
+            JButton button = (JButton) c;
+            g.setColor(button.isEnabled() ? Color.BLACK : Color.GRAY);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.fillPolygon(new int[] { x+16, x+16, x+0 }, new int[] { y+0, y+16, y+8 }, 3);
+        }
+    }
+    
     private class BackAction extends AbstractAction {
         private BackAction() {
             putValue(Action.NAME, "backAction");
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0, false));
-            putValue(Action.SMALL_ICON, new ImageIcon("/usr/share/icons/gnome/16x16/actions/back.png"));
+            // Our custom icon works fine for the Metal LAF, but not for the GTK+ LAF. I'm not currently able to test any others.
+            String gtkStockBackIconFilename = "/usr/share/icons/gnome/16x16/actions/back.png";
+            putValue(Action.SMALL_ICON, FileUtilities.exists(gtkStockBackIconFilename) ? new ImageIcon(gtkStockBackIconFilename) : new BackIcon());
         }
         
         public void actionPerformed(ActionEvent e) {
