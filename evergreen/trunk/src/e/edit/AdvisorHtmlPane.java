@@ -25,9 +25,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         
         @Override
         public void displayAdvice() {
-            textPane.setContentType("text/html");
-            textPane.setText(text);
-            textPane.setCaretPosition(0);
+            setTemporaryText(text);
         }
     }
     
@@ -47,6 +45,8 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             }
         }
     }
+    
+    private final BackAction BACK_ACTION = new BackAction();
     
     private JTextPane textPane;
     private ArrayList<Advice> history = new ArrayList<Advice>();
@@ -120,13 +120,25 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         ComponentUtilities.initKeyBinding(textPane, new ScrollAction(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), textPane, false, -1));
         
         // Connect backspace to going back in the history.
-        ComponentUtilities.initKeyBinding(textPane, new BackAction());
+        ComponentUtilities.initKeyBinding(textPane, BACK_ACTION);
+    }
+    
+    public JComponent makeToolBar() {
+        JButton backButton = new JButton(BACK_ACTION);
+        backButton.setFocusable(false);
+        backButton.setText(null);
+        
+        JToolBar toolBar = new JToolBar();
+        toolBar.setFloatable(false);
+        toolBar.add(backButton);
+        return toolBar;
     }
     
     private class BackAction extends AbstractAction {
-        public BackAction() {
+        private BackAction() {
             putValue(Action.NAME, "backAction");
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0, false));
+            putValue(Action.SMALL_ICON, new ImageIcon("/usr/share/icons/gnome/16x16/actions/back.png"));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -137,13 +149,28 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             if (history.size() < 2) {
                 return;
             }
-            Advice previousAdvice = history.remove(history.size() - 1);
+            
+            history.remove(history.size() - 1);
+            Advice previousAdvice = history.get(history.size() - 1);
             previousAdvice.displayAdvice();
+            
+            updateEnabledState();
+        }
+        
+        private void updateEnabledState() {
+            BACK_ACTION.setEnabled(history.size() >= 2);
         }
     };
     
+    public void clearAdvice() {
+        textPane.setText("");
+        history.clear();
+        BACK_ACTION.updateEnabledState();
+    }
+    
     public void setAdvice(Advice newAdvice) {
         history.add(newAdvice);
+        BACK_ACTION.updateEnabledState();
         newAdvice.displayAdvice();
     }
     
@@ -153,6 +180,12 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     
     public void setText(String text) {
         setAdvice(new TextAdvice(text));
+    }
+    
+    public void setTemporaryText(String text) {
+        textPane.setContentType("text/html");
+        textPane.setText(text);
+        textPane.setCaretPosition(0);
     }
     
     /**
