@@ -5,13 +5,51 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.text.html.*;
 
 public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
+    private interface Advice {
+        public void displayAdvice();
+    }
+    
+    private class TextAdvice implements Advice {
+        private String text;
+        
+        public TextAdvice(String text) {
+            this.text = text;
+        }
+        
+        @Override
+        public void displayAdvice() {
+            textPane.setContentType("text/html");
+            textPane.setText(text);
+            textPane.setCaretPosition(0);
+        }
+    }
+    
+    public class UrlAdvice implements Advice {
+        private String url;
+        
+        public UrlAdvice(String url) {
+            this.url = url;
+        }
+        
+        @Override
+        public void displayAdvice() {
+            try {
+                textPane.setPage(url);
+            } catch (Exception ex) {
+                Log.warn("Exception thrown in setPage.", ex);
+            }
+        }
+    }
+    
     private JTextPane textPane;
+    private ArrayList<Advice> history = new ArrayList<Advice>();
     private EStatusBar statusBar;
     
     public AdvisorHtmlPane() {
@@ -66,7 +104,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         }
     }
     
-    private static void initKeyBindings(JTextPane textPane) {
+    private void initKeyBindings(JTextPane textPane) {
         // Add C-F, C-D, and C-G.
         JTextComponentUtilities.addFindFunctionalityTo(textPane);
         
@@ -80,20 +118,41 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         // Connect the up and down arrow keys to the scroll bar.
         ComponentUtilities.initKeyBinding(textPane, new ScrollAction(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), textPane, false, 1));
         ComponentUtilities.initKeyBinding(textPane, new ScrollAction(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), textPane, false, -1));
+        
+        // Connect backspace to going back in the history.
+        ComponentUtilities.initKeyBinding(textPane, new BackAction());
     }
     
-    public void setText(String text) {
-        textPane.setContentType("text/html");
-        textPane.setText(text);
-        textPane.setCaretPosition(0);
+    private class BackAction extends AbstractAction {
+        public BackAction() {
+            putValue(Action.NAME, "backAction");
+            putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0, false));
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            goBack();
+        }
+        
+        private void goBack() {
+            if (history.size() < 2) {
+                return;
+            }
+            Advice previousAdvice = history.remove(history.size() - 1);
+            previousAdvice.displayAdvice();
+        }
+    };
+    
+    public void setAdvice(Advice newAdvice) {
+        history.add(newAdvice);
+        newAdvice.displayAdvice();
     }
     
     public void setPage(String url) {
-        try {
-            textPane.setPage(url);
-        } catch (Exception ex) {
-            Log.warn("Exception thrown in setPage.", ex);
-        }
+        setAdvice(new UrlAdvice(url));
+    }
+    
+    public void setText(String text) {
+        setAdvice(new TextAdvice(text));
     }
     
     /**
