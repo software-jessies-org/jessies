@@ -67,7 +67,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         textPane.setEditable(false);
         textPane.addHyperlinkListener(this);
         
-        initKeyBindings(textPane);
+        initKeyBindings();
         
         HTMLEditorKit editorKit = (HTMLEditorKit) textPane.getEditorKit();
         StyleSheet styleSheet = editorKit.getStyleSheet();
@@ -104,7 +104,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         }
     }
     
-    private void initKeyBindings(JTextPane textPane) {
+    private void initKeyBindings() {
         // Add C-F, C-D, and C-G.
         JTextComponentUtilities.addFindFunctionalityTo(textPane);
         
