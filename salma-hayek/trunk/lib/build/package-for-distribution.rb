@@ -196,14 +196,18 @@ copy_files_for_installation(salma_hayek, "#{resources_dir}/salma-hayek")
 # Generate a single JAR file containing both the project's unique classes and all the classes from the salma-hayek library.
 # We have to do this in two stages to avoid a "java.util.zip.ZipException: duplicate entry:" error from jar(1) for cases where both trees share a package prefix.
 
+# Windows users have java.exe on the path, but not jar.exe.
+require "#{salma_hayek}/bin/find-jdk-root.rb"
+jar = find_jdk_root() + "/bin/jar"
+
 # Use an absolute path so we can chdir first.
 jar_filename = Pathname.new("#{project_resource_directory}").realpath() + ".generated" + "classes.jar"
 # Using chdir rather than jar -C saves converting more pathnames to JVM-compatible format.
 Dir.chdir(".generated/classes/") {
-    spawnWithoutShell(["jar", "cf", convert_to_jvm_compatible_pathname(jar_filename), "."])
+    spawnWithoutShell([jar, "cf", convert_to_jvm_compatible_pathname(jar_filename), "."])
 }
 Dir.chdir("#{salma_hayek}/.generated/classes/") {
-    spawnWithoutShell(["jar", "uf", convert_to_jvm_compatible_pathname(jar_filename), "."])
+    spawnWithoutShell([jar, "uf", convert_to_jvm_compatible_pathname(jar_filename), "."])
 }
 
 if target_os() == "Darwin"
