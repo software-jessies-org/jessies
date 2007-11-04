@@ -69,6 +69,32 @@ General stuff
 * Here's a really cool auto-update system (for Cocoa) that it would be nice to imitate: 
   http://www.andymatuschak.org/articles/2006/01/09/introducing-sparkle-easy-self-updates-for-all
 
+* Mac OS equivalent of GnomeStockIcon:
+
+	The other sticking point is that images loaded by Java will simply be  
+	"scaled up" when displayed on screen. Since there is no way we could  
+	get around this limitation, we added a unique workaround that accesses  
+	Mac-specific image resources. The following code will load a multi- 
+	representation tiff, icns, or PDF from your Mac OS X bundled  
+	application's Resources directory, and present the crispest version it  
+	can:
+
+	Toolkit.getDefaultToolkit().getImage("NSImage://<image-name>");
+
+	As a parenthetical benefit, it also accesses all of the new "system  
+	images" present in NSImage.h. For example:
+
+	Toolkit.getDefaultToolkit().getImage("NSImage://NSComputer");
+	retrieves an image of your computer
+
+	Toolkit.getDefaultToolkit().getImage("NSImage://NSBonjour");
+	retrieves an image of the Bonjour logo
+
+	See the bottom of: /System/Library/Frameworks/AppKit.framework/ 
+	Versions/C/Headers/NSImage.h
+	for more constants.
+
+
 Installation
 ------------
 
