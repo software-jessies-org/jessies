@@ -164,7 +164,8 @@ def find_jdk_root()
     end
   end
   
-  return jdk_root
+  # We must not return Pathname in some circumstances and String in others.
+  return jdk_root.to_s()
 end
 
 if __FILE__ == $0
