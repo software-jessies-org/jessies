@@ -31,7 +31,7 @@ class Terminator
         display = ENV["DISPLAY"]
         display_suffix = ""
         if display != nil
-            display_suffix = display.gsub(/:/, "_")
+            display_suffix = display.gsub(/[:\/]/, "_")
         end
         server_port_file_name = "#{server_port_file_stem}#{display_suffix}"
         tryInAppServer(server_port_file_name)
