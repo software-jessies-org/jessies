@@ -15,7 +15,7 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     $(warning If you do have build errors, they are probably not make-related.)
     $(warning Exceptions include errors like:)
     $(warning make: *** virtual memory exhausted.  Stop.)
-    $(warning ../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setsid (with value "! -prune") was referred to in scope setsid.  Stop.)
+    $(warning ../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setpgid (with value "! -prune") was referred to in scope setpgid.  Stop.)
 endif
 
 # ----------------------------------------------------------------------------
