@@ -207,11 +207,11 @@ public class ProcessUtilities {
         }
         ArrayList<String> result = new ArrayList<String>();
         // Try to put the command in its own process group, so it's easier to kill it and its children.
-        File setSidBinary = FileUtilities.findOnPath("setsid");
-        if (setSidBinary != null) {
-            result.add(setSidBinary.toString());
+        File setpgidBinary = FileUtilities.findOnPath("setpgid");
+        if (setpgidBinary != null) {
+            result.add(setpgidBinary.toString());
         } else if (GuiUtilities.isWindows() && FileUtilities.findOnPath(shell) == null) {
-            // If we found setsid, it'll be able to find /bin/bash, unlike the JVM.
+            // If we found setpgid, it'll be able to find /bin/bash, unlike the JVM.
             // /bin/bash is what SHELL will be if Evergreen's started from Terminator.
             return new String[] { "cmd", "/c", command };
         }

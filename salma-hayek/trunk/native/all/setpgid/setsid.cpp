@@ -17,7 +17,7 @@ static void ensureCallerIsProcessGroupLeader() {
 
 int main(int, char* argv[]) {
   if (*++argv == 0) {
-    std::cerr << "usage: setsid PROGRAM [ARGUMENTS...]" << std::endl;
+    std::cerr << "usage: setpgid PROGRAM [ARGUMENTS...]" << std::endl;
     exit(EXIT_FAILURE);
   }
 
