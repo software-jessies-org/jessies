@@ -55,6 +55,7 @@ public class PEmailTextStyler extends PAbstractTextStyler {
     }
     
     private int getLeadingQuoteCharacterCount(String line) {
+        // FIXME: it's probably a mistake to count "                       > 4" as being quoted. if the first character on a line isn't a quote character, the line isn't quoted. this was more obvious when "|" was considered a quote character because Ruby source often contains lines like "  |line|" which we'd mistakenly color.
         int result = 0;
         for (int i = 0; i < line.length(); i++) {
             if (QUOTING_CHARACTERS.indexOf(line.charAt(i)) != -1) {
