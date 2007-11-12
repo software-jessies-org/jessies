@@ -54,8 +54,14 @@ endif
 # Locate salma-hayek.
 # ----------------------------------------------------------------------------
 
-MOST_RECENT_MAKEFILE_DIRECTORY = $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
-SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTORY))
+MOST_RECENT_MAKEFILE = $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+# The location of this makefile shouldn't change with later includes.
+SIMPLE_MAKEFILE := $(MOST_RECENT_MAKEFILE)
+# $(dir $(dir)) doesn't do what you want.
+dirWithoutSlash = $(patsubst %/,%,$(dir $(1)))
+MAKEFILE_DIRECTORY = $(call dirWithoutSlash,$(SIMPLE_MAKEFILE))
+ABSOLUTE_MAKEFILE_DIRECTORY = $(patsubst ../%,$(dir $(CURDIR))%,$(MAKEFILE_DIRECTORY))
+SALMA_HAYEK = $(ABSOLUTE_MAKEFILE_DIRECTORY)
 
 # make does special things when running commands including the magic string $(MAKE),
 # including clearing -n from $(MAKEFLAGS), so we snarf it here.
