@@ -29,16 +29,15 @@ require "cgi"
 require "pathname"
 
 # __FILE__ may be relative to the current directory which we're about to change.
-script_path=Pathname.new(__FILE__).realpath().dirname()
-$: << script_path
+salma_hayek = Pathname.new(__FILE__).realpath().dirname()
 
 # We can work out the repository name because we're <path>/<name>/hooks/post-commit
 # We could also work this out from the spurious repository_path argument.
 repository_path=Pathname.new(__FILE__).parent().parent()
 repository_name=repository_path.basename()
 
-require "escaping.rb"
-require "patch-to-html-email.rb"
+require "#{salma_hayek}/lib/build/escaping.rb"
+require "#{salma_hayek}/lib/build/patch-to-html-email.rb"
 
 # Subversion's commit-email.pl suggests that svnlook might create files.
 Dir.chdir("/tmp")
@@ -78,7 +77,7 @@ comment.each() {
 body << "</p></div>\n"
 
 # Get and output the patch.
-# We'd like to | #{script_path}/bin/annotate-patch.rb
+# We'd like to | #{salma_hayek}/bin/annotate-patch.rb
 # But that requires that the correct version of the file is available as trunk/filename
 changes=`svnlook diff #{repository_path} -r #{rev}`
 changes.gsub!(/\r/, "") # In case we're running on MS Windows.
@@ -91,7 +90,7 @@ sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes
 # will require manual intervention to fix, because we'll be stuck at the broken
 # revision forever.
 
-updateResult=`{ cd #{script_path}/../#{repository_name} && svn update && make www-dist source-dist; } 2>&1`
+updateResult=`{ cd #{salma_hayek}/../#{repository_name} && svn update && make www-dist source-dist; } 2>&1`
 if $? != 0
     begin
         # Consider using http://www.opengroup.org/onlinepubs/007908799/xcu/mailx.html if sendmail causes a problem.

@@ -5,7 +5,7 @@
 require "pathname.rb"
 salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
 
-require "#{salma_hayek}/escaping.rb"
+require "#{salma_hayek}/lib/build/escaping.rb"
 
 puts("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">")
 puts("<html>")

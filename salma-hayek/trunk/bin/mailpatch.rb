@@ -2,10 +2,9 @@
 
 require "pathname"
 
-script_path = Pathname.new(__FILE__).realpath().dirname()
-$: << script_path.dirname().to_s()
+salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
 
-require "patch-to-html-email.rb"
+require "#{salma_hayek}/lib/build/patch-to-html-email.rb"
 
 from_address = ENV["LOGNAME"]
 if from_address == ""
