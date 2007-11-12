@@ -1,23 +1,3 @@
-# Use "VARIABLE ?= default" to assign a values iff the variable hasn't already
-# been set.
-
-# ----------------------------------------------------------------------------
-# Ensure we're running a suitable version of make(1).
-# ----------------------------------------------------------------------------
-
-REQUIRED_MAKE_VERSION = 3.81
-REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
-EARLIER_MAKE_VERSION = $(firstword $(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))
-ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
-    $(warning This makefile assumes at least GNU make $(REQUIRED_MAKE_VERSION), but you're using $(REAL_MAKE_VERSION))
-    $(warning )
-    $(warning If you don't have build errors, you can ignore these warnings.)
-    $(warning If you do have build errors, they are probably not make-related.)
-    $(warning Exceptions include errors like:)
-    $(warning make: *** virtual memory exhausted.  Stop.)
-    $(warning ../salma-hayek/lib/build/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setpgid (with value "! -prune") was referred to in scope setpgid.  Stop.)
-endif
-
 # ----------------------------------------------------------------------------
 # Disable legacy make behavior.
 # ----------------------------------------------------------------------------
