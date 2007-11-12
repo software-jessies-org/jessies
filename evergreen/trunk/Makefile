@@ -5,4 +5,4 @@ UPGRADE_GUID = cdf05ed6-e1f8-11da-ae3f-00111123337e
 # If we set this then it doesn't matter what the directory's called.
 HUMAN_PROJECT_NAME = Evergreen
 
-include ../salma-hayek/simple.make
+include ../salma-hayek/lib/build/simple.make
