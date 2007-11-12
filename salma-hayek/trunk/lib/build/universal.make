@@ -33,8 +33,14 @@ endif
 # Locate salma-hayek.
 # ----------------------------------------------------------------------------
 
-MOST_RECENT_MAKEFILE_DIRECTORY = $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
-SALMA_HAYEK := $(patsubst ../%,$(dir $(CURDIR))%,$(MOST_RECENT_MAKEFILE_DIRECTORY))
+MOST_RECENT_MAKEFILE = $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+# The location of this makefile shouldn't change with later includes.
+UNIVERSAL_MAKEFILE := $(MOST_RECENT_MAKEFILE)
+# $(dir $(dir)) doesn't do what you want.
+dirWithoutSlash = $(patsubst %/,%,$(dir $(1)))
+MAKEFILE_DIRECTORY = $(call dirWithoutSlash,$(UNIVERSAL_MAKEFILE))
+ABSOLUTE_MAKEFILE_DIRECTORY = $(patsubst ../%,$(dir $(CURDIR))%,$(MAKEFILE_DIRECTORY))
+SALMA_HAYEK = $(call dirWithoutSlash,$(call dirWithoutSlash,$(ABSOLUTE_MAKEFILE_DIRECTORY)))
 
 # ----------------------------------------------------------------------------
 # Work out what we're going to generate.
@@ -773,7 +779,7 @@ echo.%:
 
 define buildNativeDirectory
   SOURCE_DIRECTORY = $(1)
-  include $(SALMA_HAYEK)/per-directory.make
+  include $(SALMA_HAYEK)/lib/build/per-directory.make
 endef
 
 $(takeProfileSample)
