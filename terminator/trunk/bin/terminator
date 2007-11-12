@@ -175,7 +175,15 @@ class Terminator
             if File.exist?(terminfo_file) == false
                 FileUtils.mkdir_p(directory)
             end
-            FileUtils.cp(original_file, terminfo_file, :preserve => true)
+            begin
+                FileUtils.cp(original_file, terminfo_file, :preserve => true)
+            rescue RangeError
+                # Silently hide "bignum too big to convert to `long' from chown from copy_metadata from copy_file.
+                # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-dev/27221 suggests that this is a known issue.
+                # We only see it on Cygwin and only if you're not in the local Administrators group and only if you haven't done the mkpasswd dance.
+                # And it only happens the first time you try to run Terminator.
+                # I wonder if it's fixed in Ruby-1.9.
+            end
         end
     end
     
