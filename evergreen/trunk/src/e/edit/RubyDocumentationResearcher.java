@@ -60,6 +60,13 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         String[] modules = line.replaceAll("<p>$", "").split("\\), ");
         for (String module : modules) {
             int openParenthesisIndex = module.indexOf('(');
+            if (openParenthesisIndex == -1) {
+                // "ri FileUtils" contains this:
+                // Includes:
+                // ---------
+                // StreamUtils_
+                continue;
+            }
             String moduleName = module.substring(0, openParenthesisIndex);
             String[] methods = module.substring(openParenthesisIndex + 1).split(", ");
             for (int i = 0; i < methods.length; ++i) {
