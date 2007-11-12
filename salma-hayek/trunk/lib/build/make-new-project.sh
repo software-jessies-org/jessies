@@ -50,7 +50,7 @@ mkdir -p $project_name/src
 
 echo "Creating Makefile..."
 cat > $project_name/Makefile <<EOF
-include ../salma-hayek/universal.make
+include ../salma-hayek/simple.make
 EOF
 
 echo "Adding GPL..."

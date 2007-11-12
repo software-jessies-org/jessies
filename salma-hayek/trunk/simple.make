@@ -59,4 +59,4 @@ default: recurse
 # We just don't want to be running make here but that's what everyone expects to type.
 .PHONY: recurse
 recurse:
-	$(if $(DRY_RUNNING),,@)$(if $(SHOULD_NOT_FILTER_OUTPUT),,ruby $(SALMA_HAYEK)/lib/build/filter-build-output.rb) $(MAKE) $(if $(DRY_RUNNING),-n) $(MAKECMDGOALS) -f $(SALMA_HAYEK)/universal.make
+	$(if $(DRY_RUNNING),,@)$(if $(SHOULD_NOT_FILTER_OUTPUT),,ruby $(SALMA_HAYEK)/lib/build/filter-build-output.rb) $(MAKE) $(if $(DRY_RUNNING),-n) $(MAKECMDGOALS) -f $(SALMA_HAYEK)/lib/build/universal.make

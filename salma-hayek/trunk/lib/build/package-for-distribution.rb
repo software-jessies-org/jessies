@@ -168,7 +168,7 @@ def copy_files_for_installation(src_root_directory, dst_root_directory)
     src_root_pathname = Pathname.new(src_root_directory)
     dst_root_pathname = Pathname.new(dst_root_directory)
     make = ENV["MAKE"]
-    open("| #{make} --no-print-directory -C #{src_root_directory} -f ../salma-hayek/universal.make installer-file-list").each_line() {
+    open("| #{make} --no-print-directory -C #{src_root_directory} -f ../salma-hayek/lib/build/universal.make installer-file-list").each_line() {
         |line|
         # Sometimes universal.make outputs the commands to generate local-variables.make.
         if line.match(/^Including (.+)\.\.\.$/) == nil

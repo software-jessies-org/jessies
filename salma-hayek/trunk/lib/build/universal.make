@@ -15,7 +15,7 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     $(warning If you do have build errors, they are probably not make-related.)
     $(warning Exceptions include errors like:)
     $(warning make: *** virtual memory exhausted.  Stop.)
-    $(warning ../salma-hayek/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setpgid (with value "! -prune") was referred to in scope setpgid.  Stop.)
+    $(warning ../salma-hayek/lib/build/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setpgid (with value "! -prune") was referred to in scope setpgid.  Stop.)
 endif
 
 # ----------------------------------------------------------------------------
@@ -744,7 +744,7 @@ echo.%:
 # ----------------------------------------------------------------------------
 
 # The $$1 here is a Ruby variable, not a make one.
-.generated/local-variables.make: $(SALMA_HAYEK)/per-directory.make $(SALMA_HAYEK)/universal.make
+.generated/local-variables.make: $(SALMA_HAYEK)/lib/build/per-directory.make $(SALMA_HAYEK)/lib/build/universal.make
 	mkdir -p $(@D) && \
 	ruby -w -ne '($$_.match(/^ *(\S+)\s*[:+]?=/) || $$_.match(/^\s*define\s*(\S+)/)) && puts("LOCAL_VARIABLES += #{$$1}")' $< | sort -u > $@
 
