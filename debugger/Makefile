@@ -1,1 +1,1 @@
-include ../salma-hayek/simple.make
+include ../salma-hayek/lib/build/simple.make
