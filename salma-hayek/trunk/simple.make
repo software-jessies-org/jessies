@@ -18,11 +18,28 @@
 
 #   must export any variables that it wants to influence salma-hayek's makefiles before the include
 
-# Used in Evergreen, terminator and scm.
+# Must be used in every project for which an .msi installer is generated.
 export UPGRADE_GUID
-# Used in terminator.
+# Should be used in every project whose name isn't entirely lowercase.
 ifneq "$(HUMAN_PROJECT_NAME)" ""
 export HUMAN_PROJECT_NAME
+endif
+
+# ----------------------------------------------------------------------------
+# Ensure we're running a suitable version of make(1).
+# ----------------------------------------------------------------------------
+
+REQUIRED_MAKE_VERSION = 3.81
+REAL_MAKE_VERSION = $(firstword $(MAKE_VERSION))
+EARLIER_MAKE_VERSION = $(firstword $(sort $(REAL_MAKE_VERSION) $(REQUIRED_MAKE_VERSION)))
+ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
+    $(warning This makefile assumes at least GNU make $(REQUIRED_MAKE_VERSION), but you're using $(REAL_MAKE_VERSION))
+    $(warning )
+    $(warning If you don't have build errors, you can ignore these warnings.)
+    $(warning If you do have build errors, they are probably not make-related.)
+    $(warning Exceptions include errors like:)
+    $(warning make: *** virtual memory exhausted.  Stop.)
+    $(warning ../salma-hayek/lib/build/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setpgid (with value "! -prune") was referred to in scope setpgid.  Stop.)
 endif
 
 # ----------------------------------------------------------------------------
