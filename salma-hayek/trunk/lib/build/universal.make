@@ -13,7 +13,7 @@
 # Locate salma-hayek.
 # ----------------------------------------------------------------------------
 
-MOST_RECENT_MAKEFILE = $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+MOST_RECENT_MAKEFILE = $(lastword $(MAKEFILE_LIST))
 # The location of this makefile shouldn't change with later includes.
 UNIVERSAL_MAKEFILE := $(MOST_RECENT_MAKEFILE)
 # $(dir $(dir)) doesn't do what you want.
