@@ -17,7 +17,6 @@ import e.util.*;
 //
 // TODO: add a menu of recent searches.
 // TODO: make recent searches persistent.
-// TODO: use rounded corners, at least on Mac OS X.
 //
 
 public class SearchField extends JTextField {
@@ -37,8 +36,22 @@ public class SearchField extends JTextField {
     }
     
     private void initBorder() {
-        new CancelBorder().attachTo(this);
-        //FIXME: new MenuBorder().attachTo(this);
+        if (GuiUtilities.isMacOs() && System.getProperty("os.version").equals("10.4") == false) {
+            putClientProperty("JTextField.variant", "search");
+            putClientProperty("JTextField.FindAction", new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    postActionEvent();
+                }
+            });
+            putClientProperty("JTextField.CancelAction", new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    cancel();
+                }
+            });
+        } else {
+            new CancelBorder().attachTo(this);
+            //FIXME: new MenuBorder().attachTo(this);
+        }
     }
     
     private void initKeyListener() {
