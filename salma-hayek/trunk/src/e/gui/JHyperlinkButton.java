@@ -22,22 +22,29 @@ public class JHyperlinkButton extends JPanel implements ActionListener {
         super(new FlowLayout());
         this.url = targetUrl;
         this.button = new JButton("<html><body><u>" + text + "</u>");
-        configureButton();
-        if (font != null) {
-            button.setFont(font);
+        if (GuiUtilities.isMacOs() && System.getProperty("os.version").equals("10.4") == false && text.equals("Help")) {
+            // On Mac OS 10.5, we can ask for the standard help button appearance.
+            button.putClientProperty("JButton.buttonType", "help");
+            button.setText(null);
+        } else {
+            configureButton();
+            if (font != null) {
+                button.setFont(font);
+            }
         }
+        button.addActionListener(this);
         add(button);
     }
     
     private void configureButton() {
         button.setBorder(null);
+        button.setBorderPainted(false);
         button.setContentAreaFilled(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setFocusPainted(false);
         button.setForeground(Color.BLUE);
         button.setRequestFocusEnabled(false);
         button.setToolTipText(url);
-        button.addActionListener(this);
     }
     
     public void actionPerformed(ActionEvent e) {
