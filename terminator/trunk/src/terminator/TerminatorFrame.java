@@ -373,7 +373,9 @@ public class TerminatorFrame extends JFrame {
 	 * Even on GNOME and Windows it would look odd because the tabbed pane is the outermost component, and the new space ought to belong to it, and share its color.
 	 */
 	private void updateBackground() {
-		setBackground(terminals.size() > 1 ? originalBackground : Options.getSharedInstance().getColor("background"));
+		if (GuiUtilities.isMacOs() == false) {
+			setBackground(terminals.size() > 1 ? originalBackground : Options.getSharedInstance().getColor("background"));
+		}
 	}
 	
 	@Override

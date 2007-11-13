@@ -79,6 +79,11 @@ public class TerminatorTabbedPane extends JTabbedPane {
             addMouseListener(TAB_DRAGGER);
             addMouseMotionListener(TAB_DRAGGER);
         }
+
+        // Mac OS 10.5 defaults JTabbedPanes to non-opaque (though this wasn't in the release notes).
+        if (GuiUtilities.isMacOs()) {
+            setOpaque(true);
+        }
     }
     
     private void initPopUpMenu() {
