@@ -290,7 +290,7 @@ public class GuiUtilities {
      * Sets the opacity (1.0 => fully opaque, 0.0 => fully transparent) of the given Frame.
      * http://elliotth.blogspot.com/2007/08/transparent-java-windows-on-x11.html
      */
-    public static void setFrameAlpha(Frame frame, double alpha) {
+    public static void setFrameAlpha(JFrame frame, double alpha) {
         try {
             Field peerField = Component.class.getDeclaredField("peer");
             peerField.setAccessible(true);
@@ -300,11 +300,15 @@ public class GuiUtilities {
             }
             
             if (isMacOs()) {
-                Class<?> cWindowClass = Class.forName("apple.awt.CWindow");
-                if (cWindowClass.isInstance(peer)) {
-                    // ((apple.awt.CWindow) peer).setAlpha(alpha);
-                    Method setAlphaMethod = cWindowClass.getMethod("setAlpha", float.class);
-                    setAlphaMethod.invoke(peer, (float) alpha);
+                if (System.getProperty("os.version").equals("10.4")) {
+                    Class<?> cWindowClass = Class.forName("apple.awt.CWindow");
+                    if (cWindowClass.isInstance(peer)) {
+                        // ((apple.awt.CWindow) peer).setAlpha(alpha);
+                        Method setAlphaMethod = cWindowClass.getMethod("setAlpha", float.class);
+                        setAlphaMethod.invoke(peer, (float) alpha);
+                    }
+                } else {
+                    frame.getRootPane().putClientProperty("Window.alpha", alpha);
                 }
             } else if (isWindows()) {
                 // FIXME: can we do this on Windows?
