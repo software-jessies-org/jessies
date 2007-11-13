@@ -416,6 +416,7 @@ public class Options {
 	private JComponent makePresetButton(final Map<String, ColorPreference> colorPreferences, String name, final Color background, final Color foreground, final Color cursor, final Color selection) {
 		// FIXME: we need to update the button image when the user changes the anti-aliasing preference.
 		JButton button = new JButton(new ImageIcon(makePresetButtonImage(name, background, foreground)));
+		button.putClientProperty("JButton.buttonType", "gradient"); // Mac OS 10.5
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				colorPreferences.get("background").updatePreference(background);
@@ -553,7 +554,11 @@ public class Options {
 			Insets margin = button.getMargin();
 			margin.left = margin.right = margin.top = margin.bottom;
 			button.setMargin(margin);
-			button.putClientProperty("JButton.buttonType", "toolbar");
+			if (System.getProperty("os.version").equals("10.4")) {
+				button.putClientProperty("JButton.buttonType", "toolbar"); // Mac OS 10.4
+			} else {
+				button.putClientProperty("JButton.buttonType", "gradient"); // Mac OS 10.5
+			}
 			return button;
 		}
 		
