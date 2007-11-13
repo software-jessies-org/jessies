@@ -290,7 +290,7 @@ JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
 # http://developer.apple.com/documentation/Porting/Conceptual/PortingUnix/compiling/chapter_4_section_3.html
 # ----------------------------------------------------------------------------
 
-universal_binary_flags = -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
+universal_binary_flags = -mmacosx-version-min=10.4 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
 C_AND_CXX_FLAGS.Darwin += $(universal_binary_flags)
 C_AND_CXX_FLAGS.Darwin += -x objective-c++
 LDFLAGS.Darwin += $(universal_binary_flags)
