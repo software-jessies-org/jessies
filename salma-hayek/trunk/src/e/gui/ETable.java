@@ -42,8 +42,10 @@ public class ETable extends JTable {
         getTableHeader().setReorderingAllowed(false);
         
         if (GuiUtilities.isMacOs()) {
-            // Work-around for Apple 4352937.
-            JLabel.class.cast(getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.LEADING);
+            // Work around Apple 4352937 (fixed in 10.5).
+            if (System.getProperty("os.version").equals("10.4")) {
+                JLabel.class.cast(getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.LEADING);
+            }
             
             // Use an iTunes-style vertical-only "grid".
             setShowHorizontalLines(false);
@@ -113,18 +115,22 @@ public class ETable extends JTable {
         return false;
     }
     
-    /**
-     * Shades alternate rows in different colors.
-     */
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-        Component c = super.prepareRenderer(renderer, row, column);
+        return prepareComponent(super.prepareRenderer(renderer, row, column), row, column);
+    }
+    
+    public Component prepareEditor(TableCellEditor editor, int row, int column) {
+        return prepareComponent(super.prepareEditor(editor, row, column), row, column);
+    }
+    
+    private Component prepareComponent(Component c, int row, int column) {
         boolean focused = hasFocus();
         boolean selected = isCellSelected(row, column);
         if (selected) {
-            if (GuiUtilities.isMacOs() && focused == false) {
+            if (GuiUtilities.isMacOs() && focused == false && isEditing() == false) {
                 // Native Mac OS renders the selection differently if the table doesn't have the focus.
                 // The Mac OS LAF doesn't imitate this for us.
-                c. setBackground(MAC_UNFOCUSED_SELECTED_CELL_BACKGROUND_COLOR);
+                c.setBackground(MAC_UNFOCUSED_SELECTED_CELL_BACKGROUND_COLOR);
                 c.setForeground(UIManager.getColor("Table.foreground"));
             } else {
                 c.setBackground(UIManager.getColor("Table.selectionBackground"));
@@ -139,10 +145,15 @@ public class ETable extends JTable {
         if (c instanceof JComponent) {
             JComponent jc = (JComponent) c;
             
-            // The Java 6 GTK LAF JCheckBox doesn't paint its background by default.
-            // Sun 5043225 says this is the intended behavior, though presumably not when it's being used as a table cell renderer.
             if (GuiUtilities.isGtk() && c instanceof JCheckBox) {
+                // The Java 6 GTK LAF JCheckBox doesn't paint its background by default.
+                // Sun 5043225 says this is the intended behavior, though presumably not when it's being used as a table cell renderer.
                 jc.setOpaque(true);
+            } else if (GuiUtilities.isMacOs() && c instanceof JCheckBox) {
+                // There's a similar situation on Mac OS.
+                jc.setOpaque(true);
+                // Mac OS 10.5 lets us use smaller checkboxes in table cells.
+                ((JCheckBox) jc).putClientProperty("JComponent.sizeVariant", "mini");
             }
             
             if (getCellSelectionEnabled() == false && isEditing() == false) {
@@ -158,7 +169,6 @@ public class ETable extends JTable {
             initToolTip(jc, row, column);
             c.setEnabled(this.isEnabled());
         }
-        
         return c;
     }
     
