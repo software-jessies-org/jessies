@@ -102,7 +102,7 @@ public class EMenuBar extends JMenuBar {
         }
         
         public void menuSelected(MenuEvent e) {
-            traverseMenu(JMenu.class.cast(e.getSource()));
+            traverseMenu((JMenu) e.getSource());
         }
         
         public void menuDeselected(MenuEvent e) {

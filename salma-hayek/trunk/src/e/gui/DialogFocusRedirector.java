@@ -35,10 +35,10 @@ public class DialogFocusRedirector {
         for (Component component : components) {
             if (isWorthGivingFocusTo(component)) {
                 component.requestFocus();
-                JTextField.class.cast(component).selectAll();
+                ((JTextField) component).selectAll();
                 return true;
             } else if (component instanceof Container) {
-                Component[] newComponents = Container.class.cast(component).getComponents();
+                Component[] newComponents = ((Container) component).getComponents();
                 boolean focusGivenAway = giveFocusToFirstTextComponentIn(newComponents);
                 if (focusGivenAway) return true;
             }
