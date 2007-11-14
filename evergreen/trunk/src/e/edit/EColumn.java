@@ -46,7 +46,7 @@ public class EColumn extends JPanel {
         ArrayList<ETextWindow> result = new ArrayList<ETextWindow>();
         for (Component c : getComponents()) {
             if (c instanceof ETextWindow) {
-                result.add(ETextWindow.class.cast(c));
+                result.add((ETextWindow) c);
             }
         }
         return result.toArray(new ETextWindow[result.size()]);
