@@ -22,7 +22,7 @@ public class JHyperlinkButton extends JPanel implements ActionListener {
         super(new FlowLayout());
         this.url = targetUrl;
         this.button = new JButton("<html><body><u>" + text + "</u>");
-        if (GuiUtilities.isMacOs() && System.getProperty("os.version").equals("10.4") == false && text.equals("Help")) {
+        if (GuiUtilities.isMacOs() && System.getProperty("os.version").startsWith("10.4") == false && text.equals("Help")) {
             // On Mac OS 10.5, we can ask for the standard help button appearance.
             button.putClientProperty("JButton.buttonType", "help");
             button.setText(null);
