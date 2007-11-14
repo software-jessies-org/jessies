@@ -36,7 +36,7 @@ public class SearchField extends JTextField {
     }
     
     private void initBorder() {
-        if (GuiUtilities.isMacOs() && System.getProperty("os.version").equals("10.4") == false) {
+        if (GuiUtilities.isMacOs() && System.getProperty("os.version").startsWith("10.4") == false) {
             putClientProperty("JTextField.variant", "search");
             putClientProperty("JTextField.FindAction", new ActionListener() {
                 public void actionPerformed(ActionEvent e) {

@@ -43,7 +43,7 @@ public class ETable extends JTable {
         
         if (GuiUtilities.isMacOs()) {
             // Work around Apple 4352937 (fixed in 10.5).
-            if (System.getProperty("os.version").equals("10.4")) {
+            if (System.getProperty("os.version").startsWith("10.4")) {
                 JLabel.class.cast(getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.LEADING);
             }
             

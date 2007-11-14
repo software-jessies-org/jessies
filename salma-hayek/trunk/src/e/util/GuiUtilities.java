@@ -300,7 +300,7 @@ public class GuiUtilities {
             }
             
             if (isMacOs()) {
-                if (System.getProperty("os.version").equals("10.4")) {
+                if (System.getProperty("os.version").startsWith("10.4")) {
                     Class<?> cWindowClass = Class.forName("apple.awt.CWindow");
                     if (cWindowClass.isInstance(peer)) {
                         // ((apple.awt.CWindow) peer).setAlpha(alpha);
