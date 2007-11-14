@@ -263,46 +263,34 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     public void updateWatermarkAndTitleBar() {
         watermarkUpdateExecutor.execute(new Runnable() {
-            // Fields initialized in "run" so not even that work is done on the EDT.
-            private ArrayList<String> items;
-            private boolean isSerious;
-            private boolean hasCounterpart;
             
-            private void init() {
-                items = new ArrayList<String>();
-                isSerious = false;
-                hasCounterpart = false;
-            }
+            // Fields initialized in "run" so not even that work is done on the EDT.
+            private String seriousMessage = null;
+            private String nonSeriousMessage = null;
+            private boolean hasCounterpart = false;
             
             public void run() {
-                init();
-                doFileChecks();
-                updateUiOnEventThread();
-            }
-            
-            private void doFileChecks() {
-                if (file.exists() == false) {
-                    items.add("(deleted)");
-                    isSerious = true;
-                }
-                if (file.exists() && file.canWrite() == false) {
-                    items.add("(read-only)");
-                }
-                if (file.exists() && isOutOfDateWithRespectToDisk()) {
-                    items.add("(out-of-date)");
-                    isSerious = true;
-                }
-                hasCounterpart = (getCounterpartFilename() != null);
-            }
-            
-            private void updateUiOnEventThread() {
+                updateFileState();
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
-                        watermarkViewPort.setSerious(isSerious);
-                        watermarkViewPort.setWatermark(items.size() > 0 ? StringUtilities.join(items, " ") : null);
+                        watermarkViewPort.setWatermark(seriousMessage, nonSeriousMessage);
                         getTitleBar().setShowSwitchButton(hasCounterpart);
                     }
                 });
+            }
+            
+            private void updateFileState() {
+                if (file.exists()) {
+                    if (file.canWrite() == false) {
+                        nonSeriousMessage = "(read-only)";
+                    }
+                    if (isOutOfDateWithRespectToDisk()) {
+                        seriousMessage = "(out-of-date)";
+                    }
+                } else {
+                    seriousMessage = "(deleted)";
+                }
+                hasCounterpart = (getCounterpartFilename() != null);
             }
         });
     }
