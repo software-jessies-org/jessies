@@ -105,7 +105,7 @@ public class VisualBellViewport extends JViewport {
     
     private void setBellVisibility(final boolean newState) {
         isBellVisible = newState;
-        JComponent.class.cast(getView()).setOpaque(!isBellVisible);
+        ((JComponent) getView()).setOpaque(!isBellVisible);
         repaint();
     }
 }

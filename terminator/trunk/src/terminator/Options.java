@@ -85,7 +85,7 @@ public class Options {
 			if (value instanceof Color) {
 				value = colorToString((Color) value);
 			} else if (value instanceof Font) {
-				value = Font.class.cast(value).getFamily();
+				value = ((Font) value).getFamily();
 			}
 			out.append("Terminator*" + key + ": " + value + "\n");
 		}
@@ -235,7 +235,7 @@ public class Options {
 	 * "fontName" and "fontSize".
 	 */
 	public Font getFont() {
-		return new Font(Font.class.cast(options.get(FONT_NAME)).getFamily(), Font.PLAIN, integerResource(FONT_SIZE));
+		return new Font(((Font) options.get(FONT_NAME)).getFamily(), Font.PLAIN, integerResource(FONT_SIZE));
 	}
 	
 	private Options() {
