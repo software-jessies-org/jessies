@@ -554,7 +554,7 @@ public class Options {
 			Insets margin = button.getMargin();
 			margin.left = margin.right = margin.top = margin.bottom;
 			button.setMargin(margin);
-			if (System.getProperty("os.version").equals("10.4")) {
+			if (System.getProperty("os.version").startsWith("10.4")) {
 				button.putClientProperty("JButton.buttonType", "toolbar"); // Mac OS 10.4
 			} else {
 				button.putClientProperty("JButton.buttonType", "gradient"); // Mac OS 10.5
