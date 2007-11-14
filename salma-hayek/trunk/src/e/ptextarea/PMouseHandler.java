@@ -106,7 +106,7 @@ public class PMouseHandler implements MouseInputListener {
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
         if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
             newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-            newToolTip = PTextSegment.class.cast(segment).getToolTip();
+            newToolTip = ((PTextSegment) segment).getToolTip();
         }
         textArea.setCursor(newCursor);
         textArea.setToolTipText(newToolTip);
@@ -119,7 +119,7 @@ public class PMouseHandler implements MouseInputListener {
         }
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
         if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
-            PTextSegment.class.cast(segment).linkClicked();
+            ((PTextSegment) segment).linkClicked();
             e.consume();
         }
     }
