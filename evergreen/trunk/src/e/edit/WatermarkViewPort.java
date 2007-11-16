@@ -22,14 +22,16 @@ public class WatermarkViewPort extends JViewport {
     private static Map<String, BufferedImage> watermarkImageCache = new HashMap<String, BufferedImage>();
     
     /**
-     * A very light gray.
+     * A light gray.
+     * It's important that this isn't too dark, because users can reasonably expected to want to read files they can't edit.
      */
-    private static final Color NON_SERIOUS_COLOR = new Color(220, 220, 220);
+    private static final Color NON_SERIOUS_COLOR = new Color(210, 210, 210);
     
     /**
-     * A very light red. Okay, so it's pink. It doesn't mean anything.
+     * A light red. Okay, so it's pink. It doesn't mean anything.
+     * It doesn't matter so much if this harms readability, because the user needs to make a decision about the problem that's being reported.
      */
-    private static final Color SERIOUS_COLOR = new Color(250, 201, 201);
+    private static final Color SERIOUS_COLOR = new Color(250, 150, 150);
     
     /**
      * The image currently being tiled across the background.
