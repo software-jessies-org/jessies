@@ -10,6 +10,7 @@ import javax.swing.text.html.*;
 
 public class HtmlPane extends JPanel implements Scrollable {
     private JTextPane textPane;
+    private String htmlSource;
     
     public HtmlPane() {
         super(new BorderLayout());
@@ -45,7 +46,7 @@ public class HtmlPane extends JPanel implements Scrollable {
         }
         
         public void actionPerformed(ActionEvent e) {
-            JFrameUtilities.showTextWindow(textPane, "HTML Source", textPane.getText());
+            JFrameUtilities.showTextWindow(textPane, "HTML Source", htmlSource);
         }
     }
     
@@ -81,7 +82,7 @@ public class HtmlPane extends JPanel implements Scrollable {
         // Work around "not a bug" bug 4233012.
         textPane.getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
         
-        textPane.setText(text);
+        textPane.setText(htmlSource = text);
         textPane.setCaretPosition(0);
     }
     
