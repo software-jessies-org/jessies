@@ -3,6 +3,7 @@ package e.gui;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
@@ -30,6 +31,22 @@ public class HtmlPane extends JPanel implements Scrollable {
                 }
             }
         });
+        EPopupMenu popupMenu =  new EPopupMenu(textPane);
+        popupMenu.addMenuItemProvider(new MenuItemProvider() {
+            public void provideMenuItems(MouseEvent event, Collection<Action> actions) {
+                actions.add(new ViewSourceAction());
+            }
+        });
+    }
+    
+    private class ViewSourceAction extends AbstractAction {
+        private ViewSourceAction() {
+            super("View Source");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            JFrameUtilities.showTextWindow(textPane, "HTML Source", textPane.getText());
+        }
     }
     
     private void linkActivated(HyperlinkEvent e) {
