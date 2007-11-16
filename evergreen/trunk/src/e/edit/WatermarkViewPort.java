@@ -91,16 +91,11 @@ public class WatermarkViewPort extends JViewport {
     }
     
     /**
-     * Returns a key for use in our internal HashMap.  The format's not
-     * important, only that only identical combinations of strings can map
-     * to the same key.
+     * Returns a key for use in our internal HashMap.
+     * The format's not important, only that only identical combinations of strings can map to the same key.
      */
     private String getKeyFromMessages(String seriousMessage, String nonSeriousMessage) {
         StringBuilder result = new StringBuilder();
-        // We take the length of seriousMessage, so it mustn't be null.
-        if (seriousMessage == null) {
-            seriousMessage = new String(seriousMessage);
-        }
         result.append(seriousMessage.length()).append(':').append(seriousMessage);
         result.append(nonSeriousMessage);
         return result.toString();
