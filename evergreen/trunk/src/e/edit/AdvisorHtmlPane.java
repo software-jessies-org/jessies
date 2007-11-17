@@ -47,9 +47,11 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     }
     
     private final BackAction BACK_ACTION = new BackAction();
+    private final ForwardAction FORWARD_ACTION = new ForwardAction();
     
     private JTextPane textPane;
     private ArrayList<Advice> history = new ArrayList<Advice>();
+    private ArrayList<Advice> future = new ArrayList<Advice>();
     private EStatusBar statusBar;
     
     public AdvisorHtmlPane() {
@@ -128,15 +130,23 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         backButton.setFocusable(false);
         backButton.setText(null);
         
+        JButton forwardButton = new JButton(FORWARD_ACTION);
+        forwardButton.setFocusable(false);
+        forwardButton.setText(null);
+        
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(false);
         toolBar.add(backButton);
+        toolBar.add(forwardButton);
         return toolBar;
     }
     
-    private static class BackIcon extends DrawnIcon {
-        private BackIcon() {
+    private static class ArrowIcon extends DrawnIcon {
+        private boolean back;
+        
+        private ArrowIcon(boolean back) {
             super(new Dimension(16, 16));
+            this.back = back;
         }
         
         public void paintIcon(Component c, Graphics oldGraphics, int x, int y) {
@@ -145,17 +155,27 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             g.setColor(button.isEnabled() ? Color.BLACK : Color.GRAY);
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g.fillPolygon(new int[] { x+16, x+16, x+0 }, new int[] { y+0, y+16, y+8 }, 3);
+            int pointyX = (back ? (x+0) : (x+16));
+            int flatX = (back ? (x+16) : (x+0));
+            if (back) {
+                g.fillPolygon(new int[] { flatX, flatX, pointyX }, new int[] { y+0, y+16, y+8 }, 3);
+            } else {
+                g.fillPolygon(new int[] { pointyX, flatX, flatX }, new int[] { y+0, y+16, y+8 }, 3);
+            }
         }
+    }
+    
+    private Icon makeIcon(boolean back) {
+        // Our custom icon works fine for the Metal LAF, but not for the GTK+ LAF.
+        String gtkStockArrowIconFilename = "/usr/share/icons/gnome/16x16/actions/" + (back ? "back" : "forward") + ".png";
+        return (FileUtilities.exists(gtkStockArrowIconFilename) ? new ImageIcon(gtkStockArrowIconFilename) : new ArrowIcon(back));
     }
     
     private class BackAction extends AbstractAction {
         private BackAction() {
             putValue(Action.NAME, "backAction");
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0, false));
-            // Our custom icon works fine for the Metal LAF, but not for the GTK+ LAF. I'm not currently able to test any others.
-            String gtkStockBackIconFilename = "/usr/share/icons/gnome/16x16/actions/back.png";
-            putValue(Action.SMALL_ICON, FileUtilities.exists(gtkStockBackIconFilename) ? new ImageIcon(gtkStockBackIconFilename) : new BackIcon());
+            putValue(Action.SMALL_ICON, makeIcon(true));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -167,27 +187,54 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
                 return;
             }
             
-            history.remove(history.size() - 1);
+            Advice currentAdvice = history.remove(history.size() - 1);
+            future.add(currentAdvice);
             Advice previousAdvice = history.get(history.size() - 1);
             previousAdvice.displayAdvice();
             
-            updateEnabledState();
-        }
-        
-        private void updateEnabledState() {
-            BACK_ACTION.setEnabled(history.size() >= 2);
+            updateEnabledStates();
         }
     };
+    
+    private class ForwardAction extends AbstractAction {
+        private ForwardAction() {
+            putValue(Action.NAME, "forwardAction");
+            putValue(Action.SMALL_ICON, makeIcon(false));
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            goForward();
+        }
+        
+        private void goForward() {
+            if (future.size() < 1) {
+                return;
+            }
+            
+            Advice nextAdvice = future.remove(future.size() - 1);
+            history.add(nextAdvice);
+            nextAdvice.displayAdvice();
+            
+            updateEnabledStates();
+        }
+    };
+    
+    private void updateEnabledStates() {
+        BACK_ACTION.setEnabled(history.size() >= 2);
+        FORWARD_ACTION.setEnabled(future.size() > 0);
+    }
     
     public void clearAdvice() {
         textPane.setText("");
         history.clear();
-        BACK_ACTION.updateEnabledState();
+        future.clear();
+        updateEnabledStates();
     }
     
     public void setAdvice(Advice newAdvice) {
         history.add(newAdvice);
-        BACK_ACTION.updateEnabledState();
+        future.clear();
+        updateEnabledStates();
         newAdvice.displayAdvice();
     }
     
