@@ -70,6 +70,7 @@ public class JavaDoc {
             "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/doc/api",
             "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/appledoc/api",
             // Debian-based Linux.
+            "/usr/share/doc/sun-java6-jdk/html/api",
             "/usr/share/doc/sun-java5-jdk/html/api",
         };
         for (String wellKnownJavaDocDirectory : wellKnownJavaDocDirectories) {
@@ -80,7 +81,7 @@ public class JavaDoc {
         
         // In an emergency, fall back to Sun's copy on the web.
         if (javaDocLocations.isEmpty()) {
-            javaDocLocations.add("http://java.sun.com/j2se/1.5.0/docs/api/");
+            javaDocLocations.add("http://java.sun.com/javase/6/docs/api/");
         }
         
         int totalPkgs = packageNames.size();

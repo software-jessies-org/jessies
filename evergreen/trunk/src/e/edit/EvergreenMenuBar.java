@@ -176,7 +176,7 @@ public class EvergreenMenuBar extends EMenuBar {
         // General.
         menu.add(new JSeparator());
         // FIXME: some day it would be nice to have our own regular expression quick reference.
-        menu.add(makeLocalOrRemoteLink("Regular Expression Documentation", "/usr/share/doc/sun-java5-jdk/html/api/java/util/regex/Pattern.html", PatternUtilities.DOCUMENTATION_URL));
+        menu.add(makeLocalOrRemoteLink("Regular Expression Documentation", "/usr/share/doc/sun-java6-jdk/html/api/java/util/regex/Pattern.html", PatternUtilities.DOCUMENTATION_URL));
         
         return menu;
     }
