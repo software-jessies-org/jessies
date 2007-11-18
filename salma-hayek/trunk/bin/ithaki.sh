@@ -8,7 +8,7 @@ DEB_DIRECTORY=/u/u154/software.jessies.org/
 # "deb" is a DNS alias for a machine in the local domain running apache on which the following command has been run:
 # sudo ln -s $DEB_DIRECTORY /var/www/software.jessies.org
 
-# When I built on wide, once, it upgraded my work areas to Subversion 1.4.
+# When I built on wide.us.dev.bluearc.com, once, it upgraded my work areas to Subversion 1.4.
 # Wide is amd64, which is only supported in etch, which only has svn 1.4.
 # ithaki runs stable, which is currently sarge, which only has svn 1.1.
 
@@ -34,7 +34,7 @@ rm *.deb
 NIGHTLY_BUILD_SCRIPT=~martind/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
 NIGHTLY_BUILD_TREE=~martind/software.jessies.org/nightlies/
 $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
-echo $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE native-dist | ssh wide bash --login
+echo $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE native-dist | ssh whitewater bash --login
 $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE native-dist
 find $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
 
