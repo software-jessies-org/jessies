@@ -8,22 +8,6 @@ DEB_DIRECTORY=/u/u154/software.jessies.org/
 # "deb" is a DNS alias for a machine in the local domain running apache on which the following command has been run:
 # sudo ln -s $DEB_DIRECTORY /var/www/software.jessies.org
 
-# When I built on wide.us.dev.bluearc.com, once, it upgraded my work areas to Subversion 1.4.
-# Wide is amd64, which is only supported in etch, which only has svn 1.4.
-# ithaki runs stable, which is currently sarge, which only has svn 1.1.
-
-# This was my solution:
-
-# /net/ithaki/usr/local/bin/svn now contains:
-# #!/bin/bash
-# LD_LIBRARY_PATH=/net/duezer/usr/lib:$LD_LIBRARY_PATH exec /net/duezer/usr/bin/svn "$@"
-
-# /net/ithaki/usr/local/bin/svnversion now contains:
-# #!/bin/bash
-# LD_LIBRARY_PATH=/net/duezer/usr/lib:$LD_LIBRARY_PATH exec /net/duezer/usr/bin/svnversion "$@"
-
-# Now all my svn updates on ithaki terminate with "Killed by signal 15" (SIGTERM) but seem to work.
-
 mkdir -p $DEB_DIRECTORY
 cd $DEB_DIRECTORY
 # Remove any .debs with obsolete names.
