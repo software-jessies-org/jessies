@@ -76,7 +76,7 @@ public enum FileType {
                  new String[] { ".php" }),
     
     PYTHON      ("Python",
-                 PNoOpIndenter.class,
+                 PPythonIndenter.class,
                  PPythonTextStyler.class,
                  new String[] { ".py" }),
     
