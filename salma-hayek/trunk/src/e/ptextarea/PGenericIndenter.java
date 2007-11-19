@@ -28,7 +28,9 @@ public class PGenericIndenter extends PSimpleIndenter {
         if (indentRegEx != null) {
             this.indentPattern = Pattern.compile(indentRegEx);
         }
-        this.unindentPattern = Pattern.compile(unindentRegEx);
+        if (unindentRegEx != null) {
+            this.unindentPattern = Pattern.compile(unindentRegEx);
+        }
         this.electricCharacters = electricCharacters;
     }
     
@@ -51,7 +53,7 @@ public class PGenericIndenter extends PSimpleIndenter {
             indentation = increaseIndentation(indentation);
         }
         
-        if (unindentPattern.matcher(thisLineText).find()) {
+        if (unindentPattern != null && unindentPattern.matcher(thisLineText).find()) {
             indentation = decreaseIndentation(indentation);
         }
         
