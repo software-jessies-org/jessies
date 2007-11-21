@@ -12,10 +12,6 @@ import java.util.concurrent.*;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
 import org.w3c.dom.*;
 
 public class Evergreen {
@@ -624,8 +620,7 @@ public class Evergreen {
     
     private void readSavedState() {
         try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = builder.parse(FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml")));
+            Document document = XmlUtilities.readXmlFromDisk(getPreferenceFilename("saved-state.xml"));
             
             Element root = document.getDocumentElement();
             initialState.initialLocation.x = Integer.parseInt(root.getAttribute("x"));
@@ -662,8 +657,7 @@ public class Evergreen {
     
     private synchronized void writeSavedState() {
         try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = builder.newDocument();
+            Document document = XmlUtilities.makeEmptyDocument();
             
             Element root = document.createElement("edit");
             document.appendChild(root);
@@ -682,20 +676,7 @@ public class Evergreen {
                 workspace.serializeAsXml(document, root);
             }
             
-            // Set up a Transformer to produce indented XML output.
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "4");
-            
-            // Create the XML content...
-            StringWriter content = new StringWriter();
-            transformer.transform(new DOMSource(document), new StreamResult(content));
-            
-            // And then carefully write it to disk.
-            File file = FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml"));
-            if (StringUtilities.writeAtomicallyTo(file, content.toString()) == false) {
-                Log.warn("\"" + file + "\" content should have been:\n" + content.toString());
-            }
+            XmlUtilities.writeXmlToDisk(getPreferenceFilename("saved-state.xml"), document);
         } catch (Exception ex) {
             Log.warn("Problem writing saved state", ex);
         }
