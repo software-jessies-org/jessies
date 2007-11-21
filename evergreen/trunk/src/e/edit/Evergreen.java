@@ -693,38 +693,12 @@ public class Evergreen {
             
             // And then carefully write it to disk.
             File file = FileUtilities.fileFromString(getPreferenceFilename("saved-state.xml"));
-            if (writeAtomicallyTo(file, content.toString()) == false) {
+            if (StringUtilities.writeAtomicallyTo(file, content.toString()) == false) {
                 Log.warn("\"" + file + "\" content should have been:\n" + content.toString());
             }
         } catch (Exception ex) {
             Log.warn("Problem writing saved state", ex);
         }
-    }
-    
-    private static boolean writeAtomicallyTo(File file, CharSequence chars) {
-        // We save to a new file first, to reduce our chances of corrupting the real file, or at least increase our chances of having one intact copy.
-        File backupFile = new File(file.toString() + ".bak");
-        try {
-            StringUtilities.writeFile(backupFile, chars);
-        } catch (Exception ex) {
-            return false;
-        }
-        
-        // Now we write to the intended destination.
-        // If the destination was a symbolic link on a CIFS server, it's important to write to the original file rather than creating a new one.
-        
-        // CIFS also causes problems if we try renaming the backup file to the intended file.
-        // For one thing, the destination must not exist, but removing the destination would make it harder to be atomic.
-        // Also, the source must not be open, which is not easy to guarantee in Java, and often not the case as soon as you'd like.
-        try {
-            StringUtilities.writeFile(file, chars);
-        } catch (Exception ex) {
-            return false;
-        }
-        
-        // Everything went well so far, so delete the backup file (ignoring failures) and return success.
-        backupFile.delete();
-        return true;
     }
     
     private Workspace openWorkspace(WorkspaceProperties properties, List<InitialFile> initialFiles) {
