@@ -88,12 +88,12 @@ public class PKeyHandler implements KeyListener {
         boolean extendingSelection = event.isShiftDown();
         int key = event.getKeyCode();
         if (textArea.isEditable() && key == KeyEvent.VK_TAB) {
-            if ((event.getModifiers() & ~KeyEvent.SHIFT_MASK) != 0) {
-                // If any modifiers (other than shift, which is meaningful to us) are down, pass on this event.
-                // Pretty much every modifier+tab combination is used by some system, and we should keep out of the way.
+            if (event.getModifiers() != 0) {
+                // If any modifiers are down, pass on this event.
+                // Pretty much every modifier+tab combination is used for something by at least one system, and we should keep out of the way.
                 return false;
             }
-            textArea.replaceSelection(event.isShiftDown() ? "\t" : textArea.getIndentationString());
+            textArea.replaceSelection(textArea.getIndentationString());
         } else if (textArea.isEditable() && key == KeyEvent.VK_ENTER) {
             new PNewlineInserter(textArea).insertNewline(event.isShiftDown() == false);
         } else if (isStartOfTextKey(event)) {
