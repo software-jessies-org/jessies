@@ -179,7 +179,11 @@ public class Advisor extends JPanel {
                 }
             }
             // Hand it on to the file-opening code to work out what to do with it.
-            Evergreen.getInstance().openFile(link);
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    Evergreen.getInstance().openFile(link);
+                }
+            });
             return null;
         }
     }
