@@ -115,7 +115,7 @@ public class PKeyHandler implements KeyListener {
         } else if (key == KeyEvent.VK_RIGHT) {
             moveRight(byWord, extendingSelection);
         } else if (key == KeyEvent.VK_BACK_SPACE) {
-            backspace();
+            backspace(event);
         } else if (key == KeyEvent.VK_DELETE) {
             if (event.isShiftDown()) {
                 textArea.cut();
@@ -186,18 +186,18 @@ public class PKeyHandler implements KeyListener {
         }
     }
     
-    private void backspace() {
+    private void backspace(KeyEvent e) {
         if (textArea.isEditable() == false) {
             return;
         }
         
-        Range range = determineRangeToRemove();
+        Range range = determineRangeToRemove(e);
         if (range.isNonEmpty()) {
             textArea.delete(range.getStart(), range.length());
         }
     }
     
-    private Range determineRangeToRemove() {
+    private Range determineRangeToRemove(KeyEvent e) {
         if (textArea.hasSelection()) {
             // The user's already done our work for us.
             return new Range(textArea.getSelectionStart(), textArea.getSelectionEnd());
@@ -214,7 +214,8 @@ public class PKeyHandler implements KeyListener {
         String whitespace = textArea.getIndenter().getCurrentIndentationOfLine(lineNumber);
         int lineOffset = position - textArea.getLineStartOffset(lineNumber);
         CharSequence chars = textArea.getTextBuffer();
-        if (Parameters.getParameter("hungryDelete", false)) {
+        if (e.isControlDown()) {
+            // "Hungry delete": delete back to first non-whitespace.
             int startPosition = position - 1;
             if (Character.isWhitespace(chars.charAt(startPosition))) {
                 while (startPosition > 0 && Character.isWhitespace(chars.charAt(startPosition - 1))) {
@@ -222,6 +223,9 @@ public class PKeyHandler implements KeyListener {
                     charactersToDelete++;
                 }
             }
+        } else if (e.isAltDown()) {
+            // Delete back to beginning of line.
+            charactersToDelete = lineOffset;
         } else if (lineOffset > 1 && lineOffset <= whitespace.length()) {
             String tab = textArea.getIndentationString();
             whitespace = whitespace.substring(0, lineOffset);
