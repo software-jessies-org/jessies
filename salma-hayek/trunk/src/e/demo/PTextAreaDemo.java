@@ -47,23 +47,10 @@ public class PTextAreaDemo {
         
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content, "    "));
         
-        iterateOverSegments(textArea);
-        //System.err.println("indenter changed lines=" + countLinesChangedByIndenter(textArea));
-        
         JFrame frame = JFrameUtilities.makeScrollableContentWindow(file.getPath() + " - PTextAreaDemo", textArea);
         frame.setSize(new Dimension(600, 600));
         frame.setLocationByPlatform(true);
         frame.setVisible(true);
-    }
-    
-    private static void iterateOverSegments(PTextArea textArea) {
-        Iterator<PLineSegment> segments = textArea.getLogicalSegmentIterator(0);
-        int segmentCount = 0;
-        while (segments.hasNext()) {
-            ++segmentCount;
-            //System.err.println("segment=" + segments.next().toString());
-        }
-        System.err.println("segmentCount=" + segmentCount);
     }
     
     private static int countLinesChangedByIndenter(PTextArea textArea) {
