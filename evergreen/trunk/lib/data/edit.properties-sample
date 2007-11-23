@@ -3,7 +3,6 @@ font.size=12
 
 fixedFont.default=false
 
-hungryDelete=true
 indent.string=    
 
 files.uninterestingExtensions=.a;.aux;.bak;.bin;.class;.d;.elf;.exe;.jar;.lib;.log;.map;.o;.obj;.orig;.swp;.texshop;.toc
