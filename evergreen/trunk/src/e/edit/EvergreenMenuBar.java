@@ -155,8 +155,8 @@ public class EvergreenMenuBar extends EMenuBar {
         
         // UI guidelines.
         menu.add(new JSeparator());
-        menu.add(makeLocalOrRemoteLink("Apple Human Interface Guidelines", null, "http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html"));
-        menu.add(makeLocalOrRemoteLink("GNOME Human Interface Guidelines", null, "http://developer.gnome.org/projects/gup/hig/2.0/"));
+        menu.add(makeLocalOrRemoteLink("Apple Human Interface Guidelines", "/Developer/Documentation/DocSets/com.apple.ADC_Reference_Library.CoreReference.docset/Contents/Resources/Documents/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html", "http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html"));
+        menu.add(makeLocalOrRemoteLink("GNOME Human Interface Guidelines", null, "http://library.gnome.org/devel/hig-book/stable/"));
         
         // C/C++.
         menu.add(new JSeparator());
@@ -165,6 +165,7 @@ public class EvergreenMenuBar extends EMenuBar {
         
         // Java.
         menu.add(new JSeparator());
+        menu.add(makeLocalOrRemoteLink("Java 6 API", "/usr/share/doc/sun-java6-jdk/html/api/overview-summary.html", "http://java.sun.com/javase/6/docs/api/overview-summary.html"));
         menu.add(makeLocalOrRemoteLink("Java Language Specification, 3e", null, "http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html"));
         menu.add(makeLocalOrRemoteLink("Java Tutorial", null, "http://java.sun.com/docs/books/tutorial/"));
         menu.add(makeLocalOrRemoteLink("Java VM Specification, 2e", null, "http://java.sun.com/docs/books/vmspec/2nd-edition/html/VMSpecTOC.doc.html"));
