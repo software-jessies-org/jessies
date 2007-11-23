@@ -65,7 +65,9 @@ public class GnomeStockIcon {
     private static synchronized void initNameMap() {
         if (nameMap == null) {
             nameMap = new HashMap<String, String>();
+            // FIXME: explicitly listing those choices which can have "..." isn't necessarily the right choice, but it does mean we can insist that, say, "Save As..." always does but "Paste" never does.
             nameMap.put("Add", "gtk-add");
+            nameMap.put("Add...", "gtk-add");
             nameMap.put("Apply", "gtk-apply");
             nameMap.put("Cancel", "gtk-cancel");
             nameMap.put("Close", "gtk-close");
@@ -73,6 +75,7 @@ public class GnomeStockIcon {
             nameMap.put("Cut", "gtk-cut");
             nameMap.put("Credits", "gtk-about");
             nameMap.put("Delete", "gtk-delete");
+            nameMap.put("Edit...", "gtk-edit");
             nameMap.put("Find...", "gtk-find");
             nameMap.put("Go to Line...", "gtk-jump-to");
             nameMap.put("Help", "gtk-help");
