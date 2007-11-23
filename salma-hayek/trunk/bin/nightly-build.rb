@@ -35,9 +35,15 @@ class Project
   end
 end
 
+class BazaarProject < Project
+  def update()
+    system("bzr status ; bzr diff ; bzr update")
+  end
+end
+
 class MercurialProject < Project
   def update()
-    system("hg pull && hg update")
+    system("hg status ; hg diff ; hg pull && hg update")
   end
 end
 
@@ -58,6 +64,11 @@ Dir.glob("#{projects_root}/*/.hg").each() {
   |hg_directory|
   hg_directory =~ /^(.*\/)\.hg$/
   projects << MercurialProject.new($1)
+}
+Dir.glob("#{projects_root}/*/.bzr").each() {
+  |bzr_directory|
+  bzr_directory =~ /^(.*\/)\.bzr$/
+  projects << BazaarProject.new($1)
 }
 projects.uniq!()
 
