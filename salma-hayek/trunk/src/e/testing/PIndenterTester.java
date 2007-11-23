@@ -23,7 +23,7 @@ public class PIndenterTester {
         PTextBuffer buffer = textArea.getTextBuffer();
         buffer.readFromFile(new File(filename));
         originalContent = buffer.toString();
-        buffer.putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(originalContent));
+        buffer.putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(originalContent, "    "));
         FileType fileType = FileType.guessFileType(filename, originalContent);
         fileType.configureTextArea(textArea);
     }
