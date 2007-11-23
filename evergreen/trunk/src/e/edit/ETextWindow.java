@@ -114,7 +114,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         // in a fixed font reverting to a proportional font each time I save.
         CharSequence content = textArea.getTextBuffer();
         textArea.setFont(ChangeFontAction.getAppropriateFontForContent(content));
-        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
+        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content, Parameters.getParameter("indent.string", "    ")));
     }
     
     public void updateStatusLine() {
