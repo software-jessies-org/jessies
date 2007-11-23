@@ -45,7 +45,7 @@ public class PTextAreaDemo {
         System.err.println("indenter=" + textArea.getIndenter());
         System.err.println("styler=" + textArea.getTextStyler());
         
-        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content));
+        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content, "    "));
         
         iterateOverSegments(textArea);
         //System.err.println("indenter changed lines=" + countLinesChangedByIndenter(textArea));
@@ -60,10 +60,8 @@ public class PTextAreaDemo {
         Iterator<PLineSegment> segments = textArea.getLogicalSegmentIterator(0);
         int segmentCount = 0;
         while (segments.hasNext()) {
-            PLineSegment segment = segments.next();
-            ++ segmentCount;
-            String segmentDump = segment.toString();
-            //System.err.println("segment=" + segmentDump);
+            ++segmentCount;
+            //System.err.println("segment=" + segments.next().toString());
         }
         System.err.println("segmentCount=" + segmentCount);
     }

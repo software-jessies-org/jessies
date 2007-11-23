@@ -47,13 +47,14 @@ public class IndentationGuesser {
     
     /**
      * Returns the best guess at the indentation in use in the given content.
+     * Uses the given "fallback" string if it can't find anything better.
      */
-    public static String guessIndentationFromFile(CharSequence chars) {
+    public static String guessIndentationFromFile(CharSequence chars, String fallback) {
         Stopwatch.Timer timer = stopwatch.start();
         try {
             String previousIndent = "";
             Bag<String> indentations = new Bag<String>();
-            String emergencyAlternative = Parameters.getParameter("indent.string", "    ");
+            String emergencyAlternative = fallback;
             
             LineIterator it = new LineIterator(chars);
             while (it.hasNext()) {
@@ -96,7 +97,7 @@ public class IndentationGuesser {
     
     public static void main(String[] args) {
         for (String filename : args) {
-            System.out.println(filename + ": \"" + guessIndentationFromFile(StringUtilities.readFile(filename)) + "\"");
+            System.out.println(filename + ": \"" + guessIndentationFromFile(StringUtilities.readFile(filename), "    ") + "\"");
         }
     }
 }
