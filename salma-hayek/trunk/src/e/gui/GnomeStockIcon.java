@@ -26,6 +26,7 @@ public class GnomeStockIcon {
     private static final String LARGE_ICON_KEY = "SwingLargeIconKey";
     
     private static HashMap<String, String> nameMap;
+    private static HashMap<String, Integer> mnemonicMap;
     
     private GnomeStockIcon() {
     }
@@ -100,6 +101,24 @@ public class GnomeStockIcon {
         }
     }
     
+    private static synchronized void initMnemonicMap() {
+        if (mnemonicMap == null) {
+            mnemonicMap = new HashMap<String, Integer>();
+            mnemonicMap.put("Apply", KeyEvent.VK_A);
+            mnemonicMap.put("Cancel", KeyEvent.VK_C);
+            mnemonicMap.put("Close", KeyEvent.VK_C);
+            mnemonicMap.put("Credits", KeyEvent.VK_R);
+            mnemonicMap.put("License", KeyEvent.VK_L);
+            mnemonicMap.put("OK", KeyEvent.VK_O);
+            mnemonicMap.put("Open", KeyEvent.VK_O);
+            mnemonicMap.put("Refresh", KeyEvent.VK_R);
+            mnemonicMap.put("Replace", KeyEvent.VK_R);
+            mnemonicMap.put("Rescan", KeyEvent.VK_R);
+            mnemonicMap.put("Run", KeyEvent.VK_R);
+            mnemonicMap.put("Save", KeyEvent.VK_S);
+        }
+    }
+    
     public static void configureButton(JButton button) {
         if (GuiUtilities.isGtk() == false) {
             return;
@@ -108,11 +127,9 @@ public class GnomeStockIcon {
         String gtkIconName = getGtkIconNameForString(buttonText);
         if (gtkIconName != null) {
             useStockIcon(button, gtkIconName);
-            // FIXME: we should probably support more mnemonics, and factor this out into another map.
-            if (buttonText.equals("Cancel") || buttonText.equals("Close")) {
-                button.setMnemonic(KeyEvent.VK_C);
-            } else if (buttonText.equals("OK")) {
-                button.setMnemonic(KeyEvent.VK_O);
+            initMnemonicMap();
+            if (mnemonicMap.get(buttonText) != null) {
+                button.setMnemonic(mnemonicMap.get(buttonText));
             }
         }
     }

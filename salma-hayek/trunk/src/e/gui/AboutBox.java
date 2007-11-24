@@ -194,11 +194,9 @@ public class AboutBox {
             JButton creditsButton = new JButton("Credits");
             GnomeStockIcon.configureButton(creditsButton);
             creditsButton.setEnabled(false);
-            creditsButton.setMnemonic(KeyEvent.VK_R);
             
             JButton licenseButton = new JButton("License");
             GnomeStockIcon.configureButton(licenseButton);
-            licenseButton.setMnemonic(KeyEvent.VK_L);
             licenseButton.addActionListener(new ShowLicenseActionListener());
             
             JButton closeButton = makeCloseButton(new ActionListener() {
