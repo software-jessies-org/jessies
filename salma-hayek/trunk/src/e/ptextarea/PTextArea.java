@@ -73,9 +73,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         revalidateLineWrappings();
         
         setAutoscrolls(true);
-        setBackground(Color.WHITE);
+        setBackground(UIManager.getColor("EditorPane.background"));
         setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
-        setFont(UIManager.getFont("TextArea.font"));
+        setFont(UIManager.getFont("EditorPane.font"));
         setOpaque(true);
         setFocusTraversalKeysEnabled(false);
         

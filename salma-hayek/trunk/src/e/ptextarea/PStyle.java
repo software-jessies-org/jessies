@@ -6,7 +6,7 @@ import java.awt.*;
  * An enum containing each style understood by PTextArea and its stylers.
  */
 public enum PStyle {
-    NORMAL("normal", javax.swing.UIManager.getColor("TextArea.foreground")),
+    NORMAL("normal", javax.swing.UIManager.getColor("EditorPane.foreground")),
     NEWLINE("newline", null),
     STRING("string", Color.decode("#0000ff")),
     COMMENT("comment", Color.decode("#227722")),
