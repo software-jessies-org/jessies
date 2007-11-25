@@ -59,8 +59,6 @@ public class Options {
 	private HashMap<String, Object> defaults = new HashMap<String, Object>();
 	private HashMap<String, String> descriptions = new HashMap<String, String>();
 	
-	private HashMap<String, Color> rgbColors = null;
-	
 	// Non-null if the preferences dialog is currently showing.
 	private FormBuilder form;
 	
@@ -201,8 +199,7 @@ public class Options {
 	
 	/**
 	 * Returns a color, if explicitly configured by the user.
-	 * We understand colors specified in the #rrggbb form,
-	 * or those parsed from rgb.txt.
+	 * We understand colors specified in the HTML-like #rrggbb form.
 	 * 
 	 * Color names supported by xterm (defaults in parentheses) include:
 	 * 
@@ -220,11 +217,7 @@ public class Options {
 	}
 	
 	private Color colorFromString(String description) {
-		if (description.startsWith("#")) {
-			return Color.decode("0x" + description.substring(1));
-		} else {
-			return getRgbColor(description);
-		}
+		return Color.decode("0x" + description.substring(1));
 	}
 	
 	/**
@@ -600,13 +593,6 @@ public class Options {
 		}
 	}
 	
-	/**
-	 * color0 to color7 are the normal colors (black, red3, green3,
-	 * yellow3, blue3, magenta3, cyan3, and gray90).
-	 *
-	 * color8 to color15 are the bold colors (gray30, red, green, yellow,
-	 * blue, magenta, cyan, and white).
-	 */
 	private void initDefaultColors() {
 		// Defaults reminiscent of SGI's xwsh(1).
 		addDefault("background", VERY_DARK_BLUE, "Background");
@@ -658,61 +644,6 @@ public class Options {
 		} else {
 			return component;
 		}
-	}
-	
-	/**
-	 * Returns the name of the first "rgb.txt" file it finds.
-	 */
-	private String findRgbDotTxt() {
-		String[] possibleRgbDotTxtLocations = {
-			"/etc/X11/rgb.txt", // Debian/Ubuntu.
-			"/usr/share/X11/rgb.txt", // Xorg Debian.
-			"/usr/lib/X11/rgb.txt", // Xorg Ubuntu.
-			"/usr/X11R6/lib/X11/rgb.txt", // XFree86 Linux, Mac OS with X11 installed.
-			"/usr/share/emacs/21.2/etc/rgb.txt", // Mac OS without X11 installed.
-		};
-		for (String possibleLocation : possibleRgbDotTxtLocations) {
-			if (FileUtilities.exists(possibleLocation)) {
-				return possibleLocation;
-			}
-		}
-		return null;
-	}
-	
-	private void readRgbFile(String rgbDotTxtFilename) {
-		rgbColors = new HashMap<String, Color>();
-		String[] lines = StringUtilities.readLinesFromFile(rgbDotTxtFilename);
-		for (String line : lines) {
-			if (line.length() == 0 || line.startsWith("!") || line.startsWith("#")) {
-				// X11's "rgb.txt" uses !-commenting, but Emacs' copy uses #-commenting, and contains an empty line.
-				continue;
-			}
-			int r = channelAt(line, 0);
-			int g = channelAt(line, 4);
-			int b = channelAt(line, 8);
-			line = line.substring(12).trim();
-			rgbColors.put(line.toLowerCase(), new Color(r, g, b));
-		}
-	}
-	
-	private Color getRgbColor(String description) {
-		// FIXME: with Sun's JVM, com.sun.java.swing.plaf.gtk.XColors.lookupColor returns a Color for each color named in "rgb.txt". We should try that (via reflection) first, and only then resort to reading "rgb.txt".
-		if (rgbColors == null) {
-			final String filename = findRgbDotTxt();
-			if (filename == null) {
-				return null;
-			}
-			try {
-				readRgbFile(filename);
-			} catch (Exception ex) {
-				Log.warn("Problem reading colors from \"" + filename + "\"", ex);
-			}
-		}
-		return rgbColors.get(description.toLowerCase());
-	}
-	
-	private int channelAt(String line, int offset) {
-		return Integer.parseInt(line.substring(offset, offset + 3).trim());
 	}
 	
 	private File getOptionsFile() {
