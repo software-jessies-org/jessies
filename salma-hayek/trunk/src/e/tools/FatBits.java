@@ -17,7 +17,7 @@ import e.util.*;
  * those of others.
  */
 public class FatBits extends MainFrame {
-    private static final String PREFERENCES_FILENAME = "~/.org.jessies.FatBits.xml";
+    private static final String PREFERENCES_FILENAME = "~/.org.jessies.FatBits";
     
     private Preferences preferences;
     private Robot robot;

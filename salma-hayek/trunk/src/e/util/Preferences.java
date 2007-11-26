@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
+import java.util.regex.*;
 import javax.swing.*;
 
 /**
@@ -25,6 +26,8 @@ import javax.swing.*;
  * @author Elliott Hughes
  */
 public abstract class Preferences {
+    private static final Pattern RESOURCE_PATTERN = Pattern.compile("(?:\\S+(?:\\*|\\.))?(\\S+):\\s*(.+)");
+    
     // Mutable at any time.
     private HashMap<String, Object> preferences = new HashMap<String, Object>();
     // Immutable after initialization.
@@ -206,36 +209,52 @@ public abstract class Preferences {
     }
     
     public void readFromDisk(String filename) {
+        if (FileUtilities.exists(filename) == false) {
+            return;
+        }
         try {
-            org.w3c.dom.Document document = XmlUtilities.readXmlFromDisk(filename);
-            org.w3c.dom.Element root = document.getDocumentElement();
-            
-            for (String key : preferences.keySet()) {
-                if (root.hasAttribute(key)) {
-                    String valueString = root.getAttribute(key);
-                    preferences.put(key, helperForKey(key).decode(valueString));
+            String[] lines = StringUtilities.readLinesFromFile(filename);
+            for (String line : lines) {
+                line = line.trim();
+                if (line.length() == 0 || line.startsWith("#")) {
+                    continue;
                 }
+                processResourceLine(line);
             }
         } catch (Exception ex) {
             Log.warn("Problem reading preferences from \"" + filename + "\"", ex);
         }
     }
     
+    private void processResourceLine(String resourceString) {
+        Matcher matcher = RESOURCE_PATTERN.matcher(resourceString);
+        if (matcher.find()) {
+            String key = matcher.group(1);
+            String valueString = matcher.group(2);
+            preferences.put(key, helperForKey(key).decode(valueString));
+        }
+    }
+    
     public boolean writeToDisk(String filename) {
         try {
-            org.w3c.dom.Document document = XmlUtilities.makeEmptyDocument();
-            org.w3c.dom.Element root = document.createElement("app-preferences");
-            document.appendChild(root);
-            
-            for (String key : preferences.keySet()) {
+            String appName = Log.getApplicationName();
+            StringBuilder result = new StringBuilder();
+            result.append("# " + appName + " preferences\n");
+            for (String key : keysInUiOrder) {
+                if (key == null) {
+                    continue;
+                }
                 // Only write out non-default settings.
                 // That way we can change defaults for things the user doesn't care about without having them using fossilized values.
                 if (preferences.get(key).equals(defaults.get(key)) == false) {
-                    root.setAttribute(key, helperForKey(key).encode(key));
+                    String description = descriptions.get(key);
+                    if (description != null) {
+                        result.append("\n# " + description + "\n");
+                    }
+                    result.append(appName + "*" + key + ": " + helperForKey(key).encode(key) + "\n");
                 }
             }
-            
-            XmlUtilities.writeXmlToDisk(filename, document);
+            StringUtilities.writeFile(FileUtilities.fileFromString(filename), result);
             return true;
         } catch (Exception ex) {
             Log.warn("Problem writing preferences to \"" + filename + "\"", ex);
