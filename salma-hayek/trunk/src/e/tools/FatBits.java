@@ -17,15 +17,12 @@ import e.util.*;
  * those of others.
  */
 public class FatBits extends MainFrame {
+    private static final String PREFERENCES_FILENAME = "~/.org.jessies.FatBits.xml";
+    
+    private Preferences preferences;
     private Robot robot;
     private RepeatingComponentTimer timer;
     private ScaledImagePanel scaledImagePanel;
-    private int scaleFactor;
-    
-    private JSlider scaleSlider;
-    private JCheckBox showCrosshairCheckBox;
-    private JCheckBox showGridCheckBox;
-    private JCheckBox keepOnTopCheckBox;
     
     private JLabel positionLabel;
     
@@ -48,16 +45,24 @@ public class FatBits extends MainFrame {
     }
     
     private JComponent makeUi() {
+        this.preferences = new FatBitsPreferences();
+        preferences.addPreferencesListener(new Preferences.Listener() {
+            public void preferencesChanged() {
+                FatBits.this.setAlwaysOnTop(preferences.getBoolean(FatBitsPreferences.KEEP_ON_TOP));
+                if (scaledImagePanel != null) {
+                    scaledImagePanel.repaint();
+                }
+            }
+        });
+        preferences.readFromDisk(PREFERENCES_FILENAME);
+        
         initAboutBox();
         initMacOsEventHandlers();
         
         initColorLabel();
-        initKeepOnTopCheckBox();
         initPositionLabel();
         initScaledImagePanel();
         initScaleSlider();
-        initShowCrosshairCheckBox();
-        initShowGridCheckBox();
         
         JPanel result = new JPanel(new BorderLayout());
         result.add(scaledImagePanel, BorderLayout.CENTER);
@@ -81,7 +86,7 @@ public class FatBits extends MainFrame {
         Application.getApplication().addApplicationListener(new ApplicationAdapter() {
             @Override
             public void handlePreferences(ApplicationEvent e) {
-                showPreferencesDialog();
+                preferences.showPreferencesDialog(FatBits.this, PREFERENCES_FILENAME);
                 e.setHandled(true);
             }
             
@@ -156,41 +161,11 @@ public class FatBits extends MainFrame {
         colorSwatchLabel.repaint();
     }
     
-    private void initShowCrosshairCheckBox() {
-        this.showCrosshairCheckBox = new JCheckBox("Show crosshair");
-        showCrosshairCheckBox.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                scaledImagePanel.setShowCrosshair(showCrosshairCheckBox.isSelected());
-            }
-        });
-        showCrosshairCheckBox.setSelected(true);
-    }
-    
-    private void initShowGridCheckBox() {
-        this.showGridCheckBox = new JCheckBox("Show grid");
-        showGridCheckBox.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                scaledImagePanel.setShowGrid(showGridCheckBox.isSelected());
-            }
-        });
-        showGridCheckBox.setSelected(false);
-    }
-    
-    private void initKeepOnTopCheckBox() {
-        this.keepOnTopCheckBox = new JCheckBox("Keep window on top");
-        keepOnTopCheckBox.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                FatBits.this.setAlwaysOnTop(keepOnTopCheckBox.isSelected());
-            }
-        });
-        keepOnTopCheckBox.setSelected(false);
-    }
-    
     private void initScaleSlider() {
-        this.scaleSlider = new JSlider(1, 4);
+        final JSlider scaleSlider = new JSlider(1, 4);
         scaleSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                scaleFactor = (1 << scaleSlider.getValue());
+                preferences.put(FatBitsPreferences.SCALE_FACTOR, Integer.valueOf(1 << scaleSlider.getValue()));
                 updatePosition(getPointerLocation());
             }
         });
@@ -202,14 +177,17 @@ public class FatBits extends MainFrame {
         scaleSlider.setPaintLabels(true);
         scaleSlider.setPaintTicks(true);
         scaleSlider.setSnapToTicks(true);
-        scaleSlider.setValue(1);
+        preferences.setCustomUiForKey(FatBitsPreferences.SCALE_FACTOR, scaleSlider);
+        scaleSlider.setValue(preferences.getInt(FatBitsPreferences.SCALE_FACTOR) >> 1);
     }
     
     private int roundLengthDown(int length) {
+        int scaleFactor = preferences.getInt(FatBitsPreferences.SCALE_FACTOR);
         return (length - (length % scaleFactor));
     }
     
     private Rectangle getScreenCaptureBounds(Point center) {
+        int scaleFactor = preferences.getInt(FatBitsPreferences.SCALE_FACTOR);
         Point topLeft = new Point(center.x - scaledImagePanel.getWidth() / (2 * scaleFactor), center.y - scaledImagePanel.getHeight() / (2 * scaleFactor));
         Rectangle result = new Rectangle(topLeft, scaledImagePanel.getSize());
         result.width /= scaleFactor;
@@ -236,8 +214,6 @@ public class FatBits extends MainFrame {
     
     private class ScaledImagePanel extends JComponent {
         private Image image;
-        private boolean showCrosshair;
-        private boolean showGrid;
         
         public ScaledImagePanel() {
             addMouseListener(new MouseAdapter() {
@@ -261,16 +237,6 @@ public class FatBits extends MainFrame {
             return image;
         }
         
-        public void setShowCrosshair(boolean showCrosshair) {
-            this.showCrosshair = showCrosshair;
-            repaint();
-        }
-        
-        public void setShowGrid(boolean showGrid) {
-            this.showGrid = showGrid;
-            repaint();
-        }
-        
         @Override
         public void paintComponent(Graphics g) {
             paintImage(g);
@@ -283,18 +249,19 @@ public class FatBits extends MainFrame {
         }
         
         private void paintCrosshair(Graphics g) {
-            if (showCrosshair == false) {
+            if (preferences.getBoolean(FatBitsPreferences.SHOW_CROSSHAIR) == false) {
                 return;
             }
-            g.setColor(showGrid ? Color.RED : Color.BLACK);
+            g.setColor(preferences.getBoolean(FatBitsPreferences.SHOW_GRID) ? Color.RED : Color.BLACK);
             g.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
             g.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
         }
         
         private void paintGridLines(Graphics g, int xOrigin, int yOrigin) {
-            if (showGrid == false) {
+            if (preferences.getBoolean(FatBitsPreferences.SHOW_GRID) == false) {
                 return;
             }
+            int scaleFactor = preferences.getInt(FatBitsPreferences.SCALE_FACTOR);
             g.setColor(Color.BLACK);
             final int maxX = xOrigin + roundLengthDown(getWidth());
             final int maxY = yOrigin + roundLengthDown(getHeight());
@@ -337,17 +304,21 @@ public class FatBits extends MainFrame {
         }
     }
     
-    private void showPreferencesDialog() {
-        FormBuilder form = new FormBuilder(this, "FatBits Preferences");
-        FormPanel formPanel = form.getFormPanel();
-        formPanel.addRow("Scale:", scaleSlider);
-        formPanel.addRow("", showCrosshairCheckBox);
-        formPanel.addRow("", showGridCheckBox);
-        formPanel.addRow("", keepOnTopCheckBox);
-        form.showNonModal();
+    private static class FatBitsPreferences extends Preferences {
+        private static String SCALE_FACTOR = "scaleFactor";
+        private static String SHOW_CROSSHAIR = "showCrosshair";
+        private static String SHOW_GRID = "showGrid";
+        private static String KEEP_ON_TOP = "keepOnTop";
         // also: [x] refresh only when mouse moves
         //       [ ] show mouse hot-spot
         // alternative grid colors?
+        
+        protected void initPreferences() {
+            addPreference(SCALE_FACTOR, Integer.valueOf(1), "Scale");
+            addPreference(SHOW_CROSSHAIR, Boolean.TRUE, "Show crosshair");
+            addPreference(SHOW_GRID, Boolean.FALSE, "Show grid");
+            addPreference(KEEP_ON_TOP, Boolean.FALSE, "Keep on top");
+        }
     }
     
     private class FatBitsMenuBar extends JMenuBar {
@@ -428,7 +399,7 @@ public class FatBits extends MainFrame {
         }
         
         public void actionPerformed(ActionEvent e) {
-            showPreferencesDialog();
+            preferences.showPreferencesDialog(FatBits.this, PREFERENCES_FILENAME);
         }
     }
     
