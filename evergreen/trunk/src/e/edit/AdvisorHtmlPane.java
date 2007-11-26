@@ -157,11 +157,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             int pointyX = (back ? (x+0) : (x+16));
             int flatX = (back ? (x+16) : (x+0));
-            if (back) {
-                g.fillPolygon(new int[] { flatX, flatX, pointyX }, new int[] { y+0, y+16, y+8 }, 3);
-            } else {
-                g.fillPolygon(new int[] { pointyX, flatX, flatX }, new int[] { y+0, y+16, y+8 }, 3);
-            }
+            g.fillPolygon(new int[] { flatX, flatX, pointyX }, new int[] { y+0, y+16, y+8 }, 3);
         }
     }
     
