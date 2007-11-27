@@ -50,15 +50,23 @@ public class TagReader {
         File tagsFile = File.createTempFile("e.edit.TagReader-tags-", ".tags");
         tagsFile.deleteOnExit();
         
+        ArrayList<String> command = new ArrayList<String>();
+        command.add(chooseCtagsBinary());
+        command.add("--c++-types=+p");
+        command.add("-n");
+        command.add("--fields=+am");
+        command.add("-u");
+        command.add("--regex-java=/(\\bstatic\\b)/\1/S/");
+        command.add("--regex-c++=/(\\bstatic\\b)/\1/S/");
+        if (fileType != null) {
+            command.add("--language-force=" + ctagsLanguageForFileType(fileType));
+        }
+        command.add("-f");
+        command.add(tagsFile.getAbsolutePath());
+        command.add(file.getAbsolutePath());
+        
         ArrayList<String> errors = new ArrayList<String>();
-        ProcessUtilities.backQuote(tagsFile.getParentFile(), new String[] {
-            chooseCtagsBinary(),
-            "--c++-types=+p", "-n", "--fields=+am", "-u",
-            "--regex-java=/(\\bstatic\\b)/\1/S/",
-            "--regex-c++=/(\\bstatic\\b)/\1/S/",
-            "-f", tagsFile.getAbsolutePath(),
-            file.getAbsolutePath()
-        }, errors, errors);
+        ProcessUtilities.backQuote(tagsFile.getParentFile(), command.toArray(new String[command.size()]), errors, errors);
         // We're not actually expecting anything on stdout or stderr from ctags.
         // All the more reason to output anything it has to say!
         for (String error : errors) {
@@ -67,6 +75,44 @@ public class TagReader {
         
         digest = FileUtilities.md5(tagsFile);
         return tagsFile;
+    }
+    
+    public static String ctagsLanguageForFileType(FileType fileType) {
+        switch (fileType) {
+        case ASSEMBLER:
+            return "Asm";
+        case BASH:
+            return "Sh";
+        case C_PLUS_PLUS:
+            return "C++";
+        case C_SHARP:
+            return "C#";
+        case JAVA:
+            return "Java";
+        case JAVA_SCRIPT:
+            return "JavaScript";
+        case MAKE:
+            return "Make";
+        case RUBY:
+            return "Ruby";
+        case PBASIC:
+            return "Basic";
+        case PERL:
+            return "Perl";
+        case PHP:
+            return "PHP";
+        case PYTHON:
+            return "Python";
+        case EMAIL:
+        case PATCH:
+        case TALC:
+        case VHDL:
+        case XML:
+        case PLAIN_TEXT:
+            return null;
+        default:
+            throw new RuntimeException("Don't know what ctags(1) calls \"" + fileType + "\"");
+        }
     }
     
     public String getTagsDigest() {

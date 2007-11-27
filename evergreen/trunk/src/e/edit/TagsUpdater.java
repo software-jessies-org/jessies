@@ -244,16 +244,6 @@ public class TagsUpdater {
             return treeModel;
         }
         
-        public String getFilenameSuffix() {
-            String suffix = ".txt";
-            String filename = FileUtilities.fileFromString(getTextWindow().getFilename()).getName();
-            int lastDot = filename.lastIndexOf('.');
-            if (lastDot != -1) {
-                suffix = filename.substring(lastDot);
-            }
-            return suffix;
-        }
-        
         public void tagFound(TagReader.Tag tag) {
             publish(tag);
         }
@@ -283,26 +273,33 @@ public class TagsUpdater {
         
         public void taggingFailed(Exception ex) {
             successful = false;
-            Evergreen.getInstance().getTagsPanel().showError("<b>Is Exuberant Ctags installed and on your path?</b><p>There was an error reading the tags: " + ex.getMessage());
+            Evergreen.getInstance().getTagsPanel().showError("<b>Is Exuberant Ctags installed and on your path?</b><p>There was an error reading its output: " + ex.getMessage());
         }
         
         public void scanTags() {
             try {
+                FileType fileType = getTextWindow().getFileType();
+                if (TagReader.ctagsLanguageForFileType(fileType) == null) {
+                    Evergreen.getInstance().getTagsPanel().showError("(No symbols available.)");
+                    successful = false;
+                    return;
+                }
+                
                 // Ctags writes the name of the file into its output, so we need to use the same file each time so that md5 hashes can be compared.
                 if (temporaryFile == null) {
-                    // It's important to use the same suffix as the original file, because that's how ctags guesses the file's type, and hence which parser to use.
-                    temporaryFile = File.createTempFile("e.edit.TagsUpdater-", getFilenameSuffix());
+                    temporaryFile = File.createTempFile("e.edit.TagsUpdater-", "");
                     temporaryFile.deleteOnExit();
                 }
                 getTextArea().getTextBuffer().writeToFile(temporaryFile);
                 String charsetName = (String) getTextArea().getTextBuffer().getProperty(PTextBuffer.CHARSET_PROPERTY);
-                TagReader tagReader = new TagReader(temporaryFile, getTextWindow().getFileType(), charsetName, tagsDigest, this);
+                TagReader tagReader = new TagReader(temporaryFile, fileType, charsetName, tagsDigest, this);
                 newDigest = tagReader.getTagsDigest();
                 // See the comment above for why we don't delete our temporary files, except on exit.
                 //temporaryFile.delete();
             } catch (Exception ex) {
                 Evergreen.getInstance().getTagsPanel().showError("Couldn't make tags: " + ex.getMessage());
                 Log.warn("Couldn't make tags", ex);
+                successful = false;
             }
         }
         

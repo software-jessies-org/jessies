@@ -324,6 +324,8 @@ public class ETextWindow extends EWindow implements PTextListener {
         newFileType.configureTextArea(textArea);
         BugDatabaseHighlighter.highlightBugs(textArea);
         initSpellingExceptionsForDocument();
+        // Ensure we re-do the tags now we've changed our mind about what kind of tags we're looking for.
+        tagsUpdater.updateTags();
     }
     
     private void uncheckedRevertToSaved() {
