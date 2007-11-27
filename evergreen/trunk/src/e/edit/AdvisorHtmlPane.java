@@ -161,17 +161,14 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         }
     }
     
-    private Icon makeIcon(boolean back) {
-        // Our custom icon works fine for the Metal LAF, but not for the GTK+ LAF.
-        String gtkStockArrowIconFilename = "/usr/share/icons/gnome/16x16/actions/" + (back ? "back" : "forward") + ".png";
-        return (FileUtilities.exists(gtkStockArrowIconFilename) ? new ImageIcon(gtkStockArrowIconFilename) : new ArrowIcon(back));
-    }
-    
     private class BackAction extends AbstractAction {
         private BackAction() {
             putValue(Action.NAME, "backAction");
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0, false));
-            putValue(Action.SMALL_ICON, makeIcon(true));
+            GnomeStockIcon.useStockIcon(this, "gtk-go-back");
+            if (getValue(Action.SMALL_ICON) == null) {
+                putValue(Action.SMALL_ICON, new ArrowIcon(true));
+            }
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -195,7 +192,10 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     private class ForwardAction extends AbstractAction {
         private ForwardAction() {
             putValue(Action.NAME, "forwardAction");
-            putValue(Action.SMALL_ICON, makeIcon(false));
+            GnomeStockIcon.useStockIcon(this, "gtk-go-forward");
+            if (getValue(Action.SMALL_ICON) == null) {
+                putValue(Action.SMALL_ICON, new ArrowIcon(false));
+            }
         }
         
         public void actionPerformed(ActionEvent e) {
