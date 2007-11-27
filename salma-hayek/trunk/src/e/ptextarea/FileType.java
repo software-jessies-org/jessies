@@ -145,11 +145,11 @@ public enum FileType {
     
     /**
      * There are three main ways to guess a file's type: by content, by name,
-     * or by emacs mode string. The initFileType methods implement this, though
-     * there's no uniform checking for emacs mode strings (the perlrun man page,
-     * for example, mentions "#!/bin/sh -- # -*- perl -*- -p" but we wouldn't
+     * or by emacs mode string.
+     * There's no uniform checking for emacs mode strings.
+     * The perlrun man page mentions "#!/bin/sh -- # -*- perl -*- -p" but we wouldn't
      * currently recognize such a script as a Perl script, even though we would
-     * recognize a C++ files by its emacs mode string).
+     * recognize a C++ file by its emacs mode string.
      */
     public static FileType guessFileType(String filename, CharSequence content) {
         // See if we can infer the type by name first and fall back to guessing
