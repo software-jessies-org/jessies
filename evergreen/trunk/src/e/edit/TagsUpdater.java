@@ -280,7 +280,7 @@ public class TagsUpdater {
             try {
                 FileType fileType = getTextWindow().getFileType();
                 if (TagReader.ctagsLanguageForFileType(fileType) == null) {
-                    Evergreen.getInstance().getTagsPanel().showError("(No symbols available.)");
+                    Evergreen.getInstance().getTagsPanel().showError("(Ctags doesn't support " + fileType.getName() + ".)");
                     successful = false;
                     return;
                 }
