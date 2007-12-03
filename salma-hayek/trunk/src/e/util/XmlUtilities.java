@@ -19,6 +19,12 @@ public class XmlUtilities {
         return document;
     }
     
+    public static Document readXmlFromString(String data) throws Exception {
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document document = builder.parse(new org.xml.sax.InputSource(new StringReader(data)));
+        return document;
+    }
+    
     public static void writeXmlToDisk(String filename, Document document) throws Exception {
         // Set up a Transformer to produce indented XML output.
         Transformer transformer = TransformerFactory.newInstance().newTransformer();

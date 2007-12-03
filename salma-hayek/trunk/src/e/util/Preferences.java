@@ -213,33 +213,52 @@ public abstract class Preferences {
             return;
         }
         try {
-            String[] lines = StringUtilities.readLinesFromFile(filename);
-            for (String line : lines) {
-                line = line.trim();
-                if (line.length() == 0 || line.startsWith("#")) {
-                    continue;
-                }
-                processResourceLine(line);
+            String data = StringUtilities.readFile(filename);
+            if (data.startsWith("<?xml ")) {
+                processXmlString(data);
+            } else {
+                processResourceLines(data.split("\n"));
             }
         } catch (Exception ex) {
             Log.warn("Problem reading preferences from \"" + filename + "\"", ex);
         }
     }
     
-    private void processResourceLine(String resourceString) {
-        Matcher matcher = RESOURCE_PATTERN.matcher(resourceString);
-        if (matcher.find()) {
-            String key = matcher.group(1);
-            String valueString = matcher.group(2);
-            preferences.put(key, helperForKey(key).decode(valueString));
+    // Process the current XML style of preferences written by writeToDisk.
+    private void processXmlString(String data) throws Exception {
+        org.w3c.dom.Document document = XmlUtilities.readXmlFromString(data);
+        org.w3c.dom.Element root = document.getDocumentElement();
+        for (org.w3c.dom.Node node = root.getFirstChild(); node != null; node = node.getNextSibling()) {
+            if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                String key = node.getAttributes().getNamedItem("key").getNodeValue();
+                String value = node.getTextContent();
+                preferences.put(key, helperForKey(key).decode(value));
+            }
+        }
+    }
+    
+    // Process the legacy X11 resources style of preferences (used in old versions of Terminator).
+    private void processResourceLines(String[] lines) {
+        for (String line : lines) {
+            line = line.trim();
+            if (line.length() == 0 || line.startsWith("#")) {
+                continue;
+            }
+            Matcher matcher = RESOURCE_PATTERN.matcher(line);
+            if (matcher.find()) {
+                String key = matcher.group(1);
+                String valueString = matcher.group(2);
+                preferences.put(key, helperForKey(key).decode(valueString));
+            }
         }
     }
     
     public boolean writeToDisk(String filename) {
         try {
-            String appName = Log.getApplicationName();
-            StringBuilder result = new StringBuilder();
-            result.append("# " + appName + " preferences\n");
+            org.w3c.dom.Document document = XmlUtilities.makeEmptyDocument();
+            org.w3c.dom.Element root = document.createElement("preferences");
+            document.appendChild(root);
+            
             for (String key : keysInUiOrder) {
                 if (key == null) {
                     continue;
@@ -249,12 +268,15 @@ public abstract class Preferences {
                 if (preferences.get(key).equals(defaults.get(key)) == false) {
                     String description = descriptions.get(key);
                     if (description != null) {
-                        result.append("\n# " + description + "\n");
+                        root.appendChild(document.createComment(description));
                     }
-                    result.append(appName + "*" + key + ": " + helperForKey(key).encode(key) + "\n");
+                    org.w3c.dom.Element settingElement = document.createElement("setting");
+                    settingElement.setAttribute("key", key);
+                    settingElement.setTextContent(helperForKey(key).encode(key));
+                    root.appendChild(settingElement);
                 }
             }
-            StringUtilities.writeFile(FileUtilities.fileFromString(filename), result);
+            XmlUtilities.writeXmlToDisk(filename, document);
             return true;
         } catch (Exception ex) {
             Log.warn("Problem writing preferences to \"" + filename + "\"", ex);
