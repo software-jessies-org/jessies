@@ -143,20 +143,15 @@ public enum FileType {
         throw new IllegalArgumentException("\"" + name + "\" doesn't denote a FileType");
     }
     
-    /**
-     * There are three main ways to guess a file's type: by content, by name,
-     * or by emacs mode string.
-     * There's no uniform checking for emacs mode strings.
-     * The perlrun man page mentions "#!/bin/sh -- # -*- perl -*- -p" but we wouldn't
-     * currently recognize such a script as a Perl script, even though we would
-     * recognize a C++ file by its emacs mode string.
-     */
     public static FileType guessFileType(String filename, CharSequence content) {
-        // See if we can infer the type by name first and fall back to guessing
-        // from the content. If you don't do it this way round, you get fooled
-        // by files (such as this one) that contain things that look like
-        // suggestive content. It's hard to see that there's ever any excuse
-        // for having the wrong filename extension.
+        // The whole point of emacs mode lines is that they override all other possibilities.
+        FileType modeType = extractFileTypeFromModeLine(content);
+        if (modeType != null) {
+            return modeType;
+        }
+        // See if we can infer the type by name first and fall back to guessing from the content.
+        // If you don't do it this way round, you get fooled by files (such as this one) that contain things that look like suggestive content.
+        // It's hard to see that there's ever any excuse for having the wrong filename extension (and not having an emacs mode line).
         FileType fileType = guessFileTypeByName(filename);
         if (fileType == FileType.PLAIN_TEXT) {
             fileType = guessFileTypeByContent(content);
@@ -234,24 +229,10 @@ public enum FileType {
     
     /**
      * Tests whether the 'content' looks like a C++ file.
-     * 
-     * A standard C++ header file (such as <string>) might not have any extension,
-     * though it's likely in that case start with #ifndef.
-     * 
-     * GNU headers tend to have an emacs mode hint, so let's obey those too (I think
-     * emacs scans the whole file, but GNU headers seem to use the first line).
+     * A standard C++ header file (such as <string>) might not have any extension, though it's likely in that case start with #ifndef.
      */
     private static boolean isCPlusPlusContent(CharSequence content) {
-        // FIXME: this method has an over-simplified idea of emacs mode strings, based on the STL header file usage.
-        // Here are two examples. The former shows that we could use a similar check for Ruby; the latter that we ought to recognize another form, and that we can also potentially find the tab string this way.
-        // hydrogen:/usr/lib/ruby/1.8$ grep -n -- '-\*-' *
-        // getoptlong.rb:1:#                                                         -*- Ruby -*-
-        // yaml.rb:1:# -*- mode: ruby; ruby-indent-level: 4; tab-width: 4 -*- vim: sw=4 ts=4
-        // We should also probably recognize plain C (since our C_PLUS_PLUS means C/C++/Objective-C/Objective-C++):
-        // powerpc-darwin8.0/dl.h:1:/* -*- C -*-
-        // FIXME: emacs mode strings should be handled separately, and override content-based file type determination.
-        // FIXME: gEdit's "modelines" plug-in http://cvs.gnome.org/viewcvs/gedit/plugins/modelines/ details emacs(1), kate(1), and vim(1) mode lines.
-        return Pattern.compile("(#ifndef|" + StringUtilities.regularExpressionFromLiteral("-*- C++ -*-") + ")").matcher(content).find();
+        return Pattern.compile("#ifndef").matcher(content).find();
     }
     
     private static boolean isPatchContent(CharSequence content) {
@@ -261,5 +242,50 @@ public enum FileType {
     /** Tests whether the 'content' looks like XML. */
     private static boolean isXmlContent(CharSequence content) {
         return Pattern.compile("(?i)^<\\?xml").matcher(content).find();
+    }
+    
+    private static FileType extractFileTypeFromModeLine(CharSequence content) {
+        // FIXME: this method has an over-simplified idea of emacs mode lines, based on a few random examples found on an Ubuntu 7.10 system.
+        // FIXME: gEdit's "modelines" plug-in http://cvs.gnome.org/viewcvs/gedit/plugins/modelines/ details emacs(1), kate(1), and vim(1) mode lines.
+        
+        // Here are a few examples.
+        // Ruby:
+        // /usr/lib/ruby/1.8/yaml.rb:1:# -*- mode: ruby; ruby-indent-level: 4; tab-width: 4 -*- vim: sw=4 ts=4
+        //
+        // C++ ("C", "C++", and "linux-c"):
+        // /usr/include/nspr/prvrsion.h:1: /* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+        // /usr/include/gdkmm-2.4/gdkmm.h:1: // This is -*- C++ -*-
+        // /usr/include/nss/preenc.h:1: /* -*- Mode: C; tab-width: 4; indent-tabs-mode: nil -*- */
+        // /usr/include/linux/ticable.h:1: /* Hey EMACS -*- linux-c -*-
+        
+        // The single ' ' after the first -*- and before the last -*- are optional. ("-*-Shell-script-*-" appears to be valid.)
+        // Mode lines are case-insensitive.
+        // The "mode: " is optional.
+        // Emacs only looks at the first two lines.
+        final int LINES_TO_CHECK = 2;
+        // FIXME: does the major mode name always come first? It seems to, but that doesn't mean anything.
+        Pattern modeLinePattern = Pattern.compile("(?i)-\\*- ?(?:mode: )?([^:; ]+).* ?-\\*-");
+        String[] lines = Pattern.compile("\n").split(content, LINES_TO_CHECK + 1);
+        for (int i = 0; i < Math.min(lines.length, LINES_TO_CHECK); ++i) {
+            Matcher matcher = modeLinePattern.matcher(lines[i]);
+            if (matcher.find()) {
+                String possibleMajorModeName = matcher.group(1);
+                // Sometimes multiple Emacs major modes map to a single one of our FileTypes.
+                // Other times, the Emacs major mode has a different name to our corresponding FileType.
+                if (possibleMajorModeName.equalsIgnoreCase("C") || possibleMajorModeName.equalsIgnoreCase("Linux-C")) {
+                    possibleMajorModeName = C_PLUS_PLUS.name;
+                } else if (possibleMajorModeName.equalsIgnoreCase("Makefile")) {
+                    possibleMajorModeName = MAKE.name;
+                } else if (possibleMajorModeName.equalsIgnoreCase("Shell-script")) {
+                    possibleMajorModeName = BASH.name;
+                }
+                for (FileType type : EnumSet.allOf(FileType.class)) {
+                    if (possibleMajorModeName.equalsIgnoreCase(type.name)) {
+                        return type;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
