@@ -14,7 +14,11 @@ import terminator.terminal.*;
 import terminator.view.highlight.*;
 
 public class JTerminalPane extends JPanel {
-	// The probably over-simplified belief here is that Unix terminals always send ^? and Windows always sends ^H.
+	// The probably over-simplified belief here is that Unix terminals always send ^?.
+	// Windows's ReadConsoleInput function always provides applications with ^H, so that's what they expect.
+	// Cygwin telnet unhelpfully doesn't translate this to ^?, unlike PuTTY.
+	// Cygwin ssh tells the server to expect ^H, which means that backspace works, although the Emacs help is hidden.
+	// Search the change log for "backspace" for more information.
 	private static final String ERASE_STRING = String.valueOf(GuiUtilities.isWindows() ? Ascii.BS : Ascii.DEL);
 	
 	private TerminalControl control;
