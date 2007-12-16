@@ -396,8 +396,19 @@ public class TerminatorFrame extends JFrame {
 			// Add a menu bar.
 			JMenuBar menuBar = new TerminatorMenuBar();
 			setJMenuBar(menuBar);
-			// Work around Sun bug 4949810.
+			
+			// Work around Sun bug 4949810 (setJMenuBar doesn't call revalidate/repaint).
 			menuBar.revalidate();
+			
+			// Work around Sun bug 6526971 (quick alt-tabbing on Windows can give focus to menu bar).
+			if (GuiUtilities.isWindows()) {
+				addWindowFocusListener(new WindowAdapter() {
+					@Override
+					public void windowLostFocus(WindowEvent e) {
+						MenuSelectionManager.defaultManager().clearSelectedPath();
+					}
+				});
+			}
 		}
 		
 		for (JTerminalPane terminal : terminals) {
