@@ -103,6 +103,10 @@ public abstract class Preferences {
         firePreferencesChanged();
     }
     
+    public Object get(String key) {
+        return preferences.get(key);
+    }
+    
     public String getString(String key) {
         return (String) preferences.get(key);
     }
@@ -123,7 +127,7 @@ public abstract class Preferences {
         return (Integer) preferences.get(key);
     }
     
-    public void showPreferencesDialog(final JFrame parent, final String filename) {
+    public void showPreferencesDialog(final Frame parent, final String filename) {
         // We can't keep reusing a form that we create just once, because you can't change the owner of an existing JDialog.
         // But we don't want to pop up another dialog if one's already up, so defer to the last one if it's still up.
         if (form != null) {
@@ -177,7 +181,7 @@ public abstract class Preferences {
                 if (customUis.get(key) != null) {
                     generalPanel.addRow(description + ":", customUis.get(key));
                 } else {
-                    helperForKey(key).addRow(formPanels, key);
+                    helperForKey(key).addRow(formPanels, key, description);
                 }
             }
         }
@@ -232,7 +236,7 @@ public abstract class Preferences {
             if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
                 String key = node.getAttributes().getNamedItem("key").getNodeValue();
                 String value = node.getTextContent();
-                preferences.put(key, helperForKey(key).decode(value));
+                decodePreference(key, value);
             }
         }
     }
@@ -248,8 +252,17 @@ public abstract class Preferences {
             if (matcher.find()) {
                 String key = matcher.group(1);
                 String valueString = matcher.group(2);
-                preferences.put(key, helperForKey(key).decode(valueString));
+                decodePreference(key, valueString);
             }
+        }
+    }
+    
+    private void decodePreference(String key, String valueString) {
+        PreferencesHelper helper = helperForKey(key);
+        if (helper != null) {
+            preferences.put(key, helper.decode(valueString));
+        } else {
+            Log.warn("No PreferencesHelper for key \"" + key + "\" with encoded value \"" + valueString + "\"");
         }
     }
     
@@ -285,22 +298,27 @@ public abstract class Preferences {
     }
     
     private PreferencesHelper helperForKey(String key) {
-        return helpers.get(preferences.get(key).getClass());
+        Object currentValue = preferences.get(key);
+        return (currentValue == null) ? null : helpers.get(currentValue.getClass());
     }
     
     // This interface isn't generic because we only have raw Object values in the HashMap.
     public interface PreferencesHelper {
         public String encode(String key);
         public Object decode(String valueString);
-        public void addRow(List<FormPanel> formPanels, String key);
+        public void addRow(List<FormPanel> formPanels, String key, final String description);
+    }
+    
+    protected void setHelperForClass(Class<?> c, PreferencesHelper helper) {
+        helpers.put(c, helper);
     }
     
     private void initHelpers() {
-        helpers.put(Boolean.class, new BooleanHelper());
-        helpers.put(Color.class, new ColorHelper());
-        helpers.put(Font.class, new FontHelper());
-        helpers.put(Integer.class, new IntegerHelper());
-        helpers.put(String.class, new StringHelper());
+        setHelperForClass(Boolean.class, new BooleanHelper());
+        setHelperForClass(Color.class, new ColorHelper());
+        setHelperForClass(Font.class, new FontHelper());
+        setHelperForClass(Integer.class, new IntegerHelper());
+        setHelperForClass(String.class, new StringHelper());
     }
     
     private class BooleanHelper implements PreferencesHelper {
@@ -312,8 +330,8 @@ public abstract class Preferences {
             return Boolean.valueOf(valueString);
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key) {
-            final JCheckBox checkBox = new JCheckBox(descriptions.get(key), getBoolean(key));
+        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
+            final JCheckBox checkBox = new JCheckBox(description, getBoolean(key));
             checkBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     put(key, checkBox.isSelected());
@@ -342,7 +360,7 @@ public abstract class Preferences {
             return Font.decode(valueString);
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key) {
+        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
             final JComboBox comboBox = new JComboBox();
             // FIXME: filter out unsuitable fonts. "Zapf Dingbats", for example.
             // FIXME: pull fixed fonts to the top of the list?
@@ -370,7 +388,7 @@ public abstract class Preferences {
                     return result;
                 }
             });
-            formPanels.get(0).addRow(descriptions.get(key) + ":", comboBox);
+            formPanels.get(0).addRow(description + ":", comboBox);
         }
         
         private void updateComboBoxFont(String key, JComboBox comboBox) {
@@ -392,7 +410,7 @@ public abstract class Preferences {
             return Color.decode(valueString);
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key) {
+        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
             final ColorSwatchIcon icon = new ColorSwatchIcon(getColor(key), new Dimension(60, 20));
             final JButton button = new JButton(icon);
             button.addActionListener(new ActionListener() {
@@ -416,7 +434,7 @@ public abstract class Preferences {
             }
             
             // FIXME: colorPreferences.put(key, colorPreference);
-            formPanels.get(1).addRow(descriptions.get(key) + ":", button);
+            formPanels.get(1).addRow(description + ":", button);
         }
     }
     
@@ -429,7 +447,7 @@ public abstract class Preferences {
             return Integer.valueOf(valueString);
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key) {
+        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
             final ETextField textField = new ETextField(preferences.get(key).toString()) {
                 @Override
                 public void textChanged() {
@@ -446,7 +464,7 @@ public abstract class Preferences {
                     setForeground(okay ? UIManager.getColor("TextField.foreground") : Color.RED);
                 }
             };
-            formPanels.get(0).addRow(descriptions.get(key) + ":", textField);
+            formPanels.get(0).addRow(description + ":", textField);
         }
     }
     
@@ -459,7 +477,7 @@ public abstract class Preferences {
             return valueString;
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key) {
+        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
             final ETextField textField = new ETextField(preferences.get(key).toString(), 20) {
                 @Override
                 public void textChanged() {
@@ -467,7 +485,7 @@ public abstract class Preferences {
                 }
             };
             textField.setCaretPosition(0);
-            formPanels.get(0).addRow(descriptions.get(key) + ":", textField);
+            formPanels.get(0).addRow(description + ":", textField);
         }
     }
 }
