@@ -157,17 +157,8 @@ public abstract class Preferences {
         List<FormPanel> formPanels = form.getFormPanels();
         FormPanel generalPanel = formPanels.get(0);
         FormPanel colorsPanel = hasColors ? formPanels.get(1) : null;
-        Map<String, ColorHelper> colorPreferences = new HashMap<String, ColorHelper>();
         
-        // FIXME: need some general way to add color scheme support so people don't have to mess about with individual colors.
-        /*
-        // Offer various preset color combinations.
-        // Note that these get fossilized into the user's preferences; updating values here doesn't affect users who've already clicked the button.
-        colorsPanel.addRow("Presets:", makePresetButton(colorPreferences, "  Terminator  ", VERY_DARK_BLUE, NEAR_WHITE, Color.GREEN, SELECTION_BLUE));
-        colorsPanel.addRow("", makePresetButton(colorPreferences, "Black on White", Color.WHITE, NEAR_BLACK, Color.BLUE, LIGHT_BLUE));
-        colorsPanel.addRow("", makePresetButton(colorPreferences, "Green on Black", Color.BLACK, NEAR_GREEN, Color.GREEN, SELECTION_BLUE));
-        colorsPanel.addRow("", makePresetButton(colorPreferences, "White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, Color.DARK_GRAY));
-        */
+        willAddRows(formPanels);
         
         for (String key : keysInUiOrder) {
             if (key == null) {
@@ -185,6 +176,8 @@ public abstract class Preferences {
                 }
             }
         }
+        
+        didAddRows(formPanels);
         
         // Save the preferences if the user hits "Save".
         form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
@@ -210,6 +203,16 @@ public abstract class Preferences {
         
         form.getFormDialog().setRememberBounds(false);
         form.show("Save");
+    }
+    
+    // Override this to add rows before the automatic ones.
+    protected void willAddRows(List<FormPanel> formPanels) {
+        // Don't add code here. This is for subclasses!
+    }
+    
+    // Override this to add rows after the automatic ones.
+    protected void didAddRows(List<FormPanel> formPanels) {
+        // Don't add code here. This is for subclasses!
     }
     
     public void readFromDisk(String filename) {
@@ -433,7 +436,6 @@ public abstract class Preferences {
                 button.putClientProperty("JButton.buttonType", "gradient"); // Mac OS 10.5
             }
             
-            // FIXME: colorPreferences.put(key, colorPreference);
             formPanels.get(1).addRow(description + ":", button);
         }
     }
