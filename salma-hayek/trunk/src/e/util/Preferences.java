@@ -364,25 +364,27 @@ public abstract class Preferences {
         }
         
         public void addRow(List<FormPanel> formPanels, final String key, final String description) {
-            final JComboBox comboBox = new JComboBox();
-            // FIXME: filter out unsuitable fonts. "Zapf Dingbats", for example.
-            // FIXME: pull fixed fonts to the top of the list?
-            for (String name : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
-                comboBox.addItem(name);
-            }
-            comboBox.setSelectedItem(getFont(key).getFamily());
-            updateComboBoxFont(key, comboBox);
-            comboBox.addActionListener(new ActionListener() {
+            final JComboBox fontNameComboBox = makeFontNameComboBox(key);
+            final JComboBox fontSizeComboBox = makeFontSizeComboBox(key);
+            
+            // updateComboBoxFont (below) sets the combo box font so that when you choose a font you can see a preview.
+            // Ensure that when the font name or font size changes, we call updateComboBoxFont.
+            ActionListener actionListener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    // FIXME: we need a component that lets you choose a size as well as a family! (choosing a style probably isn't necessary for any of our applications, though.)
-                    put(key, new Font(comboBox.getSelectedItem().toString(), Font.PLAIN, 12));
-                    updateComboBoxFont(key, comboBox);
+                    put(key, new Font(fontNameComboBox.getSelectedItem().toString(), Font.PLAIN, Integer.parseInt(fontSizeComboBox.getSelectedItem().toString())));
+                    updateComboBoxFont(key, fontNameComboBox);
                 }
-            });
-            // updateComboBoxFont sets the combo box font so that when you choose a font you can see a preview.
-            // The alternatives in the pop-up menu, though, should either use their own fonts (which has a habit of causing performance problems) or the default combo box pop-up font. This renderer ensures the latter.
-            final ListCellRenderer defaultRenderer = comboBox.getRenderer();
-            comboBox.setRenderer(new ListCellRenderer() {
+            };
+            updateComboBoxFont(key, fontNameComboBox);
+            fontNameComboBox.addActionListener(actionListener);
+            fontSizeComboBox.addActionListener(actionListener);
+            
+            // It's too expensive to show a preview of every possible font when the user pulls up the combo box's menu, sadly.
+            // You can do it if you're determined, by caching images at install-time like MS Word.
+            // A better choice on our budget would probably be writing our own JFontChooser along the lines of the GTK+ font chooser (which includes a preview).
+            // In the meantime, this renderer ensures that we don't use the currently selected font to mislead, but use the default combo box pop-up font instead.
+            final ListCellRenderer defaultRenderer = fontNameComboBox.getRenderer();
+            fontNameComboBox.setRenderer(new ListCellRenderer() {
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     Component result = defaultRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                     if (index != -1) {
@@ -391,11 +393,33 @@ public abstract class Preferences {
                     return result;
                 }
             });
-            formPanels.get(0).addRow(description + ":", comboBox);
+            
+            // Stick the two combo boxes (font name and font size) together.
+            JPanel fontChooser = new JPanel(new BorderLayout());
+            fontChooser.add(fontNameComboBox, BorderLayout.CENTER);
+            fontChooser.add(fontSizeComboBox, BorderLayout.EAST);
+            formPanels.get(0).addRow(description + ":", fontChooser);
         }
         
-        private void updateComboBoxFont(String key, JComboBox comboBox) {
-            comboBox.setFont(getFont(key).deriveFont(comboBox.getFont().getSize2D()));
+        private JComboBox makeFontNameComboBox(String key) {
+            JComboBox fontNameComboBox = new JComboBox();
+            // FIXME: filter out unsuitable fonts. "Zapf Dingbats", for example.
+            // FIXME: pull fixed fonts to the top of the list?
+            for (String name : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
+                fontNameComboBox.addItem(name);
+            }
+            fontNameComboBox.setSelectedItem(getFont(key).getFamily());
+            return fontNameComboBox;
+        }
+        
+        private JComboBox makeFontSizeComboBox(String key) {
+            JComboBox fontSizeComboBox = new JComboBox(new Integer[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 56, 64, 72 });
+            fontSizeComboBox.setSelectedItem(getFont(key).getSize());
+            return fontSizeComboBox;
+        }
+        
+        private void updateComboBoxFont(String key, JComboBox fontNameComboBox) {
+            fontNameComboBox.setFont(getFont(key).deriveFont(fontNameComboBox.getFont().getSize2D()));
         }
     }
     
