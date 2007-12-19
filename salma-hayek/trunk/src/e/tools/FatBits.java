@@ -17,8 +17,6 @@ import e.util.*;
  * those of others.
  */
 public class FatBits extends MainFrame {
-    private static final String PREFERENCES_FILENAME = "~/.org.jessies.FatBits";
-    
     private Preferences preferences;
     private Robot robot;
     private RepeatingComponentTimer timer;
@@ -54,7 +52,7 @@ public class FatBits extends MainFrame {
                 }
             }
         });
-        preferences.readFromDisk(PREFERENCES_FILENAME);
+        preferences.readFromDisk();
         
         initAboutBox();
         initMacOsEventHandlers();
@@ -86,7 +84,7 @@ public class FatBits extends MainFrame {
         Application.getApplication().addApplicationListener(new ApplicationAdapter() {
             @Override
             public void handlePreferences(ApplicationEvent e) {
-                preferences.showPreferencesDialog(FatBits.this, PREFERENCES_FILENAME);
+                preferences.showPreferencesDialog(FatBits.this);
                 e.setHandled(true);
             }
             
@@ -313,6 +311,10 @@ public class FatBits extends MainFrame {
         //       [ ] show mouse hot-spot
         // alternative grid colors?
         
+        protected String getPreferencesFilename() {
+            return "~/.org.jessies.FatBits";
+        }
+        
         protected void initPreferences() {
             addPreference(SCALE_FACTOR, Integer.valueOf(1), "Scale");
             addPreference(SHOW_CROSSHAIR, Boolean.TRUE, "Show crosshair");
@@ -399,7 +401,7 @@ public class FatBits extends MainFrame {
         }
         
         public void actionPerformed(ActionEvent e) {
-            preferences.showPreferencesDialog(FatBits.this, PREFERENCES_FILENAME);
+            preferences.showPreferencesDialog(FatBits.this);
         }
     }
     
