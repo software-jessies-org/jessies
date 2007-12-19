@@ -49,6 +49,10 @@ public abstract class Preferences {
         initPreferences();
     }
     
+    // Override this so we know where to read from and write to.
+    protected abstract String getPreferencesFilename();
+    
+    // Override this to call addPreference and addSeparator to set up your defaults.
     protected abstract void initPreferences();
     
     public interface Listener {
@@ -127,7 +131,7 @@ public abstract class Preferences {
         return (Integer) preferences.get(key);
     }
     
-    public void showPreferencesDialog(final Frame parent, final String filename) {
+    public void showPreferencesDialog(final Frame parent) {
         // We can't keep reusing a form that we create just once, because you can't change the owner of an existing JDialog.
         // But we don't want to pop up another dialog if one's already up, so defer to the last one if it's still up.
         if (form != null) {
@@ -182,9 +186,9 @@ public abstract class Preferences {
         // Save the preferences if the user hits "Save".
         form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
             public Boolean call() {
-                boolean saved = writeToDisk(filename);
+                boolean saved = writeToDisk();
                 if (saved == false) {
-                    SimpleDialog.showAlert(parent, "Couldn't save preferences.", "There was a problem writing preferences to \"" + filename + "\".");
+                    SimpleDialog.showAlert(parent, "Couldn't save preferences.", "There was a problem writing preferences to \"" + getPreferencesFilename() + "\".");
                 } else {
                     form = null;
                 }
@@ -215,19 +219,20 @@ public abstract class Preferences {
         // Don't add code here. This is for subclasses!
     }
     
-    public void readFromDisk(String filename) {
-        if (FileUtilities.exists(filename) == false) {
-            return;
-        }
+    public void readFromDisk() {
+        String filename = getPreferencesFilename();
         try {
-            String data = StringUtilities.readFile(filename);
+            if (FileUtilities.exists(filename) == false) {
+                return;
+            }
+            String data = StringUtilities.readFile(getPreferencesFilename());
             if (data.startsWith("<?xml ")) {
                 processXmlString(data);
             } else {
                 processResourceLines(data.split("\n"));
             }
         } catch (Exception ex) {
-            Log.warn("Problem reading preferences from \"" + filename + "\"", ex);
+            Log.warn("Problem reading preferences from \"" + getPreferencesFilename() + "\"", ex);
         }
     }
     
@@ -269,7 +274,8 @@ public abstract class Preferences {
         }
     }
     
-    public boolean writeToDisk(String filename) {
+    public boolean writeToDisk() {
+        String filename = getPreferencesFilename();
         try {
             org.w3c.dom.Document document = XmlUtilities.makeEmptyDocument();
             org.w3c.dom.Element root = document.createElement("preferences");
