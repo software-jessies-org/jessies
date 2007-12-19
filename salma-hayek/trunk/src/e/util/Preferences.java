@@ -395,7 +395,7 @@ public abstract class Preferences {
             });
             
             // Stick the two combo boxes (font name and font size) together.
-            JPanel fontChooser = new JPanel(new BorderLayout());
+            JPanel fontChooser = new JPanel(new BorderLayout(2, 0));
             fontChooser.add(fontNameComboBox, BorderLayout.CENTER);
             fontChooser.add(fontSizeComboBox, BorderLayout.EAST);
             formPanels.get(0).addRow(description + ":", fontChooser);
