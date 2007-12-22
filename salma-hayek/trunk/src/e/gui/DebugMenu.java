@@ -345,9 +345,13 @@ public class DebugMenu {
         ui.add(buttonPanel, BorderLayout.NORTH);
         ui.add(content, BorderLayout.CENTER);
         
-        JFrame frame = new MainFrame(title);
+        JFrame frame = new JFrame(title);
         frame.setContentPane(ui);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
         frame.setSize(size);
+        JFrameUtilities.constrainToScreen(frame);
+        JFrameUtilities.setFrameIcon(frame);
         frame.setVisible(true);
         return frame;
     }
