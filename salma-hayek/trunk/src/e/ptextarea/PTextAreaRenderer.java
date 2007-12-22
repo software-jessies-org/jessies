@@ -39,19 +39,21 @@ final class PTextAreaRenderer {
             
             Rectangle bounds = g.getClipBounds();
             
-            // Paint the background, if need be.
+            // Paint what parts of the background we need to paint.
+            int paintableBackgroundWidth;
             boolean disabledGtk = (textArea.isEnabled() == false && GuiUtilities.isGtk());
+            if (disabledGtk) {
+                // The whole background should appear disabled.
+                paintableBackgroundWidth = bounds.width;
+                g.setColor(disabledLabel.getBackground());
+            } else {
+                // Only paint that part of the background that isn't part of the right-hand margin.
+                paintableBackgroundWidth = paintRightHandMargin(bounds);
+                g.setColor(textArea.getBackground());
+            }
+            // Paint the uninteresting white background, if we're opaque.
+            // Otherwise leave that part alone for any JViewport watermark to show through.
             if (textArea.isOpaque()) {
-                int paintableBackgroundWidth;
-                if (disabledGtk) {
-                    // The whole background should appear disabled.
-                    paintableBackgroundWidth = bounds.width;
-                    g.setColor(disabledLabel.getBackground());
-                } else {
-                    // Only paint that part of the background that isn't part of the right-hand margin.
-                    paintableBackgroundWidth = paintRightHandMargin(bounds);
-                    g.setColor(textArea.getBackground());
-                }
                 g.fillRect(bounds.x, bounds.y, paintableBackgroundWidth, bounds.height);
             }
             
@@ -117,7 +119,7 @@ final class PTextAreaRenderer {
     
     /**
      * Draws the right-hand margin, and returns the width of the rectangle from bounds.x that should be filled with the non-margin background color.
-     * Using this in render when we paint the whole component's background lets us avoid unnecessary flicker caused by filling the area twice.
+     * Using this in "render" when we paint the whole component's background lets us avoid unnecessary flicker caused by filling the area twice.
      */
     private int paintRightHandMargin(Rectangle bounds) {
         int whiteBackgroundWidth = bounds.width;
