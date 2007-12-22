@@ -66,6 +66,10 @@ public class Advisor extends JPanel {
     
     public synchronized void showDocumentation() {
         advicePane.clearAdvice();
+        // Really, we want getFrame().toFront(), but GNOME breaks that, so we have to work around it.
+        if (getFrame().isVisible()) {
+            getFrame().setVisible(false);
+        }
         getFrame().setVisible(true);
         startResearch(getSearchTerm());
     }
