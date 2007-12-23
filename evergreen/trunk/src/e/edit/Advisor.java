@@ -57,9 +57,18 @@ public class Advisor extends JPanel {
     
     private synchronized JFrame getFrame() {
         if (frame == null) {
-            frame = JFrameUtilities.makeSimpleWindow("Evergreen Documentation Browser", this);
+            final String frameTitle = "Evergreen Documentation Browser";
+            frame = JFrameUtilities.makeSimpleWindow(frameTitle, this);
             frame.setSize(new Dimension(600, 500));
             JFrameUtilities.closeOnKeyStroke(frame, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false));
+            // We use the frameTitle constant rather than asking the frame for its title so if we change the title, we don't break this code.
+            JFrameUtilities.restoreBounds(frameTitle, frame);
+            frame.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    JFrameUtilities.storeBounds(frameTitle, frame);
+                }
+            });
         }
         return frame;
     }
