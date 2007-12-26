@@ -493,7 +493,7 @@ public class JTerminalPane extends JPanel {
 		private String getUtf8ForKeyEvent(KeyEvent e) {
 			char ch = e.getKeyChar();
 			// Interpret the alt key as meta if that's what the user asked for. 
-			if (Options.getSharedInstance().shouldUseAltKeyAsMeta() && e.isAltDown()) {
+			if (Terminator.getPreferences().getBoolean(TerminatorPreferences.USE_ALT_AS_META) && e.isAltDown()) {
 				return Ascii.ESC + String.valueOf(e.getKeyChar());
 			}
 			if (e.isControlDown() && ch == '\t') {
@@ -619,7 +619,7 @@ public class JTerminalPane extends JPanel {
 		 * result of a key press/release/type.
 		 */
 		public void scroll() {
-			if (Options.getSharedInstance().isScrollKey()) {
+			if (Terminator.getPreferences().getBoolean(TerminatorPreferences.SCROLL_ON_KEY_PRESS)) {
 				view.scrollToBottomButNotHorizontally();
 				waitForCorrespondingOutputTimer.stop();
 				waitForCursorStabilityTimer.stop();

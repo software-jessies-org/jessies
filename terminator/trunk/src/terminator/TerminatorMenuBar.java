@@ -602,7 +602,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		@Override
 		protected void performPaneAction(JTerminalPane terminalPane) {
 			Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, terminalPane);
-			Options.getSharedInstance().showPreferencesDialog(frame);
+			Terminator.getPreferences().showPreferencesDialog(frame);
 		}
 	}
 }

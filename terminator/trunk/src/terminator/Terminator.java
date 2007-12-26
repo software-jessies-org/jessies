@@ -3,7 +3,7 @@ package terminator;
 import com.apple.eawt.*;
 import e.gui.*;
 import e.util.*;
-import java.awt.EventQueue;
+import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -13,6 +13,9 @@ import terminator.view.*;
 public class Terminator {
 	private static final Terminator INSTANCE = new Terminator();
 	
+	private TerminatorPreferences preferences;
+	private Color boldForegroundColor;
+	
 	private List<String> arguments;
 	private Frames frames = new Frames();
 	
@@ -20,9 +23,66 @@ public class Terminator {
 		return INSTANCE;
 	}
 	
+	public static TerminatorPreferences getPreferences() {
+		return INSTANCE.preferences;
+	}
+	
 	private Terminator() {
+		initPreferences();
 		initAboutBox();
 		initMacOsEventHandlers();
+	}
+	
+	private void initPreferences() {
+		preferences = new TerminatorPreferences();
+		preferences.addPreferencesListener(new Preferences.Listener() {
+			public void preferencesChanged() {
+				optionsDidChange();
+			}
+		});
+		preferences.readFromDisk();
+	}
+	
+	public Color getBoldColor() {
+		return boldForegroundColor;
+	}
+	
+	/**
+	 * Tries to get a good bold foreground color.
+	 * This is equivalent to "colorBD" in XTerm, but isn't under the control of the user.
+	 * This is mainly a historical accident.
+	 * (But as long as no-one cares, it's quite nice that we automatically choose a good bold color.)
+	 */
+	private void updateBoldForegroundColor() {
+		Color foreground = preferences.getColor(TerminatorPreferences.FOREGROUND_COLOR);
+		
+		// If the color is one of the "standard" colors, use the corresponding bright variant.
+		for (int i = 0; i < 8; ++i) {
+			Color color = AnsiColor.byIndex(i);
+			if (foreground.equals(color)) {
+				boldForegroundColor = AnsiColor.byIndex(i + 8);
+				return;
+			}
+		}
+		
+		// That didn't work, so try to invent a suitable color.
+		// The typical use of boldForegroundColor is to turn off-white into pure white or off-black.
+		// One approach might be to use the NTSC or HDTV luminance formula, but it's not obvious that they generalize to other colors.
+		// Adjusting each component individually if it's close to full-on or full-off is simple and seems like it might generalize.
+		boldForegroundColor = new Color(adjustForBD(foreground.getRed()), adjustForBD(foreground.getGreen()), adjustForBD(foreground.getBlue()));
+	}
+	
+	private static int adjustForBD(int component) {
+		// These limits are somewhat arbitrary "round" hex numbers.
+		// 0x11 would be too close to the LCD "blacker than black".
+		// The default XTerm normal-intensity and bold blacks differ by 0x30.
+		if (component < 0x33) {
+			return 0x00;
+		} else if (component > 0xcc) {
+			return 0xff;
+		} else {
+			return component;
+		}
 	}
 	
 	private void initMacOsEventHandlers() {
@@ -48,7 +108,7 @@ public class Terminator {
 			
 			@Override
 			public void handlePreferences(ApplicationEvent e) {
-				Options.getSharedInstance().showPreferencesDialog(null);
+				preferences.showPreferencesDialog(null);
 				e.setHandled(true);
 			}
 			
@@ -84,7 +144,18 @@ public class Terminator {
 	
 	// Returns whether we started the UI.
 	public boolean parseCommandLine(final String[] argumentArray, PrintWriter out) throws IOException {
-		arguments = Options.getSharedInstance().parseCommandLine(argumentArray);
+		// Ignore "-xrm <resource-string>" argument pairs.
+		this.arguments = new ArrayList<String>();
+		for (int i = 0; i < argumentArray.length; ++i) {
+			if (argumentArray[i].equals("-xrm")) {
+				// FIXME: we want the ability to override preferences on a per-terminal (or just per-window?) basis. GNOME Terminal works around this by letting each terminal choose a "profile", rather than offering the ability to override arbitrary preferences.
+				//String resourceString = arguments[++i];
+				//processResourceString(resourceString);
+			} else {
+				arguments.add(argumentArray[i]);
+			}
+		}
+		
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
 			showUsage(out);
 		} else {
@@ -120,9 +191,11 @@ public class Terminator {
 	}
 	
 	/**
-	 * Invoked by the preferences dialog whenever an option is changed.
+	 * Invoked (via our Preferences.Listener, above) by the preferences dialog whenever an option is changed.
 	 */
-	public void optionsDidChange() {
+	private void optionsDidChange() {
+		updateBoldForegroundColor();
+		
 		// On the Mac, the Command key (called 'meta' by Java) is always used for keyboard equivalents.
 		// On other systems, Control tends to be used, but in the special case of terminal emulators this conflicts with the ability to type control characters.
 		// The traditional work-around has always been to use Alt, which -- conveniently for Mac users -- is in the same place on a PC keyboard as Command on a Mac keyboard.
@@ -131,7 +204,7 @@ public class Terminator {
 		// At the moment, we assume that Linux users who want characters not on their keyboard will switch keyboard mapping dynamically (which works fine).
 		// We can avoid the question on Mac OS for now because disabling input methods doesn't currently work properly, and we don't get the key events anyway.
 		if (GuiUtilities.isMacOs() == false) {
-			GuiUtilities.setDefaultKeyStrokeModifier(Options.getSharedInstance().shouldUseAltKeyAsMeta() ? java.awt.event.KeyEvent.SHIFT_MASK | java.awt.event.KeyEvent.CTRL_MASK : java.awt.event.KeyEvent.ALT_MASK);
+			GuiUtilities.setDefaultKeyStrokeModifier(preferences.getBoolean(TerminatorPreferences.USE_ALT_AS_META) ? java.awt.event.KeyEvent.SHIFT_MASK | java.awt.event.KeyEvent.CTRL_MASK : java.awt.event.KeyEvent.ALT_MASK);
 		}
 		
 		for (int i = 0; i < frames.size(); ++i) {
@@ -174,16 +247,11 @@ public class Terminator {
 		}
 		return result;
 	}
-
+	
 	private static void showUsage(Appendable out) {
 		try {
 			GuiUtilities.finishGnomeStartup();
-			out.append("Usage: terminator [--help] [-xrm <resource-string>]... [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
-			out.append("\n");
-			out.append("Current resource settings:\n");
-			Options.getSharedInstance().writeOptions(out, true);
-			out.append("\n");
-			out.append("Terminator only uses resources of class Terminator and only from the command line, not from your .Xdefaults and .Xresources files.\n");
+			out.append("Usage: terminator [--help] [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
 		} catch (IOException ex) {
 			// Who cares?
 		}

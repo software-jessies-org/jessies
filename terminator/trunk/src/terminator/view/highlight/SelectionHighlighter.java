@@ -32,12 +32,12 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		
 		@Override
 		public Color getBackground() {
-			return (focused ? Options.getSharedInstance().getColor("selectionColor") : unfocusedSelectionColor);
+			return (focused ? Terminator.getPreferences().getColor(TerminatorPreferences.SELECTION_COLOR) : unfocusedSelectionColor);
 		}
 		
 		@Override
 		public Color getForeground() {
-			return Options.getSharedInstance().getColor("foreground");
+			return Terminator.getPreferences().getColor(TerminatorPreferences.FOREGROUND_COLOR);
 		}
 		
 		@Override

@@ -114,6 +114,7 @@ public class TerminatorFrame extends JFrame {
 				Terminator.getSharedInstance().getFrames().frameStateChanged();
 			}
 		});
+		initMenuBar();
 		initTerminals();
 		optionsDidChange();
 		
@@ -133,6 +134,23 @@ public class TerminatorFrame extends JFrame {
 		// And sometimes we have more...
 		for (int i = 1; i < terminals.size(); ++i) {
 			addPaneToUI(terminals.get(i));
+		}
+	}
+	
+	private void initMenuBar() {
+		setJMenuBar(new TerminatorMenuBar());
+		
+		// Work around Sun bug 4949810 (setJMenuBar doesn't call revalidate/repaint).
+		getJMenuBar().revalidate();
+		
+		// Work around Sun bug 6526971 (quick alt-tabbing on Windows can give focus to menu bar).
+		if (GuiUtilities.isWindows()) {
+			addWindowFocusListener(new WindowAdapter() {
+				@Override
+				public void windowLostFocus(WindowEvent e) {
+					MenuSelectionManager.defaultManager().clearSelectedPath();
+				}
+			});
 		}
 	}
 	
@@ -374,7 +392,7 @@ public class TerminatorFrame extends JFrame {
 	 */
 	private void updateBackground() {
 		if (GuiUtilities.isMacOs() == false) {
-			setBackground(terminals.size() > 1 ? originalBackground : Options.getSharedInstance().getColor("background"));
+			setBackground(terminals.size() > 1 ? originalBackground : Terminator.getPreferences().getColor(TerminatorPreferences.BACKGROUND_COLOR));
 		}
 	}
 	
@@ -385,32 +403,12 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	private void updateTransparency() {
-		GuiUtilities.setFrameAlpha(this, Options.getSharedInstance().getAlpha());
+		GuiUtilities.setFrameAlpha(this, Terminator.getPreferences().getDouble(TerminatorPreferences.ALPHA));
 	}
 	
 	public void optionsDidChange() {
 		updateBackground();
 		updateTransparency();
-		
-		if (Options.getSharedInstance().shouldUseMenuBar() && getJMenuBar() == null) {
-			// Add a menu bar.
-			JMenuBar menuBar = new TerminatorMenuBar();
-			setJMenuBar(menuBar);
-			
-			// Work around Sun bug 4949810 (setJMenuBar doesn't call revalidate/repaint).
-			menuBar.revalidate();
-			
-			// Work around Sun bug 6526971 (quick alt-tabbing on Windows can give focus to menu bar).
-			if (GuiUtilities.isWindows()) {
-				addWindowFocusListener(new WindowAdapter() {
-					@Override
-					public void windowLostFocus(WindowEvent e) {
-						MenuSelectionManager.defaultManager().clearSelectedPath();
-					}
-				});
-			}
-		}
-		
 		for (JTerminalPane terminal : terminals) {
 			terminal.optionsDidChange();
 		}

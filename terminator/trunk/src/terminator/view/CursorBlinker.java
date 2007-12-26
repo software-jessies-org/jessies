@@ -22,7 +22,7 @@ public class CursorBlinker implements ActionListener {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		if (Options.getSharedInstance().shouldCursorBlink()) {
+		if (Terminator.getPreferences().getBoolean(TerminatorPreferences.BLINK_CURSOR)) {
 			view.blinkCursor();
 		}
 	}

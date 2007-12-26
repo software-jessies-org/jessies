@@ -68,13 +68,13 @@ public class StyledText {
 		Color result = null;
 		if (isBold && isForeground) {
 			if (hasSpecifiedColor == false && isForeground) {
-				result = Options.getSharedInstance().getColor("colorBD");
+				result = Terminator.getSharedInstance().getBoldColor();
 			} else if (colorIndex < 8) {
 				result = AnsiColor.byIndex(colorIndex + 8);
 			}
 		}
 		if (result == null && hasSpecifiedColor == false) {
-			result = Options.getSharedInstance().getColor(isForeground ? "foreground" : "background");
+			result = Terminator.getPreferences().getColor(isForeground ? TerminatorPreferences.FOREGROUND_COLOR : TerminatorPreferences.BACKGROUND_COLOR);
 		}
 		if (result == null) {
 			result = AnsiColor.byIndex(colorIndex);
