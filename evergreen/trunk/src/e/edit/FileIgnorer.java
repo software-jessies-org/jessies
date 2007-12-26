@@ -30,7 +30,7 @@ public class FileIgnorer {
     
     public static boolean isIgnoredExtension(String filename) {
         if (ignoredExtensions == null) {
-            ignoredExtensions = Parameters.getArrayOfSemicolonSeparatedElements("files.uninterestingExtensions");
+            ignoredExtensions = Evergreen.getInstance().getPreferences().getString(EvergreenPreferences.UNINTERESTING_EXTENSIONS).split(";");
         }
         return FileIgnorer.nameEndsWithOneOf(filename, ignoredExtensions);
     }

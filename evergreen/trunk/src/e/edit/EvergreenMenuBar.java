@@ -20,7 +20,7 @@ public class EvergreenMenuBar extends EMenuBar {
         add(makeHelpMenu());
     }
     
-    public static class ExitAction extends AbstractAction {
+    private static class ExitAction extends AbstractAction {
         public ExitAction() {
             super(GuiUtilities.isWindows() ? "Exit" : "Quit");
             GnomeStockIcon.configureAction(this);
@@ -28,6 +28,17 @@ public class EvergreenMenuBar extends EMenuBar {
         
         public void actionPerformed(ActionEvent e) {
             Evergreen.getInstance().handleQuit(null);
+        }
+    }
+    
+    private static class PreferencesAction extends AbstractAction {
+        public PreferencesAction() {
+            super("Preferences...");
+            GnomeStockIcon.configureAction(this);
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            Evergreen.getInstance().showPreferencesDialog();
         }
     }
     
@@ -87,7 +98,12 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new JSeparator());
         menu.add(new ShowMisspellingsAction());
         menu.add(new CompareSelectionAndClipboardAction());
-
+        
+        if (GuiUtilities.isMacOs() == false) {
+            menu.add(new JSeparator());
+            menu.add(new PreferencesAction());
+        }
+        
         return menu;
     }
 

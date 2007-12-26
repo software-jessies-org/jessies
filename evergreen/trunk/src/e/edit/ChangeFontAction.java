@@ -13,17 +13,11 @@ public abstract class ChangeFontAction extends ETextAction {
     public abstract Font getFont();
     
     public static Font getConfiguredFont() {
-        return getConfiguredFont("font", "verdana", 12);
+        return Evergreen.getInstance().getPreferences().getFont(EvergreenPreferences.PROPORTIONAL_FONT);
     }
     
     public static Font getConfiguredFixedFont() {
-        return getConfiguredFont("fixedFont", GuiUtilities.getMonospacedFontName(), 12);
-    }
-    
-    public static Font getConfiguredFont(String parameterPrefix, String defaultFontName, int defaultFontSize) {
-        String fontName = Parameters.getParameter(parameterPrefix + ".name", defaultFontName);
-        int fontSize = Parameters.getParameter(parameterPrefix + ".size", defaultFontSize);
-        return new Font(fontName, Font.PLAIN, fontSize);
+        return Evergreen.getInstance().getPreferences().getFont(EvergreenPreferences.FIXED_FONT);
     }
     
     /**
@@ -42,7 +36,7 @@ public abstract class ChangeFontAction extends ETextAction {
      * of the kind of thing that requires a fixed font.
      */
     private static boolean shouldUseFixedFontFor(CharSequence content) {
-        if (Boolean.getBoolean("fixedFont.default")) {
+        if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.ALWAYS_USE_FIXED_FONT)) {
             return true;
         }
         if (hasMixedTabsAndSpaces(content)) {
