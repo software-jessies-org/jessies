@@ -6,7 +6,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
-import terminator.Options;
+import terminator.*;
 
 /**
  * Implements our visual bell by flashing a transparent rectangle over the
@@ -45,24 +45,21 @@ public class VisualBellViewport extends JViewport {
     }
     
     private void paintBell(Graphics g) {
-        if (Options.getSharedInstance().isVisualBell() == false) {
+        TerminatorPreferences preferences = Terminator.getPreferences();
+        if (preferences.getBoolean(TerminatorPreferences.VISUAL_BELL) == false) {
             return;
         }
-        Color foreground = Options.getSharedInstance().getColor("foreground");
-        if (Options.getSharedInstance().isFancyBell()) {
-            // On decent hardware, we can produce a really tasteful effect
-            // by compositing a transparent rectangle over the terminal.
-            // We need to choose a color that will show up against the
-            // background; a reasonable assumption is that the user has
-            // already chosen such a color for the foreground.
+        Color foreground = preferences.getColor(TerminatorPreferences.FOREGROUND_COLOR);
+        if (preferences.getBoolean(TerminatorPreferences.FANCY_BELL)) {
+            // On decent hardware, we can produce a really tasteful effect by compositing a semi-transparent rectangle over the terminal.
+            // We need to choose a color that will show up against the background.
+            // A reasonable assumption is that the user has already chosen such a color for the foreground.
             Color color = new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 100);
             g.setColor(color);
             g.fillRect(0, 0, getWidth(), getHeight());
         } else {
-            // We used to composite a flash over the terminal, but on a remote
-            // X11 display that was prohibitively expensive, so we offer XOR
-            // instead.
-            Color background = Options.getSharedInstance().getColor("background");
+            // On a remote X11 display (or really rubbish hardware) the compositing effect is prohibitively expensive, so we offer XOR instead.
+            Color background = preferences.getColor(TerminatorPreferences.BACKGROUND_COLOR);;
             final int R = blend(background.getRed(), foreground.getRed());
             final int G = blend(background.getGreen(), foreground.getGreen());
             final int B = blend(background.getBlue(), foreground.getBlue());

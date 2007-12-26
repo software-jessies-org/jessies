@@ -43,8 +43,8 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	private ArrayList<ArrayList<Highlight>> lineHighlights = new ArrayList<ArrayList<Highlight>>();
 	
 	public TerminalView() {
-		Options options = Options.getSharedInstance();
-		this.model = new TerminalModel(this, options.getInitialColumnCount(), options.getInitialRowCount());
+		TerminatorPreferences preferences = Terminator.getPreferences();
+		this.model = new TerminalModel(this, preferences.getInt(TerminatorPreferences.INITIAL_COLUMN_COUNT), preferences.getInt(TerminatorPreferences.INITIAL_ROW_COUNT));
 		ComponentUtilities.disableFocusTraversal(this);
 		setBorder(BorderFactory.createEmptyBorder(1, 4, 4, 4));
 		setOpaque(true);
@@ -97,16 +97,16 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	}
 	
 	public void optionsDidChange() {
-		Options options = Options.getSharedInstance();
-		if (options.shouldUseAltKeyAsMeta()) {
+		TerminatorPreferences preferences = Terminator.getPreferences();
+		if (preferences.getBoolean(TerminatorPreferences.USE_ALT_AS_META)) {
 			// If we want to handle key events when alt is down, we need to turn off input methods.
 			enableInputMethods(false);
 		}
 		
-		setBackground(options.getColor("background"));
-		setForeground(options.getColor("foreground"));
+		setBackground(preferences.getColor("background"));
+		setForeground(preferences.getColor("foreground"));
 		
-		setFont(options.getFont());
+		setFont(preferences.getFont(TerminatorPreferences.FONT));
 		sizeChanged();
 	}
 	
@@ -125,7 +125,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	public void userIsTyping() {
 		blinkOn = true;
 		redrawCursorPosition();
-		if (Options.getSharedInstance().shouldHideMouseWhenTyping()) {
+		if (Terminator.getPreferences().getBoolean(TerminatorPreferences.HIDE_MOUSE_WHEN_TYPING)) {
 			setCursor(GuiUtilities.INVISIBLE_CURSOR);
 		}
 	}
@@ -328,7 +328,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	 * stay where we were but that *was* the bottom.
 	 */
 	public void scrollOnTtyOutput(boolean wereAtBottom) {
-		if (wereAtBottom || Options.getSharedInstance().isScrollTtyOutput()) {
+		if (wereAtBottom || Terminator.getPreferences().getBoolean(TerminatorPreferences.SCROLL_ON_TTY_OUTPUT)) {
 			scrollToBottomButNotHorizontally();
 		}
 	}
@@ -370,7 +370,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	}
 	
 	public Color getCursorColor() {
-		return Options.getSharedInstance().getColor(blinkOn ? "cursorColor" : "background");
+		return Terminator.getPreferences().getColor(blinkOn ? TerminatorPreferences.CURSOR_COLOR : TerminatorPreferences.BACKGROUND_COLOR);
 	}
 	
 	public void blinkCursor() {
@@ -681,7 +681,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 			Graphics2D g = (Graphics2D) oldGraphics;
 			
 			Object antiAliasHint = g.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
-			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, Options.getSharedInstance().isAntiAliased() ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, Terminator.getPreferences().getBoolean(TerminatorPreferences.ANTI_ALIAS) ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 			
 			FontMetrics metrics = getFontMetrics(getFont());
 			Dimension charUnitSize = getCharUnitSize();
@@ -750,10 +750,11 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		Rectangle cursorRect = modelToView(cursorPosition);
 		final int bottomY = cursorRect.y + cursorRect.height - 1;
 		if (hasFocus) {
+			TerminatorPreferences preferences = Terminator.getPreferences();
 			// The CursorBlinker may have left blinkOn in either state if the user changed the cursor blink preference.
 			// Ignore blinkOn if the cursor shouldn't be blinking right now.
-			boolean cursorIsVisible = (Options.getSharedInstance().shouldCursorBlink() == false) || blinkOn;
-			if (Options.getSharedInstance().isBlockCursor()) {
+			boolean cursorIsVisible = (preferences.getBoolean(TerminatorPreferences.BLINK_CURSOR) == false) || blinkOn;
+			if (preferences.getBoolean(TerminatorPreferences.BLOCK_CURSOR)) {
 				// Block.
 				if (cursorIsVisible) {
 					// Paint over the character underneath.
