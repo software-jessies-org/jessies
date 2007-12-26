@@ -42,10 +42,6 @@ class Evergreen
         if FileTest.directory?(edit_preferences_directory) == false
             FileUtils.mkdir_p(edit_preferences_directory)
         end
-        if FileTest.exists?("#{edit_preferences_directory}/edit.properties") == false
-            FileUtils.cp("#{@project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties")
-            FileUtils.cp("#{@project_root}/lib/data/edit.properties-sample", "#{edit_preferences_directory}/edit.properties.when-automatically-installed")
-        end
         
         serverPortPathname = Pathname.new(edit_preferences_directory) + "edit-server-port"
         # InAppClient's constructor stops anyone else from reading the .secret file.

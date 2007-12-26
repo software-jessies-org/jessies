@@ -1,9 +1,0 @@
-font.name=SansSerif
-font.size=12
-
-fixedFont.default=false
-
-indent.string=    
-
-files.uninterestingExtensions=.a;.aux;.bak;.bin;.class;.d;.elf;.exe;.jar;.lib;.log;.map;.o;.obj;.orig;.swp;.texshop;.toc
-files.externalApplicationExtensions=.icns;.jpeg;.jpg;.mov;.mp3;.mpeg;.mpg;.pdf;.png;.tiff

@@ -28,12 +28,14 @@ public class Parameters extends Properties {
     private Parameters() { /* Not instantiable. */ }
     
     public static void readPropertiesFile(String fileName) {
+        if (FileUtilities.exists(fileName) == false) {
+            return;
+        }
         Properties props = new Properties(System.getProperties());
         try {
             loadProperties(props, new BufferedReader(new FileReader(fileName)));
         } catch (Exception ex) {
             Log.warn("Unable to read properties file \"" + fileName + "\"", ex);
-            System.exit(1);
         }
         System.setProperties(props);
     }

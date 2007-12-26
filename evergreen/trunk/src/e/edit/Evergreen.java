@@ -25,14 +25,13 @@ public class Evergreen {
     private Minibuffer minibuffer;
     private JPanel statusArea;
     
-    /** Extensions that we shouldn't open. */
-    private String[] externalApplicationExtensions;
-    
     /** The global find history for all FindDialog instances. */
     private EHistoryComboBoxModel findHistory = new ChronologicalComboBoxModel();
     
     /** Whether we're fully started. */
     private CountDownLatch startSignal = new CountDownLatch(1);
+    
+    private EvergreenPreferences preferences;
     
     private InitialState initialState = new InitialState();
     
@@ -126,6 +125,10 @@ public class Evergreen {
         return instance;
     }
     
+    public Preferences getPreferences() {
+        return preferences;
+    }
+    
     /** Returns the frame we're using for the main window. */
     public JFrame getFrame() {
         return frame;
@@ -164,28 +167,6 @@ public class Evergreen {
             BrowserLauncher.openURL(url);
         } catch (Throwable th) {
             SimpleDialog.showDetails(getFrame(), "Hyperlink", th);
-        }
-    }
-    
-    private boolean isFileForExternalApplication(String filename) {
-        if (externalApplicationExtensions == null) {
-            externalApplicationExtensions = Parameters.getArrayOfSemicolonSeparatedElements("files.externalApplicationExtensions");
-        }
-        return FileIgnorer.nameEndsWithOneOf(filename, externalApplicationExtensions);
-    }
-    
-    private void openFileWithExternalApplication(String filename) {
-        try {
-            // FIXME: for Java 6, use java.awt.Desktop instead.
-            String openCommand = "gnome-open";
-            if (GuiUtilities.isMacOs()) {
-                openCommand = "/usr/bin/open";
-            } else if (GuiUtilities.isWindows()) {
-                openCommand = "start";
-            }
-            ProcessUtilities.spawn(null, new String[] { openCommand, FileUtilities.parseUserFriendlyName(filename) });
-        } catch (Exception ex) {
-            showAlert("Couldn't open \"" + filename + "\"", "The external application failed to start: " + ex.getMessage() + ".");
         }
     }
     
@@ -251,12 +232,6 @@ public class Evergreen {
                 showDocument(filename);
                 return null;
             }
-        }
-        
-        // Special case for files to open in external applications.
-        if (isFileForExternalApplication(filename)) {
-            openFileWithExternalApplication(filename);
-            return null;
         }
         
         filename = processPathRewrites(filename);
@@ -597,12 +572,12 @@ public class Evergreen {
 
         //SpellingChecker.dumpKnownBadWordsTo(System.out);
         JFrameUtilities.writeGeometriesTo(getDialogGeometriesPreferenceFilename());
-        
         writeSavedState();
+        preferences.writeToDisk();
     }
     
     /** Returns the full pathname for the given preference file. */
-    public String getPreferenceFilename(String leafname) {
+    public static String getPreferenceFilename(String leafname) {
         return System.getProperty("preferencesDirectory") + File.separator + leafname;
     }
     
@@ -722,6 +697,22 @@ public class Evergreen {
     }
     
     public void initPreferences() {
+        this.preferences = new EvergreenPreferences();
+        preferences.readFromDisk();
+        preferences.addPreferencesListener(new Preferences.Listener() {
+            public void preferencesChanged() {
+                for (Workspace workspace : getWorkspaces()) {
+                    for (ETextWindow textWindow : workspace.getTextWindows()) {
+                        textWindow.initFont();
+                        textWindow.getTextArea().setBackground(preferences.getColor(EvergreenPreferences.BACKGROUND_COLOR));
+                        textWindow.getTextArea().setForeground(preferences.getColor(EvergreenPreferences.FOREGROUND_COLOR));
+                    }
+                    workspace.getErrorsWindow().initFont();
+                }
+                tagsPanel.repaint();
+            }
+        });
+        
         Parameters.readPropertiesFile(getPreferenceFilename("edit.properties"));
     }
     
@@ -747,10 +738,21 @@ public class Evergreen {
             return;
         }
         com.apple.eawt.Application.getApplication().addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
+            @Override
             public void handleQuit(com.apple.eawt.ApplicationEvent e) {
                 Evergreen.this.handleQuit(e);
             }
+            
+            @Override
+            public void handlePreferences(com.apple.eawt.ApplicationEvent e) {
+                showPreferencesDialog();
+                e.setHandled(true);
+            }
         });
+    }
+    
+    public void showPreferencesDialog() {
+        getPreferences().showPreferencesDialog(getFrame());
     }
     
     private void initAboutBox() {

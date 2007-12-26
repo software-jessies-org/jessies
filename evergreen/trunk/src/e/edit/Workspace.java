@@ -126,6 +126,10 @@ public class Workspace extends JPanel {
         return leftColumn.getTextWindows().length == 0;
     }
     
+    public ETextWindow[] getTextWindows() {
+        return leftColumn.getTextWindows();
+    }
+    
     /** Returns an array of this workspace's dirty text windows. */
     public ETextWindow[] getDirtyTextWindows() {
         ArrayList<ETextWindow> dirtyTextWindows = new ArrayList<ETextWindow>();

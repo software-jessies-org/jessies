@@ -96,13 +96,17 @@ public class EErrorsWindow extends JFrame {
     
     private void initTextArea() {
         textArea = new PTextArea(20, 80);
-        // Default to a fixed-pitch font in errors windows.
-        textArea.setFont(ChangeFontAction.getConfiguredFixedFont());
+        initFont();
         // But no margin, because all the text should be machine-generated.
         textArea.showRightHandMarginAt(PTextArea.NO_MARGIN);
         textArea.addStyleApplicator(new ErrorLinkStyler(textArea));
         textArea.setWrapStyleWord(true);
         initTextAreaPopupMenu();
+    }
+    
+    public void initFont() {
+        // Default to a fixed-pitch font in errors windows.
+        textArea.setFont(ChangeFontAction.getConfiguredFixedFont());
     }
     
     private void initStatusBar() {
@@ -312,7 +316,7 @@ public class EErrorsWindow extends JFrame {
         }
     }
     
-    public void initTextAreaPopupMenu() {
+    private void initTextAreaPopupMenu() {
         textArea.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
             public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
                 actions.add(new OpenQuicklyAction());

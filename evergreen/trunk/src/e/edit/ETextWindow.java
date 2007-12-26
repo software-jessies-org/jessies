@@ -112,9 +112,13 @@ public class ETextWindow extends EWindow implements PTextListener {
         // Phil's been bitten by the indentation string reverting while editing
         // TSV files, and I've been repeatedly bitten by a file I want to see
         // in a fixed font reverting to a proportional font each time I save.
+        initFont();
         CharSequence content = textArea.getTextBuffer();
-        textArea.setFont(ChangeFontAction.getAppropriateFontForContent(content));
-        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content, Parameters.getParameter("indent.string", "    ")));
+        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content, Evergreen.getInstance().getPreferences().getString(EvergreenPreferences.DEFAULT_INDENTATION)));
+    }
+    
+    public void initFont() {
+        textArea.setFont(ChangeFontAction.getAppropriateFontForContent(textArea.getTextBuffer()));
     }
     
     public void updateStatusLine() {
@@ -417,7 +421,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         super.closeWindow();
     }
     
-    public void initTextAreaPopupMenu() {
+    private void initTextAreaPopupMenu() {
         textArea.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
             public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
                 actions.add(new OpenQuicklyAction());

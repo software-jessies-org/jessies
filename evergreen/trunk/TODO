@@ -13,9 +13,7 @@ Title bar text:
 Sort windows alphabetically?
 
 Subversion ignores the following by default; maybe we should hard-code
-something similar in Evergreen? I'd like to remove more of edit.properties,
-and at least only have it contain differences from some sensible default
-state, rather than be strictly necessary for a working Evergreen.
+something similar in Evergreen?
 # global-ignores = *.o *.lo *.la #*# .*.rej *.rej .*~ *~ .#* .DS_Store
 
 We should keep track of 'recent files' on a per-workspace basis. We
