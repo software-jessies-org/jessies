@@ -737,6 +737,7 @@ public class Evergreen {
         if (GuiUtilities.isMacOs() == false) {
             return;
         }
+        com.apple.eawt.Application.getApplication().setEnabledPreferencesMenu(true);
         com.apple.eawt.Application.getApplication().addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
             @Override
             public void handleQuit(com.apple.eawt.ApplicationEvent e) {
