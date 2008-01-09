@@ -50,10 +50,15 @@ public class LogWriter {
 				});
 				flushTimer.setRepeats(false);
 			} catch (IOException ex) {
-				this.info = "(" + logsDirectoryName + " is not writable)";
+				this.info = "(\"" + logFile + "\" could not be opened for writing)";
+				if (logsDirectory.canWrite()) {
+					Log.warn("Exception occurred creating log writer \"" + logFile + "\".", ex);
+				} else {
+					this.info = "(\"" + logsDirectoryName + "\" is not writable)";
+				}
 			}
 		} else {
-			this.info = "(" + logsDirectoryName + " does not exist)";
+			this.info = "(\"" + logsDirectoryName + "\" does not exist)";
 		}
 	}
 	
