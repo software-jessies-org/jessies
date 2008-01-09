@@ -22,6 +22,9 @@ public class LogWriter {
 	private Timer flushTimer;
 	
 	public LogWriter(String[] command) {
+		// Establish the invariant that writer != null.
+		// suspendedWriter is still null - when we're not suspended.
+		this.writer = NullWriter.INSTANCE;
 		try {
 			String prefix = StringUtilities.join(command, " ");
 			initLogging(prefix);
@@ -63,29 +66,19 @@ public class LogWriter {
 	
 	public void flush() {
 		try {
-			if (writer != null) {
-				writer.flush();
-			}
+			writer.flush();
 		} catch (Throwable th) {
 			Log.warn("Exception occurred flushing log writer \"" + info + "\".", th);
 		}
 	}
 	
 	public void close() {
-		if (writer != null) {
-			try {
-				if (writer != null) {
-					writer.close();
-					writer = null;
-				}
-				if (suspendedWriter != null) {
-					suspendedWriter.close();
-					suspendedWriter = null;
-				}
-				writer = NullWriter.INSTANCE;
-			} catch (Throwable th) {
-				Log.warn("Exception occurred closing log writer \"" + info + "\".", th);
-			}
+		try {
+			suspend(false);
+			writer.close();
+			writer = NullWriter.INSTANCE;
+		} catch (Throwable th) {
+			Log.warn("Exception occurred closing log writer \"" + info + "\".", th);
 		}
 	}
 	
@@ -93,13 +86,15 @@ public class LogWriter {
 		return info;
 	}
 	
-	public void setSuspended(boolean suspended) {
+	public void suspend(boolean shouldSuspend) {
 		flush();
-		if (suspended && suspendedWriter == null) {
+		if (shouldSuspend == isSuspended()) {
+			return;
+		}
+		if (shouldSuspend) {
 			suspendedWriter = writer;
 			writer = NullWriter.INSTANCE;
-		}
-		if (suspended == false && suspendedWriter != null) {
+		} else {
 			writer = suspendedWriter;
 			suspendedWriter = null;
 		}
