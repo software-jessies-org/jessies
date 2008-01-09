@@ -63,7 +63,7 @@ public class InfoDialog {
         final JCheckBox checkBox = new JCheckBox("Suspend Logging");
         checkBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                terminal.getLogWriter().setSuspended(suspendLogging.isSelected());
+                terminal.getLogWriter().suspend(suspendLogging.isSelected());
                 // The LogWriter might not be able to comply, so ensure that
                 // the UI reflects the actual state.
                 checkBox.setSelected(terminal.getLogWriter().isSuspended());
