@@ -21,7 +21,7 @@ public class LogWriter {
 	private Writer suspendedWriter;
 	private Timer flushTimer;
 	
-	public LogWriter(String[] command) {
+	public LogWriter(String[] commandWords, String ptyName) {
 		// Establish the invariant that writer != null.
 		// suspendedWriter is still null - when we're not suspended.
 		this.writer = NullWriter.INSTANCE;
@@ -32,15 +32,15 @@ public class LogWriter {
 		});
 		flushTimer.setRepeats(false);
 		try {
-			String prefix = StringUtilities.join(command, " ");
-			initLogging(prefix);
+			String commandLine = StringUtilities.join(commandWords, " ");
+			initLogging(commandLine, ptyName);
 		} catch (Throwable th) {
 			SimpleDialog.showDetails(null, "Couldn't Open Log File", th);
 		}
 	}
 	
-	private void initLogging(String prefix) throws IOException {
-		prefix = java.net.URLEncoder.encode(prefix, "UTF-8");
+	private void initLogging(String commandLine, String ptyName) throws IOException {
+		String prefix = java.net.URLEncoder.encode(commandLine, "UTF-8");
 		String timestamp = dateFormatter.format(new Date());
 		String logsDirectoryName = System.getProperty("org.jessies.terminator.logDirectory");
 		File logsDirectory = new File(logsDirectoryName);
@@ -50,6 +50,7 @@ public class LogWriter {
 			try {
 				this.info = logFile.toString();
 				this.writer = new BufferedWriter(new FileWriter(logFile));
+				Log.warn("Logging \"" + ptyName + "\" to \"" + this.info + "\"");
 			} catch (IOException ex) {
 				this.info = "(\"" + logFile + "\" could not be opened for writing)";
 				if (logsDirectory.canWrite()) {
