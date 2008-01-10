@@ -32,21 +32,30 @@ public class LogWriter {
 		});
 		flushTimer.setRepeats(false);
 		try {
-			String commandLine = StringUtilities.join(commandWords, " ");
-			initLogging(commandLine, ptyName);
+			initLogging(commandWords, ptyName);
 		} catch (Throwable th) {
 			SimpleDialog.showDetails(null, "Couldn't Open Log File", th);
 		}
 	}
 	
-	private void initLogging(String commandLine, String ptyName) throws IOException {
-		String prefix = java.net.URLEncoder.encode(commandLine, "UTF-8");
+	private static String makeStem(String[] commandWords) throws UnsupportedEncodingException {
+		String commandLine = StringUtilities.join(commandWords, " ");
+		// This should avoid "File name too long" errors on any reasonable file system.
+		// This many characters is plenty, right?
+		int lengthLimit = 100;
+		int truncationLength = Math.min(commandLine.length(), lengthLimit);
+		String mostInterestingPartOfCommandLine = commandLine.substring(0, truncationLength);
+		String stem = java.net.URLEncoder.encode(mostInterestingPartOfCommandLine, "UTF-8");
+		return stem;
+	}
+	
+	private void initLogging(String[] commandWords, String ptyName) throws IOException {
+		String stem = makeStem(commandWords);
 		String timestamp = dateFormatter.format(new Date());
 		String logsDirectoryName = System.getProperty("org.jessies.terminator.logDirectory");
 		File logsDirectory = new File(logsDirectoryName);
 		if (logsDirectory.exists()) {
-			// FIXME: Do something about "File name too long".
-			File logFile = new File(logsDirectory, prefix + '-' + timestamp + ".txt");
+			File logFile = new File(logsDirectory, timestamp + "-" + stem + ".txt");
 			try {
 				this.info = logFile.toString();
 				this.writer = new BufferedWriter(new FileWriter(logFile));
@@ -54,7 +63,7 @@ public class LogWriter {
 			} catch (IOException ex) {
 				this.info = "(\"" + logFile + "\" could not be opened for writing)";
 				if (logsDirectory.canWrite()) {
-					Log.warn("Exception occurred creating log writer \"" + logFile + "\".", ex);
+					throw ex;
 				} else {
 					this.info = "(\"" + logsDirectoryName + "\" is not writable)";
 				}
