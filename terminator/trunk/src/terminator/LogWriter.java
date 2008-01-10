@@ -62,22 +62,22 @@ public class LogWriter {
 		String stem = makeStem(commandWords);
 		String logsDirectoryName = System.getProperty("org.jessies.terminator.logDirectory");
 		File logsDirectory = new File(logsDirectoryName);
-		if (logsDirectory.exists()) {
-			File logFile = new File(logsDirectory, stem);
-			try {
-				this.info = logFile.toString();
-				this.writer = new BufferedWriter(new FileWriter(logFile));
-				Log.warn("Logging \"" + ptyName + "\" to \"" + this.info + "\"");
-			} catch (IOException ex) {
-				this.info = "(\"" + logFile + "\" could not be opened for writing)";
-				if (logsDirectory.canWrite()) {
-					throw ex;
-				} else {
-					this.info = "(\"" + logsDirectoryName + "\" is not writable)";
-				}
-			}
-		} else {
+		if (logsDirectory.exists() == false) {
 			this.info = "(\"" + logsDirectoryName + "\" does not exist)";
+			return;
+		}
+		File logFile = new File(logsDirectory, stem);
+		try {
+			this.info = logFile.toString();
+			this.writer = new BufferedWriter(new FileWriter(logFile));
+			Log.warn("Logging \"" + ptyName + "\" to \"" + this.info + "\"");
+		} catch (IOException ex) {
+			this.info = "(\"" + logFile + "\" could not be opened for writing)";
+			if (logsDirectory.canWrite()) {
+				throw ex;
+			} else {
+				this.info = "(\"" + logsDirectoryName + "\" is not writable)";
+			}
 		}
 	}
 	
