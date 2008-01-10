@@ -40,22 +40,30 @@ public class LogWriter {
 	
 	private static String makeStem(String[] commandWords) throws UnsupportedEncodingException {
 		String commandLine = StringUtilities.join(commandWords, " ");
+		int truncationLength = commandLine.length();
+		String stem = makeTruncatedStem(commandLine, truncationLength);
 		// This should avoid "File name too long" errors on any reasonable file system.
-		// This many characters is plenty, right?
-		int lengthLimit = 100;
-		int truncationLength = Math.min(commandLine.length(), lengthLimit);
+		while (stem.length() > 255) {
+			-- truncationLength;
+			stem = makeTruncatedStem(commandLine, truncationLength);
+		}
+		return stem;
+	}
+	
+	private static String makeTruncatedStem(String commandLine, int truncationLength) throws UnsupportedEncodingException {
 		String mostInterestingPartOfCommandLine = commandLine.substring(0, truncationLength);
-		String stem = java.net.URLEncoder.encode(mostInterestingPartOfCommandLine, "UTF-8");
+		String suffix = java.net.URLEncoder.encode(mostInterestingPartOfCommandLine, "UTF-8");
+		String timestamp = dateFormatter.format(new Date());
+		String stem = timestamp + "-" + suffix + ".txt";
 		return stem;
 	}
 	
 	private void initLogging(String[] commandWords, String ptyName) throws IOException {
 		String stem = makeStem(commandWords);
-		String timestamp = dateFormatter.format(new Date());
 		String logsDirectoryName = System.getProperty("org.jessies.terminator.logDirectory");
 		File logsDirectory = new File(logsDirectoryName);
 		if (logsDirectory.exists()) {
-			File logFile = new File(logsDirectory, timestamp + "-" + stem + ".txt");
+			File logFile = new File(logsDirectory, stem);
 			try {
 				this.info = logFile.toString();
 				this.writer = new BufferedWriter(new FileWriter(logFile));
