@@ -65,13 +65,13 @@ public class TerminalControl {
 	}
 	
 	public void initProcess(String[] command, String workingDirectory) throws Throwable {
-		this.logWriter = new LogWriter(command);
 		this.ptyProcess = new PtyProcess(command, workingDirectory);
 		this.processIsRunning = true;
+		Log.warn("Created " + ptyProcess);
+		this.logWriter = new LogWriter(command, ptyProcess.getPtyName());
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), CHARSET_NAME);
 		this.out = ptyProcess.getOutputStream();
 		writerExecutor = ThreadUtilities.newSingleThreadExecutor(makeThreadName("Writer"));
-		Log.warn("Created " + ptyProcess);
 	}
 	
 	public void destroyProcess() {
