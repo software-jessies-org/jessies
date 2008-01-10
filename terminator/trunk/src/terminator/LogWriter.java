@@ -45,6 +45,7 @@ public class LogWriter {
 		String logsDirectoryName = System.getProperty("org.jessies.terminator.logDirectory");
 		File logsDirectory = new File(logsDirectoryName);
 		if (logsDirectory.exists()) {
+			// FIXME: Do something about "File name too long".
 			File logFile = new File(logsDirectory, prefix + '-' + timestamp + ".txt");
 			try {
 				this.info = logFile.toString();
