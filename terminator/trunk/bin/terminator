@@ -19,8 +19,13 @@ class Terminator
     end
     
     def launch0()
+        # Allow different Terminators to have different options (and logging).
+        dot_directory = ENV["TERMINATOR_DOT_DIRECTORY"]
+        if dot_directory == nil
+            home = ENV["HOME"]
+            dot_directory = "#{home}/.terminator"
+        end
         # Make sure we have a directory for Terminator's private files and another for the logs.
-        dot_directory = "#{ENV['HOME']}/.terminator"
         log_directory = File.join(dot_directory, "logs")
         make_directory(dot_directory, true)
         make_directory(log_directory, false)
