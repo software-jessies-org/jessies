@@ -38,18 +38,6 @@ public class LogWriter {
 		}
 	}
 	
-	private static String makeStem(String[] commandWords) throws UnsupportedEncodingException {
-		String commandLine = StringUtilities.join(commandWords, " ");
-		int truncationLength = commandLine.length();
-		String stem = makeTruncatedStem(commandLine, truncationLength);
-		// This should avoid "File name too long" errors on any reasonable file system.
-		while (stem.length() > 255) {
-			-- truncationLength;
-			stem = makeTruncatedStem(commandLine, truncationLength);
-		}
-		return stem;
-	}
-	
 	private static String makeTruncatedStem(String commandLine, int truncationLength) throws UnsupportedEncodingException {
 		String mostInterestingPartOfCommandLine = commandLine.substring(0, truncationLength);
 		String suffix = java.net.URLEncoder.encode(mostInterestingPartOfCommandLine, "UTF-8");
@@ -59,26 +47,31 @@ public class LogWriter {
 	}
 	
 	private void initLogging(String[] commandWords, String ptyName) throws IOException {
-		String stem = makeStem(commandWords);
 		String logsDirectoryName = System.getProperty("org.jessies.terminator.logDirectory");
 		File logsDirectory = new File(logsDirectoryName);
 		if (logsDirectory.exists() == false) {
 			this.info = "(\"" + logsDirectoryName + "\" does not exist)";
 			return;
 		}
-		File logFile = new File(logsDirectory, stem);
-		try {
-			this.info = logFile.toString();
-			this.writer = new BufferedWriter(new FileWriter(logFile));
-			Log.warn("Logging \"" + ptyName + "\" to \"" + this.info + "\"");
-		} catch (IOException ex) {
-			this.info = "(\"" + logFile + "\" could not be opened for writing)";
-			if (logsDirectory.canWrite()) {
-				throw ex;
-			} else {
-				this.info = "(\"" + logsDirectoryName + "\" is not writable)";
+		String commandLine = StringUtilities.join(commandWords, " ");
+		int truncationLength = commandLine.length() + 1;
+		while (truncationLength > 0) {
+			-- truncationLength;
+			String stem = makeTruncatedStem(commandLine, truncationLength);
+			File logFile = new File(logsDirectory, stem);
+			try {
+				this.info = "(\"" + logFile + "\" could not be opened for writing)";
+				this.writer = new BufferedWriter(new FileWriter(logFile));
+				this.info = logFile.toString();
+				Log.warn("Logging \"" + ptyName + "\" to \"" + this.info + "\"");
+				return;
+			} catch (IOException ex) {
+				if (truncationLength == 0 && logsDirectory.canWrite()) {
+					throw ex;
+				}
 			}
 		}
+		this.info = "(\"" + logsDirectoryName + "\" is not writable)";
 	}
 	
 	public void append(char[] chars, int charCount, boolean sawNewline) throws IOException {
