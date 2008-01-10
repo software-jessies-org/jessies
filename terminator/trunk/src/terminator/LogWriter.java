@@ -14,7 +14,7 @@ import javax.swing.Timer;
  * If the terminal logs directory does not exist or we can't open the log file for some other reason, logging is automatically suspended, and can't be un-suspended.
  */
 public class LogWriter {
-	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HHmmssZ");
+	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HHmmss.SSSZ");
 	
 	private String info = "(not logging)";
 	private Writer writer;
