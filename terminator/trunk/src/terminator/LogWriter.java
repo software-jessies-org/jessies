@@ -25,6 +25,12 @@ public class LogWriter {
 		// Establish the invariant that writer != null.
 		// suspendedWriter is still null - when we're not suspended.
 		this.writer = NullWriter.INSTANCE;
+		this.flushTimer = new Timer(1000, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				flush();
+			}
+		});
+		flushTimer.setRepeats(false);
 		try {
 			String prefix = StringUtilities.join(command, " ");
 			initLogging(prefix);
@@ -43,12 +49,6 @@ public class LogWriter {
 			try {
 				this.info = logFile.toString();
 				this.writer = new BufferedWriter(new FileWriter(logFile));
-				this.flushTimer = new Timer(1000, new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						flush();
-					}
-				});
-				flushTimer.setRepeats(false);
 			} catch (IOException ex) {
 				this.info = "(\"" + logFile + "\" could not be opened for writing)";
 				if (logsDirectory.canWrite()) {
