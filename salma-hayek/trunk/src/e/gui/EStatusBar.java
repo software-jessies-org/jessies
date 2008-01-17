@@ -1,5 +1,6 @@
 package e.gui;
 
+import e.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -19,9 +20,11 @@ public class EStatusBar extends JLabel {
     public EStatusBar() {
         super(" ");
         
-        // Use the slimmer menu font on Linux.
+        // The default label fonts are a little large for status bars.
         if (System.getProperty("os.name").contains("Linux")) {
             setFont(UIManager.getFont("Menu.font"));
+        } else if (GuiUtilities.isMacOs()) {
+            setFont(UIManager.getFont("ToolTip.font"));
         }
         
         initStatusBarClearingTimer();
