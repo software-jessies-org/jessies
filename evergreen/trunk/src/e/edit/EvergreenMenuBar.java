@@ -31,17 +31,6 @@ public class EvergreenMenuBar extends EMenuBar {
         }
     }
     
-    private static class PreferencesAction extends AbstractAction {
-        public PreferencesAction() {
-            super("Preferences...");
-            GnomeStockIcon.configureAction(this);
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            Evergreen.getInstance().showPreferencesDialog();
-        }
-    }
-    
     private JMenu makeFileMenu() {
         JMenu menu = new JMenu("File");
         menu.add(new NewFileAction());
@@ -99,10 +88,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new ShowMisspellingsAction());
         menu.add(new CompareSelectionAndClipboardAction());
         
-        if (GuiUtilities.isMacOs() == false) {
-            menu.add(new JSeparator());
-            menu.add(new PreferencesAction());
-        }
+        Evergreen.getInstance().getPreferences().initPreferencesMenuItem(menu);
         
         return menu;
     }
