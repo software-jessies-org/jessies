@@ -115,6 +115,7 @@ class Terminator
         rescue SystemCallError
             if directory_exists == false
                 show_alert("Terminator had trouble starting.", "Terminator was unable to create the directory \"#{pathname}\".")
+                exit(1)
             elsif directory_safe == false
                 show_alert("Terminator had trouble starting.", "Terminator was unable to change the permissions on \"#{pathname}\" to make it safe. Others may be able to read your logs or cause new terminals to open on your display.")
             end
