@@ -90,7 +90,6 @@ public class Terminator {
 			return;
 		}
 		
-		Application.getApplication().setEnabledPreferencesMenu(true);
 		Application.getApplication().addApplicationListener(new ApplicationAdapter() {
 			@Override
 			public void handleReOpenApplication(ApplicationEvent e) {
@@ -104,12 +103,6 @@ public class Terminator {
 			public void handleOpenFile(ApplicationEvent e) {
 				SimpleDialog.showAlert(null, "Received 'open file' AppleEvent", e.toString());
 				Log.warn("open file " + e.toString());
-			}
-			
-			@Override
-			public void handlePreferences(ApplicationEvent e) {
-				preferences.showPreferencesDialog(null);
-				e.setHandled(true);
 			}
 			
 			@Override
