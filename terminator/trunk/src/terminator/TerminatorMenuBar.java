@@ -60,11 +60,8 @@ public class TerminatorMenuBar extends EMenuBar {
 		menu.add(new FindPreviousAction());
 		menu.add(new CancelFindAction());
 		
-		if (GuiUtilities.isMacOs() == false) {
-			menu.addSeparator();
-			menu.add(new PreferencesAction());
-		}
-
+		Terminator.getPreferences().initPreferencesMenuItem(menu);
+		
 		return menu;
 	}
 	
@@ -590,19 +587,6 @@ public class TerminatorMenuBar extends EMenuBar {
 		@Override
 		protected void performFrameAction(TerminatorFrame frame) {
 			frame.moveCurrentTab(delta);
-		}
-	}
-	
-	public static class PreferencesAction extends AbstractPaneAction {
-		public PreferencesAction() {
-			super("Preferences...");
-			GnomeStockIcon.configureAction(this);
-		}
-		
-		@Override
-		protected void performPaneAction(JTerminalPane terminalPane) {
-			Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, terminalPane);
-			Terminator.getPreferences().showPreferencesDialog(frame);
 		}
 	}
 }
