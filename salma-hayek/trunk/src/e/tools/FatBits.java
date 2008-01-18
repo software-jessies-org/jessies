@@ -80,14 +80,7 @@ public class FatBits extends MainFrame {
             return;
         }
         
-        Application.getApplication().setEnabledPreferencesMenu(true);
         Application.getApplication().addApplicationListener(new ApplicationAdapter() {
-            @Override
-            public void handlePreferences(ApplicationEvent e) {
-                preferences.showPreferencesDialog(FatBits.this);
-                e.setHandled(true);
-            }
-            
             @Override
             public void handleQuit(ApplicationEvent e) {
                 e.setHandled(true);
@@ -100,7 +93,7 @@ public class FatBits extends MainFrame {
         infoPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         infoPanel.add(colorSwatchLabel, BorderLayout.WEST);
         if (GuiUtilities.isGtk()) {
-            JButton infoButton = new JButton(new PreferencesAction());
+            JButton infoButton = new JButton(preferences.makeShowPreferencesAction());
             infoButton.setText("");
             infoPanel.add(infoButton, BorderLayout.EAST);
         }
@@ -342,9 +335,7 @@ public class FatBits extends MainFrame {
         private JMenu makeEditMenu() {
             JMenu menu = new JMenu("Edit");
             menu.add(new CopyImageAction());
-            if (GuiUtilities.isMacOs() == false) {
-                menu.add(new PreferencesAction());
-            }
+            preferences.initPreferencesMenuItem(menu);
             return menu;
         }
         
@@ -391,17 +382,6 @@ public class FatBits extends MainFrame {
         
         public void actionPerformed(ActionEvent e) {
             setVisible(false);
-        }
-    }
-    
-    private class PreferencesAction extends AbstractAction {
-        private PreferencesAction() {
-            super("Preferences...");
-            GnomeStockIcon.configureAction(this);
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            preferences.showPreferencesDialog(FatBits.this);
         }
     }
     

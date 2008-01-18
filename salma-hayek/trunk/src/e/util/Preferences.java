@@ -20,7 +20,7 @@ import javax.swing.*;
  * Call setCustomUiForKey if you need a custom UI component.
  * It may be best to construct your Preferences subclass, then initialize your UI, and then call setCustomUiForKey (which is why it's public rather than protected).
  * 
- * Call showPreferencesDialog for a preferences dialog.
+ * Use initPreferencesMenuItem to add a "Preferences..." item to your "Edit" menu, and to automatically do the right thing on Mac OS.
  * Use addPreferencesListener if you need to be called back when a preference is changed.
  * 
  * @author Elliott Hughes
@@ -131,7 +131,52 @@ public abstract class Preferences {
         return (Integer) preferences.get(key);
     }
     
-    public void showPreferencesDialog(final Frame parent) {
+    public void initPreferencesMenuItem(JMenu editMenu) {
+        if (GuiUtilities.isMacOs()) {
+            com.apple.eawt.Application.getApplication().setEnabledPreferencesMenu(true);
+            com.apple.eawt.Application.getApplication().addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
+                @Override
+                public void handlePreferences(com.apple.eawt.ApplicationEvent e) {
+                    showPreferencesDialog();
+                    e.setHandled(true);
+                }
+            });
+        } else {
+            editMenu.add(new JSeparator());
+            editMenu.add(makeShowPreferencesAction());
+        }
+    }
+    
+    public Action makeShowPreferencesAction() {
+        return new ShowPreferencesAction(this);
+    }
+    
+    private static class ShowPreferencesAction extends AbstractAction {
+        private Preferences preferences;
+        
+        public ShowPreferencesAction(Preferences preferences) {
+            super("Preferences...");
+            this.preferences = preferences;
+            GnomeStockIcon.configureAction(this);
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            preferences.showPreferencesDialog();
+        }
+    }
+    
+    private void showPreferencesDialog() {
+        // Find out which Frame should be the parent of the dialog.
+        Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+        if (focusOwner instanceof Frame == false) {
+            focusOwner = SwingUtilities.getAncestorOfClass(Frame.class, focusOwner);
+        }
+        if (focusOwner.getLocationOnScreen().y < 0) {
+            // This is probably the Mac OS hidden frame hack, in which case we should center on the screen.
+            focusOwner = null;
+        }
+        final Frame parent = (Frame) focusOwner;
+        
         // We can't keep reusing a form that we create just once, because you can't change the owner of an existing JDialog.
         // But we don't want to pop up another dialog if one's already up, so defer to the last one if it's still up.
         if (form != null) {
