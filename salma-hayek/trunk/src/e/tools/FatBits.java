@@ -71,7 +71,7 @@ public class FatBits extends MainFrame {
     private void initAboutBox() {
         AboutBox aboutBox = AboutBox.getSharedInstance();
         aboutBox.setWebSiteAddress("http://software.jessies.org/salma-hayek/");
-        aboutBox.addCopyright("Copyright (C) 2005-2007 Free Software Foundation, Inc.");
+        aboutBox.addCopyright("Copyright (C) 2005-2008 software.jessies.org team.");
         aboutBox.addCopyright("All Rights Reserved.");
     }
     
