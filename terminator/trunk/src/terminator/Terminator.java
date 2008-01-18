@@ -121,7 +121,7 @@ public class Terminator {
 	private void initAboutBox() {
 		AboutBox aboutBox = AboutBox.getSharedInstance();
 		aboutBox.setWebSiteAddress("http://software.jessies.org/terminator/");
-		aboutBox.addCopyright("Copyright (C) 2004-2007 Free Software Foundation, Inc.");
+		aboutBox.addCopyright("Copyright (C) 2004-2008 software.jessies.org team.");
 		aboutBox.addCopyright("All Rights Reserved.");
 	}
 	
