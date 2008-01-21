@@ -59,9 +59,7 @@ public class LogWriter {
 		// We'll keep truncating the name until we either succeed or there's no name left.
 		// This avoids assumptions about maximum filename or path lengths.
 		String commandLine = StringUtilities.join(commandWords, " ");
-		int truncationLength = commandLine.length() + 1;
-		while (truncationLength > 0) {
-			--truncationLength;
+		for (int truncationLength = commandLine.length(); truncationLength >= 0; --truncationLength) {
 			File logFile = makeLogFilename(logsDirectory, commandLine, truncationLength);
 			try {
 				this.info = "(\"" + logFile + "\" could not be opened for writing)";
@@ -70,6 +68,9 @@ public class LogWriter {
 				Log.warn("Logging \"" + ptyName + "\" to \"" + this.info + "\"");
 				return;
 			} catch (IOException ex) {
+				// access(2)'s deliberate ignoring of the effective uid renders canWrite bogus.
+				// (Lack of support for ACLs in eg NFSv2 can also cause canWrite to return erroneous results.)
+				// We do, however, support disabled logging when the user has rendered the logs directory clearly unwritable.
 				if (truncationLength == 0 && logsDirectory.canWrite()) {
 					throw ex;
 				}
