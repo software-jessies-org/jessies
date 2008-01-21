@@ -14,7 +14,8 @@ import javax.swing.Timer;
  * If the terminal logs directory does not exist or we can't open the log file for some other reason, logging is automatically suspended, and can't be un-suspended.
  */
 public class LogWriter {
-	private static DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd-HHmmss.SSSZ");
+	// We can't use ':' to separate the hours, minutes, and seconds because it's not allowed on all file systems.
+	private static final DateFormat FILENAME_TIMESTAMP_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss.SSSZ");
 	
 	private String info = "(not logging)";
 	private Writer writer;
@@ -38,12 +39,12 @@ public class LogWriter {
 		}
 	}
 	
-	private static String makeTruncatedStem(String commandLine, int truncationLength) throws UnsupportedEncodingException {
+	private static File makeLogFilename(File logsDirectory, String commandLine, int truncationLength) throws UnsupportedEncodingException {
 		String mostInterestingPartOfCommandLine = commandLine.substring(0, truncationLength);
 		String suffix = java.net.URLEncoder.encode(mostInterestingPartOfCommandLine, "UTF-8");
-		String timestamp = dateFormatter.format(new Date());
-		String stem = timestamp + "-" + suffix + ".txt";
-		return stem;
+		String timestamp = FILENAME_TIMESTAMP_FORMATTER.format(new Date());
+		String leafname = timestamp + "-" + suffix + ".txt";
+		return new File(logsDirectory, leafname);
 	}
 	
 	private void initLogging(String[] commandWords, String ptyName) throws IOException {
@@ -53,12 +54,15 @@ public class LogWriter {
 			this.info = "(\"" + logsDirectoryName + "\" does not exist)";
 			return;
 		}
+		
+		// Try to create a log file.
+		// We'll keep truncating the name until we either succeed or there's no name left.
+		// This avoids assumptions about maximum filename or path lengths.
 		String commandLine = StringUtilities.join(commandWords, " ");
 		int truncationLength = commandLine.length() + 1;
 		while (truncationLength > 0) {
-			-- truncationLength;
-			String stem = makeTruncatedStem(commandLine, truncationLength);
-			File logFile = new File(logsDirectory, stem);
+			--truncationLength;
+			File logFile = makeLogFilename(logsDirectory, commandLine, truncationLength);
 			try {
 				this.info = "(\"" + logFile + "\" could not be opened for writing)";
 				this.writer = new BufferedWriter(new FileWriter(logFile));
