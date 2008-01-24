@@ -28,7 +28,8 @@ public class FindFilesContainingSelectionAction extends ETextAction {
             pattern = StringUtilities.regularExpressionFromLiteral(selection);
         }
         String directory = guessDirectoryToSearchIn();
-        workspace.showFindInFilesDialog(pattern, directory);
+        String filenamePattern = StringUtilities.regularExpressionFromLiteral(directory);
+        workspace.showFindInFilesDialog(pattern, filenamePattern);
     }
     
     public String guessDirectoryToSearchIn() {
