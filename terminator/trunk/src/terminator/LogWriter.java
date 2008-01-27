@@ -74,7 +74,7 @@ public class LogWriter {
 						// access(2)'s deliberate ignoring of the effective uid means we can't really trust canWrite.
 						// Lack of support for ACLs in, say, NFSv2 can also cause canWrite to return erroneous results.
 						// (This is why we don't make the canWrite check up with the File.exists check.)
-						// We do, however, have undocumented support disabling logging by making the logs directory "clearly" not writable.
+						// We do, however, have undocumented support for disabling logging by making the logs directory "clearly" not writable.
 						this.info = "(\"" + logsDirectoryName + "\" is not writable)";
 						return;
 					} else {
