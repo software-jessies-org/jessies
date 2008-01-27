@@ -648,7 +648,8 @@ public class ETextWindow extends EWindow implements PTextListener {
             try {
                 writeToFile(backupFile);
             } catch (Exception ex) {
-                editor.showAlert("Couldn't save \"" + this.filename + "\"", "Couldn't create backup file.");
+                editor.showAlert("Couldn't save \"" + this.filename + "\"", "Couldn't create backup file: " + ex.getMessage() + ".");
+                Log.warn("Problem creating backup file before saving \"" + filename + "\"", ex);
                 return false;
             }
         }
@@ -697,8 +698,38 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     private void writeToFile(File file) {
-        ensureBufferEndsInNewline();
+        // Only Java has newline hygiene as part of its language specification, but it probably applies to most computer languages.
+        // For now, though, we let authors of plain text do what they like.
+        if (getFileType() != FileType.PLAIN_TEXT) {
+            // Remember what was selected/where the caret was.
+            final int selectionStart = textArea.getSelectionStart();
+            final int selectionEnd = textArea.getSelectionEnd();
+            
+            ensureBufferDoesNotEndInMultipleNewlines();
+            ensureBufferEndsInSingleNewline();
+            
+            // Restore the selection/caret as well as we can.
+            final int maxCaretIndex = textArea.getTextBuffer().length();
+            textArea.select(Math.min(maxCaretIndex, selectionStart), Math.min(maxCaretIndex, selectionEnd));
+        }
+        
         textArea.getTextBuffer().writeToFile(file);
+    }
+    
+    /**
+     * Compresses multiple newlines at the end of the file down to a single one.
+     */
+    private void ensureBufferDoesNotEndInMultipleNewlines() {
+        PTextBuffer buffer = textArea.getTextBuffer();
+        int startIndex = buffer.length() - 1;
+        int endIndex = buffer.length() - 1;
+        // FIXME: should we compress any run of whitespace down to a single '\n'? So "}\n\n  \n\n\n" would be just "}\n"?
+        while (startIndex > 0 && buffer.charAt(startIndex - 1) == '\n') {
+            --startIndex;
+        }
+        if (startIndex != endIndex) {
+            textArea.replaceRange("", startIndex, endIndex);
+        }
     }
     
     /**
@@ -706,14 +737,11 @@ public class ETextWindow extends EWindow implements PTextListener {
      * pointless requiring a round trip for the user if this isn't the case,
      * so we silently fix their files.
      */
-    private void ensureBufferEndsInNewline() {
-        FileType fileType = getFileType();
-        if (fileType == FileType.C_PLUS_PLUS || fileType == FileType.C_SHARP || fileType == FileType.JAVA) {
-            PTextBuffer buffer = textArea.getTextBuffer();
-            if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '\n') {
-                // '\n' is always correct; the buffer will translate if needed.
-                textArea.append("\n");
-            }
+    private void ensureBufferEndsInSingleNewline() {
+        PTextBuffer buffer = textArea.getTextBuffer();
+        if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '\n') {
+            // '\n' is always correct; the buffer will translate if needed when writing to disk.
+            textArea.append("\n");
         }
     }
     
