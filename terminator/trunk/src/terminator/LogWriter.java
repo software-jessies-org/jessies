@@ -68,15 +68,22 @@ public class LogWriter {
 				Log.warn("Logging \"" + ptyName + "\" to \"" + this.info + "\"");
 				return;
 			} catch (IOException ex) {
-				// access(2)'s deliberate ignoring of the effective uid renders canWrite bogus.
-				// (Lack of support for ACLs in eg NFSv2 can also cause canWrite to return erroneous results.)
-				// We do, however, support disabled logging when the user has rendered the logs directory clearly unwritable.
-				if (truncationLength == 0 && logsDirectory.canWrite()) {
-					throw ex;
+				if (truncationLength == 0) {
+					// That's it. We can't retry with a shorter filename.
+					if (logsDirectory.canWrite() == false) {
+						// access(2)'s deliberate ignoring of the effective uid means we can't really trust canWrite.
+						// Lack of support for ACLs in, say, NFSv2 can also cause canWrite to return erroneous results.
+						// (This is why we don't make the canWrite check up with the File.exists check.)
+						// We do, however, have undocumented support disabling logging by making the logs directory "clearly" not writable.
+						this.info = "(\"" + logsDirectoryName + "\" is not writable)";
+						return;
+					} else {
+						// This, though, is probably a real problem that the user needs to be explicitly alerted to.
+						throw ex;
+					}
 				}
 			}
 		}
-		this.info = "(\"" + logsDirectoryName + "\" is not writable)";
 	}
 	
 	public void append(char[] chars, int charCount, boolean sawNewline) throws IOException {
