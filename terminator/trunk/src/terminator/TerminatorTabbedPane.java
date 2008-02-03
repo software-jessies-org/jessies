@@ -145,9 +145,38 @@ public class TerminatorTabbedPane extends JTabbedPane {
     
     @Override
     public String getToolTipTextAt(int index) {
-        String primaryModifier = GuiUtilities.isMacOs() ? "\u2318" : "Alt+";
+        // Unless you have a ridiculous number of tabs, you'll get this bit.
+        String switchMessage = "";
+        String key = tabIndexToKey(index);
+        if (key != null) {
+            String primaryModifier = GuiUtilities.isMacOs() ? "\u2318" : "Alt+";
+            switchMessage = "Use " + primaryModifier + key + " to switch to this tab.<br>";
+        }
+        
+        // You always get this bit.
         String control = GuiUtilities.isMacOs() ? "\u2303" : "Ctrl+";
-        return "<html><body>Use " + primaryModifier + (index + 1) + " to switch to this tab.<br>Use " + control + "Tab to cycle through the tabs.";
+        String cycleMessage = "Use " + control + "Tab to cycle through the tabs.";
+        
+        return "<html><body>" + switchMessage + cycleMessage;
+    }
+    
+    public static String tabIndexToKey(int index) {
+        if ((index + 1) <= 9) {
+            return Integer.toString(index + 1);
+        } else if ((index + 1) == 10) {
+            // This seems strange, and makes the code awkward, but it matches the order of keys (1234567890).
+            return "0";
+        }
+        return null;
+    }
+    
+    public static int keyCharToTabIndex(char ch) {
+        if (ch >= '1' && ch <= '9') {
+            return (ch - '1');
+        } else if (ch == '0') {
+            return 9;
+        }
+        return -1;
     }
     
     // Just overriding getToolTipTextAt is insufficient because the default implementation of getToolTipText doesn't call it.
