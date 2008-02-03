@@ -605,8 +605,9 @@ public class JTerminalPane extends JPanel {
 			} else if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
 				// Emulates gnome-terminal's alt-<number> jump-to-tab behavior, or an analog of Terminal.app's command-<number> jump-to-window behavior.
 				char ch = e.getKeyChar();
-				if (ch >= '1' && ch <= '9') {
-					getTerminatorFrame().setSelectedTabIndex(ch - '1');
+				int newIndex = TerminatorTabbedPane.keyCharToTabIndex(ch);
+				if (newIndex != -1) {
+					getTerminatorFrame().setSelectedTabIndex(newIndex);
 					return true;
 				}
 			}
