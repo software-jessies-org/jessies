@@ -187,6 +187,23 @@ public class Evergreen {
         return filename;
     }
     
+    public static String processCygwinRewrites(String filename) {
+        // Perhaps we should replace processPathRewrites with a generalization of this method.
+        // I'm imagining a script that we'd invoke on all platforms.
+        // Our default script would invoke cygpath on Cygwin.
+        if (GuiUtilities.isWindows() == false) {
+            return filename;
+        }
+        ArrayList<String> jvmForm = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        // Should there ever be useful a Cygwin JVM, we may be back here.
+        int status = ProcessUtilities.backQuote(null, new String[] { "cygpath", "--windows", filename }, jvmForm, errors);
+        if (status != 0 || jvmForm.size() != 1) {
+            return filename;
+        }
+        return jvmForm.get(0);
+    }
+    
     public EWindow openFile(InitialFile file) {
         try {
             return openFileNonInteractively(file);
@@ -235,6 +252,7 @@ public class Evergreen {
         }
         
         filename = processPathRewrites(filename);
+        filename = processCygwinRewrites(filename);
         
         // Remove local-directory fluff.
         if (filename.startsWith("./") || filename.startsWith(".\\")) {
