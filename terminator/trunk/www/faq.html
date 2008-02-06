@@ -120,7 +120,16 @@ E558: Terminal entry not found in terminfo
 defaulting to 'ansi'
 </pre>
 
-<p>If you think you have the correct terminfo available but you're still having problems, the next thing to check is that you're actually <i>using</i> Terminator's terminfo. For example, if your problem is with your shell, check that <tt>echo $TERM</tt> says "terminator", and if your problem is with Vim, check that <tt>:se term</tt> says "term=terminator". (Although Terminator sets the TERM environment variable for you, it may be being overridden by your shell's profile, say, and it won't necessarily be correctly transferred if you log in to a remote machine, so it's always worth checking.)
+<p>If you think you have the correct terminfo available but you're still having problems, the next thing to check is that you're actually <i>using</i> Terminator's terminfo. For example, if your problem is with your shell, check that <tt>echo $TERM</tt> says "terminator", and if your problem is with Vim, check that <tt>:se term</tt> says "term=terminator".
+
+<p>Although Terminator sets the TERM environment variable for you, it may be being overridden by your shell's profile, say, and it won't necessarily be correctly transferred if you log in to a remote machine, so it's always worth checking.  The right fix is fix the profile not to override TERM or to use a protocol like ssh which will transfer your terminal type.  You don't want to be forcing TERM to be "terminator" in your profile.  That's how this sort of problem starts.
+
+<p>RedHat's sudo package depends on vim-minimal, which provides /bin/vi.
+vim-minimal appears to be avoiding the use of terminfo deliberately, if frustratingly.
+There are several possible solutions but this one is our current recommendation:
+<pre>
+sudo ln -s /usr/bin/vim /usr/local/bin/vi
+</pre>
 
 <h3>Terminfo problems on Cygwin</h3>
 <p>Cygwin's less(1) still uses a termcap-based ncurses library.
