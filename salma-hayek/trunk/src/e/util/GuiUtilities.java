@@ -96,7 +96,7 @@ public class GuiUtilities {
      * Assumes that you want the platform's default modifier for keyboard equivalents (but see also setDefaultKeyStrokeModifier).
      */
     public static KeyStroke makeKeyStroke(final String key, final boolean shifted) {
-        return makeKeyStrokeWithModifiers(defaultKeyStrokeModifier | (shifted ? 0 : InputEvent.SHIFT_MASK), key);
+        return makeKeyStrokeWithModifiers(defaultKeyStrokeModifier | (shifted ? InputEvent.SHIFT_MASK : 0), key);
     }
     
     /**
