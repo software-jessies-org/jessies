@@ -62,6 +62,11 @@ public abstract class ExternalToolsParser {
                 outputDisposition = ToolOutputDisposition.REPLACE;
                 needsFile = true;
                 command = command.substring(1);
+            } else if (command.startsWith("!")) {
+                inputDisposition = ToolInputDisposition.NO_INPUT;
+                outputDisposition = ToolOutputDisposition.ERRORS_WINDOW;
+                needsFile = true;
+                command = command.substring(1);
             }
             
             ExternalToolAction action = new ExternalToolAction(name, inputDisposition, outputDisposition, command);
