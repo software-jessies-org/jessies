@@ -56,12 +56,23 @@ public class EvergreenMenuBar extends EMenuBar {
     }
 
     private static JMenuItem makeAcceleratedItem(Action action, String key) {
-        return makeAcceleratedItemEx(action, key, false);
-    }
-
-    private static JMenuItem makeAcceleratedItemEx(Action action, String key, boolean shifted) {
+        // For now, the heuristic is that special keys (mainly just the function keys) have names and don't want any extra modifiers.
+        // Simple letter keys, to keep from colliding with built-in keystrokes, automatically get the platform default modifier plus shift.
+        // Neither part of this is really right.
+        // For one thing, you might well want to have f1, shift-f1, and so on all do different (though probably related) things.
+        // For another, we already use various of the "safe" combinations for built-in functionality; "Find in Files", for example.
+        // I can't remember what's wrong with KeyStroke.getKeyStroke(String); I believe the problems were:
+        // 1. complex case sensitivity for key names.
+        // 2. no support for the idea of a platform-default modifier.
+        // 3. users can get themselves into trouble with pressed/released/typed.
+        // In the long run, though, we're going to want to implement our own replacement for that, or a pre-processor.
+        int modifiers = 0;
+        if (key.length() == 1) {
+            modifiers = GuiUtilities.getDefaultKeyStrokeModifier() | InputEvent.SHIFT_MASK;
+        }
+        
         JMenuItem item = new JMenuItem(action);
-        KeyStroke keyStroke = GuiUtilities.makeKeyStroke(key, shifted);
+        KeyStroke keyStroke = GuiUtilities.makeKeyStrokeWithModifiers(modifiers, key);
         if (keyStroke != null) {
             item.setAccelerator(keyStroke);
         }
@@ -139,8 +150,8 @@ public class EvergreenMenuBar extends EMenuBar {
                 menu.add(action);
             }
 
-            public void addItem(ExternalToolAction action, char keyboardEquivalent) {
-                menu.add(makeAcceleratedItemEx(action, "" + keyboardEquivalent, true));
+            public void addItem(ExternalToolAction action, String keyboardEquivalent) {
+                menu.add(makeAcceleratedItem(action, keyboardEquivalent));
             }
 
             public void addSeparator() {

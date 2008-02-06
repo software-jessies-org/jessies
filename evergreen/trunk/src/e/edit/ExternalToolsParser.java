@@ -13,7 +13,7 @@ context-sensitive actions on its popup menu.
  */
 public abstract class ExternalToolsParser {
     public abstract void addItem(ExternalToolAction action);
-    public abstract void addItem(ExternalToolAction action, char keyEquivalent);
+    public abstract void addItem(ExternalToolAction action, String keyboardEquivalent);
     public abstract void addSeparator();
 
     public void parse() {
@@ -76,7 +76,7 @@ public abstract class ExternalToolsParser {
             
             String keyboardEquivalent = Parameters.getParameter(prefix + "keyboardEquivalent", null);
             if (keyboardEquivalent != null) {
-                char equivalent = keyboardEquivalent.toUpperCase().charAt(0);
+                String equivalent = keyboardEquivalent.trim().toUpperCase();
                 addItem(action, equivalent);
             } else {
                 addItem(action);
