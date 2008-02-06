@@ -92,20 +92,21 @@ public class GuiUtilities {
     }
     
     /**
-     * Returns a KeyStroke suitable for passing to putValue(Action.ACCELERATOR_KEY) to
-     * set up a keyboard equivalent for an Action.
+     * Returns a KeyStroke suitable for passing to putValue(Action.ACCELERATOR_KEY) to set up a keyboard equivalent for an Action.
+     * Assumes that you want the platform's default modifier for keyboard equivalents (but see also setDefaultKeyStrokeModifier).
      */
     public static KeyStroke makeKeyStroke(final String key, final boolean shifted) {
-        return makeKeyStrokeForModifier(defaultKeyStrokeModifier, key, shifted);
+        return makeKeyStrokeWithModifiers(defaultKeyStrokeModifier | (shifted ? 0 : InputEvent.SHIFT_MASK), key);
     }
     
-    private static KeyStroke makeKeyStrokeForModifier(final int modifier, final String key, final boolean shifted) {
-        int modifiers = modifier;
-        if (shifted) modifiers |= InputEvent.SHIFT_MASK;
+    /**
+     * Returns a KeyStroke suitable for passing to putValue(Action.ACCELERATOR_KEY) to set up a keyboard equivalent for an Action.
+     * Callers supply their own set of modifiers (see InputEvent).
+     */
+    public static KeyStroke makeKeyStrokeWithModifiers(final int modifiers, final String key) {
         String keycodeName = "VK_" + key;
-        int keycode;
         try {
-            keycode = KeyEvent.class.getField(keycodeName).getInt(KeyEvent.class);
+            int keycode = KeyEvent.class.getField(keycodeName).getInt(KeyEvent.class);
             return KeyStroke.getKeyStroke(keycode, modifiers);
         } catch (Exception ex) {
             Log.warn("Couldn't find virtual keycode for \"" + key + "\".", ex);
