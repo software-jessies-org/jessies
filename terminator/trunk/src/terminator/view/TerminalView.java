@@ -205,7 +205,18 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	 */
 	public Dimension getCharUnitSize() {
 		FontMetrics metrics = getFontMetrics(getFont());
-		return new Dimension(metrics.charWidth('W'), metrics.getHeight());
+		int width = metrics.charWidth('W');
+		int height = metrics.getHeight();
+		// Avoid divide by zero errors, so the user gets a chance to change their font.
+		if (width == 0) {
+			Log.warn("Insane font width for " + getFont());
+			width = 1;
+		}
+		if (height == 0) {
+			Log.warn("Insane font height for " + getFont());
+			height = 1;
+		}
+		return new Dimension(width, height);
 	}
 	
 	/**
