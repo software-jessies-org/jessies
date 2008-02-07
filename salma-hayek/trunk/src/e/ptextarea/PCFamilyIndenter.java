@@ -93,7 +93,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             indentation = decreaseIndentation(indentation);
         }
         
-        // Recognize JavaDoc-style comments, and help out with the ASCII art.
+        // Recognize block comments, and help out with the ASCII art.
         if (lineIndex > 0) {
             List<PLineSegment> previousLineSegments = textArea.getLineSegments(lineIndex - 1);
             if (previousLineSegments.size() > 0) {
@@ -109,8 +109,9 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
                 // Extract this line's text. I think we can safely infer whether or not it's comment (see below).
                 String currentLineText = textArea.getLineText(lineIndex).trim();
                 
-                if (previousLineCommentText.startsWith("/**") || previousLineCommentText.startsWith("*")) {
-                    // We're either part-way through, or on the line after, a JavaDoc-style block comment.
+                // NewlineInserter treats /** and /* the same way, so we should too.
+                if (previousLineCommentText.startsWith("/*") || previousLineCommentText.startsWith("*")) {
+                    // We're either part-way through, or on the line after, a block comment.
                     if (previousLineCommentText.endsWith("*/")) {
                         // We're on the line after, so we must leave the current line's indentation as it is.
                     } else if (currentLineText.endsWith("*/")) {
