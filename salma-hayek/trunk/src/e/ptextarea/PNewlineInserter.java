@@ -47,6 +47,13 @@ public class PNewlineInserter {
             if (isUnclosedComment(chars, startPosition, lineToTheLeft)) {
                 insertMatchingCloseComment();
             } else {
+                // This should perhaps be an indenter method, but for now special-case PCopyingIndenter so we know it only applies to the new line.
+                // The other indenters all get a chance to fix the current line's indentation.
+                // It's possible that not differentiating between these two cases when calling the indenter is a design error.
+                if (textArea.getIndenter() instanceof PCopyingIndenter) {
+                    fixIndentation = false;
+                }
+                
                 textArea.replaceSelection("\n");
                 if (fixIndentation) {
                     textArea.getIndenter().fixIndentationOnLine(startLineIndex);
