@@ -24,7 +24,7 @@ public class EvergreenPreferences extends Preferences {
         addPreference(PROPORTIONAL_FONT, new Font("Verdana", Font.PLAIN, 12), "Proportional font");
         addPreference(ALWAYS_USE_FIXED_FONT, Boolean.TRUE, "Always use fixed font");
         addSeparator();
-        addPreference(UNINTERESTING_EXTENSIONS, ".a;.aux;.bak;.bin;.class;.d;.elf;.exe;.gif;.icns;.jar;.jpeg;.jpg;.lib;.log;.map;.o;.obj;.orig;.pdf;.png;.ps;.rej;.swp;.texshop;.tiff;.toc", "Don't index");
+        addPreference(UNINTERESTING_EXTENSIONS, ".a;.aux;.bak;.bin;.class;.d;.elf;.exe;.gif;.icns;.jar;.jpeg;.jpg;.lib;.log;.map;.o;.obj;.orig;.pdf;.png;.ps;.pyc;.pyo;.rej;.swp;.texshop;.tiff;.toc", "Don't index");
         
         // FIXME: Evergreen and PTextArea need more work before we can change colors at run-time.
         //addSeparator();
