@@ -122,7 +122,7 @@ defaulting to 'ansi'
 
 <p>If you think you have the correct terminfo available but you're still having problems, the next thing to check is that you're actually <i>using</i> Terminator's terminfo. For example, if your problem is with your shell, check that <tt>echo $TERM</tt> says "terminator", and if your problem is with Vim, check that <tt>:se term</tt> says "term=terminator".
 
-<p>Although Terminator sets the TERM environment variable for you, it may be being overridden by your shell's profile. Also, if you're logging in to a remote machine, the value of TERM may not be correctly transferred. It's always worth checking as described in the previous paragraph. The correct fix is to change your profile so it doesn't override TERM, and to use protocols like SSH which transfer your terminal type. You definitely shouldn't force TERM to be "terminator" (or any other value) in your profile: that's how you get into this kind of trouble.
+<p>Although Terminator sets the TERM environment variable to "terminator" for you, your shell's profile may be setting it to an incorrect value. Also, if you're logging in to a remote machine, the value of TERM may not be correctly transferred. It's always worth checking as described in the previous paragraph. The correct fix is to change your profile so it doesn't override TERM, and to use protocols like SSH which transfer your terminal type. You definitely shouldn't force TERM to be "terminator" (or any other value) in your profile: that's how you get into this kind of trouble.
 
 <p>RedHat's sudo package depends on vim-minimal, which provides /bin/vi.
 vim-minimal appears to be avoiding the use of terminfo deliberately, if frustratingly.
