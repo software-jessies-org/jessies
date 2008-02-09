@@ -33,7 +33,8 @@ public class PKeyHandler implements KeyListener {
     }
     
     public void keyPressed(KeyEvent e) {
-        if (e.isControlDown() && e.isShiftDown()) {
+        // This is disabled because it's not been useful for years, and steals three key combinations.
+        if (false && e.isControlDown() && e.isShiftDown()) {
             switch (e.getKeyCode()) {
             case KeyEvent.VK_T:
                 textArea.logLineInfo();
