@@ -232,7 +232,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                     break;
                 }
                 comment = false;
-                index = endIndex + 2;
+                index = endIndex + multiLineCommentEnd().length();
             } else {
                 // Uncommented - strings eat comments.
                 char previous = 0;
