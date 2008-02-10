@@ -32,6 +32,13 @@ public abstract class PIndenter {
     }
     
     /**
+     * Returns true if this indenter isn't capable of fixing the current line, and is only usable for computing auto-indent (i.e. indentation for the next line).
+     */
+    public boolean canOnlyAutoIndent() {
+        return false;
+    }
+    
+    /**
      * Returns a copy of just the leading part of the given line.
      * Usually that just contains whitespace but the asterisks at the start
      * of the body lines of a doc-comment are also considered as indentation
