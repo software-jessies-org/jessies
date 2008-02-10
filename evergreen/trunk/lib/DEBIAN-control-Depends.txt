@@ -1,5 +1,7 @@
 exuberant-ctags (>= 1:5.5.4)
 glibc-doc (>= 2.3.2)
+pychecker
 ri
 rman (>= 3.2)
 stl-manual (>= 3.30)
+tidy
