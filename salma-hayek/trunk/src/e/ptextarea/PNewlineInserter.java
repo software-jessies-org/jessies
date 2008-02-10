@@ -48,14 +48,14 @@ public class PNewlineInserter {
                 insertMatchingCloseComment();
             } else {
                 textArea.replaceSelection("\n");
-                if (fixIndentation) {
-                    textArea.getIndenter().fixIndentationOnLine(startLineIndex);
-                    textArea.getIndenter().fixIndentation();
-                } else if (textArea.getIndenter().canOnlyAutoIndent()) {
+                if (textArea.getIndenter().canOnlyAutoIndent()) {
                     // The other indenters all get a chance to fix the current line's indentation before suggesting an auto-indent level for this line.
                     // It's possible that not differentiating between these two cases when calling the indenter is a design error.
                     // It's also possible that allowing this code to modify lines other than the newly-inserted line is a design error.
                     // We certainly make it annoyingly hard for the user to override us even when they want to, though maybe if our indenters were better no-one would care?
+                    textArea.getIndenter().fixIndentation();
+                } else if (fixIndentation) {
+                    textArea.getIndenter().fixIndentationOnLine(startLineIndex);
                     textArea.getIndenter().fixIndentation();
                 } else {
                     new PCopyingIndenter(textArea).fixIndentation();
