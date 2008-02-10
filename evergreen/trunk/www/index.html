@@ -117,17 +117,21 @@ It's interface is broadly similar to <code>JTextArea</code> so it's easy to use 
 <h2><a name="configuration">Configuration</a></h2>
 
 <h3>Restricting Evergreen's Indexing Activity</h3>
-<p>If Evergreen finds an executable called <tt>echo-local-non-source-directory-pattern</tt> on your path, it will be run and the output interpreted as a set of regular expression patterns (one per line) describing directories that Evergreen shouldn't scan when indexing your workspace.
+<p>If Evergreen finds an executable called <tt>echo-local-non-source-directory-pattern</tt> on your path, it will be run at start-up.
+The output is interpreted as a regular expression pattern per line describing the names of directories that Evergreen shouldn't scan when indexing your workspace.
 Evergreen already knows about most version control systems and about the autotools directories, so you shouldn't have to worry about those.
-Evergreen also assumes that no-one keeps anything it should look at in "dot directories" (directories whose names begin with a ".").
-This functionality is useful in cases such as when your object files (or test data, or whatever you don't want Evergreen to index/search) are under your workspace.
-You should make sure Evergreen knows the name of the directories containing objects.
+Evergreen also assumes that there's nothing interesting in "dot directories" (directories whose names begin with a ".").
+The ability to add custom directory patterns is useful in a variety of cases.
+The most common example is when your object files (or your test data, or whatever it is you don't want Evergreen to index/search) live under your workspace root but are segregated into directories with distinctive names.
+You should make sure Evergreen knows the name of the directories containing such files, for performance.
 
-<p>If you can't help Evergreen out, perhaps because keep your object files in the same directory as your source, Evergreen will ignore each file one by one.
-This is okay, but it's much less efficient, and it's your time you're wasting.
-Evergreen knows about most common build artifacts (object files and their friends) and recognizes them by their filename extension.
+<p>If you can't help Evergreen out&nbsp;&ndash; perhaps because keep your object files in the same directory as your source&nbsp;&ndash; Evergreen will ignore each file one by one.
+This has a similar end result, but it's much less efficient, and it's your time you're wasting.
+
+<p>Evergreen already knows about most common build artifacts (object files and their friends) and recognizes them by their filename extension.
 If you have an unusual one (and it isn't already hidden in a directory that Evergreen won't scan) you can add the extension to Evergreen's list in the GUI preferences dialog.
-(If you think the extension is a common one that Evergreen should automatically ignore, please let us know so that we can add it to the built-in list so everyone benefits.)
+
+<p>If you think the extension is a common one that Evergreen should automatically ignore, please let us know so that we can add it to the built-in list so everyone benefits.
 
 <!--#include virtual="/salma-hayek/downloads.html" -->
 
