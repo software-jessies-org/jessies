@@ -12,8 +12,18 @@ public class PCopyingIndenter extends PSimpleIndenter {
     /**
      * Ignores all characters.
      */
+    @Override
     public boolean isElectric(char c) {
         return false;
+    }
+    
+    /**
+     * Marks this indenter as being unsuitable for fixing indentation.
+     * It should only be used by PNewlineInserter for computing auto-indent.
+     */
+    @Override
+    public boolean canOnlyAutoIndent() {
+        return true;
     }
     
     @Override
