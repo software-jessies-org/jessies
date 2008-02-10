@@ -66,6 +66,7 @@ public class PNewlineInserter {
         }
     }
     
+    // FIXME: assumes C-family multi-line comments.
     private boolean isUnclosedComment(CharSequence entireDocument, int insertionPosition, CharSequence lineToTheLeft) {
         if (Pattern.matches("[ \t]*/\\*{1,2}", lineToTheLeft)) {
             // We're on a line that starts a block comment, but is it unclosed?
@@ -137,6 +138,7 @@ public class PNewlineInserter {
         return true;
     }
     
+    // FIXME: assumes C-family multi-line comments.
     private void insertMatchingCloseComment() {
         final int position = textArea.getSelectionStart();
         String whitespace = getIndentationOfLineAtOffset(position);
