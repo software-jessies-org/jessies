@@ -558,12 +558,32 @@ define closeLocalVariableScope
   $(call forEachLocalVariable,unsetLocalVariable)
 endef
 
+# This variable can only be correctly evaluated after we've included per-directory.make.
+# This should remain the first reference to it, to keep us out of trouble.
+ALL_PER_DIRECTORY_TARGETS = $(error ALL_PER_DIRECTORY_TARGETS evaluated too early)
+
 BUILD_TARGETS += $(if $(JAVA_SOURCE_FILES),.generated/java.build-finished)
 BUILD_TARGETS += $(if $(REVISION_CONTROL_SYSTEM_DIRECTORY),.generated/build-revision.txt)
 TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
 # We deliberately omit the intermediate directory.
 COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
 BUILD_TARGETS += $(COMPILED_TERMINFO)
+BUILD_TARGETS += $(ALL_PER_DIRECTORY_TARGETS)
+
+FILES_TO_INSTALL += $(ALL_PER_DIRECTORY_TARGETS)
+FILES_TO_INSTALL += .generated/build-revision.txt
+FILES_TO_INSTALL += $(COMPILED_TERMINFO)
+
+SUBDIRECTORIES_TO_INSTALL += bin
+SUBDIRECTORIES_TO_INSTALL += doc
+SUBDIRECTORIES_TO_INSTALL += lib
+
+define MAKE_INSTALLER_FILE_LIST
+  { \
+    $(foreach file,$(FILES_TO_INSTALL),echo $(file) &&) \
+    find $(wildcard $(SUBDIRECTORIES_TO_INSTALL)) $(FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY) -type f -print; \
+  } | ruby -ne 'chomp!(); puts("Including #{$$_}...")'
+endef
 
 # ----------------------------------------------------------------------------
 # Variables above this point, rules below.
@@ -572,7 +592,32 @@ BUILD_TARGETS += $(COMPILED_TERMINFO)
 # in any overt immediate evaluations (like := assignments).
 # ----------------------------------------------------------------------------
 
+# build is the default target and so must appear first, though we can't evaluate BUILD_TARGETS until later.
 .PHONY: build
+build:
+
+# ----------------------------------------------------------------------------
+# The magic incantation to build and clean all the native subdirectories.
+# Including per-directory.make more than once is bound to violate the
+# variables-before-rules dictum.
+# per-directory.make needs to cope with that but it'd be best if it doesn't impose
+# that constraint on the rest of universal.make - so let's keep this after the universal.make variables.
+# ----------------------------------------------------------------------------
+
+define buildNativeDirectory
+  SOURCE_DIRECTORY = $(1)
+  include $(SALMA_HAYEK)/lib/build/per-directory.make
+endef
+
+$(takeProfileSample)
+DUMMY := $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR)))$(closeLocalVariableScope))
+BASE_NAME = (rules)
+$(takeProfileSample)
+
+# Redefined here because this can only be correctly evaluated after we've included per-directory.make.
+ALL_PER_DIRECTORY_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
+
+# Now we can evaluate BUILD_TARGETS.
 build: $(BUILD_TARGETS)
 
 # This sentinel tells us that we need to rebuild if the source changes during the compilation:
@@ -649,7 +694,7 @@ installer-file-list:
 
 # Unfortunately, the start-up scripts tend to go looking for salma-hayek, so we can't just have Resources/bin etc; we have to keep the multi-directory structure, at least for now.
 .PHONY: $(MACHINE_PROJECT_NAME).app
-$(MACHINE_PROJECT_NAME).app: build .generated/build-revision.txt
+$(MACHINE_PROJECT_NAME).app: $(BUILD_TARGETS) .generated/build-revision.txt
 	$(BUILD_SCRIPT_PATH)/package-for-distribution.rb $(HUMAN_PROJECT_NAME) $(MACHINE_PROJECT_NAME) $(SALMA_HAYEK)
 
 # For a comparison of the major choices available at the time, see:
@@ -749,50 +794,8 @@ echo.%:
 
 -include .generated/recompilation-trigger.make
 
-# ----------------------------------------------------------------------------
-# The magic incantation to build and clean all the native subdirectories.
-# Including per-directory.make more than once is bound to violate the
-# variables-before-rules dictum.
-# per-directory.make needs to cope with that but it'd be best if it doesn't impose
-# that constraint on the rest of universal.make - so let's keep this last.
-# ----------------------------------------------------------------------------
-
-define buildNativeDirectory
-  SOURCE_DIRECTORY = $(1)
-  include $(SALMA_HAYEK)/lib/build/per-directory.make
-endef
-
-$(takeProfileSample)
-DUMMY := $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR)))$(closeLocalVariableScope))
-BASE_NAME = (rules)
-$(takeProfileSample)
-
-# Defined here because this can only be correctly evaluated after we've included per-directory.make...
-ALL_PER_DIRECTORY_TARGETS = $(foreach SUBDIR,$(SUBDIRS),$(DESIRED_TARGETS.$(notdir $(SUBDIR))))
-
-# ... and this depends on the above variable.
-FILES_TO_INSTALL += $(ALL_PER_DIRECTORY_TARGETS)
-FILES_TO_INSTALL += .generated/build-revision.txt
-FILES_TO_INSTALL += $(COMPILED_TERMINFO)
-SUBDIRECTORIES_TO_INSTALL += bin
-SUBDIRECTORIES_TO_INSTALL += doc
-SUBDIRECTORIES_TO_INSTALL += lib
-define MAKE_INSTALLER_FILE_LIST
-  { \
-    $(foreach file,$(FILES_TO_INSTALL),echo $(file) &&) \
-    find $(wildcard $(SUBDIRECTORIES_TO_INSTALL)) $(FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY) -type f -print; \
-  } | ruby -ne 'chomp!(); puts("Including #{$$_}...")'
-endef
-
-# The installer uses find(1) to discover what to include - so it must be built last.
-$(WIX_COMPILATION_DIRECTORY)/component-definitions.wxi: $(ALL_PER_DIRECTORY_TARGETS)
-
-# Presumably we need a similar dependency for non-WiX installers, which need the per-directory targets slightly later but still before the installer.
-$(MACHINE_PROJECT_NAME).app: $(ALL_PER_DIRECTORY_TARGETS)
-
 .PHONY: native
 native: $(ALL_PER_DIRECTORY_TARGETS)
-build: native
 
 .PHONY: installer
 installer: $(PUBLISHABLE_INSTALLERS)
@@ -801,7 +804,7 @@ installer: $(PUBLISHABLE_INSTALLERS)
 native-dist: $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS))
 
 # We still need the default salma-hayek build during the nightly build.
-install installer native-dist: build
+install installer native-dist: $(BUILD_TARGETS)
 
 # I'm deliberately downloading the previous version of the installer and overwriting the version you've just built.
 # This is so that, when we regenerate the Packages file, we don't change md5sums.
