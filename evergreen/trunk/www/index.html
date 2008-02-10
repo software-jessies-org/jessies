@@ -133,6 +133,16 @@ If you have an unusual one (and it isn't already hidden in a directory that Ever
 
 <p>If you think the extension is a common one that Evergreen should automatically ignore, please let us know so that we can add it to the built-in list so everyone benefits.
 
+<h3>Adding Custom Lint Checkers</h3>
+<p>If you dislike Evergreen's default choice of lint checker for a given language, or have a lint checker for a language Evergreen doesn't have a default for, you can override or supplement Evergreen's choices.
+Say you have a C++ static analysis tool you want Evergreen to use.
+Edit the <tt>~/.e.edit.Edit/edit.properties</tt> file and add a line <tt>C++.lintChecker=cpplint</tt> (including any arguments).
+The bit before the "." is the name shown in the File Properties dialog.
+If lint checking for HTML weren't built in, for example, the current behavior could be specified with <tt>XML.lintChecker=tidy -qe</tt>.
+Note that we use the file type mode's name ("XML") rather than, say, the specific file extension or specific dialect.
+
+<p>We hope to replace this with a GUI for filetype-specific configuration in the future.
+
 <!--#include virtual="/salma-hayek/downloads.html" -->
 
 <!--#include virtual="/salma-hayek/footer.html" -->
