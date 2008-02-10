@@ -110,6 +110,12 @@ salma_hayek = ARGV.shift()
 require "#{salma_hayek}/bin/invoke-java.rb"
 require "#{salma_hayek}/bin/target-os.rb"
 
+# We don't know what umask the user has, so let's protect against that.
+# This protects against the following error on Linux with "umask 0027":
+# dpkg-deb: control directory has bad permissions 750 (must be >=0755 and <=0775)
+# We've not seen it be necessary on other platforms yet, but it's hard to imagine we'd want anything else.
+File.umask(0022)
+
 native_name_for_bundle = nil
 if target_os() == "Darwin"
     native_name_for_bundle = ".app bundle"
