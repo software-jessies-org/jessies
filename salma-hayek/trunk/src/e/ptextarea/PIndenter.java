@@ -26,7 +26,7 @@ public abstract class PIndenter {
      */
     public abstract void fixIndentationOnLine(int lineIndex);
     
-    // FIXME: this is a hack for the benefit of PNewlineInserter, which does its own indentation fixing, rather than deferring to the indenter.
+    // FIXME: this is a hack for the benefit of PNewlineInserter, which does its own indentation fixing when inserting matching brackets, rather than deferring to the indenter. (Why is that the case?)
     public boolean isInNeedOfClosingSemicolon(String line) {
         return false;
     }
