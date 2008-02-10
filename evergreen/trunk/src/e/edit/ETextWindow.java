@@ -442,10 +442,6 @@ public class ETextWindow extends EWindow implements PTextListener {
                 addAction(action);
             }
 
-            public void addItem(ExternalToolAction action, String keyboardEquivalent) {
-                addAction(action);
-            }
-
             private void addAction(ExternalToolAction action) {
                 /* Ignore ExternalToolActions that aren't context-sensitive. */
                 if (action.isContextSensitive() == false) {
