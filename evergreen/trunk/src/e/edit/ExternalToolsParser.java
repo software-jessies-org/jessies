@@ -1,6 +1,8 @@
 package e.edit;
 
 import e.util.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 /**
 
@@ -13,7 +15,6 @@ context-sensitive actions on its popup menu.
  */
 public abstract class ExternalToolsParser {
     public abstract void addItem(ExternalToolAction action);
-    public abstract void addItem(ExternalToolAction action, String keyboardEquivalent);
     public abstract void addSeparator();
 
     public void parse() {
@@ -76,11 +77,28 @@ public abstract class ExternalToolsParser {
             
             String keyboardEquivalent = Parameters.getParameter(prefix + "keyboardEquivalent", null);
             if (keyboardEquivalent != null) {
-                String equivalent = keyboardEquivalent.trim().toUpperCase();
-                addItem(action, equivalent);
-            } else {
-                addItem(action);
+                keyboardEquivalent = keyboardEquivalent.trim().toUpperCase();
+                // For now, the heuristic is that special keys (mainly just the function keys) have names and don't want any extra modifiers.
+                // Simple letter keys, to keep from colliding with built-in keystrokes, automatically get the platform default modifier plus shift.
+                // Neither part of this is really right.
+                // For one thing, you might well want to have f1, shift-f1, and so on all do different (though probably related) things.
+                // For another, we already use various of the "safe" combinations for built-in functionality; "Find in Files", for example.
+                // I can't remember what's wrong with KeyStroke.getKeyStroke(String); I believe the problems were:
+                // 1. complex case sensitivity for key names.
+                // 2. no support for the idea of a platform-default modifier.
+                // 3. users can get themselves into trouble with pressed/released/typed.
+                // In the long run, though, we're going to want to implement our own replacement for that, or a pre-processor.
+                int modifiers = 0;
+                if (keyboardEquivalent.length() == 1) {
+                    modifiers = GuiUtilities.getDefaultKeyStrokeModifier() | InputEvent.SHIFT_MASK;
+                }
+                
+                KeyStroke keyStroke = GuiUtilities.makeKeyStrokeWithModifiers(modifiers, keyboardEquivalent);
+                if (keyStroke != null) {
+                    action.putValue(Action.ACCELERATOR_KEY, keyStroke);
+                }
             }
+            addItem(action);
         }
     }
 }
