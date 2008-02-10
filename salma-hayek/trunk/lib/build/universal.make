@@ -801,7 +801,7 @@ installer: $(PUBLISHABLE_INSTALLERS)
 native-dist: $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS))
 
 # We still need the default salma-hayek build during the nightly build.
-native-dist: build
+install installer native-dist: build
 
 # I'm deliberately downloading the previous version of the installer and overwriting the version you've just built.
 # This is so that, when we regenerate the Packages file, we don't change md5sums.
