@@ -47,7 +47,7 @@ public class PNewlineInserter {
             if (isUnclosedComment(chars, startPosition, lineToTheLeft)) {
                 insertMatchingCloseComment();
             } else {
-                textArea.replaceSelection("\n");
+                textArea.replaceSelection("\n" + textArea.getIndenter().getCurrentIndentationOfLine(startLineIndex));
                 if (textArea.getIndenter().canOnlyAutoIndent()) {
                     // The other indenters all get a chance to fix the current line's indentation before suggesting an auto-indent level for this line.
                     // It's possible that not differentiating between these two cases when calling the indenter is a design error.

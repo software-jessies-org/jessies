@@ -15,9 +15,12 @@ public abstract class PIndenter {
     }
     
     /**
-     * Returns true if c is an 'electric' character, which is Emacs terminology
-     * for a character that causes the line's indentation to be fixed when
-     * typed. Typically, this signifies the end of a block.
+     * Returns true if c is an 'electric' character.
+     * This is Emacs terminology for a character that, when typed, causes the line's indentation to be reassessed.
+     * Typically, this signifies the end of a block.
+     * 
+     * Note that Vim uses a significantly more sophisticated system:
+     * http://vimdoc.sourceforge.net/htmldoc/indent.html#indentkeys-format
      */
     public abstract boolean isElectric(char c);
     
@@ -45,12 +48,15 @@ public abstract class PIndenter {
      * because they end in (a single character of) whitespace.
      */
     public final String getCurrentIndentationOfLine(int lineNumber) {
-        String line = textArea.getLineText(lineNumber);
+        return indentationOf(textArea.getLineText(lineNumber));
+    }
+    
+    public static final String indentationOf(String line) {
         Matcher matcher = INDENTATION_PATTERN.matcher(line);
         if (matcher.matches()) {
             return matcher.group(1);
         } else {
-            throw new IllegalArgumentException("line number " + lineNumber + " \"" + line + "\" has impossible indentation");
+            throw new IllegalArgumentException("line \"" + line + "\" has impossible indentation");
         }
     }
     
