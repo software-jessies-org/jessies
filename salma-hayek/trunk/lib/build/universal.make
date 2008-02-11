@@ -759,7 +759,7 @@ $(INSTALLER.msi): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj $(
 	cd $(PACKAGING_DIRECTORY) && \
 	light -nologo -out $(call convertToNativeFilenames,$(CURDIR)/$@ $(CURDIR)/$<)
 
-$(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/installer.wxs
+$(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/build/installer.wxs
 	$(COPY_RULE)
 
 # ----------------------------------------------------------------------------
