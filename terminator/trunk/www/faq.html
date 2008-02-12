@@ -159,7 +159,7 @@ package from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports and Packa
 
 <p>If you're not able to run Terminator as root, you can simply run Terminator as yourself on the remote machine.
 
-<p>If you can't easily install or run Terminator on the remote machine, you only need to copy the terminfo file to <tt>~/.terminfo/t/terminator</tt> (you'll need to <tt>mkdir -p ~/.terminfo/t</tt> if the directories don't already exist).
+<p>If you can't easily install or run Terminator on the remote machine, you only need to copy the terminfo file to <tt>~/.terminfo/t/terminator</tt> (you'll need to <tt>mkdir -p ~/.terminfo/t</tt> if the directories don't already exist). Note that if your remote machine is a Mac, you'll need to copy the file to <tt>~/.terminfo/74/terminator</tt> because of a long-standing Mac OS bug (0x74 is the byte representing 't' in ASCII); running Terminator automatically covers both cases, for completeness.
 
 <p>On Linux or Mac OS, and most other ncurses-based systems, this is all you need to do. If you still have problems like the ones shown at the start of this section, add the following lines to your profile on the remote machine:
 <pre>
