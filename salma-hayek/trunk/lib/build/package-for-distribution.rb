@@ -365,7 +365,7 @@ if target_os() == "Linux"
         # Pull our build dependencies from a file rather than hard-coding them here.
         # We get build-essential for free.
         # We could also get per-project build dependencies here.
-        build_depends_filename = "#{salma_hayek}/lib/DEBIAN-control-Build-Depends.txt"
+        build_depends_filename = "#{salma_hayek}/lib/build/DEBIAN-control-Build-Depends.txt"
         build_depends = IO.readlines(build_depends_filename).join(", ").gsub("\n", "")
         
         control.puts("Depends: #{depends}")
