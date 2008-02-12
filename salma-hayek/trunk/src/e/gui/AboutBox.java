@@ -310,14 +310,14 @@ public class AboutBox {
         }
     }
     
-    public String getBugReportSubject() {
-        String systemDetails = Log.getSystemDetailsForBugReport();
-        String subject = applicationName + " bug (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
+    public String getProblemReportSubject() {
+        String systemDetails = Log.getSystemDetailsForProblemReport();
+        String subject = applicationName + " problem (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
         return StringUtilities.urlEncode(subject).replaceAll("\\+", "%20");
     }
     
     public String getIdentificationString() {
-        return applicationName + " (" + projectRevision + "/" + libraryRevision + "/" + Log.getSystemDetailsForBugReport() + ")";
+        return applicationName + " (" + projectRevision + "/" + libraryRevision + "/" + Log.getSystemDetailsForProblemReport() + ")";
     }
     
     private JButton makeCloseButton(ActionListener actionListener) {
