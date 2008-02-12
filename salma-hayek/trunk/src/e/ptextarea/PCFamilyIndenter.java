@@ -114,11 +114,14 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
                     // We're either part-way through, or on the line after, a block comment.
                     if (previousLineCommentText.endsWith("*/")) {
                         // We're on the line after, so we must leave the current line's indentation as it is.
+                    } else if (currentLineText.startsWith("**")) {
+                        // We're on a "boxed" block comment, so just add the leading space to line up.
+                        indentation += " ";
                     } else if (currentLineText.endsWith("*/")) {
                         // We're on the last line, so add a leading " " to line the "*/" on this line up with the "*" above.
                         indentation += " ";
                     } else {
-                        // We're part-way through a JavaDoc-style  block comment, so add a leading " * ".
+                        // We're part-way through a JavaDoc-style block comment, so add a leading " * ".
                         indentation += " * ";
                     }
                 }
