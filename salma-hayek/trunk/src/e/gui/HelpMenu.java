@@ -28,7 +28,7 @@ public class HelpMenu {
         
         menu.add(DebugMenu.makeJMenu());
         // FIXME: anyone else using HelpMenu is going to want some control over this. "bk sendbug" and Safari's "Report Bugs to Apple..." are both good role models.
-        menu.add(new WebLinkAction("Report a Problem", "mailto:software@jessies.org?subject=" + AboutBox.getSharedInstance().getBugReportSubject()));
+        menu.add(new WebLinkAction("Report a Problem", "mailto:software@jessies.org?subject=" + AboutBox.getSharedInstance().getProblemReportSubject()));
         // We don't support this yet, because we've got nothing to point it to.
         menu.add(new PlaceholderAction("View Bugs List"));
         

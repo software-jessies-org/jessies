@@ -80,7 +80,7 @@ public class Log {
         return osName + " " + osVersion + "/" + osArch + " x" + processorCount;
     }
     
-    public static String getSystemDetailsForBugReport() {
+    public static String getSystemDetailsForProblemReport() {
         String systemDetails = System.getProperty("java.vm.version") + "/" + getOsVersion();
         return systemDetails;
     }
