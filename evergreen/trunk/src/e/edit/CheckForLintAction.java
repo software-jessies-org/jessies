@@ -86,7 +86,7 @@ public class CheckForLintAction extends ETextAction {
         // It's probably useful to try to run these even if they're not installed; the user can figure out what's missing from the error message.
         result.put(FileType.PERL, "perl -c");
         result.put(FileType.PYTHON, "pychecker -Q");
-        result.put(FileType.RUBY, "ruby -c");
+        result.put(FileType.RUBY, "ruby -wc");
         result.put(FileType.XML, "tidy -qe");
         
         // Override or supplement those with any user-configured checkers.
