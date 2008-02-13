@@ -6,6 +6,7 @@ public class PPythonTextStyler extends PAbstractLanguageStyler {
     private static final String[] KEYWORDS = new String[] {
         // python -c 'import keyword ; print keyword.kwlist'
         "and",
+        "as",
         "assert",
         "break",
         "class",
@@ -33,6 +34,7 @@ public class PPythonTextStyler extends PAbstractLanguageStyler {
         "return",
         "try",
         "while",
+        "with",
         "yield",
     };
     
