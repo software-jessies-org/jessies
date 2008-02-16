@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.gui.*;
 import e.util.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -98,6 +99,12 @@ public abstract class ExternalToolsParser {
                     action.putValue(Action.ACCELERATOR_KEY, keyStroke);
                 }
             }
+            
+            String stockIcon = Parameters.getParameter(prefix + "stockIcon", null);
+            if (stockIcon != null) {
+                GnomeStockIcon.useStockIcon(action, stockIcon);
+            }
+            
             addItem(action);
         }
     }
