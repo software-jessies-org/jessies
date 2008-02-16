@@ -78,39 +78,33 @@ public class TagReader {
     }
     
     public static String ctagsLanguageForFileType(FileType fileType) {
-        switch (fileType) {
-        case ASSEMBLER:
+        if (fileType == FileType.ASSEMBLER) {
             return "Asm";
-        case BASH:
+        } else if (fileType == FileType.BASH) {
             return "Sh";
-        case C_PLUS_PLUS:
+        } else if (fileType == FileType.C_PLUS_PLUS) {
             return "C++";
-        case C_SHARP:
+        } else if (fileType == FileType.C_SHARP) {
             return "C#";
-        case JAVA:
+        } else if (fileType == FileType.JAVA) {
             return "Java";
-        case JAVA_SCRIPT:
+        } else if (fileType == FileType.JAVA_SCRIPT) {
             return "JavaScript";
-        case MAKE:
+        } else if (fileType == FileType.MAKE) {
             return "Make";
-        case RUBY:
+        } else if (fileType == FileType.RUBY) {
             return "Ruby";
-        case PBASIC:
+        } else if (fileType == FileType.PBASIC) {
             return "Basic";
-        case PERL:
+        } else if (fileType == FileType.PERL) {
             return "Perl";
-        case PHP:
+        } else if (fileType == FileType.PHP) {
             return "PHP";
-        case PYTHON:
+        } else if (fileType == FileType.PYTHON) {
             return "Python";
-        case EMAIL:
-        case PATCH:
-        case TALC:
-        case VHDL:
-        case XML:
-        case PLAIN_TEXT:
+        } else if (fileType == FileType.EMAIL || fileType == FileType.PATCH || fileType == FileType.TALC || fileType == FileType.VHDL || fileType == FileType.XML || fileType == FileType.PLAIN_TEXT) {
             return null;
-        default:
+        } else {
             throw new RuntimeException("Don't know what ctags(1) calls \"" + fileType + "\"");
         }
     }
