@@ -4,93 +4,95 @@ import e.util.*;
 import java.util.*;
 import java.util.regex.*;
 
-public enum FileType {
-    PLAIN_TEXT  ("Plain Text",
+public class FileType {
+    private static final Map<String, FileType> ALL_FILE_TYPES = new HashMap<String, FileType>();
+
+    public static final FileType PLAIN_TEXT = new FileType("Plain Text",
                  PNoOpIndenter.class,
                  PPlainTextStyler.class,
-                 new String[] { ".txt" }),
+                 new String[] { ".txt" });
     
-    ASSEMBLER   ("Assembler",
+    public static final FileType ASSEMBLER = new FileType("Assembler",
                  PNoOpIndenter.class,
                  PAssemblerTextStyler.class,
-                 new String[] { ".s", ".S" }),
+                 new String[] { ".s", ".S" });
     
-    BASH        ("Bash",
+    public static final FileType BASH = new FileType("Bash",
                  PBashIndenter.class,
                  PBashTextStyler.class,
-                 new String[] { ".sh", "bash.bashrc", "bash.logout", ".bash_profile", ".bashrc", ".bash_logout" }),
+                 new String[] { ".sh", "bash.bashrc", "bash.logout", ".bash_profile", ".bashrc", ".bash_logout" });
     
-    C_PLUS_PLUS ("C++",
+    public static final FileType C_PLUS_PLUS = new FileType("C++",
                  PCppIndenter.class,
                  PCPPTextStyler.class,
-                 new String[] { ".cpp", ".hpp", ".c", ".h", ".m", ".mm", ".hh", ".cc", ".strings" }),
+                 new String[] { ".cpp", ".hpp", ".c", ".h", ".m", ".mm", ".hh", ".cc", ".strings" });
     
-    C_SHARP     ("C#",
+    public static final FileType C_SHARP = new FileType("C#",
                  PJavaIndenter.class,
                  PCSharpTextStyler.class,
-                 new String[] { ".cs" }),
+                 new String[] { ".cs" });
     
-    EMAIL       ("Email",
+    public static final FileType EMAIL = new FileType("Email",
                  PNoOpIndenter.class,
                  PEmailTextStyler.class,
-                 new String[] { ".email" }),
+                 new String[] { ".email" });
     
-    JAVA        ("Java",
+    public static final FileType JAVA = new FileType("Java",
                  PJavaIndenter.class,
                  PJavaTextStyler.class,
-                 new String[] { ".java" }),
+                 new String[] { ".java" });
     
-    JAVA_SCRIPT ("JavaScript",
+    public static final FileType JAVA_SCRIPT = new FileType("JavaScript",
                  PNoOpIndenter.class,
                  PJavaScriptTextStyler.class,
-                 new String[] { ".js" }),
+                 new String[] { ".js" });
     
-    MAKE        ("Make",
+    public static final FileType MAKE = new FileType("Make",
                  PNoOpIndenter.class,
                  PMakefileTextStyler.class,
-                 new String[] { "Makefile", "GNUmakefile", "makefile", ".make" }),
+                 new String[] { "Makefile", "GNUmakefile", "makefile", ".make" });
     
-    RUBY        ("Ruby",
+    public static final FileType RUBY = new FileType("Ruby",
                  PRubyIndenter.class,
                  PRubyTextStyler.class,
-                 new String[] { ".rb" }),
+                 new String[] { ".rb" });
     
-    PATCH       ("Patch",
+    public static final FileType PATCH = new FileType("Patch",
                  PNoOpIndenter.class,
                  PPatchTextStyler.class,
-                 new String[] { ".diff", ".patch" }),
+                 new String[] { ".diff", ".patch" });
     
-    PBASIC      ("PBASIC",
+    public static final FileType PBASIC = new FileType("PBASIC",
                  PNoOpIndenter.class,
                  PPBasicTextStyler.class,
-                 new String[] { ".bs1", ".bs2", ".bse", ".bsx", ".bsp", ".bpe", ".bpx" }),
+                 new String[] { ".bs1", ".bs2", ".bse", ".bsx", ".bsp", ".bpe", ".bpx" });
     
-    PERL        ("Perl",
+    public static final FileType PERL = new FileType("Perl",
                  PPerlIndenter.class,
                  PPerlTextStyler.class,
-                 new String[] { ".pl", ".pm" }),
+                 new String[] { ".pl", ".pm" });
     
-    PHP         ("PHP",
+    public static final FileType PHP = new FileType("PHP",
                  PNoOpIndenter.class,
                  PPhpTextStyler.class,
-                 new String[] { ".php" }),
+                 new String[] { ".php" });
     
-    PYTHON      ("Python",
+    public static final FileType PYTHON = new FileType("Python",
                  PPythonIndenter.class,
                  PPythonTextStyler.class,
-                 new String[] { ".py" }),
+                 new String[] { ".py" });
     
-    TALC        ("Talc",
+    public static final FileType TALC = new FileType("Talc",
                  PJavaIndenter.class,
                  PTalcTextStyler.class,
-                 new String[] { ".talc" }),
+                 new String[] { ".talc" });
     
-    VHDL        ("VHDL",
+    public static final FileType VHDL = new FileType("VHDL",
                  PNoOpIndenter.class,
                  PVhdlTextStyler.class,
-                 new String[] { ".vhd" }),
+                 new String[] { ".vhd" });
     
-    XML         ("XML",
+    public static final FileType XML = new FileType("XML",
                  PNoOpIndenter.class,
                  PXmlTextStyler.class,
                  new String[] { ".xml", ".html", ".shtml", ".vm" });
@@ -101,10 +103,16 @@ public enum FileType {
     private final String[] extensions;
     
     private FileType(String name, Class<? extends PIndenter> indenterClass, Class<? extends PTextStyler> stylerClass, String[] extensions) {
-        this.name = name;
-        this.indenterClass = indenterClass;
-        this.stylerClass = stylerClass;
-        this.extensions = extensions;
+        synchronized (ALL_FILE_TYPES) {
+            if (ALL_FILE_TYPES.containsKey(name)) {
+                throw new RuntimeException("Attempt to redefine FileType \"" + name + "\"");
+            }
+            this.name = name;
+            this.indenterClass = indenterClass;
+            this.stylerClass = stylerClass;
+            this.extensions = extensions;
+            ALL_FILE_TYPES.put(name, this);
+        }
     }
     
     public void configureTextArea(PTextArea textArea) {
@@ -128,19 +136,18 @@ public enum FileType {
     
     public static Set<String> getAllFileTypeNames() {
         TreeSet<String> allFileTypeNames = new TreeSet<String>();
-        for (FileType fileType : EnumSet.allOf(FileType.class)) {
+        for (FileType fileType : ALL_FILE_TYPES.values()) {
             allFileTypeNames.add(fileType.getName());
         }
         return allFileTypeNames;
     }
     
     public static FileType fromName(String name) {
-        for (FileType fileType : EnumSet.allOf(FileType.class)) {
-            if (fileType.getName().equals(name)) {
-                return fileType;
-            }
+        FileType result = ALL_FILE_TYPES.get(name);
+        if (result == null) {
+            throw new IllegalArgumentException("\"" + name + "\" doesn't denote a FileType");
         }
-        throw new IllegalArgumentException("\"" + name + "\" doesn't denote a FileType");
+        return result;
     }
     
     public static FileType guessFileType(String filename, CharSequence content) {
@@ -163,7 +170,7 @@ public enum FileType {
      * Guesses the type from the given filename by checking the FileTypes' registered extensions.
      */
     private static FileType guessFileTypeByName(String filename) {
-        for (FileType type : EnumSet.allOf(FileType.class)) {
+        for (FileType type : ALL_FILE_TYPES.values()) {
             for (String extension : type.extensions) {
                 if (filename.endsWith(extension)) {
                     return type;
@@ -279,7 +286,7 @@ public enum FileType {
                 } else if (possibleMajorModeName.equalsIgnoreCase("Shell-script")) {
                     possibleMajorModeName = BASH.name;
                 }
-                for (FileType type : EnumSet.allOf(FileType.class)) {
+                for (FileType type : ALL_FILE_TYPES.values()) {
                     if (possibleMajorModeName.equalsIgnoreCase(type.name)) {
                         return type;
                     }
