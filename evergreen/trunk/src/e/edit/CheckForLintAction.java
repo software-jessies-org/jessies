@@ -17,7 +17,7 @@ import java.util.*;
  * The major disadvantage (ignoring "more code") is that we're still likely to want some local configuration mechanism (for domain-specific languages, say, or because you prefer an alternative to the tool we suggest, or because you have access to a special tool).
  */
 public class CheckForLintAction extends ETextAction {
-    private static final EnumMap<FileType, String> checkers = initCheckers();
+    private static final HashMap<FileType, String> checkers = initCheckers();
     
     public CheckForLintAction() {
         super("Check For Lint");
@@ -79,8 +79,8 @@ public class CheckForLintAction extends ETextAction {
         workspace.getErrorsWindow().taskDidExit(status);
     }
     
-    private static EnumMap<FileType, String> initCheckers() {
-        EnumMap<FileType, String> result = new EnumMap<FileType, String>(FileType.class);
+    private static HashMap<FileType, String> initCheckers() {
+        HashMap<FileType, String> result = new HashMap<FileType, String>();
         
         // Set up the defaults.
         // It's probably useful to try to run these even if they're not installed; the user can figure out what's missing from the error message.
@@ -90,11 +90,11 @@ public class CheckForLintAction extends ETextAction {
         result.put(FileType.XML, "tidy -qe");
         
         // Override or supplement those with any user-configured checkers.
-        for (FileType fileType : EnumSet.allOf(FileType.class)) {
+        for (String fileTypeName : FileType.getAllFileTypeNames()) {
             // FIXME: when we have per-FileType configuration, get the lint checker from there.
-            String checker = Parameters.getParameter(fileType.getName() + ".lintChecker");
+            String checker = Parameters.getParameter(fileTypeName + ".lintChecker");
             if (checker != null) {
-                result.put(fileType, checker.trim());
+                result.put(FileType.fromName(fileTypeName), checker.trim());
             }
         }
         
