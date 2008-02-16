@@ -180,8 +180,8 @@ public class GnomeStockIcon {
      * Returns an Icon for one of the GNOME stock icons.
      * If the icon is not available for any reason, you'll get null.
      * (Not using the GTK LAF is one reason why.)
-     * The GNOME header file listing the possible strings is here:
-     * http://cvs.gnome.org/viewcvs/gtk%2B/gtk/gtkstock.h?view=markup
+     * The GNOME header file listing the possible strings is documented here:
+     * http://library.gnome.org/devel/gtk/unstable/gtk-Stock-Items.html
      */
     public static Icon getStockIcon(String name, Size size) {
         if (GuiUtilities.isGtk() == false) {
