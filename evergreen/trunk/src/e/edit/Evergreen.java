@@ -721,9 +721,7 @@ public class Evergreen {
             public void preferencesChanged() {
                 for (Workspace workspace : getWorkspaces()) {
                     for (ETextWindow textWindow : workspace.getTextWindows()) {
-                        textWindow.initFont();
-                        //textWindow.getTextArea().setBackground(preferences.getColor(EvergreenPreferences.BACKGROUND_COLOR));
-                        //textWindow.getTextArea().setForeground(preferences.getColor(EvergreenPreferences.FOREGROUND_COLOR));
+                        textWindow.preferencesChanged();
                     }
                     workspace.getErrorsWindow().initFont();
                 }
