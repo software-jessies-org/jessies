@@ -9,6 +9,7 @@ public class EvergreenPreferences extends Preferences {
     public static final String DEFAULT_INDENTATION = "defaultIndentation";
     public static final String PROPORTIONAL_FONT = "proportionalFont";
     public static final String FIXED_FONT = "fixedFont";
+    public static final String HIDE_MOUSE_WHEN_TYPING = "hideMouseWhenTyping";
     public static final String TRIM_TRAILING_WHITESPACE = "trimTrailingWhitespace";
     public static final String UNINTERESTING_EXTENSIONS = "uninterestingExtensions";
     //public static final String BACKGROUND_COLOR = "backgroundColor";
@@ -25,6 +26,7 @@ public class EvergreenPreferences extends Preferences {
         addPreference(FIXED_FONT, new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12), "Fixed font");
         addPreference(PROPORTIONAL_FONT, new Font("Verdana", Font.PLAIN, 12), "Proportional font");
         addPreference(ALWAYS_USE_FIXED_FONT, Boolean.TRUE, "Always use fixed font");
+        addPreference(HIDE_MOUSE_WHEN_TYPING, Boolean.TRUE, "Hide mouse when typing");
         addSeparator();
         addPreference(UNINTERESTING_EXTENSIONS, ".a;.aux;.bak;.bin;.class;.d;.elf;.exe;.gif;.icns;.jar;.jpeg;.jpg;.lib;.log;.map;.o;.obj;.orig;.pdf;.png;.ps;.pyc;.pyo;.rej;.swp;.texshop;.tiff;.toc", "Don't index");
         
