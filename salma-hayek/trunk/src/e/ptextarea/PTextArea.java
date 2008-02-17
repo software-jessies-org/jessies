@@ -47,6 +47,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     private boolean editable;
     private boolean wordWrap;
+    private boolean shouldHideMouseWhenTyping;
     
     private FileType fileType;
     private PIndenter indenter;
@@ -63,6 +64,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         this.columnCount = columnCount;
         this.editable = true;
         this.wordWrap = false;
+        this.shouldHideMouseWhenTyping = false;
         this.fileType = FileType.PLAIN_TEXT;
         this.lines = new PLineList(new PTextBuffer());
         this.selection = new SelectionHighlight(this, 0, 0);
@@ -1553,5 +1555,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     public void setFileType(FileType newFileType) {
         fileType = newFileType;
+    }
+    
+    public boolean shouldHideMouseWhenTyping() {
+        return shouldHideMouseWhenTyping;
+    }
+    
+    public void setShouldHideMouseWhenTyping(boolean newState) {
+        shouldHideMouseWhenTyping = newState;
     }
 }
