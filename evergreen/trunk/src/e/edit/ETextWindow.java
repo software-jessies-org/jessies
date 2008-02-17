@@ -707,9 +707,46 @@ public class ETextWindow extends EWindow implements PTextListener {
             // Restore the selection/caret as well as we can.
             final int maxCaretIndex = textArea.getTextBuffer().length();
             textArea.select(Math.min(maxCaretIndex, selectionStart), Math.min(maxCaretIndex, selectionEnd));
+            
+            // Trim any trailing whitespace, if configured to do so.
+            // This code can do a perfect job of maintaining the selection, so it comes outside the cruder code above.
+            trimTrailingWhitespace();
         }
         
         textArea.getTextBuffer().writeToFile(file);
+    }
+    
+    private void trimTrailingWhitespace() {
+        if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.TRIM_TRAILING_WHITESPACE) == false) {
+            return;
+        }
+        PTextBuffer buffer = textArea.getTextBuffer();
+        Pattern trailingWhitespacePattern = Pattern.compile("([ \t]+)$", Pattern.MULTILINE);
+        if (trailingWhitespacePattern.matcher(buffer).find()) {
+            buffer.getUndoBuffer().startCompoundEdit();
+            try {
+                final PCoordinates selectionStart = textArea.getLogicalCoordinates(textArea.getSelectionStart());
+                final PCoordinates selectionEnd = textArea.getLogicalCoordinates(textArea.getSelectionEnd());
+                
+                Matcher m = trailingWhitespacePattern.matcher(buffer);
+                int offset = 0;
+                while (m.find(offset)) {
+                    textArea.replaceRange("", m.start(), m.end());
+                    offset = m.start();
+                }
+                
+                textArea.select(clampedOffsetOf(selectionStart), clampedOffsetOf(selectionEnd));
+            } finally {
+                buffer.getUndoBuffer().finishCompoundEdit();
+            }
+        }
+    }
+    
+    private int clampedOffsetOf(PCoordinates position) {
+        final int newLineStartOffset = textArea.getLineStartOffset(position.getLineIndex());
+        final int newLineLength = textArea.getLineContents(position.getLineIndex()).length();
+        final int newOffsetInLine = Math.min(position.getCharOffset(), newLineLength);
+        return newLineStartOffset + newOffsetInLine;
     }
     
     /**
