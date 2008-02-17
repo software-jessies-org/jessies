@@ -11,8 +11,8 @@ public class EvergreenPreferences extends Preferences {
     public static final String FIXED_FONT = "fixedFont";
     public static final String TRIM_TRAILING_WHITESPACE = "trimTrailingWhitespace";
     public static final String UNINTERESTING_EXTENSIONS = "uninterestingExtensions";
-    public static final String BACKGROUND_COLOR = "backgroundColor";
-    public static final String FOREGROUND_COLOR = "foregroundColor";
+    //public static final String BACKGROUND_COLOR = "backgroundColor";
+    //public static final String FOREGROUND_COLOR = "foregroundColor";
     
     protected String getPreferencesFilename() {
         return Evergreen.getPreferenceFilename("app-preferences");
