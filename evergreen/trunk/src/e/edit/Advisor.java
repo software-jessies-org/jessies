@@ -49,6 +49,7 @@ public class Advisor extends JPanel {
             researchers.add(ManPageResearcher.getSharedInstance());
             researchers.add(new NumberResearcher());
             researchers.add(new PerlDocumentationResearcher());
+            researchers.add(new PythonDocumentationResearcher());
             researchers.add(new RubyDocumentationResearcher());
             researchers.add(new StlDocumentationResearcher());
         }
@@ -158,6 +159,9 @@ public class Advisor extends JPanel {
             // "::" is useful in C++, so remove it from the stop list.
             // An alternative would be to stop insisting on the "std::" prefix for STL lookups, but that would introduce ambiguity: std::string versus string(3), for example.
             stopChars = stopChars.replace(":", "");
+        } else if (fileType == FileType.PYTHON) {
+            // "." is useful in Python, because pydoc(1) wants fully-qualified names.
+            stopChars = stopChars.replace(".", "");
         }
         return stopChars;
     }
