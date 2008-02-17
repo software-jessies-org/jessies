@@ -891,6 +891,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         }
     }
     
+    public PCoordinates getLogicalCoordinates(int offset) {
+        final int lineIndex = getLineOfOffset(offset);
+        return new PCoordinates(lineIndex, offset - getLineStartOffset(lineIndex));
+    }
+    
+    // FIXME: I'm never quite sure this should be used in all the places it's used. I'm pretty sure the name is misleading, especially given that PCoordinates is nothing more than a pair of ints.
     public PCoordinates getCoordinates(int location) {
         getLock().getReadLock();
         try {
