@@ -35,6 +35,8 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         final Range actualRange = rangeOfMisspelledWordBetween(offset, offset);
         if (actualRange.isEmpty() == false) {
             String misspelling = component.getTextBuffer().subSequence(actualRange.getStart(), actualRange.getEnd()).toString();
+            actions.add(new AcceptSpellingAction(misspelling));
+            actions.add(null);
             String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
             for (String suggestion : suggestions) {
                 // Since we're mainly used for editing source, camelCase
@@ -47,8 +49,6 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             if (suggestions.length == 0) {
                 actions.add(new NoSuggestionsAction());
             }
-            actions.add(null);
-            actions.add(new AcceptSpellingAction(misspelling));
         }
     }
     
