@@ -139,11 +139,9 @@ class Terminator
         # It also stops existing terminals from having their options changed when someone starts a new terminal.
         # It should also mean that my "runtitan" commands always block, like an xterm would, rather than sometimes exiting immediately.
         workingDirectory = Dir.getwd()
-        if ARGV.empty?() == false && ARGV[0] == "--working-directory"
-            ARGV.shift()
-            workingDirectory = ARGV.shift()
-        end
-        if ARGV.empty?() == false
+        if ARGV.length() == 2 && ARGV[0] == "--working-directory"
+            workingDirectory = ARGV[1]
+        elsif ARGV.empty?() == false
             return
         end
         # See if there's already a Terminator running that can open us a new window.
