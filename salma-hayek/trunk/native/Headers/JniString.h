@@ -8,22 +8,14 @@
 /**
  * Copies the characters from a jstring and makes them available.
  */
-class JniString {
-    std::string m_utf8;
-    
-public:
-    JniString(JNIEnv* env, jstring instance) {
-        const char* utf8Chars = env->GetStringUTFChars(instance, 0);
-        if (utf8Chars == 0) {
-            throw std::runtime_error("GetStringUTFChars returned 0");
-        }
-        m_utf8.assign(utf8Chars);
-        env->ReleaseStringUTFChars(instance, utf8Chars);
+std::string JniString(JNIEnv* env, jstring instance) {
+    const char* utf8Chars = env->GetStringUTFChars(instance, 0);
+    if (utf8Chars == 0) {
+        throw std::runtime_error("GetStringUTFChars returned 0");
     }
-    
-    std::string str() const {
-        return m_utf8;
-    }
-};
+    std::string result(utf8Chars);
+    env->ReleaseStringUTFChars(instance, utf8Chars);
+    return result;
+}
 
 #endif
