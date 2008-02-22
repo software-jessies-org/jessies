@@ -102,11 +102,11 @@ public class PtyProcess {
         return signalDescription;
     }
     
-    public PtyProcess(String[] command, String workingDirectory) throws Exception {
+    public PtyProcess(String executable, String[] argv, String workingDirectory) throws Exception {
         ensureLibraryLoaded();
-        startProcess(command, workingDirectory);
+        startProcess(executable, argv, workingDirectory);
         if (processId == -1) {
-            throw new IOException("Could not start process \"" + command + "\".");
+            throw new IOException("Could not start process \"" + executable + "\".");
         }
         inStream = new PtyInputStream();
         outStream = new PtyOutputStream();
@@ -124,11 +124,11 @@ public class PtyProcess {
         return processId;
     }
     
-    private void startProcess(final String[] command, final String workingDirectory) throws Exception {
+    private void startProcess(final String executable, final String[] argv, final String workingDirectory) throws Exception {
         invoke(new Callable<Exception>() {
             public Exception call() {
                 try {
-                    nativeStartProcess(command, workingDirectory);
+                    nativeStartProcess(executable, argv, workingDirectory);
                     return null;
                 } catch (Exception ex) {
                     return ex;
@@ -189,7 +189,7 @@ public class PtyProcess {
         return result;
     }
     
-    private native void nativeStartProcess(String[] command, String workingDirectory) throws IOException;
+    private native void nativeStartProcess(String executable, String[] argv, String workingDirectory) throws IOException;
     private native void nativeWaitFor() throws IOException;
     public native void destroy() throws IOException;
     

@@ -22,7 +22,7 @@ public class LogWriter {
 	private Writer suspendedWriter;
 	private Timer flushTimer;
 	
-	public LogWriter(String[] commandWords, String ptyName) {
+	public LogWriter(List<String> command, String ptyName) {
 		// Establish the invariant that writer != null.
 		// suspendedWriter is still null - when we're not suspended.
 		this.writer = NullWriter.INSTANCE;
@@ -33,7 +33,7 @@ public class LogWriter {
 		});
 		flushTimer.setRepeats(false);
 		try {
-			initLogging(commandWords, ptyName);
+			initLogging(StringUtilities.join(command, " "), ptyName);
 		} catch (Throwable th) {
 			SimpleDialog.showDetails(null, "Couldn't Open Log File", th);
 		}
@@ -47,7 +47,7 @@ public class LogWriter {
 		return new File(logsDirectory, leafname);
 	}
 	
-	private void initLogging(String[] commandWords, String ptyName) throws IOException {
+	private void initLogging(String commandLine, String ptyName) throws IOException {
 		String logsDirectoryName = System.getProperty("org.jessies.terminator.logDirectory");
 		File logsDirectory = new File(logsDirectoryName);
 		if (logsDirectory.exists() == false) {
@@ -58,7 +58,6 @@ public class LogWriter {
 		// Try to create a log file.
 		// We'll keep truncating the name until we either succeed or there's no name left.
 		// This avoids assumptions about maximum filename or path lengths.
-		String commandLine = StringUtilities.join(commandWords, " ");
 		for (int truncationLength = commandLine.length(); truncationLength >= 0; --truncationLength) {
 			File logFile = makeLogFilename(logsDirectory, commandLine, truncationLength);
 			try {

@@ -62,13 +62,13 @@ public:
         return masterFd;
     }
     
-    pid_t forkAndExec(char * const *cmd, const char* workingDirectory) {
+    pid_t forkAndExec(const std::string& executable, char * const *argv, const std::string& workingDirectory) {
         pid_t pid = fork();
         if (pid < 0) {
             return -1;
         } else if (pid == 0) {
             try {
-                runChild(cmd, workingDirectory, *this);  // Should never return.
+                runChild(executable, argv, workingDirectory, *this);  // Should never return.
             } catch (const std::exception& ex) {
                 fprintf(stderr, "%s\n", ex.what());
             }
@@ -106,10 +106,10 @@ private:
         return slaveFd;
     }
     
-    static void runChild(char * const *cmd, const char* workingDirectory, PtyGenerator& ptyGenerator) {
-        if (workingDirectory != 0) {
-            if (chdir(workingDirectory) == -1) {
-                throw child_exception(std::string() + "chdir(\"" + workingDirectory + "\")");
+    static void runChild(const std::string& executable, char * const *argv, const std::string& workingDirectory, PtyGenerator& ptyGenerator) {
+        if (workingDirectory.length() != 0) {
+            if (chdir(workingDirectory.c_str()) == -1) {
+                throw child_exception("chdir(\"" + workingDirectory + "\")");
             }
         }
         
@@ -168,8 +168,8 @@ private:
         signal(SIGQUIT, SIG_DFL);
         signal(SIGCHLD, SIG_DFL);
         
-        execvp(cmd[0], cmd);
-        throw unix_exception("Can't execute \"" + toString(cmd[0]) + "\"");
+        execvp(executable.c_str(), argv);
+        throw unix_exception("Can't execute \"" + executable + "\"");
     }
     
     static void fixEnvironment() {
