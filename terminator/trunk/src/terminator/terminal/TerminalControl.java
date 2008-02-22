@@ -4,6 +4,7 @@ import e.util.*;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 import terminator.*;
 import terminator.model.*;
@@ -64,8 +65,20 @@ public class TerminalControl {
 		this.model = model;
 	}
 	
-	public void initProcess(String[] command, String workingDirectory) throws Throwable {
-		this.ptyProcess = new PtyProcess(command, workingDirectory);
+	public void initProcess(List<String> command, String workingDirectory) throws Throwable {
+		// We always want to start a login shell.
+		// This used to be an option, but it wasn't very useful and it caused confusion.
+		// It's also hard to explain the difference without assuming a detailed knowledge of the particular shell.
+		// We used to use "--login", but "-l" was more portable.
+		// tcsh(1) is so broken that "-l" can only appear on its own.
+		// So now we use the 1970s trick of setting argv[0] to "-".
+		String[] argv = command.toArray(new String[command.size()]);
+		String executable = argv[0];
+		if (argv[0].equals(System.getenv("SHELL"))) {
+			argv[0] = "-";
+		}
+		
+		this.ptyProcess = new PtyProcess(executable, argv, workingDirectory);
 		this.processIsRunning = true;
 		Log.warn("Created " + ptyProcess);
 		this.logWriter = new LogWriter(command, ptyProcess.getPtyName());

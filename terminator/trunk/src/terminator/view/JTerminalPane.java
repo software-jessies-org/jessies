@@ -109,12 +109,8 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	private static ArrayList<String> getShellCommand() {
-		// We always start a login shell.
-		// This used to be an option, but it wasn't very useful and it caused confusion.
-		// It's also hard to explain the difference without assuming a detailed knowledge of the particular shell.
 		ArrayList<String> command = new ArrayList<String>();
 		command.add(System.getenv("SHELL"));
-		command.add("-l"); // The -l switch is supported by more shells than --login.
 		return command;
 	}
 	
@@ -164,7 +160,7 @@ public class JTerminalPane extends JPanel {
 		try {
 			control = new TerminalControl(this, view.getModel());
 			view.setTerminalControl(control);
-			control.initProcess(command.toArray(new String[command.size()]), workingDirectory);
+			control.initProcess(command, workingDirectory);
 			initSizeMonitoring();
 		} catch (final Throwable th) {
 			Log.warn("Couldn't initialize terminal", th);

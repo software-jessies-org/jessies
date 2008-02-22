@@ -37,8 +37,8 @@ struct JavaStringArrayToStringArray : StringArray {
     JavaStringArrayToStringArray(JNIEnv* env, jobjectArray javaStringArray) {
         int arrayLength = env->GetArrayLength(javaStringArray);
         for (int i = 0; i != arrayLength; ++i) {
-            JniString jniString(env, static_cast<jstring>(env->GetObjectArrayElement(javaStringArray, i)));
-            push_back(jniString.str());
+            jstring s = static_cast<jstring>(env->GetObjectArrayElement(javaStringArray, i));
+            push_back(JniString(env, s));
         }
     }
 };
@@ -69,19 +69,20 @@ static void waitUntilFdWritable(int fd) {
     }
 }
 
-void terminator_terminal_PtyProcess::nativeStartProcess(jobjectArray command, jstring javaWorkingDirectory) {
+void terminator_terminal_PtyProcess::nativeStartProcess(jstring javaExecutable, jobjectArray javaArgv, jstring javaWorkingDirectory) {
     PtyGenerator ptyGenerator;
     fd = ptyGenerator.openMaster();
     
-    JavaStringArrayToStringArray arguments(m_env, command);
+    JavaStringArrayToStringArray arguments(m_env, javaArgv);
     Argv argv(arguments);
-    std::string workingDirectoryChars; // Owns the memory for the lifetime of workingDirectory.
-    const char* workingDirectory = 0;
+    std::string executable(JniString(m_env, javaExecutable));
+    
+    std::string workingDirectory("");
     if (javaWorkingDirectory != 0) {
-        workingDirectoryChars = JniString(m_env, javaWorkingDirectory).str();
-        workingDirectory = workingDirectoryChars.c_str();
+        workingDirectory = JniString(m_env, javaWorkingDirectory);
     }
-    processId = ptyGenerator.forkAndExec(&argv[0], workingDirectory);
+    
+    processId = ptyGenerator.forkAndExec(executable, &argv[0], workingDirectory);
     
     // On Linux, the TIOCSWINSZ ioctl sets the size of the pty (without blocking) even if it hasn't been opened by the child yet.
     // On Mac OS, it silently does nothing, meaning that when the child does open the pty, TIOCGWINSZ reports the wrong size.
@@ -337,7 +338,7 @@ jstring terminator_terminal_PtyProcess::nativeListProcessesUsingTty() {
     }
     
     std::deque<std::string> processNames;
-    std::string ttyFilename(JniString(m_env, slavePtyName.get()).str());
+    std::string ttyFilename(JniString(m_env, slavePtyName.get()));
     
     listProcessesUsingTty(processNames, ttyFilename);
     return newStringUtf8(join(", ", processNames));
