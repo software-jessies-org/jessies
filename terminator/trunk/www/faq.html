@@ -124,7 +124,7 @@ defaulting to 'ansi'
 
 <p>Although Terminator sets the TERM environment variable to "terminator" for you, your shell's profile may be setting it to an incorrect value. Also, if you're logging in to a remote machine, the value of TERM may not be correctly transferred. It's always worth checking as described in the previous paragraph. The correct fix is to change your profile so it doesn't override TERM, and to use protocols like SSH which transfer your terminal type. You definitely shouldn't force TERM to be "terminator" (or any other value) in your profile: that's how you get into this kind of trouble.
 
-<p>(See later for problems specific to Cygwin, FreeBSD, and Fedora/RedHat.)
+<p>(See later for problems specific to Cygwin, Fedora/RedHat, and FreeBSD.)
 
 <h3>Terminfo problems logging in as other users/root</h3>
 <p>If the terminfo file is not installed in the system-wide location then other users (and you yourself, if you use <tt>su(1)</tt> to switch to another user) will have problems. Using <tt>sudo(1)</tt> to run a command as another user will work in many cases, because it doesn't alter <tt>$HOME</tt> by default.
