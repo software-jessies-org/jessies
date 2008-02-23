@@ -389,6 +389,11 @@ class Java
       add_property("apple.laf.useScreenMenuBar", "true")
     end
     
+    if target_os() == "Cygwin"
+      # This stops Cygwin's /etc/profile from changing the current directory, which breaks building from Evergreen and Terminator's --working-directory feature.
+      ENV["CHERE_INVOKING"] = "1"
+    end
+    
     add_pathname_property("org.jessies.aboutBoxIcon", @png_icon)
     if @frame_icon != ""
       add_pathname_property("org.jessies.frameIcon", @frame_icon)
