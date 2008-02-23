@@ -71,11 +71,12 @@ public class TerminalControl {
 		// It's also hard to explain the difference without assuming a detailed knowledge of the particular shell.
 		// We used to use "--login", but "-l" was more portable.
 		// tcsh(1) is so broken that "-l" can only appear on its own.
-		// So now we use the 1970s trick of setting argv[0] to "-".
+		// POSIX's sh(1) doesn't even have the notion of login shell (though it does specify vi-compatible line editing).
+		// So now we use the 1970s trick of prefixing argv[0] with "-".
 		String[] argv = command.toArray(new String[command.size()]);
 		String executable = argv[0];
 		if (argv[0].equals(System.getenv("SHELL"))) {
-			argv[0] = "-";
+			argv[0] = "-" + argv[0];
 		}
 		
 		this.ptyProcess = new PtyProcess(executable, argv, workingDirectory);
