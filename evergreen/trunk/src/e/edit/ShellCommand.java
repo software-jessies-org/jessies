@@ -46,10 +46,6 @@ public class ShellCommand {
         ProcessBuilder processBuilder = new ProcessBuilder(ProcessUtilities.makeShellCommandArray(command));
         processBuilder.directory(FileUtilities.fileFromString(context));
         Map<String, String> environment = processBuilder.environment();
-        if (GuiUtilities.isWindows()) {
-            // This stops Cygwin's /etc/profile from changing the current directory, which breaks building from Evergreen.
-            environment.put("CHERE_INVOKING", "1");
-        }
         environment.put("EDIT_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
         environment.put("EDIT_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(getWorkspace().getRootDirectory()));
         if (textWindow != null) {
