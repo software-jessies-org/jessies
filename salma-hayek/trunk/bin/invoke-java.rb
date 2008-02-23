@@ -15,8 +15,8 @@ def convert_to_jvm_compatible_pathname(pathname)
   # console windows to flash up, which is distracting and ugly. So we invoke
   # the Cygwin functions directly from the DLL.
   require "Win32API"
-  path_list_buf_size = Win32API.new("cygwin1.dll", "cygwin_posix_to_win32_path_list_buf_size", [ 'p' ], 'i')
-  to_win32_path = Win32API.new("cygwin1.dll", "cygwin_conv_to_full_win32_path", [ 'p', 'p' ], 'v')
+  path_list_buf_size = Win32API.new("cygwin1.dll", "cygwin_posix_to_win32_path_list_buf_size", [ "p" ], "i")
+  to_win32_path = Win32API.new("cygwin1.dll", "cygwin_conv_to_full_win32_path", [ "p", "p" ], "v")
   
   # Create a mutable copy, which seems to be required by the DLL calls.
   pathname = pathname.dup()
@@ -65,7 +65,7 @@ class InAppClient
     port = $2.to_i()
     secret = @secretPathname.open() { |file| file.read() }
     require "net/telnet"
-    telnet = Net::Telnet.new('Host' => host, 'Port' => port, 'Telnetmode' => false)
+    telnet = Net::Telnet.new("Host" => host, "Port" => port, "Telnetmode" => false)
     telnet.puts(secret)
     telnet.puts(command)
     serverOutput = telnet.readlines()
@@ -354,17 +354,17 @@ class Java
     subvertPath()
     
     # Since we're often started from the command line or from other programs, set up startup notification ourselves if it looks like we should.
-    if @initiate_startup_notification && ENV['DISPLAY'] != nil && ENV['DESKTOP_STARTUP_ID'] == nil && target_os() == "Linux"
+    if @initiate_startup_notification && ENV["DISPLAY"] != nil && ENV["DESKTOP_STARTUP_ID"] == nil && target_os() == "Linux"
       id=`gnome-startup start #{@frame_icon} Starting #{@dock_name}`.chomp()
-      ENV['DESKTOP_STARTUP_ID'] = id
+      ENV["DESKTOP_STARTUP_ID"] = id
     end
     
     # Pass any GNOME startup notification id through as a system property.
     # That way it isn't accidentally inherited by the JVM's children.
     # We test for the empty string because GDK doesn't unset the variable, it sets it to the empty string, presumably for portability reasons.
-    desktop_startup_id = ENV['DESKTOP_STARTUP_ID']
+    desktop_startup_id = ENV["DESKTOP_STARTUP_ID"]
     if desktop_startup_id != nil && desktop_startup_id.length() > 0
-      ENV['DESKTOP_STARTUP_ID'] = nil
+      ENV["DESKTOP_STARTUP_ID"] = nil
       add_property("gnome.DESKTOP_STARTUP_ID", desktop_startup_id)
     end
 
