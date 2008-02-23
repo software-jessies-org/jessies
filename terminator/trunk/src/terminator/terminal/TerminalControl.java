@@ -25,6 +25,9 @@ public class TerminalControl {
 	// FIXME: add a JNI call to return PIPE_BUF? (It's not strictly required to be the value we're looking for, but it probably is.)
 	private static final int INPUT_BUFFER_SIZE = 8192;
 	
+	// We use "new String" here because we're going to use reference equality later to recognize Terminator-supplied defaults.
+	private static final String TERMINATOR_DEFAULT_SHELL = new String(System.getenv("SHELL"));
+	
 	private static final boolean DEBUG = false;
 	private static final boolean DEBUG_STEP_MODE = false;
 	private static final boolean SHOW_ASCII_RENDITION = false;
@@ -75,7 +78,11 @@ public class TerminalControl {
 		// So now we use the 1970s trick of prefixing argv[0] with "-".
 		String[] argv = command.toArray(new String[command.size()]);
 		String executable = argv[0];
-		if (argv[0].equals(System.getenv("SHELL"))) {
+		// We deliberately use reference equality here so we're sure we know what we're meddling with.
+		// We only want to modify a call to the user's default shell that Terminator itself inserted into 'command'.
+		// If the user's messing about with -e, they get what they ask for no matter what that is.
+		// Since we only support -e for compatibility purposes, it's important to have a compatible implementation!
+		if (argv[0] == TERMINATOR_DEFAULT_SHELL) {
 			argv[0] = "-" + argv[0];
 		}
 		
@@ -86,6 +93,12 @@ public class TerminalControl {
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), CHARSET_NAME);
 		this.out = ptyProcess.getOutputStream();
 		writerExecutor = ThreadUtilities.newSingleThreadExecutor(makeThreadName("Writer"));
+	}
+	
+	public static ArrayList<String> getDefaultShell() {
+		ArrayList<String> command = new ArrayList<String>();
+		command.add(TERMINATOR_DEFAULT_SHELL);
+		return command;
 	}
 	
 	public void destroyProcess() {
