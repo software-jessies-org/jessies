@@ -33,23 +33,39 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         // FIXME: Ignore this click if the user actually clicked in the right-hand margin.
         
         final Range actualRange = rangeOfMisspelledWordBetween(offset, offset);
-        if (actualRange.isEmpty() == false) {
-            String misspelling = component.getTextBuffer().subSequence(actualRange.getStart(), actualRange.getEnd()).toString();
-            actions.add(new AcceptSpellingAction(misspelling));
-            actions.add(null);
-            String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
-            for (String suggestion : suggestions) {
-                // Since we're mainly used for editing source, camelCase
-                // and underscored_identifiers are more likely than
-                // hyphenated words or multiple words.
+        if (actualRange.isEmpty()) {
+            return;
+        }
+        
+        String misspelling = component.getTextBuffer().subSequence(actualRange.getStart(), actualRange.getEnd()).toString();
+        String[] suggestions = SpellingChecker.getSharedSpellingCheckerInstance().getSuggestionsFor(misspelling);
+        int suggestionCount = 0;
+        for (String suggestion : suggestions) {
+            if (component.getFileType() != FileType.PLAIN_TEXT) {
+                // Since we're editing source, camelCase and underscored_identifiers are more likely than hyphenated words or multiple words.
                 suggestion = suggestion.replace('-', '_');
                 suggestion = convertMultipleWordsToCamelCase(suggestion);
-                actions.add(new CorrectSpellingAction(component, suggestion, actualRange.getStart(), actualRange.getEnd()));
+                // Our attempts to be clever can have the unfortunate consequence of turning a suggestion back into the original misspelling.
+                // "FIREWIRE" (in capitals like that) is one example.
+                if (suggestion.equals(misspelling)) {
+                    continue;
+                }
             }
-            if (suggestions.length == 0) {
-                actions.add(new NoSuggestionsAction());
+            actions.add(new CorrectSpellingAction(component, suggestion, actualRange.getStart(), actualRange.getEnd()));
+            // aspell(1) makes a lot of really bad suggestions.
+            // Give up after five suggestions, or if we've seen both camelCase and underscore variants of the misspelled word.
+            // Annoyingly for our implementation, the easier-to-spot camelCase variant comes first.
+            if (++suggestionCount == 5 || (suggestion.contains("_") && suggestion.replace("_", "").equalsIgnoreCase(misspelling))) {
+                break;
             }
         }
+        
+        if (suggestions.length == 0) {
+            actions.add(new NoSuggestionsAction());
+        }
+        
+        actions.add(null);
+        actions.add(new AcceptSpellingAction(misspelling));
     }
     
     public class NoSuggestionsAction extends AbstractAction {
