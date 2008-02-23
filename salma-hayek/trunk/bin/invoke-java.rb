@@ -335,7 +335,17 @@ class Java
   end
   
   def launch(app_name)
-    report_exceptions(app_name) { launch0() }
+    report_exceptions(app_name) {
+      # Our Windows desktop shortcuts get started from Cygwin's /bin directory.
+      # We want to behave as if started from the invoking user's home directory.
+      if ENV["RUBY_LAUNCHER_INVOKING"]
+        Dir.chdir() {
+          launch0()
+        }
+      else
+        launch0()
+      end
+    }
   end
   
   def launch0()

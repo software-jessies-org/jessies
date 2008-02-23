@@ -55,6 +55,10 @@ int main(int, char** argValues) {
     if (rc != 0) {
         throw unix_exception("unsetenv(\"RUBYOPT\")");
     }
+    rc = setenv("RUBY_LAUNCHER_INVOKING", "1", 1);
+    if (rc != 0) {
+        throw unix_exception("setenv(\"RUBY_LAUNCHER_INVOKING\", \"1\", 1)");
+    }
     ensureDescriptorIsOpen(1);
     ensureDescriptorIsOpen(2);
     ++ argValues;
