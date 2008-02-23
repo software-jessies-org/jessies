@@ -65,7 +65,7 @@ public class JTerminalPane extends JPanel {
 	 */
 	public static JTerminalPane newCommandWithArgV(String name, String workingDirectory, List<String> argV) {
 		if (argV.size() == 0) {
-			argV = getShellCommand();
+			argV = TerminalControl.getDefaultShell();
 		}
 		if (name == null) {
 			name = argV.get(0);
@@ -83,7 +83,7 @@ public class JTerminalPane extends JPanel {
 		}
 		
 		// Avoid having to interpret the command (as java.lang.Process brokenly does) by passing it to the shell as-is.
-		ArrayList<String> command = getShellCommand();
+		ArrayList<String> command = TerminalControl.getDefaultShell();
 		command.add("-c");
 		command.add(originalCommand);
 		
@@ -105,13 +105,7 @@ public class JTerminalPane extends JPanel {
 			String user = System.getProperty("user.name");
 			name = user + "@localhost";
 		}
-		return new JTerminalPane(name, workingDirectory, getShellCommand(), true);
-	}
-	
-	private static ArrayList<String> getShellCommand() {
-		ArrayList<String> command = new ArrayList<String>();
-		command.add(System.getenv("SHELL"));
-		return command;
+		return new JTerminalPane(name, workingDirectory, TerminalControl.getDefaultShell(), true);
 	}
 	
 	public Dimension getPaneSize() {
