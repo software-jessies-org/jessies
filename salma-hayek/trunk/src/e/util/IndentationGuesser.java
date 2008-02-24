@@ -6,6 +6,16 @@ import java.util.regex.*;
 /**
  * Tries to guess the depth of indentation ("two spaces", "four spaces",
  * "single tab", et cetera) in use.
+ * 
+ * One area the current implementation has trouble is if you have a coding
+ * standard that has a specific indentation, a separate amount of indentation
+ * for wrapped lines, a short maximum line length, and languages/libraries
+ * that use fairly long lines meaning that many lines are wrapped. It's hard
+ * to imagine how IndentationGuesser could recognize wrapped lines (for all
+ * the languages we support) and ignore them. One possibility -- assuming that
+ * the wrapped-line indentation is an integer multiple of the normal
+ * indentation -- might be to try to recognize these, and count them as votes
+ * for each of their factors. Might that give the desired result?
  */
 public class IndentationGuesser {
     private static final Stopwatch stopwatch = Stopwatch.get("IndentationGuesser.guessIndentationFromFile");
