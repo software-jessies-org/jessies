@@ -1,24 +1,26 @@
 Bugs
 ----
 
-* Now --working-directory works, we could add Nautilus script support:
+* Can we cause Terminator to be offered in "Preferred Applications" on Linux?
+  At the moment, users have to choose "Custom" and enter our details.
+  It looks like we need something like this in "/usr/share/gnome-control-center/gnome-default-applications.xml":
 
-$ cat ~/.gnome2/nautilus-scripts/Open\ Terminator\ Here
-#!/bin/bash
-base="`echo $NAUTILUS_SCRIPT_CURRENT_URI | cut -d'/' -f3- | sed 's/%20/ /g'`"
-if [ -z "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" ]; then
-        dir="$base"
-else
-        while [ ! -z "$1" -a ! -d "$base/$1" ]; do shift; done
-        dir="$base/$1"
-fi
-terminator --working-directory "$dir"
++    <terminal>
++       <name>Terminator</name>
++       <executable>terminator</executable>
++       <command>terminator</command>
++       <icon-name>terminator</icon-name>
++       <exec-flag>-e</exec-flag>
++     </terminal>
 
-  Should probably use Ruby, and URI::parse to extract the path for 'base'.
-  We could install in /usr/share/nautilus-scripts/ to provide this
-  system-wide.
+  GNOME being GNOME, there's no reasonable way for applications to add/remove themselves as they're installed/removed, because that would be too sensible.
+  Interestingly: https://bugs.launchpad.net/gnome-control-center/+bug/184635
+  Which turns out to be a different terminal emulator called Terminator:
+  https://bugs.launchpad.net/gnome-control-center/+bug/184635
+  So it looks like this will resolve itself in GNOME 2.21, but that we might have confusion surrounding our name.
+  Lucky that our package is "org.jessies.terminator"; that should keep us out of trouble.
 
-  A similar "Command Prompt Here" feature has been commonly available on Windows since the days of the Windows 95 PowerToys.
+* A "Command Prompt Here" feature has been commonly available on Windows since the days of the Windows 95 PowerToys.
   Cygwin has a "chere" package for facilitating this with particular known, supported terminals and shells.
   http://www.burgaud.com/open-command-window-here/ has registry syntax for starting various shells.
   We'd need to give the registry a Windows executable.
