@@ -114,7 +114,19 @@ public class ETextWindow extends EWindow implements PTextListener {
         // in a fixed font reverting to a proportional font each time I save.
         preferencesChanged();
         CharSequence content = textArea.getTextBuffer();
-        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content, Evergreen.getInstance().getPreferences().getString(EvergreenPreferences.DEFAULT_INDENTATION)));
+        
+        String defaultIndentation = Evergreen.getInstance().getPreferences().getString(EvergreenPreferences.DEFAULT_INDENTATION);
+        String indentation = defaultIndentation;
+        // IndentationGuesser assumes an environment where everyone's doing
+        // their own thing and where our guesses are pretty good. In an
+        // environment where there's a coding standard *and* our guesses are
+        // often wrong, the guessing is just annoying.
+        // FIXME: can we fix IndentationGuesser?
+        // FIXME: is this common enough a situation to warrant a public preference?
+        if (Parameters.getParameter("indentation.allowGuessing", true)) {
+            indentation = IndentationGuesser.guessIndentationFromFile(content, defaultIndentation);
+        }
+        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, indentation);
     }
     
     public void preferencesChanged() {
