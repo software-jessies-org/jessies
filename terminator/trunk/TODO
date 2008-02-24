@@ -18,6 +18,25 @@ terminator --working-directory "$dir"
   We could install in /usr/share/nautilus-scripts/ to provide this
   system-wide.
 
+  A similar "Command Prompt Here" feature has been commonly available on Windows since the days of the Windows 95 PowerToys.
+  Cygwin has a "chere" package for facilitating this with particular known, supported terminals and shells.
+  http://www.burgaud.com/open-command-window-here/ has registry syntax for starting various shells.
+  We'd need to give the registry a Windows executable.
+  I don't think we can specify its current directory.
+  We currently need that for ruby-launcher.exe to find cygwin1.dll.
+  Trying "chere -i -t rxvt" gave me a registry key of:
+  C:\cygwin\bin\run.exe C:\cygwin\bin\rxvt.exe -e /bin/xhere /bin/bash.exe "%L"
+  objdump -p /bin/run.exe says that's a Windows application.
+  The man page says that it opens a hidden console window - for running console programs with no flicker.
+  Running C:\cygwin\bin\run doesn't set the working directory to C:\cygwin\bin.
+  So we need the -p option to add /bin to the PATH to find cygwin1.dll.
+  Changing the registry entry to this worked for me:
+  C:\cygwin\bin\run.exe -p /bin "C:\Program Files\software.jessies.org\terminator\Resources\salma-hayek\.generated\i386_Cygwin\bin\ruby-launcher.exe" c:\cygwin\bin\rubyw.exe "C:\Program Files\software.jessies.org\terminator\Resources\terminator\bin\terminator" --working-directory "%L"
+  The source looks big and hairy.
+  cygcheck --find-package says it comes from the "run" package, so that's another manual dependency we'd have to add.
+  Alternatively, a cygwin-launcher.exe compiled with -mno-cygwin could SetDllDirectory to its first argument, then execvp the rest.
+  We're allowed to redistribute mingwm10.dll and we could put that in the same directory as cygwin-launcher.exe.
+
 * The selection is cleared a little over-zealously when text changes: if
   the text changes are above the selection, the selection is still changed
   even if the selection contents were not changed.
