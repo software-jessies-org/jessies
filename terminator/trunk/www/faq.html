@@ -193,7 +193,7 @@ See the documentation for your operating system for details on how to change you
 
 <!-- ---------------------------------------------------- -->
 
-<h2>How can I open a new window from the command line?</h2>
+<h2>How can I open a new terminal from the command line?</h2>
 
 <p>You can start other programs, even in multiple tabs, from the command line.
 See <tt>terminator --help</tt> for the syntax.
@@ -201,6 +201,14 @@ Here's an example that opens a new window with two tabs:
 <pre>
 terminator -n "top's tab's title" top -n "another tab title" bash
 </pre>
+
+<h2>How can I open a new terminal from Nautilus?</h2>
+
+<p>If you install the <tt>nautilus-open-terminal</tt> package, Nautilus will gain an "Open Terminal" menu item.
+In the system-wide "Preferred Applications" preference dialog, you can choose "Custom" as your terminal emulator.
+Enter "terminator" as the command, and "-e" as the execute flag.
+
+<p>If you have GNOME 2.21 or later, "Terminator" will already be an available option.
 
 <!-- ---------------------------------------------------- -->
 
