@@ -1,7 +1,22 @@
 Bugs
 ----
 
-* "terminator --working-directory /tmp bash" doesn't do what you'd expect.
+* Now --working-directory works, we could add Nautilus script support:
+
+$ cat ~/.gnome2/nautilus-scripts/Open\ Terminator\ Here
+#!/bin/bash
+base="`echo $NAUTILUS_SCRIPT_CURRENT_URI | cut -d'/' -f3- | sed 's/%20/ /g'`"
+if [ -z "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" ]; then
+        dir="$base"
+else
+        while [ ! -z "$1" -a ! -d "$base/$1" ]; do shift; done
+        dir="$base/$1"
+fi
+terminator --working-directory "$dir"
+
+  Should probably use Ruby, and URI::parse to extract the path for 'base'.
+  We could install in /usr/share/nautilus-scripts/ to provide this
+  system-wide.
 
 * The selection is cleared a little over-zealously when text changes: if
   the text changes are above the selection, the selection is still changed
