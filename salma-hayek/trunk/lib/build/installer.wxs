@@ -13,28 +13,32 @@
     <Property Id="ARPURLINFOABOUT">http://software.jessies.org/$(env.MACHINE_PROJECT_NAME)/</Property>
     <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
 
-    <Property Id='CYGWIN_HKLM'>
-      <RegistrySearch Id='CYGWIN_HKLM.dir' Root="HKLM" Key='Software\Cygnus Solutions\Cygwin\mounts v2\/' Name='native' Type='directory' />
-    </Property>
     <Property Id='CYGWIN_HKLM_BIN'>
-      <DirectorySearch Id='CYGWIN_HKLM_BIN.dir' Path='[CYGWIN_HKLM]\bin' Depth='1' />
-    </Property>
-    <Property Id='RUBYW_HKLM'>
-      <DirectorySearch Id='RUBYW_HKLM.dir' Path='[CYGWIN_HKLM]\bin' Depth='0'>
-        <FileSearch Id='RUBYW_HKLM.file' Name='rubyw.exe' />
-      </DirectorySearch>
+      <RegistrySearch Id='CYGWIN_HKLM.dir' Root="HKLM" Key='Software\Cygnus Solutions\Cygwin\mounts v2\/' Name='native' Type='directory'>
+        <DirectorySearch Id='CYGWIN_HKLM_BIN.dir' Path='bin' Depth='0' />
+      </RegistrySearch>
     </Property>
 
-    <Property Id='CYGWIN_HKCU'>
-      <RegistrySearch Id='CYGWIN_HKCU.dir' Root="HKCU" Key='Software\Cygnus Solutions\Cygwin\mounts v2\/' Name='native' Type='directory' />
+    <Property Id='RUBYW_HKLM'>
+      <RegistrySearch Id='RUBYW_HKLM.dir' Root="HKLM" Key='Software\Cygnus Solutions\Cygwin\mounts v2\/' Name='native' Type='directory'>
+        <DirectorySearch Id='RUBYW_HKLM_BIN.dir' Path='bin' Depth='0'>
+          <FileSearch Id='RUBYW_HKLM.file' Name='rubyw.exe' />
+        </DirectorySearch>
+      </RegistrySearch>
     </Property>
+
     <Property Id='CYGWIN_HKCU_BIN'>
-      <DirectorySearch Id='CYGWIN_HKCU_BIN.dir' Path='[CYGWIN_HKCU]\bin' Depth='1' />
+      <RegistrySearch Id='CYGWIN_HKCU.dir' Root="HKCU" Key='Software\Cygnus Solutions\Cygwin\mounts v2\/' Name='native' Type='directory'>
+        <DirectorySearch Id='CYGWIN_HKCU_BIN.dir' Path='bin' Depth='0' />
+      </RegistrySearch>
     </Property>
+
     <Property Id='RUBYW_HKCU'>
-      <DirectorySearch Id='RUBYW_HKCU.dir' Path='[CYGWIN_HKCU]\bin' Depth='0'>
-        <FileSearch Id='RUBYW_HKCU.file' Name='rubyw.exe' />
-      </DirectorySearch>
+      <RegistrySearch Id='RUBYW_HKCU.dir' Root="HKCU" Key='Software\Cygnus Solutions\Cygwin\mounts v2\/' Name='native' Type='directory'>
+        <DirectorySearch Id='RUBYW_HKCU_BIN.dir' Path='bin' Depth='0'>
+          <FileSearch Id='RUBYW_HKCU.file' Name='rubyw.exe' />
+        </DirectorySearch>
+      </RegistrySearch>
     </Property>
 
     <Condition Message="Cygwin and Cygwin Ruby must be installed">RUBYW_HKLM OR RUBYW_HKCU</Condition>
@@ -68,11 +72,11 @@
     </Directory>
     <Feature Id='shortcut_HKLM' Title='$(env.HUMAN_PROJECT_NAME) shortcut' Level='0'>
       <ComponentRef Id='RubyShortcut_HKLM' />
-      <Condition Level='1'>CYGWIN_HKLM AND RUBYW_HKLM</Condition>
+      <Condition Level='1'>CYGWIN_HKLM_BIN AND RUBYW_HKLM</Condition>
     </Feature>
     <Feature Id='shortcut_HKCU' Title='$(env.HUMAN_PROJECT_NAME) shortcut' Level='0'>
       <ComponentRef Id='RubyShortcut_HKCU' />
-      <Condition Level='1'>CYGWIN_HKCU AND RUBYW_HKCU</Condition>
+      <Condition Level='1'>CYGWIN_HKCU_BIN AND RUBYW_HKCU</Condition>
     </Feature>
     <Feature Id='product' Title='$(env.HUMAN_PROJECT_NAME)' Level='1'>
       <ComponentRef Id='Path' /><?include component-references.wxi ?>
