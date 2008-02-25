@@ -34,12 +34,8 @@ public class CheckForLintAction extends ETextAction {
     }
     
     private void checkForLint() {
-        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
-        boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
-        if (shouldContinue == false) {
-            return;
-        }
-        
+        // Check which file?
+        // We need to get hold of this before we do anything that might lose the focus.
         ETextWindow textWindow = getFocusedTextWindow();
         if (textWindow == null) {
             Evergreen.getInstance().showAlert("Unable to check for lint", "Select a file to be checked.");
@@ -51,6 +47,14 @@ public class CheckForLintAction extends ETextAction {
         String command = checkers.get(fileType);
         if (command == null) {
             Evergreen.getInstance().showAlert("Unable to check for lint", "Don't know how to check " + fileType.getName() + " files.");
+            return;
+        }
+        
+        // Are there unsaved files?
+        // We don't just check the selected file because it might #include (or whatever) other files.
+        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
+        boolean shouldContinue = workspace.prepareForAction("Save before checking for lint?", "Some files are currently modified but not saved.");
+        if (shouldContinue == false) {
             return;
         }
         
