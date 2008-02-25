@@ -6,8 +6,16 @@ import java.awt.event.*;
 import java.io.*;
 
 /**
-The ETextArea build-project action. Works for either Ant or make.
-*/
+ * Our build-project action.
+ * We have built-in support for either Ant or make.
+ * 
+ * As an extension to support weird custom build tools, we look at a couple of special properties.
+ * If the build directory path matches the given regular expression, we run the given custom build tool.
+ * There may be a better solution, but this is the least worst hack that's come to mind.
+ * It's certainly better than having to leave bogus Makefiles all over.
+ * We'll need to see at least one other custom build system to get a feel for whether this is generally useful.
+ * If it is, we should support an arbitrary number of such custom build tools, similar to the ExternalTool situation.
+ */
 public class BuildAction extends ETextAction {
     private boolean building = false;
 
@@ -27,8 +35,26 @@ public class BuildAction extends ETextAction {
             return;
         }
         
+        // Assume we'll be building with GNU Make.
+        String command = "make --print-directory";
+        
         String makefileName = findMakefile();
+        
+        // See if we've got special fall-back instructions.
         if (makefileName == null) {
+            String pathPattern = Parameters.getParameter("build.specialPathPattern");
+            String buildTool = Parameters.getParameter("build.specialBuildTool");
+            if (pathPattern != null && buildTool != null) {
+                String directory = getMakefileSearchStartDirectory();
+                if (directory.matches(pathPattern)) {
+                    makefileName = directory + File.separator;
+                    command = buildTool;
+                }
+            }
+        }
+        
+        if (makefileName == null) {
+            Evergreen.getInstance().showAlert("Build instructions not found", "Neither a Makefile for make(1) nor a build.xml for Ant could be found.");
             return;
         }
         
@@ -38,10 +64,11 @@ public class BuildAction extends ETextAction {
             return;
         }
         
-        String command = "make --print-directory";
+        // Does it look like we should be using Ant?
         if (makefileName.endsWith("build.xml")) {
             command = "ant -emacs -quiet";
         }
+        
         invokeBuildTool(workspace, makefileName, command);
     }
     
@@ -63,9 +90,6 @@ public class BuildAction extends ETextAction {
         String makefileName = FileUtilities.findFileByNameSearchingUpFrom("Makefile", startDirectory);
         if (makefileName == null) {
             makefileName = FileUtilities.findFileByNameSearchingUpFrom("build.xml", startDirectory);
-        }
-        if (makefileName == null) {
-            Evergreen.getInstance().showAlert("Build instructions not found", "Neither a Makefile for make(1) nor a build.xml for Ant could be found.");
         }
         return makefileName;
     }
