@@ -17,7 +17,6 @@ public class AboutBox {
     private static final AboutBox INSTANCE = new AboutBox();
     
     private ImageIcon icon;
-    private String applicationName = Log.getApplicationName();
     private String webSiteAddress;
     private ArrayList<String> versionLines = new ArrayList<String>();
     private ArrayList<String> copyrightLines = new ArrayList<String>();
@@ -36,7 +35,8 @@ public class AboutBox {
     }
     
     public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
+        // Maintain binary compatibility by forwarding to the correct method.
+        Log.setApplicationName(applicationName);
     }
     
     public String getWebSiteAddress() {
@@ -54,7 +54,7 @@ public class AboutBox {
     }
     
     public boolean isConfigured() {
-        return (applicationName != null);
+        return (Log.getApplicationName() != null);
     }
     
     public void setImage(String filename) {
@@ -122,7 +122,7 @@ public class AboutBox {
     private void makeUi(final JDialog dialog) {
         if (GuiUtilities.isMacOs() == false) {
             // GNOME and Win32 applications give their about boxes titles.
-            dialog.setTitle("About " + applicationName);
+            dialog.setTitle("About " + Log.getApplicationName());
         }
         
         // FIXME: add GNOME and Win32 implementations.
@@ -167,7 +167,7 @@ public class AboutBox {
         }
         
         // Then the application name...
-        addLabel(panel, applicationNameFont, applicationName);
+        addLabel(panel, applicationNameFont, Log.getApplicationName());
         panel.add(Box.createRigidArea(spacerSize));
         
         // Then version information...
@@ -312,12 +312,12 @@ public class AboutBox {
     
     public String getProblemReportSubject() {
         String systemDetails = Log.getSystemDetailsForProblemReport();
-        String subject = applicationName + " problem (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
+        String subject = Log.getApplicationName() + " problem (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
         return StringUtilities.urlEncode(subject).replaceAll("\\+", "%20");
     }
     
     public String getIdentificationString() {
-        return applicationName + " (" + projectRevision + "/" + libraryRevision + "/" + Log.getSystemDetailsForProblemReport() + ")";
+        return Log.getApplicationName() + " (" + projectRevision + "/" + libraryRevision + "/" + Log.getSystemDetailsForProblemReport() + ")";
     }
     
     private JButton makeCloseButton(ActionListener actionListener) {
@@ -334,18 +334,18 @@ public class AboutBox {
             
             PTextArea textArea = new PTextArea(13, 40);
             textArea.setEditable(false);
-            textArea.setText(applicationName + " is free software: you can redistribute it and/or modify\n" +
+            textArea.setText(Log.getApplicationName() + " is free software: you can redistribute it and/or modify\n" +
                 "it under the terms of the GNU General Public License as published by\n" +
                 "the Free Software Foundation; either version 2 of the License, or\n" +
                 "(at your option) any later version.\n" +
                 "\n" +
-                applicationName + " is distributed in the hope that it will be useful,\n" +
+                Log.getApplicationName() + " is distributed in the hope that it will be useful,\n" +
                 "but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
                 "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" +
                 "GNU General Public License for more details.\n" +
                 "\n"+
                 "You should have received a copy of the GNU General Public License\n" +
-                "along with " + applicationName + "; If not, see <http://www.gnu.org/licenses/>.\n");
+                "along with " + Log.getApplicationName() + "; If not, see <http://www.gnu.org/licenses/>.\n");
             textArea.setWrapStyleWord(true);
             
             JButton closeButton = makeCloseButton(new ActionListener() {
@@ -364,9 +364,9 @@ public class AboutBox {
     }
     
     public static void main(String[] args) {
+        Log.setApplicationName("AboutBoxTest");
         GuiUtilities.initLookAndFeel();
         AboutBox aboutBox = AboutBox.getSharedInstance();
-        aboutBox.setApplicationName("AboutBox");
         aboutBox.setWebSiteAddress("http://software.jessies.org/");
         aboutBox.addCopyright("Copyright (C) 2006, Elliott Hughes");
         aboutBox.show();
