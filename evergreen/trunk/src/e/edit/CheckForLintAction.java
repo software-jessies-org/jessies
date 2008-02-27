@@ -15,6 +15,9 @@ import java.util.*;
  * 4. this lets us add a bit of post-processing, so we can massage tidy(1) output into more useful grep(1)-style output, for example.
  * 5. a built-in lint checking system also lets us provide a fancier interface in future, even though it's currently no better than a user-defined external tool.
  * The major disadvantage (ignoring "more code") is that we're still likely to want some local configuration mechanism (for domain-specific languages, say, or because you prefer an alternative to the tool we suggest, or because you have access to a special tool).
+ * 
+ * Regarding a possible future "fancier interface", "pyflakes" is a very fast checker for Python, and "ruby -wc" and "tidy -qe" are already very quick.
+ * Checking as-you-type sounds eminently possible, even without the ability to use any of these in-process.
  */
 public class CheckForLintAction extends ETextAction {
     private static final HashMap<FileType, String> checkers = initCheckers();
