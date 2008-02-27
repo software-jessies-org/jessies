@@ -118,7 +118,16 @@ public class JFrameUtilities {
     }
     
     public static JFrame makeSimpleWindow(String title, JComponent content) {
-        JFrame frame = new JFrame(title);
+        // See MainFrame for rationale.
+        JFrame frame = new JFrame(title) {
+            @Override
+            public void setVisible(boolean newVisibility) {
+                super.setVisible(newVisibility);
+                if (newVisibility == false) {
+                    dispose();
+                }
+            }
+        };
         frame.setContentPane(content);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);

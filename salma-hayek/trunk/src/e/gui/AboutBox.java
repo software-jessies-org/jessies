@@ -104,6 +104,7 @@ public class AboutBox {
     }
     
     public void show() {
+        // See MainFrame for rationale.
         JDialog dialog = new JDialog(findSuitableOwner()) {
             @Override
             public void setVisible(boolean newVisibility) {
