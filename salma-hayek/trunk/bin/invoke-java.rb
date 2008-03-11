@@ -339,6 +339,7 @@ class Java
       # Our Windows desktop shortcuts get started from Cygwin's /bin directory.
       # We want to behave as if started from the invoking user's home directory.
       if ENV["RUBY_LAUNCHER_INVOKING"]
+        ENV["RUBY_LAUNCHER_INVOKING"] = nil
         Dir.chdir() {
           launch0()
         }
