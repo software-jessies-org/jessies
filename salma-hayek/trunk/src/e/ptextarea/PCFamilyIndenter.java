@@ -93,40 +93,8 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             indentation = decreaseIndentation(indentation);
         }
         
-        // Recognize block comments, and help out with the ASCII art.
-        if (lineIndex > 0) {
-            List<PLineSegment> previousLineSegments = textArea.getLineSegments(lineIndex - 1);
-            if (previousLineSegments.size() > 0) {
-                // Extract the previous line's comment text.
-                String previousLineCommentText = "";
-                for (PLineSegment segment : previousLineSegments) {
-                    if (segment.getStyle() == PStyle.COMMENT) {
-                        previousLineCommentText += segment.getCharSequence();
-                    }
-                }
-                previousLineCommentText = previousLineCommentText.trim();
-                
-                // Extract this line's text. I think we can safely infer whether or not it's comment (see below).
-                String currentLineText = textArea.getLineText(lineIndex).trim();
-                
-                // NewlineInserter treats /** and /* the same way, so we should too.
-                if (previousLineCommentText.startsWith("/*") || previousLineCommentText.startsWith("*")) {
-                    // We're either part-way through, or on the line after, a block comment.
-                    if (previousLineCommentText.endsWith("*/")) {
-                        // We're on the line after, so we must leave the current line's indentation as it is.
-                    } else if (currentLineText.startsWith("**")) {
-                        // We're on a "boxed" block comment, so just add the leading space to line up.
-                        indentation += " ";
-                    } else if (currentLineText.endsWith("*/")) {
-                        // We're on the last line, so add a leading " " to line the "*/" on this line up with the "*" above.
-                        indentation += " ";
-                    } else {
-                        // We're part-way through a JavaDoc-style block comment, so add a leading " * ".
-                        indentation += " * ";
-                    }
-                }
-            }
-        }
+        indentation += extraBlockCommentArtForLine(lineIndex);
+        
         return indentation;
     }
     
