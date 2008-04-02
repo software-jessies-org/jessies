@@ -4,23 +4,35 @@ import java.util.*;
 
 public class PTalcTextStyler extends PAbstractLanguageStyler {
     private static final String[] KEYWORDS = new String[] {
-        // "man talc"
+        // "man talc" keywords.
         "break",
         "class",
         "continue",
         "do",
         "else",
+        "extends",
         "false",
         "final",
         "for",
         "function",
         "if",
+        "implements",
+        "in",
         "new",
         "null",
         "return",
         "true",
         "void",
-        "while"
+        "while",
+        
+        // "man talc" types.
+        "bool",
+        "file",
+        "int",
+        "match",
+        "object",
+        "real",
+        "string"
     };
     
     public PTalcTextStyler(PTextArea textArea) {
@@ -29,12 +41,12 @@ public class PTalcTextStyler extends PAbstractLanguageStyler {
     
     @Override
     protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
-        return isShellComment(line, atIndex);
+        return isShellComment(line, atIndex) || line.startsWith("//", atIndex);
     }
     
     @Override
     protected boolean supportMultiLineComments() {
-        return false;
+        return true;
     }
     
     public void addKeywordsTo(Collection<String> collection) {
