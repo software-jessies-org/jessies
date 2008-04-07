@@ -68,7 +68,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
     }
     
-    public class MatchingFile implements ClickableTreeItem {
+    public class MatchingFile implements ClickableTreeItem, Comparable<MatchingFile> {
         private File file;
         private String name;
         private int matchCount;
@@ -131,6 +131,10 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 FindAction.INSTANCE.findInText(textWindow, PatternUtilities.toString(pattern));
                 textWindow.getTextArea().findNext();
             }
+        }
+        
+        public int compareTo(MatchingFile lhs) {
+            return String.CASE_INSENSITIVE_ORDER.compare(name, lhs.name);
         }
         
         public String toString() {
@@ -234,14 +238,36 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                     node = pathMap.get(pathSoFar);
                     if (node == null) {
                         node = new DefaultMutableTreeNode(pathElements[i] + File.separator);
-                        parentNode.add(node);
-                        matchTreeModel.nodesWereInserted(parentNode, new int[] { parentNode.getIndex(node) });
+                        insertNodeInAlphabeticalOrder(parentNode, node);
                         pathMap.put(pathSoFar, node);
                     }
                     parentNode = node;
                 }
             }
             return node;
+        }
+        
+        /**
+         * Ensure that newNode is inserted at the correct index in parentNode to preserve case-insensitive alphabetical ordering.
+         * We originally just used DefaultMutableTreeNode.add, but that doesn't work when multiple threads are returning matches in no particular order.
+         * FIXME: given that on contemporary hardware matches come back "roughly" in order, should we search for the insertion position from the back?
+         */
+        @SuppressWarnings("unchecked")
+        private void insertNodeInAlphabeticalOrder(DefaultMutableTreeNode parentNode, DefaultMutableTreeNode newNode) {
+            // Find the index to insert at.
+            final Comparable newValue = (Comparable) newNode.getUserObject();
+            int insertionIndex = 0;
+            while (insertionIndex < parentNode.getChildCount()) {
+                DefaultMutableTreeNode thisNode = (DefaultMutableTreeNode) parentNode.getChildAt(insertionIndex);
+                Comparable thisValue = (Comparable) thisNode.getUserObject();
+                if (thisValue.compareTo(newValue) >= 0) {
+                    break;
+                }
+                ++insertionIndex;
+            }
+            // Insert it, and make sure the model understands what we did.
+            parentNode.insert(newNode, insertionIndex);
+            matchTreeModel.nodesWereInserted(parentNode, new int[] { insertionIndex });
         }
         
         @Override
@@ -330,8 +356,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                                 for (String line : matches) {
                                     fileNode.add(new DefaultMutableTreeNode(new MatchingLine(line, file, pattern)));
                                 }
-                                pathNode.add(fileNode);
-                                matchTreeModel.nodesWereInserted(pathNode, new int[] { pathNode.getIndex(fileNode) });
+                                insertNodeInAlphabeticalOrder(pathNode, fileNode);
                                 matchingFileCount.incrementAndGet();
                                 // Make sure the new node gets expanded.
                                 publish(fileNode);
@@ -340,8 +365,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                     } else {
                         synchronized (matchView) {
                             DefaultMutableTreeNode pathNode = getPathNode(candidate);
-                            pathNode.add(new DefaultMutableTreeNode(new MatchingFile(file, candidate)));
-                            // Make sure the new node gets expanded.
+                            DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(new MatchingFile(file, candidate));
+                            insertNodeInAlphabeticalOrder(pathNode, fileNode);
+                            matchingFileCount.incrementAndGet();
                             publish(pathNode);
                         }
                     }
