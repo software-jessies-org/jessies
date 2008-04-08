@@ -29,7 +29,12 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             return false;
         }
         char lastChar = activePartOfLine.charAt(activePartOfLine.length() - 1);
-        return PBracketUtilities.isOpenBracket(lastChar);
+        if ((lastChar == '<') && (activePartOfLine.length() >= 2)) {
+            // We must not consider left-shifts to be block starts.
+            return (activePartOfLine.charAt(activePartOfLine.length() - 2) != '<');
+        } else {
+            return PBracketUtilities.isOpenBracket(lastChar);
+        }
     }
     
     public boolean isBlockEnd(String activePartOfLine) {
@@ -37,7 +42,12 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             return false;
         }
         char firstChar = activePartOfLine.charAt(0);
-        return PBracketUtilities.isCloseBracket(firstChar);
+        if ((firstChar == '>') && (activePartOfLine.length() >= 2)) {
+            // We must not consider right-shifts to be block ends.
+            return (activePartOfLine.charAt(1) != '>');
+        } else {
+            return PBracketUtilities.isCloseBracket(firstChar);
+        }
     }
     
     public boolean isSwitchLabel(String activePartOfLine) {
