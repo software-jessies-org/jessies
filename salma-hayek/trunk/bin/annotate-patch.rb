@@ -108,7 +108,7 @@ def annotate_patch()
   |line|
   if line =~ /^=+$/ || line =~ /^=== / || line =~ /^Index: /
    next
-  elsif line =~ /^\=\=\=\=\= (\S+) /
+  elsif line =~ /^\=\=\=\=\= (\S+) / || line =~ /^\=\=\=\= \S+ - (\S+) \=\=\=\=/
    if test(?r, $1)
     plus_tags = tags_for_file($1)
     minus_tags = tags_for_file($1)
