@@ -102,16 +102,26 @@ public class FileType {
     private final Class<? extends PTextStyler> stylerClass;
     private final String[] extensions;
     
-    private FileType(String name, Class<? extends PIndenter> indenterClass, Class<? extends PTextStyler> stylerClass, String[] extensions) {
+    private FileType(String name, Class<? extends PIndenter> defaultIndenterClass, Class<? extends PTextStyler> defaultStylerClass, String[] extensions) {
         synchronized (ALL_FILE_TYPES) {
             if (ALL_FILE_TYPES.containsKey(name)) {
                 throw new RuntimeException("Attempt to redefine FileType \"" + name + "\"");
             }
             this.name = name;
-            this.indenterClass = indenterClass;
-            this.stylerClass = stylerClass;
+            this.indenterClass = selectClass(name + ".indenterClass", defaultIndenterClass);
+            this.stylerClass = selectClass(name + ".stylerClass", defaultStylerClass);
             this.extensions = extensions;
             ALL_FILE_TYPES.put(name, this);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static <T> Class<? extends T> selectClass(String property, Class<? extends T> defaultClass) {
+        try {
+            // This is unsafe.
+            return (Class<? extends T>) Class.forName(System.getProperty(property));
+        } catch (Exception ex) {
+            return defaultClass;
         }
     }
     
