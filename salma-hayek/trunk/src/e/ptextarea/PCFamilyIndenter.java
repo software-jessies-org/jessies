@@ -51,7 +51,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
     }
     
     public boolean isSwitchLabel(String activePartOfLine) {
-        return activePartOfLine.matches("(case\\b.*|default\\s*):");
+        return activePartOfLine.matches("(case\\b.*|default\\s*):.*");
     }
     
     /**
