@@ -68,7 +68,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
     }
     
-    public class MatchingFile implements ClickableTreeItem, Comparable<MatchingFile> {
+    public class MatchingFile implements ClickableTreeItem {
         private File file;
         private String name;
         private int matchCount;
@@ -131,10 +131,6 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 FindAction.INSTANCE.findInText(textWindow, PatternUtilities.toString(pattern));
                 textWindow.getTextArea().findNext();
             }
-        }
-        
-        public int compareTo(MatchingFile lhs) {
-            return String.CASE_INSENSITIVE_ORDER.compare(name, lhs.name);
         }
         
         public String toString() {
@@ -252,15 +248,15 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
          * We originally just used DefaultMutableTreeNode.add, but that doesn't work when multiple threads are returning matches in no particular order.
          * FIXME: given that on contemporary hardware matches come back "roughly" in order, should we search for the insertion position from the back?
          */
-        @SuppressWarnings("unchecked")
         private void insertNodeInAlphabeticalOrder(DefaultMutableTreeNode parentNode, DefaultMutableTreeNode newNode) {
             // Find the index to insert at.
-            final Comparable newValue = (Comparable) newNode.getUserObject();
+            // We compare strings, because the tree nodes are a mixture of Strings (for directories) and MatchingFiles (for matching files).
+            final String newValueString = newNode.getUserObject().toString();
             int insertionIndex = 0;
             while (insertionIndex < parentNode.getChildCount()) {
                 DefaultMutableTreeNode thisNode = (DefaultMutableTreeNode) parentNode.getChildAt(insertionIndex);
-                Comparable thisValue = (Comparable) thisNode.getUserObject();
-                if (thisValue.compareTo(newValue) >= 0) {
+                String thisValueString = thisNode.getUserObject().toString();
+                if (String.CASE_INSENSITIVE_ORDER.compare(thisValueString, newValueString) >= 0) {
                     break;
                 }
                 ++insertionIndex;
