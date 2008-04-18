@@ -10,6 +10,10 @@ import e.util.*;
  * Offers man page entries corresponding to selected words.
  */
 public class ManPageResearcher implements WorkspaceResearcher {
+    // A set of unique man page names, so we can quickly determine whether we have a suitable page.
+    // This also lets us avoid accidentally returning man pages we're trying to ignore.
+    private static TreeSet<String> uniqueManPageNames;
+    // A set of unique words, for the spelling checker.
     private static TreeSet<String> uniqueWords;
     
     private static final ManPageResearcher INSTANCE = new ManPageResearcher();
@@ -30,7 +34,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
     private static void init() {
         final long t0 = System.nanoTime();
         
-        TreeSet<String> uniqueIdentifiers = new TreeSet<String>();
+        uniqueManPageNames = new TreeSet<String>();
         
         int pageCount = 0;
         Pattern manPagePattern = Pattern.compile("^(.*)\\.([23][A-Za-z]*)(\\.gz)?$");
@@ -42,10 +46,11 @@ public class ManPageResearcher implements WorkspaceResearcher {
                 if (matcher.matches()) {
                     String stub = matcher.group(1);
                     String sectionName = matcher.group(2);
-                    if (sectionName.endsWith("pm") || sectionName.endsWith("tcl") || sectionName.endsWith("ssl")) {
+                    // FIXME: have we ever seen a useful man page whose section name wasn't wholly numeric? Maybe we should have a list of those non-numeric sections we *do* want, instead?
+                    if (sectionName.endsWith("blt") || sectionName.endsWith("perl") || sectionName.endsWith("pm") || sectionName.endsWith("ssl") || sectionName.endsWith("tcl")) {
                         continue;
                     }
-                    uniqueIdentifiers.add(stub);
+                    uniqueManPageNames.add(stub);
                     ++pageCount;
                 } else {
                     Log.warn("unexpected man page \"" + manPage + "\"");
@@ -54,7 +59,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         }
         
         // FIXME: this turns "posix_openpt" into two words, so the spelling checker will accept "openpt" alone, rather than just in the identifier "posix_openpt" as intended. Maybe we should check blessed identifiers as a whole before we try break them into words, and then supply the spelling checker with the unique identifiers we bless, rather than just the list of words? (At the same time, passing all the words works well for Java source.)
-        uniqueWords = JavaResearcher.extractUniqueWords(uniqueIdentifiers.iterator());
+        uniqueWords = JavaResearcher.extractUniqueWords(uniqueManPageNames.iterator());
         
         Log.warn("Learned of " + pageCount + " man pages in " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
     }
@@ -82,6 +87,9 @@ public class ManPageResearcher implements WorkspaceResearcher {
     }
     
     public String research(String string, ETextWindow textWindow) {
+        if (uniqueManPageNames.contains(string) == false) {
+            return "";
+        }
         return formatManPage(string, "2:3");
     }
     
