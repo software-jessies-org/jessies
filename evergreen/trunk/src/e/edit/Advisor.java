@@ -101,6 +101,9 @@ public class Advisor extends JPanel {
                 if (textWindow == null || researcher.isSuitable(textWindow)) {
                     String result = researcher.research(searchTerm, textWindow);
                     if (result != null && result.length() > 0) {
+                        // We need to strip HTML and BODY tags if we're to concatenate HTML documents.
+                        // We can't strip HEAD tags because they may have useful content.
+                        result = result.replaceAll("(?i)</?html>", "").replaceAll("(?i)</?body[^>]*>", "");
                         newText.append(result);
                     }
                 }
@@ -110,7 +113,8 @@ public class Advisor extends JPanel {
                 newText.append("No documentation found for \"" + searchTerm + "\".");
             }
             
-            return newText.toString();
+            // Add the HTML tags back. It's too hard to add BODY tags in appropriate places.
+            return "<html>" + newText.toString() + "</html>";
         }
         
         @Override
