@@ -64,13 +64,10 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
     }
     
     private String getDocumentation(String term) {
-        if (term.startsWith("std::") == false) {
-            return null;
+        if (term.startsWith("std::")) {
+            // Skip "std::".
+            term = term.substring(5);
         }
-        
-        // Skip "std::".
-        term = term.substring(5);
-        
         // Return the HTML if we have it. The STL documentation is simple enough for us to render it ourselves.
         String filename = docs.get(term);
         String result = null;
