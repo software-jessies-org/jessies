@@ -54,6 +54,10 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     private ArrayList<Advice> future = new ArrayList<Advice>();
     private EStatusBar statusBar;
     
+    static {
+        HtmlPane.fixUpSwingDtd();
+    }
+    
     public AdvisorHtmlPane() {
         statusBar = new EStatusBar();
         initTextPane();
