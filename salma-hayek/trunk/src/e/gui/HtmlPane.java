@@ -7,10 +7,35 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
+import javax.swing.text.html.parser.*;
 
 public class HtmlPane extends JPanel implements Scrollable {
     private JTextPane textPane;
     private String htmlSource;
+    
+    static {
+        fixUpSwingDtd();
+    }
+    
+    public static void fixUpSwingDtd() {
+        try {
+            // Ensure Swing has set up its HTML 3.2 DTD...
+            HtmlToPlainTextConverter.convert("");
+            // ...so we can add a couple of HTML 4 character entity references (Sun bug 6632959).
+            DTD html32 = DTD.getDTD("html32");
+            html32.defEntity("ndash", DTDConstants.CDATA | DTDConstants.GENERAL, '\u2013');
+            html32.defEntity("mdash", DTDConstants.CDATA | DTDConstants.GENERAL, '\u2014');
+            html32.defEntity("lsquo", DTDConstants.CDATA | DTDConstants.GENERAL, '\u2018');
+            html32.defEntity("rsquo", DTDConstants.CDATA | DTDConstants.GENERAL, '\u2019');
+            html32.defEntity("ldquo", DTDConstants.CDATA | DTDConstants.GENERAL, '\u201c');
+            html32.defEntity("rdquo", DTDConstants.CDATA | DTDConstants.GENERAL, '\u201d');
+            html32.defEntity("lsaquo", DTDConstants.CDATA | DTDConstants.GENERAL, '\u2039');
+            html32.defEntity("rsaquo", DTDConstants.CDATA | DTDConstants.GENERAL, '\u203a');
+            html32.defEntity("trade", DTDConstants.CDATA | DTDConstants.GENERAL, '\u2122');
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
     
     public HtmlPane() {
         super(new BorderLayout());
