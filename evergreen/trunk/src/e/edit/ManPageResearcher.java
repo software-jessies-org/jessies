@@ -99,37 +99,41 @@ public class ManPageResearcher implements WorkspaceResearcher {
     }
     
     private String formatManPage(String page, String section) {
-        // If we're on a system without rman(1), at least display something.
-        String command = "man -S " + section + " " + page + " | col -b";
-        
+        ArrayList<String> commands = new ArrayList<String>();
         String polyglotMan = findPolyglotMan();
-        if (polyglotMan != null) {
+        if (polyglotMan == null) {
+            // If we're on a system without rman(1), at least display something.
+            commands.add("man -a -S " + section + " " + page + " | col -b");
+        } else {
             polyglotMan = "'" + polyglotMan + "' -f HTML -r 'man:%s(%s)'";
             
             ArrayList<String> lines = new ArrayList<String>();
             ArrayList<String> errors = new ArrayList<String>();
-            int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray("man -S " + section + " -w " + page), lines, errors);
+            int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray("man -a -S " + section + " -w " + page), lines, errors);
             if (status != 0) {
                 return "";
             }
             
-            String filename = lines.get(0);
-            if (FileUtilities.exists(filename) == false) {
-                return "";
-            }
-            
-            if (GuiUtilities.isMacOs()) {
-                // On Mac OS, the ancient version of rman(1) only seems to work with pre-formatted pages, and then only if you let it guess.
-                command = "nroff -man '" + filename + "' | " + polyglotMan;
-            } else {
-                // On Linux, modern rman(1) works best with man page source, and then only if you explicitly tell it that's what it's got.
-                command = (filename.endsWith(".gz") ? "gunzip -c" : "cat") + " '" + filename + "' | " + polyglotMan + " -S ";
+            for (String filename : lines) {
+                if (FileUtilities.exists(filename) == false) {
+                    continue;
+                }
+                if (GuiUtilities.isMacOs()) {
+                    // On Mac OS, the ancient version of rman(1) only seems to work with pre-formatted pages, and then only if you let it guess.
+                    commands.add("nroff -man '" + filename + "' | " + polyglotMan);
+                } else {
+                    // On Linux, modern rman(1) works best with man page source, and then only if you explicitly tell it that's what it's got.
+                    commands.add((filename.endsWith(".gz") ? "gunzip -c" : "cat") + " '" + filename + "' | " + polyglotMan + " -S ");
+                }
             }
         }
         
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, errors);
+        for (String command : commands) {
+            // FIXME: should we do anything if status is non-zero?
+            int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, errors);
+        }
         
         String result = StringUtilities.join(lines, "\n");
         
@@ -140,7 +144,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
             // There's also a difference in the quote character used: ' on Linux and " on Mac OS.
             
             // Remove the table of contents at the end. There may be nested lists because subsection are included.
-            result = result.replaceAll("(?si)<hr><p>.*</ul>", "");
+            result = result.replaceAll("(?si)<hr><p>.*?</ul>", "");
             // Remove the links to the table of contents.
             result = result.replaceAll("(?i)<a name=['\"]sect\\d+['\"] href=['\"]#toc\\d+['\"]>((.|\n)*?)</a>", "$1");
             result = result.replaceAll("(?i)<a href=['\"]#toc['\"]>Table of Contents</a><p>", "");
