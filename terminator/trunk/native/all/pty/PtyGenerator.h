@@ -174,10 +174,10 @@ private:
     
     static void fixEnvironment() {
         // Tell the world which terminfo entry to use.
-        putenv("TERM=terminator");
+        setenv("TERM", "terminator", 1);
         // According to Thomas Dickey in the XTERM FAQ, some applications that don't use ncurses may need the environment variable $COLORTERM set to realize that they're on a color terminal.
         // Most of the other Unix terminals set it.
-        putenv("COLORTERM=terminator");
+        setenv("COLORTERM", "terminator", 1);
         
         // X11 terminal emulators set this, but we can't reasonably do so, even on X11.
         // http://elliotth.blogspot.com/2005/12/why-terminator-doesnt-support-windowid.html
