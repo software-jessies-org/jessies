@@ -2,6 +2,10 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+
+#include <stdlib.h>
+#include <string.h>
+
 #include <X11/Xlib.h>
 
 #include "join.h"
