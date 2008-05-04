@@ -28,6 +28,7 @@ public class DebugMenu {
         menu.add(new ShowStopwatchesAction());
         menu.addSeparator();
         menu.add(new KeyEventTester());
+        menu.add(new MouseEventTester());
         menu.addSeparator();
         menu.add(new HeapViewAction());
         // FIXME: an action to turn on debugging of hung AWT exits. All frames or just the parent frame? Just the parent is probably the more obvious (given that new frames could be created afterwards).
@@ -304,40 +305,87 @@ public class DebugMenu {
         }
         
         public void actionPerformed(ActionEvent e) {
-            final PTextArea textArea = new PTextArea();
-            textArea.setEditable(false);
+            final EventListener listener = new EventListener();
             
             final JTextField textField = new JTextField(20);
-            textField.addKeyListener(new KeyListener() {
-                private void append(KeyEvent e) {
-                    textArea.append(e.toString().replaceAll(" on javax.swing.JTextField\\[.*$", "") + "\n");
-                }
-                
-                public void keyTyped(KeyEvent e) {
-                    append(e);
-                }
-                
-                public void keyPressed(KeyEvent e) {
-                    append(e);
-                }
-                
-                public void keyReleased(KeyEvent e) {
-                    append(e);
-                }
-            });
+            textField.addKeyListener(listener);
             
             JButton clearButton = new JButton("Clear");
             clearButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    textArea.setText("");
+                    listener.textArea.setText("");
                     textField.setText("");
                     textField.requestFocusInWindow();
                 }
             });
             
-            showFrameWithButtonPanel("Key Event Tester", makeButtonPanel(clearButton, Box.createHorizontalStrut(10), textField), new JScrollPane(textArea), new Dimension(700, 400));
+            showFrameWithButtonPanel("Key Event Tester", makeButtonPanel(clearButton, Box.createHorizontalStrut(10), textField), listener.scrollableTextArea, new Dimension(700, 400));
             textField.requestFocusInWindow();
         }
+    }
+    
+    private static class MouseEventTester extends AbstractAction {
+        public MouseEventTester() {
+            super("Mouse Event Tester");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            final EventListener listener = new EventListener();
+            
+            final JPanel mouseArea = new JPanel();
+            mouseArea.setBackground(new Color(240, 255, 240));
+            mouseArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            mouseArea.setOpaque(true);
+            mouseArea.setMinimumSize(new Dimension(100, 100));
+            mouseArea.addMouseListener(listener);
+            mouseArea.addMouseMotionListener(listener);
+            mouseArea.addMouseWheelListener(listener);
+            
+            JButton clearButton = new JButton("Clear");
+            clearButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    listener.textArea.setText("");
+                }
+            });
+            
+            JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mouseArea, listener.scrollableTextArea);
+            showFrameWithButtonPanel("Mouse Event Tester", makeButtonPanel(clearButton), splitPane, new Dimension(700, 400));
+        }
+    }
+    
+    private static class EventListener implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
+        private PTextArea textArea;
+        private JScrollPane scrollableTextArea;
+        
+        private EventListener() {
+            textArea = new PTextArea();
+            textArea.setEditable(false);
+            scrollableTextArea = new JScrollPane(textArea);
+            GuiUtilities.keepMaximumShowing(scrollableTextArea.getVerticalScrollBar());
+        }
+        
+        private void reportEvent(Object e) {
+            textArea.append(e.toString().replaceAll(" on javax\\.swing\\.J.*$", "") + "\n");
+        }
+        
+        // KeyListener.
+        public void keyTyped(KeyEvent e) { reportEvent(e); }
+        public void keyPressed(KeyEvent e) { reportEvent(e); }
+        public void keyReleased(KeyEvent e) { reportEvent(e); }
+        
+        // MouseListener.
+        public void mouseClicked(MouseEvent e) { reportEvent(e); }
+        public void mouseEntered(MouseEvent e) { reportEvent(e); }
+        public void mouseExited(MouseEvent e) { reportEvent(e); }
+        public void mousePressed(MouseEvent e) { reportEvent(e); }
+        public void mouseReleased(MouseEvent e) { reportEvent(e); }
+        
+        // MouseMotionListener.
+        public void mouseDragged(MouseEvent e) { reportEvent(e); }
+        public void mouseMoved(MouseEvent e) { reportEvent(e); }
+        
+        // MouseWheelListener.
+        public void mouseWheelMoved(MouseWheelEvent e) { reportEvent(e); }
     }
     
     private static JFrame showFrameWithButtonPanel(String title, Component buttonPanel, Component content, Dimension size) {
