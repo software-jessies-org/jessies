@@ -230,6 +230,10 @@ LDFLAGS.Linux += -ldl
 LDFLAGS.Linux += -L/usr/X11R6/lib
 LDFLAGS.Linux += -lX11
 
+# Debian sid's prerelease g++ -V4.3 isn't linking this by default.
+# This seems unlikely to be harmful elsewhere.
+LDFLAGS.Linux += -lstdc++
+
 LDFLAGS += $(LDFLAGS.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
