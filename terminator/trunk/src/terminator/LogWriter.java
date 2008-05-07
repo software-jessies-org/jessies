@@ -22,7 +22,7 @@ public class LogWriter {
 	private Writer suspendedWriter;
 	private Timer flushTimer;
 	
-	public LogWriter(List<String> command, String ptyName) {
+	public LogWriter(List<String> command) {
 		// Establish the invariant that writer != null.
 		// suspendedWriter is still null - when we're not suspended.
 		this.writer = NullWriter.INSTANCE;
@@ -33,7 +33,7 @@ public class LogWriter {
 		});
 		flushTimer.setRepeats(false);
 		try {
-			initLogging(StringUtilities.join(command, " "), ptyName);
+			initLogging(StringUtilities.join(command, " "));
 		} catch (Throwable th) {
 			SimpleDialog.showDetails(null, "Couldn't Open Log File", th);
 		}
@@ -47,7 +47,7 @@ public class LogWriter {
 		return new File(logsDirectory, leafname);
 	}
 	
-	private void initLogging(String commandLine, String ptyName) throws IOException {
+	private void initLogging(String commandLine) throws IOException {
 		String logsDirectoryName = System.getProperty("org.jessies.terminator.logDirectory");
 		File logsDirectory = new File(logsDirectoryName);
 		if (logsDirectory.exists() == false) {
@@ -64,7 +64,6 @@ public class LogWriter {
 				this.info = "(\"" + logFile + "\" could not be opened for writing)";
 				this.writer = new BufferedWriter(new FileWriter(logFile));
 				this.info = logFile.toString();
-				Log.warn("Logging \"" + ptyName + "\" to \"" + this.info + "\"");
 				return;
 			} catch (IOException ex) {
 				if (truncationLength == 0) {

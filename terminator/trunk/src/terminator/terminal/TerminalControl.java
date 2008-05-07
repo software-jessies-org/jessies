@@ -86,16 +86,11 @@ public class TerminalControl {
 			argv[0] = "-" + argv[0];
 		}
 		
-		String ptyName = "(no pty)";
-		try {
-			this.ptyProcess = new PtyProcess(executable, argv, workingDirectory);
-			this.processIsRunning = true;
-			Log.warn("Created " + ptyProcess);
-			ptyName = ptyProcess.getPtyName();
-		} finally {
-			// We log an announceConnectionLost message if we fail to create the PtyProcess.
-			this.logWriter = new LogWriter(command, ptyName);
-		}
+		// We log an announceConnectionLost message if we fail to create the PtyProcess, so we need the LogWriter first.
+		this.logWriter = new LogWriter(command);
+		this.ptyProcess = new PtyProcess(executable, argv, workingDirectory);
+		this.processIsRunning = true;
+		Log.warn("Created " + ptyProcess + " and logging to " + logWriter.getInfo());
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), CHARSET_NAME);
 		this.out = ptyProcess.getOutputStream();
 		writerExecutor = ThreadUtilities.newSingleThreadExecutor(makeThreadName("Writer"));
