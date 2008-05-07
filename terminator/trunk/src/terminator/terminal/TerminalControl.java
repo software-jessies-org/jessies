@@ -86,10 +86,15 @@ public class TerminalControl {
 			argv[0] = "-" + argv[0];
 		}
 		
-		this.ptyProcess = new PtyProcess(executable, argv, workingDirectory);
-		this.processIsRunning = true;
-		Log.warn("Created " + ptyProcess);
-		this.logWriter = new LogWriter(command, ptyProcess.getPtyName());
+		String ptyName = "(no pty)";
+		try {
+			this.ptyProcess = new PtyProcess(executable, argv, workingDirectory);
+			this.processIsRunning = true;
+			Log.warn("Created " + ptyProcess);
+			ptyName = ptyProcess.getPtyName();
+		} finally {
+			this.logWriter = new LogWriter(command, ptyName);
+		}
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), CHARSET_NAME);
 		this.out = ptyProcess.getOutputStream();
 		writerExecutor = ThreadUtilities.newSingleThreadExecutor(makeThreadName("Writer"));
