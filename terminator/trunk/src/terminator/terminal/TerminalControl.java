@@ -93,6 +93,7 @@ public class TerminalControl {
 			Log.warn("Created " + ptyProcess);
 			ptyName = ptyProcess.getPtyName();
 		} finally {
+			// We log an announceConnectionLost message if we fail to create the PtyProcess.
 			this.logWriter = new LogWriter(command, ptyName);
 		}
 		this.in = new InputStreamReader(ptyProcess.getInputStream(), CHARSET_NAME);
