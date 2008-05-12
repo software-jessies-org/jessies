@@ -126,6 +126,14 @@ private:
             throw child_exception_via_pipe(childFd, "ioctl(" + toString(childFd) + ", TIOCSCTTY, 0)");
         }
 #endif
+        pid_t terminalProcessGroup = tcgetpgrp(childFd);
+        if (terminalProcessGroup == -1) {
+            throw child_exception_via_pipe(childFd, "tcgetpgrp(" + toString(childFd) + ")");
+        }
+        if (terminalProcessGroup != getpid()) {
+            errno = 0; // We're abusing unix_exception here.
+            throw child_exception_via_pipe(childFd, "tcgetpgrp(" + toString(childFd) + ") (" + toString(terminalProcessGroup) + ") != getpid() (" + toString(getpid())+ ")");
+        }
 
 #if defined(__sun__)
         // This seems to be necessary on Solaris to make STREAMS behave.
