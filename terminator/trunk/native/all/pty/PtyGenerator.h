@@ -98,9 +98,9 @@ private:
     };
     
     int openSlaveAndCloseMaster() {
-        int slaveFd = open(slavePtyName.c_str(), O_RDWR | O_NOCTTY);
+        int slaveFd = open(slavePtyName.c_str(), O_RDWR);
         if (slaveFd == -1) {
-            throw unix_exception("open(\"" + slavePtyName + "\", O_RDWR | O_NOCTTY) failed");
+            throw unix_exception("open(\"" + slavePtyName + "\", O_RDWR) failed");
         }
         close(masterFd);
         return slaveFd;
