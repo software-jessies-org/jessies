@@ -98,6 +98,7 @@ private:
     };
     
     int openSlaveAndCloseMaster() {
+        // The first terminal opened by a System V process becomes its controlling terminal.
         int slaveFd = open(slavePtyName.c_str(), O_RDWR);
         if (slaveFd == -1) {
             throw unix_exception("open(\"" + slavePtyName + "\", O_RDWR) failed");
@@ -121,7 +122,7 @@ private:
         int childFd = ptyGenerator.openSlaveAndCloseMaster();
 
 #if defined(TIOCSCTTY)
-        // The controlling terminal for a session is allocated by the session leader by issuing the TIOCSCTTY ioctl.
+        // The BSD approach is that the controlling terminal for a session is allocated by the session leader by issuing the TIOCSCTTY ioctl.
         if (ioctl(childFd, TIOCSCTTY, 0) == -1) {
             throw child_exception_via_pipe(childFd, "ioctl(" + toString(childFd) + ", TIOCSCTTY, 0)");
         }
