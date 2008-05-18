@@ -25,8 +25,10 @@ find $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
 # If we don't have a Packages file (as well as Packages.gz) we get:
 # Failed to fetch http://deb/software.jessies.org/./Release  Unable to find expected entry  Packages in Meta-index file (malformed Release file?)
 apt-ftparchive packages . > Packages
+# gzip -9 Packages would remove the original file, and we need it.
 gzip -9 < Packages > Packages.gz
 apt-ftparchive release . > Release
 # This has to run as martind@bluearc.com to sign with the right key.
+# The key was exported with gpg --export --armor, then imported by piping that to sudo apt-get add -.
 gpg -sba - - < Release > Release.gpg
 scp Packages Packages.gz Release Release.gpg software@jessies.org:~/downloads/debian/
