@@ -662,8 +662,10 @@ public class ETextWindow extends EWindow implements PTextListener {
         File backupFile = FileUtilities.fileFromString(this.filename + ".bak");
         if (file.exists()) {
             try {
+                editor.showStatus("Saving backup copy of " + filename + "...");
                 writeToFile(backupFile);
             } catch (Exception ex) {
+                editor.showStatus("");
                 editor.showAlert("Couldn't save \"" + this.filename + "\"", "Couldn't create backup file: " + ex.getMessage() + ".");
                 Log.warn("Problem creating backup file before saving \"" + filename + "\"", ex);
                 return false;
