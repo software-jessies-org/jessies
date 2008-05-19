@@ -16,9 +16,6 @@ import java.util.regex.*;
  * 4. ability to cope with if/else blocks without braces.
  * 5. ability to (optionally) apply a different amount of indentation to
  *    "public:" "protected:" and "private:".
- * 6. ability to support both common styles of indenting switch statements,
- *    and possibly also backwards-compatible support for our old idiosyncratic
- *    mess.
  */
 public class PNewCppIndenter extends PSimpleIndenter {
     public PNewCppIndenter(PTextArea textArea) {
