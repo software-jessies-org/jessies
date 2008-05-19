@@ -5,6 +5,7 @@ import java.util.*;
 public class PTalcTextStyler extends PAbstractLanguageStyler {
     private static final String[] KEYWORDS = new String[] {
         // "man talc" keywords.
+        "assert",
         "break",
         "class",
         "continue",
@@ -29,6 +30,8 @@ public class PTalcTextStyler extends PAbstractLanguageStyler {
         "bool",
         "file",
         "int",
+        "list",
+        "map",
         "match",
         "object",
         "real",
