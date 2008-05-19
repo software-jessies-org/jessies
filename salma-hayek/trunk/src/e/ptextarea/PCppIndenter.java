@@ -28,4 +28,9 @@ public class PCppIndenter extends PCFamilyIndenter {
     protected boolean shouldMoveLabels() {
         return true;
     }
+    
+    @Override
+    protected boolean shouldMoveOperatorOut() {
+        return true;
+    }
 }

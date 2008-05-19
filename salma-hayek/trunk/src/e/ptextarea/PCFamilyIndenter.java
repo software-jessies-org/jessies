@@ -1,5 +1,6 @@
 package e.ptextarea;
 
+import e.util.*;
 import java.util.*;
 
 /**
@@ -16,6 +17,9 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             return true;
         }
         if (c == ':' && shouldMoveLabels()) {
+            return true;
+        }
+        if (c == '<' && shouldMoveOperatorOut()) {
             return true;
         }
         if (PBracketUtilities.isCloseBracket(c)) {
@@ -60,11 +64,35 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
      * Going back this far keeps us tidy in the face of various multi-line comment styles,
      * multi-line C++ output operator expressions and C++ preprocessor commands.
      * 
-     * FIXME: more realistically, this tells us the minimum indentation. For example:
+     * It does assume a style that never wraps, but is otherwise surprisingly solid for Java.
+     * It doesn't work as well for C++, where there are many conflicting styles.
+     * 
+     * FIXME: sometimes this is an under-estimate. For example:
      *     { // This counts as "definitive"
-     *         os << text
-     *             // This line should start here, because it's a continuation of the previous line.
-     *         // But this is where we'd assume it starts, because we have too much faith in "definitive" lines.
+     *         object.method(some_long_expression, some_other_long_expression,
+     *                       // This line should start here, because it's a continuation of the previous line.
+     *         // But this is where we assume it starts.
+     * 
+     * FIXME: other times, this is an over-estimate. For example:
+     * void function(int i,
+     *               double d) {
+     *     // This line should start here.
+     *                   // But this is where we assume it starts.
+     * 
+     * FIXME: yet other times, many styles wouldn't indent at all. For example:
+     * namespace {
+     * class C; // This line should often start here.
+     *     // But this is where we assume it starts.
+     * }
+     * (Here, both styles are common, sadly.)
+     * 
+     * FIXME: yet other times, we should pay more attention to the "definitive" line's indentation. For example:
+     * class C {
+     *   public: // This is a half-indent.
+     *     // This line should start here.
+     *       // But this is where we assume it starts.
+     * }
+     * (Here, non-indented access specifiers and half-indented ones are both common. It might be best to just ignore them completely.)
      */
     private boolean isDefinitive(String activePartOfLine) {
         return isBlockBegin(activePartOfLine) || isBlockEnd(activePartOfLine) || isLabel(activePartOfLine);
@@ -86,6 +114,18 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         
         if (shouldMoveHashToColumnZero() && activePartOfLine.startsWith("#")) {
             return "";
+        }
+        
+        // A special case for C++'s operator<<.
+        if (shouldMoveOperatorOut() && activePartOfLine.startsWith("<<")) {
+            if (lineIndex == 0) {
+                return "";
+            }
+            String previousLine = textArea.getLineText(lineIndex - 1);
+            int previousOperatorOutIndex = previousLine.indexOf("<<");
+            if (previousOperatorOutIndex != -1) {
+                return StringUtilities.nCopies(previousOperatorOutIndex, ' ');
+            }
         }
         
         String indentation = "";
@@ -111,4 +151,5 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
     protected abstract boolean isLabel(String activePartOfLine);
     protected abstract boolean shouldMoveHashToColumnZero();
     protected abstract boolean shouldMoveLabels();
+    protected abstract boolean shouldMoveOperatorOut();
 }
