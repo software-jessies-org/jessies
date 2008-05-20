@@ -18,19 +18,4 @@ public class PCppIndenter extends PCFamilyIndenter {
     protected boolean isLabel(String activePartOfLine) {
         return isCppAccessSpecifier(activePartOfLine) || isSwitchLabel(activePartOfLine);
     }
-
-    @Override
-    protected boolean shouldMoveHashToColumnZero() {
-        return true;
-    }
-    
-    @Override
-    protected boolean shouldMoveLabels() {
-        return true;
-    }
-    
-    @Override
-    protected boolean shouldMoveOperatorOut() {
-        return true;
-    }
 }

@@ -9,19 +9,4 @@ public class PJavaIndenter extends PCFamilyIndenter {
     protected boolean isLabel(String activePartOfLine) {
         return isSwitchLabel(activePartOfLine);
     }
-    
-    @Override
-    protected boolean shouldMoveHashToColumnZero() {
-        return false;
-    }
-    
-    @Override
-    protected boolean shouldMoveLabels() {
-        return true;
-    }
-    
-    @Override
-    protected boolean shouldMoveOperatorOut() {
-        return false;
-    }
 }
