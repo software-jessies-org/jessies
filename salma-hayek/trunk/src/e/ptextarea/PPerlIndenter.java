@@ -9,19 +9,4 @@ public class PPerlIndenter extends PCFamilyIndenter {
     protected boolean isLabel(String activePartOfLine) {
         return false;
     }
-
-    @Override
-    protected boolean shouldMoveHashToColumnZero() {
-        return false;
-    }
-    
-    @Override
-    protected boolean shouldMoveLabels() {
-        return false;
-    }
-    
-    @Override
-    protected boolean shouldMoveOperatorOut() {
-        return false;
-    }
 }

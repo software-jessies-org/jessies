@@ -13,13 +13,13 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
     
     @Override
     public boolean isElectric(char c) {
-        if (c == '#' && shouldMoveHashToColumnZero()) {
+        FileType fileType = textArea.getFileType();
+        if ((c == '#' || c == '<') && (fileType == FileType.C_PLUS_PLUS)) {
+            // C++ wants special handling of operator<< and pre-processor directives.
             return true;
         }
-        if (c == ':' && shouldMoveLabels()) {
-            return true;
-        }
-        if (c == '<' && shouldMoveOperatorOut()) {
+        if (c == ':' && (fileType == FileType.C_PLUS_PLUS || fileType == FileType.JAVA)) {
+            // C++ and Java want special handling of goto and switch labels, and C++ access specifiers.
             return true;
         }
         if (PBracketUtilities.isCloseBracket(c)) {
@@ -110,14 +110,17 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
     
     @Override
     public String calculateNewIndentation(int lineIndex) {
+        FileType fileType = textArea.getFileType();
+        
         String activePartOfLine = getActivePartOfLine(lineIndex);
         
-        if (shouldMoveHashToColumnZero() && activePartOfLine.startsWith("#")) {
+        // A special case for C++'s preprocessor.
+        if (fileType == FileType.C_PLUS_PLUS && activePartOfLine.startsWith("#")) {
             return "";
         }
         
         // A special case for C++'s operator<<.
-        if (shouldMoveOperatorOut() && activePartOfLine.startsWith("<<")) {
+        if (fileType == FileType.C_PLUS_PLUS && activePartOfLine.startsWith("<<")) {
             if (lineIndex == 0) {
                 return "";
             }
@@ -149,7 +152,4 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
     }
     
     protected abstract boolean isLabel(String activePartOfLine);
-    protected abstract boolean shouldMoveHashToColumnZero();
-    protected abstract boolean shouldMoveLabels();
-    protected abstract boolean shouldMoveOperatorOut();
 }
