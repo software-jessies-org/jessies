@@ -48,6 +48,11 @@ public class EvergreenTabbedPane extends JTabbedPane {
     
     @Override
     public String getToolTipTextAt(int index) {
+        String normalText = super.getToolTipTextAt(index);
+        if (normalText == null) {
+            normalText = "";
+        }
+        
         final int numberKey = (index + 1);
         if (numberKey > 9) {
             // No keyboard I've ever seen has number keys above 9.
@@ -56,7 +61,7 @@ public class EvergreenTabbedPane extends JTabbedPane {
             return null;
         }
         String primaryModifier = "Alt+";
-        return "<html><body>Use " + primaryModifier + numberKey + " to switch to this tab.";
+        return "<html><body>" + normalText + "<p>Use " + primaryModifier + numberKey + " to switch to this tab.";
     }
     
     // Just overriding getToolTipTextAt is insufficient because the default implementation of getToolTipText doesn't call it.
