@@ -651,10 +651,16 @@ public class ETextWindow extends EWindow implements PTextListener {
             return false;
         }
         
-        if (file.exists() && isOutOfDateWithRespectToDisk()) {
-            if (showPatchAndAskForConfirmation("Overwrite", "Overwrite the currently saved version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", false) == false) {
-                return false;
+        // If the file already exists, check it hasn't changed while we've been editing it.
+        try {
+            editor.showStatus("Preparing to save " + filename + "...");
+            if (file.exists() && isOutOfDateWithRespectToDisk()) {
+                if (showPatchAndAskForConfirmation("Overwrite", "Overwrite the currently saved version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", false) == false) {
+                    return false;
+                }
             }
+        } finally {
+            editor.showStatus("");
         }
         
         // Try to save a backup copy first. Ideally, we should do this from
