@@ -142,6 +142,10 @@ HEADER_EXTENSIONS += h
 
 HEADER_EXTENSIONS += wxi
 
+NATIVE_OS_DIRECTORIES += all
+NATIVE_OS_DIRECTORIES += $(TARGET_OS)
+NATIVE_OS_DIRECTORIES += $(NATIVE_OS_DIRECTORIES.$(TARGET_OS))
+
 # ----------------------------------------------------------------------------
 # Sensible C family compiler flags.
 # ----------------------------------------------------------------------------
@@ -302,11 +306,22 @@ LDFLAGS.Darwin += -lobjc
 LDFLAGS.Darwin += -framework Cocoa
 
 # ----------------------------------------------------------------------------
+# Extra compiler and linker flags for building for Windows without Cygwin.
+# ----------------------------------------------------------------------------
+
+# The orthography at mingw.org is MinGW but here I follow, well, mainly the other directories
+# and my pronunciation but also http://www.delorie.com/howto/cygwin/mno-cygwin-howto.html.
+NATIVE_OS_DIRECTORIES.Cygwin += Mingw
+MINGW_FLAG = $(if $(findstring /Mingw/,$(SOURCE_DIRECTORY)),-mno-cygwin)
+C_AND_CXX_FLAGS.Cygwin += $(MINGW_FLAG)
+LDFLAGS.Cygwin += $(MINGW_FLAG)
+
+# ----------------------------------------------------------------------------
 # Work out what native code, if any, we need to build.
 # ----------------------------------------------------------------------------
 
 NATIVE_SOURCE_PATTERN = $(CURDIR)/native/$(OS)/*/*.$(EXTENSION)
-NATIVE_SOURCE = $(foreach OS,all $(TARGET_OS),$(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(NATIVE_SOURCE_PATTERN)))
+NATIVE_SOURCE = $(foreach OS,$(NATIVE_OS_DIRECTORIES),$(foreach EXTENSION,$(SOURCE_EXTENSIONS),$(NATIVE_SOURCE_PATTERN)))
 SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 
 # ----------------------------------------------------------------------------
