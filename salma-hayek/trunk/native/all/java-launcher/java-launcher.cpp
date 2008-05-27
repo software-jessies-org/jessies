@@ -1,6 +1,4 @@
 #ifdef __APPLE__
-#include "ScopedAutoReleasePool.h"
-#include <Cocoa/Cocoa.h>
 #include <pthread.h>
 #include <sys/stat.h>
 #endif
@@ -12,6 +10,7 @@
 #include "DirectoryIterator.h"
 #include "JniError.h"
 #include "join.h"
+#include "reportFatalErrorViaGui.h"
 #include "synchronizeWindowsEnvironment.h"
 #include "WindowsDirectoryChange.h"
 #include "WindowsDllErrorModeChange.h"
@@ -558,6 +557,10 @@ public:
 
 static void reportFatalException(const NativeArguments& launcherArguments, const std::exception& ex) {
     std::ostringstream os;
+#ifdef __CYGWIN__
+    os << "Unless you don't have Java installed, in which case please download and install JDK 6 from http://java.sun.com/javase/downloads/ and try again." << std::endl;
+    os << std::endl;
+#endif
     os << "Error: " << ex.what() << std::endl;
     os << std::endl;
     os << "Usage: " << ARGV0 << " [options] class [args...]" << std::endl;
@@ -579,21 +582,7 @@ static void reportFatalException(const NativeArguments& launcherArguments, const
     os << ARGV0 << " ";
     os << join(" ", launcherArguments);
     os << std::endl;
-    std::cerr << os.str();
-#if defined(__CYGWIN__)
-    std::string message = "If you don't have Java installed, please download and install JDK 6 from http://java.sun.com/javase/downloads/ and try again.\n";
-    message += "\n";
-    message += "Otherwise, please copy this message to the clipboard with Ctrl-C and mail it to software@jessies.org.\n";
-    message += "(Windows won't let you select the text but Ctrl-C works anyway.)\n";
-    message += "\n";
-    message += os.str();
-    MessageBox(GetActiveWindow(), message.c_str(), "Java Launcher", MB_OK);
-#elif defined(__APPLE__)
-    std::string message(os.str());
-    ScopedAutoReleasePool pool;
-    [NSApplication sharedApplication];
-    NSRunInformationalAlertPanel(@"Java Launcher", [NSString stringWithUTF8String:message.c_str()], nil, nil, nil);
-#endif
+    reportFatalErrorViaGui("Java Launcher", os.str());
 }
 
 static int runJvm(const NativeArguments& launcherArguments) {
