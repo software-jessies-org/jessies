@@ -820,7 +820,8 @@ $(addprefix upload.,$(PUBLISHABLE_INSTALLERS)): upload.%: %
 		echo Overwriting the local $(<F) with the copy of that version from the server - it should not be overwritten once its md5sums are in a Debian Packages file... && \
 		scp $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F) $<; \
 	} || { \
-		scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F); \
+		scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F).tmp && \
+		ssh $(DIST_SSH_USER_AND_HOST) mv $(DIST_DIRECTORY)/$(<F).tmp $(DIST_DIRECTORY)/$(<F); \
 	}
 
 # I like the idea of keeping several versions on the server but we're going to have a hard time
