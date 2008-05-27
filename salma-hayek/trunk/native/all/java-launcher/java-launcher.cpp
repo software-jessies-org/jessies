@@ -123,7 +123,7 @@ typedef void* SharedLibraryHandle;
 SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) {
     // Try to persuade Windows to pop-up a box complaining about unresolved symbols because we don't get anything more informative from dlerror than ENOENT.
     // This could cause a problem if we try to load an amd64 DLL before going on to try to load an i386 DLL.
-    // At least it would be a overt problem rather than the silent failure we got when MSVCR71.DLL wasn't in the current directory and wasn't on the PATH.
+    // At least it would be an overt problem rather than the silent failure we got when MSVCR71.DLL wasn't in the current directory and wasn't on the PATH.
     WindowsDllErrorModeChange windowsDllErrorModeChange;
     void* sharedLibraryHandle = dlopen(sharedLibraryFilename.c_str(), RTLD_LAZY);
     if (sharedLibraryHandle == 0) {
