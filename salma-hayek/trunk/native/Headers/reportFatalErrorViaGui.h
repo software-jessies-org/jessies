@@ -30,6 +30,8 @@ void reportFatalErrorViaGui(const std::string& programName, const std::string& a
     ScopedAutoReleasePool pool;
     [NSApplication sharedApplication];
     NSRunInformationalAlertPanel([NSString stringWithUTF8String:programName.c_str()], [NSString stringWithUTF8String:platformMessage.c_str()], nil, nil, nil);
+#else
+    (void)programName;
 #endif
     std::cerr << platformMessage;
 }
