@@ -312,9 +312,13 @@ LDFLAGS.Darwin += -framework Cocoa
 # The orthography at mingw.org is MinGW but here I follow, well, mainly the other directories
 # and my pronunciation but also http://www.delorie.com/howto/cygwin/mno-cygwin-howto.html.
 NATIVE_OS_DIRECTORIES.Cygwin += Mingw
-MINGW_FLAG = $(if $(findstring /Mingw/,$(SOURCE_DIRECTORY)),-mno-cygwin)
+MINGW_FLAG = $(if $(filter $(CURDIR)/native/Mingw/%,$(SOURCE_DIRECTORY)),-mno-cygwin)
 C_AND_CXX_FLAGS.Cygwin += $(MINGW_FLAG)
 LDFLAGS.Cygwin += $(MINGW_FLAG)
+
+HAVE_MINGW_SOURCE := $(wildcard $(CURDIR)/native/Mingw)
+CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll)
+CRT_SHARED_LIBRARIES += $(CRT_SHARED_LIBRARIES.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
 # Work out what native code, if any, we need to build.
@@ -588,10 +592,12 @@ TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
 COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
 BUILD_TARGETS += $(COMPILED_TERMINFO)
 BUILD_TARGETS += $(ALL_PER_DIRECTORY_TARGETS)
+BUILD_TARGETS += $(CRT_SHARED_LIBRARIES)
 
 FILES_TO_INSTALL += $(ALL_PER_DIRECTORY_TARGETS)
 FILES_TO_INSTALL += .generated/build-revision.txt
 FILES_TO_INSTALL += $(COMPILED_TERMINFO)
+FILES_TO_INSTALL += $(CRT_SHARED_LIBRARIES)
 
 SUBDIRECTORIES_TO_INSTALL += bin
 SUBDIRECTORIES_TO_INSTALL += doc
@@ -694,13 +700,19 @@ www-dist: ChangeLog.html
 # Old versions of SunOS tic don't support the -o argument but do support redirecting
 # the output to $TERMINFO.
 # I'd like to use -v10 but am stymied by http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=365120
-# With the cp, we both avoid having to cope with Mac OS's broken ncurses library,
+# With the mv, we both avoid having to cope with Mac OS's broken ncurses library,
 # which thinks that terminator's terminfo belongs in 74/ rather than t/,
 # and avoid having to work out the first letter of the terminal name.
 .generated/terminfo/%: lib/terminfo/%.tic
 	mkdir -p $(@D) && \
 	TERMINFO=$(@D) tic -v1 $< && \
-	cp $(@D)/*/$(@F) $@
+	mv $(@D)/*/$(@F) $@
+
+# One day we might have to look in eg /usr/share/doc/mingw32-runtime/mingwm10.dll.gz.
+.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll: /bin/mingwm10.dll
+	mkdir -p $(@D) && \
+	cp $< $@.tmp && \
+	mv $@.tmp $@
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory and package it into an installer file.
