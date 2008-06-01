@@ -1,9 +1,6 @@
-#ifdef __CYGWIN__
-#include <windows.h>
-#endif
-
 #include <string>
 #include <unistd.h>
+#include <windows.h>
 
 #include "reportFatalErrorViaGui.h"
 #include "toString.h"

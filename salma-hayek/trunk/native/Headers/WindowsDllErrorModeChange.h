@@ -1,7 +1,9 @@
 #ifndef WINDOWS_DLL_ERROR_MODE_CHANGE_H_included
 #define WINDOWS_DLL_ERROR_MODE_CHANGE_H_included
 
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(__MINGW32__)
+
+#include <windows.h>
 
 struct WindowsDllErrorModeChange {
 private:
