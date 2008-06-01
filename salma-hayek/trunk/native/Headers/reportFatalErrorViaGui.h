@@ -6,8 +6,11 @@
 #include <Cocoa/Cocoa.h>
 #endif
 
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(__MINGW32__)
+#define USE_MESSAGE_BOX 1
 #include <windows.h>
+#else
+#define USE_MESSAGE_BOX 0
 #endif
 
 #include <iostream>
@@ -15,7 +18,7 @@
 
 void reportFatalErrorViaGui(const std::string& programName, const std::string& applicationMessage) {
     std::ostringstream os;
-#if defined(__CYGWIN__)
+#if USE_MESSAGE_BOX
     os << "Please copy this message to the clipboard with Ctrl-C and mail it to software@jessies.org.";
     os << std::endl;
     os << "(Windows won't let you select the text but Ctrl-C works anyway.)";
@@ -24,7 +27,7 @@ void reportFatalErrorViaGui(const std::string& programName, const std::string& a
 #endif
     os << applicationMessage;
     std::string platformMessage(os.str());
-#if defined(__CYGWIN__)
+#if USE_MESSAGE_BOX
     MessageBox(GetActiveWindow(), platformMessage.c_str(), programName.c_str(), MB_OK);
 #elif defined(__APPLE__)
     ScopedAutoReleasePool pool;
