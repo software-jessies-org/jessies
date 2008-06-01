@@ -1,21 +1,11 @@
-#ifdef __CYGWIN__
-#include <windows.h>
-#endif
-
 #include "WindowsDirectoryChange.h"
 
 #include "toString.h"
+#include "WindowsError.h"
 
-#include <exception>
+#if defined(__CYGWIN__) || defined(__MINGW32__)
 
-#if defined(__CYGWIN__)
-
-struct WindowsError : std::runtime_error {
-    WindowsError(const std::string& description)
-    // FIXME: I know the magic to convert these numeric errors to strings.
-    : std::runtime_error(description + " failed with Windows error code " + toString(GetLastError())) {
-    }
-};
+#include <windows.h>
 
 std::string getCurrentWindowsDirectory() {
     std::string currentDirectory;
