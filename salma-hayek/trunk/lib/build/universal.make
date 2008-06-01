@@ -306,15 +306,13 @@ LDFLAGS.Darwin += -lobjc
 LDFLAGS.Darwin += -framework Cocoa
 
 # ----------------------------------------------------------------------------
-# Extra compiler and linker flags for building for Windows without Cygwin.
+# Extra compiler flags for building for Windows without Cygwin.
 # ----------------------------------------------------------------------------
 
 # The orthography at mingw.org is MinGW but here I follow, well, mainly the other directories
 # and my pronunciation but also http://www.delorie.com/howto/cygwin/mno-cygwin-howto.html.
 NATIVE_OS_DIRECTORIES.Cygwin += Mingw
-MINGW_FLAG = $(if $(filter $(CURDIR)/native/Mingw/%,$(SOURCE_DIRECTORY)),-mno-cygwin)
-C_AND_CXX_FLAGS.Cygwin += $(MINGW_FLAG)
-LDFLAGS.Cygwin += $(MINGW_FLAG)
+C_AND_CXX_FLAGS.Cygwin += $(if $(filter $(CURDIR)/.generated/native/Mingw/%,$<),-mno-cygwin)
 
 HAVE_MINGW_SOURCE := $(wildcard $(CURDIR)/native/Mingw)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll)
@@ -560,15 +558,12 @@ PACKAGING_DIRECTORY = .generated/native/$(TARGET_DIRECTORY)/$(MACHINE_PROJECT_NA
 # So that's OK then.
 -include .generated/local-variables.make
 
-# We want to use the $(BASE_NAME) of the preceding scope in error messages.
-LOCAL_VARIABLES := $(filter-out BASE_NAME,$(LOCAL_VARIABLES))
-
 define copyLocalVariable
   ERROR.$(1) =
-  $(1).$(BASE_NAME) := $$($(1))
+  $(1).$(PREVIOUS_BASE_NAME) := $$($(1))
 endef
 define unsetLocalVariable
-  ERROR.$(1) = $$(shell $(RM) .generated/local-variables.make)$$(error makefile bug: local variable $(1) from scope $(BASE_NAME) (with value "$($(1).$(BASE_NAME))") was referred to in scope $$(BASE_NAME))
+  ERROR.$(1) = $$(shell $(RM) .generated/local-variables.make)$$(error makefile bug: local variable $(1) from scope "$(PREVIOUS_BASE_NAME)" (with value "$($(1).$(PREVIOUS_BASE_NAME))") was referred to in scope "$$(BASE_NAME)")
   $(1) = $$(ERROR.$(1))
 endef
 
@@ -629,14 +624,19 @@ build:
 # that constraint on the rest of universal.make - so let's keep this after the universal.make variables.
 # ----------------------------------------------------------------------------
 
+# $(SOURCE_DIRECTORY) is effectively a local variable, though it's assigned in buildNativeDirectory.
+LOCAL_VARIABLES += SOURCE_DIRECTORY
+
+# We want to use the $(BASE_NAME) of the preceding scope in error messages.
 define buildNativeDirectory
   SOURCE_DIRECTORY = $(1)
   include $(SALMA_HAYEK)/lib/build/per-directory.make
+  PREVIOUS_BASE_NAME := $$(BASE_NAME)
 endef
 
 $(takeProfileSample)
 DUMMY := $(foreach SUBDIR,$(SUBDIRS),$(eval $(call buildNativeDirectory,$(SUBDIR)))$(closeLocalVariableScope))
-BASE_NAME = (rules)
+BASE_NAME = rules
 $(takeProfileSample)
 
 # Redefined here because this can only be correctly evaluated after we've included per-directory.make.
