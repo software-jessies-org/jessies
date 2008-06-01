@@ -1,6 +1,8 @@
 #ifndef UNIX_EXCEPTION_H_included
 #define UNIX_EXCEPTION_H_included
 
+#include "strerror_r.h"
+
 #include <errno.h>
 #include <stdexcept>
 #include <sstream>
