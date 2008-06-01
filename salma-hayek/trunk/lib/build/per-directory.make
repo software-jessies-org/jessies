@@ -107,6 +107,14 @@ MISSING_PRIVATE_FRAMEWORKS := $(filter-out $(wildcard $(PRIVATE_FRAMEWORKS_USED)
 MISSING_PREREQUISITES += $(MISSING_PRIVATE_FRAMEWORKS)
 
 # ----------------------------------------------------------------------------
+# Extra linker flags for building for Windows without Cygwin.
+# ----------------------------------------------------------------------------
+
+BUILDING_MINGW = $(filter $(CURDIR)/native/Mingw/%,$(SOURCE_DIRECTORY))
+
+LOCAL_LDFLAGS += $(if $(BUILDING_MINGW),-mno-cygwin)
+
+# ----------------------------------------------------------------------------
 # Decide on the default target.
 # ----------------------------------------------------------------------------
 
