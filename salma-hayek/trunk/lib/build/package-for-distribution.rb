@@ -193,6 +193,29 @@ def copy_files_for_installation(src_root_directory, dst_root_directory)
     }
 end
 
+# Copy any compiled terminfo files under /usr/share/terminfo/ or wherever is appropriate for the target.
+def copyTerminfoTo(usr_share_terminfo)
+    generated_terminfo_root = ".generated/terminfo/"
+    if File.exists?(generated_terminfo_root) == false
+        return
+    end
+    FileUtils.mkdir_p(usr_share_terminfo)
+    terminfo_files = []
+    FileUtils.cd(generated_terminfo_root) {
+        |dir|
+        terminfo_files.concat(Dir.glob("*"))
+    }
+    terminfo_files.each() {
+        |terminfo_file|
+        if File.directory?("#{generated_terminfo_root}#{terminfo_file}")
+            next
+        end
+        FileUtils.mkdir_p("#{usr_share_terminfo}/#{terminfo_file}")
+        FileUtils.rmdir("#{usr_share_terminfo}/#{terminfo_file}")
+        FileUtils.cp(File.join(generated_terminfo_root, terminfo_file), "#{usr_share_terminfo}/#{terminfo_file}")
+    }
+end
+    
 # Copy this project's individual files.
 project_resource_directory = "#{resources_dir}/#{machine_project_name}"
 copy_files_for_installation(".", project_resource_directory)
@@ -280,23 +303,7 @@ if target_os() == "Linux"
         system("gzip -9 #{uncompressed_file}")
     }
     
-    # Copy any compiled terminfo files under /usr/share/terminfo/.
-    generated_terminfo_root = ".generated/terminfo/"
-    if File.exists?(generated_terminfo_root)
-        usr_share_terminfo = "#{tmp_dir}/usr/share/terminfo"
-        FileUtils.mkdir_p(usr_share_terminfo)
-        terminfo_files = []
-        FileUtils.cd(generated_terminfo_root) {
-            |dir|
-            terminfo_files << Dir.glob("?/*")
-        }
-        terminfo_files.each() {
-            |terminfo_file|
-            FileUtils.mkdir_p("#{usr_share_terminfo}/#{terminfo_file}")
-            FileUtils.rmdir("#{usr_share_terminfo}/#{terminfo_file}")
-            FileUtils.cp(File.join(generated_terminfo_root, terminfo_file), "#{usr_share_terminfo}/#{terminfo_file}")
-        }
-    end
+    copyTerminfoTo("#{tmp_dir}/usr/share/terminfo")
     
     # Install the start-up script(s) from the project's bin/ to /usr/bin/.
     usr_bin = "#{tmp_dir}/usr/bin"
@@ -396,23 +403,7 @@ if target_os() == "SunOS"
     FileUtils.mkdir_p(usr_share_applications)
     FileUtils.cp(Dir.glob("#{project_resource_directory}/lib/*.desktop"), usr_share_applications)
     
-    # Copy any compiled terminfo files under /usr/share/terminfo/.
-    generated_terminfo_root = ".generated/terminfo/"
-    if File.exists?(generated_terminfo_root)
-        usr_share_terminfo = "#{tmp_dir}/root/usr/share/lib/terminfo"
-        FileUtils.mkdir_p(usr_share_terminfo)
-        terminfo_files = []
-        FileUtils.cd(generated_terminfo_root) {
-            |dir|
-            terminfo_files << Dir.glob("?/*")
-        }
-        terminfo_files.each() {
-            |terminfo_file|
-            FileUtils.mkdir_p("#{usr_share_terminfo}/#{terminfo_file}")
-            FileUtils.rmdir("#{usr_share_terminfo}/#{terminfo_file}")
-            FileUtils.cp(File.join(generated_terminfo_root, terminfo_file), "#{usr_share_terminfo}/#{terminfo_file}")
-        }
-    end
+    copyTerminfoTo("#{tmp_dir}/root/usr/share/lib/terminfo")
     
     # Install the start-up script(s) from the project's bin/ to /usr/bin/.
     usr_bin = "#{tmp_dir}/root/usr/bin"
