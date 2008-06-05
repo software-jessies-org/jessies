@@ -162,7 +162,8 @@ public class EErrorsWindow extends JFrame {
         public boolean isAcceptableMatch(CharSequence line, Matcher matcher) {
             String match = matcher.group(1);
             
-            if (FileIgnorer.isIgnoredExtension(match)) {
+            FileIgnorer fileIgnorer = workspace.getFileList().getFileIgnorer();
+            if (fileIgnorer.isIgnoredExtension(match)) {
                 return false;
             }
             

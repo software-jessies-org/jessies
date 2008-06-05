@@ -131,7 +131,13 @@ This has a similar end result, but it's much less efficient, and it's your time 
 <p>Evergreen already knows about most common build artifacts (object files and their friends) and recognizes them by their filename extension.
 If you have an unusual one (and it isn't already hidden in a directory that Evergreen won't scan) you can add the extension to Evergreen's list in the GUI preferences dialog.
 
+<p>Evergreen will also look for <tt>echo-local-extensions-evergreen-should-not-index</tt> on your path.
+The output is interpreted as a list of filename endings.
+Filenames whose endings are in the list are not indexed.
+
 <p>If you think the extension is a common one that Evergreen should automatically ignore, please let us know so that we can add it to the built-in list so everyone benefits.
+
+<p>Both <tt>echo-local-non-source-directory-pattern</tt> and <tt>echo-local-extensions-evergreen-should-not-index</tt> are run once for each workspace, when the workspace is scanned or rescanned, with a current directory of the workspace root.
 
 <h3>Adding Custom Lint Checkers</h3>
 <p>If you dislike Evergreen's default choice of lint checker for a given language, or have a lint checker for a language Evergreen doesn't have a default for, you can override or supplement Evergreen's choices.
