@@ -6,15 +6,18 @@ import java.util.regex.*;
 import e.util.*;
 
 public class FileIgnorer {
+    private File rootDirectory;
+    
     /** Extensions of files that shouldn't be indexed. */
-    private static String[] ignoredExtensions;
+    private List<String> ignoredExtensions;
     
     /** Names of directories that shouldn't be entered when indexing. */
     private Pattern uninterestingDirectoryNames;
     
     public FileIgnorer(String rootDirectoryPath) {
-        File rootDirectory = FileUtilities.fileFromString(rootDirectoryPath);
-        uninterestingDirectoryNames = Pattern.compile(getUninterestingDirectoryPattern(rootDirectory));
+        this.rootDirectory = FileUtilities.fileFromString(rootDirectoryPath);
+        this.uninterestingDirectoryNames = getUninterestingDirectoryPattern();
+        this.ignoredExtensions = Collections.unmodifiableList(getIgnoredExtensions());
     }
     
     public boolean isIgnored(File file) {
@@ -28,14 +31,18 @@ public class FileIgnorer {
         return isIgnoredExtension(filename);
     }
     
-    public static boolean isIgnoredExtension(String filename) {
-        if (ignoredExtensions == null) {
-            ignoredExtensions = Evergreen.getInstance().getPreferences().getString(EvergreenPreferences.UNINTERESTING_EXTENSIONS).split(";");
-        }
+    private ArrayList<String> getIgnoredExtensions() {
+        ArrayList<String> ignoredExtensions = new ArrayList<String>();
+        ignoredExtensions.addAll(Arrays.asList(Evergreen.getInstance().getPreferences().getString(EvergreenPreferences.UNINTERESTING_EXTENSIONS).split(";")));
+        appendLinesFromScriptOutput(ignoredExtensions, "echo-local-extensions-evergreen-should-not-index");
+        return ignoredExtensions;
+    }
+    
+    public boolean isIgnoredExtension(String filename) {
         return FileIgnorer.nameEndsWithOneOf(filename, ignoredExtensions);
     }
     
-    private static String getUninterestingDirectoryPattern(File rootDirectory) {
+    private Pattern getUninterestingDirectoryPattern() {
         ArrayList<String> patterns = new ArrayList<String>();
         
         // Start with the default ignored directory patterns.
@@ -50,14 +57,17 @@ public class FileIgnorer {
         patterns.add("CVS");
         patterns.add("SCCS");
         
-        // Try to run the site-local script.
-        final String scriptName = "echo-local-non-source-directory-pattern";
-        String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
-        ArrayList<String> errors = new ArrayList<String>();
-        ProcessUtilities.backQuote(rootDirectory, command, patterns, errors);
+        appendLinesFromScriptOutput(patterns, "echo-local-non-source-directory-pattern");
         
         // Make a regular expression.
-        return StringUtilities.join(patterns, "|");
+        return Pattern.compile(StringUtilities.join(patterns, "|"));
+    }
+    
+    private void appendLinesFromScriptOutput(ArrayList<String> lines, String scriptName) {
+        String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
+        ArrayList<String> errors = new ArrayList<String>();
+        // Try to run any site-local script.
+        ProcessUtilities.backQuote(rootDirectory, command, lines, errors);
     }
     
     public boolean isIgnoredDirectory(File directory) {
@@ -70,7 +80,7 @@ public class FileIgnorer {
      * 2. constructing a large pattern from the extensions and using Matcher.matches.
      * The second alternative comes close with a few tricks, but doesn't seem worth the complexity.
      */
-    public static boolean nameEndsWithOneOf(String name, String[] extensions) {
+    public static boolean nameEndsWithOneOf(String name, List<String> extensions) {
         for (String extension : extensions) {
             if (name.endsWith(extension)) {
                 return true;

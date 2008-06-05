@@ -9,6 +9,7 @@ import org.jdesktop.swingworker.SwingWorker;
 
 public class WorkspaceFileList {
     private Workspace workspace;
+    private FileIgnorer fileIgnorer;
     private ArrayList<String> fileList;
     
     private FileAlterationMonitor fileAlterationMonitor;
@@ -39,6 +40,17 @@ public class WorkspaceFileList {
     public int getIndexedFileCount() {
         List<String> list = fileList;
         return (list != null) ? list.size() : -1;
+    }
+    
+    public synchronized FileIgnorer getFileIgnorer() {
+        if (fileIgnorer == null) {
+            updateFileIgnorer();
+        }
+        return fileIgnorer;
+    }
+    
+    private synchronized void updateFileIgnorer() {
+        fileIgnorer = new FileIgnorer(workspace.getRootDirectory());
     }
     
     public void ensureInFileList(String pathWithinWorkspace) {
@@ -129,7 +141,8 @@ public class WorkspaceFileList {
             Log.warn("Scanning " + workspace.getRootDirectory() + " for interesting files.");
             final long t0 = System.nanoTime();
             
-            FileIgnorer fileIgnorer = new FileIgnorer(workspace.getRootDirectory());
+            // We should reload the file ignorer's configuration when we rescan.
+            updateFileIgnorer();
             ArrayList<String> result = new ArrayList<String>();
             scanDirectory(workspace.getRootDirectory(), fileIgnorer, result);
             Evergreen.getInstance().showStatus("Scan of \"" + workspace.getRootDirectory() + "\" complete (" + result.size() + " files)");
