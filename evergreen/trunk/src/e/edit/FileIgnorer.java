@@ -57,7 +57,7 @@ public class FileIgnorer {
         patterns.add("CVS");
         patterns.add("SCCS");
         
-        appendLinesFromScriptOutput(patterns, "echo-local-non-source-directory-pattern");
+        appendLinesFromScriptOutput(patterns, "echo-local-directories-evergreen-should-not-index");
         
         // Make a regular expression.
         return Pattern.compile(StringUtilities.join(patterns, "|"));
