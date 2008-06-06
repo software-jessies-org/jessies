@@ -191,12 +191,10 @@ public class FileType {
     }
     
     private static FileType guessFileTypeByContent(CharSequence content) {
+        // These tests come first because tests based on isInterpretedContent
+        // are completely definitive.
         if (isBashContent(content)) {
             return FileType.BASH;
-        } else if (isCPlusPlusContent(content)) {
-            return FileType.C_PLUS_PLUS;
-        } else if (isPatchContent(content)) {
-            return FileType.PATCH;
         } else if (isPerlContent(content)) {
             return FileType.PERL;
         } else if (isPythonContent(content)) {
@@ -205,6 +203,15 @@ public class FileType {
             return FileType.RUBY;
         } else if (isInterpretedContent(content, "talc")) {
             return FileType.TALC;
+        }
+        
+        // The following tests are weaker guesses. A Ruby script containing
+        // "#ifdef" (because it generates C++, say) would be assumed to be C++
+        // if these tests were all together and in alphabetical order.
+        if (isCPlusPlusContent(content)) {
+            return FileType.C_PLUS_PLUS;
+        } else if (isPatchContent(content)) {
+            return FileType.PATCH;
         } else if (isXmlContent(content)) {
             return FileType.XML;
         } else {
