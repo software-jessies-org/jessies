@@ -160,6 +160,9 @@ public class FileType {
         return result;
     }
     
+    /**
+     * Guesses the type from the given filename and the corresponding content.
+     */
     public static FileType guessFileType(String filename, CharSequence content) {
         // The whole point of emacs mode lines is that they override all other possibilities.
         FileType modeType = extractFileTypeFromModeLine(content);
@@ -169,7 +172,7 @@ public class FileType {
         // See if we can infer the type by name first and fall back to guessing from the content.
         // If you don't do it this way round, you get fooled by files (such as this one) that contain things that look like suggestive content.
         // It's hard to see that there's ever any excuse for having the wrong filename extension (and not having an emacs mode line).
-        FileType fileType = guessFileTypeByName(filename);
+        FileType fileType = guessFileTypeByFilename(filename);
         if (fileType == FileType.PLAIN_TEXT) {
             fileType = guessFileTypeByContent(content);
         }
@@ -177,9 +180,12 @@ public class FileType {
     }
     
     /**
-     * Guesses the type from the given filename by checking the FileTypes' registered extensions.
+     * Guesses the type from the given filename by only checking the FileTypes'
+     * registered extensions. Use guessFileType if you have the content too;
+     * this method's guess is based solely on the filename (no attempt will be
+     * made to examine the file, should it exist).
      */
-    private static FileType guessFileTypeByName(String filename) {
+    private static FileType guessFileTypeByFilename(String filename) {
         for (FileType type : ALL_FILE_TYPES.values()) {
             for (String extension : type.extensions) {
                 if (filename.endsWith(extension)) {
