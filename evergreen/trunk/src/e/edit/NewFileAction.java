@@ -1,12 +1,12 @@
 package e.edit;
 
-import java.awt.event.*;
-import java.io.*;
-import javax.swing.*;
-
 import e.forms.*;
 import e.gui.*;
 import e.util.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
+import javax.swing.*;
 
 /**
  * An action for the operation of creating and opening a new file.
@@ -71,22 +71,20 @@ public class NewFileAction extends ETextAction {
     }
     
     private void fillWithInitialContents(File file) {
-        String name = file.getName();
-        if (name.endsWith(".h")) {
-            // Turn "SomeClass.h" into "SOME_CLASS_H_included".
-            String safeName = name.replaceAll("([a-z])([A-Z])", "$1_$2").toUpperCase().replaceAll("[^A-Za-z0-9_]", "_");
-            String macroName = safeName + "_included";
-            
-            String content = "#ifndef " + macroName + "\n";
-            content += "#define " + macroName + "\n";
-            content += "\n";
-            content += "\n";
-            content += "\n";
-            content += "#endif\n";
-            String result = StringUtilities.writeFile(file, content);
-            if (result != null) {
-                Evergreen.getInstance().showAlert("Couldn't fill new file", "There was a problem filling \"" + file + "\" with initial content: " + result + ".");
-            }
+        // FIXME: we could use FileType.guessFileTypeByFilename to allow the user to specify scripts that override a single type. YAGNI.
+        String defaultBoilerplateGenerator = FileUtilities.findOnPath("evergreen-boilerplate-generator").toString();
+        String boilerplateGenerator = Parameters.getParameter("boilerplateGenerator", defaultBoilerplateGenerator);
+        if (boilerplateGenerator == null) {
+            return;
+        }
+        
+        String command = boilerplateGenerator + " \"" + file.toString() + "\"";
+        ArrayList<String> lines = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, lines);
+        
+        String result = StringUtilities.writeFile(file, StringUtilities.join(lines, "\n"));
+        if (result != null) {
+            Evergreen.getInstance().showAlert("Couldn't fill new file", "There was a problem filling \"" + file + "\" with initial content: " + result + ".");
         }
     }
 }
