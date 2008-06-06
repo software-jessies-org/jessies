@@ -1,0 +1,53 @@
+#!/usr/bin/ruby -w
+
+# Simple boilerplate generator for Evergreen.
+# Copyright (C) Elliott Hughes, 2008.
+
+# Test with:
+# evergreen-boilerplate-generator /usr/enh/projects/blah/src/SomeClass.h /usr/enh/projects/blah/src/org/jessies/talc/Talc.java
+
+def cpp(name)
+    # Turn "/usr/enh/Projects/blah/src/SomeClass.h" into "SomeClass.h".
+    name = File.basename(name)
+    # Turn "SomeClass.h" into "SOME_CLASS_H".
+    safe_name = name.gsub(/([a-z])([A-Z])/, "\\1_\\2").upcase().gsub(/[^A-Za-z0-9_]/, "_")
+
+    macro_name = "#{safe_name}_included"
+
+    puts("#ifndef #{macro_name}")
+    puts("#define #{macro_name}")
+    puts()
+    puts()
+    puts()
+    puts("#endif")
+end
+
+def java(name)
+    # Extract the class and package names.
+    elements = name.split("/")
+    class_name = elements.pop().sub(/\.java$/, "")
+    while elements.size() > 0 && elements.first() !~ /^(com|net|org)$/
+        elements.shift()
+    end
+    package = elements.join(".")
+    
+    if package.size() > 0
+        puts("package #{package};")
+        puts()
+    end
+    puts("public class #{class_name} {")
+    puts("}")
+end
+
+def emit_boilerplate(filename)
+    if filename =~ /\.h$/
+        cpp(filename)
+    elsif filename =~ /\.java$/
+        java(filename)
+    end
+end
+
+ARGV.each() {
+    |filename|
+    emit_boilerplate(filename)
+}
