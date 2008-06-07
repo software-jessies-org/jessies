@@ -908,3 +908,13 @@ test:
 .PHONY: gcj
 gcj:
 	rm -rf .generated/classes/ && JAVA_COMPILER=/usr/bin/gcj make && rm -rf .generated && make && sudo mv $(MACHINE_PROJECT_NAME) /usr/bin
+
+.PHONY: findbugs
+findbugs:
+	# Two problems here:
+	# 1. we want "-auxclasspath XXX" where XXX is a colon-separated list of jar files from $(SALMA_HAYEK)/lib/jars/ and $(PROJECT_ROOT)/lib/jars/
+	# 2. we want to see the full output of this command; I've worked around it with "exit 1", but it's not really an error.
+	# It doesn't seem to matter that, when run in salma-hayek, we supply things twice.
+	@echo Running findbugs...
+	findbugs -textui -emacs -sourcepath $(SALMA_HAYEK)/src:$(PROJECT_ROOT)/src $(SALMA_HAYEK)/.generated/classes $(PROJECT_ROOT)/.generated/classes
+	exit 1
