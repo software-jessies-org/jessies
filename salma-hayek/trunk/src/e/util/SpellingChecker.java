@@ -49,7 +49,7 @@ public class SpellingChecker {
             out = new PrintWriter(ispell.getOutputStream());
             
             String greeting = in.readLine();
-            if (greeting.startsWith("@(#) International Ispell ")) {
+            if (greeting != null && greeting.startsWith("@(#) International Ispell ")) {
                 Log.warn("SpellingChecker: connected to " + execArguments[0] + " okay: " + greeting + ".");
             } else {
                 throw new IOException("Garbled ispell response: " + greeting);
@@ -157,6 +157,10 @@ public class SpellingChecker {
             // 1. a blank line (meaning "correctly spelled"),
             // 2. lines beginning with [&?#] containing suggested corrections, followed by a blank line.
             String response = in.readLine();
+            if (response == null) {
+                Log.warn("SpellingChecker: lost connection to back end.");
+                return false;
+            }
             
             // A blank line means "correctly spelled".
             if (response.length() == 0) {
@@ -168,7 +172,7 @@ public class SpellingChecker {
             // ?: guess
             // #: no suggestions
             boolean misspelled = true;
-            while (response.length() > 0 && "&?#+-".indexOf(response.charAt(0)) != -1) {
+            while (response != null && response.length() > 0 && "&?#+-".indexOf(response.charAt(0)) != -1) {
                 debug(" " + response);
                 
                 if (response.charAt(0) == '&' && isCorrectIgnoringCase(word, response)) {
@@ -182,7 +186,7 @@ public class SpellingChecker {
                 response = in.readLine();
             }
             
-            if (response.length() != 0) {
+            if (response != null && response.length() != 0) {
                 Log.warn("SpellingChecker: garbled response: \"" + response + "\"");
             }
             
