@@ -33,7 +33,6 @@ public final class EditServer {
     
     private class Opener implements Runnable {
         private String filename;
-        private boolean shouldBlock;
         private PrintWriter out;
         private EWindow window;
         
