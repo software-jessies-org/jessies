@@ -422,9 +422,10 @@ endif
 # TODO: Consider whether we could defer to invoke-java.rb to run the compiler
 # and so lose this duplication.
 # ----------------------------------------------------------------------------
+EXTRA_JARS += $(wildcard $(SALMA_HAYEK)/lib/jars/*.jar)
+EXTRA_JARS += $(wildcard $(PROJECT_ROOT)/lib/jars/*.jar)
 CLASS_PATH += $(SALMA_HAYEK)/.generated/classes
-CLASS_PATH += $(wildcard $(SALMA_HAYEK)/lib/jars/*.jar)
-CLASS_PATH += $(wildcard $(PROJECT_ROOT)/lib/jars/*.jar)
+CLASS_PATH += $(EXTRA_JARS)
 
 # "tools.jar" doesn't exist on Mac OS (the classes are automatically available).
 # Java 6 will do likewise for the other platforms, at which point this can be removed.
@@ -911,10 +912,9 @@ gcj:
 
 .PHONY: findbugs
 findbugs:
-	# Two problems here:
-	# 1. we want "-auxclasspath XXX" where XXX is a colon-separated list of jar files from $(SALMA_HAYEK)/lib/jars/ and $(PROJECT_ROOT)/lib/jars/
-	# 2. we want to see the full output of this command; I've worked around it with "exit 1", but it's not really an error.
-	# It doesn't seem to matter that, when run in salma-hayek, we supply things twice.
+	# It doesn't seem to matter that, when run in salma-hayek, we supply the classes and source twice.
+	# It also doesn't seem to matter that our auxclasspath ends in a colon.
 	@echo Running findbugs...
-	findbugs -textui -emacs -sourcepath $(SALMA_HAYEK)/src:$(PROJECT_ROOT)/src $(SALMA_HAYEK)/.generated/classes $(PROJECT_ROOT)/.generated/classes
+	findbugs -textui -emacs $(addprefix -auxclasspath ,$(call makeNativePath,$(EXTRA_JARS))) -sourcepath $(SALMA_HAYEK)/src:$(PROJECT_ROOT)/src $(SALMA_HAYEK)/.generated/classes $(PROJECT_ROOT)/.generated/classes
+	# FIXME: we want to see the full output of this command; I've worked around it with "exit 1", but it's not really an error.
 	exit 1
