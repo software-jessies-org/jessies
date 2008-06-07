@@ -57,7 +57,7 @@ public class PWrappedSegmentIterator implements Iterator<PLineSegment> {
         throw new UnsupportedOperationException();
     }
     
-    private class CachedSegmentIterator implements Iterator<PLineSegment> {
+    private static class CachedSegmentIterator implements Iterator<PLineSegment> {
         private Iterator<PLineSegment> source;
         private PLineSegment next = null;
         
