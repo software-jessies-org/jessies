@@ -26,8 +26,8 @@ public abstract class LazyStringSelection implements Transferable, ClipboardOwne
                 if (cachedValue == null) {
                     cachedValue = reallyGetText();
                 }
+                return cachedValue;
             }
-            return cachedValue;
         }
         throw new UnsupportedFlavorException(flavor);
     }
