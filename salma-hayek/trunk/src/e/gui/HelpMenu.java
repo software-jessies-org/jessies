@@ -41,7 +41,7 @@ public class HelpMenu {
         return menu;
     }
     
-    private class AboutBoxAction extends AbstractAction {
+    private static class AboutBoxAction extends AbstractAction {
         private AboutBoxAction() {
             String name = "About";
             if (GuiUtilities.isMacOs() == false) {

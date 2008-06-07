@@ -184,7 +184,7 @@ public class SolarProjector {
         return e;
     }
     
-    class SunPosition {
+    static class SunPosition {
         double ra;
         double dec;
         double rv;

@@ -68,7 +68,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         actions.add(new AcceptSpellingAction(misspelling));
     }
     
-    public class NoSuggestionsAction extends AbstractAction {
+    public static class NoSuggestionsAction extends AbstractAction {
         public NoSuggestionsAction() {
             super("(No suggestions)");
             setEnabled(false);
@@ -78,7 +78,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         }
     }
     
-    public class AcceptSpellingAction extends AbstractAction {
+    public static class AcceptSpellingAction extends AbstractAction {
         private final String word;
         
         public AcceptSpellingAction(final String word) {
