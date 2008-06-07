@@ -27,14 +27,14 @@ public class EscapeParser {
 	}
 	private static void addSequenceRecognizers(String chars, SequenceRecognizer recognizer) {
 		for (int i = 0; i < chars.length(); i++) {
-			SEQ_RECOGNIZERS.put(new Character(chars.charAt(i)), recognizer);
+			SEQ_RECOGNIZERS.put(chars.charAt(i), recognizer);
 		}
 	}
 	
 	public void addChar(char ch) {
 		sequence += ch;
 		if (sequence.length() == 1) {
-			seqRecognizer = SEQ_RECOGNIZERS.get(new Character(ch));
+			seqRecognizer = SEQ_RECOGNIZERS.get(ch);
 			if (seqRecognizer == null) {
 				Log.warn("Unable to find escape sequence end recognizer for start char \"" + ch + "\"");
 			}
