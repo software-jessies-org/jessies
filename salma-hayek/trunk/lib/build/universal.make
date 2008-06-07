@@ -465,6 +465,7 @@ JAVAC_FLAGS.gcj += -Wno-indirect-static
 JAVAC_FLAGS.gcj += -Wno-serial
 JAVAC_FLAGS.gcj += -combine
 JAVAC_FLAGS.gcj += -encoding UTF-8
+JAVAC_FLAGS.gcj += -fjni
 JAVAC_FLAGS.gcj += --main=$(GCJ_MAIN_CLASS)
 JAVAC_FLAGS.gcj += -o $(MACHINE_PROJECT_NAME)
 
@@ -906,4 +907,4 @@ test:
 
 .PHONY: gcj
 gcj:
-	rm -rf .generated && JAVA_COMPILER=/usr/bin/gcj make && rm -rf .generated && make && sudo mv $(MACHINE_PROJECT_NAME) /usr/bin
+	rm -rf .generated/classes/ && JAVA_COMPILER=/usr/bin/gcj make && rm -rf .generated && make && sudo mv $(MACHINE_PROJECT_NAME) /usr/bin
