@@ -57,8 +57,7 @@ public final class InAppServer {
     }
     
     private void writeNewSecret() {
-        long secretValue = secureRandom.nextLong();
-        secret = new Long(secretValue).toString();
+        secret = Long.toString(secureRandom.nextLong());
         StringUtilities.writeFile(secretFile, secret);
     }
     
