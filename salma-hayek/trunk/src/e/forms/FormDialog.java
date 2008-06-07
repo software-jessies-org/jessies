@@ -396,8 +396,7 @@ public class FormDialog {
      */
     public void acceptDialog() {
         try {
-            Boolean okay = acceptCallable.call();
-            if (okay == Boolean.TRUE) {
+            if (acceptCallable.call()) {
                 processUserChoice(true);
             }
         } catch (Exception ex) {
