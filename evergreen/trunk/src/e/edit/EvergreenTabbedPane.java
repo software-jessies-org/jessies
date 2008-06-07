@@ -77,7 +77,7 @@ public class EvergreenTabbedPane extends JTabbedPane {
     /**
      * Ensures that when we change tab, we give focus to that workspace.
      */
-    private class WorkspaceFocuser implements ChangeListener {
+    private static class WorkspaceFocuser implements ChangeListener {
         public void stateChanged(ChangeEvent e) {
             EventQueue.invokeLater(new Runnable() {
                 public void run() {

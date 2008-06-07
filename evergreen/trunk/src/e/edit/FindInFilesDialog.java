@@ -42,7 +42,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         public void open();
     }
     
-    public class MatchingLine implements ClickableTreeItem {
+    public static class MatchingLine implements ClickableTreeItem {
         private String line;
         private File file;
         private Pattern pattern;
@@ -470,7 +470,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         matchTreeModel.setRoot(root);
     }
     
-    public class MatchTreeCellRenderer extends DefaultTreeCellRenderer {
+    public static class MatchTreeCellRenderer extends DefaultTreeCellRenderer {
         private Font defaultFont = null;
         
         public MatchTreeCellRenderer() {
