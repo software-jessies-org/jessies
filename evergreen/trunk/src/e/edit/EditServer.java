@@ -1,10 +1,10 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.EventQueue;
 import java.awt.event.*;
 import java.io.*;
-
-import e.util.*;
+import java.util.concurrent.CountDownLatch;
 
 public final class EditServer {
     private Evergreen editor;
@@ -70,21 +70,17 @@ public final class EditServer {
         Opener opener = new Opener(filename, out);
         final EWindow window = opener.open();
         if (shouldBlock) {
-            final Object lock = new Object();
+            final CountDownLatch done = new CountDownLatch(1);
             // FIXME: is this really the easiest way to watch for the component being removed from the hierarchy?
             window.addHierarchyListener(new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {
                     if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && window.isShowing() == false) {
-                        synchronized (lock) {
-                            lock.notify();
-                        }
+                        done.countDown();
                     }
                 }
             });
             try {
-                synchronized (lock) {
-                    lock.wait();
-                }
+                done.await();
             } catch (Exception ex) {
                 out.println(ex.getMessage());
             }
