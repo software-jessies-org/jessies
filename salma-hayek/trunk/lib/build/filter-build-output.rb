@@ -14,7 +14,13 @@ def filterBuildOutput(inputIo)
     # src/Test.java:174: warning: [deprecation] toURL() in java.io.File has been deprecated
     #     URL url = f.toURL();
     #                ^
-    if line.match(/\*\*\*/) || line.match(/warning: /)
+    
+    # We also want to see findbugs warnings, which:
+    # /Users/mad/software.jessies.org/work/terminator/src/terminator/FindDialog.java:80:80 IS: Inconsistent synchronization of terminator.FindDialog.formDialog; locked 77% of time (M)
+    # /Users/mad/software.jessies.org/work/terminator/src/terminator/terminal/TerminalControl.java:-1:-1 UuF: Unused field: terminator.terminal.TerminalControl.stepModeReader (M)
+    # But, rather lamely, I'll take the simple, low risk approach of matching the final warning counter.
+    # Warnings generated: 55
+    if line.match(/\*\*\*/) || line.match(/warning: /) || line.match(/Warnings generated: /)
       $stderr.puts(lines)
       while line = inputIo.gets()
         $stderr.puts(line)
