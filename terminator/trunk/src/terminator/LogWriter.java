@@ -39,7 +39,7 @@ public class LogWriter {
 		}
 	}
 	
-	private static File makeLogFilename(File logsDirectory, String commandLine, int truncationLength) throws UnsupportedEncodingException {
+	private synchronized static File makeLogFilename(File logsDirectory, String commandLine, int truncationLength) throws UnsupportedEncodingException {
 		String mostInterestingPartOfCommandLine = commandLine.substring(0, truncationLength);
 		String suffix = java.net.URLEncoder.encode(mostInterestingPartOfCommandLine, "UTF-8");
 		String timestamp = FILENAME_TIMESTAMP_FORMATTER.format(new Date());
