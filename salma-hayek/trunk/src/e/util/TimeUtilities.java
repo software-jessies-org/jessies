@@ -14,14 +14,18 @@ public class TimeUtilities {
      * Returns the Date corresponding to the given ISO 8601-format String.
      */
     public static Date fromIsoString(String date) throws ParseException {
-        return ISO_8601.parse(date);
+        synchronized (ISO_8601) {
+            return ISO_8601.parse(date);
+        }
     }
 
     /**
      * Returns the given Date as a String in ISO 8601 format.
      */
     public static String toIsoString(Date date) {
-        return ISO_8601.format(date);
+        synchronized (ISO_8601) {
+            return ISO_8601.format(date);
+        }
     }
 
     /**
