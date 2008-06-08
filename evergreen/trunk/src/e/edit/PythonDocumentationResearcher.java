@@ -2,6 +2,7 @@ package e.edit;
 
 import e.ptextarea.*;
 import e.util.*;
+import java.io.File;
 import java.util.*;
 
 /**
@@ -18,13 +19,13 @@ import java.util.*;
  */
 public class PythonDocumentationResearcher implements WorkspaceResearcher {
     public String research(String string, ETextWindow textWindow) {
-        String pydoc = Advisor.findToolOnPath("epydoc.py");
-        if (pydoc == null) {
+        String pydoc_binary = System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "scripts" + File.separator + "epydoc.py";
+        if (pydoc_binary == null) {
             return "";
         }
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, new String[] { "epydoc.py", string }, lines, errors);
+        int status = ProcessUtilities.backQuote(null, new String[] { pydoc_binary, string }, lines, errors);
         if (status == 1) {
             return "";
         }
