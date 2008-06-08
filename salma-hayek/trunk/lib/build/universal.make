@@ -75,7 +75,7 @@ convertToNativeFilenames.Cygwin = $(if $(1),$(shell cygpath --mixed $(1)))
 convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 
 searchPath = $(shell which $(1) 2> /dev/null)
-makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(1)))
+makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(strip $(1))))
 
 SPACE = $(subst :, ,:)
 
@@ -330,6 +330,8 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 
 PROJECT_ROOT = $(CURDIR)
 
+DISTINCT_PROJECT_ROOTS = $(sort $(PROJECT_ROOT) $(SALMA_HAYEK))
+
 PROJECT_DIRECTORY_BASE_NAME = $(notdir $(PROJECT_ROOT))
 HUMAN_PROJECT_NAME ?= $(PROJECT_DIRECTORY_BASE_NAME)
 MACHINE_PROJECT_NAME := $(shell ruby -e 'puts("$(HUMAN_PROJECT_NAME)".downcase())')
@@ -422,8 +424,7 @@ endif
 # TODO: Consider whether we could defer to invoke-java.rb to run the compiler
 # and so lose this duplication.
 # ----------------------------------------------------------------------------
-EXTRA_JARS += $(wildcard $(SALMA_HAYEK)/lib/jars/*.jar)
-EXTRA_JARS += $(wildcard $(PROJECT_ROOT)/lib/jars/*.jar)
+EXTRA_JARS := $(wildcard $(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJECT_ROOT)/lib/jars/*.jar))
 CLASS_PATH += $(SALMA_HAYEK)/.generated/classes
 CLASS_PATH += $(EXTRA_JARS)
 
@@ -432,7 +433,7 @@ CLASS_PATH += $(EXTRA_JARS)
 TOOLS_JAR := $(wildcard $(JDK_ROOT)/lib/tools.jar)
 CLASS_PATH += $(TOOLS_JAR)
 
-JAVAC_FLAGS += $(addprefix -classpath ,$(call makeNativePath,$(CLASS_PATH)))
+JAVAC_FLAGS += -classpath $(call makeNativePath,$(CLASS_PATH))
 
 # ----------------------------------------------------------------------------
 # Set Sun javac flags.
@@ -912,9 +913,5 @@ gcj:
 
 .PHONY: findbugs
 findbugs:
-	# It doesn't seem to matter that, when run in salma-hayek, we supply the classes and source twice.
-	# It also doesn't seem to matter that our auxclasspath ends in a colon.
 	@echo Running findbugs...
-	findbugs -textui -emacs $(addprefix -auxclasspath ,$(call makeNativePath,$(EXTRA_JARS))) -sourcepath $(SALMA_HAYEK)/src:$(PROJECT_ROOT)/src $(SALMA_HAYEK)/.generated/classes $(PROJECT_ROOT)/.generated/classes
-	# FIXME: we want to see the full output of this command; I've worked around it with "exit 1", but it's not really an error.
-	exit 1
+	findbugs -textui -emacs -auxclasspath $(call makeNativePath,$(EXTRA_JARS)) -sourcepath $(subst $(SPACE),:,$(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJECT_ROOT)/src)) $(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJECT_ROOT)/.generated/classes)
