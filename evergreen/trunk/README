@@ -1,8 +1,9 @@
 This directory contains the Evergreen integrating development environment.
-(Formerly known as "Edit".)
 
-This is free software. See the file COPYING for copying permission.
-All source files are copyright (C) 1999-2006, Elliott Hughes where not
-otherwise attributed.
+Evergreen is free software. See the file COPYING for copying permission.
+All source files are copyright the authors where not otherwise attributed.
+
+Send bug reports to software@jessies.org, being sure to include the
+word "Evergreen" in your Subject: line.
 
 Enjoy!
