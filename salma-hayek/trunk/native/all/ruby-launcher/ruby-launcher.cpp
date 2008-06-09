@@ -9,6 +9,8 @@
 #include <string>
 #include <unistd.h>
 
+#include "checkReadableFile.h"
+#include "reportArgValuesViaGui.h"
 #include "reportFatalErrorViaGui.h"
 #include "toString.h"
 #include "unix_exception.h"
@@ -54,15 +56,21 @@ void launchRuby(char** argValues) {
     ensureDescriptorIsOpen(1);
     ensureDescriptorIsOpen(2);
     if (*argValues == 0) {
-        throw std::runtime_error("missing interpreter");
+        throw std::runtime_error("missing Ruby interpreter");
     }
     const char* interpreter = *argValues;
+    const char* rubyScript = argValues[1];
+    if (rubyScript == 0) {
+        throw std::runtime_error("missing Ruby script name");
+    }
+    checkReadableFile("Ruby script", rubyScript);
     WindowsDllErrorModeChange windowsDllErrorModeChange;
     execvp(interpreter, argValues);
     throw unix_exception(std::string("execvp(\"") + interpreter + "\", ...)");
 }
 
 int main(int, char** argValues) {
+    //reportArgValuesViaGui(argValues);
     const char* ARGV0 = *argValues;
     ++ argValues;
     try {
@@ -77,7 +85,7 @@ int main(int, char** argValues) {
         os << std::endl;
         os << "Usage: ";
         os << ARGV0;
-        os << " <ruby interpreter> <ruby arguments>...";
+        os << " <Ruby interpreter> <Ruby script> <arguments>...";
         os << std::endl;
         reportFatalErrorViaGui("Ruby Launcher", os.str());
         return 1;
