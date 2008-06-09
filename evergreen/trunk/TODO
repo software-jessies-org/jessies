@@ -96,7 +96,7 @@ PREFERENCES
 
 + setting of regular expressions for excluded files, et cetera. text label explaining about the scripts we'll try to call to provide further customization.
 
-+ we handle site-wide customization reasonably well with the "echo" scripts (though that doesn't cover everything you can set in edit.properties, the idea could obviously be extended). we don't handle per-language customization well (it's pretty ad hoc). we don't handle per-project customization at all.
++ we handle site-wide customization reasonably well with the "echo" scripts (though that doesn't cover everything you can set in edit.properties, the idea could obviously be extended). we don't handle per-language customization well (it's pretty ad hoc). these scripts are called with the project root directory as an implicit argument, but that doesn't facilitate project-wide customization.
 
 
 
