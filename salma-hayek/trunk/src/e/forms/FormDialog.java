@@ -187,11 +187,14 @@ public class FormDialog {
         
         dialog.setContentPane(internalContentPane);
         
-        // Set sensible defaults for size and location.
+        // Set sensible defaults for size...
         dialog.pack();
+        // ...and location.
+        // FIXME: http://java.sun.com/products/jlf/at/book/Windows9.html says to position dialogs "at the golden mean of the parent window".
+        // That is, centered horizontally, but vertically n pixels below the top of the parent, where n = parentHeight - (parentHeight/1.618).
+        // We just use setLocationRelativeTo which centers horizontally and vertically...
         dialog.setLocationRelativeTo(doNotSetLocationRelativeToOwner ? null : owner);
-        
-        // But if we've shown this dialog before, put it back where it last was.
+        // ...but if we've shown this dialog before, we put it back where it last was.
         restorePreviousSize();
         
         initCloseBehavior();
