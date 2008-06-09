@@ -1,10 +1,5 @@
-TODO list for Evergreen
-
 Add a field to "Add Workspace" so you can specify a build host. Any build
-commands are then prefixed with "ssh build-host ". Probably also need a way
-to edit a workspace's properties (which would sometimes have been useful
-previously, when a repository has changed location, or I've wanted to change
-its name).
+commands are then prefixed with "ssh build-host ".
 
 Title bar text:
  1. Don't show repository root prefix in title bars?
@@ -19,14 +14,6 @@ something similar in Evergreen?
 We should keep track of 'recent files' on a per-workspace basis. We
 should also use scm's ability to find what's modified in a repository (once
 it gains this ability) to be able to offer a list of modified files too.
-
-Thinking about the literal string/regular expression problem I just
-fixed with FindFilesContainingSelectionAction, we should have a text
-field capable of automatically coloring invalid regular expressions
-red, and offering an explanation for any status line that happens to
-be available. Or we should fix all the existing dialogs using normal
-text fields to be like the Find/Replace dialog, which is the one
-place we do this properly at the moment.
 
 Did you know that vim keeps a ~/.vim/backup/ directory, containing the
 equivalent of our .bak files?
@@ -80,10 +67,6 @@ let us always show the user-friendly forms.
     This only applies the first time the dialog is opened. Thereafter, it should
     re-appear where it was when it was closed.
 
-auto-saving
-
-    [ ] Store divider position on quit. Restore on start.
-
 [ ] should have an environment variable editor (like the Windows Control
     Panel one).
 
@@ -113,17 +96,6 @@ auto-saving
         bk sfiles -v badger
 
     Produces no output even when not in a bk work area.
-
-[ ] hungry delete should probably delete to the correct indentation position
-    for the line first. so
-
-    if (blah) {
-            something();
-    }
-
-    with the caret before the 's' of 'something' would first delete four
-    spaces to fix the indentation, and then, if you backspace again, delete
-    back up to the opening brace.
 
 [ ] Change the stream monitoring code to distinguish stdout from stderr;
     get the errors windows to automatically close after a build if there
@@ -183,26 +155,6 @@ auto-saving
 [ ] The code for correcting indentation could be smarter. It doesn't do
     well with any of the things mentioned below.
     
-    [ ] C switch statements.
-
-        switch (x) {
-            case 1:
-                f();
-                break;
-            default:
-                g();
-                break;
-        }
-
-        (It does okay if you're prepared to use braces around the bodies
-        of the individual cases. This is a workaround I've taken to using,
-        when I find myself writing -- to my shame -- switch statements.)
-
-    [ ] C++ ostream output, where broken lines typically align at "<<".
-
-        std::cout << "hello, "
-                  << "world!" << std::endl;
-
     [ ] Over-complicated expressions. If we have unbalanced parentheses,
         we should probably indent as far as the last unclosed parenthesis.
         This can lead to right-justified code, mind, but then what are
@@ -235,19 +187,11 @@ auto-saving
 
 [ ] Update the manual!
 
-[ ] Fix double-clicking next to a " character to be as it was before.
-
 [ ] Have a way to copy a file or rename a file.
 
 [ ] Make the arrow keys move through 4-space tabs? If backspace knows
     about indent.string, shouldn't delete?
 
-[ ] Add some kind of "template" facility to "New File" to automatically fill
-    in the boilerplate. A combo box or list in the 'new' dialog would do,
-    letting us choose a named sample from the files in $EDIT_HOME/templates
-    or some-such. This is basically what Project Builder does (it has a
-    directory for each type).
-    
 [ ] Need to be able to go quickly from a #include to a header file.
 
 [ ] Handle out-of-date files better
@@ -266,7 +210,7 @@ HELP/DOCUMENTATION
 
 + set always on top? (an OpenWindows-like pin icon would be nice for this.)
 
-+ documentation browser back button (and relevant keystrokes).
++ documentation browser back button should have Firefox-like history pop-down.
 
 + documentation browser address bar.
 
@@ -316,9 +260,7 @@ EXTERNAL TOOLS
 
 PREFERENCES
 
-+ default font, default monospaced font, monospace defaut (or remove that and let user just set both to monospaced?), anti-alias.
-
-+ default encoding, default line ending, default indent string (per language/per workspace?).
++ default encoding, default line ending (per language/per workspace?).
 
 + overriding of environment variables?
 
@@ -370,7 +312,7 @@ VIEW
 
 + Show Invisibles (alt-command-I) could show newlines and spaces. tabs we already show anyway.
 
- + Kate, BBEdit, SubEthaEdit, and others are all implementing the "indent wrapped lines" idea we never got round to.
++ Kate, BBEdit, SubEthaEdit, and others are all implementing the "indent wrapped lines" idea we never got round to.
 
 TEXT
 
@@ -397,8 +339,6 @@ NAVIGATION
 SEARCH
 
 + use PatternSyntaxException's stored index to highlight regular expression errors in the text field showing them. JTextField does support highlighters.
-
-+ multi-threaded "Find in Files". 
 
 LANGUAGE-SPECIFIC COLORING/INDENTATION
 
@@ -432,11 +372,9 @@ EOQ
 
 + need indentation support for:
   + assembler
-  + bash
-  + HTML
+  + HTML (i.e. XML)
   + makefile
   + perl (currently uses C-family support)
-  + python
   + vhdl
   + XML
 
@@ -465,34 +403,9 @@ EOQ
 
 LANGUAGE-SPECIFIC TOOLS 
 
-+ HTML: run tidy(1) (control-command-H), send to validator.w3.org/check (control-command-V); also CSS validator.
-
-The following extra packages will be installed:
-  libtidy-0.99-0
-Suggested packages:
-  tidy-doc
-The following NEW packages will be installed:
-  libtidy-0.99-0 tidy
-0 upgraded, 2 newly installed, 0 to remove and 16 not upgraded.
-Need to get 144kB of archives.
-After unpacking 451kB of additional disk space will be used.
-Do you want to continue [Y/n]? y
-Get:1 http://us.archive.ubuntu.com edgy/main libtidy-0.99-0 20051018-1 [122kB]
-Get:2 http://us.archive.ubuntu.com edgy/main tidy 20051018-1 [21.7kB]
-Fetched 144kB in 1s (110kB/s)
-Selecting previously deselected package libtidy-0.99-0.
-(Reading database ... 100709 files and directories currently installed.)
-Unpacking libtidy-0.99-0 (from .../libtidy-0.99-0_20051018-1_i386.deb) ...
-Selecting previously deselected package tidy.
-Unpacking tidy (from .../tidy_20051018-1_i386.deb) ...
-Setting up libtidy-0.99-0 (20051018-1) ...
-
-Setting up tidy (20051018-1) ...
-
++ HTML: send to validator.w3.org/check (control-command-V); also CSS validator.
 
 + Perl: perltidy(1).
-
-+ Ruby: validate with "ruby -wc". 
 
 + C: support indent(1) if we see a ".indent.pro" file in one of the looked-for places. (or in the workspace root?) just offer to run indent(1)? or run it automatically? (on save? show a patch or just make the change, like for terminal newlines?)
 
