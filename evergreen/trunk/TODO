@@ -255,3 +255,281 @@ auto-saving
     If we kept a copy of the file's contents last time we knew we were clean, we could also provide diffs to the common ancestor.  Experience merging changes with BitKeeper shows that this isn't often useful but it's sometimes very useful.
     
     If we had that, we could notice that the file on disk was touched but its contents didn't change.  This would help me avoid spurious out-of-date watermarks with my bk edit setup.
+
+HELP/DOCUMENTATION
+
++ consider using Python and PyGtk and MozEmbed to use a native browser component rather than Java.
+
++ add some way of getting a list of the documentation providers, and where they're looking, and whether they've disabled themselves for lack of data, and how you (the user) would fix that (for systems where we can't make our package install the extras automatically).
+
++ use CSS to improve TABLE appearance. (see STL documentation.)
+
++ set always on top? (an OpenWindows-like pin icon would be nice for this.)
+
++ documentation browser back button (and relevant keystrokes).
+
++ documentation browser address bar.
+
++ documentation browser progress bar.
+
++ documentation browser's title should change depending on the page we're showing, putting the specific first, like Firefox: "isdigit(3) - Evergreen Documentation Browser". 
+
++ Insert Missing #includes (control-#)
+
+  automatic pulling of #include files from man page for function at cursor:
+
+   helium:/$ man 2 kill 2> /dev/null | grep '#include' | sort | uniq 
+       #include <signal.h>
+       #include <sys/types.h>
+
+  avoid pulling in #includes from EXAMPLES or whatever (see strftime for such
+  a man page). that is: only accept matches in the SYNOPSIS section.
+
+  could also do import statements for Java.
+
++ in JavaDoc.urlExists, cache successes.
+
++ also Mac documentation:
+   root at: /Developer/ADC Reference Library/documentation/Cocoa/Reference/
+   under there: (Foundation|ApplicationKit|WebKit)/ObjC_classic/Classes/$word.html
+   also: (Foundation|ApplicationKit|WebKit)/Classes/$word_Class/index.html 
+
++ better assembler documentation. Mac OS has "EM64T Help.app", "IA32 Help.app", and "PowerPC Help.app", which are basically just the Intel/Motorola PDFs with a machine-readable index and a little browser. we could make use of these on Mac OS or, better still, roll our own. likewise JVM bytecodes from the Sun JVM specification. one interesting problem is recognizing what kind of assembler we're dealing with.
+
++ also Perl documentation: use perldoc(1) for packages as well as functions. man page researcher should include "3pm" man pages in Perl context.
+
++ base conversion advisor will have to become a tool tip to remain useful, i think. 
+
++ should JavaDoc link to real pages in a real web browser, or try to extract the relevant chunk? (i don't think Swing's HTML code is up to the job of showing full JavaDoc pages.)
+
++ Java: a visual distinction between methods from this interface and methods from superinterfaces would be useful.
+
++ Java: we should get rid of my compressed rendering of signatures now we've got more room. it could be quite useful to be able to copy & paste the signatures into code.
+
++ cope with "man:" (et cetera) in the "address bar".
+
++ could have a combo box to choose man page sections. (any parallels for other documentation types?)
+
+EXTERNAL TOOLS
+
++ ExternalTools should also let you specify which languages they apply to. 
+
+PREFERENCES
+
++ default font, default monospaced font, monospace defaut (or remove that and let user just set both to monospaced?), anti-alias.
+
++ default encoding, default line ending, default indent string (per language/per workspace?).
+
++ overriding of environment variables?
+
++ setting of regular expressions for excluded files, et cetera. text label explaining about the scripts we'll try to call to provide further customization.
+
+SAVING/RESTORING STATE
+
+MODELINES
+
++ parse emacs/vim modelines.
+
++ the indentation guesser should look for "indent" modelines. it should also cope better with "4-spaces but use leading tabs where possible".
+
++ support this Emacs mechanism for letting an individual source file record how to build itself? is there an equivalent for how to run/test the program?
+
+/*
+Local Variables:
+compile-command: "gcc -DSOMETHING -I../include -g -Wall test.cpp"
+End:
+*/
+
++ support this BBEdit mechanism for arbitrary counterparts (and maybe #line too?):
+
+  -*- x-counterpart: file; -*-
+
+OPENING
+
++ it would be nice to be able to open "~/wlog-lad.txt" more conveniently.
+
++ it would be super-nice to be able to browse the file system at least as well as from Windows' "Run..." dialog.
+
+SAVING
+
++ auto-save to ".bak", on timer. 
+
++ if the encoding is changed, we should check that the document can still be encoded; and prevent entering unencodable characters? ... maybe the right decision is to check on save instead. SubEtherEdit has a little dialog showing the problems:
+
+http://codingmonkeys.de/blog/articles/2006/09/19/new-features-in-subethaedit-2-5
+
+SELECTION
+
++ Edit > Select > Word (ctrl-W) / Line (shift-command-L) / Paragraph / Enclosing Brackets (shift-command-B) / Current Scope (ctrl-alt-B) / All (command-A) 
+
++ show "natural" line count in status bar when partial lines are selected.
+
+VIEW
+
++ Show Line Numbers - should probably apply to the whole editor, and persist. (alt-command-L) 
+
++ Show Invisibles (alt-command-I) could show newlines and spaces. tabs we already show anyway.
+
+ + Kate, BBEdit, SubEthaEdit, and others are all implementing the "indent wrapped lines" idea we never got round to.
+
+TEXT
+
++ Text > Convert > to Uppercase (ctrl-U) / to Lowercase (ctrl-shift-U) / to Titlecase (ctrl-alt-U) / to Opposite Case (ctrl-G). work on selection or word at caret? or just character before caret? 
+
++ Text > Convert > Spaces to Tabs / Tabs to Spaces
+
++ Text > Sort (selection/whole document)
+
++ Text > Remove Duplicate Lines (like uniq(1), or without the requirement that the input be sorted?) 
+
++ Text > Shift Left (command-[) / Shift Right (command-]) add or remove one level of indentation
+
++ Text > Execute Line Inserting Result (control-R; actually inserts '\n' first) / Filter Through Command... (alt-command-R) 
+
++ Evaluate Line / Selection (control-command-C), evaluate mathematical expression; could do arbitrary Java/Ruby.
+
+NAVIGATION
+
++ Navigation > Add/Remove Bookmark (toggles on command-F2) / Next Bookmark (F2) / Previous Bookmark (shift-F2) --- handy for getting back to where you were if you need to go off and search for something.
+
++ Remove search field from tags panel, and add an action that pops up a filtering-list dialog.
+
+SEARCH
+
++ use PatternSyntaxException's stored index to highlight regular expression errors in the text field showing them. JTextField does support highlighters.
+
++ multi-threaded "Find in Files". 
+
+LANGUAGE-SPECIFIC COLORING/INDENTATION
+
++ see if we can learn anything from /usr/share/gtksourceview-1.0/language-specs
+
++ should color regular expression literals, heredocs, and (same thing) Python multi-line comments.
+
++ textmate uses (http://macromates.com/svn/Bundles/trunk/Bundles/Perl.tmbundle/Syntaxes/Perl.plist) this for heredocs in Perl:
+   <string>((&lt;&lt;) *"([^"]*)").*\n?</string>
+   <string>(^\3$)</string>
+
++ textmate has these test cases:
+
+$sql .= <<SQL if ( $type eq 'cnd' or $type eq 'mul' );
+LEFT JOIN features AS d6 ON a.Style = d6.UID
+SQL
+
+$Q->{foo1} ||= $DBH->prepare(<<EOQ);
+pretend this is SQL
+EOQ
+
+$Q->{foo2} ||= $DBH->prepare(<<EOQ);
+The next heredoc
+EOQ
+
++ textmate also has warnings for anyone trying to do Ruby.
+
++ need coloring and indentation for:
+  + CSS
+  + PL/SQL
+
++ need indentation support for:
+  + assembler
+  + bash
+  + HTML
+  + makefile
+  + perl (currently uses C-family support)
+  + python
+  + vhdl
+  + XML
+
++ kate uses (http://developer.kde.org/documentation/library/cvs-api/kdelibs-apidocs/kate/html/classKateVarIndent.html):
+
+- var-indent-indent-after: a regular expression pattern, if the first line with content above the current, indentation is added 
+- var-indent-indent: a regular expression pattern, if the current line matches indent is added. this is not tested if the above matched. 
+- var-indent-unindent: a regular expression pattern, if it matches the current line, indent is removed. 
+- var-indent-triggerchars: a string of characters, when any is typed, the current line is reindented. 
+
+ bash:
+  var-indent-indent-after (\\{(?![^\\}]*\\})|\b(then|elif|else)\b(?!.+fi)\\bdo\b(?!.+done)|\\bcase\\s+\\s+in\\b(?!.*esac)|\\[\\[)
+  var-indent-indent \\$\\{.*\\}
+  var-indent-unindent (\\}|\\b(fi|elif|else)\\b|\\bdone\b|\\besac\\b|\\]\\])
+  var-indent-triggerchars {}
+ perl:
+  var-indent-indent-after (?:\\{(?![^}]*\\})|\\((?![^\)]*\\)))
+  var-indent-indent (?:\\{.*\\}|\\(.*\\))
+  var-indent-unindent [})]
+  var-indent-triggerchars })
+ ruby:
+  var-indent-indent-after ^( )*(if|while|def|class|for).*|\\{[^\\}]*$|else|elsif|rescue|do|begin
+  var-indent-indent
+  var-indent-unindent end|else|elsif|rescue|^[^\\{]*\\}
+  var-indent-triggerchars }def
+
+LANGUAGE-SPECIFIC TOOLS 
+
++ HTML: run tidy(1) (control-command-H), send to validator.w3.org/check (control-command-V); also CSS validator.
+
+The following extra packages will be installed:
+  libtidy-0.99-0
+Suggested packages:
+  tidy-doc
+The following NEW packages will be installed:
+  libtidy-0.99-0 tidy
+0 upgraded, 2 newly installed, 0 to remove and 16 not upgraded.
+Need to get 144kB of archives.
+After unpacking 451kB of additional disk space will be used.
+Do you want to continue [Y/n]? y
+Get:1 http://us.archive.ubuntu.com edgy/main libtidy-0.99-0 20051018-1 [122kB]
+Get:2 http://us.archive.ubuntu.com edgy/main tidy 20051018-1 [21.7kB]
+Fetched 144kB in 1s (110kB/s)
+Selecting previously deselected package libtidy-0.99-0.
+(Reading database ... 100709 files and directories currently installed.)
+Unpacking libtidy-0.99-0 (from .../libtidy-0.99-0_20051018-1_i386.deb) ...
+Selecting previously deselected package tidy.
+Unpacking tidy (from .../tidy_20051018-1_i386.deb) ...
+Setting up libtidy-0.99-0 (20051018-1) ...
+
+Setting up tidy (20051018-1) ...
+
+
++ Perl: perltidy(1).
+
++ Ruby: validate with "ruby -wc". 
+
++ C: support indent(1) if we see a ".indent.pro" file in one of the looked-for places. (or in the workspace root?) just offer to run indent(1)? or run it automatically? (on save? show a patch or just make the change, like for terminal newlines?)
+
++ Java: rewriting the indenter stuff, i could really have used a simple tool to show me the inheritance hierarchy of the indenter classes.
+
++ for reference: GEdit plug-ins.
+
+UNDO
+
++ why do we sometimes claim the document is dirty, yet revert says "no non-whitespace changes"?
+
+STRANGE FILE SUPPORT
+
++ we could automatically gunzip/gzip .gz files.
+
++ we could automatically convert binary plist files to/from xml.
+
++ we could have some kind of helper program to help us handle authentication to read/write files we wouldn't otherwise have access to.
+
+OS INTEGRATION
+
++ more GNOME icons: as well as the menu icons, we should have the same icon for the "OK" button in the corresponding dialogs.
+
++ we should be a top-level drag and drop target:
+
+   http://weblogs.java.net/blog/shan_man/archive/2006/09/toplevel_drop_w.html
+
++ avoid GNOME focus-stealing-prevention. currently breaks command-line "Evergreen" use, auto-completion, and probably other stuff.
+
++ for reference: Visual Studio key bindings: http://xona.com/2005/08/02a.html
+
+BUILDING
+
++ neilb suggests having the whole command in the "Set Build Target" dialog. defaulting to what we normally construct. empty string automatically replaced? or a "reset to default" button?
+
++ possibly also add a "test" command to go with the "build" command. 
+
++ maybe all in a Workspace > Properties dialog, along with the title and directory (currently in "Edit Workspace")?
+
++ lose the errors window and open a new window for each build started. warn if the user tries to start two builds in the same workspace (but allow them to override), or possibly just warn if they start two builds from the same root (or overlapping roots)?
