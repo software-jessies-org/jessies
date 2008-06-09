@@ -199,12 +199,15 @@ public class ETextWindow extends EWindow implements PTextListener {
     private void initFocusListener() {
         textArea.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
-                rememberWeHadFocusLast();
                 updateWatermarkAndTitleBar();
                 updateStatusLine();
             }
             
             public void focusLost(FocusEvent e) {
+                // We do this when losing rather than gaining focus so that transient gains of focus don't count.
+                // For example, if the user switches tab and Swing gives focus to the first text window, that shouldn't count.
+                // We want restoreFocusToRememberedTextWindow to restore focus to the text window that lost focus when we last switched away from the new tab.
+                rememberWeHadFocusLast();
             }
             
             private void rememberWeHadFocusLast() {
