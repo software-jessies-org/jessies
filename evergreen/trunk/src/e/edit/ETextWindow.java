@@ -212,7 +212,10 @@ public class ETextWindow extends EWindow implements PTextListener {
             
             private void rememberWeHadFocusLast() {
                 Workspace workspace = (Workspace) SwingUtilities.getAncestorOfClass(Workspace.class, ETextWindow.this);
-                workspace.rememberFocusedTextWindow(ETextWindow.this);
+                // We might be losing focus because we've just been closed, in which case we're no longer in the component hierarchy.
+                if (workspace != null) {
+                    workspace.rememberFocusedTextWindow(ETextWindow.this);
+                }
             }
         });
     }
