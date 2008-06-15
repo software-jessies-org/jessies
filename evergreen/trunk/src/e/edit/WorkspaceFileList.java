@@ -8,7 +8,7 @@ import java.util.regex.*;
 import org.jdesktop.swingworker.SwingWorker;
 
 public class WorkspaceFileList {
-    private Workspace workspace;
+    private final Workspace workspace;
     private FileIgnorer fileIgnorer;
     private ArrayList<String> fileList;
     
@@ -173,14 +173,15 @@ public class WorkspaceFileList {
                 return;
             }
             for (File file : files) {
-                if (fileIgnorer.isIgnored(file)) {
+                boolean isDirectory = file.isDirectory();
+                if (fileIgnorer.isIgnored(file, isDirectory)) {
                     continue;
                 }
                 if (isSymbolicLinkWithinWorkspace(file)) {
                     continue;
                 }
                 String filename = file.toString();
-                if (file.isDirectory()) {
+                if (isDirectory) {
                     scanDirectory(filename, fileIgnorer, result);
                 } else {
                     int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()).length();

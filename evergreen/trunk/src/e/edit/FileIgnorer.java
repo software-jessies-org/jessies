@@ -6,36 +6,37 @@ import java.util.regex.*;
 import e.util.*;
 
 public class FileIgnorer {
-    private File rootDirectory;
+    /** The tree we're responsible for. */
+    private final File rootDirectory;
     
     /** Extensions of files that shouldn't be indexed. */
-    private List<String> ignoredExtensions;
+    private final List<String> ignoredExtensions;
     
     /** Names of directories that shouldn't be entered when indexing. */
-    private Pattern uninterestingDirectoryNames;
+    private final Pattern uninterestingDirectoryNames;
     
     public FileIgnorer(String rootDirectoryPath) {
         this.rootDirectory = FileUtilities.fileFromString(rootDirectoryPath);
         this.uninterestingDirectoryNames = getUninterestingDirectoryPattern();
-        this.ignoredExtensions = Collections.unmodifiableList(getIgnoredExtensions());
+        this.ignoredExtensions = Collections.unmodifiableList(makeIgnoredExtensions());
     }
     
-    public boolean isIgnored(File file) {
+    public boolean isIgnored(File file, boolean isDirectory) {
         String filename = file.getName();
         if (file.isHidden() || filename.startsWith(".") || filename.endsWith("~")) {
             return true;
         }
-        if (file.isDirectory()) {
-            return isIgnoredDirectory(file);
+        if (isDirectory) {
+            return isIgnoredDirectory(filename);
         }
         return isIgnoredExtension(filename);
     }
     
-    private ArrayList<String> getIgnoredExtensions() {
-        ArrayList<String> ignoredExtensions = new ArrayList<String>();
-        ignoredExtensions.addAll(Arrays.asList(Evergreen.getInstance().getPreferences().getString(EvergreenPreferences.UNINTERESTING_EXTENSIONS).split(";")));
-        appendLinesFromScriptOutput(ignoredExtensions, "echo-local-extensions-evergreen-should-not-index");
-        return ignoredExtensions;
+    private ArrayList<String> makeIgnoredExtensions() {
+        ArrayList<String> result = new ArrayList<String>();
+        result.addAll(Arrays.asList(Evergreen.getInstance().getPreferences().getString(EvergreenPreferences.UNINTERESTING_EXTENSIONS).split(";")));
+        appendLinesFromScriptOutput(result, "echo-local-extensions-evergreen-should-not-index");
+        return result;
     }
     
     public boolean isIgnoredExtension(String filename) {
@@ -70,8 +71,8 @@ public class FileIgnorer {
         ProcessUtilities.backQuote(rootDirectory, command, lines, errors);
     }
     
-    public boolean isIgnoredDirectory(File directory) {
-        return uninterestingDirectoryNames.matcher(directory.getName()).matches();
+    public boolean isIgnoredDirectory(String filename) {
+        return uninterestingDirectoryNames.matcher(filename).matches();
     }
     
     /**
@@ -79,6 +80,9 @@ public class FileIgnorer {
      * 1. extracting the extension from each filename and using a set.
      * 2. constructing a large pattern from the extensions and using Matcher.matches.
      * The second alternative comes close with a few tricks, but doesn't seem worth the complexity.
+     * Most importantly, making this a no-op for a large tree with no files to ignore (which is the most expensive case for this method) makes no measurable improvement.
+     * 
+     * So this method is not worth optimizing, tempting though it may look!
      */
     public static boolean nameEndsWithOneOf(String name, List<String> extensions) {
         for (String extension : extensions) {
