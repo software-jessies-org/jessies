@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.regex.*;
 
 public class FileSearcher {
-    private Pattern pattern;
+    private final Pattern pattern;
     
     /** Creates a new FileSearcher for finding the given Pattern. */
     public FileSearcher(Pattern pattern) {
