@@ -30,6 +30,7 @@ public class FileSearcher {
      */
     private void searchCharBuffer(CharSequence charSequence, Collection<String> matches) {
         // Early exit on non-matching files.
+        // Making use of the match location to optimize the loop below didn't show any significant improvement, despite doubling the amount of code.
         Matcher firstMatch = pattern.matcher(charSequence);
         if (firstMatch.find() == false) {
             return;
