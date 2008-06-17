@@ -135,8 +135,53 @@ public class FileUtilities {
     }
     
     /**
-     * Tests whether filename is a symbolic link. That is, test whether
-     * the leaf is a symbolic link, not whether we need to traverse a
+     * Tests whether filename is a symbolic link. This calls stat(2) via JNI
+     * if the JNI library is available, falling back to a pure-Java
+     * approximation otherwise.
+     * 
+     * FIXME: all of this should be replaced when Java 7 is in widespread use,
+     * and we can use the new JSR-203 functionality.
+     */
+    public static boolean isSymbolicLink(String filename) {
+        if (ensureLibraryLoaded()) {
+            try {
+                return nativeIsSymbolicLink(filename);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        } else {
+            return emulatedIsSymbolicLink(filename);
+        }
+    }
+    
+    public static boolean isSymbolicLink(File file) {
+        return isSymbolicLink(file.toString());
+    }
+    
+    private static boolean libraryLoaded = false;
+    private static boolean triedToLoadLibrary = false;
+    
+    private static synchronized boolean ensureLibraryLoaded() {
+        if (libraryLoaded == false) {
+            if (triedToLoadLibrary == false) {
+                triedToLoadLibrary = true;
+                try {
+                    FileUtilities.loadNativeLibrary("salma-hayek");
+                    libraryLoaded = true;
+                } catch (UnsatisfiedLinkError ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        return libraryLoaded;
+    }
+    
+    private static native boolean nativeIsSymbolicLink(String pathname) throws IOException;
+    
+    /**
+     * Tests heuristically whether filename is a symbolic link. That is, test
+     * whether the leaf is a symbolic link, not whether we need to traverse a
      * symbolic link to get to the leaf.
      *
      * First, consider the case where the file in question is a symbolic link.
@@ -177,11 +222,8 @@ public class FileUtilities {
      *   follow       := "/home/martind/playpen/target"
      *        => true
      */
-    public static boolean isSymbolicLink(String filename) {
+    private static boolean emulatedIsSymbolicLink(String filename) {
         File file = FileUtilities.fileFromString(filename);
-        return isSymbolicLink(file);
-    }
-    public static boolean isSymbolicLink(File file) {
         if (file.exists() == false) {
             // There are more causes of non-existent files than dangling
             // and cyclic symbolic links but, like Java, we're happy to treat

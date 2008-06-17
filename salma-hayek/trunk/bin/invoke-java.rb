@@ -123,7 +123,7 @@ class Java
     init_default_class_path()
     # We don't know the JVM's architecture at this point.
     # We've seen a number of systems which run an i386 JVM on an amd64 kernel.
-    add_pathnames_property("org.jessies.libraryDirectories", Dir.glob("#{@project_root}/.generated/*_#{target_os()}/lib"))
+    add_pathnames_property("org.jessies.libraryDirectories", Dir.glob("{#{@project_root},#{@salma_hayek}}/.generated/*_#{target_os()}/lib"))
     
     set_icons(name)
     
