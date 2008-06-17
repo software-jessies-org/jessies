@@ -1,3 +1,8 @@
+#ifdef __CYGWIN__
+// Fix jni_md.h:16: error: `__int64' does not name a type
+#include <windows.h>
+#endif
+
 #include "e_util_FileUtilities.h"
 #include "JniString.h"
 #include "unix_exception.h"
