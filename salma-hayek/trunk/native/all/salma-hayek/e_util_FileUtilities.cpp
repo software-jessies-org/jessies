@@ -8,9 +8,9 @@
 jboolean e_util_FileUtilities::nativeIsSymbolicLink(jstring javaFilename) {
     std::string filename(JniString(m_env, javaFilename));
     struct stat sb;
-    int rc = stat(filename.c_str(), &sb);
+    int rc = lstat(filename.c_str(), &sb);
     if (rc != 0) {
-        throw unix_exception("stat(\"" + filename + "\") failed");
+        throw unix_exception("lstat(\"" + filename + "\") failed");
     }
     return S_ISLNK(sb.st_mode) ? JNI_TRUE : JNI_FALSE;
 }
