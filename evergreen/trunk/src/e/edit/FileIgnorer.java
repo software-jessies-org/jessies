@@ -74,6 +74,7 @@ public class FileIgnorer {
     }
     
     public boolean isIgnoredDirectory(String filename) {
+        // Making this a no-op for a large tree with no files to ignore makes no measurable improvement to the overall indexing time.
         return uninterestingDirectoryNames.matcher(filename).matches();
     }
     
