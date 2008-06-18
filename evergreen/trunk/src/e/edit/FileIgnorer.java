@@ -23,7 +23,9 @@ public class FileIgnorer {
     
     public boolean isIgnored(File file, boolean isDirectory) {
         String filename = file.getName();
-        if (file.isHidden() || filename.startsWith(".") || filename.endsWith("~")) {
+        // FIXME: if it were cheap, we'd use File.isHidden. But it's unnecessarily expensive on Unix and not obviously useful on Windows.
+        // (Subversion for Windows doesn't use the hidden bit for its .svn directories, for example.)
+        if (filename.startsWith(".") || filename.endsWith("~")) {
             return true;
         }
         if (isDirectory) {
