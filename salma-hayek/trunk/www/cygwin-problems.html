@@ -45,4 +45,9 @@ The next major version of Cygwin will not support the old operating systems, and
 The Cygwin maintainers <a href="http://cygwin.com/ml/cygwin-patches/2006-q3/msg00014.html">didn't like the approach</a> he took.
 If you try his version, please let us know how you get on.
 
+<h2>Why does telnet(1) quit without doing anything?</h2>
+
+<p>Microsoft's telnet program does that when started from Cygwin terminals like Terminator and rxvt.
+We recommend that you install Cygwin's inetutils package, which installs a fully working /usr/bin/telnet.
+
 <!--#include virtual="/salma-hayek/footer.html" -->
