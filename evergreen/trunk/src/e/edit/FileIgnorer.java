@@ -42,7 +42,7 @@ public class FileIgnorer {
     }
     
     public boolean isIgnoredExtension(String filename) {
-        return FileIgnorer.nameEndsWithOneOf(filename, ignoredExtensions);
+        return nameEndsWithOneOf(filename, ignoredExtensions);
     }
     
     private Pattern getUninterestingDirectoryPattern() {
@@ -87,7 +87,7 @@ public class FileIgnorer {
      * 
      * So this method is not worth optimizing, tempting though it may look!
      */
-    public static boolean nameEndsWithOneOf(String name, List<String> extensions) {
+    private static boolean nameEndsWithOneOf(String name, List<String> extensions) {
         for (String extension : extensions) {
             if (name.endsWith(extension)) {
                 return true;
