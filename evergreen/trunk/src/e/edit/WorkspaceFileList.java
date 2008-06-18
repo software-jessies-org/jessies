@@ -144,7 +144,7 @@ public class WorkspaceFileList {
             // We should reload the file ignorer's configuration when we rescan.
             updateFileIgnorer();
             ArrayList<String> result = new ArrayList<String>();
-            scanDirectory(workspace.getRootDirectory(), fileIgnorer, result);
+            scanDirectory(FileUtilities.fileFromString(workspace.getRootDirectory()), fileIgnorer, result);
             Evergreen.getInstance().showStatus("Scan of \"" + workspace.getRootDirectory() + "\" complete (" + result.size() + " files)");
             
             Log.warn("Scan of " + workspace.getRootDirectory() + " took " + TimeUtilities.nsToString(System.nanoTime() - t0) + "; found " + result.size() + " files.");
@@ -166,9 +166,8 @@ public class WorkspaceFileList {
             }
         }
         
-        private void scanDirectory(String directory, FileIgnorer fileIgnorer, ArrayList<String> result) {
-            File dir = FileUtilities.fileFromString(directory);
-            File[] files = dir.listFiles();
+        private void scanDirectory(File directory, FileIgnorer fileIgnorer, ArrayList<String> result) {
+            File[] files = directory.listFiles();
             if (files == null) {
                 return;
             }
@@ -180,12 +179,11 @@ public class WorkspaceFileList {
                 if (isSymbolicLinkWithinWorkspace(file)) {
                     continue;
                 }
-                String filename = file.toString();
                 if (isDirectory) {
-                    scanDirectory(filename, fileIgnorer, result);
+                    scanDirectory(file, fileIgnorer, result);
                 } else {
                     int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()).length();
-                    result.add(filename.substring(prefixCharsToSkip));
+                    result.add(file.toString().substring(prefixCharsToSkip));
                 }
             }
         }
