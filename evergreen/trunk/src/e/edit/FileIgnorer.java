@@ -51,7 +51,7 @@ public class FileIgnorer {
         // Start with the default ignored directory patterns.
         // autotools directories:
         patterns.add("\\.deps");
-        patterns.add("autom4te.cache");
+        patterns.add("autom4te\\.cache");
         // SCM directories:
         patterns.add("\\.bzr");
         patterns.add("\\.hg");
