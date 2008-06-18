@@ -37,7 +37,7 @@ Even then, if you're programming or doing system administration on Windows, inst
 Cygwin itself doesn't yet support UTF-8 filenames.
 You can happily edit UTF-8 files or view UTF-8 manual pages or whatever, but you will have problems if you need to deal with non-ASCII filenames.
 
-<p>The Windows NT/2000/2003/XP/Vista family use UTF-16 internally but the older Windows operating systems (such as Windows 95/98/ME) didn't support Unicode at all, so it would be difficult for Cygwin to use the UTF-16 interfaces without dropping support for the older operating systems.
+<p>The Windows NT/2000/2003/XP/Vista family use two-byte Unicode characters internally but the older Windows operating systems (such as Windows 95/98/ME) didn't support Unicode at all, so it would be difficult for Cygwin to use the UTF-16 interfaces without dropping support for the older operating systems.
 The next major version of Cygwin will not support the old operating systems, and hopefully we'll see UTF-8 filename support at that time.
 
 <p>In the meantime, Suzuki Hisao maintains an ambitious <a href="http://www.okisoft.co.jp/esc/utf8-cygwin/">UTF-8 patch for Cygwin</a>.
