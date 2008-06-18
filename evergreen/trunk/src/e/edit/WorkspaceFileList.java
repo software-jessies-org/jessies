@@ -116,7 +116,12 @@ public class WorkspaceFileList {
     }
     
     private class FileListUpdater extends SwingWorker<ArrayList<String>, Object> {
+        private final String workspaceRoot;
+        private final int prefixCharsToSkip;
+        
         public FileListUpdater() {
+            this.workspaceRoot = workspace.getRootDirectory();
+            this.prefixCharsToSkip = FileUtilities.parseUserFriendlyName(workspaceRoot).length();
             fireListeners(false);
             fileList = null;
         }
@@ -138,16 +143,16 @@ public class WorkspaceFileList {
          * Builds a list of files for Open Quickly.
          */
         private ArrayList<String> scanWorkspaceForFiles() {
-            Log.warn("Scanning " + workspace.getRootDirectory() + " for interesting files.");
+            Log.warn("Scanning " + workspaceRoot + " for interesting files.");
             final long t0 = System.nanoTime();
             
             // We should reload the file ignorer's configuration when we rescan.
             updateFileIgnorer();
             ArrayList<String> result = new ArrayList<String>();
-            scanDirectory(FileUtilities.fileFromString(workspace.getRootDirectory()), fileIgnorer, result);
-            Evergreen.getInstance().showStatus("Scan of \"" + workspace.getRootDirectory() + "\" complete (" + result.size() + " files)");
+            scanDirectory(FileUtilities.fileFromString(workspaceRoot), fileIgnorer, result);
+            Evergreen.getInstance().showStatus("Scan of \"" + workspaceRoot + "\" complete (" + result.size() + " files)");
             
-            Log.warn("Scan of " + workspace.getRootDirectory() + " took " + TimeUtilities.nsToString(System.nanoTime() - t0) + "; found " + result.size() + " files.");
+            Log.warn("Scan of " + workspaceRoot + " took " + TimeUtilities.nsToString(System.nanoTime() - t0) + "; found " + result.size() + " files.");
             return result;
         }
         
@@ -182,7 +187,6 @@ public class WorkspaceFileList {
                 if (isDirectory) {
                     scanDirectory(file, fileIgnorer, result);
                 } else {
-                    int prefixCharsToSkip = FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()).length();
                     result.add(file.toString().substring(prefixCharsToSkip));
                 }
             }
