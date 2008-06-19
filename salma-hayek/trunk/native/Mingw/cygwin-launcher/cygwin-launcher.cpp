@@ -45,9 +45,9 @@ void launchCygwin(char** argValues) {
     // We mustn't quote the program argument but we must quote argv[0].
     arguments.push_back(quote(program));
     // Make sure we invoke the Cygwin rubyw, not any native version that might be ahead of it on the PATH.
-    // cygwinBin includes a trailing backslash.
-    checkReadableFile("Cygwin DLL", cygwinBin + "cygwin1.dll");
-    arguments.push_back(quote(cygwinBin + "rubyw"));
+    // cygwinBin does not include a trailing backslash.
+    checkReadableFile("Cygwin DLL", cygwinBin + "\\cygwin1.dll");
+    arguments.push_back(quote(cygwinBin + "\\rubyw"));
     while (*argValues != 0) {
         const char* argument = *argValues;
         arguments.push_back(quote(argument));
