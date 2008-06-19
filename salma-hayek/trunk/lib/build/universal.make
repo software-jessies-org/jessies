@@ -779,6 +779,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	@echo Compiling $(notdir $<)...
 	HUMAN_PROJECT_NAME=$(HUMAN_PROJECT_NAME) \
 	MACHINE_PROJECT_NAME=$(MACHINE_PROJECT_NAME) \
+	OPEN_HERE_GUID=$(makeGuid) \
 	PATH_GUID=$(makeGuid) \
 	PRODUCT_GUID=$(makeGuid) \
 	SHORTCUT_HKCU_GUID=$(makeGuid) \
