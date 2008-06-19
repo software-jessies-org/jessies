@@ -64,11 +64,13 @@
       <Component Id='RubyShortcut_HKLM' Guid='$(env.SHORTCUT_HKLM_GUID)'>
         <!-- This HKLM-related key is in HKCU deliberately to pass ICE43... but we should be able to "advertise" a shortcut now we install the target -->
         <Registry Id='RegistryKey_HKLM' Root='HKCU' Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)' Name='ShortcutTarget' Action='write' Type='string' Value='[RUBYW_HKLM]' KeyPath='yes' />
-        <Shortcut Id='DesktopShortcutId_HKLM' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[Resources]salma-hayek\.generated\i386_Cygwin\bin\cygwin-launcher' Arguments='"[CYGWIN_HKLM_BIN]" "[projectResources]bin\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='CYGWIN_HKLM_BIN' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
+        <!-- CYWGIN_HKLM_BIN ends with a backslash that escapes the quote after it -->
+        <Shortcut Id='DesktopShortcutId_HKLM' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[Resources]salma-hayek\.generated\i386_Cygwin\bin\cygwin-launcher' Arguments='"[CYGWIN_HKLM_BIN]\" "[projectResources]bin\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='CYGWIN_HKLM_BIN' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
       </Component>
       <Component Id='RubyShortcut_HKCU' Guid='$(env.SHORTCUT_HKCU_GUID)'>
         <Registry Id='RegistryKey_HKCU' Root='HKCU' Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)' Name='ShortcutTarget' Action='write' Type='string' Value='[RUBYW_HKCU]' KeyPath='yes' />
-        <Shortcut Id='DesktopShortcutId_HKCU' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[Resources]salma-hayek\.generated\i386_Cygwin\bin\cygwin-launcher' Arguments='"[CYGWIN_HKCU_BIN]" "[projectResources]bin\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='CYGWIN_HKCU_BIN' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
+        <!-- CYWGIN_HKCU_BIN ends with a backslash that escapes the quote after it -->
+        <Shortcut Id='DesktopShortcutId_HKCU' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[Resources]salma-hayek\.generated\i386_Cygwin\bin\cygwin-launcher' Arguments='"[CYGWIN_HKCU_BIN]\" "[projectResources]bin\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='CYGWIN_HKCU_BIN' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
       </Component>
       <Component Id='OpenHere' Guid='$(env.OPEN_HERE_GUID)'>
       </Component>
