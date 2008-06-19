@@ -6,6 +6,9 @@ salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
 
 require "#{salma_hayek}/lib/build/uuid.rb"
 
+xmlToInjectAfterCygwinLauncher = <<EOT
+EOT
+
 directoryPathToFileNames = Hash.new() {
   |hash, directoryPath|
   hash[directoryPath] = []
@@ -39,6 +42,9 @@ directoryPathToFileNames.each_pair() {
     filePathComponents = pathComponents + [fileName]
     filePath = filePathComponents.join("/")
     puts("<File Id='file#{fileNumber}' Name='name#{fileNumber}' LongName='#{fileName}' DiskId='1' src='#{filePath}' />")
+    if fileName == "cygwin-launcher.exe"
+      puts(xmlToInjectAfterCygwinLauncher)
+    end
     fileNumber += 1
   }
   puts("</Component>")
