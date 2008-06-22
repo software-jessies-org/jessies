@@ -23,11 +23,13 @@ void launchCygwin(char** argValues) {
         throw std::runtime_error(std::string("couldn't determine directory from which ") + ARGV0 + " was run");
     }
     std::string directory = ARGV0.substr(0, lastBackslash);
+    
     if (*argValues == 0) {
         throw std::runtime_error("missing Cygwin bin directory");
     }
     std::string cygwinBin = *argValues;
     ++ argValues;
+    
     const char* oldPath = getenv("PATH");
     if (oldPath == 0) {
         throw std::runtime_error("getenv(\"PATH\") implausibly returned null");
@@ -38,6 +40,7 @@ void launchCygwin(char** argValues) {
     if (putenv(putenvArgument.c_str()) == -1) {
         throw unix_exception(std::string("putenv(\"") + putenvArgument + "\")");
     }
+    
     // Windows requires that we quote the arguments ourselves.
     typedef std::vector<std::string> Arguments;
     Arguments arguments;
@@ -52,6 +55,7 @@ void launchCygwin(char** argValues) {
         arguments.push_back(quote(argument));
         ++ argValues;
     }
+    
     typedef std::vector<char*> ArgValues;
     ArgValues childArgValues;
     for (Arguments::iterator it = arguments.begin(), en = arguments.end(); it != en; ++ it) {
