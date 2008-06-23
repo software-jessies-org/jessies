@@ -33,7 +33,8 @@
       </Directory>
       <Directory Id='DesktopFolder' Name='Desktop' />
       <Component Id='ShortcutComponent' Guid='$(env.SHORTCUT_GUID)'>
-        <!-- This key is in HKCU deliberately to pass ICE43... but we should be able to "advertise" a shortcut now we install the target -->
+        <!-- This key is in HKCU deliberately to pass ICE43 -->
+        <!-- http://forum.installsite.net/index.php?showtopic=15661 says that we need to keep this hack if we ever want the shortcut to be optional -->
         <Registry Id='ShortcutRegistryKey' Root='HKCU' Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)' Name='ShortcutTarget' Action='write' Type='string' KeyPath='yes' />
         <Shortcut Id='ShortcutShortcut' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[Resources]salma-hayek\.generated\i386_Cygwin\bin\cygwin-launcher' Arguments='"[projectResources]bin\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='DesktopFolder' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
       </Component>
