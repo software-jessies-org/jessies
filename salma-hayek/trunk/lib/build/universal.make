@@ -92,7 +92,7 @@ takeProfileSample =
 symlink.$(TARGET_OS) = ln -s $(1) $(2)
 # Use cp for the benefit of Windows native compilers which don't
 # understand "symlinks".
-symlink.Cygwin = cp $(1) $(2) && chmod a-w $(2)
+symlink.Cygwin = cp $(1) $(2).tmp && chmod a-w $(2).tmp && mv $(2).tmp $(2)
 
 symlink = $(symlink.$(TARGET_OS))
 
