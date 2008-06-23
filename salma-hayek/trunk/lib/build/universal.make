@@ -784,8 +784,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	OPEN_HERE_GUID=$(makeGuid) \
 	PATH_GUID=$(makeGuid) \
 	PRODUCT_GUID=$(makeGuid) \
-	SHORTCUT_HKCU_GUID=$(makeGuid) \
-	SHORTCUT_HKLM_GUID=$(makeGuid) \
+	SHORTCUT_GUID=$(makeGuid) \
 	STANDARD_FILES_GUID=$(makeGuid) \
 	UPGRADE_GUID=$(UPGRADE_GUID) \
 	VERSION_STRING=$(VERSION_STRING) \
