@@ -54,7 +54,9 @@
     <Feature Id='product' Title='$(env.HUMAN_PROJECT_NAME)' Level='1'>
       <ComponentRef Id='Path' /><?include component-references.wxi ?>
     </Feature>
-    <Feature Id='OpenHereFeature' Title='Open $(env.HUMAN_PROJECT_NAME) Here' Level='1'>
+    <Feature Id='OpenHereFeature' Title='Open $(env.HUMAN_PROJECT_NAME) Here' Level='0'>
+      <!-- This hack will do until we have a second example -->
+      <Condition Level='1'>"$(env.MACHINE_PROJECT_NAME)"="terminator"</Condition>
       <ComponentRef Id='OpenHere' />
     </Feature>
     <InstallExecuteSequence>
