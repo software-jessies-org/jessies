@@ -28,10 +28,6 @@ Bugs
 <Verb Id='OpenHere_Directory_Verb' Sequence='10' Argument='[projectResources]bin\\$(env.MACHINE_PROJECT_NAME)" --working-directory "%L"' Command='Open $(env.HUMAN_PROJECT_NAME) Here' />
 </Extension>
 
-* We could get rid of the bogus registry entries we have to create at the moment now that the target of our desktop shortcut is a file that we install ourselves.  If I don't "advertise" the shortcut, then Orca complains that I have a mix of HKLM and HKCU data (the Cygwin paths) in a non-advertised shortcut.  Advertised shortcuts don't let the user see or edit the arguments, which might help if finger trouble were our biggest problem but seems like a bad idea for us.  This successfully created one:
-
-<Shortcut Id='DesktopShortcutId' Advertise='yes' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME) 2' Arguments='"[CYGWIN_HKLM_BIN]" "[CYGWIN_HKCU_BIN]" "[projectResources]bin\\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='DesktopFolder' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
-
 * The selection is cleared a little over-zealously when text changes: if
   the text changes are above the selection, the selection is still changed
   even if the selection contents were not changed.
