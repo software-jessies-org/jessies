@@ -1,18 +1,66 @@
-#include <stdlib.h>
-#include <string>
-#include <unistd.h>
-#include <vector>
-#include <windows.h>
-
 #include "checkReadableFile.h"
 #include "join.h"
 #include "reportFatalErrorViaGui.h"
 #include "toString.h"
 #include "unix_exception.h"
 #include "WindowsDllErrorModeChange.h"
+#include "WindowsError.h"
+
+#include <deque>
+#include <stdlib.h>
+#include <string>
+#include <unistd.h>
+#include <vector>
+#include <windows.h>
 
 std::string quote(const std::string& argument) {
     return std::string("\"") + argument + ("\"");
+}
+
+std::string readRegistryString(HKEY hive, const char* keyName, const char* valueName) {
+    HKEY keyHandle;
+    // RegGetValue would be more convenient but is only available on recent versions of Windows.
+    LONG errorCode = RegOpenKey(hive, keyName, &keyHandle);
+    if (errorCode != ERROR_SUCCESS) {
+        throw WindowsError("RegOpenKey(" + toString(hive) + ", " + keyName + ", &keyHandle)", errorCode);
+    }
+    // MAX_PATH seems likely to be enough.
+    std::vector<BYTE> buffer(MAX_PATH);
+    DWORD type;
+    DWORD size = buffer.size();
+    // FIXME: We could make some effort towards Unicode support.
+    errorCode = RegQueryValueEx(keyHandle, valueName, 0, &type, &buffer[0], &size);
+    if (errorCode != ERROR_SUCCESS) {
+        throw WindowsError("RegQueryValueEx(" + toString(keyHandle) + ", " + valueName + ", 0, &type, &buffer[0], &size)", errorCode);
+    }
+    if (type != REG_SZ) {
+        throw std::runtime_error("The type of registry entry hive " + toString(hive) + ", key " + keyName + ", value " + valueName + " was not REG_SZ (" + toString(REG_SZ) + ") as expected but " + toString(type));
+    }
+    // MSDN's article on RegQueryValueEx explains that the value may or may not include the null terminator.
+    if (size != 0 && buffer[size - 1] == 0) {
+        -- size;
+    }
+    return std::string(reinterpret_cast<const char*>(&buffer[0]), size);
+}
+
+std::string findCygwinBin() {
+    std::ostringstream os;
+    typedef std::deque<HKEY> Hives;
+    Hives hives;
+    hives.push_back(HKEY_LOCAL_MACHINE);
+    hives.push_back(HKEY_CURRENT_USER);
+    for (Hives::const_iterator it = hives.begin(), en = hives.end(); it != en; ++ it) {
+        HKEY hive = *it;
+        try {
+            std::string cygwinRoot = readRegistryString(hive, "Software\\Cygnus Solutions\\Cygwin\\mounts v2\\/", "native");
+            std::string cygwinBin = cygwinRoot + "\\bin";
+            return cygwinBin;
+        } catch (const std::exception& ex) {
+            os << ex.what();
+            os << std::endl;
+        }
+    }
+    throw std::runtime_error(std::string("failed to find Cygwin, errors were:\n") + os.str());
 }
 
 void launchCygwin(char** argValues) {
@@ -24,11 +72,7 @@ void launchCygwin(char** argValues) {
     }
     std::string directory = ARGV0.substr(0, lastBackslash);
     
-    if (*argValues == 0) {
-        throw std::runtime_error("missing Cygwin bin directory");
-    }
-    std::string cygwinBin = *argValues;
-    ++ argValues;
+    std::string cygwinBin = findCygwinBin();
     
     const char* oldPath = getenv("PATH");
     if (oldPath == 0) {

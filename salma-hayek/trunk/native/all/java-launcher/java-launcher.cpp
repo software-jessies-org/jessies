@@ -156,7 +156,7 @@ static std::string readFile(const std::string& path) {
 
 static std::string readRegistryFile(const std::string& path) {
     std::string contents = readFile(path);
-    // Cygwin's representation of REG_SZ keys seems to include the null terminator.
+    // MSDN's article on RegQueryValueEx explains that the value may or may not include the null terminator.
     if (contents.empty() == false && contents[contents.size() - 1] == '\0') {
         return contents.substr(0, contents.size() - 1);
     }

@@ -10,9 +10,18 @@
 #include <windows.h>
 
 struct WindowsError : std::runtime_error {
+private:
+    // FIXME: I know the FormatMessage magic to convert these numeric errors to strings.
+    static std::string makeErrorMessage(const std::string& description, DWORD errorCode) {
+        return description + " failed with Windows error code " + toString(errorCode);
+    }
+    
+public:
     WindowsError(const std::string& description)
-    // FIXME: I know the magic to convert these numeric errors to strings.
-    : std::runtime_error(description + " failed with Windows error code " + toString(GetLastError())) {
+    : std::runtime_error(makeErrorMessage(description, GetLastError())) {
+    }
+    WindowsError(const std::string& description, DWORD errorCode)
+    : std::runtime_error(makeErrorMessage(description, errorCode)) {
     }
 };
 
