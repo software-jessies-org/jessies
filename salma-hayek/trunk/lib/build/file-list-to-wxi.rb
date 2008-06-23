@@ -7,7 +7,10 @@ salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
 require "#{salma_hayek}/lib/build/uuid.rb"
 
 xmlToInjectAfterCygwinLauncher = <<EOT
+<Shortcut Id='ShortcutShortcut' Advertise='yes' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Arguments='"[projectResources]bin\\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='DesktopFolder' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
 EOT
+# While an advertised shortcut seems to be the approach we're expected to take, it can't be made optional.
+xmlToInjectAfterCygwinLauncher = ""
 
 directoryPathToFileNames = Hash.new() {
   |hash, directoryPath|
