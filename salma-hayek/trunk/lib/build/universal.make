@@ -892,6 +892,7 @@ run-installer.dmg:
 
 .PHONY: run-installer.msi
 run-installer.msi:
+	@echo Running Windows installer...
 	msiexec /i $(NATIVE_NAME_FOR_INSTALLERS)
 
 # This only works if this is precisely the same version that was installed.
