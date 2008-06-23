@@ -32,8 +32,6 @@ Bugs
 
 <Shortcut Id='DesktopShortcutId' Advertise='yes' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME) 2' Arguments='"[CYGWIN_HKLM_BIN]" "[CYGWIN_HKCU_BIN]" "[projectResources]bin\\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='DesktopFolder' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
 
-  I think the way forwards involves moving the Cygwin registry key hunting code out of the .wxs file and into cygwin-launcher.  That might allow a non-advertised shortcut to work and would certainly allow half the .wxs file to be chucked out.  You'd only find out that you needed Cygwin and Cygwin Ruby at runtime, but that's OK.
-
 * The selection is cleared a little over-zealously when text changes: if
   the text changes are above the selection, the selection is still changed
   even if the selection contents were not changed.
