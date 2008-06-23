@@ -2,26 +2,26 @@
 .SH NAME
 terminator \- terminal emulator
 .SH SYNOPSIS
-terminator [[-n NAME] [--working-directory DIR] [COMMAND]]...
+terminator [[\-n NAME] [\-\-working\-directory DIR] [COMMAND]]...
 .SH DESCRIPTION
 Each call to "terminator" creates a single window containing an arbitrary number of tabs.
 
-X11-like -xrm arguments are accepted but ignored for backwards compatibility.
+X11-like \-xrm arguments are accepted but ignored for backwards compatibility.
 
-XTerm-like -e and -T options are fully supported for backwards compatibility.
+XTerm-like \-e and \-T options are fully supported for backwards compatibility.
 .SH EXAMPLES
 This command (all one line) opens one new window containing two tabs called "console 1" and "console 2".
 .nf
 .sp
-  terminator -n "console 1" "telnet 192.168.32.32 2001" \\
-             -n "console 2" "telnet 192.168.32.32 2002" &
+  terminator \-n "console 1" "telnet 192.168.32.32 2001" \\
+             \-n "console 2" "telnet 192.168.32.32 2002" &
 .sp
 .fi
 These two commands opens two new windows called "console 1" and "console 2".
 .nf
 .sp
-  terminator -n "console 1" "telnet 192.168.32.32 2001" &
-  terminator -n "console 2" "telnet 192.168.32.32 2002" &
+  terminator \-n "console 1" "telnet 192.168.32.32 2001" &
+  terminator \-n "console 2" "telnet 192.168.32.32 2002" &
 .sp
 .fi
 Note the use of & to background the startup script. Don't use this if you want to wait for the terminal(s) to be closed.
