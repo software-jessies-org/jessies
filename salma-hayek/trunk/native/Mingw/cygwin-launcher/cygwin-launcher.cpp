@@ -19,7 +19,7 @@ std::string quote(const std::string& argument) {
 
 std::string readRegistryString(HKEY hive, const char* keyName, const char* valueName) {
     HKEY keyHandle;
-    // RegGetValue would be more convenient but is only available on recent versions of Windows.
+    // RegGetValue would let us replace most of this function with a single line but "Requires Windows Vista or Windows XP Professional x64 Edition".
     LONG errorCode = RegOpenKey(hive, keyName, &keyHandle);
     if (errorCode != ERROR_SUCCESS) {
         throw WindowsError("RegOpenKey(" + toString(hive) + ", " + keyName + ", &keyHandle)", errorCode);
