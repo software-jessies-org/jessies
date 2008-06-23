@@ -89,15 +89,17 @@ SPACE = $(subst :, ,:)
 #takeProfileSample = $(eval $(shell date --iso=s 1>&2))
 takeProfileSample =
 
-SYMLINK.$(TARGET_OS) = ln -s
+symlink.$(TARGET_OS) = ln -s $(1) $(2)
 # Use cp for the benefit of Windows native compilers which don't
 # understand "symlinks".
-SYMLINK.Cygwin = cp
+symlink.Cygwin = cp $(1) $(2) && chmod a-w $(2)
+
+symlink = $(symlink.$(TARGET_OS))
 
 define COPY_RULE
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	$(SYMLINK.$(TARGET_OS)) $< $@
+	$(call symlink,$<,$@)
 endef
 
 export MAKE
