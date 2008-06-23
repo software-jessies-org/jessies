@@ -67,7 +67,16 @@ else
     # Use this to report exceptions thrown by the given block.
     def report_exceptions(app_name, &block)
         begin
-            block.call()
+            # Our Windows desktop shortcuts get started from Cygwin's /bin directory.
+            # We want to behave as if started from the invoking user's home directory.
+            if ENV["RUBY_LAUNCHER_INVOKING"]
+                ENV["RUBY_LAUNCHER_INVOKING"] = nil
+                Dir.chdir() {
+                    block.call()
+                }
+            else
+                block.call()
+            end
         rescue Exception => e
             show_uncaught_exception(app_name, e)
         end
