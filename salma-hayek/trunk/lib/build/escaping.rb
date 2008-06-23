@@ -1,5 +1,3 @@
-#!/usr/bin/ruby -w
-
 require 'cgi'
 
 def escapeTextLineToHtml(line)
