@@ -378,7 +378,7 @@ if target_os() == "Linux"
         control.puts("Depends: #{depends}")
         control.puts("Build-Depends: #{build_depends}")
         control.puts("Installed-Size: #{installed_size}")
-        control.puts("Maintainer: software.jessies.org <software@jessies.org>")
+        control.puts("Maintainer: software.jessies.org team <software@jessies.org>")
         control.puts("Description: #{generate_debian_package_description(human_project_name)}")
     }
 end
