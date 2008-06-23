@@ -115,11 +115,19 @@ public final class InAppServer {
         private ConnectionAccepter(File portFile, InetAddress inetAddress) throws IOException {
             this.socket = new ServerSocket();
             socket.bind(new InetSocketAddress(inetAddress, 0));
-            writeHostAndPortToFile(portFile);
+            writeHostAndPortToFile(portFile, inetAddress);
         }
         
-        private void writeHostAndPortToFile(File portFile) {
-            String host = socket.getInetAddress().getHostName();
+        private void writeHostAndPortToFile(File portFile, InetAddress inetAddress) {
+            if (inetAddress == null) {
+                try {
+                    inetAddress = InetAddress.getLocalHost();
+                } catch (UnknownHostException ex) {
+                    Log.warn("Problem finding a local IP address", ex);
+                    inetAddress = socket.getInetAddress();
+                }
+            }
+            String host = inetAddress.getHostName();
             int port = socket.getLocalPort();
             // The motivation for the Log.warn would be better satisfied by Bug 38.
             Log.warn("echo " + host + ":" + port + " > " + portFile);
