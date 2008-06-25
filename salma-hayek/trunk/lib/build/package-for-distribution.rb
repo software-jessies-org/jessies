@@ -210,9 +210,9 @@ def copyTerminfoTo(usr_share_terminfo)
         if File.directory?("#{generated_terminfo_root}#{terminfo_file}")
             next
         end
-        FileUtils.mkdir_p("#{usr_share_terminfo}/#{terminfo_file}")
-        FileUtils.rmdir("#{usr_share_terminfo}/#{terminfo_file}")
-        FileUtils.cp(File.join(generated_terminfo_root, terminfo_file), "#{usr_share_terminfo}/#{terminfo_file}")
+        first_letter = terminfo_file[0, 1]
+        FileUtils.mkdir_p("#{usr_share_terminfo}/#{first_letter}")
+        FileUtils.cp(File.join(generated_terminfo_root, terminfo_file), "#{usr_share_terminfo}/#{first_letter}/#{terminfo_file}")
     }
 end
     
