@@ -204,8 +204,6 @@ NAVIGATION
 
 + Remove search field from tags panel, and add an action that pops up a filtering-list dialog.
 
-+ Some way to go quickly from a #include to a header file.
-
 + A way to make caseChangesLikeThis count as word breaks. (Xcode 1.5 does this with control + arrow keys.)
 
 + Make the arrow keys move through 4-space tabs?

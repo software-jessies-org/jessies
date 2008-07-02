@@ -35,6 +35,7 @@ public class EvergreenMenuBar extends EMenuBar {
         JMenu menu = new JMenu("File");
         menu.add(new NewFileAction());
         menu.add(new OpenQuicklyAction());
+        menu.add(new OpenImportAction());
         menu.add(new OpenAction());
         // FIXME: Should be "Open Recent >" here.
 
