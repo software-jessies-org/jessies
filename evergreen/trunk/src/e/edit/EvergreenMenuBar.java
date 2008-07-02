@@ -124,6 +124,10 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new JSeparator());
         menu.add(new CheckForLintAction());
         
+        menu.add(new JSeparator());
+        menu.add(makeExternalToolAction("Sort", "sort"));
+        menu.add(makeExternalToolAction("Sort and Remove Duplicates", "sort -u"));
+        
         ExternalToolsParser toolsParser = new ExternalToolsParser() {
             public void addItem(ExternalToolAction action) {
                 menu.add(action);
@@ -135,6 +139,12 @@ public class EvergreenMenuBar extends EMenuBar {
         };
         toolsParser.parse();
         return menu;
+    }
+    
+    private ExternalToolAction makeExternalToolAction(String name, String command) {
+        ExternalToolAction result = new ExternalToolAction(name, ToolInputDisposition.SELECTION_OR_DOCUMENT, ToolOutputDisposition.REPLACE, command);
+        result.setNeedsFile(true);
+        return result;
     }
     
     private JMenu makeDocumentationMenu() {
