@@ -182,10 +182,6 @@ EDITING
 
 + Text > Convert > Spaces to Tabs / Tabs to Spaces
 
-+ Text > Sort (selection/whole document)
-
-+ Text > Remove Duplicate Lines (like uniq(1), or without the requirement that the input be sorted?) 
-
 + Text > Shift Left (command-[) / Shift Right (command-]) add or remove one level of indentation
 
 + Text > Execute Line Inserting Result (control-R; actually inserts '\n' first) / Filter Through Command... (alt-command-R) 
