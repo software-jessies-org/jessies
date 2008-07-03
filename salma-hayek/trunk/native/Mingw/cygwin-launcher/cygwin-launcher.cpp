@@ -45,6 +45,13 @@ std::string readRegistryString(HKEY hive, const char* keyName, const char* value
 
 std::string findCygwinBin() {
     std::ostringstream os;
+    os << "This program requires Cygwin and Cygwin Ruby.\n";
+    os << "If you have never heard of Cygwin, then you do not have it installed.\n";
+    os << "If you want to install it, then you're in for a fun ride.\n";
+    os << "See http://software.jessies.org/salma-hayek/cygwin-setup.html for installation and setup hints.\n";
+    os << "The rest of this message is only relevant if you have Cygwin installed.\n";
+    os << "\n";
+    os << "We failed to find Cygwin, the errors were:\n";
     typedef std::deque<HKEY> Hives;
     Hives hives;
     hives.push_back(HKEY_LOCAL_MACHINE);
@@ -60,7 +67,7 @@ std::string findCygwinBin() {
             os << std::endl;
         }
     }
-    throw std::runtime_error(std::string("failed to find Cygwin, errors were:\n") + os.str());
+    throw std::runtime_error(os.str());
 }
 
 void launchCygwin(char** argValues) {
