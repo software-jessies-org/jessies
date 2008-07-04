@@ -33,12 +33,20 @@ public class OpenImportAction extends ETextAction {
         
         // Rewrite boilerplate to get a path fragment.
         if (fileType == FileType.C_PLUS_PLUS) {
-            // Get rid of "#include <...>" in C++.
+            // Get rid of "#include <...>".
             path = path.replaceAll("^\\s*#\\s*include\\s+[<\"]([^>\"]+)[\">].*", "$1");
         } else if (fileType == FileType.JAVA) {
-            // Get rid of "import ...;", rewrite '.' as File.separatorChar, and append ".java".
+            // Get rid of "import ...;".
             path = path.replaceAll("^\\s*import\\s+(.+)\\s*;.*", "$1");
+            // Rewrite '.' as File.separatorChar, and append the missing ".java".
             path = path.replace('.', '/') + ".java";
+        } else if (fileType == FileType.RUBY) {
+            // Get rid of "require '...'".
+            path = path.replaceAll("^\\s*require\\s+['\"](.+)['\"].*", "$1");
+            // Make sure the trailing ".rb" is present.
+            if (path.endsWith(".rb") == false) {
+                path += ".rb";
+            }
         }
         
         if (path.startsWith("~") || path.startsWith("/")) {
@@ -51,7 +59,7 @@ public class OpenImportAction extends ETextAction {
         // FIXME: use per-language import paths. This temporarily hard-coded one obviously only applies to C++.
         // FIXME: allow the path(s) to be overridden.
         // FIXME: we should probably allow "." and interpret it as "the directory containing the current file". maybe just implicitly always check there first?
-        List<String> importPath = Arrays.asList("/usr/include/:/usr/include/c++/4.2/:native/Headers/".split(":"));
+        List<String> importPath = Arrays.asList("/usr/include/:/usr/include/c++/4.2/:/usr/lib/ruby/1.8/:native/Headers/".split(":"));
         for (String importDir : importPath) {
             File file;
             if (importDir.startsWith("/")) {
