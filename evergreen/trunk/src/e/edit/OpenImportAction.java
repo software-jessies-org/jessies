@@ -21,10 +21,15 @@ public class OpenImportAction extends ETextAction {
     
     public void actionPerformed(ActionEvent e) {
         final Evergreen editor = Evergreen.getInstance();
-        final FileType fileType = getFocusedTextWindow().getFileType();
+        final ETextWindow textWindow = getFocusedTextWindow();
+        final FileType fileType = textWindow.getFileType();
         
-        // FIXME: if there's no selection, take the whole of the current line.
         String path = getSelectedText().trim();
+        if (path.length() == 0) {
+            // There was no selection, so grab the whole of the current line.
+            final ETextArea textArea = textWindow.getTextArea();
+            path = textArea.getLineText(textArea.getLineOfOffset(textArea.getSelectionStart()));
+        }
         
         // Rewrite boilerplate to get a path fragment.
         if (fileType == FileType.C_PLUS_PLUS) {
