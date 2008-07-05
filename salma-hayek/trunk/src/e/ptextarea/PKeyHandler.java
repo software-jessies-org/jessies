@@ -113,6 +113,8 @@ public class PKeyHandler implements KeyListener {
             moveCaret(extendingSelection, caretToStartOfLine());
         } else if (isEndOfLineKey(event)) {
             moveCaret(extendingSelection, caretToEndOfLine());
+        } else if (isMatchingBracketKey(event)) {
+            moveCaret(extendingSelection, caretToMatchingBracket());
         } else if (extendingSelection && key == KeyEvent.VK_PAGE_DOWN) {
             moveCaret(extendingSelection, caretPageDown());
         } else if (extendingSelection && key == KeyEvent.VK_PAGE_UP) {
@@ -164,6 +166,10 @@ public class PKeyHandler implements KeyListener {
         } else {
             return (e.getKeyCode() == KeyEvent.VK_END);
         }
+    }
+    
+    private boolean isMatchingBracketKey(KeyEvent e) {
+        return (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_5);
     }
     
     private boolean isStartOfTextKey(KeyEvent e) {
@@ -293,6 +299,21 @@ public class PKeyHandler implements KeyListener {
     private int caretToEndOfLine() {
         int lineIndex = textArea.getLineOfOffset(textArea.getUnanchoredSelectionExtreme());
         return textArea.getLineEndOffsetBeforeTerminator(lineIndex);
+    }
+    
+    private int caretToMatchingBracket() {
+        int caretOffset = textArea.getUnanchoredSelectionExtreme();
+        if (PBracketUtilities.isNextToBracket(textArea.getTextBuffer(), caretOffset) == false) {
+            // We're not next to a bracket.
+            return caretOffset;
+        }
+        int bracketOffset = PBracketUtilities.findMatchingBracketInSameStyle(textArea, caretOffset);
+        if (bracketOffset == -1) {
+            // No matching bracket.
+            return caretOffset;
+        }
+        // We want to land "inside" the brackets, so going backwards we want the offset of the character after the bracket.
+        return (bracketOffset < caretOffset) ? (bracketOffset + 1) : bracketOffset;
     }
     
     private void moveLeft(boolean byWord, boolean extendingSelection) {
