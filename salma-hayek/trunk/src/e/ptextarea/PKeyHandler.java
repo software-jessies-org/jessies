@@ -33,7 +33,6 @@ public class PKeyHandler implements KeyListener {
     }
     
     public void keyPressed(KeyEvent e) {
-        userIsTyping();
         // This is disabled because it's not been useful for years, and steals three key combinations.
         if (false && e.isControlDown() && e.isShiftDown()) {
             switch (e.getKeyCode()) {
@@ -54,8 +53,8 @@ public class PKeyHandler implements KeyListener {
     }
     
     public void keyTyped(KeyEvent e) {
-        userIsTyping();
         if (isInsertableCharacter(e) && textArea.isEditable()) {
+            userIsTyping();
             insertCharacter(e.getKeyChar()); // Only the char is usable in these events anyway.
             e.consume();
         }
