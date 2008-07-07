@@ -83,28 +83,28 @@ public class PMouseHandler implements MouseInputListener {
     
     public void mouseMoved(MouseEvent e) {
         trackMouse(e);
-        updateCursorAndToolTip();
+        updateCursorAndToolTip(e.isControlDown());
     }
     
     public void mouseEntered(MouseEvent e) {
         trackMouse(e);
-        updateCursorAndToolTip();
+        updateCursorAndToolTip(e.isControlDown());
     }
     
     public void mouseExited(MouseEvent e) {
         trackMouse(e);
-        updateCursorAndToolTip();
+        updateCursorAndToolTip(e.isControlDown());
     }
     
     private void trackMouse(MouseEvent e) {
         lastKnownPosition = e.getPoint();
     }
     
-    public void updateCursorAndToolTip() {
+    public void updateCursorAndToolTip(boolean isControlDown) {
         Cursor newCursor = null;
         String newToolTip = null;
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
-        if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
+        if (segment != null && isControlDown == false && segment.getStyle() == PStyle.HYPERLINK) {
             newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
             newToolTip = ((PTextSegment) segment).getToolTip();
         }
@@ -115,6 +115,11 @@ public class PMouseHandler implements MouseInputListener {
     private void handleHyperlinks(MouseEvent e) {
         if (SwingUtilities.isLeftMouseButton(e) == false) {
             // You can only follow a link with a left-click. Middle clicks are for pasting, and right clicks are for menus.
+            return;
+        }
+        if (e.isControlDown()) {
+            // Holding down control lets the user say "I want to position the caret inside this link, not follow it".
+            // (We can't use shift because that's used to extend the selection.)
             return;
         }
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);

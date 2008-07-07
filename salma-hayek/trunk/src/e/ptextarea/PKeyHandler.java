@@ -25,14 +25,17 @@ import e.util.*;
  */
 public class PKeyHandler implements KeyListener {
     private PTextArea textArea;
+    private PMouseHandler mouseHandler;
     private UpDownMovementHandler movementHandler = new UpDownMovementHandler();
     
-    public PKeyHandler(PTextArea textArea) {
+    public PKeyHandler(PTextArea textArea, PMouseHandler mouseHandler) {
         this.textArea = textArea;
+        this.mouseHandler = mouseHandler;
         textArea.addCaretListener(movementHandler);
     }
     
     public void keyPressed(KeyEvent e) {
+        mouseHandler.updateCursorAndToolTip(e.isControlDown());
         // This is disabled because it's not been useful for years, and steals three key combinations.
         if (false && e.isControlDown() && e.isShiftDown()) {
             switch (e.getKeyCode()) {
@@ -53,6 +56,7 @@ public class PKeyHandler implements KeyListener {
     }
     
     public void keyTyped(KeyEvent e) {
+        mouseHandler.updateCursorAndToolTip(e.isControlDown());
         if (isInsertableCharacter(e) && textArea.isEditable()) {
             userIsTyping();
             insertCharacter(e.getKeyChar()); // Only the char is usable in these events anyway.
@@ -61,6 +65,7 @@ public class PKeyHandler implements KeyListener {
     }
     
     public void keyReleased(KeyEvent e) {
+        mouseHandler.updateCursorAndToolTip(e.isControlDown());
     }
     
     private void userIsTyping() {
