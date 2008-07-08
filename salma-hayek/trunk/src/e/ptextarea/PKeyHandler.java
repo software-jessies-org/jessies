@@ -35,7 +35,7 @@ public class PKeyHandler implements KeyListener {
     }
     
     public void keyPressed(KeyEvent e) {
-        mouseHandler.updateCursorAndToolTip(e.isControlDown());
+        maybeUpdateCursorAndToolTip(e);
         // This is disabled because it's not been useful for years, and steals three key combinations.
         if (false && e.isControlDown() && e.isShiftDown()) {
             switch (e.getKeyCode()) {
@@ -56,7 +56,6 @@ public class PKeyHandler implements KeyListener {
     }
     
     public void keyTyped(KeyEvent e) {
-        mouseHandler.updateCursorAndToolTip(e.isControlDown());
         if (isInsertableCharacter(e) && textArea.isEditable()) {
             userIsTyping();
             insertCharacter(e.getKeyChar()); // Only the char is usable in these events anyway.
@@ -65,7 +64,13 @@ public class PKeyHandler implements KeyListener {
     }
     
     public void keyReleased(KeyEvent e) {
-        mouseHandler.updateCursorAndToolTip(e.isControlDown());
+        maybeUpdateCursorAndToolTip(e);
+    }
+    
+    private void maybeUpdateCursorAndToolTip(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            mouseHandler.updateCursorAndToolTip(e.isControlDown());
+        }
     }
     
     private void userIsTyping() {
