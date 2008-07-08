@@ -101,6 +101,9 @@ public class PMouseHandler implements MouseInputListener {
     }
     
     public void updateCursorAndToolTip(boolean isControlDown) {
+        if (lastKnownPosition == null) {
+            return;
+        }
         Cursor newCursor = null;
         String newToolTip = null;
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
