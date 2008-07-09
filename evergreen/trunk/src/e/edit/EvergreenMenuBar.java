@@ -69,6 +69,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(PActionFactory.makeSelectAllAction());
 
         menu.add(new JSeparator());
+        menu.add(new JoinLinesAction());
         menu.add(new CorrectIndentationAction());
         menu.add(new InsertInterfaceAction());
         
