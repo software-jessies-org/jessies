@@ -5,13 +5,13 @@ import e.util.*;
 import java.awt.event.*;
 
 /**
-The ETextArea action to open a 'goto' dialog.
-*/
-public class GotoAction extends ETextAction implements MinibufferUser {
-    public ETextArea currentTextArea;
-    public int initialCaretPosition;
+ * Lets the user jump straight to the given line number in the current text.
+ */
+public class GoToLineAction extends ETextAction implements MinibufferUser {
+    private ETextArea currentTextArea;
+    private int initialCaretPosition;
     
-    public GotoAction() {
+    public GoToLineAction() {
         super("Go to Line...");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("L", false));
         GnomeStockIcon.configureAction(this);
