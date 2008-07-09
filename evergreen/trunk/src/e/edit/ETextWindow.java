@@ -451,6 +451,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         textArea.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
             public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
                 actions.add(new OpenQuicklyAction());
+                actions.add(new OpenImportAction());
                 actions.add(new FindFilesContainingSelectionAction());
                 actions.add(new RevertToSavedAction());
                 actions.add(null);
