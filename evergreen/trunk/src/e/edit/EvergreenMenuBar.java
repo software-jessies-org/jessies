@@ -86,7 +86,6 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(FindAction.INSTANCE);
         menu.add(PActionFactory.makeFindNextAction());
         menu.add(PActionFactory.makeFindPreviousAction());
-        menu.add(new ScrollToSelectionAction());
 
         menu.add(new JSeparator());
         menu.add(new FindAndReplaceAction());
@@ -96,6 +95,10 @@ public class EvergreenMenuBar extends EMenuBar {
         
         menu.add(new JSeparator());
         menu.add(new FindFilesContainingSelectionAction());
+        
+        menu.add(new JSeparator());
+        menu.add(PActionFactory.makeFindMatchingBracketAction());
+        menu.add(new ScrollToSelectionAction());
         
         return menu;
     }
