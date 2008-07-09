@@ -1,6 +1,8 @@
 package e.ptextarea;
 
 import e.gui.*;
+import java.awt.*;
+import java.awt.event.*;
 
 public class PActionFactory {
     public static PTextAction makeCopyAction() {
@@ -13,6 +15,10 @@ public class PActionFactory {
     
     public static PTextAction makeFindAction() {
         return new PFind.FindAction();
+    }
+    
+    public static PTextAction makeFindMatchingBracketAction() {
+        return new FindMatchingBracketAction();
     }
     
     public static PTextAction makeFindNextAction() {
@@ -58,6 +64,20 @@ public class PActionFactory {
         
         public void performOn(PTextArea textArea) {
             textArea.cut();
+        }
+    }
+    
+    public static class FindMatchingBracketAction extends PTextAction {
+        public FindMatchingBracketAction() {
+            super("Find Matching Bracket", e.util.GuiUtilities.makeKeyStroke("5", false));
+        }
+        
+        public void performOn(PTextArea textArea) {
+            // Find Matching Bracket inhabits a gray area between actions and caret movements.
+            // It's high level enough to be thought of as the former, but most convenient as the latter (both for the user and the implementer).
+            // Unfortunately, it means we end up here, faking a control-5 key event to send to the text area.
+            KeyEvent control5 = new KeyEvent(textArea, KeyEvent.KEY_PRESSED, EventQueue.getMostRecentEventTime(), InputEvent.CTRL_DOWN_MASK, KeyEvent.VK_5, KeyEvent.CHAR_UNDEFINED);
+            textArea.dispatchEvent(control5);
         }
     }
     
