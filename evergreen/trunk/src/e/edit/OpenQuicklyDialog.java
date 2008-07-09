@@ -163,7 +163,16 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         }
     }
     
-    public void fileListStateChanged(boolean isNowValid) {
+    public void fileListStateChanged(final boolean isNowValid) {
+        // Ensure we're running on the EDT.
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                processFileListStateChange(isNowValid);
+            }
+        });
+    }
+    
+    private void processFileListStateChange(final boolean isNowValid) {
         rescanButton.setEnabled(isNowValid);
         if (isNowValid) {
             showMatches();
@@ -175,7 +184,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     }
     
     /**
-     * Responsible for providing some visual feedback that we're rescanning.
+     * Provides some visual feedback that we're rescanning.
      */
     private synchronized void switchToFakeList() {
         DefaultListModel model = new DefaultListModel();
