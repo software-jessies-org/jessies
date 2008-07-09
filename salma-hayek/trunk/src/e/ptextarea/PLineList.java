@@ -160,10 +160,12 @@ public class PLineList implements PTextListener {
         int newlineCount = StringUtilities.count(chars, '\n');
         Line line = getLine(lineIndex);
         if (newlineCount > 0) {
+            // FIXME: Elliott suggests that we might only need the last element of this array.
             int[] segmentLengths = getLineSegmentLengths(chars, newlineCount);
             int charOffset = event.getOffset() - line.getStart();
-            for (int i = 2; i < segmentLengths.length; i++) {
-                lines.remove(lineIndex + 1);
+            // FIXME: Elliott suggests that reordering could remove the need for the tricksy arithmetic.
+            if (segmentLengths.length > 2) {
+                lines.subList(lineIndex + 1, lineIndex + 1 + segmentLengths.length - 2).clear();
             }
             int endChars = getLine(lineIndex + 1).getLength() - segmentLengths[segmentLengths.length - 1];
             lines.remove(lineIndex + 1);
