@@ -123,6 +123,13 @@ public class PMouseHandler implements MouseInputListener {
         if (e.isControlDown()) {
             // Holding down control lets the user say "I want to position the caret inside this link, not follow it".
             // (We can't use shift because that's used to extend the selection.)
+            // FIXME: MS Word and Eclipse both invert this, and only activate the link when control *is* down. We could do that, but I think we'd want:
+            // 1. a tool tip, explaining if you hover over the link.
+            // 2. some way of visually showing the link's two states, stronger than just changing the mouse cursor; Eclipse does a really bad job.
+            // 3. to make it possible to follow the link from the context menu, because that's a common first reaction.
+            // 4. would we want to switch sense depending on whether the text area was meant for viewing or editing (as some mailers so)?
+            // The first three are arguably worthwhile patches in their own right (whether we switch or not).
+            // I think 2 is the hardest; to look enough like a link that people realize there's a way to follow it, but distinct enough that they know it's not just 'click'.
             return;
         }
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
