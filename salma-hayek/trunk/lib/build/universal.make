@@ -577,6 +577,7 @@ endef
 forEachLocalVariable = $(foreach LOCAL_VARIABLE,$(LOCAL_VARIABLES),$(eval $(call $(1),$(LOCAL_VARIABLE))))
 
 define closeLocalVariableScope
+  $(eval PREVIOUS_BASE_NAME := $$(BASE_NAME))
   $(call forEachLocalVariable,copyLocalVariable)
   $(call forEachLocalVariable,unsetLocalVariable)
 endef
@@ -636,7 +637,6 @@ LOCAL_VARIABLES += SOURCE_DIRECTORY
 define buildNativeDirectory
   SOURCE_DIRECTORY = $(1)
   include $(SALMA_HAYEK)/lib/build/per-directory.make
-  PREVIOUS_BASE_NAME := $$(BASE_NAME)
 endef
 
 $(takeProfileSample)
