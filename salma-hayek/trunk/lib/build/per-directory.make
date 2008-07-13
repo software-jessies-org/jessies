@@ -8,17 +8,18 @@
 # on the particular directory being built.
 
 # ----------------------------------------------------------------------------
+# Choose the basename(1) for the target
+# This is used in reporting scoping errors, so should be defined first.
+# ----------------------------------------------------------------------------
+
+BASE_NAME = $(notdir $(SOURCE_DIRECTORY))
+
+# ----------------------------------------------------------------------------
 # Initialize any directory-specific variables we want to append to here
 # ----------------------------------------------------------------------------
 
 LOCAL_LDFLAGS := $(LDFLAGS)
 MISSING_PREREQUISITES :=
-
-# ----------------------------------------------------------------------------
-# Choose the basename(1) for the target
-# ----------------------------------------------------------------------------
-
-BASE_NAME = $(notdir $(SOURCE_DIRECTORY))
 
 # ----------------------------------------------------------------------------
 # Find the source.
