@@ -18,9 +18,12 @@ BASE_NAME = $(notdir $(SOURCE_DIRECTORY))
 # Initialize any directory-specific variables we want to append to here
 # ----------------------------------------------------------------------------
 
-LOCAL_LDFLAGS =
-MISSING_PREREQUISITES =
 BUILDING_SHARED_LIBRARY =
+LOCAL_C_AND_CXX_FLAGS.$(TARGET_OS) =
+LOCAL_C_AND_CXX_FLAGS = $(LOCAL_C_AND_CXX_FLAGS.$(TARGET_OS))
+LOCAL_LDFLAGS.$(TARGET_OS) =
+LOCAL_LDFLAGS = $(LOCAL_LDFLAGS.$(TARGET_OS))
+MISSING_PREREQUISITES =
 
 # ----------------------------------------------------------------------------
 # Find the source.
@@ -66,7 +69,10 @@ JNI_OBJECT = $(COMPILATION_DIRECTORY)/$(JNI_BASE_NAME).o
 JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 
 BUILDING_JNI = $(JNI_SOURCE)
-LOCAL_LDFLAGS += $(if $(BUILDING_JNI),$(JNI_LIBRARY_LDFLAGS))
+
+# Cocoa won't build or link for x86_64 on Mac OS X 10.4 and we use Cocoa freely except in JNI code.
+LOCAL_C_AND_CXX_FLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64)
+LOCAL_LDFLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64 -framework JavaVM)
 
 define JAVAHPP_RULE
 $(JAVAHPP) -classpath .generated/classes $(JNI_CLASS_NAME) > $(NEW_JNI_HEADER) && \
@@ -130,11 +136,14 @@ endef
 # ----------------------------------------------------------------------------
 # Target-specific variables.
 # These need to be assigned while the right hand side is valid so need to use :=
+# (or $(eval)).
 # That means they should be after the right hand side is finalized which means
 # after other assignments.
 # ----------------------------------------------------------------------------
 
 $(WINDOWS_SUBSYSTEM_EXECUTABLES): LOCAL_LDFLAGS += -Wl,--subsystem,windows
+# LOCAL_C_AND_CXX_FLAGS is evaluated here, so it can refer to local variables but not automatic ones.
+$(eval $(OBJECTS): C_AND_CXX_FLAGS += $(LOCAL_C_AND_CXX_FLAGS))
 # LOCAL_LDFLAGS is evaluated here, so it can refer to local variables but not automatic ones.
 $(eval $(EXECUTABLES) $(SHARED_LIBRARY): LDFLAGS += $(LOCAL_LDFLAGS))
 $(NEW_JNI_HEADER): RULE := $(JAVAHPP_RULE)
