@@ -18,8 +18,8 @@ BASE_NAME = $(notdir $(SOURCE_DIRECTORY))
 # Initialize any directory-specific variables we want to append to here
 # ----------------------------------------------------------------------------
 
-LOCAL_LDFLAGS := $(LDFLAGS)
-MISSING_PREREQUISITES :=
+LOCAL_LDFLAGS =
+MISSING_PREREQUISITES =
 BUILDING_SHARED_LIBRARY =
 
 # ----------------------------------------------------------------------------
@@ -135,7 +135,8 @@ endef
 # ----------------------------------------------------------------------------
 
 $(WINDOWS_SUBSYSTEM_EXECUTABLES): LOCAL_LDFLAGS += -Wl,--subsystem,windows
-$(EXECUTABLES) $(SHARED_LIBRARY): LDFLAGS := $(LOCAL_LDFLAGS)
+# LOCAL_LDFLAGS is evaluated here, so it can refer to local variables but not automatic ones.
+$(eval $(EXECUTABLES) $(SHARED_LIBRARY): LDFLAGS += $(LOCAL_LDFLAGS))
 $(NEW_JNI_HEADER): RULE := $(JAVAHPP_RULE)
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
