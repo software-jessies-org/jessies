@@ -248,16 +248,17 @@ LDFLAGS += $(LDFLAGS.$(TARGET_OS))
 
 # Tradition has it this way.
 SHARED_LIBRARY_PREFIX.$(TARGET_OS) = lib
+
 SHARED_LIBRARY_EXTENSION.$(TARGET_OS) = so
-
-JNI_LIBRARY_EXTENSION.$(TARGET_OS) = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
-
-SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib
-JNI_LIBRARY_LDFLAGS.Darwin += -framework JavaVM
-JNI_LIBRARY_EXTENSION.Darwin = jnilib
 # http://developer.apple.com/documentation/Porting/Conceptual/PortingUnix/compiling/chapter_4_section_9.html
 # "By default, the names of dynamic libraries in Mac OS X end in .dylib instead of .so."
 SHARED_LIBRARY_EXTENSION.Darwin = dylib
+
+JNI_LIBRARY_EXTENSION.$(TARGET_OS) = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
+JNI_LIBRARY_EXTENSION.Darwin = jnilib
+JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
+
+SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib
 # The default $(LD) doesn't know about -dynamiclib on Darwin.
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
 LD = $(CXX)
@@ -291,9 +292,6 @@ endif
 SHARED_LIBRARY_LDFLAGS = $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
 SHARED_LIBRARY_PREFIX = $(SHARED_LIBRARY_PREFIX.$(TARGET_OS))
 SHARED_LIBRARY_EXTENSION = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
-
-JNI_LIBRARY_LDFLAGS = $(JNI_LIBRARY_LDFLAGS.$(TARGET_OS))
-JNI_LIBRARY_EXTENSION = $(JNI_LIBRARY_EXTENSION.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
 # Extra flags to always build Universal Binaries on Mac OS.
