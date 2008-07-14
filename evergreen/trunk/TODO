@@ -16,7 +16,7 @@ UI
 
 HELP/DOCUMENTATION
 
-+ consider using Python and PyGtk and MozEmbed to use a native browser component rather than Java.
++ consider using WebKit to offer a native documentation browser, when WebKitGtk's far enough along to be packaged. (forget MozEmbed; it's a mess.)
 
 + add some way of getting a list of the documentation providers, and where they're looking, and whether they've disabled themselves for lack of data, and how you (the user) would fix that (for systems where we can't make our package install the extras automatically).
 
@@ -78,9 +78,7 @@ EXTERNAL TOOLS
 
 + add syntax for arbitrary modifier+key combinations (alt-f2, for example).
 
-+ need documentation.
-
-+ need a UI. (providing documentation's easier in the short term, though.)
++ need a UI.
 
 + render stderr differently from stdout?
 
@@ -200,9 +198,11 @@ EDITING
 
 NAVIGATION
 
-+ Navigation > Add/Remove Bookmark (toggles on command-F2) / Next Bookmark (F2) / Previous Bookmark (shift-F2) --- handy for getting back to where you were if you need to go off and search for something.
++ Navigation > Add/Remove Bookmark (toggle on F2) / Next Bookmark (ctrl-F2) / Previous Bookmark (ctrl-shift-F2) --- handy for getting back to where you were if you need to go off and search for something.
 
-+ Remove search field from tags panel, and add an action that pops up a filtering-list dialog.
++ Remove search field from tags panel, and add an action that pops up a filtering-list dialog (control-shift-t for 'tag'?).
+
++ Need tags for HTML.
 
 + A way to make caseChangesLikeThis count as word breaks. (Xcode 1.5 does this with control + arrow keys.)
 
