@@ -28,12 +28,13 @@ public class Parameters extends Properties {
     private Parameters() { /* Not instantiable. */ }
     
     public static void readPropertiesFile(String fileName) {
-        if (FileUtilities.exists(fileName) == false) {
+        File file = FileUtilities.fileFromString(fileName);
+        if (file.exists() == false) {
             return;
         }
         Properties props = new Properties(System.getProperties());
         try {
-            loadProperties(props, new BufferedReader(new FileReader(fileName)));
+            loadProperties(props, new BufferedReader(new FileReader(file)));
         } catch (Exception ex) {
             Log.warn("Unable to read properties file \"" + fileName + "\"", ex);
         }
@@ -64,8 +65,9 @@ public class Parameters extends Properties {
     
     public static void processIncludeLine(Properties props, String line) {
         String filename = line.trim().substring(1).trim();
+        File file = FileUtilities.fileFromString(filename);
         try {
-            loadProperties(props, new BufferedReader(new FileReader(filename)));
+            loadProperties(props, new BufferedReader(new FileReader(file)));
         } catch (Exception ex) {
             Log.warn("Unable to include properties file \"" + filename + "\"", ex);
         }
