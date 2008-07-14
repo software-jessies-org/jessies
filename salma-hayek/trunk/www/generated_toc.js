@@ -3,6 +3,10 @@
     
     Generate a table of contents, based on headings in the page.
     
+    This code is available under an X11 license (see
+    http://www.kryogenix.org/code/browser/licence.html) from
+    http://www.kryogenix.org/code/browser/generated-toc/.
+    
     To place the TOC on the page, add
     
     <div id="generated-toc"></div>
@@ -311,5 +315,3 @@ else if((/mozilla/i.test(u)&&!/(compati)/.test(u)) || (/opera/i.test(u))){
 document.addEventListener("DOMContentLoaded",i,false); } else if(e){     (
 function(){var t=document.createElement('doc:rdy');try{t.doScroll('left');
 i();t=null;}catch(e){st(arguments.callee,0);}})();}else{window.onload=i;}})(generated_toc.init);
-
-
