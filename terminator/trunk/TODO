@@ -299,6 +299,11 @@ RFEs
   If we got this sorted out, then we could submit our termcap to Cygwin
   and so side-step cgf's reluctance to use terminfo, stated here:
   http://www.cygwin.com/ml/cygwin/2000-05/msg01012.html
+  
+  We could probably move towards this by responding to xterm's capabilities
+  as well as those rxvt ones that we currently advertise.
+  If we can support both sets, then we can advertise xterm's and deprecate rxvt's.
+  TERM=xterm less ~/.profile and see that the window doesn't clear for an example.
 
 * Try socat(1) (http://www.dest-unreach.org/socat/) and write up the experience
   for the benefit of the users who've wanted to use Terminator with directly
