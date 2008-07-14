@@ -114,40 +114,9 @@ It's interface is broadly similar to <code>JTextArea</code> so it's easy to use 
 
 </ul>
 
-<h2><a name="configuration">Configuration</a></h2>
+<h2><a name="documentation">Documentation</a></h2>
 
-<h3>Restricting Evergreen's Indexing Activity</h3>
-<p>If Evergreen finds an executable called <tt>echo-local-directories-evergreen-should-not-index</tt> on your path, it will be run at start-up.
-The output is interpreted as a regular expression pattern per line describing the names of directories that Evergreen shouldn't scan when indexing your workspace.
-Evergreen already knows about most version control systems and about the autotools directories, so you shouldn't have to worry about those.
-Evergreen also assumes that there's nothing interesting in "dot directories" (directories whose names begin with a ".").
-The ability to add custom directory patterns is useful in a variety of cases.
-The most common example is when your object files (or your test data, or whatever it is you don't want Evergreen to index/search) live under your workspace root but are segregated into directories with distinctive names.
-You should make sure Evergreen knows the name of the directories containing such files, for performance.
-
-<p>If you can't help Evergreen out&nbsp;&ndash; perhaps because keep your object files in the same directory as your source&nbsp;&ndash; Evergreen will ignore each file one by one.
-This has a similar end result, but it's much less efficient, and it's your time you're wasting.
-
-<p>Evergreen already knows about most common build artifacts (object files and their friends) and recognizes them by their filename extension.
-If you have an unusual one (and it isn't already hidden in a directory that Evergreen won't scan) you can add the extension to Evergreen's list in the GUI preferences dialog.
-
-<p>Evergreen will also look for <tt>echo-local-extensions-evergreen-should-not-index</tt> on your path.
-The output is interpreted as a list of filename endings.
-Filenames whose endings are in the list are not indexed.
-
-<p>If you think the extension is a common one that Evergreen should automatically ignore, please let us know so that we can add it to the built-in list so everyone benefits.
-
-<p>Both <tt>echo-local-directories-evergreen-should-not-index</tt> and <tt>echo-local-extensions-evergreen-should-not-index</tt> are run once for each workspace, when the workspace is scanned or rescanned, with a current directory of the workspace root.
-
-<h3>Adding Custom Lint Checkers</h3>
-<p>If you dislike Evergreen's default choice of lint checker for a given language, or have a lint checker for a language Evergreen doesn't have a default for, you can override or supplement Evergreen's choices.
-Say you have a C++ static analysis tool you want Evergreen to use.
-Edit the <tt>~/.e.edit.Edit/edit.properties</tt> file and add a line <tt>C++.lintChecker=cpplint</tt> (including any arguments).
-The bit before the "." is the name shown in the File Properties dialog.
-If lint checking for HTML weren't built in, for example, the current behavior could be specified with <tt>XML.lintChecker=tidy -qe</tt>.
-Note that we use the file type mode's name ("XML") rather than, say, the specific file extension or specific dialect.
-
-<p>We hope to replace this with a GUI for filetype-specific configuration in the future.
+<p>There's a separate <a href="manual.html">user manual</a> for Evergreen.
 
 <!--#include virtual="/salma-hayek/downloads.html" -->
 

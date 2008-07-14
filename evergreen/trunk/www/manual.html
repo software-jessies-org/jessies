@@ -1,0 +1,319 @@
+<!--#set var="PAGE_TITLE" value="Evergreen User Manual" -->
+<!--#include virtual="/salma-hayek/header.html" -->
+
+<!--FIXME: Screenshots. This is pretty dry material, and it would probably be easier to follow (and easier on the eye) if we had some screenshots. At least one for every dialog. -->
+<!--FIXME: CSS cleverness to mark up and visually distinguish keystrokes and menu options? -->
+<!--FIXME: Is there a better way to deal with keystroke differences between platforms? A big table at the end, with a column for each platform? That would be a useful reference anyway. -->
+
+<!--Anyone can edit this file, but try to follow these conventions (both for the convenience of the reader, and so we can maybe write scripts to extract special-purpose indexes): -->
+<!--1. refer to menu options in this way: choose "File" > "Close". -->
+<!--2. always follow a menu option that has a keyboard equivalent with ", accessible from the keyboard with <keystroke>". -->
+<!--3. use all lowercase when describing keystrokes, and list modifiers first, and in alphabetical order. -->
+<!--4. until we have a better solution, always give Linux keystrokes. -->
+<!--5. remember to mention any pop-up menu the option is also available from. -->
+<!--6. link to configuration documentation with the formula "There's more on <a href="#configuration-anchor">configuring subject</a> later." -->
+<!--Feel free to add other useful conventions. -->
+
+<h1>Evergreen User Manual</h1>
+
+<p><i>(Note: the keystrokes in this manual correspond to the Linux version. Some keystrokes may be slightly different on Cygwin or Mac OS, to better fit that platform.)</i>
+
+<p id="generated-toc" class="generate_from_h2"></p>
+
+<h2><a name="workspaces">Workspaces</a></h2>
+
+<p>Some simple text editors work primarily on one file at a time. Some IDEs effectively require that your project be created and managed by them. Evergreen falls somewhere in between. If you work primarily with single files, Evergreen may seem cumbersome; if, on the other hand, you primarily work on projects at least large enough to have more than one directory of source, you should find Evergreen comfortably lightweight.
+
+<p>You will, however, need to learn about and create "workspaces". Creating a workspace is basically just telling Evergreen the root directory of a project. That's probably the directory with the top-level build file (<tt>Makefile</tt> or <tt>build.xml</tt> or whatever). Evergreen will automatically choose a name for the workspace, but you can override it; useful if your projects are all stored in Subversion repositories and you choose the checked-out 'trunk' directory as the root of each one. The name is for your convenience, and you can change it later.
+
+<p>A workspace is also a way to work on multiple projects in the same editor. You can have as many workspaces as you like, and each will have its own tab in the main window.
+
+<p>To create a workspace, choose "Workspace" > "Add Workspace..." from the menu. A dialog will appear where you can choose a root directory, maybe customize the workspace's name, and maybe choose a custom build target (described later).
+
+<p>Each workspace gets a tab. You can switch between workspaces by clicking on the tab or, for the first nine workspaces, jump to the <i>n</i>th workspace with alt-<i>n</i> (alt-1 for the first). You can also move to the previous and next workspaces from the keyboard with control-shift-[ and control-shift-].
+
+<p>If you need to change a workspace's root, name, or build target at any time, choose "Workspace" > "Edit Workspace..." from the menu. This option is also available by right-clicking on a workspace's tab.
+
+<p>If you no longer need a workspace, select that workspace and choose "Workspace" > "Remove Workspace" from the menu. This option is also available by right-clicking on a workspace's tab.
+
+<p>Workspace configuration is stored in Evergreen's dot-directory in your home directory, not under the workspace root itself, so you don't need to worry about telling your version control system to ignore anything.
+
+<h3><a name="workspaces-indexing">Workspace Indexing</a></h3>
+
+<p>One reason why Evergreen asks you to name workspaces up front is that it indexes all the source files. It doesn't index their content, just their names. The index is updated when you start Evergreen, if the root directory of a workspace is modified (that is, either a modification in the real directory on the file system, or the workspace root is changed to point to another directory), or if you manually ask for a rescan.
+
+<p>To ask Evergreen to rescan a workspace, select that workspace and choose "Workspace" > "Rescan Files" from the menu. This option is also available by right-clicking on a workspace's tab.
+
+<p>Any dialog whose functionality relies on the index will also offer a "Rescan" button, accessible from the keyboard with alt-r.
+
+<p>There's more on <a href="#configuration-indexing">configuring indexing behavior</a> later.
+
+<h2><a name="opening">Opening Files</a></h2>
+
+<p>There are several ways to open files in Evergreen.
+
+<h3><a name="opening-quickly">Open Quickly</a></h3>
+
+<p>To open a file by name, choose "File" > "Open Quickly..." from the menu, accessible from the keyboard with control-o. This option is also available by right-clicking in a file.
+
+<p>The Open Quickly dialog shows a list of the files under the workspace root whose names match the <a href="#regexps">regular expression</a> you type. The list of matches updates as you type, and you can stop when you see what you want. Hitting return will open any selected files in the list, and you can use the mouse or hit tab to move focus into the list and keep using the keyboard to edit the selection (which generally feels quicker than either using the mouse or refining your regular expression until the file you want is the one selected).
+
+<p>If you Open Quickly with a non-empty selection, the regular expression will default to the contents of the selection. This is handy if you select the name of a class, say, and know that it's stored in a file with a matching name.
+
+<h3><a name="opening-find">Find in Files</a></h3>
+
+<p>To open a file containing a search string, choose "Find" > "Find in Files...", accessible from the keyboard with control-shift-g. This option is also available by right-clicking in a file. If the selection is non-empty, the regular expression will default to the contents of the selection.
+
+<p>You can filter on file content or file name in the Find in Files dialog, so if you want to find "some_function" but only in .cpp files, for example, that's trivial.
+
+<p>The results are shown as a tree with branches indicating the directory structure, and (assuming you actually specified a regular expression for the files' content) with a leaf for every match. Click on a match to open the file and jump to the match. The regular expression you used in the Find in Files dialog will automatically be applied to the file, so you'll be able to use the usual navigation keystrokes to move to the other matches in that file without needing to return to the Find in Files dialog.
+
+<p>Files that seem to contain a definition for the search term will have their name shown in bold in the results, so the definition stands out from the uses.
+
+<h3><a name="opening-import">Open Import</a></h3>
+
+<p>To open a file corresponding to an import (<tt>#include</tt> in C++, <tt>import</tt> in Java, and so forth), position the caret on the line, or select the filename part of the line, and choose "File" > "Open Import...", accessible from the keyboard with control-shift-o. Note: this functionality does not understand your build rules, and may not open the file your compiler will actually use.
+
+<h3><a name="opening-new">Creating a New File</a></h3>
+
+<p>To create and open a new "File" > "New File...", accessible from the keyboard with control-n. A dialog will prompt you for a pathname, defaulting to the directory containing the current file (or the root of the workspace if there is no current file).
+
+<p>If the file already exists, you're alerted to the fact and the file is opened anyway. Otherwise, the file is created.
+
+<p>The script <tt>evergreen-boilerplate-generator</tt> is run to automatically fill the new file with default content (such as the basic "public class X { }" boilerplate in Java). There's more on <a href="#configuration-boilerplate">configuring boilerplate generation</a> later.
+
+<h3><a name="opening-open">Open</a></h3>
+
+<p>Finally, to open a file that for some reason isn't indexed, choose "File" > "Open" to get your platform's usual open dialog. This is very rarely useful; if you use it more than once per year, something's wrong.
+
+<h2><a name="regexps">Regular Expressions</a></h2>
+
+<p>Evergreen uses regular expressions all over; if it's asking for input, chances are it's asking for a regular expression. You can learn about the specific dialect used by reading <a href="http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html">Sun's Pattern documentation</a> (also accessible by choosing "Documentation" > "Regular Expression Documentation" from the menu).
+
+<p>If you enter an all-lowercase regular expression, Evergreen assumes you want a case-insensitive match. Any use of uppercase implies that a case-sensitive match. You can use <tt>(?i)</tt> or <tt>(?-i)</tt> to explicitly select case (in-)sensitivity.
+
+<p>Note that the use of regular expressions even for filename matching (where you might otherwise expect to see shell-like "glob" patterns) means that <tt>.</tt> matches any character (use <tt>\.</tt> for glob behavior), <tt>*</tt> matches zero or more of the preceding character (use <tt>.*</tt>), and <tt>?</tt> matches zero or one of the preceding character (use <tt>.</tt>). The regular expression anchors <tt>^</tt> and <tt>$</tt> apply to the whole path, so <tt>$</tt> is mainly useful for matching only extensions, and <tt>/</tt> is often useful if you're trying to match a particular path segment. Don't worry too much about all this: in practice, you won't usually need to worry about this; most of the time, you'll just type a few literal characters.
+
+<h2><a name="editing">Editing Text</a></h2>
+
+<h3><a name="editing-navigating">Basic Navigation</a></h3>
+
+<p>The arrow keys move the caret by one character in the relevant direction. To move left or right by one word, use control-left and control-right.
+
+<p>The home and end keys move to the beginning and end of the current line. To move to the beginning or end of the current file, use control-home and control-end.
+
+<p>If the caret is next to a bracket character, control-5 will jump to the matching bracket (like % in Vim).
+
+<p>The page up and page down keys move the scroll bar, but not the caret.
+
+<p>If you've lost the caret, "Find" > "Scroll to Selection", accessible from the keyboard with control-j, will take you back to it.
+
+<h3><a name="editing-selection">Selection</a></h3>
+
+<p>If a given keystroke moves the caret, holding down shift at the same time will extend the selection to the new caret position.
+
+<p>You can also set the selection by pressing the left mouse button at the caret position at one end of the desired selection and dragging to the other caret position. Alternatively (and more conveniently if you wish to select a large amount of text), you can place the caret at one end of the desired selection, and shift-click at the other caret position.
+
+<p>To select the entire file, use "Edit" > "Select All", accessible from the keyboard with control-a.
+
+<h3><a name="editing-find">Find</a></h3>
+
+<p>To search for a string, choose "Find" > "Find..." from the menu, accessible with control-f from the keyboard. If there's a selection, it's used as the search term. Regardless, you can edit the regular expression in the text field that appears at the bottom of the main window.
+
+<p>All matches in the current file will be highlighted, and tiny notches next to the scroll bar will show the distribution of matches throughout the file. (You can click on a notch to jump to that match.)
+
+<p>Most conveniently, the keys either side of 'f' can be used to rapidly scan backwards and forwards through the matches. Use control-d to move to the previous match, and control-g to move to the next match. These operations don't wrap, so you can tell when you've hit the first or last match. (These operations are also available from the "Find" menu, but they're only there to help you learn the keystrokes.)
+
+<p>You can keep a find active by dismissing the text field with return. (Pressing control-d or control-g also dismisses the text field while keeping the find active.)
+
+<p>You can cancel the find (and remove the highlighting) by dismissing the text field with escape. While a find is active, the matches will be updated as you edit the file. The status bar will show the currently active find, and the current number of matches.
+
+<h3><a name="editing-tags">Symbols (Tags)</a></h3>
+
+<p>If <a href="http://ctags.sourceforge.net/">Exuberant Ctags</a> is installed, and the language you're editing is supported by it, Evergreen will show a tree on the right-hand side of the main window. You can click on an item in the tree to jump straight to the corresponding line in the source.
+
+<h3><a name="editing-goto">Go to Line</a></h3>
+
+<p>Choose "Find" > "Go to Line...", accessible from the keyboard with control-l, to jump straight to a given line number.
+
+<h3><a name="editing-editing">Basic Editing</a></h3>
+
+<p>Typing characters inserts them at the caret position. If there's a selection, typing replaces the selection.
+
+<p>The backspace key removes the character to the left of the caret (or removes the selection). To remove everything to the beginning of the current line, use alt-backspace. To remove everything to the previous non-whitespace character, use control-backspace.
+
+<p>The delete key removes the character to the right of the caret (or removes the selection).
+
+<p>The usual control-x, control-c, control-v behaviors (cut, copy, and paste) apply. For the benefit of Windows users, shift-del and shift-insert also cut and paste on all platforms.
+
+<p>Undo with control-z, redo with control-shift-z. Undo is unlimited, but isn't persistent: if you quit, you lose your undo history.
+
+<p>To join the next line onto the end of the current line, use control-shift-j.
+
+<h3><a name="editing-replace">Find/Replace</a></h3>
+
+<p>To perform a find and replace operation on the current file, choose "Find" > "Find/Replace...", accessible from the keyboard with control-r.
+
+<p>If there's a selection that spans multiple lines, the operation will only apply to those lines. If there's a selection within a single line, that's taken to be the search term.
+
+<p>Matching lines are shown in one list, with the matching substring highlighted. Suggested replacements are shown in a second list, with the replacement substring highlighted. Hovering over a line in either list brings up a tool tip showing the capturing groups. Put together, these features make it easy to experiment until you've got the right regular expression and the right replacement string.
+
+<h3><a name="editing-indentation">Indentation</a></h3>
+
+<p>Evergreen will auto-indent as you edit. The exact details vary from language to language.
+
+<p>If for some reason a line's indentation needs to be fixed, use "Edit" > "Correct Indentation", accessible from the keyboard with control-i.
+
+<p>When pasting, Evergreen will reindent the pasted text.
+
+<h3><a name="editing-sorting">Sorting</a></h3>
+
+<p>To sort multiple lines, select them and choose "Tools" > "Sort". To remove any duplicates at the same time, choose "Tools" > "Sort and Remove Duplicates".
+
+<h2><a name="windows">Windows</a></h2>
+
+<p>Each workspace's tab contains zero or more "windows" for editing files. When a new file is opened in a given workspace, a new window is inserted taking half the space of the current largest window.
+
+<p>You can cause a window to expand to take up all available space (shrinking all other windows) by double-clicking on the title bar, or by choosing "Window" > "Expand Window", accessible from the keyboard with control-1.
+
+<p>You can drag a window's title bar to make the window take more or less space.
+
+<p>A window's title bar shows the file's pathname on the left, and has a close button on the right. You can also use "File" > "Close", accessible from the keyboard with control-w. A file whose content has been edited since it was last saved has a red close button, and you'll be shown a patch and asked if you really want to throw away those changes.
+
+<p>A window's title bar may also contain a double-headed arrow next to the close button. The presence of this button indicates that the file has a counterpart file (if it's a C++ source file, probably the corresponding header file, for example). To open the counterpart file, click the button, or choose "View" > "Switch to Header/Source", accessible from the keyboard with control-shift-p.
+
+<p>To cycle back and forth between windows, click on them with the mouse, or use "Window" > "Next Window", accessible from the keyboard with control-`, and "Window" > "Previous Window", accessible from the keyboard with control-shift-`.
+
+<h2><a name="build">Building Projects</a></h2>
+
+<h3><a name="build-basics">Basic Building</a></h3>
+
+<p>To build the current project, "Workspace" > "Build Project", accessible from the keyboard with control-b. Evergreen will search up from the directory containing the current file until it finds build instructions (a <tt>Makefile</tt> or <tt>build.xml</tt>). It will run the appropriate build tool in that directory. This works great if you have a single file of build instructions, at the top of your project. If you have, say, makefiles at multiple levels, you'll have to bear in mind that what file you have selected when you start a build will influence which subtree of your project is rebuilt. This is sometimes useful (because projects large enough to have multiple sets of build instructions are usually large enough to be too expensive to totally rebuild), but it's sometimes annoying (because at some point you may want to rebuild a larger part of the system than the part you're currently working on). Two common workarounds are to have the top-level makefile open, and start a build from there when need be, or to use the shell to do top-level builds.
+
+<p>To see what build instructions Evergreen would use (or to edit them), choose "Tools" > "Open Makefile".
+
+<p>Build output appears in a new window. Error messages that use grep(1)-style filename:line: output will be hyperlinked so you can jump straight to the source. You can clear the build output and close the window with "Tools" > "Clear Errors", accessible from the keyboard with control-k.
+
+<p>There's more on <a href="#configuration-build">configuring custom build tools</a> later.
+
+<h3><a name="build-lint">Checking For Lint</a></h3>
+
+<p>Many languages have a "lint" tool that checks source code for problems that the compiler may not warn about. Some groups use lint tools to check for adherence to a particular coding style. Evergreen will run a lint check on the current file if you choose "Tools" > "Check For Lint", accessible from the keyboard with control-shift-l. Any output will appear in a build output window, and can be disposed of in the usual manner. There's more on <a href="#configuration-lint">configuring custom lint checkers</a> later.
+
+<h2><a name="cli">Command-line Use</a></h2>
+
+<h3><a name="cli-launch">Launching Evergreen</a></h3>
+
+<p>Normally, you'll have an icon on your desktop, your Applications menu, or in your Applications folder (depending on platform) from which you can launch Evergreen, but you can also use the <tt>evergreen</tt> command from the shell.
+
+<h3><a name="cli-open">Opening Files</a></h3>
+
+<p>The <tt>evergreen</tt> command also lets you tell a running instance to open a file. You can supply addresses such as "file.cpp:12" in order to go straight to line 12 of "file.cpp". To facilitate the easy pasting of entire grep(1) matches collected via selection of the entire line, anything after the address is ignored. For this reason, it is not possible to open more than one file in one command.
+
+<p>The <tt>--block</tt> option makes the <tt>evergreen</tt> command wait until the user closes the file that was opened. This is useful if you're trying to have a program call on Evergreen to edit a file, for example by setting the EDITOR environment variable. Another command, <tt>edit-and-block</tt> is provided for use with crontab(1), which is too stupid to cope with an editor that takes arguments.
+
+<h2><a name="documentation">Documentation</a></h2>
+
+<p>The "Documentation" menu contains links to various bits of useful documentation on the web, that will open in your regular browser.
+
+<!--FIXME: there's plenty to say about the researcher/advisor system. -->
+
+<h2><a name="configuration">Configuration</a></h2>
+
+<h3><a name="configuration-preferences">Preferences</a></h3>
+
+<p>There's a preferences dialog available by choosing "Edit" > "Preferences...".
+
+<h3><a name="configuration-scripts">Scripts</a></h3>
+
+<p>Some of the later sections describe customizing Evergreen using external scripts. These can be written in any language you like or can be native binaries for all Evergreen cares. Most communication is via environment variables. Unless otherwise stated, you can expect to have access to:
+
+<p><b>EDIT_CURRENT_DIRECTORY</b> The equivalent of "dirname $EDIT_CURRENT_FILENAME".
+<p><b>EDIT_CURRENT_FILENAME</b> The full pathname of the file containing the caret, if there is a current file.
+<p><b>EDIT_CURRENT_LINE_NUMBER</b> The line number containing the caret, counted from 1, if there is a current file.
+<p><b>EDIT_WORKSPACE_ROOT</b> The root directory of the workspace the command was run from.
+
+<h3><a name="configuration-properties">Properties</a></h3>
+
+<p>Many of the configuration options not presented in the UI are available by setting 'properties'. These are read from the <tt>~/.e.edit.Edit/edit.properties</tt> file. If you want to keep your local modifications separate, or share them more conveniently, you can include other files. Say you have a <tt>/home/enh/config/evergreen.properties</tt> file, just add a line <tt>&lt;/home/enh/config/evergreen.properties</tt> to the main file.
+
+<h3><a name="configuration-indexing">Advanced Indexing</a></h3>
+
+<p>If Evergreen finds an executable called <tt>echo-local-directories-evergreen-should-not-index</tt> on your path, it will be run at start-up.
+The output is interpreted as a regular expression pattern per line describing the names of directories that Evergreen shouldn't scan when indexing your workspace.
+Evergreen already knows about most version control systems and about the autotools directories, so you shouldn't have to worry about those.
+Evergreen also assumes that there's nothing interesting in "dot directories" (directories whose names begin with a ".").
+The ability to add custom directory patterns is useful in a variety of cases.
+The most common example is when your object files (or your test data, or whatever it is you don't want Evergreen to index/search) live under your workspace root but are segregated into directories with distinctive names.
+You should make sure Evergreen knows the name of the directories containing such files, for performance.
+
+<p>If you can't help Evergreen out, perhaps because keep your object files in the same directory as your source, Evergreen will ignore each file one by one.
+This has a similar end result, but it's much less efficient, and it's your time you're wasting.
+
+<p>Evergreen already knows about most common build artifacts (object files and their friends) and recognizes them by their filename extension.
+If you have an unusual one (and it isn't already hidden in a directory that Evergreen won't scan) you can add the extension to Evergreen's list in the GUI preferences dialog.
+
+<p>Evergreen will also look for <tt>echo-local-extensions-evergreen-should-not-index</tt> on your path. The output is interpreted as a list of filename endings. Filenames whose endings are in the list are not indexed. Normally you'd use the preferences dialog for this, but the script lets you set up site-wide preferences.
+
+<p>If you think the extension is a common one that Evergreen should automatically ignore, please let us know so that we can add it to the built-in list so everyone benefits.
+
+<p>Both <tt>echo-local-directories-evergreen-should-not-index</tt> and <tt>echo-local-extensions-evergreen-should-not-index</tt> are run once for each workspace, when the workspace is scanned or rescanned, with a current directory of the workspace root.
+
+<h3><a name="configuration-lint">Lint Checkers</a></h3>
+
+<p>If you dislike Evergreen's default choice of lint checker for a given language, or have a lint checker for a language Evergreen doesn't have a default for, you can override or supplement Evergreen's choices.
+Say you have a C++ static analysis tool you want Evergreen to use.
+Add the property <tt>C++.lintChecker=cpplint</tt> (include any necessary arguments).
+The bit before the "." is the name shown in the File Properties dialog.
+If lint checking for HTML weren't built in, for example, the current behavior could be specified with <tt>XML.lintChecker=tidy -qe</tt>.
+Note that we use the file type mode's name ("XML") rather than, say, the specific file extension or specific dialect.
+
+<p>We hope to replace this with a GUI for filetype-specific configuration in the future.
+
+<h3><a name="configuration-boilerplate">Boilerplate Generation</a></h3>
+
+<p>You can set the <tt>boilerplateGenerator</tt> property to point to your own script. Use <tt>/usr/bin/evergreen-boilerplate-generator</tt> as a template, but don't be tempted to edit it in place, because it will be overwritten each time you install a newer version of Evergreen. Note that currently, a single script must handle all file types (though you could make that script call solely responsible for deciding which of a variety of other scripts to call to handle the current case).
+
+<h3><a name="configuration-build">Build Tools</a></h3>
+
+<p>If you don't use make(1) or ant(1), Evergreen has limited support for alternatives. You can set the <tt>build.specialPathPattern</tt> property to a regular expression that matches paths containing files to be built by your special tool. You'll also need to set <tt>build.specialBuildTool</tt> to the name of the tool to be run if the pattern matches. Note that your tool will be started in the directory containing the current file when the user asks for a build, so any searching for the appropriate build instructions is down to you. You may find it necessary to actually call a script that works out the appropriate arguments for the real build tool.
+
+<p>If you think the tool is a common one that Evergreen should automatically support, please let us know so that we can add it to the built-in list so everyone benefits.
+
+<h3><a name="configuration-tools">External Tools</a></h3>
+
+<p>You can add your own tools to the "Tools" menu, and optionally to the pop-up menu.
+
+<p>On launch, Evergreen looks for properties whose names start <tt>tools.0.</tt> through <tt>tools.255.</tt>. All possibilities will be tested, with gaps being meaningless. If you want to add a separator to the menu, use <tt>tools.9.name=&lt;separator&gt;</tt> (changing 9 to correspond to where you want your separator).
+
+<p>The minimum information needed for an actual tool is a name and a command. You can add a keyboard equivalent if you like, either a function key or a single character; in the latter case, the keystroke will be control-shift-<i>letter</i>.
+
+<!--FIXME: this would probably be clearer as a table. -->
+
+<p>The first character of the command can be '!', '|', '&lt;', or '&gt;':
+<blockquote>
+<p>'!' simply executes the command with nothing on stdin, and stdout/stderr sent to a "Build Output" window.
+<p>'|' executes the command with stdin containing the selection (or the whole document if there's no selection), and replaces the selection with (or inserts) stdout/stderr.
+<p>'&lt;' executes the command with nothing on stdin, and stdout/stderr inserted at the caret.
+<p>'&gt;' executes the command with stdin containing the selection (or the whole document if there's no selection), and stdout/stderr sent to a "Build Output" window.
+</blockquote>
+
+<p>Here's how you'd make f5 run wc on the current file:
+<pre>
+tools.0.name=wc current file
+tools.0.command=!wc $EDIT_CURRENT_FILENAME
+tools.0.keyboardEquivalent=f5
+</pre>
+
+<p>Here's how you'd make control-shift-e insert the current date:
+<pre>
+tools.1.name=insert date
+tools.1.command=&lt;date --iso
+tools.1.keyboardEquivalent=e
+</pre>
+
+<p>There are also three boolean settings. You can cause the "some files are unsaved" dialog to appear by setting <tt>tools.0.checkEverythingSaved=true</tt>. You can disable a tool if there's no current file with <tt>tools.0.needsFile=true</tt>. You can cause an "are you sure" dialog to appear by setting <tt>tools.0.requestsConfirmation=true</tt>.
+
+<p>If you have a suitable icon in, say, <tt>/usr/share/icons/Tango/24x24/apps/user-info.png</tt>, you can set it with <tt>tools.0.icon=/usr/share/icons/Tango/24x24/apps/user-info.png</tt>. Additionally, on Linux you can request one of the GNOME stock icons: <tt>tools.0.stockIcon=gtk-clear</tt>.
+
+<!--#include virtual="/salma-hayek/footer.html" -->
