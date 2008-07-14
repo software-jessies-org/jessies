@@ -7,6 +7,9 @@
     http://www.kryogenix.org/code/browser/licence.html) from
     http://www.kryogenix.org/code/browser/generated-toc/.
     
+    This version modified by Elliott Hughes, 2008-07-12, to remove the cookies,
+    hiding, and skipping functionality.
+
     To place the TOC on the page, add
     
     <div id="generated-toc"></div>
@@ -113,37 +116,9 @@ generated_toc = {
     
     // make the basic elements of the TOC itself, ready to fill into
     
-    // first, check if there's a cookie defined to save the state as open
-    status = generated_toc.readCookie("generated_toc_display");
-    if (status && status == "open") {
-      display_initially = "block";
-      toggle_initially = "Hide table of contents";
-    } else {
-      display_initially = "none";
-      toggle_initially = "Show table of contents";
-    }
-
     cur_head_lvl = "h" + generate_from;
     cur_list_el = document.createElement('ul');
-    cur_list_el.style.display = display_initially;
-    p = document.createElement('p');
-    span = document.createElement('span');
-    span.className = 'hidden';
-    a = document.createElement('a');
-    a.href = '#aftertoc';
-    a.appendChild(document.createTextNode('skip table of contents'));
-    span.appendChild(a);
-    p.appendChild(span);
-    tocparent.appendChild(p);
-    p = document.createElement('p');
-    p.id = 'toggle-container'; 
-    a = document.createElement('a');
-    a.id = 'generated_toc_d_toggle';
-    a.appendChild(document.createTextNode(toggle_initially));
-    p.appendChild(a);
-    a.onclick = generated_toc.wrapOpenClose(a,cur_list_el);
-    a.href = '#';
-    tocparent.appendChild(p);
+    cur_list_el.style.display = "block";
     tocparent.appendChild(cur_list_el);
     
     // now walk through our saved heading nodes
@@ -194,11 +169,6 @@ generated_toc = {
       cur_list_el.appendChild(li);
     }
     
-    // add an aftertoc paragraph as destination for the skip-toc link
-    p = document.createElement('p');
-    p.id = 'aftertoc';
-    tocparent.appendChild(p);
-    
     // go through the TOC and find all LIs that are "empty", i.e., contain
     // only ULs and no links, and give them class="missing"
     var alllis = tocparent.getElementsByTagName("li");
@@ -217,61 +187,6 @@ generated_toc = {
     }
     
   },
-  
-  wrapOpenClose: function(a, cur_list_el) {
-    // we return a function here so that it acts as a closure;
-    // in essence the inner function, which is the event handler
-    // for clicking on the toggle-toc link, remembers the a and cur_list_el
-    // elements as they are when they're passed in to it.
-    // This is an explicit function rather than an anonymous function
-    // defined where it's called so it's easier to understand.
-    return function(e) {
-      d = cur_list_el.style.display;
-      a.firstChild.nodeValue = (d == 'block' ? 'Show' : 'Hide') + ' table of contents';
-      a.className = (d == 'block' ? 'toggle-closed' : 'toggle-open'); 
-      cur_list_el.style.display = d == 'block' ? 'none' : 'block';
-      // set a cookie to "open" or "closed" to save the state of the TOC
-      if (cur_list_el.style.display == "block") {
-        generated_toc.createCookie("generated_toc_display","open",21);
-      } else {
-        generated_toc.createCookie("generated_toc_display","closed",21);
-      }
-      if (window.event) {
-        window.event.returnValue = false;
-        window.event.cancelBubble = true;
-      } else {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }
-  },
-  
-  /* cookie handling: http://www.quirksmode.org/js/cookies.html */
-  createCookie: function(name,value,days) {
-    if (days) {
-      var date = new Date();
-      date.setTime(date.getTime()+(days*24*60*60*1000));
-      var expires = "; expires="+date.toGMTString();
-    }
-    else var expires = "";
-    document.cookie = name+"="+value+expires+"; path=/";
-  },
-
-  readCookie: function(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-      var c = ca[i];
-      while (c.charAt(0)==' ') c = c.substring(1,c.length);
-      if (c.indexOf(nameEQ) == 0) 
-        return c.substring(nameEQ.length,c.length);
-    }
-    return null;
-  },
-
-  eraseCookie: function(name) {
-    createCookie(name,"",-1);
-  },  
   
   innerText: function(el) {
     return (typeof(el.innerText) != 'undefined') ? el.innerText :
