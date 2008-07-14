@@ -9,6 +9,9 @@
     
     This version modified by Elliott Hughes, 2008-07-12, to remove the cookies,
     hiding, and skipping functionality.
+    FIXME: we should work out how to use anchors already embedded in the page,
+    so we can give human-readable names to them (or switch to manually
+    generating tables of contents, which would be a pain for FAQs).
 
     To place the TOC on the page, add
     
