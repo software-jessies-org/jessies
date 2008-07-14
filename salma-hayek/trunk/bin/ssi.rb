@@ -3,10 +3,6 @@
 # Usage: ssi.rb www/index.html > /tmp/test.html
 # View /tmp/test.html in your web browser.
 
-# You'll need to add a BASE HREF tag to your document's HEAD if you want to point your browser at the local file system and still have CSS and images work.
-# If you're using the software.jessies.org "header.html", this is already done for you.
-# Note that links on the local page will actually link to the currently live website.
-
 class SsiProcessor
     def initialize()
         @settings = Hash.new()
@@ -17,6 +13,12 @@ class SsiProcessor
         File.open(filename) {
             |file|
             text = file.read()
+            text = text.gsub(/<head>/) {
+                # You need to add a BASE HREF tag to your document's HEAD if you want to point your browser at the local file system and still have CSS and images work.
+                # Note that links on the local page will actually link to the currently live website.
+                # FIXME: we should probably read the desired base from a comment in the source.
+                '<head><base href="http://software.jessies.org/<!--#echo var="SHORT_DIST_NAME" -->/">'
+            }
             text = text.gsub(/<!--#(.+?)\s*-->/) {
                 |comment|
                 directive = $1
