@@ -453,8 +453,17 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         ComponentUtilities.divertPageScrollingFromTo(regexField, matchView);
         ComponentUtilities.divertPageScrollingFromTo(filenameRegexField, matchView);
     }
+        
+    public void fileListStateChanged(final boolean isNowValid) {
+        // Ensure we're running on the EDT.
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                processFileListStateChange(isNowValid);
+            }
+        });
+    }
     
-    public void fileListStateChanged(boolean isNowValid) {
+    private void processFileListStateChange(final boolean isNowValid) {
         if (isNowValid) {
             showMatches();
             matchView.setEnabled(true);
