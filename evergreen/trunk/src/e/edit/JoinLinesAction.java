@@ -23,11 +23,14 @@ public class JoinLinesAction extends ETextAction {
         if (startIndex >= buffer.length()) {
             return;
         }
+        // We remove the newline itself...
         int endIndex = startIndex + 1;
+        // ...and also any run of whitespace that follows (typically the next line's indentation, which is no longer needed).
         while (endIndex < buffer.length() && Character.isWhitespace(buffer.charAt(endIndex))) {
             ++endIndex;
         }
-        // FIXME: delete, or replace with a single ' '? what if the current line ends with whitespace?
-        textArea.delete(startIndex, endIndex - startIndex);
+        // We want vi(1)-like behavior where if the current line doesn't already end in a space, we append one.
+        String join = (startIndex > 0 && buffer.charAt(startIndex - 1) != ' ') ? " " : "";
+        textArea.replaceRange(join, startIndex, endIndex);
     }
 }
