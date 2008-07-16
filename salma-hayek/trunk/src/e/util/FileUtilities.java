@@ -13,13 +13,18 @@ import java.util.regex.*;
 public class FileUtilities {
     /**
      * Returns a new File for the given filename, coping with "~/".
-     * Try not to ever use "new File": use this instead.
+     * Try not to ever use "new File(String)": use this instead.
      */
     public static File fileFromString(String filename) {
         return new File(FileUtilities.parseUserFriendlyName(filename));
     }
+    
+    /**
+     * Returns a new File for the given filename, coping with "~/".
+     * Try not to ever use "new File(String, String)": use this instead.
+     */
     public static File fileFromParentAndString(String parent, String filename) {
-        return fileFromString(parent + File.separator + filename);
+        return fileFromString(FileUtilities.parseUserFriendlyName(parent) + File.separator + filename);
     }
 
     /**
