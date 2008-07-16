@@ -63,7 +63,7 @@ public class OpenImportAction extends ETextAction {
         List<String> importPath = importPathForFileType(fileType);
         for (String importDir : importPath) {
             File file;
-            if (importDir.startsWith("/")) {
+            if (importDir.startsWith("/") || importDir.startsWith("~")) {
                 file = FileUtilities.fileFromParentAndString(importDir, path);
             } else {
                 // We interpret non-absolute paths as being rooted at the current workspace's root.
