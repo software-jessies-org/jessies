@@ -1,8 +1,10 @@
 package e.edit;
 
 import e.util.*;
+import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.regex.*;
 import org.jdesktop.swingworker.SwingWorker;
@@ -22,12 +24,16 @@ public class WorkspaceFileList {
     }
     
     public void addFileListListener(Listener l) {
-        listeners.add(l);
-        fireListeners(fileList != null);
+        synchronized (listeners) {
+            listeners.add(l);
+            fireListeners(fileList != null);
+        }
     }
     
     public void removeFileListListener(Listener l) {
-        listeners.remove(l);
+        synchronized (listeners) {
+            listeners.remove(l);
+        }
     }
     
     public void dispose() {
@@ -198,9 +204,16 @@ public class WorkspaceFileList {
         }
     }
     
-    private void fireListeners(boolean isNowValid) {
-        for (Listener l : listeners) {
-            l.fileListStateChanged(isNowValid);
+    private void fireListeners(final boolean isNowValid) {
+        synchronized (listeners) {
+            for (final Listener l : listeners) {
+                // Ensure we're running on the EDT.
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        l.fileListStateChanged(isNowValid);
+                    }
+                });
+            }
         }
     }
     
@@ -208,6 +221,7 @@ public class WorkspaceFileList {
         /**
          * Invoked to notify listeners of the file list state.
          * Calls do not necessarily imply a change of state since the last notification.
+         * This class ensures that you will be called back on the EDT.
          */
         public void fileListStateChanged(boolean isNowValid);
     }

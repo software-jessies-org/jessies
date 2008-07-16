@@ -455,15 +455,6 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
         
     public void fileListStateChanged(final boolean isNowValid) {
-        // Ensure we're running on the EDT.
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                processFileListStateChange(isNowValid);
-            }
-        });
-    }
-    
-    private void processFileListStateChange(final boolean isNowValid) {
         if (isNowValid) {
             showMatches();
             matchView.setEnabled(true);
