@@ -261,6 +261,11 @@ class Java
   
   def init_default_heap_size()
     # Default heap size.
+    # FIXME: I suspect that our users with 1 GiB Linux boxes would have more responsive machines with the "100m" setting.
+    # Portably determining how much RAM we have is a game.
+    # sysctl hw.usermem on Mac OS
+    # cat /proc/meminfo on Linux and Cygwin
+    # sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) on Solaris?
     @heap_size = "1g"
     if target_os() == "Cygwin"
       @heap_size = "100m"
