@@ -51,9 +51,6 @@ HEADER_LINKS = $(patsubst $(SOURCE_DIRECTORY)/%,$(COMPILATION_DIRECTORY)/%,$(HEA
 # ----------------------------------------------------------------------------
 
 EXECUTABLES = $(BIN_DIRECTORY)/$(BASE_NAME)$(EXE_SUFFIX)
-WINDOWS_SUBSYSTEM_EXECUTABLES.$(TARGET_OS) =
-WINDOWS_SUBSYSTEM_EXECUTABLES.Cygwin = $(EXECUTABLES)
-WINDOWS_SUBSYSTEM_EXECUTABLES = $(WINDOWS_SUBSYSTEM_EXECUTABLES.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
 # Locate the JNI library and its intermediate files.
@@ -141,7 +138,6 @@ endef
 # after other assignments.
 # ----------------------------------------------------------------------------
 
-$(WINDOWS_SUBSYSTEM_EXECUTABLES): LOCAL_LDFLAGS += -Wl,--subsystem,windows
 # LOCAL_C_AND_CXX_FLAGS is evaluated here, so it can refer to local variables but not automatic ones.
 $(eval $(OBJECTS): C_AND_CXX_FLAGS += $(LOCAL_C_AND_CXX_FLAGS))
 # LOCAL_LDFLAGS is evaluated here, so it can refer to local variables but not automatic ones.
