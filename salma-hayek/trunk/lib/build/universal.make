@@ -240,6 +240,9 @@ LDFLAGS.Linux += -lX11
 # This seems unlikely to be harmful elsewhere.
 LDFLAGS.Linux += -lstdc++
 
+# Prevent desktop shortcuts from spewing forth console windows.
+LDFLAGS.Cygwin += -Wl,--subsystem,windows
+
 LDFLAGS += $(LDFLAGS.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
