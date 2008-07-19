@@ -30,7 +30,10 @@ public class BuildAction extends ETextAction {
     }
 
     private void buildProject() {
+        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         if (building) {
+            // Make sure the user can click on the Stop icon.
+            workspace.getErrorsWindow().setVisible(true);
             Evergreen.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
             return;
         }
@@ -58,7 +61,6 @@ public class BuildAction extends ETextAction {
             return;
         }
         
-        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
         if (shouldContinue == false) {
             return;
