@@ -65,8 +65,8 @@ void launchRuby(char** argValues) {
     }
     checkReadableFile("Ruby script", rubyScript);
     WindowsDllErrorModeChange windowsDllErrorModeChange;
-    execvp(interpreter, argValues);
-    throw unix_exception(std::string("execvp(\"") + interpreter + "\", ...)");
+    execv(interpreter, argValues);
+    throw unix_exception(std::string("execv(\"") + interpreter + "\", ...)");
 }
 
 int main(int, char** argValues) {
