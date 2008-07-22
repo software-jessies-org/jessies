@@ -95,7 +95,7 @@ void launchCygwin(char** argValues) {
     arguments.push_back(quote(program));
     // Make sure we invoke the Cygwin rubyw, not any native version that might be ahead of it on the PATH.
     std::string rubyInterpreter = cygwinBin + "\\rubyw.exe";
-    checkReadableFile("Cygwin Ruby (with no console window)", rubyInterpreter);
+    checkReadableFile("Cygwin Rubyw (Ruby with no console window)", rubyInterpreter);
     arguments.push_back(quote(rubyInterpreter));
     while (*argValues != 0) {
         const char* argument = *argValues;
