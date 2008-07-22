@@ -45,12 +45,6 @@ std::string readRegistryString(HKEY hive, const char* keyName, const char* value
 
 std::string findCygwinBin() {
     std::ostringstream os;
-    os << "This program requires Cygwin and Cygwin Ruby.\n";
-    os << "If you have never heard of Cygwin, then you do not have it installed.\n";
-    os << "If you want to install it, then you're in for a fun ride.\n";
-    os << "See http://software.jessies.org/salma-hayek/cygwin-setup.html for installation and setup hints.\n";
-    os << "The rest of this message is only relevant if you have Cygwin installed.\n";
-    os << "\n";
     os << "We failed to find Cygwin, the errors were:\n";
     typedef std::deque<HKEY> Hives;
     Hives hives;
@@ -91,16 +85,18 @@ void launchCygwin(char** argValues) {
     if (putenv(putenvArgument.c_str()) == -1) {
         throw unix_exception(std::string("putenv(\"") + putenvArgument + "\")");
     }
+    checkReadableFile("Cygwin DLL", cygwinBin + "\\cygwin1.dll");
     
     // Windows requires that we quote the arguments ourselves.
     typedef std::vector<std::string> Arguments;
     Arguments arguments;
-    std::string program = directory + "\\ruby-launcher";
+    std::string program = directory + "\\ruby-launcher.exe";
     // We mustn't quote the program argument but we must quote argv[0].
     arguments.push_back(quote(program));
     // Make sure we invoke the Cygwin rubyw, not any native version that might be ahead of it on the PATH.
-    checkReadableFile("Cygwin DLL", cygwinBin + "\\cygwin1.dll");
-    arguments.push_back(quote(cygwinBin + "\\rubyw"));
+    std::string rubyInterpreter = cygwinBin + "\\rubyw.exe";
+    checkReadableFile("Cygwin Ruby (with no console window)", rubyInterpreter);
+    arguments.push_back(quote(rubyInterpreter));
     while (*argValues != 0) {
         const char* argument = *argValues;
         arguments.push_back(quote(argument));
@@ -127,6 +123,12 @@ int main(int, char** argValues) {
         launchCygwin(argValues);
     } catch (const std::exception& ex) {
         std::ostringstream os;
+        os << "This program requires Cygwin and Cygwin Ruby.\n";
+        os << "If you have never heard of Cygwin, then you do not have it installed.\n";
+        os << "If you want to install it, then you're in for a fun ride.\n";
+        os << "See http://software.jessies.org/salma-hayek/cygwin-setup.html for installation and setup hints.\n";
+        os << "The rest of this message is only relevant if you have Cygwin and Cygwin Ruby installed.\n";
+        os << "\n";
         os << "Error: ";
         os << ex.what();
         os << std::endl;
