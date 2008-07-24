@@ -72,6 +72,11 @@ public class FileType {
                  PPlainTextStyler.class,
                  new String[] { ".txt" });
     
+    public static final FileType PROTO = new FileType("Protocol Buffer",
+                 PCppIndenter.class,
+                 PProtoTextStyler.class,
+                 new String[] { ".proto" });
+    
     public static final FileType PYTHON = new FileType("Python",
                  PPythonIndenter.class,
                  PPythonTextStyler.class,
