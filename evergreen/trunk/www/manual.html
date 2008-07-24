@@ -278,6 +278,10 @@ Note that we use the file type mode's name ("XML") rather than, say, the specifi
 
 <p>You can set the import path used by "Open Import" for any file type. Say you have a local copy of the JDK sources in <tt>/usr/java/src/</tt>, you could set <tt>Java.importPath=/usr/java/src/</tt> to search there. As with lint checkers above, use the file type mode's name.
 
+<h3><a name="configuration-margins">Right-hand Margins</a></h3>
+
+<p>You can tell Evergreen to draw a right-hand margin at any column position (when using a fixed font) on a per-file-type basis. To set the margin to 132 columns for Java, say, set <tt>Java.margin=132</tt>. As with lint checkers above, use the file type mode's name. As an extension, you can set <tt>default.margin</tt> to cover all file types <i>except</i> those you've explicitly set. As a further extension, you can set the margin to -1 to disable the margin for the file type in question (or "default").
+
 <h3><a name="configuration-build">Build Tools</a></h3>
 
 <p>If you don't use make(1) or ant(1), Evergreen has limited support for alternatives. You can set the <tt>build.specialPathPattern</tt> property to a regular expression that matches paths containing files to be built by your special tool. You'll also need to set <tt>build.specialBuildTool</tt> to the name of the tool to be run if the pattern matches. Note that your tool will be started in the directory containing the current file when the user asks for a build, so any searching for the appropriate build instructions is down to you. You may find it necessary to actually call a script that works out the appropriate arguments for the real build tool.
