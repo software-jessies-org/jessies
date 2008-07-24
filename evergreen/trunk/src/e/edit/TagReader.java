@@ -102,7 +102,7 @@ public class TagReader {
             return "PHP";
         } else if (fileType == FileType.PYTHON) {
             return "Python";
-        } else if (fileType == FileType.EMAIL || fileType == FileType.PATCH || fileType == FileType.TALC || fileType == FileType.VHDL || fileType == FileType.XML || fileType == FileType.PLAIN_TEXT) {
+        } else if (fileType == FileType.EMAIL || fileType == FileType.PATCH || fileType == FileType.PLAIN_TEXT || fileType == FileType.PROTO || fileType == FileType.TALC || fileType == FileType.VHDL || fileType == FileType.XML) {
             return null;
         } else {
             throw new RuntimeException("Don't know what ctags(1) calls \"" + fileType + "\"");
