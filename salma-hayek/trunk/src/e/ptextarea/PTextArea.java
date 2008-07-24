@@ -38,7 +38,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private List<StyleApplicator> styleApplicators;
     private TabStyleApplicator tabStyleApplicator = new TabStyleApplicator(this);
     
+    private boolean canShowRightHandMargin = false;
     private int rightHandMarginColumn = NO_MARGIN;
+    
     private ArrayList<PCaretListener> caretListeners = new ArrayList<PCaretListener>();
     private TreeMap<Integer, List<PLineSegment>> segmentCache = new TreeMap<Integer, List<PLineSegment>>();
     
@@ -560,8 +562,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     /**
      * Sets the column number at which to draw the margin. Typically, this is
-     * 80 when using a fixed-width font. Use the constant NO_MARGIN to suppress
-     * the drawing of any margin.
+     * 80 when using a fixed-width font. Use the constant NO_MARGIN (the
+     * default) to suppress the drawing of any margin.
      */
     public void showRightHandMarginAt(int rightHandMarginColumn) {
         this.rightHandMarginColumn = rightHandMarginColumn;
@@ -572,7 +574,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      * Test against the constant NO_MARGIN to see if no margin is being drawn.
      */
     public int getRightHandMarginColumn() {
-        return rightHandMarginColumn;
+        return canShowRightHandMargin ? rightHandMarginColumn : NO_MARGIN;
     }
     
     public void setTextStyler(PTextStyler textStyler) {
@@ -589,9 +591,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                 getLock().getWriteLock();
                 try {
                     cacheFontMetrics();
-                    boolean isFixedFont = GuiUtilities.isFontFixedWidth(font);
-                    showRightHandMarginAt(isFixedFont ? 80 : NO_MARGIN);
-                    //FIXME: setTabSize(isFixedFont ? 8 : 2);
+                    canShowRightHandMargin = GuiUtilities.isFontFixedWidth(font);
                     lines.invalidateWidths();
                     revalidateLineWrappings();
                 } finally {
