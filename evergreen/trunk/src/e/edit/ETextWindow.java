@@ -789,13 +789,13 @@ public class ETextWindow extends EWindow implements PTextListener {
      */
     private void ensureBufferDoesNotEndInMultipleNewlines() {
         PTextBuffer buffer = textArea.getTextBuffer();
-        int startIndex = buffer.length() - 1;
+        int startIndex = buffer.length();
         int endIndex = buffer.length() - 1;
         // FIXME: should we compress any run of whitespace down to a single '\n'? So "}\n\n  \n\n\n" would be just "}\n"?
         while (startIndex > 0 && buffer.charAt(startIndex - 1) == '\n') {
             --startIndex;
         }
-        if (startIndex != endIndex) {
+        if (startIndex < endIndex) {
             textArea.replaceRange("", startIndex, endIndex);
         }
     }
