@@ -7,11 +7,6 @@ import java.util.regex.*;
 public class FileType {
     private static final Map<String, FileType> ALL_FILE_TYPES = new HashMap<String, FileType>();
 
-    public static final FileType PLAIN_TEXT = new FileType("Plain Text",
-                 PNoOpIndenter.class,
-                 PPlainTextStyler.class,
-                 new String[] { ".txt" });
-    
     public static final FileType ASSEMBLER = new FileType("Assembler",
                  PNoOpIndenter.class,
                  PAssemblerTextStyler.class,
@@ -52,11 +47,6 @@ public class FileType {
                  PMakefileTextStyler.class,
                  new String[] { "Makefile", "GNUmakefile", "makefile", ".make" });
     
-    public static final FileType RUBY = new FileType("Ruby",
-                 PRubyIndenter.class,
-                 PRubyTextStyler.class,
-                 new String[] { ".rb" });
-    
     public static final FileType PATCH = new FileType("Patch",
                  PNoOpIndenter.class,
                  PPatchTextStyler.class,
@@ -77,10 +67,20 @@ public class FileType {
                  PPhpTextStyler.class,
                  new String[] { ".php" });
     
+    public static final FileType PLAIN_TEXT = new FileType("Plain Text",
+                 PNoOpIndenter.class,
+                 PPlainTextStyler.class,
+                 new String[] { ".txt" });
+    
     public static final FileType PYTHON = new FileType("Python",
                  PPythonIndenter.class,
                  PPythonTextStyler.class,
                  new String[] { ".py" });
+    
+    public static final FileType RUBY = new FileType("Ruby",
+                 PRubyIndenter.class,
+                 PRubyTextStyler.class,
+                 new String[] { ".rb" });
     
     public static final FileType TALC = new FileType("Talc",
                  PJavaIndenter.class,
