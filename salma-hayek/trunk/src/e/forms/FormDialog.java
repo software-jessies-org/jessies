@@ -34,7 +34,6 @@ public class FormDialog {
     
     private ArrayList<JTextComponent> listenedToTextFields;
     
-    private ComponentListener componentListener;
     private DocumentListener documentListener;
     
     private Timer textChangeTimer;
@@ -97,7 +96,7 @@ public class FormDialog {
         
         this.actionLabel = actionLabel;
         dialog.setModal(false);
-        configureDialog();
+        configureDialogEveryShowing();
         dialog.setVisible(true);
     }
     
@@ -109,7 +108,7 @@ public class FormDialog {
     public boolean show(String actionLabel) {
         this.actionLabel = actionLabel;
         dialog.setModal(true);
-        configureDialog();
+        configureDialogEveryShowing();
         dialog.setVisible(true);
         return wasAccepted;
     }
@@ -120,7 +119,17 @@ public class FormDialog {
         this.builder = builder;
         this.dialog = new JDialog(owner, title);
         
+        dialog.setResizable(true);
+        
         initAlwaysOnTopMonitoring();
+        initCloseBehavior();
+        
+        // Support for "as-you-type" interfaces that update whenever the user pauses in their typing.
+        // This is just the infrastructure; we still need to connect any text fields in the form to our listeners.
+        // (The order in which these are called is important because of dependencies between them.)
+        initComponentListener();
+        initTextChangeTimer();
+        initDocumentListener();
     }
     
     private Frame initOwner(Frame f) {
@@ -161,9 +170,9 @@ public class FormDialog {
         dialog.setAlwaysOnTop(owner.isAlwaysOnTop());
     }
     
-    private void configureDialog() {
-        dialog.setResizable(true);
-        
+    // Called every time we're about to show the dialog.
+    // Only things that need to happen *every* time the dialog is shown should be done here.
+    private void configureDialogEveryShowing() {
         // If we've got multiple tabs to display, we need a JTabbedPane.
         // Otherwise we'll take the one and only FormPanel.
         JComponent centerpiece = null;
@@ -198,14 +207,10 @@ public class FormDialog {
         // ...but if we've shown this dialog before, we put it back where it last was.
         restorePreviousSize();
         
-        initCloseBehavior();
-        initFocus(formPanels.get(0));
+        redirectFocus(formPanels.get(0));
         
-        // Support for "as-you-type" interfaces that update whenever the user pauses in their typing.
-        ActionListener listener = builder.typingTimeoutActionListener;
-        initComponentListener(listener);
-        initTextChangeTimer(listener);
-        initDocumentListener();
+        // Attach our document listener to the text fields.
+        addTextFieldListeners();
     }
     
     private JTabbedPane makeTabbedPaneForFormPanels(List<FormPanel> formPanels) {
@@ -253,15 +258,15 @@ public class FormDialog {
      * it if we're accepted without having notified the listener of the latest
      * typing.
      */
-    private void initComponentListener(final ActionListener listener) {
-        componentListener = new ComponentAdapter() {
+    private void initComponentListener() {
+        ComponentListener componentListener = new ComponentAdapter() {
             public void componentShown(ComponentEvent e) {
-                listener.actionPerformed(null);
+                builder.typingTimeoutActionListener.actionPerformed(null);
             }
             
             public void componentHidden(ComponentEvent e) {
                 if (wasAccepted && isListenerUpToDate == false) {
-                    listener.actionPerformed(null);
+                    builder.typingTimeoutActionListener.actionPerformed(null);
                 }
             }
         };
@@ -272,29 +277,24 @@ public class FormDialog {
      * Restarts our timer whenever the user types.
      */
     private void initDocumentListener() {
-        // Ensure we have a listener...
-        if (documentListener == null) {
-            this.documentListener = new DocumentListener() {
-                public void changedUpdate(DocumentEvent e) {
-                    textChanged();
-                }
-                
-                public void insertUpdate(DocumentEvent e) {
-                    textChanged();
-                }
-                
-                public void removeUpdate(DocumentEvent e) {
-                    textChanged();
-                }
-                
-                private void textChanged() {
-                    textChangeTimer.restart();
-                    isListenerUpToDate = false;
-                }
-            };
-        }
-        // ...and attach it to the text fields.
-        addTextFieldListeners();
+        this.documentListener = new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                textChanged();
+            }
+            
+            public void insertUpdate(DocumentEvent e) {
+                textChanged();
+            }
+            
+            public void removeUpdate(DocumentEvent e) {
+                textChanged();
+            }
+            
+            private void textChanged() {
+                textChangeTimer.restart();
+                isListenerUpToDate = false;
+            }
+        };
     }
     
     /**
@@ -302,18 +302,16 @@ public class FormDialog {
      * than 0.5s since the user typed anything, on the assumption that it's
      * time to update the UI in response.
      */
-    private void initTextChangeTimer(final ActionListener listener) {
-        if (textChangeTimer == null) {
-            textChangeTimer = new Timer(500, new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (dialog.isShowing()) {
-                        listener.actionPerformed(null);
-                        isListenerUpToDate = true;
-                    }
+    private void initTextChangeTimer() {
+        this.textChangeTimer = new Timer(500, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (dialog.isShowing()) {
+                    builder.typingTimeoutActionListener.actionPerformed(null);
+                    isListenerUpToDate = true;
                 }
-            });
-            textChangeTimer.setRepeats(false);
-        }
+            }
+        });
+        textChangeTimer.setRepeats(false);
         // It doesn't matter what we initialize this to; our ComponentListener
         // will do the right thing either way. But "true" seems more natural.
         isListenerUpToDate = true;
@@ -346,7 +344,7 @@ public class FormDialog {
         initKeyboardCloseBehavior();
     }
 
-    private void initFocus(FormPanel formPanel) {
+    private void redirectFocus(FormPanel formPanel) {
         dialogFocusRedirector = new DialogFocusRedirector(formPanel);
         dialogFocusRedirector.redirectFocus();
     }
@@ -425,7 +423,6 @@ public class FormDialog {
         }
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
-        dialog.removeComponentListener(componentListener);
         dialog.dispose();
     }
     
