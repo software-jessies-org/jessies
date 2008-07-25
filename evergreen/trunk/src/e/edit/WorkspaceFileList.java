@@ -26,7 +26,6 @@ public class WorkspaceFileList {
     public void addFileListListener(Listener l) {
         synchronized (listeners) {
             listeners.add(l);
-            fireListeners(fileList != null);
         }
     }
     
