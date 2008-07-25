@@ -34,6 +34,7 @@ public class FormDialog {
     
     private ArrayList<JTextComponent> listenedToTextFields;
     
+    private ComponentListener componentListener;
     private DocumentListener documentListener;
     
     private Timer textChangeTimer;
@@ -253,7 +254,7 @@ public class FormDialog {
      * typing.
      */
     private void initComponentListener(final ActionListener listener) {
-        dialog.addComponentListener(new ComponentAdapter() {
+        componentListener = new ComponentAdapter() {
             public void componentShown(ComponentEvent e) {
                 listener.actionPerformed(null);
             }
@@ -263,7 +264,8 @@ public class FormDialog {
                     listener.actionPerformed(null);
                 }
             }
-        });
+        };
+        dialog.addComponentListener(componentListener);
     }
     
     /**
@@ -423,6 +425,7 @@ public class FormDialog {
         }
         wasAccepted = isAcceptance;
         removeTextFieldListeners();
+        dialog.removeComponentListener(componentListener);
         dialog.dispose();
     }
     
