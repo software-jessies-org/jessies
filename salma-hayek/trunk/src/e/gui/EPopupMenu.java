@@ -159,4 +159,37 @@ public class EPopupMenu {
             show(menuItems, (Component) e.getSource(), e.getX(), e.getY());
         }
     }
+    
+    public static Action makeInfoItem(String text) {
+        return new InfoAction(text);
+    }
+    
+    private static class InfoAction extends AbstractAction {
+        public InfoAction(String text) {
+            super(text);
+            setEnabled(false);
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            // Do nothing.
+        }
+    }
+    
+    /**
+     * If 'selectedText' looks like a number, adds info actions to 'actions' showing that number translated to the other important bases.
+     */
+    public static void addNumberInfoItems(Collection<Action> actions, String selectedText) {
+        if (selectedText.contains("\n")) {
+            return;
+        }
+        
+        NumberDecoder numberDecoder = new NumberDecoder(selectedText);
+        if (numberDecoder.isValid()) {
+            actions.add(null);
+            List<String> items = numberDecoder.toStrings();
+            for (String item : items) {
+                actions.add(EPopupMenu.makeInfoItem(item));
+            }
+        }
+    }
 }
