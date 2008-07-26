@@ -677,7 +677,7 @@ public class JTerminalPane extends JPanel {
 			// Windows can be treated like either here because we're deliberately making it pretend to be retarded, to be like PuTTY.
 			String selectedText = GuiUtilities.isMacOs() ? getSelectionHighlighter().getTabbedString() : getSystemSelection();
 			addSelectionInfoItems(actions, selectedText);
-			addNumberInfoItems(actions, selectedText);
+			EPopupMenu.addNumberInfoItems(actions, selectedText);
 		}
 		
 		private void addSelectionInfoItems(Collection<Action> actions, String selectedText) {
@@ -692,41 +692,11 @@ public class JTerminalPane extends JPanel {
 				}
 			}
 			actions.add(null);
-			actions.add(makeInfoItem("Selection"));
-			actions.add(makeInfoItem("  characters: " + selectedText.length()));
+			actions.add(EPopupMenu.makeInfoItem("Selection"));
+			actions.add(EPopupMenu.makeInfoItem("  characters: " + selectedText.length()));
 			if (selectedLineCount != 0) {
-				actions.add(makeInfoItem("  lines: " + selectedLineCount));
+				actions.add(EPopupMenu.makeInfoItem("  lines: " + selectedLineCount));
 			}
-		}
-		
-		private void addNumberInfoItems(Collection<Action> actions, String selectedText) {
-			if (selectedText.contains("\n")) {
-				return;
-			}
-			
-			NumberDecoder numberDecoder = new NumberDecoder(selectedText);
-			if (numberDecoder.isValid()) {
-				actions.add(null);
-				List<String> items = numberDecoder.toStrings();
-				for (String item : items) {
-					actions.add(makeInfoItem(item));
-				}
-			}
-		}
-		
-		private Action makeInfoItem(String text) {
-			return new InfoAction(text);
-		}
-	}
-	
-	public static class InfoAction extends AbstractAction {
-		public InfoAction(String text) {
-			super(text);
-			setEnabled(false);
-		}
-		
-		public void actionPerformed(ActionEvent e) {
-			// Do nothing.
 		}
 	}
 	
