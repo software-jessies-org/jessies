@@ -56,8 +56,6 @@ HELP/DOCUMENTATION
 
 + also Perl documentation: use perldoc(1) for packages as well as functions. man page researcher should include "3pm" man pages in Perl context.
 
-+ base conversion advisor will have to become a tool tip to remain useful, i think. 
-
 + should JavaDoc link to real pages in a real web browser, or try to extract the relevant chunk? (i don't think Swing's HTML code is up to the job of showing full JavaDoc pages.)
 
 + Java: a visual distinction between methods from this interface and methods from superinterfaces would be useful.

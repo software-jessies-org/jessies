@@ -326,6 +326,7 @@ public class EErrorsWindow extends JFrame {
                 actions.add(new CheckInChangesAction());
                 actions.add(null);
                 actions.add(KILL_ERRORS_ACTION);
+                EPopupMenu.addNumberInfoItems(actions, textArea.getSelectedText());
             }
         });
     }

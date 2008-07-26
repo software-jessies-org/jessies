@@ -459,6 +459,7 @@ public class ETextWindow extends EWindow implements PTextListener {
                 actions.add(new ShowHistoryAction());
                 // FIXME: this could be an additional provider. Would there be any advantage?
                 addExternalToolMenuItems(actions);
+                EPopupMenu.addNumberInfoItems(actions, textArea.getSelectedText());
             }
         });
     }
