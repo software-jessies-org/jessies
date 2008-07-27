@@ -1522,7 +1522,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     private void initPopupMenu() {
         popupMenu =  new EPopupMenu(this);
-        popupMenu.addMenuItemProvider(new ExternalSearchItemProvider(this));
     }
     
     /**
