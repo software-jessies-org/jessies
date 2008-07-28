@@ -165,9 +165,7 @@ $(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
 
 ifneq "$(JNI_SOURCE)" ""
 
-# FIXME: The last prerequisite doesn't work because BIN_DIRECTORY doesn't start with $(PROJECT_ROOT)/.
-# Switching to absolute paths everywhere is too big a change for today.
-$(NEW_JNI_HEADER): .generated/java.build-finished $(JAVAHPP) $(SALMA_HAYEK)/.generated/classes/e/tools/JavaHpp.class $(SALMA_HAYEK)/.generated/$(TARGET_DIRECTORY)/bin/java-launcher$(EXE_SUFFIX)
+$(NEW_JNI_HEADER): .generated/java.build-finished $(JAVAHPP) $(SALMA_HAYEK)/.generated/classes/e/tools/JavaHpp.class
 	@echo "Generating JNI header..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
