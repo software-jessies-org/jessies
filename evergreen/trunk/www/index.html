@@ -7,12 +7,11 @@
 
 <h1>Evergreen</h1>
 
-<p><strong>Evergreen (formerly "Edit") is a cross-platform GPL development environment that tries to be lightweight and language-agnostic yet functional.</strong>
+<p><strong>Evergreen is a cross-platform GPL development environment that tries to be lightweight and language-agnostic yet functional.</strong>
 
-<p>Evergreen started as a project to reimplement Rob Pike's <a href="http://plan9.bell-labs.com/sys/doc/acme.html">acme</a> editor in Java, so I could use it on Unix and Windows.
-(I'd got used to it at university, using Plan 9.)
-Eventually, my editor diverged and today probably represents my personality quite closely; in particular, if the computer <i>can</i> do the right thing, it <i>must</i>.
-I certainly shouldn't have to.
+<p>Evergreen started as a project to reimplement Rob Pike's <a href="http://plan9.bell-labs.com/sys/doc/acme.html">acme</a> editor in Java, for use on Unix and Windows instead of Plan&nbsp;9. In the decade since then, its evolved in directions that help it deal with large codebases, and multiple projects/branches at once. Remaining similarities include the tiled windows and the Unix-like reliance on external programs rather than reinventing every wheel. The major philosophical differences include strong support for keyboard-based editing, language-specific functionality, and native platform UI conventions.
+
+There are also two new guiding principles: accept regular expressions, output diffs.
 
 <!--#include virtual="/salma-hayek/navigation.html" -->
 
@@ -79,7 +78,7 @@ How much better to be able to see all the changes at once, with the results of t
 
 <p align="center"><img src="find-replace.png" width="706" height="530" alt="Find and replace">
 
-<p>(An open question is whether we wouldn't be even more comfortable with something more like the output from <tt>diff&nbsp;-u</tt>.)
+<p>(This is the obvious exception to the "output diffs" rule.)
 
 <li><p><strong>Workspaces</strong> - You can work on multiple projects at once, with each "workspace" getting its own tab in the overall UI [<a href="manual.html#workspaces">full details</a>].
 <p>Workspaces are important.
