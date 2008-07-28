@@ -720,6 +720,9 @@ www-dist: ChangeLog.html
 	cp $< $@.tmp && \
 	mv $@.tmp $@
 
+# I want to be able to use $(SALMA_HAYEK)/ in dependencies without changing all of the relative rules to use absolute paths.
+$(PROJECT_ROOT)/%: %;
+
 # ----------------------------------------------------------------------------
 # How to build a .app directory and package it into an installer file.
 # ----------------------------------------------------------------------------
