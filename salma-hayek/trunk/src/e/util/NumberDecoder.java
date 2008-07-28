@@ -3,6 +3,9 @@ package e.util;
 import java.util.*;
 
 public class NumberDecoder {
+    // FIXME: has anyone ever actually wanted to convert something to octal?
+    private static final int[] OUTPUT_BASES = { 16, 10, 8, 2 };
+    
     private long number;
     private int radix = 10;
     private boolean valid = false;
@@ -81,10 +84,31 @@ public class NumberDecoder {
         }
     }
     
-    private int[] bases = { 16, 10, 8, 2 };
-    
     private static String toString(int radix, long number) {
-        return radixToName(radix) + " " + radixToPrefix(radix) + Long.toString(number, radix);
+        String digits = Long.toString(number, radix);
+        // Make it easier to read large numbers.
+        if (radix == 2) {
+            // FIXME: it would be convenient if binary numbers were always a multiple of 4 digits long (i.e. no partial bytes).
+            // FIXME: it would be nice to be able to see the boundary between the top and bottom 32 bits in binary.
+            digits = insertCharEveryNDigits(digits, ' ', 4);
+        } else  if (radix == 10) {
+            // FIXME: exact powers of two would usefully be given as "2048 (2Ki)", maybe (utility increasing with magnitude, probably).
+            digits = insertCharEveryNDigits(digits, ',', 3);
+        } else  if (radix == 16) {
+            // FIXME: it would be convenient if hex numbers were always a multiple of 2 digits long (i.e. no partial bytes).
+            digits = insertCharEveryNDigits(digits, ' ', 4);
+        }
+        return radixToName(radix) + " " + radixToPrefix(radix) + digits;
+    }
+    
+    private static String insertCharEveryNDigits(String s, char ch, int n) {
+        StringBuilder result = new StringBuilder(s);
+        for (int i = 1; i < s.length(); ++i) {
+            if ((i % n) == 0) {
+                result.insert(s.length() - i, ch);
+            }
+        }
+        return result.toString();
     }
     
     private String toASCII(long number) {
@@ -113,7 +137,7 @@ public class NumberDecoder {
         }
         ArrayList<String> result = new ArrayList<String>();
         result.add(toString(radix, number) + ":");
-        for (int possibleBase : bases) {
+        for (int possibleBase : OUTPUT_BASES) {
             if (possibleBase != radix) {
                 result.add("    " + toString(possibleBase, number));
             }
