@@ -763,7 +763,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	cd $(@D) && \
-	fakeroot alien --to-rpm $(CURDIR)/$<
+	fakeroot alien --to-rpm $(abspath $<)
 
 # ----------------------------------------------------------------------------
 # WiX
@@ -795,7 +795,7 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 $(INSTALLER.msi): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj $(BUILD_TARGETS)
 	@echo Creating Windows installer...
 	cd $(PACKAGING_DIRECTORY) && \
-	light -nologo -out $(call convertToNativeFilenames,$(CURDIR)/$@ $(CURDIR)/$<)
+	light -nologo -out $(call convertToNativeFilenames,$(abspath $@) $(abspath $<))
 
 $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/build/installer.wxs
 	$(COPY_RULE)
