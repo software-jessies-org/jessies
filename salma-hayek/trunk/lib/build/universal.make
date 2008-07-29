@@ -878,18 +878,24 @@ remove: $(addprefix run-remover,$(suffix $(PUBLISHABLE_INSTALLERS)))
 
 .PHONY: run-installer.pkg
 run-installer.pkg:
+	@echo Running Solaris installer...
 	yes | sudo /usr/sbin/pkgadd -G -d $(INSTALLER.pkg) all
 
 .PHONY: run-installer.deb
 run-installer.deb:
+	@echo Running Debian installer...
 	sudo dpkg -i $(INSTALLER.deb)
 
+# We use Debian packaging tools to build RPM installers, so "make installer" is unlikely work on RedHat.
+# And "make install" always rebuilds the installer because of the bogus ".app" target.
+# The command you want on RedHat is:
+# sudo rpm -i `make -f ../salma-hayek/lib/build/universal.make echo.INSTALLER.rpm`
 .PHONY: run-installer.rpm
-run-installer.rpm:
-	@echo Installing the .rpm might be possible with sudo rpm -i $(INSTALLER.rpm) but that would be a bad idea on a Debian box...
+run-installer.rpm:;
 
 .PHONY: run-installer.dmg
 run-installer.dmg:
+	@echo Running Mac OS installer...
 	open -a DiskImageMounter $(INSTALLER.dmg)
 
 .PHONY: run-installer.msi
