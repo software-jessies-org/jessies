@@ -339,8 +339,9 @@ PROJECT_DIRECTORY_BASE_NAME = $(notdir $(PROJECT_ROOT))
 HUMAN_PROJECT_NAME ?= $(PROJECT_DIRECTORY_BASE_NAME)
 MACHINE_PROJECT_NAME := $(shell ruby -e 'puts("$(HUMAN_PROJECT_NAME)".downcase())')
 
-BIN_DIRECTORY = .generated/$(TARGET_DIRECTORY)/bin
-LIB_DIRECTORY = .generated/$(TARGET_DIRECTORY)/lib
+# I want to be able to use $(SALMA_HAYEK)/.generated/$(TARGET_DIRECTORY)/bin/... in dependencies.
+BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_DIRECTORY)/bin
+LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_DIRECTORY)/lib
 
 # Distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST = software@jessies.org
@@ -719,9 +720,6 @@ www-dist: ChangeLog.html
 	mkdir -p $(@D) && \
 	cp $< $@.tmp && \
 	mv $@.tmp $@
-
-# I want to be able to use $(SALMA_HAYEK)/ in dependencies without changing all of the relative rules to use absolute paths.
-$(PROJECT_ROOT)/%: %;
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory and package it into an installer file.
