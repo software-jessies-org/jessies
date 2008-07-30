@@ -4,24 +4,31 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static void ensureCallerIsProcessGroupLeader() {
+static void ensureCallerIsProcessGroupLeaderAndHasNoControllingTerminal() {
   if (getpid() == getpgrp()) {
-    return;
+    // Thanks to a modification by John Fremlin, Debian's setsid(1) forks in this situation,
+    // running the child in the background, which isn't what we'd want.
+    // We don't currently run this program as a process group leader.
+    // We may be hiding a different implementation of setsid, so have the grace to fail with an informative error message.
+    std::cerr << "the software.jessies.org implementation of setsid does not work for process group leaders." << std::endl;
+    exit(EXIT_FAILURE);
   }
 
-  if (setpgid(0, 0) < 0) {
-    perror("setpgid(0, 0)");
+  if (setsid() < 0) {
+    perror("setsid()");
     exit(EXIT_FAILURE);
   }
 }
 
 int main(int, char* argv[]) {
   if (*++argv == 0) {
-    std::cerr << "usage: setpgid PROGRAM [ARGUMENTS...]" << std::endl;
+    std::cerr << "usage: setsid PROGRAM [ARGUMENTS...]" << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  ensureCallerIsProcessGroupLeader();
+  // When Evergreen runs CheckInTool and CheckInTool runs a commit that uses ssh and ssh decides to ask for a password,
+  // then we don't want the OS to suspend the whole process group with SIGTTIN.
+  ensureCallerIsProcessGroupLeaderAndHasNoControllingTerminal();
   execvp(*argv, argv);
 
   // execvp(3) failed.

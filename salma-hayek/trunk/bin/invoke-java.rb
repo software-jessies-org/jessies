@@ -322,7 +322,7 @@ class Java
     # File::PATH_SEPARATOR is the right choice here for Cygwin (":") and native Windows Ruby (";").
     originalPathComponents = ENV["PATH"].split(File::PATH_SEPARATOR)
     newPathComponents = []
-    # Ensure that our setpgid(1) is on the PATH, for the potential benefit of Evergreen.
+    # Ensure that our setsid(1) is on the PATH, for the potential benefit of Evergreen.
     # Experience suggests that various startup files are likely to reset the PATH in terminator shells.
     newPathComponents.concat(getExtraPathComponents())
     newPathComponents.concat(originalPathComponents)
