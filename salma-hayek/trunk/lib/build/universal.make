@@ -844,16 +844,15 @@ native-dist: $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS))
 # We still need the default salma-hayek build during the nightly build.
 install installer native-dist: $(BUILD_TARGETS)
 
-# I'm deliberately downloading the previous version of the installer and overwriting the version you've just built.
-# This is so that, when we regenerate the Packages file, we don't change md5sums.
-# If you want to upload a new installer, you're going to have to check-in first (or change this rule or manually delete the old one).
+# We mustn't overwrite a file on the server whose md5sum is in Packages file or Debian's tools complain mightily.
+# If you want to upload a new installer, then please check-in first, so the version number changes.
 .PHONY: upload.%
 $(addprefix upload.,$(PUBLISHABLE_INSTALLERS)): upload.%: %
-	@echo Uploading $(<F)...
+	@echo Testing for $(<F) on the server... && \
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY)  '&&' test -f $(DIST_DIRECTORY)/$(<F) && { \
-		echo Overwriting the local $(<F) with the copy of that version from the server - it should not be overwritten once its md5sums are in a Debian Packages file... && \
-		scp $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F) $<; \
+		echo Leaving $(<F) alone...; \
 	} || { \
+		echo Uploading $(<F)... && \
 		scp $< $(DIST_SSH_USER_AND_HOST):$(DIST_DIRECTORY)/$(<F).tmp && \
 		ssh $(DIST_SSH_USER_AND_HOST) mv $(DIST_DIRECTORY)/$(<F).tmp $(DIST_DIRECTORY)/$(<F); \
 	}
