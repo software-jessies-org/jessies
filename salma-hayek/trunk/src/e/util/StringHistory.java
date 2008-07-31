@@ -1,15 +1,19 @@
 package e.util;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.regex.*;
 
 /**
  * A duplicate-free list of strings, optionally persisted to disk.
  * Strings at low-numbered indexes are older than those at high-numbered indexes.
+ * FIXME: we should put some bound on the amount of history we're prepared to keep.
  * 
  * @author Phil Norman
  */
 public class StringHistory {
+    private static final ExecutorService executor = ThreadUtilities.newSingleThreadExecutor("StringHistory Writer");
+    
     private String filename;
     private ArrayList<String> history;
     
@@ -97,9 +101,15 @@ public class StringHistory {
             return;
         }
         
-        String error = StringUtilities.writeFile(FileUtilities.fileFromString(filename), StringUtilities.join(history, "\n"));
-        if (error != null) {
-            Log.warn("Failed to write history to file \"" + filename + "\" (" + error + ").");
-        }
+        // Make sure that we don't write to disk off the EDT.
+        // FIXME: this relies on the calling code not calling us too frequently; a timer might be a better idea.
+        executor.execute(new Runnable() {
+            public void run() {
+                String error = StringUtilities.writeFile(FileUtilities.fileFromString(filename), StringUtilities.join(history, "\n"));
+                if (error != null) {
+                    Log.warn("Failed to write history to file \"" + filename + "\" (" + error + ").");
+                }
+            }
+        });
     }
 }
