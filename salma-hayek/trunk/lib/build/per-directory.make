@@ -71,12 +71,6 @@ BUILDING_JNI = $(JNI_SOURCE)
 LOCAL_C_AND_CXX_FLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64)
 LOCAL_LDFLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64 -framework JavaVM)
 
-define JAVAHPP_RULE
-$(JAVAHPP) -classpath .generated/classes $(JNI_CLASS_NAME) > $(NEW_JNI_HEADER).tmp && \
-mv $(NEW_JNI_HEADER).tmp $(NEW_JNI_HEADER) && \
-{ cmp -s $(NEW_JNI_HEADER) $(JNI_HEADER) || cp $(NEW_JNI_HEADER) $(JNI_HEADER); }
-endef
-
 # ----------------------------------------------------------------------------
 # Build shared libraries.
 # ----------------------------------------------------------------------------
@@ -143,7 +137,7 @@ endef
 $(eval $(OBJECTS): C_AND_CXX_FLAGS += $(LOCAL_C_AND_CXX_FLAGS))
 # LOCAL_LDFLAGS is evaluated here, so it can refer to local variables but not automatic ones.
 $(eval $(EXECUTABLES) $(SHARED_LIBRARY): LDFLAGS += $(LOCAL_LDFLAGS))
-$(NEW_JNI_HEADER): RULE := $(JAVAHPP_RULE)
+$(NEW_JNI_HEADER): JNI_CLASS_NAME := $(JNI_CLASS_NAME)
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
 # ----------------------------------------------------------------------------
@@ -170,11 +164,13 @@ $(NEW_JNI_HEADER): .generated/java.build-finished $(JAVAHPP) $(SALMA_HAYEK)/.gen
 	@echo "Generating JNI header..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	$(RULE)
+	$(JAVAHPP) -classpath .generated/classes $(JNI_CLASS_NAME) > $@.tmp && \
+	mv $@.tmp $@
 
 $(JNI_OBJECT): $(JNI_HEADER)
 build: $(NEW_JNI_HEADER)
 $(JNI_HEADER): $(NEW_JNI_HEADER);
+	{ cmp -s $< $@ || { cp $< $@.tmp && mv $@.tmp $@; }; }
 
 endif
 
