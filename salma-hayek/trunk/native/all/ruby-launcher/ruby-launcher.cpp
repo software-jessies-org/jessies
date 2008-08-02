@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 #include "checkReadableFile.h"
-#include "reportArgValuesViaGui.h"
+#include "reportArgValues.h"
 #include "reportFatalErrorViaGui.h"
 #include "toString.h"
 #include "unix_exception.h"
@@ -71,11 +71,10 @@ void launchRuby(char** argValues) {
 
 int main(int, char** argValues) {
     const char* ARGV0 = *argValues;
-    ++ argValues;
     try {
         // It would seem that we can, at the moment, but I expect it'll rust.
         //throw std::runtime_error("can we report an early failure?");
-        launchRuby(argValues);
+        launchRuby(argValues + 1);
     } catch (const std::exception& ex) {
         std::ostringstream os;
         os << "Error: ";

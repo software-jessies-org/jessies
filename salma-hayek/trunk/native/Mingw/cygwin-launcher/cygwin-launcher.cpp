@@ -1,5 +1,6 @@
 #include "checkReadableFile.h"
 #include "join.h"
+#include "reportArgValues.h"
 #include "reportFatalErrorViaGui.h"
 #include "toString.h"
 #include "unix_exception.h"
@@ -135,6 +136,8 @@ int main(int, char** argValues) {
         os << ARGV0;
         os << " <Cygwin program name> <arguments>...";
         os << std::endl;
+        os << std::endl;
+        reportArgValues(os, argValues);
         reportFatalErrorViaGui("Cygwin Launcher", os.str());
         return 1;
     }
