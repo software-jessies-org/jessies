@@ -70,7 +70,6 @@ void launchRuby(char** argValues) {
 }
 
 int main(int, char** argValues) {
-    //reportArgValuesViaGui(argValues);
     const char* ARGV0 = *argValues;
     ++ argValues;
     try {
@@ -87,6 +86,8 @@ int main(int, char** argValues) {
         os << ARGV0;
         os << " <Ruby interpreter> <Ruby script> <arguments>...";
         os << std::endl;
+        os << std::endl;
+        reportArgValues(os, argValues);
         reportFatalErrorViaGui("Ruby Launcher", os.str());
         return 1;
     }
