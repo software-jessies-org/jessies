@@ -56,8 +56,8 @@ public class TagReader {
         command.add("-n");
         command.add("--fields=+am");
         command.add("-u");
-        command.add("--regex-java=/(\\bstatic\\b)/\1/S/");
-        command.add("--regex-c++=/(\\bstatic\\b)/\1/S/");
+        command.add("--regex-java=/(\\bstatic\\b)/\\1/S/");
+        command.add("--regex-c++=/(\\bstatic\\b)/\\1/S/");
         if (fileType != null) {
             command.add("--language-force=" + ctagsLanguageForFileType(fileType));
         }
