@@ -19,7 +19,7 @@ public class TagsUpdater {
     
     private static int latestSerialNumber = 0;
     private ETree tree;
-    private JPanel uiPanel;
+    private JScrollPane uiPanel;
     private ETextWindow textWindow;
     private boolean followCaretChanges;
     private File temporaryFile;
@@ -122,21 +122,7 @@ public class TagsUpdater {
         tree.setFont(UIManager.getFont("TableHeader.font"));
         tree.setCellRenderer(new TagsPanel.TagsTreeRenderer());
         
-        final SearchField searchField = new SearchField("Search Symbols");
-        searchField.setSendsNotificationForEachKeystroke(true);
-        searchField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tree.clearSelection();
-                String searchTerm = searchField.getText();
-                if (searchTerm.length() > 0) {
-                    tree.selectNodesMatching(searchTerm, true);
-                }
-            }
-        });
-        
-        uiPanel = new JPanel(new BorderLayout());
-        uiPanel.add(searchField, BorderLayout.NORTH);
-        uiPanel.add(new JScrollPane(tree), BorderLayout.CENTER);
+        uiPanel = new JScrollPane(tree);
     }
     
     public ETextWindow getTextWindow() {
