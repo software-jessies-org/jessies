@@ -184,6 +184,8 @@ public class TagReader {
             tag = new JavaTag(identifier, lineNumber, type, context, containingClass);
         } else if (fileType == FileType.C_PLUS_PLUS) {
             tag = new CTag(identifier, lineNumber, type, context, containingClass);
+        } else if (fileType == FileType.JAVA_SCRIPT) {
+            tag = new JavaScriptTag(identifier, lineNumber, type, context, containingClass);
         } else if (fileType == FileType.PERL) {
             tag = new PerlTag(identifier, lineNumber, type, context, containingClass);
         } else if (fileType == FileType.RUBY) {
@@ -304,6 +306,20 @@ public class TagReader {
             if (containingClass.endsWith("." + identifier)) {
                 // An inner class constructor.
                 this.type = TagType.CONSTRUCTOR;
+            }
+        }
+    }
+    
+    public static class JavaScriptTag extends Tag {
+        public JavaScriptTag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
+            super(identifier, lineNumber, fixType(tagType), context, containingClass);
+        }
+        
+        private static char fixType(char type) {
+            switch (type) {
+                case 'f': return 'm'; // Function -> Method.
+                case 'p': return 'f'; // Property -> Field.
+                default: return type;
             }
         }
     }
