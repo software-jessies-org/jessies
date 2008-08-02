@@ -19,13 +19,11 @@ import java.util.*;
  */
 public class PythonDocumentationResearcher implements WorkspaceResearcher {
     public String research(String string, ETextWindow textWindow) {
-        String pydoc_binary = System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "scripts" + File.separator + "epydoc.py";
-        if (pydoc_binary == null) {
-            return "";
-        }
+        String pydocBinary = System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "scripts" + File.separator + "epydoc.py";
+        
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, new String[] { pydoc_binary, string }, lines, errors);
+        int status = ProcessUtilities.backQuote(null, new String[] { pydocBinary, string }, lines, errors);
         if (status == 1) {
             return "";
         }
