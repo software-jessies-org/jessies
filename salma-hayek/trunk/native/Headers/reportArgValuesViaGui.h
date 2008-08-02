@@ -6,9 +6,7 @@
 #include <iomanip>
 #include <sstream>
 
-void reportArgValuesViaGui(char const* const* argValues) {
-    const char* ARGV0 = *argValues;
-    std::ostringstream os;
+void reportArgValues(std::ostream& os, char const* const* argValues) {
     os << "arguments [";
     os << std::endl;
     while (*argValues != 0) {
@@ -20,6 +18,12 @@ void reportArgValuesViaGui(char const* const* argValues) {
     }
     os << "] arguments";
     os << std::endl;
+}
+
+void reportArgValuesViaGui(char const* const* argValues) {
+    const char* ARGV0 = *argValues;
+    std::ostringstream os;
+    reportArgValues(os, argValues);
     reportFatalErrorViaGui(ARGV0, os.str());
 }
 
