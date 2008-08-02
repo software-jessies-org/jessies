@@ -43,8 +43,13 @@ else
                 $stderr.puts(text)
             end
         elsif target_os() == "Cygwin" || target_os() == "Windows"
+            platformMessageLines = []
+            platformMessageLines << message
+            platformMessageLines << ""
+            platformMessageLines << "Please copy this message to the clipboard with Ctrl-C and mail it to software@jessies.org.";
+            platformMessageLines << "(Windows won't let you select the text but Ctrl-C works anyway.)";
             require "Win32API"
-            Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, message, title, 0)
+            Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, platformMessageLines.join("\n"), title, 0)
         end
     end
     
@@ -79,6 +84,7 @@ else
             end
         rescue Exception => e
             show_uncaught_exception(app_name, e)
+            exit(1)
         end
     end
 end

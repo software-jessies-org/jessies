@@ -415,16 +415,25 @@ class Java
     args.concat(@extra_app_arguments)
     args.concat(ARGV)
     #$stderr.puts(args)
-    if logging
-      failed = system(*args) == false
-      if failed
-        puts(File.new(@log_filename).readlines())
+    # We used to use exec() rather than system() to work around a Cygwin problem seen most of the time when running javahpp on Cygwin 1.5.21.
+    # I may have seen this less frequently on previous versions too.
+    # The symptom, as reported by procexp, is that the forked ruby process (the child) doesn't die.
+    failed = system(*args) == false
+    if failed
+      messageLines = []
+      messageLines << "Java failed with " + $?.inspect()
+      messageLines << ""
+      messageLines << "Command line was:"
+      messageLines << args.join(" ")
+      if logging
+        messageLines << ""
+        messageLines << "Log contained [";
+        messageLines.concat(File.new(@log_filename).readlines())
+        messageLines << "]"
       end
-    else
-      # Using exec() rather than system() works around a Cygwin problem seen most of the time when running javahpp on Cygwin 1.5.21.
-      # I may have seen this less frequently on previous versions too.
-      # The symptom, as reported by procexp, is that the forked ruby process (the child) doesn't die.
-      exec(*args)
+      # A backtrace appears after the message.
+      messageLines << ""
+      raise messageLines.join("\n")
     end
   end
 end

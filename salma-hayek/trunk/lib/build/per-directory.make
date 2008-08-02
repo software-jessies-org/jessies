@@ -72,7 +72,8 @@ LOCAL_C_AND_CXX_FLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64)
 LOCAL_LDFLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64 -framework JavaVM)
 
 define JAVAHPP_RULE
-$(JAVAHPP) -classpath .generated/classes $(JNI_CLASS_NAME) > $(NEW_JNI_HEADER) && \
+$(JAVAHPP) -classpath .generated/classes $(JNI_CLASS_NAME) > $(NEW_JNI_HEADER).tmp && \
+mv $(NEW_JNI_HEADER).tmp $(NEW_JNI_HEADER) && \
 { cmp -s $(NEW_JNI_HEADER) $(JNI_HEADER) || cp $(NEW_JNI_HEADER) $(JNI_HEADER); }
 endef
 
