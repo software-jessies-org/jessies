@@ -418,6 +418,10 @@ class Java
     # We used to use exec() rather than system() to work around a Cygwin problem seen most of the time when running javahpp on Cygwin 1.5.21.
     # I may have seen this less frequently on previous versions too.
     # The symptom, as reported by procexp, is that the forked ruby process (the child) doesn't die.
+    # I haven't seen that symptom again (in 1.5.25) since reverting to system() but it's early days.
+    # Even if it does recur, I was never one to worry much about process table clutter.
+    # Having Java crashes that look like installation problems, by contrast, wastes my time.
+    # We can relegate this comment to the revision history if the symptom has gone away.
     failed = system(*args) == false
     if failed
       messageLines = []
