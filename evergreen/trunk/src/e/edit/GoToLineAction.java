@@ -45,7 +45,7 @@ public class GoToLineAction extends ETextAction implements MinibufferUser {
     }
     
     public String getPrompt() {
-        return "Go To Line";
+        return "Go to Line";
     }
     
     /** Checks whether the line number is a number, and is less than the file's line count. */
