@@ -265,11 +265,18 @@ public class Evergreen {
         String address = "";
         if (FileUtilities.exists(filename) == false) {
             // Extract any address, which here means a trailing sequence of ":\d+"s.
+            //
             // Note that we try hard to cope with trailing junk so we can work with
             // grep(1) matches along the lines of "file.cpp:123:void something()"
             // where the end of the address and the beginning of the actual line
-            // are run together. We keep regressing on this behavior!
-            Pattern addressPattern = Pattern.compile("^((?:[A-Za-z]:\\\\){0,1}.+?)((:\\d+)*)(:|:?$)");
+            // are run together.
+            //
+            // Note also that we want any trailing ':' because we use that to mean
+            // "select the line" rather than just "place the caret at the start of
+            // this line".
+            // 
+            // FIXME: We keep regressing on this behavior! A unit test for this snippet would be an excellent idea.
+            Pattern addressPattern = Pattern.compile("^((?:[A-Za-z]:\\\\){0,1}.+?)((:\\d+)*(:|:?$))");
             Matcher addressMatcher = addressPattern.matcher(filename);
             if (addressMatcher.find()) {
                 address = addressMatcher.group(2);
