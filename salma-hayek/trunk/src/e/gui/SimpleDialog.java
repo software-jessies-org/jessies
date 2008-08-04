@@ -86,7 +86,7 @@ public class SimpleDialog {
     private static String makeDialogText(String title, String message) {
         // On Mac OS, the primary text should end in punctuation.
         if (GuiUtilities.isMacOs()) {
-            if (title.endsWith(".") == false && title.endsWith("?") == false) {
+            if (title.endsWith(".") == false && title.endsWith("?") == false && title.endsWith("!") == false) {
                 title += ".";
             }
         }
