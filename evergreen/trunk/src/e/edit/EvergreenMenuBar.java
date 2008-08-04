@@ -93,6 +93,7 @@ public class EvergreenMenuBar extends EMenuBar {
 
         menu.add(new JSeparator());
         menu.add(new GoToLineAction());
+        menu.add(new GoToTagAction());
         
         menu.add(new JSeparator());
         menu.add(new FindFilesContainingSelectionAction());
