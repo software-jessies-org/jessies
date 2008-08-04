@@ -10,6 +10,24 @@
 .DELETE_ON_ERROR:
 
 # ----------------------------------------------------------------------------
+# Define useful stuff not provided by GNU make.
+# ----------------------------------------------------------------------------
+
+SPACE = $(subst :, ,:)
+
+# I sprinkled the code with calls to dump the wall-clock time and counted the
+# lines of output to work out between which calls the time was disappearing.
+# I moved the calls around to isolate the particularly expensive lines.
+# When I'd isolated things which I couldn't easily improve,
+# I left one copy either side of each line - so you can get some idea of the time
+# taken by the line.
+# Yes, it's crude but, when faced with a build time of ~30s, it was adequate.
+#takeProfileSample = $(eval $(shell date --iso=s 1>&2))
+takeProfileSample =
+
+export MAKE
+
+# ----------------------------------------------------------------------------
 # Locate salma-hayek.
 # ----------------------------------------------------------------------------
 
@@ -59,7 +77,7 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
 endif
 
 # ----------------------------------------------------------------------------
-# Define useful stuff not provided by GNU make.
+# Abstractions to help with platform-specific file system differences.
 # ----------------------------------------------------------------------------
 
 EXE_SUFFIX.Cygwin = .exe
@@ -78,18 +96,6 @@ convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 searchPath = $(shell which $(1) 2> /dev/null)
 makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(strip $(1))))
 
-SPACE = $(subst :, ,:)
-
-# I sprinkled the code with calls to dump the wall-clock time and counted the
-# lines of output to work out between which calls the time was disappearing.
-# I moved the calls around to isolate the particularly expensive lines.
-# When I'd isolated things which I couldn't easily improve,
-# I left one copy either side of each line - so you can get some idea of the time
-# taken by the line.
-# Yes, it's crude but, when faced with a build time of ~30s, it was adequate.
-#takeProfileSample = $(eval $(shell date --iso=s 1>&2))
-takeProfileSample =
-
 symlink.$(TARGET_OS) = ln -s $(1) $(2)
 # Use cp for the benefit of Windows native compilers which don't
 # understand "symlinks".
@@ -102,8 +108,6 @@ define COPY_RULE
 	$(RM) $@ && \
 	$(call symlink,$<,$@)
 endef
-
-export MAKE
 
 # ----------------------------------------------------------------------------
 # Locate Java.
