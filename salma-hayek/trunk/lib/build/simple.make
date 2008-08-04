@@ -42,6 +42,10 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
     $(warning ../salma-hayek/lib/build/universal.make:494: *** makefile bug: local variable FIND_FALSE from scope setpgid (with value "! -prune") was referred to in scope setpgid.  Stop.)
 endif
 
+# universal.make produces suggestions for where to download make-3.81, if we manage to work out TARGET_OS.
+export REQUIRED_MAKE_VERSION
+export EARLIER_MAKE_VERSION
+
 # ----------------------------------------------------------------------------
 # Disable legacy make behavior.
 # ----------------------------------------------------------------------------
@@ -54,7 +58,8 @@ endif
 # Locate salma-hayek.
 # ----------------------------------------------------------------------------
 
-MOST_RECENT_MAKEFILE = $(lastword $(MAKEFILE_LIST))
+# $(lastword) isn't available in 3.80.
+MOST_RECENT_MAKEFILE = $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 # The location of this makefile shouldn't change with later includes.
 SIMPLE_MAKEFILE := $(MOST_RECENT_MAKEFILE)
 # $(dir $(dir)) doesn't do what you want.
