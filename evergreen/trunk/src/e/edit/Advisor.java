@@ -1,7 +1,6 @@
 package e.edit;
 
 import e.gui.*;
-import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -81,7 +80,7 @@ public class Advisor extends JPanel {
             getFrame().setVisible(false);
         }
         getFrame().setVisible(true);
-        startResearch(getSearchTerm());
+        startResearch(ETextAction.getSearchTerm());
     }
     
     private class ResearchRunner extends SwingWorker<String, Object> {
@@ -133,41 +132,6 @@ public class Advisor extends JPanel {
         }
         // JEditorPane.setText is thread-safe.
         advicePane.setText(content);
-    }
-    
-    private String getSearchTerm() {
-        ETextArea textArea = ETextAction.getFocusedTextArea();
-        if (textArea == null) {
-            return "";
-        }
-        
-        // We use the selection, if there is one.
-        String selection = textArea.getSelectedText();
-        if (selection.length() > 0) {
-            return selection.trim();
-        }
-        
-        // Otherwise, we use the word at the caret.
-        CharSequence chars = textArea.getTextBuffer();
-        String stopChars = chooseStopChars();
-        int caretPosition = textArea.getSelectionStart();
-        int start = PWordUtilities.getWordStart(chars, caretPosition, stopChars);
-        int end = PWordUtilities.getWordEnd(chars, caretPosition, stopChars);
-        return chars.subSequence(start, end).toString();
-    }
-    
-    private static String chooseStopChars() {
-        FileType fileType = ETextAction.getFocusedTextWindow().getFileType();
-        String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
-        if (fileType == FileType.C_PLUS_PLUS) {
-            // "::" is useful in C++, so remove it from the stop list.
-            // An alternative would be to stop insisting on the "std::" prefix for STL lookups, but that would introduce ambiguity: std::string versus string(3), for example.
-            stopChars = stopChars.replace(":", "");
-        } else if (fileType == FileType.PYTHON) {
-            // "." is useful in Python, because pydoc(1) wants fully-qualified names.
-            stopChars = stopChars.replace(".", "");
-        }
-        return stopChars;
     }
     
     private void startResearch(String text) {

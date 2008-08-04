@@ -31,6 +31,10 @@ public class FileIgnorer {
         if (isDirectory) {
             return isIgnoredDirectory(filename);
         }
+        // People using ctags(1) don't want their tags files indexed.
+        if (filename.equals("tags")) {
+            return true;
+        }
         return isIgnoredExtension(filename);
     }
     
