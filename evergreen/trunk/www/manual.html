@@ -306,7 +306,7 @@ Note that we use the file type mode's name ("XML") rather than, say, the specifi
 
 <p>On launch, Evergreen looks for properties whose names start <tt>tools.0.</tt> through <tt>tools.255.</tt>. All possibilities will be tested, with gaps being meaningless. If you want to add a separator to the menu, use <tt>tools.9.name=&lt;separator&gt;</tt> (changing 9 to correspond to where you want your separator).
 
-<p>The minimum information needed for an actual tool is a name and a command. You can add a keyboard equivalent if you like, either a function key or a single character; in the latter case, the keystroke will be control-shift-<i>letter</i>.
+<p>The minimum information needed for an actual tool is a name and a command. You can add a keyboard equivalent if you like, either a function key or a single character; in the latter case, the keystroke will be control-shift-<i>letter</i>. To add a mnemonic, insert an underscore before the relevant character in the name property.
 
 <!--FIXME: this would probably be clearer as a table. -->
 
@@ -325,9 +325,9 @@ tools.0.command=!wc $EDIT_CURRENT_FILENAME
 tools.0.keyboardEquivalent=f5
 </pre>
 
-<p>Here's how you'd make control-shift-e insert the current date:
+<p>Here's how you'd make control-shift-e insert the current date (with mnemonic 'D'):
 <pre>
-tools.1.name=insert date
+tools.1.name=Insert _Date
 tools.1.command=&lt;date --iso
 tools.1.keyboardEquivalent=e
 </pre>
