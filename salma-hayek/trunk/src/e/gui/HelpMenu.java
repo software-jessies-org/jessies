@@ -43,11 +43,11 @@ public class HelpMenu {
     
     private static class AboutBoxAction extends AbstractAction {
         private AboutBoxAction() {
-            String name = "About";
+            String name = "_About";
             if (GuiUtilities.isMacOs() == false) {
                 name += " " + Log.getApplicationName();
             }
-            putValue(NAME, name);
+            GuiUtilities.configureAction(this, name, null);
             GnomeStockIcon.useStockIcon(this, "gtk-about");
         }
         

@@ -1,5 +1,6 @@
 package e.ptextarea;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -8,14 +9,10 @@ public abstract class PTextAction extends AbstractAction {
     private PTextArea boundTextArea;
     
     /**
-     * The parameter keyStroke can be null if you don't want to bind this
-     * action to a key.
+     * The parameter 'key' can be null if you don't want to bind this action to a key, in which case 'shifted' is ignored.
      */
-    public PTextAction(String name, KeyStroke keyStroke) {
-        super(name);
-        if (keyStroke != null) {
-            putValue(ACCELERATOR_KEY, keyStroke);
-        }
+    public PTextAction(final String name, final String key, final boolean shifted) {
+        GuiUtilities.configureAction(this, name, (key != null) ? GuiUtilities.makeKeyStroke(key, shifted) : null);
     }
     
     public void actionPerformed(ActionEvent e) {
