@@ -55,6 +55,16 @@ export EARLIER_MAKE_VERSION
 .DELETE_ON_ERROR:
 
 # ----------------------------------------------------------------------------
+# Define useful stuff not provided by GNU make.
+# ----------------------------------------------------------------------------
+
+SPACE = $(subst :, ,:)
+
+ifneq "$(findstring $(SPACE),$(CURDIR))" ""
+$(error Your work area is under a directory whose name contains a space.  While it's possible to beat make into working with such directories, it's surprisingly hard and causes more problems than it solves.  So, sorry, but don't do that)
+endif
+
+# ----------------------------------------------------------------------------
 # Locate salma-hayek.
 # ----------------------------------------------------------------------------
 
