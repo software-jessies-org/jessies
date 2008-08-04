@@ -17,8 +17,7 @@ public class OpenImportAction extends ETextAction {
     private static final HashMap<FileType, String> importPaths = initImportPaths();
     
     public OpenImportAction() {
-        super("Open Import...");
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("O", true));
+        super("Open _Import...", GuiUtilities.makeKeyStroke("O", true));
     }
     
     public void actionPerformed(ActionEvent e) {

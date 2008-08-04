@@ -23,8 +23,7 @@ public class CheckForLintAction extends ETextAction {
     private static final HashMap<FileType, String> checkers = initCheckers();
     
     public CheckForLintAction() {
-        super("Check For Lint");
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("L", true));
+        super("Check For _Lint", GuiUtilities.makeKeyStroke("L", true));
     }
     
     public void actionPerformed(ActionEvent e) {

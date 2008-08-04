@@ -1,9 +1,8 @@
 package e.edit;
 
+import e.util.*;
 import java.io.*;
 import java.awt.event.*;
-
-import e.util.*;
 
 /**
  * Opens the "Find in Files" dialog with a regular expression to match the current
@@ -11,8 +10,7 @@ import e.util.*;
  */
 public class FindFilesContainingSelectionAction extends ETextAction {
     public FindFilesContainingSelectionAction() {
-        super("Find in Files...");
-        putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("G", true));
+        super("Find in Files...", GuiUtilities.makeKeyStroke("G", true));
     }
     
     public void actionPerformed(ActionEvent e) {

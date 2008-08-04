@@ -11,7 +11,7 @@ public class CycleWindowsAction extends ETextAction {
     private int indexDelta;
     
     public CycleWindowsAction(int indexDelta) {
-        super((indexDelta == 1) ? "Next Window" : "Previous Window");
+        super((indexDelta == 1) ? "Next Window" : "Previous Window", null);
         this.indexDelta = indexDelta;
         initKeyboardEquivalent();
     }

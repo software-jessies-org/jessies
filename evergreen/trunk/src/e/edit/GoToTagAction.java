@@ -14,11 +14,11 @@ public class GoToTagAction extends ETextAction {
         // We say "tag" to be honest: we really don't know what we're going to.
         // It could be a definition, it could be a declaration, it could be an implementation (think of something like "actionPerformed"), and isn't even necessarily the right kind of thing (we might take you to a global variable with the same name as a global function, say).
         // If you don't know what a 'tag' is, you probably don't have a "tags" file lying around to use this functionality anyway.
-        super("Go to Tag");
+        //
         // We use control-t even though we're roughly equivalent to Vim's control-] because:
         // (a) 't' for 'tag' is easier to remember
         // (b) using ] or } causes much pain for users with international keyboards (Danish in particular).
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("T", false));
+        super("Go to _Tag", GuiUtilities.makeKeyStroke("T", false));
     }
     
     public void actionPerformed(ActionEvent e) {

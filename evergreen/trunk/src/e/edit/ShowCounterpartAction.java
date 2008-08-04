@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.event.*;
 
 /**
@@ -7,8 +8,7 @@ import java.awt.event.*;
  */
 public class ShowCounterpartAction extends ETextAction {
     public ShowCounterpartAction() {
-        super("Switch to Header/Source");
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("P", true));
+        super("_Switch to Header/Source", GuiUtilities.makeKeyStroke("P", true));
     }
     
     public boolean isEnabled() {

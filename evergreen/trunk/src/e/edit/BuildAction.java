@@ -20,8 +20,7 @@ public class BuildAction extends ETextAction {
     private boolean building = false;
 
     public BuildAction() {
-        super("Build Project");
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("B", false));
+        super("_Build Project", GuiUtilities.makeKeyStroke("B", false));
         GnomeStockIcon.useStockIcon(this, "gtk-execute");
     }
 
