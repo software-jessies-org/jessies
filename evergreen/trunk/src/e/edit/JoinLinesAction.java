@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.ptextarea.*;
+import e.util.*;
 import java.awt.event.*;
 
 /**
@@ -8,8 +9,7 @@ import java.awt.event.*;
  */
 public class JoinLinesAction extends ETextAction {
     public JoinLinesAction() {
-        super("Join Lines");
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("J", true));
+        super("_Join Lines", GuiUtilities.makeKeyStroke("J", true));
     }
     
     public void actionPerformed(ActionEvent e) {

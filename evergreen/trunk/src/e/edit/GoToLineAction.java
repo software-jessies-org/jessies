@@ -12,8 +12,7 @@ public class GoToLineAction extends ETextAction implements MinibufferUser {
     private int initialCaretPosition;
     
     public GoToLineAction() {
-        super("Go to Line...");
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("L", false));
+        super("Go to _Line...", GuiUtilities.makeKeyStroke("L", false));
         GnomeStockIcon.configureAction(this);
     }
     

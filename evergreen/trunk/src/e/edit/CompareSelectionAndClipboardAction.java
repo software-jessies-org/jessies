@@ -23,7 +23,7 @@ import java.awt.event.*;
  */
 public class CompareSelectionAndClipboardAction extends ETextAction {
     public CompareSelectionAndClipboardAction() {
-        super("Compare Selection and Clipboard...");
+        super("Compare Selection and Clipboard...", null);
     }
     
     public void actionPerformed(ActionEvent e) {

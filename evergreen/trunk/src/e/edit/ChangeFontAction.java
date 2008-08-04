@@ -7,7 +7,7 @@ import e.util.*;
 
 public abstract class ChangeFontAction extends ETextAction {
     public ChangeFontAction(String fontDescription) {
-        super("Use " + fontDescription + " Font");
+        super("Use " + fontDescription + " Font", null);
     }
     
     public abstract Font getFont();

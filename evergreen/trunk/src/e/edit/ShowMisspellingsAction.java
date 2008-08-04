@@ -2,15 +2,15 @@ package e.edit;
 
 import e.forms.*;
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.*;
-import e.ptextarea.*;
 
 public class ShowMisspellingsAction extends PTextAction {
     public ShowMisspellingsAction() {
-        super("Show Misspellings...", null);
+        super("Show _Misspellings...", null, false);
     }
     
     private static String regularExpressionForWord(String word) {

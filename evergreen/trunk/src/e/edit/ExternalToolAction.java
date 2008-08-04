@@ -20,7 +20,7 @@ public class ExternalToolAction extends ETextAction {
      * Creates a new tool action.
      */
     public ExternalToolAction(String name, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition, String command) {
-        super(name);
+        super(name, null);
         this.inputDisposition = inputDisposition;
         this.outputDisposition = outputDisposition;
         this.command = command;

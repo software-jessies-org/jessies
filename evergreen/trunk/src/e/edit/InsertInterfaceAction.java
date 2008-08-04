@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.ptextarea.FileType;
+import e.util.*;
 import java.awt.event.*;
 import java.lang.reflect.*;
 import java.util.regex.*;
@@ -17,8 +18,7 @@ import java.util.regex.*;
  */
 public class InsertInterfaceAction extends ETextAction {
     public InsertInterfaceAction() {
-        super("Insert Java Interface");
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("I", true));
+        super("Insert Java Interface", GuiUtilities.makeKeyStroke("I", true));
     }
     
     public boolean isEnabled() {

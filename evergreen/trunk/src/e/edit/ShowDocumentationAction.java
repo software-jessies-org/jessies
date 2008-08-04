@@ -8,8 +8,7 @@ import javax.swing.*;
  */
 public class ShowDocumentationAction extends ETextAction {
     public ShowDocumentationAction() {
-        super("Show Documentation for Word");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+        super("Show Documentation for Word", KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
     }
     
     public void actionPerformed(ActionEvent e) {

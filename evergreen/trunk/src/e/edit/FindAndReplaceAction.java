@@ -26,8 +26,7 @@ public class FindAndReplaceAction extends ETextAction {
     private static final ExecutorService matchFinderExecutor = ThreadUtilities.newSingleThreadExecutor("Find and Replace");
     
     public FindAndReplaceAction() {
-        super("Find/Replace...");
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("R", false));
+        super("Find/_Replace...", GuiUtilities.makeKeyStroke("R", false));
         GnomeStockIcon.useStockIcon(this, "gtk-find-and-replace");
         
         initLists();

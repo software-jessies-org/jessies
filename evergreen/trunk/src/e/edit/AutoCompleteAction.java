@@ -13,14 +13,9 @@ public class AutoCompleteAction extends ETextAction {
     private JWindow completionsWindow;
     
     public AutoCompleteAction() {
-        super("Complete");
-        if (GuiUtilities.isMacOs()) {
-            // All Cocoa text components use this.
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_MASK));
-        } else {
-            // IDEA and Visual Studio both use this (and the window manager gets Alt Escape under GNOME).
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK));
-        }
+        // All Cocoa text components use alt-escape, but IDEA and Visual Studio both use control-space (and the window manager gets alt-escape under GNOME).
+        super("Complete", GuiUtilities.isMacOs() ? KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_MASK)
+                                                 : KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK));
     }
     
     public void actionPerformed(ActionEvent e) {

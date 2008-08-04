@@ -1,12 +1,12 @@
 package e.edit;
 
 import e.gui.*;
+import e.util.*;
 import java.awt.event.*;
 
 public class SaveAsAction extends ETextAction {
     public SaveAsAction() {
-        super("Save As...");
-        putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("S", true));
+        super("Save _As...", GuiUtilities.makeKeyStroke("S", true));
         GnomeStockIcon.configureAction(this);
     }
     

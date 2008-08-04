@@ -15,8 +15,7 @@ public class NewFileAction extends ETextAction {
     private static final FilenameChooserField filenameField = new FilenameChooserField(JFileChooser.FILES_AND_DIRECTORIES);
     
     public NewFileAction() {
-        super("New File...");
-        putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("N", false));
+        super("_New File...", GuiUtilities.makeKeyStroke("N", false));
         GnomeStockIcon.useStockIcon(this, "gtk-new");
     }
     

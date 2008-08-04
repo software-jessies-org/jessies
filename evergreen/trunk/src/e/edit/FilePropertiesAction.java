@@ -18,7 +18,7 @@ public class FilePropertiesAction extends ETextAction {
     private JTextField indentStringField = new JTextField("", 40);
     
     public FilePropertiesAction() {
-        super("File Properties...");
+        super("File Properties...", null);
         GnomeStockIcon.useStockIcon(this, "gtk-info");
     }
     

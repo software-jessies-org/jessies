@@ -1,13 +1,14 @@
 package e.edit;
 
+import e.util.*;
 import e.ptextarea.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
 public abstract class ETextAction extends AbstractAction {
-    public ETextAction(String name) {
-        super(name);
+    public ETextAction(String name, KeyStroke keystroke) {
+        GuiUtilities.configureAction(this, name, keystroke);
     }
     
     public abstract void actionPerformed(ActionEvent e);

@@ -13,8 +13,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     private StringHistory regularExpressionHistory;
     
     private FindAction() {
-        super("Find...");
-        putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("F", false));
+        super("_Find...", GuiUtilities.makeKeyStroke("F", false));
         GnomeStockIcon.configureAction(this);
         regularExpressionHistory = new StringHistory(Evergreen.getInstance().getPreferenceFilename("e.edit.FindAction-history"));
     }
