@@ -31,6 +31,9 @@ public class GuiUtilities {
     // Used by isFontFixedWidth.
     private static final java.awt.font.FontRenderContext DEFAULT_FONT_RENDER_CONTEXT = new java.awt.font.FontRenderContext(null, false, false);
     
+    // FIXME: Action.DISPLAYED_MNEMONIC_INDEX_KEY is only available in Java 6.
+    private static final String DISPLAYED_MNEMONIC_INDEX_KEY = "SwingDisplayedMnemonicIndexKey";
+    
     /**
      * Guesses whether a font is fixed-width by comparing the widths of
      * various characters known for having wildly different sizes in
@@ -125,7 +128,7 @@ public class GuiUtilities {
         if (underscoreIndex != -1) {
             action.putValue(Action.NAME, name.replaceAll("_", ""));
             action.putValue(Action.MNEMONIC_KEY, Integer.valueOf(Character.toUpperCase(name.charAt(underscoreIndex + 1))));
-            action.putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, underscoreIndex);
+            action.putValue(DISPLAYED_MNEMONIC_INDEX_KEY, underscoreIndex);
         } else {
             action.putValue(Action.NAME, name);
         }
