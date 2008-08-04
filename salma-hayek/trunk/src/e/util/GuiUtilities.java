@@ -115,6 +115,26 @@ public class GuiUtilities {
     }
     
     /**
+     * Configures 'action' to have the given name and keystroke.
+     * To have no keyboard equivalent, use null for 'keystroke'.
+     * Any underscores will be removed from 'name' and used to set the action's mnemonic index ("Cu_t", "_Copy", and "_Paste", for example).
+     * Mac OS will ignore mnemonics.
+     */
+    public static void configureAction(AbstractAction action, String name, KeyStroke keystroke) {
+        int underscoreIndex = name.indexOf('_');
+        if (underscoreIndex != -1) {
+            action.putValue(Action.NAME, name.replaceAll("_", ""));
+            action.putValue(Action.MNEMONIC_KEY, Integer.valueOf(Character.toUpperCase(name.charAt(underscoreIndex + 1))));
+            action.putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, underscoreIndex);
+        } else {
+            action.putValue(Action.NAME, name);
+        }
+        if (keystroke != null) {
+            action.putValue(Action.ACCELERATOR_KEY, keystroke);
+        }
+    }
+    
+    /**
      * Returns the name of the system's best monospaced font.
      */
     public synchronized static String getMonospacedFontName() {

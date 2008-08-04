@@ -3,6 +3,7 @@ package e.ptextarea;
 import e.gui.*;
 import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -37,7 +38,7 @@ public class PFind {
         private List<PTextAction> actions = new ArrayList<PTextAction>();
         
         public FindAction() {
-            super("Find...", e.util.GuiUtilities.makeKeyStroke("F", false));
+            super("_Find...", "F", false);
             initAction(PActionFactory.makeFindNextAction());
             initAction(PActionFactory.makeFindPreviousAction());
         }

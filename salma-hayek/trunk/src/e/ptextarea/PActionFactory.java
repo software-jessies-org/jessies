@@ -47,7 +47,7 @@ public class PActionFactory {
     
     public static class CopyAction extends PTextAction {
         public CopyAction() {
-            super("Copy", e.util.GuiUtilities.makeKeyStroke("C", false));
+            super("_Copy", "C", false);
             GnomeStockIcon.configureAction(this);
         }
         
@@ -58,7 +58,7 @@ public class PActionFactory {
     
     public static class CutAction extends PTextAction {
         public CutAction() {
-            super("Cut", e.util.GuiUtilities.makeKeyStroke("X", false));
+            super("Cu_t", "X", false);
             GnomeStockIcon.configureAction(this);
         }
         
@@ -69,7 +69,7 @@ public class PActionFactory {
     
     public static class FindMatchingBracketAction extends PTextAction {
         public FindMatchingBracketAction() {
-            super("Find Matching Bracket", e.util.GuiUtilities.makeKeyStroke("5", false));
+            super("Find _Matching Bracket", "5", false);
         }
         
         public void performOn(PTextArea textArea) {
@@ -83,7 +83,7 @@ public class PActionFactory {
     
     public static class FindNextAction extends PTextAction {
         public FindNextAction() {
-            super("Find Next", e.util.GuiUtilities.makeKeyStroke("G", false));
+            super("Find _Next", "G", false);
         }
         
         public void performOn(PTextArea textArea) {
@@ -93,7 +93,7 @@ public class PActionFactory {
     
     public static class FindPreviousAction extends PTextAction {
         public FindPreviousAction() {
-            super("Find Previous", e.util.GuiUtilities.makeKeyStroke("D", false));
+            super("Find _Previous", "D", false);
         }
         
         public void performOn(PTextArea textArea) {
@@ -103,7 +103,7 @@ public class PActionFactory {
     
     public static class PasteAction extends PTextAction {
         public PasteAction() {
-            super("Paste", e.util.GuiUtilities.makeKeyStroke("V", false));
+            super("_Paste", "V", false);
             GnomeStockIcon.configureAction(this);
         }
         
@@ -114,7 +114,7 @@ public class PActionFactory {
     
     public static class RedoAction extends PTextAction {
         public RedoAction() {
-            super("Redo", e.util.GuiUtilities.makeKeyStroke("Z", true));
+            super("_Redo", "Z", true);
             GnomeStockIcon.configureAction(this);
         }
         
@@ -130,7 +130,7 @@ public class PActionFactory {
     
     public static class SelectAllAction extends PTextAction {
         public SelectAllAction() {
-            super("Select All", e.util.GuiUtilities.makeKeyStroke("A", false));
+            super("Select _All", "A", false);
             GnomeStockIcon.configureAction(this);
         }
         
@@ -141,7 +141,7 @@ public class PActionFactory {
     
     public static class UndoAction extends PTextAction {
         public UndoAction() {
-            super("Undo", e.util.GuiUtilities.makeKeyStroke("Z", false));
+            super("_Undo", "Z", false);
             GnomeStockIcon.configureAction(this);
         }
         
