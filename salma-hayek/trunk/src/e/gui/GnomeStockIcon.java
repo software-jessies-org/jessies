@@ -32,7 +32,7 @@ public class GnomeStockIcon {
     }
     
     /**
-     * Sets the SMALL_ICON property to the given GNOME stock icon, assuming
+     * Sets the SMALL_ICON property to the given GTK+ stock icon, assuming
      * it's available. The SMALL_ICON property is left unchanged otherwise.
      */
     public static void useStockIcon(Action action, String name) {
@@ -47,7 +47,7 @@ public class GnomeStockIcon {
     }
     
     /**
-     * Sets the button's icon to the given GNOME stock icon, assuming
+     * Sets the button's icon to the given GTK+ stock icon, assuming
      * it's available.
      */
     public static void useStockIcon(JButton button, String name) {
@@ -177,11 +177,11 @@ public class GnomeStockIcon {
     }
     
     /**
-     * Returns an Icon for one of the GNOME stock icons.
+     * Returns an Icon for one of the GTK+ stock icons.
      * If the icon is not available for any reason, you'll get null.
      * (Not using the GTK LAF is one reason why.)
-     * The GNOME header file listing the possible strings is documented here:
-     * http://library.gnome.org/devel/gtk/unstable/gtk-Stock-Items.html
+     * The header file listing the possible strings is documented here:
+     * http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html
      */
     public static Icon getStockIcon(String name, Size size) {
         if (GuiUtilities.isGtk() == false) {
