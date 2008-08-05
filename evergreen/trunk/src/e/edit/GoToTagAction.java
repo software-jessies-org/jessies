@@ -61,7 +61,7 @@ public class GoToTagAction extends ETextAction {
         }
         
         if (addresses.size() == 0) {
-            Evergreen.getInstance().showAlert("Unable to go to tag", "No definition found for '" + tagName + "'.");
+            Evergreen.getInstance().showAlert("Unable to go to tag", "No definition found for \"" + tagName + "\".");
         } else if (addresses.size() == 1) {
             Evergreen.getInstance().openFile(workspaceRoot + File.separator + addresses.get(0));
         } else {
@@ -79,7 +79,7 @@ public class GoToTagAction extends ETextAction {
             });
             list.setCellRenderer(new EListCellRenderer(true));
             
-            FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Tags matching '" + tagName + "'");
+            FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Tags Matching \"" + tagName + "\"");
             form.getFormPanel().addRow("Tags:", new JScrollPane(list));
             form.showNonModal();
         }
