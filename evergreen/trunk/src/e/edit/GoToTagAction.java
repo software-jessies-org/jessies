@@ -52,7 +52,7 @@ public class GoToTagAction extends ETextAction {
         // Pull the addresses out of the matches.
         // We assume the output is in a form similar to http://code.google.com/p/google-gtags/ so people can use that or the default script we supply.
         ArrayList<String> addresses = new ArrayList<String>();
-        final Pattern pattern = Pattern.compile("^\\* ([^\t]+:\\d+)");
+        final Pattern pattern = Pattern.compile("^([^\t]+:\\d+)");
         for (String line: lines) {
             Matcher matcher = pattern.matcher(line);
             if (matcher.find()) {
