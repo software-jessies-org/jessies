@@ -20,7 +20,7 @@ matching_tag_lines.each() {
     if matching_tag_line =~ /^([^\t]+)\t([^\t]+)\t(\d+);"\t/
         file_name = $2
         line_number = $3
-        # Output matches in a form similar to http://code.google.com/p/google-gtags/ so this can easily be swapped out for that.
-        puts("* #{file_name}:#{line_number}")
+        # Output matches in the usual grep(1) style.
+        puts("#{file_name}:#{line_number}")
     end
 }
