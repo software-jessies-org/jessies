@@ -198,8 +198,6 @@ NAVIGATION
 
 + Navigation > Add/Remove Bookmark (toggle on F2) / Next Bookmark (ctrl-F2) / Previous Bookmark (ctrl-shift-F2) --- handy for getting back to where you were if you need to go off and search for something.
 
-+ Remove search field from tags panel, and add an action that pops up a filtering-list dialog (control-shift-t for 'tag'?).
-
 + Need tags for HTML.
 
 + A way to make caseChangesLikeThis count as word breaks. (Xcode 1.5 does this with control + arrow keys.)
