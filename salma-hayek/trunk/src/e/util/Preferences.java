@@ -155,7 +155,8 @@ public abstract class Preferences {
         private Preferences preferences;
         
         public ShowPreferencesAction(Preferences preferences) {
-            super("Preferences...");
+            // Firefox has 'n' as the mnemonic, but GNOME says 'e'.
+            GuiUtilities.configureAction(this, "Pr_eferences...", null);
             this.preferences = preferences;
             GnomeStockIcon.configureAction(this);
         }
