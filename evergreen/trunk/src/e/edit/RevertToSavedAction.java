@@ -8,7 +8,7 @@ The ETextArea revert-to-saved action.
 */
 public class RevertToSavedAction extends ETextAction {
     public RevertToSavedAction() {
-        super("Revert to Saved", null);
+        super("_Revert to Saved", null);
         GnomeStockIcon.configureAction(this);
     }
     
