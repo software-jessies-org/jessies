@@ -99,6 +99,11 @@ jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arr
         throw unix_exception("nativeRead called when fd == -1");
     }
     
+    // Zero byte reads worked for me on Cygwin 1.5.25 but let's eliminate the opportunity for crashing in this corner case.
+    if (desiredLength == 0) {
+        return 0;
+    }
+    
     jbyte buffer[8192];
     if (desiredLength > jint(sizeof(buffer))) {
         throw std::runtime_error("can't read more than " + toString(sizeof(buffer)) + " bytes at once; desiredLength=" + toString(desiredLength));
@@ -125,7 +130,7 @@ void terminator_terminal_PtyProcess::nativeWrite(jbyteArray bytes, jint arrayOff
         throw unix_exception("nativeWrite called when fd == -1");
     }
     
-    // On Cygwin, attempting a zero-byte write causes the JVM to crash with an EXCEPTION_ACCESS_VIOLATION in a "cygwin1.dll" stack frame.
+    // On Cygwin, on 2006-09-28, attempting a zero-byte write caused the JVM to crash with an EXCEPTION_ACCESS_VIOLATION in a "cygwin1.dll" stack frame.
     // So let's make sure we never do that.
     if (byteCount == 0) {
         return;
