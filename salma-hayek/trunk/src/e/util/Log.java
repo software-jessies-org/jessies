@@ -5,7 +5,7 @@ import java.lang.reflect.*;
 import java.util.regex.*;
 
 public class Log {
-    private static final Pattern CYGWIN_VERSION_PATTERN = Pattern.compile("^CYGWIN\\S* ([0-9.]+)");
+    private static final Pattern CYGWIN_VERSION_PATTERN = Pattern.compile("CYGWIN\\S* ([0-9.]+).*");
     
     /**
      * java.awt.EventDispatchThread checks this property before using its
