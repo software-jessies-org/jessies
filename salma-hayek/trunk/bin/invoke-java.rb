@@ -128,7 +128,7 @@ class Java
     set_icons(name)
     
     @launcher = "java"
-    if target_os() == "Cygwin"
+    if target_os() == "Cygwin" || ENV["USE_JAVA_LAUNCHER"] != nil
       # We need to load jvm.dll from a Cygwin executable to get a reliable Cygwin JNI experience.
       # This launcher doesn't use the same algorithm as Sun's for picking a jvm.dll.
       @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/java-launcher"

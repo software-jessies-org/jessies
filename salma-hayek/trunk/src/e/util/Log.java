@@ -2,8 +2,11 @@ package e.util;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.util.regex.*;
 
 public class Log {
+    private static final Pattern CYGWIN_VERSION_PATTERN = Pattern.compile("^CYGWIN\\S* ([0-9.]+)");
+    
     /**
      * java.awt.EventDispatchThread checks this property before using its
      * default exception-reporting code; if you set it to the name of a class,
@@ -55,6 +58,10 @@ public class Log {
     static {
         warn(getJavaVersion());
         warn(getOsVersion());
+        String launcherOsVersion = System.getProperty("e.util.Log.launcherOsVersion");
+        if (launcherOsVersion != null) {
+            warn(launcherOsVersion);
+        }
     }
     
     public static String getApplicationName() {
@@ -75,6 +82,13 @@ public class Log {
     private static String getOsVersion() {
         String osName = System.getProperty("os.name");
         String osVersion = System.getProperty("os.version");
+        String launcherOsVersion = System.getProperty("e.util.Log.launcherOsVersion");
+        if (launcherOsVersion != null) {
+            Matcher cygwinVersionMatcher = CYGWIN_VERSION_PATTERN.matcher(launcherOsVersion);
+            if (cygwinVersionMatcher.matches()) {
+                osVersion = osVersion + " Cygwin " + cygwinVersionMatcher.group(1);
+            }
+        }
         String osArch = System.getProperty("os.arch");
         final int processorCount = Runtime.getRuntime().availableProcessors();
         return osName + " " + osVersion + "/" + osArch + " x" + processorCount;
