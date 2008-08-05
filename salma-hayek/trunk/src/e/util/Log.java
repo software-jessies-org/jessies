@@ -5,8 +5,6 @@ import java.lang.reflect.*;
 import java.util.regex.*;
 
 public class Log {
-    private static final Pattern CYGWIN_VERSION_PATTERN = Pattern.compile("CYGWIN\\S* ([0-9.]+).*");
-    
     /**
      * java.awt.EventDispatchThread checks this property before using its
      * default exception-reporting code; if you set it to the name of a class,
@@ -83,10 +81,11 @@ public class Log {
         String osName = System.getProperty("os.name");
         String osVersion = System.getProperty("os.version");
         String launcherOsVersion = System.getProperty("e.util.Log.launcherOsVersion");
+        //launcherOsVersion = "CYGWIN_NT-5.0 1.5.25(0.156/4/2) 2008-06-12 19:34";        
         if (launcherOsVersion != null) {
-            Matcher cygwinVersionMatcher = CYGWIN_VERSION_PATTERN.matcher(launcherOsVersion);
-            if (cygwinVersionMatcher.matches()) {
-                osVersion = osVersion + " Cygwin " + cygwinVersionMatcher.group(1);
+            Matcher matcher = Pattern.compile("^CYGWIN\\S* ([0-9.]+)").matcher(launcherOsVersion);
+            if (matcher.find()) {
+                osVersion = osVersion + " Cygwin " + matcher.group(1);
             }
         }
         String osArch = System.getProperty("os.arch");
