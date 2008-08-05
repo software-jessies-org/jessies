@@ -1,11 +1,12 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
 public class SaveAllAction extends AbstractAction {
     public SaveAllAction() {
-        super("Save All");
+        GuiUtilities.configureAction(this, "Save A_ll", null);
     }
     
     public boolean isEnabled() {
