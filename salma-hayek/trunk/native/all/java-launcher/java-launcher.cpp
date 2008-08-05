@@ -7,6 +7,7 @@
 #include <windows.h>
 #endif
 
+#include "chomp.h"
 #include "DirectoryIterator.h"
 #include "JniError.h"
 #include "join.h"
@@ -391,6 +392,12 @@ public:
         className = *it++;
         while (it != end) {
             mainArguments.push_back(*it++);
+        }
+        try {
+            std::string launcherOsVersion = chomp(readFile("/proc/version"));
+            jvmArguments.push_back("-De.util.Log.launcherOsVersion=" + launcherOsVersion);
+        } catch (const std::exception&) {
+            // We lived without this for years.
         }
     }
     
