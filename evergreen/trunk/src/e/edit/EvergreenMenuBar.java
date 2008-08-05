@@ -21,7 +21,7 @@ public class EvergreenMenuBar extends EMenuBar {
     
     private static class ExitAction extends AbstractAction {
         public ExitAction() {
-            super(GuiUtilities.isWindows() ? "Exit" : "Quit");
+            GuiUtilities.configureAction(this, GuiUtilities.isWindows() ? "E_xit" : "_Quit", null);
             GnomeStockIcon.configureAction(this);
         }
         
