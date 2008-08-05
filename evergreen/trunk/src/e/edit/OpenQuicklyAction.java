@@ -10,7 +10,7 @@ import java.awt.event.*;
  */
 public class OpenQuicklyAction extends ETextAction {
     public OpenQuicklyAction() {
-        super("Open _Quickly...", GuiUtilities.makeKeyStroke("O", false));
+        super("_Open Quickly...", GuiUtilities.makeKeyStroke("O", false));
         GnomeStockIcon.useStockIcon(this, "gtk-open");
     }
     

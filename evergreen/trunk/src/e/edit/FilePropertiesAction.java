@@ -18,7 +18,7 @@ public class FilePropertiesAction extends ETextAction {
     private JTextField indentStringField = new JTextField("", 40);
     
     public FilePropertiesAction() {
-        super("File Properties...", null);
+        super("File _Properties...", null);
         GnomeStockIcon.useStockIcon(this, "gtk-info");
     }
     
@@ -28,7 +28,7 @@ public class FilePropertiesAction extends ETextAction {
             return;
         }
         
-        ETextArea textArea = window.getTextArea();
+        final ETextArea textArea = window.getTextArea();
         final PTextBuffer buffer = textArea.getTextBuffer();
         String endOfLineString = (String) buffer.getProperty(PTextBuffer.LINE_ENDING_PROPERTY);
         String initialEndOfLine = StringUtilities.escapeForJava(endOfLineString);
@@ -45,7 +45,7 @@ public class FilePropertiesAction extends ETextAction {
         final JComboBox fileTypeCombo = new JComboBox(new Vector<String>(FileType.getAllFileTypeNames()));
         fileTypeCombo.setSelectedItem(window.getFileType().getName());
         
-        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "File Properties");
+        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Properties for \"" + window.getFilename() + "\"");
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);
