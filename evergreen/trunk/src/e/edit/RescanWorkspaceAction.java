@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.gui.*;
+import e.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -9,7 +10,7 @@ public class RescanWorkspaceAction extends AbstractAction {
     
     // Rescan the given workspace.
     public RescanWorkspaceAction(Workspace workspace) {
-        this("Rescan Files", workspace);
+        this("_Rescan Files", workspace);
         GnomeStockIcon.useStockIcon(this, "gtk-refresh");
     }
     
@@ -19,7 +20,7 @@ public class RescanWorkspaceAction extends AbstractAction {
     }
     
     private RescanWorkspaceAction(String name, Workspace workspace) {
-        super(name);
+        GuiUtilities.configureAction(this, name, null);
         this.boundWorkspace = workspace;
     }
     
@@ -30,6 +31,6 @@ public class RescanWorkspaceAction extends AbstractAction {
     
     public static JButton makeRescanButton(Workspace workspace) {
         // Use a shorter name for buttons than menus...
-        return new JButton(new RescanWorkspaceAction("Rescan", workspace));
+        return new JButton(new RescanWorkspaceAction("_Rescan", workspace));
     }
 }
