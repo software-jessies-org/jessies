@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -8,7 +9,7 @@ import javax.swing.*;
  */
 public class AddWorkspaceAction extends AbstractAction {
     public AddWorkspaceAction() {
-        super("Add Workspace...");
+        GuiUtilities.configureAction(this, "_Add Workspace...", null);
     }
     
     public void actionPerformed(ActionEvent e) {

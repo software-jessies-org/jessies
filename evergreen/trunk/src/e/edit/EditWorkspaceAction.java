@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -11,7 +12,7 @@ public class EditWorkspaceAction extends AbstractAction {
     
     // Edit the given workspace.
     public EditWorkspaceAction(Workspace workspace) {
-        super("Edit Workspace...");
+        GuiUtilities.configureAction(this, "_Edit Workspace...", null);
         this.boundWorkspace = workspace;
     }
     

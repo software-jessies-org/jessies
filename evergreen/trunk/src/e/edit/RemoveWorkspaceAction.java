@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -8,7 +9,7 @@ public class RemoveWorkspaceAction extends AbstractAction {
     
     // Remove the given workspace.
     public RemoveWorkspaceAction(Workspace workspace) {
-        super("Remove Workspace");
+        GuiUtilities.configureAction(this, "Remo_ve Workspace", null);
         this.boundWorkspace = workspace;
     }
     
