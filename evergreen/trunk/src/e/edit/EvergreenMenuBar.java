@@ -165,29 +165,29 @@ public class EvergreenMenuBar extends EMenuBar {
         
         // UI guidelines.
         menu.add(new JSeparator());
-        menu.add(makeLocalOrRemoteLink("Apple Human Interface Guidelines", "/Developer/Documentation/DocSets/com.apple.ADC_Reference_Library.CoreReference.docset/Contents/Resources/Documents/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html", "http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html"));
-        menu.add(makeLocalOrRemoteLink("GNOME Human Interface Guidelines", null, "http://library.gnome.org/devel/hig-book/stable/"));
+        menu.add(makeLocalOrRemoteLink("_Apple Human Interface Guidelines", "/Developer/Documentation/DocSets/com.apple.ADC_Reference_Library.CoreReference.docset/Contents/Resources/Documents/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html", "http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html"));
+        menu.add(makeLocalOrRemoteLink("_GNOME Human Interface Guidelines", null, "http://library.gnome.org/devel/hig-book/stable/"));
         
         // C/C++.
         menu.add(new JSeparator());
-        menu.add(makeLocalOrRemoteLink("GNU C Library Documentation", "/usr/share/doc/glibc-doc/html/index.html", "http://www.gnu.org/software/libc/manual/html_node/index.html"));
-        menu.add(makeLocalOrRemoteLink("STL Documentation", "/usr/share/doc/stl-manual/html/index.html", "http://www.sgi.com/tech/stl/"));
+        menu.add(makeLocalOrRemoteLink("GNU _C Library Documentation", "/usr/share/doc/glibc-doc/html/index.html", "http://www.gnu.org/software/libc/manual/html_node/index.html"));
+        menu.add(makeLocalOrRemoteLink("_STL Documentation", "/usr/share/doc/stl-manual/html/index.html", "http://www.sgi.com/tech/stl/"));
         
         // Java.
         menu.add(new JSeparator());
-        menu.add(makeLocalOrRemoteLink("Java 6 API", "/usr/share/doc/sun-java6-jdk/html/api/overview-summary.html", "http://java.sun.com/javase/6/docs/api/overview-summary.html"));
-        menu.add(makeLocalOrRemoteLink("Java Language Specification, 3e", null, "http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html"));
-        menu.add(makeLocalOrRemoteLink("Java Tutorial", null, "http://java.sun.com/docs/books/tutorial/"));
-        menu.add(makeLocalOrRemoteLink("Java VM Specification, 2e", null, "http://java.sun.com/docs/books/vmspec/2nd-edition/html/VMSpecTOC.doc.html"));
+        menu.add(makeLocalOrRemoteLink("_Java 6 API", "/usr/share/doc/sun-java6-jdk/html/api/overview-summary.html", "http://java.sun.com/javase/6/docs/api/overview-summary.html"));
+        menu.add(makeLocalOrRemoteLink("Java _Language Specification, 3e", null, "http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html"));
+        menu.add(makeLocalOrRemoteLink("Java _Tutorial", null, "http://java.sun.com/docs/books/tutorial/"));
+        menu.add(makeLocalOrRemoteLink("Java _VM Specification, 2e", null, "http://java.sun.com/docs/books/vmspec/2nd-edition/html/VMSpecTOC.doc.html"));
         
         // Tools.
         menu.add(new JSeparator());
-        menu.add(makeLocalOrRemoteLink("GNU Make Manual", null, "http://www.gnu.org/software/make/manual/make.html"));
+        menu.add(makeLocalOrRemoteLink("GNU _Make Manual", null, "http://www.gnu.org/software/make/manual/make.html"));
         
         // General.
         menu.add(new JSeparator());
         // FIXME: some day it would be nice to have our own regular expression quick reference.
-        menu.add(makeLocalOrRemoteLink("Regular Expression Documentation", "/usr/share/doc/sun-java6-jdk/html/api/java/util/regex/Pattern.html", PatternUtilities.DOCUMENTATION_URL));
+        menu.add(makeLocalOrRemoteLink("_Regular Expression Documentation", "/usr/share/doc/sun-java6-jdk/html/api/java/util/regex/Pattern.html", PatternUtilities.DOCUMENTATION_URL));
         
         return menu;
     }
