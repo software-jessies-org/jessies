@@ -13,9 +13,8 @@ public class WebLinkAction extends AbstractAction {
     private String url;
     
     public WebLinkAction(String name, String url) {
-        super(name);
+        GuiUtilities.configureAction(this, name, null);
         this.url = url;
-        
         // Offer the url to anything that wants a tool tip for this action.
         putValue(SHORT_DESCRIPTION, url);
     }
