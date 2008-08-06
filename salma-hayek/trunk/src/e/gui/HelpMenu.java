@@ -44,7 +44,7 @@ public class HelpMenu {
     private static class AboutBoxAction extends AbstractAction {
         private AboutBoxAction() {
             String name = "_About";
-            if (GuiUtilities.isMacOs() == false) {
+            if (GuiUtilities.isWindows()) {
                 name += " " + Log.getApplicationName();
             }
             GuiUtilities.configureAction(this, name, null);
