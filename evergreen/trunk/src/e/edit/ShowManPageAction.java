@@ -26,12 +26,13 @@ public class ShowManPageAction extends ETextAction {
             EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     // FIXME: if the user said "readlink(2)", split off the section and use it.
-                    String manPage = ManPageResearcher.getSharedInstance().formatManPage(manPageField.getText(), "2:3");
-                    if (manPage.length() > 0) {
+                    final String manPageName = manPageField.getText();
+                    final String content = ManPageResearcher.getSharedInstance().formatManPage(manPageName, "2:3");
+                    if (content.length() > 0) {
                         Advisor.getInstance().setDocumentationVisible();
-                        Advisor.getInstance().setDocumentationText(manPage);
+                        Advisor.getInstance().setDocumentationText(content);
                     } else {
-                        Evergreen.getInstance().showAlert("Can't show man page", "No man page called '" + manPage + "' found.");
+                        Evergreen.getInstance().showAlert("Can't show man page", "No man page called '" + manPageName + "' found.");
                     }
                 }
             });
