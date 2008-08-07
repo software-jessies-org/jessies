@@ -282,6 +282,9 @@ public class ETable extends JTable {
                 
                 // JTable copy & paste above this point; our code below.
                 
+                // Remove the scroll pane's focus ring.
+                scrollPane.setBorder(BorderFactory.createEmptyBorder());
+                
                 // Put a dummy header in the upper-right corner.
                 final Component renderer = new JTableHeader().getDefaultRenderer().getTableCellRendererComponent(null, "", false, false, -1, 0);
                 JPanel panel = new JPanel(new BorderLayout());
