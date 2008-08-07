@@ -84,14 +84,14 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
     /** Handles our non-IETF "stl:" URI scheme. */
     public boolean handleLink(String link) {
         Matcher matcher = Pattern.compile("^stl:([A-Za-z0-9_]+)$").matcher(link);
-        if (matcher.matches()) {
+        if (matcher.find()) {
             String term = matcher.group(1);
             if (term.startsWith("std::") == false) {
                 term = "std::" + term;
             }
             String html = getDocumentation(term);
             if (html.length() > 0) {
-                Advisor.getInstance().showDocumentation(html);
+                Advisor.getInstance().setDocumentationText(html);
                 return true;
             }
         }

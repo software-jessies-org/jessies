@@ -162,6 +162,7 @@ public class EvergreenMenuBar extends EMenuBar {
     private JMenu makeDocumentationMenu() {
         JMenu menu = makeMenu("Documentation", 'D');
         menu.add(new ShowDocumentationAction());
+        menu.add(new ShowManPageAction());
         
         // UI guidelines.
         menu.add(new JSeparator());

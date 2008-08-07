@@ -33,7 +33,7 @@ public class PerlDocumentationResearcher implements WorkspaceResearcher {
     /** Handles our non-standard "perldoc:" scheme. */
     public boolean handleLink(String link) {
         if (link.startsWith("perldoc:")) {
-            Advisor.getInstance().showDocumentation(research(link.substring(8), null));
+            Advisor.getInstance().setDocumentationText(research(link.substring(8), null));
             return true;
         }
         return false;

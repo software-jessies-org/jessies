@@ -62,7 +62,7 @@ HELP/DOCUMENTATION
 
 + Java: we should get rid of my compressed rendering of signatures now we've got more room. it could be quite useful to be able to copy & paste the signatures into code.
 
-+ cope with "man:" (et cetera) in the "address bar".
++ we could generalize "Show Man Page" to let you get other kinds of documentation without having the search term available for selection.
 
 + could have a combo box to choose man page sections. (any parallels for other documentation types?)
 

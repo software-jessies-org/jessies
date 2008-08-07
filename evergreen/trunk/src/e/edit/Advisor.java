@@ -73,13 +73,17 @@ public class Advisor extends JPanel {
         return frame;
     }
     
-    public synchronized void showDocumentation() {
+    public void setDocumentationVisible() {
         advicePane.clearAdvice();
         // Really, we want getFrame().toFront(), but GNOME breaks that, so we have to work around it.
         if (getFrame().isVisible()) {
             getFrame().setVisible(false);
         }
         getFrame().setVisible(true);
+    }
+    
+    public synchronized void showDocumentation() {
+        setDocumentationVisible();
         startResearch(ETextAction.getSearchTerm());
     }
     
@@ -119,14 +123,14 @@ public class Advisor extends JPanel {
         @Override
         public void done() {
             try {
-                showDocumentation(get());
+                setDocumentationText(get());
             } catch (Exception ex) {
                 Log.warn("ResearchRunner failed", ex);
             }
         }
     }
     
-    public void showDocumentation(String content) {
+    public void setDocumentationText(String content) {
         if (content.startsWith("<html>") == false) {
             content = "<html><head><title></title></head><body bgcolor=#FFFFFF>" + content + "</body></html>";
         }

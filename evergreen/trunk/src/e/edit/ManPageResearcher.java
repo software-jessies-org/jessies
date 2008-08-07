@@ -43,7 +43,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
             if (manPages == null) manPages = new String[0];
             for (String manPage : manPages) {
                 Matcher matcher = manPagePattern.matcher(manPage);
-                if (matcher.matches()) {
+                if (matcher.find()) {
                     String stub = matcher.group(1);
                     String sectionName = matcher.group(2);
                     // FIXME: have we ever seen a useful man page whose section name wasn't wholly numeric? Maybe we should have a list of those non-numeric sections we *do* want, instead?
@@ -72,7 +72,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
             if (FileUtilities.exists(configurationPossibility)) {
                 for (String line : StringUtilities.readLinesFromFile(configurationPossibility)) {
                     Matcher matcher = manPathPattern.matcher(line);
-                    if (matcher.matches()) {
+                    if (matcher.find()) {
                         manPaths.add(new File(matcher.group(1), "man2"));
                         manPaths.add(new File(matcher.group(1), "man3"));
                     }
@@ -98,7 +98,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         return textWindow.getFileType() == FileType.C_PLUS_PLUS;
     }
     
-    private String formatManPage(String page, String section) {
+    public String formatManPage(String page, String section) {
         ArrayList<String> commands = new ArrayList<String>();
         String polyglotMan = findPolyglotMan();
         if (polyglotMan == null) {
@@ -160,12 +160,12 @@ public class ManPageResearcher implements WorkspaceResearcher {
     public boolean handleLink(String link) {
         // We don't just test for the "man:" prefix because we're going to send the rest directly to a shell, so we don't want any nasty surprises.
         Matcher matcher = Pattern.compile("^man:([A-Za-z0-9]+)\\((\\d+)\\)$").matcher(link);
-        if (matcher.matches()) {
+        if (matcher.find()) {
             String page = matcher.group(1);
             String section = matcher.group(2);
             String manPage = formatManPage(page, section);
             if (manPage.length() > 0) {
-                Advisor.getInstance().showDocumentation(manPage);
+                Advisor.getInstance().setDocumentationText(manPage);
                 return true;
             }
         }
