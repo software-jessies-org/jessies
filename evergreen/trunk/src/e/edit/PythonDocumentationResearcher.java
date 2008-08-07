@@ -46,7 +46,7 @@ public class PythonDocumentationResearcher implements WorkspaceResearcher {
     /** Handles our non-standard "py:" scheme. */
     public boolean handleLink(String link) {
         if (link.startsWith("py:")) {
-            Advisor.getInstance().showDocumentation(research(link.substring(3), null));
+            Advisor.getInstance().setDocumentationText(research(link.substring(3), null));
             return true;
         }
         return false;
