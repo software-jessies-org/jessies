@@ -166,29 +166,25 @@ class Terminator
         exit(0)
     end
     
+    def have_same_content(file1, file2)
+        # Even in 1.9, Ruby's string equality is a memcmp of the underlying byte array.
+        return File.open(file1).read() == File.open(file2).read()
+    end
+    
     def install_terminfo_in(original_file, directory)
         terminfo_file = File.join(directory, "terminator")
-        # uptodate? doesn't return true unless the file specified by the first argument is strictly newer
-        # than all the files specified by the second argument.
-        # We copy preserving the timestamp, so we can compare compilation dates rather than a compilation date with an install date.
-        # This means the target file is never strictly newer, so we have to do the comparison backwards if we're to avoid spurious copies.
-        if FileUtils.uptodate?(original_file, [terminfo_file])
-            if ENV["DEBUGGING_TERMINATOR"]
-                puts("installing #{terminfo_file}")
-            end
-            if File.exist?(terminfo_file) == false
-                FileUtils.mkdir_p(directory)
-            end
-            begin
-                FileUtils.cp(original_file, terminfo_file, :preserve => true)
-            rescue RangeError
-                # Silently hide "bignum too big to convert to `long' from chown from copy_metadata from copy_file.
-                # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-dev/27221 suggests that this is a known issue.
-                # We only see it on Cygwin and only if you're not in the local Administrators group and only if you haven't done the mkpasswd dance.
-                # And it only happens the first time you try to run Terminator.
-                # I wonder if it's fixed in Ruby-1.9.
-            end
+        if File.exist?(terminfo_file) && have_same_content(terminfo_file, original_file)
+            return
         end
+        if ENV["DEBUGGING_TERMINATOR"]
+            puts("installing #{terminfo_file}")
+        end
+        FileUtils.mkdir_p(directory)
+        # We used to use a timestamp comparison and :preserve => true.
+        # This caused a number of different symptoms on Cygwin.
+        # The underlying problem always seemed to be related.
+        # Cygwin hadn't been given a mapping from the Windows owner/group to a Unix owner/group.
+        FileUtils.cp(original_file, terminfo_file)
     end
     
     def selectShellIfNoDefault()
