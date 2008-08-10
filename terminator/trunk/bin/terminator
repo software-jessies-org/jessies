@@ -168,7 +168,7 @@ class Terminator
     
     def have_same_content(file1, file2)
         # Even in 1.9, Ruby's string equality is a memcmp of the underlying byte array.
-        return File.open(file1).read() == File.open(file2).read()
+        return IO.read(file1) == IO.read(file2)
     end
     
     def install_terminfo_in(original_file, directory)
