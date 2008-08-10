@@ -161,19 +161,20 @@ infocmp -C >> ~/.termcap
 though it has inconvenienced <a href="http://www.google.com/search?hl=en&safe=off&c2coff=1&q=cygwin+less+terminfo+site%3Acygwin.com%2Fml&btnG=Search">quite a few people</a>.
 
 <h3>Terminfo problems specific to Fedora/RedHat/CentOS</h3>
-<p>RedHat's sudo package depends on vim-minimal, which provides /bin/vi.
-vim-minimal appears to be avoiding the use of terminfo deliberately, if frustratingly.
-There are several possible solutions but this one is our current recommendation:
-<pre>
-sudo ln -s /usr/bin/vim /usr/local/bin/vi
-</pre>
+<p>RedHat installs vim-minimal to provide /bin/vi.
+vim-minimal avoids the use of terminfo, seemingly deliberately, if frustratingly.
+We don't know of a simple, complete way of persuading RedHat to always use one of its other vim packages, which use terminfo.
+(The sudo package, for example, depends explicitly on vim-minimal.)
 
-<p>visudo runs the termcap-using /bin/vi directly unless you set EDITOR,
-so you probably want to set that to vim if you were previously letting it default.
-
-<p>If you need to use applications which are compiled with termcap, then do:
+<p>If you need to use applications, like vim-minimal, which are compiled with termcap, then first install Terminator on the RedHat box or otherwise install the Terminator terminfo there.  Then:
 <pre>
 infocmp -C >> ~/.termcap
+</pre>
+
+<p>Finally, it seems necessary to add this line, or an equivalent, to your .bash_profile or equivalent:
+
+<pre>
+export TERMCAP=~/.termcap
 </pre>
 
 <h3>Terminfo problems specific to FreeBSD</h3>
