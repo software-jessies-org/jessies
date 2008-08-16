@@ -1,5 +1,8 @@
 package e.edit;
 
+import e.ptextarea.FileType;
+import java.util.Set;
+
 public interface WorkspaceResearcher {
     /**
      * Returns an HTML string containing information about "string".
@@ -9,12 +12,10 @@ public interface WorkspaceResearcher {
     public String research(String wordAtCaret, ETextWindow textWindow);
     
     /**
-    * Invoked before research -- if we're researching an ETextWindow -- to
-    * give the Researcher an opportunity to decline. This lets a Java researcher,
-    * for example, not tell you about Java's Array class when you're working on
-    * a Ruby program.
-    */
-    public boolean isSuitable(ETextWindow textWindow);
+     * Invoked before research to give the Researcher an opportunity to decline.
+     * A Java researcher need not tell you about Java's Array class when you're working on Ruby.
+     */
+    public boolean isSuitable(FileType fileType);
     
     /**
      * Some researchers need to invent their own URI schemes such as "man:" or
@@ -25,4 +26,9 @@ public interface WorkspaceResearcher {
      * This method is not invoked from the event dispatch thread.
      */
     public boolean handleLink(String link);
+    
+    /**
+     * Adds spelling exceptions to 'words'.
+     */
+    public void addWordsTo(Set<String> words);
 }

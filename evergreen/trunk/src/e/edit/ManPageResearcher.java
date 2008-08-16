@@ -83,10 +83,6 @@ public class ManPageResearcher implements WorkspaceResearcher {
         return manPaths;
     }
     
-    public void addManPageWordsTo(Set<String> set) {
-        set.addAll(uniqueWords);
-    }
-    
     public String research(String string, ETextWindow textWindow) {
         if (uniqueManPageNames.contains(string) == false) {
             return "";
@@ -95,8 +91,8 @@ public class ManPageResearcher implements WorkspaceResearcher {
     }
     
     /** Returns true for C files, because only C programmers care about man pages. */
-    public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.getFileType() == FileType.C_PLUS_PLUS;
+    public boolean isSuitable(FileType fileType) {
+        return fileType == FileType.C_PLUS_PLUS;
     }
     
     public String formatManPage(String page, String section) {
@@ -185,5 +181,12 @@ public class ManPageResearcher implements WorkspaceResearcher {
             }
         }
         return null;
+    }
+    
+    /**
+     * Adds all the words used in identifiers that have man pages, for C++.
+     */
+    public void addWordsTo(Set<String> words) {
+        words.addAll(uniqueWords);
     }
 }

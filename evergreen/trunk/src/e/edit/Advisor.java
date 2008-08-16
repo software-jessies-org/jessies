@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.gui.*;
+import e.ptextarea.FileType;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -55,6 +56,17 @@ public class Advisor extends JPanel {
         return researchers;
     }
     
+    /**
+     * Invokes addWordsTo with 'words' on every known researcher whose isSuitable returns true for 'fileType'.
+     */
+    public void addWordsTo(FileType fileType, Set<String> words) {
+        for (WorkspaceResearcher researcher : getResearchers()) {
+            if (researcher.isSuitable(fileType)) {
+                researcher.addWordsTo(words);
+            }
+        }
+    }
+    
     private synchronized JFrame getFrame() {
         if (frame == null) {
             final String frameTitle = "Evergreen Documentation Browser";
@@ -99,9 +111,10 @@ public class Advisor extends JPanel {
         
         @Override
         protected String doInBackground() {
+            FileType fileType = (textWindow != null) ? textWindow.getFileType() : null;
             StringBuilder newText = new StringBuilder();
             for (WorkspaceResearcher researcher : getResearchers()) {
-                if (textWindow == null || researcher.isSuitable(textWindow)) {
+                if (fileType == null || researcher.isSuitable(fileType)) {
                     String result = researcher.research(searchTerm, textWindow);
                     if (result != null && result.length() > 0) {
                         // We need to strip HTML and BODY tags if we're to concatenate HTML documents.

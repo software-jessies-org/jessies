@@ -102,14 +102,6 @@ public class JavaResearcher implements WorkspaceResearcher {
         return result;
     }
     
-    /**
-     * Adds all the unique words from the identifiers in the JDK to the given set.
-     * This might be useful for spelling checking or word completion purposes.
-     */
-    public synchronized void addJavaWordsTo(Set<String> set) {
-        set.addAll(uniqueWords);
-    }
-    
     public synchronized List<String> listIdentifiersStartingWith(String prefix) {
         ArrayList<String> result = new ArrayList<String>();
         final int prefixLength = prefix.length();
@@ -514,8 +506,8 @@ public class JavaResearcher implements WorkspaceResearcher {
 //
     
     /** Returns true for Java files. */
-    public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.getFileType() == FileType.JAVA;
+    public boolean isSuitable(FileType fileType) {
+        return fileType == FileType.JAVA;
     }
     
     public String research(String string, ETextWindow textWindow) {
@@ -529,5 +521,13 @@ public class JavaResearcher implements WorkspaceResearcher {
     /** We don't implement any non-standard URI schemes. */
     public boolean handleLink(String link) {
         return false;
+    }
+    
+    /**
+     * Adds all the unique words from the identifiers in the JDK to the given set.
+     * This might be useful for spelling checking or word completion purposes.
+     */
+    public void addWordsTo(Set<String> words) {
+        words.addAll(uniqueWords);
     }
 }

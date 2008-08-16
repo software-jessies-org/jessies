@@ -81,8 +81,8 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
     }
     
     /** Returns true for Ruby files. */
-    public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.getFileType() == FileType.RUBY;
+    public boolean isSuitable(FileType fileType) {
+        return fileType == FileType.RUBY;
     }
     
     /** Handles our non-standard "ri:" scheme. */
@@ -92,5 +92,9 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
             return true;
         }
         return false;
+    }
+    
+    /** Does nothing. */
+    public void addWordsTo(Set<String> words) {
     }
 }

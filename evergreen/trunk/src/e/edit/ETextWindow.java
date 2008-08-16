@@ -55,14 +55,8 @@ public class ETextWindow extends EWindow implements PTextListener {
         // The text styler knows all the language's keywords.
         textArea.getTextStyler().addKeywordsTo(result);
         
-        // The JavaResearcher knows all the words used in JDK identifiers.
-        if (language == FileType.JAVA) {
-            JavaResearcher.getSharedInstance().addJavaWordsTo(result);
-        }
-        // The ManPageResearcher knows all the words used in identifiers that have man pages.
-        if (language == FileType.C_PLUS_PLUS) {
-            ManPageResearcher.getSharedInstance().addManPageWordsTo(result);
-        }
+        // The various researchers might have more for this file type.
+        Advisor.getInstance().addWordsTo(language, result);
         
         // And there may be a file of extra spelling exceptions for this language.
         String exceptionsFileName = Evergreen.getInstance().getResourceFilename("spelling-exceptions-" + language.getName());
