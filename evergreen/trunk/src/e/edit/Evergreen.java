@@ -824,7 +824,9 @@ public class Evergreen {
         
         frame.setVisible(true);
         GuiUtilities.finishGnomeStartup();
-        Log.warn("Frame visible after " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
+        
+        final long t1 = System.nanoTime();
+        Log.warn("Frame visible after " + TimeUtilities.nsToString(t1 - t0) + ".");
         
         // These things want to be done after the frame is visible...
         
@@ -841,7 +843,7 @@ public class Evergreen {
                 
                 Thread fileListUpdaterStarterThread = new Thread(new Runnable() {
                     public void run() {
-                        final long t1 = System.nanoTime();
+                        final long sleepStartNs = System.nanoTime();
                         try {
                             // What I really want to say is "wait until the event queue is empty and everything's caught up".
                             // I haven't yet found out how to do that, and the fact that using EventQueue.invokeLater here doesn't achieve the desired effect makes me think that what I want might not be that simple anyway.
@@ -855,7 +857,8 @@ public class Evergreen {
                         } catch (InterruptedException ex) {
                         }
                         
-                        Log.warn("Workers free to start after " + TimeUtilities.nsToString(System.nanoTime() - t0) + " (slept for " + TimeUtilities.nsToString(System.nanoTime() - t1) + ").");
+                        final long sleepEndNs = System.nanoTime();
+                        Log.warn("Workers free to start after " + TimeUtilities.nsToString(sleepEndNs - t0) + " (slept for " + TimeUtilities.nsToString(sleepEndNs - sleepStartNs) + ").");
                         startSignal.countDown();
                     }
                 });

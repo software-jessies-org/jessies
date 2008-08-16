@@ -157,7 +157,8 @@ public class WorkspaceFileList {
             scanDirectory(FileUtilities.fileFromString(workspaceRoot), fileIgnorer, result);
             Evergreen.getInstance().showStatus("Scan of \"" + workspaceRoot + "\" complete (" + result.size() + " files)");
             
-            Log.warn("Scan of " + workspaceRoot + " took " + TimeUtilities.nsToString(System.nanoTime() - t0) + "; found " + result.size() + " files.");
+            final long t1 = System.nanoTime();
+            Log.warn("Scan of " + workspaceRoot + " took " + TimeUtilities.nsToString(t1 - t0) + "; found " + result.size() + " files.");
             return result;
         }
         

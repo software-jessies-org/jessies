@@ -163,8 +163,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         private int totalFileCount;
         private int percentage;
         
-        private long startTimeMs;
-        private long endTimeMs;
+        private long startTimeNs;
+        private long endTimeNs;
         
         public FileFinder() {
             this.sequenceNumber = currentSequenceNumber.incrementAndGet();
@@ -195,8 +195,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         protected DefaultMutableTreeNode doInBackground() {
             Thread.currentThread().setName("Search for \"" + regex + "\" in files matching \"" + fileRegex + "\"");
             
-            startTimeMs = System.currentTimeMillis();
-            endTimeMs = 0;
+            startTimeNs = System.nanoTime();
+            endTimeNs = 0;
             
             try {
                 Pattern pattern = PatternUtilities.smartCaseCompile(regex);
@@ -213,8 +213,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                     ex = ex; // Fine; we're still finished.
                 }
                 
-                endTimeMs = System.currentTimeMillis();
-                Log.warn("Search for \"" + regex + "\" in files matching \"" + fileRegex + "\" took " + (endTimeMs - startTimeMs) + " ms.");
+                endTimeNs = System.nanoTime();
+                Log.warn("Search for \"" + regex + "\" in files matching \"" + fileRegex + "\" took " + TimeUtilities.nsToString(endTimeNs - startTimeNs) + ".");
             } catch (PatternSyntaxException ex) {
                 errorMessage = ex.getDescription();
             } catch (Exception ex) {
@@ -300,8 +300,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 status += " (from " + indexedFileCount + ")";
             }
             status += " match.";
-            if (endTimeMs != 0) {
-                status += " Took " + TimeUtilities.msToString(endTimeMs - startTimeMs) + ".";
+            if (endTimeNs != 0) {
+                status += " Took " + TimeUtilities.nsToString(endTimeNs - startTimeNs) + ".";
             }
             return status;
         }
@@ -320,7 +320,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                     return;
                 }
                 try {
-                    long t0 = System.currentTimeMillis();
+                    final long t0 = System.nanoTime();
                     FileSearcher fileSearcher = new FileSearcher(pattern);
                     File file = FileUtilities.fileFromParentAndString(workspace.getRootDirectory(), candidate);
                     
@@ -328,7 +328,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                     // taken enough time for the user to start caring, so we
                     // don't make quick searches unnecessarily slow.
                     doneFileCount.incrementAndGet();
-                    if (t0 - startTimeMs > 300) {
+                    if (TimeUtilities.nsToS(t0 - startTimeNs) > 300) {
                         updateStatus();
                     }
                     
@@ -339,9 +339,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                             // FIXME: should we do the grep(1) thing of "binary file <x> matches"?
                             return;
                         }
-                        long t1 = System.currentTimeMillis();
-                        if (t1 - t0 > 500) {
-                            Log.warn("Searching file \"" + file + "\" for \"" + regex + "\" took " + (t1 - t0) + "ms!");
+                        final long t1 = System.nanoTime();
+                        if (TimeUtilities.nsToS(t1 - t0) > 0.5) {
+                            Log.warn("Searching file \"" + file + "\" for \"" + regex + "\" took " + TimeUtilities.nsToString(t1 - t0) + "!");
                         }
                         final int matchCount = matches.size();
                         if (matchCount > 0) {
