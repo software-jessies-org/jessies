@@ -68,8 +68,13 @@ public class FileUtilities {
             filename += File.separatorChar;
         }
         String home = getUserHomeDirectory();
-        if (filename.startsWith(home)) {
-            return "~" + filename.substring(home.length());
+        // We can't use startsWith because Windows requires case-insensitivity.
+        if (filename.length() >= home.length()) {
+            File homeFile = new File(home);
+            File file = new File(filename.substring(0, home.length()));
+            if (homeFile.equals(file)) {
+                return "~" + filename.substring(home.length());
+            }
         }
         return filename;
     }
