@@ -83,7 +83,7 @@ public class TimeUtilities {
         } else if (ns < 1000000000L) {
             return Long.toString(ns/1000000L) + " ms";
         } else if (ns < 60000000000L) {
-            return String.format("%.2f", ((double) ns)/1000000000.0) + " s";
+            return String.format("%.2f s", nsToS(ns));
         } else {
             long duration = ns;
             long nanoseconds = duration % 1000;
@@ -117,6 +117,13 @@ public class TimeUtilities {
             result.append('s');
             return result.toString();
         }
+    }
+    
+    /**
+     * Converts nanoseconds into (fractional) seconds.
+     */
+    public static double nsToS(long ns) {
+        return ((double) ns)/1000000000.0;
     }
     
     /**
