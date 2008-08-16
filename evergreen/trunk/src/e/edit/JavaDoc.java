@@ -85,7 +85,8 @@ public class JavaDoc {
         }
         
         int totalPkgs = packageNames.size();
-        Log.warn(totalPkgs + " packages total (" + systemPkgs + " system classpath, " + (totalPkgs - systemPkgs) + " advisor.classpath) in " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
+        final long t1 = System.nanoTime();
+        Log.warn(totalPkgs + " packages total (" + systemPkgs + " system classpath, " + (totalPkgs - systemPkgs) + " advisor.classpath) in " + TimeUtilities.nsToString(t1 - t0) + ".");
     }
     
     /**

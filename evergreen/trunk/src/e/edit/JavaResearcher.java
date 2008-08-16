@@ -83,7 +83,8 @@ public class JavaResearcher implements WorkspaceResearcher {
         
         uniqueWords = extractUniqueWords(uniqueIdentifiers.iterator());
         
-        Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
+        final long t1 = System.nanoTime();
+        Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + TimeUtilities.nsToString(t1 - t0) + ".");
     }
     
     /**

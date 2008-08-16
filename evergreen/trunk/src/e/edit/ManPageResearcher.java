@@ -61,7 +61,8 @@ public class ManPageResearcher implements WorkspaceResearcher {
         // FIXME: this turns "posix_openpt" into two words, so the spelling checker will accept "openpt" alone, rather than just in the identifier "posix_openpt" as intended. Maybe we should check blessed identifiers as a whole before we try break them into words, and then supply the spelling checker with the unique identifiers we bless, rather than just the list of words? (At the same time, passing all the words works well for Java source.)
         uniqueWords = JavaResearcher.extractUniqueWords(uniqueManPageNames.iterator());
         
-        Log.warn("Learned of " + pageCount + " man pages in " + TimeUtilities.nsToString(System.nanoTime() - t0) + ".");
+        final long t1 = System.nanoTime();
+        Log.warn("Learned of " + pageCount + " man pages in " + TimeUtilities.nsToString(t1 - t0) + ".");
     }
     
     private static List<File> findManPageDirectories() {
