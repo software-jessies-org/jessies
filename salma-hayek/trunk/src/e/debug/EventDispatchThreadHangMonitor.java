@@ -38,7 +38,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
     // late-2004 hardware isn't really up to it; there are too many parts of
     // the JDK that can go away for that long (often code that has to be
     // called on the event dispatch thread, like font loading).
-    private static final long UNREASONABLE_DISPATCH_DURATION_MS = 1000;
+    private static final double UNREASONABLE_DISPATCH_DURATION_S = 1.0;
     
     // Help distinguish multiple hangs in the log, and match start and end too.
     // Only access this via getNewHangNumber.
@@ -66,15 +66,15 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         // new EDT if there's an uncaught exception.
         private final Thread eventDispatchThread = Thread.currentThread();
         
-        // The last time in milliseconds at which we saw a dispatch on the above thread.
-        private long lastDispatchTimeMillis = System.currentTimeMillis();
+        // The last time in nanoseconds at which we saw a dispatch on the above thread.
+        private long lastDispatchTimeNs = System.nanoTime();
         
         public DispatchInfo() {
             // All initialization is done by the field initializers.
         }
         
         public void checkForHang() {
-            if (timeSoFar() > UNREASONABLE_DISPATCH_DURATION_MS) {
+            if (TimeUtilities.nsToS(timeSoFar()) > UNREASONABLE_DISPATCH_DURATION_S) {
                 examineHang();
             }
         }
@@ -108,7 +108,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             hangNumber = getNewHangNumber();
             String stackTrace = stackTraceToString(currentStack);
             lastReportedStack = currentStack;
-            Log.warn("(hang #" + hangNumber + ") event dispatch thread stuck processing event for " + timeSoFar() + " ms so far:" + stackTrace);
+            Log.warn("(hang #" + hangNumber + ") event dispatch thread stuck processing event for " + TimeUtilities.nsToString(timeSoFar()) + " so far:" + stackTrace);
             checkForDeadlock();
         }
         
@@ -128,15 +128,15 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         }
         
         /**
-         * Returns how long this dispatch has been going on (in milliseconds).
+         * Returns how long this dispatch has been going on (in nanoseconds).
          */
         private long timeSoFar() {
-            return (System.currentTimeMillis() - lastDispatchTimeMillis);
+            return (System.nanoTime() - lastDispatchTimeNs);
         }
         
         public void dispose() {
             if (lastReportedStack != null) {
-                Log.warn("(hang #" + hangNumber + ") event dispatch thread unstuck after " + TimeUtilities.msToString(timeSoFar()) + ".");
+                Log.warn("(hang #" + hangNumber + ") event dispatch thread unstuck after " + TimeUtilities.nsToString(timeSoFar()) + ".");
             }
         }
     }
@@ -234,7 +234,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
             Thread currentEventDispatchThread = Thread.currentThread();
             for (DispatchInfo dispatchInfo : dispatches) {
                 if (dispatchInfo.eventDispatchThread == currentEventDispatchThread) {
-                    dispatchInfo.lastDispatchTimeMillis = System.currentTimeMillis();
+                    dispatchInfo.lastDispatchTimeNs = System.nanoTime();
                 }
             }
         }
