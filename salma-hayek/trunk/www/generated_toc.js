@@ -12,6 +12,9 @@
     FIXME: we should work out how to use anchors already embedded in the page,
     so we can give human-readable names to them (or switch to manually
     generating tables of contents, which would be a pain for FAQs).
+    FIXME: one problem with the auto-generated anchors is that because they
+    don't exist when the page is shown, links to them are ineffective, and just
+    link to the top of the page.
 
     To place the TOC on the page, add
     
