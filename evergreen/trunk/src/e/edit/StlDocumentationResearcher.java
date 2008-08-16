@@ -50,18 +50,13 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
         Log.warn("Learned of " + docs.size() + " STL terms in " + TimeUtilities.nsToString(t1 - t0) + ".");
     }
     
-    // FIXME: add STL words to C++ files!
-    public void addManPageWordsTo(Set<String> set) {
-        set.addAll(uniqueWords);
-    }
-    
     public String research(String string, ETextWindow textWindow) {
         return getDocumentation(string);
     }
     
     /** Returns true for C++ files, because only C++ programmers care about STL documentation. */
-    public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.getFileType() == FileType.C_PLUS_PLUS;
+    public boolean isSuitable(FileType fileType) {
+        return fileType == FileType.C_PLUS_PLUS;
     }
     
     private String getDocumentation(String term) {
@@ -97,5 +92,12 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
             }
         }
         return false;
+    }
+    
+    /**
+     * Adds all the words we found in the STL documentation, for C++.
+     */
+    public void addWordsTo(Set<String> words) {
+        words.addAll(uniqueWords);
     }
 }

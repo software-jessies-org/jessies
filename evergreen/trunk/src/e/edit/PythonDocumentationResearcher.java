@@ -39,8 +39,8 @@ public class PythonDocumentationResearcher implements WorkspaceResearcher {
     }
     
     /** Returns true for Python files. */
-    public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.getFileType() == FileType.PYTHON;
+    public boolean isSuitable(FileType fileType) {
+        return fileType == FileType.PYTHON;
     }
     
     /** Handles our non-standard "py:" scheme. */
@@ -50,5 +50,9 @@ public class PythonDocumentationResearcher implements WorkspaceResearcher {
             return true;
         }
         return false;
+    }
+    
+    /** Does nothing. */
+    public void addWordsTo(Set<String> words) {
     }
 }

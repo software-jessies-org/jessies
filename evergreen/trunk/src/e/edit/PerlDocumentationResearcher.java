@@ -26,8 +26,8 @@ public class PerlDocumentationResearcher implements WorkspaceResearcher {
     }
     
     /** Returns true for Perl files. */
-    public boolean isSuitable(ETextWindow textWindow) {
-        return textWindow.getFileType() == FileType.PERL;
+    public boolean isSuitable(FileType fileType) {
+        return fileType == FileType.PERL;
     }
     
     /** Handles our non-standard "perldoc:" scheme. */
@@ -37,5 +37,9 @@ public class PerlDocumentationResearcher implements WorkspaceResearcher {
             return true;
         }
         return false;
+    }
+    
+    /** Does nothing. */
+    public void addWordsTo(Set<String> words) {
     }
 }
