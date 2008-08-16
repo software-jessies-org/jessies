@@ -1,5 +1,6 @@
 package e.gui;
 
+import e.util.TimeUtilities;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
@@ -44,9 +45,9 @@ public class HeapView extends JComponent {
     private static final int TICK = 1000;
     
     /**
-     * Time (in ms) to animate heap growing.
+     * Time to animate heap growing.
      */
-    private static final int HEAP_GROW_ANIMATE_TIME = 1000;
+    private static final double HEAP_GROW_ANIMATE_TIME_S = 1.0;
     
     /**
      * Width of the border.
@@ -232,8 +233,8 @@ public class HeapView extends JComponent {
             if (heapGrowTimer != null) {
                 // Render the heap growing animation.
                 Composite lastComposite = g.getComposite();
-                float percent = 1f - heapGrowTimer.getPercent();
-                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, percent));
+                double percent = 1.0 - heapGrowTimer.getPercent();
+                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) percent));
                 g.drawImage(heapGrowTimer.image, 0, 0, null);
                 g.setComposite(lastComposite);
             }
@@ -466,14 +467,13 @@ public class HeapView extends JComponent {
     
     private final class HeapGrowTimer extends Timer {
         private final long startTime;
-        private float percent;
-        BufferedImage image;
+        private final BufferedImage image;
+        private double percent;
         
-        HeapGrowTimer() {
+        private HeapGrowTimer() {
             super(30, null);
             setRepeats(true);
-            startTime = System.currentTimeMillis();
-            percent = 0f;
+            startTime = System.nanoTime();
             int w = getWidth() - BORDER_W;
             int h = getHeight() - BORDER_H;
             image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
@@ -482,17 +482,16 @@ public class HeapView extends JComponent {
             g.dispose();
         }
         
-        public float getPercent() {
+        public double getPercent() {
             return percent;
         }
         
         protected void fireActionPerformed(ActionEvent e) {
-            long time = System.currentTimeMillis();
-            long delta = time - startTime;
-            if (delta > HEAP_GROW_ANIMATE_TIME) {
+            double delta = TimeUtilities.nsToS(System.nanoTime() - startTime);
+            if (delta > HEAP_GROW_ANIMATE_TIME_S) {
                 stopHeapAnimate();
             } else {
-                percent = (float)delta / (float)HEAP_GROW_ANIMATE_TIME;
+                percent = delta / HEAP_GROW_ANIMATE_TIME_S;
                 repaint();
             }
         }
