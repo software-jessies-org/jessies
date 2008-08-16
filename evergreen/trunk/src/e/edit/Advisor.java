@@ -47,7 +47,6 @@ public class Advisor extends JPanel {
             researchers = new ArrayList<WorkspaceResearcher>();
             researchers.add(JavaResearcher.getSharedInstance());
             researchers.add(ManPageResearcher.getSharedInstance());
-            researchers.add(new NumberResearcher());
             researchers.add(new PerlDocumentationResearcher());
             researchers.add(new PythonDocumentationResearcher());
             researchers.add(new RubyDocumentationResearcher());
