@@ -41,7 +41,7 @@ public class FileUtilities {
             }
         } else if (filename.startsWith("~")) {
             // Assume that "~user/bin/vi" is equivalent to "~/../user/bin/vi".
-            Pattern pattern = Pattern.compile("^~([^/]+)(.*)$");
+            Pattern pattern = Pattern.compile("^~([^" + Pattern.quote(File.separator) + "]+)(.*)$");
             Matcher matcher = pattern.matcher(filename);
             if (matcher.find()) {
                 String user = matcher.group(1);
