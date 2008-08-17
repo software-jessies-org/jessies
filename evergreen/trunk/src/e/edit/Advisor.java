@@ -198,4 +198,17 @@ public class Advisor extends JPanel {
         }
         return availableTools.get(0);
     }
+    
+    /**
+     * Adds all the unique words in the given collection to 'set'.
+     */
+    public synchronized static void extractUniqueWords(Collection<String> collection, Set<String> set) {
+        for (String identifier : collection) {
+            // FIXME: this turns "posix_openpt" into two words, so the spelling checker will accept "openpt" alone, rather than just in the identifier "posix_openpt" as intended. Maybe we should check blessed identifiers as a whole before we try break them into words, and then supply the spelling checker with the unique identifiers we bless, rather than just the list of words? (At the same time, passing all the words works well for Java source.)
+            final String[] words = identifier.replace('_', ' ').replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase().split(" ");
+            for (String word : words) {
+                set.add(word);
+            }
+        }
+    }
 }

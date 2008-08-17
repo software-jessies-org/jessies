@@ -9,22 +9,19 @@ import e.util.*;
  * Offers man page entries corresponding to selected words.
  */
 public class StlDocumentationResearcher implements WorkspaceResearcher {
-    private static HashMap<String, String> docs;
-    private static TreeSet<String> uniqueWords;
     private static final String STL_DOCUMENTATION_ROOT = "/usr/share/doc/stl-manual/html/";
+    
+    private static final Map<String, String> docs = new HashMap<String, String>();
+    private static final Set<String> uniqueWords = new TreeSet<String>();
     
     public StlDocumentationResearcher() {
         final long t0 = System.nanoTime();
         
-        docs = new HashMap<String, String>();
-        
-        TreeSet<String> uniqueIdentifiers = new TreeSet<String>();
-        
         if (FileUtilities.exists(STL_DOCUMENTATION_ROOT) == false) {
-            uniqueWords = new TreeSet<String>();
             return;
         }
         
+        final Set<String> uniqueIdentifiers = new TreeSet<String>();
         Pattern pattern = Pattern.compile(".*<A href=\"(.+\\.html)\">([a-z0-9_]+)(&lt;.*&gt;)?</A></TD>.*");
         String[] lines = StringUtilities.readLinesFromFile(STL_DOCUMENTATION_ROOT + "stl_index.html");
         for (String line : lines) {
@@ -44,8 +41,7 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
             }
         }
         
-        // FIXME: this turns "posix_openpt" into two words, so the spelling checker will accept "openpt" alone, rather than just in the identifier "posix_openpt" as intended. Maybe we should check blessed identifiers as a whole before we try break them into words, and then supply the spelling checker with the unique identifiers we bless, rather than just the list of words? (At the same time, passing all the words works well for Java source.)
-        uniqueWords = JavaResearcher.extractUniqueWords(uniqueIdentifiers.iterator());
+        Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
         
         final long t1 = System.nanoTime();
         Log.warn("Learned of " + docs.size() + " STL terms in " + TimeUtilities.nsToString(t1 - t0) + ".");

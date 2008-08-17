@@ -12,19 +12,17 @@ import e.util.*;
 public class ManPageResearcher implements WorkspaceResearcher {
     // A set of unique man page names, so we can quickly determine whether we have a suitable page.
     // This also lets us avoid accidentally returning man pages we're trying to ignore.
-    private static TreeSet<String> uniqueManPageNames;
+    private static final Set<String> uniqueManPageNames = new TreeSet<String>();
     // A set of unique words, for the spelling checker.
-    private static TreeSet<String> uniqueWords;
+    private static final Set<String> uniqueWords = new TreeSet<String>();
     
     private static final ManPageResearcher INSTANCE = new ManPageResearcher();
     
     private ManPageResearcher() {
+        init();
     }
     
     public synchronized static ManPageResearcher getSharedInstance() {
-        if (uniqueWords == null) {
-            init();
-        }
         return INSTANCE;
     }
 
@@ -33,8 +31,6 @@ public class ManPageResearcher implements WorkspaceResearcher {
      */
     private static void init() {
         final long t0 = System.nanoTime();
-        
-        uniqueManPageNames = new TreeSet<String>();
         
         int pageCount = 0;
         Pattern manPagePattern = Pattern.compile("^(.*)\\.([23][A-Za-z]*)(\\.gz)?$");
@@ -58,8 +54,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
             }
         }
         
-        // FIXME: this turns "posix_openpt" into two words, so the spelling checker will accept "openpt" alone, rather than just in the identifier "posix_openpt" as intended. Maybe we should check blessed identifiers as a whole before we try break them into words, and then supply the spelling checker with the unique identifiers we bless, rather than just the list of words? (At the same time, passing all the words works well for Java source.)
-        uniqueWords = JavaResearcher.extractUniqueWords(uniqueManPageNames.iterator());
+        Advisor.extractUniqueWords(uniqueManPageNames, uniqueWords);
         
         final long t1 = System.nanoTime();
         Log.warn("Learned of " + pageCount + " man pages in " + TimeUtilities.nsToString(t1 - t0) + ".");

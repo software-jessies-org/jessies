@@ -17,11 +17,12 @@ public class JavaResearcher implements WorkspaceResearcher {
     /** Matches field or static-method access expressions such as "JSplitPane.". */
     private static final Pattern ACCESS_PATTERN = Pattern.compile("(?x) \\b ([A-Za-z0-9_]+) \\.$");
     
-    private static String[] javaDocSummary;
-    private static TreeSet<String> uniqueIdentifiers;
-    private static TreeSet<String> uniqueWords;
+    private static final JavaResearcher INSTANCE = new JavaResearcher();
     
-    private static JavaResearcher INSTANCE = new JavaResearcher();
+    private static final Set<String> uniqueIdentifiers = new TreeSet<String>();
+    private static final Set<String> uniqueWords = new TreeSet<String>();
+    
+    private static String[] javaDocSummary;
     
     private JavaResearcher() {
     }
@@ -61,7 +62,6 @@ public class JavaResearcher implements WorkspaceResearcher {
         
         Log.warn("Scanning JavaDoc summary...");
         Pattern identifierPattern = Pattern.compile("^[MCFEA]:(\\S+?)(\\(|\t).*$");
-        uniqueIdentifiers = new TreeSet<String>();
         
         int classCount = 0;
         for (String line : javaDocSummary) {
@@ -81,25 +81,10 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
         Log.warn("Extracting unique words from JavaDoc summary...");
         
-        uniqueWords = extractUniqueWords(uniqueIdentifiers.iterator());
+        Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
         
         final long t1 = System.nanoTime();
         Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + TimeUtilities.nsToString(t1 - t0) + ".");
-    }
-    
-    /**
-     * Extracts all the unique words from the identifiers in the JDK.
-     */
-    public synchronized static TreeSet<String> extractUniqueWords(Iterator<String> iterator) {
-        TreeSet<String> result = new TreeSet<String>();
-        while (iterator.hasNext()) {
-            String identifier = iterator.next();
-            String[] words = identifier.replace('_', ' ').replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase().split(" ");
-            for (String word : words) {
-                result.add(word);
-            }
-        }
-        return result;
     }
     
     public synchronized List<String> listIdentifiersStartingWith(String prefix) {
