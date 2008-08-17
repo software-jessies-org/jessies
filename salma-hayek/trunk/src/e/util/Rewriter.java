@@ -67,46 +67,4 @@ public abstract class Rewriter {
         matcher.appendTail(destination);
         return destination;
     }
-
-    public static void main(String[] arguments) {
-        // Rewrite an ancient unit of length in SI units.
-        String result = new Rewriter("([0-9]+(\\.[0-9]+)?)[- ]?(inch(es)?)") {
-            public String replacement() {
-                float inches = Float.parseFloat(group(1));
-                return Float.toString(2.54f * inches) + " cm";
-            }
-        }.rewrite("a 17 inch display");
-        System.out.println(result);
-        
-        // The "Searching and Replacing with Non-Constant Values Using a
-        // Regular Expression" example from the Java Almanac.
-        result = new Rewriter("([a-zA-Z]+[0-9]+)") {
-            public String replacement() {
-                return group(1).toUpperCase();
-            }
-        }.rewrite("ab12 cd efg34");
-        System.out.println(result);
-        
-        result = new Rewriter("([0-9]+) US cents") {
-            public String replacement() {
-                long dollars = Long.parseLong(group(1))/100;
-                return "$" + dollars;
-            }
-        }.rewrite("5000 US cents");
-        System.out.println(result);
-        
-        // Rewrite durations in milliseconds in ISO 8601 format.
-        Rewriter rewriter = new Rewriter("(\\d+)\\s*ms") {
-            public String replacement() {
-                long milliseconds = Long.parseLong(group(1));
-                return TimeUtilities.msToIsoString(milliseconds);
-            }
-        };
-        result = rewriter.rewrite("232341243 ms");
-        System.out.println(result);
-        
-        for (String argument : arguments) {
-            System.out.println(rewriter.rewrite(argument));
-        }
-    }
 }
