@@ -256,7 +256,7 @@ public class EErrorsWindow extends JFrame {
         private boolean isStdErr;
         private String text;
         
-        public AppendRunnable(boolean isStdErr, String[] lines) {
+        public AppendRunnable(boolean isStdErr, List<String> lines) {
             this.isStdErr = isStdErr;
             this.text = StringUtilities.join(lines, "\n") + "\n";
         }
@@ -287,7 +287,7 @@ public class EErrorsWindow extends JFrame {
         }
     }
     
-    public void appendLines(boolean isStdErr, String[] lines) {
+    public void appendLines(boolean isStdErr, List<String> lines) {
         for (String line : lines) {
             // FIXME: this is a bit weak, and no longer necessary for our builds. The FIXME in this file about treating stderr specially might be a better way forward if we want to keep a hack.
             if (line.contains("***") || line.contains("warning:")) {

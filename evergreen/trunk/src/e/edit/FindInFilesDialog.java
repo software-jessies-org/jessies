@@ -267,7 +267,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
         
         @Override
-        protected void process(DefaultMutableTreeNode... treeNodes) {
+        protected void process(List<DefaultMutableTreeNode> treeNodes) {
             if (currentSequenceNumber.get() != sequenceNumber) {
                 return;
             }

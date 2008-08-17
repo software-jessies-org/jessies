@@ -2,6 +2,7 @@ package e.edit;
 
 import e.util.*;
 import java.io.*;
+import java.util.List;
 import org.jdesktop.swingworker.SwingWorker;
 
 /**
@@ -36,7 +37,7 @@ public class StreamMonitor extends SwingWorker<Object, String> {
     }
     
     @Override
-    protected void process(String... lines) {
+    protected void process(List<String> lines) {
         task.process(isStdErr, lines);
     }
 }

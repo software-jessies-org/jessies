@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 public class ShellCommand {
     private String command;
@@ -100,12 +101,12 @@ public class ShellCommand {
             }
         } catch (Exception ex) {
             Log.warn("Problem pumping standard input for task \"" + command + "\"", ex);
-            workspace.getErrorsWindow().appendLines(true, new String[] { "Problem pumping standard input for task \"" + command + "\": " + ex.getMessage() + "." });
+            workspace.getErrorsWindow().appendLines(true, Collections.singletonList("Problem pumping standard input for task \"" + command + "\": " + ex.getMessage() + "."));
         } finally {
             try {
                 os.close();
             } catch (IOException ex) {
-                workspace.getErrorsWindow().appendLines(true, new String[] { "Couldn't close standard input for task \"" + command + "\": " + ex.getMessage() + "." });
+                workspace.getErrorsWindow().appendLines(true, Collections.singletonList("Couldn't close standard input for task \"" + command + "\": " + ex.getMessage() + "."));
             }
         }
     }
@@ -138,7 +139,7 @@ public class ShellCommand {
     /**
      * Invoked by StreamMonitor.process, on the EDT.
      */
-    public void process(boolean isStdErr, String... lines) {
+    public void process(boolean isStdErr, List<String> lines) {
         switch (outputDisposition) {
         case CREATE_NEW_DOCUMENT:
             Log.warn("CREATE_NEW_DOCUMENT not yet implemented.");
@@ -196,7 +197,7 @@ public class ShellCommand {
         
         // A non-zero exit status is always potentially interesting.
         if (exitStatus != 0) {
-            workspace.getErrorsWindow().appendLines(true, new String[] { "Task \"" + command + "\" failed with exit status " + exitStatus });
+            workspace.getErrorsWindow().appendLines(true, Collections.singletonList("Task \"" + command + "\" failed with exit status " + exitStatus));
         }
         workspace.getErrorsWindow().taskDidExit(exitStatus);
     }

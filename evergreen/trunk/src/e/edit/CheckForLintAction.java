@@ -81,7 +81,7 @@ public class CheckForLintAction extends ETextAction {
         }
         
         // Show the user what the tool found.
-        workspace.getErrorsWindow().appendLines(true, lines.toArray(new String[lines.size()]));
+        workspace.getErrorsWindow().appendLines(true, lines);
         workspace.getErrorsWindow().taskDidExit(status);
     }
     
