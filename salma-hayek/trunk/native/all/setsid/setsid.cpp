@@ -10,6 +10,7 @@ static void ensureCallerIsProcessGroupLeaderAndHasNoControllingTerminal() {
     // running the child in the background, which isn't what we'd want.
     // We don't currently run this program as a process group leader.
     // We may be hiding a different implementation of setsid, so have the grace to fail with an informative error message.
+    // FIXME: This case always happens on Windows, which is very annoying if this setsid is first on Evergreen's PATH.
     std::cerr << "the software.jessies.org implementation of setsid does not work for process group leaders." << std::endl;
     exit(EXIT_FAILURE);
   }
