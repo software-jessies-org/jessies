@@ -6,9 +6,9 @@
 # Test with:
 # evergreen-boilerplate-generator /usr/enh/projects/blah/src/SomeClass.h /usr/enh/projects/blah/src/org/jessies/talc/Talc.java
 
-def cpp(name)
+def cpp(path)
     # Turn "/usr/enh/Projects/blah/src/SomeClass.h" into "SomeClass.h".
-    name = File.basename(name)
+    name = File.basename(path)
     # Turn "SomeClass.h" into "SOME_CLASS_H".
     safe_name = name.gsub(/([a-z])([A-Z])/, "\\1_\\2").upcase().gsub(/[^A-Za-z0-9_]/, "_")
 
@@ -22,9 +22,9 @@ def cpp(name)
     puts("#endif")
 end
 
-def java(name)
+def java(path)
     # Extract the class and package names.
-    elements = name.split("/")
+    elements = path.split(File::SEPARATOR)
     class_name = elements.pop().sub(/\.java$/, "")
     while elements.size() > 0 && elements.first() !~ /^(com|net|org)$/
         elements.shift()
@@ -35,19 +35,25 @@ def java(name)
         puts("package #{package};")
         puts()
     end
+    # Does this look like a JUnit test?
+    if path.include?(File::SEPARATOR + "test" + File::SEPARATOR) && class_name =~ /Test$/
+        puts("import org.junit.*;")
+        puts("import static org.junit.Assert.*;")
+        puts()
+    end
     puts("public class #{class_name} {")
     puts("}")
 end
 
-def emit_boilerplate(filename)
-    if filename =~ /\.h$/
-        cpp(filename)
-    elsif filename =~ /\.java$/
-        java(filename)
+def emit_boilerplate(path)
+    if path =~ /\.h$/
+        cpp(path)
+    elsif path =~ /\.java$/
+        java(path)
     end
 end
 
 ARGV.each() {
-    |filename|
-    emit_boilerplate(filename)
+    |path|
+    emit_boilerplate(path)
 }
