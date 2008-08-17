@@ -21,6 +21,7 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
         TreeSet<String> uniqueIdentifiers = new TreeSet<String>();
         
         if (FileUtilities.exists(STL_DOCUMENTATION_ROOT) == false) {
+            uniqueWords = new TreeSet<String>();
             return;
         }
         
