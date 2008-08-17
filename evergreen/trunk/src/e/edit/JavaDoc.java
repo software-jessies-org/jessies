@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.jar.*;
+import java.util.regex.*;
 import java.util.zip.*;
 
 import e.util.*;
@@ -173,7 +174,7 @@ public class JavaDoc {
      * Returns the location of the source file, as a plain String.
      */
     public static List<String> findSourceFilenames(String dottedClassName) {
-        String suffix = "\\b" + dottedClassName.replace('.', File.separatorChar) + "\\.java$";
+        String suffix = "\\b" + Pattern.quote(dottedClassName.replace('.', File.separatorChar)) + "\\.java$";
         List<String> result = new ArrayList<String>();
         for (Workspace workspace : Evergreen.getInstance().getWorkspaces()) {
             for (String leafName : workspace.getFileList().getListOfFilesMatching(suffix)) {
