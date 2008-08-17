@@ -1,17 +1,18 @@
 package e.edit;
 
+import e.gui.*;
+import e.ptextarea.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.*;
 import org.jdesktop.swingworker.SwingWorker;
-import e.gui.*;
-import e.ptextarea.*;
-import e.util.*;
 
 public class TagsUpdater {
     private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Tags Updater");
@@ -235,7 +236,7 @@ public class TagsUpdater {
         }
         
         @Override
-        protected void process(TagReader.Tag... tags) {
+        protected void process(List<TagReader.Tag> tags) {
             for (TagReader.Tag tag : tags) {
                 tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
                 
