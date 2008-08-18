@@ -135,8 +135,10 @@ public class ManPageResearcher implements WorkspaceResearcher {
             // There are case differences between 3.0.9 on Mac OS and 3.2 on Linux.
             // There's also a difference in the quote character used: ' on Linux and " on Mac OS.
             
-            // Remove the table of contents at the end. There may be nested lists because subsection are included.
-            result = result.replaceAll("(?si)<hr><p>.*?</ul>", "");
+            // Remove the table of contents at the end.
+            // There may be nested lists because subsections are included, so we really do want a greedy match.
+            // We add the "</body>" because sometimes we get multiple concatenated pages, and we don't want to skip all but the first.
+            result = result.replaceAll("(?si)<hr><p>.*?</ul>\n</body>", "");
             // Remove the links to the table of contents.
             result = result.replaceAll("(?i)<a name=['\"]sect\\d+['\"] href=['\"]#toc\\d+['\"]>((.|\n)*?)</a>", "$1");
             result = result.replaceAll("(?i)<a href=['\"]#toc['\"]>Table of Contents</a><p>", "");
