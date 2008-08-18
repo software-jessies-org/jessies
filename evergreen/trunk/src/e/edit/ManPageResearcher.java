@@ -90,6 +90,8 @@ public class ManPageResearcher implements WorkspaceResearcher {
         return fileType == FileType.C_PLUS_PLUS;
     }
     
+    // FIXME: we're relying on unmaintained code (rman) here, and should really look at doing something better.
+    // If nothing else, we should pull this out into a helper script. We're not gaining anything by writing this in Java.
     public String formatManPage(String page, String section) {
         ArrayList<String> commands = new ArrayList<String>();
         String polyglotMan = findPolyglotMan();
@@ -139,6 +141,41 @@ public class ManPageResearcher implements WorkspaceResearcher {
             // There may be nested lists because subsections are included, so we really do want a greedy match.
             // We add the "</body>" because sometimes we get multiple concatenated pages, and we don't want to skip all but the first.
             result = result.replaceAll("(?si)<hr><p>.*?</ul>\n</body>", "");
+            
+            // Try to make the synopses look better by insisting that they're in PREs, and doing a few other bits of tidying.
+            // Good test pages for this code: exec fcntl getenv getrusage pread setpgid stat.
+            result = new Rewriter("(?si)(Synopsis</a></h2>\n)(.*?)(<h2>)") {
+                public String replacement() {
+                    String synopsis = group(2);
+                    
+                    // Remove custom formatting; being in a PRE is more readable than all the bold and italic in the world.
+                    synopsis = synopsis.replaceAll("</?(b|br|i|p|pre)>", "");
+                    
+                    // Turn fancy spaces back into ASCII spaces, and stuff magically lines back up again.
+                    synopsis = synopsis.replaceAll("&nbsp;", " ");
+                    
+                    // Cope with the "feature test macro requirements" that arrived in glibc manual pages recently.
+                    // We want the heading to be body text, but the details back in a PRE.
+                    // FIXME: we (via rman) do a terrible job of formatting this stuff.
+                    synopsis = synopsis.replaceAll("(?si)(Feature Test Macro.*?</a>\n\\):)", "</pre>$1<pre>");
+                    
+                    // Re-join stuff like "size_t\npread(..." which isn't helpful.
+                    synopsis = synopsis.replaceAll("\n", "").replaceAll(" +", " "); // Remove ASCII art.
+                    synopsis = synopsis.replaceAll("#", "\n#"); // Break before any #define or #include.
+                    synopsis = synopsis.replaceAll("&gt;([^#])", "&gt;\n$1"); // Break at the end the last #include.
+                    synopsis = synopsis.replaceAll("(?<!lt);", ";\n"); // Break after any ; that ends a declaration.
+                    
+                    // One last pass tidying whitespace.
+                    String[] lines = synopsis.split("\n");
+                    for (int i = 0; i < lines.length; ++i) {
+                        lines[i] = lines[i].trim();
+                    }
+                    synopsis = StringUtilities.join(lines, "\n");
+                    
+                    return group(1) + "<pre>" + synopsis + "</pre>" + group(3);
+                }
+            }.rewrite(result);
+            
             // Remove the links to the table of contents.
             result = result.replaceAll("(?i)<a name=['\"]sect\\d+['\"] href=['\"]#toc\\d+['\"]>((.|\n)*?)</a>", "$1");
             result = result.replaceAll("(?i)<a href=['\"]#toc['\"]>Table of Contents</a><p>", "");
