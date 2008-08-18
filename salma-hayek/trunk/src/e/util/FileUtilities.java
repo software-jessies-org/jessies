@@ -67,13 +67,13 @@ public class FileUtilities {
         if (isDirectory && filename.endsWith(File.separator) == false) {
             filename += File.separatorChar;
         }
-        String home = getUserHomeDirectory();
+        String home = getUserHomeDirectory() + File.separator;
         // We can't use startsWith because Windows requires case-insensitivity.
         if (filename.length() >= home.length()) {
             File homeFile = new File(home);
             File file = new File(filename.substring(0, home.length()));
             if (homeFile.equals(file)) {
-                return "~" + filename.substring(home.length());
+                return "~" + File.separator + filename.substring(home.length());
             }
         }
         return filename;
