@@ -134,11 +134,17 @@ public class Advisor extends JPanel {
         
         @Override
         public void done() {
+            String newText;
             try {
-                setDocumentationText(get());
+                newText = get();
             } catch (Exception ex) {
-                Log.warn("ResearchRunner failed", ex);
+                // We could make more of an effort here, but this "shouldn't happen".
+                // Effort should go to hardening the researchers rather than polishing the high-level error handling.
+                // It's useful to let the user know we failed, though.
+                newText = "<html><p>An error occurred while searching for \"" + searchTerm + "\". See log for full details.</html>";
+                Log.warn("ResearchRunner failed on \"" + searchTerm + "\"", ex);
             }
+            setDocumentationText(newText);
         }
     }
     
