@@ -118,18 +118,18 @@ public class Advisor extends JPanel {
                     if (result != null && result.length() > 0) {
                         // We need to strip HTML and BODY tags if we're to concatenate HTML documents.
                         // We can't strip HEAD tags because they may have useful content.
+                        // It's too hard to add BODY tags in appropriate places.
                         result = result.replaceAll("(?i)</?html>", "").replaceAll("(?i)</?body[^>]*>", "");
                         newText.append(result);
                     }
                 }
             }
             
-            if (newText.length() == 0) {
-                newText.append("No documentation found for \"" + searchTerm + "\".");
+            if (newText.length() > 0) {
+                return newText.toString();
+            } else {
+                return "No documentation found for \"" + searchTerm + "\".";
             }
-            
-            // Add the HTML tags back. It's too hard to add BODY tags in appropriate places.
-            return "<html>" + newText.toString() + "</html>";
         }
         
         @Override
@@ -141,7 +141,7 @@ public class Advisor extends JPanel {
                 // We could make more of an effort here, but this "shouldn't happen".
                 // Effort should go to hardening the researchers rather than polishing the high-level error handling.
                 // It's useful to let the user know we failed, though.
-                newText = "<html><p>An error occurred while searching for \"" + searchTerm + "\". See log for full details.</html>";
+                newText = "<p>An error occurred while searching for \"" + searchTerm + "\". See log for full details.";
                 Log.warn("ResearchRunner failed on \"" + searchTerm + "\"", ex);
             }
             setDocumentationText(newText);
@@ -149,6 +149,7 @@ public class Advisor extends JPanel {
     }
     
     public void setDocumentationText(String content) {
+        // We've probably stripped the HTML tag.
         if (content.startsWith("<html>") == false) {
             content = "<html><head><title></title></head><body bgcolor=#FFFFFF>" + content + "</body></html>";
         }
