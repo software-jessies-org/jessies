@@ -328,7 +328,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                     // taken enough time for the user to start caring, so we
                     // don't make quick searches unnecessarily slow.
                     doneFileCount.incrementAndGet();
-                    if (TimeUtilities.nsToS(t0 - startTimeNs) > 300) {
+                    if (TimeUtilities.nsToS(t0 - startTimeNs) > 0.3) {
                         updateStatus();
                     }
                     
