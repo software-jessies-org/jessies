@@ -305,22 +305,27 @@ public class FileUtilities {
         byte[] digest = null;
         try {
             MessageDigest digester = MessageDigest.getInstance("MD5");
-            FileInputStream fileInputStream = new FileInputStream(file);
-            byte[] bytes = new byte[fileInputStream.available()];
-            int byteCount = fileInputStream.read(bytes);
-            fileInputStream.close();
-            digester.update(bytes);
-            digest = digester.digest();
+            byte[] bytes = new byte[8192];
+            FileInputStream in = new FileInputStream(file);
+            try {
+                int byteCount;
+                while ((byteCount = in.read(bytes)) > 0) {
+                    digester.update(bytes, 0, byteCount);
+                }
+                digest = digester.digest();
+            } finally {
+                in.close();
+            }
         } catch (Exception ex) {
             Log.warn("Unable to compute MD5 digest of \"" + file + "\".", ex);
         }
-        
-        if (digest == null) {
-            return null;
-        }
-        
+        return (digest == null) ? null : byteArrayToHexString(digest);
+    }
+    
+    // FIXME: move this somewhere more suitable.
+    public static String byteArrayToHexString(byte[] bytes) {
         StringBuilder result = new StringBuilder();
-        for (byte b : digest) {
+        for (byte b : bytes) {
             result.append(Integer.toHexString((b >> 4) & 0xf));
             result.append(Integer.toHexString(b & 0xf));
         }
