@@ -70,6 +70,7 @@ public:
             try {
                 runChild(executable, argv, workingDirectory, *this);  // Should never return.
             } catch (const std::exception& ex) {
+                // reportFatalErrorUsingGui would have a better chance of being seen.
                 fprintf(stderr, "%s\n", ex.what());
             }
             exit(1); // We're only exit()ing the child, not the VM.
@@ -91,9 +92,11 @@ private:
         child_exception_via_pipe(int pipeFd, const std::string& message)
         : child_exception(message) {
             // Take special measures to ensure that the error message is displayed,
-            // given that std::err may not be working at this point.
+            // given that std::cerr may not be working at this point.
             FILE* tunnel = fdopen(pipeFd, "w");
-            fprintf(tunnel, "%s\n", what());
+            if (tunnel != 0) {
+                fprintf(tunnel, "%s\n", what());
+            }
         }
     };
     
