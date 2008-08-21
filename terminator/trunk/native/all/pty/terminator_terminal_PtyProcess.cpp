@@ -305,6 +305,7 @@ static bool processHasFileOpen(const std::string& pid, const std::string& filena
         // We expect not to be able to see all users' processes' fds.
         // We also expect that some processes might have exited between us seeing their directory and scanning it.
         if (ex.getErrno() != EACCES && ex.getErrno() != ENOENT) {
+            // FIXME: Contending for stderr from multiple threads isn't likely to end well.
             fprintf(stderr, "processHasFileOpen error: %s\n", ex.what());
         }
     }
