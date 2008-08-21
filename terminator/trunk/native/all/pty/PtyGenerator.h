@@ -63,7 +63,7 @@ public:
         // Check that we can open the slave.
         // That's the one failure that in the slave that we cannot otherwise report.
         // When Cygwin runs out of ptys, the slave open failing is the first we get to know about it.
-        close(openSlave());
+        //close(openSlave());
         
         return masterFd;
     }
