@@ -252,6 +252,8 @@ private:
 #ifdef __CYGWIN__
     // Before 2006-07-18, Cygwin didn't have posix_openpt(3).
     // I'm not sure which release that first went into.
+    // As of the 2008-06-12 release, it's still not exported from cygwin1.dll unlike, say, grantpt.
+    // This is the same implementation as the one in the Cygwin source.
     int posix_openpt(int flags) {
         return open("/dev/ptmx", flags);
     }
