@@ -59,6 +59,12 @@ public:
         if (unlockpt(masterFd) != 0) {
             throw unix_exception("unlockpt(\"" + slavePtyName + "\") failed");
         }
+        
+        // Check that we can open the slave.
+        // That's the one failure that in the slave that we cannot otherwise report.
+        // When Cygwin runs out of ptys, the slave open failing is the first we get to know about it.
+        close(openSlave());
+        
         return masterFd;
     }
     
@@ -100,13 +106,12 @@ private:
         }
     };
     
-    int openSlaveAndCloseMaster() {
+    int openSlave() {
         // The first terminal opened by a System V process becomes its controlling terminal.
         int slaveFd = open(slavePtyName.c_str(), O_RDWR);
         if (slaveFd == -1) {
-            throw unix_exception("open(\"" + slavePtyName + "\", O_RDWR) failed");
+            throw unix_exception("open(\"" + slavePtyName + "\", O_RDWR) failed - did you run out of pseudo-terminals?");
         }
-        close(masterFd);
         return slaveFd;
     }
     
@@ -122,7 +127,8 @@ private:
             throw child_exception("setsid()");
         }
         
-        int childFd = ptyGenerator.openSlaveAndCloseMaster();
+        int childFd = ptyGenerator.openSlave();
+        close(ptyGenerator.masterFd);
 
 #if defined(TIOCSCTTY)
         // The BSD approach is that the controlling terminal for a session is allocated by the session leader by issuing the TIOCSCTTY ioctl.
