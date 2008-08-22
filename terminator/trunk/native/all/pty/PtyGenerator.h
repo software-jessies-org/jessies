@@ -201,6 +201,11 @@ private:
         // http://elliotth.blogspot.com/2005/12/why-terminator-doesnt-support-windowid.html
         unsetenv("WINDOWID");
         
+        // The JVM sets LD_LIBRARY_PATH, but this upsets some applications.
+        // We complained in 2005 (Sun bug 6354700), but there's no sign of progress.
+        // FIXME: write the initial value to a system property in "invoke-java.rb" and set it back here?
+        unsetenv("LD_LIBRARY_PATH");
+        
 #ifdef __APPLE__
         // Apple's Java launcher uses environment variables to implement the -Xdock options.
         pid_t ppid = getppid();
