@@ -1111,6 +1111,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      * painted. This means that we can be created on the Event Dispatch Thread
      * and manipulated immediately (centerOffsetInDisplay being a common use
      * case).
+     * 
+     * FIXME: this sounds like a hack. what's the real problem?
+     * FIXME: we call generateLineWrappings twice for each new file; first on addNotify and then on componentResized.
      */
     public void addNotify() {
         super.addNotify();
