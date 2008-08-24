@@ -252,7 +252,7 @@ public class PLineList implements PTextListener {
         }
         
         /** Specifies that the render width of the text is now invalid.  To be used only by PTextArea. */
-        public void setWidthInvalid() {
+        private void setWidthInvalid() {
             width = -1;
         }
         
@@ -290,7 +290,7 @@ public class PLineList implements PTextListener {
             setWidthInvalid();
         }
         
-        public int getLengthBeforeTerminator() {
+        private int getLengthBeforeTerminator() {
             return isLineTerminated() ? length - 1 : length;
         }
         
@@ -303,12 +303,12 @@ public class PLineList implements PTextListener {
          * Returns true if the specified character offset from the start of the underlying PTextBuffer model is
          * held within this line.
          */
-        public boolean containsIndex(int charIndex) {
+        private boolean containsIndex(int charIndex) {
             return (charIndex >= start) && (charIndex < start + length);
         }
         
         /** Returns true when this line is terminated by a newline character. */
-        public boolean isLineTerminated() {
+        private boolean isLineTerminated() {
             if (length == 0) {
                 return false;
             } else {
