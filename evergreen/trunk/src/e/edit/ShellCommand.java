@@ -183,7 +183,7 @@ public class ShellCommand {
             // We dealt with the sub-process output as we went along.
             break;
         case INSERT:
-            textWindow.getTextArea().insert(capturedOutput);
+            textWindow.getTextArea().insertOrReplaceSelection(capturedOutput);
             break;
         case REPLACE:
             PTextArea textArea = textWindow.getTextArea();
