@@ -67,8 +67,16 @@ public class IndentationGuesser {
             CharSequence emergencyAlternative = fallback;
             
             LineIterator it = new LineIterator(chars);
+            int lineCount = 0;
             while (it.hasNext()) {
                 CharSequence line = it.next();
+                ++lineCount;
+                
+                if (lineCount > 4096) {
+                    // If we haven't learned enough after 4096 lines, we may as well give up.
+                    break;
+                }
+                
                 Matcher matcher = INDENTATION_PATTERN_1.matcher(line);
                 if (matcher.matches()) {
                     CharSequence indent = matcher.group(1);
