@@ -419,11 +419,38 @@ public class PTextBuffer implements CharSequence {
     /** Returns the character at the given index.  Part of the CharSequence interface. */
     public char charAt(int index) {
         if (index < 0 || index >= length()) {
-            throw new IndexOutOfBoundsException("index " + index + " not in half-open range [0.." + length() + ")");
+            throwIOOBE(index);
         }
         return (index < gapPosition) ? text[index] : text[index + gapLength];
     }
-   
+    
+    private void throwIOOBE(int index) {
+        throw new IndexOutOfBoundsException("index " + index + " not in half-open range [0.." + length() + ")");
+    }
+    
+    /**
+     * Returns the index within this buffer of the first occurrence of 'ch', starting the search at 'startIndex'.
+     * 
+     * If 'startIndex' is negative, it has the same effect as if it were zero: the entire buffer may be searched.
+     * If 'startIndex' is greater than the length of the buffer, it has the same effect as if it were equal to the length of the string: -1 is returned.
+     */
+    public int indexOf(char ch, int startIndex) {
+        // This is how String.indexOf behaves.
+        if (startIndex < 0) {
+            startIndex = 0;
+        } else if (startIndex >= length()) {
+            return -1;
+        }
+        
+        int gapBufferIndex = (startIndex < gapPosition) ? startIndex : (startIndex + gapLength);
+        for (int i = startIndex; i < length(); ++i) {
+            if (text[gapBufferIndex++] == ch) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
     /** Returns the number of characters in the text area.  Part of the CharSequence interface. */
     public int length() {
         return text.length - gapLength;

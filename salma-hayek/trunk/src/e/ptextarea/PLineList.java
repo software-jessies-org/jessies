@@ -217,14 +217,14 @@ public class PLineList implements PTextListener {
     
     private void generateLines() {
         lines = new ArrayList<Line>();
-        int start = 0;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '\n') {
-                lines.add(new Line(start, i + 1 - start));  // The +1 is because newlines stick to previous.
-                start = i + 1;
-            }
+        int lastLineStart = 0;
+        int nextNewline;
+        while ((nextNewline = text.indexOf('\n', lastLineStart)) != -1) {
+            // Everything from the last line start up to and including the newline is a new line.
+            lines.add(new Line(lastLineStart, nextNewline + 1 - lastLineStart));
+            lastLineStart = nextNewline + 1;
         }
-        lines.add(new Line(start, text.length() - start));
+        lines.add(new Line(lastLineStart, text.length() - lastLineStart));
         lastValidLineIndex = lines.size() - 1;
     }
     
@@ -237,6 +237,8 @@ public class PLineList implements PTextListener {
     /**
      * A PLineList.Line holds information about the location and length of a particular line of
      * text.  It also contains information about how wide this line is when its text is rendered.
+     * 
+     * FIXME: we create a large number of these small but long-lived objects. Maybe PLineList should contain three int[]s instead? We could still hand these out to callers if we wished.
      */
     public class Line {
         private int start;
