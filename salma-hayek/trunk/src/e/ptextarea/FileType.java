@@ -173,7 +173,6 @@ public class FileType {
      * Guesses the type from the given filename and the corresponding content.
      */
     public static FileType guessFileType(String filename, CharSequence content) {
-        final long t0 = System.nanoTime();
         // The whole point of emacs mode lines is that they override all other possibilities.
         FileType modeType = extractFileTypeFromModeLine(content);
         if (modeType != null) {
@@ -186,8 +185,6 @@ public class FileType {
         if (fileType == FileType.PLAIN_TEXT) {
             fileType = guessFileTypeByContent(content);
         }
-        final long t1 = System.nanoTime();
-        System.err.println("guessFileType took " + TimeUtilities.nsToString(t1 - t0));
         return fileType;
     }
     
@@ -274,6 +271,7 @@ public class FileType {
      * A standard C++ header file (such as <string>) might not have any extension, though it's likely in that case start with #ifndef.
      */
     private static boolean isCPlusPlusContent(CharSequence content) {
+        // FIXME: this is wasteful on large files (because after about 1KiB in, we can give up), but at less than 100ms for a 40MiB file, it doesn't seem worth fixing yet (on my machine).
         return Pattern.compile("#ifndef").matcher(content).find();
     }
     
