@@ -260,12 +260,12 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     private void highlightMergeConflicts() {
-        // All (?) merge conflicts use these markers:
-        final String MERGE_CONFLICT_REGULAR_EXPRESSION = "(?m)^[<>]{7}";
+        // All merge conflict indications I've ever seen (and I've seen a few) contain this substring:
+        final String MERGE_CONFLICT_INDICATOR = "<<<<<<<";
         // And once we're convinced we're looking at a file with merge conflicts, we can accept a more lenient set of dividers.
         // We also match anything after the divider until end of line, because some systems add commentary such as revision numbers and filenames.
         final String ALL_MERGE_CONFLICT_DIVIDERS_REGULAR_EXPRESSION = "(?m)^([<>|=]{7}( .*)?)";
-        if (Pattern.compile(MERGE_CONFLICT_REGULAR_EXPRESSION).matcher(textArea.getTextBuffer()).find()) {
+        if (Pattern.compile(MERGE_CONFLICT_INDICATOR).matcher(textArea.getTextBuffer()).find()) {
             FindAction.INSTANCE.findInText(this, ALL_MERGE_CONFLICT_DIVIDERS_REGULAR_EXPRESSION);
         }
     }
