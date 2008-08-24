@@ -62,16 +62,16 @@ public class IndentationGuesser {
     public static String guessIndentationFromFile(CharSequence chars, String fallback) {
         Stopwatch.Timer timer = stopwatch.start();
         try {
-            String previousIndent = "";
-            Bag<String> indentations = new Bag<String>();
-            String emergencyAlternative = fallback;
+            CharSequence previousIndent = "";
+            Bag<CharSequence> indentations = new Bag<CharSequence>();
+            CharSequence emergencyAlternative = fallback;
             
             LineIterator it = new LineIterator(chars);
             while (it.hasNext()) {
                 CharSequence line = it.next();
                 Matcher matcher = INDENTATION_PATTERN_1.matcher(line);
                 if (matcher.matches()) {
-                    String indent = matcher.group(1);
+                    CharSequence indent = matcher.group(1);
                     if (indent.length() < emergencyAlternative.length()) {
                         emergencyAlternative = indent;
                     }
@@ -79,12 +79,12 @@ public class IndentationGuesser {
                 }
                 matcher = INDENTATION_PATTERN_2.matcher(line);
                 if (matcher.matches()) {
-                    String indent = matcher.group(1);
+                    CharSequence indent = matcher.group(1);
                     if (indent.length() > previousIndent.length()) {
-                        String difference = indent.substring(previousIndent.length());
+                        CharSequence difference = indent.subSequence(0, previousIndent.length());
                         indentations.add(difference);
                     } else if (indent.length() < previousIndent.length()) {
-                        String difference = previousIndent.substring(indent.length());
+                        CharSequence difference = previousIndent.subSequence(0, indent.length());
                         indentations.add(difference);
                     }
                     previousIndent = indent;
@@ -93,12 +93,15 @@ public class IndentationGuesser {
             //System.out.println("indentations=" + indentations);
             if (indentations.isEmpty()) {
                 //System.out.println(" - no line just containing an indented brace?");
-                return emergencyAlternative;
+                return emergencyAlternative.toString();
             } else {
-                return indentations.commonestItem();
+                return indentations.commonestItem().toString();
             }
         } finally {
             timer.stop();
+            if (TimeUtilities.nsToS(timer.ns()) > 0.5) {
+                Log.warn("IndentationGuesser took " + TimeUtilities.nsToString(timer.ns()) + " on " + chars.length() + " characters!");
+            }
         }
     }
     

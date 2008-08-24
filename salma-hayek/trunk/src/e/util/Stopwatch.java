@@ -85,11 +85,16 @@ public class Stopwatch {
     }
     
     public class Timer {
-        long t0_ns = System.nanoTime();
+        final long t0_ns = System.nanoTime();
+        long t1_ns;
         private Timer() {
         }
         public void stop() {
-            recordTiming(System.nanoTime() - t0_ns);
+            t1_ns = System.nanoTime();
+            recordTiming(ns());
+        }
+        public long ns() {
+            return t1_ns - t0_ns;
         }
     }
 }
