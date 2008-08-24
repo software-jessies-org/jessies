@@ -1122,11 +1122,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         try {
             if (isLineWrappingInvalid() && isShowing()) {
                 splitLines = new ArrayList<SplitLine>();
-                for (int i = 0; i < lines.size(); i++) {
-                    PLineList.Line line = lines.getLine(i);
-                    if (line.isWidthValid() == false) {
-                        setLineWidth(line);
-                    }
+                for (int i = 0; i < lines.size(); ++i) {
                     addSplitLines(i, splitLines.size());
                 }
                 updateHeight();
