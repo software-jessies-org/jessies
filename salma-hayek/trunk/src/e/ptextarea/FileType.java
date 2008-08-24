@@ -173,6 +173,7 @@ public class FileType {
      * Guesses the type from the given filename and the corresponding content.
      */
     public static FileType guessFileType(String filename, CharSequence content) {
+        final long t0 = System.nanoTime();
         // The whole point of emacs mode lines is that they override all other possibilities.
         FileType modeType = extractFileTypeFromModeLine(content);
         if (modeType != null) {
@@ -185,6 +186,8 @@ public class FileType {
         if (fileType == FileType.PLAIN_TEXT) {
             fileType = guessFileTypeByContent(content);
         }
+        final long t1 = System.nanoTime();
+        System.err.println("guessFileType took " + TimeUtilities.nsToString(t1 - t0));
         return fileType;
     }
     
@@ -301,12 +304,13 @@ public class FileType {
         // Mode lines are case-insensitive.
         // The "mode: " is optional.
         // Emacs only looks at the first two lines.
-        final int LINES_TO_CHECK = 2;
         // FIXME: does the major mode name always come first? It seems to, but that doesn't mean anything.
-        Pattern modeLinePattern = Pattern.compile("(?i)-\\*- ?(?:mode: )?([^:; ]+).* ?-\\*-");
-        String[] lines = Pattern.compile("\n").split(content, LINES_TO_CHECK + 1);
-        for (int i = 0; i < Math.min(lines.length, LINES_TO_CHECK); ++i) {
-            Matcher matcher = modeLinePattern.matcher(lines[i]);
+        
+        final int LINES_TO_CHECK = 2;
+        final List<CharSequence> lines = splitLines(content, LINES_TO_CHECK);
+        final Pattern modeLinePattern = Pattern.compile("(?i)-\\*- ?(?:mode: )?([^:; ]+).* ?-\\*-");
+        for (CharSequence line : lines) {
+            final Matcher matcher = modeLinePattern.matcher(line);
             if (matcher.find()) {
                 String possibleMajorModeName = matcher.group(1);
                 // Sometimes multiple Emacs major modes map to a single one of our FileTypes.
@@ -326,5 +330,28 @@ public class FileType {
             }
         }
         return null;
+    }
+    
+    // We used to use Pattern.compile("\n").split(content, LINES_TO_CHECK + 1) but that was expensive on large files.
+    // See the implementation of Pattern.split(CharSequence, int) for the full horror.
+    // Since that's unlikely to change, let's reinvent a simpler wheel.
+    // In particular:
+    // We don't need to split with arbitrary regular expressions.
+    // We're happy with empty lines.
+    // We don't actually need strings; subsequences are fine.
+    private static List<CharSequence> splitLines(CharSequence content, int limit) {
+        final ArrayList<CharSequence> result = new ArrayList<CharSequence>();
+        final int length = content.length();
+        int lastSplitOffset = 0;
+        for (int i = 0; i < length; ++i) {
+            if (content.charAt(i) == '\n') {
+                result.add(content.subSequence(lastSplitOffset, i));
+                if (result.size() == limit) {
+                    break;
+                }
+                lastSplitOffset = i + 1;
+            }
+        }
+        return result;
     }
 }
