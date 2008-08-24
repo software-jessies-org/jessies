@@ -389,12 +389,36 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         return result;
     }
     
+    @Deprecated
     public void insert(CharSequence chars) {
+        insertOrReplaceSelection(chars);
+    }
+    
+    /**
+     * Inserts 'chars' at the caret, or replaces the selection if there is one.
+     */
+    public void insertOrReplaceSelection(CharSequence chars) {
         getLock().getWriteLock();
         try {
             SelectionSetter endCaret = new SelectionSetter(getSelectionStart() + chars.length());
             int length = getSelectionEnd() - getSelectionStart();
             getTextBuffer().replace(new SelectionSetter(), getSelectionStart(), length, chars, endCaret);
+        } finally {
+            getLock().relinquishWriteLock();
+        }
+    }
+    
+    /**
+     * Appends the given string to the end of the text. This is meant for
+     * programmatic use, and so does not pay attention to or modify the
+     * selection.
+     */
+    public void insertPreservingSelection(String newText, int offset) {
+        getLock().getWriteLock();
+        try {
+            SelectionSetter noChange = new SelectionSetter(SelectionSetter.DO_NOT_CHANGE);
+            PTextBuffer buffer = getTextBuffer();
+            buffer.replace(noChange, offset, 0, newText, noChange);
         } finally {
             getLock().relinquishWriteLock();
         }
