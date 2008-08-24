@@ -13,8 +13,22 @@ public class SpellingChecker {
     
     private static final Stopwatch stopwatch = Stopwatch.get("SpellingChecker");
     
-    private static HashSet<String> knownGood = new HashSet<String>();
-    private static HashSet<String> knownBad = new HashSet<String>();
+    private static WordCache wordCache = new WordCache();
+    
+    /**
+     * Caches whether or not the last MAX_ENTRIES words were spelled correctly or incorrectly.
+     */
+    private static class WordCache extends LinkedHashMap<String, Boolean> {
+        private static final int MAX_ENTRIES = 4096;
+        
+        public WordCache() {
+            super(MAX_ENTRIES);
+        }
+        
+        @Override protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > MAX_ENTRIES;
+        }
+    }
     
     private Process ispell;
     private PrintWriter out;
@@ -70,8 +84,7 @@ public class SpellingChecker {
      * Tests whether the given word is misspelled.
      * If ispell is unavailable, no words are considered misspelled.
      * We only ask ispell about any given word at most once: the
-     * knownGood and knownBad HashSets are used to save on
-     * expensive inter-process communication.
+     * word cache is used to save on expensive inter-process communication.
      */
     public synchronized boolean isMisspelledWord(String word) {
         if (ispell == null) {
@@ -81,21 +94,16 @@ public class SpellingChecker {
         
         word = word.toLowerCase();
         
-        // Check the known-good words first, because good words should be more common.
-        if (knownGood.contains(word)) {
-            return false;
+        // Check the word cache first.
+        Boolean cachedResult = wordCache.get(word);
+        if (cachedResult != null) {
+            return cachedResult;
         }
-        // Then check the known-bad words.
-        if (knownBad.contains(word)) {
-            return true;
-        }
-        // Then give in and ask ispell.
-        boolean misspelled = isMisspelledWordAccordingToIspell(word, null);
-        
-        // Ensure that this word makes its way into one set or the other.
+        // Give in and ask the spelling checker.
         // We copy the word into a new string to avoid accidental retention
         // of character arrays representing documents in their entirety.
-        (misspelled ? knownBad : knownGood).add(new String(word));
+        boolean misspelled = isMisspelledWordAccordingToIspell(word, null);
+        wordCache.put(new String(word), Boolean.valueOf(misspelled));
         return misspelled;
     }
     
@@ -117,31 +125,13 @@ public class SpellingChecker {
             return;
         }
         
-        // knownBad and knownGood only contain lowercase words.
-        String setWord = word.toLowerCase();
-        knownBad.remove(setWord);
-        knownGood.add(setWord);
+        // The word cache only contains lowercase words.
+        wordCache.remove(word.toLowerCase());
         
         // Send the word to ispell to insert into the personal dictionary.
         // FIXME: we pass it through with its original case, but if it's not all lowercase, ispell(1) takes that to mean that it should only accept that capitalization. This may not be the right choice.
         out.println("*" + word);
         out.flush();
-    }
-    
-    public static synchronized void dumpKnownBadWordsTo(PrintStream out) {
-        // Get a sorted list of the known bad words.
-        ArrayList<String> words = new ArrayList<String>();
-        for (String word : knownBad) {
-            words.add(word);
-        }
-        Collections.sort(words);
-        
-        // Dump them.
-        out.println("SpellingChecker's set of known-bad words:");
-        for (int i = 0; i < words.size(); i++) {
-            out.println(words.get(i));
-        }
-        out.println("=" + words.size());
     }
     
     private boolean isMisspelledWordAccordingToIspell(String word, Collection<String> returnSuggestions) {
