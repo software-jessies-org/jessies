@@ -271,8 +271,10 @@ public class FileType {
      * A standard C++ header file (such as <string>) might not have any extension, though it's likely in that case start with #ifndef.
      */
     private static boolean isCPlusPlusContent(CharSequence content) {
-        // FIXME: this is wasteful on large files (because after about 1KiB in, we can give up), but at less than 100ms for a 40MiB file, it doesn't seem worth fixing yet (on my machine).
-        return Pattern.compile("#ifndef").matcher(content).find();
+        // Only bother looking at the first 1KiB.
+        // If we haven't seen an #ifdef by then, and nothing else suggests C++, this probably isn't.
+        final CharSequence relevantContent = content.subSequence(0, Math.min(content.length(), 1024));
+        return Pattern.compile("#ifndef").matcher(relevantContent).find();
     }
     
     private static boolean isPatchContent(CharSequence content) {
