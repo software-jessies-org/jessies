@@ -84,12 +84,12 @@ public abstract class PHighlight {
      */
     public abstract String getHighlighterName();
     
-    public String toString() {
+    @Override public String toString() {
         return "PHighlight[start=" + getStartIndex() + ",end=" + getEndIndex() + "]";
     }
 
-    public class HighlightAnchor extends PAnchor {
-        public HighlightAnchor(int index) {
+    private class HighlightAnchor extends PAnchor {
+        private HighlightAnchor(int index) {
             super(index);
         }
         
