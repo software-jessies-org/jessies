@@ -65,7 +65,7 @@ public class HeapView extends JComponent {
      * Border color.
      */
     private static final Color BORDER1_COLOR = new Color(0xA6A295);
-
+    
     /**
      * Border color.
      */
@@ -75,22 +75,22 @@ public class HeapView extends JComponent {
      * Start color for the tick gradient.
      */
     private static final Color MIN_TICK_COLOR = new Color(0xC7D6AD);
-
+    
     /**
      * End color for the tick gradient.
      */
     private static final Color MAX_TICK_COLOR = new Color(0x615d0f);
-
+    
     /**
      * Start color for the background gradient.
      */
     private static final Color BACKGROUND1_COLOR = new Color(0xD0CCBC);
-
+    
     /**
      * End color for the background gradient.
      */
     private static final Color BACKGROUND2_COLOR = new Color(0xEAE7D7);
-
+    
     /**
      * Data for the graph as a percentage of the heap used.
      */
@@ -126,7 +126,7 @@ public class HeapView extends JComponent {
      * Width data is cached at.
      */
     private int cachedWidth;
-
+    
     /**
      * Height data is cached at.
      */
@@ -146,7 +146,7 @@ public class HeapView extends JComponent {
      * Updated with the current heap usage every time we refresh the graph.
      */
     private JLabel currentHeapUsageLabel;
-
+    
     /**
      * Image containing gradient for ticks.
      */
@@ -175,7 +175,7 @@ public class HeapView extends JComponent {
     
     /**
      * Returns the minimum size.
-     *
+     * 
      * @return the minimum size
      */
     public Dimension getMinimumSize() {
