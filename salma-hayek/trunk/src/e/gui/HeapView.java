@@ -32,6 +32,8 @@ import javax.swing.*;
  * 
  * I added the "max" heap size.
  * 
+ * I removed the animation and resizing; everything's now in terms of the maximum heap size.
+ * 
  * FIXME: a meaningful grid might be useful.
  * FIXME: it would be nice to be able to point to any line in the graph and see what the heap size/utilization was at that time. (and maybe how many seconds ago that was.)
  * FIXME: the colors are ugly.
@@ -45,11 +47,6 @@ public class HeapView extends JComponent {
      * How often the display is updated.
      */
     private static final int TICK = 1000;
-    
-    /**
-     * Time to animate heap growing.
-     */
-    private static final double HEAP_GROW_ANIMATE_TIME_S = 1.0;
     
     /**
      * Width of the border.
@@ -92,7 +89,7 @@ public class HeapView extends JComponent {
     private static final Color BACKGROUND2_COLOR = new Color(0xEAE7D7);
     
     /**
-     * Data for the graph as a percentage of the heap used.
+     * Data for the graph as the percentage of the maximum heap used.
      */
     private float[] graph;
     
@@ -106,11 +103,6 @@ public class HeapView extends JComponent {
      * 0 and ends at graphIndex - 1.
      */
     private boolean graphFilled;
-    
-    /**
-     * Last total heap size.
-     */
-    private long lastTotal;
     
     /**
      * Timer used to update data.
@@ -136,11 +128,6 @@ public class HeapView extends JComponent {
      * Image containing text.
      */
     private BufferedImage textImage;
-    
-    /**
-     * Timer used to animate heap size growing.
-     */
-    private HeapGrowTimer heapGrowTimer;
     
     /**
      * Updated with the current heap usage every time we refresh the graph.
@@ -232,14 +219,6 @@ public class HeapView extends JComponent {
             g.translate(1, 2);
             int innerW = width - BORDER_W;
             int innerH = height - BORDER_H;
-            if (heapGrowTimer != null) {
-                // Render the heap growing animation.
-                Composite lastComposite = g.getComposite();
-                double percent = 1.0 - heapGrowTimer.getPercent();
-                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) percent));
-                g.drawImage(heapGrowTimer.image, 0, 0, null);
-                g.setComposite(lastComposite);
-            }
             paintTicks(g, innerW, innerH);
             // FIXME(enh): if the grid weren't meaningless, it might be worth drawing.
             //g.drawImage(getGridOverlayImage(), 0, 0, null);
@@ -371,13 +350,8 @@ public class HeapView extends JComponent {
             graphFilled = false;
             updateTimer.stop();
             updateTimer = null;
-            lastTotal = 0;
             disposeImages();
             cachedHeight = cachedWidth = -1;
-            if (heapGrowTimer != null) {
-                heapGrowTimer.stop();
-                heapGrowTimer = null;
-            }
         }
     }
     
@@ -412,85 +386,26 @@ public class HeapView extends JComponent {
             stopTimerIfNecessary();
             return;
         }
-        Runtime r = Runtime.getRuntime();
-        long total = r.totalMemory();
-        if (total != lastTotal) {
-            if (lastTotal != 0) {
-                // Total heap size has changed, start an animation.
-                startHeapAnimate();
-                // Readjust the graph size based on the new max.
-                int index = getGraphStartIndex();
-                do {
-                    graph[index] = (float)(((double)graph[index] * (double)lastTotal) / (total));
-                    index = (index + 1) % graph.length;
-                } while (index != graphIndex);
-            }
-            lastTotal = total;
+        final Runtime r = Runtime.getRuntime();
+        final long free = r.freeMemory();
+        final long total = r.totalMemory();
+        final long max = r.maxMemory();
+        // Not animating a heap size change, update the graph data and text.
+        final long used = total - free;
+        graph[graphIndex] = (float)((double)used / (double)max);
+        graphIndex = (graphIndex + 1) % graph.length;
+        if (graphIndex == 0) {
+            graphFilled = true;
         }
-        if (heapGrowTimer == null) {
-            // Not animating a heap size change, update the graph data and text.
-            long used = total - r.freeMemory();
-            graph[graphIndex] = (float)((double)used / (double)total);
-            graphIndex = (graphIndex + 1) % graph.length;
-            if (graphIndex == 0) {
-                graphFilled = true;
-            }
-            if (currentHeapUsageLabel != null) {
-                currentHeapUsageLabel.setText(String.format("%.1f/%.1f MiB (%.1f MiB)", used / 1024.0 / 1024.0, total / 1024.0 / 1024.0, r.maxMemory() / 1024.0 / 1024.0));
-            }
+        if (currentHeapUsageLabel != null) {
+            currentHeapUsageLabel.setText(String.format("%.1f/%.1f MiB (%.1f MiB)", used / 1024.0 / 1024.0, total / 1024.0 / 1024.0, r.maxMemory() / 1024.0 / 1024.0));
         }
         repaint();
-    }
-    
-    private void startHeapAnimate() {
-        if (heapGrowTimer == null) {
-            heapGrowTimer = new HeapGrowTimer();
-            heapGrowTimer.start();
-        }
-    }
-    
-    private void stopHeapAnimate() {
-        if (heapGrowTimer != null) {
-            heapGrowTimer.stop();
-            heapGrowTimer = null;
-        }
     }
     
     private final class ActionHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             update();
-        }
-    }
-    
-    private final class HeapGrowTimer extends Timer {
-        private final long startTime;
-        private final BufferedImage image;
-        private double percent;
-        
-        private HeapGrowTimer() {
-            super(30, null);
-            setRepeats(true);
-            startTime = System.nanoTime();
-            int w = getWidth() - BORDER_W;
-            int h = getHeight() - BORDER_H;
-            image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = image.createGraphics();
-            paintTicks(g, w, h);
-            g.dispose();
-        }
-        
-        public double getPercent() {
-            return percent;
-        }
-        
-        protected void fireActionPerformed(ActionEvent e) {
-            double delta = TimeUtilities.nsToS(System.nanoTime() - startTime);
-            if (delta > HEAP_GROW_ANIMATE_TIME_S) {
-                stopHeapAnimate();
-            } else {
-                percent = delta / HEAP_GROW_ANIMATE_TIME_S;
-                repaint();
-            }
         }
     }
 }
