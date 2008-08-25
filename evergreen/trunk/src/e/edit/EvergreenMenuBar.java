@@ -227,9 +227,7 @@ public class EvergreenMenuBar extends EMenuBar {
     
     private JMenu makeHelpMenu() {
         HelpMenu helpMenu = new HelpMenu();
-        JMenu result = helpMenu.makeJMenu();
-        result.setMnemonic('H');
-        return result;
+        return helpMenu.makeJMenu();
     }
     
     @Override
