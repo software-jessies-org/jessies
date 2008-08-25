@@ -103,10 +103,10 @@ public class IndentationGuesser {
                 if (matcher.matches()) {
                     CharSequence indent = matcher.group(1);
                     if (indent.length() > previousIndent.length()) {
-                        CharSequence difference = indent.subSequence(previousIndent.length(), indent.length() - 1);
+                        CharSequence difference = indent.subSequence(previousIndent.length(), indent.length());
                         indentations.add(difference);
                     } else if (indent.length() < previousIndent.length()) {
-                        CharSequence difference = previousIndent.subSequence(indent.length(), previousIndent.length() - 1);
+                        CharSequence difference = previousIndent.subSequence(indent.length(), previousIndent.length());
                         indentations.add(difference);
                     }
                     previousIndent = indent;
