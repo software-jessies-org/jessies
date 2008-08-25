@@ -127,10 +127,10 @@ public class GnomeStockIcon {
         String gtkIconName = getGtkIconNameForString(buttonText);
         if (gtkIconName != null) {
             useStockIcon(button, gtkIconName);
-            initMnemonicMap();
-            if (mnemonicMap.get(buttonText) != null) {
-                button.setMnemonic(mnemonicMap.get(buttonText));
-            }
+        }
+        initMnemonicMap();
+        if (mnemonicMap.get(buttonText) != null) {
+            button.setMnemonic(mnemonicMap.get(buttonText));
         }
     }
     
