@@ -15,6 +15,7 @@ import javax.swing.Timer;
 public class DebugMenu {
     public static JMenu makeJMenu() {
         JMenu menu = new JMenu("Debugging Tools");
+        menu.setMnemonic('D');
         menu.add(new ShowDebuggingMessagesAction());
         menu.addSeparator();
         menu.add(new ShowEnvironmentAction());
@@ -37,6 +38,7 @@ public class DebugMenu {
     
     private static JMenu makeChangeLafMenu() {
         JMenu menu = new JMenu("Look And Feel");
+        menu.setMnemonic('L');
         UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
         for (UIManager.LookAndFeelInfo laf : lafs) {
             menu.add(new ChangeLookAndFeelAction(laf.getName(), laf.getClassName()));
@@ -90,7 +92,7 @@ public class DebugMenu {
     
     private static class ShowEnvironmentAction extends AbstractAction {
         public ShowEnvironmentAction() {
-            super("Show Environment");
+            GuiUtilities.configureAction(this, "Show _Environment", null);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -104,7 +106,7 @@ public class DebugMenu {
     
     private static class ShowSystemPropertiesAction extends AbstractAction {
         public ShowSystemPropertiesAction() {
-            super("Show System Properties");
+            GuiUtilities.configureAction(this, "Show System _Properties", null);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -154,7 +156,7 @@ public class DebugMenu {
     
     private static class ShowFramesAction extends AbstractAction {
         public ShowFramesAction() {
-            super("Show Frames/Windows");
+            GuiUtilities.configureAction(this, "Show _Frames/Windows", null);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -207,7 +209,7 @@ public class DebugMenu {
     
     private static class ShowSwingTimersAction extends AbstractAction {
         public ShowSwingTimersAction() {
-            super("Show Swing Timers");
+            GuiUtilities.configureAction(this, "Show Swing _Timers", null);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -229,7 +231,7 @@ public class DebugMenu {
     
     private static class ShowStopwatchesAction extends AbstractAction {
         public ShowStopwatchesAction() {
-            super("Show Stopwatches");
+            GuiUtilities.configureAction(this, "Show Stop_watches", null);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -240,7 +242,7 @@ public class DebugMenu {
     
     private static class ShowUiDefaultsAction extends AbstractAction {
         public ShowUiDefaultsAction() {
-            super("Show UI Defaults");
+            GuiUtilities.configureAction(this, "Show _UI Defaults", null);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -265,17 +267,19 @@ public class DebugMenu {
     
     private static class HeapViewAction extends AbstractAction {
         public HeapViewAction() {
-            super("Show Heap Usage");
+            GuiUtilities.configureAction(this, "Show _Heap Usage", null);
         }
         
         public void actionPerformed(ActionEvent e) {
-            JButton gcButton = new JButton("System.gc()");
+            JButton gcButton = new JButton("Collect");
+            gcButton.setMnemonic('C');
             gcButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     System.gc();
                 }
             });
             JButton histogramButton = new JButton("Histogram");
+            histogramButton.setMnemonic('H');
             histogramButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Heap Histogram", getHeapHistogram());
@@ -301,7 +305,7 @@ public class DebugMenu {
     
     private static class KeyEventTester extends AbstractAction {
         public KeyEventTester() {
-            super("Key Event Tester");
+            GuiUtilities.configureAction(this, "_Key Event Tester", null);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -326,7 +330,7 @@ public class DebugMenu {
     
     private static class MouseEventTester extends AbstractAction {
         public MouseEventTester() {
-            super("Mouse Event Tester");
+            GuiUtilities.configureAction(this, "_Mouse Event Tester", null);
         }
         
         public void actionPerformed(ActionEvent e) {
