@@ -11,7 +11,7 @@ import java.util.*;
  * @author Phil Norman
  */
 
-public abstract class PHighlight {
+public abstract class PHighlight implements Comparable<PHighlight> {
     protected PTextArea textArea;
     private PAnchor start;
     private PAnchor end;
@@ -26,6 +26,9 @@ public abstract class PHighlight {
         PAnchorSet anchorSet = textArea.getTextBuffer().getAnchorSet();
         anchorSet.add(start);
         anchorSet.add(end);
+    }
+    
+    PHighlight() {
     }
     
     public int getStartIndex() {
@@ -102,5 +105,13 @@ public abstract class PHighlight {
         public String toString() {
             return "HighlightAnchor[" + getIndex() + ", " + PHighlight.this + "]";
         }
+    }
+    
+    @Override public boolean equals(Object obj) {
+        return (obj instanceof PHighlight) && (((PHighlight) obj).getStartIndex() == getStartIndex());
+    }
+    
+    public int compareTo(PHighlight other) {
+        return getStartIndex() - other.getStartIndex();
     }
 }
