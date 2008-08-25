@@ -13,6 +13,7 @@ public class HelpMenu {
     
     public JMenu makeJMenu() {
         JMenu menu = new JMenu("Help");
+        menu.setMnemonic('H');
         
         String webSiteAddress = AboutBox.getSharedInstance().getWebSiteAddress();
         if (webSiteAddress != null) {
