@@ -11,9 +11,18 @@ public class Bag<V> {
         }
     }
     
-    private Map<V, IntBox> objectToCountMap = new TreeMap<V, IntBox>();
+    private final Map<V, IntBox> objectToCountMap;
     
     public Bag() {
+        this(new TreeMap<V, IntBox>());
+    }
+    
+    public Bag(Comparator<? super V> comparator) {
+        this(new TreeMap<V, IntBox>(comparator));
+    }
+    
+    private Bag(TreeMap<V, IntBox> map) {
+        objectToCountMap = map;
     }
     
     public void add(V key) {

@@ -63,7 +63,21 @@ public class IndentationGuesser {
         Stopwatch.Timer timer = stopwatch.start();
         try {
             CharSequence previousIndent = "";
-            Bag<CharSequence> indentations = new Bag<CharSequence>();
+            Bag<CharSequence> indentations = new Bag<CharSequence>(new Comparator<CharSequence>() {
+                public int compare(CharSequence s1, CharSequence s2) {
+                    final int s1Length = s1.length();
+                    final int s2Length = s2.length();
+                    final int lastCommonIndex = Math.min(s1Length, s2Length);
+                    for (int i = 0; i < lastCommonIndex; ++i) {
+                        char ch1 = s1.charAt(i);
+                        char ch2 = s2.charAt(i);
+                        if (ch1 != ch2) {
+                            return ch1 - ch2;
+                        }
+                    }
+                    return s1Length - s2Length;
+                }
+            });
             CharSequence emergencyAlternative = fallback;
             
             LineIterator it = new LineIterator(chars);
@@ -89,10 +103,10 @@ public class IndentationGuesser {
                 if (matcher.matches()) {
                     CharSequence indent = matcher.group(1);
                     if (indent.length() > previousIndent.length()) {
-                        CharSequence difference = indent.subSequence(0, previousIndent.length());
+                        CharSequence difference = indent.subSequence(previousIndent.length(), indent.length() - 1);
                         indentations.add(difference);
                     } else if (indent.length() < previousIndent.length()) {
-                        CharSequence difference = previousIndent.subSequence(0, indent.length());
+                        CharSequence difference = previousIndent.subSequence(indent.length(), previousIndent.length() - 1);
                         indentations.add(difference);
                     }
                     previousIndent = indent;
