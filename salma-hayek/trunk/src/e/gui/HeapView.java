@@ -9,7 +9,7 @@ import javax.swing.*;
 
 /**
  * Originally a copy of:
- *
+ * 
  * http://weblogs.java.net/blog/zixle/archive/2006/06/modern_heap_vie.html
  * 
  * Looking a gift horse in the mouth:
@@ -29,6 +29,8 @@ import javax.swing.*;
  * I changed "MB" to "MiB".
  * 
  * I fixed all the spelling mistakes.
+ * 
+ * I added the "max" heap size.
  * 
  * FIXME: a meaningful grid might be useful.
  * FIXME: it would be nice to be able to point to any line in the graph and see what the heap size/utilization was at that time. (and maybe how many seconds ago that was.)
@@ -149,7 +151,7 @@ public class HeapView extends JComponent {
      * Image containing gradient for ticks.
      */
     private Image tickGradientImage;
-
+    
     /**
      * Image drawn on top of the ticks.
      */
@@ -185,7 +187,7 @@ public class HeapView extends JComponent {
     
     /**
      * Returns the preferred size.
-     *
+     * 
      * @return the preferred size
      */
     public Dimension getPreferredSize() {
@@ -198,7 +200,7 @@ public class HeapView extends JComponent {
     private Dimension getPreferredSize0() {
         return new Dimension(100, getFontMetrics(getFont()).getHeight() + 8);
     }
-
+    
     /**
      * Returns the first index to start rendering from.
      */
@@ -209,7 +211,7 @@ public class HeapView extends JComponent {
             return 0;
         }
     }
-
+    
     /**
      * Paints the component.
      */
@@ -265,22 +267,20 @@ public class HeapView extends JComponent {
             }
             int minHeight = (int)(min * height);
             if (minHeight > 0) {
-               g.drawImage(tickGradientImage, x, height - minHeight, width, height,
-                        x, height - minHeight, width, height, null);
+                g.drawImage(tickGradientImage, x, height - minHeight, width, height, x, height - minHeight, width, height, null);
             }
             index = getGraphStartIndex();
             do {
                 int tickHeight = (int)(graph[index] * height);
                 if (tickHeight > minHeight) {
-                    g.drawImage(tickGradientImage, x, height - tickHeight, x + 1, height - minHeight,
-                            x, height - tickHeight, x + 1, height - minHeight, null);
+                    g.drawImage(tickGradientImage, x, height - tickHeight, x + 1, height - minHeight, x, height - tickHeight, x + 1, height - minHeight, null);
                 }
                 index = (index + 1) % graph.length;
                 x++;
             } while (index != graphIndex);
         }
     }
-
+    
     private void paintCachedBackground(Graphics2D g) {
         if (bgImage != null) {
             g.drawImage(bgImage, 0, 0, null);
@@ -288,8 +288,7 @@ public class HeapView extends JComponent {
     }
     
     private void paintBackground(Graphics2D g, int w, int h) {
-        g.setPaint(new GradientPaint(0, 0, BACKGROUND1_COLOR,
-                0, h, BACKGROUND2_COLOR));
+        g.setPaint(new GradientPaint(0, 0, BACKGROUND1_COLOR, 0, h, BACKGROUND2_COLOR));
         g.fillRect(0, 0, w, h);
     }
     
@@ -331,8 +330,7 @@ public class HeapView extends JComponent {
             graphFilled = false;
             graphIndex = 0;
         }
-        GradientPaint tickGradient = new GradientPaint(0, h, MIN_TICK_COLOR,
-                w, 0, MAX_TICK_COLOR);
+        GradientPaint tickGradient = new GradientPaint(0, h, MIN_TICK_COLOR, w, 0, MAX_TICK_COLOR);
         tickGradientImage = createImage(w, h);
         imageG = (Graphics2D)tickGradientImage.getGraphics();
         imageG.setPaint(tickGradient);
@@ -382,7 +380,7 @@ public class HeapView extends JComponent {
             }
         }
     }
-
+    
     private void disposeImages() {
         if (bgImage != null) {
             bgImage.flush();
@@ -438,7 +436,7 @@ public class HeapView extends JComponent {
                 graphFilled = true;
             }
             if (currentHeapUsageLabel != null) {
-                currentHeapUsageLabel.setText(String.format("%.1f/%.1f MiB", used / 1024.0 / 1024.0, total / 1024.0 / 1024.0));
+                currentHeapUsageLabel.setText(String.format("%.1f/%.1f MiB (%.1f MiB)", used / 1024.0 / 1024.0, total / 1024.0 / 1024.0, r.maxMemory() / 1024.0 / 1024.0));
             }
         }
         repaint();
@@ -457,13 +455,12 @@ public class HeapView extends JComponent {
             heapGrowTimer = null;
         }
     }
-
+    
     private final class ActionHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             update();
         }
     }
-    
     
     private final class HeapGrowTimer extends Timer {
         private final long startTime;
