@@ -328,12 +328,14 @@ public class FatBits extends MainFrame {
         
         private JMenu makeFileMenu() {
             JMenu menu = new JMenu("File");
+            menu.setMnemonic('F');
             menu.add(new QuitAction());
             return menu;
         }
         
         private JMenu makeEditMenu() {
             JMenu menu = new JMenu("Edit");
+            menu.setMnemonic('E');
             menu.add(new CopyImageAction());
             preferences.initPreferencesMenuItem(menu);
             return menu;
@@ -341,6 +343,7 @@ public class FatBits extends MainFrame {
         
         private JMenu makeImageMenu() {
             JMenu menu = new JMenu("Image");
+            menu.setMnemonic('I');
             menu.add(new MouseMotionAction("Left", -1, 0));
             menu.add(new MouseMotionAction("Right", +1, 0));
             menu.add(new MouseMotionAction("Up", 0, -1));
@@ -361,10 +364,9 @@ public class FatBits extends MainFrame {
         private int dy;
         
         private MouseMotionAction(String direction, int dx, int dy) {
-            super("Move " + direction);
+            GuiUtilities.configureAction(this, "Move _" + direction, GuiUtilities.makeKeyStroke(direction.toUpperCase(), false));
             this.dx = dx;
             this.dy = dy;
-            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke(direction.toUpperCase(), false));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -375,8 +377,7 @@ public class FatBits extends MainFrame {
     
     private class QuitAction extends AbstractAction {
         private QuitAction() {
-            super("Quit");
-            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("Q", false));
+            GuiUtilities.configureAction(this, "_Quit", GuiUtilities.makeKeyStroke("Q", false));
             GnomeStockIcon.configureAction(this);
         }
         
@@ -387,8 +388,7 @@ public class FatBits extends MainFrame {
     
     private class CopyImageAction extends AbstractAction {
         private CopyImageAction() {
-            super("Copy Image");
-            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("C", false));
+            GuiUtilities.configureAction(this, "_Copy Image", GuiUtilities.makeKeyStroke("C", false));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -398,8 +398,7 @@ public class FatBits extends MainFrame {
     
     private class LockImageAction extends AbstractAction {
         private LockImageAction() {
-            super("Lock Image");
-            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke("L", false));
+            GuiUtilities.configureAction(this, "Loc_k Image", GuiUtilities.makeKeyStroke("L", false));
         }
         
         public void actionPerformed(ActionEvent e) {
