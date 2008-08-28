@@ -152,12 +152,16 @@ private:
         ioctl(childFd, I_PUSH, "ttcompat");
 #endif
         
-        // Humans don't need XON/XOFF flow control of output, and it only serves to confuse those who accidentally hit ^S or ^Q, so turn it off.
         termios terminalAttributes;
         if (tcgetattr(childFd, &terminalAttributes) != 0) {
             throw child_exception_via_pipe(childFd, "tcgetattr(" + toString(childFd) + ", &terminalAttributes)");
         }
+        // Humans don't need XON/XOFF flow control of output, and it only serves to confuse those who accidentally hit ^S or ^Q, so turn it off.
         terminalAttributes.c_iflag &= ~IXON;
+#if defined(IUTF8)
+        // Assume input is UTF-8; this allows character-erase to be correctly performed in cooked mode.
+        terminalAttributes.c_iflag |= IUTF8;
+#endif
         if (tcsetattr(childFd, TCSANOW, &terminalAttributes) != 0) {
             throw child_exception_via_pipe(childFd, "tcsetattr(" + toString(childFd) + ", TCSANOW, &terminalAttributes) with IXON cleared");
         }
