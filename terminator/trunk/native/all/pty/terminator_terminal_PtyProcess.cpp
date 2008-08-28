@@ -82,7 +82,7 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jstring javaExecutable, 
         workingDirectory = JniString(m_env, javaWorkingDirectory);
     }
     
-    processId = ptyGenerator.forkAndExec(executable, &argv[0], workingDirectory);
+    processId = ptyGenerator.forkAndExec("terminator", executable, &argv[0], workingDirectory);
     
     // On Linux, the TIOCSWINSZ ioctl sets the size of the pty (without blocking) even if it hasn't been opened by the child yet.
     // On Mac OS, it silently does nothing, meaning that when the child does open the pty, TIOCGWINSZ reports the wrong size.
