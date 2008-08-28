@@ -68,13 +68,13 @@ public:
         return masterFd;
     }
     
-    pid_t forkAndExec(const std::string& executable, char * const *argv, const std::string& workingDirectory) {
+    pid_t forkAndExec(const std::string& term, const std::string& executable, char * const *argv, const std::string& workingDirectory) {
         pid_t pid = fork();
         if (pid < 0) {
             return -1;
         } else if (pid == 0) {
             try {
-                runChild(executable, argv, workingDirectory, *this);  // Should never return.
+                runChild(term, executable, argv, workingDirectory, *this);  // Should never return.
             } catch (const std::exception& ex) {
                 // reportFatalErrorUsingGui would have a better chance of being seen.
                 fprintf(stderr, "%s\n", ex.what());
@@ -115,7 +115,7 @@ private:
         return slaveFd;
     }
     
-    static void runChild(const std::string& executable, char * const *argv, const std::string& workingDirectory, PtyGenerator& ptyGenerator) {
+    static void runChild(const std::string& term, const std::string& executable, char * const *argv, const std::string& workingDirectory, PtyGenerator& ptyGenerator) {
         if (workingDirectory.length() != 0) {
             if (chdir(workingDirectory.c_str()) == -1) {
                 throw child_exception("chdir(\"" + workingDirectory + "\")");
@@ -177,7 +177,7 @@ private:
             throw child_exception_via_pipe(childFd, "dup2(" + toString(childFd) + ", STDERR_FILENO)");
         }
         closeFileDescriptors();
-        fixEnvironment();
+        fixEnvironment(term);
         
         /*
          * rxvt resets these signal handlers, and we'll do the same, because it magically
@@ -194,12 +194,12 @@ private:
         throw unix_exception("Can't execute \"" + executable + "\"");
     }
     
-    static void fixEnvironment() {
+    static void fixEnvironment(const std::string& term) {
         // Tell the world which terminfo entry to use.
-        setenv("TERM", "terminator", 1);
+        setenv("TERM", term.c_str(), 1);
         // According to Thomas Dickey in the XTERM FAQ, some applications that don't use ncurses may need the environment variable $COLORTERM set to realize that they're on a color terminal.
         // Most of the other Unix terminals set it.
-        setenv("COLORTERM", "terminator", 1);
+        setenv("COLORTERM", term.c_str(), 1);
         
         // X11 terminal emulators set this, but we can't reasonably do so, even on X11.
         // http://elliotth.blogspot.com/2005/12/why-terminator-doesnt-support-windowid.html
@@ -218,7 +218,7 @@ private:
         unsetenv(("JAVA_MAIN_CLASS_" + toString(ppid)).c_str());
         
         // Apple's Terminal sets these, and some programs/scripts identify Terminal this way.
-        // In real life, these shouldn't be set, but they will be if we're debugging Terminator and running it from Terminal.
+        // In real life, these shouldn't be set, but they will be if we're debugging and being run from Terminal.
         // It's always confusing when programs behave differently during debugging!
         unsetenv("TERM_PROGRAM");
         unsetenv("TERM_PROGRAM_VERSION");
@@ -226,7 +226,7 @@ private:
     }
     
     /**
-     * This allows the terminator-server-port socket to close when terminator quits
+     * This allows the our server port socket to close when we quit
      * while a child is still running.
      * 
      * It also ensures that child processes don't have file descriptors for
