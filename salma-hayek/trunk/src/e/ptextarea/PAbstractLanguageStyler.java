@@ -208,7 +208,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         if (lastGoodLine < lineIndex) {
             PLineList lineList = textArea.getLineList();
             for (int i = lastGoodLine; i < lineIndex; i++) {
-                String line = lineList.getLine(i).getContents().toString();
+                String line = lineList.getLineContents(i).toString();
                 commentCache.set(i + 1, lineEndsCommented(line, commentCache.get(i)));
             }
             lastGoodLine = lineIndex;

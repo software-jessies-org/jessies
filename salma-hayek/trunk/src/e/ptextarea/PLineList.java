@@ -235,12 +235,21 @@ public class PLineList implements PTextListener {
     }
     
     /**
+     * Returns a CharSequence allowing access to the contents of this line, not including
+     * any newline characters.
+     */
+    public CharSequence getLineContents(int lineIndex) {
+        Line line = getLine(lineIndex);
+        return text.subSequence(line.getStart(), line.getEndOffsetBeforeTerminator(text));
+    }
+    
+    /**
      * A PLineList.Line holds information about the location and length of a particular line of
      * text.  It also contains information about how wide this line is when its text is rendered.
      * 
      * FIXME: we create a large number of these small but long-lived objects. Maybe PLineList should contain three int[]s instead? We could still hand these out to callers if we wished.
      */
-    public class Line {
+    public static class Line {
         private int start;
         private int length;
         private int width;
@@ -290,13 +299,13 @@ public class PLineList implements PTextListener {
             setWidthInvalid();
         }
         
-        private int getLengthBeforeTerminator() {
-            return isLineTerminated() ? length - 1 : length;
+        private int getLengthBeforeTerminator(PTextBuffer text) {
+            return isLineTerminated(text) ? length - 1 : length;
         }
         
         /** Returns the offset of the end of this line, not including any newline character. */
-        public int getEndOffsetBeforeTerminator() {
-            return start + getLengthBeforeTerminator();
+        public int getEndOffsetBeforeTerminator(PTextBuffer text) {
+            return start + getLengthBeforeTerminator(text);
         }
         
         /**
@@ -308,20 +317,12 @@ public class PLineList implements PTextListener {
         }
         
         /** Returns true when this line is terminated by a newline character. */
-        private boolean isLineTerminated() {
+        private boolean isLineTerminated(PTextBuffer text) {
             if (length == 0) {
                 return false;
             } else {
                 return text.charAt(start + length - 1) == '\n';
             }
-        }
-        
-        /**
-         * Returns a CharSequence allowing access to the contents of this line, not including
-         * any newline characters.
-         */
-        public CharSequence getContents() {
-            return text.subSequence(start, getEndOffsetBeforeTerminator());
         }
     }
 }

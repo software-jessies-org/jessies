@@ -24,7 +24,7 @@ public class PWrappedSegmentIterator implements Iterator<PLineSegment> {
     
     public PLineSegment next() {
         PLineSegment result = null;
-        if (charOffset == currentLine.getTextIndex() + currentLine.getLength()) {
+        if (charOffset == currentLine.getTextIndex(textArea) + currentLine.getLength()) {
             currentLine = textArea.getSplitLine(nextSplitLineIndex++);
             if ((currentSegment == null) && logicalIterator.peekNext().isNewline()) {
                 result = logicalIterator.next();
@@ -40,7 +40,7 @@ public class PWrappedSegmentIterator implements Iterator<PLineSegment> {
                 }
             }
             result = currentSegment;
-            int lineEndOffset = currentLine.getTextIndex() + currentLine.getLength();
+            int lineEndOffset = currentLine.getTextIndex(textArea) + currentLine.getLength();
             if (lineEndOffset < currentSegment.getEnd()) {
                 int splitOffset = lineEndOffset - currentSegment.getOffset();
                 result = currentSegment.subSegment(0, splitOffset);

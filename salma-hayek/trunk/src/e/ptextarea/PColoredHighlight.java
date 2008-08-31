@@ -34,7 +34,7 @@ public abstract class PColoredHighlight extends PHighlight {
         if (paintsToEndOfLine()) {
             return textArea.getWidth() - textArea.getInsets().right;
         } else {
-            int lineStart = textArea.getSplitLine(splitLineIndex).getTextIndex();
+            int lineStart = textArea.getSplitLine(splitLineIndex).getTextIndex(textArea);
             Iterator<PLineSegment> it = textArea.getWrappedSegmentIterator(lineStart);
             int result = 0;
             while (it.hasNext()) {
