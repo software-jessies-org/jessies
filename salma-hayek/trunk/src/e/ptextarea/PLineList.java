@@ -4,19 +4,19 @@ import java.util.*;
 import e.util.*;
 
 /**
- * A PLineList is an abstraction on top of a PTextBuffer.  This class handles the splitting up of lines,
- * and allows the PTextArea to easily index the text in terms of lines.
+ * A PLineList is an abstraction on top of a PTextBuffer.
+ * Where PTextBuffer represents the text as a sequence of characters, PLineList represents it as a sequence of lines.
+ * This allows PTextArea to easily index the text by lines.
  * Note that this class deals only with logical lines, that is lines separated by line terminators.
- * Line wrapping is not handled here.
- * 
- * @author Phil Norman
+ * Line wrapping is neither handled nor represented here: see SplitLine for that.
  */
-
 public class PLineList implements PTextListener {
-    private PTextBuffer text;
+    private final PTextBuffer text;
+    
     private ArrayList<Line> lines;
     private int lastValidLineIndex;
-    private ArrayList<PLineListener> listeners = new ArrayList<PLineListener>();
+    
+    private final ArrayList<PLineListener> listeners = new ArrayList<PLineListener>();
     
     public PLineList(PTextBuffer text) {
         this.text = text;

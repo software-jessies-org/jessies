@@ -1,8 +1,15 @@
 package e.ptextarea;
 
+/**
+ * Where PLineList represents model "lines" (sequences ending in '\n' or $), a SplitLine is a visible line.
+ * A long line (in the PLineList sense) that wraps such that it's displayed on three rows on the screen would have three SplitLine instances, one for each row.
+ */
 final class SplitLine {
+    // This run's line number in the PLineList.
     private int lineIndex;
+    // This run's offset into the PLineList's line.
     private final int offset;
+    // This run's number of characters of the PLineList's line.
     private final int length;
     
     public SplitLine(int lineIndex, int offset, int length) {
