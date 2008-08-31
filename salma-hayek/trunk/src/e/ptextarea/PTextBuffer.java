@@ -148,18 +148,34 @@ public class PTextBuffer implements CharSequence {
         getLock().getWriteLock();
         try {
             // Read all the bytes in.
-            long byteCount = file.length();
+            // FIXME: this is broken for files larger than 4GiB.
+            final int byteCount = (int) file.length();
+            byte[] bytes = new byte[byteCount];
             FileInputStream fileInputStream = new FileInputStream(file);
-            ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[(int) byteCount]);
             dataInputStream = new DataInputStream(fileInputStream);
-            dataInputStream.readFully(byteBuffer.array());
+            dataInputStream.readFully(bytes);
             
             // Turn the raw bytes into a char[].
-            ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
-            char[] chars = decoder.getCharArray();
-            chars = fixLineEndings(chars);
-            putProperty(CHARSET_PROPERTY, decoder.getEncodingName());
+            String encodingName = null;
+            char[] chars;
+            if (isAllAscii(bytes)) {
+                // Most files will be plain ASCII, and we can "decode" them 5x cheaper with just a cast.
+                // That speed-up includes the added cost of checking to see if the byte[] only contains ASCII.
+                // FIXME: we could make a further slight saving by checking for '\r' at the same time.
+                encodingName = "UTF-8";
+                chars = new char[byteCount];
+                for (int i = 0; i < byteCount; ++i) {
+                    chars[i] = (char) bytes[i];
+                }
+            } else {
+                ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+                ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
+                chars = decoder.getCharArray();
+                encodingName = decoder.getEncodingName();
+            }
             
+            chars = fixLineEndings(chars);
+            putProperty(CHARSET_PROPERTY, encodingName);
             setText(chars);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -167,6 +183,18 @@ public class PTextBuffer implements CharSequence {
             getLock().relinquishWriteLock();
             FileUtilities.close(dataInputStream);
         }
+    }
+    
+    // Tests whether all the given bytes could be ASCII.
+    private static boolean isAllAscii(byte[] bytes) {
+        for (int i = 0; i < bytes.length; ++i) {
+            byte b = bytes[i];
+            // FIXME: this range is a little bit arbitrary, but excluding NUL and DEL and anything with the top bit set seems reasonable.
+            if (b < 1 || b > 126) {
+                return false;
+            }
+        }
+        return true;
     }
     
     private char[] fixLineEndings(char[] chars) {
