@@ -86,7 +86,7 @@ final class PTextAreaRenderer {
     
     private void paintTextLines(int minLine, int maxLine, int startX, int startY, Color overrideColor) {
         int baseline = startY;
-        int paintCharOffset = textArea.getSplitLine(minLine).getTextIndex();
+        int paintCharOffset = textArea.getSplitLine(minLine).getTextIndex(textArea);
         int x = startX;
         int line = minLine;
         int caretOffset = textArea.hasSelection() ? -1 : textArea.getSelectionStart();
@@ -141,9 +141,9 @@ final class PTextAreaRenderer {
             return;
         }
         //StopWatch stopWatch = new StopWatch()
-        int beginOffset = textArea.getSplitLine(minLine).getTextIndex();
+        int beginOffset = textArea.getSplitLine(minLine).getTextIndex(textArea);
         SplitLine max = textArea.getSplitLine(maxLine);
-        int endOffset = max.getTextIndex() + max.getLength();
+        int endOffset = max.getTextIndex(textArea) + max.getLength();
         textArea.getSelection().paint(g);
         Collection<PHighlight> highlightList = textArea.getHighlightManager().getHighlightsOverlapping(beginOffset, endOffset);
         for (PHighlight highlight : highlightList) {

@@ -117,7 +117,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
             if (yPosition < 0 || yPosition > visible.height) {
                 yPosition = visible.y + visible.height / 2;
-                charToKeepInPosition = getSplitLine(getNearestCoordinates(new Point(0, yPosition)).getLineIndex()).getTextIndex();
+                charToKeepInPosition = getSplitLine(getNearestCoordinates(new Point(0, yPosition)).getLineIndex()).getTextIndex(this);
                 yPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
             }
             runnable.run();
@@ -519,7 +519,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     public CharSequence getLineContents(int line) {
         getLock().getReadLock();
         try {
-            return lines.getLine(line).getContents();
+            return lines.getLineContents(line);
         } finally {
             getLock().relinquishReadLock();
         }
@@ -542,7 +542,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     public int getLineEndOffsetBeforeTerminator(int line) {
         getLock().getReadLock();
         try {
-            return lines.getLine(line).getEndOffsetBeforeTerminator();
+            return lines.getLine(line).getEndOffsetBeforeTerminator(getTextBuffer());
         } finally {
             getLock().relinquishReadLock();
         }
@@ -785,7 +785,6 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      */
     private final List<PLineSegment> getLineSegmentsForSplitLine(SplitLine splitLine) {
         int lineIndex = splitLine.getLineIndex();
-        String fullLine = getLineList().getLine(lineIndex).getContents().toString();
         List<PLineSegment> segments = getLineSegments(lineIndex);
         int index = 0;
         ArrayList<PLineSegment> result = new ArrayList<PLineSegment>();
@@ -914,15 +913,15 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             while (max - min > 1) {
                 int mid = (min + max) / 2;
                 SplitLine line = getSplitLine(mid);
-                if (line.containsIndex(location)) {
-                    return new PCoordinates(mid, location - line.getTextIndex());
-                } else if (location < line.getTextIndex()) {
+                if (line.containsIndex(this, location)) {
+                    return new PCoordinates(mid, location - line.getTextIndex(this));
+                } else if (location < line.getTextIndex(this)) {
                     max = mid;
                 } else {
                     min = mid;
                 }
             }
-            return new PCoordinates(min, location - getSplitLine(min).getTextIndex());
+            return new PCoordinates(min, location - getSplitLine(min).getTextIndex(this));
         } finally {
             getLock().relinquishReadLock();
         }
@@ -949,7 +948,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     public int getTextIndex(PCoordinates coordinates) {
-        return getSplitLine(coordinates.getLineIndex()).getTextIndex() + coordinates.getCharOffset();
+        return getSplitLine(coordinates.getLineIndex()).getTextIndex(this) + coordinates.getCharOffset();
     }
     
     private void repaintHighlight(PHighlight highlight) {
@@ -1047,8 +1046,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         int minLine = Integer.MAX_VALUE;
         int visibleLineCount = 0;
         for (int i = 0; i < event.getLength(); i++) {
-            PLineList.Line line = lines.getLine(event.getLineIndex() + i);
-            setLineWidth(line);
+            final int lineIndex = event.getLineIndex() + i;
+            setLineWidth(lineIndex);
             int beginSplitIndex = getSplitLineIndex(event.getLineIndex()); // FIXME: shouldn't this be "+ i" too?
             int endSplitIndex = getSplitLineIndex(event.getLineIndex() + 1);
             if (i == 0) {
@@ -1204,7 +1203,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         PLineList.Line line = lines.getLine(lineIndex);
         final int initialSplitLineCount = splitLines.size();
         if (line.isWidthValid() == false) {
-            setLineWidth(line);
+            setLineWidth(lineIndex);
         }
         Insets insets = getInsets();
         int width = getWidth() - insets.left - insets.right;
@@ -1214,11 +1213,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         width = Math.max(width, MIN_WIDTH);  // Ensure we're at least a sensible width.
         if (line.getWidth() <= width) {
             // The whole line fits.
-            splitLines.add(index, new SplitLine(this, lineIndex, 0, line.getContents().length()));
+            splitLines.add(index, new SplitLine(lineIndex, 0, lines.getLineContents(lineIndex).length()));
         } else {
             // The line's too long, so break it into SplitLines.
             int x = 0;
-            CharSequence chars = line.getContents();
+            CharSequence chars = lines.getLineContents(lineIndex);
             int lastSplitOffset = 0;
             for (int i = 0; i < chars.length(); i++) {
                 char ch = chars.charAt(i);
@@ -1237,13 +1236,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                             }
                         }
                     }
-                    splitLines.add(index++, new SplitLine(this, lineIndex, lastSplitOffset, i - lastSplitOffset));
+                    splitLines.add(index++, new SplitLine(lineIndex, lastSplitOffset, i - lastSplitOffset));
                     lastSplitOffset = i;
                     x = addCharWidth(0, ch);
                 }
             }
             if (x > 0) {
-                splitLines.add(index++, new SplitLine(this, lineIndex, lastSplitOffset, chars.length() - lastSplitOffset));
+                splitLines.add(index++, new SplitLine(lineIndex, lastSplitOffset, chars.length() - lastSplitOffset));
             }
         }
         return (splitLines.size() - initialSplitLineCount);
@@ -1274,13 +1273,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         }
     }
     
-    private void setLineWidth(PLineList.Line line) {
-        CharSequence chars = line.getContents();
+    private void setLineWidth(int lineIndex) {
+        CharSequence chars = lines.getLineContents(lineIndex);
         int width = 0;
         for (int i = 0; i < chars.length(); ++i) {
             width = addCharWidth(width, chars.charAt(i));
         }
-        line.setWidth(width);
+        lines.getLine(lineIndex).setWidth(width);
     }
     
     /**
