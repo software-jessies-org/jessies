@@ -2,8 +2,8 @@ package e.ptextarea;
 
 final class SplitLine {
     private int lineIndex;
-    private int offset;
-    private int length;
+    private final int offset;
+    private final int length;
     
     public SplitLine(int lineIndex, int offset, int length) {
         this.lineIndex = lineIndex;
@@ -25,14 +25,6 @@ final class SplitLine {
     
     public void setLineIndex(int lineIndex) {
         this.lineIndex = lineIndex;
-    }
-    
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
-    
-    public void setLength(int length) {
-        this.length = length;
     }
     
     public int getTextIndex(PTextArea textArea) {
