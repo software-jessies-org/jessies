@@ -6,6 +6,7 @@
 #define __DARWIN_UNIX03 1
 
 #include <fcntl.h>
+#include <stdlib.h>
 #include <string>
 #include <unistd.h>
 
