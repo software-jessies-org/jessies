@@ -143,18 +143,27 @@ public class ETextWindow extends EWindow implements PTextListener {
             // Describe the selected range.
             final int startLineNumber = 1 + textArea.getLineOfOffset(selectionStart);
             final int endLineNumber = 1 + textArea.getLineOfOffset(selectionEnd);
+            final int endLineStartOffset = textArea.getLineStartOffset(endLineNumber - 1);
             if (startLineNumber == endLineNumber) {
-                final int endLineStartOffset = textArea.getLineStartOffset(endLineNumber - 1);
                 message = "Selected " + addressFromOffset(selectionStart, "line ", " columns ") + "-" + (1 + emacsDistance(textArea.getTextBuffer(), selectionEnd, endLineStartOffset));
             } else {
                 message = "Selected from line " + startLineNumber + " to " + endLineNumber;
             }
             
+            // Work out how many characters and lines are selected.
+            final int characterCount = selectionEnd - selectionStart;
+            // If we just subtract line numbers, we're effectively counting newlines.
+            // That gives a good answer if the user's selected whole lines.
+            int lineCount = endLineNumber - startLineNumber;
+            // If they've only selected part of the end line, we need to add one because the user will still consider that one of the selected lines.
+            // (We get partial selection of the start line for free, because we'll still get its newline, which was counted above.)
+            if (selectionEnd != endLineStartOffset) {
+                ++lineCount;
+            }
+            
             // Describe the size of the selection.
             message += " (";
-            message += StringUtilities.pluralize(selectionEnd - selectionStart, "character", "characters");
-            // FIXME: if we report this, we look right if the user's selected whole lines; if we add one, we look right if the user's selected partial lines. It would be nice to give a natural answer in both cases, but for now we go with whole lines because if the user's counting lines, that's more likely to be what they're interested in.
-            final int lineCount = endLineNumber - startLineNumber;
+            message += StringUtilities.pluralize(characterCount, "character", "characters");
             if (lineCount > 1) {
                 message += " on " + lineCount + " lines";
             }
