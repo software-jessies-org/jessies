@@ -742,8 +742,6 @@ public class Evergreen {
                 tagsPanel.repaint();
             }
         });
-        
-        Parameters.readPropertiesFile(getPreferenceFilename("edit.properties"));
     }
     
     public void initStatusArea() {
@@ -808,8 +806,10 @@ public class Evergreen {
     private void init() {
         final long t0 = System.nanoTime();
         
-        initPreferences();
+        Parameters.readPropertiesFile(getPreferenceFilename("edit.properties"));
         Advisor.initResearchersOnBackgroundThread();
+        
+        initPreferences();
         initMacOs();
         initAboutBox();
         JFrameUtilities.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
