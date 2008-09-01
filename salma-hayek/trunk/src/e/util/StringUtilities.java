@@ -3,16 +3,17 @@ package e.util;
 import java.io.*;
 import java.nio.*;
 import java.util.*;
+import java.util.regex.*;
 
 public class StringUtilities {
     /** Reads all the lines from the named file into a string array. Throws a RuntimeException on failure. */
     public static String[] readLinesFromFile(String filename) {
-        String contents = readFile(filename);
+        char[] chars = readFileAsCharArray(FileUtilities.fileFromString(filename));
         // The empty file clearly contains no lines but Java's split (unlike Ruby's) would give us a singleton array containing the empty string.
-        if (contents.length() == 0) {
+        if (chars.length == 0) {
             return new String[0];
         }
-        return contents.split("\n");
+        return Pattern.compile("\n").split(new CharArrayCharSequence(chars));
     }
     
     /** Reads the entire contents of the named file into a String. Throws a RuntimeException on failure. */
@@ -22,15 +23,17 @@ public class StringUtilities {
     
     /** Reads the entire contents of the given File into a String. Throws a RuntimeException on failure. */
     public static String readFile(File file) {
+        return new String(readFileAsCharArray(file));
+    }
+    
+    private static char[] readFileAsCharArray(File file) {
         try {
-            int byteCount = (int) file.length();
             ByteBuffer byteBuffer = ByteBufferUtilities.readFile(file);
-            if (ByteBufferUtilities.isBinaryByteBuffer(byteBuffer, byteCount)) {
+            if (ByteBufferUtilities.isBinaryByteBuffer(byteBuffer, byteBuffer.capacity())) {
                 throw new RuntimeException("binary file");
             }
-            ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
-            // FIXME: we could save some copying if we could return a CharSequence.
-            return new String(decoder.getCharArray());
+            ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteBuffer.capacity());
+            return decoder.getCharArray();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

@@ -54,15 +54,14 @@ public class FileSearcher {
      * Returns false if unable to search; true otherwise.
      */
     public boolean searchFile(File file, Collection<String> matches) throws IOException {
-        int byteCount = (int) file.length();
-        ByteBuffer byteBuffer = ByteBufferUtilities.readFile(file);
+        final ByteBuffer byteBuffer = ByteBufferUtilities.readFile(file);
         
-        if (ByteBufferUtilities.isBinaryByteBuffer(byteBuffer, byteCount)) {
+        if (ByteBufferUtilities.isBinaryByteBuffer(byteBuffer, byteBuffer.capacity())) {
             return false;
         }
         
-        ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
-        CharBuffer chars = decoder.getCharBuffer();
+        final ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteBuffer.capacity());
+        final CharSequence chars = new CharArrayCharSequence(decoder.getCharArray());
         searchCharBuffer(chars, matches);
         return true;
     }
