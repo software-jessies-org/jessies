@@ -809,9 +809,9 @@ public class Evergreen {
         final long t0 = System.nanoTime();
         
         initPreferences();
+        Advisor.initResearchersOnBackgroundThread();
         initMacOs();
         initAboutBox();
-        JavaResearcher.initOnBackgroundThread();
         JFrameUtilities.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
         initWindow();
         initTagsPanel();

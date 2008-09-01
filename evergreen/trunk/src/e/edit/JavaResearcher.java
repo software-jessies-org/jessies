@@ -34,21 +34,6 @@ public class JavaResearcher implements WorkspaceResearcher {
         return INSTANCE;
     }
     
-    /**
-     * Initializes this expensive class on a new low-priority thread.
-     * We used to put off initialization until the class was actually needed, but it tends to be needed early on, and on the EDT.
-     */
-    public static void initOnBackgroundThread() {
-        Thread javaDocScanner = new Thread(new Runnable() {
-            public void run() {
-                getSharedInstance();
-            }
-        });
-        // Avoid inheriting the EDT's high priority.
-        javaDocScanner.setPriority(Thread.NORM_PRIORITY);
-        javaDocScanner.start();
-    }
-    
     private synchronized static void readJavaDocSummary() {
         final long t0 = System.nanoTime();
         
@@ -79,8 +64,8 @@ public class JavaResearcher implements WorkspaceResearcher {
                 }
             }
         }
-        Log.warn("Extracting unique words from JavaDoc summary...");
         
+        Log.warn("Extracting unique words from JavaDoc summary...");
         Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
         
         final long t1 = System.nanoTime();

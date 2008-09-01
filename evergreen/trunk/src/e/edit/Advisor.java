@@ -6,13 +6,14 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.concurrent.*;
 import javax.swing.*;
 import org.jdesktop.swingworker.SwingWorker;
 
 public class Advisor extends JPanel {
     private static Advisor instance;
     
-    private ArrayList<WorkspaceResearcher> researchers;
+    private static ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
     
     /** The advice window. */
     private AdvisorHtmlPane advicePane = new AdvisorHtmlPane();
@@ -42,17 +43,67 @@ public class Advisor extends JPanel {
         */
     }
     
-    private synchronized ArrayList<WorkspaceResearcher> getResearchers() {
-        if (researchers == null) {
-            researchers = new ArrayList<WorkspaceResearcher>();
-            researchers.add(JavaResearcher.getSharedInstance());
-            researchers.add(ManPageResearcher.getSharedInstance());
-            researchers.add(new PerlDocumentationResearcher());
-            researchers.add(new PythonDocumentationResearcher());
-            researchers.add(new RubyDocumentationResearcher());
-            researchers.add(new StlDocumentationResearcher());
+    /**
+     * Initializes this class' expensive parts on a new low-priority thread.
+     * We used to put off initialization until the researchers were actually needed, but that tends to be early on, and on the EDT.
+     */
+    public static void initResearchersOnBackgroundThread() {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                initResearchersInParallel();
+            }
+        }, "initResearchersOnBackgroundThread");
+        // Avoid inheriting the EDT's high priority.
+        thread.setPriority(Thread.NORM_PRIORITY);
+        thread.start();
+    }
+    
+    private static void initResearchersInParallel() {
+        synchronized (researchers) {
+            ExecutorService executor = ThreadUtilities.newFixedThreadPool(6, "Researcher Initializer");
+            executor.execute(new Runnable() {
+                public void run() {
+                    researchers.add(JavaResearcher.getSharedInstance());
+                }
+            });
+            executor.execute(new Runnable() {
+                public void run() {
+                    researchers.add(ManPageResearcher.getSharedInstance());
+                }
+            });
+            executor.execute(new Runnable() {
+                public void run() {
+                    researchers.add(new PerlDocumentationResearcher());
+                }
+            });
+            executor.execute(new Runnable() {
+                public void run() {
+                    researchers.add(new PythonDocumentationResearcher());
+                }
+            });
+            executor.execute(new Runnable() {
+                public void run() {
+                    researchers.add(new RubyDocumentationResearcher());
+                }
+            });
+            executor.execute(new Runnable() {
+                public void run() {
+                    researchers.add(new StlDocumentationResearcher());
+                }
+            });
+            executor.shutdown();
+            try {
+                executor.awaitTermination(60, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                Log.warn("Failed to initialize researchers.", ex);
+            }
         }
-        return researchers;
+    }
+    
+    private static ArrayList<WorkspaceResearcher> getResearchers() {
+        synchronized (researchers) {
+            return researchers;
+        }
     }
     
     /**
