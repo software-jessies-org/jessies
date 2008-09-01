@@ -15,6 +15,7 @@ public final class ByteBufferUtilities {
             FileInputStream fileInputStream = new FileInputStream(file);
             ByteBuffer byteBuffer = null;
             
+            // FIXME: this is broken for files larger than 4GiB.
             int byteCount = (int) file.length();
             
             // Always read the whole file in rather than using memory mapping.
