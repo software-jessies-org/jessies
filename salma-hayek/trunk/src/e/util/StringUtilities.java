@@ -6,14 +6,19 @@ import java.util.*;
 import java.util.regex.*;
 
 public class StringUtilities {
-    /** Reads all the lines from the named file into a string array. Throws a RuntimeException on failure. */
-    public static String[] readLinesFromFile(String filename) {
-        char[] chars = readFileAsCharArray(FileUtilities.fileFromString(filename));
+    /** Reads all the lines from the given file into a string array. Throws a RuntimeException on failure. */
+    public static String[] readLinesFromFile(File file) {
+        char[] chars = readFileAsCharArray(file);
         // The empty file clearly contains no lines but Java's split (unlike Ruby's) would give us a singleton array containing the empty string.
         if (chars.length == 0) {
             return new String[0];
         }
         return Pattern.compile("\n").split(new CharArrayCharSequence(chars));
+    }
+    
+    /** Reads all the lines from the named file into a string array. Throws a RuntimeException on failure. */
+    public static String[] readLinesFromFile(String filename) {
+        return readLinesFromFile(FileUtilities.fileFromString(filename));
     }
     
     /** Reads the entire contents of the named file into a String. Throws a RuntimeException on failure. */
