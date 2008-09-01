@@ -147,48 +147,21 @@ public class PTextBuffer implements CharSequence {
         getLock().getWriteLock();
         try {
             // Read all the bytes in.
-            ByteBuffer byteBuffer = ByteBufferUtilities.readFile(file);
+            final ByteBuffer byteBuffer = ByteBufferUtilities.readFile(file);
             
-            // Turn the raw bytes into a char[].
-            final byte[] bytes = byteBuffer.array();
-            final int byteCount = bytes.length;
-            String encodingName = null;
-            char[] chars;
-            if (isAllAscii(bytes)) {
-                // Most files will be plain ASCII, and we can "decode" them 5x cheaper with just a cast.
-                // That speed-up includes the added cost of checking to see if the byte[] only contains ASCII.
-                // FIXME: we could make a further slight saving by checking for '\r' at the same time.
-                encodingName = "UTF-8";
-                chars = new char[byteCount];
-                for (int i = 0; i < byteCount; ++i) {
-                    chars[i] = (char) bytes[i];
-                }
-            } else {
-                ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
-                chars = decoder.getCharArray();
-                encodingName = decoder.getEncodingName();
-            }
+            // Decode the raw bytes into characters.
+            final ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteBuffer.capacity());
+            final char[] chars = decoder.getCharArray();
+            final String encoding = decoder.getEncodingName();
             
-            chars = fixLineEndings(chars);
-            putProperty(CHARSET_PROPERTY, encodingName);
-            setText(chars);
+            // Use the characters and the inferred encoding.
+            putProperty(CHARSET_PROPERTY, encoding);
+            setText(fixLineEndings(chars));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
             getLock().relinquishWriteLock();
         }
-    }
-    
-    // Tests whether all the given bytes could be ASCII.
-    private static boolean isAllAscii(byte[] bytes) {
-        for (int i = 0; i < bytes.length; ++i) {
-            byte b = bytes[i];
-            // FIXME: this range is a little bit arbitrary, but excluding NUL and DEL and anything with the top bit set seems reasonable.
-            if (b < 1 || b > 126) {
-                return false;
-            }
-        }
-        return true;
     }
     
     private char[] fixLineEndings(char[] chars) {

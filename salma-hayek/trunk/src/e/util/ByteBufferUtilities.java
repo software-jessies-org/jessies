@@ -7,14 +7,11 @@ import java.nio.channels.*;
 public final class ByteBufferUtilities {
     /**
      * Reads the contents of the given File into a ByteBuffer.
+     * This ByteBuffer is always backed by a byte[] of exactly the file's length (at the time we started to read).
      */
     public static ByteBuffer readFile(File file) throws IOException {
         DataInputStream dataInputStream = null;
-        FileChannel fileChannel = null;
         try {
-            FileInputStream fileInputStream = new FileInputStream(file);
-            ByteBuffer byteBuffer = null;
-            
             // FIXME: this is broken for files larger than 4GiB.
             int byteCount = (int) file.length();
             
@@ -24,26 +21,14 @@ public final class ByteBufferUtilities {
             // Testing in C (working on Ctags) shows that for typical source files (Linux 2.6.17 and JDK6), the performance benefit of mmap(2) is small anyway.
             // Evergreen actually searches both of those source trees faster with readFully than with map.
             // At the moment, then, there's no obvious situation where we should map the file.
-            final boolean shouldRead = true;
-            if (shouldRead) {
-                // Read the whole file in.
-                dataInputStream = new DataInputStream(fileInputStream);
-                byteBuffer = ByteBuffer.wrap(new byte[byteCount]);
-                dataInputStream.readFully(byteBuffer.array());
-            } else {
-                // Map the file into memory.
-                fileChannel = fileInputStream.getChannel();
-                byteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, byteCount);
-            }
+            FileInputStream fileInputStream = new FileInputStream(file);
+            dataInputStream = new DataInputStream(fileInputStream);
+            final byte[] bytes = new byte[byteCount];
+            dataInputStream.readFully(bytes);
             
-            return byteBuffer;
+            return ByteBuffer.wrap(bytes);
         } finally {
-            if (fileChannel != null) {
-                fileChannel.close();
-            }
-            if (dataInputStream != null) {
-                dataInputStream.close();
-            }
+            FileUtilities.close(dataInputStream);
         }
     }
     
@@ -53,12 +38,23 @@ public final class ByteBufferUtilities {
      */
     public static boolean isBinaryByteBuffer(ByteBuffer byteBuffer, final int byteCount) {
         final int end = Math.min(byteCount, 16);
-        for (int i = 0; i < end; i++) {
+        for (int i = 0; i < end; ++i) {
             if (byteBuffer.get(i) == 0) {
                 return true;
             }
         }
         return false;
+    }
+    
+    public static boolean isAsciiByteBuffer(ByteBuffer byteBuffer, final int byteCount) {
+        for (int i = 0; i < byteCount; ++i) {
+            byte b = byteBuffer.get(i);
+            // FIXME: this range is a little bit arbitrary, but excluding NUL and DEL and anything with the top bit set seems reasonable.
+            if (b < 1 || b > 126) {
+                return false;
+            }
+        }
+        return true;
     }
     
     private ByteBufferUtilities() {

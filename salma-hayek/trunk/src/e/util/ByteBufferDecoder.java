@@ -4,29 +4,18 @@ import java.nio.*;
 import java.nio.charset.*;
 
 /**
- * Translates a ByteBuffer into a CharBuffer or char[], trying to guess the character encoding from the content.
+ * Translates a ByteBuffer into a char[], trying to guess the character encoding from the content.
  */
 public class ByteBufferDecoder {
     private ByteBuffer byteBuffer;
-    private long byteCount;
+    private int byteCount;
     
     private String encoding;
-    private CharBuffer charBuffer;
     private char[] charArray;
     
-    public ByteBufferDecoder(ByteBuffer byteBuffer, long byteCount) {
+    public ByteBufferDecoder(ByteBuffer byteBuffer, int byteCount) {
         this.byteBuffer = byteBuffer;
         this.byteCount = byteCount;
-    }
-    
-    /**
-     * Returns a CharBuffer (which implements CharSequence) containing the characters found in the ByteBuffer.
-     */
-    public CharBuffer getCharBuffer() {
-        if (charBuffer == null) {
-            charBuffer = decodeByteBuffer();
-        }
-        return charBuffer;
     }
     
     /**
@@ -34,10 +23,10 @@ public class ByteBufferDecoder {
      */
     public char[] getCharArray() {
         if (charArray == null) {
-            if (charBuffer == null) {
-                getCharBuffer();
+            CharBuffer charBuffer = decodeByteBuffer();
+            if (charArray == null) {
+                charArray = extractCharArray(charBuffer);
             }
-            charArray = extractCharArray(charBuffer);
         }
         return charArray;
     }
@@ -47,12 +36,29 @@ public class ByteBufferDecoder {
      */
     public String getEncodingName() {
         if (encoding == null) {
-            getCharBuffer();
+            throw new IllegalStateException("this ByteBufferDecoder hasn't yet decoded anything");
         }
         return encoding;
     }
     
     private CharBuffer decodeByteBuffer() {
+        // Fast-path ASCII.
+        if (ByteBufferUtilities.isAsciiByteBuffer(byteBuffer, byteCount)) {
+            // Most files will be plain ASCII, and we can "decode" them 5x cheaper with just a cast.
+            // That speed-up includes the added cost of checking to see if the byte[] only contains ASCII.
+            // FIXME: we could make a further slight saving by checking for '\r' at the same time.
+            encoding = "UTF-8";
+            charArray = new char[byteCount];
+            for (int i = 0; i < byteCount; ++i) {
+                charArray[i] = (char) byteBuffer.get(i);
+            }
+            return null;
+        } else {
+            return decodeNonAsciiByteBuffer();
+        }
+    }
+    
+    private CharBuffer decodeNonAsciiByteBuffer() {
         // Assume UTF-8, but check for a UTF-16 BOM.
         String charsetName = "UTF-8";
         if (byteCount > 1) {
