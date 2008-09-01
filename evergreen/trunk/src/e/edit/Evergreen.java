@@ -326,7 +326,7 @@ public class Evergreen {
         
         // Find which workspace this file is on/should be on, and make it visible.
         Workspace workspace = getBestWorkspaceForFilename(filename);
-        if (startSignal.getCount() == 0) {
+        if (isInitialized()) {
             tabbedPane.setSelectedComponent(workspace);
         }
         
@@ -595,7 +595,7 @@ public class Evergreen {
      * time we start, we start more or less where we left off.
      */
     public void rememberState() {
-        if (startSignal.getCount() != 0) {
+        if (isInitialized() == false) {
             // If we haven't finished initializing, we may not have
             // read all the state in, so writing it back out could
             // actually throw state away. We don't want to do that.
@@ -785,6 +785,14 @@ public class Evergreen {
             startSignal.await();
         } catch (InterruptedException ex) {
         }
+    }
+    
+    /**
+     * Tests whether we've finished starting up.
+     * Have we opened all the remembered workspaces and the files on them yet?
+     */
+    public boolean isInitialized() {
+        return (startSignal.getCount() == 0);
     }
     
     private void initRememberedFilesOpener() {

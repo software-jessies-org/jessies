@@ -202,11 +202,14 @@ public class Workspace extends JPanel {
                 }
             });
         }
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                viewer.requestFocus();
-            }
-        });
+        
+        if (Evergreen.getInstance().isInitialized()) {
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    viewer.requestFocus();
+                }
+            });
+        }
         return viewer;
     }
     
