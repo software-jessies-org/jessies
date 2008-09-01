@@ -17,33 +17,31 @@ public class JavaResearcher implements WorkspaceResearcher {
     /** Matches field or static-method access expressions such as "JSplitPane.". */
     private static final Pattern ACCESS_PATTERN = Pattern.compile("(?x) \\b ([A-Za-z0-9_]+) \\.$");
     
-    private static final JavaResearcher INSTANCE = new JavaResearcher();
-    
     private static final Set<String> uniqueIdentifiers = new TreeSet<String>();
     private static final Set<String> uniqueWords = new TreeSet<String>();
     
     private static String[] javaDocSummary;
     
+    private static final JavaResearcher INSTANCE = new JavaResearcher();
+    
     private JavaResearcher() {
+        init();
     }
     
     public synchronized static JavaResearcher getSharedInstance() {
-        if (javaDocSummary == null) {
-            readJavaDocSummary();
-        }
         return INSTANCE;
     }
     
-    private synchronized static void readJavaDocSummary() {
+    private static void init() {
         final long t0 = System.nanoTime();
         
-        String filename = Evergreen.getInstance().getResourceFilename("javadoc-summary.txt");
-        Log.warn("Reading JavaDoc summary from \"" + filename + "\"...");
+        final String filename = Evergreen.getResourceFilename("javadoc-summary.txt");
         if (FileUtilities.exists(filename)) {
             javaDocSummary = StringUtilities.readLinesFromFile(filename);
         } else {
             javaDocSummary = new String[0];
         }
+        Log.warn("Read JavaDoc summary from \"" + filename + "\" in " + TimeUtilities.nsToString(System.nanoTime() - t0));
         
         Log.warn("Scanning JavaDoc summary...");
         Pattern identifierPattern = Pattern.compile("^[MCFEA]:(\\S+?)(\\(|\t).*$");
