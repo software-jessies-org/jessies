@@ -18,17 +18,20 @@ public class TagsUpdater {
     private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Tags Updater");
     private static final Stopwatch tagsUpdaterStopwatch = Stopwatch.get("TagsUpdater");
     
+    private final ETextWindow textWindow;
+    
     private static int latestSerialNumber = 0;
+    
     private ETree tree;
     private JScrollPane uiPanel;
-    private ETextWindow textWindow;
+    
     private boolean followCaretChanges;
+    
     private File temporaryFile;
     private String tagsDigest;
     
     public TagsUpdater(ETextWindow textWindow) {
         this.textWindow = textWindow;
-        createUI();
         installListeners();
     }
     
@@ -65,6 +68,7 @@ public class TagsUpdater {
         text.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 followCaretChanges = true;
+                createUi();
                 updateTags();
                 showTags();
                 selectTagAtCaret(text);
@@ -85,7 +89,11 @@ public class TagsUpdater {
         selectTreeNode(getTagForLine(lineNumber));
     }
     
-    private void createUI() {
+    private synchronized void createUi() {
+        if (tree != null) {
+            return;
+        }
+        
         tree = new ETree(new DefaultTreeModel(new DefaultMutableTreeNode("")));
         ToolTipManager.sharedInstance().registerComponent(tree);
         // We can't trust JTree's row height calculation. Make it use
@@ -135,11 +143,15 @@ public class TagsUpdater {
     }
     
     public void updateTags() {
+        if (tree == null) {
+            // No point updating tags if we've never been shown yet.
+            return;
+        }
         int serialNumber = ++latestSerialNumber;
         executorService.execute(new TreeModelBuilder(serialNumber));
     }
     
-    public void setTreeModel(TreeModel treeModel) {
+    private void setTreeModel(TreeModel treeModel) {
         tree.setModel(treeModel);
         tree.expandAll();
         showTags();
@@ -155,7 +167,7 @@ public class TagsUpdater {
      * tag for the line, finds the nearest tag before the caret. If that
      * fails, returns null.
      */
-    public TreeNode getTagForLine(int lineNumber) {
+    private TreeNode getTagForLine(int lineNumber) {
         lineNumber++; // JTextComponent numbers lines from 0, ectags from 1.
         
         TagReader.Tag nearestTag = null;
@@ -179,7 +191,7 @@ public class TagsUpdater {
         return nearestNode;
     }
     
-    public void selectTreeNode(TreeNode node) {
+    private void selectTreeNode(TreeNode node) {
         if (node == null) {
             tree.clearSelection();
         } else {
