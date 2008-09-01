@@ -48,52 +48,60 @@ public class Advisor extends JPanel {
      * We used to put off initialization until the researchers were actually needed, but that tends to be early on, and on the EDT.
      */
     public static void initResearchersOnBackgroundThread() {
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                initResearchersInParallel();
-            }
-        }, "initResearchersOnBackgroundThread");
-        // Avoid inheriting the EDT's high priority.
-        thread.setPriority(Thread.NORM_PRIORITY);
-        thread.start();
+        final ExecutorService executor = ThreadUtilities.newSingleThreadExecutor("initResearchersOnBackgroundThread");
+        executor.execute(new ResearcherInitializationRunnable());
+        executor.shutdown();
+    }
+    
+    private static class ResearcherInitializationRunnable implements Runnable {
+        public void run() {
+            initResearchersInParallel();
+        }
     }
     
     private static void initResearchersInParallel() {
         synchronized (researchers) {
-            ExecutorService executor = ThreadUtilities.newFixedThreadPool(6, "Researcher Initializer");
+            final ConcurrentLinkedQueue<WorkspaceResearcher> newResearchers = new ConcurrentLinkedQueue<WorkspaceResearcher>();
+            
+            // Run all the researchers' initialization code in parallel.
+            final ExecutorService executor = ThreadUtilities.newFixedThreadPool(8, "initResearchersOnBackgroundThread");
             executor.execute(new Runnable() {
                 public void run() {
-                    researchers.add(JavaResearcher.getSharedInstance());
+                    newResearchers.add(JavaResearcher.getSharedInstance());
                 }
             });
             executor.execute(new Runnable() {
                 public void run() {
-                    researchers.add(ManPageResearcher.getSharedInstance());
+                    newResearchers.add(ManPageResearcher.getSharedInstance());
                 }
             });
             executor.execute(new Runnable() {
                 public void run() {
-                    researchers.add(new PerlDocumentationResearcher());
+                    newResearchers.add(new PerlDocumentationResearcher());
                 }
             });
             executor.execute(new Runnable() {
                 public void run() {
-                    researchers.add(new PythonDocumentationResearcher());
+                    newResearchers.add(new PythonDocumentationResearcher());
                 }
             });
             executor.execute(new Runnable() {
                 public void run() {
-                    researchers.add(new RubyDocumentationResearcher());
+                    newResearchers.add(new RubyDocumentationResearcher());
                 }
             });
             executor.execute(new Runnable() {
                 public void run() {
-                    researchers.add(new StlDocumentationResearcher());
+                    newResearchers.add(new StlDocumentationResearcher());
                 }
             });
+            
+            // That's all we want to do with this executor.
             executor.shutdown();
+            // But we don't want to unlock the collection until we've finished filling it!
             try {
                 executor.awaitTermination(60, TimeUnit.SECONDS);
+                researchers.addAll(newResearchers);
             } catch (InterruptedException ex) {
                 Log.warn("Failed to initialize researchers.", ex);
             }
