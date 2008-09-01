@@ -144,18 +144,14 @@ public class PTextBuffer implements CharSequence {
      * Replaces the contents of this buffer with the entire contents of 'file'.
      */
     public void readFromFile(File file) {
-        DataInputStream dataInputStream = null;
         getLock().getWriteLock();
         try {
             // Read all the bytes in.
-            // FIXME: this is broken for files larger than 4GiB.
-            final int byteCount = (int) file.length();
-            byte[] bytes = new byte[byteCount];
-            FileInputStream fileInputStream = new FileInputStream(file);
-            dataInputStream = new DataInputStream(fileInputStream);
-            dataInputStream.readFully(bytes);
+            ByteBuffer byteBuffer = ByteBufferUtilities.readFile(file);
             
             // Turn the raw bytes into a char[].
+            final byte[] bytes = byteBuffer.array();
+            final int byteCount = bytes.length;
             String encodingName = null;
             char[] chars;
             if (isAllAscii(bytes)) {
@@ -168,7 +164,6 @@ public class PTextBuffer implements CharSequence {
                     chars[i] = (char) bytes[i];
                 }
             } else {
-                ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
                 ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteCount);
                 chars = decoder.getCharArray();
                 encodingName = decoder.getEncodingName();
@@ -181,7 +176,6 @@ public class PTextBuffer implements CharSequence {
             throw new RuntimeException(ex);
         } finally {
             getLock().relinquishWriteLock();
-            FileUtilities.close(dataInputStream);
         }
     }
     
