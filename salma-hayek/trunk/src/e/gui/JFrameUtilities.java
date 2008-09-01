@@ -4,6 +4,7 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import javax.imageio.*;
 import javax.swing.*;
@@ -194,11 +195,12 @@ public class JFrameUtilities {
      * Reads stored dialog geometries back in from disk, so we can remember them across runs.
      */
     public static void readGeometriesFrom(String filename) {
-        if (new java.io.File(filename).exists() == false) {
+        File file = FileUtilities.fileFromString(filename);
+        if (file.exists() == false) {
             return;
         }
         
-        String[] lines = StringUtilities.readLinesFromFile(filename);
+        String[] lines = StringUtilities.readLinesFromFile(file);
         try {
             for (int i = 0; i < lines.length;) {
                 String name = lines[i++];

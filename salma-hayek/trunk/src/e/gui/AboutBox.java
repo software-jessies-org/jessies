@@ -297,7 +297,7 @@ public class AboutBox {
      * automated and honest.
      */
     private void parseBuildRevisionFile(File file) {
-        String[] content = StringUtilities.readLinesFromFile(file.toString());
+        String[] content = StringUtilities.readLinesFromFile(file);
         String buildDate = content[0];
         projectRevision = content[1];
         libraryRevision = content[2];
