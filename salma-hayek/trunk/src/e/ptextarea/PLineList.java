@@ -11,6 +11,8 @@ import e.util.*;
  * Line wrapping is neither handled nor represented here: see SplitLine for that.
  */
 public class PLineList implements PTextListener {
+    private static final int INVALID_WIDTH = -1;
+    
     private final PTextBuffer text;
     
     private ArrayList<Line> lines;
@@ -28,7 +30,7 @@ public class PLineList implements PTextListener {
         Log.warn("Dumping PLineList line info:");
         for (int i = 0; i < lines.size(); i++) {
             Line line = lines.get(i);
-            Log.warn(i + ": start " + line.getStart() + ", length " + line.getLength() + ", end " + (line.getStart() + line.getLength()) + ", width " + line.getWidth());
+            Log.warn(i + ": start " + line.getStart() + ", length " + line.getLength() + ", end " + (line.getStart() + line.getLength()) + ", width " + line.width);
         }
     }
     
@@ -230,7 +232,7 @@ public class PLineList implements PTextListener {
     
     public void invalidateWidths() {
         for (int i = 0; i < lines.size(); ++i) {
-            lines.get(i).setWidthInvalid();
+            lines.get(i).width = INVALID_WIDTH;
         }
     }
     
@@ -241,6 +243,16 @@ public class PLineList implements PTextListener {
     public CharSequence getLineContents(int lineIndex) {
         Line line = getLine(lineIndex);
         return text.subSequence(line.getStart(), line.getEndOffsetBeforeTerminator(text));
+    }
+    
+    /** Returns whether the render width is valid.  To be used only by the PTextArea. */
+    public boolean isWidthValid(int lineIndex) {
+        return getLine(lineIndex).width != INVALID_WIDTH;
+    }
+    
+    /** Returns the render width of the text.  To be used only by the PTextArea. */
+    public int getWidth(int lineIndex) {
+        return getLine(lineIndex).width;
     }
     
     /**
@@ -257,27 +269,12 @@ public class PLineList implements PTextListener {
         public Line(int start, int length) {
             this.start = start;
             this.length = length;
-            setWidthInvalid();
-        }
-        
-        /** Specifies that the render width of the text is now invalid.  To be used only by PTextArea. */
-        private void setWidthInvalid() {
-            width = -1;
+            this.width = INVALID_WIDTH;
         }
         
         /** Sets the render width of the text.  To be used only by the PTextArea. */
         public void setWidth(int width) {
             this.width = width;
-        }
-        
-        /** Returns whether the render width is valid.  To be used only by the PTextArea. */
-        public boolean isWidthValid() {
-            return (width != -1);
-        }
-        
-        /** Returns the render width of the text.  To be used only by the PTextArea. */
-        public int getWidth() {
-            return width;
         }
         
         /** Returns the character offset within the underlying PTextBuffer model of the start of this line. */
@@ -296,7 +293,7 @@ public class PLineList implements PTextListener {
         
         private void setLength(int length) {
             this.length = length;
-            setWidthInvalid();
+            this.width = INVALID_WIDTH;
         }
         
         private int getLengthBeforeTerminator(PTextBuffer text) {

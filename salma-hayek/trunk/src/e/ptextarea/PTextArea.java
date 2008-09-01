@@ -1200,9 +1200,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     private int addSplitLines(int lineIndex, int index) {
-        PLineList.Line line = lines.getLine(lineIndex);
         final int initialSplitLineCount = splitLines.size();
-        if (line.isWidthValid() == false) {
+        if (lines.isWidthValid(lineIndex) == false) {
             setLineWidth(lineIndex);
         }
         Insets insets = getInsets();
@@ -1211,7 +1210,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             width = Integer.MAX_VALUE;  // Don't wrap if we don't have any size.
         }
         width = Math.max(width, MIN_WIDTH);  // Ensure we're at least a sensible width.
-        if (line.getWidth() <= width) {
+        if (lines.getWidth(lineIndex) <= width) {
             // The whole line fits.
             splitLines.add(index, new SplitLine(lineIndex, 0, lines.getLineContents(lineIndex).length()));
         } else {
