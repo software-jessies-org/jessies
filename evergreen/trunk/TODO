@@ -158,8 +158,6 @@ SELECTION
 
 + Edit > Select > Word (ctrl-W) / Line (shift-command-L) / Paragraph / Enclosing Brackets (shift-command-B) / Current Scope (ctrl-alt-B) / All (command-A) 
 
-+ show "natural" line count in status bar when partial lines are selected.
-
 
 
 VIEW
