@@ -47,7 +47,7 @@ public class CharArrayCharSequence implements CharSequence {
      * its subsequences.
      */
     public CharSequence subSequence(int start, int end) {
-        return new CharArrayCharSequence(chars, start + offset, end + offset);
+        return new CharArrayCharSequence(chars, start + offset, end - start);
     }
     
     /**
