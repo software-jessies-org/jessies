@@ -570,6 +570,8 @@ static void reportFatalException(const NativeArguments& launcherArguments, const
 #endif
     os << "Error: " << ex.what() << std::endl;
     os << std::endl;
+    
+    // FIXME: only show usage and command-line if the exception was a UsageError?
     os << "Usage: " << ARGV0 << " [options] class [args...]" << std::endl;
     os << "where options are:" << std::endl;
     os << "  -client - use client VM" << std::endl;
@@ -589,6 +591,7 @@ static void reportFatalException(const NativeArguments& launcherArguments, const
     os << ARGV0 << " ";
     os << join(" ", launcherArguments);
     os << std::endl;
+    
     reportFatalErrorViaGui("Java Launcher", os.str());
 }
 
