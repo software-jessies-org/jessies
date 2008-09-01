@@ -3,6 +3,12 @@ package e.ptextarea;
 /**
  * Where PLineList represents model "lines" (sequences ending in '\n' or $), a SplitLine is a visible line.
  * A long line (in the PLineList sense) that wraps such that it's displayed on three rows on the screen would have three SplitLine instances, one for each row.
+ * 
+ * Note that in a file with no wrapped lines, all the SplitLine information is totally superfluous:
+ * 
+ * Every 'lineIndex' is the SplitLine's index in PTextArea.splitLines.
+ * Every 'offset' is 0.
+ * Every 'length' is the line length - 1 (because SplitLine's length doesn't include '\n's for some reason).
  */
 final class SplitLine {
     // This run's line number in the PLineList.
