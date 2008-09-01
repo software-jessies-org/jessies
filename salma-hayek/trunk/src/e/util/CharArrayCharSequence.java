@@ -4,9 +4,9 @@ package e.util;
  * Wraps a char[] as a CharSequence for convenience.
  */
 public class CharArrayCharSequence implements CharSequence {
-    private char[] chars;
-    private int offset;
-    private int count;
+    private final char[] chars;
+    private final int offset;
+    private final int count;
     
     /**
      * Constructs a sequence from all the chars in the given array. The array
