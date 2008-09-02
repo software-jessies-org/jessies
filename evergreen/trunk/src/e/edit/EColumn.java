@@ -297,44 +297,29 @@ public class EColumn extends JPanel {
     }
     
     private void relayoutAfterResize() {
+        if (getComponentCount() == 0) {
+            return;
+        }
+        
+        // Ensure all the components in the column have the same width.
         final Component[] components = getComponents();
-        if (components.length == 0) {
-            return;
+        for (int i = 0; i < components.length - 1; ++i) {
+            Component c = components[i];
+            if (c.getWidth() != getWidth()) {
+                reshapeAndRevalidate(c, c.getX(), c.getY(), getWidth(), c.getHeight());
+            }
         }
         
-        setWidthsOfComponents(components, getWidth());
-        
-        /* FIXME: this assumes that the resize actually increased the column's height. */
-        Component last = components[components.length - 1];
-        int lastBottom = last.getY() + last.getHeight();
+        // FIXME: this assumes that the resize actually increased the column's height.
+        final Component last = components[components.length - 1];
+        final int lastBottom = last.getY() + last.getHeight();
         if (lastBottom != getHeight()) {
-            resizeAndRevalidate(last, getWidth(), getHeight() - last.getY());
+            reshapeAndRevalidate(last, last.getX(), last.getY(), getWidth(), getHeight() - last.getY());
         }
-    }
-    
-    /** Ensures all the components in the column have the given width. */
-    private void setWidthsOfComponents(Component[] components, int width) {
-        for (Component component : components) {
-            setWidthOfComponent(component, width);
-        }
-    }
-    
-    /** Sets the width of the given component, if it isn't already that width, and ensures that the change is noticed. */
-    private void setWidthOfComponent(Component c, int width) {
-        if (c.getWidth() == width) {
-            return;
-        }
-        resizeAndRevalidate(c, width, c.getHeight());
     }
     
     private static void reshapeAndRevalidate(Component c, int newX, int newY, int newWidth, int newHeight) {
         c.setBounds(newX, newY, newWidth, newHeight);
-        c.invalidate();
-        c.validate();
-    }
-    
-    private static void resizeAndRevalidate(Component c, int newWidth, int newHeight) {
-        c.setSize(newWidth, newHeight);
         c.invalidate();
         c.validate();
     }
