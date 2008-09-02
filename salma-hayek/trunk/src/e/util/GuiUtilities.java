@@ -150,6 +150,7 @@ public class GuiUtilities {
     private static String monospacedFontName;
     
     private static String findMonospacedFontName() {
+        // Although taking the best available from the ordered list "Monaco", "Lucida Sans Typewriter", "Lucida Console", "Monospaced" would cater for all cases, getAllFonts is expensive.
         if (GuiUtilities.isMacOs()) {
             // "Monaco" is the traditional monospaced font on Mac OS.
             // "Lucida Sans Typewriter" will be available too.
@@ -159,6 +160,8 @@ public class GuiUtilities {
         } else if (GuiUtilities.isWindows()) {
             // If we're using a JDK, we'll have "Lucida Sans Typewriter" available.
             // Not so if we've got a default JRE installation: http://java.sun.com/javase/6/docs/technotes/guides/intl/font.html
+            // It looks like Windows XP ships with "Lucida Console", a squat "funhouse mirror" variant: http://www.microsoft.com/typography/fonts/winxp.htm
+            // FIXME: we should probably choose "Lucida Sans Typewriter" over "Lucida Console", but that over "Monospaced".
             String lucidaSansTypewriter = "Lucida Sans Typewriter";
             Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
             for (Font font : fonts) {
@@ -172,6 +175,7 @@ public class GuiUtilities {
         } else {
             // We're on Linux or Solaris, where the logical font "Monospaced" uses "Lucida Sans Typewriter" for the latin range.
             // Specifying "Monospaced" has the advantage of additionally getting us fallbacks for the other ranges.
+            // FIXME: the fix for Sun bug 6378099 in Java 7 (b33) breaks this by using "Courier New" for the latin range. Bug or feature?
             return "Monospaced";
         }
     }
