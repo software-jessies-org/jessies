@@ -571,7 +571,7 @@ static void reportFatalException(const NativeArguments& launcherArguments, const
     os << "Error: " << ex.what() << std::endl;
     os << std::endl;
     
-    // FIXME: only show usage and command-line if the exception was a UsageError?
+    // FIXME: only show usage if the exception was a UsageError?
     os << "Usage: " << ARGV0 << " [options] class [args...]" << std::endl;
     os << "where options are:" << std::endl;
     os << "  -client - use client VM" << std::endl;
