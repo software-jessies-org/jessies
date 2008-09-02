@@ -255,62 +255,65 @@ public class EColumn extends JPanel {
         }
     }
     
-    /** Moves the given component to the given absolute Y position in the column. */
-    public void moveTo(Component c, int y) {
-        int which = getComponentIndex(c);
+    /**
+     * Moves the given component to the given absolute Y position in the column.
+     * Returns true on success, false on failure.
+     */
+    private boolean moveTo(Component c, int y) {
+        final int which = getComponentIndex(c);
         if (which < 1) {
-            return;
+            // You can't move the top-most window in a column.
+            return false;
         }
         
-        /* Ensure a window can't be moved off the top or bottom. */
-        int newY = Math.min(Math.max(MIN_HEIGHT, y), getHeight() - MIN_HEIGHT);
+        // Dramatis personae.
+        final Component previous = getComponent(which - 1);
+        final Component current = getComponent(which);
+        final Component next = isValidComponentIndex(which + 1) ? getComponent(which + 1) : null;
+        int newY = y;
         
-        /* Dramatis personae. */
-        Component previous = getComponent(which - 1);
-        Component current = getComponent(which);
-        Component next = isValidComponentIndex(which + 1) ? getComponent(which + 1) : null;
-        
-        /* What happens to the window above us? */
-        int bottomOfPrevious = previous.getY() + previous.getHeight();
+        // What happens to the window above us?
         int newPreviousHeight = newY - previous.getY();
-        
-        /* If it would get squished... */
+        // If it would get squished...
         if (newPreviousHeight < MIN_HEIGHT) {
-            /* FIXME: wrong test. we're really interested in knowing whether there's room. */
+            // FIXME: wrong test. we're really interested in knowing whether there's room.
             if (isThereAnySpaceAboveComponent(which)) {
-                /* ... budge it up a bit ... */
-                moveTo(previous, newY - MIN_HEIGHT);
+                // ...budge it up a bit if possible.
+                if (!moveTo(previous, newY - MIN_HEIGHT)) {
+                    return false;
+                }
                 newPreviousHeight = newY - previous.getY();
             } else {
-                /* ... or refuse to squish it. */
-                newY = previous.getY() + MIN_HEIGHT;
-                newPreviousHeight = MIN_HEIGHT;
+                // ...or refuse to squish it.
+                return false;
             }
         }
         
-        /* What happens to us? */
+        // What happens to us?
         int newHeight = (next != null) ? next.getY() - newY : getHeight() - newY;
-        
-        /* If we would get squished... */
+        // If we would get squished...
         if (newHeight < MIN_HEIGHT) {
             if (next != null) {
-                /* ... budge the window below us down a bit ... */
-                moveTo(next, newY + MIN_HEIGHT);
+                // ...budge the window below us down a bit if possible.
+                if (!moveTo(next, newY + MIN_HEIGHT)) {
+                    return false;
+                }
                 newHeight = next.getY() - newY;
             } else {
-                /** ... or refuse to be squished. */
-                //FIXME: implement this!
+                // ... or refuse to be squished.
+                return false;
             }
         }
         
-        /* Let things take their course... */
+        // Make the decided-upon changes to the window above...
         previous.setBounds(previous.getX(), previous.getY(), previous.getWidth(), newPreviousHeight);
         previous.invalidate();
         previous.validate();
-        
+        // ...and to this window.
         current.setBounds(current.getX(), newY, current.getWidth(), newHeight);
         current.invalidate();
         current.validate();
+        return true;
     }
     
     private void relayoutAfterResize() {
