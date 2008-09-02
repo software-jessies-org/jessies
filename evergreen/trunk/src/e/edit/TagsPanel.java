@@ -13,7 +13,7 @@ public class TagsPanel extends JPanel {
     private JPanel emptyPanel;
     
     public TagsPanel() {
-        setLayout(new BorderLayout());
+        super(new BorderLayout());
         add(createUI(), BorderLayout.CENTER);
     }
     

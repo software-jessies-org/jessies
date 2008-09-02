@@ -21,7 +21,7 @@ public class EColumn extends JPanel {
      */
     public EColumn() {
         // We use a null LayoutManager, because we're going to do the layout ourselves.
-        setLayout(null);
+        super(null);
         addListeners();
         initPopUpMenu();
     }
