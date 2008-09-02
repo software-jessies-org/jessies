@@ -144,7 +144,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
      * the given DocumentEvent.
      */
     private void checkSpelling(PTextEvent e) {
-        PTextBuffer buffer = e.getTextBuffer();
+        final PTextBuffer buffer = e.getTextBuffer();
         final int offset = e.getOffset();
         final int documentLength = buffer.length();
         
@@ -155,7 +155,9 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         }
         
         // Find a plausible place to finish after the end of the range affected by this event.
-        int toIndex = Math.max(fromIndex, Math.min(documentLength, offset + e.getLength() + 1));
+        int toIndex = e.isRemove() ? offset : offset + e.getLength() + 1;
+        toIndex = Math.min(toIndex, documentLength);  // Not past the end.
+        toIndex = Math.max(toIndex, fromIndex);  // Not before the start.
         while (toIndex < documentLength && Character.isWhitespace(buffer.charAt(toIndex)) == false) {
             toIndex++;
         }
