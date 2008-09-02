@@ -29,7 +29,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         }
     }
     
-    public class UrlAdvice implements Advice {
+    private class UrlAdvice implements Advice {
         private String url;
         
         public UrlAdvice(String url) {
