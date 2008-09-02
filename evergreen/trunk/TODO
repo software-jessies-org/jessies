@@ -4,7 +4,7 @@ UI
 
 + Intelligently truncate titles too long for the title bar?
 
-+ Make title bars copyable so open files are more easily used from the command-line?
++ Make title bars copyable so open files are more easily used from the command-line? Or a drag source in each title bar?
 
 + Sort windows alphabetically?
 
@@ -299,6 +299,12 @@ LANGUAGE-SPECIFIC TOOLS
 
 + for reference: GEdit plug-ins.
 
+
+
+AUTO COMPLETION
+
++ need to make auto-completion useful enough that it actually sees some use. maybe attack prose first, since that doesn't require type information? or is the trouble there that people don't necessarily know the prefix? i.e. i might want help with "rhythm", but it's the first 'h' i have trouble with. in which case, i'm better off misspelling and asking the spelling checker for corrections. if that's the common case, prose would be better served by a "show auto-corrections for previous misspelling" action. though we'd need a snappier name.
+
 + auto-completion should work for languages other than Java. We can collect all the identifiers from the current file and sort them, at the very least.
 
 
@@ -367,6 +373,4 @@ SPELLING CHECKER
 
 + add a way to show a short list of the misspelled words in the current file. and a way to add them to an exclusion list? or find/replace them?
 
-+ should we be less eager? have a timer so we don't literally check as you type each character? i think what i'd really like is two alpha values: one for misspelling-in-progress that's significantly lighter than finished-misspelling (which can be the same as what we're using at the moment), or some kind of scheme where alpha increases with age?
-
-+ instead of dumping everything in the known-bad hash, we should only pay attention to 'misspellings' left in files when they're written. the known-bad hash contains too many spellings-in-progress.
++ should we be less eager? have a timer so we don't literally check as you type each character? i think what i'd really like is two visual representations: one for misspelling-in-progress that's significantly less attention-grabbing than finished-misspelling (which can be the same as what we're using at the moment), or some kind of scheme where weight increases with age? (to what extent does this compete with the desire to show you errors early?)
