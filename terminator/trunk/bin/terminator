@@ -89,10 +89,11 @@ class Terminator
         
         # Ruby knows the mapping from signal number to signal name, but Java doesn't and POSIX doesn't either.
         # So pass the information along to Java in a way that won't leak through to our children.
-        Signal.list().each() {
+        signalMap = Signal.list().map() {
             | signal_name, signal_number |
-            invoker.add_property("org.jessies.terminator.signal.#{signal_number}", "SIG#{signal_name}")
+            "#{signal_number} => \"#{signal_name}\""
         }
+        invoker.add_property("org.jessies.terminator.signalMap", signalMap.join(", "))
         
         invoker.invoke()
     end

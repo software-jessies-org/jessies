@@ -4,6 +4,7 @@ import e.util.*;
 import java.awt.Dimension;
 import java.io.*;
 import java.util.concurrent.*;
+import java.util.regex.*;
 
 public class PtyProcess {
     private class PtyInputStream extends InputStream {
@@ -91,8 +92,10 @@ public class PtyProcess {
         
         final int signal = exitValue;
         String signalDescription = "signal " + signal;
-        String signalName = System.getProperty("org.jessies.terminator.signal." + signal);
-        if (signalName != null) {
+        String signalMap = System.getProperty("org.jessies.terminator.signalMap");
+        Matcher matcher = Pattern.compile("\\b" + signal + " => \"([^\"]+)\"").matcher(signalMap);
+        if (matcher.find()) {
+            String signalName = "SIG" + matcher.group(1);
             signalDescription += " (" + signalName + ")";
         }
         
