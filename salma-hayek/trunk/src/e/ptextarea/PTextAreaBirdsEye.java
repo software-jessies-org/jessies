@@ -3,7 +3,7 @@ package e.ptextarea;
 import e.gui.*;
 
 public class PTextAreaBirdsEye implements BirdsEye {
-    private PTextArea textArea;
+    private final PTextArea textArea;
     private int currentLineInTextArea = -1;
     
     public PTextAreaBirdsEye(PTextArea textArea) {
