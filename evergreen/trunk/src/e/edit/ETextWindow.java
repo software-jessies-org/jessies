@@ -17,6 +17,26 @@ import javax.swing.Timer;
  * A text-editing component.
  */
 public class ETextWindow extends EWindow implements PTextListener {
+    private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
+    
+    // Used to update the watermark without creating and destroying an excessive number of threads.
+    private static final ExecutorService WATERMARK_UPDATE_EXECUTOR = ThreadUtilities.newSingleThreadExecutor("Watermark Updater");
+    
+    private final String filename;
+    private final File file;
+    private final ETextArea textArea;
+    // Used to display a watermark to indicate such things as a read-only file.
+    private final WatermarkViewPort watermarkViewPort;
+    private final BirdView birdView;
+    private final TagsUpdater tagsUpdater;
+    
+    private long lastModifiedTime;
+    
+    // Each text window has its own current regular expression for finds, which may be null if there's no currently active search in that window.
+    private String currentRegularExpression;
+    
+    private Timer findResultsUpdater;
+    
     /**
      * Ensures that the TagsPanel is empty if the focused window isn't an ETextWindow.
      */
@@ -28,48 +48,6 @@ public class ETextWindow extends EWindow implements PTextListener {
                 }
             }
         };
-    }
-    
-    protected String filename;
-    protected File file;
-    private long lastModifiedTime;
-    protected ETextArea textArea;
-    private BirdView birdView;
-    private TagsUpdater tagsUpdater;
-    
-    // Each text window has its own current regular expression for finds, which may be null if there's no currently active search in that window.
-    private String currentRegularExpression;
-    
-    // Used to display a watermark to indicate such things as a read-only file.
-    private WatermarkViewPort watermarkViewPort;
-    // Used to update the watermark without creating and destroying an excessive number of threads.
-    private static final ExecutorService watermarkUpdateExecutor = ThreadUtilities.newSingleThreadExecutor("Watermark Updater");
-    
-    private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
-
-    private Timer findResultsUpdater;
-    
-    private HashSet<String> initSpellingExceptionsFor(FileType language) {
-        HashSet<String> result = new HashSet<String>();
-        
-        // The text styler knows all the language's keywords.
-        textArea.getTextStyler().addKeywordsTo(result);
-        
-        // The various researchers might have more for this file type.
-        Advisor.getInstance().addWordsTo(language, result);
-        
-        // And there may be a file of extra spelling exceptions for this language.
-        final String exceptionsFileName = Evergreen.getResourceFilename("spelling-exceptions-" + language.getName());
-        if (FileUtilities.exists(exceptionsFileName)) {
-            for (String exception : StringUtilities.readLinesFromFile(exceptionsFileName)) {
-                if (exception.startsWith("#")) {
-                    continue; // Ignore comments.
-                }
-                result.add(exception);
-            }
-        }
-        SPELLING_EXCEPTIONS_MAP.put(language, result);
-        return result;
     }
     
     public ETextWindow(String filename) {
@@ -287,6 +265,29 @@ public class ETextWindow extends EWindow implements PTextListener {
         return exceptions;
     }
     
+    private HashSet<String> initSpellingExceptionsFor(FileType language) {
+        HashSet<String> result = new HashSet<String>();
+        
+        // The text styler knows all the language's keywords.
+        textArea.getTextStyler().addKeywordsTo(result);
+        
+        // The various researchers might have more for this file type.
+        Advisor.getInstance().addWordsTo(language, result);
+        
+        // And there may be a file of extra spelling exceptions for this language.
+        final String exceptionsFileName = Evergreen.getResourceFilename("spelling-exceptions-" + language.getName());
+        if (FileUtilities.exists(exceptionsFileName)) {
+            for (String exception : StringUtilities.readLinesFromFile(exceptionsFileName)) {
+                if (exception.startsWith("#")) {
+                    continue; // Ignore comments.
+                }
+                result.add(exception);
+            }
+        }
+        SPELLING_EXCEPTIONS_MAP.put(language, result);
+        return result;
+    }
+    
     /**
      * Attaches an appropriate set of spelling exceptions to our document.
      */
@@ -295,7 +296,7 @@ public class ETextWindow extends EWindow implements PTextListener {
     }
     
     public void updateWatermarkAndTitleBar() {
-        watermarkUpdateExecutor.execute(new Runnable() {
+        WATERMARK_UPDATE_EXECUTOR.execute(new Runnable() {
             
             // Fields initialized in "run" so not even that work is done on the EDT.
             private String seriousMessage = null;
