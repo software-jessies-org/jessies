@@ -426,18 +426,13 @@ class Java
     if failed
       messageLines = []
       messageLines << "Java failed with " + $?.inspect()
+      if logging
+        messageLines << ""
+        messageLines << "Application log in: #{@log_filename}";
+      end
       messageLines << ""
       messageLines << "Command line was:"
       messageLines << args.join(" ")
-      if logging
-        messageLines << ""
-        messageLines << "Log contained [";
-        # FIXME: shouldn't we just output the log filename?
-        # Even just starting Evergreen produces a log too large to fit on my 30" display.
-        # Using it a little causes us to show an alert large enough to crash zenity(1), which seems counter-productive.
-        messageLines << IO.read(@log_filename)
-        messageLines << "]"
-      end
       # A backtrace appears after the message.
       messageLines << ""
       raise messageLines.join("\n")
