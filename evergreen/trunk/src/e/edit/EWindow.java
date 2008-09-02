@@ -4,19 +4,15 @@ import java.awt.*;
 import javax.swing.*;
 
 public class EWindow extends JComponent {
-    private ETitleBar titleBar;
+    private final ETitleBar titleBar;
     
-    public EWindow(String name) {
+    public EWindow(String initialTitleText) {
         setLayout(new BorderLayout());
-        addTitleBar(name);
+        
+        this.titleBar = new ETitleBar(initialTitleText, this);
+        add(titleBar, BorderLayout.NORTH);
+        
         setOpaque(true);
-    }
-    
-    public void addTitleBar(String titleText) {
-        titleBar = new ETitleBar(titleText, this);
-        if (titleText.equals("+Errors") == false) {
-            add(titleBar, BorderLayout.NORTH);
-        }
     }
     
     public ETitleBar getTitleBar() {
@@ -68,7 +64,7 @@ public class EWindow extends JComponent {
         return (EColumn) SwingUtilities.getAncestorOfClass(EColumn.class, this);
     }
     
-    public e.edit.Workspace getWorkspace() {
-        return (e.edit.Workspace) SwingUtilities.getAncestorOfClass(e.edit.Workspace.class, this);
+    public Workspace getWorkspace() {
+        return (Workspace) SwingUtilities.getAncestorOfClass(Workspace.class, this);
     }
 }
