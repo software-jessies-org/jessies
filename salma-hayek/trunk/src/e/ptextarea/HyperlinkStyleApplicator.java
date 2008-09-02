@@ -27,8 +27,10 @@ class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
     // If we needed to, I think we could write an exact regular expression.
     private static final String SEARCH_CHARS = "[/A-Za-z0-9;:@&=%!*'(),$_.+-]";
     
+    private static final Pattern LINK_PATTERN = Pattern.compile("\\b(https?://[A-Za-z0-9.:-]+[A-Za-z0-9](/~?"+SEARCH_CHARS+"*(\\?"+SEARCH_CHARS+"*)?)?(\\#"+SEARCH_CHARS+"+)?)(?<![),.])");
+    
     public HyperlinkStyleApplicator(PTextArea textArea) {
-        super(textArea, "\\b(https?://[A-Za-z0-9.:-]+[A-Za-z0-9](/~?"+SEARCH_CHARS+"*(\\?"+SEARCH_CHARS+"*)?)?(\\#"+SEARCH_CHARS+"+)?)(?<![),.])", PStyle.HYPERLINK);
+        super(textArea, LINK_PATTERN, PStyle.HYPERLINK);
     }
     
     @Override
