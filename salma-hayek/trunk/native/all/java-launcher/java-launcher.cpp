@@ -584,7 +584,10 @@ static std::string getUsage() {
 static void reportFatalException(const NativeArguments& launcherArguments, const std::exception& ex, const std::string& usage) {
     std::ostringstream os;
 #ifdef __CYGWIN__
-    os << "If you don't have Java installed, download and install JDK 6 from http://java.sun.com/javase/downloads/ and try again." << std::endl;
+    // As mentioned in the Terminator FAQ, the Windows JRE installer doesn't install Lucida Sans Typewriter by default.
+    // The JDK installation does, but it's a much bigger download and the web page for choosing the download is hard to navigate.
+    // The latter point is especially true for the target audience of this error message.
+    os << "If you don't have Java installed, download it from http://java.com/, then try again." << std::endl;
     os << std::endl;
 #endif
     os << "Error: " << ex.what() << std::endl;
