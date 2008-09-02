@@ -425,7 +425,8 @@ class Java
     failed = system(*args) == false
     if failed
       # We're only interested in debugging unexpected exiting here.
-      # Java alleges to mimic the behavior of Unix shells in propagating signal numbers like this.
+      # When Java gets a SIGINT (signal number 2), it exits "normally" with status 130, so termsig() will be nil here.
+      # Java mimics the behavior of Unix shells in propagating signal numbers like this.
       if $?.exited?() && $?.exitstatus() == 0x80 + Signal.list()["INT"]
         exit($?.exitstatus())
       end
