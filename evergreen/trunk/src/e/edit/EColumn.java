@@ -71,15 +71,6 @@ public class EColumn extends JPanel {
         });
     }
     
-    @Override
-    public void paint(Graphics g) {
-        if (getComponentCount() == 0) {
-            paintBackground(g, 240);
-        } else {
-            super.paint(g);
-        }
-    }
-    
     /**
      * Paints the background using a paper effect similar to that in early Mac OS X. The
      * first line in the pattern is brightest, followed by one medium gray, one dark
@@ -87,8 +78,15 @@ public class EColumn extends JPanel {
      * lines. We're not going out of our way to be slow, so we stick to horizontal
      * line drawing only!
      */
-    private void paintBackground(Graphics g, int brightestGray) {
+    @Override public void paint(Graphics g) {
+        if (getComponentCount() > 0) {
+            super.paint(g);
+            return;
+        }
+        
+        // FIXME: Is this worth the bother? Who ever sees this? Is there a platform where it's a significant improvement?
         final int grayStep = 10; // Ed had 5, but 10 is more like Mac OS X, which was our model.
+        final int brightestGray = 240;
         final Rectangle clipRect = g.getClipBounds();
         final int startY = clipRect.y / 4 * 4 - 4;
         for (int y = startY; y < clipRect.y + clipRect.height; y+=4) {
