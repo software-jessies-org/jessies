@@ -6,8 +6,10 @@ import java.util.regex.*;
  * Recognizes runs of ASCII HT characters.
  */
 public class TabStyleApplicator extends RegularExpressionStyleApplicator {
+    private static final Pattern TAB_PATTERN = Pattern.compile("(\t+)");
+    
     public TabStyleApplicator(PTextArea textArea) {
-        super(textArea, "(\t+)", PStyle.NORMAL);
+        super(textArea, TAB_PATTERN, PStyle.NORMAL);
     }
     
     @Override

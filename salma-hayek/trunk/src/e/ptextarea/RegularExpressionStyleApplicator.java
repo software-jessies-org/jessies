@@ -9,14 +9,18 @@ import java.util.regex.*;
  * used as the range to be styled.
  */
 public class RegularExpressionStyleApplicator implements StyleApplicator {
-    protected PTextArea textArea;
-    private Pattern pattern;
-    private PStyle style;
+    protected final PTextArea textArea;
+    private final Pattern pattern;
+    private final PStyle style;
+    
+    public RegularExpressionStyleApplicator(PTextArea textArea, Pattern pattern, PStyle style) {
+        this.textArea = textArea;
+        this.pattern = pattern;
+        this.style = style;
+    }
     
     public RegularExpressionStyleApplicator(PTextArea textArea, String regularExpression, PStyle style) {
-        this.textArea = textArea;
-        this.pattern = Pattern.compile(regularExpression);
-        this.style = style;
+        this(textArea, Pattern.compile(regularExpression), style);
     }
     
     public List<PLineSegment> applyStylingTo(String line, PLineSegment segment) {
