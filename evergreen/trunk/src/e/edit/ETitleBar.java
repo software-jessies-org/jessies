@@ -60,28 +60,27 @@ public class ETitleBar extends JPanel {
         }
     }
     
-    private EWindow window;
+    private final EWindow window;
+    private final JLabel titleLabel;
+    private final JPanel buttonsPanel;
+    private final ECloseButton closeButton;
     
-    private JLabel titleLabel;
-    private ECloseButton closeButton;
     private ESwitchButton switchButton;
-    
-    private JPanel buttonsPanel;
     
     private boolean isActive;
     
     public ETitleBar(String name, EWindow window) {
+        super(new BorderLayout());
+        
         this.window = window;
         
-        setLayout(new BorderLayout());
-        
-        titleLabel = new JLabel(" ");
+        this.titleLabel = new JLabel(" ");
         titleLabel.setFont(UIManager.getFont(GuiUtilities.isWindows() ? "InternalFrame.titleFont" : "TableHeader.font"));
         titleLabel.setOpaque(false);
         
         add(titleLabel, BorderLayout.CENTER);
         
-        buttonsPanel = new JPanel(new BorderLayout());
+        this.buttonsPanel = new JPanel(new BorderLayout());
         buttonsPanel.setOpaque(false);
         add(buttonsPanel, BorderLayout.EAST);
         
