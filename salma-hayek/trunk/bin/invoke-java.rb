@@ -431,11 +431,8 @@ class Java
       end
       messageLines = []
       messageLines << "Java failed with " + $?.inspect()
-      if logging
-        messageLines << ""
-        messageLines << "Application log in: #{@log_filename}";
-      end
       messageLines << ""
+      # The application log filename is perhaps of particular interest.
       messageLines << "Command line was:"
       messageLines << args.join(" ")
       # A backtrace appears after the message.
