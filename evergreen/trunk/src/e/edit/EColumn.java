@@ -81,38 +81,28 @@ public class EColumn extends JPanel {
     }
     
     public void removeComponent(EWindow c, boolean mustReassignFocus) {
-        int which = getComponentIndex(c);
+        final int which = getComponentIndex(c);
         remove(which);
         removeListenersFrom(c);
-        Log.warn("which="+which+";getComponentCount()="+getComponentCount());
+        Log.warn("which=" + which + ";getComponentCount()=" + getComponentCount());
         if (which < getComponentCount()) {
-            Log.warn("free space to component below ("+which+")");
-            /* Give free space to component below the one removed. */
-            Component luckyBoy = getComponent(which);
+            // Give free space to component below the one removed.
+            Log.warn("free space to component below (" + which + ")");
+            final Component luckyBoy = getComponent(which);
             luckyBoy.requestFocus();
-            luckyBoy.setSize(luckyBoy.getWidth(), luckyBoy.getHeight() + c.getHeight());
-            luckyBoy.setLocation(luckyBoy.getX(), c.getY());
-            luckyBoy.invalidate();
-            luckyBoy.validate();
+            reshapeAndRevalidate(luckyBoy, luckyBoy.getX(), c.getY(), luckyBoy.getWidth(), luckyBoy.getHeight() + c.getHeight());
         } else if (which > 0) {
-            Log.warn("free space to component above ("+(which-1)+")");
-            /* Give free space to component above the one removed. */
+            // Give free space to component above the one removed.
+            Log.warn("free space to component above (" + (which - 1) + ")");
             final Component luckyBoy = getComponent(which - 1);
             luckyBoy.requestFocus();
-            resizeAndRevalidate(luckyBoy, luckyBoy.getWidth(), c.getY() + c.getHeight() - luckyBoy.getY());
+            reshapeAndRevalidate(luckyBoy, luckyBoy.getX(), luckyBoy.getY(), luckyBoy.getWidth(), c.getY() + c.getHeight() - luckyBoy.getY());
         } else if (getComponentCount() > 0) {
+            // Give free space to the topmost component.
             Log.warn("free space to topmost component");
-            /* Give free space to the topmost component. */
-            Component luckyBoy = getComponent(0);
+            final Component luckyBoy = getComponent(0);
             luckyBoy.requestFocus();
-            luckyBoy.setLocation(0, 0);
-            luckyBoy.setSize(luckyBoy.getWidth(), luckyBoy.getHeight() + c.getHeight());
-            luckyBoy.invalidate();
-            luckyBoy.validate();
-        } else {
-            Log.warn("empty column");
-            /* Redraw the now empty column. */
-            getParent().repaint();
+            reshapeAndRevalidate(luckyBoy, 0, 0, luckyBoy.getWidth(), luckyBoy.getHeight() + c.getHeight());
         }
         getParent().repaint();
     }
@@ -178,12 +168,10 @@ public class EColumn extends JPanel {
     
     private void placeComponent(int index, Component c) {
         if (index == 0) {
-            c.setBounds(0, 0, getWidth(), getHeight());
-            c.invalidate();
-            c.validate();
+            reshapeAndRevalidate(c, 0, 0, getWidth(), getHeight());
         } else {
-            Component last = getComponent(index - 1);
-            int y = last.getY() + last.getHeight()/2;
+            final Component last = getComponent(index - 1);
+            final int y = last.getY() + last.getHeight()/2;
             last.setBounds(0, last.getY(), getWidth(), last.getHeight()/2);
             c.setBounds(0, y, getWidth(), getHeight() - y);
             last.invalidate();
@@ -243,13 +231,11 @@ public class EColumn extends JPanel {
     public void expandComponent(Component luckyBoy) {
         int freeSpace = getHeight() - (MIN_HEIGHT * (getComponentCount() - 1));
         int y = 0;
-        for (int i = 0; i < getComponentCount(); i++) {
-            Component c = getComponent(i);
-            int height = (c == luckyBoy) ? freeSpace : MIN_HEIGHT;
-            c.setBounds(0, y, c.getWidth(), height);
+        for (int i = 0; i < getComponentCount(); ++i) {
+            final Component c = getComponent(i);
+            final int height = (c == luckyBoy) ? freeSpace : MIN_HEIGHT;
+            reshapeAndRevalidate(c, 0, y, c.getWidth(), height);
             y += height;
-            c.invalidate();
-            c.validate();
         }
     }
     
@@ -304,13 +290,9 @@ public class EColumn extends JPanel {
         }
         
         // Make the decided-upon changes to the window above...
-        previous.setBounds(previous.getX(), previous.getY(), previous.getWidth(), newPreviousHeight);
-        previous.invalidate();
-        previous.validate();
+        reshapeAndRevalidate(previous, previous.getX(), previous.getY(), previous.getWidth(), newPreviousHeight);
         // ...and to this window.
-        current.setBounds(current.getX(), newY, current.getWidth(), newHeight);
-        current.invalidate();
-        current.validate();
+        reshapeAndRevalidate(current, current.getX(), newY, current.getWidth(), newHeight);
         return true;
     }
     
@@ -343,6 +325,12 @@ public class EColumn extends JPanel {
             return;
         }
         resizeAndRevalidate(c, width, c.getHeight());
+    }
+    
+    private static void reshapeAndRevalidate(Component c, int newX, int newY, int newWidth, int newHeight) {
+        c.setBounds(newX, newY, newWidth, newHeight);
+        c.invalidate();
+        c.validate();
     }
     
     private static void resizeAndRevalidate(Component c, int newWidth, int newHeight) {
