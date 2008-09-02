@@ -12,6 +12,7 @@ UI
 
 + We've removed most uses of "new File" and FileUtilities.parseUserFriendlyName in favor of FileUtilities.fileFromString, but should probably have something similar in the other direction, where special JFilenameField components would let us always show the user-friendly forms.
 
++ acme used to support an arbitrary number of columns. I never really saw the use for that at the time, but now the combination of 30" displays all round and an 80-column limit on code at work means I could probably make use of two (or maybe three) columns of code. I don't know it wouldn't be confusing, though. Why don't I just have a tall but narrow Evergreen window? Because I have a lot of workspaces, and wrapped tabs are unusable.
 
 
 HELP/DOCUMENTATION
