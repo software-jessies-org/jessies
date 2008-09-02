@@ -432,7 +432,10 @@ class Java
       if logging
         messageLines << ""
         messageLines << "Log contained [";
-        messageLines.concat(File.new(@log_filename).readlines())
+        # FIXME: shouldn't we just output the log filename?
+        # Even just starting Evergreen produces a log too large to fit on my 30" display.
+        # Using it a little causes us to show an alert large enough to crash zenity(1), which seems counter-productive.
+        messageLines << IO.read(@log_filename)
         messageLines << "]"
       end
       # A backtrace appears after the message.
