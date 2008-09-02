@@ -108,22 +108,18 @@ public class EColumn extends JPanel {
         final int which = getComponentIndex(c);
         remove(which);
         removeListenersFrom(c);
-        Log.warn("which=" + which + ";getComponentCount()=" + getComponentCount());
         if (which < getComponentCount()) {
             // Give free space to component below the one removed.
-            Log.warn("free space to component below (" + which + ")");
             final Component luckyBoy = getComponent(which);
             luckyBoy.requestFocus();
             reshapeAndRevalidate(luckyBoy, luckyBoy.getX(), c.getY(), luckyBoy.getWidth(), luckyBoy.getHeight() + c.getHeight());
         } else if (which > 0) {
             // Give free space to component above the one removed.
-            Log.warn("free space to component above (" + (which - 1) + ")");
             final Component luckyBoy = getComponent(which - 1);
             luckyBoy.requestFocus();
             reshapeAndRevalidate(luckyBoy, luckyBoy.getX(), luckyBoy.getY(), luckyBoy.getWidth(), c.getY() + c.getHeight() - luckyBoy.getY());
         } else if (getComponentCount() > 0) {
             // Give free space to the topmost component.
-            Log.warn("free space to topmost component");
             final Component luckyBoy = getComponent(0);
             luckyBoy.requestFocus();
             reshapeAndRevalidate(luckyBoy, 0, 0, luckyBoy.getWidth(), luckyBoy.getHeight() + c.getHeight());
