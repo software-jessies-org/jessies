@@ -28,7 +28,7 @@ public class Advisor extends JPanel {
     }
     
     private Advisor() {
-        setLayout(new BorderLayout());
+        super(new BorderLayout());
         add(advicePane.makeToolBar(), BorderLayout.NORTH);
         add(advicePane, BorderLayout.CENTER);
         
