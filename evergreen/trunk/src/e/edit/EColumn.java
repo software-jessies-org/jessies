@@ -97,11 +97,9 @@ public class EColumn extends JPanel {
         } else if (which > 0) {
             Log.warn("free space to component above ("+(which-1)+")");
             /* Give free space to component above the one removed. */
-            Component luckyBoy = getComponent(which - 1);
+            final Component luckyBoy = getComponent(which - 1);
             luckyBoy.requestFocus();
-            luckyBoy.setSize(luckyBoy.getWidth(), c.getY() + c.getHeight() - luckyBoy.getY());
-            luckyBoy.invalidate();
-            luckyBoy.validate();
+            resizeAndRevalidate(luckyBoy, luckyBoy.getWidth(), c.getY() + c.getHeight() - luckyBoy.getY());
         } else if (getComponentCount() > 0) {
             Log.warn("free space to topmost component");
             /* Give free space to the topmost component. */
@@ -328,9 +326,7 @@ public class EColumn extends JPanel {
         Component last = components[components.length - 1];
         int lastBottom = last.getY() + last.getHeight();
         if (lastBottom != getHeight()) {
-            last.setSize(getWidth(), getHeight() - last.getY());
-            last.invalidate();
-            last.validate();
+            resizeAndRevalidate(last, getWidth(), getHeight() - last.getY());
         }
     }
     
@@ -346,8 +342,11 @@ public class EColumn extends JPanel {
         if (c.getWidth() == width) {
             return;
         }
-        /* Resize and revalidate. */
-        c.setSize(width, c.getHeight());
+        resizeAndRevalidate(c, width, c.getHeight());
+    }
+    
+    private static void resizeAndRevalidate(Component c, int newWidth, int newHeight) {
+        c.setSize(newWidth, newHeight);
         c.invalidate();
         c.validate();
     }
