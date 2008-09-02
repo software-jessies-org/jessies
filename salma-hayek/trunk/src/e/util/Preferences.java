@@ -456,7 +456,9 @@ public abstract class Preferences {
         private JComboBox makeFontNameComboBox(String key) {
             JComboBox fontNameComboBox = new JComboBox();
             // FIXME: filter out unsuitable fonts. "Zapf Dingbats", for example.
-            // FIXME: pull fixed fonts to the top of the list?
+            // FIXME: pull monospaced fonts to the top of the list?
+            // FIXME: if the current setting is a monospaced font, only allow other monospaced fonts?
+            // FIXME: Windows uses a hard-coded whitelist of suitable monospaced fonts (http://blogs.msdn.com/oldnewthing/archive/2007/05/16/2659903.aspx).
             for (String name : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
                 fontNameComboBox.addItem(name);
             }
