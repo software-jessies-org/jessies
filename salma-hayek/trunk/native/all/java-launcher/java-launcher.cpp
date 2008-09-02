@@ -562,16 +562,8 @@ public:
     }
 };
 
-static void reportFatalException(const NativeArguments& launcherArguments, const std::exception& ex) {
+static std::string getUsage() {
     std::ostringstream os;
-#ifdef __CYGWIN__
-    os << "If you don't have Java installed, download and install JDK 6 from http://java.sun.com/javase/downloads/ and try again." << std::endl;
-    os << std::endl;
-#endif
-    os << "Error: " << ex.what() << std::endl;
-    os << std::endl;
-    
-    // FIXME: only show usage if the exception was a UsageError?
     os << "Usage: " << ARGV0 << " [options] class [args...]" << std::endl;
     os << "where options are:" << std::endl;
     os << "  -client - use client VM" << std::endl;
@@ -586,6 +578,20 @@ static void reportFatalException(const NativeArguments& launcherArguments, const
     // FIXME: If we know which version of JVM we've selected here, we could say so.
     os << "or any option implemented internally by the chosen JVM." << std::endl;
     os << std::endl;
+    return os.str();
+}
+
+static void reportFatalException(const NativeArguments& launcherArguments, const std::exception& ex, const std::string& usage) {
+    std::ostringstream os;
+#ifdef __CYGWIN__
+    os << "If you don't have Java installed, download and install JDK 6 from http://java.sun.com/javase/downloads/ and try again." << std::endl;
+    os << std::endl;
+#endif
+    os << "Error: " << ex.what() << std::endl;
+    os << std::endl;
+    
+    os << usage;
+    
     os << "Command line was:";
     os << std::endl;
     os << ARGV0 << " ";
@@ -600,8 +606,11 @@ static int runJvm(const NativeArguments& launcherArguments) {
         LauncherArgumentParser parser(launcherArguments);
         JavaInvocation javaInvocation(parser);
         return javaInvocation.invokeMain();
+    } catch (const UsageError& ex) {
+        reportFatalException(launcherArguments, ex, getUsage());
+        return 1;
     } catch (const std::exception& ex) {
-        reportFatalException(launcherArguments, ex);
+        reportFatalException(launcherArguments, ex, "");
         return 1;
     }
 }
