@@ -317,7 +317,8 @@ if target_os() == "Linux"
     # gdebi(1) understands that if there's no Installed-Size the size is unknown.
     # apt-get(1) thinks it implies that the installed size is zero bytes.
     # Either way, the user's better off if we declare our installed size because nothing tries to guess from the size of the package.
-    installed_size = `du -sk #{tmp_dir}`.split()[0]
+    # Note that .deb packages' Installed-Size field is measured in kB (not bytes, nor even KiB).
+    installed_size = `du -s --block-size=1000 #{tmp_dir}`.split()[0]
     
     # Make the directory for the package metadata.
     Dir.mkdir("#{tmp_dir}/DEBIAN")
