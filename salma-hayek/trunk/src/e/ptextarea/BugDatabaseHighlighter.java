@@ -13,14 +13,16 @@ import java.util.regex.*;
  *   RFCs: RFC2229.
  */
 public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
-    private static final ArrayList<SiteLocalScriptEntry> siteLocalScriptEntries = new ArrayList<SiteLocalScriptEntry>();
     private static class SiteLocalScriptEntry {
         String patternToMatch;
         String linkTemplate;
     }
+    
+    private static final ArrayList<SiteLocalScriptEntry> siteLocalScriptEntries = new ArrayList<SiteLocalScriptEntry>();
+    // FIXME: it would be slightly useful in Evergreen to be able to run this early, off the EDT.
     static {
         // Try to run the site-local script.
-        // This is too expensive and unpredictable to do every time we configure a PTextArea, especially because we'll be on the EDT.
+        // This is too expensive and unpredictable to do every time we configure a PTextArea, especially because we'll probably be on the EDT.
         // The script's output format is "^<pattern-to-match>\t<link-template>$" where the pattern's groups are as described in highlightBugs.
         // For example, this uses only Bash, keeps the two parts distinct, and avoids escaping issues:
         //
@@ -49,7 +51,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         }
     }
     
-    private String urlTemplate;
+    private final String urlTemplate;
     
     private BugDatabaseHighlighter(PTextArea textArea, String regularExpression, String urlTemplate) {
         super(textArea, regularExpression, PStyle.HYPERLINK);
