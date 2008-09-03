@@ -117,7 +117,7 @@ public class Advisor extends JPanel {
     /**
      * Invokes addWordsTo with 'words' on every known researcher whose isSuitable returns true for 'fileType'.
      */
-    public void addWordsTo(FileType fileType, Set<String> words) {
+    public static void addWordsTo(FileType fileType, Set<String> words) {
         for (WorkspaceResearcher researcher : getResearchers()) {
             if (researcher.isSuitable(fileType)) {
                 researcher.addWordsTo(words);

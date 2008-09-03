@@ -272,7 +272,7 @@ public class ETextWindow extends EWindow implements PTextListener {
         textArea.getTextStyler().addKeywordsTo(result);
         
         // The various researchers might have more for this file type.
-        Advisor.getInstance().addWordsTo(language, result);
+        Advisor.addWordsTo(language, result);
         
         // And there may be a file of extra spelling exceptions for this language.
         final String exceptionsFileName = Evergreen.getResourceFilename("spelling-exceptions-" + language.getName());
