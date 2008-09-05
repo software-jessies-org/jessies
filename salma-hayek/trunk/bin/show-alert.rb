@@ -60,9 +60,17 @@ else
         if ex.class() == SystemExit
             raise()
         end
+        # I like seeing the Ruby backtrace on the console but throwing a GUI alert confuses end users.
+        if ex.class() == Interrupt
+            raise()
+        end
+        # Ron Pagani managed to get the Dock to kill Terminator with SIGTERM.
+        if ex.class() == SignalException && ex.message() == "SIGTERM"
+            raise()
+        end
         # Based on the idea in http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/21530
         prefix = "\tat "
-        message = "An error occurred while starting #{app_name}:\n"
+        message = "An error occurred in #{app_name}:\n"
         message << "\n"
         message << "Exception #{ex.class}: #{ex.message}\n"
         message << "#{prefix}" << ex.backtrace.join("\n#{prefix}")
