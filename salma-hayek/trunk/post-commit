@@ -1,6 +1,10 @@
 #!/usr/bin/ruby -w
+
+# http://svnbook.red-bean.com/en/1.4/svn-book.html#svn.reposadmin.create.hooks
+# "For security reasons, the Subversion repository executes hook programs
+# with an empty environment - that is, no environment variables are set at
+# all, not even $PATH".
 ENV["PATH"] = "/usr/local/bin:/usr/bin:/bin"
-# Oddly, ENV seems to be empty.
 
 # A Subversion post-commit hook. Edit the configurable stuff below, and
 # copy into your repository's hooks/ directory as "post-commit". Don't
