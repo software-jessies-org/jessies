@@ -85,7 +85,7 @@
 # Returns nil if not found.
 # (From Ruby Facets' FileUtils, and hopefully part of Ruby at some point.)
 def which(program, path = ENV["PATH"])
-  path.split(File::PATH_SEPARATOR).each {
+  path.split(File::PATH_SEPARATOR).each() {
     |directory|
     file = File.join(directory, program)
     # Avoid /usr/lib/ruby, for example
