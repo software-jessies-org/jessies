@@ -1,4 +1,6 @@
 #!/usr/bin/ruby -w
+ENV["PATH"] = "/usr/local/bin:/usr/bin:/bin"
+# Oddly, ENV seems to be empty.
 
 # A Subversion post-commit hook. Edit the configurable stuff below, and
 # copy into your repository's hooks/ directory as "post-commit". Don't
