@@ -17,10 +17,6 @@ mail_domain="jessies.org" # Assumes all authors (and the to_address) share a dom
 to_address="software@#{mail_domain}"
 reply_to_address=nil
 
-if ENV["LOGNAME"] =~ /^(elliotth|martind)$/
-  to_address=$1
-end
-
 # ------------------------------------------------------------------------
 
 require "cgi"
