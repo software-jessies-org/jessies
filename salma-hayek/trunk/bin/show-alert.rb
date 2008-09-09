@@ -86,7 +86,6 @@ else
                 chdirSucceeded = true
                 block.call()
             }
-            return
         rescue Exception => ex
             if chdirSucceeded
                 raise()
@@ -114,8 +113,9 @@ else
             if ENV["RUBY_LAUNCHER_INVOKING"]
                 ENV["RUBY_LAUNCHER_INVOKING"] = nil
                 run_in_home_directory(app_name, block)
+            else
+                block.call()
             end
-            block.call()
         rescue Exception => e
             show_uncaught_exception(app_name, e)
             exit(1)
