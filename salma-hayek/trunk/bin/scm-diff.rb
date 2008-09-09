@@ -22,7 +22,7 @@ def getDiffTool(dir)
   raise("not under version control")
 end
 
-ARGV.each {
+ARGV.each() {
   |file|
   dir = Pathname.new(file).realpath().dirname()
   system(getDiffTool(dir) + " " + file)
