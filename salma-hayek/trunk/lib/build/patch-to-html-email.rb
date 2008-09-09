@@ -4,7 +4,7 @@ require 'cgi'
 
 def formatChanges(changes)
   body = ""
-  changes.each {
+  changes.each() {
     |line|
     line = CGI.escapeHTML(line)
     color = "black"
