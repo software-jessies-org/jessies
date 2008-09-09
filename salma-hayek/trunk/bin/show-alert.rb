@@ -77,6 +77,35 @@ else
         show_alert("Uncaught exception", message)
     end
     
+    def run_in_home_directory(app_name, block)
+        # This happens more often on Cygwin than users of other operating systems would think.
+        # Perhaps often enough to warrant all this code to detect and report on the situation in a friendly way.
+        chdirSucceeded = false
+        begin
+            Dir.chdir() {
+                chdirSucceeded = true
+                block.call()
+            }
+            return
+        rescue Exception => ex
+            if chdirSucceeded
+                raise()
+            end
+            messageLines = []
+            messageLines << "#{app_name} failed to change to your home directory."
+            messageLines << ""
+            messageLines << "Exception #{ex.class}: #{ex.message}"
+            messageLines << ""
+            messageLines << "Perhaps you need to double click on the Cygwin shortcut again?"
+            messageLines << "See http://software.jessies.org/salma-hayek/cygwin-setup.html"
+            show_alert("Home directory problem", messageLines.join("\n"))
+            # If the user has no home directory, then they might be happy starting in /bin,
+            # but Terminator will fail when it can't create ~/.terminator,
+            # so perhaps we're best off predictably exiting here.
+            exit(1)
+        end
+    end
+    
     # Use this to report exceptions thrown by the given block.
     def report_exceptions(app_name, &block)
         begin
@@ -84,12 +113,9 @@ else
             # We want to behave as if started from the invoking user's home directory.
             if ENV["RUBY_LAUNCHER_INVOKING"]
                 ENV["RUBY_LAUNCHER_INVOKING"] = nil
-                Dir.chdir() {
-                    block.call()
-                }
-            else
-                block.call()
+                run_in_home_directory(app_name, block)
             end
+            block.call()
         rescue Exception => e
             show_uncaught_exception(app_name, e)
             exit(1)
