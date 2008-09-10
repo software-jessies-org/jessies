@@ -333,7 +333,8 @@ public class TagsUpdater {
         public int getInsertIndex(TagReader.Tag tag) {
             String insertString = tag.getSortIdentifier() + kidsNames.size();
             kidsNames.add(insertString);
-            return new ArrayList<String>(kidsNames).indexOf(insertString);
+            // size() of headSet(), disappointingly, does a O(n) traversal.
+            return kidsNames.headSet(insertString).size();
         }
     }
 }
