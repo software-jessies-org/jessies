@@ -244,6 +244,7 @@ public class TagsUpdater {
         }
         
         public void tagFound(TagReader.Tag tag) {
+            // FIXME: We can't safely getTextArea from a thread other than the EDT.
             tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
             
             DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
