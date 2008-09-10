@@ -326,17 +326,17 @@ public class TagsUpdater {
             }
         }
         
-        private ArrayList<String> kidsNames = new ArrayList<String>();
+        private ArrayList<String> kidSortKeys = new ArrayList<String>();
         
         public int getInsertIndex(TagReader.Tag tag) {
             // Confusing tag 1 of "badger1" with tag 11 of "badger" would be bad.
-            String insertString = tag.getSortIdentifier() + '\u0000' + kidsNames.size();
-            int index = Collections.binarySearch(kidsNames, insertString, String.CASE_INSENSITIVE_ORDER);
+            String insertString = tag.getSortIdentifier() + '\u0000' + kidSortKeys.size();
+            int index = Collections.binarySearch(kidSortKeys, insertString, String.CASE_INSENSITIVE_ORDER);
             if (index < 0) {
                 index = -index - 1;
             }
             // FIXME: This is O(n*n) but works OK with the worst real-world use case yet measured (stone1/.../soapC.cpp, with ~300 kloc).
-            kidsNames.add(index, insertString);
+            kidSortKeys.add(index, insertString);
             return index;
         }
     }
