@@ -70,18 +70,20 @@ public final class TimingLogger {
      */
     public void dumpToLog() {
         if (splitCount == 0) {
-            Log.warn(label + ": took " + TimeUtilities.nsToString(System.nanoTime() - startNanos));
-            return;
+            Log.warn(label + ": took " + TimeUtilities.nsToString(System.nanoTime() - startNanos) + ".");
+        } else if (splitCount == 1) {
+            Log.warn(label + ": " + splits[0].splitLabel + " in " + TimeUtilities.nsToString(splits[0].splitNanos - startNanos) + ".");
+        } else {
+            Log.warn(label + ": begin");
+            long t = startNanos;
+            long total = 0;
+            for (int i = 0; i < splitCount; ++i) {
+                final long splitNanos = splits[i].splitNanos;
+                Log.warn(label + ":      " + TimeUtilities.nsToString(splitNanos - t) + ", " + splits[i].splitLabel);
+                total += (splitNanos - t);
+                t = splitNanos;
+            }
+            Log.warn(label + ": end, " + TimeUtilities.nsToString(total));
         }
-        Log.warn(label + ": begin");
-        long t = startNanos;
-        long total = 0;
-        for (int i = 0; i < splitCount; ++i) {
-            final long splitNanos = splits[i].splitNanos;
-            Log.warn(label + ":      " + TimeUtilities.nsToString(splitNanos - t) + ", " + splits[i].splitLabel);
-            total += (splitNanos - t);
-            t = splitNanos;
-        }
-        Log.warn(label + ": end, " + TimeUtilities.nsToString(total));
     }
 }
