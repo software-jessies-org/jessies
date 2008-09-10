@@ -328,7 +328,7 @@ public class TagsUpdater {
         
         private ArrayList<String> kidSortKeys = new ArrayList<String>();
         
-        public int getInsertIndex(TagReader.Tag tag) {
+        private int getInsertIndex(TagReader.Tag tag) {
             // Confusing tag 1 of "badger1" with tag 11 of "badger" would be bad.
             String insertString = tag.getSortIdentifier() + '\u0000' + kidSortKeys.size();
             int index = Collections.binarySearch(kidSortKeys, insertString, String.CASE_INSENSITIVE_ORDER);
