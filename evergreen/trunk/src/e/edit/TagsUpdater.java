@@ -129,7 +129,7 @@ public class TagsUpdater {
             }
         });
         tree.setFont(UIManager.getFont("TableHeader.font"));
-        tree.setCellRenderer(new TagsPanel.TagsTreeRenderer());
+        tree.setCellRenderer(new TagsPanel.TagsTreeRenderer(getTextArea()));
         
         uiPanel = new JScrollPane(tree);
     }
@@ -244,9 +244,6 @@ public class TagsUpdater {
         }
         
         public void tagFound(TagReader.Tag tag) {
-            // FIXME: We can't safely getTextArea from a thread other than the EDT.
-            tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
-            
             DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
             
             if (tag.type.isContainer()) {
