@@ -328,13 +328,16 @@ public class TagsUpdater {
             }
         }
         
-        private SortedSet<String> kidsNames = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        private ArrayList<String> kidsNames = new ArrayList<String>();
         
         public int getInsertIndex(TagReader.Tag tag) {
             String insertString = tag.getSortIdentifier() + kidsNames.size();
-            kidsNames.add(insertString);
-            // size() of headSet(), disappointingly, does a O(n) traversal.
-            return kidsNames.headSet(insertString).size();
+            int index = Collections.binarySearch(kidsNames, insertString, String.CASE_INSENSITIVE_ORDER);
+            if (index < 0) {
+                index = -index - 1;
+            }
+            kidsNames.add(index, insertString);
+            return index;
         }
     }
 }
