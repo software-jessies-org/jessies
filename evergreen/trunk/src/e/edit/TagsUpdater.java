@@ -244,30 +244,23 @@ public class TagsUpdater {
         }
         
         public void tagFound(TagReader.Tag tag) {
-            publish(tag);
-        }
-        
-        @Override
-        protected void process(List<TagReader.Tag> tags) {
-            for (TagReader.Tag tag : tags) {
-                tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
-                
-                DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
-                
-                if (tag.type.isContainer()) {
-                    leaf = new BranchNode(tag);
-                    branches.put(tag.getClassQualifiedName(), leaf);
-                }
-                
-                DefaultMutableTreeNode branch = branches.get(tag.containingClass);
-                if (branch == null) {
-                    branch = new BranchNode(tag.containingClass);
-                    branches.put(tag.containingClass, branch);
-                    root.add(branch);
-                }
-                
-                branch.add(leaf);
+            tag.toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
+            
+            DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(tag);
+            
+            if (tag.type.isContainer()) {
+                leaf = new BranchNode(tag);
+                branches.put(tag.getClassQualifiedName(), leaf);
             }
+            
+            DefaultMutableTreeNode branch = branches.get(tag.containingClass);
+            if (branch == null) {
+                branch = new BranchNode(tag.containingClass);
+                branches.put(tag.containingClass, branch);
+                root.add(branch);
+            }
+            
+            branch.add(leaf);
         }
         
         public void taggingFailed(Exception ex) {
