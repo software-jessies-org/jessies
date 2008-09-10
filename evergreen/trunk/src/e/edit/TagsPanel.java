@@ -5,6 +5,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import e.gui.*;
+import e.util.*;
 
 public class TagsPanel extends JPanel {
     private JProgressBar progressBar = new JProgressBar();
@@ -92,11 +93,17 @@ public class TagsPanel extends JPanel {
         };
         
         private TagReader.Tag tag;
+        private ETextArea textArea;
         
-        public TagsTreeRenderer() {
+        public TagsTreeRenderer(ETextArea textArea) {
+            this.textArea = textArea;
             setClosedIcon(null);
             setLeafIcon(null);
             setOpenIcon(null);
+        }
+        
+        private ETextArea getTextArea() {
+            return textArea;
         }
         
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -114,7 +121,8 @@ public class TagsPanel extends JPanel {
                     font = font.deriveFont(Font.BOLD);
                 }
                 setFont(font);
-                setToolTipText(tag.toolTip);
+                String toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
+                setToolTipText(toolTip);
                 setIcon(icon);
             } else {
                 tag = null;

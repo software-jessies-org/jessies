@@ -220,7 +220,6 @@ public class TagReader {
         public String context;
         public String containingClass;
         public int lineNumber;
-        public String toolTip;
         public boolean isStatic;
         public boolean isAbstract;
         public boolean isPrototype;
