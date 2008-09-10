@@ -62,6 +62,11 @@ public final class TimingLogger {
     /**
      * Dumps the timings to the log using Log.warn.
      * If addSplit has never been called, simply output the total time.
+     * 
+     * FIXME: we might want a variant that takes a lower bound (in seconds, as a double), and only logs if the total time was greater than that.
+     * FIXME: the output for multiple splits is a bit ugly; ideally, the times would be right-aligned.
+     * FIXME: is the "begin" line useful?
+     * FIXME: it's unfortunate for this caller that each log line has a timestamp (because it won't correspond to the times of the actions).
      */
     public void dumpToLog() {
         if (splitCount == 0) {
