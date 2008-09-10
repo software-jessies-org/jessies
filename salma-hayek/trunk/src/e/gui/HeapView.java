@@ -1,6 +1,5 @@
 package e.gui;
 
-import e.util.TimeUtilities;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
