@@ -332,11 +332,13 @@ public class TagsUpdater {
         private ArrayList<String> kidsNames = new ArrayList<String>();
         
         public int getInsertIndex(TagReader.Tag tag) {
-            String insertString = tag.getSortIdentifier() + kidsNames.size();
+            // Confusing tag 1 of "badger1" with tag 11 of "badger" would be bad.
+            String insertString = tag.getSortIdentifier() + '\u0000' + kidsNames.size();
             int index = Collections.binarySearch(kidsNames, insertString, String.CASE_INSENSITIVE_ORDER);
             if (index < 0) {
                 index = -index - 1;
             }
+            // FIXME: This is O(n*n) but works OK with the worst real-world use case yet measured (stone1/.../soapC.cpp, with ~300 kloc).
             kidsNames.add(index, insertString);
             return index;
         }
