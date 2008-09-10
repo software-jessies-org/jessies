@@ -94,7 +94,7 @@ public class Log {
     }
     
     public static String getSystemDetailsForProblemReport() {
-        String systemDetails = System.getProperty("java.vm.version") + "/" + getOsVersion();
+        String systemDetails = System.getProperty("java.runtime.version") + "/" + getOsVersion();
         return systemDetails;
     }
     
