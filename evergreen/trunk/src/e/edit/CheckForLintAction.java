@@ -1,6 +1,5 @@
 package e.edit;
 
-import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
