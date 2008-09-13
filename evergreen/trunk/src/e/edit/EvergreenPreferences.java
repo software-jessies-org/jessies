@@ -2,7 +2,6 @@ package e.edit;
 
 import e.util.*;
 import java.awt.*;
-import javax.swing.*;
 
 public class EvergreenPreferences extends Preferences {
     public static final String ALWAYS_USE_FIXED_FONT = "alwaysUseFixedFont";
