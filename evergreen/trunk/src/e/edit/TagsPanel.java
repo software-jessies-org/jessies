@@ -1,11 +1,9 @@
 package e.edit;
 
+import e.gui.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.*;
-
-import e.gui.*;
-import e.util.*;
 
 public class TagsPanel extends JPanel {
     private JProgressBar progressBar = new JProgressBar();
