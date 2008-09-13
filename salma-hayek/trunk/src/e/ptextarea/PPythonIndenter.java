@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.regex.*;
-
 /**
  * Basic Python auto-indenter.
  */
