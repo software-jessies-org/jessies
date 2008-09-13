@@ -204,9 +204,8 @@ public abstract class Preferences {
             form = new FormBuilder(parent, "Preferences");
         }
         
-        List<FormPanel> formPanels = form.getFormPanels();
-        FormPanel generalPanel = formPanels.get(0);
-        FormPanel colorsPanel = hasColors ? formPanels.get(1) : null;
+        final List<FormPanel> formPanels = form.getFormPanels();
+        final FormPanel generalPanel = formPanels.get(0);
         
         willAddRows(formPanels);
         
@@ -218,7 +217,6 @@ public abstract class Preferences {
             }
             String description = descriptions.get(key);
             if (description != null) {
-                Object value = preferences.get(key);
                 if (customUis.get(key) != null) {
                     generalPanel.addRow(description + ":", customUis.get(key));
                 } else {
