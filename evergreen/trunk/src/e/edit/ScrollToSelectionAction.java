@@ -1,7 +1,6 @@
 package e.edit;
 
 import e.ptextarea.*;
-import java.awt.event.*;
 
 /**
  * An action that ensures that the selection is visible.
