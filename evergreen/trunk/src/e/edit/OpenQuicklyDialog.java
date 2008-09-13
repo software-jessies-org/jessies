@@ -180,7 +180,6 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     }
     
     public void openSelectedFilesFromList() {
-        ListModel list = matchList.getModel();
         for (int index : matchList.getSelectedIndices()) {
             openFileAtIndex(index);
         }
