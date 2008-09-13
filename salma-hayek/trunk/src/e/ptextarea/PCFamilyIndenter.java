@@ -1,7 +1,6 @@
 package e.ptextarea;
 
 import e.util.*;
-import java.util.*;
 
 /**
  * Implements indentation for members of the C family, parameterized to cater for their differences.
