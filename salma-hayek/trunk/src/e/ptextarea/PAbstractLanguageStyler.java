@@ -235,7 +235,6 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                 index = endIndex + multiLineCommentEnd().length();
             } else {
                 // Uncommented - strings eat comments.
-                char previous = 0;
                 char lastQuote = 0;
                 boolean escaped = false;
                 for (int i = index; i < line.length(); i++) {
@@ -260,7 +259,6 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                     } else {
                         escaped = false;
                     }
-                    previous = thisChar;
                 }
                 if (comment == false) {
                     break;
