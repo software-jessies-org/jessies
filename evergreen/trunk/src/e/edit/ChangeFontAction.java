@@ -3,7 +3,6 @@ package e.edit;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
-import e.util.*;
 
 public abstract class ChangeFontAction extends ETextAction {
     public ChangeFontAction(String fontDescription) {
