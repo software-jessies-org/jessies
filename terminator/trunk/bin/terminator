@@ -91,9 +91,9 @@ class Terminator
         # So pass the information along to Java in a way that won't leak through to our children.
         signalMap = Signal.list().map() {
             | signal_name, signal_number |
-            "#{signal_number} => \"#{signal_name}\""
+            "#{signal_number}:#{signal_name}"
         }
-        invoker.add_property("org.jessies.terminator.signalMap", signalMap.join(", "))
+        invoker.add_property("org.jessies.terminator.signalMap", signalMap.join(" "))
         
         invoker.invoke()
     end

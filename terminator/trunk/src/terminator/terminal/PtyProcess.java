@@ -93,7 +93,7 @@ public class PtyProcess {
         final int signal = exitValue;
         String signalDescription = "signal " + signal;
         String signalMap = System.getProperty("org.jessies.terminator.signalMap");
-        Matcher matcher = Pattern.compile("\\b" + signal + " => \"([^\"]+)\"").matcher(signalMap);
+        Matcher matcher = Pattern.compile("\\b" + signal + ":(.+?)\\b").matcher(signalMap);
         if (matcher.find()) {
             String signalName = "SIG" + matcher.group(1);
             signalDescription += " (" + signalName + ")";
