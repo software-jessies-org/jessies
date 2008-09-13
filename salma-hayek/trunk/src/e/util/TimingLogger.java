@@ -1,7 +1,5 @@
 package e.util;
 
-import java.util.*;
-
 /**
  * A utility class to help log timing split throughout a method call.
  * Based on android.util.TimingLogger.
