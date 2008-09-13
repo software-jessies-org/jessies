@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.regex.*;
-
 /**
  * Basic C++ auto-indenter.
  * 
