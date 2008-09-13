@@ -136,7 +136,7 @@ public class Terminator {
 	}
 	
 	// Returns whether we started the UI.
-	public boolean parseCommandLine(final String[] argumentArray, PrintWriter out) throws IOException {
+	public boolean parseCommandLine(final String[] argumentArray, PrintWriter out) {
 		// Ignore "-xrm <resource-string>" argument pairs.
 		this.arguments = new ArrayList<String>();
 		for (int i = 0; i < argumentArray.length; ++i) {
