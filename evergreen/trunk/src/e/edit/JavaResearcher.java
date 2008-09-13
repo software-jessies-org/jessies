@@ -72,7 +72,6 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     public synchronized List<String> listIdentifiersStartingWith(String prefix) {
         ArrayList<String> result = new ArrayList<String>();
-        final int prefixLength = prefix.length();
         for (String identifier : uniqueIdentifiers) {
             if (identifier.startsWith(prefix)) {
                 result.add(identifier);
