@@ -46,7 +46,7 @@ public class TagReader {
         return "ctags";
     }
     
-    private File createTagsFileFor(File file) throws InterruptedException, IOException {
+    private File createTagsFileFor(File file) throws IOException {
         File tagsFile = File.createTempFile("e.edit.TagReader-tags-", ".tags");
         tagsFile.deleteOnExit();
         
