@@ -219,19 +219,15 @@ public class TerminalModel {
 	 */
 	public Location getLocationFromCharIndex(int charIndex) {
 		int lowLine = 0;
-		int low = 0;
 		int highLine = textLines.size();
-		int high = getStartIndex(highLine - 1) + getLineLength(highLine - 1);
 		
 		while (highLine - lowLine > 1) {
 			int midLine = (lowLine + highLine) / 2;
 			int mid = getStartIndex(midLine);
 			if (mid <= charIndex) {
 				lowLine = midLine;
-				low = mid;
 			} else {
 				highLine = midLine;
-				high = mid;
 			}
 		}
 		return new Location(lowLine, charIndex - getStartIndex(lowLine));
