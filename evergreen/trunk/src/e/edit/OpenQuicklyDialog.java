@@ -153,16 +153,6 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         filenameField.setText(filenamePattern);
     }
     
-    private class RescanAction extends AbstractAction {
-        public RescanAction() {
-            super("Rescan");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            workspace.getFileList().updateFileList();
-        }
-    }
-    
     public void fileListStateChanged(final boolean isNowValid) {
         rescanButton.setEnabled(isNowValid);
         if (isNowValid) {
