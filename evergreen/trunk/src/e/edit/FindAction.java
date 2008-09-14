@@ -15,7 +15,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     private FindAction() {
         super("_Find...", GuiUtilities.makeKeyStroke("F", false));
         GnomeStockIcon.configureAction(this);
-        regularExpressionHistory = new StringHistory(Evergreen.getInstance().getPreferenceFilename("e.edit.FindAction-history"));
+        regularExpressionHistory = new StringHistory(Evergreen.getPreferenceFilename("e.edit.FindAction-history"));
     }
     
     public void actionPerformed(ActionEvent e) {
