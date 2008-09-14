@@ -666,6 +666,9 @@ build: $(BUILD_TARGETS)
 .generated/java.build-finished: .generated/java.build-started $(JAVA_CLASSES_PREREQUISITES)
 	$(BUILD_JAVA)
 
+%.class: .generated/java.build-finished
+	test -e $@ || { echo Failed to build $@; exit 1; }
+
 .PHONY: clean
 clean:
 	$(RM) -r $(GENERATED_FILES) && \
