@@ -158,7 +158,7 @@ public class Terminator {
 		return false;
 	}
 
-	private void parseOriginalCommandLine(final String[] argumentArray, PrintWriter out) throws IOException {
+	private void parseOriginalCommandLine(final String[] argumentArray, PrintWriter out) {
 		if (parseCommandLine(argumentArray, out)) {
 			startTerminatorServer();
 		}
