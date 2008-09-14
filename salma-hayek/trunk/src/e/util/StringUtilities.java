@@ -251,6 +251,7 @@ public class StringUtilities {
 
     /**
      * A convenient wrapper around URLEncoder.encode.
+     * Should perhaps have been called escapeForUrl or encodeUrl, so I stop reinventing it.
      */
     public static String urlEncode(String s) {
         try {
