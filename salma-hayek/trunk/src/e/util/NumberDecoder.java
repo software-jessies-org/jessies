@@ -22,21 +22,28 @@ public class NumberDecoder {
         int index = 0;
         boolean negative = false;
         
-        // Handle minus sign, if present
+        // Handle minus sign, if present.
         if (s.startsWith("-")) {
             negative = true;
             index++;
         }
         
-        // Handle radix specifier, if present
+        // Handle radix specifier, if present.
         if (s.startsWith("0x", index) || s.startsWith("0X", index)) {
             index += 2;
             radix = 16;
         } else if (s.startsWith("#", index)) {
-            index++;
+            ++index;
             radix = 16;
+        } else if (s.startsWith("0o", index)) {
+            index += 2;
+            radix = 8;
+        } else if (s.startsWith("0b", index)) {
+            index += 2;
+            radix = 2;
         } else if (s.startsWith("0", index)) {
-            index++;
+            // A deprecated (but common) way to specify octal.
+            ++index;
             radix = 8;
         }
         
@@ -66,8 +73,12 @@ public class NumberDecoder {
     
     private static String radixToPrefix(int radix) {
         switch (radix) {
-            case 8: return "0";
-            case 16: return "0x";
+        case 2:
+            return "0b";
+        case 8:
+            return "0o";
+        case 16:
+            return "0x";
         default:
             return "";
         }
@@ -75,10 +86,14 @@ public class NumberDecoder {
     
     private static String radixToName(int radix) {
         switch (radix) {
-            case 2: return "binary";
-            case 8: return "octal";
-            case 10: return "decimal";
-            case 16: return "hex";
+        case 2:
+            return "binary";
+        case 8:
+            return "octal";
+        case 10:
+            return "decimal";
+        case 16:
+            return "hex";
         default:
             return "base " + radix;
         }
