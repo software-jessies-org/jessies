@@ -125,8 +125,8 @@ public class JavaDoc {
         Log.warn("Scanning " + jarFile);
         try {
             JarFile jar = new JarFile(jarFile);
-            for (Enumeration e = jar.entries(); e.hasMoreElements(); ) {
-                ZipEntry entry = (ZipEntry) e.nextElement();
+            for (Enumeration<JarEntry> e = jar.entries(); e.hasMoreElements(); ) {
+                ZipEntry entry = e.nextElement();
                 String name = entry.getName().replace('/', '.');
                 if (name.startsWith("META-INF")) {
                     continue;
