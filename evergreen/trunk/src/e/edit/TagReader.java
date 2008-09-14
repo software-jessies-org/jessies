@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.regex.*;
 
 public class TagReader {
-    private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t([^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
+    private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t(?:[^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
     private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface|namespace):([^\t]+).*");
     
     private TagListener listener;
@@ -156,16 +156,15 @@ public class TagReader {
         // A   headers/openssl/bn.h    257;"   m   struct:bn_blinding_st
         // Here the tag is called "A", is in "headers/openssl/bn.h" on line 257, and
         // is a 'm'ember of the struct called "bn_blinding_st".
-        Matcher matcher = TAG_LINE_PATTERN.matcher(line);
+        final Matcher matcher = TAG_LINE_PATTERN.matcher(line);
         if (matcher.matches() == false) {
             return;
         }
         
-        String identifier = matcher.group(1);
-        String filename = matcher.group(2);
-        int lineNumber = Integer.parseInt(matcher.group(3));
-        char type = matcher.group(4).charAt(0);
-        String context = matcher.group(5);
+        final String identifier = matcher.group(1);
+        final int lineNumber = Integer.parseInt(matcher.group(2));
+        final char type = matcher.group(3).charAt(0);
+        String context = matcher.group(4);
         if (context == null) {
             context = "";
         }
@@ -175,8 +174,8 @@ public class TagReader {
             return;
         }
         
-        Matcher classMatcher = CLASS_PATTERN.matcher(context);
-        String containingClass = (classMatcher.matches() ? classMatcher.group(1) : "");
+        final Matcher classMatcher = CLASS_PATTERN.matcher(context);
+        final String containingClass = (classMatcher.matches() ? classMatcher.group(1) : "");
         //Log.warn(context + " => " + containingClass);
         
         TagReader.Tag tag = null;
