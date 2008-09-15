@@ -667,7 +667,7 @@ build: $(BUILD_TARGETS)
 	$(BUILD_JAVA)
 
 %.class: .generated/java.build-finished
-	test -e $@ || { echo Failed to build $@; exit 1; }
+	test -r $@ || { echo Failed to build $@; exit 1; }
 
 .PHONY: clean
 clean:
