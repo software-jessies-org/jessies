@@ -50,18 +50,18 @@ public class TerminatorPreferences extends Preferences {
         setHelperForClass(Double.class, new AlphaHelper());
         
         addPreference(ALPHA, Double.valueOf(1.0), "Terminal opacity");
-        addPreference(ANTI_ALIAS, Boolean.FALSE, "Anti-alias text?");
-        addPreference(BLINK_CURSOR, Boolean.TRUE, "Blink cursor?");
-        addPreference(BLOCK_CURSOR, Boolean.FALSE, "Use block cursor?");
-        addPreference(FANCY_BELL, Boolean.TRUE, "High-quality rendering of the visual bell?");
-        addPreference(VISUAL_BELL, Boolean.TRUE, "Visual bell (as opposed to no bell)?");
+        addPreference(ANTI_ALIAS, Boolean.FALSE, "Anti-alias text");
+        addPreference(BLINK_CURSOR, Boolean.TRUE, "Blink cursor");
+        addPreference(BLOCK_CURSOR, Boolean.FALSE, "Use block cursor");
+        addPreference(FANCY_BELL, Boolean.TRUE, "High-quality rendering of the visual bell");
+        addPreference(VISUAL_BELL, Boolean.TRUE, "Visual bell (as opposed to no bell)");
         addPreference(FONT, new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12), "Font");
         addPreference(HIDE_MOUSE_WHEN_TYPING, Boolean.TRUE, "Hide mouse when typing");
         addPreference(INITIAL_COLUMN_COUNT, Integer.valueOf(80), "New terminal width");
         addPreference(INITIAL_ROW_COUNT, Integer.valueOf(24), "New terminal height");
-        addPreference(SCROLL_ON_KEY_PRESS, Boolean.TRUE, "Scroll to bottom on key press?");
-        addPreference(SCROLL_ON_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output?");
-        addPreference(USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key (for Emacs)?");
+        addPreference(SCROLL_ON_KEY_PRESS, Boolean.TRUE, "Scroll to bottom on key press");
+        addPreference(SCROLL_ON_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output");
+        addPreference(USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key (for Emacs)");
         
         // Defaults reminiscent of SGI's xwsh(1).
         addPreference(BACKGROUND_COLOR, VERY_DARK_BLUE, "Background");
