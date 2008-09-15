@@ -705,7 +705,7 @@ source-dist: ../$(SOURCE_DIST_FILE)
 www-dist: ChangeLog.html
 	mkdir -p $(DIST_DIRECTORY) && \
 	mv ChangeLog.html $(DIST_DIRECTORY)/ && \
-	if [ -d www/ ] ; then rsync -v -r www/* $(DIST_DIRECTORY)/ ; fi
+	rsync -v -r www/* $(DIST_DIRECTORY)/
 
 .PHONY: .generated/build-revision.txt
 .generated/build-revision.txt:
