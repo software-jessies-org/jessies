@@ -172,7 +172,7 @@ public abstract class Preferences {
         if (focusOwner instanceof Frame == false) {
             focusOwner = SwingUtilities.getAncestorOfClass(Frame.class, focusOwner);
         }
-        if (focusOwner.getLocationOnScreen().y < 0) {
+        if (focusOwner != null && focusOwner.isShowing() && focusOwner.getLocationOnScreen().y < 0) {
             // This is probably the Mac OS hidden frame hack, in which case we should center on the screen.
             focusOwner = null;
         }
