@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.*;
 import java.util.*;
 import java.util.regex.*;
+import org.jessies.test.*;
 
 public class StringUtilities {
     /** Reads all the lines from the given file into a string array. Throws a RuntimeException on failure. */
@@ -158,6 +159,12 @@ public class StringUtilities {
         return result.toString();
     }
     
+    @Test private static void testJavaEscaping() {
+        final String example = "hello\tworld\u01f8\n";
+        Assert.equals(escapeForJava(example), "hello\\tworld\\u01f8\\n");
+        Assert.equals(unescapeJava(escapeForJava(example)), example);
+    }
+    
     /** Converts a string into a regular expression matching exactly that string. */
     public static String regularExpressionFromLiteral(CharSequence literal) {
         StringBuilder result = new StringBuilder();
@@ -248,7 +255,12 @@ public class StringUtilities {
         }
         return s.substring(0, i);
     }
-
+    
+    @Test private static void testTrimmers() {
+        Assert.equals(trimLeadingWhitespace("  hello world  "), "hello world  ");
+        Assert.equals(trimTrailingWhitespace("  hello world  "), "  hello world");
+    }
+    
     /**
      * A convenient wrapper around URLEncoder.encode.
      * Should perhaps have been called escapeForUrl or encodeUrl, so I stop reinventing it.
@@ -366,24 +378,27 @@ public class StringUtilities {
         return builder.toString();
     }
     
+    @Test private static void testNCopies() {
+        Assert.equals(nCopies(0, " "), "");
+        Assert.equals(nCopies(1, " "), " ");
+        Assert.equals(nCopies(8, " "), "        ");
+    }
+    
     public static String pluralize(int value, CharSequence singularForm, CharSequence pluralForm) {
         return Integer.toString(value) + " " + (value == 1 ? singularForm : pluralForm);
     }
     
+    @Test private static void testPluralize() {
+        Assert.equals(pluralize(0, "foo", "bar"), "0 bar");
+        Assert.equals(pluralize(1, "foo", "bar"), "1 foo");
+        Assert.equals(pluralize(8, "foo", "bar"), "8 bar");
+    }
+    
     private StringUtilities() {
     }
-
+    
     public static void main(String[] arguments) {
-        System.out.println("'" + trimLeadingWhitespace("  hello world  ") + "'");
-        System.out.println("'" + trimTrailingWhitespace("  hello world  ") + "'");
-        System.out.println("blah="+escapeForJava("hello\tworld\u01f8\n"));
-        System.out.println("blah2="+escapeForJava(unescapeJava(escapeForJava("hello\tworld\u01f8\n"))));
-        for (String argument : arguments) {
-            String escaped = escapeForJava(argument);
-            System.out.println("escaped="+escaped);
-            System.out.println("unescaped="+unescapeJava(escaped));
-        }
-        
+        // FIXME: our test framework should support benchmark tests too.
         Stopwatch op1Stopwatch = Stopwatch.get("nCopies(1, ' ')");
         for (int i = 0; i < 1000000; ++i) {
             Stopwatch.Timer timer = op1Stopwatch.start();
