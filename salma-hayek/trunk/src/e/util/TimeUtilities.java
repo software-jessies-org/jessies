@@ -2,6 +2,7 @@ package e.util;
 
 import java.text.*;
 import java.util.*;
+import org.jessies.test.*;
 
 /**
  * Utilities to make it easier to work with ISO 8601 dates and times.
@@ -124,6 +125,10 @@ public class TimeUtilities {
      */
     public static double nsToS(long ns) {
         return ((double) ns)/1000000000.0;
+    }
+    
+    @Test private static void testNsToS() {
+        Assert.equals(TimeUtilities.nsToS(500000000), 0.5, 0.01);
     }
     
     /**
