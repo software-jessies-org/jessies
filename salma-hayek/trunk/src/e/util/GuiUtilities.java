@@ -320,6 +320,8 @@ public class GuiUtilities {
      */
     public static void setFrameAlpha(JFrame frame, double alpha) {
         try {
+            // FIXME: maybe test whether com.sun.awt.AWTUtilities is available, and if so go straight to that?
+            
             Field peerField = Component.class.getDeclaredField("peer");
             peerField.setAccessible(true);
             Object peer = peerField.get(frame);
