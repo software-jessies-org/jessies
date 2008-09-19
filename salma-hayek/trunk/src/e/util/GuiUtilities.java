@@ -339,7 +339,11 @@ public class GuiUtilities {
                     frame.getRootPane().putClientProperty("Window.alpha", alpha);
                 }
             } else if (isWindows()) {
-                // FIXME: can we do this on Windows?
+                // This only works on 6u10 and later (see Sun bug 6633275).
+                // com.sun.awt.AWTUtilities.setWindowOpacity(frame, alpha);
+                Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
+                Method setWindowOpacityMethod = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
+                setWindowOpacityMethod.invoke(null, (Window) frame, (float) alpha);
             } else {
                 // long windowId = peer.getWindow();
                 Class<?> xWindowPeerClass = Class.forName("sun.awt.X11.XWindowPeer");
