@@ -148,7 +148,8 @@ public class TerminatorPreferences extends Preferences {
                     put(key, ((double) slider.getValue())/256);
                 }
             });
-            slider.setEnabled(GuiUtilities.isWindows() == false);
+            // FIXME: Disable the slider if the JRE provably doesn't support setting the opacity.
+            //slider.setEnabled(GuiUtilities.isWindows() == false);
             formPanels.get(1).addRow(description + ":", slider);
         }
     }
