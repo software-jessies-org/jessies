@@ -16,6 +16,12 @@ public final class Assert {
         }
     }
     
+    public static void equals(double lhs, double rhs, double epsilon) {
+        if (Math.abs(lhs - rhs) > epsilon) {
+            throw new RuntimeException(lhs + " != " + rhs + " (+/- " + epsilon + ")");
+        }
+    }
+    
     // Outputs 'o' in the most useful form given the circumstances.
     private static String toString(Object o) {
         if (o instanceof String) {
