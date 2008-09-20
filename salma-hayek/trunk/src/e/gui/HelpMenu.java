@@ -32,10 +32,19 @@ public class HelpMenu {
         }
         
         menu.add(DebugMenu.makeJMenu());
-        // FIXME: anyone else using HelpMenu is going to want some control over this; add a system property, and set a default in invoke-java?
-        menu.add(new WebLinkAction("Report a Problem", "mailto:software@jessies.org?subject=" + AboutBox.getSharedInstance().getProblemReportSubject()));
-        // We don't support this yet, because we've got nothing to point it to.
-        menu.add(new PlaceholderAction("View Bugs List"));
+        
+        // "Report a Problem".
+        final String supportAddress = System.getProperty("e.gui.HelpMenu.supportAddress", "software@jessies.org");
+        final String subjectLine = AboutBox.getSharedInstance().getProblemReportSubject();
+        menu.add(new WebLinkAction("Report a Problem", "mailto:" + supportAddress + "?subject=" + subjectLine));
+        
+        // "Get Help Online...".
+        final String supportSite = System.getProperty("e.gui.HelpMenu.supportSite");
+        if (supportSite != null) {
+            menu.add(new WebLinkAction("Get Help Online...", supportSite));
+        } else {
+            menu.add(new PlaceholderAction("Get Help Online..."));
+        }
         
         if (GuiUtilities.isMacOs() == false) {
             // GNOME and Win32 users expect a link to the application's about box on the help menu.
