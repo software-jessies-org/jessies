@@ -148,8 +148,8 @@ public class TerminatorPreferences extends Preferences {
                     put(key, ((double) slider.getValue())/256);
                 }
             });
-            // FIXME: Disable the slider if the JRE provably doesn't support setting the opacity.
-            //slider.setEnabled(GuiUtilities.isWindows() == false);
+            // Only enable the slider if the JVM seems likely to support setFrameAlpha.
+            slider.setEnabled(GuiUtilities.canSetFrameAlpha());
             formPanels.get(1).addRow(description + ":", slider);
         }
     }
