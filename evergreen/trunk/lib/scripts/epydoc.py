@@ -7,8 +7,6 @@ looking for documentation, but it won't provide it in convenient form, nor is
 its command-line interface convenient.
 """
 
-__author__ = 'Elliott Hughes <enh@jessies.org>'
-
 import keyword
 import inspect
 import pydoc
