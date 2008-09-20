@@ -95,6 +95,9 @@ class Terminator
         }
         invoker.add_property("org.jessies.terminator.signalMap", signalMap.join(" "))
         
+        invoker.add_property("e.gui.HelpMenu.supportAddress", "terminator-users@googlegroups.com")
+        invoker.add_property("e.gui.HelpMenu.supportSite", "http://groups.google.com/group/terminator-users")
+        
         invoker.invoke()
     end
     
