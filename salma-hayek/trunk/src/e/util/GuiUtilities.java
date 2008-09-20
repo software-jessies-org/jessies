@@ -315,13 +315,45 @@ public class GuiUtilities {
     }
     
     /**
+     * Guesses whether setFrameAlpha is likely to work.
+     */
+    public static boolean canSetFrameAlpha() {
+        // setFrameAlpha works on any version of Mac OS we can still run on.
+        // setFrameAlpha may or may not work on any given Linux, and we've no good way of knowing.
+        // setFrameAlpha only works on Windows if you're running Java 6 "6u10" (it doesn't even work on Java 7 yet).
+        return isWindows() == false || getAwtUtilitiesSetWindowOpacity() != null;
+    }
+    
+    private static Method getAwtUtilitiesSetWindowOpacity() {
+        // When we require Java 6, we can move this inside setFrameAlpha (and remove the workarounds currently there).
+        // Until then, it's useful as a kind of "feature test" for setFrameAlpha on Windows (via canSetFrameAlpha).
+        try {
+            // This is only available on 6u10 and later (see Sun bug 6633275).
+            // com.sun.awt.AWTUtilities.setWindowOpacity(frame, alpha);
+            final Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
+            return awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
+        } catch (Exception ex) {
+            // No setWindowOpacity for you, then. Not unexpected.
+            return null;
+        }
+    }
+    
+    /**
      * Sets the opacity (1.0 => fully opaque, 0.0 => fully transparent) of the given Frame.
      * http://elliotth.blogspot.com/2007/08/transparent-java-windows-on-x11.html
      */
     public static void setFrameAlpha(JFrame frame, double alpha) {
+        final Method setWindowOpacityMethod = getAwtUtilitiesSetWindowOpacity();
+        if (setWindowOpacityMethod != null) {
+            try {
+                setWindowOpacityMethod.invoke(null, (Window) frame, (float) alpha);
+            } catch (Throwable th) {
+                Log.warn("com.sun.awt.AWTUtilities.setWindowOpacity failed.", th);
+            }
+            return;
+        }
+        
         try {
-            // FIXME: maybe test whether com.sun.awt.AWTUtilities is available, and if so go straight to that?
-            
             Field peerField = Component.class.getDeclaredField("peer");
             peerField.setAccessible(true);
             Object peer = peerField.get(frame);
@@ -341,12 +373,10 @@ public class GuiUtilities {
                     frame.getRootPane().putClientProperty("Window.alpha", alpha);
                 }
             } else if (isWindows()) {
-                // This only works on 6u10 and later (see Sun bug 6633275).
-                // com.sun.awt.AWTUtilities.setWindowOpacity(frame, alpha);
-                Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-                Method setWindowOpacityMethod = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
-                setWindowOpacityMethod.invoke(null, (Window) frame, (float) alpha);
+                // If you weren't taken care of above, we have no work-around for you.
             } else {
+                // FIXME: remove this when everyone has setWindowOpacity, which is likely to be long before Compiz becomes less trouble than it's worth.
+                
                 // long windowId = peer.getWindow();
                 Class<?> xWindowPeerClass = Class.forName("sun.awt.X11.XWindowPeer");
                 Method getWindowMethod = xWindowPeerClass.getMethod("getWindow", new Class[0]);
