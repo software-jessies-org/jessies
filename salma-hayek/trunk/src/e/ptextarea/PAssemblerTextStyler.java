@@ -140,10 +140,11 @@ public class PAssemblerTextStyler extends PAbstractLanguageStyler {
         if (line.startsWith("//", atIndex)) {
             // C++ comments are allowed.
             return true;
-    } else if (line.startsWith("#", atIndex)) {
+        } else if (line.startsWith("#", atIndex)) {
             // For compatibility with old assemblers, gas(1) also accepts # as comment-to-EOL most of the time.
-            // ARM also uses "#" for integer literals ("mov r0, #1", say), but insisting on a space seems like a heuristic that's likely to work.
-            if (line.length() == atIndex + 1 || line.charAt(atIndex + 1) == ' ') {
+            // ARM also uses "#" for integer literals ("mov r0, #1", say).
+            // Insisting on the "#" appearing at the start of the line or having a space after it seems like a likely heuristic.
+            if (atIndex == 0 || line.length() == atIndex + 1 || line.charAt(atIndex + 1) == ' ') {
                 return true;
             }
         }
