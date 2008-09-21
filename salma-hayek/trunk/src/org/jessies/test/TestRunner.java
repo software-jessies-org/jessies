@@ -16,6 +16,29 @@ import java.lang.reflect.*;
  * The trade-off for not requiring any configuration or naming convention is
  * that we need to load all the classes in the supplied directories to see if
  * they contain tests.
+ * 
+ * Some notes on why this particular wheel needed reinventing, to help future
+ * readers judge whether it's time to retire this stuff:
+ * 
+ * 1. JUnit is the established player, but it's not part of the JRE/JDK, so it
+ * would have been another build dependency to deal with (even if there weren't
+ * other reasons to dislike JUnit). Sorting that out for all our supported
+ * platforms seems more expensive than a couple of hundred lines of simple Java.
+ * 
+ * 2. As mentioned above, the desire was to be able to say "run all the tests
+ * to be found in classes in this directory".
+ * 
+ * 3. Keeping tests in separate classes (let alone a separate tree) is distasteful
+ * because it seems to lead to a lowering of standards for code that's "only test
+ * code", extra contortions in the tested code to provide access to otherwise
+ * inaccessible internals, and no reason to ask "is this test worth writing?"
+ * which seems to be a disease amongst the "test infected" (even though their
+ * leaders warn against this, everyone loves a silver bullet).
+ * 
+ * 4. Trivially, it's always annoyed me that equality tests in JUnit-inspired
+ * frameworks are backwards, in the pre-GCC "0 == rc" style C programmers used
+ * to use to protect against =/== mistakes. That's no longer an appropriate C/C++
+ * style, and that has never been an appropriate Java style. Let it go, dudes.
  */
 public class TestRunner {
     // We're likely to be run by make(1), so we follow usual Unix status conventions.
