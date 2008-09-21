@@ -80,25 +80,22 @@ public class TestRunner {
     private List<String> findClassNames(String[] directoryNames) {
         List<String> result = new ArrayList<String>();
         for (String directoryName : directoryNames) {
-            findClassNames(directoryName.length(), new File(directoryName), result);
+            findClassNames(new File(directoryName), "", result);
         }
         verbose("Total classes found: " + result.size());
         return result;
     }
     
-    private void findClassNames(int rootLength, File directory, List<String> result) {
+    private void findClassNames(File directory, String packageName, List<String> result) {
         // FIXME: parallelize?
-        for (File file : directory.listFiles()) {
-            if (file.isDirectory()) {
-                findClassNames(rootLength, file, result);
+        for (String filename : directory.list()) {
+            if (filename.indexOf('$') != -1) {
+                // We're not interested in inner classes.
+            } else if (filename.endsWith(".class")) {
+                String className = filename.substring(0, filename.length() - ".class".length());
+                result.add(packageName + className);
             } else {
-                String className = file.toString();
-                if (className.endsWith(".class") && className.indexOf("$") == -1) {
-                    className = className.substring(rootLength); // Remove the classpath root.
-                    className = className.replaceAll("\\.class$", ""); // Remove the trailing ".class".
-                    className = className.replace(File.separatorChar, '.'); // Rewrite fully-qualified names.
-                    result.add(className);
-                }
+                findClassNames(new File(directory, filename), packageName + filename + ".", result);
             }
         }
     }
