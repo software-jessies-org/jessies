@@ -149,7 +149,10 @@ public class TerminatorTabbedPane extends JTabbedPane {
         String switchMessage = "";
         String key = tabIndexToKey(index);
         if (key != null) {
-            String primaryModifier = GuiUtilities.isMacOs() ? "\u2318" : "Alt+";
+            String primaryModifier = KeyEvent.getKeyModifiersText(GuiUtilities.getDefaultKeyStrokeModifier()) + "+";
+            if (GuiUtilities.isMacOs()) {
+                primaryModifier = "\u2318";
+            }
             switchMessage = "Use " + primaryModifier + key + " to switch to this tab.<br>";
         }
         
