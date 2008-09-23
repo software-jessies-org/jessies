@@ -336,14 +336,10 @@ class Java
   
   def invoke(extra_app_arguments = [])
     @extra_app_arguments = extra_app_arguments
-    launch(@dock_name)
+    report_exceptions(@dock_name) { launch() }
   end
   
-  def launch(app_name)
-    report_exceptions(app_name) { launch0() }
-  end
-  
-  def launch0()
+  def launch()
     # If we're using our own launcher, it'll worry about finding an appropriate JVM version and reporting errors.
     # If we're using Sun's java(1), we need to do some pre-flight checks.
     if @launcher =~ /java$/
