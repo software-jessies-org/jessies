@@ -81,6 +81,9 @@ public class WindowMenu {
     }
     
     private void removeWindow(Frame f) {
+        f.removePropertyChangeListener("title", windowTitleListener);
+        f.removeWindowListener(windowEventListener);
+        f.removeWindowFocusListener(windowEventListener);
         windows.remove(f);
         updateMenus();
     }
