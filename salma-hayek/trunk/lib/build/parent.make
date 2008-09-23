@@ -19,6 +19,8 @@ SUBDIRS := $(wildcard $(SUBDIRS))
 default: update build
 .PHONY: build
 build: recurse.build
+.PHONY: test
+test: recurse.test
 .PHONY: install
 install: recurse.install
 .PHONY: installer
