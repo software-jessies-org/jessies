@@ -13,6 +13,8 @@ import terminator.view.highlight.*;
  * the pop-up menu on all platforms.
  */
 public class TerminatorMenuBar extends EMenuBar {
+	private static int defaultKeyStrokeModifiers = GuiUtilities.getDefaultKeyStrokeModifier();
+	
 	private Action[] customWindowMenuItems = new Action[] {
 		new MoveTabAction(+1),
 		new MoveTabAction(-1),
@@ -24,7 +26,11 @@ public class TerminatorMenuBar extends EMenuBar {
 		add(makeFileMenu());
 		add(makeEditMenu());
 		add(makeScrollbackMenu());
-		add(WindowMenu.getSharedInstance().makeJMenu(customWindowMenuItems));
+		if (GuiUtilities.isMacOs()) {
+			add(WindowMenu.getSharedInstance().makeJMenu(customWindowMenuItems));
+		} else {
+			add(makeTabsMenu());
+		}
 		add(makeHelpMenu());
 	}
 	
@@ -85,26 +91,53 @@ public class TerminatorMenuBar extends EMenuBar {
 		return menu;
 	}
 	
+	private JMenu makeTabsMenu() {
+		final JMenu menu = new JMenu("Tabs");
+		for (Action action : customWindowMenuItems) {
+			menu.add(action);
+		}
+		return menu;
+	}
+	
 	private JMenu makeHelpMenu() {
 		HelpMenu helpMenu = new HelpMenu();
 		return helpMenu.makeJMenu();
 	}
 	
 	/**
-	 * Tests whether the given event corresponds to a keyboard
-	 * equivalent.
+	 * Tests whether the given event corresponds to a keyboard equivalent.
 	 */
 	public static boolean isKeyboardEquivalent(KeyEvent event) {
-		final int modifier = GuiUtilities.getDefaultKeyStrokeModifier();
-		return ((event.getModifiers() & modifier) == modifier);
+		final int modifiers = defaultKeyStrokeModifiers;
+		return ((event.getModifiers() & modifiers) == modifiers);
 	}
 	
+	/**
+	 * Returns the appropriate keystroke modifiers for terminal-related actions.
+	 */
+	public static int getDefaultKeyStrokeModifiers() {
+		return defaultKeyStrokeModifiers;
+	}
+	
+	/**
+	 * Sets the appropriate keystroke modifiers for terminal-related actions.
+	 * On Mac OS, the command key is spare anyway, but on Linux and Windows we'd normally use control.
+	 * That's no good in a terminal emulator, because we need to be able to pass things like control-c through.
+	 */ 
+	public static void setDefaultKeyStrokeModifiers(int modifiers) {
+		defaultKeyStrokeModifiers = modifiers;
+	}
+	
+	// Semi-duplicated from GuiUtilities so we can apply our custom modifiers if needed.
+	// Use the GuiUtilities version for actions that aren't terminal-related, to get the system-wide defaults.
 	private static KeyStroke makeKeyStroke(String key) {
-		return GuiUtilities.makeKeyStroke(key, false);
+		return GuiUtilities.makeKeyStrokeWithModifiers(defaultKeyStrokeModifiers, key);
 	}
 	
+	// Semi-duplicated from GuiUtilities so we can apply our custom modifiers if needed.
+	// Use the GuiUtilities version for actions that aren't terminal-related, to get the system-wide defaults.
 	private static KeyStroke makeShiftedKeyStroke(String key) {
-		return GuiUtilities.makeKeyStroke(key, true);
+		return GuiUtilities.makeKeyStrokeWithModifiers(defaultKeyStrokeModifiers | InputEvent.SHIFT_MASK, key);
 	}
 	
 	private static Component getFocusedComponent() {
