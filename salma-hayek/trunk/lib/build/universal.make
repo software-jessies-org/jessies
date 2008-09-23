@@ -921,15 +921,15 @@ run-remover.msi:
 	msiexec /x $(NATIVE_NAME_FOR_INSTALLERS)
 
 .PHONY: test
-test:
-	@echo Testing...
-	./tests/run_tests
+test: build
+	@echo Running unit tests...
+	$(SCRIPT_PATH)/org.jessies.TestRunner $(PROJECT_ROOT)/.generated/classes
 
 .PHONY: gcj
 gcj:
 	rm -rf .generated/classes/ && JAVA_COMPILER=/usr/bin/gcj make && rm -rf .generated && make && sudo mv $(MACHINE_PROJECT_NAME) /usr/bin
 
 .PHONY: findbugs
-findbugs:
+findbugs: build
 	@echo Running findbugs...
 	findbugs -textui -emacs -auxclasspath $(call makeNativePath,$(EXTRA_JARS)) -sourcepath $(subst $(SPACE),:,$(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJECT_ROOT)/src)) $(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJECT_ROOT)/.generated/classes)
