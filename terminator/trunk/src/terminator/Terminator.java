@@ -4,6 +4,7 @@ import com.apple.eawt.*;
 import e.gui.*;
 import e.util.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -197,7 +198,11 @@ public class Terminator {
 		// At the moment, we assume that Linux users who want characters not on their keyboard will switch keyboard mapping dynamically (which works fine).
 		// We can avoid the question on Mac OS for now because disabling input methods doesn't currently work properly, and we don't get the key events anyway.
 		if (GuiUtilities.isMacOs() == false) {
-			GuiUtilities.setDefaultKeyStrokeModifier(preferences.getBoolean(TerminatorPreferences.USE_ALT_AS_META) ? java.awt.event.KeyEvent.SHIFT_MASK | java.awt.event.KeyEvent.CTRL_MASK : java.awt.event.KeyEvent.ALT_MASK);
+			int modifiers = KeyEvent.ALT_MASK;
+			if (preferences.getBoolean(TerminatorPreferences.USE_ALT_AS_META)) {
+				modifiers = KeyEvent.SHIFT_MASK | KeyEvent.CTRL_MASK;
+			}
+			TerminatorMenuBar.setDefaultKeyStrokeModifiers(modifiers);
 		}
 		
 		for (int i = 0; i < frames.size(); ++i) {

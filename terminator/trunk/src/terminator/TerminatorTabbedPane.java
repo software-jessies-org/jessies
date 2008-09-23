@@ -149,7 +149,7 @@ public class TerminatorTabbedPane extends JTabbedPane {
         String switchMessage = "";
         String key = tabIndexToKey(index);
         if (key != null) {
-            String primaryModifier = KeyEvent.getKeyModifiersText(GuiUtilities.getDefaultKeyStrokeModifier()) + "+";
+            String primaryModifier = KeyEvent.getKeyModifiersText(TerminatorMenuBar.getDefaultKeyStrokeModifiers()) + "+";
             if (GuiUtilities.isMacOs()) {
                 primaryModifier = "\u2318";
             }

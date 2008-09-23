@@ -83,7 +83,9 @@ public class TerminatorFrame extends JFrame {
 		pack();
 		setVisible(true);
 		
-		WindowMenu.getSharedInstance().addWindow(this);
+		if (GuiUtilities.isMacOs()) {
+			WindowMenu.getSharedInstance().addWindow(this);
+		}
 		GuiUtilities.finishGnomeStartup();
 	}
 	
