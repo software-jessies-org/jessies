@@ -18,7 +18,7 @@ public class GuiUtilities {
     private GuiUtilities() {
     }
     
-    private static int defaultKeyStrokeModifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    private static final int defaultKeyStrokeModifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     
     /**
      * An invisible cursor, useful if you want to hide the cursor when the
@@ -80,14 +80,6 @@ public class GuiUtilities {
      */
     public static boolean isGtk() {
         return UIManager.getLookAndFeel().getClass().getName().contains("GTK");
-    }
-    
-    /**
-     * Used to override the system's default keyboard equivalent modifier.
-     * Useful in a terminal emulator on a platform where the default is Control (and probably nowhere else).
-     */
-    public static void setDefaultKeyStrokeModifier(int modifier) {
-        defaultKeyStrokeModifier = modifier;
     }
     
     public static int getDefaultKeyStrokeModifier() {
