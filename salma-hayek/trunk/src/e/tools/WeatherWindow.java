@@ -26,6 +26,9 @@ public class WeatherWindow extends MainFrame {
         setBackground(BACKGROUND_COLOR);
         setContentPane(makeUi());
         pack();
+        
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrameUtilities.closeOnEsc(this);
     }
     
     private JComponent makeUi() {
@@ -60,7 +63,7 @@ public class WeatherWindow extends MainFrame {
             FileUtilities.close(in);
         }
         
-        Pattern cityNamePattern = Pattern.compile("^\\s+<title>BBC.* Forecast in .* for (\\S+),");
+        Pattern cityNamePattern = Pattern.compile("^\\s+<title>BBC.* Forecast in .* for (.+),");
         Pattern dayNamePattern = Pattern.compile("class=\"weatherday\".*strong>(\\S+)<br");
         Pattern imageUrlPattern = Pattern.compile("img src=\"(\\S+\\/fiveday_sym\\/\\d+\\S+)\"");
         Pattern dayTemperaturePattern = Pattern.compile("class=\"temptxt\"><strong>(\\d+)<.*Day ");
