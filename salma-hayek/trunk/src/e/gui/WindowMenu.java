@@ -14,6 +14,10 @@ import javax.swing.*;
  * 
  * http://developer.apple.com/technotes/tn/tn2042.html#Section2_2
  * 
+ * Code calling this should probably be guarded by a GuiUtilities.isMacOs() test.
+ * Linux and Windows offer their own system-wide "minimize" and "zoom" equivalents.
+ * Neither has an equivalent of "bring all to front", and users don't expect it.
+ * 
  * FIXME: should use all the icons mentioned in the UI guidelines.
  */
 public class WindowMenu {
@@ -22,14 +26,13 @@ public class WindowMenu {
     private final WindowEventListener windowEventListener = new WindowEventListener();
     private final WindowTitleListener windowTitleListener = new WindowTitleListener();
     
-    private ArrayList<Frame> windows;
+    private final ArrayList<Frame> windows = new ArrayList<Frame>();
     
     private WindowMenu() {
-        windows = new ArrayList<Frame>();
     }
     
     /**
-     * Returns this application's handle on the window menu system.
+     * Returns this application's WindowMenu.
      */
     public static WindowMenu getSharedInstance() {
         return INSTANCE;
