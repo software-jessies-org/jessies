@@ -438,6 +438,14 @@ class Java
           exit(interruptExitStatus)
         end
       }
+      
+      # It's not an error for a command-line program to exit with a non-zero
+      # exit status.
+      is_gui = @initiate_startup_notification
+      if !is_gui && $?.exitstatus() == 1
+        exit($?.exitstatus())
+      end
+      
       messageLines = []
       messageLines << "Java failed with " + $?.inspect()
       messageLines << ""
