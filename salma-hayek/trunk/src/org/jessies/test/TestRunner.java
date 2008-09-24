@@ -80,7 +80,12 @@ public class TestRunner {
     private List<String> findClassNames(String[] directoryNames) {
         List<String> result = new ArrayList<String>();
         for (String directoryName : directoryNames) {
-            findClassNames(new File(directoryName), "", result);
+            File directory = new File(directoryName);
+            if (directory.isDirectory()) {
+                findClassNames(directory, "", result);
+            } else {
+                error("'" + directoryName + "' is not a directory");
+            }
         }
         verbose("Total classes found: " + result.size());
         return result;
