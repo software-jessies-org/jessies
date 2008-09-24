@@ -663,9 +663,11 @@ build: $(BUILD_TARGETS)
 	mkdir -p $(@D) && \
 	touch $@
 
+# With JAVA_CLASSES_PREREQUISITES we're really only interested in .class files that are newer than the sentinel, especially those from salma-hayek when we're building other projects.
 .generated/java.build-finished: .generated/java.build-started $(JAVA_CLASSES_PREREQUISITES)
 	$(BUILD_JAVA)
 
+# FIXME: This is needed to build from clean but conflicts with the above rule.
 %.class: .generated/java.build-finished
 	test -r $@ || { echo Failed to build $@; exit 1; }
 
