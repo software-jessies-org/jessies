@@ -923,7 +923,8 @@ run-remover.msi:
 .PHONY: test
 test: build
 	@echo Running unit tests...
-	$(SCRIPT_PATH)/org.jessies.TestRunner $(PROJECT_ROOT)/.generated/classes
+	# Beware of passing absolute Cygwin paths to Java.
+	$(SCRIPT_PATH)/org.jessies.TestRunner .generated/classes
 
 .PHONY: gcj
 gcj:
