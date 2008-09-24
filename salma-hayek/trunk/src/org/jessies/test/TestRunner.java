@@ -100,7 +100,11 @@ public class TestRunner {
                 String className = filename.substring(0, filename.length() - ".class".length());
                 result.add(packageName + className);
             } else {
-                findClassNames(new File(directory, filename), packageName + filename + ".", result);
+                File file = new File(directory, filename);
+                if (file.isDirectory() == false) {
+                    error("'" + file + "' is not a directory or a .class file");
+                }
+                findClassNames(file, packageName + filename + ".", result);
             }
         }
     }
