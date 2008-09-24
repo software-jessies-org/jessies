@@ -26,6 +26,13 @@ def isWorthyOfOutput(line)
     return true
   end
   
+  # We also want to see make warnings like:
+  # make: Circular .generated/classes/e/debug/EventDispatchThreadHangMonitor$Tests$5$1$1.class <- .generated/java.build-finished dependency dropped.
+  # make[1]: Circular /home/martind/software.jessies.org/work/salma-hayek/.generated/classes/e/tools/JarExplorer$3.class <- .generated/java.build-finished dependency dropped.
+  if line.match(/^make(\[\d+\])?: /)
+    return true
+  end
+  
   return false
 end
 
