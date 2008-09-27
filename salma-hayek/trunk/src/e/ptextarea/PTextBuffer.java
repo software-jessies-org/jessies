@@ -151,12 +151,17 @@ public class PTextBuffer implements CharSequence {
             
             // Decode the raw bytes into characters.
             final ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteBuffer.capacity());
-            final char[] chars = decoder.getCharArray();
             final String encoding = decoder.getEncodingName();
+            char[] chars = decoder.getCharArray();
+            if (decoder.sawCarriageReturns()) {
+                chars = fixLineEndings(chars);
+            } else {
+                putProperty(LINE_ENDING_PROPERTY, "\n");
+            }
             
             // Use the characters and the inferred encoding.
             putProperty(CHARSET_PROPERTY, encoding);
-            setText(fixLineEndings(chars));
+            setText(chars);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
@@ -165,30 +170,10 @@ public class PTextBuffer implements CharSequence {
     }
     
     private char[] fixLineEndings(char[] chars) {
-        String lineEnding = "\n";
-        if (charArrayContains(chars, '\r')) {
-            String s = new String(chars);
-            if (s.contains("\r\n")) {
-                lineEnding = "\r\n";
-                s = s.replaceAll("\r\n", "\n");
-            } else {
-                lineEnding = "\r";
-                s = s.replaceAll("\r", "\n");
-            }
-            chars = s.toCharArray();
-        }
+        final String s = new String(chars);
+        final String lineEnding = s.contains("\r\n") ? "\r\n" : "\r";
         putProperty(LINE_ENDING_PROPERTY, lineEnding);
-        return chars;
-    }
-    
-    private static final boolean charArrayContains(char[] chars, char ch) {
-        final int end = chars.length;
-        for (int i = 0; i < end; ++i) {
-            if (chars[i] == ch) {
-                return true;
-            }
-        }
-        return false;
+        return s.replaceAll(lineEnding, "\n").toCharArray();
     }
     
     /**

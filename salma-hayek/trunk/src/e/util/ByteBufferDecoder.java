@@ -7,27 +7,24 @@ import java.nio.charset.*;
  * Translates a ByteBuffer into a char[], trying to guess the character encoding from the content.
  */
 public class ByteBufferDecoder {
-    private ByteBuffer byteBuffer;
-    private int byteCount;
+    private final ByteBuffer byteBuffer;
+    private final int byteCount;
     
     private String encoding;
     private char[] charArray;
+    private boolean sawCarriageReturns;
     
     public ByteBufferDecoder(ByteBuffer byteBuffer, int byteCount) {
         this.byteBuffer = byteBuffer;
         this.byteCount = byteCount;
+        this.sawCarriageReturns = false;
+        decodeByteBuffer();
     }
     
     /**
      * Returns a char[] containing the characters found in the ByteBuffer.
      */
     public char[] getCharArray() {
-        if (charArray == null) {
-            CharBuffer charBuffer = decodeByteBuffer();
-            if (charArray == null) {
-                charArray = extractCharArray(charBuffer);
-            }
-        }
         return charArray;
     }
     
@@ -35,30 +32,40 @@ public class ByteBufferDecoder {
      * Returns the character encoding assumed when decoding the ByteBuffer.
      */
     public String getEncodingName() {
-        if (encoding == null) {
-            throw new IllegalStateException("this ByteBufferDecoder hasn't yet decoded anything");
-        }
         return encoding;
     }
     
-    private CharBuffer decodeByteBuffer() {
+    /**
+     * Returns true if at least one of the characters was a carriage return ('\r').
+     */
+    public boolean sawCarriageReturns() {
+        return sawCarriageReturns;
+    }
+    
+    private void decodeByteBuffer() {
         // Fast-path ASCII.
         if (ByteBufferUtilities.isAsciiByteBuffer(byteBuffer, byteCount)) {
             // Most files will be plain ASCII, and we can "decode" them 5x cheaper with just a cast.
             // That speed-up includes the added cost of checking to see if the byte[] only contains ASCII.
-            // FIXME: we could make a further slight saving by checking for '\r' at the same time.
             encoding = "UTF-8";
             charArray = new char[byteCount];
             for (int i = 0; i < byteCount; ++i) {
-                charArray[i] = (char) byteBuffer.get(i);
+                char ch = (char) byteBuffer.get(i);
+                charArray[i] = ch;
+                if (ch == '\r') {
+                    sawCarriageReturns = true;
+                }
             }
-            return null;
         } else {
-            return decodeNonAsciiByteBuffer();
+            decodeNonAsciiByteBuffer();
         }
     }
     
-    private CharBuffer decodeNonAsciiByteBuffer() {
+    private void decodeNonAsciiByteBuffer() {
+        charArray = extractCharArray(byteBufferToCharBuffer());
+    }
+    
+    private CharBuffer byteBufferToCharBuffer() {
         // Assume UTF-8, but check for a UTF-16 BOM.
         String charsetName = "UTF-8";
         if (byteCount > 1) {
