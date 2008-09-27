@@ -44,20 +44,21 @@ public class ByteBufferDecoder {
     
     private void decodeByteBuffer() {
         // Fast-path ASCII.
-        if (ByteBufferUtilities.isAsciiByteBuffer(byteBuffer, byteCount)) {
-            // Most files will be plain ASCII, and we can "decode" them 5x cheaper with just a cast.
-            // That speed-up includes the added cost of checking to see if the byte[] only contains ASCII.
-            encoding = "UTF-8";
-            charArray = new char[byteCount];
-            for (int i = 0; i < byteCount; ++i) {
-                char ch = (char) byteBuffer.get(i);
-                charArray[i] = ch;
-                if (ch == '\r') {
-                    sawCarriageReturns = true;
-                }
+        // Most files will be plain ASCII, and we can "decode" them 5x cheaper with just a cast.
+        this.encoding = "UTF-8";
+        this.charArray = new char[byteCount];
+        for (int i = 0; i < byteCount; ++i) {
+            final char ch = (char) byteBuffer.get(i);
+            // FIXME: this range is a little bit arbitrary, but excluding NUL, DEL, and anything with the top bit set seems reasonable.
+            if (ch == 0 || ch > 126) {
+                // Okay, this isn't ASCII. Bail out and pay for a proper decoding.
+                decodeNonAsciiByteBuffer();
+                return;
             }
-        } else {
-            decodeNonAsciiByteBuffer();
+            if (ch == '\r') {
+                sawCarriageReturns = true;
+            }
+            charArray[i] = ch;
         }
     }
     
