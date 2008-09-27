@@ -137,6 +137,7 @@ endef
 $(eval $(OBJECTS): C_AND_CXX_FLAGS += $(LOCAL_C_AND_CXX_FLAGS))
 # LOCAL_LDFLAGS is evaluated here, so it can refer to local variables but not automatic ones.
 $(eval $(EXECUTABLES) $(SHARED_LIBRARY): LDFLAGS += $(LOCAL_LDFLAGS))
+$(NEW_JNI_HEADER): JNI_BASE_NAME := $(JNI_BASE_NAME)
 $(NEW_JNI_HEADER): JNI_CLASS_NAME := $(JNI_CLASS_NAME)
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 
@@ -161,7 +162,7 @@ $(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
 ifneq "$(JNI_SOURCE)" ""
 
 $(NEW_JNI_HEADER): $(PROJECT_ROOT)/.generated/java.build-finished $(JAVAHPP) $(SALMA_HAYEK)/.generated/java.build-finished $(SALMA_HAYEK)/.generated/$(TARGET_DIRECTORY)/bin/java-launcher$(EXE_SUFFIX)
-	@echo "Generating JNI header..."
+	@echo "Generating JNI header $(JNI_BASE_NAME).h..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	$(JAVAHPP) -classpath .generated/classes $(JNI_CLASS_NAME) > $@.tmp && \
