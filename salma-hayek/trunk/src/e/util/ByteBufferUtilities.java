@@ -45,17 +45,6 @@ public final class ByteBufferUtilities {
         return false;
     }
     
-    public static boolean isAsciiByteBuffer(ByteBuffer byteBuffer, final int byteCount) {
-        for (int i = 0; i < byteCount; ++i) {
-            byte b = byteBuffer.get(i);
-            // FIXME: this range is a little bit arbitrary, but excluding NUL and DEL and anything with the top bit set seems reasonable.
-            if (b < 1 || b > 126) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
     private ByteBufferUtilities() {
     }
 }
