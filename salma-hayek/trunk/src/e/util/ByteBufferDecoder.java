@@ -49,8 +49,8 @@ public class ByteBufferDecoder {
         this.charArray = new char[byteCount];
         for (int i = 0; i < byteCount; ++i) {
             final char ch = (char) byteBuffer.get(i);
-            // FIXME: this range is a little bit arbitrary, but excluding NUL, DEL, and anything with the top bit set seems reasonable.
-            if (ch == 0 || ch > 126) {
+            // FIXME: this range is a little bit arbitrary, but excluding NUL, and DEL and above seems reasonable.
+            if (ch == 0 || ch >= 0x7f) {
                 // Okay, this isn't ASCII. Bail out and pay for a proper decoding.
                 decodeNonAsciiByteBuffer();
                 return;
