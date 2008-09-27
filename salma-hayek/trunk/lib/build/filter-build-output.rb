@@ -29,7 +29,13 @@ def isWorthyOfOutput(line)
   # We also want to see make warnings like:
   # make: Circular .generated/classes/e/debug/EventDispatchThreadHangMonitor$Tests$5$1$1.class <- .generated/java.build-finished dependency dropped.
   # make[1]: Circular /home/martind/software.jessies.org/work/salma-hayek/.generated/classes/e/tools/JarExplorer$3.class <- .generated/java.build-finished dependency dropped.
-  if line.match(/^make(\[\d+\])?: /)
+  # But we don't want to see:
+  # make[1]: Entering directory `/Users/mad/software.jessies.org/work/salma-hayek'
+  # make[1]: Leaving directory `/Users/mad/software.jessies.org/work/salma-hayek'
+  if line.match(/^make(?:\[\d+\])?: ((?:Entering|Leaving) directory )?/)
+    if $1 != nil
+      return false
+    end
     return true
   end
   
