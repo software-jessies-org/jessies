@@ -50,7 +50,7 @@ public class ByteBufferDecoder {
         for (int i = 0; i < byteCount; ++i) {
             final char ch = (char) byteBuffer.get(i);
             // FIXME: this range is a little bit arbitrary, but excluding NUL, and DEL and above seems reasonable.
-            if (ch == 0 || ch >= 0x7f) {
+            if (ch == Ascii.NUL || ch >= Ascii.DEL) {
                 // Okay, this isn't ASCII. Bail out and pay for a proper decoding.
                 decodeNonAsciiByteBuffer();
                 return;
