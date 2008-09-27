@@ -68,20 +68,29 @@ public final class TimingLogger {
      */
     public void dumpToLog() {
         if (splitCount == 0) {
-            Log.warn(label + ": took " + TimeUtilities.nsToString(System.nanoTime() - startNanos) + ".");
+            Log.warn(label + ": took " + nsToString(System.nanoTime() - startNanos) + ".");
         } else if (splitCount == 1) {
-            Log.warn(label + ": " + splits[0].splitLabel + " in " + TimeUtilities.nsToString(splits[0].splitNanos - startNanos) + ".");
+            Log.warn(label + ": " + splits[0].splitLabel + " in " + nsToString(splits[0].splitNanos - startNanos) + ".");
         } else {
             Log.warn(label + ": begin");
             long t = startNanos;
             long total = 0;
             for (int i = 0; i < splitCount; ++i) {
                 final long splitNanos = splits[i].splitNanos;
-                Log.warn(label + ":      " + TimeUtilities.nsToString(splitNanos - t) + ", " + splits[i].splitLabel);
+                Log.warn(label + ":      " + nsToString(splitNanos - t) + ", " + splits[i].splitLabel);
                 total += (splitNanos - t);
                 t = splitNanos;
             }
-            Log.warn(label + ": end, " + TimeUtilities.nsToString(total));
+            Log.warn(label + ": end, " + nsToString(total));
         }
+    }
+    
+    // We don't use TimeUtilities.nsToString because that tries to be clever and convert to human-readable units.
+    // The problem with that for this application is that we really want to make it easy to *compare* times.
+    // That's made a lot easier when all times are shown in the same unit (here seconds).
+    // TimeUtilities.nsToString makes it too easy to think 30 us is more important than 7 ms.
+    private static String nsToString(long ns) {
+        // FIXME: if we're looking at things that take more than a second, we might want to specify a 'width' too.
+        return String.format("%.08f s", TimeUtilities.nsToS(ns));
     }
 }
