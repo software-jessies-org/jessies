@@ -593,7 +593,7 @@ endef
 # This should remain the first reference to it, to keep us out of trouble.
 ALL_PER_DIRECTORY_TARGETS = $(error ALL_PER_DIRECTORY_TARGETS evaluated too early)
 
-BUILD_TARGETS += $(if $(JAVA_SOURCE_FILES),.generated/java.build-finished)
+BUILD_TARGETS += $(if $(JAVA_SOURCE_FILES),$(PROJECT_ROOT)/.generated/java.build-finished)
 BUILD_TARGETS += $(if $(REVISION_CONTROL_SYSTEM_DIRECTORY),.generated/build-revision.txt)
 TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
 # We deliberately omit the intermediate directory.
@@ -664,7 +664,7 @@ build: $(BUILD_TARGETS)
 	touch $@
 
 # With JAVA_CLASSES_PREREQUISITES we're really only interested in .class files that are newer than the sentinel, especially those from salma-hayek when we're building other projects.
-.generated/java.build-finished: .generated/java.build-started $(JAVA_CLASSES_PREREQUISITES)
+$(PROJECT_ROOT)/.generated/java.build-finished: .generated/java.build-started $(JAVA_CLASSES_PREREQUISITES)
 	$(BUILD_JAVA)
 
 .PHONY: clean

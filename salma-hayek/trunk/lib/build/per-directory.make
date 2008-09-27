@@ -160,7 +160,7 @@ $(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
 
 ifneq "$(JNI_SOURCE)" ""
 
-$(NEW_JNI_HEADER): .generated/java.build-finished $(JAVAHPP) $(SALMA_HAYEK)/.generated/java.build-finished $(SALMA_HAYEK)/.generated/$(TARGET_DIRECTORY)/bin/java-launcher$(EXE_SUFFIX)
+$(NEW_JNI_HEADER): $(PROJECT_ROOT)/.generated/java.build-finished $(JAVAHPP) $(SALMA_HAYEK)/.generated/java.build-finished $(SALMA_HAYEK)/.generated/$(TARGET_DIRECTORY)/bin/java-launcher$(EXE_SUFFIX)
 	@echo "Generating JNI header..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
