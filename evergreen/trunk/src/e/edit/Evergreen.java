@@ -25,9 +25,6 @@ public class Evergreen {
     private Minibuffer minibuffer;
     private JPanel statusArea;
     
-    /** The global find history for all FindDialog instances. */
-    private EHistoryComboBoxModel findHistory = new ChronologicalComboBoxModel();
-    
     /** Whether we're fully started. */
     private CountDownLatch startSignal = new CountDownLatch(1);
     
@@ -134,10 +131,6 @@ public class Evergreen {
         return frame;
     }
     
-    public EHistoryComboBoxModel getFindHistory() {
-        return findHistory;
-    }
-    
     public TagsPanel getTagsPanel() {
         return tagsPanel;
     }
@@ -175,7 +168,7 @@ public class Evergreen {
      * and replaces the matching prefix with the appropriate substitution. Returns the
      * original filename if there's no applicable rewrite.
      */
-    public String processPathRewrites(String filename) {
+    private String processPathRewrites(String filename) {
         String from;
         for (int i = 0; (from = Parameters.getParameter("path.rewrite.from." + i)) != null; i++) {
             if (filename.startsWith(from)) {
@@ -187,7 +180,7 @@ public class Evergreen {
         return filename;
     }
     
-    public static String processCygwinRewrites(String filename) {
+    private static String processCygwinRewrites(String filename) {
         // Perhaps we should replace processPathRewrites with a generalization of this method.
         // I'm imagining a script that we'd invoke on all platforms.
         // Our default script would invoke cygpath on Cygwin.
@@ -363,7 +356,7 @@ public class Evergreen {
      * FIXME: Consistency probably demands that this be called from
      * FileUtilities.getUserFriendlyName rather than openFile.
      */
-    public String normalizeWorkspacePrefix(String filename) {
+    private String normalizeWorkspacePrefix(String filename) {
         for (Workspace workspace : getWorkspaces()) {
             String friendlyPrefix = workspace.getRootDirectory();
             String canonicalPrefix = workspace.getCanonicalRootDirectory();
@@ -405,7 +398,7 @@ public class Evergreen {
      * we shouldn't be upset by a workspace seeming to be in the wrong place, as was
      * so easily the case with the previous implicit chronological order.
      */
-    public int getWorkspaceIndexInTabbedPane(String name) {
+    private int getWorkspaceIndexInTabbedPane(String name) {
         int index = 0;
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             String title = tabbedPane.getTitleAt(i);
@@ -481,7 +474,7 @@ public class Evergreen {
         return true;
     }
     
-    public void moveFilesToBestWorkspaces() {
+    private void moveFilesToBestWorkspaces() {
         for (Workspace workspace : getWorkspaces()) {
             workspace.moveFilesToBestWorkspaces();
         }
@@ -527,19 +520,11 @@ public class Evergreen {
         thread.start();
     }
     
-    public void createWorkspaceForCurrentDirectory() {
-        String currentDirectory = System.getProperty("user.dir");
-        WorkspaceProperties properties = new WorkspaceProperties();
-        properties.name = currentDirectory.substring(currentDirectory.lastIndexOf(File.separatorChar) + 1);
-        properties.rootDirectory = currentDirectory;
-        createWorkspace(properties);
-    }
-    
     public static String getResourceFilename(String leafName) {
         return System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "data" + File.separator + leafName;
     }
     
-    public void initWindowIcon() {
+    private void initWindowIcon() {
         JFrameUtilities.setFrameIcon(frame);
     }
     
@@ -613,16 +598,8 @@ public class Evergreen {
         return System.getProperty("preferencesDirectory") + File.separator + leafname;
     }
     
-    public String getDialogGeometriesPreferenceFilename() {
+    private String getDialogGeometriesPreferenceFilename() {
         return getPreferenceFilename("dialog-geometries");
-    }
-    
-    public String getOpenFileListPreferenceFilename() {
-        return getPreferenceFilename("open-file-list");
-    }
-    
-    public String getOpenWorkspaceListPreferenceFilename() {
-        return getPreferenceFilename("open-workspace-list");
     }
     
     private void readSavedState() {
@@ -709,7 +686,7 @@ public class Evergreen {
         return workspace;
     }
     
-    public void initWindowListener() {
+    private void initWindowListener() {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -718,17 +695,17 @@ public class Evergreen {
         });
     }
     
-    public void initWindow() {
+    private void initWindow() {
         frame = new JFrame("Evergreen");
         initWindowIcon();
         initWindowListener();
     }
     
-    public void initTagsPanel() {
+    private void initTagsPanel() {
         tagsPanel = new TagsPanel();
     }
     
-    public void initPreferences() {
+    private void initPreferences() {
         this.preferences = new EvergreenPreferences();
         preferences.readFromDisk();
         preferences.addPreferencesListener(new Preferences.Listener() {
@@ -744,7 +721,7 @@ public class Evergreen {
         });
     }
     
-    public void initStatusArea() {
+    private void initStatusArea() {
         statusLine = new EStatusBar();
         minibuffer = new Minibuffer();
         
