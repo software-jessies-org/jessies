@@ -101,7 +101,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         });
     }
     
-    public void initMatchList() {
+    private void initMatchList() {
         matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
