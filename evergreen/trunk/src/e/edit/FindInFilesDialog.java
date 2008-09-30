@@ -419,7 +419,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
     }
     
-    public void initMatchList() {
+    private void initMatchList() {
         matchTreeModel = new DefaultTreeModel(null);
         matchView = new ETree(matchTreeModel);
 
