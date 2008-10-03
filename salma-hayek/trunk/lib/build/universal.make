@@ -348,28 +348,6 @@ MACHINE_PROJECT_NAME := $(shell ruby -e 'puts("$(HUMAN_PROJECT_NAME)".downcase()
 BIN_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_DIRECTORY)/bin
 LIB_DIRECTORY = $(PROJECT_ROOT)/.generated/$(TARGET_DIRECTORY)/lib
 
-# Distributions end up under http://software.jessies.org/
-DIST_SSH_USER_AND_HOST = software@jessies.org
-# Different file types end up in different directories.
-# Note the use of the prerequisite's extension rather than that of the target, which is always phony.
-DIST_SUBDIRECTORY_FOR_PREREQUISITE = $(DIST_SUBDIRECTORY$(suffix $<))
-DIST_DIRECTORY = /home/software/downloads/$(if $(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(error sub-directory not specified for extension "$(suffix $<)"))
-# The html files are copied, with rsync, from www/ into this directory.
-DIST_SUBDIRECTORY.html = $(MACHINE_PROJECT_NAME)
-# The SOURCE_DIST ends up here - FIXME: it's binary, so you might want it somewhere else.
-# $(suffix)'s definition means we need .gz here not .tar.gz.
-DIST_SUBDIRECTORY.gz = $(MACHINE_PROJECT_NAME)
-# Debian's mirrors are in a top-level directory called debian.
-# I thought there might be some tool dependency on that.
-DIST_SUBDIRECTORY.deb = debian
-DIST_SUBDIRECTORY.dmg = mac
-DIST_SUBDIRECTORY.msi = windows
-# FIXME: We can't use the extension to determine the target OS if we're going to ship OS-specific distributions with such generic extensions as .tgz.
-# FIXME: I see we have DIST_SUBDIRECTORY.gz above, which reminds me that we deliberately switched from .tgz to .tar.gz.
-DIST_SUBDIRECTORY.tgz = windows
-DIST_SUBDIRECTORY.pkg = sunos
-DIST_SUBDIRECTORY.rpm = redhat
-
 REVISION_CONTROL_SYSTEM_DIRECTORIES += .hg
 REVISION_CONTROL_SYSTEM_DIRECTORIES += .svn
 REVISION_CONTROL_SYSTEM_DIRECTORIES += CVS
@@ -395,7 +373,6 @@ JAVA_CLASSES_PREREQUISITES := $(if $(WILDCARD.classes),$(shell find $(WILDCARD.c
 # If classes/ has been deleted, depending on its parent directory should get us rebuilt.
 JAVA_CLASSES_PREREQUISITES += $(if $(WILDCARD.classes),,.generated)
 $(takeProfileSample)
-SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
 
 define GENERATE_CHANGE_LOG.svn
   svn log > ChangeLog
@@ -565,6 +542,34 @@ NATIVE_NAME_FOR_INSTALLERS := '$(subst /,\,$(call convertToNativeFilenames,$(PUB
 
 # We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.
 PACKAGING_DIRECTORY = .generated/native/$(TARGET_DIRECTORY)/$(MACHINE_PROJECT_NAME)
+
+# ----------------------------------------------------------------------------
+# Distribution variables - where we upload to.
+# ----------------------------------------------------------------------------
+
+SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
+
+# Distributions end up under http://software.jessies.org/
+DIST_SSH_USER_AND_HOST = software@jessies.org
+# Different file types end up in different directories.
+# Note the use of the prerequisite's extension rather than that of the target, which is always phony.
+DIST_SUBDIRECTORY_FOR_PREREQUISITE = $(DIST_SUBDIRECTORY$(suffix $<))
+DIST_DIRECTORY = /home/software/downloads/$(if $(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(error sub-directory not specified for extension "$(suffix $<)"))
+# The html files are copied, with rsync, from www/ into this directory.
+DIST_SUBDIRECTORY.html = $(MACHINE_PROJECT_NAME)
+# The SOURCE_DIST ends up here - FIXME: it's binary, so you might want it somewhere else.
+# $(suffix)'s definition means we need .gz here not .tar.gz.
+DIST_SUBDIRECTORY.gz = $(MACHINE_PROJECT_NAME)
+# Debian's mirrors are in a top-level directory called debian.
+# I thought there might be some tool dependency on that.
+DIST_SUBDIRECTORY.deb = debian
+DIST_SUBDIRECTORY.dmg = mac
+DIST_SUBDIRECTORY.msi = windows
+# FIXME: We can't use the extension to determine the target OS if we're going to ship OS-specific distributions with such generic extensions as .tgz.
+# FIXME: I see we have DIST_SUBDIRECTORY.gz above, which reminds me that we deliberately switched from .tgz to .tar.gz.
+DIST_SUBDIRECTORY.tgz = windows
+DIST_SUBDIRECTORY.pkg = sunos
+DIST_SUBDIRECTORY.rpm = redhat
 
 # ----------------------------------------------------------------------------
 # Prevent us from using per-directory.make's local variables in universal.make
