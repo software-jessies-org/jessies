@@ -364,6 +364,9 @@ DIST_SUBDIRECTORY.gz = $(MACHINE_PROJECT_NAME)
 DIST_SUBDIRECTORY.deb = debian
 DIST_SUBDIRECTORY.dmg = mac
 DIST_SUBDIRECTORY.msi = windows
+# FIXME: We can't use the extension to determine the target OS if we're going to ship OS-specific distributions with such generic extensions as .tgz.
+# FIXME: I see we have DIST_SUBDIRECTORY.gz above, which reminds me that we deliberately switched from .tgz to .tar.gz.
+DIST_SUBDIRECTORY.tgz = windows
 DIST_SUBDIRECTORY.pkg = sunos
 DIST_SUBDIRECTORY.rpm = redhat
 
