@@ -11,22 +11,26 @@ SUBDIRS += terminator
 
 SUBDIRS := $(wildcard $(SUBDIRS))
 
+SIMPLE_TARGETS += build
+SIMPLE_TARGETS += clean
+SIMPLE_TARGETS += install
+SIMPLE_TARGETS += installer
+SIMPLE_TARGETS += native
+SIMPLE_TARGETS += test
+
+define MAKE_SIMPLE_TARGET
+.PHONY: $(1)
+$(1): recurse.$(1)
+endef
+
 # variables
 # ======================================================================
 # rules
 
 .PHONY: default
 default: update build
-.PHONY: build
-build: recurse.build
-.PHONY: test
-test: recurse.test
-.PHONY: install
-install: recurse.install
-.PHONY: installer
-installer: recurse.installer
-.PHONY: clean
-clean: recurse.clean
+
+$(foreach SIMPLE_TARGET,$(SIMPLE_TARGETS),$(eval $(call MAKE_SIMPLE_TARGET,$(SIMPLE_TARGET))))
 
 .PHONY: recurse.%
 recurse.%:
