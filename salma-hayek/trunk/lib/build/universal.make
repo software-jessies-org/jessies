@@ -508,6 +508,12 @@ makeInstallerName.msi = $(MACHINE_PROJECT_NAME)-$(1).msi
 INSTALLER_EXTENSIONS += msi
 INSTALLER_EXTENSIONS.Cygwin += msi
 
+# Some people can't use an installer that installs to "C:\Program Files".
+# The .msi file's contents don't seem conducive to manual extraction (7-zip says it just contains file1, file2 etc).
+makeInstallerName.tgz = $(MACHINE_PROJECT_NAME)-$(1).tgz
+INSTALLER_EXTENSIONS += tgz
+INSTALLER_EXTENSIONS.Cygwin += tgz
+
 makeInstallerName.dmg = $(MACHINE_PROJECT_NAME)-$(1).dmg
 INSTALLER_EXTENSIONS += dmg
 INSTALLER_EXTENSIONS.Darwin += dmg
@@ -770,6 +776,12 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	$(RM) $@ && \
 	cd $(@D) && \
 	fakeroot alien --to-rpm $(abspath $<)
+
+$(INSTALLER.tgz): $(MACHINE_PROJECT_NAME).app
+	@echo "Creating .tgz distribution..."
+	mkdir -p $(@D) && \
+	$(RM) $@ && \
+	tar -zcf $@ -C $(PACKAGING_DIRECTORY)/.. $(notdir $(PACKAGING_DIRECTORY))
 
 # ----------------------------------------------------------------------------
 # WiX
