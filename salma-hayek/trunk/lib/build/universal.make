@@ -490,9 +490,13 @@ INSTALLER_EXTENSIONS.Cygwin += msi
 
 # Some people can't use an installer that installs to "C:\Program Files".
 # The .msi file's contents don't seem conducive to manual extraction (7-zip says it just contains file1, file2 etc).
-makeInstallerName.tgz = $(MACHINE_PROJECT_NAME)-$(1).tgz
-INSTALLER_EXTENSIONS += tgz
-INSTALLER_EXTENSIONS.Cygwin += tgz
+makeInstallerName.gz = $(MACHINE_PROJECT_NAME)-$(1).tar.gz
+INSTALLER_EXTENSIONS += gz
+# The contents of a .deb or .rpm are easily extracted with the provided tools.
+# So this line is just here for testing.
+#INSTALLER_EXTENSIONS.Linux += gz
+# The contents of a .msi are not so easily extracted.
+INSTALLER_EXTENSIONS.Cygwin += gz
 
 makeInstallerName.dmg = $(MACHINE_PROJECT_NAME)-$(1).dmg
 INSTALLER_EXTENSIONS += dmg
@@ -557,17 +561,18 @@ DIST_SUBDIRECTORY_FOR_PREREQUISITE = $(DIST_SUBDIRECTORY$(suffix $<))
 DIST_DIRECTORY = /home/software/downloads/$(if $(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(error sub-directory not specified for extension "$(suffix $<)"))
 # The html files are copied, with rsync, from www/ into this directory.
 DIST_SUBDIRECTORY.html = $(MACHINE_PROJECT_NAME)
-# The SOURCE_DIST ends up here - FIXME: it's binary, so you might want it somewhere else.
 # $(suffix)'s definition means we need .gz here not .tar.gz.
-DIST_SUBDIRECTORY.gz = $(MACHINE_PROJECT_NAME)
+# We have to distinguish between the SOURCE_DIST and OS-specific .tar.gz distributions here.
+DIST_SUBDIRECTORY.gz = $(DIST_SUBDIRECTORY_FOR_$(notdir $<))
+DIST_SUBDIRECTORY_FOR_$(SOURCE_DIST_FILE) = $(MACHINE_PROJECT_NAME)
+# Pick "deb" (or "rpm") from "gz deb rpm".
+PRIMARY_INSTALLER_EXTENSION = $(firstword $(filter-out gz,$(INSTALLER_EXTENSIONS.$(TARGET_OS))))
+DIST_SUBDIRECTORY_FOR_$(notdir $(INSTALLER.gz)) = $(DIST_SUBDIRECTORY.$(PRIMARY_INSTALLER_EXTENSION))
 # Debian's mirrors are in a top-level directory called debian.
 # I thought there might be some tool dependency on that.
 DIST_SUBDIRECTORY.deb = debian
 DIST_SUBDIRECTORY.dmg = mac
 DIST_SUBDIRECTORY.msi = windows
-# FIXME: We can't use the extension to determine the target OS if we're going to ship OS-specific distributions with such generic extensions as .tgz.
-# FIXME: I see we have DIST_SUBDIRECTORY.gz above, which reminds me that we deliberately switched from .tgz to .tar.gz.
-DIST_SUBDIRECTORY.tgz = windows
 DIST_SUBDIRECTORY.pkg = sunos
 DIST_SUBDIRECTORY.rpm = redhat
 
@@ -785,8 +790,8 @@ $(INSTALLER.rpm): $(INSTALLER.deb)
 	cd $(@D) && \
 	fakeroot alien --to-rpm $(abspath $<)
 
-$(INSTALLER.tgz): $(MACHINE_PROJECT_NAME).app
-	@echo "Creating .tgz distribution..."
+$(INSTALLER.gz): $(MACHINE_PROJECT_NAME).app
+	@echo "Creating .tar.gz distribution..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	tar -zcf $@ -C $(PACKAGING_DIRECTORY)/.. $(notdir $(PACKAGING_DIRECTORY))
