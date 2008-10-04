@@ -551,7 +551,7 @@ PACKAGING_DIRECTORY = .generated/native/$(TARGET_DIRECTORY)/$(MACHINE_PROJECT_NA
 # Distribution variables - where we upload to.
 # ----------------------------------------------------------------------------
 
-SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME).tar.gz
+SOURCE_DIST_FILE = $(MACHINE_PROJECT_NAME)-source.tar.gz
 
 # Distributions end up under http://software.jessies.org/
 DIST_SSH_USER_AND_HOST = software@jessies.org
