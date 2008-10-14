@@ -8,7 +8,9 @@ UI
 
 + Sort windows alphabetically?
 
-+ Fix the fact that you can slide windows off the bottom of the column, or behind the others at the bottom of a column.
++ Make it possible to reorder windows, maybe with some kind of draggable widget at the left-hand edge.
+
++ Fix the fact that you can slide windows off the bottom of the column, or behind the others at the bottom of a column. (this was fixed recently, but at the cost of making it really hard to scrunch a group of windows against the top or bottom.)
 
 + We've removed most uses of "new File" and FileUtilities.parseUserFriendlyName in favor of FileUtilities.fileFromString, but should probably have something similar in the other direction, where special JFilenameField components would let us always show the user-friendly forms.
 
@@ -16,6 +18,11 @@ UI
 
 
 HELP/DOCUMENTATION
+
++ good documentation:
+  http://manual.macromates.com/en/shell_commands#shell_commands
+  http://projects.serenity.de/textmate/tutorials/basics/
+  http://vimdoc.sourceforge.net/htmldoc/usr_29.html#29.1 (Vim's tags support)
 
 + consider using WebKit to offer a native documentation browser, when WebKitGtk's far enough along to be packaged. (forget MozEmbed; it's a mess.)
 
