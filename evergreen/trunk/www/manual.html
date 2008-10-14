@@ -166,9 +166,11 @@
 
 <p>To perform a find and replace operation on the current file, choose "Find" > "Find/Replace...", accessible from the keyboard with control-r.
 
+<p>The replacement string in the "Replace With:" field can either be a simple literal, or can refer to the capturing groups in the "Find:" regular expression using <tt>$<i>n</i></tt> where <tt><i>n</i></tt> is the index of the capturing group, starting with <tt>$1</tt>. (Whether or not your regular expression contains capturing groups, <tt>$0</tt> always refers to the entire match.)
+
 <p>If there's a selection that spans multiple lines, the operation will only apply to those lines. If there's a selection within a single line, that's taken to be the search term.
 
-<p>Matching lines are shown in one list, with the matching substring highlighted. Suggested replacements are shown in a second list, with the replacement substring highlighted. Hovering over a line in either list brings up a tool tip showing the capturing groups. Put together, these features make it easy to experiment until you've got the right regular expression and the right replacement string.
+<p>Matching lines are shown in one list, with the matching substring highlighted. Suggested replacements are shown in a second list, with the replacement substring highlighted. Hovering over a line in either list brings up a tool tip showing the explicit capturing groups (along the lines of <tt>$1="red", $2="0xff0000"</tt>). Put together, these features make it easy to experiment until you've got the right regular expression and the right replacement string.
 
 <h3><a name="editing-indentation">Indentation</a></h3>
 
