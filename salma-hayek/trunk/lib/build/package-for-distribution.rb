@@ -249,8 +249,11 @@ if target_os() == "Darwin"
         |file|
         file.puts("#!/bin/bash --login")
         
+        file.puts("# Avoid upsetting /usr/bin/ruby if the user's installed their own (ruby: No such file to load -- ubygems (LoadError)).")
+        file.puts("unset RUBYOPT")
+        
         file.puts("# Find our Resources/ directory.")
-        file.puts("resources=`ruby -rpathname -e 'puts(Pathname.new(ARGV[0]).realpath().dirname().dirname() + \"Resources\")' \"$0\"`")
+        file.puts("resources=`/usr/bin/ruby -rpathname -e 'puts(Pathname.new(ARGV[0]).realpath().dirname().dirname() + \"Resources\")' \"$0\"`")
         
         file.puts("# We started Bash as a login shell so that our application has access to the user's expected path.")
         file.puts("# Finder seems to start applications in /.")
