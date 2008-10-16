@@ -77,7 +77,7 @@ public class NewFileAction extends ETextAction {
             return;
         }
         
-        String command = boilerplateGenerator + " \"" + file.toString() + "\"";
+        String command = "'" + boilerplateGenerator + "' '" + file.toString() + "'";
         ArrayList<String> lines = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, lines);
         
