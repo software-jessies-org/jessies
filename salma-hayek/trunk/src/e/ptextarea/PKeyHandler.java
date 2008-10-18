@@ -182,9 +182,6 @@ public class PKeyHandler implements KeyListener {
             textArea.paste();
         } else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
             movementHandler.handleMovementKeys(key, extendingSelection);
-        } else if (GuiUtilities.isMacOs() && key == KeyEvent.VK_D && event.isControlDown() && event.isMetaDown()) {
-            // FIXME: doesn't work because Mac OS is swallowing the key event.
-            showDictionaryDefinition();
         } else if (ENABLE_EMACS_KEYS && event.isControlDown() && key == KeyEvent.VK_K) {
             // Emacs kill-to-end-of-line.
             // FIXME: this is supposed to cut to the "kill buffer", not the clipboard.
@@ -194,12 +191,6 @@ public class PKeyHandler implements KeyListener {
             return false;
         }
         return true;
-    }
-    
-    private void showDictionaryDefinition() {
-        if (textArea.hasSelection()) {
-            ProcessUtilities.spawn(null, new String[] { "open", "dict:///" + textArea.getSelectedText() });
-        }
     }
     
     private boolean isStartOfLineKey(KeyEvent e) {
