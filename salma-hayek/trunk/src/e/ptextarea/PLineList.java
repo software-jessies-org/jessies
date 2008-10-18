@@ -259,7 +259,7 @@ public class PLineList implements PTextListener {
      * A PLineList.Line holds information about the location and length of a particular line of
      * text.  It also contains information about how wide this line is when its text is rendered.
      * 
-     * FIXME: we create a large number of these small but long-lived objects. Maybe PLineList should contain three int[]s instead? We could still hand these out to callers if we wished.
+     * FIXME: we create a large number of these small but long-lived objects. Maybe PLineList should contain three int[]s instead? We could still hand a Line to callers if we wished.
      */
     public static class Line {
         private int start;
