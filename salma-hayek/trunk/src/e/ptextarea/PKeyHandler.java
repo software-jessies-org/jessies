@@ -24,6 +24,10 @@ import e.util.*;
  * Mac OS key bindings files.
  */
 public class PKeyHandler implements KeyListener {
+    // On Mac OS, native text components support some Emacs keystrokes.
+    // Thanks to Apple's "command" key, they don't conflict with the standard keystrokes.
+    private static boolean ENABLE_EMACS_KEYS = GuiUtilities.isMacOs();
+    
     private PTextArea textArea;
     private PMouseHandler mouseHandler;
     private UpDownMovementHandler movementHandler = new UpDownMovementHandler();
@@ -101,10 +105,36 @@ public class PKeyHandler implements KeyListener {
         return (ch != KeyEvent.CHAR_UNDEFINED && ch >= ' ' && ch != Ascii.DEL);
     }
     
+    private int extractKeyCode(KeyEvent event) {
+        int key = event.getKeyCode();
+        if (ENABLE_EMACS_KEYS && event.isControlDown()) {
+            key = translateEmacsKeysToNormalKeys(key);
+        }
+        return key;
+    }
+    
+    private static int translateEmacsKeysToNormalKeys(int key) {
+        if (key == KeyEvent.VK_A) {
+            return KeyEvent.VK_HOME;
+        } else if (key == KeyEvent.VK_B) {
+            return KeyEvent.VK_LEFT;
+        } else if (key == KeyEvent.VK_E) {
+            return KeyEvent.VK_END;
+        } else if (key == KeyEvent.VK_F) {
+            return KeyEvent.VK_RIGHT;
+        } else if (key == KeyEvent.VK_N) {
+            return KeyEvent.VK_DOWN;
+        } else if (key == KeyEvent.VK_P) {
+            return KeyEvent.VK_UP;
+        } else {
+            return key;
+        }
+    }
+    
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
         boolean byWord = GuiUtilities.isMacOs() ? event.isAltDown() : event.isControlDown();
         boolean extendingSelection = event.isShiftDown();
-        int key = event.getKeyCode();
+        final int key = extractKeyCode(event);
         if (textArea.isEditable() && key == KeyEvent.VK_TAB) {
             if (event.getModifiers() != 0) {
                 // If any modifiers are down, pass on this event.
@@ -137,18 +167,29 @@ public class PKeyHandler implements KeyListener {
         } else if (key == KeyEvent.VK_BACK_SPACE) {
             backspace(event);
         } else if (key == KeyEvent.VK_DELETE) {
+            // Legacy DOS-style cut/delete.
             if (event.isShiftDown()) {
                 textArea.cut();
             } else {
                 delete();
             }
         } else if (key == KeyEvent.VK_INSERT && event.isShiftDown()) {
+            // Legacy DOS-style paste.
+            textArea.paste();
+        } else if (ENABLE_EMACS_KEYS && event.isControlDown() && key == KeyEvent.VK_Y) {
+            // Legacy Emacs-style paste ("yank", which means "copy" in Vi but "paste" in Emacs).
+            // FIXME: this is supposed to paste from the "kill buffer", not the clipboard.
             textArea.paste();
         } else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
-            movementHandler.handleMovementKeys(event);
+            movementHandler.handleMovementKeys(key, extendingSelection);
         } else if (GuiUtilities.isMacOs() && key == KeyEvent.VK_D && event.isControlDown() && event.isMetaDown()) {
             // FIXME: doesn't work because Mac OS is swallowing the key event.
             showDictionaryDefinition();
+        } else if (ENABLE_EMACS_KEYS && event.isControlDown() && key == KeyEvent.VK_K) {
+            // Emacs kill-to-end-of-line.
+            // FIXME: this is supposed to cut to the "kill buffer", not the clipboard.
+            moveCaret(true, caretToEndOfLine());
+            textArea.cut();
         } else {
             return false;
         }
@@ -163,6 +204,9 @@ public class PKeyHandler implements KeyListener {
     
     private boolean isStartOfLineKey(KeyEvent e) {
         if (GuiUtilities.isMacOs()) {
+            if (ENABLE_EMACS_KEYS && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_A) {
+                return true;
+            }
             return ((e.isControlDown() || e.isMetaDown()) && e.getKeyCode() == KeyEvent.VK_LEFT);
         } else {
             return (e.getKeyCode() == KeyEvent.VK_HOME);
@@ -171,6 +215,9 @@ public class PKeyHandler implements KeyListener {
     
     private boolean isEndOfLineKey(KeyEvent e) {
         if (GuiUtilities.isMacOs()) {
+            if (ENABLE_EMACS_KEYS && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_E) {
+                return true;
+            }
             return ((e.isControlDown() || e.isMetaDown()) && e.getKeyCode() == KeyEvent.VK_RIGHT);
         } else {
             return (e.getKeyCode() == KeyEvent.VK_END);
@@ -403,14 +450,13 @@ public class PKeyHandler implements KeyListener {
             }
         }
         
-        public void handleMovementKeys(KeyEvent event) {
+        public void handleMovementKeys(int key, boolean extendingSelection) {
             isEntered = true;
             if (xPixelLocation == -1) {
                 xPixelLocation = getCurrentXPixelLocation();
             }
-            boolean extendingSelection = event.isShiftDown();
             try {
-                moveCaret(extendingSelection, event.getKeyCode() == KeyEvent.VK_UP ? caretUp() : caretDown());
+                moveCaret(extendingSelection, key == KeyEvent.VK_UP ? caretUp() : caretDown());
             } finally {
                 isEntered = false;
             }
