@@ -9,6 +9,9 @@ import java.util.*;
 import javax.swing.*;
 
 public class PTextAreaDemo {
+    private static final Font FIXED_FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
+    private static final Font PROPORTIONAL_FONT = new Font("Verdana", Font.PLAIN, 12);
+    
     private PTextAreaDemo() {
     }
     
@@ -35,6 +38,7 @@ public class PTextAreaDemo {
     private static void makeTextViewer(String filename) {
         PTextArea textArea = new PTextArea();
         textArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        textArea.setFont(FIXED_FONT);
         
         final File file = new File(filename);
         textArea.getTextBuffer().readFromFile(file);
@@ -42,15 +46,17 @@ public class PTextAreaDemo {
         
         FileType fileType = FileType.guessFileType(filename, content);
         fileType.configureTextArea(textArea);
-        System.err.println("indenter=" + textArea.getIndenter());
-        System.err.println("styler=" + textArea.getTextStyler());
         
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content, "    "));
         
         JFrame frame = JFrameUtilities.makeScrollableContentWindow(file.getPath() + " - PTextAreaDemo", textArea);
         frame.setSize(new Dimension(600, 600));
-        frame.setLocationByPlatform(true);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        
+        System.err.println("indentationString='" + textArea.getIndentationString() + "'");
+        System.err.println("indenter=" + textArea.getIndenter());
+        System.err.println("styler=" + textArea.getTextStyler());
     }
     
     private static int countLinesChangedByIndenter(PTextArea textArea) {
