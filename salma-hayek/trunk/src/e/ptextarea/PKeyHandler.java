@@ -118,10 +118,14 @@ public class PKeyHandler implements KeyListener {
             return KeyEvent.VK_HOME;
         } else if (key == KeyEvent.VK_B) {
             return KeyEvent.VK_LEFT;
+        } else if (key == KeyEvent.VK_D) {
+            return KeyEvent.VK_DELETE;
         } else if (key == KeyEvent.VK_E) {
             return KeyEvent.VK_END;
         } else if (key == KeyEvent.VK_F) {
             return KeyEvent.VK_RIGHT;
+        } else if (key == KeyEvent.VK_H) {
+            return KeyEvent.VK_BACK_SPACE;
         } else if (key == KeyEvent.VK_N) {
             return KeyEvent.VK_DOWN;
         } else if (key == KeyEvent.VK_P) {
