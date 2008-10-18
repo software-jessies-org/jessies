@@ -194,6 +194,7 @@ public class PKeyHandler implements KeyListener {
         } else {
             return false;
         }
+        // All the keystrokes that did something fall through to here.
         return true;
     }
     
