@@ -189,6 +189,7 @@ public class PKeyHandler implements KeyListener {
         } else if (ENABLE_EMACS_KEYS && event.isControlDown() && key == KeyEvent.VK_K) {
             // Emacs kill-to-end-of-line.
             // FIXME: this is supposed to cut to the "kill buffer", not the clipboard.
+            // FIXME: I also think this is wrong in the case where the selection is non-empty.
             moveCaret(true, caretToEndOfLine());
             textArea.cut();
         } else {
