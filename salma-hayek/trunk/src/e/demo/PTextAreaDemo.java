@@ -54,7 +54,9 @@ public class PTextAreaDemo {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         
+        // FIXME: stick these in the UI?
         System.err.println("indentationString='" + textArea.getIndentationString() + "'");
+        System.err.println("fileType=" + textArea.getFileType().getName());
         System.err.println("indenter=" + textArea.getIndenter());
         System.err.println("styler=" + textArea.getTextStyler());
     }
