@@ -590,11 +590,21 @@ public class TerminatorMenuBar extends EMenuBar {
 			
 			// If anyone complains about the removal of the Safari keys, we could add them back in doKeyboardTabSwitch.
 			
-			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(delta < 0 ? "LEFT" : "RIGHT"));
+			if (Terminator.getPreferences().getBoolean(TerminatorPreferences.USE_ALT_AS_META)) {
+				// Aaron Harnly points out that without this special case, USE_ALT_AS_META causes "cycle tab" and "move tab" to share control-shift left/right.
+				// Since the tab tool tip already recommends Firefox-like control-tab/control-shift-tab, let's do the same on the menu.
+				// We use KeyStroke.getKeyStroke directly here because we know exactly what keystrokes we want.
+				// The whole point of this code is to avoid having Terminator's custom modifiers applied.
+				putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_MASK | (delta < 0 ? InputEvent.SHIFT_MASK : 0)));
+			} else {
+				// Given the above, why keep advertising these?
+				// 1. We have no manual documenting the alternatives.
+				// 2. For hands like enh's, these are easier to type.
+				putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(delta < 0 ? "LEFT" : "RIGHT"));
+			}
 		}
 		
-		@Override
-		protected void performFrameAction(TerminatorFrame frame) {
+		@Override protected void performFrameAction(TerminatorFrame frame) {
 			frame.cycleTab(delta);
 		}
 	}
