@@ -76,7 +76,17 @@ public class TerminatorFrame extends JFrame {
 				Terminator.getSharedInstance().getFrames().frameStateChanged();
 			}
 		});
-		initMenuBar();
+		
+		// Work around Sun bug 6526971 (quick alt-tabbing on Windows can give focus to menu bar).
+		if (GuiUtilities.isWindows()) {
+			addWindowFocusListener(new WindowAdapter() {
+				@Override
+				public void windowLostFocus(WindowEvent e) {
+					MenuSelectionManager.defaultManager().clearSelectedPath();
+				}
+			});
+		}
+		
 		initTerminals();
 		optionsDidChange();
 		
@@ -99,21 +109,16 @@ public class TerminatorFrame extends JFrame {
 		}
 	}
 	
-	private void initMenuBar() {
+	/**
+	 * It's okay to call this multiple times, and we deliberately do so whenever the preferences change.
+	 * This lets us update suggested keystrokes when the use-alt-as-meta option changes.
+	 */
+	private void updateMenuBar() {
+		// Replace any existing menu bar.
 		setJMenuBar(new TerminatorMenuBar());
 		
 		// Work around Sun bug 4949810 (setJMenuBar doesn't call revalidate/repaint).
 		getJMenuBar().revalidate();
-		
-		// Work around Sun bug 6526971 (quick alt-tabbing on Windows can give focus to menu bar).
-		if (GuiUtilities.isWindows()) {
-			addWindowFocusListener(new WindowAdapter() {
-				@Override
-				public void windowLostFocus(WindowEvent e) {
-					MenuSelectionManager.defaultManager().clearSelectedPath();
-				}
-			});
-		}
 	}
 	
 	/**
@@ -371,6 +376,7 @@ public class TerminatorFrame extends JFrame {
 	public void optionsDidChange() {
 		updateBackground();
 		updateTransparency();
+		updateMenuBar();
 		for (JTerminalPane terminal : terminals) {
 			terminal.optionsDidChange();
 		}
