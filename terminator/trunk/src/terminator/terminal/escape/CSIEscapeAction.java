@@ -86,7 +86,7 @@ public class CSIEscapeAction implements TerminalAction {
 		case 'K':
 			return killLineContents(model, midSequence);
 		case 'J':
-			return killLines(model, midSequence);
+			return eraseInPage(model, midSequence);
 		case 'L':
 			return insertLines(model, midSequence);
 		case 'M':
@@ -226,11 +226,11 @@ public class CSIEscapeAction implements TerminalAction {
 		return true;
 	}
 	
-	public boolean killLines(TerminalModel model, String seq) {
+	public boolean eraseInPage(TerminalModel model, String seq) {
 		int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
 		boolean fromTop = (type >= 1);
 		boolean toBottom = (type != 1);
-		model.killVertically(fromTop, toBottom);
+		model.eraseInPage(fromTop, toBottom);
 		return true;
 	}
 	
