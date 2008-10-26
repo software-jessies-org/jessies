@@ -495,8 +495,8 @@ public class TerminalModel {
 		linesChangedFrom(cursorPosition.getLineIndex());
 	}
 	
-	/** Erases from either the top or the cursor line, to either the bottom or the cursor line. */
-	public void killVertically(boolean fromTop, boolean toBottom) {
+	/** Erases from either the top or the cursor, to either the bottom or the cursor. */
+	public void eraseInPage(boolean fromTop, boolean toBottom) {
 		// FIXME: We shouldn't be erasing the whole of the current line.
 		// Breaks backspace on Cisco MDS switches according to Paul Guo.
 		// See the difference between gnome-terminal/xterm and us using:
@@ -505,10 +505,6 @@ public class TerminalModel {
 		int end = toBottom ? getLineCount() : cursorPosition.getLineIndex();
 		for (int i = start; i < end; i++) {
 			getTextLine(i).clear();
-		}
-		if (fromTop && toBottom) {
-			setCursorPosition(1, 1);  // Clear screen also implies moving the cursor to 'home'.
-			// FIXME: Not according to gnome-terminal and xterm, or even rxvt.
 		}
 		lineIsDirty(start + 1);
 		view.repaint();
