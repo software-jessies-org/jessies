@@ -497,12 +497,12 @@ public class TerminalModel {
 	
 	/** Erases from either the top or the cursor, to either the bottom or the cursor. */
 	public void eraseInPage(boolean fromTop, boolean toBottom) {
-		// Should produce "wo":
-		// echo $'\x1b[3Bworld\x1b[A\rhi\x1b[B\x1b[J'
+		// Should produce "hi\nwo":
+		// echo $'\n\n\nworld\x1b[A\rhi\x1b[B\x1b[J'
 		// Should produce "   ld":
-		// echo $'\x1b[3Bworld\x1b[A\rhi\x1b[B\x1b[1J'
+		// echo $'\n\n\nworld\x1b[A\rhi\x1b[B\x1b[1J'
 		// Should clear the screen:
-		// echo $'\x1b[3Bworld\x1b[A\rhi\x1b[B\x1b[2J'
+		// echo $'\n\n\nworld\x1b[A\rhi\x1b[B\x1b[2J'
 		int start = fromTop ? getFirstDisplayLine() : cursorPosition.getLineIndex();
 		int startClearing = fromTop ? start : start + 1;
 		int endClearing = toBottom ? getLineCount() : cursorPosition.getLineIndex();
@@ -521,7 +521,6 @@ public class TerminalModel {
 		}
 		lineIsDirty(start + 1);
 		linesChangedFrom(start);
-		view.repaint();
 	}
 	
 	/**
