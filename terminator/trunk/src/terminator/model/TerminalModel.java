@@ -497,16 +497,30 @@ public class TerminalModel {
 	
 	/** Erases from either the top or the cursor, to either the bottom or the cursor. */
 	public void eraseInPage(boolean fromTop, boolean toBottom) {
-		// FIXME: We shouldn't be erasing the whole of the current line.
-		// Breaks backspace on Cisco MDS switches according to Paul Guo.
-		// See the difference between gnome-terminal/xterm and us using:
-		// echo $'\n\n\nhello\x1b[A\rworld\x1b[B\x1b[J'
+		// Should produce "wo":
+		// echo $'\x1b[3Bworld\x1b[A\rhi\x1b[B\x1b[J'
+		// Should produce "   ld":
+		// echo $'\x1b[3Bworld\x1b[A\rhi\x1b[B\x1b[1J'
+		// Should clear the screen:
+		// echo $'\x1b[3Bworld\x1b[A\rhi\x1b[B\x1b[2J'
 		int start = fromTop ? getFirstDisplayLine() : cursorPosition.getLineIndex();
-		int end = toBottom ? getLineCount() : cursorPosition.getLineIndex();
-		for (int i = start; i < end; i++) {
+		int startClearing = fromTop ? start : start + 1;
+		int endClearing = toBottom ? getLineCount() : cursorPosition.getLineIndex();
+		for (int i = startClearing; i < endClearing; i++) {
 			getTextLine(i).clear();
 		}
+		TextLine line = getTextLine(cursorPosition.getLineIndex());
+		int oldLineLength = line.length();
+		if (fromTop) {
+			// The current position is always erased, hence the + 1.
+			// Is overwriting with spaces in the currentStyle correct?
+			line.writeTextAt(0, StringUtilities.nCopies(cursorPosition.getCharOffset() + 1, ' '), currentStyle);
+		}
+		if (toBottom) {
+			line.killText(cursorPosition.getCharOffset(), oldLineLength);
+		}
 		lineIsDirty(start + 1);
+		linesChangedFrom(start);
 		view.repaint();
 	}
 	
