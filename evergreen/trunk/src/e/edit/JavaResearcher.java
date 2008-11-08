@@ -126,7 +126,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     private class ClassDoc {
         private String className;
-        private Class[] classes;
+        private Class<?>[] classes;
         
         private ClassDoc(String className) {
             this.className = className;
@@ -150,7 +150,7 @@ public class JavaResearcher implements WorkspaceResearcher {
                 return "";
             }
             StringBuilder result = new StringBuilder();
-            for (Class klass : classes) {
+            for (Class<?> klass : classes) {
                 if (result.length() > 0) {
                     result.append("<br><br>");
                 }
@@ -252,9 +252,9 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     /** Formats class names as a list of links if there's javadoc for them. */
-    private String makeClassLinks(Class[] classes, boolean pkg, String conjunct, boolean showSourceLink) {
+    private String makeClassLinks(Class<?>[] classes, boolean pkg, String conjunct, boolean showSourceLink) {
         StringBuilder s = new StringBuilder();
-        for (Class klass : classes) {
+        for (Class<?> klass : classes) {
             if (s.length() > 0) {
                 s.append(conjunct);
             }
@@ -290,7 +290,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     /** Formats a class name as a link if there's javadoc for it. */
-    private String makeClassLink(Class c, boolean showPkg, boolean showSourceLink) {
+    private String makeClassLink(Class<?> c, boolean showPkg, boolean showSourceLink) {
         ClassAndPackage classAndPackage = new ClassAndPackage(c.getName());
         if (c.isArray()) {
             return makeClassLink(c.getComponentType(), showPkg, showSourceLink) + "[]";
@@ -342,7 +342,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         String parameters = makeClassLinks(m.getParameterTypes(), false, COMMA, false);
         String returnType = makeClassLink(m.getReturnType(), false, false);
         String result = NEWLINE + returnType + " " + m.getName() + "(" + parameters + ")";
-        Class[] exceptions = m.getExceptionTypes();
+        Class<?>[] exceptions = m.getExceptionTypes();
         if (exceptions.length > 0) {
             result += " throws " + makeClassLinks(exceptions, true, NEWLINE, false);
         }
@@ -353,7 +353,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     * Lists the fully-qualified class name and all the modifiers,
     * the superclass name and all implemented interfaces.
     */
-    private String listClass(Class c) {
+    private String listClass(Class<?> c) {
         StringBuilder s = new StringBuilder();
         int modifiers = c.getModifiers();
         if (c.isInterface()) {
@@ -367,7 +367,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         s.append(makeClassLink(c, true, true));
         
         // Show superclasses.
-        Class superclass = c.getSuperclass();
+        Class<?> superclass = c.getSuperclass();
         if (superclass != null && c.isInterface() == false) {
             s.append("<br>extends ");
             int depth = 0;
@@ -379,7 +379,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
         
         // Show all implemented interfaces.
-        Class[] interfaces = c.getInterfaces();
+        Class<?>[] interfaces = c.getInterfaces();
         if (interfaces.length > 0) {
             s.append("<br>implements ");
             s.append(NEWLINE);
@@ -395,19 +395,19 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     /** Lists the class name and all the constructors. */
-    private String listConstructors(Class c) {
+    private String listConstructors(Class<?> c) {
         StringBuilder s = new StringBuilder();
         String classLink = makeClassLink(c, false, false);
         s.append(makeClassLink(c, true, true));
         s.append("<br>");
-        Constructor[] constructors = c.getConstructors();
-        for (Constructor constructor : constructors) {
+        Constructor<?>[] constructors = c.getConstructors();
+        for (Constructor<?> constructor : constructors) {
             s.append("<br>");
             s.append(classLink);
             s.append("(");
             s.append(makeClassLinks(constructor.getParameterTypes(), false, COMMA, false));
             s.append(")");
-            Class[] exceptions = constructor.getExceptionTypes();
+            Class<?>[] exceptions = constructor.getExceptionTypes();
             if (exceptions.length > 0) {
                 s.append(NEWLINE);
                 s.append(" throws ");
@@ -423,7 +423,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     /**
      * Lists all non-private fields and non-private static methods of a class.
      */
-    private String listMembers(Class c) {
+    private String listMembers(Class<?> c) {
         StringBuilder s = new StringBuilder();
         
         List<Field> fields = collectNonPrivateFields(c);
@@ -447,7 +447,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         return s.toString();
     }
     
-    private List<Field> collectNonPrivateFields(Class c) {
+    private List<Field> collectNonPrivateFields(Class<?> c) {
         ArrayList<Field> result = new ArrayList<Field>();
         for (Field field : c.getFields()) {
             if (Modifier.isPrivate(field.getModifiers()) == false) {
@@ -457,7 +457,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         return result;
     }
     
-    private List<Method> collectStaticMethods(Class c) {
+    private List<Method> collectStaticMethods(Class<?> c) {
         ArrayList<Method> result = new ArrayList<Method>();
         for (Method method : c.getMethods()) {
             int modifiers = method.getModifiers();

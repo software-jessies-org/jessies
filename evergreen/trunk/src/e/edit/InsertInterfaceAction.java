@@ -66,7 +66,7 @@ public class InsertInterfaceAction extends ETextAction {
             return;
         }
         
-        Class[] classes = JavaDoc.getClasses(className);
+        Class<?>[] classes = JavaDoc.getClasses(className);
         if (classes.length != 1) {
             Evergreen.getInstance().showAlert("Couldn't insert interface", "The class name \"" + className + "\" must be unique, but matches " + classes.length + " classes.");
             return;
@@ -80,7 +80,7 @@ public class InsertInterfaceAction extends ETextAction {
      * Returns Java source code to implement all the public abstract methods
      * in the given class.
      */
-    private static String sourceCodeForClass(Class c) {
+    private static String sourceCodeForClass(Class<?> c) {
         StringBuilder s = new StringBuilder(") {");
         if (c.getName().endsWith("Adapter")) {
             s.append(sourceCodeForMethods(c.getDeclaredMethods(), false));
@@ -118,7 +118,7 @@ public class InsertInterfaceAction extends ETextAction {
         s.append("(");
         s.append(listClassNames(m.getParameterTypes(), true));
         s.append(")");
-        Class[] exs = m.getExceptionTypes();
+        Class<?>[] exs = m.getExceptionTypes();
         if (exs.length > 0) {
             s.append(" throws ");
             s.append(listClassNames(exs, false));
@@ -131,9 +131,9 @@ public class InsertInterfaceAction extends ETextAction {
         return s.toString();
     }
     
-    private static String listClassNames(Class[] classes, boolean inventNames) {
+    private static String listClassNames(Class<?>[] classes, boolean inventNames) {
         StringBuilder s = new StringBuilder();
-        for (Class c : classes) {
+        for (Class<?> c : classes) {
             String name = c.getName();
             if (s.length() > 0) {
                 s.append(", ");
@@ -146,7 +146,7 @@ public class InsertInterfaceAction extends ETextAction {
         return s.toString();
     }
     
-    private static String getParameterNameFor(Class c) {
+    private static String getParameterNameFor(Class<?> c) {
         String name = c.getName();
         name = name.substring(name.lastIndexOf(".") + 1);
         if (name.endsWith("Event")) {
