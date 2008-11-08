@@ -371,7 +371,7 @@ public class GuiUtilities {
                 
                 // long windowId = peer.getWindow();
                 Class<?> xWindowPeerClass = Class.forName("sun.awt.X11.XWindowPeer");
-                Method getWindowMethod = xWindowPeerClass.getMethod("getWindow", new Class[0]);
+                Method getWindowMethod = xWindowPeerClass.getMethod("getWindow");
                 long windowId = ((Long) getWindowMethod.invoke(peer, new Object[0])).longValue();
                 
                 long value = (int) (0xff * alpha) << 24;

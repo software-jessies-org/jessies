@@ -72,16 +72,16 @@ public class BrowserLauncher {
 	private static Class<?> mrjFileUtilsClass;
 
 	/** The com.apple.MacOS.AEDesc class */
-	private static Class aeDescClass;
+	private static Class<?> aeDescClass;
 	
 	/** The <init>(int) method of com.apple.MacOS.AETarget */
-	private static Constructor aeTargetConstructor;
+	private static Constructor<?> aeTargetConstructor;
 	
 	/** The <init>(int, int, int) method of com.apple.MacOS.AppleEvent */
-	private static Constructor appleEventConstructor;
+	private static Constructor<?> appleEventConstructor;
 	
 	/** The <init>(String) method of com.apple.MacOS.AEDesc */
-	private static Constructor aeDescConstructor;
+	private static Constructor<?> aeDescConstructor;
 	
 	/** The findFolder method of com.apple.mrj.MRJFileUtils */
 	private static Method findFolder;
@@ -242,7 +242,7 @@ public class BrowserLauncher {
 			case MRJ_3_0:
 			    try {
 					Class<?> linker = Class.forName("com.apple.mrj.jdirect.Linker");
-					Constructor constructor = linker.getConstructor(Class.class);
+					Constructor<?> constructor = linker.getConstructor(Class.class);
 					linkage = constructor.newInstance(new Object[] { BrowserLauncher.class });
 				} catch (ClassNotFoundException cnfe) {
 					errorMessage = cnfe.getMessage();
@@ -403,8 +403,8 @@ public class BrowserLauncher {
 	public static void openURL(String url) throws IOException {
 		// FIXME: when we switch to Java 6, this whole class can be replaced with "Desktop.getDesktop().browse(new URI(url));"
 		try {
-			java.lang.reflect.Method Desktop_getDesktop_method = Class.forName("java.awt.Desktop").getDeclaredMethod("getDesktop", new Class[0]);
-			java.lang.reflect.Method Desktop_browse_method = Class.forName("java.awt.Desktop").getDeclaredMethod("browse", new Class[] { java.net.URI.class });
+			java.lang.reflect.Method Desktop_getDesktop_method = Class.forName("java.awt.Desktop").getDeclaredMethod("getDesktop");
+			java.lang.reflect.Method Desktop_browse_method = Class.forName("java.awt.Desktop").getDeclaredMethod("browse", java.net.URI.class);
 			Object desktop = Desktop_getDesktop_method.invoke(null);
 			Desktop_browse_method.invoke(desktop, new java.net.URI(url));
 			return;
