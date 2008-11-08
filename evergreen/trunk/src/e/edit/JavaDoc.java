@@ -158,7 +158,7 @@ public class JavaDoc {
     /**
     * Returns the location of the documentation for a class.
     */
-    public static String getDocLink(Class c) {
+    public static String getDocLink(Class<?> c) {
         String className = c.getName();
         if (c.isPrimitive()) {
             return className;
@@ -282,8 +282,8 @@ public class JavaDoc {
     /**
     * Returns all classes whose name matches the supplied string.
     */
-    public static Class[] getClasses(String className) {
-        ArrayList<Class> classes = new ArrayList<Class>();
+    public static Class<?>[] getClasses(String className) {
+        ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
         for (String packageName : packageNames) {
             String soughtClass = packageName + ((packageName.length() > 0) ? "." : "") + className;
             try {
@@ -305,7 +305,7 @@ public class JavaDoc {
                 ex = ex;
             }
         }
-        return classes.toArray(new Class[classes.size()]);
+        return classes.toArray(new Class<?>[classes.size()]);
     }
 
     /** Prevents instantiation. */

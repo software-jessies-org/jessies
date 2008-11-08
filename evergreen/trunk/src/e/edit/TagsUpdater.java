@@ -172,7 +172,7 @@ public class TagsUpdater {
         TreeNode nearestNode = null;
         
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-        for (Enumeration e = root.breadthFirstEnumeration(); e.hasMoreElements(); ) {
+        for (Enumeration<?> e = root.breadthFirstEnumeration(); e.hasMoreElements(); ) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
             if (node.getUserObject() instanceof TagReader.Tag) {
                 TagReader.Tag tag = (TagReader.Tag) node.getUserObject();
