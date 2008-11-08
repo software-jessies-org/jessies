@@ -10,7 +10,7 @@ public class TimerUtilities {
         ArrayList<Timer> result = new ArrayList<Timer>();
         try {
             Class<?> timerQueueClass = Class.forName("javax.swing.TimerQueue");
-            Method sharedInstanceMethod = timerQueueClass.getDeclaredMethod("sharedInstance", new Class[0]);
+            Method sharedInstanceMethod = timerQueueClass.getDeclaredMethod("sharedInstance");
             sharedInstanceMethod.setAccessible(true);
             Object sharedInstance = sharedInstanceMethod.invoke(null, new Object[0]);
             
@@ -31,10 +31,11 @@ public class TimerUtilities {
                 Field queueField = timerQueueClass.getDeclaredField("queue");
                 queueField.setAccessible(true);
                 
-                java.util.concurrent.DelayQueue queue = (java.util.concurrent.DelayQueue) queueField.get(sharedInstance);
+                // We don't have a name for the queue's element type, so ? will have to do.
+                java.util.concurrent.DelayQueue<?> queue = (java.util.concurrent.DelayQueue<?>) queueField.get(sharedInstance);
                 
                 Class<?> delayedTimerClass = Class.forName("javax.swing.TimerQueue$DelayedTimer");
-                Method getTimerMethod = delayedTimerClass.getDeclaredMethod("getTimer", new Class[0]);
+                Method getTimerMethod = delayedTimerClass.getDeclaredMethod("getTimer");
                 getTimerMethod.setAccessible(true);
                 
                 for (Object queuedObject : queue) {

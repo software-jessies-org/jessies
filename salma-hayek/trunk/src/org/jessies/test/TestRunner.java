@@ -112,7 +112,7 @@ public class TestRunner {
     private List<Method> findTestMethods(ClassLoader classLoader, List<String> classNames) throws Exception {
         List<Method> result = new ArrayList<Method>();
         for (String className : classNames) {
-            final Class testClass = classLoader.loadClass(className);
+            final Class<?> testClass = classLoader.loadClass(className);
             for (Method method : testClass.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(Test.class)) {
                     ensureTestMethodIsSuitable(method);

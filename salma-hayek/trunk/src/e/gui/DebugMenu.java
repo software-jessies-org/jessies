@@ -173,7 +173,7 @@ public class DebugMenu {
             //windows.addAll(Arrays.asList(Window.getWindows()));
             boolean haveWindows = true;
             try {
-                java.lang.reflect.Method getWindowsMethod = Window.class.getDeclaredMethod("getWindows", new Class[0]);
+                java.lang.reflect.Method getWindowsMethod = Window.class.getDeclaredMethod("getWindows");
                 windows.addAll(Arrays.asList((Window[]) getWindowsMethod.invoke(null, (Object[]) null)));
             } catch (Exception ex) {
                 // Ignore. Likely we're on Java 5, where this functionality doesn't exist.

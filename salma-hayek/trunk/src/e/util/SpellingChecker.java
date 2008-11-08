@@ -25,7 +25,7 @@ public class SpellingChecker {
             super(MAX_ENTRIES);
         }
         
-        @Override protected boolean removeEldestEntry(Map.Entry eldest) {
+        @Override protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
             return size() > MAX_ENTRIES;
         }
     }

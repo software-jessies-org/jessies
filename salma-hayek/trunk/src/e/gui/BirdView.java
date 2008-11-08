@@ -36,7 +36,7 @@ public class BirdView extends JComponent {
         this.birdsEye = birdsEye;
         this.scrollBar = scrollBar;
         try {
-            method = BasicScrollBarUI.class.getDeclaredMethod("getTrackBounds", new Class[] {});
+            method = BasicScrollBarUI.class.getDeclaredMethod("getTrackBounds");
             method.setAccessible(true);
         } catch (Exception ex) {
             Log.warn("Couldn't get access to getTrackBounds", ex);
