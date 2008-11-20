@@ -7,6 +7,7 @@ chdir
 chmod
 chown
 dirname
+foreach
 grep
 gsub
 ljust
@@ -20,6 +21,9 @@ Regexp
 rjust
 rmdir
 rmtree
+stderr
+stdin
+stdout
 symlink
 umask
 uniq
