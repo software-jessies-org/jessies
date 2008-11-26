@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #if defined(__sun__)
+// The POSIX STREAMS interface.
 #include <stropts.h>
 #endif
 
