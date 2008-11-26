@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 #if defined(__sun__)
-#include <sys/stropts.h>
+#include <stropts.h>
 #endif
 
 #include <deque>
