@@ -130,8 +130,9 @@ private:
         int childFd = ptyGenerator.openSlave();
         close(ptyGenerator.masterFd);
 
-#if defined(TIOCSCTTY)
+#if defined(TIOCSCTTY) && !defined(__sun__)
         // The BSD approach is that the controlling terminal for a session is allocated by the session leader by issuing the TIOCSCTTY ioctl.
+        // Solaris' termios.h 1.42 now includes TIOCSCTTY definition, resulting in inappropriate ioctl errors.
         if (ioctl(childFd, TIOCSCTTY, 0) == -1) {
             throw child_exception_via_pipe(childFd, "ioctl(" + toString(childFd) + ", TIOCSCTTY, 0)");
         }
