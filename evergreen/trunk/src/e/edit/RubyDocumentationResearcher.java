@@ -1,10 +1,35 @@
 package e.edit;
 
+import java.io.*;
 import java.util.*;
 import e.ptextarea.*;
 import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {
+    private static final Set<String> uniqueWords = new TreeSet<String>();
+    
+    public RubyDocumentationResearcher() {
+        final long t0 = System.nanoTime();
+        
+        final String listRubyWordsBinary = System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "scripts" + File.separator + "list-ruby-words.rb";
+        
+        final ArrayList<String> lines = new ArrayList<String>();
+        final ArrayList<String> errors = new ArrayList<String>();
+        final int status = ProcessUtilities.backQuote(null, new String[] { "ruby", listRubyWordsBinary }, lines, errors);
+        if (status != 0) {
+            return;
+        }
+        final Set<String> uniqueIdentifiers = new TreeSet<String>();
+        for (String line : lines) {
+            uniqueIdentifiers.add(line);
+        }
+        
+        Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
+        
+        final long t1 = System.nanoTime();
+        Log.warn("Learned " + uniqueWords.size() + " Ruby words in " + TimeUtilities.nsToString(t1 - t0) + ".");
+    }
+    
     public String research(String string, ETextWindow textWindow) {
         String ri = Advisor.findToolOnPath("ri");
         if (ri == null) {
@@ -94,7 +119,8 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         return false;
     }
     
-    /** Does nothing. */
+    /** Adds all the words we found by reflection. */
     public void addWordsTo(Set<String> words) {
+        words.addAll(uniqueWords);
     }
 }

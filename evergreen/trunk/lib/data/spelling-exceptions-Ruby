@@ -1,31 +1,8 @@
 # Ruby keywords.
 elsif
 # Library identifiers.
+# Note that we automatically find class and method names from "list-ruby-words.rb".
 ARGV
-basename
-chdir
-chmod
-chown
-dirname
-foreach
-grep
-gsub
-ljust
-makedirs
-mkdir
-mkpath
-Mutex
-popen
-realpath
-Regexp
-rjust
-rmdir
-rmtree
 stderr
 stdin
 stdout
-symlink
-umask
-uniq
-upcase
-upto
