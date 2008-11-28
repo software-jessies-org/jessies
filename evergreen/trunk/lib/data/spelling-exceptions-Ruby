@@ -1,6 +1,4 @@
-# Note that we automatically find class and method names from "list-ruby-words.rb".
-# We also look at Kernel.global_variables, but that's missing ARGF, ARGV, and ENV ("the ones without dollars") for some reason.
-ARGF
-ARGV
-# You might also need to add Ruby keywords that aren't already words.
+# Note that we automatically find class, method, and constant names from "list-ruby-words.rb".
+# We also look at Kernel.global_variables.
+# The only things you should need to add here are Ruby keywords that aren't already words.
 elsif

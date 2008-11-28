@@ -34,6 +34,12 @@ ObjectSpace.each_object(Class) {
             names.merge(method_name.split(/_/))
         end
     }
+    
+    c.constants().each() {
+        |constant|
+        constant_name = constant.to_s()
+        names.merge(constant_name.split(/_/))
+    }
 }
 
 # Collect variable names.
