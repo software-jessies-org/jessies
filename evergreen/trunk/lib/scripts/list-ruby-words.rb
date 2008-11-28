@@ -19,7 +19,9 @@ ObjectSpace.each_object(Class) {
     # We don't worry about breaking SystemCallError (say) into words: the
     # calling code does that anyway.
     names.merge(c.to_s().split(/::/))
-    c.methods().each() {
+    
+    all_methods = c.methods() + c.instance_methods()
+    all_methods.each() {
         |m|
         method_name = m.to_s()
         # Ignore operators like "<<" or "[]=".
