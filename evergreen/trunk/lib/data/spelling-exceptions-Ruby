@@ -1,4 +1,0 @@
-# Note that we automatically find class, method, and constant names from "list-ruby-words.rb".
-# We also look at Kernel.global_variables.
-# The only things you should need to add here are Ruby keywords that aren't already words.
-elsif
