@@ -228,9 +228,11 @@ public class TerminatorFrame extends JFrame {
 	}
 	
 	public void setSelectedTabIndex(int index) {
-		int tabCount = tabbedPane.getTabCount();
-		if (index < tabCount) {
-			tabbedPane.setSelectedIndex(index);
+		if (tabbedPane != null) {
+			int tabCount = tabbedPane.getTabCount();
+			if (index < tabCount) {
+				tabbedPane.setSelectedIndex(index);
+			}
 		}
 	}
 
