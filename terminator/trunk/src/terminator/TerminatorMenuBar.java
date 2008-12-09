@@ -108,8 +108,16 @@ public class TerminatorMenuBar extends EMenuBar {
 	 * Tests whether the given event corresponds to a keyboard equivalent.
 	 */
 	public static boolean isKeyboardEquivalent(KeyEvent event) {
-		final int modifiers = defaultKeyStrokeModifiers;
-		return ((event.getModifiers() & modifiers) == modifiers);
+		// Windows seems to use ALT_MASK|CTRL_MASK instead of ALT_GRAPH_MASK.
+		// We don't want those events, despite the lax comparison later.
+		final int fakeWindowsAltGraph = InputEvent.ALT_MASK | InputEvent.CTRL_MASK;
+		if ((event.getModifiers() & fakeWindowsAltGraph) == fakeWindowsAltGraph) {
+			return false;
+		}
+		// This comparison is more inclusive than you might expect.
+		// If the default modifier is alt, say, we still want to accept alt+shift.
+		final int expectedModifiers = defaultKeyStrokeModifiers;
+		return ((event.getModifiers() & expectedModifiers) == expectedModifiers);
 	}
 	
 	/**
