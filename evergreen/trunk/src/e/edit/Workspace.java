@@ -325,7 +325,7 @@ public class Workspace extends JPanel {
             if (bestWorkspace != this) {
                 bestWorkspace.takeWindow(textWindow);
             }
-        }        
+        }
     }
     
     public void rememberFocusedTextWindow(ETextWindow textWindow) {
