@@ -432,7 +432,6 @@ public class Evergreen {
         String name = workspace.getTitle();
         tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), getWorkspaceIndexInTabbedPane(name));
         tabbedPane.setSelectedComponent(workspace);
-        fireTabbedPaneTabCountChange();
         
         // We need to ensure that the workspace has been validated so that it
         // and its children have bounds, so that EColumn has a non-zero height
@@ -453,6 +452,7 @@ public class Evergreen {
         Workspace workspace = new Workspace(properties.name, properties.rootDirectory);
         workspace.setBuildTarget(properties.buildTarget);
         addWorkspaceToTabbedPane(workspace);
+        fireTabbedPaneTabCountChange();
         moveFilesToBestWorkspaces();
         return workspace;
     }
