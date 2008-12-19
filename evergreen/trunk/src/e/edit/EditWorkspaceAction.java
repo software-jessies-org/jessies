@@ -30,11 +30,10 @@ public class EditWorkspaceAction extends AbstractAction {
         properties.buildTarget = workspace.getBuildTarget();
         
         if (properties.showWorkspacePropertiesDialog("Workspace Properties", "Apply") == true) {
-            // FIXME: We need to sort the tabs when one of their names is changed.
             workspace.setTitle(properties.name);
             workspace.setRootDirectory(properties.rootDirectory);
             workspace.setBuildTarget(properties.buildTarget);
-            Evergreen.getInstance().moveFilesToBestWorkspaces();
+            Evergreen.getInstance().reorganizeWorkspacesAfterConfigurationChange();
         }
     }
 }

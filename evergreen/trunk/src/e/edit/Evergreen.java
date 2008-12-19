@@ -452,8 +452,7 @@ public class Evergreen {
         Workspace workspace = new Workspace(properties.name, properties.rootDirectory);
         workspace.setBuildTarget(properties.buildTarget);
         addWorkspaceToTabbedPane(workspace);
-        fireTabbedPaneTabCountChange();
-        moveFilesToBestWorkspaces();
+        reorganizeWorkspacesAfterConfigurationChange();
         return workspace;
     }
     
@@ -468,15 +467,14 @@ public class Evergreen {
                     return false;
                 }
                 tabbedPane.remove(workspace);
-                fireTabbedPaneTabCountChange();
-                workspace.moveFilesToBestWorkspaces();
+                reorganizeWorkspacesAfterConfigurationChange();
                 workspace.dispose();
             }
         }
         return true;
     }
     
-    public void moveFilesToBestWorkspaces() {
+    private void moveFilesToBestWorkspaces() {
         for (Workspace workspace : getWorkspaces()) {
             workspace.moveFilesToBestWorkspaces();
         }
@@ -502,8 +500,7 @@ public class Evergreen {
         }
         
         tabbedPane.remove(workspace);
-        fireTabbedPaneTabCountChange();
-        workspace.moveFilesToBestWorkspaces();
+        reorganizeWorkspacesAfterConfigurationChange();
         workspace.dispose();
     }
     
@@ -513,13 +510,15 @@ public class Evergreen {
      * should invoke this method. Annoyingly, JTabbedPane doesn't make such
      * changes observable, so it's down to us to be careful.
      */
-    private void fireTabbedPaneTabCountChange() {
+    public void reorganizeWorkspacesAfterConfigurationChange() {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 rememberState();
             }
         });
         thread.start();
+        moveFilesToBestWorkspaces();
+        // FIXME: We need to sort the tabs when one of their names is changed.
     }
     
     public static String getResourceFilename(String leafName) {
