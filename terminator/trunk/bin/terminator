@@ -138,10 +138,9 @@ class Terminator
             return
         end
         # We only support the simple "new shell" case.
-        # Allowing the execution of arbitrary commands would be a security hole.
-        # This is, as explained below, simply a performance optimization.
-        # It also stops existing terminals from having their options changed when someone starts a new terminal.
+        # The motivation for using InAppServer here was performance.
         # It should also mean that my "runtitan" commands always block, like an xterm would, rather than sometimes exiting immediately.
+        # But we could implement that differently, as in edit-and-block, albeit with the added complexity of multiple tabs.
         workingDirectory = Dir.getwd()
         if ARGV.length() == 2 && ARGV[0] == "--working-directory"
             workingDirectory = ARGV[1]
