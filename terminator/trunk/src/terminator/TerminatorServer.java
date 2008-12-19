@@ -12,7 +12,7 @@ public class TerminatorServer {
     public void newShell(PrintWriter out, String line) {
         try {
             String workingDirectory = line.substring("newShell ".length());
-            // We don't accept any arguments over the network, because that could easily be a security hole.
+            // We don't accept any arguments over the network, originally because that would have been a security hole.
             Terminator.getSharedInstance().parseCommandLine(new String[] { "--working-directory", workingDirectory }, out);
         } catch (Exception ex) {
             ex.printStackTrace(out);
