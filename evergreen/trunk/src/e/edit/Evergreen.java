@@ -474,7 +474,7 @@ public class Evergreen {
         return true;
     }
     
-    private void moveFilesToBestWorkspaces() {
+    public void moveFilesToBestWorkspaces() {
         for (Workspace workspace : getWorkspaces()) {
             workspace.moveFilesToBestWorkspaces();
         }
