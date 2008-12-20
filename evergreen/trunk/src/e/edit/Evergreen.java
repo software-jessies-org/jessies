@@ -518,7 +518,19 @@ public class Evergreen {
         });
         thread.start();
         moveFilesToBestWorkspaces();
-        // FIXME: We need to sort the tabs when one of their names is changed.
+        for (Workspace workspace : getWorkspaces()) {
+            String name = workspace.getTitle();
+            int newIndex = getWorkspaceIndexInTabbedPane(name);
+            if (workspace == (Workspace) tabbedPane.getComponentAt(newIndex)) {
+                continue;
+            }
+            boolean wasSelected = getCurrentWorkspace() == workspace;
+            tabbedPane.remove(workspace);
+            tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), newIndex);
+            if (wasSelected) {
+                tabbedPane.setSelectedComponent(workspace);
+            }
+        }
     }
     
     public static String getResourceFilename(String leafName) {
