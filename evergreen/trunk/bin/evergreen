@@ -34,16 +34,19 @@ class Evergreen
             ARGV[0] = "#{ARGV[0]}:#$1"
         end
         
-        edit_preferences_directory = "#{home}/.e.edit.Edit"
-        if target_os() == "Darwin"
-            edit_preferences_directory = "#{home}/Library/Preferences/e.edit.Edit"
+        dot_directory = ENV["EVERGREEN_DOT_DIRECTORY"]
+        if dot_directory == nil
+            dot_directory = "#{home}/.e.edit.Edit"
+            if target_os() == "Darwin"
+                dot_directory = "#{home}/Library/Preferences/e.edit.Edit"
+            end
         end
         
-        if FileTest.directory?(edit_preferences_directory) == false
-            FileUtils.mkdir_p(edit_preferences_directory)
+        if FileTest.directory?(dot_directory) == false
+            FileUtils.mkdir_p(dot_directory)
         end
         
-        serverPortPathname = Pathname.new(edit_preferences_directory) + "edit-server-port"
+        serverPortPathname = Pathname.new(dot_directory) + "edit-server-port"
         # InAppClient's constructor stops anyone else from reading the .secret file.
         client = InAppClient.new(serverPortPathname)
         filename = ARGV[0]
@@ -58,7 +61,7 @@ class Evergreen
         
         invoker = Java.new("Evergreen", "e/util/Launcher")
         invoker.log_filename = "/tmp/edit.log.#$$"
-        invoker.add_pathname_property("preferencesDirectory", edit_preferences_directory)
+        invoker.add_pathname_property("preferencesDirectory", dot_directory)
         invoker.add_property("e.gui.HelpMenu.hasManual", "true")
         invoker.add_property("e.gui.HelpMenu.supportAddress", "evergreen-users@googlegroups.com")
         invoker.add_property("e.gui.HelpMenu.supportSite", "http://groups.google.com/group/evergreen-users")
