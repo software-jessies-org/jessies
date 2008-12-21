@@ -28,6 +28,12 @@ public:
     {
     }
     
+    // Used by JavaHpp.java to prevent static methods trying to access non-static fields.
+    JniField()
+    : m_env(0), m_instance(0), m_fieldName(0), m_fieldSignature(0)
+    {
+    }
+    
     Self& operator=(const NativeT& rhs) {
         set(rhs);
         return *this;
