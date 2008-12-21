@@ -52,6 +52,13 @@ public class JavaHpp {
         emit_newStringUtf8(out);
         
         out.println("public:");
+        out.println("// For static methods.");
+        out.println(proxyClassName + "(JNIEnv* env)");
+        out.println(": m_env(env)");
+        out.println(", m_instance(0)");
+        out.println("{ }");
+        
+        out.println("// For non-static methods.");
         out.println(proxyClassName + "(JNIEnv* env, jobject instance)");
         out.println(": m_env(env)");
         out.println(", m_instance(instance)");
@@ -61,8 +68,7 @@ public class JavaHpp {
             }
             out.println(", " + field.getName() + "(env, instance, \"" + field.getName() + "\", \"" + encodedTypeNameFor(field.getType()) + "\")");
         }
-        out.println("{");
-        out.println("}");
+        out.println("{ }");
         for (Method method : nativeMethods) {
             StringBuilder proxyMethodArguments = new StringBuilder();
             for (Class<?> parameterType : method.getParameterTypes()) {
@@ -87,8 +93,9 @@ public class JavaHpp {
                     jniMangledName += jniMangle(encodedTypeNameFor(parameterType));
                 }
             }
+            final boolean isStatic = ((method.getModifiers() & Modifier.STATIC) != 0);
             String jniReturnType = jniTypeNameFor(method.getReturnType());
-            String parameters = "JNIEnv* env, jobject instance";
+            String parameters = isStatic ? "JNIEnv* env, jclass /*klass*/" : "JNIEnv* env, jobject instance";
             String arguments = "";
             int argCount = 0;
             for (Class<?> parameterType : method.getParameterTypes()) {
@@ -102,7 +109,7 @@ public class JavaHpp {
             
             out.println("extern \"C\" JNIEXPORT " + jniReturnType + " JNICALL " + jniMangledName + "(" + parameters + ") {");
             out.println("try {");
-            out.println(proxyClassName + " proxy(env, instance);");
+            out.println(proxyClassName + " proxy(env" + (isStatic ? "" : ", instance") + ");");
             String proxyMethodCall = "proxy." + jniMangle(method.getName()) + "(" + arguments + ")";
             if (method.getReturnType() == Void.TYPE) {
                 out.println(proxyMethodCall + ";");
