@@ -42,7 +42,6 @@ public class TerminatorMenuBar extends EMenuBar {
 		menu.addSeparator();
 		menu.add(new NewTabAction());
 		menu.add(new NewCommandTabAction());
-		menu.add(new DetachTabAction());
 		
 		menu.addSeparator();
 		menu.add(new CloseAction());
@@ -93,6 +92,7 @@ public class TerminatorMenuBar extends EMenuBar {
 	
 	private JMenu makeTabsMenu() {
 		final JMenu menu = new JMenu("Tabs");
+		menu.add(new DetachTabAction());
 		for (Action action : customWindowMenuItems) {
 			menu.add(action);
 		}
