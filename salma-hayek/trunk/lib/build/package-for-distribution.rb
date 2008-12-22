@@ -381,6 +381,9 @@ if target_os() == "Linux"
         
         control.puts("Depends: #{depends}")
         control.puts("Build-Depends: #{build_depends}")
+        # Although Replaces would remove the need for user intervention, it would be anti-social
+        # both to the conflicting package and to anyone using the Scheme interpreter or pane-oriented terminal.
+        control.puts("Conflicts: #{machine_project_name}")
         control.puts("Homepage: http://software.jessies.org/#{machine_project_name}")
         control.puts("Installed-Size: #{installed_size}")
         control.puts("Maintainer: software.jessies.org team <software@jessies.org>")
