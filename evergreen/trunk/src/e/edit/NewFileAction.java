@@ -81,7 +81,7 @@ public class NewFileAction extends ETextAction {
         ArrayList<String> lines = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, lines);
         
-        String result = StringUtilities.writeFile(file, StringUtilities.join(lines, "\n"));
+        String result = StringUtilities.writeFile(file, StringUtilities.join(lines, "\n") + "\n");
         if (result != null) {
             Evergreen.getInstance().showAlert("Couldn't fill new file", "There was a problem filling \"" + file + "\" with initial content: " + result + ".");
         }
