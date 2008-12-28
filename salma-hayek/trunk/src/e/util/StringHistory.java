@@ -105,7 +105,7 @@ public class StringHistory {
         // FIXME: this relies on the calling code not calling us too frequently; a timer might be a better idea.
         executor.execute(new Runnable() {
             public void run() {
-                String error = StringUtilities.writeFile(FileUtilities.fileFromString(filename), StringUtilities.join(history, "\n"));
+                String error = StringUtilities.writeFile(FileUtilities.fileFromString(filename), history);
                 if (error != null) {
                     Log.warn("Failed to write history to file \"" + filename + "\" (" + error + ").");
                 }

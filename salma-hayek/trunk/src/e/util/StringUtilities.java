@@ -45,12 +45,35 @@ public class StringUtilities {
         }
     }
     
-    /** Writes the given String to the given File. Returns the text of the exception message on failure, null on success. */
+    /**
+     * Writes the given String to the given File, overwriting any existing content.
+     * Returns the text of the exception message on failure, null on success.
+     */
     public static String writeFile(File file, CharSequence content) {
+        return writeFile0(file, content, null);
+    }
+    
+    /**
+     * Writes the given lines to the given File, overwriting any existing content.
+     * Returns the text of the exception message on failure, null on success.
+     */
+    public static String writeFile(File file, List<String> lines) {
+        return writeFile0(file, null, lines);
+    }
+    
+    private static String writeFile0(File file, CharSequence content, List<String> lines) {
         PrintWriter out = null;
         try {
             out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
-            out.print(content);
+            if (content != null) {
+                out.print(content);
+            } else {
+                for (String line : lines) {
+                    // We could use println, but we'd probably want to make readFile smarter first.
+                    out.print(content);
+                    out.print("\n");
+                }
+            }
             return null;
         } catch (IOException ex) {
             return ex.getMessage();
