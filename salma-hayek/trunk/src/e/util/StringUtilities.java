@@ -70,7 +70,7 @@ public class StringUtilities {
             } else {
                 for (String line : lines) {
                     // We could use println, but we'd probably want to make readFile smarter first.
-                    out.print(content);
+                    out.print(line);
                     out.print("\n");
                 }
             }
