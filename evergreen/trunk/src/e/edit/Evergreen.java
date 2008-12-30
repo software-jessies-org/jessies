@@ -466,6 +466,7 @@ public class Evergreen {
                 if (workspace.isEmpty() == false) {
                     return false;
                 }
+                // The workspace is empty, therefore there is no need to moveFilesToBestWorkspaces.
                 tabbedPane.remove(workspace);
                 reorganizeWorkspacesAfterConfigurationChange();
                 workspace.dispose();
@@ -499,6 +500,7 @@ public class Evergreen {
             return;
         }
         
+        workspace.moveFilesToBestWorkspaces();
         tabbedPane.remove(workspace);
         reorganizeWorkspacesAfterConfigurationChange();
         workspace.dispose();
