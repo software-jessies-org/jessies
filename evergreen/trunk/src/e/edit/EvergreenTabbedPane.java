@@ -12,28 +12,15 @@ import javax.swing.event.*;
 public class EvergreenTabbedPane extends TabbedPane {
     public EvergreenTabbedPane() {
         super(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);
-        
-        initPopUpMenu();
         addChangeListener(new WorkspaceFocuser());
     }
     
-    private void initPopUpMenu() {
-        EPopupMenu tabMenu = new EPopupMenu(this);
-        tabMenu.addMenuItemProvider(new MenuItemProvider() {
-            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
-                // If the user clicked on some part of the tabbed pane that isn't actually a tab, we're not interested.
-                int tabIndex = indexAtLocation(e.getX(), e.getY());
-                if (tabIndex == -1) {
-                    return;
-                }
-                
-                Workspace workspace = (Workspace) getComponentAt(tabIndex);
-                actions.add(new RescanWorkspaceAction(workspace));
-                actions.add(null);
-                actions.add(new EditWorkspaceAction(workspace));
-                actions.add(new RemoveWorkspaceAction(workspace));
-            }
-        });
+    @Override protected void provideMenuItems(int index, Collection<Action> actions) {
+        final Workspace workspace = (Workspace) getComponentAt(index);
+        actions.add(new RescanWorkspaceAction(workspace));
+        actions.add(null);
+        actions.add(new EditWorkspaceAction(workspace));
+        actions.add(new RemoveWorkspaceAction(workspace));
     }
     
     @Override public String getToolTipTextAt(int index) {
