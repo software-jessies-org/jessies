@@ -18,7 +18,7 @@ public class Evergreen {
     private static Evergreen instance;
     
     private JFrame frame;
-    private JTabbedPane tabbedPane;
+    private TabbedPane tabbedPane;
     private JSplitPane splitPane;
     private TagsPanel tagsPanel;
     private EStatusBar statusLine;
@@ -521,18 +521,12 @@ public class Evergreen {
         });
         thread.start();
         moveFilesToBestWorkspaces();
-        for (Workspace workspace : getWorkspaces()) {
-            String name = workspace.getTitle();
-            final int newIndex = chooseIndexInTabbedPane(tabbedPane, name);
-            if (workspace == (Workspace) tabbedPane.getComponentAt(newIndex)) {
-                continue;
-            }
-            boolean wasSelected = getCurrentWorkspace() == workspace;
-            tabbedPane.remove(workspace);
-            tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), newIndex);
-            if (wasSelected) {
-                tabbedPane.setSelectedComponent(workspace);
-            }
+        
+        // Re-sort the tabs.
+        final Workspace[] workspaces = getWorkspaces();
+        for (int i = 0; i < workspaces.length; ++i) {
+            final int newIndex = chooseIndexInTabbedPane(tabbedPane, workspaces[i].getTitle());
+            tabbedPane.moveTab(i, newIndex);
         }
     }
     
@@ -690,14 +684,9 @@ public class Evergreen {
         }
         
         workspace.setInitialFiles(initialFiles);
-        File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
-        int which = tabbedPane.indexOfComponent(workspace);
-        if (rootDirectory.exists() == false) {
-            tabbedPane.setForegroundAt(which, Color.RED);
-            tabbedPane.setToolTipTextAt(which, properties.rootDirectory + " doesn't exist.");
-        } else if (rootDirectory.isDirectory() == false) {
-            tabbedPane.setForegroundAt(which, Color.RED);
-            tabbedPane.setToolTipTextAt(which, properties.rootDirectory + " isn't a directory.");
+        final File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
+        if (rootDirectory.exists() == false || rootDirectory.isDirectory() == false) {
+            tabbedPane.setForegroundAt(tabbedPane.indexOfComponent(workspace), Color.RED);
         }
         return workspace;
     }

@@ -4,6 +4,7 @@ import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -37,9 +38,13 @@ public class EvergreenTabbedPane extends TabbedPane {
     
     @Override public String getToolTipTextAt(int index) {
         // You always get this bit.
-        String normalText = super.getToolTipTextAt(index);
-        if (normalText == null) {
-            normalText = "";
+        final Workspace workspace = (Workspace) getComponentAt(index);
+        final File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
+        String normalText = FileUtilities.getUserFriendlyName(rootDirectory);
+        if (rootDirectory.exists() == false) {
+            normalText += "<p><font color='red'>(This directory doesn't exist.)</font>";
+        } else if (rootDirectory.isDirectory() == false) {
+            normalText += "<p><font color='red'>(This isn't a directory.)</font>";
         }
         
         // Unless you have a ridiculous number of tabs, you'll get this bit.
