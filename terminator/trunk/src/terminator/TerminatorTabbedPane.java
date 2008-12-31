@@ -9,7 +9,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import terminator.view.*;
 
-public class TerminatorTabbedPane extends JTabbedPane {
+public class TerminatorTabbedPane extends TabbedPane {
     private static final TabDragger TAB_DRAGGER = new TabDragger();
     
     /**
@@ -62,17 +62,9 @@ public class TerminatorTabbedPane extends JTabbedPane {
     }
     
     public TerminatorTabbedPane() {
-        // We want to provide custom tool tips.
-        ToolTipManager.sharedInstance().registerComponent(this);
-        
         initPopUpMenu();
         
         addChangeListener(new TerminalFocuser());
-        ComponentUtilities.disableFocusTraversal(this);
-        
-        // The tabs themselves (the components with the labels) shouldn't be able to get the focus.
-        // If they can, clicking on an already-selected tab takes focus away from the associated terminal, which is annoying.
-        setFocusable(false);
         
         // Enable drag-to-order for the tab ears, but not on Mac OS where it doesn't work with the LAF.
         if (GuiUtilities.isMacOs() == false) {
@@ -107,44 +99,7 @@ public class TerminatorTabbedPane extends JTabbedPane {
         });
     }
     
-    public void moveTab(int originalIndex, int newIndex) {
-        // Clamp movement to the ends (rather than wrapping round or going out of bounds).
-        newIndex = Math.max(0, newIndex);
-        newIndex = Math.min(newIndex, getTabCount() - 1);
-        if (newIndex == originalIndex) {
-            return;
-        }
-        
-        // Remember everything about the original tab.
-        final Color background = getBackgroundAt(originalIndex);
-        final Component component = getComponentAt(originalIndex);
-        final Icon disabledIcon = getDisabledIconAt(originalIndex);
-        final int displayedMnemonicIndex = getDisplayedMnemonicIndexAt(originalIndex);
-        final boolean enabled = isEnabledAt(originalIndex);
-        final Color foreground = getForegroundAt(originalIndex);
-        final Icon icon = getIconAt(originalIndex);
-        final int mnemonic = getMnemonicAt(originalIndex);
-        final String title = getTitleAt(originalIndex);
-        final String toolTip = getToolTipTextAt(originalIndex);
-        final Component tabComponent = getTabComponentAt_safe(originalIndex);
-        
-        // Remove the original tab and add a new one.
-        remove(originalIndex);
-        insertTab(title, icon, component, toolTip, newIndex);
-        setSelectedIndex(newIndex);
-        
-        // Configure the new tab to look like the old one.
-        setBackgroundAt(newIndex, background);
-        setDisabledIconAt(newIndex, disabledIcon);
-        setDisplayedMnemonicIndexAt(newIndex, displayedMnemonicIndex);
-        setEnabledAt(newIndex, enabled);
-        setForegroundAt(newIndex, foreground);
-        setMnemonicAt(newIndex, mnemonic);
-        setTabComponentAt_safe(newIndex, tabComponent);
-    }
-    
-    @Override
-    public String getToolTipTextAt(int index) {
+    @Override public String getToolTipTextAt(int index) {
         // Unless you have a ridiculous number of tabs, you'll get this bit.
         String switchMessage = "";
         String key = tabIndexToKey(index);
@@ -163,37 +118,7 @@ public class TerminatorTabbedPane extends JTabbedPane {
         return "<html><body>" + switchMessage + cycleMessage;
     }
     
-    public static String tabIndexToKey(int index) {
-        if ((index + 1) <= 9) {
-            return Integer.toString(index + 1);
-        } else if ((index + 1) == 10) {
-            // This seems strange, and makes the code awkward, but it matches the order of keys (1234567890).
-            return "0";
-        }
-        return null;
-    }
-    
-    public static int keyCharToTabIndex(char ch) {
-        if (ch >= '1' && ch <= '9') {
-            return (ch - '1');
-        } else if (ch == '0') {
-            return 9;
-        }
-        return -1;
-    }
-    
-    // Just overriding getToolTipTextAt is insufficient because the default implementation of getToolTipText doesn't call it.
-    @Override
-    public String getToolTipText(MouseEvent event) {
-        int index = indexAtLocation(event.getX(), event.getY());
-        if (index != -1) {
-            return getToolTipTextAt(index);
-        }
-        return super.getToolTipText(event);
-    }
-    
-    @Override
-    public void addTab(String name, Component c) {
+    @Override public void addTab(String name, Component c) {
         super.addTab(name, c);
         
         int newIndex = getTabCount() - 1;
@@ -201,8 +126,7 @@ public class TerminatorTabbedPane extends JTabbedPane {
         setTabComponentAt_safe(newIndex, tabEar);
     }
     
-    @Override
-    public void setTitleAt(int index, String title) {
+    @Override public void setTitleAt(int index, String title) {
         TerminatorTabComponent c = (TerminatorTabComponent) getTabComponentAt_safe(index);
         if (c != null) {
             c.setTitle(title);
@@ -210,27 +134,7 @@ public class TerminatorTabbedPane extends JTabbedPane {
         super.setTitleAt(index, title);
     }
     
-    // We make use of Java 6's custom tab ear components if available, but we still want to work on Java 5 until Java 6 is widespread.
-    // FIXME: Java 6 getTabComponentAt
-    private Component getTabComponentAt_safe(int index) {
-        try {
-            return (Component) JTabbedPane.class.getMethod("getTabComponentAt", int.class).invoke(this, index);
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-    
-    // We make use of Java 6's custom tab ear components if available, but we still want to work on Java 5 until Java 6 is widespread.
-    // FIXME: Java 6 => setTabComponentAt
-    private void setTabComponentAt_safe(int index, Component c) {
-        try {
-            JTabbedPane.class.getMethod("setTabComponentAt", int.class, Component.class).invoke(this, index, c);
-        } catch (Exception ex) {
-        }
-    }
-    
-    @Override
-    protected void fireStateChanged() {
+    @Override protected void fireStateChanged() {
         super.fireStateChanged();
         updateSpinnerVisibilities();
     }
