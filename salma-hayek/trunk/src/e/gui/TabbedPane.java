@@ -11,7 +11,7 @@ public class TabbedPane extends JTabbedPane {
         ToolTipManager.sharedInstance().registerComponent(this);
         
         // The tabs themselves (the components with the labels) shouldn't be able to get the focus.
-        // If they can, clicking on an already-selected tab takes focus away from the associated terminal, which is annoying.
+        // If they can, clicking on an already-selected tab takes focus away from the associated content, which is annoying.
         setFocusable(false);
         ComponentUtilities.disableFocusTraversal(this);
     }
