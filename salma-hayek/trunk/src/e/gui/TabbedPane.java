@@ -106,11 +106,15 @@ public class TabbedPane extends JTabbedPane {
         
         // We deliberately don't save/restore the tool tip because we assume it's dynamically generated.
         final String toolTip = null;
+        // We do want to restore the selection, though, even though it's a property of the tabbed pane rather than any tab.
+        final boolean wasSelected = (getSelectedIndex() == originalIndex);
         
         // Remove the original tab and add a new one.
         remove(originalIndex);
         insertTab(title, icon, component, toolTip, newIndex);
-        setSelectedIndex(newIndex);
+        if (wasSelected) {
+            setSelectedIndex(newIndex);
+        }
         
         // Configure the new tab to look like the old one.
         setBackgroundAt(newIndex, background);
