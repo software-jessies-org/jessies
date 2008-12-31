@@ -7,6 +7,12 @@ import javax.swing.*;
 
 public class TabbedPane extends JTabbedPane {
     public TabbedPane() {
+        this(TOP);
+    }
+    
+    public TabbedPane(int tabPlacement) {
+        super(tabPlacement);
+        
         // We want to provide custom tool tips.
         ToolTipManager.sharedInstance().registerComponent(this);
         
