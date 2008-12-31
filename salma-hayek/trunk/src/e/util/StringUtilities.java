@@ -82,6 +82,21 @@ public class StringUtilities {
         }
     }
     
+    @Test private static void testWriteFile_CharSequence() {
+        final File tmpFile = FileUtilities.createTemporaryFile("test", "test file");
+        final String expectedString = "hello\nworld";
+        Assert.equals(writeFile(tmpFile, expectedString), null);
+        Assert.equals(join(readLinesFromFile(tmpFile), "\n"), expectedString);
+    }
+    
+    @Test private static void testWriteFile_List() {
+        final File tmpFile = FileUtilities.createTemporaryFile("test", "test file");
+        final List<String> expectedLines = Arrays.asList(new String[] { "hello", "world" });
+        Assert.equals(writeFile(tmpFile, expectedLines), null);
+        final List<String> actualLines = Arrays.asList(readLinesFromFile(tmpFile));
+        Assert.equals(actualLines, expectedLines);
+    }
+    
     public static boolean writeAtomicallyTo(File file, CharSequence chars) {
         // We save to a new file first, to reduce our chances of corrupting the real file, or at least increase our chances of having one intact copy.
         File backupFile = new File(file.toString() + ".bak");

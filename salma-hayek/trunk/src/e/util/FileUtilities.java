@@ -393,21 +393,35 @@ public class FileUtilities {
     }
     
     /**
-     * Creates a temporary file containing 'content' where the temporary file's
-     * name begins with 'prefix'. Returns the name of the temporary file.
-     * On error, a RuntimeException is thrown which will refer to the file
-     * using 'humanReadableName'. The file will be deleted on exit. 
+     * Returns a temporary file whose name begins with 'prefix'.
+     * The file will be deleted on exit.
+     * On error, a RuntimeException is thrown which will refer to the file using 'humanReadableName'.
      */
-    public static String createTemporaryFile(String prefix, String humanReadableName, String content) {
+    public static File createTemporaryFile(String prefix, String humanReadableName) {
         try {
             File file = File.createTempFile(prefix, null);
             file.deleteOnExit();
+            return file;
+        } catch (IOException ex) {
+            throw new RuntimeException("Couldn't create " + humanReadableName + ": " + ex.getMessage());
+        }
+    }
+    
+    /**
+     * Creates a temporary file containing 'content' where the temporary file's name begins with 'prefix'.
+     * The file will be deleted on exit.
+     * Returns the name of the temporary file.
+     * On error, a RuntimeException is thrown which will refer to the file using 'humanReadableName'.
+     */
+    public static String createTemporaryFile(String prefix, String humanReadableName, String content) {
+        try {
+            File file = createTemporaryFile(prefix, humanReadableName);
             PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
             out.print(content);
             out.close();
             return file.toString();
         } catch (IOException ex) {
-            throw new RuntimeException("Couldn't create " + humanReadableName + ": " + ex.getMessage());
+            throw new RuntimeException("Couldn't write " + humanReadableName + ": " + ex.getMessage());
         }
     }
     
