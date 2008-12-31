@@ -62,8 +62,6 @@ public class TerminatorTabbedPane extends TabbedPane {
     }
     
     public TerminatorTabbedPane() {
-        initPopUpMenu();
-        
         addChangeListener(new TerminalFocuser());
         
         // Enable drag-to-order for the tab ears, but not on Mac OS where it doesn't work with the LAF.
@@ -78,25 +76,14 @@ public class TerminatorTabbedPane extends TabbedPane {
         }
     }
     
-    private void initPopUpMenu() {
-        EPopupMenu tabMenu = new EPopupMenu(this);
-        tabMenu.addMenuItemProvider(new MenuItemProvider() {
-            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
-                // If the user clicked on some part of the tabbed pane that isn't actually a tab, we're not interested.
-                int tabIndex = indexAtLocation(e.getX(), e.getY());
-                if (tabIndex == -1) {
-                    return;
-                }
-                
-                actions.add(new TerminatorMenuBar.NewTabAction());
-                actions.add(new TerminatorMenuBar.DetachTabAction());
-                actions.add(null);
-                actions.add(new TerminatorMenuBar.MoveTabAction(+1));
-                actions.add(new TerminatorMenuBar.MoveTabAction(-1));
-                actions.add(null);
-                actions.add(new TerminatorMenuBar.CloseAction());
-            }
-        });
+    @Override protected void provideMenuItems(int index, Collection<Action> actions) {
+        actions.add(new TerminatorMenuBar.NewTabAction());
+        actions.add(new TerminatorMenuBar.DetachTabAction());
+        actions.add(null);
+        actions.add(new TerminatorMenuBar.MoveTabAction(+1));
+        actions.add(new TerminatorMenuBar.MoveTabAction(-1));
+        actions.add(null);
+        actions.add(new TerminatorMenuBar.CloseAction());
     }
     
     @Override public String getToolTipTextAt(int index) {
