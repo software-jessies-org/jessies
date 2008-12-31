@@ -3,6 +3,7 @@ package e.gui;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 
 public class TabbedPane extends JTabbedPane {
@@ -20,6 +21,26 @@ public class TabbedPane extends JTabbedPane {
         // If they can, clicking on an already-selected tab takes focus away from the associated content, which is annoying.
         setFocusable(false);
         ComponentUtilities.disableFocusTraversal(this);
+        
+        initPopUpMenu();
+    }
+    
+    private void initPopUpMenu() {
+        final EPopupMenu tabMenu = new EPopupMenu(this);
+        tabMenu.addMenuItemProvider(new MenuItemProvider() {
+            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+                // If the user clicked on a part of the tabbed pane that's actually a tab, see if we have anything to offer.
+                final int tabIndex = indexAtLocation(e.getX(), e.getY());
+                if (tabIndex != -1) {
+                    TabbedPane.this.provideMenuItems(tabIndex, actions);
+                }
+            }
+        });
+    }
+    
+    // Override this if you want a pop-up menu on the given tab.
+    // If you don't override it, you'll get no menu.
+    protected void provideMenuItems(int tabIndex, Collection<Action> actions) {
     }
     
     // Override getToolTipText to defer to getToolTipTextAt, if we're over a tab.
