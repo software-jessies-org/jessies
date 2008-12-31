@@ -8,23 +8,12 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-public class EvergreenTabbedPane extends JTabbedPane {
+public class EvergreenTabbedPane extends TabbedPane {
     public EvergreenTabbedPane() {
         super(GuiUtilities.isMacOs() ? JTabbedPane.LEFT : JTabbedPane.TOP);
         
-        // We want to provide custom tool tips.
-        ToolTipManager.sharedInstance().registerComponent(this);
-        
         initPopUpMenu();
-        
         addChangeListener(new WorkspaceFocuser());
-        ComponentUtilities.disableFocusTraversal(this);
-        
-        // The tabs themselves (the components with the labels)
-        // shouldn't be able to get the focus. If they can, clicking
-        // on an already-selected tab takes focus away from the
-        // associated content, which is annoying.
-        setFocusable(false);
     }
     
     private void initPopUpMenu() {
@@ -46,32 +35,22 @@ public class EvergreenTabbedPane extends JTabbedPane {
         });
     }
     
-    @Override
-    public String getToolTipTextAt(int index) {
+    @Override public String getToolTipTextAt(int index) {
+        // You always get this bit.
         String normalText = super.getToolTipTextAt(index);
         if (normalText == null) {
             normalText = "";
         }
         
-        final int numberKey = (index + 1);
-        if (numberKey > 9) {
-            // No keyboard I've ever seen has number keys above 9.
-            // Extending the current scheme to "0" (and "-" and "="?) is more work than it's probably worth.
-            // Apple keyboards have function keys up to F16 if we were to use those instead, but Mac OS uses many of them from F9 up anyway.
-            return null;
+        // Unless you have a ridiculous number of tabs, you'll get this bit.
+        String switchMessage = "";
+        String key = tabIndexToKey(index);
+        if (key != null) {
+            String primaryModifier = GuiUtilities.isMacOs() ? "\u2318" : "Alt+";
+            switchMessage = "Use " + primaryModifier + key + " to switch to this tab.";
         }
-        String primaryModifier = "Alt+";
-        return "<html><body>" + normalText + "<p>Use " + primaryModifier + numberKey + " to switch to this tab.";
-    }
-    
-    // Just overriding getToolTipTextAt is insufficient because the default implementation of getToolTipText doesn't call it.
-    @Override
-    public String getToolTipText(MouseEvent event) {
-        int index = indexAtLocation(event.getX(), event.getY());
-        if (index != -1) {
-            return getToolTipTextAt(index);
-        }
-        return super.getToolTipText(event);
+        
+        return "<html><body>" + normalText + "<p>" + switchMessage;
     }
     
     /**

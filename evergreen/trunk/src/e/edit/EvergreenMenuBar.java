@@ -230,13 +230,13 @@ public class EvergreenMenuBar extends EMenuBar {
         return helpMenu.makeJMenu();
     }
     
-    @Override
-    protected boolean processKeyBinding(KeyStroke ks, KeyEvent event, int condition, boolean pressed) {
+    @Override protected boolean processKeyBinding(KeyStroke ks, KeyEvent event, int condition, boolean pressed) {
         int modifier = KeyEvent.ALT_MASK;
         if ((event.getModifiers() & modifier) == modifier) {
             char ch = event.getKeyChar();
-            if (ch >= '1' && ch <= '9') {
-                Evergreen.getInstance().goToWorkspaceByIndex(ch - '1');
+            final int newIndex = TabbedPane.keyCharToTabIndex(ch);
+            if (newIndex != -1) {
+                Evergreen.getInstance().goToWorkspaceByIndex(newIndex);
                 return true;
             }
         }
