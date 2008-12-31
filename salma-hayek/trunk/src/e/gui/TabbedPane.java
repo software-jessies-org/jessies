@@ -22,13 +22,21 @@ public class TabbedPane extends JTabbedPane {
         ComponentUtilities.disableFocusTraversal(this);
     }
     
-    // Just overriding getToolTipTextAt is insufficient because the default implementation of getToolTipText doesn't call it.
+    // Override getToolTipText to defer to getToolTipTextAt, if we're over a tab.
     @Override public String getToolTipText(MouseEvent event) {
         int index = indexAtLocation(event.getX(), event.getY());
         if (index != -1) {
             return getToolTipTextAt(index);
         }
         return super.getToolTipText(event);
+    }
+    
+    // Disable setToolTipTextAt to force people to override getToolTipTextAt (which we call from getToolTipText).
+    // If you try to use setToolTipTextAt:
+    // 1. text you set can go stale (where overriding getToolTipTextAt means you're always in the loop).
+    // 2. it's hard for callers to differentiate timeless text from text that can go stale (see moveTab).
+    @Override public void setToolTipTextAt(int index, String toolTipText) {
+        throw new RuntimeException("do not use setToolTipTextAt; override getToolTipTextAt instead");
     }
     
     // Support for keyboard equivalents that jump straight to a given tab.
@@ -94,8 +102,10 @@ public class TabbedPane extends JTabbedPane {
         final Icon icon = getIconAt(originalIndex);
         final int mnemonic = getMnemonicAt(originalIndex);
         final String title = getTitleAt(originalIndex);
-        final String toolTip = getToolTipTextAt(originalIndex);
         final Component tabComponent = getTabComponentAt_safe(originalIndex);
+        
+        // We deliberately don't save/restore the tool tip because we assume it's dynamically generated.
+        final String toolTip = null;
         
         // Remove the original tab and add a new one.
         remove(originalIndex);
