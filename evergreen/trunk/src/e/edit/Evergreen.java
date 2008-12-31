@@ -398,7 +398,7 @@ public class Evergreen {
      * we shouldn't be upset by a workspace seeming to be in the wrong place, as was
      * so easily the case with the previous implicit chronological order.
      */
-    private int getWorkspaceIndexInTabbedPane(String name) {
+    private static int chooseIndexInTabbedPane(JTabbedPane tabbedPane, String name) {
         int index = 0;
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             String title = tabbedPane.getTitleAt(i);
@@ -429,8 +429,9 @@ public class Evergreen {
     }
     
     private void addWorkspaceToTabbedPane(final Workspace workspace) {
-        String name = workspace.getTitle();
-        tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), getWorkspaceIndexInTabbedPane(name));
+        final String name = workspace.getTitle();
+        final int newIndex = chooseIndexInTabbedPane(tabbedPane, name);
+        tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), newIndex);
         tabbedPane.setSelectedComponent(workspace);
         
         // We need to ensure that the workspace has been validated so that it
@@ -522,7 +523,7 @@ public class Evergreen {
         moveFilesToBestWorkspaces();
         for (Workspace workspace : getWorkspaces()) {
             String name = workspace.getTitle();
-            int newIndex = getWorkspaceIndexInTabbedPane(name);
+            final int newIndex = chooseIndexInTabbedPane(tabbedPane, name);
             if (workspace == (Workspace) tabbedPane.getComponentAt(newIndex)) {
                 continue;
             }
