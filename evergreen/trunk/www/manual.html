@@ -327,11 +327,18 @@ tools.0.command=!wc $EDIT_CURRENT_FILENAME
 tools.0.keyboardEquivalent=f5
 </pre>
 
+<p>If you work on scripts that take no arguments, and would like to be able to run them from the editor (with clickable links in any stack traces that are output, taking you back to the source), you can use something like this:
+<pre>
+tools.1.name=Execute Current File
+tools.1.command=!$EDIT_CURRENT_FILENAME
+tools.1.keyboardEquivalent=f3
+</pre>
+
 <p>Here's how you'd make control-shift-e insert the current date (with mnemonic 'D'):
 <pre>
-tools.1.name=Insert _Date
-tools.1.command=&lt;date --iso
-tools.1.keyboardEquivalent=e
+tools.2.name=Insert _Date
+tools.2.command=&lt;date --iso
+tools.2.keyboardEquivalent=e
 </pre>
 
 <p>There are also three boolean settings. You can cause the "some files are unsaved" dialog to appear by setting <tt>tools.0.checkEverythingSaved=true</tt>. You can disable a tool if there's no current file with <tt>tools.0.needsFile=true</tt>. You can cause an "are you sure" dialog to appear by setting <tt>tools.0.requestsConfirmation=true</tt>.
