@@ -188,7 +188,7 @@ public class DebugMenu {
             int i = 0;
             for (Window window : windows) {
                 if (window.isDisplayable()) {
-                    builder.append("\n" + i + ": " + window.toString() + "\n");
+                    describeWindow(builder, i, window);
                     ++i;
                 } else {
                     ++nonDisplayableCount;
@@ -199,7 +199,7 @@ public class DebugMenu {
                 i = 0;
                 for (Window window : windows) {
                     if (window.isDisplayable() == false) {
-                        builder.append("\n" + i + ": " + window.toString() + "\n");
+                        describeWindow(builder, i, window);
                         ++i;
                     }
                 }
@@ -208,6 +208,24 @@ public class DebugMenu {
                 builder.append("\n(Upgrade to Java 6 to get the windows too.)");
             }
             return builder.toString();
+        }
+        
+        private static void describeWindow(StringBuilder sb, int i, Window window) {
+            sb.append("\n");
+            sb.append(i);
+            sb.append(": ");
+            // Work around the fact that there's no Window.getTitle method.
+            if (window instanceof Frame) {
+                sb.append("\"");
+                sb.append(((Frame) window).getTitle());
+                sb.append("\": ");
+            } else if (window instanceof Dialog) {
+                sb.append("\"");
+                sb.append(((Dialog) window).getTitle());
+                sb.append("\": ");
+            }
+            sb.append(window.toString());
+            sb.append("\n");
         }
     }
     
