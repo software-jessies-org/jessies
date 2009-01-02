@@ -1,7 +1,6 @@
 #!/usr/bin/ruby -w
 
 # Simple boilerplate generator for Evergreen.
-# Copyright (C) Elliott Hughes, 2008.
 
 # Test with:
 # evergreen-boilerplate-generator /usr/enh/projects/blah/src/SomeClass.h /usr/enh/projects/blah/src/org/jessies/talc/Talc.java
