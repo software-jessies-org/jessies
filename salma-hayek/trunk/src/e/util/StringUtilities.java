@@ -91,7 +91,7 @@ public class StringUtilities {
     
     @Test private static void testWriteFile_List() {
         final File tmpFile = FileUtilities.createTemporaryFile("test", "test file");
-        final List<String> expectedLines = Arrays.asList(new String[] { "hello", "world" });
+        final List<String> expectedLines = Arrays.asList("hello", "world");
         Assert.equals(writeFile(tmpFile, expectedLines), null);
         final List<String> actualLines = Arrays.asList(readLinesFromFile(tmpFile));
         Assert.equals(actualLines, expectedLines);
