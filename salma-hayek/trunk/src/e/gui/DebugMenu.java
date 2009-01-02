@@ -185,18 +185,22 @@ public class DebugMenu {
             int nonDisplayableCount = 0;
             StringBuilder builder = new StringBuilder();
             builder.append("Displayable\n===========");
+            int i = 0;
             for (Window window : windows) {
                 if (window.isDisplayable()) {
-                    builder.append("\n" + window.toString() + "\n");
+                    builder.append("\n" + i + ": " + window.toString() + "\n");
+                    ++i;
                 } else {
                     ++nonDisplayableCount;
                 }
             }
             if (nonDisplayableCount > 0) {
                 builder.append("\nNon-displayable\n===============");
+                i = 0;
                 for (Window window : windows) {
                     if (window.isDisplayable() == false) {
-                        builder.append("\n" + window.toString() + "\n");
+                        builder.append("\n" + i + ": " + window.toString() + "\n");
+                        ++i;
                     }
                 }
             }
