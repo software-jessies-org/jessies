@@ -31,8 +31,7 @@ public class BuildAction extends ETextAction {
     private void buildProject() {
         Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         if (building) {
-            // Make sure the user can click on the Stop icon.
-            workspace.getErrorsWindow().setVisible(true);
+            // FIXME: work harder to recognize possibly-deliberate duplicate builds (different targets or makefiles, for example).
             Evergreen.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
             return;
         }
@@ -99,8 +98,7 @@ public class BuildAction extends ETextAction {
         String makefileDirectoryName = makefileName.substring(0, makefileName.lastIndexOf(File.separatorChar));
         command = addTarget(workspace, command);
         try {
-            final ShellCommand shellCommand = new ShellCommand(command, ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW);
-            shellCommand.setWorkspace(workspace);
+            final ShellCommand shellCommand = new ShellCommand(workspace, command, ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW);
             shellCommand.setContext(makefileDirectoryName);
             shellCommand.setLaunchRunnable(new Runnable() {
                 public void run() {

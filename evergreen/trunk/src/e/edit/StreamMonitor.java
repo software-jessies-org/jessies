@@ -20,8 +20,7 @@ public class StreamMonitor extends SwingWorker<Object, String> {
         this.isStdErr = isStdErr;
     }
     
-    @Override
-    protected Object doInBackground() {
+    @Override protected Object doInBackground() {
         task.streamOpened();
         try {
             String line;
@@ -36,8 +35,7 @@ public class StreamMonitor extends SwingWorker<Object, String> {
         return null;
     }
     
-    @Override
-    protected void process(List<String> lines) {
-        task.process(isStdErr, lines);
+    @Override protected void process(List<String> lines) {
+        task.processLines(isStdErr, lines);
     }
 }
