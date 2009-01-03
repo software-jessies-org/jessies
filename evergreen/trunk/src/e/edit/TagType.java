@@ -37,6 +37,7 @@ public enum TagType {
     ENUM_CONSTANT("enum constant", null, false, "%s"),
     EXTERN("extern", null, false, "extern %s"),
     FIELD("field", TagShapes.TRIANGLE, false, "%s"),
+    HEADING("heading", TagShapes.SQUARE, true, "%s"),
     INTERFACE("interface", TagShapes.CIRCLE, true, "interface %s"),
     MACRO("macro", TagShapes.HASH, false, "%s"),
     METHOD("method", TagShapes.SQUARE, false, "%s()"),
@@ -45,6 +46,7 @@ public enum TagType {
     PACKAGE("package", null, false, "package %s"),
     PROTOTYPE("prototype", TagShapes.SQUARE, false, "%s() prototype"),
     STRUCT("struct", TagShapes.CIRCLE, true, "struct %s"),
+    TITLE("title", TagShapes.SQUARE, true, "%s"),
     TYPEDEF("typedef", null, false, "typedef %s"),
     UNION("union", TagShapes.CIRCLE, false, "union %s"),
     VARIABLE("variable", TagShapes.TRIANGLE, false, "%s"),
@@ -92,6 +94,8 @@ public enum TagType {
             return FIELD;
         case 'g':
             return ENUM;
+        case 'H':
+            return HEADING;
         case 'i':
             return INTERFACE;
         case 'm':
@@ -108,6 +112,8 @@ public enum TagType {
             return STRUCT;
         case 't':
             return TYPEDEF;
+        case 'T':
+            return TITLE;
         case 'u':
             return UNION;
         case 'v':

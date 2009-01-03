@@ -267,6 +267,14 @@ public class TagsUpdater {
         public void scanTags() {
             try {
                 FileType fileType = getTextWindow().getFileType();
+                
+                // FIXME: generalize this and implement more taggers in Java?
+                if (fileType == FileType.XML) {
+                    HtmlTagger tagger = new HtmlTagger(getTextArea(), this);
+                    newDigest = tagger.scan();
+                    return;
+                }
+                
                 if (TagReader.ctagsLanguageForFileType(fileType) == null) {
                     Evergreen.getInstance().getTagsPanel().showError("(Ctags doesn't support " + fileType.getName() + ".)");
                     successful = false;
