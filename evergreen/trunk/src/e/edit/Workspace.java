@@ -147,15 +147,6 @@ public class Workspace extends JPanel {
         return leftColumn.findWindowByName(name);
     }
     
-    public static boolean isAbsolute(String filename) {
-        if (GuiUtilities.isWindows()) {
-            /* FIXME: is this a good test for Windows? What about \\ names? */
-            return (filename.length() > 1) && (filename.charAt(1) == ':');
-        } else {
-            return (filename.length() > 0) && (filename.charAt(0) == '/');
-        }
-    }
-    
     /** Returns the EWindow corresponding to the given file. If the file's open, shows the given address. */
     public EWindow findIfAlreadyOpen(String filename, String address) {
         /* Check we don't already have this open as a file or directory. */
