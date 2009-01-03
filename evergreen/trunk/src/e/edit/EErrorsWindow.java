@@ -49,8 +49,8 @@ public class EErrorsWindow extends JFrame {
     private boolean shouldAutoScroll;
     private ChangeListener autoScroller;
     
-    public EErrorsWindow(Workspace workspace) {
-        super("Build Output");
+    public EErrorsWindow(Workspace workspace, String title) {
+        super(title);
         this.workspace = workspace;
         initKillButton();
         initTextArea();
@@ -284,6 +284,10 @@ public class EErrorsWindow extends JFrame {
     private class HideRunnable implements Runnable {
         public void run() {
             setVisible(false);
+            if (process == null) {
+                workspace.destroyErrorsWindow(EErrorsWindow.this);
+                dispose();
+            }
         }
     }
     

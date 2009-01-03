@@ -14,6 +14,7 @@ public class KillErrorsAction extends AbstractAction {
         if (workspace == null) {
             return;
         }
-        workspace.getErrorsWindow().clearErrors();
+        // FIXME: if (as is reasonably likely) the focus was in an errors window, we should apply to that specific one.
+        workspace.clearTopErrorsWindow();
     }
 }

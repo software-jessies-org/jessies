@@ -80,8 +80,9 @@ public class CheckForLintAction extends ETextAction {
         }
         
         // Show the user what the tool found.
-        workspace.getErrorsWindow().appendLines(true, lines);
-        workspace.getErrorsWindow().taskDidExit(status);
+        final EErrorsWindow errorsWindow = workspace.createErrorsWindow("Lint Output");
+        errorsWindow.appendLines(true, lines);
+        errorsWindow.taskDidExit(status);
     }
     
     private static HashMap<FileType, String> initCheckers() {

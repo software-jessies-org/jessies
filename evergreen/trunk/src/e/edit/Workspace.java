@@ -11,7 +11,8 @@ import javax.swing.*;
 
 public class Workspace extends JPanel {
     private EColumn leftColumn = new EColumn();
-    private EErrorsWindow errorsWindow = new EErrorsWindow(this);
+    
+    private ArrayList<EErrorsWindow> errorsWindows = new ArrayList<EErrorsWindow>();
 
     private String title;
     private String rootDirectory;
@@ -213,10 +214,6 @@ public class Workspace extends JPanel {
         return viewer;
     }
     
-    public EErrorsWindow getErrorsWindow() {
-        return errorsWindow;
-    }
-    
     /**
      * Checks whether this workspace has unsaved files before performing some action.
      * Offers the user the choice of continuing without saving, continuing after saving, or
@@ -404,6 +401,37 @@ public class Workspace extends JPanel {
             initialFiles.clear();
             updateTabForWorkspace();
             restoreFocusToRememberedTextWindow();
+        }
+    }
+    
+    public void preferencesChanged() {
+        for (ETextWindow textWindow : getTextWindows()) {
+            textWindow.preferencesChanged();
+        }
+        for (EErrorsWindow errorsWindow : errorsWindows) {
+            errorsWindow.initFont();
+        }
+    }
+    
+    public EErrorsWindow createErrorsWindow(String title) {
+        synchronized (errorsWindows) {
+            final EErrorsWindow errorsWindow = new EErrorsWindow(this, title);
+            errorsWindows.add(errorsWindow);
+            return errorsWindow;
+        }
+    }
+    
+    public void destroyErrorsWindow(EErrorsWindow errorsWindow) {
+        synchronized (errorsWindows) {
+            errorsWindows.remove(errorsWindow);
+        }
+    }
+    
+    public void clearTopErrorsWindow() {
+        synchronized (errorsWindows) {
+            if (errorsWindows.size() > 0) {
+                errorsWindows.get(errorsWindows.size() - 1).clearErrors();
+            }
         }
     }
 }

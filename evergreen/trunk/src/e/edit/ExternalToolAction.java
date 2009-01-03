@@ -63,10 +63,10 @@ public class ExternalToolAction extends ETextAction {
             }
         }
         
-        ShellCommand shellCommand = new ShellCommand(command, inputDisposition, outputDisposition);
+        final Workspace workspace = (textWindow != null) ? textWindow.getWorkspace() : Evergreen.getInstance().getCurrentWorkspace();
+        final ShellCommand shellCommand = new ShellCommand(workspace, command, inputDisposition, outputDisposition);
         if (textWindow != null) {
             shellCommand.setTextWindow(textWindow);
-            shellCommand.setWorkspace(textWindow.getWorkspace());
             shellCommand.setContext(textWindow.getContext());
             shellCommand.setCompletionRunnable(new Runnable() {
                 public void run() {
@@ -75,7 +75,7 @@ public class ExternalToolAction extends ETextAction {
                 }
             });
         } else {
-            shellCommand.setContext(shellCommand.getWorkspace().getRootDirectory());
+            shellCommand.setContext(workspace.getRootDirectory());
         }
         runCommand(shellCommand);
     }

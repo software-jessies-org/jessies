@@ -716,10 +716,7 @@ public class Evergreen {
         preferences.addPreferencesListener(new Preferences.Listener() {
             public void preferencesChanged() {
                 for (Workspace workspace : getWorkspaces()) {
-                    for (ETextWindow textWindow : workspace.getTextWindows()) {
-                        textWindow.preferencesChanged();
-                    }
-                    workspace.getErrorsWindow().initFont();
+                    workspace.preferencesChanged();
                 }
                 tagsPanel.repaint();
             }

@@ -14,8 +14,10 @@ public class ShellCommand {
     private ToolInputDisposition inputDisposition;
     private ToolOutputDisposition outputDisposition;
     
-    private ETextWindow textWindow;
     private Workspace workspace;
+    private EErrorsWindow errorsWindow;
+    
+    private ETextWindow textWindow;
     private String context;
     
     private Process process;
@@ -34,12 +36,13 @@ public class ShellCommand {
      * Until you invoke runCommand, you're at liberty to change any of the
      * command's properties through the relevant accessor methods.
      */
-    public ShellCommand(String command, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition) {
+    public ShellCommand(Workspace workspace, String command, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition) {
+        this.workspace = workspace;
+        this.errorsWindow = workspace.createErrorsWindow("Command Output"); // FIXME: be more specific.
         setCommand(command);
         this.inputDisposition = inputDisposition;
         this.outputDisposition = outputDisposition;
         setTextWindow(null);
-        setWorkspace(Evergreen.getInstance().getCurrentWorkspace());
         setContext(System.getProperty("java.io.tmpdir"));
     }
     
@@ -48,7 +51,7 @@ public class ShellCommand {
         processBuilder.directory(FileUtilities.fileFromString(context));
         Map<String, String> environment = processBuilder.environment();
         environment.put("EDIT_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
-        environment.put("EDIT_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(getWorkspace().getRootDirectory()));
+        environment.put("EDIT_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()));
         if (textWindow != null) {
             environment.put("EDIT_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(textWindow.getFilename()));
             
@@ -69,11 +72,12 @@ public class ShellCommand {
         // This causes ugly flickering if the window's already on the top of the stack, but it fixes the problem on small screens where your main window covers your build window and you don't remember/want to close the build window before you start editing.
         // As usual, we can't use toFront because the GNOME morons (okay, well-intentioned fascists, but aren't fascists always well-intentioned in their own minds?) broke it for us, and Sun hasn't worked around the breakage.
         // I don't know of any way to test whether we're already on top.
-        workspace.getErrorsWindow().setVisible(false);
-        workspace.getErrorsWindow().setVisible(true);
+        // FIXME: this isn't relevant at the moment, because each build gets a new EErrorsWindow.
+        //errorsWindow.setVisible(false);
+        errorsWindow.setVisible(true);
         
-        workspace.getErrorsWindow().showStatus("Started task \"" + command + "\"");
-        workspace.getErrorsWindow().taskDidStart(process);
+        errorsWindow.showStatus("Started task \"" + command + "\"");
+        errorsWindow.taskDidStart(process);
         
         Thread standardInputPump = new Thread(new Runnable() {
             public void run() {
@@ -101,12 +105,12 @@ public class ShellCommand {
             }
         } catch (Exception ex) {
             Log.warn("Problem pumping standard input for task \"" + command + "\"", ex);
-            workspace.getErrorsWindow().appendLines(true, Collections.singletonList("Problem pumping standard input for task \"" + command + "\": " + ex.getMessage() + "."));
+            errorsWindow.appendLines(true, Collections.singletonList("Problem pumping standard input for task \"" + command + "\": " + ex.getMessage() + "."));
         } finally {
             try {
                 os.close();
             } catch (IOException ex) {
-                workspace.getErrorsWindow().appendLines(true, Collections.singletonList("Couldn't close standard input for task \"" + command + "\": " + ex.getMessage() + "."));
+                errorsWindow.appendLines(true, Collections.singletonList("Couldn't close standard input for task \"" + command + "\": " + ex.getMessage() + "."));
             }
         }
     }
@@ -139,7 +143,7 @@ public class ShellCommand {
     /**
      * Invoked by StreamMonitor.process, on the EDT.
      */
-    public void process(boolean isStdErr, List<String> lines) {
+    public void processLines(boolean isStdErr, List<String> lines) {
         switch (outputDisposition) {
         case CREATE_NEW_DOCUMENT:
             Log.warn("CREATE_NEW_DOCUMENT not yet implemented.");
@@ -147,7 +151,7 @@ public class ShellCommand {
         case DISCARD:
             break;
         case ERRORS_WINDOW:
-            getWorkspace().getErrorsWindow().appendLines(isStdErr, lines);
+            errorsWindow.appendLines(isStdErr, lines);
             break;
         case CLIPBOARD:
         case DIALOG:
@@ -165,7 +169,7 @@ public class ShellCommand {
      * Invoked when the StreamMonitors finish, on the EDT.
      */
     private void processFinished(int exitStatus) {
-        workspace.getErrorsWindow().showStatus("Task \"" + command + "\" finished");
+        errorsWindow.showStatus("Task \"" + command + "\" finished");
         switch (outputDisposition) {
         case CLIPBOARD:
             StringSelection selection = new StringSelection(capturedOutput.toString());
@@ -197,9 +201,9 @@ public class ShellCommand {
         
         // A non-zero exit status is always potentially interesting.
         if (exitStatus != 0) {
-            workspace.getErrorsWindow().appendLines(true, Collections.singletonList("Task \"" + command + "\" failed with exit status " + exitStatus));
+            errorsWindow.appendLines(true, Collections.singletonList("Task \"" + command + "\" failed with exit status " + exitStatus));
         }
-        workspace.getErrorsWindow().taskDidExit(exitStatus);
+        errorsWindow.taskDidExit(exitStatus);
     }
     
     /**
@@ -232,14 +236,6 @@ public class ShellCommand {
             });
             EventQueue.invokeLater(completionRunnable);
         }
-    }
-    
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-    
-    public void setWorkspace(Workspace newWorkspace) {
-        this.workspace = newWorkspace;
     }
     
     public void setTextWindow(ETextWindow textWindow) {
@@ -278,12 +274,5 @@ public class ShellCommand {
      */
     public void setLaunchRunnable(Runnable launchRunnable) {
         this.launchRunnable = launchRunnable;
-    }
-    
-    /**
-     * Returns the underlying Process instance.
-     */
-    public Process getProcess() {
-        return process;
     }
 }
