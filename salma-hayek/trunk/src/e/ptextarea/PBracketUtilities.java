@@ -134,7 +134,7 @@ public class PBracketUtilities {
     }
     
     public static boolean afterOpenBracket(CharSequence chars, int offset) {
-        return (offset > 0 && offset - 1 < chars.length() && isOpenBracket(chars.charAt(offset - 1)));
+        return (offset > 0 && isOpenBracket(chars.charAt(offset - 1)));
     }
     
     private PBracketUtilities() {
