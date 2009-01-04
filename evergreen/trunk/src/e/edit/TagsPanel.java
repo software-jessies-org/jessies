@@ -67,7 +67,7 @@ public class TagsPanel extends JPanel {
     
     public static class TagsTreeRenderer extends DefaultTreeCellRenderer {
         private final Icon icon = new DrawnIcon(new Dimension(10, 10)) {
-            public void paintIcon(Component c, Graphics og, int x, int y) {
+            @Override public void paintIcon(Component c, Graphics og, int x, int y) {
                 Graphics2D g = (Graphics2D) og;
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -104,7 +104,7 @@ public class TagsPanel extends JPanel {
             return textArea;
         }
         
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        @Override public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
             if (node.getUserObject() instanceof TagReader.Tag) {
@@ -119,13 +119,15 @@ public class TagsPanel extends JPanel {
                     font = font.deriveFont(Font.BOLD);
                 }
                 setFont(font);
-                String toolTip = getTextArea().getLineText(tag.lineNumber - 1).trim();
-                setToolTipText(toolTip);
                 setIcon(icon);
             } else {
                 tag = null;
             }
             return this;
+        }
+        
+        @Override public String getToolTipText() {
+            return getTextArea().getLineText(tag.lineNumber - 1).trim();
         }
     }
 }
