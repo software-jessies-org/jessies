@@ -366,7 +366,8 @@ public class ETextWindow extends EWindow implements PTextListener {
         // FIXME - work with non-empty selection
         int originalCaretPosition = textArea.getSelectionStart();
         fillWithContent();
-        textArea.setCaretPosition(originalCaretPosition);
+        int newCaretPosition = Math.min(originalCaretPosition, textArea.getTextBuffer().length());
+        textArea.setCaretPosition(newCaretPosition);
         tagsUpdater.updateTags();
         Evergreen.getInstance().showStatus("Reverted to saved version of " + filename);
     }
