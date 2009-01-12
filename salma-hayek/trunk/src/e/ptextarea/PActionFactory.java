@@ -51,6 +51,11 @@ public class PActionFactory {
             GnomeStockIcon.configureAction(this);
         }
         
+        public boolean isEnabled() {
+            PTextArea textArea = getTextArea();
+            return (textArea != null && textArea.hasSelection());
+        }
+        
         public void performOn(PTextArea textArea) {
             textArea.copy();
         }
@@ -60,6 +65,11 @@ public class PActionFactory {
         public CutAction() {
             super("Cu_t", "X", false);
             GnomeStockIcon.configureAction(this);
+        }
+        
+        public boolean isEnabled() {
+            PTextArea textArea = getTextArea();
+            return (textArea != null && textArea.isEditable() && textArea.hasSelection());
         }
         
         public void performOn(PTextArea textArea) {
@@ -105,6 +115,11 @@ public class PActionFactory {
         public PasteAction() {
             super("_Paste", "V", false);
             GnomeStockIcon.configureAction(this);
+        }
+        
+        public boolean isEnabled() {
+            PTextArea textArea = getTextArea();
+            return (textArea != null && textArea.isEditable());
         }
         
         public void performOn(PTextArea textArea) {
