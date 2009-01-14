@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) && !defined(__MINGW32__)
 struct HKey;
 typedef HKey* HKEY;
 static HKEY HKEY_CURRENT_USER;
