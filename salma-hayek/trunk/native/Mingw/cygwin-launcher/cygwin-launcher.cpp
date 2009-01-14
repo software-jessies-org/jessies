@@ -1,4 +1,5 @@
 #include "checkReadableFile.h"
+#include "HKEY.h"
 #include "join.h"
 #include "reportArgValues.h"
 #include "reportFatalErrorViaGui.h"
@@ -49,8 +50,8 @@ std::string findCygwinBin() {
     os << "We failed to find Cygwin, the errors were:\n";
     typedef std::deque<HKEY> Hives;
     Hives hives;
-    hives.push_back(HKEY_LOCAL_MACHINE);
     hives.push_back(HKEY_CURRENT_USER);
+    hives.push_back(HKEY_LOCAL_MACHINE);
     for (Hives::const_iterator it = hives.begin(), en = hives.end(); it != en; ++ it) {
         HKEY hive = *it;
         try {
