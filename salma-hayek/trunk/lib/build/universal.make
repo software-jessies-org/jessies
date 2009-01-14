@@ -542,7 +542,7 @@ PUBLISHABLE_INSTALLERS.salma-hayek =
 PUBLISHABLE_INSTALLERS = $(PUBLISHABLE_INSTALLERS.$(MACHINE_PROJECT_NAME))
 
 # Among its many breakages, msiexec is more restrictive about slashes than Win32.
-NATIVE_NAME_FOR_INSTALLERS := '$(subst /,\,$(call convertToNativeFilenames,$(PUBLISHABLE_INSTALLERS)))'
+NATIVE_NAME_FOR_MSI_INSTALLER := '$(subst /,\,$(call convertToNativeFilenames,$(INSTALLER.msi)))'
 
 # We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.
 PACKAGING_DIRECTORY = .generated/native/$(TARGET_DIRECTORY)/$(MACHINE_PROJECT_NAME)
@@ -931,7 +931,7 @@ run-installer.dmg:
 .PHONY: run-installer.msi
 run-installer.msi:
 	@echo Running Windows installer...
-	msiexec /i $(NATIVE_NAME_FOR_INSTALLERS)
+	msiexec /i $(NATIVE_NAME_FOR_MSI_INSTALLER)
 
 # This only works if this is precisely the same version that was installed.
 # We can't uninstall by GUID because the GUID you give to the uninstaller is
@@ -941,7 +941,7 @@ run-installer.msi:
 # rather than name.
 .PHONY: run-remover.msi
 run-remover.msi:
-	msiexec /x $(NATIVE_NAME_FOR_INSTALLERS)
+	msiexec /x $(NATIVE_NAME_FOR_MSI_INSTALLER)
 
 .PHONY: test
 test: build
