@@ -9,6 +9,7 @@
 
 #include "chomp.h"
 #include "DirectoryIterator.h"
+#include "HKEY.h"
 #include "JniError.h"
 #include "join.h"
 #include "reportFatalErrorViaGui.h"
@@ -261,13 +262,17 @@ public:
         os << std::endl;
     }
     
-    SharedLibraryHandle openJvmLibraryUsingRegistry(const char* javaVendor, const char* jdkName, const char* jreName) const {
-        const std::string registryPrefix = std::string("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/") + javaVendor + "/";
+    SharedLibraryHandle openJvmLibraryUsingSpecificRegistryHive(HKEY hive, const char* javaVendor, const char* jdkName, const char* jreName) const {
+        const std::string registryPrefix = "/proc/registry/" + toString(hive) + "/SOFTWARE/" + javaVendor + "/";
         const std::string jreRegistryPath = registryPrefix + jreName;
         const std::string jdkRegistryPath = registryPrefix + jdkName;
         std::ostringstream os;
         JvmRegistryKeys jvmRegistryKeys;
         findVersionsInRegistry(os, jvmRegistryKeys, jreRegistryPath, "");
+        // My Sun JDK key says:
+        // "JavaHome"="C:\\Program Files\\Java\\jdk1.5.0_06"
+        // Jesse Kriss's IBM JDK has an appended "jre" component:
+        // "JavaHome"="C:\\Program Files\\IBM\\Java50\\jre"
         findVersionsInRegistry(os, jvmRegistryKeys, jdkRegistryPath, "\\jre");
         std::sort(jvmRegistryKeys.begin(), jvmRegistryKeys.end());
         while (jvmRegistryKeys.empty() == false) {
@@ -299,6 +304,34 @@ public:
         throw std::runtime_error(os.str());
     }
     
+    SharedLibraryHandle openJvmLibraryUsingRegistry(const char* javaVendor, const char* jdkName, const char* jreName) const {
+        std::ostringstream os;
+        typedef std::deque<HKEY> Hives;
+        Hives hives;
+        hives.push_back(HKEY_CURRENT_USER);
+        hives.push_back(HKEY_LOCAL_MACHINE);
+        for (Hives::const_iterator it = hives.begin(), en = hives.end(); it != en; ++ it) {
+            HKEY hive = *it;
+            try {
+                return openJvmLibraryUsingSpecificRegistryHive(hive, javaVendor, jdkName, jreName);
+            } catch (const std::exception& ex) {
+                os << ex.what();
+                os << std::endl;
+            }
+        }
+        throw std::runtime_error(os.str());
+    }
+        
+    struct JavaVendorRegistryLocation {
+        const char* javaVendor;
+        const char* jdkName;
+        const char* jreName;
+        
+        JavaVendorRegistryLocation(const char* javaVendor0, const char* jdkName0, const char* jreName0)
+        : javaVendor(javaVendor0), jdkName(jdkName0), jreName(jreName0) {
+        }
+    };
+    
     // Once we've successfully opened a shared library, I think we're committed to trying to use it
     // or else who knows what it's DLL entry point has done.
     // Until we've successfully opened it, though, we can keep trying alternatives.
@@ -308,21 +341,17 @@ public:
         os << std::endl;
         os << "Error messages were:";
         os << std::endl;
-        try {
-            return openJvmLibraryUsingRegistry("JavaSoft", "Java Development Kit", "Java Runtime Environment");
-        } catch (const std::exception& ex) {
-            os << ex.what();
-            os << std::endl;
-        }
-        try {
-            // My Sun JDK key says:
-            // "JavaHome"="C:\\Program Files\\Java\\jdk1.5.0_06"
-            // Jesse Kriss's IBM JDK has an appended "jre" component:
-            // "JavaHome"="C:\\Program Files\\IBM\\Java50\\jre"
-            return openJvmLibraryUsingRegistry("IBM", "Java Development Kit", "Java2 Runtime Environment");
-        } catch (const std::exception& ex) {
-            os << ex.what();
-            os << std::endl;
+        typedef std::deque<JavaVendorRegistryLocation> JavaVendorRegistryLocations;
+        JavaVendorRegistryLocations javaVendorRegistryLocations;
+        javaVendorRegistryLocations.push_back(JavaVendorRegistryLocation("JavaSoft", "Java Development Kit", "Java Runtime Environment"));
+        javaVendorRegistryLocations.push_back(JavaVendorRegistryLocation("IBM", "Java Development Kit", "Java2 Runtime Environment"));
+        for (JavaVendorRegistryLocations::const_iterator it = javaVendorRegistryLocations.begin(); it != javaVendorRegistryLocations.end(); ++ it) {
+            try {
+                return openJvmLibraryUsingRegistry(it->javaVendor, it->jdkName, it->jreName);
+            } catch (const std::exception& ex) {
+                os << ex.what();
+                os << std::endl;
+            }
         }
         throw std::runtime_error(os.str());
     }
