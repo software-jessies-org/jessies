@@ -45,30 +45,26 @@ public class CommandDialog {
         historyList = new JList();
         historyList.setCellRenderer(new EListCellRenderer(true));
         
-        // Handle single and double clicks on the history list.
+        // If the user double-clicks on a historical command, run it without further ado.
         historyList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                int index = historyList.locationToIndex(e.getPoint());
-                String selectedCommand = (String) historyList.getModel().getElementAt(index);
                 if (e.getClickCount() == 2) {
-                    // If the user double-clicks on a historical command, run it without further ado.
-                    commandField.setText(selectedCommand);
+                    commandField.setText((String) historyList.getSelectedValue());
                     form.getFormDialog().acceptDialog();
                 }
             }
         });
         
         // If the user hits enter while the list has the focus, run the command selected in the list without further ado.
-        historyList.getActionMap().put("accept-command", new AbstractAction() {
+        ComponentUtilities.initKeyBinding(historyList, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), new AbstractAction("accept-command") {
             public void actionPerformed(ActionEvent e) {
                 commandField.setText((String) historyList.getSelectedValue());
                 form.getFormDialog().acceptDialog();
             }
         });
-        historyList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "accept-command");
         
         // If the user hits delete while the list has the focus, remove the selected items.
-        historyList.getActionMap().put("remove-entry", new AbstractAction() {
+        ComponentUtilities.initKeyBinding(historyList, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), new AbstractAction("remove-entry") {
             public void actionPerformed(ActionEvent e) {
                 synchronized (history) {
                     for (Object item : historyList.getSelectedValues()) {
@@ -78,7 +74,6 @@ public class CommandDialog {
                 showMatches();
             }
         });
-        historyList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "remove-entry");
         
         ComponentUtilities.divertPageScrollingFromTo(commandField, historyList);
     }
