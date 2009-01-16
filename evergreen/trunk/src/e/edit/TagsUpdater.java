@@ -101,14 +101,14 @@ public class TagsUpdater {
         tree.setShowsRootHandles(true);
         
         // Make both space and enter in the tree jump to the currently selected tag, and transfer focus back to the file.
-        tree.getActionMap().put("select-tag", new AbstractAction() {
+        Action selectTagAction = new AbstractAction("select-tag") {
             public void actionPerformed(ActionEvent e) {
                 getTextArea().goToLine(((TagReader.Tag) ((DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent()).getUserObject()).lineNumber);
                 getTextArea().requestFocusInWindow();
             }
-        });
-        tree.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "select-tag");
-        tree.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "select-tag");
+        };
+        ComponentUtilities.initKeyBinding(tree, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), selectTagAction);
+        ComponentUtilities.initKeyBinding(tree, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), selectTagAction);
         
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         tree.addMouseListener(new MouseAdapter() {
