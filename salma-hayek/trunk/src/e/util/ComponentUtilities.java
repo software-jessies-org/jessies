@@ -20,8 +20,15 @@ public class ComponentUtilities {
      * Binds an Action to a JComponent via the Action's configured ACCELERATOR_KEY.
      */
     public static void initKeyBinding(JComponent component, Action action) {
-        String name = (String) action.getValue(Action.NAME);
         KeyStroke keyStroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+        initKeyBinding(component, keyStroke, action);
+    }
+    
+    /**
+     * Binds an Action to a JComponent via the given KeyStroke.
+     */
+    public static void initKeyBinding(JComponent component, KeyStroke keyStroke, Action action) {
+        String name = (String) action.getValue(Action.NAME);
         component.getActionMap().put(name, action);
         component.getInputMap().put(keyStroke, name);
     }
@@ -32,27 +39,23 @@ public class ComponentUtilities {
      * Note that the home/end keys aren't redirected for text fields, on the assumption that they're needed for cursor movement.
      */
     public static void divertPageScrollingFromTo(final JComponent focusedComponent, final JComponent componentToPageScroll) {
-        focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("PAGE_UP"), "pagePatchUp");
-        focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pagePatchDown");
-        focusedComponent.getActionMap().put("pagePatchUp", new AbstractAction() {
+        initKeyBinding(focusedComponent, KeyStroke.getKeyStroke("PAGE_UP"), new AbstractAction("pagePatchUp") {
             public void actionPerformed(ActionEvent e) {
                 ComponentUtilities.scroll(componentToPageScroll, true, -1);
             }
         });
-        focusedComponent.getActionMap().put("pagePatchDown", new AbstractAction() {
+        initKeyBinding(focusedComponent, KeyStroke.getKeyStroke("PAGE_DOWN"), new AbstractAction("pagePatchDown") {
             public void actionPerformed(ActionEvent e) {
                 ComponentUtilities.scroll(componentToPageScroll, true, 1);
             }
         });
         if (focusedComponent instanceof JTextField == false) {
-            focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("HOME"), "pagePatchToTop");
-            focusedComponent.getInputMap().put(KeyStroke.getKeyStroke("END"), "pagePatchToBottom");
-            focusedComponent.getActionMap().put("pagePatchToTop", new AbstractAction() {
+            initKeyBinding(focusedComponent, KeyStroke.getKeyStroke("HOME"), new AbstractAction("pagePatchToTop") {
                 public void actionPerformed(ActionEvent e) {
                     ComponentUtilities.scrollToExtremity(componentToPageScroll, true);
                 }
             });
-            focusedComponent.getActionMap().put("pagePatchToBottom", new AbstractAction() {
+            initKeyBinding(focusedComponent, KeyStroke.getKeyStroke("END"), new AbstractAction("pagePatchToBottom") {
                 public void actionPerformed(ActionEvent e) {
                     ComponentUtilities.scrollToExtremity(componentToPageScroll, false);
                 }
