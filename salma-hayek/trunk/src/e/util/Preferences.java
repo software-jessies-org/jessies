@@ -142,7 +142,7 @@ public abstract class Preferences {
                 }
             });
         } else {
-            editMenu.add(new JSeparator());
+            editMenu.addSeparator();
             editMenu.add(makeShowPreferencesAction());
         }
     }

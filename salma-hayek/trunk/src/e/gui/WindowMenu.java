@@ -131,7 +131,7 @@ public class WindowMenu {
             
             addCustomItems();
             
-            add(new JSeparator());
+            addSeparator();
             add(new BringAllToFrontAction());
         }
         
@@ -140,14 +140,14 @@ public class WindowMenu {
                 return;
             }
             
-            add(new JSeparator());
+            addSeparator();
             for (int i = 0; i < customItems.length; ++i) {
                 add(customItems[i]);
             }
         }
         
         private void addWindowItems(Frame[] windows) {
-            add(new JSeparator());
+            addSeparator();
             for (int i = 0; i < windows.length; ++i) {
                 addWindowItem(windows[i]);
             }

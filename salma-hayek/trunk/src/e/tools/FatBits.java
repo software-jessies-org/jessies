@@ -347,7 +347,7 @@ public class FatBits extends MainFrame {
             menu.add(new MouseMotionAction("Right", +1, 0));
             menu.add(new MouseMotionAction("Up", 0, -1));
             menu.add(new MouseMotionAction("Down", 0, +1));
-            menu.add(new JSeparator());
+            menu.addSeparator();
             menu.add(new JCheckBoxMenuItem(new LockImageAction()));
             return menu;
         }
