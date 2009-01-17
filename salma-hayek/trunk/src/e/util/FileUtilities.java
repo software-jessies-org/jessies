@@ -462,7 +462,8 @@ public class FileUtilities {
                 ex = ex;
             }
         }
-        throw new UnsatisfiedLinkError("Failed to load " + fileName + " from " + directories);
+        final String arch = System.getProperty("os.arch");
+        throw new UnsatisfiedLinkError("Failed to load " + fileName + " for " + arch + " from " + directories);
     }
     
     public static void main(String[] arguments) {
