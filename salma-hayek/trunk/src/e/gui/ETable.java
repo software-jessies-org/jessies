@@ -27,9 +27,17 @@ public class ETable extends JTable {
     
     /**
      * Creates a table with a default data model.
-     * Callers should use setModel after construction to provide their own model; JTable's convenience constructors are not provided.
      */
     public ETable() {
+        this(null);
+    }
+    
+    /**
+     * Creates a table with the given data model.
+     */
+    public ETable(TableModel model) {
+        super(model);
+        
         // Although it's the JTable default, most systems' tables don't draw a grid by default.
         // Worse, it's not easy (or possible?) for us to take over grid painting ourselves for those LAFs (Metal, for example) that do paint grids.
         // The Aqua and GTK LAFs ignore the grid settings anyway, so this causes no change there.
