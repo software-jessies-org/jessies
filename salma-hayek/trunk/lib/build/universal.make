@@ -525,6 +525,8 @@ INSTALLER_EXTENSIONS.Linux += rpm
 # I wonder if we shouldn't say "latest" somewhere in the name.
 # It would be easy to do that were it not for the odd "-2" part that alien adds to the name.
 # When I upload, perhaps I should get rid of that.
+# Passing --keep-version to alien turns the "-2" into "-1".
+# Perhaps the rpm version number format doesn't support our Windows-style version numbers.
 LATEST_INSTALLER_LINK = $(subst --2.,.,$(subst __,.,$(subst -.,.,$(call makeInstallerName$(suffix $<),))))
 
 define defineInstallerPath
