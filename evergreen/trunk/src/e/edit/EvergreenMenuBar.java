@@ -38,18 +38,18 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new OpenAction());
         // FIXME: Should be "Open Recent >" here.
 
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new CloseWindowAction());
         menu.add(new SaveAction());
         menu.add(new SaveAsAction());
         menu.add(new SaveAllAction());
         menu.add(new RevertToSavedAction());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new FilePropertiesAction());
         
         if (GuiUtilities.isMacOs() == false) {
-            menu.add(new JSeparator());
+            menu.addSeparator();
             menu.add(new JMenuItem(new ExitAction()));
         }
         return menu;
@@ -60,19 +60,19 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(PActionFactory.makeUndoAction());
         menu.add(PActionFactory.makeRedoAction());
 
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(PActionFactory.makeCutAction());
         menu.add(PActionFactory.makeCopyAction());
         menu.add(PActionFactory.makePasteAction());
         menu.add(new AutoCompleteAction());
         menu.add(PActionFactory.makeSelectAllAction());
 
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new JoinLinesAction());
         menu.add(new CorrectIndentationAction());
         menu.add(new InsertInterfaceAction());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new ShowMisspellingsAction());
         menu.add(new CompareSelectionAndClipboardAction());
         
@@ -87,17 +87,17 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(PActionFactory.makeFindNextAction());
         menu.add(PActionFactory.makeFindPreviousAction());
 
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new FindAndReplaceAction());
 
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new GoToLineAction());
         menu.add(new GoToTagAction());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new FindFilesContainingSelectionAction());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(PActionFactory.makeFindMatchingBracketAction());
         menu.add(new ScrollToSelectionAction());
         
@@ -110,17 +110,17 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new FixedFontAction());
         menu.add(new AppropriateFontAction());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new ShowCounterpartAction());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(ShowHideTagsAction.makeMenuItem());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new CycleWindowsAction(1));
         menu.add(new CycleWindowsAction(-1));
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new ExpandWindowAction());
         
         return menu;
@@ -130,13 +130,13 @@ public class EvergreenMenuBar extends EMenuBar {
         final JMenu menu = makeMenu("Tools", 'T');
         menu.add(new OpenMakefileAction());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new KillErrorsAction());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new CheckForLintAction());
         
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(makeExternalToolAction("Sort", "sort"));
         menu.add(makeExternalToolAction("Sort and Remove Duplicates", "sort -u"));
         
@@ -146,7 +146,7 @@ public class EvergreenMenuBar extends EMenuBar {
             }
 
             public void addSeparator() {
-                menu.add(new JSeparator());
+                menu.addSeparator();
             }
         };
         toolsParser.parse();
@@ -165,28 +165,28 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new ShowManPageAction());
         
         // UI guidelines.
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(makeLocalOrRemoteLink("_Apple Human Interface Guidelines", "/Developer/Documentation/DocSets/com.apple.ADC_Reference_Library.CoreReference.docset/Contents/Resources/Documents/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html", "http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html"));
         menu.add(makeLocalOrRemoteLink("_GNOME Human Interface Guidelines", null, "http://library.gnome.org/devel/hig-book/stable/"));
         
         // C/C++.
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(makeLocalOrRemoteLink("GNU _C Library Documentation", "/usr/share/doc/glibc-doc/html/index.html", "http://www.gnu.org/software/libc/manual/html_node/index.html"));
         menu.add(makeLocalOrRemoteLink("_STL Documentation", "/usr/share/doc/stl-manual/html/index.html", "http://www.sgi.com/tech/stl/"));
         
         // Java.
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(makeLocalOrRemoteLink("_Java 6 API", "/usr/share/doc/sun-java6-jdk/html/api/overview-summary.html", "http://java.sun.com/javase/6/docs/api/overview-summary.html"));
         menu.add(makeLocalOrRemoteLink("Java _Language Specification, 3e", null, "http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html"));
         menu.add(makeLocalOrRemoteLink("Java _Tutorial", null, "http://java.sun.com/docs/books/tutorial/"));
         menu.add(makeLocalOrRemoteLink("Java _VM Specification, 2e", null, "http://java.sun.com/docs/books/vmspec/2nd-edition/html/VMSpecTOC.doc.html"));
         
         // Tools.
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(makeLocalOrRemoteLink("GNU _Make Manual", null, "http://www.gnu.org/software/make/manual/make.html"));
         
         // General.
-        menu.add(new JSeparator());
+        menu.addSeparator();
         // FIXME: some day it would be nice to have our own regular expression quick reference.
         menu.add(makeLocalOrRemoteLink("_Regular Expression Documentation", "/usr/share/doc/sun-java6-jdk/html/api/java/util/regex/Pattern.html", PatternUtilities.DOCUMENTATION_URL));
         
@@ -209,11 +209,11 @@ public class EvergreenMenuBar extends EMenuBar {
         JMenu menu = makeMenu("Workspace", 'W');
         menu.add(new BuildAction());
         menu.add(new RescanWorkspaceAction());
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new AddWorkspaceAction());
         menu.add(new EditWorkspaceAction());
         menu.add(new RemoveWorkspaceAction());
-        menu.add(new JSeparator());
+        menu.addSeparator();
         menu.add(new CycleWorkspacesAction(1));
         menu.add(new CycleWorkspacesAction(-1));
         return menu;
