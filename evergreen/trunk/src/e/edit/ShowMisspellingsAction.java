@@ -41,7 +41,7 @@ public class ShowMisspellingsAction extends PTextAction {
         final JList list = new JList(listItems);
         list.setPrototypeCellValue("this would be quite a long misspelling");
         list.setCellRenderer(new EListCellRenderer(true));
-        ComponentUtilities.setJListAction(list, new ActionListener() {
+        ComponentUtilities.bindDoubleClickAndEnter(list, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, textArea);
                 // Highlight all matches of this misspelling.
