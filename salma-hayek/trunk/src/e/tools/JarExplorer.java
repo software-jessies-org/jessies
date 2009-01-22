@@ -88,7 +88,7 @@ public class JarExplorer extends MainFrame {
         list = new JList(filteredListModel);
         list.setCellRenderer(new EListCellRenderer(true));
         list.setVisibleRowCount(10);
-        ComponentUtilities.setJListAction(list, new ActionListener() {
+        ComponentUtilities.bindDoubleClickAndEnter(list, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 updateInformation();
             }
