@@ -67,7 +67,7 @@ public class GoToTagAction extends ETextAction {
         } else {
             final JList list = new JList(addresses.toArray(new String[addresses.size()]));
             list.setCellRenderer(new EListCellRenderer(true));
-            ComponentUtilities.setJListAction(list, new ActionListener() {
+            ComponentUtilities.bindDoubleClickAndEnter(list, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     final String address = (String) list.getSelectedValue();
                     Evergreen.getInstance().openFile(workspaceRoot + File.separator + address);
