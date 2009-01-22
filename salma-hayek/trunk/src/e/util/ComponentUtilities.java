@@ -34,6 +34,26 @@ public class ComponentUtilities {
     }
     
     /**
+     * Calls an ActionListener on both double-click and the enter key in the given JList.
+     */
+    public static void setJListAction(final JList list, final ActionListener listener) {
+        list.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    listener.actionPerformed(new ActionEvent(list, ActionEvent.ACTION_PERFORMED, null, e.getWhen(), e.getModifiers()));
+                }
+            }
+        });
+        // The most likely caller hands us an anonymous AbstractAction, so make sure 'action' has a name.
+        final Action trampoline = new AbstractAction("e.util.ComponentUtilities.setJListAction") {
+            public void actionPerformed(ActionEvent e) {
+                listener.actionPerformed(e);
+            }
+        };
+        ComponentUtilities.initKeyBinding(list, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), trampoline);
+    }
+    
+    /**
      * Fixes the page up/down keys and home/end keys to work on another component from the one with the keyboard focus.
      * This lets you offer convenient keyboard navigation like in Apple's Mail, where the arrow keys move through the inbox while the page keys move through the selected message.
      * Note that the home/end keys aren't redirected for text fields, on the assumption that they're needed for cursor movement.
