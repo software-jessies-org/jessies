@@ -46,7 +46,7 @@ public class CommandDialog {
         historyList.setCellRenderer(new EListCellRenderer(true));
         
         // If the user double-clicks on a historical command, or hits enter while the list has focus, run the command without further ado.
-        ComponentUtilities.setJListAction(historyList, new ActionListener() {
+        ComponentUtilities.bindDoubleClickAndEnter(historyList, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 commandField.setText((String) historyList.getSelectedValue());
                 form.getFormDialog().acceptDialog();
