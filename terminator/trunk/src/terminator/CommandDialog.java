@@ -45,18 +45,8 @@ public class CommandDialog {
         historyList = new JList();
         historyList.setCellRenderer(new EListCellRenderer(true));
         
-        // If the user double-clicks on a historical command, run it without further ado.
-        historyList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    commandField.setText((String) historyList.getSelectedValue());
-                    form.getFormDialog().acceptDialog();
-                }
-            }
-        });
-        
-        // If the user hits enter while the list has the focus, run the command selected in the list without further ado.
-        ComponentUtilities.initKeyBinding(historyList, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), new AbstractAction("accept-command") {
+        // If the user double-clicks on a historical command, or hits enter while the list has focus, run the command without further ado.
+        ComponentUtilities.setJListAction(historyList, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 commandField.setText((String) historyList.getSelectedValue());
                 form.getFormDialog().acceptDialog();
