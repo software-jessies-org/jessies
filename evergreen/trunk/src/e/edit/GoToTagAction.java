@@ -66,18 +66,13 @@ public class GoToTagAction extends ETextAction {
             Evergreen.getInstance().openFile(workspaceRoot + File.separator + addresses.get(0));
         } else {
             final JList list = new JList(addresses.toArray(new String[addresses.size()]));
-            list.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() != 2) {
-                        return;
-                    }
-                    
-                    int index = list.locationToIndex(e.getPoint());
-                    String address = (String) list.getModel().getElementAt(index);
+            list.setCellRenderer(new EListCellRenderer(true));
+            ComponentUtilities.setJListAction(list, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    final String address = (String) list.getSelectedValue();
                     Evergreen.getInstance().openFile(workspaceRoot + File.separator + address);
                 }
             });
-            list.setCellRenderer(new EListCellRenderer(true));
             
             FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Tags Matching \"" + tagName + "\"");
             form.getFormPanel().addRow("Tags:", new JScrollPane(list));

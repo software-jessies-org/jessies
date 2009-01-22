@@ -40,11 +40,9 @@ public class ShowMisspellingsAction extends PTextAction {
         
         final JList list = new JList(listItems);
         list.setPrototypeCellValue("this would be quite a long misspelling");
-        list.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() != 2) {
-                    return;
-                }
+        list.setCellRenderer(new EListCellRenderer(true));
+        ComponentUtilities.setJListAction(list, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, textArea);
                 // Highlight all matches of this misspelling.
                 String literal = (String) list.getSelectedValue();
@@ -55,7 +53,6 @@ public class ShowMisspellingsAction extends PTextAction {
                 textArea.findNext();
             }
         });
-        list.setCellRenderer(new EListCellRenderer(true));
         
         FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Misspellings");
         form.getFormPanel().addRow("Misspellings:", new JScrollPane(list));
