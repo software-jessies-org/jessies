@@ -1,5 +1,8 @@
 package e.tools;
 
+import e.gui.*;
+import e.ptextarea.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -7,10 +10,6 @@ import java.util.*;
 import java.util.List;
 import java.util.zip.*;
 import javax.swing.*;
-
-import e.gui.*;
-import e.ptextarea.*;
-import e.util.*;
 
 /**
  * Shows and decodes the contents of JAR files specified on the command line.
@@ -89,11 +88,9 @@ public class JarExplorer extends MainFrame {
         list = new JList(filteredListModel);
         list.setCellRenderer(new EListCellRenderer(true));
         list.setVisibleRowCount(10);
-        list.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    updateInformation();
-                }
+        ComponentUtilities.setJListAction(list, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateInformation();
             }
         });
         
