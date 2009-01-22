@@ -34,13 +34,13 @@ public class ComponentUtilities {
     }
     
     /**
-     * Calls an ActionListener on both double-click and the enter key in the given JList.
-     */
-    public static void setJListAction(final JList list, final ActionListener listener) {
-        list.addMouseListener(new MouseAdapter() {
+     * Binds an ActionListener to both double-click and the enter key in the given component.
+s     */
+    public static void bindDoubleClickAndEnter(final JComponent component, final ActionListener listener) {
+        component.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    listener.actionPerformed(new ActionEvent(list, ActionEvent.ACTION_PERFORMED, null, e.getWhen(), e.getModifiers()));
+                    listener.actionPerformed(new ActionEvent(component, ActionEvent.ACTION_PERFORMED, null, e.getWhen(), e.getModifiers()));
                 }
             }
         });
@@ -50,7 +50,7 @@ public class ComponentUtilities {
                 listener.actionPerformed(e);
             }
         };
-        ComponentUtilities.initKeyBinding(list, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), trampoline);
+        ComponentUtilities.initKeyBinding(component, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), trampoline);
     }
     
     /**
