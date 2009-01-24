@@ -337,7 +337,9 @@ public:
     // Until we've successfully opened it, though, we can keep trying alternatives.
     SharedLibraryHandle openWin32JvmLibrary() const {
         std::ostringstream os;
-        os << "Couldn't find jvm.dll - please install a 1.5 or newer JRE or JDK.";
+        os << "Couldn't find ";
+        os << sizeof(void*) * 8;
+        os << " bit jvm.dll - please install a 1.5 or newer JRE or JDK.";
         os << std::endl;
         os << "Error messages were:";
         os << std::endl;
