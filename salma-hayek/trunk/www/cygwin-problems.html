@@ -49,6 +49,14 @@ The next major version of Cygwin will not support the old operating systems, and
 The Cygwin maintainers <a href="http://cygwin.com/ml/cygwin-patches/2006-q3/msg00014.html">didn't like the approach</a> he took.
 If you try his version, please let us know how you get on.
 
+<h2>Why can't java-launcher find jvm.dll on 64 bit Windows?</h2>
+
+<p>All our projects are designed to work with both 64 bit and 32 bit processors.
+Cygwin itself, however, is 32 bit only.
+Our Cygwin-compiled java-launcher.exe is thus a 32 bit application and cannot load a 64 bit shared library.
+Terminator needs to use a Cygwin-compiled Java launcher in order to be able to load a JNI DLL that uses Cygwin's pseudo-terminal support.
+A 32 bit Java installation should work fine on 64 bit Windows.
+
 <h2>Why does telnet(1) quit without doing anything?</h2>
 
 <p>Microsoft's telnet program does that when started from Cygwin terminals like Terminator and rxvt.
