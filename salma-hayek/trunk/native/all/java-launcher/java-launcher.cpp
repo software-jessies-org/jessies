@@ -442,6 +442,10 @@ public:
     }
     
     SharedLibraryHandle openJvmLibrary() const {
+        const char* jvmSharedLibrary = getenv("ORG_JESSIES_LAUNCHER_JVM_SHARED_LIBRARY");
+        if (jvmSharedLibrary != 0) {
+            return openSharedLibrary(jvmSharedLibrary);
+        }
         JvmLocation jvmLocation(isClient);
         return jvmLocation.openJvmLibrary();
     }
