@@ -10,8 +10,13 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         super(textArea);
     }
     
-    @Override
-    public boolean isElectric(char c) {
+    private void debug(String message) {
+        if (false) {
+            System.err.println(message);
+        }
+    }
+    
+    @Override public boolean isElectric(char c) {
         FileType fileType = textArea.getFileType();
         if ((c == '#' || c == '<') && (fileType == FileType.C_PLUS_PLUS)) {
             // C++ wants special handling of operator<< and pre-processor directives.
@@ -93,22 +98,48 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
      * }
      * (Here, non-indented access specifiers and half-indented ones are both common. It might be best to just ignore them completely.)
      */
-    private boolean isDefinitive(String activePartOfLine) {
-        return isBlockBegin(activePartOfLine) || isBlockEnd(activePartOfLine) || isLabel(activePartOfLine);
-    }
-    
-    public int getPreviousDefinitiveLineNumber(int startLineNumber) {
+    private DefinitiveLine getPreviousDefinitiveLine(int startLineNumber) {
         for (int lineIndex = startLineNumber - 1; lineIndex >= 0; --lineIndex) {
-            String line = getActivePartOfLine(lineIndex);
-            if (isDefinitive(line)) {
-                return lineIndex;
+            String activePartOfLine = getActivePartOfLine(lineIndex);
+            if (isBlockBegin(activePartOfLine)) {
+                if (activePartOfLine.endsWith(") {")) {
+                    // Find the matching opening parenthesis: *that* line is the definitive one.
+                    final String wholeLine = textArea.getLineText(lineIndex);
+                    final int closingParenthesisOffset = textArea.getLineStartOffset(lineIndex) + wholeLine.lastIndexOf(") {");
+                    debug("need to find matching opening paren for closing paren at offset" + closingParenthesisOffset + " on line " + lineIndex + "...");
+                    int openingParenthesisOffset = PBracketUtilities.findMatchingBracketInSameStyle(textArea, closingParenthesisOffset);
+                    if (openingParenthesisOffset == -1) {
+                        // We're confused; keep searching.
+                        continue;
+                    } else {
+                        final int openingParenthesisLineIndex = textArea.getLineOfOffset(openingParenthesisOffset);
+                        debug("translated offset " + openingParenthesisOffset + " to line number " + openingParenthesisLineIndex + "!");
+                        return new DefinitiveLine(openingParenthesisLineIndex, false);
+                    }
+                }
+                return new DefinitiveLine(lineIndex, false);
+            } else if (isBlockEnd(activePartOfLine)) {
+                // I'm not aware of any case where a closing brace isn't truly definitive.
+                return new DefinitiveLine(lineIndex, true);
+            } else if (isLabel(activePartOfLine)) {
+                // Ignore these, as per this method's doc comment?
+                //return lineIndex;
+                continue;
             }
         }
-        return -1;
+        return null;
     }
     
-    @Override
-    public String calculateNewIndentation(int lineIndex) {
+    private static class DefinitiveLine {
+        int lineIndex;
+        boolean closing;
+        DefinitiveLine(int lineIndex, boolean closing) {
+            this.lineIndex = lineIndex;
+            this.closing = closing;
+        }
+    }
+    
+    @Override public String calculateNewIndentation(int lineIndex) {
         FileType fileType = textArea.getFileType();
         
         String activePartOfLine = getActivePartOfLine(lineIndex);
@@ -131,21 +162,24 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         
         String indentation = "";
-        int previousDefinitive = getPreviousDefinitiveLineNumber(lineIndex);
-        if (previousDefinitive != -1) {
-            indentation = getCurrentIndentationOfLine(previousDefinitive);
+        DefinitiveLine previousDefinitive = getPreviousDefinitiveLine(lineIndex);
+        if (previousDefinitive != null) {
+            indentation = getCurrentIndentationOfLine(previousDefinitive.lineIndex);
+            debug("indentation1='"+indentation+"'");
             
-            String activePartOfPrevious = getActivePartOfLine(previousDefinitive);
-            if (isBlockBegin(activePartOfPrevious) || isLabel(activePartOfPrevious)) {
+            if (!previousDefinitive.closing) {
                 indentation = increaseIndentation(indentation);
+                debug("indentation2='"+indentation+"'");
             }
         }
         
         if (isBlockEnd(activePartOfLine) || isLabel(activePartOfLine)) {
             indentation = decreaseIndentation(indentation);
+            debug("indentation3='"+indentation+"'");
         }
         
         indentation += extraBlockCommentArtForLine(lineIndex);
+        debug("indentation4='"+indentation+"'");
         
         return indentation;
     }
