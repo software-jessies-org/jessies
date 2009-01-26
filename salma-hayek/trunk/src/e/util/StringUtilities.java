@@ -303,6 +303,27 @@ public class StringUtilities {
         }
     }
     
+    public static String urlDecode(String s) {
+        try {
+            return java.net.URLDecoder.decode(s, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            // Can't happen. We're guaranteed UTF-8.
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    @Test private static void testUrlEncode() {
+        Assert.equals(urlEncode("hello"), "hello");
+        Assert.equals(urlEncode("hello world 1+2"), "hello+world+1%2B2");
+        Assert.equals(urlEncode("<hello&world>"), "%3Chello%26world%3E");
+    }
+    
+    @Test private static void testUrlDecode() {
+        Assert.equals(urlDecode("hello"), "hello");
+        Assert.equals(urlDecode("hello+world+1%2B2"), "hello world 1+2");
+        Assert.equals(urlDecode("%3Chello%26world%3E"), "<hello&world>");
+    }
+    
     /**
      * Returns the number of times 'ch' occurs in 'chars'.
      */
