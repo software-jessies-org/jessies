@@ -17,11 +17,14 @@ import java.io.*;
  * If it is, we should support an arbitrary number of such custom build tools, similar to the ExternalTool situation.
  */
 public class BuildAction extends ETextAction {
+    private final boolean test;
+    
     private boolean building = false;
 
-    public BuildAction() {
-        super("_Build Project", GuiUtilities.makeKeyStroke("B", false));
+    public BuildAction(boolean test) {
+        super(test ? "Build and _Test Project" : "_Build Project", GuiUtilities.makeKeyStroke("B", test));
         GnomeStockIcon.useStockIcon(this, "gtk-execute");
+        this.test = test;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -118,10 +121,18 @@ public class BuildAction extends ETextAction {
     }
     
     private String addTarget(Workspace workspace, String command) {
-        String target = workspace.getBuildTarget();
-        if (target.length() == 0) {
-            return command;
+        String result = command;
+        
+        // FIXME: it would be good if we better understood what was being specified here. Personally, I mainly pass "-j".
+        String workspaceTarget = workspace.getBuildTarget();
+        if (workspaceTarget.length() == 0) {
+            result += " " + workspaceTarget;
         }
-        return command + " " + target;
+        // FIXME: does this work for Ant?
+        if (test) {
+            result += " test";
+        }
+        
+        return result;
     }
 }
