@@ -125,7 +125,7 @@ public class BuildAction extends ETextAction {
         
         // FIXME: it would be good if we better understood what was being specified here. Personally, I mainly pass "-j".
         String workspaceTarget = workspace.getBuildTarget();
-        if (workspaceTarget.length() == 0) {
+        if (workspaceTarget.length() != 0) {
             result += " " + workspaceTarget;
         }
         // FIXME: does this work for Ant?
