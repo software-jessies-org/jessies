@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.geom.*;
 
@@ -75,7 +76,7 @@ public enum TagType {
     }
     
     public String describe(String identifier) {
-        return formatString.replaceAll("%s", identifier);
+        return formatString.replaceAll("%s", StringUtilities.replacementStringFromLiteral(identifier));
     }
     
     public static TagType fromChar(char typeChar) {
