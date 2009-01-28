@@ -216,6 +216,20 @@ public class StringUtilities {
         return result.toString();
     }
     
+    /** Converts a literal into a form suitable to pass to Matcher's various replacement methods. */
+    public static String replacementStringFromLiteral(CharSequence literal) {
+        StringBuilder result = new StringBuilder();
+        final String REPLACEMENT_META_CHARACTERS = "\\$";
+        for (int i = 0; i < literal.length(); i++) {
+            char c = literal.charAt(i);
+            if (REPLACEMENT_META_CHARACTERS.indexOf(c) != -1) {
+                result.append('\\');
+            }
+            result.append(c);
+        }
+        return result.toString();
+    }
+    
     /**
      * Returns the length in characters of the prefix common to
      * both s1 and s2. If the strings start with different characters,
