@@ -51,8 +51,8 @@ public class PActionFactory {
             GnomeStockIcon.configureAction(this);
         }
         
-        public boolean isEnabled() {
-            PTextArea textArea = getTextArea();
+        @Override public boolean isEnabled() {
+            final PTextArea textArea = getTextArea();
             return (textArea != null && textArea.hasSelection());
         }
         
@@ -67,8 +67,8 @@ public class PActionFactory {
             GnomeStockIcon.configureAction(this);
         }
         
-        public boolean isEnabled() {
-            PTextArea textArea = getTextArea();
+        @Override public boolean isEnabled() {
+            final PTextArea textArea = getTextArea();
             return (textArea != null && textArea.isEditable() && textArea.hasSelection());
         }
         
@@ -81,6 +81,7 @@ public class PActionFactory {
         public FindMatchingBracketAction() {
             super("Find _Matching Bracket", "5", false);
         }
+        
         
         public void performOn(PTextArea textArea) {
             // Find Matching Bracket inhabits a gray area between actions and caret movements.
@@ -117,8 +118,8 @@ public class PActionFactory {
             GnomeStockIcon.configureAction(this);
         }
         
-        public boolean isEnabled() {
-            PTextArea textArea = getTextArea();
+        @Override public boolean isEnabled() {
+            final PTextArea textArea = getTextArea();
             return (textArea != null && textArea.isEditable());
         }
         
@@ -133,8 +134,8 @@ public class PActionFactory {
             GnomeStockIcon.configureAction(this);
         }
         
-        public boolean isEnabled() {
-            PTextArea textArea = getTextArea();
+        @Override public boolean isEnabled() {
+            final PTextArea textArea = getTextArea();
             return (textArea != null && textArea.getTextBuffer().getUndoBuffer().canRedo());
         }
         
@@ -160,8 +161,8 @@ public class PActionFactory {
             GnomeStockIcon.configureAction(this);
         }
         
-        public boolean isEnabled() {
-            PTextArea textArea = getTextArea();
+        @Override public boolean isEnabled() {
+            final PTextArea textArea = getTextArea();
             return (textArea != null && textArea.getTextBuffer().getUndoBuffer().canUndo());
         }
         

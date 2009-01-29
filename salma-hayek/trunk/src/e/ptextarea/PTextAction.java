@@ -15,6 +15,12 @@ public abstract class PTextAction extends AbstractAction {
         GuiUtilities.configureAction(this, name, (key != null) ? GuiUtilities.makeKeyStroke(key, shifted) : null);
     }
     
+    // If you don't require a focused text window, you probably shouldn't be an PTextAction.
+    // Feel free to override if you have more specialist needs (but don't forget this check).
+    public boolean isEnabled() {
+        return (getTextArea() != null);
+    }
+    
     public void actionPerformed(ActionEvent e) {
         PTextArea textArea = getTextArea();
         if (textArea != null) {
