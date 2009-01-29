@@ -1,6 +1,8 @@
 package e.gui;
 
 import e.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * Implements various hacks to best approximate an uneditable text field.
@@ -9,6 +11,11 @@ import e.util.*;
  */
 public class UneditableTextField extends ETextField {
     public UneditableTextField() {
+        this("");
+    }
+    
+    public UneditableTextField(String initialValue) {
+        super(initialValue);
         // Text fields with setEditable(false) don't look very different on any platform but Win32.
         // Win32 is the only platform that clearly distinguishes between all the combinations of editable and enabled.
         // It's sadly unclear that those responsible for the other platforms even understand the distinction.
@@ -17,8 +24,8 @@ public class UneditableTextField extends ETextField {
         // You lose the visual clue that you can select and copy the text, but that's less important than obscuring the visual clue on editable fields that they're editable.
         // FIXME: at the moment, we're far too wide when there are lots of processes with access to the terminal.
         // FIXME: a PTextArea would retain the selection behavior but add wrapping, but we need to change FormPanel first because GridBagLayout won't let us do the right thing when (say) the "dimensions" and "processes" need one line-height each, but "log filename" needs two line-heights.
-        // FIXME: because of the way the GTK+ LAF renders text fields, this looks awful. setBorder effectively just removes the padding, and setOpaque has no effect. See getName for a partial work-around.
-        setBorder(null);
+        // FIXME: because of the way the GTK+ LAF renders text fields, this looks awful. setOpaque has no effect. See getName for a partial work-around.
+        setBorder(new EmptyBorder(getBorder().getBorderInsets(this)));
         setOpaque(false);
         setEditable(false);
     }
