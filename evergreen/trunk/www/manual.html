@@ -280,7 +280,7 @@ If you have an unusual one (and it isn't already hidden in a directory that Ever
 <p>If you dislike Evergreen's default choice of lint checker for a given language, or have a lint checker for a language Evergreen doesn't have a default for, you can override or supplement Evergreen's choices.
 Say you have a C++ static analysis tool you want Evergreen to use.
 Add the property <tt>C++.lintChecker=cpplint</tt> (include any necessary arguments).
-The bit before the "." is the name shown in the File Properties dialog.
+The bit before the "." is the value shown for File Type in the File Properties dialog.
 If lint checking for HTML weren't built in, for example, the current behavior could be specified with <tt>XML.lintChecker=tidy -qe</tt>.
 Note that we use the file type mode's name ("XML") rather than, say, the specific file extension or specific dialect.
 
