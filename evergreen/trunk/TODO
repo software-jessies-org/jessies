@@ -4,7 +4,7 @@ UI
 
 + Intelligently truncate titles too long for the title bar?
 
-+ Make title bars copyable so open files are more easily used from the command-line? Or a drag source in each title bar?
++ Keyboard equivalent for "File Properties" (other than alt f p on Linux/Windows, which is probably good enough).
 
 + Sort windows alphabetically?
 
