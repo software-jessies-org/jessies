@@ -2,15 +2,16 @@ package e.edit;
 
 import e.util.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Moves the focus a given number of workspaces forward or back.
  */
-public class CycleWorkspacesAction extends ETextAction {
+public class CycleWorkspacesAction extends AbstractAction {
     private int indexDelta;
     
     public CycleWorkspacesAction(int indexDelta) {
-        super((indexDelta == 1) ? "_Next Workspace" : "_Previous Workspace", null);
+        GuiUtilities.configureAction(this, (indexDelta == 1) ? "_Next Workspace" : "_Previous Workspace", null);
         this.indexDelta = indexDelta;
         initKeyboardEquivalent();
     }

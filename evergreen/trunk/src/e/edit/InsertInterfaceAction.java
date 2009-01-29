@@ -21,8 +21,8 @@ public class InsertInterfaceAction extends ETextAction {
         super("Insert Java Interface", GuiUtilities.makeKeyStroke("I", true));
     }
     
-    public boolean isEnabled() {
-        ETextWindow textWindow = getFocusedTextWindow();
+    @Override public boolean isEnabled() {
+        final ETextWindow textWindow = getFocusedTextWindow();
         return (textWindow != null && textWindow.getFileType() == FileType.JAVA);
     }
     

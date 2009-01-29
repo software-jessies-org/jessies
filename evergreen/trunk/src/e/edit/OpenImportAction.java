@@ -22,7 +22,9 @@ public class OpenImportAction extends ETextAction {
     public void actionPerformed(ActionEvent e) {
         final Evergreen editor = Evergreen.getInstance();
         final ETextWindow textWindow = getFocusedTextWindow();
-        final FileType fileType = textWindow.getFileType();
+        if (textWindow == null) {
+            return;
+        }
         
         String path = getSelectedText().trim();
         if (path.length() == 0) {
@@ -33,6 +35,7 @@ public class OpenImportAction extends ETextAction {
         }
         
         // Rewrite boilerplate to get a path fragment.
+        final FileType fileType = textWindow.getFileType();
         if (fileType == FileType.C_PLUS_PLUS) {
             // Get rid of "#include <...>".
             path = path.replaceAll("^\\s*#\\s*include\\s+[<\"]([^>\"]+)[\">].*", "$1");

@@ -11,8 +11,8 @@ public class ShowCounterpartAction extends ETextAction {
         super("_Switch to Header/Source", GuiUtilities.makeKeyStroke("P", true));
     }
     
-    public boolean isEnabled() {
-        ETextWindow textWindow = getFocusedTextWindow();
+    @Override public boolean isEnabled() {
+        final ETextWindow textWindow = getFocusedTextWindow();
         return (textWindow != null && textWindow.getCounterpartFilename() != null);
     }
     

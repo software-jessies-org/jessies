@@ -3,21 +3,23 @@ package e.edit;
 import e.util.*;
 import java.io.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Opens the "Find in Files" dialog with a regular expression to match the current
  * selection entered in the dialog's pattern field.
  */
-public class FindFilesContainingSelectionAction extends ETextAction {
+public class FindFilesContainingSelectionAction extends AbstractAction {
     public FindFilesContainingSelectionAction() {
-        super("Find in Files...", GuiUtilities.makeKeyStroke("G", true));
+        GuiUtilities.configureAction(this, "Find in Files...", GuiUtilities.makeKeyStroke("G", true));
     }
     
     public void actionPerformed(ActionEvent e) {
         Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         
         // Get the selection, stripping trailing newlines.
-        String selection = getSelectedText();
+        // ETextAction.getSelectedText returns the empty string if no text window has focus.
+        String selection = ETextAction.getSelectedText();
         selection = selection.replaceAll("\n$", "");
         
         // Only use the selection as a pattern if there are no embedded newlines.
@@ -31,7 +33,7 @@ public class FindFilesContainingSelectionAction extends ETextAction {
     }
     
     public String guessDirectoryToSearchIn() {
-        ETextWindow textWindow = getFocusedTextWindow();
+        ETextWindow textWindow = ETextAction.getFocusedTextWindow();
         if (textWindow == null) {
             return "";
         }

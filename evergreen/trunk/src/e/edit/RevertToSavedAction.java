@@ -12,8 +12,8 @@ public class RevertToSavedAction extends ETextAction {
         GnomeStockIcon.configureAction(this);
     }
     
-    public boolean isEnabled() {
-        ETextWindow textWindow = getFocusedTextWindow();
+    @Override public boolean isEnabled() {
+        final ETextWindow textWindow = getFocusedTextWindow();
         return (textWindow != null && textWindow.canRevertToSaved());
     }
     
