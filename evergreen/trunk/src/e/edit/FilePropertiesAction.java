@@ -14,9 +14,6 @@ import javax.swing.*;
  * encoding.
  */
 public class FilePropertiesAction extends ETextAction {
-    private JTextField endOfLineStringField = new JTextField("", 40);
-    private JTextField indentStringField = new JTextField("", 40);
-    
     public FilePropertiesAction() {
         super("File _Properties...", null);
         GnomeStockIcon.useStockIcon(this, "gtk-info");
@@ -32,11 +29,11 @@ public class FilePropertiesAction extends ETextAction {
         final PTextBuffer buffer = textArea.getTextBuffer();
         String endOfLineString = (String) buffer.getProperty(PTextBuffer.LINE_ENDING_PROPERTY);
         String initialEndOfLine = StringUtilities.escapeForJava(endOfLineString);
-        endOfLineStringField.setText(initialEndOfLine);
+        final JTextField endOfLineStringField = new JTextField(initialEndOfLine, 40);
         
         String indentationString = textArea.getIndentationString();
         String initialIndentationString = StringUtilities.escapeForJava(indentationString);
-        indentStringField.setText(initialIndentationString);
+        final JTextField indentStringField = new JTextField(initialIndentationString, 40);
         
         // FIXME: if you add a charset here, you'll probably have to modify ByteBufferDecoder so we can read the resulting file back in.
         final JComboBox charsetCombo = new JComboBox(new Object[] { "UTF-8", "ISO-8859-1", "UTF-16BE", "UTF-16LE" });
