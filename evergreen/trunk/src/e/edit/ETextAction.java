@@ -11,6 +11,12 @@ public abstract class ETextAction extends AbstractAction {
         GuiUtilities.configureAction(this, name, keystroke);
     }
     
+    // If you don't require a focused text window, you probably shouldn't be an ETextAction.
+    // Feel free to override if you have more specialist needs (but don't forget this check).
+    @Override public boolean isEnabled() {
+        return (getFocusedTextWindow() != null);
+    }
+    
     public abstract void actionPerformed(ActionEvent e);
 
     public static Component getFocusedComponent() {
@@ -35,7 +41,7 @@ public abstract class ETextAction extends AbstractAction {
         return textWindow;
     }
     
-    public String getSelectedText() {
+    public static String getSelectedText() {
         return (getFocusedTextArea() != null) ? getFocusedTextArea().getSelectedText() : "";
     }
     

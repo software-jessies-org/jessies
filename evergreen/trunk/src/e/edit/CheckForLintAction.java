@@ -29,8 +29,8 @@ public class CheckForLintAction extends ETextAction {
         checkForLint();
     }
     
-    public boolean isEnabled() {
-        ETextWindow textWindow = getFocusedTextWindow();
+    @Override public boolean isEnabled() {
+        final ETextWindow textWindow = getFocusedTextWindow();
         return textWindow != null && checkers.containsKey(textWindow.getFileType());
     }
     

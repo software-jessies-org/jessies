@@ -3,19 +3,19 @@ package e.edit;
 import e.gui.*;
 import e.util.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
- * Opens the "Open Quickly" dialog with the current selection entered in the dialog's
- * text field.
+ * Opens the "Open Quickly" dialog with the current selection (if any) entered in the dialog's text field.
  */
-public class OpenQuicklyAction extends ETextAction {
+public class OpenQuicklyAction extends AbstractAction {
     public OpenQuicklyAction() {
-        super("_Open Quickly...", GuiUtilities.makeKeyStroke("O", false));
+        GuiUtilities.configureAction(this, "_Open Quickly...", GuiUtilities.makeKeyStroke("O", false));
         GnomeStockIcon.useStockIcon(this, "gtk-open");
     }
     
     public void actionPerformed(ActionEvent e) {
-        String filename = getSelectedText();
+        String filename = ETextAction.getSelectedText();
         if (filename.startsWith("~") || filename.startsWith("/")) {
             // If we have an absolute name, we can go straight there.
             Evergreen.getInstance().openFile(filename);

@@ -80,7 +80,7 @@ public class ExternalToolAction extends ETextAction {
         runCommand(shellCommand);
     }
     
-    public boolean isEnabled() {
+    @Override public boolean isEnabled() {
         return (needsFile == false || getFocusedTextWindow() != null);
     }
     

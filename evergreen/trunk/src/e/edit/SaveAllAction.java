@@ -9,7 +9,7 @@ public class SaveAllAction extends AbstractAction {
         GuiUtilities.configureAction(this, "Save A_ll", null);
     }
     
-    public boolean isEnabled() {
+    @Override public boolean isEnabled() {
         for (Workspace workspace : Evergreen.getInstance().getWorkspaces()) {
             if (workspace.getDirtyTextWindows().length > 0) {
                 return true;

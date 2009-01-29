@@ -11,16 +11,16 @@ import javax.swing.*;
 /**
  * An action for the operation of creating and opening a new file.
  */
-public class NewFileAction extends ETextAction {
+public class NewFileAction extends AbstractAction {
     private static final FilenameChooserField filenameField = new FilenameChooserField(JFileChooser.FILES_AND_DIRECTORIES);
     
     public NewFileAction() {
-        super("_New File...", GuiUtilities.makeKeyStroke("N", false));
+        GuiUtilities.configureAction(this, "_New File...", GuiUtilities.makeKeyStroke("N", false));
         GnomeStockIcon.useStockIcon(this, "gtk-new");
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextWindow window = getFocusedTextWindow();
+        ETextWindow window = ETextAction.getFocusedTextWindow();
         if (window != null) {
             filenameField.setPathname(window.getContext());
         } else {
