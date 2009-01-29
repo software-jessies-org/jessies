@@ -44,6 +44,7 @@ public class FilePropertiesAction extends ETextAction {
         
         FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Properties for \"" + window.getFilename() + "\"");
         FormPanel formPanel = form.getFormPanel();
+        formPanel.addRow("Filename:", new UneditableTextField(window.getFilename()));
         formPanel.addRow("End of Line:", endOfLineStringField);
         formPanel.addRow("Indent With:", indentStringField);
         formPanel.addRow("Character Encoding:", charsetCombo);
