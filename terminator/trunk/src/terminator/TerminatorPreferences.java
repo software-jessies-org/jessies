@@ -142,10 +142,10 @@ public class TerminatorPreferences extends Preferences {
         
         public void addRow(List<FormPanel> formPanels, final String key, final String description) {
             final JSlider slider = new JSlider(0, 255);
-            slider.setValue((int) (255 * getDouble(key)));
+            slider.setValue((int) (slider.getMaximum() * getDouble(key)));
             slider.addChangeListener(new javax.swing.event.ChangeListener() {
                 public void stateChanged(javax.swing.event.ChangeEvent e) {
-                    put(key, ((double) slider.getValue())/256);
+                    put(key, ((double) slider.getValue())/slider.getMaximum());
                 }
             });
             // Only enable the slider if the JVM seems likely to support setFrameAlpha.
