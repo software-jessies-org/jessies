@@ -379,8 +379,12 @@ RFEs
   to telnet(1), I have to create a new tab. It might be nice to add a little
   "Run Again" button to the terminal when its process exits.
 
-* Some kind of built-in log searching. Using grep(1) from within Terminator
+* Some kind of built-in log browsing/searching. Using grep(1) from within Terminator
   causes trouble as the newly logged matches are themselves found.
+  * "You have <count> log files from <date> to <date> taking up <bytes> on disk."
+  * date/name-based search. (date-based is awkward because we only have *start* dates in filenames. we could use mtime to work out when the session ended, but people who keep a few terminals for a long time won't be much helped.)
+  * content-based search.
+  * "Remove All" / "Remove Old" (older than given date? 6 months?)
 
 * Log timestamps seem to be requested relatively frequently. Either the ability
   to manually ask to write a specific mark to the log or automatic timestamping
