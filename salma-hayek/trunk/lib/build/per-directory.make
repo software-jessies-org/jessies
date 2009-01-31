@@ -67,9 +67,7 @@ JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 
 BUILDING_JNI = $(JNI_SOURCE)
 
-# Cocoa won't build or link for x86_64 on Mac OS X 10.4 and we use Cocoa freely except in JNI code.
-LOCAL_C_AND_CXX_FLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64)
-LOCAL_LDFLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64 -framework JavaVM)
+LOCAL_LDFLAGS.Darwin += $(if $(BUILDING_JNI),-framework JavaVM)
 
 # ----------------------------------------------------------------------------
 # Build shared libraries.
