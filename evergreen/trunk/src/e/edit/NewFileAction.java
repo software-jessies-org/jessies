@@ -45,7 +45,7 @@ public class NewFileAction extends AbstractAction {
             if (newFile.isAbsolute() == false) {
                 // A new file, if no absolute path is specified, should be
                 // created relative to the root of the current workspace.
-                newFile = FileUtilities.fileFromParentAndString(editor.getCurrentWorkspace().getCanonicalRootDirectory(), filename);
+                newFile = FileUtilities.fileFromParentAndString(editor.getCurrentWorkspace().getRootDirectory(), filename);
             }
             File directory = newFile.getParentFile();
             if (directory.exists() == false) {

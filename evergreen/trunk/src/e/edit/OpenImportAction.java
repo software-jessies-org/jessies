@@ -68,7 +68,7 @@ public class OpenImportAction extends ETextAction {
                 file = FileUtilities.fileFromParentAndString(importDir, path);
             } else {
                 // We interpret non-absolute paths as being rooted at the current workspace's root.
-                String root = editor.getCurrentWorkspace().getCanonicalRootDirectory();
+                final String root = editor.getCurrentWorkspace().getRootDirectory();
                 file = new File(FileUtilities.fileFromParentAndString(root, importDir), path);
             }
             
