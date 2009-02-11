@@ -138,7 +138,8 @@ public class ShellCommand {
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StreamMonitor streamMonitor = new StreamMonitor(bufferedReader, this, isStdErr);
         // Circumvent SwingWorker's MAX_WORKER_THREADS limit, as a ShellCommand may run for arbitrarily long.
-        ThreadUtilities.newSingleThreadExecutor(command).execute(streamMonitor);
+        final String threadName = (isStdErr ? "stderr" : "stdout") + " pump for " + command;
+        ThreadUtilities.newSingleThreadExecutor(threadName).execute(streamMonitor);
     }
     
     /**
