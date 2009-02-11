@@ -33,7 +33,7 @@ public class GoToTagAction extends ETextAction {
             return;
         }
         
-        final String workspaceRoot = Evergreen.getInstance().getCurrentWorkspace().getCanonicalRootDirectory();
+        final String workspaceRoot = Evergreen.getInstance().getCurrentWorkspace().getRootDirectory();
         
         // Call our helper script/binary to find the tags for us.
         final String defaultFindTagsBinary = System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "scripts" + File.separator + "find-tags.rb";
