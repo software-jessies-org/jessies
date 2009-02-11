@@ -137,6 +137,7 @@ public class ShellCommand {
         InputStreamReader inputStreamReader = new InputStreamReader(stream, "UTF-8");
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StreamMonitor streamMonitor = new StreamMonitor(bufferedReader, this, isStdErr);
+        // Circumvent SwingWorker's MAX_WORKER_THREADS limit, as a ShellCommand may run for arbitrarily long.
         ThreadUtilities.newSingleThreadExecutor(command).execute(streamMonitor);
     }
     
