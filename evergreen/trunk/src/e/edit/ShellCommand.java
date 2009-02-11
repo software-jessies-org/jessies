@@ -137,7 +137,7 @@ public class ShellCommand {
         InputStreamReader inputStreamReader = new InputStreamReader(stream, "UTF-8");
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StreamMonitor streamMonitor = new StreamMonitor(bufferedReader, this, isStdErr);
-        streamMonitor.execute();
+        ThreadUtilities.newSingleThreadExecutor(command).execute(streamMonitor);
     }
     
     /**
