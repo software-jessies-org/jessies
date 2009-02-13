@@ -314,6 +314,7 @@ cwchar
 cwctype
 # Standard headers from C which are still in common use in C++.
 stddef
+stdint
 # Some of the standard functions from C99 which are not yet in C++ 2003.
 # From Annex B of ISO/IEC 9899:1999.
 # inttypes.h
