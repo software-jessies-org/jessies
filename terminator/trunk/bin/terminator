@@ -116,7 +116,7 @@ class Terminator
                 end
             end
             directory_safe = true
-        rescue SystemCallError
+        rescue SystemCallError => ex
             if directory_exists == false
                 show_alert("Terminator had trouble starting.", "Terminator was unable to create the directory \"#{pathname}\".")
                 exit(1)
