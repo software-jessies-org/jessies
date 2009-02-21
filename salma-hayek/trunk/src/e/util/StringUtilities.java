@@ -141,9 +141,10 @@ public class StringUtilities {
     
     /** Turns a string into a printable Java string literal (minus the quotes). So a tab is converted to "\t", et cetera. */
     public static String escapeForJava(CharSequence s) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
+        final int sLength = s.length();
+        final StringBuilder result = new StringBuilder(sLength);
+        for (int i = 0; i < sLength; ++i) {
+            final char c = s.charAt(i);
             if (c == '\\') {
                 result.append("\\\\");
             } else if (c == '\n') {
@@ -163,10 +164,11 @@ public class StringUtilities {
     
     /** Turns a printable Java string literal (minus the quotes) into a string. So "\t" is converted to a tab, et cetera. */
     public static String unescapeJava(String s) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '\\' && i < s.length() - 1) {
+        final int sLength = s.length();
+        final StringBuilder result = new StringBuilder(sLength);
+        for (int i = 0; i < sLength; ++i) {
+            final char c = s.charAt(i);
+            if (c == '\\' && i < sLength - 1) {
                 char next = s.charAt(++i);
                 if (next == 'n') {
                     result.append('\n');
@@ -192,6 +194,76 @@ public class StringUtilities {
         final String example = "hello\tworld\u01f8\n";
         Assert.equals(escapeForJava(example), "hello\\tworld\\u01f8\\n");
         Assert.equals(unescapeJava(escapeForJava(example)), example);
+    }
+    
+    /**
+     * Escapes &, ", <, and > in the plain-text string 's' so it can be used as HTML.
+     */
+    public static String escapeForHtml(String s) {
+        final int sLength = s.length();
+        final StringBuilder result = new StringBuilder(sLength);
+        for (int i = 0; i < sLength; ++i) {
+            final char ch = s.charAt(i);
+            if (ch == '&') {
+                result.append("&amp;");
+            } else if (ch == '"') {
+                result.append("&quot;");
+            } else if (ch == '>') {
+                result.append("&gt;");
+            } else if (ch == '<') {
+                result.append("&lt;");
+            } else {
+                result.append(ch);
+            }
+        }
+        return result.toString();
+    }
+    
+    /**
+     * Reverses the escaping done by escapeForHtml.
+     * This method is only meant to cope with HTML from escapeForHtml, not general HTML using arbitrary entities.
+     * Unknown entities will be preserved.
+     */
+    public static String unescapeHtml(String s) {
+        final int sLength = s.length();
+        final StringBuilder result = new StringBuilder(sLength);
+        for (int i = 0; i < sLength; ++i) {
+            final char ch = s.charAt(i);
+            if (ch == '&') {
+                if (s.startsWith("&amp;", i)) {
+                    result.append('&');
+                    i += 4;
+                } else if (s.startsWith("&quot;", i)) {
+                    result.append('"');
+                    i += 5;
+                } else if (s.startsWith("&gt;", i)) {
+                    result.append('>');
+                    i += 3;
+                } else if (s.startsWith("&lt;", i)) {
+                    result.append('<');
+                    i += 3;
+                } else {
+                    // There are a lot of entities we don't know. Leave them unmolested.
+                    result.append(ch);
+                }
+            } else {
+                result.append(ch);
+            }
+        }
+        return result.toString();
+    }
+    
+    @Test private static void testEscapeForHtml() {
+        Assert.equals(escapeForHtml("hello, world!"), "hello, world!");
+        Assert.equals(escapeForHtml("1 < 2 && 2 > 1"), "1 &lt; 2 &amp;&amp; 2 &gt; 1");
+        Assert.equals(escapeForHtml("puts(\"hello, world!\")"), "puts(&quot;hello, world!&quot;)");
+    }
+    
+    @Test private static void testUnescapeHtml() {
+        Assert.equals(unescapeHtml("hello, world!"), "hello, world!");
+        Assert.equals(unescapeHtml("1 &lt; 2 &amp;&amp; 2 &gt; 1"), "1 < 2 && 2 > 1");
+        Assert.equals(unescapeHtml("puts(&quot;hello, world!&quot;)"), "puts(\"hello, world!\")");
+        Assert.equals(unescapeHtml("hello,&nbsp;world!"), "hello,&nbsp;world!");
     }
     
     /** Converts a string into a regular expression matching exactly that string. */
