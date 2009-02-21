@@ -15,8 +15,28 @@ import javax.swing.*;
  */
 public class AboutBox {
     public static enum License {
-        UNKNOWN,
-        GPL_2_OR_LATER,
+        UNKNOWN("Unknown license.\n"),
+        
+        GPL_2_OR_LATER(
+            "%APP% is free software: you can redistribute it and/or modify\n" +
+            "it under the terms of the GNU General Public License as published by\n" +
+            "the Free Software Foundation; either version 2 of the License, or\n" +
+            "(at your option) any later version.\n" +
+            "\n" +
+            "%APP% is distributed in the hope that it will be useful,\n" +
+            "but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+            "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" +
+            "GNU General Public License for more details.\n" +
+            "\n"+
+            "You should have received a copy of the GNU General Public License\n" +
+            "along with %APP%; If not, see <http://www.gnu.org/licenses/>.\n"
+        );
+        
+        public final String text;
+        
+        private License(String text) {
+            this.text = text;
+        }
     }
     
     private static final AboutBox INSTANCE = new AboutBox();
@@ -347,18 +367,7 @@ public class AboutBox {
             
             PTextArea textArea = new PTextArea(13, 40);
             textArea.setEditable(false);
-            textArea.setText(Log.getApplicationName() + " is free software: you can redistribute it and/or modify\n" +
-                "it under the terms of the GNU General Public License as published by\n" +
-                "the Free Software Foundation; either version 2 of the License, or\n" +
-                "(at your option) any later version.\n" +
-                "\n" +
-                Log.getApplicationName() + " is distributed in the hope that it will be useful,\n" +
-                "but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
-                "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" +
-                "GNU General Public License for more details.\n" +
-                "\n"+
-                "You should have received a copy of the GNU General Public License\n" +
-                "along with " + Log.getApplicationName() + "; If not, see <http://www.gnu.org/licenses/>.\n");
+            textArea.setText(license.text.replaceAll("%APP%", Log.getApplicationName()));
             textArea.setWrapStyleWord(true);
             
             JButton closeButton = makeCloseButton(new ActionListener() {
