@@ -17,6 +17,24 @@ public class AboutBox {
     public static enum License {
         UNKNOWN("Unknown license.\n"),
         
+        APL_2(
+            // Unlike the GPL, I couldn't find standard text suitable for UI.
+            // I've used the friendly first line of the usual GPL UI formulation,
+            // followed by the APL2 per-file comment, replacing "file" with "software".
+            "%APP% is free software: you can redistribute it and/or modify " +
+            "it under the terms of the Apache License, Version 2.0 (the \"License\"); " +
+            "you may not use this software except in compliance with the License. " +
+            "You may obtain a copy of the License at\n" +
+            "\n" +
+            "   http://www.apache.org/licenses/LICENSE-2.0\n" +
+            "\n" +
+            "Unless required by applicable law or agreed to in writing, software " +
+            "distributed under the License is distributed on an \"AS IS\" BASIS, " +
+            "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied." +
+            "See the License for the specific language governing permissions and " +
+            "limitations under the License."
+        ),
+        
         GPL_2_OR_LATER(
             "%APP% is free software: you can redistribute it and/or modify\n" +
             "it under the terms of the GNU General Public License as published by\n" +
@@ -242,7 +260,7 @@ public class AboutBox {
             buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
             buttonPanel.add(creditsButton);
             buttonPanel.add(Box.createHorizontalGlue());
-            if (license == License.GPL_2_OR_LATER) {
+            if (license != License.UNKNOWN) {
                 buttonPanel.add(licenseButton);
                 buttonPanel.add(Box.createHorizontalGlue());
             }
