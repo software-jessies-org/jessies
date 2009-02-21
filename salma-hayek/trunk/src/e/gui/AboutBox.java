@@ -14,8 +14,14 @@ import javax.swing.*;
  * A simple "about box".
  */
 public class AboutBox {
+    public static enum License {
+        UNKNOWN,
+        GPL_2_OR_LATER,
+    }
+    
     private static final AboutBox INSTANCE = new AboutBox();
     
+    private License license = License.UNKNOWN;
     private ImageIcon icon;
     private String webSiteAddress;
     private ArrayList<String> versionLines = new ArrayList<String>();
@@ -85,6 +91,10 @@ public class AboutBox {
      */
     public void addCopyright(String copyright) {
         copyrightLines.add(copyright.replaceAll("\\([Cc]\\)", "\u00a9"));
+    }
+    
+    public void setLicense(License license) {
+        this.license = license;
     }
     
     private Frame findSuitableOwner() {
@@ -212,8 +222,10 @@ public class AboutBox {
             buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
             buttonPanel.add(creditsButton);
             buttonPanel.add(Box.createHorizontalGlue());
-            buttonPanel.add(licenseButton);
-            buttonPanel.add(Box.createHorizontalGlue());
+            if (license == License.GPL_2_OR_LATER) {
+                buttonPanel.add(licenseButton);
+                buttonPanel.add(Box.createHorizontalGlue());
+            }
             buttonPanel.add(closeButton);
             
             panel.add(Box.createRigidArea(spacerSize));
