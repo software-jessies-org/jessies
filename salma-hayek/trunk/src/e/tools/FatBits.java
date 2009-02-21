@@ -72,6 +72,7 @@ public class FatBits extends MainFrame {
         aboutBox.setWebSiteAddress("http://software.jessies.org/salma-hayek/");
         aboutBox.addCopyright("Copyright (C) 2005-2008 software.jessies.org team.");
         aboutBox.addCopyright("All Rights Reserved.");
+        aboutBox.setLicense(AboutBox.License.GPL_2_OR_LATER);
     }
     
     private void initMacOsEventHandlers() {
