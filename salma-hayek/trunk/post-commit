@@ -103,7 +103,7 @@ if $? != 0
             fd.puts("\n")
             fd.puts(updateResult)
         }
-    rescue
+    rescue Exception => ex
         exit(1)
     end
 end

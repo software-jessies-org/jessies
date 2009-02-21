@@ -80,7 +80,7 @@ class InAppClient
     print(serverOutput.join(""))
     telnet.close()
     return success
-  rescue
+  rescue Exception => ex
     return false
   end
 end
@@ -375,7 +375,7 @@ class Java
       begin
         File.new(@log_filename, "w").close() # Like touch(1).
         add_pathname_property("e.util.Log.filename", @log_filename)
-      rescue SystemCallError
+      rescue SystemCallError => ex
         # Inability to create the log file is not fatal.
       end
     end
