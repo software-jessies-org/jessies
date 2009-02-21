@@ -116,8 +116,8 @@ else
             else
                 block.call()
             end
-        rescue Exception => e
-            show_uncaught_exception(app_name, e)
+        rescue Exception => ex
+            show_uncaught_exception(app_name, ex)
             exit(1)
         end
     end
