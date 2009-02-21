@@ -124,6 +124,7 @@ public class Terminator {
 		aboutBox.setWebSiteAddress("http://software.jessies.org/terminator/");
 		aboutBox.addCopyright("Copyright (C) 2004-2009 software.jessies.org team.");
 		aboutBox.addCopyright("All Rights Reserved.");
+		aboutBox.setLicense(AboutBox.License.GPL_2_OR_LATER);
 	}
 	
 	private void startTerminatorServer() {
