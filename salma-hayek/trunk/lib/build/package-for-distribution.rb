@@ -92,9 +92,13 @@ def generate_debian_package_description(human_project_name)
     return description
 end
 
+# Copies 'src' to 'dst', if 'src' exists.
+# If 'src' doesn't exist, will accept 'src'.txt instead.
 def maybe_copy_file(src, dst)
     if File.exist?(src)
         FileUtils.cp(src, dst)
+    elsif File.exist?("#{src}.txt")
+        FileUtils.cp("#{src}.txt", dst)
     end
 end
 
