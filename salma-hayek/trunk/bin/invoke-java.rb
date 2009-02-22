@@ -109,8 +109,16 @@ class Java
     @log_filename = ""
     @initiate_startup_notification = true
 
-    # Cope with symbolic links to this script.
-    @project_root = Pathname.new("#{$0}/..").realpath().dirname()
+    # The 'realpath' calls are to cope with symbolic links to the launch
+    # script and this script.
+    # We look at the PROJECT_ROOT environment variable first so that we can
+    # run tests with org.jessies.TestRunner in the context of the project under
+    # tests (rather than the project containing the TestRunner script itself,
+    # which is always salma-hayek).
+    @project_root = ENV["PROJECT_ROOT"]
+    if @project_root == nil
+      @project_root = Pathname.new("#{$0}/..").realpath().dirname()
+    end
     @salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
     
     # Load salma-hayek libraries.
