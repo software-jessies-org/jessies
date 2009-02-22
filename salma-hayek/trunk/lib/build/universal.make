@@ -338,6 +338,8 @@ SUBDIRS := $(sort $(patsubst %/,%,$(dir $(wildcard $(NATIVE_SOURCE)))))
 
 PROJECT_ROOT = $(CURDIR)
 
+export PROJECT_ROOT
+
 DISTINCT_PROJECT_ROOTS = $(sort $(PROJECT_ROOT) $(SALMA_HAYEK))
 
 PROJECT_DIRECTORY_BASE_NAME = $(notdir $(PROJECT_ROOT))
