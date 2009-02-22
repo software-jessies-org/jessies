@@ -465,7 +465,10 @@ end
 #    (Ignore setuid because it's likely to be a real mistake that needs investigating.)
 system("chmod -R g-s #{tmp_dir}")
 # 2. You're not supposed (it's a warning rather than an error) to create packages with contents writable by users other than root.
-system("chmod -R og-w #{tmp_dir}")
+system("chmod -R go-w #{tmp_dir}")
+# 3. Since everything will be installed as root:root, make sure normal users still have access.
+#    It's unrealistic to assume everything has the right "group" and "other" permissions in the repository.
+system("chmod -R go+rX #{tmp_dir}")
 
 # The files in a .deb will be installed with the uid and gid values they had when packaged.
 # It's traditional to install as root, so everything should be owned by root when packaging.
