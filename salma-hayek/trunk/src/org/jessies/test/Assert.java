@@ -22,6 +22,12 @@ public final class Assert {
         }
     }
     
+    public static void contains(String lhs, String rhs) {
+        if (!lhs.contains(rhs)) {
+            throw new RuntimeException(toString(lhs) + " does not contain " + toString(rhs));
+        }
+    }
+    
     // Outputs 'o' in the most useful form given the circumstances.
     private static String toString(Object o) {
         if (o instanceof String) {
