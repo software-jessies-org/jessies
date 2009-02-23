@@ -34,9 +34,11 @@ public class HelpMenu {
         menu.add(DebugMenu.makeJMenu());
         
         // "Report a Problem".
-        final String supportAddress = System.getProperty("e.gui.HelpMenu.supportAddress", "software@jessies.org");
-        final String subjectLine = AboutBox.getSharedInstance().getProblemReportSubject();
-        menu.add(new WebLinkAction("Report a Problem", "mailto:" + supportAddress + "?subject=" + subjectLine));
+        final String supportAddress = System.getProperty("e.gui.HelpMenu.supportAddress");
+        if (supportAddress != null) {
+            final String subjectLine = AboutBox.getSharedInstance().getProblemReportSubject();
+            menu.add(new WebLinkAction("Report a Problem", "mailto:" + supportAddress + "?subject=" + subjectLine));
+        }
         
         // "Get Help Online...".
         final String supportSite = System.getProperty("e.gui.HelpMenu.supportSite");
